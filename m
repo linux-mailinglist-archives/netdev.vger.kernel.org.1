@@ -1,123 +1,147 @@
-Return-Path: <netdev+bounces-82274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 178E888D064
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 23:03:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4488B88D068
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 23:06:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAE5F1F61626
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:03:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92348B213FF
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1624D13D8A0;
-	Tue, 26 Mar 2024 22:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBDF813D89D;
+	Tue, 26 Mar 2024 22:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fD7rG1NG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tv4f1lNE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE9613C9CD
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 22:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA4B13D604;
+	Tue, 26 Mar 2024 22:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711490629; cv=none; b=UDyNtsxYLorhj3mbepNu/+rm54f8bLX4T6d/s4qvwGPki8VpJle03gq4hMTkQdIlGCkkZHH2WDPBIxSxM7xiuzmsjTGFTH1OtZ3s1GdA9HTIv8V7HM8/Jqc1EFId3nEpinaRC5eIU6Er2VqljjEP7NqfOFXcj0JFmehhFVi/HoY=
+	t=1711490788; cv=none; b=lPfwRjd4e5IU/Gb4Gu8lDeSUhULyM4gv6JrPty/lrigSFqPJEmvkvSMWBxzRVcbhUxmp+NWIWogaf5uBNdU+uheqbRr0fiGljUBAgcxBLI2ddvT7NYFgutMKMElSdBdpgBiVFMNezjNPpd6j22l5gl+lqBQE4Li5ybh1PJi5Las=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711490629; c=relaxed/simple;
-	bh=7TKd0saSqO2snc89msEoa1QA+B9bSgZkg7SBKFh1Jf8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=anMnKy8tQPZb8WgiHTMWcSBpU9a8eLVBjly3f4eHFONz+GQaty8JSQjU+f7W/Vl7X1Su0sKOjuspa6DnAI4gdqWvJTVGpvgVebZsWKdNrutkQyuLz2SuyRG4SLFkfzxo3HjxUsw++s0tgKEYbaJNV64+aB6ELD68sA855bxDuwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fD7rG1NG; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5a4a14c52fcso2801730eaf.1
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 15:03:47 -0700 (PDT)
+	s=arc-20240116; t=1711490788; c=relaxed/simple;
+	bh=TL9l5kVxRW7ebqXvNEm/v9prUz+V0nX2Ma1t8SHFn80=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ryd+feDLm3XzUvhOFFh2KOkVZgUbPUJ6Jz8Z7iu3HTR4PdoZ7uMgHFDcyfNLixnMt41J7Yn5jWNg5ZImciciG66lruxno6DDdvkSEOUDKeSEoEvEcYdYdtreyqhSpmi1nBx6seeUtFKwNfR1lD9MGyuoavGq5Ho8HWpF+BHxng8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tv4f1lNE; arc=none smtp.client-ip=209.85.222.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-7e043f577c5so136430241.1;
+        Tue, 26 Mar 2024 15:06:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711490626; x=1712095426; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O7d/79/qhHAW4S4hPjrpaIqd9akj4wQ6SZW8rjZq0n4=;
-        b=fD7rG1NG+OHiGg5VhiYoJN7C/FlWdoQIp69p8l7V5r+cNx/H1JhnS6PhijjxUhGIt/
-         1Qyx4lxhgYdZU7IeEybQGX/DOulQEaOK6AGOOfAq0ZK892hUzPCS2ftEfli8tzOgaFlB
-         KwTt/UGsCvHlvBJYFejtX6Rj1/431KQ2aMsnImjM5bpF25RtdKQVVo18/33lEkXzx+Jm
-         nAOEluiqH3o2Yn6pc3wCxXrCg1IXOikfEbZIrc3/HX+E/ziTSmnPOt61Kwi0/8XB0EZQ
-         bkA0KxPSqUUmiF/anMfw8U1C9/tgKc/zYSNdNmDp5SDTVbVM48zjOvP0teaS1irOgZNM
-         Ecxg==
+        d=gmail.com; s=20230601; t=1711490785; x=1712095585; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TU3+ImXwqiVtc0TZrqGynXRP9+v8b83+IYx34sTtg0o=;
+        b=Tv4f1lNErnWQOOT6HWyb6ssQFBUaj269JGliife3gklKD096gNenMqTcdYFuPAySl6
+         Imy74t9KIp7bjHV5/URQFgNvWK/WGOfGCTZ/Evqy7FMvMArAbyfGv8JcUurSqzTqPUl0
+         7OrhS3Eer3EBRsyV9QbTpbTV6ErQScjp7gwBR5F82Kb/uhSYt77GqkgRz529uRpfE+8t
+         SF19trGRNFfq2Hj43AwpGIEbWdyRH+MrtewgyqRlRvCf25dniGyq/PUkELzotgi0HV4E
+         BrszsjhALIwdUg3Y3WZKwLz9fahKFWDjjNIbEyEgZpoVtSWwIjrUxaBM2Cy6qM5vtyU3
+         gIkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711490626; x=1712095426;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O7d/79/qhHAW4S4hPjrpaIqd9akj4wQ6SZW8rjZq0n4=;
-        b=ZoQ1Wv1o2AINfTXoiZrzWbMBtTu0FD3rTpJSOlhOCnq9I05cwphHIneV2880+ziVK1
-         MGkArNZ/m3WUNO59y13ia3tUFBMFVqE5ufeCDHyAwn/5r5kdP6RWpbyDKUyZKPZ8/B4R
-         eZwHYIoSxiU3hL8YUVwkw8tZptgfcjMdfhipYLZiPRYylm7TyA/d1DEMephHkY4UVoC6
-         CQ3wJ32/J/CV11XNiR9LMf8Xu0h9a++ZFD9Uy5pcR8SDX+/5sNJrUOlFJbdRbovFhnEB
-         xFO6iCY2bi95CTgQtBvBkJe70zWIiyQyFYkUpK7ZkLDxw2eLqrOUUNNyLUOr9euwy/hQ
-         jGgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7PeI8G4PvMARkhh2B0/mng/bpORYivmiURuplpvu9HhTra8q4pY7S24wu+xFkwkx8Hgt29BPd2iSKEkIqcew9P3xZEqqM
-X-Gm-Message-State: AOJu0YzgT1+Mi5xwNvjvB6ahFp98c6HmOdN/8W7MjNkXJMTQio7lDylB
-	a5eDMyGJZsoK/8ObusZ8SukoMwrJ439qUE0Mg92kVWIucMtJ81j1u4ex1UyoTRsN3oCwj6AF2Lh
-	FnhyljJWV1QEJuL3NpEedueU4qqMybYvSthwS
-X-Google-Smtp-Source: AGHT+IEba+EtV8PNVVMiJ5fkeS9vgWsunJxg8PCAWEwaSa5ZMzBYSCbP2XNrmTzPWLRRu4EsCOf+4pcyZLJIse3HFg8=
-X-Received: by 2002:a05:6358:4043:b0:17f:5980:79fa with SMTP id
- a3-20020a056358404300b0017f598079famr1378375rwa.20.1711490626147; Tue, 26 Mar
- 2024 15:03:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711490785; x=1712095585;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TU3+ImXwqiVtc0TZrqGynXRP9+v8b83+IYx34sTtg0o=;
+        b=cyHjjLnCqAgWeQV17/6WXrvBtEwxK/X0tWaZ6SKMrJB3MpYn9l3HrM9Yl1dr4NgFII
+         ABew/F5b+Mbai60AgBe5ZILeytYPMXXXMPvCN+9NGv6+WKGrcp2fcq+zfsEV3wRSEWre
+         Lt2g9++ELP/Gp90i5xF4MJBvoeiRAMAC/i3bxpDKSzH8oKWD2vsFsOIEEdf+UFOgMpcR
+         JxCRPwO9Sy5Xu5F+6Q2ycqsnsCK3Imy6d1zNq4VcRi2R0RZmUbJNjLnT3Qpb3PC8VC/e
+         Gy12AVIKlaHKwi/4w6nNCzasQf1XesdkuEm/tAlZbHu3Rgfg6ffofJsb+sQ77diY7D4Q
+         2T1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWfCjAuMhQTDVtCDi7EWYQOBxJ56lp27nWy66hZ5GwiC1VsZiJN7G4fSR9a5BTitmpZrB9hqTLp9ZZJZXoPlN6ywhNeb5vTfxxO5aHTI8qDmhtKuBGsbv3zGX4M7r4NpmSSvisfrXCDIOAoas1OTEoxnp4NvfgVf6bq
+X-Gm-Message-State: AOJu0Yy0IbwmA6huKubMoMTxJnS15YpMR8xYHCrpAEjtzRhZwCgCR5Jd
+	dE2tLj7LkOaoCmqDAQH8+aipwq+thycsANGSWQN+7O3XCMyGLVn88k137uX/YnZzSwIXlO3maaE
+	nht2X02jO42UrRaBJwlOZxqFnW9Y=
+X-Google-Smtp-Source: AGHT+IHuR7Iz9HHCrbPSIDe/Dh6qnQz8tqD5xO0PbRSbfqjZSk6fryeuQ5vQk6JDgn8iIjf9hU/2Re5KklxHU3kqaJk=
+X-Received: by 2002:a05:6102:32d2:b0:476:d94e:da66 with SMTP id
+ o18-20020a05610232d200b00476d94eda66mr2905818vss.13.1711490784977; Tue, 26
+ Mar 2024 15:06:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240326133412.47cf6d99@kernel.org>
-In-Reply-To: <20240326133412.47cf6d99@kernel.org>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Tue, 26 Mar 2024 23:03:26 +0100
-Message-ID: <CADVnQymqFELYQqpoDsxh=z2XxvhMSvdUfCyjgRYeA1QaesnpEg@mail.gmail.com>
-Subject: Re: ICMP_PARAMETERPROB and ICMP_TIME_EXCEEDED during connect
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+From: Kaiming Huang <lightninghkm96@gmail.com>
+Date: Tue, 26 Mar 2024 18:06:14 -0400
+Message-ID: <CAH3=goX+Don_BBskDT0BviROgvjDGQoZ-3YfY+WMwdKsmoh+7w@mail.gmail.com>
+Subject: Re: stack access issue. Re: [syzbot] [bpf?] UBSAN:
+ array-index-out-of-bounds in check_stack_range_initialized
+To: Andrei Matei <andreimatei1@gmail.com>
+Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
+	bpf@vger.kernel.org, daniel@iogearbox.net, eadavis@qq.com, eddyz87@gmail.com, 
+	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev, 
+	Kaiming Huang <lightninghkm96@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 26, 2024 at 9:34=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Hi!
->
-> I got a report from a user surprised/displeased that ICMP_TIME_EXCEEDED
-> breaks connect(), while TCP RFCs say it shouldn't. Even pointing a
-> finger at Linux, RFC5461:
->
->    A number of TCP implementations have modified their reaction to all
->    ICMP soft errors and treat them as hard errors when they are received
->    for connections in the SYN-SENT or SYN-RECEIVED states.  For example,
->    this workaround has been implemented in the Linux kernel since
->    version 2.0.0 (released in 1996) [Linux].  However, it should be
->    noted that this change violates section 4.2.3.9 of [RFC1122], which
->    states that these ICMP error messages indicate soft error conditions
->    and that, therefore, TCP MUST NOT abort the corresponding connection.
->
-> Is there any reason we continue with this behavior or is it just that
-> nobody ever sent a patch?
+Hi there,
 
-Back in November of 2023 Eric did merge a patch to bring the
-processing in line with section 4.2.3.9 of [RFC1122]:
+Please discard my previous email as I figured it may be beneficial to
+rephrase some of the content in it for clarity.
 
-0a8de364ff7a tcp: no longer abort SYN_SENT when receiving some ICMP
+I went across this bug using my static analysis tool as well and was
+glad to find this email thread.
 
-However, the fixed behavior did not meet some expectations of Vagrant
-(see the netdev thread "Bug report connect to VM with Vagrant"), so
-for now it got reverted:
+My understanding is that the root cause of this bug has not been
+identified yet given the previous discussion in this thread.
 
-b59db45d7eba tcp: Revert no longer abort SYN_SENT when receiving some ICMP
+This is the line of code that has the issue.
 
-I think the hope was to root-cause the Vagrant issue, fix Vagrant's
-assumptions, then resubmit Eric's commit. Eric mentioned on Jan 8,
-2024: "We will submit the patch again for 6.9, once we get to the root
-cause." But I don't think anyone has had time to do that yet.
+stype = &state->stack[spi].slot_type[slot % BPF_REG_SIZE];
 
-neal
+Based on my analysis result, it is the part "slot_type[slot %
+BPF_REG_SIZE]" may result in memory access with a negative index,
+which should not be allowed. min_off and max_off are supposed to be
+negative based on my understanding of the
+workflow. But the spi, slot, and the index of slot_type are not
+supposed to be negative.
+
+The slot_type is defined as below:
+
+u8 slot_type[BPF_REG_SIZE];  //BPF_REG_SIZE is 8
+
+So the type of slot_type is u8[8].
+
+However, the bug may alter the "slot" to be negative, say -1. Then
+this would cause the result of slot %
+BPF_REG_SIZE is -1. This might sound counter-intuitive as % always
+gives positive results. But in C, % operation keeps the sign of
+the dividend. The applied check checks whether access_size is
+negative, I'm not sure whether the fix will catch
+this sufficiently). Could the fix be potentially directly applied to
+"slot" to ensure it is positive?
+
+You can examine this by simply running this short piece of code. The
+result of the modulo operation is -1 on my end, and that is the reason
+that causes the OOB negative index -1, which was reported by the Syzkaller.
+
+#include <stdio.h>
+#define BPF_REG_SIZE 8
+int main() {
+    int i = -1;
+    unsigned int j = i % BPF_REG_SIZE;
+    printf("%d\n", j);
+    return 0;
+}
+
+A more severe scenario, if possible, is when interpreting the j in the
+above example
+as unsigned int, aka integer overflow/wrap-around, in that case, the
+value of j will be 4,294,967,295. If this is the case, then it is a
+classic OOB access on the u8[8]. I don't know whether this part is feasible.
+
+Hopefully, my illustration makes sense, please let me know if you see
+any issues. Thanks.
+
+Best regards,
+Kaiming.
 
