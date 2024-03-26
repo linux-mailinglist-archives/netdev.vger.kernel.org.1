@@ -1,70 +1,55 @@
-Return-Path: <netdev+bounces-82066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C36D88C432
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:58:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9002688C435
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:58:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E0641C3F516
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:58:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49CF22C6A50
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0315B757F9;
-	Tue, 26 Mar 2024 13:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4779D75806;
+	Tue, 26 Mar 2024 13:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TfAnJHGU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qONJxGIK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C6E125C9;
-	Tue, 26 Mar 2024 13:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24094757F9
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711461498; cv=none; b=Gw07PqYOqx7crn9tsWT6l+MMtBjCKQ3PDCLE9PVD88/ZsG96BGmeFGLsHCWBH0Z7C2KanbWZiRnNDg1yaZjfHfkkAhYdC5ClS3HeeAM0c5EM7NV9FYbOmU8zsybNQEx/E/AmyeoQR70bBxK3DU2Mhaa7DLy+4kgR3H/Zo7NgLQE=
+	t=1711461523; cv=none; b=APju4/UGlHCnLt/LktVHDLB/iosGbj81FqPE4WvneDHVhHtvYWPE6C5s8wKE9V9nJ/xLhfOwM0pj7bdfeutDYcWDsMn2H++byn73CbBU/XlonXxSUhki7Z4qLp1U+QjtKrJLJA74rxzO9VjE3CHIJ/CDnAp5WFEwgpfrPUQ3JAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711461498; c=relaxed/simple;
-	bh=UkX75V9l2kKeZPRM2sj6rUQZY2m0OPjpnlnv9BQJ7zM=;
+	s=arc-20240116; t=1711461523; c=relaxed/simple;
+	bh=yyvQj/ggAgR1YIAGtJLB7gWLu8PfGZ8S8ihCiRxRCDc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q3Pt8hp1CxKwdcnBlBLTbEUWdOtxAX7MsIV16yx4zTkWfXhLQIYGgB5uCwvxwKLm+bqmMtNbg1RalAh6enLrJd/duzPD3OwSJ1A9b48eAC+MWkMbWPcHQSa/lH8WsYpak4SoFzN/ZgYmfoMo8f/8FX80JKh+MsjLPzH5VFJ0kNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TfAnJHGU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vNnrYFubP6muTfOE3nnaUwzi5pQkV31BF/tVPuyXjRs=; b=TfAnJHGU62uIy+XDLC9mejbExn
-	EyKUGfPCjZbxdkxhdmwkZHLJWY8syH7wZdLL0KzAmlsqj0lh3RPaRm4fmWJmjFrDIzT2Cc4vvJeDQ
-	KLyQ7UFGJojCR5tYNwV/RZG4lPqL+vGXbCnppM77jN9sAqp4A6NiDvLPjzpF5iqw9wlU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rp7JT-00BHZx-Kb; Tue, 26 Mar 2024 14:58:03 +0100
-Date: Tue, 26 Mar 2024 14:58:03 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Marek Vasut <marex@denx.de>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] dt-bindings: net: add phy-supply property for
- stm32
-Message-ID: <0e14ad5d-3c25-40ab-981a-fbc4e245fc94@lunn.ch>
-References: <20240326125849.226765-1-christophe.roullier@foss.st.com>
- <20240326125849.226765-2-christophe.roullier@foss.st.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=M4PIWWcpNnzNq4b6tgebhJ/IBXFwHw3meLj/5ZRn2GnIUqLYzf4be0s544kqUcegAke9xyrzhieC9+bsM7KHloptSJB/LetsBrmvwPbbNvPa8AHr1Qx4vKGOHAa/4z7ohEu5t5MxueOGGn7hAZCHyzal4CLOg3/ukPxtGA/0lvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qONJxGIK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ADC5C43390;
+	Tue, 26 Mar 2024 13:58:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711461522;
+	bh=yyvQj/ggAgR1YIAGtJLB7gWLu8PfGZ8S8ihCiRxRCDc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qONJxGIKoqdANIfaF45NfOkCbBD5RprNgBtS8CY61/LYuwKyOXfxU+heOLL2sLONi
+	 6VMcOoRDMc64pu+wBLO4cJbqBxv/cts4I3DIVECaOrtWBplykcVElp+dorxKAsaXEu
+	 KG002JgzQKoJHxXZvPAXrwSFMmoffQEgM0ImPsVfANTnq/J5nZmhOLgPH1lTDpjF6L
+	 ZpnYRjIp9x6uSbrh24M8Cta5Sp4aDiLNb2ZDJrOli4vT1NS9l5lw8/1hTutwI+LXba
+	 xo9VpalqbzgJOPPUg32xfs41hkguHzxcyR4x6iSck/vAfhsC+6XOl4drhcCPnurdvl
+	 5KyLdf8byP+Cg==
+Date: Tue, 26 Mar 2024 13:58:39 +0000
+From: Simon Horman <horms@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, magnus.karlsson@intel.com,
+	jesse.brandeburg@intel.com
+Subject: Re: [PATCH iwl-next] i40e: avoid forward declarations in i40e_nvm.c
+Message-ID: <20240326135839.GT403975@kernel.org>
+References: <20240306163054.90627-1-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,36 +58,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240326125849.226765-2-christophe.roullier@foss.st.com>
+In-Reply-To: <20240306163054.90627-1-maciej.fijalkowski@intel.com>
 
-On Tue, Mar 26, 2024 at 01:58:48PM +0100, Christophe Roullier wrote:
-> Phandle to a regulator that provides power to the PHY. This
-> regulator will be managed during the PHY power on/off sequence.
+On Wed, Mar 06, 2024 at 05:30:54PM +0100, Maciej Fijalkowski wrote:
+> Move code around to get rid of forward declarations. No functional
+> changes.
 > 
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+> After a plain code juggling, checkpatch reported:
+> total: 0 errors, 7 warnings, 12 checks, 1581 lines checked
+> 
+> so while at it let's address old issues as well. Should we ever address
+> the remaining unnecessary forward declarations within
+> drivers/net/ethernet/intel/, consider this change as a starting
+> point/reference.
+> 
+> As reported in [0], there would be a lot more of work to do...if we
+> care.
+> 
+> [0]: https://lore.kernel.org/intel-wired-lan/Zeh8qadiTGf413YU@boxer/T/#u
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 > ---
->  Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> index fc8c96b08d7dc..80937b28fa046 100644
-> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> @@ -82,6 +82,9 @@ properties:
->        Should be phandle/offset pair. The phandle to the syscon node which
->        encompases the glue register, and the offset of the control register
->  
-> +  phy-supply:
-> +    description: PHY regulator
+>  drivers/net/ethernet/intel/i40e/i40e_nvm.c | 1050 ++++++++++----------
+>  1 file changed, 509 insertions(+), 541 deletions(-)
 
-~/linux/drivers/net/ethernet/stmicro/stmmac$ grep regulator_get *
-dwmac-rk.c:	bsp_priv->regulator = devm_regulator_get(dev, "phy");
-dwmac-sun8i.c:	gmac->regulator = devm_regulator_get_optional(dev, "phy");
-dwmac-sunxi.c:	gmac->regulator = devm_regulator_get_optional(dev, "phy");
+Thanks Maciej,
 
-Maybe i'm missing something, but i don't see an actual implementation
-of this binding?
+FWIIW, it might have been easier to review if this had been broken up.
+But I appreciate that is a lot more work, and perhaps it wouldn't
+have been easier to review anyway.
 
-	Andrew
+In any case, I did find time to work through this and I agree that
+the patch matches it's description. And is a positive step IMHO.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
