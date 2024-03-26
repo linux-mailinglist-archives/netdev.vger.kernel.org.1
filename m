@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-81886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9550F88B80D
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:10:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3025588B80F
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4247B2C6885
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:10:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4D34B2283A
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22E6129A9E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9691129E8C;
 	Tue, 26 Mar 2024 03:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X4cAogem"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMgACAGl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A72E12839D;
-	Tue, 26 Mar 2024 03:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A54129A8E
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711422630; cv=none; b=fhjb8OPziRvWVS50CS6fWsHShuzJIWQme/kWdh6kIGnW9DdENqQOwHEqEBa47hPuLQUGAx8rzDCVXFZt7xckLB1tPOd86KBG6gmw1gouStQvWQlGjx8OBhV7hkYOWCP5dboV92kqA3vi/hzugkd2jn8XCPaIfQRJLUQ1NFrhf8I=
+	t=1711422630; cv=none; b=lZuX2o/jTMNuEB5bM2TXJ00FJhdXd48XKbCu2yDOC/FJesnpQfVNCY7l59tbbvSDeoD7Ym5Q81Nk8cpl7njRTTavI5mOFHizqLtpo4462a0KnSdjpacrrIIJoAdVEYKA8wSPvaUgpTMJVb0KT5nyAztQp2aDRdzRK/l5HaXdTo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711422630; c=relaxed/simple;
-	bh=VCzsm8+oqab452/8Y18pSmS5G3d1zEXJCGijns/dcIM=;
+	bh=fpcSB7h5oCCliCVPUvCo6+Z7/NsojGrbxsq2DHYr2Ws=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GqICKAlwzMmQ+P1ZoF+KpQO14kL09e3xsAOp2fvpnIhOxocf2ykaVoNE+szOQx/foyecJAaSj3nNImI8momacmR5NVuDf44Txk0S5MIVBgqnQA2Hbb3wSL7tfj7OO4LuygIkFSotJusdz7T7PqyIJevTO9vaPfgkjjp1ju/C0pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X4cAogem; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 75D85C43330;
+	 In-Reply-To:To:Cc; b=sDLZUkZ4VmK3t4zTgs5mOYaDHWDTBUT0BHIL1VuAbJzpTNfq9Njz/YW9na+pBytQJdGDdATR0gihx9qZoaTnXtPxWB8pz1wy03x46JCDrw8GOZc1oiwXaksPPQDPT4LZwrEwjfaDZwRnx16MRimKsb8xqzOP6mPn9AtwXm//Fv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VMgACAGl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8B68BC43609;
 	Tue, 26 Mar 2024 03:10:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711422630;
-	bh=VCzsm8+oqab452/8Y18pSmS5G3d1zEXJCGijns/dcIM=;
+	bh=fpcSB7h5oCCliCVPUvCo6+Z7/NsojGrbxsq2DHYr2Ws=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=X4cAogemiKNFygqrQUyy4Pl4KA7BldxBNy+ceXGYqG+ZR4dCLVFQ8eS9AYVCKxsU3
-	 4S02AOknlIK1O7Jzq2HUvazmmwCPeS0RG2Pa4w6l+dCqCuXbTaiVbDvUrkS6fLBWjw
-	 c9e7lNDd1eGvOuFksaSRp3To4FrBzcyWhENOsNEi3nYpiPSxjbnka4GSalTUukkg/7
-	 c1TKmz5aedlR18B3oCtxXC4uhQYb267Q+Zaret06t1lAFXLrdhuvu4EyHleIvOHtGK
-	 6kj5kgftZTSZIyXyHiILJUPH8ZoNO9PKdeT+6f+79EjL+mXkYlrrpCUeSZ4PPv2qc8
-	 WSiDc2+OVDzKw==
+	b=VMgACAGl9VGqw4jjUC1JjfsLv4KpRtgO92H0mTXxp3qLMLjgTDPNG7SQu77M5/5bq
+	 HKo+L8rGYcFJh/4GEF2oK7G9THD6+nyQidKzX2g3aNRBFTKSlMk5RQS/6M0/i0stIQ
+	 BSTt1A/fCi/f2odxTyvvuf1Q84W6nZFGmDrBngyBPkuRp/xDUXovNbdO6zesve2jVS
+	 3NSXF7n77IoIURy7Qso+CczJXuQrmJJZLBFydCfFeHXdJhQqLTLuzxLcAxvRtKpPsh
+	 ALADNTID7XdeobUflgvRlLpPl5UNYoSJznC2Rmxl0gC3XnIgf9+xP3NeT57KyadiAM
+	 7lcYR6fSQoqPQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 67F75D8BCE8;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7EFB5D2D0E0;
 	Tue, 26 Mar 2024 03:10:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: ll_temac: platform_get_resource replaced by wrong
- function
+Subject: Re: [PATCH net v1] dpll: indent DPLL option type by a tab
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171142263041.4499.11330999568533443925.git-patchwork-notify@kernel.org>
+ <171142263051.4499.15352445898793436984.git-patchwork-notify@kernel.org>
 Date: Tue, 26 Mar 2024 03:10:30 +0000
-References: <cca18f9c630a41c18487729770b492bb@terma.com>
-In-Reply-To: <cca18f9c630a41c18487729770b492bb@terma.com>
-To: Claus Hansen Ries <chr@terma.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com, wei.fang@nxp.com,
- yangyingliang@huawei.com, robh@kernel.org, harini.katakam@amd.com,
- dan.carpenter@linaro.org, u.kleine-koenig@pengutronix.de,
- wanghai38@huawei.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, horms@kernel.org
+References: <20240322114819.1801795-1-ppandit@redhat.com>
+In-Reply-To: <20240322114819.1801795-1-ppandit@redhat.com>
+To: Prasad Pandit <ppandit@redhat.com>
+Cc: jiri@resnulli.us, vadim.fedorenko@linux.dev,
+ arkadiusz.kubalewski@intel.com, netdev@vger.kernel.org, pjp@fedoraproject.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 21 Mar 2024 13:08:59 +0000 you wrote:
-> The function platform_get_resource was replaced with
-> devm_platform_ioremap_resource_byname and is called using 0 as name.
+On Fri, 22 Mar 2024 17:18:19 +0530 you wrote:
+> From: Prasad Pandit <pjp@fedoraproject.org>
 > 
-> This eventually ends up in platform_get_resource_byname in the call
-> stack, where it causes a null pointer in strcmp.
+> Indent config option type by a tab. It helps Kconfig parsers
+> to read file without error.
 > 
-> 	if (type == resource_type(r) && !strcmp(r->name, name))
+> Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
+> Signed-off-by: Prasad Pandit <pjp@fedoraproject.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] net: ll_temac: platform_get_resource replaced by wrong function
-    https://git.kernel.org/netdev/net/c/3a38a829c8bc
+  - [net,v1] dpll: indent DPLL option type by a tab
+    https://git.kernel.org/netdev/net/c/cc2699268152
 
 You are awesome, thank you!
 -- 
