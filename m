@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-82269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EE3388D041
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:43:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80AD888D04B
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:45:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 505F81C2FC34
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:43:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD20C1C32E22
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C023513D885;
-	Tue, 26 Mar 2024 21:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197F613D88A;
+	Tue, 26 Mar 2024 21:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="KjSS30Vw"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ISx7zH4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF4412AAF6
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 21:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5538173
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 21:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711489405; cv=none; b=i01NvAdeyWBMLJrXzBH+TwPOzpsHkXXiqBD1Qkk/w3X7xpmeYFEsIzJYySaUJjnNzkAoAzM5CfkPLZ606reFswv8G7Yw+HLbHAyZ/ST18BwAVWamz1G5ROTnRNFYHoe6MKf2NBeYDHmj56P22YHMLbBm2M4l6C+G8C5UHe71ouQ=
+	t=1711489524; cv=none; b=QvT2zfY4W5Ke9FyutJvv0gcIvg2VFtwItXWpZDsiWYXTuTefUtp06aYIG2HjwzobxsVIcTw47G0jmmbwdp3WVZH7MayqB7zeGMH6+xh/fWWiQZdV8GLj9l9Q7JBkXvbs029v9dHISC0/FQPTAAG3vgKYn4pgWKc5XAXsV/LqcGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711489405; c=relaxed/simple;
-	bh=pEV1hxXOAo3PKM3VoAdgR+/wC/wm3QxIdcy28/Wwrrg=;
+	s=arc-20240116; t=1711489524; c=relaxed/simple;
+	bh=+qGJb+BTj0PPLbgP+utwClewxIxav1jB1gGpqUrFN7c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DAOv6VArwJAIKHzbq9pK23H2shEkmOWI51JMChcyvg0elPt4sQt0URq/T5TZGPaklaM/atvt+pZj/2R28T2NPEMxbCL9vjYYh80SoOP/bqNG5BtpVxSOYI1RFLCVBYKrM8KNQEF6lrrElSbO5QjE0uIc2DX+4q8sjTtCWTKvn3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=KjSS30Vw; arc=none smtp.client-ip=209.85.221.47
+	 In-Reply-To:Content-Type; b=Ol4e1hXnW+y43pOg3KHsA9POihOceZNhDENJZIXVgfCIZHxx4BOmi0daxvLmBGrkaxrjgD7sRYBMDpY6tc+KZlTYvUmH+0i5gnk2mqGtIe8a4uE16ViVjquC4+fc2sy2dqTDYpGh76gfk+0fQkcGHrS17ySqZi2E/iNI7iPHAgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ISx7zH4u; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-34005b5927eso4212827f8f.1
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:43:23 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-41490d249e9so4700795e9.3
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:45:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1711489402; x=1712094202; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1711489520; x=1712094320; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jAO3QrzOBFcf/k3Zh5hbIglynGJxd6YaZsx9czmLBkc=;
-        b=KjSS30VwYNIFiauvc8QquoTKnkbn9sk9sRgtpPHvjfUC6u1lJHUZ4x8DH9DHlaCv81
-         bsL5PBTnnTAZduyEbl5HbMjJ8+hDFKd0SxprQqQBYJCz5zEQwvGsSOtIEHAm+JVxF6Hd
-         hdInEfRquWdSzPpINSaULhppzG0naYzIN4wrZnGoSGLQB/QuShA6KAY8OEZZorpJmSsb
-         F9LCcWmIR434bRDAGEDZ6tnGeQ51uKZUNs/HGojU+P8OyrAdAiOBXJ4ULAPps51zAlmr
-         vBN0QZIjJe0RyOO2wsic1BNubP5HjCUZbtB/V2QhSEB7Lv4I0T3lvVUWyNL823xwyh0J
-         pttA==
+        bh=x26+t6Wu3TNmU6iUO6Oo0lX0aWesd01li/awVKYCU1k=;
+        b=ISx7zH4utBFx12nMNN+y2yiDuGjQGClXnyZhji42V+sdNij6eBsqEzf+8SVZwgzlmw
+         W2JuAqcWBWsbM6LefIkQ83Ie3ajgzyCOMuZ7X9nxQmyY7zRQ43YHtLoUTnAHplvdrDRr
+         MMNzMqzMrmjK6g8I9+/MZkJzSVysR4wUjzI2VManuSXHsjVKts3wcsvY+ZVjy3xp342P
+         wL1LKEy1cbV057ew0Xjx21WO5K4PSAIP+PcCg9U8/8MB8Tu+bjTtAgBrjow38RE+eC9h
+         aEAvnHGW0fUo3gwaL55SS6E6XDYloZbQnPhyPqyvY3gy0hdzb0JYJXxjTZc8mavQTfSE
+         3F3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711489402; x=1712094202;
+        d=1e100.net; s=20230601; t=1711489520; x=1712094320;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jAO3QrzOBFcf/k3Zh5hbIglynGJxd6YaZsx9czmLBkc=;
-        b=KCzefdLa2CVm1Eou1+9jbmFfTEIEUucH5OPyZZD11QUi62VYS6A82j6k3eaByFMCo0
-         IgBvtUwY1oBCQxk2z7lPsJPse2mzZaCydqfM/IABz8ZXXv1zsfz+it/gLuWz8lYpJwQU
-         XuApnh5fF8FXE2boLDP83xln9c9uYAXYQo6clhY5WOOgJ7zH9h8ot6q9qpqFW56qxIgM
-         Gc0VoMarA7Zdkm5Yp1itmOfEfk0QvDsWaSTsMoazcPxbjnfqWN9AYUQzSc/7EUfa/Ecq
-         nQEuJSgefIJs+LELbsj+DXu0lHluSnnJF4uj8evhXqjMDbaMQc2uWveWYHonVxPPAWOb
-         lNSA==
-X-Gm-Message-State: AOJu0YzHXHDZ+QxTtduMHIIh8rMtAWVj3ndaP7BA1v+yrcIAo/RU/MPr
-	CqBqgm1vu5IKB3bf4cOFbqCC0emb2b28GtPyoA9nLeMw7ajxhAOOMjprpk5MftE=
-X-Google-Smtp-Source: AGHT+IE+iAM2BKjTB+oRb2CjaraSb8NenLsX7oQTGc/wIeijlrEQl+c8J6pUxb6BcPqjVWmbqIp72Q==
-X-Received: by 2002:a5d:68c3:0:b0:341:ba6a:6995 with SMTP id p3-20020a5d68c3000000b00341ba6a6995mr1741834wrw.47.1711489401730;
-        Tue, 26 Mar 2024 14:43:21 -0700 (PDT)
+        bh=x26+t6Wu3TNmU6iUO6Oo0lX0aWesd01li/awVKYCU1k=;
+        b=SEnYlOc/Nj/MUhfj458WSKXZ4eGmr0+cIY/pV7MPovd54J5P8Hq9SledU2hywl3aok
+         Sx3uyPbS0/Td5NfaIp7KDqBAlOQQi8HWxEbvGCD4DFtN84cwlj9bQESMT/TqGgtHdF2N
+         FfQ1BeBQPZNLumnxyZcuFUnlVTFwUTmPjo67o4njJW82xdsG7jToIaLuQI0TXbi1EErS
+         2/bVAkHOx2+tXDUc9e8GcHdxm8Vd7dxB6fmRliC3ru2HVcKGVbAlSaxclE/SJ3TrBVPU
+         7Nm5rwUXgz72FxDaBa1Zo+FPzoDG9kk3+hI7K2sHOgNDBN7Khe8wavDD39529PBZ1EJy
+         WGaw==
+X-Gm-Message-State: AOJu0YxR5wPEhcDlFJaDEYcMilVEpNTsLcT0rntY4bRNDRU5I4Su3eZU
+	mXdeIo7fZBMw2U+qAcLzZJWnCjU00gK9nX3ah+yWMZqdZHadOkGyVT6tID8izONMunp+ilQRQBh
+	7
+X-Google-Smtp-Source: AGHT+IG8R6PG4dd1DWEr8h/8UjntBZo7ULFJhOuKSv7293OTGqtCBYCDOAj32fSXUDAXeTOEdJfD+g==
+X-Received: by 2002:a05:600c:358a:b0:414:8865:bfc0 with SMTP id p10-20020a05600c358a00b004148865bfc0mr6440793wmq.0.1711489520090;
+        Tue, 26 Mar 2024 14:45:20 -0700 (PDT)
 Received: from ?IPV6:2001:67c:2fbc:0:2da8:e89c:e33f:a4e3? ([2001:67c:2fbc:0:2da8:e89c:e33f:a4e3])
-        by smtp.gmail.com with ESMTPSA id fa7-20020a056000258700b00341c563aacbsm9306519wrb.1.2024.03.26.14.43.20
+        by smtp.gmail.com with ESMTPSA id l20-20020a05600c1d1400b004146a304863sm146007wms.34.2024.03.26.14.45.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Mar 2024 14:43:21 -0700 (PDT)
-Message-ID: <57a773fc-dc1e-4f8b-b60b-13582e6d057c@openvpn.net>
-Date: Tue, 26 Mar 2024 22:44:01 +0100
+        Tue, 26 Mar 2024 14:45:19 -0700 (PDT)
+Message-ID: <5d7f805e-8b09-44cf-8d6b-e9c0b17909e9@openvpn.net>
+Date: Tue, 26 Mar 2024 22:45:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,15 +77,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 05/22] ovpn: implement interface
- creation/destruction via netlink
+Subject: Re: [PATCH net-next v2 06/22] ovpn: introduce the ovpn_peer object
 Content-Language: en-US
 To: Esben Haabendal <esben@geanix.com>
 Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
  Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>
 References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-6-antonio@openvpn.net> <871q7yz77t.fsf@geanix.com>
+ <20240304150914.11444-7-antonio@openvpn.net> <871q7xe0xf.fsf@geanix.com>
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
  xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
@@ -126,60 +126,54 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  ify06RjcfKmutBiS7jNrNWDK7nOpAP4zMYxYTD9DP03i1MqmJjR9hD+RhBiB63Rsh/UqZ8iN
  VL3XJZMQ2E9SfVWyWYLTfb0Q8c4zhhtKwyOr6wvpEpkCH6uevqKx4YC5
 Organization: OpenVPN Inc.
-In-Reply-To: <871q7yz77t.fsf@geanix.com>
+In-Reply-To: <871q7xe0xf.fsf@geanix.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 25/03/2024 16:01, Esben Haabendal wrote:
+On 26/03/2024 11:34, Esben Haabendal wrote:
 > Antonio Quartulli <antonio@openvpn.net> writes:
 > 
->> Allow userspace to create and destroy an interface using netlink
->> commands.
->>
->> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
->> ---
->>   drivers/net/ovpn/netlink.c | 50 ++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 50 insertions(+)
->>
->> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
->> index 2e855ce145e7..02b41034f615 100644
->> --- a/drivers/net/ovpn/netlink.c
->> +++ b/drivers/net/ovpn/netlink.c
->> @@ -154,7 +154,57 @@ static void ovpn_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb
->>   		dev_put(ovpn->dev);
->>   }
->>   
->> +static int ovpn_nl_new_iface(struct sk_buff *skb, struct genl_info *info)
+>> +static inline bool ovpn_bind_skb_src_match(const struct ovpn_bind *bind, struct sk_buff *skb)
 >> +{
->> +	enum ovpn_mode mode = OVPN_MODE_P2P;
->> +	struct net_device *dev;
->> +	char *ifname;
->> +	int ret;
->> +
->> +	if (!info->attrs[OVPN_A_IFNAME])
->> +		return -EINVAL;
->> +
->> +	ifname = nla_data(info->attrs[OVPN_A_IFNAME]);
->> +
->> +	if (info->attrs[OVPN_A_MODE]) {
->> +		mode = nla_get_u8(info->attrs[OVPN_A_MODE]);
->> +		netdev_dbg(dev, "%s: setting device (%s) mode: %u\n", __func__, ifname,
->> +			   mode);
+>> +	const unsigned short family = skb_protocol_to_family(skb);
+>> +	const struct ovpn_sockaddr *sa = &bind->sa;
 > 
-> Maybe print out the message even if the default mode is used, as the
-> mode is applied in ovpn_iface_create anyways.
+> You should move this dereferencing of bind to after the following check
+> to avoid segmentation fault.
 
-Being this a debug message, my reasoning was "let's print what we got 
-via netlink" (if nothing is printed, we know we are applying the default).
+ouch. good catch, thanks!
 
-Otherwise, when printing "P2P" we wouldn't be able to understand if it 
-was set by default or received via netlink.
+> 
+>> +	if (unlikely(!bind))
+>> +		return false;
+> 
+>> diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
+>> new file mode 100644
+>> index 000000000000..4319271927a4
+>> --- /dev/null
+>> +++ b/drivers/net/ovpn/peer.c
+>> +
+>> +/* Use with kref_put calls, when releasing refcount
+>> + * on ovpn_peer objects.  This method should only
+>> + * be called from process context with config_mutex held.
+>> + */
+>> +void ovpn_peer_release_kref(struct kref *kref)
+>> +{
+>> +	struct ovpn_peer *peer = container_of(kref, struct ovpn_peer, refcount);
+>> +
+>> +	INIT_WORK(&peer->delete_work, ovpn_peer_delete_work);
+> 
+> Is this safe, or could we end up re-initializing delete_work while it is
+> queued or running?
 
-Does it make sense?
+ovpn_peer_release_kref() is only invoked once upon peer refcounter 
+reaching 0 (then the peer object is erased).
+Therefore it should be safe to init the work object here.
 
 Cheers,
 
-
+> 
+>> +	queue_work(peer->ovpn->events_wq, &peer->delete_work);
 > 
 > /Esben
 
