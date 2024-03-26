@@ -1,76 +1,91 @@
-Return-Path: <netdev+bounces-82132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7FCF88C5C0
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:50:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61EF388C5C7
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:51:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C6C629C0B6
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:50:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4C3AB227C4
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D4813C81B;
-	Tue, 26 Mar 2024 14:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0269E13C673;
+	Tue, 26 Mar 2024 14:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqQzgcLL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbPu/ALU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B5C13C819;
-	Tue, 26 Mar 2024 14:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25BA13C668
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711464593; cv=none; b=fY0koFWY5bkXZ458I4zbdcZfzeEt8R2zo2SbDZtBeh4YFxxVrE8KTd2m8AigWIvOkTiAs1TRrWZXxFdEVTwMW26bIUPvK7OOIYCqd9HUEr4Qnbapg2nDiqI2xGqeHz8uQbsTLmCur86VsfU6Ce/+vkTG9a4fIUeQ67IZtCEDOeY=
+	t=1711464629; cv=none; b=d/fWDat2HIn1QdS3b/8+xlF/0gR/q3r4zT4qLCAjT2deemRgT0NzcsfOwT+1OKZiOLDtEeznTSWTQWvlVWLJRVbEetugmdKXxPi6DwTHoZjjx0ocgMaIw8W0MFmwS96h2NeeLfujbt7J3nlE8KpBTjPxmFSMpgdU8hkl58HLCBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711464593; c=relaxed/simple;
-	bh=ASjwD7pJp1QVPdIY4VaqbkU4p3lWLNQhHSEK1Mb6Lq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gO1Idqe8SMikuRogbx5FQEWat/GMgFBr4/m+DGX6Hw12LR8tUKkfFVeg1vXtihNSgklrS+QfwJYSzCgGu1faXI4vb3HZ6dER4OiZcK7aghbO/zNcp/lUqcyk1L+fCVdtM42haowotQ9Od3RgxTZtZl/y2RF4Kswlp/+yYC1mnxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqQzgcLL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06885C433C7;
-	Tue, 26 Mar 2024 14:49:50 +0000 (UTC)
+	s=arc-20240116; t=1711464629; c=relaxed/simple;
+	bh=RL8bocqvYwqCmrd2ycvaqV5iijyrUrS/VqBu8y72uZ0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bKZS3Inr7ylJQqj7VnO69LCrtMyJij3DhCDNaNsO8eBla8PWo6/tXnHw6SKpvtBTAgZ8jk0+3wcQc+wrGYgVgQbiEKYPaXhxuXyPXs9L6nUOokY3WQaJgx7lDWrgtCo2IlSMRtL7Z+Y9Vxz3AvStUc/ZR3Y8iwpUYkvhAO5eoWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cbPu/ALU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 775A1C43394;
+	Tue, 26 Mar 2024 14:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711464593;
-	bh=ASjwD7pJp1QVPdIY4VaqbkU4p3lWLNQhHSEK1Mb6Lq8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aqQzgcLL7LriJUPU7Yh/2d+4i6zlMg8hXgq61RPx4TPmVPv3xYYNjdOyYgwRMaB2k
-	 r0ovk40QhDtJsrGOOL1Ic85pouWcMAJDgYmzZW7okzlmr93rkIvSw31iD5JE2y+Xte
-	 ZBcVyEaWkldrOerHY3ziPriLLpnf7uPga7Sk1bOkPGFpbj+p3aEraYeDfhyjbtvXcT
-	 OxGi7jiaKD1eefxYV9nPKei5XIDFcHYJAhNNbxWdqHR3Qa5Mj6dU7X2F5gMyHDD0Fp
-	 yVmsyXug6tBhNLuEuVt9wiVtBij++7wQlKRHNqF0N6HkZvbgdkhQb4NGA8wgImHwe2
-	 2XYezfyuKWwpQ==
-Date: Tue, 26 Mar 2024 14:49:48 +0000
-From: Simon Horman <horms@kernel.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Ariel Elior <aelior@marvell.com>, Manish Chopra <manishc@marvell.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH] qed: Drop useless pci_params.pm_cap
-Message-ID: <20240326144948.GC403975@kernel.org>
-References: <20240325224931.1462051-1-helgaas@kernel.org>
+	s=k20201202; t=1711464629;
+	bh=RL8bocqvYwqCmrd2ycvaqV5iijyrUrS/VqBu8y72uZ0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cbPu/ALUySbz/D7/5SUK+WJ/h6dqQZNOF3j9svuJDWSVgNPwwz4oz8K+DGjjdsnpr
+	 X3ZoRh2muWpAw0Y5oPP6Z7qYVKX0ilTfRU1Fm2ZjAp0dUAgp2W/jFCQ0n8A5aFo/hk
+	 54drPGdUPq7JGlDJuEmlUyKZ9+3+9bUaB/96Q795XEY3JT2kVSgNFU/8wt8LvYvDAh
+	 xkqAgfiGTe1xa3okWlNqPb8FDteUDTy3xrYotPKreiHne5jcBNDECnnOh+3XV54W5G
+	 DsbMkGxNfOmbO98OQUckH8bdQPLF7F/gUm+rmmd0StPQh8Sz+naahJX6FpdL7gpwhN
+	 u906R3z20yD3A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6580CD2D0EE;
+	Tue, 26 Mar 2024 14:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240325224931.1462051-1-helgaas@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: remove skb_free_datagram_locked()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171146462941.14765.9067284482126372902.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Mar 2024 14:50:29 +0000
+References: <20240325134155.620531-1-edumazet@google.com>
+In-Reply-To: <20240325134155.620531-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, kerneljasonxing@gmail.com
 
-On Mon, Mar 25, 2024 at 05:49:31PM -0500, Bjorn Helgaas wrote:
-> From: Bjorn Helgaas <bhelgaas@google.com>
-> 
-> qed_init_pci() used pci_params.pm_cap only to cache the pci_dev.pm_cap.
-> Drop the cache and use pci_dev.pm_cap directly.
-> 
-> Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+Hello:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Mon, 25 Mar 2024 13:41:55 +0000 you wrote:
+> Last user of skb_free_datagram_locked() went away in 2016
+> with commit 850cbaddb52d ("udp: use it's own memory
+> accounting schema").
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: remove skb_free_datagram_locked()
+    https://git.kernel.org/netdev/net-next/c/6e0631203503
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
