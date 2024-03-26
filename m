@@ -1,179 +1,282 @@
-Return-Path: <netdev+bounces-81899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F18EB88B95F
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 05:16:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E8988B981
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 05:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78A992C3DD2
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:16:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1DD11F34A82
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128E5129E92;
-	Tue, 26 Mar 2024 04:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62BEB73514;
+	Tue, 26 Mar 2024 04:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nUxXMYRT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+sjZjW4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343A2129A9A;
-	Tue, 26 Mar 2024 04:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0B15FB82
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 04:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711426598; cv=none; b=UnyuNVBbrQg64zfXdjIWUfhuoYCGTX3uBmrTRI+2T9mkKCdYLQKKLTY6H87fnL/YEnhf4O0d42F54yNbZOH34c1eqywMQD9Jeqz0FOK92bi2/xa6ITDi9KJMMesNGfTXYiub1NMHZ9kJUbSal0s8+9f5YO3rhWp54K+zgwedR4E=
+	t=1711428420; cv=none; b=DuQMcf5PJ7IGzYUppnCxV8JzqbxUrRDqq2K8FjK9SiTEACjGQU5AHxiQLDEKcTUbXEZ6E6JHCMGe+IX6ejB6mvyiy25xbXjdZD6Y8okz3RDyyQxSTXFd3pvQVX1Gp/oLD+kTQcA2bYcLaJ8mRXAgjvb8OmjLNvfwj2j7eRgOHjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711426598; c=relaxed/simple;
-	bh=CSVejvEYOedfyonLgBa1G5pnuLOA66hTYhglClj35J8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=H4pRQp//0qL1Z1keYE0jwQzuswFcmrSVNt4noGEEOF8raXhTo7/2OM7LQ5+r9HjjMENq/PuhtGiF/1zeAI1QN/SnIxSFySV4qot19o3YNUyIu2ETe3wEko5xQeWtbeTtObVPQ13NfbS6SUhgZHVYm9mdCq0lP53RrnfOMvHEmi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nUxXMYRT; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1711426597; x=1742962597;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=YFx2se4bn9E56Ag+u1F7rtLy6zyMfAzjo4PoVE0Mmcw=;
-  b=nUxXMYRT2WFaqK9WNc74aBcyNXS+lcpblAN6p2RrXWQZ7VSifXYamW7L
-   iGFWvOjBYCvMs2OZVTybNb3v4HcmVo9N4Y0c/XA96enNWyr+cqtfjaFTh
-   a+Ar646x9j1x0fAzW1KiXcMSrg6DTVwYUNRmbwoD66XuZv8L6zxiI/+dE
-   g=;
-X-IronPort-AV: E=Sophos;i="6.07,155,1708387200"; 
-   d="scan'208";a="335178185"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 04:16:30 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:11300]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.88:2525] with esmtp (Farcaster)
- id 610b1168-5c11-4beb-8700-7c740ef800bb; Tue, 26 Mar 2024 04:16:28 +0000 (UTC)
-X-Farcaster-Flow-ID: 610b1168-5c11-4beb-8700-7c740ef800bb
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 26 Mar 2024 04:16:28 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.62) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 26 Mar 2024 04:16:25 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
-	<kadlec@netfilter.org>
-CC: Florian Westphal <fw@strlen.de>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netfilter-devel@vger.kernel.org>,
-	<coreteam@netfilter.org>, <netdev@vger.kernel.org>, syzkaller
-	<syzkaller@googlegroups.com>
-Subject: [PATCH v1 nf] netfilter: arptables: Select NETFILTER_FAMILY_ARP when building arp_tables.c
-Date: Mon, 25 Mar 2024 21:15:52 -0700
-Message-ID: <20240326041552.19888-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1711428420; c=relaxed/simple;
+	bh=I0hBgUkJ6VetAVQzfY2/W0v2jZI+GcguK0+glpr0W/g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d0NxW1BWs9gxoXIFSOpV1CYNLklJxH5+wplTeDp5wIOxwI7mRkA33v7xGNJBPrrixV0YC7u/KTPDN/sD3TZ2fQh04r4rgQSLnuej1cdfRXL0nHyTsaxidV6XuqDGabYKBvAw13hFe/UCbd/vUT3EH92otk2L1HF9AABRfktLKtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H+sjZjW4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711428417;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lGXaQ3GVVuKxjOu0MEIZIl+iuzlQBISaMUUEdgRTSrA=;
+	b=H+sjZjW4LhkSub7kyHRdi84xApaOdpk4nY1gHCyixMjSZspqiOXwLgt+gUBJVaiJq4UNax
+	Z441wHq0avWfamdHuVerG9x5mwCk8PwRiL928u5QgvRUoBaPUfC2kHUToJraptHI1GMt4f
+	163dOrOnVuDS5VFH9ADjZgi5E2N/c5c=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-448-Ja-Q3yokMAi3dwrRj-L9Xg-1; Tue, 26 Mar 2024 00:46:55 -0400
+X-MC-Unique: Ja-Q3yokMAi3dwrRj-L9Xg-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1e0b3a4c2e4so13606535ad.0
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 21:46:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711428412; x=1712033212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lGXaQ3GVVuKxjOu0MEIZIl+iuzlQBISaMUUEdgRTSrA=;
+        b=mzN4fyujRDNpyrrGhjJUopOxfo6T9ENO3XsSAGk6AIW2HQW3fcDrVhI/jRVhqwbHgY
+         7S6/OAEq4AWPWYvI5/FziLoND0F3HpgFoKU5r5kQgjavjwUb/BehPr28S6wo5VItekyQ
+         o1eOnlknRZ5svmy3OkAoDLlokJK5GtaBsd7eEU7JBEtf+tWf0KWC8V6myiyb7AOw9/DK
+         0uWzElRxKIsvbSHnnb0DLDcjiKSaX5MaPL+OJJdbCqWMhc00226xPYdReHml9Bxd4dFi
+         9MwnIyEbqtmmzFhEXbhXE+zHuXtEWMgQF1i6yZ/HyL40lKtTOeDvwEPSAglV3R4Rvum6
+         PIUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVz0x71cHBg2NhjiAJkbmg9WyxzDzzQkG4NPgF24zMyJdrDFdFLIrpxQDQLm/EsTjEWBuuFvhwQ9SIi/Jel8fup1RXslcn1
+X-Gm-Message-State: AOJu0Yyk36U6w6nBS6x8j6NtJnkyMEQKtfMbolsaQxA0R8tWj1LvrcPJ
+	lKop3omsDBt1/lEzAk1XsRWz2aq8wc70Rnv9zIvsiFAq5t5tKNblrQGcIguRbs2SrngCopFSwSP
+	rriiMMEz/dLv7fxqL+6C4gRtrfJIXba5t68U3apUaB6a4txMlxfErEB2D8XJSKY48CFtwhreFni
+	hmUl7xmBjIBtPwYzo0G6U38+u/rZz0
+X-Received: by 2002:a17:902:d489:b0:1e0:c37d:cfb5 with SMTP id c9-20020a170902d48900b001e0c37dcfb5mr4165146plg.22.1711428412627;
+        Mon, 25 Mar 2024 21:46:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFyZmO2cvV4Hypg7KgUhp4pGLbalivRgNQTcdIDlFTO7Rsww9A745kpUDRmzlVRxVoxlFRU8bCaHOEWYUelx6c=
+X-Received: by 2002:a17:902:d489:b0:1e0:c37d:cfb5 with SMTP id
+ c9-20020a170902d48900b001e0c37dcfb5mr4165133plg.22.1711428412276; Mon, 25 Mar
+ 2024 21:46:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
+ <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+ <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
+ <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com>
+ <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
+ <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com> <CA+9S74hs_1Ft9iyXOPU_vF_EFKuoG8LjDpSna0QSPMFnMywd_g@mail.gmail.com>
+In-Reply-To: <CA+9S74hs_1Ft9iyXOPU_vF_EFKuoG8LjDpSna0QSPMFnMywd_g@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 26 Mar 2024 12:46:41 +0800
+Message-ID: <CACGkMEvHiAN7X_QBgihWX6zzEUOxhrV2Nqg1arw1sfYy2A5K0g@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Igor Raits <igor@gooddata.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	Stefano Garzarella <sgarzare@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzkaller started to report a warning below [0] after consuming the
-commit 4654467dc7e1 ("netfilter: arptables: allow xtables-nft only
-builds").
+On Mon, Mar 25, 2024 at 4:44=E2=80=AFPM Igor Raits <igor@gooddata.com> wrot=
+e:
+>
+> Hello,
+>
+> On Fri, Mar 22, 2024 at 12:19=E2=80=AFPM Igor Raits <igor@gooddata.com> w=
+rote:
+> >
+> > Hi Jason,
+> >
+> > On Fri, Mar 22, 2024 at 9:39=E2=80=AFAM Igor Raits <igor@gooddata.com> =
+wrote:
+> > >
+> > > Hi Jason,
+> > >
+> > > On Fri, Mar 22, 2024 at 6:31=E2=80=AFAM Jason Wang <jasowang@redhat.c=
+om> wrote:
+> > > >
+> > > > On Thu, Mar 21, 2024 at 5:44=E2=80=AFPM Igor Raits <igor@gooddata.c=
+om> wrote:
+> > > > >
+> > > > > Hello Jason & others,
+> > > > >
+> > > > > On Wed, Mar 20, 2024 at 10:33=E2=80=AFAM Jason Wang <jasowang@red=
+hat.com> wrote:
+> > > > > >
+> > > > > > On Tue, Mar 19, 2024 at 9:15=E2=80=AFPM Igor Raits <igor@goodda=
+ta.com> wrote:
+> > > > > > >
+> > > > > > > Hello Stefan,
+> > > > > > >
+> > > > > > > On Tue, Mar 19, 2024 at 2:12=E2=80=AFPM Stefan Hajnoczi <stef=
+anha@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Tue, Mar 19, 2024 at 10:00:08AM +0100, Igor Raits wrote:
+> > > > > > > > > Hello,
+> > > > > > > > >
+> > > > > > > > > We have started to observe kernel crashes on 6.7.y kernel=
+s (atm we
+> > > > > > > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9=
+ where we
+> > > > > > > > > have nodes of cluster it looks stable. Please see stacktr=
+ace below. If
+> > > > > > > > > you need more information please let me know.
+> > > > > > > > >
+> > > > > > > > > We do not have a consistent reproducer but when we put so=
+me bigger
+> > > > > > > > > network load on a VM, the hypervisor's kernel crashes.
+> > > > > > > > >
+> > > > > > > > > Help is much appreciated! We are happy to test any patche=
+s.
+> > > > > > > >
+> > > > > > > > CCing Michael Tsirkin and Jason Wang for vhost_net.
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
+> > > > > > > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Taint=
+ed: G
+> > > > > > > > >    E      6.7.10-1.gdc.el9.x86_64 #1
+> > > > > > > >
+> > > > > > > > Are there any patches in this kernel?
+> > > > > > >
+> > > > > > > Only one, unrelated to this part. Removal of pr_err("EEVDF sc=
+heduling
+> > > > > > > fail, picking leftmost\n"); line (reported somewhere few mont=
+hs ago
+> > > > > > > and it was suggested workaround until proper solution comes).
+> > > > > >
+> > > > > > Btw, a bisection would help as well.
+> > > > >
+> > > > > In the end it seems like we don't really have "stable" setup, so
+> > > > > bisection looks to be useless but we did find few things meantime=
+:
+> > > > >
+> > > > > 1. On 6.6.9 it crashes either with unexpected GSO type or usercop=
+y:
+> > > > > Kernel memory exposure attempt detected from SLUB object
+> > > > > 'skbuff_head_cache'
+> > > >
+> > > > Do you have a full calltrace for this?
+> > >
+> > > I have shared it in one of the messages in this thread.
+> > > https://marc.info/?l=3Dlinux-virtualization&m=3D171085443512001&w=3D2
+> > >
+> > > > > 2. On 6.7.5, 6.7.10 and 6.8.1 it crashes with RIP:
+> > > > > 0010:skb_release_data+0xb8/0x1e0
+> > > >
+> > > > And for this?
+> > >
+> > > https://marc.info/?l=3Dlinux-netdev&m=3D171083870801761&w=3D2
+> > >
+> > > > > 3. It does NOT crash on 6.8.1 when VM does not have multi-queue s=
+etup
+> > > > >
+> > > > > Looks like the multi-queue setup (we have 2 interfaces =C3=97 3 v=
+irtio
+> > > > > queues for each) is causing problems as if we set only one queue =
+for
+> > > > > each interface the issue is gone.
+> > > > > Maybe there is some race condition in __pfx_vhost_task_fn+0x10/0x=
+10 or
+> > > > > somewhere around?
+> > > >
+> > > > I can't tell now, but it seems not because if we have 3 queue pairs=
+ we
+> > > > will have 3 vhost threads.
+> > > >
+> > > > > We have noticed that there are 3 of such functions
+> > > > > in the stacktrace that gave us hints about what we could try=E2=
+=80=A6
+> > > >
+> > > > Let's try to enable SLUB_DEBUG and KASAN to see if we can get
+> > > > something interesting.
+> > >
+> > > We were able to reproduce it even with 1 vhost queue... And now we
+> > > have slub_debug + kasan so I hopefully have more useful data for you
+> > > now.
+> > > I have attached it for better readability.
+> >
+> > Looks like we have found a "stable" kernel and that is 6.1.32. The
+> > 6.3.y is broken and we are testing 6.2.y now.
+> > My guess it would be related to virtio/vsock: replace virtio_vsock_pkt
+> > with sk_buff that was done around that time but we are going to test,
+> > bisect and let you know more.
+>
+> So we have been trying to bisect it but it is basically impossible for
+> us to do so as the ICE driver was quite broken for most of the release
+> cycle so we have no networking on 99% of the builds and we can't test
+> such a setup.
+> More specifically, the bug was introduced between 6.2 and 6.3 but we
+> could not get much further. The last good commit we were able to test
+> was f18f9845f2f10d3d1fc63e4ad16ee52d2d9292fa and then after 20 commits
+> where we had no networking we gave up.
+>
+> If you have some suspicious commit(s) we could revert - happy to test.
 
-The change accidentally removed the dependency on NETFILTER_FAMILY_ARP
-from IP_NF_ARPTABLES.
+Here is the is for the change since f18f9845f2f10d3d1fc63e4ad16ee52d2d9292f=
+a:
 
-If NF_TABLES_ARP is not enabled on Kconfig, NETFILTER_FAMILY_ARP will
-be removed and some code necessary for arptables will not be compiled.
+cbfbfe3aee71 tun: prevent negative ifindex
+b2f8323364ab tun: add __exit annotations to module exit func tun_cleanup()
+6231e47b6fad tun: avoid high-order page allocation for packet header
+4d016ae42efb Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+59eeb2329405 drivers: net: prevent tun_build_skb() to exceed the
+packet size limit
+35b1b1fd9638 Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+ce7c7fef1473 net: tun: change tun_alloc_skb() to allow bigger paged allocat=
+ions
+9bc3047374d5 net: tun_chr_open(): set sk_uid from current_fsuid()
+82b2bc279467 tun: Fix memory leak for detached NAPI queue.
+6e98b09da931 Merge tag 'net-next-6.4' of
+git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
+de4f5fed3f23 iov_iter: add iter_iovec() helper
+438b406055cd tun: flag the device as supporting FMODE_NOWAIT
+de4287336794 Daniel Borkmann says:
+a096ccca6e50 tun: tun_chr_open(): correctly initialize socket uid
+66c0e13ad236 drivers: net: turn on XDP features
 
-  $ grep -E "(NETFILTER_FAMILY_ARP|IP_NF_ARPTABLES|NF_TABLES_ARP)" .config
-  CONFIG_NETFILTER_FAMILY_ARP=y
-  # CONFIG_NF_TABLES_ARP is not set
-  CONFIG_IP_NF_ARPTABLES=y
+The commit that touches the datapath are:
 
-  $ make olddefconfig
+6231e47b6fad tun: avoid high-order page allocation for packet header
+59eeb2329405 drivers: net: prevent tun_build_skb() to exceed the
+packet size limit
+ce7c7fef1473 net: tun: change tun_alloc_skb() to allow bigger paged allocat=
+ions
+82b2bc279467 tun: Fix memory leak for detached NAPI queue.
+de4f5fed3f23 iov_iter: add iter_iovec() helper
 
-  $ grep -E "(NETFILTER_FAMILY_ARP|IP_NF_ARPTABLES|NF_TABLES_ARP)" .config
-  # CONFIG_NF_TABLES_ARP is not set
-  CONFIG_IP_NF_ARPTABLES=y
+I assume you didn't use NAPI mode, so 82b2bc279467 tun: Fix memory
+leak for detached NAPI queue doesn't make sense for us.
 
-So, when nf_register_net_hooks() is called for arptables, it will
-trigger the splat below.
+The rest might be the bad commit if it is caused by a change of tun itself.
 
-Now IP_NF_ARPTABLES is only enabled by IP_NF_ARPFILTER, so let's
-restore the dependency on NETFILTER_FAMILY_ARP in IP_NF_ARPFILTER.
+btw I vaguely remember KASAN will report who did the allocation and
+who did the free. But it seems not in your KASAN log.
 
-[0]:
-WARNING: CPU: 0 PID: 242 at net/netfilter/core.c:316 nf_hook_entry_head+0x1e1/0x2c0 net/netfilter/core.c:316
-Modules linked in:
-CPU: 0 PID: 242 Comm: syz-executor.0 Not tainted 6.8.0-12821-g537c2e91d354 #10
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:nf_hook_entry_head+0x1e1/0x2c0 net/netfilter/core.c:316
-Code: 83 fd 04 0f 87 bc 00 00 00 e8 5b 84 83 fd 4d 8d ac ec a8 0b 00 00 e8 4e 84 83 fd 4c 89 e8 5b 5d 41 5c 41 5d c3 e8 3f 84 83 fd <0f> 0b e8 38 84 83 fd 45 31 ed 5b 5d 4c 89 e8 41 5c 41 5d c3 e8 26
-RSP: 0018:ffffc90000b8f6e8 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffffff83c42164
-RDX: ffff888106851180 RSI: ffffffff83c42321 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000005 R09: 000000000000000a
-R10: 0000000000000003 R11: ffff8881055c2f00 R12: ffff888112b78000
-R13: 0000000000000000 R14: ffff8881055c2f00 R15: ffff8881055c2f00
-FS:  00007f377bd78800(0000) GS:ffff88811b000000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000496068 CR3: 000000011298b003 CR4: 0000000000770ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- __nf_register_net_hook+0xcd/0x7a0 net/netfilter/core.c:428
- nf_register_net_hook+0x116/0x170 net/netfilter/core.c:578
- nf_register_net_hooks+0x5d/0xc0 net/netfilter/core.c:594
- arpt_register_table+0x250/0x420 net/ipv4/netfilter/arp_tables.c:1553
- arptable_filter_table_init+0x41/0x60 net/ipv4/netfilter/arptable_filter.c:39
- xt_find_table_lock+0x2e9/0x4b0 net/netfilter/x_tables.c:1260
- xt_request_find_table_lock+0x2b/0xe0 net/netfilter/x_tables.c:1285
- get_info+0x169/0x5c0 net/ipv4/netfilter/arp_tables.c:808
- do_arpt_get_ctl+0x3f9/0x830 net/ipv4/netfilter/arp_tables.c:1444
- nf_getsockopt+0x76/0xd0 net/netfilter/nf_sockopt.c:116
- ip_getsockopt+0x17d/0x1c0 net/ipv4/ip_sockglue.c:1777
- tcp_getsockopt+0x99/0x100 net/ipv4/tcp.c:4373
- do_sock_getsockopt+0x279/0x360 net/socket.c:2373
- __sys_getsockopt+0x115/0x1e0 net/socket.c:2402
- __do_sys_getsockopt net/socket.c:2412 [inline]
- __se_sys_getsockopt net/socket.c:2409 [inline]
- __x64_sys_getsockopt+0xbd/0x150 net/socket.c:2409
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x46/0x4e
-RIP: 0033:0x7f377beca6fe
-Code: 1f 44 00 00 48 8b 15 01 97 0a 00 f7 d8 64 89 02 b8 ff ff ff ff eb b8 0f 1f 44 00 00 f3 0f 1e fa 49 89 ca b8 37 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 0a c3 66 0f 1f 84 00 00 00 00 00 48 8b 15 c9
-RSP: 002b:00000000005df728 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 00000000004966e0 RCX: 00007f377beca6fe
-RDX: 0000000000000060 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 000000000042938a R08: 00000000005df73c R09: 00000000005df800
-R10: 00000000004966e8 R11: 0000000000000246 R12: 0000000000000003
-R13: 0000000000496068 R14: 0000000000000003 R15: 00000000004bc9d8
- </TASK>
+Thanks
 
-Fixes: 4654467dc7e1 ("netfilter: arptables: allow xtables-nft only builds")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv4/netfilter/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/ipv4/netfilter/Kconfig b/net/ipv4/netfilter/Kconfig
-index 8f6e950163a7..1b991b889506 100644
---- a/net/ipv4/netfilter/Kconfig
-+++ b/net/ipv4/netfilter/Kconfig
-@@ -329,6 +329,7 @@ config NFT_COMPAT_ARP
- config IP_NF_ARPFILTER
- 	tristate "arptables-legacy packet filtering support"
- 	select IP_NF_ARPTABLES
-+	select NETFILTER_FAMILY_ARP
- 	depends on NETFILTER_XTABLES
- 	help
- 	  ARP packet filtering defines a table `filter', which has a series of
--- 
-2.30.2
+>
+> Thanks again.
+>
 
 
