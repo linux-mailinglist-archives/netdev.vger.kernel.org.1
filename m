@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-81865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A175D88B6E9
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:34:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B338D88B6FF
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:42:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A9321F3AAB5
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:34:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90FB7B22C75
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED7D208A5;
-	Tue, 26 Mar 2024 01:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CDF21362;
+	Tue, 26 Mar 2024 01:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="V3q4iwt7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TlQ3rYgb"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A16D1CFB2
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 01:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CA61CFB2;
+	Tue, 26 Mar 2024 01:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711416840; cv=none; b=RAj5/LsPd4mV8DC4Sk5uKjpy/lX6KXZ11BJS36N7aMWmJGNNNpJMJdh+xWcgCIEWkOM819KDSy+lDhvf206meT+4vCIoqTF4NDSfjQoB6qqiTwLv8LaJtnP8w3Hg6gu3Oi6EvinkF66DMFisVBbhkt8WmcnyQn/EF1UJyYX5EVU=
+	t=1711417359; cv=none; b=TgrV4ZL9Rkbkz/KKf9nS6PUsBaEZ9GR3rxyaCHcnUvdO47fdnmSwRU40CROgtB1EO7UvSl5qZvZHvZu5l5frtDIrLwyZ/lJfx6Npp14CCTHy9NwMFvLCDSHXs6sM1jZPwNbwGblNOjNA/J8xxQayJpQbccZGT23wykIKNaSm7EA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711416840; c=relaxed/simple;
-	bh=BixFEykapZwVNVEYPFjYThzYjKiAkONn3vmz/qgv0gc=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=vDyIlaHdJ/itxgFndCj+3Nqp7RU54X36xcSg+aBqe6wJaDP6ijReX6apAO8z/kvlZSfiMoCtrUYFW/4TJoeOovQ70nBylugb8nczxYWgtvK6YE/zJmXqm4FibpVV9K0VAbOZHemlV0jswtJqM1lEToN0PZptB6dr5FKwvRJD63k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=V3q4iwt7; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711416830; h=Message-ID:Subject:Date:From:To;
-	bh=OtDyvDpEmkA9ncX8H7rdwsGH2Mc+/yUbMhqgfXQ4gjU=;
-	b=V3q4iwt7tGGxfTOhepPhryVatpCz/qcwXINy5NL0UmLXitpFKxy1jFh3TYEQRV1//7aGwndXi3cCrhZybiEBgAkoRhD+//KD2NDzhMm6+6T//gh2IX9UKYblUrtb0Dv/ZvQT/HJJ3VOiJRRPe1iu7jr4O5scMPqCzInfaoiZx9w=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W3J8F6j_1711416828;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3J8F6j_1711416828)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Mar 2024 09:33:49 +0800
-Message-ID: <1711416803.443376-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 0/4] Remove RTNL lock protection of CVQ
-Date: Tue, 26 Mar 2024 09:33:23 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: <mst@redhat.com>,
- <jasowang@redhat.com>,
- <xuanzhuo@linux.alibaba.com>,
- <virtualization@lists.linux.dev>,
- <davem@davemloft.net>,
- <edumazet@google.com>,
- <kuba@kernel.org>,
- <pabeni@redhat.com>,
- <jiri@nvidia.com>,
- Daniel Jurgens <danielj@nvidia.com>,
- <netdev@vger.kernel.org>
-References: <20240325214912.323749-1-danielj@nvidia.com>
-In-Reply-To: <20240325214912.323749-1-danielj@nvidia.com>
+	s=arc-20240116; t=1711417359; c=relaxed/simple;
+	bh=cZ6v5V99Dnf667GHfXx8dOjxbW4TM7gnOeT0ksyBVqs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EQ8mpafxZK5YPUfP8rahCWsPvBtkSnC9+5pKVMkfoizZpzg7Icdo6FqPIRcg3vN/s44mOZyi5fi/wZXWv91nclGSIJeLOpArGdwC1/VVIwnNSu8MYodRERaGSB95PqVc7lyaltDORtU6yCFN63fOhSyrFyG0hWrfQs+3rWWQgc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TlQ3rYgb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530B9C433F1;
+	Tue, 26 Mar 2024 01:42:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711417358;
+	bh=cZ6v5V99Dnf667GHfXx8dOjxbW4TM7gnOeT0ksyBVqs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TlQ3rYgbJ3LMZZnOVGxKUABZh9uIxKr4TMeCJD/n2r5JDuW2XpKXcqVyIldARUlXO
+	 Ucw5O/68hD5W0ceblsbOjvZhUWk9XQTvNcnYEgkohCiQX3MyQEv57v2n1NFZiFo9p9
+	 uo2n5RzuP8poCt+YB0WK3w2gkNh0aG3/09Gexjpw9MIvFPZSP2TT7DLpdsqHAp5DeM
+	 51YxXru+CauNpBl8iP1+IzaQz3RbT8AdDc+WsxAWRqSwXfzg7KZDbRwTr1JP7DUZ5N
+	 FwHPu39Cl6c1JhNg9IL7TSG9SCJqMUdmT15hbEW6iUgmcKeXyNqW8Go7T3KYcqOfUd
+	 1SwbfIgT3NxNg==
+Date: Mon, 25 Mar 2024 18:42:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: Re: [TEST] VirtioFS instead of 9p (was: net-next is OPEN)
+Message-ID: <20240325184237.0d5a3a7d@kernel.org>
+In-Reply-To: <34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
+References: <20240325064234.12c436c2@kernel.org>
+	<34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-For series:
+On Mon, 25 Mar 2024 17:32:54 +0100 Matthieu Baerts wrote:
+> With 'virtme-ng' used by NIPA, it is possible to use VirtioFS or
+> OverlayFS instead of 9p.
+> 
+> VirtioFS seems to perform much better than 9p [1]. All you need is to
+> install "virtiofsd" daemon in userspace [2]. It looks like Nipa is still
+> using 9p for the rootfs, it might be good to switch to VirtioFS if it is
+> easy :)
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+"All you need is to install" undersells it a little :)
 
-On Mon, 25 Mar 2024 16:49:07 -0500, Daniel Jurgens <danielj@nvidia.com> wrote:
-> Currently the buffer used for control VQ commands is protected by the
-> RTNL lock. Previously this wasn't a major concern because the control
-> VQ was only used during device setup and user interaction. With the
-> recent addition of dynamic interrupt moderation the control VQ may be
-> used frequently during normal operation.
->
-> This series removes the RNTL lock dependancy by introducing a spin lock
-> to protect the control buffer and writing SGs to the control VQ.
->
-> Daniel Jurgens (4):
->   virtio_net: Store RSS setting in virtnet_info
->   virtio_net: Remove command data from control_buf
->   virtio_net: Add a lock for the command VQ.
->   virtio_net: Remove rtnl lock protection of command buffers
->
->  drivers/net/virtio_net.c | 185 ++++++++++++++++++++++-----------------
->  1 file changed, 104 insertions(+), 81 deletions(-)
->
-> --
-> 2.42.0
->
+It's not packaged for silly OS^w^w AWS Linux. 
+And the Rust that comes with it doesn't seem to be able to build it :(
+
+
+error[E0658]: use of unstable library feature 'is_some_and'
+  --> /home/virtme/.cargo/registry/src/github.com-1ecc6299db9ec823/vhost-user-backend-0.14.0/src/bitmap.rs:87:14
+   |
+87 |             .is_some_and(|bitmap| bitmap.dirty_at(self.base_address.saturating_add(offset)))
+   |              ^^^^^^^^^^^
+   |
+   = note: see issue #93050 <https://github.com/rust-lang/rust/issues/93050> for more information
+
+For more information about this error, try `rustc --explain E0658`.
+error: could not compile `vhost-user-backend` due to previous error
+warning: build failed, waiting for other jobs to finish...
+
+
+Onto the ToDo pile it goes :)
+
+> If you want to use OverlayFS (e.g. to mount the kselftests dir), you can
+> use "vng --overlay-rwdir". If you use "vng --rwdir" (or "vng --rodir"),
+> 9p will be used. Maybe better to recommend that on the wiki [3]?
+> 
+> (The MPTCP CI didn't hit the bug with 9p, because it now uses vng with
+> VirtioFS.)
 
