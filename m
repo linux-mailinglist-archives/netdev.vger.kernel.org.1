@@ -1,216 +1,239 @@
-Return-Path: <netdev+bounces-82038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B91188C280
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:46:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1CEC88C289
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:47:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00BB41F650DF
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:46:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 881B5304B87
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858B95C61F;
-	Tue, 26 Mar 2024 12:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="ABrFPU4N"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704D06D1B9;
+	Tue, 26 Mar 2024 12:47:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCEC14A8E;
-	Tue, 26 Mar 2024 12:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0826D139E;
+	Tue, 26 Mar 2024 12:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711457199; cv=none; b=Jcvl0MJQ+AZ74AQ3QNRQNoH4bTRonzXfbOcb9O1FWIjztGg1Kr9hrZyDhYbiOCprl6WmZjHQxNOrsdVIezumqKSVKBE/P5rEm6qLsCvpbFt+vBSAe/IAMsrVB03Kct92SYJeeXN3AW87WxplVVz8l8FAKLB5GR1yaHO971Y1h2w=
+	t=1711457245; cv=none; b=IBTf+jFr+Ryz/oWCtPW+jwPzqOtRqqzL3t+Hby9L56GTsbtUXyk8J6rmEIkyS74tGB6jhSByQaeG83hz8efzzJnTJUqYuZTxeOtWxQhVRAupG+ihckYmZK50kkpSGLeIheqyZvzwC0otJuc+tftsxAgvO6NAkvc5SqJHQHJaKy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711457199; c=relaxed/simple;
-	bh=hwuqNlIoW1eh62U/CrrcM41dXmP127sWmudFYXwn90M=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=l9chtatjAjC2vPRp8T7XuEsX+i2KLXpX7iZNX8VTzx5k9Ayd4Q5634VVD1kUCyxdb+jKttuLZ/ndl9GgkozK5jM0wpz6sVpRMBOo1JrokafSUKA5JA2eKKRd6aTS+5zuN9MmRdkHWaID3fL8ZMDlPr0LKkmX/Cc9QtY12vvzVWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=ABrFPU4N; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=iu293LeB3d/Uyn4wXl7wKNldzLqRgRxlP7R7VQm4BP0=; b=ABrFPU4N1noUANzlT1WG0JrQ32
-	ccTCsBC+aiiv3RLfsz6MKV6FpGGfdyBhqUygSTGYdMzN4p3RoZ6dWV+YUBY7JM2h5u410ag8C31t5
-	SU7lCNQmC1jmbA0hS66DWadTtx0/Z0mfNOljO+9yyQu5s7UqOi2t6jCJWTpzagGqot80Aqy65Hhla
-	U0CuEoOCc4QYMNymBgy3fkJENYfWXa3vuYXxMCO9JGyw4xD2LE0NH0jdgvP8HWKcozvQczp2FWqGo
-	nPPByNgh6O85dVpB0V9t4mDLEQi666rj7vE9+ykEI/ymSQK9Z6vvTgAwwh6bUppf5KvHg8Unu6Ubi
-	QapwUcsA==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rp6C9-000B3b-1x; Tue, 26 Mar 2024 13:46:25 +0100
-Received: from [178.197.248.30] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rp6C8-0002dz-2g; Tue, 26 Mar 2024 13:46:24 +0100
-Subject: Re: [PATCH net] bpf: Don't redirect too small packets
-To: Stanislav Fomichev <sdf@google.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Guillaume Nault <gnault@redhat.com>,
- patchwork-bot+netdevbpf@kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>,
- Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- Eric Dumazet <eric.dumazet@gmail.com>,
- syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com,
- Willem de Bruijn <willemb@google.com>
-References: <20240322122407.1329861-1-edumazet@google.com>
- <171111663201.19374.16295682760005551863.git-patchwork-notify@kernel.org>
- <CAADnVQJy+0=6ZuAz-7dwOPK3sN2QrPiAcxhtojh8p65j0TRNhg@mail.gmail.com>
- <CANn89iLSOeFGNogYMHbeLRC5kOwwArMz3d5_2hZmBn6fibyUhw@mail.gmail.com>
- <CAADnVQ+OhsBetPT0avuNVsEwru13UtMjX1U_6_u6xROXBBn-Yg@mail.gmail.com>
- <ZgGmQu09Z9xN7eOD@google.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <d9531955-06ad-ccdd-d3d0-4779400090ba@iogearbox.net>
-Date: Tue, 26 Mar 2024 13:46:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1711457245; c=relaxed/simple;
+	bh=sGJsi5QL5OEY3rakPIBQalfrmkZhP62VUd/1rO/Tex0=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=DfJ3VN04r+4INdHxV48V0lQz7d8EB/2PUJWx4xT/AyraDzO1NeWNm5TTs4gNneBDn5ZyU0L1WgouB7fI+dbSciSGO++epSeV5V4pkSLMGKO2QxZBCzrx3syGdYVbPsKWz5GEmA2DiywhOEv3/abWddIsQNVDlfidgA0bjAM2jq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4V3qJ843l4z2BhYv;
+	Tue, 26 Mar 2024 20:44:40 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4E2C9140120;
+	Tue, 26 Mar 2024 20:47:19 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 26 Mar
+ 2024 20:47:18 +0800
+Subject: Re: [RFC PATCH net-next v6 00/15] Device Memory TCP
+To: Mina Almasry <almasrymina@google.com>, YiFei Zhu <zhuyifei@google.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-alpha@vger.kernel.org>,
+	<linux-mips@vger.kernel.org>, <linux-parisc@vger.kernel.org>,
+	<sparclinux@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard
+ Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
+	<ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+	<James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+	<arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
+ Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Shailend Chand
+	<shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel
+ Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
+ Kaligineedi <pkaligineedi@google.com>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <6208950d-6453-e797-7fc3-1dcf15b49dbe@huawei.com>
+ <CAHS8izMwTRyqUS0iRtErfAqDVsXRia5Ajx9PRK3vcfo8utJoUA@mail.gmail.com>
+ <CAHS8izPR+SioMKNv3=2ajK=GGOE26BTaxOMykHJfjttqYjx1wQ@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <ca9ab650-3f77-509c-7a29-6d7dd775b6d1@huawei.com>
+Date: Tue, 26 Mar 2024 20:47:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZgGmQu09Z9xN7eOD@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAHS8izPR+SioMKNv3=2ajK=GGOE26BTaxOMykHJfjttqYjx1wQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27226/Tue Mar 26 09:37:28 2024)
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 3/25/24 5:28 PM, Stanislav Fomichev wrote:
-> On 03/25, Alexei Starovoitov wrote:
->> On Mon, Mar 25, 2024 at 6:33 AM Eric Dumazet <edumazet@google.com> wrote:
->>>
->>> On Sat, Mar 23, 2024 at 4:02 AM Alexei Starovoitov
->>> <alexei.starovoitov@gmail.com> wrote:
->>>>
->>>> On Fri, Mar 22, 2024 at 7:10 AM <patchwork-bot+netdevbpf@kernel.org> wrote:
->>>>>
->>>>> Hello:
->>>>>
->>>>> This patch was applied to bpf/bpf.git (master)
->>>>> by Daniel Borkmann <daniel@iogearbox.net>:
->>>>>
->>>>> On Fri, 22 Mar 2024 12:24:07 +0000 you wrote:
->>>>>> Some drivers ndo_start_xmit() expect a minimal size, as shown
->>>>>> by various syzbot reports [1].
->>>>>>
->>>>>> Willem added in commit 217e6fa24ce2 ("net: introduce device min_header_len")
->>>>>> the missing attribute that can be used by upper layers.
->>>>>>
->>>>>> We need to use it in __bpf_redirect_common().
->>>>
->>>> This patch broke empty_skb test:
->>>> $ test_progs -t empty_skb
->>>>
->>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
->>>> [redirect_ingress] unexpected ret: veth ETH_HLEN+1 packet ingress
->>>> [redirect_ingress]: actual -34 != expected 0
->>>> test_empty_skb:PASS:err: veth ETH_HLEN+1 packet ingress [redirect_egress] 0 nsec
->>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
->>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
->>>> [redirect_egress]: actual -34 != expected 1
->>>>
->>>> And looking at the test I think it's not a test issue.
->>>> This check
->>>> if (unlikely(skb->len < dev->min_header_len))
->>>> is rejecting more than it should.
->>>>
->>>> So I reverted this patch for now.
->>>
->>> OK, it seems I missed __bpf_rx_skb() vs __bpf_tx_skb(), but even if I
->>> move my sanity test in __bpf_tx_skb(),
->>> the bpf test program still fails, I am suspecting the test needs to be adjusted.
->>>
->>>
->>>
->>> diff --git a/net/core/filter.c b/net/core/filter.c
->>> index 745697c08acb3a74721d26ee93389efa81e973a0..e9c0e2087a08f1d8afd2c3e8e7871ddc9231b76d
->>> 100644
->>> --- a/net/core/filter.c
->>> +++ b/net/core/filter.c
->>> @@ -2128,6 +2128,12 @@ static inline int __bpf_tx_skb(struct
->>> net_device *dev, struct sk_buff *skb)
->>>                  return -ENETDOWN;
->>>          }
->>>
->>> +       if (unlikely(skb->len < dev->min_header_len)) {
->>> +               pr_err_once("__bpf_tx_skb skb->len=%u <
->>> dev(%s)->min_header_len(%u)\n", skb->len, dev->name,
->>> dev->min_header_len);
->>> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
->>> +               kfree_skb(skb);
->>> +               return -ERANGE;
->>> +       } // Note: this is before we change skb->dev
->>>          skb->dev = dev;
->>>          skb_set_redirected_noclear(skb, skb_at_tc_ingress(skb));
->>>          skb_clear_tstamp(skb);
->>>
->>>
->>> -->
->>>
->>>
->>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
->>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
->>> [redirect_egress]: actual -34 != expected 1
->>>
->>> [   58.382051] __bpf_tx_skb skb->len=1 < dev(veth0)->min_header_len(14)
->>> [   58.382778] skb len=1 headroom=78 headlen=1 tailroom=113
->>>                 mac=(64,14) net=(78,-1) trans=-1
->>>                 shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
->>>                 csum(0x0 ip_summed=0 complete_sw=0 valid=0 level=0)
->>>                 hash(0x0 sw=0 l4=0) proto=0x7f00 pkttype=0 iif=0
+On 2024/3/26 8:28, Mina Almasry wrote:
+> On Tue, Mar 5, 2024 at 11:38 AM Mina Almasry <almasrymina@google.com> wrote:
 >>
->> Hmm. Something is off.
->> That test creates 15 byte skb.
->> It's not obvious to me how it got reduced to 1.
->> Something stripped L2 header and the prog is trying to redirect
->> such skb into veth that expects skb with L2 ?
+>> On Tue, Mar 5, 2024 at 4:54 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>>
+>>> On 2024/3/5 10:01, Mina Almasry wrote:
+>>>
+>>> ...
+>>>
+>>>>
+>>>> Perf - page-pool benchmark:
+>>>> ---------------------------
+>>>>
+>>>> bench_page_pool_simple.ko tests with and without these changes:
+>>>> https://pastebin.com/raw/ncHDwAbn
+>>>>
+>>>> AFAIK the number that really matters in the perf tests is the
+>>>> 'tasklet_page_pool01_fast_path Per elem'. This one measures at about 8
+>>>> cycles without the changes but there is some 1 cycle noise in some
+>>>> results.
+>>>>
+>>>> With the patches this regresses to 9 cycles with the changes but there
+>>>> is 1 cycle noise occasionally running this test repeatedly.
+>>>>
+>>>> Lastly I tried disable the static_branch_unlikely() in
+>>>> netmem_is_net_iov() check. To my surprise disabling the
+>>>> static_branch_unlikely() check reduces the fast path back to 8 cycles,
+>>>> but the 1 cycle noise remains.
+>>>>
+>>>
+>>> The last sentence seems to be suggesting the above 1 ns regresses is caused
+>>> by the static_branch_unlikely() checking?
 >>
->> Stan,
->> please take a look.
->> Since you wrote that test.
+>> Note it's not a 1ns regression, it's looks like maybe a 1 cycle
+>> regression (slightly less than 1ns if I'm reading the output of the
+>> test correctly):
+>>
+>> # clean net-next
+>> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 8 cycles(tsc)
+>> 2.993 ns (step:0)
+>>
+>> # with patches
+>> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 9 cycles(tsc)
+>> 3.679 ns (step:0)
+>>
+>> # with patches and with diff that disables static branching:
+>> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 8 cycles(tsc)
+>> 3.248 ns (step:0)
+>>
+>> I do see noise in the test results between run and run, and any
+>> regression (if any) is slightly obfuscated by the noise, so it's a bit
+>> hard to make confident statements. So far it looks like a ~0.25ns
+>> regression without static branch and about ~0.65ns with static branch.
+>>
+>> Honestly when I saw all 3 results were within some noise I did not
+>> investigate more, but if this looks concerning to you I can dig
+>> further. I likely need to gather a few test runs to filter out the
+>> noise and maybe investigate the assembly my compiler is generating to
+>> maybe narrow down what changes there.
+>>
 > 
-> Sure. Daniel wants to take a look on a separate thread, so we can sync
-> up. Tentatively, seems like the failure is in the lwt path that does
-> indeed drop the l2.
+> I did some more investigation here to gather more data to filter out
+> the noise, and recorded the summary here:
+> 
+> https://pastebin.com/raw/v5dYRg8L
+> 
+> Long story short, the page_pool benchmark results are consistent with
+> some outlier noise results that I'm discounting here. Currently
+> page_pool fast path is at 8 cycles
+> 
+> [ 2115.724510] time_bench: Type:tasklet_page_pool01_fast_path Per
+> elem: 8 cycles(tsc) 3.187 ns (step:0) - (measurement period
+> time:0.031870585 sec time_interval:31870585) - (invoke count:10000000
+> tsc_interval:86043192)
+> 
+> and with this patch series it degrades to 10 cycles, or about a 0.7ns
+> degradation or so:
 
-If we'd change the test into the below, the tc and empty_skb tests pass.
-run_lwt_bpf() calls into skb_do_redirect() which has L2 stripped, and thus
-skb->len is 1 in this test. We do use skb_mac_header_len() also in other
-tc BPF helpers, so perhaps s/skb->len/skb_mac_header_len(skb)/ is the best
-way forward..
+Even if the absolute value for the overhead is small, we seems have a
+degradation of about 20% for tasklet_page_pool01_fast_path testcase,
+which seems scary.
 
-static int __bpf_redirect_common(struct sk_buff *skb, struct net_device *dev,
-                                  u32 flags)
-{
-         /* Verify that a link layer header is carried */
-         if (unlikely(skb->mac_header >= skb->network_header || skb->len == 0)) {
-                 kfree_skb(skb);
-                 return -ERANGE;
-         }
+I am assuming that every page is recyclable for tasklet_page_pool01_fast_path
+testcase, and that code path matters for page_pool, it would be good to
+remove any additional checking for that code path.
 
-         if (unlikely(skb_mac_header_len(skb) < dev->min_header_len)) {
-                 kfree_skb(skb);
-                 return -ERANGE;
-         }
+And we already have pool->has_init_callback checking when we have to use
+a new page, it may make sense to refactor that to share the same checking
+for provider to avoid the overhead as much as possible.
 
-         bpf_push_mac_rcsum(skb);
-         return flags & BPF_F_INGRESS ?
-                __bpf_rx_skb(dev, skb) : __bpf_tx_skb(dev, skb);
-}
+Also, I am not sure if it really matter that much, as with the introducing
+of netmem_is_net_iov() checking spreading in the networking, the overhead
+might add up for other case too.
 
-Thanks,
-Daniel
+> 
+> [  498.226127] time_bench: Type:tasklet_page_pool01_fast_path Per
+> elem: 10 cycles(tsc) 3.944 ns (step:0) - (measurement period
+> time:0.039442539 sec time_interval:39442539) - (invoke count:10000000
+> tsc_interval:106485268)
+> 
+> I took the time to dig into where the degradation comes from, and to
+> my surprise we can shave off 1 cycle in perf by removing the
+> static_branch_unlikely check in netmem_is_net_iov() like so:
+> 
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index fe354d11a421..2b4310ac1115 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -122,8 +122,7 @@ typedef unsigned long __bitwise netmem_ref;
+>  static inline bool netmem_is_net_iov(const netmem_ref netmem)
+>  {
+>  #ifdef CONFIG_PAGE_POOL
+> -       return static_branch_unlikely(&page_pool_mem_providers) &&
+> -              (__force unsigned long)netmem & NET_IOV;
+> +       return (__force unsigned long)netmem & NET_IOV;
+>  #else
+>         return false;
+>  #endif
+> 
+> With this change, the fast path is 9 cycles, only  a 1 cycle (~0.35ns)
+> regression:
+> 
+> [  199.184429] time_bench: Type:tasklet_page_pool01_fast_path Per
+> elem: 9 cycles(tsc) 3.552 ns (step:0) - (measurement period
+> time:0.035524013 sec time_interval:35524013) - (invoke count:10000000
+> tsc_interval:95907775)
+> 
+> I did some digging with YiFei on why the static_branch_unlikely
+> appears to be causing a 1 cycle regression, but could not get an
+> answer that makes sense. The # of instructions in
+> page_pool_return_page() with the static_branch_unlikely and without is
+> about the same in the compiled .o file, and my understanding is that
+> static_branch will cause code re-writing anyway so looking at the
+> compiled code may not be representative.
+> 
+> Worthy of note is that I get ~95% line rate of devmem TCP regardless
+> of the static_branch_unlikely() or not, so impact of the static_branch
+> is not large enough to be measurable end-to-end. I'm thinking I want
+> to drop the static_branch_unlikely() in the next RFC since it doesn't
+> improve the end-to-end throughput number and is resulting in a
+> measurable improvement in the page pool benchmark.
+> 
 
