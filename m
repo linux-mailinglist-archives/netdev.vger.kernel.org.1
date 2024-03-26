@@ -1,55 +1,57 @@
-Return-Path: <netdev+bounces-81866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B338D88B6FF
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:42:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5263F88B719
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:52:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90FB7B22C75
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:42:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 302E91C360E0
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CDF21362;
-	Tue, 26 Mar 2024 01:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866AD282EB;
+	Tue, 26 Mar 2024 01:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TlQ3rYgb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GyTUbtTT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CA61CFB2;
-	Tue, 26 Mar 2024 01:42:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2D0208A0;
+	Tue, 26 Mar 2024 01:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711417359; cv=none; b=TgrV4ZL9Rkbkz/KKf9nS6PUsBaEZ9GR3rxyaCHcnUvdO47fdnmSwRU40CROgtB1EO7UvSl5qZvZHvZu5l5frtDIrLwyZ/lJfx6Npp14CCTHy9NwMFvLCDSHXs6sM1jZPwNbwGblNOjNA/J8xxQayJpQbccZGT23wykIKNaSm7EA=
+	t=1711417957; cv=none; b=E+6VqVNkELlWk11W9PoXpaxOz8CTudJtZnkl5UL+lYPyIJi7bDjmQwRJMWGQ8GfUMqpU6X5JjagcbzBqYqqOcHuZDfz/FI+hfuWv2hAf3AL/uB+iBhtADSZUYO/M32tKF0kUI5+Vx+LW+Tmayr9PCcge9WHPU36u++5qCIu1qgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711417359; c=relaxed/simple;
-	bh=cZ6v5V99Dnf667GHfXx8dOjxbW4TM7gnOeT0ksyBVqs=;
+	s=arc-20240116; t=1711417957; c=relaxed/simple;
+	bh=41HzCcmKGdpC5F2Ac6G0iIm2fkdlbujw9uvFa0tJEh8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EQ8mpafxZK5YPUfP8rahCWsPvBtkSnC9+5pKVMkfoizZpzg7Icdo6FqPIRcg3vN/s44mOZyi5fi/wZXWv91nclGSIJeLOpArGdwC1/VVIwnNSu8MYodRERaGSB95PqVc7lyaltDORtU6yCFN63fOhSyrFyG0hWrfQs+3rWWQgc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TlQ3rYgb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530B9C433F1;
-	Tue, 26 Mar 2024 01:42:38 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fr/GYkkFJ5x90XvztdcTTgIE/lhX9w3YG/qTSub0lSfJ5wfs6k0k/8vL/jWypkOZj0utu3k/doffuRhZYWjvrV/qjtjN3aChCj8+M/t9DkFFf3qCRhqpYb7mOV+KUdEedNSg8bzhyhGgKI3Mxpy0haiSBmAJGZAgKGhqcI8eVag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GyTUbtTT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B70C433F1;
+	Tue, 26 Mar 2024 01:52:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711417358;
-	bh=cZ6v5V99Dnf667GHfXx8dOjxbW4TM7gnOeT0ksyBVqs=;
+	s=k20201202; t=1711417956;
+	bh=41HzCcmKGdpC5F2Ac6G0iIm2fkdlbujw9uvFa0tJEh8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TlQ3rYgbJ3LMZZnOVGxKUABZh9uIxKr4TMeCJD/n2r5JDuW2XpKXcqVyIldARUlXO
-	 Ucw5O/68hD5W0ceblsbOjvZhUWk9XQTvNcnYEgkohCiQX3MyQEv57v2n1NFZiFo9p9
-	 uo2n5RzuP8poCt+YB0WK3w2gkNh0aG3/09Gexjpw9MIvFPZSP2TT7DLpdsqHAp5DeM
-	 51YxXru+CauNpBl8iP1+IzaQz3RbT8AdDc+WsxAWRqSwXfzg7KZDbRwTr1JP7DUZ5N
-	 FwHPu39Cl6c1JhNg9IL7TSG9SCJqMUdmT15hbEW6iUgmcKeXyNqW8Go7T3KYcqOfUd
-	 1SwbfIgT3NxNg==
-Date: Mon, 25 Mar 2024 18:42:37 -0700
+	b=GyTUbtTT/+lK39/t1cAhOoP5DswYTsi6hk2B5d43nkrVsvlJ/fcIxIRKMpJJFDMor
+	 5ayovZsp26/P+PSTLTSU3h334wLThM6mxS+aEtq7Zsb77ReMdZ1ESmiDIAjmepaErd
+	 R2VATHqvZqTdc7rjlfIPELACI9CynhopuLXq1NJoeVphzbL33F1FqJF4H79PlBv17q
+	 lOsRnuZb/j0golrV6oTbWtjyQsopxto7B3O56FagUPttf7Y9MQyXAujBuZW6qfMolj
+	 9+1qvXqH7see4+ynEbvnmKkgXTnBQ5jaZHQ3mR6nrzeCqftFWXMByuVVnD3dZ40wzH
+	 D4MxfJ7j2pszw==
+Date: Mon, 25 Mar 2024 18:52:35 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [TEST] VirtioFS instead of 9p (was: net-next is OPEN)
-Message-ID: <20240325184237.0d5a3a7d@kernel.org>
-In-Reply-To: <34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
-References: <20240325064234.12c436c2@kernel.org>
-	<34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Johannes Berg <johannes.berg@intel.com>, Brendan Higgins
+ <brendanhiggins@google.com>, David Gow <davidgow@google.com>, Rae Moar
+ <rmoar@google.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, x86@kernel.org
+Subject: Re: kunit alltests runs broken in mainline
+Message-ID: <20240325185235.2f704004@kernel.org>
+In-Reply-To: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
+References: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,40 +61,45 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 25 Mar 2024 17:32:54 +0100 Matthieu Baerts wrote:
-> With 'virtme-ng' used by NIPA, it is possible to use VirtioFS or
-> OverlayFS instead of 9p.
+On Mon, 25 Mar 2024 15:21:33 +0000 Mark Brown wrote:
+> Hi,
 > 
-> VirtioFS seems to perform much better than 9p [1]. All you need is to
-> install "virtiofsd" daemon in userspace [2]. It looks like Nipa is still
-> using 9p for the rootfs, it might be good to switch to VirtioFS if it is
-> easy :)
-
-"All you need is to install" undersells it a little :)
-
-It's not packaged for silly OS^w^w AWS Linux. 
-And the Rust that comes with it doesn't seem to be able to build it :(
-
-
-error[E0658]: use of unstable library feature 'is_some_and'
-  --> /home/virtme/.cargo/registry/src/github.com-1ecc6299db9ec823/vhost-user-backend-0.14.0/src/bitmap.rs:87:14
-   |
-87 |             .is_some_and(|bitmap| bitmap.dirty_at(self.base_address.saturating_add(offset)))
-   |              ^^^^^^^^^^^
-   |
-   = note: see issue #93050 <https://github.com/rust-lang/rust/issues/93050> for more information
-
-For more information about this error, try `rustc --explain E0658`.
-error: could not compile `vhost-user-backend` due to previous error
-warning: build failed, waiting for other jobs to finish...
-
-
-Onto the ToDo pile it goes :)
-
-> If you want to use OverlayFS (e.g. to mount the kselftests dir), you can
-> use "vng --overlay-rwdir". If you use "vng --rwdir" (or "vng --rodir"),
-> 9p will be used. Maybe better to recommend that on the wiki [3]?
+> Commit 28b3df1fe6ba2cb4 ("kunit: add wireless unit tests") which I can't
+> seem to find on lore breaks full kunit runs on non-UML builds and is now
+> present in mainline.  If I run:
 > 
-> (The MPTCP CI didn't hit the bug with 9p, because it now uses vng with
-> VirtioFS.)
+>    ./tools/testing/kunit/kunit.py run --alltests --cross_compile x86_64-linux-gnu- --arch x86_64
+> 
+> on a clean tree then I get:
+> 
+>    [15:09:20] Configuring KUnit Kernel ...
+>    Generating .config ...
+>    Populating config with:
+>    $ make ARCH=x86_64 O=.kunit olddefconfig CROSS_COMPILE=x86_64-linux-gnu-
+>    ERROR:root:Not all Kconfig options selected in kunitconfig were in the generated .config.
+>    This is probably due to unsatisfied dependencies.
+>    Missing: CONFIG_IWLWIFI=y, CONFIG_WLAN_VENDOR_INTEL=y
+> 
+> UML works fine, but other real architectures (eg, arm64) seem similarly
+> broken.  I've not looked properly yet, I'm a bit confused given that
+> there's not even any dependencies for WLAN_VENDOR_INTEL and it's not
+> mentoned in the defconfig.
+
+I'm late to the party, but FWIW I had to toss this into netdev testing
+tree as a local patch:
+
+CONFIG_NETDEVICES=y
+CONFIG_WLAN=y
+CONFIG_DAMON_DBGFS_DEPRECATED=y
+https://github.com/linux-netdev/testing/commit/9a632301bf3dbc9ba553562a0ba2657af6fa84d1
+
+We run using:
+
+	./tools/testing/kunit/kunit.py run --alltests
+
+it got broken after we fast-forwarded to Linus on Thu, so I assumed it
+was kunit itself that changed. Not that I found the relevant commit.
+
+The DAMON config was also breaking UML for us, BTW, and I don't see
+any fix for that in Linus's tree. Strangeness.
 
