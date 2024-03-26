@@ -1,125 +1,122 @@
-Return-Path: <netdev+bounces-81961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41F6888BEDD
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:08:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E1588BEEA
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA9E42E5A18
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:08:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 044791C3CFAC
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48A0535AC;
-	Tue, 26 Mar 2024 10:08:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41265B208;
+	Tue, 26 Mar 2024 10:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="v6e+0QPh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DN+4xh8f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0151AEAF6
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 10:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6D754916
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 10:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711447702; cv=none; b=Tqof/oPX5Jppw+gm0eI+ZTfkB33Rz2qZLxJuGQILhdv6FYpzTcEupPuZKQsPy/buVL+dbupsp1ah7WiliOteiBKWWXyZ/VTpECwHJf+shawckbmUfgAQVJrDfnStZUPcWElUfv+Ww6gguYiBbZ8fYjxZuXcLdDJ27b1Dwb0QUV8=
+	t=1711447774; cv=none; b=BIYnZhNRs67LY17jpefgvautJwNrJlO5DuPB0BkPqCsL+7cKnGoQjiyrsCa+u7+Kt7GSkfK6tQZzkW7rl9HcGJ/FzlpdpLj4Y9UqhPcqRqtrKqVXdCfneig0farWaHGcp9wxCD81brYvL0/+B+jDtxQfZP4XnGNV/1Q4B87yuHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711447702; c=relaxed/simple;
-	bh=iMasg3RXiM2zMrPtA/PUIeA9zhqUb3/K3j9D+/sk2KY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lRy/4JVd0sZ3ZBL+Q59frZdxUKPtU2t/kQ6kpgxj03LOvwvtZwVN0CeXxS4tRgLG51lufcB5XsCMjmEc37aVM+Om+D7iB34hfwMnL6g7P3zPuOCMMZZC/WIvmiNyXtvUgXrFMmAJhs3+ARw87h9poM03ivVALVcXEcNyM7lM3so=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=v6e+0QPh; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 1C1DC3F204
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 10:08:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1711447698;
-	bh=i31uu0Ui9r+LT8kJmavX0tuIXLiQjHwXp0dNp5AvTr8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type;
-	b=v6e+0QPhrLTLYLwWXXSRWBs8kzc2h7ZbiWTTerVRFeJrR4T7FyS/+Bb859oHYKY67
-	 f6jB9D7EDJfYT6s8XTM6Y8TL8k/9eMqrEpqippSTckOxlZf2vgqigY92s8p/dpHQ5h
-	 5Az7odu8uRF+xU1FUf9drlXau/0RSyQlOph9hJ1caCmZ3Vl/d5U7yfz4EsdThtfPEd
-	 loLKmbhk/QN+zQuIc6ufM9dEnQFkpd5nLRNVx52sysPBPcA2NTKjzzkBsIt/shZEGO
-	 etqlQJYKT2l4Qgj6WNpy41LNg6u8F1oIK/xhg1d1NxFwqh+b5QwIJYDKCgv6Ogj/nH
-	 /tCO49o1bvJtA==
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1defc12ef3fso35517545ad.0
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:08:18 -0700 (PDT)
+	s=arc-20240116; t=1711447774; c=relaxed/simple;
+	bh=sPRMdzA0/luYwpYQ+t5SitI43KODkM/+VZrv4i/srQQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a4Re1S19Y+QXZxpK8j0JAhAp80D9jxasZGTGYydcct5XRNAbAhBNvvX8Yssf9smbNp1y3JTMG5YiVm2apXk+LKaraQa6EbP9OAS9UaQBk3CYDcv+nLIS8EwM1RLMW2jms7gSSsutOfmXdHhSfF4wHIwX1yzahA2e3WZUzkJKS2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DN+4xh8f; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso5908a12.1
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:09:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711447771; x=1712052571; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sPRMdzA0/luYwpYQ+t5SitI43KODkM/+VZrv4i/srQQ=;
+        b=DN+4xh8frdyAiEnVwfuinp82pltvxQlVw9XhAML7PoAKV6C1fWD9uAjFFAGBqpglCO
+         9sot3FI9CZUm3XszHjBnNKuKc3X0Xm8XZe8weIANEBJhDl+RpwRSXvIRJ7Knjxi+yStn
+         QNMp+AUehd+8D6KG6XbZFyv1G8KYlLZl59eMcMFD5pNhqIEK5xitJlnEvZP1LCkq/eNz
+         6CFWCsHYSlTFM+jMSLhctbAQOYIVAePeTkAMaxfSnMg1ZFYNMnaJIwhp33UQQjJg+7kn
+         EYAJi5qfuOY80+/OHgnmVAMpGdSUIOe4JNq2H5yJNRir7ktw6Dfkw81R7Hgg7HHHz28Q
+         Q34g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711447697; x=1712052497;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i31uu0Ui9r+LT8kJmavX0tuIXLiQjHwXp0dNp5AvTr8=;
-        b=qx+k/xcW4TKRCx6Yx5RdVr4TnCSl9/8gwgNHPXQrEW2olIyTQzm9qagk4sMpTnxJt0
-         LsjQvp1ApVifm4wUmJrGRrKNEy4q0AwyuLBCDXdQmCBT8uwBznGWUcoGtrkhvdG5/Zd4
-         hlThEJCdeWIJ+wf4TT2wohj8C2U55K+O9su3dQPEA2pW9QFPaXQpplbv4wcReuizYXBM
-         XBeaWxdAcwb4rY5d/pxUoRKBBUeEze5N39Fq5W9w9R30KnlQdlMR1vBnkOOSr4xU9DMs
-         dDhQCKJrsK/WvqD6d7VSScIaKi2Mbvp3NhvlD3yrEe6kaIQxfDOnKv+X3J2qiuNKWRkK
-         kv/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUeH6PlhVLzlq8+VEe277hvoznkc+MzlqNJttD0Y+6AkkHoPOhPhkbJiniarWRHMpSUCMFM0oEPMGaIqWy136Kk5UIOYEYm
-X-Gm-Message-State: AOJu0Yx1Io6vCgWTSjI7wxqSbpwJdj9nfdeeC2EJENjyVng4+wW1ySQF
-	JPg6r/rViaFEqaxF3QNFrEkRQfFjHtlB2DAxJaHVXZhAtAKgmgC4xHjR+87Aomji1QvA8uv9GmF
-	qcQteNwwiz+TqeG/fKuyz+m3NOdjLs5G1NH/TDwU88mGnEFv0qPdVxh5yXc8qwNvrXazKOA==
-X-Received: by 2002:a17:902:70c8:b0:1dd:df89:5c2 with SMTP id l8-20020a17090270c800b001dddf8905c2mr1142256plt.22.1711447696762;
-        Tue, 26 Mar 2024 03:08:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGvn/WKom1ejskT1JAUaGxB10DGNNfX+RLkfo78oEtGyJQWcriTiXiqcCkkAeRDzDOTb7wbkw==
-X-Received: by 2002:a17:902:70c8:b0:1dd:df89:5c2 with SMTP id l8-20020a17090270c800b001dddf8905c2mr1142241plt.22.1711447696451;
-        Tue, 26 Mar 2024 03:08:16 -0700 (PDT)
-Received: from localhost ([2001:67c:1560:8007::aac:c02c])
-        by smtp.gmail.com with UTF8SMTPSA id i10-20020a170902c94a00b001e0c949124fsm2752115pla.309.2024.03.26.03.08.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Mar 2024 03:08:16 -0700 (PDT)
-From: Atlas Yu <atlas.yu@canonical.com>
-To: pabeni@redhat.com
-Cc: atlas.yu@canonical.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	hau@realtek.com,
-	hkallweit1@gmail.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	nic_swsd@realtek.com
-Subject: DRY rules - extract into rtl_cond_loop_wait_high()
-Date: Tue, 26 Mar 2024 18:08:02 +0800
-Message-Id: <20240326100802.51343-1-atlas.yu@canonical.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <bdfd3a4938e2eb37272a9550c869bb557fb70cab.camel@redhat.com>
-References: <bdfd3a4938e2eb37272a9550c869bb557fb70cab.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1711447771; x=1712052571;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sPRMdzA0/luYwpYQ+t5SitI43KODkM/+VZrv4i/srQQ=;
+        b=B0eAOGEZcmTWerYkTq3SX3qIrGqOl2/ga5BrhpnlLdqa3F0I2i4cztFtqEpEKeHGRB
+         UHzlmnTCurQY96CM1ymrPzsnmj3NxQ2/dFeUP3AWo123CvSVY2sN8HaNfA5oWzyfSmFY
+         0rECvoANo2vMdcrpb5RPKQy5UMQlBomahEzGzI5rjNPC/liAY9ZDucdTUUE6/WP8SjFL
+         FKpR58F02J/UEfTcPWl0Yl8feMn85HF+d4jenxqoDqGSJf8JmZ+MpnMbAgxEc44YJMJ/
+         Z6x+uFTx7XvECXIEviqu+sBWRB/U5AYe16noS7v1m9K90UcY9mNlQRdbHLh6EEbROQY/
+         CRwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXw99DBePIuuSvbpUekfVDWSd08em9lYT73FrzO1e9YXj0XmOEc5XswtVqhKqYFpgrZrxcCpeIO7izKo5EtWRtnBeYuKcis
+X-Gm-Message-State: AOJu0YxX0XDjhDREUFl184aM6Ff1iSP50Z2FCjQXB0z0afbu0CM22A7a
+	O8JRp/JZxsdACmHykvWJ0plGBQWvAIGpEmGiVQzwQ2DsaK9BHqkSmXpLkiAANpONIxRL24G6i8a
+	FtGt+wGprlsTAiPA+XzJZQ2ia+QRPtRQvUIC2
+X-Google-Smtp-Source: AGHT+IFsdAQAH3RTB6NNO1lM6vBlfeh66lb6zcjOza4ii2Pdb3Ksm7rfchw4e7cN0A62WHXsMB1XpXXLh6TwvmgAmHM=
+X-Received: by 2002:a05:6402:7c2:b0:56c:9ae:274a with SMTP id
+ u2-20020a05640207c200b0056c09ae274amr73795edy.7.1711447771060; Tue, 26 Mar
+ 2024 03:09:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
+ <20240325185235.2f704004@kernel.org> <33670310a2b84d1a650b2aa087ac9657fa4abf84.camel@sipsolutions.net>
+In-Reply-To: <33670310a2b84d1a650b2aa087ac9657fa4abf84.camel@sipsolutions.net>
+From: David Gow <davidgow@google.com>
+Date: Tue, 26 Mar 2024 18:09:17 +0800
+Message-ID: <CABVgOS=F0uFA=6+cab56a_-bS1p79BrpF6zJco7j+W74Z4BR5A@mail.gmail.com>
+Subject: Re: kunit alltests runs broken in mainline
+To: Johannes Berg <johannes@sipsolutions.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	SeongJae Park <sj@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	Brendan Higgins <brendanhiggins@google.com>, Rae Moar <rmoar@google.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
+	"kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Mar 26, 2024 at 5:09 PM Paolo Abeni <pabeni@redhat.com> wrote:
+On Tue, 26 Mar 2024 at 15:55, Johannes Berg <johannes@sipsolutions.net> wrote:
+>
+> On Tue, 2024-03-26 at 01:52 +0000, Jakub Kicinski wrote:
+> >
+> > I'm late to the party, but FWIW I had to toss this into netdev testing
+> > tree as a local patch:
+> >
+> > CONFIG_NETDEVICES=y
+> > CONFIG_WLAN=y
+>
+> I'll send this in the next wireless pull, soon.
+>
+> > CONFIG_DAMON_DBGFS_DEPRECATED=y
+>
+> > The DAMON config was also breaking UML for us, BTW, and I don't see
+> > any fix for that in Linus's tree. Strangeness.
+>
+> I noticed that too (though didn't actually find the fix) against net-
+> next, wireless trees are still a bit behind. I guess it'll get fixed
+> eventually.
+>
 
-> >  drivers/net/ethernet/realtek/r8169_main.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> > index 5c879a5c86d7..a39520a3f41d 100644
-> > --- a/drivers/net/ethernet/realtek/r8169_main.c
-> > +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> > @@ -1317,6 +1317,8 @@ static void rtl8168ep_stop_cmac(struct rtl8169_private *tp)
-> >  static void rtl8168dp_driver_start(struct rtl8169_private *tp)
-> >  {
-> >  	r8168dp_oob_notify(tp, OOB_CMD_DRIVER_START);
-> > +	if (!tp->dash_enabled)
-> > +		return;
-> >  	rtl_loop_wait_high(tp, &rtl_dp_ocp_read_cond, 10000, 10);
-> 
-> You are replicating this chunk several times. It would probably be
-> better to create a new helper - say rtl_cond_loop_wait_high() or
-> something similar - and use it where needed.
++ Shuah, sj
 
-Sure, will do, thanks for the suggestion.
+Thanks for fixing this. I've sent out a fix (though I'm not 100% sure
+it's the right one) to the DAMON issue here:
+https://lore.kernel.org/linux-kselftest/20240326100740.178594-1-davidgow@google.com/
+
+I don't think it'd conflict with the wireless fix, but if so, I'm
+happy for them both to go in via KUnit if that's easier.
+
+Sorry for the breakage!
+-- David
 
