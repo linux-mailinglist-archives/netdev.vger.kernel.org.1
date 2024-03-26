@@ -1,100 +1,108 @@
-Return-Path: <netdev+bounces-81975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489B588BFE7
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:50:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E00388BFE9
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:50:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC9E71F63326
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:50:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42B962E33A8
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4243746E;
-	Tue, 26 Mar 2024 10:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF556FDC;
+	Tue, 26 Mar 2024 10:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oxb16ArK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C43MZsZz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EC36139;
-	Tue, 26 Mar 2024 10:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73F023B1
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 10:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711450231; cv=none; b=hEzd2ztheQ0arJQLTkA3ecGwnHCnWu6kYEDMKGteSjIKNoxaXWHqWQ9DiwOqIZPUFUejStCPG4yFLFqqT3WzHjq+1uTM+ErF5LJXFKSFyRy3hz7XdEfTXTe7U+V4/zNMLyjEm5IpJvgDq5g/L4XJ7QadpxGr3wDPhp3iLCjKqTg=
+	t=1711450253; cv=none; b=XXJih05fdz8ymOl50RzFY7Ev7CFGGJJZOFFb4sRhCnnynlvTjEPiYqUAV0okMvmMMSqmYtHtb1NhQvE+HogqNdKtBF6zasPZ7dAkcIrxfFY1zLBuzj9VIeut+xzsFNIamd388OO+oilhFK6pq2lA+7ePuwdM57RkUSXKIGza5uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711450231; c=relaxed/simple;
-	bh=n5KohEPCq0GhrwtD0Eq9zR1JQFlf93My+mDTkF/qH/Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EQLVvC+SsG9GfV4IZ1QzubsWgjqSpz8GItTzE7tvRYLJkLfo+AHniNavwlfWJxmDmXyNSn91FOxHK21mwTIkUODHMloBrGpXboSEFegbJMqSjq8pcXcbaVr/4n1BF/tpw81m0vVmid+0k10bJoWg8pMSQ3z+e4kVypAKkfMpHw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oxb16ArK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2279FC43390;
-	Tue, 26 Mar 2024 10:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711450231;
-	bh=n5KohEPCq0GhrwtD0Eq9zR1JQFlf93My+mDTkF/qH/Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oxb16ArKfmn/G1M1GzuCdsY1VJ/mnQDzdkXksRVuskGERE8zt3/o9vyQDeegb3S2U
-	 unWNhm2WIv39Py/k+jKN7AcfFwT/Azj0IEZ090AlWMMGuIS/1iL3is9t/Y6nTcOVid
-	 A6ga9MpgH6ZqEZvNjMYLyV6AG+tSi2IrHUKIDR4Sr+paipaTZo7eYvQ1PB1XU2cc4c
-	 ItTxQcV3PT5vtZmRNhJxKkqvDS7RCVslowjLLtNPz0xi2JlZToC7daGU8dL7yuANM0
-	 iIOsFA3E/c0E87h88Vza7tQlPSZDpbdbik80vOOcPfkR5s6FgcfNQypewijlZma8E7
-	 78I80KfJvdoQA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0DD9AD2D0EC;
-	Tue, 26 Mar 2024 10:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711450253; c=relaxed/simple;
+	bh=XuNE0urkJZH2EHRTNS6T3FBqUdV3UDDrFFrOZGjTYRw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=tGt8Y3XG3bcjDsNCvkjiHsVRWBG6UtW4SPJoAdjFByMoNXH5FjFD8+jCVucYyvqSH4G/OR6bJJ+j62HFAG5AYMosxwOit7ahsf5GraDDPRzfADFxPBdZKq788E28D9MUCh5FdHpRrlBpp/NqqM+Z6pqckl7TRqhfbN/OJU2EcL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C43MZsZz; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a47385a4379so609851166b.0
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711450250; x=1712055050; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JclH2nB2M0JO+1/XDYqHzXNFgdlE/tI0cUIFJlaG6Jk=;
+        b=C43MZsZz03l7Hmpg9J5NJsWvylC09tPD3aPua5uhcGmBiTP1QqJaXJ5R6KqyWY+gZJ
+         icp4iMGsFFo/4veSw7lvYWencFinaccjX/NcuqElKtJ3zz4YWa0Rbn/aNJx29svnShGO
+         BnSbTfTziw98Fp932IttS9utCQ5J4fbcI1TxLXM2KJgDeL2+6YiCZFbMmECxhlTfEWzV
+         xwQcYH53gxud9+pZqaDo13JhVu/6fUF0fUi2M5lVPKpj+7mlhVcH+00c1N1qdrimDk3F
+         F8T4HBLqNBXyF+4wN2FfM0EgQfFr4uxndnzVmEYtZyY4kaEpl4+nZMNzzSS62ISmxbpH
+         2Jzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711450250; x=1712055050;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JclH2nB2M0JO+1/XDYqHzXNFgdlE/tI0cUIFJlaG6Jk=;
+        b=FW5HT1AtOCtBPf2dsKpGLOZaHqgpAfifSxMGK4VS3hdBHoZHDSLrVJT7FFfUfGzGlN
+         YJiY8sc49sgVurnAcVIb50iZItUO+kIpELaaCVNb6AGmOAtCECDnipKzK5yhjMbDB8o/
+         cyVxaHPJis8ClEGWveHX/7EzX01v3I6msaSPjBAiZS3p+H2RHNjew5kUCKY73O7HWYLa
+         1CzdQk9vpR9fDUrJyuU0ZJE/uju+SCT+h1vRN3jSAcfgEb5HJBx6IRgFb1+dmH8RGO3J
+         uppfVLiwcQLaBTnMXXpAv+NkGtgQah+KtECPMkvs8BmhrCluJyvIff3pKa9TFoHySDID
+         GyPA==
+X-Gm-Message-State: AOJu0Ywo4En5jcU/0oZpIhI4tM0DkirVGp4jSCbq6At30JN+6EGuFUBb
+	PMK0FrzRcvIzVWf9eAaSwWUxIeynqyiIYgeY6odc1cf/Dqz3uRSEQ6+Ki5QU
+X-Google-Smtp-Source: AGHT+IGMyaWXIDGxHGWSnHfzul1aJ0sO8vjrO1ZMUWZ3KuOs29KGr/5KkcPLSjUT1hvHOgF9l9pRPQ==
+X-Received: by 2002:a17:906:dacb:b0:a4d:f2db:3f2c with SMTP id xi11-20020a170906dacb00b00a4df2db3f2cmr1129569ejb.12.1711450249821;
+        Tue, 26 Mar 2024 03:50:49 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id i20-20020a17090671d400b00a46e92e583bsm4132974ejk.149.2024.03.26.03.50.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Mar 2024 03:50:49 -0700 (PDT)
+Subject: Re: [PATCH net-next 10/12] bnxt_en: Support RSS contexts in ethtool
+ .{get|set}_rxfh()
+To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com,
+ Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+References: <20240325222902.220712-1-michael.chan@broadcom.com>
+ <20240325222902.220712-11-michael.chan@broadcom.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <6f302b24-6ca4-4c16-9808-9cf89cda0ffe@gmail.com>
+Date: Tue, 26 Mar 2024 10:50:48 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] trace: use TP_STORE_ADDRS macro
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171145023104.5244.17207851427768482622.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Mar 2024 10:50:31 +0000
-References: <20240325034347.19522-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240325034347.19522-1-kerneljasonxing@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- rostedt@goodmis.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
- netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kernelxing@tencent.com
+In-Reply-To: <20240325222902.220712-11-michael.chan@broadcom.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 25 Mar 2024 11:43:44 +0800 you wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On 25/03/2024 22:29, Michael Chan wrote:
+> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 > 
-> Using the macro for other tracepoints use to be more concise.
-> No functional change.
-> 
-> Jason Xing (3):
->   trace: move to TP_STORE_ADDRS related macro to net_probe_common.h
->   trace: use TP_STORE_ADDRS() macro in inet_sk_error_report()
->   trace: use TP_STORE_ADDRS() macro in inet_sock_set_state()
-> 
-> [...]
+> Support up to 32 RSS contexts per device if supported by the device.
 
-Here is the summary with links:
-  - [net-next,1/3] trace: move to TP_STORE_ADDRS related macro to net_probe_common.h
-    https://git.kernel.org/netdev/net-next/c/b3af9045b482
-  - [net-next,2/3] trace: use TP_STORE_ADDRS() macro in inet_sk_error_report()
-    https://git.kernel.org/netdev/net-next/c/a24c855a5ef2
-  - [net-next,3/3] trace: use TP_STORE_ADDRS() macro in inet_sock_set_state()
-    https://git.kernel.org/netdev/net-next/c/646700ce23f4
+Is this maximum of 32 driven by hardware limitations, or was a fixed
+ limit chosen to simplify state management on the driver side?
+I ask because at some point in the future I hope to get back to my
+ rewrite of the kernel API (see [1]) and this info may help me to
+ port your driver correctly.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+-ed
 
-
+[1]: https://lore.kernel.org/netdev/4a41069859105d8c669fe26171248aad7f88d1e9.1695838185.git.ecree.xilinx@gmail.com/T/
 
