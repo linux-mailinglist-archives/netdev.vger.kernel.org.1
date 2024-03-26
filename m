@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-82125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D2488C596
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:47:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ABF588C59A
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:48:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 249BD304889
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:47:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02F803048F9
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25DD13C80F;
-	Tue, 26 Mar 2024 14:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0D013C902;
+	Tue, 26 Mar 2024 14:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IM36hn3y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itW+ttUo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4EF13C666
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5716613C666
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711464425; cv=none; b=nQLnzmbg190TJqcwPw232ACSwTYEeXjXTDB855jXYby/WhY5IdzHJzcg/TLZJuySIUXLnrSmk/dPcbhcG+cABFrpsx7qX3S6UJ8REoKG7rOvoFUBP/P8HLnK2w7ecs4H8WbmNwBCC/z06OL60trs/vX1NCo3lFz5CnVd6DD8Slw=
+	t=1711464427; cv=none; b=SNWn4mavLjyWz6JlWQ7xG78bF9bSBR42dcWZPShDxz9KRj9O5DO7+W96WyIMXfk53VWSpXDukMeoNC8pkCfhtUWAh6MElWh+41IkmxAg7E7S3ee+RmNqLjO5VJxzPtSDQnLG91E9ZBpLLg62UJGQyOxsaY40p9UqKzUSFlyF7kM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711464425; c=relaxed/simple;
-	bh=WDSMVBdK4khOmOZqIo19jACc2yX49nOcGyxD1syaniE=;
+	s=arc-20240116; t=1711464427; c=relaxed/simple;
+	bh=FPCDULxX2JZK+MYnvtoUHQRsvHjfLGwPqNFWembX4lo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QazQTPMyrK9br09Iqs7Fq8iKo1rvePbsrSWtW/7gFa9btW4NzO0+CIbV/5Efpd0K1fAj1ldG/MzGJ/aUhqZpfI/iXGeEX84E0zltgCVo0tdseSkcI29Tn6qKod3mhUgH6Ym/yNxqGev/aOp2sCbWtypBTaoCUiDzL7/T7XcngVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IM36hn3y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41A69C433F1;
-	Tue, 26 Mar 2024 14:47:05 +0000 (UTC)
+	 MIME-Version; b=uaTzg2v2a6TIwA3eQA1dtMLBokx0Gwa3Y0k/5IjJLeGes31Xd4j5o1HElfQ6yX7BrPsjwutzW8z/JEYf2vafggKoj3B86SPPEYrFZWrxXOfNl59gJBtrBFOWxSS1/MoY3ZKs66oMKgF6qfdX6XK5dCrRhB60D8LjsNIj5MZkwwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itW+ttUo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBB4EC433F1;
+	Tue, 26 Mar 2024 14:47:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711464425;
-	bh=WDSMVBdK4khOmOZqIo19jACc2yX49nOcGyxD1syaniE=;
+	s=k20201202; t=1711464427;
+	bh=FPCDULxX2JZK+MYnvtoUHQRsvHjfLGwPqNFWembX4lo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IM36hn3y1YcE5i/KX+/ITawzmW1Z+vxdwQpNIjou9GJinm7WsZJPuv3OcI3LG8ZP5
-	 M9GtnlIqcRq47ogDTP7TDeWFT+xP6nSSqtw6g7UfRz+HHrx18B/5QIdqrYmIP2OIDn
-	 mbMTdxyJJ1xZCEMpifrf1fjEPUMeS55jIzbPbTMFsJdG4cdNTzHdQTi0YAz4WvNt6E
-	 diEfM1v8QmKzHc3DMtLBLa1VYvEO4FPANbT1wsalzOcQm+Vs/JLFiBKzykhhUC9Kr5
-	 5QmsBBt9wUeJ+bb7KfnrIxs8y/UVl8Ca862dHY1mVtI9bjNvOiuHQtDpO9XHputf3F
-	 uBnurKvc7VfXA==
+	b=itW+ttUotex+vgHenyTdCrsT++gGs8Idjx5KuIW8nTAWLhgGSZcqRj2BucOU0AcBe
+	 eic5M3BTi0/9ZQuFr3oB17E7s9aAA4CAkWpzyzB3+D43kn2YlF8X8XgxeHRUMppomh
+	 djRPNyJt7WWxmjPMRHkwyhw7e9s9QoCCukIXuTGzQZCI5XiVZxMeIIKcn09GuCbIPx
+	 VZ5EzVD3x8uXHWAoNNZH3/kKJjUh1YRNr0m+McuIii+rWKxSWFfrLi2GBAXL4Fy8x3
+	 Ix7KxfD4/WtNqrpSziaPH9qAE84NJ4I9NW1VAshVikRiCxmcCTCr+3Y1ziTDe32laY
+	 V8m8mD67JkrHA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,11 +51,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [net 08/10] net/mlx5e: HTB, Fix inconsistencies with QoS SQs number
-Date: Tue, 26 Mar 2024 07:46:44 -0700
-Message-ID: <20240326144646.2078893-9-saeed@kernel.org>
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: [net 09/10] net/mlx5e: Do not produce metadata freelist entries in Tx port ts WQE xmit
+Date: Tue, 26 Mar 2024 07:46:45 -0700
+Message-ID: <20240326144646.2078893-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240326144646.2078893-1-saeed@kernel.org>
 References: <20240326144646.2078893-1-saeed@kernel.org>
@@ -67,75 +66,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Carolina Jubran <cjubran@nvidia.com>
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-When creating a new HTB class while the interface is down,
-the variable that follows the number of QoS SQs (htb_max_qos_sqs)
-may not be consistent with the number of HTB classes.
+Free Tx port timestamping metadata entries in the NAPI poll context and
+consume metadata enties in the WQE xmit path. Do not free a Tx port
+timestamping metadata entry in the WQE xmit path even in the error path to
+avoid a race between two metadata entry producers.
 
-Previously, we compared these two values to ensure that
-the node_qid is lower than the number of QoS SQs, and we
-allocated stats for that SQ when they are equal.
-
-Change the check to compare the node_qid with the current
-number of leaf nodes and fix the checking conditions to
-ensure allocation of stats_list and stats for each node.
-
-Fixes: 214baf22870c ("net/mlx5e: Support HTB offload")
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+Fixes: 3178308ad4ca ("net/mlx5e: Make tx_port_ts logic resilient to out-of-order CQEs")
+Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en/qos.c  | 33 ++++++++++---------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h | 8 +++++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tx.c  | 7 +++----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
-index e87e26f2c669..6743806b8480 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
-@@ -83,24 +83,25 @@ int mlx5e_open_qos_sq(struct mlx5e_priv *priv, struct mlx5e_channels *chs,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h
+index 86f1854698b4..883c044852f1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h
+@@ -95,9 +95,15 @@ static inline void mlx5e_ptp_metadata_fifo_push(struct mlx5e_ptp_metadata_fifo *
+ }
  
- 	txq_ix = mlx5e_qid_from_qos(chs, node_qid);
+ static inline u8
++mlx5e_ptp_metadata_fifo_peek(struct mlx5e_ptp_metadata_fifo *fifo)
++{
++	return fifo->data[fifo->mask & fifo->cc];
++}
++
++static inline void
+ mlx5e_ptp_metadata_fifo_pop(struct mlx5e_ptp_metadata_fifo *fifo)
+ {
+-	return fifo->data[fifo->mask & fifo->cc++];
++	fifo->cc++;
+ }
  
--	WARN_ON(node_qid > priv->htb_max_qos_sqs);
--	if (node_qid == priv->htb_max_qos_sqs) {
--		struct mlx5e_sq_stats *stats, **stats_list = NULL;
--
--		if (priv->htb_max_qos_sqs == 0) {
--			stats_list = kvcalloc(mlx5e_qos_max_leaf_nodes(priv->mdev),
--					      sizeof(*stats_list),
--					      GFP_KERNEL);
--			if (!stats_list)
--				return -ENOMEM;
--		}
-+	WARN_ON(node_qid >= mlx5e_htb_cur_leaf_nodes(priv->htb));
-+	if (!priv->htb_qos_sq_stats) {
-+		struct mlx5e_sq_stats **stats_list;
+ static inline void
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+index 2fa076b23fbe..e21a3b4128ce 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+@@ -398,6 +398,8 @@ mlx5e_txwqe_complete(struct mlx5e_txqsq *sq, struct sk_buff *skb,
+ 		     (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))) {
+ 		u8 metadata_index = be32_to_cpu(eseg->flow_table_metadata);
+ 
++		mlx5e_ptp_metadata_fifo_pop(&sq->ptpsq->metadata_freelist);
 +
-+		stats_list = kvcalloc(mlx5e_qos_max_leaf_nodes(priv->mdev),
-+				      sizeof(*stats_list), GFP_KERNEL);
-+		if (!stats_list)
-+			return -ENOMEM;
-+
-+		WRITE_ONCE(priv->htb_qos_sq_stats, stats_list);
-+	}
-+
-+	if (!priv->htb_qos_sq_stats[node_qid]) {
-+		struct mlx5e_sq_stats *stats;
-+
- 		stats = kzalloc(sizeof(*stats), GFP_KERNEL);
--		if (!stats) {
--			kvfree(stats_list);
-+		if (!stats)
- 			return -ENOMEM;
--		}
--		if (stats_list)
--			WRITE_ONCE(priv->htb_qos_sq_stats, stats_list);
-+
- 		WRITE_ONCE(priv->htb_qos_sq_stats[node_qid], stats);
- 		/* Order htb_max_qos_sqs increment after writing the array pointer.
- 		 * Pairs with smp_load_acquire in en_stats.c.
+ 		mlx5e_skb_cb_hwtstamp_init(skb);
+ 		mlx5e_ptp_metadata_map_put(&sq->ptpsq->metadata_map, skb,
+ 					   metadata_index);
+@@ -496,9 +498,6 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
+ 
+ err_drop:
+ 	stats->dropped++;
+-	if (unlikely(sq->ptpsq && (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)))
+-		mlx5e_ptp_metadata_fifo_push(&sq->ptpsq->metadata_freelist,
+-					     be32_to_cpu(eseg->flow_table_metadata));
+ 	dev_kfree_skb_any(skb);
+ 	mlx5e_tx_flush(sq);
+ }
+@@ -657,7 +656,7 @@ static void mlx5e_cqe_ts_id_eseg(struct mlx5e_ptpsq *ptpsq, struct sk_buff *skb,
+ {
+ 	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
+ 		eseg->flow_table_metadata =
+-			cpu_to_be32(mlx5e_ptp_metadata_fifo_pop(&ptpsq->metadata_freelist));
++			cpu_to_be32(mlx5e_ptp_metadata_fifo_peek(&ptpsq->metadata_freelist));
+ }
+ 
+ static void mlx5e_txwqe_build_eseg(struct mlx5e_priv *priv, struct mlx5e_txqsq *sq,
 -- 
 2.44.0
 
