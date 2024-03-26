@@ -1,142 +1,128 @@
-Return-Path: <netdev+bounces-82052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57B2688C379
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:32:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31C988C38E
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:35:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 892E81C334EC
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:32:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68ACF1F3857D
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928007581D;
-	Tue, 26 Mar 2024 13:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D733C76901;
+	Tue, 26 Mar 2024 13:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FZueqFr9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PdhOSbQv"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8757D7442E;
-	Tue, 26 Mar 2024 13:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22085763F1;
+	Tue, 26 Mar 2024 13:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711459906; cv=none; b=ouw5CfCIz1H491YkeIqFDtbIjV4SrPuLwLMQ6HUXl1wltvyr1StIyghqxvMoyK/Rptqz0s689vR70trL7QKfV1+liSkwoXrGfyRjBVrZLRHthXnwa2RyKKzv18Lh2N5M6pIlC7uPezxDg/FeaIgFQUyNpJh91YAiDIk2egOYd/A=
+	t=1711460078; cv=none; b=mjILfgYoVi8D+gaQWYRWd2kjGdzqoQVt9mOO2chIObYPJduu7Vd4968fhHPe4NXoWofSfZ3mgoM5+1eh1nZd4sgBRsY+ajhZ9qr+8Ao7meMjWGasi/hB0gAMiKan9vr6nIOiKAJdEFNacDzE6KBuElSD6svR3WXYBnatdl5PvB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711459906; c=relaxed/simple;
-	bh=rvrImScrre1QyGkyNvp89/1N9MkOxvI5xA8HqVsAHKc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OgqCmhLZme/g9fcmoXpEUT9HX3HPANS+/sIgKT9YftLIYuQNc+u/YYf796EGUS1O2anUAV35sZRX4MpviP3EnvWWj0SUSRA0eHVsDoS1xsiJ78+8p7grjVbjgpAVdPQda/03jGtdcQcIEVjF8VfG5Voccg+yZ3TpB69ie/JKu04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FZueqFr9; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2FF27C000F;
-	Tue, 26 Mar 2024 13:31:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1711459903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O8MBjRw+XjYP4AGNDE/5givq5CD6fzEROYjULWNw0vo=;
-	b=FZueqFr9RmmswTGwgbRXyC9hpG98yS0LOgqA3D1F6Hexn3H2g26L37s4mtXj7Sa5lPoQ2w
-	0WpDpeuDj46jql5z50HokXFkfQ1ZDs9++uAuZQ7TaKBEMZxmcmgCn42AlLpz8haFAb79V8
-	wwAaqJTOdb4V11YPyU/cD0b3SxEwO3Y8VZSJJ/VGeqkmq9iJ/AmLyo+GowyIUngG8B6K+h
-	xQH+emovB5drOgVh/DBF9TDJgYtxv3579l4fpfYhxIi4EwO3I1amFTJCcAojnw/0TPK1Pr
-	jtKua6Vh9RlBIY81N4t/azJQIeU5+K+H6jyguCjenTNyukUS95j8PbMqtyUcvg==
-From: Romain Gantois <romain.gantois@bootlin.com>
-Date: Tue, 26 Mar 2024 14:32:13 +0100
-Subject: [PATCH RESEND net-next v6 7/7] net: pcs: rzn1-miic: Init RX clock
- early if MAC requires it
+	s=arc-20240116; t=1711460078; c=relaxed/simple;
+	bh=hv+PGuhsTxD1BcgqQtHnAlyD2PF/guDaBxGu+ZRp8zI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HPRqeIH5BXWdectTuw3HOwDDmS3m6fR1ImrByEWalRWlp+YhwM1eHVdqxxt3XhNEfx3tIGBLWUvLxPwzztJeo65hqngqxZAnvvnbLcbKuWVEqFgb7BwZ0oAHXWHo/1EeY8gKodZcz+62OR78wONADt15t2Cb9jgMiNbGz3wpSTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PdhOSbQv; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56b8e4f38a2so7112773a12.3;
+        Tue, 26 Mar 2024 06:34:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711460075; x=1712064875; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hv+PGuhsTxD1BcgqQtHnAlyD2PF/guDaBxGu+ZRp8zI=;
+        b=PdhOSbQvTQe4ZlihtMxLYHMeC+R3mJLN2Go3YtKj+Xv4kMWE1BiuTHIKdETyz/K5Fn
+         LGxBk1OKI3xQSc3gT6Fmp6SKDmuz+4O1N1vD2Ng1PpNPIZEf66tnP5RupIPe/o6WeEnv
+         LDZdTNeawI9MBLqUsl70axIARbwRvD6ldHb1Lkc8ctzpioKITaHjqXYgdutDu+ECOZDX
+         wjBpkExgJVIBJ4BYg4JqZLRtIaiBbrfu/A25XwIczHGeXyCyCwg80yjbbkKd5XOrNSQj
+         J+ExZZnutNHUie91dwVjq9CbHnbHK4qBCjicRrxeDW7csOwhEFkAO0eaWBfWcWTbpNJ7
+         v7lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711460075; x=1712064875;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hv+PGuhsTxD1BcgqQtHnAlyD2PF/guDaBxGu+ZRp8zI=;
+        b=MMftFFj/o9o1tYcWDlWJHHQU3lpKv15ig8Et4x4Rwah9lWSlVqO5HN2DyExcFyevIV
+         UexDgHEfrjcvW3c+DfXDuysQ7VmqR/pmKpa54/gjka7P9nLKfUeQ8cwZno+lLhzhRt3i
+         HK8cn7Sp8nFmePjG2cMjm0TEq/Jtbhr1/WVPHY1jYMv0lrL50pQ+wj/ngd84k2Nt7ULx
+         tiDcTUbKtcSF/l/sM3SFMH+TkuOWpdxXEMHOBFZT/ZJylHE/ILkCcxHVfHdiK34Ybha2
+         c2I5Vj4OcuCBNyOfIIY6E+z0e70LXfMVvKLspdqWKGSlrUrJhlSes4sn1aMlTbaYT+/u
+         CDVA==
+X-Forwarded-Encrypted: i=1; AJvYcCXVtQNPhAfsoa2XD4F3AXHeTrVPaOyiRrE/YvjPcZJHhRHNbxWVUtEWfoaobI3abg931GqJmHLYHxiu2UjyuZ8sH4a+Djb4ktBQzNs9dVmr1mRqs3YiTuTTDn09siipWYhfrdVhyduC3xVd
+X-Gm-Message-State: AOJu0YwQCLs4+UCFjNtLXfJdqjPIZnSkzMoA7wzDH/XPLl+F0Eou+I8P
+	gtTgAeS+xCIzSKL3cwerkZLLAyqG40uDpJYWdVBUEVOZKRT83inQkmxaG1YjaneSyE8zU76k8t/
+	zMpYBvBcqsxRFrF8G4s1ibNUDOY0wSCyGyo8faw==
+X-Google-Smtp-Source: AGHT+IFebIu2ouRnyG50yataUMJvTNYmfp4RjbN16ta5wmEBUPaemij5rqIzEi9D6Ly7a9bVF6i7k5+sYZHb4FeuZzM=
+X-Received: by 2002:a17:907:20ab:b0:a46:7e07:e66f with SMTP id
+ pw11-20020a17090720ab00b00a467e07e66fmr967510ejb.0.1711460075172; Tue, 26 Mar
+ 2024 06:34:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240326-rxc_bugfix-v6-7-24a74e5c761f@bootlin.com>
-References: <20240326-rxc_bugfix-v6-0-24a74e5c761f@bootlin.com>
-In-Reply-To: <20240326-rxc_bugfix-v6-0-24a74e5c761f@bootlin.com>
-To: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- =?utf-8?q?Cl=C3=A9ment_L=C3=A9ger?= <clement.leger@bootlin.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
- Romain Gantois <romain.gantois@bootlin.com>
-X-Mailer: b4 0.13.0
-X-GND-Sasl: romain.gantois@bootlin.com
+References: <20240325034347.19522-1-kerneljasonxing@gmail.com>
+ <CAL+tcoAb3Q13hXnEhukCUwBL0Q1W9qC7LuWyzXYGcDzEM56LqA@mail.gmail.com>
+ <b84992bf3953da59e597883e018a79233a09a0bb.camel@redhat.com>
+ <CAL+tcoAW6YxrW7M8io_JHaNm3-VfY_sWZFBg=6XVmYyPAb1Nag@mail.gmail.com> <CANn89iKK-qPhQ91Sq8rR_=KDWajnY2=Et2bUjDsgoQK4wxFOHw@mail.gmail.com>
+In-Reply-To: <CANn89iKK-qPhQ91Sq8rR_=KDWajnY2=Et2bUjDsgoQK4wxFOHw@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 26 Mar 2024 21:33:58 +0800
+Message-ID: <CAL+tcoCpOqBrnSko2rYYCAqfbZxSj0jmM1uMB58HgPLYCAuiMQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/3] trace: use TP_STORE_ADDRS macro
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	rostedt@goodmis.org, kuba@kernel.org, davem@davemloft.net, 
+	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The GMAC1 controller in the RZN1 IP requires the RX MII clock signal to be
-started before it initializes its own hardware, thus before it calls
-phylink_start.
+On Tue, Mar 26, 2024 at 9:18=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Mar 26, 2024 at 11:44=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
+l.com> wrote:
+>
+> > Well, it's a pity that it seems that we are about to abandon this
+> > method but it's not that friendly to the users who are unable to
+> > deploy BPF...
+>
+> It is a pity these tracepoint patches are consuming a lot of reviewer
+> time, just because
+> some people 'can not deploy BPF'
 
-Implement the pcs_pre_init() callback so that the RX clock signal can be
-enabled early if necessary.
+Sure, not everyone can do this easily. The phenomenon still exists and
+we cannot ignore it. Do you remember that about a month ago someone
+submitted one patch introducing a new tracepoint and then I replied
+to/asked you if it's necessary that we replace most of the tracepoints
+with BPF? Now I realise and accept the fact...
 
-Reported-by: Clément Léger <clement.leger@bootlin.com>
-Link: https://lore.kernel.org/linux-arm-kernel/20230116103926.276869-4-clement.leger@bootlin.com/
-Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/pcs/pcs-rzn1-miic.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+I'll keep reviewing such patches and hope it can give you maintainers
+a break. I don't mind taking some time to do it, after all it's not a
+bad thing to help some people.
 
-diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
-index 4bd66fdde367..d0a722d43368 100644
---- a/drivers/net/pcs/pcs-rzn1-miic.c
-+++ b/drivers/net/pcs/pcs-rzn1-miic.c
-@@ -279,10 +279,38 @@ static int miic_validate(struct phylink_pcs *pcs, unsigned long *supported,
- 	return -EINVAL;
- }
- 
-+static int miic_pre_init(struct phylink_pcs *pcs)
-+{
-+	struct miic_port *miic_port = phylink_pcs_to_miic_port(pcs);
-+	struct miic *miic = miic_port->miic;
-+	u32 val, mask;
-+
-+	/* Start RX clock if required */
-+	if (pcs->rxc_always_on) {
-+		/* In MII through mode, the clock signals will be driven by the
-+		 * external PHY, which might not be initialized yet. Set RMII
-+		 * as default mode to ensure that a reference clock signal is
-+		 * generated.
-+		 */
-+		miic_port->interface = PHY_INTERFACE_MODE_RMII;
-+
-+		val = FIELD_PREP(MIIC_CONVCTRL_CONV_MODE, CONV_MODE_RMII) |
-+		      FIELD_PREP(MIIC_CONVCTRL_CONV_SPEED, CONV_MODE_100MBPS);
-+		mask = MIIC_CONVCTRL_CONV_MODE | MIIC_CONVCTRL_CONV_SPEED;
-+
-+		miic_reg_rmw(miic, MIIC_CONVCTRL(miic_port->port), mask, val);
-+
-+		miic_converter_enable(miic, miic_port->port, 1);
-+	}
-+
-+	return 0;
-+}
-+
- static const struct phylink_pcs_ops miic_phylink_ops = {
- 	.pcs_validate = miic_validate,
- 	.pcs_config = miic_config,
- 	.pcs_link_up = miic_link_up,
-+	.pcs_pre_init = miic_pre_init,
- };
- 
- struct phylink_pcs *miic_create(struct device *dev, struct device_node *np)
+>
+> Well, I came up with more ideas about how to improve the
+> > trace function in recent days. The motivation of doing this is that I
+> > encountered some issues which could be traced/diagnosed by using trace
+> > effortlessly without writing some bpftrace codes again and again. The
+> > status of trace seems not active but many people are still using it, I
+> > believe.
+>
+> 'Writing bpftrace codes again and again' is not a good reason to add
+> maintenance costs
+> to linux networking stack.
 
--- 
-2.44.0
-
+I'm just saying :)
 
