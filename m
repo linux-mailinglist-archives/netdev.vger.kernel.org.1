@@ -1,96 +1,112 @@
-Return-Path: <netdev+bounces-82007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DC1888C0FB
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:40:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E32AE88C104
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:43:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19D522C5C9C
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:40:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2126D1C355F7
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6D455E58;
-	Tue, 26 Mar 2024 11:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F416A481A5;
+	Tue, 26 Mar 2024 11:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4Np1bNn"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="Z5w4GuV1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A8C5475D
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5317B4E1CC
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711453231; cv=none; b=uRpf/6y9nauPR2Fqxe55XYzvpEt08KCBxFSk8KwPe2OAnYzydDR+w6CeF1AwvlvvHYNZoGry4tF/cGSfkxJivdJACGv4FNWkFNCiHO+7+taCVjOk0Jsx+wPxfD5JAfhu3U0Nv5RbdOc2oemAcFt/MZ+tuZgqCq6cBZxjEWXLxhk=
+	t=1711453407; cv=none; b=rqA5wHfCOyebeRN9Hh7yZCx/AvGosisBMM6c8SLe4xv05kxmS36VyDxjmKFF7DjmMLtdLaXJdh7g0MD20fjmt79+/wsPrUN01xhJgFRmW2BN3sxBmRCZ9it4GEC9Js44gtQPuZiN91ghv7nvoMedNvBM+3fgsEfsUxvN1sz4ndA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711453231; c=relaxed/simple;
-	bh=7lJIWy/m7ZLTiyMMI48HYyvtpwcDo8JPg6CufdR47TQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pvsgMfUkSQxaDILbx97e0KYeH5sOx62cIxG6+A0lDyyitjRkUHOt0hIZ2Z9iUvVD7nuAVnJq92BOIZuSWQJWxTka4BNuxEiEMXmo7hkKFAXJpScs1LaqGCyibUe/4zxrCkUHRmt8RT/4yAvg1c2TwXx4qb+7iiV++UvxzBvC6zY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4Np1bNn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 71F80C433C7;
-	Tue, 26 Mar 2024 11:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711453230;
-	bh=7lJIWy/m7ZLTiyMMI48HYyvtpwcDo8JPg6CufdR47TQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q4Np1bNntonbF41eNRS5iwYT5/FkEWFQPhs01BN7w4C9tyN8JL/K5MxFOkb5SACEh
-	 HhyJYdLIKCGcu8ZO6uyLlA6eVA+qf+zgXvUpztA8t1qcjq6UC8e0cPmxe39+dgY1lP
-	 UekcVaYPr5N5SlZmEEI9JmNFKRgiDZwnmhqaI8mr0UhiUXBcAJRwvcLBARKnigo7pz
-	 zKSrakT4Yjvw4Wy8uyLjv4/f1ZhZhPQ2RX64Ut0xMepazbDFmEfIUxlvrEIAl6y+qh
-	 MiU7Lnn89eRHCxnrNWF3ZotLDNhqcS4Lxv0mUQ8W+b5w7Xa6YrDqB6xMCtj5ptZ30L
-	 YLekv6nseXsBg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 67837D2D0EC;
-	Tue, 26 Mar 2024 11:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711453407; c=relaxed/simple;
+	bh=O3/uGb91PFbdzFCMy5zfjku5UN+X8xYy7iiLrmCyeDo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nMEb/6HgdJFl7BVDVDHNjT2lMRxbYIdCWbNpgfkFxGAk8DMn2v4dg1DuKBLCRrE0I776jjeS0grShx2k9cmg91LokhjjuF0bXy+cHYCPwxkYLzOMpOs5blX8YG5Xm2YtrBz/pXFgsM3eEF5yoeeZVh/dYbWRE64CChoNCHQVAnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=Z5w4GuV1; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=vAE7TzatyoGbv1GLQ9UEI4z1EcUU+8Ks0r7zjwSdCKM=; b=Z5w4GuV12elzh54zAB6zboCcly
+	5aiHWHu1AQ/mNrdjN3V9/WSs1/XpxPlTZIyGWNBh1VWRbvQr0oQGlEYThWm3XQoGujvQZ9UqGPg/J
+	i1KZ18IHT36/Io1OpaRGRA1WgCnoNPMPVosLgQz8KvcscYM53mNi2SEjVVLE6FNihuWw2wyZC//va
+	JayCpsaLgKn4EFkubKxSutzXpLa1KhN95n0D/EnXpVi8bH5gYNgyDXAOThy6y+nCndUUb8zAyqlhl
+	nJda/mBY41mGwKX66GS1Jzx4Sdb3Rr8nLGa/qKHG6QyalodLuddzqzJ6vLS85O3yK1OxBT+T2DOgu
+	b/5i/Efw==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1rp5D4-000BSK-Pm; Tue, 26 Mar 2024 12:43:18 +0100
+Received: from [185.17.218.86] (helo=localhost)
+	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <esben@geanix.com>)
+	id 1rp5D4-000MjT-1B;
+	Tue, 26 Mar 2024 12:43:18 +0100
+From: Esben Haabendal <esben@geanix.com>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  Sergey
+ Ryazanov <ryazanov.s.a@gmail.com>,  Paolo Abeni <pabeni@redhat.com>,  Eric
+ Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 03/22] ovpn: add basic netlink support
+In-Reply-To: <20240304150914.11444-4-antonio@openvpn.net> (Antonio Quartulli's
+	message of "Mon, 4 Mar 2024 16:08:54 +0100")
+References: <20240304150914.11444-1-antonio@openvpn.net>
+	<20240304150914.11444-4-antonio@openvpn.net>
+Date: Tue, 26 Mar 2024 12:43:18 +0100
+Message-ID: <87ttktcj6x.fsf@geanix.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: vxlan_mdb: Fix failures with old libnet
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171145323041.5270.10718978656923412689.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Mar 2024 11:40:30 +0000
-References: <20240325075030.2379513-1-idosch@nvidia.com>
-In-Reply-To: <20240325075030.2379513-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, razor@blackwall.org,
- mirsad.todorovac@alu.unizg.hr
+Content-Type: text/plain
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27226/Tue Mar 26 09:37:28 2024)
 
-Hello:
+Antonio Quartulli <antonio@openvpn.net> writes:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+> index 25964eb89aac..3769f99cfe6f 100644
+> --- a/drivers/net/ovpn/main.c
+> +++ b/drivers/net/ovpn/main.c
+> @@ -101,12 +104,23 @@ static int __init ovpn_init(void)
+>  		return err;
+>  	}
+>  
+> +	err = ovpn_nl_register();
+> +	if (err) {
+> +		pr_err("ovpn: can't register netlink family: %d\n", err);
+> +		goto unreg_netdev;
+> +	}
+> +
+>  	return 0;
+> +
+> +unreg_netdev:
+> +	unregister_netdevice_notifier(&ovpn_netdev_notifier);
+> +	return err;
+>  }
+>  
+>  static __exit void ovpn_cleanup(void)
+>  {
+>  	unregister_netdevice_notifier(&ovpn_netdev_notifier);
+> +	ovpn_nl_unregister();
 
-On Mon, 25 Mar 2024 09:50:30 +0200 you wrote:
-> Locally generated IP multicast packets (such as the ones used in the
-> test) do not perform routing and simply egress the bound device.
-> 
-> However, as explained in commit 8bcfb4ae4d97 ("selftests: forwarding:
-> Fix failing tests with old libnet"), old versions of libnet (used by
-> mausezahn) do not use the "SO_BINDTODEVICE" socket option. Specifically,
-> the library started using the option for IPv6 sockets in version 1.1.6
-> and for IPv4 sockets in version 1.2. This explains why on Ubuntu - which
-> uses version 1.1.6 - the IPv4 overlay tests are failing whereas the IPv6
-> ones are passing.
-> 
-> [...]
+Any good reason for not using reverse order from ovpn_init() here?
 
-Here is the summary with links:
-  - [net] selftests: vxlan_mdb: Fix failures with old libnet
-    https://git.kernel.org/netdev/net/c/f1425529c33d
+>  }
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+/Esben
 
