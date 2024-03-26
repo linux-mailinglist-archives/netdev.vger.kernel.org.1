@@ -1,174 +1,144 @@
-Return-Path: <netdev+bounces-81978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3434788C01A
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:04:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF38288C031
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85BFF2E4064
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:04:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6C67300B20
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8948814292;
-	Tue, 26 Mar 2024 11:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4794F1E2;
+	Tue, 26 Mar 2024 11:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lz8AQyCT"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="N92iqx2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6115D803;
-	Tue, 26 Mar 2024 11:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD153EA90
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711451041; cv=none; b=FZh4ziZBu+9lxS2qOXk2m5Ib1g3RQTaj59LeLfrxOc4ZQbQ48yqxFZd0uyofs6F95wMa7Vk+FP0WknaErw4MrO8S4rGlIPm3BA3hXePtYgfq5i7+8CVZ+jWVvOQXuXa4x+OU2+4c/cyAmTWnfg8H8tg/E2KMmoGWVlbDnRJjTFs=
+	t=1711451244; cv=none; b=JP40ZbGxpkKRRCPFnrlSl/SgrS0tQy0c4en0idEZ9OeF+dFNngMQ6eGendRJOLJ44Lani72jUPiOcvd/qEh5Egpl3mq+X4BePaK3jCQnmsSZbC55hA4Dt3grMhdrfLNtqykWfReLQGwmk/CwXZDsx59ZGr7jVqUiqGKFQDgZusk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711451041; c=relaxed/simple;
-	bh=F9slUs/Z49ylzomu+AHpY3mR0XJBNgjudTQ/JGzdJ94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ChCqCY6N9oFLpeDzXvR6mlEc51aly/VGpRR6fIJH9jUzIEZM59H5S0RT+IcbN2i0lU+ifzgHNpYpgQbHTbAWm9WPykQQ2fk3+thhFMEG5zIf8WkT+bXfOj96uzSzibEvekmrXEPdGpSpyUjK6Ozeo/BwMCHY/a/7F8TdtWPxJ+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lz8AQyCT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAFD8C433F1;
-	Tue, 26 Mar 2024 11:03:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711451040;
-	bh=F9slUs/Z49ylzomu+AHpY3mR0XJBNgjudTQ/JGzdJ94=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lz8AQyCTjgK7kYzZ/M7hDWasyGcgEI6QYOVA/HXmUrnoBbjIlyHokVOF4qfmPrpIn
-	 q052rfQo1GJsHUkS6gcSBseMVHRqnlBOTQKnTkWWAk7jrEkejz6AsPvKDyeEMraYqk
-	 UPBkTB31PWobwvf/io28jy4fDGdOwymg0yOPk0TlSnDtneU3Mx0th/hnFwU6h7Tbaf
-	 FNe/Jg7SS6D3HK5wRuXyf1VL7pBSCYmK9orLrvdVNFWbpTsoSzQtieHbs4tVliQ7je
-	 fjGCtBteWOzaA/hSfQ8Vzc493/9UUSEsAxzxjLVNzRRs1xUKplBHOHiyatlQ/1LU47
-	 cijow3Bsvy6qQ==
-Date: Tue, 26 Mar 2024 11:03:55 +0000
-From: Simon Horman <horms@kernel.org>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 07/16] net: dsa: vsc73xx: Add vlan filtering
-Message-ID: <20240326110355.GI403975@kernel.org>
-References: <20240325204344.2298241-1-paweldembicki@gmail.com>
- <20240325204344.2298241-8-paweldembicki@gmail.com>
+	s=arc-20240116; t=1711451244; c=relaxed/simple;
+	bh=AZ9qaaGQLRaLh2erSzhK0546WiFMXsWnmx6StL2v698=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pa6hjo+OtKUA2w2tFKLyaBIYHJl6T482JjQi/E5VQPG0u2aco554pUIKbnFLOqflma5Jof1AGp89Oajyq/K5F7gKQveccdsTHT6yG5a6diBmGPO6U5FX1vvw0/ljrbdgIDSN3nes1pj0P93YuVCYrTW4vCkoaBU9YyigsbTYxoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=N92iqx2L; arc=none smtp.client-ip=185.136.64.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 20240326110713eedc925fe822512a8e
+        for <netdev@vger.kernel.org>;
+        Tue, 26 Mar 2024 12:07:14 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=cEHbLT2jVMdGX6hNOXRPoDNWmYXIjvyLR3rnxVrloAg=;
+ b=N92iqx2LqZPoXm1Vpyonl2lcubItESnxayQkawDeDdznkrF1LMgN1KGunoKE+SKRdqT89i
+ N+2nJW7U0/xy4sGxvklTTeVGxdG6XONeG0tpdNZnAwbVQ6t3S04JH3Cf5Oiry6mSAL3ocFkX
+ N3MOGQIm39qCGeewim3gFDGn81ilo=;
+From: Diogo Ivo <diogo.ivo@siemens.com>
+To: danishanwar@ti.com,
+	rogerq@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	dan.carpenter@linaro.org,
+	jacob.e.keller@intel.com,
+	robh@kernel.org,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	vigneshr@ti.com,
+	wsa+renesas@sang-engineering.com,
+	hkallweit1@gmail.com,
+	arnd@arndb.de,
+	vladimir.oltean@nxp.com,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Cc: Diogo Ivo <diogo.ivo@siemens.com>,
+	jan.kiszka@siemens.com
+Subject: [PATCH net-next v5 00/10] Support ICSSG-based Ethernet on AM65x SR1.0 devices
+Date: Tue, 26 Mar 2024 11:06:50 +0000
+Message-ID: <20240326110709.26165-1-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240325204344.2298241-8-paweldembicki@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-On Mon, Mar 25, 2024 at 09:43:32PM +0100, Pawel Dembicki wrote:
-> This patch implements VLAN filtering for the vsc73xx driver.
-> 
-> After starting VLAN filtering, the switch is reconfigured from QinQ to
-> a simple VLAN aware mode. This is required because VSC73XX chips do not
-> support inner VLAN tag filtering.
-> 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+Hello,
 
-...
+This series extends the current ICSSG-based Ethernet driver to support
+AM65x Silicon Revision 1.0 devices.
 
-> +static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
-> +				 const struct switchdev_obj_port_vlan *vlan,
-> +				 struct netlink_ext_ack *extack)
-> +{
-> +	bool untagged = vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED;
-> +	bool pvid = vlan->flags & BRIDGE_VLAN_INFO_PVID;
-> +	struct dsa_port *dp = dsa_to_port(ds, port);
-> +	enum vsc73xx_port_vlan_conf port_vlan_conf;
-> +	struct vsc73xx_bridge_vlan *vsc73xx_vlan;
-> +	struct vsc73xx_vlan_summary summary;
-> +	struct vsc73xx *vsc = ds->priv;
-> +	bool operate_on_storage;
-> +	int ret;
-> +	u16 vid;
-> +
-> +	/* Be sure to deny alterations to the configuration done by tag_8021q.
-> +	 */
-> +	if (vid_is_dsa_8021q(vlan->vid)) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Range 3072-4095 reserved for dsa_8021q operation");
-> +		return -EBUSY;
-> +	}
-> +
-> +	/* The processed vlan->vid is excluded from the search because the VLAN
-> +	 * can be re-added with a different set of flags, so it's easiest to
-> +	 * ignore its old flags from the VLAN database software copy.
-> +	 */
-> +	vsc73xx_bridge_vlan_summary(vsc, port, &summary, vlan->vid);
-> +
-> +	/* VSC73XX allow only three untagged states: none, one or all */
-> +	if ((untagged && summary.num_tagged > 0 && summary.num_untagged > 0) ||
-> +	    (!untagged && summary.num_untagged > 1)) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Port can have only none, one or all untagged vlan");
-> +		return -EBUSY;
-> +	}
-> +
-> +	vsc73xx_vlan = vsc73xx_bridge_vlan_find(vsc, vlan->vid);
-> +
-> +	if (!vsc73xx_vlan) {
-> +		vsc73xx_vlan = kzalloc(sizeof(*vsc73xx_vlan), GFP_KERNEL);
-> +		if (!vsc73xx_vlan)
-> +			return -ENOMEM;
-> +
-> +		vsc73xx_vlan->vid = vlan->vid;
-> +		vsc73xx_vlan->portmask = 0;
-> +		vsc73xx_vlan->untagged = 0;
-> +
-> +		INIT_LIST_HEAD(&vsc73xx_vlan->list);
-> +		list_add_tail(&vsc73xx_vlan->list, &vsc->vlans);
-> +	}
-> +
-> +	vsc73xx_vlan->portmask |= BIT(port);
-> +
-> +	if (untagged)
-> +		vsc73xx_vlan->untagged |= BIT(port);
-> +	else
-> +		vsc73xx_vlan->untagged &= ~BIT(port);
-> +
-> +	/* CPU port must be always tagged because port separation is based on
-> +	 * tag_8021q.
-> +	 */
-> +	if (port == CPU_PORT)
-> +		goto update_vlan_table;
-> +
-> +	operate_on_storage = vsc73xx_tag_8021q_active(dp);
-> +
-> +	if (pvid)
-> +		ret = vsc73xx_vlan_set_pvid(vsc, port, vlan->vid,
-> +					    operate_on_storage, false);
-> +	else if (vsc73xx_port_get_pvid(vsc, port, &vid, false) &&
-> +		 vid == vlan->vid)
-> +		ret = vsc73xx_vlan_clear_pvid(vsc, port, operate_on_storage,
-> +					      false);
+Notable differences between the Silicon Revisions are that there is
+no TX core in SR1.0 with this being handled by the firmware, requiring
+extra DMA channels to manage communication with the firmware (with the
+firmware being different as well) and in the packet classifier.
 
-Hi Pawel,
+The motivation behind it is that a significant number of Siemens
+devices containing SR1.0 silicon have been deployed in the field
+and need to be supported and updated to newer kernel versions
+without losing functionality.
 
-some minor feedback from my side.
+This series is based on TI's 5.10 SDK [1].
 
-If neither of the above conditions immediately above is met,
-then ret will be used ininitialised on the line below.
+The fourth version of this patch series can be found in [2].
 
-Flagged by clang-17 W=1 build, and Smatch.
+Detailed descriptions of the changes in this series can be found in
+each commit's message.
 
-> +	if (ret)
-> +		goto err;
+Both of the problems mentioned in v4 have been addressed by disabling
+those functionalities, meaning that this driver currently only supports
+one TX queue and does not support a 100Mbit/s half-duplex connection.
+The removal of these features has been commented in the appropriate 
+locations in the code.
 
-...
+[1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
+[2]: https://lore.kernel.org/netdev/20240305114045.388893-1-diogo.ivo@siemens.com/
+
+Diogo Ivo (10):
+  dt-bindings: net: Add support for AM65x SR1.0 in ICSSG
+  eth: Move IPv4/IPv6 multicast address bases to their own symbols
+  net: ti: icssg-prueth: Move common functions into a separate file
+  net: ti: icssg-prueth: Add SR1.0-specific configuration bits
+  net: ti: icssg-prueth: Add SR1.0-specific description bits
+  net: ti: icssg-prueth: Adjust IPG configuration for SR1.0
+  net: ti: icssg-prueth: Adjust the number of TX channels for SR1.0
+  net: ti: icssg-prueth: Add functions to configure SR1.0 packet
+    classifier
+  net: ti: icssg-prueth: Modify common functions for SR1.0
+  net: ti: icssg-prueth: Add ICSSG Ethernet driver for AM65x SR1.0
+    platforms
+
+ .../bindings/net/ti,icssg-prueth.yaml         |   35 +-
+ drivers/net/ethernet/ti/Kconfig               |   15 +
+ drivers/net/ethernet/ti/Makefile              |    9 +
+ .../net/ethernet/ti/icssg/icssg_classifier.c  |  113 +-
+ drivers/net/ethernet/ti/icssg/icssg_common.c  | 1221 +++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |   14 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |   56 +
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c |   10 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 1189 +---------------
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   79 +-
+ .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  | 1181 ++++++++++++++++
+ include/linux/etherdevice.h                   |   12 +-
+ 12 files changed, 2724 insertions(+), 1210 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_common.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
 
 -- 
-pw-bot: changes-requested
+2.44.0
+
 
