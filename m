@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-82012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15ED388C15E
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:59:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E24B488C160
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:59:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF7C01F3F7A3
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:59:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F3CA1C3E6DF
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725D66F09C;
-	Tue, 26 Mar 2024 11:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD786E616;
+	Tue, 26 Mar 2024 11:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="btkLELeR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHA9ZYUr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F836F060;
-	Tue, 26 Mar 2024 11:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F3659150
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711454373; cv=none; b=Ti12yrqBdtrUmZj/2NDLUGdreTXMydkO7H66SXu2gjgoN/F4KIxh8X1YqFCp0WyUH36bYALFgquIv+tOhDc9W7sX0seEoH2AiE7ElzSI1rJGKMgUTZ26yj+octM8UkFetcSuyb7YZWRkRlOql3eG/ynlLNqIecTVMYHM2CfdG9I=
+	t=1711454392; cv=none; b=ILotfSe1755DLP0irU87s8xubG3RwyYDxNCTewpEfvqa4YgBDrYojrL51vvRwa6VK9BZD87iRduLvvEPHBtpxDanmc9llsDOUG10gfssvKJOiTfzEko3wcHdOwJ3MaPUnWqWGDTaaYlLSecvo0/4oL3mbdn/+eOtgcQX3DMTM6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711454373; c=relaxed/simple;
-	bh=staRgg3gzbLITS0e4pRWsJcx//2CF8dAZPbjAdbyxAw=;
+	s=arc-20240116; t=1711454392; c=relaxed/simple;
+	bh=/OboRI6wQUa5mCA+RlrkHJhr1pO31/2RzaZacp30huk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IFvr4MtyqVfBP+M3D/6GgPhpoI3VH0t1I53XToQNmeBogcmTt9K61E15DZwyUYCOVY+Uy2Bsw9JmkSq+Q6xLwWsMHs8KCpvkIPH6MgV3ZKWlS5Terfp6dYhzIcFJ3CpMSglKxSiQ7T8wKYqAXqz5RzTUxBoxthLXnur65/K2Cws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=btkLELeR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1A6C433C7;
-	Tue, 26 Mar 2024 11:59:28 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Owbx0o5o8db7StPnMjPlGWpU5OMocNU/Rui6T9e9FZBhiHxiJ3z6dTdmDuCs73eCAMti2QZj0nO/xuFe7DT7a+uaVqdnL5txX2NzlypF5QjAwVywKav0Vg4wgwb4RCgCK8c1QHtq5j82iStfUkyLZj5SVQCHk6UXzjMwRztVobg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHA9ZYUr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74BEAC433C7;
+	Tue, 26 Mar 2024 11:59:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711454370;
-	bh=staRgg3gzbLITS0e4pRWsJcx//2CF8dAZPbjAdbyxAw=;
+	s=k20201202; t=1711454392;
+	bh=/OboRI6wQUa5mCA+RlrkHJhr1pO31/2RzaZacp30huk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=btkLELeRKcmI3Ie81lwvVV1GhVMzthcBlC4BpVnBJNIG/4I/ncL+wWVZGGDzFJZWH
-	 /5G8agJQLPAF8XOhlObDsHJVnJsTDhHR9DpJd4b4cG7eMyCC8ARUYL0GuggYRrX3eZ
-	 9ZXaAjK2wKDLYgeRiN/CFrSlGHUZ/RZOD4QcwCpN9VhzY70qeADzIJVwDfzzvIHlF1
-	 7ZMOq0dzkc2S5arzmpQ2fTzRqMWs3SaxhiUcXV1zrsdfKceQpc14yrJbVPxHR3vbV4
-	 GUOP08JibVEkoKHhba9Ig1ikEXoiKgr55nMsrp7rtgSJUFhm+v/5XGYtTPBRfuFSdn
-	 6WDInjH6WRFZQ==
-Date: Tue, 26 Mar 2024 11:59:26 +0000
+	b=ZHA9ZYUrTZOKxmt9YexgQdSjiqEuZxccqUiJTdpSfiyU/LOCChn8ZrvdS4u9/uH9d
+	 ljwt40dW4wXbErVQkIzX+TXqlBt2bd16dckuv2aa6fLVPXnDPyMJoM7FZdcmbGSDEI
+	 PXO5MteYOLNYBrcDidBNjmqFPtj5Lrr6CgSASmoYjSL7aaFZLkfDCTFKEbOEfbagDN
+	 Wao7R6q+uNpGEYv3z5QDmSWPuosUrSU9o0EeYsPhvSAlCIztL3b95nMh1EeI1D9ofH
+	 5cXwLJYSUjJXXLngzeDqf/3sfFBazsBeZduD3P1kgn+l6JSHvrnhelzF095IS4EsXx
+	 zlddtnhGRNrWA==
+Date: Tue, 26 Mar 2024 11:59:48 +0000
 From: Simon Horman <horms@kernel.org>
 To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>, Boris Pismenny <borisp@nvidia.com>,
+Cc: netdev@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>,
 	John Fastabend <john.fastabend@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net 3/4] selftests: tls: add test with a partially
- invalid iov
-Message-ID: <20240326115926.GR403975@kernel.org>
+Subject: Re: [PATCH net 4/4] tls: get psock ref after taking rxlock to avoid
+ leak
+Message-ID: <20240326115948.GS403975@kernel.org>
 References: <cover.1711120964.git.sd@queasysnail.net>
- <720e61b3d3eab40af198a58ce2cd1ee019f0ceb1.1711120964.git.sd@queasysnail.net>
+ <fe2ade22d030051ce4c3638704ed58b67d0df643.1711120964.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,14 +62,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <720e61b3d3eab40af198a58ce2cd1ee019f0ceb1.1711120964.git.sd@queasysnail.net>
+In-Reply-To: <fe2ade22d030051ce4c3638704ed58b67d0df643.1711120964.git.sd@queasysnail.net>
 
-On Mon, Mar 25, 2024 at 04:56:47PM +0100, Sabrina Dubroca wrote:
-> Make sure that we don't return more bytes than we actually received if
-> the userspace buffer was bogus. We expect to receive at least the rest
-> of rec1, and possibly some of rec2 (currently, we don't, but that
-> would be ok).
+On Mon, Mar 25, 2024 at 04:56:48PM +0100, Sabrina Dubroca wrote:
+> At the start of tls_sw_recvmsg, we take a reference on the psock, and
+> then call tls_rx_reader_lock. If that fails, we return directly
+> without releasing the reference.
 > 
+> Instead of adding a new label, just take the reference after locking
+> has succeeded, since we don't need it before.
+> 
+> Fixes: 4cbc325ed6b4 ("tls: rx: allow only one reader at a time")
 > Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
