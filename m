@@ -1,121 +1,110 @@
-Return-Path: <netdev+bounces-81911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0284588BA45
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 07:13:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AE9D88BA61
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 07:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E5CFB23B9E
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 06:13:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E9312C50BA
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 06:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6097D12B166;
-	Tue, 26 Mar 2024 06:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFFA12DD8C;
+	Tue, 26 Mar 2024 06:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RvsfLJUK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 25B9212AAF3;
-	Tue, 26 Mar 2024 06:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B9112881C
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 06:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711433593; cv=none; b=e0T3d9cjaXZMRg34bAkU+ncwtOMY8YyUbq1dopIRYqKVMdXeth6SLSJn/eNG5BRfQCkLbE7Y2SjYChwjJhoHW7IMRd9PVAFkvUE/Cc5PiNzuyQK6TxHHUTI9KNIFtNLO++CBluFucYpFpOMsWOMdCFMpA5YiDEqybjbD3dYXnPg=
+	t=1711434344; cv=none; b=U9DoN6ur+rSa1bJ5r3jQ1Xe9WSLF5Srn2SAdXE9K6ONtqRaVhh9HYVjEi+MXqk+MZPYI/NAOxgD54v85+hu1UgKSnl6zUHoRZCcKyt6a+XdMJI1QQ40zUdxyDv8d1GV64L8nR2/Ob6zc4O2F0vO4faYh+qEYYiag6ykDcm3XC54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711433593; c=relaxed/simple;
-	bh=NdKLQ7JamUzG1z9KVDouidvoQOk9dDTvpTFBpz+UgxY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version; b=YB3z7ZwPIa4rBjezGEFKojeEvKaE4d7lCUrnA/a0SPXqO5BErxYnPaWmMrDxssb5TL52PWAMXLFE05oidPMJDCnH2Mw2CGpFQsiRZx7kIMNjbNbkM4uKGylFbOTNAF3AvsbFxyo1U3vlebHY84MBhRb4F2UOpAiRVM3tFtUECrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from localhost.localdomain (unknown [180.167.10.98])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPSA id DDADD6070B0AA;
-	Tue, 26 Mar 2024 14:13:07 +0800 (CST)
-X-MD-Sfrom: suhui@nfschina.com
-X-MD-SrcIP: 180.167.10.98
-From: Su Hui <suhui@nfschina.com>
-To: sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	nathan@kernel.org,
-	ndesaulniers@google.com,
-	morbo@google.com,
-	justinstitt@google.com
-Cc: Su Hui <suhui@nfschina.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net v2 2/2] octeontx2-pf: remove unused variables req_hdr and rsp_hdr
-Date: Tue, 26 Mar 2024 14:12:36 +0800
-Message-Id: <20240326061233.4133148-2-suhui@nfschina.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240326061233.4133148-1-suhui@nfschina.com>
+	s=arc-20240116; t=1711434344; c=relaxed/simple;
+	bh=JVRlUGrgX9JPGKwuRYAxSFPzGRJh0ssLcpC/ohe5i+o=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=AiB5eJalOGCC40To84JX2SZYG9gH1ef+K6vD409fSJ1BZiQIa4yzragGjrW4K4HXmhZ4Ze8sLlaaMEnUsN13A+7rKG6M9Zr6Brdu1KssOSLpllOpRhh3WWphwphRhWrM9dsdftkL3liZEbOYla3YSrR2FdD9Y+dhSeTSFd5r4WA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RvsfLJUK; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711434339; h=From:To:Subject:Date:Message-Id;
+	bh=VrIgm9u1Afb8K7YWBLMtJPyOCbI419F7AlIXEULMlY8=;
+	b=RvsfLJUKNSttrwKcxXkTRee7r3oaegUZh4dikmJfGXThBAenO5qTv25Kq6tCX2H5mr4OOVbNufKrXv8SuYpPZBHIiTTfXWcbA8pZSZJ+dFbbNebJ+4KXR53wzVmaWfUjX85BDjwx3jRbAcce0DHOKsG+gPrLt2M60xyCpZ3yF4k=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R241e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3K3fs7_1711434338;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3K3fs7_1711434338)
+          by smtp.aliyun-inc.com;
+          Tue, 26 Mar 2024 14:25:39 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net v2] virtio-net: fix possible dim status unrecoverable
+Date: Tue, 26 Mar 2024 14:25:38 +0800
+Message-Id: <1711434338-64848-1-git-send-email-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Clang static checker(scan-buid):
-drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:503:2: warning:
-Value stored to 'rsp_hdr' is never read [deadcode.DeadStores]
+When the dim worker is scheduled, if it fails to acquire the lock,
+dim may not be able to return to the working state later.
 
-Remove these unused variables to save some space.
+For example, the following single queue scenario:
+  1. The dim worker of rxq0 is scheduled, and the dim status is
+     changed to DIM_APPLY_NEW_PROFILE;
+  2. The ethtool command is holding rtnl lock;
+  3. Since the rtnl lock is already held, virtnet_rx_dim_work fails
+     to acquire the lock and exits;
 
-Signed-off-by: Su Hui <suhui@nfschina.com>
+Then, even if net_dim is invoked again, it cannot work because the
+state is not restored to DIM_START_MEASURE.
+
+Patch has been tested on a VM with 16 NICs, 128 queues per NIC
+(2kq total):
+With dim enabled on all queues, there are many opportunities for
+contention for RTNL lock, and this patch introduces no visible hotspots.
+The dim performance is also stable.
+
+Fixes: 6208799553a8 ("virtio-net: support rx netdim")
+Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
 ---
-v2: add "net" in subject
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+v1->v2:
+  - Update commit log. No functional changes.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 3f46d5e0fb2e..637b05c79c42 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -450,7 +450,6 @@ static void otx2_pfvf_mbox_handler(struct work_struct *work)
- 	struct mbox_msghdr *msg = NULL;
- 	int offset, vf_idx, id, err;
- 	struct otx2_mbox_dev *mdev;
--	struct mbox_hdr *req_hdr;
- 	struct otx2_mbox *mbox;
- 	struct mbox *vf_mbox;
- 	struct otx2_nic *pf;
-@@ -461,9 +460,8 @@ static void otx2_pfvf_mbox_handler(struct work_struct *work)
+ drivers/net/virtio_net.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index c22d111..0ebe322 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3563,8 +3563,10 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+ 	struct dim_cq_moder update_moder;
+ 	int i, qnum, err;
  
- 	mbox = &pf->mbox_pfvf[0].mbox;
- 	mdev = &mbox->dev[vf_idx];
--	req_hdr = (struct mbox_hdr *)(mdev->mbase + mbox->rx_start);
+-	if (!rtnl_trylock())
++	if (!rtnl_trylock()) {
++		schedule_work(&dim->work);
+ 		return;
++	}
  
--	offset = ALIGN(sizeof(*req_hdr), MBOX_MSG_ALIGN);
-+	offset = ALIGN(sizeof(struct mbox_hdr), MBOX_MSG_ALIGN);
- 
- 	for (id = 0; id < vf_mbox->num_msgs; id++) {
- 		msg = (struct mbox_msghdr *)(mdev->mbase + mbox->rx_start +
-@@ -494,7 +492,6 @@ static void otx2_pfvf_mbox_up_handler(struct work_struct *work)
- 	struct otx2_nic *pf = vf_mbox->pfvf;
- 	struct otx2_mbox_dev *mdev;
- 	int offset, id, vf_idx = 0;
--	struct mbox_hdr *rsp_hdr;
- 	struct mbox_msghdr *msg;
- 	struct otx2_mbox *mbox;
- 
-@@ -502,8 +499,7 @@ static void otx2_pfvf_mbox_up_handler(struct work_struct *work)
- 	mbox = &pf->mbox_pfvf[0].mbox_up;
- 	mdev = &mbox->dev[vf_idx];
- 
--	rsp_hdr = (struct mbox_hdr *)(mdev->mbase + mbox->rx_start);
--	offset = mbox->rx_start + ALIGN(sizeof(*rsp_hdr), MBOX_MSG_ALIGN);
-+	offset = mbox->rx_start + ALIGN(sizeof(struct mbox_hdr), MBOX_MSG_ALIGN);
- 
- 	for (id = 0; id < vf_mbox->up_num_msgs; id++) {
- 		msg = mdev->mbase + offset;
+ 	/* Each rxq's work is queued by "net_dim()->schedule_work()"
+ 	 * in response to NAPI traffic changes. Note that dim->profile_ix
 -- 
-2.30.2
+1.8.3.1
 
 
