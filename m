@@ -1,163 +1,193 @@
-Return-Path: <netdev+bounces-82143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43EFC88C6B0
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:20:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 005DE88C6C2
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:23:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAB5F320257
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:19:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EC67B242B0
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C9B13C91F;
-	Tue, 26 Mar 2024 15:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C4113C3E0;
+	Tue, 26 Mar 2024 15:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VBV7sZta"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F81D13C8F9;
-	Tue, 26 Mar 2024 15:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CAE763E6
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 15:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711466367; cv=none; b=l+yGU8SfwSkve8Ca0opCfXoZK1/3URfsiAoi/ElHy1htbg+aqwVCSYJEJMewlO9qC+0cFyc1NeTaeA1CVdo7mWgJW8TPUUKioS9Za17Opjr99D5CKvWSuQMqCbWYf0vpZwlSAeV/bQ5OY9LlJU4wukjz0hHgIbFP1NFGYMl1cKc=
+	t=1711466602; cv=none; b=fnj9eFj9RqXeaUOfbQEoY1KqTMRPV0S1L84E4s7MkZyXvK5DQ6u/t6OEdoFTr9zHRtheV4i84Rj5ZztzrKqQDKblfbOyJausQQXBwqOaqXgs6/+FBE+kfhOz/jYO8Dbvag6Z8g4Cc8FXN1DBb836dBZGy23D9U3iXDxh+CTNVww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711466367; c=relaxed/simple;
-	bh=hHinf3uw5mGBk3XfcvWhk/gfoOKl1t3aCvp3XB22w68=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e9GSY+EW9f8oKZUIIonLuXyf6b7PaM4ztA/DLiATN9zE9DAPpi8DVTMQBy0l7txy4NVkk9fhikxkeo3YCJKv34e8cbBd4F70aDPfRFaMPkaxWWMfXMueCZfGq0jgNrNonXCrYeCyJ4gPThtkIvG2mcP6Wf3CQKsPclSzte6CVOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1711466602; c=relaxed/simple;
+	bh=rgVyp+y2gQ3R68sBlqkf50YJlA2c0rrAoXXPG4GQ5Qg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=gu9PAtEjao+VmqmJacwCO4p0SEv6GD0wFcqXBm11Whxt/CiTy3TAklZPg3w6qpiLqGIl9z+2eFoEMni58i/JINstK7QdlKNIVzq8hXQHqFU+xTnYAOdiUcE6W2KnVv47pxl6lFOhHC+YjYmmiq0xVwAreDxiW7Kf9Bopk3S7xwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VBV7sZta; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-515a97846b5so2885688e87.2;
-        Tue, 26 Mar 2024 08:19:24 -0700 (PDT)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-430c41f3f89so49582701cf.0
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 08:23:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711466600; x=1712071400; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=171x83l+ahLVp7SFOrquDIhPP+v5e1CVKqpqWTE/6os=;
+        b=VBV7sZta6q9Wvd+aFsQzZm5sAlOoUnthPC1JEdK0Q6mVIN2EiArCueIrteaqXEWIgT
+         OwG6Sct3ZWfk95Do+lvyp0jW9t2jE4Q4QWScGf2hgyHOC3DIQ53WuY5xJ+p/AIDTavhV
+         sjCokbeOIKwkbaW32bRXuDM7yt8zDd/rnLSh/XlMroGmudsicvtQkptGihS9RtAmT/Nd
+         DtZ+UFo5HVhxc6t5XtyKRBKN7kWmkri95IO3HXhxBeGynGMDo2s64C7FaUzOsUVBSPQc
+         4kE0Re2X7EUsyOUmmsE1yNCAJaxkACo0bY8KXyBKZmTFef95WmxuPRZLhADwRKwNppL2
+         pJcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711466363; x=1712071163;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JUVslbHxJBsutcvQ73cVdAnF0u3jUnm/TB9Hv1RCS88=;
-        b=lTf7y/EveBKTZ/gEajfiO3bkUybaOiVGWCowwSiu+WYvXkM8aWYzPiXLC87HNFik8H
-         Uxa6r6JOyPI0s99h0RE41Bs/Mcrr0aS8g5rPupuEQtupbbHSIOT+OvowXmzajeNiJdAU
-         yRTcryR2RrqU+Iu+e+uDyiiOsYyyadDrAwowfkUoQSRKsw6Yuw9nngEa8yMlPp2m/UQj
-         6AwSRw3iR8y/K2o/MbrTsq6CHGmBIDqu4DWER5PURfP/LHTixZP04tnnssBUd+ympkcu
-         Occ7ht8zmuVLJbLPaq+A6d0EXDbLtMAbj/rxWRLFpyo1xNxHArLIwa08Ndd4cJZt/W08
-         hh9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW7FGOa0oF4CfN8fJM3UKa+fOCgkwFZfWkTFEcEn8X/11/B67kUMi7v1jQgSrruBQi0oS44+77XZRlgLg/9wKLc1HVeQZYIUKdjfbL/q/DHjJ/PKAKOxWAzVZIvWddBZfMoToyOxg2rmRui2q1NhGLbYkbXYxDN7gLYD+rZ
-X-Gm-Message-State: AOJu0Yyh3inStF3XC/iw/ObsR0moDcvlnrS46hqs6s3HOVPPeqAvgdMe
-	Cs2PW0kU9NWpZe5jb8T9A1xdPsflPu3X49+CQbRICDW+UYEAcW58
-X-Google-Smtp-Source: AGHT+IFP2FZZbpvO9c2stqUmT05DnUhkBn3keNu/tRQhmT0rhlV567sSQvXWBoBrIb87kTJm2cF7ag==
-X-Received: by 2002:a05:6512:54e:b0:513:d522:b58c with SMTP id h14-20020a056512054e00b00513d522b58cmr6423792lfl.56.1711466363049;
-        Tue, 26 Mar 2024 08:19:23 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
-        by smtp.gmail.com with ESMTPSA id i16-20020a170906091000b00a4735fc654fsm4295335ejd.205.2024.03.26.08.19.22
+        d=1e100.net; s=20230601; t=1711466600; x=1712071400;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=171x83l+ahLVp7SFOrquDIhPP+v5e1CVKqpqWTE/6os=;
+        b=DywhLhT/R48Y3ypjh2LYxRJqz7HKAPPVIPSiiLurTaMkFyNwrOWVo94H0GW3j43m45
+         SsmGwwwp2siPaCArr1IUjUI5d9/w1BsiLtpkgzTzF615bBR2Hjj3dzdg7L5zIAxCxYHS
+         msqDZ9RLZxLQkzzZFWLz0fDRE7QUPaedfi8bkmK78788NlZGh4PViW8gzB7RIYWF5xuY
+         yH17uuFwAN6WcwDk/Y3boBl+h5cAQF/dKP6kEUmxRk13bR0Y5EUgBQa0/aj1RUSCc3vK
+         i/m4nX8VykFsmQ0JC9H7wJdL+86BO4quN5QB6R1BBmkzkVGLJvmwTUTgDRZAryBwAQZ0
+         n6PA==
+X-Gm-Message-State: AOJu0YxzXGfYQumQzj1jwstP/rJVTI93jVtLNxKTwfE5sIPMYqiKdFxT
+	xIlHY3JnuSAyHrwNCKB9OcnG+acHTncUkDLOqe96XwpcVtrrZ+4R
+X-Google-Smtp-Source: AGHT+IFZGFNAqPSDp6+2sWFIxy/+cmY6Q/iXGRpE0x+h+hitUWqLhH3rZydH2fRvXGRLl1Q03Srn5g==
+X-Received: by 2002:ac8:574f:0:b0:431:3fff:b3e1 with SMTP id 15-20020ac8574f000000b004313fffb3e1mr2671617qtx.31.1711466599718;
+        Tue, 26 Mar 2024 08:23:19 -0700 (PDT)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id bt11-20020ac8690b000000b0043167d8c57dsm1132120qtb.56.2024.03.26.08.23.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 08:19:22 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: hengqi@linux.alibaba.com,
-	xuanzhuo@linux.alibaba.com,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Melnychenko <andrew@daynix.com>
-Cc: rbc@meta.com,
-	riel@surriel.com,
-	stable@vger.kernel.org,
-	qemu-devel@nongnu.org,
-	virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v2 2/2] virtio_net: Do not send RSS key if it is not supported
-Date: Tue, 26 Mar 2024 08:19:09 -0700
-Message-ID: <20240326151911.2155689-2-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240326151911.2155689-1-leitao@debian.org>
-References: <20240326151911.2155689-1-leitao@debian.org>
+        Tue, 26 Mar 2024 08:23:19 -0700 (PDT)
+Date: Tue, 26 Mar 2024 11:23:19 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org
+Message-ID: <6602e8671ecd0_1408f4294cf@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240326073722.637e8504@kernel.org>
+References: <20240325223905.100979-5-johannes@sipsolutions.net>
+ <20240325190957.02d74258@kernel.org>
+ <8eeae19a0535bfe72f87ee8c74a15dd2e753c765.camel@sipsolutions.net>
+ <20240326073722.637e8504@kernel.org>
+Subject: Re: [PATCH 0/3] using guard/__free in networking
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-There is a bug when setting the RSS options in virtio_net that can break
-the whole machine, getting the kernel into an infinite loop.
+Jakub Kicinski wrote:
+> On Tue, 26 Mar 2024 09:42:43 +0100 Johannes Berg wrote:
+> > On Mon, 2024-03-25 at 19:09 -0700, Jakub Kicinski wrote:
+> > > On Mon, 25 Mar 2024 23:31:25 +0100 Johannes Berg wrote:  
+> > > > Hi,
+> > > > 
+> > > > So I started playing with this for wifi, and overall that
+> > > > does look pretty nice, but it's a bit weird if we can do
+> > > > 
+> > > >   guard(wiphy)(&rdev->wiphy);
+> > > > 
+> > > > or so, but still have to manually handle the RTNL in the
+> > > > same code.  
+> > > 
+> > > Dunno, it locks code instead of data accesses.  
+> > 
+> > Well, I'm not sure that's a fair complaint. After all, without any more
+> > compiler help, even rtnl_lock()/rtnl_unlock() _necessarily_ locks code.
+> > Clearly
+> > 
+> > 	rtnl_lock();
+> > 	// something
+> > 	rtnl_unlock();
+> > 
+> > also locks the "// something" code, after all., and yeah that might be
+> > doing data accesses, but it might also be a function call or a whole
+> > bunch of other things?
+> > 
+> > Or if you look at something like bpf_xdp_link_attach(), I don't think
+> > you can really say that it locks only data. That doesn't even do the
+> > allocation outside the lock (though I did convert that one to
+> > scoped_guard because of that.)
+> > 
+> > Or even something simple like unregister_netdev(), it just requires the
+> > RTNL for some data accesses and consistency deep inside
+> > unregister_netdevice(), not for any specific data accessed there.
+> > 
+> > So yeah, this is always going to be a trade-off, but all the locking is.
+> > We even make similar trade-offs manually, e.g. look at
+> > bpf_xdp_link_update(), it will do the bpf_prog_put() under the RTNL
+> > still, for no good reason other than simplifying the cleanup path there.
+> 
+> At least to me the mental model is different. 99% of the time the guard
+> is covering the entire body. So now we're moving from "I'm touching X
+> so I need to lock" to "This _function_ is safe to touch X".
+> 
+> > Anyway, I can live with it either way (unless you tell me you won't pull
+> > wireless code using guard), just thought doing the wireless locking with
+> > guard and the RTNL around it without it (only in a few places do we
+> > still use RTNL though) looked odd.
+> > 
+> > 
+> > > Forgive the comparison but it feels too much like Java to me :)  
+> > 
+> > Heh. Haven't used Java in 20 years or so...
+> 
+> I only did at uni, but I think they had a decorator for a method, where
+> you can basically say "this method should be under lock X" and runtime
+> will take that lock before entering and drop it after exit,
+> appropriately. I wonder why the sudden love for this concept :S
+> Is it also present in Rust or some such?
+> 
+> > > scoped_guard is fine, the guard() not so much.  
+> > 
+> > I think you can't get scoped_guard() without guard(), so does that mean
+> > you'd accept the first patch in the series?
+> 
+> How can we get one without the other.. do you reckon Joe P would let us
+> add a checkpatch check to warn people against pure guard() under net/ ?
+> 
+> > > Do you have a piece of code in wireless where the conversion
+> > > made you go "wow, this is so much cleaner"?  
+> > 
+> > Mostly long and complex error paths. Found a double-unlock bug (in
+> > iwlwifi) too, when converting some locking there.
+> > 
+> > Doing a more broader conversion on cfg80211/mac80211 removes around 200
+> > lines of unlocking, mostly error handling, code.
+> > 
+> > Doing __free() too will probably clean up even more.
+> 
+> Not super convinced by that one either:
+> https://lore.kernel.org/all/20240321185640.6f7f4d6b@kernel.org/
+> maybe I'm too conservative..
 
-Running the following command in any QEMU virtual machine with virtionet
-will reproduce this problem:
++1 on the concept (fwiw).
 
-    # ethtool -X eth0  hfunc toeplitz
+Even the simple examples, such as unregister_netdevice_notifier_net,
+show how it avoids boilerplate and so simplifies control flow.
 
-This is how the problem happens:
+That benefit multiplies with the number of resources held and number
+of exit paths. Or in our case, gotos and (unlock) labels.
 
-1) ethtool_set_rxfh() calls virtnet_set_rxfh()
+Error paths are notorious for seeing little test coverage and leaking
+resources. This is an easy class of bugs that this RAII squashes.
 
-2) virtnet_set_rxfh() calls virtnet_commit_rss_command()
+Sprinkling guard statements anywhere in the scope itself makes it
+perhaps hard to follow. Perhaps a heuristic would be to require these
+statements at the start of scope (after variable declaration)?
 
-3) virtnet_commit_rss_command() populates 4 entries for the rss
-scatter-gather
-
-4) Since the command above does not have a key, then the last
-scatter-gatter entry will be zeroed, since rss_key_size == 0.
-sg_buf_size = vi->rss_key_size;
-
-5) This buffer is passed to qemu, but qemu is not happy with a buffer
-with zero length, and do the following in virtqueue_map_desc() (QEMU
-function):
-
-  if (!sz) {
-      virtio_error(vdev, "virtio: zero sized buffers are not allowed");
-
-6) virtio_error() (also QEMU function) set the device as broken
-
-    vdev->broken = true;
-
-7) Qemu bails out, and do not repond this crazy kernel.
-
-8) The kernel is waiting for the response to come back (function
-virtnet_send_command())
-
-9) The kernel is waiting doing the following :
-
-      while (!virtqueue_get_buf(vi->cvq, &tmp) &&
-	     !virtqueue_is_broken(vi->cvq))
-	      cpu_relax();
-
-10) None of the following functions above is true, thus, the kernel
-loops here forever. Keeping in mind that virtqueue_is_broken() does
-not look at the qemu `vdev->broken`, so, it never realizes that the
-vitio is broken at QEMU side.
-
-Fix it by not sending RSS commands if the feature is not available in
-the device.
-
-Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
-Cc: stable@vger.kernel.org
-Cc: qemu-devel@nongnu.org
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/virtio_net.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index c640fdf28fc5..e6b0eaf08ac2 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3809,6 +3809,9 @@ static int virtnet_set_rxfh(struct net_device *dev,
- 	struct virtnet_info *vi = netdev_priv(dev);
- 	int i;
- 
-+	if (!vi->has_rss && !vi->has_rss_hash_report)
-+		return -EOPNOTSUPP;
-+
- 	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
- 	    rxfh->hfunc != ETH_RSS_HASH_TOP)
- 		return -EOPNOTSUPP;
--- 
-2.43.0
-
+Function level decorators could further inform static analysis.
+But that is somewhat tangential.
 
