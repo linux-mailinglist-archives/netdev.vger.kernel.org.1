@@ -1,149 +1,110 @@
-Return-Path: <netdev+bounces-82112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90DBC88C574
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:42:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C45F388C57C
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E0751F36CAE
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:42:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FEAC3042C3
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9216213C3F1;
-	Tue, 26 Mar 2024 14:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B4313C67B;
+	Tue, 26 Mar 2024 14:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="N7QBY2ec"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kYwgmkee"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106B813C3E8;
-	Tue, 26 Mar 2024 14:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597E413C3F7;
+	Tue, 26 Mar 2024 14:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711464168; cv=none; b=f00aFacUguG0IicA+HeThz/Co8u3qPdl9FxPF2/ZNvmAEr3oqy21ZwdoXnkz+zBkU1MIzWTKiJ+8qVz6ClYUeX2ar8sAgGzVAkTkhhNFDoyrjIYUiTbdwYjwLFUTrWvSoROn4BvwZfhIiikkpQLu7E47yDj0ydDKT7Da+CfMmjk=
+	t=1711464239; cv=none; b=Xdlt7BnDBE+kqOEwyNPoyr8ZN6P/+Z+Lo6AMEvnMpnp2XLC5uXq7iF3WO503Yd2EnLlE52cXgdshOFfIsdlqfPVxd5VQsueFKLg9ilsLsEYe8zOKsOOGVPiB4WBqCbINLS0Z6QHcCrJRn5UXEDiH87JgqWLWzLdsACwmmGhie/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711464168; c=relaxed/simple;
-	bh=+KV3AdzDzpYqpS+EbXnPmHttAO5r/1XNhRRlBBa+ycs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TR3HaRpp87LtYxMGwsKaZ07YiX7W3RRZMmnLEBYbUTmuFDglIJqCCj8mN+GTb0KYRaAWn1AOfVtb0lQXPDCKh/fuf01M3/vEDoBl1/ED95Muh6mn/Kv/LimRhWoThznHCOPxnxUUGnuERUOEeMKPagrH8esDtAJIdC7VlhBWAB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=N7QBY2ec; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42QCBklK007694;
-	Tue, 26 Mar 2024 15:42:16 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=9pRVmSnmGKK7LB7PnddfDWHBQ6XSXKYj11IRLNtwqSQ=; b=N7
-	QBY2ec7CNT8qV5bVJxFwCDKNtHCHQLL1A2stjMn/y2a4mdDZEu0nBAlJV+jMjui2
-	LYszZwLbZByRXeHRFaejhU3MjTETCjwfNjUV4Njk6S49C7OFaHuZE0vstFESInfg
-	aFKxKYfkE0yQr0qm0EIQkqonrNGxlKa7j1DR0xai5h+k1qWGd0XjS0ljqbziXDH9
-	IXA0/FVPB/FuzD1YgnAEdDcCXk82T1afpRWlcIyoxY10xDZz/x3b7U5N05QolwH1
-	E5JdYkwfgD8f4fw3SFTHtD1z/PVr8jNDN3aCM2bf/IcLIN9I+tesoV12ZYhQlA0L
-	lxrGKJQnhPk5G8mFWXdw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3x29h5ueb8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Mar 2024 15:42:16 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 119E840044;
-	Tue, 26 Mar 2024 15:42:11 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 5347A220B61;
-	Tue, 26 Mar 2024 15:41:15 +0100 (CET)
-Received: from [10.201.21.128] (10.201.21.128) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 26 Mar
- 2024 15:41:13 +0100
-Message-ID: <a19b20ae-d12a-47c8-9d1f-482a84924e6c@foss.st.com>
-Date: Tue, 26 Mar 2024 15:41:13 +0100
+	s=arc-20240116; t=1711464239; c=relaxed/simple;
+	bh=jPWM6+WpUBPL+YwV08qHgIODFf2tfl+DO7ozX+Tnf+Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TFVietBmkn2fB1suMNK1QjjMqXyqiQ352dTARdver0k6IcDcZG1DzTedfwTUIpUw2ab78nKbuues6rTziccrBNE13jCgTWGmWWZYBEvu8zcyXJn6nGRdkw+1CuXgl5vZMT19Tsl/IDnOr9JfgMhBjy0/BGN461EvtMGRXUtaIm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kYwgmkee; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-341d730bdfcso851299f8f.1;
+        Tue, 26 Mar 2024 07:43:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711464237; x=1712069037; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jBZDNawipMzkUz/p9SvTq2gGRo0D52L34u+c+97yOhs=;
+        b=kYwgmkeej/3XRdK8hPjYAfx3ocbDeYIPAoydNlkGEsvM9BkSZo95Ve07+2UkZxTRmI
+         eCHgFiPcXjul3CvZ0Ht/WACNYuII56P5aKyLBW0cuMBOa/HQB5tnGz4pmuV4IRxQYGUE
+         zvTo9vyIrTHR3nAVRCv7rpZTLi8npQXiRMrbX882NloYCaGbxwbOBUpnjLnB8l74Iig8
+         Jlq863C3eOs01myYnKV0Dpn5F55red39BMOmUOdaZceRV3vqExjOFppeysURktIrnOwO
+         jocD5er4HybguhHQKnMZV9dJMBuxhKeSPEqteirMOBQRbLg3Tg9wONIVJdSlTU0oq/kA
+         xspg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711464237; x=1712069037;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jBZDNawipMzkUz/p9SvTq2gGRo0D52L34u+c+97yOhs=;
+        b=UpiEfkxdd1z+PI4GhWkTSB49yRG3v698+WcjVKp2I54p0E4g6k88EEdX1VtVa6j5zu
+         fkOenuhM19qRPoyvuK6sO6Y558EjUqQtDtYiFL2Cuyhd8q7zsDhNwcsu0y3QNchxLDY3
+         93MYvc70BWNJbvwdqvbHCK76kQvYbAczqs9dwx4O0dgHcBp/3mduJCy4/30cW2N/AlG6
+         R38aFL8iRauoA45jnJFzf289EpqkbOsJG5NlPbnWdB8hcSHTABA//fzMb9F30ot18nX1
+         XFalp39gzBC2xTOCJlAShSXDi1wmhnWZrwE8goG0kOyrDrZYuUvF28Bflzv9REfRm5B1
+         PQRg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+xdSlaywL7vAqsVFERjMk0/n8DlGQ3g11mB0B8ZVvRrxswJenA1QZw1Nvv3lNFe81J2uuZiU6/nlZO+zg9Zt+ciWltPfatYM+DApVSKK5XoXb1UY6fHGhRQTZbeHr8FPmYbNqFoVnPg34aM76bMg+QiyfJ2KrRQyZossVSlRnHk4W2QnA
+X-Gm-Message-State: AOJu0YyPZ/9V2/7WY3NyNmitLPG8tLSGLKMDJy1ScdzcZE0PuFuG1QSN
+	GH0b03FgTfSLwFo+tozdiOfvmkxY4pyBld8X9hXhJI40mJ2i0k8/
+X-Google-Smtp-Source: AGHT+IFr2Afh4wPA8cw5YTVxfO+9Jah04+g4n+rcVUGUTUmT1CTfF5BMd5FDJkcgxWGVd6tTbxFqIQ==
+X-Received: by 2002:a5d:4dd0:0:b0:33d:c5b5:5796 with SMTP id f16-20020a5d4dd0000000b0033dc5b55796mr7649289wru.22.1711464236611;
+        Tue, 26 Mar 2024 07:43:56 -0700 (PDT)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id dn1-20020a0560000c0100b0033ec7182673sm12357832wrb.52.2024.03.26.07.43.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Mar 2024 07:43:56 -0700 (PDT)
+Message-ID: <46e0c775-91e7-4bf6-88f3-53ab5e00414f@gmail.com>
+Date: Tue, 26 Mar 2024 15:43:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] dt-bindings: net: add phy-supply property for
- stm32
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>, Marek Vasut <marex@denx.de>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240326125849.226765-1-christophe.roullier@foss.st.com>
- <20240326125849.226765-2-christophe.roullier@foss.st.com>
- <0e14ad5d-3c25-40ab-981a-fbc4e245fc94@lunn.ch>
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <0e14ad5d-3c25-40ab-981a-fbc4e245fc94@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-26_06,2024-03-21_02,2023-05-22_02
+Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
+ tcp_gro_receive
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240325182543.87683-1-richardbgobert@gmail.com>
+ <20240325182543.87683-5-richardbgobert@gmail.com>
+ <CANn89iKzeTKuBA3NL0DQUmUHmmc0QzZ0X62DUarZ2Q7cKRZvSA@mail.gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <CANn89iKzeTKuBA3NL0DQUmUHmmc0QzZ0X62DUarZ2Q7cKRZvSA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-On 3/26/24 14:58, Andrew Lunn wrote:
-> On Tue, Mar 26, 2024 at 01:58:48PM +0100, Christophe Roullier wrote:
->> Phandle to a regulator that provides power to the PHY. This
->> regulator will be managed during the PHY power on/off sequence.
+Eric Dumazet wrote:
+> On Mon, Mar 25, 2024 at 7:27 PM Richard Gobert <richardbgobert@gmail.com> wrote:
 >>
->> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
->> ---
->>   Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
->> index fc8c96b08d7dc..80937b28fa046 100644
->> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
->> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
->> @@ -82,6 +82,9 @@ properties:
->>         Should be phandle/offset pair. The phandle to the syscon node which
->>         encompases the glue register, and the offset of the control register
->>   
->> +  phy-supply:
->> +    description: PHY regulator
-> ~/linux/drivers/net/ethernet/stmicro/stmmac$ grep regulator_get *
-> dwmac-rk.c:	bsp_priv->regulator = devm_regulator_get(dev, "phy");
-> dwmac-sun8i.c:	gmac->regulator = devm_regulator_get_optional(dev, "phy");
-> dwmac-sunxi.c:	gmac->regulator = devm_regulator_get_optional(dev, "phy");
->
-> Maybe i'm missing something, but i don't see an actual implementation
-> of this binding?
->
-> 	Andrew
+>> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
+>> iph->id, ...) against all packets in a loop. These flush checks are used
+>> currently only in tcp flows in GRO.
+> 
+> I think this is a bug.
+> 
+> GRO should not aggregate packets if their ttl/tos fields do not match.
 
-Hi Andrew,
+AFAIU, the only UDP flow where ttl/flush_id need to be checked is when
+udp_gro_receive_segment calls skb_gro_receive - could you confirm / point
+out if there are any other flows to which these flush checks may be
+relevant?
 
-You are right, my next step is to upstream support of Ethernet MP13 glue 
-and some update like Phy regulator support
-
-(it is look like 
-https://lore.kernel.org/linux-arm-kernel/20230928122427.313271-9-christophe.roullier@foss.st.com/)
-
-Regards,
-
-Christophe
-
+As I've discussed with Willem in v3 I prefer to fix this bug in a separate
+series.
 
