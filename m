@@ -1,89 +1,104 @@
-Return-Path: <netdev+bounces-82062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C277D88C397
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:38:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D24D88C3E0
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:43:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 467C1B21F6F
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:38:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52C9E1C366C3
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C8F74BE8;
-	Tue, 26 Mar 2024 13:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D74474C05;
+	Tue, 26 Mar 2024 13:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANhScBWi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWG5AHu2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F57E74437
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104198005B;
+	Tue, 26 Mar 2024 13:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711460314; cv=none; b=sgOjcOiZ5yPlS/Bh6+OO8tFbfv3Q7e2oyyAQgrHCnlbIpAHilvoQsC290Bt5I7EaNn6SB3KYG/8se1gSYKSglBORUKGMnQ5GseKCn80V3AXnQ5rQ6M7D6c6TDevYjj1a0OcdhjvNI7RUKb0ZbzITXOKxDfqHz74Aj9iMmqgbpwc=
+	t=1711460435; cv=none; b=OyHqcNZWNciLbDBa9NKgbabkzR/+L/sotr7JtNvgcFO0bDIV/feYY7Mxm4DL0inYHYae1dtnAvhEqm716a9rdrlReDim/O3ECsA87AcRalQY0ThkOG9JTASs1lo0A+vNQt36OBuL+lMLOD/z2NT6ezUr8rlIrOKDuPHN0choDKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711460314; c=relaxed/simple;
-	bh=qQwh5DXV1GR5CLqTlfRtZ8Epr2JKbvZ81ftaZW160Cs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=PuMhC00i94KV0j2EfIcJ2pe2eHZch8hh6EmSwBNFBMaAn5b93vC4e6F3HVbJhpB+KPj0qfIRFMKRb/CEmGJ6ZlWufNuv5bOGyGmYlT+YpB78OTYZ8DhA83Hc8vjZ21B278Fucg7OLqcMj4WxIcs7Xwl1qr3gDXsRzbe/yvuiBwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ANhScBWi; arc=none smtp.client-ip=209.85.160.169
+	s=arc-20240116; t=1711460435; c=relaxed/simple;
+	bh=/Jc0MWHCp4fuAc5CLYtUxmc90iQbiyIL1jxufTmq4K4=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KZ19pwjIiHy7NXMWM8ng05qOtaUZDBJ3GXPX2AmvqqGzBgRYj0CFQg16Lr1G+RLg4/qYWB7hnPQNdktoEsmv0RcCEnQqrtap5dcUAm99Ae27xHk4suhz6rllCoBSSREHGgxx4MYMGEkgvnDEZblJsYL4bQin4md0tJIfhlbHlIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GWG5AHu2; arc=none smtp.client-ip=209.85.222.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42a029c8e76so37602671cf.2
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 06:38:32 -0700 (PDT)
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-788598094c4so261356985a.0;
+        Tue, 26 Mar 2024 06:40:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711460312; x=1712065112; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711460433; x=1712065233; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zwOLi7NSLkcwvI/HWZn8thc0v3Y0sRe4RVro70EHshM=;
-        b=ANhScBWiZm6Mx6RaVff7o50qgMRxUzqNtv4KcjU+TW7SQ3Jdm5AONAznXU9wgzHp7L
-         4e2mlA5Ev7zaiFkBmuqPKeFe0pxmOn8lrFAib1LnzvsSDHIXJ5IcOJ3MveABdcjOqwLp
-         dakxgGm1fDEGqOvqf7BExX94Vr/xHWXK6BXhcCba/qNPAsm5KJTL+8N6o6yNt5wIeAri
-         IjPA6YvwNtyXv++AKnqKFs7XBN4awA665LXze2d0hRS6fXgrDBEyCOLN3DrTAIQQ9NB6
-         Q5ZnMHbTcmmdTailvjeUZJ6lry9PxtYmOONxncGWdAET8Ar2q6P/YSW9orPHuxK3hVO6
-         d5GQ==
+        bh=8cKb2/u7bTUjCLAuXknqnuW2euAxMzzYcAXpS6k1T8I=;
+        b=GWG5AHu24n0ofkFTp5wlES/dO/VstowhuqK6IsWUa6y/fubLHqvzb4iq7UFBFTW8aT
+         kGnFdELzfHEAkInn5hxA1Tqxaxe/53L0FMhbIvNv0/ZkBB+jmXKCMx0C7g08QKbMHNlC
+         z7On5J6oPcNbgRV/FqhQwvpPBTQJWtstMAH1hayqOW9cWVS8ZKFifEamoAvZ72umUx4U
+         zfYhYLQdNVE4Ft80EaTBnEJEGnYubStKkIoh0PW9SGR/qvSpIdOroZiL2UNvh2IKv6Si
+         jIn6r4kO+ro7JOPEl1cSniDdGQvs+cCORhphJvoMv2tBD6awON9kpLvR3r2oZl8Xd7CT
+         gcFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711460312; x=1712065112;
+        d=1e100.net; s=20230601; t=1711460433; x=1712065233;
         h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zwOLi7NSLkcwvI/HWZn8thc0v3Y0sRe4RVro70EHshM=;
-        b=apHMPd1lhoM4Nd225VOeaf7plRBn33JhLUXfhOzQqbOXo0De2LKR2VTLxdqsZoJDDq
-         df1WuK0iQ3yGjOk0WLbq9l0dtf0kdYMW3Tgl5mnFo7PNBZl0Kx5W5lxf/0U1Ac1/l6kC
-         +bGujefRx3VTEQiPKgyqHSIRzHGjJnd1Mbw1Q/gQNekjMVPzuzs7wTuXHzbPElur4aro
-         Q3QZEbPZEj5wQUuSaB6VEoX4clgEXzWi7Mt2szYlXxApb+o18ZEmBBx49yMySoo4GMe5
-         PZORNDekiMUTgdfGMjiNO3OyG2sBY6khC5G/ZjyBEocqv2Ls1aKIusNmzGQtgZC6gPtc
-         U/HA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnZafkE5Y005+Q4aFTcDccvHxAr0O/ko61PaZarGl9l5QI9iSlGufBGuLhAXj0TiqKz/+H8BOHRon1zTzTP0LWUTadkV9U
-X-Gm-Message-State: AOJu0YyF4pU51Z9vUxiSk4rVN4/0bSzzO27bKzZ3ppvq+S7vlL5u1Wqa
-	LJY8x62Bzc1P2GBoBaAB0tjqwMs0mXTNQnRe8wgEesUbdEL1xBO+
-X-Google-Smtp-Source: AGHT+IGepbKqOqViYIISQErMIslRUSe01L9wDJYnxx+/aubLMw3epRyKvHv8YNNWNzb02Qy6EAx6Ug==
-X-Received: by 2002:ac8:5a43:0:b0:431:6078:a2a with SMTP id o3-20020ac85a43000000b0043160780a2amr2945983qta.19.1711460311878;
-        Tue, 26 Mar 2024 06:38:31 -0700 (PDT)
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8cKb2/u7bTUjCLAuXknqnuW2euAxMzzYcAXpS6k1T8I=;
+        b=uwwKm/gfLysQE8nFHhSqbLiRaiUabftURVb1pWmz+RCo4Q7Btf7Sg3fvEu4NashVfn
+         mEEPvlaTzCAqbDKSXIvPB9NR0+8r1/J/W1MCZ0nKde71vGGhEmLyIfK/G5NZSuX4K/P6
+         ZsJGmfQDtj7ZXBWZM83JjpiJ+STvFad+K47Nxdrz0GEkNd8nxGCnr2TBzryPhMy4Ashd
+         18eMqAmCOUvbPJfM+ldcKRZeD/piUSzMZ5aHFxQQ6IDa08HNcmAimKpQbxD39edqucvD
+         Wu6aFuyeaUNTbf9OBgx4+FiCTvT6aTwE2nbIHBz6GwNQLxyqSDTxLzOrcRHa9RhgHjgP
+         NTOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXYaeQdtTM+N/Syz9ipDkNm6sWiHo/Dtv58tO63U7DxXGB/q09k6V/Xw1TQIsQ5FRK484OLrHpeer997mhgZdPpLg3vuZ+qwULCBZqPAoSBZeO86kiOnMjZTMTpNIl+r+h9M9SdK1SVOgRYyf8s4g9rVDf1SkRfRx/2CXldCWvGKuS5V2/5
+X-Gm-Message-State: AOJu0YylwmnpimxG3lhDY9npTmWpCgn+ldYePKofq9+Xtgxyi+YA/03H
+	MIv3YMZOZbZXgBeU2igl0RbmEwfh7r/jZUcb+UTJq3dieNsDNr0J
+X-Google-Smtp-Source: AGHT+IED33vhTtcX4UL0LWOVjztttUhUL+F7bTRE2mgHIwp2zhvbcAhTRJiumZ9zpSTsUF3lo1ekZA==
+X-Received: by 2002:a05:620a:55b2:b0:78a:5c88:9b04 with SMTP id vr18-20020a05620a55b200b0078a5c889b04mr2959946qkn.73.1711460432892;
+        Tue, 26 Mar 2024 06:40:32 -0700 (PDT)
 Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id bs8-20020ac86f08000000b004317485a4e9sm354919qtb.66.2024.03.26.06.38.31
+        by smtp.gmail.com with ESMTPSA id o15-20020ae9f50f000000b007882fe32acasm3017567qkg.3.2024.03.26.06.40.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 06:38:31 -0700 (PDT)
-Date: Tue, 26 Mar 2024 09:38:31 -0400
+        Tue, 26 Mar 2024 06:40:32 -0700 (PDT)
+Date: Tue, 26 Mar 2024 09:40:32 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Antoine Tenart <atenart@kernel.org>, 
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
  davem@davemloft.net, 
+ edumazet@google.com, 
  kuba@kernel.org, 
  pabeni@redhat.com, 
- edumazet@google.com
-Cc: Antoine Tenart <atenart@kernel.org>, 
- steffen.klassert@secunet.com, 
- willemdebruijn.kernel@gmail.com, 
- netdev@vger.kernel.org
-Message-ID: <6602cfd748870_13d9ab2942e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240326113403.397786-4-atenart@kernel.org>
-References: <20240326113403.397786-1-atenart@kernel.org>
- <20240326113403.397786-4-atenart@kernel.org>
-Subject: Re: [PATCH net v4 3/5] udp: do not transition UDP GRO fraglist
- partial checksums to unnecessary
+ dsahern@kernel.org, 
+ xeb@mail.ru, 
+ shuah@kernel.org, 
+ idosch@nvidia.com, 
+ amcohen@nvidia.com, 
+ petrm@nvidia.com, 
+ jbenc@redhat.com, 
+ bpoirier@nvidia.com, 
+ b.galvani@gmail.com, 
+ liujian56@huawei.com, 
+ horms@kernel.org, 
+ linyunsheng@huawei.com, 
+ therbert@google.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <6602d05046526_13d9ab29498@willemb.c.googlers.com.notmuch>
+In-Reply-To: <494e8cac-e87a-4bc4-8a77-1801a703fd86@gmail.com>
+References: <20240325182543.87683-1-richardbgobert@gmail.com>
+ <20240325182543.87683-5-richardbgobert@gmail.com>
+ <6601c830c1daa_11c6072943b@willemb.c.googlers.com.notmuch>
+ <494e8cac-e87a-4bc4-8a77-1801a703fd86@gmail.com>
+Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
+ tcp_gro_receive
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,30 +109,28 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Antoine Tenart wrote:
-> UDP GRO validates checksums and in udp4/6_gro_complete fraglist packets
-> are converted to CHECKSUM_UNNECESSARY to avoid later checks. However
-> this is an issue for CHECKSUM_PARTIAL packets as they can be looped in
-> an egress path and then their partial checksums are not fixed.
+Richard Gobert wrote:
+> Willem de Bruijn wrote:
+> > In v3 we discussed how the flush on network layer differences (like
+> > TTL or ToS) currently only affect the TCP GRO path, but should apply
+> > more broadly.
+> > 
+> > We agreed that it is fine to leave that to a separate patch series.
+> > 
+> > But seeing this patch, it introduces a lot of churn, but also makes
+> > it harder to address that issue for UDP, as it now moves network
+> > layer checks directly to the TCP code.
+> Currently the logic of flush_id is scattered in tcp_gro_receive and
+> {inet,ipv6}_gro_receive with conditionals rewriting ->flush and ->flush_id,
+> so IMO the code should be more concise when it's in one place - in addition
+> to not doing checks against non relevant packets.
 > 
-> Different issues can be observed, from invalid checksum on packets to
-> traces like:
-> 
->   gen01: hw csum failure
->   skb len=3008 headroom=160 headlen=1376 tailroom=0
->   mac=(106,14) net=(120,40) trans=160
->   shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
->   csum(0xffff232e ip_summed=2 complete_sw=0 valid=0 level=0)
->   hash(0x77e3d716 sw=1 l4=1) proto=0x86dd pkttype=0 iif=12
->   ...
-> 
-> Fix this by only converting CHECKSUM_NONE packets to
-> CHECKSUM_UNNECESSARY by reusing __skb_incr_checksum_unnecessary. All
-> other checksum types are kept as-is, including CHECKSUM_COMPLETE as
-> fraglist packets being segmented back would have their skb->csum valid.
-> 
-> Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
-> Signed-off-by: Antoine Tenart <atenart@kernel.org>
+> With this patch, the fix will probably be simple, most likely just calling
+> gro_network_flush from skb_gro_receive or from the relevant flow in
+> udp_gro_receive_segment. Since this bug fix should be simple and it being
+> not relevant to the optimization, I'd like to solve it in another series
+> and properly test that new flow. Do you agree?
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+My main concern is moving this code to tcp_offload.c, if it likely
+soon will be moved elsewhere again.
 
