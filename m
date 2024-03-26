@@ -1,366 +1,406 @@
-Return-Path: <netdev+bounces-82157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEAA388C864
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:02:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7389C88C878
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:04:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A40833235F6
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:02:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98B7C1C3064D
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9833813C83A;
-	Tue, 26 Mar 2024 16:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B71413C8F9;
+	Tue, 26 Mar 2024 16:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DpOxoHPK"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zm34060w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2099.outbound.protection.outlook.com [40.107.95.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542262574B;
-	Tue, 26 Mar 2024 16:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEFE713C8E1;
+	Tue, 26 Mar 2024 16:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.99
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711468963; cv=fail; b=o7A52MJbG5pb/E48WDPIYMAJfZj/uRMda0bP37ulzOpnzV5GjZNK5DMB8vMWNUhHntpJN14JlMsE6tlqQlxc4AFl7ML5a/DSn/hCcfWSVWA0esmyM1i5ZV8Obt+V6NbOwET/Rxy5g6GxfRK6PdC6nG+YmDY1pWxBR0VR8wZ5IKA=
+	t=1711469087; cv=fail; b=WMWrjr6s5ZlwUYghQXj81QOTNdReuJ6i7jE902gRD4OhZG1GFFPIOdwyI20WtO952JIpm3KzSb0WpNzg3Lh1UAQy4wHLYmVyYkeaUJ06rlK4/b7ZHl6DAF/RdKpONsXvX57YWMHVgZ2RGMUKcJEjq08OFORU8kDljFkEzLUpXxY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711468963; c=relaxed/simple;
-	bh=/2mgMQaJfwNFUhuYtUqQIAjPU3T5zPILwM8XmCyQvYM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=M3HoaftMaX3iPwoPaQLxEO09Z4gCOej7QprZXgmRXCFBxhiiDkyr87uzEfVXevIMnz58dnAjW2ZZu3JWIX06GyVL8Dq8A1FDHcVP2sy7FCPnb58axySliDcKqWZNJi7Ov68mow2qWlAefO3fjRp/q4u7D8hrtYFUc5KNhqID2Tw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DpOxoHPK; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711468961; x=1743004961;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/2mgMQaJfwNFUhuYtUqQIAjPU3T5zPILwM8XmCyQvYM=;
-  b=DpOxoHPKmAOU4GGk3V2HgwraZvmDkPVF/QlWr5lTm4RVrXkCaV18lvuI
-   LLKm1eIJzqcG/Ht9r9CjlVVYkEuHLlOalc6gd71D//n8vbQUauxi+zyPF
-   qtnrrzTghhee2suoeyZB1DY0Qg6jL29Wl1sXYTV5yzH+MnNoabHocg7Lw
-   XONybnVubbTs5uVLumEE8U+4+J8U3jTwVNPPqV/X8K4mXWBqj1AicuH9C
-   l8JfLIq9zwyZGmsTUj/MLT+1iGDOyCBInIcDwBXPaE1KCvS/5aBOgiRlS
-   aF+q/DPEoPEwMlO/hu34je3nnyKapAJQJ/eufGdQK2WDokbLDG97PLTb9
-   A==;
-X-CSE-ConnectionGUID: O+4qRj3STs+NLYbB2wE7XA==
-X-CSE-MsgGUID: vmgVabqCR0q5k33+a6Y+FA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="31970090"
-X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
-   d="scan'208";a="31970090"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 09:02:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
-   d="scan'208";a="39099580"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Mar 2024 09:02:34 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 26 Mar 2024 09:02:33 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 26 Mar 2024 09:02:33 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 26 Mar 2024 09:02:33 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 26 Mar 2024 09:02:32 -0700
+	s=arc-20240116; t=1711469087; c=relaxed/simple;
+	bh=m4xrObFSpIGMN9UCZ2ccksvCvzd/ux34TYfmf5oTCVs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=YH1/wgBeHYbG4lXsiXojF79G6IBu3k5ULv7t7utClY8eSwAWdkqCUizucGqi0+mQb+yb8cDXg8LwEb1Nuly2LafV+T8UdmFLB4k3bkDux+FNJgobro3VLmN48rkrdp1iGd8KLy0PY35m3Tq048uUCnnsddfYYjjHnJ5dPA6Ghxk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zm34060w; arc=fail smtp.client-ip=40.107.95.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XT0KYlgWpuB07tjkZL7lSsYb8XVc9T2Pj3kbYZyPzQIgNQ3Be79vi/fBXdY1m8lJikUYXO6MXHqyfIC8u+g4bdGWp0GpfI2EHDypjDgn8TPkWj4pWOaPkZRBsFuWcBuO/m/bhwQovdROLL1B5HhKBkjreTnH0oOpM+wAmbSU1f8qxKURVavbCbqN2XFWg6ji/TKWqhAL1TJ4nFuOvMDDbn5lEHVq8EiZDuv1seyMmek4s1nKvRvt9aJ/mz60kZQsDFjvQSqhYcsdCPpo+ZFaJG9FJWDbGi6vIr5CHoAFlepPZleMx/+cFfKzIRU2fgGX841JHwQ5UK4bf2O2QDIKrA==
+ b=B9OyNG3mczypzDLfsnvqJVBKj/xCqLqvS5i/QSaMECGP2S22AZzpRzQLXhSoWpCJwy95r2O1IXCA92uTShqxRqHkcrSLUIgM71MAXdAqHd7hbKscKSazGNFYDisoxCIzxo47HKoklrJy3HVq4vPs35JpO/uUU8ZONOWviJ/Zy6dOqIbkBzxXYNxWlLlXZVMC6dIO7DmKyuHsV7K+M31pCPL1m0SQZjXIyyqwrJxeDHRrL24p78R2pUv1S2tYFckykUEVJPkuxka3UEfGxl4/Jb5fPWcKYVV8HwwEpOrkScFd66Zkx5acmDbxWOMXv4zvQVULMigGE4B98dmcJJQLwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TtQlaNXMJEwJ1Xh99/aCL9bPmpcq1pCx/mV5SgpYZHs=;
- b=Dykq0OdXf6nF7fo4fg35JOrhgez6pFR/x/8vW0x3BzIDO2QHK2NvV8g9iG/mfNOo0hFXoe03FbdUo/1D/2o3EXCrObts3LJ+SjXwO1F0wZ6n29Vx2jxrtsx8GeTOchY8lW8xyrdDn3JXoOvcKTUtIoKIxqzsCOmrzTaT6s+xPeNUX5iNm78SrdV78uSiSBfqSvTEWQmjuKWqacVn3QDU4IAbrQbSbR2bjG000oU91ACkFy8xu4ElL0p6ZLzNRlxzcRV4ALHAjsDY7O3joLS8h3r2QDzvBAhVl6duKvRjF0rwonMwmFSLHPkGqZP3yYDoxBxDBOw/RVNhkkvQeZARWw==
+ bh=NlM2WUgQ8IFzMds0j4DUEUxfyOFk4QfhQ3N2ivwaNhg=;
+ b=JkkluEtib836Md3LGzPbAUmFs0YJTmVly7X/szagI/6rM3o7RP+2wL6PeW9OtspDdROM+RLMnYrxZHAiepNhsLw86uzYDw9/PDa8Q+r8/ZT6iJ5WjO/ANpNmJL61lbaNCpoAmVUGwIL0PIH+Sn8wUe/2ZEwojju+xlfT3D1E39UXRTBzEzu4toeYdv0m16Ak91O0VvQEBKddKevLF//MZSFy3iFKjZNlJIh13Vn5qF8r20EVeK823glHo7sylYSFegjS5nBn8tyTXffMOsw8Hlj90gmLDJdrYGSnG7Qywy6mHVodKPKPK+8iREEi6/fKYSGusY7ZutF0H365duluxA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB5866.namprd11.prod.outlook.com (2603:10b6:a03:429::10)
- by CY8PR11MB7948.namprd11.prod.outlook.com (2603:10b6:930:7f::10) with
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NlM2WUgQ8IFzMds0j4DUEUxfyOFk4QfhQ3N2ivwaNhg=;
+ b=zm34060wcM73RXDSxXp+vK7BIR693fcKUgWLWIl30iA2u52Hpe7LuP28xeLUGnGXKhWm5N3PKOjErhSgT2/wMt0xEkzIaRqpzsSObqV0gre4mY47/qgUShesWcXKSnTMvPuzxwBV5PAZhrJMDJ0cCA65OEV3hDC/oIxSn4n50Ws=
+Received: from SN7PR12MB6839.namprd12.prod.outlook.com (2603:10b6:806:265::21)
+ by MW4PR12MB6731.namprd12.prod.outlook.com (2603:10b6:303:1eb::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Tue, 26 Mar
- 2024 16:02:25 +0000
-Received: from SJ0PR11MB5866.namprd11.prod.outlook.com
- ([fe80::aaf8:95c2:2724:9688]) by SJ0PR11MB5866.namprd11.prod.outlook.com
- ([fe80::aaf8:95c2:2724:9688%6]) with mapi id 15.20.7409.028; Tue, 26 Mar 2024
- 16:02:22 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: ivecera <ivecera@redhat.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-CC: "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list
-	<linux-kernel@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, "Nguyen,
- Anthony L" <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next 2/7] i40e: Change argument of
- several client notification functions
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 2/7] i40e: Change argument of
- several client notification functions
-Thread-Index: AQHaeUEAGqYb6uMHzU69Qc7Ah6Pn97FKOxnA
-Date: Tue, 26 Mar 2024 16:02:22 +0000
-Message-ID: <SJ0PR11MB5866F87F079606B968A60EFCE5352@SJ0PR11MB5866.namprd11.prod.outlook.com>
-References: <20240318143058.287014-1-ivecera@redhat.com>
- <20240318143058.287014-3-ivecera@redhat.com>
-In-Reply-To: <20240318143058.287014-3-ivecera@redhat.com>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Tue, 26 Mar
+ 2024 16:04:41 +0000
+Received: from SN7PR12MB6839.namprd12.prod.outlook.com
+ ([fe80::a084:ca6e:2c6c:1664]) by SN7PR12MB6839.namprd12.prod.outlook.com
+ ([fe80::a084:ca6e:2c6c:1664%5]) with mapi id 15.20.7409.028; Tue, 26 Mar 2024
+ 16:04:41 +0000
+Message-ID: <8a3ae5bf-4cb7-4201-8388-48135114886f@amd.com>
+Date: Tue, 26 Mar 2024 12:04:36 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/12] kbuild: make -Woverride-init warnings more
+ consistent
+To: Arnd Bergmann <arnd@kernel.org>, linux-kbuild@vger.kernel.org,
+ Masahiro Yamada <masahiroy@kernel.org>,
+ Harry Wentland <harry.wentland@amd.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Lucas De Marchi <lucas.demarchi@intel.com>, Oded Gabbay
+ <ogabbay@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Jeffery <andrew@codeconstruct.com.au>,
+ Linus Walleij <linus.walleij@linaro.org>, Joel Stanley <joel@jms.id.au>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas@fjasle.eu>, Arnd Bergmann <arnd@arndb.de>,
+ dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mm@kvack.org, llvm@lists.linux.dev,
+ amd-gfx@lists.freedesktop.org
+References: <20240326144741.3094687-1-arnd@kernel.org>
+ <20240326144741.3094687-2-arnd@kernel.org>
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB5866:EE_|CY8PR11MB7948:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: CxPECePTIuAyS0p02BBVAwjVT63Sly0G0C9mV32FyZmtFNiX0a3l7I+mwV/jRrvO8qAq+WdHQfW26K8BQgItrMPPB+3AIcKrHNH/Py00YbdWPdGRKdTT5FXZTRXYe7vVKRnXjWkx/Vvwm2roF0Y/zLjDhea97xi/HvYVsOsghEXbH3+QPMaA40JEwkpVTpUqdxNSZNB6WHbSckq7VUnnIi8jHznwj9BsRMY98t/Vgkrv73SXzWp137o3F13bA8TP5EZro4IkKtyknqZRs/RnzuypneAWt9PIqgkix4w5X/pcKhn1SVBx1tKdVI5zOKPAPVObR6TgWlltGfdcVW2nu9tgfNM/DrGN8RFmeOdNX2fm+4N7kD4JJWS1MS0wFlOO9JRgBm3lmqL3k8KDl1FwOj4Jt0M1jBGlq1AffIzaqOk3Fn57pCm4RjlNKVkVEs3lRlzy50v9Uu31q3coA5zZspdEpbTBKq3DVJerz7RjXnb58VksFQkVSEZwTRAILu7VQwhPkAcWiRUZWJcDuniFQRZGnW/vx4AIcVCMHIBLhLKLvLkeVzlZMJUIYmImqbjYbcSED9xJe5fU1stEUhacHUNGWlaCs+aB5A5v7q2orGw9aRxGjmnfqjVVZge/TZAnEXpCmrAEMp11PLcd62tVc7B57JAJItlzok+vWfZfkoI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5866.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TWOkk/a0JzmrS1B/JZMjjcQiUVCjUfPtByeWmordvr4OzOe6v0DajReSTOiQ?=
- =?us-ascii?Q?vZEgi0rOcs7Jtq/qnLeLS1SOXSoLLJUH+IDudXnwqGlG7mMBgvPay+78b4DK?=
- =?us-ascii?Q?gvbKEiaHgFRAXFE1fWbDwFNyE8ss6DkNCZhwxTkoBvN4zpB8jKzM88M8pmL3?=
- =?us-ascii?Q?0d+CIElwXUA6lqvgbDgxPKJt+OtThgILWy5FNP8FKVRlMAXqfMx5KqacBIf4?=
- =?us-ascii?Q?FLUImLRqi0nPnqQuT+O5bIgT35mY3pGXoA3+ERfFjlHlgibCtxTAdKenoM+Y?=
- =?us-ascii?Q?rDwXD5AXbWVKJ8awqu/bhKssO4HUFN8TkVn1nx17YS5/UJsWfvQ2n7PspiS2?=
- =?us-ascii?Q?Lcsp1SujuB6FBdGnX3Y50jpA+5pbl4Xw/RoHXSFKfF7eWHiyEobKV3J1Ffnb?=
- =?us-ascii?Q?igOzq2NDGJw6hSXMKT1+09sD+Ozdyhs8yOpK+1THea6uX10LsW2yDvVY+R6n?=
- =?us-ascii?Q?QNHY+q0kXXsD78a9eRBGWe8KuGjsuiw34yfeZlvYxkGEDp+dviZgGI7lIv1m?=
- =?us-ascii?Q?GEAM7RsL0vBRsFy8l4cAlrMi4Oceb+b6LJOM5pQkGjJH/NNMETFBZ7/1omXE?=
- =?us-ascii?Q?4f5EYUJK/P+EOJ55zKgHBOg/1oUEiD1ck/k8vZoiokSslCcD7rOulEzddIhP?=
- =?us-ascii?Q?XmiCKw035+dqv7SP3tYSmx46/x2Zg6gXSMOrV2EkO/SbL9IIxatUyYCVuITS?=
- =?us-ascii?Q?6TwRe/zJpLCaQjWsYvP7XLig9UZB81QfWIQkvkDV7KT4xathY/xoe4RZs7kb?=
- =?us-ascii?Q?r0VYVsN4iiK545xQpAHLqroJrl3LW6mt71NniEJ7jIyjjCMCr30uv0zUEcfs?=
- =?us-ascii?Q?X88sPlaKEGQRroElXybzEJypbudLifw7tKSznDVp/fEkrLDkussWKyvSZoem?=
- =?us-ascii?Q?lqE5/rthlTTd+QEKvyVRPVhULOfSvbry6JLKmwbWzSXSKWqvCm8xsYpK7Pba?=
- =?us-ascii?Q?as1blRzAD6V1WWWA7YHapENpv62JN70AFZHjIOFKBLMOKApFplQVSRd8jatA?=
- =?us-ascii?Q?OoNjC9YX9PRTJNeyb62SY52oDvjK4gImc3Sr16RKpIKIG/hbHGiEp13mCp1T?=
- =?us-ascii?Q?ohlmvyGSqN/2jzGv2PJyPRGl3B4vUgHpfpYS5xOwtFMa+odtq84kxXGLDv+L?=
- =?us-ascii?Q?HKAjmLRMi7QcOP7Sr7YIMyFeyvR8zgLREh6kXZLxPr6tIUTl1IhOdkrEzTED?=
- =?us-ascii?Q?0d4DDoAfKjxfPWy1CAq/G8Lm6ILi1uLv8qrm+zeYlsmGDQbat1RQaQcLHfi+?=
- =?us-ascii?Q?reyVAM7XnBi3gSspAMD5HsXNK+nMVWhpDeQo6EbBnQUNlcN10mXgZZsCvahg?=
- =?us-ascii?Q?0/GOpaDqRUaFD1l7J7uZXhEFh7o4yvwm9xl2XB+NBKJh1hIfpqwSHEV2xsEl?=
- =?us-ascii?Q?1CUzsOiv1ogjoTQ4akI+GR4Jzd86jcN64Wn2uY/R3Yak6kJdz0p3SDX7DS75?=
- =?us-ascii?Q?SkzMgnjVEpLgiDAei77IPd4m1yBCCgcWZsxt+GYim2gisPNlBr1Xj+qAFiGY?=
- =?us-ascii?Q?+X5yD/DZF3vSZHqdgrteTvjiI5GaQhAEy72yYju7DAMxJslxWetTTwEqgH7f?=
- =?us-ascii?Q?cpMrAnHPvZLDmSlhFtygNV3WtjOdBAKD/++Jo6s/zhbV4lImWSqDus53t8YX?=
- =?us-ascii?Q?Gw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From: Hamza Mahfooz <hamza.mahfooz@amd.com>
+In-Reply-To: <20240326144741.3094687-2-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: YT4PR01CA0221.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:eb::12) To SN7PR12MB6839.namprd12.prod.outlook.com
+ (2603:10b6:806:265::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR12MB6839:EE_|MW4PR12MB6731:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ZiNBN5hJyUgycB4OxG0mqDUATb9BgPuJqQhzAIx5V5qo9BYpnxj1pSEj1P5+mJByVyUeg/S+VESqV6fWVcgypXcY+SvGN2iQC4Fj9M7u6FhRcoQveGpmK5i7AviPm3ZydK3JkF59XZzwU0xRqr9vVM4Y7gSZFDcggwoRGbEGVucCfkYz4vtEOVn7BgfQ4fxQTCuTEEnpk5bXkBNNGTILIVBChu6a24oC9wozsJHkxzCq5XEucvZVn8ha/4kPCxbJ7qRyRigEgzXPHEuk+Rr2KSagl4hgFEmbDEp92i5bMSnOTPml/yvM1behHLzuCGvq89Hjh2zxAVmFLjxEYgd2sp5BXFLLoNIfLRxVAOauuGkJbaHjvSvGlUTGkujxDP0ft7O/CRHxsCVHOy1T++ZKJCg6xm+PNEOtTZrSAW0NApb/7Oi2jrQDvw17MENRX8ihRVvb5ZvECAc5g8xTGBafXfaewKCtVi5S9N0koq6FtL135a/r5zNLmqgHP+vawAEqqJ2fb41Rihja4vrS8/uv+l66dKttHdlJ9uizRv/1IGKTz0oDQAWRiykYOWK6RlzYDFr5bQR7aPt3P3V5nCpGGijJvCzaimzufOcH6DPsqJiOAa5zsgp+ldUxmqnjwk3ESTkm4oCPO6jGMMuV3SyNJNwd0UObt9cgdRqhDgXg7agETrExhgxyrHxeM68kWndrxKdaU95TFVDeBdRj9i9NVw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB6839.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(366007)(921011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eUhnclNDTHRsREdkWi8xcEg4SWRKaTVudUNKNmRhSStpNWNycjVLaFVDaVdO?=
+ =?utf-8?B?azkxSDdrQ2I0L1FhYVl0dWQ5R21HUFJpMzExc2pRR0RZVUJWMVBMMFZFZzc5?=
+ =?utf-8?B?NEdKeCtNYWE2Mi9pcmNtYnRBMys1b0lnNWd0WmdxcEIzQXEwY0V4QlM3dkVS?=
+ =?utf-8?B?TmFybzNSVnludFpQRzhZTmxTai9EMVpUSDdqT0d2MjBWZmpOM0p0c3h1dkM2?=
+ =?utf-8?B?OVZYdmQzMHRTek5tWVYvTiswNHdkTkpWd0pMMjVadkZRb2RINzBlWkZiQ2M0?=
+ =?utf-8?B?NDFuWHNVRTEvNXpWbmdzMlRDZlNvVEd5cWRZWjRaOE1UWjduSW9FMlpzZHd4?=
+ =?utf-8?B?OVFxZXl2b2Y5U0w5cHNPVWdpVW5FUVpMR0toa2p1dTFWMGE3UCtadWhqSTgy?=
+ =?utf-8?B?YllXNkYwYUVTMXZqZ0x5TVlRektpUktSR1JqN0tiM3pZQkpMRjZHaWxTdXJN?=
+ =?utf-8?B?bUkrMnh4ZXZ1dEpKeUFOQXRtc0ROVHlWRWoyK05rSUFqNDlIbVBjY1FKKy9w?=
+ =?utf-8?B?MWhabFArM3pSQktnOHZDOVEvamp0T3Q1YjlPV3I4MkF0YmVUeE5vM2h1L3lY?=
+ =?utf-8?B?aUxSbnJRbXdROUhLRWlEVlBWMUFYcFJoelpNQllKeXVUdGxXY0NHd1JWVzl2?=
+ =?utf-8?B?cFRaTkM4RjR0WXU0TEdxM3hlaThRWkhJeTE2VVdHa3BTckZWTTU2OEE0RlB6?=
+ =?utf-8?B?Qk5pYUxZZXdnRWZGc1Nod2NwaWhERXVrVnp3MWorVUdPU1paR0JlaFNGNlJl?=
+ =?utf-8?B?Nzc0TEVxUFhYQ3daWEVkcXNjQ1VDZnJkRVBVWXVxNXYxVnp2bWNqU3FWWjVt?=
+ =?utf-8?B?elc0ckVLMStJRkhiZWt1N2RBM2dBcFBiUUFCSS9JNzVpY0R2d1pUeTJZM1JM?=
+ =?utf-8?B?aHFhbDFCU0ZQZUFsVXc1dThqSjJTY3pNZHlvcnltRWtJQmtYM01IWnA2eTNU?=
+ =?utf-8?B?Z1ZSRDQ0dXF3a3lDL0NyeHRzMTdWUVhRMU5hbFFFdmlORHlZMFZRdlMvN0Jy?=
+ =?utf-8?B?a3hJOTBoa29wak5Fb3dBK0NLZ0hYUWJXV0VIdUdGN3ZLZkNISS8vYnUwVXdS?=
+ =?utf-8?B?Wlg0R0hTaTkyeHBtZnZuWEp4WHZIK1JBcGJIM1BmU3Y0TmdESU9aeVExOXlU?=
+ =?utf-8?B?Y3VrK2JOWDFIa3hUOWY5LzFKUmFDcEpFTnlxdDNUWEJNS2dramx2U1ZwNmsx?=
+ =?utf-8?B?K2VGaXJDd2NGMkRBZjFRKzZpcmZuRmQ1ZWNGU1lCSm1yVE54VS9Jekp2MU5u?=
+ =?utf-8?B?QVc1NnRGV3h3dzRGRi9GR2dZV0xncWFBMUxyaElPMXdLbFp3amZ2SXNIZklR?=
+ =?utf-8?B?dTluKzZDc1pOVWQ4ZkUxVzRjOW9oRFV0MEZBZlpES0ptcmc2STgzRExjMDRK?=
+ =?utf-8?B?M09Id3l6c3R4d1dBUE1KV0xITVJkVmRPeEVCUlp6S2lxTlZaRmRFYk81M0c4?=
+ =?utf-8?B?Q2I0UEdpV1p1elpmK0pvSG8wNVVlOENIZkZXb0crblJPUEtKdGlzZFE3V1JN?=
+ =?utf-8?B?WW5qalhlVG5OZkhUYjdGNmlHbm1hZndzQWN0OThFb1N5YlVGNlVzNTN2dGI2?=
+ =?utf-8?B?djZVZmcvZHVvdkNmWlhKUHorMHdVWXNxU1NNaXE1dW1KS0ozNFdTdXdPcktI?=
+ =?utf-8?B?cURNTFhjNDlxTUt5Z3Y3OStQVEM3V0h1RE5vZ1FEalVMQk9lNGZBT1hveG5F?=
+ =?utf-8?B?S1BtUVFLYkMrN0lyOHZQN2FiUThaT1BmTzBBc1ArZVh2ZndpSytoN1RxNk9X?=
+ =?utf-8?B?ZDFXS1JCM3RHWW5zYW1GYVN2SG82b0NFa1pYaWlyRkNPYzFIS2xRN3MwOVN2?=
+ =?utf-8?B?MVVSZHhCTit4d0IzNnVjWXJPYnRlVWh2NlRXbmt1bEVXaEk3V0RRRlFFald1?=
+ =?utf-8?B?S0N4SzczaTY4bWZGRTBZQjV2ZHE0MWN4MW9idFMrUm5TK2J6L0h4SlpzWWc2?=
+ =?utf-8?B?RFgyWUhtS095M1RlRjhnQ2R3UmhOSmxlOUphZkIrM1BNTmhRRkNtTDFYSVdE?=
+ =?utf-8?B?M0hidWdJSUdJb1dNelJtdHdsZjc1a2x3bG1GLy9ibUEreWdUSWVEWjUzZkdR?=
+ =?utf-8?B?N2Q2amovS1B2UEd4UmpmV2FES3BnM0xjeUpNWEhCVFViZG45RmJVMThsNnVM?=
+ =?utf-8?Q?8SppTiIEuV/wcSan6tv/AmWfZ?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f48f3e3-df5b-45d1-5c09-08dc4dae7201
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB6839.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5866.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 603eb049-7d27-4d05-3815-08dc4dae1f4a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2024 16:02:22.4067
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2024 16:04:41.3766
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KN2seefv3YVf3Znr71vPs5Q30KFAWUXl9DGTNNvbimrEWwD9oBwf9PELldizwbHjgOJCZHL2YrAatXCd81Tr+jSHdr8ec6j6hAWVlRXgKyg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7948
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yxnnEy6oLSaV8XiMI0gtm5DUIpMi5cJ1BQ7DcB6eVowhFRSB5vgd2f6qWJ3sqzqaPPyOie9BBULWNBd3hw6/XA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6731
 
+Cc: amd-gfx@lists.freedesktop.org
 
+On 3/26/24 10:47, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The -Woverride-init warn about code that may be intentional or not,
+> but the inintentional ones tend to be real bugs, so there is a bit of
+> disagreement on whether this warning option should be enabled by default
+> and we have multiple settings in scripts/Makefile.extrawarn as well as
+> individual subsystems.
+> 
+> Older versions of clang only supported -Wno-initializer-overrides with
+> the same meaning as gcc's -Woverride-init, though all supported versions
+> now work with both. Because of this difference, an earlier cleanup of
+> mine accidentally turned the clang warning off for W=1 builds and only
+> left it on for W=2, while it's still enabled for gcc with W=1.
+> 
+> There is also one driver that only turns the warning off for newer
+> versions of gcc but not other compilers, and some but not all the
+> Makefiles still use a cc-disable-warning conditional that is no
+> longer needed with supported compilers here.
+> 
+> Address all of the above by removing the special cases for clang
+> and always turning the warning off unconditionally where it got
+> in the way, using the syntax that is supported by both compilers.
+> 
+> Fixes: 2cd3271b7a31 ("kbuild: avoid duplicate warning options")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On
-> Behalf Of Ivan Vecera
-> Sent: Monday, March 18, 2024 3:31 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: open list:NETWORKING DRIVERS <netdev@vger.kernel.org>; open
-> list <linux-kernel@vger.kernel.org>; Eric Dumazet
-> <edumazet@google.com>; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; Jakub Kicinski <kuba@kernel.org>;
-> Paolo Abeni <pabeni@redhat.com>; David S. Miller
-> <davem@davemloft.net>
-> Subject: [Intel-wired-lan] [PATCH iwl-next 2/7] i40e: Change
-> argument of several client notification functions
->=20
-Can you rename the title of the commit change -> refactor?
-To make it obvious that there is no functionality change, just refactor?
+Acked-by: Hamza Mahfooz <hamza.mahfooz@amd.com>
 
+For the amdgpu changes.
 
-> Commit 0ef2d5afb12d ("i40e: KISS the client interface") simplified
-> the client interface so in practice it supports only one client per
-> i40e netdev. But we have still 2 notification functions that uses
-> as parameter a pointer to VSI of netdevice associated with the
-> client. After the mentioned commit only possible and used VSI is
-> the main (LAN) VSI.
-> So change these functions so they are called with PF pointer
-> argument and the associated VSI (LAN) is taken inside them.
->=20
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > ---
->  drivers/net/ethernet/intel/i40e/i40e.h        |  4 ++--
->  drivers/net/ethernet/intel/i40e/i40e_client.c | 20 +++++++++------
-> ----
->  drivers/net/ethernet/intel/i40e/i40e_main.c   | 12 +++++------
->  3 files changed, 17 insertions(+), 19 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h
-> b/drivers/net/ethernet/intel/i40e/i40e.h
-> index 5248e78f7849..0792c7324527 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-> @@ -1236,8 +1236,8 @@ static inline void i40e_dbg_exit(void) {}
-> int i40e_lan_add_device(struct i40e_pf *pf);  int
-> i40e_lan_del_device(struct i40e_pf *pf);  void
-> i40e_client_subtask(struct i40e_pf *pf); -void
-> i40e_notify_client_of_l2_param_changes(struct i40e_vsi *vsi); -void
-> i40e_notify_client_of_netdev_close(struct i40e_vsi *vsi, bool
-> reset);
-> +void i40e_notify_client_of_l2_param_changes(struct i40e_pf *pf);
-> void
-> +i40e_notify_client_of_netdev_close(struct i40e_pf *pf, bool
-> reset);
->  void i40e_notify_client_of_vf_enable(struct i40e_pf *pf, u32
-> num_vfs);  void i40e_notify_client_of_vf_reset(struct i40e_pf *pf,
-> u32 vf_id);  void i40e_client_update_msix_info(struct i40e_pf *pf);
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_client.c
-> b/drivers/net/ethernet/intel/i40e/i40e_client.c
-> index b32071ee84af..93e52138826e 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_client.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_client.c
-> @@ -101,25 +101,26 @@ i40e_notify_client_of_vf_msg(struct i40e_vsi
-> *vsi, u32 vf_id, u8 *msg, u16 len)
->=20
->  /**
->   * i40e_notify_client_of_l2_param_changes - call the client notify
-> callback
-> - * @vsi: the VSI with l2 param changes
-> + * @pf: PF device pointer
->   *
-> - * If there is a client to this VSI, call the client
-> + * If there is a client, call its callback
->   **/
-> -void i40e_notify_client_of_l2_param_changes(struct i40e_vsi *vsi)
-> +void i40e_notify_client_of_l2_param_changes(struct i40e_pf *pf)
->  {
-> -	struct i40e_pf *pf =3D vsi->back;
->  	struct i40e_client_instance *cdev =3D pf->cinst;
-> +	struct i40e_vsi *vsi =3D pf->vsi[pf->lan_vsi];
->  	struct i40e_params params;
->=20
->  	if (!cdev || !cdev->client)
->  		return;
->  	if (!cdev->client->ops || !cdev->client->ops-
-> >l2_param_change) {
-> -		dev_dbg(&vsi->back->pdev->dev,
-> +		dev_dbg(&pf->pdev->dev,
->  			"Cannot locate client instance l2_param_change
-> routine\n");
->  		return;
->  	}
->  	if (!test_bit(__I40E_CLIENT_INSTANCE_OPENED, &cdev->state)) {
-> -		dev_dbg(&vsi->back->pdev->dev, "Client is not open,
-> abort l2 param change\n");
-> +		dev_dbg(&pf->pdev->dev,
-> +			"Client is not open, abort l2 param change\n");
->  		return;
->  	}
->  	memset(&params, 0, sizeof(params));
-> @@ -157,20 +158,19 @@ static void i40e_client_release_qvlist(struct
-> i40e_info *ldev)
->=20
->  /**
->   * i40e_notify_client_of_netdev_close - call the client close
-> callback
-> - * @vsi: the VSI with netdev closed
-> + * @pf: PF device pointer
->   * @reset: true when close called due to a reset pending
->   *
->   * If there is a client to this netdev, call the client with close
->   **/
-> -void i40e_notify_client_of_netdev_close(struct i40e_vsi *vsi, bool
-> reset)
-> +void i40e_notify_client_of_netdev_close(struct i40e_pf *pf, bool
-> reset)
->  {
-> -	struct i40e_pf *pf =3D vsi->back;
->  	struct i40e_client_instance *cdev =3D pf->cinst;
->=20
->  	if (!cdev || !cdev->client)
->  		return;
->  	if (!cdev->client->ops || !cdev->client->ops->close) {
-> -		dev_dbg(&vsi->back->pdev->dev,
-> +		dev_dbg(&pf->pdev->dev,
->  			"Cannot locate client instance close routine\n");
->  		return;
->  	}
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index 2f1604ae78c7..7fed7fb69d4e 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -11283,14 +11283,12 @@ static void i40e_service_task(struct
-> work_struct *work)
->  		i40e_fdir_reinit_subtask(pf);
->  		if (test_and_clear_bit(__I40E_CLIENT_RESET, pf->state))
-> {
->  			/* Client subtask will reopen next time through.
-> */
-> -			i40e_notify_client_of_netdev_close(pf->vsi[pf-
-> >lan_vsi],
-> -							   true);
-> +			i40e_notify_client_of_netdev_close(pf, true);
->  		} else {
->  			i40e_client_subtask(pf);
->  			if (test_and_clear_bit(__I40E_CLIENT_L2_CHANGE,
->  					       pf->state))
-> -				i40e_notify_client_of_l2_param_changes(
-> -								pf->vsi[pf-
-> >lan_vsi]);
-> +				i40e_notify_client_of_l2_param_changes(pf);
->  		}
->  		i40e_sync_filters_subtask(pf);
->  	} else {
-> @@ -16228,7 +16226,7 @@ static void i40e_remove(struct pci_dev
-> *pdev)
->  	/* Client close must be called explicitly here because the
-> timer
->  	 * has been stopped.
->  	 */
-> -	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi],
-> false);
-> +	i40e_notify_client_of_netdev_close(pf, false);
->=20
->  	i40e_fdir_teardown(pf);
->=20
-> @@ -16487,7 +16485,7 @@ static void i40e_shutdown(struct pci_dev
-> *pdev)
->  	/* Client close must be called explicitly here because the
-> timer
->  	 * has been stopped.
->  	 */
-> -	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi],
-> false);
-> +	i40e_notify_client_of_netdev_close(pf, false);
->=20
->  	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps)
-> &&
->  	    pf->wol_en)
-> @@ -16541,7 +16539,7 @@ static int i40e_suspend(struct device *dev)
->  	/* Client close must be called explicitly here because the
-> timer
->  	 * has been stopped.
->  	 */
-> -	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi],
-> false);
-> +	i40e_notify_client_of_netdev_close(pf, false);
->=20
->  	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps)
-> &&
->  	    pf->wol_en)
-> --
-> 2.43.0
+>   drivers/gpu/drm/amd/display/dc/dce110/Makefile |  2 +-
+>   drivers/gpu/drm/amd/display/dc/dce112/Makefile |  2 +-
+>   drivers/gpu/drm/amd/display/dc/dce120/Makefile |  2 +-
+>   drivers/gpu/drm/amd/display/dc/dce60/Makefile  |  2 +-
+>   drivers/gpu/drm/amd/display/dc/dce80/Makefile  |  2 +-
+>   drivers/gpu/drm/i915/Makefile                  |  6 +++---
+>   drivers/gpu/drm/xe/Makefile                    |  4 ++--
+>   drivers/net/ethernet/renesas/sh_eth.c          |  2 +-
+>   drivers/pinctrl/aspeed/Makefile                |  2 +-
+>   fs/proc/Makefile                               |  2 +-
+>   kernel/bpf/Makefile                            |  2 +-
+>   mm/Makefile                                    |  3 +--
+>   scripts/Makefile.extrawarn                     | 10 +++-------
+>   13 files changed, 18 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/amd/display/dc/dce110/Makefile b/drivers/gpu/drm/amd/display/dc/dce110/Makefile
+> index f0777d61c2cb..c307f040e48f 100644
+> --- a/drivers/gpu/drm/amd/display/dc/dce110/Makefile
+> +++ b/drivers/gpu/drm/amd/display/dc/dce110/Makefile
+> @@ -23,7 +23,7 @@
+>   # Makefile for the 'controller' sub-component of DAL.
+>   # It provides the control and status of HW CRTC block.
+>   
+> -CFLAGS_$(AMDDALPATH)/dc/dce110/dce110_resource.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_$(AMDDALPATH)/dc/dce110/dce110_resource.o = -Wno-override-init
+>   
+>   DCE110 = dce110_timing_generator.o \
+>   dce110_compressor.o dce110_opp_regamma_v.o \
+> diff --git a/drivers/gpu/drm/amd/display/dc/dce112/Makefile b/drivers/gpu/drm/amd/display/dc/dce112/Makefile
+> index 7e92effec894..683866797709 100644
+> --- a/drivers/gpu/drm/amd/display/dc/dce112/Makefile
+> +++ b/drivers/gpu/drm/amd/display/dc/dce112/Makefile
+> @@ -23,7 +23,7 @@
+>   # Makefile for the 'controller' sub-component of DAL.
+>   # It provides the control and status of HW CRTC block.
+>   
+> -CFLAGS_$(AMDDALPATH)/dc/dce112/dce112_resource.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_$(AMDDALPATH)/dc/dce112/dce112_resource.o = -Wno-override-init
+>   
+>   DCE112 = dce112_compressor.o
+>   
+> diff --git a/drivers/gpu/drm/amd/display/dc/dce120/Makefile b/drivers/gpu/drm/amd/display/dc/dce120/Makefile
+> index 1e3ef68a452a..8f508e662748 100644
+> --- a/drivers/gpu/drm/amd/display/dc/dce120/Makefile
+> +++ b/drivers/gpu/drm/amd/display/dc/dce120/Makefile
+> @@ -24,7 +24,7 @@
+>   # It provides the control and status of HW CRTC block.
+>   
+>   
+> -CFLAGS_$(AMDDALPATH)/dc/dce120/dce120_resource.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_$(AMDDALPATH)/dc/dce120/dce120_resource.o = -Wno-override-init
+>   
+>   DCE120 = dce120_timing_generator.o
+>   
+> diff --git a/drivers/gpu/drm/amd/display/dc/dce60/Makefile b/drivers/gpu/drm/amd/display/dc/dce60/Makefile
+> index fee331accc0e..eede83ad91fa 100644
+> --- a/drivers/gpu/drm/amd/display/dc/dce60/Makefile
+> +++ b/drivers/gpu/drm/amd/display/dc/dce60/Makefile
+> @@ -23,7 +23,7 @@
+>   # Makefile for the 'controller' sub-component of DAL.
+>   # It provides the control and status of HW CRTC block.
+>   
+> -CFLAGS_$(AMDDALPATH)/dc/dce60/dce60_resource.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_$(AMDDALPATH)/dc/dce60/dce60_resource.o = -Wno-override-init
+>   
+>   DCE60 = dce60_timing_generator.o dce60_hw_sequencer.o \
+>   	dce60_resource.o
+> diff --git a/drivers/gpu/drm/amd/display/dc/dce80/Makefile b/drivers/gpu/drm/amd/display/dc/dce80/Makefile
+> index 7eefffbdc925..fba189d26652 100644
+> --- a/drivers/gpu/drm/amd/display/dc/dce80/Makefile
+> +++ b/drivers/gpu/drm/amd/display/dc/dce80/Makefile
+> @@ -23,7 +23,7 @@
+>   # Makefile for the 'controller' sub-component of DAL.
+>   # It provides the control and status of HW CRTC block.
+>   
+> -CFLAGS_$(AMDDALPATH)/dc/dce80/dce80_resource.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_$(AMDDALPATH)/dc/dce80/dce80_resource.o = -Wno-override-init
+>   
+>   DCE80 = dce80_timing_generator.o
+>   
+> diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
+> index 3ef6ed41e62b..4c2f85632391 100644
+> --- a/drivers/gpu/drm/i915/Makefile
+> +++ b/drivers/gpu/drm/i915/Makefile
+> @@ -33,9 +33,9 @@ endif
+>   subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
+>   
+>   # Fine grained warnings disable
+> -CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
+> -CFLAGS_display/intel_display_device.o = $(call cc-disable-warning, override-init)
+> -CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_i915_pci.o = -Wno-override-init
+> +CFLAGS_display/intel_display_device.o = -Wno-override-init
+> +CFLAGS_display/intel_fbdev.o = -Wno-override-init
+>   
+>   # Support compiling the display code separately for both i915 and xe
+>   # drivers. Define I915 when building i915.
+> diff --git a/drivers/gpu/drm/xe/Makefile b/drivers/gpu/drm/xe/Makefile
+> index 5a428ca00f10..c29a850859ad 100644
+> --- a/drivers/gpu/drm/xe/Makefile
+> +++ b/drivers/gpu/drm/xe/Makefile
+> @@ -172,8 +172,8 @@ subdir-ccflags-$(CONFIG_DRM_XE_DISPLAY) += \
+>   	-Ddrm_i915_gem_object=xe_bo \
+>   	-Ddrm_i915_private=xe_device
+>   
+> -CFLAGS_i915-display/intel_fbdev.o = $(call cc-disable-warning, override-init)
+> -CFLAGS_i915-display/intel_display_device.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_i915-display/intel_fbdev.o = -Wno-override-init
+> +CFLAGS_i915-display/intel_display_device.o = -Wno-override-init
+>   
+>   # Rule to build SOC code shared with i915
+>   $(obj)/i915-soc/%.o: $(srctree)/drivers/gpu/drm/i915/soc/%.c FORCE
+> diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
+> index 475e1e8c1d35..0786eb0da391 100644
+> --- a/drivers/net/ethernet/renesas/sh_eth.c
+> +++ b/drivers/net/ethernet/renesas/sh_eth.c
+> @@ -50,7 +50,7 @@
+>    * the macros available to do this only define GCC 8.
+>    */
+>   __diag_push();
+> -__diag_ignore(GCC, 8, "-Woverride-init",
+> +__diag_ignore_all("-Woverride-init",
+>   	      "logic to initialize all and then override some is OK");
+>   static const u16 sh_eth_offset_gigabit[SH_ETH_MAX_REGISTER_OFFSET] = {
+>   	SH_ETH_OFFSET_DEFAULTS,
+> diff --git a/drivers/pinctrl/aspeed/Makefile b/drivers/pinctrl/aspeed/Makefile
+> index 489ea1778353..db2a7600ae2b 100644
+> --- a/drivers/pinctrl/aspeed/Makefile
+> +++ b/drivers/pinctrl/aspeed/Makefile
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   # Aspeed pinctrl support
+>   
+> -ccflags-y += $(call cc-option,-Woverride-init)
+> +ccflags-y += -Woverride-init
+>   obj-$(CONFIG_PINCTRL_ASPEED)	+= pinctrl-aspeed.o pinmux-aspeed.o
+>   obj-$(CONFIG_PINCTRL_ASPEED_G4)	+= pinctrl-aspeed-g4.o
+>   obj-$(CONFIG_PINCTRL_ASPEED_G5)	+= pinctrl-aspeed-g5.o
+> diff --git a/fs/proc/Makefile b/fs/proc/Makefile
+> index bd08616ed8ba..7b4db9c56e6a 100644
+> --- a/fs/proc/Makefile
+> +++ b/fs/proc/Makefile
+> @@ -5,7 +5,7 @@
+>   
+>   obj-y   += proc.o
+>   
+> -CFLAGS_task_mmu.o	+= $(call cc-option,-Wno-override-init,)
+> +CFLAGS_task_mmu.o	+= -Wno-override-init
+>   proc-y			:= nommu.o task_nommu.o
+>   proc-$(CONFIG_MMU)	:= task_mmu.o
+>   
+> diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+> index 368c5d86b5b7..e497011261b8 100644
+> --- a/kernel/bpf/Makefile
+> +++ b/kernel/bpf/Makefile
+> @@ -4,7 +4,7 @@ ifneq ($(CONFIG_BPF_JIT_ALWAYS_ON),y)
+>   # ___bpf_prog_run() needs GCSE disabled on x86; see 3193c0836f203 for details
+>   cflags-nogcse-$(CONFIG_X86)$(CONFIG_CC_IS_GCC) := -fno-gcse
+>   endif
+> -CFLAGS_core.o += $(call cc-disable-warning, override-init) $(cflags-nogcse-yy)
+> +CFLAGS_core.o += -Wno-override-init $(cflags-nogcse-yy)
+>   
+>   obj-$(CONFIG_BPF_SYSCALL) += syscall.o verifier.o inode.o helpers.o tnum.o log.o token.o
+>   obj-$(CONFIG_BPF_SYSCALL) += bpf_iter.o map_iter.o task_iter.o prog_iter.o link_iter.o
+> diff --git a/mm/Makefile b/mm/Makefile
+> index e4b5b75aaec9..4abb40b911ec 100644
+> --- a/mm/Makefile
+> +++ b/mm/Makefile
+> @@ -29,8 +29,7 @@ KCOV_INSTRUMENT_mmzone.o := n
+>   KCOV_INSTRUMENT_vmstat.o := n
+>   KCOV_INSTRUMENT_failslab.o := n
+>   
+> -CFLAGS_init-mm.o += $(call cc-disable-warning, override-init)
+> -CFLAGS_init-mm.o += $(call cc-disable-warning, initializer-overrides)
+> +CFLAGS_init-mm.o += -Wno-override-init
+>   
+>   mmu-y			:= nommu.o
+>   mmu-$(CONFIG_MMU)	:= highmem.o memory.o mincore.o \
+> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+> index 3ce5d503a6da..c5af566e911a 100644
+> --- a/scripts/Makefile.extrawarn
+> +++ b/scripts/Makefile.extrawarn
+> @@ -114,6 +114,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, format-overflow)
+>   KBUILD_CFLAGS += $(call cc-disable-warning, format-truncation)
+>   KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
+>   
+> +KBUILD_CFLAGS += -Wno-override-init # alias for -Wno-initializer-overrides in clang
+> +
+>   ifdef CONFIG_CC_IS_CLANG
+>   # Clang before clang-16 would warn on default argument promotions.
+>   ifneq ($(call clang-min-version, 160000),y)
+> @@ -151,10 +153,6 @@ KBUILD_CFLAGS += -Wtype-limits
+>   KBUILD_CFLAGS += $(call cc-option, -Wmaybe-uninitialized)
+>   KBUILD_CFLAGS += $(call cc-option, -Wunused-macros)
+>   
+> -ifdef CONFIG_CC_IS_CLANG
+> -KBUILD_CFLAGS += -Winitializer-overrides
+> -endif
+> -
+>   KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN2
+>   
+>   else
+> @@ -164,9 +162,7 @@ KBUILD_CFLAGS += -Wno-missing-field-initializers
+>   KBUILD_CFLAGS += -Wno-type-limits
+>   KBUILD_CFLAGS += -Wno-shift-negative-value
+>   
+> -ifdef CONFIG_CC_IS_CLANG
+> -KBUILD_CFLAGS += -Wno-initializer-overrides
+> -else
+> +ifdef CONFIG_CC_IS_GCC
+>   KBUILD_CFLAGS += -Wno-maybe-uninitialized
+>   endif
+>   
+-- 
+Hamza
 
 
