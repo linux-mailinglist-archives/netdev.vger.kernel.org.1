@@ -1,99 +1,151 @@
-Return-Path: <netdev+bounces-82088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65EB888C4C0
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:12:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0519F88C4D0
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:13:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B4E2307228
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:12:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93F861F65A87
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0353912D1FD;
-	Tue, 26 Mar 2024 14:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1FBE12BF03;
+	Tue, 26 Mar 2024 14:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="foXo01lS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IdbRuFIM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F057641B;
-	Tue, 26 Mar 2024 14:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD83A12BF02;
+	Tue, 26 Mar 2024 14:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711462192; cv=none; b=C9ElihkB5nEIHFk/TosQABbh0/QL/ehLDoQSTqXUR7KzgMmX2a5xDWVgt6BXZrUDADLU9wVcWpira0hIIrglatl1s00T4ZmkyMf+g2eBFhIZzIzlYJu6QvXTTathCs+OKC08mXrOHqkaXg8GUj1GyaFhJXVSp3iOfDst/WTJpdo=
+	t=1711462384; cv=none; b=F7vjHb9cqR6MWYHEH4uTWbnGICNtXDFI6eW3NcPN1JEfV6adWV/YpU7TAOlxQlV6H1E71GDPPNi21CCmOZ28/cPkfZikhiwtp5AxQdNRG9zqGtTIAq0l57QQkwzsXzw68jyOZvwLy8LEXTwb7iqgIC7TQkJ+29G7GzhQURG1nEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711462192; c=relaxed/simple;
-	bh=q8UnXfSeM5UVwmqgM/TReDYUEzDHA5y4BulPyK+wuG0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eyD3Yv5sGLPsohGAf5Xp2ypc0b8yDsq1YOBNbq3uvwnImiyJo+Ywl2vFjgLjJHC8shelF3LjtgZD5QZ9U9K5mt/mYo30li/Vu+TZeW2PcIjTriDK4832VigLTDew0nkbqXNp8aTjRMW+tE8/vfZXyIJ3rilGhqdnfrcos6N369w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=foXo01lS; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1711462384; c=relaxed/simple;
+	bh=FhtNZLQWuyLFu7dDdT12isku2y5LiTvNqB0gI4titEg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u+ujBrZfXeBgMmNxD0mxp2SDGw/69OYpKvUz3bzKvlTfiGuLZrN3BbZysVsPMfNIz7L5seYIpNngGwUW9l6nM3adTE5HVYVChjP58KcRjst7529Fyy8+rlye3Kqe5Sktojv3L4BkL7FUZ2hRzpjq+B1BA4/YnaA4x3wJcXX2o/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IdbRuFIM; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41490e42c74so1623855e9.1;
-        Tue, 26 Mar 2024 07:09:50 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a45f257b81fso648644966b.0;
+        Tue, 26 Mar 2024 07:13:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711462189; x=1712066989; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q8UnXfSeM5UVwmqgM/TReDYUEzDHA5y4BulPyK+wuG0=;
-        b=foXo01lSD0Z74P68Ei4WXpHlPCN2xLTDq3h8IfGutL+jfF0VszhMoyUpymDHOW6Ubu
-         hRk6Q3ed0nVdi8RKGLRxOPUJlTMAgcVynPfWcURMMEUEJE5Lfm51F9bPzVdbvHbPBYpp
-         +HInyPvGGU2i7hRcQBJQDzmAK/2pBpI6UjgN6M9QCuQ844IEca7lsnYK0D4hyw/I8X2w
-         UKEZoCT5FlTAoZp7AqM+mwIaXo6OQqCx/CpkjRq8a/YjvcvujwtC8Dn/KATc4NHhqquz
-         dmUXb912XurknWBLsT/+8D6+h6c3ekBUch+Y57zzvhYsKGD4QxCgWfrfFg6BHg7QUGMG
-         +T+A==
+        d=gmail.com; s=20230601; t=1711462380; x=1712067180; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qLHRRxSI4Hl56G/+UarRDoZK1Wj/9ZIxTRiWiXAgPnQ=;
+        b=IdbRuFIMs/SGOMn8ny5swhNJSlNNOM7bfKJRbY2tHZSOsjf7Dhc6Su17D+i8nfs5Gl
+         Ji0ATmQM1n3c48/gCeempYK6psQ1k4PI3Oo0LIlPGpXlrkNyoguXC8JVV1AarixvhHWT
+         MoJ9LpxGapL7moKZOEbo2yF38dpXgwlzbSi+xpEek1kLKZ+7U/0VObrcT8Q+9A+cRmki
+         G15QXlT+uZF6/yOQbGfsq6Vz9n2ShedcA8J6FDa5OKpBN8FAj8/IBnhd/lKYUE7F9uQP
+         iwcJecQKzvSY/DD2B54QswSZGzmjFw6+UJ7hEhBsR1Z/qH4nJ11X9iqMG9KUxFt1MCzb
+         zVyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711462189; x=1712066989;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=q8UnXfSeM5UVwmqgM/TReDYUEzDHA5y4BulPyK+wuG0=;
-        b=en/7QRcIoEVJEe5QY/ryhRaTT+YqQn4ZD7BSEkrqWcaToF1oXxhg47ArKufIBogtla
-         F/KivqtZNHM4U/BvhXH8Le8q//ttJ8J1NzufLnSr1SpXuzbekgYzds6pXSkUQSjQES/I
-         bHkl5fT40bngKWbcMaO/uUiC6JsiKX/h0F/sVxRkuL+Nn+6zTa6tN5TSYuf3YEvIrdBe
-         JHnWrYVCAOmyqsIyAKl2eqDaU/MpPnDkAtrKU+Wk/bcR3g5dT/4HvDyIVFysjWW3YPaI
-         2hv2S1PPAQg2kWhG73X2G6CDNWhTh9rn2c4h3bFlcmAVjXVNM/yG8/hv3zF/4V9kRUJI
-         zw9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXV8Fn9awoVBvNpQt0N229YUpRfzecWH39gyBSeCBId11lf9s8DZWSxx1jX6Wpyospnwha8d/MCYf2eM+b4k4FZyXqfuz1T8PHXFLmhmgemHbZd3QWEWWnniiFwUQIK4qkj4ZSrJr21yYhCpeZJbL5KclzG4i3XfNMf/EPxXPMI0Z0Zv3H5
-X-Gm-Message-State: AOJu0Yx9x3mZ/laT4iILFIRQ3gGiURt20taPGAL23FFMAiD619+q4irr
-	lZ7Sx9LVUyhvlme1JwfVuSMbjUi8xDJEmLvaUXk+qSEfB89F1S5A
-X-Google-Smtp-Source: AGHT+IFlBQtNPV9GdJ6LTZiznVIgb+47RYLTK8nn5fmx1xecoWVMyIeFPcKV2ouXDFh5PrX7p/uNvQ==
-X-Received: by 2002:a05:600c:510d:b0:414:7bf0:973f with SMTP id o13-20020a05600c510d00b004147bf0973fmr1483318wms.9.1711462189436;
-        Tue, 26 Mar 2024 07:09:49 -0700 (PDT)
-Received: from debian ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id v16-20020a05600c445000b0041490a83f8fsm820290wmn.31.2024.03.26.07.09.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Mar 2024 07:09:49 -0700 (PDT)
-Message-ID: <5ecf0c85-5435-4371-8201-6a5a322298e3@gmail.com>
-Date: Tue, 26 Mar 2024 15:09:28 +0100
+        d=1e100.net; s=20230601; t=1711462380; x=1712067180;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qLHRRxSI4Hl56G/+UarRDoZK1Wj/9ZIxTRiWiXAgPnQ=;
+        b=ttp/ySxlYu6iO0Kpve7uYKjHLqHlKgdO3jKBbGuvGYLhwpYiVe7Oo0P7G1EZIo+W75
+         Z/oUo6FX14YSbOe0FDhqVzoGcrkMUaRzKjrf5YZIo8XDTU5sv/kRMZySsBXpivaTlvUz
+         JaBM+xGgnzv7YakmW9j7ro5Yf72HLJCH2H+mjxksoff6JF9M2br1hL4LPzwtZt8NuVf9
+         U2HPS3dTnqGTLU/8HED85QK/jioL2titcXG6YVvw/mhzL7oKtVnNyBWirPAVaC1h7EL3
+         Eknjx+qscAH/I0vhityQhIrmqyhyMGnQsz/j6eQL108Nl9CQwDJW0jhd6aunBFGlTxWk
+         9xMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXxrRzQO5ZISxiotkgxxxy3sbeNZe3tRyC5yKtlNeV8+cNpPhhBz2x6KVxUHBvedcJcDv/LVh7NPwAb9gi21ueCT/Jh1cAia1QmalZC
+X-Gm-Message-State: AOJu0YxWYr1rRcCt0yMUynhcWEUqiuTxyEQ6rcxbgcv/Qp3VKfryeuLn
+	27TRCr8AWAxA/oDymryDCFXk3uNEOLZ0FA2mwGdseVY/Gu3LQHAr93e+j6f65rI=
+X-Google-Smtp-Source: AGHT+IGsVcoN+1x6FIYzS/p2U4qw+4XpV/UTj6G66QyIUFm13sLxUw+Smj8kV0oO3H0gHD5xJtVXBg==
+X-Received: by 2002:a17:906:33d2:b0:a47:31aa:142d with SMTP id w18-20020a17090633d200b00a4731aa142dmr7382520eja.70.1711462380393;
+        Tue, 26 Mar 2024 07:13:00 -0700 (PDT)
+Received: from WBEC325.dom.lan ([185.188.71.122])
+        by smtp.gmail.com with ESMTPSA id t21-20020a170906179500b00a468bf8586bsm4324094eje.174.2024.03.26.07.12.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 07:12:59 -0700 (PDT)
+From: Pawel Dembicki <paweldembicki@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Pawel Dembicki <paweldembicki@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>,
+	Dimitri Fedrau <dima.fedrau@gmail.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 1/2] net: phy: marvell: add basic support of 88E308X/88E609X family
+Date: Tue, 26 Mar 2024 15:12:35 +0100
+Message-Id: <20240326141238.2315974-1-paweldembicki@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
- tcp_gro_receive
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20240325182543.87683-1-richardbgobert@gmail.com>
- <20240325182543.87683-5-richardbgobert@gmail.com>
- <6601c830c1daa_11c6072943b@willemb.c.googlers.com.notmuch>
- <494e8cac-e87a-4bc4-8a77-1801a703fd86@gmail.com>
- <6602d05046526_13d9ab29498@willemb.c.googlers.com.notmuch>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <6602d05046526_13d9ab29498@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Willem de Bruijn wrote:
-> My main concern is moving this code to tcp_offload.c, if it likely
-> soon will be moved elsewhere again.
+This patch implements only basic support.
 
-Got it. I'll move these functions to gro.c and post a v5 with Jakub's
-requests as well.
+It covers PHY used in multiple IC:
+PHY: 88E3082, 88E3083
+Switch: 88E6096, 88E6097
+
+Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+---
+ drivers/net/phy/marvell.c   | 13 +++++++++++++
+ include/linux/marvell_phy.h |  1 +
+ 2 files changed, 14 insertions(+)
+
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index 42ed013385bf..fae7eb57ee2c 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -3289,6 +3289,18 @@ static struct phy_driver marvell_drivers[] = {
+ 		.get_strings = marvell_get_strings,
+ 		.get_stats = marvell_get_stats,
+ 	},
++	{
++		.phy_id = MARVELL_PHY_ID_88E3082,
++		.phy_id_mask = MARVELL_PHY_ID_MASK,
++		.name = "Marvell 88E308X/88E609X Family",
++		/* PHY_BASIC_FEATURES */
++		.probe = marvell_probe,
++		.config_init = marvell_config_init,
++		.aneg_done = marvell_aneg_done,
++		.read_status = marvell_read_status,
++		.resume = genphy_resume,
++		.suspend = genphy_suspend,
++	},
+ 	{
+ 		.phy_id = MARVELL_PHY_ID_88E1112,
+ 		.phy_id_mask = MARVELL_PHY_ID_MASK,
+@@ -3742,6 +3754,7 @@ module_phy_driver(marvell_drivers);
+ 
+ static struct mdio_device_id __maybe_unused marvell_tbl[] = {
+ 	{ MARVELL_PHY_ID_88E1101, MARVELL_PHY_ID_MASK },
++	{ MARVELL_PHY_ID_88E3082, MARVELL_PHY_ID_MASK },
+ 	{ MARVELL_PHY_ID_88E1112, MARVELL_PHY_ID_MASK },
+ 	{ MARVELL_PHY_ID_88E1111, MARVELL_PHY_ID_MASK },
+ 	{ MARVELL_PHY_ID_88E1111_FINISAR, MARVELL_PHY_ID_MASK },
+diff --git a/include/linux/marvell_phy.h b/include/linux/marvell_phy.h
+index 693eba9869e4..88254f9aec2b 100644
+--- a/include/linux/marvell_phy.h
++++ b/include/linux/marvell_phy.h
+@@ -7,6 +7,7 @@
+ 
+ /* Known PHY IDs */
+ #define MARVELL_PHY_ID_88E1101		0x01410c60
++#define MARVELL_PHY_ID_88E3082		0x01410c80
+ #define MARVELL_PHY_ID_88E1112		0x01410c90
+ #define MARVELL_PHY_ID_88E1111		0x01410cc0
+ #define MARVELL_PHY_ID_88E1118		0x01410e10
+-- 
+2.25.1
+
 
