@@ -1,80 +1,103 @@
-Return-Path: <netdev+bounces-81929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9D888BC56
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 09:29:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D98388BC9D
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 09:38:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24B921F3A271
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 08:29:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE9D61C2DC47
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 08:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDE0137765;
-	Tue, 26 Mar 2024 08:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="RxG/ncDU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7E1EAF6;
+	Tue, 26 Mar 2024 08:38:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1D71369B8;
-	Tue, 26 Mar 2024 08:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C69E2114;
+	Tue, 26 Mar 2024 08:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711441699; cv=none; b=MPEkKqRpu6+G09fNV+hdIDoXpNILUsV1VnumWf7fq/obHsZubSQO6yssIONs1KmFS7CCM1TyeOwxqk52lgxmEDk83TOwOpQ9jBQhpnQ0DSVcfuxX2RX/5M75Fgivi+wwsSxlyxzL1q8bqiRYHM3wOEqslF8sk9oijZsrmN96uYc=
+	t=1711442291; cv=none; b=r4EpK2EZRa3YHN/TmTzPxWmNU8yfkVEhxi3BlVFxFT/Dvb3+CYqz82hPkxr0zs+bojbjLJtcdqXgz0Eq8m/msv6kK21Hy14okMQ/7yoA7yOVCChP5ge23SinMLqs2xevfrv8/ieY4SJvYMCU8Wo+Ta3ukZ/XqO+FrB2OyNMM1hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711441699; c=relaxed/simple;
-	bh=96BDswjuIPcZg1qhOZIkzTSwczxsMEua47evXf14TnY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ts0hAJe6+m3emiy7aNmF4e4wDNbdyXT4YasilSISdtdHszeIVZyBYbZaSoG9fWfl/lLZW7hPk+YARAo/3MQTKAy2+T0mFoWHaxbrRDtdF3RbQ1AE5DrnIBiK6abUeLIy3EYQ+9KvzdtdpMXSstZqY5k43gTJ+mtIUUXC6NJAObk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=RxG/ncDU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09485C43390;
-	Tue, 26 Mar 2024 08:28:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1711441698;
-	bh=96BDswjuIPcZg1qhOZIkzTSwczxsMEua47evXf14TnY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RxG/ncDUNX4/TQRQ37YMA/tgly5hlKCcMt7eJY0HhwuFwTGKbpHnqDXspdqXSeTAz
-	 6/Y0SZpQZS7m7O59ZsyIkMKIARh7/BDEvQVP+xzLqN+WCNa0lvdQK0bvME1twyoLP7
-	 EjKWKE6g0qxwIv7z73HaM8pwD+C6vl8IYemUdXG4=
-Date: Tue, 26 Mar 2024 09:28:15 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-	Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jaroslav Kysela <perex@perex.cz>, linux-sound@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
-	Hans de Goede <hdegoede@redhat.com>,
-	platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
-	Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
-	amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
-	linux-rdma@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	s=arc-20240116; t=1711442291; c=relaxed/simple;
+	bh=zRSQJ6WGPCwUjhMT+4T16q3Tfzhz94Gd+n+XYSLM2Yg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XknMReWL/LSkpzZRnPg6cbBfBKbE+oCjQwBPAMMhfaQynWW+QFB9in/QfH8wors8NY+95OCF1PDTmVEWT+6POACNE78KyDltyd7DCtY88LXDjHSock4E69YdzHBFLsV8yzM+WQG62+ezeXO/mPbPlcMEIwTwfnweXZ0gxmH97BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.07,155,1708354800"; 
+   d="scan'208";a="199297022"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 26 Mar 2024 17:38:07 +0900
+Received: from renesas-deb12.mshome.net (unknown [10.226.92.201])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id B9CB24006DEF;
+	Tue, 26 Mar 2024 17:38:03 +0900 (JST)
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Paul Barker <paul.barker.ct@bp.renesas.com>,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 05/28] usb: hcd-pci: Use PCI_IRQ_INTX
-Message-ID: <2024032609-rage-faceplate-23be@gregkh>
-References: <20240325070944.3600338-1-dlemoal@kernel.org>
- <20240325070944.3600338-6-dlemoal@kernel.org>
+Subject: [PATCH 1/2] net: ravb: Always process TX descriptor ring
+Date: Tue, 26 Mar 2024 08:37:39 +0000
+Message-Id: <20240326083740.23364-1-paul.barker.ct@bp.renesas.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240325070944.3600338-6-dlemoal@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 25, 2024 at 04:09:16PM +0900, Damien Le Moal wrote:
-> Use the macro PCI_IRQ_INTX instead of the deprecated PCI_IRQ_LEGACY
-> macro.
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+The TX queue should be serviced each time the poll function is called,
+even if the full RX work budget has been consumed. This prevents
+starvation of the TX queue when RX bandwidth usage is high.
 
+Fixes: a0d2f20650e8 ("Renesas Ethernet AVB PTP clock driver")
+Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index d1be030c8848..4f98e4e2badb 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -1324,12 +1324,12 @@ static int ravb_poll(struct napi_struct *napi, int budget)
+ 	int q = napi - priv->napi;
+ 	int mask = BIT(q);
+ 	int quota = budget;
++	bool rearm = true;
+ 
+ 	/* Processing RX Descriptor Ring */
+ 	/* Clear RX interrupt */
+ 	ravb_write(ndev, ~(mask | RIS0_RESERVED), RIS0);
+-	if (ravb_rx(ndev, &quota, q))
+-		goto out;
++	rearm = !ravb_rx(ndev, &quota, q);
+ 
+ 	/* Processing TX Descriptor Ring */
+ 	spin_lock_irqsave(&priv->lock, flags);
+@@ -1339,6 +1339,9 @@ static int ravb_poll(struct napi_struct *napi, int budget)
+ 	netif_wake_subqueue(ndev, q);
+ 	spin_unlock_irqrestore(&priv->lock, flags);
+ 
++	if (!rearm)
++		goto out;
++
+ 	napi_complete(napi);
+ 
+ 	/* Re-enable RX/TX interrupts */
+
+base-commit: 4cece764965020c22cff7665b18a012006359095
+-- 
+2.44.0
+
 
