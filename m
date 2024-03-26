@@ -1,149 +1,182 @@
-Return-Path: <netdev+bounces-82258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D28688CF4D
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:46:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A467488CF65
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:49:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF0B21F863A6
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 20:46:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FABF32092F
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 20:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F279412AAF6;
-	Tue, 26 Mar 2024 20:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9405F74E11;
+	Tue, 26 Mar 2024 20:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEjPIUtz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C58217591;
-	Tue, 26 Mar 2024 20:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDCD1E884
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 20:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711485967; cv=none; b=WVahVDNKRP6vSdh6UDZib8p5SWQvmm9Ixjxr2f0AuM5r59Hl9ccA4gmqpuUqKM9nU9HhM0agLBCiCfbvb+aCx//Vgd17Q4YcfzhcpRXDX3X7Ih5gZ5fbQw4yh1Ucyx5lM0bDqF/2KYLtH6iI0T9fqzXvuoMqdiZhXmbnVSoF8Uk=
+	t=1711486168; cv=none; b=thuNBwPuatEjSiJNRE6sPbDF8JCZ+Du8pBeOQxuOuynUo5xAawcfP2pBxSNfjPQJWYmgTgxJYnRcW8/Jpm5ieydQz/N+gS0bXqj9fXdBh6GWyNa02R8Qols6ue06yRkDIE9i5fHCwTg8dw6zj+tu/2swy+iDeDLvDuXXI7GwjC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711485967; c=relaxed/simple;
-	bh=I+m323qrScoplgD7tgJEKjUTCwMNgAWsVZh3d6BG38Q=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=RZOIShHPCgVyT45CUl/TCzu6Q3IURmLmmS1TGt28hALNVNkiVl19FoL/z6u0lW1dEsix9VSxVG+u7FTLANVpuaMjn+AvkldUw9X5xjmWjJsYFi9WsrNEMhKh1GlnwwbrxE1R8XBaHfykFiWXC3BHjO9FxlhWsfONWsx1JyJTfYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.80.118) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 26 Mar
- 2024 23:45:46 +0300
-Subject: Re: [PATCH 2/2] net: ravb: Always update error counters
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	<netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20240326083740.23364-1-paul.barker.ct@bp.renesas.com>
- <20240326083740.23364-2-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <b2594458-0819-9b92-26fb-7cd5e8725e60@omp.ru>
-Date: Tue, 26 Mar 2024 23:45:45 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1711486168; c=relaxed/simple;
+	bh=DlRAOeJV8NjOd+uBVaU7xAKSz4AlGyiLtJWwkgO5JYo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qEWl+FZ+4x4K1UGokITjXWg5AO30bjUFmSOjj3psiaPrPB+60/mNBq32QUiPflwbBov5yfz04L0F5bYzCeIroxSJ8l8Wl7Rci6j9uQkSugGHmekv6WiK5fVVPR28Rg19Q/WsDFzpEnTpEYOVamu7KZqmvWnYDDqaTw2Wnoyw3WQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEjPIUtz; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-368aa96233bso1330355ab.3
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:49:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711486166; x=1712090966; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xUe3b+cdCt3CNtT6kmS7FqC5H6re7v1aHPzp+YOAJWE=;
+        b=jEjPIUtzXvzY4GHjOKJsbcWMC1kYjeOW/uPeNWXbLV3OQr29ojM46u8Alp71QBw841
+         sdWb/ZeOGpCQaMy9BLsOYcCBq2xpMaYq1XO5DfS0rGQsR7OTrXOgYbrk/mDlXtKyT065
+         AOiofyl6o/CQov6ugEdPt2Jmr3JL5sLwVVNaYD8iBd/pLsWSyy+sIszp8dpKc8hishEt
+         0SCk4Hzm731FOA7Xqocxo/n5ipbU0jPaz3zjFW0EMJBvRiN8/pL+mqSI2HFmFp7GaALH
+         8odZyrwHR1TPn+eVVljYEILxaQ/zjQ1OVXSvGMh771ee4OhNITXm6mGS2nBrB25BBaPH
+         ZS8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711486166; x=1712090966;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xUe3b+cdCt3CNtT6kmS7FqC5H6re7v1aHPzp+YOAJWE=;
+        b=Jt2JMugiyD+BqruE9IOuw/rb8XRxZfNeSuVk21LYkXjdIf+/BscEV0fLQoA6LPHv/p
+         nreFyTanVE1UXc0/AvwdqyjaIU9e2UgikkmLHdr1Pku7ns0KD9UEijo9cAOTKxIQC82O
+         9wrFumqqjOglP0uYvr8ymXt0cpBBMYh7JU0lX2djl+hpApAPf4Xa3gh9SQHCIqg41fYh
+         84pGYYoIe7/S3uqG2maP2AVmBDC2JUYBUK//1ku6XZXlosQxT0jaf+r4dyCJpnNyb5A4
+         xKj1nAOvtuazYz4usil/mGyPhmb1otOn0rAwK67oGp7o878q3HKFLbL3iCBVHYSnBsi8
+         80EA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0f9sjGVLEaF23bC0O+cExaXieDzmY4G/Fx3wt0DmeHSkpFL+i8z1DZSFL7S48lrA7CmtUgv8eXOG0tKX4O21T/Elfo8P1
+X-Gm-Message-State: AOJu0YzghD4D/sI6hiA483rONXBwJS0MLCPQxhRbVQKApdMA/0aFHF92
+	AYF3z2prHzWMPMQd8Jkb/wdcDd5xO9qkD0b4LJTNNwERr2cqg9SLz5M+iOC/mrznspg5TS9oBDe
+	SJqmFj565sAnk0gaQ54jWWnPDatA=
+X-Google-Smtp-Source: AGHT+IGTjVEXv5gv8q+yUGOJo/9H42E4YOCndog1H1dcpHu2xMblBPziZC+n9XcSs3EQigen3m7HjBSy/3vfRJhZaak=
+X-Received: by 2002:a92:508:0:b0:368:9a79:6c9b with SMTP id
+ q8-20020a920508000000b003689a796c9bmr4883488ile.10.1711486165867; Tue, 26 Mar
+ 2024 13:49:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240326083740.23364-2-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/26/2024 20:26:54
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 184430 [Mar 26 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 12 0.3.12
- d1a01b14eb3fc102c904d35fe6c2622ed2d1c16e
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.80.118 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.80.118 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.80.118
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/26/2024 20:34:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/26/2024 6:28:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <20eee0606b06a3e0ec7d90a4cb24a86a1905d4df.1711478269.git.lucien.xin@gmail.com>
+ <20240326203637.50709-1-kuniyu@amazon.com>
+In-Reply-To: <20240326203637.50709-1-kuniyu@amazon.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 26 Mar 2024 16:49:14 -0400
+Message-ID: <CADvbK_ciytN_TBJFDK0PxeE45bhzPF6uGX=0b=GJW2pSDrG=iA@mail.gmail.com>
+Subject: Re: [PATCH net] net: fix the any addr conflict check in inet_bhash2_addr_any_conflict
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, joannelkoong@gmail.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/26/24 11:37 AM, Paul Barker wrote:
+On Tue, Mar 26, 2024 at 4:36=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> From: Xin Long <lucien.xin@gmail.com>
+> Date: Tue, 26 Mar 2024 14:37:49 -0400
+> > Xiumei reported a socket bind issue with this python script:
+> >
+> >   from socket import *
+> >
+> >   s_v41 =3D socket(AF_INET, SOCK_STREAM)
+> >   s_v41.bind(('0.0.0.0', 5901))
+> >
+> >   s_v61 =3D socket(AF_INET6, SOCK_STREAM)
+> >   s_v61.setsockopt(IPPROTO_IPV6, IPV6_V6ONLY, 1)
+> >   s_v61.bind(('::', 5901))
+> >
+> >   s_v42 =3D socket(AF_INET, SOCK_STREAM)
+> >   s_v42.bind(('localhost', 5901))
+> >
+> > where s_v42.bind() is expected to fail.
+>
+> Hi,
+>
+> I posted a similar patch yesterday, which needs another round due to
+> build error by another patch though.
+> https://lore.kernel.org/netdev/20240325181923.48769-3-kuniyu@amazon.com/
+>
+> So, let me repost this series.
+Cool, thanks for letting me know.
 
-> The error statistics should be updated each time the poll function is
-> called, even if the full RX work budget has been consumed. This prevents
-> the counts from becoming stuck when RX bandwidth usage is high.
-> 
-> This also ensures that error counters are not updated after we've
-> re-enabled interrupts as that could result in a race condition.
-> 
-> Also drop an unnecessary space.
-
-   Which one? I'm seeing one intact... :-)
-
-> Fixes: a0d2f20650e8 ("Renesas Ethernet AVB PTP clock driver")
-
-   As have been already said, it's wrong... :-/
-
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
-> ---
->  drivers/net/ethernet/renesas/ravb_main.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 4f98e4e2badb..a95703948a36 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -1339,6 +1339,15 @@ static int ravb_poll(struct napi_struct *napi, int budget)
->  	netif_wake_subqueue(ndev, q);
->  	spin_unlock_irqrestore(&priv->lock, flags);
->  
-> +	/* Receive error message handling */
-> +	priv->rx_over_errors =  priv->stats[RAVB_BE].rx_over_errors;
-
-   So you missed this extra space...
-
-> +	if (info->nc_queues)
-> +		priv->rx_over_errors += priv->stats[RAVB_NC].rx_over_errors;
-> +	if (priv->rx_over_errors != ndev->stats.rx_over_errors)
-> +		ndev->stats.rx_over_errors = priv->rx_over_errors;
-> +	if (priv->rx_fifo_errors != ndev->stats.rx_fifo_errors)
-> +		ndev->stats.rx_fifo_errors = priv->rx_fifo_errors;
-> +
->  	if (!rearm)
->  		goto out;
->  
-[...]
-
-MBR, Sergey
+>
+> Thanks!
+>
+>
+> >
+> > However, in this case s_v41 and s_v61 are linked to different buckets a=
+nd
+> > these buckets are linked into the same bhash2 chain where s_v61's bucke=
+ts
+> > is ahead of s_v41's. When doing the ANY addr conflict check with s_v42 =
+in
+> > inet_bhash2_addr_any_conflict(), it breaks the bhash2 chain traverse af=
+ter
+> > matching s_v61 by inet_bind2_bucket_match_addr_any(), but never gets a
+> > chance to match s_v41. Then s_v42.bind() works as ipv6only is set on s_=
+v61
+> > and inet_bhash2_conflict() returns false.
+> >
+> > This patch fixes the issue by NOT breaking the bhash2 chain traverse un=
+til
+> > both inet_bind2_bucket_match_addr_any() and inet_bhash2_conflict() retu=
+rn
+> > true.
+> >
+> > Fixes: 28044fc1d495 ("net: Add a bhash2 table hashed by port and addres=
+s")
+> > Reported-by: Xiumei Mu <xmu@redhat.com>
+> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> > ---
+> >  net/ipv4/inet_connection_sock.c | 14 ++++++--------
+> >  1 file changed, 6 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection=
+_sock.c
+> > index c038e28e2f1e..a3188f90210b 100644
+> > --- a/net/ipv4/inet_connection_sock.c
+> > +++ b/net/ipv4/inet_connection_sock.c
+> > @@ -299,14 +299,12 @@ static bool inet_bhash2_addr_any_conflict(const s=
+truct sock *sk, int port, int l
+> >
+> >       spin_lock(&head2->lock);
+> >
+> > -     inet_bind_bucket_for_each(tb2, &head2->chain)
+> > -             if (inet_bind2_bucket_match_addr_any(tb2, net, port, l3md=
+ev, sk))
+> > -                     break;
+> > -
+> > -     if (tb2 && inet_bhash2_conflict(sk, tb2, uid, relax, reuseport_cb=
+_ok,
+> > -                                     reuseport_ok)) {
+> > -             spin_unlock(&head2->lock);
+> > -             return true;
+> > +     inet_bind_bucket_for_each(tb2, &head2->chain) {
+> > +             if (inet_bind2_bucket_match_addr_any(tb2, net, port, l3md=
+ev, sk) &&
+> > +                 inet_bhash2_conflict(sk, tb2, uid, relax, reuseport_c=
+b_ok, reuseport_ok)) {
+> > +                     spin_unlock(&head2->lock);
+> > +                     return true;
+> > +             }
+> >       }
+> >
+> >       spin_unlock(&head2->lock);
+> > --
+> > 2.43.0
 
