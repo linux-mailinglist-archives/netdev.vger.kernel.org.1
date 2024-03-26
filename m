@@ -1,202 +1,271 @@
-Return-Path: <netdev+bounces-81895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A725F88B93B
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 05:05:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A547288B943
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 05:08:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00AD4B2267D
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:05:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AD6F2E7EFD
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE09129A9E;
-	Tue, 26 Mar 2024 04:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C64129E62;
+	Tue, 26 Mar 2024 04:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dvEFtq6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7682C1292D8
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 04:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D441292F5
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 04:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711425929; cv=none; b=kxRPnXAf/vYLXLwwh8jL47q2dml3PgqcLD7TQ1SlvbM78TXVzuXyTzKTHmRPMBiO6nmEUfXQHGQYJWSZaaChm/T+b4SAGSk8YbM+KZyce5WjBaVhH1k/Y7WPc8BJS48JhRZzNh3U8dDin+caRl4jUBGXoRIfy37cvuUrPkBADyU=
+	t=1711426114; cv=none; b=uSFl90E6FJIU1pBxSV2sB1ryyNZXqyTlV0QuVUJRKzSwwdVDuvTZrrnf80eQPXGPh4Ulmde9MSwnpWSh9b9218EAcU2XnFD4It4M2rVPPHTvZkaYhrUDsdF+YWBZojvwrR7xXLQbdVcTIYBO8P02RpEQvhbp3o4M5Qy9Gfa39ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711425929; c=relaxed/simple;
-	bh=RWMooWm2hTg+urHegWoX075dxGCiiXod91LeHWx3vAQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Z6Wpl0kg5s4607veIn8GO3p9RfUIAm9upOEPfH4A2ziPXqVzVkowiwBJTmmSUkRhGfnk3i6JYkQ0Suz+8+WzbzNnkp8Fh1PAma31+2STJmCMCL8utPhtoeeQwPKsuUroNpGCzSTahX4bhpSBBsBoEe3tJwv0nDY2udzIqGcS1Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7cf179c3da4so522478339f.2
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 21:05:27 -0700 (PDT)
+	s=arc-20240116; t=1711426114; c=relaxed/simple;
+	bh=StPWDnlpYhi+VnvUUlAezhM3U+Iq/7qgaasIGyswI6c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kX6jXOVWxcoPj3Ba4mvgQYMngMaogd4XxUG60X7TpYRtBFQsUyEScopukMJSpjffY/N6T+xeF7VUic0Ki96G/fFRNhA8vERZpHpUuLR0opHRjjql9Pwg3nDmMmzbrmhDcx6az1SKB+8wLvNTCZITu4076sPiEEEIq4cYqpkCFmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dvEFtq6L; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711426110;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=StPWDnlpYhi+VnvUUlAezhM3U+Iq/7qgaasIGyswI6c=;
+	b=dvEFtq6LGcYH777sjNhiGmyZzVc9zHI/qiCs/BLa76JoXq8flx8DebQPv3D+0v6SfgOPGZ
+	uMuXzdQGsUbj79qiHPorLpBDEWGhJ5aI3aLV2aiWKozWddqp0cvGba2ADVsJ4LlTpDxabW
+	gErEgIfc9DonIMZFm16TLi5jezF/u6k=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-298-LUhDlw0INYqsHQjdZv7HfA-1; Tue, 26 Mar 2024 00:08:28 -0400
+X-MC-Unique: LUhDlw0INYqsHQjdZv7HfA-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6e73833c7f6so3253459b3a.3
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 21:08:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711425926; x=1712030726;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d7qjNzAOBCybfoRNbZxcOy1j71w0Id/vFEg3S7E5tBY=;
-        b=Jwj98HT0PhkZgZzk99KBp7bToqFCvM+CnB8DaYtVPmocYtSHz/MyV3S6T3ueBnxl7b
-         16C9kLxEYmoLGP++dWOQjIOU5mkz/WjK8PR9Z5EbfaTaKrkoaOEPoK19DScjR8BkYR40
-         6We4p/gBMJ5bGEVjbypmTNwoi7j61925GPUXrWHVMOyIOBqu7ckf9UY5t28fUg8B0czK
-         aO52z7UHsKK+/QIg+71X1lrMcpFXRqpJKDWBgwmxSYya9Rp6ZLOJZI11qeaIE4Ibogze
-         uiGnGkZfDx2/P2S8vN2ikmWAzsVsyE+IvWxu10cwqlzwx6wkd05BhI7Qw3C7hOzE/izk
-         t6tw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNt4iVq8W/+AuMamarpIJLJkHwXU7Oh9aUMcDO/zdROX3GdITnPyON7fMOETE8gGTCl0P/TnVkNccfgbXPElb020VWv+td
-X-Gm-Message-State: AOJu0YzA9dAYkiL/Pss7x5xDTNUDGg+ctLva4o2ZBbyCPBzheTYw1mfi
-	/QAdIOnFIi1Kc8SQNJVyODN4qMyVlqJbtEjXsBfU0Wb8mV6HSZ6DUDN2RTQ2Rsxt+7YwRqfDXrI
-	IzfNonOoR9kf7DAImjZ+R6I2Geesatf9+wcw2lYDkB+0tA387orammUU=
-X-Google-Smtp-Source: AGHT+IFts4zA2Z3bUiY9aEPSNt9BH1OB0xu+cuRCJO43hRtNgnWV2ARVS0eAAhcU5FM6y8Ev6kn3aTZtfo2Eu16PJa6cX5oo/Uec
+        d=1e100.net; s=20230601; t=1711426107; x=1712030907;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=StPWDnlpYhi+VnvUUlAezhM3U+Iq/7qgaasIGyswI6c=;
+        b=Oe4A1L0E5hIXgkj3olVJm2WjrucQoljNGVOUPMZokFNUDNwMrFMTJDf4/LlOMHNZxr
+         +o21MEypCTdTH3dQDt0lJ8CqtVgtMVU1TmbaCpvHuCqfYEd8zpVwTi/2z+/FjBuDNv2x
+         MxfDV8ZOmPel444P3gahF8GB34cGfWNBGZg+13Hh/6uLiC/qx2/Q87z/xpFyOgOTy0aE
+         c1En8+B302HczPFTC5bMkz0xJSgE5CS4lCowLxGEl2d3YoJEuv1Dhe5yL8/KJesO7Y4d
+         qWHtCL5Hxts/WjqhJ3C/R1xjSzTCa6gERbC8Lmicq+ytlK5j4mj43YCGOesLCJbziW9k
+         ABzA==
+X-Gm-Message-State: AOJu0Yzn9P+XnqbzOr3YGMNVDtrY0aXkrMIQVaiqJG22J4kMLdRpZmTp
+	ujqlkJ8rLdHURayPuWFzV2LtF13NkZFKqRlytIxdkX8oqHSIhZE36KMPVdoWB6KDUoepFGCON+5
+	CE2rIpw+Yyju966ed5HjB4gfIEjXiXiQylrvtONoOSjW9l1t54ko/MLRSibQ7Hqd+1hVpH+Fb57
+	sjE01WLWtmLRQyQlDIuOuEs9F4Z/ND
+X-Received: by 2002:a05:6a20:2d21:b0:1a3:6a71:8282 with SMTP id g33-20020a056a202d2100b001a36a718282mr10074816pzl.0.1711426107684;
+        Mon, 25 Mar 2024 21:08:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBlkL9Z9LCjG2AzHQwehG3CJAeH4UJ5fo1nk/Ns/ww09oy/aF6P2JJr07fKJQmaIcaJvaaZgBdaQGRm8gMtj0=
+X-Received: by 2002:a05:6a20:2d21:b0:1a3:6a71:8282 with SMTP id
+ g33-20020a056a202d2100b001a36a718282mr10074794pzl.0.1711426107315; Mon, 25
+ Mar 2024 21:08:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cda8:0:b0:367:472c:e7d7 with SMTP id
- g8-20020a92cda8000000b00367472ce7d7mr484039ild.0.1711425926722; Mon, 25 Mar
- 2024 21:05:26 -0700 (PDT)
-Date: Mon, 25 Mar 2024 21:05:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006c06870614886611@google.com>
-Subject: [syzbot] [wireless?] KMSAN: uninit-value in ieee80211_rx_handlers (2)
-From: syzbot <syzbot+75af45a00cf13243ba39@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
+ <1711021557-58116-3-git-send-email-hengqi@linux.alibaba.com>
+ <CACGkMEuZ457UU6MhPtKHd_Y0VryvZoNU+uuKOc_4OK7jc62WwA@mail.gmail.com>
+ <5708312a-d8eb-40ee-88a9-e16930b94dda@linux.alibaba.com> <CACGkMEu8or7+fw3+vX_PY3Qsrm7zVSf6TS9SiE20NpOsz-or6g@mail.gmail.com>
+ <b54ad370-67bd-4b8c-82fb-54625e68288b@linux.alibaba.com> <CACGkMEv88U1_2K2b0KdmH97gfrdOvK_1ajqh=UTK6=KgZ4OYvQ@mail.gmail.com>
+ <36ce2bbf-3a31-4c01-99f3-1875f79e2831@linux.alibaba.com> <CACGkMEvShZKd7AvMFtmEWBVGQsQrGkQMTEx8yQYYU0uYqp=uMg@mail.gmail.com>
+ <62451c11-0957-4d1b-8a34-5e224ea552e0@linux.alibaba.com>
+In-Reply-To: <62451c11-0957-4d1b-8a34-5e224ea552e0@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 26 Mar 2024 12:08:16 +0800
+Message-ID: <CACGkMEsvsmyUaTD35kp=4qJhMdDYG=hGVbT0JGGTwGTb3XRuLg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] virtio-net: reduce the CPU consumption of dim worker
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, Mar 26, 2024 at 10:46=E2=80=AFAM Heng Qi <hengqi@linux.alibaba.com>=
+ wrote:
+>
+>
+>
+> =E5=9C=A8 2024/3/25 =E4=B8=8B=E5=8D=884:42, Jason Wang =E5=86=99=E9=81=93=
+:
+> > On Mon, Mar 25, 2024 at 4:22=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.c=
+om> wrote:
+> >>
+> >>
+> >> =E5=9C=A8 2024/3/25 =E4=B8=8B=E5=8D=883:56, Jason Wang =E5=86=99=E9=81=
+=93:
+> >>> On Mon, Mar 25, 2024 at 3:18=E2=80=AFPM Heng Qi <hengqi@linux.alibaba=
+.com> wrote:
+> >>>>
+> >>>> =E5=9C=A8 2024/3/25 =E4=B8=8B=E5=8D=881:57, Jason Wang =E5=86=99=E9=
+=81=93:
+> >>>>> On Mon, Mar 25, 2024 at 10:21=E2=80=AFAM Heng Qi <hengqi@linux.alib=
+aba.com> wrote:
+> >>>>>> =E5=9C=A8 2024/3/22 =E4=B8=8B=E5=8D=881:19, Jason Wang =E5=86=99=
+=E9=81=93:
+> >>>>>>> On Thu, Mar 21, 2024 at 7:46=E2=80=AFPM Heng Qi <hengqi@linux.ali=
+baba.com> wrote:
+> >>>>>>>> Currently, ctrlq processes commands in a synchronous manner,
+> >>>>>>>> which increases the delay of dim commands when configuring
+> >>>>>>>> multi-queue VMs, which in turn causes the CPU utilization to
+> >>>>>>>> increase and interferes with the performance of dim.
+> >>>>>>>>
+> >>>>>>>> Therefore we asynchronously process ctlq's dim commands.
+> >>>>>>>>
+> >>>>>>>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> >>>>>>> I may miss some previous discussions.
+> >>>>>>>
+> >>>>>>> But at least the changelog needs to explain why you don't use int=
+errupt.
+> >>>>>> Will add, but reply here first.
+> >>>>>>
+> >>>>>> When upgrading the driver's ctrlq to use interrupt, problems may o=
+ccur
+> >>>>>> with some existing devices.
+> >>>>>> For example, when existing devices are replaced with new drivers, =
+they
+> >>>>>> may not work.
+> >>>>>> Or, if the guest OS supported by the new device is replaced by an =
+old
+> >>>>>> downstream OS product, it will not be usable.
+> >>>>>>
+> >>>>>> Although, ctrlq has the same capabilities as IOq in the virtio spe=
+c,
+> >>>>>> this does have historical baggage.
+> >>>>> I don't think the upstream Linux drivers need to workaround buggy
+> >>>>> devices. Or it is a good excuse to block configure interrupts.
+> >>>> Of course I agree. Our DPU devices support ctrlq irq natively, as lo=
+ng
+> >>>> as the guest os opens irq to ctrlq.
+> >>>>
+> >>>> If other products have no problem with this, I would prefer to use i=
+rq
+> >>>> to solve this problem, which is the most essential solution.
+> >>> Let's do that.
+> >> Ok, will do.
+> >>
+> >> Do you have the link to the patch where you previously modified the
+> >> control queue for interrupt notifications.
+> >> I think a new patch could be made on top of it, but I can't seem to fi=
+nd it.
+> > Something like this?
+>
+> YES. Thanks Jason.
+>
+> >
+> > https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redha=
+t.com/t/
+> >
+> > Note that
+> >
+> > 1) some patch has been merged
+> > 2) we probably need to drop the timeout logic as it's another topic
+> > 3) need to address other comments
+>
+> I did a quick read of your patch sets from the previous 5 version:
+> [1]
+> https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redhat.=
+com/t/
+> [2] https://lore.kernel.org/all/20221226074908.8154-1-jasowang@redhat.com=
+/
+> [3] https://lore.kernel.org/all/20230413064027.13267-1-jasowang@redhat.co=
+m/
+> [4] https://lore.kernel.org/all/20230524081842.3060-1-jasowang@redhat.com=
+/
+> [5] https://lore.kernel.org/all/20230720083839.481487-1-jasowang@redhat.c=
+om/
+>
+> Regarding adding the interrupt to ctrlq, there are a few points where
+> there is no agreement,
+> which I summarize below.
+>
+> 1. Require additional interrupt vector resource
+> https://lore.kernel.org/all/20230516165043-mutt-send-email-mst@kernel.org=
+/
 
-syzbot found the following issue on:
+I don't think one more vector is a big problem. Multiqueue will
+require much more than this.
 
-HEAD commit:    4f55aa85a874 Merge tag 'fbdev-for-6.9-rc1' of git://git.ke..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1536e231180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e6bd769cb793b98a
-dashboard link: https://syzkaller.appspot.com/bug?extid=75af45a00cf13243ba39
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=156ebbb9180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12605691180000
+Even if it is, we can try to share an interrupt as Michael suggests.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7189321e94a5/disk-4f55aa85.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2cca9c27d4fe/vmlinux-4f55aa85.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b707938817e2/bzImage-4f55aa85.xz
+Let's start from something that is simple, just one more vector.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+75af45a00cf13243ba39@syzkaller.appspotmail.com
+> 2. Adding the interrupt for ctrlq may break some devices
+> https://lore.kernel.org/all/f9e75ce5-e6df-d1be-201b-7d0f18c1b6e7@redhat.c=
+om/
 
-=====================================================
-BUG: KMSAN: uninit-value in ieee80211_rx_h_action net/mac80211/rx.c:3783 [inline]
-BUG: KMSAN: uninit-value in ieee80211_rx_handlers+0xbeb7/0x10ec0 net/mac80211/rx.c:4188
- ieee80211_rx_h_action net/mac80211/rx.c:3783 [inline]
- ieee80211_rx_handlers+0xbeb7/0x10ec0 net/mac80211/rx.c:4188
- ieee80211_invoke_rx_handlers net/mac80211/rx.c:4223 [inline]
- ieee80211_prepare_and_rx_handle+0x5424/0x99f0 net/mac80211/rx.c:5071
- ieee80211_rx_for_interface+0x88d/0x990 net/mac80211/rx.c:5156
- __ieee80211_rx_handle_packet net/mac80211/rx.c:5312 [inline]
- ieee80211_rx_list+0x5498/0x6690 net/mac80211/rx.c:5447
- ieee80211_rx_napi+0x84/0x3f0 net/mac80211/rx.c:5470
- ieee80211_rx include/net/mac80211.h:5083 [inline]
- ieee80211_tasklet_handler+0x19f/0x330 net/mac80211/main.c:438
- tasklet_action_common+0x395/0xd50 kernel/softirq.c:781
- tasklet_action+0x2d/0x40 kernel/softirq.c:807
- __do_softirq+0x1c0/0x7d7 kernel/softirq.c:554
- do_softirq+0x9a/0x100 kernel/softirq.c:455
- __local_bh_enable_ip+0x9f/0xb0 kernel/softirq.c:382
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- __ieee80211_tx_skb_tid_band+0x28a/0x580 net/mac80211/tx.c:6099
- ieee80211_tx_skb_tid+0x203/0x2a0 net/mac80211/tx.c:6126
- ieee80211_mgmt_tx+0x1c87/0x2210 net/mac80211/offchannel.c:979
- rdev_mgmt_tx net/wireless/rdev-ops.h:758 [inline]
- cfg80211_mlme_mgmt_tx+0xbdd/0x1b90 net/wireless/mlme.c:937
- nl80211_tx_mgmt+0xfb0/0x1570 net/wireless/nl80211.c:12650
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
- genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1208
- netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2559
- genl_rcv+0x40/0x60 net/netlink/genetlink.c:1217
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0xf4c/0x1260 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x10df/0x11f0 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:745
- ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
+These devices need to be fixed. It's hard to imagine the evolution of
+virtio-net is blocked by buggy devices.
 
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:3804 [inline]
- slab_alloc_node mm/slub.c:3845 [inline]
- kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
- __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
- skb_copy+0x116/0xa10 net/core/skbuff.c:2128
- mac80211_hwsim_tx_frame_no_nl+0x18e1/0x2130 drivers/net/wireless/virtual/mac80211_hwsim.c:1854
- mac80211_hwsim_tx+0x1c3b/0x2d90 drivers/net/wireless/virtual/mac80211_hwsim.c:2072
- drv_tx net/mac80211/driver-ops.h:37 [inline]
- ieee80211_tx_frags+0x5ea/0xd90 net/mac80211/tx.c:1731
- __ieee80211_tx+0x470/0x640 net/mac80211/tx.c:1785
- ieee80211_tx+0x532/0x570 net/mac80211/tx.c:1965
- ieee80211_xmit+0x54a/0x5b0 net/mac80211/tx.c:2057
- __ieee80211_tx_skb_tid_band+0x27d/0x580 net/mac80211/tx.c:6098
- ieee80211_tx_skb_tid+0x203/0x2a0 net/mac80211/tx.c:6126
- ieee80211_mgmt_tx+0x1c87/0x2210 net/mac80211/offchannel.c:979
- rdev_mgmt_tx net/wireless/rdev-ops.h:758 [inline]
- cfg80211_mlme_mgmt_tx+0xbdd/0x1b90 net/wireless/mlme.c:937
- nl80211_tx_mgmt+0xfb0/0x1570 net/wireless/nl80211.c:12650
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
- genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1208
- netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2559
- genl_rcv+0x40/0x60 net/netlink/genetlink.c:1217
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0xf4c/0x1260 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x10df/0x11f0 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:745
- ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> 3. RTNL breaks surprise removal
+> https://lore.kernel.org/all/20230720170001-mutt-send-email-mst@kernel.org=
+/
 
-CPU: 1 PID: 5018 Comm: syz-executor547 Not tainted 6.8.0-syzkaller-13006-g4f55aa85a874 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-=====================================================
+The comment is for indefinite waiting for ctrl vq which turns out to
+be another issue.
 
+For the removal, we just need to do the wakeup then everything is fine.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> Regarding the above, there seems to be no conclusion yet.
+> If these problems still exist, I think this patch is good enough and we
+> can merge it first.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+I don't think so, poll turns out to be problematic for a lot of cases.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+>
+> For the third point, it seems to be being solved by Daniel now [6], but
+> spink lock is used,
+> which I think conflicts with the way of adding interrupts to ctrlq.
+>
+> [6] https://lore.kernel.org/all/20240325214912.323749-1-danielj@nvidia.co=
+m/
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+I don't see how it conflicts with this.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Thanks
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+>
+>
+> Thanks,
+> Heng
+>
+> >
+> > THanks
+> >
+> >
+> >> Thanks,
+> >> Heng
+> >>
+> >>> Thanks
+> >>>
+> >>>>> And I remember you told us your device doesn't have such an issue.
+> >>>> YES.
+> >>>>
+> >>>> Thanks,
+> >>>> Heng
+> >>>>
+> >>>>> Thanks
+> >>>>>
+> >>>>>> Thanks,
+> >>>>>> Heng
+> >>>>>>
+> >>>>>>> Thanks
+>
 
-If you want to undo deduplication, reply with:
-#syz undup
 
