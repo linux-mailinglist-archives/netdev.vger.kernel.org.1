@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-82162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49E9B88C8F7
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:23:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E25688C8F9
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:23:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA5BC1F247B9
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:23:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EF462A68DC
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D78013C9D0;
-	Tue, 26 Mar 2024 16:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7F413CA8E;
+	Tue, 26 Mar 2024 16:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Spnm8GVC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCkdmwi9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB2C6CDD9;
-	Tue, 26 Mar 2024 16:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F2A13C91B;
+	Tue, 26 Mar 2024 16:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711470197; cv=none; b=N2ANb7iCAnxs8klOuI+qFgWch7mxrlhlJFQPIzMdYZAM3C6LOSBGxwcl+czAnJ0o31NEvQlJ/GFfEZ/0Lp8ORcJKVFChf0eVdap5IAWzAG4l8RoAGcws+OvBa3/4qu2dtEAJEi2cJzKOs6gTLDf+vRCi/hsNYGD4dDBUG+D+2os=
+	t=1711470198; cv=none; b=LLwBkbB1lZ24EeIijPrw56HClhdvUZbE10KtKLqHinhDnNkFksoiMorY/Ok2d1+CxwoTEAbpyPtI9H8bR3D/1w/PQnkc2xodKstRkT9REHfz4poQVkH34uqnEc98yTyad6FWF3/ixDm9U3eouCv6R7fFJ8aLllZB/AKHylGg0hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711470197; c=relaxed/simple;
-	bh=kbVE0BFlHN7M+tBE7KbRZRpTSzAB1jm3f/QyZ7BbXGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IX7NNeBvZyeX4mFgGPcwEu2VgiZupUxC9BmWsvSDr9+3h/gAB9uq/zwfFp6J6326gFpJjeBleKtvUtEC+c6mNbhb+L7jd2FQaxQVLZMhQKEC8+k23Mf7vsc3O77xqQbyn9pAmTV23OZbAWkXl/NHca85iMqaVHeoMrvy1syPecY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Spnm8GVC; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1711470198; c=relaxed/simple;
+	bh=iPOtwCgQENo5R6dSb6I691mI3RiGq3IBiaR5DR9Uvq0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nL74MB91sxTFEXue4s3F/veQvLq7+178LSVaV0QiiO+EjMNrJidGe6Z5Dkp5RtI5xRvfqWEEOKs/RPTv4RhUTz2vdC55jGNiNkFWKm5Ox/134DnukGcTv7ZEEJocqH53hM9mYO2VMiFK1IHVNbY0Hh9Y66cmYgDm7/Kqkecw2Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fCkdmwi9; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56c197d042fso2416146a12.0;
-        Tue, 26 Mar 2024 09:23:15 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a4df5bd63fbso100918666b.2;
+        Tue, 26 Mar 2024 09:23:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711470194; x=1712074994; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VKUNNpxNaAI/7PXRrOo7xhSawzp6pfpXDlQt9EpV79Y=;
-        b=Spnm8GVCMDdyCt9Cjw5pT7b9ujhhVkiJ3dOkONE2hl6IHqQb+4EBQwjlfdXYN5tEzj
-         v8U3v6bY+F6hg7HCg0FS7is5Al5/atwrIAlBoGlX7Bodp+tg3nj384yV1bXgXiHVvW5Y
-         ORjPTaz8j43wBPRLHW7j2D6JRSW3waIENNAdjzJu62zseCfnAMgepEdtfeahaOzRdnNo
-         pL+/u3gpAgcL7yXokjOWBMVGSXkByaVWHqTEK5B9W+qETerBciiUQjkoOkqdESN5wxMQ
-         /GUhghfMiS8aqcNRFxnK1sy6toHqZF5KJCi/TzWJRvHNZnjbaYBIQNO3DF54+nB/nNVm
-         1glg==
+        d=gmail.com; s=20230601; t=1711470195; x=1712074995; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P1r9GtXpp87nA055yl7m2jzg8nZcGgHakpWwhF5+6+w=;
+        b=fCkdmwi9mDD/eCR5scOjbJjT33t4vXvMQLDI14F8okwNRx5XOqMEnVJRxj3Liw6Rfb
+         fttjYwzWk1lZU2f1jQmP27sMlxaiDYf+5fOrCPj2vGRzsO7tcmmznTsG0ShSY7S964Pc
+         Zb1OVZWOalrBX1FL5aHKNVoTqlJaIAkAIIK4OPpjtacbbm7kz+dJk2M0swvxnLWQ2HWQ
+         hZBvvj2ue+RUVVGFSb2STHTGbhLgfZEnwS/Np3I0FTEgUPlpp5VlfzviLHRJs/7CZeo3
+         ZDN3xR74ejhE5mkG5NuIqrnrqJtAza8LqQ9yJfyXeMFOfkGO4ef+j6hShc0viiTY+Zsv
+         2cwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711470194; x=1712074994;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VKUNNpxNaAI/7PXRrOo7xhSawzp6pfpXDlQt9EpV79Y=;
-        b=dURmXJ5SZp0UyaxZ3bIC7J1PBbi1nobGTJEu2d5XVG0VfPW6TbdiNhrhqWI/HnSoCF
-         PZkeBuyRYoJmi7Fgb7M8T8Mrdq9j/upHBf9NiZftuhI+qWP3uAAV3JpAYjzrWN4irUF7
-         DhE70B2qjBNRBZ/qenGVayQ2Ef35e6Hv285vLDbZytceFiocnuJ67Q2U7rcMy2M10fJ6
-         zPJEctC6cMFIquzoC13OGyELh3U7qJkvsNDy2Tcjsv2vPU1sOe20k4s6ha5i5Pq0zNK9
-         5ifOTPz1WCX4t0aTwHvBreBCyO9EkKOB7UTDgsE4xOp6idzhP7DTLKxnNgU21Uaf+f2E
-         mpVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVchWzziqMyx1SVQn2KAIY3qJ1jJKQd+y1XYr/iaa2Y4cLv90Zmvoe6cJoEARNcHM01DKdTiCjz87WRp63i1JZp/yZK3S0d6RG1hw==
-X-Gm-Message-State: AOJu0YzKlZFCT1ZgchkqrR5tjnRnHEpYH6girEUY3Ze2dFUgHN+5Opg2
-	z3lRxOEZLhvFFx7hidNCLPkDK/dZKCPIY3u2302HMYachguHBuHo
-X-Google-Smtp-Source: AGHT+IGUClW0zDISU72AE4aTvEMimWfP0R9ZG5Vpw+mZBDintzYGwgvPPQm6vyCw+lD1mhp1caRwTg==
-X-Received: by 2002:a17:906:d0c8:b0:a46:cbf3:a674 with SMTP id bq8-20020a170906d0c800b00a46cbf3a674mr170443ejb.21.1711470193805;
-        Tue, 26 Mar 2024 09:23:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711470195; x=1712074995;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P1r9GtXpp87nA055yl7m2jzg8nZcGgHakpWwhF5+6+w=;
+        b=penlZCpcJ6Ke0xHVEq0mAZlpQBb/Odnj2tsFA7tQlcoRu0QTMBMkx+pCiQKI3uxpLY
+         j7XvdEdGVq22et/jYB2cV58f95Tw54WmOSFFTdgKegy96j4MfLmzFge8CxzyBlznl9s1
+         o6ty54zD40b3gderS4R73qfd80Nye9GxwKczPpfQ1wFtVg6F/J5kC+hDP1ahPrLsSqGH
+         oC93m+MJcXcaIg/sxbV0r5x5RHQ/2t61PoD7Y+EUHigUHJB1HEdX1R9ZpwE3NR5y0APG
+         e2QRk+l5OmUE9/d81H/zsfF+V3WpEwY9pm6pjSS5hQSN9zfBRY7G4OHhfmipCwtIZRVG
+         WsJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKdsPU/0gFPvDxpshXb2GE8otOplotJ9j+tmkch8/q8cTqSxTI5MLSeYhv1o6H+t/ZKjYxE5rXz7ax7E4CiHfMgga0PTevEKQm7g==
+X-Gm-Message-State: AOJu0YzCS+Y+2fWYZDlV0TtVIeOaXvYjcfjPVOma6Cu65u5Hog0OhrSt
+	9R3i78NQaAq2inNHpsazFQo2Ma1AjzGQV96s6mtBkVIpkbFNPr00
+X-Google-Smtp-Source: AGHT+IHQ1q8Gh8Q1ajyS+8jJTHh7RbQqhdYLDi1jPPuuJ1HPCTeida1PjBpaKzz3CHMja6WzF4HVqg==
+X-Received: by 2002:a17:906:1401:b0:a47:61d:7d38 with SMTP id p1-20020a170906140100b00a47061d7d38mr8542274ejc.0.1711470194966;
+        Tue, 26 Mar 2024 09:23:14 -0700 (PDT)
 Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id am11-20020a170906568b00b00a474690a946sm3961415ejc.48.2024.03.26.09.23.12
+        by smtp.gmail.com with ESMTPSA id am11-20020a170906568b00b00a474690a946sm3961415ejc.48.2024.03.26.09.23.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 09:23:13 -0700 (PDT)
+        Tue, 26 Mar 2024 09:23:14 -0700 (PDT)
 From: Eric Woudstra <ericwouds@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -85,10 +87,12 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v3 net-next 0/2] Add en8811h phy driver and devicetree binding doc
-Date: Tue, 26 Mar 2024 17:23:03 +0100
-Message-ID: <20240326162305.303598-1-ericwouds@gmail.com>
+Subject: [PATCH v3 net-next 1/2] dt-bindings: net: airoha,en8811h: Add en8811h
+Date: Tue, 26 Mar 2024 17:23:04 +0100
+Message-ID: <20240326162305.303598-2-ericwouds@gmail.com>
 X-Mailer: git-send-email 2.42.1
+In-Reply-To: <20240326162305.303598-1-ericwouds@gmail.com>
+References: <20240326162305.303598-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,86 +101,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch series adds the driver and the devicetree binding documentation
-for the Airoha en8811h PHY.
+Add the Airoha EN8811H 2.5 Gigabit PHY.
 
-Changes in PATCH v3:
+The en8811h phy can be set with serdes polarity reversed on rx and/or tx.
 
-air_en8811h.c:
- * Dedicated __air_buckpbus_reg_modify()
- * Renamed host to mcu
- * Append 'S' to AIR_PHY_LED_DUR_BLINK_xxxM
- * Handle hw-leds as in mt798x_phy_led_hw_control_set(), add 2500Mbps
- * Moved firmware loading to .probe()
- * Disable leds after firmware load
- * Moved 'waiting for mcu ready' to dedicated function
- * Return -EINVAL from .config_aneg() when auto-neg is turned off
- * Removed check for AUTONEG_ENABLE from .read_status()
- * Added more details about mode 1
- * Use macros from wordpart.h
- * Set rate_matching in .read_status(), fixes 100Mbps traffic
-
-Changes in PATCH v2:
-
-air_en8811h.c:
- * Implement air_buckpbus_reg_modify()
- * Added if (saved_page >= 0)
- * Use linkmode_adv_to_mii_10gbt_adv_t()
- * Check led index within limit, before using it
- * Renamed AIR_PBUS_XXX to AIR_BPBUS_XXX to indicate buckpbus, not pbus
- * Cosmetic changes
-
-airoha,en8811h.yaml:
- * Add compatible
- * Add description
- * Cosmetic changes
-
-Changes in PATCH (mistakenly considered as v1):
-
-air_en8811h.c:
- * Use the correct order in Kconfig and Makefile
- * Change some register naming to correspond with datasheet
- * Use phy_driver .read_page() and .write_page()
- * Use module_phy_driver()
- * Use get_unaligned_le16() instead of macro
- * In .config_aneg() and .read_status() use genphy_xxx() C22
- * Use another vendor register to read real speed
- * Load firmware only once and store firmware version
- * Apply 2.5G LPA work-around (firmware before 24011202)
- * Read 2.5G LPA from vendor register (firmware 24011202 and later)
-
-airoha,en8811h.yaml:
-* Explicitly describe which pins are reversed in polarity.
-
-Notes for original RFC patch:
-
- * Source originated from airoha's en8811h v1.2.1 driver
- * Moved air_en8811h.h to air_en8811h.c
- * Removed air_pbus_reg_write() as it writes to another device on mdio-bus
-   (Confirmed by Airoha, register on pbus does not need to be written to)
- * Load firmware from /lib/firmware/airoha/ instead of /lib/firmware/
- * Added .get_rate_matching()
- * Use generic phy_read/write() and phy_read/write_mmd()
- * Edited .get_features() to use generic C45 functions
- * Edited .config_aneg() and .read_status() to use a mix of generic C22/C45
- * Use led handling functions from mediatek-ge-soc.c
- * Simplified led handling by storing led rules
- * Cleanup macro definitions
- * Cleanup code to pass checkpatch.pl
- * General code cleanup
-
-Eric Woudstra (2):
-  dt-bindings: net: airoha,en8811h: Add en8811h
-  net: phy: air_en8811h: Add the Airoha EN8811H PHY driver
-
- .../bindings/net/airoha,en8811h.yaml          |   56 +
- drivers/net/phy/Kconfig                       |    5 +
- drivers/net/phy/Makefile                      |    1 +
- drivers/net/phy/air_en8811h.c                 | 1086 +++++++++++++++++
- 4 files changed, 1148 insertions(+)
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+---
+ .../bindings/net/airoha,en8811h.yaml          | 56 +++++++++++++++++++
+ 1 file changed, 56 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/airoha,en8811h.yaml
- create mode 100644 drivers/net/phy/air_en8811h.c
 
+diff --git a/Documentation/devicetree/bindings/net/airoha,en8811h.yaml b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
+new file mode 100644
+index 000000000000..ecb5149ec6b0
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
+@@ -0,0 +1,56 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/airoha,en8811h.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Airoha EN8811H PHY
++
++maintainers:
++  - Eric Woudstra <ericwouds@gmail.com>
++
++description:
++  The Airoha EN8811H PHY has the ability to reverse polarity
++  on the lines to and/or from the MAC. It is reversed by
++  the booleans in the devicetree node of the phy.
++
++allOf:
++  - $ref: ethernet-phy.yaml#
++
++properties:
++  compatible:
++    enum:
++      - ethernet-phy-id03a2.a411
++
++  reg:
++    maxItems: 1
++
++  airoha,pnswap-rx:
++    type: boolean
++    description:
++      Reverse rx polarity of the SERDES. This is the receiving
++      side of the lines from the MAC towards the EN881H.
++
++  airoha,pnswap-tx:
++    type: boolean
++    description:
++      Reverse tx polarity of SERDES. This is the transmitting
++      side of the lines from EN8811H towards the MAC.
++
++required:
++  - reg
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        ethernet-phy@1 {
++            compatible = "ethernet-phy-id03a2.a411";
++            reg = <1>;
++            airoha,pnswap-rx;
++        };
++    };
 -- 
 2.42.1
 
