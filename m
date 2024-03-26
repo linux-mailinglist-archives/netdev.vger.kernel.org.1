@@ -1,96 +1,106 @@
-Return-Path: <netdev+bounces-82146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A129788C6D6
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:27:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F31188C6FE
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:30:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1B801C3989B
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:27:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5B49B26887
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9851313C82B;
-	Tue, 26 Mar 2024 15:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0828E13C8E2;
+	Tue, 26 Mar 2024 15:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0Y8aRds9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pqFxomEA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE80BFC0E;
-	Tue, 26 Mar 2024 15:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A8E757FD;
+	Tue, 26 Mar 2024 15:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711466843; cv=none; b=D4J6T3tdk/aNCzjjPxTeAf3A4UhoMbWSnMfBY6qbBKopSPTfenPb+vipwvWmZ0CCS23I36PotazN5Ao1jvrb2cAIl2u7EOabW8OT7MKE236Q2yRmSGggQQ4nLMRbG6jFLQQP3wgM0286EMmxzlKmGptuk04gMv/Mc9TnWTNz99o=
+	t=1711467040; cv=none; b=LxWsqklMJzSCUdvNglf/l4jEIqihOaVLQLtyXZhG2wWflAL4fuz5Cz1trJAMQ7Iyy2LGFOfV2xkDmGocdqzv7QJDNEsgJstorxCA6UABMqnN/Uv6FG6LHpCp6XCevcilk0tS/oOOFm9yyA7IWn6ELO0dA4qWCcu2Jh+eTK64+yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711466843; c=relaxed/simple;
-	bh=5ZdD6EBQDhSWELf/1IQNK1gqAf36MIWICbfgY5mKye0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SPNDKZ/OxDWyQnmYEe7ADIdxKn0pzdTCxHntaafsknNjpTu7f+6J8s0PmrxYbYVnZbzm8c1hIE4NrzV5rZ8mKCBrTAOzalWtnR7cdBWY+Pe6G3d0t+sY1O5iYNbvmpJMeI0xWPSImaZCsCcJxcBiSEqWjO5rn0Zk1aZMt4D6O/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0Y8aRds9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=Lnm0V+V77Hgs5hICixRMn3liIWAung7AV9I1XLBrOP0=; b=0Y
-	8aRds9y6PWhr3O6sLboGYsDlUSlEQnxYG53C8D5twelTMkziAG26H3CBYhmPT3SidYgUHW+CTkWXO
-	QRPSDgC6JMPQSDIxXWeGi2lLIuyewUseP84juJNvL7tl2EyE1dWBr8SlTNmIBncGPMfgAteQrIogw
-	KRNsSzNOpQmZi/o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rp8hs-00BIMG-0h; Tue, 26 Mar 2024 16:27:20 +0100
-Date: Tue, 26 Mar 2024 16:27:20 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Matthieu Baerts <matttbe@kernel.org>, netdev@vger.kernel.org,
-	netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [TEST] VirtioFS instead of 9p
-Message-ID: <e54258e7-429a-4805-b263-e2bf9fc7d4c4@lunn.ch>
-References: <20240325064234.12c436c2@kernel.org>
- <34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
- <20240325184237.0d5a3a7d@kernel.org>
- <60c891b6-03c9-413c-b41a-14949390d106@kernel.org>
- <4c575cc7-22b8-42e0-a973-e06ccb82124b@lunn.ch>
- <20240326072005.1a7fa533@kernel.org>
+	s=arc-20240116; t=1711467040; c=relaxed/simple;
+	bh=o6CYcZxpDQIt2/pbcizSI8kvPoWkCHq1wkzT2k2XcIY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JO+GCtn1miHqRhxYSlwYsSv9xihLiu1sdbCgnANEEMox5z5wUCjVPZtvtcSFOJiimU8eyXP4Z/DMzRDNs0mX+uvkQnS6532Rj8hYxkRkv8BUttjAf6lsWhLKSdivC5xE/NgKTiwxYrLF1vFgIH/wjR+JPt/NlPzoOfF/IBsKzMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pqFxomEA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 61DCAC43390;
+	Tue, 26 Mar 2024 15:30:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711467040;
+	bh=o6CYcZxpDQIt2/pbcizSI8kvPoWkCHq1wkzT2k2XcIY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pqFxomEAFsI0Uc52UqguqMRU+vuximhONo1wk9jsKiAAvfKpoMjaUMRB8pdyxqLTW
+	 uV1FlhJB6uqhOdhBER+T8uAKjX4K/++ylq56UCZK1p//0u1jYEhYqWyaHvlT8WEn8Y
+	 nlolO/GGGgM+PgqOTxVBove7AVZLypFqGGuP6xml1wxnVEw/GzNzAGP+gUoYAyCu1Q
+	 FYH/MLuVUv4v+QB41lN0Et+IFwelaQYPGuAaOv+hyI+yB4HlTpYwLOYKH9bd+DSakR
+	 0AWjkwgmcG+VnVc5sghWjU7GV5r/D2tk2tmTlCHp2l+F0Pg1wM9d0TGM/P9AzbXV4m
+	 49Ck99G1lcteg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4CCB1D2D0E9;
+	Tue, 26 Mar 2024 15:30:40 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240326072005.1a7fa533@kernel.org>
+Subject: Re: [PATCH v4 0/4] Bluetooth: qca: fix device-address endianness
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171146704030.9961.6734393156915246148.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Mar 2024 15:30:40 +0000
+References: <20240320075554.8178-1-johan+linaro@kernel.org>
+In-Reply-To: <20240320075554.8178-1-johan+linaro@kernel.org>
+To: Johan Hovold <johan+linaro@kernel.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, andersson@kernel.org,
+ robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ cros-qcom-dts-watchers@chromium.org, konrad.dybcio@linaro.org,
+ johan.hedberg@gmail.com, quic_bgodavar@quicinc.com, mka@chromium.org,
+ dianders@chromium.org, quic_rjliao@quicinc.com, dmitry.baryshkov@linaro.org,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-> Somewhat related, our current build_rust test doesn't work because
-> I used rustup, and it works by adding stuff (paths mostly?) to bashrc.
-> Which does not get evaluated when we launch the script from a systemd
-> unit :( I couldn't find a "please run this as an interactive shell"
-> switch in bash, should we source ~/.bashrc in build_rust.sh for now?
+Hello:
 
-The man page says:
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-       When bash is started non-interactively, to run a shell script, for  ex‐
-       ample,  it  looks for the variable BASH_ENV in the environment, expands
-       its value if it appears there, and uses the expanded value as the  name
-       of  a  file to read and execute.  Bash behaves as if the following com‐
-       mand were executed:
-              if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
-       but the value of the PATH variable is not used to search for the  file‐
-       name.
+On Wed, 20 Mar 2024 08:55:50 +0100 you wrote:
+> The Qualcomm Bluetooth driver is configuring the device address in
+> reverse order for none-ROME devices, which breaks user space tools like
+> btmgmt and the 'local-bd-address' devicetree property.
+> 
+> As these Qualcomm controllers lack persistent storage for the device
+> address, boot firmware can use the 'local-bd-address' devicetree
+> property to provide a valid address. The property should specify the
+> address in little endian order but instead some boot firmware has been
+> reversing the address to match the buggy Qualcomm driver.
+> 
+> [...]
 
-So something like:
+Here is the summary with links:
+  - [v4,1/4] dt-bindings: bluetooth: add 'qcom,local-bd-address-broken'
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ea56aab91231
+  - [v4,2/4] arm64: dts: qcom: sc7180-trogdor: mark bluetooth address as broken
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c4406d97b78c
+  - [v4,3/4] Bluetooth: add quirk for broken address properties
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ddaa064664fe
+  - [v4,4/4] Bluetooth: qca: fix device-address endianness
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ff2ed85c0122
 
-[Service]
-Environment="BASH_ENV=~/.bashrc"
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-assuming the service is running as the same user as rustup was run as,
-and it is invoking bash, not sh, to run the script.
 
-	Andrew
 
