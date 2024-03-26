@@ -1,159 +1,189 @@
-Return-Path: <netdev+bounces-82205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D589B88CA20
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 18:04:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F0088CA2A
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 18:05:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 601BA1F81782
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:04:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1418B1C61EA8
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CEDD13D533;
-	Tue, 26 Mar 2024 17:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5481C69E;
+	Tue, 26 Mar 2024 17:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZJqXVN6g"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="qYEHpAGv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527E113D528;
-	Tue, 26 Mar 2024 17:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EE41C69D
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 17:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711472542; cv=none; b=cUIMAn2f3RIcyVZVZoqUJcIypw2PgfjlcnH7bwfXUNRejuccp0QpLen1HfEWBqa/tNkFMFA+lq5yq3IcmpjczTCJY05SXGnp0OdD/6qFu+SEprFCdsYn7GV3zw/yoD7/P4567E7bIIbJFcBSTCIrV5ojtsaqs+PLrwI9V74MadM=
+	t=1711472599; cv=none; b=Zl25XUaP2XD+YTxbAyYz0lXNdlEBC9SDkGnxdH9sbeEG8cG9UZc9irN64aFC/pEMUiJYm4Mz0PxKtEk5Pdz4GG1iT36bM1AgkguZ0DihGctdlkNhmlr/DtBb2IN9jmprFMx1tzC2NrjyeAB18DrvYvTrK9hlC2xXZmkwxBYijqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711472542; c=relaxed/simple;
-	bh=o5QNpHgBmscUL7nafvXWlTtMo6ETkFbO2P7BD8OWaqU=;
+	s=arc-20240116; t=1711472599; c=relaxed/simple;
+	bh=TqvAoicy0PYb4UF0R6/Cx1/0SjfPKX1Rg3iR3agHsQo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IDvmJk0MlWpWnE8MIs+rvXXVca0qxVFXXMZq8Mjel192o0ROQGKHAunteqC5mRi1smgPZizDVXkg/1LIcVWopB4vUANbc1iJeMlLHGmnL2wUiHJbM31jhg1kYzQBhfCPYYA3rLduWTk+YLdN+/1HwMg3RfRLSOJELIC9WW8xOyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZJqXVN6g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 351ADC433C7;
-	Tue, 26 Mar 2024 17:02:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711472541;
-	bh=o5QNpHgBmscUL7nafvXWlTtMo6ETkFbO2P7BD8OWaqU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZJqXVN6gAqTJtRW3lrAE8W592DbHU3oIy2g9S9MHrn0HozAy+utKG6pxkCmjqL9A4
-	 ktFujnQithqpifl3PSNcbTv6aHLAmyHrYWGSrOr2EnERP8GsB3/9O2+sUKXwVXj4YQ
-	 4pcO/RT9hzJ1JURaVlnIpyZ2PDUB3gKxuOIni/usHDeIZPLP8+SaBBaA5WYL3dU25y
-	 S+jGo5YTt+Aldr+Mr79/56vJijvueyjhOSGHL7W1IY9p5XDfkdd6MbN2yeL8wVUBim
-	 10HiXlKsqS2h4utQmeFI7bNT18VCuJNyp01VHY+yABt0lTEpTqoEDCQFSpDE52mqgU
-	 NRmqeFzcm5K1w==
-Message-ID: <07677234-6440-407e-9b01-55f86028af66@kernel.org>
-Date: Tue, 26 Mar 2024 18:02:19 +0100
+	 In-Reply-To:Content-Type; b=GZiCnwHSEwbP65RzTOw5OasYnLbG3TvWyzinZ+sY/fvWlCIkftNWpYHaxgYeWOpWODaoXsjPYd29sqJ1jKbJ02ann9WSGA2g/zve1z3/NuJUvUnqzMBtkCbTaV0TscaNeheNxACq1/lCWhU1OQzP6mb+Yq/ZHiLkUVliUayxxTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=qYEHpAGv; arc=none smtp.client-ip=44.202.169.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-6010a.ext.cloudfilter.net ([10.0.30.248])
+	by cmsmtp with ESMTPS
+	id ocRrr2XbIl9dRpAChrWPR9; Tue, 26 Mar 2024 17:03:16 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id pACbrMu8NQufZpACbraRnx; Tue, 26 Mar 2024 17:03:10 +0000
+X-Authority-Analysis: v=2.4 cv=eK4Vjmp1 c=1 sm=1 tr=0 ts=6602ffce
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=zXgy4KOrraTBHT4+ULisNA==:17
+ a=IkcTkHD0fZMA:10 a=K6JAEmCyrfEA:10 a=wYkD_t78qR0A:10 a=cm27Pg_UAAAA:8
+ a=QyXUC8HyAAAA:8 a=VwQbUJbxAAAA:8 a=WFmGiULL8WMXhObYpVMA:9 a=QEXdDO2ut3YA:10
+ a=xmb-EsYY8bH0VWELuYED:22 a=AjGcO6oz07-iQ99wixmX:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rFF3IEv1pQkVliIlfBa5Tw/0KDEQACYRpeKK2HhiYeY=; b=qYEHpAGvILy9Vl9Ea56ZcsQpyp
+	5d1O12jQAdIGi1w7Xrqw62FzGswWZxmT2PVF7Csv1Oaic02tq+Dw5jWbGdtwDxpW6AMjzrjMDzdIX
+	+6cEfQ/fj0fb5N4QLa1Dr0OF9AjqoO1XtiYRC7tQPvv+ThlFXcX7RYWEJ96NGi9E23LEOQe7HnjCw
+	y7f3FAxvRaKtJjlgZjQ9VGjcqg1Xs2BzrBZITc7HE+Z2Gibi25Tk682p5eSQf999TCh1g74rwisUm
+	5IQiCmg7p1mPjkPeF5xdwdiVrY4fkoPRbXj2y/mfCPCMglN0D7XXhvQhCdfSISEiJtgHHvPrdZLB+
+	dUX4mstA==;
+Received: from [201.172.173.147] (port=44416 helo=[192.168.15.10])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1rpACR-001bkE-26;
+	Tue, 26 Mar 2024 12:02:59 -0500
+Message-ID: <8d2c9cb1-6f2e-4ad4-a1b7-25e6ae953a65@embeddedor.com>
+Date: Tue, 26 Mar 2024 11:02:57 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [TEST] VirtioFS instead of 9p
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-References: <20240325064234.12c436c2@kernel.org>
- <34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
- <20240325184237.0d5a3a7d@kernel.org>
- <60c891b6-03c9-413c-b41a-14949390d106@kernel.org>
- <20240326072332.08546282@kernel.org>
-Content-Language: en-GB
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240326072332.08546282@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] compiler_types: add Endianness-dependent
+ __counted_by_{le,be}
+Content-Language: en-US
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Kees Cook <keescook@chromium.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Simon Horman <horms@kernel.org>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+ intel-wired-lan@lists.osuosl.org, linux-hardening@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240326164116.645718-1-aleksander.lobakin@intel.com>
+ <20240326164116.645718-2-aleksander.lobakin@intel.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20240326164116.645718-2-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.173.147
+X-Source-L: No
+X-Exim-ID: 1rpACR-001bkE-26
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.10]) [201.172.173.147]:44416
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 2
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfJAxOMvo5nTJXSd9Qvx+6Rjzcv3Fi9kA2AoVDZOWex6wG1U8lF3W+a2a76Fhf+hOlB+6iSK1hLt8DbSDEyOP3megQkGUCiYwvlNcSEDBu20VpWvUPjTe
+ 8+V5vDax9w0sVR0gdUdmELuvs7Lqt09baGmMEd91KMO5oTaxhWnqoSkHxN+mnpZZDHNG0AWVOqGhMWt8IPQrs3rxDdl4/2Qs3T4=
 
-On 26/03/2024 15:23, Jakub Kicinski wrote:
-> On Tue, 26 Mar 2024 11:27:17 +0100 Matthieu Baerts wrote:
->>> "All you need is to install" undersells it a little :)
->>>
->>> It's not packaged for silly OS^w^w AWS Linux.  
->>
->> Thank you for having tried! That's a shame "virtiofsd" is not packaged!
->>
->>> And the Rust that comes with it doesn't seem to be able to build it :(  
->> Did you try by installing Rust (rustc, cargo) via rustup [1]? It is even
->> possible to get the offline installer if it is easier [2]. With rustup,
->> you can easily install newer versions of the Rust toolchain.
->>
->> [1] https://www.rust-lang.org/learn/get-started
->> [2] https://forge.rust-lang.org/infra/other-installation-methods.html
+
+
+On 3/26/24 10:41, Alexander Lobakin wrote:
+> Some structures contain flexible arrays at the end and the counter for
+> them, but the counter has explicit Endianness and thus __counted_by()
+> can't be used directly.
 > 
-> I know, I know, but there's only so many minutes ;)
-
-I like your idea from the bi-weekly meeting of using Docker (or similar)
-for that. It looks like virtiofsd is in Debian testing (not in stable
-yet) and in Ubuntu 23.10 (what we are using for the MPTCP CI, from a
-Docker image).
-
-- https://github.com/multipath-tcp/mptcp-upstream-virtme-docker
--
-https://github.com/multipath-tcp/mptcp_net-next/blob/export/.github/workflows/tests.yml#L78
-
->> Do you need a hand to update the wiki page?
+> To increase test coverage for potential problems without breaking
+> anything, introduce __counted_by_{le,be}() defined depending on
+> platform's Endianness to either __counted_by() when applicable or noop
+> otherwise.
+> Maybe it would be a good idea to introduce such attributes on compiler
+> level if possible, but for now let's stop on what we have.
 > 
-> Yes please! I believe it's a repo somewhere, but not sure if it's easy
-> to send PRs against it. If PRs are not trivial feel free to edit the
-> wiki directly.
+> Acked-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-There is a repo [1], but we cannot send PRs [2] :-/
+LGTM:
 
-So I just did a few modifications [3] (thanks for letting me doing
-that), feel free to review :)
+Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-[1] https://github.com/linux-netdev/nipa.wiki.git
-[2] https://github.com/orgs/community/discussions/50163
-[3]
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style/_history
+Thanks
+--
+Gustavo
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+> ---
+>   Documentation/conf.py          |  2 ++
+>   scripts/kernel-doc             |  1 +
+>   include/linux/compiler_types.h | 11 +++++++++++
+>   3 files changed, 14 insertions(+)
+> 
+> diff --git a/Documentation/conf.py b/Documentation/conf.py
+> index d148f3e8dd57..0c2205d536b3 100644
+> --- a/Documentation/conf.py
+> +++ b/Documentation/conf.py
+> @@ -75,6 +75,8 @@ if major >= 3:
+>               "__rcu",
+>               "__user",
+>               "__force",
+> +            "__counted_by_le",
+> +            "__counted_by_be",
+>   
+>               # include/linux/compiler_attributes.h:
+>               "__alias",
+> diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+> index 967f1abb0edb..1474e95dbe4f 100755
+> --- a/scripts/kernel-doc
+> +++ b/scripts/kernel-doc
+> @@ -1143,6 +1143,7 @@ sub dump_struct($$) {
+>           $members =~ s/\s*$attribute/ /gi;
+>           $members =~ s/\s*__aligned\s*\([^;]*\)/ /gos;
+>           $members =~ s/\s*__counted_by\s*\([^;]*\)/ /gos;
+> +        $members =~ s/\s*__counted_by_(le|be)\s*\([^;]*\)/ /gos;
+>           $members =~ s/\s*__packed\s*/ /gos;
+>           $members =~ s/\s*CRYPTO_MINALIGN_ATTR/ /gos;
+>           $members =~ s/\s*____cacheline_aligned_in_smp/ /gos;
+> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+> index 2abaa3a825a9..a29ba6ef1e27 100644
+> --- a/include/linux/compiler_types.h
+> +++ b/include/linux/compiler_types.h
+> @@ -282,6 +282,17 @@ struct ftrace_likely_data {
+>   #define __no_sanitize_or_inline __always_inline
+>   #endif
+>   
+> +/*
+> + * Apply __counted_by() when the Endianness matches to increase test coverage.
+> + */
+> +#ifdef __LITTLE_ENDIAN
+> +#define __counted_by_le(member)	__counted_by(member)
+> +#define __counted_by_be(member)
+> +#else
+> +#define __counted_by_le(member)
+> +#define __counted_by_be(member)	__counted_by(member)
+> +#endif
+> +
+>   /* Do not trap wrapping arithmetic within an annotated function. */
+>   #ifdef CONFIG_UBSAN_SIGNED_WRAP
+>   # define __signed_wrap __attribute__((no_sanitize("signed-integer-overflow")))
 
