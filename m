@@ -1,160 +1,102 @@
-Return-Path: <netdev+bounces-81926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6351588BC06
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 09:11:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11BFF88BC83
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 09:33:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1858328414D
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 08:11:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF2462E2B38
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 08:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0C113342F;
-	Tue, 26 Mar 2024 08:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7ED17993;
+	Tue, 26 Mar 2024 08:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJWLaQVr"
+	dkim=pass (2048-bit key) header.d=softline.com header.i=@softline.com header.b="GZwnl0QV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail03.softline.ru (mail03.softline.ru [185.31.132.229])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FEF18C38;
-	Tue, 26 Mar 2024 08:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A7FEED6;
+	Tue, 26 Mar 2024 08:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.31.132.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711440670; cv=none; b=mCao3r+ICnaeWiYyqrn71CHPzSWWqYhhx+BFqqlfdxkdDwhHOklE1iTQVwHR1B39e3k5mhRcntZyMuZohEj7QYZHB4ImFDn/V21JURDF2N0c6Lp8SNVAh1HKINXMhZt2DMhbhKIdJv0OugnP2wZabSXhiDvJg4hBqb4OFQ7dwy4=
+	t=1711441978; cv=none; b=NJAZlYhDTm4/NVZR6sdqz/QxasBALtqzxoyGJtIb8ovHn00ErIElPQJoUqLppZ2wkTgKV9Ighu533+dd4w8vmPxV6+1eCo2mvObnLxPj/k7nJFoCwps7QXmQR56TFleIRrOkO0F0XebAzbcj+9oOF3Pkkmnkc3PG1ibl/U+oLeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711440670; c=relaxed/simple;
-	bh=qgPYrZ/NPDwrw9n8R5vjfsAIwZpztvwYlvGEZ1/cqwk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NG/FvRiOnM/tp0nL8UZO09SsUKws9rSqGBUw8pt/iXXrcdsArP2t3fR+qYh2NQrVvehU81SLE4MYa8vqhTvCH+zPP/tsk6gfy1IEvajX3IB85fOL2bHuvPbpHjzHT0/WMr4Qheo1f441JjLCucNNyQVF2UDlBZmFGRPB+kbKh1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJWLaQVr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9209BC433F1;
-	Tue, 26 Mar 2024 08:11:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711440669;
-	bh=qgPYrZ/NPDwrw9n8R5vjfsAIwZpztvwYlvGEZ1/cqwk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sJWLaQVrmHkXdPfZu2CLehPVBt1a3A07VW9D2hHdhmdx1dfdxfVkVKCTg3D62osKG
-	 covenVtPafFo/IsLWh5g6/g3y4hUOYHVaYVuutRm+dDNWvFegJiXJkyb9LPukcVk1u
-	 m2VKGv9L+iOGqzN1zqikyJWB7X2H+66W3diLGpPYXcd955q0ivSrK5+w1rrysq8ScW
-	 jQgegNSKueMZQeTO9BeBWfCCjyuJE8rYmEQ3DowcaWuUvoIMe1slI1gbwfkLgkTh5p
-	 0SWFa6/UJfRQdfXuO3A8YQwEULv6J+4OPmMdm50N29USGF6PCDE72cs+NvDxnyRPel
-	 LHLk7KAb/beXQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rp1tr-000000005vk-2JeX;
-	Tue, 26 Mar 2024 09:11:16 +0100
-Date: Tue, 26 Mar 2024 09:11:15 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Kalle Valo <kvalo@kernel.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	ath11k@lists.infradead.org
-Subject: Re: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k:
- describe the ath11k on QCA6390
-Message-ID: <ZgKDI4Es11aN5nx7@hovoldconsulting.com>
-References: <20240325131624.26023-1-brgl@bgdev.pl>
- <20240325131624.26023-5-brgl@bgdev.pl>
- <87r0fy8lde.fsf@kernel.org>
- <CAMRc=Mc2Tc8oHr5NVo=aHAADkJtGCDAVvJs+7V-19m2zGi-vbw@mail.gmail.com>
- <87frwe8jiu.fsf@kernel.org>
+	s=arc-20240116; t=1711441978; c=relaxed/simple;
+	bh=+khCV1ORRWjue2vAhs6LLDgZaeQG/wO4Ggi2gFVAe30=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SlphoveXIdpadKm9SzzZr3OpkoR9rV/DFhbZXj0Zh1hu1COtBffwxlodz4cR1HlJahPdFH5wWl7XbNJ4FxjM1f6e4ZgyNjObB8afRnsca4VWccmxqy2p9mpI29J5l4t3Ej1Br04W9JtJobp0m5Sgy2nXes5NjbGSj+0zkhkvy50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=softline.com; spf=pass smtp.mailfrom=softline.com; dkim=pass (2048-bit key) header.d=softline.com header.i=@softline.com header.b=GZwnl0QV; arc=none smtp.client-ip=185.31.132.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=softline.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=softline.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=softline.com;
+	s=relay; t=1711441123;
+	bh=+khCV1ORRWjue2vAhs6LLDgZaeQG/wO4Ggi2gFVAe30=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=GZwnl0QVLxEOjw2B9WUcXWgOxkrx157uG7SF6tuhK/4YEdBVMoG7Pe/fjicpz/Wda
+	 8zD9THcCHR+6luud4VFzQAbCFrXTY7USfYaSjV+CtWK33MdMwrMvYWF9IKznW8jIvW
+	 ZcRGt/uGy6NbEC9UznuvMcMZZGK/MCeoerl96MlvxMAAgwMXKNd03oAfYCeSKuINzd
+	 2c248ieOuDi7fe5F4CwxKaqX6PmqM4XUUoUjleU5GKd7Fh0RyfI3RzgNqaCk40kFCJ
+	 mEagjJLZ2DAkMvr44VRxz1sd430hIcuEqiltdU2xfcu6ClN4BD5R2Y4JBlvlPQ3+6h
+	 JNJ58LW+yMKGg==
+From: "Antipov, Dmitriy" <Dmitriy.Antipov@softline.com>
+To: "gbayer@linux.ibm.com" <gbayer@linux.ibm.com>, "guwen@linux.alibaba.com"
+	<guwen@linux.alibaba.com>, "wenjia@linux.ibm.com" <wenjia@linux.ibm.com>,
+	"jaka@linux.ibm.com" <jaka@linux.ibm.com>
+CC: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>, "Shvetsov,
+ Alexander" <Alexander.Shvetsov@softline.com>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: Re: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+Thread-Topic: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+Thread-Index: AQHaZNb+eL3YMOb6v02FhrfSeOr3x7EXFu4AgBCQ6wCAAwYsAIAAOGyAgAEJXgCAAAaTAIAduhIA
+Date: Tue, 26 Mar 2024 08:18:43 +0000
+Message-ID: <941b129e87fec6b2f22ed3bc75334bd8515565a1.camel@softline.com>
+References: <20240221051608.43241-1-dmantipov@yandex.ru>
+	 <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
+	 <659c7821842fca97513624b713ced72ab970cdfc.camel@softline.com>
+	 <19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com>
+	 <380043fa-3208-4856-92b1-be9c87caeeb6@yandex.ru>
+	 <2c9c9ffe-13c4-44b8-982a-a3b4070b8a11@linux.alibaba.com>
+	 <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+	 <93077cee-b81a-4690-9aa8-cc954f9be902@linux.ibm.com>
+	 <4a65f2f04d502a770627ccaacd099fd6a9d7f43a.camel@softline.com>
+In-Reply-To: <4a65f2f04d502a770627ccaacd099fd6a9d7f43a.camel@softline.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A5829988BFE8C848B374725DCC6A8A00@softline.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87frwe8jiu.fsf@kernel.org>
 
-On Mon, Mar 25, 2024 at 04:37:29PM +0200, Kalle Valo wrote:
-> Bartosz Golaszewski <brgl@bgdev.pl> writes:
-> > On Mon, Mar 25, 2024 at 2:57 PM Kalle Valo <kvalo@kernel.org> wrote:
-> >> Bartosz Golaszewski <brgl@bgdev.pl> writes:
-> >> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >> >
-> >> > Add a PCI compatible for the ATH11K module on QCA6390 and describe the
-> >> > power inputs from the PMU that it consumes.
-> >> >
-> >> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>
-> >> [...]
-> >>
-> >> > +allOf:
-> >> > +  - if:
-> >> > +      properties:
-> >> > +        compatible:
-> >> > +          contains:
-> >> > +            const: pci17cb,1101
-> >> > +    then:
-> >> > +      required:
-> >> > +        - vddrfacmn-supply
-> >> > +        - vddaon-supply
-> >> > +        - vddwlcx-supply
-> >> > +        - vddwlmx-supply
-> >> > +        - vddrfa0p8-supply
-> >> > +        - vddrfa1p2-supply
-> >> > +        - vddrfa1p7-supply
-> >> > +        - vddpcie0p9-supply
-> >> > +        - vddpcie1p8-supply
-> >>
-> >> I don't know DT well enough to know what the "required:" above means,
-> >> but does this take into account that there are normal "plug&play" type
-> >> of QCA6390 boards as well which don't need any DT settings?
-> >
-> > Do they require a DT node though for some reason?
-> 
-> You can attach the device to any PCI slot, connect the WLAN antenna and
-> it just works without DT nodes. I'm trying to make sure here that basic
-> setup still works.
-> 
-> Adding also Johan and ath11k list. For example, I don't know what's the
-> plan with Lenovo X13s, will it use this framework? I guess in theory we
-> could have devices which use qcom,ath11k-calibration-variant from DT but
-> not any of these supply properties?
-
-In theory we could, but at least the WCN6855 in the X13s has a similar
-set of supplies and enable gpios which are currently not fully described
-in the devicetree as there has been no support for doing so thus far.
-Instead we rely on the bootloader to enable the module.
-
-I haven't had time to look at the latest attempt on adding support for
-handling such resources, but eventually we'll need to address this in
-some way.
-
-Johan
+T24gVGh1LCAyMDI0LTAzLTA3IGF0IDEzOjIxICswMzAwLCBEbWl0cnkgQW50aXBvdiB3cm90ZToN
+Cg0KPiBPbiBUaHUsIDIwMjQtMDMtMDcgYXQgMTA6NTcgKzAxMDAsIEphbiBLYXJjaGVyIHdyb3Rl
+Og0KPiANCj4gPiBXZSB0aGluayBpdCBtaWdodCBiZSBhbiBvcHRpb24gdG8gc2VjdXJlIHRoZSBw
+YXRoIGluIHRoaXMgZnVuY3Rpb24gd2l0aCANCj4gPiB0aGUgc21jLT5jbGNzb2NrX3JlbGVhc2Vf
+bG9jay4NCj4gPiANCj4gPiBgYGANCj4gPiAJbG9ja19zb2NrKCZzbWMtPnNrKTsNCj4gPiAJaWYg
+KHNtYy0+dXNlX2ZhbGxiYWNrKSB7DQo+ID4gCQlpZiAoIXNtYy0+Y2xjc29jaykgew0KPiA+IAkJ
+CXJlbGVhc2Vfc29jaygmc21jLT5zayk7DQo+ID4gCQkJcmV0dXJuIC1FQkFERjsNCj4gPiAJCX0N
+Cj4gPiArCQltdXRleF9sb2NrKCZzbWMtPmNsY3NvY2tfcmVsZWFzZV9sb2NrKTsNCj4gPiAJCWFu
+c3cgPSBzbWMtPmNsY3NvY2stPm9wcy0+aW9jdGwoc21jLT5jbGNzb2NrLCBjbWQsIGFyZyk7DQo+
+ID4gKwkJbXV0ZXhfdW5sb2NrKCZzbWMtPmNsY3NvY2tfcmVsZWFzZV9sb2NrKTsNCj4gPiAJCXJl
+bGVhc2Vfc29jaygmc21jLT5zayk7DQo+ID4gCQlyZXR1cm4gYW5zdzsNCj4gPiAJfQ0KPiA+IGBg
+YA0KPiA+IA0KPiA+IFdoYXQgZG8geW8gdGhpbmsgYWJvdXQgdGhpcz8NCj4gDQo+IFlvdSdyZSB0
+cnlpbmcgdG8gZml4IGl0IG9uIHRoZSB3cm9uZyBwYXRoLiBGSU9BU1lOQyBpcyBhIGdlbmVyaWMg
+cmF0aGVyDQo+IHRoYW4gcHJvdG9jb2wtc3BlY2lmaWMgdGhpbmcuIFNvIHVzZXJzcGFjZSAnaW9j
+dGwoc29jaywgRklPQVNZTkMsIFtdKScNCj4gY2FsbCBpcyBoYW5kbGVkIHdpdGg6DQo+IA0KPiAt
+PiBzeXNfaW9jdGwoKQ0KPiAgIC0+IGRvX3Zmc19pb2N0bCgpDQo+ICAgICAtPiBpb2N0bF9maW9h
+c3luYygpDQo+ICAgICAgIC0+IGZpbHAtPmZfb3AtPmZhc3luYygpICh3aGljaCBpcyBzb2NrX2Zh
+c3luYygpIGZvciBhbGwgc29ja2V0cykNCj4gDQo+IHJhdGhlciB0aGFuICdzb2NrLT5vcHMtPmlv
+Y3RsKC4uLiknLg0KDQpBbnkgcHJvZ3Jlc3Mgb24gdGhpcz8NCg0KRG1pdHJ5DQoNCg==
 
