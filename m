@@ -1,184 +1,191 @@
-Return-Path: <netdev+bounces-82068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C8A988C43C
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:00:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DDCA88C466
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 507501C3FCBD
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:00:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 017732C3DDE
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E245574C0B;
-	Tue, 26 Mar 2024 14:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3579576C68;
+	Tue, 26 Mar 2024 14:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="DAuhoM/m";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="sj61wnSZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DiEiYc2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81DF535AB;
-	Tue, 26 Mar 2024 14:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5EBA74C0B;
+	Tue, 26 Mar 2024 14:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711461625; cv=none; b=sREUV9JIr7E9fGvx+lRPLH55gmPVO0LedC4Sq8uqQu4VigOZcrub2ter5YqBHk2UVMqeDQM0omFWjUOzI0hr4HX67XC+L8NdYdE+NH5GKouggQqSJ7jx1PB6P3JDTMLCTWfo8DVh79MZVdvfau9u5OtgbY3aND/xYyprzWwfvYE=
+	t=1711461899; cv=none; b=ZFdUbRIqLL3aAiVgPc/wXOBcEDYFOMwN3vLY7dUrFou8c/CFqRkAAD4ytSJo+mbbmDYZ2xwW8420UlbSmLN7yhtIHvflo0J0SDG4mX8tvWokRO6VTK5t05J/FhaVJTLgDsYaOM9HKi3qvOP2FtSeXa12mcGA7ORwqxN8g+axpzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711461625; c=relaxed/simple;
-	bh=Gm1WAIrYB3cH17+JMV26qz73QxvJFbmWHlQKnpd2C/I=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=de5tPLef++HD9YR8G0j4KNwSQFFe6i6NgpiJ96hKnXUrntUqm7ltugSaraO+vS0oKGq348+lpvSYlxySSdGVdBrUPI4tfEbM//GVYdv17dIalt8ozBvT8eWft/BQIQTFrTFKjf/2cCNqoYfYDQX916gZN2mMWCTudHJJ8N68noE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=DAuhoM/m; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=sj61wnSZ reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1711461622; x=1742997622;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=0EKpZTo5hv6iT79UBNQej/4K4vOd3xcIXh9ByDCTvaQ=;
-  b=DAuhoM/m5W+q4Vuq43GmWF+XpDmr8/djsRbECp3At2APu+FIjVnXNI55
-   KpZ7yC6Arbgz5NlZZvuhvEARtD5C54NBeQAxnYNWKa27LArSnE05/l9Uk
-   mIV9DUVQQ2PB7ruUnfyjPFsn/xnxoZ7KwNMwqzC7ADiGRukPTvjMpCtVk
-   O3CY1G6hyPfm5f8ulnnVWJr8GGqwt/8vg5hUcDdtB9uWEXvvn44A54EUd
-   JilF9pBV1k+tsc6ZSj/PUhTwfUxEV4F3UnsVufpR9oG5eqokqx1zABRr7
-   TVziW7ucSTV/88yyWkJgfbZiL6VPKIhf6/QLjF/LD6AGR9FOpU3wmb/cW
-   g==;
-X-IronPort-AV: E=Sophos;i="6.07,156,1708383600"; 
-   d="scan'208";a="36107278"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 26 Mar 2024 15:00:19 +0100
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 080E716E108;
-	Tue, 26 Mar 2024 15:00:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1711461614;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=0EKpZTo5hv6iT79UBNQej/4K4vOd3xcIXh9ByDCTvaQ=;
-	b=sj61wnSZ5Rd6TXOyCPp7MuFTO3vrxAMy34iifMO13YKrF8Jnu2HdtLoSOPIz01z3mEBTg+
-	r/EtJoGdeebPAn0LswvOxjbabAriHPjTr3Tlye1G2zSrScT//GzTUa7fiPkwx1YCrPU3MV
-	CN4QlrbDeCqCC9byFN7i4SubtjKEB0mst9WizrwOQk4B+lOzDg9fbkrWbLbYWxtpI4ic8p
-	1RhubmELwyCy8ECAJjgG676RVW1cL1wHFaWzTkOaMJ0HxMFxl34X3VU4UQlUPdjmWEl57H
-	aniAi43PK9b7JgtFKNfiPllyWhOh/tGt6VLehCNyBYKEA/ILEPO6YObeVIpgIg==
-Message-ID: <35cc888230a0146a7687d8b859e5a6ceffec581a.camel@ew.tq-group.com>
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: fix usable ports on 88e6020
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org, linux@ew.tq-group.com, Michael Krummsdorf
- <michael.krummsdorf@tq-group.com>
-Date: Tue, 26 Mar 2024 15:00:12 +0100
-In-Reply-To: <20240326143424.3368d9b1@wsk>
-References: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
-	 <20240326143424.3368d9b1@wsk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1711461899; c=relaxed/simple;
+	bh=Bht56GKwfxqVLHT3PK85DitT4MWOhPng5tzAATBDR8s=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qwJzeMA9QB6bS8ahFrZZXkVOK076EsfxCU7onl64mFJsrfM4SaOW7hW2DpnQSpZyf8xv/PNvYemY4aq/qQ4E3BpfGdEbJY6EDhF9bDd8C7cRZDsNc3hSNR6FKAAZfqgo/FY89olvekA64fEisMEGvOch4lQZHiYu7yHwOXeCRzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DiEiYc2m; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 43BF91C000A;
+	Tue, 26 Mar 2024 14:04:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1711461887;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mDQJ6BqK7hwq+aJhog7TsYkjrfTNYhsBctyPN0Rrc+s=;
+	b=DiEiYc2mkkpVcrbkbZWV4Gd4rOxwCqep4QznxAcskGy7ztIIciskxLpTbiVt8+9VqXvtGF
+	iu9WlHAOTmsjsEXSDy+Z+zawJWDmpiKTYvz5eJYp++8TyJGLbGRst5skcrCOxfPvMmAYa9
+	ovKQ75wGqPM3FYfLyJlwnJmc3nx1fA47S5mjtf2m2zP9SqHluts4ajAB+TEFY4ec89YC+S
+	PQxDXGDCw3uKWJR4lspppfV04p1uKTX3j0aRHzqIuyX35SnFVj7kedgKODotvNgcJj9E3G
+	lpwLvAtlxVvjiw3U8kCuT6naF6M96Sa5iCofmFBjRzEfXUC+qZCbmwvanIBB3A==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next v6 00/17] net: Add support for Power over Ethernet
+ (PoE)
+Date: Tue, 26 Mar 2024 15:04:37 +0100
+Message-Id: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAPXVAmYC/2XN0UrEMBCF4VdZcm1kMpmmrVe+h4ik6cQNaLKks
+ awsfXdjQdzQy8Pw/XMTC+fAi3g63UTmNSwhxTrMw0m4s43vLMNct0BArQBJerblK/PbJbFUeqQ
+ RuNcEWlRxyezDda+9iMhFRr4W8Vov57CUlL/3N6va73tRKdMUVyVBTkwDEE0eaXyeUiofIT669
+ LmXVvzXCKrVWHVn5sFZZ6D39qj1nyZAGFqtf7VWM5qeyIx81HSnVddqqlp300QONRrjjrq709i
+ 3uqsaBw/W0oBk5lZv2/YD4r6aUaoBAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>, 
+ Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>, 
+ Kory Maincent <kory.maincent@bootlin.com>
+X-Mailer: b4 0.14-dev
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, 2024-03-26 at 14:34 +0100, Lukasz Majewski wrote:
-> Hi Matthias,
->=20
-> > From: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
-> >=20
-> > The switch has 4 ports with 2 internal PHYs, but ports are numbered up
-> > to 6, with ports 0, 1, 5 and 6 being usable.
-> >=20
-> > Fixes: 71d94a432a15 ("net: dsa: mv88e6xxx: add support for MV88E6020
-> > switch") Signed-off-by: Michael Krummsdorf
-> > <michael.krummsdorf@tq-group.com> Signed-off-by: Matthias Schiffer
-> > <matthias.schiffer@ew.tq-group.com> ---
-> >=20
-> > I was unfortunately too busy to notice the issue when the patch this
-> > Fixes was resubmitted in my name. It would have been better to change
-> > my From into a Based-on-patch-by or similar when modifying it
->=20
-> The "discussion" about this work was lasting at least a few months with
-> several iterations and changing the design decisions ...
->=20
-> > - and
-> > the final version obviously wasn't even tested on an 88E6020...
->=20
->=20
-> Can you share on which kernel version have you tested the patch that
-> you claim that testing was omitted?
+From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Hi Lukasz,
+This patch series aims at adding support for PoE (Power over Ethernet),
+based on the already existing support for PoDL (Power over Data Line)
+implementation. In addition, it adds support for two specific PoE
+controller, the Microchip PD692x0 and the TI TPS23881.
 
-we are currently testing with commit 71d94a432a15 backported onto a recent =
-Linux 6.1.y. At least on
-this kernel version, the driver will reject a Device Tree configuration tha=
-t uses the=C2=A0ports 5 and 6
-(rightfully so, as num_ports is set to 4), leaving only the internal-PHY po=
-rts 0 and 1, and none of
-the *MII ports that are likely to be used as CPU ports.
+In detail:
+- Patch 1 to 13 prepare net to support PoE devices.
+- Patch 14 and 15 add PD692x0 PoE PSE controller driver and its binding.
+- Patch 16 and 17 add TI TPS23881 PSE controller driver and its binding.
 
-So if the accepted version worked fine for you, your configuration possibly=
- only used the first two
-ports, or newer kernels somehow ignore num_ports when determining if a port=
- number is valid.
+Changes in v6:
+- TPS23881 fix firmware management release missing.
+- Use pcdev device pointer as regulator consumer and provider.
+- Rename of_legacy to no_of_pse_pi.
+- Add kdoc, and separate functions for better readability.
+- Add vpwr-supply regulator parent.
+- Link to v5: https://lore.kernel.org/r/20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com
 
-We should be able to repeat our test on a newer kernel next week if needed.
+Changes in v5:
+- Fix bindings nit.
+- Add supported-polarity parameter to bindings.
+- Fix yamllint binding errors.
+- Remove the nested lock brought by the use of regulator framework.
+- Link to v4: https://lore.kernel.org/r/20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com
+
+Changes in v4:
+- Replaced sponsored-by tag by a simple sentence.
+- Fix pse_pi node bindings.
+- Add pse pi documentation written by Oleksij.
+- Link to v3: https://lore.kernel.org/r/20240208-feature_poe-v3-0-531d2674469e@bootlin.com
+
+Changes in v3:
+- Add patches to add Oleksij and myself to PSE MAINTAINERS.
+- Add patches to add pse devlink.
+- Add TI TPS23881 PSE controller driver with its binding.
+- Replace pse_get_types helper by pse_has_podl and pse_has_c33
+- Changed the PSE core bindings.
+- Add a setup_pi_matrix callback.
+- Register regulator for each PSE PI (Power Interface).
+- Changed the PD692x0 bindings.
+- Updated PD692x0 drivers to new bindings and PSE PI description.
+- Updated PD692x0 drivers according to the reviews and made fixes.
+- Link to v2: https://lore.kernel.org/r/20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com
+
+Changes in v2:
+- Extract "firmware_loader: Expand Firmware upload error codes patches" to
+  send it alone and get it merge in an immutable branch.
+- Add "c33" prefix for PoE variables and enums.
+- Enhance few comments.
+- Add PSE Documentation.
+- Make several changes in pd692x0 driver, mainly for readibility.
+- Link to v1: https://lore.kernel.org/r/20231116-feature_poe-v1-0-be48044bf249@bootlin.com
+
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+Kory Maincent (17):
+      MAINTAINERS: net: Add Oleksij to pse-pd maintainers
+      of: property: Add fw_devlink support for pse parent
+      net: pse-pd: Rectify and adapt the naming of admin_cotrol member of struct pse_control_config
+      ethtool: Expand Ethernet Power Equipment with c33 (PoE) alongside PoDL
+      net: pse-pd: Introduce PSE types enumeration
+      net: ethtool: pse-pd: Expand pse commands with the PSE PoE interface
+      netlink: specs: Modify pse attribute prefix
+      netlink: specs: Expand the pse netlink command with PoE interface
+      MAINTAINERS: Add myself to pse networking maintainer
+      net: pse-pd: Add support for PSE PIs
+      dt-bindings: net: pse-pd: Add another way of describing several PSE PIs
+      net: pse-pd: Add support for setup_pi_matrix callback
+      net: pse-pd: Use regulator framework within PSE framework
+      dt-bindings: net: pse-pd: Add bindings for PD692x0 PSE controller
+      net: pse-pd: Add PD692x0 PSE controller driver
+      dt-bindings: net: pse-pd: Add bindings for TPS23881 PSE controller
+      net: pse-pd: Add TI TPS23881 PSE controller driver
+
+ .../bindings/net/pse-pd/microchip,pd692x0.yaml     |  158 +++
+ .../bindings/net/pse-pd/pse-controller.yaml        |  102 +-
+ .../bindings/net/pse-pd/ti,tps23881.yaml           |   93 ++
+ Documentation/netlink/specs/ethtool.yaml           |   33 +-
+ Documentation/networking/ethtool-netlink.rst       |   20 +
+ Documentation/networking/index.rst                 |    1 +
+ Documentation/networking/pse-pd/index.rst          |   10 +
+ Documentation/networking/pse-pd/introduction.rst   |   73 ++
+ Documentation/networking/pse-pd/pse-pi.rst         |  302 +++++
+ MAINTAINERS                                        |    8 +
+ drivers/net/pse-pd/Kconfig                         |   20 +
+ drivers/net/pse-pd/Makefile                        |    2 +
+ drivers/net/pse-pd/pd692x0.c                       | 1223 ++++++++++++++++++++
+ drivers/net/pse-pd/pse_core.c                      |  511 +++++++-
+ drivers/net/pse-pd/pse_regulator.c                 |   49 +-
+ drivers/net/pse-pd/tps23881.c                      |  818 +++++++++++++
+ drivers/of/property.c                              |    2 +
+ include/linux/pse-pd/pse.h                         |   86 +-
+ include/uapi/linux/ethtool.h                       |   55 +
+ include/uapi/linux/ethtool_netlink.h               |    3 +
+ net/ethtool/pse-pd.c                               |   60 +-
+ 21 files changed, 3527 insertions(+), 102 deletions(-)
+---
+base-commit: f81d6cec4a4ed1b6580340a43ec68f3132423964
+change-id: 20231024-feature_poe-139490e73403
 
 Best regards,
-Matthias
-
-
->=20
-> >=20
-> >=20
-> >  drivers/net/dsa/mv88e6xxx/chip.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/net/dsa/mv88e6xxx/chip.c
-> > b/drivers/net/dsa/mv88e6xxx/chip.c index 9ed1821184ece..c95787cb90867
-> > 100644 --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> > +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> > @@ -5503,8 +5503,12 @@ static const struct mv88e6xxx_info
-> > mv88e6xxx_table[] =3D { .family =3D MV88E6XXX_FAMILY_6250,
-> >  		.name =3D "Marvell 88E6020",
-> >  		.num_databases =3D 64,
-> > -		.num_ports =3D 4,
-> > +		/* Ports 2-4 are not routed to pins
-> > +		 * =3D> usable ports 0, 1, 5, 6
-> > +		 */
-> > +		.num_ports =3D 7,
-> >  		.num_internal_phys =3D 2,
-> > +		.invalid_port_mask =3D BIT(2) | BIT(3) | BIT(4),
-> >  		.max_vid =3D 4095,
-> >  		.port_base_addr =3D 0x8,
-> >  		.phy_base_addr =3D 0x0,
->=20
->=20
->=20
->=20
-> Best regards,
->=20
-> Lukasz Majewski
->=20
-> --
->=20
-> DENX Software Engineering GmbH,      Managing Director: Erika Unter
-> HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-> Achtung externe E-Mail:=C2=A0=C3=96ffnen Sie Anh=C3=A4nge und Links nur, =
-wenn Sie wissen, dass diese aus einer sicheren Quelle stammen und sicher si=
-nd. Leiten Sie die E-Mail im Zweifelsfall zur Pr=C3=BCfung an den IT-Helpde=
-sk weiter.
->  Attention external email:=C2=A0Open attachments and links only if you kn=
-ow that they are from a secure source and are safe. In doubt forward the em=
-ail to the IT-Helpdesk to check it.
->=20
-> =C2=A0
+-- 
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
 
