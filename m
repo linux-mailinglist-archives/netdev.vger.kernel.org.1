@@ -1,115 +1,106 @@
-Return-Path: <netdev+bounces-82097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E03888C50E
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:26:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8820188C514
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:27:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D45B129B214
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:26:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 288FF1F3902A
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF87312D768;
-	Tue, 26 Mar 2024 14:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA15912D774;
+	Tue, 26 Mar 2024 14:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qS4zhIih"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os43os4xodqa.icoremail.net (zg8tmja2lje4os43os4xodqa.icoremail.net [206.189.79.184])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F34F20DF7;
-	Tue, 26 Mar 2024 14:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.79.184
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7964F20DF7;
+	Tue, 26 Mar 2024 14:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711463171; cv=none; b=OY0GwwCRemAoJLkhUYt6U2OWGQRKn2p9CQ95yGFuzKvgD6r+hBlInRH0DUpepgeJhKJp/VJJLiGyT8u96xxDmquVDz9TutyX9VQ9er+p7hCFBn6q5r3Ty2fiEgiHGpNx+Ejxc9hKnAgo0igJspJauyRMTavbUjoqxUwq9EB1Nuo=
+	t=1711463226; cv=none; b=RPjMtCw6ea0xHgxYYqiZld7GB3i3nQPHrlq/t9QRAUPLh68UEq7NNvDS8lJ5dqo0eMUs+yem54ISk/tpwZxsQ1eHuJo46GpKH7Ah2Z8XW+BA/pTorV142/UrHF2PzloPhToUc+hVR4lLm8+qayGeBhGkEjIfXmFydTnNZA6ZhlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711463171; c=relaxed/simple;
-	bh=OC7tCvTydfv2WFPYMhnm6Kce8VRGXQdO45oszdOLx2w=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=R91NulUY6xNDLEUI/teb7v71jErr7BLSD9xau8X82lvpMIaC4TQwwfeYo8Qy9WroD11d0yYnOJSrjps63rjU6dkukK/ZLAOMyoOpiyQknE4V3Kh9CTMVoLFatfnr88hdfjYOWpT5hc1G7mpG1uTSgTSJCZDEydQjmp+PKYRbXKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=206.189.79.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [218.12.18.99])
-	by mail-app4 (Coremail) with SMTP id cS_KCgDXi8Dm2gJmIc5YAQ--.22282S2;
-	Tue, 26 Mar 2024 22:25:52 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-hams@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	jreuter@yaina.de,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH net] ax25: fix use-after-free bugs caused by ax25_ds_del_timer
-Date: Tue, 26 Mar 2024 22:25:42 +0800
-Message-Id: <20240326142542.118058-1-duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cS_KCgDXi8Dm2gJmIc5YAQ--.22282S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFy7GF45tw47JFyxJr13Jwb_yoW8JF4kpF
-	WqgF43AF97AryqyF48WF1kWryUAFy8Z3yDCFy7ua1Ikwn3X3Z8JF1DK3yIqFW7GFZ5Arn7
-	Cw10qr45uFn5CFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	Jw0_GFylc2xSY4AK67AK6ry5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
-	UI43ZEXa7VU1OtxDUUUUU==
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUMAWYBgRkWjQBPsg
+	s=arc-20240116; t=1711463226; c=relaxed/simple;
+	bh=qoEJASPCUxmcyaJydCy2VV6pZZWWMfCad+tM+6zcuU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qGLavpmWKlFCUMIx3VuZNXmceC81faEZdUPcnaLrhm2eLVmYAMjs/TwKprLMZhAelc0jByAqb7RFVqiCCCD45J3d8dw7S8uo/nYjbCRHDf7x3MubqGR9wdPtzzPzucHQd/HAyR/rumhrUGveYvm61kmwf8c6ubJPpA7qf71sgps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qS4zhIih; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0A48C433C7;
+	Tue, 26 Mar 2024 14:27:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711463226;
+	bh=qoEJASPCUxmcyaJydCy2VV6pZZWWMfCad+tM+6zcuU8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qS4zhIih2hC+so417yzJNvaab4L7Oie30dt1x5IbaGQQ5ivzJIMiragYqFDaziYdl
+	 V1SXGkh0w0txXIID6rDnT+oHviOLxvy2ES03x3Re1TldyhA2AUZl4DY1p11OiO+BvB
+	 3H9UHTAvd4AB2y3gwJwUCIThH2dDUGxyY4VbzCCv9zYw1fsHxcOSawEhKzQccsTFae
+	 P3CmJ4NfnmaNNexMwOrcJapL9yoTi/KTS+c9d7Jb/wfdgln34YADG86H+eV2Xk7KPV
+	 TPPczJfDQ39U0SvXP+0o9wLjnGE42PTK1qxA3d26lcrhjCWfzFnhyRdEmUavG3+dE+
+	 99qucStc/c9zg==
+Date: Tue, 26 Mar 2024 14:27:00 +0000
+From: Simon Horman <horms@kernel.org>
+To: Su Hui <suhui@nfschina.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, nathan@kernel.org,
+	ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, kernel-janitors@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net v2 2/2] octeontx2-pf: remove unused variables req_hdr
+ and rsp_hdr
+Message-ID: <20240326142700.GX403975@kernel.org>
+References: <20240326061233.4133148-1-suhui@nfschina.com>
+ <20240326061233.4133148-2-suhui@nfschina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240326061233.4133148-2-suhui@nfschina.com>
 
-When the ax25 device is detaching, the ax25_dev_device_down()
-calls ax25_ds_del_timer() to cleanup the slave_timer. When
-the timer handler is running, the ax25_ds_del_timer() that
-calls del_timer() in it will return directly. As a result,
-the use-after-free bugs could happen, one of the scenarios
-is shown below:
++ Dan Carpenter
 
-      (Thread 1)          |      (Thread 2)
-                          | ax25_ds_timeout()
-ax25_dev_device_down()    |
-  ax25_ds_del_timer()     |
-    del_timer()           |
-  ax25_dev_put() //FREE   |
-                          |  ax25_dev-> //USE
+On Tue, Mar 26, 2024 at 02:12:36PM +0800, Su Hui wrote:
+> Clang static checker(scan-buid):
+> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:503:2: warning:
+> Value stored to 'rsp_hdr' is never read [deadcode.DeadStores]
+> 
+> Remove these unused variables to save some space.
+> 
+> Signed-off-by: Su Hui <suhui@nfschina.com>
 
-In order to mitigate bugs, when the device is detaching, use
-timer_shutdown_sync() to stop the timer.
+Hi Su Hui,
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
- net/ax25/ax25_ds_timer.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+as pointed out by Dan in his review of v1 of this patch, it is not a fix.
+This means that it should be targeted at the net-next rather than the net
+branch. As the granularity of patch handling on netdev is generally at the
+patchset level I believe that this means that you need to separately,
+in different email threads, repost:
 
-diff --git a/net/ax25/ax25_ds_timer.c b/net/ax25/ax25_ds_timer.c
-index c4f8adbf814..5624c0d174c 100644
---- a/net/ax25/ax25_ds_timer.c
-+++ b/net/ax25/ax25_ds_timer.c
-@@ -43,7 +43,12 @@ void ax25_ds_setup_timer(ax25_dev *ax25_dev)
- 
- void ax25_ds_del_timer(ax25_dev *ax25_dev)
- {
--	if (ax25_dev)
-+	if (!ax25_dev)
-+		return;
-+
-+	if (!ax25_dev->device_up)
-+		timer_shutdown_sync(&ax25_dev->dama.slave_timer);
-+	else
- 		del_timer(&ax25_dev->dama.slave_timer);
- }
- 
+1. Patch 1/2 of this series, targeted at net
+
+   [PATCH net v3] octeontx2-pf: check negative error code in otx2_open()
+
+2. Patch 2/2 of this series, targeted at net-next
+
+   [PATCH net-next v3] octeontx2-pf: remove unused variables req_hdr
+
+Also, please be sure to wait 24 hours since the posting of this patch-set
+before reposting.
+
+Some more information can be found here:
+https://docs.kernel.org/process/maintainer-netdev.html
+
+...
+
 -- 
-2.17.1
-
+pw-bot: changes-requested
 
