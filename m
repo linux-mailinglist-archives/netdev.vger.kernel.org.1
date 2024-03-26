@@ -1,105 +1,79 @@
-Return-Path: <netdev+bounces-81875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAB0788B773
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:33:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78FF888B775
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A56C42E7383
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:33:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0236B22B14
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:33:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08247128362;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30075128379;
 	Tue, 26 Mar 2024 02:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P0XLuDa7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nr4BgcbT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF383DABF7;
-	Tue, 26 Mar 2024 02:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A5D1272DC;
+	Tue, 26 Mar 2024 02:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711420420; cv=none; b=RwJfFhrA4l00ti2nokDqwjsu/wnDdzZkuImRUf6hue+ut3cyS9wC8ZDsIt0COsyZgSSX47kYWMW2qtsA4VFXiTisJpAiGu+2xQRHEiAhEegSDuL2wD44iODt+RWMe4/jrEOKw9ogIHDuK+glEJ4b9IhQiY3L8ZO2OYWOfoqBhsw=
+	t=1711420421; cv=none; b=fAG+oHgScDenvqYC79RGLZ33s3KUp58x4MNnt79vsff/BFGLTYfST/biJKdGLfPnm4xjZHLix/37fesMhdJMxuf8AcdBH9iE1oiZ/eoGu3ZB2Rmk+jdHKdDQhFRBLB2vgNjIolcbJM2iLaNMGH0XLMp48DFN+ZuRke8L9K89HKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711420420; c=relaxed/simple;
-	bh=85L/a51HnO6m4QY8aLFiASnw4aQdtlumeIiIvnEDeqU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aXZL8hVNvQ2KXsjbSW/A9+NsUJPWzPw9vhGnjc1M/aK0wTQukhWZMwXqp28xXcKrsSJgCNV2aOm7W5DHOm3s6umMPjBI3doKnNnrJdjWS1LEP9taW9OsRQ1SWDWyGJwJ7JiF3Rcvb4YgG/h3gDkaC+e+f1Otq6VegBDY+N46qXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P0XLuDa7; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a46a7208eedso685501266b.0;
-        Mon, 25 Mar 2024 19:33:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711420417; x=1712025217; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=85L/a51HnO6m4QY8aLFiASnw4aQdtlumeIiIvnEDeqU=;
-        b=P0XLuDa7LYPXlm2F6UMi0yC49D8Og4aMKzi5l/aSTLNywg9s2y3kNaCFlSniIGV6ew
-         uzrwdd4QVlO1uV/D3xiipN5kHS4l6KWQ5ujGQR+sXvphdsHbsKXWU6NQK1yUAEmPVR3M
-         gA6UBhK+o3yH+y9TvNN8Efz/BwISieNmFCXXfLuhdNNutqXBlqeUzOfjiAXMX1kmciSl
-         vApsvvB4op5xh0yjXMhFqjgU2bvoHj9Bxg2hD/YU2l6VsAXgSIZfgK2qdjB8ubKJiOPf
-         iZWYnDPvxBCFC7T/ORg9D6FMHmDxk7govcMg6qmQw1HG22ty1EIaeXHs2CEir8e/03/X
-         GfMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711420417; x=1712025217;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=85L/a51HnO6m4QY8aLFiASnw4aQdtlumeIiIvnEDeqU=;
-        b=dxRr2c+2+kUxMYC1SlLYaaLScQt+yWqTLrMMhuQn2ZSfSZSsjdJ0d/+lJhC5RmhHER
-         AwdcFDvMJ+/MIDl63UkSbqvAZjN6TD6mme8+lE3MKxfapSBxFodOsi0Iav0fKU8an5Er
-         DAKxrppkVQ2FqxGad8ZNg0BVeRTO3r4RdA/PR8WstBN8ydAdYCxVrd5p8mxtBKWr1wtY
-         ZALGd3taELES1Q9qmPghxYof2YwiED39Gi28uM4qcijrDoEFGy/9SN0rCQ4a4+6RHmMI
-         gC3VQy0yq1Wk9rzfAZqYc3XiGRxKNnLng+GfSmTs/3tep3A7JpYBDInwCZ4YiijqIuEq
-         TBrg==
-X-Forwarded-Encrypted: i=1; AJvYcCXgsX0+Zy9/6C3404qmnB9yAEGWFXDJ+o2b/y2fbu1cGGu2O/LAmL5CDH6cAS2YojQMCJc+qonbS+DAgSp3gqXTq75NLTY3z/wGynEbiO1+1bXHT6zSd5PfunbSzYG+fWMxsjm3phkvi6lb
-X-Gm-Message-State: AOJu0YyCZRe4eVmKebUpCfHhbH55rg+uK44mUOR00WRxCjsd+S610n+Q
-	FxyqqKqfUueForheRUy94Rtepw9uTOqV9caG3Eee1sTIX9GytxihhRAsAmT7dRKXSmDYGAQw2Qv
-	Fxt9Unb46n01tffl/qrZm8JgZflM=
-X-Google-Smtp-Source: AGHT+IGsoM00LvbOckuuEcdVDvseZJWaZUBBrMGlxpcPhn670oKvHDam7dctAr17MfY4maSjCkvPgLlep8d3fCYlT0w=
-X-Received: by 2002:a17:907:7784:b0:a45:f263:361b with SMTP id
- ky4-20020a170907778400b00a45f263361bmr5259427ejc.61.1711420417428; Mon, 25
- Mar 2024 19:33:37 -0700 (PDT)
+	s=arc-20240116; t=1711420421; c=relaxed/simple;
+	bh=PWWez+GCtzHxL+Q3cBOsyLC3Pjq/o440jxyRuUA0HBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=meXvpgOb3C1jIns9U7xkb2xD6XbB6dv0OQae5WEZTMfnqE/riXFyyBrSbwDNupuGz6xbp1JNxJp+o6KpVs0dsgQj21ilypNunBICnRYemJh88+zAvxaktnAThoqaMs3lPn3kp3SrMpd1Qq1/w1Jp0UmiO2N75nIgRNtMwdM9XuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nr4BgcbT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F1C2C433F1;
+	Tue, 26 Mar 2024 02:33:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711420420;
+	bh=PWWez+GCtzHxL+Q3cBOsyLC3Pjq/o440jxyRuUA0HBE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Nr4BgcbTvRaBmyTyiDaqh0FqlHuYfefFC+IXxVFq/ApLTk1sVLb0xjv7r92kJ1iqV
+	 2ZYyhky/tPHOmOjpy7qvb4YoufvMY14ilBjZ+3zTbAzbh7GAIN5cEmXgC+xAfJ8e6E
+	 qD1MN4pmY5qylBsJ3UNrBubrI6A1PPhYyb2wORcke8wmPAyeHrrkq8FfcH/LENJqzn
+	 ZVoC1igpWA10v1Mn7ViEqvNT9d107JB5gFcpeVsNJBX6dnjQRxkYdoZUnqM+1P3zu0
+	 XXLP8GvSOwQS9KyjaLMkf8Smbbqf0jWPUn3YrHsIL9q4u1yAwqGxKBKJ9rspU9iLJX
+	 8+1/BFu4yearg==
+Date: Mon, 25 Mar 2024 19:33:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, dsahern@kernel.org, xeb@mail.ru,
+ shuah@kernel.org, idosch@nvidia.com, amcohen@nvidia.com, petrm@nvidia.com,
+ jbenc@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com,
+ liujian56@huawei.com, horms@kernel.org, linyunsheng@huawei.com,
+ therbert@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
+ tcp_gro_receive
+Message-ID: <20240325193338.565a4e45@kernel.org>
+In-Reply-To: <20240325182543.87683-5-richardbgobert@gmail.com>
+References: <20240325182543.87683-1-richardbgobert@gmail.com>
+	<20240325182543.87683-5-richardbgobert@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325062831.48675-1-kerneljasonxing@gmail.com>
- <20240325183033.79107f1d@kernel.org> <CAL+tcoAXCagwnNNwcP95JcW3Wx-5Zzu87+YFOaaecH5XMS6sMQ@mail.gmail.com>
- <20240325192308.22e6924c@kernel.org>
-In-Reply-To: <20240325192308.22e6924c@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 26 Mar 2024 10:33:00 +0800
-Message-ID: <CAL+tcoBkbPvkf6PB+gjN=x+DV5Q9AaUXTDP3eg14fjmcoJhnyg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/3] tcp: make trace of reset logic complete
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: edumazet@google.com, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	rostedt@goodmis.org, pabeni@redhat.com, davem@davemloft.net, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 26, 2024 at 10:23=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Tue, 26 Mar 2024 10:13:55 +0800 Jason Xing wrote:
-> > Yesterday, I posted two series to do two kinds of things. They are not
-> > the same. Maybe you get me wrong :S
->
-> Ah, my bad, sorry about that. I see that they are different now.
+On Mon, 25 Mar 2024 19:25:43 +0100 Richard Gobert wrote:
+> +	const u32 id = ntohl(*(__be32 *)&iph->id);
+> +	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
+> +	const int flush_id = ntohs(id >> 16) - ntohs(id2 >> 16);
 
-That's all right :)
-
-> One is v1 the other v2, both targeting tcp tracing... Easy to miss
-> in the post merge window rush :(
-
-Yes, and thanks for the check :)
+The endian conversions don't match types here. sparse is unhappy.
+If id is in host endian shouldn't it be htons(id >> 16) ?
+Also if you cast to a bitwise type you need __force
+-- 
+pw-bot: cr
 
