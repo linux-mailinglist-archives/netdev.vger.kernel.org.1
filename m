@@ -1,63 +1,89 @@
-Return-Path: <netdev+bounces-82127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C6A988C59C
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:48:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6322188C5A0
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE00C3048AC
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:48:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8678A1C28B7D
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8DB13C910;
-	Tue, 26 Mar 2024 14:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F1D13C668;
+	Tue, 26 Mar 2024 14:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VtFCZ0Zh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E4BQDDTk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A653013C90F
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2EFED9;
+	Tue, 26 Mar 2024 14:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711464428; cv=none; b=cQI+etEmmVT+YTVC29HWdL9SoC4p5Ld4z90liBycbF7jQ82UPt8LAZfuHW4jrQS4aIKep1V8a+aCi2+0f1z3mrt6uZeujjfIEgm85+8au99udu7Mv9STkZWOb44Pe9LC6qH4olHFrtNj3qbger5gfk0fTyFnSL/uluzwjyISmtw=
+	t=1711464475; cv=none; b=PAfCurn4xudZRybbuD85+d1vw6LsFdeT7zqCxPDo39QLV7XhXMOJGm1k1yxRKqyi/JSfoG5+YLF4ugZ6nQjqqvREPql0L07GKtHxjbtZpDu9b+lkaM+lIs+RJpyd7A7k6CQ1yWwUuidiIwpPiYFOs/JkpbbCUNCgv3waKKlOwc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711464428; c=relaxed/simple;
-	bh=R42jsIDG/t+XNrhIdId5YWvl61mgtbTcHWQRtcC7afo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UKgN3zwYvaCGwLhqiMz1AwiH7W7CQncpw+mDq78fMbCfZPIoqnhPNwpVu5R8qxSkvtNemdp4vbGZEGgUqVGO9NZh1aY24fY94GkDBMGl+HnieOBlOZ+GaKqIk3A+B5dE0J2DJJ31nxEN+wEr8XVDkmkuVBVd25jbWxq8+IkiZVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VtFCZ0Zh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62810C433B2;
-	Tue, 26 Mar 2024 14:47:08 +0000 (UTC)
+	s=arc-20240116; t=1711464475; c=relaxed/simple;
+	bh=2VRodtLYji0E2iO14KF37hDwen2VjVMAvwAcrcgPpT4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RP8DQWyViGOgZmbG2QgzfPgzfywKA/8kNopgnvNdc4T6EGj7lUY4r7gXw1Opte+0uc+fUuisIXtCDlUPqjnQW03IOAW28kHepgtmA8eSrcorHK9W+3xOlMOLutz9UQHP5vIMjzlkvWulGnlVHp5NSC5gpQjGL6gYvjuJAQ743BE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E4BQDDTk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C54DC433F1;
+	Tue, 26 Mar 2024 14:47:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711464428;
-	bh=R42jsIDG/t+XNrhIdId5YWvl61mgtbTcHWQRtcC7afo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VtFCZ0ZhGt8HIPfE78eJ0NutkTPs7aUUEUHeUAHrDaDBsLqVqT7yTn2oLkVV/pfxY
-	 dCuIf5f65a9ZkN76Jw3+WOza90xcVvZBb5o7EPZpHyCKvAl/fAYBoNnSh3GPLNYebr
-	 Qdh2kDVqlvlL/aFzAfxlWkuDGhIXviuoLz3xEGrOttvug8BIRp5WxC+XOx6ChU/DES
-	 sYBAgtiOJeNhXlREwYNxOv/WP6HXqIUza16hUmfPbSG/nKU+W9Kig7ar4vXHvtNEYu
-	 FS0019YupmS1ywWvxbENM5BQEwyZf6Bp2dHp/vXSFdWZ1WXoR9B3juzs8b9410XTcd
-	 b7P/EeDAVeV+g==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=k20201202; t=1711464475;
+	bh=2VRodtLYji0E2iO14KF37hDwen2VjVMAvwAcrcgPpT4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=E4BQDDTkgrdwdIkmMvielkRpTAsqHIEG3dNSrY21fnxwoLYvLOoCje+XGKi0Q6+lb
+	 vXFNIViLU9NTXcLVTR3XwdRIIouf6xWYpzwnmHI2t5ZxiCoyK5CtJGLAMaMQhP4GqM
+	 LFJItP61E8WSzWQOgV3iidHNLT5C63yxLkS/wCtha2CzziKBhSzJgJ8mdUJnDc4MsM
+	 mHMWnrCmz0M9BMr26mXQL/Ot8TdiiiLpbc7Z6ykNI9wEj4r4WuyvPMGjqE0R7U0B4a
+	 JYlh8463XR1dZ+1yi/iNsx2NnACkLOIgc70LBf5p2SbJ28JbOOieq3jHp29R//i1VX
+	 XyBZZot1G0W0w==
+From: Arnd Bergmann <arnd@kernel.org>
+To: linux-kbuild@vger.kernel.org,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas@fjasle.eu>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bill Metzenthen <billm@melbpc.org.au>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	x86@kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Jean Delvare <jdelvare@suse.com>,
+	Harry Wentland <harry.wentland@amd.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	"Manoj N. Kumar" <manoj@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org,
+	nouveau@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org,
 	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Carolina Jubran <cjubran@nvidia.com>
-Subject: [net 10/10] net/mlx5e: RSS, Block XOR hash with over 128 channels
-Date: Tue, 26 Mar 2024 07:46:46 -0700
-Message-ID: <20240326144646.2078893-11-saeed@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240326144646.2078893-1-saeed@kernel.org>
-References: <20240326144646.2078893-1-saeed@kernel.org>
+	linux-renesas-soc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-mm@kvack.org,
+	llvm@lists.linux.dev
+Subject: [PATCH 00/12] kbuild: enable some -Wextra warnings by default
+Date: Tue, 26 Mar 2024 15:47:15 +0100
+Message-Id: <20240326144741.3094687-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,115 +92,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Carolina Jubran <cjubran@nvidia.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-When supporting more than 128 channels, the RQT size is
-calculated by multiplying the number of channels by 2
-and rounding up to the nearest power of 2.
+This is a follow-up on a couple of patch series I sent in the past,
+enabling -Wextra (aside from stuff that is explicitly disabled),
+-Wcast-function-pointer-strict and -Wrestrict.
 
-The index of the RQT is derived from the RSS hash
-calculations. If XOR8 is used as the RSS hash function,
-there are only 256 possible hash results, and therefore,
-only 256 indexes can be reached in the RQT.
+I have tested these on 'defconfig' and 'allmodconfig' builds across
+all architectures, as well as many 'randconfig' builds on x86, arm and
+arm64. It would be nice to have all the Makefile.extrawarn changes in
+v6.10, hopefully with the driver fixes going in before that through
+the respective subsystem trees.
 
-Block setting the RSS hash function to XOR when the number
-of channels exceeds 128.
+     Arnd
 
-Fixes: 74a8dadac17e ("net/mlx5e: Preparations for supporting larger number of channels")
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/en/rqt.c  |  7 +++++
- .../net/ethernet/mellanox/mlx5/core/en/rqt.h  |  1 +
- .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 28 +++++++++++++++++--
- 3 files changed, 34 insertions(+), 2 deletions(-)
+Arnd Bergmann (12):
+  kbuild: make -Woverride-init warnings more consistent
+  [v3] parport: mfc3: avoid empty-body warning
+  kbuild: turn on -Wextra by default
+  kbuild: remove redundant extra warning flags
+  firmware: dmi-id: add a release callback function
+  nouveau: fix function cast warning
+  cxlflash: fix function pointer cast warnings
+  x86: math-emu: fix function cast warnings
+  kbuild: enable -Wcast-function-type-strict unconditionally
+  sata: sx4: fix pdc20621_get_from_dimm() on 64-bit
+  [v4] kallsyms: rework symbol lookup return codes
+  kbuild: turn on -Wrestrict by default
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c
-index bcafb4bf9415..8d9a3b5ec973 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c
-@@ -179,6 +179,13 @@ u32 mlx5e_rqt_size(struct mlx5_core_dev *mdev, unsigned int num_channels)
- 	return min_t(u32, rqt_size, max_cap_rqt_size);
- }
- 
-+#define MLX5E_MAX_RQT_SIZE_ALLOWED_WITH_XOR8_HASH 256
-+
-+unsigned int mlx5e_rqt_max_num_channels_allowed_for_xor8(void)
-+{
-+	return MLX5E_MAX_RQT_SIZE_ALLOWED_WITH_XOR8_HASH / MLX5E_UNIFORM_SPREAD_RQT_FACTOR;
-+}
-+
- void mlx5e_rqt_destroy(struct mlx5e_rqt *rqt)
- {
- 	mlx5_core_destroy_rqt(rqt->mdev, rqt->rqtn);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h b/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h
-index e0bc30308c77..2f9e04a8418f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h
-@@ -38,6 +38,7 @@ static inline u32 mlx5e_rqt_get_rqtn(struct mlx5e_rqt *rqt)
- }
- 
- u32 mlx5e_rqt_size(struct mlx5_core_dev *mdev, unsigned int num_channels);
-+unsigned int mlx5e_rqt_max_num_channels_allowed_for_xor8(void);
- int mlx5e_rqt_redirect_direct(struct mlx5e_rqt *rqt, u32 rqn, u32 *vhca_id);
- int mlx5e_rqt_redirect_indir(struct mlx5e_rqt *rqt, u32 *rqns, u32 *vhca_ids,
- 			     unsigned int num_rqns,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-index c5a203b5119d..d60cb6d47d26 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-@@ -451,6 +451,17 @@ int mlx5e_ethtool_set_channels(struct mlx5e_priv *priv,
- 
- 	mutex_lock(&priv->state_lock);
- 
-+	if (mlx5e_rx_res_get_current_hash(priv->rx_res).hfunc == ETH_RSS_HASH_XOR) {
-+		unsigned int xor8_max_channels = mlx5e_rqt_max_num_channels_allowed_for_xor8();
-+
-+		if (count > xor8_max_channels) {
-+			err = -EINVAL;
-+			netdev_err(priv->netdev, "%s: Requested number of channels (%d) exceeds the maximum allowed by the XOR8 RSS hfunc (%d)\n",
-+				   __func__, count, xor8_max_channels);
-+			goto out;
-+		}
-+	}
-+
- 	/* Don't allow changing the number of channels if RXFH was previously configured.
- 	 * Changing the channels number after configuring the RXFH may alter the RSS table size,
- 	 * the previous configuration may no longer be compatible with the new RSS table.
-@@ -1292,17 +1303,30 @@ int mlx5e_set_rxfh(struct net_device *dev, struct ethtool_rxfh_param *rxfh,
- 	struct mlx5e_priv *priv = netdev_priv(dev);
- 	u32 *rss_context = &rxfh->rss_context;
- 	u8 hfunc = rxfh->hfunc;
-+	unsigned int count;
- 	int err;
- 
- 	mutex_lock(&priv->state_lock);
-+
-+	count = priv->channels.params.num_channels;
-+
-+	if (hfunc == ETH_RSS_HASH_XOR) {
-+		unsigned int xor8_max_channels = mlx5e_rqt_max_num_channels_allowed_for_xor8();
-+
-+		if (count > xor8_max_channels) {
-+			err = -EINVAL;
-+			netdev_err(priv->netdev, "%s: Cannot set RSS hash function to XOR, current number of channels (%d) exceeds the maximum allowed for XOR8 RSS hfunc (%d)\n",
-+				   __func__, count, xor8_max_channels);
-+			goto unlock;
-+		}
-+	}
-+
- 	if (*rss_context && rxfh->rss_delete) {
- 		err = mlx5e_rx_res_rss_destroy(priv->rx_res, *rss_context);
- 		goto unlock;
- 	}
- 
- 	if (*rss_context == ETH_RXFH_CONTEXT_ALLOC) {
--		unsigned int count = priv->channels.params.num_channels;
--
- 		err = mlx5e_rx_res_rss_init(priv->rx_res, rss_context, count);
- 		if (err)
- 			goto unlock;
+ arch/x86/math-emu/fpu_etc.c                   |  9 +++--
+ arch/x86/math-emu/fpu_trig.c                  |  6 ++--
+ arch/x86/math-emu/reg_constant.c              |  7 +++-
+ drivers/ata/sata_sx4.c                        |  6 ++--
+ drivers/firmware/dmi-id.c                     |  7 +++-
+ .../gpu/drm/amd/display/dc/dce110/Makefile    |  2 +-
+ .../gpu/drm/amd/display/dc/dce112/Makefile    |  2 +-
+ .../gpu/drm/amd/display/dc/dce120/Makefile    |  2 +-
+ drivers/gpu/drm/amd/display/dc/dce60/Makefile |  2 +-
+ drivers/gpu/drm/amd/display/dc/dce80/Makefile |  2 +-
+ drivers/gpu/drm/i915/Makefile                 |  6 ++--
+ .../drm/nouveau/nvkm/subdev/bios/shadowof.c   |  7 +++-
+ drivers/gpu/drm/xe/Makefile                   |  4 +--
+ drivers/net/ethernet/renesas/sh_eth.c         |  2 +-
+ drivers/parport/parport_mfc3.c                |  3 +-
+ drivers/pinctrl/aspeed/Makefile               |  2 +-
+ drivers/scsi/cxlflash/lunmgt.c                |  4 +--
+ drivers/scsi/cxlflash/main.c                  | 14 ++++----
+ drivers/scsi/cxlflash/superpipe.c             | 34 +++++++++----------
+ drivers/scsi/cxlflash/superpipe.h             | 11 +++---
+ drivers/scsi/cxlflash/vlun.c                  |  7 ++--
+ fs/proc/Makefile                              |  2 +-
+ include/linux/filter.h                        | 14 ++++----
+ include/linux/ftrace.h                        |  6 ++--
+ include/linux/module.h                        | 14 ++++----
+ kernel/bpf/Makefile                           |  2 +-
+ kernel/bpf/core.c                             |  7 ++--
+ kernel/kallsyms.c                             | 23 +++++++------
+ kernel/module/kallsyms.c                      | 26 +++++++-------
+ kernel/trace/ftrace.c                         | 13 +++----
+ mm/Makefile                                   |  3 +-
+ scripts/Makefile.extrawarn                    | 33 ++++--------------
+ 32 files changed, 134 insertions(+), 148 deletions(-)
+
 -- 
-2.44.0
+2.39.2
 
+Cc: Bill Metzenthen <billm@melbpc.org.au>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: x86@kernel.org
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jean Delvare <jdelvare@suse.com>
+Cc: Harry Wentland <harry.wentland@amd.com>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Cc: Andrew Jeffery <andrew@codeconstruct.com.au>
+Cc: "Manoj N. Kumar" <manoj@linux.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas@fjasle.eu>
+Cc: Greg Kroah-Hartman <gregkh@suse.de>
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-ide@vger.kernel.org
+Cc: amd-gfx@lists.freedesktop.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: intel-gfx@lists.freedesktop.org
+Cc: nouveau@lists.freedesktop.org
+Cc: intel-xe@lists.freedesktop.org
+Cc: netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-scsi@vger.kernel.org
+Cc: bpf@vger.kernel.org
+Cc: linux-trace-kernel@vger.kernel.org
+Cc: linux-modules@vger.kernel.org
+Cc: linux-mm@kvack.org
+Cc: linux-kbuild@vger.kernel.org
+Cc: llvm@lists.linux.dev
 
