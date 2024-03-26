@@ -1,216 +1,123 @@
-Return-Path: <netdev+bounces-82153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 298CC88C819
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:53:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B9D388C82B
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:56:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DB1D1C63CC8
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:53:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A21F4B2B0E0
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB7F13CA8A;
-	Tue, 26 Mar 2024 15:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D338613CC69;
+	Tue, 26 Mar 2024 15:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Wuqowq8Z"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SoYdaWXj"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984F213C91F
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 15:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E0F13CC4E
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 15:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711468228; cv=none; b=RLCz7rlheVgvOsgom0bjIjhOaT2vtRMM68reii1Va/N4WuzxoYvYk0gzFGHpRD7W/Z8ayN6hSt68lhkhuM9ZZB7DTJ3QvD+xFz/YjSLgQZDmal9rhA3AIDMGP4hid/O1GcDAHi0eo8DWCpqb481mDgqdN4OVPdVB2c4AeXdTCJw=
+	t=1711468331; cv=none; b=ltxczzsTUGEATSMvWmgafpQYtQAfMuzRaKLbAtoahyfdjfp4mHMgRuoCviOCxSLvJTWJkbFaFTy9TOoXNVRoij+9bLx61GwaO3rKh1U2sMPxGETqAavrFueVsN/XJtqMZNz6tnaZFqwDpRevF0SQvJcFJh97dMxizhgXXKdQCbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711468228; c=relaxed/simple;
-	bh=KkrDyw3smHZ9f4tYyg5QxN379RqsLlDRcG1CIwHIXDM=;
+	s=arc-20240116; t=1711468331; c=relaxed/simple;
+	bh=luZtCqmszjdO/6TtGW7YLjbXyaMgfBYnzDa2u78dgGQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OZ11G1FIL4iMC5MGb3+6FTEV6k7oIHzCnMSZyvjlook6NgetVc+BQn4++L0USlpQj/Iqju5MLyd/AfG/JrY0I74rqK1c/6cQlWI0Hz3x0A8fK95mzp5AftCwtez2TqtXWQLJHwdpin0627/qYb+7JC9ODu4llkQ76EXIxNAD21o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Wuqowq8Z; arc=none smtp.client-ip=209.85.167.41
+	 To:Cc:Content-Type; b=vDUwCDMkh2EWNsSenNO8559aRp7pyuLbWlDEuRmuQxpUkXNu7jCfbyx+yf4oC39Pa5oyzKcnNk1/vOG8ABm0P9E6OCfV5A5+qwoZaDEfaUpQSKoiOc+Qb8+x+1GrN9JVRVbPuG4ETg0qD4ZsEHi3WE1PnXvVks2tVFG6TbnPZog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=SoYdaWXj; arc=none smtp.client-ip=209.85.167.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-513dc9d6938so7269502e87.2
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 08:50:26 -0700 (PDT)
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-515a81928a1so4246554e87.3
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 08:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1711468224; x=1712073024; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1711468324; x=1712073124; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DX7zDk6qn5WsiJtm7IvAEtgvETf/4yKh1yU5CcatC5I=;
-        b=Wuqowq8ZqMrtKhMeK8F30c8NLU2fGJbr2gkXN4Z6BMX+h2/ONx0p1b3naC47pcm57L
-         so88DVRW05Hv/E9mlKlNYUcIAR+80XXkAwbBOgImy11/pKcUOmVwohSmnWNQ2cxaXd1l
-         B2W6QA0hcP+qroe0TW/fvdsZyhE6o1vPVjISw=
+        bh=fjNXTB+k7b/lZxamA/+bUSLZpFesOkFmibrQjyulTmE=;
+        b=SoYdaWXjos4rBS+3X7UYpeIPaY9R6wtobqHkGmeppa2RmUp/vf2pVqTaGZkgmiz8QV
+         6JoKN4pQYKBHqqEBQ7CZeVYlK3kAru0cjrNLbynvAcUcqKGfAzKNQ2BaYy1UkBxtlp7u
+         mhEwQrbUeCNOqO8OE+Z79ogS7jx/qeRF6eRBs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711468224; x=1712073024;
+        d=1e100.net; s=20230601; t=1711468324; x=1712073124;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DX7zDk6qn5WsiJtm7IvAEtgvETf/4yKh1yU5CcatC5I=;
-        b=Nh4A2waciLq70W2oIXe5/aLE5g2kzA2i13TkErUSiw0bOkXfVP5lu4u4hdABDlnplf
-         /T5pvwZLSBQiG8S9FfjEZT1OVanAZYmI8cTyLpp3OHFey6rrjHFK1Jz12dKoBI0rK4Qe
-         JbNe+bXHjFFXZBbOz2EtS0vkBL110QFPCNAgLNTvxbz1S2aaL4rXUznC2wN0KxHRqmmV
-         atoBJVzN9hYUBZARch3CBEg1Yv0Tv82Mb7ZUBGUX5q0uiLr48Cwa6Dij6AcWGPlZEoZF
-         m71Mba2y2SaGHg2s1+W3Xd9S6v5O7u34HTvvU8lwXWlfFojxpfX0yfNgLWPbBQwzDt0c
-         1DBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGcvDTztvcugA/EU3yBOXkAAtLSKdn6My8EQR6fnDyISfYzmT35nHLOK12FTu0LjFVV4mY0eYDZ0HC1V+obnp3QaYcL2iE
-X-Gm-Message-State: AOJu0YxITf+d24R2a1Js7aHyWUbW2uNM+NYHEB8THpmADPHRPb5NZgA0
-	uBhONjQxnsMWSaI9WvjW4V9gpsUmVDUYoQO054JHhGNPt8+mTUL2TXu8uTNuRvEMcC3w50ct0DQ
-	JpryOQFdzvIFeUwjP2c7SD649tVXYJx1mh4+K
-X-Google-Smtp-Source: AGHT+IEZsWWhyJnpVY4bOEB1rkwgNZ4QLyZCmfdVyz38U6YTYA3uMIazxxrn5hR1yshvHc+fDrlCli7x096SWH2PV/8=
-X-Received: by 2002:ac2:464e:0:b0:515:a8c9:6ec4 with SMTP id
- s14-20020ac2464e000000b00515a8c96ec4mr1326729lfo.42.1711468223601; Tue, 26
- Mar 2024 08:50:23 -0700 (PDT)
+        bh=fjNXTB+k7b/lZxamA/+bUSLZpFesOkFmibrQjyulTmE=;
+        b=GR0GYrL6xQqqBxVCspr1GPdrQZLI1DeTaaTdqMlCHFIyJBrC7+/WK4ebi7UXU/VjM8
+         FD9NyDPdB94XTkUWxKlkt9t83LMbK0svEqYL4jg/MOkC9u905R7X1A9q0g4FAgHZO1m7
+         KSi+HCn1p4NmNMvwOztIo9T6PFSAFlSoE+kvdcFX2dIs8XjYr7byn2U+PCwOfYoevEsb
+         UubIqwudyQKx5IyzpcZt3Aw6mZzb0MV9pS+YKaMyiyVtk+uTsJOh1w3giLL/xHgHzJZQ
+         e4RoC8PZYyVOAuCNvfmzhk1IKi/EMw2TZYmTcZdwYphZVpIkdVz2JoAXlq6fZOJIVpio
+         nSFg==
+X-Forwarded-Encrypted: i=1; AJvYcCWzUpjinf191wKQVMj7e5d6vmWXlD5nRV7PjsMutKekcKsW9MVYImyFt6AmEfftL7U+d2PYuoPC84H6PdqMER+zJ7IkpBTt
+X-Gm-Message-State: AOJu0YyoG6yvDQBdU/hq2V59sT+PF1Th0Lo/ghGwMdEI+f4sexPbdtXk
+	TDQXAhg+DKeGUrSSsGJNAR6+DiCS11bvxqzXhNwD2DoEy4m0Kv+/BduLIOlYL5boxzeuSBcf5l4
+	gBR9ibFHpZSMDVwCFHLg12oSY/zUeMplWOKPb
+X-Google-Smtp-Source: AGHT+IEd99iQdt5s3nxQmQjQL+kWq2UATM17DlKBxE0FXHEHbmb6dlrsT+p+vWHMtj6uU8KDB4FaZxjZTkMdmQsnOLg=
+X-Received: by 2002:a19:3807:0:b0:513:e4e0:8e12 with SMTP id
+ f7-20020a193807000000b00513e4e08e12mr8414535lfa.12.1711468324525; Tue, 26 Mar
+ 2024 08:52:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240318143058.287014-1-ivecera@redhat.com> <20240318143058.287014-2-ivecera@redhat.com>
-In-Reply-To: <20240318143058.287014-2-ivecera@redhat.com>
+References: <20240326061233.4133148-1-suhui@nfschina.com>
+In-Reply-To: <20240326061233.4133148-1-suhui@nfschina.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Tue, 26 Mar 2024 21:20:10 +0530
-Message-ID: <CAH-L+nPvsC=ZKgR-pFOYYFZ1+G4DgPW=oTaAOyDJJY-vMjbJBQ@mail.gmail.com>
-Subject: Re: [PATCH iwl-next 1/7] i40e: Remove flags field from i40e_veb
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Date: Tue, 26 Mar 2024 21:21:53 +0530
+Message-ID: <CAH-L+nM4nKxfRM29J02dtFcWkY7yuW+980swUhHC=avD8ZdkEQ@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/2] octeontx2-pf: check negative error code in otx2_open()
+To: Su Hui <suhui@nfschina.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com, 
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, saikrishnag@marvell.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000008b42720614923f68"
+	boundary="0000000000008ce08c0614924551"
 
---0000000000008b42720614923f68
+--0000000000008ce08c0614924551
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 18, 2024 at 8:01=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
-ote:
+On Tue, Mar 26, 2024 at 11:43=E2=80=AFAM Su Hui <suhui@nfschina.com> wrote:
 >
-> The field is initialized always to zero and it is never read.
-> Remove it.
+> otx2_rxtx_enable() return negative error code such as -EIO,
+> check -EIO rather than EIO to fix this problem.
 >
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> Fixes: c926252205c4 ("octeontx2-pf: Disable packet I/O for graceful exit"=
+)
+> Signed-off-by: Su Hui <suhui@nfschina.com>
+> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
 > ---
 LGTM
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-
->  drivers/net/ethernet/intel/i40e/i40e.h         |  3 +--
->  drivers/net/ethernet/intel/i40e/i40e_debugfs.c |  2 +-
->  drivers/net/ethernet/intel/i40e/i40e_main.c    | 13 +++++--------
->  3 files changed, 7 insertions(+), 11 deletions(-)
+> v2: add "net" in subject
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/etherne=
-t/intel/i40e/i40e.h
-> index 2fbabcdb5bb5..5248e78f7849 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-> @@ -788,7 +788,6 @@ struct i40e_veb {
->         u16 stats_idx;          /* index of VEB parent */
->         u8  enabled_tc;
->         u16 bridge_mode;        /* Bridge Mode (VEB/VEPA) */
-> -       u16 flags;
->         u16 bw_limit;
->         u8  bw_max_quanta;
->         bool is_abs_credits;
-> @@ -1213,7 +1212,7 @@ void i40e_vsi_stop_rings(struct i40e_vsi *vsi);
->  void i40e_vsi_stop_rings_no_wait(struct  i40e_vsi *vsi);
->  int i40e_vsi_wait_queues_disabled(struct i40e_vsi *vsi);
->  int i40e_reconfig_rss_queues(struct i40e_pf *pf, int queue_count);
-> -struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags, u16 uplin=
-k_seid,
-> +struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 uplink_seid,
->                                 u16 downlink_seid, u8 enabled_tc);
->  void i40e_veb_release(struct i40e_veb *veb);
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net=
-/ethernet/intel/i40e/i40e_debugfs.c
-> index f9ba45f596c9..6147c5f128e8 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-> @@ -867,7 +867,7 @@ static ssize_t i40e_dbg_command_write(struct file *fi=
-lp,
->                         goto command_write_done;
->                 }
->
-> -               veb =3D i40e_veb_setup(pf, 0, uplink_seid, vsi_seid, enab=
-led_tc);
-> +               veb =3D i40e_veb_setup(pf, uplink_seid, vsi_seid, enabled=
-_tc);
->                 if (veb)
->                         dev_info(&pf->pdev->dev, "added relay %d\n", veb-=
->seid);
->                 else
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/et=
-hernet/intel/i40e/i40e_main.c
-> index 663b2237eb4e..2f1604ae78c7 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -13138,7 +13138,7 @@ static int i40e_ndo_bridge_setlink(struct net_dev=
-ice *dev,
->
->                 /* Insert a new HW bridge */
->                 if (!veb) {
-> -                       veb =3D i40e_veb_setup(pf, 0, vsi->uplink_seid, v=
-si->seid,
-> +                       veb =3D i40e_veb_setup(pf, vsi->uplink_seid, vsi-=
->seid,
->                                              vsi->tc_config.enabled_tc);
->                         if (veb) {
->                                 veb->bridge_mode =3D mode;
-> @@ -14394,10 +14394,10 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf =
-*pf, u8 type,
->                 }
->
->                 if (vsi->uplink_seid =3D=3D pf->mac_seid)
-> -                       veb =3D i40e_veb_setup(pf, 0, pf->mac_seid, vsi->=
-seid,
-> +                       veb =3D i40e_veb_setup(pf, pf->mac_seid, vsi->sei=
-d,
->                                              vsi->tc_config.enabled_tc);
->                 else if ((vsi->flags & I40E_VSI_FLAG_VEB_OWNER) =3D=3D 0)
-> -                       veb =3D i40e_veb_setup(pf, 0, vsi->uplink_seid, v=
-si->seid,
-> +                       veb =3D i40e_veb_setup(pf, vsi->uplink_seid, vsi-=
->seid,
->                                              vsi->tc_config.enabled_tc);
->                 if (veb) {
->                         if (vsi->seid !=3D pf->vsi[pf->lan_vsi]->seid) {
-> @@ -14791,7 +14791,6 @@ static int i40e_add_veb(struct i40e_veb *veb, str=
-uct i40e_vsi *vsi)
->  /**
->   * i40e_veb_setup - Set up a VEB
->   * @pf: board private structure
-> - * @flags: VEB setup flags
->   * @uplink_seid: the switch element to link to
->   * @vsi_seid: the initial VSI seid
->   * @enabled_tc: Enabled TC bit-map
-> @@ -14804,9 +14803,8 @@ static int i40e_add_veb(struct i40e_veb *veb, str=
-uct i40e_vsi *vsi)
->   * Returns pointer to the successfully allocated VEB sw struct on
->   * success, otherwise returns NULL on failure.
->   **/
-> -struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
-> -                               u16 uplink_seid, u16 vsi_seid,
-> -                               u8 enabled_tc)
-> +struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 uplink_seid,
-> +                               u16 vsi_seid, u8 enabled_tc)
->  {
->         struct i40e_vsi *vsi =3D NULL;
->         struct i40e_veb *veb;
-> @@ -14837,7 +14835,6 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *p=
-f, u16 flags,
->         if (veb_idx < 0)
->                 goto err_alloc;
->         veb =3D pf->veb[veb_idx];
-> -       veb->flags =3D flags;
->         veb->uplink_seid =3D uplink_seid;
->         veb->enabled_tc =3D (enabled_tc ? enabled_tc : 0x1);
->
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drive=
+rs/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> index b40bd0e46751..3f46d5e0fb2e 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> @@ -1933,7 +1933,7 @@ int otx2_open(struct net_device *netdev)
+>          * mcam entries are enabled to receive the packets. Hence disable=
+ the
+>          * packet I/O.
+>          */
+> -       if (err =3D=3D EIO)
+> +       if (err =3D=3D -EIO)
+>                 goto err_disable_rxtx;
+>         else if (err)
+>                 goto err_tx_stop_queues;
 > --
-> 2.43.0
+> 2.30.2
 >
 >
 
@@ -219,7 +126,7 @@ f, u16 flags,
 Regards,
 Kalesh A P
 
---0000000000008b42720614923f68
+--0000000000008ce08c0614924551
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -291,14 +198,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIKcFSDrIi/ib7jpqphSFrLwQBwFxlaZBL28xHk6P8Jf2MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDMyNjE1NTAyNFowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIGuRILz2fiQxw2zdJwSYKdwhvzIyn5LTqkqxABVoYakoMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDMyNjE1NTIwNFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCWSeEjRpjV
-+tKWmNzFYmFPpliKQz/7SEWO8nljpg7bGN5dR9FyENmt85Ih+40BDAGmkWVBhdKQAXMfZ50+xDdS
-Hl9Zmfz5XzDvBWfJvgZI+JsVIfjYs2yqb4f3mwwgYjylWip4KjzlhokMP8E96gTYCcjoJ0Z8XOab
-YJXPLGlCnsDXuFJ563hncanrKdC+MUao3KrGigSmb4B6l99HPiRfnHFRX758JL53QWznj8uVVFHT
-cNG6hhaxxDgTLHMbmlw3eiRZwCnrVyexNFmNlSJPFIUt/6G6DXVvsWZ+lYykL4fic8Pw+IMmDQrB
-kjHqAvQpA4JDR8IzztYxMV4kAJuA
---0000000000008b42720614923f68--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBamkHgZFQG
+9oz+aLr1okGWEatyZE64sEICqGSTaHDRxqY2fbj2lY8FabhU3392r51mq+82JCwRZm4r41dh0zeH
+UzJsB0Dr5fjf8o8b6Q0KWQrLQpAesLx/18oCFNl+CWevpm0z353ZbvfHRfMD2pwgjso4m8+9/WzT
+YXdKDzpSKQ9MMeYEMB8oI8HNT2T5XsE/HQBL327qc7F2q6RIk6ggUF9ZhAdTC9wBggIVTcwKJWjx
+8XDETHcCcd4yHVOI9MON2B+DrJX9y3D9FK0nIY1cz57cL2UnA/dYruh3pgFE3YYNVDyiyv7w1O1j
+MRYrhMF6x2RQUcSWyiGvRNCfOicc
+--0000000000008ce08c0614924551--
 
