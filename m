@@ -1,195 +1,143 @@
-Return-Path: <netdev+bounces-81968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F9288BF2F
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:20:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C7588BF59
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:27:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D461C3D0B4
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:20:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0E6F1F2B8BE
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5359679F3;
-	Tue, 26 Mar 2024 10:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1BF5490D;
+	Tue, 26 Mar 2024 10:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m/uPSkYp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K+UohmZq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CE067A04
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 10:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D794C3DE;
+	Tue, 26 Mar 2024 10:27:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711448403; cv=none; b=bgS6MJnlrsY2zudnbBIU0dRSIm/qEyWKaLbdBwiflE0do+LholIMBNoEk62gQoNbZ9r1nLDLsonPdDIiSYK+Eh9CbURI3CAjpandFVPv3lF7pDye5KrKdw33h+C+uwdm8T1PQsuzTvet3uUBJN89ss42RHCKDWgWz63bdKMPp64=
+	t=1711448842; cv=none; b=m6jqQ3t1SZVHhPqra8A0yDW99aUi8iTCVoGlSoq3qUqDy7bEOu3z6GQ+8gjKNv/GESPbFL9d5laUx/e7bh+fNGjVoGIQmFSitNb2uYWvUAU5m/k9aZklS847csd37FxEKq2+9jQ8f4MGFvu8v+I030R0vgCKecYEg7Q1g6IoVmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711448403; c=relaxed/simple;
-	bh=q5om1klt5Vblib09/KLSBK+RA4M8EjI0aAy/3rvo75o=;
+	s=arc-20240116; t=1711448842; c=relaxed/simple;
+	bh=kOI/dIIevG2xcttP7mDyRu+x/JIjo06VlzOdVnwHXdI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d6VDTr6CJQGESI2UoJAZzxNoGDIDusfiIgYfnMKpRn1MNl/70aKFIZh1dI9Cr24J97qe0S5ZWAEtgvBXn2On3VObFLehGxFaNivezK2O/KDaF9rzDwye9MNp9j7gZwwx6NV9h9QhECdXOpEAH6U9WUG2sDjN34Y7fqBihn+Zfnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=m/uPSkYp; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a474c4faf5eso271334266b.2
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:20:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711448400; x=1712053200; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4RCPWhIUFPUN1OPlIQTyF7klcOBcvyvE4uNRkcfrCSQ=;
-        b=m/uPSkYpd3PoAGbjfXQT1+aFC1ynEXuKdz3dWrFZ9tcJD7lKi93f1OAmq+CIgAjRFs
-         fGV/CZ0/ijqRixzIvWBO80H/Puo25Q+dvSCx8wqJ13OXDckMJT7iQw2sunMCnRxHR/+P
-         fY2mia8inJeZ7gu2ba9Xqw2NyPhsBrtoX2uwsA7Vw3qmtWya/QIiJG66pWudELZz6pl7
-         Wz+b80CjWF1I1nt6cHSuy+cxwSOUShIHqNIYcjkVKh2eUQl0P/qNpJ6z77RwrDoNEN4p
-         mS9JAqNVdjjYM2gSHOU9cwut83Afbf70gbzn0GPhEknk+wucBh9vZ2cyJRIXhh4wv9pm
-         bdRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711448400; x=1712053200;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4RCPWhIUFPUN1OPlIQTyF7klcOBcvyvE4uNRkcfrCSQ=;
-        b=eZ+IPeOnEPdUSoCSHLL+WVykleacsNB9sXdq2H1qihnXy+XQlB2B/FyeCpc7u5wBWN
-         mylTrzzGtwcXAiARxTQ1sobMgb+gnVqv9lF7MA3zO1i0k5bIHKJiG4M0pWMFHYrRYMsf
-         d59gPKjUFHYM6BUymdLImQXj4gznNrZEAKHyeS+rBz4CyOthBdwWy1PynkPJBqVlZQ3g
-         FtKxdpfaAvIqpmw16qGaHSvqFFyBV+tQzYGzH1TjpiBXauWIx2M35/Bq4vTrPxvzEYOE
-         I19VTXbeh9oyaebbuxK3GmEXQs6caNeRIZ5q5N34DgOxi4jveYXvqioF9pL+AO9zCIia
-         Gl8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXLmRmXFYfW92I5gewRUkHZQkdCgR4lyjSHHuga0wwd4jEzqAUvqYMNq+lL/3z5JWthA6GtcsoZe5z9CL0E1u1SoAAjtpjV
-X-Gm-Message-State: AOJu0YzMB4qCGgPBOmkP8Iil6x8gq6lK77CxLvWcJTD+qBS2IHi6wNTE
-	ppUXoxqJgSrKzPoZcefYO9nmcCUd68VrAzrdA4OfP7/MknMFcpnZ3oVrEFGeTlY=
-X-Google-Smtp-Source: AGHT+IHqJmTV9fx0c6gDzeZ28VWO2ncjlRQQumCuqoIhZLOLhIufmQoAWrHWUAlkSONRG/VAPLaC/A==
-X-Received: by 2002:a17:906:2a10:b0:a46:e8c1:11ac with SMTP id j16-20020a1709062a1000b00a46e8c111acmr5996035eje.18.1711448399658;
-        Tue, 26 Mar 2024 03:19:59 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.222.44])
-        by smtp.gmail.com with ESMTPSA id wk15-20020a170907054f00b00a4a3600d2absm2067438ejb.172.2024.03.26.03.19.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Mar 2024 03:19:59 -0700 (PDT)
-Message-ID: <dc3e2cb4-f631-4611-8814-0dc04c5502f0@linaro.org>
-Date: Tue, 26 Mar 2024 11:19:54 +0100
+	 In-Reply-To:Content-Type; b=Mxk+M2L2KFVp2zBJpv+by8gyLV19EUWyyyedblS4tzQmJ3jSYReldDyYNKcrwtBbPMQdqmME7B4LydD1aR50HI+SAh8gVF8XgsBVLn3QjKiTbENspCktTY1pMYahz4UDRw8foJTTiRmJXIBBOxKO2cimjfQtQf6VMWx0ja6xCRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K+UohmZq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7240C433C7;
+	Tue, 26 Mar 2024 10:27:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711448842;
+	bh=kOI/dIIevG2xcttP7mDyRu+x/JIjo06VlzOdVnwHXdI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=K+UohmZqYkHjmg4mnlRF69yGlqvYRCKu2Sn7wfzn/iyb0ZQRzPSxvmovNAWZBeVrO
+	 cm6O+2TuN76pQ41G0x+1vxbztFs7xK0tyfQtYHqIAHHBG1FCOUkUIC6i1Az6440IWV
+	 w+8evq0tY3f3g63gBpjY8++vLTq7XBBGzpRBwBBLTCktdvJCNucewfKyFJ/SANK/0q
+	 8sYEOVRKtep2fYutJzbwMcv6XaiImxi8Xqw8bZms+nJGz9baL5iZ7gjy9raDGTK81v
+	 edY2KStCnbGsMsazalq9EQrw+zXloSePNhRt3SAbZYkadXrEeZhAQjFhlU7fjntkVa
+	 1WuDAXqZGoOow==
+Message-ID: <60c891b6-03c9-413c-b41a-14949390d106@kernel.org>
+Date: Tue, 26 Mar 2024 11:27:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 00/38] ep93xx device tree conversion
-To: nikita.shubin@maquefel.me, Hartley Sweeten
- <hsweeten@visionengravers.com>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Sebastian Reichel <sre@kernel.org>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
- Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck
- <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Ralf Baechle <ralf@linux-mips.org>,
- "Wu, Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>,
- Olof Johansson <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
- netdev@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-ide@vger.kernel.org, linux-input@vger.kernel.org,
- linux-sound@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Andrew Lunn <andrew@lunn.ch>, Andy Shevchenko <andy.shevchenko@gmail.com>
-References: <20240326-ep93xx-v9-0-156e2ae5dfc8@maquefel.me>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240326-ep93xx-v9-0-156e2ae5dfc8@maquefel.me>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [TEST] VirtioFS instead of 9p
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+References: <20240325064234.12c436c2@kernel.org>
+ <34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
+ <20240325184237.0d5a3a7d@kernel.org>
+Content-Language: en-GB
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240325184237.0d5a3a7d@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 26/03/2024 10:18, Nikita Shubin via B4 Relay wrote:
-> The goal is to recieve ACKs for all patches in series to merge it via Arnd branch.
-> 
-> Some changes since last version (v8):
-> 
-> - Most important, fixed bug in Device Tree resulting in CS4271 not working by Alexander Sverdlin.
-> - added #interrupt-cells to gpio nodes with interrupts-controller
-> - fixed some EOF in dtsi files
-> - fixed identation and type in ep93xx-keypad thanks to Andy Shevchenko
-> 
-> Stephen Boyd, Vinod Koul PLEASE! give some comments on following, couse i hadn't one for a couple of iterations already:
-> 
-> Following patches require attention from Stephen Boyd, as they were converted to aux_dev as suggested:
-> 
-> - ARM: ep93xx: add regmap aux_dev
-> - clk: ep93xx: add DT support for Cirrus EP93xx
-> 
-> Following patches require attention from Vinod Koul:
-> 
-> - dma: cirrus: Convert to DT for Cirrus EP93xx
-> - dma: cirrus: remove platform code
+Hi Jakub,
 
-A lot of this could have been already merged if you split it... Just
-saying...
+On 26/03/2024 02:42, Jakub Kicinski wrote:
+> On Mon, 25 Mar 2024 17:32:54 +0100 Matthieu Baerts wrote:
+>> With 'virtme-ng' used by NIPA, it is possible to use VirtioFS or
+>> OverlayFS instead of 9p.
+>>
+>> VirtioFS seems to perform much better than 9p [1]. All you need is to
+>> install "virtiofsd" daemon in userspace [2]. It looks like Nipa is still
+>> using 9p for the rootfs, it might be good to switch to VirtioFS if it is
+>> easy :)
+> 
+> "All you need is to install" undersells it a little :)
+> 
+> It's not packaged for silly OS^w^w AWS Linux.
 
-Best regards,
-Krzysztof
+Thank you for having tried! That's a shame "virtiofsd" is not packaged!
+
+> And the Rust that comes with it doesn't seem to be able to build it :(
+Did you try by installing Rust (rustc, cargo) via rustup [1]? It is even
+possible to get the offline installer if it is easier [2]. With rustup,
+you can easily install newer versions of the Rust toolchain.
+
+[1] https://www.rust-lang.org/learn/get-started
+[2] https://forge.rust-lang.org/infra/other-installation-methods.html
+
+
+Do you need a hand to update the wiki page?
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
