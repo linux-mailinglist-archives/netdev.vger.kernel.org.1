@@ -1,106 +1,201 @@
-Return-Path: <netdev+bounces-82098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8820188C514
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:27:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E22C888C55B
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:40:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 288FF1F3902A
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:27:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AF911F3D338
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA15912D774;
-	Tue, 26 Mar 2024 14:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067E9763E6;
+	Tue, 26 Mar 2024 14:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qS4zhIih"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M0601OWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7964F20DF7;
-	Tue, 26 Mar 2024 14:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B310813C3D2
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711463226; cv=none; b=RPjMtCw6ea0xHgxYYqiZld7GB3i3nQPHrlq/t9QRAUPLh68UEq7NNvDS8lJ5dqo0eMUs+yem54ISk/tpwZxsQ1eHuJo46GpKH7Ah2Z8XW+BA/pTorV142/UrHF2PzloPhToUc+hVR4lLm8+qayGeBhGkEjIfXmFydTnNZA6ZhlU=
+	t=1711463999; cv=none; b=Gbp8euGI040AdmL+7LLMTvmvQQCpRuW9v50j1OraH+Whuc6IHjYT9ym8keteQFahT7qdhVxqU4VEFeiqvYBXJM7rZ2HWYoS6lhpmE2n/h8bN6+qSo9dkHGIIGDRqM6tSOuUaUFLuVohkAfTfnar1hbqV6sNdxIZFxe9qqyNOMx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711463226; c=relaxed/simple;
-	bh=qoEJASPCUxmcyaJydCy2VV6pZZWWMfCad+tM+6zcuU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qGLavpmWKlFCUMIx3VuZNXmceC81faEZdUPcnaLrhm2eLVmYAMjs/TwKprLMZhAelc0jByAqb7RFVqiCCCD45J3d8dw7S8uo/nYjbCRHDf7x3MubqGR9wdPtzzPzucHQd/HAyR/rumhrUGveYvm61kmwf8c6ubJPpA7qf71sgps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qS4zhIih; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0A48C433C7;
-	Tue, 26 Mar 2024 14:27:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711463226;
-	bh=qoEJASPCUxmcyaJydCy2VV6pZZWWMfCad+tM+6zcuU8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qS4zhIih2hC+so417yzJNvaab4L7Oie30dt1x5IbaGQQ5ivzJIMiragYqFDaziYdl
-	 V1SXGkh0w0txXIID6rDnT+oHviOLxvy2ES03x3Re1TldyhA2AUZl4DY1p11OiO+BvB
-	 3H9UHTAvd4AB2y3gwJwUCIThH2dDUGxyY4VbzCCv9zYw1fsHxcOSawEhKzQccsTFae
-	 P3CmJ4NfnmaNNexMwOrcJapL9yoTi/KTS+c9d7Jb/wfdgln34YADG86H+eV2Xk7KPV
-	 TPPczJfDQ39U0SvXP+0o9wLjnGE42PTK1qxA3d26lcrhjCWfzFnhyRdEmUavG3+dE+
-	 99qucStc/c9zg==
-Date: Tue, 26 Mar 2024 14:27:00 +0000
-From: Simon Horman <horms@kernel.org>
-To: Su Hui <suhui@nfschina.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, nathan@kernel.org,
-	ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, kernel-janitors@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH net v2 2/2] octeontx2-pf: remove unused variables req_hdr
- and rsp_hdr
-Message-ID: <20240326142700.GX403975@kernel.org>
-References: <20240326061233.4133148-1-suhui@nfschina.com>
- <20240326061233.4133148-2-suhui@nfschina.com>
+	s=arc-20240116; t=1711463999; c=relaxed/simple;
+	bh=5gV6EVhEbMv0yAYpnYZRUXxjR+lELJinE6IjzP3XhuY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I4MdUneFQ7InxFXVKXAP4bqdPzTWp4Rv/gI33zbNKGfs1ErUoM/fjb+07ttRl/3d+1undhJeykbOGd7MntDMYvKOwH6mLbyXYtzzvE5s76DwgDTJSVcQtTV28oh1VyBWFJMyhis8qFgAwJXSjEATlJprYuCtFK4VkGesmuGwhuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M0601OWg; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711463998; x=1742999998;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5gV6EVhEbMv0yAYpnYZRUXxjR+lELJinE6IjzP3XhuY=;
+  b=M0601OWgKcWkMSEQhf+UanEsh1onNdSGSIcesOEh3PKbbJR8JsNDOKr6
+   9oR7jnv4bPXE+zvWCKEiToTNPL0R0nVX5IM2WLyGf3OANjCJVFKjCNHQW
+   qrT6YzMYBQEjC0o8fsHFc1KJnhcIpxw/n+U901s0/NmjjU8vJzt7rj9qJ
+   kN9tZ6ODDo/gXNg3Q/O83US5DyxpsZnS272xzLo/Oy7g86Ei24bxF7nG4
+   EaBjHg8F7tbwc9d72JfWEj8cjbdlTunuiHBDDQ9wzg0ZBqNPtJUCkDfyg
+   HdCqgpa77DHN6uHtVeMYgzXdirx7y0rM/CRKEgBsVBEy/X6FkNoSd1v2t
+   Q==;
+X-CSE-ConnectionGUID: MOV6N3BlQEywZ5a9s1hP2w==
+X-CSE-MsgGUID: V6FpV/f2QVC9d1s3O2pjVQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="10296697"
+X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
+   d="scan'208";a="10296697"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 07:39:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
+   d="scan'208";a="16412243"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa006.jf.intel.com with ESMTP; 26 Mar 2024 07:39:54 -0700
+Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 404922819E;
+	Tue, 26 Mar 2024 14:39:42 +0000 (GMT)
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	kuba@kernel.org,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	przemyslaw.kitszel@intel.com,
+	andrew@lunn.ch,
+	victor.raj@intel.com,
+	michal.wilczynski@intel.com,
+	lukasz.czapnik@intel.com,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH net-next v8 0/6] ice: Support 5 layer Tx scheduler topology
+Date: Tue, 26 Mar 2024 10:30:36 -0400
+Message-Id: <20240326143042.9240-1-mateusz.polchlopek@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326061233.4133148-2-suhui@nfschina.com>
+Content-Transfer-Encoding: 8bit
 
-+ Dan Carpenter
+For performance reasons there is a need to have support for selectable
+Tx scheduler topology. Currently firmware supports only the default
+9-layer and 5-layer topology. This patch series enables switch from
+default to 5-layer topology, if user decides to opt-in.
 
-On Tue, Mar 26, 2024 at 02:12:36PM +0800, Su Hui wrote:
-> Clang static checker(scan-buid):
-> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:503:2: warning:
-> Value stored to 'rsp_hdr' is never read [deadcode.DeadStores]
-> 
-> Remove these unused variables to save some space.
-> 
-> Signed-off-by: Su Hui <suhui@nfschina.com>
+---
+v8:
+- fixed all drivers to use new *set pointer - commit 1
+- added setting flag in ice_copy_and_init_pkg based on family - commit 2
+- changed the way of registering devlink param - commit 5
+- changed the name of devlink param to be more descriptive - commit 5
+- added RB in commit 1 and commit 6
 
-Hi Su Hui,
+v7:
+- fixed comments from v6 in commit 1 (devlink changes) and commit 5 (ice_devlink changes)
+- included Documentation change that should be in v6 (reboot -> PCI slot powercycle)
+- added Reviewed-by tag to commit 1 (devlink changes) and commit 6 (Documentation)
+https://lore.kernel.org/netdev/20240308113919.11787-1-mateusz.polchlopek@intel.com/
 
-as pointed out by Dan in his review of v1 of this patch, it is not a fix.
-This means that it should be targeted at the net-next rather than the net
-branch. As the granularity of patch handling on netdev is generally at the
-patchset level I believe that this means that you need to separately,
-in different email threads, repost:
+v6:
+- extended devlink_param *set pointer to accept one more parameter - extack
+- adjusted all drivers that use *set pointer to pass one more parameter
+- updated Documentation - changed "reboot" to "PCI slot powercycle", kept Kuba's ACK
+- removed "Error: " prefix from NL_SET_ERR_MSG_MOD function in ice_devlink.c
+- removed/adjusted messages sent to end user in ice_devlink.c
+https://lore.kernel.org/netdev/20240305143942.23757-1-mateusz.polchlopek@intel.com/
 
-1. Patch 1/2 of this series, targeted at net
+v5:
+- updated Documentation commit as suggested in v4
+https://lore.kernel.org/netdev/20240228142054.474626-1-mateusz.polchlopek@intel.com/
 
-   [PATCH net v3] octeontx2-pf: check negative error code in otx2_open()
+v4:
+- restored the initial way of passing firmware data to ice_cfg_tx_topo
+  function in ice_init_tx_topology function in ice_main.c file. In v2
+  and v3 version it was passed as const u8 parameter which caused kernel
+  crash. Because of this change I decided to drop all Reviewed-by tags.
+https://lore.kernel.org/netdev/20240219100555.7220-1-mateusz.polchlopek@intel.com/
 
-2. Patch 2/2 of this series, targeted at net-next
+v3:
+- fixed documentation warnings
+https://lore.kernel.org/netdev/20231009090711.136777-1-mateusz.polchlopek@intel.com/
 
-   [PATCH net-next v3] octeontx2-pf: remove unused variables req_hdr
+v2:
+- updated documentation
+- reorder of variables list (default-init first)
+- comments changed to be more descriptive
+- added elseif's instead of few if's
+- returned error when ice_request_fw fails
+- ice_cfg_tx_topo() changed to take const u8 as parameter (get rid of copy
+  buffer)
+- renamed all "balance" occurences to the new one
+- prevent fail of ice_aq_read_nvm() function
+- unified variables names (int err instead of int status in few
+  functions)
+- some smaller fixes, typo fixes
+https://lore.kernel.org/netdev/20231006110212.96305-1-mateusz.polchlopek@intel.com/
 
-Also, please be sure to wait 24 hours since the posting of this patch-set
-before reposting.
+v1:
+https://lore.kernel.org/netdev/20230523174008.3585300-1-anthony.l.nguyen@intel.com/
+---
 
-Some more information can be found here:
-https://docs.kernel.org/process/maintainer-netdev.html
+Lukasz Czapnik (1):
+  ice: Add tx_scheduling_layers devlink param
 
-...
+Mateusz Polchlopek (1):
+  devlink: extend devlink_param *set pointer
+
+Michal Wilczynski (2):
+  ice: Enable switching default Tx scheduler topology
+  ice: Document tx_scheduling_layers parameter
+
+Raj Victor (2):
+  ice: Support 5 layer topology
+  ice: Adjust the VSI/Aggregator layers
+
+ Documentation/networking/devlink/ice.rst      |  47 ++++
+ .../marvell/octeontx2/otx2_cpt_devlink.c      |   9 +-
+ drivers/net/ethernet/amd/pds_core/core.h      |   3 +-
+ drivers/net/ethernet/amd/pds_core/devlink.c   |   3 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   6 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  32 +++
+ drivers/net/ethernet/intel/ice/ice_common.c   |   5 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      | 205 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |   2 +
+ drivers/net/ethernet/intel/ice/ice_devlink.c  | 184 +++++++++++++++-
+ .../net/ethernet/intel/ice/ice_fw_update.c    |   7 +-
+ .../net/ethernet/intel/ice/ice_fw_update.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_main.c     | 102 +++++++--
+ drivers/net/ethernet/intel/ice/ice_nvm.c      |   7 +-
+ drivers/net/ethernet/intel/ice/ice_nvm.h      |   3 +
+ drivers/net/ethernet/intel/ice/ice_sched.c    |  37 ++--
+ drivers/net/ethernet/intel/ice/ice_sched.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ .../marvell/octeontx2/af/rvu_devlink.c        |  12 +-
+ .../marvell/octeontx2/nic/otx2_devlink.c      |   3 +-
+ drivers/net/ethernet/mellanox/mlx4/main.c     |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c |   3 +-
+ .../mellanox/mlx5/core/eswitch_offloads.c     |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |   3 +-
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    |   3 +-
+ .../mellanox/mlxsw/spectrum_acl_tcam.c        |   3 +-
+ .../ethernet/netronome/nfp/devlink_param.c    |   3 +-
+ drivers/net/ethernet/qlogic/qed/qed_devlink.c |   3 +-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c      |   3 +-
+ drivers/net/ethernet/ti/cpsw_new.c            |   6 +-
+ drivers/net/wwan/iosm/iosm_ipc_devlink.c      |   3 +-
+ include/net/devlink.h                         |   3 +-
+ include/net/dsa.h                             |   3 +-
+ net/devlink/param.c                           |   7 +-
+ net/dsa/devlink.c                             |   3 +-
+ 35 files changed, 645 insertions(+), 84 deletions(-)
 
 -- 
-pw-bot: changes-requested
+2.38.1
+
 
