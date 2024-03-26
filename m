@@ -1,244 +1,156 @@
-Return-Path: <netdev+bounces-81860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5235188B60D
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:28:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BA2688B689
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:10:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D49991F3C7C6
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 00:28:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B65271C3541C
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439C9179;
-	Tue, 26 Mar 2024 00:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0311CA8A;
+	Tue, 26 Mar 2024 01:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jwc72MJc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="rhJ7uKz/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DC41370
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 00:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BDA1C6BB;
+	Tue, 26 Mar 2024 01:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711412910; cv=none; b=UXgFJY3rIP8V9MfvNghMh2GJr1hiDSCnUWefzJ4nIhF9q3FLbgOGQfgXaqbsSgMDZEHbkn1umlAMi2iEJ1FQw/e+dJRrHLP3ZpE2HIqfEMIAOlrB4Bm6imrYCOI3gwFDDaPO7OStdquxWN6SSNpfbvWJO+C0Tp+lx0uj/dwIlr8=
+	t=1711415401; cv=none; b=W/+fx7+/orU6IciVaDvtWHrSg2URj5L76FAI/IH2IUKDSD+35nuXrchzgF80e89NlX7f/YsXaWxc6+z1ZmVCoV3fkT3ltB6fOPIic1BqAm6aVnJk0I9nDydtHjh5zT7K4fYuKzRGwLxMN8YvuiXbKD/gR2qEgiFBwntUK8KsKWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711412910; c=relaxed/simple;
-	bh=q9rJFj0LGRVbIR7Im5V+4jATTEQF0xUdYxt97RfhsCY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GzGoyV5/DaCDkrm0GGn1IvRReRZXsrk56w0mH9i4hMugu6i4dO/Qhfp51fIikKxxMpz2S+9qoO2+6dXYBqfXV1deYVMst+1DqpbxJGCciRjf73Hr3XvWuTbxk/PapWieN1WJJI0sSs7kCZ6Q/jNk37Gylgw9gmWJduseLm+DAFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jwc72MJc; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-513e89d0816so6184544e87.0
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 17:28:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711412906; x=1712017706; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6AS6qRiVlQsc1+zZ8NlPzKQQkZa8BexCVQalpdaPfxc=;
-        b=jwc72MJcbOv3kNXMWOzcqkprlIA0kzQenPVePAM+2MCIOWNpyQlr6Bod5r9PGyvAtH
-         W6MB0rm6nc8gi1c90MEweCLFgqrpGJGagH8d9WJ+/WPLaNmtIo9qwAX7olhxp7p1+eyd
-         DcyyHKRIsnQpuHfXC265pgCXIuHYOQ18/yzNq9b12LEYr0kPYRM0GpIGdh8sOyaD9+kR
-         qvdPyYoNIACwyhXeSLQae4+A4idpRdC3nULounqP9EtnB1V1RPwCNZ4w4UvOv+JUb4FC
-         0pIfwgms3iFSJGJuud3CMLeDpCdI+yUp2mJeizZI7bwQ90Mb/sYG+eprzKPZ3MZUedo+
-         6zIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711412906; x=1712017706;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6AS6qRiVlQsc1+zZ8NlPzKQQkZa8BexCVQalpdaPfxc=;
-        b=cEga9sqf7A/9pFpZlIxXgOp5EDOwCAmNV/SMWAnnStQKzITZBermsnjS2MgA1WnS+X
-         6+NWywJyiUAQUI3r93FD57pqCZxZs0Gokr/0ONEH+WLEekfaeNZIx/QnsBbD5WKu8eyz
-         uHMdza0M7V5xmlGrATcV6ku+T/EmVzZtJKwzvTjg/LNGvGnpsKgcloO/9MpvUJJM88uE
-         e2bPCfPEnhjovppBrkXmxYjetguJ3Pg/P7Pzaj5Ixb5EhqOFzINZbxYxU0cgNym8/DHs
-         RFCvpNgtynxIXGm5cEQdc6zmY0TL9nYvRVGI6Ous/qsAB2TgOELOZzCn670K/INF1iyo
-         6+iQ==
-X-Gm-Message-State: AOJu0Ywks5Qo6G6iyDqjXXPbacdUWm7bKcG3dBFDC/ZHq3STDIkDm5XX
-	aDktvpqJugeEIRaNiiR/2OTowhuFqARxc98xx4IanyrISrDlNqDQWyC4q8siIYtTMzURI041CIC
-	NoSqC2ozAQDHFT3hMZ6zApt+r/aCwwZ/Mo/pm
-X-Google-Smtp-Source: AGHT+IF9aQZZlm3m7qhQmoIyJ6RkPwr/Dop+uoHu7fO/1Q5QVzyOPH34BhQ7Hc1bMJCfX+wA5X9L6ZhSH1TjcEziOMA=
-X-Received: by 2002:a05:6512:456:b0:513:2b35:2520 with SMTP id
- y22-20020a056512045600b005132b352520mr5371798lfk.58.1711412905481; Mon, 25
- Mar 2024 17:28:25 -0700 (PDT)
+	s=arc-20240116; t=1711415401; c=relaxed/simple;
+	bh=roh76JjuCHVUs6BqSKLBhOvR9MjqmcFIpLLx103EMp4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G0LPK8Mh/FQUXpCybK75iT+Ywt8hKKLbHVIa6vkRj9X2tPMb3BGZdbwUKWkRiFHneT0/ZbiYeaTWIAqa38Gve9FDCZ2QYuEwtWYzG67pNt5leN7uU72B91e8im1hZRagRMRFAtyju0rWAvM56xOE7Z9xNYrTLSnUScZ1ItT5WjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=rhJ7uKz/; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2+G6lqjrPiGO7sJw8UoeY7bYbprZSC43xVHllYnfJhk=; b=rhJ7uKz/jNbiljxVy2Ig0qkt0g
+	kvpuUE1lPLbwPzGEmAlvqhxspbyqAuhp3lvVu2/0lRADtNrnqN1QVyowSfck4x7sswZ3Mf2c+isL5
+	JHZn0pHwYrSeW216yn4KsRHK18declY467zYpe1aGEz4NXQ34ztnSOhzbkext8kKJgZdEYIA3CDQl
+	MqJkCcu19SKuJctfquerQaSbPbb9T0JPq0vVllSSIHhmlX5nSZbHfYt1w1RnUNz1OMZqjwluyIgKJ
+	Z/NwN46y340x2/yIZMUl99PpWvJ+BJHNP4LRLQigoe4+IwdjCfowt9nl3g3oxJgDc06FTbUHhayoY
+	+ROL5mmQ==;
+Received: from [177.34.169.255] (helo=[192.168.0.139])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1rovJx-00FHd6-1x; Tue, 26 Mar 2024 02:09:45 +0100
+Message-ID: <7f6a223f-f432-4e1b-a67e-3816448224a1@igalia.com>
+Date: Mon, 25 Mar 2024 22:09:31 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <6208950d-6453-e797-7fc3-1dcf15b49dbe@huawei.com> <CAHS8izMwTRyqUS0iRtErfAqDVsXRia5Ajx9PRK3vcfo8utJoUA@mail.gmail.com>
-In-Reply-To: <CAHS8izMwTRyqUS0iRtErfAqDVsXRia5Ajx9PRK3vcfo8utJoUA@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 25 Mar 2024 17:28:12 -0700
-Message-ID: <CAHS8izPR+SioMKNv3=2ajK=GGOE26BTaxOMykHJfjttqYjx1wQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 00/15] Device Memory TCP
-To: Yunsheng Lin <linyunsheng@huawei.com>, YiFei Zhu <zhuyifei@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/14] drm: Suppress intentional warning backtraces in
+ scaling unit tests
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: linux-kselftest@vger.kernel.org, David Airlie <airlied@gmail.com>,
+ Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>,
+ Kees Cook <keescook@chromium.org>, Daniel Diaz <daniel.diaz@linaro.org>,
+ David Gow <davidgow@google.com>, Arthur Grillo <arthurgrillo@riseup.net>,
+ Brendan Higgins <brendan.higgins@linux.dev>,
+ Naresh Kamboju <naresh.kamboju@linaro.org>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Maxime Ripard
+ <mripard@kernel.org>, =?UTF-8?B?VmlsbGUgU3lyasOkbMOk?=
+ <ville.syrjala@linux.intel.com>, Daniel Vetter <daniel@ffwll.ch>,
+ Thomas Zimmermann <tzimmermann@suse.de>, dri-devel@lists.freedesktop.org,
+ kunit-dev@googlegroups.com, linux-arch@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+ loongarch@lists.linux.dev, netdev@vger.kernel.org,
+ Linux Kernel Functional Testing <lkft@linaro.org>
+References: <20240325175248.1499046-1-linux@roeck-us.net>
+ <20240325175248.1499046-6-linux@roeck-us.net>
+ <0729b218-53f1-4139-b165-a324794a9abd@igalia.com>
+ <e880828b-552e-488e-9f31-3989bec276ae@roeck-us.net>
+Content-Language: en-US
+From: =?UTF-8?Q?Ma=C3=ADra_Canal?= <mcanal@igalia.com>
+Autocrypt: addr=mcanal@igalia.com; keydata=
+ xjMEZIsaeRYJKwYBBAHaRw8BAQdAGU6aY8oojw61KS5rGGMrlcilFqR6p6ID45IZ6ovX0h3N
+ H01haXJhIENhbmFsIDxtY2FuYWxAaWdhbGlhLmNvbT7CjwQTFggANxYhBDMCqFtIvFKVRJZQ
+ hDSPnHLaGFVuBQJkixp5BQkFo5qAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQNI+cctoYVW5u
+ GAEAwpaC5rI3wD8zqETKwGVoXd6+AbmGfZuVD40xepy7z/8BAM5w95/oyPsHUqOsg/xUTlNp
+ rlbhA+WWoaOXA3XgR+wCzjgEZIsaeRIKKwYBBAGXVQEFAQEHQGoOK0jgh0IorMAacx6WUUWb
+ s3RLiJYWUU6iNrk5wWUbAwEIB8J+BBgWCAAmFiEEMwKoW0i8UpVEllCENI+cctoYVW4FAmSL
+ GnkFCQWjmoACGwwACgkQNI+cctoYVW6cqwD/Q9R98msvkhgRvi18fzUPFDwwogn+F+gQJJ6o
+ pwpgFkAA/R2zOfla3IT6G3SBoV5ucdpdCpnIXFpQLbmfHK7dXsAC
+In-Reply-To: <e880828b-552e-488e-9f31-3989bec276ae@roeck-us.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 5, 2024 at 11:38=E2=80=AFAM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-> On Tue, Mar 5, 2024 at 4:54=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.c=
-om> wrote:
-> >
-> > On 2024/3/5 10:01, Mina Almasry wrote:
-> >
-> > ...
-> >
-> > >
-> > > Perf - page-pool benchmark:
-> > > ---------------------------
-> > >
-> > > bench_page_pool_simple.ko tests with and without these changes:
-> > > https://pastebin.com/raw/ncHDwAbn
-> > >
-> > > AFAIK the number that really matters in the perf tests is the
-> > > 'tasklet_page_pool01_fast_path Per elem'. This one measures at about =
-8
-> > > cycles without the changes but there is some 1 cycle noise in some
-> > > results.
-> > >
-> > > With the patches this regresses to 9 cycles with the changes but ther=
-e
-> > > is 1 cycle noise occasionally running this test repeatedly.
-> > >
-> > > Lastly I tried disable the static_branch_unlikely() in
-> > > netmem_is_net_iov() check. To my surprise disabling the
-> > > static_branch_unlikely() check reduces the fast path back to 8 cycles=
-,
-> > > but the 1 cycle noise remains.
-> > >
-> >
-> > The last sentence seems to be suggesting the above 1 ns regresses is ca=
-used
-> > by the static_branch_unlikely() checking?
->
-> Note it's not a 1ns regression, it's looks like maybe a 1 cycle
-> regression (slightly less than 1ns if I'm reading the output of the
-> test correctly):
->
-> # clean net-next
-> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 8 cycles(tsc)
-> 2.993 ns (step:0)
->
-> # with patches
-> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 9 cycles(tsc)
-> 3.679 ns (step:0)
->
-> # with patches and with diff that disables static branching:
-> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 8 cycles(tsc)
-> 3.248 ns (step:0)
->
-> I do see noise in the test results between run and run, and any
-> regression (if any) is slightly obfuscated by the noise, so it's a bit
-> hard to make confident statements. So far it looks like a ~0.25ns
-> regression without static branch and about ~0.65ns with static branch.
->
-> Honestly when I saw all 3 results were within some noise I did not
-> investigate more, but if this looks concerning to you I can dig
-> further. I likely need to gather a few test runs to filter out the
-> noise and maybe investigate the assembly my compiler is generating to
-> maybe narrow down what changes there.
->
+On 3/25/24 16:24, Guenter Roeck wrote:
+> Hi,
+> 
+> On Mon, Mar 25, 2024 at 04:05:06PM -0300, Maíra Canal wrote:
+>> Hi Guenter,
+>>
+>> On 3/25/24 14:52, Guenter Roeck wrote:
+>>> The drm_test_rect_calc_hscale and drm_test_rect_calc_vscale unit tests
+>>> intentionally trigger warning backtraces by providing bad parameters to
+>>> the tested functions. What is tested is the return value, not the existence
+>>> of a warning backtrace. Suppress the backtraces to avoid clogging the
+>>> kernel log.
+>>>
+>>> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>>> Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
+>>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+>>> ---
+>>> - Rebased to v6.9-rc1
+>>> - Added Tested-by:, Acked-by:, and Reviewed-by: tags
+>>>
+>>>    drivers/gpu/drm/tests/drm_rect_test.c | 6 ++++++
+>>>    1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/drivers/gpu/drm/tests/drm_rect_test.c b/drivers/gpu/drm/tests/drm_rect_test.c
+>>> index 76332cd2ead8..75614cb4deb5 100644
+>>> --- a/drivers/gpu/drm/tests/drm_rect_test.c
+>>> +++ b/drivers/gpu/drm/tests/drm_rect_test.c
+>>> @@ -406,22 +406,28 @@ KUNIT_ARRAY_PARAM(drm_rect_scale, drm_rect_scale_cases, drm_rect_scale_case_desc
+>>>    static void drm_test_rect_calc_hscale(struct kunit *test)
+>>>    {
+>>> +	DEFINE_SUPPRESSED_WARNING(drm_calc_scale);
+>>>    	const struct drm_rect_scale_case *params = test->param_value;
+>>>    	int scaling_factor;
+>>> +	START_SUPPRESSED_WARNING(drm_calc_scale);
+>>
+>> I'm not sure if it is not that obvious only to me, but it would be nice
+>> to have a comment here, remembering that we provide bad parameters in
+>> some test cases.
+> 
+> Sure. Something like this ?
+> 
+>          /*
+>           * drm_rect_calc_hscale() generates a warning backtrace whenever bad
+>           * parameters are passed to it. This affects all unit tests with an
+>           * error code in expected_scaling_factor.
+>           */
+> 
 
-I did some more investigation here to gather more data to filter out
-the noise, and recorded the summary here:
+Yeah, perfect. With that, feel free to add my
 
-https://pastebin.com/raw/v5dYRg8L
+Acked-by: Maíra Canal <mcanal@igalia.com>
 
-Long story short, the page_pool benchmark results are consistent with
-some outlier noise results that I'm discounting here. Currently
-page_pool fast path is at 8 cycles
+Best Regards,
+- Maíra
 
-[ 2115.724510] time_bench: Type:tasklet_page_pool01_fast_path Per
-elem: 8 cycles(tsc) 3.187 ns (step:0) - (measurement period
-time:0.031870585 sec time_interval:31870585) - (invoke count:10000000
-tsc_interval:86043192)
-
-and with this patch series it degrades to 10 cycles, or about a 0.7ns
-degradation or so:
-
-[  498.226127] time_bench: Type:tasklet_page_pool01_fast_path Per
-elem: 10 cycles(tsc) 3.944 ns (step:0) - (measurement period
-time:0.039442539 sec time_interval:39442539) - (invoke count:10000000
-tsc_interval:106485268)
-
-I took the time to dig into where the degradation comes from, and to
-my surprise we can shave off 1 cycle in perf by removing the
-static_branch_unlikely check in netmem_is_net_iov() like so:
-
-diff --git a/include/net/netmem.h b/include/net/netmem.h
-index fe354d11a421..2b4310ac1115 100644
---- a/include/net/netmem.h
-+++ b/include/net/netmem.h
-@@ -122,8 +122,7 @@ typedef unsigned long __bitwise netmem_ref;
- static inline bool netmem_is_net_iov(const netmem_ref netmem)
- {
- #ifdef CONFIG_PAGE_POOL
--       return static_branch_unlikely(&page_pool_mem_providers) &&
--              (__force unsigned long)netmem & NET_IOV;
-+       return (__force unsigned long)netmem & NET_IOV;
- #else
-        return false;
- #endif
-
-With this change, the fast path is 9 cycles, only  a 1 cycle (~0.35ns)
-regression:
-
-[  199.184429] time_bench: Type:tasklet_page_pool01_fast_path Per
-elem: 9 cycles(tsc) 3.552 ns (step:0) - (measurement period
-time:0.035524013 sec time_interval:35524013) - (invoke count:10000000
-tsc_interval:95907775)
-
-I did some digging with YiFei on why the static_branch_unlikely
-appears to be causing a 1 cycle regression, but could not get an
-answer that makes sense. The # of instructions in
-page_pool_return_page() with the static_branch_unlikely and without is
-about the same in the compiled .o file, and my understanding is that
-static_branch will cause code re-writing anyway so looking at the
-compiled code may not be representative.
-
-Worthy of note is that I get ~95% line rate of devmem TCP regardless
-of the static_branch_unlikely() or not, so impact of the static_branch
-is not large enough to be measurable end-to-end. I'm thinking I want
-to drop the static_branch_unlikely() in the next RFC since it doesn't
-improve the end-to-end throughput number and is resulting in a
-measurable improvement in the page pool benchmark.
-
---=20
-Thanks,
-Mina
+> Thanks,
+> Guenter
 
