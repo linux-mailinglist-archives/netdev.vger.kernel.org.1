@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-81998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ECE688C088
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:23:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 396B688C0A6
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:30:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE4571F3C7E2
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:23:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1C452C3F47
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1C15475D;
-	Tue, 26 Mar 2024 11:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6484754911;
+	Tue, 26 Mar 2024 11:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GQV9VlHA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uo8Pny64"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3537753E2E;
-	Tue, 26 Mar 2024 11:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA7D548F7;
+	Tue, 26 Mar 2024 11:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711452178; cv=none; b=GUki9Id+MsnrIzmGIZOTsITPEQkFdoavHJO/lW+z82VKRlPSqJUFhqtV97QHuaT/uhCHS9zSGAFqhu7JJxl19txteui/yIMLTMfvu8mlFLznHv+ht7g/cBBtH4nxcBtbsATsBK3/vaNgMThyXWQndWXa3LdXgBBIyP0u4u77Oac=
+	t=1711452622; cv=none; b=uGGoui5Lj+ij+CtA6K2d+eETHYQ27Fp3kUvHCMxVAhC4cRQc/33TsZhsS0hMud/eoKJEaDkEvTsFH2w6YOJixEz7wawt6UkZJ4G6O/1xar+TxpGT+g2z31Xn9linq58DiXe+Ye+lM+ZUrbxs1cW8XMI7/sgvfPX9RmeP4GlZYkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711452178; c=relaxed/simple;
-	bh=WawzTENwsYUOrDp5S0K26oozIGFl1jrEA05wmb5QyPM=;
+	s=arc-20240116; t=1711452622; c=relaxed/simple;
+	bh=+QB+k9q7X2hM6H14jozXpfcuH+qkfGW+CjSA15dosBU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nJ5Gu+HPDBGAYh9mugiuVQhDJE4PNHL2qJNMhfv7dOEFSS+lQ39PMFT3AeOEJ0DvKoOYGe8w8BgOXY2fkEWQZBRBGE5D7N8dRwjNcxcDWDe9ASRJE2AIuW6bcjzg7QPTb4S4cC237Np5Aks9tKJbDQ4I9r5B4vQTIQsIPr6n+4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GQV9VlHA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0813C433C7;
-	Tue, 26 Mar 2024 11:22:54 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cl8ciaNEqlJ203WKSV70CHPn9OZ1FMKvwizJRQgyNdaqZ+1I8fZGLNd4FwODRpksCJMDOKmDIg2sdEk5S48GeD6YHbUBCCsfg/y4/xy4G1Nj9oXpi981UbO/2j/Pg8iJt4t0r+ORUX42VXgm+RwHRzbfgGtcc9qtUorudbqMADY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uo8Pny64; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEE7EC433C7;
+	Tue, 26 Mar 2024 11:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711452177;
-	bh=WawzTENwsYUOrDp5S0K26oozIGFl1jrEA05wmb5QyPM=;
+	s=k20201202; t=1711452621;
+	bh=+QB+k9q7X2hM6H14jozXpfcuH+qkfGW+CjSA15dosBU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GQV9VlHAeTw/8dqGLG3t5wlWDT7oCEKR6rQHIChe3CQ6LIRUNSfi/kYjKD57e9Svf
-	 hPhyEFNjnxAgYimBoIU7AA0ikXajsUVs94wa7lMdxMmmwRYUuOlZMbJhh3urVf0JOE
-	 NeP1DhKJ1e6FyHjeqG3JaLYzTwast0tJZB5L8gVP9LEcUBbic5Eg391Eklx3G7ZDyo
-	 NtopiBh6iLhvqp+0Xr9NC5ya1bI+V2iwe04vDDAUoyPQiTP67ZWKjWhJv48xob34vS
-	 4N0mXgJrDn8FTOP77zSmkB1koQ9lqsynAwYoT3owghDZSeMKP//1lZyaw0klQoUJ2a
-	 iD+hT0uIHOhbw==
-Date: Tue, 26 Mar 2024 11:22:52 +0000
+	b=Uo8Pny64VQXHeZ5mqC4adPId0bEvhoSchLKYMZMNbcRL0uAcYlTM7DoeBCMmOONja
+	 xtChP763RO3j1b/wp0DyRlrKq9hDimZOA0r+8Bx2ZqMvgw7ozmZaGjgRWoPG3QoSUN
+	 48YjpKtJHV1z2Aud4c8oomshD/lL7cYQlLGT6sG/JFcdrbIozo0KJA4GwD5EGoq6Hu
+	 HC10i/qZQfFP23Skln9hI5JRZc0EJx2Or6rHzHPDefSOSOyywYDGh2gqPUxWhtrD1u
+	 5iCTxoyq3gsC2f38M455rC3yOIAf1grksF7f9nnB8OSGSpo3yxTk1A+Zjn7vTu97d5
+	 MUNXDr4EzH0Bw==
+Date: Tue, 26 Mar 2024 11:30:16 +0000
 From: Simon Horman <horms@kernel.org>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
@@ -50,11 +50,11 @@ Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
 	shenjian15@huawei.com, wangjie125@huawei.com,
 	liuyonglong@huawei.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 net 1/3] net: hns3: fix index limit to support all
- queue stats
-Message-ID: <20240326112252.GN403975@kernel.org>
+Subject: Re: [PATCH V4 net 3/3] net: hns3: mark unexcuted loopback test
+ result as UNEXECUTED
+Message-ID: <20240326113016.GO403975@kernel.org>
 References: <20240325124311.1866197-1-shaojijie@huawei.com>
- <20240325124311.1866197-2-shaojijie@huawei.com>
+ <20240325124311.1866197-4-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,19 +63,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240325124311.1866197-2-shaojijie@huawei.com>
+In-Reply-To: <20240325124311.1866197-4-shaojijie@huawei.com>
 
-On Mon, Mar 25, 2024 at 08:43:09PM +0800, Jijie Shao wrote:
-> From: Jie Wang <wangjie125@huawei.com>
+On Mon, Mar 25, 2024 at 08:43:11PM +0800, Jijie Shao wrote:
+> From: Jian Shen <shenjian15@huawei.com>
 > 
-> Currently, hns hardware supports more than 512 queues and the index limit
-> in hclge_comm_tqps_update_stats is wrong. So this patch removes it.
+> Currently, loopback test may be skipped when resetting, but the test
+> result will still show as 'PASS', because the driver doesn't set
+> ETH_TEST_FL_FAILED flag. Fix it by setting the flag and
+> initializating the value to UNEXECUTED.
 > 
-> Fixes: 287db5c40d15 ("net: hns3: create new set of common tqp stats APIs for PF and VF reuse")
-> Signed-off-by: Jie Wang <wangjie125@huawei.com>
+> Fixes: 4c8dab1c709c ("net: hns3: reconstruct function hns3_self_test")
+> Signed-off-by: Jian Shen <shenjian15@huawei.com>
 > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 > Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
