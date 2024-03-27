@@ -1,249 +1,229 @@
-Return-Path: <netdev+bounces-82550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D239788E8AB
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:23:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98DD588E8DE
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6390C1F2FD58
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:23:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC3111C30256
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8DF131BC1;
-	Wed, 27 Mar 2024 15:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEAEA12D76A;
+	Wed, 27 Mar 2024 15:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+uLdb2H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUH9C+8L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D5184A2A;
-	Wed, 27 Mar 2024 15:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDE43A28B;
+	Wed, 27 Mar 2024 15:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711552258; cv=none; b=Gt84/ybaXzp8ZA1eM7AJQ0W7TmmianZyFahfA/KfQ8Yy5uFty07dgRphXxbyZFLRXFIfJ+5rGstR/4Gut015vFr7SqlZun3iv0Fmy/0GvmXcKubnvvgcMt/yEF4kwhQtdLZQDm1KMgZJrT1Au1IuI3SPx695uLTE5VpxLpYLir0=
+	t=1711552810; cv=none; b=kTrf/ruxswuFsWOK6vKSzkIOsnSlOEBEWmZNEfXpOinT6e47RPhgZLTt37cIkmSoqAViiJekScXAw8QHjU5VLBdscgtXLvfQ+cbhCrhocl/mVxvLXbMPjaFugsSB81vY/iiwTOlHQEyvu8PNBApug6hXjqJZbg6qSp6vw7eBZ1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711552258; c=relaxed/simple;
-	bh=hZADyUy9JYJUx70kDvTSFdOct8TUW++G/hR/m5TbJ5I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t9D4Qfo6rKAGqd8LE7XF5F9yIYDspV6E2mg7LEm37hxFb6uGIo7sbpldFtQERJS2nw+aDPBrxgxGkYoXlBul1pt+oylRDE74GNBYzFkt6hA47LzE+e+36vuwdPw9YoJ//n/3q2Lf04TjW318mHvwhTMVNSTgQCu8nWUTAPN1cW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+uLdb2H; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	s=arc-20240116; t=1711552810; c=relaxed/simple;
+	bh=AGB35Fob2y5UQt4B0th7Kiu3sbhYIiNFab3gZ3YruNg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M+wMxeIKTJ/PDT3/UYa4OmouJ8gBlGpIZ5Ott7FoQEOd2g6W+++RODlww9fkiElJ4wxGDFl2x5nKTuXV2ntoMl3dXLMDYmTjqkEaxOuMLpY6JaJkFyYmyuDJXebt5z8VL85/LOTKNml5BDno7kTn1L9J5ybMs2/8RagmKzYJSJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FUH9C+8L; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6e6b54a28d0so4670040b3a.2;
-        Wed, 27 Mar 2024 08:10:55 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4149749cc36so2364245e9.0;
+        Wed, 27 Mar 2024 08:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711552255; x=1712157055; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=GhC1S2pW9btr9pVuDZELsqNgJuQdIsA6xlv8onmT65s=;
-        b=i+uLdb2HWxyuVw5Db3DGWEk9UTq0u831fRAaB2ysl3AReUdwpgOmdJSI3NfmAjaLV3
-         fTyL+m4fn+NLF3FbRspB/r630RmPsawW3kcHO43rIISjS3kbd+nAeY+VKu9cZv6d/k7m
-         uOK8qtUg08v9Yl+cLpg10W3rftFrOmiRtY8pOAXmQwgr6o/j4qM8ZeWw46ptRvqh+8NK
-         eka3CHtIKvAoL4PXYjG4RsqyAJ+osfJTq4IKwKmUQKc1JUMArzxtQ+bKn3L8dsXTb3rt
-         ySIIWblJ4mubCcfXZmdUyGL5CHJ2uJeXMdNoIQXl04bPmBlTci/r7ymym73B4icqjtgB
-         L3UA==
+        d=gmail.com; s=20230601; t=1711552805; x=1712157605; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Eb4ZlIHwFzNSo4XEEI4kSHnkSklEZQmdWPWfzTXDpFk=;
+        b=FUH9C+8LBK+siUCqp26jKs6UzW3JCzpDj9HgWZVRXIO4GeIwBez3IP324g169pJZ7c
+         S8R3tXx0GUEppQpO/tqmbZhPDss/JLysDUIu8iWM5sXnMepWSFGr3vOZQ9oTJP31/REX
+         nJXH3Y2A2tfkzQDw7GjUR7x3NGhWDkLRXqIRlvtd1x2LPQUnJAt4d9MEwj3BgchA4hrM
+         NfHWobCkmvmbO3R+SJQB6UX2c40l9MS6IqVENkF67xEiF5YArpP4FTrEnKOciWR8Ds34
+         XhJpPjX79r+DO9unmtU0Nk91g7fuAF+l9z17drHFuurnbEb7LgNn51NSZTwtGQ+66qzp
+         mSYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711552255; x=1712157055;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GhC1S2pW9btr9pVuDZELsqNgJuQdIsA6xlv8onmT65s=;
-        b=MXJzXQGbINSrOd0jrh7vcHD2mTq/I+jhGLBvaWnAcT7EdQUAlk1wgyhMEGdv9rOw2/
-         bDYUA+7Tm0k4qM3+37ORS5kzDnfjBjrbqEdLcrW883eQfsqhmVZW0v2ps3jKuIaVw5hu
-         u801y4DtvUEZKIJIwQf2aK3rz1khzr2n1c8vIk4DhE6/ETVAus1vxbFkTEy3KPTsFt1a
-         31Mee5cGAVLOAawOJbyyE9TKGxCgM4meGEalK/9mIbMGlNdOYDnrWmAFUxbfx4dYy8er
-         gG69s1TlMyHOXccKfKDmH7W5MnuaiH9Wu1gEQBqC3X2zRY61rhFOWGuMkdpYj1JCYVBo
-         OLlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpnzUcC5UQTlsfMkvZ1VUHfkeei8qR7u150mc2S2RgTEJybHqJ7yFZDxeq/4ZqZrOVI4Nc99Agy6yHL9CpYiIh5vbNbWRYwWZCnTZhfM7rkg4vXd9AO13NzZFm4/sNFhvrLtK+S5HBlTbIWk/vwC67FyPEqtExw29529uZQYrwFHUhol916KNNX994ecygkXEZ+jorwFWq6fCr0TYfnFYIKw58Q3+X6drBoEoFcFNXnlnar9b3HwzL1vWlEH5tpZvXUsakludCERBIId2bLab6ZsfHkN3DB+v9c3yro/3/dYEembAu/iMALJ9JWS8oVw==
-X-Gm-Message-State: AOJu0Yw8W7WHi7TVqQIhNDTmQUv0WDfoFRXAmfC88VWaz5eA9nqxLifk
-	b9Jv71yhmkwmKENAJaDxZ66ieazhBkxqTgNHCMcWvacCYnW1Wftz
-X-Google-Smtp-Source: AGHT+IFTcwPFOlfI6eRT+0rf0ZnAMCTISb8ttH9tKFaraPJRt460mqVcAAiNBuFiDAxZrRyiWoSPIw==
-X-Received: by 2002:a05:6a20:f39d:b0:1a0:adbc:7a96 with SMTP id qr29-20020a056a20f39d00b001a0adbc7a96mr225466pzb.36.1711552255375;
-        Wed, 27 Mar 2024 08:10:55 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id u8-20020a62ed08000000b006e4e616e520sm7950526pfh.72.2024.03.27.08.10.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 08:10:54 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <320aacc6-b7e5-4c3d-948e-d0743ab26c5d@roeck-us.net>
-Date: Wed, 27 Mar 2024 08:10:51 -0700
+        d=1e100.net; s=20230601; t=1711552805; x=1712157605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Eb4ZlIHwFzNSo4XEEI4kSHnkSklEZQmdWPWfzTXDpFk=;
+        b=rDiiC/U/ZAdBFZ9r5iUaww6QylzxDMbWhSWPzdcNofujJhSDgUsFqzaED6jlngZMgb
+         LGg367BqLl1KrSTKOLOwfwu3yIVikhl8g2sHZ+bYXpyhdzi4e5adOJs1FshTpQwQdfVs
+         RpfADBGNWf2s/mXqUfQz2bONwemHd1Tz0eJ2B8MvbrfkeGJug/qn9Xls/MlSUNjLzFFw
+         Od18cbxRrBH36glniUhaJpdHaNUMYGnoQUEG8aMva9Lne+7YhIJeWrTHjOALAZ9mFO+T
+         EBj6C8wLknorTvR+j3mte+D34KErUuq7yFDg1QGAg+1bwBYwlQXODN0faktTMi9n/If4
+         hDiA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ4ipLQ2kgyTADlSGJCYC2YK2AiZhAD8NmCaNdFqLJTsXeMaOEdTXs+9LXZORERk8LFhi9SMvsXBmvTMKQOahxQEfhJRVJOpMa9v5ODxNPq/pFcOCc5CGlhpuYvNycdzQFqIBY5TweRDnGzw9uABv186k6bgFdDwm7
+X-Gm-Message-State: AOJu0Yw2s0Ho9s+7RlcMAMSqTH72U72JNLgIbXRWuoDVqA5AGZW/QKJN
+	MyBJNWJ3vRuOSVA5Sy6J5NZAK4lhYzLYXhX+TR/9UZjs4zHdsqFE57Dk97HRMWRl9XtiMwIBdD+
+	nDZ/W0VaoRQRDLfITE6B7toj5rWw=
+X-Google-Smtp-Source: AGHT+IGrazYcWWtMjkDSZxv9LDncYBgQMoVg+p+/F/y3qeG444ccoI5fBYKA8jZew1ly0agNjobWNV3csS0RvCqQCoA=
+X-Received: by 2002:adf:e849:0:b0:341:e0fd:4dec with SMTP id
+ d9-20020adfe849000000b00341e0fd4decmr187632wrn.6.1711552804380; Wed, 27 Mar
+ 2024 08:20:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/14] sh: Add support for suppressing warning
- backtraces
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: linux-kselftest@vger.kernel.org, David Airlie <airlied@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, =?UTF-8?Q?Ma=C3=ADra_Canal?=
- <mcanal@igalia.com>, Dan Carpenter <dan.carpenter@linaro.org>,
- Kees Cook <keescook@chromium.org>, Daniel Diaz <daniel.diaz@linaro.org>,
- David Gow <davidgow@google.com>, Arthur Grillo <arthurgrillo@riseup.net>,
- Brendan Higgins <brendan.higgins@linux.dev>,
- Naresh Kamboju <naresh.kamboju@linaro.org>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Andrew Morton <akpm@linux-foundation.org>, Maxime Ripard
- <mripard@kernel.org>, =?UTF-8?B?VmlsbGUgU3lyasOkbMOk?=
- <ville.syrjala@linux.intel.com>, Daniel Vetter <daniel@ffwll.ch>,
- Thomas Zimmermann <tzimmermann@suse.de>, dri-devel@lists.freedesktop.org,
- kunit-dev@googlegroups.com, linux-arch@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
- loongarch@lists.linux.dev, netdev@vger.kernel.org,
- Linux Kernel Functional Testing <lkft@linaro.org>
-References: <20240325175248.1499046-1-linux@roeck-us.net>
- <20240325175248.1499046-13-linux@roeck-us.net>
- <20240327144431.GL403975@kernel.org>
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-In-Reply-To: <20240327144431.GL403975@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <000000000000f6531b061494e696@google.com> <00000000000069ee1a06149ff00c@google.com>
+In-Reply-To: <00000000000069ee1a06149ff00c@google.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 27 Mar 2024 08:19:52 -0700
+Message-ID: <CAADnVQLpJwEfLoF9ORc7bSsDPG7Y05mWUpWWyfi7qjY+2LhC+Q@mail.gmail.com>
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue
+To: syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/27/24 07:44, Simon Horman wrote:
-> On Mon, Mar 25, 2024 at 10:52:46AM -0700, Guenter Roeck wrote:
->> Add name of functions triggering warning backtraces to the __bug_table
->> object section to enable support for suppressing WARNING backtraces.
->>
->> To limit image size impact, the pointer to the function name is only added
->> to the __bug_table section if both CONFIG_KUNIT_SUPPRESS_BACKTRACE and
->> CONFIG_DEBUG_BUGVERBOSE are enabled. Otherwise, the __func__ assembly
->> parameter is replaced with a (dummy) NULL parameter to avoid an image size
->> increase due to unused __func__ entries (this is necessary because __func__
->> is not a define but a virtual variable).
->>
->> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
->> Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
->> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->> ---
->> - Rebased to v6.9-rc1
->> - Added Tested-by:, Acked-by:, and Reviewed-by: tags
->> - Introduced KUNIT_SUPPRESS_BACKTRACE configuration option
->>
->>   arch/sh/include/asm/bug.h | 26 ++++++++++++++++++++++----
->>   1 file changed, 22 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/sh/include/asm/bug.h b/arch/sh/include/asm/bug.h
->> index 05a485c4fabc..470ce6567d20 100644
->> --- a/arch/sh/include/asm/bug.h
->> +++ b/arch/sh/include/asm/bug.h
->> @@ -24,21 +24,36 @@
->>    * The offending file and line are encoded in the __bug_table section.
->>    */
->>   #ifdef CONFIG_DEBUG_BUGVERBOSE
->> +
->> +#ifdef CONFIG_KUNIT_SUPPRESS_BACKTRACE
->> +# define HAVE_BUG_FUNCTION
->> +# define __BUG_FUNC_PTR	"\t.long %O2\n"
->> +#else
->> +# define __BUG_FUNC_PTR
->> +#endif /* CONFIG_KUNIT_SUPPRESS_BACKTRACE */
->> +
-> 
-> Hi Guenter,
-> 
-> a minor nit from my side: this change results in a Kernel doc warning.
-> 
->       .../bug.h:29: warning: expecting prototype for _EMIT_BUG_ENTRY(). Prototype was for HAVE_BUG_FUNCTION() instead
-> 
-> Perhaps either the new code should be placed above the Kernel doc,
-> or scripts/kernel-doc should be enhanced?
-> 
+Toke, Jesper,
 
-Thanks a lot for the feedback.
+please take a look.
+It's reproducible 100% of the time.
+dst is NULL in dev_map_enqueue().
 
-The definition block needs to be inside CONFIG_DEBUG_BUGVERBOSE,
-so it would be a bit odd to move it above the documentation
-just to make kerneldoc happy. I am not really sure that to do
-about it.
+Thanks
 
-I'll wait for comments from others before making any changes.
-
-Thanks,
-Guenter
-
->>   #define _EMIT_BUG_ENTRY				\
->>   	"\t.pushsection __bug_table,\"aw\"\n"	\
->>   	"2:\t.long 1b, %O1\n"			\
->> -	"\t.short %O2, %O3\n"			\
->> -	"\t.org 2b+%O4\n"			\
->> +	__BUG_FUNC_PTR				\
->> +	"\t.short %O3, %O4\n"			\
->> +	"\t.org 2b+%O5\n"			\
->>   	"\t.popsection\n"
->>   #else
->>   #define _EMIT_BUG_ENTRY				\
->>   	"\t.pushsection __bug_table,\"aw\"\n"	\
->>   	"2:\t.long 1b\n"			\
->> -	"\t.short %O3\n"			\
->> -	"\t.org 2b+%O4\n"			\
->> +	"\t.short %O4\n"			\
->> +	"\t.org 2b+%O5\n"			\
->>   	"\t.popsection\n"
->>   #endif
->>   
->> +#ifdef HAVE_BUG_FUNCTION
->> +# define __BUG_FUNC	__func__
->> +#else
->> +# define __BUG_FUNC	NULL
->> +#endif
->> +
->>   #define BUG()						\
->>   do {							\
->>   	__asm__ __volatile__ (				\
-> 
-> ...
-
+On Wed, Mar 27, 2024 at 1:10=E2=80=AFAM syzbot
+<syzbot+af9492708df9797198d6@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has found a reproducer for the following issue on:
+>
+> HEAD commit:    443574b03387 riscv, bpf: Fix kfunc parameters incompatibi=
+l..
+> git tree:       bpf
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D17d370b118000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D6fb1be60a193d=
+440
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Daf9492708df9797=
+198d6
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D13d6b041180=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1060cc8118000=
+0
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/3f355021a085/dis=
+k-443574b0.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/44cf4de7472a/vmlinu=
+x-443574b0.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/a99a36c7ad65/b=
+zImage-443574b0.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
+>
+> general protection fault, probably for non-canonical address 0xdffffc0000=
+000000: 0000 [#1] PREEMPT SMP KASAN PTI
+> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+> CPU: 1 PID: 5078 Comm: syz-executor295 Not tainted 6.8.0-syzkaller-05236-=
+g443574b03387 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 02/29/2024
+> RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+> Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 0=
+0 00 00 00 00 fc ff df e8 a6 42 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00=
+ 74 08 48 89 ef e8 10 8a 3b 00 4c 8b 7d 00 48 83 c5
+> RSP: 0018:ffffc90003bef688 EFLAGS: 00010246
+> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888022169e00
+> RDX: 0000000000000000 RSI: ffff88802ef65070 RDI: 0000000000000000
+> RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff90e
+> R10: 0000000000000004 R11: ffff888022169e00 R12: ffff888015bd0000
+> R13: ffff88802ef65070 R14: dffffc0000000000 R15: ffff8880b953c088
+> FS:  000055558e3b9380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f1141b380d0 CR3: 0000000021838000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  __xdp_do_redirect_frame net/core/filter.c:4384 [inline]
+>  xdp_do_redirect_frame+0x20d/0x4d0 net/core/filter.c:4438
+>  xdp_test_run_batch net/bpf/test_run.c:336 [inline]
+>  bpf_test_run_xdp_live+0xe8a/0x1e90 net/bpf/test_run.c:384
+>  bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
+>  bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
+>  __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
+>  __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+>  __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+>  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
+>  do_syscall_64+0xfb/0x240
+>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> RIP: 0033:0x7f1141ac0fb9
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffe180a1958 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f1141ac0fb9
+> RDX: 0000000000000048 RSI: 0000000020000340 RDI: 000000000000000a
+> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000006
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
+>  </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+> Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 0=
+0 00 00 00 00 fc ff df e8 a6 42 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00=
+ 74 08 48 89 ef e8 10 8a 3b 00 4c 8b 7d 00 48 83 c5
+> RSP: 0018:ffffc90003bef688 EFLAGS: 00010246
+> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888022169e00
+> RDX: 0000000000000000 RSI: ffff88802ef65070 RDI: 0000000000000000
+> RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff90e
+> R10: 0000000000000004 R11: ffff888022169e00 R12: ffff888015bd0000
+> R13: ffff88802ef65070 R14: dffffc0000000000 R15: ffff8880b953c088
+> FS:  000055558e3b9380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f1141b380d0 CR3: 0000000021838000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> ----------------
+> Code disassembly (best guess):
+>    0:   41 56                   push   %r14
+>    2:   41 55                   push   %r13
+>    4:   41 54                   push   %r12
+>    6:   53                      push   %rbx
+>    7:   48 83 ec 18             sub    $0x18,%rsp
+>    b:   49 89 d4                mov    %rdx,%r12
+>    e:   49 89 f5                mov    %rsi,%r13
+>   11:   48 89 fd                mov    %rdi,%rbp
+>   14:   49 be 00 00 00 00 00    movabs $0xdffffc0000000000,%r14
+>   1b:   fc ff df
+>   1e:   e8 a6 42 d8 ff          call   0xffd842c9
+>   23:   48 89 e8                mov    %rbp,%rax
+>   26:   48 c1 e8 03             shr    $0x3,%rax
+> * 2a:   42 80 3c 30 00          cmpb   $0x0,(%rax,%r14,1) <-- trapping in=
+struction
+>   2f:   74 08                   je     0x39
+>   31:   48 89 ef                mov    %rbp,%rdi
+>   34:   e8 10 8a 3b 00          call   0x3b8a49
+>   39:   4c 8b 7d 00             mov    0x0(%rbp),%r15
+>   3d:   48                      rex.W
+>   3e:   83                      .byte 0x83
+>   3f:   c5                      .byte 0xc5
+>
+>
+> ---
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
 
