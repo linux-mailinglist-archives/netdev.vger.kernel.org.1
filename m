@@ -1,141 +1,124 @@
-Return-Path: <netdev+bounces-82577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C22F88E96C
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:41:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C6F488E9D4
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 107721F31EBE
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:41:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E88F1C315B0
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FC959B71;
-	Wed, 27 Mar 2024 15:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43A412EBC6;
+	Wed, 27 Mar 2024 15:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="JnmygjQ3";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="L5St7XrR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kkSyUHW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout3-smtp.messagingengine.com (fout3-smtp.messagingengine.com [103.168.172.146])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A424F5F8;
-	Wed, 27 Mar 2024 15:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A620B59B71;
+	Wed, 27 Mar 2024 15:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711553695; cv=none; b=feE3EWea2sSctiX4ahyCgn5GoKXKjoREEPUJ6iJTCrZU/4SjarwHbUjLet9CMa6DDdixnB7HDTAp9nsOIEbQUMcsSvEgJdnOpTyOXymrk6CtMjZ8scMVSKk6wjBe3pDJLelCSKq5Z83rgVFB/2xHAI2tyvnZRI3EespGLRttrVA=
+	t=1711554527; cv=none; b=m4h8/Ywyo2k0VfYWlVtPdK8rfeP+uQYFOXrSh7McVxECtgwpPBW1UBlcKCSU/yS+F5kUg69/c2OobLOr3gFszLywierVQOx+BUu9rENO4WXN9cPnDC2ifiIQAK+aVbqLpdeywAal5/oV+9YW61FZaedZpkH2/k5J19zIImZzYKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711553695; c=relaxed/simple;
-	bh=lUHWRBpXKfmP0a3SvWBrN/BSuWtzBTXtGgk7O5R0Pz8=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=IKckvJZvS1Hxc4/6vB9kkUUFitoPtKgTv+dehR3/KOMcKiGjFeoTWQfMl8Cz8hxSdKz4cXdac8taqa2+p2hCE+f9OOI8VDjpqHJMN9Rqpr7WfVRb4APShi/COUw3bqfRAiUtCtDj+dGgkScBsHyaV83OxShOxC64iKKu2LAGQQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=JnmygjQ3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=L5St7XrR; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.nyi.internal (Postfix) with ESMTP id 4EE5A1380090;
-	Wed, 27 Mar 2024 11:34:52 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 27 Mar 2024 11:34:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm1; t=1711553692; x=1711640092; bh=gJ7Xh4n4V5
-	9XATJeqHFzpnTJe2/5ypdcmW4oC7ig2Jw=; b=JnmygjQ3q8nH17VFO7y4ypXObv
-	H5QudRFgGDXD3iPOWTOhnrfraaE2jEe2ZuERyQqkAvzguzWvrw9Xbrl0BgYPsuM1
-	GQ91t4Eis0L2+PN6k9VKMgJbLNAEAnTipnubkg4/slYpNAUjCl+7dl3rILjuauvY
-	aYFmTGt9RAfZ5TxlObNwaJ+oNo8mE5Z20aV/t6095L8EmaBbAODemR5brQFz0I/m
-	fuM0RyeEluV2vMB/1pEl0KkawNa/6R5bW15G4adjuaejW5wrxm8e4nDLNXKnA27p
-	mnrmYFcBXYCaLlIpAzZ6XvBjrkwnGXvILz+PNvwuHH/zrAULDefFEz5MxgAA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1711553692; x=1711640092; bh=gJ7Xh4n4V59XATJeqHFzpnTJe2/5
-	ypdcmW4oC7ig2Jw=; b=L5St7XrR3/MAPQEbqvRF4QviegIL+Af8tRM+ibhX+Aae
-	E8zvBhoh6gXO0RvQC22z/HNJk0FQWX9oin4ojBOoC43Iif/1ukDnl7LtyhzQe/O7
-	WVmcp2VK6YD4xl8NARuAKzSaeCa01c5F4RffS1sQeaHJ9lGp/CPWI6d4lgHwzBmd
-	i6tYyXQtIEvPGQzUOhKL5jfH44+kvvAA2DsBR2jzM1LiIrFRBvuUERZuU+fmuqta
-	0T/1W/EkmLWLaeSkC0IG3JOGUbQIijCPQRq3t1CPyFBv+2H6eO79zC97SXw1SDbH
-	2q9WhEDNMb0UjKsxgbNa+Wb/wiOnjmuOw+ITwsaFkg==
-X-ME-Sender: <xms:mzwEZu78CN3xb6AsalWwSx4P7qfguZ-yv_lPNT-uYwb7STNBkAP1Uw>
-    <xme:mzwEZtKOeM70KUmof9Q-MtZ1_K8bRjZu_8gkqVVkOaDajHM8x87vxc2pZrw7qr1j7
-    KMh3oJk2VhR0tMLne0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudduiedgheegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:mzwEZvIa0ddXl7H1YeHdrSnPfbrS8lvG4dT2BrK5nfhSj4O6_NpDqQ>
-    <xmx:mzwEZjXbnqlH0QatGBlS6dFGkxorexklKNvm0yv3OwPZ5AOc7vVdrw>
-    <xmx:mzwEZpg8SyT9WSa8Ms_UCnN7MkzF4THhZf2o4VbSH6enMQBuAemUFQ>
-    <xmx:mzwEZm_aX6I356Aj0Po9_lJmRoa91EnBg2JiPYlouwvd42KNhHzBQw>
-    <xmx:nDwEZl4kWE5_OcwQPWec-d7QUMWV-jF7kzVebwQYJFkfSPeQ_ERQCg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 7F4F4B60098; Wed, 27 Mar 2024 11:34:51 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-328-gc998c829b7-fm-20240325.002-gc998c829
+	s=arc-20240116; t=1711554527; c=relaxed/simple;
+	bh=/Fy+XebLi84xhsuIn0Baks2bdrJHrKjSXbeknmduzQQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j1yre8lcxQ1uqC980iO9uUckDi1ZkUavBm4WLgcM4zHSgXEhDttd0B+KvGeyjhrEwkznWf3UGyQrS2RtZu+Zc8trdyIp60RCjs0j8oRAN60qnHHSeIN6/1DBWJz2RPvPAnxYuMOsiK8atrVoVqHf7yOKvZ7n5/i/D665bzeMef4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kkSyUHW/; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711554526; x=1743090526;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/Fy+XebLi84xhsuIn0Baks2bdrJHrKjSXbeknmduzQQ=;
+  b=kkSyUHW/2PYK1GRO1HK04wjlFtJoeWO6hQScOxYolLGEAsxqsuURWqVh
+   TAjj80i9Nnq/z1qdR8Y42vtSL7nhyJFaWuRO4zxps2JM612FrdnT7HO3O
+   kHC3G/bxygHwUmGVHwllr6VBgP1aUPFc303MfQ73Ah9DDj8BlNN64wPwb
+   UyUvowuF6nua91zFW8vLFQr0d5Lm05WJTVXT4LUbGRWN/g5yNxTkri1Eq
+   kB82A2Sx5CFPaFcYftIvyRcEDcLC5XAk10+9nlRAAWm3Tl1yMzz16si3o
+   4WKMtqVx2K3jDP5Sz4xHVF8R7LbFN+kIHaudo1pUlr12/FGZkorDgI60E
+   Q==;
+X-CSE-ConnectionGUID: 1l8k0xYFS+mLAK9NhKsaxA==
+X-CSE-MsgGUID: whvq8QYyTk+YYMitxoeVmg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="24119406"
+X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
+   d="scan'208";a="24119406"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 08:48:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="914916637"
+X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
+   d="scan'208";a="914916637"
+Received: from smile.fi.intel.com (HELO smile) ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 08:48:35 -0700
+Received: from andy by smile with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rpVVe-0000000Gjzz-2WQr;
+	Wed, 27 Mar 2024 17:48:14 +0200
+Date: Wed, 27 Mar 2024 17:47:56 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 02/21] lib/test_bitmap: add tests for
+ bitmap_{read,write}()
+Message-ID: <ZgQ_rP5KnMfL-0b2@smile.fi.intel.com>
+References: <20240327152358.2368467-1-aleksander.lobakin@intel.com>
+ <20240327152358.2368467-3-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <6242198a-8559-4465-918a-36442ea03e32@app.fastmail.com>
-In-Reply-To: 
- <CO1PR18MB4666DF3B7684D340C3A3646DA1342@CO1PR18MB4666.namprd18.prod.outlook.com>
-References: <20240326223825.4084412-1-arnd@kernel.org>
- <20240326223825.4084412-4-arnd@kernel.org>
- <CO1PR18MB4666DF3B7684D340C3A3646DA1342@CO1PR18MB4666.namprd18.prod.outlook.com>
-Date: Wed, 27 Mar 2024 16:34:31 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Subbaraya Sundeep Bhatta" <sbhatta@marvell.com>,
- "Arnd Bergmann" <arnd@kernel.org>,
- "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
- "Ariel Elior" <aelior@marvell.com>, "Manish Chopra" <manishc@marvell.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Nathan Chancellor" <nathan@kernel.org>,
- "Nick Desaulniers" <ndesaulniers@google.com>,
- "Bill Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>,
- "Simon Horman" <horms@kernel.org>,
- "Konstantin Khorenko" <khorenko@virtuozzo.com>,
- "Sudarsana Reddy Kalluru" <sudarsana.kalluru@cavium.com>,
- Netdev <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] [PATCH 3/9] qed: avoid truncating work queue length
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327152358.2368467-3-aleksander.lobakin@intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Wed, Mar 27, 2024, at 15:04, Subbaraya Sundeep Bhatta wrote:
+On Wed, Mar 27, 2024 at 04:23:39PM +0100, Alexander Lobakin wrote:
+> From: Alexander Potapenko <glider@google.com>
+> 
+> Add basic tests ensuring that values can be added at arbitrary positions
+> of the bitmap, including those spanning into the adjacent unsigned
+> longs.
+> 
+> Two new performance tests, test_bitmap_read_perf() and
+> test_bitmap_write_perf(), can be used to assess future performance
+> improvements of bitmap_read() and bitmap_write():
+> 
+> [    0.431119][    T1] test_bitmap: Time spent in test_bitmap_read_perf:	615253
+> [    0.433197][    T1] test_bitmap: Time spent in test_bitmap_write_perf:	916313
+> 
+> (numbers from a Intel(R) Xeon(R) Gold 6154 CPU @ 3.00GHz machine running
+> QEMU).
+> 
+> Signed-off-by: Alexander Potapenko <glider@google.com>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Acked-by: Yury Norov <yury.norov@gmail.com>
 
->>-		snprintf(name, NAME_SIZE, "slowpath-%02x:%02x.%02x",
->>-			 cdev->pdev->bus->number,
->>-			 PCI_SLOT(cdev->pdev->devfn), hwfn->abs_pf_id);
->>+		hwfn->slowpath_wq = alloc_workqueue("slowpath-
->>%02x:%02x.%02x",
->>+					 0, 0, cdev->pdev->bus->number,
->>+					 PCI_SLOT(cdev->pdev->devfn),
->>+					 hwfn->abs_pf_id);
->
-> Confused. This should be alloc_workqueue("slowpath-%02x:%02x.%02x",  
-> cdev->pdev->bus->number, PCI_SLOT(cdev->pdev->devfn), hwfn->abs_pf_id, 
-> 0, 0);
-> Right?
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
 
-I still think my version is the right one here, see the
-prototype:
+This is a bit strange.
+Can you explain the SoB chain in this patch and similar which have Yury's SoB?
 
-__printf(1, 4) struct workqueue_struct *
-alloc_workqueue(const char *fmt, unsigned int flags, int max_active, ...);
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-so the first argument in the format, while the printf arguments
-start after the flags and max_active arguments that are still both
-set to zero.
+-- 
+With Best Regards,
+Andy Shevchenko
 
-      Arnd
+
 
