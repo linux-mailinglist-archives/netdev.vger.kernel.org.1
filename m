@@ -1,142 +1,134 @@
-Return-Path: <netdev+bounces-82349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC8488D5F4
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 06:43:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31D6A88D63F
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:12:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00B882A3636
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 05:43:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C90CB29C192
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 06:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03A718026;
-	Wed, 27 Mar 2024 05:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50111A26E;
+	Wed, 27 Mar 2024 06:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Z0LipRbe"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="b4clgp7R"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF60134A5;
-	Wed, 27 Mar 2024 05:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B0EE574;
+	Wed, 27 Mar 2024 06:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711518174; cv=none; b=MqTQZch4Pz9Y1ml3rdJ9pJrIDYSh4zQkFTGQ1/uxhSiDeWT0GvfSahseX0s0B2nt0tR1yrVSovRuPX+7JhapTX6zeJnj0axNFlA7/3QqpMIE+dylOZ/BzCze6SVPeWAaynzwg3kQJmW+kIn5iaH5rXUhPjQ+6pE2r2JVA/LKEig=
+	t=1711519967; cv=none; b=e9En+TbtdLMHG0EKyUwDmiBUdNmwJUWqDzFoehJsi8lhYNeb204gYFHoeMwN8tYilr8a8gVas+/H3l9kXKnt8W6qGrZ6CYJhqLwYL5dmC1uEkTeaN3B0k5gZx2zM0mj43Of1TB+rnVSYDRmucdeiMvOgv/qSICSAXntzix6fr9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711518174; c=relaxed/simple;
-	bh=gT9JMuRKI4jdYdmjO6l0bHa8hzlKAHE36LSilQNd0+g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sh7N8JS4uI5MOvlPWdKGcjHI/s2z3lJJDeWHeOTbj2NCpjEzpXD0Y5FPY/OjY5l1col77qgHfDYWZTML8s+cYv//MD67cbysIUCx0TyW50oFN+m5cPAkzADPT7d1m9oPd8dt2AiMXpvhioMvaK0CT2h5W3RHz4SvGBwjfW8TjQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Z0LipRbe; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 42R5gePk100705;
-	Wed, 27 Mar 2024 00:42:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1711518160;
-	bh=SXnJ/nkGq8MQYcYDTq+gWGEJI4HADRdErVvMi57hR1I=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=Z0LipRbe5T1/SMI6BuPT3e8pgGXiyRlE1WaHsmz7hxny5GVafYQTSrDfsebiIsOdR
-	 BeVLP8d61XCfg1kZRR9XxbQvFlzdyy7Jc5C+uoHWPJNb40aB2TuRUPN8NsPxlG60/h
-	 NSZrAwRlnZkEqE47UFtTuTOsGBxs9woYvuEGKeOg=
-Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 42R5geoK002234
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 27 Mar 2024 00:42:40 -0500
-Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 27
- Mar 2024 00:42:39 -0500
-Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 27 Mar 2024 00:42:39 -0500
-Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
-	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 42R5gc1N018526;
-	Wed, 27 Mar 2024 00:42:39 -0500
-From: Chintan Vankar <c-vankar@ti.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>,
-        Siddharth Vadapalli
-	<s-vadapalli@ti.com>,
-        Grygorii Strashko <grygorii.strashko@ti.com>,
-        "Heiner
- Kallweit" <hkallweit1@gmail.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Chintan Vankar <c-vankar@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Roger Quadros
-	<rogerq@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next v4 3/3] net: ethernet: ti: am65-cpsw-ethtool: Update rx_filters for CPSW's timestamping capability
-Date: Wed, 27 Mar 2024 11:12:34 +0530
-Message-ID: <20240327054234.1906957-3-c-vankar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240327054234.1906957-1-c-vankar@ti.com>
-References: <20240327054234.1906957-1-c-vankar@ti.com>
+	s=arc-20240116; t=1711519967; c=relaxed/simple;
+	bh=FRN4FGEIXxZqMd9Dxbhy8xlh5SUrt4ZT8yCX4Xe/6nk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=fMBcx61v3k4QxBnfihlpewKBHwXIYW1kgTYAC1YFl9jqVP+q+6bh+R0zh+5tDJJKwR+U5JXL05NdQm92BiiU6fdNuVTQMZhowNZe2hAx2TxJ7MStf0aMHDlhJix2bQckMkB8j7C+S7vWYTgumqaDskC1WYYyJxFcpuANbbOSOso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=b4clgp7R; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711519954; h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type;
+	bh=w//wBJx0dmNDGEW+UAQSP0xfh5NfZViFFDaWBKW7THg=;
+	b=b4clgp7R187dooEoNB2HjtzZ0p9Z16XVrIDlIhBc07Mq4oArbhRwdQDYYj5lf2RjBI/3GFczS20wTAh0wtm/IiWJEgc08rMAHOj87MKqtIGLnP3/FAHJfSyrn42JhMJsz/Y4hIBJRLyq9MJ4TTwaU0X2eFMc6MJpPtuyqVHJcqE=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R631e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3NhBAT_1711519944;
+Received: from 30.221.131.6(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W3NhBAT_1711519944)
+          by smtp.aliyun-inc.com;
+          Wed, 27 Mar 2024 14:12:34 +0800
+Message-ID: <3045529a-11a3-421d-8da3-94788f12f6f4@linux.alibaba.com>
+Date: Wed, 27 Mar 2024 14:12:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+From: Wen Gu <guwen@linux.alibaba.com>
+Subject: Re: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+To: "Antipov, Dmitriy" <Dmitriy.Antipov@softline.com>,
+ "gbayer@linux.ibm.com" <gbayer@linux.ibm.com>,
+ "wenjia@linux.ibm.com" <wenjia@linux.ibm.com>,
+ "jaka@linux.ibm.com" <jaka@linux.ibm.com>
+Cc: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+ "Shvetsov, Alexander" <Alexander.Shvetsov@softline.com>,
+ "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240221051608.43241-1-dmantipov@yandex.ru>
+ <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
+ <659c7821842fca97513624b713ced72ab970cdfc.camel@softline.com>
+ <19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com>
+ <380043fa-3208-4856-92b1-be9c87caeeb6@yandex.ru>
+ <2c9c9ffe-13c4-44b8-982a-a3b4070b8a11@linux.alibaba.com>
+ <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+ <93077cee-b81a-4690-9aa8-cc954f9be902@linux.ibm.com>
+ <4a65f2f04d502a770627ccaacd099fd6a9d7f43a.camel@softline.com>
+ <941b129e87fec6b2f22ed3bc75334bd8515565a1.camel@softline.com>
+In-Reply-To: <941b129e87fec6b2f22ed3bc75334bd8515565a1.camel@softline.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Update supported hwtstamp_rx_filters values for CPSW's timestamping
-capability.
 
-Signed-off-by: Chintan Vankar <c-vankar@ti.com>
----
 
-Changes from v3 to v4:
-- No changes in v4.
+On 2024/3/26 16:18, Antipov, Dmitriy wrote:
+> On Thu, 2024-03-07 at 13:21 +0300, Dmitry Antipov wrote:
+> 
+>> On Thu, 2024-03-07 at 10:57 +0100, Jan Karcher wrote:
+>>
+>>> We think it might be an option to secure the path in this function with
+>>> the smc->clcsock_release_lock.
+>>>
+>>> ```
+>>> 	lock_sock(&smc->sk);
+>>> 	if (smc->use_fallback) {
+>>> 		if (!smc->clcsock) {
+>>> 			release_sock(&smc->sk);
+>>> 			return -EBADF;
+>>> 		}
+>>> +		mutex_lock(&smc->clcsock_release_lock);
+>>> 		answ = smc->clcsock->ops->ioctl(smc->clcsock, cmd, arg);
+>>> +		mutex_unlock(&smc->clcsock_release_lock);
+>>> 		release_sock(&smc->sk);
+>>> 		return answ;
+>>> 	}
+>>> ```
+>>>
+>>> What do yo think about this?
+>>
+>> You're trying to fix it on the wrong path. FIOASYNC is a generic rather
+>> than protocol-specific thing. So userspace 'ioctl(sock, FIOASYNC, [])'
+>> call is handled with:
+>>
+>> -> sys_ioctl()
+>>    -> do_vfs_ioctl()
+>>      -> ioctl_fioasync()
+>>        -> filp->f_op->fasync() (which is sock_fasync() for all sockets)
+>>
+>> rather than 'sock->ops->ioctl(...)'.
+> 
+> Any progress on this?
 
-Link to v3:
-https://lore.kernel.org/r/20240320102600.3418248-3-c-vankar@ti.com/
+Hi Dmitry,
 
- drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+In my opinion, first we need to figure out what the root cause(race) of this leak is.
+I am not very convinced about your analysis[1] and gave some my thoughts about it[2].
+I would appreciate if you give your response about that to make this issue clearer and
+get everyone on the same page (including SMC maintainers). Then we can see if your other
+proposal[3] is a proper solution to the issue or if anyone has a better idea.
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-index d6ce2c9f0a8d..a1d0935d1ebe 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-@@ -695,6 +695,17 @@ static int am65_cpsw_get_ethtool_ts_info(struct net_device *ndev,
- 					 struct ethtool_ts_info *info)
- {
- 	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	unsigned int ptp_v2_filter;
-+
-+	ptp_v2_filter = BIT(HWTSTAMP_FILTER_PTP_V2_L4_EVENT)	 |
-+			BIT(HWTSTAMP_FILTER_PTP_V2_L4_SYNC)	 |
-+			BIT(HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ) |
-+			BIT(HWTSTAMP_FILTER_PTP_V2_L2_EVENT)	 |
-+			BIT(HWTSTAMP_FILTER_PTP_V2_L2_SYNC)	 |
-+			BIT(HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ) |
-+			BIT(HWTSTAMP_FILTER_PTP_V2_EVENT)	 |
-+			BIT(HWTSTAMP_FILTER_PTP_V2_SYNC)	 |
-+			BIT(HWTSTAMP_FILTER_PTP_V2_DELAY_REQ);
- 
- 	if (!IS_ENABLED(CONFIG_TI_K3_AM65_CPTS))
- 		return ethtool_op_get_ts_info(ndev, info);
-@@ -708,7 +719,7 @@ static int am65_cpsw_get_ethtool_ts_info(struct net_device *ndev,
- 		SOF_TIMESTAMPING_RAW_HARDWARE;
- 	info->phc_index = am65_cpts_phc_index(common->cpts);
- 	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
--	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) | BIT(HWTSTAMP_FILTER_ALL);
-+	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) | ptp_v2_filter;
- 	return 0;
- }
- 
--- 
-2.34.1
+[1] https://lore.kernel.org/netdev/35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru/
+[2] https://lore.kernel.org/netdev/a88a0731-6cbe-4987-b1e9-afa51f9ab057@linux.alibaba.com/
+[3] https://lore.kernel.org/netdev/625c9519-7ae6-43a3-a5d0-81164ad7fd0e@yandex.ru/
 
+Thanks.
+
+> 
+> Dmitry
+> 
 
