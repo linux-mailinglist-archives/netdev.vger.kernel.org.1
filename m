@@ -1,166 +1,171 @@
-Return-Path: <netdev+bounces-82316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F214188D387
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 01:54:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7762888D398
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 02:07:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B496B22579
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 00:54:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE5051F306C3
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 01:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442ED171AA;
-	Wed, 27 Mar 2024 00:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2112A17BB5;
+	Wed, 27 Mar 2024 01:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XtoXeY09"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rul+llgw"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1415063D0
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 00:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45518FBF3;
+	Wed, 27 Mar 2024 01:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711500843; cv=none; b=hxLplmJStkhfU55jsHmJV/RxYM5lXrNY4vLJRC/feEFb7j6RFX7p1cXeDL0UTL9eed1VGraVmdYeLvcQmMIM3WzmIhHETNAWXM1CNrXDHsaNyBsWfqkk1usFoCpeFL6HzTqhsP2g/BrBqv39eCldRel1anBnTI+Ur1Twq9IN1k8=
+	t=1711501670; cv=none; b=RHWCap2r1bpGmzSdrvyV5mKCHBVhO/Ou5ix32G+WgfjXZdERhSl9+t1FlJhzt5+ZyO3vbspzTYwA7PaW/5VVml4tgYUaTBxVnpC1nTYJ0KbIv/+cOf+FmL2f9vu0l03zlaghjpig75wPa/43lZaCbm0ipy/O2i2+B2dfDF99G1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711500843; c=relaxed/simple;
-	bh=1WqnUqENqtLDzPfSULJFlgoYt8LJn4Bwnw0VymQ2POQ=;
-	h=Message-ID:Date:MIME-Version:Subject:References:From:Cc:To:
-	 In-Reply-To:Content-Type; b=scF9DOpIycTfmBqVfbQgbNIOR9Yx+bW1aSKj9e4KqXG81CYD6/HYO9LZpMm5hRaRa2eJUXw/XymHo6YeGi5/0D4YpNnaGHK82dDq2GJIQuTrMTMAlTgm2+wN0LA/qjOxY2+nM5XhVoU54YcwtTzk7KJsJ25IkdlA0Q8nNrhdtGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XtoXeY09; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a402206e-a9c9-40bd-bf78-710054506071@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711500839;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MsAzpIR5m4icJqztze3ObvV0i67LfQFqEEAl5UkK2p4=;
-	b=XtoXeY09v906+vCrTnKypyV3mnIl1ql2vkYUZIKyIV+wLnWXsO5YLOdoFI/6NU9ykcRgXo
-	iE38VMWP8VzNageQRp8MkVnxcxKWZyD+LFrd6gir7NKUo1jcGKbURK4XhkYnFpAeIop2U7
-	Wz/Y3F+rV++Rvp2F2AplP9YGobj0di0=
-Date: Tue, 26 Mar 2024 17:53:49 -0700
+	s=arc-20240116; t=1711501670; c=relaxed/simple;
+	bh=hD2cjHS/Tqt9C0VCpflFTu+0Yjy8Iey2SCgJPXIV95M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eou2owHpK00Q0FzHx7wHKhNuJhETAuHKMSB0FwO3CKLAk2V/RBwG38KzQNteoRFU4KUAZsahLgN83p5uL8l0D7WXz/jEm2ZDB6r0lIV1B+FO8Bj+L67RAVaIwtIZEka1U0SDm/grGK7vix0zEaFVfX972Zvmuv4JVsBnMkFpctU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rul+llgw; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33ed5b6bf59so4411961f8f.0;
+        Tue, 26 Mar 2024 18:07:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711501666; x=1712106466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/mkHEfMse9h6YXI+Og+/iiUhyCAWdI4OdWFAFndX8Dc=;
+        b=Rul+llgwDnI5YJUapt/UrkroJO9FqNu0V/ZpneoySkZEE1FIwM59+3dPBAQgl2pTbM
+         HBEv3d1pC33ISzx3gy98iLQRNCeE5qAY7UNOravTaEhc6hljiBkavO1JRIzh66K/Vwf1
+         OWL42JVquv2FybZSy0HHp/K0psqih1/i4oKC1rU3C78mnbj4YfF5Qz0OmSqs59YrIh42
+         7b+5uZt4awXnZXciVv/nbxUdX4afcSKr5B7c2xZCfIf6/R5riSE2UIo42kARQr1f11ud
+         V0NFgEPN6s1x1g4GeqgizPb2x0Uw//wxylSSImhdNO9BQPxYdJanhs29mKI+VrjTXrIX
+         X8Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711501666; x=1712106466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/mkHEfMse9h6YXI+Og+/iiUhyCAWdI4OdWFAFndX8Dc=;
+        b=PMAmZYi4FlyoPIFMe+AT9oPd8YyGg137GxNKAjSmrC3XB9OrdlZJQaYebjkKAB8tyN
+         1Rfz2b/EJiZrmTYg7bZ5DhzYJpJgBNUKwszScJu9MLxfDZZ8Gt4LWOb4mcPfNZJ13Vrv
+         yG7LT5zVDc3svjQ0xVj0QvxHLHfp6dGidYdYJ2MMnwrYG/WkBl3YefV/EjpqbfQzVv6N
+         SVY7dSgHUHSo6TVEJbHKop8EwSUvwtj3crstuWNujqkjVNbBj3v5wXR77B5WYncRD7OZ
+         rILV5TmqZFeGsgdvWD6a36LSyx7hd1jPuHlrEve1r51LU1cDuk6lBH2VP2RpYzpfNJEP
+         q89A==
+X-Forwarded-Encrypted: i=1; AJvYcCW0wOCL9p3vujXM3EytX0kW5XRagOfndeifNb6g+/26mYuy06IPZXovmPuwDkEY8aEIzA0/MBieD++IkfyriXI5SyJa66qxcbHgZ2Pn127rYIy4Qsb1zO9vhJwT2zchOQDBggqGh37Kbdtwjp7BTsehQJiS3QhXJPwP
+X-Gm-Message-State: AOJu0YzuD1C0KbNh3H38Gpfu6+5IQtQgyOLWCeJVdya1xtUXtXTp533s
+	p+lhyRF/th3SK+c+YLBKJ+zQPOT0a+TBKDl/OV7qSwA10pGizoEe5oqoazdMKaqSCqC99/544jB
+	St+HCNSoEKdQjCmh9qLmXi0MkAAw=
+X-Google-Smtp-Source: AGHT+IHKO+MI/cRpXRx4nUYx8wr8uD46Z/chGaNxpSsow+FmjTz97oaonbfR4Qj7TvEixYtGIRtUb/VYncXMxmY+ark=
+X-Received: by 2002:a5d:5090:0:b0:341:c2a9:ceb with SMTP id
+ a16-20020a5d5090000000b00341c2a90cebmr1812475wrt.42.1711501666313; Tue, 26
+ Mar 2024 18:07:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <0000000000006f876b061478e878@google.com> <a402206e-a9c9-40bd-bf78-710054506071@linux.dev>
+In-Reply-To: <a402206e-a9c9-40bd-bf78-710054506071@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 26 Mar 2024 18:07:34 -0700
+Message-ID: <CAADnVQLXyQ_o5hSA0OpHYj231WKPFNRNMyr0NePMr2ypusiLmg@mail.gmail.com>
 Subject: Re: [syzbot] [bpf?] [net?] KMSAN: uninit-value in dev_map_lookup_elem
-Content-Language: en-US
-References: <0000000000006f876b061478e878@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: syzbot <syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com>,
- bpf@vger.kernel.org, davem@davemloft.net, eddyz87@gmail.com,
- haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, sdf@google.com,
- song@kernel.org, syzkaller-bugs@googlegroups.com
-To: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- yonghong.song@linux.dev
-In-Reply-To: <0000000000006f876b061478e878@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Yonghong Song <yonghong.song@linux.dev>, 
+	syzbot <syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com>, 
+	bpf <bpf@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eddy Z <eddyz87@gmail.com>, 
+	Hao Luo <haoluo@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <jolsa@kernel.org>, 
+	KP Singh <kpsingh@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Song Liu <song@kernel.org>, 
+	syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/25/24 2:36 AM, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    5e74df2f8f15 Merge tag 'x86-urgent-2024-03-24' of git://gi..
-> git tree:       upstream
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=148872a5180000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=e6bd769cb793b98a
-> dashboard link: https://syzkaller.appspot.com/bug?extid=1a3cf6f08d68868f9db3
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15921a6e180000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12e081f1180000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/1a82880723a7/disk-5e74df2f.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/fd3046ac43b9/vmlinux-5e74df2f.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/2097be59cbc1/bzImage-5e74df2f.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com
-> 
-> =====================================================
-> BUG: KMSAN: uninit-value in __dev_map_lookup_elem kernel/bpf/devmap.c:441 [inline]
-> BUG: KMSAN: uninit-value in dev_map_lookup_elem+0xf3/0x170 kernel/bpf/devmap.c:796
->   __dev_map_lookup_elem kernel/bpf/devmap.c:441 [inline]
->   dev_map_lookup_elem+0xf3/0x170 kernel/bpf/devmap.c:796
->   ____bpf_map_lookup_elem kernel/bpf/helpers.c:42 [inline]
->   bpf_map_lookup_elem+0x5c/0x80 kernel/bpf/helpers.c:38
->   ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
->   __bpf_prog_run256+0xb5/0xe0 kernel/bpf/core.c:2237
+On Tue, Mar 26, 2024 at 5:54=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 3/25/24 2:36 AM, syzbot wrote:
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    5e74df2f8f15 Merge tag 'x86-urgent-2024-03-24' of git:/=
+/gi..
+> > git tree:       upstream
+> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D148872a5180=
+000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3De6bd769cb79=
+3b98a
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D1a3cf6f08d688=
+68f9db3
+> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for D=
+ebian) 2.40
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D15921a6e1=
+80000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D12e081f1180=
+000
+> >
+> > Downloadable assets:
+> > disk image: https://storage.googleapis.com/syzbot-assets/1a82880723a7/d=
+isk-5e74df2f.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/fd3046ac43b9/vmli=
+nux-5e74df2f.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/2097be59cbc1=
+/bzImage-5e74df2f.xz
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the co=
+mmit:
+> > Reported-by: syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+> > BUG: KMSAN: uninit-value in __dev_map_lookup_elem kernel/bpf/devmap.c:4=
+41 [inline]
+> > BUG: KMSAN: uninit-value in dev_map_lookup_elem+0xf3/0x170 kernel/bpf/d=
+evmap.c:796
+> >   __dev_map_lookup_elem kernel/bpf/devmap.c:441 [inline]
+> >   dev_map_lookup_elem+0xf3/0x170 kernel/bpf/devmap.c:796
+> >   ____bpf_map_lookup_elem kernel/bpf/helpers.c:42 [inline]
+> >   bpf_map_lookup_elem+0x5c/0x80 kernel/bpf/helpers.c:38
+> >   ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
+> >   __bpf_prog_run256+0xb5/0xe0 kernel/bpf/core.c:2237
+>
+> It should be in the interpreter mode.
+>
+> The C reproducer is trying to run the following bpf prog:
+>
+>     0: (18) r0 =3D 0x0
+>     2: (18) r1 =3D map[id:49]
+>     4: (b7) r8 =3D 16777216
+>     5: (7b) *(u64 *)(r10 -8) =3D r8
+>     6: (bf) r2 =3D r10
+>     7: (07) r2 +=3D -229
+>             ^^^^^^^^^^
+>
+>     8: (b7) r3 =3D 8
+>     9: (b7) r4 =3D 0
+>    10: (85) call dev_map_lookup_elem#1543472
+>    11: (95) exit
+>
+> I think this KMSAN report (and a few others related to lookup/delete_elem=
+)
+> should only happen in the interpreter mode.
+>
+> Does it worth to suppress it by always initializing the stack in the inte=
+rpreter
+> mode considering the interpreter is not very speed sensitive ?
 
-It should be in the interpreter mode.
-
-The C reproducer is trying to run the following bpf prog:
-
-    0: (18) r0 = 0x0
-    2: (18) r1 = map[id:49]
-    4: (b7) r8 = 16777216
-    5: (7b) *(u64 *)(r10 -8) = r8
-    6: (bf) r2 = r10
-    7: (07) r2 += -229
-            ^^^^^^^^^^
-
-    8: (b7) r3 = 8
-    9: (b7) r4 = 0
-   10: (85) call dev_map_lookup_elem#1543472
-   11: (95) exit
-
-I think this KMSAN report (and a few others related to lookup/delete_elem) 
-should only happen in the interpreter mode.
-
-Does it worth to suppress it by always initializing the stack in the interpreter 
-mode considering the interpreter is not very speed sensitive ?
-
-
->   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
->   __bpf_prog_run include/linux/filter.h:657 [inline]
->   bpf_prog_run include/linux/filter.h:664 [inline]
->   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
->   bpf_trace_run5+0x16f/0x350 kernel/trace/bpf_trace.c:2423
->   __bpf_trace_ext4_remove_blocks+0x45/0x60 include/trace/events/ext4.h:1984
->   __traceiter_ext4_remove_blocks+0xb5/0x170 include/trace/events/ext4.h:1984
->   trace_ext4_remove_blocks include/trace/events/ext4.h:1984 [inline]
->   ext4_remove_blocks fs/ext4/extents.c:2463 [inline]
->   ext4_ext_rm_leaf fs/ext4/extents.c:2686 [inline]
->   ext4_ext_remove_space+0x4e30/0x7e00 fs/ext4/extents.c:2934
->   ext4_ext_truncate+0x1e3/0x390 fs/ext4/extents.c:4440
->   ext4_truncate+0x14c6/0x1e10 fs/ext4/inode.c:4146
->   ext4_evict_inode+0x1886/0x24d0 fs/ext4/inode.c:258
->   evict+0x3ae/0xa60 fs/inode.c:667
->   iput_final fs/inode.c:1741 [inline]
->   iput+0x9ca/0xe10 fs/inode.c:1767
->   d_delete_notify include/linux/fsnotify.h:307 [inline]
->   vfs_rmdir+0x53c/0x790 fs/namei.c:4222
->   do_rmdir+0x630/0x8b0 fs/namei.c:4268
->   __do_sys_rmdir fs/namei.c:4287 [inline]
->   __se_sys_rmdir fs/namei.c:4285 [inline]
->   __x64_sys_rmdir+0x78/0xb0 fs/namei.c:4285
->   do_syscall_64+0xd5/0x1f0
->   entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> 
-> Local variable stack created at:
->   __bpf_prog_run256+0x45/0xe0 kernel/bpf/core.c:2237
->   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
->   __bpf_prog_run include/linux/filter.h:657 [inline]
->   bpf_prog_run include/linux/filter.h:664 [inline]
->   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
->   bpf_trace_run5+0x16f/0x350 kernel/trace/bpf_trace.c:2423
-> 
-> CPU: 0 PID: 5017 Comm: syz-executor365 Not tainted 6.8.0-syzkaller-13236-g5e74df2f8f15 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-> =====================================================
-
-> 
-
+Maybe we can mark it as initialized from kmsan pov ?
+There are kasan_poison/unpoison helpers that may fit ?
 
