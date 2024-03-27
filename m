@@ -1,127 +1,152 @@
-Return-Path: <netdev+bounces-82674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 180C988F121
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:43:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B6D88F12D
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:45:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324FA1C2A69A
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:43:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95F2C29E2E3
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86AB15350A;
-	Wed, 27 Mar 2024 21:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F7F15356A;
+	Wed, 27 Mar 2024 21:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="tryAY9MH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SdR68CvE"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3335F152DF0;
-	Wed, 27 Mar 2024 21:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DBD1534FA
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 21:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711575819; cv=none; b=kNPXEpJbIxs48a3BMvC9EpQevXGrQyAeHJhd9Jq5iJ8pmY496pvxmPBRsDMBxWl6yQnZ4BxZ0Dz3DPQJObzGScNTStLO0saapNKimmVmfcPyqqBpYFBL1Lw/uqUpZdobU8gkvU8KBKJCUqrlCaYHJTURl+R5JYcw/AnYNxl/Rvc=
+	t=1711575929; cv=none; b=HIRfESUFoWLAp/gWg7LYisCW+82DB+Mf0tCqoFXIWqEbK7V1gM/rgjj8yRCZEL2RrXs/BcLHkM8HLW4UkflfVRvehUWzFpBZ5YyAKxCIAuPNx4My9SeDW9rw1MiDJAKH5vsmjuCnA1Jki2I2cAt9V6/C3P6zYDbx4iFB/yE0GQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711575819; c=relaxed/simple;
-	bh=qXdwMjctvpeC4uhAfUKnHc6+D0VbmDFQ/tteFpiojL8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FVl/OdxyU5dlggAskj2cPvHt2/izWLVGO3sdqI+CxniNJcaosikk9fQunLa1p9WmckuUl8++5TeGlEizIalwRRHBQwKXl50HNjqOxwc3vTJ1kNiEJukpFsENyPyv/cOQCe6JM+e8+3djtXY0E9WJzkWWbl+8PEq1c37qpMn6O9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=tryAY9MH; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=0E6XNCXe9tY4/BkqEg7TfJ6EdX6Zcqe7RrlA/oI/V+0=;
-	t=1711575818; x=1712785418; b=tryAY9MHAsL65aVTGC72ATnxbgVWvoxRTkMcDUyA5oMd4cZ
-	SVBkclQZ2SauBxQlT9ss9ZDk8kIx+MsCXgdwZuKt3Ns7wbiJIYN+RmhrlPmeOEXPCWdeFV5bqD63g
-	2honUAjmUggIEDgLYb9+LRPXH6gKDH7/TQAj0Q0I7apFJ5DYlOdmRgtKElDjLgmkTTFmgXWBv2QnQ
-	7FPrCaMI2JwTxrWNnQrvOx9Sk/2nEH57O/yeGOlgU5yEqE0E3qo3VGoX3BoIAgXs83nJrQMDf3erc
-	iUnYUDWWOdadbD14oWFs+2ukGxfKJWxAh1H5Qt4mi3oUGw5etabr4XxmwfVPXPmg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rpb3W-0000000HPjO-1ApD;
-	Wed, 27 Mar 2024 22:43:34 +0100
-Message-ID: <e6fabaa541704463804f48b5931e8a43f7ee75eb.camel@sipsolutions.net>
-Subject: Re: [PATCH 0/3] using guard/__free in networking
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Peter Zijlstra
-	 <peterz@infradead.org>, linux-kernel@vger.kernel.org
-Date: Wed, 27 Mar 2024 22:43:33 +0100
-In-Reply-To: <0e7af4cb0dc19be7cc0267256284a70ceb250b38.camel@sipsolutions.net>
-References: <20240325223905.100979-5-johannes@sipsolutions.net>
-	 <20240325190957.02d74258@kernel.org>
-	 <8eeae19a0535bfe72f87ee8c74a15dd2e753c765.camel@sipsolutions.net>
-	 <20240326073722.637e8504@kernel.org>
-	 <0dc633a36a658b96f9ec98165e7db61a176c79e0.camel@sipsolutions.net>
-	 <87h6grbevf.fsf@cloudflare.com>
-	 <0e7af4cb0dc19be7cc0267256284a70ceb250b38.camel@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1711575929; c=relaxed/simple;
+	bh=lTnVetYvVWg5DjyVBudKOtPcgTtVueyB5BYBsAsl91Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LmO/pRKJHVab20EG3ukUcZ+4mSd9AKeoRjb377DHic0e8MaGVCphMH5q4/q95/8dEaXJVjMgWosuEpzcvvkWqTI0bGg7J/pEYfz8ojDHjocVyTcA09+Ks/dxZlevmdsZdqKlMHI+h1uGZfwGnKVh3S5BMIVsKqi89Q3xADuBaOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SdR68CvE; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-610ed1c0f93so5363757b3.1
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 14:45:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711575927; x=1712180727; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CKh/si12loPcjkl/bjouIbxS+vyvkdZDxqEpH33Vuvs=;
+        b=SdR68CvEpuBEsx2TIE0nQmQ0u5KH1ZB5jWHON47nBAdvzzx6a7S353k1NDA3eKnsz5
+         MHTp6gPdPLJLmF9KWv1oxhHoJdiU9OSmkOUtVzJ7VgUoiVSLXW1zTGFfLeZdGpnE3HjZ
+         Bkv28ee42yrZoMrydEOqUbmWrqVsU8WX4YAZvup4rNd8uzMzVWF40y+0MDrpHrljErxP
+         LxnfH8nS9GAJ/88KNBeD0P/tZh1cdclhcFaOR8A9QCCCWsi02Ca1ogIgHJCPbgjWYY05
+         KnRLYrUzHycOHOgnHqyqoHfJu8GPw4Wc8v2pAfmo4HHVxksJvu+S4NvX01do8bl32WAl
+         NXlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711575927; x=1712180727;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CKh/si12loPcjkl/bjouIbxS+vyvkdZDxqEpH33Vuvs=;
+        b=KWeCNGVPxJ7Lb6yWjJ0GxDgjsibiLSlShTqxlngvFjjjFpBhNC3HIhkUp9O2O/3NWe
+         tWHNlbruoACNy/TLoOmmSQVYeCcOXB+Rd4XdFiVllb+zix1N1VFPSQU6FSu44HeT66k9
+         WV3lrFToJymuh6GHLQbGkqRgU3zelCLKtBZcWC7FaRsYkHoq6z21e8ntTPJieiQfwc8E
+         epo/Se7CWDKU4oXLiJpAjjXLSaF1cwlulkuv5vN+mCV/CU2bl8YZygmKRn/38dmF4IjM
+         eVpg0ZVQZ9jC9NTCGf1MTXYpdW1JVYVljWofoSkZqncxZrHk+173yCRIsdtqTo8QHEbP
+         lsbg==
+X-Gm-Message-State: AOJu0Ywp/lWfTejwCd2Zusnvekq0fmY6wpEDgqsrpbtPD1B/f1EanhH2
+	hXlpKy1GwH4AoGLA3+KOJVNxbuR8upc68X4wPp+osbYPS7jg5VK3K1GggnZw3dJSurET943dFGI
+	fOADl6wkDERaHWD2G+cSpKBTJOeyJK5TG190KcMFUCuPKV063acHTIXFO2x86JAf5lS0Ldafhel
+	Cjr1nddJik+GQBP1+zh7j1zvJ0k80h23WS+L/czYBWprwwDKMatzPE7L/89Po=
+X-Google-Smtp-Source: AGHT+IFM+e1tBg9sIOrqzj/fm8HC2M1gqAlsPGauO/4UHdAS39gUJvq9E+dCMs/mmshel1oryCqv2D34XoEaWwuTUg==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:b757:6e7b:2156:cabc])
+ (user=almasrymina job=sendgmr) by 2002:a81:834c:0:b0:60c:ca9c:7d10 with SMTP
+ id t73-20020a81834c000000b0060cca9c7d10mr184265ywf.2.1711575927326; Wed, 27
+ Mar 2024 14:45:27 -0700 (PDT)
+Date: Wed, 27 Mar 2024 14:45:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
+Message-ID: <20240327214523.2182174-1-almasrymina@google.com>
+Subject: [PATCH net-next v2 0/3] Minor cleanups to skb frag ref/unref
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Ayush Sawal <ayush.sawal@chelsio.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger <stephen@networkplumber.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Boris Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, 
+	Dragos Tatulea <dtatulea@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 2024-03-27 at 22:28 +0100, Johannes Berg wrote:
->=20
-> +typedef struct class_##_name##_drop##_t {				\
-> +	class_##_name##_t obj;						\
-> +	void (*destructor)(struct class_##_name##_drop##_t *);		\
-> +} class_##_name##_drop##_t;						\
+v2:
 
-No, I misread the compiler output, it does output a real destructor
-function to push it into a stack variable with this...
+- Removed RFC tag.
+- Rebased on net-next after the merge window opening.
+- Added 1 patch at the beginning, "net: make napi_frag_unref reuse
+  skb_page_unref" because a recent patch introduced some code
+  duplication that can also be improved.
+- Addressed feedback from Dragos & Yunsheng.
+- Added Dragos's Reviewed-by.
 
-So I guess it'd have to be
+This series is largely motivated by a recent discussion where there was
+some confusion on how to properly ref/unref pp pages vs non pp pages:
 
-void my_something(my_t *my)
-{
-...
-	named_guard(lock, mutex)(&my->mutex);
-...
-	if (foo)
-		return -EINVAL; // automatically unlocks
-...
-	// no need for lock any more
-	drop_guard(lock, mutex);
-...
-	// do other things now unlocked
-}
+https://lore.kernel.org/netdev/CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com/T/#t
 
+There is some subtely there because pp uses page->pp_ref_count for
+refcounting, while non-pp uses get_page()/put_page() for ref counting.
+Getting the refcounting pairs wrong can lead to kernel crash.
 
-instead, syntax-wise.
+Additionally currently it may not be obvious to skb users unaware of
+page pool internals how to properly acquire a ref on a pp frag. It
+requires checking of skb->pp_recycle & is_pp_page() to make the correct
+calls and may require some handling at the call site aware of arguable pp
+internals.
 
+This series is a minor refactor with a couple of goals:
 
-Which obviously simplifies the changes:
+1. skb users should be able to ref/unref a frag using
+   [__]skb_frag_[un]ref() functions without needing to understand pp
+   concepts and pp_ref_count vs get/put_page() differences.
 
+2. reference counting functions should have a mirror opposite. I.e. there
+   should be a foo_unref() to every foo_ref() with a mirror opposite
+   implementation (as much as possible).
 
-diff --git a/include/linux/cleanup.h b/include/linux/cleanup.h
-index c2d09bc4f976..cf39a4a3f56f 100644
---- a/include/linux/cleanup.h
-+++ b/include/linux/cleanup.h
-@@ -163,6 +163,12 @@ static inline class_##_name##_t class_##_name##ext##_c=
-onstructor(_init_args) \
- #define guard(_name) \
- 	CLASS(_name, __UNIQUE_ID(guard))
-=20
-+#define named_guard(_name, _class) \
-+	CLASS(_class, _name)
-+
-+#define drop_guard(_name, _class) \
-+	do { class_##_class##_destructor(&_name); _name =3D NULL; } while (0)
-+
- #define __guard_ptr(_name) class_##_name##_lock_ptr
-=20
- #define scoped_guard(_name, args...)					\
+This is RFC to collect feedback if this change is desirable, but also so
+that I don't race with the fix for the issue Dragos is seeing for his
+crash.
+
+https://lore.kernel.org/lkml/CAHS8izN436pn3SndrzsCyhmqvJHLyxgCeDpWXA4r1ANt3RCDLQ@mail.gmail.com/T/
+
+Cc: Dragos Tatulea <dtatulea@nvidia.com>
+
+Mina Almasry (3):
+  net: make napi_frag_unref reuse skb_page_unref
+  net: mirror skb frag ref/unref helpers
+  net: remove napi_frag_unref
+
+ .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c |  2 +-
+ drivers/net/ethernet/marvell/sky2.c           |  2 +-
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c    |  2 +-
+ drivers/net/ethernet/sun/cassini.c            |  4 +-
+ include/linux/skbuff.h                        | 44 +++++++-------
+ net/core/skbuff.c                             | 58 ++++++-------------
+ net/ipv4/esp4.c                               |  2 +-
+ net/ipv6/esp6.c                               |  2 +-
+ net/tls/tls_device.c                          |  2 +-
+ net/tls/tls_strp.c                            |  2 +-
+ 10 files changed, 52 insertions(+), 68 deletions(-)
+
+-- 
+2.44.0.396.g6e790dbe36-goog
 
 
