@@ -1,59 +1,55 @@
-Return-Path: <netdev+bounces-82457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C64B88E049
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 13:32:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C03CF88E062
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 13:35:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 969E21C29354
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 12:32:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA6461C27965
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 12:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC64146A60;
-	Wed, 27 Mar 2024 12:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F161487C9;
+	Wed, 27 Mar 2024 12:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aO/R+IYr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/v8f+Ih"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4184D13173B;
-	Wed, 27 Mar 2024 12:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46231482F5;
+	Wed, 27 Mar 2024 12:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711541527; cv=none; b=W+iZbnYz1EZgs64FMdbhOTHekeJmw+V4CSkv9G8NaTdAaPv8REnA+M1bSNr7r9HUVE+tE4LAtTBR1gCKJavXMO84ZPA7aRtfrAkt4VicHycj28A1KgTZAYg03y+ult3/UYm1EVFWWui2P/XLf+ddTmErVCYjSKqT8uf/lEeLl2E=
+	t=1711541553; cv=none; b=D/g22LrDrx/V3wfWHNHb3lMxbYjavPGIiafCMgC/bZPzcsWMB89euBLGxE2YScmEP0+eH7PBFC9X50KBrdhppy75w9/ANCFydzVt2QywoOcRtE4y0p5GGUoE+gmrKYrQ4wBf6DeG8aRbihH10RVVNh7qomXPst95/qKH/31p4is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711541527; c=relaxed/simple;
-	bh=WkqM2xRrt9S4GOiaDbWjOlTlI7hLcUBiFswcddDxWCs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m3WhdfzxP2wJkeYuE72vPZU43EUt+7mfkpm+Id2bXY2CNGYBXAgryIznoHeAQCPYlaXtMwQt0ae0kG2ZtWjVJgE/f7I7S/nuo15Ckt1KPEvX2yVIL6ABHlKLqhfAkuO0a1RhWGo/COhhwu5gUF5UIxoPOSNr7VKVC/uN2uppVQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aO/R+IYr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 973BDC433F1;
-	Wed, 27 Mar 2024 12:12:05 +0000 (UTC)
+	s=arc-20240116; t=1711541553; c=relaxed/simple;
+	bh=meVdZ+I3Etmw9Ync3NQCCfPHAChryipvSKQ37gSv00Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EVQjkzPKvn6CIl5bhJaxW3YBY8xDqi8tIZrL9eDT7wTIwllORKyXiq0V+lGMorTNsP1sZCR6m7zsgKwVgEVyQ2wTierRsMMlm6CDE0En9stEx/JjMnQa/JGHqY1qLepOT2HvLz6Dw8Ma4gk5OXaf9dg+fnA84yjr5p2g/WOmvlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/v8f+Ih; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9649AC433F1;
+	Wed, 27 Mar 2024 12:12:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711541526;
-	bh=WkqM2xRrt9S4GOiaDbWjOlTlI7hLcUBiFswcddDxWCs=;
+	s=k20201202; t=1711541553;
+	bh=meVdZ+I3Etmw9Ync3NQCCfPHAChryipvSKQ37gSv00Y=;
 	h=From:To:Cc:Subject:Date:From;
-	b=aO/R+IYrjl7RQFS6L5bQX2FHbXVko5OtG0HCKaK3z3FkolTAnII5XChQ+TJcGfbxG
-	 9MlJSDfz5xu6IaQwXsQTY5RH0BruHqlpBltqfsbtzia9CjIG14OJIbyGrPBPUdJ2B0
-	 D34d1mlxXsTRSwsMwUhJMfcHInA2nX0zDrp6xfESnv8Wh+6U6oRFF8m4mMRxkxdcC9
-	 R7obP49OYQTURZwr6rpaXv3bRNAcD3Momih+L/yRCQe6xNisOeQ8DVtba66H7fPwo2
-	 ZsTZpLksgVmqnDsPigKvip5r28iqprhpqALakcHOe+5Lc1VzqvQJLXnWPvLyC7hw8S
-	 G8AVLgDd6+izw==
+	b=n/v8f+IhvsXodfwkAGsIdOMHmLtVhY/lOf/Cfm3LuVrqmZ/bi1BrlYf8/HROjKRrJ
+	 +Zg+wrpKhN8mZnVVUZQ39Im1ETbgHIRLLAFxl8g9Dc/skDOni8OGUBXN0XoMADJIAb
+	 sMfjEvBymSAiQc8XdT04L/ORLMSRUf1wH2SxRHWmdGfRqfMINTBEk8RnS+Um/XbCm9
+	 EGmLt5+ocsbEgYxUTCR0M0+Gx5cqswXMG3K7LqtB0nC1fdOMzYQ45h1IzGBdSQBgIo
+	 GVcR7xDZ+ahqn0Cp0wivH1Hlk0Y+xRmhR+tbxGRW92/Gpx0ulIxGE25McKz6mfOFqG
+	 TfZdIn/TO/TIQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	dtatulea@nvidia.com
-Cc: "Anatoli N . Chechelnickiy" <Anatoli.Chechelnickiy@m.interpipe.biz>,
-	Ian Kumlien <ian.kumlien@gmail.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: FAILED: Patch "net: esp: fix bad handling of pages from page_pool" failed to apply to 6.1-stable tree
-Date: Wed, 27 Mar 2024 08:12:04 -0400
-Message-ID: <20240327121204.2829236-1-sashal@kernel.org>
+	johannes.berg@intel.com
+Cc: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: FAILED: Patch "wifi: mac80211: track capability/opmode NSS separately" failed to apply to 6.1-stable tree
+Date: Wed, 27 Mar 2024 08:12:31 -0400
+Message-ID: <20240327121231.2829578-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,194 +71,200 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From c3198822c6cb9fb588e446540485669cc81c5d34 Mon Sep 17 00:00:00 2001
-From: Dragos Tatulea <dtatulea@nvidia.com>
-Date: Fri, 8 Mar 2024 17:26:00 +0200
-Subject: [PATCH] net: esp: fix bad handling of pages from page_pool
+From a8bca3e9371dc5e276af4168be099b2a05554c2a Mon Sep 17 00:00:00 2001
+From: Johannes Berg <johannes.berg@intel.com>
+Date: Wed, 28 Feb 2024 12:01:57 +0100
+Subject: [PATCH] wifi: mac80211: track capability/opmode NSS separately
 
-When the skb is reorganized during esp_output (!esp->inline), the pages
-coming from the original skb fragments are supposed to be released back
-to the system through put_page. But if the skb fragment pages are
-originating from a page_pool, calling put_page on them will trigger a
-page_pool leak which will eventually result in a crash.
+We're currently tracking rx_nss for each station, and that
+is meant to be initialized to the capability NSS and later
+reduced by the operating mode notification NSS.
 
-This leak can be easily observed when using CONFIG_DEBUG_VM and doing
-ipsec + gre (non offloaded) forwarding:
+However, we're mixing up capabilities and operating mode
+NSS in the same variable. This forces us to recalculate
+the NSS capability on operating mode notification RX,
+which is a bit strange; due to the previous fix I had to
+never keep rx_nss as zero, it also means that the capa is
+never taken into account properly.
 
-  BUG: Bad page state in process ksoftirqd/16  pfn:1451b6
-  page:00000000de2b8d32 refcount:0 mapcount:0 mapping:0000000000000000 index:0x1451b6000 pfn:0x1451b6
-  flags: 0x200000000000000(node=0|zone=2)
-  page_type: 0xffffffff()
-  raw: 0200000000000000 dead000000000040 ffff88810d23c000 0000000000000000
-  raw: 00000001451b6000 0000000000000001 00000000ffffffff 0000000000000000
-  page dumped because: page_pool leak
-  Modules linked in: ip_gre gre mlx5_ib mlx5_core xt_conntrack xt_MASQUERADE nf_conntrack_netlink nfnetlink iptable_nat nf_nat xt_addrtype br_netfilter rpcrdma rdma_ucm ib_iser libiscsi scsi_transport_iscsi ib_umad rdma_cm ib_ipoib iw_cm ib_cm ib_uverbs ib_core overlay zram zsmalloc fuse [last unloaded: mlx5_core]
-  CPU: 16 PID: 96 Comm: ksoftirqd/16 Not tainted 6.8.0-rc4+ #22
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x36/0x50
-   bad_page+0x70/0xf0
-   free_unref_page_prepare+0x27a/0x460
-   free_unref_page+0x38/0x120
-   esp_ssg_unref.isra.0+0x15f/0x200
-   esp_output_tail+0x66d/0x780
-   esp_xmit+0x2c5/0x360
-   validate_xmit_xfrm+0x313/0x370
-   ? validate_xmit_skb+0x1d/0x330
-   validate_xmit_skb_list+0x4c/0x70
-   sch_direct_xmit+0x23e/0x350
-   __dev_queue_xmit+0x337/0xba0
-   ? nf_hook_slow+0x3f/0xd0
-   ip_finish_output2+0x25e/0x580
-   iptunnel_xmit+0x19b/0x240
-   ip_tunnel_xmit+0x5fb/0xb60
-   ipgre_xmit+0x14d/0x280 [ip_gre]
-   dev_hard_start_xmit+0xc3/0x1c0
-   __dev_queue_xmit+0x208/0xba0
-   ? nf_hook_slow+0x3f/0xd0
-   ip_finish_output2+0x1ca/0x580
-   ip_sublist_rcv_finish+0x32/0x40
-   ip_sublist_rcv+0x1b2/0x1f0
-   ? ip_rcv_finish_core.constprop.0+0x460/0x460
-   ip_list_rcv+0x103/0x130
-   __netif_receive_skb_list_core+0x181/0x1e0
-   netif_receive_skb_list_internal+0x1b3/0x2c0
-   napi_gro_receive+0xc8/0x200
-   gro_cell_poll+0x52/0x90
-   __napi_poll+0x25/0x1a0
-   net_rx_action+0x28e/0x300
-   __do_softirq+0xc3/0x276
-   ? sort_range+0x20/0x20
-   run_ksoftirqd+0x1e/0x30
-   smpboot_thread_fn+0xa6/0x130
-   kthread+0xcd/0x100
-   ? kthread_complete_and_exit+0x20/0x20
-   ret_from_fork+0x31/0x50
-   ? kthread_complete_and_exit+0x20/0x20
-   ret_from_fork_asm+0x11/0x20
-   </TASK>
-
-The suggested fix is to introduce a new wrapper (skb_page_unref) that
-covers page refcounting for page_pool pages as well.
+Fix all this by storing the capability value, that can be
+recalculated unconditionally whenever needed, and storing
+the operating mode notification NSS separately, taking it
+into account when assigning the final rx_nss value.
 
 Cc: stable@vger.kernel.org
-Fixes: 6a5bcd84e886 ("page_pool: Allow drivers to hint on SKB recycling")
-Reported-and-tested-by: Anatoli N.Chechelnickiy <Anatoli.Chechelnickiy@m.interpipe.biz>
-Reported-by: Ian Kumlien <ian.kumlien@gmail.com>
-Link: https://lore.kernel.org/netdev/CAA85sZvvHtrpTQRqdaOx6gd55zPAVsqMYk_Lwh4Md5knTq7AyA@mail.gmail.com
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Fixes: dd6c064cfc3f ("wifi: mac80211: set station RX-NSS on reconfig")
+Reviewed-by: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>
+Link: https://msgid.link/20240228120157.0e1c41924d1d.I0acaa234e0267227b7e3ef81a59117c8792116bc@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 ---
- include/linux/skbuff.h | 10 ++++++++++
- net/ipv4/esp4.c        |  8 ++++----
- net/ipv6/esp6.c        |  8 ++++----
- 3 files changed, 18 insertions(+), 8 deletions(-)
+ net/mac80211/cfg.c         |  2 +-
+ net/mac80211/ieee80211_i.h |  2 +-
+ net/mac80211/rate.c        |  2 +-
+ net/mac80211/sta_info.h    |  6 ++++-
+ net/mac80211/vht.c         | 46 ++++++++++++++++++--------------------
+ 5 files changed, 30 insertions(+), 28 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 3023bc2be6a1c..b49a7d6591e8e 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3523,6 +3523,16 @@ int skb_cow_data_for_xdp(struct page_pool *pool, struct sk_buff **pskb,
- 			 struct bpf_prog *prog);
- bool napi_pp_put_page(struct page *page, bool napi_safe);
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index 0744113f3535d..3aa96898a250d 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -1867,7 +1867,7 @@ static int sta_link_apply_parameters(struct ieee80211_local *local,
+ 					      sband->band);
+ 	}
  
-+static inline void
-+skb_page_unref(const struct sk_buff *skb, struct page *page, bool napi_safe)
-+{
-+#ifdef CONFIG_PAGE_POOL
-+	if (skb->pp_recycle && napi_pp_put_page(page, napi_safe))
-+		return;
-+#endif
-+	put_page(page);
-+}
+-	ieee80211_sta_set_rx_nss(link_sta);
++	ieee80211_sta_init_nss(link_sta);
+ 
+ 	return ret;
+ }
+diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
+index 4bec625a84d12..32b5ac8947bdd 100644
+--- a/net/mac80211/ieee80211_i.h
++++ b/net/mac80211/ieee80211_i.h
+@@ -2153,7 +2153,7 @@ enum ieee80211_sta_rx_bandwidth
+ ieee80211_sta_cap_rx_bw(struct link_sta_info *link_sta);
+ enum ieee80211_sta_rx_bandwidth
+ ieee80211_sta_cur_vht_bw(struct link_sta_info *link_sta);
+-void ieee80211_sta_set_rx_nss(struct link_sta_info *link_sta);
++void ieee80211_sta_init_nss(struct link_sta_info *link_sta);
+ enum ieee80211_sta_rx_bandwidth
+ ieee80211_chan_width_to_rx_bw(enum nl80211_chan_width width);
+ enum nl80211_chan_width
+diff --git a/net/mac80211/rate.c b/net/mac80211/rate.c
+index 34e03b9522c8a..192c5f8b9e086 100644
+--- a/net/mac80211/rate.c
++++ b/net/mac80211/rate.c
+@@ -37,7 +37,7 @@ void rate_control_rate_init(struct sta_info *sta)
+ 	struct ieee80211_supported_band *sband;
+ 	struct ieee80211_chanctx_conf *chanctx_conf;
+ 
+-	ieee80211_sta_set_rx_nss(&sta->deflink);
++	ieee80211_sta_init_nss(&sta->deflink);
+ 
+ 	if (!ref)
+ 		return;
+diff --git a/net/mac80211/sta_info.h b/net/mac80211/sta_info.h
+index f03731a5bbee2..a52fb76386d01 100644
+--- a/net/mac80211/sta_info.h
++++ b/net/mac80211/sta_info.h
+@@ -3,7 +3,7 @@
+  * Copyright 2002-2005, Devicescape Software, Inc.
+  * Copyright 2013-2014  Intel Mobile Communications GmbH
+  * Copyright(c) 2015-2017 Intel Deutschland GmbH
+- * Copyright(c) 2020-2023 Intel Corporation
++ * Copyright(c) 2020-2024 Intel Corporation
+  */
+ 
+ #ifndef STA_INFO_H
+@@ -482,6 +482,8 @@ struct ieee80211_fragment_cache {
+  *	same for non-MLD STA. This is used as key for searching link STA
+  * @link_id: Link ID uniquely identifying the link STA. This is 0 for non-MLD
+  *	and set to the corresponding vif LinkId for MLD STA
++ * @op_mode_nss: NSS limit as set by operating mode notification, or 0
++ * @capa_nss: NSS limit as determined by local and peer capabilities
+  * @link_hash_node: hash node for rhashtable
+  * @sta: Points to the STA info
+  * @gtk: group keys negotiated with this station, if any
+@@ -518,6 +520,8 @@ struct link_sta_info {
+ 	u8 addr[ETH_ALEN];
+ 	u8 link_id;
+ 
++	u8 op_mode_nss, capa_nss;
 +
- static inline void
- napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
+ 	struct rhlist_head link_hash_node;
+ 
+ 	struct sta_info *sta;
+diff --git a/net/mac80211/vht.c b/net/mac80211/vht.c
+index 2c475c439ba9b..642891cafbaf2 100644
+--- a/net/mac80211/vht.c
++++ b/net/mac80211/vht.c
+@@ -4,7 +4,7 @@
+  *
+  * Portions of this file
+  * Copyright(c) 2015 - 2016 Intel Deutschland GmbH
+- * Copyright (C) 2018 - 2023 Intel Corporation
++ * Copyright (C) 2018 - 2024 Intel Corporation
+  */
+ 
+ #include <linux/ieee80211.h>
+@@ -541,15 +541,11 @@ ieee80211_sta_cur_vht_bw(struct link_sta_info *link_sta)
+ 	return bw;
+ }
+ 
+-void ieee80211_sta_set_rx_nss(struct link_sta_info *link_sta)
++void ieee80211_sta_init_nss(struct link_sta_info *link_sta)
  {
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 4dd9e50406720..d33d124218140 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -95,7 +95,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
- 			     __alignof__(struct scatterlist));
+ 	u8 ht_rx_nss = 0, vht_rx_nss = 0, he_rx_nss = 0, eht_rx_nss = 0, rx_nss;
+ 	bool support_160;
+ 
+-	/* if we received a notification already don't overwrite it */
+-	if (link_sta->pub->rx_nss)
+-		return;
+-
+ 	if (link_sta->pub->eht_cap.has_eht) {
+ 		int i;
+ 		const u8 *rx_nss_mcs = (void *)&link_sta->pub->eht_cap.eht_mcs_nss_supp;
+@@ -627,7 +623,15 @@ void ieee80211_sta_set_rx_nss(struct link_sta_info *link_sta)
+ 	rx_nss = max(vht_rx_nss, ht_rx_nss);
+ 	rx_nss = max(he_rx_nss, rx_nss);
+ 	rx_nss = max(eht_rx_nss, rx_nss);
+-	link_sta->pub->rx_nss = max_t(u8, 1, rx_nss);
++	rx_nss = max_t(u8, 1, rx_nss);
++	link_sta->capa_nss = rx_nss;
++
++	/* that shouldn't be set yet, but we can handle it anyway */
++	if (link_sta->op_mode_nss)
++		link_sta->pub->rx_nss =
++			min_t(u8, rx_nss, link_sta->op_mode_nss);
++	else
++		link_sta->pub->rx_nss = rx_nss;
  }
  
--static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
-+static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
- {
- 	struct crypto_aead *aead = x->data;
- 	int extralen = 0;
-@@ -114,7 +114,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
- 	 */
- 	if (req->src != req->dst)
- 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
--			put_page(sg_page(sg));
-+			skb_page_unref(skb, sg_page(sg), false);
- }
+ u32 __ieee80211_vht_handle_opmode(struct ieee80211_sub_if_data *sdata,
+@@ -637,7 +641,7 @@ u32 __ieee80211_vht_handle_opmode(struct ieee80211_sub_if_data *sdata,
+ 	enum ieee80211_sta_rx_bandwidth new_bw;
+ 	struct sta_opmode_info sta_opmode = {};
+ 	u32 changed = 0;
+-	u8 nss, cur_nss;
++	u8 nss;
  
- #ifdef CONFIG_INET_ESPINTCP
-@@ -260,7 +260,7 @@ static void esp_output_done(void *data, int err)
- 	}
+ 	/* ignore - no support for BF yet */
+ 	if (opmode & IEEE80211_OPMODE_NOTIF_RX_NSS_TYPE_BF)
+@@ -647,23 +651,17 @@ u32 __ieee80211_vht_handle_opmode(struct ieee80211_sub_if_data *sdata,
+ 	nss >>= IEEE80211_OPMODE_NOTIF_RX_NSS_SHIFT;
+ 	nss += 1;
  
- 	tmp = ESP_SKB_CB(skb)->tmp;
--	esp_ssg_unref(x, tmp);
-+	esp_ssg_unref(x, tmp, skb);
- 	kfree(tmp);
- 
- 	if (xo && (xo->flags & XFRM_DEV_RESUME)) {
-@@ -639,7 +639,7 @@ int esp_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
- 	}
- 
- 	if (sg != dsg)
--		esp_ssg_unref(x, tmp);
-+		esp_ssg_unref(x, tmp, skb);
- 
- 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
- 		err = esp_output_tail_tcp(x, skb);
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 6e6efe026cdcc..7371886d4f9f4 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -112,7 +112,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
- 			     __alignof__(struct scatterlist));
- }
- 
--static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
-+static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
- {
- 	struct crypto_aead *aead = x->data;
- 	int extralen = 0;
-@@ -131,7 +131,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
- 	 */
- 	if (req->src != req->dst)
- 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
--			put_page(sg_page(sg));
-+			skb_page_unref(skb, sg_page(sg), false);
- }
- 
- #ifdef CONFIG_INET6_ESPINTCP
-@@ -294,7 +294,7 @@ static void esp_output_done(void *data, int err)
- 	}
- 
- 	tmp = ESP_SKB_CB(skb)->tmp;
--	esp_ssg_unref(x, tmp);
-+	esp_ssg_unref(x, tmp, skb);
- 	kfree(tmp);
- 
- 	esp_output_encap_csum(skb);
-@@ -677,7 +677,7 @@ int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
- 	}
- 
- 	if (sg != dsg)
--		esp_ssg_unref(x, tmp);
-+		esp_ssg_unref(x, tmp, skb);
- 
- 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
- 		err = esp_output_tail_tcp(x, skb);
+-	if (link_sta->pub->rx_nss != nss) {
+-		cur_nss = link_sta->pub->rx_nss;
+-		/* Reset rx_nss and call ieee80211_sta_set_rx_nss() which
+-		 * will set the same to max nss value calculated based on capability.
+-		 */
+-		link_sta->pub->rx_nss = 0;
+-		ieee80211_sta_set_rx_nss(link_sta);
+-		/* Do not allow an nss change to rx_nss greater than max_nss
+-		 * negotiated and capped to APs capability during association.
+-		 */
+-		if (nss <= link_sta->pub->rx_nss) {
+-			link_sta->pub->rx_nss = nss;
+-			sta_opmode.rx_nss = nss;
+-			changed |= IEEE80211_RC_NSS_CHANGED;
+-			sta_opmode.changed |= STA_OPMODE_N_SS_CHANGED;
++	if (link_sta->op_mode_nss != nss) {
++		if (nss <= link_sta->capa_nss) {
++			link_sta->op_mode_nss = nss;
++
++			if (nss != link_sta->pub->rx_nss) {
++				link_sta->pub->rx_nss = nss;
++				changed |= IEEE80211_RC_NSS_CHANGED;
++				sta_opmode.rx_nss = link_sta->pub->rx_nss;
++				sta_opmode.changed |= STA_OPMODE_N_SS_CHANGED;
++			}
+ 		} else {
+-			link_sta->pub->rx_nss = cur_nss;
+ 			pr_warn_ratelimited("Ignoring NSS change in VHT Operating Mode Notification from %pM with invalid nss %d",
+ 					    link_sta->pub->addr, nss);
+ 		}
 -- 
 2.43.0
 
