@@ -1,156 +1,123 @@
-Return-Path: <netdev+bounces-82379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C890388D7F9
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:52:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 978DE88D7FC
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:52:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47DA229AAC0
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:52:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AD211F2A4CB
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C324C58123;
-	Wed, 27 Mar 2024 07:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC6F2C6B6;
+	Wed, 27 Mar 2024 07:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pFV3igqv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aGE283kE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B7F56761
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5F52C699
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711525554; cv=none; b=lK3yZyH7novzciKmov29FuaPMiTK2yntjzqvzwypRHUUBgOzkVP0KWh3eW42f7bCDFKSE+N3t8yrhtUiRmaLShP3j3S67WWyTNHF+EwQthknqfmXRsfqJh3wu2fCe+20kI9y+iDIZV9R5V6ShdP5QeXtrmAsjSKnDCi2AQYFb1w=
+	t=1711525726; cv=none; b=e2nmrrENPNSAGYdP38MK/TzfwUEg4JfnfWjlgzSotwGL3nhoZORiScnLJgSlscrA2QfqBeerTf7q0wgNMmLw8cYhmW8ho4iu1JOlI8Vt4M9RQIUL21xt+MmOU17mUz++0bZZQvyaWLKDs1lPh4ro9aXnvnOnDpwS6bAQXzGlOZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711525554; c=relaxed/simple;
-	bh=htKh4Jp4vM0zvCuX4KapTUnP1c1FqeWCRPv1BZ+Q/j8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZVqTScBxfBHFr4BzhhmKfxx4BQJuVLv8C9v/MLK0DvZszcuDuObGfYy/3SQA7ZcjYTBspHaLgJpSZ5gIJ1REVQQCjLkdW1nDzGtnvXeuJWdO5oWGgeJt/aBGNPiZTKZ/JN7TqdSzSPxAg3+bfTvzB3l+feRF+dOlMFWn3KQOpdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pFV3igqv; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a4a393b699fso93593166b.0
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 00:45:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711525551; x=1712130351; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N7K6idk2YeGVu0lxj/Ps3L084ba7NhsvfbgHIaF82R8=;
-        b=pFV3igqvMJ9HjluHp9Vf0MAhtXbNQ842Fbm5B7bFRfSuyEJNxCwy027lyxinbK1zC9
-         ZmCJgklr0fKbMRe7WPKSN44dgzHg7XJjBSV3FngoSqdey2jX7ObyAXRanlG81bHyvJC9
-         czDRKpp5nVwhNhaj/ZJJ8IkU+DBIWxXl+Xu8aRiz5hdIF4t2S1ILUfp3mra0uEIgvPSk
-         40Abq57DGCsYzUOOGqhQB5wN5edTKBiNbfznKNZxmSA999sLsLfdaFmc1K5u5YMzioly
-         BsA41ig8RRChZ86qzkDLsMP7upAELFQFRSga5bJEb4KoTNJRvNjnEqdjCTuLFArvTMda
-         s0nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711525551; x=1712130351;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N7K6idk2YeGVu0lxj/Ps3L084ba7NhsvfbgHIaF82R8=;
-        b=CGIg40eq0wpp5h+3EIMv8ePLkXMikHuRUUtK+kc9Whv8Png3rXuy65xoOu0oFDslxa
-         pgUgXhDnr/tnZYWPmX/pj0I+UAEjV9IGr2aJE6TYPUdCCfiF/5+emfVNlkkD1utNNJXl
-         oi+5TWMUY2KaxQSNeC2Lb7dfIHQUD273oYgSbINGEhHi2osgFVS1/an93YqB4LjrJLmE
-         Uv7lAQSycMBaCevLIDO4CJEstFSjS27ZgVEdEoUzmhFJuuHCtjjaxkI6Qa4JS4O3MXpv
-         sYvFCcgntiQ10ZfbzvyecaLby9gTFihox+YWzGG2ydgvQ3J5Ov3H200WilMVnJkmu2g2
-         rhzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIYv1X9QUFYhGPnc2Swj2osXWITUI6Zpp4mQ7D1EhpiZrn98e/BKoYReFMOlHuyoqsaPL3rQ6/jyVa+vEMO4mzkylikn0T
-X-Gm-Message-State: AOJu0YzyMd96rpm9B/yhKpyG39PXB7IpePVZBM/5UWhXdRh2F+AXywiA
-	eICmETRrIl+QXQpJR4Q3xlm0i9UDdkK6q6W9zpvxfZn79ak8KB4gLHJ3RFIkwdU=
-X-Google-Smtp-Source: AGHT+IFo1SVbUJhfk2D5dISc82f8C01XAvtK/9Ua8RHBqCpkGF1uNtl0N5fMsZ3xQ2K6OiUoagNCQg==
-X-Received: by 2002:a17:907:e8c:b0:a46:a3d1:679a with SMTP id ho12-20020a1709070e8c00b00a46a3d1679amr4106291ejc.14.1711525551050;
-        Wed, 27 Mar 2024 00:45:51 -0700 (PDT)
-Received: from [127.0.1.1] ([178.197.206.205])
-        by smtp.gmail.com with ESMTPSA id am11-20020a170906568b00b00a474690a946sm4671745ejc.48.2024.03.27.00.45.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 00:45:50 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Wed, 27 Mar 2024 08:44:06 +0100
-Subject: [PATCH 19/19] ACPI: drop redundant owner from acpi_driver
+	s=arc-20240116; t=1711525726; c=relaxed/simple;
+	bh=4sl0oSN1BXFDdtolW8v8qbePP+GxgJ1NSQEbU86HuFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZL9XMLRbbprHnyj9SLW4eJZtu0fAGEGuE8J09a5DzOXpmgsgDHJ4fD2HTuv9kheqaNNKHJRw/vUwhx2XWqjIKNllSA6Wv8yV2rpWiVksM9GlQ05BPL/6tQwxPhaVdWu+XntorcA3EjiBtZ9L3Ej8IbUuxWkEkGxzl8P1kEAVHWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aGE283kE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711525724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0yBaS1hfGcIJ0g5TQWCk0L3glJvaFE4LWtb3UsOxD4A=;
+	b=aGE283kEVQWNHW5XrAnBtR2OugjtvVKsnEcws5rxrwP3ArK4DK3Z7510OqhbfjAMeNqtFv
+	psgx71onjRInA4LCDzLZJK03uMSSeZ/cl0WZ9nA4gMhDz6Pd/l+8jbDbGXNjw8SIh77phF
+	KTkvPqmCHN5Bosl/VMtqSvAxa85wKKo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-362-sv2Iot2kNQKb-W_tfZ0jdA-1; Wed, 27 Mar 2024 03:48:40 -0400
+X-MC-Unique: sv2Iot2kNQKb-W_tfZ0jdA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B0EF185CE42;
+	Wed, 27 Mar 2024 07:48:39 +0000 (UTC)
+Received: from p1.luc.cera.cz (unknown [10.45.224.197])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0C62F492BD4;
+	Wed, 27 Mar 2024 07:48:37 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mschmidt@redhat.com,
+	aleksandr.loktionov@intel.com,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH iwl-next v2 0/7] i40e: cleanups & refactors
+Date: Wed, 27 Mar 2024 08:48:25 +0100
+Message-ID: <20240327074833.8701-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240327-b4-module-owner-acpi-v1-19-725241a2d224@linaro.org>
-References: <20240327-b4-module-owner-acpi-v1-0-725241a2d224@linaro.org>
-In-Reply-To: <20240327-b4-module-owner-acpi-v1-0-725241a2d224@linaro.org>
-To: "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>, 
- Robert Moore <robert.moore@intel.com>, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>, 
- Corentin Chary <corentin.chary@gmail.com>, 
- "Luke D. Jones" <luke@ljones.dev>, Hans de Goede <hdegoede@redhat.com>, 
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
- Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>, 
- Daniel Oliveira Nascimento <don@syst.com.br>, 
- =?utf-8?q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
- Matan Ziv-Av <matan@svgalib.org>, Mattia Dongili <malattia@linux.it>, 
- Azael Avalos <coproscefalo@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>, Jeff Sipek <jsipek@vmware.com>, 
- Ajay Kaher <akaher@vmware.com>, Alexey Makhalov <amakhalov@vmware.com>, 
- VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
- Theodore Ts'o <tytso@mit.edu>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
- "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Cc: linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org, 
- acpica-devel@lists.linux.dev, linux-input@vger.kernel.org, 
- netdev@vger.kernel.org, chrome-platform@lists.linux.dev, 
- platform-driver-x86@vger.kernel.org, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=674;
- i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=htKh4Jp4vM0zvCuX4KapTUnP1c1FqeWCRPv1BZ+Q/j8=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmA85bDmBUKGxLiw+IE8MXLih8uNdO+fOokRWlT
- TIm2uaEvyuJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgPOWwAKCRDBN2bmhouD
- 1z6cD/oCytA+t0QmfxlLxr4zYP8tlK64yfX5UfqshoxKOm8kP+7fJ49TPWNAJ/2WOuldx1L8JZP
- GlN8xW/4GU+WN5dsD5vqU4gbr9Fuk5sFzeGpF1Wn+LAWc7Rzm6MSPsGY32bIeJfKiv6H4mha/ps
- 6iC3ilwowIllCYO/VS+7EUinaRgOc4gLWxeG5fsWst0/vaT/ppa+J0RqUaM65oxA2SVXfaGW29Z
- WfdVl9fZ4bIoKvmzM1u0QM8ugLZUVyqdYaaMqZb4oCV9JATh4I80NtpIfy6o4YaCRAmDwxiapUC
- HUHnluTQsUJdqX4wyUG5eukbNSJWoevYgQkyFge+T9YteFs9tbViIAwcMKZDN/XVEY76fDZjxCh
- V9t5i4PTRFJFOxxwQMv34S//WxQreKqDkMyo2m8nbCDEp0dHGXiYPbibrEXk286kkju9dqzQXFL
- SwWC13gJbV5ZXZoYT9ZtKUN7IgyenZ8Emo5hTx8uQQ0hP/r2vwR8uRfZZ2tbr1CEqFdpciqLfBo
- eWfMHiqnX05AtOftT8P6/W5u4JbGxibHOlzGY+SlIFixrIy9beGzWztoHO5v77lVosMNGQixCAH
- Brl8aSiMZnR5rKQUT7+dBC9lBBeAk761YLH+3wjtZoA4c8m63tKEgTknXO4Ny2XJQcxUiykSJaM
- p0b7ggN21hq0YrQ==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
- fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Once all .owner is removed from all acpi_driver instances, drop it from
-the structure.
+This series do following:
+Patch 1 - Removes write-only flags field from i40e_veb structure and
+          from i40e_veb_setup() parameters
+Patch 2 - Refactors parameter of i40e_notify_client_of_l2_param_changes()
+          and i40e_notify_client_of_netdev_close()
+Patch 3 - Refactors parameter of i40e_detect_recover_hung()
+Patch 4 - Adds helper i40e_pf_get_main_vsi() to get main VSI and uses it
+          in existing code
+Patch 5 - Consolidates checks whether given VSI is the main one
+Patch 6 - Adds helper i40e_pf_get_main_veb() to get main VEB and uses it
+          in existing code
+Patch 7 - Adds helper i40e_vsi_reconfig_tc() to reconfigure TC for
+          particular and uses it to replace existing open-coded pieces
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Changes since v1:
+- adjusted titles for patches 2 & 3
 
----
+Ivan Vecera (8):
+  i40e: Enforce software interrupt during busy-poll exit
+  i40e: Remove flags field from i40e_veb
+  i40e: Refactor argument of several client notification functions
+  i40e: Refactor argument of i40e_detect_recover_hung()
+  i40e: Add helper to access main VSI
+  i40e: Consolidate checks whether given VSI is main
+  i40e: Add helper to access main VEB
+  i40e: Add and use helper to reconfigure TC for given VSI
 
-This depends on all previous patches. It could go next cycle, after
-things got merged.
----
- include/acpi/acpi_bus.h | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/include/acpi/acpi_bus.h b/include/acpi/acpi_bus.h
-index 7453be56f855..32aae3ee99ac 100644
---- a/include/acpi/acpi_bus.h
-+++ b/include/acpi/acpi_bus.h
-@@ -170,7 +170,6 @@ struct acpi_driver {
- 	unsigned int flags;
- 	struct acpi_device_ops ops;
- 	struct device_driver drv;
--	struct module *owner;
- };
- 
- /*
+ drivers/net/ethernet/intel/i40e/i40e.h        |  30 ++-
+ drivers/net/ethernet/intel/i40e/i40e_client.c |  28 +--
+ drivers/net/ethernet/intel/i40e/i40e_ddp.c    |   3 +-
+ .../net/ethernet/intel/i40e/i40e_debugfs.c    |  36 +--
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    |  29 ++-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 205 ++++++++++--------
+ drivers/net/ethernet/intel/i40e/i40e_ptp.c    |   6 +-
+ .../net/ethernet/intel/i40e/i40e_register.h   |   3 +
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  98 ++++++---
+ drivers/net/ethernet/intel/i40e/i40e_txrx.h   |   3 +-
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  14 +-
+ 11 files changed, 282 insertions(+), 173 deletions(-)
 
 -- 
-2.34.1
+2.43.0
 
 
