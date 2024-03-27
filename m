@@ -1,131 +1,136 @@
-Return-Path: <netdev+bounces-82648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76E7288EEB2
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:56:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8A388EECC
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:02:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5C1D1C33BA3
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:56:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D2829DEE6
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15A11509BB;
-	Wed, 27 Mar 2024 18:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA3651509AE;
+	Wed, 27 Mar 2024 19:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="k+GzYoMN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYHPGXJ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A6614F9D7
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 18:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D9812EBC4;
+	Wed, 27 Mar 2024 19:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711565785; cv=none; b=IXMjYIab9w5ITMaSo7uaB5vspUJFuU3W9xWYDU6V6va5QFtPi+NbvBujeBs4euJ99M7tKfcIa6Jx9J6D9dqOUPskVgUDe9UpCVzJHtcgDJg1QshnhNUEz1mTHhNMv7N8YvoEWZRLmrJgACpVSphIfO7MK5JpPOMIAAS9VFB63zY=
+	t=1711566142; cv=none; b=TJC2zj12O4ThTg00v4SI9PNDiWiO+qUeHB0Fi9rGhskmx0aWBk78FKV8mORJuBjurXx+Baq7fOFiimy/iXtuWESlSPTDTpuqoqXxWIpHfPD3bEL6H7lWA5rwVg3igWAhEXATxou16X5q353Z8cjGbc9idzmEgSGVeLmw6f1/WTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711565785; c=relaxed/simple;
-	bh=4NcW9kjQzz+4rxkmVWvO3SDYc5HCNpy2e5LNejNHhtg=;
+	s=arc-20240116; t=1711566142; c=relaxed/simple;
+	bh=Mkjkay7Z0Vj+E8vwdVGwj0OsZgK9nBJ7enE6cPyGExw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=epJyuUZ1W0O7n7bb/miU3QpsrusEQH/kJoivxiZ0f7JvqCmWvA7DSlTDCp5G+QrS4iEuEuBMpZzw+CMn7WRXlJo+59E8HOA5PK2xJ2PdM9XmLq4LgE0lclqnBHsWBCyEl37bTH4SrwFTgmLn5UbIcw2cMDzXMXyahLgKBPtCyyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=k+GzYoMN; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-515a97846b5so81257e87.2
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 11:56:23 -0700 (PDT)
+	 To:Cc:Content-Type; b=mdewmW++iMtfjVPAyJYu/P0E+ZyUHOwIf+D7U4gBM+AbbJd6jxiSocCsWHWMXTTSYos0vUHxLPvg9/OPnG/MjJc+pXUZi72uzzxj7pSieGxI7C7ZoVW8/koYrFEB+k+2WACaXYXq0cqyxyE9OUwDfGGXiPc/KPmHz74tAOX56wI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UYHPGXJ3; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33fd8a2a407so61157f8f.2;
+        Wed, 27 Mar 2024 12:02:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711565782; x=1712170582; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711566139; x=1712170939; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l22hpajQYrTCvXSZPoe2VYkKnBi8J9PfZ646Pjp2W30=;
-        b=k+GzYoMNF+LcVXBmiHcmrFB4dZFJNgouhgKcpQvZW0IdaI7TRkIBxVVfis7Xf6/YgV
-         i+cxoTNndWJGoWXc8oNFRXMWAxQJ/skQNhUIvkHYB1NHmCBgDN+yxTad5sBUPb+4uWUR
-         98y1M0cJGM+XwXEkKF8reiwDzWclpLd5qDXD64sgPy0URIHowh3ALJy4fgAYb56FmxX6
-         Xlpg74waxdIpybanX+ddeb25ROMy1YHi2KDtqerIB1Rok6jFWGgieaoXtCUUBGAYpEeb
-         gDIo45RdX2dT1mltKpiLiyWloSc6W5lUBq2LXZ/LjbwvpONUK2yw+ZH5jG0SimlbiNtv
-         HoZw==
+        bh=G43Y9I+3uus2Fv/YCLNGCC6IN7NsddtveLn+lJcwAXE=;
+        b=UYHPGXJ3PPkqIeKVia220JRIT2Mq5ZI9ahYFTwPWE6QsdixEs6MV0i/+rtxhe9prLh
+         /JWeed8ZDDmU5px4kx1jf6pgqxGa3/vwdSlxmIODqjTwIdl91IIo5WfLcR66eQxGYfOM
+         5VcdRh1jqGyDEAST+7nqacKRrcZyiP80qvPVDSYZql6ZZyFhhSsPMISHXOVxMe37t0q5
+         73nJwoX6McszcNwbP1CUXXrZRzh3qai8Hc11f7hkprwLNXbzU+D2mNLJmvIO1nQjlkRo
+         lBTH/hIh7JKon2iPflrEZw8k1N5ctVl8Ar/RS+37D3iDi7J1WEqZ25nfnYlDc/W6SKMJ
+         Y7SA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711565782; x=1712170582;
+        d=1e100.net; s=20230601; t=1711566139; x=1712170939;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l22hpajQYrTCvXSZPoe2VYkKnBi8J9PfZ646Pjp2W30=;
-        b=bXhVrmHEuw9qggpjrMvFcYoU4+Y0CahtFr5H9n9pSbHVMjgu8k7o7vEevMwGpqyJ7S
-         QpwkZHRtNbyvZ3XzWpz7Peepz+2n2ZTVujGzkemt6ZHR3KkqELkMl96TTjLu+Rv2vTPr
-         TVQqs5dctqF2hhZssBTDQ7ZagSnYcVftlw4dwPuxCIS0Mw/Xg/mOV205+bSGMT3IjVgJ
-         qfYitODOcTkuqTot6GM/Sxk4Ja2Mzir/fPafIkikXVd0Ynp/caLw7tCw8whnvrExL99T
-         wX6dCueAvr7ygat+J0/DpKZEK95qWFUMMw3PCQcecrjNcK5OcZC6JIRBuuX5C34uS3Zu
-         jofQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUscixIu1PyUBeFO9ctWF7fppssPaHe1fCcREJ+wazFZ+M0aW/VOVQ4xWIFhjo4iTEjHnsA9icjn1HBp79O0KatRJ8uisk4
-X-Gm-Message-State: AOJu0YwTonox67g4soS3tLrfV7B+f3GPPqkpXypS/E/p9VU7GQNFxxxH
-	fcxXTq6Ie0oJrFqGv3N+C7JbD8xeXLIaq+J0hBYmMqrYf4Bv2+rNh/6F5sSwxWg878zDJQPYqYn
-	fOJrqHwW2TEzXuySCsg2JjwjPK7UMd1FUy9a34A==
-X-Google-Smtp-Source: AGHT+IHKydle8I12XQm1CXJCoOY/EXeZTUxgXyi6L8xBSnmh4cSMTwhyhLVJE5IgeGuedARFVJZKgD+gbga9ggLr/Og=
-X-Received: by 2002:a05:6512:60a:b0:513:9b96:a954 with SMTP id
- b10-20020a056512060a00b005139b96a954mr200564lfe.68.1711565781942; Wed, 27 Mar
- 2024 11:56:21 -0700 (PDT)
+        bh=G43Y9I+3uus2Fv/YCLNGCC6IN7NsddtveLn+lJcwAXE=;
+        b=Dv9p5/FMr/rgf67WB86azqkrrmZDfAlqHe8BbmUUfA2UKVuAXV4mFR2hxx+H/cd7K7
+         hIxEZFmQa4x5xKT+fEp4fH7NRrZ8jkf8wwVlDvWeGCbYZZr3XMhsHMpBNpSt5cytA+Vj
+         ksKCb4xpt6iaWWEQqwI/+JFmKfH/+I3/Ne6pgIjcMUJ67PW0TvC2gw7YgXYMmRGnWZP4
+         2LnBnjJgk3qT11Nq6Q5OP8nhEbxUYX6WVBcBUTEFmoPDBDwyA81Wp5ETFOHVtIzHxmMP
+         zTHv3DjGp/O28Q4qI7iOiVlpTnJl9GwNJyROCI4zxpvoZdKM9Is/oCAliGBxbtk1JaOR
+         /PFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVhIDoa0MX9FFtcR9MV8S2zWQzPfW+MChouNEH9perUpWZ0RVL2FIuUzYXPuVYnSRLcU5K0VMwgnaNZdsIKQmaQiyaX0EgdoN+nEXAIRmZZUeTu/TDYh9TjjtB6EYCV4m9DhlG5s98/136mnpygcEHEhSE/sTLVJa+bQ+jkWeNfVTkVVjmwEqiD5aNXlhKnZLYSvTrza3KMpg==
+X-Gm-Message-State: AOJu0YzmXagCvwkmEN3FLd9NZeTBX1nr7oS9XZH3+yx2qiPgaHSZSsjN
+	U0WrMdDofkCmDmwP2lyoU3FGireASSr7PfK26s5Y4Ojuei/TpcB8RMxrDUYkkVb5/WSDIu1n8oc
+	NIVN6AalzvB3c6VztWOinUz7AVrI=
+X-Google-Smtp-Source: AGHT+IF3uK8BNj55j5GBkzVOsoRtME4sRuRyuXZ1Yo73eCITL53hu+yrnhHrXwg4fZIQHBJexfPsMc5dhyeUKDaRz0g=
+X-Received: by 2002:a5d:6e0d:0:b0:33e:7896:a9d7 with SMTP id
+ h13-20020a5d6e0d000000b0033e7896a9d7mr601323wrz.67.1711566139396; Wed, 27 Mar
+ 2024 12:02:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325131624.26023-1-brgl@bgdev.pl> <20240325131624.26023-3-brgl@bgdev.pl>
- <1614af1c-330d-49ee-aa22-a19de866862e@linaro.org>
-In-Reply-To: <1614af1c-330d-49ee-aa22-a19de866862e@linaro.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 27 Mar 2024 19:56:10 +0100
-Message-ID: <CAMRc=Mf3eVc2iJxdkSMgeLFU0rCVnwOQ_mg=fj=uOxj01e5yNQ@mail.gmail.com>
-Subject: Re: [PATCH v6 02/16] regulator: dt-bindings: describe the PMU module
- of the WCN7850 package
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <00000000000055ecb906105ed669@google.com> <20240202121531.2550018-1-lizhi.xu@windriver.com>
+ <ZeXGZS1-X8_CYCUz@codewreck.org> <20240321182824.6f303e38@kernel.org>
+ <ada13e85bf2ceed91052fa20adb02c4815953e26@linux.dev> <20240322081312.2a8a4908@kernel.org>
+ <20240327115328.22c5b5a3@kernel.org>
+In-Reply-To: <20240327115328.22c5b5a3@kernel.org>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 27 Mar 2024 12:02:08 -0700
+Message-ID: <CAADnVQJ2SyJq25wvV2kf8Mepic_rYyGNYh7KpdGerFi6a-jQJw@mail.gmail.com>
+Subject: Re: [PATCH next] fs/9p: fix uaf in in v9fs_stat2inode_dotl
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Van Hensbergen <eric.vanhensbergen@linux.dev>, asmadeus@codewreck.org, 
+	Lizhi Xu <lizhi.xu@windriver.com>, 
+	syzbot+7a3d75905ea1a830dbe5@syzkaller.appspotmail.com, 
+	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux_oss@crudebyte.com, lucho@ionkov.net, 
+	syzkaller-bugs <syzkaller-bugs@googlegroups.com>, v9fs@lists.linux.dev, 
+	Linux Regressions <regressions@lists.linux.dev>, Network Development <netdev@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 27, 2024 at 7:19=E2=80=AFPM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
+On Wed, Mar 27, 2024 at 11:53=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
 >
-> On 25/03/2024 14:16, Bartosz Golaszewski wrote:
-> > +    then:
-> > +      required:
-> > +        - vdd-supply
-> > +        - vddio-supply
-> > +        - vddaon-supply
-> > +        - vdddig-supply
-> > +        - vddrfa1p2-supply
-> > +        - vddrfa1p8-supply
+> On Fri, 22 Mar 2024 08:13:12 -0700 Jakub Kicinski wrote:
+> > On Fri, 22 Mar 2024 14:26:07 +0000 Eric Van Hensbergen wrote:
+> > > Patch is in the unapplied portion of my for-next tree along with
+> > > another one.  I was hoping to hear some feedback on the other one
+> > > before i did a pull request and was torn on whether or not I wait on
+> > > -rc1 to send since we are so close.
+> >
+> > My guess would be that quite a few folks use 9p for in-VM kernel
+> > testing. Real question is how many actually update their work tree
+> > before -rc1 or even -rc2, given the anticipated merge window code
+> > instability.. so maybe there's no extreme urgency?
+> >
+> > From netdev's perspective, FWIW, it'd be great if the fix reached
+> > Linux before Thursday, which is when we will forward our tree again.
 >
-> I assume vddio1p2 is not required on purpose.
+> Any progress on getting the fix to Linus? I didn't spot it getting
+> merged.
 >
+> I'm a bit surprised there aren't more people complaining TBH
+> I'd have thought any CI setup with KASAN enabled has a good
+> chance of hitting this..
 
-Correct.
+The proposed fix is no brainer:
+https://lore.kernel.org/all/20240202121531.2550018-1-lizhi.xu@windriver.com=
+/
 
-Bart
++ v9fs_stat2inode_dotl(st, inode, 0);
+  kfree(st);
+  if (retval)
+    goto error;
 
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->
-> Best regards,
-> Krzysztof
->
+- v9fs_stat2inode_dotl(st, inode, 0);
+
+Please ship it to Linus asap.
+I'm surprised this bug slipped through.
+
+It does affect bpf developers and our CI, since we run with KASAN and use 9=
+P.
 
