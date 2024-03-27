@@ -1,137 +1,101 @@
-Return-Path: <netdev+bounces-82667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C96A588F028
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:32:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC6A288F087
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6941F1F2C9A8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:32:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 766952A380B
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F17152DFE;
-	Wed, 27 Mar 2024 20:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8EE152E1D;
+	Wed, 27 Mar 2024 20:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I1aKgMjR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I32QU/6W"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5F5152526;
-	Wed, 27 Mar 2024 20:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C3941760;
+	Wed, 27 Mar 2024 20:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711571558; cv=none; b=KI9UKrIr7XLSo1AaI/jTiyG/r2+XZCi+KslOeIKMcLFcH5+3V87cI2qzYLyYCqhDnD/Lvze6boktDre2yFIvYv5Q9E1iKP2/u/hXRhrh5Y7uflEpkGwXhol/vfGmYKsSQlf0LMmJSAp5FfXdq0DkTGFEyOxtDjwyhAmpt1SdTYg=
+	t=1711573048; cv=none; b=gX7B9WFr5lpwE7/bAS5n31wO+7VPQpw8GnZ0qUqxGsGW0fW8jFrzJZxXQieh6jVzMUVh5JD7lExCJlP9/ZFpFpADb8Y+ZC35LAW7b8KOl+pwenwzNh7jeT8C+J4rSx0PpA69QoUrq8u6ln3mvZ888gvEpJGx4qZLOy7f20hd5eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711571558; c=relaxed/simple;
-	bh=bUD7hRVKwVDpYh8ceARY/rXBSbxh69k1obIrokK7TR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RYjfx9TTba+ofvUEiaqBFjbEPDa/8bDRRbQwFKv5vZcorgp2AahaJ5UwlzCSmpD4WrmRDODQrUlNtF6sbqy8C2yPXALxSnoOs63IB9Jf4rp9TmwPQ9FZc31MpNUhUfFo2Sxb8zzKLZonvORU1enpwfpywaFdNMoEMZ01mNOpWTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I1aKgMjR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56B50C433C7;
-	Wed, 27 Mar 2024 20:32:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711571557;
-	bh=bUD7hRVKwVDpYh8ceARY/rXBSbxh69k1obIrokK7TR8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I1aKgMjRz70NgKGq3kD7zdlCAncjjYgZt6draVS17IT5OqyIWMKVqHkFdF+uIiBdw
-	 wKwCAAXNnOc1SNd+WdyxcSVCn03YYTUgpJW4iCHcOVq90o8OexCDaIkYStDtPUxUBr
-	 at82lhQwaBm5ZRWywlyHGN0mh5omIQzwAzghqk5EPIqUqY5eIOxGPEb1ZALZ86PUPB
-	 CZBD9DnUhpMXBlIZRjBkzaKCm9EfqstsXrL8k0/4RY6iBVld0d/ZhxBr1dWD1oFd0F
-	 XzXaBERa6K2024PS0nriLLOIiT6+5MbTCiDKJ/8dpvnCaQQ7fxxD1j3B9refO27qTZ
-	 wTDGskEYXb1/w==
-Date: Wed, 27 Mar 2024 20:32:33 +0000
-From: Conor Dooley <conor@kernel.org>
-To: =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Samuel Holland <samuel.holland@sifive.com>,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
-	linux-riscv@lists.infradead.org, Andy Chiu <andy.chiu@sifive.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: RISC-V for-next/fixes (cont'd from PW sync)
-Message-ID: <20240327-irrigate-unread-d9de28174437@spud>
-References: <87ttkro3b5.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1711573048; c=relaxed/simple;
+	bh=pjHbYSEpPgHM1kEiDgVmvCyBkD87pYONFMJomn9n2Q0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=Z/jA1FVl0/rcU3pjKHAcKEqMA/dfv7mcTZyD2Y+hm6TUgH4lf5Sa21jhVdtw9/A/YWGW4yQr0m+/UmJe/+kqOWPmVkmnM7iso9VOdHWwKXk++7eAFvycEY5pOqVhs5lNJHjeEv8IF/kBQiGRF9U51cTGXHMdv5jYEjSCZZKE2so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I32QU/6W; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-33ed6078884so769771f8f.1;
+        Wed, 27 Mar 2024 13:57:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711573045; x=1712177845; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:cc:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t/OshXTbOf0/0RWZkIZUHM3fViD/ee2V/FuKY2I6mRk=;
+        b=I32QU/6WanVhdFjkUY2LcJEfMgKg8SCVpICuxn8ZlCgXgu4djJYNHGiRnD0ed07gDz
+         0EbUxxDmCdrj+P/a5YQirgGM/ZXq1IQPkVWRg1eVDmi9qWydNnKoZyS4LB7HivoHiX32
+         RBliTDcNXoeaewGqBanBO1+6QFUkD5botxhYeQ/wvwkzL2c2i4SDXfohvU4R/Y55rVfK
+         x5EraOhIA56LW8LICNWUCmnv4PU1PfLmiQ2zbOi3rKbEfFhvr+cMGzJHUAjD00nK8trI
+         JYS7GfKZUqJJxJNbBwP9VvLznQmnMLwKx9EK9bVMFAFXThJIkk+6Q2E63QIZajoaqOYb
+         tAXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711573045; x=1712177845;
+        h=content-transfer-encoding:in-reply-to:from:cc:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t/OshXTbOf0/0RWZkIZUHM3fViD/ee2V/FuKY2I6mRk=;
+        b=FYXgTXKzuiVLCEisu2ZnK1UoPwypkzwF5hcw6cbDqlbxgZR2m3xOJwaHGIfKCYoWDK
+         VqzfoK7hkaPDWHzQS1eXsIixDPdqY1P1rTuIQ8EiYOLuj+32sO3SdHbKVmbqcMFE3Aii
+         FB0QV8llToaCY4GfkuToU2GWHnY8syVcMBfu5G6KLTSFbGg3v+sw948e+bhNlh1A6atV
+         zfs1n6IQ3VZlWy1XiFUcFJpEspUCCF+4LQgeG7yNVWoWaFSBF5ltuvFCr5yqx5mknnq5
+         8+K+X6YZg9VI7QumjOMGpekCfLbQq7rTaIJJJBKPKQ7G4VKdO9DJaSlrjShv1rJyjfPU
+         VBLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUuVj3ZASnp50oj90e22SPKj9Go0BnFVnsaG/UFzXjVmySffkjFEZuvPqU6/OehuvPius0010cxBw0Onjrjr5H+KHLEnh15
+X-Gm-Message-State: AOJu0YzURp30j5uqkqTEsFJUoL+F0JcEW+VOwLerHcvrH3XDeOAhBvOi
+	wJtpo9vC7VJAe+CroiqIwuat0SSIGwdXDyecM9IMHThvbKvlrLDa
+X-Google-Smtp-Source: AGHT+IE1BOKkogON6pk/RJmUnwZD11wOJqQQZBQDW8z+OqIgl1EJ3OGOPeKP7pWDwh7CTXDnWm2B6Q==
+X-Received: by 2002:a5d:590e:0:b0:33e:2d7b:c5a8 with SMTP id v14-20020a5d590e000000b0033e2d7bc5a8mr318923wrd.17.1711573045356;
+        Wed, 27 Mar 2024 13:57:25 -0700 (PDT)
+Received: from [192.168.0.3] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id az7-20020adfe187000000b00341ce80ea66sm8669296wrb.82.2024.03.27.13.57.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Mar 2024 13:57:24 -0700 (PDT)
+Message-ID: <46091098-d51b-45b2-a17f-f1e0329bcf01@gmail.com>
+Date: Wed, 27 Mar 2024 22:57:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+H3UkLQ2ywM6BKxo"
-Content-Disposition: inline
-In-Reply-To: <87ttkro3b5.fsf@all.your.base.are.belong.to.us>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/4] net: wwan: mhi: drop driver owner assignment
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Loic Poulain <loic.poulain@linaro.org>,
+ Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org
+References: <20240327174810.519676-1-krzysztof.kozlowski@linaro.org>
+ <20240327174810.519676-2-krzysztof.kozlowski@linaro.org>
+Cc: linux-kernel@vger.kernel.org
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20240327174810.519676-2-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 27.03.2024 19:48, Krzysztof Kozlowski wrote:
+> Core in mhi_driver_register() already sets the .owner, so driver
+> does not need to.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
---+H3UkLQ2ywM6BKxo
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Mar 27, 2024 at 08:57:50PM +0100, Bj=F6rn T=F6pel wrote:
-> Hi,
->=20
-> I figured I'd put some words on the "how to update the RISC-V
-> for-next/fixes branches [1]" that came up on the patchwork call today.
->=20
-> In RISC-V land, the for-next branch is used for features, and typically
-> sent as a couple of PRs to Linus when the merge window is open. The
-> fixes branch is sent as PR(s) between the RCs of a release.
->=20
-> Today, the baseline for for-next/fixes is the CURRENT_RELEASE-rc1, and
-> features/fixes are based on that.
->=20
-> This has IMO a couple of issues:
->=20
-> 1. fixes is missing the non-RISC-V fixes from releases later than
->    -rc1, which makes it harder for contributors.
-> 2. for-next does not have the fixes from RISC-V/rest of the kernel,
->    and it's hard for contributors to test the work on for-next (buggy,
->    no fixes, and sometime missing deps).
->=20
-> I used to spend a whole lot of mine time in the netdev tree of the
-> kernel, and this is how they manage it (Thanks Kuba!):
->=20
-> Netdev (here exchanged to RISC-V trees), fast-forward fixes, and then
-> cross-merge fixes into for-next -- for every -rc.
->=20
-> E.g., say fixes is submitted for -rc2 to Linus, once he pulls, do:
->=20
->   git push --delete origin $SOMETAG
->   git tag -d $SOMETAG
->   git pull --ff-only --tags git://git.kernel.org/pub/scm/linux/kernel/git=
-/torvalds/linux.git
->   build / test / push out.
->=20
-> Then pull fixes into for-next:
->=20
->   git pull --tags git://git.kernel.org/pub/scm/linux/kernel/git/riscv/lin=
-ux.git fixes
->=20
->=20
-> Personally (obviously biased), I think this would be easier for
-> contributors. Any downsides from a RISC-V perspective?
-
-After you left, Palmer said he'd go for merging his fixes tag into
-for-next after they got merged by Linus. At least I think it was that,
-rather than Linus' -rcs...
-
---+H3UkLQ2ywM6BKxo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgSCYQAKCRB4tDGHoIJi
-0jSXAQC9hx3TKykVdHY3TVEbOmGffTwUej+VecLBQq9NlaLEaQD8DHwblxB6xvNU
-37YujV2wcGemH2l70tsYuN6yZnL1vwg=
-=ZRKV
------END PGP SIGNATURE-----
-
---+H3UkLQ2ywM6BKxo--
+Acked-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
