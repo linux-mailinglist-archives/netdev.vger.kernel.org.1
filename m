@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-82500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF09088E6D2
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:44:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 809B288E6D5
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:44:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EB762E2149
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:44:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3FC11C2E562
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9590614AD25;
-	Wed, 27 Mar 2024 13:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A304E127B47;
+	Wed, 27 Mar 2024 13:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJ3RnOI8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="df/7DgX4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0CD13C3C2
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 13:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F3713AD15
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 13:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711546252; cv=none; b=MgEc2UqaWAEuuiWj/Z9OsPYE0Fb7R3pQXOhXzqPIetuniXkxlXRyqkB5OWmT9SYIkhDTBjowC3T0tgK+WHz5atYgrhwNkfpN33SY8H/p5k2MVJGR9mw903bkaWDewlzkD1MdOoblFxtcRa/zg8pzuU2BgqCLngZ3UDdrMpD/wE4=
+	t=1711546334; cv=none; b=ZCXjouDKWZp5MMti+tIQC4K4fftopd5z42Ea9VWCqFcqXX7nMh6JJ9Fn60CPnmNTGGGSPl2osMcaMo140RbOzw6Q0M0nTd61egmLCplp+Yk8WITxqNzladecy0V70WeL7qBniEXwN8Ji3+O8dkZo7hwuN2I4+IaMI9cSmD1yN/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711546252; c=relaxed/simple;
-	bh=0XY9//HMaNHTRAMknvvS4g417tWnY3ABPrd/afaOHBI=;
+	s=arc-20240116; t=1711546334; c=relaxed/simple;
+	bh=K0UVZINUhSSLxdNU4wwBE/T+FEz46ODAQKkZL3ADYrU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HwFMPE0buJDHoWhFA+IfHO+v3OnCdVd/F4H2OAEb3VA4ScBlYQbdulGWJi3r+o5edBN6TdugYw9LP1+WI6/xBR1/sLfdSYOfiH8SUja2voVjHAcVkWsmxqJM374o2/beMEUH0mrj2RVwziohbB+3JUytCH+OYoRe/ZGfGi5f2JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WJ3RnOI8; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=ut9r2z1nYAbCC8p36AAwf8QgtJ2xomZU53Ci9werKmx2TzAE192fk2wrAo1+PwPF0Vhv/djNbCR/gqaLOMrXwy452vbCqJkl6fd3llOVGOy/kaJEOfiSadK+S6gUdv+c47ngkNmVgJsSartDASfQW7g5pXvzfckSKcnvTxhO3/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=df/7DgX4; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711546248;
+	s=mimecast20190719; t=1711546331;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TLg38MFVhLXh0D5Ryy6sGfzcGNzaaaxhoktXDmAvMEQ=;
-	b=WJ3RnOI86/sAHWAMgdQqLrMelD/t6XEAckeoelj8QBm91qy5NU+vsN7633SgriEFzcAgpu
-	49OLRrd0n6XN7OqyRfFxgkebOUIRlojOjbNIfOpmnbNqVnIFEuO6YhEdmTBiQ+m7rZJ7Pb
-	sDPoociN0YtKSPkXDCc/x+PAqojvRJ4=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jD3Utmle+bis7mmdPw9AquqAmC1o8mQyHmUQiw/WEzk=;
+	b=df/7DgX4aTiAuA+JAj2tG6lVWAV68slnmgNzVKrmQG6jhUh5Mx53DO1djxuzUqoIoJpRdZ
+	DVmQJYFXTw/OSV//gs0x/8prhF6ZiHRlt3C6ylvTQRvk+SEmlP8UhagE6HY5f5PDqyBj04
+	DKQLnAFR3HLLDoNeoNE6D0kI3MuMWrk=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-8-OiO-lJsmNHKJt_G7KN1tSw-1; Wed, 27 Mar 2024 09:30:46 -0400
-X-MC-Unique: OiO-lJsmNHKJt_G7KN1tSw-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5684345c0ebso995938a12.1
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 06:30:46 -0700 (PDT)
+ us-mta-97-scfRyHy8OoiUW6io6VtvFA-1; Wed, 27 Mar 2024 09:32:10 -0400
+X-MC-Unique: scfRyHy8OoiUW6io6VtvFA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a47416276c7so260437466b.3
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 06:32:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711546245; x=1712151045;
+        d=1e100.net; s=20230601; t=1711546329; x=1712151129;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TLg38MFVhLXh0D5Ryy6sGfzcGNzaaaxhoktXDmAvMEQ=;
-        b=nMSaiWLiVJsx/lB0W3i33SjwoO0CcWyWd0QTp8/EtfMlDJDYG4iGefADEgI5gQLRUu
-         sWlcuvX5PUieu3v+GWkqRKkTi55JqaQuOecIltX4NJkp03XnlK6gEF9ZqGOOXO9X72eB
-         72pleP+rgU1VKGnvKvUdPOlrVDZ5wwNSTWc4KyFr5pHy/w4gWB5QUD+Ki9Sdp2N6hFhF
-         efXEUAOQ0JSmrsfBoV9BwZJcrZT223owO2K/3JWO4sAn1jmyOiyJYtXd4UCWhqiI4Hfq
-         cA5py118+PLavZ+DnpT9vqi7q4fU967KlQJ5yrGFwRQygCqlsg7fdlwGwbNjhc2KLdeu
-         0DAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWgFlfVQtoluXNiLB7n1Gqs0FvJ/zQNGf+5vEdXElnfH3BUoQskrNydeFY5V2eBw7+fPLyPgAZ5u+HiFu0q53Pxa+la2ZI6
-X-Gm-Message-State: AOJu0YzxCbK2uoEFslE7vh1jRm7VwW/diW5KisF+9PebtXr0huhMEhwQ
-	Sz/Dy4nUQlWt5HPp6SPi6p3Shiu+R8WtOGDV7nJa+C+pyba6oEwGft6zu/+sMeFJ6bnCVpKe+8g
-	eY4zWIpl+vwI+GR5ZXnl3nJ7vkea5avYl/2C3WnDniMv1TeQejAq/RA==
-X-Received: by 2002:a17:906:4552:b0:a4e:ca2:f597 with SMTP id s18-20020a170906455200b00a4e0ca2f597mr464571ejq.30.1711546245273;
-        Wed, 27 Mar 2024 06:30:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHxMNQa6I7wHwsl8AheMWybiN2BzRa3S3xpZTZlv2r8DjsDL3nA8c8TtS4ntqPeWCUGEfcy9w==
-X-Received: by 2002:a17:906:4552:b0:a4e:ca2:f597 with SMTP id s18-20020a170906455200b00a4e0ca2f597mr464548ejq.30.1711546244934;
-        Wed, 27 Mar 2024 06:30:44 -0700 (PDT)
+        bh=jD3Utmle+bis7mmdPw9AquqAmC1o8mQyHmUQiw/WEzk=;
+        b=NIPwZuxfFcw4OYNPcmRPFlNuYWRlYh/8kviYENMkCwCtEeLvrnSdOq24Jdj6zjLuCb
+         jddgQTo2sTMN1hVYlZlls3AE4xB19mnfTwaKMCcrGpzsxFaAT40yKI1S+sUDm+9kY/yk
+         hn8K0Zy26SIlOCD2UPXhUhgKZXiKEiY6pYweL3KbEJhE5ZyK+fvDCnDQASn/Pp4MhifI
+         Lojol1PVCz97Q4QVR3RzsDu4Uvp9yPBpWopX9s9nYDcK5AXwUoIOwNOZF/U+4hUxFtIS
+         sq0md3AZO0A8bFsmzV7GbgEAj/Vx1/kidZ4yVL+bhPzRhK0OPt9lSlS09BSNNV6etNEG
+         WnYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPSn31VZUgGZ4FqiFag0A040xUfxbKO8JfeCpVRJkAKKjSM7vPX+dbSiP11eq57tLmS171NryGv4j3rcstb7hmYcBvPZMh
+X-Gm-Message-State: AOJu0Yw6GwddPE4Dle8rdOUIBK8bwN/6djpEOMCGiXr5Z0ZpRAvcQWln
+	5qDB1DXGOOKv0Xx1zEBWHPcY5LhAUL+btOPsJDbe9FiUp1Z5itAk/UiOzh153DbchHBYVIDffqc
+	jSvEFBdRvUDEqsr34Zbklwah+TsvViFed9GYCjYwd6+koyNpfgW28mg==
+X-Received: by 2002:a17:907:7206:b0:a4d:fe2f:a70b with SMTP id dr6-20020a170907720600b00a4dfe2fa70bmr2448976ejc.41.1711546329060;
+        Wed, 27 Mar 2024 06:32:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGGdhqFLAf1gKN0Y/NZQvk+kIH5rUrJ00j88K5l/PrX7PEX8pYP+EIH8Lg2tXiyjUb+BEqFQQ==
+X-Received: by 2002:a17:907:7206:b0:a4d:fe2f:a70b with SMTP id dr6-20020a170907720600b00a4dfe2fa70bmr2448827ejc.41.1711546326567;
+        Wed, 27 Mar 2024 06:32:06 -0700 (PDT)
 Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
-        by smtp.gmail.com with ESMTPSA id q2-20020a1709060e4200b00a4674ad8ab9sm5383406eji.211.2024.03.27.06.30.43
+        by smtp.gmail.com with ESMTPSA id q2-20020a1709060e4200b00a4674ad8ab9sm5383406eji.211.2024.03.27.06.32.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 06:30:44 -0700 (PDT)
-Message-ID: <7a7d7216-ae22-4908-af63-6b1dd96359dd@redhat.com>
-Date: Wed, 27 Mar 2024 14:30:43 +0100
+        Wed, 27 Mar 2024 06:32:06 -0700 (PDT)
+Message-ID: <cbd6cf18-cdfe-409f-82f0-de46d2fe08ca@redhat.com>
+Date: Wed, 27 Mar 2024 14:32:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,6 +116,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 Hi,
+
+<sorry for the empty previous reply, my bad>
 
 On 3/27/24 2:16 PM, Rafael J. Wysocki wrote:
 > On Wed, Mar 27, 2024 at 8:44 AM Krzysztof Kozlowski
@@ -167,9 +169,18 @@ On 3/27/24 2:16 PM, Rafael J. Wysocki wrote:
 > 
 > for the series and I can pick it up if people agree.
 
+Thanks all the drivers/platform/x86/* change look good
+to me:
 
-> 
-> Thanks!
-> 
+Acked-by: Hans de Goede <hdegoede@redhat.com>
+
+And I'm fine with merging these through the linux-pm /
+ACPI tree.
+
+Regards,
+
+Hans
+
+
 
 
