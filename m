@@ -1,159 +1,103 @@
-Return-Path: <netdev+bounces-82606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D9FD88EAFB
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:20:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1A588EB09
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:22:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A14461C31D44
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:20:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9792528EF68
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E6B12FB12;
-	Wed, 27 Mar 2024 16:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEB3130AF0;
+	Wed, 27 Mar 2024 16:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d6yYArjz"
+	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="vSMCQaVH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38DA24F890;
-	Wed, 27 Mar 2024 16:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+Received: from smtpfb2-g21.free.fr (smtpfb2-g21.free.fr [212.27.42.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EACBE83A0B;
+	Wed, 27 Mar 2024 16:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711556405; cv=none; b=X+QNNFK+jy2vNM8rv2qqWor34TLahfAc1c89C8Vl/KDEJpQUnJK54uzZACqbXrQxmBoHHT6XMVeZfKub8kvy0XDhl6L2cWDtBwdmWYgix5kDoiaVA+xsZU3XrJG51yNRW0vYEMZtlKOwNaq7TEb5hudfxcdXRwwYIH1wU6JkToU=
+	t=1711556549; cv=none; b=sxcwfFNWRtw+5ePIjGoTIYPF7/Jzh8s/pJa8oVl153xykUYcCoYQpF7MzU5te9YlHsDWN6OmyjCvpuoYF5pBrQ4Mn61ZFAwmrlk6kxd/L+xqH2z4Ua04Dd0cGlFqdTD4a4BsFaS9tF0mnKlQfTfeBtc/onoRSLPVe1cjKIL6Tyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711556405; c=relaxed/simple;
-	bh=j88n54s9zbJvWLno8JfXJMl7NtO8hsipemJhXEQ6Oe4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DF+9SjGCPCyJa3QcWGinbE9DctHv+e+k8A5VbH+S/RdVdisCvilfz25KWX6I5Eyho1Sa+ZYNSfS78kcZliWYWqGbbUCFImdhTgGAeo4TUii0CjBHXPsEdzIUT4bLIU6CfnXLYJ3Q55d3dKbyMg/oUT26vvtA2jyZP+l5+VM4FBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d6yYArjz; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-341c9926f98so2659316f8f.1;
-        Wed, 27 Mar 2024 09:20:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711556402; x=1712161202; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GA4SmAHnWf7E/XAz1zEJ5N0QxB09yCyD6l/c5eJ2my4=;
-        b=d6yYArjzlsaFro0tR8lK5yIuGzuQck5g9g93jTBA72McGGVZMrTHyPrr/rfsvCgOp2
-         oOFmb7iW4K58GoUyPNFiZiNNNoUKprYFAXTZiTm1SjT/M/CBMn+ESiy5jOrO9fN6MJRZ
-         BUYnOM0YzS9J8nfFrZg/+WEU9hbHFu4reFKy7VWVFx4trfKG2+csQMwDAVfFpQYGpheV
-         3f0/dAUMfZAIyQGHSDCQjtYGRiKB0cp6QmVfa/eoHNmuDHDJraa9XmAmzBoWC9B5MzSM
-         bn884YYkKazijE6vVow6/ZQkk74TrGMVx2TLGXtGFsi3lkMVUMX/NR8QU00V41fqCTU4
-         j7ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711556402; x=1712161202;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GA4SmAHnWf7E/XAz1zEJ5N0QxB09yCyD6l/c5eJ2my4=;
-        b=q9sUvF2/z9Wf/dffkO6Gku3r1XSbw8J0mXuKWDC1zmQMDL2/Jm8VOBavR8RwZbISub
-         3GXxAdAimQW9YkbDsEPbJJ6zpBDfKRO4hNuF86sLw88lfQEoI4pImOONSUqCTuRKsFMY
-         FxQ5oC8nReDYMMZIioUCG9QKPrVP93Ia0gL4lyG530DMYYkQZJBsWTX44s7k9bM90ukf
-         UjPzTfdgbhNu4m2CutkdPIrFQ5QihhuQ2TgDIdJjq19iunLzxa3tpXTXQ6pXi61LAFeJ
-         Zv9JhWaYdgl/GUlLwf2UkYJOQ1WwTa0CukBlDARxNdVd5evwkJkQjR0pLrfawWrhXptT
-         X+QQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVlALUS19X/8NvWXAx+HQnencAuIT3Oe5HF3DZFMYRs4T/SMhsPr5k1yuW7ivtwdsxp1XlHdbjRfta6twfHnN2hUkrsLIYtGMbYOIjiigRDpydbAgS8KD0y3ROw
-X-Gm-Message-State: AOJu0YyECuJYQJwRasa30ssL2jqzeVDxX7klEEBY2rFwQN/spoDs1ZSL
-	bHwZnZQV+jSMuQOHIrIjiKSlhRZx0K8hWrkTOeFyRs5OSbs6LiIkzcWOFvTeMpjUKEKdkmvzEBI
-	KyzmFFgQHUfhTyg1a/Dqgp5X+mHKbX25w
-X-Google-Smtp-Source: AGHT+IGOLUyybcaypmwHtjo1hmb6tDschtNePdsR8FdIz9SZnndIxYwA3hfIOexbD2jDzYa+ftvaKAwLNVT68AqgLmY=
-X-Received: by 2002:a5d:6150:0:b0:33e:67c3:43cd with SMTP id
- y16-20020a5d6150000000b0033e67c343cdmr304498wrt.27.1711556402510; Wed, 27 Mar
- 2024 09:20:02 -0700 (PDT)
+	s=arc-20240116; t=1711556549; c=relaxed/simple;
+	bh=g9NIYWY7Zqq4Jpe3GVuphoABvUpR98WMNlTO/PqC+cM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W0+VZwtK9f5Ae2J1rFarexkkZwPR1vpW8002AGfSHYDd7Xed82yj7jzhz/Di+7pHWcGWPlzlI0pbIJfaG5z4y99fRqwAKYIIplpNsaNRvbmAVUo+tiNcdRLsCwvT2nLS/09pfrz9RnXVM88O83NjtRigXMMuIhNyQT+QRzHhPL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=vSMCQaVH; arc=none smtp.client-ip=212.27.42.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=free.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
+Received: from smtp5-g21.free.fr (smtp5-g21.free.fr [212.27.42.5])
+	by smtpfb2-g21.free.fr (Postfix) with ESMTP id 75DD44C8DC;
+	Wed, 27 Mar 2024 17:22:16 +0100 (CET)
+Received: from [IPV6:2a01:e0a:255:1000:f49a:79c4:c3c6:eaf3] (unknown [IPv6:2a01:e0a:255:1000:f49a:79c4:c3c6:eaf3])
+	(Authenticated sender: duncan.sands@free.fr)
+	by smtp5-g21.free.fr (Postfix) with ESMTPSA id A3A9F60142;
+	Wed, 27 Mar 2024 17:20:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
+	s=smtp-20201208; t=1711556526;
+	bh=g9NIYWY7Zqq4Jpe3GVuphoABvUpR98WMNlTO/PqC+cM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vSMCQaVHDvOS+MJTVx5PjO8YOXxmIEoXqqAuvBYuRC535uirpZWCAg3Zcduu9rDtt
+	 KXKCxUyreW9ES5/mQaKWuQmfTpoSpYf8IwCcPc988GMFZvS+1wbAKCcOjbSk3mXiD9
+	 ZK8Hamum4SVmsMBE1c9pxQwBG+dsyo12O4SxF8j/IiVpKDUrPYQJdtKDuV/HWRo3xL
+	 PYIWjDHKv6Iwt5jWnepwy1J7Y+fjiF4JTHXVaKfZ4ukUUftUNKj+3Aem3Jcxh8PUFu
+	 tZQKCHeE4q+71+QXSA4TwBR2eiNJVHnD/WyXCPKNPqsgcwl7VuDNvLoWg/63fz6oE5
+	 pvkLMrw2O9NMA==
+Message-ID: <7297be25-a3c8-4e8b-9a80-ff720ccddc90@free.fr>
+Date: Wed, 27 Mar 2024 17:20:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240321134911.120091-1-tushar.vyavahare@intel.com> <CAJ8uoz1+ubemU4FPviGjTgtbW9f37=AxnDVXvkw85d4eQkfzhg@mail.gmail.com>
-In-Reply-To: <CAJ8uoz1+ubemU4FPviGjTgtbW9f37=AxnDVXvkw85d4eQkfzhg@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 27 Mar 2024 09:19:50 -0700
-Message-ID: <CAADnVQK6mRib56QC4K2RhCRH_1yHEH-37J_h25mZ3hwPRHbRcQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 0/7] Selftests/xsk: Test with maximum and
- minimum HW ring size configurations
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-Cc: Tushar Vyavahare <tushar.vyavahare@intel.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	"Karlsson, Magnus" <magnus.karlsson@intel.com>, 
-	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"Sarkar, Tirthendu" <tirthendu.sarkar@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/9] USB: Convert from tasklet to BH workqueue
+To: Allen Pais <apais@linux.microsoft.com>, linux-kernel@vger.kernel.org
+Cc: tj@kernel.org, keescook@chromium.org, vkoul@kernel.org, marcan@marcan.st,
+ sven@svenpeter.dev, florian.fainelli@broadcom.com, rjui@broadcom.com,
+ sbranden@broadcom.com, paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com,
+ manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com,
+ leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com,
+ haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de,
+ sean.wang@mediatek.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, afaerber@suse.de,
+ logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com,
+ robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org,
+ orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
+ patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org,
+ jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ jassisinghbrar@gmail.com, mchehab@kernel.org, maintainers@bluecherrydvr.com,
+ aubin.constans@microchip.com, ulf.hansson@linaro.org,
+ manuel.lauss@gmail.com, mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com,
+ oakad@yahoo.com, hayashi.kunihiko@socionext.com, mhiramat@kernel.org,
+ brucechang@via.com.tw, HaraldWelte@viatech.com, pierre@ossman.eu,
+ stern@rowland.harvard.edu, oneukum@suse.com,
+ openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
+ asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+ linux-mediatek@lists.infradead.org, linux-actions@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+ linux-omap@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org, linux-usb@vger.kernel.org
+References: <20240327160314.9982-1-apais@linux.microsoft.com>
+ <20240327160314.9982-5-apais@linux.microsoft.com>
+Content-Language: en-GB
+From: Duncan Sands <duncan.sands@free.fr>
+In-Reply-To: <20240327160314.9982-5-apais@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 26, 2024 at 12:24=E2=80=AFAM Magnus Karlsson
-<magnus.karlsson@gmail.com> wrote:
->
-> On Thu, 21 Mar 2024 at 15:05, Tushar Vyavahare
-> <tushar.vyavahare@intel.com> wrote:
-> >
-> > Please find enclosed a patch set that introduces enhancements and new t=
-est
-> > cases to the selftests/xsk framework. These test the robustness and
-> > reliability of AF_XDP across both minimal and maximal ring size
-> > configurations.
-> >
-> > While running these tests, a bug [1] was identified when the batch size=
- is
-> > roughly the same as the NIC ring size. This has now been addressed by
-> > Maciej's fix.
-> >
-> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/comm=
-it/?id=3D913eda2b08cc49d31f382579e2be34c2709eb789
-> >
-> > Patch Summary:
-> >
-> > 1. This commit syncs the ethtool.h header file between the kernel sourc=
-e
-> >    tree and the tools directory to maintain consistency.
-> >
-> > 2: Modifies the BATCH_SIZE from a constant to a variable, batch_size, t=
-o
-> >    support dynamic modification at runtime for testing different hardwa=
-re
-> >    ring sizes.
-> >
-> > 3: Implements a function, get_hw_ring_size, to retrieve the current
-> >    maximum interface size and store this information in the
-> >    ethtool_ringparam structure.
-> >
-> > 4: Implements a new function, set_hw_ring_size, which allows for the
-> >    dynamic configuration of the ring size within an interface.
-> >
-> > 5: Introduce a new function, set_ring_size(), to manage asynchronous AF=
-_XDP
-> >    socket closure. Make sure to retry the set_hw_ring_size function
-> >    multiple times, up to SOCK_RECONF_CTR, if it fails due to an active
-> >    AF_XDP socket. Immediately return an error for non-EBUSY errors.
-> >
-> > 6: Adds a new test case that puts the AF_XDP driver under stress by
-> >    configuring minimal hardware and software ring sizes, verifying its
-> >    functionality under constrained conditions.
-> >
-> > 7: Add a new test case that evaluates the maximum ring sizes for AF_XDP=
-,
-> >    ensuring its reliability under maximum ring utilization.
-> >
-> > Testing Strategy:
-> >
-> > Check the system in extreme scenarios, such as maximum and minimum
-> > configurations. This helps identify and fix any bugs that may occur.
->
-> Thanks Tushar for this patch set. A year and a half ago, we had some
-> bugs in this area in the ice driver, so these new tests are very
-> welcome.
->
-> Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Hi Allen, the usbatm bits look very reasonable to me.  Unfortunately I don't 
+have the hardware to test any more.  Still, for what it's worth:
 
-Agree, but CI doesn't like the set.
-
-Tushar, pls keep the Ack when you respin.
+Signed-off-by: Duncan Sands <duncan.sands@free.fr>
 
