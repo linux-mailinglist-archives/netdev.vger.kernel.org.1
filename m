@@ -1,228 +1,239 @@
-Return-Path: <netdev+bounces-82383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC0B688D802
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:53:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5AC88D80C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:54:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A39B1C25EF5
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:53:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 303D31C26053
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5982F37143;
-	Wed, 27 Mar 2024 07:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B212E644;
+	Wed, 27 Mar 2024 07:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WRNQtcAk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mBdwjkqw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAB23613E
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5A82E651;
+	Wed, 27 Mar 2024 07:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711525734; cv=none; b=RHqQmvfOIYLL9w1VT6i2pCSk2lqR0pBKy7pZpo6eh6DYOtXznDuaEaFb3ddEE8EMkq04Th8MefSWWJg2MNvbbdnMH1/E5k2dPmrDbv5TYCLGkotdirIn/lFACx/F4wOPx8uR9KGhvKk0ukjvRjw6WMUjJyC2q8lRh7WOXuI4H60=
+	t=1711525819; cv=none; b=fb7DIMoEfXcy8viV0fgq66QCFvxrq6+3AWcCynza4hqULrPrVdy5bJQU1OB3TKcoLHXKt/8bQgUUiXHEgrbTeXp842qjtP0+4QcYE2uMhwAmPKc7PTcUWzuwbXHKsrKddukXKOKk1WDKgp0Wc+miQsRyQDcIUoyGG6him+fI2Wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711525734; c=relaxed/simple;
-	bh=7YMhfk0p2O36gZWTX2RotZ/8+ijBT+vuda5UTe+68oo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iPlnnWyr1Z6a4F7tIrkQ6Cjzl8HtYJtl2MrdeMEDYYXjZvb2WQIAqKhu2giSt8nFDXRWRIIvl/trckS0u0kRzGrTCSRVsYI0SBmubREQ96E4oE5ZmpBPPeIGSA2ElK1R7gbrWUkRdzHA1Q4FplBwjpVAr0EMwzdeWAxQauDiCME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WRNQtcAk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711525730;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=743xqqMxvEa8pf291lhegMW777M4srXuD6J4SDbXQ5g=;
-	b=WRNQtcAkjdn+fRpD9YjdqVGZcMUOMJ56vV8h5RRTRFAhpsMTdtnrZEtz2lo40aVEPFycHy
-	1/CJfbsGz+FqoARNCFSvzrCEMgLhPyGh1+YmxIgcKJnfkaWdDDlOmR9BDg3kGZr/wFWHD9
-	junk5l0pF8UVRCV4fhcYIbW8iqHomo8=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-574-hNsPy_KzPli9ocmHw0iLrA-1; Wed,
- 27 Mar 2024 03:48:46 -0400
-X-MC-Unique: hNsPy_KzPli9ocmHw0iLrA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 834FA1C01719;
-	Wed, 27 Mar 2024 07:48:45 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.224.197])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E7205492BDA;
-	Wed, 27 Mar 2024 07:48:43 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mschmidt@redhat.com,
-	aleksandr.loktionov@intel.com,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH iwl-next v2 3/8] i40e: Refactor argument of several client notification functions
-Date: Wed, 27 Mar 2024 08:48:28 +0100
-Message-ID: <20240327074833.8701-4-ivecera@redhat.com>
-In-Reply-To: <20240327074833.8701-1-ivecera@redhat.com>
-References: <20240327074833.8701-1-ivecera@redhat.com>
+	s=arc-20240116; t=1711525819; c=relaxed/simple;
+	bh=+I0dUNOdZGkwtBeC0T1EU1TrsDrWBxEiMA9XkoJPZrg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=A6Ghz/AYm4Zg5LvKYaDlxauccQlV19cW/f1PCDce9tXxt88rgc5sAFIpg2e5/RSWORcPVHXXNBklREqVuthV4OeUus1AXjCGFDFL44UYwglYys9FL1Maae666IZ+uYqC+hH6G5Z55Jj5kjYHPyLQ/tnKIk3rOU9+tjd+ogmA6ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mBdwjkqw; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711525817; x=1743061817;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=+I0dUNOdZGkwtBeC0T1EU1TrsDrWBxEiMA9XkoJPZrg=;
+  b=mBdwjkqwAsAxs3oi7apG/3ZtBkcnGikAWzoehoPZOkbTYpetrxHWvsfX
+   +eph1azzxHrFfNAOe6p3LmfchINcPPToWi/uSzbVnwVpruMnB9sCEFaLe
+   6Vtjlt2UVeYpyuHgis9/Bamdy7vhl6jo6xfrokuGIgi5DF76sHeH3ViIA
+   0CyFfaC5yKldgVT8vTWq1tQLAx7V1Zzt5Qh37mN1+jSMm7ppYAORBtgoZ
+   CvpJr8zEtA9Lw8dPHV/iPBMlmZCOWcE7GDpphatxEOVFPHAUqnLxZNonI
+   wQEAoOq8KpfgzUnoQhZbRHqTqka+psUEpRumluka9xe1SnEhxqH4FODgt
+   Q==;
+X-CSE-ConnectionGUID: MsyQbz5AQHy8y68fVaLnuQ==
+X-CSE-MsgGUID: hocw4mZkQ2y001r8rNwlqA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="6467190"
+X-IronPort-AV: E=Sophos;i="6.07,158,1708416000"; 
+   d="scan'208";a="6467190"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 00:50:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,158,1708416000"; 
+   d="scan'208";a="16277502"
+Received: from mmazilu-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.56.43])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 00:50:08 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
+ linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>,
+ Harry Wentland <harry.wentland@amd.com>, Alex Deucher
+ <alexander.deucher@amd.com>, Christian =?utf-8?Q?K=C3=B6nig?=
+ <christian.koenig@amd.com>,
+ Lucas De Marchi <lucas.demarchi@intel.com>, Oded Gabbay
+ <ogabbay@kernel.org>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
+ Thomas Zimmermann <tzimmermann@suse.de>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Jeffery
+ <andrew@codeconstruct.com.au>, Linus Walleij <linus.walleij@linaro.org>,
+ Joel Stanley <joel@jms.id.au>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas@fjasle.eu>, dri-devel@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-mm@kvack.org, llvm@lists.linux.dev
+Subject: Re: [PATCH 01/12] kbuild: make -Woverride-init warnings more
+ consistent
+In-Reply-To: <cb853762-06d4-401c-a1c8-07a0c031b499@app.fastmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20240326144741.3094687-1-arnd@kernel.org>
+ <20240326144741.3094687-2-arnd@kernel.org> <87jzlohhbc.fsf@intel.com>
+ <cb853762-06d4-401c-a1c8-07a0c031b499@app.fastmail.com>
+Date: Wed, 27 Mar 2024 09:50:05 +0200
+Message-ID: <87edbwglle.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain
 
-Commit 0ef2d5afb12d ("i40e: KISS the client interface") simplified
-the client interface so in practice it supports only one client
-per i40e netdev. But we have still 2 notification functions that
-uses as parameter a pointer to VSI of netdevice associated with
-the client. After the mentioned commit only possible and used
-VSI is the main (LAN) VSI.
-So refactor these functions so they are called with PF pointer argument
-and the associated VSI (LAN) is taken inside them.
+On Tue, 26 Mar 2024, "Arnd Bergmann" <arnd@arndb.de> wrote:
+> On Tue, Mar 26, 2024, at 21:24, Jani Nikula wrote:
+>> On Tue, 26 Mar 2024, Arnd Bergmann <arnd@kernel.org> wrote:
+>>> From: Arnd Bergmann <arnd@arndb.de>
+>>> index 475e1e8c1d35..0786eb0da391 100644
+>>> --- a/drivers/net/ethernet/renesas/sh_eth.c
+>>> +++ b/drivers/net/ethernet/renesas/sh_eth.c
+>>> @@ -50,7 +50,7 @@
+>>>   * the macros available to do this only define GCC 8.
+>>>   */
+>>>  __diag_push();
+>>> -__diag_ignore(GCC, 8, "-Woverride-init",
+>>> +__diag_ignore_all("-Woverride-init",
+>>>  	      "logic to initialize all and then override some is OK");
+>>
+>> This is nice because it's more localized than the per-file
+>> disable. However, we tried to do this in i915, but this doesn't work for
+>> GCC versions < 8, and some defconfigs enabling -Werror forced us to
+>> revert. See commit 290d16104575 ("Revert "drm/i915: use localized
+>> __diag_ignore_all() instead of per file"").
+>
+> It works now.
+>
+> The original __diag_ignore_all() only did it for gcc-8 and above
+> because that was initially needed to suppress warnings that
+> got added in that version, but this was always a mistake.
+>
+> 689b097a06ba ("compiler-gcc: Suppress -Wmissing-prototypes
+> warning for all supported GCC") made it work correctly.
 
-Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h        |  4 ++--
- drivers/net/ethernet/intel/i40e/i40e_client.c | 20 +++++++++----------
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 12 +++++------
- 3 files changed, 17 insertions(+), 19 deletions(-)
+Oh, nice! Then I think we'd like to go back to __diag_ignore_all() in
+i915 and xe.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 5248e78f7849..0792c7324527 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -1236,8 +1236,8 @@ static inline void i40e_dbg_exit(void) {}
- int i40e_lan_add_device(struct i40e_pf *pf);
- int i40e_lan_del_device(struct i40e_pf *pf);
- void i40e_client_subtask(struct i40e_pf *pf);
--void i40e_notify_client_of_l2_param_changes(struct i40e_vsi *vsi);
--void i40e_notify_client_of_netdev_close(struct i40e_vsi *vsi, bool reset);
-+void i40e_notify_client_of_l2_param_changes(struct i40e_pf *pf);
-+void i40e_notify_client_of_netdev_close(struct i40e_pf *pf, bool reset);
- void i40e_notify_client_of_vf_enable(struct i40e_pf *pf, u32 num_vfs);
- void i40e_notify_client_of_vf_reset(struct i40e_pf *pf, u32 vf_id);
- void i40e_client_update_msix_info(struct i40e_pf *pf);
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_client.c b/drivers/net/ethernet/intel/i40e/i40e_client.c
-index b32071ee84af..93e52138826e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_client.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_client.c
-@@ -101,25 +101,26 @@ i40e_notify_client_of_vf_msg(struct i40e_vsi *vsi, u32 vf_id, u8 *msg, u16 len)
+The diff is below. I'm fine with you squashing it to your patch, or if
+you want me to turn it into a proper patch for you to pick up in your
+series, that's fine too. Just let me know.
+
+BR,
+Jani.
+
+Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+
+
+diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
+index 3ef6ed41e62b..87d6ba8d2341 100644
+--- a/drivers/gpu/drm/i915/Makefile
++++ b/drivers/gpu/drm/i915/Makefile
+@@ -32,11 +32,6 @@ endif
+ # Enable -Werror in CI and development
+ subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
  
- /**
-  * i40e_notify_client_of_l2_param_changes - call the client notify callback
-- * @vsi: the VSI with l2 param changes
-+ * @pf: PF device pointer
+-# Fine grained warnings disable
+-CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
+-CFLAGS_display/intel_display_device.o = $(call cc-disable-warning, override-init)
+-CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
+-
+ # Support compiling the display code separately for both i915 and xe
+ # drivers. Define I915 when building i915.
+ subdir-ccflags-y += -DI915
+diff --git a/drivers/gpu/drm/i915/display/intel_display_device.c b/drivers/gpu/drm/i915/display/intel_display_device.c
+index c02d79b50006..b8903bd0e82a 100644
+--- a/drivers/gpu/drm/i915/display/intel_display_device.c
++++ b/drivers/gpu/drm/i915/display/intel_display_device.c
+@@ -17,6 +17,9 @@
+ #include "intel_display_reg_defs.h"
+ #include "intel_fbc.h"
+ 
++__diag_push();
++__diag_ignore_all("-Woverride-init", "Allow field initialization overrides for display info");
++
+ static const struct intel_display_device_info no_display = {};
+ 
+ #define PIPE_A_OFFSET		0x70000
+@@ -768,6 +771,8 @@ static const struct intel_display_device_info xe2_lpd_display = {
+ 		BIT(INTEL_FBC_C) | BIT(INTEL_FBC_D),
+ };
+ 
++__diag_pop();
++
+ /*
+  * Separate detection for no display cases to keep the display id array simple.
   *
-- * If there is a client to this VSI, call the client
-+ * If there is a client, call its callback
-  **/
--void i40e_notify_client_of_l2_param_changes(struct i40e_vsi *vsi)
-+void i40e_notify_client_of_l2_param_changes(struct i40e_pf *pf)
+diff --git a/drivers/gpu/drm/i915/display/intel_fbdev.c b/drivers/gpu/drm/i915/display/intel_fbdev.c
+index 99894a855ef0..43855c6c3509 100644
+--- a/drivers/gpu/drm/i915/display/intel_fbdev.c
++++ b/drivers/gpu/drm/i915/display/intel_fbdev.c
+@@ -135,6 +135,9 @@ static int intel_fbdev_mmap(struct fb_info *info, struct vm_area_struct *vma)
+ 	return i915_gem_fb_mmap(obj, vma);
+ }
+ 
++__diag_push();
++__diag_ignore_all("-Woverride-init", "Allow field initialization overrides for fb ops");
++
+ static const struct fb_ops intelfb_ops = {
+ 	.owner = THIS_MODULE,
+ 	__FB_DEFAULT_DEFERRED_OPS_RDWR(intel_fbdev),
+@@ -146,6 +149,8 @@ static const struct fb_ops intelfb_ops = {
+ 	.fb_mmap = intel_fbdev_mmap,
+ };
+ 
++__diag_pop();
++
+ static int intelfb_create(struct drm_fb_helper *helper,
+ 			  struct drm_fb_helper_surface_size *sizes)
  {
--	struct i40e_pf *pf = vsi->back;
- 	struct i40e_client_instance *cdev = pf->cinst;
-+	struct i40e_vsi *vsi = pf->vsi[pf->lan_vsi];
- 	struct i40e_params params;
+diff --git a/drivers/gpu/drm/i915/i915_pci.c b/drivers/gpu/drm/i915/i915_pci.c
+index 1e69783ae4fd..405ca17a990b 100644
+--- a/drivers/gpu/drm/i915/i915_pci.c
++++ b/drivers/gpu/drm/i915/i915_pci.c
+@@ -38,6 +38,9 @@
+ #include "i915_reg.h"
+ #include "intel_pci_config.h"
  
- 	if (!cdev || !cdev->client)
- 		return;
- 	if (!cdev->client->ops || !cdev->client->ops->l2_param_change) {
--		dev_dbg(&vsi->back->pdev->dev,
-+		dev_dbg(&pf->pdev->dev,
- 			"Cannot locate client instance l2_param_change routine\n");
- 		return;
- 	}
- 	if (!test_bit(__I40E_CLIENT_INSTANCE_OPENED, &cdev->state)) {
--		dev_dbg(&vsi->back->pdev->dev, "Client is not open, abort l2 param change\n");
-+		dev_dbg(&pf->pdev->dev,
-+			"Client is not open, abort l2 param change\n");
- 		return;
- 	}
- 	memset(&params, 0, sizeof(params));
-@@ -157,20 +158,19 @@ static void i40e_client_release_qvlist(struct i40e_info *ldev)
++__diag_push();
++__diag_ignore_all("-Woverride-init", "Allow field initialization overrides for device info");
++
+ #define PLATFORM(x) .platform = (x)
+ #define GEN(x) \
+ 	.__runtime.graphics.ip.ver = (x), \
+@@ -785,6 +788,8 @@ static const struct intel_device_info mtl_info = {
  
- /**
-  * i40e_notify_client_of_netdev_close - call the client close callback
-- * @vsi: the VSI with netdev closed
-+ * @pf: PF device pointer
-  * @reset: true when close called due to a reset pending
-  *
-  * If there is a client to this netdev, call the client with close
-  **/
--void i40e_notify_client_of_netdev_close(struct i40e_vsi *vsi, bool reset)
-+void i40e_notify_client_of_netdev_close(struct i40e_pf *pf, bool reset)
- {
--	struct i40e_pf *pf = vsi->back;
- 	struct i40e_client_instance *cdev = pf->cinst;
+ #undef PLATFORM
  
- 	if (!cdev || !cdev->client)
- 		return;
- 	if (!cdev->client->ops || !cdev->client->ops->close) {
--		dev_dbg(&vsi->back->pdev->dev,
-+		dev_dbg(&pf->pdev->dev,
- 			"Cannot locate client instance close routine\n");
- 		return;
- 	}
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 2f1604ae78c7..7fed7fb69d4e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -11283,14 +11283,12 @@ static void i40e_service_task(struct work_struct *work)
- 		i40e_fdir_reinit_subtask(pf);
- 		if (test_and_clear_bit(__I40E_CLIENT_RESET, pf->state)) {
- 			/* Client subtask will reopen next time through. */
--			i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi],
--							   true);
-+			i40e_notify_client_of_netdev_close(pf, true);
- 		} else {
- 			i40e_client_subtask(pf);
- 			if (test_and_clear_bit(__I40E_CLIENT_L2_CHANGE,
- 					       pf->state))
--				i40e_notify_client_of_l2_param_changes(
--								pf->vsi[pf->lan_vsi]);
-+				i40e_notify_client_of_l2_param_changes(pf);
- 		}
- 		i40e_sync_filters_subtask(pf);
- 	} else {
-@@ -16228,7 +16226,7 @@ static void i40e_remove(struct pci_dev *pdev)
- 	/* Client close must be called explicitly here because the timer
- 	 * has been stopped.
- 	 */
--	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
-+	i40e_notify_client_of_netdev_close(pf, false);
++__diag_pop();
++
+ /*
+  * Make sure any device matches here are from most specific to most
+  * general.  For example, since the Quanta match is based on the subsystem
+diff --git a/drivers/gpu/drm/xe/Makefile b/drivers/gpu/drm/xe/Makefile
+index 3c3e67885559..2f58faf0a79a 100644
+--- a/drivers/gpu/drm/xe/Makefile
++++ b/drivers/gpu/drm/xe/Makefile
+@@ -172,9 +172,6 @@ subdir-ccflags-$(CONFIG_DRM_XE_DISPLAY) += \
+ 	-Ddrm_i915_gem_object=xe_bo \
+ 	-Ddrm_i915_private=xe_device
  
- 	i40e_fdir_teardown(pf);
- 
-@@ -16487,7 +16485,7 @@ static void i40e_shutdown(struct pci_dev *pdev)
- 	/* Client close must be called explicitly here because the timer
- 	 * has been stopped.
- 	 */
--	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
-+	i40e_notify_client_of_netdev_close(pf, false);
- 
- 	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps) &&
- 	    pf->wol_en)
-@@ -16541,7 +16539,7 @@ static int i40e_suspend(struct device *dev)
- 	/* Client close must be called explicitly here because the timer
- 	 * has been stopped.
- 	 */
--	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
-+	i40e_notify_client_of_netdev_close(pf, false);
- 
- 	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps) &&
- 	    pf->wol_en)
+-CFLAGS_i915-display/intel_fbdev.o = $(call cc-disable-warning, override-init)
+-CFLAGS_i915-display/intel_display_device.o = $(call cc-disable-warning, override-init)
+-
+ # Rule to build SOC code shared with i915
+ $(obj)/i915-soc/%.o: $(srctree)/drivers/gpu/drm/i915/soc/%.c FORCE
+ 	$(call cmd,force_checksrc)
+
 -- 
-2.43.0
-
+Jani Nikula, Intel
 
