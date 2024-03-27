@@ -1,178 +1,194 @@
-Return-Path: <netdev+bounces-82681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1450988F1A8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 23:12:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D0488F1B1
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 23:16:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FB98294F67
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:12:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95B231C28E18
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FD8152E17;
-	Wed, 27 Mar 2024 22:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F47715359B;
+	Wed, 27 Mar 2024 22:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FpNXClLW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N0J7uWQT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A2C150982
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 22:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8855E150982
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 22:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711577567; cv=none; b=ee7Zrgda2cL1NGmrT6Wnk7w8wRferfu8ZVmmlZk94vxuKIed+fOpt0q7Z3QnYMKeSi04xeUvXSBjNcCGWnCS4Blv49iqgezm+uQZwU9R5Oidie9wVQzOPJTJUGHBlA/24WswG5fh/whgPOnMe+KvaiiDg2w0KHGRoOEvkyFysUo=
+	t=1711577787; cv=none; b=e83/+u0xxG5juXA+X5AYcG9sG7iPVdwIPgoAKocAZ6paH/BZWqMBqCyy65rfw4XGLdw5hm2OynhDatVN9Uw3LVuNMfsZextv9U0sT4nE2o2lI1RQEg5puCriWyYzrZlCH1zXlW6u+Jd58IPbVKkqMiZwv5GVD2VNO1oUy5SWQo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711577567; c=relaxed/simple;
-	bh=PlUoPOLQIqqodP0Vk11RTAn31WG2ArvUtXykR6VJtw4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J8ExRvyrv0rkCaHIXMzmbq4dIdD6vYt0dHRwj2R+ahTcJP9+jfUiHXtJlxSqOrkz4Pbv4s/vuzaOV83gOg/kO9IAYen3V2sHTu1KuUzkhQqdm6cct8/ey6d4g/STyXhf1OcFim03eEzsLhYFo9ipHk37vt8lNqU+VWKbvOEsmKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FpNXClLW; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711577566; x=1743113566;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PlUoPOLQIqqodP0Vk11RTAn31WG2ArvUtXykR6VJtw4=;
-  b=FpNXClLWjD93MfQEZ+WU2+0zPQt/8U6Xsq25jo0tqL6bMwwlQYeRcbja
-   yX1aY9XW8KjMLtPAvCc1XGnbt1CG20t1BizWhs2HKK/Jf1PSAgpWirRBx
-   uVBmUHrPpSc+CeIx2XRvQ5CNwbd7roOsgJpmWRRGuV9NUlk+IPklCsDDy
-   /WsA42dDBVmeT8AQvSR+6HHkoUvnP29r4tVaXivAGQJUlH45n//GM9OEB
-   tWoAGTSy3S3Nosu6bBtlKrGZHAkM2GMz2hi3ghkagMOft21mn41xJF4rg
-   gHl36tkc5LVPxVLyX4XLFOJLbuzP/zflTK0KDJqdUx5LCQP8TqXoOuW/b
-   Q==;
-X-CSE-ConnectionGUID: 5RBh9Vt/QD61OWFag636gA==
-X-CSE-MsgGUID: lEvvCd8zSYm5wAeFNMytgg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6925710"
-X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="6925710"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 15:12:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="53902958"
-Received: from lkp-server01.sh.intel.com (HELO be39aa325d23) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 27 Mar 2024 15:12:43 -0700
-Received: from kbuild by be39aa325d23 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rpbVg-0001Xq-2y;
-	Wed, 27 Mar 2024 22:12:40 +0000
-Date: Thu, 28 Mar 2024 06:12:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	netdev@vger.kernel.org, Carolyn Wyborny <carolyn.wyborny@intel.com>,
-	Jan Glaza <jan.glaza@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 5/5] ixgbe: Enable link
- management in E610 device
-Message-ID: <202403280523.pcRsyVNp-lkp@intel.com>
-References: <20240327155422.25424-6-piotr.kwapulinski@intel.com>
+	s=arc-20240116; t=1711577787; c=relaxed/simple;
+	bh=TL38rdaM2fQ9Y+5FhIl1zc5uqD5U3p45jsJRIMDvQP0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kqSsKCSGLJsBquPWfZpnSadtdOATfAgSn7RZBBgCkFFm4bxOf+RCS7dzF+C17ujOLPTuoEpW6GedcOUUAGoCtYgB2DoHYEd2u/3DicvAXeAgD0Too/DR3jPBqptCrhZtv17C07BJUkmh06FJMkyGpErxRpbceRnGx/XIeaUp+jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N0J7uWQT; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <649dc1dc-ca80-4686-ae37-62d7c81dde8b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711577783;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uhS1cYr0b+J7i2oT4omrAU15v3XtnTOguzp54SXOCQI=;
+	b=N0J7uWQTyZ6m2rCZR5vCqOCF8LFZ97B9Qh2zySkgqlOdPOAY/OStiAeTy+TXwJ3xUT71Nt
+	kUCRYs0qRUSYamP3DS9vqNmf4wBPFm75cq6gJPoxBq0PIITrTH19ofRa4ivxSBJhPs38vO
+	vYESVjEDBS7EEkDKF9jnrZxaQT9vuNM=
+Date: Wed, 27 Mar 2024 15:16:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327155422.25424-6-piotr.kwapulinski@intel.com>
+Subject: Re: mptcp splat
+Content-Language: en-US
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+ MPTCP Upstream <mptcp@lists.linux.dev>, Matthieu Baerts
+ <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>
+References: <CAADnVQKCxxETthqDpcE1xMGwa5au8JuLr_49QuwemL7uBKfiVg@mail.gmail.com>
+ <8410a6f61e7a778117819ebeda667687353ffb21.camel@redhat.com>
+ <CAADnVQLj9bQDonRzJO5z2hMZ7kf6zdU-s6Cm_7_kj-wP3CiUSA@mail.gmail.com>
+ <d917d3a5690a0115cb8136e1dda5fbe5621dcd95.camel@redhat.com>
+ <CAADnVQKXcEhL680E85=rrYuu4eVvVTH60kYRY_VnAKzZo1qKYg@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAADnVQKXcEhL680E85=rrYuu4eVvVTH60kYRY_VnAKzZo1qKYg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Piotr,
+On 3/27/24 11:50 AM, Alexei Starovoitov wrote:
+> On Wed, Mar 27, 2024 at 11:33 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>
+>> On Wed, 2024-03-27 at 10:00 -0700, Alexei Starovoitov wrote:
+>>> On Wed, Mar 27, 2024 at 9:56 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>>
+>>>> On Wed, 2024-03-27 at 09:43 -0700, Alexei Starovoitov wrote:
+>>>>> I ffwded bpf tree with the recent net fixes and caught this:
+>>>>>
+>>>>> [   48.386337] WARNING: CPU: 32 PID: 3276 at net/mptcp/subflow.c:1430
+>>>>> subflow_data_ready+0x147/0x1c0
+>>>>> [   48.392012] Modules linked in: dummy bpf_testmod(O) [last unloaded:
+>>>>> bpf_test_no_cfi(O)]
+>>>>> [   48.396609] CPU: 32 PID: 3276 Comm: test_progs Tainted: G
+>>>>> O       6.8.0-12873-g2c43c33bfd23 #1014
+>>>>> #[   48.467143] Call Trace:
+>>>>> [   48.469094]  <TASK>
+>>>>> [   48.472159]  ? __warn+0x80/0x180
+>>>>> [   48.475019]  ? subflow_data_ready+0x147/0x1c0
+>>>>> [   48.478068]  ? report_bug+0x189/0x1c0
+>>>>> [   48.480725]  ? handle_bug+0x36/0x70
+>>>>> [   48.483061]  ? exc_invalid_op+0x13/0x60
+>>>>> [   48.485809]  ? asm_exc_invalid_op+0x16/0x20
+>>>>> [   48.488754]  ? subflow_data_ready+0x147/0x1c0
+>>>>> [   48.492159]  mptcp_set_rcvlowat+0x79/0x1d0
+>>>>> [   48.495026]  sk_setsockopt+0x6c0/0x1540
+>>>>>
+>>>>> It doesn't reproduce all the time though.
+>>>>> Some race?
+>>>>> Known issue?
+>>>>
+>>>> It was not known to me. Looks like something related to not so recent
+>>>> changes (rcvlowat support).
+>>>>
+>>>> Definitely looks lie a race.
+>>>>
+>>>> If you could share more info about the running context and/or a full
+>>>> decoded splat it could help, thanks!
+>>>
+>>> This is just running bpf selftests in parallel:
+>>> test_progs -j
+>>>
+>>> The end of the splat:
+>>> [   48.500075]  __bpf_setsockopt+0x6f/0x90
+>>> [   48.503124]  bpf_sock_ops_setsockopt+0x3c/0x90
+>>> [   48.506053]  bpf_prog_509ce5db2c7f9981_bpf_test_sockopt_int+0xb4/0x11b
+>>> [   48.510178]  bpf_prog_dce07e362d941d2b_bpf_test_socket_sockopt+0x12b/0x132
+>>> [   48.515070]  bpf_prog_348c9b5faaf10092_skops_sockopt+0x954/0xe86
+>>> [   48.519050]  __cgroup_bpf_run_filter_sock_ops+0xbc/0x250
+>>> [   48.523836]  tcp_connect+0x879/0x1160
+>>> [   48.527239]  ? ktime_get_with_offset+0x8d/0x140
+>>> [   48.531362]  tcp_v6_connect+0x50c/0x870
+>>> [   48.534609]  ? mptcp_connect+0x129/0x280
+>>> [   48.538483]  mptcp_connect+0x129/0x280
+>>> [   48.542436]  __inet_stream_connect+0xce/0x370
+>>> [   48.546664]  ? rcu_is_watching+0xd/0x40
+>>> [   48.549063]  ? lock_release+0x1c4/0x280
+>>> [   48.553497]  ? inet_stream_connect+0x22/0x50
+>>> [   48.557289]  ? rcu_is_watching+0xd/0x40
+>>> [   48.560430]  inet_stream_connect+0x36/0x50
+>>> [   48.563604]  bpf_trampoline_6442491565+0x49/0xef
+>>> [   48.567770]  ? security_socket_connect+0x34/0x50
+>>> [   48.575400]  inet_stream_connect+0x5/0x50
+>>> [   48.577721]  __sys_connect+0x63/0x90
+>>> [   48.580189]  ? bpf_trace_run2+0xb0/0x1a0
+>>> [   48.583171]  ? rcu_is_watching+0xd/0x40
+>>> [   48.585802]  ? syscall_trace_enter+0xfb/0x1e0
+>>> [   48.588836]  __x64_sys_connect+0x14/0x20
+>>
+>> Ouch, it looks bad. BPF should not allow any action on mptcp subflows
+>> that go through sk_socket. They touch the mptcp main socket, which is
+>> _not_ protected by the subflow socket lock.
+>>
+>> AFICS currently the relevant set of racing sockopt allowed by bpf boils
+>> down to SO_RCVLOWAT only - sk_setsockopt(SO_RCVLOWAT) will call sk-
+>>> sk_socket->ops->set_rcvlowat()
+>>
+>> So something like the following (completely untested) should possibly
+>> address the issue at hand, but I think it would be better/safer
+>> completely disable ebpf on mptcp subflows, WDYT?
+>>
+>> Thanks,
+>>
+>> Paolo
+>>
+>> ---
+>> diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+>> index dcd1c76d2a3b..6e5e64c2cf89 100644
+>> --- a/net/mptcp/sockopt.c
+>> +++ b/net/mptcp/sockopt.c
+>> @@ -1493,6 +1493,9 @@ int mptcp_set_rcvlowat(struct sock *sk, int val)
+>>          struct mptcp_subflow_context *subflow;
+>>          int space, cap;
+>>
+>> +       if (has_current_bpf_ctx())
+>> +               return -EINVAL;
+>> +
+> 
+> Looks fine to me.
+> 
+> Martin,
+> 
+> Do you have any better ideas?
+> 
+> The splat explains the race.
+> In this case setget_sockopt test happen to run in parallel
+> with mptcp/bpf test and the former one was TCP connect request
+> but it was for subflow.
+> 
+> We can disable that callback when tcp flow is a subflow,
+> but that doesn't feel right.
 
-kernel test robot noticed the following build warnings:
+I am also not sure if we can disable all set/getsockopt for tcp subflows. Not 
+clear if there is use case that depends on this to setsockopt the subflow.
 
-[auto build test WARNING on v6.8]
-[cannot apply to tnguy-next-queue/dev-queue tnguy-net-queue/dev-queue horms-ipvs/master v6.9-rc1 linus/master next-20240327]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> I think Paolo's targeted fix is cleaner.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Piotr-Kwapulinski/ixgbe-Add-support-for-E610-FW-Admin-Command-Interface/20240327-234237
-base:   v6.8
-patch link:    https://lore.kernel.org/r/20240327155422.25424-6-piotr.kwapulinski%40intel.com
-patch subject: [Intel-wired-lan] [PATCH iwl-next v1 5/5] ixgbe: Enable link management in E610 device
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240328/202403280523.pcRsyVNp-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240328/202403280523.pcRsyVNp-lkp@intel.com/reproduce)
+I will also go with Paolo's fix. The radius is smaller. I don't have a better idea.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202403280523.pcRsyVNp-lkp@intel.com/
+Unrelated, is there a way to tell if a tcp_sock is a subflow? bpf prog can use 
+it to decide if it wants to setsockopt on a subflow or not.
 
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:2822:5: warning: no previous prototype for 'ixgbe_set_fw_drv_ver_x550' [-Wmissing-prototypes]
-    2822 | s32 ixgbe_set_fw_drv_ver_x550(struct ixgbe_hw *hw, u8 maj, u8 min,
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:3563:6: warning: no previous prototype for 'ixgbe_set_ethertype_anti_spoofing_x550' [-Wmissing-prototypes]
-    3563 | void ixgbe_set_ethertype_anti_spoofing_x550(struct ixgbe_hw *hw,
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:3584:6: warning: no previous prototype for 'ixgbe_set_source_address_pruning_x550' [-Wmissing-prototypes]
-    3584 | void ixgbe_set_source_address_pruning_x550(struct ixgbe_hw *hw,
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/ixgbe_set_ethertype_anti_spoofing_x550 +3563 drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-
-  3556	
-  3557	/** ixgbe_set_ethertype_anti_spoofing_x550 - Enable/Disable Ethertype
-  3558	 *	anti-spoofing
-  3559	 *  @hw:  pointer to hardware structure
-  3560	 *  @enable: enable or disable switch for Ethertype anti-spoofing
-  3561	 *  @vf: Virtual Function pool - VF Pool to set for Ethertype anti-spoofing
-  3562	 **/
-> 3563	void ixgbe_set_ethertype_anti_spoofing_x550(struct ixgbe_hw *hw,
-  3564						    bool enable, int vf)
-  3565	{
-  3566		int vf_target_reg = vf >> 3;
-  3567		int vf_target_shift = vf % 8 + IXGBE_SPOOF_ETHERTYPEAS_SHIFT;
-  3568		u32 pfvfspoof;
-  3569	
-  3570		pfvfspoof = IXGBE_READ_REG(hw, IXGBE_PFVFSPOOF(vf_target_reg));
-  3571		if (enable)
-  3572			pfvfspoof |= BIT(vf_target_shift);
-  3573		else
-  3574			pfvfspoof &= ~BIT(vf_target_shift);
-  3575	
-  3576		IXGBE_WRITE_REG(hw, IXGBE_PFVFSPOOF(vf_target_reg), pfvfspoof);
-  3577	}
-  3578	
-  3579	/** ixgbe_set_source_address_pruning_x550 - Enable/Disbale src address pruning
-  3580	 *  @hw: pointer to hardware structure
-  3581	 *  @enable: enable or disable source address pruning
-  3582	 *  @pool: Rx pool to set source address pruning for
-  3583	 **/
-> 3584	void ixgbe_set_source_address_pruning_x550(struct ixgbe_hw *hw,
-  3585						   bool enable,
-  3586						   unsigned int pool)
-  3587	{
-  3588		u64 pfflp;
-  3589	
-  3590		/* max rx pool is 63 */
-  3591		if (pool > 63)
-  3592			return;
-  3593	
-  3594		pfflp = (u64)IXGBE_READ_REG(hw, IXGBE_PFFLPL);
-  3595		pfflp |= (u64)IXGBE_READ_REG(hw, IXGBE_PFFLPH) << 32;
-  3596	
-  3597		if (enable)
-  3598			pfflp |= (1ULL << pool);
-  3599		else
-  3600			pfflp &= ~(1ULL << pool);
-  3601	
-  3602		IXGBE_WRITE_REG(hw, IXGBE_PFFLPL, (u32)pfflp);
-  3603		IXGBE_WRITE_REG(hw, IXGBE_PFFLPH, (u32)(pfflp >> 32));
-  3604	}
-  3605	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
