@@ -1,161 +1,205 @@
-Return-Path: <netdev+bounces-82344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D46D88D586
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 05:47:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB79888D5BC
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 06:07:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EDA21C232CA
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 04:47:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF60F1C23AE5
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 05:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BBF36B;
-	Wed, 27 Mar 2024 04:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550E2101F2;
+	Wed, 27 Mar 2024 05:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jHxXhwLZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nJ4cvSY6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124961849
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 04:47:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F8C79E5
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 05:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711514854; cv=none; b=HBe+02fq1BJj1Lt09+CjoxPNcNgPNe/yv5gfzw1nEAR8qLiG/53XU8VlDmiq72wNVBEF6ZGGkruD6ncFxNVpSKlA6MuR4ITD6l4Dn0VYWq14Rv6M7naFpePzlgaN551Cnps9HVUp5A0eizRTmTnNWpdGwzCsn9L2rvfFzkU4Q0Q=
+	t=1711516059; cv=none; b=f8Ie5189mYSDaLBcUOELmzi655ykDe062Wbh77dDzKV4y8kHcJvN5+3ZQF9QFMD0QMe/7OJggQNpAtGooB9npNtle96CEvtbQmdu/on+zfK1SF29C83sPXKgKJRvOmDCUvexKmFNMuHmSo3abBI1EC5WTgQlR3Q/7uhGrO2gXGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711514854; c=relaxed/simple;
-	bh=GoAYJoUbDvL+mnkA0okNy+Gw9hafyMKwLrOYooCCFpc=;
+	s=arc-20240116; t=1711516059; c=relaxed/simple;
+	bh=6hRrPE77vMG9UB+u2FZ3N08FEfbvyAhJGxbSd6EuVlM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mRSunQUObge7tm1YGp9xOZxWcbaELc+1sA7jYTvNDyX10zX8lXNXHU7+AQBTYDN3FLtwxu8YzhKA4JciXEXtRqVWD7GauYiOB/1jGnDidGRUA/ofm25gVbOdSGmk+IIc8lu3i+sD5O//+SulfbeCYMeYRdnc2XfawRDQGqH0aOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jHxXhwLZ; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5063d525-d9df-4aaf-991d-bcb9f495c041@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711514849;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IbK/ZW/7K1EL+Nq+KEdi1fO9koy8r8tuTSZhqjqIDLg=;
-	b=jHxXhwLZAtItISUimSJNjxg2zvqb2tFGCkNTaO6P7vfwuDuFq8E7KGiu1sSUSiliZtlIo7
-	8M6GNF23yDP5uiYyPqC/hgWLYEcl86fEEkUTB4Gu4EYNt37JkL3VfNLjYrEOu9C/oaV7Gf
-	JPklqrU3PIqJNs0EYfxBA20Od30YaCQ=
-Date: Tue, 26 Mar 2024 21:47:14 -0700
+	 In-Reply-To:Content-Type; b=u7Wtut6B61oUJvXioU3Czk/A+l0b48gtklcq1au3Ar1IPpVgRY8AckkTFLsz+ldYsVmIx+mDSjMfb/PH0lsHOFbw3coAheMzTNG0F5jRwaiLO8GvQUp7XxxH1AYpvk71bnmGInPk6YfpsZh4D0Bk0yCWMlSHmqnGns7+49AnNdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nJ4cvSY6; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a450bedffdfso724669066b.3
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 22:07:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711516054; x=1712120854; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/j/wkfnU1VMtlD/kDo+x6lLCbpnn8+R/4k1WBBOkFIQ=;
+        b=nJ4cvSY6gnVf4RRHoeSMIHgnar5jPBgsCwbnnW6oSdwx6NrcvEb3w50No93GB2LVhf
+         /PlRabLRgZV5JZz1QhBJgs66UDJidTrOe2S86AanQ3O+meXq5lOY+06eQvicBhRpKyCR
+         kiqERp/I2widroPubgcF508ITqKMzG/TzXxwBKEVIa2ftAZTcoD6PgD/VhZ+v2TTV1tA
+         WirLlFulCjEX4/cMMsw6waqIzAh/Jo9GpCRmhsRxVGOhRF7lW9SwGz0P+MSgkW05suEe
+         jv+JKIdzG+S0oTXVXL5iybsv7XdoEzDTFkjr82ORR0Rkl3HkMmHx0DptNcGA+R9MArEC
+         wbdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711516054; x=1712120854;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/j/wkfnU1VMtlD/kDo+x6lLCbpnn8+R/4k1WBBOkFIQ=;
+        b=Prm1rChIXVip9PY08fIh4c3ERqgPh/50riEq67r0JRUi5e+kmnEmDtdtrECiHSWxnT
+         +4TOiqsciQMMzYlaxOTLR+T2rTJXG3OrL+61JbGKdtNo7sipisb9kpdyAU/sinrTu3P9
+         HxPJRB4W+I0Is6Oy2G1OzUDsOxdtH5aV9g4KQ4nZT/sK1Oo6oqL8KTW2CO/Fc6ep0k1S
+         Hsxjo6awZEYsd7huAEeb+BieVeuJFE2Zl7jNHt7r0iOl4Cd8cD14Ueszk6horRvOqtBo
+         gXecHdLfS7WTknNXUy+F7OjGIFvhEkamqzpub03BCx8W8/HIZ6Em2+6a9S2HoZJPFsVX
+         JpcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgp4wweLUn9ucn4fcdlCMBUU3PFnWiYulHUiAH4rgpMiTqrbHS/KM+vmCjsYLlYhTN8Zc++aLJrUEHsW6N4QYF6WDgNDga
+X-Gm-Message-State: AOJu0Yxr4n/scuEHkRiLqSYrxfqNrkJBcRrGHqix5dypNBaDCSB7RqSH
+	6SP1iXOQG51jSWCJTdArEY7afHUfHwAr2K6pcRs2TgXQ4NLTi0ubQB7bB/hPFJk=
+X-Google-Smtp-Source: AGHT+IHlo+FYMJRDViGKDBKHGZt4C85CAdTPEoXLJs8oiXtdIa99YCUHjkKw6jicrE8R7Bo7TiFa/A==
+X-Received: by 2002:a17:906:7cd:b0:a4d:f2d9:cf1a with SMTP id m13-20020a17090607cd00b00a4df2d9cf1amr1965395ejc.63.1711516054468;
+        Tue, 26 Mar 2024 22:07:34 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.44])
+        by smtp.gmail.com with ESMTPSA id l19-20020a17090612d300b00a46cffe6d06sm4950533ejb.42.2024.03.26.22.07.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Mar 2024 22:07:33 -0700 (PDT)
+Message-ID: <a16f45c9-747c-4a19-98a3-aa5f47ee5c4d@linaro.org>
+Date: Wed, 27 Mar 2024 06:07:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [syzbot] [bpf?] [net?] KMSAN: uninit-value in dev_map_lookup_elem
-Content-Language: en-GB
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- syzbot <syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com>,
- bpf <bpf@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eddy Z <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <jolsa@kernel.org>,
- KP Singh <kpsingh@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Song Liu <song@kernel.org>,
- syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-References: <0000000000006f876b061478e878@google.com>
- <a402206e-a9c9-40bd-bf78-710054506071@linux.dev>
- <CAADnVQLXyQ_o5hSA0OpHYj231WKPFNRNMyr0NePMr2ypusiLmg@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <CAADnVQLXyQ_o5hSA0OpHYj231WKPFNRNMyr0NePMr2ypusiLmg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 00/38] ep93xx device tree conversion
+To: Andy Shevchenko <andy@kernel.org>
+Cc: nikita.shubin@maquefel.me, Hartley Sweeten
+ <hsweeten@visionengravers.com>,
+ Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Michael Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@kernel.org>, Sebastian Reichel <sre@kernel.org>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+ Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck
+ <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Ralf Baechle <ralf@linux-mips.org>,
+ "Wu, Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>,
+ Olof Johansson <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-ide@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-sound@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <20240326-ep93xx-v9-0-156e2ae5dfc8@maquefel.me>
+ <dc3e2cb4-f631-4611-8814-0dc04c5502f0@linaro.org>
+ <ZgLgY11N8dkpTZJB@smile.fi.intel.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <ZgLgY11N8dkpTZJB@smile.fi.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-On 3/26/24 6:07 PM, Alexei Starovoitov wrote:
-> On Tue, Mar 26, 2024 at 5:54 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->> On 3/25/24 2:36 AM, syzbot wrote:
->>> Hello,
+On 26/03/2024 15:49, Andy Shevchenko wrote:
+> On Tue, Mar 26, 2024 at 11:19:54AM +0100, Krzysztof Kozlowski wrote:
+>> On 26/03/2024 10:18, Nikita Shubin via B4 Relay wrote:
+>>> The goal is to recieve ACKs for all patches in series to merge it via Arnd branch.
 >>>
->>> syzbot found the following issue on:
+>>> Some changes since last version (v8):
 >>>
->>> HEAD commit:    5e74df2f8f15 Merge tag 'x86-urgent-2024-03-24' of git://gi..
->>> git tree:       upstream
->>> console+strace: https://syzkaller.appspot.com/x/log.txt?x=148872a5180000
->>> kernel config:  https://syzkaller.appspot.com/x/.config?x=e6bd769cb793b98a
->>> dashboard link: https://syzkaller.appspot.com/bug?extid=1a3cf6f08d68868f9db3
->>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15921a6e180000
->>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12e081f1180000
+>>> - Most important, fixed bug in Device Tree resulting in CS4271 not working by Alexander Sverdlin.
+>>> - added #interrupt-cells to gpio nodes with interrupts-controller
+>>> - fixed some EOF in dtsi files
+>>> - fixed identation and type in ep93xx-keypad thanks to Andy Shevchenko
 >>>
->>> Downloadable assets:
->>> disk image: https://storage.googleapis.com/syzbot-assets/1a82880723a7/disk-5e74df2f.raw.xz
->>> vmlinux: https://storage.googleapis.com/syzbot-assets/fd3046ac43b9/vmlinux-5e74df2f.xz
->>> kernel image: https://storage.googleapis.com/syzbot-assets/2097be59cbc1/bzImage-5e74df2f.xz
+>>> Stephen Boyd, Vinod Koul PLEASE! give some comments on following, couse i hadn't one for a couple of iterations already:
 >>>
->>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->>> Reported-by: syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com
+>>> Following patches require attention from Stephen Boyd, as they were converted to aux_dev as suggested:
 >>>
->>> =====================================================
->>> BUG: KMSAN: uninit-value in __dev_map_lookup_elem kernel/bpf/devmap.c:441 [inline]
->>> BUG: KMSAN: uninit-value in dev_map_lookup_elem+0xf3/0x170 kernel/bpf/devmap.c:796
->>>    __dev_map_lookup_elem kernel/bpf/devmap.c:441 [inline]
->>>    dev_map_lookup_elem+0xf3/0x170 kernel/bpf/devmap.c:796
->>>    ____bpf_map_lookup_elem kernel/bpf/helpers.c:42 [inline]
->>>    bpf_map_lookup_elem+0x5c/0x80 kernel/bpf/helpers.c:38
->>>    ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
->>>    __bpf_prog_run256+0xb5/0xe0 kernel/bpf/core.c:2237
->> It should be in the interpreter mode.
+>>> - ARM: ep93xx: add regmap aux_dev
+>>> - clk: ep93xx: add DT support for Cirrus EP93xx
+>>>
+>>> Following patches require attention from Vinod Koul:
+>>>
+>>> - dma: cirrus: Convert to DT for Cirrus EP93xx
+>>> - dma: cirrus: remove platform code
 >>
->> The C reproducer is trying to run the following bpf prog:
->>
->>      0: (18) r0 = 0x0
->>      2: (18) r1 = map[id:49]
->>      4: (b7) r8 = 16777216
->>      5: (7b) *(u64 *)(r10 -8) = r8
->>      6: (bf) r2 = r10
->>      7: (07) r2 += -229
->>              ^^^^^^^^^^
->>
->>      8: (b7) r3 = 8
->>      9: (b7) r4 = 0
->>     10: (85) call dev_map_lookup_elem#1543472
->>     11: (95) exit
->>
->> I think this KMSAN report (and a few others related to lookup/delete_elem)
->> should only happen in the interpreter mode.
->>
->> Does it worth to suppress it by always initializing the stack in the interpreter
->> mode considering the interpreter is not very speed sensitive ?
-> Maybe we can mark it as initialized from kmsan pov ?
-> There are kasan_poison/unpoison helpers that may fit ?
+>> A lot of this could have been already merged if you split it... Just
+>> saying...
+> 
+> But you able to apply DT schema patches if you wish.
+> Just doing? :-)
 
-Maybe use kmsan_unpoison_memory()?
+Me? Why? DT bindings are supposed to go via subsystem maintainers, not
+DT tree. Plus, I do not apply any bindings patches, except for managed
+subsystems and none of them are touched here.
 
-In lib/Kconfig.kmsan, we have
-
-config KMSAN
-         bool "KMSAN: detector of uninitialized values use"
-         depends on HAVE_ARCH_KMSAN && HAVE_KMSAN_COMPILER
-         depends on DEBUG_KERNEL && !KASAN && !KCSAN
-         depends on !PREEMPT_RT
-         select STACKDEPOT
-         select STACKDEPOT_ALWAYS_INIT
-         help
-           KernelMemorySanitizer (KMSAN) is a dynamic detector of uses of
-           uninitialized values in the kernel. It is based on compiler
-           instrumentation provided by Clang and thus requires Clang to build.
-
-           An important note is that KMSAN is not intended for production use,
-           because it drastically increases kernel memory footprint and slows
-           the whole system down.
-
-           See <file:Documentation/dev-tools/kmsan.rst> for more details.
-
-So enable KMSAN, KASAN and KCSAN needs to be disabled.
+Best regards,
+Krzysztof
 
 
