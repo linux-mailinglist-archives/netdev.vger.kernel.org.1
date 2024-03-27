@@ -1,173 +1,163 @@
-Return-Path: <netdev+bounces-82517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 868C288E71C
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:49:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED9688E740
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E5B6292135
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:49:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4ED521F28C5C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D9215AAA7;
-	Wed, 27 Mar 2024 13:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oPiIZP5u"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE10F13E6C2;
+	Wed, 27 Mar 2024 13:44:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09C913E3E8;
-	Wed, 27 Mar 2024 13:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D881A13A27E;
+	Wed, 27 Mar 2024 13:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711546858; cv=none; b=VAt1LxQ/FNkDKls+8aSxBQMO+NRYZ7ZT9y+O8XmpBKzdyES49hNRSGYhVsGArR/SDxw3BUCblMRp3m3gEdl9DiBTKSGV0QnJmg4kM5INIZwiAyVWd47K23OVSlrT7qDsIFpSKWRPm1pJuQ3TyjYo9pM0XDqWDJIaxNtGj5dz5Es=
+	t=1711547078; cv=none; b=G/IqYnFG2gDiuZmwHrGcNt0b6MqivZb/Bq8SP5K1T8LIuscKW+CWZZOBkCfgFk7PJ1/NllBVM6ZX/cKLdbDJG2nzRASCilFCqEsaoL7XBOUETwfpK0L9ZUzM9mQdKJFvhrTzpMEugoA/1mzB7/Yr+XuJ0zQF14FXTlqdVao+2UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711546858; c=relaxed/simple;
-	bh=C2xZuYuE0bMiGZGvxAUBs6jO3wA1ouACC5SZ95LnNFI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H2rrBb1C5d9l0npNiT4AJ/7e1mlhdm7eGFQVfaRiAxc3xftIBKSEuEmS7auvPstY5+v6kR464R+ur6BapcFzqbt2Ue4+1qC6SkKspBXsQn+LHpLFOT5mlg+JX/cc/GNWQPwGGaQOgNuOUkGt1TTQDBci8sWYE2aiT5dmf+HleBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oPiIZP5u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75359C433F1;
-	Wed, 27 Mar 2024 13:40:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711546858;
-	bh=C2xZuYuE0bMiGZGvxAUBs6jO3wA1ouACC5SZ95LnNFI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oPiIZP5uFcf+EPPe0Khf+td7enUVTphKFH5O8Sjh5QbDTvvzxp4AusoSouDyd+Qty
-	 uNykdMuMQa/3MK9HnwK2YnaNpcAkwziUq3reFV1RYyomG0PJxIZXbdnBqsRsQE9wiW
-	 wLj47B9Lgf9HG3GyHbTyRd/K5ZRm0z/GNEI3Qdrq6LztHDzJTooMaR+NhVqj52gD0M
-	 xPi7oVVfb+oKYpuBiBykgSVcS4Id3gpKilRn/2SvMis2yzYd4XdG+svbKALT31FoRB
-	 xxZViWevf40SnxPCloRb8CPdyibhYtQ48bc87rBCAC3LEnn5pSTNManFgzx2MRjCoV
-	 EzPw7kha0wNtQ==
-Message-ID: <94590f14-f17f-4d07-a2d7-6dfc5f1e171e@kernel.org>
-Date: Wed, 27 Mar 2024 14:40:33 +0100
+	s=arc-20240116; t=1711547078; c=relaxed/simple;
+	bh=2xZT353bg+Gd2k0hEm0r6uRcXB+j37Lc80ZKxrL2FNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M28GYBziTQye7HLZ5PjSZQTp4LVgpkFtydwFj+lxzo4BB0uytmNjjQBdm33Sn/2BE45VaXg8vJYCIli1MooYAuxcTVepzlohLJ3c052EO8S/rWgmgdf9OufaUShEwOK28tVf5sYX0D2s+9en/OozX4fZUyhcDBazdlTgLxa/gpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a4734ae95b3so694288266b.0;
+        Wed, 27 Mar 2024 06:44:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711547075; x=1712151875;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jLz16fmiK7clzNfffXEiofOH4lXEAbKlwPA6/CgGe8Y=;
+        b=GLn4NIfRsVSvqy33hwqDXqIb+aGddKHlnN2DNNdkcLIidlrJg2E/isG8KTPgs1iPVd
+         boFJ7WUyIU/XkqSpJNBLppkCdDW0ABvtw8Okez4rtWgdhiV5HlomzQjMsxVy5802I9JO
+         HdzbQqHqwlvs/6yJcnp9Ea97G1quiWm/szuplmvB/1hyS95cKY4YpItAoZg6DEVoR14M
+         z+2Jx4nm76GltUsofZRhWEXBJPvHHQuvpYK4LLC+NSSVqJMV64YDC2PDX1Czz0CycfDG
+         zVdXSVBwfwPERfQdeYnPVieT0d/gHN8zv2QKCeqzEMfx853G8nXA8qIHhlAyeOLifnfJ
+         L/Yg==
+X-Forwarded-Encrypted: i=1; AJvYcCXs7rC/NwUDZuoXyh5jHX5R/ro70JhoDUmZvexdskq0ofxDBiweMyBw02nHp1tGSzfDlm8yVwHxnFHRLk7GePLkB7F86F0MthM2Yjc3bweej6xp0jM94UmajeFLhYwkjjkV6wPFCNuVfyCodTmGbTBX5EkkZ6IFYZpq8Oeg
+X-Gm-Message-State: AOJu0YzCwoF8hSKAjjZkalF/I7OcsGibNDiG4DuI+orU+H2V88dPF0CB
+	RzkAftlelRUWS8BS6vH5XnKwdKokT8GlCFZLTnEVTE7VDxZDVV/0
+X-Google-Smtp-Source: AGHT+IHlsqprzpnxJBYeJapDRINLx/aNTv+m24jMPvBz9QGVUn18hEMdVfXDoR7rOZNE4m03xIbPbA==
+X-Received: by 2002:a17:906:e08a:b0:a4d:fae7:ece3 with SMTP id gh10-20020a170906e08a00b00a4dfae7ece3mr2030643ejb.5.1711547074857;
+        Wed, 27 Mar 2024 06:44:34 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a11-20020a170906670b00b00a44b90abb1dsm5439004ejp.110.2024.03.27.06.44.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 06:44:34 -0700 (PDT)
+Date: Wed, 27 Mar 2024 06:44:31 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: xuanzhuo@linux.alibaba.com, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Melnychenko <andrew@daynix.com>, rbc@meta.com,
+	riel@surriel.com, stable@vger.kernel.org, qemu-devel@nongnu.org,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v2 2/2] virtio_net: Do not send RSS key if it is not
+ supported
+Message-ID: <ZgQivw8YG7XT2boy@gmail.com>
+References: <20240326151911.2155689-1-leitao@debian.org>
+ <20240326151911.2155689-2-leitao@debian.org>
+ <bc5a835b-94c8-4500-b05b-0dd32afddbe8@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/22] um: virt-pci: drop owner assignment
-To: Johannes Berg <johannes@sipsolutions.net>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
- <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
- Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
- Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
- <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- Anton Yakovlev <anton.yakovlev@opensynergy.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
- iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
- kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-sound@vger.kernel.org
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-2-0feffab77d99@linaro.org>
- <46e9539f59c82762e3468a9519fa4123566910d5.camel@sipsolutions.net>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <46e9539f59c82762e3468a9519fa4123566910d5.camel@sipsolutions.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bc5a835b-94c8-4500-b05b-0dd32afddbe8@linux.alibaba.com>
 
-On 27/03/2024 14:34, Johannes Berg wrote:
-> On Wed, 2024-03-27 at 13:40 +0100, Krzysztof Kozlowski wrote:
->> virtio core already sets the .owner, so driver does not need to.
+On Wed, Mar 27, 2024 at 10:27:58AM +0800, Heng Qi wrote:
 > 
->> All further patches depend on the first virtio patch, therefore please ack
->> and this should go via one tree: virtio?
 > 
-> Sure. Though it's not really actually necessary, you can set it in the
-> core and merge the other patches in the next cycle; those drivers that
-> _have_ an .owner aren't broken after all.
+> 在 2024/3/26 下午11:19, Breno Leitao 写道:
+> > There is a bug when setting the RSS options in virtio_net that can break
+> > the whole machine, getting the kernel into an infinite loop.
+> > 
+> > Running the following command in any QEMU virtual machine with virtionet
+> > will reproduce this problem:
+> > 
+> >      # ethtool -X eth0  hfunc toeplitz
+> > 
+> > This is how the problem happens:
+> > 
+> > 1) ethtool_set_rxfh() calls virtnet_set_rxfh()
+> > 
+> > 2) virtnet_set_rxfh() calls virtnet_commit_rss_command()
+> > 
+> > 3) virtnet_commit_rss_command() populates 4 entries for the rss
+> > scatter-gather
+> > 
+> > 4) Since the command above does not have a key, then the last
+> > scatter-gatter entry will be zeroed, since rss_key_size == 0.
+> > sg_buf_size = vi->rss_key_size;
+> > 
+> > 5) This buffer is passed to qemu, but qemu is not happy with a buffer
+> > with zero length, and do the following in virtqueue_map_desc() (QEMU
+> > function):
+> > 
+> >    if (!sz) {
+> >        virtio_error(vdev, "virtio: zero sized buffers are not allowed");
+> > 
+> > 6) virtio_error() (also QEMU function) set the device as broken
+> > 
+> >      vdev->broken = true;
+> > 
+> > 7) Qemu bails out, and do not repond this crazy kernel.
+> > 
+> > 8) The kernel is waiting for the response to come back (function
+> > virtnet_send_command())
+> > 
+> > 9) The kernel is waiting doing the following :
+> > 
+> >        while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+> > 	     !virtqueue_is_broken(vi->cvq))
+> > 	      cpu_relax();
+> > 
+> > 10) None of the following functions above is true, thus, the kernel
+> > loops here forever. Keeping in mind that virtqueue_is_broken() does
+> > not look at the qemu `vdev->broken`, so, it never realizes that the
+> > vitio is broken at QEMU side.
+> > 
+> > Fix it by not sending RSS commands if the feature is not available in
+> > the device.
+> > 
+> > Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
+> > Cc: stable@vger.kernel.org
+> > Cc: qemu-devel@nongnu.org
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >   drivers/net/virtio_net.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index c640fdf28fc5..e6b0eaf08ac2 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -3809,6 +3809,9 @@ static int virtnet_set_rxfh(struct net_device *dev,
+> >   	struct virtnet_info *vi = netdev_priv(dev);
+> >   	int i;
+> > +	if (!vi->has_rss && !vi->has_rss_hash_report)
+> > +		return -EOPNOTSUPP;
+> > +
 > 
-> Acked-by: Johannes Berg <johannes@sipsolutions.net>
+> Why not make the second patch as the first, this seems to work better.
 
-True, this can be spread over two cycles. What I wanted to express, is
-that maintainers should not pick individual patches.
-
-Thanks for the Ack and apologies for a bit too big CC-list. I need to
-learn how to ask b4 to make Cc-per-patch for such case.
-
-
-
-Best regards,
-Krzysztof
-
+Sure, that works for me. Let me update it in v2.
 
