@@ -1,133 +1,89 @@
-Return-Path: <netdev+bounces-82670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D96E788F0A8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:11:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A3D88F0D8
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:25:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1664F1C282AF
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:11:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A98351F2620C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE68F153503;
-	Wed, 27 Mar 2024 21:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E79153565;
+	Wed, 27 Mar 2024 21:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQtccIVw"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="eGdUKc52"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDA7152E07;
-	Wed, 27 Mar 2024 21:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1EE28366;
+	Wed, 27 Mar 2024 21:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711573883; cv=none; b=qKrGMOPHukVMIJ78FqQ1j4UNMTbcRTt/ulRhDPQIJ/gLiVSJ+TuHEbnuuhdW06GZtlwaXtSz9nO7GBtfADm1iYhF4FMYtqQc1xX3K0DIr1lB/8KEuYAhjmRUyK6CYF5e6ym0YgjUKGJBLxHJiVYzBR7CwE0fTwtvVipik5mEB08=
+	t=1711574703; cv=none; b=TPK0Rh41mZSPMxaMkKysvJ3Yv2ho+NWtkQaAHCZHsnT7Bgp5P2met0rnPJoFzATIfv1nq0JQs/HVevaJkqEKkcImtnUwGKvoCErlPup5GUwv3CRfI2Euim6WSgJgK4RUjzBZZRWdJc7b93fAUMkUFr8nKkMYJ7YHlyvaZgP1MHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711573883; c=relaxed/simple;
-	bh=oTnKlubl3uH5wFO9lV+FBwfsUlprxdrKnXH/rfzlnLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lFtLEbz+WH7n5NyaH2RdrWcRqzZ+6f86Itah+sUg/02X+mgtloxFZ/EQU0JdHtRc7/jhf+6t9qFTjnG7VBaVXlQ+/N+mN7AsuQNc4sc3hIvXqq0H7e/edgl8RuTeWLXW2TaooajKDL9B5D12JyTt2hV2qb5cx24cIDYpRG1b7OM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bQtccIVw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1D8CC433F1;
-	Wed, 27 Mar 2024 21:11:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711573883;
-	bh=oTnKlubl3uH5wFO9lV+FBwfsUlprxdrKnXH/rfzlnLM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bQtccIVw6KLhkY+o8OPOmg33CFVXRvxtmB5iGdfkvI6x5TLhcqnXobL87VcKGWCoo
-	 hEEA7hQlDV+PoOK9UDjQGbf9PAcUE2drNEg1YzxLOhGt/QZavwWBLEkrTL8TxdrzwA
-	 +RJFIymXP24phYo/Rf/tHf+0LzfLng+MsLaecKnG7PmHFH+3lS0t4px3K8lJeRw8Ps
-	 HdDur5qq4oZrAh+Jyrc6GEwcE5piRdb5yyPAScMBtrvkxLVbGZGpk8ULYPOSH0j7Gf
-	 5lDPdySI/picQyOuLaVcE3TNNAu+2AMyoMIswnmGuMnwXXXBElSlWi4AKt6ejrPEap
-	 rWSWUF8K0gBWg==
-Date: Wed, 27 Mar 2024 21:11:19 +0000
-From: Simon Horman <horms@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
+	s=arc-20240116; t=1711574703; c=relaxed/simple;
+	bh=fMWyR4T8HDfiXSrxNx4i4P75j10VLhztLf65/nEwedA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=L2oUVuHnGjGROlR/MAagYXGvgnzy1e+10LZTvbJldYODhKEiAoCynqJQTTaOeHybA60wZMK4cYJ4e6eIfnsy/8fx7spKOJVp5IRSYfNIgL45Wjo+OAZlkpGSdmiGPY9jQpsjEXwHmCA4jGCdb8f76gHiA1flYsrLu2jY2azg2ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=eGdUKc52; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=fMWyR4T8HDfiXSrxNx4i4P75j10VLhztLf65/nEwedA=;
+	t=1711574701; x=1712784301; b=eGdUKc529jKPvDJpYhuu7ujqZgD6Oonudp6XU+ZXie5k5Kl
+	t1yt7HVoL2GI0EkL5RoIFxRk1OTrsYmq+EoBKw/4IrNVypqQXexG8ViH/wah4QFL9PEt0h1FLko4O
+	5IT65arrJXuxoytyg2iPlraYHeRIX9HuTzz6JYApJnEwsMUwv00TqB6r/Jkf6q7QbNFqjfih4/NAX
+	3cLrT4qjHTVJDCViq768HhjYQpDAfcxU6HxKwB7TgaW4kK7QHQlXWzrNsBMsMEVCbNroufKTFT8HJ
+	nHiUaAl2zkl1IpDMy0YFK+1dPvJ5vge2KgUGWbaThIrp44woFAWfzaUSpcRrLxUA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rpalV-0000000HOpZ-2XGl;
+	Wed, 27 Mar 2024 22:24:57 +0100
+Message-ID: <f50b31a3328986952f4042985eb5bab66c4ed1d9.camel@sipsolutions.net>
 Subject: Re: [RFC PATCH v2 1/4] tracing: add __print_sym() to replace
  __print_symbolic()
-Message-ID: <20240327211119.GW403975@kernel.org>
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Date: Wed, 27 Mar 2024 22:24:56 +0100
+In-Reply-To: <20240327211119.GW403975@kernel.org>
 References: <20240326192131.438648-6-johannes@sipsolutions.net>
- <20240326202131.9d261d5bb667.I9bd2617499f0d170df58471bc51379742190f92d@changeid>
+	 <20240326202131.9d261d5bb667.I9bd2617499f0d170df58471bc51379742190f92d@changeid>
+	 <20240327211119.GW403975@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326202131.9d261d5bb667.I9bd2617499f0d170df58471bc51379742190f92d@changeid>
+X-malware-bazaar: not-scanned
 
-On Tue, Mar 26, 2024 at 08:15:56PM +0100, Johannes Berg wrote:
-> From: Johannes Berg <johannes.berg@intel.com>
-> 
-> The way __print_symbolic() works is limited and inefficient
-> in multiple ways:
->  - you can only use it with a static list of symbols, but
->    e.g. the SKB dropreasons are now a dynamic list
-> 
->  - it builds the list in memory _three_ times, so it takes
->    a lot of memory:
->    - The print_fmt contains the list (since it's passed to
->      the macro there). This actually contains the names
->      _twice_, which is fixed up at runtime.
->    - TRACE_DEFINE_ENUM() puts a 24-byte struct trace_eval_map
->      for every entry, plus the string pointed to by it, which
->      cannot be deduplicated with the strings in the print_fmt
->    - The in-kernel symbolic printing creates yet another list
->      of struct trace_print_flags for trace_print_symbols_seq()
-> 
->  - it also requires runtime fixup during init, which is a lot
->    of string parsing due to the print_fmt fixup
-> 
-> Introduce __print_sym() to - over time - replace the old one.
-> We can easily extend this also to __print_flags later, but I
-> cared only about the SKB dropreasons for now, which has only
-> __print_symbolic().
-> 
-> This new __print_sym() requires only a single list of items,
-> created by TRACE_DEFINE_SYM_LIST(), or can even use another
-> already existing list by using TRACE_DEFINE_SYM_FNS() with
-> lookup and show methods.
-> 
-> Then, instead of doing an init-time fixup, just do this at the
-> time when userspace reads the print_fmt. This way, dynamically
-> updated lists are possible.
-> 
-> For userspace, nothing actually changes, because the print_fmt
-> is shown exactly the same way the old __print_symbolic() was.
-> 
-> This adds about 4k .text in my test builds, but that'll be
-> more than paid for by the actual conversions.
-> 
-> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+On Wed, 2024-03-27 at 21:11 +0000, Simon Horman wrote:
+>=20
+> I'm seeing some allmodconfig build problems with this applied on top of
+> net-next.
 
-Hi Johannes,
+> ./include/trace/stages/init.h:30: warning: "TRACE_DEFINE_SYM_FNS" redefin=
+ed
 
-I'm seeing some allmodconfig build problems with this applied on top of
-net-next.
+> ./include/trace/stages/init.h:54: warning: "TRACE_DEFINE_SYM_LIST" redefi=
+ned
 
-In file included from ./include/trace/trace_events.h:27,
-                 from ./include/trace/define_trace.h:102,
-                 from ./include/trace/events/module.h:134,
-                 from kernel/module/main.c:64:
-./include/trace/stages/init.h:30: warning: "TRACE_DEFINE_SYM_FNS" redefined
-   30 | #define TRACE_DEFINE_SYM_FNS(_symbol_id, _lookup, _show)                \
-      |
-In file included from ./include/linux/trace_events.h:11,
-                 from kernel/module/main.c:14:
-./include/linux/tracepoint.h:130: note: this is the location of the previous definition
-  130 | #define TRACE_DEFINE_SYM_FNS(...)
-      |
-./include/trace/stages/init.h:54: warning: "TRACE_DEFINE_SYM_LIST" redefined
-   54 | #define TRACE_DEFINE_SYM_LIST(_symbol_id, ...)                          \
-      |
-./include/linux/tracepoint.h:131: note: this is the location of the previous definition
-  131 | #define TRACE_DEFINE_SYM_LIST(...)
-      |
+Yeah, the 0-day bot reported that too, sorry about that. It needs two
+lines to #undef these in init.h before their definition, just like all
+other macros there. Not sure why my builds didn't show that, maybe it
+doesn't affect all users.
 
+johannes
 
