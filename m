@@ -1,96 +1,178 @@
-Return-Path: <netdev+bounces-82680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9061588F1A3
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 23:10:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1450988F1A8
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 23:12:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924141C2B011
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:10:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FB98294F67
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29F4153813;
-	Wed, 27 Mar 2024 22:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FD8152E17;
+	Wed, 27 Mar 2024 22:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ba8aXH8U"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FpNXClLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989E1153511;
-	Wed, 27 Mar 2024 22:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A2C150982
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 22:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711577433; cv=none; b=kqV4ruboyW2wdK3TNl5Qmf5eDWd1rE+aaq5CKdoBMhHQMecQKLj3U96bVpandnO8M9hGK3F9bQezM8OvAfEqcZXjFvtjXHucQhjdGf7UrSZXDY3PegwKGRqWoQpoCtEXAEBjX5q8htL2MN5qDYpN25gaygj6FVNDLXV89VzY9C8=
+	t=1711577567; cv=none; b=ee7Zrgda2cL1NGmrT6Wnk7w8wRferfu8ZVmmlZk94vxuKIed+fOpt0q7Z3QnYMKeSi04xeUvXSBjNcCGWnCS4Blv49iqgezm+uQZwU9R5Oidie9wVQzOPJTJUGHBlA/24WswG5fh/whgPOnMe+KvaiiDg2w0KHGRoOEvkyFysUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711577433; c=relaxed/simple;
-	bh=++k0Av1KN6XD6lDnmn+sB/vOhM/0gXGBQQjyUi7oo/E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Mo5w9aP1/LQK25UgrfL9v3X4wzUikYLL2YZRy70KnOW4cH0BuY1zrFdt1Dl1V/iub9H9zEpLYV6Gs5RRxEC8I6vpD1cwe5mhvxcADz5AcnKnZlbOsC6/5Da6jvzgv0+ov5J7CVzsrqQfzOetts+9SdggvHshfS1aIfBhcf0mwD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ba8aXH8U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 34264C433F1;
-	Wed, 27 Mar 2024 22:10:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711577433;
-	bh=++k0Av1KN6XD6lDnmn+sB/vOhM/0gXGBQQjyUi7oo/E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ba8aXH8Ut+LFva1gZgboycMtv8egaEOlXjkLLeKkBpQL9a4CsPU1zmlNIbrjzNPCG
-	 j+6L03vnNxf2WT2ph+yXJPR+UgbybXXZCMiqNGlQOvGdS8eWhRIFgvJ3ihkfrcPkuh
-	 4lkwCrUCGp5n/tFrflKUgEsbVPhVrjUHNetcaRFoGeICgJDt2msA6/iycVvzB20Yav
-	 H6HLSQEtlqorO2zjJw+uZwhYyCNHh31eeMewU1jE96cxU6SwppJ1qhPc/4T+PTix13
-	 yizJKaHs3hMEPEM2urEUgJHOk7w1V0/JNVMFhQ6wSJP+xHNAoE/r1Y68ytjd3/MBDP
-	 QPheC0340Haog==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21C26D9505F;
-	Wed, 27 Mar 2024 22:10:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711577567; c=relaxed/simple;
+	bh=PlUoPOLQIqqodP0Vk11RTAn31WG2ArvUtXykR6VJtw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J8ExRvyrv0rkCaHIXMzmbq4dIdD6vYt0dHRwj2R+ahTcJP9+jfUiHXtJlxSqOrkz4Pbv4s/vuzaOV83gOg/kO9IAYen3V2sHTu1KuUzkhQqdm6cct8/ey6d4g/STyXhf1OcFim03eEzsLhYFo9ipHk37vt8lNqU+VWKbvOEsmKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FpNXClLW; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711577566; x=1743113566;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PlUoPOLQIqqodP0Vk11RTAn31WG2ArvUtXykR6VJtw4=;
+  b=FpNXClLWjD93MfQEZ+WU2+0zPQt/8U6Xsq25jo0tqL6bMwwlQYeRcbja
+   yX1aY9XW8KjMLtPAvCc1XGnbt1CG20t1BizWhs2HKK/Jf1PSAgpWirRBx
+   uVBmUHrPpSc+CeIx2XRvQ5CNwbd7roOsgJpmWRRGuV9NUlk+IPklCsDDy
+   /WsA42dDBVmeT8AQvSR+6HHkoUvnP29r4tVaXivAGQJUlH45n//GM9OEB
+   tWoAGTSy3S3Nosu6bBtlKrGZHAkM2GMz2hi3ghkagMOft21mn41xJF4rg
+   gHl36tkc5LVPxVLyX4XLFOJLbuzP/zflTK0KDJqdUx5LCQP8TqXoOuW/b
+   Q==;
+X-CSE-ConnectionGUID: 5RBh9Vt/QD61OWFag636gA==
+X-CSE-MsgGUID: lEvvCd8zSYm5wAeFNMytgg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6925710"
+X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
+   d="scan'208";a="6925710"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 15:12:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
+   d="scan'208";a="53902958"
+Received: from lkp-server01.sh.intel.com (HELO be39aa325d23) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 27 Mar 2024 15:12:43 -0700
+Received: from kbuild by be39aa325d23 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rpbVg-0001Xq-2y;
+	Wed, 27 Mar 2024 22:12:40 +0000
+Date: Thu, 28 Mar 2024 06:12:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	netdev@vger.kernel.org, Carolyn Wyborny <carolyn.wyborny@intel.com>,
+	Jan Glaza <jan.glaza@intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 5/5] ixgbe: Enable link
+ management in E610 device
+Message-ID: <202403280523.pcRsyVNp-lkp@intel.com>
+References: <20240327155422.25424-6-piotr.kwapulinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next 1/2] bpf: Remove CONFIG_X86 and CONFIG_DYNAMIC_FTRACE
- guard from the tcp-cc kfuncs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171157743313.7147.9400834997000407590.git-patchwork-notify@kernel.org>
-Date: Wed, 27 Mar 2024 22:10:33 +0000
-References: <20240322191433.4133280-1-martin.lau@linux.dev>
-In-Reply-To: <20240322191433.4133280-1-martin.lau@linux.dev>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
- daniel@iogearbox.net, netdev@vger.kernel.org, kernel-team@meta.com,
- jolsa@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327155422.25424-6-piotr.kwapulinski@intel.com>
 
-Hello:
+Hi Piotr,
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+kernel test robot noticed the following build warnings:
 
-On Fri, 22 Mar 2024 12:14:32 -0700 you wrote:
-> From: Martin KaFai Lau <martin.lau@kernel.org>
-> 
-> The commit 7aae231ac93b ("bpf: tcp: Limit calling some tcp cc functions to CONFIG_DYNAMIC_FTRACE")
-> added CONFIG_DYNAMIC_FTRACE guard because pahole was only generating
-> btf for ftrace-able functions. The ftrace filter had already been
-> removed from pahole, so the CONFIG_DYNAMIC_FTRACE guard can be
-> removed.
-> 
-> [...]
+[auto build test WARNING on v6.8]
+[cannot apply to tnguy-next-queue/dev-queue tnguy-net-queue/dev-queue horms-ipvs/master v6.9-rc1 linus/master next-20240327]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Here is the summary with links:
-  - [bpf-next,1/2] bpf: Remove CONFIG_X86 and CONFIG_DYNAMIC_FTRACE guard from the tcp-cc kfuncs
-    https://git.kernel.org/bpf/bpf-next/c/88be2ea40f94
-  - [bpf-next,2/2] selftests/bpf: Test loading bpf-tcp-cc prog calling the kernel tcp-cc kfuncs
-    https://git.kernel.org/bpf/bpf-next/c/74c8edc68573
+url:    https://github.com/intel-lab-lkp/linux/commits/Piotr-Kwapulinski/ixgbe-Add-support-for-E610-FW-Admin-Command-Interface/20240327-234237
+base:   v6.8
+patch link:    https://lore.kernel.org/r/20240327155422.25424-6-piotr.kwapulinski%40intel.com
+patch subject: [Intel-wired-lan] [PATCH iwl-next v1 5/5] ixgbe: Enable link management in E610 device
+config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240328/202403280523.pcRsyVNp-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240328/202403280523.pcRsyVNp-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202403280523.pcRsyVNp-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:2822:5: warning: no previous prototype for 'ixgbe_set_fw_drv_ver_x550' [-Wmissing-prototypes]
+    2822 | s32 ixgbe_set_fw_drv_ver_x550(struct ixgbe_hw *hw, u8 maj, u8 min,
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:3563:6: warning: no previous prototype for 'ixgbe_set_ethertype_anti_spoofing_x550' [-Wmissing-prototypes]
+    3563 | void ixgbe_set_ethertype_anti_spoofing_x550(struct ixgbe_hw *hw,
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:3584:6: warning: no previous prototype for 'ixgbe_set_source_address_pruning_x550' [-Wmissing-prototypes]
+    3584 | void ixgbe_set_source_address_pruning_x550(struct ixgbe_hw *hw,
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/ixgbe_set_ethertype_anti_spoofing_x550 +3563 drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+
+  3556	
+  3557	/** ixgbe_set_ethertype_anti_spoofing_x550 - Enable/Disable Ethertype
+  3558	 *	anti-spoofing
+  3559	 *  @hw:  pointer to hardware structure
+  3560	 *  @enable: enable or disable switch for Ethertype anti-spoofing
+  3561	 *  @vf: Virtual Function pool - VF Pool to set for Ethertype anti-spoofing
+  3562	 **/
+> 3563	void ixgbe_set_ethertype_anti_spoofing_x550(struct ixgbe_hw *hw,
+  3564						    bool enable, int vf)
+  3565	{
+  3566		int vf_target_reg = vf >> 3;
+  3567		int vf_target_shift = vf % 8 + IXGBE_SPOOF_ETHERTYPEAS_SHIFT;
+  3568		u32 pfvfspoof;
+  3569	
+  3570		pfvfspoof = IXGBE_READ_REG(hw, IXGBE_PFVFSPOOF(vf_target_reg));
+  3571		if (enable)
+  3572			pfvfspoof |= BIT(vf_target_shift);
+  3573		else
+  3574			pfvfspoof &= ~BIT(vf_target_shift);
+  3575	
+  3576		IXGBE_WRITE_REG(hw, IXGBE_PFVFSPOOF(vf_target_reg), pfvfspoof);
+  3577	}
+  3578	
+  3579	/** ixgbe_set_source_address_pruning_x550 - Enable/Disbale src address pruning
+  3580	 *  @hw: pointer to hardware structure
+  3581	 *  @enable: enable or disable source address pruning
+  3582	 *  @pool: Rx pool to set source address pruning for
+  3583	 **/
+> 3584	void ixgbe_set_source_address_pruning_x550(struct ixgbe_hw *hw,
+  3585						   bool enable,
+  3586						   unsigned int pool)
+  3587	{
+  3588		u64 pfflp;
+  3589	
+  3590		/* max rx pool is 63 */
+  3591		if (pool > 63)
+  3592			return;
+  3593	
+  3594		pfflp = (u64)IXGBE_READ_REG(hw, IXGBE_PFFLPL);
+  3595		pfflp |= (u64)IXGBE_READ_REG(hw, IXGBE_PFFLPH) << 32;
+  3596	
+  3597		if (enable)
+  3598			pfflp |= (1ULL << pool);
+  3599		else
+  3600			pfflp &= ~(1ULL << pool);
+  3601	
+  3602		IXGBE_WRITE_REG(hw, IXGBE_PFFLPL, (u32)pfflp);
+  3603		IXGBE_WRITE_REG(hw, IXGBE_PFFLPH, (u32)(pfflp >> 32));
+  3604	}
+  3605	
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
