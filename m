@@ -1,123 +1,120 @@
-Return-Path: <netdev+bounces-82650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D0188EEE5
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:11:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E1C888EF04
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:13:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90E311C3423E
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:11:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD1D729F886
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581FE152168;
-	Wed, 27 Mar 2024 19:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C154A131E54;
+	Wed, 27 Mar 2024 19:12:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R1Q1iO77"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uQ8HGiPr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4EE1514D8;
-	Wed, 27 Mar 2024 19:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE7214F9F6
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 19:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711566630; cv=none; b=LXXx+7W+MQWfJ5hR0BJGoFED3RMWG8zPlQsqaD29GSjRVeUx10SEUHEO3oLegEvr51rk3BpAYaNsOaFdzbhI77I93JTXx8isPS3dUlPtQ6TSUAcxl6wDSdbve8RS0DX0u1pcuGqawZMpIAnnSuXzPWweU1NqGg3kHpArcOALV/w=
+	t=1711566730; cv=none; b=lNAzfyH2Yyz6CauXClpG2M2pegO3KC2Hi3vZFhfpEjxNATyeGAQcK2fuEbiERVWDJeu4J44Li6TsEhQLt27RB0jHS3Ig2GWgXKjX3Rj6CYNlvpgjhYFQEZzqq1x/6e3kD8ePk674J1cLI4s8EpNxWOEdJMJ6a+1TP8GWQL9xadc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711566630; c=relaxed/simple;
-	bh=ceAJBDJsMQ5sDuySRq7ldhrporPZTG7ZT1EpQXcXN1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lUuu6kmhDEGaFrv1j7M/uNnetq0P7KqBD9lXaB60xim4dnDcr0RJt5WCV1TKZAtM+wOmfGTq05/aLBFG1PvtDEearaGIUbbdl9FKyuVeftAeqN9wOvZQPcQYGyqVL61+C5iX2aoHdf7wgrYfTKDrdn7SQbCeCmgwEky7Rbcqpj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R1Q1iO77; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D33E7C433F1;
-	Wed, 27 Mar 2024 19:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711566629;
-	bh=ceAJBDJsMQ5sDuySRq7ldhrporPZTG7ZT1EpQXcXN1Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R1Q1iO770PoO1j4FciX9Y5BU9kmYJujFc52pzkyG+BLJxx/CLBKAAVYC8Lt9REJDJ
-	 HpckABPRRQMoSyMxYM0p1Dv4Qi8flAq+1UXQhAVh5rKC0QHADZxp9GwXbp8IWoXTQA
-	 5f4/qnMydLfKJ3dMCIj2cgBUYE+CCuyNkB6AAhB8jv9Xd+ZdjqaK7hpormBBPSP+In
-	 wFrgpYsxVFyY48Va7RwjLqmZ/hgQOQEg+gLxCgg6+PtJ4mTvxXMXP214XILZM0HdyS
-	 sZy3JhkjTuROHpTWwwtLu11nXHKCWNHvX73CzzQyec4rdFXxAlZY4Jj2ea28lIrr+a
-	 l4JTADtsvGHyw==
-Date: Wed, 27 Mar 2024 19:10:25 +0000
-From: Simon Horman <horms@kernel.org>
-To: Duoming Zhou <duoming@zju.edu.cn>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hams@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, jreuter@yaina.de
-Subject: Re: [PATCH net] ax25: fix use-after-free bugs caused by
- ax25_ds_del_timer
-Message-ID: <20240327191025.GU403975@kernel.org>
-References: <20240326142542.118058-1-duoming@zju.edu.cn>
+	s=arc-20240116; t=1711566730; c=relaxed/simple;
+	bh=P8CcbCtPEKX5DVMu8IcqRKCmdxwtfwyxG5EVy0LARuo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qq6BQ/gaP5x2guiV2t+PJz/VyxvfKiIwgwLFjvuujDSewStYivSBln7sjbcFVt0XIF/birPDREmUPvX02F9GkbYGqc0Xmxeqey5ibU6AgYilf/2JuPBvvCIO1Mm56yXfq2PmrCmlG6pEMfTTMty0vATZgyNYL6Epb4Ecqi0N7MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uQ8HGiPr; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a61b31993so3218167b3.1
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:12:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711566728; x=1712171528; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5j8FX0L+UPteWKf09uX1NCGacX18nAOhhO/u6xqP5EU=;
+        b=uQ8HGiPrytSng9ZRRJXv8SiYeAfkf0uy+pYqKlfeQ40hWtgYb7kqZuS/DUBvVoIyT8
+         s4t1BbwNUQqBGGMu0GlhV/9vZ/T+b8q3Z5Nj5MnefU0d5IKZDBVjphNa9hQyvV3XPAnu
+         qfi2x5/2SdBy+dixyRGMJbvbHeYLjHV9Y7QaBOEAk8kml+HuVYifUlkb0x4YtW418DLK
+         XEcoq4rAdnNR8NrZc/HQovtRkAnHLVV5jF6x8rzlfqn/+2Ym6GfvO3/p0Ej1vZl7wy/E
+         zM9OhgWA65fhrIm2B7eQ1QSYKbp7HenJwfJxOkV5U27k7PE0xRSSKg+s5qmRB7S7dAZd
+         Rlug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711566728; x=1712171528;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5j8FX0L+UPteWKf09uX1NCGacX18nAOhhO/u6xqP5EU=;
+        b=nRzNxz2NvE4fJ53bNMlgJiPson/luv6uRchQ8OCP/h2napXWGQVO6Uj7Pr3BTCHmlH
+         93obbuVeox6D+6eXXO8EQ7f4RoY9De06hL4ONgZe/MrwU+1bM4GhBV0B0LVVF12g09IB
+         2EiLwFaag7qajykQ8hWUgMb/19UU55Y9N53a/orpRVxf0TByiB3kiEyPdtcn6nhU+kqA
+         D6L1HzX775Ox3tQ/ofDrQt8OWInLp5mAJivD9N5+BYmwTb0hosE8ryMatR/Zyu23T//s
+         S2vgb+rd8OklBbCp4jecOT8nMGNxvioQHImsgt3LTkiZw3UwRwdMNI4jD4/4auZnh7Kl
+         gzGQ==
+X-Gm-Message-State: AOJu0Yxk0V9OY7cpwZEnNBoJQGCVII1k8HG9e6lRsd4leSTjN54kh3x0
+	DdMaLL+6rhmgVlo387qBlZ8tvvb733cSoC74VkNdqBo5nN7GiPUIIT7xYy+DlZ5KEfmdO+ZbhWU
+	LDUVE8nNApA==
+X-Google-Smtp-Source: AGHT+IGv1o1IlMwkUfNp+YxL3r3ukvdF3cl8XVYkaFMhhSTqjt6Hz7X5lAcDPrNX019HQLUGwNi/zO2TIZxiXQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a0d:df41:0:b0:60a:3d7e:2b98 with SMTP id
+ i62-20020a0ddf41000000b0060a3d7e2b98mr135621ywe.4.1711566728156; Wed, 27 Mar
+ 2024 12:12:08 -0700 (PDT)
+Date: Wed, 27 Mar 2024 19:12:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326142542.118058-1-duoming@zju.edu.cn>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
+Message-ID: <20240327191206.508114-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp/dccp: bypass empty buckets in inet_twsk_purge()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Mar 26, 2024 at 10:25:42PM +0800, Duoming Zhou wrote:
-> When the ax25 device is detaching, the ax25_dev_device_down()
-> calls ax25_ds_del_timer() to cleanup the slave_timer. When
-> the timer handler is running, the ax25_ds_del_timer() that
-> calls del_timer() in it will return directly. As a result,
-> the use-after-free bugs could happen, one of the scenarios
-> is shown below:
-> 
->       (Thread 1)          |      (Thread 2)
->                           | ax25_ds_timeout()
-> ax25_dev_device_down()    |
->   ax25_ds_del_timer()     |
->     del_timer()           |
->   ax25_dev_put() //FREE   |
->                           |  ax25_dev-> //USE
-> 
-> In order to mitigate bugs, when the device is detaching, use
-> timer_shutdown_sync() to stop the timer.
+TCP ehash table is often sparsely populated.
 
-FWIIW, in my reading of things there is another failure mode whereby
-ax25_ds_timeout may rearm the timer after the call to del_timer() but
-before the call to ax25_dev_put().
+inet_twsk_purge() spends too much time calling cond_resched().
 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
-> ---
->  net/ax25/ax25_ds_timer.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ax25/ax25_ds_timer.c b/net/ax25/ax25_ds_timer.c
-> index c4f8adbf814..5624c0d174c 100644
-> --- a/net/ax25/ax25_ds_timer.c
-> +++ b/net/ax25/ax25_ds_timer.c
-> @@ -43,7 +43,12 @@ void ax25_ds_setup_timer(ax25_dev *ax25_dev)
->  
->  void ax25_ds_del_timer(ax25_dev *ax25_dev)
->  {
-> -	if (ax25_dev)
-> +	if (!ax25_dev)
-> +		return;
-> +
-> +	if (!ax25_dev->device_up)
-> +		timer_shutdown_sync(&ax25_dev->dama.slave_timer);
-> +	else
->  		del_timer(&ax25_dev->dama.slave_timer);
->  }
+This patch can reduce time spent in inet_twsk_purge() by 20x.
 
-I think that a) it is always correct to call timer_shutdown_sync,
-and b) ax25_dev->device_up is always true. So a call to
-timer_shutdown_sync can simply replace the call to del_timer.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/inet_timewait_sock.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Also, not strictly related, I think ax25_dev cannot be NULL,
-so that check could be dropped. But perhaps that is better left alone.
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index e8de45d34d56a507a4bdcceaccbd5707692b6c0a..b0cc07d9a568c5dc52bd29729862bcb03e5d595d 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -266,12 +266,17 @@ EXPORT_SYMBOL_GPL(__inet_twsk_schedule);
+ /* Remove all non full sockets (TIME_WAIT and NEW_SYN_RECV) for dead netns */
+ void inet_twsk_purge(struct inet_hashinfo *hashinfo, int family)
+ {
++	struct inet_ehash_bucket *head = &hashinfo->ehash[0];
++	unsigned int ehash_mask = hashinfo->ehash_mask;
+ 	struct hlist_nulls_node *node;
+ 	unsigned int slot;
+ 	struct sock *sk;
+ 
+-	for (slot = 0; slot <= hashinfo->ehash_mask; slot++) {
+-		struct inet_ehash_bucket *head = &hashinfo->ehash[slot];
++	for (slot = 0; slot <= ehash_mask; slot++, head++) {
++
++		if (hlist_nulls_empty(&head->chain))
++			continue;
++
+ restart_rcu:
+ 		cond_resched();
+ 		rcu_read_lock();
+-- 
+2.44.0.396.g6e790dbe36-goog
 
-
-Zooming out a bit, has removal of ax25 been considered.
-I didn't check the logs thoroughly, but I'm not convinced it's been
-maintained - other than clean-ups and by-inspection bug fixes - since git
-history began.
 
