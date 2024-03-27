@@ -1,163 +1,125 @@
-Return-Path: <netdev+bounces-82318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D11C88D3BC
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 02:31:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76A288D3CB
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 02:38:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D112E1C252A1
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 01:31:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 557E01F244EF
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 01:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5921B7E9;
-	Wed, 27 Mar 2024 01:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE33D1CD2B;
+	Wed, 27 Mar 2024 01:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qipBKAvA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D70A1CF92;
-	Wed, 27 Mar 2024 01:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D761B7E9;
+	Wed, 27 Mar 2024 01:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711503081; cv=none; b=HX14UsxjK2jnOuBn3Rv4b0/fYhRc/6w2jccIBDN5xCYUPdO5fAUTfaOpWLLshBqvXB7ihmcIwYVT61zqo4ApBi5wPffibl4SgDN/XzZeyTNUJ4jxngQxwgj/nlw+SB1dfNirTWkT/MQuEhOHzKf1KTD9m9iRqmABY+ZYRscaaEY=
+	t=1711503492; cv=none; b=hpLnBmbSC7Dq8CkDodNVbj3JDVtzXZdM6gG4mIfKNF6boe/vngPxQbeVDOeIdYGjzKWg/nfB0wXyZrG9dsGffTAGtPWS0AGvBakZyXeNN6v8maY3oDMyGtJZVfWQ5PCubAlDtdh64rIx3iGP+yPbl9LUM40CTSptnbFWrWM3JqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711503081; c=relaxed/simple;
-	bh=PB78qaohyz8M/acpebMaE6FdLWqAdAAntBtk1iJ8u+g=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GDqNEoYpoh0lj1AzZSwo/gIBAT03vJiyDqD5qL7/9HfudFHV6Jw8JQwFlyNkS/N4rDGg+tVj1vpQkv/a8w87DIWqo4eOJrjkFzevcBvqyLO5AqfzFQ49KU1rYlectb8WXdNmTknVPQtR7j3MlDe6W+k4XemzvKbPVD1GmEFk1W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid:Yeas8t1711502976t933t54105
-Received: from 73E00E8BC808433CB9DB281092DFBE6B (duanqiangwen@net-swift.com [122.235.142.34])
-X-QQ-SSF:00400000000000F0FH4000000000000
-From: duanqiangwen@net-swift.com
-X-BIZMAIL-ID: 293933216363626304
-To: "'Jiri Pirko'" <jiri@resnulli.us>
-Cc: <netdev@vger.kernel.org>,
-	<jiawenwu@trustnetic.com>,
-	<mengyuanlou@net-swift.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<maciej.fijalkowski@intel.com>,
-	<andrew@lunn.ch>,
-	<wangxiongfeng2@huawei.com>,
-	<linux-kernel@vger.kernel.org>,
-	<michal.kubiak@intel.com>
-References: <20240322080416.470517-1-duanqiangwen@net-swift.com> <Zf09VnR2YI_WOchd@nanopsycho>
-In-Reply-To: <Zf09VnR2YI_WOchd@nanopsycho>
-Subject: RE: [PATCH net v5] net: txgbe: fix i2c dev name cannot match clkdev
-Date: Wed, 27 Mar 2024 09:29:35 +0800
-Message-ID: <001201da7fe6$3aa37f10$afea7d30$@net-swift.com>
+	s=arc-20240116; t=1711503492; c=relaxed/simple;
+	bh=6qAmt+xdA2QOcCOcEi6dB8mBsdItFfMjVsA3nuCRwiU=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=FeTnDw3i2JOD7uAT/JB5hupeseRvS4lH9N9MT+uFpVR6WJLIonsiBpquF/eOQ0CnzLOtCMBXhAuyVWa6dmgigI/Pkm95oVwHpo8DXwUlP0M9qcgJHhrKPX0OemThnuuQMPljrLQz2WAjHKDY9sCIuWdxWXyvCtvsLI9bD529B3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qipBKAvA; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711503481; h=Message-ID:Subject:Date:From:To;
+	bh=xSV0Dmq1/beES1CrMcd6dQoXETDRC4jlecw03aBarYs=;
+	b=qipBKAvAOeq6M0q+nrL3Y6PjYTzqODbRaVKZyNrfi7pMnNBQapugNcZaHbJmlTLe1U8n6rsgvu08vel8BcbxSdjpOm8e51K+ErBIAz9FeIxZR+Itkt7sa1awBaDIyvDqLcvMz2/NXbayzJ3coBHMBvXzKzhrp0ihChKH9K6YWp8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W3Mnh-R_1711503480;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3Mnh-R_1711503480)
+          by smtp.aliyun-inc.com;
+          Wed, 27 Mar 2024 09:38:01 +0800
+Message-ID: <1711503463.632461-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net v2 1/2] virtio_net: Do not set rss_indir if RSS is not supported
+Date: Wed, 27 Mar 2024 09:37:43 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: rbc@meta.com,
+ riel@surriel.com,
+ virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
+ netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+ linux-kernel@vger.kernel.org (open list),
+ hengqi@linux.alibaba.com,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20240326151911.2155689-1-leitao@debian.org>
+In-Reply-To: <20240326151911.2155689-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQFwLs5rgYGClTpBePjvbYMXpqMxXgKXsSFcsgqwUFA=
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
 
-> -----Original Message-----
-> From: Jiri Pirko <jiri@resnulli.us>
-> Sent: 2024=C4=EA3=D4=C222=C8=D5 16:12
-> To: Duanqiang Wen <duanqiangwen@net-swift.com>
-> Cc: netdev@vger.kernel.org; jiawenwu@trustnetic.com;
-> mengyuanlou@net-swift.com; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
-> maciej.fijalkowski@intel.com; andrew@lunn.ch;
-> wangxiongfeng2@huawei.com; linux-kernel@vger.kernel.org;
-> michal.kubiak@intel.com
-> Subject: Re: [PATCH net v5] net: txgbe: fix i2c dev name cannot match
-clkdev
->=20
-> Fri, Mar 22, 2024 at 09:04:16AM CET, duanqiangwen@net-swift.com wrote:
-> >txgbe clkdev shortened clk_name, so i2c_dev info_name also need to
-> >shorten. Otherwise, i2c_dev cannot initialize clock.
-> >
-> >Change log:
-> >v4-v5: address comments:
-> >	Jiri Pirko:
-> >	Well, since it is used in txgbe_phy.c, it should be probably
-> >	rather defined locally in txgbe_phy.c.
->=20
-> Did you read Florian's comment? Please do.
->=20
-> pw-bot: cr
->=20
+On Tue, 26 Mar 2024 08:19:08 -0700, Breno Leitao <leitao@debian.org> wrote:
+> Do not set virtnet_info->rss_indir_table_size if RSS is not available
+> for the device.
+>
+> Currently, rss_indir_table_size is set if either has_rss or
+> has_rss_hash_report is available, but, it should only be set if has_rss
+> is set.
+>
+> On the virtnet_set_rxfh(), return an invalid command if the request has
+> indirection table set, but virtnet does not support RSS.
+>
+> Suggested-by: Heng Qi <hengqi@linux.alibaba.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  drivers/net/virtio_net.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index c22d1118a133..c640fdf28fc5 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3813,6 +3813,9 @@ static int virtnet_set_rxfh(struct net_device *dev,
+>  	    rxfh->hfunc != ETH_RSS_HASH_TOP)
+>  		return -EOPNOTSUPP;
+>
+> +	if (rxfh->indir && !vi->has_rss)
+> +		return -EINVAL;
+> +
+>  	if (rxfh->indir) {
 
-I replied to Florian:=20
-" I want to shorten "i2c_desginware" to "i2c_dw" in txgbe driver, so =
-other
-drivers which use "i2c_designware" need another patch to use a define. "
+Put !vi->has_rss here?
 
-He hasn't replied to me for several days, what should I do next?
+Thanks.
 
->=20
-> >v3->v4: address comments:
-> >	Jakub Kicinski:
-> >	No empty lines between Fixes and Signed-off... please.
-> >v2->v3: address comments:
-> >	Jiawen Wu:
-> >	Please add the define in txgbe_type.h
-> >
-> >Fixes: e30cef001da2 ("net: txgbe: fix clk_name exceed MAX_DEV_ID
-> >limits")
-> >Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
-> >---
-> > drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 8 +++++---
-> > 1 file changed, 5 insertions(+), 3 deletions(-)
-> >
-> >diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> >b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> >index 5b5d5e4310d1..2fa511227eac 100644
-> >--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> >+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> >@@ -20,6 +20,8 @@
-> > #include "txgbe_phy.h"
-> > #include "txgbe_hw.h"
-> >
-> >+#define TXGBE_I2C_CLK_DEV_NAME "i2c_dw"
-> >+
-> > static int txgbe_swnodes_register(struct txgbe *txgbe)  {
-> > 	struct txgbe_nodes *nodes =3D &txgbe->nodes; @@ -571,8 +573,8
-> @@ static
-> >int txgbe_clock_register(struct txgbe *txgbe)
-> > 	char clk_name[32];
-> > 	struct clk *clk;
-> >
-> >-	snprintf(clk_name, sizeof(clk_name), "i2c_dw.%d",
-> >-		 pci_dev_id(pdev));
-> >+	snprintf(clk_name, sizeof(clk_name), "%s.%d",
-> >+		 TXGBE_I2C_CLK_DEV_NAME, pci_dev_id(pdev));
-> >
-> > 	clk =3D clk_register_fixed_rate(NULL, clk_name, NULL, 0, =
-156250000);
-> > 	if (IS_ERR(clk))
-> >@@ -634,7 +636,7 @@ static int txgbe_i2c_register(struct txgbe =
-*txgbe)
-> >
-> > 	info.parent =3D &pdev->dev;
-> > 	info.fwnode =3D software_node_fwnode(txgbe-
-> >nodes.group[SWNODE_I2C]);
-> >-	info.name =3D "i2c_designware";
-> >+	info.name =3D TXGBE_I2C_CLK_DEV_NAME;
-> > 	info.id =3D pci_dev_id(pdev);
-> >
-> > 	info.res =3D &DEFINE_RES_IRQ(pdev->irq);
-> >--
-> >2.27.0
-> >
-> >
->=20
 
+>  		for (i = 0; i < vi->rss_indir_table_size; ++i)
+>  			vi->ctrl->rss.indirection_table[i] = rxfh->indir[i];
+> @@ -4729,13 +4732,15 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
+>  		vi->has_rss_hash_report = true;
+>
+> -	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS))
+> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
+>  		vi->has_rss = true;
+>
+> -	if (vi->has_rss || vi->has_rss_hash_report) {
+>  		vi->rss_indir_table_size =
+>  			virtio_cread16(vdev, offsetof(struct virtio_net_config,
+>  				rss_max_indirection_table_length));
+> +	}
+> +
+> +	if (vi->has_rss || vi->has_rss_hash_report) {
+>  		vi->rss_key_size =
+>  			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
+>
+> --
+> 2.43.0
+>
 
