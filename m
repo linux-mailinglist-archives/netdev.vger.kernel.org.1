@@ -1,203 +1,81 @@
-Return-Path: <netdev+bounces-82535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 170F788E7BE
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:03:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5194788E7D9
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:06:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B46B1C2E294
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:03:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3F872E5ECA
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E370914600A;
-	Wed, 27 Mar 2024 14:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEA71487E4;
+	Wed, 27 Mar 2024 14:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Re0GYhPS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rkCPQTx8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234EC14535D;
-	Wed, 27 Mar 2024 14:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A0D147C80;
+	Wed, 27 Mar 2024 14:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711549403; cv=none; b=FJcq0pOg8Em11fhfT5CMI28sfcVcv5f2q848QYNZFSunG6NCSqwTgTLKi59gsuxZlQTXNHHZDBx6FsxX+PX4zoD7bzqGzesuERAFToDMltz+qO2ykPpKqiffKjAEiacJijY1rzTdW7nCcK6HT+2e/TPi8NRgvGIdZPigYVWwXNc=
+	t=1711549576; cv=none; b=p//Nr49P7YGIpCYiu7l/2BXsDmmXyeGNoxbTa4aUDHEY3ZVLCNKzfO6EdzUXQ0lJm8+RHZ1jUx1VSy/h4dv6FmbUAiftZsfqnZPZRz8ToNLygNCi27Sz9X/sSYxlKctDdSex5dBLpobI6F6xDl0AKgmrbHsDGgsmf+SrtP54pKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711549403; c=relaxed/simple;
-	bh=iiy+IT/DztQVWAIWT58TrPOTIu+zB11vMHnxpdfkMvE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LJ3F9gajsFs9EzblkevWEl3RFBYefPN7EhCrKs/pF4f5vzy+FW3nueP558hK2qujiRMlLH4gzPYfMMP+HybLjLhZQyaTAtxBpOSYtb3O6POO3kAS4iW/5DuyNB+QdRRGnRsIpeI08uoWsok8Mf56gPE1r0BHEqtnVVL1RRO5Qnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Re0GYhPS; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711549402; x=1743085402;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=iiy+IT/DztQVWAIWT58TrPOTIu+zB11vMHnxpdfkMvE=;
-  b=Re0GYhPSRqT+9Ck2LNl0UyFzSs2cvMof5Z9Vs4DhFSUNC6OdadPEVdBx
-   rAEcLO88pJdCL7NcNU29PWXArvw6IpXyZaPEPWK8oq5Ia1gbiYXjg8KGA
-   4pFsLInmr5AYIAR+S9xveDcwA+/TmfAOkTAbQ0KfZkkJKtaRxPEQ9GjjV
-   OATr3mFLrpGRjwbWK/IWoskZOcGC5rgjgTSQqgutYa3CgQKOhFypJx/wO
-   Vgq8M4dvbst6rjFDLj2Ouw8K92EQHZU/LNO6uc35J7bX7dQ/drfTJdHZh
-   vzNapZC+SN4aCFcf3ibZVV8muDfNBUsKswUI9ipVYCsZVlENzRLmd9MZs
-   A==;
-X-CSE-ConnectionGUID: s+OdSvCbQfqTnGeh9JKTEA==
-X-CSE-MsgGUID: C55Xa0mNTsCIpPmqOskaKw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6592551"
-X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
-   d="scan'208";a="6592551"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 07:23:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
-   d="scan'208";a="20973106"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa004.fm.intel.com with ESMTP; 27 Mar 2024 07:23:19 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	linux-hardening@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 3/3] idpf: sprinkle __counted_by{,_le}() in the virtchnl2 header
-Date: Wed, 27 Mar 2024 15:22:41 +0100
-Message-ID: <20240327142241.1745989-4-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240327142241.1745989-1-aleksander.lobakin@intel.com>
-References: <20240327142241.1745989-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1711549576; c=relaxed/simple;
+	bh=tYPHhNepAAUe/RQ25n0j0I86CGTDkYfEPdE4S8lqpas=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uG46wo3EUNA/YP/0MPPKplkNSOMkUoRkRtsWpuwmLFY0uJXlQHLHT0Taofcy+cNdsTCoG6FNhZpZgrBY8Se0JjH/ru+F3aJNkPcWBcrYXZdQEbXdb1qzUHKRgWO4bEJIBYCtHvygcTW2DDGbvvg/16LUNY/cXuhWk7gfm7XwtmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rkCPQTx8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 256A5C433F1;
+	Wed, 27 Mar 2024 14:26:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711549575;
+	bh=tYPHhNepAAUe/RQ25n0j0I86CGTDkYfEPdE4S8lqpas=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rkCPQTx86xKBwvhO7HDufGb5TKgJnEhkgurHdpJP2aGkREXb4bWU9HlVf2dDPQ8ht
+	 QQCXpMrDWKt40fjB3JZfbkKhRJwxTKqpsF1AONm11z/vKvlMlZwwYZOg63P6rE/VHZ
+	 P7ziXQhb+6A6CJ+L39PXLqydtd/ebYP0Z+OnOR3YtdQ9u4zA/FO34PrntOuZKTvvAC
+	 dMp6xdNb3OOWu+bqrD7RpqmmuLPC5DTrqZpJ3Ze2Ej5hXYqDSUIdxwSPzeOWwB7Mw1
+	 W8SRMhKw2dPENkg4EERVYrp/mQxgIu1+1Ii0Vkd6yBCduwZEiGwCGSnGJMWAHBecLn
+	 oLr9UgQ5W9E9w==
+Date: Wed, 27 Mar 2024 14:26:10 +0000
+From: Simon Horman <horms@kernel.org>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, lcherian@marvell.com, sbhatta@marvell.com,
+	naveenm@marvell.com, edumazet@google.com, pabeni@redhat.com
+Subject: Re: [net PATCH] Octeontx2-af: fix pause frame configuration in GMP
+ mode
+Message-ID: <20240327142610.GI403975@kernel.org>
+References: <20240326052720.4441-1-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240326052720.4441-1-hkelam@marvell.com>
 
-Both virtchnl2.h and its consumer idpf_virtchnl.c are very error-prone.
-There are 10 structures with flexible arrays at the end, but 9 of them
-has flex member counter in Little Endian.
-Make the code a bit more robust by applying __counted_by_le() to those
-9. LE platforms is the main target for this driver, so they would
-receive additional protection.
-While we're here, add __counted_by() to virtchnl2_ptype::proto_id, as
-its counter is `u8` regardless of the Endianness.
-Compile test on x86_64 (LE) didn't reveal any new issues after applying
-the attributes.
+On Tue, Mar 26, 2024 at 10:57:20AM +0530, Hariprasad Kelam wrote:
+> The Octeontx2 MAC block (CGX) has separate data paths (SMU and GMP) for
+> different speeds, allowing for efficient data transfer.
+> 
+> The previous patch which added pause frame configuration has a bug due
+> to which pause frame feature is not working in GMP mode.
+> 
+> This patch fixes the issue by configurating appropriate registers.
+> 
+> Fixes: f7e086e754fe ("octeontx2-af: Pause frame configuration at cgx")
+> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
 
-Acked-by: Kees Cook <keescook@chromium.org>
-Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/ethernet/intel/idpf/virtchnl2.h | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+nit: For consistency with git history,
+     octeontx2-af should be all lowercase in the subject
 
-diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-index 29419211b3d9..63deb120359c 100644
---- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
-+++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-@@ -555,7 +555,7 @@ VIRTCHNL2_CHECK_STRUCT_LEN(32, virtchnl2_queue_reg_chunk);
- struct virtchnl2_queue_reg_chunks {
- 	__le16 num_chunks;
- 	u8 pad[6];
--	struct virtchnl2_queue_reg_chunk chunks[];
-+	struct virtchnl2_queue_reg_chunk chunks[] __counted_by_le(num_chunks);
- };
- VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_queue_reg_chunks);
- 
-@@ -703,7 +703,7 @@ struct virtchnl2_config_tx_queues {
- 	__le32 vport_id;
- 	__le16 num_qinfo;
- 	u8 pad[10];
--	struct virtchnl2_txq_info qinfo[];
-+	struct virtchnl2_txq_info qinfo[] __counted_by_le(num_qinfo);
- };
- VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_config_tx_queues);
- 
-@@ -782,7 +782,7 @@ struct virtchnl2_config_rx_queues {
- 	__le32 vport_id;
- 	__le16 num_qinfo;
- 	u8 pad[18];
--	struct virtchnl2_rxq_info qinfo[];
-+	struct virtchnl2_rxq_info qinfo[] __counted_by_le(num_qinfo);
- };
- VIRTCHNL2_CHECK_STRUCT_LEN(24, virtchnl2_config_rx_queues);
- 
-@@ -868,7 +868,7 @@ VIRTCHNL2_CHECK_STRUCT_LEN(32, virtchnl2_vector_chunk);
- struct virtchnl2_vector_chunks {
- 	__le16 num_vchunks;
- 	u8 pad[14];
--	struct virtchnl2_vector_chunk vchunks[];
-+	struct virtchnl2_vector_chunk vchunks[] __counted_by_le(num_vchunks);
- };
- VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_vector_chunks);
- 
-@@ -912,7 +912,7 @@ struct virtchnl2_rss_lut {
- 	__le16 lut_entries_start;
- 	__le16 lut_entries;
- 	u8 pad[4];
--	__le32 lut[];
-+	__le32 lut[] __counted_by_le(lut_entries);
- };
- VIRTCHNL2_CHECK_STRUCT_LEN(12, virtchnl2_rss_lut);
- 
-@@ -977,7 +977,7 @@ struct virtchnl2_ptype {
- 	u8 ptype_id_8;
- 	u8 proto_id_count;
- 	__le16 pad;
--	__le16 proto_id[];
-+	__le16 proto_id[] __counted_by(proto_id_count);
- } __packed __aligned(2);
- VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
- 
-@@ -1104,7 +1104,7 @@ struct virtchnl2_rss_key {
- 	__le32 vport_id;
- 	__le16 key_len;
- 	u8 pad;
--	u8 key_flex[];
-+	u8 key_flex[] __counted_by_le(key_len);
- } __packed;
- VIRTCHNL2_CHECK_STRUCT_LEN(7, virtchnl2_rss_key);
- 
-@@ -1131,7 +1131,7 @@ VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_queue_chunk);
- struct virtchnl2_queue_chunks {
- 	__le16 num_chunks;
- 	u8 pad[6];
--	struct virtchnl2_queue_chunk chunks[];
-+	struct virtchnl2_queue_chunk chunks[] __counted_by_le(num_chunks);
- };
- VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_queue_chunks);
- 
-@@ -1195,7 +1195,7 @@ struct virtchnl2_queue_vector_maps {
- 	__le32 vport_id;
- 	__le16 num_qv_maps;
- 	u8 pad[10];
--	struct virtchnl2_queue_vector qv_maps[];
-+	struct virtchnl2_queue_vector qv_maps[] __counted_by_le(num_qv_maps);
- };
- VIRTCHNL2_CHECK_STRUCT_LEN(16, virtchnl2_queue_vector_maps);
- 
-@@ -1247,7 +1247,7 @@ struct virtchnl2_mac_addr_list {
- 	__le32 vport_id;
- 	__le16 num_mac_addr;
- 	u8 pad[2];
--	struct virtchnl2_mac_addr mac_addr_list[];
-+	struct virtchnl2_mac_addr mac_addr_list[] __counted_by_le(num_mac_addr);
- };
- VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_mac_addr_list);
- 
--- 
-2.44.0
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
