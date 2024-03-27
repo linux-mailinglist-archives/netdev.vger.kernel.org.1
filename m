@@ -1,155 +1,218 @@
-Return-Path: <netdev+bounces-82619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450D088EBF7
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:00:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0270D88EC1E
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:08:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 740651C3112E
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:00:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 700BC1F25FA4
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D035A14C592;
-	Wed, 27 Mar 2024 17:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834AB14C5A4;
+	Wed, 27 Mar 2024 17:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H60IOwim"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="gYExkU2X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20121148835;
-	Wed, 27 Mar 2024 17:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711558833; cv=none; b=JTVxGiBBt4G1qFygKYUhSA5cT4MNJha/eErT2MSZFW0lNT/NcNdPHkLVnhEEa1bixQaJquxasYlJe6pFc/Cng42irIWNJ7+SLT+OYKGKz9WoBaNiHwGVvJxR6pD9q5cQDw43H76w8QSMW/ebz7oWBzIlhKXpeyrGhCdKOO1XseU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711558833; c=relaxed/simple;
-	bh=J37ICIcDeIhSRv8OF2aSODi811JNXz0+B8VLSNUEPKI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s7pD7cPfk3YA3Rl3U2ir7c/6XjcP2dlabzCgE0AxYbF30tSfispgRtQgR7jg9czDlkxhlUjW8RiqLXXJz0YDole5OKQ7o6G2v6rZwlCODJ4wLN2277BJYFYSt1Oeuvyj1VJBUWcoESzZQcuFy5sho1RRH33wZ/Zr7YeIBoBuw1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H60IOwim; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33ed4d8e9edso5142689f8f.2;
-        Wed, 27 Mar 2024 10:00:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711558830; x=1712163630; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rE6PANI0PKpDtDKb8HO4vaBnD1jO6J6fZqWjXbZEANc=;
-        b=H60IOwimmt+FNgt1ObLh3qILiMau/xCaHR04oMHt/chcbAwyF3imH9dUdPzWqQ1Llk
-         0ylz1BUPSdDHFcw++x3nEMeYdwA2UX0uX4C3B1la52z0ypkTSo8tZ4VQVakGvGcijGX2
-         JdkX5hymXpTQ8xCGfcARj3ROd10VW3E2JUM0ii9XpdR9XXrXaTkVyJnFku3N18gLIW7q
-         bthDUdY04B2RS4//rdjBbeC5tk6ydjfGYR/R+5DTsXhTuCrdDOiR40jr7AqVbl5X54qx
-         4I/oqvLCWxbYJ/eA6xs1qo/DNOAlV5cVZi922/M7kT2l7KRdkp86xRBC73vApb32NRZ3
-         LoVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711558830; x=1712163630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rE6PANI0PKpDtDKb8HO4vaBnD1jO6J6fZqWjXbZEANc=;
-        b=M+9wyLakmgW4KZOjln+e2qE/ctMPe/dq03tQCHSuzJm2I/hgsBhbJVFyjbTYKCJ5nA
-         Xn56yHjDu1R6LdzoeRHx2ZRkzXiJbXVfm/9AWWXrMa5Ljjsr76kyi+9qQ5v7NkM9zVf0
-         V+NfLVD0xYqbKnB1Gojs2dDxGNKJcHQqR+TryivXMPclaLefJLBXqwqFKLS3YDTt7pmW
-         95yzEnYLLgP7JAg5a86gyraAJYPKXfgEIBPcmlAb+09T+RrA/dpzvS1ir5XY0hsl2M7V
-         YOcvJPe9hdpTwOEUm2yov+BI+ZgpClIqeWIqhB4rrsRanckFCjvC/E4DDCdYt79XQBBa
-         H6NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVEi8bzn9BbqHilUrSFrZ/okK+/pfeMQOISqIzAInxs/s9C/bGJLCLSnmI15YO0AIHbAVOTjJIU3AFZds+9KLRYOQ0Q
-X-Gm-Message-State: AOJu0Yzit0JqPqojDQZkuHIZK/9+2N8Hy9CP/cnVZpd1TC/THY/uyJoX
-	KdR8fmnQiFwSK1xsRmvCDQzCHCITfykf9KChCIZ9z4AdhwtNb0ApCX4CYydwZvluDvuzZF985OS
-	MuZre77D8i8E+PjxEQQzwOC1qg7T9wE/LtzA=
-X-Google-Smtp-Source: AGHT+IHhkloAX659y62N9Sgl+ZqyAfY8iq+7jOOX1+KAnA+tCvDhALQMxu4P9hoaXL1TLSv6AhIzTZxYoj35NB0egW8=
-X-Received: by 2002:a5d:64a2:0:b0:341:bd4c:f075 with SMTP id
- m2-20020a5d64a2000000b00341bd4cf075mr375333wrp.16.1711558830159; Wed, 27 Mar
- 2024 10:00:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A9312FF99;
+	Wed, 27 Mar 2024 17:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711559321; cv=fail; b=TO2QuYgt+pR0dEObFqnqVBbt4Fm5pmQPubZiri7WbLVO2BHEkx1soSXlijDlLacrEP6X9WXNkPEcprfhEjs1F8REuO5JeUkP3CS3AmDpPC3v+WBwRdDMfx3Q8n1J6egMY3LWytU0sj+htdbmi+AirlA7LjGvlb3eH95qIaegjqk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711559321; c=relaxed/simple;
+	bh=KZKCqjEW5wsjjwUTF+/V+F9e2ZFxR0JF3XbTOkLRRww=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Am6hfmPmI9lbrkv9S1mVzhe2reId8N6n5PtYy3tvYUwRp96l7/s5JkhROFzvtX3FN7qYHf4eDSRIDrdwf59HgiYamcVJAfzqly+7g/D+3g6Ox6bBIaye/7NWlPQZd6AMHengQgHzHIJeVRemxDjM5gfspeqI1L5MTyED7yE+QUI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=gYExkU2X; arc=fail smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42RALhWt002476;
+	Wed, 27 Mar 2024 10:08:26 -0700
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2101.outbound.protection.outlook.com [104.47.58.101])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3x4hmp9sax-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Mar 2024 10:08:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cOw3rX7f0QKQzkwZDraSjrT/JGaLb12Wq9hOZKnVlFSpTNhiIrIgAmIAxtz0ZHnhz8GE6KvuVDxmcIAkFQFAaL8oXOkF/SnSQ1H+w+zsAnbIE4KemhdyZjvrTQEhRH/yur7HX9PIhm/tpwd0RNspnPztKqx/T8EnLNS+GSD00G+ZR4V6IAy56mndWtqLdSZIcmG6ZD2G7xrWS1MJgMrZ687AFNh7k36GUyCFTwO1WOhD26TBzyKOgNdDUwsVG8FlNydohR2K8QNv94fn/bqWNGUR10qcvphR8H6cvUkfHOxIWZHDxBKjpUDgDNPI9cnzOq7p0kkYYxOp52YerHCr3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SE401zh08/RRXlrXAYy5Cqke3RJc4qWkmTf5JP+hehU=;
+ b=FbLjZzd41ULW5dGcnUZMpwtyySrWVojy8gx08vLUxKRfC0jB2O1fEshWoae/y//4HmOz7ht8qKV0SLaEkZSCnHG9FIfB3tQdVhG8QrhpFCBRy01C33boMXAj6JzzVkHvU6XTiNlSJ8t7uQX2Waf7lJxi9FDrjI2rXhsVU36XRjEK90TOYBEMsVYzjs31HcP0OF3UZNEPr+LTW7wUooggo2IWAJAJ8X3Ye/4IvMQe8/Z3mQT8huS5GYUz53Lkrh5pyrVa2DhSq3snZ6gbLaFaAjiFNC8ZI6nRYgYaoV59c+hr/w7XIwzyaxjiqF4TWIjHz+CBVO/lQI6VgWvixVhuIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SE401zh08/RRXlrXAYy5Cqke3RJc4qWkmTf5JP+hehU=;
+ b=gYExkU2XPEqP4mnrVAvJP2POojkvhKR1mJzoigNJmHisUcBzquTHAXjyfFdTo6p4AP0c75/z8mWNdlJn/ULbNmqm8Bjo7xOpCnlemDT/yKkp6aAZ7ViQLNqCBATiNKoX6+2r44wLbLxO7q80/fj7YkwhX1bFdJ8XGDcLamgo+30=
+Received: from CO1PR18MB4666.namprd18.prod.outlook.com (2603:10b6:303:e5::24)
+ by DM4PR18MB5146.namprd18.prod.outlook.com (2603:10b6:8:51::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Wed, 27 Mar
+ 2024 17:08:21 +0000
+Received: from CO1PR18MB4666.namprd18.prod.outlook.com
+ ([fe80::5087:a566:c473:1fef]) by CO1PR18MB4666.namprd18.prod.outlook.com
+ ([fe80::5087:a566:c473:1fef%7]) with mapi id 15.20.7409.031; Wed, 27 Mar 2024
+ 17:08:21 +0000
+From: Subbaraya Sundeep Bhatta <sbhatta@marvell.com>
+To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        Ariel Elior
+	<aelior@marvell.com>, Manish Chopra <manishc@marvell.com>
+CC: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers
+	<ndesaulniers@google.com>,
+        Bill Wendling <morbo@google.com>,
+        Justin Stitt
+	<justinstitt@google.com>,
+        Simon Horman <horms@kernel.org>,
+        Konstantin
+ Khorenko <khorenko@virtuozzo.com>,
+        Sudarsana Reddy Kalluru
+	<sudarsana.kalluru@cavium.com>,
+        Netdev <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [EXTERNAL] [PATCH 3/9] qed: avoid truncating work queue length
+Thread-Topic: [EXTERNAL] [PATCH 3/9] qed: avoid truncating work queue length
+Thread-Index: AQHagCfC+qakUE/9NUWNrCxJqKFS87FLnkwQgAAZ6oCAABoNIA==
+Date: Wed, 27 Mar 2024 17:08:21 +0000
+Message-ID: 
+ <CO1PR18MB4666CD328AFA8B8EE49B389AA1342@CO1PR18MB4666.namprd18.prod.outlook.com>
+References: <20240326223825.4084412-1-arnd@kernel.org>
+ <20240326223825.4084412-4-arnd@kernel.org>
+ <CO1PR18MB4666DF3B7684D340C3A3646DA1342@CO1PR18MB4666.namprd18.prod.outlook.com>
+ <6242198a-8559-4465-918a-36442ea03e32@app.fastmail.com>
+In-Reply-To: <6242198a-8559-4465-918a-36442ea03e32@app.fastmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR18MB4666:EE_|DM4PR18MB5146:EE_
+x-ms-office365-filtering-correlation-id: 019c2e2a-3f18-46f5-3401-08dc4e808160
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ 18hZ1BmpCkqVCW+qvPARiCHWlPgZlf5YDrietL5b7ti7NqbJa0l0T+Tk8j1zyt+//pShXQ1ZQ9EoK9/BvtX60qiemk2QT/YFvrVAl12efqQDuYH22C/WqGJpuM0DLa7TsYVn+7oG+OEeNsVsz8y1IH7U22zOSz1f/paeEeeh6N6j7BJpjvSpD12LTeDt9GF6MAQ6cwpZCGTWMUc7ANrysT8hCemaozwcj1XhZCGwWON5H6FGC+Tzy/03Z9f4MpPosET3+40IsGuIClGP3ISWNAciZC/DZCKmdP91Vt91zNwbB0gSo1ef9FxaRwyye2DPpksX5L7i6h5HjpKVR1A4GSx3G3ap84GmXBcTbOvESib3C05QgyFwDuKkpmwOvyKL7oERIkK2PVRAL9ShvAM+4l1nM/Ke/UBQ2Muktv8ESIEiS02Xv/+BdE5BYHsnET3kDv+QFuv+UwNMjixIstC2XPCkbz26lpGsHnC0TgQkp7nqe/DDOR5gQkp7jbggLNrGnduuQyBZGr15OtJtdAFzOVqWXILnwag/niIfoZmQNOC/dYV3HC/0rSE5hGzQOHl/SvORqvA58RuxSpoq9vAy2Fo3Z6KYCZbYWf0R2ODWdcasoekxxNhZPo6gJRB0Y93qOakLWornTwerC2zoyeEgjV7BA68ZRQ5yTW12rGNhGmkSLOUGBpmNvevjYwRs1zX3hHpRR8+dceSSaX1XSxciqdzGlkw/NCl1m4C++1UmSvY=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR18MB4666.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(7416005)(1800799015)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?pJiH66A9yOeYcXXz2KyJ7km7JoQgZGLeupEHEugplWI7pX54wNtK/qo+6XTv?=
+ =?us-ascii?Q?wvnFAgheHqFZ95i9khCZDveDZ2HEwjgCYVNJ3T31So3QxT4sfAAlK7npf/Ka?=
+ =?us-ascii?Q?3aExjmTfu00VJAV3ChwR4i3BfA866+hpsPE7caTMbn9bFCvI538y9gWENoEq?=
+ =?us-ascii?Q?tTvMEtI58amqaJdjGk01HR7KSuP66hBtgG/kQIXDoD02c3SXZyHs10q8rC21?=
+ =?us-ascii?Q?PpY0uCscOrkFNA4jNL4Z2+PDWsBTyvfS0xzvwMEh9VqjPAxMslXzgCJqXli6?=
+ =?us-ascii?Q?7+LI+H/cd262nyD78n7Xzku0u6ncSfxaePTRmSoSOY6E5lvfO3/IwddGtd8T?=
+ =?us-ascii?Q?j4Sx+KVd3t1xx+jHiQ3lXgI4nVIklY+oGyORzaGWzC32MtvikH2kSbFmmT5D?=
+ =?us-ascii?Q?7c82WP4JZ17S3jPI/wDoBHND8j0s5DCxtGeur3QocRMkhS1NdzrZHkRY0okZ?=
+ =?us-ascii?Q?jzhS2HbONxNEDzDVFArPBL415FgCdlkMMtzXmK9e40mI2yEBSHMIOpV1iISy?=
+ =?us-ascii?Q?zbfGLjqk3zOy8nGsaCTjCUEdA27w3O1V885A+tWD645uoXB0B1C9PxV4ar+9?=
+ =?us-ascii?Q?7NQOK1m6WHWCIPuo8GwFgzpUt7ZRwHMOjOhlWhNYhlEPZXAnw0ingOHL280Q?=
+ =?us-ascii?Q?QV8R8o2upHIl5zgS0YbhOixV7QCa8GzNuygKsiyL+QKLedeNZi/M4IJ2vuPx?=
+ =?us-ascii?Q?jvltEqFsFhRCNq6hdEeZqrJRS1oaXeRz9B62QyCbDqhkkQpzSF8IisbYcmIq?=
+ =?us-ascii?Q?kps1fWBmOgcgGpfiqOEhFQJGC2xvwzFUr/v2CbQcPzicgsWVv0Rl1h9DVBCz?=
+ =?us-ascii?Q?6wQOOwZDJdNXMLwRFqe8EtsSciAhOBZk9WfIQHyRaDZt02qc9QZ1FgRVYp3s?=
+ =?us-ascii?Q?vdL2bn1e7J7GDLlbKG9I7bIhF+mm9BmRlVhXqLyLnU07xHxnK0WuXrFRClEl?=
+ =?us-ascii?Q?REV+dmNrGdfBWFIa8NqfVQfMkzzPPAb1QQmpMESw7ppUCcS19GopmKepIqxX?=
+ =?us-ascii?Q?Dxm97egUIYQmft6r6hJdMDWoDrZ2W8/kRzcKjyYpr1TukJnu2cjuwYMv+h0E?=
+ =?us-ascii?Q?z4fUS5Wlo5g0XevIjDHIeztCk4c3zy5xiWpojSY7HB3BqYBsh3yYv5Uxzcv4?=
+ =?us-ascii?Q?Ig026inyFHQdK9fvXll3SOxHSp1uwONUHDrjeH7PYER6ZyOt3BVJeQ8qMTfC?=
+ =?us-ascii?Q?hGu6l6qW473/xZ5mgYZrYLYRSDZiwClwMoF/lE6nvNCWTyuX8j4+YvIah0Ns?=
+ =?us-ascii?Q?OQl9uwW8ZPbvAaldtTYVFpyBt1XD4khQa1YPVXqBKTOrNBOTLmQXqLWkoDeF?=
+ =?us-ascii?Q?ngEyGk3PQpMvkhnhsBnsGjuH6QXzARDv770nCTbfFdGfbAmpLc0qBiSw/6TP?=
+ =?us-ascii?Q?oZ4cesHc13wC24jwWyMihjvB4Dteo3ragauqBSeidDn2aaQbI7a9gJI5faUL?=
+ =?us-ascii?Q?F5IFWoRPNKv00sImGbAcH61hrVVcKQx0tD46f3o3pqxB2RrUDjNwao+zDV4a?=
+ =?us-ascii?Q?T3T6MINhtGWTvimHS+x8wvmFKl5nhBIn3oTIxwKdaVTXAofPpoZMBfUg9l3t?=
+ =?us-ascii?Q?tRnAmfiMgl90ONT372lR8tzuZaqGOI4sBWjTCbtT?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAADnVQKCxxETthqDpcE1xMGwa5au8JuLr_49QuwemL7uBKfiVg@mail.gmail.com>
- <8410a6f61e7a778117819ebeda667687353ffb21.camel@redhat.com>
-In-Reply-To: <8410a6f61e7a778117819ebeda667687353ffb21.camel@redhat.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 27 Mar 2024 10:00:19 -0700
-Message-ID: <CAADnVQLj9bQDonRzJO5z2hMZ7kf6zdU-s6Cm_7_kj-wP3CiUSA@mail.gmail.com>
-Subject: Re: mptcp splat
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	MPTCP Upstream <mptcp@lists.linux.dev>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR18MB4666.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 019c2e2a-3f18-46f5-3401-08dc4e808160
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2024 17:08:21.2505
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gZ7+wPCJKqPh0L/U6X3OW5/i95UXQNEe756hPX5oA9s5+7xZuenNVvrL8PoDLNYRnp7sEOPrxuN/iYWZw7/CUg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR18MB5146
+X-Proofpoint-ORIG-GUID: ibsyrP8y627W6eK70XDI9Ue7-4QGo-mO
+X-Proofpoint-GUID: ibsyrP8y627W6eK70XDI9Ue7-4QGo-mO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-27_13,2024-03-27_01,2023-05-22_02
 
-On Wed, Mar 27, 2024 at 9:56=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Wed, 2024-03-27 at 09:43 -0700, Alexei Starovoitov wrote:
-> > I ffwded bpf tree with the recent net fixes and caught this:
-> >
-> > [   48.386337] WARNING: CPU: 32 PID: 3276 at net/mptcp/subflow.c:1430
-> > subflow_data_ready+0x147/0x1c0
-> > [   48.392012] Modules linked in: dummy bpf_testmod(O) [last unloaded:
-> > bpf_test_no_cfi(O)]
-> > [   48.396609] CPU: 32 PID: 3276 Comm: test_progs Tainted: G
-> > O       6.8.0-12873-g2c43c33bfd23 #1014
-> > #[   48.467143] Call Trace:
-> > [   48.469094]  <TASK>
-> > [   48.472159]  ? __warn+0x80/0x180
-> > [   48.475019]  ? subflow_data_ready+0x147/0x1c0
-> > [   48.478068]  ? report_bug+0x189/0x1c0
-> > [   48.480725]  ? handle_bug+0x36/0x70
-> > [   48.483061]  ? exc_invalid_op+0x13/0x60
-> > [   48.485809]  ? asm_exc_invalid_op+0x16/0x20
-> > [   48.488754]  ? subflow_data_ready+0x147/0x1c0
-> > [   48.492159]  mptcp_set_rcvlowat+0x79/0x1d0
-> > [   48.495026]  sk_setsockopt+0x6c0/0x1540
-> >
-> > It doesn't reproduce all the time though.
-> > Some race?
-> > Known issue?
->
-> It was not known to me. Looks like something related to not so recent
-> changes (rcvlowat support).
->
-> Definitely looks lie a race.
->
-> If you could share more info about the running context and/or a full
-> decoded splat it could help, thanks!
+Hi,
 
-This is just running bpf selftests in parallel:
-test_progs -j
+>-----Original Message-----
+>From: Arnd Bergmann <arnd@arndb.de>
+>Sent: Wednesday, March 27, 2024 9:05 PM
+>To: Subbaraya Sundeep Bhatta <sbhatta@marvell.com>; Arnd Bergmann
+><arnd@kernel.org>; llvm@lists.linux.dev; Ariel Elior <aelior@marvell.com>;
+>Manish Chopra <manishc@marvell.com>
+>Cc: David S . Miller <davem@davemloft.net>; Eric Dumazet
+><edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+><pabeni@redhat.com>; Nathan Chancellor <nathan@kernel.org>; Nick
+>Desaulniers <ndesaulniers@google.com>; Bill Wendling <morbo@google.com>;
+>Justin Stitt <justinstitt@google.com>; Simon Horman <horms@kernel.org>;
+>Konstantin Khorenko <khorenko@virtuozzo.com>; Sudarsana Reddy Kalluru
+><sudarsana.kalluru@cavium.com>; Netdev <netdev@vger.kernel.org>; linux-
+>kernel@vger.kernel.org
+>Subject: Re: [EXTERNAL] [PATCH 3/9] qed: avoid truncating work queue lengt=
+h
+>
+>On Wed, Mar 27, 2024, at 15:04, Subbaraya Sundeep Bhatta wrote:
+>
+>>>-		snprintf(name, NAME_SIZE, "slowpath-%02x:%02x.%02x",
+>>>-			 cdev->pdev->bus->number,
+>>>-			 PCI_SLOT(cdev->pdev->devfn), hwfn->abs_pf_id);
+>>>+		hwfn->slowpath_wq =3D alloc_workqueue("slowpath-
+>>>%02x:%02x.%02x",
+>>>+					 0, 0, cdev->pdev->bus->number,
+>>>+					 PCI_SLOT(cdev->pdev->devfn),
+>>>+					 hwfn->abs_pf_id);
+>>
+>> Confused. This should be alloc_workqueue("slowpath-%02x:%02x.%02x",
+>> cdev->pdev->bus->number, PCI_SLOT(cdev->pdev->devfn), hwfn->abs_pf_id,
+>> 0, 0);
+>> Right?
+>
+>I still think my version is the right one here, see the
+>prototype:
+>
+>__printf(1, 4) struct workqueue_struct *
+>alloc_workqueue(const char *fmt, unsigned int flags, int max_active, ...);
+>
+>so the first argument in the format, while the printf arguments
+>start after the flags and max_active arguments that are still both
+>set to zero.
+>
+My bad. Got it
 
-The end of the splat:
-[   48.500075]  __bpf_setsockopt+0x6f/0x90
-[   48.503124]  bpf_sock_ops_setsockopt+0x3c/0x90
-[   48.506053]  bpf_prog_509ce5db2c7f9981_bpf_test_sockopt_int+0xb4/0x11b
-[   48.510178]  bpf_prog_dce07e362d941d2b_bpf_test_socket_sockopt+0x12b/0x1=
-32
-[   48.515070]  bpf_prog_348c9b5faaf10092_skops_sockopt+0x954/0xe86
-[   48.519050]  __cgroup_bpf_run_filter_sock_ops+0xbc/0x250
-[   48.523836]  tcp_connect+0x879/0x1160
-[   48.527239]  ? ktime_get_with_offset+0x8d/0x140
-[   48.531362]  tcp_v6_connect+0x50c/0x870
-[   48.534609]  ? mptcp_connect+0x129/0x280
-[   48.538483]  mptcp_connect+0x129/0x280
-[   48.542436]  __inet_stream_connect+0xce/0x370
-[   48.546664]  ? rcu_is_watching+0xd/0x40
-[   48.549063]  ? lock_release+0x1c4/0x280
-[   48.553497]  ? inet_stream_connect+0x22/0x50
-[   48.557289]  ? rcu_is_watching+0xd/0x40
-[   48.560430]  inet_stream_connect+0x36/0x50
-[   48.563604]  bpf_trampoline_6442491565+0x49/0xef
-[   48.567770]  ? security_socket_connect+0x34/0x50
-[   48.575400]  inet_stream_connect+0x5/0x50
-[   48.577721]  __sys_connect+0x63/0x90
-[   48.580189]  ? bpf_trace_run2+0xb0/0x1a0
-[   48.583171]  ? rcu_is_watching+0xd/0x40
-[   48.585802]  ? syscall_trace_enter+0xfb/0x1e0
-[   48.588836]  __x64_sys_connect+0x14/0x20
+Thanks,
+Sundeep
+
+>      Arnd
 
