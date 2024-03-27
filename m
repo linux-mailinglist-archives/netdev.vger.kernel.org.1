@@ -1,146 +1,145 @@
-Return-Path: <netdev+bounces-82493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49CC688E62C
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:34:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1843888E642
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:35:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01C531F3081A
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:34:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C62C2C21DA
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F87139D10;
-	Wed, 27 Mar 2024 13:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lYSMlrF2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1579B1552FE;
+	Wed, 27 Mar 2024 13:06:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D47139D05
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 13:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C96139D1A;
+	Wed, 27 Mar 2024 13:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711544734; cv=none; b=CCjrzcMiEtoWa3QPDIclYsuwzzSbUPbiRigRuEN1d29yHtwdDnpa5thZ9QwC4HggFk6Yw3lhgyA2otVB60rOk5Bajsp91C/Dfgh9S/NnpPNavUYafJrWAjxQOENEDdlifetskyJ5jYQQaBQjcpDhQp3dHZjplqsGz0LiTddLkyU=
+	t=1711544807; cv=none; b=AnlktMfzGK924gcR6VXBh3uxYZH1BUaXYSWNijKW08MclzRR/4NZbsMzMkQwyYcaYmLpRsvCfKRCHQjPw1rkME23ObgbHvmBxrGpZBXN7qfn3wzugYsQlQdpx165zEQQyUqcVGEHIWJk6x7KkQndqAuTl0NQNWAOJVKojZnhie8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711544734; c=relaxed/simple;
-	bh=6OywkV+f7o0OgA406yHPrQDvuUOJCUtns0fRF1Sioko=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MH4G/MPuVR/glawxXrjDq4ap3kLOfZEDTlo3xFAI53dWuv+tKqr4Nr0VvOihJKRMiQc+TdXPkX8jBXGnX0+QGKewkWVjOZZdNoKt70T+3Rbqsm8FkENVpSWc2E2/+oJk7qAocPwmCYnpkDb9gu38rwbd/jmiSuIptSKLrd66z6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lYSMlrF2; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4146f72e2dfso69875e9.1
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 06:05:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711544731; x=1712149531; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vKS6PrEySMHF9Zxcg2g7pHWm3h+ybRiVTjtthpaGx58=;
-        b=lYSMlrF2nQorWlm4BdWdY8jyFnth+FW1QHQCgfJm93GHuLzdPaTchFIge56ezOUtV9
-         ME+afKw99qtQ2l5RTxwvwgMG78H8GGnDrLZHQi0+v5dEWzX3VGBxvgcCW7C1Te8MeAYW
-         nx/MtDJ+h+PJUtIhDKUjlT9LMxrqYGi8htpYbOVA1QIJbLj5zPXFdfr2i5I18B0owHMS
-         w6X4JoQHvrEBVG2qzvPeoQop0s7J8h526WL9dIEzKoFXGqRrtUqq3Dcz5pgBgnGpvdw8
-         gDImLlE8uJsSvyW84OhUkqFCao5Rur6kyv9dCTPQRtVh+k4HWKzL5mDBXCw7eYumrC4g
-         97IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711544731; x=1712149531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vKS6PrEySMHF9Zxcg2g7pHWm3h+ybRiVTjtthpaGx58=;
-        b=MYjeJtOFiUaOJatTarpyi4I+RgoBhOQ6i8bISjDRhpM42lcr1Sp5k31yHdseBLwfFX
-         PWNZV/15deH+vKzqK4hUpVdG7zrtizmDEsXnFq8fSbDAusWQa0pN8dRZ405fhEzOUzuo
-         bXEtNL4SsrLgpprxhqQoTIUPnl4/wCGP5G4bA7hJ+AI9HSWZxO1lzg6ASqBztIU0E/Mh
-         LBD8v30dHJ0e0uTx9DAau+jc31ErSSKAaw4NqK9WNQ8fxCstHADYsBu7SawjN6h3b/kJ
-         m8GNjW9MnZtfE+z5Gj98ArPTH7ntvErb66E4pqa/vV6wiOcQ7FZpLOgYfEoTW3+frjpI
-         +ixQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWMS0V+Xizo/oulVGcJg8EHPZMl6efkeygWgzoVP4Ymjg3Y16au9bJnh4tt2kL97HJueqAHYNs7vrlrc46PY/1BrUXCCd4w
-X-Gm-Message-State: AOJu0YxkvrULKlVSEsj52Z/OBuECxLlG9qNLedDFt5KgeWr37vul1h/L
-	BveVgn47ifnBYJGrZVoPtzbiUvTNstolidflLIu2+JNAUQ8DVChdzbm+UcbvtaCATaE57dMP46o
-	PyYsZJ7pfHqK2iFg8Kop7E9XYDDQvOFeQNHNa
-X-Google-Smtp-Source: AGHT+IEJQojKRQ4623RVf8T8SHhVFd6XE4htI6xpx3tVDCgyltzj8g0Z9RaCXXlHi6GAAbMsAcguOPcrdA5yYPZu5Q0=
-X-Received: by 2002:a05:600c:3ba6:b0:413:f41a:ed1b with SMTP id
- n38-20020a05600c3ba600b00413f41aed1bmr118217wms.3.1711544730916; Wed, 27 Mar
- 2024 06:05:30 -0700 (PDT)
+	s=arc-20240116; t=1711544807; c=relaxed/simple;
+	bh=lq5c4OQ/5yFeGjaajVMOXJaR21Pssmn50/wixaoQauc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=pmUeffrdPQcKM8wtfCxSZhnIeDqnN+bOBFgKT8ad4Dxua0xwPrRVz9d+bq3jkxgLGzyl8LuNVWhMjnt38Pl3gz+pgWafRaIyASuDlXOCEFKwPou0r8M6OqJixSuG4R5D5g9AE9O8dzb3bEiVQH53+ZouWYu2PQe+fbeSa97ZjXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24F80C43394;
+	Wed, 27 Mar 2024 13:05:57 +0000 (UTC)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Amit Shah <amit@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gonglei <arei.gonglei@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Viresh Kumar <vireshk@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	David Airlie <airlied@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Joerg Roedel <joro@8bytes.org>,
+	Alexander Graf <graf@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>,
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Vivek Goyal <vgoyal@redhat.com>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	virtualization@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-um@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-gpio@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev,
+	netdev@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	alsa-devel@alsa-project.org,
+	linux-sound@vger.kernel.org
+Subject: [PATCH 21/22] fuse: virtio: drop owner assignment
+Date: Wed, 27 Mar 2024 14:05:52 +0100
+Message-Id: <20240327130552.378821-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240326133412.47cf6d99@kernel.org> <CADVnQymqFELYQqpoDsxh=z2XxvhMSvdUfCyjgRYeA1QaesnpEg@mail.gmail.com>
- <20240326165554.541551c3@kernel.org>
-In-Reply-To: <20240326165554.541551c3@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 27 Mar 2024 14:05:17 +0100
-Message-ID: <CANn89iJDxv2hkT7-KCaizu3r44HpT=xbvRtMXjxd-LUQS=Br8g@mail.gmail.com>
-Subject: Re: ICMP_PARAMETERPROB and ICMP_TIME_EXCEEDED during connect
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 27, 2024 at 12:55=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Tue, 26 Mar 2024 23:03:26 +0100 Neal Cardwell wrote:
-> > On Tue, Mar 26, 2024 at 9:34=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > >
-> > > Hi!
-> > >
-> > > I got a report from a user surprised/displeased that ICMP_TIME_EXCEED=
-ED
-> > > breaks connect(), while TCP RFCs say it shouldn't. Even pointing a
-> > > finger at Linux, RFC5461:
-> > >
-> > >    A number of TCP implementations have modified their reaction to al=
-l
-> > >    ICMP soft errors and treat them as hard errors when they are recei=
-ved
-> > >    for connections in the SYN-SENT or SYN-RECEIVED states.  For examp=
-le,
-> > >    this workaround has been implemented in the Linux kernel since
-> > >    version 2.0.0 (released in 1996) [Linux].  However, it should be
-> > >    noted that this change violates section 4.2.3.9 of [RFC1122], whic=
-h
-> > >    states that these ICMP error messages indicate soft error conditio=
-ns
-> > >    and that, therefore, TCP MUST NOT abort the corresponding connecti=
-on.
-> > >
-> > > Is there any reason we continue with this behavior or is it just that
-> > > nobody ever sent a patch?
-> >
-> > Back in November of 2023 Eric did merge a patch to bring the
-> > processing in line with section 4.2.3.9 of [RFC1122]:
-> >
-> > 0a8de364ff7a tcp: no longer abort SYN_SENT when receiving some ICMP
-> >
-> > However, the fixed behavior did not meet some expectations of Vagrant
-> > (see the netdev thread "Bug report connect to VM with Vagrant"), so
-> > for now it got reverted:
-> >
-> > b59db45d7eba tcp: Revert no longer abort SYN_SENT when receiving some I=
-CMP
-> >
-> > I think the hope was to root-cause the Vagrant issue, fix Vagrant's
-> > assumptions, then resubmit Eric's commit. Eric mentioned on Jan 8,
-> > 2024: "We will submit the patch again for 6.9, once we get to the root
-> > cause." But I don't think anyone has had time to do that yet.
->
-> Ah.
->
-> Thank you!!
+virtio core already sets the .owner, so driver does not need to.
 
-For the record, Leon Romanovsky brought this issue directly to Linus
-Torvalds, stating that I broke things.
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-It tooks weeks before Shachar did some debugging, but with no
-conclusion I recall.
+---
 
-This kind of stuff makes me not very eager to work on this point.
+Depends on the first patch.
+---
+ fs/fuse/virtio_fs.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
+index 322af827a232..ca7b64f9c3c7 100644
+--- a/fs/fuse/virtio_fs.c
++++ b/fs/fuse/virtio_fs.c
+@@ -1023,7 +1023,6 @@ static const unsigned int feature_table[] = {};
+ 
+ static struct virtio_driver virtio_fs_driver = {
+ 	.driver.name		= KBUILD_MODNAME,
+-	.driver.owner		= THIS_MODULE,
+ 	.id_table		= id_table,
+ 	.feature_table		= feature_table,
+ 	.feature_table_size	= ARRAY_SIZE(feature_table),
+-- 
+2.34.1
+
 
