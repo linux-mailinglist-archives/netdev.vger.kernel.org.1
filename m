@@ -1,150 +1,115 @@
-Return-Path: <netdev+bounces-82587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7A1088E9E2
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:52:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD7588E975
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:41:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E11F1F2FFA3
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:52:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D24B71F32013
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D322D12F379;
-	Wed, 27 Mar 2024 15:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673073717F;
+	Wed, 27 Mar 2024 15:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GM6fiX/K"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iJOPltoc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32F812DD84;
-	Wed, 27 Mar 2024 15:52:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B526D1DFF5
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 15:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711554763; cv=none; b=es30UiAs5kVqrN9pCy/7d+uA4uUTTt59+vTsOPKUChWglAYDrAFUj9D3BY8Hwh6f6rsBAu8YTQEemy2lyUuWJs2aZCMT8EtkV/1pX1RquEYCH5mze3kXXeCafeDcpUR+LwL+/zaz8wDqxVPBkd6ZlJEh4pP0xdF1RaMaYghLkzg=
+	t=1711553923; cv=none; b=HBkKB4wQwI/Uc/Cbilwj2/wbQB6AlKoOVesbZv8LkwaMGSELbbrA6eoWPPt8mYz3njIDUdYePopRLKV/Fw9jhHlygWwlCULVxdJEFhD5XV0riTVX/c1VVUOTxR/gUJQ1AMg+MIF34DCVjYekxp8Kh/iUia8n5ByQYI57TpotKwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711554763; c=relaxed/simple;
-	bh=qW/fd5BsHMv42OERGvBEWgfMs2nJ8WYa2Q4ev1Mj2bE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tSM5gF62V7CSYQRYuXDGgTTvwBEEWG7z9dfRN6FkcaNE+1YtVExnwjObJ+poR6ZryFUTyMnY4xnEhHR+v9rbmm0CBUNDdNnkH4OiPMHXca1v7VuvuHzskFIalyF2MCoYgx8Wn8tF4I5KA3fGnggFwji9xWU/n8IulrSEv8U9oK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GM6fiX/K; arc=none smtp.client-ip=192.198.163.11
+	s=arc-20240116; t=1711553923; c=relaxed/simple;
+	bh=ktB/xB3Lp0DrTvfAFS5vXhhDauIgHWF4C+6HuvQJMJA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fkjM5iJkcq1xcdrfMC8KG3ReaS4hghdf+UHLr12mIEx70ygQ/MZXhjlKhkhRT0B9AZrWU+727wMlS7Tfd8NFDXceTm+d8tmsKeEKmOwGGW1mmJCELH4i4ldSKaItBj2InMy3UYBnxEEnP89ZrLdahkvbBl2LLkUwFUQ8gC7nB5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iJOPltoc; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711554762; x=1743090762;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qW/fd5BsHMv42OERGvBEWgfMs2nJ8WYa2Q4ev1Mj2bE=;
-  b=GM6fiX/KWb2SvgMdZ06xGUflF/tlwS7KtbZr6bBL1KJnJPA5KZgxl5ym
-   4Lq9Ga9Rxhox/VQfjRLd24Mpyr+vEbwnvBoMSPR1T84fGYLv+XvZSdnks
-   /m3yt31ccAgLylJBkXlfh2A07QrqsfBXyrvhPpLE0SPxS7jbRh0bKDqHJ
-   XqNoO8BJGCrg8vaX+yc1kw4rMB6u28ej+8gsb0ptbZ9ZmOErYKQ2vC97V
-   h+NMmo5CQ2DGM8rNMxvWWCKNTRo4UL5HaRAFY1P9y6h/Z4hOZxMcGZbiR
-   ax2nhnuGsp3bLKHoKQy4d+wjNGvOGIu5svNAxNZJoyCDeVd6th/g3oLYx
+  t=1711553922; x=1743089922;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ktB/xB3Lp0DrTvfAFS5vXhhDauIgHWF4C+6HuvQJMJA=;
+  b=iJOPltoc5yzA72OCDpDxFjqFYZCf/dnrAfT+45D9yMb57XN4Lj/SUKRb
+   mpEwH4MbrYfPFeIiEpvfuObqTXfa2GnFRFj6S7+Tv0+Pi3/zJj/ObaS5R
+   w/CTPEix+kzp5hO1+ZmBxdHROJ3mMCIAbDLQJWu5Z8CRsIau174euUn3r
+   89F+NzdIUD7BFJqRira3fEHOVHG0/0a9wRScWHs86NFYz+AVGrjDJVmpg
+   2+CjD3ePvufKVTqEMkKs/Nu8KxtouHFnXPaZVeZ8UtUcOXoMcMP/8Xqnn
+   6gBFX1LguESfRt9OuSgyfXwhexTWvUD0UL3fRzHuw5+PeR8CYPAsVJH0E
    w==;
-X-CSE-ConnectionGUID: ElgAeAEUSH+ywKyS6Nmj5A==
-X-CSE-MsgGUID: qWe1ytXnTmmEDhuGSNCj8g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="17302203"
+X-CSE-ConnectionGUID: 7cSsNTfqRnyC9YOPaJxUfw==
+X-CSE-MsgGUID: apPanttZSoyh1Nc/wpoYGA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="6531099"
 X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
-   d="scan'208";a="17302203"
+   d="scan'208";a="6531099"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 08:52:40 -0700
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 08:38:41 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
-   d="scan'208";a="20816491"
-Received: from djiang5-mobl3.amr.corp.intel.com (HELO [10.212.56.222]) ([10.212.56.222])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 08:52:37 -0700
-Message-ID: <2757205c-8a58-4619-bed1-d511812d5a18@intel.com>
-Date: Wed, 27 Mar 2024 08:52:35 -0700
+   d="scan'208";a="20807787"
+Received: from amlin-018-251.igk.intel.com (HELO localhost.localdomain) ([10.102.18.251])
+  by fmviesa005.fm.intel.com with ESMTP; 27 Mar 2024 08:38:26 -0700
+From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Subject: [PATCH iwl-next v1 0/5] ixgbe: Add support for Intel(R) E610 device
+Date: Wed, 27 Mar 2024 16:54:17 +0100
+Message-Id: <20240327155422.25424-1-piotr.kwapulinski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/22] nvdimm: virtio_pmem: drop owner assignment
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
- <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
- Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
- Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- Anton Yakovlev <anton.yakovlev@opensynergy.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
- iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
- kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-sound@vger.kernel.org
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-18-0feffab77d99@linaro.org>
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20240327-module-owner-virtio-v1-18-0feffab77d99@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Add initial support for Intel(R) E610 Series of network devices. The E610
+is based on X550 but adds firmware managed link, enhanced security
+capabilities and support for updated server manageability.
 
+This patch series adds low level support for the following features and
+enables link management.
 
-On 3/27/24 5:41 AM, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Piotr Kwapulinski (5):
+  ixgbe: Add support for E610 FW Admin Command Interface
+  ixgbe: Add support for E610 device capabilities detection
+  ixgbe: Add link management support for E610 device
+  ixgbe: Add support for NVM handling in E610 device
+  ixgbe: Enable link management in E610 device
 
-Acked-by: Dave Jiang <dave.jiang@intel.com>
-> 
-> ---
-> 
-> Depends on the first patch.
-> ---
->  drivers/nvdimm/virtio_pmem.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-> index 4ceced5cefcf..c9b97aeabf85 100644
-> --- a/drivers/nvdimm/virtio_pmem.c
-> +++ b/drivers/nvdimm/virtio_pmem.c
-> @@ -151,7 +151,6 @@ static struct virtio_driver virtio_pmem_driver = {
->  	.feature_table		= features,
->  	.feature_table_size	= ARRAY_SIZE(features),
->  	.driver.name		= KBUILD_MODNAME,
-> -	.driver.owner		= THIS_MODULE,
->  	.id_table		= id_table,
->  	.validate		= virtio_pmem_validate,
->  	.probe			= virtio_pmem_probe,
-> 
+ drivers/net/ethernet/intel/ixgbe/Makefile     |    4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   15 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |    3 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_common.c   |   19 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |    3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2590 +++++++++++++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   75 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |    7 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |    3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  437 ++-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c  |    4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |    5 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   71 +-
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 1064 +++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |   42 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h |    7 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |   28 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |   20 +
+ 18 files changed, 4331 insertions(+), 66 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
+
+-- 
+2.31.1
+
 
