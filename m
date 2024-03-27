@@ -1,146 +1,130 @@
-Return-Path: <netdev+bounces-82624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EFA888ECA0
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:28:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98CF288ECD6
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:43:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8288FB24E7B
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:28:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27F7E1F2EFF6
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8D712FB3E;
-	Wed, 27 Mar 2024 17:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1367314D456;
+	Wed, 27 Mar 2024 17:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ztkricb4"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="oDUV0niR"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E6BF4E2;
-	Wed, 27 Mar 2024 17:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359321494A9
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 17:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711560480; cv=fail; b=bvVCxL4twD7mO5zkk+euysvRmRQV9VNhQI7LsCyhplk8XXTOrwT1Yt9767be78g8KXZPYZnk6ndgiTktxNbJPzCX5wz8BarpXLbJwSbxXzxwtF/2ZilIwcP0N9vVCSI6Kn9Kwav5MlVBUIxBjVg8217NxNwoGu4gTcfR4i9oAcg=
+	t=1711561422; cv=fail; b=G/ds7fXgOQqSHRCqu5gNNE+M0A/3qPCEfv8vQ+fF3Fo9FXBu9csEGVHsJpeZ+0DSFAC0Oh/ns6d4OlJSlMRmDGwBf0deo95Z3XjeewhVZwZedlgBvSozPn1sJ/I3p4c+8Kf8AjFWDc1bnWzffBs3cHny/tKux367Vna5AoxTSh4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711560480; c=relaxed/simple;
-	bh=6+6x+HKT+owSnqmkNoOtElCcVIQqNYvalo2eiQlplog=;
+	s=arc-20240116; t=1711561422; c=relaxed/simple;
+	bh=l850I3yof1jea919b9glw6y5hyaWIg47AWVCxzfr088=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UZBR07A/Y7h0j9OVQ8K0TQbUxrVfYod7heeZa8PIIgZEwzVdJ2pFCSIlwI/2RThoLp+82aPWAfS7AMrIl2S6ZNq8H7/dprxHsXY/DRZ+0bDhTGsvOA5ChIx4LvC5M9mtOoJ0nGao8yio4mmhrvDKq51z4veB4WxyWNhmqKvWgLI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ztkricb4; arc=fail smtp.client-ip=67.231.148.174
+	 Content-Type:MIME-Version; b=KoE+HDWAexfWIfZ+LeDF6iUlPy0OLEsmb4qp461jbeFhSIJ/I1tn0aIDbHi2MXoXyJwoxgGYI4jUCB4CVEhtQblSzcVFuQp1nj2zZh5g9k7XrHgj9csXNJWT40UhDvI/nBFzkp6krlsEOlnCMvlOGiURZPo3ar2Do/9AF/pzNwQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=oDUV0niR; arc=fail smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42RALgAr002468;
-	Wed, 27 Mar 2024 10:27:44 -0700
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2040.outbound.protection.outlook.com [104.47.56.40])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3x4hmp9v80-2
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42RAM0ut002581;
+	Wed, 27 Mar 2024 10:43:38 -0700
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2040.outbound.protection.outlook.com [104.47.73.40])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3x4hmp9xhd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Mar 2024 10:27:44 -0700 (PDT)
+	Wed, 27 Mar 2024 10:43:36 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bMSGsyJt8yI8f18ZlCWotZzzcLfcxZMvisTPChjG30zC5x5TcZ+oFo6DeRkvEN5S+85p4iORYpniB3EqlMNKiCZxDZt55MC1BVzS0F47wAOqI49xGCiIFP/FRVMxovw5T0dK8d7qmMlPH4Bnr/mhM9pbs+We2Lla73X+itUfCzudj4xsrMoUpxq1k0h8/Hf9KrYRStTPiG5qoLlKtDBWLiMbTdDwtsOhKPAMG40Q9+4AY1GbZGE/490OjQB8CqrQkx2t4is+qpTG7jPFg/Bg7hNE0cpIi0t7zhFRR7P/2bwMpKXLArnW/PE+sLel4sQPUQFX7NMJuHOSPkkYpynuRA==
+ b=ETzYGfFmvnwCtivjqqEODSf8tWWGfIcVzSu4Wqcod4scMhvzgrvqVGIxRcCypDyoyQjf8NsR1f8CuZNjzRRlhq8hShYBOeu2ixNuk2jDbIwGZzUCptiIVpB9XGXUf+wHtKyZkA1TpwV6zV/9CykuakJGDdxVHu26FC5jZCX1/Pbu7laJPuGjPzQ+0vUPvcUInYTax/GHi97wQWM5r6A75pBH+fyQdCtFJVnwVlficogpuADYJ5tKOtU94KWX5AnKcGfPRE/gZ2SptXYYvYQsPtT/rUPJx8D36NyjrL6EpYGsxJGs6XnLl9LHCf2kPdwDIU4udc4t2eJ/J4Q5JlGPFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pW0RW5iO2UyYJ6B4rJAgFKPTWFoiS9673Y0ovxBjbx8=;
- b=cbh15CDWj8bGoH/0ysqLPb3k+jTWeVGwKLE+ANKXLMaNFD0WPULWJjTft33OvkH2GMIgErKt5wXmpUl/r/uf+Gbiz3Z1tuAgXxsr8wYwcl9FTnocBvL7pmfRKlEEMX0u0H0tSU75l1deqXEmnkFXKFn3h1PTFSEQ/jrsvkcCpGJ8s0+sYC35JmBDhcHlqjeOFWtrS3S1TTzvlEqvJAMjP3BmIrguVmlbexapaz+rjVLaBRGddgSb2YHhkwaVObsD3mXW1dcJa7ANi74v0s0UV0Qx9q2oY5XdSWDPDYfUBKUxPSneszcXIs7PaEeGz96gKjJgP3mjkN3t6Nq4X2UjUw==
+ bh=VEsg0MelXvjdc+ZF+qZoVnwAnbteVbi1q8ALrGCu+CE=;
+ b=aC7YBMYX9bmXfDvMHd95uuEsf2TKGjDFvzWcJagKFNNzIQnKbO2bT9v7wGbiuMXOSYfCLsbdhkqS6h/4nRVPET3H07gjFfeHd5LoXBzpiA0s7ha108+09xRtICd6AXxjOB5Wmavi7ykL2TQyLqJPICG3EQObIP057CLP38eAp5Ekq6iQe1EuZaq3F0sby7PLGKPxOoZUG/Tybi/BiC2WxtZvj4leLtquxEdO0GJugdnN4zgT9Lsb/c83kjv0f6oc114uoPNB/2fq/YE10gG00gGNMIoRvK9nRBjOIHiCp9C6JL2kcBF34yHX/Pvzc8z4X36GHk3k8WOGQPLFHwijZg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
  dkim=pass header.d=marvell.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pW0RW5iO2UyYJ6B4rJAgFKPTWFoiS9673Y0ovxBjbx8=;
- b=Ztkricb4aerxZa+EVavtCA5x3yswSEdgaRVGZlEa5j98vgYuPjX/54ZVvql8UMfUzvKsPSENOiQh5R7HIckIJX9dYpPqodEzc+EXrcuAkPVETSkqrcK2soZJMkWWSmGp8bz9Ou5n/QDxSrtmjmMJK60XFSXv0Se27Xt2edDRXcQ=
-Received: from BN9PR18MB4251.namprd18.prod.outlook.com (2603:10b6:408:11c::10)
- by LV8PR18MB5855.namprd18.prod.outlook.com (2603:10b6:408:223::22) with
+ bh=VEsg0MelXvjdc+ZF+qZoVnwAnbteVbi1q8ALrGCu+CE=;
+ b=oDUV0niRA+gMJyva3ycM1Y2Wdjbfg3A3j09oSMP/3LMMXTNqpX+1TOstAGf8fhCje120vyn0w1/hbabJiEVz5a0nXEPPSOAUiUYdTd2BAB1zrQczpMIxxzM91zrEdFdE2QZjDC7EoN3oqrnkc9kYWxlc+3IMwI4IM3ylKTySiB0=
+Received: from BY3PR18MB4707.namprd18.prod.outlook.com (2603:10b6:a03:3ca::23)
+ by SJ0PR18MB5817.namprd18.prod.outlook.com (2603:10b6:a03:43b::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Wed, 27 Mar
- 2024 17:27:41 +0000
-Received: from BN9PR18MB4251.namprd18.prod.outlook.com
- ([fe80::7471:7657:9316:1494]) by BN9PR18MB4251.namprd18.prod.outlook.com
- ([fe80::7471:7657:9316:1494%7]) with mapi id 15.20.7409.031; Wed, 27 Mar 2024
- 17:27:41 +0000
-From: Elad Nachman <enachman@marvell.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Taras Chornyi <taras.chornyi@plvision.eu>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-        "thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-        "miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
-        "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-        "dkirjanov@suse.de" <dkirjanov@suse.de>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to probe
- twice
-Thread-Topic: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to probe
- twice
-Thread-Index: 
- AQHaeurjPmANQMrOHkqJdwxY/uh+37FBVLMAgAEesYCAACDkgIAD853QgACBRQCABNdBkA==
-Date: Wed, 27 Mar 2024 17:27:41 +0000
+ 2024 17:43:34 +0000
+Received: from BY3PR18MB4707.namprd18.prod.outlook.com
+ ([fe80::1f55:2359:3c4d:2c81]) by BY3PR18MB4707.namprd18.prod.outlook.com
+ ([fe80::1f55:2359:3c4d:2c81%5]) with mapi id 15.20.7409.031; Wed, 27 Mar 2024
+ 17:43:33 +0000
+From: Sai Krishna Gajula <saikrishnag@marvell.com>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Jacob Keller
+	<jacob.e.keller@intel.com>,
+        Wojciech Drewek <wojciech.drewek@intel.com>,
+        Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 06/12] iavf: add initial
+ framework for registering PTP clock
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 06/12] iavf: add initial
+ framework for registering PTP clock
+Thread-Index: AQHagG5KBjlhU44Oik2GrH4qxhL8KA==
+Date: Wed, 27 Mar 2024 17:43:33 +0000
 Message-ID: 
- <BN9PR18MB4251B1533E14523AEADBA22FDB342@BN9PR18MB4251.namprd18.prod.outlook.com>
-References: <20240320172008.2989693-1-enachman@marvell.com>
- <4104387a-d7b5-4029-b822-060ef478c6e3@lunn.ch>
- <BN9PR18MB42517F8E84C8C18078E45C37DB322@BN9PR18MB4251.namprd18.prod.outlook.com>
- <89a01616-57c2-4338-b469-695bdc731dee@lunn.ch>
- <BL1PR18MB42488523A5E05291EA57D0AEDB372@BL1PR18MB4248.namprd18.prod.outlook.com>
- <6dae31dc-8c4f-4b8d-80e4-120619119326@lunn.ch>
-In-Reply-To: <6dae31dc-8c4f-4b8d-80e4-120619119326@lunn.ch>
-Accept-Language: he-IL, en-US
+ <BY3PR18MB470739CD723B6712C1D72B20A0342@BY3PR18MB4707.namprd18.prod.outlook.com>
+References: <20240326115116.10040-1-mateusz.polchlopek@intel.com>
+ <20240326115116.10040-7-mateusz.polchlopek@intel.com>
+In-Reply-To: <20240326115116.10040-7-mateusz.polchlopek@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR18MB4251:EE_|LV8PR18MB5855:EE_
-x-ms-office365-filtering-correlation-id: d9ef1118-f7f7-4e7d-d231-08dc4e8334e4
-x-ld-processed: 70e1fb47-1155-421d-87fc-2e58f638b6e0,ExtAddr
+x-ms-traffictypediagnostic: BY3PR18MB4707:EE_|SJ0PR18MB5817:EE_
+x-ms-office365-filtering-correlation-id: 603e2477-44b4-4eef-3440-08dc4e856c98
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
 x-microsoft-antispam-message-info: 
- 0+VgTA6HTr8JI4SqdoC1Xldqoso4ItdkVL8AUV4N31kdkQaT1fFVpo1aQ8aauj0VmNqCMGDV358MDqWhoIuOOR3x/rMTRMAMOkRcXptJtSmI0Wje5OVzfQLWGIH8IwbagSsTULRpAuDGk4EH/3X3KE431n1Lxgo+Q0hc+IKfq8D39iruWW1vAZPyM9gHUU0bX4LU/TOHqMlDXAPthCXhD3+KKbqC10185ku77NRuHEIAL/BkrtvHJyIGe39HVMI1PrR5+ACxXs/quTz3mpM8sLZnORtx8IxVItuhCFhUtc5SqrkL+cPO/vaE8WqlPUZBig6I+V76TGOj+4lStRRf52bqFsQKTUlclPTHCWaYFfkI/k6obdQtLcyI6Rzb3QrWc95PNYlucikTq8axMda8hvY2Kn/nXIOX+a/R/K2c7yI2gqSrAIccbrqHUIbUEV0eYIcbCC7Hin/L8GmkUKZPBCysd5XFtTPnocd0vKR7kEzVa5pULIFOSu/tYrUAaMxs5aM794Ch4qZwoulOynCNRGsCSrMSqdp5FfjsPEP8V7gJ00qpSYliZNmwFj63pP2/aqgeUTM5OM07rUfLySFdhtXlEE2xjYvI7pa50+nCDvQd1urEqGID8MK6uDJLUTShZ86yd8iYHO4dHNI3/gZJ9kdmJAHSrznTLXVszmdU8qA=
+ b9i7sGN8EVMGmp4xS7U148XHi7wQ3Ft8QKIbQ+bWog+K6ftpsEjWQda0a7C/DmryKo2oOZ68qWh43BTZiAZ1pTTy54k2XMynu92fgalKVnwn+r7E8cmZp7fYad0xdheuk+hPD9lLOdcMXttJaE6cg6dbnlEw+Wn4qWdgv0qhzc21k4jvnpNc2SfcsgFy7s98nbFcT9f2F7OrLTiINnCbEk5ln8nWIO1kccNXvkGkUrKttZCviyhiFxDAmvzEbBGzPkMyvZdLTgBo3uDUxSUw/2aEd6VB1XJjf1JoPhPNHJc1rKamkAdMCkyUSgBtYQp+fcgfSTixL1x1OHNFmY8ANIchvLUmL/zcyrJPbNzHPKMWtkL34w2nlaKW8+mCos0ULbSZU7ls7S4mYg9j7TWWzXjTv357c+I2+dWQ5vQNNYpqcWaPaL8+ERu5KqFAySp5L8rByHBoC5GwPzT65CVHsAX5E9/WKX7WzeEpa0laQmmUFsSK7JPZ4v5YGJAQ9bq1mjE5HoxGFvJtmlglFRv7Lnn3TROMVmKsQBEXEJKKbtpYlcCrjkQWkgEHgt0125Phc3oNQg88yaNTtEXt2IHlew4yE0g1iLzlORVH5sru+9tolnjeWmq3xNhx5RhAHDvALnPM/N86KQdzjjRFd9Sn1DruoUYdXwy7U2RDA+A55Uq1sn755+RVOQ7p4JtWWjnMmgf4ZSum4EPcnseUL7I7T40jFRTQQWK3ho367fKM+Uo=
 x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR18MB4251.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005)(38070700009);DIR:OUT;SFP:1102;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4707.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(38070700009);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0: 
- =?iso-8859-1?Q?WqZMR/EGSQAGVGQiEq5CK+owlfJpS53FzQ3k+7osQC4r4myaRJ9PNthzIQ?=
- =?iso-8859-1?Q?I+A44+K1BM1otABHHKv9s95+e2HSFQT5TPfo8DxWgzH87R2l3mF57tF1VF?=
- =?iso-8859-1?Q?XBk2NAM8jCI6fM6XSTse3Izg2nQhJXv91jRsz0NcfPME+o1+tS1oDPNOp4?=
- =?iso-8859-1?Q?ECyeHbinOT1PQHxWbx1r08PmV02nFYUcueDVlljB+coTIgNONUajp7Nkr1?=
- =?iso-8859-1?Q?JxnvCIoeMRkNY0FEOPxqAWBn3t/WJ28dqLt12BRKy1EYognE6oMwRgJwvt?=
- =?iso-8859-1?Q?hOF7UBNJviYNEU5/rJ0kZElXn5K+XYj/M9Stie0oo4AN7ZDXBspacnGqi+?=
- =?iso-8859-1?Q?SCrOwPTzHgH7JQhvG11heXSHj/vcAQlNJorF+w3OJg6UP9llFNwuLwxy5Z?=
- =?iso-8859-1?Q?wFhOkczCEzEWbsqBDhTCEwq8edCLdavepIksD8ZvwZZYuCVZJJjCc/1tiy?=
- =?iso-8859-1?Q?Yt9cbx5UZzVnkMCfThbsViUzdalccMhzgbT+b5fX0AJPAC4PC4/n46eKKV?=
- =?iso-8859-1?Q?yWXTInSfzroHfLew6WnSV8x6PuskYzmVxhob+tQxlaA3ABMwH0pDCmJtCM?=
- =?iso-8859-1?Q?eP3Zn/6bQ944KGENGi5RQg5PyKgPJ7UfMolHlwsNaeyEPsc5uImrCAMEKN?=
- =?iso-8859-1?Q?tg5R+9dtJXqsj4jPSscIrntGbDMAjZXHcz06f9EOj4kIZgmxo05UPaYZ5h?=
- =?iso-8859-1?Q?eY8LgL4obDy7swcD2v9h58NGmAMunLN8K0gBQzvCjA1r2M9ihB0TUiJDYm?=
- =?iso-8859-1?Q?ZcYTswdqqi9716JjzJnxEKWng5a5jQdhWdsQzIwkyAZOMQuWS+Mf35ouq+?=
- =?iso-8859-1?Q?MsdAL7IS95StPko+hjPc/WfKvvDtEZWS5qjj+vsuDCNaav4OvQ7/vBHAEj?=
- =?iso-8859-1?Q?9D8lG08jIfU4L+Anu7UCB1Icnffy1j55laNfwXAtR6Tod7LYH98UAZtrRU?=
- =?iso-8859-1?Q?B4wN/7//bAGd9Vidu4+4t3gAu2RX99nVwKzeFHaeY5EbS2dE2eG1Vf27ff?=
- =?iso-8859-1?Q?JqovnEnR7w5hK/OAi4hhHfCwY4BGPivmUa6kt9mShu+eO1Hn+vOefRnpyJ?=
- =?iso-8859-1?Q?tP+vfZnnPGHTXxr9D++Y037XLNEeYwXxF2+6Ma7J/hUfeaQMPHInOCDmEp?=
- =?iso-8859-1?Q?MfKA6zzoNOfOJIG7mrbkH2VF21fDb2HPVUt2Q4AOammXbj5/0Gz/455FfM?=
- =?iso-8859-1?Q?TrYaopZ/cWUHLKY+7UkR7MYNwW1Wj0OMQHzzKaOngfUuNKthZBUqjVCkHs?=
- =?iso-8859-1?Q?msD2sbJs0dkbj9cv7g6Heb+KeS/rZq8g1tpiToNltBEASA7l0wH8hYb/lB?=
- =?iso-8859-1?Q?p8z1Vol/DcNWSsVFfluy8WXDQyvmp8nyqp/ejmvFyvdpHY/9b37hdhDWVs?=
- =?iso-8859-1?Q?LMwlR/97HlJCjnQgMIzhvbchJscAKAae+H2M1TbLKOVjZHnK9jerAZ+RD9?=
- =?iso-8859-1?Q?V/GZ0rY7kOFvJ+ygJXLn5v56orwpm4bgF8I76rOq8Ota2Pqp2VriCH0/yO?=
- =?iso-8859-1?Q?owF+nIUPq2W6Tm70mvg67ADZh3kjaqE/ek0tJh7uBdPEhB/H+J5znhLwHL?=
- =?iso-8859-1?Q?qwKw9AfSdKuOgIf2Ek2XkfiomWgGMIkjS5D4NOPa3OTMXj8i4g7af6qgyt?=
- =?iso-8859-1?Q?nzWxyyDyupsZYZHghY/kSMrV5BX/ASU9ib?=
-Content-Type: text/plain; charset="iso-8859-1"
+ =?us-ascii?Q?sEpiBmdIVDfatAx0S75BXVpgNtruXFpWQfSOZc+h0pO9hq+clGaC5vtcwlBU?=
+ =?us-ascii?Q?mpJZY2aANwvfnSSC8vtYWQOHgDnnURy9TdOsX5KuudTJr2Ic/fZ2BM3MTM8r?=
+ =?us-ascii?Q?0uUGF+xdxXV0irxGm/n0j/Eqn63gYSdvbzukUVeKBcfLC7XlGI174/LN7f8C?=
+ =?us-ascii?Q?hrC3oEiyxeg07pVTu8Zb/JGqvaoU4So3kk6OVW8WuwQbxd6CtXoXuj7MvSOi?=
+ =?us-ascii?Q?6OTYJ9uCHcs6xOBVfKvnBAsgO55mSOklj7CKKLX8sdyApqfBBskCf+YPoFDN?=
+ =?us-ascii?Q?A3RvSE0Bo2JwZf7pemdmaoJ3gihW8Nw66aS4uBkmpxELXqK/S8BKjPVMFGOv?=
+ =?us-ascii?Q?4EH78Bf3rrDngwybPaowYGZNE2es7WjUYWBjwW2FZTD6FxXTlIVH5wcOTqnT?=
+ =?us-ascii?Q?B289Vhk8IRpp3SKHNPX/A0/c6m1xBdI6CQa+eJDEJ1LVesPB4dt27htwSbo8?=
+ =?us-ascii?Q?oZ/RJeCtsYwg4EdcHrpLMbC6BnQzYUGPywKpGQuA2rECGvTAg6KFfjSCmbdS?=
+ =?us-ascii?Q?NYJ4hD1drWM8iUvh2e/w1Bf1r4cCochNv7Jz/TNrx0PDaBLF+1NMfdGKZVug?=
+ =?us-ascii?Q?f7B+6qb/y9r82BGHQGL8Q0w/uadJmZ6rtQ+k71dWd1iP9gQz2QYAcScXKnP7?=
+ =?us-ascii?Q?82ugjGTNRqUurHpyJJ3cIEEEL6Miq5fEkLEjuEdo3lPQBiCQKc65TgVTbFIp?=
+ =?us-ascii?Q?A+0ev57I7T0MUHHjD5d+afbBEneZon1Ue2iTa3GmdUh+RduQQphb9J0swGMn?=
+ =?us-ascii?Q?X+EXFSB7Ec/2eNL4f+csQ+Hg+SzwIdURE4SfHlnb4GdsP5ZyZV+EoCag2h0P?=
+ =?us-ascii?Q?LU0ku77ad9D7mHU53HlTqxIQJ7GNJf9jDIK6QaPB+ZXsZ25MhbzzWpu4H5qu?=
+ =?us-ascii?Q?2jItS/aSVW9e1ggkuq+2NM9rw7yNzvIG/jhVHGicKtX668BTdObkcc/h3ORK?=
+ =?us-ascii?Q?nhLgUGOLCMROSUWUhv8eqthQ4o7I7z5HlYHhkRPW+rc0kmZnhCuKanmKU0Ln?=
+ =?us-ascii?Q?atSTYMBNMNR9aFyon74CrrvbLBabs0PYZhWguBpAzg2JrZTJHQ3lUMhHGsm+?=
+ =?us-ascii?Q?mNljKSM9hRF86+AaKTn+vjQv1hPFkCy5umpDtqE8xXRZz/qT97KzFNj8Wm/e?=
+ =?us-ascii?Q?SuAq0VVd8G6zyO5kaYdLWrCrK4EJ/8hwBAGInlHEYLWxXlbnR6pXPXJSHuJc?=
+ =?us-ascii?Q?D0wOm/Kgbogyt7m01xGgF9tJxtXLhhSv/lZGpoGcRIWcmCt8w+fjvZHc+2zz?=
+ =?us-ascii?Q?H+Bs4txny5j1iNbLdzqBHHcLE+rnbeOLLzjPM7W2M5qVitMn03DOLyNlYh/m?=
+ =?us-ascii?Q?RqoOelQUXmIKwskXMt7nYOGRcDiCkc6XGgkGcvUkWANMu9+DfUM7loH62xWj?=
+ =?us-ascii?Q?TzwUk7IBP50XG8qOcq5hYzbkj4bFh7iT7u3m4uswlATIQ/t4O1QoXtiYm1a7?=
+ =?us-ascii?Q?jOsPmQDTSmgkbiV+95sFw2G4rIt1r+Bc8FGMwvqrD3UwrJrY0SMjqo3XMmQb?=
+ =?us-ascii?Q?c6KkGR5SYj6S3IVd+vYJGibLTp3xkaB/CGUogmGyD+zojlbqyNeh5VIn24c/?=
+ =?us-ascii?Q?1z+O5FukCWxmWw/+OJ/DwBccX3GY0DE0RZap6+P0?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -150,143 +134,268 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-OriginatorOrg: marvell.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR18MB4251.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9ef1118-f7f7-4e7d-d231-08dc4e8334e4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2024 17:27:41.4290
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4707.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 603e2477-44b4-4eef-3440-08dc4e856c98
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2024 17:43:33.8882
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5y1vIH08GKNEx2mQUHUbymchkGS4B+uIGg5e9qXSrnzdIc2YPEyJZMGpdxkAx1nivCHRcd3UG9cFd+2QeVkW4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR18MB5855
-X-Proofpoint-ORIG-GUID: MX057xmhy6dEYHOlHIXAtskouQcmLRKL
-X-Proofpoint-GUID: MX057xmhy6dEYHOlHIXAtskouQcmLRKL
+X-MS-Exchange-CrossTenant-userprincipalname: BVl0Kgf84mOOEntjaluzVsiGGJsxFT/ykvGKI3VOKKIArdJkfJCPhjbknU360Rm7fzYZzxY2N4Kc62cYVSgnVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR18MB5817
+X-Proofpoint-ORIG-GUID: qIoDk31H0VfwUCy_w7Z4tru4jwV_p1jg
+X-Proofpoint-GUID: qIoDk31H0VfwUCy_w7Z4tru4jwV_p1jg
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-03-27_14,2024-03-27_01,2023-05-22_02
 
-Hi Andrew,
-
-We have made internal technical review of the issues you have raised (retur=
-n version API, try to get version API before starting to initialize and loa=
-d the firmware, clear configuration API) versus the delay saved (almost 30 =
-seconds minus several seconds to perform and complete the API calls) - arou=
-nd 20 seconds or so.
-
-Existing customers we have talked to seem to be able to cope with the exist=
-ing delay.
-
-Unfortunately, the amount of coding and testing involved with saving these =
-20 seconds or so is beyond our available development manpower at this speci=
-fic point in time.
-
-Unfortunately, we will have to defer making the development you have reques=
-ted to a later period in time.
-
-Elad.
-
 
 > -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Sunday, March 24, 2024 5:25 PM
-> To: Elad Nachman <enachman@marvell.com>
-> Cc: Taras Chornyi <taras.chornyi@plvision.eu>; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
-> kory.maincent@bootlin.com; thomas.petazzoni@bootlin.com;
-> miquel.raynal@bootlin.com; przemyslaw.kitszel@intel.com;
-> dkirjanov@suse.de; netdev@vger.kernel.org; linux-kernel@vger.kernel.org
-> Subject: Re: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to pr=
-obe
-> twice
+> From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Sent: Tuesday, March 26, 2024 5:21 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Jacob Keller <jacob.e.keller@intel.com>;
+> Wojciech Drewek <wojciech.drewek@intel.com>; Ahmed Zaki
+> <ahmed.zaki@intel.com>; Mateusz Polchlopek
+> <mateusz.polchlopek@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v1 06/12] iavf: add
+> initial framework for registering PTP clock
 >=20
-> > > > Originally, the pain point for Kory was the rmmod + insmod
-> > > > re-probing failure, Which is only fixed by the first two commits,
-> > > > so I see little point in submitting 3-5 alone, Without fixing Kory'=
-s
-> problem.
-> > >
-> > > I thought Kory's problem was actually EPROBE_DEFER? The resources
-> > > needed for the PoE are not available, so probing the switch needs to
-> > > happen again later, when PoE can get the resources it needs.
-> >
-> > No, the PoE is the general high level application where he noted the
-> problem.
-> > There is no PoE code nor special PoE resources in the Prestera driver.
+> From: Jacob Keller <jacob.e.keller@intel.com>
 >=20
-> So here is K=F6ry email:
+> Add the iavf_ptp.c file and fill it in with a skeleton framework to allow
+> registering the PTP clock device.
+> Add implementation of helper functions to check if a PTP capability is
+> supported and handle change in PTP capabilities.
+> Enabling virtual clock would be possible, though it would probably perfor=
+m
+> poorly due to the lack of direct time access.
 >=20
-> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
-> 3A__lore.kernel.org_netdev_20240208101005.29e8c7f3-40kmaincent-2DXPS-
-> 2D13-2D7390_T_-
-> 23mb898bb2a4bf07776d79f1a19b6a8420716ecb4a3&d=3DDwIDAw&c=3DnKjWec2
-> b6R0mOyPaz7xtfQ&r=3DeTeNTLEK5-
-> TxXczjOcKPhANIFtlB9pP4lq9qhdlFrwQ&m=3DSD1MhKC11sFmp4Q8l76N_DgGdac
-> 4aMCTdPsa7Pofb73HEqAGtJ-1p0-
-> etIyyldC7&s=3DVWat9LPub52H3nUez4itmkpuMipnYD3Ngn-paFC9wd4&e=3D
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> ---
+>  drivers/net/ethernet/intel/iavf/Makefile      |   3 +-
+>  drivers/net/ethernet/intel/iavf/iavf_main.c   |   6 +
+>  drivers/net/ethernet/intel/iavf/iavf_ptp.c    | 123 ++++++++++++++++++
+>  drivers/net/ethernet/intel/iavf/iavf_ptp.h    |  10 ++
+>  .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   2 +
+>  5 files changed, 143 insertions(+), 1 deletion(-)  create mode 100644
+> drivers/net/ethernet/intel/iavf/iavf_ptp.c
 >=20
-> I don't see why the prestera needs to be involved in PoE itself. It is ju=
-st a MAC.
-> PoE happens much lower down in the network stack. Same as Prestera uses
-> phylink, it does not need to know about the PHYs or the SFP modules, phyl=
-ink
-> manages them, not prestera.
+> diff --git a/drivers/net/ethernet/intel/iavf/Makefile
+> b/drivers/net/ethernet/intel/iavf/Makefile
+> index 2d154a4e2fd7..06a5d2752246 100644
+> --- a/drivers/net/ethernet/intel/iavf/Makefile
+> +++ b/drivers/net/ethernet/intel/iavf/Makefile
+> @@ -13,4 +13,5 @@ obj-$(CONFIG_IAVF) +=3D iavf.o
 >=20
-> > The problem was caused because the module exit was lacking the so
-> > called "switch HW reset" API call which would cause the firmware to
-> > exit to the firmware loader on the firmware CPU, and move to the state
-> > in the state machine when it can receive new firmware from the host
-> > CPU (running the Prestera switchDev driver).
-> >
-> > >
-> > > But if that is going to take 30 seconds, i'm not sure we can call
-> > > EPROBE_DEFER solved.
-> > >
-> > > The later patches are pretty simple, don't need discussion, so could
-> > > be merged. However, i think we need to explore different possible
-> > > solutions for firmware {re}loading.
-> > >
-> > > > The problem is not with the hardware, but with the existing
-> > > > firmware code on the Firmware cpu, most probably secure-boot
-> > > > protected, which lacks the ABIs to report to The kernel what is
-> > > > loaded, what version, what
-> > > state, etc.
-> > >
-> > > Can you at least tell if it is running firmware?
-> >
-> > There is no existing API/ABI for that.
+>  iavf-objs :=3D iavf_main.o iavf_ethtool.o iavf_virtchnl.o iavf_fdir.o \
+>  	     iavf_adv_rss.o \
+> -	     iavf_txrx.o iavf_common.o iavf_adminq.o
+> +	     iavf_txrx.o iavf_common.o iavf_adminq.o \
+> +	     iavf_ptp.o
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index ea2034d7914a..6feabb1c62d1 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -2875,6 +2875,9 @@ static void iavf_init_config_adapter(struct
+> iavf_adapter *adapter)
+>  		/* request initial VLAN offload settings */
+>  		iavf_set_vlan_offload_features(adapter, 0, netdev->features);
 >=20
-> Do you at least have the ability to determine if an API call exists or no=
-t? It
-> sounds like your firmware needs extending to support returning the versio=
-n.
-> If the API is missing, you know it is 4.1 or older. If it does exist, it =
-will return
-> 4.2 or higher.
+> +	/* Setup initial PTP configuration */
+> +	iavf_ptp_init(adapter);
+> +
+>  	iavf_schedule_finish_config(adapter);
+>  	return;
 >=20
-> > > Can you explain the boot in a bit more detail. Are you saying it
-> > > could be running an old firmware when the driver first loads? So you
-> > > need to hit it with
-> >
-> > Exactly.
-> >
-> > > a reset in order to load the firmware for /lib/firmware, which might
-> > > be newer than what it is already running?
-> >
-> > Right. And there is also the configuration. There is no telling what
-> > kind of Configuration the existing firmware is running. Just using the
-> > existing firmware Will lead to the situation where Linux kernel side
-> > will report certain configuration (via ip link / ip addr / tc , etc.) b=
-ut the
-> firmware configuration is completely different.
+> @@ -5331,6 +5334,9 @@ static void iavf_remove(struct pci_dev *pdev)
+>  	}
 >=20
-> Well, during probe and -EPRODE_DEFER, linux has no configuration, since t=
-he
-> driver failed to probe. However, for a rmmod/modprobe, the firmware could
-> have stale configuration. However pretty much every device i've come acro=
-ss
-> has the concept of a software reset which clears out the configuration. S=
-eems
-> to be something else your firmware is missing.
+>  	iavf_misc_irq_disable(adapter);
+> +
+> +	iavf_ptp_release(adapter);
+> +
+>  	/* Shut down all the garbage mashers on the detention level */
+>  	cancel_work_sync(&adapter->reset_task);
+>  	cancel_delayed_work_sync(&adapter->watchdog_task);
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c
+> b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
+> new file mode 100644
+> index 000000000000..0f09d918d269
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
+> @@ -0,0 +1,123 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright(c) 2024 Intel Corporation. */
+> +
+> +#include "iavf.h"
+> +
+> +/**
+> + * iavf_ptp_cap_supported - Check if a PTP capability is supported
+> + * @adapter: private adapter structure
+> + * @cap: the capability bitmask to check
+> + *
+> + * Return true if every capability set in cap is also set in the
+> +enabled
+> + * capabilities reported by the PF.
+> + */
+> +bool iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap) {
+> +	if (!PTP_ALLOWED(adapter))
+> +		return false;
+> +
+> +	/* Only return true if every bit in cap is set in hw_caps.caps */
+> +	return (adapter->ptp.hw_caps.caps & cap) =3D=3D cap; }
+> +
+> +/**
+> + * iavf_ptp_register_clock - Register a new PTP for userspace
+> + * @adapter: private adapter structure
+> + *
+> + * Allocate and register a new PTP clock device if necessary.
+> + */
+> +static int iavf_ptp_register_clock(struct iavf_adapter *adapter) {
+> +	struct ptp_clock_info *ptp_info =3D &adapter->ptp.info;
+> +	struct device *dev =3D &adapter->pdev->dev;
+> +
+> +	memset(ptp_info, 0, sizeof(*ptp_info));
+> +
+> +	snprintf(ptp_info->name, sizeof(ptp_info->name) - 1, "%s-%s-clk",
+> +		 dev_driver_string(dev),
+> +		 dev_name(dev));
+> +	ptp_info->owner =3D THIS_MODULE;
+> +
+> +	adapter->ptp.clock =3D ptp_clock_register(ptp_info, dev);
+> +	if (IS_ERR(adapter->ptp.clock))
+> +		return PTR_ERR(adapter->ptp.clock);
+> +
+> +	dev_info(&adapter->pdev->dev, "PTP clock %s registered\n",
+> +		 adapter->ptp.info.name);
+> +	return 0;
+> +}
+> +
+> +/**
+> + * iavf_ptp_init - Initialize PTP support if capability was negotiated
+> + * @adapter: private adapter structure
+> + *
+> + * Initialize PTP functionality, based on the capabilities that the PF
+> +has
+> + * enabled for this VF.
+> + */
+> +void iavf_ptp_init(struct iavf_adapter *adapter) {
+> +	struct device *dev =3D &adapter->pdev->dev;
+> +	int err;
+> +
+> +	if (WARN_ON(adapter->ptp.initialized)) {
+> +		dev_err(dev, "PTP functionality was already initialized!\n");
+> +		return;
+> +	}
+> +
+> +	if (!iavf_ptp_cap_supported(adapter,
+> VIRTCHNL_1588_PTP_CAP_READ_PHC)) {
+> +		dev_dbg(dev, "Device does not have PTP clock support\n");
+> +		return;
+> +	}
+> +
+> +	err =3D iavf_ptp_register_clock(adapter);
+> +	if (err) {
+> +		dev_warn(dev, "Failed to register PTP clock device (%d)\n",
+> +			 err);
+> +		return;
+> +	}
+> +
+> +	adapter->ptp.initialized =3D true;
+> +}
+> +
+> +/**
+> + * iavf_ptp_release - Disable PTP support
+> + * @adapter: private adapter structure
+> + *
+> + * Release all PTP resources that were previously initialized.
+> + */
+> +void iavf_ptp_release(struct iavf_adapter *adapter) {
+> +	if (!IS_ERR_OR_NULL(adapter->ptp.clock)) {
+> +		dev_info(&adapter->pdev->dev, "removing PTP clock %s\n",
+> +			 adapter->ptp.info.name);
+> +		ptp_clock_unregister(adapter->ptp.clock);
+> +		adapter->ptp.clock =3D NULL;
+> +	}
+> +
+> +	adapter->ptp.initialized =3D false;
+> +}
+> +
+> +/**
+> + * iavf_ptp_process_caps - Handle change in PTP capabilities
+> + * @adapter: private adapter structure
+> + *
+> + * Handle any state changes necessary due to change in PTP
+> +capabilities, such
+> + * as after a device reset or change in configuration from the PF.
+> + */
+> +void iavf_ptp_process_caps(struct iavf_adapter *adapter) {
+> +	struct device *dev =3D &adapter->pdev->dev;
+> +
+> +	dev_dbg(dev, "PTP capabilities changed at runtime\n");
+> +
+> +	/* Check if the device gained or lost necessary access to support the
+> +	 * PTP hardware clock. If so, driver must respond appropriately by
+> +	 * creating or destroying the PTP clock device.
+> +	 */
+> +	if (adapter->ptp.initialized &&
+> +	    !iavf_ptp_cap_supported(adapter,
+> VIRTCHNL_1588_PTP_CAP_READ_PHC))
+> +		iavf_ptp_release(adapter);
+> +	else if (!adapter->ptp.initialized &&
+> +		 iavf_ptp_cap_supported(adapter,
+> VIRTCHNL_1588_PTP_CAP_READ_PHC))
+> +		iavf_ptp_init(adapter);
+> +}
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h
+> b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
+> index aee4e2da0b9a..4939c219bd18 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_ptp.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
+> @@ -4,9 +4,19 @@
+>  #ifndef _IAVF_PTP_H_
+>  #define _IAVF_PTP_H_
 >=20
-> 	Andrew
+> +#include <linux/ptp_clock_kernel.h>
+> +
+>  /* fields used for PTP support */
+>  struct iavf_ptp {
+>  	struct virtchnl_ptp_caps hw_caps;
+> +	bool initialized;
+> +	struct ptp_clock_info info;
+> +	struct ptp_clock *clock;
+>  };
+>=20
+> +void iavf_ptp_init(struct iavf_adapter *adapter); void
+> +iavf_ptp_release(struct iavf_adapter *adapter); void
+> +iavf_ptp_process_caps(struct iavf_adapter *adapter); bool
+> +iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap);
+> +
+>  #endif /* _IAVF_PTP_H_ */
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> index f922e177146d..12ce169699cf 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> @@ -2511,6 +2511,8 @@ void iavf_virtchnl_completion(struct iavf_adapter
+> *adapter,
+>  	case VIRTCHNL_OP_1588_PTP_GET_CAPS:
+>  		memcpy(&adapter->ptp.hw_caps, msg,
+>  		       min_t(u16, msglen, sizeof(adapter->ptp.hw_caps)));
+> +		/* process any state change needed due to new capabilities */
+> +		iavf_ptp_process_caps(adapter);
+>  	break;
+>  	case VIRTCHNL_OP_ENABLE_QUEUES:
+>  		/* enable transmits */
+> --
+> 2.38.1
+>=20
+Reviewed-by: Sai Krishna <saikrishnag@marvell.com
 
