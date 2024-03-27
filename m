@@ -1,193 +1,155 @@
-Return-Path: <netdev+bounces-82618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A3B988EBD5
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:58:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450D088EBF7
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB46C1F2FD47
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:58:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 740651C3112E
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD9014D712;
-	Wed, 27 Mar 2024 16:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D035A14C592;
+	Wed, 27 Mar 2024 17:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ckfkJpte"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H60IOwim"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1354148835;
-	Wed, 27 Mar 2024 16:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20121148835;
+	Wed, 27 Mar 2024 17:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711558706; cv=none; b=NamUCOA6s8va22fN1OXqR9cz0GO31GxqzVh4wM4FmWwHTP1ou/QtBcGPzmtsMM/RDky7oG1+l1cNQb5sWYQx1AOPVH+9cuw3906q7OCNAiZLeHwxvv7uAgAJvMGlFmTTLvuectVWX5hIMWTwOow2XSagvX6xQHSqU/XorqiexMs=
+	t=1711558833; cv=none; b=JTVxGiBBt4G1qFygKYUhSA5cT4MNJha/eErT2MSZFW0lNT/NcNdPHkLVnhEEa1bixQaJquxasYlJe6pFc/Cng42irIWNJ7+SLT+OYKGKz9WoBaNiHwGVvJxR6pD9q5cQDw43H76w8QSMW/ebz7oWBzIlhKXpeyrGhCdKOO1XseU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711558706; c=relaxed/simple;
-	bh=68oAjuOe+OtmBLErtbaq8rH3+7CTr5nb8XNBRGIt+ms=;
+	s=arc-20240116; t=1711558833; c=relaxed/simple;
+	bh=J37ICIcDeIhSRv8OF2aSODi811JNXz0+B8VLSNUEPKI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B4p2lr+qVpZCC7imiw5JoN5CUaazlBgoNXP5JqJceMvz4+DeHa9uHzyshOCAQaXInYOHmpI0JEnbcY/4Q8X3sKMbdV1gIGGec0YsFUQk187B0bizsVAQcaRgaM5I2oyS/AQb5hSLvmAyeGkIdplgzBGf8Zh1TbtxJHksgPF3/oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ckfkJpte; arc=none smtp.client-ip=209.85.217.42
+	 To:Cc:Content-Type; b=s7pD7cPfk3YA3Rl3U2ir7c/6XjcP2dlabzCgE0AxYbF30tSfispgRtQgR7jg9czDlkxhlUjW8RiqLXXJz0YDole5OKQ7o6G2v6rZwlCODJ4wLN2277BJYFYSt1Oeuvyj1VJBUWcoESzZQcuFy5sho1RRH33wZ/Zr7YeIBoBuw1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H60IOwim; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-476794adf30so2697024137.1;
-        Wed, 27 Mar 2024 09:58:24 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33ed4d8e9edso5142689f8f.2;
+        Wed, 27 Mar 2024 10:00:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711558704; x=1712163504; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yUltN/NJxMhxZV1CH62BOvzy406AgQtlnwGFiPeOm1M=;
-        b=ckfkJpteGm7XCNtho31GGIx7rxeiwCLcEehHDPmagJO6GPaPsWqjOulaA7fSfUpWoR
-         hgUj3obgxGj/lPR48GbOHyNuU2HKlqGvmSHhhUSj5CQy8SsiWlhkwnbzcP9ln2NghDLN
-         mBJH/c8bZdVY7fqCuSfLf9TVA5f8Gsl/zxuFprg8bmtGhe3atKajWGyi1MSWoiFVe5A0
-         6bBYOndui4T4Jo1unOE4DIHpb0JkW+kc3oCeZundaguc/nPxmxax2GkNBPYa11vHe6cL
-         G1NSBEolZikMOWPAYyQVb16SEbKd7IMl7LVlXZ/hJeQQ1NGF5XsLvcQzWfcHkJpRrEnE
-         F15A==
+        d=gmail.com; s=20230601; t=1711558830; x=1712163630; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rE6PANI0PKpDtDKb8HO4vaBnD1jO6J6fZqWjXbZEANc=;
+        b=H60IOwimmt+FNgt1ObLh3qILiMau/xCaHR04oMHt/chcbAwyF3imH9dUdPzWqQ1Llk
+         0ylz1BUPSdDHFcw++x3nEMeYdwA2UX0uX4C3B1la52z0ypkTSo8tZ4VQVakGvGcijGX2
+         JdkX5hymXpTQ8xCGfcARj3ROd10VW3E2JUM0ii9XpdR9XXrXaTkVyJnFku3N18gLIW7q
+         bthDUdY04B2RS4//rdjBbeC5tk6ydjfGYR/R+5DTsXhTuCrdDOiR40jr7AqVbl5X54qx
+         4I/oqvLCWxbYJ/eA6xs1qo/DNOAlV5cVZi922/M7kT2l7KRdkp86xRBC73vApb32NRZ3
+         LoVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711558704; x=1712163504;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yUltN/NJxMhxZV1CH62BOvzy406AgQtlnwGFiPeOm1M=;
-        b=NKQ12SJFoFCjMiu00meIisUAH99XJ+YdaN2UVhlUWPfndyYs3NsfFVaYTrlnbvGfrG
-         UtIrJLyqDVrDTn0yDNT82InomIaYFgEl9Ife35vrv+/gFsA6FbZTcHeiEeu2r7wDEkuZ
-         Fo/qwiUmXHTG/pGCf3vLM2PQuDtqhxpONR6iPpqVyAb2WlnEVaO/MpE6HclyEHztvhZl
-         kMbNDqxGZY/UG8f/HMQhZRm4zBaNvA3GeswpjS42+/kASTixhu99mgwqV0OMJEjeaK5r
-         JjeelFNnv6T/SPpeOyEdbPk9MsSZVH8ALqnERB105wg7ft6rfzwdwF6gntlTM5ZaZDYZ
-         EVWA==
-X-Forwarded-Encrypted: i=1; AJvYcCULFYzDpcr45FafFATbKzaC4rFzgGCcNAmUm9bSqi7dJu7CyTfwNBAfcXWW1+ZYsOjNY0tKTeRdC1fb53E+gIdT1vZmPdPIvZ1SA+ilcx5uG25vD1UK2SVkb0T11xVilFfd8Ec1jpuAliGdmnIiXNjI15hMAgQ93AF2qOMutKsUvAaiELn3jFmqG0WHmj2MkSgQxn+pBVRR1QBhcar0i5u2lV0UkUDrT/NPLWVyTWTnjez+aXpZozP4IB25x0cS83Ulvah1a+2LtL1NBSkUePPLc6VwR1x0QcOOhtPot9rGFSZCIZH+0J8HSj11KppR26/R3/8SymJXSqLS7fjhxtLY7Qdjz8p/qOV1Nd2X6Y6sdoX3+ybC9OoRl2op5p2feUivOz1Q2xXVLbOg9kW7co2Dbu31ZJmdzISl4C0v1SkWum3Bc168LggOiQKO5A7hySxdLRKn0J58eo7GHXQX1GD+o2d6H32mnQgvpOKAUdVqv0725cIfSaYGpfXFYaA5zRnpw/Y1Dgj+x6RfWqDRLx/+fMQttTNky+r98U5CNHd//FRYzGWHKShU5TLTqWWFpXihdCRQBN5bZow7fvvU3C4=
-X-Gm-Message-State: AOJu0Yz6IZ0/Jwk9cnnAAAKCmz6PUwebNCazfsdzXY5JmW/KALiVNNI8
-	jT9niDdu7bjt+B7F/fCZVUvTh+FGKWa6rjMt3YBPkRYKHEC7tm7ijuamn90sR/hK0KnWquZCWRl
-	xLvBVC13cU6dkbxwdHXCz3hggp/Y=
-X-Google-Smtp-Source: AGHT+IG2+7fcvBBedZik6uQF+4M2q3ObjFc26qAotYqTJVzVn8pG6NuXX7LEd77qXX8Tn8MdeN0ijCK67x3Q8xGLlB4=
-X-Received: by 2002:a05:6102:3b83:b0:472:64aa:403f with SMTP id
- z3-20020a0561023b8300b0047264aa403fmr602964vsu.26.1711558703814; Wed, 27 Mar
- 2024 09:58:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711558830; x=1712163630;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rE6PANI0PKpDtDKb8HO4vaBnD1jO6J6fZqWjXbZEANc=;
+        b=M+9wyLakmgW4KZOjln+e2qE/ctMPe/dq03tQCHSuzJm2I/hgsBhbJVFyjbTYKCJ5nA
+         Xn56yHjDu1R6LdzoeRHx2ZRkzXiJbXVfm/9AWWXrMa5Ljjsr76kyi+9qQ5v7NkM9zVf0
+         V+NfLVD0xYqbKnB1Gojs2dDxGNKJcHQqR+TryivXMPclaLefJLBXqwqFKLS3YDTt7pmW
+         95yzEnYLLgP7JAg5a86gyraAJYPKXfgEIBPcmlAb+09T+RrA/dpzvS1ir5XY0hsl2M7V
+         YOcvJPe9hdpTwOEUm2yov+BI+ZgpClIqeWIqhB4rrsRanckFCjvC/E4DDCdYt79XQBBa
+         H6NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEi8bzn9BbqHilUrSFrZ/okK+/pfeMQOISqIzAInxs/s9C/bGJLCLSnmI15YO0AIHbAVOTjJIU3AFZds+9KLRYOQ0Q
+X-Gm-Message-State: AOJu0Yzit0JqPqojDQZkuHIZK/9+2N8Hy9CP/cnVZpd1TC/THY/uyJoX
+	KdR8fmnQiFwSK1xsRmvCDQzCHCITfykf9KChCIZ9z4AdhwtNb0ApCX4CYydwZvluDvuzZF985OS
+	MuZre77D8i8E+PjxEQQzwOC1qg7T9wE/LtzA=
+X-Google-Smtp-Source: AGHT+IHhkloAX659y62N9Sgl+ZqyAfY8iq+7jOOX1+KAnA+tCvDhALQMxu4P9hoaXL1TLSv6AhIzTZxYoj35NB0egW8=
+X-Received: by 2002:a5d:64a2:0:b0:341:bd4c:f075 with SMTP id
+ m2-20020a5d64a2000000b00341bd4cf075mr375333wrp.16.1711558830159; Wed, 27 Mar
+ 2024 10:00:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-5-apais@linux.microsoft.com> <2024032753-probable-blatancy-80bf@gregkh>
-In-Reply-To: <2024032753-probable-blatancy-80bf@gregkh>
-From: Allen <allen.lkml@gmail.com>
-Date: Wed, 27 Mar 2024 09:58:12 -0700
-Message-ID: <CAOMdWSLipPfm3OZTpjZz4uF4M+E_8QAoTeMcKBXawLnkTQx6Jg@mail.gmail.com>
-Subject: Re: [PATCH 4/9] USB: Convert from tasklet to BH workqueue
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Allen Pais <apais@linux.microsoft.com>, linux-kernel@vger.kernel.org, tj@kernel.org, 
-	keescook@chromium.org, vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev, 
-	florian.fainelli@broadcom.com, rjui@broadcom.com, sbranden@broadcom.com, 
-	paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com, 
-	manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com, 
-	leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com, 
-	haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de, 
-	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, afaerber@suse.de, 
-	logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com, 
-	robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org, 
-	orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com, 
-	patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org, 
-	jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com, kys@microsoft.com, 
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
-	jassisinghbrar@gmail.com, mchehab@kernel.org, maintainers@bluecherrydvr.com, 
-	aubin.constans@microchip.com, ulf.hansson@linaro.org, manuel.lauss@gmail.com, 
-	mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com, 
-	hayashi.kunihiko@socionext.com, mhiramat@kernel.org, brucechang@via.com.tw, 
-	HaraldWelte@viatech.com, pierre@ossman.eu, duncan.sands@free.fr, 
-	stern@rowland.harvard.edu, oneukum@suse.com, 
-	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org, 
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	linux-mediatek@lists.infradead.org, linux-actions@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-omap@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org, linux-usb@vger.kernel.org
+References: <CAADnVQKCxxETthqDpcE1xMGwa5au8JuLr_49QuwemL7uBKfiVg@mail.gmail.com>
+ <8410a6f61e7a778117819ebeda667687353ffb21.camel@redhat.com>
+In-Reply-To: <8410a6f61e7a778117819ebeda667687353ffb21.camel@redhat.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 27 Mar 2024 10:00:19 -0700
+Message-ID: <CAADnVQLj9bQDonRzJO5z2hMZ7kf6zdU-s6Cm_7_kj-wP3CiUSA@mail.gmail.com>
+Subject: Re: mptcp splat
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	MPTCP Upstream <mptcp@lists.linux.dev>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > The only generic interface to execute asynchronously in the BH context is
-> > tasklet; however, it's marked deprecated and has some design flaws. To
-> > replace tasklets, BH workqueue support was recently added. A BH workqueue
-> > behaves similarly to regular workqueues except that the queued work items
-> > are executed in the BH context.
-> >
-> > This patch converts drivers/infiniband/* from tasklet to BH workqueue.
+On Wed, Mar 27, 2024 at 9:56=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
-> No it does not, I think your changelog is wrong :(
+> On Wed, 2024-03-27 at 09:43 -0700, Alexei Starovoitov wrote:
+> > I ffwded bpf tree with the recent net fixes and caught this:
+> >
+> > [   48.386337] WARNING: CPU: 32 PID: 3276 at net/mptcp/subflow.c:1430
+> > subflow_data_ready+0x147/0x1c0
+> > [   48.392012] Modules linked in: dummy bpf_testmod(O) [last unloaded:
+> > bpf_test_no_cfi(O)]
+> > [   48.396609] CPU: 32 PID: 3276 Comm: test_progs Tainted: G
+> > O       6.8.0-12873-g2c43c33bfd23 #1014
+> > #[   48.467143] Call Trace:
+> > [   48.469094]  <TASK>
+> > [   48.472159]  ? __warn+0x80/0x180
+> > [   48.475019]  ? subflow_data_ready+0x147/0x1c0
+> > [   48.478068]  ? report_bug+0x189/0x1c0
+> > [   48.480725]  ? handle_bug+0x36/0x70
+> > [   48.483061]  ? exc_invalid_op+0x13/0x60
+> > [   48.485809]  ? asm_exc_invalid_op+0x16/0x20
+> > [   48.488754]  ? subflow_data_ready+0x147/0x1c0
+> > [   48.492159]  mptcp_set_rcvlowat+0x79/0x1d0
+> > [   48.495026]  sk_setsockopt+0x6c0/0x1540
+> >
+> > It doesn't reproduce all the time though.
+> > Some race?
+> > Known issue?
+>
+> It was not known to me. Looks like something related to not so recent
+> changes (rcvlowat support).
+>
+> Definitely looks lie a race.
+>
+> If you could share more info about the running context and/or a full
+> decoded splat it could help, thanks!
 
-Whoops, sorry about that. I messed up the commit messages. I will fix it in v2.
->
-> >
-> > Based on the work done by Tejun Heo <tj@kernel.org>
-> > Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
-> >
-> > Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-> > ---
-> >  drivers/usb/atm/usbatm.c            | 55 +++++++++++++++--------------
-> >  drivers/usb/atm/usbatm.h            |  3 +-
-> >  drivers/usb/core/hcd.c              | 22 ++++++------
-> >  drivers/usb/gadget/udc/fsl_qe_udc.c | 21 +++++------
-> >  drivers/usb/gadget/udc/fsl_qe_udc.h |  4 +--
-> >  drivers/usb/host/ehci-sched.c       |  2 +-
-> >  drivers/usb/host/fhci-hcd.c         |  3 +-
-> >  drivers/usb/host/fhci-sched.c       | 10 +++---
-> >  drivers/usb/host/fhci.h             |  5 +--
-> >  drivers/usb/host/xhci-dbgcap.h      |  3 +-
-> >  drivers/usb/host/xhci-dbgtty.c      | 15 ++++----
-> >  include/linux/usb/cdc_ncm.h         |  2 +-
-> >  include/linux/usb/usbnet.h          |  2 +-
-> >  13 files changed, 76 insertions(+), 71 deletions(-)
-> >
-> > diff --git a/drivers/usb/atm/usbatm.c b/drivers/usb/atm/usbatm.c
-> > index 2da6615fbb6f..74849f24e52e 100644
-> > --- a/drivers/usb/atm/usbatm.c
-> > +++ b/drivers/usb/atm/usbatm.c
-> > @@ -17,7 +17,7 @@
-> >   *           - Removed the limit on the number of devices
-> >   *           - Module now autoloads on device plugin
-> >   *           - Merged relevant parts of sarlib
-> > - *           - Replaced the kernel thread with a tasklet
-> > + *           - Replaced the kernel thread with a work
->
-> a "work"?
- will fix the comments.
+This is just running bpf selftests in parallel:
+test_progs -j
 
->
-> >   *           - New packet transmission code
-> >   *           - Changed proc file contents
-> >   *           - Fixed all known SMP races
-> > @@ -68,6 +68,7 @@
-> >  #include <linux/wait.h>
-> >  #include <linux/kthread.h>
-> >  #include <linux/ratelimit.h>
-> > +#include <linux/workqueue.h>
-> >
-> >  #ifdef VERBOSE_DEBUG
-> >  static int usbatm_print_packet(struct usbatm_data *instance, const unsigned char *data, int len);
-> > @@ -249,7 +250,7 @@ static void usbatm_complete(struct urb *urb)
-> >       /* vdbg("%s: urb 0x%p, status %d, actual_length %d",
-> >            __func__, urb, status, urb->actual_length); */
-> >
-> > -     /* Can be invoked from task context, protect against interrupts */
-> > +     /* Can be invoked from work context, protect against interrupts */
->
-> "workqueue"?  This too seems wrong.
->
-> Same for other comment changes in this patch.
-
-Thanks for the quick review, I will fix the comments and send out v2.
-
-- Alle
-
-> thanks,
->
-> greg k-h
->
+The end of the splat:
+[   48.500075]  __bpf_setsockopt+0x6f/0x90
+[   48.503124]  bpf_sock_ops_setsockopt+0x3c/0x90
+[   48.506053]  bpf_prog_509ce5db2c7f9981_bpf_test_sockopt_int+0xb4/0x11b
+[   48.510178]  bpf_prog_dce07e362d941d2b_bpf_test_socket_sockopt+0x12b/0x1=
+32
+[   48.515070]  bpf_prog_348c9b5faaf10092_skops_sockopt+0x954/0xe86
+[   48.519050]  __cgroup_bpf_run_filter_sock_ops+0xbc/0x250
+[   48.523836]  tcp_connect+0x879/0x1160
+[   48.527239]  ? ktime_get_with_offset+0x8d/0x140
+[   48.531362]  tcp_v6_connect+0x50c/0x870
+[   48.534609]  ? mptcp_connect+0x129/0x280
+[   48.538483]  mptcp_connect+0x129/0x280
+[   48.542436]  __inet_stream_connect+0xce/0x370
+[   48.546664]  ? rcu_is_watching+0xd/0x40
+[   48.549063]  ? lock_release+0x1c4/0x280
+[   48.553497]  ? inet_stream_connect+0x22/0x50
+[   48.557289]  ? rcu_is_watching+0xd/0x40
+[   48.560430]  inet_stream_connect+0x36/0x50
+[   48.563604]  bpf_trampoline_6442491565+0x49/0xef
+[   48.567770]  ? security_socket_connect+0x34/0x50
+[   48.575400]  inet_stream_connect+0x5/0x50
+[   48.577721]  __sys_connect+0x63/0x90
+[   48.580189]  ? bpf_trace_run2+0xb0/0x1a0
+[   48.583171]  ? rcu_is_watching+0xd/0x40
+[   48.585802]  ? syscall_trace_enter+0xfb/0x1e0
+[   48.588836]  __x64_sys_connect+0x14/0x20
 
