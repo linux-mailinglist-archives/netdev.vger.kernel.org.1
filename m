@@ -1,174 +1,147 @@
-Return-Path: <netdev+bounces-82646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0742288EEA8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:55:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8487988EEAC
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B13BB1F36C32
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:55:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39C69298DF5
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09BB814F9FE;
-	Wed, 27 Mar 2024 18:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE74F14F9D4;
+	Wed, 27 Mar 2024 18:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bZBQH4To"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="VV+0VnhV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEBC14F134
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 18:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E382614E2CC
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 18:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711565730; cv=none; b=I1ZXgBCKQQ5GyUxbAg9ZHNZUTPIcZhTeY+63uW6C/nCpJziRDahhnCVp1TvKVluk6Y5dHg6utKq/MBoT0flI4+He8HcvhcZDYp+WCm40rz4e2k0uk1HtXLCgEL9A6l73CoTvBzLVjjsE/uUxJwOzq+ZHVApz4Oz0Ns9eMZkosp8=
+	t=1711565765; cv=none; b=G4xsA8ogjOw0FySKk6FGSIfCGYUofN8Cg+oxuO7VIOWWAL1WEuZDs7gOFOTt1eClaDWlGlIEm7FqvP8hMIGtGSFt+0LczaxysG6MXEiN2UyU7NeZvunC+rolQx4gCgsZO5mMFtP3mVHcatDsvbp8b0o09U6dSie8WGYLkNJmJ0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711565730; c=relaxed/simple;
-	bh=61gLHHkk9Hl+GgCfsGmd3UU6RraLBgaDyHN8UAM7C9c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X2v2Irk3sksqJctZ1NoQKQcRnKqdWSST1FW5IIIThWo8lNSqpEaxnxILMirGNuu6BIyzsi8a4v39VYiAg3gMmyzJ9EVPPzQ1X3DOvVluZFdjag/q4ltAoVp9DWVYlYFyYwpUjNd+3vBklT4iLKBgvBaVdllVQcRRmY6H1qN9Tf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bZBQH4To; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711565730; x=1743101730;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=61gLHHkk9Hl+GgCfsGmd3UU6RraLBgaDyHN8UAM7C9c=;
-  b=bZBQH4To8Ccn77d7mm0P9ijzO/7+AvXHNgJMPiRe69X7PXKqcok5ewXX
-   4xRQt59sCQS+JRJy0ueBAr9M/yhpivS9XH92HuEbjCweQ5uvyYi/Ti+0q
-   a92gEfjzrUr3rFRquVStdhZ0sP8AdoMdu6rbLIjrf1hTk7PqzvmjA9j5Y
-   y7YxUpBCMsz63LDWZPc4xrsKwn/gBRlXZxSqul1zY7bWBDGWq4osL/MJQ
-   FvTldBVNbs14LXXpGgVd6dK/Mrt1gYI9Fx3+t9NMeYALSK403w6AMCvZm
-   48Jtq4lFVkKULMNvMpH9YpinK/8aNDrny4vK2eQWTFTOqXGjoOjdFesKF
-   Q==;
-X-CSE-ConnectionGUID: xfc4hVP1SgG2KuCrhR5Q4g==
-X-CSE-MsgGUID: g4XUMrSTSqKTxluSIz7JIQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="18122799"
-X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
-   d="scan'208";a="18122799"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 11:55:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
-   d="scan'208";a="16470606"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 27 Mar 2024 11:55:26 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	anthony.l.nguyen@intel.com,
-	sasha.neftin@intel.com,
-	Dima Ruinskiy <dima.ruinskiy@intel.com>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net 2/2] e1000e: move force SMBUS from enable ulp function to avoid PHY loss issue
-Date: Wed, 27 Mar 2024 11:55:13 -0700
-Message-ID: <20240327185517.2587564-3-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240327185517.2587564-1-anthony.l.nguyen@intel.com>
-References: <20240327185517.2587564-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1711565765; c=relaxed/simple;
+	bh=H/eTOCcjo9aN7qQPdq07jhsvhHbGanS8AyyyYf4Umi4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OQBh6UtTDQTfY7VzzH4w95JGnMwiNfmlM5lGg81hS+P9GomKaGJfUxmATxp8jshFLWAiK9EinQ8bah0zXwfioqiYL7ea+ySRw4G+ypDhwg0DWWaLvAUYq4/EA/NGuLK1Aig/GwPq5PedY3VZY/tMmYE4iyeonaEUCsaGr9Bc3T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=VV+0VnhV; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d6ff0422a2so1081191fa.2
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 11:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711565762; x=1712170562; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H/eTOCcjo9aN7qQPdq07jhsvhHbGanS8AyyyYf4Umi4=;
+        b=VV+0VnhVEki3ILwm72RPkCOxQjmcPyNa5rlAf+qZ438dgZs/xKJxeiQoGEQFJuioUx
+         Vbq6R5nNIlf+nucsCHFBGLM+zFicFajoPs2T/pbSHbYu53+e6BUPCLudWwwD6Rh0qDdh
+         UjWAQjJBP4arE5fOXwBcifFWLwxNak/p2DWXpGYSu2QhPEZhRjLJe8Iy50TttYq4OHd0
+         0jLYXTf6PPoLqMPVa+mZXoF9j7AebRY3eRxNXu8utctAhs4jdAuR5B/1FxO8zDXSq6x3
+         bE9Zn0QoIuRDVF9lB5roTPOXQBynJ3tDJa58OcvPzoTagZZJMlxjsrjqGM9S10RItQQ4
+         J1oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711565762; x=1712170562;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H/eTOCcjo9aN7qQPdq07jhsvhHbGanS8AyyyYf4Umi4=;
+        b=xN+GYjhyJ8inmFSzja82duU1VhEFxWNvFEUnwEGtoEeMjV++gY1uPqeQvlQCZ+9xFF
+         ykdYWLPsTgNVaa8VZgp7NG/j2yMqDGtfGh9a7DZIiAZtLZ2mtQK8qJsp7oxuYWb9QsCh
+         vhHFbRubyXhfNR0T5nwl7odsNmRt+b4YoC6a/fGfu9OgRaoxTysqwnG/Xs2GdKrkwtMD
+         7oG9fi1raiNFWddJHw5rG06+UJwZaVuz8aYCq/YCLs7bAGI82hGuDMssf09ZVxpE+d+a
+         BWFwGVhCTXo6us6KfTgiLitSyKXRm7P0ZkAcc/cgLv3y8hnuL+03x077NabMePdz3fqz
+         t27Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWdfTf7tRo6N+YmBgucq6eg+IuqojOgK6ct742tW6bLRGWUKZmLkRR0E3XA/V8vpOKTQVM4s775P9p8hhiXLWFOYXL4JC14
+X-Gm-Message-State: AOJu0YxNLgqdrA0kLYmcnlk6YgF/ZUqTjgGgvgukfL2VTqxqOd11tI9O
+	kMHQhGte991o6/pkGXn5Waq7h+3e1DLgh6EZ8Ui0cz4Y1sGQFBWPQBPrEel004TRtQvJKywscRQ
+	4o+oOt+oNM4+1GcffjjMtZ4eQDuyEXwJqHy3s5A==
+X-Google-Smtp-Source: AGHT+IFfaQnTAbP7+beuXcrrsmTHRVPtnb/RHBukbiOBMqcY0DDZ63uCDR3FE1XKpIsOQEkleMW2WlpbTNeUExk8xKY=
+X-Received: by 2002:ac2:4648:0:b0:515:9ae1:9a6e with SMTP id
+ s8-20020ac24648000000b005159ae19a6emr206133lfo.67.1711565762008; Wed, 27 Mar
+ 2024 11:56:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240325131624.26023-1-brgl@bgdev.pl> <20240325131624.26023-2-brgl@bgdev.pl>
+ <af9def4e-c6d6-49d9-a457-68c40492587a@linaro.org>
+In-Reply-To: <af9def4e-c6d6-49d9-a457-68c40492587a@linaro.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 27 Mar 2024 19:55:50 +0100
+Message-ID: <CAMRc=Mdw9Ox5EC6=GdR_1kzWcfhpdbz1Hu3e7+GY9-wqTh2fhQ@mail.gmail.com>
+Subject: Re: [PATCH v6 01/16] regulator: dt-bindings: describe the PMU module
+ of the QCA6390 package
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+On Wed, Mar 27, 2024 at 7:17=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> On 25/03/2024 14:16, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > The QCA6390 package contains discreet modules for WLAN and Bluetooth. T=
+hey
+> > are powered by the Power Management Unit (PMU) that takes inputs from t=
+he
+> > host and provides LDO outputs. This document describes this module.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Can you start using b4?
+>
+> This is a friendly reminder during the review process.
+>
+> It looks like you received a tag and forgot to add it.
+>
+> If you do not know the process, here is a short explanation:
+> Please add Acked-by/Reviewed-by/Tested-by tags when posting new
+> versions, under or above your Signed-off-by tag. Tag is "received", when
+> provided in a message replied to you on the mailing list. Tools like b4
+> can help here. However, there's no need to repost patches *only* to add
+> the tags. The upstream maintainer will do that for tags received on the
+> version they apply.
+>
+> https://elixir.bootlin.com/linux/v6.5-rc3/source/Documentation/process/su=
+bmitting-patches.rst#L577
+>
+> If a tag was not added on purpose, please state why and what changed.
+>
 
-Forcing SMBUS inside the ULP enabling flow leads to sporadic PHY loss on
-some systems. It is suspected to be caused by initiating PHY transactions
-before the interface settles.
+As per the first sentence of the cover letter: I dropped review tags
+from the patches that changed significantly while keeping them for
+those that didn't. If there's a way to let your automation know about
+this, please let me know/point me in the right direction because I
+don't know about it.
 
-Separating this configuration from the ULP enabling flow and moving it to
-the shutdown function allows enough time for the interface to settle and
-avoids adding a delay.
-
-Fixes: 6607c99e7034 ("e1000e: i219 - fix to enable both ULP and EEE in Sx state")
-Co-developed-by: Dima Ruinskiy <dima.ruinskiy@intel.com>
-Signed-off-by: Dima Ruinskiy <dima.ruinskiy@intel.com>
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000e/ich8lan.c | 19 -------------------
- drivers/net/ethernet/intel/e1000e/netdev.c  | 18 ++++++++++++++++++
- 2 files changed, 18 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-index d8e97669f31b..f9e94be36e97 100644
---- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-+++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-@@ -1165,25 +1165,6 @@ s32 e1000_enable_ulp_lpt_lp(struct e1000_hw *hw, bool to_sx)
- 	if (ret_val)
- 		goto out;
- 
--	/* Switching PHY interface always returns MDI error
--	 * so disable retry mechanism to avoid wasting time
--	 */
--	e1000e_disable_phy_retry(hw);
--
--	/* Force SMBus mode in PHY */
--	ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, &phy_reg);
--	if (ret_val)
--		goto release;
--	phy_reg |= CV_SMB_CTRL_FORCE_SMBUS;
--	e1000_write_phy_reg_hv_locked(hw, CV_SMB_CTRL, phy_reg);
--
--	e1000e_enable_phy_retry(hw);
--
--	/* Force SMBus mode in MAC */
--	mac_reg = er32(CTRL_EXT);
--	mac_reg |= E1000_CTRL_EXT_FORCE_SMBUS;
--	ew32(CTRL_EXT, mac_reg);
--
- 	/* Si workaround for ULP entry flow on i127/rev6 h/w.  Enable
- 	 * LPLU and disable Gig speed when entering ULP
- 	 */
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index cc8c531ec3df..3692fce20195 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -6623,6 +6623,7 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 	struct e1000_hw *hw = &adapter->hw;
- 	u32 ctrl, ctrl_ext, rctl, status, wufc;
- 	int retval = 0;
-+	u16 smb_ctrl;
- 
- 	/* Runtime suspend should only enable wakeup for link changes */
- 	if (runtime)
-@@ -6696,6 +6697,23 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 			if (retval)
- 				return retval;
- 		}
-+
-+		/* Force SMBUS to allow WOL */
-+		/* Switching PHY interface always returns MDI error
-+		 * so disable retry mechanism to avoid wasting time
-+		 */
-+		e1000e_disable_phy_retry(hw);
-+
-+		e1e_rphy(hw, CV_SMB_CTRL, &smb_ctrl);
-+		smb_ctrl |= CV_SMB_CTRL_FORCE_SMBUS;
-+		e1e_wphy(hw, CV_SMB_CTRL, smb_ctrl);
-+
-+		e1000e_enable_phy_retry(hw);
-+
-+		/* Force SMBus mode in MAC */
-+		ctrl_ext = er32(CTRL_EXT);
-+		ctrl_ext |= E1000_CTRL_EXT_FORCE_SMBUS;
-+		ew32(CTRL_EXT, ctrl_ext);
- 	}
- 
- 	/* Ensure that the appropriate bits are set in LPI_CTRL
--- 
-2.41.0
-
+Bart
 
