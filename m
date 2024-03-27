@@ -1,56 +1,59 @@
-Return-Path: <netdev+bounces-82332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6E1888D50D
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 04:28:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C3A988D510
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 04:34:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5812DB22DDD
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 03:28:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09B7E2C75F6
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 03:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC66224F0;
-	Wed, 27 Mar 2024 03:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AA71CF92;
+	Wed, 27 Mar 2024 03:34:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iQ3eEOjS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0A+cGpY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4967F224DC
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 03:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E4E380
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 03:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711510096; cv=none; b=Y/S/lfb4cBnAJoidp6BnuG/LWfsnZcc+hJyNrnk25utr9xsAU6sSDZL9SpkC3Dne8kSw+v43/Kg4w404PoIzGQJSWEp0tyC9vhv2VcFag4qICqSuz6D5rTIGxos29zpW+NUk7l0SMcQoBFIOmsjDaDflEPrfyOFW7+AUwqb4s4M=
+	t=1711510467; cv=none; b=dSFj7OYWJ1B8xXStv9wwkXHa6R8I9GPDt5fs1TSF6FUXP9/Ea8IduDYHLDi55+grf2faEgmZMsUYcmuEujrQOdVw6b5gAw0IzcxkRNxLe7Q6UBOkfy69m2yke2EM81wVsZcMYmNcVdvagaP1WSUrggxqfAhsWw5TG2KTzWDg6wI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711510096; c=relaxed/simple;
-	bh=+0xen8NUOGIO8QNlJF4kylCE8XJXbPLDF95nfnCb/n4=;
+	s=arc-20240116; t=1711510467; c=relaxed/simple;
+	bh=C2eSKKoUQ8peaNhNZv243+bDGsWLreYGK1B+6YZDQb0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kXmstpdQ1g6pOyhcZ7O3DWVR3zttlZm54TfFSGvGw/9Eivmkzloc760DEMByL6wA2dpjN/5VRDLPRZYp3EwSt11hnCWxMmhpSYOlNy7uI/INEvSJe9dujMgL+QijOcPbJfPwcAx1MTP+OGDORFb6ewzUxbEiuKM3C1dKhAiNJhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iQ3eEOjS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C34FC433C7;
-	Wed, 27 Mar 2024 03:28:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=D1htQ/tkKyl3/Fg9Yu00rinA1QxnsHwZOmwdfB0XZfLrV0JdkkKTdcP1U7mH/WuOmWDoPs9L/C9A0oKtSo3yf7x/zS5K5gVUB+ZJD+dPsFHrqaSluLaIifX5wJeBaywIGlqBfmCZWxMfBQkkBgnKYU+dfDT6wZ8q8ijy4apEiLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0A+cGpY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E499C433F1;
+	Wed, 27 Mar 2024 03:34:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711510095;
-	bh=+0xen8NUOGIO8QNlJF4kylCE8XJXbPLDF95nfnCb/n4=;
+	s=k20201202; t=1711510466;
+	bh=C2eSKKoUQ8peaNhNZv243+bDGsWLreYGK1B+6YZDQb0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iQ3eEOjSdpDJ3Ilfza+Ap/YF+UFCN6IX0YrOFswzewUTZP01JU0aHN5niWVBWrixQ
-	 DzlWbfRgECHJpCGMRnGwy/bQ892h4hEcjuEQdwV4xUuNbW7q4azZZBlixbSkwS7c8c
-	 x+u+tyC2FxmQ6VylxpyDlw6s9hkHAsSK52AbM4Vkdfxt1pvLzbxTb43bB37huWMdxs
-	 FBEk2RkfizC8pKzR34h4Fkg5ziGBKpaL6exyVVtUDl5vJFee6OhCGNqgp5E4kvxZT7
-	 CYntWw1TsHh0Kn3Tbhs3sjLwnlco3ezseAyL3wz91VaEB/goxiAno/fplNmA9saYg3
-	 h36EFJlS3Fn3w==
-Date: Tue, 26 Mar 2024 20:28:14 -0700
+	b=C0A+cGpYep+JPFc9y/E4IP7W80VyjDiO+EX6gyMC6+PVJbAZwAqiNAxOf0hGahlo5
+	 ooldoLIu4MJFpQjKaxPEkSjw68dEAMwO2GneAA887hhi7D80IODrMc1boMnk1KWB3l
+	 FXsBhI/AtL8Oq3ejekQDZdWjIm4cFu7hkUo+bO25E2J8tQzfBIzRVdi6Rw2WDG6YYx
+	 6tEPPRqKPbL5xFXD7BBDtyvL4WP5VVSz6egp1jKFUj/nutCynCyv6Nm4aXx0EMUkzz
+	 MPhRJjIIODzsiFbNrSz/0vSyuYmZ2JjzerqnbFyfwtWKGcdhYd8KfAdF/S6QcBA4Ze
+	 YOyXSHsgnzBwA==
+Date: Tue, 26 Mar 2024 20:34:25 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: <jiri@nvidia.com>
-Cc: William Tu <witu@nvidia.com>, <netdev@vger.kernel.org>,
- <bodong@nvidia.com>, <saeedm@nvidia.com>
-Subject: Re: [PATCH net-next v3] Documentation: Add documentation for
- eswitch attribute
-Message-ID: <20240326202814.03c3b121@kernel.org>
-In-Reply-To: <20240325181228.6244-1-witu@nvidia.com>
-References: <20240325181228.6244-1-witu@nvidia.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald
+ Hunter <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jacob
+ Keller <jacob.e.keller@intel.com>, Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCHv2 net-next 2/2] doc/netlink/specs: Add vlan attr in
+ rt_link spec
+Message-ID: <20240326203425.1c5bbe5a@kernel.org>
+In-Reply-To: <20240326024325.2008639-3-liuhangbin@gmail.com>
+References: <20240326024325.2008639-1-liuhangbin@gmail.com>
+	<20240326024325.2008639-3-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,9 +63,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 25 Mar 2024 11:12:28 -0700 William Tu wrote:
-> Provide devlink documentation for three eswitch attributes:
-> mode, inline-mode, and encap-mode.
+On Tue, 26 Mar 2024 10:43:25 +0800 Hangbin Liu wrote:
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> 
 
-Hi Jiri, looks good?
+nit: please add a "---" line here so that the changelog is not part 
+of the commit after we apply it with git am.
+
+> v2:
+>  - Add eth-protocols definitions, but only include vlan protocols (Donald Hunter)
+>  - Set protocol to big-endian (Donald Hunter)
+>  - Add display-hint for vlan flag mask (Donald Hunter)
+> ---
 
