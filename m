@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-82341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F398288D559
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 05:09:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B507488D55A
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 05:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92B701F2F54F
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25118B21EE4
 	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 04:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D683824A08;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D67EC249FA;
 	Wed, 27 Mar 2024 04:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZAqnuxPQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NjLW1/AY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0A424205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF07C241EC
 	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 04:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711512575; cv=none; b=HkXa37jvPpMRuKMC+phOR6fkHePR4EuD9JbghzPMcHdCekIend4+2ESbNAxiP1555y8kLMH6C1Vh0fU5FruHEi6kkqVHaNImO52h3ymZhiqRSHsbcFVCnfqlqICtCJcqSG+zru0phIByUjVcXhb/w5OG5KDtA8cg5tlNSVR/WfM=
+	t=1711512575; cv=none; b=F872KCld357DkxTd4tGjyKw2gNuRWZi/bBCEWEa04dqMNfYDOONAaa4oVvyj1DddeAN3k+T7osJhjL4FNHvytEmNoG/AHx1gx8ZUbTCWXIlT1ZhRsDWFoy+t3UG4FL91zY1C85PDEUHE1itx1lL1uw850D1CMfDKWMTdfgm4Q8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711512575; c=relaxed/simple;
-	bh=q31/8B2SpeicIxOOnAtj2J6PqK6Quct4VhvLR73c0KU=;
+	bh=xr7ZedN21d+IrgNuQIJbeY8FbsfyIp9LcnmMozCPHoA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NcE1RxEEfWqwjHP+Xjje3AXKoxFVWGlIVTb2gcrtQcCHDefe5GVG4mbVNiwEmH25zSfPNzKAha1ERU374PVyHyNbDsqWOrGrfytIYoXiZFfhFo+jZP0Eh6V4nfhNf0u6J4p+T5ZNe7aZ2TnaP6KKm6FUmcWpSfDmY1Vi3HRcLxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZAqnuxPQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5CCFDC433A6;
+	 In-Reply-To:To:Cc; b=hSt3O1v4Cqm2qlZWp4HIIMgHryQATzI5oVqavWFCQwE9HkY8800mJKGo8GDRZvZflGsOt715EFI05h1XGrwOd/Ao5nm46FcWULtM+2jeCTr7uuePc5Gbd/6ggYVXLTPTBUuU/XgsROVYCZ/PBaXMj1T8w/et7kX0Ey3/wtUqVB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NjLW1/AY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 53370C433F1;
 	Wed, 27 Mar 2024 04:09:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711512575;
-	bh=q31/8B2SpeicIxOOnAtj2J6PqK6Quct4VhvLR73c0KU=;
+	bh=xr7ZedN21d+IrgNuQIJbeY8FbsfyIp9LcnmMozCPHoA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZAqnuxPQG34ujcaeYHTV73ChxubmmeXJKbuezltMFobiD04Ff/WviXxF4T5BrVRvJ
-	 vQTAdtdOK7DXO8oYf31fmeoPq6z+L6/QvQKUMPV4Toc9+8uNpJf4LA1/HciVaARcLz
-	 48v9MDG3I7WykG6mgY6N/x8Zr8dLVAHw0+wlFt/PrusjE8hsQ92He1xj4PcYTQU1g5
-	 YD9r1QAOymu/Nr11JrzqoHxrMSMHRU8gnJfcBWaMXWNn3Ok7ugouf+3/dS+Z4QlKRF
-	 TOtuA9h+NV7kXGNzKLoRkHxEx9Kae4h1ZhGT8bu/YExLB/QjEVy53dTTm/VeKtISeJ
-	 H3f9//8PVkj7w==
+	b=NjLW1/AYdlbF+yLVjG1FYsG3ERyAiwk0DwMjh8UAsykdOwz4xoOy47WMigxJAYKTJ
+	 t2ig/wZxRcGjjCFbpDMGi1Fp/5UXPifJBaLwgWkZTNpibNhgewrJa2J1XZu/Blg1pU
+	 zJPQsANgPRsZg4Vu3S+TaktV895FOlKMHyvZzlCA4D2sy9BgPFfgnyoa4o1sHQjWgY
+	 2A9d9bPFToQTMOKdsxs5J6ZSTphh3abLW8jxgNlXJdGcSx4uie3J5bFxlVagJhVI5h
+	 +q1jD1npT8fG7uvXHslZL5rNiSK8YoMx7868W5X7riLgXig7Dl6S3USBV5Mfe6sN6t
+	 HqGhwOZDBR3AA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4DC1AD95061;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45BE5D2D0EC;
 	Wed, 27 Mar 2024 04:09:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,43 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] tls: recvmsg fixes
+Subject: Re: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates
+ 2024-03-25 (ice, ixgbe, igc)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171151257431.29046.2588768601360918338.git-patchwork-notify@kernel.org>
+ <171151257428.29046.8286657405383973543.git-patchwork-notify@kernel.org>
 Date: Wed, 27 Mar 2024 04:09:34 +0000
-References: <cover.1711120964.git.sd@queasysnail.net>
-In-Reply-To: <cover.1711120964.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com,
- kuba@kernel.org, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
+References: <20240325200659.993749-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240325200659.993749-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Mon, 25 Mar 2024 16:56:44 +0100 you wrote:
-> The first two fixes are again related to async decrypt. The last one
-> is unrelated but I stumbled upon it while reading the code.
+On Mon, 25 Mar 2024 13:06:44 -0700 you wrote:
+> This series contains updates to ice, ixgbe, and igc drivers.
 > 
-> Sabrina Dubroca (4):
->   tls: recv: process_rx_list shouldn't use an offset with kvec
->   tls: adjust recv return with async crypto and failed copy to userspace
->   selftests: tls: add test with a partially invalid iov
->   tls: get psock ref after taking rxlock to avoid leak
+> Steven fixes incorrect casting of bitmap type for ice driver.
+> 
+> Jesse fixes memory corruption issue with suspend flow on ice.
+> 
+> Przemek adds GFP_ATOMIC flag to avoid sleeping in IRQ context for ixgbe.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/4] tls: recv: process_rx_list shouldn't use an offset with kvec
-    https://git.kernel.org/netdev/net/c/7608a971fdeb
-  - [net,2/4] tls: adjust recv return with async crypto and failed copy to userspace
-    https://git.kernel.org/netdev/net/c/85eef9a41d01
-  - [net,3/4] selftests: tls: add test with a partially invalid iov
-    https://git.kernel.org/netdev/net/c/dc54b813df63
-  - [net,4/4] tls: get psock ref after taking rxlock to avoid leak
-    https://git.kernel.org/netdev/net/c/417e91e85609
+  - [net,1/4] ice: Refactor FW data type and fix bitmap casting issue
+    https://git.kernel.org/netdev/net/c/817b18965b58
+  - [net,2/4] ice: fix memory corruption bug with suspend and rebuild
+    https://git.kernel.org/netdev/net/c/1cb7fdb1dfde
+  - [net,3/4] ixgbe: avoid sleeping allocation in ixgbe_ipsec_vf_add_sa()
+    https://git.kernel.org/netdev/net/c/aec806fb4afb
+  - [net,4/4] igc: Remove stale comment about Tx timestamping
+    https://git.kernel.org/netdev/net/c/47ce2956c7a6
 
 You are awesome, thank you!
 -- 
