@@ -1,159 +1,119 @@
-Return-Path: <netdev+bounces-82590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 091BD88EA1F
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:59:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97AA388EB5C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:33:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1DE928510D
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:59:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC26FB304BE
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6171812E1C9;
-	Wed, 27 Mar 2024 15:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A037F524BD;
+	Wed, 27 Mar 2024 16:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ueCJTHB3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfFvfus0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596764E1DC;
-	Wed, 27 Mar 2024 15:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F95C12EBD5;
+	Wed, 27 Mar 2024 16:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711555189; cv=none; b=ZukB1hiwX2mRZEj36uhYOTQjB3Fl74R2EnTEhzwEUZWGQoICRa/Q44zzWx1YyPD4GFL9ka7ns8dc1/4vmC/vR8+vIiC0NQQbmzj7+XLI1BQqOgRimiJhbMGzEYD8N8Wlm9oNOuahDfQV8dbBn63bVUJPV1pvG8vcGJyPemJJrq8=
+	t=1711555257; cv=none; b=gErfNU6eziTi/Y1yDjIp933fozZ5i3rz+9Uh+aBYr3/gioxYKPMEiTC066hq/D98sVRvdG/aUiNzKWy0lHRMx6bZ1xAWlPVY1vJJQ//35qOB4kMjNGd696ZxuDnu3kpsIwj+tfSP9vf6UYWjSVWWNxUwMu2gVPjd6XHbJBSCrgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711555189; c=relaxed/simple;
-	bh=ahlK969iEtBfPy2ESYo1kBB+dg89mMeSvLfKzLWoLLc=;
+	s=arc-20240116; t=1711555257; c=relaxed/simple;
+	bh=u6n+JOCbKSEs9oYkgfRBrVp4u4Bc/B/DGHjtaPIfQac=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BnNiDsei7hZyyyI8nxpzqCVxJU7g/1OALi4U5e4HE8zH8nZ9JK8vZRKS/OwhAow3ubPvj23FSkvUroSElTSpkhNG0+yHHP47od7LYzDvHBmatHI1G6iGdjYh8WeONcYvHP9458azCbPEvbNo5XdhF71MbnyLE3II/Ji27+qcepk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ueCJTHB3; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9Hvf1kcJmMZrkquYolDkUWZ6BPu0lUrFynvcvJG0xU4=; b=ueCJTHB3QmDBFaPEuyAeiwiH/E
-	Q/8fENuaqGIo59TZdVSa80uVHGnoY4pzx49BZD0ZJ/lDi8k+v0s4lAPIlUKsjjPW2RxTi0s+IVQIs
-	QTd9qIh4CrTdxEVcLqwXXrRQs5MuvqhSD0FoLQxxuDD5El7u6Ei7h03LPrxS+An1OcRwh744WYsm0
-	87egy56dFPwRgzwnV98KXH67J6F3Q4s2qzGbtAwsnYq9jMbztNdN+6wPwYkpi/Rp6CDBIqAnISr69
-	hBosEtc27jhOWJNMHBDbHuakbdknuuoj8l/+ucRcOzSqLbAUs9CLWckom+zs9+bPcxt/K3OiorJOl
-	LEL47uUQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47908)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rpVgc-0007Ef-1h;
-	Wed, 27 Mar 2024 15:59:34 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rpVgb-00010G-Qi; Wed, 27 Mar 2024 15:59:33 +0000
-Date: Wed, 27 Mar 2024 15:59:33 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: arinc.unal@arinc9.com
-Cc: Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	=?iso-8859-1?Q?Ren=E9?= van Dorst <opensource@vdorst.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net v2 2/2] net: dsa: mt7530: fix disabling EEE on
- failure on MT7531 and MT7988
-Message-ID: <ZgRCZSBniraUCuT2@shell.armlinux.org.uk>
-References: <20240321-for-net-mt7530-fix-eee-for-mt7531-mt7988-v2-0-9af9d5041bfe@arinc9.com>
- <20240321-for-net-mt7530-fix-eee-for-mt7531-mt7988-v2-2-9af9d5041bfe@arinc9.com>
- <799572b672ea8b4756236b14068aef7c8fa726a6.camel@redhat.com>
- <d65f4c45-e616-4157-a769-c285cbad575c@arinc9.com>
- <530da7c1-c058-44ef-84fd-86ff58f1501b@arinc9.com>
- <ZgRCFZBFvNSZ1a2U@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l0sQpkGKPczu4LMgZ9QMhYb84nil3q/opKZLuKGkYUAYlcwoSAvcj7Jv+Svgb6oqgHpuC/rOYXvigvfIfjOlbA0FlTangyaHsV0WL3wVU5N8ZSIb233xos0w4c4btMMJkVtW4EXjjI5bwmKKnr/jKw/kVXLq83rTJ/l88HsLecE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfFvfus0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01459C433C7;
+	Wed, 27 Mar 2024 16:00:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711555257;
+	bh=u6n+JOCbKSEs9oYkgfRBrVp4u4Bc/B/DGHjtaPIfQac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YfFvfus0K9rgM73e4RFSFYk9ZfrbyhADvtKBKQi6KsHAAuA3ky6rkjAzk1fIkl8gZ
+	 J4B/HuKG8Yz1zqxAd1jswnvyh9WipcMNMqh2lEn23f2yBF5jzl8GPeQQnU47ZowJIB
+	 paTPhlCxtNcPVfQjaKfOoEh+USnnbBUr9rmKX7LTBIRHbTgVWua5woTlnxcRwLxXqW
+	 NZN8OaklRgaV+O9gXTNkNbo0Q4jsgjkORNzC7pMkm9Glh0r60PHro6vibRMEB9953n
+	 2ylLAWKKRofiLmpTYMkl83GHcg16t1M2a81yGSJrT/H1QV4VB/qHe/rsz5Aacb/Vjv
+	 +vOaFyiG1793Q==
+Date: Wed, 27 Mar 2024 16:00:52 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: dave.stevenson@raspberrypi.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] net: usb: ax88179_178a: non necessary second
+ random mac address
+Message-ID: <20240327160052.GP403975@kernel.org>
+References: <20240326092459.GG403975@kernel.org>
+ <20240326163107.306612-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZgRCFZBFvNSZ1a2U@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20240326163107.306612-1-jtornosm@redhat.com>
 
-On Wed, Mar 27, 2024 at 03:58:13PM +0000, Russell King (Oracle) wrote:
-> On Wed, Mar 27, 2024 at 11:46:19AM +0300, arinc.unal@arinc9.com wrote:
-> > On 26.03.2024 12:19, Arınç ÜNAL wrote:
-> > > On 26.03.2024 12:02, Paolo Abeni wrote:
-> > > > If I read the past discussion correctly, this is a potential issue
-> > > > found by code inspection and never producing problem in practice, am I
-> > > > correct?
-> > > > 
-> > > > If so I think it will deserve a 3rd party tested-by tag or similar to
-> > > > go in.
-> > > > 
-> > > > If nobody could provide such feedback in a little time, I suggest to
-> > > > drop this patch and apply only 1/2.
-> > > 
-> > > Whether a problem would happen in practice depends on when
-> > > phy_init_eee()
-> > > fails, meaning it returns a negative non-zero code. I requested Russell
-> > > to
-> > > review this patch to shed light on when phy_init_eee() would return a
-> > > negative non-zero code so we have an idea whether this patch actually
-> > > fixes
-> > > a problem.
-> > 
-> > I don't suppose Russell is going to review the patch at this point. I will
-> > submit this to net-next then. If someone actually reports a problem in
-> > practice, I can always submit it to the stable trees.
+On Tue, Mar 26, 2024 at 05:31:07PM +0100, Jose Ignacio Tornos Martinez wrote:
+> If the mac address can not be read from the device registers or the
+> devicetree, a random address is generated, but this was already done from
+> usbnet_probe, so it is not necessary to call eth_hw_addr_random from here
+> again to generate another random address.
 > 
-> So the fact that I only saw your request this morning to look at
-> phy_init_eee(), and to review this patch... because... I work for
-> Oracle, and I've been looking at backporting Arm64 KVM patches to
-> our kernel, been testing and debugging that effort... and the
-> act that less than 24 hours had passed since you made the original
-> request... yea, sorry, it's clearly my fault for not jumping on this
-> the moment you sent the email.
+> Indeed, when reset was also executed from bind, generate another random mac
+> address invalidated the check from usbnet_probe to configure if the assigned
+> mac address for the interface was random or not, because it is comparing
+> with the initial generated random address. Now, with only a reset from open
+> operation, it is just a harmless simplification.
 > 
-> I get _so_ much email that incorrectly has me in the To: header. I
-> also get _so_ much email that fails to list me in the To: header
-> when the author wants me to respond. I don't have time to read every
-> email as it comes in. I certainly don't have time to read every
-> email in any case. I do the best I can, which varies considerably
-> with my workload.
-> 
-> I already find that being single, fitting everything in during the
-> day (paid work, chores, feeding oneself) is quite a mammoth task.
-> There is no one else to do the laundry. There is no one else to get
-> the shopping. There is no one else to do the washing up. There is no
-> one else to take the rubbish out. All this I do myself, and serially
-> because there is only one of me, and it all takes time away from
-> sitting here reading every damn email as it comes in.
-> 
-> And then when I end up doing something that _you_ very well could do
-> (reading the phy_init_eee() code to find out when it might return a
-> negative number) and then you send an email like this... yea... that
-> really gets my goat.
+> cc: stable@vger.kernel.org # 6.6+
+> Fixes: 9fb137aef34e ("net: usb: ax88179_178a: allow optionally getting mac address from device tree")
+> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+> ---
+> V1 -> V2:
+> - Split the fix and the improvement in two patches and keep curly-brackets
+> as Simon Horman suggests.
 
-... and now I have a 1:1 with my manager for the next 30-60 minutes.
-Is it okay by you for me to be offline for that period of time while
-I have a chat with him?
+Hi Jose,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks for splitting the patches.
+They look good, but there are a few process issues.
+Sorry for not being clearer in my previous email.
+
+As the 2nd patch of the series is not a fix it:
+- Should not have a fixes tag
+- Should not be sent to stable
+- Should be targeted at the net-next tree rather than the net tree
+
+As the granularity of patch handling on netdev is generally at the
+patchset level I believe that this means that you need to separately,
+in different, new, email threads, repost:
+
+1. Patch 1/2 of this series, targeted at net, with a Fixes tag
+
+   [PATCH net v3] net: usb: ax88179_178a: avoid the interface always configured as random address
+
+2. Patch 2/2 of this series, targeted at net-next, without a Fixes tag
+
+   [PATCH net-next v3] et: usb: ax88179_178a: non necessary second random mac address
+
+Also, please be sure to wait 24 hours since the posting of this patch-set
+before reposting.
+
+Some more information can be found here:
+https://docs.kernel.org/process/maintainer-netdev.html
+
+...
+
+--
+pw-bot: changes-requested
 
