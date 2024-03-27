@@ -1,148 +1,195 @@
-Return-Path: <netdev+bounces-82358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C233B88D743
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:29:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C990F88D78A
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:44:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AFD6282E9F
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:29:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D3562966D1
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B90D28DC8;
-	Wed, 27 Mar 2024 07:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4DC2C693;
+	Wed, 27 Mar 2024 07:44:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DDkQ134D"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SdBvHhiu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2465D28DAE
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79D92C1B4
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711524589; cv=none; b=pZYw8NBJ5JR2jsOk/eVyfEYwODW12NQ7q0BacVMpPFdZqG/+KOBQglxRiZbN1cGleFIGKrPERthfF47u67r37zqBF+fGxLQ+dhkyFFjCb6ZH8Tdsq8kXNkPiorWwJenhT+yZWTmGKWRcxwzK86sU1By6J7Zd1/vhPfyx8xigjAw=
+	t=1711525483; cv=none; b=DPMRVQIQ6X/4mTxcJzDKDsD4GGfDXzC8FWULUAiI0QuYiumDNVBY5HTy0N8xVRYtJubsaM/XVZoQeDAYT1pmKwFd4suekHzP4rW6jPYsf1U7kzBPotLVrcwTrE14E2CdFQzxSIhUVbiqZsuIaBheTlKyx9FRQq/oCCvfgISHMWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711524589; c=relaxed/simple;
-	bh=u2wKnhEypQjtnqRaK5MI7baqVABv6jSUiswMbhJsllU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=TYufrTVndXvHR9j8shELQhS9Q8bvlxYtS9M+5kodND33MY+36t3X6bKdxctVUHz0Kk+ytg0TBBKaXQJmrMu8mFRWibKoBBeI7NNRWbsGQdAO4n9ebS/q3AXOpDXVmzHc47mXCfiQrwPmXin7boOLtgzKz713Mn1neTDeWp0fNTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DDkQ134D; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711524586;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I+MC2q8y8nD5KthMzwqiAm8lJS2baMGc2mOBEQ/3u6A=;
-	b=DDkQ134DfZgt3OlE6vPNPw4DD+OmycyGhVherG3Hpp/yD8+9byE0lWzrmP+aMZsdxLFv6Z
-	Pr1z/CIR2QXgvA7GK76EjA5UHiyU2+SXssRoK4M+JADNAvtbm2BrhYiZGAPYvgmmEbLHgb
-	sD/uSHNxzIJJZJEqSA7ofs/+Lu6VVzs=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-156-nqxTmeZ1MK2Q_AuxGNsxpA-1; Wed,
- 27 Mar 2024 03:29:42 -0400
-X-MC-Unique: nqxTmeZ1MK2Q_AuxGNsxpA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D63653800E8D;
-	Wed, 27 Mar 2024 07:29:41 +0000 (UTC)
-Received: from [10.45.224.197] (unknown [10.45.224.197])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 32D79C017A2;
-	Wed, 27 Mar 2024 07:29:40 +0000 (UTC)
-Message-ID: <8e585156-4f6f-4837-9375-f29842fa7f85@redhat.com>
-Date: Wed, 27 Mar 2024 08:29:35 +0100
+	s=arc-20240116; t=1711525483; c=relaxed/simple;
+	bh=meBEX830gRW4HXcwRaI98fQKaU/0vg8wDYKxDADJaXA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mCNPUKpi77K8hQcb7NIyh0A8Q1Xb6uKqNKGQmUMKarp2je3uPYHEsoKey2ewB1YffqPavd6TjFjfAoGKJsyqOF95Q369d0c1hJHEvpl+4gHSteybXxbUg0rLlkgXly5zxC3g28D759RgtWOqy315fN8lqcrXxmneoI6EYKo2ZoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SdBvHhiu; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a46a7208eedso866344466b.0
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 00:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711525480; x=1712130280; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cwJgbNd9Cb1xxQGP3U28yL2PzFi4V4xZap9Ru43Q/Mw=;
+        b=SdBvHhiuyUFUwk8YiTvwTtM0bHquxeOd2OPGUG8vYvWcXZnHxn1vC3JMkri5DuT2yE
+         izjt00bO/nAqGy0SL8agPK3BuCqc6QXUmOA81omR5XOsCZAWY4+FubBak/OxYtnjhaOi
+         S0FMQW1j/sFO41MbQXMHvg5E1Y3x+AyH+prQe5CztQWuAeX2TuSaqudsfrRLDFw8ULO6
+         hD5OyKb3+NKvXLrQFbLzvXsEoLWswJC2E0e//xCD6uvBc11LNNLZTlqeNKgnxJfNReSE
+         eXjh7sFj/Nwpyil4JxHw4LdEThDgguzEq8fAkBXS8io9mTMUMdbcJ611WUE/hZCi13h8
+         I0Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711525480; x=1712130280;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cwJgbNd9Cb1xxQGP3U28yL2PzFi4V4xZap9Ru43Q/Mw=;
+        b=iGBUJAO8vDYqNTeKcPP9mgAaD3DinGd5YgrToCaAw2tAp9uNAZblwfUeKFioeMn7tG
+         3+1B0p6uZ/UnCxAqbtz50WiRtlA4N8Xod1JL654hf3r2Dl7q/F+BjlvtSKWkdRCx1l7r
+         /T+CN+xyIhQ71owk3KtyLvwmxsuGil5MK8LZl+/TVrOSBcyLiI1PbaTMdxSedcb5X4AG
+         sxw7D4NHuYOnTc0J6dY5M8PMbiqq1A9Pao6ACWVSzu6S+w3PbpxH3Ax6ua8wGFQ5wuqa
+         7l4GvwVlpRXQRohEdK3AGpmjY0DkMBdnoXXWY8jWn/gbp25c7mN/6D2kqUGtn8CuqNcQ
+         kx1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVVQzu2ZBtXw/ZVseMSZLrpbE7OjhUsjvLgiKUwJX5m8OKouaKnAXNfcQKlF3kgXC6j9/NWhuHA28lCY0p+E4WbGsqnmlM/
+X-Gm-Message-State: AOJu0YyW2GulmIK0t7BA/L4Cii+zZvJH8h4xar1OXK/lhnzdWMDo/v5V
+	r6pEef5RndjKhGERfhkDxi5uz0UxZYj0NhJHu/vtocD3lxC1NRpZ1qJePuK3ebo=
+X-Google-Smtp-Source: AGHT+IGlvH7IOquxCns2fE0YzmhHeEjVjLkRMbV5aqG3+Bvmapd6+zXlFoC0J4tu34KlhV5VJ7nhhQ==
+X-Received: by 2002:a17:906:4112:b0:a46:930c:b793 with SMTP id j18-20020a170906411200b00a46930cb793mr2316193ejk.9.1711525480120;
+        Wed, 27 Mar 2024 00:44:40 -0700 (PDT)
+Received: from [127.0.1.1] ([178.197.206.205])
+        by smtp.gmail.com with ESMTPSA id am11-20020a170906568b00b00a474690a946sm4671745ejc.48.2024.03.27.00.44.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 00:44:39 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH 00/19] ACPI: store owner from modules with
+ acpi_bus_register_driver()
+Date: Wed, 27 Mar 2024 08:43:47 +0100
+Message-Id: <20240327-b4-module-owner-acpi-v1-0-725241a2d224@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] i40e: Fix VF MAC filter removal
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: aleksandr.loktionov@intel.com, mschmidt@redhat.com, horms@kernel.org,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <20240313135618.20930-1-ivecera@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20240313135618.20930-1-ivecera@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-B4-Tracking: v=1; b=H4sIADPOA2YC/x3MSQqAMAxA0atI1gY0VhyuIi6qjRrQVlocQLy7x
+ eVb/P9AYC8coE0e8HxKEGcj8jSBcdF2ZhQTDZSRygqqcFC4OXOsjO6y7FGPu6BRjap1Q1SUOcR
+ 09zzJ/W+7/n0/4mos7mYAAAA=
+To: "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>, 
+ Robert Moore <robert.moore@intel.com>, 
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>, 
+ Corentin Chary <corentin.chary@gmail.com>, 
+ "Luke D. Jones" <luke@ljones.dev>, Hans de Goede <hdegoede@redhat.com>, 
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+ Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>, 
+ Daniel Oliveira Nascimento <don@syst.com.br>, 
+ =?utf-8?q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
+ Matan Ziv-Av <matan@svgalib.org>, Mattia Dongili <malattia@linux.it>, 
+ Azael Avalos <coproscefalo@gmail.com>, 
+ Richard Cochran <richardcochran@gmail.com>, Jeff Sipek <jsipek@vmware.com>, 
+ Ajay Kaher <akaher@vmware.com>, Alexey Makhalov <amakhalov@vmware.com>, 
+ VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
+ Theodore Ts'o <tytso@mit.edu>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+ "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Cc: linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ acpica-devel@lists.linux.dev, linux-input@vger.kernel.org, 
+ netdev@vger.kernel.org, chrome-platform@lists.linux.dev, 
+ platform-driver-x86@vger.kernel.org, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2754;
+ i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
+ bh=meBEX830gRW4HXcwRaI98fQKaU/0vg8wDYKxDADJaXA=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmA85It2J1eYnVhuIuXN7MMCJqdE2fAF7WfeZ2j
+ n2apL2796uJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgPOSAAKCRDBN2bmhouD
+ 1/SnEACOwWo91bl9rH3s5QXO4O8oEUXK1eW8eqIErfBujjd0mBVo1U62GGVdqCTwbnohFmGH8uS
+ 0Hg0mT7Zeq81wweeJX6lhia/0ZXEq+ZS+N/VqqJ7A+7ylKAQBaJ/b12k4fTnfTvl8ROmcKTYwMO
+ xzDw5Zk15EIcQqY7MGSWFtkoR4IrS2/djZzKQcElvc6wPnn9pAGHCnlsuqyNNfA0qKbLEKwbCZL
+ ZHiY9SxWBdWl2HKHK8Mx9QC92FqorWxtdvlyyZbo8P3rLgNwOgKI/2iM2FL86OTTYm/I8h8K0uT
+ 4zjFkXBSfJa5ZtEMyVYWaO/zJcCvsyANCUfmn+nApiQWih+qd2Bfgz7Gha5MiT/O9rP6SsOOlUM
+ tbNEj8Cj8fPjz4pTITvXtRtmnxGIMv7j1sZ7b1tn1QCd0wj9ZTUDDh5LA2Wqr/EqqxRiP7yhmJx
+ VlCIdsMAP0QRviCJeFZ/5IZsqoWkmPw48k2Jj1hAr4Y6e7OhxXXvGltn8sh7mvh4j0J5zpBJlM2
+ fjx/dZOndwUdkjsJSP0MbGEgMKEUw3t1Q1gKfYe6exbD7qfbc0CGKaHnss5MMzmn9bJVCGnsroA
+ wySn4govEwvO62oJtu9o8OUcuu12dPLodXlbGS6LxGJSnQfhXloYUEOlIsusrAiizfR4Vy/tLG2
+ szuZE69hHAS2bhA==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
+ fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-On 13. 03. 24 14:56, Ivan Vecera wrote:
-> Commit 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove
-> administratively set MAC") fixed an issue where untrusted VF was
-> allowed to remove its own MAC address although this was assigned
-> administratively from PF. Unfortunately the introduced check
-> is wrong because it causes that MAC filters for other MAC addresses
-> including multi-cast ones are not removed.
-> 
-> <snip>
-> 	if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
-> 	    i40e_can_vf_change_mac(vf))
-> 		was_unimac_deleted = true;
-> 	else
-> 		continue;
-> 
-> 	if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
-> 	...
-> </snip>
-> 
-> The else path with `continue` effectively skips any MAC filter
-> removal except one for primary MAC addr when VF is allowed to do so.
-> Fix the check condition so the `continue` is only done for primary
-> MAC address.
-> 
-> Fixes: 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove administratively set MAC")
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 11 ++++++-----
->   1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> index b34c71770887..10267a300770 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> @@ -3143,11 +3143,12 @@ static int i40e_vc_del_mac_addr_msg(struct i40e_vf *vf, u8 *msg)
->   		/* Allow to delete VF primary MAC only if it was not set
->   		 * administratively by PF or if VF is trusted.
->   		 */
-> -		if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
-> -		    i40e_can_vf_change_mac(vf))
-> -			was_unimac_deleted = true;
-> -		else
-> -			continue;
-> +		if (ether_addr_equal(addr, vf->default_lan_addr.addr)) {
-> +			if (i40e_can_vf_change_mac(vf))
-> +				was_unimac_deleted = true;
-> +			else
-> +				continue;
-> +		}
->   
->   		if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
->   			ret = -EINVAL;
+Merging
+=======
+All further patches depend on the first amba patch, therefore please ack
+and this should go via one tree: ACPI?
 
-Hi Tony,
-the fix is not part of your recent pull series for i40e... I have 
-submitted it to 'net' instead of 'iwl-net' as it fixes recent commit 
-that causes MAC filter resource leaks that should be fixed as soon as 
-possible. But its status in patchwork is 'Awaiting upstream' so it has 
-to be resubmitted by yourself... Or should this be picked directly by 
-netdev maintainers?
+Description
+===========
+Modules registering driver with acpi_bus_register_driver() often forget to
+set .owner field.
 
-Thanks,
-Ivan
+Solve the problem by moving this task away from the drivers to the core
+amba bus code, just like we did for platform_driver in commit
+9447057eaff8 ("platform_device: use a macro instead of
+platform_driver_register").
+
+Best regards,
+Krzysztof
+
+---
+Krzysztof Kozlowski (19):
+      ACPI: store owner from modules with acpi_bus_register_driver()
+      Input: atlas: - drop owner assignment
+      net: fjes: drop owner assignment
+      platform: chrome: drop owner assignment
+      platform: asus-laptop: drop owner assignment
+      platform: classmate-laptop: drop owner assignment
+      platform/x86/dell: drop owner assignment
+      platform/x86/eeepc: drop owner assignment
+      platform/x86/intel/rst: drop owner assignment
+      platform/x86/intel/smartconnect: drop owner assignment
+      platform/x86/lg-laptop: drop owner assignment
+      platform/x86/sony-laptop: drop owner assignment
+      platform/x86/toshiba_acpi: drop owner assignment
+      platform/x86/toshiba_bluetooth: drop owner assignment
+      platform/x86/toshiba_haps: drop owner assignment
+      platform/x86/wireless-hotkey: drop owner assignment
+      ptp: vmw: drop owner assignment
+      virt: vmgenid: drop owner assignment
+      ACPI: drop redundant owner from acpi_driver
+
+ drivers/acpi/bus.c                        | 9 +++++----
+ drivers/input/misc/atlas_btns.c           | 1 -
+ drivers/net/fjes/fjes_main.c              | 1 -
+ drivers/platform/chrome/wilco_ec/event.c  | 1 -
+ drivers/platform/x86/asus-laptop.c        | 1 -
+ drivers/platform/x86/classmate-laptop.c   | 5 -----
+ drivers/platform/x86/dell/dell-rbtn.c     | 1 -
+ drivers/platform/x86/eeepc-laptop.c       | 1 -
+ drivers/platform/x86/intel/rst.c          | 1 -
+ drivers/platform/x86/intel/smartconnect.c | 1 -
+ drivers/platform/x86/lg-laptop.c          | 1 -
+ drivers/platform/x86/sony-laptop.c        | 2 --
+ drivers/platform/x86/toshiba_acpi.c       | 1 -
+ drivers/platform/x86/toshiba_bluetooth.c  | 1 -
+ drivers/platform/x86/toshiba_haps.c       | 1 -
+ drivers/platform/x86/wireless-hotkey.c    | 1 -
+ drivers/ptp/ptp_vmw.c                     | 1 -
+ drivers/virt/vmgenid.c                    | 1 -
+ include/acpi/acpi_bus.h                   | 8 ++++++--
+ 19 files changed, 11 insertions(+), 28 deletions(-)
+---
+base-commit: 1fdad13606e104ff103ca19d2d660830cb36d43e
+change-id: 20240327-b4-module-owner-acpi-d4948a922351
+
+Best regards,
+-- 
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 
