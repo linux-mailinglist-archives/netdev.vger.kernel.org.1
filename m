@@ -1,101 +1,135 @@
-Return-Path: <netdev+bounces-82668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC6A288F087
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:57:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C5188F08D
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:00:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 766952A380B
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:57:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DA132A5381
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8EE152E1D;
-	Wed, 27 Mar 2024 20:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I32QU/6W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E44C153510;
+	Wed, 27 Mar 2024 21:00:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C3941760;
-	Wed, 27 Mar 2024 20:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CFF1327EC;
+	Wed, 27 Mar 2024 21:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711573048; cv=none; b=gX7B9WFr5lpwE7/bAS5n31wO+7VPQpw8GnZ0qUqxGsGW0fW8jFrzJZxXQieh6jVzMUVh5JD7lExCJlP9/ZFpFpADb8Y+ZC35LAW7b8KOl+pwenwzNh7jeT8C+J4rSx0PpA69QoUrq8u6ln3mvZ888gvEpJGx4qZLOy7f20hd5eY=
+	t=1711573222; cv=none; b=uZmzPDCfeNNxAmBT7eJqLDkAKzdp36oJOchD4diysKkuEOi5nkpubFKiMb8aQSXwjpe/S8oW0nKENEBBem8es00yTvXrTRV6rzLz47X5MJXeFda7GXN1VBDEdRxy1NVjCAPDY4lcGpraxnOW3nlHX4dC45TH/FA4uT62WN08UfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711573048; c=relaxed/simple;
-	bh=pjHbYSEpPgHM1kEiDgVmvCyBkD87pYONFMJomn9n2Q0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=Z/jA1FVl0/rcU3pjKHAcKEqMA/dfv7mcTZyD2Y+hm6TUgH4lf5Sa21jhVdtw9/A/YWGW4yQr0m+/UmJe/+kqOWPmVkmnM7iso9VOdHWwKXk++7eAFvycEY5pOqVhs5lNJHjeEv8IF/kBQiGRF9U51cTGXHMdv5jYEjSCZZKE2so=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I32QU/6W; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-33ed6078884so769771f8f.1;
-        Wed, 27 Mar 2024 13:57:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711573045; x=1712177845; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:cc:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t/OshXTbOf0/0RWZkIZUHM3fViD/ee2V/FuKY2I6mRk=;
-        b=I32QU/6WanVhdFjkUY2LcJEfMgKg8SCVpICuxn8ZlCgXgu4djJYNHGiRnD0ed07gDz
-         0EbUxxDmCdrj+P/a5YQirgGM/ZXq1IQPkVWRg1eVDmi9qWydNnKoZyS4LB7HivoHiX32
-         RBliTDcNXoeaewGqBanBO1+6QFUkD5botxhYeQ/wvwkzL2c2i4SDXfohvU4R/Y55rVfK
-         x5EraOhIA56LW8LICNWUCmnv4PU1PfLmiQ2zbOi3rKbEfFhvr+cMGzJHUAjD00nK8trI
-         JYS7GfKZUqJJxJNbBwP9VvLznQmnMLwKx9EK9bVMFAFXThJIkk+6Q2E63QIZajoaqOYb
-         tAXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711573045; x=1712177845;
-        h=content-transfer-encoding:in-reply-to:from:cc:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t/OshXTbOf0/0RWZkIZUHM3fViD/ee2V/FuKY2I6mRk=;
-        b=FYXgTXKzuiVLCEisu2ZnK1UoPwypkzwF5hcw6cbDqlbxgZR2m3xOJwaHGIfKCYoWDK
-         VqzfoK7hkaPDWHzQS1eXsIixDPdqY1P1rTuIQ8EiYOLuj+32sO3SdHbKVmbqcMFE3Aii
-         FB0QV8llToaCY4GfkuToU2GWHnY8syVcMBfu5G6KLTSFbGg3v+sw948e+bhNlh1A6atV
-         zfs1n6IQ3VZlWy1XiFUcFJpEspUCCF+4LQgeG7yNVWoWaFSBF5ltuvFCr5yqx5mknnq5
-         8+K+X6YZg9VI7QumjOMGpekCfLbQq7rTaIJJJBKPKQ7G4VKdO9DJaSlrjShv1rJyjfPU
-         VBLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuVj3ZASnp50oj90e22SPKj9Go0BnFVnsaG/UFzXjVmySffkjFEZuvPqU6/OehuvPius0010cxBw0Onjrjr5H+KHLEnh15
-X-Gm-Message-State: AOJu0YzURp30j5uqkqTEsFJUoL+F0JcEW+VOwLerHcvrH3XDeOAhBvOi
-	wJtpo9vC7VJAe+CroiqIwuat0SSIGwdXDyecM9IMHThvbKvlrLDa
-X-Google-Smtp-Source: AGHT+IE1BOKkogON6pk/RJmUnwZD11wOJqQQZBQDW8z+OqIgl1EJ3OGOPeKP7pWDwh7CTXDnWm2B6Q==
-X-Received: by 2002:a5d:590e:0:b0:33e:2d7b:c5a8 with SMTP id v14-20020a5d590e000000b0033e2d7bc5a8mr318923wrd.17.1711573045356;
-        Wed, 27 Mar 2024 13:57:25 -0700 (PDT)
-Received: from [192.168.0.3] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id az7-20020adfe187000000b00341ce80ea66sm8669296wrb.82.2024.03.27.13.57.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 13:57:24 -0700 (PDT)
-Message-ID: <46091098-d51b-45b2-a17f-f1e0329bcf01@gmail.com>
-Date: Wed, 27 Mar 2024 22:57:37 +0200
+	s=arc-20240116; t=1711573222; c=relaxed/simple;
+	bh=x7O4GJqe2xti4nuEXHz6sAiFWm1Qt5JV/1A5WBS+MwE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gN60ZNJ3QAO+sGEnC3RwHKxHJEaZUBGL92UIP/cI/hmcQHEJL3IEtu00CX6+BYMJSFeqeYyfcc+46vhbuNF++pEzWpwxHUa8CIjfN5giDWCuYL32UJHiKoEhabfBTxKZKgKGPI7ZmKMopAScfbseB+y2i4u4H23831BJojeACUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.86.12) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 28 Mar
+ 2024 00:00:02 +0300
+Subject: Re: [PATCH 1/2] net: ravb: Always process TX descriptor ring
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	<netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240326083740.23364-1-paul.barker.ct@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <f656ecda-6d4b-15ed-9ac5-ec626e25d0a3@omp.ru>
+Date: Wed, 27 Mar 2024 23:59:53 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/4] net: wwan: mhi: drop driver owner assignment
+In-Reply-To: <20240326083740.23364-1-paul.barker.ct@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Loic Poulain <loic.poulain@linaro.org>,
- Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org
-References: <20240327174810.519676-1-krzysztof.kozlowski@linaro.org>
- <20240327174810.519676-2-krzysztof.kozlowski@linaro.org>
-Cc: linux-kernel@vger.kernel.org
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20240327174810.519676-2-krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/27/2024 20:45:40
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 184456 [Mar 27 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 13 0.3.13
+ 9d58e50253d512f89cb08f71c87c671a2d0a1bca
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.12 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.12
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 03/27/2024 20:50:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 3/27/2024 6:25:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 27.03.2024 19:48, Krzysztof Kozlowski wrote:
-> Core in mhi_driver_register() already sets the .owner, so driver
-> does not need to.
+On 3/26/24 11:37 AM, Paul Barker wrote:
+
+> The TX queue should be serviced each time the poll function is called,
+> even if the full RX work budget has been consumed. This prevents
+> starvation of the TX queue when RX bandwidth usage is high.
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Fixes: a0d2f20650e8 ("Renesas Ethernet AVB PTP clock driver")
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
 
-Acked-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+[...]
+
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index d1be030c8848..4f98e4e2badb 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1324,12 +1324,12 @@ static int ravb_poll(struct napi_struct *napi, int budget)
+>  	int q = napi - priv->napi;
+>  	int mask = BIT(q);
+>  	int quota = budget;
+> +	bool rearm = true;
+
+   I don't think we need an initializer, it gets reassigned below.
+   And I'd rather call it unmask...
+
+>  
+>  	/* Processing RX Descriptor Ring */
+>  	/* Clear RX interrupt */
+>  	ravb_write(ndev, ~(mask | RIS0_RESERVED), RIS0);
+> -	if (ravb_rx(ndev, &quota, q))
+> -		goto out;
+> +	rearm = !ravb_rx(ndev, &quota, q);
+>  
+>  	/* Processing TX Descriptor Ring */
+>  	spin_lock_irqsave(&priv->lock, flags);
+[...]
+
+MBR, Sergey
 
