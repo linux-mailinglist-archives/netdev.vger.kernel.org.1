@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-82634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110E588EE0F
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:17:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DC1188EE21
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:19:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06B901C2DF72
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:17:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EAACBB21972
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C317714E2F9;
-	Wed, 27 Mar 2024 18:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC7714F105;
+	Wed, 27 Mar 2024 18:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYdl0sWW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDWcl568"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F36130A63
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 18:17:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E8C14D717
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 18:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711563430; cv=none; b=tUchHx9l85S0GoxBoisZqYfTHNLtEtmYNVFBGofEvouDfv6IVpwoE4cWxqqncYPSoebLzcqwy6fqNA0djQbKKx7pBdbDHX4Ib1ivlNL84Riw61wQnm+/AUXGAJwY480ckM0BO20VdKAsp8BxRXcqb2tpZALbKKVKfFZiqE1LO+8=
+	t=1711563431; cv=none; b=gOkJE4A58xaL6sqVHWgXG08PWDqLYs694EhD2ZLgVnVKECAnATBSBRJ5Dr1ZwPH61iEyNrL4u+9c6xnWh4kpX6bCB+u4J5DAupJtlXaUYmmspDBWpDm6dxOxdYMKbzzb39PDmdS+Tz3WYYnDB168RAz/s3UE/kf6nekBA7UzkUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711563430; c=relaxed/simple;
-	bh=O+UqMcCS79jOyq1iWue0XKO/fs2v42fPL6+Kbmo5rB8=;
+	s=arc-20240116; t=1711563431; c=relaxed/simple;
+	bh=ZwOfMQEo85FAbkApsVodyGnX3s2noxt0sg8rMI+dkqc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r1SluH/KWa6EMkjtAbzUkYaocsD82OBCxT8o9yZf0YvNKVnqS3m4t2Y554Ul63RvVF1ndgdlYkrzgBd3zvCAggUVZ+eddaVqVnoMeveR6Mcmjb0HjNdqR8pRe+IYzZb0/iOlt466xbds1fGmysXRfN0IR11sGe26kysJ2i+FGrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IYdl0sWW; arc=none smtp.client-ip=209.85.221.53
+	 MIME-Version; b=VrU/OCIo9BG59t++rpMDrDuDA4AwU1/tGHeITAQ58GHC2nk8KyG/1O8YhxDx84wkqDSX5xsz0ak/vTYruG2UJXhw/wg5N/fbdyMDnsOoQMFscVpIKfnDkesqYMLJ/4h046WcyxcufiL1AR2Zu6a23UBUPmKLcLYNE81oMw1hFrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDWcl568; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33ed4dd8659so819614f8f.0
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 11:17:07 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33ed7ba1a42so22121f8f.2
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 11:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711563426; x=1712168226; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711563427; x=1712168227; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZrwA1x20/xC+pYy5KqYqlGXxArd1oHVz7kN0iSqFPGs=;
-        b=IYdl0sWWm+UXsP36lAEbKJqlc7VsWjVlJbskiJgpPSRTBlTodf52p1wIO+WjiA4uPi
-         eNQhvkgJzqwo18sSV+wYrj6hSwtfprZUL+euqanshaKSU4rydQqIFkDcyYkHqZ3SUhFT
-         7/9f1461YBd0PsE78JOAczOgm9TpbrM+5rmmYRZ16oPDdMUduavCpqmYzztTAQOAImKk
-         FKAUW6+prD3A8P4vWnhWVdKto5o1m5nGWr7435kDQu9A5KwZfqSwprZjkHZd84U3bL/H
-         bLiw25PQWwgiM6nDDkmH8XR5rTxuPWgIvKVcRVV0DJFhlVaq3O7vtc62GX3+lWXXJgTp
-         z34w==
+        bh=9qn8TFAerzpQEshTl46/Kmqots7yf4ojhzF0TbaqZVQ=;
+        b=CDWcl568I/dxMw3EXLPoEv1ipsIWRGgb+43rZsN4T7Ns7rrj9vzU25PVKe5dp7NGDW
+         rs/aMy7jMGsbUjsLZkqe56BFgt1j+jLFQuvhHBfKaWMfgrOQS+BYp8D9q3f9ab59vyG4
+         uQfjXcnEGBxNpDSMxTtD/q1JldogEY9me6RVI5AOrw8sPisQE+TXN1rJnHdXpZ6QRGbD
+         p8IUPG65dU0EF7d/9WxdQgKu45tX6iQNx/yOcv1BLrZxpQ4haCQoeYYxFBhEmsr/XstB
+         B6qqa4kTdcQLcQL9JpcOx7lPx/fEEWYI+mNJyZ53f9WYulAN+m1mo0bPo3v88YhEMZ0z
+         fNlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711563426; x=1712168226;
+        d=1e100.net; s=20230601; t=1711563427; x=1712168227;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZrwA1x20/xC+pYy5KqYqlGXxArd1oHVz7kN0iSqFPGs=;
-        b=OcJ4NWj7b3kXhEcTRQj9eNuS9sRBLNtmki/81jv5ybyJjw+xOqKceNMYTtBT3zv0G4
-         mKu2q7BitX97xmUcFX3zsAaSuDrgWVmBFFV/9JgusO/EGkMbmE57xZEioQQeQ02qwao5
-         PiN+aivFSF8g/A3y7XzzFQySijbAaF/SKP9Zjy1mf8NwD6zMyhWBNVHShxjWQcymmn5H
-         Lwv7XfAzCcZAVWj/6ofMIyOY4hp9oFlfyp8aCmsc+70C6r6YiqAZDoE9edRW38gQSD2e
-         rsFImGFWPkXO/zZ/kC066Wiy3Al1jk8/Q0YtjGa15OWDab4AVdV7rHRrYtN4V5xiYvl5
-         Ag/g==
-X-Gm-Message-State: AOJu0YzCkb5CXrMoqLx7IwQ3Z+0sYTEGk6XUHCPRkvHN7qmLSFXgtvOD
-	d9PRdQitgkS45kfulkDw2geawAWYz5od+SjssCYNZ4kPC8ZNyzlU5TprxTNR6mc=
-X-Google-Smtp-Source: AGHT+IHdmjQVH8Ye9AmutDf76YNqk3HO6CLgX5GJaHm576dCQhBDqUFLApZGqZBJ1vzI+g1uxAB1HQ==
-X-Received: by 2002:a5d:66c5:0:b0:342:cd1b:eb5f with SMTP id k5-20020a5d66c5000000b00342cd1beb5fmr31636wrw.16.1711563425828;
-        Wed, 27 Mar 2024 11:17:05 -0700 (PDT)
+        bh=9qn8TFAerzpQEshTl46/Kmqots7yf4ojhzF0TbaqZVQ=;
+        b=BtyiaPWHTs8wT+crcGk2WsX1ra1VyNfHSqdUoqKWDAJ90OKdrF/lJI2AnMZiW3s1Nd
+         XHy2P5deWZtaBNREPizSzs+Xfo5d+DIzCOm45zvQKZnPf9TTCVLIm/mSN+1+vtTUvhry
+         jeADO7b3lv24aJMF9qK0aGtHwWiEiGdDd6othE/ZXP1zxKbO2x5RzlIj7npxK1Mlnf/J
+         Wk3PoJQCDHn7oJ14BSdJ4Vx++43arg6UWOBQk1X/MB0x1gU1MSodwWr7Jn6gu0skAv/j
+         8SNWhj2SJn5xmdkzjDCdeBvd2SPnatPahVyE9Gho0UTabipeekNdnGIPZpmWSM7BL850
+         Sjug==
+X-Gm-Message-State: AOJu0YxBjMU8fkfw4vqKQxcsA4u0V/tBERFF/wEm8i09ViUzx8JIEPDa
+	vcrNa/TXEJarox1PiHHPJeSS5X3uCo+w1W/3vCFJ96dHj5PhEZ7w2lysEHUfR3g=
+X-Google-Smtp-Source: AGHT+IEzwcAq/r/gKjkq9VnQEaNHYZLr28fY/AggxCHwtEHZgzJXo/nhBfvVmyObpBNhmfUqlXXZ6g==
+X-Received: by 2002:adf:c00c:0:b0:33e:d8f:3466 with SMTP id z12-20020adfc00c000000b0033e0d8f3466mr533651wre.33.1711563427149;
+        Wed, 27 Mar 2024 11:17:07 -0700 (PDT)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:5876:f134:d112:62c7])
-        by smtp.gmail.com with ESMTPSA id t14-20020a0560001a4e00b0033e96fe9479sm15467848wry.89.2024.03.27.11.17.04
+        by smtp.gmail.com with ESMTPSA id t14-20020a0560001a4e00b0033e96fe9479sm15467848wry.89.2024.03.27.11.17.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 11:17:05 -0700 (PDT)
+        Wed, 27 Mar 2024 11:17:06 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -77,9 +77,9 @@ To: netdev@vger.kernel.org,
 	Stanislav Fomichev <sdf@google.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 1/2] doc/netlink/specs: Add draft nftables spec
-Date: Wed, 27 Mar 2024 18:16:59 +0000
-Message-ID: <20240327181700.77940-2-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 2/2] tools/net/ynl: Add multi message support to ynl
+Date: Wed, 27 Mar 2024 18:17:00 +0000
+Message-ID: <20240327181700.77940-3-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240327181700.77940-1-donald.hunter@gmail.com>
 References: <20240327181700.77940-1-donald.hunter@gmail.com>
@@ -91,1285 +91,182 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a spec for nftables that has nearly complete coverage of the ops,
-but limited coverage of rule types and subexpressions.
+Add a "--multi <op> <json>" command line to ynl that makes it possible
+to add several operations to a single netlink request payload. The
+--multi command line option is repeated for each operation.
+
+This is used by the nftables family for transaction batches. For
+example:
+
+./tools/net/ynl/cli.py \
+ --spec Documentation/netlink/specs/nftables.yaml \
+ --multi batch-begin '{"res-id": 10}' \
+ --multi newtable '{"name": "test", "nfgen-family": 1}' \
+ --multi newchain '{"name": "chain", "table": "test", "nfgen-family": 1}' \
+ --multi batch-end '{"res-id": 10}'
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- Documentation/netlink/specs/nftables.yaml | 1264 +++++++++++++++++++++
- 1 file changed, 1264 insertions(+)
- create mode 100644 Documentation/netlink/specs/nftables.yaml
+ tools/net/ynl/cli.py     | 22 ++++++++++++++++---
+ tools/net/ynl/lib/ynl.py | 47 +++++++++++++++++++++++++++-------------
+ 2 files changed, 51 insertions(+), 18 deletions(-)
 
-diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
-new file mode 100644
-index 000000000000..dff2a18f3d90
---- /dev/null
-+++ b/Documentation/netlink/specs/nftables.yaml
-@@ -0,0 +1,1264 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
+index f131e33ac3ee..1b8f87b472ba 100755
+--- a/tools/net/ynl/cli.py
++++ b/tools/net/ynl/cli.py
+@@ -19,13 +19,23 @@ class YnlEncoder(json.JSONEncoder):
+ 
+ 
+ def main():
+-    parser = argparse.ArgumentParser(description='YNL CLI sample')
++    description = """
++    YNL CLI utility - a general purpose netlink utility that uses YNL specs
++    to drive protocol encoding and decoding.
++    """
++    epilog = """
++    The --multi option can be repeated to include several operations
++    in the same netlink payload.
++    """
 +
-+name: nftables
-+protocol: netlink-raw
-+protonum: 12
++    parser = argparse.ArgumentParser(description=description,
++                                     epilog=epilog)
+     parser.add_argument('--spec', dest='spec', type=str, required=True)
+     parser.add_argument('--schema', dest='schema', type=str)
+     parser.add_argument('--no-schema', action='store_true')
+     parser.add_argument('--json', dest='json_text', type=str)
+-    parser.add_argument('--do', dest='do', type=str)
+-    parser.add_argument('--dump', dest='dump', type=str)
++    parser.add_argument('--do', dest='do', metavar='OPERATION', type=str)
++    parser.add_argument('--dump', dest='dump', metavar='OPERATION', type=str)
+     parser.add_argument('--sleep', dest='sleep', type=int)
+     parser.add_argument('--subscribe', dest='ntf', type=str)
+     parser.add_argument('--replace', dest='flags', action='append_const',
+@@ -40,6 +50,8 @@ def main():
+     parser.add_argument('--output-json', action='store_true')
+     parser.add_argument('--dbg-small-recv', default=0, const=4000,
+                         action='store', nargs='?', type=int)
++    parser.add_argument('--multi', dest='multi', nargs=2, action='append',
++                        metavar=('OPERATION', 'JSON_TEXT'), type=str)
+     args = parser.parse_args()
+ 
+     def output(msg):
+@@ -73,6 +85,10 @@ def main():
+         if args.dump:
+             reply = ynl.dump(args.dump, attrs)
+             output(reply)
++        if args.multi:
++            ops = [ (item[0], json.loads(item[1]), args.flags) for item in args.multi ]
++            reply = ynl.do_multi(ops)
++            output(reply)
+     except NlError as e:
+         print(e)
+         exit(1)
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 557ef5a22b7d..cecd89db7d58 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -927,16 +927,11 @@ class YnlFamily(SpecFamily):
+ 
+       return op['do']['request']['attributes'].copy()
+ 
+-    def _op(self, method, vals, flags=None, dump=False):
+-        op = self.ops[method]
+-
++    def _encode_message(self, op, vals, flags, req_seq):
+         nl_flags = Netlink.NLM_F_REQUEST | Netlink.NLM_F_ACK
+         for flag in flags or []:
+             nl_flags |= flag
+-        if dump:
+-            nl_flags |= Netlink.NLM_F_DUMP
+ 
+-        req_seq = random.randint(1024, 65535)
+         msg = self.nlproto.message(nl_flags, op.req_value, 1, req_seq)
+         if op.fixed_header:
+             msg += self._encode_struct(op.fixed_header, vals)
+@@ -944,8 +939,20 @@ class YnlFamily(SpecFamily):
+         for name, value in vals.items():
+             msg += self._add_attr(op.attr_set.name, name, value, search_attrs)
+         msg = _genl_msg_finalize(msg)
++        return msg
+ 
+-        self.sock.send(msg, 0)
++    def _ops(self, ops):
++        reqs_by_seq = {}
++        req_seq = random.randint(1024, 65535)
++        payload = b''
++        for (method, vals, flags) in ops:
++            op = self.ops[method]
++            msg = self._encode_message(op, vals, flags, req_seq)
++            reqs_by_seq[req_seq] = (op, msg)
++            payload += msg
++            req_seq += 1
 +
-+doc:
-+  Netfilter nftables configuration over netlink.
++        self.sock.send(payload, 0)
+ 
+         done = False
+         rsp = []
+@@ -954,8 +961,9 @@ class YnlFamily(SpecFamily):
+             nms = NlMsgs(reply, attr_space=op.attr_set)
+             self._recv_dbg_print(reply, nms)
+             for nl_msg in nms:
+-                if nl_msg.extack:
+-                    self._decode_extack(msg, op, nl_msg.extack)
++                if nl_msg.extack and nl_msg.nl_seq in reqs_by_seq:
++                    (req_op, req_msg) = reqs_by_seq[nl_msg.nl_seq]
++                    self._decode_extack(req_msg, req_op, nl_msg.extack)
+ 
+                 if nl_msg.error:
+                     raise NlError(nl_msg)
+@@ -963,13 +971,15 @@ class YnlFamily(SpecFamily):
+                     if nl_msg.extack:
+                         print("Netlink warning:")
+                         print(nl_msg)
++                    del reqs_by_seq[nl_msg.nl_seq]
+                     done = True
+                     break
+ 
+                 decoded = self.nlproto.decode(self, nl_msg)
++                rsp_op = self.rsp_by_value[decoded.cmd()]
+ 
+                 # Check if this is a reply to our request
+-                if nl_msg.nl_seq != req_seq or decoded.cmd() != op.rsp_value:
++                if nl_msg.nl_seq not in reqs_by_seq or decoded.cmd() != rsp_op.rsp_value:
+                     if decoded.cmd() in self.async_msg_ids:
+                         self.handle_ntf(decoded)
+                         continue
+@@ -977,19 +987,26 @@ class YnlFamily(SpecFamily):
+                         print('Unexpected message: ' + repr(decoded))
+                         continue
+ 
+-                rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
++                rsp_msg = self._decode(decoded.raw_attrs, rsp_op.attr_set.name)
+                 if op.fixed_header:
+-                    rsp_msg.update(self._decode_struct(decoded.raw, op.fixed_header))
++                    rsp_msg.update(self._decode_struct(decoded.raw, rsp_op.fixed_header))
+                 rsp.append(rsp_msg)
+ 
+         if not rsp:
+             return None
+-        if not dump and len(rsp) == 1:
++        if not Netlink.NLM_F_DUMP in flags and len(rsp) == 1:
+             return rsp[0]
+         return rsp
+ 
++    def _op(self, method, vals, flags):
++        ops = [(method, vals, flags)]
++        return self._ops(ops)
 +
-+definitions:
-+  -
-+    name: nfgenmsg
-+    type: struct
-+    members:
-+      -
-+        name: nfgen-family
-+        type: u8
-+      -
-+        name: version
-+        type: u8
-+      -
-+        name: res-id
-+        byte-order: big-endian
-+        type: u16
-+  -
-+    name: meta-keys
-+    type: enum
-+    entries:
-+      - len
-+      - protocol
-+      - priority
-+      - mark
-+      - iif
-+      - oif
-+      - iifname
-+      - oifname
-+      - iftype
-+      - oiftype
-+      - skuid
-+      - skgid
-+      - nftrace
-+      - rtclassid
-+      - secmark
-+      - nfproto
-+      - l4-proto
-+      - bri-iifname
-+      - bri-oifname
-+      - pkttype
-+      - cpu
-+      - iifgroup
-+      - oifgroup
-+      - cgroup
-+      - prandom
-+      - secpath
-+      - iifkind
-+      - oifkind
-+      - bri-iifpvid
-+      - bri-iifvproto
-+      - time-ns
-+      - time-day
-+      - time-hour
-+      - sdif
-+      - sdifname
-+      - bri-broute
-+  -
-+    name: cmp-ops
-+    type: enum
-+    entries:
-+      - eq
-+      - neq
-+      - lt
-+      - lte
-+      - gt
-+      - gte
-+  -
-+    name: object-type
-+    type: enum
-+    entries:
-+      - unspec
-+      - counter
-+      - quota
-+      - ct-helper
-+      - limit
-+      - connlimit
-+      - tunnel
-+      - ct-timeout
-+      - secmark
-+      - ct-expect
-+      - synproxy
-+  -
-+    name: nat-range-flags
-+    type: flags
-+    entries:
-+      - map-ips
-+      - proto-specified
-+      - proto-random
-+      - persistent
-+      - proto-random-fully
-+      - proto-offset
-+      - netmap
-+  -
-+    name: table-flags
-+    type: flags
-+    entries:
-+      - dormant
-+      - owner
-+      - persist
-+  -
-+    name: chain-flags
-+    type: flags
-+    entries:
-+      - base
-+      - hw-offload
-+      - binding
-+  -
-+    name: set-flags
-+    type: flags
-+    entries:
-+      - anonymous
-+      - constant
-+      - interval
-+      - map
-+      - timeout
-+      - eval
-+      - object
-+      - concat
-+      - expr
+     def do(self, method, vals, flags=None):
+-        return self._op(method, vals, flags)
++        return self._op(method, vals, flags or [])
+ 
+     def dump(self, method, vals):
+-        return self._op(method, vals, [], dump=True)
++        return self._op(method, vals, [Netlink.NLM_F_DUMP])
 +
-+attribute-sets:
-+  -
-+    name: empty-attrs
-+    attributes:
-+      -
-+        name: name
-+        type: string
-+  -
-+    name: batch-attrs
-+    attributes:
-+      -
-+        name: genid
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: table-attrs
-+    attributes:
-+      -
-+        name: name
-+        type: string
-+        doc: name of the table
-+      -
-+        name: flags
-+        type: u32
-+        byte-order: big-endian
-+        doc: bitmask of flags
-+        enum: table-flags
-+        enum-as-flags: true
-+      -
-+        name: use
-+        type: u32
-+        byte-order: big-endian
-+        doc: number of chains in this table
-+      -
-+        name: handle
-+        type: u64
-+        byte-order: big-endian
-+        doc: numeric handle of the table
-+      -
-+        name: userdata
-+        type: binary
-+        doc: user data
-+  -
-+    name: chain-attrs
-+    attributes:
-+      -
-+        name: table
-+        type: string
-+        doc: name of the table containing the chain
-+      -
-+        name: handle
-+        type: u64
-+        byte-order: big-endian
-+        doc: numeric handle of the chain
-+      -
-+        name: name
-+        type: string
-+        doc: name of the chain
-+      -
-+        name: hook
-+        type: nest
-+        nested-attributes: nft-hook-attrs
-+        doc: hook specification for basechains
-+      -
-+        name: policy
-+        type: u32
-+        byte-order: big-endian
-+        doc: numeric policy of the chain
-+      -
-+        name: use
-+        type: u32
-+        byte-order: big-endian
-+        doc: number of references to this chain
-+      -
-+        name: type
-+        type: string
-+        doc: type name of the chain
-+      -
-+        name: counters
-+        type: nest
-+        nested-attributes: nft-counter-attrs
-+        doc: counter specification of the chain
-+      -
-+        name: flags
-+        type: u32
-+        byte-order: big-endian
-+        doc: chain flags
-+        enum: chain-flags
-+        enum-as-flags: true
-+      -
-+        name: id
-+        type: u32
-+        byte-order: big-endian
-+        doc: uniquely identifies a chain in a transaction
-+      -
-+        name: userdata
-+        type: binary
-+        doc: user data
-+  -
-+    name: counter-attrs
-+    attributes:
-+      -
-+        name: bytes
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: packets
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: pad
-+        type: pad
-+  -
-+    name: nft-hook-attrs
-+    attributes:
-+      -
-+        name: num
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: priority
-+        type: s32
-+        byte-order: big-endian
-+      -
-+        name: dev
-+        type: string
-+        doc: net device name
-+      -
-+        name: devs
-+        type: nest
-+        nested-attributes: hook-dev-attrs
-+        doc: list of net devices
-+  -
-+    name: hook-dev-attrs
-+    attributes:
-+      -
-+        name: name
-+        type: string
-+        multi-attr: true
-+  -
-+    name: nft-counter-attrs
-+    attributes:
-+      -
-+        name: bytes
-+        type: u64
-+      -
-+        name: packets
-+        type: u64
-+  -
-+    name: rule-attrs
-+    attributes:
-+      -
-+        name: table
-+        type: string
-+        doc: name of the table containing the rule
-+      -
-+        name: chain
-+        type: string
-+        doc: name of the chain containing the rule
-+      -
-+        name: handle
-+        type: u64
-+        byte-order: big-endian
-+        doc: numeric handle of the rule
-+      -
-+        name: expressions
-+        type: nest
-+        nested-attributes: expr-list-attrs
-+        doc: list of expressions
-+      -
-+        name: compat
-+        type: nest
-+        nested-attributes: rule-compat-attrs
-+        doc: compatibility specifications of the rule
-+      -
-+        name: position
-+        type: u64
-+        byte-order: big-endian
-+        doc: numeric handle of the previous rule
-+      -
-+        name: userdata
-+        type: binary
-+        doc: user data
-+      -
-+        name: id
-+        type: u32
-+        doc: uniquely identifies a rule in a transaction
-+      -
-+        name: position-id
-+        type: u32
-+        doc: transaction unique identifier of the previous rule
-+      -
-+        name: chain-id
-+        type: u32
-+        doc: add the rule to chain by ID, alternative to chain name
-+  -
-+    name: expr-list-attrs
-+    attributes:
-+      -
-+        name: elem
-+        type: nest
-+        nested-attributes: expr-attrs
-+        multi-attr: true
-+  -
-+    name: expr-attrs
-+    attributes:
-+      -
-+        name: name
-+        type: string
-+        doc: name of the expression type
-+      -
-+        name: data
-+        type: sub-message
-+        sub-message: expr-ops
-+        selector: name
-+        doc: type specific data
-+  -
-+    name: rule-compat-attrs
-+    attributes:
-+      -
-+        name: proto
-+        type: binary
-+        doc: numeric value of the handled protocol
-+      -
-+        name: flags
-+        type: binary
-+        doc: bitmask of flags
-+  -
-+    name: set-attrs
-+    attributes:
-+      -
-+        name: table
-+        type: string
-+        doc: table name
-+      -
-+        name: name
-+        type: string
-+        doc: set name
-+      -
-+        name: flags
-+        type: u32
-+        enum: set-flags
-+        byte-order: big-endian
-+        doc: bitmask of enum nft_set_flags
-+      -
-+        name: key-type
-+        type: u32
-+        byte-order: big-endian
-+        doc: key data type, informational purpose only
-+      -
-+        name: key-len
-+        type: u32
-+        byte-order: big-endian
-+        doc: key data length
-+      -
-+        name: data-type
-+        type: u32
-+        byte-order: big-endian
-+        doc: mapping data type
-+      -
-+        name: data-len
-+        type: u32
-+        byte-order: big-endian
-+        doc: mapping data length
-+      -
-+        name: policy
-+        type: u32
-+        byte-order: big-endian
-+        doc: selection policy
-+      -
-+        name: desc
-+        type: nest
-+        nested-attributes: set-desc-attrs
-+        doc: set description
-+      -
-+        name: id
-+        type: u32
-+        doc: uniquely identifies a set in a transaction
-+      -
-+        name: timeout
-+        type: u64
-+        doc: default timeout value
-+      -
-+        name: gc-interval
-+        type: u32
-+        doc: garbage collection interval
-+      -
-+        name: userdata
-+        type: binary
-+        doc: user data
-+      -
-+        name: pad
-+        type: pad
-+      -
-+        name: obj-type
-+        type: u32
-+        byte-order: big-endian
-+        doc: stateful object type
-+      -
-+        name: handle
-+        type: u64
-+        byte-order: big-endian
-+        doc: set handle
-+      -
-+        name: expr
-+        type: nest
-+        nested-attributes: expr-attrs
-+        doc: set expression
-+        multi-attr: true
-+      -
-+        name: expressions
-+        type: nest
-+        nested-attributes: set-list-attrs
-+        doc: list of expressions
-+  -
-+    name: set-desc-attrs
-+    attributes:
-+      -
-+        name: size
-+        type: u32
-+        byte-order: big-endian
-+        doc: number of elements in set
-+      -
-+        name: concat
-+        type: nest
-+        nested-attributes: set-desc-concat-attrs
-+        doc: description of field concatenation
-+        multi-attr: true
-+  -
-+    name: set-desc-concat-attrs
-+    attributes:
-+      -
-+        name: elem
-+        type: nest
-+        nested-attributes: set-field-attrs
-+  -
-+    name: set-field-attrs
-+    attributes:
-+      -
-+        name: len
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: set-list-attrs
-+    attributes:
-+      -
-+        name: elem
-+        type: nest
-+        nested-attributes: expr-attrs
-+        multi-attr: true
-+  -
-+    name: setelem-attrs
-+    attributes:
-+      -
-+        name: key
-+        type: nest
-+        nested-attributes: data-attrs
-+        doc: key value
-+      -
-+        name: data
-+        type: nest
-+        nested-attributes: data-attrs
-+        doc: data value of mapping
-+      -
-+        name: flags
-+        type: binary
-+        doc: bitmask of nft_set_elem_flags
-+      -
-+        name: timeout
-+        type: u64
-+        doc: timeout value
-+      -
-+        name: expiration
-+        type: u64
-+        doc: expiration time
-+      -
-+        name: userdata
-+        type: binary
-+        doc: user data
-+      -
-+        name: expr
-+        type: nest
-+        nested-attributes: expr-attrs
-+        doc: expression
-+      -
-+        name: objref
-+        type: string
-+        doc: stateful object reference
-+      -
-+        name: key-end
-+        type: nest
-+        nested-attributes: data-attrs
-+        doc: closing key value
-+      -
-+        name: expressions
-+        type: nest
-+        nested-attributes: expr-list-attrs
-+        doc: list of expressions
-+  -
-+    name: setelem-list-elem-attrs
-+    attributes:
-+      -
-+        name: elem
-+        type: nest
-+        nested-attributes: setelem-attrs
-+        multi-attr: true
-+  -
-+    name: setelem-list-attrs
-+    attributes:
-+      -
-+        name: table
-+        type: string
-+      -
-+        name: set
-+        type: string
-+      -
-+        name: elements
-+        type: nest
-+        nested-attributes: setelem-list-elem-attrs
-+      -
-+        name: set-id
-+        type: u32
-+  -
-+    name: gen-attrs
-+    attributes:
-+      -
-+        name: id
-+        type: u32
-+        byte-order: big-endian
-+        doc: ruleset generation id
-+      -
-+        name: proc-pid
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: proc-name
-+        type: string
-+  -
-+    name: obj-attrs
-+    attributes:
-+      -
-+        name: table
-+        type: string
-+        doc: name of the table containing the expression
-+      -
-+        name: name
-+        type: string
-+        doc: name of this expression type
-+      -
-+        name: type
-+        type: u32
-+        enum: object-type
-+        byte-order: big-endian
-+        doc: stateful object type
-+      -
-+        name: data
-+        type: sub-message
-+        sub-message: obj-data
-+        selector: type
-+        doc: stateful object data
-+      -
-+        name: use
-+        type: u32
-+        byte-order: big-endian
-+        doc: number of references to this expression
-+      -
-+        name: handle
-+        type: u64
-+        byte-order: big-endian
-+        doc: object handle
-+      -
-+        name: pad
-+        type: pad
-+      -
-+        name: userdata
-+        type: binary
-+        doc: user data
-+  -
-+    name: quota-attrs
-+    attributes:
-+      -
-+        name: bytes
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: flags # TODO
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: pad
-+        type: pad
-+      -
-+        name: consumed
-+        type: u64
-+        byte-order: big-endian
-+  -
-+    name: flowtable-attrs
-+    attributes:
-+      -
-+        name: table
-+        type: string
-+      -
-+        name: name
-+        type: string
-+      -
-+        name: hook
-+        type: nest
-+        nested-attributes: flowtable-hook-attrs
-+      -
-+        name: use
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: handle
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: pad
-+        type: pad
-+      -
-+        name: flags
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: flowtable-hook-attrs
-+    attributes:
-+      -
-+        name: num
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: priority
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: devs
-+        type: nest
-+        nested-attributes: hook-dev-attrs
-+  -
-+    name: expr-cmp-attrs
-+    attributes:
-+      -
-+        name: sreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: op
-+        type: u32
-+        byte-order: big-endian
-+        enum: cmp-ops
-+      -
-+        name: data
-+        type: nest
-+        nested-attributes: data-attrs
-+  -
-+    name: data-attrs
-+    attributes:
-+      -
-+        name: value
-+        type: binary
-+        # sub-type: u8
-+      -
-+        name: verdict
-+        type: nest
-+        nested-attributes: verdict-attrs
-+  -
-+    name: verdict-attrs
-+    attributes:
-+      -
-+        name: code
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: chain
-+        type: string
-+      -
-+        name: chain-id
-+        type: u32
-+  -
-+    name: expr-counter-attrs
-+    attributes:
-+      -
-+        name: bytes
-+        type: u64
-+        doc: Number of bytes
-+      -
-+        name: packets
-+        type: u64
-+        doc: Number of packets
-+      -
-+        name: pad
-+        type: pad
-+  -
-+    name: expr-flow-offload-attrs
-+    attributes:
-+      -
-+        name: name
-+        type: string
-+        doc: Flow offload table name
-+  -
-+    name: expr-immediate-attrs
-+    attributes:
-+      -
-+        name: dreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: data
-+        type: nest
-+        nested-attributes: data-attrs
-+  -
-+    name: expr-meta-attrs
-+    attributes:
-+      -
-+        name: dreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: key
-+        type: u32
-+        byte-order: big-endian
-+        enum: meta-keys
-+      -
-+        name: sreg
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: expr-nat-attrs
-+    attributes:
-+      -
-+        name: type
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: family
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: reg-addr-min
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: reg-addr-max
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: reg-proto-min
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: reg-proto-max
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: flags
-+        type: u32
-+        byte-order: big-endian
-+        enum: nat-range-flags
-+        enum-as-flags: true
-+  -
-+    name: expr-payload-attrs
-+    attributes:
-+      -
-+        name: dreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: base
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: offset
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: len
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: sreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: csum-type
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: csum-offset
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: csum-flags
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: expr-tproxy-attrs
-+    attributes:
-+      -
-+        name: family
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: reg-addr
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: reg-port
-+        type: u32
-+        byte-order: big-endian
-+
-+sub-messages:
-+  -
-+    name: expr-ops
-+    formats:
-+      -
-+        value: bitwise # TODO
-+      -
-+        value: cmp
-+        attribute-set: expr-cmp-attrs
-+      -
-+        value: counter
-+        attribute-set: expr-counter-attrs
-+      -
-+        value: ct # TODO
-+      -
-+        value: flow_offload
-+        attribute-set: expr-flow-offload-attrs
-+      -
-+        value: immediate
-+        attribute-set: expr-immediate-attrs
-+      -
-+        value: lookup # TODO
-+      -
-+        value: meta
-+        attribute-set: expr-meta-attrs
-+      -
-+        value: nat
-+        attribute-set: expr-nat-attrs
-+      -
-+        value: payload
-+        attribute-set: expr-payload-attrs
-+      -
-+        value: tproxy
-+        attribute-set: expr-tproxy-attrs
-+  -
-+    name: obj-data
-+    formats:
-+      -
-+        value: counter
-+        attribute-set: counter-attrs
-+      -
-+        value: quota
-+        attribute-set: quota-attrs
-+
-+operations:
-+  enum-model: directional
-+  list:
-+    -
-+      name: batch-begin
-+      doc: Start a batch of operations
-+      attribute-set: batch-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0x10
-+          attributes:
-+            - genid
-+        reply:
-+          value: 0x10
-+          attributes:
-+            - genid
-+    -
-+      name: batch-end
-+      doc: Finish a batch of operations
-+      attribute-set: batch-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0x11
-+          attributes:
-+            - genid
-+    -
-+      name: newtable
-+      doc: Create a new table.
-+      attribute-set: table-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa00
-+          attributes:
-+            - name
-+    -
-+      name: gettable
-+      doc: Get / dump tables.
-+      attribute-set: table-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa01
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa00
-+          attributes:
-+            - name
-+    -
-+      name: deltable
-+      doc: Delete an existing table.
-+      attribute-set: table-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa02
-+          attributes:
-+            - name
-+    -
-+      name: destroytable
-+      doc: Delete an existing table with destroy semantics (ignoring ENOENT errors).
-+      attribute-set: table-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa1a
-+          attributes:
-+            - name
-+    -
-+      name: newchain
-+      doc: Create a new chain.
-+      attribute-set: chain-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa03
-+          attributes:
-+            - name
-+    -
-+      name: getchain
-+      doc: Get / dump chains.
-+      attribute-set: chain-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa04
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa03
-+          attributes:
-+            - name
-+    -
-+      name: delchain
-+      doc: Delete an existing chain.
-+      attribute-set: chain-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa05
-+          attributes:
-+            - name
-+    -
-+      name: destroychain
-+      doc: Delete an existing chain with destroy semantics (ignoring ENOENT errors).
-+      attribute-set: chain-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa1b
-+          attributes:
-+            - name
-+    -
-+      name: newrule
-+      doc: Create a new rule.
-+      attribute-set: rule-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa06
-+          attributes:
-+            - name
-+    -
-+      name: getrule
-+      doc: Get / dump rules.
-+      attribute-set: rule-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa07
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa06
-+          attributes:
-+            - name
-+    -
-+      name: getrule-reset
-+      doc: Get / dump rules and reset stateful expressions.
-+      attribute-set: rule-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa19
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa06
-+          attributes:
-+            - name
-+    -
-+      name: delrule
-+      doc: Delete an existing rule.
-+      attribute-set: rule-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa08
-+          attributes:
-+            - name
-+    -
-+      name: destroyrule
-+      doc: Delete an existing rule with destroy semantics (ignoring ENOENT errors).
-+      attribute-set: rule-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa1c
-+          attributes:
-+            - name
-+    -
-+      name: newset
-+      doc: Create a new set.
-+      attribute-set: set-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa09
-+          attributes:
-+            - name
-+    -
-+      name: getset
-+      doc: Get / dump sets.
-+      attribute-set: set-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa0a
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa09
-+          attributes:
-+            - name
-+    -
-+      name: delset
-+      doc: Delete an existing set.
-+      attribute-set: set-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa0b
-+          attributes:
-+            - name
-+    -
-+      name: destroyset
-+      doc: Delete an existing set with destroy semantics (ignoring ENOENT errors).
-+      attribute-set: set-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa1d
-+          attributes:
-+            - name
-+    -
-+      name: newsetelem
-+      doc: Create a new set element.
-+      attribute-set: setelem-list-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa0c
-+          attributes:
-+            - name
-+    -
-+      name: getsetelem
-+      doc: Get / dump set elements.
-+      attribute-set: setelem-list-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa0d
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa0c
-+          attributes:
-+            - name
-+    -
-+      name: getsetelem-reset
-+      doc: Get / dump set elements and reset stateful expressions.
-+      attribute-set: setelem-list-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa21
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa0c
-+          attributes:
-+            - name
-+    -
-+      name: delsetelem
-+      doc: Delete an existing set element.
-+      attribute-set: setelem-list-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa0e
-+          attributes:
-+            - name
-+    -
-+      name: destroysetelem
-+      doc: Delete an existing set element with destroy semantics.
-+      attribute-set: setelem-list-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa1e
-+          attributes:
-+            - name
-+    -
-+      name: getgen
-+      doc: Get / dump rule-set generation.
-+      attribute-set: gen-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa10
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa0f
-+          attributes:
-+            - name
-+    -
-+      name: newobj
-+      doc: Create a new stateful object.
-+      attribute-set: obj-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa12
-+          attributes:
-+            - name
-+    -
-+      name: getobj
-+      doc: Get / dump stateful objects.
-+      attribute-set: obj-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa13
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa12
-+          attributes:
-+            - name
-+    -
-+      name: delobj
-+      doc: Delete an existing stateful object.
-+      attribute-set: obj-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa14
-+          attributes:
-+            - name
-+    -
-+      name: destroyobj
-+      doc: Delete an existing stateful object with destroy semantics.
-+      attribute-set: obj-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa1f
-+          attributes:
-+            - name
-+    -
-+      name: newflowtable
-+      doc: Create a new flow table.
-+      attribute-set: flowtable-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa16
-+          attributes:
-+            - name
-+    -
-+      name: getflowtable
-+      doc: Get / dump flow tables.
-+      attribute-set: flowtable-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa17
-+          attributes:
-+            - name
-+        reply:
-+          value: 0xa16
-+          attributes:
-+            - name
-+    -
-+      name: delflowtable
-+      doc: Delete an existing flow table.
-+      attribute-set: flowtable-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa18
-+          attributes:
-+            - name
-+    -
-+      name: destroyflowtable
-+      doc: Delete an existing flow table with destroy semantics.
-+      attribute-set: flowtable-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0xa20
-+          attributes:
-+            - name
-+
-+mcast-groups:
-+  list:
-+    -
-+      name: mgmt
++    def do_multi(self, ops):
++        return self._ops(ops)
 -- 
 2.44.0
 
