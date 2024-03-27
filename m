@@ -1,132 +1,111 @@
-Return-Path: <netdev+bounces-82403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D688D88D94E
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 09:41:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2C888D96C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 09:46:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 901BA297C5A
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:41:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E8F91F2A948
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D8C2E633;
-	Wed, 27 Mar 2024 08:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D004E36B0D;
+	Wed, 27 Mar 2024 08:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="q0N+qofl"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="fUI+UlYj"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7AC33993;
-	Wed, 27 Mar 2024 08:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6B035881;
+	Wed, 27 Mar 2024 08:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711528868; cv=none; b=uqbjNOznxN4EXogJoehae3HufXIDO2XxsC0XxeEz4/kgHoIeQQgBxafeVpkLneItMhK3i0hm/SU6btZ6loO75pj4n1RerRjzo59MPxkSj6Hshfgd/G+0XCSmmvqwRqWidQjJwGLOs++IeCvXtSWajfY0Z9nwAzClv/fwRX9/ZJU=
+	t=1711529186; cv=none; b=GKkFvx7yLJOPXiq5efGkcipiuo/KJdl66OWaPC9mPfUcYwhTnGnfKebHySnJVBuI4MRlO19rAm5x5ZE6CXjUM14kphTkL/18Rw90F+kgrm2w8h8gmoB+ztl3hinhbxYPUONuZNAvddPbkv6s6/nKjRb4BUPD9SGagimh57zt0yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711528868; c=relaxed/simple;
-	bh=xRB92wiK/60Dd4ywTzCohV4wgX5MoXZ7PetfJo/uNGs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N17vz9qD+Kc5NIyKpF94ktoYcFMSkfNOr49GkhkO0eC9SQpBHkFcymzu7oHP6ej+HWwcKi+jf0XI0pn5w8P2ghi5oAvmo15RToJvyHi/s9Y+EarT9UtnSyBPkvQ03JgdfCHS6lQc51L8XBDbNxYkukjR06XJoS1TykfQ4lx0c6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=q0N+qofl; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 8548F8803A;
-	Wed, 27 Mar 2024 09:41:02 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1711528863;
-	bh=0aClRNtVlcXSh2p2olWCG/oCLHKpi0YBik2OFWy6TPs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q0N+qoflRag9vW7VrC5CfShn5I3BQ6CVsSqV9yoOp+eXprYdlQ8MO/uMxZOr4qQEZ
-	 bM798ijThTFq+AnORt2Wd1pJZAMOMximkegQO0L5EWhAMAHjNiG8a+b/u+YK2NoF7a
-	 AUW4i+Uv6IF0P0+vBuo8DuJSQahlGHrJRsDmggRIqzn2QGr/MnR/9fba4jJqewckcX
-	 WuWusHB94XHdmaqhoKuOreGIMv8YoYj3m5wzjMM6w4bdsJT5amWGis+05mJKWCqvio
-	 VDrKbOo3i7Tsdlqf1eRPf1FuiZDDuDnv2IrEeoo8ecTyr+zB5ZorLWKyZYfW2tUNOc
-	 s8Z+C2ClBCM4g==
-Date: Wed, 27 Mar 2024 09:41:01 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Oleksij
- Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian
- Andrzej Siewior <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>,
- Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>,
- Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Murali Karicheri
- <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan Carpenter
- <dan.carpenter@linaro.org>, Ziyang Xuan <william.xuanziyang@huawei.com>,
- Shigeru Yoshida <syoshida@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RESEND] net: hsr: Provide RedBox support
-Message-ID: <20240327094101.4712d8ec@wsk>
-In-Reply-To: <20240326101240.65c28519@hermes.local>
-References: <20240326090220.3259927-1-lukma@denx.de>
-	<20240326101240.65c28519@hermes.local>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711529186; c=relaxed/simple;
+	bh=hjuB1NTOIJIDWdrjxrlzbkyEhKqeT0IDibX9JMRk5l0=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=Xyk2bjxPFsQPOLRv/KAet8Tw8wuH+fQL2Yv4VVKbednyatXX5zuqJKZDJnUiADZPVQIPBNJA440DjBKum4tq0ALwtLBaFMVxpXH/npdVJQsSd1PbF9VdU5vVIxVFAiT5x9or6XQal+bx1WABweLgpuLpt2uB3/pPkcMgl7Hhwf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=fUI+UlYj; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 44BE120003;
+	Wed, 27 Mar 2024 08:46:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1711529182;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V6/9Lbi9NXGVyx2M/GwqTcAQaMos4oEM2EADJm5/7JA=;
+	b=fUI+UlYj89U6BM+J15/EBp0MtnKjFnJM6AomUDVdkohOldxf0oyoLbAIL84DEZ3jAOfGWs
+	L+AC0AAU6+p5tirDlSTz3J/v6xQjw42EECSdNlDtPqpT9Pj3o8DCrIksLLU2aTOjLGkx+b
+	7Z0Rd9C9Ul0nT5abGD/q8OI1CKyxJSGDbEtHjIwO6qyp6ZDJrP0j0Phg15ZpmrfeAjJ6WM
+	hjAmEkoGMLuMAeLhF9rMqSc4RxR8Z6I2dNzIYpDN1KrqEK71NlDsRk3CL5sc0CLYg+Jr9x
+	9/Rq+6LqG++FKKGK6WX6GOfrb0A42Qj6rwlTF7zyIsQStaKSG88rOllE1rlhKg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/B8iOh7uBlCiQ9Te8tY3Oba5";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Date: Wed, 27 Mar 2024 11:46:19 +0300
+From: arinc.unal@arinc9.com
+To: Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
+ DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew
+ Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir
+ Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, =?UTF-8?Q?Ren=C3=A9_van_Dor?=
+ =?UTF-8?Q?st?= <opensource@vdorst.com>, Russell King
+ <linux@armlinux.org.uk>, SkyLake Huang <SkyLake.Huang@mediatek.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net v2 2/2] net: dsa: mt7530: fix disabling EEE on failure
+ on MT7531 and MT7988
+In-Reply-To: <d65f4c45-e616-4157-a769-c285cbad575c@arinc9.com>
+References: <20240321-for-net-mt7530-fix-eee-for-mt7531-mt7988-v2-0-9af9d5041bfe@arinc9.com>
+ <20240321-for-net-mt7530-fix-eee-for-mt7531-mt7988-v2-2-9af9d5041bfe@arinc9.com>
+ <799572b672ea8b4756236b14068aef7c8fa726a6.camel@redhat.com>
+ <d65f4c45-e616-4157-a769-c285cbad575c@arinc9.com>
+Message-ID: <530da7c1-c058-44ef-84fd-86ff58f1501b@arinc9.com>
+X-Sender: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
---Sig_/B8iOh7uBlCiQ9Te8tY3Oba5
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 26.03.2024 12:19, Arınç ÜNAL wrote:
+> On 26.03.2024 12:02, Paolo Abeni wrote:
+>> If I read the past discussion correctly, this is a potential issue
+>> found by code inspection and never producing problem in practice, am I
+>> correct?
+>> 
+>> If so I think it will deserve a 3rd party tested-by tag or similar to
+>> go in.
+>> 
+>> If nobody could provide such feedback in a little time, I suggest to
+>> drop this patch and apply only 1/2.
+> 
+> Whether a problem would happen in practice depends on when 
+> phy_init_eee()
+> fails, meaning it returns a negative non-zero code. I requested Russell 
+> to
+> review this patch to shed light on when phy_init_eee() would return a
+> negative non-zero code so we have an idea whether this patch actually 
+> fixes
+> a problem.
 
-Hi Stephen,
+I don't suppose Russell is going to review the patch at this point. I 
+will
+submit this to net-next then. If someone actually reports a problem in
+practice, I can always submit it to the stable trees.
 
-> On Tue, 26 Mar 2024 10:02:20 +0100
-> Lukasz Majewski <lukma@denx.de> wrote:
->=20
-> > Configuration - RedBox (EVB-KSZ9477):
-> > ifconfig lan1 down;ifconfig lan2 down
-> > ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision
-> > 45 version 1 ip link add name hsr1 type hsr slave1 lan4 slave2 lan5
-> > interlink lan3 supervision 45 version 1 ifconfig lan4 up;ifconfig
-> > lan5 up ifconfig lan3 up
-> > ifconfig hsr1 192.168.0.11 up =20
->=20
-> Learn to use ip instead of ifconfig...
->=20
-> ip link set lan4 up
-
-Ok. Thanks for info.
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/B8iOh7uBlCiQ9Te8tY3Oba5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYD250ACgkQAR8vZIA0
-zr2xVwgAl3fFlMnCYArx7X4rafNLdbHv3H3iBt9QIthMIhAVVZk3c/gi2SLW7WqD
-+s9um3AsLUkdqAYcsQFEGB7iF98t3p42HnypUibo+jTR0Oyp/1tF/B3NtgTGx3bi
-D2BcIL9bV++SVnLC8OLAFNKcaXAMYd25RnhMQLZJbIGIRbSurikoPx5QZonJxKaM
-EaF1gM5/a9FK7+X4korSjxSrWKWqOPr/Jh/5xSPCWgCvgUbHLohSP1/VIFwVRLgd
-mJCt4YHntg9ivke8sjPREprJXCDQbE5lRm0vj/t6ydCXnnoFhv0JtSGpeVx/qWsn
-posHiiNm7D5wqiw5SmsYoREP1ODA9w==
-=AxW0
------END PGP SIGNATURE-----
-
---Sig_/B8iOh7uBlCiQ9Te8tY3Oba5--
+Arınç
 
