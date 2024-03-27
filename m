@@ -1,225 +1,274 @@
-Return-Path: <netdev+bounces-82678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31CBE88F137
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:46:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DEE488F13C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:46:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 553531C3021E
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:46:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD2671F2A4FC
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CB4153821;
-	Wed, 27 Mar 2024 21:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0XVbZsSD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A5715359D;
+	Wed, 27 Mar 2024 21:46:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710CA154438
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 21:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7522C153575
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 21:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711575937; cv=none; b=LHJdYzIzAtvj9+p9Tm+HmD8ZOrtNLH7lz8CF7rrFr4UlKPTkOH83Xixd9+1L/80erhHyCDKNvp8Wf/w+Al9BsnWxxg1DpycAcFdcq/z8MuFRSt7HWSrPEOmsYwCEf64hchWQy3PNbxAjA0ROHCWxqg7M00KzbMoJhvqE5Xk1/6w=
+	t=1711575990; cv=none; b=KK19K5+AFds2PlBVqTuDSUD8lgtj6apE+kUsMnFiVThyZwk5Xq8aePg7Em3ibKHp98nh3Yq2pK3egARpMo27EiNq7DDFYt74sEL6MOZ2VSZScoYZaEHJr2L98y5H5PKrvi9unIFVWDdZYGYmP0Kwd9FZ0A5yogtbZ0ibXW/TyE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711575937; c=relaxed/simple;
-	bh=HcoNxlvdGhGfyulBOvat+dNXCCSpR7y/F/Sfr6c14to=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j0x9RHAgbKKx2ri9RurPGf+fSo7yhoRWtiDmjDEyNjb+Rh4ApqFb2aSFRAeoBFNqMB9xZF554KjbbhA8SuVAXiBLepaxmxNyEPIktbqSn1/CUznMPjBA+t4D0nHct4e09yj9VAvdVkABduPJMoMKHXslcJS8GREWMmigMmehaKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0XVbZsSD; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b269686aso424466276.1
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 14:45:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711575934; x=1712180734; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Fas+uh+IATqHO1ThFI61gBVEvoGJvlSG5a3mDRu0bA=;
-        b=0XVbZsSD/EY7uJzjdM0oltuqcR63ul7SIEC7onTbbcgVIuCwdq7GDDDQ21AtBfeUyk
-         cs+Scu5GqJ9NAPd+HY9k+8msD7NSzwA/g4+SXQHpMVBvJffadO//HDSWSOF3KhUq/C/u
-         Lx59/TdBmkST50ZNDmySR5a9G2XbLBCphPNthvBVtR/WxmI8U64PfV6tCfJgCONDzJMq
-         jAcziPMivArgkZzgNSar4Tmw5bjbfc4SMsc5H1IFhs1gsMfYwSVWlGpTGb/5Q+zJbRgF
-         TbXUJ7yzYW5XfMXtWdAo36YpcuWpTanmWI8uB5e9eMPcWweRHgs+Sd3xGZqnadJs+8yk
-         P9VQ==
+	s=arc-20240116; t=1711575990; c=relaxed/simple;
+	bh=M/9L1KyTs/npx1S4/HkyL0CDUFo1C0HBdSQodhTP4N8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LNAKZpA5+1nkljYlakJa637Fv7WnxvMam9oe/YUFwF5HeZroo4sgAlXIc26k8zmat+gho98FWgcd4U2/KnAo1LYQ5WTE/uP/bavKBchaqDF88uU/hnAxCaCrpd29WPDZGwv7bg+sxiatDcnOhWaYyZZxYION8Z3dmgqWdC3uz1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7cc01445f6bso29346539f.3
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 14:46:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711575934; x=1712180734;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Fas+uh+IATqHO1ThFI61gBVEvoGJvlSG5a3mDRu0bA=;
-        b=poGc9vWb//PN1azlMfsBvsNo10oULvfHgaO2M7xM555rIzY9ZYJke4kDb3Mrtenhve
-         dADvz7v2VlPEitPOq96j97pKE8JDpzW/kwuxebmf3tiHqdMIIBTQo/4CMUMhc+doGtlS
-         Z2lZt0PKiQ4dxKKxmrZ/k08jX9ycqCWjh+QEHeMGf7I/KdU6SITj+WEDyH45LcZ2L9uA
-         Hcirj59psXIEgr9HWNECnb9yEb9pqek1kBDOhQ4KaUJkwPHSCJM0Wec5vMkDu/OAiYMQ
-         JDZYB/L28kbZb3KDnXW8JYQLDZCfMQyYP+Jbo73tDQAwNJAxj9HAZfhDKYdkOmiqcL6V
-         lD4A==
-X-Gm-Message-State: AOJu0Yzn/USSXgMzCrqWjSQ+Eq5kO8UHQ94X/oeX+mcbIclxaPzExtc9
-	JkPRdnOehtwLur1LNfyNOYLGNvIUvyPsrhwYoipQkzwauCiFh7r2oxdg6CY0xYBmlRTAxZjOZwe
-	1d/ZD/EufCdE1xHf64Oy2trZo+fZ7t9HJBthCzYYNsA9Je8dLzD9K8IG8qA3sCa+IhokUn/tjVk
-	87eD4CkfPKQb9CdYeEEbZO+PFrrqUu5OexSQsPOqvlIVao/jtwG+0GwOQa5uc=
-X-Google-Smtp-Source: AGHT+IEbxk1R4CRvllhl4uFMMmoABCiOd+KYKwhp/rGbIhNQO57O71um9bj7xu9u0AunMaECDk0/6mpFbNSCoQSHdw==
-X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:b757:6e7b:2156:cabc])
- (user=almasrymina job=sendgmr) by 2002:a05:6902:2413:b0:dc6:dfd9:d423 with
- SMTP id dr19-20020a056902241300b00dc6dfd9d423mr119003ybb.3.1711575933748;
- Wed, 27 Mar 2024 14:45:33 -0700 (PDT)
-Date: Wed, 27 Mar 2024 14:45:21 -0700
-In-Reply-To: <20240327214523.2182174-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1711575987; x=1712180787;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gzi9zS6MHKsIeVXb9Xws83R+6MjQ5wF3Qk1/fvh0VZg=;
+        b=mD+jvlCSVJbkVpCC2RMYSzkbVF8TdDQHkbvrbVo9/G2eymLWxpcQhf/NK/diPAgVje
+         hugo7JB6aSoWOEC2zjr8fE/hJU5mJKz+U4mna3fbtWoRCZlI7jnpZw0GZpnoZNVqw2Wh
+         P1diYiJxzRiZWwwwCmydPyjtf8scOeEylf/I0VZHedZMKKRZ42cb4lhgLZDPfVd7nwa7
+         5vcyVuAhfZXcQz/WmEc6uaKrUaME+L63qI+1NtTvGkYXLSyJPp8pW4UzCFFrJJI8kdGr
+         7Sx3Z9aDQv6heo65hpaqo3hEchAGLz6ewR3BppNfMh/Smuq9VslgxIx8QSNZF0JrXfDP
+         L8eQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVyoXPk4ae8WLwPWI2KzxC4xUUiHnPqHzBNgG8PN5Bn+D2tQs/Mt+OIOKQCY3/RW1Vy9ccB4pEn7Zk8FoQdjir7OpWdZf7E
+X-Gm-Message-State: AOJu0Yyvnb6a36lMIN8naBty24jFEqRVqlwYzTNY8gd8OiaMrsif0OuK
+	IWRCWUWpy3nQC+qZQWakuiDl246UL1CwxCvayIVaYH4d03CP0MqT9qWaEzBTPkiak2KYRfqcgvD
+	lzv1dHCa0WTpavqCTdlmNwarRMV473+V1olEEu6z6N1nI9QlopV9mr/s=
+X-Google-Smtp-Source: AGHT+IFKtBUTJRyd+4AwJNKYgyidA75De4UkktFZO/j9EpAbUf/dEHTfNhTxH1n5RbkUS5p8VJe04G1khoiR6fEn51TxfJ0133cN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240327214523.2182174-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
-Message-ID: <20240327214523.2182174-4-almasrymina@google.com>
-Subject: [PATCH net-next v2 3/3] net: remove napi_frag_unref
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, Ayush Sawal <ayush.sawal@chelsio.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Tariq Toukan <tariqt@nvidia.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Boris Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Dragos Tatulea <dtatulea@nvidia.com>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6638:2720:b0:47b:f666:f7e5 with SMTP id
+ m32-20020a056638272000b0047bf666f7e5mr26990jav.6.1711575987742; Wed, 27 Mar
+ 2024 14:46:27 -0700 (PDT)
+Date: Wed, 27 Mar 2024 14:46:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c1783b0614ab5634@google.com>
+Subject: [syzbot] [openvswitch?] KASAN: slab-use-after-free Read in ovs_ct_exit
+From: syzbot <syzbot+25f4f05818dda7aabaea@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dev@openvswitch.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, pshelar@ovn.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-With the changes in the last patches, napi_frag_unref() is now
-reduandant. Remove it and use skb_page_unref directly.
+Hello,
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+syzbot found the following issue on:
+
+HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=117d023a180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4d90a36f0cab495a
+dashboard link: https://syzkaller.appspot.com/bug?extid=25f4f05818dda7aabaea
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f6c04726a2ae/disk-fe46a7dd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/09c26ce901ea/vmlinux-fe46a7dd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/134acf7f5322/bzImage-fe46a7dd.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+25f4f05818dda7aabaea@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in ovs_ct_exit+0x102/0x200 net/openvswitch/conntrack.c:1994
+Read of size 8 at addr ffff888023f74080 by task kworker/u8:3/50
+
+CPU: 1 PID: 50 Comm: kworker/u8:3 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Workqueue: netns cleanup_net
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ ovs_ct_exit+0x102/0x200 net/openvswitch/conntrack.c:1994
+ ovs_exit_net+0xee/0x7d0 net/openvswitch/datapath.c:2680
+ ops_exit_list net/core/net_namespace.c:170 [inline]
+ cleanup_net+0x802/0xcc0 net/core/net_namespace.c:637
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+Allocated by task 5482:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ kmalloc_trace+0x1db/0x360 mm/slub.c:3997
+ kmalloc include/linux/slab.h:628 [inline]
+ ovs_ct_limit_set_zone_limit net/openvswitch/conntrack.c:1659 [inline]
+ ovs_ct_limit_cmd_set+0x2f7/0xaf0 net/openvswitch/conntrack.c:1836
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+Freed by task 5138:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object+0xa6/0xe0 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2106 [inline]
+ slab_free_freelist_hook mm/slub.c:2135 [inline]
+ slab_free_bulk mm/slub.c:4293 [inline]
+ kmem_cache_free_bulk+0x1f8/0x360 mm/slub.c:4507
+ kfree_bulk include/linux/slab.h:545 [inline]
+ kvfree_rcu_bulk+0x24b/0x4e0 kernel/rcu/tree.c:3033
+ kvfree_rcu_drain_ready kernel/rcu/tree.c:3207 [inline]
+ kfree_rcu_monitor+0x8a4/0x1020 kernel/rcu/tree.c:3225
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+Last potentially related work creation:
+ kasan_save_stack+0x3f/0x60 mm/kasan/common.c:47
+ __kasan_record_aux_stack+0xac/0xc0 mm/kasan/generic.c:541
+ kvfree_call_rcu+0xfc/0x790 kernel/rcu/tree.c:3443
+ ovs_ct_limit_exit net/openvswitch/conntrack.c:1598 [inline]
+ ovs_ct_exit+0xed/0x200 net/openvswitch/conntrack.c:1994
+ ovs_exit_net+0xee/0x7d0 net/openvswitch/datapath.c:2680
+ ops_exit_list net/core/net_namespace.c:170 [inline]
+ cleanup_net+0x802/0xcc0 net/core/net_namespace.c:637
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+The buggy address belongs to the object at ffff888023f74080
+ which belongs to the cache kmalloc-cg-64 of size 64
+The buggy address is located 0 bytes inside of
+ freed 64-byte region [ffff888023f74080, ffff888023f740c0)
+
+The buggy address belongs to the physical page:
+page:ffffea00008fdd00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x23f74
+memcg:ffff88801e41d201
+anon flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000800 ffff888014c4da00 0000000000000000 dead000000000001
+raw: 0000000000000000 0000000000200020 00000001ffffffff ffff88801e41d201
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x112cc0(GFP_USER|__GFP_NOWARN|__GFP_NORETRY), pid 5482, tgid 5481 (syz-executor.3), ts 212870377595, free_ts 212211960458
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
+ prep_new_page mm/page_alloc.c:1540 [inline]
+ get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
+ __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
+ __alloc_pages_node include/linux/gfp.h:238 [inline]
+ alloc_pages_node include/linux/gfp.h:261 [inline]
+ alloc_slab_page+0x5f/0x160 mm/slub.c:2175
+ allocate_slab mm/slub.c:2338 [inline]
+ new_slab+0x84/0x2f0 mm/slub.c:2391
+ ___slab_alloc+0xc73/0x1260 mm/slub.c:3525
+ __slab_alloc mm/slub.c:3610 [inline]
+ __slab_alloc_node mm/slub.c:3663 [inline]
+ slab_alloc_node mm/slub.c:3835 [inline]
+ kmalloc_trace+0x269/0x360 mm/slub.c:3992
+ kmalloc include/linux/slab.h:628 [inline]
+ ovs_ct_limit_set_zone_limit net/openvswitch/conntrack.c:1659 [inline]
+ ovs_ct_limit_cmd_set+0x2f7/0xaf0 net/openvswitch/conntrack.c:1836
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+page last free pid 81 tgid 81 stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1140 [inline]
+ free_unref_page_prepare+0x95d/0xa80 mm/page_alloc.c:2346
+ free_unref_page_list+0x5a3/0x850 mm/page_alloc.c:2532
+ shrink_folio_list+0x7f72/0x89e0 mm/vmscan.c:1488
+ shrink_inactive_list mm/vmscan.c:1914 [inline]
+ shrink_list mm/vmscan.c:2155 [inline]
+ shrink_lruvec+0x16e3/0x2d40 mm/vmscan.c:5681
+ shrink_node_memcgs mm/vmscan.c:5867 [inline]
+ shrink_node+0x11a8/0x2960 mm/vmscan.c:5902
+ kswapd_shrink_node mm/vmscan.c:6696 [inline]
+ balance_pgdat mm/vmscan.c:6886 [inline]
+ kswapd+0x1aac/0x2f50 mm/vmscan.c:7146
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+Memory state around the buggy address:
+ ffff888023f73f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888023f74000: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+>ffff888023f74080: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+                   ^
+ ffff888023f74100: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888023f74180: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+==================================================================
+
 
 ---
- drivers/net/ethernet/marvell/sky2.c        |  2 +-
- drivers/net/ethernet/mellanox/mlx4/en_rx.c |  2 +-
- include/linux/skbuff.h                     | 14 +++++---------
- net/core/skbuff.c                          |  4 ++--
- net/tls/tls_device.c                       |  2 +-
- net/tls/tls_strp.c                         |  2 +-
- 6 files changed, 11 insertions(+), 15 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/marvell/sky2.c b/drivers/net/ethernet/marvell/sky2.c
-index 07720841a8d7..8e00a5856856 100644
---- a/drivers/net/ethernet/marvell/sky2.c
-+++ b/drivers/net/ethernet/marvell/sky2.c
-@@ -2501,7 +2501,7 @@ static void skb_put_frags(struct sk_buff *skb, unsigned int hdr_space,
- 
- 		if (length == 0) {
- 			/* don't need this page */
--			__skb_frag_unref(frag, false);
-+			__skb_frag_unref(frag, false, false);
- 			--skb_shinfo(skb)->nr_frags;
- 		} else {
- 			size = min(length, (unsigned) PAGE_SIZE);
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-index eac49657bd07..4dbf29b46979 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-@@ -526,7 +526,7 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
- fail:
- 	while (nr > 0) {
- 		nr--;
--		__skb_frag_unref(skb_shinfo(skb)->frags + nr, false);
-+		__skb_frag_unref(skb_shinfo(skb)->frags + nr, false, false);
- 	}
- 	return 0;
- }
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 058d72a2a250..c3edb4a3450a 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3547,23 +3547,19 @@ skb_page_unref(struct page *page, bool recycle, bool napi_safe)
- 	put_page(page);
- }
- 
--static inline void
--napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
--{
--	skb_page_unref(skb_frag_page(frag), recycle, napi_safe);
--}
--
- /**
-  * __skb_frag_unref - release a reference on a paged fragment.
-  * @frag: the paged fragment
-  * @recycle: recycle the page if allocated via page_pool
-+ * @napi_safe: set to true if running in the same napi context as where the
-+ * consumer would run.
-  *
-  * Releases a reference on the paged fragment @frag
-  * or recycles the page via the page_pool API.
-  */
--static inline void __skb_frag_unref(skb_frag_t *frag, bool recycle)
-+static inline void __skb_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
- {
--	napi_frag_unref(frag, recycle, false);
-+	skb_page_unref(skb_frag_page(frag), recycle, napi_safe);
- }
- 
- /**
-@@ -3578,7 +3574,7 @@ static inline void skb_frag_unref(struct sk_buff *skb, int f)
- 	struct skb_shared_info *shinfo = skb_shinfo(skb);
- 
- 	if (!skb_zcopy_managed(skb))
--		__skb_frag_unref(&shinfo->frags[f], skb->pp_recycle);
-+		__skb_frag_unref(&shinfo->frags[f], skb->pp_recycle, false);
- }
- 
- /**
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 5c86ecaceb6c..a6dbba56e047 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -1109,7 +1109,7 @@ static void skb_release_data(struct sk_buff *skb, enum skb_drop_reason reason,
- 	}
- 
- 	for (i = 0; i < shinfo->nr_frags; i++)
--		napi_frag_unref(&shinfo->frags[i], skb->pp_recycle, napi_safe);
-+		__skb_frag_unref(&shinfo->frags[i], skb->pp_recycle, napi_safe);
- 
- free_head:
- 	if (shinfo->frag_list)
-@@ -4200,7 +4200,7 @@ int skb_shift(struct sk_buff *tgt, struct sk_buff *skb, int shiftlen)
- 		fragto = &skb_shinfo(tgt)->frags[merge];
- 
- 		skb_frag_size_add(fragto, skb_frag_size(fragfrom));
--		__skb_frag_unref(fragfrom, skb->pp_recycle);
-+		__skb_frag_unref(fragfrom, skb->pp_recycle, false);
- 	}
- 
- 	/* Reposition in the original skb */
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index bf8ed36b1ad6..5dc6381f34fb 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -140,7 +140,7 @@ static void destroy_record(struct tls_record_info *record)
- 	int i;
- 
- 	for (i = 0; i < record->num_frags; i++)
--		__skb_frag_unref(&record->frags[i], false);
-+		__skb_frag_unref(&record->frags[i], false, false);
- 	kfree(record);
- }
- 
-diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
-index ca1e0e198ceb..85b41f226978 100644
---- a/net/tls/tls_strp.c
-+++ b/net/tls/tls_strp.c
-@@ -196,7 +196,7 @@ static void tls_strp_flush_anchor_copy(struct tls_strparser *strp)
- 	DEBUG_NET_WARN_ON_ONCE(atomic_read(&shinfo->dataref) != 1);
- 
- 	for (i = 0; i < shinfo->nr_frags; i++)
--		__skb_frag_unref(&shinfo->frags[i], false);
-+		__skb_frag_unref(&shinfo->frags[i], false, false);
- 	shinfo->nr_frags = 0;
- 	if (strp->copy_mode) {
- 		kfree_skb_list(shinfo->frag_list);
--- 
-2.44.0.396.g6e790dbe36-goog
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
