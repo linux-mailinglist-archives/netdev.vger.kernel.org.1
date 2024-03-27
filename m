@@ -1,59 +1,78 @@
-Return-Path: <netdev+bounces-82540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5141388E87D
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:22:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC8A988E828
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:13:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67BEEB262B7
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:11:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C31531C2FA2F
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB8C149C67;
-	Wed, 27 Mar 2024 14:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA201386A0;
+	Wed, 27 Mar 2024 14:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xzuTZSBa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HaYZUqiJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B3914659A;
-	Wed, 27 Mar 2024 14:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746A313790B;
+	Wed, 27 Mar 2024 14:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711550271; cv=none; b=GpEQznjGjjSAOOVKV8RHTGraZJrDlf0wIAr+KwaMh5lV6WdeARVhxV4ZxnLsauVj7dvexa5o8vY8jmPNatUu56yBjIsSINNajPmGmdmnSe9WJmCTPTw7mQeZB0hsV+uMAlCk3WGwJJBsVpdauAJCz1ZkKOmHl8p+qQr7NphIhwc=
+	t=1711550679; cv=none; b=cn/hcHkdh5wc55iITmiodCFijCa7SesZRSDLdNPW8MNp+auiR8HW1Vgm6y97e/a7TUwRKdfnSym79W9Muml26cTMOz89cXMQJJYh2o2H1BWHrAqU0mBOEIeSNJwTltAJgbQXiF1ncb/8WUHLixc398gj4EWJIzsQE2b6BIjDBfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711550271; c=relaxed/simple;
-	bh=d+1+22sVSGzYxPrvLwgHoaoTt9M7aBJRMT25MX0cxuI=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ORo0KmokRXm8MA7vxDFFyd0uEw2tOawDa3rygNAQpLU0dx1OBDmasp6b6YHHKHvzOrFMEm9VqgeAry9RJPwBhWFiWyuTNxeGvylwhshIbmKouRLjgW22cg0gndkrxpyDvIjNFFRVQKiEvWSUhMoZ3iG9eBBtuTvWdj35hoJRjSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xzuTZSBa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C23C433C7;
-	Wed, 27 Mar 2024 14:37:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1711550271;
-	bh=d+1+22sVSGzYxPrvLwgHoaoTt9M7aBJRMT25MX0cxuI=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=xzuTZSBakeIeXIqimdvXQSQogs61P+L/IYfB5wKQlftbcY0DfYFygaM4ZkKG7VUoo
-	 z0WFNBOyNBWQUSna74v+SsaHr7Wck2IvJJgcuRYeWesJFhbrXBPmc7T4eIQH8ckUVf
-	 Nuvx3/Cql0rdluNj/vKflfDsP3taJstdTRAQWItA=
-Date: Wed, 27 Mar 2024 15:37:48 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org, David Ahern <dsahern@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, heng guo <heng.guo@windriver.com>,
-	netdev@vger.kernel.org
-Subject: Re: fix IPSTATS_MIB_OUTOCTETS for IPv6 in stable-6.6.x
-Message-ID: <2024032740-runny-giver-3d64@gregkh>
-References: <ZauRBl7zXWQRVZnl@pc11.op.pod.cz>
- <20240124123006.26bad16c@kernel.org>
- <61d1b53f-2879-4f9f-bd68-01333a892c02@gmail.com>
- <493d90b0-53f8-487e-8e0f-49f1dce65d58@windriver.com>
- <20240124174652.670af8d9@kernel.org>
- <ZbIEDFETblTqqCWm@pc11.op.pod.cz>
- <ZbJ5Wfx7jNfXBpAP@pc11.op.pod.cz>
- <08d60060-ee2b-436f-9dcc-8aad1c8c35a1@gmail.com>
- <ZecuUV4xwXxQ8Ach@pc11.op.pod.cz>
+	s=arc-20240116; t=1711550679; c=relaxed/simple;
+	bh=YSLGb1GXTxnIIfhyIvC9GwAUZFGWgRDDFdTmlm4yRqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gmwhrf900JhTTQN1zSkGKjQRNbgZQabbTMWBm7xvYb2pLemNXTe7ppt4PmTtXuhAWDoakSAGlZB5g3swHlDiezNxFpnMG9sr6N9UjWCeV3cui9n26RuHm3WNJRSB5GthLIHajxb5Gzbn1+cbg5w02i7ylHw5LoSFtjs4VWxsGos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HaYZUqiJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 463CDC433C7;
+	Wed, 27 Mar 2024 14:44:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711550679;
+	bh=YSLGb1GXTxnIIfhyIvC9GwAUZFGWgRDDFdTmlm4yRqw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HaYZUqiJa07VEuOX2hUbqIVTlZ8o22sLnSNBmDvYGZReqgO3lSbCQK9Or5zp1KJbR
+	 JvGvc2ZghpWxbzW5dcHWLkdtr9WPLtyBcYNZCtzYkZ0aehioYwzIa2QQF4Onnok8FB
+	 Wc4M/AdTqe1cmI5ouLQdACNeTQWP2vIBDKBtvzYFRBk3qaqst4TyhFgm3+FAsIAsGT
+	 mP0xgnOjCX2lX877lT3Jl7cBjQZe+yHaVUg+5xWuYNjiWEBCoNJyKr1tugz+G9vCSC
+	 fo6IjfObk8UjT+1n6kvF1dQ0obJmvxfW9gBCQkbrMpth/5YtLWt0cnhdydB5wLkqq1
+	 8N6oSbYrk2HYQ==
+Date: Wed, 27 Mar 2024 14:44:31 +0000
+From: Simon Horman <horms@kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: linux-kselftest@vger.kernel.org, David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	=?utf-8?B?TWHDrXJh?= Canal <mcanal@igalia.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Kees Cook <keescook@chromium.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	Ville =?utf-8?B?U3lyasOkbMOk?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: Re: [PATCH v2 12/14] sh: Add support for suppressing warning
+ backtraces
+Message-ID: <20240327144431.GL403975@kernel.org>
+References: <20240325175248.1499046-1-linux@roeck-us.net>
+ <20240325175248.1499046-13-linux@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,21 +81,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZecuUV4xwXxQ8Ach@pc11.op.pod.cz>
+In-Reply-To: <20240325175248.1499046-13-linux@roeck-us.net>
 
-On Tue, Mar 05, 2024 at 03:38:09PM +0100, Vitezslav Samel wrote:
-> 	Hi,
+On Mon, Mar 25, 2024 at 10:52:46AM -0700, Guenter Roeck wrote:
+> Add name of functions triggering warning backtraces to the __bug_table
+> object section to enable support for suppressing WARNING backtraces.
 > 
->   could you, please, include commit b4a11b2033b7 ("net: fix
-> IPSTATS_MIB_OUTPKGS increment in OutForwDatagrams") from Linus' tree
-> into the 6.6 stable tree (only)?
+> To limit image size impact, the pointer to the function name is only added
+> to the __bug_table section if both CONFIG_KUNIT_SUPPRESS_BACKTRACE and
+> CONFIG_DEBUG_BUGVERBOSE are enabled. Otherwise, the __func__ assembly
+> parameter is replaced with a (dummy) NULL parameter to avoid an image size
+> increase due to unused __func__ entries (this is necessary because __func__
+> is not a define but a virtual variable).
 > 
-> Reported-by: Vitezslav Samel <vitezslav@samel.cz>
-> Fixes: e4da8c78973c ("net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated")
-> Link: https://lore.kernel.org/netdev/ZauRBl7zXWQRVZnl@pc11.op.pod.cz/
-> Tested-by: Vitezslav Samel <vitezslav@samel.cz>
+> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> ---
+> - Rebased to v6.9-rc1
+> - Added Tested-by:, Acked-by:, and Reviewed-by: tags
+> - Introduced KUNIT_SUPPRESS_BACKTRACE configuration option
+> 
+>  arch/sh/include/asm/bug.h | 26 ++++++++++++++++++++++----
+>  1 file changed, 22 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/sh/include/asm/bug.h b/arch/sh/include/asm/bug.h
+> index 05a485c4fabc..470ce6567d20 100644
+> --- a/arch/sh/include/asm/bug.h
+> +++ b/arch/sh/include/asm/bug.h
+> @@ -24,21 +24,36 @@
+>   * The offending file and line are encoded in the __bug_table section.
+>   */
+>  #ifdef CONFIG_DEBUG_BUGVERBOSE
+> +
+> +#ifdef CONFIG_KUNIT_SUPPRESS_BACKTRACE
+> +# define HAVE_BUG_FUNCTION
+> +# define __BUG_FUNC_PTR	"\t.long %O2\n"
+> +#else
+> +# define __BUG_FUNC_PTR
+> +#endif /* CONFIG_KUNIT_SUPPRESS_BACKTRACE */
+> +
 
-Now queued up, thanks.
+Hi Guenter,
 
-greg k-h
+a minor nit from my side: this change results in a Kernel doc warning.
+
+     .../bug.h:29: warning: expecting prototype for _EMIT_BUG_ENTRY(). Prototype was for HAVE_BUG_FUNCTION() instead
+
+Perhaps either the new code should be placed above the Kernel doc,
+or scripts/kernel-doc should be enhanced?
+
+>  #define _EMIT_BUG_ENTRY				\
+>  	"\t.pushsection __bug_table,\"aw\"\n"	\
+>  	"2:\t.long 1b, %O1\n"			\
+> -	"\t.short %O2, %O3\n"			\
+> -	"\t.org 2b+%O4\n"			\
+> +	__BUG_FUNC_PTR				\
+> +	"\t.short %O3, %O4\n"			\
+> +	"\t.org 2b+%O5\n"			\
+>  	"\t.popsection\n"
+>  #else
+>  #define _EMIT_BUG_ENTRY				\
+>  	"\t.pushsection __bug_table,\"aw\"\n"	\
+>  	"2:\t.long 1b\n"			\
+> -	"\t.short %O3\n"			\
+> -	"\t.org 2b+%O4\n"			\
+> +	"\t.short %O4\n"			\
+> +	"\t.org 2b+%O5\n"			\
+>  	"\t.popsection\n"
+>  #endif
+>  
+> +#ifdef HAVE_BUG_FUNCTION
+> +# define __BUG_FUNC	__func__
+> +#else
+> +# define __BUG_FUNC	NULL
+> +#endif
+> +
+>  #define BUG()						\
+>  do {							\
+>  	__asm__ __volatile__ (				\
+
+...
 
