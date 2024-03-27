@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-82671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A3D88F0D8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:25:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB01988F0E7
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 22:28:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A98351F2620C
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:25:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A2101F2805B
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E79153565;
-	Wed, 27 Mar 2024 21:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E705014C5BE;
+	Wed, 27 Mar 2024 21:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="eGdUKc52"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="l8Rn6UNA"
 X-Original-To: netdev@vger.kernel.org
 Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1EE28366;
-	Wed, 27 Mar 2024 21:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0E120DF1;
+	Wed, 27 Mar 2024 21:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711574703; cv=none; b=TPK0Rh41mZSPMxaMkKysvJ3Yv2ho+NWtkQaAHCZHsnT7Bgp5P2met0rnPJoFzATIfv1nq0JQs/HVevaJkqEKkcImtnUwGKvoCErlPup5GUwv3CRfI2Euim6WSgJgK4RUjzBZZRWdJc7b93fAUMkUFr8nKkMYJ7YHlyvaZgP1MHs=
+	t=1711574919; cv=none; b=uPgoJOdjlvz0Pai+ehrBZMAazC8TuKFQPnFrD2D0NydSO+70eJoKk+LEm3wZn1r2Eyx1V7vS57mBpFkb6xPmt/kowFpUMdkHpac2XXNBQ9VBxJh86d7/mwaob0W66BO4E5nWZvle9q+W1i5pZeMqygr+aAnUzAiEDVt7QQAseRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711574703; c=relaxed/simple;
-	bh=fMWyR4T8HDfiXSrxNx4i4P75j10VLhztLf65/nEwedA=;
+	s=arc-20240116; t=1711574919; c=relaxed/simple;
+	bh=W32MUgIqaGh13w+iDuYAwjGFaRPCymDNIE0Az86m6sU=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=L2oUVuHnGjGROlR/MAagYXGvgnzy1e+10LZTvbJldYODhKEiAoCynqJQTTaOeHybA60wZMK4cYJ4e6eIfnsy/8fx7spKOJVp5IRSYfNIgL45Wjo+OAZlkpGSdmiGPY9jQpsjEXwHmCA4jGCdb8f76gHiA1flYsrLu2jY2azg2ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=eGdUKc52; arc=none smtp.client-ip=168.119.38.16
+	 Content-Type:MIME-Version; b=d45kUEjofn+9NBw/z9mOPAfTkc0saTIrgI0yTiwP67w9qmiSuAe3OjNRmmIDmI3KLG2mzwiLdRdhxtZDmGYRYksKAwApW1r5Ayid9piE7NroDYf24mnNif61KQb5sYJX301pGfGuNpSBFEa0Fe7ZGccdPUzi9ekZYJvBGuNGUgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=l8Rn6UNA; arc=none smtp.client-ip=168.119.38.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
 	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=fMWyR4T8HDfiXSrxNx4i4P75j10VLhztLf65/nEwedA=;
-	t=1711574701; x=1712784301; b=eGdUKc529jKPvDJpYhuu7ujqZgD6Oonudp6XU+ZXie5k5Kl
-	t1yt7HVoL2GI0EkL5RoIFxRk1OTrsYmq+EoBKw/4IrNVypqQXexG8ViH/wah4QFL9PEt0h1FLko4O
-	5IT65arrJXuxoytyg2iPlraYHeRIX9HuTzz6JYApJnEwsMUwv00TqB6r/Jkf6q7QbNFqjfih4/NAX
-	3cLrT4qjHTVJDCViq768HhjYQpDAfcxU6HxKwB7TgaW4kK7QHQlXWzrNsBMsMEVCbNroufKTFT8HJ
-	nHiUaAl2zkl1IpDMy0YFK+1dPvJ5vge2KgUGWbaThIrp44woFAWfzaUSpcRrLxUA==;
+	Resent-Cc:Resent-Message-ID; bh=MFYQmoUrcQloaBNBs8abCrEkISK3AqZ58HKKo9Dwa7w=;
+	t=1711574918; x=1712784518; b=l8Rn6UNA5e8BK6puaNhplIxUIDMAN+m80aWDEUrQL+LWicA
+	jcRwYpJtQxr5bbePTr1H6roxIf1F9PA+1BaA9QV+3FCvoY6IXAxyjj6Cx5WE2LTRV3xfHixstQtog
+	oS9/l5p24EodlgjMp3HmdrgOfA9tmDmXPZ5d63fxtvThiPAJ+Fog6vsGAMjR64kwNr+UOT5qlnfZj
+	PaZ6qANNwKUx0e6beBMaIvu1gQzxZjIJy8DadM2gPYx+pTvVqmp32VQQ1HO5BEfPRpMgTo6NxB2ZL
+	2eLID6AD/gI0c7fwz+RUP2i8aGecKLx7G3c27yhzZhF0K77N+dnLxj4aF2eU1I4Q==;
 Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.97)
 	(envelope-from <johannes@sipsolutions.net>)
-	id 1rpalV-0000000HOpZ-2XGl;
-	Wed, 27 Mar 2024 22:24:57 +0100
-Message-ID: <f50b31a3328986952f4042985eb5bab66c4ed1d9.camel@sipsolutions.net>
-Subject: Re: [RFC PATCH v2 1/4] tracing: add __print_sym() to replace
- __print_symbolic()
+	id 1rpap1-0000000HOyv-0JxP;
+	Wed, 27 Mar 2024 22:28:35 +0100
+Message-ID: <0e7af4cb0dc19be7cc0267256284a70ceb250b38.camel@sipsolutions.net>
+Subject: Re: [PATCH 0/3] using guard/__free in networking
 From: Johannes Berg <johannes@sipsolutions.net>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Wed, 27 Mar 2024 22:24:56 +0100
-In-Reply-To: <20240327211119.GW403975@kernel.org>
-References: <20240326192131.438648-6-johannes@sipsolutions.net>
-	 <20240326202131.9d261d5bb667.I9bd2617499f0d170df58471bc51379742190f92d@changeid>
-	 <20240327211119.GW403975@kernel.org>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Peter Zijlstra
+	 <peterz@infradead.org>, linux-kernel@vger.kernel.org
+Date: Wed, 27 Mar 2024 22:28:33 +0100
+In-Reply-To: <87h6grbevf.fsf@cloudflare.com>
+References: <20240325223905.100979-5-johannes@sipsolutions.net>
+	 <20240325190957.02d74258@kernel.org>
+	 <8eeae19a0535bfe72f87ee8c74a15dd2e753c765.camel@sipsolutions.net>
+	 <20240326073722.637e8504@kernel.org>
+	 <0dc633a36a658b96f9ec98165e7db61a176c79e0.camel@sipsolutions.net>
+	 <87h6grbevf.fsf@cloudflare.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
@@ -69,21 +71,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-malware-bazaar: not-scanned
 
-On Wed, 2024-03-27 at 21:11 +0000, Simon Horman wrote:
+On Wed, 2024-03-27 at 21:25 +0100, Jakub Sitnicki wrote:
+> On Tue, Mar 26, 2024 at 04:33 PM +01, Johannes Berg wrote:
+> > > Is it also present in Rust or some such?
+> >=20
+> > I have no idea. I _think_ Rust actually ties the data and the locks
+> > together more?
 >=20
-> I'm seeing some allmodconfig build problems with this applied on top of
-> net-next.
+> That is right. Nicely explained here:
+>=20
+> https://marabos.nl/atomics/basics.html#rusts-mutex
 
-> ./include/trace/stages/init.h:30: warning: "TRACE_DEFINE_SYM_FNS" redefin=
-ed
+Right.
 
-> ./include/trace/stages/init.h:54: warning: "TRACE_DEFINE_SYM_LIST" redefi=
-ned
+Thinking about that, we _could_ even add support for drop_guard()?
 
-Yeah, the 0-day bot reported that too, sorry about that. It needs two
-lines to #undef these in init.h before their definition, just like all
-other macros there. Not sure why my builds didn't show that, maybe it
-doesn't affect all users.
+With the below patch to cleanup.h, you can write
 
-johannes
+void my_something(my_t *my)
+{
+...
+	named_guard(lock, mutex)(&my->mutex);
+...
+	if (foo)
+		return -EINVAL; // automatically unlocks
+...
+	// no need for lock any more
+	drop_guard(lock);
+...
+	// do other things now unlocked
+}
+
+
+Is that too ugly? Maybe it's less Java-like and more Rust-like and
+better for Jakub ;-)
+
+In some sense that's nicer than scoped_guard() since it doesn't require
+a new scope / indentation, but maybe Peter already thought about it and
+rejected it :-)
+
+
+Patch follows, though maybe that should be rolled into the 'base' CLASS
+definition instead of defining another "_drop" one for named_guard()?
+
+diff --git a/include/linux/cleanup.h b/include/linux/cleanup.h
+index c2d09bc4f976..31298106c28b 100644
+--- a/include/linux/cleanup.h
++++ b/include/linux/cleanup.h
+@@ -106,7 +106,27 @@ typedef _type class_##_name##_t;					\
+ static inline void class_##_name##_destructor(_type *p)			\
+ { _type _T =3D *p; _exit; }						\
+ static inline _type class_##_name##_constructor(_init_args)		\
+-{ _type t =3D _init; return t; }
++{ _type t =3D _init; return t; }						\
++typedef struct class_##_name##_drop##_t {				\
++	class_##_name##_t obj;						\
++	void (*destructor)(struct class_##_name##_drop##_t *);		\
++} class_##_name##_drop##_t;						\
++static inline void							\
++class_##_name##_drop##_destructor(class_##_name##_drop##_t *p)		\
++{									\
++	if (p->obj)							\
++		class_##_name##_destructor(&p->obj);			\
++	p->obj =3D NULL;							\
++}									\
++static inline class_##_name##_drop##_t					\
++class_##_name##_drop##_constructor(_init_args)				\
++{									\
++	class_##_name##_drop##_t t =3D {					\
++		.obj =3D _init,						\
++		.destructor =3D class_##_name##_drop##_destructor,	\
++	};								\
++	return t;							\
++}
+=20
+ #define EXTEND_CLASS(_name, ext, _init, _init_args...)			\
+ typedef class_##_name##_t class_##_name##ext##_t;			\
+@@ -163,6 +183,11 @@ static inline class_##_name##_t class_##_name##ext##_c=
+onstructor(_init_args) \
+ #define guard(_name) \
+ 	CLASS(_name, __UNIQUE_ID(guard))
+=20
++#define named_guard(_name, _class) \
++	CLASS(_class##_drop, _name)
++
++#define drop_guard(_name) do { _name.destructor(&_name); } while (0)
++
+ #define __guard_ptr(_name) class_##_name##_lock_ptr
+=20
+ #define scoped_guard(_name, args...)					\
+
 
