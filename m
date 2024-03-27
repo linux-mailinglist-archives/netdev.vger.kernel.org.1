@@ -1,141 +1,121 @@
-Return-Path: <netdev+bounces-82655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8186888EF4E
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:36:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6CF488EF56
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3E111C34D48
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:36:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0469F1C34F27
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC161514F9;
-	Wed, 27 Mar 2024 19:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C8F14F9C2;
+	Wed, 27 Mar 2024 19:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XoaXAMOJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0tBNGNW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C47D380;
-	Wed, 27 Mar 2024 19:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C59380
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 19:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711568162; cv=none; b=IqaR9I7OSVj2cn5pb2amOwEtxcvVrBX0EAMfJwD3p6Ob27Zzb/SuI1Su3Y6wltd4qJ1yDWFc4Ng818HcZ+H4ri68r0fA9/VLXzsqR2OPt/3WA8/xsqJ11/k82+d51DDgjZrzRot0tVOyCL0OWGdktpraTBXuaQ+f+Jh+QK+o/6E=
+	t=1711568191; cv=none; b=neY4qHSYbQhAx0iEHhuwLl3X1pSX/EpMApLRZUTyeRxTFB53yExDpLSAcaspf3EwGORo6mgy6cbUJT31NieQ80nFFW4CY+ppyAAlL2HD1/Anj6HNtfyazCQfkICdlJmovl7XWGDjmRHWK+891+sOxCO1pMiMeEiLFAfkcMM9VTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711568162; c=relaxed/simple;
-	bh=T0Gc63+M14jsX7PKFtiIXFMl0tWSi9oDRmgoUZTW/2w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kvWLzCHlXrCLVHGZq9tEGrVrmqm7KSNrNZfM/VNeF3qr9oqwDMT0waNjexrtBYb6MyvcNR0aKcPavrM9Qx1+KwvLDE+6XbMRo3wdksFd9xC7errlqfut1uYd0vGohu9fJUvwGRXMbKgpwpdS/w4jSdfFLTpMMjUYEKK1dPlfb0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XoaXAMOJ; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a4a393b699fso38648266b.0;
-        Wed, 27 Mar 2024 12:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711568159; x=1712172959; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aojaArSnA0JfedDto4elyer8YODIKcUTNNFpLzMMgW8=;
-        b=XoaXAMOJ4Ojmd7idhXiyfKsYBXO1nlVNNBH2lrYeTP5tUZYgJcfSMkvYDdSECwJe3O
-         2WPWBYmKXHC3NZWnWbzWbnrHUyovIC/aoenU0HNzQCX/wvlCFvq+1zEn21HC3sezb8Jz
-         SPURbZsQS6fgh2YVN3sqFKrAbjZhNNG29y5z+ZwHL1BZB0eyGa0r1WlwajFoU7kWaoqZ
-         185ZvXwubU7cpqnWYSzx0ODOXGVS3Mu2DrliJPjTMaV7TwMtsw25xfnbYF5dA8TRfuQ7
-         d8HeMsqPzustoXEui2Uc+vAQDibV6fBvr6di3ODvecj0COgUZeNJQykOCy7aPcLPeDfo
-         WMIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711568159; x=1712172959;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aojaArSnA0JfedDto4elyer8YODIKcUTNNFpLzMMgW8=;
-        b=n8H1GZxWGCDyZS5GqC4sE0iRZ6/9XuV3nlKHKJkja+AZPJKXTt3r1bhBFrxuwpoXLP
-         /AuIC8w+HXy958J1FQf+Iy8P//jBuByUSsJs7ZDJyzOxYeJqyARMljJnc3A2G5ovAQVV
-         yMucFt5nfs8w5c0R/CmBVsN29G8RYl0rdhnkTA4x68Pr6Tc+sVfTGJwKvGsADzkk0z7r
-         ZuacuYt2GO1+otB+99QWCJ431XrYBpUJo2gJUJx+m70N4HppIHuJ0tJcAoyw1Os/6lNk
-         A7IPnFSrw34Qoq2FEpCdpDNEt2tlRguwX14hgVUljq3KsTPBv+nxZOfx3wZjSjKQheEp
-         eLAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVCYs+LogtakcWjQysrzX6wzvIepjw4NCiF8HoEvdnW+fcNZb6q0ncljdi6I5FBFilRdUn5iZ+bKJKGewBdPfMSzBsWPfsv/XqgvyGupEJypYlJ8aUH+Smswfxo10UetclKXgE97Rq//Icad6T7MUFCuayMEwItobDtws+wo/edI1IwriKnb8wNXfmtCeGm1MhBk9yD4Nb6NeeIE2CJi3siS9XkvdLH2QMXSc9ZKCTqjMnArQ2s2S+y+7efnQKwKB7Sh+JQHr9Oali08QD7nkd9+mTNPPesNdBoy5hJdtpUyesJaRFG3rX27s82zYLOQka3WSwt0L3bww8acX1hFWejjOxv/XPiYIHXlO7Qp7cSCgMumKXmmGj/BBqgbPv+hmcJCoJzk0Vg6rREXD4G2sYYooVDZTkzg1NL6i8W/n3poH6AkiaMGuZvsFSjyjfoKCe5k+uOpdSspnFHnd38kzfXebGQ3IHl5+lOODTNJYDDZ5sfGo533LxVP86Tb/wgi5OoYubNq8S7haZuCCbHvffDGirQVz9dYy5SXNsE+g1zIzM=
-X-Gm-Message-State: AOJu0Yyipuc5TsIErMTNm9jkKX/fFMTmqPVE3UYPTd1po8U8p1sC9R2o
-	ZrFIl5QEdHBNhCaYvqj2qCmN3xq+VhVckML3IqGQ17mgDI+OKPapdtBwuK+1qU0=
-X-Google-Smtp-Source: AGHT+IHWYCsKCZfCKe9WJ0A8h2jBWKCzprPvh9Stt4hH84aJN1DmeskwZihR1IueuTRTWs9wYxpP6Q==
-X-Received: by 2002:a17:906:119a:b0:a47:3766:cfec with SMTP id n26-20020a170906119a00b00a473766cfecmr235001eja.9.1711568159337;
-        Wed, 27 Mar 2024 12:35:59 -0700 (PDT)
-Received: from jernej-laptop.localnet (86-58-6-171.dynamic.telemach.net. [86.58.6.171])
-        by smtp.gmail.com with ESMTPSA id j24-20020a17090643d800b00a4672fb2a03sm5858783ejn.10.2024.03.27.12.35.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 12:35:58 -0700 (PDT)
-From: Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
-To: linux-kernel@vger.kernel.org, Allen Pais <apais@linux.microsoft.com>
-Cc: tj@kernel.org, keescook@chromium.org, vkoul@kernel.org, marcan@marcan.st,
- sven@svenpeter.dev, florian.fainelli@broadcom.com, rjui@broadcom.com,
- sbranden@broadcom.com, paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com,
- manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com,
- leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com,
- haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de,
- sean.wang@mediatek.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, afaerber@suse.de,
- logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com,
- robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org,
- orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
- patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org,
- peter.ujfalusi@gmail.com, kys@microsoft.com, haiyangz@microsoft.com,
- wei.liu@kernel.org, decui@microsoft.com, jassisinghbrar@gmail.com,
- mchehab@kernel.org, maintainers@bluecherrydvr.com,
- aubin.constans@microchip.com, ulf.hansson@linaro.org, manuel.lauss@gmail.com,
- mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com,
- hayashi.kunihiko@socionext.com, mhiramat@kernel.org, brucechang@via.com.tw,
- HaraldWelte@viatech.com, pierre@ossman.eu, duncan.sands@free.fr,
- stern@rowland.harvard.edu, oneukum@suse.com,
- openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
- asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
- linux-mediatek@lists.infradead.org, linux-actions@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
- linux-omap@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH 9/9] mmc: Convert from tasklet to BH workqueue
-Date: Wed, 27 Mar 2024 20:35:54 +0100
-Message-ID: <9252961.CDJkKcVGEf@jernej-laptop>
-In-Reply-To: <20240327160314.9982-10-apais@linux.microsoft.com>
-References:
- <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-10-apais@linux.microsoft.com>
+	s=arc-20240116; t=1711568191; c=relaxed/simple;
+	bh=QfXzi0YNDFsvO8OTu50pvn3hzJPM8ReXHZFLA98loos=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qT3nd9pW8XSj2yJfBacQOfr11502aQPVX7zUb+GAtxLm29UnT1l8tvt0UbSTctMSJ1DnWRN2DPlypdmP8HZWghpEC67BgUjkSrfH3vozRAU+ooj8s6BQl/sTSun6lgW7goBnNb4YDdDvNBCX4uMXBJUXNUMCgwK2xsMk1hlK008=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a0tBNGNW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711568188;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=RNzpMpe3zjcO2rv2cPTPhLNPeQGeEirCU3wKPzNxR/w=;
+	b=a0tBNGNWJWLeNh5C/IMufKuzU3+VdchVZueLOtD6dFVAQ23s6pkt9LGyhxEMtWlJBM18VA
+	hVpq0AvsU3CX5o0k+lFnL5PPCia6WXJz85E+/BNfXZxqtgRrercsdGUR9EAQ6a63pUr+ri
+	ZhF3qacrB/DUtPGoRhUlEi0LsihxzO0=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-uVMlZZbbNb6l0MVBaSbpvQ-1; Wed,
+ 27 Mar 2024 15:36:25 -0400
+X-MC-Unique: uVMlZZbbNb6l0MVBaSbpvQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F03FD3801FE1;
+	Wed, 27 Mar 2024 19:36:24 +0000 (UTC)
+Received: from tpad.localdomain (unknown [10.96.133.3])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FB6F1C060D0;
+	Wed, 27 Mar 2024 19:36:24 +0000 (UTC)
+Received: by tpad.localdomain (Postfix, from userid 1000)
+	id 9C4EC4210057A; Wed, 27 Mar 2024 16:36:04 -0300 (-03)
+Date: Wed, 27 Mar 2024 16:36:04 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: net: enable timestamp static key if CPU isolation is configured
+Message-ID: <ZgR1JFNf8bMkTAAm@tpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
-
-Dne sreda, 27. marec 2024 ob 17:03:14 CET je Allen Pais napisal(a):
-> The only generic interface to execute asynchronously in the BH context is
-> tasklet; however, it's marked deprecated and has some design flaws. To
-> replace tasklets, BH workqueue support was recently added. A BH workqueue
-> behaves similarly to regular workqueues except that the queued work items
-> are executed in the BH context.
-> 
-> This patch converts drivers/infiniband/* from tasklet to BH workqueue.
-
-infiniband -> mmc
-
-Best regards,
-Jernej
-
-> 
-> Based on the work done by Tejun Heo <tj@kernel.org>
-> Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
-> 
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 
+For systems that use CPU isolation (via nohz_full), creating or destroying
+a socket with SO_TIMESTAMP, SO_TIMESTAMPNS or SO_TIMESTAMPING with flag
+SOF_TIMESTAMPING_RX_SOFTWARE will cause a static key to be enabled/disabled.
+This in turn causes undesired IPIs to isolated CPUs.
+
+So enable the static key unconditionally, if CPU isolation is enabled,
+thus avoiding the IPIs.
+
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+
+---
+v2: mention SOF_TIMESTAMPING_OPT_TX_SWHW in the commit log (Willem de Bruijn / Paolo Abeni)
+v3: SOF_TIMESTAMPING_OPT_TX_SWHW is irrelevant (Willem de Bruijn)
+v4: additional changelog improvements (Willem de Bruijn)
+v5: late initcall not necessary, can use subsys initcall (Willem de Bruijn)
+v6: rebase against net-next, change subject (Jakub Kicinski)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 5d36a634f468..48c725caa130 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -157,6 +157,7 @@
+ #include <net/page_pool/types.h>
+ #include <net/page_pool/helpers.h>
+ #include <net/rps.h>
++#include <linux/sched/isolation.h>
+ 
+ #include "dev.h"
+ #include "net-sysfs.h"
+@@ -11890,6 +11891,10 @@ static int __init net_dev_init(void)
+ 				       NULL, dev_cpu_dead);
+ 	WARN_ON(rc < 0);
+ 	rc = 0;
++
++	/* avoid static key IPIs to isolated CPUs */
++	if (housekeeping_enabled(HK_TYPE_MISC))
++		net_enable_timestamp();
+ out:
+ 	if (rc < 0) {
+ 		for_each_possible_cpu(i) {
 
 
