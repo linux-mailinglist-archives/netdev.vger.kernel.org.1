@@ -1,252 +1,161 @@
-Return-Path: <netdev+bounces-82450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4371488DCD8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 12:49:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF8A188DCE4
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 12:52:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE79129EB73
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 11:49:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80B63297859
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 11:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440A112C7EB;
-	Wed, 27 Mar 2024 11:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D06212BF0F;
+	Wed, 27 Mar 2024 11:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E+Gh+NKc"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0AE12B16F;
-	Wed, 27 Mar 2024 11:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A216C839F0;
+	Wed, 27 Mar 2024 11:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711540143; cv=none; b=VbR/KTnmCiKpKd5v7Sifn19rXjuJclOgdiozkAiNDohlY1RpkeBuWW9143LPEQ2aO2LB6MWaH4Xk94vx3q7EE53T5v1eFMBiRydzBcn6lE9ty07PbRWh7EKBCS61YYXqQMVdYyAViK7AnNWvV/6QivbpmCAJ6NXadCS8qNLWIFg=
+	t=1711540328; cv=none; b=PWLIJjjkzY2vpwuTCbGvyWtu21mkUJhzQeXqdd0WBBpnYd+hgop1hLR3fTP/w8JUkKHJJXKBxqqHnXUVX4c4kVIzleUviKMP4SJGYXguTDQHlLKGO2VBgXtypO66E9AaN6t1DBUzm1chxVHNZ9yNkr8fxByzvBecThIHpxdKxXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711540143; c=relaxed/simple;
-	bh=OeCOJXi+V4AjNrEA00UOOb+3Wy6y1zs9/FElN9Bvds4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Buw9exxE9hPYoBAr+uSKeQU6IOuaejGhhXTOsZgd3FUTKxrlfNDTrzsyylV6TgI0XqRr/4rP294r1lbaeP0PuG6UVo2Jz7gNtKdGkFuc4IrCvTNBO9ykPIfcNAdRmjkCf6SUCMzRkjed3BUEtgbbTyrKQqq4JlSEUEgxQaZWg4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4V4Q0h6Y0Wz1GDN2;
-	Wed, 27 Mar 2024 19:48:20 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id C48E7140258;
-	Wed, 27 Mar 2024 19:48:51 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 27 Mar 2024 19:48:51 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <jiri@resnulli.us>, <horms@kernel.org>,
-	<rkannoth@marvell.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH V6 net-next 4/4] net: hns3: add support to query scc version by devlink info
-Date: Wed, 27 Mar 2024 19:43:30 +0800
-Message-ID: <20240327114330.1826631-5-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240327114330.1826631-1-shaojijie@huawei.com>
-References: <20240327114330.1826631-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1711540328; c=relaxed/simple;
+	bh=4hdiSWyOaq4PTNqiiHYw1eV5isab4taY8SB4Jx/XtiA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=PfKqcTBPFI33PdPfyxbmE1PngFJsFVTlTxiEZ+qwy/cwezJyMEfAM1n5bbGA0fZmFRSu/wnepYFN6SI61u1UWsaG+n8onlBj8sxSf3t4bnqOQCy7ainEr0DDdchn/2id3QTgGF6aIaRKef2/9cVk1iEjaffhvVzm07v4v08ARDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E+Gh+NKc; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a45f257b81fso765669366b.0;
+        Wed, 27 Mar 2024 04:52:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711540325; x=1712145125; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L+d1nuqxFtNkWbCvpZ9Vg4lSX7Mk6a5AbjdAX72V6OQ=;
+        b=E+Gh+NKc+Z3p3vSSmb83kJox+QSfJR+7MHw/iSLmX7sAwuUnCLVwoqRo/vB7FMHgtF
+         t+3g/9YQCO9utNdOOu79RvfbH4wSLowYC0XkGpNgulWsOUiIG3dMkDKndaSJweL1tJDa
+         g0nXM3i6TTn1LU5r2vTLogsq7c69APsyBeGKNHu3Um2oxz3SHydWOBAVB4pPRdGz+iv5
+         ezGrZXcEQQfEdsvJs+0XioEN3jzAfuJffcS4c2x8ayDaZC8hcSdXTMVXW8Ow894yuhpv
+         QB6+hw7eMYqaKYvmgeCEaqcsDo1s9xQ7CkPeLKqnMPZbNs4DNAkS+tL4uDIniZF5NUgZ
+         Ntdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711540325; x=1712145125;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L+d1nuqxFtNkWbCvpZ9Vg4lSX7Mk6a5AbjdAX72V6OQ=;
+        b=RdpWbY7VjIJ0T1U8TZRcohH/eH/QQO6bB1XzfhnvquvbUSeGQNENzgVbI3jkjQ/dzI
+         Zny1xEF/WB5Kw/LoZ+sZLu0d+w4RMoFs2dG+dNdT/O4UUdyTMKMp5MweUG9zBdxoZUop
+         ZqpljU7x9DX9mCyuZF9/CaM47IkuZ0U2ugpope+dnCheoLJsNjsS9eiIjXVmgZGw4/6l
+         fqUMwmKUu+HosGowegDBxLgR0yVtvORSxpGPS0Ejd6GA0KAgKgz9CpXgH/Q3Djr2JtTo
+         hQZJN9rYplUpnNRrsJh1zfhGm5luVZwv8pnxk3EfYkW3gPI7WEKWt1vqvCsV7zIuAr1E
+         L21Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVqhiFnqMypGgoP3eUhCmu8OP6S1fSRWTqZrIwJJSENwiCzDRIY2yIfPsNg0T5ZwI0OZKsRRSm9HwNg5n7OTFUbgzmBcK0p
+X-Gm-Message-State: AOJu0YwWhtWub7gsc2z+456Bb2UgFPeVVnDJv7Pqt8neNbAAjk1xVRlW
+	9rKPfg8CW1sC8+sE9/fWyYVcTBRnhXIcV0DxCKtAkNZuc/A/hinibpKU6T1b
+X-Google-Smtp-Source: AGHT+IEZB9iv0yio76vX87RQYNFK/Yt+r52vpa230EJAe6g42GyVUYPJ3p9MMiNPp59XMnju/SjZJA==
+X-Received: by 2002:a17:906:a855:b0:a4d:f682:50c5 with SMTP id dx21-20020a170906a85500b00a4df68250c5mr725198ejb.53.1711540324629;
+        Wed, 27 Mar 2024 04:52:04 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:7b87:a500:dd0e:a4dd:4c2a:b10a? (dynamic-2a01-0c22-7b87-a500-dd0e-a4dd-4c2a-b10a.c22.pool.telefonica.de. [2a01:c22:7b87:a500:dd0e:a4dd:4c2a:b10a])
+        by smtp.googlemail.com with ESMTPSA id c21-20020a170906155500b00a46baba1a0asm5358054ejd.100.2024.03.27.04.52.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Mar 2024 04:52:04 -0700 (PDT)
+Message-ID: <982b02cb-a095-4131-84a7-24817ac68857@gmail.com>
+Date: Wed, 27 Mar 2024 12:52:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Bjorn Helgaas <bhelgaas@google.com>,
+ Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
+Cc: "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH 0/2] PCI: Add and use pcim_iomap_region()
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Hao Chen <chenhao418@huawei.com>
+Several drivers use the following sequence for a single BAR:
+rc = pcim_iomap_regions(pdev, BIT(bar), name);
+if (rc)
+	error;
+addr = pcim_iomap_table(pdev)[bar];
 
-Add support to query scc version by devlink info for device V3.
+Let's create a simpler (from implementation and usage perspective)
+pcim_iomap_region() for this use case.
 
-Signed-off-by: Hao Chen <chenhao418@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  9 ++++
- .../hns3/hns3_common/hclge_comm_cmd.h         |  8 ++++
- .../hisilicon/hns3/hns3pf/hclge_devlink.c     | 44 +++++++++++++++++--
- .../hisilicon/hns3/hns3pf/hclge_devlink.h     |  2 +
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 18 ++++++++
- .../hisilicon/hns3/hns3pf/hclge_main.h        |  1 +
- 6 files changed, 79 insertions(+), 3 deletions(-)
+Note: The check for !pci_resource_len() is included in
+pcim_iomap(), so we don't have to duplicate it.
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index e9266c65b331..7c2c8bea4c06 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -366,6 +366,15 @@ struct hnae3_vector_info {
- #define HNAE3_FW_VERSION_BYTE0_SHIFT	0
- #define HNAE3_FW_VERSION_BYTE0_MASK	GENMASK(7, 0)
- 
-+#define HNAE3_SCC_VERSION_BYTE3_SHIFT	24
-+#define HNAE3_SCC_VERSION_BYTE3_MASK	GENMASK(31, 24)
-+#define HNAE3_SCC_VERSION_BYTE2_SHIFT	16
-+#define HNAE3_SCC_VERSION_BYTE2_MASK	GENMASK(23, 16)
-+#define HNAE3_SCC_VERSION_BYTE1_SHIFT	8
-+#define HNAE3_SCC_VERSION_BYTE1_MASK	GENMASK(15, 8)
-+#define HNAE3_SCC_VERSION_BYTE0_SHIFT	0
-+#define HNAE3_SCC_VERSION_BYTE0_MASK	GENMASK(7, 0)
-+
- struct hnae3_ring_chain_node {
- 	struct hnae3_ring_chain_node *next;
- 	u32 tqp_index;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-index a2bc5a9adaa3..2c2a2f1e0d7a 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-@@ -247,6 +247,9 @@ enum hclge_opcode_type {
- 	HCLGE_OPC_QCN_AJUST_INIT	= 0x1A07,
- 	HCLGE_OPC_QCN_DFX_CNT_STATUS    = 0x1A08,
- 
-+	/* SCC commands */
-+	HCLGE_OPC_QUERY_SCC_VER		= 0x1A84,
-+
- 	/* Mailbox command */
- 	HCLGEVF_OPC_MBX_PF_TO_VF	= 0x2000,
- 	HCLGEVF_OPC_MBX_VF_TO_PF	= 0x2001,
-@@ -394,6 +397,11 @@ struct hclge_comm_query_version_cmd {
- 	__le32 caps[HCLGE_COMM_QUERY_CAP_LENGTH]; /* capabilities of device */
- };
- 
-+struct hclge_comm_query_scc_cmd {
-+	__le32 scc_version;
-+	u8 rsv[20];
-+};
-+
- #define HCLGE_DESC_DATA_LEN		6
- struct hclge_desc {
- 	__le16 opcode;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.c
-index 9a939c0b217f..a1571c108678 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.c
-@@ -5,6 +5,34 @@
- 
- #include "hclge_devlink.h"
- 
-+static int hclge_devlink_scc_info_get(struct devlink *devlink,
-+				      struct devlink_info_req *req)
-+{
-+	struct hclge_devlink_priv *priv = devlink_priv(devlink);
-+	char scc_version[HCLGE_DEVLINK_FW_SCC_LEN];
-+	struct hclge_dev *hdev = priv->hdev;
-+	u32 scc_version_tmp;
-+	int ret;
-+
-+	ret = hclge_query_scc_version(hdev, &scc_version_tmp);
-+	if (ret) {
-+		dev_err(&hdev->pdev->dev,
-+			"failed to get scc version, ret = %d\n", ret);
-+		return ret;
-+	}
-+
-+	snprintf(scc_version, sizeof(scc_version), "%lu.%lu.%lu.%lu",
-+		 hnae3_get_field(scc_version_tmp, HNAE3_SCC_VERSION_BYTE3_MASK,
-+				 HNAE3_FW_VERSION_BYTE3_SHIFT),
-+		 hnae3_get_field(scc_version_tmp, HNAE3_SCC_VERSION_BYTE2_MASK,
-+				 HNAE3_FW_VERSION_BYTE2_SHIFT),
-+		 hnae3_get_field(scc_version_tmp, HNAE3_SCC_VERSION_BYTE1_MASK,
-+				 HNAE3_FW_VERSION_BYTE1_SHIFT),
-+		 hnae3_get_field(scc_version_tmp, HNAE3_SCC_VERSION_BYTE0_MASK,
-+				 HNAE3_FW_VERSION_BYTE0_SHIFT));
-+	return devlink_info_version_running_put(req, "fw.scc", scc_version);
-+}
-+
- static int hclge_devlink_info_get(struct devlink *devlink,
- 				  struct devlink_info_req *req,
- 				  struct netlink_ext_ack *extack)
-@@ -13,6 +41,7 @@ static int hclge_devlink_info_get(struct devlink *devlink,
- 	struct hclge_devlink_priv *priv = devlink_priv(devlink);
- 	char version_str[HCLGE_DEVLINK_FW_STRING_LEN];
- 	struct hclge_dev *hdev = priv->hdev;
-+	int ret;
- 
- 	snprintf(version_str, sizeof(version_str), "%lu.%lu.%lu.%lu",
- 		 hnae3_get_field(hdev->fw_version, HNAE3_FW_VERSION_BYTE3_MASK,
-@@ -24,9 +53,18 @@ static int hclge_devlink_info_get(struct devlink *devlink,
- 		 hnae3_get_field(hdev->fw_version, HNAE3_FW_VERSION_BYTE0_MASK,
- 				 HNAE3_FW_VERSION_BYTE0_SHIFT));
- 
--	return devlink_info_version_running_put(req,
--						DEVLINK_INFO_VERSION_GENERIC_FW,
--						version_str);
-+	ret = devlink_info_version_running_put(req,
-+					       DEVLINK_INFO_VERSION_GENERIC_FW,
-+					       version_str);
-+	if (ret) {
-+		dev_err(&hdev->pdev->dev, "failed to set running version of fw\n");
-+		return ret;
-+	}
-+
-+	if (hdev->pdev->revision > HNAE3_DEVICE_VERSION_V2)
-+		ret = hclge_devlink_scc_info_get(devlink, req);
-+
-+	return ret;
- }
- 
- static int hclge_devlink_reload_down(struct devlink *devlink, bool netns_change,
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.h
-index 918be04507a5..148effa5ea89 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.h
-@@ -6,6 +6,8 @@
- 
- #include "hclge_main.h"
- 
-+#define	HCLGE_DEVLINK_FW_SCC_LEN	32
-+
- struct hclge_devlink_priv {
- 	struct hclge_dev *hdev;
- };
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 9ecc7fc34c5e..4d2fd89bf202 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -10883,6 +10883,24 @@ static u32 hclge_get_fw_version(struct hnae3_handle *handle)
- 	return hdev->fw_version;
- }
- 
-+int hclge_query_scc_version(struct hclge_dev *hdev, u32 *scc_version)
-+{
-+	struct hclge_comm_query_scc_cmd *resp;
-+	struct hclge_desc desc;
-+	int ret;
-+
-+	hclge_cmd_setup_basic_desc(&desc, HCLGE_OPC_QUERY_SCC_VER, 1);
-+	resp = (struct hclge_comm_query_scc_cmd *)desc.data;
-+
-+	ret = hclge_cmd_send(&hdev->hw, &desc, 1);
-+	if (ret)
-+		return ret;
-+
-+	*scc_version = le32_to_cpu(resp->scc_version);
-+
-+	return 0;
-+}
-+
- static void hclge_set_flowctrl_adv(struct hclge_dev *hdev, u32 rx_en, u32 tx_en)
- {
- 	struct phy_device *phydev = hdev->hw.mac.phydev;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-index e821dd2f1528..df3c10098349 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-@@ -1169,4 +1169,5 @@ int hclge_enable_vport_vlan_filter(struct hclge_vport *vport, bool request_en);
- int hclge_mac_update_stats(struct hclge_dev *hdev);
- struct hclge_vport *hclge_get_vf_vport(struct hclge_dev *hdev, int vf);
- int hclge_inform_vf_reset(struct hclge_vport *vport, u16 reset_type);
-+int hclge_query_scc_version(struct hclge_dev *hdev, u32 *scc_version);
- #endif
+Make r8169 the first user of the new function.
+
+I'd prefer to handle this via the PCI tree.
+
+Heiner Kallweit (2):
+  PCI: Add pcim_iomap_region
+  r8169: use new function pcim_iomap_region()
+
+ drivers/net/ethernet/realtek/r8169_main.c |  8 +++----
+ drivers/pci/devres.c                      | 28 +++++++++++++++++++++++
+ include/linux/pci.h                       |  2 ++
+ 3 files changed, 33 insertions(+), 5 deletions(-)
+
 -- 
-2.30.0
+2.44.0
 
 
