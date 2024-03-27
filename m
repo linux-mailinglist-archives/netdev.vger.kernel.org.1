@@ -1,125 +1,137 @@
-Return-Path: <netdev+bounces-82319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A76A288D3CB
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 02:38:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 449D488D3FE
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 02:53:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 557E01F244EF
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 01:38:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A891D1F3586B
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 01:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE33D1CD2B;
-	Wed, 27 Mar 2024 01:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF261F614;
+	Wed, 27 Mar 2024 01:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qipBKAvA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ht+b5B02"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D761B7E9;
-	Wed, 27 Mar 2024 01:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FE2200A0;
+	Wed, 27 Mar 2024 01:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711503492; cv=none; b=hpLnBmbSC7Dq8CkDodNVbj3JDVtzXZdM6gG4mIfKNF6boe/vngPxQbeVDOeIdYGjzKWg/nfB0wXyZrG9dsGffTAGtPWS0AGvBakZyXeNN6v8maY3oDMyGtJZVfWQ5PCubAlDtdh64rIx3iGP+yPbl9LUM40CTSptnbFWrWM3JqU=
+	t=1711504398; cv=none; b=sr2WZiHVlMXn77nRNtp03t31DzsTR4craEoEvl8kf5FrDu/4I9Nws8YJGSKjS/r7NvXb0SpE4wddFU17CBc2SGBWc5iGGIanLyrd+wjHIAJjTvp/QtChbI5TOY4JA2Zw3kWAfzjxn9XnhDOGtsx2GLHoiGflSaNdy3v0D+HWv+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711503492; c=relaxed/simple;
-	bh=6qAmt+xdA2QOcCOcEi6dB8mBsdItFfMjVsA3nuCRwiU=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=FeTnDw3i2JOD7uAT/JB5hupeseRvS4lH9N9MT+uFpVR6WJLIonsiBpquF/eOQ0CnzLOtCMBXhAuyVWa6dmgigI/Pkm95oVwHpo8DXwUlP0M9qcgJHhrKPX0OemThnuuQMPljrLQz2WAjHKDY9sCIuWdxWXyvCtvsLI9bD529B3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qipBKAvA; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711503481; h=Message-ID:Subject:Date:From:To;
-	bh=xSV0Dmq1/beES1CrMcd6dQoXETDRC4jlecw03aBarYs=;
-	b=qipBKAvAOeq6M0q+nrL3Y6PjYTzqODbRaVKZyNrfi7pMnNBQapugNcZaHbJmlTLe1U8n6rsgvu08vel8BcbxSdjpOm8e51K+ErBIAz9FeIxZR+Itkt7sa1awBaDIyvDqLcvMz2/NXbayzJ3coBHMBvXzKzhrp0ihChKH9K6YWp8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W3Mnh-R_1711503480;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3Mnh-R_1711503480)
-          by smtp.aliyun-inc.com;
-          Wed, 27 Mar 2024 09:38:01 +0800
-Message-ID: <1711503463.632461-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net v2 1/2] virtio_net: Do not set rss_indir if RSS is not supported
-Date: Wed, 27 Mar 2024 09:37:43 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: rbc@meta.com,
- riel@surriel.com,
- virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
- netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
- linux-kernel@vger.kernel.org (open list),
- hengqi@linux.alibaba.com,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20240326151911.2155689-1-leitao@debian.org>
-In-Reply-To: <20240326151911.2155689-1-leitao@debian.org>
+	s=arc-20240116; t=1711504398; c=relaxed/simple;
+	bh=DRnkkrf8xROfgZfWGbfaO7oz85CrYz5nFzmP7jk/Lpo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=geS9AeL2kvsXVhdK0b2zwUd6x27cFDlhsCO8T1nvsne/o+UyQ6aM1L2V7jFjATjNNF33x6s20JEpWSF0aj0sEiMfdHaYU3mj1JN4jkMYdFeDunA/NA82frmXRJiN4YODCLc2gBhc/broAvjmNfAUcPx5mp9p2pUHkPPa3INHBn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=fail (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ht+b5B02 reason="signature verification failed"; arc=none smtp.client-ip=209.85.221.48; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4d435a60217so1791436e0c.0;
+        Tue, 26 Mar 2024 18:53:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711504395; x=1712109195;
+        h=content-transfer-encoding:mime-version:list-unsubscribe
+         :list-subscribe:list-id:precedence:dkim-signature:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DRnkkrf8xROfgZfWGbfaO7oz85CrYz5nFzmP7jk/Lpo=;
+        b=Ug4SGtvn5/oHaF4qBnkCk4Ozm/XLWS5Ysv8QRJeDQrL+qP0/CXZC3fuK+fnZP49Xnj
+         3bHda3SjFnLVpUvQyC84x8KnqgOf/sdD/06pc4XnoXyrl/mWWKhmhQ1hg182CcUIa7/X
+         EwJT9fSwvs7tfk7qpsbGefnCE6XJdRmVe7j56HA8CqTP1gDbbIJQix3cBMfa+3nQsWUc
+         qbekfmUA8iSJsPTyYRURf0+pO8mSR60WpHzPfIRG2TBhZi2Jhjc8XKddJj2SinX2C2bH
+         iB8HJfockwgplWCgk8Ofqz6qVSyMxaH4Q/4EIsL/R2LAHMv7WRX37rxW5m/Qqt1RnMSO
+         osTw==
+X-Forwarded-Encrypted: i=1; AJvYcCXValHBaa0TrQwEQUeDrtFZMzuu8+fL6iIqBY1ALq1bdjmQKJily1J0alsgYAxFONEdBCg4sfmK+DRCGplB9g7U18NlAhqBLxx/QG6FtD8KlDGSqJD2AgO7OjH/KgnJfm17BkboxTWqPhKMSKElbIqDEbkGoS87Kf7cUJYm1Z1NtSDsSK9MaNDdu6oFWrTcoYI83LsO1Xn9isDwkuo//JQcHq4jeQfjHZZadHsBsCphjDaX/G0ZSg==
+X-Gm-Message-State: AOJu0YzGHYQJD6VBXDo8Al5Ip4c0Y5pp8SRhUh//ZErRdfjdsfBjg4Tk
+	ZPFtjKtnxIodNbPneig3nxZrDpNEF42pK3HjyhZQYlaJGKfIvuNP
+X-Google-Smtp-Source: AGHT+IHu+26ARqT6YXdlH4UWt1l8C5+RYVEWaKo9otsDSaAzLyvff84BpoFrCdHc4+Dt1anFqquTLw==
+X-Received: by 2002:a05:6122:914:b0:4c8:8d45:5325 with SMTP id j20-20020a056122091400b004c88d455325mr1683016vka.7.1711504395386;
+        Tue, 26 Mar 2024 18:53:15 -0700 (PDT)
+Received: from l1441l.lan0.xorvpn.com (pool-98-116-41-146.nycmny.fios.verizon.net. [98.116.41.146])
+        by smtp.gmail.com with ESMTPSA id g15-20020a0562140acf00b0068c8be959a0sm5834155qvi.111.2024.03.26.18.53.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 18:53:14 -0700 (PDT)
+From: Daniel Hodges <hodges.daniel.scott@gmail.com>
+To: alexei.starovoitov@gmail.com,
+	Daniel Hodges <hodges.daniel.scott@gmail.com>,
+	netfilter-devel <netfilter-devel@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>
+Cc: ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	lee@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org,
+	pavel@ucw.cz
+Subject: Re: [PATCH 1/3] leds: trigger: legtrig-bpf: Add ledtrig-bpf module
+Date: Tue, 26 Mar 2024 21:53:14 -0400
+Message-ID: <CAADnVQ+BsBcp5osqiG46gjtLViQjHStVnPsySffHsybaz7OYEw@mail.gmail.com>
+X-Mailer: git-send-email 2.43.2
+In-Reply-To: <ac8e77881212e18d117059a698affd6afc2607af.1711113657.git.hodges.daniel.scott@gmail.com>
+References: <cover.1711113657.git.hodges.daniel.scott@gmail.com> <ac8e77881212e18d117059a698affd6afc2607af.1711113657.git.hodges.daniel.scott@gmail.com>
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48]) (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits)) (No client certificate requested) by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544F15491E; Sat, 23 Mar 2024 19:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-34175878e30so1992384f8f.3; Sat, 23 Mar 2024 12:19:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20230601; t=1711221558; x=1711826358; darn=vger.kernel.org; h=content-transfer-encoding:cc:to:subject:message-id:date:from :in-reply-to:references:mime-version:from:to:cc:subject:date :message-id:reply-to; bh=yixKxMyJp9zitpdKye9pLVcWEHJONLO0fUVkk9RNx2Q=; b=ht+b5B022yADnDN4bBtI8hIFZg6LP/qjoqSbPdqEGKF3W77asD0frBQ5Kw3XdZwQYK nHavVdO5CaNHbr8HvQPLIr5wFr78x4bHiCFsqkhk+M7N1DWJOtVp243RPanS0rHQNNYZ rHkE7EkevI0Vns01+SQfErkfW17U8hplCAa5EyFjWolpmpVY70Ckdcp7m0/7Z0nY2aEl 0abQz6lAEitw4cPUS0gxZWRg2ejgBs5IBx9WtwdWGQd1hzcn7hWfofuzWMwohwLKMgOA tfV8/DZhFvhbzs13+TzljnOhT90p4dvBHvRbwu5UFoRHzUl4dHlGNOi/8zH0HqtO9vbM aYMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIeaQ/yiBpH2/hsPlo1ilbVrmGWbW1/Q/mj/lYUpLY0mNt9n+PMhtL1TwavvqIOG/JF4WlslG8qKucixGp+ulx+9Ej+OZsA3Uc30xeXt974R4DuKvjyStaBnI1QMrx9Bdc1XtgcDTzxMG2ijeNLuU+ozIdYh1pNbMfa3Fj0oPzOE4qLKz+sub0QqtOv3wrCcBUurTs5GF9dyTu4eEbpsHOcteP88UhdDEXpVBZ2vsoD1uht87SBw==
+X-Received: by 2002:a5d:5cc6:0:b0:33e:c522:a071 with SMTP id cg6-20020a5d5cc6000000b0033ec522a071mr1942577wrb.51.1711221558546; Sat, 23 Mar 2024 12:19:18 -0700 (PDT)
+Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, 26 Mar 2024 08:19:08 -0700, Breno Leitao <leitao@debian.org> wrote:
-> Do not set virtnet_info->rss_indir_table_size if RSS is not available
-> for the device.
->
-> Currently, rss_indir_table_size is set if either has_rss or
-> has_rss_hash_report is available, but, it should only be set if has_rss
-> is set.
->
-> On the virtnet_set_rxfh(), return an invalid command if the request has
-> indirection table set, but virtnet does not support RSS.
->
-> Suggested-by: Heng Qi <hengqi@linux.alibaba.com>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  drivers/net/virtio_net.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c22d1118a133..c640fdf28fc5 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3813,6 +3813,9 @@ static int virtnet_set_rxfh(struct net_device *dev,
->  	    rxfh->hfunc != ETH_RSS_HASH_TOP)
->  		return -EOPNOTSUPP;
->
-> +	if (rxfh->indir && !vi->has_rss)
-> +		return -EINVAL;
-> +
->  	if (rxfh->indir) {
-
-Put !vi->has_rss here?
-
-Thanks.
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
 
 
->  		for (i = 0; i < vi->rss_indir_table_size; ++i)
->  			vi->ctrl->rss.indirection_table[i] = rxfh->indir[i];
-> @@ -4729,13 +4732,15 @@ static int virtnet_probe(struct virtio_device *vdev)
->  	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
->  		vi->has_rss_hash_report = true;
->
-> -	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS))
-> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
->  		vi->has_rss = true;
->
-> -	if (vi->has_rss || vi->has_rss_hash_report) {
->  		vi->rss_indir_table_size =
->  			virtio_cread16(vdev, offsetof(struct virtio_net_config,
->  				rss_max_indirection_table_length));
-> +	}
-> +
-> +	if (vi->has_rss || vi->has_rss_hash_report) {
->  		vi->rss_key_size =
->  			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
->
-> --
-> 2.43.0
->
+> A new kernel module just to call this helper?
+> Feels like overkill. Can it be a part of generic led bits?
+
+I looked and in general most of the other triggers are modules so I was trying
+to follow that pattern. I think having a few kfuncs in the generic led core
+might be far more flexible. I'd have to defer to someone with more insight on
+that though.
+
+> btw, have you looked at net/netfilter/xt_LED.c ?
+> netfilter had the ability to blink led for a long time.
+> I'm curious whether folks found it useful.
+
+I briefly looked at it and to be honest not sure of how widely used it is. I
+did see some docs in OpenWRT
+(https://openwrt.org/docs/guide-user/base-system/led_configuration) so it may
+be used in that context. My thought is to have something like bpftrace be able
+to trigger LEDs for troubleshooting purposes. Sure, it can already print
+counts and sums of counts over intervals, but one thing I've found interesting
+is triggering on perf events. For example, triggering on CPU cycles gives a
+nice visual indication of the amount of work being done.
+
+> It can also do led_trigger_event().
+> Should that be another kfunc?
+
+That's a good question, there seems to be a few other functions that would
+maybe be useful kfuncs (led_set_brightness etc). My only thought was some of
+them get passed the led_classdev and wasn't sure how difficult it would easily
+it would be for callers of the kfuncs to access/pass it through. With the
+trigger interface at least it seems rather self contained.
+
+Anyways, part of this exercise was a learning experience for me on getting
+some bearings for being able to submit patches properly and learning the
+kernel development process. The V2 patchset (which I wasn't sure if I was
+supposed to respond to a thread or make a new one from
+https://kernelnewbies.org/FirstKernelPatch it made it seem like either was
+acceptable), I think correctly implements a per LED version. Thanks all for
+your time and insight.
+
+- Daniel
 
