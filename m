@@ -1,167 +1,205 @@
-Return-Path: <netdev+bounces-82395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1406488D83A
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:59:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B85F88D861
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 09:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 962F41F2AC65
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:59:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00CAE29D13B
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32821376E1;
-	Wed, 27 Mar 2024 07:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A972C694;
+	Wed, 27 Mar 2024 08:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ab3fFdlG"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OK8UOyKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627A038395
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282F42577D
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 08:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711526281; cv=none; b=F9afhKn7Y2fJVpzIuzXa+K8/n+5P2U7pTPZr1ekC/Pf7aIlMVQ4oIpY+0I8G9LqZfj3o16jaw2PDwEbnDsRsdZ9ADmBGfPv4/eWak7Ro/xfIIzS60qx9G0sLRhCEs9Llt72J4y6nEEcYEdIxLBG4hu0zuyimbc50asQPFKGujx8=
+	t=1711526851; cv=none; b=KsHp3pTDlHWUiAXMmr3dhlebdP2tS4c4spS1lVlXy+7Wab8PCv84RF5Sgq2shcs2r0cHzg0rPN457EZ+0W/y2X5QdBttNGyWmDeIOfWNuxX+YwULG2p4QrcB6swF22UW1/Rm2LjiSdO95H2lAJIj3BC6HXjnKDJmlUcXiVuiu9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711526281; c=relaxed/simple;
-	bh=Vat65M6stqG5LA6cc3GP/buZ1IUl+hHUoX98W5OebkM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VhrmVka72Mw7TzsCvugkQ7BP9ydH2b5SYdRV57yw8LqF0PQzttOA5uugjtMw+HBv9VNzv1qWNl8Vswa9iC9GitFWfsmjWaknTYM9Qte6tJSVEhEyInHUEKUM1MeYiL9n/x/ahoumG1EA7uzxChkxI//qoCQB3vk6IRWghXmNfUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ab3fFdlG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711526278;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C+d10wCVD+Bb8HTautm4Nb6wFglF1en0DfE0cedzY+0=;
-	b=Ab3fFdlGV6XBTLBWcyQM/L18FKS4W0D+OJ/Sn3iSgFoKBADbxocuVTkapCVdkFLg4Ja5GK
-	8naZDTbQS03WE/UzCX9glUZzf7sJOKoHHuKLS86ahvXP6n+Hh72KZbiF5RkJO+NnHs+kiG
-	aar9win2MiPwXdSS9qe+WBYLzS3eaI0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-288-5Fi22-_JPOuSAlaIFpsNEQ-1; Wed, 27 Mar 2024 03:57:53 -0400
-X-MC-Unique: 5Fi22-_JPOuSAlaIFpsNEQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B817800266;
-	Wed, 27 Mar 2024 07:57:52 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.224.197])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E9B65C15774;
-	Wed, 27 Mar 2024 07:57:50 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mschmidt@redhat.com,
-	aleksandr.loktionov@intel.com,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH iwl-next v2 7/7] i40e: Add and use helper to reconfigure TC for given VSI
-Date: Wed, 27 Mar 2024 08:57:33 +0100
-Message-ID: <20240327075733.8967-8-ivecera@redhat.com>
-In-Reply-To: <20240327075733.8967-1-ivecera@redhat.com>
-References: <20240327075733.8967-1-ivecera@redhat.com>
+	s=arc-20240116; t=1711526851; c=relaxed/simple;
+	bh=zb9pTWa4v6J7bjx0jnI6uWcGPwFOi+i8kDB7D26ywz4=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=mFnRyxHrTrn09OwGmcUT7jNVZFc8JSqrEYRLwaRE442rfnL8UJBvnr34ZmpBwc1shR05oXIypLNWkHHL4ex3/DtAo3FP4TLQ0K2Y+vU9ZyTvKdIsr3ZFKf50N4UVOwsxuIB6SxPmppdrEzygvK3vDeFc2otV1XN8ZqMJsWjUGPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OK8UOyKQ; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711526840; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=HqBglzuBzXwHz8JFm548qIsgg7kLqHB9t6RwxUvdavE=;
+	b=OK8UOyKQsVDuIcAS7ycoSvlI/l3b4EC4eUdvB4DYR/Fx1peuxEhmnYrGb5Psm6Aq8K+T/vLJzRJoWFOu8UGj+9fwOE1Nw8BAhRdKCVZxCzQdoki5Cy2asdxgsX8UKUKJiMmUdWs3nLGwRgngzabONkg0nHtSY3x4H8dH53R6zWs=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3NzNmQ_1711526839;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3NzNmQ_1711526839)
+          by smtp.aliyun-inc.com;
+          Wed, 27 Mar 2024 16:07:20 +0800
+Message-ID: <1711526642.5018039-4-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v5 00/10] virtio: drivers maintain dma info for premapped vq
+Date: Wed, 27 Mar 2024 16:04:02 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240325085428.7275-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEtEWCjb8+Zcfizij2+0ef-wb8YJD2bfyAvP_72hKZrGvA@mail.gmail.com>
+ <1711523698.8996527-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvzMKyYTNwCwept1HJKLM8FZBa2FZq1oyQ0tFVL2TvMeQ@mail.gmail.com>
+In-Reply-To: <CACGkMEvzMKyYTNwCwept1HJKLM8FZBa2FZq1oyQ0tFVL2TvMeQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Add helper i40e_vsi_reconfig_tc(vsi) that configures TC
-for given VSI using previously stored TC bitmap.
+On Wed, 27 Mar 2024 15:50:17 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Wed, Mar 27, 2024 at 3:16=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > On Tue, 26 Mar 2024 14:35:21 +0800, Jason Wang <jasowang@redhat.com> wr=
+ote:
+> > > On Mon, Mar 25, 2024 at 4:54=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
+baba.com> wrote:
+> > > >
+> > > > As discussed:
+> > > >
+> > > > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVm=
+J3rHYqRZxYg@mail.gmail.com
+> > > >
+> > > > If the virtio is premapped mode, the driver should manage the dma i=
+nfo by self.
+> > > > So the virtio core should not store the dma info. We can release th=
+e memory used
+> > > > to store the dma info.
+> > > >
+> > > > For virtio-net xmit queue, if the virtio-net maintains the dma info,
+> > > > the virtio-net must allocate too much memory(19 * queue_size for pe=
+r-queue), so
+> > > > we do not plan to make the virtio-net to maintain the dma info by d=
+efault. The
+> > > > virtio-net xmit queue only maintain the dma info when premapped mod=
+e is enable
+> > > > (such as AF_XDP is enable).
+> > > >
+> > > > So this patch set try to do:
+> > > >
+> > > > 1. make the virtio core to do not store the dma info when driver ca=
+n do that
+> > > >     - But if the desc_extra has not dma info, we face a new questio=
+n,
+> > > >       it is hard to get the dma info of the desc with indirect flag.
+> > > >       For split mode, that is easy from desc, but for the packed mo=
+de,
+> > > >       it is hard to get the dma info from the desc. And hardening
+> > > >       the dma unmap is safe, we should store the dma info of indire=
+ct
+> > > >       descs when the virtio core does not store the bufer dma info.
+> > > >
+> > > >       The follow patches to this:
+> > > >          * virtio_ring: packed: structure the indirect desc table
+> > > >          * virtio_ring: split: structure the indirect desc table
+> > > >
+> > > >     - On the other side, in the umap handle, we mix the indirect de=
+scs with
+> > > >       other descs. That make things too complex. I found if we we d=
+istinguish
+> > > >       the descs with VRING_DESC_F_INDIRECT before unmap, thing will=
+ be clearer.
+> > > >
+> > > >       The follow patches do this.
+> > > >          * virtio_ring: packed: remove double check of the unmap ops
+> > > >          * virtio_ring: split: structure the indirect desc table
+> > > >
+> > > > 2. make the virtio core to enable premapped mode by find_vqs() para=
+ms
+> > > >     - Because the find_vqs() will try to allocate memory for the dm=
+a info.
+> > > >       If we set the premapped mode after find_vqs() and release the
+> > > >       dma info, that is odd.
+> > > >
+> > > >
+> > > > Please review.
+> > > >
+> > > > Thanks
+> > >
+> > > This doesn't apply cleany on vhost.git linux-next branch.
+> > >
+> > > Which tree is this based on?
+> >
+> >
+> > Sorry. That is on the top of "[PATCH vhost v5 0/6] refactor the params =
+of
+> > find_vqs()".
+> >
+> > Lore-URL: http://lore.kernel.org/all/20240325090419.33677-1-xuanzhuo@li=
+nux.alibaba.com
+> >
+> > Thanks.
+>
+> I've tried that but it doesn't work:
+>
+> % git am ~/Downloads/\[PATCH\ vhost\ v5\ 01_10\]\ virtio_ring_\
+> introduce\ vring_need_unmap_buffer.eml
+> Applying: virtio_ring: introduce vring_need_unmap_buffer
+> error: patch failed: drivers/virtio/virtio_ring.c:2080
+> error: drivers/virtio/virtio_ring.c: patch does not apply
+> Patch failed at 0001 virtio_ring: introduce vring_need_unmap_buffer
+> hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
+> When you have resolved this problem, run "git am --continue".
+> If you prefer to skip this patch, run "git am --skip" instead.
+> To restore the original branch and stop patching, run "git am --abort".
+>
+> I'm using vhost.git linux-next branch, HEAD is
+>
+> commit 56e71885b0349241c07631a7b979b61e81afab6a
+> Author: Maxime Coquelin <maxime.coquelin@redhat.com>
+> Date:   Tue Jan 9 12:10:24 2024 +0100
+>
+>     vduse: Temporarily fail if control queue feature requested
 
-Effectively replaces open-coded patterns:
 
-enabled_tc = vsi->tc_config.enabled_tc;
-vsi->tc_config.enabled_tc = 0;
-i40e_vsi_config_tc(vsi, enabled_tc);
+NOT ON the vhost directly.
 
-Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 31 +++++++++++++++------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+That is on the top of "refactor the params of find_vqs"
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 2e1955064abb..6c25d02ea05e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -5924,6 +5924,27 @@ static int i40e_vsi_config_tc(struct i40e_vsi *vsi, u8 enabled_tc)
- 	return ret;
- }
- 
-+/**
-+ * i40e_vsi_reconfig_tc - Reconfigure VSI Tx Scheduler for stored TC map
-+ * @vsi: VSI to be reconfigured
-+ *
-+ * This reconfigures a particular VSI for TCs that are mapped to the
-+ * TC bitmap stored previously for the VSI.
-+ *
-+ * NOTE:
-+ * It is expected that the VSI queues have been quisced before calling
-+ * this function.
-+ **/
-+static int i40e_vsi_reconfig_tc(struct i40e_vsi *vsi)
-+{
-+	u8 enabled_tc;
-+
-+	enabled_tc = vsi->tc_config.enabled_tc;
-+	vsi->tc_config.enabled_tc = 0;
-+
-+	return i40e_vsi_config_tc(vsi, enabled_tc);
-+}
-+
- /**
-  * i40e_get_link_speed - Returns link speed for the interface
-  * @vsi: VSI to be configured
-@@ -14290,7 +14311,6 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 	struct i40e_vsi *main_vsi;
- 	u16 alloc_queue_pairs;
- 	struct i40e_pf *pf;
--	u8 enabled_tc;
- 	int ret;
- 
- 	if (!vsi)
-@@ -14323,10 +14343,8 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 	 * layout configurations.
- 	 */
- 	main_vsi = i40e_pf_get_main_vsi(pf);
--	enabled_tc = main_vsi->tc_config.enabled_tc;
--	main_vsi->tc_config.enabled_tc = 0;
- 	main_vsi->seid = pf->main_vsi_seid;
--	i40e_vsi_config_tc(main_vsi, enabled_tc);
-+	i40e_vsi_reconfig_tc(main_vsi);
- 
- 	if (vsi->type == I40E_VSI_MAIN)
- 		i40e_rm_default_mac_filter(vsi, pf->hw.mac.perm_addr);
-@@ -15085,11 +15103,8 @@ static int i40e_setup_pf_switch(struct i40e_pf *pf, bool reinit, bool lock_acqui
- 		}
- 	} else {
- 		/* force a reset of TC and queue layout configurations */
--		u8 enabled_tc = main_vsi->tc_config.enabled_tc;
--
--		main_vsi->tc_config.enabled_tc = 0;
- 		main_vsi->seid = pf->main_vsi_seid;
--		i40e_vsi_config_tc(main_vsi, enabled_tc);
-+		i40e_vsi_reconfig_tc(main_vsi);
- 	}
- 	i40e_vlan_stripping_disable(main_vsi);
- 
--- 
-2.43.0
+"refactor the params of find_vqs" said:
 
+	"""
+	This pathset is splited from the
+
+	     http://lore.kernel.org/all/20240229072044.77388-1-xuanzhuo@linux.alib=
+aba.com
+
+	That may needs some cycles to discuss. But that notifies too many people.
+	"""
+
+But now that is broken due to the change of the that patch set.
+
+I will post the new version of these two patch set soon.
+
+Thanks.
+
+
+>
+> Thanks
+>
+> >
+> > >
+> > > Thanks
+> > >
+> >
+>
 
