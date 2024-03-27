@@ -1,152 +1,105 @@
-Return-Path: <netdev+bounces-82353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F0B188D689
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:38:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D917288D6E0
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8531B2294E
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 06:38:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79E651F287C9
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 06:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A66BE2869B;
-	Wed, 27 Mar 2024 06:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E5A22EF4;
+	Wed, 27 Mar 2024 06:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I+tCX6Wm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LXFx52Pj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039591F606
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 06:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74763241E1;
+	Wed, 27 Mar 2024 06:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711521455; cv=none; b=IJ3S9mSEGhYJkFkkSOCmveObLHIJJI1RrRm7KWvTdMUPqSdyU4zS7a5MCYlAN4gQgunLcOMb5XAuEaF9V+j+PvW+cPFlkx8kTLju7e5bXuKlGQAsWXVxfi2Rr0W+BavEI4ZkUenCl6Bdcio4COLsds4sQRvzCIRfCxzCSFdbVJU=
+	t=1711522648; cv=none; b=pAC6nIu8VAhwJAJGCW8Iyh4O6U/i3kC+ZaZreaV9tczxbiXxLtM43KNlF+Sg9u877sJ9csp8rb2fxzi+aIEwdUCCydpX/izjCWonw1SdYpTDK9mGIkfrqv08Tzv3csUOm52XkQhh/O5UBCHKjDSm1d4Mm0GGw9tdeOMHftu5Gag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711521455; c=relaxed/simple;
-	bh=ZWpTg9av0SEb4HtERx+D+t/XDE/F3v78YQE8wYgnGXk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dTsb4ZeUdiTlAv4jNVu10Y5aVKfBcQsaqCVjgDrI/nNEuPrDvxvh8FiCyXBIz1dbsuh4y413RvU+qNopK9oCvOR6K92OZBkezZrEIJTci3gYVDCnTtJM92+vCF8YERxMUfrYj9IRLqSAvQtRWuJtTA7ydQzqaZ7CXQ5ENIGNrd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I+tCX6Wm; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1711522648; c=relaxed/simple;
+	bh=SLe3EkoAmpsK8G38HlQexQFaGXpkqG9r7/RlGeZTW7w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RcBTnc9IU94hLZDWOkcOAZy2ogKad6xIy0EXS5ufopfKVNAC5m6w62BTgOUY5/eckbjqT+dqqD3EaPkeGRqOQ+alpaq7gfjbQZfpTgwnZe3K+hV7nqVqMFf4W+2BB91mh225+KTwi4aS+s/GayXmQY6nmWvkLbLjsb97rKs+m18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LXFx52Pj; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56c3260a714so1223251a12.3
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 23:37:33 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56b8e4f38a2so8110742a12.3;
+        Tue, 26 Mar 2024 23:57:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711521452; x=1712126252; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MCni5ORcQgGWL1BPgy+Fgj3N1BFFhzKz1CLiEdYrnOs=;
-        b=I+tCX6WmkLKyRuapubG4QUzVR/i+thN4ih2Os09cpRMBzsKfHZbGCP0Irt62aky27d
-         mpOhE3wdSNFUnptIwG/TRYbQ2M/RrP7qqhBB2zSMmQSdVkuVAQJ7rQR4PlySsDhqIUag
-         5C7tXlrvL5mk6z2A+hkHwLIFRLJb0Q7mIGR8i4+CzgkFnwWkZRXvCXdLkwYDDH+T5Kd7
-         dnDYqejSj0IlxzOBYFm1bri2JzfFibhsD9ySHghxtE9B7eNXlYCz1d8YV+gy0hSmNkDQ
-         389l4cUH6qUczLaWdGOPx38NYG1geMybSj90ws1KJvd7tXEuLzTRYclTfibTH61hmg6J
-         l7Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711521452; x=1712126252;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1711522646; x=1712127446; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MCni5ORcQgGWL1BPgy+Fgj3N1BFFhzKz1CLiEdYrnOs=;
-        b=XUKPJjIXmaOqS4pvbNosvV8QSGYCvgrlQgb4PJwWB/lyPZ8FBhebwUDg7PYX2itbd0
-         1ya2Od7z5otQxbJqXzB7B+CbFR+kFUsIy3NmYfNP2AAUOYLVk9A1hClmgKOu2oFiB1fk
-         jq/xlBVGXSax/epFJB3cuqhO34JXjznUd3BwLhThPslLYAg5yHQK9RVo8JWYzaq1KqF4
-         iGSNCY2SWdzVEA2SGxh629W9dM5Ax3LRz68DdNM3B9/XwPy3rWjmKysvGNNcth38W83L
-         +4b9JQB0AvPy9c4kZTRWmVkhvIwVxKum7jpot3VcTVzu9giB0a2jWBodMaZPzWMHS2UG
-         h+tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXjUdOtibnvM5jqe7axV7zHBtLbVFuTM/KcBAzQS8EBC3XMU49ruascdx1YpawdzfkrKN9CsYSfS3BafhP05zv7LSPeMRhM
-X-Gm-Message-State: AOJu0Yx1HsC2qvnQCFLkGmad4l/TV1XPuiMuFRGr4lM2iMknic/rXfvM
-	1u2JCAlYcLGHf9b+y4XF/kmM4R6t+cWqQCQg8T7Qz+/C0Agv4qeM
-X-Google-Smtp-Source: AGHT+IH+ypU3zqfL2SGKiwOwwdx8gnoelxLkaO4/BeG0YepyaXKhinlYgbAWTAB9SaNwMq12puWCxg==
-X-Received: by 2002:a17:906:46d9:b0:a46:faa7:d014 with SMTP id k25-20020a17090646d900b00a46faa7d014mr1249237ejs.9.1711521452060;
-        Tue, 26 Mar 2024 23:37:32 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:7b87:a500:218f:b5de:97a2:61d5? (dynamic-2a01-0c22-7b87-a500-218f-b5de-97a2-61d5.c22.pool.telefonica.de. [2a01:c22:7b87:a500:218f:b5de:97a2:61d5])
-        by smtp.googlemail.com with ESMTPSA id ao11-20020a170907358b00b00a4a377ee13asm2897808ejc.218.2024.03.26.23.37.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Mar 2024 23:37:31 -0700 (PDT)
-Message-ID: <ade53d2b-193a-4f78-b2d4-186919359103@gmail.com>
-Date: Wed, 27 Mar 2024 07:37:33 +0100
+        bh=SLe3EkoAmpsK8G38HlQexQFaGXpkqG9r7/RlGeZTW7w=;
+        b=LXFx52PjjNw0+ED8EE4gfujBsrIZ8MSviDj0zCkd5OpnYXQDqDN5hxrWIzqBvH+Kml
+         0l0OcetIto8sO6NJnZZb1/57QS5ErZBmvz2kVzHzqJU6V5rtDXL24nvyoHm5H8tiZJai
+         TfOqN/XHSCWDhtiiTQfbVQAQE+RMvjHR67LCNm7F61n8Myb54ftsr4ALssQLQ4WLDGKr
+         y1KD41KEAaodh2VpYSE3z0Fz1JtUj8vXFSfQpJJoqqQbRuUJiuJ5jPhXTvgwHCwdMS6Q
+         l+NHmvDwi6RpWRwOTeNoFRrwYjJQxDGGh1JAjU70othm26Tc0npe+aXz56YzUFPPw+jM
+         IF0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711522646; x=1712127446;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SLe3EkoAmpsK8G38HlQexQFaGXpkqG9r7/RlGeZTW7w=;
+        b=RvAUuxifvjdISQ49XXYJhPoXl13BHm+ah1+95ml6bmQp5opvnKs5bKpRKGRJaTIu3X
+         8EeChA17hLyI6CmJrX05v7vu572lcgq2+pdxKxx1EaTQPE/0FD0jf7EJWEYZnMsKc8tJ
+         heXUQxN7Hps++DoP0PaLsmu4Gm2InELGb9/c3k17pIM6raWW1qIGQL+vzt0QhocEkJj7
+         sZYb2nuCKJ+NIcJxCry0Eq5UFxaG0P/9bXOuVBTfgVg9hgFp9AEUpcMi/Avg2kB3Y/ec
+         EK6CiKD2BhHFT1z+cTEEai4gwwRkosbo+6EbJdb0yo2cQ/LK25fziJFAMyZ6sEjmrWbN
+         DKiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWrBcEqYY6RI61egIjulf/RZZQhgXHasLvGcg7wDS3S0kg63fPYFzCu5mmt1MsRFm78JsMSxpT8a0/qHn3/s/X+kl76TSeahYuloZ9tg5yvVCJlQlH8wbP55sjLGAUDbIk90yx75y19bWaJbRI4FdwkY9ODSWsdzzYwNxnjer7KTZ0Hu+pHrKg5
+X-Gm-Message-State: AOJu0YzHnZObMPn615h1BJIe8BXM8sCo7vY5mA6Nq7WpMQsRoj2E/6Jb
+	WREEJjKr3EKbufCX9fK84u5iTaxv7+MWuPFQi+0Kxth3n/QiNflKBams5eWpVdSAy7G1bEb5ImL
+	o8OZuJ7blQG5v4LwPNM/58r2IGX0=
+X-Google-Smtp-Source: AGHT+IHwC1Xl9gPnTUY6wLcUNw+FjI+7Ejo0bvWGC/bVdJHL3gFSiwCZmJZq1WaW9XmnK7lrUZZaqOkkY5/QxWoufFw=
+X-Received: by 2002:a17:906:3c12:b0:a4d:f400:4e17 with SMTP id
+ h18-20020a1709063c1200b00a4df4004e17mr2441213ejg.34.1711522645616; Tue, 26
+ Mar 2024 23:57:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: DRY rules - extract into inline helper functions
-To: Atlas Yu <atlas.yu@canonical.com>
-Cc: davem@davemloft.net, edumazet@google.com, hau@realtek.com,
- kuba@kernel.org, netdev@vger.kernel.org, nic_swsd@realtek.com,
- pabeni@redhat.com
-References: <146be1ba-c0fb-4ed2-8515-319151b1406b@gmail.com>
- <20240327021541.6499-1-atlas.yu@canonical.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20240327021541.6499-1-atlas.yu@canonical.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <cover.1711475011.git.balazs.scheidler@axoflow.com> <0c8b3e33dbf679e190be6f4c6736603a76988a20.1711475011.git.balazs.scheidler@axoflow.com>
+In-Reply-To: <0c8b3e33dbf679e190be6f4c6736603a76988a20.1711475011.git.balazs.scheidler@axoflow.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 27 Mar 2024 14:56:48 +0800
+Message-ID: <CAL+tcoCsrGRWd-oE1xLs7JQ=a8_HUQ_6wx2py5-D6Nxb9jpRjg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/2] net: udp: add IP/port data to the
+ tracepoint udp/udp_fail_queue_rcv_skb
+To: Balazs Scheidler <bazsi77@gmail.com>
+Cc: kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Balazs Scheidler <balazs.scheidler@axoflow.com>, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 27.03.2024 03:15, Atlas Yu wrote:
-> On Wed, Mar 27, 2024 at 4:29 AM Heiner Kallweit <hkallweit1@gmail.com> wrote:
-> 
->> cond like conditional would be a little too generic here IMO.
->> Something like rtl_dash_loop_wait_high()/low() would make clear
->> that the poll loop is relevant only if DASH is enabled.
-> 
-> I don't know if cond might be reused later somewhere, so I am thinking of
-> creating both dash_loop_wait and cond_loop_wait. And specifying them to be
-> inline functions explicitly. What do you think?
+On Wed, Mar 27, 2024 at 2:05=E2=80=AFAM Balazs Scheidler <bazsi77@gmail.com=
+> wrote:
+>
+> The udp_fail_queue_rcv_skb() tracepoint lacks any details on the source
+> and destination IP/port whereas this information can be critical in case
+> of UDP/syslog.
+>
+> Signed-off-by: Balazs Scheidler <balazs.scheidler@axoflow.com>
 
-It's about replacing a very simple check in 6 places. So we shouldn't
-over-engineer the helpers.
-It's discouraged to use inline in source files. Kernel standard is to let
-the compiler decide.
+Looks good to me, thanks!
 
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
