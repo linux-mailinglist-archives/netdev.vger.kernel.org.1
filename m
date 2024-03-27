@@ -1,177 +1,226 @@
-Return-Path: <netdev+bounces-82467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F4488E615
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:31:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B9D488E4CA
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:13:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9AE5B28A76
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:11:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D27D1C2BE43
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C797F83A0B;
-	Wed, 27 Mar 2024 12:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DFA145351;
+	Wed, 27 Mar 2024 12:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6ZQOJD4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YmjO+wGu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7441017BB3;
-	Wed, 27 Mar 2024 12:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690D4144D25
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711543217; cv=none; b=SoIJRGjB0+FNp+Unip7W7unZYb/uAY0EzW09B0Gk/EDsafJfpFiud6adnTCoUZB58Szeq4e9T7UlKZhDOtI/rpEgcU0KLjyVsWBm61XKP/OT3SuwML+W3IwB7ReIoVjl/uHuiftD/P7Th5wuvc45iiTNz4wX7ctXqaiXBp875u0=
+	t=1711543304; cv=none; b=oK+DOF32jE+X+/maWYrb9u8/STARrtFDwD1RieVHWeRNl08haDxg6JoBvDy9V7V/Dk5RKt57/FPHf5HVtGqmxNCsb5BaOoMBQc0W5KMNOkkNXqKy2t9IcirdFUN1x8pec2/q4ZLt25ExEtRwQ8CmaIXMfXvGKyOSlsJd7J5+DRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711543217; c=relaxed/simple;
-	bh=vqrJ5VzMfXlx/Y9j1KWBiClOP7ga73CZKpxbeFf1/iM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dxL829uBtfF46QH34pRp85bV77kcejELCH+nkOyEQWnLVd43HljD7TQ07KAqLdz2E1bF+2b3LWQCOo0/kBF1PXpkX299lO64A8Eyffu8noz8wyJQste26lOp0ZXAlCi0sUEoA2UNFUSWxHy5sQiKNlISuHQpBLQMSi292CjPhjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V6ZQOJD4; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4d42d18bd63so1650063e0c.2;
-        Wed, 27 Mar 2024 05:40:15 -0700 (PDT)
+	s=arc-20240116; t=1711543304; c=relaxed/simple;
+	bh=ZqxqBePx9O0aSeYwWfac5JC18N8WH4wazKZPUDWtyb4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lZJ08Q6cylKf3TdKYRE/sOgwZKQIphNw3Mk6J9MCVhOvekZl7c3pw3y5Y4hCQL5BPSU1b+t+Ve9nVpECSyXnN4sgSKp3k1BFg3g3tf6jQFRTpoHappL5pEbNSAtMF2aHinBZajJwCEIeR6l2iJFzxxW6lUhAlfjdbkyzpdknbAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YmjO+wGu; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d6fd3cfaceso5768941fa.3
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 05:41:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711543214; x=1712148014; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=g+FXAXUoAMddOfVyu1X6NS/tcVaDCZa54BSmGD3WKj0=;
-        b=V6ZQOJD4uQTCc7vRrQHpxKMmN/Cx8i8RA2nD+me6D1SCOW6gnDCqm/pK0X2wIdIRG1
-         pfB0wr242Htr+KIpfwJjZRr2XZfX2hElESv7iD1HVpajizJlTZrfFMA3vLc9qyUPFwTg
-         T+7CinjkVlunr9dnWi8WkBtaayxoyY0A6bbRJolLFIaVt2ZGxZ8uUMZqunK9XYzFnWT+
-         fTndf1gjS7acDG2kfGgCVIrVN9B3boypVpfyZWyZmtTghTFwrZIQctkG+ssHfvWOoluw
-         0Zdv7b+uxjY7B5w33jBWhbr9xAyC0wu7610G6VTgeg0DV6VczKCa3GRUtXPVoQkX2rIm
-         JOHg==
+        d=linaro.org; s=google; t=1711543298; x=1712148098; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AFaFw1OZuXizkw4uNoNpzMqxfCxSvA28jWrn6rdqU5M=;
+        b=YmjO+wGuctwvzU8ZNUZDLFidgP/qW/gIe+e/+u4PRXpt9aiaCueYVHxxQlnquEf7wo
+         6MyMimKon6o+3zr83QHAolDCtbiRJMHQv0jm8UKyy8FzdMI/X3wY0G/Hz3/vV0CzydiL
+         yWCuUl8kd9sCC8Ij7Bol3c8a1BC7xup4GJ32Z0UBIfzqzoS1GOAtXwMC0UYO/LLSI6iK
+         RvtDXOXNSC/Fe8BGekmHqP/S7ATCiIzBkHVqGsLX3qejNAy2BJ/wPs4Hiu1C6o67xezY
+         xW0UY+GJG8n23TR5q8R6KRDFbbgl11ZZg/l7GMMAsdIIFzQci+jZohdP7rpB6CULoHWT
+         TP7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711543214; x=1712148014;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g+FXAXUoAMddOfVyu1X6NS/tcVaDCZa54BSmGD3WKj0=;
-        b=dv1jYeqeXotVncpuNzcu6PIYda7IUdierPRhbeFy/TXBGBOYoHxPqUIihAB+OSHrYJ
-         G4yIrYDzO9tS7uEcXyCNUF8MhjGShATaOwvU1xqM7OTt0WduijkQFX+K4rx7bgRHq7WK
-         uE/dqPTFSvrgLVuoq5iMiW2acLgczv2Y7sphYlAT7rwKLoIlr7JpSqXXmcpvLlCTOO+2
-         pZuwSCSqItBhVwN/vFVSpPcrgKhSN2kcax8LWLY44EEa5itLOy9oMPy2gP/n+t45tobY
-         R9XUXfaAJnMy/6IUWKVJ3yLeRbtriKRShwh5mxZOOc+Y9xEJ4aDxpZ4deA7WDGciX81w
-         mm9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVGIPF2G2vFOvnX57hFzv/LNaw9Z7E03RpDequKsF+wdncED6x/dibHl9eNSWisjx6klaB8aMsdCihHPRmGTMFLwnJQbiSya9wJrKhK
-X-Gm-Message-State: AOJu0YxQ65qnnRh5Yw+dX60P0Ri8XZNf4uRrGRixH2t5Ir8KuZQsy78f
-	UDFM3gUshCaZsAQlWSf4QImLcolIIlZGmCs9LImuzhobyRv4xx+e
-X-Google-Smtp-Source: AGHT+IG+QqyfVfcgfscx8Fy+bRpptm/CI8N+Y+dZgq/zSf4MqiSE8oqdVAYjXsaLGmSda22GqYniTw==
-X-Received: by 2002:a05:6122:3983:b0:4d8:7339:4c35 with SMTP id eq3-20020a056122398300b004d873394c35mr862861vkb.13.1711543214355;
-        Wed, 27 Mar 2024 05:40:14 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id t3-20020ad45bc3000000b0069697d41adfsm2284331qvt.55.2024.03.27.05.40.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 05:40:13 -0700 (PDT)
-Message-ID: <6620d1c1-4178-413e-b090-dd2a9ba9abf3@gmail.com>
-Date: Wed, 27 Mar 2024 05:40:10 -0700
+        d=1e100.net; s=20230601; t=1711543298; x=1712148098;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AFaFw1OZuXizkw4uNoNpzMqxfCxSvA28jWrn6rdqU5M=;
+        b=NXCj/+yEnU09vdYJFG/mawbrA+HZOSXmOIgQOsQxqHreozvHH3zq85HNQrhfY6O0JG
+         ZKhUUNEhfEW4tfVoYuG6ck0qtZFRkEQgfwDv9afbp1JD7ID8ugGGgz7Gp6dhmBBqcgoZ
+         poR68uEOlAXfPWHkFsBOHwvGdf7fpXu8LxXO0vTE+NjicpZWCU/dEF8znqS0X+/ZOjxe
+         ppeA8mR83nwMCDsFAKBGmiVe8PUjO1AVi13bF3az68JRsAIPoUt+o+S003u3Z8blVaK9
+         hVpnsKKpPPrZvdzSOWdebuXHE5AXA7qU5ygF5FP995cijSbpbFtKvFa50HvmzeNcZ11V
+         hjVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVdLKbUumG7JCquXkPFskHwBTxQ76t3rEUKGrEKJfK+r8D1n0Usisq8OdVI9ADPiYOW0WQFu1tKDRrU1Zh3BK8Lj/6n3g1Z
+X-Gm-Message-State: AOJu0Yy9L1TOEWnIxWjOJE8w+sZi9zPa1/VySL6YRSBJpt0SamaSAdvX
+	OxC07NNvxBd5j1LIPDJhZR7X9GiGc3BENuO5tAp8MG6b/2/uvp/vumwVEVKhuR0=
+X-Google-Smtp-Source: AGHT+IFS1x7gpjA7jUKSh2w40PflGxs4LWIU8D0QvTuDe3IphcKfLGKJ6nGMGd9SaTSRJh693GFsRg==
+X-Received: by 2002:a2e:3a1a:0:b0:2d6:e148:2463 with SMTP id h26-20020a2e3a1a000000b002d6e1482463mr2074785lja.24.1711543298562;
+        Wed, 27 Mar 2024 05:41:38 -0700 (PDT)
+Received: from [127.0.1.1] ([178.197.206.205])
+        by smtp.gmail.com with ESMTPSA id gx16-20020a170906f1d000b00a4707ec7c34sm5379175ejb.166.2024.03.27.05.41.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 05:41:38 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH 00/22] virtio: store owner from modules with
+ register_virtio_driver()
+Date: Wed, 27 Mar 2024 13:40:53 +0100
+Message-Id: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5] net: txgbe: fix i2c dev name cannot match clkdev
-To: duanqiangwen@net-swift.com, 'Jiri Pirko' <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
- mengyuanlou@net-swift.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, maciej.fijalkowski@intel.com,
- andrew@lunn.ch, wangxiongfeng2@huawei.com, linux-kernel@vger.kernel.org,
- michal.kubiak@intel.com
-References: <20240322080416.470517-1-duanqiangwen@net-swift.com>
- <Zf09VnR2YI_WOchd@nanopsycho> <001201da7fe6$3aa37f10$afea7d30$@net-swift.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <001201da7fe6$3aa37f10$afea7d30$@net-swift.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANUTBGYC/x3MSQqAMAxA0atI1gY0dQCvIi4coga0ldQJxLtbX
+ L7F/w94VmEPVfSA8ilenA1I4wj6ubUTowzBQAlliaESVzccC6O7LCueors4zLOiLExn+pYIQrk
+ pj3L/17p53w9578lCZQAAAA==
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+ Johannes Berg <johannes@sipsolutions.net>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+ Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, 
+ Arnd Bergmann <arnd@arndb.de>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, 
+ Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>, 
+ Gerd Hoffmann <kraxel@redhat.com>, 
+ Gurchetan Singh <gurchetansingh@chromium.org>, 
+ Chia-I Wu <olvaffe@gmail.com>, 
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+ Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
+ Latchesar Ionkov <lucho@ionkov.net>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Christian Schoenebeck <linux_oss@crudebyte.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
+ Ira Weiny <ira.weiny@intel.com>, 
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ Mathieu Poirier <mathieu.poirier@linaro.org>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+ Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-um@lists.infradead.org, 
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
+ linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
+ linux-sound@vger.kernel.org, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3506;
+ i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
+ bh=ZqxqBePx9O0aSeYwWfac5JC18N8WH4wazKZPUDWtyb4=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmBBPZS5yGoH1UVP3T0Npm8blJRoVKIHSae5kBq
+ HxYGiIbwMaJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgQT2QAKCRDBN2bmhouD
+ 12zhD/9C6ukv+8iXJ63iu65KAxWO0209no/Zk8V5PPOIg8YWF23fhUh5Tg2IbxFs1SDSIqOKCGf
+ 078xrARdl7OLN91lsOjjrbjnZZrO+3UXwHxBg6rRfwtkp+kgAzLzR84hoSWqyqlq+JpiqE73Ex1
+ fNyOEu1Il2sVbtLvNN9ZvBBGDNN/h7JC9ywVxJ0Fa0LD8kwtsV8pUIgsVva8ILQKkMQBTP09QPM
+ 7DW97OEmYao/IN0z9JQ8xmwCXf08ciDibfQZ884ZF4dVW/paLFkgw4OyR+22WTqneeBTsJKdlH1
+ Os9//BH9zlvxyZG6vpAg3g6NvH7MxigyNbztqSw7Uqw1jx1u1032qs/yjWHbs7c4pNm32w5Sc2U
+ BWMIQlsiyt2Gg33SxWybhDqMfp72LBlT04SmQHYDlMTlPA4vvgeUK/H/oYmg/uzy5MM/kx9WGtR
+ pNCFFDPI2B6EAqAvrzZWEGv2PVNujF5tHSLKVqxYwXHWIDIqg8LnCgQeizyqp/tqjoQFY7vGlzI
+ B3wE5riIQuaCN41Id+3PH7pVc6tEQlepaRhz7jRIFh+JEA53CORhQ62m1PpLMq7z8zNhn+Igsh+
+ AB69huA3C3eKILpuFw33OXJybFczTX0Vd0F95nDwyWCahIwaUlrRfoO1JQlJFdOgChtyx0ws9Uf
+ xOnSxyBfnZ9hbow==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
+ fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
+Merging
+=======
+All further patches depend on the first virtio patch, therefore please ack
+and this should go via one tree: virtio?
 
+Description
+===========
+Modules registering driver with register_virtio_driver() often forget to
+set .owner field.
 
-On 3/26/2024 6:29 PM, duanqiangwen@net-swift.com wrote:
->> -----Original Message-----
->> From: Jiri Pirko <jiri@resnulli.us>
->> Sent: 2024年3月22日 16:12
->> To: Duanqiang Wen <duanqiangwen@net-swift.com>
->> Cc: netdev@vger.kernel.org; jiawenwu@trustnetic.com;
->> mengyuanlou@net-swift.com; davem@davemloft.net;
->> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
->> maciej.fijalkowski@intel.com; andrew@lunn.ch;
->> wangxiongfeng2@huawei.com; linux-kernel@vger.kernel.org;
->> michal.kubiak@intel.com
->> Subject: Re: [PATCH net v5] net: txgbe: fix i2c dev name cannot match
-> clkdev
->>
->> Fri, Mar 22, 2024 at 09:04:16AM CET, duanqiangwen@net-swift.com wrote:
->>> txgbe clkdev shortened clk_name, so i2c_dev info_name also need to
->>> shorten. Otherwise, i2c_dev cannot initialize clock.
->>>
->>> Change log:
->>> v4-v5: address comments:
->>> 	Jiri Pirko:
->>> 	Well, since it is used in txgbe_phy.c, it should be probably
->>> 	rather defined locally in txgbe_phy.c.
->>
->> Did you read Florian's comment? Please do.
->>
->> pw-bot: cr
->>
-> 
-> I replied to Florian:
-> " I want to shorten "i2c_desginware" to "i2c_dw" in txgbe driver, so other
-> drivers which use "i2c_designware" need another patch to use a define. "
-> 
-> He hasn't replied to me for several days, what should I do next?
+Solve the problem by moving this task away from the drivers to the core
+amba bus code, just like we did for platform_driver in commit
+9447057eaff8 ("platform_device: use a macro instead of
+platform_driver_register").
 
-You emailed me directly rather than do a reply-all and have the mailing 
-list copied. At any rate, you are only changing your internal clock 
-name, so my suggestion to standardize the 'i2c_designware' string beyond 
-your driver did not really make sense.
+Best regards,
+Krzysztof
 
-With that:
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+Krzysztof Kozlowski (22):
+      virtio: store owner from modules with register_virtio_driver()
+      um: virt-pci: drop owner assignment
+      virtio_blk: drop owner assignment
+      bluetooth: virtio: drop owner assignment
+      hwrng: virtio: drop owner assignment
+      virtio_console: drop owner assignment
+      crypto: virtio - drop owner assignment
+      firmware: arm_scmi: virtio: drop owner assignment
+      gpio: virtio: drop owner assignment
+      drm/virtio: drop owner assignment
+      iommu: virtio: drop owner assignment
+      misc: nsm: drop owner assignment
+      net: caif: virtio: drop owner assignment
+      net: virtio: drop owner assignment
+      net: 9p: virtio: drop owner assignment
+      net: vmw_vsock: virtio: drop owner assignment
+      wireless: mac80211_hwsim: drop owner assignment
+      nvdimm: virtio_pmem: drop owner assignment
+      rpmsg: virtio: drop owner assignment
+      scsi: virtio: drop owner assignment
+      fuse: virtio: drop owner assignment
+      sound: virtio: drop owner assignment
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+ Documentation/driver-api/virtio/writing_virtio_drivers.rst | 1 -
+ arch/um/drivers/virt-pci.c                                 | 1 -
+ drivers/block/virtio_blk.c                                 | 1 -
+ drivers/bluetooth/virtio_bt.c                              | 1 -
+ drivers/char/hw_random/virtio-rng.c                        | 1 -
+ drivers/char/virtio_console.c                              | 2 --
+ drivers/crypto/virtio/virtio_crypto_core.c                 | 1 -
+ drivers/firmware/arm_scmi/virtio.c                         | 1 -
+ drivers/gpio/gpio-virtio.c                                 | 1 -
+ drivers/gpu/drm/virtio/virtgpu_drv.c                       | 1 -
+ drivers/iommu/virtio-iommu.c                               | 1 -
+ drivers/misc/nsm.c                                         | 1 -
+ drivers/net/caif/caif_virtio.c                             | 1 -
+ drivers/net/virtio_net.c                                   | 1 -
+ drivers/net/wireless/virtual/mac80211_hwsim.c              | 1 -
+ drivers/nvdimm/virtio_pmem.c                               | 1 -
+ drivers/rpmsg/virtio_rpmsg_bus.c                           | 1 -
+ drivers/scsi/virtio_scsi.c                                 | 1 -
+ drivers/virtio/virtio.c                                    | 6 ++++--
+ fs/fuse/virtio_fs.c                                        | 1 -
+ include/linux/virtio.h                                     | 7 +++++--
+ net/9p/trans_virtio.c                                      | 1 -
+ net/vmw_vsock/virtio_transport.c                           | 1 -
+ sound/virtio/virtio_card.c                                 | 1 -
+ 24 files changed, 9 insertions(+), 27 deletions(-)
+---
+base-commit: 7fdcff3312e16ba8d1419f8a18f465c5cc235ecf
+change-id: 20240327-module-owner-virtio-546763b3ca22
 
-Thanks!
+Best regards,
 -- 
-Florian
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
 
