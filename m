@@ -1,144 +1,177 @@
-Return-Path: <netdev+bounces-82466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E51D88E4B4
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:11:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7F4488E615
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:31:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71744B35128
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:10:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9AE5B28A76
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BED12EBD6;
-	Wed, 27 Mar 2024 12:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C797F83A0B;
+	Wed, 27 Mar 2024 12:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d2joMcjM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6ZQOJD4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007DD12EBDD;
-	Wed, 27 Mar 2024 12:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7441017BB3;
+	Wed, 27 Mar 2024 12:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542986; cv=none; b=tIYAF6cB2VPcxWK6tLT2LzjnqXJj1SP6xQzIpFzbRZ1XUNfh4pIzbTWu1YqgXjd+lKPFdwPehcP4CUf3LDYEce8zeYM4sxex+zS/fhigtfWaE84/yqrud/M4joibbxDhiEY0NuEyOeSMmfMX0ZawjktZuR/jtMCiJA4nJHTZIY4=
+	t=1711543217; cv=none; b=SoIJRGjB0+FNp+Unip7W7unZYb/uAY0EzW09B0Gk/EDsafJfpFiud6adnTCoUZB58Szeq4e9T7UlKZhDOtI/rpEgcU0KLjyVsWBm61XKP/OT3SuwML+W3IwB7ReIoVjl/uHuiftD/P7Th5wuvc45iiTNz4wX7ctXqaiXBp875u0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542986; c=relaxed/simple;
-	bh=oWual4D9pynFOAqFc+0csfX9lRZor/YG/q2D8yBbldk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FOjFrYU822uO948yW8KA/TmTrikWc9jt0IcSrnshyXr8fVc646zIGpHebz3XfkJk+h2RUsBbmVcUJerL9YYDEqok6hH4eUi2ni7wTj4HXCk5g/jR+w84M+gEb5JFfvuyZPgPV8eDZY0Fye0XUVXfTCCsPPJKvKKIgpUK0Uyz+DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d2joMcjM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=W89r0bsVU2voc8CCyX1FkI6R4xhAvahVaf/LUakcvPc=; b=d2joMcjMX0dxYY7/Zc+XxdAyUb
-	fPQ77U2Rf+nkpx10PT1uNqjD2l5ZPzPFN0FOb/mfR7jIl6H+rA11CneBdmZRP83hq9LwbDngUjkmC
-	puWTS+yXhcBXG9TbRZJSMWETxH9S0fX2dP6M9yF8C3mnPcLT5pZwPiEX3a5Hga3CIW0g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rpSVW-00BOJ1-6F; Wed, 27 Mar 2024 13:35:54 +0100
-Date: Wed, 27 Mar 2024 13:35:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Diogo Ivo <diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Simon Horman <horms@kernel.org>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com
-Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
- ICSSG switch firmware
-Message-ID: <27d960ed-8e67-431b-a910-e6b2fc12e292@lunn.ch>
-References: <20240327114054.1907278-1-danishanwar@ti.com>
- <20240327114054.1907278-4-danishanwar@ti.com>
+	s=arc-20240116; t=1711543217; c=relaxed/simple;
+	bh=vqrJ5VzMfXlx/Y9j1KWBiClOP7ga73CZKpxbeFf1/iM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dxL829uBtfF46QH34pRp85bV77kcejELCH+nkOyEQWnLVd43HljD7TQ07KAqLdz2E1bF+2b3LWQCOo0/kBF1PXpkX299lO64A8Eyffu8noz8wyJQste26lOp0ZXAlCi0sUEoA2UNFUSWxHy5sQiKNlISuHQpBLQMSi292CjPhjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V6ZQOJD4; arc=none smtp.client-ip=209.85.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4d42d18bd63so1650063e0c.2;
+        Wed, 27 Mar 2024 05:40:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711543214; x=1712148014; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=g+FXAXUoAMddOfVyu1X6NS/tcVaDCZa54BSmGD3WKj0=;
+        b=V6ZQOJD4uQTCc7vRrQHpxKMmN/Cx8i8RA2nD+me6D1SCOW6gnDCqm/pK0X2wIdIRG1
+         pfB0wr242Htr+KIpfwJjZRr2XZfX2hElESv7iD1HVpajizJlTZrfFMA3vLc9qyUPFwTg
+         T+7CinjkVlunr9dnWi8WkBtaayxoyY0A6bbRJolLFIaVt2ZGxZ8uUMZqunK9XYzFnWT+
+         fTndf1gjS7acDG2kfGgCVIrVN9B3boypVpfyZWyZmtTghTFwrZIQctkG+ssHfvWOoluw
+         0Zdv7b+uxjY7B5w33jBWhbr9xAyC0wu7610G6VTgeg0DV6VczKCa3GRUtXPVoQkX2rIm
+         JOHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711543214; x=1712148014;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g+FXAXUoAMddOfVyu1X6NS/tcVaDCZa54BSmGD3WKj0=;
+        b=dv1jYeqeXotVncpuNzcu6PIYda7IUdierPRhbeFy/TXBGBOYoHxPqUIihAB+OSHrYJ
+         G4yIrYDzO9tS7uEcXyCNUF8MhjGShATaOwvU1xqM7OTt0WduijkQFX+K4rx7bgRHq7WK
+         uE/dqPTFSvrgLVuoq5iMiW2acLgczv2Y7sphYlAT7rwKLoIlr7JpSqXXmcpvLlCTOO+2
+         pZuwSCSqItBhVwN/vFVSpPcrgKhSN2kcax8LWLY44EEa5itLOy9oMPy2gP/n+t45tobY
+         R9XUXfaAJnMy/6IUWKVJ3yLeRbtriKRShwh5mxZOOc+Y9xEJ4aDxpZ4deA7WDGciX81w
+         mm9A==
+X-Forwarded-Encrypted: i=1; AJvYcCVGIPF2G2vFOvnX57hFzv/LNaw9Z7E03RpDequKsF+wdncED6x/dibHl9eNSWisjx6klaB8aMsdCihHPRmGTMFLwnJQbiSya9wJrKhK
+X-Gm-Message-State: AOJu0YxQ65qnnRh5Yw+dX60P0Ri8XZNf4uRrGRixH2t5Ir8KuZQsy78f
+	UDFM3gUshCaZsAQlWSf4QImLcolIIlZGmCs9LImuzhobyRv4xx+e
+X-Google-Smtp-Source: AGHT+IG+QqyfVfcgfscx8Fy+bRpptm/CI8N+Y+dZgq/zSf4MqiSE8oqdVAYjXsaLGmSda22GqYniTw==
+X-Received: by 2002:a05:6122:3983:b0:4d8:7339:4c35 with SMTP id eq3-20020a056122398300b004d873394c35mr862861vkb.13.1711543214355;
+        Wed, 27 Mar 2024 05:40:14 -0700 (PDT)
+Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
+        by smtp.gmail.com with ESMTPSA id t3-20020ad45bc3000000b0069697d41adfsm2284331qvt.55.2024.03.27.05.40.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Mar 2024 05:40:13 -0700 (PDT)
+Message-ID: <6620d1c1-4178-413e-b090-dd2a9ba9abf3@gmail.com>
+Date: Wed, 27 Mar 2024 05:40:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327114054.1907278-4-danishanwar@ti.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v5] net: txgbe: fix i2c dev name cannot match clkdev
+To: duanqiangwen@net-swift.com, 'Jiri Pirko' <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
+ mengyuanlou@net-swift.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, maciej.fijalkowski@intel.com,
+ andrew@lunn.ch, wangxiongfeng2@huawei.com, linux-kernel@vger.kernel.org,
+ michal.kubiak@intel.com
+References: <20240322080416.470517-1-duanqiangwen@net-swift.com>
+ <Zf09VnR2YI_WOchd@nanopsycho> <001201da7fe6$3aa37f10$afea7d30$@net-swift.com>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <001201da7fe6$3aa37f10$afea7d30$@net-swift.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 27, 2024 at 05:10:54PM +0530, MD Danish Anwar wrote:
-> Add support for ICSSG switch firmware using existing Dual EMAC driver
-> with switchdev.
+
+
+On 3/26/2024 6:29 PM, duanqiangwen@net-swift.com wrote:
+>> -----Original Message-----
+>> From: Jiri Pirko <jiri@resnulli.us>
+>> Sent: 2024年3月22日 16:12
+>> To: Duanqiang Wen <duanqiangwen@net-swift.com>
+>> Cc: netdev@vger.kernel.org; jiawenwu@trustnetic.com;
+>> mengyuanlou@net-swift.com; davem@davemloft.net;
+>> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
+>> maciej.fijalkowski@intel.com; andrew@lunn.ch;
+>> wangxiongfeng2@huawei.com; linux-kernel@vger.kernel.org;
+>> michal.kubiak@intel.com
+>> Subject: Re: [PATCH net v5] net: txgbe: fix i2c dev name cannot match
+> clkdev
+>>
+>> Fri, Mar 22, 2024 at 09:04:16AM CET, duanqiangwen@net-swift.com wrote:
+>>> txgbe clkdev shortened clk_name, so i2c_dev info_name also need to
+>>> shorten. Otherwise, i2c_dev cannot initialize clock.
+>>>
+>>> Change log:
+>>> v4-v5: address comments:
+>>> 	Jiri Pirko:
+>>> 	Well, since it is used in txgbe_phy.c, it should be probably
+>>> 	rather defined locally in txgbe_phy.c.
+>>
+>> Did you read Florian's comment? Please do.
+>>
+>> pw-bot: cr
+>>
 > 
-> Limitations:
-> VLAN offloading is limited to 0-256 IDs.
-> MDB/FDB static entries are limited to 511 entries and different FDBs can
-> hash to same bucket and thus may not completely offloaded
+> I replied to Florian:
+> " I want to shorten "i2c_desginware" to "i2c_dw" in txgbe driver, so other
+> drivers which use "i2c_designware" need another patch to use a define. "
 > 
-> Switch mode requires loading of new firmware into ICSSG cores. This
-> means interfaces have to taken down and then reconfigured to switch
-> mode.
+> He hasn't replied to me for several days, what should I do next?
 
-Patch 0/3 does not say this. It just shows the interfaces being added
-to the bridge. There should not be any need to down the interfaces.
+You emailed me directly rather than do a reply-all and have the mailing 
+list copied. At any rate, you are only changing your internal clock 
+name, so my suggestion to standardize the 'i2c_designware' string beyond 
+your driver did not really make sense.
 
-> Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
-> 
-> Switch to ICSSG Switch mode:
->  ip link set dev eth1 down
->  ip link set dev eth2 down
->  ip link add name br0 type bridge
->  ip link set dev eth1 master br0
->  ip link set dev eth2 master br0
->  ip link set dev br0 up
->  ip link set dev eth1 up
->  ip link set dev eth2 up
->  bridge vlan add dev br0 vid 1 pvid untagged self
-> 
-> Going back to Dual EMAC mode:
-> 
->  ip link set dev br0 down
->  ip link set dev eth1 nomaster
->  ip link set dev eth2 nomaster
->  ip link set dev eth1 down
->  ip link set dev eth2 down
->  ip link del name br0 type bridge
->  ip link set dev eth1 up
->  ip link set dev eth2 up
-> 
-> By default, Dual EMAC firmware is loaded, and can be changed to switch
-> mode by above steps
+With that:
 
-I keep asking this, so it would be good to explain it in the commit
-message. What configuration is preserved over a firmware reload, and
-what is lost?
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 
-Can i add VLAN in duel MAC mode and then swap into the switch firmware
-and all the VLANs are preserved? Can i add fdb entries to a port in
-dual MAC mode, and then swap into the swtich firmware and the FDB
-table is preserved? What about STP port state? What about ... ?
-
-
-> +bool prueth_dev_check(const struct net_device *ndev)
-> +{
-> +	if (ndev->netdev_ops == &emac_netdev_ops && netif_running(ndev)) {
-> +		struct prueth_emac *emac = netdev_priv(ndev);
-> +
-> +		return emac->prueth->is_switch_mode;
-> +	}
-> +
-> +	return false;
-> +}
-
-This does not appear to be used anywhere?
-
-     Andrew
+Thanks!
+-- 
+Florian
 
