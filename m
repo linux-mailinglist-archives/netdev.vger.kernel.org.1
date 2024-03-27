@@ -1,80 +1,119 @@
-Return-Path: <netdev+bounces-82629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4FDA88ED41
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:55:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5011E88ED67
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 19:00:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02D1F1C32373
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:55:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B7EF2A8AD1
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BFB415218B;
-	Wed, 27 Mar 2024 17:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC361514F5;
+	Wed, 27 Mar 2024 17:55:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5144514F114;
-	Wed, 27 Mar 2024 17:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id B87EE1514D0
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 17:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.131.102.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711561712; cv=none; b=RJuuvN0GBfNDR2R51IApVKNLh+t0A9PnsUcSltrDf2UIzHH8AqIeGtZtSIQZxP6RVDYJsXe9DKWb9xLaOXx4WCWKzUcUnTuo7i5/H7k58uu+sDYbVZS1xP/hf1K1s7FsjB4OvEAghGkGpNAsVeV6tXhJlQaBAjX+GzGXUVo1uS0=
+	t=1711562116; cv=none; b=EbEhaZwVmE/JOFF0qQ/A56/OLb+5Ftl1IEx+LCNox5Qx6cK/J1LSqOv7HuBjq2+ByyWBG+vUjMxTgl+3Cf2lRCjXd8fQDKrK54qKdKlVw32414ct50vQhlbpmfAo3Yo5eCDgzW5Eey74WsEwj6tZb+1bMAs7Q4od2uBK0MKu09k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711561712; c=relaxed/simple;
-	bh=GlXTJYgV3U0VaavTKzUi652h6ZbWONW0X+LAIesw5uY=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UVYaDVWLWCedAsRuXZGf0pxZ1JK3ciKhcBm8GUsIKxJ3U3Ywb3Y8lAp5ZPa1zMo9Clbg6qDTehB0aFl30gCEaYGCzo2PcqPYgBWg14g9wBs5XeX88HlUcSYYoPNgE64WKPX4rmpe+dGQXl/UTwdc/4m8eaCJduv0vBTPW8vHoVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A55EC433F1;
-	Wed, 27 Mar 2024 17:48:27 +0000 (UTC)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 4/4] nfc: st95hf: drop driver owner assignment
-Date: Wed, 27 Mar 2024 18:48:10 +0100
-Message-Id: <20240327174810.519676-4-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240327174810.519676-1-krzysztof.kozlowski@linaro.org>
-References: <20240327174810.519676-1-krzysztof.kozlowski@linaro.org>
+	s=arc-20240116; t=1711562116; c=relaxed/simple;
+	bh=2em/62sKNa2uOySIrx3SPAGa+oAkz9sarrrAbR/FclA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L4Ba5ginzzETB+4diG4ayfAhGhHwNKJ2paGjU7l/ywqyipjKVzLUe6P6kjYSFt4mb3TncX7ogZ1+CayXDtSGYzosc/f14zNwlAcDDxBXXQFC6dhntfbNMnPq4cxgS0cp0wcqnmo+xFD7pY2LnvBZ8IjMYldIXLSXGUU5Nb9jiZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=rowland.harvard.edu; spf=pass smtp.mailfrom=netrider.rowland.org; arc=none smtp.client-ip=192.131.102.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=rowland.harvard.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netrider.rowland.org
+Received: (qmail 935614 invoked by uid 1000); 27 Mar 2024 13:55:00 -0400
+Date: Wed, 27 Mar 2024 13:55:00 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Allen Pais <apais@linux.microsoft.com>
+Cc: linux-kernel@vger.kernel.org, tj@kernel.org, keescook@chromium.org,
+  vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev,
+  florian.fainelli@broadcom.com, rjui@broadcom.com, sbranden@broadcom.com,
+  paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com,
+  manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com,
+  leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com,
+  haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de,
+  sean.wang@mediatek.com, matthias.bgg@gmail.com,
+  angelogioacchino.delregno@collabora.com, afaerber@suse.de,
+  logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com,
+  robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org,
+  orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
+  patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org,
+  jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com, kys@microsoft.com,
+  haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+  jassisinghbrar@gmail.com, mchehab@kernel.org, maintainers@bluecherrydvr.com,
+  aubin.constans@microchip.com, ulf.hansson@linaro.org,
+  manuel.lauss@gmail.com, mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com,
+  oakad@yahoo.com, hayashi.kunihiko@socionext.com, mhiramat@kernel.org,
+  brucechang@via.com.tw, HaraldWelte@viatech.com, pierre@ossman.eu,
+  duncan.sands@free.fr, oneukum@suse.com,
+  openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
+  asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+  linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+  imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+  linux-mediatek@lists.infradead.org, linux-actions@lists.infradead.org,
+  linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org,
+  linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+  linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
+  linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+  linux-omap@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+  linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+  linux-usb@vger.kernel.org
+Subject: Re: [PATCH 4/9] USB: Convert from tasklet to BH workqueue
+Message-ID: <42c445b4-a156-4c43-bf98-bd2a9ac7a4fa@rowland.harvard.edu>
+References: <20240327160314.9982-1-apais@linux.microsoft.com>
+ <20240327160314.9982-5-apais@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327160314.9982-5-apais@linux.microsoft.com>
 
-Core in spi_register_driver() already sets the .owner, so driver
-does not need to.
+On Wed, Mar 27, 2024 at 04:03:09PM +0000, Allen Pais wrote:
+> The only generic interface to execute asynchronously in the BH context is
+> tasklet; however, it's marked deprecated and has some design flaws. To
+> replace tasklets, BH workqueue support was recently added. A BH workqueue
+> behaves similarly to regular workqueues except that the queued work items
+> are executed in the BH context.
+> 
+> This patch converts drivers/infiniband/* from tasklet to BH workqueue.
+> 
+> Based on the work done by Tejun Heo <tj@kernel.org>
+> Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
+> 
+> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+> ---
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- drivers/nfc/st95hf/core.c | 1 -
- 1 file changed, 1 deletion(-)
+> diff --git a/drivers/usb/core/hcd.c b/drivers/usb/core/hcd.c
+> index c0e005670d67..88d8e1c366cd 100644
+> --- a/drivers/usb/core/hcd.c
+> +++ b/drivers/usb/core/hcd.c
 
-diff --git a/drivers/nfc/st95hf/core.c b/drivers/nfc/st95hf/core.c
-index ed704bb77226..ddefe470f4e9 100644
---- a/drivers/nfc/st95hf/core.c
-+++ b/drivers/nfc/st95hf/core.c
-@@ -1242,7 +1242,6 @@ static void st95hf_remove(struct spi_device *nfc_spi_dev)
- static struct spi_driver st95hf_driver = {
- 	.driver = {
- 		.name = "st95hf",
--		.owner = THIS_MODULE,
- 		.of_match_table = of_match_ptr(st95hf_spi_of_match),
- 	},
- 	.id_table = st95hf_id,
--- 
-2.34.1
+> @@ -1662,10 +1663,9 @@ static void __usb_hcd_giveback_urb(struct urb *urb)
+>  	usb_put_urb(urb);
+>  }
+>  
+> -static void usb_giveback_urb_bh(struct work_struct *work)
+> +static void usb_giveback_urb_bh(struct work_struct *t)
+>  {
+> -	struct giveback_urb_bh *bh =
+> -		container_of(work, struct giveback_urb_bh, bh);
+> +	struct giveback_urb_bh *bh = from_work(bh, t, bh);
+>  	struct list_head local_list;
+>  
+>  	spin_lock_irq(&bh->lock);
 
+Is there any reason for this apparently pointless change of a local
+variable's name?
+
+Alan Stern
 
