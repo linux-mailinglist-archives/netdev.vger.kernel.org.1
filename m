@@ -1,259 +1,144 @@
-Return-Path: <netdev+bounces-82465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A4D488E4A8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:09:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E51D88E4B4
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:11:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A4BA281392
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:09:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71744B35128
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA5912EBCE;
-	Wed, 27 Mar 2024 12:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BED12EBD6;
+	Wed, 27 Mar 2024 12:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iPgLbVyZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d2joMcjM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F1A1EF0D
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007DD12EBDD;
+	Wed, 27 Mar 2024 12:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542710; cv=none; b=t878A9BGiTVorA38F1klrSSsU+Zm+aOjksmc1b8ReIVTk7Y+J2wgLGVrc6eDMwWZQnroUUg8m2VWbanwSUF4vR+a+yuJTXFdjgUvXearFTivjnPw4nDaNwY86YuMvmTNfVNV7v+JR663oCr5XQZLUxWQ4IomKUtBIBvmQWycHiQ=
+	t=1711542986; cv=none; b=tIYAF6cB2VPcxWK6tLT2LzjnqXJj1SP6xQzIpFzbRZ1XUNfh4pIzbTWu1YqgXjd+lKPFdwPehcP4CUf3LDYEce8zeYM4sxex+zS/fhigtfWaE84/yqrud/M4joibbxDhiEY0NuEyOeSMmfMX0ZawjktZuR/jtMCiJA4nJHTZIY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542710; c=relaxed/simple;
-	bh=R5dmpsAMWJZ29k7krm/vAFrzPjEWM20cOR1D6qiEdCI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TSmv9cqt9/Oo0KJE3IoNNlQXogDnjIWTPaC5N/z3EysI67LbEddrwypVmmzp2sW2u0jAQ7WxsMndgzTfxgH3gqo7BdHARa+SxQ3fYPNhVXX30a/TIkYaUOwUXg0fOZ+ZvhKZqYCRMctAm+tTeCqfvrBHPxc7ol5OQJp2G0r4ef0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iPgLbVyZ; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1e0878b76f3so6647295ad.0
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 05:31:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711542708; x=1712147508; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zzSDuj4+MczrI+iCc3I4wXOJsqZz8d0kjIIpIQGRFPE=;
-        b=iPgLbVyZx1LIgycQ/KMBqXjwDZt0Y6OG4gX6oGeja+OtdBrUtzRhLFhX8y3XytIImW
-         vB6V1HObJNmXxj5tuw07YP9ybPbWn2Od75VP5HHKaBGzlInRRtLSq1IXQ65yCDBJllLo
-         V2+LjGg3tc2wmaZqryOfKZBiheTpRH7ljUCK8GOrPamuv3S73jWygDybHoTppDHjgNpW
-         pyrcGy1nbV1w5oiDp9fsFx/v2BXqIlwa2BoCK62q1cnxvsGLJe7T3DU8ZaIj2Qu3w77l
-         Iu24l++EDePPGe9iSC2f9N8lcX8TXYalqCr8zjIbgViZ7cIdVBSUPo1wTGlE0AgixW8G
-         SeUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711542708; x=1712147508;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zzSDuj4+MczrI+iCc3I4wXOJsqZz8d0kjIIpIQGRFPE=;
-        b=rBIldSJ9epofoqx4jpAekng6pTkCaEC7wlUkf8SJiMaNEev0mjJL9zyJEfR2JpX1Rj
-         RliMpzv0rRVD32NxFZGi7kTIL3nJiyn9GPmTmmMJHcUpOVsgylqOfpTYUH6XRjB48t3t
-         BJOzwmd7Eu/OzDw6K2wTloH2ZrrWhVDJx8qNXK7nmDT2sC6UptWTcrttGS2kgDZK8mbq
-         STcnWD35Z5JmnAf1gGTz8two7HzSL878aonboCzOiYznm7q8pIX00Zyrxalt0yAO4XNG
-         8ZwSGIksdL0hkh3XJ9RGJ19dx27OY9wcwR+OIsBdmZSFi4nmZ2ax3xZF3+ru8zI6/S2L
-         TCiQ==
-X-Gm-Message-State: AOJu0YxcpmXxlUImrPTP4m1SoGNhTRzXmWMx1RzNS4FCtHIsmUzSWY9Q
-	7lXo1clDQNhyhhnAiaxrrctUyR9Km0JywjiHER5GkLlfDdFHRn1/J0+qttmFO/9v6xAJ
-X-Google-Smtp-Source: AGHT+IG2v4zW+JbY8/L3njlDOiPXCQ4m4zRrnuqYz69sJaSAZR3urcqx9RIeSGtbjB9IDE/Y0CheHA==
-X-Received: by 2002:a17:902:d2cc:b0:1e0:dc6e:45ed with SMTP id n12-20020a170902d2cc00b001e0dc6e45edmr7403948plc.15.1711542708108;
-        Wed, 27 Mar 2024 05:31:48 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id x17-20020a1709027c1100b001e197cfe08fsm1356771pll.59.2024.03.27.05.31.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 05:31:47 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1711542986; c=relaxed/simple;
+	bh=oWual4D9pynFOAqFc+0csfX9lRZor/YG/q2D8yBbldk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FOjFrYU822uO948yW8KA/TmTrikWc9jt0IcSrnshyXr8fVc646zIGpHebz3XfkJk+h2RUsBbmVcUJerL9YYDEqok6hH4eUi2ni7wTj4HXCk5g/jR+w84M+gEb5JFfvuyZPgPV8eDZY0Fye0XUVXfTCCsPPJKvKKIgpUK0Uyz+DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d2joMcjM; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=W89r0bsVU2voc8CCyX1FkI6R4xhAvahVaf/LUakcvPc=; b=d2joMcjMX0dxYY7/Zc+XxdAyUb
+	fPQ77U2Rf+nkpx10PT1uNqjD2l5ZPzPFN0FOb/mfR7jIl6H+rA11CneBdmZRP83hq9LwbDngUjkmC
+	puWTS+yXhcBXG9TbRZJSMWETxH9S0fX2dP6M9yF8C3mnPcLT5pZwPiEX3a5Hga3CIW0g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rpSVW-00BOJ1-6F; Wed, 27 Mar 2024 13:35:54 +0100
+Date: Wed, 27 Mar 2024 13:35:54 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Diogo Ivo <diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Simon Horman <horms@kernel.org>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next 2/2] doc/netlink/specs: Add vlan attr in rt_link spec
-Date: Wed, 27 Mar 2024 20:31:29 +0800
-Message-ID: <20240327123130.1322921-3-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240327123130.1322921-1-liuhangbin@gmail.com>
-References: <20240327123130.1322921-1-liuhangbin@gmail.com>
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com
+Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
+ ICSSG switch firmware
+Message-ID: <27d960ed-8e67-431b-a910-e6b2fc12e292@lunn.ch>
+References: <20240327114054.1907278-1-danishanwar@ti.com>
+ <20240327114054.1907278-4-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327114054.1907278-4-danishanwar@ti.com>
 
-With command:
- # ./tools/net/ynl/cli.py \
- --spec Documentation/netlink/specs/rt_link.yaml \
- --do getlink --json '{"ifname": "eno1.2"}' --output-json | \
- jq -C '.linkinfo'
+On Wed, Mar 27, 2024 at 05:10:54PM +0530, MD Danish Anwar wrote:
+> Add support for ICSSG switch firmware using existing Dual EMAC driver
+> with switchdev.
+> 
+> Limitations:
+> VLAN offloading is limited to 0-256 IDs.
+> MDB/FDB static entries are limited to 511 entries and different FDBs can
+> hash to same bucket and thus may not completely offloaded
+> 
+> Switch mode requires loading of new firmware into ICSSG cores. This
+> means interfaces have to taken down and then reconfigured to switch
+> mode.
 
-Before:
-Exception: No message format for 'vlan' in sub-message spec 'linkinfo-data-msg'
+Patch 0/3 does not say this. It just shows the interfaces being added
+to the bridge. There should not be any need to down the interfaces.
 
-After:
- {
-   "kind": "vlan",
-   "data": {
-     "protocol": "8021q",
-     "id": 2,
-     "flag": {
-       "flags": [
-         "reorder-hdr"
-       ],
-       "mask": "0xffffffff"
-     },
-     "egress-qos": {
-       "mapping": [
-         {
-           "from": 1,
-           "to": 2
-         },
-         {
-           "from": 4,
-           "to": 4
-         }
-       ]
-     }
-   }
- }
+> Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
+> 
+> Switch to ICSSG Switch mode:
+>  ip link set dev eth1 down
+>  ip link set dev eth2 down
+>  ip link add name br0 type bridge
+>  ip link set dev eth1 master br0
+>  ip link set dev eth2 master br0
+>  ip link set dev br0 up
+>  ip link set dev eth1 up
+>  ip link set dev eth2 up
+>  bridge vlan add dev br0 vid 1 pvid untagged self
+> 
+> Going back to Dual EMAC mode:
+> 
+>  ip link set dev br0 down
+>  ip link set dev eth1 nomaster
+>  ip link set dev eth2 nomaster
+>  ip link set dev eth1 down
+>  ip link set dev eth2 down
+>  ip link del name br0 type bridge
+>  ip link set dev eth1 up
+>  ip link set dev eth2 up
+> 
+> By default, Dual EMAC firmware is loaded, and can be changed to switch
+> mode by above steps
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
-v3:
- - lower case vlan protocols (Donald Hunter)
- - use abbreviated form for vlan flags (Donald Hunter)
- - set ifla-vlan-qos as multi-attr (Donald Hunter)
-v2:
- - Add eth-protocols definitions, but only include vlan protocols (Donald Hunter)
- - Set protocol to big-endian (Donald Hunter)
- - Add display-hint for vlan flag mask (Donald Hunter)
----
- Documentation/netlink/specs/rt_link.yaml | 80 +++++++++++++++++++++++-
- 1 file changed, 78 insertions(+), 2 deletions(-)
+I keep asking this, so it would be good to explain it in the commit
+message. What configuration is preserved over a firmware reload, and
+what is lost?
 
-diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-index 8e4d19adee8c..81a5a3d1b04d 100644
---- a/Documentation/netlink/specs/rt_link.yaml
-+++ b/Documentation/netlink/specs/rt_link.yaml
-@@ -50,7 +50,16 @@ definitions:
-         name: dormant
-       -
-         name: echo
--
-+  -
-+    name: vlan-protocols
-+    type: enum
-+    entries:
-+      -
-+        name: 8021q
-+        value: 33024
-+      -
-+        name: 8021ad
-+        value: 34984
-   -
-     name: rtgenmsg
-     type: struct
-@@ -729,7 +738,38 @@ definitions:
-       -
-         name: filter-mask
-         type: u32
--
-+  -
-+    name: ifla-vlan-flags
-+    type: struct
-+    members:
-+      -
-+        name: flags
-+        type: u32
-+        enum: vlan-flags
-+        enum-as-flags: true
-+      -
-+        name: mask
-+        type: u32
-+        display-hint: hex
-+  -
-+    name: vlan-flags
-+    type: flags
-+    entries:
-+      - reorder-hdr
-+      - gvrp
-+      - loose-binding
-+      - mvrp
-+      - bridge-binding
-+  -
-+    name: ifla-vlan-qos-mapping
-+    type: struct
-+    members:
-+      -
-+        name: from
-+        type: u32
-+      -
-+        name: to
-+        type: u32
- 
- attribute-sets:
-   -
-@@ -1507,6 +1547,39 @@ attribute-sets:
-       -
-         name: num-disabled-queues
-         type: u32
-+  -
-+    name: linkinfo-vlan-attrs
-+    name-prefix: ifla-vlan-
-+    attributes:
-+      -
-+        name: id
-+        type: u16
-+      -
-+        name: flag
-+        type: binary
-+        struct: ifla-vlan-flags
-+      -
-+        name: egress-qos
-+        type: nest
-+        nested-attributes: ifla-vlan-qos
-+      -
-+        name: ingress-qos
-+        type: nest
-+        nested-attributes: ifla-vlan-qos
-+      -
-+        name: protocol
-+        type: u16
-+        enum: vlan-protocols
-+        byte-order: big-endian
-+  -
-+    name: ifla-vlan-qos
-+    name-prefix: ifla-vlan-qos
-+    attributes:
-+      -
-+        name: mapping
-+        type: binary
-+        multi-attr: true
-+        struct: ifla-vlan-qos-mapping
-   -
-     name: linkinfo-vrf-attrs
-     name-prefix: ifla-vrf-
-@@ -1666,6 +1739,9 @@ sub-messages:
-       -
-         value: tun
-         attribute-set: linkinfo-tun-attrs
-+      -
-+        value: vlan
-+        attribute-set: linkinfo-vlan-attrs
-       -
-         value: vrf
-         attribute-set: linkinfo-vrf-attrs
--- 
-2.43.0
+Can i add VLAN in duel MAC mode and then swap into the switch firmware
+and all the VLANs are preserved? Can i add fdb entries to a port in
+dual MAC mode, and then swap into the swtich firmware and the FDB
+table is preserved? What about STP port state? What about ... ?
 
+
+> +bool prueth_dev_check(const struct net_device *ndev)
+> +{
+> +	if (ndev->netdev_ops == &emac_netdev_ops && netif_running(ndev)) {
+> +		struct prueth_emac *emac = netdev_priv(ndev);
+> +
+> +		return emac->prueth->is_switch_mode;
+> +	}
+> +
+> +	return false;
+> +}
+
+This does not appear to be used anywhere?
+
+     Andrew
 
