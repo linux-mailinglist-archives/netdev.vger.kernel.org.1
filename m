@@ -1,205 +1,178 @@
-Return-Path: <netdev+bounces-82396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B85F88D861
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 09:07:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FCE88D876
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 09:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00CAE29D13B
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:07:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ADE71C2656C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A972C694;
-	Wed, 27 Mar 2024 08:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OK8UOyKQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF012C86E;
+	Wed, 27 Mar 2024 08:10:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282F42577D
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 08:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57692C6AF
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 08:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711526851; cv=none; b=KsHp3pTDlHWUiAXMmr3dhlebdP2tS4c4spS1lVlXy+7Wab8PCv84RF5Sgq2shcs2r0cHzg0rPN457EZ+0W/y2X5QdBttNGyWmDeIOfWNuxX+YwULG2p4QrcB6swF22UW1/Rm2LjiSdO95H2lAJIj3BC6HXjnKDJmlUcXiVuiu9I=
+	t=1711527028; cv=none; b=aakDbSYtk1GVRA63GxEd5lRXklS8ZOR4h+AnyuHNftdwPSdlPAscAUPLIgXAPmGsopW+wAb6IPKbKV7AemBxQMQL+nOdJYntE8WpyfO0kuD6kTlYkLeI2oZTiCFcTFeL5NZBDRUdbT0LlRR9umJ08sMQz0qTO+b1LBC0/F3HijE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711526851; c=relaxed/simple;
-	bh=zb9pTWa4v6J7bjx0jnI6uWcGPwFOi+i8kDB7D26ywz4=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=mFnRyxHrTrn09OwGmcUT7jNVZFc8JSqrEYRLwaRE442rfnL8UJBvnr34ZmpBwc1shR05oXIypLNWkHHL4ex3/DtAo3FP4TLQ0K2Y+vU9ZyTvKdIsr3ZFKf50N4UVOwsxuIB6SxPmppdrEzygvK3vDeFc2otV1XN8ZqMJsWjUGPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OK8UOyKQ; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711526840; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=HqBglzuBzXwHz8JFm548qIsgg7kLqHB9t6RwxUvdavE=;
-	b=OK8UOyKQsVDuIcAS7ycoSvlI/l3b4EC4eUdvB4DYR/Fx1peuxEhmnYrGb5Psm6Aq8K+T/vLJzRJoWFOu8UGj+9fwOE1Nw8BAhRdKCVZxCzQdoki5Cy2asdxgsX8UKUKJiMmUdWs3nLGwRgngzabONkg0nHtSY3x4H8dH53R6zWs=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3NzNmQ_1711526839;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3NzNmQ_1711526839)
-          by smtp.aliyun-inc.com;
-          Wed, 27 Mar 2024 16:07:20 +0800
-Message-ID: <1711526642.5018039-4-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v5 00/10] virtio: drivers maintain dma info for premapped vq
-Date: Wed, 27 Mar 2024 16:04:02 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <20240325085428.7275-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEtEWCjb8+Zcfizij2+0ef-wb8YJD2bfyAvP_72hKZrGvA@mail.gmail.com>
- <1711523698.8996527-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEvzMKyYTNwCwept1HJKLM8FZBa2FZq1oyQ0tFVL2TvMeQ@mail.gmail.com>
-In-Reply-To: <CACGkMEvzMKyYTNwCwept1HJKLM8FZBa2FZq1oyQ0tFVL2TvMeQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1711527028; c=relaxed/simple;
+	bh=vCvfEahHjZAkW+O6g9pPGopW0u821OQfSSlcU3Ov9aU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=RDQmsg/AA1JEFoInFs6J5V6S2609a+RMiExoEscdt0yjvRAJ5W/OaBjLk5i6abjPbLNf4oNgw+262GQ/PNE0VgAQYJLDPh9GjlLrKwTyryp4PDd2oS9PtmPDlP1/+3fqrkPKA+MxdosMU16ke5HCDUSiR0aZE+MxqOSyVHYko5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-368593f281bso62683005ab.1
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 01:10:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711527026; x=1712131826;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LGiWUvAa6L+cHxPyWZ6TJFAGG3f4fNVktjBZljI6Owc=;
+        b=ACoetQJfdnY5cpFQg3PNpguPyFUcclWFqVpvuA84YhS2WcOwfapaa5FfjVoFS11TVm
+         pWfQxPWixihc0lUBbWiPNdRGVNBHpDonQU9ySuuFb73HAiPHJggy5sa/3EfFvnM/fatp
+         JwLKUsvgT3RMOA+tHLqyRlyFahJQJJ+y2Gwm/gbS1RBrHlPG6iIo/Fl8LegaqyhPSQJo
+         IWQC4t54kLPuSTNXPODGNOOCcDd9FsG8VuRfe0zyZQpN3n88xdIj6/BAwTVvjnFuVIrP
+         QkmGvFVsvpVP9NO4JHFLgzDIzfcp98KKBmxaMAe1BypMlvET49ughvQfKKdKur1ZNnEL
+         YiEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUueJAi2Y0kzUekvlca4huE0aZ6gluup6aUDd9l77eHxHF34rrR79iHIyQItkTAJ7QOoQxemvlsSoBaa1HQSe31ypOn/sse
+X-Gm-Message-State: AOJu0YxbVha+IXw6Pid0/ZotKj+iIcBJ4IA7//ofGbxTEi6Am/WJFlny
+	kdnu28czoVErRwRnvTt4LukthZHWF44X4ykb2Oio7EoW3AgYGkb+yBryE6hhVvWuvr9KTCCeP1q
+	UfHsalKhMJDmEO7DrmHLp8Uvdfst5NM4aVJDhkzbeoKks9c210anIpIA=
+X-Google-Smtp-Source: AGHT+IFt/ebXjGSIxGhSzs3o1fzYBP0G5Ct5VVO0aRLylyyV/lnLMufnSMMqBQkmr9DSE6qQefejvffznV5i/2qNUio6aVFg2/gw
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1a0e:b0:368:a259:75cc with SMTP id
+ s14-20020a056e021a0e00b00368a25975ccmr231667ild.3.1711527026086; Wed, 27 Mar
+ 2024 01:10:26 -0700 (PDT)
+Date: Wed, 27 Mar 2024 01:10:26 -0700
+In-Reply-To: <000000000000f6531b061494e696@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000069ee1a06149ff00c@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue
+From: syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 27 Mar 2024 15:50:17 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Wed, Mar 27, 2024 at 3:16=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Tue, 26 Mar 2024 14:35:21 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Mon, Mar 25, 2024 at 4:54=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > > As discussed:
-> > > >
-> > > > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVm=
-J3rHYqRZxYg@mail.gmail.com
-> > > >
-> > > > If the virtio is premapped mode, the driver should manage the dma i=
-nfo by self.
-> > > > So the virtio core should not store the dma info. We can release th=
-e memory used
-> > > > to store the dma info.
-> > > >
-> > > > For virtio-net xmit queue, if the virtio-net maintains the dma info,
-> > > > the virtio-net must allocate too much memory(19 * queue_size for pe=
-r-queue), so
-> > > > we do not plan to make the virtio-net to maintain the dma info by d=
-efault. The
-> > > > virtio-net xmit queue only maintain the dma info when premapped mod=
-e is enable
-> > > > (such as AF_XDP is enable).
-> > > >
-> > > > So this patch set try to do:
-> > > >
-> > > > 1. make the virtio core to do not store the dma info when driver ca=
-n do that
-> > > >     - But if the desc_extra has not dma info, we face a new questio=
-n,
-> > > >       it is hard to get the dma info of the desc with indirect flag.
-> > > >       For split mode, that is easy from desc, but for the packed mo=
-de,
-> > > >       it is hard to get the dma info from the desc. And hardening
-> > > >       the dma unmap is safe, we should store the dma info of indire=
-ct
-> > > >       descs when the virtio core does not store the bufer dma info.
-> > > >
-> > > >       The follow patches to this:
-> > > >          * virtio_ring: packed: structure the indirect desc table
-> > > >          * virtio_ring: split: structure the indirect desc table
-> > > >
-> > > >     - On the other side, in the umap handle, we mix the indirect de=
-scs with
-> > > >       other descs. That make things too complex. I found if we we d=
-istinguish
-> > > >       the descs with VRING_DESC_F_INDIRECT before unmap, thing will=
- be clearer.
-> > > >
-> > > >       The follow patches do this.
-> > > >          * virtio_ring: packed: remove double check of the unmap ops
-> > > >          * virtio_ring: split: structure the indirect desc table
-> > > >
-> > > > 2. make the virtio core to enable premapped mode by find_vqs() para=
-ms
-> > > >     - Because the find_vqs() will try to allocate memory for the dm=
-a info.
-> > > >       If we set the premapped mode after find_vqs() and release the
-> > > >       dma info, that is odd.
-> > > >
-> > > >
-> > > > Please review.
-> > > >
-> > > > Thanks
-> > >
-> > > This doesn't apply cleany on vhost.git linux-next branch.
-> > >
-> > > Which tree is this based on?
-> >
-> >
-> > Sorry. That is on the top of "[PATCH vhost v5 0/6] refactor the params =
-of
-> > find_vqs()".
-> >
-> > Lore-URL: http://lore.kernel.org/all/20240325090419.33677-1-xuanzhuo@li=
-nux.alibaba.com
-> >
-> > Thanks.
->
-> I've tried that but it doesn't work:
->
-> % git am ~/Downloads/\[PATCH\ vhost\ v5\ 01_10\]\ virtio_ring_\
-> introduce\ vring_need_unmap_buffer.eml
-> Applying: virtio_ring: introduce vring_need_unmap_buffer
-> error: patch failed: drivers/virtio/virtio_ring.c:2080
-> error: drivers/virtio/virtio_ring.c: patch does not apply
-> Patch failed at 0001 virtio_ring: introduce vring_need_unmap_buffer
-> hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
-> When you have resolved this problem, run "git am --continue".
-> If you prefer to skip this patch, run "git am --skip" instead.
-> To restore the original branch and stop patching, run "git am --abort".
->
-> I'm using vhost.git linux-next branch, HEAD is
->
-> commit 56e71885b0349241c07631a7b979b61e81afab6a
-> Author: Maxime Coquelin <maxime.coquelin@redhat.com>
-> Date:   Tue Jan 9 12:10:24 2024 +0100
->
->     vduse: Temporarily fail if control queue feature requested
+syzbot has found a reproducer for the following issue on:
 
+HEAD commit:    443574b03387 riscv, bpf: Fix kfunc parameters incompatibil..
+git tree:       bpf
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=17d370b1180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=af9492708df9797198d6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13d6b041180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1060cc81180000
 
-NOT ON the vhost directly.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3f355021a085/disk-443574b0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/44cf4de7472a/vmlinux-443574b0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a99a36c7ad65/bzImage-443574b0.xz
 
-That is on the top of "refactor the params of find_vqs"
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
 
-"refactor the params of find_vqs" said:
-
-	"""
-	This pathset is splited from the
-
-	     http://lore.kernel.org/all/20240229072044.77388-1-xuanzhuo@linux.alib=
-aba.com
-
-	That may needs some cycles to discuss. But that notifies too many people.
-	"""
-
-But now that is broken due to the change of the that patch set.
-
-I will post the new version of these two patch set soon.
-
-Thanks.
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 5078 Comm: syz-executor295 Not tainted 6.8.0-syzkaller-05236-g443574b03387 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 a6 42 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 10 8a 3b 00 4c 8b 7d 00 48 83 c5
+RSP: 0018:ffffc90003bef688 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888022169e00
+RDX: 0000000000000000 RSI: ffff88802ef65070 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff90e
+R10: 0000000000000004 R11: ffff888022169e00 R12: ffff888015bd0000
+R13: ffff88802ef65070 R14: dffffc0000000000 R15: ffff8880b953c088
+FS:  000055558e3b9380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1141b380d0 CR3: 0000000021838000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __xdp_do_redirect_frame net/core/filter.c:4384 [inline]
+ xdp_do_redirect_frame+0x20d/0x4d0 net/core/filter.c:4438
+ xdp_test_run_batch net/bpf/test_run.c:336 [inline]
+ bpf_test_run_xdp_live+0xe8a/0x1e90 net/bpf/test_run.c:384
+ bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
+ bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
+ __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7f1141ac0fb9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe180a1958 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f1141ac0fb9
+RDX: 0000000000000048 RSI: 0000000020000340 RDI: 000000000000000a
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000006
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 a6 42 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 10 8a 3b 00 4c 8b 7d 00 48 83 c5
+RSP: 0018:ffffc90003bef688 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888022169e00
+RDX: 0000000000000000 RSI: ffff88802ef65070 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff90e
+R10: 0000000000000004 R11: ffff888022169e00 R12: ffff888015bd0000
+R13: ffff88802ef65070 R14: dffffc0000000000 R15: ffff8880b953c088
+FS:  000055558e3b9380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1141b380d0 CR3: 0000000021838000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	41 56                	push   %r14
+   2:	41 55                	push   %r13
+   4:	41 54                	push   %r12
+   6:	53                   	push   %rbx
+   7:	48 83 ec 18          	sub    $0x18,%rsp
+   b:	49 89 d4             	mov    %rdx,%r12
+   e:	49 89 f5             	mov    %rsi,%r13
+  11:	48 89 fd             	mov    %rdi,%rbp
+  14:	49 be 00 00 00 00 00 	movabs $0xdffffc0000000000,%r14
+  1b:	fc ff df
+  1e:	e8 a6 42 d8 ff       	call   0xffd842c9
+  23:	48 89 e8             	mov    %rbp,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	48 89 ef             	mov    %rbp,%rdi
+  34:	e8 10 8a 3b 00       	call   0x3b8a49
+  39:	4c 8b 7d 00          	mov    0x0(%rbp),%r15
+  3d:	48                   	rex.W
+  3e:	83                   	.byte 0x83
+  3f:	c5                   	.byte 0xc5
 
 
->
-> Thanks
->
-> >
-> > >
-> > > Thanks
-> > >
-> >
->
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
