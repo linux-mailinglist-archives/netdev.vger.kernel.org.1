@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-82464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E7988E4A7
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:09:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A4D488E4A8
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:09:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A83CB1F21DB5
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:09:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A4BA281392
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E0F1272C4;
-	Wed, 27 Mar 2024 12:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA5912EBCE;
+	Wed, 27 Mar 2024 12:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hh8PHilz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iPgLbVyZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981431EF0D
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F1A1EF0D
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542707; cv=none; b=iurxLVGC2XDhG8B0UMyEgPSfUU+mmu/oVfH0qaxEsVEdG29pYykqoQNUwEBDCn7sUKGUyypq4jOb/VwaizSkAXKpeRCTYmU5AwhzR6Q0vxJmteQB7tZubmSmgRQu+eYLIBFaQkfyh9j80mucEkAPnPx0SSIbWxelUl4OooXuRBo=
+	t=1711542710; cv=none; b=t878A9BGiTVorA38F1klrSSsU+Zm+aOjksmc1b8ReIVTk7Y+J2wgLGVrc6eDMwWZQnroUUg8m2VWbanwSUF4vR+a+yuJTXFdjgUvXearFTivjnPw4nDaNwY86YuMvmTNfVNV7v+JR663oCr5XQZLUxWQ4IomKUtBIBvmQWycHiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542707; c=relaxed/simple;
-	bh=VUbVM+M/356SfvAPGqmazZHtmxdmJwAxcwXrlIoUEok=;
+	s=arc-20240116; t=1711542710; c=relaxed/simple;
+	bh=R5dmpsAMWJZ29k7krm/vAFrzPjEWM20cOR1D6qiEdCI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n1b7yyYPAWrp9k1tCYBKWKS8SMqSQMjgAJrVAljQKKkfm3/KmeFbjxPlqMDs38opc9dJd6ZlxRO9MGF9/GuJKkQe8QfkvwxQGvALkOm11piyFv9kSG5Uf1tojAJQvTBPmOr1K5xDgYCoOMVoqwEH0E2rl6ffMKZxknrEbYYKil4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hh8PHilz; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=TSmv9cqt9/Oo0KJE3IoNNlQXogDnjIWTPaC5N/z3EysI67LbEddrwypVmmzp2sW2u0jAQ7WxsMndgzTfxgH3gqo7BdHARa+SxQ3fYPNhVXX30a/TIkYaUOwUXg0fOZ+ZvhKZqYCRMctAm+tTeCqfvrBHPxc7ol5OQJp2G0r4ef0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iPgLbVyZ; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1e0fa980d55so14759115ad.3
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 05:31:45 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1e0878b76f3so6647295ad.0
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 05:31:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711542705; x=1712147505; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711542708; x=1712147508; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w1qnP2I8xCsfPUR7bxFs1jTB4j3kU40LHJqThhM5Ztk=;
-        b=Hh8PHilzd4cIRjtiuSoEP2UyDOOTsdixse/+XjlGCTlzkgWLT6BR3QrN1l1bd1mE3K
-         Oa5jOmF05ATylOW7dPbu89hpiNhmbkmev4nbqzTstSymlp8RjRMcIldOBw0upbN2/PoY
-         y/hs5ciDU65eEXvTHZBxvrlolPsS3vwEfSXmTU6lJ0PvWaWa8X5E55W8qrHJfCEIR5Hg
-         yVyD/iScaR8ue3Q7Ffv1EpAyrr+kSsV5uo1RgxzgOTqrVSJUqaDcjVBmeUoRrXouLFZN
-         6mO58fYS4y7NrZ/O+Tc6BVxOq0Vm7R/SHXNUCCjO++R/2CAewaGcJTYYN+wqhzzhiwnB
-         mIZg==
+        bh=zzSDuj4+MczrI+iCc3I4wXOJsqZz8d0kjIIpIQGRFPE=;
+        b=iPgLbVyZx1LIgycQ/KMBqXjwDZt0Y6OG4gX6oGeja+OtdBrUtzRhLFhX8y3XytIImW
+         vB6V1HObJNmXxj5tuw07YP9ybPbWn2Od75VP5HHKaBGzlInRRtLSq1IXQ65yCDBJllLo
+         V2+LjGg3tc2wmaZqryOfKZBiheTpRH7ljUCK8GOrPamuv3S73jWygDybHoTppDHjgNpW
+         pyrcGy1nbV1w5oiDp9fsFx/v2BXqIlwa2BoCK62q1cnxvsGLJe7T3DU8ZaIj2Qu3w77l
+         Iu24l++EDePPGe9iSC2f9N8lcX8TXYalqCr8zjIbgViZ7cIdVBSUPo1wTGlE0AgixW8G
+         SeUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711542705; x=1712147505;
+        d=1e100.net; s=20230601; t=1711542708; x=1712147508;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w1qnP2I8xCsfPUR7bxFs1jTB4j3kU40LHJqThhM5Ztk=;
-        b=LIbTFaNKm4nyN9i663yDk1qjgCK0PlAniSwLl//SLlHDk/UYXfP7d+7eDnjcRL/ryF
-         blL5fvY1g4yMOhfY4K2UUMvRFTgUtq60vDcbsjzDsj6lSMcDCS7pVacKMPzq+OZAGNcA
-         /AJcTHnmg5wT2X5vLhEjoxhSfpz4hQmparJqQz8SwbSCyViQxbweF/kbbU3lxLuNB6d1
-         sbz/LyoimX9lpON9VsQGX/bGz57jAegQmIQ0M0zisbSjCnt7YtRMioB2c1/BpixLzBVN
-         Ar6Axdqo/VcuvoHNUkQ/CnL0TsOn1AF4bWyjx79eXp7Y3ReOi4LqdziLWbPPQNQCMuP5
-         RyJg==
-X-Gm-Message-State: AOJu0YyElNIPHoeDw4VB2dQByYpXbhLTUa9dtSXnZt6yg/Ia/spFqVjs
-	h3ZycJRGx5vh8CuiQrdYFiumjm6lWiW6xxzJgiAQQoh2W6FJ4jY8v9hTE5NO8oKwh6AH
-X-Google-Smtp-Source: AGHT+IFBN9bnhgVG2V3q52YpoAo7HacQUBnG8a82XIhg+GFxlpGYReZoEyY29+hzjTOLw1CUsP9H5A==
-X-Received: by 2002:a17:902:ecc5:b0:1e0:342b:af6f with SMTP id a5-20020a170902ecc500b001e0342baf6fmr4506955plh.16.1711542704768;
-        Wed, 27 Mar 2024 05:31:44 -0700 (PDT)
+        bh=zzSDuj4+MczrI+iCc3I4wXOJsqZz8d0kjIIpIQGRFPE=;
+        b=rBIldSJ9epofoqx4jpAekng6pTkCaEC7wlUkf8SJiMaNEev0mjJL9zyJEfR2JpX1Rj
+         RliMpzv0rRVD32NxFZGi7kTIL3nJiyn9GPmTmmMJHcUpOVsgylqOfpTYUH6XRjB48t3t
+         BJOzwmd7Eu/OzDw6K2wTloH2ZrrWhVDJx8qNXK7nmDT2sC6UptWTcrttGS2kgDZK8mbq
+         STcnWD35Z5JmnAf1gGTz8two7HzSL878aonboCzOiYznm7q8pIX00Zyrxalt0yAO4XNG
+         8ZwSGIksdL0hkh3XJ9RGJ19dx27OY9wcwR+OIsBdmZSFi4nmZ2ax3xZF3+ru8zI6/S2L
+         TCiQ==
+X-Gm-Message-State: AOJu0YxcpmXxlUImrPTP4m1SoGNhTRzXmWMx1RzNS4FCtHIsmUzSWY9Q
+	7lXo1clDQNhyhhnAiaxrrctUyR9Km0JywjiHER5GkLlfDdFHRn1/J0+qttmFO/9v6xAJ
+X-Google-Smtp-Source: AGHT+IG2v4zW+JbY8/L3njlDOiPXCQ4m4zRrnuqYz69sJaSAZR3urcqx9RIeSGtbjB9IDE/Y0CheHA==
+X-Received: by 2002:a17:902:d2cc:b0:1e0:dc6e:45ed with SMTP id n12-20020a170902d2cc00b001e0dc6e45edmr7403948plc.15.1711542708108;
+        Wed, 27 Mar 2024 05:31:48 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id x17-20020a1709027c1100b001e197cfe08fsm1356771pll.59.2024.03.27.05.31.41
+        by smtp.gmail.com with ESMTPSA id x17-20020a1709027c1100b001e197cfe08fsm1356771pll.59.2024.03.27.05.31.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 05:31:44 -0700 (PDT)
+        Wed, 27 Mar 2024 05:31:47 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -77,9 +77,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Stanislav Fomichev <sdf@google.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next 1/2] ynl: support hex display_hint for integer
-Date: Wed, 27 Mar 2024 20:31:28 +0800
-Message-ID: <20240327123130.1322921-2-liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 2/2] doc/netlink/specs: Add vlan attr in rt_link spec
+Date: Wed, 27 Mar 2024 20:31:29 +0800
+Message-ID: <20240327123130.1322921-3-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240327123130.1322921-1-liuhangbin@gmail.com>
 References: <20240327123130.1322921-1-liuhangbin@gmail.com>
@@ -91,32 +91,168 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some times it would be convenient to read the integer as hex, like
-mask values.
+With command:
+ # ./tools/net/ynl/cli.py \
+ --spec Documentation/netlink/specs/rt_link.yaml \
+ --do getlink --json '{"ifname": "eno1.2"}' --output-json | \
+ jq -C '.linkinfo'
 
-Suggested-by: Donald Hunter <donald.hunter@gmail.com>
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Before:
+Exception: No message format for 'vlan' in sub-message spec 'linkinfo-data-msg'
+
+After:
+ {
+   "kind": "vlan",
+   "data": {
+     "protocol": "8021q",
+     "id": 2,
+     "flag": {
+       "flags": [
+         "reorder-hdr"
+       ],
+       "mask": "0xffffffff"
+     },
+     "egress-qos": {
+       "mapping": [
+         {
+           "from": 1,
+           "to": 2
+         },
+         {
+           "from": 4,
+           "to": 4
+         }
+       ]
+     }
+   }
+ }
+
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- tools/net/ynl/lib/ynl.py | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+v3:
+ - lower case vlan protocols (Donald Hunter)
+ - use abbreviated form for vlan flags (Donald Hunter)
+ - set ifla-vlan-qos as multi-attr (Donald Hunter)
+v2:
+ - Add eth-protocols definitions, but only include vlan protocols (Donald Hunter)
+ - Set protocol to big-endian (Donald Hunter)
+ - Add display-hint for vlan flag mask (Donald Hunter)
+---
+ Documentation/netlink/specs/rt_link.yaml | 80 +++++++++++++++++++++++-
+ 1 file changed, 78 insertions(+), 2 deletions(-)
 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 5fa7957f6e0f..e73b027c5624 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -819,7 +819,10 @@ class YnlFamily(SpecFamily):
-         if display_hint == 'mac':
-             formatted = ':'.join('%02x' % b for b in raw)
-         elif display_hint == 'hex':
--            formatted = bytes.hex(raw, ' ')
-+            if isinstance(raw, int):
-+                formatted = hex(raw)
-+            else:
-+                formatted = bytes.hex(raw, ' ')
-         elif display_hint in [ 'ipv4', 'ipv6' ]:
-             formatted = format(ipaddress.ip_address(raw))
-         elif display_hint == 'uuid':
+diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
+index 8e4d19adee8c..81a5a3d1b04d 100644
+--- a/Documentation/netlink/specs/rt_link.yaml
++++ b/Documentation/netlink/specs/rt_link.yaml
+@@ -50,7 +50,16 @@ definitions:
+         name: dormant
+       -
+         name: echo
+-
++  -
++    name: vlan-protocols
++    type: enum
++    entries:
++      -
++        name: 8021q
++        value: 33024
++      -
++        name: 8021ad
++        value: 34984
+   -
+     name: rtgenmsg
+     type: struct
+@@ -729,7 +738,38 @@ definitions:
+       -
+         name: filter-mask
+         type: u32
+-
++  -
++    name: ifla-vlan-flags
++    type: struct
++    members:
++      -
++        name: flags
++        type: u32
++        enum: vlan-flags
++        enum-as-flags: true
++      -
++        name: mask
++        type: u32
++        display-hint: hex
++  -
++    name: vlan-flags
++    type: flags
++    entries:
++      - reorder-hdr
++      - gvrp
++      - loose-binding
++      - mvrp
++      - bridge-binding
++  -
++    name: ifla-vlan-qos-mapping
++    type: struct
++    members:
++      -
++        name: from
++        type: u32
++      -
++        name: to
++        type: u32
+ 
+ attribute-sets:
+   -
+@@ -1507,6 +1547,39 @@ attribute-sets:
+       -
+         name: num-disabled-queues
+         type: u32
++  -
++    name: linkinfo-vlan-attrs
++    name-prefix: ifla-vlan-
++    attributes:
++      -
++        name: id
++        type: u16
++      -
++        name: flag
++        type: binary
++        struct: ifla-vlan-flags
++      -
++        name: egress-qos
++        type: nest
++        nested-attributes: ifla-vlan-qos
++      -
++        name: ingress-qos
++        type: nest
++        nested-attributes: ifla-vlan-qos
++      -
++        name: protocol
++        type: u16
++        enum: vlan-protocols
++        byte-order: big-endian
++  -
++    name: ifla-vlan-qos
++    name-prefix: ifla-vlan-qos
++    attributes:
++      -
++        name: mapping
++        type: binary
++        multi-attr: true
++        struct: ifla-vlan-qos-mapping
+   -
+     name: linkinfo-vrf-attrs
+     name-prefix: ifla-vrf-
+@@ -1666,6 +1739,9 @@ sub-messages:
+       -
+         value: tun
+         attribute-set: linkinfo-tun-attrs
++      -
++        value: vlan
++        attribute-set: linkinfo-vlan-attrs
+       -
+         value: vrf
+         attribute-set: linkinfo-vrf-attrs
 -- 
 2.43.0
 
