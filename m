@@ -1,271 +1,298 @@
-Return-Path: <netdev+bounces-82545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F03A788E8B2
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:24:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1FB288E85D
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:19:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EF1DB39387
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:18:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 117361C2BC34
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C19130A52;
-	Wed, 27 Mar 2024 14:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45503130A4D;
+	Wed, 27 Mar 2024 14:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ebuCNCTm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cpWLlS8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2084.outbound.protection.outlook.com [40.107.102.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8CF1304BB;
-	Wed, 27 Mar 2024 14:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E22B12A160
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 14:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.84
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711551266; cv=fail; b=Lyx4uJU3r3y9bJcVJOqMHjfPNip15+/zlhB9mdZjfvtaXlK5pV8NRsQDXIHf9uwdoa8+A6IldCyA9EZhND+GKkN5JHS00Od3QlXZUfNn4qA9LdcFXDLt6BMu7thiwppukEEzXm8jQqIrE8xypXWtevBa7ZW8sxgEf41L5S79/iI=
+	t=1711551433; cv=fail; b=m653gD4xrRTMjguH/YlnKV61a4buqKWj7SarCcVC+F0FJXDaZIoQV+wZzJ3T+jc89H0mpAF8gVcYKMPbiOwhYKycxsiLIvmezFgk4MDduzA6nAOOF7B8HOFcJ1oNmqXd4oXiZ2Q2Bm1gwB71rzKvW2eqgcG0XBCePDLG3H0DV1Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711551266; c=relaxed/simple;
-	bh=KreXbNCMKyniovO+nT7P361hCoKKM6ML85pAyWU6Xa4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GQY29gocAGFm79hJNSBw+gETIDguCr8GpojHO3QvVwT/YJN73Cl2FFijAHRO1a3wbmF41E0pSUoIM2s4D9RjVMP2PK8RkNaowK+08C+KHSo0WhfoMaaaIDeZ37srzGggalVkaqigWzC9lgCQa7CQ9DxT+k9RZjoJnsinZRlLklk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ebuCNCTm; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711551264; x=1743087264;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KreXbNCMKyniovO+nT7P361hCoKKM6ML85pAyWU6Xa4=;
-  b=ebuCNCTmVcKVIAIH/7PRQzm1dfJWpK0yB8ciZM+0t+KNKJp4XoGDqeHy
-   KgM14e/E/0z96NRGc1T2qvMxSKWhV2fkjaMNPSEBI7lW0k5oTan5bgeFV
-   lZmEwuVx/sKA0STgoqx0RA+D8WZMs/QWupvijoYTdupRu+wFuYU/neTLS
-   J3qFJZhAIbTcDJqIw4uRsS7yW+1y3k/C3OVotlL3X5m/2KG+HDaZ41fkE
-   sR3jj7cJGrn8MFvi4pYXgeSgUha4PfN5Rw4waARP/VcleTJ4gLDPdb45E
-   np6UAbZOz+fKhyj1H7lvpBQs+DlRcmW/g7vKE8bT6R88TaPmiBfmTol06
-   Q==;
-X-CSE-ConnectionGUID: rYE2ebc3R42gZIT9P79G3g==
-X-CSE-MsgGUID: de3qAVFHQ9+eDVeswqLkPw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="17291980"
-X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
-   d="scan'208";a="17291980"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 07:54:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,159,1708416000"; 
-   d="scan'208";a="16407956"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Mar 2024 07:54:14 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 27 Mar 2024 07:54:13 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 27 Mar 2024 07:54:13 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 27 Mar 2024 07:54:13 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 27 Mar 2024 07:54:13 -0700
+	s=arc-20240116; t=1711551433; c=relaxed/simple;
+	bh=sZ7kKQgXLr5gN6nI0BwVfHh9ANr4ZvmUdeUqY1DuVT0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HHTXphdKz0nLCwX2VsANYWUOMHta8dhgSeHH9R4wZNm0rt0SyBY7JDV7/O3L8OiYGC17V7w0kZYgGVVxQvQz1xM+rInVW1LNKfIq1aCmWczCi7zdv81sbSGUjxCv+V98e9mjArIlZBdarLc3vbDVn1ZGU54Z5rft4/r7V+Y/b3Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cpWLlS8r; arc=fail smtp.client-ip=40.107.102.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fD9soMeelQTpSjJmPntzsTqXxyX3asvqhkzNLfRdb3DmXxu68wSX5CcTbVaTJNTgTffTHQzDxRBxxDp9Udw5sMnsYNaAm8aazvyAxNSGT5FlfAARuCLQzFYvIuoA+Qx8IpQVPCPDm2atXAxXwhiMG5NqqakWqq/9BTljlE9Hv9ZyVjPLHVAgR8H9xcEOC32829DfVsLW4dZlUup7H4NVyjZZyG0ZP6FktZ92GGlUyNt9RdL5MdhhWrhGLRS/S48WeX1GrgXfcpxBTJd1KTstQbdOd46mdMQVE1HuLHvQf8tPw6TsjEN4TO/QFI5LHtH+wz4c0VMY6jZAtQYiiSuQ8g==
+ b=jHuDOhAR+gn7Q9jx+Fr6cSEG6NqU+bnWGFmYXsICR4U2+TtwvjWxinQ9/Fm6pHbB7FyuI1DxPjsQ7A0YPxspZH8Ed+OTdjwyHL4k5kjsJqsZ3SGQIZfWd09V73TAKCckHsH0CcAtqFgsMBefpp1zNrwdGj9Rg+AHDV8yxLMcb0TnkNgeI0q0SQmdZrmyDYbzBOCs8oWZScnwzegQuWfJkTUp60KQ9ZJ8U6siwek6Fril9Hn7S0z/6YL+LgvwgJJuYpmVEQC5T7ZyqQ5jwzYPQWLErMRAErla7i0kZ6+0q7+zubZHdxoTStReX4pT/e1Bx9XWxiK64sRH1K915x2gBA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KreXbNCMKyniovO+nT7P361hCoKKM6ML85pAyWU6Xa4=;
- b=LdTcE7Gc0kUkxdSIOnzCdLRMrHinq2U/2mS8Kp6CnFr4+6SXOHT6ApBC5r5ieU4fyiVSHENaFpCq2GDu+lx531ec23Q3wQYDJTPE3A476NKoulNlBz4yh/sjNlOFS5KVAMgMsYsth95W6xJoltIblJDiFXFtp4qi1RnlExmxNsscH8OuRXbykLwPa9CnBPPVEpphsILcBz4yrmNZ92dBEHKF6OphHS8CFMl3ghslGYuC6gWD6itBIhX0j+UNyHqVjDhcGZaakk6wGRtIX+1XnJ4zbN0PsqbO1rKjZvbUi1xCICabUD61aJyX5QuctkVvW0dfFbzGtm7tATla3qIc1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5830.namprd11.prod.outlook.com (2603:10b6:510:129::20)
- by DS0PR11MB8135.namprd11.prod.outlook.com (2603:10b6:8:155::17) with
+ bh=x8Io+HT0g438eEk52lDbIOksj3uQxYx00Hx3S6ykG8s=;
+ b=XNfxhYTZ57HcBotw7ll+GEA10mynUGQydQ9j/a77BgeW3cRzisxlLTCIOaONeAAhoNzoTkpz/0pE/0lT3tEaDzCnrFW3PxwMhkVMUJ3XFvCUuyM3BdF0ufDIpbGzGV7grx4CHISteGqxqim8zZbjRSt3R8UEGYuuqCMAU4rQ7m+WQW10YaEcunYd20qaSTs9hwZh+E3Q55/lp2XaEOyJo4EiTAhjcpCRxGxwWsC09DZwR0z+xnand5QTmT8W0uJRwjfO92icGwZDcMfPBhtukDs0Q1CR9PH4Rprj07SkbDr7kWvDSFztK3h9tyLlKV1JKt7vspMDZTHuEdcU+DUPjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x8Io+HT0g438eEk52lDbIOksj3uQxYx00Hx3S6ykG8s=;
+ b=cpWLlS8rCvLtRX3XA+V06ILyV5FtEnyNLdroaySP5t/XrT6Z9SDHXxEGhJGk7dqVqvjclFXsNa0vNoQolBJfuVmjB1oLm4xMtcTrY9N/qfUmX6HkljCEkIu1nYGPbRp4Br21M6rdyNYyb0LXCh8wFoHaYe2hB63lpI8TOk0p2ySrcRew4xFXOZcG+DUy/nzFN1cNL230Y5ejrOoRPw0fZ0CvnOwsNB2fgVaZo/gWvcYF0nNcQKPb8gFFBXQO+BaYoWt+W++biGA2cVYBVSKd2TT4U/Q9Dd2XUOAvg4RWYURUpz1WbkTuVn3XCQLeR5keuCGemmKz3aUTobEmQ/ndMg==
+Received: from BN9P223CA0001.NAMP223.PROD.OUTLOOK.COM (2603:10b6:408:10b::6)
+ by CH0PR12MB8507.namprd12.prod.outlook.com (2603:10b6:610:189::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Wed, 27 Mar
- 2024 14:54:09 +0000
-Received: from PH0PR11MB5830.namprd11.prod.outlook.com
- ([fe80::9445:5793:b0b7:711a]) by PH0PR11MB5830.namprd11.prod.outlook.com
- ([fe80::9445:5793:b0b7:711a%7]) with mapi id 15.20.7409.031; Wed, 27 Mar 2024
- 14:54:09 +0000
-From: "Song, Yoong Siang" <yoong.siang.song@intel.com>
-To: "Bezdeka, Florian" <florian.bezdeka@siemens.com>, Kurt Kanzenbach
-	<kurt@linutronix.de>, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
-	<richardcochran@gmail.com>, Alexei Starovoitov <ast@kernel.org>, "Daniel
- Borkmann" <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
-	<sdf@google.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>, "Fijalkowski,
- Maciej" <maciej.fijalkowski@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "xdp-hints@xdp-project.net"
-	<xdp-hints@xdp-project.net>
-Subject: RE: [xdp-hints] Re: [PATCH iwl-next,v4 1/1] igc: Add Tx hardware
- timestamp request for AF_XDP zero-copy packet
-Thread-Topic: [xdp-hints] Re: [PATCH iwl-next,v4 1/1] igc: Add Tx hardware
- timestamp request for AF_XDP zero-copy packet
-Thread-Index: AQHaf1vDcRX66gQlB0+gJtjiHFgRbLFJ/peAgAAUiKCAAV/bgIAAN/Jw
-Date: Wed, 27 Mar 2024 14:54:09 +0000
-Message-ID: <PH0PR11MB5830C7CC397B0B5CB1CB34ECD8342@PH0PR11MB5830.namprd11.prod.outlook.com>
-References: <20240325020928.1987947-1-yoong.siang.song@intel.com>
-	 <d2623ac0f1cb07a23976416cdcf9eee1986747b0.camel@siemens.com>
-	 <87h6gtb0p0.fsf@kurt.kurt.home>
-	 <PH0PR11MB583028B2023E1E809B45B51DD8352@PH0PR11MB5830.namprd11.prod.outlook.com>
- <ab114fcc84c50723bb88d40ccbbeedf7b48dbe0e.camel@siemens.com>
-In-Reply-To: <ab114fcc84c50723bb88d40ccbbeedf7b48dbe0e.camel@siemens.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5830:EE_|DS0PR11MB8135:EE_
-x-ms-office365-filtering-correlation-id: 1aa7869a-9cd6-4c3a-6d7d-08dc4e6dc255
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3nynhD8Gnn5C1c9Og4CoTNeJDcjqtmmm4Hw+2Kjsw9pWa2ho0XZ18aBscGCTzw348C7TC7zqPe4+njX5O7htEXpDCc0vkUUlM8fssV0gVR5LhiQ5Rblrgq0Tx+QCW+g+GHcsfe5WYzVHmS1YdBBwtO5dST4mzEmnjE3v68z7sy+JMUdmm6d49BC1PJMRZ2i4/8nfV+OzgpFBtNfk9VuT40+K0yZILFh+6RGWiv3DwYL5swp6MYxev6W022FCU9/6x6ydFYAx6usO8jKnLTFPCLBk6nKHpvMh84GkcECNzyaeaMOoypRF8PG4KJixMeoBW7gFDA2HKNNJ/PypdboZgPaN2/3u3x61SFHPAd87iM0xtdhiv5gfex7MFWgk4L3NemL65CDLmUFLv7HXIRmSnF8ycTlf7peHtrHAkcbSHpNY9tTu0cvynCWnk00HHfqPqVUdGg217xR2WxEop4Yb7b+6YuenIGPd46EoaX9tdfhtjh34BFnWMo3NXDkSXYOMiuPxiVUbBFgCw25bRNpZHnDL3IXZxGcroSkl81qnJKNzQ/Hfc8tQCmN8VMlybbkt36Mb/lBmpTGqLpuTv2EH+U7w+uX3Fjzkz5Y5kHggwlewqT68/7F7ndewrs69FzO5hflxaPCfP6BpsmFwgHjs93Buzjmp1vb7bSjY6dagT5hvI1Xjvd+gsJqwXr9vXEC2
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5830.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(7416005)(38070700009)(921011);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SkhkaDFZbElUNmRIYjBNYS9jS3JmR1JFVzhBTGd5MFZOMlIzM2VEcGs0dERE?=
- =?utf-8?B?aXhmQWFzakpEb29BbEo0T2lmZExjRlF0SWVQdm1uVFQrcytDWXlBMENMSDFw?=
- =?utf-8?B?dk9FMDhqSEk1djRjekI1akNXbDAzSW4rMkgxWHB1WEl0b3ovZm5VTFQyaUFy?=
- =?utf-8?B?UUVUaS8wYllrNlNuQ0JkZTlSME5LUzkzMkxDN3Y2U3hoZ2hKMzkrSE1QK1ZV?=
- =?utf-8?B?dTBWMFlvbCtqVHFMMDJNRFJPeTE0R2wxK0FXbE1Cb016YWxHWVhRSlV3cU53?=
- =?utf-8?B?cHMxbWxKTm5wV05LS2VCbUxZMEgwWkpRQ1VLbC9WSlRPRlBBaStKMFdyNTla?=
- =?utf-8?B?NC8wRWNrazVqYnZlejBaQzJFL1plb2hDdEpJM2lGNC9iVExPcUdIQUFQU1hJ?=
- =?utf-8?B?cmlwdnJST0FLTVgwb1lKQUtLVkxla0g5ME0rd3hJQ0drRW5ZSTRxLzBwMU40?=
- =?utf-8?B?dUYwNnJqa1Z2VDB1c0lhZWg4VUIyZ0E1WG9NY0d1cUNGRGkzZVNVRTRDZzUy?=
- =?utf-8?B?Q2JVWWRkNk9VbkhTLytvRThDWWdISTErdHFtK3lNUlVVamxGaUEvZ0doZ0Vv?=
- =?utf-8?B?UkdESFloT2Vab2NSVTFCWFVWUS95SVA1bHlEU3RzdWJlaVRVc3hWcDIwWXgr?=
- =?utf-8?B?dUQxTjgrZ3RKcmZZcGk4SVhsQzIvNkczaS9rWDB1VDZDYmVBSUlqdDltZ3Vx?=
- =?utf-8?B?cnlodFU2bTUyNCtZNU1yckxQSlJPczRUbEFHdWhabCtjWGhKVnNkTGg4Uk92?=
- =?utf-8?B?K1VzdUU2Q0d0V3p6eDVHWUI0dzI5czBzdnZiNU8xdzlMTkowU0prN2hPci9K?=
- =?utf-8?B?WHQ3M3NTa2pzK2NxbjdNM1dKYmlMSzE5dDFJN1FZMUtveEJjOWFwMSt4OGZJ?=
- =?utf-8?B?QmtKZHJ2TDZUbWFGTVBPdHV4U1gveWZFemdtdTN4cUdVMTBrMVowVXpyQkZD?=
- =?utf-8?B?eHBKbCtMd2dSdDc3T2d3TE02QTg0bVBOZEhKQ0VzU0p2MGxNcWZwbmxIeXls?=
- =?utf-8?B?MmNqS3I5UmFaZGpEZG9aNjRod0U4UDF1OTNUZmFuQWVEK1FyZ2MycGVjVWRK?=
- =?utf-8?B?OU12RTVDRHNGV1FvNTByVnd5R21Md3orZ3V2cFROVHM2YTNwd3RCU2NuM043?=
- =?utf-8?B?YjBZTHY5VUNqK1pCNmFGYUlzOTduV0xvSVhJU1JhOHliTjBkSWhvT1RBcUFh?=
- =?utf-8?B?ZjN1QzYybXMvdXo5bkFzbW1sVDNkMG9GZDl6ZDQ5S09RN0pyK1lOUmFpTVhm?=
- =?utf-8?B?NjN5bGxBYkVrTy9jL3RkeWxCZGdMaXdoTUFjNW1zUFQ3bFBKdkNBY3VleDBK?=
- =?utf-8?B?RHhqd1A3bDVicjJzTTRBR0RiNzFTN2NEeG1qbWN4M1hKbXowVWFoVHp2SG1T?=
- =?utf-8?B?Q1RyNzN5dUVpS2E1L0l5WFlXaDI5cUI3ZU1tNTZJcUJWaG91V0Z5c0lObXBt?=
- =?utf-8?B?ZHd4UllFMm1IbUM0YmJOS0hML3k2WG5VdmVMakp0R0lKK0VPa0N5UVU1dUwx?=
- =?utf-8?B?Mis3T0pXa3dUS2l0Q29nZmpFdFVJZWkyM1RsQUVUMHBGd2xOVEtud2p4QWxP?=
- =?utf-8?B?VVpwOVdNMlF3UVU5OXZIRWN0dVRQYnNxbDFCSWgraVNVUWFqdTFCQkdyemxt?=
- =?utf-8?B?NDhMUENka09yNm5SMEVKWkVQRnFwSUxKRFlib0RkalpVdUxHR3NNRzRINERR?=
- =?utf-8?B?VytRQVhEbjNpcktGaG5YVlVXRUllbk45ajB6T0loaXEza0tmMTZHalFLL1NP?=
- =?utf-8?B?aEhmSHZGYlA0Mm5QQVRESHdTNW5BVkNHZllBOXgwaFQ3Q1lmQmIvSy9zRjJ1?=
- =?utf-8?B?dGRyNjI3VzB4M3EwK0NQdUxjY1grNk0wT3JCMmE0K3JUb0JJSXpQQUJ1TkEy?=
- =?utf-8?B?VmxUbXIvMk8wNm9oUW5GeUVmclBicVVPUzBwSGlDY1RqdzMya0M1dyttYzFt?=
- =?utf-8?B?VUpDY1pXOHBDUXQ3L05YN2d3VXRpY1RENURsMVl1T2FEcjVxL1F6RHc2ckpw?=
- =?utf-8?B?VFhFSTFCR0R4bmtDREtrR040QXlWRmtMMlJabk1qWEpFc3hBcWJra3I0aWRW?=
- =?utf-8?B?b0FFQ29mS0d0SG04V09FeFJUWUdQY3dPaEVpaTN4RmRLSXdsSHp2aitsaG1F?=
- =?utf-8?B?b1JlOCtzU3FYYVlHNWszbFQwWjVldTBYYWE1ekJHSThIZEd1NlVGbWFIOXN6?=
- =?utf-8?B?R1E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Wed, 27 Mar
+ 2024 14:57:08 +0000
+Received: from BN1PEPF00004685.namprd03.prod.outlook.com
+ (2603:10b6:408:10b:cafe::75) by BN9P223CA0001.outlook.office365.com
+ (2603:10b6:408:10b::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.13 via Frontend
+ Transport; Wed, 27 Mar 2024 14:57:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ BN1PEPF00004685.mail.protection.outlook.com (10.167.243.86) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.10 via Frontend Transport; Wed, 27 Mar 2024 14:57:08 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 27 Mar
+ 2024 07:56:55 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Wed, 27 Mar 2024 07:56:55 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Wed, 27 Mar 2024 07:56:53 -0700
+From: William Tu <witu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <jiri@nvidia.com>, <bodong@nvidia.com>, <kuba@kernel.org>,
+	<witu@nvidia.com>
+Subject: [PATCH RFC v4 iproute2-next] devlink: Add shared memory pool eswitch attribute
+Date: Wed, 27 Mar 2024 16:56:45 +0200
+Message-ID: <20240327145645.32025-1-witu@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5830.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1aa7869a-9cd6-4c3a-6d7d-08dc4e6dc255
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2024 14:54:09.8062
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004685:EE_|CH0PR12MB8507:EE_
+X-MS-Office365-Filtering-Correlation-Id: c09a6a5e-ca95-4568-716c-08dc4e6e2cbb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	A4bZi2ar5cSEQQURY6oKfnRcyoKd65FtleKssO8BjWbTA0NuquU++Zes1nevk6xso5Cn4l1zP3eCc0KobiuqzATQGRldzTqcZG2uQopKvT8CjBl0EVvpXalMa25sgYGQFP4NX2eNG053XJiT2x5+nwarHrNEi9I3uakb7VcYx08Gd8Z8vc/4uupvju6AJpBeoKEKcPz3WG3vPFC7vimvf6Y5CsFtEcER2LitfVhjWs/VdwV4njCpDqJvQt5fuwfhIhyZJfYtOKcimwUD+HzXnPt8qR3xTPBiawhM/8socumbEez3x/pUPXtFy8K56lfJnB6vQOAt1y1O8g+oqCdasKqthUZyXeAPZFwtgIUt4x9CUla4R0JjaI91XJ9NytlG3JcUMJBv0RetcorEpi2LL9ZrtS74bcvpxAQir6alp/WYK71K4/Ph+rDS+cpaCislR7eDnk+QN36Io5KPUh25bRFxgFNqXoKos+XPaUrfNsmsEkRSJlDkUiYCkBrHUs7L8Wp/j2uKJVzSBzOosQz9c/DAFPF7V8WNGCWzxxNzVLnes8Ao2aQtBz4RD3MLBzLNIDPQ8NEDFE9d92joxKvAha7pfcb6r5vy0axYMDjE4E327gIco79MIkrXSWc0XStQORuGNHjOwlHBYIHGgpLF0+oNSZwl1uJSZLAEiNiIy3miWCCs/kKjRwPtuh35R3ON1wqn11flcEf6IDBzMIiuL5z/3KtsTCeiZmgKq1jC6UIajl7wgtzjkLlHoqI8YSjI
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(1800799015)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2024 14:57:08.1743
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BFbeKMGaJ8aJtrVieNuAAGRsy4RLIamPnabAJK9KH/HanQaqXnUfItGbfsxsUCyzLC/+rTkO/aOKXTC/F4RLx2AIRtfg1CJdEi40mdRD9Sc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8135
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c09a6a5e-ca95-4568-716c-08dc4e6e2cbb
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004685.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8507
 
-T24gV2VkbmVzZGF5LCBNYXJjaCAyNywgMjAyNCA3OjIxIFBNLCBGbG9yaWFuIEJlemRla2EgPGZs
-b3JpYW4uYmV6ZGVrYUBzaWVtZW5zLmNvbT4gd3JvdGU6DQo+T24gVHVlLCAyMDI0LTAzLTI2IGF0
-IDE0OjU1ICswMDAwLCBTb25nLCBZb29uZyBTaWFuZyB3cm90ZToNCj4+IE9uIFR1ZXNkYXksIE1h
-cmNoIDI2LCAyMDI0IDk6MDggUE0sIEt1cnQgS2FuemVuYmFjaCA8a3VydEBsaW51dHJvbml4LmRl
-PiB3cm90ZToNCj4+ID4gSGkgRmxvcmlhbiwNCj4+ID4NCj4+ID4gT24gVHVlIE1hciAyNiAyMDI0
-LCBGbG9yaWFuIEJlemRla2Egd3JvdGU6DQo+PiA+ID4gT24gTW9uLCAyMDI0LTAzLTI1IGF0IDEw
-OjA5ICswODAwLCBTb25nIFlvb25nIFNpYW5nIHdyb3RlOg0KPj4gPiA+ID4gVGhpcyBwYXRjaCBh
-ZGRzIHN1cHBvcnQgdG8gcGVyLXBhY2tldCBUeCBoYXJkd2FyZSB0aW1lc3RhbXAgcmVxdWVzdCB0
-bw0KPj4gPiA+ID4gQUZfWERQIHplcm8tY29weSBwYWNrZXQgdmlhIFhEUCBUeCBtZXRhZGF0YSBm
-cmFtZXdvcmsuIFBsZWFzZSBub3RlIHRoYXQNCj4+ID4gPiA+IHVzZXIgbmVlZHMgdG8gZW5hYmxl
-IFR4IEhXIHRpbWVzdGFtcCBjYXBhYmlsaXR5IHZpYSBpZ2NfaW9jdGwoKSB3aXRoDQo+PiA+ID4g
-PiBTSU9DU0hXVFNUQU1QIGNtZCBiZWZvcmUgc2VuZGluZyB4c2sgVHggaGFyZHdhcmUgdGltZXN0
-YW1wIHJlcXVlc3QuDQo+PiA+ID4gPg0KPj4gPiA+ID4gU2FtZSBhcyBpbXBsZW1lbnRhdGlvbiBp
-biBSWCB0aW1lc3RhbXAgWERQIGhpbnRzIGtmdW5jIG1ldGFkYXRhLCBUaW1lciAwDQo+PiA+ID4g
-PiAoYWRqdXN0YWJsZSBjbG9jaykgaXMgdXNlZCBpbiB4c2sgVHggaGFyZHdhcmUgdGltZXN0YW1w
-LiBpMjI1L2kyMjYgaGF2ZQ0KPj4gPiA+ID4gZm91ciBzZXRzIG9mIHRpbWVzdGFtcGluZyByZWdp
-c3RlcnMuICpza2IgYW5kICp4c2tfdHhfYnVmZmVyIHBvaW50ZXJzDQo+PiA+ID4gPiBhcmUgdXNl
-ZCB0byBpbmRpY2F0ZSB3aGV0aGVyIHRoZSB0aW1lc3RhbXBpbmcgcmVnaXN0ZXIgaXMgYWxyZWFk
-eSBvY2N1cGllZC4NCj4+ID4gPg0KPj4gPiA+IExldCBtZSBtYWtlIHN1cmUgdGhhdCBJIGZ1bGx5
-IHVuZGVyc3RhbmQgdGhhdDogSW4gbXkgb3duIHdvcmRzOg0KPj4gPiA+DQo+PiA+ID4gV2l0aCB0
-aGF0IGFwcGxpZWQgSSdtIGFibGUgdG8gZ2V0IHRoZSBwb2ludCBpbiB0aW1lIGZyb20gdGhlIGRl
-dmljZQ0KPj4gPiA+IHdoZW4gYSBzcGVjaWZpYyBmcmFtZSBtYWRlIGl0IHRvIHRoZSB3aXJlLiBJ
-IGhhdmUgdG8gZW5hYmxlIHRoYXQNCj4+ID4gPiBmdW5jdGlvbmFsaXR5IHVzaW5nIHRoZSBtZW50
-aW9uZWQgaW9jdGwoKSBjYWxsIGZpcnN0LCBhbmQgdGhlbiBjaGVjaw0KPj4gPiA+IHRoZSBtZXRh
-IGFyZWEgKGxvY2F0ZWQgaW4gdGhlIHVtZW0gcmlnaHQgYmVmb3JlIHRoZSBmcmFtZSBwYXlsb2Fk
-KQ0KPj4gPiA+IHdoaWxlIGNvbnN1bWluZyB0aGUgY29tcGxldGlvbiBxdWV1ZS9yaW5nLiBDb3Jy
-ZWN0Pw0KPj4NCj4+IEhpIEZsb3JpYW4sDQo+Pg0KPj4gWWVzLCB5b3UgYXJlIHJpZ2h0LiBCdXQg
-YmVmb3JlIHlvdSBwYXNzIHRoZSBmcmFtZSB0byBkcml2ZXIsIG1ha2Ugc3VyZQ0KPj4geW91IHJl
-cXVlc3QgVHggbWV0YWRhdGEgaGFyZHdhcmUgdGltZXN0YW1wIGZlYXR1cmUgYnkgc2V0dGluZw0K
-Pj4gWERQX1RYTURfRkxBR1NfVElNRVNUQU1QIGZsYWcuDQo+PiBZb3UgY2FuIHJlZmVyIHRvIHRv
-b2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2JwZi94ZHBfaHdfbWV0YWRhdGEuYw0KPj4gb24gaG93IHRv
-IGRvIGl0Lg0KPg0KPkdvdCBpdC4gVGhhbmtzIQ0KPg0KPj4NCj4+ID4gPg0KPj4gPiA+IElmIHNv
-LCB3ZSBub3cgaGF2ZSBhIGZlZWRiYWNrIGNoYW5uZWwgZm9yIG1ldGEgaW5mb3JtYXRpb24gZm9y
-L2Zyb20gVFguDQo+PiA+ID4gQXJlIHRoZXJlIGFueSBwbGFucyAtIG9yIHdvdWxkIGl0IGJlIHBv
-c3NpYmxlIC0gdG8gc3VwcG9ydCBFYXJsaWVzdA0KPj4gPiA+IFR4VGltZSBGaXJzdCAoTkVUX1ND
-SEVEX0VURikgUURpc2MgYmFzZWQgb24gdGhhdCBjaGFubmVsPyBJbiB0aGUgcGFzdA0KPj4gPiA+
-IHdlIGhhZCB0aGUgcHJvYmxlbSB0aGF0IHdlIHdlJ3JlIG1pc3NpbmcgYSBmZWVkYmFjayBjaGFu
-bmVsIHRvDQo+PiA+ID4gY29tbXVuaWNhdGUgYmFjayBpbnZhbGlkIGx1bmNoIHRpbWVzLg0KPj4g
-Pg0KPj4gPiBKdXN0IGFza2luZzogSG93IHdvdWxkIHRoYXQgd29yaz8gQUZBSUsgWERQIGJ5cGFz
-c2VzIHRoZSBRZGlzYw0KPj4gPiBsYXllci4gQ3VycmVudGx5IGludmFsaWQgTGF1bmNoIFRpbWVz
-IGFyZSBhY2NvdW50ZWQgaW4gdGhlIEVURiBRZGlzYw0KPj4gPiBpdHNlbGYuIERvZXMgdGhhdCBt
-ZWFuIGV2ZXJ5IGRyaXZlciBoYXMgdG8gdGFrZSBjYXJlIG9mIGl0Pw0KPj4gPg0KPj4gPiBUaGFu
-a3MsDQo+PiA+IEt1cnQNCj4+DQo+PiBGbG9yaWFuICYgS3VydCwNCj4+DQo+PiBZZXMsIG1lIGFu
-ZCBTdGFuaXNsYXYgYXJlIHRyeWluZyB0byBhZGQgRWFybGllc3QgVHhUaW1lIEZpcnN0IC8gTGF1
-bmNoIFRpbWUgdG8gdGhlDQo+ZnJhbWV3b3JrLg0KPj4gUGxlYXNlIHJlZmVyIHRvIFsxXSBmb3Ig
-dGhlIHBhdGNoc2V0LiBUaGUgbWV0YWRhdGEgZnJhbWV3b3JrIHdpbGwganVzdCBwYXNzIHRoZQ0K
-Pj4gTGF1bmNoIHRpbWUgdmFsdWUgdG8gZHJpdmVyLCBhbmQgZHJpdmVyIG5lZWQgdG8gaGFuZGxl
-IHRoZSByZXN0Lg0KPj4gSW4gdGhlIHBhdGNoc2V0LCBJIGFtIGVuYWJsaW5nIGl0IG9uIHN0bW1h
-YyBkcml2ZXIgb25seSwgYnV0IHdlIG5lZWQgbW9yZSBkcml2ZXJzDQo+PiB0byBjaGVjayB3aGV0
-aGVyIHRoZSBkZXNpZ24gaXMgZmVhc2libGUgZm9yIGRpZmZlcmVudCBkcml2ZXJzLCBjYXVzZSBl
-YWNoIGRyaXZlciBpcw0KPj4gaGF2aW5nIHRoZWlyIG93biBsaW1pdGF0aW9uIG9uIGxhdW5jaCB0
-aW1lLiBUaGVyZWZvcmUsIGFmdGVyIHRoaXMgdHggaHd0cyBwYXRjaA0KPmFjY2VwdGVkLA0KPj4g
-SSB3aWxsIHRyeSB0byBlbmFibGUgbGF1bmNoIHRpbWUgb24gaWdjIGRyaXZlciwgYW5kIHN1Ym1p
-dCBuZXcgdmVyc2lvbi4NCj4NCj5OaWNlIHRvIGhlYXIhIEtlZXAgbWUgaW4gdGhlIGxvb3AgYW5k
-IGxldCBtZSBrbm93IGlmIEkgY291bGQgc3VwcG9ydA0KPnNvbWVob3cuDQoNClN1cmUsIHdpbGwg
-a2VlcCB5b3UgaW4gbG9vcC4NCkRvIHlvdSBtaW5kIHRvIHNoYXJlLCB3aGljaCBFdGhlcm5ldCBk
-cml2ZXIgeW91IGFyZSB3b3JraW5nIG9uPw0KDQo+DQo+Pg0KPj4gS3VydCBpcyByaWdodCB0aGF0
-IGN1cnJlbnQgbWV0YWRhdGEgZnJhbWV3b3JrIGlzIGxhY2tpbmcgYSB3YXkgdG8gZmVlZGJhY2sg
-d2hldGhlcg0KPj4gdGhlIGxhdW5jaCB0aW1lIGlzIGludmFsaWQgb3Igbm90LiBNYXliZSB3ZSBj
-YW4gdHJ5IHRvIGVuYWJsZSBsYXVuY2ggdGltZSB3aXRob3V0DQo+ZmVlZGJhY2ssDQo+PiB0aGVu
-IGRpc2N1c3MgYWJvdXQgdGhlIHN0YXR1cyByZXBvcnQgZGVzaWduLg0KPg0KPkluIGNhc2UgdGhl
-IGxhdW5jaCB0aW1lIGlzIGludmFsaWQgLSBjb3VsZG4ndCB3ZSBzaW1wbHkgc2tpcCB0aGUgZnJh
-bWUNCj5hbmQgImZvcndhcmQiIGl0IGJhY2sgdG8gdGhlIGFwcGxpY2F0aW9uIChjb21wbGV0aW9u
-IHF1ZXVlL3JpbmcpIGFmdGVyDQo+YWRqdXN0aW5nIHNvbWUgbWV0YS1pbmZvcm1hdGlvbiAobGlr
-ZSB0aGUgVFggdGltZXN0YW1wcyBpbiB0aGlzIHBhdGNoKQ0KPnRlbGxpbmcgdGhlIGFwcGxpY2F0
-aW9uIHdoYXQgaGFwcGVuZWQ/DQoNCkkgbm90IHN1cmUgd2hldGhlciBkcml2ZXIgbGV2ZWwgbmVl
-ZCB0byBkbyB0aGUgdmFsaWRhdGlvbiBqb2IgZm9yIGxhdW5jaCB0aW1lLA0KT3Igd2UgY2FuIGp1
-c3QgbGV0IHRoZSBOSUMgYmVoYXZlIGFjY29yZGluZyB0byBpdHMgb3duIGRlc2lnbiwNCndoZXRo
-ZXIgaXQgd2FudCB0byBkcm9wIHRoZSBwYWNrZXQsIG9yIHRyYW5zbWl0IHRoZSBwYWNrZXQgaW1t
-ZWRpYXRlbHksIG9yIHRyYW5zbWl0IHRoZSBwYWNrZXQgYXQgbWF4aW11bSBzdXBwb3J0ZWQgbGF1
-bmNoIHRpbWUuIA0KV2UgY2FuIGRpc2N1c3MgZnVydGhlciB3aGVuIEkgc3VibWl0IG5ldyB2ZXJz
-aW9uIG9mIFsxXS4NCg0KPg0KPlRoYW5rcyBhIGxvdCENCj5GbG9yaWFuDQo+DQo+Pg0KPj4gWzFd
-DQo+aHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9wcm9qZWN0L25ldGRldmJwZi9jb3Zlci8y
-MDIzMTIwMzE2NTEyOS4xNzQwNTEyLTEtDQo+eW9vbmcuc2lhbmcuc29uZ0BpbnRlbC5jb20vDQo+
-Pg0KPj4gVGhhbmtzICYgUmVnYXJkcw0KPj4gU2lhbmcNCg0K
+Add eswitch attribute spool_size for shared memory pool size.
+
+When using switchdev mode, the representor ports handles the slow path
+traffic, the traffic that can't be offloaded will be redirected to the
+representor port for processing. Memory consumption of the representor
+port's rx buffer can grow to several GB when scaling to 1k VFs reps.
+For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
+consumes 3MB of DMA memory for packet buffer in WQEs, and with four
+channels, it consumes 4 * 3MB * 1024 = 12GB of memory. And since rep
+ports are for slow path traffic, most of these rx DMA memory are idle.
+
+Add spool_size configuration, allowing multiple representor ports
+to share a rx memory buffer pool. When enabled, individual representor
+doesn't need to allocate its dedicated rx buffer, but just pointing
+its rq to the memory pool. This could make the memory being better
+utilized. The spool_size represents the number of bytes of the memory
+pool. Users can adjust it based on how many reps, total system
+memory, or performance expectation.
+
+An example use case:
+$ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
+  spool-size 4194304
+$ devlink dev eswitch show pci/0000:08:00.0
+  pci/0000:08:00.0: mode legacy inline-mode none encap-mode basic \
+  spool-size 4194304
+
+Disable the shared memory pool by setting spool_size to 0.
+
+Signed-off-by: William Tu <witu@nvidia.com>
+Change-Id: I362c312cca15700077711919c350c89635db64fc
+---
+v4: comments from Jiri
+- more verbose, remove { as SIZE is not enum
+
+v3:
+- change to 1 attributes and rename to spool_size
+
+v2: feedback from Stephen
+- add man page, send to iproute2-next
+---
+ devlink/devlink.c            | 25 +++++++++++++++++++++++--
+ include/uapi/linux/devlink.h |  1 +
+ man/man8/devlink-dev.8       |  8 ++++++++
+ 3 files changed, 32 insertions(+), 2 deletions(-)
+
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index dbeb6e397e8e..a57f2edc2253 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -309,6 +309,7 @@ static int ifname_map_update(struct ifname_map *ifname_map, const char *ifname)
+ #define DL_OPT_PORT_FN_RATE_TX_PRIORITY	BIT(55)
+ #define DL_OPT_PORT_FN_RATE_TX_WEIGHT	BIT(56)
+ #define DL_OPT_PORT_FN_CAPS	BIT(57)
++#define DL_OPT_ESWITCH_SPOOL_SIZE	BIT(58)
+ 
+ struct dl_opts {
+ 	uint64_t present; /* flags of present items */
+@@ -375,6 +376,7 @@ struct dl_opts {
+ 	const char *linecard_type;
+ 	bool selftests_opt[DEVLINK_ATTR_SELFTEST_ID_MAX + 1];
+ 	struct nla_bitfield32 port_fn_caps;
++	uint32_t eswitch_spool_size;
+ };
+ 
+ struct dl {
+@@ -630,6 +632,7 @@ static const enum mnl_attr_data_type devlink_policy[DEVLINK_ATTR_MAX + 1] = {
+ 	[DEVLINK_ATTR_ESWITCH_MODE] = MNL_TYPE_U16,
+ 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = MNL_TYPE_U8,
+ 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = MNL_TYPE_U8,
++	[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE] = MNL_TYPE_U32,
+ 	[DEVLINK_ATTR_DPIPE_TABLES] = MNL_TYPE_NESTED,
+ 	[DEVLINK_ATTR_DPIPE_TABLE] = MNL_TYPE_NESTED,
+ 	[DEVLINK_ATTR_DPIPE_TABLE_NAME] = MNL_TYPE_STRING,
+@@ -1672,6 +1675,7 @@ static const struct dl_args_metadata dl_args_required[] = {
+ 	{DL_OPT_LINECARD,	      "Linecard index expected."},
+ 	{DL_OPT_LINECARD_TYPE,	      "Linecard type expected."},
+ 	{DL_OPT_SELFTESTS,            "Test name is expected"},
++	{DL_OPT_ESWITCH_SPOOL_SIZE,   "E-Switch shared memory pool size expected."},
+ };
+ 
+ static int dl_args_finding_required_validate(uint64_t o_required,
+@@ -1895,6 +1899,13 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
+ 			if (err)
+ 				return err;
+ 			o_found |= DL_OPT_ESWITCH_ENCAP_MODE;
++		} else if (dl_argv_match(dl, "spool-size") &&
++			   (o_all & DL_OPT_ESWITCH_SPOOL_SIZE)) {
++			dl_arg_inc(dl);
++			err = dl_argv_uint32_t(dl, &opts->eswitch_spool_size);
++			if (err)
++				return err;
++			o_found |= DL_OPT_ESWITCH_SPOOL_SIZE;
+ 		} else if (dl_argv_match(dl, "path") &&
+ 			   (o_all & DL_OPT_RESOURCE_PATH)) {
+ 			dl_arg_inc(dl);
+@@ -2547,6 +2558,9 @@ static void dl_opts_put(struct nlmsghdr *nlh, struct dl *dl)
+ 	if (opts->present & DL_OPT_ESWITCH_ENCAP_MODE)
+ 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_ESWITCH_ENCAP_MODE,
+ 				opts->eswitch_encap_mode);
++	if (opts->present & DL_OPT_ESWITCH_SPOOL_SIZE)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,
++				 opts->eswitch_spool_size);
+ 	if ((opts->present & DL_OPT_RESOURCE_PATH) && opts->resource_id_valid)
+ 		mnl_attr_put_u64(nlh, DEVLINK_ATTR_RESOURCE_ID,
+ 				 opts->resource_id);
+@@ -2707,6 +2721,7 @@ static void cmd_dev_help(void)
+ 	pr_err("       devlink dev eswitch set DEV [ mode { legacy | switchdev } ]\n");
+ 	pr_err("                               [ inline-mode { none | link | network | transport } ]\n");
+ 	pr_err("                               [ encap-mode { none | basic } ]\n");
++	pr_err("                               [ spool-size SIZE ]\n");
+ 	pr_err("       devlink dev eswitch show DEV\n");
+ 	pr_err("       devlink dev param set DEV name PARAMETER value VALUE cmode { permanent | driverinit | runtime }\n");
+ 	pr_err("       devlink dev param show [DEV name PARAMETER]\n");
+@@ -3194,7 +3209,12 @@ static void pr_out_eswitch(struct dl *dl, struct nlattr **tb)
+ 			     eswitch_encap_mode_name(mnl_attr_get_u8(
+ 				    tb[DEVLINK_ATTR_ESWITCH_ENCAP_MODE])));
+ 	}
+-
++	if (tb[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]) {
++		check_indent_newline(dl);
++		print_uint(PRINT_ANY, "spool-size", "spool-size %u",
++			   mnl_attr_get_u32(
++				    tb[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]));
++	}
+ 	pr_out_handle_end(dl);
+ }
+ 
+@@ -3239,7 +3259,8 @@ static int cmd_dev_eswitch_set(struct dl *dl)
+ 	err = dl_argv_parse(dl, DL_OPT_HANDLE,
+ 			    DL_OPT_ESWITCH_MODE |
+ 			    DL_OPT_ESWITCH_INLINE_MODE |
+-			    DL_OPT_ESWITCH_ENCAP_MODE);
++			    DL_OPT_ESWITCH_ENCAP_MODE |
++			    DL_OPT_ESWITCH_SPOOL_SIZE);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index aaac24380bf1..8775777ce88b 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -614,6 +614,7 @@ enum devlink_attr {
+ 
+ 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+ 
++	DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,	/* u32 */
+ 	/* Add new attributes above here, update the spec in
+ 	 * Documentation/netlink/specs/devlink.yaml and re-generate
+ 	 * net/devlink/netlink_gen.c.
+diff --git a/man/man8/devlink-dev.8 b/man/man8/devlink-dev.8
+index e9d091df48d8..2a55fa72d10e 100644
+--- a/man/man8/devlink-dev.8
++++ b/man/man8/devlink-dev.8
+@@ -34,6 +34,8 @@ devlink-dev \- devlink device configuration
+ .BR inline-mode " { " none " | " link " | " network " | " transport " } "
+ ] [
+ .BR encap-mode " { " none " | " basic " } "
++] [
++.BR spool-size " SIZE "
+ ]
+ 
+ .ti -8
+@@ -151,6 +153,12 @@ Set eswitch encapsulation support
+ .I basic
+ - Enable encapsulation support
+ 
++.TP
++.BR spool-size " SIZE"
++Set the rx shared memory pool size in bytes. This allows multiple representors
++to share the rx memory buffer pool. When SIZE > 0, representors point its rx
++queue to use this memory pool. Disable when set SIZE to 0.
++
+ .SS devlink dev param set  - set new value to devlink device configuration parameter
+ 
+ .TP
+-- 
+2.38.1
+
 
