@@ -1,102 +1,143 @@
-Return-Path: <netdev+bounces-82687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A1A288F2AD
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 00:17:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4CEB88F34F
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 00:44:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89C221C26336
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 23:17:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 589511F238F9
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 23:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17C0152160;
-	Wed, 27 Mar 2024 23:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EFC15382F;
+	Wed, 27 Mar 2024 23:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dmHuOjuk"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="G+/0RXGe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90402433D8;
-	Wed, 27 Mar 2024 23:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827FF153593
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 23:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711581453; cv=none; b=ks6C7k9crJ2ljBRUEV5Uh22OXJgsnqY+9mEOkeXWj1A4uglDIMKKQS5K4um+8i2EjFq/QUx5qMlXzxYn/O9015Bvlr/1lEN/wx/E7fs3CrqP/gB7gcl27r1gwtF3FIfUGXFhPWn4ewlQV1QwaLIjZlpLnt+KruWi0J/SCVNKRZE=
+	t=1711583058; cv=none; b=MaQEz2KwLkbYlWWTI4zdA7K7HXA8EgsKtoZRKZafltQ874HCZwn6qjNxfU0r57cWSfMeVe2xgG7UWMHpeW/+3zRx+WlUPy2jNYSdsP7PXE/RyztsiVYuv+ReX6JjuMvX7JKmeU/oCSe0LhDWlQQcpMHO/RvDexBZZFsk2+dppU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711581453; c=relaxed/simple;
-	bh=4WjYjDwm3w6B8gj/uMoHHzsRpfRNRmomT5co1eXnBjg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s/KFP/C9DOPveRynt/UK/ss8eHPAl2L35k3u2e+ru7886LMrFB1tZxgfQDcdMU0Q9jUoXXHghprJX+gG1BrSo/6QFbMTJuypzG2bepo7V0vmSQgSLJgNvTcuVfSs6dswmPBoZgKyZXNrBKoPrQaD/LTySS176fWFhlyE44YrzNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dmHuOjuk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B581C433F1;
-	Wed, 27 Mar 2024 23:17:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711581453;
-	bh=4WjYjDwm3w6B8gj/uMoHHzsRpfRNRmomT5co1eXnBjg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dmHuOjukP1kaGro22Y0vhnpswDZgRdNyRJt7B3uGRuZ3lrksJ4JUVg52O1Kgj1vfh
-	 k/y/tJjqqZ8kepp0hFZ7qKpem4EkaPTqM2f8kWLalCtunJG0JcGrUPS1XtdX0JsFGa
-	 l4YeBpR0lwCCqKFDNdEFsLlXcCvsxVFxwUsn6WFgPywShmEWGNhjD+ZicAz2r3Xs4h
-	 solnW6arXUGJ59dtOVSX2DaabGrPHCbxJ776kZcuUYodG1V3xwAPVd5DvqW+XNrr0J
-	 DTXYfNZDphhJlhZ+UYnUFpmvG0fWviuF/eqTjTKWFL50RqrZ8yGTE56RkIMtwYnmYM
-	 9nJ88asHnfDng==
-Date: Wed, 27 Mar 2024 16:17:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- quic_jjohnson@quicinc.com, kvalo@kernel.org, leon@kernel.org,
- dennis.dalessandro@cornelisnetworks.com, Jiri Pirko <jiri@resnulli.us>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>,
- netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
- linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next] net: create a dummy net_device allocator
-Message-ID: <20240327161731.6b100cb8@kernel.org>
-In-Reply-To: <20240327200809.512867-1-leitao@debian.org>
-References: <20240327200809.512867-1-leitao@debian.org>
+	s=arc-20240116; t=1711583058; c=relaxed/simple;
+	bh=dzBreCw05Zj1z2WXknwvtlBCs0CVANyQ6oNok2B+YWI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mcz6Bnc+Shp2gbf+xRfRR9nPI2i+dZz0B4uzQ/KUaeMGXQJE7qZqsWwhoe+kggTPfN39v6KuA71x9rMFCsX33MAOrBVs6PIaNzQ/yhLBAU42qJcw9I6y+L4tdnyif2BDIYsVzLohTjK00lsTgSclowTv4rk6JPgXy8atV4DHJpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=G+/0RXGe; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a46de423039so20980466b.0
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 16:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1711583055; x=1712187855; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uafOqS8+Hx03UMEMNJ98UkxQPudcualGmS525ViN+u4=;
+        b=G+/0RXGemv25P/Hg9aic/QOJWWkPl3ECvxPJ5Z8ILPNBe41hiuMiw7rnT95hKNdUMW
+         w3FzNtE11lJdGGK+mjV+Nde35g4YUELzWMGPZRURdsj0xmuyOnEe3MXOdNYtSqIGePfJ
+         hrukdWGqK6iCM73WjsVfVJSOpLbjG4XABs2bcRay+WM0v1hnfe9J/MmCRy5d+7M08Qw3
+         2deBSbvtz/8Ox2BrbkSOyJmIUgSnymNtX/rwm8cWOezqJ8pkjsAYXGQ+zUCuj6w3kJ6R
+         eG7zc4ifb3iFLkEK+0YTW8pg67F5XLJQ/CdqTiArIFbgB94X6J1gURX3BYzDkyJQpdEy
+         NH/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711583055; x=1712187855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uafOqS8+Hx03UMEMNJ98UkxQPudcualGmS525ViN+u4=;
+        b=lPYk8SUGUtV5K2atTNFCAWcW5UDMI+73Pk66k6vxhh2tKasWLGI4Q184eoY9lrlzgY
+         qfunpMDXaClXMxMoWOxnTfS9UrYTY0MO0TKQursOMB5tq54IoW1o8ghHohgpHS0QSzYu
+         W/AYqaoF9aEqhh4tjoHz61YLdNHW8N+gpQknOgDySCtah0a/Y2E9jDnXtaEj667fH4AE
+         ZVdG0vXGXRfAawfwuQw/rxM9osR8T4DSGO7YKcJ2z0UTB5/Qy66pgXR+15N7uT4SokvW
+         Szw88Uh1kFrgsbPqTBta5p2X0CzMv/0JZXA6mXVlHgLbzTl2M0yIEwzn1i+89eUV1/lO
+         Vcyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyaoJu4K2GfWQxZV6l6RHnqq5q7iq3lXQwMoSzgUXoEgs/SMDZhVthImjfX7eq4EOoEnCu4zb7Ws4G6F1JYkeZzdHAOY2G
+X-Gm-Message-State: AOJu0YzqP9OsV6QW3iiu8JFkg2bWwbZ+zuSj7Vfkn70+sz3XEUm5px7m
+	6nieilFN85vTAyAdFVuWrPDvrPUJLKXpPXjvdZkruLfqizufdeckp3ir2FQi430=
+X-Google-Smtp-Source: AGHT+IG7URuP7axjuQKV/J+VTSyGmCmmaOiCo+Mv3EERteoqR/3prQyrSPwxKzpmfIt9Ury01gmlHg==
+X-Received: by 2002:a50:8a93:0:b0:56c:18b4:d2ab with SMTP id j19-20020a508a93000000b0056c18b4d2abmr1042066edj.42.1711583054754;
+        Wed, 27 Mar 2024 16:44:14 -0700 (PDT)
+Received: from localhost.localdomain (178.165.195.38.wireless.dyn.drei.com. [178.165.195.38])
+        by smtp.gmail.com with ESMTPSA id eo12-20020a056402530c00b00568afb0e731sm139243edb.63.2024.03.27.16.44.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 16:44:14 -0700 (PDT)
+From: Andrew Melnychenko <andrew@daynix.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: yuri.benditovich@daynix.com,
+	yan@daynix.com
+Subject: [PATCH v2 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
+Date: Thu, 28 Mar 2024 01:18:26 +0200
+Message-ID: <20240327231826.1725488-1-andrew@daynix.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 27 Mar 2024 13:08:04 -0700 Breno Leitao wrote:
-> It is impossible to use init_dummy_netdev together with alloc_netdev()
-> as the 'setup' argument.
-> 
-> This is because alloc_netdev() initializes some fields in the net_device
-> structure, and later init_dummy_netdev() memzero them all. This causes
-> some problems as reported here:
-> 
-> 	https://lore.kernel.org/all/20240322082336.49f110cc@kernel.org/
-> 
-> Split the init_dummy_netdev() function in two. Create a new function called
-> init_dummy_netdev_core() that does not memzero the net_device structure.
-> Then have init_dummy_netdev() memzero-ing and calling
-> init_dummy_netdev_core(), keeping the old behaviour.
-> 
-> init_dummy_netdev_core() is the new function that could be called as an
-> argument for alloc_netdev().
-> 
-> Also, create a helper to allocate and initialize dummy net devices,
-> leveraging init_dummy_netdev_core() as the setup argument. This function
-> basically simplify the allocation of dummy devices, by allocating and
-> initializing it. Freeing the device continue to be done through
-> free_netdev()
+When the Qemu launched with vhost but without tap vnet_hdr,
+vhost tries to copy vnet_hdr from socket iter with size 0
+to the page that may contain some trash.
+That trash can be interpreted as unpredictable values for
+vnet_hdr.
+That leads to dropping some packets and in some cases to
+stalling vhost routine when the vhost_net tries to process
+packets and fails in a loop.
 
-Ah, but you need to make it part of the series with some caller.
-Maybe convert all the ethernet ones?
+Qemu options:
+  -netdev tap,vhost=on,vnet_hdr=off,...
 
-$ git grep 'struct net_device [^*]*;' -- drivers/net/ethernet/
-drivers/net/ethernet/cavium/thunder/thunder_bgx.c:      struct net_device       netdev;
-drivers/net/ethernet/marvell/prestera/prestera_rxtx.c:  struct net_device napi_dev;
-drivers/net/ethernet/microchip/vcap/vcap_api_debugfs_kunit.c:static struct net_device test_netdev = {};
-drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c:static struct net_device test_netdev = {};
+From security point of view, wrong values on field used later
+tap's tap_get_user_xdp() and will affect skb gso and options.
+Later the header(and data in headroom) should not be used by the stack.
+Using custom socket as a backend to vhost_net can reveal some data
+in the vnet_hdr, although it would require kernel access to implement.
+
+The issue happens because the value of sock_len in virtqueue is 0.
+That value is set at vhost_net_set_features() with
+VHOST_NET_F_VIRTIO_NET_HDR, also it's set to zero at device open()
+and reset() routine.
+So, currently, to trigger the issue, we need to set up qemu with
+vhost=on,vnet_hdr=off, or do not configure vhost in the custom program.
+
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+---
+ drivers/vhost/net.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f2ed7167c848..57411ac2d08b 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	hdr = buf;
+ 	gso = &hdr->gso;
+ 
++	if (!sock_hlen)
++		memset(buf, 0, pad);
++
+ 	if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+ 	    vhost16_to_cpu(vq, gso->csum_start) +
+ 	    vhost16_to_cpu(vq, gso->csum_offset) + 2 >
 -- 
-pw-bot: cr
+2.43.0
+
 
