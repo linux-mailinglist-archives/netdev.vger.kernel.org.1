@@ -1,137 +1,143 @@
-Return-Path: <netdev+bounces-82621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E200F88EC22
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:09:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3934D88EC59
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 18:18:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CF26299110
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:09:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBFF229F24F
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F0A14D701;
-	Wed, 27 Mar 2024 17:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19CC714D44C;
+	Wed, 27 Mar 2024 17:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="VTizb/8e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="frpurN/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C805F14D43F
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 17:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD5C12F5A2
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 17:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711559336; cv=none; b=gyUd8MIMFljim9a4vY9NCTyuR3+uHnUVUY4qaZnZ4TxWiQ71DcKldHazakMW5SzncjtIlDGSpnKGvkuIKiPetWHVIP4f5RQiKpNCZCIXkY+S9AKWny5DYOZ/LhX5Bt76fKLdNK8e+QQqvZqR7uZJVpAi2296JWMIiYWMEt2Wkjo=
+	t=1711559875; cv=none; b=MRuUanf7Fxkh2gKVpITjVgEmT+fF4cNteb5zgKfKphhD4hAYGVtwUeNgjGFOq7JMfJ2L4wBPhPwQfjEHzHoGxEISdcTZDY/RFZjYYI3y0x3C3mE+NlPzF/M4zKWS1w+Piw63g/gfTjtc/TdMCuSwEKkSwoP9JlMVJeryhoXbn4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711559336; c=relaxed/simple;
-	bh=gMN/vy1OEAGkXDYuiqVo7/hP63UcoJ3uKwb/j9S4MrU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e8eLRke9Ot5ztJSGvG9J/p1QMT3CBItkYL752W5+wcRh9HE20gP75REAoso4sNC2/zxfBhpQabYfDtCONwe/kizrxBSxJUM4Q1cEzOEYueRq0sLrkAmEKzytksP0s7AF00QQRNRHRcSVmS7dQTxxV1OOSlzQzRg/GfBPTbhEqzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=VTizb/8e; arc=none smtp.client-ip=44.202.169.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-5001a.ext.cloudfilter.net ([10.0.29.139])
-	by cmsmtp with ESMTPS
-	id pWKkrzz1YQr4SpWlcrhNaV; Wed, 27 Mar 2024 17:08:48 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id pWlPrxda43g73pWlQrvuHg; Wed, 27 Mar 2024 17:08:36 +0000
-X-Authority-Analysis: v=2.4 cv=esUUzZpX c=1 sm=1 tr=0 ts=66045294
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=zXgy4KOrraTBHT4+ULisNA==:17
- a=IkcTkHD0fZMA:10 a=K6JAEmCyrfEA:10 a=wYkD_t78qR0A:10 a=VwQbUJbxAAAA:8
- a=94brYO8VEXWNUbGmlHcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=AjGcO6oz07-iQ99wixmX:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lSCdqTkx1RljbiqDMVW8JxneDk+aNzMqtkDooNcx1vQ=; b=VTizb/8erBSeOHgRDK4TOCBTbK
-	MNAbyEO8E8ekOM4tvOVc9aqjXSOPBiWwcfNJTHM3i5qI8apQrHoPJv8/ZvjKd/DQ5CvS+TLX7CuwU
-	/VOXsNIWvAEI66e1BdhRuZoPh/dEVY5+S9VgOx8UJ6jvXf1fU9xdddpkbi5UndS9i921mPdD5XgDp
-	XOQmvJ8ng1eNr9C7n8kXwmLbE/cnu832gPvDETyWYKgWV/2uk90nuYcB0AjMOqFZniGx4WB1x/eWF
-	wDIYk3l03cUgta1YH/XWXc/Q+O2YPHQaoev7Vis4cp83P67f4lvN6dHEBpto3KjtukxfjtmlVMj+R
-	eAlTG9Nw==;
-Received: from [201.172.173.147] (port=54120 helo=[192.168.15.10])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1rpWlP-001nk2-05;
-	Wed, 27 Mar 2024 12:08:35 -0500
-Message-ID: <d5b0c70e-8369-4b99-9a42-9a4a93098251@embeddedor.com>
-Date: Wed, 27 Mar 2024 11:08:33 -0600
+	s=arc-20240116; t=1711559875; c=relaxed/simple;
+	bh=UA3aAZ6OJD/YBTezWMH3e5Ei1wRNk1JwfdDlSOWXRl0=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=eoqdAI1PAksRfojXOVF7b3u4JLgtS2CjB5qccfIDhEMRdNcSdVdMs4YC/Gm76XTXbkzuW8CDdV5RgoQi0jYiyk7hScVaVcTm112d6QwrqCt9LOfOW6+ROH2BAQYqwB3j77UE6YxpktnBIBxmr/KI+aHf5y2cbVl+7xggeaLZ3Fw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=frpurN/E; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711559872;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=brnN/NCeTstfV3DWN+AFy3XAX/hGuMmV9sRUj5MIAgg=;
+	b=frpurN/E/4fA3QsjaEO6ghGXJKvmEbLvQC8+mUSXiU+fajktYJJeHCP2Vtyl5qbqDTO9Wq
+	cilVr2crdwjLwDoPfAaHOxBJi+xr8+IDyWDhzu47FV7NGhrVVEXaT02rT04IPpI7VI1LQq
+	++mFge8ONv1Fppzrl7EimJTof4Gr8xk=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-450-ANzFHTBkPCSIIzq1MCJC4g-1; Wed,
+ 27 Mar 2024 13:17:47 -0400
+X-MC-Unique: ANzFHTBkPCSIIzq1MCJC4g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E894D1E441C1;
+	Wed, 27 Mar 2024 17:17:46 +0000 (UTC)
+Received: from RHTPC1VM0NT (dhcp-17-72.bos.redhat.com [10.18.17.72])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 54EF51121306;
+	Wed, 27 Mar 2024 17:17:46 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Eelco Chaudron <echaudro@redhat.com>
+Cc: Ilya Maximets <i.maximets@ovn.org>,  dev@openvswitch.org,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  "David S. Miller" <davem@davemloft.net>
+Subject: Re: [ovs-dev] [PATCH net] openvswitch: Set the skbuff pkt_type for
+ proper pmtud support.
+References: <20240322190603.251831-1-aconole@redhat.com>
+	<7AFF5D6D-568C-449B-83CF-9436DE97CA91@redhat.com>
+	<f7t5xxawlen.fsf@redhat.com>
+	<4066cc6a-24a8-4d05-b180-99222fe792fa@ovn.org>
+	<4C04D4FF-0ADF-45DC-B253-2CD5C997DA1B@redhat.com>
+Date: Wed, 27 Mar 2024 13:17:46 -0400
+In-Reply-To: <4C04D4FF-0ADF-45DC-B253-2CD5C997DA1B@redhat.com> (Eelco
+	Chaudron's message of "Mon, 25 Mar 2024 13:57:22 +0100")
+Message-ID: <f7tbk6ztwzp.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2][next] Bluetooth: L2CAP: Avoid
- -Wflex-array-member-not-at-end warnings
-Content-Language: en-US
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <ZgRIF1bkXlZlaK22@neat>
- <CABBYNZLi_PCbRB6CVYxwOG04917tDudMvuVT1NU3LVth=xpCtw@mail.gmail.com>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <CABBYNZLi_PCbRB6CVYxwOG04917tDudMvuVT1NU3LVth=xpCtw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.173.147
-X-Source-L: No
-X-Exim-ID: 1rpWlP-001nk2-05
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.10]) [201.172.173.147]:54120
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfH6hesUrKkn5Lldkee3GE4eo2vmbWdB26yB5VvOahQ8tVrlGAsSRQ93w65NKJPQpPskgFAkq3GZwdmyi3okHdGwAZnlk9KG6L0CISimsrjll7EuWNDde
- YG2rownS2KbQa+V3tcc3ZhKzmUcq19beHJZoLjw+wxkjaIhYBAY/3RRMbtlbYq96+/Grjcjq61l1mnIV2rfSRQHMmhlY0d6WGSI=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Hi!
+Eelco Chaudron <echaudro@redhat.com> writes:
 
-On 3/27/24 10:55, Luiz Augusto von Dentz wrote:
-> Hi Gustavo,
-> 
-> On Wed, Mar 27, 2024 at 12:23 PM Gustavo A. R. Silva
-> <gustavoars@kernel.org> wrote:
+> On 25 Mar 2024, at 13:37, Ilya Maximets wrote:
+>
+>> On 3/25/24 13:22, Aaron Conole wrote:
+>>> Eelco Chaudron <echaudro@redhat.com> writes:
+>>>
+>>>> On 22 Mar 2024, at 20:06, Aaron Conole wrote:
+>>>>
+>>>>> Open vSwitch is originally intended to switch at layer 2, only dealin=
+g with
+>>>>> Ethernet frames.  With the introduction of l3 tunnels support, it cro=
+ssed
+>>>>> into the realm of needing to care a bit about some routing details wh=
+en
+>>>>> making forwarding decisions.  If an oversized packet would need to be
+>>>>> fragmented during this forwarding decision, there is a chance for pmtu
+>>>>> to get involved and generate a routing exception.  This is gated by t=
+he
+>>>>> skbuff->pkt_type field.
+>>>>>
+>>>>> When a flow is already loaded into the openvswitch module this field =
+is
+>>>>> set up and transitioned properly as a packet moves from one port to
+>>>>> another.  In the case that a packet execute is invoked after a flow is
+>>>>> newly installed this field is not properly initialized.  This causes =
+the
+>>>>> pmtud mechanism to omit sending the required exception messages across
+>>>>> the tunnel boundary and a second attempt needs to be made to make sure
+>>>>> that the routing exception is properly setup.  To fix this, we set the
+>>>>> outgoing packet's pkt_type to PACKET_OUTGOING, since it can only get
+>>>>> to the openvswitch module via a port device or packet command.
+>>>>
+>>>> Is this not a problem when the packet comes from the bridge port in th=
+e kernel?
+>>>
+>>> It very well may be an issue there as well, but the recommendation is to
+>>> operate with the bridge port down as far as I know, so I don't know if
+>>> this issue has been observed happening from the bridge port.
 >>
->> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
->> ready to enable it globally.
-> 
-> Which tree is this base on, I just rebased bluetooth-next on top of
-> net-next but it looks like CI is still failing to build it, so either
-> we don't have all the dependencies already in net-next or perhaps you
-> had it submit while the tree had not been updated.
+>> FWIW, bridge ports are typically used as an entry point for tunneled
+>> traffic so it can egress from a physical port attached to OVS.  It means
+>> they are pretty much always UP in most common setups like OpenStack or
+>> ovn-kubernetes and handle a decent amount of traffic.  They are also used
+>> to direct some other types of traffic to the host kernel.
+>
+> +1 here, I=E2=80=99m talking about the same port. I think we only advise
+> having this down for userspace bridges, but not in the case the bridge
+> is the tunnel endpoint.
 
-This is based off of linux-next.
+Okay, I'll confirm about up/down, but it seems like it shouldn't matter
+and we should be setting the outgoing type.
 
-I think net-next is missing this commit in v6.9-rc1:
+>> Unless I misunderstood which ports we're talking about here.
+>>
+>> Best regards, Ilya Maximets.
 
-d8e45f2929b9 "overflow: Change DEFINE_FLEX to take __counted_by member")
-
-https://git.kernel.org/linus/d8e45f2929b9
-
-Thanks
---
-Gustavo
 
