@@ -1,197 +1,379 @@
-Return-Path: <netdev+bounces-82592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A1B888EA2C
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:03:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A74288EA37
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:04:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B37982A362B
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:03:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 288A2295385
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4CE31304B6;
-	Wed, 27 Mar 2024 16:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59F4130E2D;
+	Wed, 27 Mar 2024 16:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lzw7ZRd8"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="j1MFXh/g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947B412FB39
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 16:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97FD512DD97;
+	Wed, 27 Mar 2024 16:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711555392; cv=none; b=iHgIcsdb0fZjl698g1qnWqZzYZU78oufl2vqzvqE1RkTrcgoWF3HYjp7rcB9jhG6uYxpTUvt2cC50mX7Hq44HHepgCzEjMdg7+xi8mF7i2vLPlz8BI1EW1nz9jRv9d7wlKEzUR96dcV2p9tmauALhRPaR0KABkJ2ReFanft2otU=
+	t=1711555403; cv=none; b=UyWWo+OCfyBl9yetBZ63gU2qfpvCB/AwBD59LsTh6lTl81kGKobcKft2pCGZNWtGqW2CG87DMI3yDlqS6Twy9oOp5azxI3P2B55cXgFcBH44VqkA3ZnlfuUfFsYj2QrruaY+BsmLdOga202jz8UU+I3c2tt9sPraphuAGgDb0KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711555392; c=relaxed/simple;
-	bh=3akiRIsg9ariRSmqL4zMkYN+HATJCR9eNt4gSUncbPw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DEWVDIyLooBReZxn0y7H9xknl/14JnKy/shIVrkZLYtRwJ4dHdRpMoni9nkRJwq5+AENbIGa1ULUoJ+Q3+WSaAcOOrG7nOhIjTD8xrlC460FiOA7jDnYaXrAm05TFbA5QGmqEmutgxDw1DqT12SMAwDvyjhQ9kdZ5kgR4yyYV24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lzw7ZRd8; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4141156f245so46698645e9.2
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 09:03:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711555388; x=1712160188; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yANHfsSq1wnQHY0oy3e5H0IzzlKaSeY4xO4Bq5L1W4A=;
-        b=Lzw7ZRd83bFKY1t4Mg783/xrIoh47DWfnlXYWTyzKudHjlAPhDJzXFDvWiS2xuX6Gu
-         V6a3NmHHNujl0lVFqT8PRgu5EgJVPHT/SxNqjVuaG/Te3UN+Rm59HFcrqJveCObdTwRS
-         ceMwWZ/wEFMXBAO23hLTELIIU9d/1vaPF03RMtdJwSpu7hK/t/FTSV79zortFkDuJie6
-         7vLSlwpuTDvASV5vuiRByodX9NlwXYHEMvL63dLXrlGkiOWo5q0gIetkZQUcp/DA/uVY
-         cv8PqW+KMAJWcCkazDFs+u+oS6O7u+fWTtDW1KEL/2dZliU7Wnrxq8OXjPX09X3oewPT
-         lQkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711555388; x=1712160188;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yANHfsSq1wnQHY0oy3e5H0IzzlKaSeY4xO4Bq5L1W4A=;
-        b=GhZX5TGcRgoD9uc1yQBrXV3q8F83fOS8nHrRL66QJYs3SM674gMJi/G6d+lKiVIrGo
-         XBe5P8il4tqhcp14caOGSTpl0M55aDoJeE+bC7JqG8/6eRbPJ+Cxt+Denv7vSLFX/uWC
-         P5gsiO2R8CPvC+PL9Wb+6txIFrwy2wXHChF6VXqfScuF3A8yBUpE4Itj4Ufq78lOMlBI
-         bF2Zunhyicyrllp2YkPFmR8NlsdO82iFkB2ceFVlIPUfv2rzpHUkYGv2aQuVnra4upGr
-         zYWzZzHmh3nwQCMykK9z4yesQ3eFgT9uT5BIHOLLRTcm0NZnUgTbhEB0+PuCoD0ETKSl
-         Ba9A==
-X-Gm-Message-State: AOJu0YydXzQjslF7/2pkiI4f1a/y8ylr8aPIE586nUQzGvUClAg6BJDU
-	SdOAuEtKIvSnzwpExxERYR3PuyCXeKtH54iLQCb+bJ96S/v8p47eVEEx8wEkOcQ=
-X-Google-Smtp-Source: AGHT+IE81RbhsENGEfqAOeVQfdhAEzLv4nHmA8Wh3qGC+F7hvW0b2zkedpV84M64aCmtcUd6UIgiwA==
-X-Received: by 2002:a05:600c:1f8e:b0:414:71e2:a249 with SMTP id je14-20020a05600c1f8e00b0041471e2a249mr321444wmb.41.1711555387374;
-        Wed, 27 Mar 2024 09:03:07 -0700 (PDT)
-Received: from imac.fritz.box ([2a02:8010:60a0:0:5876:f134:d112:62c7])
-        by smtp.gmail.com with ESMTPSA id j19-20020a05600c191300b00414924f307csm2540450wmq.26.2024.03.27.09.03.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 09:03:06 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Stanislav Fomichev <sdf@google.com>
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1] tools/net/ynl: Add extack policy attribute decoding
-Date: Wed, 27 Mar 2024 16:03:02 +0000
-Message-ID: <20240327160302.69378-1-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1711555403; c=relaxed/simple;
+	bh=axfExQQ9XjSS7+xlvPmWMy5GZEEZS+Lbf0Yr8kq4jQs=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=k1PnerHMVG2HZHBj0Wx68x+pMTRGAdRseU9U8XKrrZKTIfVdk0uP3UVgWDYivwdZV2AjeM/DhFjFdWoo071ZllPHL0pMYs0GNA4aG1ziwh6s7KqPudtcYYlCiKW0xe4CTDfIqiIG2k5zZLHSmJ1tEa4AyENUr7iRHMZq4dGwOcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=j1MFXh/g; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from apais-vm1.0synte4vioeebbvidf5q0vz2ua.xx.internal.cloudapp.net (unknown [52.183.86.224])
+	by linux.microsoft.com (Postfix) with ESMTPSA id DA2672085CE4;
+	Wed, 27 Mar 2024 09:03:20 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DA2672085CE4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1711555401;
+	bh=3hcnlvv5JwxGRimv8puox0FI6yYT22rRQLYPals06nM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=j1MFXh/gQg1tzy1NiZhDwekxwc8dvAzI+onvdyQYuwuUQW8n92YESaET4UqKK3s+1
+	 GkKlfkFJN7woCpfY/15BUPreZuaOKAoShX2RDT1e+7ZGcLy3rLDfkRWzSogXlEFbF5
+	 xONzEb2r0qc0V0QS8P8cWQIe/e+DcLcRmQWlSfJA=
+From: Allen Pais <apais@linux.microsoft.com>
+To: linux-kernel@vger.kernel.org
+Cc: tj@kernel.org,
+	keescook@chromium.org,
+	vkoul@kernel.org,
+	marcan@marcan.st,
+	sven@svenpeter.dev,
+	florian.fainelli@broadcom.com,
+	rjui@broadcom.com,
+	sbranden@broadcom.com,
+	paul@crapouillou.net,
+	Eugeniy.Paltsev@synopsys.com,
+	manivannan.sadhasivam@linaro.org,
+	vireshk@kernel.org,
+	Frank.Li@nxp.com,
+	leoyang.li@nxp.com,
+	zw@zh-kernel.org,
+	wangzhou1@hisilicon.com,
+	haijie1@huawei.com,
+	shawnguo@kernel.org,
+	s.hauer@pengutronix.de,
+	sean.wang@mediatek.com,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	afaerber@suse.de,
+	logang@deltatee.com,
+	daniel@zonque.org,
+	haojian.zhuang@gmail.com,
+	robert.jarzmik@free.fr,
+	andersson@kernel.org,
+	konrad.dybcio@linaro.org,
+	orsonzhai@gmail.com,
+	baolin.wang@linux.alibaba.com,
+	zhang.lyra@gmail.com,
+	patrice.chotard@foss.st.com,
+	linus.walleij@linaro.org,
+	wens@csie.org,
+	jernej.skrabec@gmail.com,
+	peter.ujfalusi@gmail.com,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	jassisinghbrar@gmail.com,
+	mchehab@kernel.org,
+	maintainers@bluecherrydvr.com,
+	aubin.constans@microchip.com,
+	ulf.hansson@linaro.org,
+	manuel.lauss@gmail.com,
+	mirq-linux@rere.qmqm.pl,
+	jh80.chung@samsung.com,
+	oakad@yahoo.com,
+	hayashi.kunihiko@socionext.com,
+	mhiramat@kernel.org,
+	brucechang@via.com.tw,
+	HaraldWelte@viatech.com,
+	pierre@ossman.eu,
+	duncan.sands@free.fr,
+	stern@rowland.harvard.edu,
+	oneukum@suse.com,
+	openipmi-developer@lists.sourceforge.net,
+	dmaengine@vger.kernel.org,
+	asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rpi-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	imx@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-mediatek@lists.infradead.org,
+	linux-actions@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH 0/9] Convert Tasklets to BH Workqueues
+Date: Wed, 27 Mar 2024 16:03:05 +0000
+Message-Id: <20240327160314.9982-1-apais@linux.microsoft.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-The NLMSGERR_ATTR_POLICY extack attribute has been ignored by ynl up to
-now. Extend extack decoding to include _POLICY and the nested
-NL_POLICY_TYPE_ATTR_* attributes.
+This patch series represents a significant shift in how asynchronous
+execution in the bottom half (BH) context is handled within the kernel.
+Traditionally, tasklets have been the go-to mechanism for such operations.
+This series introduces the conversion of existing tasklet implementations
+to the newly supported BH workqueues, marking a pivotal enhancement
+in how asynchronous tasks are managed and executed.
 
-For example:
+Background and Motivation:
+Tasklets have served as the kernel's lightweight mechanism for
+scheduling bottom-half processing, providing a simple interface
+for deferring work from interrupt context. There have been increasing
+requests and motivations to deprecate and eventually remove tasklets
+in favor of more modern and flexible mechanisms.
 
-./tools/net/ynl/cli.py \
-  --spec Documentation/netlink/specs/rt_link.yaml \
-  --create --do newlink --json '{
-    "ifname": "12345678901234567890",
-    "linkinfo": {"kind": "bridge"}
-    }'
-Netlink error: Numerical result out of range
-nl_len = 104 (88) nl_flags = 0x300 nl_type = 2
-	error: -34	extack: {'msg': 'Attribute failed policy validation',
-'policy': {'max-length': 15, 'type': 'string'}, 'bad-attr': '.ifname'}
+Introduction of BH Workqueues:
+BH workqueues are designed to behave similarly to regular workqueues
+with the added benefit of execution in the BH context.
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- tools/net/ynl/lib/ynl.py | 50 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+Conversion Details:
+The conversion process involved identifying all instances where
+tasklets were used within the kernel and replacing them with BH workqueue
+implementations.
 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 5fa7957f6e0f..557ef5a22b7d 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- 
- from collections import namedtuple
-+from enum import Enum
- import functools
- import os
- import random
-@@ -76,6 +77,25 @@ class Netlink:
-     NLMSGERR_ATTR_MISS_TYPE = 5
-     NLMSGERR_ATTR_MISS_NEST = 6
- 
-+    # Policy types
-+    NL_POLICY_TYPE_ATTR_TYPE = 1
-+    NL_POLICY_TYPE_ATTR_MIN_VALUE_S = 2
-+    NL_POLICY_TYPE_ATTR_MAX_VALUE_S = 3
-+    NL_POLICY_TYPE_ATTR_MIN_VALUE_U = 4
-+    NL_POLICY_TYPE_ATTR_MAX_VALUE_U = 5
-+    NL_POLICY_TYPE_ATTR_MIN_LENGTH = 6
-+    NL_POLICY_TYPE_ATTR_MAX_LENGTH = 7
-+    NL_POLICY_TYPE_ATTR_POLICY_IDX = 8
-+    NL_POLICY_TYPE_ATTR_POLICY_MAXTYPE = 9
-+    NL_POLICY_TYPE_ATTR_BITFIELD32_MASK = 10
-+    NL_POLICY_TYPE_ATTR_PAD = 11
-+    NL_POLICY_TYPE_ATTR_MASK = 12
-+
-+    AttrType = Enum('AttrType', ['flag', 'u8', 'u16', 'u32', 'u64',
-+                                  's8', 's16', 's32', 's64',
-+                                  'binary', 'string', 'nul-string',
-+                                  'nested', 'nested-array',
-+                                  'bitfield32', 'sint', 'uint'])
- 
- class NlError(Exception):
-   def __init__(self, nl_msg):
-@@ -198,6 +218,8 @@ class NlMsg:
-                     self.extack['miss-nest'] = extack.as_scalar('u32')
-                 elif extack.type == Netlink.NLMSGERR_ATTR_OFFS:
-                     self.extack['bad-attr-offs'] = extack.as_scalar('u32')
-+                elif extack.type == Netlink.NLMSGERR_ATTR_POLICY:
-+                    self.extack['policy'] = self._decode_policy(extack.raw)
-                 else:
-                     if 'unknown' not in self.extack:
-                         self.extack['unknown'] = []
-@@ -214,6 +236,34 @@ class NlMsg:
-                             desc += f" ({spec['doc']})"
-                         self.extack['miss-type'] = desc
- 
-+    def _decode_policy(self, raw):
-+        policy = {}
-+        for attr in NlAttrs(raw):
-+            if attr.type == Netlink.NL_POLICY_TYPE_ATTR_TYPE:
-+                type = attr.as_scalar('u32')
-+                policy['type'] = Netlink.AttrType(type).name
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_VALUE_S:
-+                policy['min-value-s'] = attr.as_scalar('s64')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_VALUE_S:
-+                policy['max-value-s'] = attr.as_scalar('s64')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_VALUE_U:
-+                policy['min-value-u'] = attr.as_scalar('u64')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_VALUE_U:
-+                policy['max-value-u'] = attr.as_scalar('u64')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_LENGTH:
-+                policy['min-length'] = attr.as_scalar('u32')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_LENGTH:
-+                policy['max-length'] = attr.as_scalar('u32')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_POLICY_IDX:
-+                policy['policy-idx'] = attr.as_scalar('u32')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_POLICY_MAXTYPE:
-+                policy['policy-maxtype'] = attr.as_scalar('u32')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_BITFIELD32_MASK:
-+                policy['bitfield32-mask'] = attr.as_scalar('u32')
-+            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MASK:
-+                policy['mask'] = attr.as_scalar('u64')
-+        return policy
-+
-     def cmd(self):
-         return self.nl_type
- 
+This patch series is a first step toward broader adoption of BH workqueues
+across the kernel, and soon other subsystems using tasklets will undergo
+a similar transition. The groundwork laid here could serve as a
+blueprint for such future conversions.
+
+Testing Request:
+In addition to a thorough review of these changes,
+I kindly request that the reviwers engage in both functional and
+performance testing of this patch series. Specifically, benchmarks
+that measure interrupt handling efficiency, latency, and throughput.
+
+I welcome your feedback, suggestions, and any further discussion on this
+patch series.
+
+
+Additional Info:
+    Based on the work done by Tejun Heo <tj@kernel.org>
+    Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
+
+Allen Pais (9):
+  hyperv: Convert from tasklet to BH workqueue
+  dma: Convert from tasklet to BH workqueue
+  IB: Convert from tasklet to BH workqueue
+  USB: Convert from tasklet to BH workqueue
+  mailbox: Convert from tasklet to BH workqueue
+  ipmi: Convert from tasklet to BH workqueue
+  s390: Convert from tasklet to BH workqueue
+  drivers/media/*: Convert from tasklet to BH workqueue
+  mmc: Convert from tasklet to BH workqueue
+
+ drivers/char/ipmi/ipmi_msghandler.c           | 30 ++++----
+ drivers/dma/altera-msgdma.c                   | 15 ++--
+ drivers/dma/apple-admac.c                     | 15 ++--
+ drivers/dma/at_hdmac.c                        |  2 +-
+ drivers/dma/at_xdmac.c                        | 15 ++--
+ drivers/dma/bcm2835-dma.c                     |  2 +-
+ drivers/dma/dma-axi-dmac.c                    |  2 +-
+ drivers/dma/dma-jz4780.c                      |  2 +-
+ .../dma/dw-axi-dmac/dw-axi-dmac-platform.c    |  2 +-
+ drivers/dma/dw-edma/dw-edma-core.c            |  2 +-
+ drivers/dma/dw/core.c                         | 13 ++--
+ drivers/dma/dw/regs.h                         |  3 +-
+ drivers/dma/ep93xx_dma.c                      | 15 ++--
+ drivers/dma/fsl-edma-common.c                 |  2 +-
+ drivers/dma/fsl-qdma.c                        |  2 +-
+ drivers/dma/fsl_raid.c                        | 11 +--
+ drivers/dma/fsl_raid.h                        |  2 +-
+ drivers/dma/fsldma.c                          | 15 ++--
+ drivers/dma/fsldma.h                          |  3 +-
+ drivers/dma/hisi_dma.c                        |  2 +-
+ drivers/dma/hsu/hsu.c                         |  2 +-
+ drivers/dma/idma64.c                          |  4 +-
+ drivers/dma/img-mdc-dma.c                     |  2 +-
+ drivers/dma/imx-dma.c                         | 27 +++----
+ drivers/dma/imx-sdma.c                        |  6 +-
+ drivers/dma/ioat/dma.c                        | 17 +++--
+ drivers/dma/ioat/dma.h                        |  5 +-
+ drivers/dma/ioat/init.c                       |  2 +-
+ drivers/dma/k3dma.c                           | 19 ++---
+ drivers/dma/mediatek/mtk-cqdma.c              | 35 ++++-----
+ drivers/dma/mediatek/mtk-hsdma.c              |  2 +-
+ drivers/dma/mediatek/mtk-uart-apdma.c         |  4 +-
+ drivers/dma/mmp_pdma.c                        | 13 ++--
+ drivers/dma/mmp_tdma.c                        | 11 +--
+ drivers/dma/mpc512x_dma.c                     | 17 +++--
+ drivers/dma/mv_xor.c                          | 13 ++--
+ drivers/dma/mv_xor.h                          |  5 +-
+ drivers/dma/mv_xor_v2.c                       | 23 +++---
+ drivers/dma/mxs-dma.c                         | 13 ++--
+ drivers/dma/nbpfaxi.c                         | 15 ++--
+ drivers/dma/owl-dma.c                         |  2 +-
+ drivers/dma/pch_dma.c                         | 17 +++--
+ drivers/dma/pl330.c                           | 31 ++++----
+ drivers/dma/plx_dma.c                         | 13 ++--
+ drivers/dma/ppc4xx/adma.c                     | 17 +++--
+ drivers/dma/ppc4xx/adma.h                     |  5 +-
+ drivers/dma/pxa_dma.c                         |  2 +-
+ drivers/dma/qcom/bam_dma.c                    | 35 ++++-----
+ drivers/dma/qcom/gpi.c                        | 18 ++---
+ drivers/dma/qcom/hidma.c                      | 11 +--
+ drivers/dma/qcom/hidma.h                      |  5 +-
+ drivers/dma/qcom/hidma_ll.c                   | 11 +--
+ drivers/dma/qcom/qcom_adm.c                   |  2 +-
+ drivers/dma/sa11x0-dma.c                      | 27 +++----
+ drivers/dma/sf-pdma/sf-pdma.c                 | 23 +++---
+ drivers/dma/sf-pdma/sf-pdma.h                 |  5 +-
+ drivers/dma/sprd-dma.c                        |  2 +-
+ drivers/dma/st_fdma.c                         |  2 +-
+ drivers/dma/ste_dma40.c                       | 17 +++--
+ drivers/dma/sun6i-dma.c                       | 33 ++++----
+ drivers/dma/tegra186-gpc-dma.c                |  2 +-
+ drivers/dma/tegra20-apb-dma.c                 | 19 ++---
+ drivers/dma/tegra210-adma.c                   |  2 +-
+ drivers/dma/ti/edma.c                         |  2 +-
+ drivers/dma/ti/k3-udma.c                      | 11 +--
+ drivers/dma/ti/omap-dma.c                     |  2 +-
+ drivers/dma/timb_dma.c                        | 23 +++---
+ drivers/dma/txx9dmac.c                        | 29 +++----
+ drivers/dma/txx9dmac.h                        |  5 +-
+ drivers/dma/virt-dma.c                        |  9 ++-
+ drivers/dma/virt-dma.h                        |  9 ++-
+ drivers/dma/xgene-dma.c                       | 21 +++---
+ drivers/dma/xilinx/xilinx_dma.c               | 23 +++---
+ drivers/dma/xilinx/xilinx_dpdma.c             | 21 +++---
+ drivers/dma/xilinx/zynqmp_dma.c               | 21 +++---
+ drivers/hv/channel.c                          |  8 +-
+ drivers/hv/channel_mgmt.c                     |  5 +-
+ drivers/hv/connection.c                       |  9 ++-
+ drivers/hv/hv.c                               |  3 +-
+ drivers/hv/hv_balloon.c                       |  4 +-
+ drivers/hv/hv_fcopy.c                         |  8 +-
+ drivers/hv/hv_kvp.c                           |  8 +-
+ drivers/hv/hv_snapshot.c                      |  8 +-
+ drivers/hv/hyperv_vmbus.h                     |  9 ++-
+ drivers/hv/vmbus_drv.c                        | 19 ++---
+ drivers/infiniband/hw/bnxt_re/bnxt_re.h       |  3 +-
+ drivers/infiniband/hw/bnxt_re/qplib_fp.c      | 21 +++---
+ drivers/infiniband/hw/bnxt_re/qplib_fp.h      |  2 +-
+ drivers/infiniband/hw/bnxt_re/qplib_rcfw.c    | 25 ++++---
+ drivers/infiniband/hw/bnxt_re/qplib_rcfw.h    |  2 +-
+ drivers/infiniband/hw/erdma/erdma.h           |  3 +-
+ drivers/infiniband/hw/erdma/erdma_eq.c        | 11 +--
+ drivers/infiniband/hw/hfi1/rc.c               |  2 +-
+ drivers/infiniband/hw/hfi1/sdma.c             | 37 ++++-----
+ drivers/infiniband/hw/hfi1/sdma.h             |  9 ++-
+ drivers/infiniband/hw/hfi1/tid_rdma.c         |  6 +-
+ drivers/infiniband/hw/irdma/ctrl.c            |  2 +-
+ drivers/infiniband/hw/irdma/hw.c              | 24 +++---
+ drivers/infiniband/hw/irdma/main.h            |  5 +-
+ drivers/infiniband/hw/qib/qib.h               |  7 +-
+ drivers/infiniband/hw/qib/qib_iba7322.c       |  9 ++-
+ drivers/infiniband/hw/qib/qib_rc.c            | 16 ++--
+ drivers/infiniband/hw/qib/qib_ruc.c           |  4 +-
+ drivers/infiniband/hw/qib/qib_sdma.c          | 11 +--
+ drivers/infiniband/sw/rdmavt/qp.c             |  2 +-
+ drivers/mailbox/bcm-pdc-mailbox.c             | 21 +++---
+ drivers/mailbox/imx-mailbox.c                 | 16 ++--
+ drivers/media/pci/bt8xx/bt878.c               |  8 +-
+ drivers/media/pci/bt8xx/bt878.h               |  3 +-
+ drivers/media/pci/bt8xx/dvb-bt8xx.c           |  9 ++-
+ drivers/media/pci/ddbridge/ddbridge.h         |  3 +-
+ drivers/media/pci/mantis/hopper_cards.c       |  2 +-
+ drivers/media/pci/mantis/mantis_cards.c       |  2 +-
+ drivers/media/pci/mantis/mantis_common.h      |  3 +-
+ drivers/media/pci/mantis/mantis_dma.c         |  5 +-
+ drivers/media/pci/mantis/mantis_dma.h         |  2 +-
+ drivers/media/pci/mantis/mantis_dvb.c         | 12 +--
+ drivers/media/pci/ngene/ngene-core.c          | 23 +++---
+ drivers/media/pci/ngene/ngene.h               |  5 +-
+ drivers/media/pci/smipcie/smipcie-main.c      | 18 ++---
+ drivers/media/pci/smipcie/smipcie.h           |  3 +-
+ drivers/media/pci/ttpci/budget-av.c           |  3 +-
+ drivers/media/pci/ttpci/budget-ci.c           | 27 +++----
+ drivers/media/pci/ttpci/budget-core.c         | 10 +--
+ drivers/media/pci/ttpci/budget.h              |  5 +-
+ drivers/media/pci/tw5864/tw5864-core.c        |  2 +-
+ drivers/media/pci/tw5864/tw5864-video.c       | 13 ++--
+ drivers/media/pci/tw5864/tw5864.h             |  7 +-
+ drivers/media/platform/intel/pxa_camera.c     | 15 ++--
+ drivers/media/platform/marvell/mcam-core.c    | 11 +--
+ drivers/media/platform/marvell/mcam-core.h    |  3 +-
+ .../st/sti/c8sectpfe/c8sectpfe-core.c         | 15 ++--
+ .../st/sti/c8sectpfe/c8sectpfe-core.h         |  2 +-
+ drivers/media/radio/wl128x/fmdrv.h            |  7 +-
+ drivers/media/radio/wl128x/fmdrv_common.c     | 41 +++++-----
+ drivers/media/rc/mceusb.c                     |  2 +-
+ drivers/media/usb/ttusb-dec/ttusb_dec.c       | 21 +++---
+ drivers/mmc/host/atmel-mci.c                  | 35 ++++-----
+ drivers/mmc/host/au1xmmc.c                    | 37 ++++-----
+ drivers/mmc/host/cb710-mmc.c                  | 15 ++--
+ drivers/mmc/host/cb710-mmc.h                  |  3 +-
+ drivers/mmc/host/dw_mmc.c                     | 25 ++++---
+ drivers/mmc/host/dw_mmc.h                     |  9 ++-
+ drivers/mmc/host/omap.c                       | 17 +++--
+ drivers/mmc/host/renesas_sdhi.h               |  3 +-
+ drivers/mmc/host/renesas_sdhi_internal_dmac.c | 24 +++---
+ drivers/mmc/host/renesas_sdhi_sys_dmac.c      |  9 +--
+ drivers/mmc/host/sdhci-bcm-kona.c             |  2 +-
+ drivers/mmc/host/tifm_sd.c                    | 15 ++--
+ drivers/mmc/host/tmio_mmc.h                   |  3 +-
+ drivers/mmc/host/tmio_mmc_core.c              |  4 +-
+ drivers/mmc/host/uniphier-sd.c                | 13 ++--
+ drivers/mmc/host/via-sdmmc.c                  | 25 ++++---
+ drivers/mmc/host/wbsd.c                       | 75 ++++++++++---------
+ drivers/mmc/host/wbsd.h                       | 10 +--
+ drivers/s390/block/dasd.c                     | 42 +++++------
+ drivers/s390/block/dasd_int.h                 | 10 +--
+ drivers/s390/char/con3270.c                   | 27 ++++---
+ drivers/s390/crypto/ap_bus.c                  | 24 +++---
+ drivers/s390/crypto/ap_bus.h                  |  2 +-
+ drivers/s390/crypto/zcrypt_msgtype50.c        |  2 +-
+ drivers/s390/crypto/zcrypt_msgtype6.c         |  4 +-
+ drivers/s390/net/ctcm_fsms.c                  |  4 +-
+ drivers/s390/net/ctcm_main.c                  | 15 ++--
+ drivers/s390/net/ctcm_main.h                  |  5 +-
+ drivers/s390/net/ctcm_mpc.c                   | 12 +--
+ drivers/s390/net/ctcm_mpc.h                   |  7 +-
+ drivers/s390/net/lcs.c                        | 26 +++----
+ drivers/s390/net/lcs.h                        |  2 +-
+ drivers/s390/net/qeth_core_main.c             |  2 +-
+ drivers/s390/scsi/zfcp_qdio.c                 | 45 +++++------
+ drivers/s390/scsi/zfcp_qdio.h                 |  9 ++-
+ drivers/usb/atm/usbatm.c                      | 55 +++++++-------
+ drivers/usb/atm/usbatm.h                      |  3 +-
+ drivers/usb/core/hcd.c                        | 22 +++---
+ drivers/usb/gadget/udc/fsl_qe_udc.c           | 21 +++---
+ drivers/usb/gadget/udc/fsl_qe_udc.h           |  4 +-
+ drivers/usb/host/ehci-sched.c                 |  2 +-
+ drivers/usb/host/fhci-hcd.c                   |  3 +-
+ drivers/usb/host/fhci-sched.c                 | 10 +--
+ drivers/usb/host/fhci.h                       |  5 +-
+ drivers/usb/host/xhci-dbgcap.h                |  3 +-
+ drivers/usb/host/xhci-dbgtty.c                | 15 ++--
+ include/linux/hyperv.h                        |  2 +-
+ include/linux/usb/cdc_ncm.h                   |  2 +-
+ include/linux/usb/usbnet.h                    |  2 +-
+ 186 files changed, 1135 insertions(+), 1044 deletions(-)
+
 -- 
-2.44.0
+2.17.1
 
 
