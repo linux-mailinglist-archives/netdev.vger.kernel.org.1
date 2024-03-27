@@ -1,176 +1,117 @@
-Return-Path: <netdev+bounces-82488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4770E88E5D8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:27:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00BC988E548
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE478283EDF
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:27:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 311CE1C2C65B
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5241C6884;
-	Wed, 27 Mar 2024 12:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9CB136E08;
+	Wed, 27 Mar 2024 12:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mB+8y+Mb"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EJMw9/TA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1071C5AB7
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D2414A62F;
+	Wed, 27 Mar 2024 12:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711543604; cv=none; b=ms2S+lEr4aOdLnpmceRs3H2hH/huTf1JuCh72YKuUCaDTUoA9vxQnZz+TcaJevLZUSzI9JVCNhQEhPvCDqjFNC2OnvjEdTFX75YONxhmOb9DrjqBHGAo7+6fAcXARykFYHjkUVZLS8zh7/+ZN0T6CPNVeZ4ml+2lOmgRFhb89Gw=
+	t=1711543498; cv=none; b=jIk6siq8qoD5jwOybKj/m6knrcxrqGyxH1DO0+9T8D4T0ovoUCW5ygAMQMLGBgP0YpsWa/8gBDPI/HD952lXEn3fCoSRP8XWqdnFNY7shxIvtXvFlhusEMEWN6kt3ad9NNKdABG3bI2a0jXcC9fkj69ycbTiv/N3qc237Nk7Nq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711543604; c=relaxed/simple;
-	bh=+b7HD7blN2XR0vp569P7KUgZ+rP9RZRo3/7Ljc6RdPk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Gd7DEyjVvn7jE5unUkyJxQiObhcNke6PqXIlwNPKQEAOGP0xy6xjS1Uy2MHsMDYMFOvUt+cY1NLARzUyGVOs0CslecPDl2gZsLshohrGFBWBOTNj0vyBzRUgzOglj67s2wJ1i2luW3LKRSKJKlR7bDgLDxedbQP+KXMAyyCcd+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mB+8y+Mb; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a470d7f77eeso848059966b.3
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 05:46:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711543600; x=1712148400; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TImcoBJxfXGIQgqj3n4MKEXII2pXosMotms9pHsJzXs=;
-        b=mB+8y+MbQ5b4xCQhL5oKRf/rZChAFoUdzVzedv7+FxYhmcK1WhPa3CceQVP4wH8Tl/
-         zRBBH6OzQ7vSoMkaR8/Uj6h/5jXNMlCrTApGXivvLZ1Q2F3PWPVfnLVfWHeKbjn6AlmY
-         FyyilVRPS9xVI4gJ3jvyz8UDHCnjE2iIzBup9EEU+2JDYwcPxg0shBAPcU1o4GE6bQmq
-         1sh6idy/gO6T6Z37tvE8VjguVXMn04oueZYA7uiuYYJSPceMDdMS4XwEubfnB4xGQjp9
-         ZhRgsJIhI97DBOM6tnVIgSCPUziy4LkmNuJq8gAu3yKXvY9+tI1ksHuPbJc7H/bev3/7
-         K5Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711543600; x=1712148400;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TImcoBJxfXGIQgqj3n4MKEXII2pXosMotms9pHsJzXs=;
-        b=PGeRjD14gOEFy76smkIUm2PelEUfdYFYQoIi52TImgZUTBVqUH3eh9q6JJ6Ahk1itu
-         ih4/8joOWTDEPf6pzg7D7SfnExsbyrrW/maQ48pZO96N1mro5zJBszhgKAVth0BJVJZb
-         pMdEk7hsTRQqUO3+Up+xLEoSxfSbiQ9WfVQfHqfI7I/QPhhQDyDiOCFbgii40zmzzgIC
-         bbkcNyYZDttnASPqSt7bLwx8nqZiMb4EniIGJQ6MEjJ0zaIziONBBDbCLmNQ4ZW0pvSL
-         Pt3qE6Mty/yTrgpX3llyHE4c9cfq6tUAScKa99G1Tk+e8a/pG4Jaxqk00H69NfVNybC3
-         twNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVFQZc+JOOKc1vLtY6MLiJ+k9sMflUMB7FiqG5M3fJLjmjh9abujBSDAXpLgqUAAvTFOavPc/hdKjv9xtw0fpYrO1NMR/Zw
-X-Gm-Message-State: AOJu0YxobslM7AA9B5RQ9y/p4WbTFehq3T2WkfRzGhmAfXv60K9uSEnv
-	Eh2JBiH2coKkY3x77ILirKk6vEGPn6yt9opN1Dr8pGqYlHy+c+jrDo10yt5ricE=
-X-Google-Smtp-Source: AGHT+IHz3XNCa9vYxVdXv7C592UPDYjRtJdl/QW4qXpaVGK+f9EGoToWDlCo1tr4K4SuiD6SS2oOpw==
-X-Received: by 2002:a17:906:5847:b0:a47:1b77:7c4 with SMTP id h7-20020a170906584700b00a471b7707c4mr907960ejs.48.1711543599897;
-        Wed, 27 Mar 2024 05:46:39 -0700 (PDT)
-Received: from [127.0.1.1] ([178.197.206.205])
-        by smtp.gmail.com with ESMTPSA id gx16-20020a170906f1d000b00a4707ec7c34sm5379175ejb.166.2024.03.27.05.46.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 05:46:39 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Wed, 27 Mar 2024 13:41:12 +0100
-Subject: [PATCH 19/22] rpmsg: virtio: drop owner assignment
+	s=arc-20240116; t=1711543498; c=relaxed/simple;
+	bh=KVlZQj8XUXytiuallTU5/HL5sY9jCIpvzzH0zeKt83Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f3ORjcVRuV72E0gSBpwxkeSoN0l42OVebeTF8HwTkjlL2OknkVwBNvftBLxo0NqzQ+14MGhP0D1SaQKhKh2b+MHLaf4oPqNJpj+hwv+eCe/2NWXBH81MVjzL2I5BKlCfczisQPwxDzfrEjWU1Ab+a+wNwFovgpkXl/r3onZemnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EJMw9/TA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3Z065/I/LAJeMMl4zDwMUynhzEkIt59RXYcO6jgtIMk=; b=EJMw9/TA1wYV7JIcoHAuzkCiJ2
+	HufeCrgBWSCHMToIRIQ37ReXIp7lpICMVVy7ZEYrTS+D4LsBDCQjhiv7jfXQxvfq346cl4JAit+WN
+	n8OPb5GUx+wTpsdo30Zi82UdILDJnZ+a0TvxhBRx/5EqUisrL5fXRVfHquK6V6VylDVI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rpSe7-00BOLU-GL; Wed, 27 Mar 2024 13:44:47 +0100
+Date: Wed, 27 Mar 2024 13:44:47 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux@ew.tq-group.com,
+	Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: fix usable ports on 88e6020
+Message-ID: <b5abcd09-8dda-4a9a-b6b2-47c9a50faccf@lunn.ch>
+References: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240327-module-owner-virtio-v1-19-0feffab77d99@linaro.org>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
-In-Reply-To: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
- Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
- Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Olivia Mackall <olivia@selenic.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, 
- Arnd Bergmann <arnd@arndb.de>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, 
- Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
- Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>, 
- Gerd Hoffmann <kraxel@redhat.com>, 
- Gurchetan Singh <gurchetansingh@chromium.org>, 
- Chia-I Wu <olvaffe@gmail.com>, 
- Jean-Philippe Brucker <jean-philippe@linaro.org>, 
- Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
- Latchesar Ionkov <lucho@ionkov.net>, 
- Dominique Martinet <asmadeus@codewreck.org>, 
- Christian Schoenebeck <linux_oss@crudebyte.com>, 
- Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
- Dan Williams <dan.j.williams@intel.com>, 
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
- Ira Weiny <ira.weiny@intel.com>, 
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>, 
- Bjorn Andersson <andersson@kernel.org>, 
- Mathieu Poirier <mathieu.poirier@linaro.org>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
- Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-um@lists.infradead.org, 
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev, 
- kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
- linux-sound@vger.kernel.org, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=768;
- i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=+b7HD7blN2XR0vp569P7KUgZ+rP9RZRo3/7Ljc6RdPk=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmBBPqAdq/eg/PtMCEKo1gva2x7VgdnMT6C6Tep
- 2wGqe9FMdyJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgQT6gAKCRDBN2bmhouD
- 1/TJD/4qOl/HewPvOEL3qGcOWPCkSVABYFtSCCfDob4NTUwAYOsNZXbH02ywzlUMcBk5kU1U06e
- AkckuKvzdO/5ojXTRYDkDVHSyZ/6w/2Zete946WspuC9senP7Ez3D3YkNyAxCE+Sk2DVkmiCf2E
- CyINMhaAkygs+ceOFDbHwFTbo7vJVRYCTGaGRm542+GjfTkvYuWVg4xeDHg1ogRagShb3QsonMJ
- iM7hJlEEdxsNQj/ThY3v2hfTnTAx2YlEu+KeqadqilMq04KLM5rus3fTej4xY0P3Ne5G0IffMH1
- EveHiww1oViKjbvjP1s8KwwzV/hlVXkuLkEpSakHpjgTxlrBqrMB2RUdWwPDNaH/T6cC0lQxSHn
- PbZ7RdLNVmu6v4LPR9S1ncpMO//afg+3LNsPd20FwxOaCv3IEiUwKRbUqxkbjuSQH4iwKR6llkU
- IGcF4f5x4/q+EXK6r0Foa98dU3i91q5S1y0X+Fsyceaza2rKKZSTaxY46atCOCfkKWuYH+5+Uju
- 5UESG7t+HFinMBkI1h6Qjkyrz93J+YOK5IKd6DQYtK0YownJLLGBpupYua5HeUemtn1gA/b+4ci
- nrfmHTqXJfXn1sKxAPG+3hj2jFzFA2Ibj7vzIzNYNdcpR33XtvVIbUpTu2kE3HPXhlMaJh18Nxt
- 9eoqc6/7NrkIp+w==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
- fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
 
-virtio core already sets the .owner, so driver does not need to.
+On Tue, Mar 26, 2024 at 01:36:54PM +0100, Matthias Schiffer wrote:
+> From: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+> 
+> The switch has 4 ports with 2 internal PHYs, but ports are numbered up
+> to 6, with ports 0, 1, 5 and 6 being usable.
+> 
+> Fixes: 71d94a432a15 ("net: dsa: mv88e6xxx: add support for MV88E6020 switch")
+> Signed-off-by: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> ---
+> 
+> I was unfortunately too busy to notice the issue when the patch this
+> Fixes was resubmitted in my name. It would have been better to change
+> my From into a Based-on-patch-by or similar when modifying it - and the
+> final version obviously wasn't even tested on an 88E6020...
+> 
+> Best regards,
+> Matthias
+> 
+> 
+>  drivers/net/dsa/mv88e6xxx/chip.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+> index 9ed1821184ece..c95787cb90867 100644
+> --- a/drivers/net/dsa/mv88e6xxx/chip.c
+> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
+> @@ -5503,8 +5503,12 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+>  		.family = MV88E6XXX_FAMILY_6250,
+>  		.name = "Marvell 88E6020",
+>  		.num_databases = 64,
+> -		.num_ports = 4,
+> +		/* Ports 2-4 are not routed to pins
+> +		 * => usable ports 0, 1, 5, 6
+> +		 */
+> +		.num_ports = 7,
+>  		.num_internal_phys = 2,
+> +		.invalid_port_mask = BIT(2) | BIT(3) | BIT(4),
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+This patch does what the commit message suggests. So
 
----
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Depends on the first patch.
----
- drivers/rpmsg/virtio_rpmsg_bus.c | 1 -
- 1 file changed, 1 deletion(-)
+It would however be nice to fully understand how it currently works
+for the deployed use case, just to ensure we are not missing
+something.
 
-diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
-index 1062939c3264..e9e8c1f7829f 100644
---- a/drivers/rpmsg/virtio_rpmsg_bus.c
-+++ b/drivers/rpmsg/virtio_rpmsg_bus.c
-@@ -1053,7 +1053,6 @@ static struct virtio_driver virtio_ipc_driver = {
- 	.feature_table	= features,
- 	.feature_table_size = ARRAY_SIZE(features),
- 	.driver.name	= KBUILD_MODNAME,
--	.driver.owner	= THIS_MODULE,
- 	.id_table	= id_table,
- 	.probe		= rpmsg_probe,
- 	.remove		= rpmsg_remove,
-
--- 
-2.34.1
-
+    Andrew
 
