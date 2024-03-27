@@ -1,99 +1,90 @@
-Return-Path: <netdev+bounces-82665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46CAA88F009
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:26:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E00688F025
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 21:32:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C11AD1F2F600
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:26:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EB941F2CA8D
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 20:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C2914F13F;
-	Wed, 27 Mar 2024 20:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="BitdxUkR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FC7152168;
+	Wed, 27 Mar 2024 20:32:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8223A1EA95
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 20:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3ACB152E1C
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 20:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711571194; cv=none; b=H5MXxsel1JgD7h16T83u9J0kJsCuFB5bB15QkyGahD/6Wi6WKfQmDnGEk1VmIwa14gw4YE/I6YFNtykS/ef+6nKIWndYUJGc1eAsQ51XyE+70lAZx/ZwOMjeYn9Xg5zVDldrJF40pcWDTLMpme1BoQSguV2qnRam3XnsgnqO2GU=
+	t=1711571525; cv=none; b=EY50jYyQE/CGgaVYduSeYKXRhWU51+HxeyZe+Q2GFTfh5rcOPP3ZFglcV/2fXGYnVxZpxBxOQne3OpGtlL37/vOodsNjXa2ulwsR95jq8Ha3vidaNZmZbtKrft8Bjn73z3quFv+TH97P1RZHihtbEy89W1vjOTp8FGgOrhJUjGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711571194; c=relaxed/simple;
-	bh=bLG9VeyvVNGnJqtNYSCHif2KvKFQcLbPVwcRnQ1xnQ8=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=JPjQfNLT/zylEBm3c8kjV/NVytxDUeIl4jJLuOwvET3cYc8GCQicx9iVg0GATGRhdTXUYODM9AILDoCLIL+EY3HuTb4Fe1p93uA+56XD6VYSvXVetaPZqar+C8zI4gfpHfweP91hpUYH9PvcTQrVPL4avyq+jxXd13gUQnrnv58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=BitdxUkR; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56c36f8f932so2385249a12.0
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 13:26:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1711571191; x=1712175991; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=bLG9VeyvVNGnJqtNYSCHif2KvKFQcLbPVwcRnQ1xnQ8=;
-        b=BitdxUkR0VAs7tZY3WDJz1w19176XZrSRFOsUFaDma1+47ApXweebvwZxCOp4KxJ81
-         VjFtVDPWDPlxnyRqronWrs+wSCgFgDuiB7vks/mI6PbGUvZBIFp4TDkNDyp32Wz/Ea0t
-         G5q1mk8PGbBVdbzlQHY6rlDBGS8pxsDH4gdL3QEnJ2+8rQ2GltcuT6L8q8ruN89ckJ4J
-         5NxO7vScCmmaqEREHMMj4zx0LEDRUNkMkG2eBZEOxZAtoJ7Mu5JQMuuZwoEd3OpGlnyc
-         /p863LUJzsSaNDhB7qPSXfY0lTmVopNayQ5cXkwd9nxmuvujODJT86oWQjzyPmQluJQU
-         0ZoQ==
+	s=arc-20240116; t=1711571525; c=relaxed/simple;
+	bh=nRwlE/hA+5kIdWWS/56V+tZqn6E78CxeZd1m1w7AwQ4=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=NUY4uuF0lEdO8fVCjiGETWHWrZHZOYCxNFenEISyGoH2qdbl/zoqbO5CjCy6wNhgbW5DHm0J3NFRMrCMtc4x60+u+RzK3tvvG+HsFzu6q9lrCQfrlrJxatIiG7EJka+J3OXvWFZRkTQvAboqJ3MAfgZnC8L4dmAUlYD6DExhmmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c88a694b46so20704639f.1
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 13:32:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711571191; x=1712175991;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bLG9VeyvVNGnJqtNYSCHif2KvKFQcLbPVwcRnQ1xnQ8=;
-        b=HEFhQDBpfPN7VZWy68Od89DQWQ1u4cBANas4zo3v+Giy9CifDO9lfKmfcFHV33nG6v
-         F0F0Z7HNHU+ycm+x/+K1JJqd24DwNdBCNpYQYZImUmEhwwTjUIdsFYGe8lwIXUbqXtf8
-         j+/DG2Yi8zWXsjI9B9sskiPSQLPfft39evq6rZbvfBnbAlZRNLAHnVdyFYtetFl6OBO5
-         ePM7ARK0z6fNm5r3JCdPjT0zmkf9o1PirtyiVzqBZZTRAixVQeu4XDs8N6QxKkfnPiCH
-         Y3XflEl3IVQ9pZxA2R4W/OrFwwQUDRst+Wk5DFaE62VjiutVoP4HHAz5d+NfDPkHCkD4
-         /B7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXisMBWfkXtO8NY9oqgLksTXfukXjyTTVn+LIXc5p8DjzaShyimoZSbinXIXVzmv9LYPuh6x22GQOxJP8KvxPRv4D8TMSS7
-X-Gm-Message-State: AOJu0YzcOSI5zzjtHtjhBcu9ORhh4+vo+1QkknqAsa/NJkfyg0lRZcFw
-	2IQmBjE8eYCNBOMgTgOzb2nA6kNVh3mxHWALiQN7/sYKs2ih72FffcSdqxCMhcI=
-X-Google-Smtp-Source: AGHT+IENUoAEF16NAf5vS/425PRYUQHt5RNabK9zmWvd+HEO2gHJDsMCvv5ag/FfG8zcqaiByoRI1w==
-X-Received: by 2002:a17:906:b7d7:b0:a47:48d7:d393 with SMTP id fy23-20020a170906b7d700b00a4748d7d393mr303063ejb.33.1711571190765;
-        Wed, 27 Mar 2024 13:26:30 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:159])
-        by smtp.gmail.com with ESMTPSA id k18-20020a1709060cb200b00a455d78be5bsm5821054ejh.9.2024.03.27.13.26.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 13:26:30 -0700 (PDT)
-References: <20240325223905.100979-5-johannes@sipsolutions.net>
- <20240325190957.02d74258@kernel.org>
- <8eeae19a0535bfe72f87ee8c74a15dd2e753c765.camel@sipsolutions.net>
- <20240326073722.637e8504@kernel.org>
- <0dc633a36a658b96f9ec98165e7db61a176c79e0.camel@sipsolutions.net>
-User-agent: mu4e 1.6.10; emacs 29.2
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH 0/3] using guard/__free in networking
-Date: Wed, 27 Mar 2024 21:25:01 +0100
-In-reply-to: <0dc633a36a658b96f9ec98165e7db61a176c79e0.camel@sipsolutions.net>
-Message-ID: <87h6grbevf.fsf@cloudflare.com>
+        d=1e100.net; s=20230601; t=1711571523; x=1712176323;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GrIQKBS2v/d7YU14An08GRjqL5ZRUdHZeXnpNFfQdUk=;
+        b=FIDcLKz5uQ0K+4XX18ICQGkecDzl3aZExMKH3j/LdvAFawLgfGBsSw2jPgNThPkXj3
+         k1wxSRlmUBMvFePoMni+Rg7emxk5hPYS0kIz/OvAvdZtVunegOFORy/6FUzA1aSoocd2
+         pYoHIFsRZPqaSlvlxRTlHUTaG5AJz0ZvK3EOguBw7xiG/dHxuC8B1zKQsYlAm8t9j0VP
+         NRJok2R9gQSVz6QBlJrPiDBxIn0u/OzIEzefLC2EsNdBdSA61s4Om1/y7MPfcSeNEDh4
+         zo7Dimn6wbIbZa6wilhWlAcAXSfZGU+cEg8SmUcO/P30iDGtef4DqbyYwQJdm9tqs9Bx
+         yQUw==
+X-Forwarded-Encrypted: i=1; AJvYcCW10MhfOs27espGCdZrFlCAwWGmjLvc1t/KyqnjwEvQu0RNgvKv257a08JcFhlzh6VOLGAYihmD6aP5aOWUwX8rMP+T8IGE
+X-Gm-Message-State: AOJu0YyL7tWoSvFQ73K6AeovapCy/GMrBaKDCqRaDZ3iGhSBLjMZ4Jvd
+	oUkD/napkIRz645ZsDdDSO26QwEgVbVQnEL/aQfOj0rRYt4+RvEGaQxYuM6+9lu6YWd6LWCK5bB
+	pwJeOV0TLiAkdbRaT3TfLJYgVULMGoWtH1kQct1wDkx01O8gzLrpWotQ=
+X-Google-Smtp-Source: AGHT+IEv1GS0F1bIQIoueTKC7US/um1YmwFLw785Q/O0DHu40YUikpwnw4dFaz1J6Vc+zuxa3ZZur/MOvmSybjnXmQSPHjqMWXYb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Received: by 2002:a05:6602:2d81:b0:7c8:c7ec:2b71 with SMTP id
+ k1-20020a0566022d8100b007c8c7ec2b71mr4702iow.3.1711571523139; Wed, 27 Mar
+ 2024 13:32:03 -0700 (PDT)
+Date: Wed, 27 Mar 2024 13:32:03 -0700
+In-Reply-To: <87le63bfuf.fsf@cloudflare.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a50cbd0614aa4ceb@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] possible deadlock in ahci_single_level_irq_intr
+From: syzbot <syzbot+d4066896495db380182e@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Mar 26, 2024 at 04:33 PM +01, Johannes Berg wrote:
->> Is it also present in Rust or some such?
->
-> I have no idea. I _think_ Rust actually ties the data and the locks
-> together more?
+Hello,
 
-That is right. Nicely explained here:
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-https://marabos.nl/atomics/basics.html#rusts-mutex
+Reported-and-tested-by: syzbot+d4066896495db380182e@syzkaller.appspotmail.com
+
+Tested on:
+
+commit:         4dd65107 bpf: update BPF LSM designated reviewer list
+git tree:       bpf
+console output: https://syzkaller.appspot.com/x/log.txt?x=116d23e6180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5826764df8e788a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=d4066896495db380182e
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1593c145180000
+
+Note: testing is done by a robot and is best-effort only.
 
