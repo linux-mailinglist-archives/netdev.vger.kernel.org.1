@@ -1,75 +1,62 @@
-Return-Path: <netdev+bounces-82386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F9A88D815
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:55:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF24588D818
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:56:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133C81C260F9
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:55:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F15C81C2612D
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5432D04C;
-	Wed, 27 Mar 2024 07:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57611286BF;
+	Wed, 27 Mar 2024 07:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v60OY88s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWQUD/la"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B822C85C
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3F54C81
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711526076; cv=none; b=HWr4XxYEYA21rullvlBYnf1dgSXfd/aB+MBPJVYJmMhlZXt9iStBkAjaf/VzHuozwJl12yat7ruP2Ph7ola/DlxnhZs1eUMLKWix+ibgLvuC7FQbQh04K7bNQVMjDStzTWTKM077v7LOa0InBG+SDwJjNtLqRrHj0Azqkxc9O2o=
+	t=1711526193; cv=none; b=u5LwD7WCqBKUFBR3BpgGcPeyjCyWXFaqlEClIeSnRURCiF1TJkUJIsK0vyNAouh+AX0bMVw2a6ws1scN+yTMJIfAZQbUvk9b9brAUW7ZwvXwENmEPMmK7Tt22+gMdaCSLnrPaM8vIXuvO7Qg0Tuc33OBbUY9nr5ZqlXi+9pUVPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711526076; c=relaxed/simple;
-	bh=8+LLbp43q+hfjs5ymAg8kij5Hy4bzN7T0M9/FvwxK/A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gBf6T20D0YXR0+VWLZLyn0rJxrS+957sEv6gtSWyRQWyiLrnK/MMpJEsLLSvQtZIqLen7ENo/kJxyPJkJ3vPlqcyIiWFwAC1P/LmP+j8sy9bTpGGDWF3G9uBG/0otAtgqjA39J+td3kcXuYqeh1+cHF5tFs5HNAExUvS6tK4YCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=v60OY88s; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a470d7f77eeso810335766b.3
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 00:54:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711526073; x=1712130873; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=47TQHK5tr4oTWKeoCO4xhTxaiIGWWamQR+oyvM1xDdo=;
-        b=v60OY88slB3WWgOZk9tX2EWz90zEUQZP5G0S6qDo44HUnyC9VDLn8yVzkR6+srqjGX
-         /EGRDlGvNUq4trI4aaW/dbENfGQZ3gmzHZ8uOAUzv7A9yDLyDwiRlnBFPVtUWG+/5aqI
-         Gjdj8ObVIlvtZqpriPk7YWGxPLkEyCpeHz9iau+GbHB8qjUJqgr95ZPoscFpGKdLK/pS
-         636+kkvwotGqmIc/2crX+GHWargLVM/tk7T2fcyRJahZ9RJFZK1U1R45uN93XeuNOPNN
-         o+CoGf9KRL8L/m5dxVJyGn3HB4pS0ZsIhutQUQE21ueFL26dX1nAuEM7vRP7nkBQA7zX
-         8xzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711526073; x=1712130873;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=47TQHK5tr4oTWKeoCO4xhTxaiIGWWamQR+oyvM1xDdo=;
-        b=Y1zY8bp3nldu/LQcNUpQDdxflq8Ewrtcl4M5g8nE7IzLtO7ZQdjv/IjCNXKJZv8QR1
-         QI3NP71Kgmvt5fqTsj6esszbEkxINrfUPncwCcPRPaVLXB5KGYguozbFyPZYx91UbXQS
-         CKRIFpmU/iFELby8PNH6kecEYqVAaMvem+BXNIflioyoozQS56nxNwURXdrrpKkyWTMN
-         7SCOeguj/TFwabG2xo6S/Q1Pietua9yntqthPpS8bSXKyp5MJjelQBbGlEYIHYQG39ji
-         QoTIsqPmvAX+cYGUTFL85Kla8XhEUfUMJQDIZfJarHSCZeMtthUixU6D53UCn2bfxBrO
-         8sCg==
-X-Forwarded-Encrypted: i=1; AJvYcCVirabWwFwBMHWPkdB9bPNmOE/CiuhDL+K0XL7jbj24XCmdqoYB1N2r6VohJybHUGH+xQsZ11bmVNC8w/zmrgCQccHxY0yi
-X-Gm-Message-State: AOJu0YxRhooG38a+Ay82WOgo58MaqvDqocZyG3RZ+o5KqEBMsXXqGTaB
-	tWw6kHIKRo5kvEYQ3VGXbllNnC8osz3D6LEGL3eFHw7XSscrGvKUJ+u7IzL4HaY=
-X-Google-Smtp-Source: AGHT+IGSGtVU28nMbjqAjMEL6UzKByu3jHiyksyRt9/sCk4+2cUceRaHHMh3EOBzRtNVFspvoIIByQ==
-X-Received: by 2002:a17:906:b2c9:b0:a48:7cbd:8b13 with SMTP id cf9-20020a170906b2c900b00a487cbd8b13mr305312ejb.52.1711526073300;
-        Wed, 27 Mar 2024 00:54:33 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.206.205])
-        by smtp.gmail.com with ESMTPSA id kh11-20020a170906f80b00b00a4df6442e69sm1394491ejb.152.2024.03.27.00.54.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 00:54:32 -0700 (PDT)
-Message-ID: <31ac366d-bfa6-4c99-a04d-ab9fb029da7e@linaro.org>
-Date: Wed, 27 Mar 2024 08:54:30 +0100
+	s=arc-20240116; t=1711526193; c=relaxed/simple;
+	bh=C4U0eqAmnNBrofU/o36p66DJsXqi1eYto3VlCqQ5c9s=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IOTy2ZCVn5POVIA32XaaiCz1bIdwTpkYVMteBoNGnoKOemrjelH8ghABCyYaik8xpOVjehCIJBW1T0QtDDe3Ti0A+lGNx5B+GZi6F89tuJoeI3f48PITz5hZYNNhnCmuMXKRZAM5qQHd+jF80NM9XslIhltkTg3IpW3tRgz5oFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iWQUD/la; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711526190;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sWGB2LdKUChFqfU8um7pkDBwNPH94X6nDV81R4tdCC4=;
+	b=iWQUD/la7YhOv0kzmDdTyZEMea0Ocd0JoZ7yDFn67SnkVCHF2M+v+bhmo+WeoNOebSkcki
+	DRyPRzHnZL1CN69kcISgb6xoLqBitOLinhs+z7EWhy+nuAyAG34z2qeaSg27R4VP4AaCze
+	M90lGuZSqCRvo+VgemlyXO36V4E58Q8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-678-wu8tkoviPh28arYMlnYIGg-1; Wed, 27 Mar 2024 03:56:28 -0400
+X-MC-Unique: wu8tkoviPh28arYMlnYIGg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5D3B885A58C;
+	Wed, 27 Mar 2024 07:56:28 +0000 (UTC)
+Received: from [10.45.224.197] (unknown [10.45.224.197])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C4D87492BD4;
+	Wed, 27 Mar 2024 07:56:26 +0000 (UTC)
+Message-ID: <4e9e2877-7fa1-44e5-9ca5-8397197bf725@redhat.com>
+Date: Wed, 27 Mar 2024 08:56:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,161 +64,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/1] dt-bindings: net: starfive,jh7110-dwmac: Add
- StarFive JH8100 support
-To: Tan Chun Hau <chunhau.tan@starfivetech.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Emil Renner Berthing <kernel@esmil.dk>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Simon Horman <horms@kernel.org>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Andrew Halaney <ahalaney@redhat.com>, Jisheng Zhang <jszhang@kernel.org>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Russell King <rmk+kernel@armlinux.org.uk>
-Cc: Ley Foon Tan <leyfoon.tan@starfivetech.com>,
- Jee Heng Sia <jeeheng.sia@starfivetech.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org
-References: <20240327015750.226349-1-chunhau.tan@starfivetech.com>
- <20240327015750.226349-2-chunhau.tan@starfivetech.com>
+Subject: Re: [PATCH iwl-next v2 0/7] i40e: cleanups & refactors
 Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240327015750.226349-2-chunhau.tan@starfivetech.com>
-Content-Type: text/plain; charset=UTF-8
+From: Ivan Vecera <ivecera@redhat.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mschmidt@redhat.com, aleksandr.loktionov@intel.com,
+ jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+References: <20240327074833.8701-1-ivecera@redhat.com>
+In-Reply-To: <20240327074833.8701-1-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On 27/03/2024 02:57, Tan Chun Hau wrote:
-> Add StarFive JH8100 dwmac support.
-> The JH8100 dwmac shares the same driver code as the JH7110 dwmac
-> and has only one reset signal.
+
+
+On 27. 03. 24 8:48, Ivan Vecera wrote:
+> This series do following:
+> Patch 1 - Removes write-only flags field from i40e_veb structure and
+>            from i40e_veb_setup() parameters
+> Patch 2 - Refactors parameter of i40e_notify_client_of_l2_param_changes()
+>            and i40e_notify_client_of_netdev_close()
+> Patch 3 - Refactors parameter of i40e_detect_recover_hung()
+> Patch 4 - Adds helper i40e_pf_get_main_vsi() to get main VSI and uses it
+>            in existing code
+> Patch 5 - Consolidates checks whether given VSI is the main one
+> Patch 6 - Adds helper i40e_pf_get_main_veb() to get main VEB and uses it
+>            in existing code
+> Patch 7 - Adds helper i40e_vsi_reconfig_tc() to reconfigure TC for
+>            particular and uses it to replace existing open-coded pieces
 > 
-> Please refer to below:
+> Changes since v1:
+> - adjusted titles for patches 2 & 3
 > 
->   JH8100: reset-names = "stmmaceth";
->   JH7110: reset-names = "stmmaceth", "ahb";
->   JH7100: reset-names = "ahb";
+> Ivan Vecera (8):
+>    i40e: Enforce software interrupt during busy-poll exit
+>    i40e: Remove flags field from i40e_veb
+>    i40e: Refactor argument of several client notification functions
+>    i40e: Refactor argument of i40e_detect_recover_hung()
+>    i40e: Add helper to access main VSI
+>    i40e: Consolidate checks whether given VSI is main
+>    i40e: Add helper to access main VEB
+>    i40e: Add and use helper to reconfigure TC for given VSI
 > 
-> Example usage of JH8100 in the device tree:
+>   drivers/net/ethernet/intel/i40e/i40e.h        |  30 ++-
+>   drivers/net/ethernet/intel/i40e/i40e_client.c |  28 +--
+>   drivers/net/ethernet/intel/i40e/i40e_ddp.c    |   3 +-
+>   .../net/ethernet/intel/i40e/i40e_debugfs.c    |  36 +--
+>   .../net/ethernet/intel/i40e/i40e_ethtool.c    |  29 ++-
+>   drivers/net/ethernet/intel/i40e/i40e_main.c   | 205 ++++++++++--------
+>   drivers/net/ethernet/intel/i40e/i40e_ptp.c    |   6 +-
+>   .../net/ethernet/intel/i40e/i40e_register.h   |   3 +
+>   drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  98 ++++++---
+>   drivers/net/ethernet/intel/i40e/i40e_txrx.h   |   3 +-
+>   .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  14 +-
+>   11 files changed, 282 insertions(+), 173 deletions(-)
 > 
-> gmac0: ethernet@16030000 {
->         compatible = "starfive,jh8100-dwmac",
->                      "starfive,jh7110-dwmac",
->                      "snps,dwmac-5.20";
->         ...
-> };
-> 
-> Signed-off-by: Tan Chun Hau <chunhau.tan@starfivetech.com>
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
->  .../bindings/net/starfive,jh7110-dwmac.yaml   | 29 +++++++++++++++----
->  2 files changed, 25 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 6b0341a8e0ea..a6d596b7dcf4 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -97,6 +97,7 @@ properties:
->          - snps,dwxgmac-2.10
->          - starfive,jh7100-dwmac
->          - starfive,jh7110-dwmac
-> +        - starfive,jh8100-dwmac
 
-I think that's not needed. You have there already your fallback.
+Please ignore this... Wrong series with extra patch. Need to resubmit.
 
->  
->    reg:
->      minItems: 1
-> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> index 0d1962980f57..5805a58c55d1 100644
-> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> @@ -18,6 +18,7 @@ select:
->          enum:
->            - starfive,jh7100-dwmac
->            - starfive,jh7110-dwmac
-> +          - starfive,jh8100-dwmac
-
-Same here, even more obvious.
-
->    required:
->      - compatible
->  
-> @@ -30,6 +31,10 @@ properties:
->        - items:
->            - const: starfive,jh7110-dwmac
->            - const: snps,dwmac-5.20
-> +      - items:
-> +          - const: starfive,jh8100-dwmac
-> +          - const: starfive,jh7110-dwmac
-> +          - const: snps,dwmac-5.20
->  
->    reg:
->      maxItems: 1
-> @@ -116,11 +121,25 @@ allOf:
->            minItems: 3
->            maxItems: 3
->  
-> -        resets:
-> -          minItems: 2
-> -
-> -        reset-names:
-> -          minItems: 2
-> +      if:
-
-I would personally avoid nesting if within if. It gets unreadable.
-Although Rob did not comment on this one, so I guess it is fine.
-
-Best regards,
-Krzysztof
+Ivan
 
 
