@@ -1,239 +1,203 @@
-Return-Path: <netdev+bounces-82384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5AC88D80C
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:54:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66EAA88D810
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 08:55:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 303D31C26053
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:54:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A1031C26100
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 07:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B212E644;
-	Wed, 27 Mar 2024 07:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0136F2C6A7;
+	Wed, 27 Mar 2024 07:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mBdwjkqw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e29rVE4D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5A82E651;
-	Wed, 27 Mar 2024 07:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCD92E651
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 07:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711525819; cv=none; b=fb7DIMoEfXcy8viV0fgq66QCFvxrq6+3AWcCynza4hqULrPrVdy5bJQU1OB3TKcoLHXKt/8bQgUUiXHEgrbTeXp842qjtP0+4QcYE2uMhwAmPKc7PTcUWzuwbXHKsrKddukXKOKk1WDKgp0Wc+miQsRyQDcIUoyGG6him+fI2Wc=
+	t=1711525833; cv=none; b=f3QFbRmyQpCQFapucgTfrZYjssZaFV0EhTWj99oefdLmND/BrkJWA0b4rpPK6tg5XTbGq7Y7qpcQTHMgoOx5VbhjCtCCtq3XrEu7/hofhx6BxtkeKcO0LNJNmYIE4fHFOJ0sQc+jRKK7QY2h/N0hd/m/AAtL9pQZGqoLF+xCPIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711525819; c=relaxed/simple;
-	bh=+I0dUNOdZGkwtBeC0T1EU1TrsDrWBxEiMA9XkoJPZrg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=A6Ghz/AYm4Zg5LvKYaDlxauccQlV19cW/f1PCDce9tXxt88rgc5sAFIpg2e5/RSWORcPVHXXNBklREqVuthV4OeUus1AXjCGFDFL44UYwglYys9FL1Maae666IZ+uYqC+hH6G5Z55Jj5kjYHPyLQ/tnKIk3rOU9+tjd+ogmA6ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mBdwjkqw; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711525817; x=1743061817;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=+I0dUNOdZGkwtBeC0T1EU1TrsDrWBxEiMA9XkoJPZrg=;
-  b=mBdwjkqwAsAxs3oi7apG/3ZtBkcnGikAWzoehoPZOkbTYpetrxHWvsfX
-   +eph1azzxHrFfNAOe6p3LmfchINcPPToWi/uSzbVnwVpruMnB9sCEFaLe
-   6Vtjlt2UVeYpyuHgis9/Bamdy7vhl6jo6xfrokuGIgi5DF76sHeH3ViIA
-   0CyFfaC5yKldgVT8vTWq1tQLAx7V1Zzt5Qh37mN1+jSMm7ppYAORBtgoZ
-   CvpJr8zEtA9Lw8dPHV/iPBMlmZCOWcE7GDpphatxEOVFPHAUqnLxZNonI
-   wQEAoOq8KpfgzUnoQhZbRHqTqka+psUEpRumluka9xe1SnEhxqH4FODgt
-   Q==;
-X-CSE-ConnectionGUID: MsyQbz5AQHy8y68fVaLnuQ==
-X-CSE-MsgGUID: hocw4mZkQ2y001r8rNwlqA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="6467190"
-X-IronPort-AV: E=Sophos;i="6.07,158,1708416000"; 
-   d="scan'208";a="6467190"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 00:50:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,158,1708416000"; 
-   d="scan'208";a="16277502"
-Received: from mmazilu-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.56.43])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 00:50:08 -0700
-From: Jani Nikula <jani.nikula@linux.intel.com>
-To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
- linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>,
- Harry Wentland <harry.wentland@amd.com>, Alex Deucher
- <alexander.deucher@amd.com>, Christian =?utf-8?Q?K=C3=B6nig?=
- <christian.koenig@amd.com>,
- Lucas De Marchi <lucas.demarchi@intel.com>, Oded Gabbay
- <ogabbay@kernel.org>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
- Thomas Zimmermann <tzimmermann@suse.de>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Jeffery
- <andrew@codeconstruct.com.au>, Linus Walleij <linus.walleij@linaro.org>,
- Joel Stanley <joel@jms.id.au>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Andrew Morton
- <akpm@linux-foundation.org>, Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nicolas@fjasle.eu>, dri-devel@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-mm@kvack.org, llvm@lists.linux.dev
-Subject: Re: [PATCH 01/12] kbuild: make -Woverride-init warnings more
- consistent
-In-Reply-To: <cb853762-06d4-401c-a1c8-07a0c031b499@app.fastmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20240326144741.3094687-1-arnd@kernel.org>
- <20240326144741.3094687-2-arnd@kernel.org> <87jzlohhbc.fsf@intel.com>
- <cb853762-06d4-401c-a1c8-07a0c031b499@app.fastmail.com>
-Date: Wed, 27 Mar 2024 09:50:05 +0200
-Message-ID: <87edbwglle.fsf@intel.com>
+	s=arc-20240116; t=1711525833; c=relaxed/simple;
+	bh=G4gBxI9rnfFMlIO3v/jwuSxookG3kaOjTJgRf/Y/wfo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bUGnyLx17aJmr8Ki2MD7ik0QtLph63KE9hUr2NYMyoGG/mj1RiNOUD8VWu4FGVvoUZqNeIHBdkEQ5r6uNMKJT9+AmBcon10RD2MvCMVZ9CF28B4rxnmGHg50tVG9IQM57yH1ndzUF9p7xDBPcyKO4M9aJvf68gfo0OLFfc4G3x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e29rVE4D; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711525830;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=leNaeVEeegZNAyCWujLBBYSGN9KTxodCNVdWyzvOBB0=;
+	b=e29rVE4DGAsb8gx/2KGhx9Oo8fLRIGKyUObm4nN7d3QWaCWk0XkplDCyeu19BA9vFDXitO
+	8MEdiPdK20Qs8fgBRDReHAr5OSLBjlg52lhAxeAO3VHtGQlomH05lPjtW7BrTyNay7M/vj
+	orliHBt3CMngdZzfHyAVNN2uVMV+rBo=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-589-7JhTJexPOSq7pfCg5VpGVw-1; Wed, 27 Mar 2024 03:50:29 -0400
+X-MC-Unique: 7JhTJexPOSq7pfCg5VpGVw-1
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6e6cbb27964so3891119a34.2
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 00:50:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711525828; x=1712130628;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=leNaeVEeegZNAyCWujLBBYSGN9KTxodCNVdWyzvOBB0=;
+        b=NZmPwUqeOpe9NWQPmSB3To4BDwBvDa8R1ItW/Udm3NyPAckYHv2Ja2l5e8U/vKy70t
+         j9zpFRPaeeswaSjpr635vzsTZcFNmrUKDWtIMIugg70Z6WKDF3atPpHEQv1EMtE71Mlu
+         eovcv+TPGjys5FfT8f1o82mXwHUg8ZsPVlSB8tHa0En4LITNEK5ETQtdGv0CfwMbfcLV
+         TKoYTgdDCSM1HxKFPbr3Gt6i9OVzgyyMFPW2Us5IARYsKsu33RgP0ZnEliALwqi2zFwF
+         NUqriK7pqa1TOcSxEfMyUJd2Ylxvk9/6sm4riufyG1Ebk0JvjX1Sfh+snT/9Y8n/rI5l
+         Bs7w==
+X-Forwarded-Encrypted: i=1; AJvYcCULOS9idVo5tCNI03WOnzPvufl4BcwOcKgJMG01wpNmim4Gzp8brGMBHMvaeJpv0GbWRdAA5U8vPDr5k1qTTuwoN+lLO6nk
+X-Gm-Message-State: AOJu0Yx3nK0311dXA5s/HwXaee1fmtbpnDi8xN2ImHtUNBqhv6/PMeA6
+	OZVXLDoQEUX7SLDFDpiVuobHMwTCSGcoI5GEWox98SZyOns1cfEFO4Q4YLQXxi2EZA/KOSIu07c
+	8Eubbs2NmpNa3Wg9HYbw92/wUxrTWyXqDbiOU19q2s3wyKGc6J43IA6PQidiM8XYZtJFw+FFx9+
+	ljwejwblB2rSSFsqj4tKm119lke56SnQakR51dF3w=
+X-Received: by 2002:a05:6808:3a1b:b0:3c3:d459:d849 with SMTP id gr27-20020a0568083a1b00b003c3d459d849mr2463789oib.27.1711525828306;
+        Wed, 27 Mar 2024 00:50:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFIwlaV3wv9ZkE1tKICeIHrGUIEjqVJum9I6Gwneza/2HcRBp/yllRKFNMqZogdirZl+9w0LsR5VG9mSD4vDXQ=
+X-Received: by 2002:a05:6808:3a1b:b0:3c3:d459:d849 with SMTP id
+ gr27-20020a0568083a1b00b003c3d459d849mr2463778oib.27.1711525828020; Wed, 27
+ Mar 2024 00:50:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240325085428.7275-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEtEWCjb8+Zcfizij2+0ef-wb8YJD2bfyAvP_72hKZrGvA@mail.gmail.com> <1711523698.8996527-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1711523698.8996527-2-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 27 Mar 2024 15:50:17 +0800
+Message-ID: <CACGkMEvzMKyYTNwCwept1HJKLM8FZBa2FZq1oyQ0tFVL2TvMeQ@mail.gmail.com>
+Subject: Re: [PATCH vhost v5 00/10] virtio: drivers maintain dma info for
+ premapped vq
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 26 Mar 2024, "Arnd Bergmann" <arnd@arndb.de> wrote:
-> On Tue, Mar 26, 2024, at 21:24, Jani Nikula wrote:
->> On Tue, 26 Mar 2024, Arnd Bergmann <arnd@kernel.org> wrote:
->>> From: Arnd Bergmann <arnd@arndb.de>
->>> index 475e1e8c1d35..0786eb0da391 100644
->>> --- a/drivers/net/ethernet/renesas/sh_eth.c
->>> +++ b/drivers/net/ethernet/renesas/sh_eth.c
->>> @@ -50,7 +50,7 @@
->>>   * the macros available to do this only define GCC 8.
->>>   */
->>>  __diag_push();
->>> -__diag_ignore(GCC, 8, "-Woverride-init",
->>> +__diag_ignore_all("-Woverride-init",
->>>  	      "logic to initialize all and then override some is OK");
->>
->> This is nice because it's more localized than the per-file
->> disable. However, we tried to do this in i915, but this doesn't work for
->> GCC versions < 8, and some defconfigs enabling -Werror forced us to
->> revert. See commit 290d16104575 ("Revert "drm/i915: use localized
->> __diag_ignore_all() instead of per file"").
+On Wed, Mar 27, 2024 at 3:16=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
 >
-> It works now.
+> On Tue, 26 Mar 2024 14:35:21 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Mon, Mar 25, 2024 at 4:54=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > As discussed:
+> > >
+> > > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3=
+rHYqRZxYg@mail.gmail.com
+> > >
+> > > If the virtio is premapped mode, the driver should manage the dma inf=
+o by self.
+> > > So the virtio core should not store the dma info. We can release the =
+memory used
+> > > to store the dma info.
+> > >
+> > > For virtio-net xmit queue, if the virtio-net maintains the dma info,
+> > > the virtio-net must allocate too much memory(19 * queue_size for per-=
+queue), so
+> > > we do not plan to make the virtio-net to maintain the dma info by def=
+ault. The
+> > > virtio-net xmit queue only maintain the dma info when premapped mode =
+is enable
+> > > (such as AF_XDP is enable).
+> > >
+> > > So this patch set try to do:
+> > >
+> > > 1. make the virtio core to do not store the dma info when driver can =
+do that
+> > >     - But if the desc_extra has not dma info, we face a new question,
+> > >       it is hard to get the dma info of the desc with indirect flag.
+> > >       For split mode, that is easy from desc, but for the packed mode=
+,
+> > >       it is hard to get the dma info from the desc. And hardening
+> > >       the dma unmap is safe, we should store the dma info of indirect
+> > >       descs when the virtio core does not store the bufer dma info.
+> > >
+> > >       The follow patches to this:
+> > >          * virtio_ring: packed: structure the indirect desc table
+> > >          * virtio_ring: split: structure the indirect desc table
+> > >
+> > >     - On the other side, in the umap handle, we mix the indirect desc=
+s with
+> > >       other descs. That make things too complex. I found if we we dis=
+tinguish
+> > >       the descs with VRING_DESC_F_INDIRECT before unmap, thing will b=
+e clearer.
+> > >
+> > >       The follow patches do this.
+> > >          * virtio_ring: packed: remove double check of the unmap ops
+> > >          * virtio_ring: split: structure the indirect desc table
+> > >
+> > > 2. make the virtio core to enable premapped mode by find_vqs() params
+> > >     - Because the find_vqs() will try to allocate memory for the dma =
+info.
+> > >       If we set the premapped mode after find_vqs() and release the
+> > >       dma info, that is odd.
+> > >
+> > >
+> > > Please review.
+> > >
+> > > Thanks
+> >
+> > This doesn't apply cleany on vhost.git linux-next branch.
+> >
+> > Which tree is this based on?
 >
-> The original __diag_ignore_all() only did it for gcc-8 and above
-> because that was initially needed to suppress warnings that
-> got added in that version, but this was always a mistake.
 >
-> 689b097a06ba ("compiler-gcc: Suppress -Wmissing-prototypes
-> warning for all supported GCC") made it work correctly.
+> Sorry. That is on the top of "[PATCH vhost v5 0/6] refactor the params of
+> find_vqs()".
+>
+> Lore-URL: http://lore.kernel.org/all/20240325090419.33677-1-xuanzhuo@linu=
+x.alibaba.com
+>
+> Thanks.
 
-Oh, nice! Then I think we'd like to go back to __diag_ignore_all() in
-i915 and xe.
+I've tried that but it doesn't work:
 
-The diff is below. I'm fine with you squashing it to your patch, or if
-you want me to turn it into a proper patch for you to pick up in your
-series, that's fine too. Just let me know.
+% git am ~/Downloads/\[PATCH\ vhost\ v5\ 01_10\]\ virtio_ring_\
+introduce\ vring_need_unmap_buffer.eml
+Applying: virtio_ring: introduce vring_need_unmap_buffer
+error: patch failed: drivers/virtio/virtio_ring.c:2080
+error: drivers/virtio/virtio_ring.c: patch does not apply
+Patch failed at 0001 virtio_ring: introduce vring_need_unmap_buffer
+hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
 
-BR,
-Jani.
+I'm using vhost.git linux-next branch, HEAD is
 
-Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+commit 56e71885b0349241c07631a7b979b61e81afab6a
+Author: Maxime Coquelin <maxime.coquelin@redhat.com>
+Date:   Tue Jan 9 12:10:24 2024 +0100
 
+    vduse: Temporarily fail if control queue feature requested
 
-diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
-index 3ef6ed41e62b..87d6ba8d2341 100644
---- a/drivers/gpu/drm/i915/Makefile
-+++ b/drivers/gpu/drm/i915/Makefile
-@@ -32,11 +32,6 @@ endif
- # Enable -Werror in CI and development
- subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
- 
--# Fine grained warnings disable
--CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
--CFLAGS_display/intel_display_device.o = $(call cc-disable-warning, override-init)
--CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
--
- # Support compiling the display code separately for both i915 and xe
- # drivers. Define I915 when building i915.
- subdir-ccflags-y += -DI915
-diff --git a/drivers/gpu/drm/i915/display/intel_display_device.c b/drivers/gpu/drm/i915/display/intel_display_device.c
-index c02d79b50006..b8903bd0e82a 100644
---- a/drivers/gpu/drm/i915/display/intel_display_device.c
-+++ b/drivers/gpu/drm/i915/display/intel_display_device.c
-@@ -17,6 +17,9 @@
- #include "intel_display_reg_defs.h"
- #include "intel_fbc.h"
- 
-+__diag_push();
-+__diag_ignore_all("-Woverride-init", "Allow field initialization overrides for display info");
-+
- static const struct intel_display_device_info no_display = {};
- 
- #define PIPE_A_OFFSET		0x70000
-@@ -768,6 +771,8 @@ static const struct intel_display_device_info xe2_lpd_display = {
- 		BIT(INTEL_FBC_C) | BIT(INTEL_FBC_D),
- };
- 
-+__diag_pop();
-+
- /*
-  * Separate detection for no display cases to keep the display id array simple.
-  *
-diff --git a/drivers/gpu/drm/i915/display/intel_fbdev.c b/drivers/gpu/drm/i915/display/intel_fbdev.c
-index 99894a855ef0..43855c6c3509 100644
---- a/drivers/gpu/drm/i915/display/intel_fbdev.c
-+++ b/drivers/gpu/drm/i915/display/intel_fbdev.c
-@@ -135,6 +135,9 @@ static int intel_fbdev_mmap(struct fb_info *info, struct vm_area_struct *vma)
- 	return i915_gem_fb_mmap(obj, vma);
- }
- 
-+__diag_push();
-+__diag_ignore_all("-Woverride-init", "Allow field initialization overrides for fb ops");
-+
- static const struct fb_ops intelfb_ops = {
- 	.owner = THIS_MODULE,
- 	__FB_DEFAULT_DEFERRED_OPS_RDWR(intel_fbdev),
-@@ -146,6 +149,8 @@ static const struct fb_ops intelfb_ops = {
- 	.fb_mmap = intel_fbdev_mmap,
- };
- 
-+__diag_pop();
-+
- static int intelfb_create(struct drm_fb_helper *helper,
- 			  struct drm_fb_helper_surface_size *sizes)
- {
-diff --git a/drivers/gpu/drm/i915/i915_pci.c b/drivers/gpu/drm/i915/i915_pci.c
-index 1e69783ae4fd..405ca17a990b 100644
---- a/drivers/gpu/drm/i915/i915_pci.c
-+++ b/drivers/gpu/drm/i915/i915_pci.c
-@@ -38,6 +38,9 @@
- #include "i915_reg.h"
- #include "intel_pci_config.h"
- 
-+__diag_push();
-+__diag_ignore_all("-Woverride-init", "Allow field initialization overrides for device info");
-+
- #define PLATFORM(x) .platform = (x)
- #define GEN(x) \
- 	.__runtime.graphics.ip.ver = (x), \
-@@ -785,6 +788,8 @@ static const struct intel_device_info mtl_info = {
- 
- #undef PLATFORM
- 
-+__diag_pop();
-+
- /*
-  * Make sure any device matches here are from most specific to most
-  * general.  For example, since the Quanta match is based on the subsystem
-diff --git a/drivers/gpu/drm/xe/Makefile b/drivers/gpu/drm/xe/Makefile
-index 3c3e67885559..2f58faf0a79a 100644
---- a/drivers/gpu/drm/xe/Makefile
-+++ b/drivers/gpu/drm/xe/Makefile
-@@ -172,9 +172,6 @@ subdir-ccflags-$(CONFIG_DRM_XE_DISPLAY) += \
- 	-Ddrm_i915_gem_object=xe_bo \
- 	-Ddrm_i915_private=xe_device
- 
--CFLAGS_i915-display/intel_fbdev.o = $(call cc-disable-warning, override-init)
--CFLAGS_i915-display/intel_display_device.o = $(call cc-disable-warning, override-init)
--
- # Rule to build SOC code shared with i915
- $(obj)/i915-soc/%.o: $(srctree)/drivers/gpu/drm/i915/soc/%.c FORCE
- 	$(call cmd,force_checksrc)
+Thanks
 
--- 
-Jani Nikula, Intel
+>
+> >
+> > Thanks
+> >
+>
+
 
