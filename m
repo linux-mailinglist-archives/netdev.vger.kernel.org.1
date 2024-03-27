@@ -1,175 +1,220 @@
-Return-Path: <netdev+bounces-82604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A638088EAD0
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:13:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FBD088EAE6
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 17:16:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35D081F2D6B8
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:13:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F21421F33A8C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 16:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA097139CEE;
-	Wed, 27 Mar 2024 16:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D7612EBD5;
+	Wed, 27 Mar 2024 16:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPaQC+Ta"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="afq6nzfs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDAC13A255;
-	Wed, 27 Mar 2024 16:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1CE42A91;
+	Wed, 27 Mar 2024 16:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711555700; cv=none; b=fWy6dqkmcf0NBuBpzoyInJGJ01tHvwV9OPNlOuKFylH0Afb+UhvEzdPdSedIVIsW3DIaqRMLs/MWs7siheh3epQUB6/iRMc/37kZ69k5uL7MopBPPEcg96tOgrIyAkU/J9ZrF1R+UeXahjT2K2N9zqMrEbhwTgeB4wwPpsssD1E=
+	t=1711556177; cv=none; b=lO5vQ9Owg8p3Hvs72DSZ2x9lICrOs3YR8ckJc2bP73d1q4/bllIw7U1Ui0ZVxzoXQoreGubZEKA2QLXh2+mrzc2TFV76RiZDYFX+pkXUkE22JxgrmF4LcO6S6yo5br8RgePjGBe6ArrBQtyKLGnAekRgQqyyEhB7/L7PXyJqDp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711555700; c=relaxed/simple;
-	bh=0iO16U+RcaIQj4aVKcNwp6XirUs1x1b9+4YFmPwZvGk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dmiJ6lG+i5GuFUoifmO7QWVRJeFLpS40H9GmzHaMaeT3vl6//3t+L6rnPdc/9igcXRT6IKgJItA/jvrmmUKXyl7HRDevl9quzkkohenMq/blMnw45Up4PfakYbAXAvDVrpCcJfBpc8DcHi+vGcNTOuP5EVvNhbpotBCn7cfKzTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPaQC+Ta; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d46dd5f222so82577451fa.1;
-        Wed, 27 Mar 2024 09:08:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711555697; x=1712160497; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3CUv3CkTq//cWUwM4SJVOjx7HSDPtYW8lbxH5Dusfu0=;
-        b=VPaQC+TaMcY8Q7dBbnUJeMB5sYp8VrjZYPiJMQFKx+52GP+oAO2APAqtghNVlu1ZM6
-         MAshVGxOf++lOA9jzdGrcsPMN5+/sDxaVuBgkvhiri8wV2/ow8VHH/c/UEmgCLfDjgrZ
-         +RkS8dFGMUFYqA6MUmqBV6WofT0xJY/PZwJXt4sFv8l1TF2dF90FIGzSKlQctS6K2mjh
-         ui89FDdLxkwkw3+WoNe+ZHB6xAnLXJ8gbCJNm9EBxkR1f6RtXl5CfxwK8SSbbph/Pp7H
-         nFjCkMf+5YijPkMYOPgOUca59P6Ij2QNTxqN9wM8HdBY2nBwol17QNFqgRqpL64Fx5LT
-         bYvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711555697; x=1712160497;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3CUv3CkTq//cWUwM4SJVOjx7HSDPtYW8lbxH5Dusfu0=;
-        b=urIqav6J8OVP+iwa9cE4QIIEzlIajzfLqx6vO3sx9i5vYgCTWnFpx/wgIQriS7OJb4
-         TbPLtZTW6mcY8ruTOUGbkmNSIaBrXeyoXcKcQ85GdOmeHnGrNp/LMPnb5DWFBgj8Dnni
-         /66tiAO6K72g23qRsxuOoY4pDg1by+qG3A4nJCNfNkcXue2ge+B1Ms0oq49jgBE5dwJt
-         CVEdghablR9LGWAB6irUs9SAz1vMjPGOjifhuyghavUNIx9uPvRNu0p7E6HTjvu2B8W6
-         Q7t49eiTWOeVihWZt9242G5LbdOPhZSFeDv5HAkpkqeGxzQPlCqlcFF1poW+D3vaMulo
-         IkJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWicKr4cFTJPH8JBro5mb6j9+L3gL2oGrMMU0UxTL+PEKMuk8sE0Rv/zqaD1eK2Hp2CW8PIit4rviz0Ct64TdsgfpU4mv6RYEibjf4eDxFWsa+L3kk6ZA6pMaYe+QJJKle0A78rhqhdml2NB3tJui/blVui+LDoSe6/cKz/lDDhWYE5/RHO
-X-Gm-Message-State: AOJu0YzLnZV070K5eI6XbXm4mIKFHO1lI/N5v7un+R7wnBf/G7y8f91e
-	Qp5jvJlu8AKv+u9auVUZZQuH7RuEc2aIzmCtQpKPiccSr6LJpNwl
-X-Google-Smtp-Source: AGHT+IFzPUMFJ/CK9cR+qDyB9jS0Lqe2prJoSm3WpbtCPdC85ve6ooT6e0kSEkuhZJCLoZsPEXZhFg==
-X-Received: by 2002:a2e:99d3:0:b0:2d6:f127:f5e7 with SMTP id l19-20020a2e99d3000000b002d6f127f5e7mr362090ljj.21.1711555696459;
-        Wed, 27 Mar 2024 09:08:16 -0700 (PDT)
-Received: from debian ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id bn15-20020a056000060f00b00341e2802a30sm1669899wrb.98.2024.03.27.09.07.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 09:08:16 -0700 (PDT)
-Message-ID: <f314f3c5-0641-42e3-be56-3173fdcf0977@gmail.com>
-Date: Wed, 27 Mar 2024 17:07:46 +0100
+	s=arc-20240116; t=1711556177; c=relaxed/simple;
+	bh=On495Vosho8yghuPe/ZcVehrvgix78EySfxCo6i6kY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z+opMG5L+mMnnm9+EZpVPLYvhXkM+TZ/Oov3Wea/FE2H7hUd1ojdSGt5v8+H6bwfVo3t/puUXt43JPM+5EDVaLj9maqkM70U2YpEhaLpcRItvHrvrKsGJqNFGJVleo0Lg3jcwUWewKJJ4kARuqSHbt6p3IIsE1imUxEmbZhM2zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=afq6nzfs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5CADC433C7;
+	Wed, 27 Mar 2024 16:16:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711556177;
+	bh=On495Vosho8yghuPe/ZcVehrvgix78EySfxCo6i6kY8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=afq6nzfsTajwNl8LvbUonLyvoZy88ahtEF+Fkmr8Gp55VWkjLs02RvASLRTcGlPw9
+	 A3k0+c1v5Oru+8yj3BFHimVUIVe4OlixbdFKebF2ujjugw6eNhDo/O9u9W8H8tIN3l
+	 YydxW0Vv+8AEQLXDLSm04PLqYwyGSDe6yaspn7eTWUW80gV+PCVCEWC7il7Ul4mNrY
+	 SwqO6F0OkjmS2ihwcJsLxTCZShaQsiShwljjoSa214PxaVDT/DjdHpGCmWS9dlAORe
+	 v7dPwEHLncbOl4VOkta++OzMHyOOBBuAXEiCm2WRsWW2f74aR42cEmKBCqEIFLKCDP
+	 Q2VEXR1vc5xmg==
+Date: Wed, 27 Mar 2024 16:16:07 +0000
+From: Simon Horman <horms@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v6 12/16] PCI/pwrctl: add PCI power control core code
+Message-ID: <20240327161607.GQ403975@kernel.org>
+References: <20240325131624.26023-1-brgl@bgdev.pl>
+ <20240325131624.26023-13-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
- tcp_gro_receive
-To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, willemdebruijn.kernel@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20240325182543.87683-1-richardbgobert@gmail.com>
- <20240325182543.87683-5-richardbgobert@gmail.com>
- <CANn89iKzeTKuBA3NL0DQUmUHmmc0QzZ0X62DUarZ2Q7cKRZvSA@mail.gmail.com>
- <46e0c775-91e7-4bf6-88f3-53ab5e00414f@gmail.com>
- <CANn89iJkDbzLKmUGRHNFpfiaO8z19i44qgqkBA9Updt4QsRkyg@mail.gmail.com>
- <6566fd5f-fcdf-4dc7-b8a2-5e8a182f8c49@gmail.com>
- <d60c6185b8394da02479100981fa3f1306d9c81f.camel@redhat.com>
- <57bf675d-c2f0-4022-845c-166891e336be@gmail.com>
- <9f3509a7134f7e2dfd633ea62d24815e12b1f482.camel@redhat.com>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <9f3509a7134f7e2dfd633ea62d24815e12b1f482.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240325131624.26023-13-brgl@bgdev.pl>
 
-Paolo Abeni wrote:
-> On Tue, 2024-03-26 at 18:25 +0100, Richard Gobert wrote:
->> Paolo Abeni wrote:
->>> Hi,
->>>
->>> On Tue, 2024-03-26 at 16:02 +0100, Richard Gobert wrote:
->>>> This patch is meaningful by itself - removing checks against non-relevant
->>>> packets and making the flush/flush_id checks in a single place.
->>>
->>> I'm personally not sure this patch is a win. The code churn is
->>> significant. I understand this is for performance's sake, but I don't
->>> see the benefit??? 
->>>
->>
->> Could you clarify what do you mean by code churn?
+On Mon, Mar 25, 2024 at 02:16:20PM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> The diffstat of this patch is not negligible and touches very sensitive
-> areas.
+> Some PCI devices must be powered-on before they can be detected on the
+> bus. Introduce a simple framework reusing the existing PCI OF
+> infrastructure.
 > 
+> The way this works is: a DT node representing a PCI device connected to
+> the port can be matched against its power control platform driver. If
+> the match succeeds, the driver is responsible for powering-up the device
+> and calling pcie_pwrctl_device_set_ready() which will trigger a PCI bus
+> rescan as well as subscribe to PCI bus notifications.
+> 
+> When the device is detected and created, we'll make it consume the same
+> DT node that the platform device did. When the device is bound, we'll
+> create a device link between it and the parent power control device.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-diff mainly touches flush/flush_id/is_atomic, the new code should be
-less complex. I agree this is sensitive as it is part of core GRO -
-I checked all relevant flows manually, but I can also create more
-tests and ensure that logic remains the same.
+Hi Bartosz,
 
->>> he changelog shows that perf reports slightly lower figures for
->>> inet_gro_receive(). That is expected, as this patch move code out of
->>> such functio. What about inet_gro_flush()/tcp_gro_receive() where such
->>> code is moved?
->>>
->>
->> Please consider the following 2 common scenarios:
->>
->> 1) Multiple packets in the GRO bucket - the common case with multiple
->>    packets in the bucket (i.e. running super_netperf TCP_STREAM) - each layer
->>    executes a for loop - going over each packet in the bucket. Specifically,
->>    L3 gro_receive loops over the bucket making flush,flush_id,is_atomic
->>    checks. 
-> 
-> Only for packets with the same rx hash. 
-> 
+some minor Kernel doc nits from my side.
 
-Right, but there are only 8 GRO buckets, so a collision can still happen
-on multiple concurrent streams.
+...
 
->> For most packets in the bucket, these checks are not
->>    relevant. (possibly also dirtying cache lines with non-relevant p
->>    packets). Removing code in the for loop for this case is significant.
->>
->> 2) UDP/TCP streams which do not coalesce in GRO. This is the common case
->>    for regular UDP connections (i.e. running netperf UDP_STREAM). In this
->>    case, GRO is just overhead. Removing any code from these layers
->>    is good (shown in the first measurement of the commit message).
-> 
-> If UDP GRO is not enabled, there are no UDP packet staging in the UDP
-> gro engine, the bucket list is empty.
-> 
->>> Additionally the reported deltas is within noise level according to my
->>> personal experience with similar tests.
->>>
->>
->> I've tested the difference between net-next and this patch repetitively,
->> which showed stable results each time. Is there any specific test you
->> think would be helpful to show the result?
-> 
-> Anything that show measurable gain. 
-> 
-> Reporting the CPU utilization in the inet_gro_receive() function alone
-> is not enough, as part of the load has been moved into
-> gro_network_flush()/tcp_gro_receive().
-> 
+> diff --git a/drivers/pci/pwrctl/core.c b/drivers/pci/pwrctl/core.c
 
-Got it, the numbers I reported were only relevant to UDP flows (so
-measuring perf top with -g flag showed the same improvement). I'll post in v5
-numbers relevant to TCP as well.
+...
 
-Thanks
+> +/**
+> + * devm_pci_pwrctl_device_set_ready - Managed variant of
+> + * pci_pwrctl_device_set_ready().
+> + *
+
+nit: @dev should be documented here
+
+> + * @pwrctl: PCI power control data
+> + *
+> + * Returns:
+> + * 0 on success, negative error number on error.
+> + */
+> +int devm_pci_pwrctl_device_set_ready(struct device *dev,
+> +				     struct pci_pwrctl *pwrctl)
+> +{
+> +	int ret;
+> +
+> +	ret = pci_pwrctl_device_set_ready(pwrctl);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return devm_add_action_or_reset(dev,
+> +					devm_pci_pwrctl_device_unset_ready,
+> +					pwrctl);
+> +}
+> +EXPORT_SYMBOL_GPL(devm_pci_pwrctl_device_set_ready);
+> +
+> +MODULE_AUTHOR("Bartosz Golaszewski <bartosz.golaszewski@linaro.org>");
+> +MODULE_DESCRIPTION("PCI Device Power Control core driver");
+> +MODULE_LICENSE("GPL");
+> diff --git a/include/linux/pci-pwrctl.h b/include/linux/pci-pwrctl.h
+> new file mode 100644
+> index 000000000000..ae8324ea7eeb
+> --- /dev/null
+> +++ b/include/linux/pci-pwrctl.h
+> @@ -0,0 +1,51 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2024 Linaro Ltd.
+> + */
+> +
+> +#ifndef __PCI_PWRCTL_H__
+> +#define __PCI_PWRCTL_H__
+> +
+> +#include <linux/notifier.h>
+> +
+> +struct device;
+> +struct device_link;
+> +
+> +/*
+> + * This is a simple framework for solving the issue of PCI devices that require
+> + * certain resources (regulators, GPIOs, clocks) to be enabled before the
+> + * device can actually be detected on the PCI bus.
+> + *
+> + * The idea is to reuse the platform bus to populate OF nodes describing the
+> + * PCI device and its resources, let these platform devices probe and enable
+> + * relevant resources and then trigger a rescan of the PCI bus allowing for the
+> + * same device (with a second associated struct device) to be registered with
+> + * the PCI subsystem.
+> + *
+> + * To preserve a correct hierarchy for PCI power management and device reset,
+> + * we create a device link between the power control platform device (parent)
+> + * and the supplied PCI device (child).
+> + */
+> +
+> +/**
+> + * struct pci_pwrctl - PCI device power control context.
+> + * @dev - Address of the power controlling device.
+
+nit: I think this should be "@dev: " rather than "@dev - "
+     As is, "./scripts/kernel-doc -none" complains.
+> + *
+> + * An object of this type must be allocated by the PCI power control device and
+> + * passed to the pwrctl subsystem to trigger a bus rescan and setup a device
+> + * link with the device once it's up.
+> + */
+> +struct pci_pwrctl {
+> +	struct device *dev;
+> +
+> +	/* Private, don't use. */
+
+I think Private needs to be followed by a ':' rather than a ',' to keep
+kernel-doc happy.
+
+> +	struct notifier_block nb;
+> +	struct device_link *link;
+> +};
+> +
+> +int pci_pwrctl_device_set_ready(struct pci_pwrctl *pwrctl);
+> +void pci_pwrctl_device_unset_ready(struct pci_pwrctl *pwrctl);
+> +int devm_pci_pwrctl_device_set_ready(struct device *dev,
+> +				     struct pci_pwrctl *pwrctl);
+> +
+> +#endif /* __PCI_PWRCTL_H__ */
+> -- 
+> 2.40.1
+> 
+> 
 
