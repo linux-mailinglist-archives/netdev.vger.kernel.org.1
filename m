@@ -1,153 +1,173 @@
-Return-Path: <netdev+bounces-82516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D13EF88E702
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:47:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868C288E71C
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:49:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65A4C1F2E266
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:47:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E5B6292135
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:49:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B83E158854;
-	Wed, 27 Mar 2024 13:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D9215AAA7;
+	Wed, 27 Mar 2024 13:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="igBxeSmS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oPiIZP5u"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E72130483
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 13:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09C913E3E8;
+	Wed, 27 Mar 2024 13:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711546522; cv=none; b=lAQ9E028x0/3CD5e16+XFAc1Qjj3qup0/Hm2c5dfiIJlRJACIitio1/RqWzyb2UYi1UtTlhspyeWstLhf1xIrfPY5ZImDqbJHatOlGQcENvLItVUu6lu0egcHMpovx/RgbUmYHucAWUqfe6QvBH4joj4TdtywbsBnel8X/7tbaU=
+	t=1711546858; cv=none; b=VAt1LxQ/FNkDKls+8aSxBQMO+NRYZ7ZT9y+O8XmpBKzdyES49hNRSGYhVsGArR/SDxw3BUCblMRp3m3gEdl9DiBTKSGV0QnJmg4kM5INIZwiAyVWd47K23OVSlrT7qDsIFpSKWRPm1pJuQ3TyjYo9pM0XDqWDJIaxNtGj5dz5Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711546522; c=relaxed/simple;
-	bh=4PAqrg9dUBPe+VNGRO6PREAWBX5CjE7+Q4T65E6s8+Y=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IRb4XQTU04nHc9kp5AWS8nAq0qP1C4WMM7yUiVMKvPT5A6rj16VEnq7T5RIeoG44hsZBLgqZ279urW8TOK5jPNq0go7SW2X7URBOvpHdWkPa6FlPET05sHHPHpbm8EPEJM1h+QYtJXFUrGuKIF8JNv1uG4GDcj9llM9NEPvJmqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=igBxeSmS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711546519;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VVrCuxpTJ0gCHZTB0QxvdcPy8C9E7vvFJM6R//tX0K4=;
-	b=igBxeSmSbtod55Z+vnvZoSvOOSU5t5TcGXgWVYbLmj6ELbRpXvDzTNcUxC+EssBVoBelfY
-	gdEc9cf5tQDoOnAdPrEHUikTDcGDpE41J5xx4yclfGzBLxeetv7TOnBoTVMH4gl5zenVc7
-	M+gB7OEXDr9HB/RWkBvKSOLSEoTbJLo=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-487-litk6JeXOiGqhK_742hPRw-1; Wed, 27 Mar 2024 09:35:17 -0400
-X-MC-Unique: litk6JeXOiGqhK_742hPRw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-515a8e9bea9so600079e87.0
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 06:35:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711546516; x=1712151316;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VVrCuxpTJ0gCHZTB0QxvdcPy8C9E7vvFJM6R//tX0K4=;
-        b=YI3tF2p8iv7sM27XA6uU6EspRVp4ptEiU7koj6fMPm9D4nxcWKgB0zBL+8EdsxqYyv
-         ysaJJpIUGB2ZPoCTr11dO9YGOp3wsTzOoUdIHz+2GQkn/KN/Jp5ztN29ZXyrT+8JUgc1
-         bX6kdn/E2e19MTdlT8YNJ0DgRPAQcUZEdboXBtPUoDTsgy3h4GEMsULZqp6ndVN1s7tw
-         8rV2nS8N/CLgBgrPXS7+4BVatNfvrdEkQa4aSKTH3uyFAxWWrnP/YwVOILRaUbgpM87j
-         Dv81zF43LX77UgsGYhJYBKCd74TSgbhdGFW5ujH8OahVC+qJWx2Bb+GLH3NUaF7lk8Vr
-         /Y5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWGzkZ2t4KkPuCQWjJwBBBwkEjbPu2/v+3MhU6WWov7Zfgabw58y1c0kFaLp7e7za7WYJGDkjjRKEI2ARJfDkhl20k4/2Xa
-X-Gm-Message-State: AOJu0Yx4YgNIoaqHB3LrSNfUl1WtzguoY2YZUqdgMpKEed/nkyoHXYVO
-	f2Jmv9do8gMktMq5dbJ5b6jodU7fFW+8KSvFdirM3PY5PENhIzUBIueN6lWAJq3ujAKY0lApUwr
-	/RsPjNSBo54KyjzU9z1A+u/RXj/o9zfYHx9heYWSxqxEzsiVGlyAe0w==
-X-Received: by 2002:ac2:464e:0:b0:514:b446:f5d9 with SMTP id s14-20020ac2464e000000b00514b446f5d9mr8965365lfo.3.1711546516388;
-        Wed, 27 Mar 2024 06:35:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGQKIU9SHXAL1+Jnd1RxSm68b2VOAzsmpECG/7Uos2n1azhI8UWjryVQIJwi+EZrekuHsWPbg==
-X-Received: by 2002:ac2:464e:0:b0:514:b446:f5d9 with SMTP id s14-20020ac2464e000000b00514b446f5d9mr8965350lfo.3.1711546516004;
-        Wed, 27 Mar 2024 06:35:16 -0700 (PDT)
-Received: from pstanner-thinkpadt14sgen1.remote.csb (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id dn1-20020a0560000c0100b0033ec7182673sm14913658wrb.52.2024.03.27.06.35.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 06:35:15 -0700 (PDT)
-Message-ID: <cd94a64536b687ee07f4e59be5bc6fed0df48404.camel@redhat.com>
-Subject: Re: [PATCH 2/2] r8169: use new function pcim_iomap_region()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>,  Realtek linux nic maintainers
- <nic_swsd@realtek.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, David Miller
- <davem@davemloft.net>
-Cc: "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, 
-	"netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>
-Date: Wed, 27 Mar 2024 14:35:14 +0100
-In-Reply-To: <e1016eec-c059-47e5-8e01-539b1b48012a@gmail.com>
-References: <982b02cb-a095-4131-84a7-24817ac68857@gmail.com>
-	 <e1016eec-c059-47e5-8e01-539b1b48012a@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1711546858; c=relaxed/simple;
+	bh=C2xZuYuE0bMiGZGvxAUBs6jO3wA1ouACC5SZ95LnNFI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H2rrBb1C5d9l0npNiT4AJ/7e1mlhdm7eGFQVfaRiAxc3xftIBKSEuEmS7auvPstY5+v6kR464R+ur6BapcFzqbt2Ue4+1qC6SkKspBXsQn+LHpLFOT5mlg+JX/cc/GNWQPwGGaQOgNuOUkGt1TTQDBci8sWYE2aiT5dmf+HleBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oPiIZP5u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75359C433F1;
+	Wed, 27 Mar 2024 13:40:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711546858;
+	bh=C2xZuYuE0bMiGZGvxAUBs6jO3wA1ouACC5SZ95LnNFI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oPiIZP5uFcf+EPPe0Khf+td7enUVTphKFH5O8Sjh5QbDTvvzxp4AusoSouDyd+Qty
+	 uNykdMuMQa/3MK9HnwK2YnaNpcAkwziUq3reFV1RYyomG0PJxIZXbdnBqsRsQE9wiW
+	 wLj47B9Lgf9HG3GyHbTyRd/K5ZRm0z/GNEI3Qdrq6LztHDzJTooMaR+NhVqj52gD0M
+	 xPi7oVVfb+oKYpuBiBykgSVcS4Id3gpKilRn/2SvMis2yzYd4XdG+svbKALT31FoRB
+	 xxZViWevf40SnxPCloRb8CPdyibhYtQ48bc87rBCAC3LEnn5pSTNManFgzx2MRjCoV
+	 EzPw7kha0wNtQ==
+Message-ID: <94590f14-f17f-4d07-a2d7-6dfc5f1e171e@kernel.org>
+Date: Wed, 27 Mar 2024 14:40:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/22] um: virt-pci: drop owner assignment
+To: Johannes Berg <johannes@sipsolutions.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Olivia Mackall <olivia@selenic.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
+ <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
+ Latchesar Ionkov <lucho@ionkov.net>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Christian Schoenebeck <linux_oss@crudebyte.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
+ <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+ Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+ kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
+ linux-sound@vger.kernel.org
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-2-0feffab77d99@linaro.org>
+ <46e9539f59c82762e3468a9519fa4123566910d5.camel@sipsolutions.net>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <46e9539f59c82762e3468a9519fa4123566910d5.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2024-03-27 at 12:54 +0100, Heiner Kallweit wrote:
-> Use new function pcim_iomap_region() to simplify the code.
->=20
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
-> =C2=A0drivers/net/ethernet/realtek/r8169_main.c | 8 +++-----
-> =C2=A01 file changed, 3 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c
-> b/drivers/net/ethernet/realtek/r8169_main.c
-> index 5c879a5c8..7411cf1a1 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -5333,11 +5333,9 @@ static int rtl_init_one(struct pci_dev *pdev,
-> const struct pci_device_id *ent)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (region < 0)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0return dev_err_probe(&pdev->dev, -ENODEV, "no MMIO
-> resource found\n");
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0rc =3D pcim_iomap_regions(pdev=
-, BIT(region), KBUILD_MODNAME);
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (rc < 0)
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0return dev_err_probe(&pdev->dev, rc, "cannot remap
-> MMIO, aborting\n");
-> -
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tp->mmio_addr =3D pcim_iomap_t=
-able(pdev)[region];
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tp->mmio_addr =3D pcim_iomap_r=
-egion(pdev, region,
-> KBUILD_MODNAME);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!tp->mmio_addr)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0return dev_err_probe(&pdev->dev, -ENOMEM, "cannot
-> remap MMIO, aborting\n");
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0txconfig =3D RTL_R32(tp, =
-TxConfig);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (txconfig =3D=3D ~0U)
+On 27/03/2024 14:34, Johannes Berg wrote:
+> On Wed, 2024-03-27 at 13:40 +0100, Krzysztof Kozlowski wrote:
+>> virtio core already sets the .owner, so driver does not need to.
+> 
+>> All further patches depend on the first virtio patch, therefore please ack
+>> and this should go via one tree: virtio?
+> 
+> Sure. Though it's not really actually necessary, you can set it in the
+> core and merge the other patches in the next cycle; those drivers that
+> _have_ an .owner aren't broken after all.
+> 
+> Acked-by: Johannes Berg <johannes@sipsolutions.net>
 
-You could use this patch then on top of my series; the only little
-change necessary would be that you have to check for an ERR_PTR:
+True, this can be spread over two cycles. What I wanted to express, is
+that maintainers should not pick individual patches.
 
-if (IS_ERR(tp->mmio_addr))
-   ...
+Thanks for the Ack and apologies for a bit too big CC-list. I need to
+learn how to ask b4 to make Cc-per-patch for such case.
 
 
-Looks very good otherwise.
 
-P.
+Best regards,
+Krzysztof
 
 
