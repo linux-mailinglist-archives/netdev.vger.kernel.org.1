@@ -1,117 +1,107 @@
-Return-Path: <netdev+bounces-82477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00BC988E548
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:20:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84FAA88E5E9
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 311CE1C2C65B
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:20:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDEA528B670
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9CB136E08;
-	Wed, 27 Mar 2024 12:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6008412F378;
+	Wed, 27 Mar 2024 12:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EJMw9/TA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UojXrXQO"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D2414A62F;
-	Wed, 27 Mar 2024 12:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C21A37711
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711543498; cv=none; b=jIk6siq8qoD5jwOybKj/m6knrcxrqGyxH1DO0+9T8D4T0ovoUCW5ygAMQMLGBgP0YpsWa/8gBDPI/HD952lXEn3fCoSRP8XWqdnFNY7shxIvtXvFlhusEMEWN6kt3ad9NNKdABG3bI2a0jXcC9fkj69ycbTiv/N3qc237Nk7Nq0=
+	t=1711543677; cv=none; b=qzdnxNLZyuCg+eRYAoIgc23Bu5bLE+Osy1mHhzs3EjwRSNKgEYzklmYUXz7fDhGFFq+KfrB2PHZgGn5VO6hrRMh7Ha0Q8KToYONA6C6QYBzAWNNnowotvC+4BXjCrHeWYO41r/nHeMTuGyWi+MdjMtvpzmgjH8JAEdPWGTlIemk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711543498; c=relaxed/simple;
-	bh=KVlZQj8XUXytiuallTU5/HL5sY9jCIpvzzH0zeKt83Q=;
+	s=arc-20240116; t=1711543677; c=relaxed/simple;
+	bh=ycXO8RaqLOO260i8Qen21R213eBB3AqbVjSglqCRQ5k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f3ORjcVRuV72E0gSBpwxkeSoN0l42OVebeTF8HwTkjlL2OknkVwBNvftBLxo0NqzQ+14MGhP0D1SaQKhKh2b+MHLaf4oPqNJpj+hwv+eCe/2NWXBH81MVjzL2I5BKlCfczisQPwxDzfrEjWU1Ab+a+wNwFovgpkXl/r3onZemnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EJMw9/TA; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=oJUvIgy2hHUPdtoy/Z0F5Hfw2jqOtMA3Ny9l9gOx5YtPAW0nItULr7VkySj3RDWeKTJhpaAQwPaxa2zX9cM2a1qxBtY22M8I/jlw1YHCXcvcULo7EfOp1b1WFno4qVYqJd324E2ZlcpyjHs24rZb0dZzUb/NJoh6xPV1zcAD+aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UojXrXQO; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3Z065/I/LAJeMMl4zDwMUynhzEkIt59RXYcO6jgtIMk=; b=EJMw9/TA1wYV7JIcoHAuzkCiJ2
-	HufeCrgBWSCHMToIRIQ37ReXIp7lpICMVVy7ZEYrTS+D4LsBDCQjhiv7jfXQxvfq346cl4JAit+WN
-	n8OPb5GUx+wTpsdo30Zi82UdILDJnZ+a0TvxhBRx/5EqUisrL5fXRVfHquK6V6VylDVI=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=R3HTWNASLWmTMH76FL3kCLA26idudbGRSg6DVKbF+Nc=; b=Uo
+	jXrXQOoFikZJ7LjrtK8yTUy/EdV5vHXbBQVj0ttRJFKzgUZywwOc0BuNiKIPG0zbu2IBkddFSWCIn
+	Rz3VmNmkuTVSU0/533wKv1G+fRK9DCuXaFiuFSwh1nPtsS0wvZ5HGHj1IjHALdKDaDeyDr2piYVYg
+	u3qZfw7//GAGCU8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rpSe7-00BOLU-GL; Wed, 27 Mar 2024 13:44:47 +0100
-Date: Wed, 27 Mar 2024 13:44:47 +0100
+	id 1rpSgy-00BOMN-H0; Wed, 27 Mar 2024 13:47:44 +0100
+Date: Wed, 27 Mar 2024 13:47:44 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux@ew.tq-group.com,
-	Michael Krummsdorf <michael.krummsdorf@tq-group.com>
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: fix usable ports on 88e6020
-Message-ID: <b5abcd09-8dda-4a9a-b6b2-47c9a50faccf@lunn.ch>
-References: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: Serge Semin <fancer.lancer@gmail.com>, hkallweit1@gmail.com,
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn, linux@armlinux.org.uk,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v8 08/11] net: stmmac: dwmac-loongson: Fix MAC
+ speed for GNET
+Message-ID: <234e3ee5-ff39-4691-943d-c46dbdfde73b@lunn.ch>
+References: <e3c83d1e62cd67d5f3b50b30f46c232a307504ab.1706601050.git.siyanteng@loongson.cn>
+ <fg46ykzlyhw7vszgfaxkfkqe5la77clj2vcyrxo6f2irjod3gq@xdrlg4h7hzbu>
+ <4873ea5a-1b23-4512-b039-0a9198b53adf@loongson.cn>
+ <2b6459cf-7be3-4e69-aff0-8fc463eace64@loongson.cn>
+ <odsfccr7b3pphxha5vuyfauhslnr3hm5oy34pdowh24fi35mhc@4mcfbvtnfzdh>
+ <a9e27007-c754-4baf-84ed-0deed9f29da4@loongson.cn>
+ <3c551143-2e49-47c6-93bf-b43d6c62012b@lunn.ch>
+ <5aad4eea-e509-4a29-be0a-0ae1beb58a86@loongson.cn>
+ <593adab6-7ecf-4d8f-aefb-3f5eea24f3fc@lunn.ch>
+ <8d6eed68-0719-4a30-9278-6faea3174d23@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8d6eed68-0719-4a30-9278-6faea3174d23@loongson.cn>
 
-On Tue, Mar 26, 2024 at 01:36:54PM +0100, Matthias Schiffer wrote:
-> From: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+On Wed, Mar 27, 2024 at 10:41:57AM +0800, Yanteng Si wrote:
 > 
-> The switch has 4 ports with 2 internal PHYs, but ports are numbered up
-> to 6, with ports 0, 1, 5 and 6 being usable.
+> 在 2024/3/26 20:21, Andrew Lunn 写道:
+> > On Tue, Mar 26, 2024 at 08:02:55PM +0800, Yanteng Si wrote:
+> > > 在 2024/3/21 23:02, Andrew Lunn 写道:
+> > > > > When switching speeds (from 100M to 1000M), the phy cannot output clocks,
+> > > > > 
+> > > > > resulting in the unavailability of the network card.  At this time, a reset
+> > > > > of the
+> > > > > 
+> > > > > phy is required.
+> > > > reset, or restart of autoneg?
+> > > reset.
+> > If you need a reset, why are you asking it to restart auto-neg?
+> Autoneg was discussed in patch v1, but we may have misunderstood the
+> description from our hardware engineers at the time. The root cause is that
+> there is an error in the connection between the MAC and PHY. After repeated
+> tests, we have found that
 > 
-> Fixes: 71d94a432a15 ("net: dsa: mv88e6xxx: add support for MV88E6020 switch")
-> Signed-off-by: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> ---
-> 
-> I was unfortunately too busy to notice the issue when the patch this
-> Fixes was resubmitted in my name. It would have been better to change
-> my From into a Based-on-patch-by or similar when modifying it - and the
-> final version obviously wasn't even tested on an 88E6020...
-> 
-> Best regards,
-> Matthias
-> 
-> 
->  drivers/net/dsa/mv88e6xxx/chip.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-> index 9ed1821184ece..c95787cb90867 100644
-> --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> @@ -5503,8 +5503,12 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
->  		.family = MV88E6XXX_FAMILY_6250,
->  		.name = "Marvell 88E6020",
->  		.num_databases = 64,
-> -		.num_ports = 4,
-> +		/* Ports 2-4 are not routed to pins
-> +		 * => usable ports 0, 1, 5, 6
-> +		 */
-> +		.num_ports = 7,
->  		.num_internal_phys = 2,
-> +		.invalid_port_mask = BIT(2) | BIT(3) | BIT(4),
-
-This patch does what the commit message suggests. So
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-It would however be nice to fully understand how it currently works
-for the deployed use case, just to ensure we are not missing
-something.
+> auto-negcannot solve all problems and can only be reset. Thanks, Yanteng
+ 
+So calling phylink_ethtool_nway_reset() does not fix your problem, and
+you need some other fix.
 
     Andrew
+
+---
+pw-bot: cr
 
