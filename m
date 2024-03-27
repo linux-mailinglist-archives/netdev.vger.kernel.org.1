@@ -1,56 +1,83 @@
-Return-Path: <netdev+bounces-82462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B5688E3E1
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:49:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0631288E4A5
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 15:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE73C29D888
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 13:49:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A46D1F25B8F
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 14:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C2C185231;
-	Wed, 27 Mar 2024 12:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A16B3A8E4;
+	Wed, 27 Mar 2024 12:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mjdpvojb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d85pcWdh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6CB18522E;
-	Wed, 27 Mar 2024 12:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA27E1EF0D
+	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542337; cv=none; b=OLum/NfpOla9s8QE80i5BhnpAWh39GccANteF35oFPOfIBcfBYVFMyPWTK6o4PN/loV40PGPAqtWFusB1VUjuXxicngs/DyPMbsJT18oRCd5MFdmHp94VtVA8dT8chuLTtvpepvJZ44XmnQ1Ui4jadGWCUrPaJEMAwXjUdhHHH4=
+	t=1711542704; cv=none; b=XnU+BA/KQrUXwPQQ7Nlfd6/S1QtPAdr9o3m7AZ5pTY4JDABdT35HXBI3PpHNdZbE1RF3uLbGT3EpRqW1Hi3qfIledMjIufol32HV+iSQF7maeqjmId5xf160Vb5MbxBwaqJMWMlzv4GFVV9xa8kok+6pRa7paCZqNU8dG9eSZdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542337; c=relaxed/simple;
-	bh=IXGj7gDGkyso8Gc8zTpkguwTv7FyFRFp+3Fdl7+V+V8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EgYPKIvZQjBEQbeh2Uzq/EjVOZ7Z3XVcN5jtbEYWN7jU+QamUYr8sfh/NDiMI23KqHkXlFKOmayii8mumj3sTFS1QI9hIrFfrhHHcuWb3XXlvsGCV080ELfT2I2eIiG53o9NhCFt0v7eTPB8ElLudsU1TrgkTLt5hq1+FJJCQpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mjdpvojb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE8E2C433F1;
-	Wed, 27 Mar 2024 12:25:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711542336;
-	bh=IXGj7gDGkyso8Gc8zTpkguwTv7FyFRFp+3Fdl7+V+V8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Mjdpvojb9cQR9hQ5DD4xKu8Irp06zfdugQQxvdsplxjcWcnlPUQLjKRCYJZxVohPX
-	 SL1Abrg2el9cmw5Fc6aXTqQbIhO+I2URuY8RPBo/VC3FGBjKF1ip16V80bXU9og2Lz
-	 vUlDCJYi6X7C5V1wggxGYlZGKoiOxH2MWkQIer+557xzw2j2nsCL1SBHhmGa+vbtrF
-	 UD8lrTl9jWbKERmCfO+J56JkUKf5uAog0jhSexP/ahs83lpEL/wL6FrumO1QoIiZHS
-	 M/ZGyfVD9F2ELw27Y8OaoSITecdqxuSzFtdsu64cjhTktlKGkKRMvXJeqsam6ZPUlt
-	 Q/kfQeFPw4mcQ==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org,
-	pchelkin@ispras.ru
-Cc: Alexander Aring <aahringo@redhat.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "mac802154: fix llsec key resources release in mac802154_llsec_key_del" failed to apply to 4.19-stable tree
-Date: Wed, 27 Mar 2024 08:25:34 -0400
-Message-ID: <20240327122535.2840351-1-sashal@kernel.org>
+	s=arc-20240116; t=1711542704; c=relaxed/simple;
+	bh=MVRo1FVaNQkt6cygR/FZtAHMjsfJUCgUtoJADLDJUfw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B4oz58FehIcRE0zPUSmW9hXynPLl5AWkpj1My1LJFcYJ5mW8CqlcD9FnIuD4QTmi7B7R4+6gOyAPx/6hb4tjUPkzWg7cXJMuWMnjadxdqNpkP0ZdXyLysFLmV6WE9x4dG9ipgTSjK5bbq2vyCkbCkyPHYWpDr0Yg2iXVhqvfr+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d85pcWdh; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dff837d674so52694435ad.3
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 05:31:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711542701; x=1712147501; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t5Vhd35Q0Ojrnz32o7q4ugHp0PTDWaaA9QvDHNSN3rQ=;
+        b=d85pcWdhaZQGcBs98gWjUyAwBrIcGnvojNu2ztFAq5AI7Ll+wIfNyoK2aFXpCmlO1B
+         sGISK741CNbfU48Yd7KBT/ZdX1SmPkTScd+hsFCHkJ7Z6yZ47XZWHs0pWzFDxHAwyHhn
+         BTkBHhPtG+nZctTkCRYFjmzzvuvgREgC0Qvc2bCcuAUVur+QXUL4EuC/NCkMeDymKgoI
+         iCz06gHhPmxVj65x/fE/QYm9sm98TvwhA/oumR6z7pIWNoriAP1xvzD+mNdGUFzjE4AR
+         O2h4LVSmjROLBxiEHVdWPfNZA9OcUVDuqNw9+zHLmGi+KJlS5He99BfuUAM2d+jQ70Zg
+         41Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711542701; x=1712147501;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t5Vhd35Q0Ojrnz32o7q4ugHp0PTDWaaA9QvDHNSN3rQ=;
+        b=OJ2I+RYZwUlRq/iu4k5dn8hS/nyVgRJAiLTWg9J2huw1Qm6yzsdIwcp938g+5pyO99
+         Fg1Xq6k57aNvoeNmtkpWWqCiuPCGpMtTv1RBPpCwXbgeqOhZI/gjMAv12g2/I4C4+OUT
+         DW+h3377PfotdI4iuO8kf/1MZzLoXc9+8BcjTHEDRSJLPDP4s8+BPpd2gQtmGN0zQbKx
+         iXMN+hAQ1sc8LVHASgOXO0p/K/n9Bmw7WFiyA1XCfhI1/H4ULkV6uPJZxdh5/1Hpu/lb
+         upBAArBPReLn8dsRcVG/P3o4wIdmEvoEoWqqHNSJVsbMa3usf+MkJDMHuQGDhZl9KZJB
+         Z3MQ==
+X-Gm-Message-State: AOJu0Yy4o9bsaqgUAumKqHSYMIM1tKxcOxidtFrd2A1xNKuQgJWJSSR+
+	2pNNHE+F+jBxirDzA/KSfTvw0sTD/Uc6qLSVbhGdwWRNCbUHBmft0gmn2W+5lLQJWz1t
+X-Google-Smtp-Source: AGHT+IGyfL96nXP6BkhZifAGCmLmGDUFZpSwcT2pYB73q6UCXAaii+uX+WH0gUjcgCfQAj6tLbNPcA==
+X-Received: by 2002:a17:902:ab94:b0:1e0:c5cc:d7cc with SMTP id f20-20020a170902ab9400b001e0c5ccd7ccmr1066773plr.64.1711542701457;
+        Wed, 27 Mar 2024 05:31:41 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id x17-20020a1709027c1100b001e197cfe08fsm1356771pll.59.2024.03.27.05.31.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 05:31:39 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 0/2] doc/netlink/specs: Add vlan support
+Date: Wed, 27 Mar 2024 20:31:27 +0800
+Message-ID: <20240327123130.1322921-1-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -58,151 +85,19 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Patchwork-Hint: ignore
-X-stable: review
 Content-Transfer-Encoding: 8bit
 
-The patch below does not apply to the 4.19-stable tree.
-If someone wants it applied there, or to any other stable or longterm
-tree, then please email the backport, including the original git commit
-id to <stable@vger.kernel.org>.
+Add vlan support in rt_link spec.
 
-Thanks,
-Sasha
+Hangbin Liu (2):
+  ynl: support hex display_hint for integer
+  doc/netlink/specs: Add vlan attr in rt_link spec
 
------------------- original commit in Linus's tree ------------------
+ Documentation/netlink/specs/rt_link.yaml | 80 +++++++++++++++++++++++-
+ tools/net/ynl/lib/ynl.py                 |  5 +-
+ 2 files changed, 82 insertions(+), 3 deletions(-)
 
-From e8a1e58345cf40b7b272e08ac7b32328b2543e40 Mon Sep 17 00:00:00 2001
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-Date: Wed, 28 Feb 2024 19:38:39 +0300
-Subject: [PATCH] mac802154: fix llsec key resources release in
- mac802154_llsec_key_del
-
-mac802154_llsec_key_del() can free resources of a key directly without
-following the RCU rules for waiting before the end of a grace period. This
-may lead to use-after-free in case llsec_lookup_key() is traversing the
-list of keys in parallel with a key deletion:
-
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 4 PID: 16000 at lib/refcount.c:25 refcount_warn_saturate+0x162/0x2a0
-Modules linked in:
-CPU: 4 PID: 16000 Comm: wpan-ping Not tainted 6.7.0 #19
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:refcount_warn_saturate+0x162/0x2a0
-Call Trace:
- <TASK>
- llsec_lookup_key.isra.0+0x890/0x9e0
- mac802154_llsec_encrypt+0x30c/0x9c0
- ieee802154_subif_start_xmit+0x24/0x1e0
- dev_hard_start_xmit+0x13e/0x690
- sch_direct_xmit+0x2ae/0xbc0
- __dev_queue_xmit+0x11dd/0x3c20
- dgram_sendmsg+0x90b/0xd60
- __sys_sendto+0x466/0x4c0
- __x64_sys_sendto+0xe0/0x1c0
- do_syscall_64+0x45/0xf0
- entry_SYSCALL_64_after_hwframe+0x6e/0x76
-
-Also, ieee802154_llsec_key_entry structures are not freed by
-mac802154_llsec_key_del():
-
-unreferenced object 0xffff8880613b6980 (size 64):
-  comm "iwpan", pid 2176, jiffies 4294761134 (age 60.475s)
-  hex dump (first 32 bytes):
-    78 0d 8f 18 80 88 ff ff 22 01 00 00 00 00 ad de  x.......".......
-    00 00 00 00 00 00 00 00 03 00 cd ab 00 00 00 00  ................
-  backtrace:
-    [<ffffffff81dcfa62>] __kmem_cache_alloc_node+0x1e2/0x2d0
-    [<ffffffff81c43865>] kmalloc_trace+0x25/0xc0
-    [<ffffffff88968b09>] mac802154_llsec_key_add+0xac9/0xcf0
-    [<ffffffff8896e41a>] ieee802154_add_llsec_key+0x5a/0x80
-    [<ffffffff8892adc6>] nl802154_add_llsec_key+0x426/0x5b0
-    [<ffffffff86ff293e>] genl_family_rcv_msg_doit+0x1fe/0x2f0
-    [<ffffffff86ff46d1>] genl_rcv_msg+0x531/0x7d0
-    [<ffffffff86fee7a9>] netlink_rcv_skb+0x169/0x440
-    [<ffffffff86ff1d88>] genl_rcv+0x28/0x40
-    [<ffffffff86fec15c>] netlink_unicast+0x53c/0x820
-    [<ffffffff86fecd8b>] netlink_sendmsg+0x93b/0xe60
-    [<ffffffff86b91b35>] ____sys_sendmsg+0xac5/0xca0
-    [<ffffffff86b9c3dd>] ___sys_sendmsg+0x11d/0x1c0
-    [<ffffffff86b9c65a>] __sys_sendmsg+0xfa/0x1d0
-    [<ffffffff88eadbf5>] do_syscall_64+0x45/0xf0
-    [<ffffffff890000ea>] entry_SYSCALL_64_after_hwframe+0x6e/0x76
-
-Handle the proper resource release in the RCU callback function
-mac802154_llsec_key_del_rcu().
-
-Note that if llsec_lookup_key() finds a key, it gets a refcount via
-llsec_key_get() and locally copies key id from key_entry (which is a
-list element). So it's safe to call llsec_key_put() and free the list
-entry after the RCU grace period elapses.
-
-Found by Linux Verification Center (linuxtesting.org).
-
-Fixes: 5d637d5aabd8 ("mac802154: add llsec structures and mutators")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
-Acked-by: Alexander Aring <aahringo@redhat.com>
-Message-ID: <20240228163840.6667-1-pchelkin@ispras.ru>
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
----
- include/net/cfg802154.h |  1 +
- net/mac802154/llsec.c   | 18 +++++++++++++-----
- 2 files changed, 14 insertions(+), 5 deletions(-)
-
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index cd95711b12b8e..76d2cd2e2b309 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -401,6 +401,7 @@ struct ieee802154_llsec_key {
- 
- struct ieee802154_llsec_key_entry {
- 	struct list_head list;
-+	struct rcu_head rcu;
- 
- 	struct ieee802154_llsec_key_id id;
- 	struct ieee802154_llsec_key *key;
-diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-index 8d2eabc71bbeb..f13b07ebfb98a 100644
---- a/net/mac802154/llsec.c
-+++ b/net/mac802154/llsec.c
-@@ -265,19 +265,27 @@ int mac802154_llsec_key_add(struct mac802154_llsec *sec,
- 	return -ENOMEM;
- }
- 
-+static void mac802154_llsec_key_del_rcu(struct rcu_head *rcu)
-+{
-+	struct ieee802154_llsec_key_entry *pos;
-+	struct mac802154_llsec_key *mkey;
-+
-+	pos = container_of(rcu, struct ieee802154_llsec_key_entry, rcu);
-+	mkey = container_of(pos->key, struct mac802154_llsec_key, key);
-+
-+	llsec_key_put(mkey);
-+	kfree_sensitive(pos);
-+}
-+
- int mac802154_llsec_key_del(struct mac802154_llsec *sec,
- 			    const struct ieee802154_llsec_key_id *key)
- {
- 	struct ieee802154_llsec_key_entry *pos;
- 
- 	list_for_each_entry(pos, &sec->table.keys, list) {
--		struct mac802154_llsec_key *mkey;
--
--		mkey = container_of(pos->key, struct mac802154_llsec_key, key);
--
- 		if (llsec_key_id_equal(&pos->id, key)) {
- 			list_del_rcu(&pos->list);
--			llsec_key_put(mkey);
-+			call_rcu(&pos->rcu, mac802154_llsec_key_del_rcu);
- 			return 0;
- 		}
- 	}
 -- 
 2.43.0
-
-
-
 
 
