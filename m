@@ -1,99 +1,272 @@
-Return-Path: <netdev+bounces-82459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF32F88E101
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 13:49:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E70AC88E11F
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 13:52:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8D2DB25D79
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 12:48:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FAF6B24E76
+	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 12:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA05152E10;
-	Wed, 27 Mar 2024 12:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA1815358E;
+	Wed, 27 Mar 2024 12:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PYfnWiDT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PiaZlJ10"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA28B152E0D
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 12:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7395153808;
+	Wed, 27 Mar 2024 12:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711541700; cv=none; b=M9usZ/1LYKExQkMvcFwy0VxsgICngIP+s45C8SQeecPAIUII2WjD1t74SPnrAVYlBeAy96ycch4pnQqHwJMpvbDoHtIAW+qMxg6VvhfSZS4hPcxN3pQbUE5md7AT4SBfE/C/n2sa4JihSxQwYyEiK0rnL/fvmyUlpXDBo7d+Dzc=
+	t=1711541715; cv=none; b=cT0udtsV5yE/M8NFSQqRE394OlDCNYJZFHFi+ZhRbzY3BnoMQdfbspGwqecMz6gd1Y0mdINvcmzk4ubK9+iF3eu+psbjLxrSvmFy+QxqlTkM8jERoMjQmEdMNwFdQSP/p6rYzfr8JySy8GJom4kWC75gMAA0MGOy4Q1ByU08FvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711541700; c=relaxed/simple;
-	bh=TGBhXpvpwt3Sy3sv2afWOztmZwM+ykD/J2PKpMOqi3Y=;
-	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=ChLwK8K0j+JsavhSXJS8h1h9W+C9PIBLONO8QEZfdO8UC0LcUgavdYWnB24vryAfEaODJSYrvtqmCFIeuToATu6hS4sY5YG6tJXLEQM4n35NOMEFxhyPRiRoGIp+lp7MbMQgqyj/k2q/rkuI0DFk/aG8fU7qyGabFLm1ePRZKG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PYfnWiDT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A77AC433F1;
-	Wed, 27 Mar 2024 12:14:57 +0000 (UTC)
+	s=arc-20240116; t=1711541715; c=relaxed/simple;
+	bh=7tjlYr/koR2ItXdpC7R/cFNFCbMhGwO67d6zvUmF6dE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CkaX4Ufas1CfpHDyMkllZ9Rc9Et8keq3lRbZ8L+6YEHfb+f9ei5nMJvsVZd8kDIRNFk3r6E+q2feikTl94dttMuVbfe3FYz9p7p23NFMwLlNelKTXc36qjCmCI6QuwQj686V7YAV1zAdYyGaypxnVuxv8z6e7Coubn2s0vRANO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PiaZlJ10; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79BE2C433C7;
+	Wed, 27 Mar 2024 12:15:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711541700;
-	bh=TGBhXpvpwt3Sy3sv2afWOztmZwM+ykD/J2PKpMOqi3Y=;
-	h=Subject:From:To:Cc:Date:From;
-	b=PYfnWiDT6yaDffCHSBNbxd/CZkoZKj1v7nQKhcq6vzD0VwH0OXGv5VfOGgyBD8v90
-	 qPS/mJPXlpPhOIP/niHhiwqrUUuy7iFAF5tDaoxYXOqlQAxob4/po+74o3HWUt8Y6q
-	 rpZKtfaNZhR4jePfk7Z36DZq7ruT8yciszVfOSFQhudT+jKvdiIIMSBfGKWcx36tys
-	 F4UQDnywU4BH0/TJqSXPpVoq+rnv68d7dUgRKXCngCUEWtKswYL9GWa96/O/mRhovJ
-	 zLRenmEYeFHF+yPH1saJv1oWQ75ayKDq0vRsuPhfJKf4SaPo/YiVPGXhED/aVDoEYw
-	 AfISea9uz1zRg==
-Subject: [PATCH net] xen-netfront: Add missing skb_mark_for_recycle
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, arthurborsboom@gmail.com,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, wei.liu@kernel.org,
- paul@xen.org, Jakub Kicinski <kuba@kernel.org>, kirjanov@gmail.com,
- dkirjanov@suse.de, kernel-team@cloudflare.com, security@xenproject.org,
- andrew.cooper3@citrix.com, xen-devel@lists.xenproject.org
-Date: Wed, 27 Mar 2024 13:14:56 +0100
-Message-ID: <171154167446.2671062.9127105384591237363.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=k20201202; t=1711541715;
+	bh=7tjlYr/koR2ItXdpC7R/cFNFCbMhGwO67d6zvUmF6dE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PiaZlJ10n613vSDrKch2JMzi1yfhYOUTXGzD8cD+B0qngneBYcWRlSb2BUQ/858X3
+	 s5AQmhmVc1e+278co05VYKj+yNMy0DV++ubUTi8Xa1/MDsO4R+qB+ESYQ9TzluK8bs
+	 K3QbGl1JFqlcF2okqUrRvkkNPgTellF3ppG8GRbsv04V7H2NyYqqCQUhJj/emu5BTH
+	 RPE2IqT3jn7er8VUILyMasVZtlACF1hEvx3opiPTqzyx0QqRXLon5ibyalgwTck9D/
+	 ggt0xhIzIxp+1QK8dxGcFUagSYn7V1NvW1a75bN//vdOXXe/QbkJS9Ut4dEYMNBdsU
+	 Gg7BALs9cZEwA==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org,
+	dtatulea@nvidia.com
+Cc: "Anatoli N . Chechelnickiy" <Anatoli.Chechelnickiy@m.interpipe.biz>,
+	Ian Kumlien <ian.kumlien@gmail.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: FAILED: Patch "net: esp: fix bad handling of pages from page_pool" failed to apply to 5.15-stable tree
+Date: Wed, 27 Mar 2024 08:15:13 -0400
+Message-ID: <20240327121513.2831737-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+X-Patchwork-Hint: ignore
+X-stable: review
+Content-Transfer-Encoding: 8bit
 
-Notice that skb_mark_for_recycle() is introduced later than fixes tag in
-6a5bcd84e886 ("page_pool: Allow drivers to hint on SKB recycling").
+The patch below does not apply to the 5.15-stable tree.
+If someone wants it applied there, or to any other stable or longterm
+tree, then please email the backport, including the original git commit
+id to <stable@vger.kernel.org>.
 
-It is believed that fixes tag were missing a call to page_pool_release_page()
-between v5.9 to v5.14, after which is should have used skb_mark_for_recycle().
-Since v6.6 the call page_pool_release_page() were removed (in 535b9c61bdef
-("net: page_pool: hide page_pool_release_page()") and remaining callers
-converted (in commit 6bfef2ec0172 ("Merge branch
-'net-page_pool-remove-page_pool_release_page'")).
+Thanks,
+Sasha
 
-This leak became visible in v6.8 via commit dba1b8a7ab68 ("mm/page_pool: catch
-page_pool memory leaks").
+------------------ original commit in Linus's tree ------------------
 
-Fixes: 6c5aa6fc4def ("xen networking: add basic XDP support for xen-netfront")
-Reported-by: Arthur Borsboom <arthurborsboom@gmail.com>
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+From c3198822c6cb9fb588e446540485669cc81c5d34 Mon Sep 17 00:00:00 2001
+From: Dragos Tatulea <dtatulea@nvidia.com>
+Date: Fri, 8 Mar 2024 17:26:00 +0200
+Subject: [PATCH] net: esp: fix bad handling of pages from page_pool
+
+When the skb is reorganized during esp_output (!esp->inline), the pages
+coming from the original skb fragments are supposed to be released back
+to the system through put_page. But if the skb fragment pages are
+originating from a page_pool, calling put_page on them will trigger a
+page_pool leak which will eventually result in a crash.
+
+This leak can be easily observed when using CONFIG_DEBUG_VM and doing
+ipsec + gre (non offloaded) forwarding:
+
+  BUG: Bad page state in process ksoftirqd/16  pfn:1451b6
+  page:00000000de2b8d32 refcount:0 mapcount:0 mapping:0000000000000000 index:0x1451b6000 pfn:0x1451b6
+  flags: 0x200000000000000(node=0|zone=2)
+  page_type: 0xffffffff()
+  raw: 0200000000000000 dead000000000040 ffff88810d23c000 0000000000000000
+  raw: 00000001451b6000 0000000000000001 00000000ffffffff 0000000000000000
+  page dumped because: page_pool leak
+  Modules linked in: ip_gre gre mlx5_ib mlx5_core xt_conntrack xt_MASQUERADE nf_conntrack_netlink nfnetlink iptable_nat nf_nat xt_addrtype br_netfilter rpcrdma rdma_ucm ib_iser libiscsi scsi_transport_iscsi ib_umad rdma_cm ib_ipoib iw_cm ib_cm ib_uverbs ib_core overlay zram zsmalloc fuse [last unloaded: mlx5_core]
+  CPU: 16 PID: 96 Comm: ksoftirqd/16 Not tainted 6.8.0-rc4+ #22
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x36/0x50
+   bad_page+0x70/0xf0
+   free_unref_page_prepare+0x27a/0x460
+   free_unref_page+0x38/0x120
+   esp_ssg_unref.isra.0+0x15f/0x200
+   esp_output_tail+0x66d/0x780
+   esp_xmit+0x2c5/0x360
+   validate_xmit_xfrm+0x313/0x370
+   ? validate_xmit_skb+0x1d/0x330
+   validate_xmit_skb_list+0x4c/0x70
+   sch_direct_xmit+0x23e/0x350
+   __dev_queue_xmit+0x337/0xba0
+   ? nf_hook_slow+0x3f/0xd0
+   ip_finish_output2+0x25e/0x580
+   iptunnel_xmit+0x19b/0x240
+   ip_tunnel_xmit+0x5fb/0xb60
+   ipgre_xmit+0x14d/0x280 [ip_gre]
+   dev_hard_start_xmit+0xc3/0x1c0
+   __dev_queue_xmit+0x208/0xba0
+   ? nf_hook_slow+0x3f/0xd0
+   ip_finish_output2+0x1ca/0x580
+   ip_sublist_rcv_finish+0x32/0x40
+   ip_sublist_rcv+0x1b2/0x1f0
+   ? ip_rcv_finish_core.constprop.0+0x460/0x460
+   ip_list_rcv+0x103/0x130
+   __netif_receive_skb_list_core+0x181/0x1e0
+   netif_receive_skb_list_internal+0x1b3/0x2c0
+   napi_gro_receive+0xc8/0x200
+   gro_cell_poll+0x52/0x90
+   __napi_poll+0x25/0x1a0
+   net_rx_action+0x28e/0x300
+   __do_softirq+0xc3/0x276
+   ? sort_range+0x20/0x20
+   run_ksoftirqd+0x1e/0x30
+   smpboot_thread_fn+0xa6/0x130
+   kthread+0xcd/0x100
+   ? kthread_complete_and_exit+0x20/0x20
+   ret_from_fork+0x31/0x50
+   ? kthread_complete_and_exit+0x20/0x20
+   ret_from_fork_asm+0x11/0x20
+   </TASK>
+
+The suggested fix is to introduce a new wrapper (skb_page_unref) that
+covers page refcounting for page_pool pages as well.
+
+Cc: stable@vger.kernel.org
+Fixes: 6a5bcd84e886 ("page_pool: Allow drivers to hint on SKB recycling")
+Reported-and-tested-by: Anatoli N.Chechelnickiy <Anatoli.Chechelnickiy@m.interpipe.biz>
+Reported-by: Ian Kumlien <ian.kumlien@gmail.com>
+Link: https://lore.kernel.org/netdev/CAA85sZvvHtrpTQRqdaOx6gd55zPAVsqMYk_Lwh4Md5knTq7AyA@mail.gmail.com
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
-Compile tested only, can someone please test this
+ include/linux/skbuff.h | 10 ++++++++++
+ net/ipv4/esp4.c        |  8 ++++----
+ net/ipv6/esp6.c        |  8 ++++----
+ 3 files changed, 18 insertions(+), 8 deletions(-)
 
- drivers/net/xen-netfront.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
-index ad29f370034e..8d2aee88526c 100644
---- a/drivers/net/xen-netfront.c
-+++ b/drivers/net/xen-netfront.c
-@@ -285,6 +285,7 @@ static struct sk_buff *xennet_alloc_one_rx_buffer(struct netfront_queue *queue)
- 		return NULL;
- 	}
- 	skb_add_rx_frag(skb, 0, page, 0, 0, PAGE_SIZE);
-+	skb_mark_for_recycle(skb);
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 3023bc2be6a1c..b49a7d6591e8e 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -3523,6 +3523,16 @@ int skb_cow_data_for_xdp(struct page_pool *pool, struct sk_buff **pskb,
+ 			 struct bpf_prog *prog);
+ bool napi_pp_put_page(struct page *page, bool napi_safe);
  
- 	/* Align ip header to a 16 bytes boundary */
- 	skb_reserve(skb, NET_IP_ALIGN);
++static inline void
++skb_page_unref(const struct sk_buff *skb, struct page *page, bool napi_safe)
++{
++#ifdef CONFIG_PAGE_POOL
++	if (skb->pp_recycle && napi_pp_put_page(page, napi_safe))
++		return;
++#endif
++	put_page(page);
++}
++
+ static inline void
+ napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
+ {
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 4dd9e50406720..d33d124218140 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -95,7 +95,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+ 			     __alignof__(struct scatterlist));
+ }
+ 
+-static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
++static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+ {
+ 	struct crypto_aead *aead = x->data;
+ 	int extralen = 0;
+@@ -114,7 +114,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
+ 	 */
+ 	if (req->src != req->dst)
+ 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+-			put_page(sg_page(sg));
++			skb_page_unref(skb, sg_page(sg), false);
+ }
+ 
+ #ifdef CONFIG_INET_ESPINTCP
+@@ -260,7 +260,7 @@ static void esp_output_done(void *data, int err)
+ 	}
+ 
+ 	tmp = ESP_SKB_CB(skb)->tmp;
+-	esp_ssg_unref(x, tmp);
++	esp_ssg_unref(x, tmp, skb);
+ 	kfree(tmp);
+ 
+ 	if (xo && (xo->flags & XFRM_DEV_RESUME)) {
+@@ -639,7 +639,7 @@ int esp_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info *
+ 	}
+ 
+ 	if (sg != dsg)
+-		esp_ssg_unref(x, tmp);
++		esp_ssg_unref(x, tmp, skb);
+ 
+ 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
+ 		err = esp_output_tail_tcp(x, skb);
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 6e6efe026cdcc..7371886d4f9f4 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -112,7 +112,7 @@ static inline struct scatterlist *esp_req_sg(struct crypto_aead *aead,
+ 			     __alignof__(struct scatterlist));
+ }
+ 
+-static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
++static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
+ {
+ 	struct crypto_aead *aead = x->data;
+ 	int extralen = 0;
+@@ -131,7 +131,7 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
+ 	 */
+ 	if (req->src != req->dst)
+ 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
+-			put_page(sg_page(sg));
++			skb_page_unref(skb, sg_page(sg), false);
+ }
+ 
+ #ifdef CONFIG_INET6_ESPINTCP
+@@ -294,7 +294,7 @@ static void esp_output_done(void *data, int err)
+ 	}
+ 
+ 	tmp = ESP_SKB_CB(skb)->tmp;
+-	esp_ssg_unref(x, tmp);
++	esp_ssg_unref(x, tmp, skb);
+ 	kfree(tmp);
+ 
+ 	esp_output_encap_csum(skb);
+@@ -677,7 +677,7 @@ int esp6_output_tail(struct xfrm_state *x, struct sk_buff *skb, struct esp_info
+ 	}
+ 
+ 	if (sg != dsg)
+-		esp_ssg_unref(x, tmp);
++		esp_ssg_unref(x, tmp, skb);
+ 
+ 	if (!err && x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
+ 		err = esp_output_tail_tcp(x, skb);
+-- 
+2.43.0
+
+
 
 
 
