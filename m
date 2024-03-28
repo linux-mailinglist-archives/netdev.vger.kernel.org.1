@@ -1,122 +1,200 @@
-Return-Path: <netdev+bounces-83019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10DD38906C9
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:08:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80E3F8906ED
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93BA6B225F9
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:08:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A46EC1C31CFE
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FED313280B;
-	Thu, 28 Mar 2024 17:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E7F5338D;
+	Thu, 28 Mar 2024 17:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mo8XnrxT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nbt7lRk2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92C31327FF
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 17:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE5B39FFE;
+	Thu, 28 Mar 2024 17:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711645409; cv=none; b=sit2Fg+dKO1h63+DVDAKBUFfCqpPHvJYvKwHsxKlOYX4FFMyNP5MJYa888F9QNAr6ZEB80GVtGEYs7GZ3nlHgUO6ePzy95LLKYDzmOmHC5lAG4mZYA+PPOk62LKJIIaYvsQQgz+eohmjTwkza1pg7ZDfoCd+W2ptxT/LmtilPW4=
+	t=1711645703; cv=none; b=Sjqw0MoHpHI1A2V7z9Fm17ZLjUYTJ/8tzKsB+duatJXQkXeCjA+8oMkRUG+V9Jv3P/vjvoBBkAe9glSl/XWaD3746j8f12Adsaw3gvsYeDaOikixrc0F+e9mtcatU/ZB9ZbTaRJkUrMKRYVb3Lf2fhWgkrE+N+oJ+9xNvLcCcXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711645409; c=relaxed/simple;
-	bh=cDQ06vC2AO2hdTXvL2nVcFw/pVw+7ML0rIty1NNvoeY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LHT+kbe63y9StQwflP3rycBTrMv5NdZdqWaJWEOJLRJ+A5dnZkYRGHuUSjKgjdeCiJ4IrE00t9Mqu2r5EDQiXQacOZNIKW5FfNzrRSBP8J0kf7fJMlAoOP4qrBg41gwZh2Lst/VbZvfxZtvR1CJpQ1W+hyozJ96qQ2lna8bcDWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mo8XnrxT; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf618042daso1644776276.0
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 10:03:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711645406; x=1712250206; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P4Rf3n0ThGg2QZAaciZ/MGFx+ZUjVEIBegGBLhJw3P8=;
-        b=Mo8XnrxTutPEuyDHw4HvrkJUF2u9wCB0LNXSY7HxVn+FWo68kkKav6TVCqVL0hTe9l
-         ntkqnP1Gg7biSlYp4N6mV7+2ArhObXI37aO++GvTPjVyKT/SkGThsS2gtFnmcQspj6zF
-         ADri6GzHQ5scSFCfB8znRSRRLHyyeallr009GQXPHW3xS18nxIRCvCwAwYap+HcQsTZC
-         YGclO2DuRWBmPFS95AM7yaVSpCs3LN49Imki5FaUZN6909kl7a/q01yy17Lo2VMk+33Q
-         kg5dNn0786of2u34dfteFZx/MHXxBkX2afrtGmWZdGIOd2Sk8T32gL9O+2w54ylL45C6
-         SlZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711645406; x=1712250206;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P4Rf3n0ThGg2QZAaciZ/MGFx+ZUjVEIBegGBLhJw3P8=;
-        b=LE6z0XK97LrhxNm+hxPjcbVDfTCmYML0aMKnYi2+tHVxs3gAkdv3MtWw089yJEMelL
-         1H+GWIGoJNvWhJGFYQ/RXjL0DvuAErndnYXRiNCqUmmS+46yGM4khfRSkSuiXM/3kHSG
-         i1JxqeHiyMyWgPqNeRsJdqa3t9z4D/F8X3smgwbYvOj2pabuGGS4fyLe0EqbYIVkf/uK
-         6uiE6TWrFZsVCBtj8hPdT43zxp6z3Csm2FwCooZ9DFxJdxIyEhO2QUXlUF1ONt2XMcKA
-         D1hU6ZJJt1Q8ekArcnacJ6xHyQWJBvfygknQu1tV1z702wqMx1kUsRdDNo5KQdIfQi1n
-         IHUQ==
-X-Gm-Message-State: AOJu0YwwJ6q/7uWKOwKx5Zj6xKudoCQImzy4q/tgpXGFwuzLcVaQU98e
-	Bq98SYyIfRxxvs6gGztQPIERFZXoAoSwd9ceiK47CuUX6jds6N0T3d7QE/1TSAiRgQTb3GzqFiy
-	1RmwPuvQclw==
-X-Google-Smtp-Source: AGHT+IE8RUsLi5NEWaCQpBxCzHAtR+Tt/Xs83paI2PEaSb0MWJvXoJgJAFNVO+Mxu01+BA4dDmGcfec5aB2qRw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2413:b0:dc2:5273:53f9 with SMTP
- id dr19-20020a056902241300b00dc2527353f9mr249416ybb.1.1711645406759; Thu, 28
- Mar 2024 10:03:26 -0700 (PDT)
-Date: Thu, 28 Mar 2024 17:03:09 +0000
-In-Reply-To: <20240328170309.2172584-1-edumazet@google.com>
+	s=arc-20240116; t=1711645703; c=relaxed/simple;
+	bh=UCnU67HeXYoqYdj4S5dBKZ2Q4xHzdK3/OCAHu2KUfBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EQOzDEg/Tbylz/gXhPcSgQ1Fc87Khc172Hn2d75d6TZ1y02ih2Lxe6teguUnZjlj2ZvkxxTlQwVtI5Bwevx4WrHmkNLUuxI2N/zwo61Dteb9iGcOUZzVcxanFK+PfeTNBAxGWGXupj1z0f4KJ9KRoc2VITfA9RRsNqIKRflJmT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nbt7lRk2; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711645701; x=1743181701;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UCnU67HeXYoqYdj4S5dBKZ2Q4xHzdK3/OCAHu2KUfBI=;
+  b=Nbt7lRk294+zepCU7jnY/4BlzLmzfQHNIYoCDoTfUUzx5pwidfcPzH64
+   9KODxFPwn3hLHcZBVXDEDIZDeNVTfNld/N+km4ANtBDHVM/Ayk/8aTXU7
+   mQW5ImjZ6IXzFthZ6elqRhGWcON9S78u9P0rjhVdDttTcgWdluvJCrene
+   duMO5fhorj3qpt6gS2y4d/BKyK4ZNx+gMLPdTf4m4xEJ/kn2ZqxtdrBHa
+   gprL7BFiGpUOjURsusQdTSFnyYxofzPEK5sKab0qdxMXn8zMrlOAjbh3K
+   2Adrlsjom26hxu87Yn92k2xGLz/kIT55HTPbF7TsVD8clH0/lfv9MOv3W
+   Q==;
+X-CSE-ConnectionGUID: 1ye/Oi/jQsCv30UPnsNRpw==
+X-CSE-MsgGUID: WXpS8vqAQ8ic/wwBB9Z6aQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="7417542"
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="7417542"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 10:08:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="39865448"
+Received: from lkp-server01.sh.intel.com (HELO be39aa325d23) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 28 Mar 2024 10:08:17 -0700
+Received: from kbuild by be39aa325d23 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rptEc-0002NC-2v;
+	Thu, 28 Mar 2024 17:08:14 +0000
+Date: Fri, 29 Mar 2024 01:07:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Mina Almasry <almasrymina@google.com>,
+	Ayush Sawal <ayush.sawal@chelsio.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Mirko Lindner <mlindner@marvell.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next v2 2/3] net: mirror skb frag ref/unref helpers
+Message-ID: <202403290006.WfusvToB-lkp@intel.com>
+References: <20240327214523.2182174-3-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240328170309.2172584-1-edumazet@google.com>
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240328170309.2172584-9-edumazet@google.com>
-Subject: [PATCH net-next 8/8] net: rps: move received_rps field to a better location
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327214523.2182174-3-almasrymina@google.com>
 
-Commit 14d898f3c1b3 ("dev: Move received_rps counter next
-to RPS members in softnet data") was unfortunate:
+Hi Mina,
 
-received_rps is dirtied by a cpu and never read by other
-cpus in fast path.
+kernel test robot noticed the following build errors:
 
-Its presence in the hot RPS cache line (shared by many cpus)
-is hurting RPS/RFS performance.
+[auto build test ERROR on net-next/main]
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/netdevice.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Mina-Almasry/net-make-napi_frag_unref-reuse-skb_page_unref/20240328-054816
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240327214523.2182174-3-almasrymina%40google.com
+patch subject: [PATCH net-next v2 2/3] net: mirror skb frag ref/unref helpers
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20240329/202403290006.WfusvToB-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240329/202403290006.WfusvToB-lkp@intel.com/reproduce)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 14f19cc2616452d7e6afbbaa52f8ad3e61a419e9..274d8db48b4858c70b43ea4628544e924ba6a263 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3203,6 +3203,7 @@ struct softnet_data {
- 	struct softnet_data	*rps_ipi_list;
- #endif
- 
-+	unsigned int		received_rps;
- 	bool			in_net_rx_action;
- 	bool			in_napi_threaded_poll;
- 
-@@ -3235,7 +3236,6 @@ struct softnet_data {
- 	unsigned int		cpu;
- 	unsigned int		input_queue_tail;
- #endif
--	unsigned int		received_rps;
- 	struct sk_buff_head	input_pkt_queue;
- 	struct napi_struct	backlog;
- 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202403290006.WfusvToB-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/tls/tls_device_fallback.c:280:22: error: too few arguments to function call, expected 2, have 1
+     280 |                 __skb_frag_ref(frag);
+         |                 ~~~~~~~~~~~~~~     ^
+   include/linux/skbuff.h:3517:20: note: '__skb_frag_ref' declared here
+    3517 | static inline void __skb_frag_ref(skb_frag_t *frag, bool recycle)
+         |                    ^              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   1 error generated.
+
+
+vim +280 net/tls/tls_device_fallback.c
+
+e8f69799810c32 Ilya Lesokhin  2018-04-30  228  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  229  /* This function may be called after the user socket is already
+e8f69799810c32 Ilya Lesokhin  2018-04-30  230   * closed so make sure we don't use anything freed during
+e8f69799810c32 Ilya Lesokhin  2018-04-30  231   * tls_sk_proto_close here
+e8f69799810c32 Ilya Lesokhin  2018-04-30  232   */
+e8f69799810c32 Ilya Lesokhin  2018-04-30  233  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  234  static int fill_sg_in(struct scatterlist *sg_in,
+e8f69799810c32 Ilya Lesokhin  2018-04-30  235  		      struct sk_buff *skb,
+d80a1b9d186057 Boris Pismenny 2018-07-13  236  		      struct tls_offload_context_tx *ctx,
+e8f69799810c32 Ilya Lesokhin  2018-04-30  237  		      u64 *rcd_sn,
+e8f69799810c32 Ilya Lesokhin  2018-04-30  238  		      s32 *sync_size,
+e8f69799810c32 Ilya Lesokhin  2018-04-30  239  		      int *resync_sgs)
+e8f69799810c32 Ilya Lesokhin  2018-04-30  240  {
+504148fedb8542 Eric Dumazet   2022-06-30  241  	int tcp_payload_offset = skb_tcp_all_headers(skb);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  242  	int payload_len = skb->len - tcp_payload_offset;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  243  	u32 tcp_seq = ntohl(tcp_hdr(skb)->seq);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  244  	struct tls_record_info *record;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  245  	unsigned long flags;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  246  	int remaining;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  247  	int i;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  248  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  249  	spin_lock_irqsave(&ctx->lock, flags);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  250  	record = tls_get_record(ctx, tcp_seq, rcd_sn);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  251  	if (!record) {
+e8f69799810c32 Ilya Lesokhin  2018-04-30  252  		spin_unlock_irqrestore(&ctx->lock, flags);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  253  		return -EINVAL;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  254  	}
+e8f69799810c32 Ilya Lesokhin  2018-04-30  255  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  256  	*sync_size = tcp_seq - tls_record_start_seq(record);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  257  	if (*sync_size < 0) {
+e8f69799810c32 Ilya Lesokhin  2018-04-30  258  		int is_start_marker = tls_record_is_start_marker(record);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  259  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  260  		spin_unlock_irqrestore(&ctx->lock, flags);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  261  		/* This should only occur if the relevant record was
+e8f69799810c32 Ilya Lesokhin  2018-04-30  262  		 * already acked. In that case it should be ok
+e8f69799810c32 Ilya Lesokhin  2018-04-30  263  		 * to drop the packet and avoid retransmission.
+e8f69799810c32 Ilya Lesokhin  2018-04-30  264  		 *
+e8f69799810c32 Ilya Lesokhin  2018-04-30  265  		 * There is a corner case where the packet contains
+e8f69799810c32 Ilya Lesokhin  2018-04-30  266  		 * both an acked and a non-acked record.
+e8f69799810c32 Ilya Lesokhin  2018-04-30  267  		 * We currently don't handle that case and rely
+a0e128ef88e4a0 Yueh-Shun Li   2023-06-22  268  		 * on TCP to retransmit a packet that doesn't contain
+e8f69799810c32 Ilya Lesokhin  2018-04-30  269  		 * already acked payload.
+e8f69799810c32 Ilya Lesokhin  2018-04-30  270  		 */
+e8f69799810c32 Ilya Lesokhin  2018-04-30  271  		if (!is_start_marker)
+e8f69799810c32 Ilya Lesokhin  2018-04-30  272  			*sync_size = 0;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  273  		return -EINVAL;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  274  	}
+e8f69799810c32 Ilya Lesokhin  2018-04-30  275  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  276  	remaining = *sync_size;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  277  	for (i = 0; remaining > 0; i++) {
+e8f69799810c32 Ilya Lesokhin  2018-04-30  278  		skb_frag_t *frag = &record->frags[i];
+e8f69799810c32 Ilya Lesokhin  2018-04-30  279  
+e8f69799810c32 Ilya Lesokhin  2018-04-30 @280  		__skb_frag_ref(frag);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  281  		sg_set_page(sg_in + i, skb_frag_page(frag),
+b54c9d5bd6e38e Jonathan Lemon 2019-07-30  282  			    skb_frag_size(frag), skb_frag_off(frag));
+e8f69799810c32 Ilya Lesokhin  2018-04-30  283  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  284  		remaining -= skb_frag_size(frag);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  285  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  286  		if (remaining < 0)
+e8f69799810c32 Ilya Lesokhin  2018-04-30  287  			sg_in[i].length += remaining;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  288  	}
+e8f69799810c32 Ilya Lesokhin  2018-04-30  289  	*resync_sgs = i;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  290  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  291  	spin_unlock_irqrestore(&ctx->lock, flags);
+e8f69799810c32 Ilya Lesokhin  2018-04-30  292  	if (skb_to_sgvec(skb, &sg_in[i], tcp_payload_offset, payload_len) < 0)
+e8f69799810c32 Ilya Lesokhin  2018-04-30  293  		return -EINVAL;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  294  
+e8f69799810c32 Ilya Lesokhin  2018-04-30  295  	return 0;
+e8f69799810c32 Ilya Lesokhin  2018-04-30  296  }
+e8f69799810c32 Ilya Lesokhin  2018-04-30  297  
+
 -- 
-2.44.0.478.gd926399ef9-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
