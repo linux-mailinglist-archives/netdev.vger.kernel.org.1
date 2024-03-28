@@ -1,107 +1,211 @@
-Return-Path: <netdev+bounces-82834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 705D788FE4B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:45:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F2D388FE4E
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:46:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C02B29507B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:45:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B645D2951A5
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D94F7BAE5;
-	Thu, 28 Mar 2024 11:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A967D06B;
+	Thu, 28 Mar 2024 11:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="dT5uxZjg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eKDotHXu"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6BB2D792;
-	Thu, 28 Mar 2024 11:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5A42E3FE
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 11:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711626322; cv=none; b=L9KQcxLbaCnxymrUYEQpLMfaIeXYgRHVM2vWaMKONKAU4eLsOIlRQ+mlfZKZvcZ5C1FiA36tdtgwvEQuhHr4FIwE16AVjITEcOLfzUcsbjbW2H+EAr97/RDKLH9zom8GwVF07VsJ7AS7+8+d/n629i4ITAM85OASKP5Fg2CpODI=
+	t=1711626398; cv=none; b=uno6n7CjDUEjHGtlyD8wm/0HfwVXDqjwcFyr3u6oYG1JHOEXnH1Xv3ImBjvvXP5fNxlvj1qR0I2D8CbSe3Ssfr+Gw/J/t0ubIXFfk2kQUD8nFf50bDVha0YoTp0vYRXXGpC5nQrF5yKtehIpio8gh2TiCUYaB0JXeVVUJb015mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711626322; c=relaxed/simple;
-	bh=B/NLA0JqUu9nGEsxqIfEeqxUghyu4idtZeiguQk7wxc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mD/mJV1EHa3wnaPjMin7c6f4z15qJYUlbqlTzPG9TiLnFE8NA5iIvPs9h4dgoMED2RKpj/tloC8i7uNWxboqgizUWhv5iyJxWDXdwPvIuouq1a7i1+LHpbjf6pOImShfS/HnfJJ/at2KeOMvpg8hrRPX89TlBEyKZX83bj3rubA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=dT5uxZjg; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=sWdWCgyZ6xlfuvIzR+ofSNpFmValQUTb1NvuAPBYTns=;
-	t=1711626320; x=1712835920; b=dT5uxZjgz8i09sSqkEHIY9ZnZFnyW/x53aF4teYBjL1wSa7
-	nuITPAcVfDj9g891BCdodZgryXfJnlqAUxYc5FKTo0NvECT3T/0wC4VlV2e8KBDj1+JrY+JHec7SI
-	do5gT6iCOxBvwra1NUwJZVOFhGtH1fNsJCsQhBqkhEuJmeI9EHvf+la5oMgLvx+IGT+w2Oq5cSJka
-	Hu1MYQE0cFJRspevDkB9QkuaV4cXVRVOlHwonUQ+kqt8av5R2p2L69/DXHWlh5pB+WNL2ac7LWgUW
-	a47N1j51p2GnB1l3LpCdX3XrSqKZDG2uvcqaLMQSzXJPSzJ0sgnfBXNFccHnX4bQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rpoBz-00000000vii-2O2d;
-	Thu, 28 Mar 2024 12:45:11 +0100
-Message-ID: <550cc81a3dffd07ec1235dc32fd7bbde22d9bf57.camel@sipsolutions.net>
-Subject: Re: [syzbot] [wireless?] WARNING in kcov_remote_start (3)
-From: Johannes Berg <johannes@sipsolutions.net>
-To: syzbot <syzbot+0438378d6f157baae1a2@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Cc: Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov
- <dvyukov@google.com>,  Aleksandr Nogikh <nogikh@google.com>
-Date: Thu, 28 Mar 2024 12:45:10 +0100
-In-Reply-To: <0000000000007b02500614b66e31@google.com>
-References: <0000000000007b02500614b66e31@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1711626398; c=relaxed/simple;
+	bh=jd50ccBDmt6hfv7/MdhphQmNaMN9Yc1zWRCQCEWQGJs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3moIG8WVFxUoiE+Or7ezdMzmGkXtOsTbxy3Anw4Sv3fls4o5QXtoI+hOIuDbZ760o4GnBd0zmEVx+5RzuVdR2iv/KkGDXTBRJ9AUA1BgWVYYeimtmE9dpB4eAGUwXnR8LmopGWocnc74rVoVt9BHhThvABB85seGnvAXr3kWaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eKDotHXu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65381C433C7;
+	Thu, 28 Mar 2024 11:46:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711626397;
+	bh=jd50ccBDmt6hfv7/MdhphQmNaMN9Yc1zWRCQCEWQGJs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eKDotHXu+veeELVCiF/IpiHPTI5PlSRQeftHjWipIhucI2ennUtM1GnHG0SQtt0ra
+	 1yGJ7aKCno5sRi6bl97djZmNTRLbLinniGPCHccPSlflyH+jCECO0C9XtPWlNSjVDT
+	 y922mr6oxOzySDoUCeICJMJoMt3NG6DN5psR1g37N9glgvdFc2KQiMgrQhqMsMTyNS
+	 ODc7QFvvJqIKo+cgEA1AA49okRvSNIelw4BSMsACF2e/iwQXyjr2IdD1FtuPmFW+cJ
+	 36pEwnND5LKiQKFxkrfoUSDhrZbBqXJ23tPcLoHp1r4+Sc4Uun1Ix4SMtSN203f5g0
+	 2lM8pnIKqmYjw==
+Date: Thu, 28 Mar 2024 11:46:33 +0000
+From: Simon Horman <horms@kernel.org>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2] igc: Add MQPRIO offload support
+Message-ID: <20240328114633.GI403975@kernel.org>
+References: <20240212-igc_mqprio-v2-1-587924e6b18c@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240212-igc_mqprio-v2-1-587924e6b18c@linutronix.de>
 
-On Thu, 2024-03-28 at 04:00 -0700, syzbot wrote:
->=20
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 2400 at kernel/kcov.c:860 kcov_remote_start+0x549/0x=
-7e0 kernel/kcov.c:860
+On Tue, Mar 26, 2024 at 02:34:54PM +0100, Kurt Kanzenbach wrote:
+> Add support for offloading MQPRIO. The hardware has four priorities as well
+> as four queues. Each queue must be a assigned with a unique priority.
+> 
+> However, the priorities are only considered in TSN Tx mode. There are two
+> TSN Tx modes. In case of MQPRIO the Qbv capability is not required.
+> Therefore, use the legacy TSN Tx mode, which performs strict priority
+> arbitration.
+> 
+> Example for mqprio with hardware offload:
+> 
+> |tc qdisc replace dev ${INTERFACE} handle 100 parent root mqprio num_tc 4 \
+> |   map 0 0 0 0 0 1 2 3 0 0 0 0 0 0 0 0 \
+> |   queues 1@0 1@1 1@2 1@3 \
+> |   hw 1
+> 
+> The mqprio Qdisc also allows to configure the `preemptible_tcs'. However,
+> frame preemption is not supported yet.
+> 
+> Tested on Intel i225 and implemented by following data sheet section 7.5.2,
+> Transmit Scheduling.
+> 
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 
-This is
-
-        /*
-         * Check that kcov_remote_start() is not called twice in background
-         * threads nor called by user tasks (with enabled kcov).
-         */
-        mode =3D READ_ONCE(t->kcov_mode);
-        if (WARN_ON(in_task() && kcov_mode_enabled(mode))) {
-                local_unlock_irqrestore(&kcov_percpu_data.lock, flags);
-                return;
-        }
-
-but I have no idea what that even means?
-
-> Workqueue: events_unbound cfg80211_wiphy_work
-> RIP: 0010:kcov_remote_start+0x549/0x7e0 kernel/kcov.c:860
 ...
-> Call Trace:
->  <TASK>
->  kcov_remote_start_common include/linux/kcov.h:48 [inline]
->  ieee80211_iface_work+0x21f/0xf10 net/mac80211/iface.c:1654
->  cfg80211_wiphy_work+0x221/0x260 net/wireless/core.c:437
->  process_one_work kernel/workqueue.c:3218 [inline]
->  process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
->  worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
 
-It's a worker thread. Was this not intended to be called in threads?
+> diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
+> index 5f92b3c7c3d4..73502a0b4df7 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
+> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
+> @@ -547,6 +547,15 @@
+>  
+>  #define IGC_MAX_SR_QUEUES		2
+>  
+> +#define IGC_TXARB_TXQ_PRIO_0_SHIFT	0
+> +#define IGC_TXARB_TXQ_PRIO_1_SHIFT	2
+> +#define IGC_TXARB_TXQ_PRIO_2_SHIFT	4
+> +#define IGC_TXARB_TXQ_PRIO_3_SHIFT	6
+> +#define IGC_TXARB_TXQ_PRIO_0_MASK	GENMASK(1, 0)
+> +#define IGC_TXARB_TXQ_PRIO_1_MASK	GENMASK(3, 2)
+> +#define IGC_TXARB_TXQ_PRIO_2_MASK	GENMASK(5, 4)
+> +#define IGC_TXARB_TXQ_PRIO_3_MASK	GENMASK(7, 6)
+> +
+>  /* Receive Checksum Control */
+>  #define IGC_RXCSUM_CRCOFL	0x00000800   /* CRC32 offload enable */
+>  #define IGC_RXCSUM_PCSD		0x00002000   /* packet checksum disabled */
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
 
-johannes
+...
+
+> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
+
+...
+
+> @@ -106,7 +109,26 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+>  	wr32(IGC_QBVCYCLET_S, 0);
+>  	wr32(IGC_QBVCYCLET, NSEC_PER_SEC);
+>  
+> +	/* Reset mqprio TC configuration. */
+> +	netdev_reset_tc(adapter->netdev);
+> +
+> +	/* Restore the default Tx arbitration: Priority 0 has the highest
+> +	 * priority and is assigned to queue 0 and so on and so forth.
+> +	 */
+> +	txarb = rd32(IGC_TXARB);
+> +	txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
+> +		   IGC_TXARB_TXQ_PRIO_1_MASK |
+> +		   IGC_TXARB_TXQ_PRIO_2_MASK |
+> +		   IGC_TXARB_TXQ_PRIO_3_MASK);
+> +
+> +	txarb |= 0x00 << IGC_TXARB_TXQ_PRIO_0_SHIFT;
+> +	txarb |= 0x01 << IGC_TXARB_TXQ_PRIO_1_SHIFT;
+> +	txarb |= 0x02 << IGC_TXARB_TXQ_PRIO_2_SHIFT;
+> +	txarb |= 0x03 << IGC_TXARB_TXQ_PRIO_3_SHIFT;
+> +	wr32(IGC_TXARB, txarb);
+
+Hi Kurt,
+
+It looks like the above would be a good candidate for using FIELD_PREP,
+in which case the _SHIFT #defines can likely be removed.
+
+Also, the logic above seems to be replicated in igc_tsn_enable_offload.
+Perhaps a helper is appropriate.
+
+> +
+>  	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
+> +	adapter->flags &= ~IGC_FLAG_TSN_LEGACY_ENABLED;
+>  
+>  	return 0;
+>  }
+> @@ -123,6 +145,50 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
+>  	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_TSN);
+>  	wr32(IGC_TXPBS, IGC_TXPBSIZE_TSN);
+>  
+> +	if (adapter->strict_priority_enable) {
+> +		u32 txarb;
+> +		int err;
+> +
+> +		err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
+> +		if (err)
+> +			return err;
+> +
+> +		for (i = 0; i < adapter->num_tc; i++) {
+> +			err = netdev_set_tc_queue(adapter->netdev, i, 1,
+> +						  adapter->queue_per_tc[i]);
+> +			if (err)
+> +				return err;
+> +		}
+> +
+> +		/* In case the card is configured with less than four queues. */
+> +		for (; i < IGC_MAX_TX_QUEUES; i++)
+> +			adapter->queue_per_tc[i] = i;
+> +
+> +		/* Configure queue priorities according to the user provided
+> +		 * mapping.
+> +		 */
+> +		txarb = rd32(IGC_TXARB);
+> +		txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
+> +			   IGC_TXARB_TXQ_PRIO_1_MASK |
+> +			   IGC_TXARB_TXQ_PRIO_2_MASK |
+> +			   IGC_TXARB_TXQ_PRIO_3_MASK);
+> +		txarb |= adapter->queue_per_tc[3] << IGC_TXARB_TXQ_PRIO_0_SHIFT;
+> +		txarb |= adapter->queue_per_tc[2] << IGC_TXARB_TXQ_PRIO_1_SHIFT;
+> +		txarb |= adapter->queue_per_tc[1] << IGC_TXARB_TXQ_PRIO_2_SHIFT;
+> +		txarb |= adapter->queue_per_tc[0] << IGC_TXARB_TXQ_PRIO_3_SHIFT;
+> +		wr32(IGC_TXARB, txarb);
+> +
+> +		/* Enable legacy TSN mode which will do strict priority without
+> +		 * any other TSN features.
+> +		 */
+> +		tqavctrl = rd32(IGC_TQAVCTRL);
+> +		tqavctrl |= IGC_TQAVCTRL_TRANSMIT_MODE_TSN;
+> +		tqavctrl &= ~IGC_TQAVCTRL_ENHANCED_QAV;
+> +		wr32(IGC_TQAVCTRL, tqavctrl);
+> +
+> +		return 0;
+> +	}
+> +
+>  	for (i = 0; i < adapter->num_tx_queues; i++) {
+>  		struct igc_ring *ring = adapter->tx_ring[i];
+>  		u32 txqctl = 0;
+
+...
 
