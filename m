@@ -1,104 +1,132 @@
-Return-Path: <netdev+bounces-83118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 292E9890E97
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 00:39:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1568C890EB0
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 00:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8C75298879
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:39:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C921C22F91
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975FE80BE0;
-	Thu, 28 Mar 2024 23:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763BF4F200;
+	Thu, 28 Mar 2024 23:52:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33FE4F881
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 23:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF91C31A89;
+	Thu, 28 Mar 2024 23:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711669142; cv=none; b=NFS+BxGHnPoC0y2tGUZcr5JbsIBdKDp5eQGu4bKikIvW9/aUTJKACwnCN9xixlBfM6/qok3+SzClV+vth+8xnzdkiVeVeXH1g9Da0i6IHR9105jlDloSQ5ZIJo0m6obMx6wqth/YXUEvTzeF2XPfhvIGgEvhmJAE76BHbdZ2ojE=
+	t=1711669951; cv=none; b=Lx7HU+199YwKqUK0stDjrHdtqRVNNQJ/ASYOUJ5Se1AGFOurXub7mi7e9k8xGIZCky3PnOx/K8eeGZ23V3/upbo163ce7x0wkruvxwpu3KQ480ScGNqIBGUA9SAbVzfeUTnExc3tmYx1tHKhXZu2cSo5noNOeqWRVpfsFqUJIvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711669142; c=relaxed/simple;
-	bh=wIBk8zTBEE7uSRk1ranGS4zTe6D/JaOHoJikEodZsbo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O0DnS1wD9uP/RsdA3z1HTIN8BYajUgO0BSzmep3OoXmo4ltHMtucPeRnDLLtX1FlbJBRkgaR3wEVhL5i3V5xX7yPH/JvAQQgvgGB6dDsCINqZyie/W5PU/PkIR2Vjsj1b+QWfMuuoqQYSZKNfNWyrLQ1RNcCA6bmvFhiYO1PILE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
+	s=arc-20240116; t=1711669951; c=relaxed/simple;
+	bh=etDRwKheHq95MKBzVfJh5fym5y4GzVa/9DYqO8PheyE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EqPeKdsu2AicGIKmmHKKsvvx9xILKd613rvFWYegCi212BPDnJoivHiSgzhmvqQ5es92e9MdfwYpO6QaVxyCByiIQ0BT8En/eeqqdm/nnoM+BNko2yax4Nun3yrZf/tGIPQTplflf7AcXtz+UTnvsiWsQ9U0FOD2oruJWCJZwMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-56c147205b9so2667542a12.0
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 16:39:00 -0700 (PDT)
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-513e89d0816so1713825e87.0;
+        Thu, 28 Mar 2024 16:52:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711669139; x=1712273939;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sfcfQlcJEvHTtJDm6FczhwUjiRdabmrf95f7H7kz0gc=;
-        b=OlLJPhct5jW/uzVkva20GaXa4f1Nt7a6Dusiug+SVCBy8rdUN6jcjbuGBqpa+yqObc
-         2PaQvKV2B/U9TsvIBmRwXTC+LbwYLi/zd4N8gh7+YmBLFePMR+lrG2ojQd+M0+O174v8
-         yUug6LttCseM3eGjiQa3pjBDbbcXmU56OlE38meUyzf8WBHdfo2UN/uf5GzeXenUnz4D
-         V1ZXjmDOIOMcMk3sFajPGMsRhsie8hfoBFHZIvzi6XY+zJ5eFTfPOo0JNEnMUnmKl10c
-         gm8ngy6Fh+CZWPU8nbH0cQs3f6Gj/6HNy/dRQCET9Y1uLtTUTOcBC6g5zByIMtD7cboO
-         Uy8Q==
-X-Gm-Message-State: AOJu0YxD7AN96XoaL17z71RsgRsPUFur98QmRVowG8x3Tphbnir43ISd
-	ALZqMfmosLX0M8sIgufMSqbVsuNNVc5FWGNf9rZZ3VfnteGprzOG
-X-Google-Smtp-Source: AGHT+IEg1VbuRjZJJsJBNOePXvaKKHZV9FJYjXGWvzy9Dyeb/Nta2yNEjF0Wbf/icFV9Id/ipGVXSg==
-X-Received: by 2002:a50:ccd1:0:b0:56b:d1c6:66a5 with SMTP id b17-20020a50ccd1000000b0056bd1c666a5mr3283882edj.6.1711669138858;
-        Thu, 28 Mar 2024 16:38:58 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id fd6-20020a056402388600b0056c53ea5affsm1125071edb.77.2024.03.28.16.38.57
+        d=1e100.net; s=20230601; t=1711669948; x=1712274748;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vHFTjzwMlLxYTV/uWUOWTAxMr5DnJvs9Xihd1iUFzOo=;
+        b=Wk6JqD9u07dDNpp+4KHIasriPhIevOclLYcKs7SM6lZye7k/nR/EC55J2/FScC/RpT
+         Rb4CjGImJzfYc5W2gBqz7xAy8RSkOsFUwOJuIptislXplWqUzBtiz/h/wHAOJIaDMB0H
+         acp6EC/R1jdsX4KgADdP3jC1XEb/HrOAwIZ5kEBue39tbKr1ZU1x8nLHxYRYuO931EF0
+         jD6/zlmSG/CfFgFbJ0Q2n9u29GMp3og/JiGviPQCNtrNhlfQUYvRuaOcvngmDKYC/siV
+         AZ53kBfxX9K5NZD609CFmFyMTOFyvJSyuiaCPQdcljmwgPOi3YFFtyHPoB3bTawob1+u
+         W5JA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCB9hkT079VyLNCHHU9znEPO5DawNHYNV8+NJLQAULE9TdsVof0xnRj1y2l0cSvQx+ZSGEnrUwVQiV/WwxC5s470rPJIhotjuK5djQPHeBTyhJZfeWeYyShjW4X+yNm1rApGYK
+X-Gm-Message-State: AOJu0YwM+6fCWyQ6ARkQVJuQc6zHn1N6L5tVKjIg/5Wzem6vBwRvQZnA
+	AcEyN6J3RXEMM/fX9qL5sLRzS0LD5p6LwinPdyfTFkw2dn5mgU8wwQzlx2WT
+X-Google-Smtp-Source: AGHT+IHea/mcKEQJBsf8M8lvi9cuVZSl0/vHdWVNfuVQJNDNJYOeBBlVBsaa33wxKnH58C+HDbRR6w==
+X-Received: by 2002:a19:a408:0:b0:515:ad80:566e with SMTP id q8-20020a19a408000000b00515ad80566emr545396lfc.27.1711669947652;
+        Thu, 28 Mar 2024 16:52:27 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id qa31-20020a170907869f00b00a466fccbe96sm1263865ejc.122.2024.03.28.16.52.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 16:38:58 -0700 (PDT)
-Date: Thu, 28 Mar 2024 16:38:56 -0700
+        Thu, 28 Mar 2024 16:52:27 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alessandro Marcolini <alessandromarcolini99@gmail.com>,
-	donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 2/3] doc: netlink: Add hyperlinks to
- generated Netlink docs
-Message-ID: <ZgX/kJTKQP7GaR/b@gmail.com>
-References: <20240326201311.13089-1-donald.hunter@gmail.com>
- <20240326201311.13089-3-donald.hunter@gmail.com>
- <ZgWF/fIGXo/C1LSh@gmail.com>
- <CAD4GDZz+-3=fBqEkMJqORxF=1wwX84aXm3JW=K0tLG2vNF+Vdg@mail.gmail.com>
+To: aleksander.lobakin@intel.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: quic_jjohnson@quicinc.com,
+	kvalo@kernel.org,
+	leon@kernel.org,
+	dennis.dalessandro@cornelisnetworks.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Mediatek SoC support:Keyword:mediatek),
+	linux-mediatek@lists.infradead.org (moderated list:ARM/Mediatek SoC support:Keyword:mediatek)
+Subject: [PATCH net-next v2 0/5] allocate dummy device dynamically
+Date: Thu, 28 Mar 2024 16:52:00 -0700
+Message-ID: <20240328235214.4079063-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAD4GDZz+-3=fBqEkMJqORxF=1wwX84aXm3JW=K0tLG2vNF+Vdg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 28, 2024 at 03:54:09PM +0000, Donald Hunter wrote:
+struct net_device shouldn't be embedded into any structure, instead,
+the owner should use the private space to embed their state into
+net_device.
 
-> > > -def rst_section(title: str) -> str:
-> > > +def rst_section(prefix: str, title: str) -> str:
-> > >      """Add a section to the document"""
-> > > -    return f"\n{title}\n" + "=" * len(title)
-> > > +    return f".. _{family}-{prefix}-{title}:\n\n{title}\n" + "=" * len(title)
-> >
-> > Where is 'family' variable set? Is this a global variable somewhere?
-> 
-> Yes, here in parse_yaml(). I realise it's a bit of a hack but would
-> like to clean this up as part of switching to using ynl/lib/nlspec.py
-> for reading the specs, in a separate patchset.
+But, in some cases the net_device is embedded inside the private
+structure, which blocks the usage of zero-length arrays inside
+net_device.
 
-Thanks. Is it worth adding a hack that would be removed later, other
-than going straight to the final solution?
+Create a helper to allocate a dummy device at dynamically runtime, and
+move the Ethernet devices to use it, instead of embedding the dummy
+device inside the private structure.
 
-> -    title = f"Family ``{obj['name']}`` netlink specification"
-> +    # Save the family for use in ref labels
-> +    global family
+This fixes all the network cases except for wireless drivers.
 
-Is it hard to pass this variable by without having to use a global
-variable?
+PS: Due to lack of hardware, unfortunately all these patches are
+compiled tested only.
+
+---
+Changelog:
+
+v1:
+	* https://lore.kernel.org/all/20240327200809.512867-1-leitao@debian.org/
+
+v2:
+	* Patch 1: Use a pre-defined name ("dummy#") for the dummy
+	  net_devices.
+	* Patch 2-5: Added users for the new helper.
+
+Breno Leitao (5):
+  net: create a dummy net_device allocator
+  net: marvell: prestera: allocate dummy net_device dynamically
+  net: mediatek: mtk_eth_sock: allocate dummy net_device dynamically
+  net: ipa: allocate dummy net_device dynamically
+  net: ibm/emac: allocate dummy net_device dynamically
+
+ drivers/net/ethernet/ibm/emac/mal.c           | 13 +++--
+ drivers/net/ethernet/ibm/emac/mal.h           |  2 +-
+ .../ethernet/marvell/prestera/prestera_rxtx.c | 15 ++++--
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   | 17 ++++--
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h   |  2 +-
+ drivers/net/ipa/gsi.c                         | 12 +++--
+ drivers/net/ipa/gsi.h                         |  2 +-
+ include/linux/netdevice.h                     |  3 ++
+ net/core/dev.c                                | 54 ++++++++++++-------
+ 9 files changed, 85 insertions(+), 35 deletions(-)
+
+-- 
+2.43.0
+
 
