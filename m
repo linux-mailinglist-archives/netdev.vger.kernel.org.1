@@ -1,67 +1,70 @@
-Return-Path: <netdev+bounces-82893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E03D8901D4
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:33:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8579D8901DE
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:34:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 905BBB23402
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:33:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D9FF1F268EB
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDF612DDA6;
-	Thu, 28 Mar 2024 14:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD2112EBD5;
+	Thu, 28 Mar 2024 14:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IeIzeJPL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rwlsvkhH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D4612D209;
-	Thu, 28 Mar 2024 14:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9B712BEA0;
+	Thu, 28 Mar 2024 14:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711636313; cv=none; b=u9TkTQTKadAKw5YUhM3/ZuZELFGTh+e+Fz5LL9cR3wjDZy4WSrYhCTFP+PLl3mXpBqD41peDy87heqz0b4K3SKHZii6AV8C9cMNwhCosxeq+QzMR2C53nOAGB3GN6xOY8w8feKyBw3Y6jDhetrEbSsZK2SRqoU5jrFNBVPgDjuc=
+	t=1711636336; cv=none; b=r6jlSDlIp2kjm3+3yyYrk5/Kfj30PKkooy1wya/QS20+16jt8vfjedyH7VWaJpfQoVv3g7COtmnvmTfDX0qMYUakvL5LbiZUdaykOdPWrNdWxOwlM6C89qrBwTAXSixSWTbCXZM9Pe35DsBeItRa91KyIz6l8ZSuar3xvCfKVCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711636313; c=relaxed/simple;
-	bh=63E3lJn+RbWzhvFRPe7NeWgxZ0tEg6xP/LcfJ4ruTtU=;
+	s=arc-20240116; t=1711636336; c=relaxed/simple;
+	bh=oOMLQx+gPaXHH5Tk6o+DNZIrvqEEtpFNuWMdgsGdvoY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YQWBsT1aUuYNNiZN6nfJ44ii5iCVrELo6R18lYFSyBEs0dvvy33MYGrlUxc7YPUlCqYwQx1IJ8Li558jXre3qbiTgvEKcINfjSHYmNjkaQFrD2pUZNrAJIqqXwXr3eem+VEz5dTHRCgUYzs+BkF2KkVq4bIQ9/QS3B7FMcgcp8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IeIzeJPL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73B14C433C7;
-	Thu, 28 Mar 2024 14:31:49 +0000 (UTC)
+	 MIME-Version; b=R2V28Mqe7RAhA0iJzGNNSU4GZEsZRo0w7C0YVELohycv94O7Scvj5KAXj9p0VoatgeNpat9PDsJdAEQABWRonMJUTgl0j6KGbsO3iazTruqC1wwTXAI8Jtv0nV6ZQTUd7/uvWQ8sfGAvTaYTuNoIcJa1kAcs7XFy6Kps1Cy/MNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rwlsvkhH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CBF9C433C7;
+	Thu, 28 Mar 2024 14:32:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711636313;
-	bh=63E3lJn+RbWzhvFRPe7NeWgxZ0tEg6xP/LcfJ4ruTtU=;
+	s=k20201202; t=1711636336;
+	bh=oOMLQx+gPaXHH5Tk6o+DNZIrvqEEtpFNuWMdgsGdvoY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IeIzeJPLkhJmIX8tfvNCyH/kz7dBZEaGv2AH5mRvXEHTKzjG/bGvkl1wrQQSGhHhR
-	 WAlroVk1KIkwQ+Q3j546UO8T09Xwgq/PY6cz6Ni1I+dxI3+5Qm72UOXucjukpc5yFH
-	 i41C1dQwmNLmjnPVXyDRWAY/cNcBJqm7V4Vmdqq8VtznuVDuRQKbNognTdbcoHH/dr
-	 DBEQCkj5UgVY9xr9OQxUF6szyNPMOywEknh4MEaqD+Su+pv3NDwx9F2ZS6Og5GR9aB
-	 analtJheeLW2+JVcuCKBt3GTI318iexloMXaM3CNcDQ9ZU4TbZBVBkGMfOCL0WXWSJ
-	 WJRJmX9ZP13/Q==
+	b=rwlsvkhHCsWSQWHVw/27w1M7pS1Z3C3fvOkjQZto5XbtiZvBzheadtKt4qSt9CO53
+	 BRkZ1E9up6qBgTfor+rcxdIc0tpi08tqJfhHIhvDMK2F9Uzd/A44Xm5N1CZ4AtzNOw
+	 M31LEk8eYkBTzX6NzeKe8UsHOGHu8oSP48s0psUqL7RdUe32N+QrfOvA+wzOxn/z6x
+	 bGGtaUBNb3NdDlOlch3dTNKM8l8KiK4VVMjjnnVnLeXTYPetOdxgDP5WwxSLNecWsh
+	 TLngdvzP4KMTHREfE0HPuRvpbwwU8jiF0Jk67qcQrAliZbIH+7w3RMZduND8EqkBUz
+	 V3dj+E+ST0j6w==
 From: Arnd Bergmann <arnd@kernel.org>
 To: linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>
+	Nathan Chancellor <nathan@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Maxim Mikityanskiy <maxtram95@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>
 Cc: Arnd Bergmann <arnd@arndb.de>,
 	Nick Desaulniers <ndesaulniers@google.com>,
 	Bill Wendling <morbo@google.com>,
 	Justin Stitt <justinstitt@google.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	"mfreemon@cloudflare.com" <mfreemon@cloudflare.com>,
-	Yan Zhai <yan@cloudflare.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
 	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
 	llvm@lists.linux.dev
-Subject: [PATCH 5/9] ipv4: tcp_output: avoid warning about NET_ADD_STATS
-Date: Thu, 28 Mar 2024 15:30:43 +0100
-Message-Id: <20240328143051.1069575-6-arnd@kernel.org>
+Subject: [PATCH 8/9] mlx5: stop warning for 64KB pages
+Date: Thu, 28 Mar 2024 15:30:46 +0100
+Message-Id: <20240328143051.1069575-9-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240328143051.1069575-1-arnd@kernel.org>
 References: <20240328143051.1069575-1-arnd@kernel.org>
@@ -75,52 +78,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-Clang warns about a range check in percpu_add_op() being impossible
-to hit for an u8 variable:
+When building with 64KB pages, clang points out that xsk->chunk_size
+can never be PAGE_SIZE:
 
-net/ipv4/tcp_output.c:188:3: error: result of comparison of constant -1 with expression of type 'u8' (aka 'unsigned char') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
-                NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPACKCOMPRESSED,
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-include/net/ip.h:291:41: note: expanded from macro 'NET_ADD_STATS'
- #define NET_ADD_STATS(net, field, adnd) SNMP_ADD_STATS((net)->mib.net_statistics, field, adnd)
-                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-include/net/snmp.h:143:4: note: expanded from macro 'SNMP_ADD_STATS'
-                        this_cpu_add(mib->mibs[field], addend)
-                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-include/linux/percpu-defs.h:509:33: note: expanded from macro 'this_cpu_add'
- #define this_cpu_add(pcp, val)          __pcpu_size_call(this_cpu_add_, pcp, val)
-                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
-<scratch space>:187:1: note: expanded from here
-this_cpu_add_8
-^
-arch/x86/include/asm/percpu.h:326:35: note: expanded from macro 'this_cpu_add_8'
- #define this_cpu_add_8(pcp, val)                percpu_add_op(8, volatile, (pcp), val)
-                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-arch/x86/include/asm/percpu.h:127:31: note: expanded from macro 'percpu_add_op'
-                              ((val) == 1 || (val) == -1)) ?            \
-                                             ~~~~~ ^  ~~
+drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c:19:22: error: result of comparison of constant 65536 with expression of type 'u16' (aka 'unsigned short') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
+        if (xsk->chunk_size > PAGE_SIZE ||
+            ~~~~~~~~~~~~~~~ ^ ~~~~~~~~~
 
-Avoid this warning with a cast to a signed 'int'.
+In older versions of this code, using PAGE_SIZE was the only
+possibility, so this would have never worked on 64KB page kernels,
+but the patch apparently did not address this case completely.
 
+As Maxim Mikityanskiy suggested, 64KB chunks are really not all that
+useful, so just shut up the warning by adding a cast.
+
+Fixes: 282c0c798f8e ("net/mlx5e: Allow XSK frames smaller than a page")
+Link: https://lore.kernel.org/netdev/20211013150232.2942146-1-arnd@kernel.org/
+Link: https://lore.kernel.org/lkml/a7b27541-0ebb-4f2d-bd06-270a4d404613@app.fastmail.com/
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- net/ipv4/tcp_output.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index e3167ad96567..dbe54fceee08 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -183,7 +183,7 @@ static inline void tcp_event_ack_sent(struct sock *sk, u32 rcv_nxt)
- 
- 	if (unlikely(tp->compressed_ack)) {
- 		NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPACKCOMPRESSED,
--			      tp->compressed_ack);
-+			      (int)tp->compressed_ack);
- 		tp->compressed_ack = 0;
- 		if (hrtimer_try_to_cancel(&tp->compressed_ack_timer) == 1)
- 			__sock_put(sk);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
+index 06592b9f0424..9240cfe25d10 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
+@@ -28,8 +28,10 @@ bool mlx5e_validate_xsk_param(struct mlx5e_params *params,
+ 			      struct mlx5e_xsk_param *xsk,
+ 			      struct mlx5_core_dev *mdev)
+ {
+-	/* AF_XDP doesn't support frames larger than PAGE_SIZE. */
+-	if (xsk->chunk_size > PAGE_SIZE || xsk->chunk_size < MLX5E_MIN_XSK_CHUNK_SIZE) {
++	/* AF_XDP doesn't support frames larger than PAGE_SIZE,
++	 * and xsk->chunk_size is limited to 65535 bytes.
++	 */
++	if ((size_t)xsk->chunk_size > PAGE_SIZE || xsk->chunk_size < MLX5E_MIN_XSK_CHUNK_SIZE) {
+ 		mlx5_core_err(mdev, "XSK chunk size %u out of bounds [%u, %lu]\n", xsk->chunk_size,
+ 			      MLX5E_MIN_XSK_CHUNK_SIZE, PAGE_SIZE);
+ 		return false;
 -- 
 2.39.2
 
