@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-83013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4019E8906C3
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:07:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E2418906C4
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED5C82841BB
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:07:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90515B23817
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971235A784;
-	Thu, 28 Mar 2024 17:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523AC3BB38;
+	Thu, 28 Mar 2024 17:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NtY2nOw0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bvbTVzn5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064004436D
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 17:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 973035A78E
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 17:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711645396; cv=none; b=lZixxEl8daCH135BfWKJclcO8ccdNYK086J+YbBTGNiVNGPb20XKd78eCXzkoTIgsp7mURTlVVSokEszX62EnPM6/3jQWYJscTyrGIHV0QmLPAA4OoSoxw1vQrusuM1SaFnzcKEiVJNno4kb/j9FIPav9NzVifn47SUtStqLikQ=
+	t=1711645398; cv=none; b=cCGdZsbAvajmSOL1T++vWkp30kzykgolV/uw0RKCHkbZxFzyJmmUXldn0hcr7EEUWQqJ4GcgPh2niZt74ue6X9XRO2H6RhZ//6HBgYsVffDt4eU2FxrQ+QMZNAVbSzqiM9ybm265aNwrvKrJ1sl3oSij7iPCYFq20GKDnfeOVc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711645396; c=relaxed/simple;
-	bh=u6CKHjdRZ3Q3jFE+0JJbKpQLd3hkwh+kwA+sSojO8Vs=;
+	s=arc-20240116; t=1711645398; c=relaxed/simple;
+	bh=F4gefdTj70muIJN2Zn7X1B8TXmBV5hqnEjBHGBIqff8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=USFPSvIVqZSX6PPMsFkp8vNwtPPkOuGp5/aSZriB7I3x4LaPCEdnz4qzOMrfpeo4/zLoCJijwmq4jbT5KYfcn87mkOdAKZ/2B2OySN7hf5fM1jzUNXZVICc4T8EhHK4BSjVsr3IpPfYHoaMxJfaeazKsnTBYknIl24iLA2+GPtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NtY2nOw0; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=n0Oed3D1A8lc6/AN1ZEtoB6IXSGJA0URnDG7+XjFnJY9OVVwG0RhhI9jfJnaChASFD51CKlLEyVjjKevZaCps6AFAPwbpkEesYjxzFaUkWRebbVHJvZSRleditXcsAo9t6sfnRX5Unbg0GQ2X0aPQBnhblGQuSEV3JzOlfCETC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bvbTVzn5; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6dbdcfd39so1891297276.2
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 10:03:14 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dd169dd4183so1379617276.3
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 10:03:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711645394; x=1712250194; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1711645395; x=1712250195; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zkkkR4bJVGdAmtjki7FbOrCs0xkI3kc/cNsgAoiErHk=;
-        b=NtY2nOw0nmHqIEXkS52pIfHOt8/hJX7x9xF2SY2rGqq7HgIjRlIMxvHTWhwZ8/QAog
-         SCkQ3op82Ke3DNvwyEPxYcgK+ERNWks3yPp/9B5DGeX+2JXIcUy4O7vD7Wxi4P9+0qvt
-         L1/hHlfjXjJE58P3ZrFrxXD8atSYHf0GF6xgopYESYtvDbY54CAczdYvB2twabm9n3yS
-         det8caSOTXXM9b5ruwFA+erDVgC5ODcOIERLfk1GEmww5+OI6Z+4pzSXsn1Xy5YApwZF
-         2heFr11Ef1ljIgFXxhn/K7D39Q7LgvOpI/+yycPZDGkrAGinuMuh7kq6Y/By37AxwhY/
-         IaRw==
+        bh=FtfH02Ug/jt3Vtvx2bBwAZ1F+VYum2JtqqevVN5MyMc=;
+        b=bvbTVzn5lpS1821HnOAn8qLAoFXvXlx0n0Qu8qASV7ZL1Bvw5HBjK71tioP15LJZce
+         0S+XjG+7xUOZgGmRxU3cKcFC46mQ3nKsX86ZfOi6j0eRk1pnZUBUFofAoizF7up8gIPT
+         wIIjCgsVLWd0VYw89VxBZVAvYX71i1O1KDP3iM0Vdj5xiAvRXv2ObLimhNOPnXBD6pTC
+         oFoJcSuKPVY4XUk86DN+U5URs4bw7daokt9oc6N6wUhF6R08syVP8g7h/napKFlFPcOa
+         AUlKadmhNVdvba60tXeldB07MdI+349TJjkaxxS9pv4q6rotkhBxl/p6W/1oqf/2Dhuc
+         EO/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711645394; x=1712250194;
+        d=1e100.net; s=20230601; t=1711645395; x=1712250195;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zkkkR4bJVGdAmtjki7FbOrCs0xkI3kc/cNsgAoiErHk=;
-        b=X5D0rY8Hu/iiZZNSKPObZdHn9t+8TGPDXW3sT7xHYI/Xgh8q1T64d/pJ2ytZSm0OUG
-         W2dp9frqwVCEzTVkcKHiMgjijnSrVmQOyoFndHoOSQOCr9oK7xQOHS2xKdyR1CZf7gA7
-         c6U4JAUY5I8TlrFGSTS5hsj94Qz4F1rqOtV+i/yxiDFRysQ08+CIF/NhdwFv0M8GOj9U
-         QG1tJgoDHSWJi1869McvCxNWS7oJNNyXQsZIcCzP9Qv2edKErnee+nRm2q2OPhUwlADz
-         2DdafUTOt0mjuGkssgVeTkLEn1fmNbrLms8a4Wu/w+AvDT1Gs1UM06KZRvdkIaW7GVQr
-         EyGg==
-X-Gm-Message-State: AOJu0YyhFvCMlLVRP/FxwBDGE/WaFug4fJ6Jg7ix0NnQXq0bshfmj3kR
-	Nq7HnQ0OajD43W8z50ixKMSjh8kp/3iiZa91VrGwvvh+fTcJ98TUNDHpGrEsMM4E/t3ChB5jtZ5
-	M299DNnNUbg==
-X-Google-Smtp-Source: AGHT+IEkDMdQwB28sjXqbQO6DPsBKrPbAJ86d1jrLX7OZqcPrx6CURW1BBpKVVOSGf8tTKhq7AJ/4pFN5ifMvQ==
+        bh=FtfH02Ug/jt3Vtvx2bBwAZ1F+VYum2JtqqevVN5MyMc=;
+        b=ulkyzdidUBug2wxr1AcVsmurfTc+alzYjayUWBvqw/kUf6MotOSWLHU5zClidRmkS9
+         C7R79oDFVkFC0iksftBwLRJ9mcDupRYs80ft5kBObFHe/h4nyajxRC3kbacttue0rDXs
+         83DUUHObkA23B3aUztNtZJt8QHt5LKBu9TLpnlcRyFipF2sfBnoNJ92vJ1zL5Tjy4llN
+         Z9zftTtOpm7zw7PkvTGdIUqH5k/wYHMFzz/jlBSM+/cCWGUj6kFepdVPSKRFI8j8RAzO
+         QWWwAeOf1XjNregjU9kZJIJoBibe7VlPtwZrANMx5THq1V0I+iEeqmMbZtGlxvDz5nHJ
+         LCyg==
+X-Gm-Message-State: AOJu0Yy9qImlIvnZGuJAdeVMzk6O9h+DvJ573ZggSxKrYkqeZj6QrocX
+	oH+Grjn4qHp60MjccEsXqG1NFNhRPMIwlHf9qFC+DohQHHCUukCX6nHbAr0SAp5344ZFb1CVYhT
+	woE/nFCo9+Q==
+X-Google-Smtp-Source: AGHT+IH+8zFiZOYmBZcmX4Q9j60Xdg9XImP4FW/41zvE6T/HOTeWE3/uBt0aUrcda2YyGzUocDfaX0OEueuBlQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:110c:b0:dcc:f01f:65e1 with SMTP
- id o12-20020a056902110c00b00dccf01f65e1mr1089559ybu.8.1711645394049; Thu, 28
- Mar 2024 10:03:14 -0700 (PDT)
-Date: Thu, 28 Mar 2024 17:03:03 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1502:b0:dda:c565:1025 with SMTP
+ id q2-20020a056902150200b00ddac5651025mr252047ybu.2.1711645395779; Thu, 28
+ Mar 2024 10:03:15 -0700 (PDT)
+Date: Thu, 28 Mar 2024 17:03:04 +0000
 In-Reply-To: <20240328170309.2172584-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240328170309.2172584-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240328170309.2172584-3-edumazet@google.com>
-Subject: [PATCH net-next 2/8] net: move dev_xmit_recursion() helpers to net/core/dev.h
+Message-ID: <20240328170309.2172584-4-edumazet@google.com>
+Subject: [PATCH net-next 3/8] net: enqueue_to_backlog() change vs not running device
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,70 +82,55 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move dev_xmit_recursion() and friends to net/core/dev.h
+If the device attached to the packet given to enqueue_to_backlog()
+is not running, we drop the packet.
 
-They are only used from net/core/dev.c and net/core/filter.c.
+But we accidentally increase sd->dropped, giving false signals
+to admins: sd->dropped should be reserved to cpu backlog pressure,
+not to temporary glitches at device dismantles.
+
+While we are at it, perform the netif_running() test before
+we get the rps lock, and use REASON_DEV_READY
+drop reason instead of NOT_SPECIFIED.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/netdevice.h | 17 -----------------
- net/core/dev.h            | 17 +++++++++++++++++
- 2 files changed, 17 insertions(+), 17 deletions(-)
+ net/core/dev.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index cb37817d6382c29117afd8ce54db6dba94f8c930..70775021cc269e0983f538619115237b0067d408 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3270,23 +3270,6 @@ static inline int dev_recursion_level(void)
- 	return this_cpu_read(softnet_data.xmit.recursion);
- }
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 5d36a634f468ffdeaca598c3dd033fe06d240bd0..af7a34b0a7d6683c6ffb21dd3388ed678473d95e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4791,12 +4791,13 @@ static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
+ 	unsigned long flags;
+ 	unsigned int qlen;
  
--#define XMIT_RECURSION_LIMIT	8
--static inline bool dev_xmit_recursion(void)
--{
--	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
--			XMIT_RECURSION_LIMIT);
--}
--
--static inline void dev_xmit_recursion_inc(void)
--{
--	__this_cpu_inc(softnet_data.xmit.recursion);
--}
--
--static inline void dev_xmit_recursion_dec(void)
--{
--	__this_cpu_dec(softnet_data.xmit.recursion);
--}
--
- void __netif_schedule(struct Qdisc *q);
- void netif_schedule_queue(struct netdev_queue *txq);
+-	reason = SKB_DROP_REASON_NOT_SPECIFIED;
++	reason = SKB_DROP_REASON_DEV_READY;
++	if (!netif_running(skb->dev))
++		goto bad_dev;
++
+ 	sd = &per_cpu(softnet_data, cpu);
  
-diff --git a/net/core/dev.h b/net/core/dev.h
-index 9d0f8b4587f81f4c12487f1783d8ba5cc49fc1d6..8572d2c8dc4adce75c98868c888363e6a32e0f52 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -150,4 +150,21 @@ static inline void xdp_do_check_flushed(struct napi_struct *napi) { }
- struct napi_struct *napi_by_id(unsigned int napi_id);
- void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu);
+ 	backlog_lock_irq_save(sd, &flags);
+-	if (!netif_running(skb->dev))
+-		goto drop;
+ 	qlen = skb_queue_len(&sd->input_pkt_queue);
+ 	if (qlen <= READ_ONCE(net_hotdata.max_backlog) &&
+ 	    !skb_flow_limit(skb, qlen)) {
+@@ -4817,10 +4818,10 @@ static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
+ 	}
+ 	reason = SKB_DROP_REASON_CPU_BACKLOG;
  
-+#define XMIT_RECURSION_LIMIT	8
-+static inline bool dev_xmit_recursion(void)
-+{
-+	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
-+			XMIT_RECURSION_LIMIT);
-+}
-+
-+static inline void dev_xmit_recursion_inc(void)
-+{
-+	__this_cpu_inc(softnet_data.xmit.recursion);
-+}
-+
-+static inline void dev_xmit_recursion_dec(void)
-+{
-+	__this_cpu_dec(softnet_data.xmit.recursion);
-+}
-+
- #endif
+-drop:
+ 	sd->dropped++;
+ 	backlog_unlock_irq_restore(sd, &flags);
+ 
++bad_dev:
+ 	dev_core_stats_rx_dropped_inc(skb->dev);
+ 	kfree_skb_reason(skb, reason);
+ 	return NET_RX_DROP;
 -- 
 2.44.0.478.gd926399ef9-goog
 
