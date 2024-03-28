@@ -1,185 +1,213 @@
-Return-Path: <netdev+bounces-82733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D33ED88F798
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:02:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 659D988F7BC
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C3D4B21AB9
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:02:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88B2E1C24196
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E0F4E1BC;
-	Thu, 28 Mar 2024 06:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8394E1BC;
+	Thu, 28 Mar 2024 06:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LYLTNjCc"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="A+l+pys6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C05B241E1
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 06:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3061CAAC;
+	Thu, 28 Mar 2024 06:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711605755; cv=none; b=Ya8kIk7i+1KlLzfrVSMwnHrueFUd7umramNC1NALqJtK76YbMHbRW/vmraLV+qpJFawtgTxL33+3cmcKQrXbMcg1gMI58vv8lsjC75GyWxBk6c/CH9++ZP5/fOh/ECnweW73dc37EWC10JWPo1HQXCy4yTeilpXrpdeY7BZBiGE=
+	t=1711606221; cv=none; b=chK5rQkxyIEcanavR4KjB0Y60E5bgQsmhtbaDyzFaG2siT4rWL+XQUxPmAhL8tewoGxKqGiEuUbAY/EwoIZratKiPC/fozl83Eilmbf6Yk+IiJJCEfor8/XRQl4+AKasNSlbzsb2neLZPBoHm7M5Lu1hOCFQC9Hli6nDME561Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711605755; c=relaxed/simple;
-	bh=SSg/6LeOq6Wjr4nnvlfuPVy2ZR18YLmIn1OPcrktg4w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PPq18bQ5aeeKhOb66lt8eaiMRrOQkr0KTjALZVvwBiDn13yj1Rp4+Y2msPJ6bf3XybHHtvPXvG0MQee9MG9xAT9cagzny8117R1EgunKZjleQU33r3qJZq3B48TjzTkK54r0rwlEjuGSsU1iW44uDgMdAjZ41KdbUMMKzW6XO6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LYLTNjCc; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <00936e03-e4a0-4d93-a576-58a7cd61fd78@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711605751;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0lPvbxXSzuDLjfFugorlD3IGCK2hvLcLqcq21+5wnE4=;
-	b=LYLTNjCcgJ/ZAMcGl/iUy/7pPNOU/+qIWHm7xEqUMigkC62L/NMudPm17rlhLapzY6wCYs
-	S7rHzRDRwcUv7yQCQQUlN9+pbrSrFvhNze7Pj6LRBTonOCQrRMdIzT8wdw3XXndghoWWIC
-	IX2QGM+aZzcGxmZrLOnB4G75S34KnJM=
-Date: Wed, 27 Mar 2024 23:02:24 -0700
+	s=arc-20240116; t=1711606221; c=relaxed/simple;
+	bh=f827W552AcLk4Fd3qgu2RaZ4mLJcPreNh8vnCtreCcY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HuTE7gERrl2tFuedWCrRLVaaiBytmCrjLJio04XS7vxlWTIcLChTO9SUVmYk2dE0UzldNC4H/HiYRw7ZnVFbSiAr4FMN8yFVXGPx4+jnHyPWMJLtaKQiSO+PsILIgXa1OPlGuw95YHo7Zlk6KzvVSMr6kqOTmZwwuH8+uQQaY9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=A+l+pys6; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 42S69g9i000766;
+	Thu, 28 Mar 2024 01:09:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1711606182;
+	bh=JrzMOdxfOHPP/UN6vNlxvG+mwBhM9McFbLhDU4FrLFE=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=A+l+pys6wcMdSU+uzmQmZGuBV3PX4uct+U6yF2clBsdxOR6gyqaQkDAHTfi3brfPp
+	 DuJq36vLp+MOWOAfEtN+qvAOJ+OjgdSfyCMG+uJ/O2kvgIUmRuldjAAbummf2t/c1/
+	 QaYfV0eIqpGQNm8WAcVqvUUtCpbmzqcGJ2zAZeS8=
+Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 42S69gZn016311
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 28 Mar 2024 01:09:42 -0500
+Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 28
+ Mar 2024 01:09:42 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 28 Mar 2024 01:09:42 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 42S69YaD029568;
+	Thu, 28 Mar 2024 01:09:34 -0500
+Message-ID: <c94815f8-798a-4167-8f69-359b9b28b7ce@ti.com>
+Date: Thu, 28 Mar 2024 11:39:33 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 02/12] bnxt_en: Retry PTP TX timestamp from FW
- for 1 second
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
+ ICSSG switch firmware
 Content-Language: en-US
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
- kuba@kernel.org
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
- Richard Cochran <richardcochran@gmail.com>
-References: <20240325222902.220712-1-michael.chan@broadcom.com>
- <20240325222902.220712-3-michael.chan@broadcom.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240325222902.220712-3-michael.chan@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Diogo Ivo <diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
+        Dan
+ Carpenter <dan.carpenter@linaro.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>,
+        Wolfram Sang
+	<wsa+renesas@sang-engineering.com>,
+        Arnd Bergmann <arnd@arndb.de>, Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+References: <20240327114054.1907278-1-danishanwar@ti.com>
+ <20240327114054.1907278-4-danishanwar@ti.com>
+ <27d960ed-8e67-431b-a910-e6b2fc12e292@lunn.ch>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <27d960ed-8e67-431b-a910-e6b2fc12e292@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On 25/03/2024 22:28, Michael Chan wrote:
-> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> 
-> Use a new default 1 second timeout value instead of the existing
-> 1 msec value.  The driver will keep track of the remaining time
-> before timeout and will pass this value to bnxt_hwrm_port_ts_query().
-> The firmware supports timeout values up to 65535 usecs.  If the
-> timeout value passed to bnxt_hwrm_port_ts_query() is less than the
-> FW max value, we will use that value to precisely control the
-> specified timeout.  If it is larger than the FW max value, we will
-> use the FW max value and any additional retry to reach the desired
-> timeout will be done in the context of bnxt_ptp_ts_aux_eork().
-> 
-> Link: https://lore.kernel.org/netdev/20240229070202.107488-2-michael.chan@broadcom.com/
-> Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Cc: Richard Cochran <richardcochran@gmail.com>
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
-> v2: Don't use the devlink parameter.
->      Pass the timeout parameter to bnxt_hwrm_port_ts_query() to precisely
->      control the timeout.
-> ---
->   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 16 +++++++++++++++-
->   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  4 ++++
->   2 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> index dbfd1b36774c..345aac4484ee 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> @@ -678,11 +678,17 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
->   {
->   	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
->   	struct skb_shared_hwtstamps timestamp;
-> +	unsigned long now = jiffies;
->   	u64 ts = 0, ns = 0;
-> +	u32 tmo = 0;
->   	int rc;
->   
-> +	if (!ptp->txts_pending)
-> +		ptp->abs_txts_tmo = now + msecs_to_jiffies(ptp->txts_tmo);
-> +	if (!time_after_eq(now, ptp->abs_txts_tmo))
-> +		tmo = jiffies_to_msecs(ptp->abs_txts_tmo - now);
->   	rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_PATH_TX, &ts,
-> -				     0);
-> +				     tmo);
->   	if (!rc) {
->   		memset(&timestamp, 0, sizeof(timestamp));
->   		spin_lock_bh(&ptp->ptp_lock);
-> @@ -691,6 +697,10 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
->   		timestamp.hwtstamp = ns_to_ktime(ns);
->   		skb_tstamp_tx(ptp->tx_skb, &timestamp);
->   	} else {
-> +		if (!time_after_eq(jiffies, ptp->abs_txts_tmo)) {
-> +			ptp->txts_pending = true;
-> +			return;
-> +		}
->   		netdev_warn_once(bp->dev,
->   				 "TS query for TX timer failed rc = %x\n", rc);
->   	}
-> @@ -698,6 +708,7 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
->   	dev_kfree_skb_any(ptp->tx_skb);
->   	ptp->tx_skb = NULL;
->   	atomic_inc(&ptp->tx_avail);
-> +	ptp->txts_pending = false;
->   }
->   
->   static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
-> @@ -721,6 +732,8 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
->   		spin_unlock_bh(&ptp->ptp_lock);
->   		ptp->next_overflow_check = now + BNXT_PHC_OVERFLOW_PERIOD;
->   	}
-> +	if (ptp->txts_pending)
-> +		return 0;
->   	return HZ;
->   }
->   
-> @@ -973,6 +986,7 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
->   		spin_unlock_bh(&ptp->ptp_lock);
->   		ptp_schedule_worker(ptp->ptp_clock, 0);
->   	}
-> +	ptp->txts_tmo = BNXT_PTP_DFLT_TX_TMO;
->   	return 0;
->   
->   out:
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> index 04886d5f22ad..6a2bba3f9e2d 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> @@ -22,6 +22,7 @@
->   #define BNXT_LO_TIMER_MASK	0x0000ffffffffUL
->   #define BNXT_HI_TIMER_MASK	0xffff00000000UL
->   
-> +#define BNXT_PTP_DFLT_TX_TMO	1000 /* ms */
->   #define BNXT_PTP_QTS_TIMEOUT	1000
->   #define BNXT_PTP_QTS_MAX_TMO_US	65535
->   #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
-> @@ -116,11 +117,14 @@ struct bnxt_ptp_cfg {
->   					 BNXT_PTP_MSG_PDELAY_REQ |	\
->   					 BNXT_PTP_MSG_PDELAY_RESP)
->   	u8			tx_tstamp_en:1;
-> +	u8			txts_pending:1;
->   	int			rx_filter;
->   	u32			tstamp_filters;
->   
->   	u32			refclk_regs[2];
->   	u32			refclk_mapped_regs[2];
-> +	u32			txts_tmo;
-> +	unsigned long		abs_txts_tmo;
->   };
->   
->   #if BITS_PER_LONG == 32
+Hi Andrew,
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+On 27/03/24 6:05 pm, Andrew Lunn wrote:
+> On Wed, Mar 27, 2024 at 05:10:54PM +0530, MD Danish Anwar wrote:
+>> Add support for ICSSG switch firmware using existing Dual EMAC driver
+>> with switchdev.
+>>
+>> Limitations:
+>> VLAN offloading is limited to 0-256 IDs.
+>> MDB/FDB static entries are limited to 511 entries and different FDBs can
+>> hash to same bucket and thus may not completely offloaded
+>>
+>> Switch mode requires loading of new firmware into ICSSG cores. This
+>> means interfaces have to taken down and then reconfigured to switch
+>> mode.
+> 
+> Patch 0/3 does not say this. It just shows the interfaces being added
+
+I will modify the cover letter to state that.
+
+> to the bridge. There should not be any need to down the interfaces.
+> 
+
+The interfaces needs to be turned down for switching between dual emac
+and switch mode.
+
+Dual Emac mode runs with ICSSG Dual Emac firmware where as Switch mode
+works with ICSSG Switch firmware. These firmware are running on the
+dedicated PRU RPROC cores (pru0, rtu0, txpru0). When switch mode is
+enabled, these pru cores need to be stopped and then Switch firmware is
+loaded on these cores and then the cores are started again.
+
+We stop the cores when interfaces are down and start the cores when
+interfaces are up.
+
+In short, Dual EMAC firmware runs on pru cores, we put down the
+interface, stop pru cores, load switch firmware on the cores, bring the
+interface up and start the pru cores and now Switch mode is enabled.
+
+
+>> Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
+>>
+>> Switch to ICSSG Switch mode:
+>>  ip link set dev eth1 down
+>>  ip link set dev eth2 down
+>>  ip link add name br0 type bridge
+>>  ip link set dev eth1 master br0
+>>  ip link set dev eth2 master br0
+>>  ip link set dev br0 up
+>>  ip link set dev eth1 up
+>>  ip link set dev eth2 up
+>>  bridge vlan add dev br0 vid 1 pvid untagged self
+>>
+>> Going back to Dual EMAC mode:
+>>
+>>  ip link set dev br0 down
+>>  ip link set dev eth1 nomaster
+>>  ip link set dev eth2 nomaster
+>>  ip link set dev eth1 down
+>>  ip link set dev eth2 down
+>>  ip link del name br0 type bridge
+>>  ip link set dev eth1 up
+>>  ip link set dev eth2 up
+>>
+>> By default, Dual EMAC firmware is loaded, and can be changed to switch
+>> mode by above steps
+> 
+> I keep asking this, so it would be good to explain it in the commit
+> message. What configuration is preserved over a firmware reload, and
+> what is lost?
+> 
+> Can i add VLAN in duel MAC mode and then swap into the switch firmware
+> and all the VLANs are preserved? Can i add fdb entries to a port in
+> dual MAC mode, and then swap into the swtich firmware and the FDB
+> table is preserved? What about STP port state? What about ... ?
+> 
+
+When ports are brought up (firmware reload) we do a full cleaning of all
+the shared memories i.e. SMEM (shared RAM). [1]
+
+Vlan table and FDB table are stored in SMEM so all the configuration
+done to VLAN / FDB tables will be lost.
+
+We don't clear DRAM. DRAM is used for sending r30 commands [see
+emac_r30_cmd_init()], configure half duplex [see
+icssg_config_half_duplex()] and configure link speed [see
+icssg_config_set_speed()]. r30 commands are used to set port state (stp).
+
+Now when the interfaces are brought up (firmware reload) r30 command is
+reconfigured as a result any changes done to port state (stp) will be
+lost. But the duplex and speed settings will be preserved.
+
+To summarize,
+VLAN table / FDB table and port states are lost during a firmware reload.
+
+[1]
+https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/ti/icssg/icssg_prueth.c#L1321
+> 
+>> +bool prueth_dev_check(const struct net_device *ndev)
+>> +{
+>> +	if (ndev->netdev_ops == &emac_netdev_ops && netif_running(ndev)) {
+>> +		struct prueth_emac *emac = netdev_priv(ndev);
+>> +
+>> +		return emac->prueth->is_switch_mode;
+>> +	}
+>> +
+>> +	return false;
+>> +}
+> 
+> This does not appear to be used anywhere?
+> 
+>      Andrew
+
+-- 
+Thanks and Regards,
+Danish
 
