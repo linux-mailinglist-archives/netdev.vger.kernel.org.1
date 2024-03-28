@@ -1,143 +1,290 @@
-Return-Path: <netdev+bounces-82745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93DB388F8C9
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:31:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E003588F8E4
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:38:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0ACD1C229E6
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:31:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FF4EB24E16
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC0C52F6A;
-	Thu, 28 Mar 2024 07:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA0C4086A;
+	Thu, 28 Mar 2024 07:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gcYWJotu"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="w6H+RVsK"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E32F2561F;
-	Thu, 28 Mar 2024 07:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8155C39FC6
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711611101; cv=none; b=l35qVSooQJgulXf8OEKXM4ee0eiW9zEiabwibizv6f8FKhsfkL2kBsAFdsaSVFGnwEn/j5SNqdoECfx+4U/wzWExWXSMbiYW1R5710zGqQWe24Zt57/6WWij+zk0Y4X16uKXZLVUG59umzXIyA3yrmEdXTITyXfMyzhZ9bFyVQA=
+	t=1711611483; cv=none; b=jFNaeQWlC5zBpMHdVvuwAgIJv5vA/soJodhAsd2ZiZDXMYvBDd2Tku+96xpp/AYqN+rg1v9vz0Gmnuz0PpaL4zDUWrvlKThZHjUbXRhLnFdKvQXqn0X31omPvEV0cbHsGE6LaRiOUkRGoSIdb97gmUxtdEZp/fUjd6aCgepWhCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711611101; c=relaxed/simple;
-	bh=UiexvZQWK+4Yc+SMZ9M3zHpPBZVoEYHrn9anANb9C5w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d5Fm6ImLcHPV6UYzlsQeYNsjvAQufCBZvBPsa210F2htuofaAshATEDf/2A5+yv08JlFkWpjmTYRAyXYwW6T0YT/0SU5eCH/gYnEQ9pXljqsRinJCl/lnkDFftrLbeUWzIEzBr/O7AtKnfMOcFBuMtBpAoSVFpTIrHmgldSXXD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gcYWJotu; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=vttzHoZOnFV3RpiKvH6mM16x2BnNpMVa6ppcy7eNO+k=; b=gcYWJotuQVW8GYZ0l03Qd1Y7Rx
-	geRqzubUVBuSA9E2/DAQoiPMRqhx1n9l+w28Wiufj/ZAExFJaqfwavTjC8gzuWje1jZN2jUSkE+qE
-	Q15FOsZFQN2b0luQEwgHnGe7lzK15zDdvK7FQjfmrbwwmVTazNYcBHn8mWmTha+YKF08jxIWc0REQ
-	+8EyFi9U6Gl0G+TAuZmP4Qd6h8HYQgYngvPlmHvo3Jo8XSRKsSWUmgiFQ8nfw+lmfCUH+lF0bMRBm
-	3NB7t68iGeniQOu1nPNBlIsx+leXTDUB9ZbdcRiTXuwjN/rjZyp29U3bvNZvER0Ozv/NSab0o7bxJ
-	CYLe7RCQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rpkEV-0000000CslI-1PHG;
-	Thu, 28 Mar 2024 07:31:31 +0000
-Date: Thu, 28 Mar 2024 00:31:31 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Christoph Hellwig <hch@infradead.org>, shakeel.butt@linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
- custom page providers
-Message-ID: <ZgUc07Szbx5x-obb@infradead.org>
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-3-almasrymina@google.com>
- <ZfegzB341oNc_Ocz@infradead.org>
- <CAHS8izOUi6qGp=LSQb_o5oph-EnhNOuhLkPSfbQRU3eniZvbdA@mail.gmail.com>
- <ZgC5JoSiWAYf3IgX@infradead.org>
- <CAHS8izO5-giYhM1bVCLLOXRXq-Xd0=pi0kPq5E1-R=3i=XihmQ@mail.gmail.com>
+	s=arc-20240116; t=1711611483; c=relaxed/simple;
+	bh=Jla3slRc4P8od91/pZc3s+BBoI4ESENWZ5tYTQkyJBU=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=UzF8OsG9awjp3onJblwAjUw/Oqc1EH8EVaK/cv04VdkgbuARuyR/F+jem81pqRRTZRdo7qzdcrQG/RFFdzAcuObGGAcFWYWclYmNYLXbv6oCfetpVemRNJl55GMVXqZT/x54LAesQcORv3YcsK1vfU9RgSigFJtx37b7JSs8QlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=w6H+RVsK; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711611478; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=VwXafepT0aMMhy5NzW7ic7Zg72Wm47lRCmVfEeNBsxA=;
+	b=w6H+RVsKqC8FiR2yEuk+9xhIKys1rOd5IMU5yxI+fsQTgEhF9FhPLMBOk49JwHjTI4M7pHsD/GxopbiLAu6QIjFH2LGTSAU7U0n7+Zhc4Q4cPL0aQ4WvrQdysbHR50H8gbclLLKdHDms4448u+i9zd/74kyN8lhZ3SKYhNAwTR0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3SbyNm_1711611476;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3SbyNm_1711611476)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Mar 2024 15:37:57 +0800
+Message-ID: <1711611393.0808053-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v6 03/10] virtio_ring: packed: structure the indirect desc table
+Date: Thu, 28 Mar 2024 15:36:33 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240327111430.108787-1-xuanzhuo@linux.alibaba.com>
+ <20240327111430.108787-4-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvGTiZUepzRL9dMNaxZUenKzrqPnnd9594aWjF-KcXCrw@mail.gmail.com>
+In-Reply-To: <CACGkMEvGTiZUepzRL9dMNaxZUenKzrqPnnd9594aWjF-KcXCrw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHS8izO5-giYhM1bVCLLOXRXq-Xd0=pi0kPq5E1-R=3i=XihmQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Mar 26, 2024 at 01:19:20PM -0700, Mina Almasry wrote:
-> 
-> Are you envisioning that dmabuf support would be added to the block
-> layer
+On Thu, 28 Mar 2024 14:56:55 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Wed, Mar 27, 2024 at 7:14=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > This commit structure the indirect desc table.
+> > Then we can get the desc num directly when doing unmap.
+> >
+> > And save the dma info to the struct, then the indirect
+> > will not use the dma fields of the desc_extra. The subsequent
+> > commits will make the dma fields are optional.
+>
+> Nit: It's better to add something like "so we can't reuse the
+> desc_extra[] array"
+>
+> > But for
+> > the indirect case, we must record the dma info.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/virtio/virtio_ring.c | 61 +++++++++++++++++++-----------------
+> >  1 file changed, 33 insertions(+), 28 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index a2838fe1cc08..e3343cf55774 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -74,7 +74,7 @@ struct vring_desc_state_split {
+> >
+> >  struct vring_desc_state_packed {
+> >         void *data;                     /* Data for callback. */
+> > -       struct vring_packed_desc *indir_desc; /* Indirect descriptor, i=
+f any. */
+> > +       struct vring_desc_extra *indir_desc; /* Indirect descriptor, if=
+ any. */
+>
+> Should be "DMA info with indirect descriptor, if any" ?
+>
+> >         u16 num;                        /* Descriptor list length. */
+> >         u16 last;                       /* The last desc state in a lis=
+t. */
+> >  };
+> > @@ -1243,10 +1243,13 @@ static void vring_unmap_desc_packed(const struc=
+t vring_virtqueue *vq,
+> >                        DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> >  }
+> >
+> > -static struct vring_packed_desc *alloc_indirect_packed(unsigned int to=
+tal_sg,
+> > -                                                      gfp_t gfp)
+> > +static struct vring_desc_extra *alloc_indirect_packed(unsigned int tot=
+al_sg,
+> > +                                                     gfp_t gfp)
+> >  {
+> > -       struct vring_packed_desc *desc;
+> > +       struct vring_desc_extra *in_extra;
+> > +       u32 size;
+> > +
+> > +       size =3D sizeof(*in_extra) + sizeof(struct vring_packed_desc) *=
+ total_sg;
+> >
+> >         /*
+> >          * We require lowmem mappings for the descriptors because
+> > @@ -1255,9 +1258,10 @@ static struct vring_packed_desc *alloc_indirect_=
+packed(unsigned int total_sg,
+> >          */
+> >         gfp &=3D ~__GFP_HIGHMEM;
+> >
+> > -       desc =3D kmalloc_array(total_sg, sizeof(struct vring_packed_des=
+c), gfp);
+> >
+> > -       return desc;
+> > +       in_extra =3D kmalloc(size, gfp);
+> > +
+> > +       return in_extra;
+> >  }
+> >
+> >  static int virtqueue_add_indirect_packed(struct vring_virtqueue *vq,
+> > @@ -1268,6 +1272,7 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
+> >                                          void *data,
+> >                                          gfp_t gfp)
+> >  {
+> > +       struct vring_desc_extra *in_extra;
+> >         struct vring_packed_desc *desc;
+> >         struct scatterlist *sg;
+> >         unsigned int i, n, err_idx;
+> > @@ -1275,10 +1280,12 @@ static int virtqueue_add_indirect_packed(struct=
+ vring_virtqueue *vq,
+> >         dma_addr_t addr;
+> >
+> >         head =3D vq->packed.next_avail_idx;
+> > -       desc =3D alloc_indirect_packed(total_sg, gfp);
+> > -       if (!desc)
+> > +       in_extra =3D alloc_indirect_packed(total_sg, gfp);
+> > +       if (!in_extra)
+> >                 return -ENOMEM;
+> >
+> > +       desc =3D (struct vring_packed_desc *)(in_extra + 1);
+> > +
+> >         if (unlikely(vq->vq.num_free < 1)) {
+> >                 pr_debug("Can't add buf len 1 - avail =3D 0\n");
+> >                 kfree(desc);
+> > @@ -1315,17 +1322,16 @@ static int virtqueue_add_indirect_packed(struct=
+ vring_virtqueue *vq,
+> >                 goto unmap_release;
+> >         }
+> >
+> > +       if (vq->use_dma_api) {
+> > +               in_extra->addr =3D addr;
+> > +               in_extra->len =3D total_sg * sizeof(struct vring_packed=
+_desc);
+> > +       }
+>
+> Any reason why we don't do it after the below assignment of descriptor fi=
+elds?
+>
+> > +
+> >         vq->packed.vring.desc[head].addr =3D cpu_to_le64(addr);
+> >         vq->packed.vring.desc[head].len =3D cpu_to_le32(total_sg *
+> >                                 sizeof(struct vring_packed_desc));
+> >         vq->packed.vring.desc[head].id =3D cpu_to_le16(id);
+> >
+> > -       if (vq->use_dma_api) {
+> > -               vq->packed.desc_extra[id].addr =3D addr;
+> > -               vq->packed.desc_extra[id].len =3D total_sg *
+> > -                               sizeof(struct vring_packed_desc);
+> > -       }
+> > -
+> >         vq->packed.desc_extra[id].flags =3D VRING_DESC_F_INDIRECT |
+> >                 vq->packed.avail_used_flags;
+> >
+> > @@ -1356,7 +1362,7 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
+> >         /* Store token and indirect buffer state. */
+> >         vq->packed.desc_state[id].num =3D 1;
+> >         vq->packed.desc_state[id].data =3D data;
+> > -       vq->packed.desc_state[id].indir_desc =3D desc;
+> > +       vq->packed.desc_state[id].indir_desc =3D in_extra;
+> >         vq->packed.desc_state[id].last =3D id;
+> >
+> >         vq->num_added +=3D 1;
+> > @@ -1375,7 +1381,7 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
+> >                 vring_unmap_desc_packed(vq, &desc[i]);
+> >
+> >  free_desc:
+> > -       kfree(desc);
+> > +       kfree(in_extra);
+> >
+> >         END_USE(vq);
+> >         return -ENOMEM;
+> > @@ -1589,7 +1595,6 @@ static void detach_buf_packed(struct vring_virtqu=
+eue *vq,
+> >                               unsigned int id, void **ctx)
+> >  {
+> >         struct vring_desc_state_packed *state =3D NULL;
+> > -       struct vring_packed_desc *desc;
+> >         unsigned int i, curr;
+> >         u16 flags;
+> >
+> > @@ -1616,27 +1621,27 @@ static void detach_buf_packed(struct vring_virt=
+queue *vq,
+> >                 if (ctx)
+> >                         *ctx =3D state->indir_desc;
+> >         } else {
+> > -               const struct vring_desc_extra *extra;
+> > -               u32 len;
+> > +               struct vring_desc_extra *in_extra;
+> > +               struct vring_packed_desc *desc;
+> > +               u32 num;
+> > +
+> > +               in_extra =3D state->indir_desc;
+> >
+> >                 if (vq->use_dma_api) {
+> > -                       extra =3D &vq->packed.desc_extra[id];
+> >                         dma_unmap_single(vring_dma_dev(vq),
+> > -                                        extra->addr, extra->len,
+> > +                                        in_extra->addr, in_extra->len,
+> >                                          (flags & VRING_DESC_F_WRITE) ?
+> >                                          DMA_FROM_DEVICE : DMA_TO_DEVIC=
+E);
+>
+> Can't we just reuse vring_unmap_extra_packed() here?
 
-Yes.
+vring_unmap_extra_packed calls dma_unmap_page.
+Here needs dma_unmap_single.
 
-> (which I understand is part of the VFS and not driver specific),
+You mean we call dma_unmap_page directly.
 
-The block layer isn't really the VFS, it's just another core stack
-like the network stack.
+Thanks.
 
-> or as part of the specific storage driver (like nvme for example)? If
-> we can add dmabuf support to the block layer itself that sounds
-> awesome. We may then be able to do devmem TCP on all/most storage
-> devices without having to modify each individual driver.
-
-I suspect we'll still need to touch the drivers to understand it,
-but hopefully all the main infrastructure can live in the block layer.
-
-> In your estimation, is adding dmabuf support to the block layer
-> something technically feasible & acceptable upstream? I notice you
-> suggested it so I'm guessing yes to both, but I thought I'd confirm.
-
-I think so, and I know there has been quite some interest to at least
-pre-register userspace memory so that the iommu overhead can be
-pre-loaded.  It also is a much better interface for Peer to Peer
-transfers than what we currently have.
-
+>
+> Thanks
+>
+>
+> >                 }
+> >
+> > -               /* Free the indirect table, if any, now that it's unmap=
+ped. */
+> > -               desc =3D state->indir_desc;
+> > -
+> >                 if (vring_need_unmap_buffer(vq)) {
+> > -                       len =3D vq->packed.desc_extra[id].len;
+> > -                       for (i =3D 0; i < len / sizeof(struct vring_pac=
+ked_desc);
+> > -                                       i++)
+> > +                       num =3D in_extra->len / sizeof(struct vring_pac=
+ked_desc);
+> > +                       desc =3D (struct vring_packed_desc *)(in_extra =
++ 1);
+> > +
+> > +                       for (i =3D 0; i < num; i++)
+> >                                 vring_unmap_desc_packed(vq, &desc[i]);
+> >                 }
+> > -               kfree(desc);
+> > +               kfree(in_extra);
+> >                 state->indir_desc =3D NULL;
+> >         }
+> >  }
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
