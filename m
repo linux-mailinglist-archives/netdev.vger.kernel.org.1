@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-83018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 839D38906C8
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:07:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10DD38906C9
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7BE81C262B0
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:07:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93BA6B225F9
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439CE131E3C;
-	Thu, 28 Mar 2024 17:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FED313280B;
+	Thu, 28 Mar 2024 17:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tHmPJZUC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mo8XnrxT"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF1939FCF
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 17:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92C31327FF
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 17:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711645407; cv=none; b=X4UhTapvpYW30GUegs28EG5H1jnzoYahu092IxXsH7a5Z0WcXtA4Wfk2s2Kmmgw9P4KKG0bE6LYxTEttl4N5F8Ux2bRRl2kqMgYshhrqLffCRURkoIexPRkE4sInHq/APj3AOKhXMNDfOn8o7J/yr8cBH54vVCaQnTP68u267h4=
+	t=1711645409; cv=none; b=sit2Fg+dKO1h63+DVDAKBUFfCqpPHvJYvKwHsxKlOYX4FFMyNP5MJYa888F9QNAr6ZEB80GVtGEYs7GZ3nlHgUO6ePzy95LLKYDzmOmHC5lAG4mZYA+PPOk62LKJIIaYvsQQgz+eohmjTwkza1pg7ZDfoCd+W2ptxT/LmtilPW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711645407; c=relaxed/simple;
-	bh=VWLua73p7ZUAjdHrayoP/lX15Em4rPKgzz1/a9x1KxQ=;
+	s=arc-20240116; t=1711645409; c=relaxed/simple;
+	bh=cDQ06vC2AO2hdTXvL2nVcFw/pVw+7ML0rIty1NNvoeY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SVRyS7VzszEWRzROMIYHzpEu0v4KRdMeP5k5iMyGO5jalHdPqhh5eQTLscAfSibDGU2aC7OZsrH3I8PQAVBVejLm6s0BQvYBdwMpZykEUXm7f1dEgMJlrpqKRxQp1fBm7Pr/vmfD+FLIV2jN/pZyyaaRW877tFrDkdXqDDs5E0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tHmPJZUC; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=LHT+kbe63y9StQwflP3rycBTrMv5NdZdqWaJWEOJLRJ+A5dnZkYRGHuUSjKgjdeCiJ4IrE00t9Mqu2r5EDQiXQacOZNIKW5FfNzrRSBP8J0kf7fJMlAoOP4qrBg41gwZh2Lst/VbZvfxZtvR1CJpQ1W+hyozJ96qQ2lna8bcDWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mo8XnrxT; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcbee93a3e1so1734847276.3
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 10:03:25 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf618042daso1644776276.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 10:03:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711645404; x=1712250204; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1711645406; x=1712250206; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DyO3NL4DZ5+zyEmGrUmGhqOJCsHXA1HlVzHyeVmkchI=;
-        b=tHmPJZUCToedZH0Khr2fAir1EVZdmg1TKq27+KLpk5ZLSTaQfmvRPaiRyMGES4y1rh
-         YB9Tsnyz/W+i8cyNJTVrhL4VRJnoETtIUzTTx/Ge1wMKjIzii2YvGkH3a0DCRA2DBWPg
-         i91BrwR2zxNpSYdik/d8MR2nzfGQOEWOaHMYgjuzpF/fPciQzsrBJCOdepOH2m0PCye6
-         NuH2Yw863EwNpW4nbuoEqSGRWESiZQVuqU74N02/DZJ/73WnQPww8InKq1yZfYGwXO/n
-         nTXNcekTdlnSaX6fxILl3qQJjQcRcOoCLrMalGriKdciDPn+6fJbQrVIjnJfDHTQURUn
-         XTPg==
+        bh=P4Rf3n0ThGg2QZAaciZ/MGFx+ZUjVEIBegGBLhJw3P8=;
+        b=Mo8XnrxTutPEuyDHw4HvrkJUF2u9wCB0LNXSY7HxVn+FWo68kkKav6TVCqVL0hTe9l
+         ntkqnP1Gg7biSlYp4N6mV7+2ArhObXI37aO++GvTPjVyKT/SkGThsS2gtFnmcQspj6zF
+         ADri6GzHQ5scSFCfB8znRSRRLHyyeallr009GQXPHW3xS18nxIRCvCwAwYap+HcQsTZC
+         YGclO2DuRWBmPFS95AM7yaVSpCs3LN49Imki5FaUZN6909kl7a/q01yy17Lo2VMk+33Q
+         kg5dNn0786of2u34dfteFZx/MHXxBkX2afrtGmWZdGIOd2Sk8T32gL9O+2w54ylL45C6
+         SlZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711645404; x=1712250204;
+        d=1e100.net; s=20230601; t=1711645406; x=1712250206;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DyO3NL4DZ5+zyEmGrUmGhqOJCsHXA1HlVzHyeVmkchI=;
-        b=eBDqcVK3A7pNtkUSquIJkMQ6hSWHAuT6vTwwSopFyYkcFD8/ZBJWraK0BhgOqS4Zpd
-         sCpOjv8tGfrGD3hnEsqCXOWHF1yTGVIOwjfaV9U4WUb7I099tYBqXtIeZmj2G9+hcD1C
-         XhwdCeg8dmHFq9r5zF28B4PhbWRkJzFftmecnZjChvHfSTWL5W2qH+8JAyTndRzoFzkD
-         AbMn8/d2piMfl43lX+SIGXv0095URlMxFaSkVox2AQuL0jJtGaur5Ch862WF0m9eOwhN
-         +I0GrPUMRa+UOsHIhf0tG5aWa+ZwT2yFZ31KY6puyYyqWuVG+VB/K2j9zHt+dEoK/52v
-         J8Kw==
-X-Gm-Message-State: AOJu0YzeQ56qysJsC9OWI3rlwkHYK74A5e4uItpSJYuwHySg1nXCTZHb
-	FbmLN0OeF/zpp0lDkBZ0S/MzGGA6fwzkb2TRCS5n+MXCRIrNarxsmV9NRG2S4NuV1nq99MKv8vn
-	hZVhLN9bjTA==
-X-Google-Smtp-Source: AGHT+IEcAU6On1FebhvDzRMHxKgc0gG9W0lAfWMgqvnygBHzEBD0mgjfLuzwj379NGUbm10JUxpCruxTKGqE3g==
+        bh=P4Rf3n0ThGg2QZAaciZ/MGFx+ZUjVEIBegGBLhJw3P8=;
+        b=LE6z0XK97LrhxNm+hxPjcbVDfTCmYML0aMKnYi2+tHVxs3gAkdv3MtWw089yJEMelL
+         1H+GWIGoJNvWhJGFYQ/RXjL0DvuAErndnYXRiNCqUmmS+46yGM4khfRSkSuiXM/3kHSG
+         i1JxqeHiyMyWgPqNeRsJdqa3t9z4D/F8X3smgwbYvOj2pabuGGS4fyLe0EqbYIVkf/uK
+         6uiE6TWrFZsVCBtj8hPdT43zxp6z3Csm2FwCooZ9DFxJdxIyEhO2QUXlUF1ONt2XMcKA
+         D1hU6ZJJt1Q8ekArcnacJ6xHyQWJBvfygknQu1tV1z702wqMx1kUsRdDNo5KQdIfQi1n
+         IHUQ==
+X-Gm-Message-State: AOJu0YwwJ6q/7uWKOwKx5Zj6xKudoCQImzy4q/tgpXGFwuzLcVaQU98e
+	Bq98SYyIfRxxvs6gGztQPIERFZXoAoSwd9ceiK47CuUX6jds6N0T3d7QE/1TSAiRgQTb3GzqFiy
+	1RmwPuvQclw==
+X-Google-Smtp-Source: AGHT+IE8RUsLi5NEWaCQpBxCzHAtR+Tt/Xs83paI2PEaSb0MWJvXoJgJAFNVO+Mxu01+BA4dDmGcfec5aB2qRw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2292:b0:ddd:7581:1234 with SMTP
- id dn18-20020a056902229200b00ddd75811234mr207996ybb.11.1711645404695; Thu, 28
- Mar 2024 10:03:24 -0700 (PDT)
-Date: Thu, 28 Mar 2024 17:03:08 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:2413:b0:dc2:5273:53f9 with SMTP
+ id dr19-20020a056902241300b00dc2527353f9mr249416ybb.1.1711645406759; Thu, 28
+ Mar 2024 10:03:26 -0700 (PDT)
+Date: Thu, 28 Mar 2024 17:03:09 +0000
 In-Reply-To: <20240328170309.2172584-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240328170309.2172584-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240328170309.2172584-8-edumazet@google.com>
-Subject: [PATCH net-next 7/8] net: rps: add rps_input_queue_head_add() helper
+Message-ID: <20240328170309.2172584-9-edumazet@google.com>
+Subject: [PATCH net-next 8/8] net: rps: move received_rps field to a better location
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,95 +82,39 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-process_backlog() can batch increments of sd->input_queue_head,
-saving some memory bandwidth.
+Commit 14d898f3c1b3 ("dev: Move received_rps counter next
+to RPS members in softnet data") was unfortunate:
 
-Also add READ_ONCE()/WRITE_ONCE() annotations around sd->input_queue_head
-accesses.
+received_rps is dirtied by a cpu and never read by other
+cpus in fast path.
+
+Its presence in the hot RPS cache line (shared by many cpus)
+is hurting RPS/RFS performance.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/rps.h |  9 +++++++--
- net/core/dev.c    | 13 ++++++++-----
- 2 files changed, 15 insertions(+), 7 deletions(-)
+ include/linux/netdevice.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/rps.h b/include/net/rps.h
-index c13f829b8556fda63e76544c332f2c089f0d6ea4..135427bc6fcd29b9dad92a671c9a9f4efc975dec 100644
---- a/include/net/rps.h
-+++ b/include/net/rps.h
-@@ -51,13 +51,18 @@ static inline void rps_input_queue_tail_save(u32 *dest, u32 tail)
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 14f19cc2616452d7e6afbbaa52f8ad3e61a419e9..274d8db48b4858c70b43ea4628544e924ba6a263 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -3203,6 +3203,7 @@ struct softnet_data {
+ 	struct softnet_data	*rps_ipi_list;
  #endif
- }
  
--static inline void rps_input_queue_head_incr(struct softnet_data *sd)
-+static inline void rps_input_queue_head_add(struct softnet_data *sd, int val)
- {
- #ifdef CONFIG_RPS
--	sd->input_queue_head++;
-+	WRITE_ONCE(sd->input_queue_head, sd->input_queue_head + val);
++	unsigned int		received_rps;
+ 	bool			in_net_rx_action;
+ 	bool			in_napi_threaded_poll;
+ 
+@@ -3235,7 +3236,6 @@ struct softnet_data {
+ 	unsigned int		cpu;
+ 	unsigned int		input_queue_tail;
  #endif
- }
- 
-+static inline void rps_input_queue_head_incr(struct softnet_data *sd)
-+{
-+	rps_input_queue_head_add(sd, 1);
-+}
-+
- /*
-  * The rps_dev_flow_table structure contains a table of flow mappings.
-  */
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 1fe7c6b10793d45a03461ee581d240d2442f9e17..59e7fc30e8f03880340bfbeda0fa9e9ac757a168 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4518,7 +4518,7 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 	out:
- #endif
- 		rflow->last_qtail =
--			per_cpu(softnet_data, next_cpu).input_queue_head;
-+			READ_ONCE(per_cpu(softnet_data, next_cpu).input_queue_head);
- 	}
- 
- 	rflow->cpu = next_cpu;
-@@ -4600,7 +4600,7 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		 */
- 		if (unlikely(tcpu != next_cpu) &&
- 		    (tcpu >= nr_cpu_ids || !cpu_online(tcpu) ||
--		     ((int)(per_cpu(softnet_data, tcpu).input_queue_head -
-+		     ((int)(READ_ONCE(per_cpu(softnet_data, tcpu).input_queue_head) -
- 		      READ_ONCE(rflow->last_qtail))) >= 0)) {
- 			tcpu = next_cpu;
- 			rflow = set_rps_cpu(dev, skb, rflow, next_cpu);
-@@ -4655,7 +4655,7 @@ bool rps_may_expire_flow(struct net_device *dev, u16 rxq_index,
- 		rflow = &flow_table->flows[flow_id];
- 		cpu = READ_ONCE(rflow->cpu);
- 		if (rflow->filter == filter_id && cpu < nr_cpu_ids &&
--		    ((int)(per_cpu(softnet_data, cpu).input_queue_head -
-+		    ((int)(READ_ONCE(per_cpu(softnet_data, cpu).input_queue_head) -
- 			   READ_ONCE(rflow->last_qtail)) <
- 		     (int)(10 * flow_table->mask)))
- 			expire = false;
-@@ -6035,9 +6035,10 @@ static int process_backlog(struct napi_struct *napi, int quota)
- 			rcu_read_lock();
- 			__netif_receive_skb(skb);
- 			rcu_read_unlock();
--			rps_input_queue_head_incr(sd);
--			if (++work >= quota)
-+			if (++work >= quota) {
-+				rps_input_queue_head_add(sd, work);
- 				return work;
-+			}
- 
- 		}
- 
-@@ -6060,6 +6061,8 @@ static int process_backlog(struct napi_struct *napi, int quota)
- 		backlog_unlock_irq_enable(sd);
- 	}
- 
-+	if (work)
-+		rps_input_queue_head_add(sd, work);
- 	return work;
- }
+-	unsigned int		received_rps;
+ 	struct sk_buff_head	input_pkt_queue;
+ 	struct napi_struct	backlog;
  
 -- 
 2.44.0.478.gd926399ef9-goog
