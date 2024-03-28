@@ -1,177 +1,234 @@
-Return-Path: <netdev+bounces-82940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C7CB890465
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:02:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBBD489046C
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:02:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C37E0B23632
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:02:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B69B1C2306C
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B51B130E48;
-	Thu, 28 Mar 2024 15:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15257F7C9;
+	Thu, 28 Mar 2024 16:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XTzTd8gk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.actia.se (mail.actia.se [212.181.117.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD1480600;
-	Thu, 28 Mar 2024 15:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FCD13118C;
+	Thu, 28 Mar 2024 16:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711641576; cv=none; b=gtwVQuA+8AzAt7qN3KoumNJBd1x703oNvZSviQwN24CnJ+6DJlRIDWRgZgrXWf496wqVSLi6HTOUMNbHgz/B+aAi92AqRgQpJywSCeq9CsWFCaXeptVYnTayyJ6mztlS5ZN78K7u1IhM7hM+qtJXlwLeXKur9kAfQK5lGbTdgEo=
+	t=1711641608; cv=none; b=oTpQnOJt4sDlCpPoAKs0NC3+KKwBnRgYRe8uYYtV8BWzwEtJzuwWHPLUqouU97COddYqGiFU+7BzKzvh0nVKA5geqGA10Bu9Jw+yzbNPQ3QCaM+uaYKAoSKfsMaaYN/HLkAE15fQW+R+apzuH4aIY3ZVkRC3SRiJPeA5hiDkSm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711641576; c=relaxed/simple;
-	bh=UvFVPUriBw/O+tP6PxLNlmjDO3SPq+EmZIKLkI817Vs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cSz7ylhMGzcY3TcyHdDn6sTLcIrQiszf28bFdOpFoxKfu+J7rj96NnHsn/n9e8lqANXb102+7MGTllsjpg5qTK3EClklEfvrYtAmRdJTuHGag1lYIsAHT6X52KEbVnu1Iyor/hTTLwgc2YAF7xB2m9QleY6Plcqr/PfqZp7CTSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
-Received: from S036ANL.actianordic.se (10.12.31.117) by S036ANL.actianordic.se
- (10.12.31.117) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Thu, 28 Mar
- 2024 16:59:30 +0100
-Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
- S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%4]) with mapi id
- 15.01.2507.037; Thu, 28 Mar 2024 16:59:30 +0100
-From: John Ernberg <john.ernberg@actia.se>
-To: Wei Fang <wei.fang@nxp.com>
-CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Heiner
- Kallweit" <hkallweit1@gmail.com>, "imx@lists.linux.dev"
-	<imx@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Florian
- Fainelli" <f.fainelli@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	"Maxime Chevallier" <maxime.chevallier@bootlin.com>, John Ernberg
-	<john.ernberg@actia.se>
-Subject: [PATCH v4 1/1] net: fec: Set mac_managed_pm during probe
-Thread-Topic: [PATCH v4 1/1] net: fec: Set mac_managed_pm during probe
-Thread-Index: AQHagSjq+ds97ioUXkWTdcA71FXzTg==
-Date: Thu, 28 Mar 2024 15:59:29 +0000
-Message-ID: <20240328155909.59613-2-john.ernberg@actia.se>
-References: <20240328155909.59613-1-john.ernberg@actia.se>
-In-Reply-To: <20240328155909.59613-1-john.ernberg@actia.se>
-Accept-Language: en-US, sv-SE
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: git-send-email 2.44.0
-x-esetresult: clean, is OK
-x-esetid: 37303A2958D729556C7D60
-Content-Type: text/plain; charset="iso-8859-1"
+	s=arc-20240116; t=1711641608; c=relaxed/simple;
+	bh=uVhMu+y3FUztYcdJ2dXcf4O32bylsnvucopeOGHBa5U=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ugkOisja3SNTZYHTKDwhf+F4V/PVUSQQ9fDQ9CXpQFdME2hMzFV5pJl9YGHTxkgN63YxGkMj9fWUtFYbhVdxp0/cTJkKTUFVODjcaS/5/W0+ojGUKbdtBffmedbZZHfs27lDF07RQf8dY+hUMkSzNh1YnF1LrZxXoPdAOtICmn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XTzTd8gk; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42SFvmjj005628;
+	Thu, 28 Mar 2024 16:00:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=/2wRlPBJsjZsl/yMZFhudzZNi3JTgbcz7TgCymz2ZGU=;
+ b=XTzTd8gkw+WmZGwW6ZsW18loVKS7yXqXuvHaJ6dvb9VCSs/eGBpqv9aGYy7THzXYyS9W
+ ZmcGOXr77yMWNL7EQPpkf6040RTysl2uH2dPZGkrTXv0ave3clXx6yNTPEdiVa0qKdH1
+ UcEAgtFvxybzsZ3BwK4/7suPmUsJNxD2m3rWPmCYpj2MU9TAWT/8v+4VGmOMgvs2lGgJ
+ +4o8Ki4H/w0XNkmzmnEYZgWHJNb3qH5osQxjIX9nmKnu6OiPpv1SrA2d55xwMU5gistx
+ fFWeBhPJp4KvxAm9AIIt2nA7QY7MLclzrFAw2phFNq3YA4L9Zd8LVepO0OWcYbUE0Zv1 gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x5bn6005w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Mar 2024 16:00:02 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42SG02fI009753;
+	Thu, 28 Mar 2024 16:00:02 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x5bn6005r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Mar 2024 16:00:02 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42SEN0wu028623;
+	Thu, 28 Mar 2024 16:00:00 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x2adppdtv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Mar 2024 16:00:00 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42SFxtqK50004476
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 28 Mar 2024 15:59:57 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0784020043;
+	Thu, 28 Mar 2024 15:59:55 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2DCDF20040;
+	Thu, 28 Mar 2024 15:59:54 +0000 (GMT)
+Received: from [9.171.12.209] (unknown [9.171.12.209])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 28 Mar 2024 15:59:54 +0000 (GMT)
+Message-ID: <1b532020394c6441634a665b7e59427002b4f79f.camel@linux.ibm.com>
+Subject: Re: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Heiko Carstens <hca@linux.ibm.com>, pasic@linux.ibm.com,
+        schnelle@linux.ibm.com, Christoph Hellwig <hch@lst.de>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        Alexandra Winter
+ <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Vasily
+ Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>
+Date: Thu, 28 Mar 2024 16:59:53 +0100
+In-Reply-To: <20240328154144.272275-2-gbayer@linux.ibm.com>
+References: <20240328154144.272275-1-gbayer@linux.ibm.com>
+	 <20240328154144.272275-2-gbayer@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: unwUFeZI_eZfd4vvsAMzGZxKCAKCjbCe
+X-Proofpoint-ORIG-GUID: QH6Q4a3q3EJOwu7gRCAQHxwKSWcEPthg
 Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-28_15,2024-03-28_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ clxscore=1011 impostorscore=0 mlxscore=0 malwarescore=0 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 bulkscore=0 mlxlogscore=664 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2403210000
+ definitions=main-2403280109
 
-From: Wei Fang <wei.fang@nxp.com>
+On Thu, 2024-03-28 at 16:41 +0100, Gerd Bayer wrote:
+> Since [1], dma_alloc_coherent() does not accept requests for GFP_COMP
+> anymore, even on archs that may be able to fulfill this.
+> Functionality that
+> relied on the receive buffer being a compound page broke at that
+> point:
+> The SMC-D protocol, that utilizes the ism device driver, passes
+> receive
+> buffers to the splice processor in a struct splice_pipe_desc with a
+> single entry list of struct pages. As the buffer is no longer a
+> compound
+> page, the splice processor now rejects requests to handle more than a
+> page worth of data.
+>=20
+> Replace dma_alloc_coherent() and allocate a buffer with kmalloc()
+> then
+> create a DMA map for it with dma_map_page(). Since only receive
+> buffers
+> on ISM devices use DMA, qualify the mapping as FROM_DEVICE.
+> Since ISM devices are available on arch s390, only and on that arch
+> all
+> DMA is coherent, there is no need to introduce and export some kind
+> of
+> dma_sync_to_cpu() method to be called by the SMC-D protocol layer.
+>=20
+> Analogously, replace dma_free_coherent by a two step dma_unmap_page,
+> then kfree to free the receive buffer.
+>=20
+> [1] https://lore.kernel.org/all/20221113163535.884299-1-hch@lst.de/
+>=20
+> Fixes: c08004eede4b ("s390/ism: don't pass bogus GFP_ flags to
+> dma_alloc_coherent")
 
-Setting mac_managed_pm during interface up is too late.
+Late adding Christoph as the "blamed" committer.
 
-In situations where the link is not brought up yet and the system suspends
-the regular PHY power management will run. Since the FEC ETHEREN control
-bit is cleared (automatically) on suspend the controller is off in resume.
-When the regular PHY power management resume path runs in this context it
-will write to the MII_DATA register but nothing will be transmitted on the
-MDIO bus.
+> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> ---
+> =C2=A0drivers/s390/net/ism_drv.c | 35 ++++++++++++++++++++++++++---------
+> =C2=A01 file changed, 26 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+> index 2c8e964425dc..25911b887e5e 100644
+> --- a/drivers/s390/net/ism_drv.c
+> +++ b/drivers/s390/net/ism_drv.c
+> @@ -14,6 +14,8 @@
+> =C2=A0#include <linux/err.h>
+> =C2=A0#include <linux/ctype.h>
+> =C2=A0#include <linux/processor.h>
+> +#include <linux/dma-direction.h>
+> +#include <linux/gfp_types.h>
+> =C2=A0
+> =C2=A0#include "ism.h"
+> =C2=A0
+> @@ -292,13 +294,15 @@ static int ism_read_local_gid(struct ism_dev
+> *ism)
+> =C2=A0static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+> =C2=A0{
+> =C2=A0	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+> -	dma_free_coherent(&ism->pdev->dev, dmb->dmb_len,
+> -			=C2=A0 dmb->cpu_addr, dmb->dma_addr);
+> +	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
+> +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DMA_FROM_DEVICE);
+> +	kfree(dmb->cpu_addr);
+> =C2=A0}
+> =C2=A0
+> =C2=A0static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+> =C2=A0{
+> =C2=A0	unsigned long bit;
+> +	int rc;
+> =C2=A0
+> =C2=A0	if (PAGE_ALIGN(dmb->dmb_len) > dma_get_max_seg_size(&ism-
+> >pdev->dev))
+> =C2=A0		return -EINVAL;
+> @@ -315,14 +319,27 @@ static int ism_alloc_dmb(struct ism_dev *ism,
+> struct ism_dmb *dmb)
+> =C2=A0	=C2=A0=C2=A0=C2=A0 test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
+> =C2=A0		return -EINVAL;
+> =C2=A0
+> -	dmb->cpu_addr =3D dma_alloc_coherent(&ism->pdev->dev, dmb-
+> >dmb_len,
+> -					=C2=A0=C2=A0 &dmb->dma_addr,
+> -					=C2=A0=C2=A0 GFP_KERNEL | __GFP_NOWARN
+> |
+> -					=C2=A0=C2=A0 __GFP_NOMEMALLOC |
+> __GFP_NORETRY);
+> -	if (!dmb->cpu_addr)
+> -		clear_bit(dmb->sba_idx, ism->sba_bitmap);
+> +	dmb->cpu_addr =3D kmalloc(dmb->dmb_len, GFP_KERNEL |
+> __GFP_NOWARN |
+> +				__GFP_COMP | __GFP_NOMEMALLOC |
+> __GFP_NORETRY);
+> +	if (!dmb->cpu_addr) {
+> +		rc =3D -ENOMEM;
+> +		goto out_bit;
+> +	}
+> +	dmb->dma_addr =3D dma_map_page(&ism->pdev->dev,
+> +				=C2=A0=C2=A0=C2=A0=C2=A0 virt_to_page(dmb->cpu_addr), 0,
+> +				=C2=A0=C2=A0=C2=A0=C2=A0 dmb->dmb_len, DMA_FROM_DEVICE);
+> +	if (dma_mapping_error(&ism->pdev->dev, dmb->dma_addr)) {
+> +		rc =3D -ENOMEM;
+> +		goto out_free;
+> +	}
+> +
+> +	return 0;
+> =C2=A0
+> -	return dmb->cpu_addr ? 0 : -ENOMEM;
+> +out_free:
+> +	kfree(dmb->cpu_addr);
+> +out_bit:
+> +	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+> +	return rc;
+> =C2=A0}
+> =C2=A0
+> =C2=A0int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
 
-This can be observed by the following log:
-
-    fec 5b040000.ethernet eth0: MDIO read timeout
-    Microchip LAN87xx T1 5b040000.ethernet-1:04: PM: dpm_run_callback(): md=
-io_bus_phy_resume+0x0/0xc8 returns -110
-    Microchip LAN87xx T1 5b040000.ethernet-1:04: PM: failed to resume: erro=
-r -110
-
-The data written will however remain in the MII_DATA register.
-
-When the link later is set to administrative up it will trigger a call to
-fec_restart() which will restore the MII_SPEED register. This triggers the
-quirk explained in f166f890c8f0 ("net: ethernet: fec: Replace interrupt
-driven MDIO with polled IO") causing an extra MII_EVENT.
-
-This extra event desynchronizes all the MDIO register reads, causing them
-to complete too early. Leading all reads to read as 0 because
-fec_enet_mdio_wait() returns too early.
-
-When a Microchip LAN8700R PHY is connected to the FEC, the 0 reads causes
-the PHY to be initialized incorrectly and the PHY will not transmit any
-ethernet signal in this state. It cannot be brought out of this state
-without a power cycle of the PHY.
-
-Fixes: 557d5dc83f68 ("net: fec: use mac-managed PHY PM")
-Closes: https://lore.kernel.org/netdev/1f45bdbe-eab1-4e59-8f24-add177590d27=
-@actia.se/
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-[jernberg: commit message]
-Signed-off-by: John Ernberg <john.ernberg@actia.se>
-
----
-
-v4:
- - Adjustments to commit message after a better understanding of the
-   behavior explained in f166f890c8f0 as a result of the discussion on v3
-   patch 2.
-
-v3:
- - No changes
-
-v2:
- - New patch. Big thanks to Wei for the help on this issue.
----
- drivers/net/ethernet/freescale/fec_main.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethern=
-et/freescale/fec_main.c
-index d7693fdf640d..8bd213da8fb6 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -2454,8 +2454,6 @@ static int fec_enet_mii_probe(struct net_device *ndev=
-)
- 	fep->link =3D 0;
- 	fep->full_duplex =3D 0;
-=20
--	phy_dev->mac_managed_pm =3D true;
--
- 	phy_attached_info(phy_dev);
-=20
- 	return 0;
-@@ -2467,10 +2465,12 @@ static int fec_enet_mii_init(struct platform_device=
- *pdev)
- 	struct net_device *ndev =3D platform_get_drvdata(pdev);
- 	struct fec_enet_private *fep =3D netdev_priv(ndev);
- 	bool suppress_preamble =3D false;
-+	struct phy_device *phydev;
- 	struct device_node *node;
- 	int err =3D -ENXIO;
- 	u32 mii_speed, holdtime;
- 	u32 bus_freq;
-+	int addr;
-=20
- 	/*
- 	 * The i.MX28 dual fec interfaces are not equal.
-@@ -2584,6 +2584,13 @@ static int fec_enet_mii_init(struct platform_device =
-*pdev)
- 		goto err_out_free_mdiobus;
- 	of_node_put(node);
-=20
-+	/* find all the PHY devices on the bus and set mac_managed_pm to true */
-+	for (addr =3D 0; addr < PHY_MAX_ADDR; addr++) {
-+		phydev =3D mdiobus_get_phy(fep->mii_bus, addr);
-+		if (phydev)
-+			phydev->mac_managed_pm =3D true;
-+	}
-+
- 	mii_cnt++;
-=20
- 	/* save fec0 mii_bus */
---=20
-2.44.0
 
