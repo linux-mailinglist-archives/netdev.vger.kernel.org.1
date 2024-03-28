@@ -1,102 +1,143 @@
-Return-Path: <netdev+bounces-82744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2805388F8AA
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:28:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93DB388F8C9
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:31:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D0BCB2374C
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:28:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0ACD1C229E6
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF8751C27;
-	Thu, 28 Mar 2024 07:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC0C52F6A;
+	Thu, 28 Mar 2024 07:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="MV54KqWu"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gcYWJotu"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE412561F
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E32F2561F;
+	Thu, 28 Mar 2024 07:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711610878; cv=none; b=QNIdTuLV8a/CQs2UwJORqhsrF11yifwcyUuZsJnlrXaTViAOMlJgO+JSfXU7Q+x9Gg4sJ5QljkjmLoKb/C7x3wKUDCQ0zsWsI95nCvI6oO9NAkajm/zyRFB4unH+G25M1YO/aCOcjugjwkzhwALagDPF4GmooWD085WStqwkzmI=
+	t=1711611101; cv=none; b=l35qVSooQJgulXf8OEKXM4ee0eiW9zEiabwibizv6f8FKhsfkL2kBsAFdsaSVFGnwEn/j5SNqdoECfx+4U/wzWExWXSMbiYW1R5710zGqQWe24Zt57/6WWij+zk0Y4X16uKXZLVUG59umzXIyA3yrmEdXTITyXfMyzhZ9bFyVQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711610878; c=relaxed/simple;
-	bh=wkdatT5C0jwZccnhZqFH1RLssfB//i5tEVMb3hYcIe4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FvsWOfOGTVHXMaCb23taMfc/iM7pYzlsM4DHl6BTsJcaN04OkTnnVOTW3iXY6uUkO1ppcEndy8zz92kEyZnGnTJ2N6z1UQwmjlQsnNlS1rUeDg/8uMf9+xRrYmZor+O3xlFYzeSXdvZdMXgUz84pnnvQK78eMyqHKluWuMfc8xM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=MV54KqWu; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1711611101; c=relaxed/simple;
+	bh=UiexvZQWK+4Yc+SMZ9M3zHpPBZVoEYHrn9anANb9C5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d5Fm6ImLcHPV6UYzlsQeYNsjvAQufCBZvBPsa210F2htuofaAshATEDf/2A5+yv08JlFkWpjmTYRAyXYwW6T0YT/0SU5eCH/gYnEQ9pXljqsRinJCl/lnkDFftrLbeUWzIEzBr/O7AtKnfMOcFBuMtBpAoSVFpTIrHmgldSXXD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gcYWJotu; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=2AEukLxIliae8y2z4gLCpGetRKM6887Vh6O3ET1Umy4=;
-	t=1711610876; x=1712820476; b=MV54KqWuf0ofls2kfe7rlICL8Ex0EiXwOi3oCJty4ENvzY7
-	+2lEJa154v9Ty/ybLLzk8cXYZMTnxwkiQ674xDhpx/Ky5A894SV4mC/cLUWcVTmyF/PsJJvN+fx7f
-	jDBDGlX9EG4diZRxcl5nuX+YUgmYWafd+c5mv6ePPbpNnCwGYVC4MzpsOIYz4Wkuk2nS/i5vEQT+m
-	u8DLK+NAJHzH3akSjOwqW9fLG/aDtKzpy+WSB559F/ZR1B0WYO+duLFiVfyqyrICxqI1Z/Ik5Zw52
-	UEH3KT5BUyus364AX6+IdKwJ+EuJrS86HJN0G9S0SBAhDinrzI39gmXelM4GFHPA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rpkAy-00000000jvG-32Hz;
-	Thu, 28 Mar 2024 08:27:52 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: jiri@resnulli.us,
-	jhs@mojatatu.com,
-	victor@mojatatu.com,
-	kuba@kernel.org,
-	pctammela@mojatatu.com,
-	martin@strongswan.org,
-	horms@kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH net-next v2 2/2] netdevice: add DEFINE_FREE() for dev_put
-Date: Thu, 28 Mar 2024 08:27:50 +0100
-Message-ID: <20240328082748.4f7e1895ed81.I1515fdc09a9f39fdbc26558556dd65a2cb03576a@changeid>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240328082748.b6003379b15b.I9da87266ad39fff647828b5822e6ac8898857b71@changeid>
-References: <20240328082748.b6003379b15b.I9da87266ad39fff647828b5822e6ac8898857b71@changeid>
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=vttzHoZOnFV3RpiKvH6mM16x2BnNpMVa6ppcy7eNO+k=; b=gcYWJotuQVW8GYZ0l03Qd1Y7Rx
+	geRqzubUVBuSA9E2/DAQoiPMRqhx1n9l+w28Wiufj/ZAExFJaqfwavTjC8gzuWje1jZN2jUSkE+qE
+	Q15FOsZFQN2b0luQEwgHnGe7lzK15zDdvK7FQjfmrbwwmVTazNYcBHn8mWmTha+YKF08jxIWc0REQ
+	+8EyFi9U6Gl0G+TAuZmP4Qd6h8HYQgYngvPlmHvo3Jo8XSRKsSWUmgiFQ8nfw+lmfCUH+lF0bMRBm
+	3NB7t68iGeniQOu1nPNBlIsx+leXTDUB9ZbdcRiTXuwjN/rjZyp29U3bvNZvER0Ozv/NSab0o7bxJ
+	CYLe7RCQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rpkEV-0000000CslI-1PHG;
+	Thu, 28 Mar 2024 07:31:31 +0000
+Date: Thu, 28 Mar 2024 00:31:31 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Christoph Hellwig <hch@infradead.org>, shakeel.butt@linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
+ custom page providers
+Message-ID: <ZgUc07Szbx5x-obb@infradead.org>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <20240305020153.2787423-3-almasrymina@google.com>
+ <ZfegzB341oNc_Ocz@infradead.org>
+ <CAHS8izOUi6qGp=LSQb_o5oph-EnhNOuhLkPSfbQRU3eniZvbdA@mail.gmail.com>
+ <ZgC5JoSiWAYf3IgX@infradead.org>
+ <CAHS8izO5-giYhM1bVCLLOXRXq-Xd0=pi0kPq5E1-R=3i=XihmQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHS8izO5-giYhM1bVCLLOXRXq-Xd0=pi0kPq5E1-R=3i=XihmQ@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Johannes Berg <johannes.berg@intel.com>
+On Tue, Mar 26, 2024 at 01:19:20PM -0700, Mina Almasry wrote:
+> 
+> Are you envisioning that dmabuf support would be added to the block
+> layer
 
-For short netdev holds within a function there are still a lot of
-users of dev_put() rather than netdev_put(). Add DEFINE_FREE() to
-allow making those safer.
+Yes.
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
-v2: resend
----
- include/linux/netdevice.h | 2 ++
- 1 file changed, 2 insertions(+)
+> (which I understand is part of the VFS and not driver specific),
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index cb37817d6382..f6c0d731fa35 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4127,6 +4127,8 @@ static inline void dev_put(struct net_device *dev)
- 	netdev_put(dev, NULL);
- }
- 
-+DEFINE_FREE(dev_put, struct net_device *, if (_T) dev_put(_T))
-+
- static inline void netdev_ref_replace(struct net_device *odev,
- 				      struct net_device *ndev,
- 				      netdevice_tracker *tracker,
--- 
-2.44.0
+The block layer isn't really the VFS, it's just another core stack
+like the network stack.
+
+> or as part of the specific storage driver (like nvme for example)? If
+> we can add dmabuf support to the block layer itself that sounds
+> awesome. We may then be able to do devmem TCP on all/most storage
+> devices without having to modify each individual driver.
+
+I suspect we'll still need to touch the drivers to understand it,
+but hopefully all the main infrastructure can live in the block layer.
+
+> In your estimation, is adding dmabuf support to the block layer
+> something technically feasible & acceptable upstream? I notice you
+> suggested it so I'm guessing yes to both, but I thought I'd confirm.
+
+I think so, and I know there has been quite some interest to at least
+pre-register userspace memory so that the iommu overhead can be
+pre-loaded.  It also is a much better interface for Peer to Peer
+transfers than what we currently have.
 
 
