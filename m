@@ -1,150 +1,153 @@
-Return-Path: <netdev+bounces-82729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2361E88F76F
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:51:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3341088F777
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2592291161
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:51:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E15A529349A
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E9B47F69;
-	Thu, 28 Mar 2024 05:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7C24DA06;
+	Thu, 28 Mar 2024 05:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BZsBjyz4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="Oc5M9ecH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54F040878
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 05:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAED248CFC
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 05:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711605102; cv=none; b=FT8upRj2VtN9NdKNo/ILGW05Vd44txHneZKn8awYV9LUMOTVX0b8WT47IHT/TyCeOLHxI2Lqzo6pJWM+QUjfUFI7SEZFaYHWvOgDOCVIP9dCuM0Hq8o2SL++19nB2gjd8T48ykaGaODP872bCuBhhPSbTVL36/I6YGrKwFWQkUI=
+	t=1711605119; cv=none; b=uTtR2LTNqsyUcPfWZe8ZKJMZB034kDuqWimoj+aAAHwDjt0i2r6MmImkHfqpvsxZYX9eJmNBPtWJSTF63cSStTXIGY/nq6WWAE7VWGAK+fhSEhw+Stys+r5l1M9SiGVE6XsreXPq9/KdVGb9yps/mFPabS7AcxyeAQoZolMMo7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711605102; c=relaxed/simple;
-	bh=e+ivK+sEKC6jHcpFhx7jkO+gQuawHV6zSHHitD3sr+Q=;
+	s=arc-20240116; t=1711605119; c=relaxed/simple;
+	bh=XzUh4e+GUGrMcXpbZTUiag+z5Q0W3vzGlRM1MWSPvVs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EgVq8kBp68QP1ZyLVm7A4czNb/g+4IwVfEhCH6EBAsO9azmJMWJQYNK90fkKnwmxUzwkl1/egfuJrA4y2hu1G/YdRfvMbZJw56sn/3GK48GAIsIcD2X/6gqsKxDcUNO06/dXtf8MR7aVTZGyVhxv34qkOLCFlPyRun2Tv8n8g/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BZsBjyz4; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <aca9f551-da56-4c50-b456-cb67f5ca79fe@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711605097;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cHnnb0+qZhD5eQZ6r1asbItmM6NKbnOUjHanXATII2o=;
-	b=BZsBjyz4Udrd0YhrJRoxCpGiEi/daQHI+7HfxhEHQbFN7nP/7pofvXz9633HEz9qJtNfQW
-	Q0TMR7ABJ+q4smOPMyJHu4a5VdaQIDr9hkd14i9Xz4lz9B4D8TXAzUG7EtcWTcAGzLJiWe
-	US1Z098Qy8Q38ZhzQD/m9YMoFz7wc5c=
-Date: Wed, 27 Mar 2024 22:51:30 -0700
+	 In-Reply-To:Content-Type; b=hEKvnIkT6A+OlRjO3TkSwelpG1yf1wfpu23J5Rw1KXvDW5uympDQkgvMupnRk/WJykP82kCivF9Tg5fSOHPdJdBMXZnrB7anA/ObIMKi2W8Bb7+uvTVSq3Nf3wkSjDQIATXQqtipET0fwCLi6v3H9KiH1wIfQUTq1A2O6Dm+aMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=Oc5M9ecH; arc=none smtp.client-ip=44.202.169.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5009a.ext.cloudfilter.net ([10.0.29.176])
+	by cmsmtp with ESMTPS
+	id pWKlrzz7OQr4Spig8rnVoU; Thu, 28 Mar 2024 05:51:56 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id pig7rwJkaELAWpig8rBv6g; Thu, 28 Mar 2024 05:51:56 +0000
+X-Authority-Analysis: v=2.4 cv=EfzOQumC c=1 sm=1 tr=0 ts=6605057c
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=zXgy4KOrraTBHT4+ULisNA==:17
+ a=IkcTkHD0fZMA:10 a=K6JAEmCyrfEA:10 a=wYkD_t78qR0A:10 a=_Wotqz80AAAA:8
+ a=VwQbUJbxAAAA:8 a=ig1jn5DGqgWrHlYdm24A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=buJP51TR1BpY-zbLSsyS:22 a=AjGcO6oz07-iQ99wixmX:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=OcyKQZGGVgXeDvPpM0FzUWGtl7ItivqUfJysf/GnhwY=; b=Oc5M9ecHzFYA7FQzOy/2hKZgz/
+	v7+B98xURL/wvmkDwRhiolfQGFH2gbMZr9FVDZV1Z2UzeubH2VbS0VAHDZolh/TjEqt74o0tSnUNa
+	uoMaH+biF4r1ZK9hFJV5BZdpYn9A2LiXNBdimeeWMa5yeAcEu3imYTd30bbeWscSZQdgYVU9OLbx9
+	0LwpRJXh5G4Yl2qOb86kA0MOeLn+kcgzCr8uOWzeaDu5E1qeZDHGp8PAn+bUOutiexX11tLcbLlaW
+	q06PUqQVIWmJDIgUISU9c9FSDuG0BV4aulTOvlaGvMnk4/zVd6MYFRHXff+685NrPm2LbvSFGKtk+
+	3yC2tTNA==;
+Received: from [201.172.173.147] (port=46938 helo=[192.168.15.14])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1rpig5-0000I1-2n;
+	Thu, 28 Mar 2024 00:51:53 -0500
+Message-ID: <ceb2091f-d36f-419e-8ed6-2165b6842d96@embeddedor.com>
+Date: Wed, 27 Mar 2024 23:51:50 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 01/12] bnxt_en: Add a timeout parameter to
- bnxt_hwrm_port_ts_query()
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2][next] Bluetooth: L2CAP: Avoid
+ -Wflex-array-member-not-at-end warnings
+To: Kees Cook <kees@kernel.org>, Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <ZgRIF1bkXlZlaK22@neat>
+ <CABBYNZLi_PCbRB6CVYxwOG04917tDudMvuVT1NU3LVth=xpCtw@mail.gmail.com>
+ <d5b0c70e-8369-4b99-9a42-9a4a93098251@embeddedor.com>
+ <E3E65D27-9A43-4D99-8AF7-C857A169D8E2@kernel.org>
 Content-Language: en-US
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
- Richard Cochran <richardcochran@gmail.com>
-References: <20240325222902.220712-1-michael.chan@broadcom.com>
- <20240325222902.220712-2-michael.chan@broadcom.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240325222902.220712-2-michael.chan@broadcom.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <E3E65D27-9A43-4D99-8AF7-C857A169D8E2@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.173.147
+X-Source-L: No
+X-Exim-ID: 1rpig5-0000I1-2n
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.14]) [201.172.173.147]:46938
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 3
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfC93nHjOVylDmU3IacslU+t/ODg65vBC0tqRYXb0rWbEOuSv/j8I83hfGmn1LtZ5wpKIfZskrTXKJ7Q1jmRpcPp94OEnMXnKgLPgsZOj1wqQaZD1eD7C
+ V8oGoEi3G//FWo9S71mtllrXDJhGbXG7gcp9vjSzS4YCe/1e9PKjVLbOkMXz8eqXx1iGzde5gEDvVLGDIDgisxDHU6OZVceVcHE=
 
-On 25/03/2024 22:28, Michael Chan wrote:
-> The caller can pass this new timeout parameter to the function to
-> specify the firmware timeout value when requesting the TX timestamp
-> from the firmware.  This will allow the caller to precisely control
-> the timeout and will be used in the next patch.  In this patch, the
-> parameter is 0 which means to use the current default value.
-> 
-> Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Cc: Richard Cochran <richardcochran@gmail.com>
-> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
->   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 16 ++++++++++++----
->   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
->   2 files changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> index cc07660330f5..dbfd1b36774c 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> @@ -109,7 +109,8 @@ static void bnxt_ptp_get_current_time(struct bnxt *bp)
->   	spin_unlock_bh(&ptp->ptp_lock);
->   }
->   
-> -static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
-> +static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts,
-> +				   u32 txts_tmo)
->   {
->   	struct hwrm_port_ts_query_output *resp;
->   	struct hwrm_port_ts_query_input *req;
-> @@ -122,10 +123,15 @@ static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
->   	req->flags = cpu_to_le32(flags);
->   	if ((flags & PORT_TS_QUERY_REQ_FLAGS_PATH) ==
->   	    PORT_TS_QUERY_REQ_FLAGS_PATH_TX) {
-> +		u32 tmo_us = txts_tmo * 1000;
-> +
->   		req->enables = cpu_to_le16(BNXT_PTP_QTS_TX_ENABLES);
->   		req->ptp_seq_id = cpu_to_le32(bp->ptp_cfg->tx_seqid);
->   		req->ptp_hdr_offset = cpu_to_le16(bp->ptp_cfg->tx_hdr_off);
-> -		req->ts_req_timeout = cpu_to_le16(BNXT_PTP_QTS_TIMEOUT);
-> +		if (!tmo_us)
-> +			tmo_us = BNXT_PTP_QTS_TIMEOUT;
-> +		tmo_us = min(tmo_us, BNXT_PTP_QTS_MAX_TMO_US);
-> +		req->ts_req_timeout = cpu_to_le16(txts_tmo);
->   	}
->   	resp = hwrm_req_hold(bp, req);
->   
-> @@ -675,7 +681,8 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
->   	u64 ts = 0, ns = 0;
->   	int rc;
->   
-> -	rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_PATH_TX, &ts);
-> +	rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_PATH_TX, &ts,
-> +				     0);
->   	if (!rc) {
->   		memset(&timestamp, 0, sizeof(timestamp));
->   		spin_lock_bh(&ptp->ptp_lock);
-> @@ -891,7 +898,8 @@ int bnxt_ptp_init_rtc(struct bnxt *bp, bool phc_cfg)
->   		if (rc)
->   			return rc;
->   	} else {
-> -		rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_CURRENT_TIME, &ns);
-> +		rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_CURRENT_TIME,
-> +					     &ns, 0);
->   		if (rc)
->   			return rc;
->   	}
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> index fce8dc39a7d0..04886d5f22ad 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> @@ -23,6 +23,7 @@
->   #define BNXT_HI_TIMER_MASK	0xffff00000000UL
->   
->   #define BNXT_PTP_QTS_TIMEOUT	1000
-> +#define BNXT_PTP_QTS_MAX_TMO_US	65535
->   #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
->   				 PORT_TS_QUERY_REQ_ENABLES_TS_REQ_TIMEOUT | \
->   				 PORT_TS_QUERY_REQ_ENABLES_PTP_HDR_OFFSET)
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+
+On 27/03/24 23:28, Kees Cook wrote:
+> 
+> 
+> On March 27, 2024 11:08:33 AM MDT, "Gustavo A. R. Silva" <gustavo@embeddedor.com> wrote:
+>> Hi!
+>>
+>> On 3/27/24 10:55, Luiz Augusto von Dentz wrote:
+>>> Hi Gustavo,
+>>>
+>>> On Wed, Mar 27, 2024 at 12:23 PM Gustavo A. R. Silva
+>>> <gustavoars@kernel.org> wrote:
+>>>>
+>>>> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+>>>> ready to enable it globally.
+>>>
+>>> Which tree is this base on, I just rebased bluetooth-next on top of
+>>> net-next but it looks like CI is still failing to build it, so either
+>>> we don't have all the dependencies already in net-next or perhaps you
+>>> had it submit while the tree had not been updated.
+>>
+>> This is based off of linux-next.
+>>
+>> I think net-next is missing this commit in v6.9-rc1:
+>>
+>> d8e45f2929b9 "overflow: Change DEFINE_FLEX to take __counted_by member")
+>>
+>> https://git.kernel.org/linus/d8e45f2929b9
+> 
+> Just FYI, that is in rc1. (I sent it late to avoid a netdev collision.)
+> 
+
+Yep.
+
+They haven't pulled all the changes from mainline up to -rc1, yet:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/log/
+
+--
+Gustavo
 
