@@ -1,132 +1,153 @@
-Return-Path: <netdev+bounces-82921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D112890323
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:35:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 278D18902A7
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:09:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 257892926B6
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:35:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D059328DEDD
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BF012F384;
-	Thu, 28 Mar 2024 15:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F058D12AAC8;
+	Thu, 28 Mar 2024 15:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bTc7SKP3"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="zpu+15rj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6D85917F
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 15:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEAA81AB1;
+	Thu, 28 Mar 2024 15:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711640119; cv=none; b=CpIgVx+gjZRlOEtWs2cr8mz5F9p/CiY4j9GpnxvINM5Cxnmg+Ezr4dClvRxvvWYR+AzENEmshJH86Bqa8eyD6i22mGBXdqJge1qOEqd+heNyuP3x3vCmpZz0AeyY9Tnz5Ek1RS8xrw89Rtl/x9Om3vQI+D+XWMKDPfTTkwlqjBs=
+	t=1711638541; cv=none; b=FUin7t3z822Ow0QrNIlnxzw+JRrKeZXSnsCQY6dPy7DQfsHBgofs4QCAKkzCfw+b8OJjs7R0g5x7SbXrI4M/rwq/6EF4y+8qePFFOnyzsLQR1UHlFpEwLNvvUY7jzdCcu73IMMzNFP1KyGORY+KGUT16E7I9nXm4w98R8Iy2G3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711640119; c=relaxed/simple;
-	bh=lgxgdYqATTmqx4Maz+fNM/fbjmDidDF+l7fOFfZo1v8=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=Ak2MyUHAFxNYp/doVR5EeESUZJuW9zNKF0YchyMBEahk5RvJ86hULdJOjVsi8tPmmEjJDY1TwC0X1U1pXjZZTGcGZViY8Yx1bCb5WNkM5Ffre3CI+0o9716rIT3eSkAVRbpXEiPqOpM6fPHf28eqR8aAFgcIWkzC1BSwvTwOCCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bTc7SKP3; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-341808b6217so663141f8f.3
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 08:35:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711640116; x=1712244916; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L+KdH1+O3S6ienwS38m2KEffLYN6XW6D4Qvi4jXmZy4=;
-        b=bTc7SKP3HNhcAplSXoZXfkhAs5r2HqENnHqC6JhuWSXusXcP7bz2H9PJLDvlByjTEH
-         ZzSoozuJm20q7IBvZLZYEi3e/WBIXmPv1lVrpUjfjpGHgXv/oNof3WZQjNULhrggMASg
-         AMtH+ZfKZr3gAtpZiUxfeyrFu6Ri66J/qxjxHPaZRyE332nh9Z0Ok+bLRwANF1jjdtln
-         iLY1/2BVguwXjnnneme3H/GG3PmdazmxgXJaoLq9jNKgq/Rd9kb3M6fkEyocZlGc/MwC
-         ijE0Onc7aFlaKnBb0NXsFfHiDy/bDbg0fiMmjp6dVqnQj2KKYl0ZfEtPuS3Ozs335UNz
-         z07Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711640116; x=1712244916;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L+KdH1+O3S6ienwS38m2KEffLYN6XW6D4Qvi4jXmZy4=;
-        b=xDgOwixQlJpXGezB/7fcB178m9ilE3BCdGGowkqzRS+Z9scf5UEjChDoO9Jwzv98vx
-         hzMGUtwtgYFwLxY2n6tGiqJX0jLfsRzgZqfnH+xVsuVDJGVBNAGhpla24Qc1WkF8I1lW
-         H0aiz7ZIHWm25REwrfTv+tJ2k7UvUbH+En+/uBpqMhp6nD1jBtR0cHgrcnREhjt9KB+i
-         qmOFHzECtBoV73i9RMuSVSQjbDEYz64vAkY/M9+dicfR80WGbytxObo1SUBoIKpvuz60
-         oW6S8y2X3mgzPkFvm014THK0CT5oYgcC6V9FFLqkJYwFvEL4rfUkYFcvPoF+bv66soY2
-         NXjg==
-X-Gm-Message-State: AOJu0YwN3PoxIkZW84+J50RqiLZhGwsRf+2e0vMXkDDDnnslAyum7O+I
-	02uLCkZchHkB2yERZtEqn29klyYywml0GL8tMNk79hctAXgQLtPb
-X-Google-Smtp-Source: AGHT+IEh77BNFZZdN7dAmRruRCLNkr2BMYozDepnCwZnzRqOvlIoJlHTBjxkOBFinbtr4ucttGNsOw==
-X-Received: by 2002:a05:6000:2af:b0:341:b5ca:9e9d with SMTP id l15-20020a05600002af00b00341b5ca9e9dmr2758311wry.67.1711640116363;
-        Thu, 28 Mar 2024 08:35:16 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:7530:d5b0:adf6:d5c5])
-        by smtp.gmail.com with ESMTPSA id k17-20020adff5d1000000b00341b7388dafsm2017686wrp.77.2024.03.28.08.35.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 08:35:15 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Jiri Pirko <jiri@resnulli.us>,  Jacob Keller
- <jacob.e.keller@intel.com>,  Stanislav Fomichev <sdf@google.com>
-Subject: Re: [PATCHv3 net-next 2/2] doc/netlink/specs: Add vlan attr in
- rt_link spec
-In-Reply-To: <20240327123130.1322921-3-liuhangbin@gmail.com> (Hangbin Liu's
-	message of "Wed, 27 Mar 2024 20:31:29 +0800")
-Date: Thu, 28 Mar 2024 15:05:57 +0000
-Message-ID: <m2wmpmjt0q.fsf@gmail.com>
-References: <20240327123130.1322921-1-liuhangbin@gmail.com>
-	<20240327123130.1322921-3-liuhangbin@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1711638541; c=relaxed/simple;
+	bh=4RMpfFVGWhEWafnefWiakyA1PM0ClZPXcn1uGjIvT/k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MLBBokwIL1FQmsP40qxK5ehJI+JErHI6gW0qj5RpschzRVL9KrylHGpw2Eo42lv/Hwr+3jN2O3Od+GFHpj/5FOD6uDiZyYAEHBP5Er/IrgXf83paPB6Fx6ZBKVD60AzkFc2ZYROjyj/Qao1IjwwM5PsHgPrC/RjzhAzOuPP7+zE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=zpu+15rj; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42SENT78017636;
+	Thu, 28 Mar 2024 16:08:23 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=iLOweYbCsmn698CJ46dWyC3tf2LxrlF3WpWQb+3oxRE=; b=zp
+	u+15rjkBN0yym8/YKQUXKM7KkDrPXNb9xjRmvtVUWcwUoAA7fwTn2+GqQbrvk1fD
+	07bu7tF8IK1QJaSKPiZDfuu6HSMjHkn9NObrsultisKGcOfQHHseo1zme7sMk3BY
+	8wiGfR4FwPkyXwXQeSRWiDPDWABG7RXz85nwtKpB4IurCvxQNxyA5dvJIRbxhqWM
+	LiMrXzMQAO0SnLYOJwIlt4zg0lvvFdZ8rjPlEQSv6RHauyNw34Uz/jU59xwIN4W9
+	vDg32W4tGw5vo06quCrMLd3mr4pOquc8b5ELSfyQmv8EvWnt6FnnPnGXV0tMLuPK
+	7cx7o3DgklHKP0reBu0g==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3x1n39tw26-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Mar 2024 16:08:23 +0100 (CET)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 7EC9B40044;
+	Thu, 28 Mar 2024 16:08:19 +0100 (CET)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id BFE3F2248BB;
+	Thu, 28 Mar 2024 16:07:03 +0100 (CET)
+Received: from [10.201.21.128] (10.201.21.128) by SHFDAG1NODE2.st.com
+ (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 28 Mar
+ 2024 16:07:02 +0100
+Message-ID: <6df41c81-0aa4-48a5-a069-d8a742f412ef@foss.st.com>
+Date: Thu, 28 Mar 2024 16:07:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 1/1] dt-bindings: net: dwmac: Document STM32 property
+ st,ext-phyclk
+Content-Language: en-US
+To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20240328140803.324141-1-christophe.roullier@foss.st.com>
+ <20240328140803.324141-2-christophe.roullier@foss.st.com>
+ <480d4064-b553-4005-ad98-499a862703ff@denx.de>
+From: Christophe ROULLIER <christophe.roullier@foss.st.com>
+In-Reply-To: <480d4064-b553-4005-ad98-499a862703ff@denx.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-28_15,2024-03-27_01,2023-05-22_02
 
-Hangbin Liu <liuhangbin@gmail.com> writes:
 
-> With command:
->  # ./tools/net/ynl/cli.py \
->  --spec Documentation/netlink/specs/rt_link.yaml \
->  --do getlink --json '{"ifname": "eno1.2"}' --output-json | \
->  jq -C '.linkinfo'
+On 3/28/24 15:19, Marek Vasut wrote:
+> On 3/28/24 3:08 PM, Christophe Roullier wrote:
 >
-> Before:
-> Exception: No message format for 'vlan' in sub-message spec 'linkinfo-data-msg'
+> [...]
 >
-> After:
->  {
->    "kind": "vlan",
->    "data": {
->      "protocol": "8021q",
->      "id": 2,
->      "flag": {
->        "flags": [
->          "reorder-hdr"
->        ],
->        "mask": "0xffffffff"
->      },
->      "egress-qos": {
->        "mapping": [
->          {
->            "from": 1,
->            "to": 2
->          },
->          {
->            "from": 4,
->            "to": 4
->          }
->        ]
->      }
->    }
->  }
+>> | RMII    |    -   |     eth-ck    | eth-ck        |       n/a        |
+>> |         |        | st,ext-phyclk | st,eth-ref-clk-sel 
+>> |                  |
+>> |         |        |               | or st,ext-phyclk 
+>> |                  |
+>>
+>> --------------------------------------------------------------------------- 
+>>
+>>
+>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+>> ---
+>>   Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 7 +++++++
+>>   1 file changed, 7 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml 
+>> b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+>> index fc8c96b08d7dc..b35eae80ed6ac 100644
+>> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+>> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+>> @@ -82,6 +82,13 @@ properties:
+>>         Should be phandle/offset pair. The phandle to the syscon node 
+>> which
+>>         encompases the glue register, and the offset of the control 
+>> register
+>>   +st,ext-phyclk:
 >
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+> Don't you need two spaces in front of the 'st,' here ?
+Sorry, that's right.
+>
+>> +    description:
+>> +      set this property in RMII mode when you have PHY without 
+>> crystal 50MHz and want to
+>> +      select RCC clock instead of ETH_REF_CLK. OR in RGMII mode when 
+>> you want to select
+>> +      RCC clock instead of ETH_CLK125.
+>> +    type: boolean
+>> +
+>
+> With that fixed:
+>
+> Reviewed-by: Marek Vasut <marex@denx.de>
 
