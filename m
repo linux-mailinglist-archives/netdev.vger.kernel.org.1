@@ -1,216 +1,143 @@
-Return-Path: <netdev+bounces-82865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C5C89005B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:36:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8534F89006D
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:37:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04088B2109B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 13:36:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A94751C21E45
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 13:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8037EEFD;
-	Thu, 28 Mar 2024 13:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF34481AA2;
+	Thu, 28 Mar 2024 13:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XNkPBCNH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gquCu54b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA7C7FBCD
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 13:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200D780BEC
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 13:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711632965; cv=none; b=RPaxMgcImc6HYt3s2/Kao2vrRTp0VuzR7GkCOvmDav4I55+2NGPLKUNypwZb+XZPS7YIwRHe8Ep0+QGpP0BHF+flKFSOAiqHTNnyqsnKjvDMCJhT5rgxkZQfm+y81mYNEZ0C4NKs2cLLypw3AKfCkPYthGAKX9p0F8ryQGxwssE=
+	t=1711633045; cv=none; b=taHNO7ZeJFP+7A2oqt71TV7XYitxTva4SfT120bvbhqXS2a+q2HVnxQi0N+Wb12LuDf2KveaTM0q1eTki+QJfNgOjkQnOzS0nJxBXN/dE1g9BNRB6UbwTXyC6e3eLwOVQkLiBzG/ZD+22ZxLoxLSk1flUhtFn3qlThzK28SY2kY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711632965; c=relaxed/simple;
-	bh=afSWyp4SGOlayKC4baG6Dl/jStlqgHhaSrmYGHz5ZK8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r6R6sVOCHboqw/eoAC5BKOloxp+rXIhOdefq/RYDSB9llvvCE8psk26Ag+VPmihz8gx44EJNwKq41rvVt6iWOI1wM3osylrNa230I0oCdUu/mK58czrTnAXX4C9IX8CgVhHfY8w54somjkdstvxaN6GNhTrqG/U1Xk+NkJ6STzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XNkPBCNH; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-513d492c3cdso288656e87.0
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 06:36:03 -0700 (PDT)
+	s=arc-20240116; t=1711633045; c=relaxed/simple;
+	bh=vhptj9/Vq4Rm0PoGzxaGiCJqIgDUZwkAbXDvc9ksjDI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AgN6inN/ovWlrjJszV3kOk9Gb1jIBPa0jYUZNi3OGakT8xG0bzJipNNDl0lRViN+cSJthN3n8PyMIrfYShxRNrta+z2yqrwCf9ULwx7d2dZYlCdr32Av9KkCljuanvikuF/ZzXfBTv8BRdyTKmy9/VZ7zp13K4SUpLP5oZBKYg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gquCu54b; arc=none smtp.client-ip=209.85.219.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-dcbcea9c261so962416276.3
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 06:37:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711632961; x=1712237761; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yk1JFmB+78Xg7br165/GKmGhERp7Awzg64hnVY/1y9I=;
-        b=XNkPBCNHV5m1VIiD6m5FCx9ps+9aFhTEBJ1141zpr+ZnAPB6QI+Y/ss06acJmmHFsz
-         b4vdSEJcNv3BZZvOJl7GeqJazFTOv2ELEv1cogIDwtnX6f+ZwpYTxmv8+lEKMyjCUDRd
-         DB4LnicH0XQQRmKIsJ7iekyAqZGWHUa0fuHGDWnlL8btPoZ0Cl9QqE16anHvRyyovevN
-         6ltvlY41l6r5IpNtXU7BDvNeT78O8BMrdse5uW2/fVSxcWv5KO5vKt5tBUzmHVH/UbPC
-         lVnQRCOqzGuIlvWk584hUTgVDuiwKMh7smppdTbdM+y5H8s4E3PT+C+xGL7X385jqgoe
-         hfcw==
+        d=linaro.org; s=google; t=1711633042; x=1712237842; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vhptj9/Vq4Rm0PoGzxaGiCJqIgDUZwkAbXDvc9ksjDI=;
+        b=gquCu54b7my9LLg/q4oPnqkKhGJwkL7ltG07Je+mkXnkO0tce3QQpinYIyA7vcMP/8
+         Sauy3czMzIHrSZ3M3UhQ+GugaxC245fv7DBzi8sGuKlDvKv23NV1VgjUUzcezwu/i0ml
+         3HrBrO9F758spxgQNWF+Ci5uC4PqVuJlKBak5mCFxHIhRfXo6w6Nmf2on3E6OtKniUNV
+         LT+M+VYkCIqd8Ya+BOtEl1V3iANk+gyZjZ1mB7ci4WB+l2OjnJnP7F4pH66J5T09vOM3
+         DIs8FWa5IPBud/6lNqR+RP9dQvkjXcvuHeTQr6oNe2jFd3rTU0IALrzYHbQvhymkZzQM
+         YC1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711632961; x=1712237761;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yk1JFmB+78Xg7br165/GKmGhERp7Awzg64hnVY/1y9I=;
-        b=Pde9Wp8ezjN/FR6Xok4DeJyj89DY2dg/06dtOiUSjeFzTj9CdWEZT51fjUc+9+NyFb
-         h+jj78CYfjAniPG5M5sC+CjzAlECnp+Cgx2vuEtSTfi+4tRDOMoCmHL14Rg1Dl4mhNp4
-         Ev9wvxP/sZOYEXpbTfgJjR5lYh8Nz1EvPJCgiD40mT2yO9459+cAWN5MiSBXX9/NT8Pf
-         hhOH7/x7sDURrPfLTlWsjaHkFqgTVg2ZOU9D4xDC342KF6Ina3oJIX1+QO6yFMK/JNDi
-         lngP6lNkPPxSudMboDsmSgfjRhoQrR+UH0BYhzJ4+hVLvGCTKvyi3M9DDFI6JHDmml0X
-         pgSg==
-X-Gm-Message-State: AOJu0YxiRTu9UMXRn/17nn5YN02T21Cj1uX/kTNOAEk1KXCQjL1CbOAg
-	pFNIFJ1spedWV2Cw6Bd9Bvv0bIOgA1Zhly6EKqlxknwKkxm0JrdxP/Fl/6DM/In4ne66
-X-Google-Smtp-Source: AGHT+IGuu/ntgczcc55uop5j2oZ1vO48hkx/nlTiLC4zJU7QFUkMOG+swkCaU5zszPOBeMUjGOZroA==
-X-Received: by 2002:a19:e017:0:b0:513:ec32:aa89 with SMTP id x23-20020a19e017000000b00513ec32aa89mr1871008lfg.2.1711632961079;
-        Thu, 28 Mar 2024 06:36:01 -0700 (PDT)
-Received: from localhost.localdomain ([83.217.198.104])
-        by smtp.gmail.com with ESMTPSA id u15-20020a056512040f00b00515c1a97da2sm208215lfk.83.2024.03.28.06.36.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 06:36:00 -0700 (PDT)
-From: Denis Kirjanov <kirjanov@gmail.com>
-X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.de>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	jgg@ziepe.ca,
-	leon@kernel.org,
-	Denis Kirjanov <dkirjanov@suse.de>,
-	syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
-Subject: [PATCH v3 net] Subject: [PATCH] RDMA/core: fix UAF with ib_device_get_netdev()
-Date: Thu, 28 Mar 2024 09:35:42 -0400
-Message-Id: <20240328133542.28572-1-dkirjanov@suse.de>
-X-Mailer: git-send-email 2.30.2
+        d=1e100.net; s=20230601; t=1711633042; x=1712237842;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vhptj9/Vq4Rm0PoGzxaGiCJqIgDUZwkAbXDvc9ksjDI=;
+        b=cxVxjUWtNWsZqpUeXwOPtQaMANFEoVnzIuf/yJ3Y27MH/sN8AqChm7fa9wyeJ1qzCZ
+         XeE8eyxkeeBYd85eQzQcvLfj8KhqS/ahncf/oFvpP73Q0V+ZBE1JWvPKAG02Rl0dKCgw
+         teejtni4CDSbTxmAGH2F95MeeugT2+vT4JHOeQlu76h1OsGKYVLbokzy03jDi0Pd0UJp
+         mCTVO6rEG11CrMK7TFOoFigAp8O2IRkK72WKpfmChzPwSqY3iosVaZgNSlveeNcz4LPK
+         4ssf3Hs6Led1uV1puEWtsiyXngqqCxdXzzyEWVZ50bstQxg4upHofWHVCymXfghjs+8s
+         cK8A==
+X-Forwarded-Encrypted: i=1; AJvYcCW/Gze08ZHXUNS7rHp5aWBsNqecn4c7gtGO/WEhy/bInUV4IkEck0maQHXhKf695PdpEiRPmxcQ7DhM+Rhqa2k6N9vmLMrg
+X-Gm-Message-State: AOJu0Yw8A94ryutzXDvipiSQFDU1ow0ymiLks3a+l1r7APS83hOXCj6K
+	tKSKpe6+17akrgWeHGpEfCUJeSluXeUSniCd43KKgDGwxFZF0KvbPQq9fCfi4PRYRvDR+i6XhfX
+	06vORHVnQN1rAcDSxeCM8/LZKTzzqVIwhMSd7Pg==
+X-Google-Smtp-Source: AGHT+IGjGHEbsk10nKTaVGgOOQzkHc5Qm9STf87bHGVpMP0DEmjO9lKjEWUgvRJ23UvcJC23rRkiymMtwiTmbVMLRs0=
+X-Received: by 2002:a25:b9ca:0:b0:dd1:3cc1:5352 with SMTP id
+ y10-20020a25b9ca000000b00dd13cc15352mr2820459ybj.15.1711633040798; Thu, 28
+ Mar 2024 06:37:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240327160314.9982-1-apais@linux.microsoft.com>
+ <20240327160314.9982-10-apais@linux.microsoft.com> <CAPDyKFpuKadPQv6+61C2pE4x4FE-DUC5W6WCCPu9Nb2DnDB56g@mail.gmail.com>
+In-Reply-To: <CAPDyKFpuKadPQv6+61C2pE4x4FE-DUC5W6WCCPu9Nb2DnDB56g@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 28 Mar 2024 14:37:09 +0100
+Message-ID: <CACRpkdZ7wAbtTUmmLCef7KnATmfZeAL26Q-gLqnGe3CdZ3+O3A@mail.gmail.com>
+Subject: Re: [PATCH 9/9] mmc: Convert from tasklet to BH workqueue
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Allen Pais <apais@linux.microsoft.com>, linux-kernel@vger.kernel.org, tj@kernel.org, 
+	keescook@chromium.org, vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev, 
+	florian.fainelli@broadcom.com, rjui@broadcom.com, sbranden@broadcom.com, 
+	paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com, 
+	manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com, 
+	leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com, 
+	haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de, 
+	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
+	angelogioacchino.delregno@collabora.com, afaerber@suse.de, 
+	logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com, 
+	robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org, 
+	orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com, 
+	patrice.chotard@foss.st.com, wens@csie.org, jernej.skrabec@gmail.com, 
+	peter.ujfalusi@gmail.com, kys@microsoft.com, haiyangz@microsoft.com, 
+	wei.liu@kernel.org, decui@microsoft.com, jassisinghbrar@gmail.com, 
+	mchehab@kernel.org, maintainers@bluecherrydvr.com, 
+	aubin.constans@microchip.com, manuel.lauss@gmail.com, mirq-linux@rere.qmqm.pl, 
+	jh80.chung@samsung.com, oakad@yahoo.com, hayashi.kunihiko@socionext.com, 
+	mhiramat@kernel.org, brucechang@via.com.tw, HaraldWelte@viatech.com, 
+	pierre@ossman.eu, duncan.sands@free.fr, stern@rowland.harvard.edu, 
+	oneukum@suse.com, openipmi-developer@lists.sourceforge.net, 
+	dmaengine@vger.kernel.org, asahi@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org, 
+	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
+	linuxppc-dev@lists.ozlabs.org, linux-mediatek@lists.infradead.org, 
+	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-omap@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-A call to ib_device_get_netdev may lead to a race condition
-while accessing a netdevice instance since we don't hold
-the rtnl lock while checking
-the registration state:
-	if (res && res->reg_state != NETREG_REGISTERED) {
+On Thu, Mar 28, 2024 at 1:54=E2=80=AFPM Ulf Hansson <ulf.hansson@linaro.org=
+> wrote:
 
-v2: unlock rtnl on error path
-v3: update remaining callers of ib_device_get_netdev
+> At this point we have suggested to drivers to switch to use threaded
+> irq handlers (and regular work queues if needed too). That said,
+> what's the benefit of using the BH work queue?
 
-Reported-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
-Fixes: d41861942fc55 ("IB/core: Add generic function to extract IB speed from netdev")
-Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
----
- drivers/infiniband/core/cache.c  |  2 ++
- drivers/infiniband/core/device.c | 15 ++++++++++++---
- drivers/infiniband/core/nldev.c  |  2 ++
- drivers/infiniband/core/verbs.c  |  6 ++++--
- 4 files changed, 20 insertions(+), 5 deletions(-)
+Context:
+https://lwn.net/Articles/960041/
+"Tasklets, in particular, remain because they offer lower latency than
+workqueues which, since they must go through the CPU scheduler,
+can take longer to execute a deferred-work item."
 
-diff --git a/drivers/infiniband/core/cache.c b/drivers/infiniband/core/cache.c
-index c02a96d3572a..cf9c826cd520 100644
---- a/drivers/infiniband/core/cache.c
-+++ b/drivers/infiniband/core/cache.c
-@@ -1461,7 +1461,9 @@ static int config_non_roce_gid_cache(struct ib_device *device,
- 		if (rdma_protocol_iwarp(device, port)) {
- 			struct net_device *ndev;
- 
-+			rtnl_lock();
- 			ndev = ib_device_get_netdev(device, port);
-+			rtnl_unlock();
- 			if (!ndev)
- 				continue;
- 			RCU_INIT_POINTER(gid_attr.ndev, ndev);
-diff --git a/drivers/infiniband/core/device.c b/drivers/infiniband/core/device.c
-index 07cb6c5ffda0..53074a4b04c9 100644
---- a/drivers/infiniband/core/device.c
-+++ b/drivers/infiniband/core/device.c
-@@ -2026,9 +2026,12 @@ static int iw_query_port(struct ib_device *device,
- 
- 	memset(port_attr, 0, sizeof(*port_attr));
- 
-+	rtnl_lock();
- 	netdev = ib_device_get_netdev(device, port_num);
--	if (!netdev)
-+	if (!netdev) {
-+		rtnl_unlock();
- 		return -ENODEV;
-+	}
- 
- 	port_attr->max_mtu = IB_MTU_4096;
- 	port_attr->active_mtu = ib_mtu_int_to_enum(netdev->mtu);
-@@ -2052,6 +2055,7 @@ static int iw_query_port(struct ib_device *device,
- 		rcu_read_unlock();
- 	}
- 
-+	rtnl_unlock();
- 	dev_put(netdev);
- 	return device->ops.query_port(device, port_num, port_attr);
- }
-@@ -2220,6 +2224,8 @@ struct net_device *ib_device_get_netdev(struct ib_device *ib_dev,
- 	struct ib_port_data *pdata;
- 	struct net_device *res;
- 
-+	ASSERT_RTNL();
-+
- 	if (!rdma_is_port_valid(ib_dev, port))
- 		return NULL;
- 
-@@ -2306,12 +2312,15 @@ void ib_enum_roce_netdev(struct ib_device *ib_dev,
- 
- 	rdma_for_each_port (ib_dev, port)
- 		if (rdma_protocol_roce(ib_dev, port)) {
--			struct net_device *idev =
--				ib_device_get_netdev(ib_dev, port);
-+			struct net_device *idev;
-+
-+			rtnl_lock();
-+			idev = ib_device_get_netdev(ib_dev, port);
- 
- 			if (filter(ib_dev, port, idev, filter_cookie))
- 				cb(ib_dev, port, idev, cookie);
- 
-+			rtnl_unlock();
- 			if (idev)
- 				dev_put(idev);
- 		}
-diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
-index 4900a0848124..cfa204a224f2 100644
---- a/drivers/infiniband/core/nldev.c
-+++ b/drivers/infiniband/core/nldev.c
-@@ -360,6 +360,7 @@ static int fill_port_info(struct sk_buff *msg,
- 	if (nla_put_u8(msg, RDMA_NLDEV_ATTR_PORT_PHYS_STATE, attr.phys_state))
- 		return -EMSGSIZE;
- 
-+	rtnl_lock();
- 	netdev = ib_device_get_netdev(device, port);
- 	if (netdev && net_eq(dev_net(netdev), net)) {
- 		ret = nla_put_u32(msg,
-@@ -371,6 +372,7 @@ static int fill_port_info(struct sk_buff *msg,
- 	}
- 
- out:
-+	rtnl_unlock();
- 	dev_put(netdev);
- 	return ret;
- }
-diff --git a/drivers/infiniband/core/verbs.c b/drivers/infiniband/core/verbs.c
-index 94a7f3b0c71c..6a3757b00c93 100644
---- a/drivers/infiniband/core/verbs.c
-+++ b/drivers/infiniband/core/verbs.c
-@@ -1976,11 +1976,13 @@ int ib_get_eth_speed(struct ib_device *dev, u32 port_num, u16 *speed, u8 *width)
- 	if (rdma_port_get_link_layer(dev, port_num) != IB_LINK_LAYER_ETHERNET)
- 		return -EINVAL;
- 
-+	rtnl_lock();
- 	netdev = ib_device_get_netdev(dev, port_num);
--	if (!netdev)
-+	if (!netdev) {
-+		rtnl_unlock();
- 		return -ENODEV;
-+	}
- 
--	rtnl_lock();
- 	rc = __ethtool_get_link_ksettings(netdev, &lksettings);
- 	rtnl_unlock();
- 
--- 
-2.30.2
+The BH WQ is controlled by a software IRQ and quicker than an
+ordinary work item.
 
+I don't know if this little latency could actually affect any MMC
+device, I doubt it.
+
+The other benefit IIUC is that it is easy to mechanically rewrite tasklets
+to BH workqueues and be sure that it is as fast as the tasklet, if you want
+to switch to threaded IRQ handlers or proper work, you need to write a
+lot of elaborate code and test it (preferably on real hardware).
+
+Yours,
+Linus Walleij
 
