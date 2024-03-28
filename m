@@ -1,97 +1,147 @@
-Return-Path: <netdev+bounces-82793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 563B588FC0F
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:51:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 147A988FC30
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:54:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C8821F2DA53
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:51:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2888EB26CD0
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1707C093;
-	Thu, 28 Mar 2024 09:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B425FB90;
+	Thu, 28 Mar 2024 09:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dt4wAvzN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dhi3Kyho"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC58B7C08C;
-	Thu, 28 Mar 2024 09:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03BA376E0
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 09:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711619430; cv=none; b=qt+bUBLwBBBTgo3o5r96KCQJ65xvGpt3rBjoeOkOI1lrcLWzJ+c/+gw+sVLG5DGZ5yGFmlZsn0FU0o2uUsPTwZWHOLLxIIJjtKX9b36riR/l48mOqSYUCo8ge7wSDPBZW1ttB/Uk+R06XoASjUDnVQGDhxQg3VHGSYU7PBCBbGk=
+	t=1711619645; cv=none; b=R+uh9LaxCj8yu0X7MQwyckFCincm59CHxnonFK8ktiPMM2LDCA4yy0sTmxgis65elJGCTLUHcyv09MPcWAGNFRp63ZNQUxIWGP7NcZXAkFKajmklhBzrdQ+fgpowdPHY41XGBT6BZ3BNxMKXmjqufkTKtJNWgr1wV6IVpUA3y8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711619430; c=relaxed/simple;
-	bh=hw9CXjyBt1jqIOFA9VS3MGEAq01vM/E+/Dnp8mAip2U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=svNcDgiSAulIeMdB4lp5KzDdZSxNQmjO7ruF8M1ganbFVHfSlN9X69UsNdSGiFkljt13JsCW+hUE9sR5hg8TD21DLr1ZrJ7ursupY2il4lHO4rzlfjCIqZkgaNJkCEuPPbEnzJ02SUkoAwRp5UJINPd638OAJb4WzW8sXMfgE+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dt4wAvzN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D448C43399;
-	Thu, 28 Mar 2024 09:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711619430;
-	bh=hw9CXjyBt1jqIOFA9VS3MGEAq01vM/E+/Dnp8mAip2U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dt4wAvzN5ozOMy2FY9l0OWR8MfisK06g3BLLGmuDYQZFOoEwAtdrFwQanMBgM80Xu
-	 Cbh0EKEp2O3Bl3B224dqiSyfedWDiywmJk+M4s54hE3BAXOAhYDKgFcTtzj2pWiagl
-	 zM9Kmj8AcJ4mlItwBaI1oK0Jhc6IfeS33CHVGjT9cQ9eHKVthr+AutAaurFflo4QmZ
-	 H661gJJl/ZXFco7TuNL5UxTjLk1+fi/l7mz5NWAlXmu+O+n+g3WxM4xs1O2OVxjU4X
-	 P/mjoMgEl5IQjAoLQZ/uS3L9ooXMFwsiqyYjFnxMZ1DpyA3sdKcdM0dP/CyzQyhHm7
-	 j5IcpRUD1EF8Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46445D8C965;
-	Thu, 28 Mar 2024 09:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711619645; c=relaxed/simple;
+	bh=yYDNUot13y8C3ZJ+iZrI0rAfnoRfIoL4ETxwLJIdJ1c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=C/rXfaaxVkaff6Y9RVWU/HilPFiXqUCP/Zwo3ouAdpYRJ628mwEdRMr5umktwIXxuX9b37pzEyO0Q8PBQsEdwTF290fXQeGsfjs3vt3G6Ud/P3r5MHnxz4IcxIzaPM7HsV9D8J/rUCJeZ+rRPDRJBXnWzRymW42TzperzBbWnk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Dhi3Kyho; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33ec7e38b84so476687f8f.1
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 02:54:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711619642; x=1712224442; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qR7L2zsTQZFBtjYk0D8hXAaerXX/BB/ioIDe3/j49Fo=;
+        b=Dhi3KyhoLAFgAjSDZkwQ/9/fOO00Ok3p26stzK6iBc65g45d5fks7Y0mSIg/xhZpg8
+         u4aqLiDnuMthIPey++uJEOXbx2wICT4Eh/ZODi1/h4BowmKTo/7J4gOGBu+yYs2i3EBw
+         WDwGFe2UIx9occdHK3637zTRgaQKlJ/tajAjLG1l+oL7JjpcakbgjW8Dbo/oOBlPh9W+
+         EwpzMEV8yt4WvnX3BXu4zlGtdacM4eMeVUwFlhiEjon0lLIEnwSSjg8j1H39H7EDgfap
+         xmJUCvCD58rAFSUpHkhIP+N651roInQrfMGxjokeh1q2qYIxqiGZTvbEoM0EGuBC3T+s
+         R9IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711619642; x=1712224442;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qR7L2zsTQZFBtjYk0D8hXAaerXX/BB/ioIDe3/j49Fo=;
+        b=sElYTeL0MxIfd0XWz/zSNHabjnsGr03iYnMqL7HGVNIb3JylkbTEGUJp+62vhXRTRw
+         roqs+za5MN1NKMyuHmu3nxDS8xv0x1W85rgaLl+PxHxcq7ths5oEVwn+Di2BIaVOj/81
+         CPW3UjD8wbzbmTk/bm7mMLM1cp0Kqeh6Rrun4WAL+oHTbREV1c2AmVt6lFAo98Sd1NzB
+         Zv1zFyEbYgHny4u03Fr+EBn9+/olBLiv8ShiNq+qASEXoT472rXP7j85PINuJXizFL9G
+         MFQ2m+FSDiExtMkqG6fBztB1bNHUDs4savW2Oa/elcvSZvLGlutlv3Fc9hpz0+qjTrDv
+         mRgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWsnSn9EjFt/SmOJDgc/Owaas83lK/swry5l9pXIsATqCA0/AwBFTI5+6MjYVsTUSzYnsN15n9oxOIjwVd8q/7SfGgk+88L
+X-Gm-Message-State: AOJu0YxblA0DsJirgrPL3DL2HwMkclus95G5qwaoh0wJEmbTxfUDppky
+	MQ7V5X4y9h5JfBMaZiUkI0CHkkk0BBtyq/l+AjOTP7yUMKM2uNmRUMF1nDeQwVA=
+X-Google-Smtp-Source: AGHT+IGxp7E2/LIC9lCPGAz/YYMslQUnBPVeT64Qu+NHwS+JRYtYdMeHw6/t9lzCSZb1vU7Q3sGO0Q==
+X-Received: by 2002:a5d:6e53:0:b0:33e:8b95:62d9 with SMTP id j19-20020a5d6e53000000b0033e8b9562d9mr1722982wrz.23.1711619642166;
+        Thu, 28 Mar 2024 02:54:02 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.148])
+        by smtp.gmail.com with ESMTPSA id i13-20020adfe48d000000b00341bdbf0b07sm1295194wrm.50.2024.03.28.02.54.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 02:54:01 -0700 (PDT)
+Message-ID: <93fc47b1-ae44-4eb7-b799-9227a019c7c8@linaro.org>
+Date: Thu, 28 Mar 2024 10:54:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net PATCH] net: phy: qcom: at803x: fix kernel panic with
- at8031_probe
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171161943028.10354.7334071604258663095.git-patchwork-notify@kernel.org>
-Date: Thu, 28 Mar 2024 09:50:30 +0000
-References: <20240325190621.2665-1-ansuelsmth@gmail.com>
-In-Reply-To: <20240325190621.2665-1-ansuelsmth@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org, wwortel@dorpstraat.com, stable@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next][resend v1 1/1] nfc: st95hf: Switch to using
+ gpiod API
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240326175836.1418718-1-andriy.shevchenko@linux.intel.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240326175836.1418718-1-andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 25 Mar 2024 20:06:19 +0100 you wrote:
-> On reworking and splitting the at803x driver, in splitting function of
-> at803x PHYs it was added a NULL dereference bug where priv is referenced
-> before it's actually allocated and then is tried to write to for the
-> is_1000basex and is_fiber variables in the case of at8031, writing on
-> the wrong address.
+On 26/03/2024 18:58, Andy Shevchenko wrote:
+> This updates the driver to gpiod API, and removes yet another use of
+> of_get_named_gpio().
 > 
-> Fix this by correctly setting priv local variable only after
-> at803x_probe is called and actually allocates priv in the phydev struct.
-> 
-> [...]
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
 
-Here is the summary with links:
-  - [net] net: phy: qcom: at803x: fix kernel panic with at8031_probe
-    https://git.kernel.org/netdev/net/c/6a4aee277740
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Best regards,
+Krzysztof
 
 
