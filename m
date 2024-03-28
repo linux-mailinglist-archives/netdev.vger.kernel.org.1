@@ -1,230 +1,195 @@
-Return-Path: <netdev+bounces-82735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 656F888F815
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:49:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F24588F832
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D69F21F23B70
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:49:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3331B212A1
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:55:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9171DA21;
-	Thu, 28 Mar 2024 06:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/6mMKM0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1AA4F8AB;
+	Thu, 28 Mar 2024 06:55:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28079386
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 06:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E004F88E
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 06:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711608591; cv=none; b=qM52ptol1ZA4Fi5IbjC0jGTUuUVhJeMM0S2LEJSlB308D08LMq2JLIYNvC/RgCVMoxwqoxxLMvT7fQd+rwMmZcRtFzlIkwom5HRqvgCreN+FkxSg4Fk4hK7Ous4at6FDtLYS6m047FfT5cGoQkevcIEl0kWVR8l3tZWiEM6B1EQ=
+	t=1711608919; cv=none; b=bHfw6wB8VbQHWLpsGR2YI9fe0d20FZXRxAgakvFFacnzM9PSrsVkVo82HcJrnL7n9JcTqbn2rrHf4Jslm81XeByUQ4d2dp6xKDYh7MZ9plT+iAQ5pHFpkDHTheMo4hdmsW6QLvWzFJgyr28suEnV4CJmKTDmmCoxhddbYsQdVG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711608591; c=relaxed/simple;
-	bh=ZrC3pr0hwy0QsgWyfhvgBQXDsGRT0oPPRWr/0BKX9oo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JhURT9UbVtJPMYEH2wh6OyVGKJ3knGBJxrxg/aKlspcGXmNZQBtp99qtju60ytSTSH3X16Oyh3C8n24tiWARHC/cNS+mjsfBbKI5IC3T0KTQJvx9I0UfGzLcBnR+2zOvdz/gwrvLtEcwZGWSPPEQHy7ag5szOyI8cRn+CYkMhmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/6mMKM0; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33ed6078884so903382f8f.1
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 23:49:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711608588; x=1712213388; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rI6V37SnYDYbURnF1urBy7OvJmctsdnVYB8EYoTFMQ0=;
-        b=c/6mMKM0Nz5VzSSVOM6w7ajLjJwCg701Z918nFdJLtaQNDDn4kpJyHkIJsBwiZGVLK
-         ao++ZZl61N79NGbxkSsVR63pBehZ2GbdcXky0ax8LefYUDR9QsRycwvciIIt3MFZPDOc
-         CEcaO5SdjEipsLmWG3C0dHW+CAef08N6MyowFEWA1LF3nrTEsBKxVjHACoNB3Wlt4ZeF
-         WxaKZpq5thVOf1mgwaF0f9XDyrt/SfG15F/SZw4YYl8B9Q2jpjROl7J0eVfoxmWpQtej
-         /WCGeMGPFRWKm1gybiAp5YodLJ/3Tox8p1FhwCiBY6x9hhAJxMORugGSQ+dcvkVRDuGB
-         Sz9g==
+	s=arc-20240116; t=1711608919; c=relaxed/simple;
+	bh=2fyVaUsZFTan7wuwhsap+GM+OrmCodYjQgxDz3cqFxs=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=JV7p3aUPH5JkHRhLPj4pEz63JbiqzwRx3vJzXGbHaNQNdZmePWbLU6gSpl2j3EE2Ml3Ywf7TuJcyoiOIVrgxnTgF+tQFdDAkObMZ0foD4eaAf+t43ZgxyQ0WWLOyqO5BjLLPQksMoTx0g2/pFgvJzNt6+KlxKnrRtjXVSD/yreI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7d022d0c76aso54166539f.3
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 23:55:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711608588; x=1712213388;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rI6V37SnYDYbURnF1urBy7OvJmctsdnVYB8EYoTFMQ0=;
-        b=XtLjNGSGoB2dfMiCJW1j74OZVh/sa/krTyX9VdefRywV0mFrLSRDh0sozkq+vk8ACq
-         MtudKsNXe9chMXJT7gOQt+tvdUzT6JMUKXptQVQ5yaLa20HgYvGFXN/3aZLEODBZdifi
-         eX5629uMXpnLq7PBC7B3e4kMIEM5+YPpZNNkcLSX569OrvtYlqdSfFNSl4Ir4rQbP91m
-         PCt6O65R9D5Rfv6LOhZr5ICmgWlmE/Jr4rBL3WPyCflP2LfQIPLBMc5PfQ4+R1xvH5p3
-         AfN80PakAN7TsNPIIjFmptoHG/nNi2AKsfrglLx7D+I5EpsQ02T505UeXvM5IAbRZkb7
-         sgng==
-X-Gm-Message-State: AOJu0Yz9056rc3G88CTqVEZOwD5uenq7TO3wut6fp/Cb19+fPfLPpq+z
-	84PXSGzzHVfSxS3ec9ZcWBbeFzsVtEx2ZGuLBun/TnG74FPfQJj2
-X-Google-Smtp-Source: AGHT+IFOqw6coTgZhzwvW3ZOidrQ6g/VgACJDx6xVYfMfqAgKpNwzUvvncsKOLGdLa0I1FeE2skLvg==
-X-Received: by 2002:a05:6000:883:b0:33e:6ef3:b68e with SMTP id cs3-20020a056000088300b0033e6ef3b68emr903079wrb.34.1711608588243;
-        Wed, 27 Mar 2024 23:49:48 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:b9be:3500:b4fb:6405:2668:9580? (dynamic-2a01-0c23-b9be-3500-b4fb-6405-2668-9580.c23.pool.telefonica.de. [2a01:c23:b9be:3500:b4fb:6405:2668:9580])
-        by smtp.googlemail.com with ESMTPSA id e11-20020a056000194b00b00341c6b53358sm870352wry.66.2024.03.27.23.49.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 23:49:47 -0700 (PDT)
-Message-ID: <1c02e074-5511-4c4b-b9f3-b280d3d75a93@gmail.com>
-Date: Thu, 28 Mar 2024 07:49:46 +0100
+        d=1e100.net; s=20230601; t=1711608917; x=1712213717;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4E/rXIt+7CvbLzlbJO4yXgpA0XKHTyInmlxo4zDQfLE=;
+        b=Br1kRYy+/TgUJxWQdaRwVpM/NKbf0s5zF/JBZ0BgH96fsG9WlAVg6g5XB/naZR95yD
+         dtnP/edJFhuT7s9NOe3fFJAHk42lyhFF5qgSaiaDiiM/uCVI+Iup/yTryQjxzJ6GZHFm
+         Xo407sYInozbfXCo+XhES0zWfZfcY2cBUKu/MZtl4+ampRjDPUtE/JHoxBA0m2VEI9h+
+         6batgeQG3KlDoIlH59BRcTZ7Ru3NwWHDrmoB4wnkE7V9dGCBnEgdaNVarI9VCVvbxYL3
+         i/uWwIWLTuxv+GQeK/g4ntXU0mdmo5ofhu3Uzax2XlI2I+OHV35FSNG92tnnlV97LwIS
+         cmTg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1INjuBkZax1mnjKy6B4etq8rx0vsq6eehPVbC9BL+cJ5moYHCHnLl5ACJeaYjeXaW02f2wdlXKA6drnaHkW1n571PufNl
+X-Gm-Message-State: AOJu0YwGaKdQSJPIxux0KCOycZ1/T4obGUz9Mf4B2mMFPnP7yLmm8lr0
+	K8SWkTNyBqd+WsghGRbVqhhvppCsG4gwdYFucSNVMSGQn6pbqww+Yrfq9W3wZ42DVa6e+KpBZd5
+	qx9rPe8CWy799fAzhylE6aOMsJi9nacFSPWtKY+FKwHG/E0WPebwSXxA=
+X-Google-Smtp-Source: AGHT+IG3vAY+ssWCjAmwFEXyLitc8vwEwCfM1d4gXp1HX3hujFGheiW1S1aKADUng0Rc0gQZPGwVC1VW0Xw4KwZpFm/BPAB52QNL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] r8169: skip DASH fw status checks when DASH is
- disabled
-To: Atlas Yu <atlas.yu@canonical.com>, nic_swsd@realtek.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org
-References: <20240328055152.18443-1-atlas.yu@canonical.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20240328055152.18443-1-atlas.yu@canonical.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:4af:b0:368:7775:2df2 with SMTP id
+ e15-20020a056e0204af00b0036877752df2mr27444ils.5.1711608917110; Wed, 27 Mar
+ 2024 23:55:17 -0700 (PDT)
+Date: Wed, 27 Mar 2024 23:55:17 -0700
+In-Reply-To: <000000000000f94ee2061458a2e0@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007fc08e0614b30176@google.com>
+Subject: Re: [syzbot] [usb?] WARNING: ODEBUG bug in netdev_freemem (3)
+From: syzbot <syzbot+83845bb93916bb30c048@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 28.03.2024 06:51, Atlas Yu wrote:
-> On devices that support DASH, the current code in the "rtl_loop_wait" function
-> raises false alarms when DASH is disabled. This occurs because the function
-> attempts to wait for the DASH firmware to be ready, even though it's not
-> relevant in this case.
-> 
-> r8169 0000:0c:00.0 eth0: RTL8168ep/8111ep, 38:7c:76:49:08:d9, XID 502, IRQ 86
-> r8169 0000:0c:00.0 eth0: jumbo features [frames: 9194 bytes, tx checksumming: ko]
-> r8169 0000:0c:00.0 eth0: DASH disabled
-> ...
-> r8169 0000:0c:00.0 eth0: rtl_ep_ocp_read_cond == 0 (loop: 30, delay: 10000).
-> 
-> This patch modifies the driver start/stop functions to skip checking the DASH
-> firmware status when DASH is explicitly disabled. This prevents unnecessary
-> delays and false alarms.
-> 
-> The patch has been tested on several ThinkStation P8/PX workstations.
-> 
-> Fixes: 0ab0c45d8aae ("r8169: add handling DASH when DASH is disabled")
-> Signed-off-by: Atlas Yu <atlas.yu@canonical.com>
+syzbot has found a reproducer for the following issue on:
 
-You sent a v2 already, so I think this is v3. And the change log is missing.
-But as the change is more or less trivial, no need to resubmit IMO.
+HEAD commit:    498e47cd1d1f Fix build errors due to new UIO_MEM_DMA_COHER..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15236d7e180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=43f1e0cbdb852271
+dashboard link: https://syzkaller.appspot.com/bug?extid=83845bb93916bb30c048
+compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a9c4f9180000
 
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 31 ++++++++++++++++++++---
->  1 file changed, 27 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 5c879a5c86d7..4ac444eb269f 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -1314,17 +1314,40 @@ static void rtl8168ep_stop_cmac(struct rtl8169_private *tp)
->  	RTL_W8(tp, IBCR0, RTL_R8(tp, IBCR0) & ~0x01);
->  }
->  
-> +static void rtl_dash_loop_wait(struct rtl8169_private *tp,
-> +			       const struct rtl_cond *c,
-> +			       unsigned long usecs, int n, bool high)
-> +{
-> +	if (!tp->dash_enabled)
-> +		return;
-> +	rtl_loop_wait(tp, c, usecs, n, high);
-> +}
-> +
-> +static void rtl_dash_loop_wait_high(struct rtl8169_private *tp,
-> +				    const struct rtl_cond *c,
-> +				    unsigned long d, int n)
-> +{
-> +	rtl_dash_loop_wait(tp, c, d, n, true);
-> +}
-> +
-> +static void rtl_dash_loop_wait_low(struct rtl8169_private *tp,
-> +				   const struct rtl_cond *c,
-> +				   unsigned long d, int n)
-> +{
-> +	rtl_dash_loop_wait(tp, c, d, n, false);
-> +}
-> +
->  static void rtl8168dp_driver_start(struct rtl8169_private *tp)
->  {
->  	r8168dp_oob_notify(tp, OOB_CMD_DRIVER_START);
-> -	rtl_loop_wait_high(tp, &rtl_dp_ocp_read_cond, 10000, 10);
-> +	rtl_dash_loop_wait_high(tp, &rtl_dp_ocp_read_cond, 10000, 10);
->  }
->  
->  static void rtl8168ep_driver_start(struct rtl8169_private *tp)
->  {
->  	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_START);
->  	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
-> -	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
-> +	rtl_dash_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
->  }
->  
->  static void rtl8168_driver_start(struct rtl8169_private *tp)
-> @@ -1338,7 +1361,7 @@ static void rtl8168_driver_start(struct rtl8169_private *tp)
->  static void rtl8168dp_driver_stop(struct rtl8169_private *tp)
->  {
->  	r8168dp_oob_notify(tp, OOB_CMD_DRIVER_STOP);
-> -	rtl_loop_wait_low(tp, &rtl_dp_ocp_read_cond, 10000, 10);
-> +	rtl_dash_loop_wait_low(tp, &rtl_dp_ocp_read_cond, 10000, 10);
->  }
->  
->  static void rtl8168ep_driver_stop(struct rtl8169_private *tp)
-> @@ -1346,7 +1369,7 @@ static void rtl8168ep_driver_stop(struct rtl8169_private *tp)
->  	rtl8168ep_stop_cmac(tp);
->  	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_STOP);
->  	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
-> -	rtl_loop_wait_low(tp, &rtl_ep_ocp_read_cond, 10000, 10);
-> +	rtl_dash_loop_wait_low(tp, &rtl_ep_ocp_read_cond, 10000, 10);
->  }
->  
->  static void rtl8168_driver_stop(struct rtl8169_private *tp)
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/8ead8862021c/non_bootable_disk-498e47cd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/88de02166e48/vmlinux-498e47cd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2f2f314f3da3/zImage-498e47cd.xz
 
-Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+83845bb93916bb30c048@syzkaller.appspotmail.com
 
+cdc_ncm 2-1:1.0 usb0: register 'cdc_ncm' at usb-dummy_hcd.1-1, CDC NCM (NO ZLP), 42:42:42:42:42:42
+usb 2-1: USB disconnect, device number 80
+cdc_ncm 2-1:1.0 usb0: unregister 'cdc_ncm' usb-dummy_hcd.1-1, CDC NCM (NO ZLP)
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 44 at lib/debugobjects.c:514 debug_print_object+0xc4/0xd8 lib/debugobjects.c:514
+ODEBUG: free active (active state 0) object: 84e6c7ac object type: work_struct hint: usbnet_deferred_kevent+0x0/0x388 drivers/net/usb/usbnet.c:630
+Modules linked in:
+Kernel panic - not syncing: kernel: panic_on_warn set ...
+CPU: 1 PID: 44 Comm: kworker/1:1 Not tainted 6.9.0-rc1-syzkaller #0
+Hardware name: ARM-Versatile Express
+Workqueue: usb_hub_wq hub_event
+Call trace: 
+[<81878e9c>] (dump_backtrace) from [<81878f98>] (show_stack+0x18/0x1c arch/arm/kernel/traps.c:256)
+ r7:00000000 r6:82622e44 r5:00000000 r4:81fc4710
+[<81878f80>] (show_stack) from [<81896734>] (__dump_stack lib/dump_stack.c:88 [inline])
+[<81878f80>] (show_stack) from [<81896734>] (dump_stack_lvl+0x54/0x7c lib/dump_stack.c:114)
+[<818966e0>] (dump_stack_lvl) from [<81896774>] (dump_stack+0x18/0x1c lib/dump_stack.c:123)
+ r5:00000000 r4:82858d18
+[<8189675c>] (dump_stack) from [<81879a40>] (panic+0x120/0x358 kernel/panic.c:348)
+[<81879920>] (panic) from [<8024390c>] (check_panic_on_warn kernel/panic.c:241 [inline])
+[<81879920>] (panic) from [<8024390c>] (print_tainted+0x0/0xa0 kernel/panic.c:236)
+ r3:8260c584 r2:00000001 r1:81fad394 r0:81fb4f3c
+ r7:8080b850
+[<80243898>] (check_panic_on_warn) from [<80243b00>] (__warn+0x7c/0x180 kernel/panic.c:694)
+[<80243a84>] (__warn) from [<80243dec>] (warn_slowpath_fmt+0x1e8/0x1f4 kernel/panic.c:727)
+ r8:00000009 r7:820112e0 r6:df915a7c r5:82ee6c00 r4:00000000
+[<80243c08>] (warn_slowpath_fmt) from [<8080b850>] (debug_print_object+0xc4/0xd8 lib/debugobjects.c:514)
+ r10:00000005 r9:84e6c000 r8:81a02b44 r7:820391e8 r6:828bc414 r5:df915b24
+ r4:8260ce18
+[<8080b78c>] (debug_print_object) from [<8080d0e8>] (__debug_check_no_obj_freed lib/debugobjects.c:989 [inline])
+[<8080b78c>] (debug_print_object) from [<8080d0e8>] (debug_check_no_obj_freed+0x254/0x2a0 lib/debugobjects.c:1019)
+ r8:84e6c800 r7:84e6c7ac r6:00000100 r5:00000003 r4:00000000
+[<8080ce94>] (debug_check_no_obj_freed) from [<804b2650>] (slab_free_hook mm/slub.c:2078 [inline])
+[<8080ce94>] (debug_check_no_obj_freed) from [<804b2650>] (slab_free mm/slub.c:4280 [inline])
+[<8080ce94>] (debug_check_no_obj_freed) from [<804b2650>] (kfree+0x1a0/0x334 mm/slub.c:4390)
+ r10:82775a30 r9:84d86080 r8:84e6c000 r7:8045a7ac r6:82c023c0 r5:ddea96a0
+ r4:84e6c000
+[<804b24b0>] (kfree) from [<8045a7ac>] (kvfree+0x2c/0x30 mm/util.c:680)
+ r10:82775a30 r9:84d86080 r8:84e6c000 r7:00000000 r6:84f41900 r5:84f71480
+ r4:84e6c000
+[<8045a780>] (kvfree) from [<813b36cc>] (netdev_freemem+0x1c/0x20 net/core/dev.c:10797)
+ r5:84f71480 r4:84e6c000
+[<813b36b0>] (netdev_freemem) from [<813ee72c>] (netdev_release+0x2c/0x34 net/core/net-sysfs.c:2031)
+[<813ee700>] (netdev_release) from [<80a41a70>] (device_release+0x38/0xa8 drivers/base/core.c:2565)
+ r5:84f71480 r4:84e6c3b8
+[<80a41a38>] (device_release) from [<81852e00>] (kobject_cleanup lib/kobject.c:689 [inline])
+[<80a41a38>] (device_release) from [<81852e00>] (kobject_release lib/kobject.c:720 [inline])
+[<80a41a38>] (device_release) from [<81852e00>] (kref_put include/linux/kref.h:65 [inline])
+[<80a41a38>] (device_release) from [<81852e00>] (kobject_put+0xc8/0x1f8 lib/kobject.c:737)
+ r5:81b485c4 r4:84e6c3b8
+[<81852d38>] (kobject_put) from [<80a41cf8>] (put_device+0x18/0x1c drivers/base/core.c:3813)
+ r7:84d86400 r6:84e6c10c r5:84e6c000 r4:00000000
+[<80a41ce0>] (put_device) from [<813a4a18>] (free_netdev+0x108/0x188 net/core/dev.c:10993)
+[<813a4910>] (free_netdev) from [<80d110f0>] (usbnet_disconnect+0xac/0xf0 drivers/net/usb/usbnet.c:1636)
+ r6:84e6c774 r5:84e6c660 r4:00000000
+[<80d11044>] (usbnet_disconnect) from [<80d6c068>] (usb_unbind_interface+0x84/0x2c4 drivers/usb/core/driver.c:461)
+ r8:00000044 r7:84d86430 r6:82775a30 r5:00000000 r4:84d86400
+[<80d6bfe4>] (usb_unbind_interface) from [<80a49b4c>] (device_remove drivers/base/dd.c:568 [inline])
+[<80d6bfe4>] (usb_unbind_interface) from [<80a49b4c>] (device_remove+0x64/0x6c drivers/base/dd.c:560)
+ r10:84d86080 r9:828eccc4 r8:00000044 r7:84d86474 r6:82775a30 r5:00000000
+ r4:84d86430
+[<80a49ae8>] (device_remove) from [<80a4b064>] (__device_release_driver drivers/base/dd.c:1270 [inline])
+[<80a49ae8>] (device_remove) from [<80a4b064>] (device_release_driver_internal+0x18c/0x200 drivers/base/dd.c:1293)
+ r5:00000000 r4:84d86430
+[<80a4aed8>] (device_release_driver_internal) from [<80a4b0f0>] (device_release_driver+0x18/0x1c drivers/base/dd.c:1316)
+ r9:828eccc4 r8:82eaa540 r7:82eaa538 r6:82eaa50c r5:84d86430 r4:82eaa530
+[<80a4b0d8>] (device_release_driver) from [<80a491f0>] (bus_remove_device+0xcc/0x120 drivers/base/bus.c:574)
+[<80a49124>] (bus_remove_device) from [<80a43274>] (device_del+0x15c/0x3bc drivers/base/core.c:3894)
+ r9:828eccc4 r8:84d86400 r7:82ee6c00 r6:84f72e08 r5:04208060 r4:84d86430
+[<80a43118>] (device_del) from [<80d69ac4>] (usb_disable_device+0xdc/0x1f0 drivers/usb/core/message.c:1418)
+ r10:00000000 r9:00000000 r8:84d86400 r7:84d86000 r6:84f72e08 r5:00000001
+ r4:00000038
+[<80d699e8>] (usb_disable_device) from [<80d5e930>] (usb_disconnect+0xec/0x29c drivers/usb/core/hub.c:2296)
+ r10:00000001 r9:84110200 r8:84d860c4 r7:8391e400 r6:84d86080 r5:84d86000
+ r4:60000013
+[<80d5e844>] (usb_disconnect) from [<80d615e0>] (hub_port_connect drivers/usb/core/hub.c:5352 [inline])
+[<80d5e844>] (usb_disconnect) from [<80d615e0>] (hub_port_connect_change drivers/usb/core/hub.c:5652 [inline])
+[<80d5e844>] (usb_disconnect) from [<80d615e0>] (port_event drivers/usb/core/hub.c:5812 [inline])
+[<80d5e844>] (usb_disconnect) from [<80d615e0>] (hub_event+0xe78/0x194c drivers/usb/core/hub.c:5894)
+ r10:00000001 r9:00000100 r8:83b28500 r7:84d86000 r6:8391dc00 r5:8391e610
+ r4:00000001
+[<80d60768>] (hub_event) from [<802665fc>] (process_one_work+0x1b8/0x508 kernel/workqueue.c:3254)
+ r10:83400a05 r9:82ee6c00 r8:00000180 r7:ddde3f00 r6:83400a00 r5:83b28500
+ r4:82eae680
+[<80266444>] (process_one_work) from [<80267320>] (process_scheduled_works kernel/workqueue.c:3335 [inline])
+[<80266444>] (process_one_work) from [<80267320>] (worker_thread+0x1ec/0x418 kernel/workqueue.c:3416)
+ r10:82ee6c00 r9:82eae6ac r8:61c88647 r7:ddde3f20 r6:82604d40 r5:ddde3f00
+ r4:82eae680
+[<80267134>] (worker_thread) from [<80270034>] (kthread+0x104/0x134 kernel/kthread.c:388)
+ r10:00000000 r9:df879e90 r8:82eb0500 r7:82eae680 r6:80267134 r5:82ee6c00
+ r4:82eb0280
+[<8026ff30>] (kthread) from [<80200104>] (ret_from_fork+0x14/0x30 arch/arm/kernel/entry-common.S:134)
+Exception stack(0xdf915fb0 to 0xdf915ff8)
+5fa0:                                     00000000 00000000 00000000 00000000
+5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+ r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:8026ff30 r4:82eb0280
+Rebooting in 86400 seconds..
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
