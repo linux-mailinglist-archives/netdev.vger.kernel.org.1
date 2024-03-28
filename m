@@ -1,154 +1,154 @@
-Return-Path: <netdev+bounces-82700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41CE588F4D7
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:39:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C69B988F48C
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:29:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D57E61F31490
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:39:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78060299DCC
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2348E3BBE4;
-	Thu, 28 Mar 2024 01:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D749617550;
+	Thu, 28 Mar 2024 01:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="E5YEks9c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ckhifJt8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F5E3BB25;
-	Thu, 28 Mar 2024 01:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE53368;
+	Thu, 28 Mar 2024 01:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711589847; cv=none; b=VxpkcvS2WvFCjq2iHv6yu4frzgJVRKUYM3YprKcLx/gmHkmWFqWY2n1TVuUvKpoP2ouhJB58qp8n6mtg8wTar9KDeG6itb9jkD2YosaWNnADNInPPVvJrYmv3PkcKa0zFhHjXx0DrV9hpXwgN9lpjwZCW7tu4ioAcZslALS7DYc=
+	t=1711589385; cv=none; b=Ila4FHJ+Bm9xidHCXaSS7ai5cMGReYbqqQkb/6V7TafVQsrys8BZ8g0os6KMuSFSThE9UZ+3YrNuFNb5NJDJAaTW7aAaLAhHe/pg2T93w++RWGSF8eSN4XTc8NBflI45KNoGDVZ225tl8xQQN6oRkmjgaATG2gos1I3Ehb9FXwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711589847; c=relaxed/simple;
-	bh=ufJutT73Z+lUzAoxlRPNMe5+qxbNbjQJyVoWy3hjDaA=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=untORWMF28MsvLiad0BeQB37CQdC0ihaWXQSx13c6ZLKDPDWw4ql2P7rxS2R83hiJ4e5Kk2S/xQcGKVjM64HX2/jF33UTccnD4Nqu1hGM23kJp2TbSX890VLw3C5dL+dgjkI8huwAKz5OeYvvXgOmOmJQs12NS145tpofQslgIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=E5YEks9c; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711589840; h=Message-ID:Subject:Date:From:To;
-	bh=v7bS5t8QiDMoASYcN5lpCGZoaZnfviWiy8N1d5+w1eE=;
-	b=E5YEks9cwDFMuVnGqCgjQ7pWOGumODwyeYQOIYyaKyjMo5MrjQ+PrelyXHspCf6Q71ciTUkpqF+D7qkrthraK5WmvZk+uhIuS3oNEsP1j09x52woHK0WtE5fR1GHZSrHV4wv6ylTT+X3gRc8pt+7enOp6OEVOqmUT8kKVn5tWkM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R641e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W3QICuj_1711589839;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3QICuj_1711589839)
-          by smtp.aliyun-inc.com;
-          Thu, 28 Mar 2024 09:37:20 +0800
-Message-ID: <1711589335.4973893-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net v2 1/2] virtio_net: Do not set rss_indir if RSS is not supported
-Date: Thu, 28 Mar 2024 09:28:55 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: rbc@meta.com,
- riel@surriel.com,
- "open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- hengqi@linux.alibaba.com,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20240326151911.2155689-1-leitao@debian.org>
- <1711503463.632461-1-xuanzhuo@linux.alibaba.com>
- <ZgQkXfMd6GIEndXm@gmail.com>
-In-Reply-To: <ZgQkXfMd6GIEndXm@gmail.com>
+	s=arc-20240116; t=1711589385; c=relaxed/simple;
+	bh=GjZawt6xoy98e3Xp/Y+236Wtagn1P4gXHsS7RC+0S60=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dLxRI2gW84wnsQPvbzaAwSTvcxGKuA3cSIMWkaIplI2ESzEZ+knkN/AueEkBLEylQEhK1VrSg0S/yVTMa5+Zl3J7fctgW3r43pglyIcl3FR7yslVRMCZvkrCbBntgytoftJu0/n4nXp30rT02rjQT6xuKoC86PbEYtrGTOJ8Z4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ckhifJt8; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6ea8a0d1a05so1024838b3a.1;
+        Wed, 27 Mar 2024 18:29:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711589384; x=1712194184; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pnr6mD1K3zXgGPE0SDwjtoTMxIipbCVjzzKQw/uc1b8=;
+        b=ckhifJt8cASI+G1pXT21xBoEh+7o/cGGEVkNOfWByEYSKPxVItTNTxRkqEkN/6Ck3M
+         MoWKDbhnqmXAzQpbP53oG3X6YPFZTr6oTZm5YKNy07gXmqejkI0HUZoOc88Rd0EkmChH
+         MrHLzUJtb+4XDUtfs9141kuz/rO9qNtam3+nzPt5apGw0Uuiyn178EQc3wNSmqgeE/t+
+         bcU559ZQ0vZDhQW2znZYnZpwW1qmTGGmdujmuy7Iso6kbQQk+FR1o+dA+98nFGOi4jVA
+         SrwWMAS+Jb2dXlH31NQfqn9U+NOQMUdRfNan2OIPFjGNituk2WN8AcTVUXMJDuUN1zUv
+         Z7zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711589384; x=1712194184;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pnr6mD1K3zXgGPE0SDwjtoTMxIipbCVjzzKQw/uc1b8=;
+        b=GiM4bJoxFCpc+aqlIgdSwCNqyz2t2efo9GVOY2hC+hTUv/cEsmRp227POMgFTunPHV
+         2QZ6OjADkXnvz3Ktl+BbI1ij1prXm7tMxJkPM8dV7/t+myKCUaoCNAx/cleAYwjz94AK
+         54D8L9P8xeMpPjg6yMLDyBgOdyOfv1wbYg6GSXuupdSBIt6PVhfGcesQ24dbOQjtS0Jd
+         W2E2uqJKVF0nuvoG/U55xLUa4fIrBXgNLjqsZ1Snm2FryOfujUzmOvNAYz2j8iKiUS85
+         XtHzQPec745s0hEZR63M0dgyKWZYrHIuYEDBzjilwLsY7SXnWOkoIXnCh9RQpC91CIay
+         2yFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXF2TOGwizXDpl7zTbyxtq5YoaDjTVXSx9KC41EXy7fMSoOBsHv9yXjRvLljFAVpfcOpors5fWP7vfsan3p+sLHftimVhNgOZFkyc9cWNeBoOVejyFEI5ncV5LV
+X-Gm-Message-State: AOJu0YxL3GnuVkDdA9SfJjH80K4ZqZMJkR3A8wQoMQdw1EECylcT6qfc
+	027QGbQfvTNG+FAiqiNydGewCUfF4f8UdTh336+shkKaFT3Fy5GM
+X-Google-Smtp-Source: AGHT+IFECPtMYMPkz/XyDf2wvLowijIT5I7aeAW6f+9oJSADgOj1T6V6Mlh2GFflyTvYOC1wApR58w==
+X-Received: by 2002:a17:902:da85:b0:1e0:e85c:72dc with SMTP id j5-20020a170902da8500b001e0e85c72dcmr1439310plx.19.1711589382252;
+        Wed, 27 Mar 2024 18:29:42 -0700 (PDT)
+Received: from macbook-pro-49.dhcp.thefacebook.com ([2620:10d:c090:400::5:21bc])
+        by smtp.gmail.com with ESMTPSA id k5-20020a170902694500b001e038619e34sm187995plt.221.2024.03.27.18.29.40
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 27 Mar 2024 18:29:41 -0700 (PDT)
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	kernel-team@fb.com
+Subject: pull-request: bpf 2024-03-27
+Date: Wed, 27 Mar 2024 18:29:38 -0700
+Message-Id: <20240328012938.24249-1-alexei.starovoitov@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, 27 Mar 2024 06:51:25 -0700, Breno Leitao <leitao@debian.org> wrote:
-> Hello Xuan,
->
-> On Wed, Mar 27, 2024 at 09:37:43AM +0800, Xuan Zhuo wrote:
-> > On Tue, 26 Mar 2024 08:19:08 -0700, Breno Leitao <leitao@debian.org> wrote:
-> > > Do not set virtnet_info->rss_indir_table_size if RSS is not available
-> > > for the device.
-> > >
-> > > Currently, rss_indir_table_size is set if either has_rss or
-> > > has_rss_hash_report is available, but, it should only be set if has_rss
-> > > is set.
-> > >
-> > > On the virtnet_set_rxfh(), return an invalid command if the request has
-> > > indirection table set, but virtnet does not support RSS.
-> > >
-> > > Suggested-by: Heng Qi <hengqi@linux.alibaba.com>
-> > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > ---
-> > >  drivers/net/virtio_net.c | 9 +++++++--
-> > >  1 file changed, 7 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > index c22d1118a133..c640fdf28fc5 100644
-> > > --- a/drivers/net/virtio_net.c
-> > > +++ b/drivers/net/virtio_net.c
-> > > @@ -3813,6 +3813,9 @@ static int virtnet_set_rxfh(struct net_device *dev,
-> > >  	    rxfh->hfunc != ETH_RSS_HASH_TOP)
-> > >  		return -EOPNOTSUPP;
-> > >
-> > > +	if (rxfh->indir && !vi->has_rss)
-> > > +		return -EINVAL;
-> > > +
-> > >  	if (rxfh->indir) {
-> >
-> > Put !vi->has_rss here?
->
-> I am not sure I understand the suggestion. Where do you suggest we have
-> !vi->has_rss?
->
-> If we got this far, we either have:
->
-> a) rxfh->indir set and vi->has_rss is also set
-> b) rxfh->indir not set. (vi->has_rss could be set or not).
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
+The following pull-request contains BPF updates for your *net* tree.
 
-This function does two tasks.
-1. update indir table
-2. update rss key
+We've added 4 non-merge commits during the last 1 day(s) which contain
+a total of 5 files changed, 26 insertions(+), 3 deletions(-).
 
-#1 only for has_rss
-#2 for has_rss or has_rss_hash_report
+The main changes are:
 
+1) Fix bloom filter value size validation and protect the verifier
+   against such mistakes, from Andrei.
 
-So I would code:
+2) Fix build due to CONFIG_KEXEC_CORE/CRASH_DUMP split, from Hari.
 
-	bool update = false
+3) Update bpf_lsm maintainers entry, from Matt.
 
-	if (rxfh->indir) {
-		if (!vi->has_rss)
-			return -EINVAL;
+Please consider pulling these changes from:
 
-		for (i = 0; i < vi->rss_indir_table_size; ++i)
-			vi->ctrl->rss.indirection_table[i] = rxfh->indir[i];
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-net
 
-		update = true
-	}
+Thanks a lot!
 
-	if (rxfh->key) {
-		if (!vi->has_rss && !vi->has_rss_hash_report)
-			return -EINVAL;
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
 
-		memcpy(vi->ctrl->rss.key, rxfh->key, vi->rss_key_size);
-		update = true
-	}
+Andrii Nakryiko, Baoquan He, Jiri Olsa, KP Singh, Stanislav Fomichev
 
+----------------------------------------------------------------
 
-	if (update)
-		virtnet_commit_rss_command(vi);
+The following changes since commit afbf75e8da8ce8a0698212953d350697bb4355a6:
 
-Thanks.
+  selftests: netdevsim: set test timeout to 10 minutes (2024-03-27 11:29:27 +0000)
 
+are available in the Git repository at:
 
->
-> Thanks for the review,
-> Breno
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-net
+
+for you to fetch changes up to 4dd651076ef0e5f09940f763a1b4e8a209dab7ab:
+
+  bpf: update BPF LSM designated reviewer list (2024-03-27 11:10:36 -0700)
+
+----------------------------------------------------------------
+for-net
+
+----------------------------------------------------------------
+Alexei Starovoitov (1):
+      Merge branch 'check-bloom-filter-map-value-size'
+
+Andrei Matei (2):
+      bpf: Check bloom filter map value size
+      bpf: Protect against int overflow for stack access size
+
+Hari Bathini (1):
+      bpf: fix warning for crash_kexec
+
+Matt Bobrowski (1):
+      bpf: update BPF LSM designated reviewer list
+
+ MAINTAINERS                                               |  3 +--
+ kernel/bpf/bloom_filter.c                                 | 13 +++++++++++++
+ kernel/bpf/helpers.c                                      |  2 +-
+ kernel/bpf/verifier.c                                     |  5 +++++
+ tools/testing/selftests/bpf/prog_tests/bloom_filter_map.c |  6 ++++++
+ 5 files changed, 26 insertions(+), 3 deletions(-)
 
