@@ -1,174 +1,155 @@
-Return-Path: <netdev+bounces-83106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80065890D2A
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:14:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B01B890D68
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:20:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EAD0FB212CC
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:14:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F1A01C3140B
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FA81448E2;
-	Thu, 28 Mar 2024 22:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C1E13B5B9;
+	Thu, 28 Mar 2024 22:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PiY+MAvZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZDZEVmNh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE671448DA;
-	Thu, 28 Mar 2024 22:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C1D136994
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 22:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711663650; cv=none; b=qar7Mbl1p1ZkcGuyKdHmdSBrEQJ6iquXu75U4w7grAseeEmKzQ1PYsQkfutg8fwQV/pf5O2wgJ48DF8nkjssF/Krvo+n+nmi4C+gEQmt5zkyUTWuZeAkF/Ry9sm27qUWgR5FssJlX++lgEUHDNw/JZlVDySGxvGc5AtpWZOuBQk=
+	t=1711663788; cv=none; b=OQIONxwVgL3Ftkeql2W3wXMszjKaLHTF27b6sO8WEm9ZuPNbfzlVT0VwXBtYj1kg6njdS3fA/pBOiYCvrps3tp5YYFQrO2muhByDhrsEAbbDV5sF9cf7eHCQzkxCzA1CBzFm5oFnmRrg23lXcF0OnF1seIJKnQuoYLtikvPPwD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711663650; c=relaxed/simple;
-	bh=qy7UxkfEbTXP0fG7wTtOhGPzbFidkRhVmLz4VIILo8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ohkCd3ympkEcQk8ic6P2I7hUCT+uWSVjXdJLRnO2paC43ywyb74+dSfoDhhuVSoBOgnwFW9pRitzCqVLUww49eb2uFPzOUbru6Qo8ZxrGs5bFKoc2PR1Vs5P1mhYCcjBQucQ/tT+x+1kiFuwa+54Z+sI1I8iiVOOo92Y0p2+vEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PiY+MAvZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDCAEC433C7;
-	Thu, 28 Mar 2024 22:07:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711663649;
-	bh=qy7UxkfEbTXP0fG7wTtOhGPzbFidkRhVmLz4VIILo8w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PiY+MAvZ71RFRJLOV9wNKnH78WzuQ+yoDrFEDHLeDYUytCNt8LwKz0Sygxq8mN3zB
-	 zQ6z9aJ/UtcJQYb+0Ix1xOcUvBTzmGnVrlnLp0Gmy7zuin8SEKFIMvaRgai8sI5mNa
-	 rT0GGDmlNev4jmnp2j+eIlSQgjrssSa+StiYbos4MJYWh8B1/94h4hBeRi0O8f134x
-	 7uE7DuBDy9eZNkcQZ17ObD+cwHa1FuZ5aWLMcVBNPO0eRbV2uVEVu77DeIN5SRax/v
-	 JzK10wMVrXwQSwVmxMsxsApYaUSTFjSerYL/VPgvBRQMixcY7jSB7TVLmYTpiDnk/3
-	 kwyow4tk4wpsA==
-Date: Thu, 28 Mar 2024 22:07:23 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Stefan O'Rear <sorear@fastmail.com>
-Cc: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org, netdev@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Manu Bretelle <chantr4@gmail.com>,
-	Pu Lehui <pulehui@huawei.com>
-Subject: Re: [PATCH bpf-next 2/5] riscv, bpf: Relax restrictions on Zbb
- instructions
-Message-ID: <20240328-ferocity-repose-c554f75a676c@spud>
-References: <20240328124916.293173-1-pulehui@huaweicloud.com>
- <20240328124916.293173-3-pulehui@huaweicloud.com>
- <3ed9fe94-2610-41eb-8a00-a9f37fcf2b1a@app.fastmail.com>
+	s=arc-20240116; t=1711663788; c=relaxed/simple;
+	bh=BOXlsNwnprUececioCWqQEsiqvtUYISmlVnkC/Wl+j8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Va1JIJdacV6JVHVV5IcgnEGbXyX5hPkkjR/zqF/FdyRbDdbkjDPlgxoUkd+lH2IMHzldu2xJvn4K3KzOXx1sKKhsUttXx7KEcVDM1tLqUvGYxrw9k4IftHNtDexJa65khF14nOepyyTqZ+SgxMfx+VRfHj7+y5DWpxijpbLSg/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZDZEVmNh; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56be32b9775so1812257a12.1
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 15:09:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711663784; x=1712268584; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D+7Drz3KCpZvZH2UsNch2VNXZc69VVimkJhVMnXEUEw=;
+        b=ZDZEVmNhwPHhD5UzejDM3aaPGVPKxmhcexqbZUzE/vP+5zSqALHbf1/vqt+Et4n3ED
+         H5fwD6Le23S9LvTh4QCtvP8gV1mAVHYP7fcsYmCSGHZt3JYqsjQV3I4gxcrSzZcVxsUi
+         i7I41x1BGWD4I3JAUmiZAhbWv2ZfNRiOXjDfs1Yvl+Zi72gfs4yqF8T3IohNOg6QzVsc
+         MMwAeBCU+JBM+qVP9WOV+HAcqiDE4v7KB4hlnZ0IIM18u0wEmSP3eHZpL6wzvsY1Es6X
+         mpkuwr8nUpm0vPtIEfKTEur4gkovWgsQbpqvqS2Yzs2viDAp1RFUAKsCXhWr0Zaw1oX/
+         3NSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711663784; x=1712268584;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D+7Drz3KCpZvZH2UsNch2VNXZc69VVimkJhVMnXEUEw=;
+        b=fbEoj7rDBnAM7Id7ENHMEgZZ4kaez5CJESuui1SO4C0BpXfrGBN28xzY6j27YowXvl
+         UlHCK40AOUXGbplYxrpu6Q7PXOqiwVzJjHEmbgFx+N1/DujUWDGhe7vY/psRIs/GJKmo
+         N/LV506crHopwzI5sKb18OTEP/kr6RY3b0oyivHlea6ymAHuOPS/LY7SmGb9as2b7As3
+         EWvTDpJwr06zXD7XSzjNGKW9DonkX+jZTK9HzC+6vL4hT6gfgMtchYrkc+ThMug3LYRO
+         o0K/puK38eJQdFiB7wYYnMu7Lq6WWBSOl2vawDZO4LnHKCTktgmWoETfwTOdNfyBVzJq
+         4t7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXxG6khQuJ6zepQ/Z2Bos25uZ8GiCY1k3lCRXGVyji7D6bF3khW38Xzx/ATC2YBx/gzm5+n+QJ7w5iwJOIxFzrAQq0irdj0
+X-Gm-Message-State: AOJu0YxI0efavQzfwJCNQtqsUOPHsdQMfPeVtWhDi+UtLy5O8tJdZ2is
+	/rURVEfYb62GvDs1+AhWrwYgKZLguYLunNatYp+8X8TLPS4e2H9wRSC1dpttqnNfHUcxvB0SmzU
+	u/9mCE/+rQjb+HXM8TFtPbhF/rbBb86ZaRNkG
+X-Google-Smtp-Source: AGHT+IFlZjMDM+xUDBM0MqA1a/+L68VZiYm6JTYTrKDyQTRWVSkTX38SqjBvy4N9VKZ94M58Wndm1vGhgVCwh8IuY4w=
+X-Received: by 2002:a50:931d:0:b0:564:f6d5:f291 with SMTP id
+ m29-20020a50931d000000b00564f6d5f291mr308024eda.34.1711663783904; Thu, 28 Mar
+ 2024 15:09:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AbnF/Y1LlP5Fvmu+"
-Content-Disposition: inline
-In-Reply-To: <3ed9fe94-2610-41eb-8a00-a9f37fcf2b1a@app.fastmail.com>
-
-
---AbnF/Y1LlP5Fvmu+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240328143051.1069575-1-arnd@kernel.org> <20240328143051.1069575-9-arnd@kernel.org>
+In-Reply-To: <20240328143051.1069575-9-arnd@kernel.org>
+From: Justin Stitt <justinstitt@google.com>
+Date: Thu, 28 Mar 2024 15:09:30 -0700
+Message-ID: <CAFhGd8pTdJNzmxhUaCpDkWpYiAP0Gvm6K=o+w5uE-g20M7u3rA@mail.gmail.com>
+Subject: Re: [PATCH 8/9] mlx5: stop warning for 64KB pages
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Maxim Mikityanskiy <maxtram95@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Arnd Bergmann <arnd@arndb.de>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 28, 2024 at 03:34:31PM -0400, Stefan O'Rear wrote:
-> On Thu, Mar 28, 2024, at 8:49 AM, Pu Lehui wrote:
-> > From: Pu Lehui <pulehui@huawei.com>
-> >
-> > This patch relaxes the restrictions on the Zbb instructions. The hardwa=
-re
-> > is capable of recognizing the Zbb instructions independently, eliminati=
-ng
-> > the need for reliance on kernel compile configurations.
->=20
-> This doesn't make sense to me.
+On Thu, Mar 28, 2024 at 7:32=E2=80=AFAM Arnd Bergmann <arnd@kernel.org> wro=
+te:
+>
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> When building with 64KB pages, clang points out that xsk->chunk_size
+> can never be PAGE_SIZE:
 
-It doesn't make sense to me either. Of course the hardware's capability
-to understand an instruction is independent of whether or not a
-toolchain is capable of actually emitting the instruction.
+This is under W=3D1 right? Otherwise this is a mighty annoying warning.
 
-> RISCV_ISA_ZBB is defined as:
->=20
->            Adds support to dynamically detect the presence of the ZBB
->            extension (basic bit manipulation) and enable its usage.
->=20
-> In other words, RISCV_ISA_ZBB=3Dn should disable everything that attempts
-> to detect Zbb at runtime. It is mostly relevant for code size reduction,
-> which is relevant for BPF since if RISCV_ISA_ZBB=3Dn all rvzbb_enabled()
-> checks can be constant-folded.
->=20
-> If BPF needs to become an exception (why?), this should be mentioned in
-> Kconfig.
+>
+> drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c:19:22: error: resu=
+lt of comparison of constant 65536 with expression of type 'u16' (aka 'unsi=
+gned short') is always false [-Werror,-Wtautological-constant-out-of-range-=
+compare]
+>         if (xsk->chunk_size > PAGE_SIZE ||
+>             ~~~~~~~~~~~~~~~ ^ ~~~~~~~~~
+>
+> In older versions of this code, using PAGE_SIZE was the only
+> possibility, so this would have never worked on 64KB page kernels,
+> but the patch apparently did not address this case completely.
+>
+> As Maxim Mikityanskiy suggested, 64KB chunks are really not all that
+> useful, so just shut up the warning by adding a cast.
+>
+> Fixes: 282c0c798f8e ("net/mlx5e: Allow XSK frames smaller than a page")
+> Link: https://lore.kernel.org/netdev/20211013150232.2942146-1-arnd@kernel=
+.org/
+> Link: https://lore.kernel.org/lkml/a7b27541-0ebb-4f2d-bd06-270a4d404613@a=
+pp.fastmail.com/
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-And in the commit message. On one hand I think this could be a reasonable
-thing to do in bpf as it is acting as a jit here, and doesn't actually
-need the alternatives that we are using elsewhere to enable the
-optimisations nor the compiler support. On the other the intention of
-that kconfig option is to control optimisations like rvzbb_enabled()
-gates, so this is gonna need a proper justification as to
+Reviewed-by: Justin Stitt <justinstitt@google.com>
 
-As I said on IRC to you earlier, I think the Kconfig options here are in
-need of a bit of a spring cleaning - they should be modified to explain
-their individual purposes, be that enabling optimisations in the kernel
-or being required for userspace. I'll try to send a patch for that if
-I remember tomorrow.
-
-Thanks,
-Conor.
-
-> > Signed-off-by: Pu Lehui <pulehui@huawei.com>
-> > ---
-> >  arch/riscv/net/bpf_jit.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
-> > index 5fc374ed98ea..bcf109b88df5 100644
-> > --- a/arch/riscv/net/bpf_jit.h
-> > +++ b/arch/riscv/net/bpf_jit.h
-> > @@ -20,7 +20,7 @@ static inline bool rvc_enabled(void)
-> >=20
-> >  static inline bool rvzbb_enabled(void)
-> >  {
-> > -	return IS_ENABLED(CONFIG_RISCV_ISA_ZBB) &&=20
-> > riscv_has_extension_likely(RISCV_ISA_EXT_ZBB);
-> > +	return riscv_has_extension_likely(RISCV_ISA_EXT_ZBB);
-> >  }
-> >=20
-> >  enum {
-> > --=20
-> > 2.34.1
-> >
-> >
-> > _______________________________________________
-> > linux-riscv mailing list
-> > linux-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-riscv
->=20
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
-
---AbnF/Y1LlP5Fvmu+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgXqGwAKCRB4tDGHoIJi
-0n9mAQCMUUZGliN/KpdYVcNTscPK+ff5W8UCov2gCxTu1Rgs/gD/aDZv9SYF6EQx
-SpQgWucp0nYikxazDlNmYYOtPAZn8QE=
-=TrHF
------END PGP SIGNATURE-----
-
---AbnF/Y1LlP5Fvmu+--
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c b/dri=
+vers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
+> index 06592b9f0424..9240cfe25d10 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
+> @@ -28,8 +28,10 @@ bool mlx5e_validate_xsk_param(struct mlx5e_params *par=
+ams,
+>                               struct mlx5e_xsk_param *xsk,
+>                               struct mlx5_core_dev *mdev)
+>  {
+> -       /* AF_XDP doesn't support frames larger than PAGE_SIZE. */
+> -       if (xsk->chunk_size > PAGE_SIZE || xsk->chunk_size < MLX5E_MIN_XS=
+K_CHUNK_SIZE) {
+> +       /* AF_XDP doesn't support frames larger than PAGE_SIZE,
+> +        * and xsk->chunk_size is limited to 65535 bytes.
+> +        */
+> +       if ((size_t)xsk->chunk_size > PAGE_SIZE || xsk->chunk_size < MLX5=
+E_MIN_XSK_CHUNK_SIZE) {
+>                 mlx5_core_err(mdev, "XSK chunk size %u out of bounds [%u,=
+ %lu]\n", xsk->chunk_size,
+>                               MLX5E_MIN_XSK_CHUNK_SIZE, PAGE_SIZE);
+>                 return false;
+> --
+> 2.39.2
+>
 
