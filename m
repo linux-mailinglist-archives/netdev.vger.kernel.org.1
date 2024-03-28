@@ -1,177 +1,108 @@
-Return-Path: <netdev+bounces-82883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99FAD890157
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:11:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B08890146
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:09:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DF2E293A12
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:11:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D271293118
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4185A8626D;
-	Thu, 28 Mar 2024 14:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D9F12F38C;
+	Thu, 28 Mar 2024 14:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="qYjX7mHm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fN/F3QvQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B5280630;
-	Thu, 28 Mar 2024 14:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C40281AD2;
+	Thu, 28 Mar 2024 14:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711635027; cv=none; b=PQ0KoHTSrubwcEWBK5aXww5HVDaGoz6wPlAn9oAWzAobRhblmkl7VHPfJHwHZlNH/5/9hDJsgq8eb6//3czvckH0d3NnveRgyB8EaqvsDwuKf7gd2SSCCucedDY2pHt7+81e4ZCTctDf9un1ZGzqJFe5HWpwmVji0/YSGayUb9I=
+	t=1711634919; cv=none; b=Ii0L1mEfjl+BoaXpxlNr8C7yRM5/TriPVnXrEf/xWnsURqZZvaS6ghveCoBRU/9jJ6P1wJgG9s/2a/jirnBVRupDSPLslVBP3o5VMoWhITPQdDjx9Mfz88lUI5gwAKWAcEzsB8qqg7z0chQtLzNc+43E3/6sn/wLY5EpHUqENZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711635027; c=relaxed/simple;
-	bh=ov2D7tmh8X+K6i0wYrHkTxzXFBxqNjc8etmkfZRDax8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ty9pzBczcTanj9h6NtWBWFej+ieyGTGoMlB40XiVRubKRAnavnwapqoodAiPWcXouD3CpQEgOaChKXNPhTkNkDwAK9pV0jS5IirL2vhOPQHa5IEY9MhugvhkghhamUjjRCYpchfOdDDNUahfiYkr9IeQfOzRtb5ZblM486/fMUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=qYjX7mHm; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42SDpIYE007931;
-	Thu, 28 Mar 2024 15:09:35 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	selector1; bh=6PKNIDizNNs2v9Dt/K/rRql3tlVXcVQGNz32rcb+Tmc=; b=qY
-	jX7mHmyBjN6+t71PqTsFogIgCkS8/AG0OoPzYb8NkiQKq9qCqg9ngPF3bvBbLIUz
-	/P1bLsOtfP/CgwiuRf9orP3Sj3nlv0KGZCLLBmIDy0/mvHUYAUlP2fUKLQJfJ5is
-	cgDmx5jpp60Gukxg9KxeRT9pYRpOrnjdj9nv5PJU1HsYomTi1goJkqa3pXZoRJxz
-	f7coUHlpWe6vXFx8VgFqh9hdJrCIANOk5Y1hTMBqXz8Em4QwTx0glbckrgqBgGOA
-	EjcYAPOS/abpd21XnmhqxEpICs51QRkktFF8pjxDqSicr4OrN+ZFEL+WC6ZJoO6Y
-	/2palJr3WTVq6SBZcMHg==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3x1pugtf6m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Mar 2024 15:09:35 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 8E79040045;
-	Thu, 28 Mar 2024 15:09:23 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id D227C221E9F;
-	Thu, 28 Mar 2024 15:08:10 +0100 (CET)
-Received: from localhost (10.201.21.128) by SHFDAG1NODE2.st.com (10.75.129.70)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 28 Mar
- 2024 15:08:09 +0100
-From: Christophe Roullier <christophe.roullier@foss.st.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>,
-        Christophe Roullier
-	<christophe.roullier@foss.st.com>,
-        Marek Vasut <marex@denx.de>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v5 1/1] dt-bindings: net: dwmac: Document STM32 property st,ext-phyclk
-Date: Thu, 28 Mar 2024 15:08:03 +0100
-Message-ID: <20240328140803.324141-2-christophe.roullier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240328140803.324141-1-christophe.roullier@foss.st.com>
-References: <20240328140803.324141-1-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1711634919; c=relaxed/simple;
+	bh=MmbZ0ahCCHtV5qsDRCOojRvFo+8CrnG/5V4HvoQ4sLU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DVpSsDupXpTiwxAD55+nLzQkoqYUbb0p/aYB9xxThSm5Ji5+pBcJ2/2B7zqjrtDjAPDVLGJ+SdlzW6fz7CTxlOubBJ2w3mOwED2djHSWOqL6ibCmYMlmA4IA8kktc+0ahxG0FMhGdj/VDqF/SAt5la0+ZwVsnVkba+UTMvgJIiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fN/F3QvQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B198C433C7;
+	Thu, 28 Mar 2024 14:08:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711634918;
+	bh=MmbZ0ahCCHtV5qsDRCOojRvFo+8CrnG/5V4HvoQ4sLU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fN/F3QvQlBi8eZVq3NKCdhtmZbUoZjzW8WGEEdaVMOZlmaGnXzMItzA0w9E3fP8UZ
+	 ez8QJ8HulpC6NHE0wpGKTxzvVCwA7DIQiuWYlLPK//qcWdYNAy2GRObzU1CmJAruCk
+	 UtIBBTnL9lXaOwwPCx1m/ZswYzrfnfCY4tdVXruE2poqOsXL4v4Y6WQB9y8Ld3KAn/
+	 Do8BbKbfbWbrRJG7nvHT0iAeMqJkswl7OEae31BdeRMHFrENH2yIHZrculLln+zPS7
+	 MfH3vcNciBjkj3xMPBRoXDnAU2TlNicQ3AOeJbzUuOG3lZN+1aIzZXbuTflbJ5LgN3
+	 ajMoIhMXoEMQQ==
+Date: Thu, 28 Mar 2024 14:08:34 +0000
+From: Simon Horman <horms@kernel.org>
+To: Oliver Neukum <oneukum@suse.com>
+Cc: Sai Krishna Gajula <saikrishnag@marvell.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com" <syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com>
+Subject: Re: [PATCH net-next] usbnet: fix cyclical race on disconnect with
+ work queue
+Message-ID: <20240328140834.GM403975@kernel.org>
+References: <20240321124758.6302-1-oneukum@suse.com>
+ <SA1PR18MB470955BBB332D3A9F9A6F247A0312@SA1PR18MB4709.namprd18.prod.outlook.com>
+ <04cfa214-4d45-48b1-87ba-500e3e501977@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-28_14,2024-03-27_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <04cfa214-4d45-48b1-87ba-500e3e501977@suse.com>
 
-The Linux kernel dwmac-stm32 driver currently supports three DT
-properties used to configure whether PHY clock are generated by
-the MAC or supplied to the MAC from the PHY.
+On Wed, Mar 27, 2024 at 04:10:36PM +0100, Oliver Neukum wrote:
+> 
+> 
+> On 3/22/24 18:43, Sai Krishna Gajula wrote:
+> > 
+> > > -----Original Message-----
+> > > From: Oliver Neukum <oneukum@suse.com>
+> > > Sent: Thursday, March 21, 2024 6:17 PM
+> > > To: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> > > pabeni@redhat.com; netdev@vger.kernel.org; linux-usb@vger.kernel.org;
+> > > linux-kernel@vger.kernel.org
+> > > Cc: Oliver Neukum <oneukum@suse.com>;
+> > > syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com
+> > > Subject: [PATCH net-next] usbnet: fix cyclical race on disconnect
+> > > with work queue
+> > 
+> > This patch seems to be a fix, in that case the subject need to be with [PATCH net]
+> 
+> OK
+> > 
+> > > 
+> > > The work can submit URBs and the URBs can schedule the work.
+> > > This cycle needs to be broken, when a device is to be stopped.
+> > > Use a flag to do so.
+> > > 
+> > > Fixes: f29fc259976e9 ("[PATCH] USB: usbnet (1/9) clean up framing")
+> > 
+> > Please use correct Fixes: style 'Fixes: <12 chars of sha1> ("<title line>")' - ie: 'Fixes: f29fc259976e ("[PATCH] USB: usbnet (1/9) clean up framing")'
+> 
+> Ehm, what exactly did I do differently
 
-Originally there were two properties, st,eth-clk-sel and
-st,eth-ref-clk-sel, each used to configure MAC clocking in
-different bus mode and for different MAC clock frequency.
-Since it is possible to determine the MAC 'eth-ck' clock
-frequency from the clock subsystem and PHY bus mode from
-the 'phy-mode' property, two disparate DT properties are
-no longer required to configure MAC clocking.
+I think the point being made is that the hash has 13 rather than 12
+characters. But, IMHO, that is fine because my understanding is that the
+requirement is that the hash is at least, not exactly, 12 characters long.
 
-Linux kernel commit 1bb694e20839 ("net: ethernet: stmmac: simplify phy modes management for stm32")
-introduced a third, unified, property st,ext-phyclk. This property
-covers both use cases of st,eth-clk-sel and st,eth-ref-clk-sel DT
-properties, as well as a new use case for 25 MHz clock generated
-by the MAC.
-
-The third property st,ext-phyclk is so far undocumented,
-document it.
-
-Below table summarizes the clock requirement and clock sources for
-supported PHY interface modes.
- __________________________________________________________________________
-|PHY_MODE | Normal | PHY wo crystal|   PHY wo crystal   |No 125Mhz from PHY|
-|         |        |      25MHz    |        50MHz       |                  |
-
----------------------------------------------------------------------------
-|  MII    |    -   |     eth-ck    |        n/a         |       n/a        |
-|         |        | st,ext-phyclk |                    |                  |
-
----------------------------------------------------------------------------
-|  GMII   |    -   |     eth-ck    |        n/a         |       n/a        |
-|         |        | st,ext-phyclk |                    |                  |
-
----------------------------------------------------------------------------
-| RGMII   |    -   |     eth-ck    |        n/a         |      eth-ck      |
-|         |        | st,ext-phyclk |                    | st,eth-clk-sel or|
-|         |        |               |                    | st,ext-phyclk    |
-
----------------------------------------------------------------------------
-| RMII    |    -   |     eth-ck    |      eth-ck        |       n/a        |
-|         |        | st,ext-phyclk | st,eth-ref-clk-sel |                  |
-|         |        |               | or st,ext-phyclk   |                  |
-
----------------------------------------------------------------------------
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
----
- Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-index fc8c96b08d7dc..b35eae80ed6ac 100644
---- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-@@ -82,6 +82,13 @@ properties:
-       Should be phandle/offset pair. The phandle to the syscon node which
-       encompases the glue register, and the offset of the control register
- 
-+st,ext-phyclk:
-+    description:
-+      set this property in RMII mode when you have PHY without crystal 50MHz and want to
-+      select RCC clock instead of ETH_REF_CLK. OR in RGMII mode when you want to select
-+      RCC clock instead of ETH_CLK125.
-+    type: boolean
-+
-   st,eth-clk-sel:
-     description:
-       set this property in RGMII PHY when you want to select RCC clock instead of ETH_CLK125.
--- 
-2.25.1
-
+...
 
