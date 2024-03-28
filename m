@@ -1,123 +1,227 @@
-Return-Path: <netdev+bounces-82886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 097B189017E
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:19:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4E0F890191
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:20:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B81C6294933
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:19:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5247E296E3A
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E6181737;
-	Thu, 28 Mar 2024 14:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="hs3RqxMJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9675E1272AC;
+	Thu, 28 Mar 2024 14:20:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D887126F19;
-	Thu, 28 Mar 2024 14:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F5383A1C
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711635552; cv=none; b=OhDqPdPmsZmAW2fQnDuSBDrOXF249A0uKgv30+Bi0zZxBoPUSG8zs9sNu7nlZ3NB7r4+4TtJp/SKftGZ5nNhCg+FnBmy/gX+Wml29wiXAINg8hho4xsAegHDmFIoXKp3sJJY+eVu4refBpLLl9n/OwLUOmqrX+TH1115t49bR4E=
+	t=1711635633; cv=none; b=upQ3mAV1+nKUvO3NSh4fS2p5UCeymRYXZMIY3CkR2G+W4JjHoqhWuaowL3BGUhwX4MjMPQoIHzXhZ3Ev7F0sToPRuNrzP2IYcROqCBDG2NMxDAskULauZU/4JC4SFg7JNQdlEYLoubXr7eB1mjmk1ms2/hARj024E75VavGGstk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711635552; c=relaxed/simple;
-	bh=nZyYoG1hcN9sZV1x6eeJSQ7WJTnGbfV5shTYRE57f+k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P23BBOM+fRKnMOQ/qNdcX4cNPPYbvWO3hettLa8juE+6nMtZcUZdWPLJUbLFuwAuUWxg7f/+c1Id0KIwn5zO3E81+c6dy52kHUQQGHRZPRm2TCdu9sCsP9Gktqgf1bdR+494TsoCWaUZQV3Hq2/L4ajo97zdaVuFoTJgDJrGfLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=hs3RqxMJ; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 2FBB68818C;
-	Thu, 28 Mar 2024 15:19:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1711635545;
-	bh=SonutgD18/IvJSdqtAfr8jPeMT+pqsEe9jBU5XMTvVM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hs3RqxMJQCoEI9woF3jNnqv5D63sMTWJjGzivOtDRxDy2hrbQeSd7eSwq7O6GgRC0
-	 xaOgPFJVGNvbkgDPdfPH7WEBN83mQhn2m+ViwPZEZAF5/FwwM7JgCL7wCxACaGR03J
-	 l/8aEwaAXPvaaOKTnHuKLpUhAj3b39PsM67Q09qLJW6wsm2NFscYMT6ccD2NVxU/df
-	 GJc4OAWnxF5RmGXXjR/VpLiR70+M/hugonzdB3zGJyr3j5r6kB8eACLloha5PyXXEN
-	 Up6lSzcfFAMheNlq0c+0vsVsnlL3o/GNGtIiF6xKhO8UrpHIA1DAQmi+00rM8RjCOA
-	 evKusuNNo5nNg==
-Message-ID: <480d4064-b553-4005-ad98-499a862703ff@denx.de>
-Date: Thu, 28 Mar 2024 15:19:03 +0100
+	s=arc-20240116; t=1711635633; c=relaxed/simple;
+	bh=Bq9LWOx+1iPt2NmZWbnO9eJmfYrUT9ZFxtW8nkO9COA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WEH9eLPDm4RHHvj0bKStC6+7aEUK6xuYYFBnVCsbFXcZp+juSKXiigK00FSVNRn3M98QnbwM06dKFS03ebMzNmmyeaYZ6AQ6tZjXCy4NF/65toNIHFA/alW9ijFzf0lIIRXTRaVopTtu6YNQ/WhwWf4QygsEMUDSkyF7u4rLc1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-366b97b571cso8290265ab.3
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:20:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711635631; x=1712240431;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EtBIqGObUrXQ9PDYL92r63zx6gFykZehyqeUGmcuBHc=;
+        b=AmtZz8nQ66W8RHlfh6jy9JFLEMgukFy7SAhCJnLZobjtaeGkdOOoQWj3mjQQWQ0Je2
+         9P5JTqUxhP/DZhKK7WPt3UsF+OtcKJ+WTDINKjkbI1fX1uiCJT/Af8HFh5NfCW2m3UmS
+         QPgQ7sEq3posXkzr2yROAG3E0hSqI5WCeQHrvprQEZVzUYtk/086smBalS57jIep07w+
+         IVPmWY/+nJpKY9P4UMZzZCUl7YrkVU9DrkT/4Dqysw+mXmF7B9SL9j+0nCXxzUSX7taB
+         SuPoxeX9gI67VlcmwXdJjmhrGrqBYpmfA77Rh7qOYC9GrN9uaC4VFrEnjquHbDXkcgB6
+         JE5w==
+X-Forwarded-Encrypted: i=1; AJvYcCU0u35wNXpe9JTTf2Y+YiOlWb6yEVslKniA+lFuX2c8HFCyA9LtZmWFXACP1XV5xStuAVRCFQcMSxQpN5GHda+wwppWSXQt
+X-Gm-Message-State: AOJu0YytLiKpvGW2G86I08lU5He4QXddXzhb4O6+yJPe/17vjG0Xl8kE
+	79Wd6Bs7iDskcAxVGw3A2cfIF/o9hHhQAjiUaLfaAEPZQSRkA0wGRszMO1zbIbkm8Eh0f8vgPZu
+	X5Y7FmtTJBMuG34bvNG/gY2/LVXw0aE8cGlAfV9d+KNzytQxX1+GAPvw=
+X-Google-Smtp-Source: AGHT+IF2okDFYYACtM78GHxJSW7p6ypgkem81yHhPqKP6LvZ5bVld3W2oLnEEXSYlqAtJNOeFP5QVMMUjRI2y5nX0LRea7OuEUMl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/1] dt-bindings: net: dwmac: Document STM32 property
- st,ext-phyclk
-To: Christophe Roullier <christophe.roullier@foss.st.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>, Jose Abreu
- <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240328140803.324141-1-christophe.roullier@foss.st.com>
- <20240328140803.324141-2-christophe.roullier@foss.st.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <20240328140803.324141-2-christophe.roullier@foss.st.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+X-Received: by 2002:a05:6e02:1d81:b0:368:b289:38b2 with SMTP id
+ h1-20020a056e021d8100b00368b28938b2mr64156ila.1.1711635630923; Thu, 28 Mar
+ 2024 07:20:30 -0700 (PDT)
+Date: Thu, 28 Mar 2024 07:20:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c430800614b93936@google.com>
+Subject: [syzbot] [net?] possible deadlock in hsr_dev_xmit (2)
+From: syzbot <syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 3/28/24 3:08 PM, Christophe Roullier wrote:
+Hello,
 
-[...]
+syzbot found the following issue on:
 
-> | RMII    |    -   |     eth-ck    |      eth-ck        |       n/a        |
-> |         |        | st,ext-phyclk | st,eth-ref-clk-sel |                  |
-> |         |        |               | or st,ext-phyclk   |                  |
-> 
-> ---------------------------------------------------------------------------
-> 
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
-> ---
->   Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 7 +++++++
->   1 file changed, 7 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> index fc8c96b08d7dc..b35eae80ed6ac 100644
-> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> @@ -82,6 +82,13 @@ properties:
->         Should be phandle/offset pair. The phandle to the syscon node which
->         encompases the glue register, and the offset of the control register
->   
-> +st,ext-phyclk:
+HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11cc4c51180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fe78468a74fdc3b7
+dashboard link: https://syzkaller.appspot.com/bug?extid=fbf74291c3b7e753b481
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
 
-Don't you need two spaces in front of the 'st,' here ?
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> +    description:
-> +      set this property in RMII mode when you have PHY without crystal 50MHz and want to
-> +      select RCC clock instead of ETH_REF_CLK. OR in RGMII mode when you want to select
-> +      RCC clock instead of ETH_CLK125.
-> +    type: boolean
-> +
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/55a16212fbdf/disk-fe46a7dd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/704972635ac7/vmlinux-fe46a7dd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a04b0d8c481f/bzImage-fe46a7dd.xz
 
-With that fixed:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com
 
-Reviewed-by: Marek Vasut <marex@denx.de>
+============================================
+WARNING: possible recursive locking detected
+6.8.0-syzkaller-08951-gfe46a7dd189e #0 Not tainted
+--------------------------------------------
+kworker/u8:3/49 is trying to acquire lock:
+ffff888050f26da0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffff888050f26da0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: hsr_dev_xmit+0x13e/0x1d0 net/hsr/hsr_device.c:229
+
+but task is already holding lock:
+ffff88807cdaeda0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffff88807cdaeda0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: send_hsr_supervision_frame+0x276/0xad0 net/hsr/hsr_device.c:310
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&hsr->seqnr_lock);
+  lock(&hsr->seqnr_lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+9 locks held by kworker/u8:3/49:
+ #0: ffff88802a81f948 ((wq_completion)bat_events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+ #0: ffff88802a81f948 ((wq_completion)bat_events){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
+ #1: ffffc90000b97d00 ((work_completion)(&(&bat_priv->nc.work)->work)
+){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
+ #2: ffffc90000a08ca0 ((&hsr->announce_timer)){+.-.}-{0:0}
+, at: call_timer_fn+0xc0/0x600 kernel/time/timer.c:1789
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hsr_announce+0xa3/0x370 net/hsr/hsr_device.c:387
+ #4: ffff88807cdaeda0 (&hsr->seqnr_lock
+){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+){+.-.}-{2:2}, at: send_hsr_supervision_frame+0x276/0xad0 net/hsr/hsr_device.c:310
+ #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hsr_forward_skb+0xae/0x2400 net/hsr/hsr_forward.c:614
+ #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
+ #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
+ #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4260
+ #7: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #7: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #7: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: br_dev_xmit+0x1b9/0x1a10 net/bridge/br_device.c:44
+ #8: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
+ #8: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
+ #8: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4260
+
+stack backtrace:
+CPU: 1 PID: 49 Comm: kworker/u8:3 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Workqueue: bat_events batadv_nc_worker
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ check_deadlock kernel/locking/lockdep.c:3062 [inline]
+ validate_chain+0x15c1/0x58e0 kernel/locking/lockdep.c:3856
+ __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+ _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ hsr_dev_xmit+0x13e/0x1d0 net/hsr/hsr_device.c:229
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
+ __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ br_dev_queue_push_xmit+0x701/0x8d0 net/bridge/br_forward.c:53
+ NF_HOOK+0x3a7/0x460 include/linux/netfilter.h:314
+ br_forward_finish+0xe5/0x140 net/bridge/br_forward.c:66
+ NF_HOOK+0x3a7/0x460 include/linux/netfilter.h:314
+ __br_forward+0x489/0x660 net/bridge/br_forward.c:115
+ deliver_clone net/bridge/br_forward.c:131 [inline]
+ maybe_deliver+0xb3/0x150 net/bridge/br_forward.c:190
+ br_flood+0x2e4/0x660 net/bridge/br_forward.c:236
+ br_dev_xmit+0x118c/0x1a10
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
+ __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ hsr_xmit net/hsr/hsr_forward.c:380 [inline]
+ hsr_forward_do net/hsr/hsr_forward.c:471 [inline]
+ hsr_forward_skb+0x183f/0x2400 net/hsr/hsr_forward.c:619
+ send_hsr_supervision_frame+0x548/0xad0 net/hsr/hsr_device.c:333
+ hsr_announce+0x1a9/0x370 net/hsr/hsr_device.c:389
+ call_timer_fn+0x17e/0x600 kernel/time/timer.c:1792
+ expire_timers kernel/time/timer.c:1843 [inline]
+ __run_timers kernel/time/timer.c:2408 [inline]
+ __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2419
+ run_timer_base kernel/time/timer.c:2428 [inline]
+ run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2438
+ __do_softirq+0x2bc/0x943 kernel/softirq.c:554
+ do_softirq+0x11b/0x1e0 kernel/softirq.c:455
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
+ spin_unlock_bh include/linux/spinlock.h:396 [inline]
+ batadv_nc_purge_paths+0x30f/0x3b0 net/batman-adv/network-coding.c:471
+ batadv_nc_worker+0x328/0x610 net/batman-adv/network-coding.c:720
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
