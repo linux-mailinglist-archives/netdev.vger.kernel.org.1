@@ -1,100 +1,140 @@
-Return-Path: <netdev+bounces-83098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2712890C3C
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:08:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B67F6890C40
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30F51C26D72
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 21:08:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E753E1C25B2A
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 21:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CF413AD04;
-	Thu, 28 Mar 2024 21:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEDA13AD29;
+	Thu, 28 Mar 2024 21:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="KNvcUyWl"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Z9AbJH6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A768413A875
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 21:07:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9033313AA5F;
+	Thu, 28 Mar 2024 21:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711660069; cv=none; b=Leq02PBLH4690BG9cXkVFESX5YHRGsAQBO+dmycPAj1BVHcSevCq59b2BM8GkQFdHm0OvYTm8agxJfUCM+inzQF6gRlpG6cEgLrCk62ZCvx9/4cxFI4n46wsu8GD2ARJqiFt15bjtl/PVQ77vxWvIewKhwTnlxE8+yFYou13LmQ=
+	t=1711660114; cv=none; b=j+rZd78t14F6jvdhht9fMfxmK3WyWl9UItlUbxm/EiSzPFG/kommxuZvu1J4lZOC1woZpNjHfGl3raG2ai2ldKlIdQEUe14GwQfHmtapt7dh9RbnZeDFpcuWfG+q+iLNi2As4CVI0hcR/iUIsbbo+lmQpVJYtHSgHuHmpmmyH/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711660069; c=relaxed/simple;
-	bh=TmkCS9jM7MpgxxtIOAWwrufoB48CaCg9AIUTLLa1ssc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LIP5jrLDX2AbPCCUKCfAb9WA/a/5pwiBTjXf35JTmJFHGe76RlUPbww5XrEZg5zRJINmwm+SnBL4ENwHDfch/BsQF09hmjpVbyQBKIFv6F1b2g7416VK/yrOCm3aLfBstE3JrJAZpz1smAXJrlMw91zaraVp1HfP+nTTSuVUVPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=KNvcUyWl; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e0025ef1efso10882685ad.1
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:07:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1711660067; x=1712264867; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aoe08oLfHPamqNE7SkYcG+AKQATabTcrNs03hfc/OQQ=;
-        b=KNvcUyWl7FrFRAx+Iq+1Z3OAYdndM9O4fH8olXJt86o0BGPvWbjSlfsZhuHzqpE+89
-         6ONAwuiUJ2WSKyR5gPgWY8EBsMID3lhCjG3W//MBdhxxlL3+LrK4wjtLXAap6Ydij7Ux
-         sUIKPKPyKZCXf5SF9twsSc3/AbTC0YiG3Xhl0gtdPZUCoMIfWu/UmtkU1cV1Jd6oGyu3
-         SRs9uLiNxgKLZ4nea8X/18vjQQZx55YHSazyWmR7CgHGkzWpYDrb+/Tc0f6i+Wld427n
-         gYwp2eZh18VOFPtWSxMfrYqCUPUoYQxBfrSe6cUhZJ1gBaSr08WYZ+7Cv5SCaEpkhY2y
-         y5+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711660067; x=1712264867;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aoe08oLfHPamqNE7SkYcG+AKQATabTcrNs03hfc/OQQ=;
-        b=lBAz1TbmMcY2HUn2EPF8Zh4LCsMSGfTFRBMGpUT4Vcmco0l8Lpmydm9Wbll4AJfxEU
-         R/xkLaduUpLGWf0gyCXYeFYEE6rVxVU66I/96FXdiRFuo6z/tptlKkR0bg/8N164ynAP
-         C9qto3jbkizsmuKhPGNcmPrMDv6HXupDvOi3YRIeTOp8JYbsPFB5norsVwNuW3xNJ2zL
-         xhHa+IuA9KbNq8M3SGUiXxyQMNhkRz7K1stPs+TWYkLnBn3liTyvSJKK8cuvBDpCjY6Y
-         7Cl9PQRKFRk+BHLlaH+p69azBuxzUpF3sf0ut5ArN5QlP/7Vht+DXTAJY+e9UIz++TAm
-         68Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5BwSF9aaf2p1bUmwsSPOHrIynnCSYG1iWFPRARRbIqmeczslNxCm7QwUtGT36+PcQjk2M2tkP72XgufPvdEL7luhQrfAB
-X-Gm-Message-State: AOJu0Yyz6XipdwKIs47wnD+Td+P3+Gb5YFxFPoehxMeNCr3mgRyzD8ti
-	P9URbG4DWgN/EyYIbIw3YEGUdWPv4RChGFbjsF1XkHBDvF9Ri5oNfYPiIzaJ2vg=
-X-Google-Smtp-Source: AGHT+IE7z0/TK1fMFS0Yvk6NaGjSry7T5aLMZtluecZUF0Xx3MLIsDvGnwum9NiAtMXBaJMCr5R7Xg==
-X-Received: by 2002:a17:903:555:b0:1e2:577:f694 with SMTP id jo21-20020a170903055500b001e20577f694mr624724plb.61.1711660066861;
-        Thu, 28 Mar 2024 14:07:46 -0700 (PDT)
-Received: from hermes.local (204-195-123-203.wavecable.com. [204.195.123.203])
-        by smtp.gmail.com with ESMTPSA id lc13-20020a170902fa8d00b001e0c949124fsm2073287plb.309.2024.03.28.14.07.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 14:07:46 -0700 (PDT)
-Date: Thu, 28 Mar 2024 14:07:44 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Date Huang <tjjh89017@hotmail.com>
-Cc: roopa@nvidia.com, razor@blackwall.org, netdev@vger.kernel.org,
- bridge@lists.linux-foundation.org
-Subject: Re: [PATCH iproute2-next v3 2/2] bridge: vlan: add compressvlans
- manpage
-Message-ID: <20240328140744.7c98fa7c@hermes.local>
-In-Reply-To: <MAZP287MB0503FE53735FD12BD753C328E4362@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
-References: <20240325054916.37470-1-tjjh89017@hotmail.com>
-	<MAZP287MB0503FE53735FD12BD753C328E4362@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1711660114; c=relaxed/simple;
+	bh=7nBpC+ZQDDjgWAiXHx2Dnp9F7qfeWRyKrR0L8kcTm+I=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=ZUyM0NcLT2PmBRGD6aKVqQJNAn5Lyf9445ptci6fhVesT1iDK/j0oItM6w91080yoR8SXRPkHuQRcLsG+6vI0BoRcrICbw3xb9yzl21r48G5y+ShnnaYWBRAZ6MfTWMyj+58Vk5ogAq8XFO5Csg9mDURw3N9UUM35MPB5TiKFZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Z9AbJH6g; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42SJsU0T025706;
+	Thu, 28 Mar 2024 21:08:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:date:subject:mime-version:content-type
+	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=C6u
+	J8bKPl3Ejk7cVp0J1A3lZipXuKjyCmUAO09Yk2R0=; b=Z9AbJH6gblrSqefCJwm
+	F0PqiNLlMLCbcAl1EzS6c/g10KXDdGL02bc0T3cHBHdJIoVUZwEouYmUggefJ7S+
+	aVdfebC5OLBNpU+2vioiNIrgoWTpF5NOME2IZjAY+caT2sSTRWmtxjyv0fJX02Ck
+	io3LbHc/0TWEA2uOsSXzWgbCicc7Sl3AvR5+175gO86dwbjytLLkUwPfvN5X6tfS
+	98jT4zctEJ4W2Aolng+aki3YonJ8JCkULrzhqMUcTorMo3gOCqV8l+MPHznfVuOu
+	5kOpa00VpHQhe5Mjl0fo/u+Cpe25daPapo6VlB7eOKdq4pMwhlCe3xIzF3eS8aNR
+	5bg==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x575m9jn0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Mar 2024 21:08:20 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42SL8JHg031875
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Mar 2024 21:08:19 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 28 Mar
+ 2024 14:08:19 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Thu, 28 Mar 2024 14:08:18 -0700
+Subject: [PATCH] wifi: mac80222: Fix ieee80211_i.h kernel-doc issues
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-ID: <20240328-ieee80211_i-kerneldoc-v1-1-e848bdec58f3@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAEHcBWYC/x3MQQqDMBBG4avIrA0kEwOpVxEpJfPbDpUoCYgg3
+ r2hy2/x3kUVRVFp7C4qOLTqlhtc31H6vPIbRqWZ2PJgPUejAKJl555qvigZq2zJCEd5hCWkIJ5
+ auxcsev6/03zfP7s+tptnAAAA
+To: Johannes Berg <johannes@sipsolutions.net>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: UExPF2-IgkRs6AVdZn0HSU9qCAHPWbXp
+X-Proofpoint-GUID: UExPF2-IgkRs6AVdZn0HSU9qCAHPWbXp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-28_17,2024-03-28_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ mlxscore=0 spamscore=0 mlxlogscore=775 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 impostorscore=0 phishscore=0 priorityscore=1501 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2403210001
+ definitions=main-2403280151
 
-On Mon, 25 Mar 2024 13:49:16 +0800
-Date Huang <tjjh89017@hotmail.com> wrote:
+kernel-doc flagged the following issues:
 
-> Add the missing 'compressvlans' to man page
-> 
-> Signed-off-by: Date Huang <tjjh89017@hotmail.com>
-> ---
+net/mac80211/ieee80211_i.h:146: warning: expecting prototype for enum ieee80211_corrupt_data_flags. Prototype was for enum ieee80211_bss_corrupt_data_flags instead
+net/mac80211/ieee80211_i.h:163: warning: expecting prototype for enum ieee80211_valid_data_flags. Prototype was for enum ieee80211_bss_valid_data_flags instead
 
-Marked this as superseded since your previous man page patch is already merged
-in iproute2 (not next). If you want to update that send another patch.
+Correct the documentation to match the code.
+
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+This file is being modified by a quicinc.com patch and my review
+process flagged these pre-existing kernel-doc issues.
+---
+ net/mac80211/ieee80211_i.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
+index def611e4e55f..458f63ce9a32 100644
+--- a/net/mac80211/ieee80211_i.h
++++ b/net/mac80211/ieee80211_i.h
+@@ -132,7 +132,7 @@ struct ieee80211_bss {
+ };
+ 
+ /**
+- * enum ieee80211_corrupt_data_flags - BSS data corruption flags
++ * enum ieee80211_bss_corrupt_data_flags - BSS data corruption flags
+  * @IEEE80211_BSS_CORRUPT_BEACON: last beacon frame received was corrupted
+  * @IEEE80211_BSS_CORRUPT_PROBE_RESP: last probe response received was corrupted
+  *
+@@ -145,7 +145,7 @@ enum ieee80211_bss_corrupt_data_flags {
+ };
+ 
+ /**
+- * enum ieee80211_valid_data_flags - BSS valid data flags
++ * enum ieee80211_bss_valid_data_flags - BSS valid data flags
+  * @IEEE80211_BSS_VALID_WMM: WMM/UAPSD data was gathered from non-corrupt IE
+  * @IEEE80211_BSS_VALID_RATES: Supported rates were gathered from non-corrupt IE
+  * @IEEE80211_BSS_VALID_ERP: ERP flag was gathered from non-corrupt IE
+
+---
+base-commit: b68b2beadfd30907faae944358de3a17acf6fdb6
+change-id: 20240328-ieee80211_i-kerneldoc-d28d95f5c5d3
+
 
