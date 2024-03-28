@@ -1,101 +1,129 @@
-Return-Path: <netdev+bounces-83108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7258E890D6F
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:21:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8911E890D7A
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:22:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D2BB29BC09
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:21:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A49AB23E11
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF62713BAD1;
-	Thu, 28 Mar 2024 22:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3343213BC18;
+	Thu, 28 Mar 2024 22:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="amT/7IC5"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1FYqTFq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2ED313BACD;
-	Thu, 28 Mar 2024 22:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBE012FF95;
+	Thu, 28 Mar 2024 22:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711663922; cv=none; b=rYASPYL5DR7lzDr96nKThCmQTSFm4yayLUQcyu17axy+6QMFY5dL+8gY6HEERy7zTpsI+vreOnc6IYAP5v6D9GOVbggQmXPGGjdB7Vd7KIjcHPiJPay1pDq6VEYAejiblRie7zQPT+TG/lD1w3qqCEVygccSXMSyWH4rvhS/VrQ=
+	t=1711664177; cv=none; b=DGNVL0LWXsopWDbJNkAY2MjwRRM0fLxpEhv5Gf/eRdQxtwLqz78eXsKsv2hu7FSDPrJB2A/YMvEL70BosHNZsNhPVZcCACCiKBDy5KkJk8PVoojFDC8VmSMww0mtz+sjuav5jG6me+WCeJmkfUqz1yqPbIJlaQN51s8ec0d9SbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711663922; c=relaxed/simple;
-	bh=ehbsRbh2x7F3tw4Jrc369T8BwH+Mb2OxM/pImqRP/Qk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nvTgDpTujnQZicUoIx4cS7aELmzFFGevzBnA9CIJeHe9YZ9o1V1KCxq4F69u6zgi34mQ10JSDvwSKwPdP4+yebtEwurN/BdSz3JOudKTkmG9pjCUBVRuTXkm/OAecN6putiok78Wztw8Jcg46UWl7soOkIEsI8/TiR7CEQHcm7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=amT/7IC5; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1711664177; c=relaxed/simple;
+	bh=fdtZQoLZf+k6qboyWg53YmVU9ZYYXUnvEjjAvY2Zbuc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W0LE/RkoPvPsjPHCiztSukqrfYv4P6cA/etmEGP1mUiyFY3hl2lILSd2RZfnjwA0CnUpQZDmgjYYUEECe2suj4rF3uicfXLxb1t85XoyJQ5xoOAzn8/XOREcaqO/MMIpx2yzzjqFmSm2WW9KtUFd9ZJhQ28SQw+q1ElcPFiNQaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1FYqTFq4; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=ehbsRbh2x7F3tw4Jrc369T8BwH+Mb2OxM/pImqRP/Qk=;
-	t=1711663919; x=1712873519; b=amT/7IC52/2NyjGDtcGT2vjNUAcYERizCX+MVJ9q7/RLGk0
-	WUvdx9kMS9PAOskGyKGRO8GiniVn8Kn5CFOfgL/3ysRX6jroUfvoCIWzy+Tq7ic0sD37OYHIGWqkY
-	lCeUiQL+hK5LfXHWAuvlt+PbdKmFLQ2F+MpAC8FGftHh8pfmAnQl40D5fvR8d1PoxCIcy+PoP3Jx2
-	OkrSdGozWUHik9C1YZECEqx8nDkD3LukFhbYJHk9fNYPL6uphilaGtB1QlTkAsT3MNg2LrJrj52NI
-	iQXQzISWs67IqFD4+RY2QoAFhyftXtAL5tPuwYuo3fEbTka/KhtyprQ4mQg9EEkw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rpxyW-00000001PRE-2aun;
-	Thu, 28 Mar 2024 23:11:56 +0100
-Message-ID: <eccb00604d9dae9b67d3d97d0526eb53cd6ffca7.camel@sipsolutions.net>
-Subject: Re: kunit alltests runs broken in mainline
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Shuah Khan <skhan@linuxfoundation.org>, David Gow <davidgow@google.com>,
-  SeongJae Park <sj@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>, 
- Brendan Higgins <brendanhiggins@google.com>, Rae Moar <rmoar@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>, "x86@kernel.org"
- <x86@kernel.org>
-Date: Thu, 28 Mar 2024 23:11:55 +0100
-In-Reply-To: <6591ea0d-572b-4deb-b2a7-da58ed91c8f9@linuxfoundation.org>
-References: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
-	 <20240325185235.2f704004@kernel.org>
-	 <33670310a2b84d1a650b2aa087ac9657fa4abf84.camel@sipsolutions.net>
-	 <CABVgOS=F0uFA=6+cab56a_-bS1p79BrpF6zJco7j+W74Z4BR5A@mail.gmail.com>
-	 <6591ea0d-572b-4deb-b2a7-da58ed91c8f9@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=3ilz03y73fsrB9+n9Uy1QM7lLm0rRc6zHwaEe0RJkzw=; b=1FYqTFq4DcCU2YvlnoviU4q3hR
+	iN522UQydezjRLomRP9sBO6dNPuBVE2ulNe+3qTQ4Fb80kPqgwrSdMrPKOD95BOfMpmx8qiNoVtwt
+	+BKJ6PTbQfRvsXsHzCaQMiWJgU2JyffRmZphRmtiyF2KZ9ZfU8k8NSCK6K/KFLT0awC0+YlBF24hT
+	KBKx3WRDqAixwQWCy4EgZjzZwoD0qgMxOmHYIiaxp3LMaNc4DiS2E/DeRZMjI38aqHgFMUWSZC0JL
+	DI9FGUxeyhCFUmxoQ19OzXe3LQtCHdpJUTTLAVJd5z817HIept4Zjr9eaYcF+8qRZRVMxhuG676Y0
+	KqPp6Zqw==;
+Received: from [50.53.2.121] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rpy2Z-0000000FtcS-3SpS;
+	Thu, 28 Mar 2024 22:16:07 +0000
+Message-ID: <a009a21a-56d7-4a1a-aaf9-feefa5acc561@infradead.org>
+Date: Thu, 28 Mar 2024 15:16:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] wifi: mac80222: Fix ieee80211_i.h kernel-doc issues
+Content-Language: en-US
+To: Jeff Johnson <quic_jjohnson@quicinc.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240328-ieee80211_i-kerneldoc-v1-1-e848bdec58f3@quicinc.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240328-ieee80211_i-kerneldoc-v1-1-e848bdec58f3@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 2024-03-28 at 14:08 -0600, Shuah Khan wrote:
-> On 3/26/24 04:09, David Gow wrote:
-> > On Tue, 26 Mar 2024 at 15:55, Johannes Berg <johannes@sipsolutions.net>=
- wrote:
-> > >=20
-> > > On Tue, 2024-03-26 at 01:52 +0000, Jakub Kicinski wrote:
-> > > >=20
-> > > > I'm late to the party, but FWIW I had to toss this into netdev test=
-ing
-> > > > tree as a local patch:
-> > > >=20
-> > > > CONFIG_NETDEVICES=3Dy
-> > > > CONFIG_WLAN=3Dy
-> > >=20
-> > > I'll send this in the next wireless pull, soon.
->=20
-> You are welcome to send this with wireless pull if you like
-> or I can include it in my pull request.
+Hi,
 
-It's already in net now, and in the pull request to Linus here:
-https://lore.kernel.org/netdev/20240328143117.26574-1-pabeni@redhat.com
+On 3/28/24 14:08, Jeff Johnson wrote:
+> kernel-doc flagged the following issues:
+> 
+> net/mac80211/ieee80211_i.h:146: warning: expecting prototype for enum ieee80211_corrupt_data_flags. Prototype was for enum ieee80211_bss_corrupt_data_flags instead
+> net/mac80211/ieee80211_i.h:163: warning: expecting prototype for enum ieee80211_valid_data_flags. Prototype was for enum ieee80211_bss_valid_data_flags instead
+> 
+> Correct the documentation to match the code.
+> 
+> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 
-johannes
+These seem to be corrected in linux-next already.
+However, I do still see this one:
+
+ieee80211_i.h:689: warning: missing initial short description on line:
+ * struct mesh_table
+
+Thanks.
+
+> ---
+> This file is being modified by a quicinc.com patch and my review
+> process flagged these pre-existing kernel-doc issues.
+> ---
+>  net/mac80211/ieee80211_i.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
+> index def611e4e55f..458f63ce9a32 100644
+> --- a/net/mac80211/ieee80211_i.h
+> +++ b/net/mac80211/ieee80211_i.h
+> @@ -132,7 +132,7 @@ struct ieee80211_bss {
+>  };
+>  
+>  /**
+> - * enum ieee80211_corrupt_data_flags - BSS data corruption flags
+> + * enum ieee80211_bss_corrupt_data_flags - BSS data corruption flags
+>   * @IEEE80211_BSS_CORRUPT_BEACON: last beacon frame received was corrupted
+>   * @IEEE80211_BSS_CORRUPT_PROBE_RESP: last probe response received was corrupted
+>   *
+> @@ -145,7 +145,7 @@ enum ieee80211_bss_corrupt_data_flags {
+>  };
+>  
+>  /**
+> - * enum ieee80211_valid_data_flags - BSS valid data flags
+> + * enum ieee80211_bss_valid_data_flags - BSS valid data flags
+>   * @IEEE80211_BSS_VALID_WMM: WMM/UAPSD data was gathered from non-corrupt IE
+>   * @IEEE80211_BSS_VALID_RATES: Supported rates were gathered from non-corrupt IE
+>   * @IEEE80211_BSS_VALID_ERP: ERP flag was gathered from non-corrupt IE
+> 
+> ---
+> base-commit: b68b2beadfd30907faae944358de3a17acf6fdb6
+> change-id: 20240328-ieee80211_i-kerneldoc-d28d95f5c5d3
+> 
+> 
+
+-- 
+#Randy
 
