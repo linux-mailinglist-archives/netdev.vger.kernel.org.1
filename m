@@ -1,202 +1,96 @@
-Return-Path: <netdev+bounces-82992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE58889062A
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:48:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B79889064B
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:51:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E36EBB24C01
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:48:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35E632A46C1
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B1E44365;
-	Thu, 28 Mar 2024 16:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314A444376;
+	Thu, 28 Mar 2024 16:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="gg0BjxU8";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="P252tgkR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zr/1SOrS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh6-smtp.messagingengine.com (fhigh6-smtp.messagingengine.com [103.168.172.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FC538388;
-	Thu, 28 Mar 2024 16:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE5B43176
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 16:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711643999; cv=none; b=YeSpjW72iBDeEA4hjLBh1YdVFcAXu+CxZlvhH64v0e/dQvKaxmOXOpB2SYjuTqzT2mxp5c2b/A2vWl8AQ5Y+fs1PnQ8H5LZkiqzZ612MyWkqJ/g8nKU3CacHvSVtdyS6gg8NPCZCBDajK1O+MAlrhlf4pZLH3wiUOpGf81pkKbw=
+	t=1711644529; cv=none; b=N7PEzbywwm6uOzXwdt9I5KLj4YUPdaKOQ7FNMdeKwtJhextHhPr+VHHyo/D3ypTb9dWtVCQK7Y04sGkEHiVFkJmpo7hhwpAy7RzCcHvmLYYr648yqJgLH4GiQdQego59EoOXT05tbCKU4TMzd5y9vgFHCMG/RGms95Rq2MiRxik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711643999; c=relaxed/simple;
-	bh=wb/qSsrG9p00H2YgbJ23G128MXHEa52O+6iF8sj5TtY=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=q3uZ5aI0oJ9iKIfdZtPn7UWcyHVkubWh4vEu8mNYyqPSURkIJ57Uxsmc0ogcIYqkrewMP84G65TSq9MNzW0PxBm1l6SHL9zXJArdI/Ih0zFvdU863RS+bOjkdGcSd/06Mz0AV4ahH0dnlVDvmwOP790N2pjshueyWUZ15igNmYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=gg0BjxU8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=P252tgkR; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 19D5E1140163;
-	Thu, 28 Mar 2024 12:39:57 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Thu, 28 Mar 2024 12:39:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1711643997;
-	 x=1711730397; bh=aUszvSWxiA8AwwpnjADcGdmlaqvcxRRc2keJGjADuiU=; b=
-	gg0BjxU8PF7wrDeOt6Y5eATYhX9zfvEDFJryGM3FP7AW4kzWeWUpBA3JHkR31B1S
-	o+rfhUCKwSa3OF46LOGI9ZEv9LpOAuctp4lhvmve/dYt0byJqTMau9JGOrvEpJNn
-	BhqYzMiX28wGv8kRplwNab3ZmxW077ysB+UgrO2/TeNtvmjNl9Aaqcm+Pjw9hMmJ
-	ewTxMwnmaF93R8ybTZYBPIF/CS224Q6fgMHYHQItyc7lqGz4S2BioMqm8kxfZcRX
-	aOy65p2eXBBPXlKRh+YonNkl9ZBrCiWiewZq+gwfahCbHmZBo7S0deYHYRqll2O3
-	v6htgafYrusq6SSbapwc5A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1711643997; x=
-	1711730397; bh=aUszvSWxiA8AwwpnjADcGdmlaqvcxRRc2keJGjADuiU=; b=P
-	252tgkRJqRLht28QLlqUwvcrHXIU5eVMmvtXPt4OY0VLSMjif5s5Uy7LblkJscpB
-	pnzdzLn9jYb0iIoJjtFi3+G72Bw5s9PiVxpPv/sPvbfZO2ba939EwqIysGjLigsr
-	tBBN4TFt/1FrScYofwBU+nnUtCg7bPRT9BV5+hge1VyCtPrf2+0Iv9QXLqleYy8O
-	LNJ8ygqSqdk5fZTWfFKJWyCtwhAM6rP97yfZsQk434BK8CoysODn9F+QOLc5yDiD
-	Ifhz6MnXfNMokqfn1dIP4eCF1xoJH+S/r0WdznRkKVz9uRPHsc4YRSfVIGo/QjH7
-	zzx+Df5kndBtLaDByuISQ==
-X-ME-Sender: <xms:XJ0FZh_qGSFOV6xuzvQjQYgjiuNbHX_scIdkv4_aKCt1GnNS8gxcwg>
-    <xme:XJ0FZlul6l4MgvQnW8S8TxKPExyXlIufw6n7BtXUTksesfcRAD_THHm78MEePYIin
-    BsPQ0ibIA35qSjL6bs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudduledgledtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeelfefgueeviefgudduueefueffkeelleeijeelkefgudfgueelledtuddu
-    ieegvdenucffohhmrghinhepghhouggsohhlthdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:XJ0FZvCBvIuhQGbw6wfmrNS_mOA1m9wAwTnp16NiHEkRhrR-S7YuqQ>
-    <xmx:XJ0FZldfJAr9PnAVtMDXWsMRg3Ohlu2mqn6cBs6YxP8vboVblKtUtg>
-    <xmx:XJ0FZmOGnJHZWmYnJHn87hCccqcF8HAmrpPl0u6Mp1LeSsmgOBkAOQ>
-    <xmx:XJ0FZnnGjN49gJA-VQJ5K6DAWlhfQTcJ_IUrdWtisP4JaboD3Y5rcA>
-    <xmx:XZ0FZrxA9XI3f_xAV6-xNT6gLwiSkQ4SSB7b_dlue5OM1q4-ITlQFA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 9F1EAB6008D; Thu, 28 Mar 2024 12:39:56 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-333-gbfea15422e-fm-20240327.001-gbfea1542
+	s=arc-20240116; t=1711644529; c=relaxed/simple;
+	bh=XCS8coifLJoAHodCgPDnHwtBvKFyYNMs8FtMyUu4F5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PLvYIHVm9Wu2hG9iI8BJLNm8OOUrJ4W290D1aO6XgiPpZYzQnOykkw9ZBYxe3wjxy8urvoqs8M4mDdq9GDsQ56tLfVmS6xpqtReAW7Gnng1iGbCLyCtvnxWkLNTRnPjWJvbRdylJhkXQM+rpA9Z95jkveoWRSuAoxAUr/+U1/kQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zr/1SOrS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FAAFC433F1;
+	Thu, 28 Mar 2024 16:48:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711644528;
+	bh=XCS8coifLJoAHodCgPDnHwtBvKFyYNMs8FtMyUu4F5w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Zr/1SOrSZkUxqJy0E+QLq1IXfcEWYfN8ZbtWSdwVtIIi7Au67KNS0ccFrSB2Gwbf1
+	 yFQMHIAuJzvhSxu3YKERGeflNE7MxdxwIlN7VFfLJsPq3pwFp+xbdrk16Q5lNk3+1X
+	 c+ASHp18/WcfXoajRbTsq98fsIPCNzONapgOdSHo29GTpchCbZkEThS4q6ESvwWzF1
+	 LUKSS66gKRmGVBVZKAe8yTX4mA8iqdd/Cz9X2ad9d5vrjmbT3qQdz6xyzg6eAGpmSZ
+	 DxV+/96B3aHYbW9mJhz7viISF398dDXxokkSaB8SHehHZgy1CweHiv8qfuHqwcMPHm
+	 oIHYHyiunNmeA==
+Date: Thu, 28 Mar 2024 09:48:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Heng Qi <hengqi@linux.alibaba.com>, <netdev@vger.kernel.org>, Eric 
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Vladimir 
+ Oltean <vladimir.oltean@nxp.com>, "David S. Miller" <davem@davemloft.net>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ vadim.fedorenko@linux.dev, Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: Re: [PATCH net-next v2 2/2] virtio-net: support dim profile
+ fine-tuning
+Message-ID: <20240328094847.1af51a8d@kernel.org>
+In-Reply-To: <1711591930.8288093-2-xuanzhuo@linux.alibaba.com>
+References: <1711531146-91920-1-git-send-email-hengqi@linux.alibaba.com>
+	<1711531146-91920-3-git-send-email-hengqi@linux.alibaba.com>
+	<556ec006-6157-458d-b9c8-86436cb3199d@intel.com>
+	<20240327173258.21c031a8@kernel.org>
+	<1711591930.8288093-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <62cf1c3c-29b7-48cc-9d52-cd47a6c07aa4@app.fastmail.com>
-In-Reply-To: 
- <CANn89i+3FuKc1RsYaciNe3uQMZuJBjSmvC_ueuQ=NaFVzEnyuA@mail.gmail.com>
-References: <20240328143051.1069575-1-arnd@kernel.org>
- <20240328143051.1069575-6-arnd@kernel.org>
- <CANn89i+3FuKc1RsYaciNe3uQMZuJBjSmvC_ueuQ=NaFVzEnyuA@mail.gmail.com>
-Date: Thu, 28 Mar 2024 17:39:36 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Eric Dumazet" <edumazet@google.com>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- "David Ahern" <dsahern@kernel.org>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Nathan Chancellor" <nathan@kernel.org>,
- "Nick Desaulniers" <ndesaulniers@google.com>,
- "Bill Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>,
- "Dmitry Safonov" <0x7f454c46@gmail.com>,
- "Neal Cardwell" <ncardwell@google.com>,
- "mfreemon@cloudflare.com" <mfreemon@cloudflare.com>,
- "Yan Zhai" <yan@cloudflare.com>, Netdev <netdev@vger.kernel.org>,
- llvm@lists.linux.dev
-Subject: Re: [PATCH 5/9] ipv4: tcp_output: avoid warning about NET_ADD_STATS
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 28, 2024, at 15:38, Eric Dumazet wrote:
-> On Thu, Mar 28, 2024 at 3:31=E2=80=AFPM Arnd Bergmann <arnd@kernel.org=
-> wrote:
-^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> arch/x86/include/asm/percpu.h:127:31: note: expanded from macro 'perc=
-pu_add_op'
->>                               ((val) =3D=3D 1 || (val) =3D=3D -1)) ? =
-           \
->>                                              ~~~~~ ^  ~~
->>
->
-> This seems like a bug in the macro or the compiler, because val is not
-> a constant ?
->
-> __builtin_constant_p(val) should return false ???
->
-> +#define percpu_add_op(size, qual, var, val)                          =
-  \
-> +do {                                                                 =
-  \
-> +       const int pao_ID__ =3D (__builtin_constant_p(val) &&          =
-    \
-> +                             ((val) =3D=3D 1 || (val) =3D=3D -1)) ?  =
-          \
-> +                               (int)(val) : 0;                       =
-  \
+On Thu, 28 Mar 2024 10:12:10 +0800 Xuan Zhuo wrote:
+> For netdim, I think profiles are an aspect. In many cases, this can solve many
+> problems.
 
-It looks like gcc does the same thing, with the broader and
-still disabled -Wtype-limits, see: https://godbolt.org/z/3EPTGx68n
+Okay, but then you should try harder to hide all the config in the core.
+The driver should be blissfully unaware that the user is changing 
+the settings. It should just continue calling net_dim_get_*moderation().
 
-As far as I can tell, it does not matter that the comparison
-against -1 is never actually evaluated, since the warning
-is already printed before it simplifies the condition.
+You can create proper dim_init(), dim_destroy() functions for drivers
+to call, instead of doing
 
-This is the only such warning I got from percpu, but
-I guess we could also add the cast inside of the macro,
-such as
+	INIT_WORK(&bla->dim.work, my_driver_do_dim_work);
 
-diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu=
-.h
-index 44958ebaf626..5923d786e67a 100644
---- a/arch/x86/include/asm/percpu.h
-+++ b/arch/x86/include/asm/percpu.h
-@@ -181,12 +181,14 @@ do {                                              =
-                        \
-  */
- #define percpu_add_op(size, qual, var, val)                            \
- do {                                                                   \
--       const int pao_ID__ =3D (__builtin_constant_p(val) &&            =
-  \
--                             ((val) =3D=3D 1 || (val) =3D=3D -1)) ?    =
-        \
--                               (int)(val) : 0;                         \
-+       __auto_type __val =3D (val);                                    =
-  \
-+       const int pao_ID__ =3D (__builtin_constant_p(__val) &&          =
-  \
-+                             ((__val) =3D=3D (typeof(__val))1 ||       =
-    \
-+                              (__val) =3D=3D (typeof(__val))-1)) ?     =
-    \
-+                               (int)(__val) : 0;                       \
-        if (0) {                                                        \
-                typeof(var) pao_tmp__;                                  \
--               pao_tmp__ =3D (val);                                    =
-  \
-+               pao_tmp__ =3D (__val);                                  =
-  \
-                (void)pao_tmp__;                                        \
-        }                                                               \
-        if (pao_ID__ =3D=3D 1)                                          =
-    \
-@@ -194,7 +196,7 @@ do {                                                =
-                        \
-        else if (pao_ID__ =3D=3D -1)                                    =
-    \
-                percpu_unary_op(size, qual, "dec", var);                \
-        else                                                            \
--               percpu_to_op(size, qual, "add", var, val);              \
-+               percpu_to_op(size, qual, "add", var, __val);            \
- } while (0)
-=20
- #define percpu_from_op(size, qual, op, _var)                           \
+directly. In dim_init() you can hook the dim structure to net_device
+and then ethtool code can operation on it without driver involvement.
 
-I added a temporary variable there to avoid expanding
-the argument too many times.
+About the uAPI - please make sure you add the new stuff to
+Documentation/netlink/specs/ethtool.yaml
+see: https://docs.kernel.org/next/userspace-api/netlink/specs.html
 
-       Arnd
+And break up the attributes, please, no raw C structs of this nature:
+
++	return nla_put(skb, attr_type, sizeof(struct dim_cq_moder) *
++		       NET_DIM_PARAMS_NUM_PROFILES, profs);
+
+They are hard to extend.
 
