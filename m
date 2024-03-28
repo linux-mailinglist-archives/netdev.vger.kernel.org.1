@@ -1,153 +1,155 @@
-Return-Path: <netdev+bounces-82715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A57C988F5D9
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 04:19:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36A9E88F61C
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:03:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B2DC1F2C3B7
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 03:19:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F66B1C27FBB
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 04:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74DC9381BE;
-	Thu, 28 Mar 2024 03:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3E1376E5;
+	Thu, 28 Mar 2024 04:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IxYZGCLb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EEC2D05D;
-	Thu, 28 Mar 2024 03:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CC0849C
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 04:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711595946; cv=none; b=gT5w/2YVQ45DXiLhHEWJzrfe45m0CmENgOYGpuWJWF3/784q8SK5Mc3ExL4TrvQoBpEQn/hDeTaIr0xja94WIkN1i0UflZ2dfr+KyRzLsPwtLqYsREdphC7Da9+sdJ3L+WfCycLFFQqYtC2CkYTGTSwYRi+6iy8OwAyi9uknc8Y=
+	t=1711598591; cv=none; b=Rs4uSPf3OgBqsBUxcn3G6rdTjQpFtWlAYw7aSC5+D4YiqR5a1ig78xypJe40/8TfMEA6hIuSTbnaliJ7d2T+FHNrshxukrG4AEB5qNJ9ks2frpFm+HXqRfBTHJH+shJVjJzeuPd/AIjCQFMJaFTTfKQPUWSAbqxy0kWxy1fASzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711595946; c=relaxed/simple;
-	bh=B0Ze6+oWAL5Zo74OMFSnjAVUGS4kLKFzcO13q8xCxqc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FOTNpuPatN+vuCF1y6dNDBTzoWm0pT//CaNAEWufbF2fY3yFo3LwQbp/1MAyTzjxVZPef16L3/YDnE6Ws6/ZnToU4KJ9sdC77/vxNavyf12unX2qG/9Np0+/2+73NSUQRTYudaMrlNIrNzyIk5SJGjPN3tFpiVTwMvaHDHsX6rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net 4/4] netfilter: arptables: Select NETFILTER_FAMILY_ARP when building arp_tables.c
-Date: Thu, 28 Mar 2024 04:18:55 +0100
-Message-Id: <20240328031855.2063-5-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240328031855.2063-1-pablo@netfilter.org>
-References: <20240328031855.2063-1-pablo@netfilter.org>
+	s=arc-20240116; t=1711598591; c=relaxed/simple;
+	bh=MA0vU3W1LZn4Qn1ileNbbCmxahwffPLbnt6IdvVY1DQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RY2c75zYSkLH6HjZYWgFxS1x35bTnce5O9ZmdpaZ4peyWyEINVtjDok+6a77VDgegAsVovugsH53t4rmgiDKVfg63VWQN9E+IzOc6t8BSaP8kZSYM6k2UioEVsA84dW6WIXoZI8wNpwZSqz7vLJyIuJ4AsjDjwxocx621JuysX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IxYZGCLb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711598588;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VR9QH5sWK+/AEwJzme4Yl+zpIsFT2eAe45QtEGaUS2M=;
+	b=IxYZGCLbqvNWXFvkRBEu6YBTDjtj2wanoyFNg8hXA6sbVdK+UZl54GTuImvmmrm/s5vqdl
+	5Qiyoyb8/ETBlLVHNSl9fwQ+ucalyrspDS+V5O5L/wXrh81w+0pw73mc/2RCYz6GqOIZhq
+	OgnNqjlVnIQkeH1hcgIYVa6/nqG1LNI=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-617-FaWMVsghPgmLlDwpZNjnmw-1; Thu, 28 Mar 2024 00:03:06 -0400
+X-MC-Unique: FaWMVsghPgmLlDwpZNjnmw-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-29df71a709eso473119a91.1
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 21:03:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711598586; x=1712203386;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VR9QH5sWK+/AEwJzme4Yl+zpIsFT2eAe45QtEGaUS2M=;
+        b=sHBZO8jKJGrpp95C2s0O5kI/oNmlLThmmf8BYj3p7o+i72N2Qit+nToo3RryTHDHZI
+         e5H5XMR58uEoeWXaWElo0i8gYtbDXdIvqyJ5ud3uuZhT3JUj6kb3TvG4rqIj5wLiXOpI
+         9lfKRf6Q787UEyrQggUUVaUarARvpXdlRk+CZ7Am9fBEziV4WuvQ44rCMlG00NY5qWH2
+         CrH619sS98cJBIgWJBNCHGxNs2v305lwJBhX2j40FS3OeFY/I8ZsBqZZD9BBzCLa7RO+
+         zKmgQpHZ6mScHXfRxdc9uhGRoipn6ZxaePUQ8yGEcfY7dQtTw985BX8I5klY4sPo3SGn
+         mOGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPVd1LlW4pz7niu8mAqW98Q16QZz24CLv0mZLro25yVzs9t8wxpYTHnN3904cY3pdIUPLQewfuScwY8EsC1LY1yv75TkW8
+X-Gm-Message-State: AOJu0YxeszdNLr9s4jSXmd5iZtTaCqM/8w5NYQWZJcabB6Ws1oHtsuqS
+	U5zTzm+XQxce73MReytjrqTXg2OxvcaMg/PaCxvM1GUJI6nx8fOxhJH+zEBCtvn0i1l23f5XOtW
+	/5LRac4XhFHy3GWitecIHpOlKpr0GVJRznYNzrE1Y/3dNxMAVTjPcBmRxsAxAgDKYJBMX49xKwr
+	ix38PM31OyNTaUGbsQOs4poUItDKen
+X-Received: by 2002:a17:90b:14a:b0:2a0:7815:dd25 with SMTP id em10-20020a17090b014a00b002a07815dd25mr1734994pjb.20.1711598585819;
+        Wed, 27 Mar 2024 21:03:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/veJ62gWCxJH+rJXD0BAZFk49zg7RYhlAQmbs4vW7XEiQGECvkaoiOerml1BopvTt9smdmlPuOr7dLI1u01k=
+X-Received: by 2002:a17:90b:14a:b0:2a0:7815:dd25 with SMTP id
+ em10-20020a17090b014a00b002a07815dd25mr1734975pjb.20.1711598585557; Wed, 27
+ Mar 2024 21:03:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240327231826.1725488-1-andrew@daynix.com>
+In-Reply-To: <20240327231826.1725488-1-andrew@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 28 Mar 2024 12:02:54 +0800
+Message-ID: <CACGkMEuW8jLvje0_oqCT=-ih9JEgxOrWRsvjvfwQXw=OWT_RtQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
+To: Andrew Melnychenko <andrew@daynix.com>
+Cc: mst@redhat.com, ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
+	kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	yuri.benditovich@daynix.com, yan@daynix.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
+On Thu, Mar 28, 2024 at 7:44=E2=80=AFAM Andrew Melnychenko <andrew@daynix.c=
+om> wrote:
+>
+> When the Qemu launched with vhost but without tap vnet_hdr,
+> vhost tries to copy vnet_hdr from socket iter with size 0
+> to the page that may contain some trash.
+> That trash can be interpreted as unpredictable values for
+> vnet_hdr.
+> That leads to dropping some packets and in some cases to
+> stalling vhost routine when the vhost_net tries to process
+> packets and fails in a loop.
+>
+> Qemu options:
+>   -netdev tap,vhost=3Don,vnet_hdr=3Doff,...
+>
+> From security point of view, wrong values on field used later
+> tap's tap_get_user_xdp() and will affect skb gso and options.
+> Later the header(and data in headroom) should not be used by the stack.
+> Using custom socket as a backend to vhost_net can reveal some data
+> in the vnet_hdr, although it would require kernel access to implement.
+>
+> The issue happens because the value of sock_len in virtqueue is 0.
+> That value is set at vhost_net_set_features() with
+> VHOST_NET_F_VIRTIO_NET_HDR, also it's set to zero at device open()
+> and reset() routine.
+> So, currently, to trigger the issue, we need to set up qemu with
+> vhost=3Don,vnet_hdr=3Doff, or do not configure vhost in the custom progra=
+m.
+>
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 
-syzkaller started to report a warning below [0] after consuming the
-commit 4654467dc7e1 ("netfilter: arptables: allow xtables-nft only
-builds").
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-The change accidentally removed the dependency on NETFILTER_FAMILY_ARP
-from IP_NF_ARPTABLES.
+It seems it has been merged by Michael.
 
-If NF_TABLES_ARP is not enabled on Kconfig, NETFILTER_FAMILY_ARP will
-be removed and some code necessary for arptables will not be compiled.
+Thanks
 
-  $ grep -E "(NETFILTER_FAMILY_ARP|IP_NF_ARPTABLES|NF_TABLES_ARP)" .config
-  CONFIG_NETFILTER_FAMILY_ARP=y
-  # CONFIG_NF_TABLES_ARP is not set
-  CONFIG_IP_NF_ARPTABLES=y
-
-  $ make olddefconfig
-
-  $ grep -E "(NETFILTER_FAMILY_ARP|IP_NF_ARPTABLES|NF_TABLES_ARP)" .config
-  # CONFIG_NF_TABLES_ARP is not set
-  CONFIG_IP_NF_ARPTABLES=y
-
-So, when nf_register_net_hooks() is called for arptables, it will
-trigger the splat below.
-
-Now IP_NF_ARPTABLES is only enabled by IP_NF_ARPFILTER, so let's
-restore the dependency on NETFILTER_FAMILY_ARP in IP_NF_ARPFILTER.
-
-[0]:
-WARNING: CPU: 0 PID: 242 at net/netfilter/core.c:316 nf_hook_entry_head+0x1e1/0x2c0 net/netfilter/core.c:316
-Modules linked in:
-CPU: 0 PID: 242 Comm: syz-executor.0 Not tainted 6.8.0-12821-g537c2e91d354 #10
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:nf_hook_entry_head+0x1e1/0x2c0 net/netfilter/core.c:316
-Code: 83 fd 04 0f 87 bc 00 00 00 e8 5b 84 83 fd 4d 8d ac ec a8 0b 00 00 e8 4e 84 83 fd 4c 89 e8 5b 5d 41 5c 41 5d c3 e8 3f 84 83 fd <0f> 0b e8 38 84 83 fd 45 31 ed 5b 5d 4c 89 e8 41 5c 41 5d c3 e8 26
-RSP: 0018:ffffc90000b8f6e8 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffffff83c42164
-RDX: ffff888106851180 RSI: ffffffff83c42321 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000005 R09: 000000000000000a
-R10: 0000000000000003 R11: ffff8881055c2f00 R12: ffff888112b78000
-R13: 0000000000000000 R14: ffff8881055c2f00 R15: ffff8881055c2f00
-FS:  00007f377bd78800(0000) GS:ffff88811b000000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000496068 CR3: 000000011298b003 CR4: 0000000000770ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- __nf_register_net_hook+0xcd/0x7a0 net/netfilter/core.c:428
- nf_register_net_hook+0x116/0x170 net/netfilter/core.c:578
- nf_register_net_hooks+0x5d/0xc0 net/netfilter/core.c:594
- arpt_register_table+0x250/0x420 net/ipv4/netfilter/arp_tables.c:1553
- arptable_filter_table_init+0x41/0x60 net/ipv4/netfilter/arptable_filter.c:39
- xt_find_table_lock+0x2e9/0x4b0 net/netfilter/x_tables.c:1260
- xt_request_find_table_lock+0x2b/0xe0 net/netfilter/x_tables.c:1285
- get_info+0x169/0x5c0 net/ipv4/netfilter/arp_tables.c:808
- do_arpt_get_ctl+0x3f9/0x830 net/ipv4/netfilter/arp_tables.c:1444
- nf_getsockopt+0x76/0xd0 net/netfilter/nf_sockopt.c:116
- ip_getsockopt+0x17d/0x1c0 net/ipv4/ip_sockglue.c:1777
- tcp_getsockopt+0x99/0x100 net/ipv4/tcp.c:4373
- do_sock_getsockopt+0x279/0x360 net/socket.c:2373
- __sys_getsockopt+0x115/0x1e0 net/socket.c:2402
- __do_sys_getsockopt net/socket.c:2412 [inline]
- __se_sys_getsockopt net/socket.c:2409 [inline]
- __x64_sys_getsockopt+0xbd/0x150 net/socket.c:2409
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x46/0x4e
-RIP: 0033:0x7f377beca6fe
-Code: 1f 44 00 00 48 8b 15 01 97 0a 00 f7 d8 64 89 02 b8 ff ff ff ff eb b8 0f 1f 44 00 00 f3 0f 1e fa 49 89 ca b8 37 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 0a c3 66 0f 1f 84 00 00 00 00 00 48 8b 15 c9
-RSP: 002b:00000000005df728 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 00000000004966e0 RCX: 00007f377beca6fe
-RDX: 0000000000000060 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 000000000042938a R08: 00000000005df73c R09: 00000000005df800
-R10: 00000000004966e8 R11: 0000000000000246 R12: 0000000000000003
-R13: 0000000000496068 R14: 0000000000000003 R15: 00000000004bc9d8
- </TASK>
-
-Fixes: 4654467dc7e1 ("netfilter: arptables: allow xtables-nft only builds")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/ipv4/netfilter/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/ipv4/netfilter/Kconfig b/net/ipv4/netfilter/Kconfig
-index 8f6e950163a7..1b991b889506 100644
---- a/net/ipv4/netfilter/Kconfig
-+++ b/net/ipv4/netfilter/Kconfig
-@@ -329,6 +329,7 @@ config NFT_COMPAT_ARP
- config IP_NF_ARPFILTER
- 	tristate "arptables-legacy packet filtering support"
- 	select IP_NF_ARPTABLES
-+	select NETFILTER_FAMILY_ARP
- 	depends on NETFILTER_XTABLES
- 	help
- 	  ARP packet filtering defines a table `filter', which has a series of
--- 
-2.30.2
+> ---
+>  drivers/vhost/net.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index f2ed7167c848..57411ac2d08b 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_virtq=
+ueue *nvq,
+>         hdr =3D buf;
+>         gso =3D &hdr->gso;
+>
+> +       if (!sock_hlen)
+> +               memset(buf, 0, pad);
+> +
+>         if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+>             vhost16_to_cpu(vq, gso->csum_start) +
+>             vhost16_to_cpu(vq, gso->csum_offset) + 2 >
+> --
+> 2.43.0
+>
 
 
