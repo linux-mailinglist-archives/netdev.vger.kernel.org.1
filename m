@@ -1,69 +1,67 @@
-Return-Path: <netdev+bounces-82891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C9B8901C7
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:32:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E03D8901D4
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:33:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C14A7297920
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:32:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 905BBB23402
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0C112E1DB;
-	Thu, 28 Mar 2024 14:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDF612DDA6;
+	Thu, 28 Mar 2024 14:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q6rPZGLf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IeIzeJPL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C39912D77B;
-	Thu, 28 Mar 2024 14:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D4612D209;
+	Thu, 28 Mar 2024 14:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711636290; cv=none; b=SHlVZSnNDHv4t8Y7Qy/Dn6fnrXuWwc7+VvzhllHQ8OJrgNYVx4phCyuP644iDuWto64Nq2NU54yZyC3bO91tQ6y7XqmPVvRQvol8xH0smk8Z1W2eGmoBixaKDU4OaSqxhu1NUB4lahhMx5P4YeYNXMO19ivjmxAe4HzP0EWWggY=
+	t=1711636313; cv=none; b=u9TkTQTKadAKw5YUhM3/ZuZELFGTh+e+Fz5LL9cR3wjDZy4WSrYhCTFP+PLl3mXpBqD41peDy87heqz0b4K3SKHZii6AV8C9cMNwhCosxeq+QzMR2C53nOAGB3GN6xOY8w8feKyBw3Y6jDhetrEbSsZK2SRqoU5jrFNBVPgDjuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711636290; c=relaxed/simple;
-	bh=CLKmSwfWJ51R7yRH9H4Z02ae07/lsbxBLTkdp9cvOH0=;
+	s=arc-20240116; t=1711636313; c=relaxed/simple;
+	bh=63E3lJn+RbWzhvFRPe7NeWgxZ0tEg6xP/LcfJ4ruTtU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NV6FqXfv7be4XkFVHyDPcZKorlDvkb6Jm74KCAb0jM/UFQCDh44p2Z9/1plwbPi3tPcCd7/osYwZl7iakv1gek7Z8jBSYI5JzMA8hATp/8E8T2C2Gd2vgC7NDarC73VBKLl/B102P6PVdsrFV1ZFe/dSLwavtoAoY28mXelMENo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q6rPZGLf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7265C433F1;
-	Thu, 28 Mar 2024 14:31:25 +0000 (UTC)
+	 MIME-Version; b=YQWBsT1aUuYNNiZN6nfJ44ii5iCVrELo6R18lYFSyBEs0dvvy33MYGrlUxc7YPUlCqYwQx1IJ8Li558jXre3qbiTgvEKcINfjSHYmNjkaQFrD2pUZNrAJIqqXwXr3eem+VEz5dTHRCgUYzs+BkF2KkVq4bIQ9/QS3B7FMcgcp8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IeIzeJPL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73B14C433C7;
+	Thu, 28 Mar 2024 14:31:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711636289;
-	bh=CLKmSwfWJ51R7yRH9H4Z02ae07/lsbxBLTkdp9cvOH0=;
+	s=k20201202; t=1711636313;
+	bh=63E3lJn+RbWzhvFRPe7NeWgxZ0tEg6xP/LcfJ4ruTtU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q6rPZGLfjJ85hVRL9zvH78xHWI71xn2Fvzu/M5q0+HDEkrd6TQ/WnLodC2ogsLTvr
-	 sB+1VLU0PVi30PcYICt9g8mTpwOMIDnovxTMxNzgc0eyT/e924ZhQ9TUMmE+BmyMdS
-	 Et8bKBZWJ2FTljWdJZ3OH90jTqoDxKWp6NVsDt8xZ5mpFYCJFXWCRSPoG5QUOWJZuu
-	 KpwIfSk1FzjWLZacCXDuyX7jJuyJqU31+/HZEs0shtldrC56E5tOQI5oTRs4RyXRHU
-	 2zkvnh6eg1KMYnPyAs6+3p3rTSy9AsqD/VRw+TEMXlc+oqz4tIiOfkfeaOjp6fL+gd
-	 Q9E045wcHMrww==
+	b=IeIzeJPLkhJmIX8tfvNCyH/kz7dBZEaGv2AH5mRvXEHTKzjG/bGvkl1wrQQSGhHhR
+	 WAlroVk1KIkwQ+Q3j546UO8T09Xwgq/PY6cz6Ni1I+dxI3+5Qm72UOXucjukpc5yFH
+	 i41C1dQwmNLmjnPVXyDRWAY/cNcBJqm7V4Vmdqq8VtznuVDuRQKbNognTdbcoHH/dr
+	 DBEQCkj5UgVY9xr9OQxUF6szyNPMOywEknh4MEaqD+Su+pv3NDwx9F2ZS6Og5GR9aB
+	 analtJheeLW2+JVcuCKBt3GTI318iexloMXaM3CNcDQ9ZU4TbZBVBkGMfOCL0WXWSJ
+	 WJRJmX9ZP13/Q==
 From: Arnd Bergmann <arnd@kernel.org>
 To: linux-kernel@vger.kernel.org,
-	Xiubo Li <xiubli@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Nathan Chancellor <nathan@kernel.org>
 Cc: Arnd Bergmann <arnd@arndb.de>,
-	Jeff Layton <jlayton@kernel.org>,
 	Nick Desaulniers <ndesaulniers@google.com>,
 	Bill Wendling <morbo@google.com>,
 	Justin Stitt <justinstitt@google.com>,
-	Milind Changire <mchangir@redhat.com>,
-	Patrick Donnelly <pdonnell@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	ceph-devel@vger.kernel.org,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	"mfreemon@cloudflare.com" <mfreemon@cloudflare.com>,
+	Yan Zhai <yan@cloudflare.com>,
 	netdev@vger.kernel.org,
 	llvm@lists.linux.dev
-Subject: [PATCH 2/9] libceph: avoid clang out-of-range warning
-Date: Thu, 28 Mar 2024 15:30:40 +0100
-Message-Id: <20240328143051.1069575-3-arnd@kernel.org>
+Subject: [PATCH 5/9] ipv4: tcp_output: avoid warning about NET_ADD_STATS
+Date: Thu, 28 Mar 2024 15:30:43 +0100
+Message-Id: <20240328143051.1069575-6-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240328143051.1069575-1-arnd@kernel.org>
 References: <20240328143051.1069575-1-arnd@kernel.org>
@@ -77,60 +75,52 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-clang-14 points out that on 64-bit architectures, a u32
-is never larger than constant based on SIZE_MAX:
+Clang warns about a range check in percpu_add_op() being impossible
+to hit for an u8 variable:
 
-net/ceph/osdmap.c:1425:10: error: result of comparison of constant 4611686018427387891 with expression of type 'u32' (aka 'unsigned int') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
-        if (len > (SIZE_MAX - sizeof(*pg)) / sizeof(u32))
-            ~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-net/ceph/osdmap.c:1608:10: error: result of comparison of constant 2305843009213693945 with expression of type 'u32' (aka 'unsigned int') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
-        if (len > (SIZE_MAX - sizeof(*pg)) / (2 * sizeof(u32)))
-            ~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+net/ipv4/tcp_output.c:188:3: error: result of comparison of constant -1 with expression of type 'u8' (aka 'unsigned char') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
+                NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPACKCOMPRESSED,
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+include/net/ip.h:291:41: note: expanded from macro 'NET_ADD_STATS'
+ #define NET_ADD_STATS(net, field, adnd) SNMP_ADD_STATS((net)->mib.net_statistics, field, adnd)
+                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+include/net/snmp.h:143:4: note: expanded from macro 'SNMP_ADD_STATS'
+                        this_cpu_add(mib->mibs[field], addend)
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+include/linux/percpu-defs.h:509:33: note: expanded from macro 'this_cpu_add'
+ #define this_cpu_add(pcp, val)          __pcpu_size_call(this_cpu_add_, pcp, val)
+                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+<scratch space>:187:1: note: expanded from here
+this_cpu_add_8
+^
+arch/x86/include/asm/percpu.h:326:35: note: expanded from macro 'this_cpu_add_8'
+ #define this_cpu_add_8(pcp, val)                percpu_add_op(8, volatile, (pcp), val)
+                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arch/x86/include/asm/percpu.h:127:31: note: expanded from macro 'percpu_add_op'
+                              ((val) == 1 || (val) == -1)) ?            \
+                                             ~~~~~ ^  ~~
 
-The code is correct anyway, so just shut up that warning.
+Avoid this warning with a cast to a signed 'int'.
 
-Fixes: 6f428df47dae ("libceph: pg_upmap[_items] infrastructure")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- fs/ceph/snap.c    | 2 +-
- net/ceph/osdmap.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ net/ipv4/tcp_output.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/ceph/snap.c b/fs/ceph/snap.c
-index c65f2b202b2b..521507ea8260 100644
---- a/fs/ceph/snap.c
-+++ b/fs/ceph/snap.c
-@@ -374,7 +374,7 @@ static int build_snap_context(struct ceph_mds_client *mdsc,
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index e3167ad96567..dbe54fceee08 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -183,7 +183,7 @@ static inline void tcp_event_ack_sent(struct sock *sk, u32 rcv_nxt)
  
- 	/* alloc new snap context */
- 	err = -ENOMEM;
--	if (num > (SIZE_MAX - sizeof(*snapc)) / sizeof(u64))
-+	if ((size_t)num > (SIZE_MAX - sizeof(*snapc)) / sizeof(u64))
- 		goto fail;
- 	snapc = ceph_create_snap_context(num, GFP_NOFS);
- 	if (!snapc)
-diff --git a/net/ceph/osdmap.c b/net/ceph/osdmap.c
-index 295098873861..8e7cb2fde6f1 100644
---- a/net/ceph/osdmap.c
-+++ b/net/ceph/osdmap.c
-@@ -1438,7 +1438,7 @@ static struct ceph_pg_mapping *__decode_pg_temp(void **p, void *end,
- 	ceph_decode_32_safe(p, end, len, e_inval);
- 	if (len == 0 && incremental)
- 		return NULL;	/* new_pg_temp: [] to remove */
--	if (len > (SIZE_MAX - sizeof(*pg)) / sizeof(u32))
-+	if ((size_t)len > (SIZE_MAX - sizeof(*pg)) / sizeof(u32))
- 		return ERR_PTR(-EINVAL);
- 
- 	ceph_decode_need(p, end, len * sizeof(u32), e_inval);
-@@ -1621,7 +1621,7 @@ static struct ceph_pg_mapping *__decode_pg_upmap_items(void **p, void *end,
- 	u32 len, i;
- 
- 	ceph_decode_32_safe(p, end, len, e_inval);
--	if (len > (SIZE_MAX - sizeof(*pg)) / (2 * sizeof(u32)))
-+	if ((size_t)len > (SIZE_MAX - sizeof(*pg)) / (2 * sizeof(u32)))
- 		return ERR_PTR(-EINVAL);
- 
- 	ceph_decode_need(p, end, 2 * len * sizeof(u32), e_inval);
+ 	if (unlikely(tp->compressed_ack)) {
+ 		NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPACKCOMPRESSED,
+-			      tp->compressed_ack);
++			      (int)tp->compressed_ack);
+ 		tp->compressed_ack = 0;
+ 		if (hrtimer_try_to_cancel(&tp->compressed_ack_timer) == 1)
+ 			__sock_put(sk);
 -- 
 2.39.2
 
