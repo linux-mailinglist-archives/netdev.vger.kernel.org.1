@@ -1,101 +1,115 @@
-Return-Path: <netdev+bounces-82764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02DA988F9FF
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:27:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25AC388FA16
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DBB31C230FE
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:27:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEA552950C6
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5585548F8;
-	Thu, 28 Mar 2024 08:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011FD51C5F;
+	Thu, 28 Mar 2024 08:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pPEP70On"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MyISy5uL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B366F26AD8
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 08:27:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9F91DFF0;
+	Thu, 28 Mar 2024 08:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711614435; cv=none; b=R+QgCxZ3JU5MYJ23cdHIpt/e52/ujcM/VEmZvyb41pPjLoyBfR7n668JBAc79+9s+lOpITz5dSO/OQap/CQPJhlrFxu55sI0aOZfKTirWHQvbfGtZoTFAZQZvnMQq2Cb7dxVXbBVCfOjSkxGjEA9hdlX95bq9NdAhG8HKq3U9to=
+	t=1711615290; cv=none; b=oamAnyqGyLFcknftsjXNRL6kYvO5C/lmnf0Emf2bnQx9oLO0wTUhye4tnFGOF7nyXLC/cz6SfIBVoEUjUm0CSbkNjcegAp2JJgFnp58EvnNaIwA1G4GJjHOEt2xziNjuWE6rWfPIrx6QN/i5HyHG2lwN+Y6I0FR6Vbq0LMFp5n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711614435; c=relaxed/simple;
-	bh=154NNC38xSFg55WCV2iA+69UZou8k05HbUXMIxiDnu0=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=C2sf+d5RqHLigLj0N+NT5LqDJqfEVKv1Wv196xfRAMPPGIbImc72h1EgPDRMtbogVJ7l/qF4WBTeHl819E7oSY1Fp1uWkRemkENjK/zn9N3inZ+PcenErqJhTx5TmmrZTQvRGpm5AEA0iIMaZzhIGJiP1q8jipUQJcpU4aS/QvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pPEP70On; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711614431; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=154NNC38xSFg55WCV2iA+69UZou8k05HbUXMIxiDnu0=;
-	b=pPEP70OnQKU4dlBqSHUPm6dv74O3YT+7fbtF7MHtqeM+qtCjsrn7nmhGdhW89Lv0cVtbpSPROeD/oOTLyWoABWUEIAEfBqIXX9de3tjFsL56JXvKMGjK4FhjQBfbUtQLaSY5VTIa8Y5KyyZVWb7A7+77tLVLOpK7+QHc8CmaEGE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3SeOCW_1711614430;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3SeOCW_1711614430)
-          by smtp.aliyun-inc.com;
-          Thu, 28 Mar 2024 16:27:10 +0800
-Message-ID: <1711614157.5913072-7-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v6 09/10] virtio_net: set premapped mode by find_vqs()
-Date: Thu, 28 Mar 2024 16:22:37 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <20240327111430.108787-1-xuanzhuo@linux.alibaba.com>
- <20240327111430.108787-10-xuanzhuo@linux.alibaba.com>
- <CACGkMEs=NZGkkA7ye0wY7YcPBPfbKkYq84KCRX1gS0e=bZDX-w@mail.gmail.com>
-In-Reply-To: <CACGkMEs=NZGkkA7ye0wY7YcPBPfbKkYq84KCRX1gS0e=bZDX-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1711615290; c=relaxed/simple;
+	bh=rBCX1vRqRdRkpZvPo4/73GUU8xUHYzwEJQOKnllDrqE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZiD1VVEhQenj+Mbb7pQKfufkf/7JKdzXxd6SYQ4+cNluSuXnrRp5PvOnr+71gZap32FUyjK/bSuPu+gu0r74UdBelUbzLI8zYFJKIr1mXqy/QJQFiG1wCqY/DtCi8y5v7i5YFpbNc8qdUBMTHVkl3t6NwYUfQQj24TJc7JhiP40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MyISy5uL; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-29f8ae4eae5so215924a91.0;
+        Thu, 28 Mar 2024 01:41:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711615289; x=1712220089; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rBCX1vRqRdRkpZvPo4/73GUU8xUHYzwEJQOKnllDrqE=;
+        b=MyISy5uLw8HJY4A+hCrImfZoo5FCYIPM2j9FR1pzmMs7hWlGbPrccXAySAxUjak2Ez
+         F4QR00lwPxbsv7SCWapLABat29Xu4xAKFub6T06wR6xsWzklT21K5mFuhh9Q11eaS/QH
+         B3F5oH28RAZ67nSQAxuTSpYzpcASkHcOBPfB0eTRW9nAkv4fZ00IUcBDSvvsxl3qPL0K
+         9qWO7ITCKp7OSSDQ4UmzXWY1CxJAqflHBe0gPwa6IHoROxcXOFW8Jd6QOnbxil6gWk77
+         SrKaMsQmBA8NauNYrynH+lmE6gECb1dWd5VnOyqPaj1HFfecxbzBuh+HegNmUl3aDGvM
+         9Kaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711615289; x=1712220089;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rBCX1vRqRdRkpZvPo4/73GUU8xUHYzwEJQOKnllDrqE=;
+        b=sfG7DmzaP8TksNonoDXo6e1CnnwP8JEoyMkzYrbXPip/JPRpxodDCypHMXZew5ldM0
+         tqqYV7OwGLEcGPLQzDmZiucGQ8IXDGwlCi5+RlY7lzvTKd6soA6T7xnZd3Dl6gH2csxE
+         qDCabXXjDXadn+zPDaQfjyAnTxhWMlc91CySycBA0vAWGdEtHuf62KpLE8/k3Qn2Elfm
+         MHtSwRJiSW0JQv9Q4CdVnMLkSEOo5LCrZVK+G9vcpM/e+ws3JiDVbUB8vthSLKMnMJB9
+         PLM2u4x0cBlKjAacGWTWYgemo87jcIDmdTWZRyY7AtEWTrt5Bp/XROOw8I33HtBVJ7h6
+         ZydA==
+X-Forwarded-Encrypted: i=1; AJvYcCXRVRwMJ9M8Amv+7HI9ZexA08p/3LCfkrNPJJJHj/G2kOf6T1yOYNhy7RoE0g2o1xRGmivvwK/0snlnTavlQCPLgxAL2/xa
+X-Gm-Message-State: AOJu0YyBVJsVP7lNS0ENntIZ78QatCvWFmT7QWmpjxC+zf8vmctSWP+2
+	ZmDa0zDNHbg1Mp6j3bsrZW02+jUkYlUdb73IzK9pj0Z9VjNOpPEetFm6JefFslQt63VQLM/QQWY
+	FfTY1q3eBqIMu9DuW90+hiISytu8=
+X-Google-Smtp-Source: AGHT+IEzK/9g9IdxJdcAP2qh59eRR1xQ5H5ze1+sejBoHye3/TS+rL0aqbv6ZfFGSWK7ZVfRNXrAGek4KwBcAn5viDo=
+X-Received: by 2002:a17:90b:3794:b0:2a0:65f:dc50 with SMTP id
+ mz20-20020a17090b379400b002a0065fdc50mr1911117pjb.3.1711615288747; Thu, 28
+ Mar 2024 01:41:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240311122401.6549-1-lizheng043@gmail.com> <20240311135117.GA1244788@maili.marvell.com>
+ <CAPCnf4zS=FN0MHM2tQV0b468zN0yqRHbaNMsk3cDQ7Vu8wiHKA@mail.gmail.com>
+ <MWHPR1801MB19185089A3147123D1E877D0D32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+ <CAPCnf4z0gp47TkxP+PFw3bd_Weh7=jn9Q2t-z6QB654Ckc36Pg@mail.gmail.com> <MWHPR1801MB1918BF213DD974CB5A6CF032D3312@MWHPR1801MB1918.namprd18.prod.outlook.com>
+In-Reply-To: <MWHPR1801MB1918BF213DD974CB5A6CF032D3312@MWHPR1801MB1918.namprd18.prod.outlook.com>
+From: James Lee <lizheng043@gmail.com>
+Date: Thu, 28 Mar 2024 16:41:16 +0800
+Message-ID: <CAPCnf4ysy032UZbHjtymkPHcJUOXef6ZUX13+L4yEC=eEYzLEQ@mail.gmail.com>
+Subject: Re: [EXTERNAL] Re: [PATCH] neighbour: guarantee the localhost
+ connections be established successfully even the ARP table is full
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "nhorman@tuxdriver.com" <nhorman@tuxdriver.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "jmorris@namei.org" <jmorris@namei.org>, 
+	"James.Z.Li@dell.com" <James.Z.Li@dell.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 28 Mar 2024 16:05:02 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Wed, Mar 27, 2024 at 7:14=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > Now, the virtio core can set the premapped mode by find_vqs().
-> > If the premapped can be enabled, the dma array will not be
-> > allocated. So virtio-net use the api of find_vqs to enable the
-> > premapped.
-> >
-> > Judge the premapped mode by the vq->premapped instead of saving
-> > local variable.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
+It's not an issue, why need "post a new patch version"?
+
+Ratheesh Kannoth <rkannoth@marvell.com> =E4=BA=8E2024=E5=B9=B43=E6=9C=8822=
+=E6=97=A5=E5=91=A8=E4=BA=94 11:37=E5=86=99=E9=81=93=EF=BC=9A
 >
-> I wonder what's the reason to keep a fallback when premapped is not enabl=
-ed?
-
-Rethink this.
-
-I think you are right. We can remove the fallback.
-
-Because we have the virtio dma apis that wrap all the cases.
-So I will remove the fallback from the virtio-net in next version.
-
-But we still need to export the premapped to the drivers.
-Because we can enable the AF_XDP only when premapped is true.
-
-Thanks
-
-
->
-> Thanks
->
+> > From: James Lee <lizheng043@gmail.com>
+> > Sent: Tuesday, March 19, 2024 3:13 PM
+> > To: Ratheesh Kannoth <rkannoth@marvell.com>
+> > Cc: linux-kernel@vger.kernel.org; netdev@vger.kernel.org;
+> > nhorman@tuxdriver.com; davem@davemloft.net; jmorris@namei.org;
+> > James.Z.Li@dell.com
+> > Subject: Re: [EXTERNAL] Re: [PATCH] neighbour: guarantee the localhost
+> > connections be established successfully even the ARP table is full
+> >
+> > It's not an issue, the loopback device can only be created by kernel it=
+self,
+> > loopback neigh entry also can only be created by kernel, one loopback n=
+eigh
+> > for ipv4 ,one for ipv6, impossible that the num of loopback neigh entri=
+es
+> > exceeds 2.
+> ACK. I still feel like a hack. Please post a new patch version. Let maint=
+ainers take a call.
 
