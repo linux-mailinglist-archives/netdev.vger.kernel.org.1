@@ -1,158 +1,120 @@
-Return-Path: <netdev+bounces-83048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49DA289085B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 19:32:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7172189088E
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 19:49:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5D64B21F2D
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:32:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 073F1292815
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF7A136E28;
-	Thu, 28 Mar 2024 18:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A087E115;
+	Thu, 28 Mar 2024 18:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQ+Ol01e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pUXYyF4L"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A3C1327F8;
-	Thu, 28 Mar 2024 18:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4EA374F1;
+	Thu, 28 Mar 2024 18:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711650709; cv=none; b=SMfPpC/Ltxe6Y8bC5SBajqJZrUZLWeDjd2q2tPn0YmZY9VqROns4nCSEjN28OGtBPUoFVC6vNDa/1JN0QcGmhBt6aACp2g2UpXJYEOUrvYNlyQdao53zf+y/wfrcMLfoc7GQcKGxMhctD+J7/mfxBTufds1UkseUkYlu5fDxnxY=
+	t=1711651745; cv=none; b=JyUWyhYx73ZLJgAR3WlQID6m8OUv0KYsiVqTe4/AnfYF0mn6sNUJOUFHDXo8kEVLyhLKSRRSGEraKZ90t7SfYvRRm/zwbbMZXf8+Cezp1olACHa0gvx13VgCet6IkVZHW9WlEtDGI8JwmXi7DIA1oEbaU8Xy3lNb42LJi48smyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711650709; c=relaxed/simple;
-	bh=09Kq07Ctu1YK6YAopY47/y5AlbJwjHjNBMXfeYxKY3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mc+bmHU7JCh9T2qz/jKyKISblvHUMRyjYOEKwefhMp+SpBo+KEZunCDaUOfyxVqaH2nRtbEFzsaXfY7St2PHPArtNQ18jv3kbP8sMNYjt2B8WRyDhc54G3/LIVhXybYiD9uu0NBwwzc92ifzdPX4yIYM9RzRZUURIOKxpkoXwjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQ+Ol01e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9561C433C7;
-	Thu, 28 Mar 2024 18:31:47 +0000 (UTC)
+	s=arc-20240116; t=1711651745; c=relaxed/simple;
+	bh=99VsYl9LLb/Fgf4qp6tFM6y8MYoeu/u9qF5KbrJouGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X4pmxSnXiE0/+kzMxgSH+c8B2ycADEmRKhkBvY0iLGJwWzWXPoaiSx1tGEWIOss5QZQAVXqq6pcqhKIdGLwVCUA2+BZLIBlAhUMyNG5/uOftSjo3RuLnrlp2KeeE/JM3QK1WE4k5ATWsJpxrJl+gN+5ZwEcvavB36Gnkai3VU0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pUXYyF4L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D10C433F1;
+	Thu, 28 Mar 2024 18:49:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711650709;
-	bh=09Kq07Ctu1YK6YAopY47/y5AlbJwjHjNBMXfeYxKY3s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QQ+Ol01eGrtbmmXmm5UOF8z3YVrAFzrLyUinoyXQOw2oD/3BtgXxtRpcyL6qEGHMi
-	 Fuf1dGmu1+mXVCx0A2v+QG1OZmZa5GwKeTprSp0vXiGl5WvN4w7glf0wb/Ho4jGsI6
-	 A7WhuNfxRZ+SYEDd2EHDavctgY396ec7mZY6h+UmOVbwQhncgmm56Grgtq512eTU0I
-	 juRVEJtAyO8mA2/2SAJmqgsMiWvU8lqDqaMAEVDmDUSGgn+tYLJ7mum23hafaIgM0S
-	 0/cB+mlWradcKD4+nkGPqD1rFiy3Q7s73Qm1b4qRq5IHy2lK358t2WVn9s4EqNJkuF
-	 qXaWYWlrz6OoQ==
-Date: Fri, 29 Mar 2024 00:01:43 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Allen Pais <apais@linux.microsoft.com>, linux-kernel@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>, Kees Cook <keescook@chromium.org>,
-	Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-	Paul Cercueil <paul@crapouillou.net>, Eugeniy.Paltsev@synopsys.com,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Viresh Kumar <vireshk@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Leo Li <leoyang.li@nxp.com>, zw@zh-kernel.org,
-	Zhou Wang <wangzhou1@hisilicon.com>, haijie1@huawei.com,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	logang@deltatee.com, Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Patrice Chotard <patrice.chotard@foss.st.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>, peter.ujfalusi@gmail.com,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Jassi Brar <jassisinghbrar@gmail.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	maintainers@bluecherrydvr.com, aubin.constans@microchip.com,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Manuel Lauss <manuel.lauss@gmail.com>,
-	=?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-	"jh80.chung" <jh80.chung@samsung.com>, oakad@yahoo.com,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>, brucechang@via.com.tw,
-	HaraldWelte@viatech.com, pierre@ossman.eu, duncan.sands@free.fr,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Oliver Neukum <oneukum@suse.com>,
-	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-mediatek@lists.infradead.org,
-	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-	"linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>,
-	Linux-OMAP <linux-omap@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-	linux-s390@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH 2/9] dma: Convert from tasklet to BH workqueue
-Message-ID: <ZgW3j1qkLA-QU4iM@matsya>
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-3-apais@linux.microsoft.com>
- <ZgUGXTKPVhrA1tam@matsya>
- <2e9257af-c123-406b-a189-eaebeecc1d71@app.fastmail.com>
+	s=k20201202; t=1711651745;
+	bh=99VsYl9LLb/Fgf4qp6tFM6y8MYoeu/u9qF5KbrJouGE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pUXYyF4LKffpWAHKSOSBBDM9VU4bzm9YdG/yU93M5ND28v79HezOyMi8jsUvGwCQU
+	 FSb7X3GsU1qpKUf92xWygjKSCVFJH1KCnIPHddz6n29IMJQjlh5iQFoJdoAHvgNd0F
+	 ZbQ8bVGZPN7+lAd631fadKn/2vb4H2JWCuYRAUwPEW375WyeO9F7ezdqYSsAK2Zc2u
+	 Ab/IJ1F8JG8u1ToVTX6xs3vnYIBCh12Fw++nRegRO1lEHcJQOUZUOlNa+k+uU8HicV
+	 avyCGlvU8KfrjVuZD0pD/zFTfb6CULhfln/ABODz7VAniRT6sp02fqqG6CqtQ/2nVl
+	 n9B0ItU6Q8vfQ==
+Date: Thu, 28 Mar 2024 11:49:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Karthikeyan Periyasamy <quic_periyasa@quicinc.com>,
+ ath12k@lists.infradead.org, linux-wireless@vger.kernel.org, Vasanthakumar
+ Thiagarajan  <quic_vthiagar@quicinc.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 02/13] wifi: nl80211: send underlying multi-hardware
+ channel capabilities to user space
+Message-ID: <20240328114903.1d0c8af9@kernel.org>
+In-Reply-To: <9d0f309da45ae657cd2ce0bc11a93d66e856ef64.camel@sipsolutions.net>
+References: <20240328072916.1164195-1-quic_periyasa@quicinc.com>
+	<20240328072916.1164195-3-quic_periyasa@quicinc.com>
+	<6d92d0ba4a8764cd91cc20c4bd35613bcc41dfcd.camel@sipsolutions.net>
+	<9d5c2f9f-19b5-af4d-8018-1eb97fac10d6@quicinc.com>
+	<9d0f309da45ae657cd2ce0bc11a93d66e856ef64.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2e9257af-c123-406b-a189-eaebeecc1d71@app.fastmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 28-03-24, 11:08, Arnd Bergmann wrote:
-> On Thu, Mar 28, 2024, at 06:55, Vinod Koul wrote:
-> > On 27-03-24, 16:03, Allen Pais wrote:
-> >> The only generic interface to execute asynchronously in the BH context is
-> >> tasklet; however, it's marked deprecated and has some design flaws. To
-> >> replace tasklets, BH workqueue support was recently added. A BH workqueue
-> >> behaves similarly to regular workqueues except that the queued work items
-> >> are executed in the BH context.
-> >
-> > Thanks for conversion, am happy with BH alternative as it helps in
-> > dmaengine where we need shortest possible time between tasklet and
-> > interrupt handling to maximize dma performance
+On Thu, 28 Mar 2024 13:01:55 +0100 Johannes Berg wrote:
+> If we do that, including NL80211_MULTI_HW_ATTR_IDX for illustrative
+> purposes though I think it should be removed, we'd end up with:
 > 
-> I still feel that we want something different for dmaengine,
-> at least in the long run. As we have discussed in the past,
-> the tasklet context in these drivers is what the callbacks
-> from the dma client device is run in, and a lot of these probably
-> want something other than tasklet context, e.g. just call
-> complete() on a client-provided completion structure.
+> NL80211_ATTR_MULTI_HW
+>  - NL80211_MULTI_HW_ATTR_IDX: 0
+>  - NL80211_MULTI_HW_ATTR_FREQ: 2412
+>  - NL80211_MULTI_HW_ATTR_FREQ: 2417
+>  ...
+> NL80211_ATTR_MULTI_HW
+>  - NL80211_MULTI_HW_ATTR_IDX: 1
+>  - NL80211_MULTI_HW_ATTR_FREQ: 5180
+>  - NL80211_MULTI_HW_ATTR_FREQ: 5200
+>  ...
 > 
-> Instead of open-coding the use of the system_bh_wq in each
-> dmaengine, how about we start with a custom WQ_BH
-> specifically for the dmaengine subsystem and wrap them
-> inside of another interface.
+> which _is_ a lot more compact, and removes all the uninteresting mid-
+> level indexing.
 > 
-> Since almost every driver associates the tasklet with the
-> dma_chan, we could go one step further and add the
-> work_queue structure directly into struct dma_chan,
-> with the wrapper operating on the dma_chan rather than
-> the work_queue.
+> So in that sense, I prefer that, but I'm truly not sure how the (hand-
+> written) userspace code would deal with that.
 
-I think that is very great idea. having this wrapped in dma_chan would
-be very good way as well
+I think the best way today would be two walks:
 
-Am not sure if Allen is up for it :-)
+	for_each_attr() {
+		switch (type):
+		case THE_A_ARRAY_1:
+			cnt1++;
+			break;
+		case THE_A_ARRAY_2:
+			cnt2++;
+			break;
+	}
 
--- 
-~Vinod
+	if (cnt1)
+		array_1 = calloc();
+	cnt1 = 0; /* we'll use it as index in second loop */
+	if (cnt2)
+		array_2 = calloc();
+	cnt2 = 0;
+
+	for_each_attr() {
+		/* [ normal parsing, populating array_1[cnt1++] etc. ] */
+	}
+
+Compared to "indexed array" the only practical difference I think is
+the fact that all attrs are walked. I think you have to count them
+either way before parsing.
+
+I was wondering at some point whether we should require that all
+multi-attr attributes are grouped together. Or add an explicit "count"
+attribute. But couldn't convince myself that such extra rules will
+pay off sufficiently with perf and/or ease of use...
 
