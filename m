@@ -1,387 +1,155 @@
-Return-Path: <netdev+bounces-82904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 637C989022B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:44:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EFB6890232
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:46:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 172BA290541
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:44:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A04991C2DD68
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0991E12BEA5;
-	Thu, 28 Mar 2024 14:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A244212BEAA;
+	Thu, 28 Mar 2024 14:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fffhrml+"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="jAu4ww4X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEADB4E1C9
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92BF80BF8;
+	Thu, 28 Mar 2024 14:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711637073; cv=none; b=HUxEnybNcXz1MspW6IoeAoymbaplx1A7OqfR9kNfabz67sbfZMC+IrmaCD4/nXoGKHjHkRE843o16+spZRaN5FYQ0jD6JPi6QokBbzh79kC5wP8eAPuBLO35/OCtZWDkNCar1E2Vx0ZZ99MyJY6DHDHQeAIB5GmQcoEiRV9Udio=
+	t=1711637176; cv=none; b=j88oyVUhwpdX7W55qnHRn1MKDn1MyLCiJeue/M213l0w76C6b58jfO3RP+S5iGXJuE2nvS1Yxa0ncC3aHIxnkm/k/6mL+sG7JUcD9Zjn5RlzLkAvPuqn+b1Xk7H3TcDZk8gxVuP1VtlSw43fwwTNO4hMJFLFPreMmvPj3ua+peY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711637073; c=relaxed/simple;
-	bh=LEprU2jPM8ksUYabsyoi8PYiiIPWjhL+SWahKNMHrBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QWawIHU2ogoqDIx94Lcn9OgK7sjSsizxPfM6gTgXxOGTGPlq6HSaeoMoep8Q8EgDjbQwAl+/UqHBXhPH5RvHdzw5PoKtt73N445n/35FdUqBltP5/6WTAd429Fyf288ANi5kDuQtJhXVW8GvsDdl4THxV9sJZQiniKBq+1KoqrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fffhrml+; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso1057150a12.3
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:44:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1711637069; x=1712241869; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=r7ylXFiKHIksB42ti3MSS3aIQj+rujgRhh3qImPjKuE=;
-        b=fffhrml+/HzI3725AnaT94MdwmCUGhOAm/impBNA29jGlDrWmdHvv+az0FK0TWEjWd
-         HZ3pepNj1lcFdh3f4O5Yzuq6A6NoxWCKX1YZzNPOlykrSHwjsGXdUKIhlcmGZWgLiJ2Q
-         4cQXInVRBKJann6JXJgSFr3z5fJ1/bYSR19+jPgNNqvDbqe3GOjB0Ui8ir9ffuyuSBP0
-         GVDQXWoHBcZqY3jPFtGFzWpHAdnb5RIgV+9tghrRjSTgpg+3ePLaN8mqyvU//+edTogK
-         rxXkPaFhKrOJLVhDsbzfl0dJTr0sfgP/cGBV1uS4BXn29B9QTL1nrRfx1WUk8fSjxki5
-         vheA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711637069; x=1712241869;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r7ylXFiKHIksB42ti3MSS3aIQj+rujgRhh3qImPjKuE=;
-        b=fqmAnry/7TCcyE8wkLd39olYwDIqEWWdRNiAO3wRF8PhCjRols2+ShE+o0fP7KzVEI
-         GN3pFawFO9YULvYI+D3/s20seD3jY1Fz5tZ9UNXY/UySbwqcj9bURD14hMU4WF89FFS9
-         mqGA5RhM4WMYhXUdUqQ30aY7Au3kQ9kUMgqknVfyhpc+tXRha7tREnm8crxxFY9xUDsN
-         4OWdqJxAomqwK1iSj47WdjGaLH1nYhXKHaWQ0D21ahOAwtjqhxeTNqX/cpEWG7IDfTkx
-         8fCGCnQZj/7lgNMA4XLpp/GAC3blkCFeTTqIeDTcCCRO0SfQZX4OalF0P6K+9ULs1A/t
-         +dXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUf2cZ+SClD2KRDQE0X6zVUxZxHuyKBTsOYXBrLaJgsVwre54y8LgTgEwIRRmQQUzAE2UsLzko/nmtUHXZbdpK8dQXN3+nl
-X-Gm-Message-State: AOJu0YxU0EzDDZ7mSc56J4hLx+HaoeCaQoxNYNVZIkqXWrDo6ArdPJj8
-	S2A1blRm6trLa2osUYP5WEPi3FdINkaZ8FIw4UbWtbkK/snxAQ66KaipAgVf5CYxtN5vYj9CbXw
-	V
-X-Google-Smtp-Source: AGHT+IGuD1iTcuof/WR3530eNCYMuUTYORbLADr99qWkpkrQjIRYslbg6z+8tarJA+KHntZeNlt4Og==
-X-Received: by 2002:a50:cc89:0:b0:56b:863c:2c92 with SMTP id q9-20020a50cc89000000b0056b863c2c92mr2715627edi.34.1711637069221;
-        Thu, 28 Mar 2024 07:44:29 -0700 (PDT)
-Received: from alley ([176.114.240.50])
-        by smtp.gmail.com with ESMTPSA id l13-20020a056402028d00b0056bfa6ad5eesm892876edv.91.2024.03.28.07.44.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 07:44:28 -0700 (PDT)
-Date: Thu, 28 Mar 2024 15:44:27 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Paul Moore <paul@paul-moore.com>
-Cc: syzbot <syzbot+81f5ca46b043d4a1b789@syzkaller.appspotmail.com>,
-	andrii@kernel.org, ast@kernel.org, audit@vger.kernel.org,
-	bpf@vger.kernel.org, daniel@iogearbox.net, eparis@redhat.com,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	john.ogness@linutronix.de,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [syzbot] [audit?] [bpf?] INFO: rcu detected stall in
- kauditd_thread (4)
-Message-ID: <ZgVvN5DmLLMaAg_S@alley>
-References: <000000000000d929dd0614a8ba8c@google.com>
- <CAHC9VhTWk8j2OnnH+307UzH+A4tLAmcyw7xde3KboZJ0JE2hzw@mail.gmail.com>
+	s=arc-20240116; t=1711637176; c=relaxed/simple;
+	bh=p2J07VNUHUPvh5qAwaad4eJ9jVb4amixahDlgymiSlA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fVM4vu9ZaoMj/6ZPonhL4XhS7RWdo7AKLnzan7I/tno4uk45afgGVK1l/uKIrV9SEwBuzvG7qzJuLvsWihKqmmSbu99ahbcCDKi8PWn68VM1SGxAN8wTU6h7hnLf2Uu4Dky0UMNkry6G56swgRkgOFk4+s0sooVmDk7yqXIpHsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=jAu4ww4X; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C15E460005;
+	Thu, 28 Mar 2024 14:46:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1711637172;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yvXc/6fB/STKMVpjx0LeFmiE8/rH1mB7ohtX7hXt9io=;
+	b=jAu4ww4X3VxvcLdS3J00rkjW+Rwb2tH+izGCSUraHF5ssrjAwsT4npqWOf4+ih8U9oUZbP
+	h3+iooEUdjyMVVH4Wx55xhtsOzafmrK/ZkwcO+drbk1tyFwDztVsZg/kp/IsF4oMEqH8ul
+	U/I1akDNZo3t6twvO5EN+uaOrz5LtY/wXOHQriJcNxN4pKqBqbJ8nrdQn6Om0S5OiCODOt
+	fSdB/V8CL+nSomrlHtFqpl3vdR2SwftbkBkPHjWlsgqXdOiwCdO4vrFkyi13xEeChmtujw
+	B8jP565rNI5qmBmgWaW7EGprWyddbAvrsSbmpiLSh6bPAQ/8avXtYDwin9uPXw==
+Message-ID: <515ca95e-7f7a-4eb7-9431-a297301ca55d@arinc9.com>
+Date: Thu, 28 Mar 2024 17:46:03 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] net: dsa: mt7530: fix disabling EEE on failure
+ on MT7531 and MT7988
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
+ DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240321-for-net-mt7530-fix-eee-for-mt7531-mt7988-v2-0-9af9d5041bfe@arinc9.com>
+ <20240321-for-net-mt7530-fix-eee-for-mt7531-mt7988-v2-2-9af9d5041bfe@arinc9.com>
+ <799572b672ea8b4756236b14068aef7c8fa726a6.camel@redhat.com>
+ <d65f4c45-e616-4157-a769-c285cbad575c@arinc9.com>
+ <530da7c1-c058-44ef-84fd-86ff58f1501b@arinc9.com>
+ <ZgRCFZBFvNSZ1a2U@shell.armlinux.org.uk>
+ <ZgRCZSBniraUCuT2@shell.armlinux.org.uk>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <ZgRCZSBniraUCuT2@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHC9VhTWk8j2OnnH+307UzH+A4tLAmcyw7xde3KboZJ0JE2hzw@mail.gmail.com>
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Wed 2024-03-27 15:16:25, Paul Moore wrote:
-> On Wed, Mar 27, 2024 at 2:39 PM syzbot
-> <syzbot+81f5ca46b043d4a1b789@syzkaller.appspotmail.com> wrote:
-> >
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=121a9e21180000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=aef2a55903e5791c
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=81f5ca46b043d4a1b789
-> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12104f9e180000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=112840ee180000
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/089e25869df5/disk-fe46a7dd.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/423b1787914f/vmlinux-fe46a7dd.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/4c043e30c07d/bzImage-fe46a7dd.xz
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+81f5ca46b043d4a1b789@syzkaller.appspotmail.com
+On 27.03.2024 18:59, Russell King (Oracle) wrote:
+> On Wed, Mar 27, 2024 at 03:58:13PM +0000, Russell King (Oracle) wrote:
+>> On Wed, Mar 27, 2024 at 11:46:19AM +0300, arinc.unal@arinc9.com wrote:
+>>> On 26.03.2024 12:19, Arınç ÜNAL wrote:
+>>>> Whether a problem would happen in practice depends on when
+>>>> phy_init_eee()
+>>>> fails, meaning it returns a negative non-zero code. I requested Russell
+>>>> to
+>>>> review this patch to shed light on when phy_init_eee() would return a
+>>>> negative non-zero code so we have an idea whether this patch actually
+>>>> fixes
+>>>> a problem.
+>>>
+>>> I don't suppose Russell is going to review the patch at this point. I will
+>>> submit this to net-next then. If someone actually reports a problem in
+>>> practice, I can always submit it to the stable trees.
+>>
+>> So the fact that I only saw your request this morning to look at
+>> phy_init_eee(), and to review this patch... because... I work for
+>> Oracle, and I've been looking at backporting Arm64 KVM patches to
+>> our kernel, been testing and debugging that effort... and the
+>> act that less than 24 hours had passed since you made the original
+>> request... yea, sorry, it's clearly my fault for not jumping on this
+>> the moment you sent the email.
+>>
+>> I get _so_ much email that incorrectly has me in the To: header. I
+>> also get _so_ much email that fails to list me in the To: header
+>> when the author wants me to respond. I don't have time to read every
+>> email as it comes in. I certainly don't have time to read every
+>> email in any case. I do the best I can, which varies considerably
+>> with my workload.
+>>
+>> I already find that being single, fitting everything in during the
+>> day (paid work, chores, feeding oneself) is quite a mammoth task.
+>> There is no one else to do the laundry. There is no one else to get
+>> the shopping. There is no one else to do the washing up. There is no
+>> one else to take the rubbish out. All this I do myself, and serially
+>> because there is only one of me, and it all takes time away from
+>> sitting here reading every damn email as it comes in.
+>>
+>> And then when I end up doing something that _you_ very well could do
+>> (reading the phy_init_eee() code to find out when it might return a
+>> negative number) and then you send an email like this... yea... that
+>> really gets my goat.
+
+I've made the request on 21th of March. It must've been buried under the
+other emails that are incorrectly sent to you as you've described. Of
+course you're not in fault for not responding. I trust your expertise on
+the topic so I requested your comment. You're not entitled to do that,
+which is why, after waiting for about 6 days, I assumed that you're not
+interested in looking at this patch, so I responded with the intention to
+move on.
+
+https://lore.kernel.org/netdev/dc487e20-7d6c-48b7-a590-cb3bd815cd21@arinc9.com/
+
 > 
-> This doesn't look to be audit related, but I do see something that may
-> be related in the printk code which was just merged into Linus' tree:
-> 
->   commit 8076972468584d4a21dab9aa50e388b3ea9ad8c7
->   Author: John Ogness <john.ogness@linutronix.de>
->   Date:   Mon Feb 26 13:07:24 2024 +0106
-> 
->    printk: Update @console_may_schedule in console_trylock_spinning()
-> 
->    console_trylock_spinning() may takeover the console lock from a
->    schedulable context. Update @console_may_schedule to make sure it
->    reflects a trylock acquire.
+> ... and now I have a 1:1 with my manager for the next 30-60 minutes.
+> Is it okay by you for me to be offline for that period of time while
+> I have a chat with him?
 
-This change should not introduce any new solflockup. By other words,
-if we see a softlockup with this patch then it was possible even before.
+That sounds exhausting. I wish things get easier for you.
 
-conosle_trylock_spinning() does two things:
-
-  1. It call console_trylock(). On success, it has always cleared
-     @console_may_schedule.
-
-  2. As a fallback, it tries to take over the cosnole_lock() from
-     the current owner. On success, it should clear
-     @console_may_schedule like the plain console_trylock().
-
-     This code path has an effect only when another CPU is just
-     emitting messages on the console (calling con->write()).
-     It might happen only when there is a flood of messages.
-
-The bug was that conosle_trylock_spinning() did not clear
-@console_may_schedule in the fallback path.
-
-Note that conosle_trylock_spinning() must always clear
-@console_may_schedule. It is used only in printk() which might
-be called in atomic context.
-
-
-> > rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> > rcu:    1-...!: (1 ticks this GP) idle=9bf4/1/0x4000000000000000 softirq=6591/6591 fqs=5
-> > rcu:    (detected by 0, t=10502 jiffies, g=7873, q=65 ncpus=2)
-> > Sending NMI from CPU 0 to CPUs 1:
-> > NMI backtrace for cpu 1
-> > CPU: 1 PID: 28 Comm: kauditd Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-> > RIP: 0010:write_comp_data+0x0/0x90 kernel/kcov.c:230
-> > Code: 48 8b 05 13 e2 76 7e 48 8b 80 08 16 00 00 c3 cc cc cc cc 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 <49> 89 d2 49 89 f8 49 89 f1 65 48 8b 15 df e1 76 7e 65 8b 05 e0 e1
-> > RSP: 0018:ffffc90000a08d78 EFLAGS: 00000046
-> > RAX: 0000000000000001 RBX: 0000000000000001 RCX: ffffffff88e73a44
-> > RDX: 0000000000000001 RSI: 0000000000000000 RDI: 0000000000000005
-> > RBP: 000000000003d3cc R08: 0000000000000005 R09: 0000000000000000
-> > R10: 0000000000000001 R11: 0000000000000002 R12: ffff8880b952cac0
-> > R13: ffff88802abeb340 R14: ffff88802abeb340 R15: ffffffff88e73220
-> > FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000555582f0dca8 CR3: 000000002bcea000 CR4: 00000000003506f0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > Call Trace:
-> >  <NMI>
-> >  </NMI>
-> >  <IRQ>
-> >  advance_sched+0x824/0xc60 net/sched/sch_taprio.c:925
-> >  __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
-> >  __hrtimer_run_queues+0x20c/0xc20 kernel/time/hrtimer.c:1756
-> >  hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1818
-> >  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-> >  __sysvec_apic_timer_interrupt+0x10f/0x410 arch/x86/kernel/apic/apic.c:1049
-> >  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-> >  sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1043
-
-I wonder what this timer does and if it might get stuck and cause
-the lockup.
-
-> >  </IRQ>
-> >  <TASK>
-> >  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-> > RIP: 0010:console_flush_all+0xa19/0xd70 kernel/printk/printk.c:2979
-> > Code: e8 9c dd 25 00 9c 5b 81 e3 00 02 00 00 31 ff 48 89 de e8 0a c9 1e 00 48 85 db 0f 85 8b 01 00 00 e8 ec cd 1e 00 fb 48 8b 04 24 <4c> 89 fa 83 e2 07 0f b6 00 38 d0 7f 08 84 c0 0f 85 a9 02 00 00 41
-> > RSP: 0018:ffffc90000a47a98 EFLAGS: 00000293
-> > RAX: fffff52000148f7a RBX: 0000000000000000 RCX: ffffffff816e2ab6
-> > RDX: ffff888018ee9e00 RSI: ffffffff816e2ac4 RDI: 0000000000000007
-> > RBP: dffffc0000000000 R08: 0000000000000007 R09: 0000000000000000
-> > R10: 0000000000000000 R11: 0000000000000003 R12: 0000000000000200
-> > R13: ffffffff8e3995f8 R14: ffffffff8e3995a0 R15: ffffc90000a47bd0
-> >  console_unlock+0xae/0x290 kernel/printk/printk.c:3042
-> >  vprintk_emit kernel/printk/printk.c:2342 [inline]
-> >  vprintk_emit+0x11a/0x5a0 kernel/printk/printk.c:2297
-> >  vprintk+0x7f/0xa0 kernel/printk/printk_safe.c:45
-> >  _printk+0xc8/0x100 kernel/printk/printk.c:2367
-> >  kauditd_printk_skb kernel/audit.c:546 [inline]
-> >  kauditd_hold_skb+0x1fb/0x240 kernel/audit.c:581
-> >  kauditd_send_queue+0x236/0x290 kernel/audit.c:766
-> >  kauditd_thread+0x61e/0xa80 kernel/audit.c:890
-> >  kthread+0x2c1/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> >  </TASK>
-> > INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 2.415 msecs
-> > rcu: rcu_preempt kthread starved for 10491 jiffies! g7873 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-> > rcu:    Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-> > rcu: RCU grace-period kthread stack dump:
-> > task:rcu_preempt     state:R  running task     stack:28304 pid:16    tgid:16    ppid:2      flags:0x00004000
-> > Call Trace:
-> >  <TASK>
-> >  context_switch kernel/sched/core.c:5409 [inline]
-> >  __schedule+0xf15/0x5c70 kernel/sched/core.c:6736
-> >  __schedule_loop kernel/sched/core.c:6813 [inline]
-> >  schedule+0xe7/0x350 kernel/sched/core.c:6828
-> >  schedule_timeout+0x136/0x2a0 kernel/time/timer.c:2572
-> >  rcu_gp_fqs_loop+0x1eb/0xb00 kernel/rcu/tree.c:1663
-> >  rcu_gp_kthread+0x271/0x380 kernel/rcu/tree.c:1862
-> >  kthread+0x2c1/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> >  </TASK>
-> > rcu: Stack dump where RCU GP kthread last ran:
-> > CPU: 0 PID: 43 Comm: kworker/u8:3 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-> > Workqueue: events_unbound toggle_allocation_gate
-> > RIP: 0010:csd_lock_wait kernel/smp.c:311 [inline]
-> > RIP: 0010:smp_call_function_many_cond+0x4e7/0x1590 kernel/smp.c:855
-> > Code: 0c 00 85 ed 74 4d 48 b8 00 00 00 00 00 fc ff df 4d 89 f4 4c 89 f5 49 c1 ec 03 83 e5 07 49 01 c4 83 c5 03 e8 4b 05 0c 00 f3 90 <41> 0f b6 04 24 40 38 c5 7c 08 84 c0 0f 85 5d 0e 00 00 8b 43 08 31
-> > RSP: 0018:ffffc90000b37910 EFLAGS: 00000293
-> > RAX: 0000000000000000 RBX: ffff8880b9544380 RCX: ffffffff8180f38b
-> > RDX: ffff8880192f0000 RSI: ffffffff8180f365 RDI: 0000000000000005
-> > RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
-> > R10: 0000000000000001 R11: 0000000000000006 R12: ffffed10172a8871
-> > R13: 0000000000000001 R14: ffff8880b9544388 R15: ffff8880b943f840
-> > FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 000055e176bb4000 CR3: 000000000d57a000 CR4: 00000000003506f0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > Call Trace:
-> >  <IRQ>
-> >  </IRQ>
-> >  <TASK>
-> >  on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1023
-> >  on_each_cpu include/linux/smp.h:71 [inline]
-> >  text_poke_sync arch/x86/kernel/alternative.c:2086 [inline]
-
-I guess that this wants to run something on each CPU before
-it continues. It would block this CPU when the other CPU gets stuck.
-
-> >  text_poke_bp_batch+0x22b/0x760 arch/x86/kernel/alternative.c:2296
-> >  text_poke_flush arch/x86/kernel/alternative.c:2487 [inline]
-> >  text_poke_flush arch/x86/kernel/alternative.c:2484 [inline]
-> >  text_poke_finish+0x30/0x40 arch/x86/kernel/alternative.c:2494
-> >  arch_jump_label_transform_apply+0x1c/0x30 arch/x86/kernel/jump_label.c:146
-> >  jump_label_update+0x1d7/0x400 kernel/jump_label.c:829
-> >  static_key_enable_cpuslocked+0x1b7/0x270 kernel/jump_label.c:205
-> >  static_key_enable+0x1a/0x20 kernel/jump_label.c:218
-> >  toggle_allocation_gate mm/kfence/core.c:826 [inline]
-> >  toggle_allocation_gate+0xf8/0x250 mm/kfence/core.c:818
-> >  process_one_work+0x9a9/0x1a60 kernel/workqueue.c:3254
-> >  process_scheduled_works kernel/workqueue.c:3335 [inline]
-> >  worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
-> >  kthread+0x2c1/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> >  </TASK>
-> > watchdog: BUG: soft lockup - CPU#0 stuck for 246s! [kworker/u8:3:43]
-
-It is interesting that it took 246s. AFAIK, the default watchdog
-thresh is much sorter (like 20s). Well, I havn't checked setting
-used for this test.
-
-> > Modules linked in:
-> > irq event stamp: 519008
-> > hardirqs last  enabled at (519007): [<ffffffff8ad251cb>] irqentry_exit+0x3b/0x90 kernel/entry/common.c:351
-> > hardirqs last disabled at (519008): [<ffffffff8ad239ae>] sysvec_apic_timer_interrupt+0xe/0xb0 arch/x86/kernel/apic/apic.c:1043
-> > softirqs last  enabled at (519006): [<ffffffff8ad63156>] softirq_handle_end kernel/softirq.c:400 [inline]
-> > softirqs last  enabled at (519006): [<ffffffff8ad63156>] __do_softirq+0x596/0x8de kernel/softirq.c:583
-> > softirqs last disabled at (518991): [<ffffffff8151a149>] invoke_softirq kernel/softirq.c:428 [inline]
-> > softirqs last disabled at (518991): [<ffffffff8151a149>] __irq_exit_rcu kernel/softirq.c:633 [inline]
-> > softirqs last disabled at (518991): [<ffffffff8151a149>] irq_exit_rcu+0xb9/0x120 kernel/softirq.c:645
-> > CPU: 0 PID: 43 Comm: kworker/u8:3 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-> > Workqueue: events_unbound toggle_allocation_gate
-> > RIP: 0010:preempt_count arch/x86/include/asm/preempt.h:26 [inline]
-> > RIP: 0010:check_kcov_mode kernel/kcov.c:173 [inline]
-> > RIP: 0010:write_comp_data+0x11/0x90 kernel/kcov.c:236
-> > Code: cc cc 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 49 89 d2 49 89 f8 49 89 f1 65 48 8b 15 df e1 76 7e <65> 8b 05 e0 e1 76 7e a9 00 01 ff 00 74 0f f6 c4 01 74 59 8b 82 14
-> > RSP: 0018:ffffc90000b37908 EFLAGS: 00000202
-> > RAX: 0000000000000001 RBX: ffff8880b9544380 RCX: ffffffff8180f38b
-> > RDX: ffff8880192f0000 RSI: 0000000000000000 RDI: 0000000000000005
-> > RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
-> > R10: 0000000000000001 R11: 0000000000000006 R12: ffffed10172a8871
-> > R13: 0000000000000001 R14: ffff8880b9544388 R15: ffff8880b943f840
-> > FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 000055e176bb4000 CR3: 000000000d57a000 CR4: 00000000003506f0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > Call Trace:
-> >  <IRQ>
-> >  </IRQ>
-> >  <TASK>
-> >  csd_lock_wait kernel/smp.c:311 [inline]
-> >  smp_call_function_many_cond+0x50b/0x1590 kernel/smp.c:855
-> >  on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1023
-> >  on_each_cpu include/linux/smp.h:71 [inline]
-
-It seems that this is really stuck because it is not able to
-run something on the other CPU.
-
-IMHO, the primary problem is in the code proceed by the hrtimer.
-Adding networking people into Cc.
-
-Best Regards,
-Petr
-
-> >  text_poke_sync arch/x86/kernel/alternative.c:2086 [inline]
-> >  text_poke_bp_batch+0x22b/0x760 arch/x86/kernel/alternative.c:2296
-> >  text_poke_flush arch/x86/kernel/alternative.c:2487 [inline]
-> >  text_poke_flush arch/x86/kernel/alternative.c:2484 [inline]
-> >  text_poke_finish+0x30/0x40 arch/x86/kernel/alternative.c:2494
-> >  arch_jump_label_transform_apply+0x1c/0x30 arch/x86/kernel/jump_label.c:146
-> >  jump_label_update+0x1d7/0x400 kernel/jump_label.c:829
-> >  static_key_enable_cpuslocked+0x1b7/0x270 kernel/jump_label.c:205
-> >  static_key_enable+0x1a/0x20 kernel/jump_label.c:218
-> >  toggle_allocation_gate mm/kfence/core.c:826 [inline]
-> >  toggle_allocation_gate+0xf8/0x250 mm/kfence/core.c:818
-> >  process_one_work+0x9a9/0x1a60 kernel/workqueue.c:3254
-> >  process_scheduled_works kernel/workqueue.c:3335 [inline]
-> >  worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
-> >  kthread+0x2c1/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> >  </TASK>
-> >
-> >
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this issue. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> >
-> > If the report is already addressed, let syzbot know by replying with:
-> > #syz fix: exact-commit-title
-> >
-> > If you want syzbot to run the reproducer, reply with:
-> > #syz test: git://repo/address.git branch-or-commit-hash
-> > If you attach or paste a git patch, syzbot will apply it before testing.
-> >
-> > If you want to overwrite report's subsystems, reply with:
-> > #syz set subsystems: new-subsystem
-> > (See the list of subsystem names on the web dashboard)
-> >
-> > If the report is a duplicate of another one, reply with:
-> > #syz dup: exact-subject-of-another-report
-> >
-> > If you want to undo deduplication, reply with:
-> > #syz undup
-> 
-> 
-> 
-> -- 
-> paul-moore.com
+Arınç
 
