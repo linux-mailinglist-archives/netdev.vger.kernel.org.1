@@ -1,168 +1,130 @@
-Return-Path: <netdev+bounces-83083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCEDF890A46
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 20:56:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01A4C890A5F
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 20:58:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5012F1F2228E
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 19:56:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF2B3297FE1
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 19:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865F213E8B3;
-	Thu, 28 Mar 2024 19:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F9813AA54;
+	Thu, 28 Mar 2024 19:55:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSZjD/ti"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUBDeGl9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D2F13E6D0;
-	Thu, 28 Mar 2024 19:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F23C13B598;
+	Thu, 28 Mar 2024 19:55:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711655549; cv=none; b=G8iCXSuIcdYKcIbYGG308uWA28EJpLf7XXNpfrfZPczb7e7/F8zJq4UHd88AlyZO8OK8BL3R/aHEzcBchYI1sUZx60XC4TDrrsYrDzh+uuVud66n41wMS8vFUzLsXhXFNOAlGB8yHIVDWY8gmoCmyRd1kfaoMScn/Re9OBWEdR0=
+	t=1711655720; cv=none; b=eRgDoysZsOz8pRmsneZvtyKuCECKflDZ4Y9TQ/5gcq/sn8xBMiG0FxjF0oUx65rbIrC+ffsSpHm7iRXwCDFJh7b8EenvakBSmFAgTMZ3WiRAOsiSHdK4BuYn1OpT3J/qDO+oQxg5zZguf2MB6RlGUXkI1TDvhb7/8nV9yVFciGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711655549; c=relaxed/simple;
-	bh=qmQFGHYUei7BOkNgnnntn6VCVy9UtjipJi0ZJ6b8pZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WJbdZtoySnpArpKIq3Y++q+4noEuikoyvfCKGgU8nniqriLp3WjGlhCSIQN2aO4CrNverX+/B/cC/BW8I6UvBtosmiOx8siUe/3mvobdXBRnWiXZaeixC20ZngOUUvSRuBphg/9H4753nOZ4nW1WhH/TYgI+Dba7Tiwa3tKER0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DSZjD/ti; arc=none smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=acm.org
+	s=arc-20240116; t=1711655720; c=relaxed/simple;
+	bh=8H5op9oxVlU0msUtq5I4WSqtnbdnJghczRSI2SqtUaM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=I3V5uP+xaYnPL0AfZdeCTFwrCYgZzL3Rc+xqyXZnOHn1Xof8nkSm+spYO/94aWVzrnUzpWL2xtqyYfDU2COVChrS5GEHZguRbOYmly9nfwIOa36Pc11sRKerc3gYJGgogWIl7ry6hTDithUIdvQHugqEuJtJmqGarwDarrTeR8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FUBDeGl9; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3c3ceeb2d04so901583b6e.1;
-        Thu, 28 Mar 2024 12:52:27 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e0d82c529fso12721145ad.2;
+        Thu, 28 Mar 2024 12:55:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711655547; x=1712260347; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:reply-to
-         :message-id:subject:cc:to:from:date:sender:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1711655718; x=1712260518; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YT6C4kyGaXJTnO4s5bmEmPWYlNQPKErlDo5CuGDxbV8=;
-        b=DSZjD/tiqsflzsxPPIOjMyejt0NBAWGlYrE2Wvot3e2jzuoCM7HG1rkaLTYcDhFPbC
-         6JJVcTkheE8+myU/0c2kKCD+JeGq9uPq2wvOFjjZhhDSNSp0mCwxKDs4pYOeM9dneme+
-         rQMJ5kN8T1EPBxkfQv5GDoArt3WXZnsrrLTpOXQ2PldTrs9wil7tjOS2ppDuZxDigVNj
-         WMSJJEI4YSQXkA36kT/PwmFc+KbfYrbBUZOdcXvfNgFNC7npGmcxED87Trhu5D8gSnC1
-         xTcLxX25ONlDU1LnLheM/+AU8swKE3a8XmzqovSYzvtKKhyDzp9rIaLDdRlOra2Of76J
-         OKUg==
+        bh=EzqUPsfXWj4binayeXTWXcfCoPWBBRiht8YRpbXdcMA=;
+        b=FUBDeGl9A7jmubRkBgVcnyIBChMi26PnlOPx/hjHJ/Mwg/tfyOMh7bvFZjFpE0UYCT
+         ZHhzlllWiC43WF87h1e6HXC+FNmq/N+I64RKBVrvGhCzTORfDXdxx5ULDAZ8B6x4NU0O
+         BsCpp7uKTtZjvwe56Ja/5YH/7PFIl2TnruX+SdQDH5Z90cYemOiUMdah3jZhbdqII+Ik
+         U2KJ14rdZTYjMYpuIE8PthCac3sV83w92HqV/yI4GV3pHfp6ooQE3USdRMY37YRyEn0L
+         1KENrWbJaoD5M7ktUKfderZlbGMyNYCjDAxlyvvKNkHVO94TluyG3Ti2DEKWf45ee3zg
+         tAtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711655547; x=1712260347;
-        h=in-reply-to:content-disposition:mime-version:references:reply-to
-         :message-id:subject:cc:to:from:date:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YT6C4kyGaXJTnO4s5bmEmPWYlNQPKErlDo5CuGDxbV8=;
-        b=GHxTWz3eZFtKTpj2JYaz9XJyvfZgYbWOcFm55wd/HQ+1ybTDC7fW8VozjpP0K4Q1v2
-         dYHvMcxjFAeL8D4EgosuIUAniUGwBUlTn6u6/s40SDOxasgEYKy7ii8oW8+UWv2gIuOq
-         50d4z7Uy3YYWGX3ij8SJ1ifu8YgSBaWNK5IUNnorkX7fATMRHtZ2CEDv98fpLPUcoo5+
-         6++7jJBP4QaVfY02gMF9NQIYByLPJy0njLlVYaJHmVcCZ7RXYaYGmmFsBlLaN43Svby3
-         c5eaKKr/6a91koJPXrgEiTY6mae3zfqckAnQd/DpGNDwK6SCHuoSgDUhX9tYX7jBEZo8
-         Ctzg==
-X-Forwarded-Encrypted: i=1; AJvYcCXngZi6NV1xWSwl46mmaCS/lRJprCGnNUF5tvTYqkxHzjRJ9kBHF+HEe3CgNSPvgSmLgbg9WATEEfSu4arW/HaAsKqlCA66XzeaxJpfK/kir+QVpyZluM1EgCEYqVBDe09DrFYzjyOweTdyf4EZL10KMnTUjspiVwGsduQDqgdrdcoyeU1jli+yNkOMLBA+SzR3cc5GYiV6Z63pLdt0Wfwlq+DJJU4CQOQSynFm6okMnOdr+EWdKlvPZ1kVBOxTTw39YCHs+MbYN/J/dxiuiegzLxiPd+nMDcx25djrqmPMqeiZl6jU1TsQxbS/ODJGnP5jkuIUnwQtX2IHMK7WoVQeWI+LbRFlGVnqY3+f2hsPE2wUrRJ3vqFUXDTjuC53OlZBF6/X9mXEwOOABw5g+bi/8zau3uMyicxHJSNbbW7FiSm4tAzg5pSLV+bKwpxa59zZjQdfqxKHOldoTghq5dYtBdI60KdZt9EtrV4NGrJ26PZTU5AbIf8nE8q9Bw6Gqoal9ZAGLk3A4AYLQEgG5RPckvRZjCEl4m0PJ609n0wILfgk1BcZtnMbl/woNwWBAZw8j62XbJ3uVPubsSk2j/c=
-X-Gm-Message-State: AOJu0YyvXq7J/e6xvMdgvbJKc/measjiCe7T07f8gLtC4S2Yx+tgo37m
-	sDKyRqpR0Ualfik/5wj3qOb2zUlx8Ve+Mtylw6bHQvfE3OfGqbk=
-X-Google-Smtp-Source: AGHT+IGa6m7tWMYIWy51l607HYGlrsX0qHDQfT9gmhvhIngwQWHc2ccP79f2XqPzu8hB8uCGkbHOGQ==
-X-Received: by 2002:a05:6808:1790:b0:3c3:d1a8:6d14 with SMTP id bg16-20020a056808179000b003c3d1a86d14mr306232oib.35.1711655546757;
-        Thu, 28 Mar 2024 12:52:26 -0700 (PDT)
-Received: from serve.minyard.net ([47.184.181.2])
-        by smtp.gmail.com with ESMTPSA id 22-20020aca2816000000b003c3d6dab111sm345409oix.30.2024.03.28.12.52.26
+        d=1e100.net; s=20230601; t=1711655718; x=1712260518;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EzqUPsfXWj4binayeXTWXcfCoPWBBRiht8YRpbXdcMA=;
+        b=sXRKYaTuteajfrZxL5eW2BceANRBRYHVinBBO0jSAHlx0asCxh35dMWFB/o6qKd8I1
+         /ga1r1pdcpihQkI7G9XGpmCD1QXxE5NVoQGjXPwdCabyxV/myNTg9WEt5ED1uSmiaTgo
+         wtVYc2blaZClgQWqrkcJStPIuPmBx6QUJQ2IifGsTnPr8nw99JsADSoC6k8mkG7RBHXT
+         eNyyJvWZeJnXux06lI7ngbDaRrtV226uM+MLm4u7vPTEg9V2Jn9Nc8x0xCXOCllOPJpm
+         +OeYIJU5SaR2DkNZBeCLiwl135P9/iNFO542d5+5PIqGuGJNwqdHW0R8KnK09/rCMrJu
+         kiNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWl82i6PKd0T0L31FhqG7RdyYAuG+OXFMzk6EGfjzx+wEc2Vp5iNh0dPYNU4Zeryo0fgW3TTxlnRGI3DXpKwEz+Dtk/Of++W2IBDZxNc2B8ijoSxLW7O5HUyWS6au2Gtx5cPpqJ
+X-Gm-Message-State: AOJu0YzpKAA92gEgXa3Bg92LF9u7zWC/DMgxJPY/NgKPlBNkSkcWipey
+	U+AJXnVr9/qBKEzk04bN7t4qEq6GWMUUfYO6CtqgJrG9q7nxR0ZHoBerG+8e
+X-Google-Smtp-Source: AGHT+IFcH8y9aRYK8WAqYucQcxKLzTdOpTXagA/BsEXoq0kvwRHyM3jJoCzmityUgjvvuOTNcC1qnQ==
+X-Received: by 2002:a17:902:e888:b0:1e0:b5d4:9fa3 with SMTP id w8-20020a170902e88800b001e0b5d49fa3mr634632plg.2.1711655718390;
+        Thu, 28 Mar 2024 12:55:18 -0700 (PDT)
+Received: from wedsonaf-dev.home.lan ([189.124.190.154])
+        by smtp.googlemail.com with ESMTPSA id p16-20020a170902e75000b001dd7a97a266sm2006520plf.282.2024.03.28.12.55.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 12:52:26 -0700 (PDT)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Received: from mail.minyard.net (unknown [IPv6:2001:470:b8f6:1b:b987:69e:202a:697a])
-	by serve.minyard.net (Postfix) with ESMTPSA id 4B51A180059;
-	Thu, 28 Mar 2024 19:52:25 +0000 (UTC)
-Date: Thu, 28 Mar 2024 14:52:24 -0500
-From: Corey Minyard <minyard@acm.org>
-To: Allen <allen.lkml@gmail.com>
-Cc: Allen Pais <apais@linux.microsoft.com>, linux-kernel@vger.kernel.org,
-	tj@kernel.org, keescook@chromium.org, vkoul@kernel.org,
-	marcan@marcan.st, sven@svenpeter.dev, florian.fainelli@broadcom.com,
-	rjui@broadcom.com, sbranden@broadcom.com, paul@crapouillou.net,
-	Eugeniy.Paltsev@synopsys.com, manivannan.sadhasivam@linaro.org,
-	vireshk@kernel.org, Frank.Li@nxp.com, leoyang.li@nxp.com,
-	zw@zh-kernel.org, wangzhou1@hisilicon.com, haijie1@huawei.com,
-	shawnguo@kernel.org, s.hauer@pengutronix.de, sean.wang@mediatek.com,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	afaerber@suse.de, logang@deltatee.com, daniel@zonque.org,
-	haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-	andersson@kernel.org, konrad.dybcio@linaro.org, orsonzhai@gmail.com,
-	baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
-	patrice.chotard@foss.st.com, linus.walleij@linaro.org,
-	wens@csie.org, jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com,
-	kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, jassisinghbrar@gmail.com, mchehab@kernel.org,
-	maintainers@bluecherrydvr.com, aubin.constans@microchip.com,
-	ulf.hansson@linaro.org, manuel.lauss@gmail.com,
-	mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com,
-	hayashi.kunihiko@socionext.com, mhiramat@kernel.org,
-	brucechang@via.com.tw, HaraldWelte@viatech.com, pierre@ossman.eu,
-	duncan.sands@free.fr, stern@rowland.harvard.edu, oneukum@suse.com,
-	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-mediatek@lists.infradead.org,
-	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH 6/9] ipmi: Convert from tasklet to BH workqueue
-Message-ID: <ZgXKeL36ckOyNpI/@mail.minyard.net>
-Reply-To: minyard@acm.org
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-7-apais@linux.microsoft.com>
- <ZgRePyo2zC4A1Fp4@mail.minyard.net>
- <CAOMdWS+1AFxEqmACiBYzPHc+q0Ut6hp15tdV50JHvfVeUNCGQw@mail.gmail.com>
- <ZgXDmx1HvujsMYAR@mail.minyard.net>
- <CAOMdWS+nB5EENp_Vb=k1j77nrch5JgbZP2XYPJ2ieTja14zB0w@mail.gmail.com>
+        Thu, 28 Mar 2024 12:55:18 -0700 (PDT)
+From: Wedson Almeida Filho <wedsonaf@gmail.com>
+To: rust-for-linux@vger.kernel.org
+Cc: Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	linux-kernel@vger.kernel.org,
+	Wedson Almeida Filho <walmeida@microsoft.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 1/5] rust: phy: implement `Send` for `Registration`
+Date: Thu, 28 Mar 2024 16:54:53 -0300
+Message-Id: <20240328195457.225001-2-wedsonaf@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240328195457.225001-1-wedsonaf@gmail.com>
+References: <20240328195457.225001-1-wedsonaf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOMdWS+nB5EENp_Vb=k1j77nrch5JgbZP2XYPJ2ieTja14zB0w@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 28, 2024 at 12:41:22PM -0700, Allen wrote:
-> > > > I believe that work queues items are execute single-threaded for a work
-> > > > queue, so this should be good.  I need to test this, though.  It may be
-> > > > that an IPMI device can have its own work queue; it may not be important
-> > > > to run it in bh context.
-> > >
-> > >   Fair point. Could you please let me know once you have had a chance to test
-> > > these changes. Meanwhile, I will work on RFC wherein IPMI will have its own
-> > > workqueue.
-> > >
-> > >  Thanks for taking time out to review.
-> >
-> > After looking and thinking about it a bit, a BH context is still
-> > probably the best for this.
-> >
-> > I have tested this patch under load and various scenarios and it seems
-> > to work ok.  So:
-> >
-> > Tested-by: Corey Minyard <cminyard@mvista.com>
-> > Acked-by: Corey Minyard <cminyard@mvista.com>
-> >
-> > Or I can take this into my tree.
-> >
-> > -corey
-> 
->  Thank you very much. I think it should be okay for you to carry it into
-> your tree.
+From: Wedson Almeida Filho <walmeida@microsoft.com>
 
-Ok, it's in my for-next tree.  I fixed the directory reference, and I
-changed all the comments where you changed "tasklet" to "work" to
-instead say "workqueue".
+In preparation for requiring `Send` for `Module` implementations in the
+next patch.
 
--corey
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: Trevor Gross <tmgross@umich.edu>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Wedson Almeida Filho <walmeida@microsoft.com>
+---
+ rust/kernel/net/phy.rs | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> 
-> - Allen
-> 
+diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+index 96e09c6e8530..265d0e1c1371 100644
+--- a/rust/kernel/net/phy.rs
++++ b/rust/kernel/net/phy.rs
+@@ -640,6 +640,10 @@ pub struct Registration {
+     drivers: Pin<&'static mut [DriverVTable]>,
+ }
+ 
++// SAFETY: The only action allowed in a `Registration` instance is dropping it, which is safe to do
++// from any thread because `phy_drivers_unregister` can be called from any thread context.
++unsafe impl Send for Registration {}
++
+ impl Registration {
+     /// Registers a PHY driver.
+     pub fn register(
+-- 
+2.34.1
+
 
