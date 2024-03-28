@@ -1,200 +1,148 @@
-Return-Path: <netdev+bounces-82914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19FE8902BF
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:11:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CD998902B4
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:10:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E20B11C2B1DD
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:11:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A0E01F266F8
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB8E12DDB8;
-	Thu, 28 Mar 2024 15:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DC1mmQls"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BCA12DDA6;
+	Thu, 28 Mar 2024 15:10:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C9A12A154;
-	Thu, 28 Mar 2024 15:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B2A2C6AD;
+	Thu, 28 Mar 2024 15:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711638680; cv=none; b=qG6o1nhNuaHk1OdbTponimXknjDsx6ZBFKA1flatq/FrBbsYmEi4akr8siSUI02PPP3eLzwY1f0WeMKX2TbLxWSjPf6CoX5EEr/iFnI37JAONrnacEkn2yMJ4GBA170Qk98DNIblGpDHhXjQ++A4PE0Em/vu3DTvwqCZ0Aarz4k=
+	t=1711638651; cv=none; b=RTF9NSHXD+5MhH16WmzEsgBTAMHv5ymC3bHdaNYbwEbeBwYZmuhtjESbIG32YEAU/3A9o9B9sRqpH813TbJ1VJlV9ScMQoC5me7S318cwAXy0IDCcrc/rueWivK4dn2euhCnfWdvrVO79K6rnoW+CmrqWHIywX9Mu3knaQYMK1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711638680; c=relaxed/simple;
-	bh=39mlhyxBKQOXxiWS656Ol19WFtjbnxzPLcE94DGj/8w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=eMNMSV9V4NLVqwFP5XvQcFJMGLFcHLm+SO66HH08UWB6UduWtKR2gZEsjUMO5ma/SXJkVGH8lPA8NPdIYaQWaI/ZDBI7vNHYCHu/xg7uu70DCmOaLa8obYaSGnqpL3K83BGRRAv1XhMS/lViQ7kcLfC55pPKaWFb+5448xK2npw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=DC1mmQls; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42SEt1gl003007;
-	Thu, 28 Mar 2024 15:11:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=93YM5qXrGBXdDNyLUklgisAaCVZ+0WF+yRUbnOKQ9iA=; b=DC
-	1mmQlsjBD2WIZMJVE0CMMWz/4XCpSxvcUaRLY8KHQyqtJEgS+1pf9beJOB5BnEE8
-	AaVHYp8AyP1/g0oYMfVCcyzFrB5y+hy0DS6+SNvwmDPbo1mHnGSYha8d1FE2A0Kp
-	cgirEkINQ0E7ecJkGKy5HX6YjwQrjeaQ/HAFR4pZ3z6LQ8OF35iQoxXWgZx5qSc4
-	Qegn1q3grt4K5ecZswKg+LuEzOEfuu4KUjbxBO6iYXAjifbdyvq3KrophEgIsyfB
-	7nJ8D2Ji3waiKWtzmznQgiVNsWM5PgI7q3yJTz0oBrhpelqPBbXDto9HWQFbWRxK
-	qI0ojZyjxcEXhYDQ+bYA==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x5aqug1je-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Mar 2024 15:11:06 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42SFB5Pn024319
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Mar 2024 15:11:05 GMT
-Received: from [10.50.27.20] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 28 Mar
- 2024 08:11:02 -0700
-Message-ID: <14b739c9-18da-0d58-b58d-cccebc505950@quicinc.com>
-Date: Thu, 28 Mar 2024 20:40:59 +0530
+	s=arc-20240116; t=1711638651; c=relaxed/simple;
+	bh=r2D0EqkpCrFqFode/ZlZv88Dg4Xknt6j7iyrIgxbYTU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZrLs/p/darscR+NvP4+RVCZY73NhOQzeshRJ3qXd6r1FWuvJGfJv0F4JqW6gZYetnh3TH61LJ9Zc1Ch7Kb0z0CYuRI+BHxvs9E5PKPZqVeFXneU3UMXcNHyTC7QUddAc6/+WXNB0fbW87TAnaNWrSnH93X9jJXa8kxH/O/lhXDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95D2BC433C7;
+	Thu, 28 Mar 2024 15:10:47 +0000 (UTC)
+Date: Thu, 28 Mar 2024 11:13:30 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jiri Olsa
+ <jolsa@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, "David S.
+ Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Dave
+ Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet
+ <quentin@isovalent.com>, bpf <bpf@vger.kernel.org>, linux-arm-kernel
+ <linux-arm-kernel@lists.infradead.org>, LKML
+ <linux-kernel@vger.kernel.org>, linux-riscv
+ <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>,
+ linux-trace-kernel@vger.kernel.org, "open list:KERNEL SELFTEST FRAMEWORK"
+ <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add
+ support to record and check the accessed args
+Message-ID: <20240328111330.194dcbe5@gandalf.local.home>
+In-Reply-To: <CALz3k9jG5Jrqw=BGjt05yMkEF-1u909GbBYrV-02W0dQtm6KQQ@mail.gmail.com>
+References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
+	<20240311093526.1010158-2-dongmenglong.8@bytedance.com>
+	<CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
+	<CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
+	<CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
+	<CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
+	<CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
+	<CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com>
+	<CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
+	<CALz3k9g-U8ih=ycJPRbyU9x_9cp00fNkU3PGQ6jP0WJ+=uKmqQ@mail.gmail.com>
+	<CALz3k9jG5Jrqw=BGjt05yMkEF-1u909GbBYrV-02W0dQtm6KQQ@mail.gmail.com>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 02/13] wifi: nl80211: send underlying multi-hardware
- channel capabilities to user space
-To: Johannes Berg <johannes@sipsolutions.net>, <ath12k@lists.infradead.org>
-CC: <linux-wireless@vger.kernel.org>,
-        Vasanthakumar Thiagarajan
-	<quic_vthiagar@quicinc.com>,
-        <netdev@vger.kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>
-References: <20240328072916.1164195-1-quic_periyasa@quicinc.com>
- <20240328072916.1164195-3-quic_periyasa@quicinc.com>
- <6d92d0ba4a8764cd91cc20c4bd35613bcc41dfcd.camel@sipsolutions.net>
- <9d5c2f9f-19b5-af4d-8018-1eb97fac10d6@quicinc.com>
- <9d0f309da45ae657cd2ce0bc11a93d66e856ef64.camel@sipsolutions.net>
-Content-Language: en-US
-From: Karthikeyan Periyasamy <quic_periyasa@quicinc.com>
-In-Reply-To: <9d0f309da45ae657cd2ce0bc11a93d66e856ef64.camel@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: rIhQfC8DJ_4OyzryFmkwTIs1-_dnuRQd
-X-Proofpoint-GUID: rIhQfC8DJ_4OyzryFmkwTIs1-_dnuRQd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-28_15,2024-03-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 phishscore=0
- clxscore=1011 adultscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- bulkscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2403210001 definitions=main-2403280104
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 28 Mar 2024 22:43:46 +0800
+=E6=A2=A6=E9=BE=99=E8=91=A3 <dongmenglong.8@bytedance.com> wrote:
 
-On 3/28/2024 5:31 PM, Johannes Berg wrote:
-> On Thu, 2024-03-28 at 15:48 +0530, Karthikeyan Periyasamy wrote:
->> On 3/28/2024 1:19 PM, Johannes Berg wrote:
->>> On Thu, 2024-03-28 at 12:59 +0530, Karthikeyan Periyasamy wrote:
->>>> +/**
->>>> + * nl80211_multi_hw_attrs - multi-hw attributes
->>>> + *
->>>> + * @NL80211_MULTI_HW_ATTR_INVALID: invalid
->>>> + * @NL80211_MULTI_HW_ATTR_IDX: (u8) multi-HW index to refer the underlying HW
->>>> + *	for which the supported channel list is advertised. Internally refer
->>>> + *	the index of the wiphy's @hw_chans array.
->>> Is there a good reason to expose this? Seems pretty internal to me, and
->>> not sure what userspace would do with it?
->> Hostapd use this hw index for the channel switch cmd.
-> What, where? I don't see that in this patchset? And why??
->
-> In any case, unless I just missed it and you're going to tell me to look
-> at patch N, we don't need it here, and then I'd prefer to keep it an
-> internal detail until it's needed.
->
->> The hw index used as a sanity check to identify whether the user
->> requested channel fall under the different hw or not.
-> You mean within hostapd itself? That doesn't make sense, it can derive
-> that information differently.
->
->> In split-phy hardware, 5GHz band supported by two physical hardware's.
->> First supports 5GHz Low band and second supports 5GHz High band.
-> In your hardware design anyway, but yeah, I get it.
->
->> In this case, user space cannot use band vise check here to identify
->> given channel or freq supported in the given hardware.
-> No, but it also doesn't need an index assigned by the kernel for that.
+> I have done a simple benchmark on creating 1000
+> trampolines. It is slow, quite slow, which consume up to
+> 60s. We can't do it this way.
+>=20
+> Now, I have a bad idea. How about we introduce
+> a "dynamic trampoline"? The basic logic of it can be:
+>=20
+> """
+> save regs
+> bpfs =3D trampoline_lookup_ip(ip)
+> fentry =3D bpfs->fentries
+> while fentry:
+>   fentry(ctx)
+>   fentry =3D fentry->next
+>=20
+> call origin
+> save return value
+>=20
+> fexit =3D bpfs->fexits
+> while fexit:
+>   fexit(ctx)
+>   fexit =3D fexit->next
+>=20
+> xxxxxx
+> """
+>=20
+> And we lookup the "bpfs" by the function ip in a hash map
+> in trampoline_lookup_ip. The type of "bpfs" is:
+>=20
+> struct bpf_array {
+>   struct bpf_prog *fentries;
+>  struct bpf_prog *fexits;
+>   struct bpf_prog *modify_returns;
+> }
+>=20
+> When we need to attach the bpf progA to function A/B/C,
+> we only need to create the bpf_arrayA, bpf_arrayB, bpf_arrayC
+> and add the progA to them, and insert them to the hash map
+> "direct_call_bpfs", and attach the "dynamic trampoline" to
+> A/B/C. If bpf_arrayA exist, just add progA to the tail of
+> bpf_arrayA->fentries. When we need to attach progB to
+> B/C, just add progB to bpf_arrayB->fentries and
+> bpf_arrayB->fentries.
+>=20
+> Compared to the trampoline, extra overhead is introduced
+> by the hash lookuping.
+>=20
+> I have not begun to code yet, and I am not sure the overhead is
+> acceptable. Considering that we also need to do hash lookup
+> by the function in kprobe_multi, maybe the overhead is
+> acceptable?
 
-Yes
+Sounds like you are just recreating the function management that ftrace
+has. It also can add thousands of trampolines very quickly, because it does
+it in batches. It takes special synchronization steps to attach to fentry.
+ftrace (and I believe multi-kprobes) updates all the attachments for each
+step, so the synchronization needed is only done once.
 
+If you really want to have thousands of functions, why not just register it
+with ftrace itself. It will give you the arguments via the ftrace_regs
+structure. Can't you just register a program as the callback?
 
->>>> +	for (i = 0; i < wiphy->num_hw; i++) {
->>>> +		hw_mac = nla_nest_start(msg, i + 1);
->>> And you kind of even have it here already ...
->> Then user and kernel have to make an assumption that implicit index used
->> in the life cycle.
-> Agree that's maybe not a great idea, for all we care this could just use
-> 0 as the index anyway.
->
-> Which reminds me ...
->
-> Right now, the way you have it, we have the following structure:
->
-> NL80211_ATTR_MULTI_HW
-> - 1
->    - NL80211_MULTI_HW_ATTR_IDX: 0
->    - NL80211_MULTI_HW_ATTR_FREQS
->      - 0: 2412
->      - 1: 2417
->      ...
-> - 2
->    - NL80211_MULTI_HW_ATTR_IDX: 1
->    - NL80211_MULTI_HW_ATTR_FREQS
->      - ... as above with 5 GHz etc.
-> ...
->
->
-> Netlink is kind of moving away from nested arrays though:
->
-> https://kernel.org/doc/html/latest/userspace-api/netlink/specs.html#multi-attr-arrays
-> https://kernel.org/doc/html/latest/userspace-api/netlink/genetlink-legacy.html#attribute-type-nests
->
-> This talks about families, but maybe we shouldn't read that literally
-> and do the new style for new arrays in existing families as well, not
-> just new families.
->
-> If we do that, including NL80211_MULTI_HW_ATTR_IDX for illustrative
-> purposes though I think it should be removed, we'd end up with:
->
-> NL80211_ATTR_MULTI_HW
->   - NL80211_MULTI_HW_ATTR_IDX: 0
->   - NL80211_MULTI_HW_ATTR_FREQ: 2412
->   - NL80211_MULTI_HW_ATTR_FREQ: 2417
->   ...
-> NL80211_ATTR_MULTI_HW
->   - NL80211_MULTI_HW_ATTR_IDX: 1
->   - NL80211_MULTI_HW_ATTR_FREQ: 5180
->   - NL80211_MULTI_HW_ATTR_FREQ: 5200
->   ...
->
-> which _is_ a lot more compact, and removes all the uninteresting mid-
-> level indexing.
+It will probably make your accounting much easier, and just let ftrace
+handle the fentry logic. That's what it was made to do.
 
-Can you point to any attribute constructed in this way from kernelspace 
-for the reference to explore more ?
-
--- 
-
-Karthikeyan Periyasamy
---
-கார்த்திகேயன் பெரியசாமி
-
+-- Steve
 
