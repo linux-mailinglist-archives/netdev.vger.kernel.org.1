@@ -1,94 +1,120 @@
-Return-Path: <netdev+bounces-82938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8BF589041F
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:59:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89C93890464
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:02:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60C91291A58
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:59:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2D2AB23567
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112481304A3;
-	Thu, 28 Mar 2024 15:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hGy1H9Jl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C50F130E31;
+	Thu, 28 Mar 2024 15:59:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.actia.se (mail.actia.se [212.181.117.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D33D130494;
-	Thu, 28 Mar 2024 15:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE15130AE8;
+	Thu, 28 Mar 2024 15:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711641542; cv=none; b=hJXMgHOOP+SJOv3/czMMqZ3Sp8ixfSg87Of0vwpjP/I/IoetvNHwTjFr+Al5jqQALDW7/lZnVLnZL09Dcxi7dU/GyhNPcv/SH2/jHXURNbx5pK+U1GliyDVlWL+k4B+F+oWj9X2an+6Fe1e43xwgZSgJUKM5pIW2V1+6WBNN1Yk=
+	t=1711641576; cv=none; b=kiEj8MoOYYd8Ie3Djx1kZ0TKGuJwx8zfY6ssSfc9rFnQ5Ta3rSUU8M0UG963r+PFayaBYrjHMawrNLdQyz1x0EunqtRTzuELLeswQPhLgzXEDj0nYUXkPRFwSkyBxgRyJlWTEn99If+DsmNfWKv2zbyyz7PGK+Wlj+0CBuKkEPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711641542; c=relaxed/simple;
-	bh=GWtJFEiitlhtsVgrclj9h0xKI8Ojp/cCLUDFmZyqqcg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RhMd6Tv/pORBiORPvcxD3XWXgBfCRc9hGu/6SP7SutA8rDpBKDeEkCgHu3UHvhsJOU4y+tLIPHyeKQCb427PYoHYER2g9qvVFSrgEGi/5FTL7JwMC7jWXSC86tJX/7QWNmz9zxASjxiDqNKh+P2AZ61JA3ccZxH+wryTNqDBvgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hGy1H9Jl; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=a9y+egi/SnB6tqk3YaEf7Iwf2TbvjOWOgkUI0R8Vlxo=; b=hGy1H9JlS38JfZrmWnL3AFfZXZ
-	CgRq6LXqqMmFQrzY5c2MJ29apnmucU0qJAkWmewJK+2Jzrwk1J8k3x7oCrD7ic3ebilQBB5q+ICAC
-	oc8UVrI7ANFSfnbDD58IIh+CjlwTw3pC0fthRFG4wPcutfM1KZKGXs311nsq4rJO0WFQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rps9Q-00BW3c-J0; Thu, 28 Mar 2024 16:58:48 +0100
-Date: Thu, 28 Mar 2024 16:58:48 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v6 16/17] dt-bindings: net: pse-pd: Add bindings
- for TPS23881 PSE controller
-Message-ID: <8569b8b4-68d4-4ece-be80-e28ba50522d2@lunn.ch>
-References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
- <20240326-feature_poe-v6-16-c1011b6ea1cb@bootlin.com>
+	s=arc-20240116; t=1711641576; c=relaxed/simple;
+	bh=rEYm+RuDegHUaXhNywXY5gVCIeEihjWtUykcULPsMHs=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=PSC8pL5owfQ/Iwn9uSoXU85HNkOJEIEQUnJTOl4LLCu/htn9PMD17cUJSCflmyKO2adJeHsCbStJ1ia6sqOTP0d1H0A5d5U1usIMxrx9FTR9n3TD5qqn4o3sxsQ5hzs158Tuu5njrsSxR0K8Y+NItPnHyY5SUhlEMvnCpVfnLqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
+Received: from S036ANL.actianordic.se (10.12.31.117) by S035ANL.actianordic.se
+ (10.12.31.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Thu, 28 Mar
+ 2024 16:59:29 +0100
+Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
+ S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%4]) with mapi id
+ 15.01.2507.037; Thu, 28 Mar 2024 16:59:29 +0100
+From: John Ernberg <john.ernberg@actia.se>
+To: Wei Fang <wei.fang@nxp.com>
+CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Heiner
+ Kallweit" <hkallweit1@gmail.com>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Florian
+ Fainelli" <f.fainelli@gmail.com>, Russell King <linux@armlinux.org.uk>,
+	"Maxime Chevallier" <maxime.chevallier@bootlin.com>, John Ernberg
+	<john.ernberg@actia.se>
+Subject: [PATCH net v4 0/1] net: fec: Fix to suspend / resume with
+ mac_managed_pm
+Thread-Topic: [PATCH net v4 0/1] net: fec: Fix to suspend / resume with
+ mac_managed_pm
+Thread-Index: AQHagSjquwfDL2zjHkCW93uNOBsjcQ==
+Date: Thu, 28 Mar 2024 15:59:29 +0000
+Message-ID: <20240328155909.59613-1-john.ernberg@actia.se>
+Accept-Language: en-US, sv-SE
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: git-send-email 2.44.0
+x-esetresult: clean, is OK
+x-esetid: 37303A2921D729556C7D60
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326-feature_poe-v6-16-c1011b6ea1cb@bootlin.com>
 
-On Tue, Mar 26, 2024 at 03:04:53PM +0100, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> Add the TPS23881 I2C Power Sourcing Equipment controller device tree
-> bindings documentation.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Since the introduction of mac_managed_pm in the FEC driver there were some
+discrepancies regarding power management of the PHY.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This failed on our board that has a permanently powered Microchip LAN8700R
+attached to the FEC. Although the root cause of the failure can be traced
+back to f166f890c8f0 ("net: ethernet: fec: Replace interrupt driven MDIO
+with polled IO") and probably even before that, we only started noticing
+the problem going from 5.10 to 6.1.
 
-    Andrew
+Since 557d5dc83f68 ("net: fec: use mac-managed PHY PM") is actually a fix
+to most of the power management sequencing problems that came with power
+managing the MDIO bus which for the FEC meant adding a race with FEC
+resume (and phy_start() if netif was running) and PHY resume.
+
+That it worked before for us was probably just luck...
+
+Thanks to Wei's response to my report at [1] I was able to pick up his
+patch and start honing in on the remaining missing details.
+
+[1]: https://lore.kernel.org/netdev/1f45bdbe-eab1-4e59-8f24-add177590d27@ac=
+tia.se/
+
+v4:
+ - Adjustments to commit message in patch 1
+ - Drop patch 2 after discussion in v3.
+
+v3: https://lore.kernel.org/netdev/20240306133734.4144808-1-john.ernberg@ac=
+tia.se/
+ - Implement feedback from Wei Fang for patch 2
+ - Fixes tag in patch 2 dropped, should it be delayed for net-next now?
+
+v2: https://lore.kernel.org/netdev/20240229105256.2903095-1-john.ernberg@ac=
+tia.se/
+ - Completely different approach that should be much more correct
+   (Wei Fang, Jakub Kicinski)
+ - Re-target to net tree, because I have fixes tags now
+
+v1: https://lore.kernel.org/netdev/20240212105010.2258421-1-john.ernberg@ac=
+tia.se/
+
+Wei Fang (1):
+  net: fec: Set mac_managed_pm during probe
+
+ drivers/net/ethernet/freescale/fec_main.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+--=20
+2.44.0
 
