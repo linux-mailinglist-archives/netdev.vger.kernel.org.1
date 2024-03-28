@@ -1,155 +1,150 @@
-Return-Path: <netdev+bounces-82716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36A9E88F61C
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:03:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBD8188F691
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:47:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F66B1C27FBB
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 04:03:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 865A1294F27
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 04:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3E1376E5;
-	Thu, 28 Mar 2024 04:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BC43FE47;
+	Thu, 28 Mar 2024 04:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IxYZGCLb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aorb2FvE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2072.outbound.protection.outlook.com [40.107.243.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CC0849C
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 04:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711598591; cv=none; b=Rs4uSPf3OgBqsBUxcn3G6rdTjQpFtWlAYw7aSC5+D4YiqR5a1ig78xypJe40/8TfMEA6hIuSTbnaliJ7d2T+FHNrshxukrG4AEB5qNJ9ks2frpFm+HXqRfBTHJH+shJVjJzeuPd/AIjCQFMJaFTTfKQPUWSAbqxy0kWxy1fASzU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711598591; c=relaxed/simple;
-	bh=MA0vU3W1LZn4Qn1ileNbbCmxahwffPLbnt6IdvVY1DQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RY2c75zYSkLH6HjZYWgFxS1x35bTnce5O9ZmdpaZ4peyWyEINVtjDok+6a77VDgegAsVovugsH53t4rmgiDKVfg63VWQN9E+IzOc6t8BSaP8kZSYM6k2UioEVsA84dW6WIXoZI8wNpwZSqz7vLJyIuJ4AsjDjwxocx621JuysX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IxYZGCLb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711598588;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VR9QH5sWK+/AEwJzme4Yl+zpIsFT2eAe45QtEGaUS2M=;
-	b=IxYZGCLbqvNWXFvkRBEu6YBTDjtj2wanoyFNg8hXA6sbVdK+UZl54GTuImvmmrm/s5vqdl
-	5Qiyoyb8/ETBlLVHNSl9fwQ+ucalyrspDS+V5O5L/wXrh81w+0pw73mc/2RCYz6GqOIZhq
-	OgnNqjlVnIQkeH1hcgIYVa6/nqG1LNI=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-FaWMVsghPgmLlDwpZNjnmw-1; Thu, 28 Mar 2024 00:03:06 -0400
-X-MC-Unique: FaWMVsghPgmLlDwpZNjnmw-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-29df71a709eso473119a91.1
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 21:03:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711598586; x=1712203386;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VR9QH5sWK+/AEwJzme4Yl+zpIsFT2eAe45QtEGaUS2M=;
-        b=sHBZO8jKJGrpp95C2s0O5kI/oNmlLThmmf8BYj3p7o+i72N2Qit+nToo3RryTHDHZI
-         e5H5XMR58uEoeWXaWElo0i8gYtbDXdIvqyJ5ud3uuZhT3JUj6kb3TvG4rqIj5wLiXOpI
-         9lfKRf6Q787UEyrQggUUVaUarARvpXdlRk+CZ7Am9fBEziV4WuvQ44rCMlG00NY5qWH2
-         CrH619sS98cJBIgWJBNCHGxNs2v305lwJBhX2j40FS3OeFY/I8ZsBqZZD9BBzCLa7RO+
-         zKmgQpHZ6mScHXfRxdc9uhGRoipn6ZxaePUQ8yGEcfY7dQtTw985BX8I5klY4sPo3SGn
-         mOGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWPVd1LlW4pz7niu8mAqW98Q16QZz24CLv0mZLro25yVzs9t8wxpYTHnN3904cY3pdIUPLQewfuScwY8EsC1LY1yv75TkW8
-X-Gm-Message-State: AOJu0YxeszdNLr9s4jSXmd5iZtTaCqM/8w5NYQWZJcabB6Ws1oHtsuqS
-	U5zTzm+XQxce73MReytjrqTXg2OxvcaMg/PaCxvM1GUJI6nx8fOxhJH+zEBCtvn0i1l23f5XOtW
-	/5LRac4XhFHy3GWitecIHpOlKpr0GVJRznYNzrE1Y/3dNxMAVTjPcBmRxsAxAgDKYJBMX49xKwr
-	ix38PM31OyNTaUGbsQOs4poUItDKen
-X-Received: by 2002:a17:90b:14a:b0:2a0:7815:dd25 with SMTP id em10-20020a17090b014a00b002a07815dd25mr1734994pjb.20.1711598585819;
-        Wed, 27 Mar 2024 21:03:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/veJ62gWCxJH+rJXD0BAZFk49zg7RYhlAQmbs4vW7XEiQGECvkaoiOerml1BopvTt9smdmlPuOr7dLI1u01k=
-X-Received: by 2002:a17:90b:14a:b0:2a0:7815:dd25 with SMTP id
- em10-20020a17090b014a00b002a07815dd25mr1734975pjb.20.1711598585557; Wed, 27
- Mar 2024 21:03:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154503FBAE
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 04:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711601261; cv=fail; b=n70gQQqRhOgJ+tH0UDKuYlGKNnDJEs/AP0mW9QDHc+FxSO13yzwrpsJfA+SQfsiH0MkIsQF6Ujzd041RT0xXBuCW2UFkQ25ks9tflz3HBVeH1Gdx2gEmyEnoGMUjBiYjKe/UmwBzIv/Qfw5T8XA76KRlHmFP02ye9y47hpE1F8s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711601261; c=relaxed/simple;
+	bh=7MzuGWnHs5kD8vIcPfsH5T145lOa2yxqqC2Wf794kXM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rb8PTw91LUh0qmTgaEU5l+uLY24iVZxshsWsq0TY9RWnrASOTykQqdYwu5lZDr5h4ciwV2I8uCHOiNYgvb/nPSIb2FuQa4/VAocFa9Sn1PvHQs8rDTgKwZF4ewhCBQfb1xd5cVecGBoX36viA8g40x7Jvz8KuNeubR2nI9FwD80=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aorb2FvE; arc=fail smtp.client-ip=40.107.243.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BKmNOFHrNUio+RWVq3lVhfdcJ4yyQQldP8fmcMj79KRYSBkPQ9ktAaDSCLVHp8MEJjpZarjoTukGZfqV1qJteRMFB7Qfle0j+ChDoQ/rVhESm4Huq0qNOPC37XWBOsLLbjpdUw7f32Y02WgWqCFMXtnjuCzGNEVAFNtWX5MdqUlXUnb/d/f8h0W98hzNWaxqZ+P+UjwFHx/Ceaf3AT+BVbDT5hIctrpnsFZ6Nj9RjuzAUce6MtxUtIeAUhrpl2s+DZgnGEiQJWJtpqnE/qBQQGV311GHOpZ6M3UMsSIK2pmqkgFDJgvDPKykV4yBuIp7mm3zmGoTQh4p0l7znMOQUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DrKywuJ4+Z/TRBx0E6l1EIMKu8PFNhDc6o81EF4thyY=;
+ b=A0xH95n8NFwdfG7wZMp99Fjn724I+tCklq5oCCmDJgBvLXBWSKcGXAHnlSdIByVpAwR1QSiEFFgC5hFEdAFINufgqfNeSGDqjp5e4araoWi5M07rhtf87i74QFRCZy/Ly1FlEp3HKQrLGMsoU2pukq5E6azBeMlIcEso8ESyLdb54wwKPwnC9ByhcmXCQVqFS1gksUP+LIPUcRt373CmEvUw+sFDCxKfteFmRov6Sz6vs6Vf5so73aAOcRqzWJdKGrX0aHxCcve59iUUnVNnogYmiKYz4JsNFLeP2WA11QlRXCDhhHQgMj4ejYXQ1l8dTdk7yXiBqKvl9/SDMatdAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DrKywuJ4+Z/TRBx0E6l1EIMKu8PFNhDc6o81EF4thyY=;
+ b=aorb2FvEzC1v7Ki9DUQbLZ2qSFRM/SgxdeAKDvzDb7OkBpN039AMBZRkUKhRFJA0VkMjZX464zU8aCcMk1ipnbW/ReNpq3RlP27Zzn5M2A0QZmyAQYXZSt7bJk71kyMTTGX7vN5G/yuSl5qPgRB6s1fwE0qHFZlhxr9NXpwOxr3DgB8RGjt5vbg4Zk47W6JwLf9sg+T+FZlF+wb427qkTlHjTOIqcnfjRghxYMOmY8PbgNGTQx4KM2h/D130y4NhWaH2AsytZldylCAqc41vFm+qyvtWy8G7S+HHhCVPW238HopdKluGs7cWMjjT70GmB/Lbhl2oDFYY2visd+tmKA==
+Received: from SJ0P220CA0023.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:41b::21)
+ by MW4PR12MB6898.namprd12.prod.outlook.com (2603:10b6:303:207::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Thu, 28 Mar
+ 2024 04:47:30 +0000
+Received: from DS2PEPF00003442.namprd04.prod.outlook.com
+ (2603:10b6:a03:41b:cafe::25) by SJ0P220CA0023.outlook.office365.com
+ (2603:10b6:a03:41b::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33 via Frontend
+ Transport; Thu, 28 Mar 2024 04:47:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DS2PEPF00003442.mail.protection.outlook.com (10.167.17.69) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.10 via Frontend Transport; Thu, 28 Mar 2024 04:47:29 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 27 Mar
+ 2024 21:47:20 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Wed, 27 Mar 2024 21:47:19 -0700
+Received: from vdi.nvidia.com (10.127.8.11) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Wed, 27 Mar 2024 21:47:19 -0700
+From: Daniel Jurgens <danielj@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
+	<virtualization@lists.linux.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<jiri@nvidia.com>, Daniel Jurgens <danielj@nvidia.com>
+Subject: [PATCH net-next v2 0/6] Remove RTNL lock protection of CVQ
+Date: Thu, 28 Mar 2024 06:47:09 +0200
+Message-ID: <20240328044715.266641-1-danielj@nvidia.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327231826.1725488-1-andrew@daynix.com>
-In-Reply-To: <20240327231826.1725488-1-andrew@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 28 Mar 2024 12:02:54 +0800
-Message-ID: <CACGkMEuW8jLvje0_oqCT=-ih9JEgxOrWRsvjvfwQXw=OWT_RtQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
-To: Andrew Melnychenko <andrew@daynix.com>
-Cc: mst@redhat.com, ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	yuri.benditovich@daynix.com, yan@daynix.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003442:EE_|MW4PR12MB6898:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e7421ba-6172-443f-0600-08dc4ee22cc0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TiHFDU6jCVmfV9ZuiUzWPMLpJlq8NFqpbxC3VWj4utJMT+i/OkgNFDAojAPvfktf8WiQ7mCF//jiFE2tUluPlAcklCX/PYNSO41xvMc0gS5z0MmTavg6JXPXYE4fPzDjcMYpkvdoAvDidh0RthCV/BHHtkLN3+zi7t7eDK56kZitdt+OY6zjRIrsFHFt/4OLfC//ABxClCLTlBd6kRGFIHKaQmS9NAux+VpGvMYQrAKtFuarewAOxRe31Gq5EgpCj+zn49PSOe4KeVQ5WSk3hF0so382x6HFpVfDwaD5f456KyPqHqhqvwd+cwHq/1RL7oCnqqT6Mg0Hi+vq/FBeazQM4w057PdoAXxCG0ohUFKEBahXz/el3hSw0kfXO/a2BC02jnX/g8YkB5nJRje7Jc78NbOhYBeOs72Ccj+BbpKiJ4iD/RkPx4Dmc5z65eLXYVAA8T2JPzwpICt7QnP3t1ewJLTMMxpNtls3dGvWZ3hraMJUDbqL9Z2w8EzF7UGf5yobrgxwyqs25cVxyS8WrxjeQVt47dmUJiTVSM23Ow0NR9aEdwZb0wpgXEOAsgwiN9cDg/fu8K97gM+pilugqnNmi1ZKEdFnpwSRHorwKT+LSiQfkjGIAGV83CaI99QHGNxcyWS9F/U1ac6JJlDAyFhmFwEeBcpmpfwkBk7sUKG84bGeg/HZmRbkeBzUBsePkhftMC+b0cbf5CP4HQl3H3S1CPxPUjlbS8d27gSTOtJkYOrzxVK+GkAlmr4/6edM
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2024 04:47:29.8718
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e7421ba-6172-443f-0600-08dc4ee22cc0
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003442.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6898
 
-On Thu, Mar 28, 2024 at 7:44=E2=80=AFAM Andrew Melnychenko <andrew@daynix.c=
-om> wrote:
->
-> When the Qemu launched with vhost but without tap vnet_hdr,
-> vhost tries to copy vnet_hdr from socket iter with size 0
-> to the page that may contain some trash.
-> That trash can be interpreted as unpredictable values for
-> vnet_hdr.
-> That leads to dropping some packets and in some cases to
-> stalling vhost routine when the vhost_net tries to process
-> packets and fails in a loop.
->
-> Qemu options:
->   -netdev tap,vhost=3Don,vnet_hdr=3Doff,...
->
-> From security point of view, wrong values on field used later
-> tap's tap_get_user_xdp() and will affect skb gso and options.
-> Later the header(and data in headroom) should not be used by the stack.
-> Using custom socket as a backend to vhost_net can reveal some data
-> in the vnet_hdr, although it would require kernel access to implement.
->
-> The issue happens because the value of sock_len in virtqueue is 0.
-> That value is set at vhost_net_set_features() with
-> VHOST_NET_F_VIRTIO_NET_HDR, also it's set to zero at device open()
-> and reset() routine.
-> So, currently, to trigger the issue, we need to set up qemu with
-> vhost=3Don,vnet_hdr=3Doff, or do not configure vhost in the custom progra=
-m.
->
-> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+Currently the buffer used for control VQ commands is protected by the
+RTNL lock. Previously this wasn't a major concern because the control
+VQ was only used during device setup and user interaction. With the
+recent addition of dynamic interrupt moderation the control VQ may be
+used frequently during normal operation.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+This series removes the RNTL lock dependancy by introducing a spin lock
+to protect the control buffer and writing SGs to the control VQ.
 
-It seems it has been merged by Michael.
+v2:
+	- New patch to only process the provided queue in
+	  virtnet_dim_work
+	- New patch to lock per queue rx coalescing structure.
 
-Thanks
+Daniel Jurgens (6):
+  virtio_net: Store RSS setting in virtnet_info
+  virtio_net: Remove command data from control_buf
+  virtio_net: Add a lock for the command VQ.
+  virtio_net: Do DIM update for specified queue only
+  virtio_net: Add a lock for per queue RX coalesce
+  virtio_net: Remove rtnl lock protection of command buffers
 
-> ---
->  drivers/vhost/net.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index f2ed7167c848..57411ac2d08b 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_virtq=
-ueue *nvq,
->         hdr =3D buf;
->         gso =3D &hdr->gso;
->
-> +       if (!sock_hlen)
-> +               memset(buf, 0, pad);
-> +
->         if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
->             vhost16_to_cpu(vq, gso->csum_start) +
->             vhost16_to_cpu(vq, gso->csum_offset) + 2 >
-> --
-> 2.43.0
->
+ drivers/net/virtio_net.c | 243 +++++++++++++++++++++------------------
+ 1 file changed, 134 insertions(+), 109 deletions(-)
+
+-- 
+2.42.0
 
 
