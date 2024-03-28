@@ -1,67 +1,75 @@
-Return-Path: <netdev+bounces-82848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866BE88FEEB
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 13:26:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ABF588FF09
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 13:31:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08FD6B22076
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:26:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B50B1F24EA7
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083337F481;
-	Thu, 28 Mar 2024 12:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9BD208B0;
+	Thu, 28 Mar 2024 12:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9jEuvem"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x1AejCY/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BF07E575;
-	Thu, 28 Mar 2024 12:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12E36AC0;
+	Thu, 28 Mar 2024 12:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711628755; cv=none; b=lyiioQOA5J3ohE286ldWOILLaAeCdC2ihew3HyBEn0n9eXgW423j72RDWpx19SON8eR0okcKUFxc/wAzt7XliP93jMSLtRkmeLceE4azEeLqr3DulxATJVeJDVm1VsW6B9aXOy/mmk9kLH7Q0WPkwKx0FbjYl/4jljdfPDNxhiw=
+	t=1711629084; cv=none; b=RKR+Xug5e/9es2W6QNyeeHsehQPZwTHp2LQShbIwVPcRWK8uyDA0InRQZIZMTC7KnfAxw5EYXQTQWkRHCLZM3lOEfeZP02k8Vp/pHUhe5O59NcVy7EXcrz4bL1g4SOnhMG40pVg5e5N9N4M2lafKdOG+FLrbL8CRKils+mifdIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711628755; c=relaxed/simple;
-	bh=BfyepUCPUZFKLn0+q11h5xNB6kNozPxJq/XAGESUjts=;
+	s=arc-20240116; t=1711629084; c=relaxed/simple;
+	bh=olEwNUHU8Es3c7i2wR9R6RW1M4yAYUSI1YmaXDThgXY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c17ccXk+qD6+54zVfnsjI42ewj2s7twuxDZ8qtKA08A+ByKF2pi5/HtYNsku0knsLK3vjBkrGJubYQkvspknfJUl/j1r8A8t06vRV5uPs5YFZzQ0RB0yt1qcYBwWwt+SzzWTg5b+tM2bHL95Xs0FvakUpxVUC26fSXe2RtETUb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9jEuvem; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDE65C433F1;
-	Thu, 28 Mar 2024 12:25:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711628755;
-	bh=BfyepUCPUZFKLn0+q11h5xNB6kNozPxJq/XAGESUjts=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q9jEuvemfKaUfbAp3lYMf289x2fuQIl1EQTIyV7/VznHbJwdPX9Y99qCZTc4L5Rma
-	 27UZ7+dPMRscrMH14JppQuGPvw3CBMh087urv9+FwGTjebaWTcUbmKc6v7rjqSYbWk
-	 cDPJxOs3dVJmbe2f/UadXoLmVLL16jN8g/Iduhqq3UqWAn15h8ilD3YTyfeh2USXTQ
-	 3uKaZw4FkCTkUoJEw+q9XhNc6LZgckEmzoZ/16GCNDzLoGDViM+2dXzdVSLyvk1B4m
-	 FBICgyhGBpe1LwpgJn5Ms1ZYGXih4ypLhLzD2ozHf7tFtvJSVIAa2zS/UmDvxTDYad
-	 XUptbSzvQqG5w==
-Date: Thu, 28 Mar 2024 12:25:49 +0000
-From: Simon Horman <horms@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=C9x+p+li/xQfB7Eqa8U7AChvMBDeJpBMSrBwete+j3eH6wKBeuXHdV9FAF/d0TDSZddp5XzYH6vZFrvOQKTHwDE9j46a34o+c58lkzLRnWJx6Q8R5cWBOKtmbA7b9d099oEjv1TIIi1OJg9gwEtceAlJlEm2CYwgezLIQmRZ0aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x1AejCY/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3K9+fUzqHNKuVE49NIFsoNm4LPPEQ0miuf9p4SueIoU=; b=x1AejCY/iaLYOJuSBK+K6mDmGy
+	3nrU15a5Xb1JTEFBw+IyKQSC9dXWPEbMI11Ae06rP1xpvhcE8iCcirSx2K179rTSvZX04wRY39yLd
+	eyUvLXo/8HJCLV/7giSH+Os3nJ/UNUgWaaZJwLhhG5TzqGBaKX6+ahVDD8flBV9P9Mb4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rpouQ-00BUms-VV; Thu, 28 Mar 2024 13:31:06 +0100
+Date: Thu, 28 Mar 2024 13:31:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Ziyang Xuan <william.xuanziyang@huawei.com>,
-	Shigeru Yoshida <syoshida@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RESEND] net: hsr: Provide RedBox support
-Message-ID: <20240328122549.GJ403975@kernel.org>
-References: <20240326090220.3259927-1-lukma@denx.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <2d325acb-fc35-4ca3-80f2-ac88359578fd@lunn.ch>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,69 +78,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240326090220.3259927-1-lukma@denx.de>
+In-Reply-To: <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
 
-On Tue, Mar 26, 2024 at 10:02:20AM +0100, Lukasz Majewski wrote:
-> Introduce RedBox support (HSR-SAN to be more precise) for HSR networks.
-> Following traffic reduction optimizations have been implemented:
-> - Do not send HSR supervisory frames to Port C (interlink)
-> - Do not forward to HSR ring frames addressed to Port C
-> - Do not forward to Port C frames from HSR ring
-> - Do not send duplicate HSR frame to HSR ring when destination is Port C
-> 
-> The corresponding patch to modify iptable2 sources has already been sent:
-> https://lore.kernel.org/netdev/20240308145729.490863-1-lukma@denx.de/T/
-> 
-> Testing procedure:
-> ------------------
-> The EVB-KSZ9477 has been used for testing on net-next branch
-> (SHA1: 709776ea8562).
-> 
-> Ports 4/5 were used for SW managed HSR (hsr1) as first hsr0 for ports 1/2
-> (with HW offloading for ksz9477) was created. Port 3 has been used as
-> interlink port (single USB-ETH dongle).
-> 
-> Configuration - RedBox (EVB-KSZ9477):
-> ifconfig lan1 down;ifconfig lan2 down
-> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
-> ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 interlink lan3 supervision 45 version 1
-> ifconfig lan4 up;ifconfig lan5 up
-> ifconfig lan3 up
-> ifconfig hsr1 192.168.0.11 up
-> 
-> Configuration - DAN-H (EVB-KSZ9477):
-> 
-> ifconfig lan1 down;ifconfig lan2 down
-> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
-> ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 supervision 45 version 1
-> ifconfig lan4 up;ifconfig lan5 up
-> ifconfig hsr1 192.168.0.12 up
-> 
-> This approach uses only SW based HSR devices (hsr1).
-> 
-> --------------          -----------------       ------------
-> DAN-H  Port5 | <------> | Port5         |       |
->        Port4 | <------> | Port4   Port3 | <---> | PC
->              |          | (RedBox)      |       | (USB-ETH)
-> EVB-KSZ9477  |          | EVB-KSZ9477   |       |
-> --------------          -----------------       ------------
-> 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> +          pairsets:
+> +            $ref: /schemas/types.yaml#/definitions/phandle-array
+> +            description:
+> +              List of phandles, each pointing to the power supply for the
+> +              corresponding pairset named in 'pairset-names'. This property
+> +              aligns with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
+> +              PSE Pinout Alternatives (as per IEEE 802.3-2022 Table 145\u20133)
+> +              |-----------|---------------|---------------|---------------|---------------|
+> +              | Conductor | Alternative A | Alternative A | Alternative B | Alternative B |
+> +              |           |    (MDI-X)    |     (MDI)     |      (X)      |      (S)      |
+> +              |-----------|---------------|---------------|---------------|---------------|
+> +              | 1         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
+> +              | 2         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
+> +              | 3         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
+> +              | 4         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
+> +              | 5         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
+> +              | 6         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
+> +              | 7         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
+> +              | 8         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
 
-Hi Lukasz,
+Is it possible to avoid \u encoding? Ideally this documentation should
+be understandable without having to render it using a toolset. I just
+want to use less(1).
 
-this patch (2) seems to have a build dependency on:
-(1) [v2,RESEND] net: hsr: Use full string description when opening HSR network device
-    https://lore.kernel.org/all/20240326085649.3259424-1-lukma@denx.de/
+Or is this a email problem? Has something converted your UTF-8 file to
+this \u notation?
 
-Which is pending review.
-
-With this in mind, I suggest waiting for the review of 1 to be completed
-and then either:
-
-* If 1 is accepted, then follow-up by sending v4 of this patch (2); or
-* If changes are requested to 1, include 1 and 2 together in
-   a patchset after addressing relevant feedback
-
-...
+     Andrew
 
