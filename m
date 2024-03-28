@@ -1,130 +1,150 @@
-Return-Path: <netdev+bounces-82728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD84588F74C
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:35:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2361E88F76F
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A6FC1F277D5
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:35:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2592291161
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A8240871;
-	Thu, 28 Mar 2024 05:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E9B47F69;
+	Thu, 28 Mar 2024 05:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BZsBjyz4"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1496C2E630;
-	Thu, 28 Mar 2024 05:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54F040878
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 05:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711604111; cv=none; b=GNjytftecE6PJ9tyLe2mgCbmCn7T7gCSnZtA5PpSgwkJ5KBmkAaRBkkAwWtM82M4URjGnTQWnw8oWWMd4Uplc3daHSdUoMUdbstl7SEdttH8Se+kwna6YPuLZcD3fsBWgJKKYhseMGjvDT6YwnMAgajurSAc92Ao0IWlCmX3Rao=
+	t=1711605102; cv=none; b=FT8upRj2VtN9NdKNo/ILGW05Vd44txHneZKn8awYV9LUMOTVX0b8WT47IHT/TyCeOLHxI2Lqzo6pJWM+QUjfUFI7SEZFaYHWvOgDOCVIP9dCuM0Hq8o2SL++19nB2gjd8T48ykaGaODP872bCuBhhPSbTVL36/I6YGrKwFWQkUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711604111; c=relaxed/simple;
-	bh=Lgd4O19vrz5qqCNALb/TQFydB9SMVctddaeUCF0e9so=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=Mk3n9I4U2m+RwGhz/azC2R1RQvccC9UNlW0M5fT53Q+m7uvCrPAOwQq4ycpfb9lIE+iiZEmnFBCUXwm458BNpwZVMUSA6wl3EEsKb0ikzh02Q6rkV2Z4R6uOGsDVNiT+l7W9ZgIhh9ImDIJ+78Bt6AP5jFHi0LFu7UGaxtnNql8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.237.72.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from duoming$zju.edu.cn ( [218.12.18.152] ) by
- ajax-webmail-mail-app3 (Coremail) ; Thu, 28 Mar 2024 13:34:48 +0800
- (GMT+08:00)
-Date: Thu, 28 Mar 2024 13:34:48 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: duoming@zju.edu.cn
-To: "Simon Horman" <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hams@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, jreuter@yaina.de
-Subject: Re: [PATCH net] ax25: fix use-after-free bugs caused by
- ax25_ds_del_timer
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
- 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn zju.edu.cn
-In-Reply-To: <20240327191025.GU403975@kernel.org>
-References: <20240326142542.118058-1-duoming@zju.edu.cn>
- <20240327191025.GU403975@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1711605102; c=relaxed/simple;
+	bh=e+ivK+sEKC6jHcpFhx7jkO+gQuawHV6zSHHitD3sr+Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EgVq8kBp68QP1ZyLVm7A4czNb/g+4IwVfEhCH6EBAsO9azmJMWJQYNK90fkKnwmxUzwkl1/egfuJrA4y2hu1G/YdRfvMbZJw56sn/3GK48GAIsIcD2X/6gqsKxDcUNO06/dXtf8MR7aVTZGyVhxv34qkOLCFlPyRun2Tv8n8g/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BZsBjyz4; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <aca9f551-da56-4c50-b456-cb67f5ca79fe@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711605097;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cHnnb0+qZhD5eQZ6r1asbItmM6NKbnOUjHanXATII2o=;
+	b=BZsBjyz4Udrd0YhrJRoxCpGiEi/daQHI+7HfxhEHQbFN7nP/7pofvXz9633HEz9qJtNfQW
+	Q0TMR7ABJ+q4smOPMyJHu4a5VdaQIDr9hkd14i9Xz4lz9B4D8TXAzUG7EtcWTcAGzLJiWe
+	US1Z098Qy8Q38ZhzQD/m9YMoFz7wc5c=
+Date: Wed, 27 Mar 2024 22:51:30 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <7192041a.9d52.18e838dbf1b.Coremail.duoming@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cC_KCgCXvMd5AQVmOTZDAQ--.26395W
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUOAWYEJBkNNgAAst
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Subject: Re: [PATCH net-next 01/12] bnxt_en: Add a timeout parameter to
+ bnxt_hwrm_port_ts_query()
+Content-Language: en-US
+To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+ Richard Cochran <richardcochran@gmail.com>
+References: <20240325222902.220712-1-michael.chan@broadcom.com>
+ <20240325222902.220712-2-michael.chan@broadcom.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240325222902.220712-2-michael.chan@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-T24gV2VkLCAyNyBNYXIgMjAyNCAxOToxMDoyNSArMDAwMCBTaW1vbiBIb3JtYW4gd3JvdGU6Cj4g
-PiBXaGVuIHRoZSBheDI1IGRldmljZSBpcyBkZXRhY2hpbmcsIHRoZSBheDI1X2Rldl9kZXZpY2Vf
-ZG93bigpCj4gPiBjYWxscyBheDI1X2RzX2RlbF90aW1lcigpIHRvIGNsZWFudXAgdGhlIHNsYXZl
-X3RpbWVyLiBXaGVuCj4gPiB0aGUgdGltZXIgaGFuZGxlciBpcyBydW5uaW5nLCB0aGUgYXgyNV9k
-c19kZWxfdGltZXIoKSB0aGF0Cj4gPiBjYWxscyBkZWxfdGltZXIoKSBpbiBpdCB3aWxsIHJldHVy
-biBkaXJlY3RseS4gQXMgYSByZXN1bHQsCj4gPiB0aGUgdXNlLWFmdGVyLWZyZWUgYnVncyBjb3Vs
-ZCBoYXBwZW4sIG9uZSBvZiB0aGUgc2NlbmFyaW9zCj4gPiBpcyBzaG93biBiZWxvdzoKPiA+IAo+
-ID4gICAgICAgKFRocmVhZCAxKSAgICAgICAgICB8ICAgICAgKFRocmVhZCAyKQo+ID4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICB8IGF4MjVfZHNfdGltZW91dCgpCj4gPiBheDI1X2Rldl9kZXZp
-Y2VfZG93bigpICAgIHwKPiA+ICAgYXgyNV9kc19kZWxfdGltZXIoKSAgICAgfAo+ID4gICAgIGRl
-bF90aW1lcigpICAgICAgICAgICB8Cj4gPiAgIGF4MjVfZGV2X3B1dCgpIC8vRlJFRSAgIHwKPiA+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgYXgyNV9kZXYtPiAvL1VTRQo+ID4gCj4gPiBJ
-biBvcmRlciB0byBtaXRpZ2F0ZSBidWdzLCB3aGVuIHRoZSBkZXZpY2UgaXMgZGV0YWNoaW5nLCB1
-c2UKPiA+IHRpbWVyX3NodXRkb3duX3N5bmMoKSB0byBzdG9wIHRoZSB0aW1lci4KPiAKPiBGV0lJ
-VywgaW4gbXkgcmVhZGluZyBvZiB0aGluZ3MgdGhlcmUgaXMgYW5vdGhlciBmYWlsdXJlIG1vZGUg
-d2hlcmVieQo+IGF4MjVfZHNfdGltZW91dCBtYXkgcmVhcm0gdGhlIHRpbWVyIGFmdGVyIHRoZSBj
-YWxsIHRvIGRlbF90aW1lcigpIGJ1dAo+IGJlZm9yZSB0aGUgY2FsbCB0byBheDI1X2Rldl9wdXQo
-KS4KCkkgdGhpbmsgdXNpbmcgdGltZXJfc2h1dGRvd25fc3luYygpIG9yIGRlbF90aW1lcl9zeW5j
-KCkgdG8gcmVwbGFjZSBkZWxfdGltZXIoKQpjb3VsZCBwcmV2ZW50IHRoZSByZWFybS4KCj4gPiBG
-aXhlczogMWRhMTc3ZTRjM2Y0ICgiTGludXgtMi42LjEyLXJjMiIpCj4gPiBTaWduZWQtb2ZmLWJ5
-OiBEdW9taW5nIFpob3UgPGR1b21pbmdAemp1LmVkdS5jbj4KPiA+IC0tLQo+ID4gIG5ldC9heDI1
-L2F4MjVfZHNfdGltZXIuYyB8IDcgKysrKysrLQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2Vy
-dGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPiA+IAo+ID4gZGlmZiAtLWdpdCBhL25ldC9heDI1L2F4
-MjVfZHNfdGltZXIuYyBiL25ldC9heDI1L2F4MjVfZHNfdGltZXIuYwo+ID4gaW5kZXggYzRmOGFk
-YmY4MTQuLjU2MjRjMGQxNzRjIDEwMDY0NAo+ID4gLS0tIGEvbmV0L2F4MjUvYXgyNV9kc190aW1l
-ci5jCj4gPiArKysgYi9uZXQvYXgyNS9heDI1X2RzX3RpbWVyLmMKPiA+IEBAIC00Myw3ICs0Mywx
-MiBAQCB2b2lkIGF4MjVfZHNfc2V0dXBfdGltZXIoYXgyNV9kZXYgKmF4MjVfZGV2KQo+ID4gIAo+
-ID4gIHZvaWQgYXgyNV9kc19kZWxfdGltZXIoYXgyNV9kZXYgKmF4MjVfZGV2KQo+ID4gIHsKPiA+
-IC0JaWYgKGF4MjVfZGV2KQo+ID4gKwlpZiAoIWF4MjVfZGV2KQo+ID4gKwkJcmV0dXJuOwo+ID4g
-Kwo+ID4gKwlpZiAoIWF4MjVfZGV2LT5kZXZpY2VfdXApCj4gPiArCQl0aW1lcl9zaHV0ZG93bl9z
-eW5jKCZheDI1X2Rldi0+ZGFtYS5zbGF2ZV90aW1lcik7Cj4gPiArCWVsc2UKPiA+ICAJCWRlbF90
-aW1lcigmYXgyNV9kZXYtPmRhbWEuc2xhdmVfdGltZXIpOwo+ID4gIH0KPiAKPiBJIHRoaW5rIHRo
-YXQgYSkgaXQgaXMgYWx3YXlzIGNvcnJlY3QgdG8gY2FsbCB0aW1lcl9zaHV0ZG93bl9zeW5jLAo+
-IGFuZCBiKSBheDI1X2Rldi0+ZGV2aWNlX3VwIGlzIGFsd2F5cyB0cnVlLiBTbyBhIGNhbGwgdG8K
-PiB0aW1lcl9zaHV0ZG93bl9zeW5jIGNhbiBzaW1wbHkgcmVwbGFjZSB0aGUgY2FsbCB0byBkZWxf
-dGltZXIuCgpJIHRoaW5rIHRpbWVyX3NodXRkb3duKigpIGlzIHVzZWQgZm9yIHRoZSBjb2RlIHBh
-dGggdG8gY2xlYW4gdXAgdGhlCmRyaXZlciBvciBkZXRhY2ggdGhlIGRldmljZS4gSWYgdGltZXIg
-aXMgc2h1dCBkb3duIGJ5IHRpbWVyX3NodXRkb3duKigpLAppdCBjb3VsZCBub3QgYmUgcmUtYXJt
-ZWQgYWdhaW4gdW5sZXNzIHdlIHJlaW5pdGlhbGl6ZSB0aGUgdGltZXIuIFRoZQpzbGF2ZV90aW1l
-ciBzaG91bGQgb25seSBiZSBzaHV0IGRvd24gd2hlbiB0aGUgYXgyNSBkZXZpY2UgaXMgZGV0YWNo
-aW5nIG9yCnRoZSBkcml2ZXIgaXMgcmVtb3ZpbmcuIEFuZCBpdCBzaG91bGQgbm90IGJlIHNodXQg
-ZG93biBpbiBvdGhlciBzY2VuYXJpb3MsCnN1Y2ggYXMgY2FsbGVkIGluIGF4MjVfZHNfc3RhdGUy
-X21hY2hpbmUoKSBvciBheDI1X2RzX3N0YXRlM19tYWNoaW5lKCkuClNvIEkgdGhpbmsgY2FsbGlu
-ZyB0aW1lcl9zaHV0ZG93bl9zeW5jKCkgaXMgbm90IGFsd2F5cyBjb3JyZWN0LgoKV2hhdCdzIG1v
-cmUsIHRoZSBheDI1X2Rldi0+ZGV2aWNlX3VwIGlzIG5vdCBhbHdheXMgdHJ1ZS4gSXQgaXMgc2V0
-IHRvCmZhbHNlIGluIGF4MjVfa2lsbF9ieV9kZXZpY2UoKS4KCkluIGEgd29yZCwgdGhlIHRpbWVy
-X3NodXRkb3duX3N5bmMoKSBjb3VsZCBub3QgcmVwbGFjZSB0aGUgZGVsX3RpbWVyKCkKY29tcGxl
-dGVseS4KCj4gQWxzbywgbm90IHN0cmljdGx5IHJlbGF0ZWQsIEkgdGhpbmsgYXgyNV9kZXYgY2Fu
-bm90IGJlIE5VTEwsCj4gc28gdGhhdCBjaGVjayBjb3VsZCBiZSBkcm9wcGVkLiBCdXQgcGVyaGFw
-cyB0aGF0IGlzIGJldHRlciBsZWZ0IGFsb25lLgoKVGhlIGF4MjVfZGV2IGNhbm5vdCBub3QgYmUg
-TlVMTCwgYmVjYXVzZSB3ZSBvbmx5IHVzZSBheDI1X2Rldl9wdXQoKSB0bwpmcmVlIHRoZSBheDI1
-X2RldiBpbnN0ZWFkIG9mIHNldHRpbmcgaXMgdG8gTlVMTC4gU28gSSB0aGluayB0aGUgY2hlY2sK
-Y291bGQgYmUgZHJvcHBlZC4KCkRvIHlvdSB0aGluayB0aGUgZm9sbG93aW5nIHBsYW4gaXMgcHJv
-cGVyPwoKZGlmZiAtLWdpdCBhL25ldC9heDI1L2F4MjVfZHNfdGltZXIuYyBiL25ldC9heDI1L2F4
-MjVfZHNfdGltZXIuYwppbmRleCBjNGY4YWRiZjgxNDQuLmYxY2FiNGVmZmE0NCAxMDA2NDQKLS0t
-IGEvbmV0L2F4MjUvYXgyNV9kc190aW1lci5jCisrKyBiL25ldC9heDI1L2F4MjVfZHNfdGltZXIu
-YwpAQCAtNDMsOCArNDMsNyBAQCB2b2lkIGF4MjVfZHNfc2V0dXBfdGltZXIoYXgyNV9kZXYgKmF4
-MjVfZGV2KQoKIHZvaWQgYXgyNV9kc19kZWxfdGltZXIoYXgyNV9kZXYgKmF4MjVfZGV2KQogewot
-ICAgICAgIGlmIChheDI1X2RldikKLSAgICAgICAgICAgICAgIGRlbF90aW1lcigmYXgyNV9kZXYt
-PmRhbWEuc2xhdmVfdGltZXIpOworICAgICAgIGRlbF90aW1lcl9zeW5jKCZheDI1X2Rldi0+ZGFt
-YS5zbGF2ZV90aW1lcik7CiB9CgpUaGVyZSBpcyBubyBkZWFkbG9jayB3aWxsIGhhcHBlbi4KCj4g
-Wm9vbWluZyBvdXQgYSBiaXQsIGhhcyByZW1vdmFsIG9mIGF4MjUgYmVlbiBjb25zaWRlcmVkLgo+
-IEkgZGlkbid0IGNoZWNrIHRoZSBsb2dzIHRob3JvdWdobHksIGJ1dCBJJ20gbm90IGNvbnZpbmNl
-ZCBpdCdzIGJlZW4KPiBtYWludGFpbmVkIC0gb3RoZXIgdGhhbiBjbGVhbi11cHMgYW5kIGJ5LWlu
-c3BlY3Rpb24gYnVnIGZpeGVzIC0gc2luY2UgZ2l0Cj4gaGlzdG9yeSBiZWdhbi4KCkJlc3QgcmVn
-YXJkcywKRHVvbWluZyBaaG91
+On 25/03/2024 22:28, Michael Chan wrote:
+> The caller can pass this new timeout parameter to the function to
+> specify the firmware timeout value when requesting the TX timestamp
+> from the firmware.  This will allow the caller to precisely control
+> the timeout and will be used in the next patch.  In this patch, the
+> parameter is 0 which means to use the current default value.
+> 
+> Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Cc: Richard Cochran <richardcochran@gmail.com>
+> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 16 ++++++++++++----
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
+>   2 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> index cc07660330f5..dbfd1b36774c 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> @@ -109,7 +109,8 @@ static void bnxt_ptp_get_current_time(struct bnxt *bp)
+>   	spin_unlock_bh(&ptp->ptp_lock);
+>   }
+>   
+> -static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
+> +static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts,
+> +				   u32 txts_tmo)
+>   {
+>   	struct hwrm_port_ts_query_output *resp;
+>   	struct hwrm_port_ts_query_input *req;
+> @@ -122,10 +123,15 @@ static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
+>   	req->flags = cpu_to_le32(flags);
+>   	if ((flags & PORT_TS_QUERY_REQ_FLAGS_PATH) ==
+>   	    PORT_TS_QUERY_REQ_FLAGS_PATH_TX) {
+> +		u32 tmo_us = txts_tmo * 1000;
+> +
+>   		req->enables = cpu_to_le16(BNXT_PTP_QTS_TX_ENABLES);
+>   		req->ptp_seq_id = cpu_to_le32(bp->ptp_cfg->tx_seqid);
+>   		req->ptp_hdr_offset = cpu_to_le16(bp->ptp_cfg->tx_hdr_off);
+> -		req->ts_req_timeout = cpu_to_le16(BNXT_PTP_QTS_TIMEOUT);
+> +		if (!tmo_us)
+> +			tmo_us = BNXT_PTP_QTS_TIMEOUT;
+> +		tmo_us = min(tmo_us, BNXT_PTP_QTS_MAX_TMO_US);
+> +		req->ts_req_timeout = cpu_to_le16(txts_tmo);
+>   	}
+>   	resp = hwrm_req_hold(bp, req);
+>   
+> @@ -675,7 +681,8 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+>   	u64 ts = 0, ns = 0;
+>   	int rc;
+>   
+> -	rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_PATH_TX, &ts);
+> +	rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_PATH_TX, &ts,
+> +				     0);
+>   	if (!rc) {
+>   		memset(&timestamp, 0, sizeof(timestamp));
+>   		spin_lock_bh(&ptp->ptp_lock);
+> @@ -891,7 +898,8 @@ int bnxt_ptp_init_rtc(struct bnxt *bp, bool phc_cfg)
+>   		if (rc)
+>   			return rc;
+>   	} else {
+> -		rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_CURRENT_TIME, &ns);
+> +		rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_CURRENT_TIME,
+> +					     &ns, 0);
+>   		if (rc)
+>   			return rc;
+>   	}
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> index fce8dc39a7d0..04886d5f22ad 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> @@ -23,6 +23,7 @@
+>   #define BNXT_HI_TIMER_MASK	0xffff00000000UL
+>   
+>   #define BNXT_PTP_QTS_TIMEOUT	1000
+> +#define BNXT_PTP_QTS_MAX_TMO_US	65535
+>   #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
+>   				 PORT_TS_QUERY_REQ_ENABLES_TS_REQ_TIMEOUT | \
+>   				 PORT_TS_QUERY_REQ_ENABLES_PTP_HDR_OFFSET)
+
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
