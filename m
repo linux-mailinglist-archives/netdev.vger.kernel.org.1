@@ -1,209 +1,133 @@
-Return-Path: <netdev+bounces-82934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFF489039E
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:43:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABDFD8903E9
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:54:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55086B22E67
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:43:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC9891C2DDAE
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DCB3130E5F;
-	Thu, 28 Mar 2024 15:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411D212E1D0;
+	Thu, 28 Mar 2024 15:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="A2bwLeDA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TOZDS/Ah"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF85130E5E;
-	Thu, 28 Mar 2024 15:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B332B54BED
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 15:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711640536; cv=none; b=hqvYZPNg14Q22eCaCXD3xd/pZNRj8DLCJ5G+Jx64mv6bPPB8Q0wKpfd9d3nQ3VVuHEIRfUSWE+BSSX+OswX0UUbgotQd6ZGtUJFAbgrnUrGb5zqE0+kn/DsV7Jiu3gmbBhvs8GOvigBPBnxeghHgg6egBzgq2ZUFkqLSuqexQSU=
+	t=1711641263; cv=none; b=hvFVkQK+02nO5S5pYiNeVZ/kVEOjyYJgHfh49xpv5eMoE+OhjJdeb0Us9LpOtk0ILfFrGtlFOY4jkF8Bwnog1x8TebqjWlvB+h/+W2g5N3TEjev0hjHQa5ezg+xIpZdHqzElHP9ba2xCf/IsM6KlhnOAo2VdJy2Qjj1gefCq2xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711640536; c=relaxed/simple;
-	bh=uth9Af0P1r9+c/CKd6YirN6mU1fJBi0Wm0/5gSpdHII=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pffoQycydF2P9rRG2ScQJrFtoDWihBeMgsPe1HZLy2lpohGYVh3noCYoOmbB76HQWTDMFP2gIK1MWrDoBdzKdOhFsv1rNs3eLIh98JcBoISAEpVBrZ9lMSru1cjF7pCcAgSRi0IK/QjMS6xBXLw8cMUQ73fsE1aZCmRrynBtAf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=A2bwLeDA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42SFPDHl026396;
-	Thu, 28 Mar 2024 15:42:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=ehVBDuTk4Pl0tibhJJHYqqAVYUN6KlmjH3/AIxCqkhw=;
- b=A2bwLeDANlGv2YXMwJhvUVInxQQP/3Sl1rdMwMWuIDNc0LsD6l4He5AKRT3rX51n31CR
- nARMCWF2wLeGTYyhjpteDKM7EGcPVVfsIISBvUKfQAkCmxggaItpr+Ddpq42J39biFU1
- 04Z6RONxUUOnaJKWkPGZJiEDtpCzmIKVNSxuRld0+0AjluxCMHqjN1lIyyPQ0AViGMLS
- TwiI7gphh95+55y9am/Rr3RpLCYSU4G1mgCUvMJAG/ZtWb5PK+MRL5Txau7j17r7A30K
- ZRsWjoG0j3NRITGK/WmDlHi8PgYFIPeKTRV9lnAjgrSMgl+sWis0ahEQk9xtE8VmeO2I vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x5ary83af-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Mar 2024 15:42:13 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42SFgCN8023041;
-	Thu, 28 Mar 2024 15:42:12 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x5ary83ab-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Mar 2024 15:42:12 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42SEAXE8012975;
-	Thu, 28 Mar 2024 15:42:11 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x29t0xg9u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Mar 2024 15:42:11 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42SFg5Vc30999180
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 28 Mar 2024 15:42:07 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B57182004B;
-	Thu, 28 Mar 2024 15:42:05 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F264720043;
-	Thu, 28 Mar 2024 15:42:04 +0000 (GMT)
-Received: from dilbert5.fritz.box (unknown [9.171.12.209])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 28 Mar 2024 15:42:04 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Heiko Carstens <hca@linux.ibm.com>, pasic@linux.ibm.com,
-        schnelle@linux.ibm.com
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>
-Subject: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
-Date: Thu, 28 Mar 2024 16:41:44 +0100
-Message-ID: <20240328154144.272275-2-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240328154144.272275-1-gbayer@linux.ibm.com>
-References: <20240328154144.272275-1-gbayer@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fjFtrxuvbvfY-Wqx276JACrFWEgtiXZp
-X-Proofpoint-ORIG-GUID: e-cfi3yA8Hpjy5iAe0p3FUoN-V4G2Xtw
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1711641263; c=relaxed/simple;
+	bh=DdVbdbDrDFs2RTiS1Hx4Pdses+aj8Em2CA8hjdrZPfI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MYCy9VZxEBYb/1Jyq9YmoGBeIpTJF8Fs0qJuehHfGUGjPA9BtyW1J4VP+xO/rcUEWNEjeUw5Bt211Ymh3UofLaRz400cZEx+0FJ/SaAspgrUwCaYjgagdk3kqLW0jEPlcU7ew7fCrBRidz8Pf70qtvoOgMmKEI98qpGXuGvwqD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TOZDS/Ah; arc=none smtp.client-ip=209.85.160.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2220a389390so518618fac.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 08:54:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711641261; x=1712246061; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dkyOSAqnjnWoky7Ff1S/mAj3ec5VipKASoh7TgF31Q8=;
+        b=TOZDS/Ahi8EkHgFCK/twvRQQdgDbrXLIQdy2wZqVuPGAgvutSH4DrF6d62D25o/hgr
+         1mvLp/6i5PdAbpre5yqcbF9bF+CXXT9VtN5ZsQVp3F185BwVGNe7turKxMD14uj3X0vG
+         YB4Pu/ZAjWa2ruDWDcz0bs6RdSXraCBSxPfax75qyvVAEhhCw7BrTQB3/IEQ2TrTPHDf
+         6B3IKpWIFZIrr8rys+yfvoAIy0zBdAQIUP8vEw3r7w3iicS0BwO0iT9EkWUtT1BSEa+e
+         LIt8m74ZDkQAb8s8ErEmYhLHFaFYRRvwvP17z1H43OjNvdSTHkDdyNfBNk0BY7j2wgPc
+         S5ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711641261; x=1712246061;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dkyOSAqnjnWoky7Ff1S/mAj3ec5VipKASoh7TgF31Q8=;
+        b=B21zThWTkledLk4Ifry32GKZxqfdxg7KM1Fhp/IzG5NHcXgIzpCJCIvGpKy2aCrZfz
+         vyC/2xq/tjo6V7ZDSyWWf9irk6MLwLq03e5s7vwdIx3lnVznhWtkgMVsIbsAjSIzmx/D
+         nS6IkoCFpU1tF3C5Ak8AC83hE26+fhW5qSYK+tbqrKe3oqUrTmkHhjdR01zaH+Gh7Z6l
+         XWO6btkzDsMKOboPnNsDG17ktXmgnV8KBVqGIy7HBmJuqQ07abpEBDtaJKL4OdVNiH9g
+         WeWtfnqCcLkYLNbNPC1g+/bUded7bo6Pe7QFZAAfhqAHRwtIwevpVU4deoBxOt4BEANC
+         Xs8g==
+X-Gm-Message-State: AOJu0YwEcwweC77Onw3+RF/bqgQC1Ui20cFrgiGmr6ZSHg0kz/1AdOux
+	GgG+99s+3Vgz2RVhIrLO3qs3Qt/JaFkp2nvi02oR2TCGr8kEGqdKgA+Qlg13bdLAUSPQXURkKvr
+	CHpblOo8WsNpDdlHC7sESymEGd7o=
+X-Google-Smtp-Source: AGHT+IFpE65PpW2PtxXTIA/h0t462n1/D8x+MuARcBEbuOf2SszydNvrwc9pFB/GKpvlC0aUNGvH/TkMxPtWdBcu0+I=
+X-Received: by 2002:a05:6870:a712:b0:22a:57da:6fec with SMTP id
+ g18-20020a056870a71200b0022a57da6fecmr1153124oam.16.1711641260813; Thu, 28
+ Mar 2024 08:54:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-28_15,2024-03-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- mlxlogscore=648 spamscore=0 suspectscore=0 phishscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 mlxscore=0 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2403280108
+References: <20240326201311.13089-1-donald.hunter@gmail.com>
+ <20240326201311.13089-3-donald.hunter@gmail.com> <ZgWF/fIGXo/C1LSh@gmail.com>
+In-Reply-To: <ZgWF/fIGXo/C1LSh@gmail.com>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Thu, 28 Mar 2024 15:54:09 +0000
+Message-ID: <CAD4GDZz+-3=fBqEkMJqORxF=1wwX84aXm3JW=K0tLG2vNF+Vdg@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 2/3] doc: netlink: Add hyperlinks to generated
+ Netlink docs
+To: Breno Leitao <leitao@debian.org>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Alessandro Marcolini <alessandromarcolini99@gmail.com>, donald.hunter@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-Since [1], dma_alloc_coherent() does not accept requests for GFP_COMP
-anymore, even on archs that may be able to fulfill this. Functionality that
-relied on the receive buffer being a compound page broke at that point:
-The SMC-D protocol, that utilizes the ism device driver, passes receive
-buffers to the splice processor in a struct splice_pipe_desc with a
-single entry list of struct pages. As the buffer is no longer a compound
-page, the splice processor now rejects requests to handle more than a
-page worth of data.
+On Thu, 28 Mar 2024 at 15:00, Breno Leitao <leitao@debian.org> wrote:
+>
+> Hi Donald,
+>
+> On Tue, Mar 26, 2024 at 08:13:10PM +0000, Donald Hunter wrote:
+> > Update ynl-gen-rst to generate hyperlinks to definitions, attribute
+> > sets and sub-messages from all the places that reference them.
+> >
+> > Note that there is a single label namespace for all of the kernel docs.
+> > Hyperlinks within a single netlink doc need to be qualified by the
+> > family name to avoid collisions.
+> >
+> > The label format is 'family-type-name' which gives, for example,
+> > 'rt-link-attribute-set-link-attrs' as the link id.
+> >
+> > Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> > ---
+> >  tools/net/ynl/ynl-gen-rst.py | 44 +++++++++++++++++++++++++++---------
+> >  1 file changed, 33 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
+> > index 5825a8b3bfb4..4be931c9bdbf 100755
+> > --- a/tools/net/ynl/ynl-gen-rst.py
+> > +++ b/tools/net/ynl/ynl-gen-rst.py
+> > @@ -82,9 +82,9 @@ def rst_subsubsection(title: str) -> str:
+> >      return f"{title}\n" + "~" * len(title)
+> >
+> >
+> > -def rst_section(title: str) -> str:
+> > +def rst_section(prefix: str, title: str) -> str:
+> >      """Add a section to the document"""
+> > -    return f"\n{title}\n" + "=" * len(title)
+> > +    return f".. _{family}-{prefix}-{title}:\n\n{title}\n" + "=" * len(title)
+>
+> Where is 'family' variable set? Is this a global variable somewhere?
 
-Replace dma_alloc_coherent() and allocate a buffer with kmalloc() then
-create a DMA map for it with dma_map_page(). Since only receive buffers
-on ISM devices use DMA, qualify the mapping as FROM_DEVICE.
-Since ISM devices are available on arch s390, only and on that arch all
-DMA is coherent, there is no need to introduce and export some kind of
-dma_sync_to_cpu() method to be called by the SMC-D protocol layer.
+Yes, here in parse_yaml(). I realise it's a bit of a hack but would
+like to clean this up as part of switching to using ynl/lib/nlspec.py
+for reading the specs, in a separate patchset.
 
-Analogously, replace dma_free_coherent by a two step dma_unmap_page,
-then kfree to free the receive buffer.
-
-[1] https://lore.kernel.org/all/20221113163535.884299-1-hch@lst.de/
-
-Fixes: c08004eede4b ("s390/ism: don't pass bogus GFP_ flags to dma_alloc_coherent")
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
- drivers/s390/net/ism_drv.c | 35 ++++++++++++++++++++++++++---------
- 1 file changed, 26 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 2c8e964425dc..25911b887e5e 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -14,6 +14,8 @@
- #include <linux/err.h>
- #include <linux/ctype.h>
- #include <linux/processor.h>
-+#include <linux/dma-direction.h>
-+#include <linux/gfp_types.h>
- 
- #include "ism.h"
- 
-@@ -292,13 +294,15 @@ static int ism_read_local_gid(struct ism_dev *ism)
- static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- {
- 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
--	dma_free_coherent(&ism->pdev->dev, dmb->dmb_len,
--			  dmb->cpu_addr, dmb->dma_addr);
-+	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
-+		       DMA_FROM_DEVICE);
-+	kfree(dmb->cpu_addr);
- }
- 
- static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- {
- 	unsigned long bit;
-+	int rc;
- 
- 	if (PAGE_ALIGN(dmb->dmb_len) > dma_get_max_seg_size(&ism->pdev->dev))
- 		return -EINVAL;
-@@ -315,14 +319,27 @@ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- 	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
- 		return -EINVAL;
- 
--	dmb->cpu_addr = dma_alloc_coherent(&ism->pdev->dev, dmb->dmb_len,
--					   &dmb->dma_addr,
--					   GFP_KERNEL | __GFP_NOWARN |
--					   __GFP_NOMEMALLOC | __GFP_NORETRY);
--	if (!dmb->cpu_addr)
--		clear_bit(dmb->sba_idx, ism->sba_bitmap);
-+	dmb->cpu_addr = kmalloc(dmb->dmb_len, GFP_KERNEL | __GFP_NOWARN |
-+				__GFP_COMP | __GFP_NOMEMALLOC | __GFP_NORETRY);
-+	if (!dmb->cpu_addr) {
-+		rc = -ENOMEM;
-+		goto out_bit;
-+	}
-+	dmb->dma_addr = dma_map_page(&ism->pdev->dev,
-+				     virt_to_page(dmb->cpu_addr), 0,
-+				     dmb->dmb_len, DMA_FROM_DEVICE);
-+	if (dma_mapping_error(&ism->pdev->dev, dmb->dma_addr)) {
-+		rc = -ENOMEM;
-+		goto out_free;
-+	}
+-    title = f"Family ``{obj['name']}`` netlink specification"
++    # Save the family for use in ref labels
++    global family
++    family = obj['name']
 +
-+	return 0;
- 
--	return dmb->cpu_addr ? 0 : -ENOMEM;
-+out_free:
-+	kfree(dmb->cpu_addr);
-+out_bit:
-+	clear_bit(dmb->sba_idx, ism->sba_bitmap);
-+	return rc;
- }
- 
- int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
--- 
-2.44.0
-
++    title = f"Family ``{family}`` netlink specification"
 
