@@ -1,308 +1,219 @@
-Return-Path: <netdev+bounces-82902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3092B89021C
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:41:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9C989021F
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:42:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 886032973BE
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:41:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CE22296B7F
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41AC912BEAA;
-	Thu, 28 Mar 2024 14:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835D112AAC8;
+	Thu, 28 Mar 2024 14:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o74ZV9CL"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Uj3GWBEf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BDA12D76A
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85CF1272AC
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711636843; cv=none; b=k9XulxDeTIJx76Mimz5zMkbnJJOaCJj7+n0etnu855YyHaB4mLhalkLEKuJhI5No0BsJE9V0vn3l3sqAT2o5orbmEs+0sO9JG0GHSpTmCquZ5U0P4BvuxRLOhTxsMzGymNhklur6WKB19pyVmONgzNz1OiERM+QpEdSCI4tyqrg=
+	t=1711636947; cv=none; b=QQhqUVZM4Vh/MqFoiKKLBGr0Kpb4nplKvwDE9JS/Jd1KxWcqWThSdyFFdXlpHN9vsSV9pOeEdP4f3HgtiPSdWZmiuGoHo52khXgNA4CGeq+DkLEon1FGyAvt7tTvvwz0P6YPbBmH7VV+jYp09VBhAgPP8XUobUHzcM8i52FcYg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711636843; c=relaxed/simple;
-	bh=hH1R9nucTJno3soiryv3o2FiSWCSXHP2hnOZDfZ9SDU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uzc9b/H3CPSQzz/BZi88VWWfL5dtFBZgMNTqQjvH/7O/vHEHQBC5Yxu/K7wuzy3rCZPTp8So7Iq522goETGFBOx1rjxIplm0Un81THa2hP7H0tn9wBS0zepjtMV5h1ZhcNyaQ9Wyv0EVGEFGXngHVVhy9mBPjT/vQfMj7PNh08s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o74ZV9CL; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a2386e932so18714547b3.1
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:40:41 -0700 (PDT)
+	s=arc-20240116; t=1711636947; c=relaxed/simple;
+	bh=Gc8satM/FTCQ1mZJea9kW64b0UoXxa5bHnts8j6XkdI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mzHmrZCLIfMaj3xEnxfgIA2bcXapm5pNG4mIM0BILQdj6FkonlyQfhVR1E9tSDrMWghBR5PK41fe5e27mkkYtH80wKyIrl90ng3LHQgggiwJ7vYxYilP9ppeCoA/0PdXZ4aXJudFc/82gEG+2PNGQ49KMn5ZutU7UXGfqxNUNkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Uj3GWBEf; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2a07b092c4fso878206a91.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:42:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711636840; x=1712241640; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V+p86SvCRADRmCtp38fnFrKEhLTcYAFsdvzNjPMNeyI=;
-        b=o74ZV9CL5rsPPLbp/70E3aWmJ+eIyeUTqVcaczUmNhPNpWWKPRqC5IyXBoCLEQ3Dvg
-         +Qa9ZUfMDgoA+GcFnQ4ZVVpwTDoLbpKmU5oju/f0ThWYvtd4dDIb/ZTE0tbVZyiWk0mx
-         Zfx4InbRHSbTLtaO4b3+leRjc0OGslkFtg94/M+KHBKyzYr16MIZtOH28lvLd60ExgbF
-         PrnQHCp5AVzGMqF5nkMhkB84KG10Vl1+LmHG/RQlR9/K30GGHFvDG/w/PL/8JPXo8JUK
-         tU6xlPgR5vXmopbNZOUqYGdfn+rus+k/6+egG+kjoRnyegykSeBlCC/6QXTswKpxMwDN
-         Ysjw==
+        d=bytedance.com; s=google; t=1711636945; x=1712241745; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zOp5govZZQSJRzD95rrhGtQGcUj+k1AZvhk4Bdb7Q3s=;
+        b=Uj3GWBEfDEWNV6Q9ppTZHPzRDEPC9fxtMAqn1djsqbVx20F79rNmK5bgA+C8ycXzbU
+         oEFFP/gogMOePAlDaU9sVoBoNebgesz3ut+o36ul5HOYBJMd8FDxSpMcBn1jKhPVMvtM
+         DOdpDn/ex6muGP4REazyeb/Gp3+Vf6TU9sEauM9bIcCGDUYSn/p3IKSRnP+fMBS21t5i
+         /qa1vZpEOYBTcSQHBpW+JtgJaF1zEFiESDT0I/7Bw21YTEoLdZ5ZsbLSsNzml8/LiCyi
+         1le6TYrKh/3U7j84SubQtc6js3WFKAVLHZd+ZVJrYF1zJM3z31z5W0BC5+zFqi3Zp6l5
+         1w2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711636840; x=1712241640;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V+p86SvCRADRmCtp38fnFrKEhLTcYAFsdvzNjPMNeyI=;
-        b=jcQuejLrIhuWDky7jmEqyF6Lb4i1CDPXWm5UKDBBlWBIlw2bmq2wPXRuGQGowT10AY
-         CxYARrmYzlgVJ4T5ASO/AQK9RVEULie773OANg+wdwZ+SjfaxCuJ6DHbBfvAr86TvnAZ
-         5oR71RUZeAyakZuarDtyAIJyv8Go/A3xlwlfsf6zXJN3BztTlxed8GlpcjyDD94N0/NX
-         pqhGXIVZHBLnH2d6OCYjubgnY104Rzl/KqnA3lC6Husp308TsQmrbF5w13Qz8HJMGASP
-         AD/cMT/HSHHn9PkWGvit78eVFnxky89Rr9Om2FDNdeKsYAX+X7g6lsPROG0ExIBII0NR
-         YXww==
-X-Forwarded-Encrypted: i=1; AJvYcCU1bleE2sFWzb4gqXHu6SMVcMOs7yTDjPe3rO3eT4dCMLr7sc+GBlA3lvH57pQkI+yyuoalISYdlh77AnaCF+IaHpcKmHsq
-X-Gm-Message-State: AOJu0YwTrJkRodgZQOXjFRcCZMrfuZ8zvDKYWBIrmdrT5UQHPyzq8yGg
-	XyxtjdiO4Pr4CTMY1MaulRUm2AzMoUPVVMHTasGhQZ4Mco10po/ZBFE/ewJSli0HnsRxVMwwZAi
-	BwiwYqOACKA==
-X-Google-Smtp-Source: AGHT+IEZYqHCpZDNMX/jR49tpTDjJmDcGTDoFb+s++TOGcFIZ05XLf5y0WOMTjdIn0OXgCkQ9ZRNv3RF6WoCCw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:690c:64ca:b0:611:1f1c:1287 with SMTP
- id ht10-20020a05690c64ca00b006111f1c1287mr650924ywb.3.1711636840478; Thu, 28
- Mar 2024 07:40:40 -0700 (PDT)
-Date: Thu, 28 Mar 2024 14:40:32 +0000
-In-Reply-To: <20240328144032.1864988-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1711636945; x=1712241745;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zOp5govZZQSJRzD95rrhGtQGcUj+k1AZvhk4Bdb7Q3s=;
+        b=ekLbJjTZXrZuvLbd2W3Sk9ilEQ0rOW2dmwRFGwqRCyuuZSw+dFQRMg7wKocedfh23D
+         qe8qpVjEbK45X2Xp0DKjqNK/XbgL/4e/uadGbTwEYWKIQpDlcUnBLpKIp9p1w/au/mZq
+         JLYN2y/a2FF1yODcEnvMCMgbDz6QmSPRgUisnUs8X+2f7E3RUZQgEwU121VQMQeJYsyQ
+         HXL7mhZDVmdzyZ+HSgfCzSjmyNXaDH/j2i6n16/nm0pH7mOKnJSwMzLTtVGrIcUb94Cr
+         LE+1JNxcjsRhCEbrwFgVV0zLuZgN4iZ6ixZD0cXgY/ySO4ri3dOilIiLxpRENFuXwHU/
+         Aryg==
+X-Forwarded-Encrypted: i=1; AJvYcCWD3/YH+LV35hWDQmALeRvrz+A6mUj0J+L3oouXJG3jxsL+1bvWx94daO8CpM5QjcpJS7m3EtxzepULLIRloLPHR8//zX/d
+X-Gm-Message-State: AOJu0YwmxIbJMjajpEILnLadClxpFOQ2VTdni5jfVPWV3P5DzOcabLQz
+	fVE7WEpRrJB/FFwL0CHfh8AiL8a8mitS0foN3LrNH86O/sePmwla9syWkBD4CrOKfh9Zu3u1tRv
+	x5wPUBfp+Rof1yYMMIOzXIsZg3WOWIZIwUJlenQ==
+X-Google-Smtp-Source: AGHT+IHIvCiL9/viH3Zv87RhUz8r9B/nNMpWCgwAx/ZU6AQHkrpwzseaugUZlw+S2sSjSOL/j/AgVGUngrHrFzkoTBM=
+X-Received: by 2002:a17:90a:d481:b0:2a2:88d:19d9 with SMTP id
+ s1-20020a17090ad48100b002a2088d19d9mr1331992pju.1.1711636945073; Thu, 28 Mar
+ 2024 07:42:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240328144032.1864988-1-edumazet@google.com>
-X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
-Message-ID: <20240328144032.1864988-5-edumazet@google.com>
-Subject: [PATCH net-next 4/4] net: add sk_wake_async_rcu() helper
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
+ <20240311093526.1010158-2-dongmenglong.8@bytedance.com> <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
+ <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
+ <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
+ <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
+ <CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
+ <CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com>
+ <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com> <CALz3k9g-U8ih=ycJPRbyU9x_9cp00fNkU3PGQ6jP0WJ+=uKmqQ@mail.gmail.com>
+In-Reply-To: <CALz3k9g-U8ih=ycJPRbyU9x_9cp00fNkU3PGQ6jP0WJ+=uKmqQ@mail.gmail.com>
+From: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
+Date: Thu, 28 Mar 2024 22:43:46 +0800
+Message-ID: <CALz3k9jG5Jrqw=BGjt05yMkEF-1u909GbBYrV-02W0dQtm6KQQ@mail.gmail.com>
+Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
+ to record and check the accessed args
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jiri Olsa <jolsa@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
+	bpf <bpf@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-While looking at UDP receive performance, I saw sk_wake_async()
-was no longer inlined.
+On Fri, Mar 15, 2024 at 4:00=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <dongme=
+nglong.8@bytedance.com> wrote:
+>
+> On Thu, Mar 14, 2024 at 8:27=E2=80=AFAM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Tue, Mar 12, 2024 at 6:53=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <do=
+ngmenglong.8@bytedance.com> wrote:
+> [......]
+> > > What does "a hundred attachments max" means? Can't I
+> > > trace thousands of kernel functions with a bpf program of
+> > > tracing multi-link?
+> >
+> > I mean what time does it take to attach one program
+> > to 100 fentry-s ?
+> > What is the time for 1k and for 10k ?
+> >
+> > The kprobe multi test attaches to pretty much all funcs in
+> > /sys/kernel/tracing/available_filter_functions
+> > and it's fast enough to run in test_progs on every commit in bpf CI.
+> > See get_syms() in prog_tests/kprobe_multi_test.c
+> >
+> > Can this new multi fentry do that?
+> > and at what speed?
+> > The answer will decide how applicable this api is going to be.
+> > Generating different trampolines for every attach point
+> > is an approach as well. Pls benchmark it too.
+>
+> I see. Creating plenty of trampolines does take a lot of time,
+> and I'll do testing on it.
+>
 
-This matters at least on AMD Zen1-4 platforms (see SRSO)
+I have done a simple benchmark on creating 1000
+trampolines. It is slow, quite slow, which consume up to
+60s. We can't do it this way.
 
-This might be because rcu_read_lock() and rcu_read_unlock()
-are no longer nops in recent kernels ?
+Now, I have a bad idea. How about we introduce
+a "dynamic trampoline"? The basic logic of it can be:
 
-Add sk_wake_async_rcu() variant, which must be called from
-contexts already holding rcu lock.
+"""
+save regs
+bpfs =3D trampoline_lookup_ip(ip)
+fentry =3D bpfs->fentries
+while fentry:
+  fentry(ctx)
+  fentry =3D fentry->next
 
-As SOCK_FASYNC is deprecated in modern days, use unlikely()
-to give a hint to the compiler.
+call origin
+save return value
 
-sk_wake_async_rcu() is properly inlined from
-__udp_enqueue_schedule_skb() and sock_def_readable().
+fexit =3D bpfs->fexits
+while fexit:
+  fexit(ctx)
+  fexit =3D fexit->next
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- crypto/af_alg.c      | 4 ++--
- include/net/sock.h   | 6 ++++++
- net/atm/common.c     | 2 +-
- net/core/sock.c      | 8 ++++----
- net/dccp/output.c    | 2 +-
- net/ipv4/udp.c       | 2 +-
- net/iucv/af_iucv.c   | 2 +-
- net/rxrpc/af_rxrpc.c | 2 +-
- net/sctp/socket.c    | 2 +-
- net/smc/smc_rx.c     | 4 ++--
- net/unix/af_unix.c   | 2 +-
- 11 files changed, 21 insertions(+), 15 deletions(-)
+xxxxxx
+"""
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 68cc9290cabe9a9f8a264908466897f2f93e039d..5bc6d0fa7498df30fdf002ec7bcfb46ed4344e8c 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -847,7 +847,7 @@ void af_alg_wmem_wakeup(struct sock *sk)
- 		wake_up_interruptible_sync_poll(&wq->wait, EPOLLIN |
- 							   EPOLLRDNORM |
- 							   EPOLLRDBAND);
--	sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
-+	sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_IN);
- 	rcu_read_unlock();
- }
- EXPORT_SYMBOL_GPL(af_alg_wmem_wakeup);
-@@ -914,7 +914,7 @@ static void af_alg_data_wakeup(struct sock *sk)
- 		wake_up_interruptible_sync_poll(&wq->wait, EPOLLOUT |
- 							   EPOLLRDNORM |
- 							   EPOLLRDBAND);
--	sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
-+	sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
- 	rcu_read_unlock();
- }
- 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index b5e00702acc1f037df7eb8ad085d00e0b18079a8..38adc3970500f4ae1b8d5ade343c5fbe1d04e085 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2506,6 +2506,12 @@ static inline void sk_wake_async(const struct sock *sk, int how, int band)
- 	}
- }
- 
-+static inline void sk_wake_async_rcu(const struct sock *sk, int how, int band)
-+{
-+	if (unlikely(sock_flag(sk, SOCK_FASYNC)))
-+		sock_wake_async(rcu_dereference(sk->sk_wq), how, band);
-+}
-+
- /* Since sk_{r,w}mem_alloc sums skb->truesize, even a small frame might
-  * need sizeof(sk_buff) + MTU + padding, unless net driver perform copybreak.
-  * Note: for send buffers, TCP works better if we can build two skbs at
-diff --git a/net/atm/common.c b/net/atm/common.c
-index 2a1ec014e901d6549732e7bce35bce6a9eb467e0..9b75699992ff9244470c143433f444fb9d46c3b2 100644
---- a/net/atm/common.c
-+++ b/net/atm/common.c
-@@ -116,7 +116,7 @@ static void vcc_write_space(struct sock *sk)
- 		if (skwq_has_sleeper(wq))
- 			wake_up_interruptible(&wq->wait);
- 
--		sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
-+		sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
- 	}
- 
- 	rcu_read_unlock();
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 43bf3818c19e829b47d3989d36e2e1b3bf985438..b9203fccaf1e29ba8e5f48b44987abb79f28fc60 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3338,7 +3338,7 @@ static void sock_def_error_report(struct sock *sk)
- 	wq = rcu_dereference(sk->sk_wq);
- 	if (skwq_has_sleeper(wq))
- 		wake_up_interruptible_poll(&wq->wait, EPOLLERR);
--	sk_wake_async(sk, SOCK_WAKE_IO, POLL_ERR);
-+	sk_wake_async_rcu(sk, SOCK_WAKE_IO, POLL_ERR);
- 	rcu_read_unlock();
- }
- 
-@@ -3353,7 +3353,7 @@ void sock_def_readable(struct sock *sk)
- 	if (skwq_has_sleeper(wq))
- 		wake_up_interruptible_sync_poll(&wq->wait, EPOLLIN | EPOLLPRI |
- 						EPOLLRDNORM | EPOLLRDBAND);
--	sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
-+	sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_IN);
- 	rcu_read_unlock();
- }
- 
-@@ -3373,7 +3373,7 @@ static void sock_def_write_space(struct sock *sk)
- 						EPOLLWRNORM | EPOLLWRBAND);
- 
- 		/* Should agree with poll, otherwise some programs break */
--		sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
-+		sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
- 	}
- 
- 	rcu_read_unlock();
-@@ -3398,7 +3398,7 @@ static void sock_def_write_space_wfree(struct sock *sk)
- 						EPOLLWRNORM | EPOLLWRBAND);
- 
- 		/* Should agree with poll, otherwise some programs break */
--		sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
-+		sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
- 	}
- }
- 
-diff --git a/net/dccp/output.c b/net/dccp/output.c
-index fd2eb148d24de4d1b9e40c6721577ed7f11b5a6c..5c2e24f3c39b7ff4ee1d5d96d5e406c96609a022 100644
---- a/net/dccp/output.c
-+++ b/net/dccp/output.c
-@@ -204,7 +204,7 @@ void dccp_write_space(struct sock *sk)
- 		wake_up_interruptible(&wq->wait);
- 	/* Should agree with poll, otherwise some programs break */
- 	if (sock_writeable(sk))
--		sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
-+		sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
- 
- 	rcu_read_unlock();
- }
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 5dfbe4499c0f89f94af9ee1fb64559dd672c1439..4119e74fee02b3930075fe5b00c0fc753a620149 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1544,7 +1544,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 			INDIRECT_CALL_1(sk->sk_data_ready,
- 					sock_def_readable, sk);
- 		else
--			sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
-+			sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_IN);
- 	}
- 	busylock_release(busy);
- 	return 0;
-diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
-index 7c8c3adcac6e94379360ef6e609c48e3b396ceaa..c951bb9cc2e044249ff7e4f86470b4035d60aeaa 100644
---- a/net/iucv/af_iucv.c
-+++ b/net/iucv/af_iucv.c
-@@ -184,7 +184,7 @@ static void iucv_sock_wake_msglim(struct sock *sk)
- 	wq = rcu_dereference(sk->sk_wq);
- 	if (skwq_has_sleeper(wq))
- 		wake_up_interruptible_all(&wq->wait);
--	sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
-+	sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
- 	rcu_read_unlock();
- }
- 
-diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
-index 5222bc97d192e05e2169dcf5f548fdeb98e6b07b..f4844683e12039d636253cb06f622468593487eb 100644
---- a/net/rxrpc/af_rxrpc.c
-+++ b/net/rxrpc/af_rxrpc.c
-@@ -65,7 +65,7 @@ static void rxrpc_write_space(struct sock *sk)
- 
- 		if (skwq_has_sleeper(wq))
- 			wake_up_interruptible(&wq->wait);
--		sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
-+		sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
- 	}
- 	rcu_read_unlock();
- }
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index c67679a41044fc8e801d175b235249f2c8b99dc0..e416b6d3d2705286d3e5af18b2314bceacfb98b1 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -9276,7 +9276,7 @@ void sctp_data_ready(struct sock *sk)
- 	if (skwq_has_sleeper(wq))
- 		wake_up_interruptible_sync_poll(&wq->wait, EPOLLIN |
- 						EPOLLRDNORM | EPOLLRDBAND);
--	sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
-+	sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_IN);
- 	rcu_read_unlock();
- }
- 
-diff --git a/net/smc/smc_rx.c b/net/smc/smc_rx.c
-index 9a2f3638d161d2ff7d7261835a5b13be63b11701..f0cbe77a80b44046b880e5a7107f535507c76c7c 100644
---- a/net/smc/smc_rx.c
-+++ b/net/smc/smc_rx.c
-@@ -42,10 +42,10 @@ static void smc_rx_wake_up(struct sock *sk)
- 	if (skwq_has_sleeper(wq))
- 		wake_up_interruptible_sync_poll(&wq->wait, EPOLLIN | EPOLLPRI |
- 						EPOLLRDNORM | EPOLLRDBAND);
--	sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
-+	sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_IN);
- 	if ((sk->sk_shutdown == SHUTDOWN_MASK) ||
- 	    (sk->sk_state == SMC_CLOSED))
--		sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_HUP);
-+		sk_wake_async_rcu(sk, SOCK_WAKE_WAITD, POLL_HUP);
- 	rcu_read_unlock();
- }
- 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 5b41e2321209ae0a17ac97d7214eefd252ec0180..ee382cf55f2016d19e600b6fde75da12b53bea09 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -546,7 +546,7 @@ static void unix_write_space(struct sock *sk)
- 		if (skwq_has_sleeper(wq))
- 			wake_up_interruptible_sync_poll(&wq->wait,
- 				EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND);
--		sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
-+		sk_wake_async_rcu(sk, SOCK_WAKE_SPACE, POLL_OUT);
- 	}
- 	rcu_read_unlock();
- }
--- 
-2.44.0.396.g6e790dbe36-goog
+And we lookup the "bpfs" by the function ip in a hash map
+in trampoline_lookup_ip. The type of "bpfs" is:
 
+struct bpf_array {
+  struct bpf_prog *fentries;
+ struct bpf_prog *fexits;
+  struct bpf_prog *modify_returns;
+}
+
+When we need to attach the bpf progA to function A/B/C,
+we only need to create the bpf_arrayA, bpf_arrayB, bpf_arrayC
+and add the progA to them, and insert them to the hash map
+"direct_call_bpfs", and attach the "dynamic trampoline" to
+A/B/C. If bpf_arrayA exist, just add progA to the tail of
+bpf_arrayA->fentries. When we need to attach progB to
+B/C, just add progB to bpf_arrayB->fentries and
+bpf_arrayB->fentries.
+
+Compared to the trampoline, extra overhead is introduced
+by the hash lookuping.
+
+I have not begun to code yet, and I am not sure the overhead is
+acceptable. Considering that we also need to do hash lookup
+by the function in kprobe_multi, maybe the overhead is
+acceptable?
+
+Thanks!
+Menglong Dong
+
+> >
+> > > >
+> > > > Let's step back.
+> [......]
+> >
+> > For one trampoline to handle all attach points we might
+> > need some arch support, but we can start simple.
+> > Make btf_func_model with MAX_BPF_FUNC_REG_ARGS
+> > by calling btf_distill_func_proto() with func=3D=3DNULL.
+> > And use that to build a trampoline.
+> >
+> > The challenge is how to use minimal number of trampolines
+> > when bpf_progA is attached for func1, func2, func3
+> > and bpf_progB is attached to func3, func4, func5.
+> > We'd still need 3 trampolines:
+> > for func[12] to call bpf_progA,
+> > for func3 to call bpf_progA and bpf_progB,
+> > for func[45] to call bpf_progB.
+> >
+> > Jiri was trying to solve it in the past. His slides from LPC:
+> > https://lpc.events/event/16/contributions/1350/attachments/1033/1983/pl=
+umbers.pdf
+> >
+> > Pls study them and his prior patchsets to avoid stepping on the same ra=
+kes.
 
