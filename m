@@ -1,108 +1,186 @@
-Return-Path: <netdev+bounces-82694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5154D88F436
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:49:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C6488F438
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:49:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B06A92A657D
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 00:49:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C90B71F2E1FB
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 00:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C830ED8;
-	Thu, 28 Mar 2024 00:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F314E210EC;
+	Thu, 28 Mar 2024 00:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MYmnV0ww"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o/UmYXjD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B637B8480
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 00:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF54F208B0
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 00:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711586825; cv=none; b=u/O8DYh35zJFsXljwEbGszPnBQifp+AmE/L1ulLQiCJjiF5VnSsAH3ciYcvyF13C7qQbdlBfkvisFg6RvCbxG1HnZSkQ+gcmP5Jg8e+Glgo1cIf+NRkIb0EYGE+Qctx/aQ9asC2xH8R+UIHywT2OE7yH4JnElqGtnaFbvvSd9p8=
+	t=1711586852; cv=none; b=AdnvlXIW4C8k/4Gonfz/haRa174d2sY61YSCesVLGlsM6Osn0P8l0Iw4iNkYPfECz+uFltDGNtphEG/oIZdGswZi+1Y58S5qzdGGGNKrDOid6uGNtSo0tpv+8fHD1+NDqlkNkE3H3MpgYNVZ5u8Tyqpt1LQD6HzXI4yl7AuqSH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711586825; c=relaxed/simple;
-	bh=5O0BckSJkMcZIPPF6A3HpA/50UE6EVGOMA31bgfACvo=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M8VrcPxxFlN0onP2Nw4sdwRIRC0n3vwf/9u4EAevQRx7mN8/ZX7+jHffs4vqqrPzm+bme9ySQPFbKtvWdKKTcrnYRUlGdjtAlMCsRiJVV4fwEXHTwKaEG+SPxmzB2X3FXORRr+akikFU/NJpQd305onuYkRn6T087fu9K2BZPcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MYmnV0ww; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711586822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5O0BckSJkMcZIPPF6A3HpA/50UE6EVGOMA31bgfACvo=;
-	b=MYmnV0wwdemAXau2PpCwdHE25KBOFYdhgQrXj4/zxrShB7IzJSqfgtpUrA3fRYf08bZWoq
-	/dvmqNnfJFNrUmpg+v5LyihqT0j/pu0j1Ev+kW4PoBQYGs/uxGObeChtppd/XNF8TT5TQx
-	iYlSmpA79fIKw33koS1UEk+h5GpekcQ=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-384-cfpnVazkNuiNSGp2PnOAxw-1; Wed, 27 Mar 2024 20:47:01 -0400
-X-MC-Unique: cfpnVazkNuiNSGp2PnOAxw-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d48517c975so1925181fa.2
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 17:47:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711586819; x=1712191619;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5O0BckSJkMcZIPPF6A3HpA/50UE6EVGOMA31bgfACvo=;
-        b=bsocxwditm178grd4HfeMfyxFswhB8z8etRRrWhB+DUQgt4BxQw5FCz6kRh710wh0O
-         yu5/pRdlccY+zIPNj68cPKYwwln62Jpj3OSOvgH4v9Gsxs8ogdAScGd41z5ZbwmKteSQ
-         vkwUyIi6UO/YEz7j4+f0oxItn43l9gwa1BRAVUkDs1GFrXpDed9VBUQjb2Qs+pLprMn7
-         aOXP2gJ0ibtCLG5qpDutRIg/6qHVsDFJ+ao/XKg26lR5g3ZVcFciRrcdAtgUvTK2oyP9
-         2HHz4BbVxay5trTm0nuFxz+HWyHV0WFKAg8QcUCEkL/i9vEE/HngFr7n9xxGrI2uzqOc
-         usNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVoGh38TYX4VMxJ7mPfOI+nszAIgOvOzMfZHlEIuI1FSy/otA0QjHvznTknz7oseWBQD7bVQU8cxoiDsRp3FgUmYUwvOgQZ
-X-Gm-Message-State: AOJu0YxRDoZLPSovPemxGmWLjTLGPDw4w+hEflN5mR7cuYUusqpdt3rf
-	11cQymjKOfUPo1O+zgenZnJXu+sBrimG7v6wUs6XbpooEJFlN2Km77QbxqwvT20ULWXXle7rSQS
-	98RtRIIlt/pc6U/t4a5wDdDnJjwk4orCr2xchd55F3abbC9divWdn4ZzsTnpjGhc0QQAaPUBi5I
-	TafEnz2JYtF5X1luEWqgTEMzXMjukQ
-X-Received: by 2002:a2e:9f50:0:b0:2d6:f96c:d84d with SMTP id v16-20020a2e9f50000000b002d6f96cd84dmr867644ljk.16.1711586819580;
-        Wed, 27 Mar 2024 17:46:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGDWK6joV0/iQh5KlYwN44LS5IngAbC7R1Qkn/dm1JPxH6MSFYi0B6bfaI3/MpIh/ZUSeiKhOszWywYXmQfdeQ=
-X-Received: by 2002:a2e:9f50:0:b0:2d6:f96c:d84d with SMTP id
- v16-20020a2e9f50000000b002d6f96cd84dmr867635ljk.16.1711586819340; Wed, 27 Mar
- 2024 17:46:59 -0700 (PDT)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 27 Mar 2024 17:46:58 -0700
-From: Marcelo Ricardo Leitner <mleitner@redhat.com>
-References: <20240325204740.1393349-1-ast@fiberby.net> <20240325204740.1393349-3-ast@fiberby.net>
+	s=arc-20240116; t=1711586852; c=relaxed/simple;
+	bh=/3e5j1pZT5R4ZLPVlNBdoGzSUNkZCcCp1sMuHOs/UkE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M9bRbgRAAR/F0D1lbW8SAzUJTfVIrK6ZuDBXwvZvL5CLpzjSxZdyIJyaEOm96mohjXs+zkuuRDr7lcaA3n4+/D5DmT7nul5SzQCHH1GjFm1zUmN3EIHicgbMSPcLAvNl9Y/6YHgo5WUhFsnc03W+eXwvZ5H/+Y4g4I+2t+oMBwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o/UmYXjD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F5DC433F1;
+	Thu, 28 Mar 2024 00:47:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711586852;
+	bh=/3e5j1pZT5R4ZLPVlNBdoGzSUNkZCcCp1sMuHOs/UkE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=o/UmYXjDsv1kfRCol3jHvZc2ht3Iyt8mXwYol9PkflMv8XCgT0NmBiA6Gw03DuWcx
+	 Ka0riY2U43/52eACCiMZ06hol65sTxqH2UNtwFDyIvPXx2fr/g84EncxeUBB2sJ0Od
+	 JJAybHmXJB+jKAoWWSZ99LBCeGhX4Tlqy7el7Gg/ZAfqhVnJ9H8lIuR39crejGZqPE
+	 WZ1JmhRCY2dcNJ1ceqXH24IhESx6gKd5pnJQ9mMJOEIMNRb5oN/Ru3aX+11Zpv7Yh0
+	 9KfNWsAqaO6MeItMOGypSXU5bCVn0VNIhjDdYjb0qRXBdSbdYsYwCPWPCbkIKUpaKD
+	 zYQkns/fZDqvA==
+Date: Wed, 27 Mar 2024 17:47:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
+ <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, Stanislav
+ Fomichev <sdf@google.com>, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1] tools/net/ynl: Add extack policy attribute
+ decoding
+Message-ID: <20240327174731.6933ed21@kernel.org>
+In-Reply-To: <20240327160302.69378-1-donald.hunter@gmail.com>
+References: <20240327160302.69378-1-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240325204740.1393349-3-ast@fiberby.net>
-Date: Wed, 27 Mar 2024 17:46:58 -0700
-Message-ID: <CALnP8ZYMJufj1ALQ5ffojNaY6fj+K8rsSo4JyFx1qoSTjpXg8Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/3] net: sched: cls_api: add filter counter
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vlad Buslov <vladbu@nvidia.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llu@fiberby.dk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 25, 2024 at 08:47:35PM +0000, Asbj=C3=B8rn Sloth T=C3=B8nnesen =
-wrote:
-> Maintain a count of filters per block.
->
-> Counter updates are protected by cb_lock, which is
-> also used to protect the offload counters.
->
-> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+On Wed, 27 Mar 2024 16:03:02 +0000 Donald Hunter wrote:
+> The NLMSGERR_ATTR_POLICY extack attribute has been ignored by ynl up to
+> now. Extend extack decoding to include _POLICY and the nested
+> NL_POLICY_TYPE_ATTR_* attributes.
+> 
+> For example:
+> 
+> ./tools/net/ynl/cli.py \
+>   --spec Documentation/netlink/specs/rt_link.yaml \
+>   --create --do newlink --json '{
+>     "ifname": "12345678901234567890",
+>     "linkinfo": {"kind": "bridge"}
+>     }'
+> Netlink error: Numerical result out of range
+> nl_len = 104 (88) nl_flags = 0x300 nl_type = 2
+> 	error: -34	extack: {'msg': 'Attribute failed policy validation',
+> 'policy': {'max-length': 15, 'type': 'string'}, 'bad-attr': '.ifname'}
 
-Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Nice!
+
+Some optional comments below...
+
+> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+> index 5fa7957f6e0f..557ef5a22b7d 100644
+> --- a/tools/net/ynl/lib/ynl.py
+> +++ b/tools/net/ynl/lib/ynl.py
+> @@ -1,6 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+>  
+>  from collections import namedtuple
+> +from enum import Enum
+>  import functools
+>  import os
+>  import random
+> @@ -76,6 +77,25 @@ class Netlink:
+>      NLMSGERR_ATTR_MISS_TYPE = 5
+>      NLMSGERR_ATTR_MISS_NEST = 6
+>  
+> +    # Policy types
+> +    NL_POLICY_TYPE_ATTR_TYPE = 1
+> +    NL_POLICY_TYPE_ATTR_MIN_VALUE_S = 2
+> +    NL_POLICY_TYPE_ATTR_MAX_VALUE_S = 3
+> +    NL_POLICY_TYPE_ATTR_MIN_VALUE_U = 4
+> +    NL_POLICY_TYPE_ATTR_MAX_VALUE_U = 5
+> +    NL_POLICY_TYPE_ATTR_MIN_LENGTH = 6
+> +    NL_POLICY_TYPE_ATTR_MAX_LENGTH = 7
+> +    NL_POLICY_TYPE_ATTR_POLICY_IDX = 8
+> +    NL_POLICY_TYPE_ATTR_POLICY_MAXTYPE = 9
+> +    NL_POLICY_TYPE_ATTR_BITFIELD32_MASK = 10
+> +    NL_POLICY_TYPE_ATTR_PAD = 11
+> +    NL_POLICY_TYPE_ATTR_MASK = 12
+> +
+> +    AttrType = Enum('AttrType', ['flag', 'u8', 'u16', 'u32', 'u64',
+> +                                  's8', 's16', 's32', 's64',
+> +                                  'binary', 'string', 'nul-string',
+> +                                  'nested', 'nested-array',
+> +                                  'bitfield32', 'sint', 'uint'])
+>  
+>  class NlError(Exception):
+>    def __init__(self, nl_msg):
+> @@ -198,6 +218,8 @@ class NlMsg:
+>                      self.extack['miss-nest'] = extack.as_scalar('u32')
+>                  elif extack.type == Netlink.NLMSGERR_ATTR_OFFS:
+>                      self.extack['bad-attr-offs'] = extack.as_scalar('u32')
+> +                elif extack.type == Netlink.NLMSGERR_ATTR_POLICY:
+> +                    self.extack['policy'] = self._decode_policy(extack.raw)
+>                  else:
+>                      if 'unknown' not in self.extack:
+>                          self.extack['unknown'] = []
+> @@ -214,6 +236,34 @@ class NlMsg:
+>                              desc += f" ({spec['doc']})"
+>                          self.extack['miss-type'] = desc
+>  
+> +    def _decode_policy(self, raw):
+> +        policy = {}
+> +        for attr in NlAttrs(raw):
+> +            if attr.type == Netlink.NL_POLICY_TYPE_ATTR_TYPE:
+> +                type = attr.as_scalar('u32')
+> +                policy['type'] = Netlink.AttrType(type).name
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_VALUE_S:
+> +                policy['min-value-s'] = attr.as_scalar('s64')
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_VALUE_S:
+> +                policy['max-value-s'] = attr.as_scalar('s64')
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_VALUE_U:
+> +                policy['min-value-u'] = attr.as_scalar('u64')
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_VALUE_U:
+> +                policy['max-value-u'] = attr.as_scalar('u64')
+
+I think the signed / unsigned thing is primarily so that decode knows
+if its s64 or u64. Is it useful for the person seeing the decoded
+extack whether max was signed or unsigned?
+
+IOW are we losing any useful info if we stop the -u / -s suffixes?
+
+Otherwise I'd vote lose them.
+
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_LENGTH:
+> +                policy['min-length'] = attr.as_scalar('u32')
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_LENGTH:
+> +                policy['max-length'] = attr.as_scalar('u32')
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_POLICY_IDX:
+> +                policy['policy-idx'] = attr.as_scalar('u32')
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_POLICY_MAXTYPE:
+> +                policy['policy-maxtype'] = attr.as_scalar('u32')
+
+I don't think these two (policy-..) can actually pop up in extack.
+They are for cross-referencing nested policies in policy dumps.
+extack only carries constraints local to the attr.
+
+Up to you if you want to keep them.
+
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_BITFIELD32_MASK:
+> +                policy['bitfield32-mask'] = attr.as_scalar('u32')
+> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MASK:
+> +                policy['mask'] = attr.as_scalar('u64')
+> +        return policy
+> +
+>      def cmd(self):
+>          return self.nl_type
+>  
 
 
