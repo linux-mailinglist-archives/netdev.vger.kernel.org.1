@@ -1,158 +1,150 @@
-Return-Path: <netdev+bounces-83039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE558907AF
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:54:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECAC18907C2
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:55:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EAC21C27655
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:54:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1DD41F284CF
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F102130E5A;
-	Thu, 28 Mar 2024 17:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7A7130493;
+	Thu, 28 Mar 2024 17:55:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k3Gk2UXH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IffZ6Zq7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB991C6B0;
-	Thu, 28 Mar 2024 17:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEB240856;
+	Thu, 28 Mar 2024 17:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711648461; cv=none; b=NPCm94nwK8Zk8QS37dKMlZA6rD9WssCfvjCiqjttdHV8wd6o7S5n1cChqU4bnniBbCnv6vRrKpNZV8Xh6wpEBluuMLXcM4AOYhKTMM96uA+ZGr7V75h1awmlelfNshmXnzsezV+MaEmQnuXHvRCaDRQ8JFmLgGtgUtXud4ipeuI=
+	t=1711648512; cv=none; b=rCNusSNWawPdtBev9rBxKvcMyWP4CBPziROQ4R7k7qEJdo8fyKomF5XgdGotdff+qMx2bv5UDISv7ANR/fk/+cInznBOysVsO6VklJDYm2pEeEcJcXiP9Y6cNuHOWyH4Mc5TE31H9UR+qbHN0OG4a66Hu7rxcZwaubM6O+hoHaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711648461; c=relaxed/simple;
-	bh=8O7B4ndnzZYI74uzyfTuc1Y0kP3Ph8Ksu/YsD5/bHbk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QDwbcnk/NVZGHopHF+9E6a5ACd6/3Xwq2U9uPUPD2edyS1a8ZF6Npz9r38DhbblNEoPp0nKnGWM4dErg/h7rHauieLOr53c3SJCoCN3oOXnn5gQbZiKFNUmaiMLE8PXUHubXAUn5BJL1OicNxMGvnRo9diz+UOkmqTZ4MoeCuJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k3Gk2UXH; arc=none smtp.client-ip=209.85.217.45
+	s=arc-20240116; t=1711648512; c=relaxed/simple;
+	bh=o/ViFlzn9DcSB6zcA7kLtK65QCPH/Ss4D4l1HH9emKY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qp3gRY+mBkqKv6pmLXP6ISa1//f9MbZliapH+/irw3ssTL02eMwD/AVllUrx6yRDq6OO+holO5Y+mf5v7ScJUN7LY7TthnoWS6HbwZjgVm6yy8iXHwGW+32KpKDoBXUSxLb4d0AjiruXxcZKihacu6ewvgWSShA6rfOdnhLFeY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IffZ6Zq7; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-4766e56ccccso458661137.0;
-        Thu, 28 Mar 2024 10:54:19 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-29e0a1fd9a7so980847a91.2;
+        Thu, 28 Mar 2024 10:55:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711648458; x=1712253258; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=nG7pFQ9K9R/mz80FNkdLLBY0bbfjalJJC6HLc51WLAE=;
-        b=k3Gk2UXHiumnTtQzUB5dWG4O3lJ/rdGCnTHv4cw5+txAcVZMp7wM8q7EP1sSHBOhzi
-         9jgkvMiBfXOsask9rcESwhrkgm1O0/tzU5vQFiV8KVbSzZUEziBlYxlscbifgz8Ou05E
-         PETzvJISmjgT/ETJriHk8L4xbIFeUq9mA4uDGd8nRZYgjkBBR64cMnB6D4+T0CI9hROM
-         rkSSRoHd1aTNPlVZHkLE236WMJwgP3ydTW6ubmJ4jpDug5K3t0qLjTGsv9zlFpY4m1t/
-         CyF8NdRjTmjFrzBjn/gdn3FOuxFXHq17FlYQhaZsa8w49g0sDLQ8toG+a8D6zwrC8h60
-         RBhA==
+        d=gmail.com; s=20230601; t=1711648511; x=1712253311; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yWQ5s/MasTSk4jjQrdrW05L8Qpoj2heGIDr+tGSERBM=;
+        b=IffZ6Zq7mdTlgFNOXYKYk8APhEZ+jnWd5P7vwV8L5bZgdd5YBj99UAEtTmBYfmR5vI
+         gExwSz+/raqBzCXL2yKp/akDSbKK4j7V/ZzyD8CH9e+ylDWW1RtX0MbZa14kZfmILufE
+         /t3NJ3FtHc4hJDtK0Ox1C+/15dK6UqLmvleGLbLMkMMCfZBj2UHcoQ7dL8xtIpJRwJl+
+         H89s8wOuwf68ipXVqoyOIbAlimD9s8bMgjmEGEgfJ7gGYdhKPob06n89IRUa+tQvD5gm
+         KwmFbmNMvYYX6vVqLyGIRIBIAYpr3u0zZqWZMKvv+Sxeh0voL1kH9oCsa0rVhT+AlTSF
+         o8DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711648458; x=1712253258;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nG7pFQ9K9R/mz80FNkdLLBY0bbfjalJJC6HLc51WLAE=;
-        b=eT/+O+jrTK6nxgGsPXuIkb1GIZK8hv11fRhvmFbyl0DEDRHTcU5rInne6ytrgllic9
-         h6W/qa4Pk2wiy1J36k+Ahv3Mx11CM95aXgIT9dnkULoJBOTlcPE4NRGrLXubTpWzjNNQ
-         jpfe3+FS9J9wZlCGgJve+6mtnEZCSA9sxUVE6JMCvDIBIHh/UiM7lzYKA9smiqUxK5w+
-         bv4IGmT4AeTef00u1j+qnJ5ltvr5pdJjS/r9sjvWeHJh3Gl8R1GYQV4paP56QbibVF2T
-         ysuVIgLbdT3X+ITqDOXFb7DZ8yU0mTDV6yihLZRKOOTCBJI4K/kzY8GshLMDbPBNrNsz
-         ysAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKYOF0hIoI1e+3HsyG4vssWlb15lSFhXbLrdlgZCapX8aQRQP54uXCkntP97HXzYjEaKptQOxHQPF/zGf+iigwJDotg/beuTw1T+gD+d+SBHL/YOLUYchlSnQiBMKMvgE4piyP+LfKP5M8+lOjFevuGZceu0lwX7uHZuiVQCA3iYBFRNuTU32TI5Gse1qbm/YSqjfzhje+L2vp3/TU4i3yzjOCH8s1L43ab4jKaw0+iu0hVjCHzXUnWMz3SA7YFxLTiXZx7LGTPOQBbVfEVoRtmxravLkHnItvxQIzSpYGmSJHaCJmLzMY5su3ITsSy5yuhtXuPtK/KxfbTMxNe3K+kNfqz+SxxFNvzVDOnQVYTFuq7f2J93d9RGSdLnqEZ3HnpKSVQphQoA7C+gW82apSArhcxPRjHWac5oEhTuCkPhyu0uCHL3mF7/cQUEbFk13efUmjPzRmt/2OJQ9arQdw/2xsbajiHgjvMZf3GhqJ6JyrAjfRPRKAlqt+3nkVgdxvHDNxqfFNKzEozSIOdkg+ROjdDZIKJXvHWOTPgoTUOw2+7jIZlF5wS70vSSXeug0gkI3BLwIm6F370VKBkm8=
-X-Gm-Message-State: AOJu0YyIM20Svv9uGi+jdHk/0lIZ/eGfa7KMyiG83Ky7uxPYv2FlcLU+
-	kU34FfkrYXeynbk6InYlfS18PwAg2KuTdsh3D4eS5r1EY91kmY3PNVjjGJC7iBnD6NT21AFPmQA
-	L9EbcS4NPlZDMv4XyRizwYKLOP7Y=
-X-Google-Smtp-Source: AGHT+IGBQCwISe8ItG/2YCXarhKnEHlwL8nEFQuoDJ++KAY35MV4NPvZiqYz3quZfRGkQvsUcmc8+OZbNMhL2JCbvQY=
-X-Received: by 2002:a67:b64d:0:b0:476:fc98:c73e with SMTP id
- e13-20020a67b64d000000b00476fc98c73emr4018043vsm.34.1711648458714; Thu, 28
- Mar 2024 10:54:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711648511; x=1712253311;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yWQ5s/MasTSk4jjQrdrW05L8Qpoj2heGIDr+tGSERBM=;
+        b=igCQB4QFsYScQJeP3cRiQxUa5qmLNqpZC5tOlwX33nWNCf888oEZxhRUtBNw6Az6De
+         ayrIpJosrt6iJl7D+ax3xPKN8uCp/jyESYD8z8rs9mXeYrLD1DY3pPv92MZJu2F5f23t
+         NWhdBQuIEovlxVw0gsUf00ja9tHjqs2nBCcP6Ogwtv1JjTs+xRuwYXtQQCZMB4MhtLu3
+         7Rjbh5TEQQTDwCBcOds3vpthVYN3CT+bF3kfHE76b2X36+qhh5oqjYbuTbt5YNGJTxJY
+         aLRmt/G4WfGjB2+dKLvjCvG91AleXJG/H49ITYfiFvNR1IR9hafdcTG6r9wS6YfgpJQ8
+         awuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXuGa0nZKrEsNS7AXHHBRX65WF9XiM3fFvpPsn3s2rxTK/FMqe7m4o9cyoHYzwTFthYPh/CRYANPbWi0C0UEr2FCaOA1ZKayBxC+DCIuj8jS4RmiRYVxh2oEX60+KNM4p7RiuNdFSZg2iSNS7s50CRed6fjNUC1FAHnjyDZEGJ1wzDUIw1SUqXjMIkioK/ok0h0W6hrDTsvkbBRQfY6oi8aRzzmf7IzP8dSJJOq9iCUeyAARKJJXE3OY2FQCQp4TbB4QQ==
+X-Gm-Message-State: AOJu0YyzHv5stqt7AuVoBIO8Gpz08IsWdmauhSa1iX/DxA1OW/oUtjV3
+	6bf5HpY87l7xy1IlctxEQ2/KuciA1G63gA5DB1HzsuIdcZk1r+n7
+X-Google-Smtp-Source: AGHT+IEL2KsBed1zz8v9qIzuDDeEt0qqVBch3QKL5XMgY1v1rvbtZioXqmZcYbMTotvgHuw38SY6bw==
+X-Received: by 2002:a17:90a:e7c6:b0:29b:d748:fae5 with SMTP id kb6-20020a17090ae7c600b0029bd748fae5mr155051pjb.32.1711648510684;
+        Thu, 28 Mar 2024 10:55:10 -0700 (PDT)
+Received: from google.com ([2620:15c:9d:2:493e:82a3:49f9:d88])
+        by smtp.gmail.com with ESMTPSA id z2-20020a17090ab10200b0029c7963a33fsm3791215pjq.10.2024.03.28.10.55.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 10:55:10 -0700 (PDT)
+Date: Thu, 28 Mar 2024 10:55:07 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>,
+	Corentin Chary <corentin.chary@gmail.com>,
+	"Luke D. Jones" <luke@ljones.dev>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>,
+	Daniel Oliveira Nascimento <don@syst.com.br>,
+	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
+	Matan Ziv-Av <matan@svgalib.org>,
+	Mattia Dongili <malattia@linux.it>,
+	Azael Avalos <coproscefalo@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jeff Sipek <jsipek@vmware.com>, Ajay Kaher <akaher@vmware.com>,
+	Alexey Makhalov <amakhalov@vmware.com>,
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	acpica-devel@lists.linux.dev, linux-input@vger.kernel.org,
+	netdev@vger.kernel.org, chrome-platform@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 02/19] Input: atlas: - drop owner assignment
+Message-ID: <ZgWu-33aKyCOjRBX@google.com>
+References: <20240327-b4-module-owner-acpi-v1-0-725241a2d224@linaro.org>
+ <20240327-b4-module-owner-acpi-v1-2-725241a2d224@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-5-apais@linux.microsoft.com> <42c445b4-a156-4c43-bf98-bd2a9ac7a4fa@rowland.harvard.edu>
-In-Reply-To: <42c445b4-a156-4c43-bf98-bd2a9ac7a4fa@rowland.harvard.edu>
-From: Allen <allen.lkml@gmail.com>
-Date: Thu, 28 Mar 2024 10:54:07 -0700
-Message-ID: <CAOMdWS+4T7rw577q9iW_oin8bbVF4m6Mpx-L2riqno5QX_L=WQ@mail.gmail.com>
-Subject: Re: [PATCH 4/9] USB: Convert from tasklet to BH workqueue
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Allen Pais <apais@linux.microsoft.com>, linux-kernel@vger.kernel.org, tj@kernel.org, 
-	keescook@chromium.org, vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev, 
-	florian.fainelli@broadcom.com, rjui@broadcom.com, sbranden@broadcom.com, 
-	paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com, 
-	manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com, 
-	leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com, 
-	haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de, 
-	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, afaerber@suse.de, 
-	logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com, 
-	robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org, 
-	orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com, 
-	patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org, 
-	jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com, kys@microsoft.com, 
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
-	jassisinghbrar@gmail.com, mchehab@kernel.org, maintainers@bluecherrydvr.com, 
-	aubin.constans@microchip.com, ulf.hansson@linaro.org, manuel.lauss@gmail.com, 
-	mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com, 
-	hayashi.kunihiko@socionext.com, mhiramat@kernel.org, brucechang@via.com.tw, 
-	HaraldWelte@viatech.com, pierre@ossman.eu, duncan.sands@free.fr, 
-	oneukum@suse.com, openipmi-developer@lists.sourceforge.net, 
-	dmaengine@vger.kernel.org, asahi@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org, 
-	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, linux-mediatek@lists.infradead.org, 
-	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, linux-omap@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327-b4-module-owner-acpi-v1-2-725241a2d224@linaro.org>
 
-> >
-> > This patch converts drivers/infiniband/* from tasklet to BH workqueue.
-> >
-> > Based on the work done by Tejun Heo <tj@kernel.org>
-> > Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
-> >
-> > Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-> > ---
->
-> > diff --git a/drivers/usb/core/hcd.c b/drivers/usb/core/hcd.c
-> > index c0e005670d67..88d8e1c366cd 100644
-> > --- a/drivers/usb/core/hcd.c
-> > +++ b/drivers/usb/core/hcd.c
->
-> > @@ -1662,10 +1663,9 @@ static void __usb_hcd_giveback_urb(struct urb *urb)
-> >       usb_put_urb(urb);
-> >  }
-> >
-> > -static void usb_giveback_urb_bh(struct work_struct *work)
-> > +static void usb_giveback_urb_bh(struct work_struct *t)
-> >  {
-> > -     struct giveback_urb_bh *bh =
-> > -             container_of(work, struct giveback_urb_bh, bh);
-> > +     struct giveback_urb_bh *bh = from_work(bh, t, bh);
-> >       struct list_head local_list;
-> >
-> >       spin_lock_irq(&bh->lock);
->
-> Is there any reason for this apparently pointless change of a local
-> variable's name?
+On Wed, Mar 27, 2024 at 08:43:49AM +0100, Krzysztof Kozlowski wrote:
+> ACPI bus core already sets the .owner, so driver does not need to.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
- No, it was done just to keep things consistent across the kernel.
-I can revert it back to *work if you'd prefer.
+Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 
-Thanks.
+But please fix the stray colon in the subject.
 
->
-> Alan Stern
->
-
+> 
+> ---
+> 
+> Depends on the first patch.
+> ---
+>  drivers/input/misc/atlas_btns.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/input/misc/atlas_btns.c b/drivers/input/misc/atlas_btns.c
+> index 3c9bbd04e143..5b9be2957746 100644
+> --- a/drivers/input/misc/atlas_btns.c
+> +++ b/drivers/input/misc/atlas_btns.c
+> @@ -127,7 +127,6 @@ MODULE_DEVICE_TABLE(acpi, atlas_device_ids);
+>  static struct acpi_driver atlas_acpi_driver = {
+>  	.name	= ACPI_ATLAS_NAME,
+>  	.class	= ACPI_ATLAS_CLASS,
+> -	.owner	= THIS_MODULE,
+>  	.ids	= atlas_device_ids,
+>  	.ops	= {
+>  		.add	= atlas_acpi_button_add,
+> 
+> -- 
+> 2.34.1
+> 
 
 -- 
-       - Allen
+Dmitry
 
