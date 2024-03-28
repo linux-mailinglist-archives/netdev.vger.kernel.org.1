@@ -1,139 +1,89 @@
-Return-Path: <netdev+bounces-82952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F186C89048D
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:07:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ECFA89049E
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:09:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB4E229784B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:07:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D22441F2610F
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C4E137740;
-	Thu, 28 Mar 2024 16:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513558004E;
+	Thu, 28 Mar 2024 16:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="u8DMk1h5"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BF013118A
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 16:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9743F32C9C;
+	Thu, 28 Mar 2024 16:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711641941; cv=none; b=Nzw1acC7D4kqjtc7CpUobTqbfPnshq/Z1nW5I/Emspg+6PtuT0lpzkGFsQZpyqfVzRXHM1Yv1d74FbIBCYlDccWIe9cHcSkTSAFAZRy1T00uPVyFCzIBptkL/XNKzZcZLbLFZOF0jBT33rFWrzjqLdMLDo2HXfzC+/KxnffW2TU=
+	t=1711642163; cv=none; b=aR9EdEf9uSTzHXF8oX+60MddCBP3BesDEbl2tNxh9vOX9fUK5WaCwiByGnLuKmV/wtuMogQ5dniyKdsyoLhhtkz/CT5T7v5VYwHKkDL102WwhjLCZ4Rl/aCL9/ud+0/hBxd0h9oPlo13OGzYLt+c+OxtSrUG66pJ/6kPO5K5hDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711641941; c=relaxed/simple;
-	bh=1aC+Qty898Z7QWHKEUyYsyErbgy+fs+anDbaCZiMYpc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AMmxbYWORh+T4JUCbrHpuFFLgOfXHN6wI56Xmz1s5vu1v/xghXYR6Kz/N92oxw+n7l729o8VS1HSqCQveHJMsoJZawZJF3FeycLM9O+33vEKfOzJv2ELp7pQro6eCvyIqP5vRPoBGyXgmewFbbi8kWZIJ9c1AGrQ1f9ahbQbfKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rpsFm-00058o-N5; Thu, 28 Mar 2024 17:05:22 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rpsFj-0092JU-Hw; Thu, 28 Mar 2024 17:05:19 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rpsFj-00A3Pb-1X;
-	Thu, 28 Mar 2024 17:05:19 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
-Subject: [PATCH net-next v1 9/9] net: dsa: microchip: let DCB code do PCP and DSCP policy configuration
-Date: Thu, 28 Mar 2024 17:05:18 +0100
-Message-Id: <20240328160518.2396238-10-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240328160518.2396238-1-o.rempel@pengutronix.de>
-References: <20240328160518.2396238-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1711642163; c=relaxed/simple;
+	bh=CMmVIKQoM/PlNFhCTLxNd05/dFR7NQI6JqPlu8BOkgE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=t+damuH4YvQbNXIsV3w+pSwGULXtvfCEMmQcQ6XIKotHlLER1zLmixpr26PJIF2mICf2hsqhl8zw3hKDOmTLGqJ3+7Lv6iE+shlB8+kjbYm9UGz+vA0c3Nh93O+gjSCApZdyTF7e+MXESxO1XMcLtot8WgrdbD+ykWYMW1sBge4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=u8DMk1h5; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=CMmVIKQoM/PlNFhCTLxNd05/dFR7NQI6JqPlu8BOkgE=;
+	t=1711642161; x=1712851761; b=u8DMk1h5iQFoCGm05H5oMCjSEgo1e/FjFyOS86/rCxS3GCd
+	1s+OHU0Jm+Q9WU3UNNs4cVJClo3OL3YyNcg7JAtVpLL0p2DCkvyrjr82w1DB8G3gLZ+W0QNSCeSMf
+	CaqsrHpAtceieEtlDhQk942bicrAEDO/EHScG9FhMYBJZuFZxoBtSjVL3D0ScG4P6/qHhULtDn9i6
+	RqCSW9YpiRnQ3f8Kq1mxQI5xr2OTqwstcj5J4x5mHyggLFzzLYs+9oqodEU5KC8TuRDyfBH19N0NG
+	cIHZcI/sB1NkInmJQTlqP8thkE9EnOZl9+6yErDKA/VWHrIIa8GJRB+YBxRZlV4Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rpsJa-000000017LB-363U;
+	Thu, 28 Mar 2024 17:09:18 +0100
+Message-ID: <3f61f18fbf3372ff88da54cdfbd309e74b2aa4e9.camel@sipsolutions.net>
+Subject: Re: [PATCH 02/13] wifi: nl80211: send underlying multi-hardware
+ channel capabilities to user space
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Karthikeyan Periyasamy <quic_periyasa@quicinc.com>, 
+	ath12k@lists.infradead.org
+Cc: linux-wireless@vger.kernel.org, Vasanthakumar Thiagarajan
+	 <quic_vthiagar@quicinc.com>, netdev@vger.kernel.org, Jakub Kicinski
+	 <kuba@kernel.org>
+Date: Thu, 28 Mar 2024 17:09:17 +0100
+In-Reply-To: <14b739c9-18da-0d58-b58d-cccebc505950@quicinc.com>
+References: <20240328072916.1164195-1-quic_periyasa@quicinc.com>
+	 <20240328072916.1164195-3-quic_periyasa@quicinc.com>
+	 <6d92d0ba4a8764cd91cc20c4bd35613bcc41dfcd.camel@sipsolutions.net>
+	 <9d5c2f9f-19b5-af4d-8018-1eb97fac10d6@quicinc.com>
+	 <9d0f309da45ae657cd2ce0bc11a93d66e856ef64.camel@sipsolutions.net>
+	 <14b739c9-18da-0d58-b58d-cccebc505950@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-malware-bazaar: not-scanned
 
-802.1P (PCP) and DiffServ (DSCP) are handled now by DCB code. Let it do
-all needed initial configuration.
+On Thu, 2024-03-28 at 20:40 +0530, Karthikeyan Periyasamy wrote:
+>=20
+> Can you point to any attribute constructed in this way from kernelspace=
+=20
+> for the reference to explore more ?
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz8795.c | 6 ------
- drivers/net/dsa/microchip/ksz9477.c | 6 ------
- 2 files changed, 12 deletions(-)
+I don't have anything directly, looking at the code finds e.g.
+devlink_dpipe_entry_ctx_append() but honestly that's really quite
+trivial, it just adds that new attribute while iterating whatever list
+you have.
 
-diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index a520352d5b93e..06dbc75aef8fd 100644
---- a/drivers/net/dsa/microchip/ksz8795.c
-+++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -1564,16 +1564,10 @@ void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- 
- 	ksz8_port_queue_split(dev, port, queues);
- 
--	/* disable DiffServ priority */
--	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_DIFFSERV_ENABLE, false);
--
- 	/* replace priority */
- 	ksz_port_cfg(dev, port, P_802_1P_CTRL,
- 		     masks[PORT_802_1P_REMAPPING], false);
- 
--	/* enable 802.1p priority */
--	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_802_1P_ENABLE, true);
--
- 	if (cpu_port)
- 		member = dsa_user_ports(ds);
- 	else
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index 7f745628c84d1..f8ad7833f5d9d 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -1158,18 +1158,12 @@ void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- 	/* enable broadcast storm limit */
- 	ksz_port_cfg(dev, port, P_BCAST_STORM_CTRL, PORT_BROADCAST_STORM, true);
- 
--	/* disable DiffServ priority */
--	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_DIFFSERV_PRIO_ENABLE, false);
--
- 	/* replace priority */
- 	ksz_port_cfg(dev, port, REG_PORT_MRI_MAC_CTRL, PORT_USER_PRIO_CEILING,
- 		     false);
- 	ksz9477_port_cfg32(dev, port, REG_PORT_MTI_QUEUE_CTRL_0__4,
- 			   MTI_PVID_REPLACE, false);
- 
--	/* enable 802.1p priority */
--	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_802_1P_PRIO_ENABLE, true);
--
- 	/* force flow control for non-PHY ports only */
- 	ksz_port_cfg(dev, port, REG_PORT_CTRL_0,
- 		     PORT_FORCE_TX_FLOW_CTRL | PORT_FORCE_RX_FLOW_CTRL,
--- 
-2.39.2
-
+johannes
 
