@@ -1,108 +1,132 @@
-Return-Path: <netdev+bounces-82910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4055B890293
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:03:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D112890323
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:35:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA3FBB22A44
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:03:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 257892926B6
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342BD7D417;
-	Thu, 28 Mar 2024 15:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BF012F384;
+	Thu, 28 Mar 2024 15:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bTc7SKP3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7641E48C
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 15:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6D85917F
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 15:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711638209; cv=none; b=MElWzQEOG8BEh6T3t2zidPTu2PXnkHPgO+kpXhycULs+dVQG9Ih/vtRGRcBZmokn8g/xucDvrd4yWKF2FZE3CH30RAV+fVnnj22yxsSXXoc28RJ4PgNuaqTfh6O2G7LpyqUvaWqtNnvtfHvKCme13GnWv1n3xLhhhHnm28/7ofE=
+	t=1711640119; cv=none; b=CpIgVx+gjZRlOEtWs2cr8mz5F9p/CiY4j9GpnxvINM5Cxnmg+Ezr4dClvRxvvWYR+AzENEmshJH86Bqa8eyD6i22mGBXdqJge1qOEqd+heNyuP3x3vCmpZz0AeyY9Tnz5Ek1RS8xrw89Rtl/x9Om3vQI+D+XWMKDPfTTkwlqjBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711638209; c=relaxed/simple;
-	bh=5EyZBOeRPa4QOPglad1fTvI7GeyrqMuIbfx/Tk5gSc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EoV23MVzkLt9DI+Xq75G+ITiH4OCNlDWERDcJiMk75yQvqC84W3WAddFFaFs8I0IMLNmKk4aF5Htx0PhqiMm21Hh2PUqhICFSe+Sy/CH2wKkrnWvOMJipXXCTaXnfdpeWiPafiSxtrHhhK/rohA5Nif3Kp4TZQ2OuP/+pMG4UAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1711640119; c=relaxed/simple;
+	bh=lgxgdYqATTmqx4Maz+fNM/fbjmDidDF+l7fOFfZo1v8=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=Ak2MyUHAFxNYp/doVR5EeESUZJuW9zNKF0YchyMBEahk5RvJ86hULdJOjVsi8tPmmEjJDY1TwC0X1U1pXjZZTGcGZViY8Yx1bCb5WNkM5Ffre3CI+0o9716rIT3eSkAVRbpXEiPqOpM6fPHf28eqR8aAFgcIWkzC1BSwvTwOCCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bTc7SKP3; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a44f2d894b7so132366866b.1
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 08:03:26 -0700 (PDT)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-341808b6217so663141f8f.3
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 08:35:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711640116; x=1712244916; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L+KdH1+O3S6ienwS38m2KEffLYN6XW6D4Qvi4jXmZy4=;
+        b=bTc7SKP3HNhcAplSXoZXfkhAs5r2HqENnHqC6JhuWSXusXcP7bz2H9PJLDvlByjTEH
+         ZzSoozuJm20q7IBvZLZYEi3e/WBIXmPv1lVrpUjfjpGHgXv/oNof3WZQjNULhrggMASg
+         AMtH+ZfKZr3gAtpZiUxfeyrFu6Ri66J/qxjxHPaZRyE332nh9Z0Ok+bLRwANF1jjdtln
+         iLY1/2BVguwXjnnneme3H/GG3PmdazmxgXJaoLq9jNKgq/Rd9kb3M6fkEyocZlGc/MwC
+         ijE0Onc7aFlaKnBb0NXsFfHiDy/bDbg0fiMmjp6dVqnQj2KKYl0ZfEtPuS3Ozs335UNz
+         z07Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711638205; x=1712243005;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1711640116; x=1712244916;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hQLex7ntB7VTFPIaLwxFN4vNjoelaqHGNSsMwiUnFjs=;
-        b=DJ2DA5bpm23lhfUaaITmUn97SNWeSA55BW3DJskKYTej+P92vpx8sDW2dDnfjDMVEO
-         E+y1+czao8EHC2okuwuQhUvjKuA3CS//gAFyXXhph+WhfVkFZIfnHiNFugHhSLmTn/MY
-         cPkOc23JmKexkcK/1cktkwWI11j+eEpxFEI50R7mRSWVE9J5g4HRaO45yT/AX0i/Zfp/
-         oWOjEZuBguhqNbfHJEFXaNd83rj9nBjsi42mDxk1fbCLJMCJhFyExZ3OYTamS4QNvzja
-         UEeCMilL8Aw1eczqrc92rHE5abdDJw5vooUA8ZYdk+Rbn2CZmfwmJeMmESLJmUZDpiT1
-         PMfw==
-X-Gm-Message-State: AOJu0YwZzk8N9X7O3ZsbauNxRGhjihyOW0bYBzrJTnAofWRPWGWXMVxT
-	nV1yoBvlBxuZWl3qfhQj0/eh0KeEDORhXAutnQl53sNOHAk5jcjI
-X-Google-Smtp-Source: AGHT+IFEmuIf078GPYXs86/Ay81ah3BHyGb/3w+17Dbwx4ai2pl1RT54agf3n4Tyr4G1IsDtTW13zw==
-X-Received: by 2002:a17:906:b7c8:b0:a4d:f0c3:a9e9 with SMTP id fy8-20020a170906b7c800b00a4df0c3a9e9mr1993911ejb.28.1711638204528;
-        Thu, 28 Mar 2024 08:03:24 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
-        by smtp.gmail.com with ESMTPSA id bg12-20020a170906a04c00b00a4a3580b215sm848467ejb.80.2024.03.28.08.03.23
+        bh=L+KdH1+O3S6ienwS38m2KEffLYN6XW6D4Qvi4jXmZy4=;
+        b=xDgOwixQlJpXGezB/7fcB178m9ilE3BCdGGowkqzRS+Z9scf5UEjChDoO9Jwzv98vx
+         hzMGUtwtgYFwLxY2n6tGiqJX0jLfsRzgZqfnH+xVsuVDJGVBNAGhpla24Qc1WkF8I1lW
+         H0aiz7ZIHWm25REwrfTv+tJ2k7UvUbH+En+/uBpqMhp6nD1jBtR0cHgrcnREhjt9KB+i
+         qmOFHzECtBoV73i9RMuSVSQjbDEYz64vAkY/M9+dicfR80WGbytxObo1SUBoIKpvuz60
+         oW6S8y2X3mgzPkFvm014THK0CT5oYgcC6V9FFLqkJYwFvEL4rfUkYFcvPoF+bv66soY2
+         NXjg==
+X-Gm-Message-State: AOJu0YwN3PoxIkZW84+J50RqiLZhGwsRf+2e0vMXkDDDnnslAyum7O+I
+	02uLCkZchHkB2yERZtEqn29klyYywml0GL8tMNk79hctAXgQLtPb
+X-Google-Smtp-Source: AGHT+IEh77BNFZZdN7dAmRruRCLNkr2BMYozDepnCwZnzRqOvlIoJlHTBjxkOBFinbtr4ucttGNsOw==
+X-Received: by 2002:a05:6000:2af:b0:341:b5ca:9e9d with SMTP id l15-20020a05600002af00b00341b5ca9e9dmr2758311wry.67.1711640116363;
+        Thu, 28 Mar 2024 08:35:16 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:7530:d5b0:adf6:d5c5])
+        by smtp.gmail.com with ESMTPSA id k17-20020adff5d1000000b00341b7388dafsm2017686wrp.77.2024.03.28.08.35.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 08:03:24 -0700 (PDT)
-Date: Thu, 28 Mar 2024 08:03:21 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alessandro Marcolini <alessandromarcolini99@gmail.com>,
-	donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 1/3] doc: netlink: Change generated docs to
- limit TOC to depth 3
-Message-ID: <ZgWGuQIiPxiQh2PA@gmail.com>
-References: <20240326201311.13089-1-donald.hunter@gmail.com>
- <20240326201311.13089-2-donald.hunter@gmail.com>
+        Thu, 28 Mar 2024 08:35:15 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Jiri Pirko <jiri@resnulli.us>,  Jacob Keller
+ <jacob.e.keller@intel.com>,  Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCHv3 net-next 2/2] doc/netlink/specs: Add vlan attr in
+ rt_link spec
+In-Reply-To: <20240327123130.1322921-3-liuhangbin@gmail.com> (Hangbin Liu's
+	message of "Wed, 27 Mar 2024 20:31:29 +0800")
+Date: Thu, 28 Mar 2024 15:05:57 +0000
+Message-ID: <m2wmpmjt0q.fsf@gmail.com>
+References: <20240327123130.1322921-1-liuhangbin@gmail.com>
+	<20240327123130.1322921-3-liuhangbin@gmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326201311.13089-2-donald.hunter@gmail.com>
+Content-Type: text/plain
 
-On Tue, Mar 26, 2024 at 08:13:09PM +0000, Donald Hunter wrote:
-> The tables of contents in the generated Netlink docs include individual
-> attribute definitions. This can make the contents exceedingly long and
-> repeats a lot of what is on the rest of the pages. See for example:
-> 
-> https://docs.kernel.org/networking/netlink_spec/tc.html
-> 
-> Add a depth limit to the contents directive in generated .rst files to
-> limit the contents depth to 3 levels. This reduces the contents to:
-> 
->  - Family
->    - Summary
->    - Operations
->      - op-one
->      - op-two
->      - ...
->    - Definitions
->      - struct-one
->      - struct-two
->      - enum-one
->      - ...
->    - Attribute sets
->      - attrs-one
->      - attrs-two
->      - ...
-> 
-> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+Hangbin Liu <liuhangbin@gmail.com> writes:
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+> With command:
+>  # ./tools/net/ynl/cli.py \
+>  --spec Documentation/netlink/specs/rt_link.yaml \
+>  --do getlink --json '{"ifname": "eno1.2"}' --output-json | \
+>  jq -C '.linkinfo'
+>
+> Before:
+> Exception: No message format for 'vlan' in sub-message spec 'linkinfo-data-msg'
+>
+> After:
+>  {
+>    "kind": "vlan",
+>    "data": {
+>      "protocol": "8021q",
+>      "id": 2,
+>      "flag": {
+>        "flags": [
+>          "reorder-hdr"
+>        ],
+>        "mask": "0xffffffff"
+>      },
+>      "egress-qos": {
+>        "mapping": [
+>          {
+>            "from": 1,
+>            "to": 2
+>          },
+>          {
+>            "from": 4,
+>            "to": 4
+>          }
+>        ]
+>      }
+>    }
+>  }
+>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
