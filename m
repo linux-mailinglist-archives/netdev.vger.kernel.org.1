@@ -1,194 +1,111 @@
-Return-Path: <netdev+bounces-82752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E27488F926
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:52:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A37E488F945
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:56:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6111A1C226D2
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:52:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 423BD1F2BED6
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8729354792;
-	Thu, 28 Mar 2024 07:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F5823768;
+	Thu, 28 Mar 2024 07:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vEEeyk+s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="djRDraCR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A786E5FBAB
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232AC50A7E
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711612289; cv=none; b=P1wxF+NACXBUjMRHVAiMk4cfTBs4se7kGNDWrqmP/ORZSEK4GM5S5gAE9nA4GeAcdGfK0ZqSQNxI7RTjqZeQrBo0Xsly0APchQ3+oc+gwDRFSgHeHP/0jZO6JR7uqkm5SM4Hg+LCZcW4CADF9sGcts2hdMPE8yrj1QD/r3n8FRg=
+	t=1711612604; cv=none; b=qkN0wk01P3cCBtH2ldIznDBet0Kg6DZqAF7o8LGmVhV5Bca//Y5k7xqbV5G2MiWbJMd6q5voUD+xsgBIo+MeY4a8WKj0okZInFj+otCRMjPn60VZiKKI6cAB1IrChzEdbKHzQ9NK5U7GK4wm4r6B6CO5nRoCsUws50fc/mL/N3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711612289; c=relaxed/simple;
-	bh=kEscZ/8Kkqqx1MT1J4dd88+mQT+FPnz0y12rnoIaq60=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QnWIL67ehCv7WHPOXNsU+8C4e00aywfhpZ0GOYge1CfTcpe26CrFBLovaFGuYPO/TbpjLvWrAJvdnRFRhF0v5fVTReXFpe42M7e511lnsjr4KgCRZxxy1f69iYGzVEbYYIxf6uE/Of+1xfY1gcIkPSdFr/kIViE/zQA2fJUe7w4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vEEeyk+s; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711612284; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=eYCNs1eyvLbuEg7kTMTsjiZymK6Vox2z18+oy8WLiRM=;
-	b=vEEeyk+sjJHWV6j65nfG4fBvN33w0QDJNSs5Jzy0Axdn2Rt0g+nYPUYeKHK4qAn8U10bX5Rnb19P0zjl3vr/7ii6LtKSRAxnBJhZltzOlsrNg8gNV9dMALL7puHZAaOQyEKtZJefBsD2haDDeEw3zARAqGhACABSqCtFl8O1KCc=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R921e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3Sg0gU_1711612275;
-Received: from 30.221.148.146(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3Sg0gU_1711612275)
-          by smtp.aliyun-inc.com;
-          Thu, 28 Mar 2024 15:51:19 +0800
-Message-ID: <e73d4bc1-15cb-4f59-90b9-f8b128c2eba8@linux.alibaba.com>
-Date: Thu, 28 Mar 2024 15:51:14 +0800
+	s=arc-20240116; t=1711612604; c=relaxed/simple;
+	bh=qMuY90RU06ldvXyUdfez/ncLT/9htamRUr37CGC5ACM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AwMwJZOacPy7zT0Ib9j2dNAtQMpfAhGjSmYyoKC2lXhgh/iCODMoc+0z5zTqdCfGI755GUdbQJ/kbS5mXSkneI7MEUHflw/gOrH0Xjf8+JgtDn3AKfLtcmwnVEw2c/fqjIyr1BKHQtqopPIYdYY7qJs/nDzcjPaHJShjoKZMWqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=djRDraCR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711612601;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qMuY90RU06ldvXyUdfez/ncLT/9htamRUr37CGC5ACM=;
+	b=djRDraCR+25mJdx8ixCdjEjNZ0xipKMXxXIoDfFG6I2r6Irh3YclOXQ/I73HHHpxLz/YQn
+	hPho69EPK1y/8IgQ7t4Vwyd/RWDlhMFtXP+oK53Kw5HPTM2r8vf2G7KqHbH9v9vp1p7d/T
+	Isqgon23wdrtXJHGCQaHGk99XLk7mPE=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-384-NNftgrlsP32gVWnHL7-NAQ-1; Thu, 28 Mar 2024 03:56:39 -0400
+X-MC-Unique: NNftgrlsP32gVWnHL7-NAQ-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-29905ac5c21so616311a91.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 00:56:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711612598; x=1712217398;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qMuY90RU06ldvXyUdfez/ncLT/9htamRUr37CGC5ACM=;
+        b=FP1C7knLdvc3o4KoUzkFGisY7gsNDX3RLCgw48BPQ1p9kw696CeL7kzzOJI2JpUFox
+         mGnGDr2DHxKqAJ4DRvksHpvW+1PaUOHRygF3BbJpdDAlBma//ejE65mO+/IsQWsM3a4W
+         AsOA+0ZzgIrb8m2qppn30eRYdetAZ9QqhRHrWndWYgvCol56cnfU4E/3rVZv1iHe5gTn
+         1RS9WwO/PDahPvIRMF2xGOWgAJM0dXyb4OKkwaSMSa/CC2TlgtGCd3VNgtvFo3J1Wfzf
+         c8M6NqbCs9YFkYkf4w/efse7y3lTGvOa9kxI7IxzqrP4RD7/9EBhW+ewGpIxKu1kY0/J
+         YhOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfGw/yBI2k8W7gNCqGHmuoVpjzUj36CXbXXzjxZbQQ9fqQLJlFhXJnKelODVLqgX+JNhRqHEoBlsCYjcCRy/JdgbAqxlks
+X-Gm-Message-State: AOJu0YwotPyJWQqJSLxckVUwHYAoT2epcxtx5m9ksjdKesEUDVf8h0/q
+	sG42ARjAyEngZ9DiQQrpVdmR/292yFqd7mY9fRSGqP46P8wwzQOTAtSDy01D+LrZuVBkE1yGTvg
+	CODuOx4HFGsle6HCBJQqEQMpLKj8H97ST04mvjesSUiHa1Xlw6SP6NXvDnSlhFtVNeebHqPuhvx
+	rk9Lt2XpUpkuRbw2INz/oOVoRKCQvtvqWgu6wV
+X-Received: by 2002:a17:90a:6d82:b0:2a0:99b9:dff0 with SMTP id a2-20020a17090a6d8200b002a099b9dff0mr1686999pjk.16.1711612598236;
+        Thu, 28 Mar 2024 00:56:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHdfM9f+Ys19JA8GILgDnNKXIhVRTVPRqVS/fiSFTFwJ5Vy6BwFi+yHd4p4PtmjI1CNMZWR4yIxHQSKosoLrTE=
+X-Received: by 2002:a17:90a:6d82:b0:2a0:99b9:dff0 with SMTP id
+ a2-20020a17090a6d8200b002a099b9dff0mr1686989pjk.16.1711612597940; Thu, 28 Mar
+ 2024 00:56:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/2] virtio-net: support dim profile
- fine-tuning
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- "David S. Miller" <davem@davemloft.net>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-References: <1711531146-91920-1-git-send-email-hengqi@linux.alibaba.com>
- <1711531146-91920-3-git-send-email-hengqi@linux.alibaba.com>
- <20240328032636-mutt-send-email-mst@kernel.org>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240328032636-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240327111430.108787-1-xuanzhuo@linux.alibaba.com> <20240327111430.108787-8-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240327111430.108787-8-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 28 Mar 2024 15:56:26 +0800
+Message-ID: <CACGkMEszXC=B3U05OsbMwEFcvSvU7AwPEKasmQa=VgjCz+k2ww@mail.gmail.com>
+Subject: Re: [PATCH vhost v6 07/10] virtio: find_vqs: add new parameter premapped
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-在 2024/3/28 下午3:27, Michael S. Tsirkin 写道:
-> On Wed, Mar 27, 2024 at 05:19:06PM +0800, Heng Qi wrote:
->> Virtio-net has different types of back-end device
->> implementations. In order to effectively optimize
->> the dim library's gains for different device
->> implementations, let's use the new interface params
->> to fine-tune the profile list.
->>
->> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
->> ---
->>   drivers/net/virtio_net.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++--
->>   1 file changed, 52 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index e709d44..9b6c727 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -57,6 +57,16 @@
->>   
->>   #define VIRTNET_DRIVER_VERSION "1.0.0"
->>   
->> +/* This is copied from NET_DIM_RX_EQE_PROFILES in DIM library */
-> So maybe move it to a header and reuse?
-
-Will do. And plan to put configurable parameters into 'vi'.
-
-Thanks.
-
+On Wed, Mar 27, 2024 at 7:14=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
 >
+> If the premapped mode is enabled, the dma array(struct vring_desc_dma) of
+> virtio core will not be allocated. That is judged when find_vqs() is
+> called. To avoid allocating dma array in find_vqs() and releasing it
+> immediately by virtqueue_set_dma_premapped(). This patch introduces a
+> new parameter to find_vqs(). Then we can judge should we allocate the
+> dma array(struct vring_desc_dma) or not inside find_vqs().
 >
->> +#define VIRTNET_DIM_RX_PKTS 256
->> +static struct dim_cq_moder rx_eqe_conf[] = {
->> +	{.usec = 1,   .pkts = VIRTNET_DIM_RX_PKTS,},
->> +	{.usec = 8,   .pkts = VIRTNET_DIM_RX_PKTS,},
->> +	{.usec = 64,  .pkts = VIRTNET_DIM_RX_PKTS,},
->> +	{.usec = 128, .pkts = VIRTNET_DIM_RX_PKTS,},
->> +	{.usec = 256, .pkts = VIRTNET_DIM_RX_PKTS,}
->> +};
->> +
->>   static const unsigned long guest_offloads[] = {
->>   	VIRTIO_NET_F_GUEST_TSO4,
->>   	VIRTIO_NET_F_GUEST_TSO6,
->> @@ -3584,7 +3594,10 @@ static void virtnet_rx_dim_work(struct work_struct *work)
->>   		if (!rq->dim_enabled)
->>   			continue;
->>   
->> -		update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
->> +		if (dim->profile_ix >= ARRAY_SIZE(rx_eqe_conf))
->> +			dim->profile_ix = ARRAY_SIZE(rx_eqe_conf) - 1;
->> +
->> +		update_moder = rx_eqe_conf[dim->profile_ix];
->>   		if (update_moder.usec != rq->intr_coal.max_usecs ||
->>   		    update_moder.pkts != rq->intr_coal.max_packets) {
->>   			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
->> @@ -3627,6 +3640,34 @@ static int virtnet_should_update_vq_weight(int dev_flags, int weight,
->>   	return 0;
->>   }
->>   
->> +static int virtnet_update_profile(struct virtnet_info *vi,
->> +				  struct kernel_ethtool_coalesce *kc)
->> +{
->> +	int i;
->> +
->> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
->> +		for (i = 0; i < NET_DIM_PARAMS_NUM_PROFILES; i++)
->> +			if (kc->rx_eqe_profs[i].comps)
->> +				return -EINVAL;
->> +	} else {
->> +		for (i = 0; i < NET_DIM_PARAMS_NUM_PROFILES; i++) {
->> +			if (kc->rx_eqe_profs[i].usec != rx_eqe_conf[i].usec ||
->> +			    kc->rx_eqe_profs[i].pkts != rx_eqe_conf[i].pkts ||
->> +			    kc->rx_eqe_profs[i].comps)
->> +				return -EINVAL;
->> +		}
->> +
->> +		return 0;
->> +	}
->> +
->> +	for (i = 0; i < NET_DIM_PARAMS_NUM_PROFILES; i++) {
->> +		rx_eqe_conf[i].usec = kc->rx_eqe_profs[i].usec;
->> +		rx_eqe_conf[i].pkts = kc->rx_eqe_profs[i].pkts;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>   static int virtnet_set_coalesce(struct net_device *dev,
->>   				struct ethtool_coalesce *ec,
->>   				struct kernel_ethtool_coalesce *kernel_coal,
->> @@ -3653,6 +3694,10 @@ static int virtnet_set_coalesce(struct net_device *dev,
->>   		}
->>   	}
->>   
->> +	ret = virtnet_update_profile(vi, kernel_coal);
->> +	if (ret)
->> +		return ret;
->> +
->>   	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
->>   		ret = virtnet_send_notf_coal_cmds(vi, ec);
->>   	else
->> @@ -3689,6 +3734,10 @@ static int virtnet_get_coalesce(struct net_device *dev,
->>   			ec->tx_max_coalesced_frames = 1;
->>   	}
->>   
->> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
->> +		memcpy(kernel_coal->rx_eqe_profs, rx_eqe_conf,
->> +		       sizeof(rx_eqe_conf));
->> +
->>   	return 0;
->>   }
->>   
->> @@ -3868,7 +3917,8 @@ static int virtnet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
->>   
->>   static const struct ethtool_ops virtnet_ethtool_ops = {
->>   	.supported_coalesce_params = ETHTOOL_COALESCE_MAX_FRAMES |
->> -		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
->> +		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
->> +		ETHTOOL_COALESCE_RX_EQE_PROFILE,
->>   	.get_drvinfo = virtnet_get_drvinfo,
->>   	.get_link = ethtool_op_get_link,
->>   	.get_ringparam = virtnet_get_ringparam,
->> -- 
->> 1.8.3.1
+> The driver must check the premapped mode of every vq after find_vqs().
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
 
 
