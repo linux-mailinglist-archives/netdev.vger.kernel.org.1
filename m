@@ -1,148 +1,186 @@
-Return-Path: <netdev+bounces-82851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B192D88FF13
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 13:34:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5599B88FF2E
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 13:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C721F2447B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:34:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 770E11C26F75
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB0E7E767;
-	Thu, 28 Mar 2024 12:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B3B7F49C;
+	Thu, 28 Mar 2024 12:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="NSyWSFj6"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HAvDne/M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C537F5F87C
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 12:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445537FBA9
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 12:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711629265; cv=none; b=SSn2UlhYY+jv0CXKFx1H+qxzLqTktGxwh8udUFzu/94c/uR99QywdtRmTGV64GIWkv06g3SkqDtKnT31xZUIhXwr8FXX3Et3ioFu1Tpl8+xX11DOgbepFfjnfolPbaPvpu39tkmsd8PsWAMMX83kMBEytjPfBBZcyRaF11Xl3c8=
+	t=1711629547; cv=none; b=DmzJNj8gDK851JVuD3wCfNPphQt5RqYK8q1lNenWkTytXH0bS6bof7di6i3nNMWrwcf6BTStzK5IPj0ZVI5Q3yMGsH2x08bYDxAtqj1INZgLQL2YQBTrVxgOLZzmxbyBrcN5cvPRMwX/E0Q6/uzDwuJGtGirYCjSjnb6NLMom1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711629265; c=relaxed/simple;
-	bh=zX2GWYXPtC7qjhq9kFDCMg3asCTHBNFGRevEEyfJ4pU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hcxs8Lx9D+qO7JMtb8LkBxva100kEIiDBIEJIeZZryvy7XRYMN+PndetThFP5gMdCmx1fr+x69pMVEI3xLfcMlB5g9uNYPV1A/3aDOwbidgUs8EMi7VC/vLdbMQEEuc4jdAI7wiCb5UXRes0IQVstr+D8OGeHl14xvuSOlgGW/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=NSyWSFj6; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41493e0fbf2so6229545e9.1
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 05:34:23 -0700 (PDT)
+	s=arc-20240116; t=1711629547; c=relaxed/simple;
+	bh=LhEmO1/QpTYLcqhWQ1oIVDE/05mjh3QmxpGCsp1Ngzo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VzXcKROnFI/hbCFOnVqhVIY+4HCmhqfO+65aOZF2IFgJ52K/B0uoUEbjtxLzs0vR6/VgorzIuI/h+j1Nzl0fw/gFBjAeWjjeL6auINpdF6TafjbIpCVMHTvTADAuq3yLNZA0mDwwoJXhpp4u12MX0lJdna3bdItcJuVhs9FbkXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=HAvDne/M; arc=none smtp.client-ip=209.85.210.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-6ea838bf357so816882b3a.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 05:39:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1711629262; x=1712234062; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qWn4vKf6jmo6u/KAkidvDYA7hMTdnPHRFemGgPWSlIk=;
-        b=NSyWSFj68eR8wToM0XskqZHMJ29ZmkRU/fJ+NFfAUHhG0HmaKu0bBTvq4QkfzMGjmH
-         jUAEtrsdZFPxsSvlIAdvu4Dw2VNqcrSAaVGTmQf7otdSslwPlTAOxxHk4+wM/q7R5jYd
-         KSY+/dmahb4erl5kG39qfc7NCHptH8BslDFoGHXL7NCC9zHoBtIB11axS9h9RaBGx97k
-         X5oms86dove+9KITXsvdyYjeGMDys13gA0NLPZC1fuxEtRywv1WlTYQ9f1OtasQZgD7w
-         X4XnDgNPOs93OKplHCkWKCufTJoFx/W5yj33Q4qbIkk5yI24Ti8upUn+0ni+haAdNNHu
-         PtDg==
+        d=broadcom.com; s=google; t=1711629545; x=1712234345; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GCsDnnNASp8ef4/b0tg4ZDvexLdNUsjbgwDUzBJT2lQ=;
+        b=HAvDne/MDmGSAYZBrDfHRu/Kn/pLEFK6X80QT/QD0YpYWHGN+03mXUsrbNL3IarUwu
+         c3we2EfpxQbtFgpKt8hiIauzNjpqRL1M6YZRCSi95lbk8uyAZF0e2sj75BxZ5HW7jkLg
+         l7KMF0+v75RHLwz9dCqd3HFjKbgMPN/7JR7Fg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711629262; x=1712234062;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qWn4vKf6jmo6u/KAkidvDYA7hMTdnPHRFemGgPWSlIk=;
-        b=eaXd9lrbEysnlYIkqMYLgKlznK6t4HTct8Cr/omLSQJTFJD8WWI3TYob1rLr3qHodn
-         6peG8Xqi/FHIEgWJNCrFG7wbCcSNQpRICwL3zjLAmpKHk/pLW9WN+W6o5FHfYl243F7W
-         g+sCzVwR35QdskwUqkRlDwSufunoYG+Hs3E+ukTG8MoDZ835InXYadiB33gfXrEMfmF7
-         VCSxvnCySs0sULvsAWUIL4BTKC8ShRZREwcPrZ5W52L5sAK5xjHHXI1XdwYK4xiqEIb+
-         PjtprUPP0lic5HGWaG1LzrMNjA8zlsMyK2LrhBcttFN+FvZMeZbh8jObB8IbK6egOwCr
-         zXcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJulBGehTjI03BSOfbaOOioZ/Ec8UnrPgnjyyWJ/MB09Sd/8I2/Xq+jhXQNkGEdQoKTX8xuaHXUqc90f8HvV5hjUlihyBf
-X-Gm-Message-State: AOJu0YyS6+MuwVkuE19jbqUr7ect5bARhTz3P+O51bAJdt2uq6JF1/6S
-	TDAt9VoJuHn7z+o74gKmaTy7nP29ILr/8BkbzZMObTtoHDv7TbCq/UDXHijg8l4=
-X-Google-Smtp-Source: AGHT+IFLB/cUHJWkbnWrK10eduOa8rRtXuIj5s2I8YXRQ+IvMFyMnMJuaj5WaCt6J4TWoyPiuBZHlA==
-X-Received: by 2002:a05:600c:45ca:b0:414:8948:621c with SMTP id s10-20020a05600c45ca00b004148948621cmr2473201wmo.8.1711629262250;
-        Thu, 28 Mar 2024 05:34:22 -0700 (PDT)
-Received: from [10.1.5.112] (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.gmail.com with ESMTPSA id fc9-20020a05600c524900b004154399fbd9sm2287689wmb.45.2024.03.28.05.34.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Mar 2024 05:34:22 -0700 (PDT)
-Message-ID: <34f9a771-08dd-4db6-9790-cc5f70f707c7@baylibre.com>
-Date: Thu, 28 Mar 2024 13:34:21 +0100
+        d=1e100.net; s=20230601; t=1711629545; x=1712234345;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GCsDnnNASp8ef4/b0tg4ZDvexLdNUsjbgwDUzBJT2lQ=;
+        b=thtkNhzRrqHDPxiDzZ9kPk21W5XKzzg5S60VFZUFOJOLvMQYB7EaR37ylXCF5SFYp/
+         Jdl+aD88s6xS5k1FlY4raEUjPVty/nMcc3FnmNl2FeUUNLM4xrcPAAjcMb2BgWSQaEg3
+         InW4QMruwhDRCX1mq5E0mvJJsbhuwu9Jd3c4F7TwnWU9DbSY7ZasemayCQMpRm/6OQcP
+         2nyfS63wNSiKWqZn8FPk6IkBN9hss/c/E4XMfy8WnCEY3WSesfRUM28iIMYrBVi2ruo8
+         LHtW/9gyIHdc/re+kHwEg8hzw+m3no3CVG2hSxc9QldDb8rC/4yFZuU2B+1kXygLATuK
+         w1Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCXr5c3VC0p9g3UbcgHtx95D4OGFLASLYiLodcw0D3Aaw/wsC29CB3q6jvS9cMwKy8vP+pVeXj80CZQmowAhoJmlKtVQTzND
+X-Gm-Message-State: AOJu0YzOhrb7aS77MrzZW5jptRq642c5ghAprhUtPWyKbe9BxBuyvK93
+	tXaYWOEzZaanhkOqyjYDD91/FadKEUfCudrZTCdUkLrR2mtTfKwS2Bq/oLe/Ig==
+X-Google-Smtp-Source: AGHT+IGIRxGSrxYY3VCs5Jj9rn9qLfuCbkVocf3OMBUZsTxdS3k81sJrbt3PnRXofn/Pb2GTq6PCKA==
+X-Received: by 2002:a05:6a20:7346:b0:1a5:6f7e:3b81 with SMTP id v6-20020a056a20734600b001a56f7e3b81mr1346855pzc.41.1711629545458;
+        Thu, 28 Mar 2024 05:39:05 -0700 (PDT)
+Received: from srish-ubuntu-desktop.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id a18-20020aa780d2000000b006e6cc93381esm1256685pfn.125.2024.03.28.05.39.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 05:39:05 -0700 (PDT)
+From: Srish Srinivasan <srish.srinivasan@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	vakul.garg@nxp.com,
+	davejwatson@fb.com,
+	netdev@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vasavi.sirnapalli@broadcom.com,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Srish Srinivasan <srish.srinivasan@broadcom.com>
+Subject: [PATCH 6.1.y] net: tls: handle backlogging of crypto requests
+Date: Thu, 28 Mar 2024 18:08:05 +0530
+Message-Id: <20240328123805.3886026-1-srish.srinivasan@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/3] net: ethernet: ti: am65-cpsw: Add minimal
- XDP support
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org
-References: <20240223-am65-cpsw-xdp-basic-v5-0-bc1739170bc6@baylibre.com>
- <20240223-am65-cpsw-xdp-basic-v5-3-bc1739170bc6@baylibre.com>
- <20240328114245.GA1560669@maili.marvell.com>
-Content-Language: en-US
-From: Julien Panis <jpanis@baylibre.com>
-In-Reply-To: <20240328114245.GA1560669@maili.marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/28/24 12:42, Ratheesh Kannoth wrote:
-> On 2024-03-28 at 14:56:42, Julien Panis (jpanis@baylibre.com) wrote:
->> This patch adds XDP (eXpress Data Path) support to TI AM65 CPSW
->> Ethernet driver. The following features are implemented:
->> - NETDEV_XDP_ACT_BASIC (XDP_PASS, XDP_TX, XDP_DROP, XDP_ABORTED)
->> - NETDEV_XDP_ACT_REDIRECT (XDP_REDIRECT)
->> - NETDEV_XDP_ACT_NDO_XMIT (ndo_xdp_xmit callback)
->>
->> The page pool memory model is used to get better performance.
->> Below are benchmark results obtained for the receiver with iperf3 default
->> parameters:
->> - Without page pool: 495 Mbits/sec
->> - With page pool: 505 Mbits/sec (actually 510 Mbits/sec, with a 5 Mbits/sec
->> loss due to extra processing in the hot path to handle XDP).
->>
->> Signed-off-by: Julien Panis <jpanis@baylibre.com>
->> ---
+From: Jakub Kicinski <kuba@kernel.org>
 
-[...]
+commit 8590541473188741055d27b955db0777569438e3 upstream
 
->> +static struct sk_buff *am65_cpsw_alloc_skb(struct am65_cpsw_rx_chn *rx_chn,
->> +					   struct net_device *ndev,
->> +					   unsigned int len,
->> +					   int desc_idx)
->> +{
->> +	struct sk_buff *skb;
->> +	struct page *page;
->> +
->> +	page = page_pool_dev_alloc_pages(rx_chn->page_pool);
->> +	if (unlikely(!page))
->> +		return NULL;
->> +
->> +	len += AM65_CPSW_HEADROOM;
->> +
->> +	skb = build_skb(page_address(page), len);
->> +	if (unlikely(!skb)) {
->> +		page_pool_put_full_page(rx_chn->page_pool, page, ndev);
-> Is it compiling ? third argument should be a bool.
+Since we're setting the CRYPTO_TFM_REQ_MAY_BACKLOG flag on our
+requests to the crypto API, crypto_aead_{encrypt,decrypt} can return
+ -EBUSY instead of -EINPROGRESS in valid situations. For example, when
+the cryptd queue for AESNI is full (easy to trigger with an
+artificially low cryptd.cryptd_max_cpu_qlen), requests will be enqueued
+to the backlog but still processed. In that case, the async callback
+will also be called twice: first with err == -EINPROGRESS, which it
+seems we can just ignore, then with err == 0.
 
-Thank you for the time you spent on this patch.
+Compared to Sabrina's original patch this version uses the new
+tls_*crypt_async_wait() helpers and converts the EBUSY to
+EINPROGRESS to avoid having to modify all the error handling
+paths. The handling is identical.
 
-Yes, it is compiling.
-This was intentional but it may be unclear indeed.
-I'll make the bool using more explicit in next version.
+Fixes: a54667f6728c ("tls: Add support for encryption using async offload accelerator")
+Fixes: 94524d8fc965 ("net/tls: Add support for async decryption of tls records")
+Co-developed-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+Link: https://lore.kernel.org/netdev/9681d1febfec295449a62300938ed2ae66983f28.1694018970.git.sd@queasysnail.net/
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[Srish: fixed merge-conflict in stable branch linux-6.1.y,
+needs to go on top of https://lore.kernel.org/stable/20240307155930.913525-1-lee@kernel.org/]
+Signed-off-by: Srish Srinivasan <srish.srinivasan@broadcom.com>
+---
+ net/tls/tls_sw.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 2bd27b777..61b01dfc6 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -195,6 +195,17 @@ static void tls_decrypt_done(crypto_completion_data_t *data, int err)
+ 	struct sock *sk;
+ 	int aead_size;
+ 
++	/* If requests get too backlogged crypto API returns -EBUSY and calls
++	 * ->complete(-EINPROGRESS) immediately followed by ->complete(0)
++	 * to make waiting for backlog to flush with crypto_wait_req() easier.
++	 * First wait converts -EBUSY -> -EINPROGRESS, and the second one
++	 * -EINPROGRESS -> 0.
++	 * We have a single struct crypto_async_request per direction, this
++	 * scheme doesn't help us, so just ignore the first ->complete().
++	 */
++	if (err == -EINPROGRESS)
++		return;
++
+ 	aead_size = sizeof(*aead_req) + crypto_aead_reqsize(aead);
+ 	aead_size = ALIGN(aead_size, __alignof__(*dctx));
+ 	dctx = (void *)((u8 *)aead_req + aead_size);
+@@ -268,6 +279,10 @@ static int tls_do_decryption(struct sock *sk,
+ 	}
+ 
+ 	ret = crypto_aead_decrypt(aead_req);
++	if (ret == -EBUSY) {
++		ret = tls_decrypt_async_wait(ctx);
++		ret = ret ?: -EINPROGRESS;
++	}
+ 	if (ret == -EINPROGRESS) {
+ 		if (darg->async)
+ 			return 0;
+@@ -452,6 +467,9 @@ static void tls_encrypt_done(crypto_completion_data_t *data, int err)
+ 	bool ready = false;
+ 	struct sock *sk;
+ 
++	if (err == -EINPROGRESS) /* see the comment in tls_decrypt_done() */
++		return;
++
+ 	rec = container_of(aead_req, struct tls_rec, aead_req);
+ 	msg_en = &rec->msg_encrypted;
+ 
+@@ -560,6 +578,10 @@ static int tls_do_encryption(struct sock *sk,
+ 	atomic_inc(&ctx->encrypt_pending);
+ 
+ 	rc = crypto_aead_encrypt(aead_req);
++	if (rc == -EBUSY) {
++		rc = tls_encrypt_async_wait(ctx);
++		rc = rc ?: -EINPROGRESS;
++	}
+ 	if (!rc || rc != -EINPROGRESS) {
+ 		atomic_dec(&ctx->encrypt_pending);
+ 		sge->offset -= prot->prepend_size;
+-- 
+2.34.1
 
