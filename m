@@ -1,83 +1,193 @@
-Return-Path: <netdev+bounces-83045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 235CE89082E
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 19:23:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8B67890847
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 19:28:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D21CB290F30
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:23:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69DF22926FA
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43314136E2D;
-	Thu, 28 Mar 2024 18:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF23D137745;
+	Thu, 28 Mar 2024 18:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ARG4bkyD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d/yG/doR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720CD132802
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 18:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A81136E29;
+	Thu, 28 Mar 2024 18:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711650205; cv=none; b=n2iDAHxi/UJOdYcfTOKCY/zDJXaFqSQLsIb2ypZxxZkgRgcCg5hXcxVtC8YaCf92p/kSv/n9nAox1ZjFZC4GQ/NeOamc4QE6ADRmPfOFUzdQBH5/aoE64u/7Z4V/ggLNIvORbXgecdFJdBox3OsdW13yzoi1VfLlizOabWhIFWs=
+	t=1711650506; cv=none; b=RWO+xypqnhY/5wo8iMzBkWKfk6+UGu83i7eq9FW3GlMpBdO9qopL/d19xWWSKdC9Lhq+INg+3hSdKkSvoFmFvoHugE4jiJrYGk8NY4JHCB/uNxhAz/+mqAxCINg4NjCVqWQtR2I0zzgpwfezrLU5OdGc8GOnv0xBXR88AfBJW+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711650205; c=relaxed/simple;
-	bh=rhMs+IW+LjgjgJG2bjuDC2kRA/YBDohWPyTnq4wTmlw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=Mm5zmmW2Zr3mVNKgjXJ7KwPgfyyAW1qXm7Iy6lEtjQqISzBGXs28SfV7rcm1bk0tRd5xU16SC38lvbYrfdGlRI5+TybCdcRr7aYBpCTOxjbOBVpSek4jfKvDbx9fbzxb0t4BMZ+hZ5ZYZwC5DnTnj47nOOsQ9+ZCXoACjsV/1JI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ARG4bkyD; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <16b32b53-5a01-43e8-93db-64778378fa09@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711650197;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bvccjBgvV8FPnWLETfwa5X6p1gUwr/hfB1axJ8LOH4E=;
-	b=ARG4bkyDA/Vzrk5HPV4L8uXDHlS+KGa6BXgc+OWOCZOzz7yMadsTRX1+yWr1QLiRWQXK4Y
-	5FJJjHUw4vhZdXTsHFY817EuoGtAsGuiYKpCMm0rH7CZiEEOUgYbNTM2iUAL002W3KPZEb
-	LZaNF09ZJ9DXkVnlxWO0mx+/2tPYIlA=
-Date: Thu, 28 Mar 2024 11:23:07 -0700
+	s=arc-20240116; t=1711650506; c=relaxed/simple;
+	bh=fCpsuqpXPx6EiIEqbV6/oK+Mco4Eg3WQcaCu8FFYxmE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=szC01qJIyRbhFpJ2EdWWwRN8BTvKblSusZFXnbGqVAt9h9OFgkWngQ4p+w2eGOUCY3feMg5MP4zH4njT8c1LYGmNiAIa3Fu3UR5j066mxjzIUIpkwm6IucL8beqWx3rzRqGNz9tpBXr5tkJrYmpwPpMhjzpiTDf6fx/X2PtbAec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d/yG/doR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E27A2C433F1;
+	Thu, 28 Mar 2024 18:28:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711650505;
+	bh=fCpsuqpXPx6EiIEqbV6/oK+Mco4Eg3WQcaCu8FFYxmE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d/yG/doRGyXpqxmVEGZRl29Gx01ZBHRqsLyBFhmaT8mmf44tImPwfhWbq/+onqqYQ
+	 Mk7belOYYdf/oaQElpAohzTOcmJEhrO4/oBdC872X4+PkuC19MXZYEObKWc8b1DXht
+	 E4JJM33unaXbObP+98zU5UfutVyF0MSVFb61PFWrUjcxtA1CoRmOrTxZIvLd/2j5Xc
+	 i2AR4w5A19X/edVUb5L7inWvNDxXBn2PViw3xzrRFzrBAWN5Ov77wY7xaniySz8nzx
+	 dj+p8Y9PBq0IYtN+jR1hn0KR4MgR7mupP9oDLO77XhK2IZq0VluR8c5zcvoWCrB8P2
+	 oprZ6oa0nyp9A==
+Date: Thu, 28 Mar 2024 18:28:12 +0000
+From: Simon Horman <horms@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Subject: Re: [RFC PATCH net-next v7 04/14] netdev: support binding dma-buf to
+ netdevice
+Message-ID: <20240328182812.GJ651713@kernel.org>
+References: <20240326225048.785801-1-almasrymina@google.com>
+ <20240326225048.785801-5-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [syzbot] [bpf?] [net?] KMSAN: uninit-value in dev_map_lookup_elem
-Content-Language: en-US
-To: ast@kernel.org, yonghong.song@linux.dev
-References: <000000000000c8d6b00614b599a2@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
- haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, sdf@google.com,
- song@kernel.org, syzkaller-bugs@googlegroups.com, andrii@kernel.org,
- alexei.starovoitov@gmail.com, bpf@vger.kernel.org,
- syzbot <syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com>
-In-Reply-To: <000000000000c8d6b00614b599a2@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240326225048.785801-5-almasrymina@google.com>
 
-On 3/28/24 3:01 AM, syzbot wrote:
-> Killed
-> make[2]: *** [scripts/Makefile.vmlinux_o:62: vmlinux.o] Error 137
-> make[2]: *** Deleting file 'vmlinux.o'
-> make[1]: *** [/syzkaller/jobs/linux/kernel/Makefile:1141: vmlinux_o] Error 2
-> make: *** [Makefile:240: __sub-make] Error 2
+On Tue, Mar 26, 2024 at 03:50:35PM -0700, Mina Almasry wrote:
+> Add a netdev_dmabuf_binding struct which represents the
+> dma-buf-to-netdevice binding. The netlink API will bind the dma-buf to
+> rx queues on the netdevice. On the binding, the dma_buf_attach
+> & dma_buf_map_attachment will occur. The entries in the sg_table from
+> mapping will be inserted into a genpool to make it ready
+> for allocation.
+> 
+> The chunks in the genpool are owned by a dmabuf_chunk_owner struct which
+> holds the dma-buf offset of the base of the chunk and the dma_addr of
+> the chunk. Both are needed to use allocations that come from this chunk.
+> 
+> We create a new type that represents an allocation from the genpool:
+> net_iov. We setup the net_iov allocation size in the
+> genpool to PAGE_SIZE for simplicity: to match the PAGE_SIZE normally
+> allocated by the page pool and given to the drivers.
+> 
+> The user can unbind the dmabuf from the netdevice by closing the netlink
+> socket that established the binding. We do this so that the binding is
+> automatically unbound even if the userspace process crashes.
+> 
+> The binding and unbinding leaves an indicator in struct netdev_rx_queue
+> that the given queue is bound, but the binding doesn't take effect until
+> the driver actually reconfigures its queues, and re-initializes its page
+> pool.
+> 
+> The netdev_dmabuf_binding struct is refcounted, and releases its
+> resources only when all the refs are released.
+> 
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-My second syzbot test attempt passed the build stage and passed the reproducer 
-also. https://lore.kernel.org/all/000000000000b7bdd80614bc433f@google.com/
+...
 
-Not sure what caused the syzbot build error in the first attempt but should be 
-unrelated to the fix. I will post the patch.
+> +int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+> +				    struct net_devmem_dmabuf_binding *binding)
+> +{
+> +	struct netdev_rx_queue *rxq;
+> +	u32 xa_idx;
+> +	int err;
+> +
+> +	if (rxq_idx >= dev->num_rx_queues)
+> +		return -ERANGE;
+> +
+> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
+> +	if (rxq->mp_params.mp_priv)
+> +		return -EEXIST;
+> +
+> +	err = xa_alloc(&binding->bound_rxq_list, &xa_idx, rxq, xa_limit_32b,
+> +		       GFP_KERNEL);
+> +	if (err)
+> +		return err;
+> +
+> +	/* We hold the rtnl_lock while binding/unbinding dma-buf, so we can't
+> +	 * race with another thread that is also modifying this value. However,
+> +	 * the driver may read this config while it's creating its * rx-queues.
+> +	 * WRITE_ONCE() here to match the READ_ONCE() in the driver.
+> +	 */
+> +	WRITE_ONCE(rxq->mp_params.mp_ops, &dmabuf_devmem_ops);
 
+Hi Mina,
+
+This causes a build failure because mabuf_devmem_ops is not added until a
+subsequent patch in this series.
+
+> +	WRITE_ONCE(rxq->mp_params.mp_priv, binding);
+> +
+> +	err = net_devmem_restart_rx_queue(dev, rxq_idx);
+> +	if (err)
+> +		goto err_xa_erase;
+> +
+> +	return 0;
+> +
+> +err_xa_erase:
+> +	WRITE_ONCE(rxq->mp_params.mp_ops, NULL);
+> +	WRITE_ONCE(rxq->mp_params.mp_priv, NULL);
+> +	xa_erase(&binding->bound_rxq_list, xa_idx);
+> +
+> +	return err;
+> +}
+
+...
 
