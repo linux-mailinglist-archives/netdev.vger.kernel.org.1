@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-82899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11245890219
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:40:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A38789021A
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:40:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35DB928DC41
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:40:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E073A1C2D904
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691A9823CB;
-	Thu, 28 Mar 2024 14:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1813112A154;
+	Thu, 28 Mar 2024 14:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zrW22ih3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xImDMEGr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D544F82D7F
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:40:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9287912D76A
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711636838; cv=none; b=Z5vSipqu67Af/BuJJ1gVUE548Rc7RWKcc87zlH9bOfTtmS/w0j+nVMtN19c2CIA/1ZuI/1lHRTVJbYmxc7hPZ6oZoD9lopitmOMW03vKs8fwHkcedtZlt08X4bmLC50aMcbyjCMDIRdSIUWgYjVf9tG1AFQvveVnZAtjqO5Rscs=
+	t=1711636840; cv=none; b=MtksoqEYayb/JJ5Q9Bvv18EMqpKWCTm47iFS5qZMxdDZZ2Vm3oZ1bdmlCouTCnLcSSIptNihdpIyloft7vL8yFAoRaPV2wZ/uEj6oIOJKzNWbvC9h49wWeEyxn+JMrXK0wGlW/KVoTq5eAkNW03xT7AxcIsg9WaS7pqlBW01k7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711636838; c=relaxed/simple;
-	bh=+gdzjdAz3SmFxBm9Peu7OfEUlG2/6IYoqorF/m2CC3o=;
+	s=arc-20240116; t=1711636840; c=relaxed/simple;
+	bh=wIncWrswncQh1bRWLkOE4ukf9R7mdV4WgyoV/cDr3i4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oQgIVaMlCZPQM/OhByQnbWmPnkwVpNOBazg7TF6NUiXtNY0Z/DFNiDvo9dJDEUnH6e1AOj8XazOVkRnK2DaOeUgIOCAuxajWcd6L6JD7J6dw8xbPObnudM4IpMz4oC0wdX/HM9OfqhjOgu+fPGc4j/daZS/JNdnGhAm9m8Fwc2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zrW22ih3; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=ARyq9fJ+XDjhCoUnVTvg3c/WHpt5YZ874Ut3WOGNmx72J2ofOuQx4Efu3sns4PWyRN3QnN4hwvW34GsbizgSE3UBx6XpTDCWbI1sXRotL4wUXwKmwG86SCZji499uF4zWeYGjbUsmikLUYBcp6clvOJJt8XioOWnJ/69TGhIyJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xImDMEGr; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-611e89cf3b5so16742377b3.3
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:40:36 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf618042daso1433963276.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:40:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711636836; x=1712241636; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1711636837; x=1712241637; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y1Blf2tfA5r57pliiQCXKJixA+SeK/vqFtyh4abCJ18=;
-        b=zrW22ih352RobK2NWX69gVxhpIA2RHvqbYdtfu340QspugvPclIj5gHRQ5N1BvAM/Y
-         xhJohs9uzHeJxImRviBcdFWvnVFBdnAjSgIZ5uojFhPf5IEhia1gT+btShQLblzrLz3u
-         2grZycdkaHvvvAk17HmJe5FZo5QpBSu6Zum7U+0DnTapVfeRzI0/seVdYbNw6S79vdMA
-         nXly9o3Gz0vASuz80Nl7IQmWw2dY1pv3ErmI9dAtCPIsbsLQrHgUWYnLpwB9ns1gMYWY
-         VLfvgy6s+2L4IvAWq0Djeq86vxg/qBtkMqCYtfJs7eKi6NSFGpU6VVLnpdyg2/S3KEbw
-         fLaw==
+        bh=74e/xj321Yg8Kp/ugt0Wz2SNI5GKWEc3hdNqdlM7Rp4=;
+        b=xImDMEGrPfTCl3hsG0TCswa0wZ9aBH5pHceC9TkDaGgcwmBllxK7xbtgbeESrH7a3O
+         DNAdtmD9Xv+PstEaYt+vE1TQeJwtb5/ajxrbSR7/1OpwoKEbVTAm+qmcHvGir++uGyRJ
+         sdr20fTE37LcX5MXyI19nCnN3XlepFdKWnts+jAVjB3IjH7rvIr4TkAdAvLTI5NMYlUe
+         N5gt2ttq7L1nbtBTBoBt9Eh0Y6CPn1skNOxSbGmu/YRbbXiAc9s1ijJeAP+zbkEI/lcU
+         AWsMVcmqxrdZPt0r9ORxkmfFsUwYshNDINtkLsK/g1YaVeGl/zcmb0fwRtFTm7DXk9gf
+         dBKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711636836; x=1712241636;
+        d=1e100.net; s=20230601; t=1711636837; x=1712241637;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y1Blf2tfA5r57pliiQCXKJixA+SeK/vqFtyh4abCJ18=;
-        b=JStutj6YsmpcjVwj9TD4ydZvBICFvsLXzm2zHVOmOmNa0ZgsaPqosce0IY0fZtBQu5
-         pa53oWA0vtsC7PYbOntsVfqaIjHLbisOuc7+dJvqSHjkyUVxnOjA6VNSiXsYthMYyFCv
-         LpAQAcOHXoAHEH5itrdlHl50oAqfg84NvkJewC6U9an/UlWh72wHYZk6f/I3XRbRQs5s
-         h9661mmcs+CGfBemhmHqfSlKuSR+W1K50xV5QPc3z8trCdiaSqg3J+/ifI9jTxAphXC2
-         bIrttoPDoyR7pa/S0wNDvia7XQJttucFIL1Xz/YXHA27Xd+n7vrkWHWBXB6FyLsWNiSj
-         gJ1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWGsu3IQLJ3rKSEgaW6tfaiiI4+S8T3sxDfjmMgOcG+WkGLEBwlmkPDKmc7517zFkA4elhu8fNpcge4IJsj9ZuAsZYkmlkG
-X-Gm-Message-State: AOJu0YyClWWK90n4Yr3klfcrRGWz+1EetVBTqR/F63/t8QGq4KcT37eQ
-	SByHo7MX3mgYysncK/2lOwpPtLdgqhZiCVKaEHjK9d9NfULkLcefeZgHRAEDktd4Crgif7eGpeE
-	Jy4ZdMXrKRA==
-X-Google-Smtp-Source: AGHT+IHAqudW+dS7+SmI3Sc39hQ4EeL4UxtAyM2XVSSvEpfCnV/GM5VstfU1dMfOKyO9epjZklOWMqZ9TXh/dQ==
+        bh=74e/xj321Yg8Kp/ugt0Wz2SNI5GKWEc3hdNqdlM7Rp4=;
+        b=WG6yi0a5O/JxXvt9QZyivy4cqjYfDNcpKrfp+dObBsgjfsxzBppFlpv+WE2uN23DAA
+         vWcN87xr6mKQyp1DSgI9LPMFazlhyh+vi8jlB3n6QOUTPoYR0e5T+UqGzXju2+PLpZXi
+         jTTP0xabd92BPOCe2SIgjXWgcay3biZ9qtCdP6yYo6b37AikAeZ9spcrCIUL3lmBMkYV
+         ASDcZt4B0Ff6dGbB/V3Xo8c9CnDygRaujC2HV0K7peRU/3WWLRESY36mBJwPxXJ0EFcV
+         XPIqHOvXng5K58XKdsvornn39GciYixFdA4gWSLCdk/Z0euym6p8CsDhL/f7vzc9ic4U
+         sOPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXiZalqxutM5TaCG4tZqio8HRq14tAC3LW/gRiikY0eCVlscbSIV0s2RD8+bqEW+6ZnbeGWZOFtg0Hg/eU06wnxAYwp7mzF
+X-Gm-Message-State: AOJu0Yz5WjYNF0ku8xYir7UDibqtmYOzS7H0fVenx4JZyDSvqN3BLKub
+	pI7xo4P9GNm9jD1ci6NoKLu9JlYkhnCtU/tWciNvhZy/Tgwoye77YMU+pC12CqnO0zEnIMk3a5P
+	VEL1OC2W2PQ==
+X-Google-Smtp-Source: AGHT+IF/Y0ofKB2DyDqUZAQTS65is5HxA4flQEVOy942Zd2HFD9Dil8dPIykb/bxzvZEKenSzQzfnI9ZBKeNIw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2182:b0:dce:30f5:6bc5 with SMTP
- id dl2-20020a056902218200b00dce30f56bc5mr213520ybb.4.1711636835954; Thu, 28
- Mar 2024 07:40:35 -0700 (PDT)
-Date: Thu, 28 Mar 2024 14:40:29 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1b06:b0:dcc:94b7:a7a3 with SMTP
+ id eh6-20020a0569021b0600b00dcc94b7a7a3mr206671ybb.12.1711636837606; Thu, 28
+ Mar 2024 07:40:37 -0700 (PDT)
+Date: Thu, 28 Mar 2024 14:40:30 +0000
 In-Reply-To: <20240328144032.1864988-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240328144032.1864988-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
-Message-ID: <20240328144032.1864988-2-edumazet@google.com>
-Subject: [PATCH net-next 1/4] udp: annotate data-race in __udp_enqueue_schedule_skb()
+Message-ID: <20240328144032.1864988-3-edumazet@google.com>
+Subject: [PATCH net-next 2/4] udp: relax atomic operation on sk->sk_rmem_alloc
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,48 +83,32 @@ Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-sk->sk_rcvbuf is read locklessly twice, while other threads
-could change its value.
-
-Use a READ_ONCE() to annotate the race.
+atomic_add_return() is more expensive than atomic_add()
+and seems overkill in UDP rx fast path.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/udp.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ net/ipv4/udp.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 661d0e0d273f616ad82746b69b2c76d056633017..f2736e8958187e132ef45d8e25ab2b4ea7bcbc3d 100644
+index f2736e8958187e132ef45d8e25ab2b4ea7bcbc3d..d2fa9755727ce034c2b4bca82bd9e72130d588e6 100644
 --- a/net/ipv4/udp.c
 +++ b/net/ipv4/udp.c
-@@ -1492,13 +1492,14 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	struct sk_buff_head *list = &sk->sk_receive_queue;
- 	int rmem, err = -ENOMEM;
- 	spinlock_t *busy = NULL;
--	int size;
-+	int size, rcvbuf;
+@@ -1516,12 +1516,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
+ 	size = skb->truesize;
+ 	udp_set_dev_scratch(skb);
  
--	/* try to avoid the costly atomic add/sub pair when the receive
--	 * queue is full; always allow at least a packet
-+	/* Immediately drop when the receive queue is full.
-+	 * Always allow at least one packet.
- 	 */
- 	rmem = atomic_read(&sk->sk_rmem_alloc);
--	if (rmem > sk->sk_rcvbuf)
-+	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
-+	if (rmem > rcvbuf)
- 		goto drop;
+-	/* we drop only if the receive buf is full and the receive
+-	 * queue contains some other skb
+-	 */
+-	rmem = atomic_add_return(size, &sk->sk_rmem_alloc);
+-	if (rmem > (size + (unsigned int)sk->sk_rcvbuf))
+-		goto uncharge_drop;
++	atomic_add(size, &sk->sk_rmem_alloc);
  
- 	/* Under mem pressure, it might be helpful to help udp_recvmsg()
-@@ -1507,7 +1508,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	 * - Less cache line misses at copyout() time
- 	 * - Less work at consume_skb() (less alien page frag freeing)
- 	 */
--	if (rmem > (sk->sk_rcvbuf >> 1)) {
-+	if (rmem > (rcvbuf >> 1)) {
- 		skb_condense(skb);
- 
- 		busy = busylock_acquire(sk);
+ 	spin_lock(&list->lock);
+ 	err = udp_rmem_schedule(sk, size);
 -- 
 2.44.0.396.g6e790dbe36-goog
 
