@@ -1,139 +1,173 @@
-Return-Path: <netdev+bounces-82889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24B38901AB
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:24:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E13B88901BD
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:31:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 716271F2404B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:24:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E9A01C2B18D
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AACC81ACC;
-	Thu, 28 Mar 2024 14:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5BA8565D;
+	Thu, 28 Mar 2024 14:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ORguJtxs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eWM+Qp30"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06EB914011;
-	Thu, 28 Mar 2024 14:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F081879;
+	Thu, 28 Mar 2024 14:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711635858; cv=none; b=Q3/qt7wWBwAN2NAMRVZ9bIiBwq0wifcVFr/N41LTip6YsVrxnbAFPxOmWbmGgtAw1IvSZCG90PQIP/0xftgDaEtYok05wBT7WQtaZ3AIQH0huOlogHWf4BdE82ymm1UHO52ax7+5IyfjbHOLfQqcrfxdKCbviLwVmzJx3XlAols=
+	t=1711636265; cv=none; b=TsaSuZaa+mOPb4gMTrYw6L6GZvvkXyWSJl1F6oLiN/d9cyei/sqjeLivDoKuLEArbftgkr8kn/4RC8rMN9pSq8Gslumnb5ALq7gqV9IAkh6ac+f9ubVSGA5egeD7c36qrt3LE6ob/nVFyIDbCG9PrsXhJb8Ue7u7TlApyLr1VNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711635858; c=relaxed/simple;
-	bh=GpSW9qy/DbCkeanF/WDNIkt+UbrGs1BU2sGeTKT1BZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SKH+moJ+q33xyN1mnb0QnSffdXqegqIpKj0kq+4nXUCGIEX7nFCcH+RG1/RqNmSyOjz9dXKVwRRsY35R1Bcxz2n9Z2VJALE/vbimDbKduoCtu0VDgWsy59N5+YWNATrIrfGO3n3vc8dUoNfbfAmbCxcS1kHsNZeYNY29azIpAy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ORguJtxs; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E012760002;
-	Thu, 28 Mar 2024 14:24:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1711635847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XPK8OWtA7r2lnM0J492qYwHtOe3RtTG+NnxTRXgMEzE=;
-	b=ORguJtxsDZUdBCmxS9tQJ3NMnzZ/VeROyKqHmRgFQEMnKdwLvphs8X2Niycnfnh2+obNGB
-	twnVypHhM1PgDDy8u5f/49EpRAKmxxPIP7bjr18BYamJJTqeHlhWIhSoZsHSyrhvxUm7Wf
-	C4JLbjTiQPeGiA6oqw19YN+IipmTT0M/Dr8jhTuSKw+S2IJmyFMwfNgKMvqcoADvZIFbVE
-	0j7qIBfzzB09U+EKC/1y0qAARFC+uJtO0r2HgZQOFSqaCOs6bgaUujSqLmXU5y+N9OqlBP
-	lu30+/I1XcrkVsDV5rAFn2v+b4V+1qVK330MnPQcGLoya/3G2cNJdaIIsvyjZg==
-Date: Thu, 28 Mar 2024 15:23:59 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
- way of describing several PSE PIs
-Message-ID: <20240328152359.63f8e93a@kmaincent-XPS-13-7390>
-In-Reply-To: <2d325acb-fc35-4ca3-80f2-ac88359578fd@lunn.ch>
-References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
-	<20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
-	<2d325acb-fc35-4ca3-80f2-ac88359578fd@lunn.ch>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711636265; c=relaxed/simple;
+	bh=zN2hzijZlAwA7dSIUuqXqTXuAGGw3rihlUXROhzown4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XSfHzXv59ixjGGMOCuKiEcRfQH5Wz0iPodm6syal3cKs1ibOcBB8VQ6aE2+tAAVPsfPQQBTyRyb/qoda2KTCVttB0xw3cB816Y4UGNxWeP4Km2wwe+2WJvcSsEZOcPsQad/YfFPQWfacVFhDbYmSmLNrUyj97Cy6uzU917PbO2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eWM+Qp30; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7141C433C7;
+	Thu, 28 Mar 2024 14:30:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711636264;
+	bh=zN2hzijZlAwA7dSIUuqXqTXuAGGw3rihlUXROhzown4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eWM+Qp30VXj9Cmh0LnGCxoeRKFCdiRG/+7cYiw3/d1A2+4+cFEwZTeR0JCmdB7dCq
+	 BJ9rIQbF9IBEI+soObC424HP7laoiCA3/oi1O9qP9rBITnPfxuSYeV5KRvg9hYcRab
+	 e/dCX3l7xvE+Crt9nLuvyn+RK8JuQn+i+0gl/X6RqKrS31M7lA4cVVAcZLH+2tD70I
+	 3HfxG2oBSEgx+79CZh8PlNRuEJmIOG2T+nm5DpqItFA2gaY6b7ltr3jg7UjRUmiCnX
+	 fBIiKt6tGKRHDPmTgbO18UpcTP5WlsP5+HLng5MSKm27q042WFMvRohaMfXHDUBt2+
+	 CV0uOkwqjgK7A==
+From: Arnd Bergmann <arnd@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Dongsheng Yang <dongsheng.yang@easystack.cn>,
+	Jens Axboe <axboe@kernel.dk>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	dm-devel@lists.linux.dev,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xiubo Li <xiubli@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	ceph-devel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-nilfs@vger.kernel.org,
+	kasan-dev@googlegroups.com,
+	linux-kbuild@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH 0/9] address remaining -Wtautological-constant-out-of-range-compare
+Date: Thu, 28 Mar 2024 15:30:38 +0100
+Message-Id: <20240328143051.1069575-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On Thu, 28 Mar 2024 13:31:06 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+From: Arnd Bergmann <arnd@arndb.de>
 
-> > +          pairsets:
-> > +            $ref: /schemas/types.yaml#/definitions/phandle-array
-> > +            description:
-> > +              List of phandles, each pointing to the power supply for =
-the
-> > +              corresponding pairset named in 'pairset-names'. This pro=
-perty
-> > +              aligns with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
-> > +              PSE Pinout Alternatives (as per IEEE 802.3-2022 Table
-> > 145\u20133)
-> > +
-> > |-----------|---------------|---------------|---------------|----------=
------|
-> > +              | Conductor | Alternative A | Alternative A | Alternativ=
-e B
-> > | Alternative B |
-> > +              |           |    (MDI-X)    |     (MDI)     |      (X)
-> > |      (S)      |
-> > +
-> > |-----------|---------------|---------------|---------------|----------=
------|
-> > +              | 1         | Negative VPSE | Positive VPSE | \u2014
-> >     | \u2014             |
-> > +              | 2         | Negative VPSE | Positive VPSE | \u2014
-> >     | \u2014             |
-> > +              | 3         | Positive VPSE | Negative VPSE | \u2014
-> >     | \u2014             |
-> > +              | 4         | \u2014             | \u2014             |
-> > Negative VPSE | Positive VPSE |
-> > +              | 5         | \u2014             | \u2014             |
-> > Negative VPSE | Positive VPSE |
-> > +              | 6         | Positive VPSE | Negative VPSE | \u2014
-> >     | \u2014             |
-> > +              | 7         | \u2014             | \u2014             |
-> > Positive VPSE | Negative VPSE |
-> > +              | 8         | \u2014             | \u2014             |
-> > Positive VPSE | Negative VPSE | =20
->=20
-> Is it possible to avoid \u encoding? Ideally this documentation should
-> be understandable without having to render it using a toolset. I just
-> want to use less(1).
->=20
-> Or is this a email problem? Has something converted your UTF-8 file to
-> this \u notation?
+The warning option was introduced a few years ago but left disabled
+by default. All of the actual bugs that this has found have been
+fixed in the meantime, and this series should address the remaining
+false-positives, as tested on arm/arm64/x86 randconfigs as well as
+allmodconfig builds for all architectures supported by clang.
 
-It seems to come from the documentation I copied pasted from Oleksij mail.
-Will fix it.
+Please apply the patches individually to subsystem maintainer trees.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+      Arnd
+
+Arnd Bergmann (9):
+  dm integrity: fix out-of-range warning
+  libceph: avoid clang out-of-range warning
+  rbd: avoid out-of-range warning
+  kcov: avoid clang out-of-range warning
+  ipv4: tcp_output: avoid warning about NET_ADD_STATS
+  nilfs2: fix out-of-range warning
+  infiniband: uverbs: avoid out-of-range warnings
+  mlx5: stop warning for 64KB pages
+  kbuild: enable tautological-constant-out-of-range-compare
+
+ drivers/block/rbd.c                                    | 2 +-
+ drivers/infiniband/core/uverbs_ioctl.c                 | 4 ++--
+ drivers/md/dm-integrity.c                              | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c | 6 ++++--
+ fs/ceph/snap.c                                         | 2 +-
+ fs/nilfs2/ioctl.c                                      | 2 +-
+ kernel/kcov.c                                          | 3 ++-
+ net/ceph/osdmap.c                                      | 4 ++--
+ net/ipv4/tcp_output.c                                  | 2 +-
+ scripts/Makefile.extrawarn                             | 1 -
+ 10 files changed, 15 insertions(+), 13 deletions(-)
+
+-- 
+2.39.2
+
+Cc: Ilya Dryomov <idryomov@gmail.com>
+Cc: Dongsheng Yang <dongsheng.yang@easystack.cn>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: Alasdair Kergon <agk@redhat.com>
+Cc: Mike Snitzer <snitzer@kernel.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>
+Cc: dm-devel@lists.linux.dev
+Cc: Saeed Mahameed <saeedm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Xiubo Li <xiubli@redhat.com>
+Cc: Jeff Layton <jlayton@kernel.org>
+Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Cc: Andrey Konovalov <andreyknvl@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas@fjasle.eu>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Bill Wendling <morbo@google.com>
+Cc: Justin Stitt <justinstitt@google.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Tariq Toukan <tariqt@nvidia.com>
+Cc: ceph-devel@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-rdma@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-nilfs@vger.kernel.org
+Cc: kasan-dev@googlegroups.com
+Cc: linux-kbuild@vger.kernel.org
+Cc: llvm@lists.linux.dev
+
 
