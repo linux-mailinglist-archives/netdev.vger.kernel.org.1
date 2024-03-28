@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-82792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C79C88FC0D
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:50:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 563B588FC0F
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D1E91F2DA02
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:50:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C8821F2DA53
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F6B7C081;
-	Thu, 28 Mar 2024 09:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1707C093;
+	Thu, 28 Mar 2024 09:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J4DbqByj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dt4wAvzN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BD9657C6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC58B7C08C;
 	Thu, 28 Mar 2024 09:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711619430; cv=none; b=XcAAi26Q02yogxl79zzbGAuiMNCfQkRosC6nSb+Xv/9RPaWWYCvtqmRudEdVm/2WUnq6mGXLXI6IwNU5fjACB8qpG6fGAkCbxMvsg+q9eEGQ1BnkpnZHdMdP6BoODl2LOGrnHx7iu28N1EY3N2JZVZwGvIHLe3dT58q6l7RSuwE=
+	t=1711619430; cv=none; b=qt+bUBLwBBBTgo3o5r96KCQJ65xvGpt3rBjoeOkOI1lrcLWzJ+c/+gw+sVLG5DGZ5yGFmlZsn0FU0o2uUsPTwZWHOLLxIIJjtKX9b36riR/l48mOqSYUCo8ge7wSDPBZW1ttB/Uk+R06XoASjUDnVQGDhxQg3VHGSYU7PBCBbGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711619430; c=relaxed/simple;
-	bh=T/OibAZwWOIloOVhxmID1Y6yFKccDxG8AzFj3qVJeuA=;
+	bh=hw9CXjyBt1jqIOFA9VS3MGEAq01vM/E+/Dnp8mAip2U=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oCMyOKKez5cMOWrPhCJ2vcKBE45WB+MCdKhqseOETHfZdA4Drart5XqytpEonIu3dAu3XpH/lXlEYCszAvCg/IJ78ugDY4FlBJ08wy60gkeDI5aXsbQYt5F5KFIc7Qxz2uawY9sKwasOpjulgp2/2rktSqzizI1qnBCFiWt4AHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J4DbqByj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 47BFDC433C7;
+	 In-Reply-To:To:Cc; b=svNcDgiSAulIeMdB4lp5KzDdZSxNQmjO7ruF8M1ganbFVHfSlN9X69UsNdSGiFkljt13JsCW+hUE9sR5hg8TD21DLr1ZrJ7ursupY2il4lHO4rzlfjCIqZkgaNJkCEuPPbEnzJ02SUkoAwRp5UJINPd638OAJb4WzW8sXMfgE+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dt4wAvzN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D448C43399;
 	Thu, 28 Mar 2024 09:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711619430;
-	bh=T/OibAZwWOIloOVhxmID1Y6yFKccDxG8AzFj3qVJeuA=;
+	bh=hw9CXjyBt1jqIOFA9VS3MGEAq01vM/E+/Dnp8mAip2U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=J4DbqByjuRHbAFJNQ4TETVv3m0pjAEPYKZoDSwhVk7Xfv+nDwZXGN1zqjLMGl+kba
-	 iMC76bZ65By4/czPbwVEfMlO5yi74cgTLAeoM1K5af3T5bkx+9Q2bN2R369gZ4m7oW
-	 ksM/rTDLRQTITgadNB0ac697ivcyGE2kkndMUm90hPCg92eaiNsorHSxAOQzAbxKul
-	 fw4gjMmyktQ17dPAeMSS+eW0UWv8NqEopdJ5nQ9lqAdSyy/QBXXpX+R7SnnTrb2EEj
-	 20L5DqeNYhgy/zPqk5VkKKogai7w0vavOmV0ByKaoD7k9Ui8SlKArGVBAlQKF7IQXm
-	 v8y63edg1erlw==
+	b=dt4wAvzN5ozOMy2FY9l0OWR8MfisK06g3BLLGmuDYQZFOoEwAtdrFwQanMBgM80Xu
+	 Cbh0EKEp2O3Bl3B224dqiSyfedWDiywmJk+M4s54hE3BAXOAhYDKgFcTtzj2pWiagl
+	 zM9Kmj8AcJ4mlItwBaI1oK0Jhc6IfeS33CHVGjT9cQ9eHKVthr+AutAaurFflo4QmZ
+	 H661gJJl/ZXFco7TuNL5UxTjLk1+fi/l7mz5NWAlXmu+O+n+g3WxM4xs1O2OVxjU4X
+	 P/mjoMgEl5IQjAoLQZ/uS3L9ooXMFwsiqyYjFnxMZ1DpyA3sdKcdM0dP/CyzQyhHm7
+	 j5IcpRUD1EF8Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 35FBCC43168;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46445D8C965;
 	Thu, 28 Mar 2024 09:50:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,43 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/4] netfilter: nf_tables: reject destroy command to
- remove basechain hooks
+Subject: Re: [net PATCH] net: phy: qcom: at803x: fix kernel panic with
+ at8031_probe
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171161943021.10354.8421836895816515032.git-patchwork-notify@kernel.org>
+ <171161943028.10354.7334071604258663095.git-patchwork-notify@kernel.org>
 Date: Thu, 28 Mar 2024 09:50:30 +0000
-References: <20240328031855.2063-2-pablo@netfilter.org>
-In-Reply-To: <20240328031855.2063-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com
+References: <20240325190621.2665-1-ansuelsmth@gmail.com>
+In-Reply-To: <20240325190621.2665-1-ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, wwortel@dorpstraat.com, stable@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu, 28 Mar 2024 04:18:52 +0100 you wrote:
-> Report EOPNOTSUPP if NFT_MSG_DESTROYCHAIN is used to delete hooks in an
-> existing netdev basechain, thus, only NFT_MSG_DELCHAIN is allowed.
+On Mon, 25 Mar 2024 20:06:19 +0100 you wrote:
+> On reworking and splitting the at803x driver, in splitting function of
+> at803x PHYs it was added a NULL dereference bug where priv is referenced
+> before it's actually allocated and then is tried to write to for the
+> is_1000basex and is_fiber variables in the case of at8031, writing on
+> the wrong address.
 > 
-> Fixes: 7d937b107108f ("netfilter: nf_tables: support for deleting devices in an existing netdev chain")
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> ---
->  net/netfilter/nf_tables_api.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Fix this by correctly setting priv local variable only after
+> at803x_probe is called and actually allocates priv in the phydev struct.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net,1/4] netfilter: nf_tables: reject destroy command to remove basechain hooks
-    https://git.kernel.org/netdev/net/c/b32ca27fa238
-  - [net,2/4] netfilter: nf_tables: reject table flag and netdev basechain updates
-    https://git.kernel.org/netdev/net/c/1e1fb6f00f52
-  - [net,3/4] netfilter: nf_tables: skip netdev hook unregistration if table is dormant
-    https://git.kernel.org/netdev/net/c/216e7bf7402c
-  - [net,4/4] netfilter: arptables: Select NETFILTER_FAMILY_ARP when building arp_tables.c
-    https://git.kernel.org/netdev/net/c/15fba562f7a9
+  - [net] net: phy: qcom: at803x: fix kernel panic with at8031_probe
+    https://git.kernel.org/netdev/net/c/6a4aee277740
 
 You are awesome, thank you!
 -- 
