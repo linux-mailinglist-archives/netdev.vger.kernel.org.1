@@ -1,140 +1,189 @@
-Return-Path: <netdev+bounces-83099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B67F6890C40
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:08:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004E6890C9B
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E753E1C25B2A
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 21:08:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8429E1F24200
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 21:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEDA13AD29;
-	Thu, 28 Mar 2024 21:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9366E13B2B4;
+	Thu, 28 Mar 2024 21:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Z9AbJH6g"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DudOXb1j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9033313AA5F;
-	Thu, 28 Mar 2024 21:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711660114; cv=none; b=j+rZd78t14F6jvdhht9fMfxmK3WyWl9UItlUbxm/EiSzPFG/kommxuZvu1J4lZOC1woZpNjHfGl3raG2ai2ldKlIdQEUe14GwQfHmtapt7dh9RbnZeDFpcuWfG+q+iLNi2As4CVI0hcR/iUIsbbo+lmQpVJYtHSgHuHmpmmyH/Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711660114; c=relaxed/simple;
-	bh=7nBpC+ZQDDjgWAiXHx2Dnp9F7qfeWRyKrR0L8kcTm+I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=ZUyM0NcLT2PmBRGD6aKVqQJNAn5Lyf9445ptci6fhVesT1iDK/j0oItM6w91080yoR8SXRPkHuQRcLsG+6vI0BoRcrICbw3xb9yzl21r48G5y+ShnnaYWBRAZ6MfTWMyj+58Vk5ogAq8XFO5Csg9mDURw3N9UUM35MPB5TiKFZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Z9AbJH6g; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42SJsU0T025706;
-	Thu, 28 Mar 2024 21:08:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:date:subject:mime-version:content-type
-	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=C6u
-	J8bKPl3Ejk7cVp0J1A3lZipXuKjyCmUAO09Yk2R0=; b=Z9AbJH6gblrSqefCJwm
-	F0PqiNLlMLCbcAl1EzS6c/g10KXDdGL02bc0T3cHBHdJIoVUZwEouYmUggefJ7S+
-	aVdfebC5OLBNpU+2vioiNIrgoWTpF5NOME2IZjAY+caT2sSTRWmtxjyv0fJX02Ck
-	io3LbHc/0TWEA2uOsSXzWgbCicc7Sl3AvR5+175gO86dwbjytLLkUwPfvN5X6tfS
-	98jT4zctEJ4W2Aolng+aki3YonJ8JCkULrzhqMUcTorMo3gOCqV8l+MPHznfVuOu
-	5kOpa00VpHQhe5Mjl0fo/u+Cpe25daPapo6VlB7eOKdq4pMwhlCe3xIzF3eS8aNR
-	5bg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x575m9jn0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Mar 2024 21:08:20 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42SL8JHg031875
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Mar 2024 21:08:19 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 28 Mar
- 2024 14:08:19 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Thu, 28 Mar 2024 14:08:18 -0700
-Subject: [PATCH] wifi: mac80222: Fix ieee80211_i.h kernel-doc issues
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D893813AD36
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 21:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711662019; cv=fail; b=DBOSLUN2v90ZI8c7a6I5acPqJuAattT1OjNiZKN5HCGPQ5Z73yySF2tuacfcayh1r/tMpMs6z1+jm8K4uRXjqkapsaPo1F977bbP14JV/5brLSNEWBt75U+SpWIC9Kfv5wY9MHIwPweq/So+TOQfvi1uo4ILayZkbGJeGChyovg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711662019; c=relaxed/simple;
+	bh=WpBWM0c6+0m5J+2GMV6JS/Ah3LW7pYd1bVahBzXEHdg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oLHWYJ4vDVHL5Lg5w/mr8Q6PWZcO9CBEHFQgbyzFNClhd/K0qtWIlBXhXZhcP34fVFZitNInHe868ro4HMDYvNHkDxJ51lDrB2GJAPl4wgRFfxGW7Ss4QLBOb4aAbloPA6ld+qgyS7UtVD0b2B+By8ETfRUvV6MSvJa0b6y6wDw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DudOXb1j; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711662018; x=1743198018;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WpBWM0c6+0m5J+2GMV6JS/Ah3LW7pYd1bVahBzXEHdg=;
+  b=DudOXb1jrvlgujDqvvFk6eYbKwnBcfbra6Wxeoqvyd1gW7XQBTKOc9BZ
+   dJoCnHYqnn5R9G/wMXsND5hwAgppD3xj8xwRVdA3xwoIFjw/d9/NMwSbt
+   mc/+DPqhZIWrYMXGA4BT3hKACJMg9Yn2RES+2hq0ZuRobVVquiHDNQP1p
+   18+5GcaRjcSBLsfhdDraNXqVyC+wVX/C4PCoP64Svy+LqQrXDxBqayRNo
+   u2iuw6OJ/aAAF9i6TQH/D+yxZNAVCB7dit8H9QdDQ9Uyi0OrX19q8CEaW
+   YWtos9nsz5LqZZcLNrxQOFNKdKO02kj9MRNWcsvrMWSRDRAoYE+22m+QB
+   A==;
+X-CSE-ConnectionGUID: TQzq0e78QUujeybFZUC81g==
+X-CSE-MsgGUID: GMzumjWaRGeD4kPDq0u4mQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="10631976"
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="10631976"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 14:40:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="47747831"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Mar 2024 14:40:17 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 28 Mar 2024 14:40:16 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 28 Mar 2024 14:40:16 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 28 Mar 2024 14:40:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Uvnv3iuKAMBEiu6rLyPGuRcGm2HflvqPvvc1RbZ1fXPx7p13S4YL+Ur2WMEodMGvYvsmex7TL+Ldt5IqBmHnas2ZCj22Dno9LQYbTSHf46UHxty+UcznoSIKw/cguy4WAek8ouKTLrsJbQ1/vyFNUDJfg1i84lXRoGF7Y8aR+o91nOL86ZgNBezbWmvhEYnqyiO1kcfdN1InyGQ2/+n85nJqKSdIsDcUt2ESmAIKhEU8HXU2qh1ksuDnC5RRC2qksBwW7XhGLBuE4YEPC0EWEdCwrpnX3jzRuvbYqk0Zd+9WX/SYWXndf3Waw2z8Icxc+rkx8a2a8uaupRViycqHrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WpBWM0c6+0m5J+2GMV6JS/Ah3LW7pYd1bVahBzXEHdg=;
+ b=BR9k7BtVIyGY4mtDCbY3Vh8nfHqKU/NAuDRidSke63CV0uuZN1i1toQmF2a0I/k6qVOqaLujt0O4MCA0DwOGSzY6VVvSStQ73UNHvUAEpm518C8fBGKYUpoM4er7m6N/drt41+9ZSqy517o4XGGqppqKap404jMyTfC2fVPhNlupKzRiXAtR49TQuWPyWD/nBWQ7dRa3XePP8Rq/cGcfKoCzHIzkuxtogp1KY4QJ32I5GbFtuH37RWGa4vsURqmfi4D2ER12W0rBmjG9MFYSSUCBQk26G3ClCwf9NNAM82sc2ACCTpELO3D/qVpIxuwCz1G1I1EeGD6y5S+1qHv7+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH7PR11MB6449.namprd11.prod.outlook.com (2603:10b6:510:1f7::17)
+ by LV3PR11MB8481.namprd11.prod.outlook.com (2603:10b6:408:1b7::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Thu, 28 Mar
+ 2024 21:40:14 +0000
+Received: from PH7PR11MB6449.namprd11.prod.outlook.com
+ ([fe80::c8f:b939:aa0f:717d]) by PH7PR11MB6449.namprd11.prod.outlook.com
+ ([fe80::c8f:b939:aa0f:717d%7]) with mapi id 15.20.7409.031; Thu, 28 Mar 2024
+ 21:40:14 +0000
+Message-ID: <dc8d9997-c1cd-1270-0d16-81e7532eaf80@intel.com>
+Date: Thu, 28 Mar 2024 14:40:11 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [Intel-wired-lan] [PATCH net-next v8 0/6] ice: Support 5 layer Tx
+ scheduler topology
+Content-Language: en-US
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <kuba@kernel.org>, <jiri@resnulli.us>,
+	<horms@kernel.org>, <przemyslaw.kitszel@intel.com>, <andrew@lunn.ch>,
+	<victor.raj@intel.com>, <michal.wilczynski@intel.com>,
+	<lukasz.czapnik@intel.com>
+References: <20240326143042.9240-1-mateusz.polchlopek@intel.com>
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20240326143042.9240-1-mateusz.polchlopek@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0163.namprd04.prod.outlook.com
+ (2603:10b6:303:85::18) To PH7PR11MB6449.namprd11.prod.outlook.com
+ (2603:10b6:510:1f7::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240328-ieee80211_i-kerneldoc-v1-1-e848bdec58f3@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAEHcBWYC/x3MQQqDMBBG4avIrA0kEwOpVxEpJfPbDpUoCYgg3
- r2hy2/x3kUVRVFp7C4qOLTqlhtc31H6vPIbRqWZ2PJgPUejAKJl555qvigZq2zJCEd5hCWkIJ5
- auxcsev6/03zfP7s+tptnAAAA
-To: Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: UExPF2-IgkRs6AVdZn0HSU9qCAHPWbXp
-X-Proofpoint-GUID: UExPF2-IgkRs6AVdZn0HSU9qCAHPWbXp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-28_17,2024-03-28_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- mlxscore=0 spamscore=0 mlxlogscore=775 lowpriorityscore=0 malwarescore=0
- clxscore=1015 impostorscore=0 phishscore=0 priorityscore=1501 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2403210001
- definitions=main-2403280151
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR11MB6449:EE_|LV3PR11MB8481:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: X8GK6rjEP3LPFhxs5IaVf24ZT5dNNEO9BNIXFG7fQ8yxTAQCZjyGoLDdi8ZC8KRR4dpS/IN3AAlocpkDIEY1R9wxLWYVdSKaiOo1LMx35H6rXYbsopA7TZE/QEtXiGvYke2dt1XpKXa3B+0EV7+W62TZOmwcBt0CQgEbcvnqJT7N0SVqJFvO3li0MUpyVFrCOFi98IEdqBNcxONWAvDULOdVUfhGizji37tPaJ3fz42Lndi1MC1R3OBXLJmpEy2ax1L59yt2zu84oUGZw8KBlvcxnikbVmF/XmM/9P/gTUAup6+3sr8u3tgtx8SXTUB8hRErAt3pA/VC+MQ4hwhzoxrbajUpYbPSQlHXfKd3mw2TKFQCexFZ02vIYRh99hofX2PG+jivOTZ8QVfmcgCeYkjTf599yHgWDUxcCVK1IY+hLvRaxVxABCjjZpCriS8jueoWtJom+Qp9nU9YuEECDAyagZMyZo+wFf+NrMjSWs01nrYzNZcEw6vqAJ1EwieW7IJ1ftBUd0hHCNVK0Lgq+DjckzyepbEcotCgPnB6pbwISUByNJUau8zyHBem1pHbqilurCPLJJNU0NhSHY6gMXXsZLbkVXKjncPNfcFS7u8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB6449.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UWc4amE5Mnk0dCtCTjFFN0NldjlzMUZvbFlJbllod0xlVHFvYi8wVm9qd1Jj?=
+ =?utf-8?B?enJVcFFKWCs3TDFueUhlaUs5UEJFVEtYUGZiWXBjKytnTzZvWWpSSjVaS3Vq?=
+ =?utf-8?B?V3BCZnkyU214TEdyb0N2WXNSdVZKekpNU3U3S25WTmdXdkZKNlpldEJ5bGt3?=
+ =?utf-8?B?bkU0dGtRWlJVdWF0TFhTSnQ1MTdNUm10eFRXY0FVQnBZWTRua09qbEhma2dH?=
+ =?utf-8?B?N3d0R1NIS096eVhCZ3VBa0VYNEpsRmNKS2t5UmVaYnlPYnlWRjRRWC9YZUZG?=
+ =?utf-8?B?Vll4Qmd5cHAyQzY0VGFDcnYyUnNlQ09ZUW5BTUt2dVNMbWNQczdZdHlLcys1?=
+ =?utf-8?B?dFQ1R2loL2tWdEhPamN2dGIzcTBXeVBlTE1Tckg3VUVrN3QxRnp2N2xCTnVT?=
+ =?utf-8?B?VkEvejFlU3dDK1QwcW9hWjhveUN0N0huOW9ZMzlYUGZGQlVmNGl0MDN2TGhC?=
+ =?utf-8?B?V0xOODBXNHpWcHdkS2hJSXhhUER4R1pHUDZQS0JqUVVpcnMvK3NpS1ZjMmZO?=
+ =?utf-8?B?RFZKMmNUejNmckJPWDJPMExGcGdGd2x5QkkrbVREd3JpL1FkdFEzMkxMWllh?=
+ =?utf-8?B?cTJrRXN5UHZPSnFOU0Q5NnpIa2RHNENVYm1jS2E0cHF2ZDlMTzZsaG5xdTdD?=
+ =?utf-8?B?MmxOREFJRklHZXU0dFMxRDVvMUJYalZQaUVMdGttdkdMT2p2dEtiSW01YXFR?=
+ =?utf-8?B?N2Jtc0RSMzF3bk9CL0drSG5KeVVya1VySlBKcnJBTERVeDFpOXFZdFlnOFZz?=
+ =?utf-8?B?YTBvMzNxbEdWOHNmUU0yYWxPZkZVZWIxRUJJYjFUVXRuQWxmTHlRVmI4d3Bv?=
+ =?utf-8?B?eUpoRVFkNHczVko0Zm1SQXpJbHVGYWptTlVTaTQ4V1g4bmlVS296ZkpXM1l4?=
+ =?utf-8?B?WDRkWmlMVUZRcFcvOEVGSFNHWE1QZDhsNVZwYkR5a29jNzQraU1OalR5TXZH?=
+ =?utf-8?B?QWFEVDIrZHFHU3I4d2VyUWdMSTNvdUNhdXpyUWF5akdsN3BhalR6M0dDQVgv?=
+ =?utf-8?B?ZVp3K1RWVEZtcWM0OG5mUGtmWTJiSW94QVpidGh6Q0lvWkd2aytGK2NnL2t0?=
+ =?utf-8?B?QmRzYzJ5WUpOVEJDZ0E2dEdqZUQ0Tzc1WTQzd0tmdXkvMnBxL1ZKMG5IR2dE?=
+ =?utf-8?B?VWVYY1FLSXBzdEVKeUlnRm9LQVl4ME43UWYzVDlTZ1U3VHJqb1FZdFBUTUZI?=
+ =?utf-8?B?aW9EWEhLcGs4SFpQVDFHVUYzcGU1ZXJ3b2wrT3VjTmFUdXR4MzZXT0liai9k?=
+ =?utf-8?B?T0pHck1CMXdjRVdLc2dFZXVWc3dOYy95SkZ2dHFFUEJnZ1hUR2JRZFNwRTA1?=
+ =?utf-8?B?OGlHczZTNWpjMEh1S3U4VVpESzBZOGliSkU2WjcwbXB0QnNibHZFWjdpZ3c1?=
+ =?utf-8?B?TVNjNFgxbFpKVEpkdE00QmxDbXovbWc1ZnVrdVJDczlBRzJJNmxUa2JLU082?=
+ =?utf-8?B?ZWJmOGNvNW5TUTR4M0NONWxPeWtOM3hnUGZLMERPNk16YVRweUE0RGxjYUdV?=
+ =?utf-8?B?UVlDZmIrdTcxMUs0MG1qTEtNS1pnb0F2NDE0YWhJWTBsbUU4L1NHUlFoNVBo?=
+ =?utf-8?B?KzM0NVdtTVFwYjR4cFluTWRkMkNteDdWR21EcWF2WWZvSFZsWjVjeFBUUDl0?=
+ =?utf-8?B?U0JlRUJ6dXowWjRDVTUzS09pM0RhQm12MjRHWDFMK3FCckRyeFlUODNkb2dn?=
+ =?utf-8?B?Q1BCMFlmb21RSkxNVjR4WmtBdnArU0I4YW1TZlE3QWVJcWlDcVRKRXY1WkRM?=
+ =?utf-8?B?ZGJ5cUtqY3FoQW5ZZjBRUlpjS3dKQzlhZWpBOEtWekd4SUtMRUovQS9YdGdn?=
+ =?utf-8?B?ME92WTJib2oydGdVWVVwYzhMOTdTeC84K0FqVmhnT2NqQkZCVFFmUDBYSXA0?=
+ =?utf-8?B?OTdzK2ZPQVFyZXZnZS9rOXkySGZPRTlSWEVCUEpzYlpmK0Z1QXd2OGZUc3RI?=
+ =?utf-8?B?ZzJOSHVEOXNObzdlNnZyR3pIM1VOS3Rva0wrOU1Rd3E2R1Izc1NCUkNjUjds?=
+ =?utf-8?B?cWxpQXZYNytrNUVsdUFrRnJQS3YzNWdDdTNqdjFVU1N4bnNGRDBicWdxcWxN?=
+ =?utf-8?B?S1ZPZGNpQU1ISjQvYzZvQ0R0b3hnYk41ZEtBbkFzcS8vRjR3aUxtbm1tc3p2?=
+ =?utf-8?B?M0htb0ZiMHB6aEtCb3ZkQmRsdm02Qkd6azNIZHczWFU0akF6dGx5Vmc5Rnl2?=
+ =?utf-8?B?U1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b28bea31-e5b3-4140-47fd-08dc4f6fa706
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB6449.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2024 21:40:14.3328
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: esZ64yjOalNuOSESfns/oVnqbnGIAVnayYjed68y1TixIVoc49Cr2JOVkH4hxW129E9wCffOnRhFgfcmbpxKixyQS00Rjee4UfLVMXeMZZI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8481
+X-OriginatorOrg: intel.com
 
-kernel-doc flagged the following issues:
 
-net/mac80211/ieee80211_i.h:146: warning: expecting prototype for enum ieee80211_corrupt_data_flags. Prototype was for enum ieee80211_bss_corrupt_data_flags instead
-net/mac80211/ieee80211_i.h:163: warning: expecting prototype for enum ieee80211_valid_data_flags. Prototype was for enum ieee80211_bss_valid_data_flags instead
 
-Correct the documentation to match the code.
+On 3/26/2024 7:30 AM, Mateusz Polchlopek wrote:
+> For performance reasons there is a need to have support for selectable
+> Tx scheduler topology. Currently firmware supports only the default
+> 9-layer and 5-layer topology. This patch series enables switch from
+> default to 5-layer topology, if user decides to opt-in.
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
-This file is being modified by a quicinc.com patch and my review
-process flagged these pre-existing kernel-doc issues.
----
- net/mac80211/ieee80211_i.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This no longer applies after Michal S' series was applied
+https://lore.kernel.org/intel-wired-lan/20240325213433.829161-1-michal.swiatkowski@linux.intel.com/
 
-diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
-index def611e4e55f..458f63ce9a32 100644
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -132,7 +132,7 @@ struct ieee80211_bss {
- };
- 
- /**
-- * enum ieee80211_corrupt_data_flags - BSS data corruption flags
-+ * enum ieee80211_bss_corrupt_data_flags - BSS data corruption flags
-  * @IEEE80211_BSS_CORRUPT_BEACON: last beacon frame received was corrupted
-  * @IEEE80211_BSS_CORRUPT_PROBE_RESP: last probe response received was corrupted
-  *
-@@ -145,7 +145,7 @@ enum ieee80211_bss_corrupt_data_flags {
- };
- 
- /**
-- * enum ieee80211_valid_data_flags - BSS valid data flags
-+ * enum ieee80211_bss_valid_data_flags - BSS valid data flags
-  * @IEEE80211_BSS_VALID_WMM: WMM/UAPSD data was gathered from non-corrupt IE
-  * @IEEE80211_BSS_VALID_RATES: Supported rates were gathered from non-corrupt IE
-  * @IEEE80211_BSS_VALID_ERP: ERP flag was gathered from non-corrupt IE
+Can you please rebase and resend?
 
----
-base-commit: b68b2beadfd30907faae944358de3a17acf6fdb6
-change-id: 20240328-ieee80211_i-kerneldoc-d28d95f5c5d3
-
+Thanks,
+Tony
 
