@@ -1,112 +1,81 @@
-Return-Path: <netdev+bounces-82960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE7DA8904DD
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:19:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CDE68904E4
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88184B24FBE
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:19:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 475342909A9
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B76131184;
-	Thu, 28 Mar 2024 16:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFAA8288C;
+	Thu, 28 Mar 2024 16:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="S6/NF9un"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGgb4xOC"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D87F13281C;
-	Thu, 28 Mar 2024 16:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF7154773
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 16:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711642744; cv=none; b=skXQfMpk1hP/eNbi5APsXMOBLawTglMUkEFjmjLk1oubWAkXMf0lasgBz5rs6cZdomwtloXtvK+5jY33Hh8g+2t38HwJBYkgZ8Z4D2Hr6+aABTgpB9Bd4x94jPsnqihUUMqPYhDZ7XKT/cMd83TdC1aX7uSY/m8kuUpejdGklH0=
+	t=1711642895; cv=none; b=MCS21OoKpOFI/w6937RJUnX7gTzYI4ahMhvAX76LieEqRKI5vqoGJPL9CDoRZw59VgQAVjvUoLIv6ajgAGaLXuud0+rKaL8AEWgURJiMFBtdWnFhyjqnAOdgx7C3ny3ASBCj6WKrWS6n2rlZszwM40CASP2qAINdCAyHSOLAMWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711642744; c=relaxed/simple;
-	bh=vArowKgbDJzmZWDWeF0zjkz6oCdO1S/8qWK3bsATyZE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KD27New74hni8Ipbx8yYGC9IAou1x7fjdzKGjVqvcYl5Sn3Tkdk49S2Z9Kc1UAM6irOc8PtCsNTJYEIc/yOxZTW3/yb1Bmete5w0LXylZlnro3x8ZFElD3ISG39SpAwRfvPAZGvUK9q1ZwU3hEQMrVF3M33UPqwXF0TNuwhHL9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=S6/NF9un; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=vArowKgbDJzmZWDWeF0zjkz6oCdO1S/8qWK3bsATyZE=;
-	t=1711642742; x=1712852342; b=S6/NF9unt546w6x2hk1vPBPnsuxLzgjllnx9ZtMtDqoc95d
-	wNgOzG8axejD7PtDbS4Cl42RoF3OCfUFuwVUGxP7YlkHUAGyohqowAcPK8qhgUjDM2BnKUsAKhnh+
-	R4Cdx0XazzPGcnfhuYQNX7tLy9HwDMnVYSU3MqoX4yvREerN6sfgh3cfV0wANllA84KpDdVI1sZqU
-	sIqx6AyWtXldqOTbK0fdOSf/NxWanyXUS+/W979jY1ekUzNW68dTci26M10nIKVrnFVA/qfDJHPBJ
-	no6nwsl00J3JeU0DBjzOtexw1SnREbBTM4WPppclSF3YkyPdlpGo8RDfnXP8Xf1w==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rpsSx-000000017qF-1fBQ;
-	Thu, 28 Mar 2024 17:18:59 +0100
-Message-ID: <0d4878d0dce3c2e9d500d19783dc7be3f995cced.camel@sipsolutions.net>
-Subject: Re: [PATCH 02/13] wifi: nl80211: send underlying multi-hardware
- channel capabilities to user space
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>, Karthikeyan Periyasamy
-	 <quic_periyasa@quicinc.com>, ath12k@lists.infradead.org
-Cc: linux-wireless@vger.kernel.org, Vasanthakumar Thiagarajan
-	 <quic_vthiagar@quicinc.com>, netdev@vger.kernel.org, Jakub Kicinski
-	 <kuba@kernel.org>
-Date: Thu, 28 Mar 2024 17:18:58 +0100
-In-Reply-To: <3cc984766a2cf1452ac44054cd736c913c356469.camel@sipsolutions.net>
-References: <20240328072916.1164195-1-quic_periyasa@quicinc.com>
-	 <20240328072916.1164195-3-quic_periyasa@quicinc.com>
-	 <6d92d0ba4a8764cd91cc20c4bd35613bcc41dfcd.camel@sipsolutions.net>
-	 <9d5c2f9f-19b5-af4d-8018-1eb97fac10d6@quicinc.com>
-	 <9d0f309da45ae657cd2ce0bc11a93d66e856ef64.camel@sipsolutions.net>
-	 <14b739c9-18da-0d58-b58d-cccebc505950@quicinc.com>
-	 <3f61f18fbf3372ff88da54cdfbd309e74b2aa4e9.camel@sipsolutions.net>
-	 <2b5fdc14-85f0-48ba-9797-c1f43ecab86e@quicinc.com>
-	 <3cc984766a2cf1452ac44054cd736c913c356469.camel@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1711642895; c=relaxed/simple;
+	bh=ZGbWzrmV77/4nkqUKgQSxwPGvhVeKblIbHnt9BHMivc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZOgp1r06SkJP7/ER1+D8EX0xRo9lWd5z9Wcu98EQd0ouJEz9m2zhr7ftY6CvJG5psk6quzrOz6lrm1YK5Wqyw0H9Io0qM+iDzDHxy88fsSb0zuNEDuzEZ9j9kWVzRcVbHwD3EVsRGZTwJwxW/uRhwkhMtPMGCEA/bDmLx3y3qK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGgb4xOC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC398C433C7;
+	Thu, 28 Mar 2024 16:21:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711642894;
+	bh=ZGbWzrmV77/4nkqUKgQSxwPGvhVeKblIbHnt9BHMivc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iGgb4xOCqgtukj4SvN0SvbuPt6ebsDT89RN0tgOANCThRD2IS3TrwtBiktza/Z6hK
+	 BwDEJWXz/XFdFAPLnQKjm4ve0UOYLnwTkw44AFt9N7KhoGVOdKFIbgn2JoMeGoecUV
+	 MQgW8f+dtSgPdjfBq27bFw3fiwxHwT1zJiTgEqEqCQynkKixrX3+O1BAlCxPXRO22/
+	 YN8RknCtjM+c5GIwJ6XRpQwJvWP281VRa3xbUDtv83uPG92EgxSC9EMt9x7FBMznx9
+	 HQch84txvTyM5y5Ld/rYHLgclaIgFR4OHdjNVsIpxuNVAkcl2JuaFA01TJDL+GOjjD
+	 Y1TqMw+3zNlkA==
+Date: Thu, 28 Mar 2024 09:21:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, netdev@vger.kernel.org, Saeed Mahameed
+ <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+ <leonro@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Aya Levin
+ <ayal@nvidia.com>
+Subject: Re: [PATCH net-next 5/8] net/mlx5e: Expose the VF/SF RX drop
+ counter on the representor
+Message-ID: <20240328092132.47877242@kernel.org>
+In-Reply-To: <20240328111831.GA403975@kernel.org>
+References: <20240326222022.27926-1-tariqt@nvidia.com>
+	<20240326222022.27926-6-tariqt@nvidia.com>
+	<20240328111831.GA403975@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 2024-03-28 at 17:17 +0100, Johannes Berg wrote:
-> On Thu, 2024-03-28 at 09:14 -0700, Jeff Johnson wrote:
-> > On 3/28/2024 9:09 AM, Johannes Berg wrote:
-> > > On Thu, 2024-03-28 at 20:40 +0530, Karthikeyan Periyasamy wrote:
-> > > >=20
-> > > > Can you point to any attribute constructed in this way from kernels=
-pace=20
-> > > > for the reference to explore more ?
-> > >=20
-> > > I don't have anything directly, looking at the code finds e.g.
-> > > devlink_dpipe_entry_ctx_append() but honestly that's really quite
-> > > trivial, it just adds that new attribute while iterating whatever lis=
-t
-> > > you have.
-> >=20
-> > Note that we are trying to maintain the same structure used by the curr=
-ent
-> > wiphy global advertisement since we actually refactor and reuse the exi=
-sting code.
->=20
-> Partially, yes. That's not true for the one I was discussing _here_,
-> notably nl80211_put_multi_hw_support(), however.
->=20
-> It's partially true for patch 6, though even there
-> nl80211_put_per_hw_iface_combinations() doesn't need to do it that way,
-> since that's a whole new attribute (NL80211_IFACE_COMB_PER_HW_COMB) and
-> can define the content anew
+On Thu, 28 Mar 2024 11:18:31 +0000 Simon Horman wrote:
+> > The "rx_vport_out_of_buffer" equals the sum of all
+> > Q counters out_of_buffer values allocated on the VF/SF.  
+> 
+> Hi Carolina and Tariq,
+> 
+> I am wondering if any consideration was given to making this
+> a generic counter. Buffer exhaustion sounds like something that
+> other NICs may report too.
 
-I should say "content and how it forms an array in the top-level
-message" here.
-
-johannes
+I think it's basically rx_missed_errors from rtnl_link_stats64.
+mlx5 doesn't currently report it at all, AFAICT.
 
