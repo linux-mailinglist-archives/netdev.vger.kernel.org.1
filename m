@@ -1,48 +1,73 @@
-Return-Path: <netdev+bounces-82768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC4D088FA87
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:58:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB66288FAA5
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DD0828EB4C
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:58:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 169FF1C22DAD
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8070D54775;
-	Thu, 28 Mar 2024 08:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EB954664;
+	Thu, 28 Mar 2024 09:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aaoOkLhU"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="F5BMyzi1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BD328DD5;
-	Thu, 28 Mar 2024 08:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EE84E1C9
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 09:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711616320; cv=none; b=s9dVW/Y1heYmqNtRSLrjj5wh8Kv54Co5BlPVxz8Nq0S8NP9vH6veyCwYReV/TEZ4rHtQMHwBpvsNwcS9iDTc8zcdb3AqO/WvtAxfqVCJx4Ny2B2LGu5Xxv7LjivaxZIUm8r996N43ccHfjx4cSeu8La+nhLyU3n39gqD/p44n38=
+	t=1711616716; cv=none; b=W3d3daVstxIwYDU7s+3wf1GkOjbjTXLBqCn2DICqQ6f3/GMD8RzLYcTvbIweEyHAfasgXMZhtCQ3NnzyJHje97yo75Wy7FqwqFZFWfY+Mygsu35vgqCHiqQL8ICNngAMa78JvoqwCJQdjqVjlDmzEJGGIc7+5PYVXRlcsRTmXOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711616320; c=relaxed/simple;
-	bh=NLceuoXWSrAw6KtncQrzxljx54OGZehtk2tzm/mFNk4=;
+	s=arc-20240116; t=1711616716; c=relaxed/simple;
+	bh=6T4yGPmJu34uRBcPwl1hNwi43YyWt+lVR9yf7CUHql8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Puct+839VIqqKL9NwUbDBj931eASdeOhCqhue50xsCPOAYU8jYkLt+WxB0a5182cO2+hvdHiqtnhzrvidChHDIbs/hzdFpnJ6CSvIHu9CRPn0GhB935ACQ6R2Ka12BQ3sifEdnO2R8oAtnw23IQlnkWP5QAp0T0eNS2wqeuLq8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aaoOkLhU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D90BC433F1;
-	Thu, 28 Mar 2024 08:58:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711616319;
-	bh=NLceuoXWSrAw6KtncQrzxljx54OGZehtk2tzm/mFNk4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aaoOkLhUIgB3iGvDT31YBh4+7cJSzPQuYBzI1zwq4IfwOCnvIwkUDJ3LGuJ5AGApj
-	 ueeO1wenYQeU106nTOPdtB2iMDhYJI/O/boFxm/CxbH4SAyFg4DtCIoxCkGOgy7uS6
-	 IhWZCPVvr0MbeAIU0punZ1QcWGzRI0TTR2eii/euy02NyJ2HzIQwLmCGHza4Cixxuy
-	 kLaF2IslR68YaXAfL/3IAWwi9vy5KVHLGStCL3USM3iwAToQ8X+KnlNj3pS1hh+hiE
-	 KsELCMWZJRqkUm9tAnReehFF8pbVAWDECkzhMSLXFHwu9K2brjRc2q5C4Pu9sVyfUe
-	 vBgUzmywPD/3Q==
-Message-ID: <42106158-ca2b-48f5-9397-87e7cd9d4fc8@kernel.org>
-Date: Thu, 28 Mar 2024 09:58:34 +0100
+	 In-Reply-To:Content-Type; b=FsJIwKqtKKRDDto/wI3yfk5ZRG6fCsNDFWCgWaYe8wDzP0GyOdemeNRakCAwj5CI8u7FcdaLEZ7+Fnl8zb8KgFGgW7b/N5s0lRbOO5JqMc8kwcp5JBvHfzU4UujCMlJ4EfQxycFeDZ+YOg5J0fpu2psL3aj7NtOqQHU5jS/Oac0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=F5BMyzi1; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-341b01dbebbso565747f8f.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 02:05:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1711616712; x=1712221512; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k0Zoda5/PWfmG3tdB4xaR5Gwiq6FjJ6RsD+9yrf3YQQ=;
+        b=F5BMyzi1UcpSLT7DamY65H9I5JNcxNDbvsmX8kdeYptfvqBMKy6CjZFJU/Zn4ugOpA
+         MQOt1zDTGV7A5iWykiiBBvKYRUTInkNgy4ySWWqMJvt6SJbCM3IO90ZdU8hJ/ksuWRRr
+         uekIa9PSi13FgzyOVKAjOaij3S3XS2anfziLYxZp79aRL/FIZuzbAmp5tTytIOb8po90
+         VHa+4FIceiIseQY69Cn/xNlOFqAmPNs/SxTQKRK2Ehq+pzCs1yO8WT3Gnoe4dnIuDEdb
+         OSBj2MITz206xiWFboU9me2iO/H4SshqphjE+WwNIODdjf+NSPvyq6OzTknQGdwIpfbT
+         G2/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711616712; x=1712221512;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k0Zoda5/PWfmG3tdB4xaR5Gwiq6FjJ6RsD+9yrf3YQQ=;
+        b=fTrm4emc96wF2jY6DKTnLsfVtX3tBg4x4xMqfkLfGtsBcKayQGqaH7eZGi+irHVw2p
+         ZPMwWAkj67ggant7H3BCO8bEmVFDbH+4aXt3Aw058ZbEDqfHN1U8w6Cgxasp0Z1WMhS2
+         mcHj3hW/tL/KysMUwXSB+32i+yIC+nloLHHXogrEHYxnBi8QdFUSbe4HehWVrG4T1w/8
+         c4vrP3G+PtU9aBnxiFFlf+YYylY5fHb5i7GehZWA7C+qavaY0Zue0zjL1aYp0YFZr9k3
+         8miUS7ot7HcdVGTcom0HDYzvAVMdXcPM1/kvmEP39ntKEZG3RO+YNr2yeUlAXtuMJEeO
+         QBcA==
+X-Gm-Message-State: AOJu0Yw0D+jd/1iLxI8dMFBtET1bX/1DK+dZT56Ix496yY8FYUsYB53S
+	/n4XRqB7/ZuKZgiPlpydpuIaX7J1wuvLmlSjPa5Swk6Q9kfdNEH0C9XiM0Y0sKk=
+X-Google-Smtp-Source: AGHT+IFRe02F2th8jZvDnTorPoPnIBUOrzJTyhGpxLIaUswHjwgI+8oWrXDOivVwqpcds/sqXavbfw==
+X-Received: by 2002:a5d:4ccc:0:b0:341:76bc:2bfe with SMTP id c12-20020a5d4ccc000000b0034176bc2bfemr2472006wrt.4.1711616712379;
+        Thu, 28 Mar 2024 02:05:12 -0700 (PDT)
+Received: from [192.168.50.4] ([82.78.167.144])
+        by smtp.gmail.com with ESMTPSA id bn9-20020a056000060900b00341bdecdae3sm1192362wrb.117.2024.03.28.02.05.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 02:05:11 -0700 (PDT)
+Message-ID: <f8e9fca1-69e9-42c9-a14e-078d763a6788@tuxon.dev>
+Date: Thu, 28 Mar 2024 11:05:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,152 +75,219 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in
- dev_map_enqueue
+Subject: Re: [PATCH net-next v2 2/4] net: macb: Add ARP support to WOL
 Content-Language: en-US
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
- haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
- kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com,
- song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-References: <000000000000f6531b061494e696@google.com>
- <00000000000069ee1a06149ff00c@google.com>
- <CAADnVQLpJwEfLoF9ORc7bSsDPG7Y05mWUpWWyfi7qjY+2LhC+Q@mail.gmail.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAADnVQLpJwEfLoF9ORc7bSsDPG7Y05mWUpWWyfi7qjY+2LhC+Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+ nicolas.ferre@microchip.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ linux@armlinux.org.uk, vadim.fedorenko@linux.dev, andrew@lunn.ch
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, git@amd.com
+References: <20240222153848.2374782-1-vineeth.karumanchi@amd.com>
+ <20240222153848.2374782-3-vineeth.karumanchi@amd.com>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20240222153848.2374782-3-vineeth.karumanchi@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
 
-On 27/03/2024 16.19, Alexei Starovoitov wrote:
-> Toke, Jesper,
+On 22.02.2024 17:38, Vineeth Karumanchi wrote:
+> -Add wake-on LAN support using ARP with the provision to select
+>  through ethtool. Advertise wakeup capability in the probe and
+>  get the supported modes from OS policy (MACB_CAPS_WOL).
 > 
-> please take a look.
-> It's reproducible 100% of the time.
-> dst is NULL in dev_map_enqueue().
+> -Re-order MACB_WOL_<> macros for ease of extension.
+> -Add ARP support configurable through ethtool, "wolopts" variable in
+>  struct macb contains the current WOL options configured through ethtool.
 > 
+> -For WOL via ARP, ensure the IP address is assigned and
+>  report an error otherwise.
 
-The `dst` (NULL) is basically `ri->tgt_value` being passed through
-(unmodified) via xdp_do_redirect_frame() and __xdp_do_redirect_frame()
-into dev_map_enqueue().
+Having '-' for each thing that you did makes the 1st time reader of this
+commit message think that you did multiple things in this patch, which
+should be avoided.
 
-I think something is wrong in xdp_test_run_batch().
-The `ri->tgt_value` is being set in __bpf_xdp_redirect_map(), but I
-cannot see __bpf_xdp_redirect_map() being used in xdp_test_run_batch().
+Also, please compose the commit message such that it responds to the
+questions "what the patch does?" and "why it's necessary?"
 
-Toke, can you take a look at xdp_test_run_batch() and where
-`ri->tgt_value` is getting set?
+> 
+> Co-developed-by: Harini Katakam <harini.katakam@amd.com>
+> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
+> Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+> ---
+>  drivers/net/ethernet/cadence/macb.h      |  2 +
+>  drivers/net/ethernet/cadence/macb_main.c | 52 +++++++++++++++++-------
+>  2 files changed, 40 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+> index 50cd35ef21ad..c9ca61959f3c 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -738,6 +738,7 @@
+>  #define MACB_CAPS_MIIONRGMII			0x00000200
+>  #define MACB_CAPS_NEED_TSUCLK			0x00000400
+>  #define MACB_CAPS_QUEUE_DISABLE			0x00000800
+> +#define MACB_CAPS_WOL				0x00001000
+>  #define MACB_CAPS_PCS				0x01000000
+>  #define MACB_CAPS_HIGH_SPEED			0x02000000
+>  #define MACB_CAPS_CLK_HW_CHG			0x04000000
+> @@ -1306,6 +1307,7 @@ struct macb {
+>  	unsigned int		jumbo_max_len;
+>  
+>  	u32			wol;
+> +	u32			wolopts;
+>  
+>  	/* holds value of rx watermark value for pbuf_rxcutthru register */
+>  	u32			rx_watermark;
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index f34933ef03b0..62d796ef4035 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -38,6 +38,7 @@
+>  #include <linux/ptp_classify.h>
+>  #include <linux/reset.h>
+>  #include <linux/firmware/xlnx-zynqmp.h>
+> +#include <linux/inetdevice.h>
+>  #include "macb.h"
+>  
+>  /* This structure is only used for MACB on SiFive FU540 devices */
+> @@ -84,8 +85,9 @@ struct sifive_fu540_macb_mgmt {
+>  #define GEM_MTU_MIN_SIZE	ETH_MIN_MTU
+>  #define MACB_NETIF_LSO		NETIF_F_TSO
+>  
+> -#define MACB_WOL_HAS_MAGIC_PACKET	(0x1 << 0)
+> -#define MACB_WOL_ENABLED		(0x1 << 1)
 
+> +#define MACB_WOL_ENABLED		(0x1 << 0)> +#define MACB_WOL_HAS_MAGIC_PACKET	(0x1 << 1)
 
-> On Wed, Mar 27, 2024 at 1:10 AM syzbot
-> <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com> wrote:
->>
->> syzbot has found a reproducer for the following issue on:
->>
->> HEAD commit:    443574b03387 riscv, bpf: Fix kfunc parameters incompatibil..
->> git tree:       bpf
->> console+strace: https://syzkaller.appspot.com/x/log.txt?x=17d370b1180000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
->> dashboard link: https://syzkaller.appspot.com/bug?extid=af9492708df9797198d6
->> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13d6b041180000
->> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1060cc81180000
->>
->> Downloadable assets:
->> disk image: https://storage.googleapis.com/syzbot-assets/3f355021a085/disk-443574b0.raw.xz
->> vmlinux: https://storage.googleapis.com/syzbot-assets/44cf4de7472a/vmlinux-443574b0.xz
->> kernel image: https://storage.googleapis.com/syzbot-assets/a99a36c7ad65/bzImage-443574b0.xz
->>
->> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->> Reported-by: syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
->>
->> general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
->> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
->> CPU: 1 PID: 5078 Comm: syz-executor295 Not tainted 6.8.0-syzkaller-05236-g443574b03387 #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
->> RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
->> Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 a6 42 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 10 8a 3b 00 4c 8b 7d 00 48 83 c5
->> RSP: 0018:ffffc90003bef688 EFLAGS: 00010246
->> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888022169e00
->> RDX: 0000000000000000 RSI: ffff88802ef65070 RDI: 0000000000000000
->> RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff90e
->> R10: 0000000000000004 R11: ffff888022169e00 R12: ffff888015bd0000
->> R13: ffff88802ef65070 R14: dffffc0000000000 R15: ffff8880b953c088
->> FS:  000055558e3b9380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00007f1141b380d0 CR3: 0000000021838000 CR4: 00000000003506f0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>   <TASK>
->>   __xdp_do_redirect_frame net/core/filter.c:4384 [inline]
->>   xdp_do_redirect_frame+0x20d/0x4d0 net/core/filter.c:4438
->>   xdp_test_run_batch net/bpf/test_run.c:336 [inline]
->>   bpf_test_run_xdp_live+0xe8a/0x1e90 net/bpf/test_run.c:384
->>   bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
->>   bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
->>   __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
->>   __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
->>   __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
->>   __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
->>   do_syscall_64+0xfb/0x240
->>   entry_SYSCALL_64_after_hwframe+0x6d/0x75
->> RIP: 0033:0x7f1141ac0fb9
->> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
->> RSP: 002b:00007ffe180a1958 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
->> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f1141ac0fb9
->> RDX: 0000000000000048 RSI: 0000000020000340 RDI: 000000000000000a
->> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000006
->> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
->> R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
->>   </TASK>
->> Modules linked in:
->> ---[ end trace 0000000000000000 ]---
->> RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
->> Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 a6 42 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 10 8a 3b 00 4c 8b 7d 00 48 83 c5
->> RSP: 0018:ffffc90003bef688 EFLAGS: 00010246
->> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888022169e00
->> RDX: 0000000000000000 RSI: ffff88802ef65070 RDI: 0000000000000000
->> RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff90e
->> R10: 0000000000000004 R11: ffff888022169e00 R12: ffff888015bd0000
->> R13: ffff88802ef65070 R14: dffffc0000000000 R15: ffff8880b953c088
->> FS:  000055558e3b9380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00007f1141b380d0 CR3: 0000000021838000 CR4: 00000000003506f0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> ----------------
->> Code disassembly (best guess):
->>     0:   41 56                   push   %r14
->>     2:   41 55                   push   %r13
->>     4:   41 54                   push   %r12
->>     6:   53                      push   %rbx
->>     7:   48 83 ec 18             sub    $0x18,%rsp
->>     b:   49 89 d4                mov    %rdx,%r12
->>     e:   49 89 f5                mov    %rsi,%r13
->>    11:   48 89 fd                mov    %rdi,%rbp
->>    14:   49 be 00 00 00 00 00    movabs $0xdffffc0000000000,%r14
->>    1b:   fc ff df
->>    1e:   e8 a6 42 d8 ff          call   0xffd842c9
->>    23:   48 89 e8                mov    %rbp,%rax
->>    26:   48 c1 e8 03             shr    $0x3,%rax
->> * 2a:   42 80 3c 30 00          cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
->>    2f:   74 08                   je     0x39
->>    31:   48 89 ef                mov    %rbp,%rdi
->>    34:   e8 10 8a 3b 00          call   0x3b8a49
->>    39:   4c 8b 7d 00             mov    0x0(%rbp),%r15
->>    3d:   48                      rex.W
->>    3e:   83                      .byte 0x83
->>    3f:   c5                      .byte 0xc5
->>
->>
->> ---
->> If you want syzbot to run the reproducer, reply with:
->> #syz test: git://repo/address.git branch-or-commit-hash
->> If you attach or paste a git patch, syzbot will apply it before testing.
+Is there a reason you changed the values of these 2 macros?
+
+> +#define MACB_WOL_HAS_ARP_PACKET		(0x1 << 2)
+>  
+>  #define HS_SPEED_10000M			4
+>  #define MACB_SERDES_RATE_10G		1
+> @@ -3278,18 +3280,18 @@ static void macb_get_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
+>  {
+>  	struct macb *bp = netdev_priv(netdev);
+>  
+> -	if (bp->wol & MACB_WOL_HAS_MAGIC_PACKET) {
+> +	if (bp->wol & (MACB_WOL_HAS_MAGIC_PACKET | MACB_WOL_HAS_ARP_PACKET))
+>  		phylink_ethtool_get_wol(bp->phylink, wol);
+> -		wol->supported |= WAKE_MAGIC;
+> -
+> -		if (bp->wol & MACB_WOL_ENABLED)
+> -			wol->wolopts |= WAKE_MAGIC;
+> -	}
+> +	wol->supported |= (bp->wol & MACB_WOL_HAS_MAGIC_PACKET) ? WAKE_MAGIC : 0;
+> +	wol->supported |= (bp->wol & MACB_WOL_HAS_ARP_PACKET) ? WAKE_ARP : 0;
+> +	/* Pass wolopts to ethtool */
+> +	wol->wolopts = bp->wolopts;
+>  }
+>  
+>  static int macb_set_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
+>  {
+>  	struct macb *bp = netdev_priv(netdev);
+> +	bp->wolopts = 0;
+>  	int ret;
+>  
+>  	/* Pass the order to phylink layer */
+> @@ -3300,11 +3302,14 @@ static int macb_set_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
+>  	if (!ret || ret != -EOPNOTSUPP)
+>  		return ret;
+>  
+> -	if (!(bp->wol & MACB_WOL_HAS_MAGIC_PACKET) ||
+> -	    (wol->wolopts & ~WAKE_MAGIC))
+> +	if (!(bp->wol & (MACB_WOL_HAS_MAGIC_PACKET | MACB_WOL_HAS_ARP_PACKET)) ||
+> +	    (wol->wolopts & ~(WAKE_MAGIC | WAKE_ARP)))
+>  		return -EOPNOTSUPP;
+>  
+> -	if (wol->wolopts & WAKE_MAGIC)
+> +	bp->wolopts |= (wol->wolopts & WAKE_MAGIC) ? WAKE_MAGIC : 0;
+> +	bp->wolopts |= (wol->wolopts & WAKE_ARP) ? WAKE_ARP : 0;
+> +
+> +	if (bp->wolopts)
+>  		bp->wol |= MACB_WOL_ENABLED;
+>  	else
+>  		bp->wol &= ~MACB_WOL_ENABLED;
+> @@ -5087,7 +5092,6 @@ static int macb_probe(struct platform_device *pdev)
+>  	bp->wol = 0;
+>  	if (of_property_read_bool(np, "magic-packet"))
+>  		bp->wol |= MACB_WOL_HAS_MAGIC_PACKET;
+> -	device_set_wakeup_capable(&pdev->dev, bp->wol & MACB_WOL_HAS_MAGIC_PACKET);
+>  
+>  	bp->usrio = macb_config->usrio;
+>  
+> @@ -5115,6 +5119,11 @@ static int macb_probe(struct platform_device *pdev)
+>  	/* setup capabilities */
+>  	macb_configure_caps(bp, macb_config);
+>  
+> +	if (bp->caps & MACB_CAPS_WOL)
+> +		bp->wol |= (MACB_WOL_HAS_ARP_PACKET | MACB_WOL_HAS_MAGIC_PACKET);
+> +
+> +	device_set_wakeup_capable(&pdev->dev, (bp->wol) ? true : false);
+
+It can be simplified with:
+
+device_set_wakeup_capable(&pdev->dev, !!bp->wol);
+
+> +
+>  #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+>  	if (GEM_BFEXT(DAW64, gem_readl(bp, DCFG6))) {
+>  		dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(44));
+> @@ -5244,6 +5253,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
+>  	struct net_device *netdev = dev_get_drvdata(dev);
+>  	struct macb *bp = netdev_priv(netdev);
+>  	struct macb_queue *queue;
+> +	struct in_ifaddr *ifa;
+>  	unsigned long flags;
+>  	unsigned int q;
+>  	int err;
+> @@ -5256,6 +5266,12 @@ static int __maybe_unused macb_suspend(struct device *dev)
+>  		return 0;
+>  
+>  	if (bp->wol & MACB_WOL_ENABLED) {
+> +		/* Check for IP address in WOL ARP mode */
+> +		ifa = rcu_dereference(__in_dev_get_rcu(bp->dev)->ifa_list);
+> +		if ((bp->wolopts & WAKE_ARP) && !ifa) {
+> +			netdev_err(netdev, "IP address not assigned\n");
+> +			return -EOPNOTSUPP;
+> +		}
+>  		spin_lock_irqsave(&bp->lock, flags);
+>  
+>  		/* Disable Tx and Rx engines before  disabling the queues,
+> @@ -5289,6 +5305,14 @@ static int __maybe_unused macb_suspend(struct device *dev)
+>  		macb_writel(bp, TSR, -1);
+>  		macb_writel(bp, RSR, -1);
+>  
+> +		tmp = (bp->wolopts & WAKE_MAGIC) ? MACB_BIT(MAG) : 0;
+> +		if (bp->wolopts & WAKE_ARP) {
+> +			tmp |= MACB_BIT(ARP);
+> +			/* write IP address into register */
+> +			tmp |= MACB_BFEXT(IP,
+> +					 (__force u32)(cpu_to_be32p((uint32_t *)&ifa->ifa_local)));
+> +		}
+> +
+>  		/* Change interrupt handler and
+>  		 * Enable WoL IRQ on queue 0
+>  		 */
+> @@ -5304,7 +5328,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
+>  				return err;
+>  			}
+>  			queue_writel(bp->queues, IER, GEM_BIT(WOL));
+> -			gem_writel(bp, WOL, MACB_BIT(MAG));
+> +			gem_writel(bp, WOL, tmp);
+>  		} else {
+>  			err = devm_request_irq(dev, bp->queues[0].irq, macb_wol_interrupt,
+>  					       IRQF_SHARED, netdev->name, bp->queues);
+> @@ -5316,7 +5340,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
+>  				return err;
+>  			}
+>  			queue_writel(bp->queues, IER, MACB_BIT(WOL));
+> -			macb_writel(bp, WOL, MACB_BIT(MAG));
+> +			macb_writel(bp, WOL, tmp);
+>  		}
+>  		spin_unlock_irqrestore(&bp->lock, flags);
+>  
 
