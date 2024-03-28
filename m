@@ -1,147 +1,500 @@
-Return-Path: <netdev+bounces-82794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 147A988FC30
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:54:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7868D88FC50
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:01:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2888EB26CD0
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:54:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E36791F2FB3E
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B425FB90;
-	Thu, 28 Mar 2024 09:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dhi3Kyho"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06D665BA8;
+	Thu, 28 Mar 2024 10:01:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03BA376E0
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 09:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA721657BC
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 10:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711619645; cv=none; b=R+uh9LaxCj8yu0X7MQwyckFCincm59CHxnonFK8ktiPMM2LDCA4yy0sTmxgis65elJGCTLUHcyv09MPcWAGNFRp63ZNQUxIWGP7NcZXAkFKajmklhBzrdQ+fgpowdPHY41XGBT6BZ3BNxMKXmjqufkTKtJNWgr1wV6IVpUA3y8g=
+	t=1711620064; cv=none; b=S53r55mt42dJrcpUGMhhJCiA7fWhojTGtW2P0+wFVBvB3AJmgGXcnxm0EGS62KswaM4z6SmGa3BvDUFUjnHok5m6iyWs8hwKLJ8R/PSVXaJm28WysgrARFYzamWZVZOBMKYeZRQjboZYG0uMX7IIQtG5/RmiEChu2pUfOlwscAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711619645; c=relaxed/simple;
-	bh=yYDNUot13y8C3ZJ+iZrI0rAfnoRfIoL4ETxwLJIdJ1c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=C/rXfaaxVkaff6Y9RVWU/HilPFiXqUCP/Zwo3ouAdpYRJ628mwEdRMr5umktwIXxuX9b37pzEyO0Q8PBQsEdwTF290fXQeGsfjs3vt3G6Ud/P3r5MHnxz4IcxIzaPM7HsV9D8J/rUCJeZ+rRPDRJBXnWzRymW42TzperzBbWnk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Dhi3Kyho; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33ec7e38b84so476687f8f.1
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 02:54:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711619642; x=1712224442; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qR7L2zsTQZFBtjYk0D8hXAaerXX/BB/ioIDe3/j49Fo=;
-        b=Dhi3KyhoLAFgAjSDZkwQ/9/fOO00Ok3p26stzK6iBc65g45d5fks7Y0mSIg/xhZpg8
-         u4aqLiDnuMthIPey++uJEOXbx2wICT4Eh/ZODi1/h4BowmKTo/7J4gOGBu+yYs2i3EBw
-         WDwGFe2UIx9occdHK3637zTRgaQKlJ/tajAjLG1l+oL7JjpcakbgjW8Dbo/oOBlPh9W+
-         EwpzMEV8yt4WvnX3BXu4zlGtdacM4eMeVUwFlhiEjon0lLIEnwSSjg8j1H39H7EDgfap
-         xmJUCvCD58rAFSUpHkhIP+N651roInQrfMGxjokeh1q2qYIxqiGZTvbEoM0EGuBC3T+s
-         R9IA==
+	s=arc-20240116; t=1711620064; c=relaxed/simple;
+	bh=+6LHEoV9s46N51EU+LWqDbmOctNRbs5eK1bWjSv2IdI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=QkrUcdOsDl5Lya8fQXN7Jq0p0v7Urb/DmrVLsVBKohcG1ByFYwbHpyr32axzaHIO1Ll6uuQQlrxBCdBQWqUCt8y+/3rayQpvC9gDbyHb5wrwPpg/KvxfXBasaZqzP8C6MVOnIwwCIOfbqTM59SQRhSlX16/DYKDASwsLunNBY0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7cf179c3da4so74515939f.2
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 03:01:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711619642; x=1712224442;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qR7L2zsTQZFBtjYk0D8hXAaerXX/BB/ioIDe3/j49Fo=;
-        b=sElYTeL0MxIfd0XWz/zSNHabjnsGr03iYnMqL7HGVNIb3JylkbTEGUJp+62vhXRTRw
-         roqs+za5MN1NKMyuHmu3nxDS8xv0x1W85rgaLl+PxHxcq7ths5oEVwn+Di2BIaVOj/81
-         CPW3UjD8wbzbmTk/bm7mMLM1cp0Kqeh6Rrun4WAL+oHTbREV1c2AmVt6lFAo98Sd1NzB
-         Zv1zFyEbYgHny4u03Fr+EBn9+/olBLiv8ShiNq+qASEXoT472rXP7j85PINuJXizFL9G
-         MFQ2m+FSDiExtMkqG6fBztB1bNHUDs4savW2Oa/elcvSZvLGlutlv3Fc9hpz0+qjTrDv
-         mRgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWsnSn9EjFt/SmOJDgc/Owaas83lK/swry5l9pXIsATqCA0/AwBFTI5+6MjYVsTUSzYnsN15n9oxOIjwVd8q/7SfGgk+88L
-X-Gm-Message-State: AOJu0YxblA0DsJirgrPL3DL2HwMkclus95G5qwaoh0wJEmbTxfUDppky
-	MQ7V5X4y9h5JfBMaZiUkI0CHkkk0BBtyq/l+AjOTP7yUMKM2uNmRUMF1nDeQwVA=
-X-Google-Smtp-Source: AGHT+IGxp7E2/LIC9lCPGAz/YYMslQUnBPVeT64Qu+NHwS+JRYtYdMeHw6/t9lzCSZb1vU7Q3sGO0Q==
-X-Received: by 2002:a5d:6e53:0:b0:33e:8b95:62d9 with SMTP id j19-20020a5d6e53000000b0033e8b9562d9mr1722982wrz.23.1711619642166;
-        Thu, 28 Mar 2024 02:54:02 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.148])
-        by smtp.gmail.com with ESMTPSA id i13-20020adfe48d000000b00341bdbf0b07sm1295194wrm.50.2024.03.28.02.54.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Mar 2024 02:54:01 -0700 (PDT)
-Message-ID: <93fc47b1-ae44-4eb7-b799-9227a019c7c8@linaro.org>
-Date: Thu, 28 Mar 2024 10:54:00 +0100
+        d=1e100.net; s=20230601; t=1711620062; x=1712224862;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ab8qw9AVrknDLGgJj+5LJ6dILUHEmB6hGFiour98v3c=;
+        b=OsdPPdGrBGSn0f4ZTRRRzussPEu5lhVN3RbSWtl3EZmuhph/gPzbNGSMudBGaNTYqx
+         5vTnNDc8wI7e8Rpi/ZJNG3eF6FQQAbPmjHq8lfDArRZSmcJDTAJvIBmZBuHurWlwMHDm
+         rimvCixkSuvTBHV26e/KdUf5dDMTeCnI+evOcl67TULmUSD21bFuxvr4UDoROVZSCqcv
+         Hz8styYKTBIHyz2W0DwBmPfw6ZaePYCbtUK9HKp6oyJ731CnYs9Vp2ID8jjmWKPkanvU
+         9Xd0vWooARgBteVve6/YAuF+xGPJTIAHexgBlOfATjS+cOjJrB6htYfZy2SpzEf1pY24
+         q0Og==
+X-Forwarded-Encrypted: i=1; AJvYcCUk8Eq2oU/m/CYBezAMejEzkseR8eJ7WI/IK4qxo345dZaT0rE322BAp/8OqJCal09fP5BSsQV03FCgWgm+9R0+muSaAjTe
+X-Gm-Message-State: AOJu0Yw1nGiWE98h4YzQyt8QvTqTs8oy7FeJ7Ca5YXBRyWS4uzQRG5j6
+	zOjF+H3f4zc9oTvfu+ROHawPVkBKuYOKFSKIkF1zTuvVs1upt4Hq9dgoZVKokWn/lCdPm3Ecldu
+	fhOlt85swQDc6D7VCJzj1yIStMEglu3q5/CekQBQ+BSlN/BU80hdi+uQ=
+X-Google-Smtp-Source: AGHT+IEw78GzKmoKx2Mo4gzNfjYiJopkXff13tBAzWtmZlgMSwm8qSfkO4ezX6DFTCrt51Eb36dR1A4A5F3vFt64swA4HhSKKse8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next][resend v1 1/1] nfc: st95hf: Switch to using
- gpiod API
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240326175836.1418718-1-andriy.shevchenko@linux.intel.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240326175836.1418718-1-andriy.shevchenko@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6602:3f90:b0:7cf:16d5:1820 with SMTP id
+ fb16-20020a0566023f9000b007cf16d51820mr62462iob.2.1711620061971; Thu, 28 Mar
+ 2024 03:01:01 -0700 (PDT)
+Date: Thu, 28 Mar 2024 03:01:01 -0700
+In-Reply-To: <c621f56d-6354-45a3-8c41-1380f5f03b1f@linux.dev>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c8d6b00614b599a2@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] KMSAN: uninit-value in dev_map_lookup_elem
+From: syzbot <syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com>
+To: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
+	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
+	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 26/03/2024 18:58, Andy Shevchenko wrote:
-> This updates the driver to gpiod API, and removes yet another use of
-> of_get_named_gpio().
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
+Hello,
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+syzbot tried to test the proposed patch but the build/boot failed:
 
-Best regards,
-Krzysztof
+.o
+  CC      fs/aio.o
+  CC      drivers/hid/hid-gt683r.o
+  CC      drivers/hid/hid-gyration.o
+  CC      drivers/hid/hid-holtek-kbd.o
+  CC      drivers/platform/x86/p2sb.o
+  CC      drivers/iio/buffer/industrialio-triggered-buffer.o
+  CC      drivers/staging/rtl8712/rtl871x_ioctl_set.o
+  CC      drivers/staging/rtl8712/rtl8712_led.o
+  AR      drivers/mailbox/built-in.a
+  CC      fs/btrfs/uuid-tree.o
+  CC      fs/xfs/xfs_dquot.o
+  CC      fs/dax.o
+  AR      drivers/iio/accel/built-in.a
+  AR      drivers/iio/cdc/built-in.a
+  CC      fs/locks.o
+  CC      drivers/iio/adc/viperboard_adc.o
+  CC      drivers/gpu/drm/i915/display/intel_plane_initial.o
+  CC      fs/binfmt_misc.o
+  CC      fs/binfmt_script.o
+  CC      net/netfilter/xt_length.o
+  CC      drivers/hid/hid-holtek-mouse.o
+  AR      drivers/iio/chemical/built-in.a
+  CC      fs/xfs/xfs_dquot_item.o
+  AR      drivers/iio/common/cros_ec_sensors/built-in.a
+  CC      drivers/iio/common/hid-sensors/hid-sensor-attributes.o
+  CC      drivers/extcon/devres.o
+  CC      fs/bcachefs/opts.o
+  CC      drivers/iio/common/hid-sensors/hid-sensor-trigger.o
+  CC      fs/binfmt_elf.o
+  AR      drivers/media/usb/pvrusb2/built-in.a
+  CC      fs/xfs/xfs_trans_dquot.o
+  AR      drivers/iio/common/inv_sensors/built-in.a
+  CC      fs/xfs/xfs_qm_syscalls.o
+  CC      fs/xfs/xfs_qm_bhv.o
+  CC      drivers/staging/rtl8712/rtl871x_mlme.o
+  AR      drivers/iio/dac/built-in.a
+  CC      drivers/hid/hid-holtekff.o
+  CC      drivers/hid/hid-icade.o
+  CC      drivers/iio/buffer/kfifo_buf.o
+  AR      drivers/iio/common/ms_sensors/built-in.a
+  CC      net/netfilter/xt_limit.o
+  CC      net/netfilter/xt_mac.o
+  AR      drivers/iio/common/scmi_sensors/built-in.a
+  CC      drivers/thunderbolt/nhi.o
+  AR      drivers/hwtracing/intel_th/built-in.a
+  AR      drivers/iio/adc/built-in.a
+  CC      net/netfilter/xt_multiport.o
+  AR      drivers/iio/common/ssp_sensors/built-in.a
+  CC      drivers/gpu/drm/i915/display/intel_pmdemand.o
+  AR      drivers/iio/dummy/built-in.a
+  CC      drivers/thunderbolt/nhi_ops.o
+  CC      fs/btrfs/props.o
+  AR      drivers/iio/common/st_sensors/built-in.a
+  CC      net/netfilter/xt_nfacct.o
+  CC      fs/xfs/xfs_qm.o
+  CC      net/netfilter/xt_osf.o
+  AR      drivers/platform/x86/built-in.a
+  CC      fs/xfs/xfs_quotaops.o
+  AR      drivers/platform/built-in.a
+  CC      fs/xfs/xfs_rtalloc.o
+  CC      drivers/android/binderfs.o
+  CC      drivers/iio/gyro/hid-sensor-gyro-3d.o
+  CC      drivers/extcon/extcon-intel-cht-wc.o
+  CC      fs/compat_binfmt_elf.o
+  CC      fs/xfs/xfs_acl.o
+  CC      drivers/thunderbolt/ctl.o
+  CC      drivers/thunderbolt/tb.o
+  CC      fs/btrfs/free-space-tree.o
+  CC      fs/btrfs/tree-checker.o
+  CC      fs/xfs/xfs_sysctl.o
+  CC      drivers/hid/hid-ite.o
+  CC      drivers/staging/rtl8712/ieee80211.o
+  CC      drivers/staging/rtl8712/rtl871x_mp_ioctl.o
+  CC      drivers/staging/rtl8712/rtl871x_mp.o
+  CC      fs/btrfs/space-info.o
+  CC      drivers/thunderbolt/switch.o
+  CC      net/netfilter/xt_owner.o
+  CC      drivers/hid/hid-kensington.o
+  AR      drivers/nvmem/layouts/built-in.a
+  CC      drivers/nvmem/core.o
+  CC      drivers/staging/rtl8712/mlme_linux.o
+  CC      fs/backing-file.o
+  CC      drivers/staging/rtl8712/recv_linux.o
+  CC      drivers/staging/rtl8712/xmit_linux.o
+  CC      drivers/thunderbolt/cap.o
+  CC      fs/bcachefs/printbuf.o
+  AR      drivers/ras/built-in.a
+  CC      fs/mbcache.o
+  AR      drivers/iio/filter/built-in.a
+  CC      drivers/counter/counter-core.o
+  AR      drivers/iio/buffer/built-in.a
+  CC      fs/posix_acl.o
+  CC      drivers/staging/rtl8712/usb_intf.o
+  CC      fs/coredump.o
+  AR      drivers/iio/frequency/built-in.a
+  AR      drivers/iio/health/built-in.a
+  CC      drivers/most/core.o
+  AR      drivers/extcon/built-in.a
+  CC      drivers/counter/counter-sysfs.o
+  CC      drivers/counter/counter-chrdev.o
+  CC      net/netfilter/xt_cgroup.o
+  AR      drivers/iio/gyro/built-in.a
+  AR      drivers/iio/common/hid-sensors/built-in.a
+  CC      fs/drop_caches.o
+  AR      drivers/iio/common/built-in.a
+  CC      drivers/iio/humidity/hid-sensor-humidity.o
+  CC      fs/sysctls.o
+  CC      drivers/hid/hid-keytouch.o
+  CC      fs/xfs/xfs_ioctl32.o
+  CC      drivers/thunderbolt/path.o
+  CC      drivers/thunderbolt/tunnel.o
+  AR      fs/ocfs2/built-in.a
+  CC      drivers/thunderbolt/eeprom.o
+  CC      net/netfilter/xt_physdev.o
+  CC      fs/fhandle.o
+  CC      drivers/android/binder.o
+  CC      drivers/staging/rtl8712/os_intfs.o
+  CC      fs/btrfs/block-rsv.o
+  CC      drivers/android/binder_alloc.o
+  CC      drivers/hid/hid-kye.o
+  CC      drivers/most/configfs.o
+  AR      drivers/iio/imu/bmi160/built-in.a
+  AR      drivers/iio/imu/bmi323/built-in.a
+  AR      drivers/iio/imu/bno055/built-in.a
+  CC      fs/bcachefs/quota.o
+  CC      drivers/iio/light/hid-sensor-als.o
+  CC      drivers/iio/light/hid-sensor-prox.o
+  AR      drivers/iio/imu/inv_icm42600/built-in.a
+  AR      drivers/iio/imu/inv_mpu6050/built-in.a
+  CC      fs/btrfs/delalloc-space.o
+  AR      drivers/iio/imu/st_lsm6dsx/built-in.a
+  CC      fs/btrfs/block-group.o
+  AR      drivers/iio/imu/st_lsm9ds0/built-in.a
+  CC      fs/btrfs/discard.o
+  AR      drivers/iio/imu/built-in.a
+  CC      fs/btrfs/reflink.o
+  CC      drivers/staging/rtl8712/rtl871x_pwrctrl.o
+  CC      fs/bcachefs/rebalance.o
+  CC      drivers/iio/magnetometer/hid-sensor-magn-3d.o
+  CC      fs/btrfs/subpage.o
+  CC      drivers/thunderbolt/domain.o
+  CC      fs/btrfs/tree-mod-log.o
+  CC      net/netfilter/xt_pkttype.o
+  CC      fs/btrfs/extent-io-tree.o
+  AR      drivers/iio/multiplexer/built-in.a
+  CC      drivers/iio/orientation/hid-sensor-incl-3d.o
+  CC      drivers/gpu/drm/i915/display/intel_psr.o
+  AR      drivers/media/usb/gspca/built-in.a
+  AR      drivers/iio/position/built-in.a
+  CC      drivers/iio/orientation/hid-sensor-rotation.o
+  AR      drivers/media/usb/built-in.a
+  CC      net/netfilter/xt_policy.o
+  CC      net/netfilter/xt_quota.o
+  AR      drivers/iio/potentiometer/built-in.a
+  CC      drivers/nvmem/layouts.o
+  CC      drivers/staging/rtl8712/rtl8712_recv.o
+  AR      drivers/media/built-in.a
+  CC      fs/bcachefs/recovery.o
+  CC      fs/xfs/xfs_pnfs.o
+  CC      drivers/gpu/drm/i915/display/intel_quirks.o
+  CC      fs/btrfs/fs.o
+  AR      drivers/iio/potentiostat/built-in.a
+  CC      drivers/hid/hid-lcpower.o
+  CC      drivers/hid/hid-lenovo.o
+  CC      drivers/hid/hid-lg.o
+  CC      drivers/hid/hid-lgff.o
+  AR      drivers/iio/humidity/built-in.a
+  CC      net/netfilter/xt_rateest.o
+  AR      drivers/iio/resolver/built-in.a
+  AR      drivers/iio/proximity/built-in.a
+  CC      drivers/gpu/drm/i915/display/intel_sprite.o
+  CC      drivers/iio/pressure/hid-sensor-press.o
+  CC      drivers/iio/temperature/hid-sensor-temperature.o
+  CC      drivers/gpu/drm/i915/display/intel_sprite_uapi.o
+  CC      fs/btrfs/messages.o
+  CC      drivers/gpu/drm/i915/display/intel_tc.o
+  AR      drivers/counter/built-in.a
+  CC      drivers/gpu/drm/i915/display/intel_vblank.o
+  CC      drivers/gpu/drm/i915/display/intel_vga.o
+  CC      drivers/hid/hid-lg2ff.o
+  CC      drivers/thunderbolt/dma_port.o
+  CC      fs/btrfs/bio.o
+  AR      drivers/iio/light/built-in.a
+  AR      drivers/iio/test/built-in.a
+  AR      drivers/iio/trigger/built-in.a
+  CC      drivers/thunderbolt/icm.o
+  CC      net/netfilter/xt_realm.o
+  CC      net/netfilter/xt_recent.o
+  CC      net/netfilter/xt_sctp.o
+  CC      drivers/thunderbolt/property.o
+  AR      drivers/iio/magnetometer/built-in.a
+  CC      drivers/hid/hid-lg3ff.o
+  AR      drivers/most/built-in.a
+  CC      drivers/thunderbolt/xdomain.o
+  CC      drivers/hid/hid-lg4ff.o
+  CC      net/netfilter/xt_socket.o
+  CC      drivers/thunderbolt/lc.o
+  CC      net/netfilter/xt_state.o
+  CC      drivers/hid/hid-lg-g15.o
+  CC      fs/btrfs/lru_cache.o
+  CC      drivers/staging/rtl8712/rtl871x_recv.o
+  CC      drivers/iio/industrialio-core.o
+  CC      drivers/gpu/drm/i915/display/intel_wm.o
+  AR      drivers/iio/orientation/built-in.a
+  CC      net/netfilter/xt_statistic.o
+  CC      drivers/iio/industrialio-event.o
+  CC      drivers/iio/inkern.o
+  CC      net/netfilter/xt_string.o
+  CC      fs/btrfs/raid-stripe-tree.o
+  CC      net/netfilter/xt_tcpmss.o
+  CC      net/netfilter/xt_time.o
+  CC      drivers/iio/industrialio-buffer.o
+  CC      drivers/hid/hid-logitech-dj.o
+  CC      drivers/gpu/drm/i915/display/skl_scaler.o
+  AR      drivers/nvmem/built-in.a
+  CC      drivers/iio/industrialio-trigger.o
+  CC      drivers/gpu/drm/i915/display/skl_universal_plane.o
+  CC      drivers/thunderbolt/tmu.o
+  AR      drivers/iio/temperature/built-in.a
+  CC      fs/btrfs/acl.o
+  CC      drivers/hid/hid-logitech-hidpp.o
+  CC      drivers/hid/hid-magicmouse.o
+  AR      drivers/iio/pressure/built-in.a
+  CC      drivers/thunderbolt/usb4.o
+  CC      drivers/thunderbolt/usb4_port.o
+  CC      drivers/staging/rtl8712/rtl871x_sta_mgt.o
+  CC      drivers/gpu/drm/i915/display/skl_watermark.o
+  CC      drivers/hid/hid-mf.o
+  CC      net/netfilter/xt_u32.o
+  CC      fs/bcachefs/reflink.o
+  CC      drivers/staging/rtl8712/rtl871x_xmit.o
+  CC      fs/btrfs/ref-verify.o
+  CC      drivers/thunderbolt/nvm.o
+  CC      net/netfilter/nf_hooks_lwtunnel.o
+  CC      drivers/staging/rtl8712/rtl8712_xmit.o
+  CC      fs/bcachefs/sb-clean.o
+  CC      drivers/hid/hid-microsoft.o
+  CC      fs/bcachefs/replicas.o
+  CC      fs/btrfs/zoned.o
+  CC      drivers/gpu/drm/i915/display/intel_acpi.o
+  CC      fs/bcachefs/sb-counters.o
+  CC      drivers/hid/hid-monterey.o
+  CC      drivers/gpu/drm/i915/display/intel_opregion.o
+  CC      fs/btrfs/verity.o
+  CC      fs/bcachefs/sb-downgrade.o
+  CC      fs/bcachefs/sb-errors.o
+  CC      fs/bcachefs/sb-members.o
+  CC      fs/bcachefs/siphash.o
+  CC      drivers/hid/hid-multitouch.o
+  CC      drivers/hid/hid-nti.o
+  CC      drivers/hid/hid-ntrig.o
+  CC      drivers/gpu/drm/i915/display/intel_fbdev.o
+  CC      drivers/thunderbolt/retimer.o
+  CC      fs/bcachefs/six.o
+  CC      fs/bcachefs/snapshot.o
+  CC      drivers/thunderbolt/quirks.o
+  CC      drivers/thunderbolt/clx.o
+  CC      drivers/thunderbolt/acpi.o
+  CC      drivers/hid/hid-ortek.o
+  CC      drivers/hid/hid-prodikeys.o
+  CC      drivers/hid/hid-pl.o
+  CC      drivers/gpu/drm/i915/display/intel_fbdev_fb.o
+  CC      drivers/hid/hid-penmount.o
+  CC      drivers/thunderbolt/debugfs.o
+  CC      drivers/hid/hid-petalynx.o
+  CC      drivers/hid/hid-picolcd_core.o
+  CC      drivers/hid/hid-picolcd_fb.o
+  CC      drivers/hid/hid-picolcd_backlight.o
+  CC      drivers/hid/hid-picolcd_lcd.o
+  CC      drivers/gpu/drm/i915/display/intel_display_debugfs.o
+  CC      drivers/gpu/drm/i915/display/intel_display_debugfs_params.o
+  CC      drivers/hid/hid-picolcd_leds.o
+  CC      drivers/gpu/drm/i915/display/intel_pipe_crc.o
+  CC      drivers/hid/hid-picolcd_cir.o
+  CC      drivers/gpu/drm/i915/display/dvo_ch7017.o
+  CC      drivers/gpu/drm/i915/display/dvo_ch7xxx.o
+  CC      drivers/hid/hid-picolcd_debugfs.o
+  CC      drivers/gpu/drm/i915/display/dvo_ivch.o
+  CC      fs/bcachefs/subvolume.o
+  CC      fs/bcachefs/super.o
+  CC      fs/bcachefs/super-io.o
+  CC      fs/bcachefs/sysfs.o
+  CC      drivers/hid/hid-plantronics.o
+  CC      fs/bcachefs/tests.o
+  CC      fs/bcachefs/time_stats.o
+  CC      fs/bcachefs/thread_with_file.o
+  CC      drivers/hid/hid-primax.o
+  CC      fs/bcachefs/trace.o
+  CC      drivers/hid/hid-redragon.o
+  CC      drivers/hid/hid-retrode.o
+  CC      drivers/hid/hid-roccat.o
+  CC      drivers/hid/hid-roccat-common.o
+  CC      fs/bcachefs/two_state_shared_lock.o
+  CC      drivers/hid/hid-roccat-arvo.o
+  CC      fs/bcachefs/util.o
+  CC      fs/bcachefs/varint.o
+  CC      drivers/hid/hid-roccat-isku.o
+  CC      drivers/gpu/drm/i915/display/dvo_ns2501.o
+  CC      drivers/hid/hid-roccat-kone.o
+  CC      fs/bcachefs/xattr.o
+  CC      drivers/hid/hid-roccat-koneplus.o
+  CC      drivers/gpu/drm/i915/display/dvo_sil164.o
+  CC      drivers/hid/hid-roccat-konepure.o
+  CC      drivers/hid/hid-roccat-kovaplus.o
+  CC      drivers/gpu/drm/i915/display/dvo_tfp410.o
+  CC      drivers/gpu/drm/i915/display/g4x_dp.o
+  AR      drivers/iio/built-in.a
+  AR      drivers/staging/rtl8712/built-in.a
+  CC      drivers/hid/hid-roccat-lua.o
+  CC      drivers/gpu/drm/i915/display/g4x_hdmi.o
+  AR      drivers/staging/built-in.a
+  CC      drivers/hid/hid-roccat-pyra.o
+  CC      drivers/hid/hid-roccat-ryos.o
+  CC      drivers/hid/hid-roccat-savu.o
+  AR      net/netfilter/built-in.a
+  CC      drivers/hid/hid-rmi.o
+  CC      drivers/gpu/drm/i915/display/icl_dsi.o
+  CC      drivers/hid/hid-saitek.o
+  AR      fs/xfs/built-in.a
+  CC      drivers/hid/hid-samsung.o
+  AR      net/built-in.a
+  CC      drivers/hid/hid-sjoy.o
+  CC      drivers/hid/hid-sony.o
+  CC      drivers/hid/hid-speedlink.o
+  CC      drivers/hid/hid-steelseries.o
+  CC      drivers/gpu/drm/i915/display/intel_backlight.o
+  CC      drivers/hid/hid-sunplus.o
+  CC      drivers/gpu/drm/i915/display/intel_crt.o
+  CC      drivers/gpu/drm/i915/display/intel_cx0_phy.o
+  CC      drivers/hid/hid-gaff.o
+  CC      drivers/hid/hid-tmff.o
+  CC      drivers/hid/hid-thrustmaster.o
+  CC      drivers/gpu/drm/i915/display/intel_ddi.o
+  CC      drivers/hid/hid-tivo.o
+  CC      drivers/gpu/drm/i915/display/intel_ddi_buf_trans.o
+  CC      drivers/hid/hid-topseed.o
+  CC      drivers/hid/hid-twinhan.o
+  CC      drivers/hid/hid-uclogic-core.o
+  CC      drivers/hid/hid-uclogic-rdesc.o
+  CC      drivers/hid/hid-uclogic-params.o
+  AR      drivers/thunderbolt/built-in.a
+  CC      drivers/hid/hid-udraw-ps3.o
+  CC      drivers/hid/hid-led.o
+  CC      drivers/hid/hid-xinmo.o
+  CC      drivers/hid/hid-zpff.o
+  CC      drivers/hid/hid-zydacron.o
+  CC      drivers/hid/wacom_wac.o
+  CC      drivers/hid/wacom_sys.o
+  CC      drivers/hid/hid-waltop.o
+  CC      drivers/hid/hid-wiimote-core.o
+  CC      drivers/hid/hid-wiimote-modules.o
+  CC      drivers/hid/hid-wiimote-debug.o
+  CC      drivers/hid/hid-sensor-hub.o
+  CC      drivers/gpu/drm/i915/display/intel_display_device.o
+  CC      drivers/hid/hid-sensor-custom.o
+  CC      drivers/gpu/drm/i915/display/intel_display_trace.o
+  CC      drivers/gpu/drm/i915/display/intel_dkl_phy.o
+  CC      drivers/gpu/drm/i915/display/intel_dp.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_aux.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_aux_backlight.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_hdcp.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_link_training.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_mst.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi_dcs_backlight.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi_vbt.o
+  CC      drivers/gpu/drm/i915/display/intel_gmbus.o
+  CC      drivers/gpu/drm/i915/display/intel_dvo.o
+  CC      drivers/gpu/drm/i915/display/intel_hdmi.o
+  CC      drivers/gpu/drm/i915/display/intel_lspcon.o
+  CC      drivers/gpu/drm/i915/display/intel_lvds.o
+  CC      drivers/gpu/drm/i915/display/intel_panel.o
+  CC      drivers/gpu/drm/i915/display/intel_pps.o
+  CC      drivers/gpu/drm/i915/display/intel_qp_tables.o
+  CC      drivers/gpu/drm/i915/display/intel_sdvo.o
+  CC      drivers/gpu/drm/i915/display/intel_snps_phy.o
+  CC      drivers/gpu/drm/i915/display/intel_tv.o
+  CC      drivers/gpu/drm/i915/display/intel_vdsc.o
+  CC      drivers/gpu/drm/i915/display/vlv_dsi.o
+  CC      drivers/gpu/drm/i915/display/intel_vrr.o
+  CC      drivers/gpu/drm/i915/display/vlv_dsi_pll.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_tunnel.o
+  AR      fs/btrfs/built-in.a
+  CC      drivers/gpu/drm/i915/i915_perf.o
+  CC      drivers/gpu/drm/i915/pxp/intel_pxp.o
+  CC      drivers/gpu/drm/i915/pxp/intel_pxp_huc.o
+  CC      drivers/gpu/drm/i915/pxp/intel_pxp_tee.o
+  CC      drivers/gpu/drm/i915/i915_gpu_error.o
+  CC      drivers/gpu/drm/i915/i915_vgpu.o
+  AR      drivers/android/built-in.a
+  AR      fs/bcachefs/built-in.a
+  AR      fs/built-in.a
+  AR      drivers/hid/built-in.a
+  AR      drivers/gpu/drm/i915/built-in.a
+  AR      drivers/gpu/drm/built-in.a
+  AR      drivers/gpu/built-in.a
+  AR      drivers/built-in.a
+  AR      built-in.a
+  AR      vmlinux.a
+  LD      vmlinux.o
+Killed
+make[2]: *** [scripts/Makefile.vmlinux_o:62: vmlinux.o] Error 137
+make[2]: *** Deleting file 'vmlinux.o'
+make[1]: *** [/syzkaller/jobs/linux/kernel/Makefile:1141: vmlinux_o] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
 
+
+Error text is too large and was truncated, full error text is at:
+https://syzkaller.appspot.com/x/error.txt?x=12986595180000
+
+
+Tested on:
+
+commit:         d8889e86 bpf: Mark bpf prog stack with kmsan_unposion_..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/martin.lau/bpf-next.git interpreter.kmsan
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e6bd769cb793b98a
+dashboard link: https://syzkaller.appspot.com/bug?extid=1a3cf6f08d68868f9db3
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Note: no patches were applied.
 
