@@ -1,119 +1,321 @@
-Return-Path: <netdev+bounces-82762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64D9788F9F0
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:19:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BC6988F9ED
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 09:17:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A9731F26005
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:19:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E9BA1C26DBC
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA4854775;
-	Thu, 28 Mar 2024 08:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7752951C45;
+	Thu, 28 Mar 2024 08:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="hfyUJ6qw"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="hN8bpeUV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B067847C;
-	Thu, 28 Mar 2024 08:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E139D847C
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 08:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711613944; cv=none; b=uhWidEGrxsRehFqM6W2MtxmEpyGKP9dz9/9GWnRCLzgjBozqv0DEnSQSkyXwlSprEEMM2imW3kLf367CAjeTKyQ1W3o24rP+tiG3HkVqiN/VN7U5h5TzwzFA3iQVutaBOcKCwyeYx6veFxyhmY91QRWY5iR4oSNgP3oDwc77WCQ=
+	t=1711613862; cv=none; b=D/7w8vKmhGk1bw3+UMV3R63WYBrbo7MzI3DFKNDrXojVs22dI68UmMD2AyR+T3Vq7eTXhjcfaLtXAJe1aMKVk9kpQKIOwJw3vkokjemEPBl64u+SidV092iDGteuYotC24NUzlpN9b8lcKE3Jyp+4B3PK3A33rMCnwydieWxxdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711613944; c=relaxed/simple;
-	bh=gGMVJNa69Leb+cEsuqMfbUA1imWzW7vL8sf2rg0Skpo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kQXMK/xhfMXhj4kWv2ZaS7O4xxvO4oqKs+HwvneXHk+nclMuXNANRahx8g7jc3s3TzFJ2CI/a51i2Oi09Og1CH1m+GlGANZSu53URqTkV2NCn4dzIbbYGd5bIVtALexFYH8h0GRu35kHESRpOQmqRjlrPwMOgBtXuEG2ijas+o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=hfyUJ6qw; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id EA2F3100002;
-	Thu, 28 Mar 2024 11:18:33 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1711613914; bh=PBDen4iYcixurelbSTnSYzaQdiGcKvKP3bLFXy2ahvQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=hfyUJ6qwa0EdurR0ieoZbSH+vxyi00Eh/N8Kgmj54z98a4F9waSSW4HyYyn8fv8es
-	 92k5TDTzeqxzQjNvSMjj7SW2Ls0jouagLRfVxAJWekx5aATjE7yec8JxMbNlvHT3zO
-	 2SGObajDAqBGWe9yXDpxCNtAYdfkP2qyPm9SqHP5HqZ2a9AnUxVrndy67G9ioxwflu
-	 F4QjLKtMDvKGEUr81VYLRI9kz7lwlYxQc8bUC+WQ1/53iybepcxys5zyQGo0B+Z9ry
-	 yTn+sUDN7GSFkTglQ0gyIMXoJMO9kvprZyLzYc0j9xr9t4EzaQXaRuBtBTXXI1ISnj
-	 KuwUkOt6ML4ig==
-Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Thu, 28 Mar 2024 11:17:18 +0300 (MSK)
-Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 28 Mar
- 2024 11:16:57 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Sunil Goutham <sgoutham@marvell.com>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, Linu Cherian
-	<lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin Jacob
-	<jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya Sundeep
-	<sbhatta@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH] octeontx2-af: Add array index check
-Date: Thu, 28 Mar 2024 11:16:48 +0300
-Message-ID: <20240328081648.13193-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1711613862; c=relaxed/simple;
+	bh=3SOkDTyP9HxTO7h0ezDidoMJuHi0h8JqMjlHYmEoxpU=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=m4YXeMxZ9n+oPxybZ5Uz3naQulT7UjLke8r5bEPnp4RL7sXFZtMkEKK54dyp8ZZg+ulyDdJUHtGOvSduwMsQpiGaLQ4t9LyPxT55GOAtN7sALhQy2EqygcnvFaOj6K//y/xONUnfkdGRw08uwtQGAqpBb6+leEbcfzM3WeQhXpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=hN8bpeUV; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711613857; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=4IAjtJBq71Z99PqrugQaYSuGDC0Z+quLozoQ2s7i0MY=;
+	b=hN8bpeUVk22hpef6DMfZkS2OnrwY082k6zAkWrmn+t+fIzI+OIyMzDPvd2Jp2PYKa/aNKqvRCsfjHr3f8/rX/r6Ii/5dX7U92sO+Iw8FQON6Ku7GTmMhaENOaC4oRqWGQtVXAFuiooauxg+tvLb+CqfV4y46Tz+ZldPOU9TrO7A=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3Si.Ks_1711613856;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3Si.Ks_1711613856)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Mar 2024 16:17:37 +0800
+Message-ID: <1711613829.5284276-6-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v6 03/10] virtio_ring: packed: structure the indirect desc table
+Date: Thu, 28 Mar 2024 16:17:09 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240327111430.108787-1-xuanzhuo@linux.alibaba.com>
+ <20240327111430.108787-4-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvGTiZUepzRL9dMNaxZUenKzrqPnnd9594aWjF-KcXCrw@mail.gmail.com>
+ <1711611393.0808053-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEsrB_vjUqMXvAZyLxGz4QtMky5wn8ozf-+w9eXn7agTSQ@mail.gmail.com>
+In-Reply-To: <CACGkMEsrB_vjUqMXvAZyLxGz4QtMky5wn8ozf-+w9eXn7agTSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 184459 [Mar 28 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 13 0.3.13 9d58e50253d512f89cb08f71c87c671a2d0a1bca, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;mx1.t-argos.ru.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/03/28 07:24:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/03/28 06:03:00 #24486213
-X-KSMG-AntiVirus-Status: Clean, skipped
 
-In rvu_map_cgx_lmac_pf() the 'iter', which is used as an array index, can reach
-value (up to 14) that exceed the size (MAX_LMAC_COUNT = 8) of the array.
-Fix this bug by adding 'iter' value check.
+On Thu, 28 Mar 2024 16:07:03 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Thu, Mar 28, 2024 at 3:38=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > On Thu, 28 Mar 2024 14:56:55 +0800, Jason Wang <jasowang@redhat.com> wr=
+ote:
+> > > On Wed, Mar 27, 2024 at 7:14=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
+baba.com> wrote:
+> > > >
+> > > > This commit structure the indirect desc table.
+> > > > Then we can get the desc num directly when doing unmap.
+> > > >
+> > > > And save the dma info to the struct, then the indirect
+> > > > will not use the dma fields of the desc_extra. The subsequent
+> > > > commits will make the dma fields are optional.
+> > >
+> > > Nit: It's better to add something like "so we can't reuse the
+> > > desc_extra[] array"
+> > >
+> > > > But for
+> > > > the indirect case, we must record the dma info.
+> > > >
+> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > ---
+> > > >  drivers/virtio/virtio_ring.c | 61 +++++++++++++++++++-------------=
+----
+> > > >  1 file changed, 33 insertions(+), 28 deletions(-)
+> > > >
+> > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_r=
+ing.c
+> > > > index a2838fe1cc08..e3343cf55774 100644
+> > > > --- a/drivers/virtio/virtio_ring.c
+> > > > +++ b/drivers/virtio/virtio_ring.c
+> > > > @@ -74,7 +74,7 @@ struct vring_desc_state_split {
+> > > >
+> > > >  struct vring_desc_state_packed {
+> > > >         void *data;                     /* Data for callback. */
+> > > > -       struct vring_packed_desc *indir_desc; /* Indirect descripto=
+r, if any. */
+> > > > +       struct vring_desc_extra *indir_desc; /* Indirect descriptor=
+, if any. */
+> > >
+> > > Should be "DMA info with indirect descriptor, if any" ?
+> > >
+> > > >         u16 num;                        /* Descriptor list length. =
+*/
+> > > >         u16 last;                       /* The last desc state in a=
+ list. */
+> > > >  };
+> > > > @@ -1243,10 +1243,13 @@ static void vring_unmap_desc_packed(const s=
+truct vring_virtqueue *vq,
+> > > >                        DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> > > >  }
+> > > >
+> > > > -static struct vring_packed_desc *alloc_indirect_packed(unsigned in=
+t total_sg,
+> > > > -                                                      gfp_t gfp)
+> > > > +static struct vring_desc_extra *alloc_indirect_packed(unsigned int=
+ total_sg,
+> > > > +                                                     gfp_t gfp)
+> > > >  {
+> > > > -       struct vring_packed_desc *desc;
+> > > > +       struct vring_desc_extra *in_extra;
+> > > > +       u32 size;
+> > > > +
+> > > > +       size =3D sizeof(*in_extra) + sizeof(struct vring_packed_des=
+c) * total_sg;
+> > > >
+> > > >         /*
+> > > >          * We require lowmem mappings for the descriptors because
+> > > > @@ -1255,9 +1258,10 @@ static struct vring_packed_desc *alloc_indir=
+ect_packed(unsigned int total_sg,
+> > > >          */
+> > > >         gfp &=3D ~__GFP_HIGHMEM;
+> > > >
+> > > > -       desc =3D kmalloc_array(total_sg, sizeof(struct vring_packed=
+_desc), gfp);
+> > > >
+> > > > -       return desc;
+> > > > +       in_extra =3D kmalloc(size, gfp);
+> > > > +
+> > > > +       return in_extra;
+> > > >  }
+> > > >
+> > > >  static int virtqueue_add_indirect_packed(struct vring_virtqueue *v=
+q,
+> > > > @@ -1268,6 +1272,7 @@ static int virtqueue_add_indirect_packed(stru=
+ct vring_virtqueue *vq,
+> > > >                                          void *data,
+> > > >                                          gfp_t gfp)
+> > > >  {
+> > > > +       struct vring_desc_extra *in_extra;
+> > > >         struct vring_packed_desc *desc;
+> > > >         struct scatterlist *sg;
+> > > >         unsigned int i, n, err_idx;
+> > > > @@ -1275,10 +1280,12 @@ static int virtqueue_add_indirect_packed(st=
+ruct vring_virtqueue *vq,
+> > > >         dma_addr_t addr;
+> > > >
+> > > >         head =3D vq->packed.next_avail_idx;
+> > > > -       desc =3D alloc_indirect_packed(total_sg, gfp);
+> > > > -       if (!desc)
+> > > > +       in_extra =3D alloc_indirect_packed(total_sg, gfp);
+> > > > +       if (!in_extra)
+> > > >                 return -ENOMEM;
+> > > >
+> > > > +       desc =3D (struct vring_packed_desc *)(in_extra + 1);
+> > > > +
+> > > >         if (unlikely(vq->vq.num_free < 1)) {
+> > > >                 pr_debug("Can't add buf len 1 - avail =3D 0\n");
+> > > >                 kfree(desc);
+> > > > @@ -1315,17 +1322,16 @@ static int virtqueue_add_indirect_packed(st=
+ruct vring_virtqueue *vq,
+> > > >                 goto unmap_release;
+> > > >         }
+> > > >
+> > > > +       if (vq->use_dma_api) {
+> > > > +               in_extra->addr =3D addr;
+> > > > +               in_extra->len =3D total_sg * sizeof(struct vring_pa=
+cked_desc);
+> > > > +       }
+> > >
+> > > Any reason why we don't do it after the below assignment of descripto=
+r fields?
+> > >
+> > > > +
+> > > >         vq->packed.vring.desc[head].addr =3D cpu_to_le64(addr);
+> > > >         vq->packed.vring.desc[head].len =3D cpu_to_le32(total_sg *
+> > > >                                 sizeof(struct vring_packed_desc));
+> > > >         vq->packed.vring.desc[head].id =3D cpu_to_le16(id);
+> > > >
+> > > > -       if (vq->use_dma_api) {
+> > > > -               vq->packed.desc_extra[id].addr =3D addr;
+> > > > -               vq->packed.desc_extra[id].len =3D total_sg *
+> > > > -                               sizeof(struct vring_packed_desc);
+> > > > -       }
+> > > > -
+> > > >         vq->packed.desc_extra[id].flags =3D VRING_DESC_F_INDIRECT |
+> > > >                 vq->packed.avail_used_flags;
+> > > >
+> > > > @@ -1356,7 +1362,7 @@ static int virtqueue_add_indirect_packed(stru=
+ct vring_virtqueue *vq,
+> > > >         /* Store token and indirect buffer state. */
+> > > >         vq->packed.desc_state[id].num =3D 1;
+> > > >         vq->packed.desc_state[id].data =3D data;
+> > > > -       vq->packed.desc_state[id].indir_desc =3D desc;
+> > > > +       vq->packed.desc_state[id].indir_desc =3D in_extra;
+> > > >         vq->packed.desc_state[id].last =3D id;
+> > > >
+> > > >         vq->num_added +=3D 1;
+> > > > @@ -1375,7 +1381,7 @@ static int virtqueue_add_indirect_packed(stru=
+ct vring_virtqueue *vq,
+> > > >                 vring_unmap_desc_packed(vq, &desc[i]);
+> > > >
+> > > >  free_desc:
+> > > > -       kfree(desc);
+> > > > +       kfree(in_extra);
+> > > >
+> > > >         END_USE(vq);
+> > > >         return -ENOMEM;
+> > > > @@ -1589,7 +1595,6 @@ static void detach_buf_packed(struct vring_vi=
+rtqueue *vq,
+> > > >                               unsigned int id, void **ctx)
+> > > >  {
+> > > >         struct vring_desc_state_packed *state =3D NULL;
+> > > > -       struct vring_packed_desc *desc;
+> > > >         unsigned int i, curr;
+> > > >         u16 flags;
+> > > >
+> > > > @@ -1616,27 +1621,27 @@ static void detach_buf_packed(struct vring_=
+virtqueue *vq,
+> > > >                 if (ctx)
+> > > >                         *ctx =3D state->indir_desc;
+> > > >         } else {
+> > > > -               const struct vring_desc_extra *extra;
+> > > > -               u32 len;
+> > > > +               struct vring_desc_extra *in_extra;
+> > > > +               struct vring_packed_desc *desc;
+> > > > +               u32 num;
+> > > > +
+> > > > +               in_extra =3D state->indir_desc;
+> > > >
+> > > >                 if (vq->use_dma_api) {
+> > > > -                       extra =3D &vq->packed.desc_extra[id];
+> > > >                         dma_unmap_single(vring_dma_dev(vq),
+> > > > -                                        extra->addr, extra->len,
+> > > > +                                        in_extra->addr, in_extra->=
+len,
+> > > >                                          (flags & VRING_DESC_F_WRIT=
+E) ?
+> > > >                                          DMA_FROM_DEVICE : DMA_TO_D=
+EVICE);
+> > >
+> > > Can't we just reuse vring_unmap_extra_packed() here?
+> >
+> > vring_unmap_extra_packed calls dma_unmap_page.
+> > Here needs dma_unmap_single.
+> >
+> > You mean we call dma_unmap_page directly.
+>
+> Nope, I meant having a helper for this.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+OK.
 
-Fixes: 91c6945ea1f9 ("octeontx2-af: cn10k: Add RPM MAC support")
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 2 ++
- 1 file changed, 2 insertions(+)
+I will add a helper.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index 72e060cf6b61..e9bf9231b018 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -160,6 +160,8 @@ static int rvu_map_cgx_lmac_pf(struct rvu *rvu)
- 			continue;
- 		lmac_bmap = cgx_get_lmac_bmap(rvu_cgx_pdata(cgx, rvu));
- 		for_each_set_bit(iter, &lmac_bmap, rvu->hw->lmac_per_cgx) {
-+			if (iter >= MAX_LMAC_COUNT)
-+				continue;
- 			lmac = cgx_get_lmacid(rvu_cgx_pdata(cgx, rvu),
- 					      iter);
- 			rvu->pf2cgxlmac_map[pf] = cgxlmac_id_to_bmap(cgx, lmac);
--- 
-2.30.2
+Thanks.
 
+
+
+>
+> Thanks
+>
+>
+> >
+> > Thanks.
+> >
+> > >
+> > > Thanks
+> > >
+> > >
+> > > >                 }
+> > > >
+> > > > -               /* Free the indirect table, if any, now that it's u=
+nmapped. */
+> > > > -               desc =3D state->indir_desc;
+> > > > -
+> > > >                 if (vring_need_unmap_buffer(vq)) {
+> > > > -                       len =3D vq->packed.desc_extra[id].len;
+> > > > -                       for (i =3D 0; i < len / sizeof(struct vring=
+_packed_desc);
+> > > > -                                       i++)
+> > > > +                       num =3D in_extra->len / sizeof(struct vring=
+_packed_desc);
+> > > > +                       desc =3D (struct vring_packed_desc *)(in_ex=
+tra + 1);
+> > > > +
+> > > > +                       for (i =3D 0; i < num; i++)
+> > > >                                 vring_unmap_desc_packed(vq, &desc[i=
+]);
+> > > >                 }
+> > > > -               kfree(desc);
+> > > > +               kfree(in_extra);
+> > > >                 state->indir_desc =3D NULL;
+> > > >         }
+> > > >  }
+> > > > --
+> > > > 2.32.0.3.g01195cf9f
+> > > >
+> > >
+> >
+>
 
