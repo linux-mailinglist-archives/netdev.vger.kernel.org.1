@@ -1,165 +1,94 @@
-Return-Path: <netdev+bounces-82917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D337890303
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:26:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F92890309
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:28:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F5D81F29693
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:25:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7C74295F98
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18CA12F38B;
-	Thu, 28 Mar 2024 15:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E75B12FB2D;
+	Thu, 28 Mar 2024 15:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m7YCPw09"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dNK8rvpH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC1B42061;
-	Thu, 28 Mar 2024 15:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3C812F5BD;
+	Thu, 28 Mar 2024 15:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711639555; cv=none; b=hBG+FKNUdJDtAHIbRbkgexfrP4W5qtC6Pcr7CqswpLs4Rjf0JxU/NnzVs5uBhLDQ/xw/U1SjC64PxiyePPw6zqnPj2xCN6ucWOQtqQ5iyCppimnG94SW2VaSxBf8o5BMPWfSh54IUMSLs4Wpbpg2wF+HC14A/F0kICDKKXGpzh0=
+	t=1711639678; cv=none; b=Pp93ozXXAu0ZdjaM/Zq1jplgT0VftBrdVeRcOcjqa2DzIddAc/XJNo421tp/GpKq5wIl4Zyj75mhDbKvYDFLK7Vnaa+qtiBfW/AqiS1wN5WMXqbfpu0AP/nMinaWlWAkY81kRp/t5ryfrLGCBniInFwplpyWYxO83WBtDEG0oOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711639555; c=relaxed/simple;
-	bh=eM6eoVS/j9fw7JpCQoWfgH8JFa9jiXdb3VWcSy5HKQs=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=I0bq95ErXwCvGn7wu4A1sG1VmTPosUlVVCI9GLmy/i7LoE6cxDCbofZBzBy4Cko3QWhIFSnXXNRH6BpT00v8B0BWA+5eoqxPJNYsvLAME3Y1Grl7elDDPMuAGO55r2ylVIF0jkEK8qMAAvbE8eu9LSUobqUbMGuiqGEi4T7fV4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m7YCPw09; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92053C433F1;
-	Thu, 28 Mar 2024 15:25:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711639554;
-	bh=eM6eoVS/j9fw7JpCQoWfgH8JFa9jiXdb3VWcSy5HKQs=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=m7YCPw09Lnjm3o8eGUlVm1JyS575H5ItmJV66i/715GAh9DvT2s1TqVQsmtMiwFJQ
-	 Sdveujo87MYNPaBKsD3/BHH4k/zHid421JUnytdk/Qx+cM34N7hrlSsFXQwcatw1DZ
-	 5M6D2E/gbHUfQU4eaGnAaJ/UjsMdEOGB3gHfBuazOcTB8DNXWBCxN9jsz46CxByMsh
-	 UcMgWz6gsNati9StCAyoP4u/GLqZBLWtDaW2P6FlM8ifoD/Mx5WOGjWpCrJvkmeRaz
-	 flyIyVt0ALvaDO3JikR1Wpg/2pRCj9odTaHZReKhEwD89WB8YmmhpdueJefBAWofwx
-	 cCVaSb07IY8IQ==
-Date: Thu, 28 Mar 2024 10:25:53 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1711639678; c=relaxed/simple;
+	bh=HuNig3RpwkXx2DMIwr5zBSXaiyjINkDByOFu6xQnufs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lo1+rSWHhafyYnrOy7uXFbWPaTwjN7iC8Xfft1IboDRLjin0Rta3mgKLwAM34y9/AbETPChmKCDuOH5K2jnxUwG3tvbsDJyrm1lJ2l1dmU1vEfIKx/rJ2A29+e8Ts7cBc+XxgrJnnzhhOm5gUr4Zh6KpQ2FiIHtIrZx7RxsEpHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dNK8rvpH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7Qb+Zk2OMvEibY2uXNpvJSMIvTKdl68RE/8yS9t2zKk=; b=dNK8rvpH7mR4JTbMyoIeRKuXnZ
+	Lnu9mvj41WZSIsqzn2knyVvI/qfQE0Nvzpq97ijkldKHxVA3rtMCaXuL4E8EDTX/WK5Ci/kyv/HNg
+	hGHnX7YNp6OXiP2Keq8bDavnpKZrTx40EXPVEXwI0r0aZWoBiBwZpHDoEBx3EMervK1g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rprfL-00BVpb-PV; Thu, 28 Mar 2024 16:27:43 +0100
+Date: Thu, 28 Mar 2024 16:27:43 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 14/17] dt-bindings: net: pse-pd: Add bindings
+ for PD692x0 PSE controller
+Message-ID: <b4769aa2-8c24-420d-a5a7-fbe94a0d7b82@lunn.ch>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-14-c1011b6ea1cb@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: linux-arm-kernel@lists.infradead.org, Marek Vasut <marex@denx.de>, 
- Mark Brown <broonie@kernel.org>, Jose Abreu <joabreu@synopsys.com>, 
- Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org, 
- Richard Cochran <richardcochran@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
- linux-stm32@st-md-mailman.stormreply.com, devicetree@vger.kernel.org, 
- Liam Girdwood <lgirdwood@gmail.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
- Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240328140803.324141-2-christophe.roullier@foss.st.com>
-References: <20240328140803.324141-1-christophe.roullier@foss.st.com>
- <20240328140803.324141-2-christophe.roullier@foss.st.com>
-Message-Id: <171163955238.3507826.5734001949624773121.robh@kernel.org>
-Subject: Re: [PATCH v5 1/1] dt-bindings: net: dwmac: Document STM32
- property st,ext-phyclk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240326-feature_poe-v6-14-c1011b6ea1cb@bootlin.com>
 
-
-On Thu, 28 Mar 2024 15:08:03 +0100, Christophe Roullier wrote:
-> The Linux kernel dwmac-stm32 driver currently supports three DT
-> properties used to configure whether PHY clock are generated by
-> the MAC or supplied to the MAC from the PHY.
+On Tue, Mar 26, 2024 at 03:04:51PM +0100, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> Originally there were two properties, st,eth-clk-sel and
-> st,eth-ref-clk-sel, each used to configure MAC clocking in
-> different bus mode and for different MAC clock frequency.
-> Since it is possible to determine the MAC 'eth-ck' clock
-> frequency from the clock subsystem and PHY bus mode from
-> the 'phy-mode' property, two disparate DT properties are
-> no longer required to configure MAC clocking.
+> Add the PD692x0 I2C Power Sourcing Equipment controller device tree
+> bindings documentation.
 > 
-> Linux kernel commit 1bb694e20839 ("net: ethernet: stmmac: simplify phy modes management for stm32")
-> introduced a third, unified, property st,ext-phyclk. This property
-> covers both use cases of st,eth-clk-sel and st,eth-ref-clk-sel DT
-> properties, as well as a new use case for 25 MHz clock generated
-> by the MAC.
-> 
-> The third property st,ext-phyclk is so far undocumented,
-> document it.
-> 
-> Below table summarizes the clock requirement and clock sources for
-> supported PHY interface modes.
->  __________________________________________________________________________
-> |PHY_MODE | Normal | PHY wo crystal|   PHY wo crystal   |No 125Mhz from PHY|
-> |         |        |      25MHz    |        50MHz       |                  |
-> 
-> ---------------------------------------------------------------------------
-> |  MII    |    -   |     eth-ck    |        n/a         |       n/a        |
-> |         |        | st,ext-phyclk |                    |                  |
-> 
-> ---------------------------------------------------------------------------
-> |  GMII   |    -   |     eth-ck    |        n/a         |       n/a        |
-> |         |        | st,ext-phyclk |                    |                  |
-> 
-> ---------------------------------------------------------------------------
-> | RGMII   |    -   |     eth-ck    |        n/a         |      eth-ck      |
-> |         |        | st,ext-phyclk |                    | st,eth-clk-sel or|
-> |         |        |               |                    | st,ext-phyclk    |
-> 
-> ---------------------------------------------------------------------------
-> | RMII    |    -   |     eth-ck    |      eth-ck        |       n/a        |
-> |         |        | st,ext-phyclk | st,eth-ref-clk-sel |                  |
-> |         |        |               | or st,ext-phyclk   |                  |
-> 
-> ---------------------------------------------------------------------------
-> 
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
-> ---
->  Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/stm32-dwmac.yaml:86:5: [warning] wrong indentation: expected 2 but found 4 (indentation)
-./Documentation/devicetree/bindings/net/stm32-dwmac.yaml:92:3: [error] syntax error: expected <block end>, but found '<block mapping start>' (syntax)
-
-dtschema/dtc warnings/errors:
-make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/stm32-dwmac.example.dts'
-Documentation/devicetree/bindings/net/stm32-dwmac.yaml:92:3: did not find expected key
-make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/stm32-dwmac.example.dts] Error 1
-make[2]: *** Waiting for unfinished jobs....
-./Documentation/devicetree/bindings/net/stm32-dwmac.yaml:92:3: did not find expected key
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/stm32-dwmac.yaml: ignoring, error parsing file
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1430: dt_binding_check] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240328140803.324141-2-christophe.roullier@foss.st.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+    Andrew
 
