@@ -1,82 +1,95 @@
-Return-Path: <netdev+bounces-82822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE88388FDED
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:20:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 341B188FDEE
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8339E1F2510C
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:20:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD11D1F24D34
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9FA67D3F8;
-	Thu, 28 Mar 2024 11:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8377D410;
+	Thu, 28 Mar 2024 11:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIB7r7/5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r16ejzt/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64167D071
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 11:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48D97C6D5;
+	Thu, 28 Mar 2024 11:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711624817; cv=none; b=OhZNpveNNIkUhIyb7T29w76bRWgiLvuUThELnDx6uUWvJIdDKEVibhRaF8tGTeFGYgGe+HqFnb8nKQ5YymR5ygCsSt6/jPxA3qMMK+z3hJOELRtGzduMY3fUOucc3SQ7GtjMgpRjC/q7z9EjB+qKOTLpjeTVn1nvITDYitYkE+Y=
+	t=1711624828; cv=none; b=MakYS7AgeylZfgef/rQXOg//1UwsAvAcqJqhCL9O/uvXN1LjflyuFhJ6BA45IFtphyt90z2iD+TkpAP2keGf9PNELS8AUPuBmLMV1atQdJpmegRf3z9tQllvflwda0oxUPobrxBxTpXWbBbzGF2VEW8YCnXOGDlD5cb4jBPhjUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711624817; c=relaxed/simple;
-	bh=Lv3cp2LppPq2NOJ0YjPuq3snJAFqNfEiO5dPrY6uEYU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yg/DsNoACJJvK1CfFN927M053xmsq7MiBGEcNUToWY/6gTXv+bVaNKZ1Va0W5m/Jcq6WRH2lce14Iq55PCcsjHAFocRhzAHKdn4Cz5DPgNpYS3KPISaw1uKbTTFiJUhoSppEOkb3nxp+d3IDzhN586/F/lr5IJuyy7qcbr0vrFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIB7r7/5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73A41C433C7;
-	Thu, 28 Mar 2024 11:20:15 +0000 (UTC)
+	s=arc-20240116; t=1711624828; c=relaxed/simple;
+	bh=rln8LQGT49GIKShKZMPcgTPrafkfe0C1BUR0MNCCD6Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZRCTxuO7TgOvJCL/yG+pXdx0clk6XFeHKuP8KWiPqfDsT/PrLYvuW05bN5xA1ge+no5M+neCqHoJfAcqKOD7LAfMOTSwjtpWGiyMIS6ScbZs7p5zWoou6HqU9kVhD4TjiAh0BJdUUe2xx+eCR6LZxF3Fj9Ap8ZgqMK3zBYLQzCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r16ejzt/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D162C433C7;
+	Thu, 28 Mar 2024 11:20:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711624817;
-	bh=Lv3cp2LppPq2NOJ0YjPuq3snJAFqNfEiO5dPrY6uEYU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gIB7r7/55fU76qR8fy6c8lL5Z8GCx/zFwZmbxOa9JqfzGl4TsOcILiD4NAx7P25TO
-	 vmiGMgdoNzaZKy67i9R+CaFXASdMCnNv3s/VDxkA2/c37D2lcQ8Hg6xzgKIl6hGT79
-	 MrfNimsMxFnzs+uwKN4gWmf3fq1ayzdQHn2CkEiUUls2AiVqCxaTcDthUqrsU3uowr
-	 lTLWghjZMLVIAcI5QqE9x4B6H6OzGilYCic0u0SfPckndK+MODk1ygh25Y0Zq6Iuag
-	 2av7NQvVJrQNEIWXueHbmMAiN0h4fJ1NDhPdc1IHv+jcZkjo2ljYvhXMZge+bi0hUw
-	 ujENtHj7P30fw==
-Date: Thu, 28 Mar 2024 11:20:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH net-next 4/8] net/mlx5e: Make stats group fill_stats
- callbacks consistent with the API
-Message-ID: <20240328112013.GE403975@kernel.org>
-References: <20240326222022.27926-1-tariqt@nvidia.com>
- <20240326222022.27926-5-tariqt@nvidia.com>
+	s=k20201202; t=1711624828;
+	bh=rln8LQGT49GIKShKZMPcgTPrafkfe0C1BUR0MNCCD6Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=r16ejzt/TlGwqOFXTFztcrEN+zhTGC4oNurDiVTb3m7RS23WPQHwJ0zDZMiBhjbhC
+	 4757YJvSyMqOyilnnNWqEzip17eBHav95s7oohNHDyp8zF6rkwP5OipqpVydCypHBv
+	 UgpMTxI47K0kALr9ghXHHxNBCbR7iIr3UmtzWzxxNcXk2QEGPEQyq2KH0KeboRhupO
+	 jMXA855kzcOVy/IMb8NMyt+JB6A0A+MSPXnd5f5KkgfElVaBAduajTGQlvuT9SJqQ0
+	 3WP0fHEItDgVMjPpBK6ygU9DOCHeDDyuGkB580JP0c7g8pxOn9Y1QADU5oUGOZAFUX
+	 mXT1y6a0MOdyw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3CF29C43168;
+	Thu, 28 Mar 2024 11:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326222022.27926-5-tariqt@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] inet: inet_defrag: prevent sk release while still in
+ use
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171162482824.5741.7261983024812909275.git-patchwork-notify@kernel.org>
+Date: Thu, 28 Mar 2024 11:20:28 +0000
+References: <20240326101845.30836-1-fw@strlen.de>
+In-Reply-To: <20240326101845.30836-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, dsahern@kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, netfilter-devel@vger.kernel.org, edumazet@google.com,
+ xrivendell7@gmail.com, samsun1006219@gmail.com,
+ syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com
 
-On Wed, Mar 27, 2024 at 12:20:18AM +0200, Tariq Toukan wrote:
-> From: Gal Pressman <gal@nvidia.com>
-> 
-> The fill_strings() callbacks were changed to accept a **data pointer,
-> and not rely on propagating the index value.
-> Make a similar change to fill_stats() callbacks to keep the API
-> consistent.
-> 
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Hello:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 26 Mar 2024 11:18:41 +0100 you wrote:
+> ip_local_out() and other functions can pass skb->sk as function argument.
+> 
+> If the skb is a fragment and reassembly happens before such function call
+> returns, the sk must not be released.
+> 
+> This affects skb fragments reassembled via netfilter or similar
+> modules, e.g. openvswitch or ct_act.c, when run as part of tx pipeline.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net] inet: inet_defrag: prevent sk release while still in use
+    https://git.kernel.org/netdev/net/c/18685451fc4e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
