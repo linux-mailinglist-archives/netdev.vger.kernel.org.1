@@ -1,211 +1,99 @@
-Return-Path: <netdev+bounces-83091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18EA4890B5F
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 21:34:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1148A890B66
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 21:36:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CF6DB21A07
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 20:34:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 421381C28C80
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 20:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8DB13342F;
-	Thu, 28 Mar 2024 20:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A54A52F62;
+	Thu, 28 Mar 2024 20:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqyQfO1b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u26sQAvG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76FB3224;
-	Thu, 28 Mar 2024 20:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366CF1849
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 20:35:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711658073; cv=none; b=m8dTzHkxnFyfX7WoDUWQ0m0fKMndEH1iCh9l+TOs6awEhz4QvDyrIQ8zoFP4lu2/S3pPtCGtkYH4v0bgUZHO+KUOYtd4iMH8g+Feexo9n607Lkn3nMmbPl28tzfQ7SYX2y+1ZTxYBPuJm2R/CRBi8LkhhYHgCBOJEFDuebIjEk0=
+	t=1711658156; cv=none; b=WyBxH8990kRW2C4HNk+sranIuFTqdVRc2RrCC0PujrZ+6tEsktPmGCUW79vGyWqKcSJuQowmcL/e01A94MX+XJSK3zE+G0oYznedb0I5KkIerk4nnpUDbeKWszfwf0fHmXK3XwMCMac9DeIhG6jXHNmcW/viB+d4DDETSKssqWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711658073; c=relaxed/simple;
-	bh=PNbWtH6pb1bFU8mR75ZCza2MSEsYFINscoc85iE3ivM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dqbimiozqkTbVMqvt6FJHN429u0gRg37CnxlhI4ABlPFegELkA+1XztbtNuILbNwnbtRQyZJ77cVS8Hr0bI5hokuBWh058Bk5WSP2t5+Zt1G+5SRam0xcMqXZqpin9uoCSA3ZIcuDThBGjla0SxJ8ucQhee4XnfSgKLkQqFC7+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqyQfO1b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5468CC433C7;
-	Thu, 28 Mar 2024 20:34:31 +0000 (UTC)
+	s=arc-20240116; t=1711658156; c=relaxed/simple;
+	bh=kRNEJC4VJoG40VlRd9UCkNbbI/ezYTboNDaCkIt1vs0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p3o2u4yh86maNgFaCDHwnodRtNxrYiVkcssodmZ0AeJG6zboih4SePcN3/ulxf4cLUmDJDg1wBmFylk6nl3sezMxy2UwZi+VziVOhhWFPceC4iASz4rVBQFGxpNzSrHvFRHyj8HyXZBVKUhIs5ov+3nhwpxIfcSEkJbYWnSVO0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u26sQAvG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68384C433F1;
+	Thu, 28 Mar 2024 20:35:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711658073;
-	bh=PNbWtH6pb1bFU8mR75ZCza2MSEsYFINscoc85iE3ivM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sqyQfO1b26epdd/+5n8N7eLLOrgVkfDQyn4sz+V8MLUGXxXLMXbOC8Ug7n3SOBGGU
-	 QDBOIkLaYEhsmsfrt1g4o95UCTGblkOakcQERPyQ5HqlQ4s7cMDJIU09Aa7ICrBFxW
-	 9ifYIlblCISyxVkl5wDd2k6Eh8FENilnKRYIhxl7HlfTD5vyicDngXl+9Z3S5lZAJX
-	 6uqGuYJueM3Vxe+5dSewnuRiuqgNNbkoKwbJxit5MoSgrenHic7iYWA+D/OwXbzM9Q
-	 Yd9+a0tOeaJHMwa+k7jAo2oX4mTejQyPsnZOgIeg3PAc6PVJBz3z6gJzXapKuYnae8
-	 zly2t5zeyttWQ==
-Date: Thu, 28 Mar 2024 20:34:29 +0000
-From: Simon Horman <horms@kernel.org>
-To: nikita.shubin@maquefel.me
-Cc: Hartley Sweeten <hsweeten@visionengravers.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH v9 17/38] net: cirrus: add DT support for Cirrus EP93xx
-Message-ID: <20240328203429.GK651713@kernel.org>
-References: <20240326-ep93xx-v9-0-156e2ae5dfc8@maquefel.me>
- <20240326-ep93xx-v9-17-156e2ae5dfc8@maquefel.me>
+	s=k20201202; t=1711658155;
+	bh=kRNEJC4VJoG40VlRd9UCkNbbI/ezYTboNDaCkIt1vs0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=u26sQAvGzJ8ppBGjWRyFmwJm1zXGwOi+TB+bmzjiqqm+hi8gpsWDzLdHY42qyiV3+
+	 7TZYwvhTap4nKMQlYwdIHmukP2vcNsym/R0AnUe8zmxTPZd63xi6u+o+5Oh7Qw+lqI
+	 OLMWVBxBPbooySso1kM26DeXrgJPK+ey+S06oCeHEaJDgIu4UkOambr5oX4WwBguGm
+	 6epkNfwwRrO6q7kIGGRGyJv4lXMyRBKmVSW97PT1NIR4Fpj1W+envdYZ1/8X7J0Mo9
+	 X1i6+/A5Hjfo39xW8QqfjZu1KH26QlpReifFXTdTDLpknwsIHhY8rA5cWdiiHYz99l
+	 o2dvLPva2oROQ==
+Message-ID: <34e94b33-94cb-42ae-bc58-8ab4f7b44801@kernel.org>
+Date: Thu, 28 Mar 2024 21:35:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326-ep93xx-v9-17-156e2ae5dfc8@maquefel.me>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: do not consume a cacheline for system_page_pool
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+References: <20240328173448.2262593-1-edumazet@google.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20240328173448.2262593-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 26, 2024 at 12:18:44PM +0300, Nikita Shubin via B4 Relay wrote:
-> From: Nikita Shubin <nikita.shubin@maquefel.me>
+
+
+On 28/03/2024 18.34, Eric Dumazet wrote:
+> There is no reason to consume a full cacheline to store system_page_pool.
 > 
-> - add OF ID match table
-> - get phy_id from the device tree, as part of mdio
-> - copy_addr is now always used, as there is no SoC/board that aren't
-> - dropped platform header
+> We can eventually move it to softnet_data later for full locality control.
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Tested-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
+> Fixes: 2b0cfa6e4956 ("net: add generic percpu page_pool allocator")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Lorenzo Bianconi <lorenzo@kernel.org>
+> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+> Cc: Toke Høiland-Jørgensen <toke@redhat.com>
 > ---
->  drivers/net/ethernet/cirrus/ep93xx_eth.c | 63 ++++++++++++++++----------------
->  1 file changed, 32 insertions(+), 31 deletions(-)
+>   net/core/dev.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
 > 
-> diff --git a/drivers/net/ethernet/cirrus/ep93xx_eth.c b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-> index 1f495cfd7959..2523d9c9d1b8 100644
-> --- a/drivers/net/ethernet/cirrus/ep93xx_eth.c
-> +++ b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-> @@ -16,13 +16,12 @@
->  #include <linux/ethtool.h>
->  #include <linux/interrupt.h>
->  #include <linux/moduleparam.h>
-> +#include <linux/of.h>
->  #include <linux/platform_device.h>
->  #include <linux/delay.h>
->  #include <linux/io.h>
->  #include <linux/slab.h>
->  
-> -#include <linux/platform_data/eth-ep93xx.h>
-> -
->  #define DRV_MODULE_NAME		"ep93xx-eth"
->  
->  #define RX_QUEUE_ENTRIES	64
-> @@ -738,25 +737,6 @@ static const struct net_device_ops ep93xx_netdev_ops = {
->  	.ndo_set_mac_address	= eth_mac_addr,
->  };
->  
-> -static struct net_device *ep93xx_dev_alloc(struct ep93xx_eth_data *data)
-> -{
-> -	struct net_device *dev;
-> -
-> -	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
-> -	if (dev == NULL)
-> -		return NULL;
-> -
-> -	eth_hw_addr_set(dev, data->dev_addr);
-> -
-> -	dev->ethtool_ops = &ep93xx_ethtool_ops;
-> -	dev->netdev_ops = &ep93xx_netdev_ops;
-> -
-> -	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
-> -
-> -	return dev;
-> -}
-> -
-> -
->  static void ep93xx_eth_remove(struct platform_device *pdev)
->  {
->  	struct net_device *dev;
-> @@ -786,27 +766,47 @@ static void ep93xx_eth_remove(struct platform_device *pdev)
->  
->  static int ep93xx_eth_probe(struct platform_device *pdev)
->  {
-> -	struct ep93xx_eth_data *data;
->  	struct net_device *dev;
->  	struct ep93xx_priv *ep;
->  	struct resource *mem;
-> +	void __iomem *base_addr;
-> +	struct device_node *np;
-> +	u32 phy_id;
->  	int irq;
->  	int err;
-
-Please consider preserving reverse xmas tree order - longest line to
-shortest, for local variables in Networking code.
-
->  
->  	if (pdev == NULL)
->  		return -ENODEV;
-> -	data = dev_get_platdata(&pdev->dev);
->  
->  	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
->  	irq = platform_get_irq(pdev, 0);
->  	if (!mem || irq < 0)
->  		return -ENXIO;
->  
-> -	dev = ep93xx_dev_alloc(data);
-> +	base_addr = ioremap(mem->start, resource_size(mem));
-> +	if (!base_addr)
-> +		return dev_err_probe(&pdev->dev, -EIO, "Failed to ioremap ethernet registers\n");
-> +
-> +	np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
-> +	if (!np)
-> +		return dev_err_probe(&pdev->dev, -ENODEV, "Please provide \"phy-handle\"\n");
-
-This function, not entirely due to this patch, seems to leak
-resources in error paths.
-
-F.e., here base_addr is not unmapped and mem->start is not released.
-
-I expect that to resolve this problem it would be best to move
-to idiomatic error handling by:
-
-* using a ladder of goto labels in ep93xx_eth_probe(); and
-* as a clean up, remove the conditions from ep93xx_eth_remove.
-
-> +
-> +	err = of_property_read_u32(np, "reg", &phy_id);
-> +	of_node_put(np);
-> +	if (err)
-> +		return dev_err_probe(&pdev->dev, -ENOENT, "Failed to locate \"phy_id\"\n");
-> +
-> +	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
->  	if (dev == NULL) {
->  		err = -ENOMEM;
->  		goto err_out;
->  	}
-> +
-> +	eth_hw_addr_set(dev, base_addr + 0x50);
-
-This doesn't look right.
-
-eth_hw_addr_set() expects it's second argument to
-be a char * which represents an Ethernet address.
-But the type of base_addr + 0x50 is __iomem *.
-
-I suspect that you need some construction based on readb/readw/readl
-to copy the Ethernet address from io memory into a buffer,
-taking into account endiness and possibly taking into account
-unaligned access.
-
-Also, it would be good a descriptively named #define in place of 0x50.
-
-> +	dev->ethtool_ops = &ep93xx_ethtool_ops;
-> +	dev->netdev_ops = &ep93xx_netdev_ops;
-> +	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
-> +
->  	ep = netdev_priv(dev);
->  	ep->dev = dev;
->  	SET_NETDEV_DEV(dev, &pdev->dev);
-
-...
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 9a67003e49db87f3f92b6c6296b3e7a5ca9d9171..984ff8b9d0e1aa5646a7237a8cf0b0a21c2aa559 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -429,7 +429,7 @@ EXPORT_PER_CPU_SYMBOL(softnet_data);
+>    * PP consumers must pay attention to run APIs in the appropriate context
+>    * (e.g. NAPI context).
+>    */
+> -static DEFINE_PER_CPU_ALIGNED(struct page_pool *, system_page_pool);
+> +static DEFINE_PER_CPU(struct page_pool *, system_page_pool);
+>   
+>   #ifdef CONFIG_LOCKDEP
+>   /*
 
