@@ -1,118 +1,124 @@
-Return-Path: <netdev+bounces-82703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8103688F4FA
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:58:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E8D888F50C
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 03:02:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 359722A271A
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:58:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDEFB29E4CC
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BAF21364;
-	Thu, 28 Mar 2024 01:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFBF22618;
+	Thu, 28 Mar 2024 02:02:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KX7zyqJg"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sRn1ESua"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7E98465;
-	Thu, 28 Mar 2024 01:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8945CFBF0
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 02:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711591083; cv=none; b=LIl7ic2C5yyzC8N6uqL51dW9qJtOpbny7gtMDVBlWP5aPeiev/q+uZlzS96fWxgHipwysqEsiKa1O/vcDnPCQ3rm1ZZPMIcQCO/KjWXUZ8Sx3UE/Qyh90X1BF4oAHCvw/oOcHue4xohvHdBZNq36cbiWUw49FWrviJalL88IXyA=
+	t=1711591366; cv=none; b=OmyeHKLLwMYddOZJisptDCnrQGGDPTN2kvew6On7MXw6skbo7pg+Vi9dYhHp0QC/01oN2ioSRwLXBwn8iE1vcYcUSKCp0rLsL8SQxsieS+huYuJE4+ijSw5XJharJm/Y5A1L7B11NJt0GXpTF+YRoCNPnBI0sIj02/uw05MTCxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711591083; c=relaxed/simple;
-	bh=17frHZKHa4HTS0M444Swz4V9jidjHHSAtk9DQb/zVs8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gCwsCHJYB2KLGY0CXZhBUvWEueqtUAdCpcEwgUBww1zPWCdfgvcvWl5++lbb43WzoF302jA4KDzgBrTA4gi/8T9c6CHF/FYNEdexW1PztDa7LdxuwATv/4NPDTzZ31HXX32XbTfJ3ZvTSa8qAoV5mt1tVzZM1ZyDmA6qsua7ZOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KX7zyqJg; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33ed7ba1a42so241524f8f.2;
-        Wed, 27 Mar 2024 18:58:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711591079; x=1712195879; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tosp/xHwhQFOv14TlgTnZk/pGUufTB1z88IENWTkKck=;
-        b=KX7zyqJgBoyUxD9psSlG4exqFfRjo/QdJ2GFaaq15bCl+5jHJbB/s3TwKXWfc14bqb
-         +wYMZP6+fKJZxwhKn9J4UpwgZXuc6DiPNs3G2NgHFTm455CRaiLA30rE3hmrg5GkZFI2
-         YCG6jFSyMcIOIQOydDQaD9Z5URKbbeKCXFqGxjefwGI2BUHvERHtGrm607Y/cNoB4x8W
-         0gVJP2cedfe/CkSgWprQGNa3oLulvYB9ZHm1CW0xMMNazpMeHlF3ElqhXIr7QU59PTgd
-         8jbGDlLBJxQqaumIUqrEUtgWPuC1xRAoqJemt0B+PHGx8XBNChSdzqNp+fiGr7ikpik2
-         HGiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711591079; x=1712195879;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tosp/xHwhQFOv14TlgTnZk/pGUufTB1z88IENWTkKck=;
-        b=eCunpIlnN7xz04k09abi7b5nkxNYDUAkwCH1w+qjTadSC9/SPya75aUiaTIX/694Fd
-         7BDt/rzeqs5LT/ZtkEl5ysS89WoenNCQ8XiiFGdsTREkGmeDqez3jm/d2y6WT3BBPcHn
-         Eo5gr+L4IP39k04jDFzKf/0OxrF9sX/FuOXUSnugAq9j3Tio7B7WdqsIXJJzfy3ZMjhC
-         gTJ17p2w6954n3y7U3ihBHinhowSUv+iSQJ2szx8b+1vU00e6dFK94xQWzchlT8SWNE6
-         ruNxYnFLavnGlcMa6fHKL8Vzrpd+rJY3xMEt/Id5o4rXaB8JyUIF7RJaVRtR3mdI+Ngt
-         xrFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVDyC0/Z2TvBh0wkZRp5667OAI49Pe0ToLxFAWqkSHwH7Bwr/WRUGPHmdMwo7nSYLz9C3PYV+NPmnjXxLZPw75M9LW5A3xNGwEdMVW2SlszTV/CW/OScoUNp8RqpAaTtR8P91W+Ugx2BastKtGJUwzT/5EhJANMPo6xLiAMcJyyKOdqbLWp9abHVNvty/15Zy3k+pmj5Q==
-X-Gm-Message-State: AOJu0YwrZNLtkXYXl18o1pih5tqn5zV/FdnIPAWJ4dZLAb4g/K9mUMjR
-	y14pAF9h2gBR4O8xDpwig0DNpSFg2o0GpdYzohtyhFra9jUBQODg4rNsxdymy4tU7HhqUFdI3Os
-	xNECOMak8632yo/Lz8LZjVJQUvoA=
-X-Google-Smtp-Source: AGHT+IHsz6xL8bOK7aBf8BF761yTQJSarhpeyqPNrxEeiReNWPZGeG4ZKWWYpHZ4dezNtkqzoqFjScaO3BflrBK3mSs=
-X-Received: by 2002:a5d:5486:0:b0:341:c775:68b8 with SMTP id
- h6-20020a5d5486000000b00341c77568b8mr1135611wrv.57.1711591079229; Wed, 27 Mar
- 2024 18:57:59 -0700 (PDT)
+	s=arc-20240116; t=1711591366; c=relaxed/simple;
+	bh=X/Tckc3Af5oxrbcQn0TygAvQUc9VKQnEbaPGljUVYoU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S2hAGU+6wJGWNO0bo+LgcXZDM7SkCFx7bSNbaMp9ZeWJ29ZVuzHu0q6l8Az9tzdXiwThFli74zZNMkusIdkUEa820lyC/OI+31xpp4kYf4W/4wZbuz/S99zphwhR+ld0454En4zf92Zl0tCJNujXhw/uz6iYHFGXmNN+ohwARCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sRn1ESua; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711591355; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=9eWZzhHcFDFZepTkmHL2HqA/lnC2pj1j1x1+d7dBfTE=;
+	b=sRn1ESuaTWnndrUhMAUR0S8IJ2iEtMvB8MB7VAyQ2xS2zY1SqH9HhXF5Y4H6FbNFs2a5dzgCj6QLxr8tGBq/CAj4l95VGs/lHo8CglKRiqHY0V/IIoZXBrCCU78b0gTO9A7GNn4ikqZZrT6zSUBN+DPWdMBpLNZPZSiTsaJEsg4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W3QD6BM_1711591352;
+Received: from 30.221.148.146(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3QD6BM_1711591352)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Mar 2024 10:02:34 +0800
+Message-ID: <8bbbcd8b-b812-4e65-8169-73ffc5479eef@linux.alibaba.com>
+Date: Thu, 28 Mar 2024 10:02:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240328125500.2582492e@canb.auug.org.au>
-In-Reply-To: <20240328125500.2582492e@canb.auug.org.au>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 27 Mar 2024 18:57:47 -0700
-Message-ID: <CAADnVQJ3S2DpCTe6m2xxjwgmUO5wLknDdV68Y5S7Lit+jZy51Q@mail.gmail.com>
-Subject: Re: linux-next: manual merge of the bpf-next tree with the net tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, David Miller <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, Haiyue Wang <haiyue.wang@intel.com>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/2] virtio-net: support dim profile
+ fine-tuning
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ "David S. Miller" <davem@davemloft.net>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <1711531146-91920-1-git-send-email-hengqi@linux.alibaba.com>
+ <1711531146-91920-3-git-send-email-hengqi@linux.alibaba.com>
+ <556ec006-6157-458d-b9c8-86436cb3199d@intel.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <556ec006-6157-458d-b9c8-86436cb3199d@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 27, 2024 at 6:55=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
-.au> wrote:
->
-> Hi all,
->
-> Today's linux-next merge of the bpf-next tree got a conflict in:
->
->   kernel/bpf/arena.c
->
-> between commit:
->
->   ee498a38f317 ("bpf: Clarify bpf_arena comments.")
->
-> from the net tree and commit:
->
->   45a683b2d815 ("bpf,arena: Use helper sizeof_field in struct accessors")
->
-> from the bpf-next tree.
->
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
 
-Thanks for headsup.
-We'll fix it up when bpf-next gets ffwded in a day or two.
+
+在 2024/3/27 下午10:45, Alexander Lobakin 写道:
+> From: Heng Qi <hengqi@linux.alibaba.com>
+> Date: Wed, 27 Mar 2024 17:19:06 +0800
+>
+>> Virtio-net has different types of back-end device
+>> implementations. In order to effectively optimize
+>> the dim library's gains for different device
+>> implementations, let's use the new interface params
+>> to fine-tune the profile list.
+> Nice idea, but
+>
+>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+>> ---
+>>   drivers/net/virtio_net.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++--
+>>   1 file changed, 52 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index e709d44..9b6c727 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -57,6 +57,16 @@
+>>   
+>>   #define VIRTNET_DRIVER_VERSION "1.0.0"
+>>   
+>> +/* This is copied from NET_DIM_RX_EQE_PROFILES in DIM library */
+>> +#define VIRTNET_DIM_RX_PKTS 256
+>> +static struct dim_cq_moder rx_eqe_conf[] = {
+>> +	{.usec = 1,   .pkts = VIRTNET_DIM_RX_PKTS,},
+>> +	{.usec = 8,   .pkts = VIRTNET_DIM_RX_PKTS,},
+>> +	{.usec = 64,  .pkts = VIRTNET_DIM_RX_PKTS,},
+>> +	{.usec = 128, .pkts = VIRTNET_DIM_RX_PKTS,},
+>> +	{.usec = 256, .pkts = VIRTNET_DIM_RX_PKTS,}
+>> +};
+> This is wrong.
+> This way you will have one global table for ALL the virtio devices in
+> the system, while Ethtool performs configuration on a per-netdevice basis.
+> What you need is to have 1 dim_cq_moder per each virtio netdevice,
+> embedded somewhere into its netdev_priv(). Then
+> virtio_dim_{rx,tx}_work() will take profiles from there, not the global
+> struct. The global struct can stay here as const to initialize default
+> per-netdevice params.
+
+You are right. Good catch!
+
+Thanks,
+Heng
+
+>> +
+>>   static const unsigned long guest_offloads[] = {
+>>   	VIRTIO_NET_F_GUEST_TSO4,
+>>   	VIRTIO_NET_F_GUEST_TSO6,
+> Thanks,
+> Olek
+
 
