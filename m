@@ -1,187 +1,250 @@
-Return-Path: <netdev+bounces-82731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8478888F779
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:52:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3506888F788
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 06:55:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A77E11C2552E
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:52:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0A311F275CB
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 05:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033E645944;
-	Thu, 28 Mar 2024 05:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1BF4E1A0;
+	Thu, 28 Mar 2024 05:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="CV9TAJ2i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hysjLZhk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA64D3D55D
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 05:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93913DAC11;
+	Thu, 28 Mar 2024 05:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711605152; cv=none; b=f+HtivhbEBAfWdV30bSWnyzWE5maCYSZaqsnSwZ1Pk6SJKiXAD9rSYNvvw372Uu9NXSSoAmo82bz2VNJTpkPbQlWtF/T/wJdS5RSN/MA66ltTbItUp05k6+Fi/kohInZWjOA8zaImE86CHghWPIAOvndoER6fu7HXmmq9Xdw0mI=
+	t=1711605347; cv=none; b=J3Ds7r5eOMEbWMfQ7uqDEJlqtCz+JrTHmxnGm4WED/Cy4b1CkuubQ1a/CYrY8lzS8tsG/9TCriJTZenJnvbwuM3Q4VbJr8g79ZddLaknWhon35QjmHZ4MsrmmJ6j3GwirWSyoLAKChtFvN40iHQ5/flt0i/ln//S4hLoN3CPkfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711605152; c=relaxed/simple;
-	bh=IM7KzaaRTUbiiz8gas+y3YT7bts1cJvbq3AR9jRHSRY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uCHJwU9+qxqsniVX76n9geYQXr9o6JLG1stbY1ItSetLtAep3U4sMg6/O1+bKDvgB08GUwxFLwaXhTvWbcv7t+9lf0nV4TYVcddf7cHIkQeXwEaYCc2CVQngVFOhrjeMn+hBpUvLZuNOPoQjjrWBqIxoqu5Oa/eNiouaK45wr0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=CV9TAJ2i; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id C9E113FB76
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 05:52:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1711605141;
-	bh=VBxUCjUNVZV+fl5KJlFAhITCM40y00zmGCguCULZrbw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=CV9TAJ2i1kZu2GIErF/LEyyC0DWNdrHDj4VhwBBv0tz3UpY97Z1LYe+wE/nYxv3zF
-	 JO7j5fwimyp/F9MobEiJqx4z4sY2CYRG+ix3lgXNA4r95KdnZFhVaV3fwJEQWmja1S
-	 pWs3f+aadAUA/MfARnTBv2qc7+s6vVEcTuA0way4lIifnN/Tf3kzIlBGE5IW5DH708
-	 WCxA+rj82LdoOp4uttAjfqgBPO/LtBXL0crB5GDsQ8ZUKm0VUC2UaVdUzXCIWKaogu
-	 FSkIOquugeHrC0HLLTIdjVr5bO87ikb53RNJ3rrxhyfVrg+l+lzgWlLgrqoqrsOd1i
-	 LnYkOKyqyu2Ug==
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2a031e5bb29so531683a91.3
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 22:52:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711605140; x=1712209940;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VBxUCjUNVZV+fl5KJlFAhITCM40y00zmGCguCULZrbw=;
-        b=uF1QoOkf58ybBFh6gPdYfABJI7Ek4y39c6Osyw0U8mXwu1As1e0V/2CVUFZ1DwyEVy
-         HDOisxdyhexCP7KQm2ib9binjkXy3fY8fd49LqNUCkQnnt4Fh/uHuXwewhxlIJpKRRvt
-         93g6jrgGcaYElRrC6xpucpbS4rFfdof7qOzF5ptbcYteZoxMmtYN1ZzkgXNy+M0JhlKP
-         kLtZ92EVM2/J9TTxjsS9fVvJ0MQCIA3SnBV8vTgNSKRdDtZYvfBQLi3fj1VNetzI9Cfc
-         IG7rn8mtW4wYhT/ZAmamNjlXqWnkNcbXAM4DuDW3S0GyCSRNFu77OU2NhPAmXwf11l5T
-         O97A==
-X-Gm-Message-State: AOJu0YzxNqLJnY8vxUAuLxTVVPGtzFV1EgIGmM2AjVkUuK1Vc/VaDaxA
-	E+kV/F70TZmXMFSKg3fD6icUhO/a7whE6SsQQAItQEHgzntM6FXk2ofJVcoIqHcqkkcSiQLqLxI
-	uilFyUUTK9aOy7k7+QaivyZgQ3n4JdzKnnPDwspmP1N1t1wGKxg7eaKyudFY1ZkBJ4WGkeQ==
-X-Received: by 2002:a17:90a:fc95:b0:29f:8d52:d5da with SMTP id ci21-20020a17090afc9500b0029f8d52d5damr1666117pjb.22.1711605140197;
-        Wed, 27 Mar 2024 22:52:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGhdAR5Qr3109Gj+ShgjvrgV5CZXFMSIAQJkuqovm9XMmsuc/x89atGroPnAzWBfcdakLA3FA==
-X-Received: by 2002:a17:90a:fc95:b0:29f:8d52:d5da with SMTP id ci21-20020a17090afc9500b0029f8d52d5damr1666107pjb.22.1711605139830;
-        Wed, 27 Mar 2024 22:52:19 -0700 (PDT)
-Received: from localhost (211-75-139-218.hinet-ip.hinet.net. [211.75.139.218])
-        by smtp.gmail.com with UTF8SMTPSA id ev9-20020a17090aeac900b002a03d13fef5sm2741309pjb.7.2024.03.27.22.52.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 22:52:19 -0700 (PDT)
-From: Atlas Yu <atlas.yu@canonical.com>
-To: nic_swsd@realtek.com,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Atlas Yu <atlas.yu@canonical.com>
-Subject: [PATCH net v2] r8169: skip DASH fw status checks when DASH is disabled
-Date: Thu, 28 Mar 2024 13:51:52 +0800
-Message-Id: <20240328055152.18443-1-atlas.yu@canonical.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1711605347; c=relaxed/simple;
+	bh=C6skgkr2NMPDni3brGoFkl+5/I4LRqRBMa9zmdDL9uY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OLlER+IyhNXi5cnVjcrG/OL81p81BVQFfPzNN3Zk1SeAZj0z82TyWSUGM40COJDwd2xQkSZ6tyNK4gyFtFA5dLU3naWd19RAA53MPAz6HSVVU5QQzQTPdqi6lAd72Jw7gVyEpVhqsNjM9jesmL6Ppa5Ujox0TN6hi0BOjZwwDac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hysjLZhk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55E6DC433F1;
+	Thu, 28 Mar 2024 05:55:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711605346;
+	bh=C6skgkr2NMPDni3brGoFkl+5/I4LRqRBMa9zmdDL9uY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hysjLZhkEnvXnxd+HtHwjnxShxKJsdr7YRORWMMbG9CAv2Wo4v/3W17f+9SmlwjYP
+	 AyxLZuXRv9YJGW7TBEhuFvjqai5JqAqlAjT7kP1ISp5EH8RS9fJ2YPnuq82HTriscX
+	 k3oc9NY2bXpiP0jGnfR7dbOxiqpXyBbLE3Kr+zaoP4w8AQS+EkbA1t2gSCobYQ2KlV
+	 32f78em/AA4bHgFdo/ljQvmpapnRbgSvmNw6bLqNSxN3FzIz/Su4hMEut3jzJjbgI6
+	 ErlOb5+1jhqeBVqohmzPhEaaC6pQ2kHQXfpk3998EVOS2mUbOgGjtxbSO/uM8abY2C
+	 N/IIGvRGfpoEA==
+Date: Thu, 28 Mar 2024 11:25:41 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Allen Pais <apais@linux.microsoft.com>
+Cc: linux-kernel@vger.kernel.org, tj@kernel.org, keescook@chromium.org,
+	marcan@marcan.st, sven@svenpeter.dev, florian.fainelli@broadcom.com,
+	rjui@broadcom.com, sbranden@broadcom.com, paul@crapouillou.net,
+	Eugeniy.Paltsev@synopsys.com, manivannan.sadhasivam@linaro.org,
+	vireshk@kernel.org, Frank.Li@nxp.com, leoyang.li@nxp.com,
+	zw@zh-kernel.org, wangzhou1@hisilicon.com, haijie1@huawei.com,
+	shawnguo@kernel.org, s.hauer@pengutronix.de, sean.wang@mediatek.com,
+	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+	afaerber@suse.de, logang@deltatee.com, daniel@zonque.org,
+	haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+	andersson@kernel.org, konrad.dybcio@linaro.org, orsonzhai@gmail.com,
+	baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
+	patrice.chotard@foss.st.com, linus.walleij@linaro.org,
+	wens@csie.org, jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com,
+	kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, jassisinghbrar@gmail.com, mchehab@kernel.org,
+	maintainers@bluecherrydvr.com, aubin.constans@microchip.com,
+	ulf.hansson@linaro.org, manuel.lauss@gmail.com,
+	mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com,
+	hayashi.kunihiko@socionext.com, mhiramat@kernel.org,
+	brucechang@via.com.tw, HaraldWelte@viatech.com, pierre@ossman.eu,
+	duncan.sands@free.fr, stern@rowland.harvard.edu, oneukum@suse.com,
+	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
+	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-mediatek@lists.infradead.org,
+	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH 2/9] dma: Convert from tasklet to BH workqueue
+Message-ID: <ZgUGXTKPVhrA1tam@matsya>
+References: <20240327160314.9982-1-apais@linux.microsoft.com>
+ <20240327160314.9982-3-apais@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327160314.9982-3-apais@linux.microsoft.com>
 
-On devices that support DASH, the current code in the "rtl_loop_wait" function
-raises false alarms when DASH is disabled. This occurs because the function
-attempts to wait for the DASH firmware to be ready, even though it's not
-relevant in this case.
+Hi Allen,
 
-r8169 0000:0c:00.0 eth0: RTL8168ep/8111ep, 38:7c:76:49:08:d9, XID 502, IRQ 86
-r8169 0000:0c:00.0 eth0: jumbo features [frames: 9194 bytes, tx checksumming: ko]
-r8169 0000:0c:00.0 eth0: DASH disabled
+Subsytem is dmaengine, can you rename this to dmaengine: ...
+
+On 27-03-24, 16:03, Allen Pais wrote:
+> The only generic interface to execute asynchronously in the BH context is
+> tasklet; however, it's marked deprecated and has some design flaws. To
+> replace tasklets, BH workqueue support was recently added. A BH workqueue
+> behaves similarly to regular workqueues except that the queued work items
+> are executed in the BH context.
+
+Thanks for conversion, am happy with BH alternative as it helps in
+dmaengine where we need shortest possible time between tasklet and
+interrupt handling to maximize dma performance
+
+> 
+> This patch converts drivers/dma/* from tasklet to BH workqueue.
+
+> 
+> Based on the work done by Tejun Heo <tj@kernel.org>
+> Branch: git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
+> 
+> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+> ---
+>  drivers/dma/altera-msgdma.c                   | 15 ++++----
+>  drivers/dma/apple-admac.c                     | 15 ++++----
+>  drivers/dma/at_hdmac.c                        |  2 +-
+>  drivers/dma/at_xdmac.c                        | 15 ++++----
+>  drivers/dma/bcm2835-dma.c                     |  2 +-
+>  drivers/dma/dma-axi-dmac.c                    |  2 +-
+>  drivers/dma/dma-jz4780.c                      |  2 +-
+>  .../dma/dw-axi-dmac/dw-axi-dmac-platform.c    |  2 +-
+>  drivers/dma/dw-edma/dw-edma-core.c            |  2 +-
+>  drivers/dma/dw/core.c                         | 13 +++----
+>  drivers/dma/dw/regs.h                         |  3 +-
+>  drivers/dma/ep93xx_dma.c                      | 15 ++++----
+>  drivers/dma/fsl-edma-common.c                 |  2 +-
+>  drivers/dma/fsl-qdma.c                        |  2 +-
+>  drivers/dma/fsl_raid.c                        | 11 +++---
+>  drivers/dma/fsl_raid.h                        |  2 +-
+>  drivers/dma/fsldma.c                          | 15 ++++----
+>  drivers/dma/fsldma.h                          |  3 +-
+>  drivers/dma/hisi_dma.c                        |  2 +-
+>  drivers/dma/hsu/hsu.c                         |  2 +-
+>  drivers/dma/idma64.c                          |  4 +--
+>  drivers/dma/img-mdc-dma.c                     |  2 +-
+>  drivers/dma/imx-dma.c                         | 27 +++++++-------
+>  drivers/dma/imx-sdma.c                        |  6 ++--
+>  drivers/dma/ioat/dma.c                        | 17 ++++-----
+>  drivers/dma/ioat/dma.h                        |  5 +--
+>  drivers/dma/ioat/init.c                       |  2 +-
+>  drivers/dma/k3dma.c                           | 19 +++++-----
+>  drivers/dma/mediatek/mtk-cqdma.c              | 35 ++++++++++---------
+>  drivers/dma/mediatek/mtk-hsdma.c              |  2 +-
+>  drivers/dma/mediatek/mtk-uart-apdma.c         |  4 +--
+>  drivers/dma/mmp_pdma.c                        | 13 +++----
+>  drivers/dma/mmp_tdma.c                        | 11 +++---
+>  drivers/dma/mpc512x_dma.c                     | 17 ++++-----
+>  drivers/dma/mv_xor.c                          | 13 +++----
+>  drivers/dma/mv_xor.h                          |  5 +--
+>  drivers/dma/mv_xor_v2.c                       | 23 ++++++------
+>  drivers/dma/mxs-dma.c                         | 13 +++----
+>  drivers/dma/nbpfaxi.c                         | 15 ++++----
+>  drivers/dma/owl-dma.c                         |  2 +-
+>  drivers/dma/pch_dma.c                         | 17 ++++-----
+>  drivers/dma/pl330.c                           | 31 ++++++++--------
+>  drivers/dma/plx_dma.c                         | 13 +++----
+>  drivers/dma/ppc4xx/adma.c                     | 17 ++++-----
+>  drivers/dma/ppc4xx/adma.h                     |  5 +--
+>  drivers/dma/pxa_dma.c                         |  2 +-
+>  drivers/dma/qcom/bam_dma.c                    | 35 ++++++++++---------
+>  drivers/dma/qcom/gpi.c                        | 18 +++++-----
+>  drivers/dma/qcom/hidma.c                      | 11 +++---
+>  drivers/dma/qcom/hidma.h                      |  5 +--
+>  drivers/dma/qcom/hidma_ll.c                   | 11 +++---
+>  drivers/dma/qcom/qcom_adm.c                   |  2 +-
+>  drivers/dma/sa11x0-dma.c                      | 27 +++++++-------
+>  drivers/dma/sf-pdma/sf-pdma.c                 | 23 ++++++------
+>  drivers/dma/sf-pdma/sf-pdma.h                 |  5 +--
+>  drivers/dma/sprd-dma.c                        |  2 +-
+>  drivers/dma/st_fdma.c                         |  2 +-
+>  drivers/dma/ste_dma40.c                       | 17 ++++-----
+>  drivers/dma/sun6i-dma.c                       | 33 ++++++++---------
+>  drivers/dma/tegra186-gpc-dma.c                |  2 +-
+>  drivers/dma/tegra20-apb-dma.c                 | 19 +++++-----
+>  drivers/dma/tegra210-adma.c                   |  2 +-
+>  drivers/dma/ti/edma.c                         |  2 +-
+>  drivers/dma/ti/k3-udma.c                      | 11 +++---
+>  drivers/dma/ti/omap-dma.c                     |  2 +-
+>  drivers/dma/timb_dma.c                        | 23 ++++++------
+>  drivers/dma/txx9dmac.c                        | 29 +++++++--------
+>  drivers/dma/txx9dmac.h                        |  5 +--
+>  drivers/dma/virt-dma.c                        |  9 ++---
+>  drivers/dma/virt-dma.h                        |  9 ++---
+>  drivers/dma/xgene-dma.c                       | 21 +++++------
+>  drivers/dma/xilinx/xilinx_dma.c               | 23 ++++++------
+>  drivers/dma/xilinx/xilinx_dpdma.c             | 21 +++++------
+>  drivers/dma/xilinx/zynqmp_dma.c               | 21 +++++------
+>  74 files changed, 442 insertions(+), 395 deletions(-)
+> 
+> diff --git a/drivers/dma/altera-msgdma.c b/drivers/dma/altera-msgdma.c
+> index a8e3615235b8..611b5290324b 100644
+> --- a/drivers/dma/altera-msgdma.c
+> +++ b/drivers/dma/altera-msgdma.c
+> @@ -20,6 +20,7 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/slab.h>
+>  #include <linux/of_dma.h>
+> +#include <linux/workqueue.h>
+>  
+>  #include "dmaengine.h"
+>  
+> @@ -170,7 +171,7 @@ struct msgdma_sw_desc {
+>  struct msgdma_device {
+>  	spinlock_t lock;
+>  	struct device *dev;
+> -	struct tasklet_struct irq_tasklet;
+> +	struct work_struct irq_work;
+
+Can we name these as bh_work to signify that we are always in bh
+context? here and everywhere please
+
+
+>  	struct list_head pending_list;
+>  	struct list_head free_list;
+>  	struct list_head active_list;
+> @@ -676,12 +677,12 @@ static int msgdma_alloc_chan_resources(struct dma_chan *dchan)
+>  }
+>  
+>  /**
+> - * msgdma_tasklet - Schedule completion tasklet
+> + * msgdma_work - Schedule completion work
+
 ...
-r8169 0000:0c:00.0 eth0: rtl_ep_ocp_read_cond == 0 (loop: 30, delay: 10000).
 
-This patch modifies the driver start/stop functions to skip checking the DASH
-firmware status when DASH is explicitly disabled. This prevents unnecessary
-delays and false alarms.
+> @@ -515,7 +516,7 @@ struct gpii {
+>  	enum gpi_pm_state pm_state;
+>  	rwlock_t pm_lock;
+>  	struct gpi_ring ev_ring;
+> -	struct tasklet_struct ev_task; /* event processing tasklet */
+> +	struct work_struct ev_task; /* event processing work */
+>  	struct completion cmd_completion;
+>  	enum gpi_cmd gpi_cmd;
+>  	u32 cntxt_type_irq_msk;
+> @@ -755,7 +756,7 @@ static void gpi_process_ieob(struct gpii *gpii)
+>  	gpi_write_reg(gpii, gpii->ieob_clr_reg, BIT(0));
+>  
+>  	gpi_config_interrupts(gpii, MASK_IEOB_SETTINGS, 0);
+> -	tasklet_hi_schedule(&gpii->ev_task);
+> +	queue_work(system_bh_highpri_wq, &gpii->ev_task);
 
-The patch has been tested on several ThinkStation P8/PX workstations.
-
-Fixes: 0ab0c45d8aae ("r8169: add handling DASH when DASH is disabled")
-Signed-off-by: Atlas Yu <atlas.yu@canonical.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 31 ++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 5c879a5c86d7..4ac444eb269f 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -1314,17 +1314,40 @@ static void rtl8168ep_stop_cmac(struct rtl8169_private *tp)
- 	RTL_W8(tp, IBCR0, RTL_R8(tp, IBCR0) & ~0x01);
- }
- 
-+static void rtl_dash_loop_wait(struct rtl8169_private *tp,
-+			       const struct rtl_cond *c,
-+			       unsigned long usecs, int n, bool high)
-+{
-+	if (!tp->dash_enabled)
-+		return;
-+	rtl_loop_wait(tp, c, usecs, n, high);
-+}
-+
-+static void rtl_dash_loop_wait_high(struct rtl8169_private *tp,
-+				    const struct rtl_cond *c,
-+				    unsigned long d, int n)
-+{
-+	rtl_dash_loop_wait(tp, c, d, n, true);
-+}
-+
-+static void rtl_dash_loop_wait_low(struct rtl8169_private *tp,
-+				   const struct rtl_cond *c,
-+				   unsigned long d, int n)
-+{
-+	rtl_dash_loop_wait(tp, c, d, n, false);
-+}
-+
- static void rtl8168dp_driver_start(struct rtl8169_private *tp)
- {
- 	r8168dp_oob_notify(tp, OOB_CMD_DRIVER_START);
--	rtl_loop_wait_high(tp, &rtl_dp_ocp_read_cond, 10000, 10);
-+	rtl_dash_loop_wait_high(tp, &rtl_dp_ocp_read_cond, 10000, 10);
- }
- 
- static void rtl8168ep_driver_start(struct rtl8169_private *tp)
- {
- 	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_START);
- 	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
--	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
-+	rtl_dash_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
- }
- 
- static void rtl8168_driver_start(struct rtl8169_private *tp)
-@@ -1338,7 +1361,7 @@ static void rtl8168_driver_start(struct rtl8169_private *tp)
- static void rtl8168dp_driver_stop(struct rtl8169_private *tp)
- {
- 	r8168dp_oob_notify(tp, OOB_CMD_DRIVER_STOP);
--	rtl_loop_wait_low(tp, &rtl_dp_ocp_read_cond, 10000, 10);
-+	rtl_dash_loop_wait_low(tp, &rtl_dp_ocp_read_cond, 10000, 10);
- }
- 
- static void rtl8168ep_driver_stop(struct rtl8169_private *tp)
-@@ -1346,7 +1369,7 @@ static void rtl8168ep_driver_stop(struct rtl8169_private *tp)
- 	rtl8168ep_stop_cmac(tp);
- 	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_STOP);
- 	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
--	rtl_loop_wait_low(tp, &rtl_ep_ocp_read_cond, 10000, 10);
-+	rtl_dash_loop_wait_low(tp, &rtl_ep_ocp_read_cond, 10000, 10);
- }
- 
- static void rtl8168_driver_stop(struct rtl8169_private *tp)
+This is good conversion, thanks for ensuring system_bh_highpri_wq is
+used here
 -- 
-2.40.1
-
+~Vinod
 
