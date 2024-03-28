@@ -1,190 +1,120 @@
-Return-Path: <netdev+bounces-82897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5744890209
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:38:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D27CC890218
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:40:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30B021F24F97
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:38:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EE1F1C2D981
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF15D127B66;
-	Thu, 28 Mar 2024 14:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0571272AC;
+	Thu, 28 Mar 2024 14:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="flsy+nfw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dFqzCQQS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27B64E1C9
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EB4823CB
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711636699; cv=none; b=doJPVI/5xeN3GaA6HXLJEdkyrxRyx6HCIx4x/5cWmqP5sJTOEMULLQ0C5GEWkGyAyBlB4tqnDA8VBWy1egQUvsNx6fN2mbjhZlzB8zSLdU/PdpLqzks7k25RxyXDQx0cOacOU+PbboJ8P1K7//G51hp1+Ds+rvyrCZ55GzI2gBQ=
+	t=1711636837; cv=none; b=BxP6D8JbRXNNKBdP7FUhtxA5beCtwtMoYsRlLDnRKYsRRLRiwg7sElIb8RDlVamiijvPAEdvggCRtQMCO9Mvqa7Y6g28ng5aWOfWTp11WpU0AprzobRlgkPIFjKKgDVWkmRKyck+SSZFtfss9EmGj2akSxgGLRPl/2dVt4Z9BEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711636699; c=relaxed/simple;
-	bh=Je2UAtEY68if5uMZucjTLmJZ569unNwJAEX8q4vFPRs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NHqgxrQGy/EEct9nDOe5froUBCnlOsBxYjFDJR4YPHOiFc0se76nYHvkzSajLBwEImte7/RhvOMpkp14ohuDUROisdufPCVuiaDBH0WgawGwXs/U/gNVLpHGU87egkoXIV+ZlzQxu4rup6WcGqloGOIROYoYvPdLM8uUFIKB62U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=flsy+nfw; arc=none smtp.client-ip=209.85.208.41
+	s=arc-20240116; t=1711636837; c=relaxed/simple;
+	bh=lkPaoKPzxidKcyPh03190AbRKW8zWrlysr29NJHk8qA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N3YbO9a56gdBJwjlqQVkKdujwjxQ2Jx3tOfKvEfhxIl9OrRrZd/IYZXtS5nT1D+fKHVANSq+Q4CimE8MEGhUwjiQO2AFYK4tx+kcXS0nxeW+lgvtHPpttWMDkb2Diznajzork/mY4xcL9vgbqU6JRnYy/jkMjsygcTDOatoK3Xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dFqzCQQS; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56c3689ad32so12313a12.0
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:38:16 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dd944567b6cso1364450276.2
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:40:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711636695; x=1712241495; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mBDqCwUo0BszO/p4vM05OTn+yRfN49/fU9/chw4uLSk=;
-        b=flsy+nfwkO1ZbK426PFd7YABXbLYkGaaW1V9v6akdpzEsaj61F1qk6RJlJbj1E3f/e
-         pjpAxK7JGumtfzg9aiYogJEtRiIrpMhVEDFriaIPxplEfDmAH8YnOGo3ivqJUysWLsoT
-         Yvipt4FUyeXFle4lCPKo4zyD0DAggUnhN5O7nEQKD6LF3d6BvY2O7ttL4g6LrMyWApJ1
-         sCAZIJL4c5bx6b0ZKZt6J15IxX0o9Bi16uxl6P/5DXPuQ/PimBn+DiQpQBWfAhIRa/Sm
-         N7bT6zSJ8qqZ6tOLedR/WHRz4Qv7VP5cvkvuK9efNsj2EtoH3k4aH5Yk8CNusCKnC4QA
-         rmHg==
+        d=google.com; s=20230601; t=1711636834; x=1712241634; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uzgF+TDCaR0KFcPaP54dKjTrgoQrZQDJnm0Od+se0Vk=;
+        b=dFqzCQQSziJzzDs/gx67BTYqx1+v3MVqOKbY7pX7CkiiUvSW50CST+eNdm9bcrnSx3
+         pHkHXf9vuvNWoK10CvHaQCl4aWOLXd/3gXGqRSF+L2IeC5STM2uld+nAd1u454LLZvWK
+         Ua7s0QJVCQuLUe9YSho/DPGW6s37FwPZM0LjgrO1mi3dtBVBHd4kNK6MgD65B8aukiq4
+         kBfOJulSNdOuIdJ1VgsYyjXyJ/qVRUqEcJblLndhM4dcJHs7Y4eFst4NipXHLEVgV4BW
+         Xw8W1Zk3lYFyfbeMvzLAHFc6LK1AI30Fy1Jw5XJCnr6lgG4mKDnh14nY6xwRCZHFWhkL
+         CsZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711636695; x=1712241495;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mBDqCwUo0BszO/p4vM05OTn+yRfN49/fU9/chw4uLSk=;
-        b=XraOUT1yOS0zq4tewvyIuFFKJC5fJXcbx5MRiPesQByXE7GqH4Uj/CwJ0MyC/rJXvJ
-         53Olwp78+WnnViIbqq8kkNgHhOFPmXu3s5N+KiN7iFxhBHJQ5r+d3dIiawKFJGmMY2Hv
-         NrPm9IUVVpNm314MrinG2R2Wvf0DhS+i8PExaX7VHKt2SOY2R7a2UdYndBsDGYQ9+SVi
-         jd1l9+aRHAuHT80FfRAhrORz8NG0X64oycToWeuZCVaMo5aRH+eygCIz2aAqp4h9bIt+
-         Wdjr/IP2/HkWAjAU2NXr6AXtt6f3kGpa6vuOGDAIs3trF4VoibwZFCyyd/b4CH13BDql
-         PUHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCcphJD4zbOEkvZMb7leElhXmeLGGwLEB5/g/kWlsEceiNlS82xB6B5qok/oeDbV0ndTbW6WYTTOv9+kMN0mjMfoecvNlK
-X-Gm-Message-State: AOJu0Yzft5uauy4IXEgSFcqbAnd+1MtbWyOAnS9VqwyKOcAUgbpKCoHb
-	H6F1loWn3L9XzCt87E3hO2AJLbUX5Q1fPEYHNwXAqo8CYFH65zRdnTltHjlNHOPwxv2jrAuPONR
-	E45A+i53oDxU1sSJZrfGdzUryQZN0onWNJkrg
-X-Google-Smtp-Source: AGHT+IFpCb+hAEMXqJRx+znyNHc29XT0UrNVUxB6VWgzCxHc/S/gsBG3CXhdt+RzMQsIPrDbBmYFcfOf8JEENWeNtM0=
-X-Received: by 2002:a50:bb21:0:b0:56c:18df:f9e1 with SMTP id
- y30-20020a50bb21000000b0056c18dff9e1mr142319ede.5.1711636695048; Thu, 28 Mar
- 2024 07:38:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711636834; x=1712241634;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uzgF+TDCaR0KFcPaP54dKjTrgoQrZQDJnm0Od+se0Vk=;
+        b=sy3A93U3lxH2ahlnPp6aNQN98QEHiOQk6t+yIJPNTKMq3QimeR5v2uKbZbg/udwvoR
+         4H/rWNCewQLeZOxhhNjgLtkAA/ttl7M0EZ81gSt1MHcBVqg2geXXHUejY16Zg/uhG1aa
+         Z0Xs70kQPyb85APoLbfDgX0HuAaCnURpxR9yAOy9HnNc8sd03jLc9TaLA4QnUpefioR8
+         zH1Qo0tJpTJnC0DsFNn5y4aK6AD0B53oS+sK5wXlCJeRQcpiu0B7KGdxLERqHPuE8WMw
+         QSpLR4thj1+AEE+vCAQVHJhBVNkZbe7Aqh5jy9QESvfGft0LWjnmdiAK7aBGSrUbCnQe
+         YlVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUx1APujjjhHNDQN18sDWM2PLHpxWhSoRRwtMx1YqNVNIoWvwCZhOoT1KwuUHU/NKdhk6L1sk6dCGXDMOdndnu/wt4YrKOg
+X-Gm-Message-State: AOJu0YyWymcbJu0/3wMmUNU7P9WLDcIs1gDs9EJGCLXaPy7XYdzBhzqo
+	N3VruhyKx/sEm4EhrTAgVOO9XY/agDoooZlmUQ5b2wD+SZxWeoHIMPz2gz9ivXLnl4rzCtmP/6g
+	05pMJleTt9w==
+X-Google-Smtp-Source: AGHT+IH4zdUY1XwgNdYfB+sWmIN55MJwAfZlxrWR68TK91mlUVVMpUbEXTDrrpwpyHj8Vf3CZWHP0MW576KdDg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1009:b0:dc6:b768:2994 with SMTP
+ id w9-20020a056902100900b00dc6b7682994mr216422ybt.0.1711636834439; Thu, 28
+ Mar 2024 07:40:34 -0700 (PDT)
+Date: Thu, 28 Mar 2024 14:40:28 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240328143051.1069575-1-arnd@kernel.org> <20240328143051.1069575-6-arnd@kernel.org>
-In-Reply-To: <20240328143051.1069575-6-arnd@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
+Message-ID: <20240328144032.1864988-1-edumazet@google.com>
+Subject: [PATCH net-next 0/4] udp: small changes on receive path
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 28 Mar 2024 15:38:03 +0100
-Message-ID: <CANn89i+3FuKc1RsYaciNe3uQMZuJBjSmvC_ueuQ=NaFVzEnyuA@mail.gmail.com>
-Subject: Re: [PATCH 5/9] ipv4: tcp_output: avoid warning about NET_ADD_STATS
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Dmitry Safonov <0x7f454c46@gmail.com>, 
-	Neal Cardwell <ncardwell@google.com>, "mfreemon@cloudflare.com" <mfreemon@cloudflare.com>, 
-	Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org, llvm@lists.linux.dev
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 28, 2024 at 3:31=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wro=
-te:
->
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> Clang warns about a range check in percpu_add_op() being impossible
-> to hit for an u8 variable:
->
-> net/ipv4/tcp_output.c:188:3: error: result of comparison of constant -1 w=
-ith expression of type 'u8' (aka 'unsigned char') is always false [-Werror,=
--Wtautological-constant-out-of-range-compare]
->                 NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPACKCOMPRESSED,
->                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> include/net/ip.h:291:41: note: expanded from macro 'NET_ADD_STATS'
->  #define NET_ADD_STATS(net, field, adnd) SNMP_ADD_STATS((net)->mib.net_st=
-atistics, field, adnd)
->                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~~~~~~~~~~~~
-> include/net/snmp.h:143:4: note: expanded from macro 'SNMP_ADD_STATS'
->                         this_cpu_add(mib->mibs[field], addend)
->                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> include/linux/percpu-defs.h:509:33: note: expanded from macro 'this_cpu_a=
-dd'
->  #define this_cpu_add(pcp, val)          __pcpu_size_call(this_cpu_add_, =
-pcp, val)
->                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
-> note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=3D=
-0 to see all)
-> <scratch space>:187:1: note: expanded from here
-> this_cpu_add_8
-> ^
-> arch/x86/include/asm/percpu.h:326:35: note: expanded from macro 'this_cpu=
-_add_8'
->  #define this_cpu_add_8(pcp, val)                percpu_add_op(8, volatil=
-e, (pcp), val)
->                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~~~~
-> arch/x86/include/asm/percpu.h:127:31: note: expanded from macro 'percpu_a=
-dd_op'
->                               ((val) =3D=3D 1 || (val) =3D=3D -1)) ?     =
-       \
->                                              ~~~~~ ^  ~~
->
+This series is based on an observation I made in UDP receive path.
 
-This seems like a bug in the macro or the compiler, because val is not
-a constant ?
+The sock_def_readable() costs are pretty high, especially when
+epoll is used to generate EPOLLIN events.
 
-__builtin_constant_p(val) should return false ???
+First patch annotates races on sk->sk_rcvbuf reads.
 
-+#define percpu_add_op(size, qual, var, val)                            \
-+do {                                                                   \
-+       const int pao_ID__ =3D (__builtin_constant_p(val) &&              \
-+                             ((val) =3D=3D 1 || (val) =3D=3D -1)) ?       =
-     \
-+                               (int)(val) : 0;                         \
-+       if (0) {                                                        \
-+               typeof(var) pao_tmp__;                                  \
-+               pao_tmp__ =3D (val);                                      \
-+               (void)pao_tmp__;                                        \
-+       }                                                               \
-+       if (pao_ID__ =3D=3D 1)                                             =
- \
-+               percpu_unary_op(size, qual, "inc", var);                \
-+       else if (pao_ID__ =3D=3D -1)                                       =
- \
-+               percpu_unary_op(size, qual, "dec", var);                \
-+       else                                                            \
-+               percpu_to_op(size, qual, "add", var, val);              \
-+} while (0)
-+
+Second patch replaces an atomic_add_return()
+ with a less expensive atomic_add()
 
+Third patch avoids calling sock_def_readable() when possible.
 
+Fourth patch adds sk_wake_async_rcu() to get better inlining
+and code generation.
 
-> Avoid this warning with a cast to a signed 'int'.
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  net/ipv4/tcp_output.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index e3167ad96567..dbe54fceee08 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -183,7 +183,7 @@ static inline void tcp_event_ack_sent(struct sock *sk=
-, u32 rcv_nxt)
->
->         if (unlikely(tp->compressed_ack)) {
->                 NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPACKCOMPRESSED,
-> -                             tp->compressed_ack);
-> +                             (int)tp->compressed_ack);
->                 tp->compressed_ack =3D 0;
->                 if (hrtimer_try_to_cancel(&tp->compressed_ack_timer) =3D=
-=3D 1)
->                         __sock_put(sk);
-> --
-> 2.39.2
->
+Eric Dumazet (4):
+  udp: annotate data-race in __udp_enqueue_schedule_skb()
+  udp: relax atomic operation on sk->sk_rmem_alloc
+  udp: avoid calling sock_def_readable() if possible
+  net: add sk_wake_async_rcu() helper
+
+ crypto/af_alg.c      |  4 ++--
+ include/net/sock.h   |  6 ++++++
+ net/atm/common.c     |  2 +-
+ net/core/sock.c      |  8 ++++----
+ net/dccp/output.c    |  2 +-
+ net/ipv4/udp.c       | 32 ++++++++++++++++++--------------
+ net/iucv/af_iucv.c   |  2 +-
+ net/rxrpc/af_rxrpc.c |  2 +-
+ net/sctp/socket.c    |  2 +-
+ net/smc/smc_rx.c     |  4 ++--
+ net/unix/af_unix.c   |  2 +-
+ 11 files changed, 38 insertions(+), 28 deletions(-)
+
+-- 
+2.44.0.396.g6e790dbe36-goog
+
 
