@@ -1,84 +1,73 @@
-Return-Path: <netdev+bounces-82802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C972988FCEF
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:25:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B57C88FD20
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8466D2994B5
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:25:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E69E2939D0
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 10:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158287BB17;
-	Thu, 28 Mar 2024 10:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AAC374EF;
+	Thu, 28 Mar 2024 10:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=holoscopio.com header.i=@holoscopio.com header.b="VPL5dvFP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZD/g23Ny"
 X-Original-To: netdev@vger.kernel.org
-Received: from grilo.cascardo.info (trem.minaslivre.org [195.201.110.149])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A450158239;
-	Thu, 28 Mar 2024 10:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.201.110.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4072561D;
+	Thu, 28 Mar 2024 10:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711621527; cv=none; b=e0EEfoW5ldWjXbijJhba8AAqA4A/J2MQQCCQZys8AC/tengKQBI5gtOCJSdoTSV+PWIqs1Xc71Yj/sDJav8qAjCwhF4gPRs1XEXqmjWzcyAzUZ2Rxysf65F1QIGvnKM9qgDrj1vHEIpzmajYC22Mvb8vL3C07jmrsEQ+H7+3kag=
+	t=1711622010; cv=none; b=RFMFQ5c9A6m1TdCAufv8wbnluR8IjZfchL0kDWQaoGb6U86vcGAnpjxzQ+zyWoiUgSLdbjPCYeoJjAx4t3tYqglHQwXrRQVHbIdcJ92gypCYWNYnHxmQFH8nUCj/rHZRTts3GuPgSihFZIHBLoMh8BFAxhX89OweblwFCfFBcmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711621527; c=relaxed/simple;
-	bh=d8qZMuxobQ9NQ+uTJ8eeu7ofwq5oepk3x8NbHvHajl8=;
+	s=arc-20240116; t=1711622010; c=relaxed/simple;
+	bh=iU1tUXhCDwyIc1WbR0eWG2uv/PUO2eklfA03DFfPGIA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UuapznrTWJdt2aBYklSCphdU0DDeLi+GAyC+a7uPgZEXnN0AF0hevmUpnZeKy8A+O0eHh3vmx5zu54X2vMk+ZKdPiJBM6+F+Lk8rvWsZ9Wa3Jqd8zdUaOZg+Js+OB2YWCNyuhCI6MUu2VNBpPHTNSO/0dWR7gp2WFVr6TWZ40Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holoscopio.com; spf=pass smtp.mailfrom=holoscopio.com; dkim=pass (2048-bit key) header.d=holoscopio.com header.i=@holoscopio.com header.b=VPL5dvFP; arc=none smtp.client-ip=195.201.110.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holoscopio.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=holoscopio.com
-Received: from siri.cascardo.eti.br (unknown [IPv6:2804:431:e7c5:1ab4:6a17:29ff:fe00:4f38])
-	by grilo.cascardo.info (Postfix) with ESMTPSA id D24D0206F1A;
-	Thu, 28 Mar 2024 07:25:02 -0300 (-03)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=holoscopio.com;
-	s=mail; t=1711621511;
-	bh=d8qZMuxobQ9NQ+uTJ8eeu7ofwq5oepk3x8NbHvHajl8=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=tKoNzmXcRY6LFDJHN8Q3TBaYl1WFqmy+OH9Wx5EJLmqxnrngDtB7+aGwoSuA2gBEafmi4NPuIvMqFTYAz9dMhYnk/cXOWHx+l/XmpqjiWv46p6h9G5atgbPmFBQIS+RlYpqHAD0eKkJevJDf+wjd3PLAbbE/xFzPrvG+YuJpB6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZD/g23Ny; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DFA3C433F1;
+	Thu, 28 Mar 2024 10:33:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711622009;
+	bh=iU1tUXhCDwyIc1WbR0eWG2uv/PUO2eklfA03DFfPGIA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VPL5dvFPC9/KvtZR7dhL29GCVfdBABB9ilSj2h62jCjgj3jNASCQmKccKddwNUR2u
-	 YsVTDl1IneRVDN1sl2i083vS8wXNrCVnJeOoACNhfDVrxV18sQ8S9BGenJczRpc0Be
-	 hohraa2sTtoUaUhF6GKan9BOWJJh9vKv40DsXWvSZ8CFpj1l2j2YugcG3nCrZSpzJf
-	 JfbYHtAZWZs34rq1Uaa4aI5+BoEcImc7aJd1GiXE1WUhnk4JeGzQjUFYCYDv3tgZLf
-	 OXY2vM83OKFEOE5Zt+d53o4HmJWd36MVVemcJCkR9kV1WBaVNfjBsxNUEWR4fE5V9u
-	 fdb8VgUNzIKZw==
-Date: Thu, 28 Mar 2024 07:24:59 -0300
-From: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	b=ZD/g23NyMfnrDXqG9nJ1YMij3C0sSLv35lOLM6I9BSJqsUT1hiiQARxtBH9p4W0Y8
+	 lZDNdqc3LZiWPsO0cjNC7pnKr+Xqrl3k1Iz8COAOHsXzy3CSDuPpVcUVvPxwJRf6TK
+	 1utgva25c83ZOhTWXEmEhXUcKIFKR3i1RdNQRSLnq9eew7CAwx/eXKSSSTNZVLGZIC
+	 cPYP+5y/+gLNIVN+mAfHD6OoVfPo2SZVcNeWPNC02XTBC9UAVMxjVh63OnAXqOJqkA
+	 0D9ooBcZ7VJHzgYyQK7yLksLvjfR96ZtgUyPElsmjRNdRYA6g6jb4DNgUqixVSN762
+	 QkJoOvn5zIdKg==
+Date: Thu, 28 Mar 2024 10:33:22 +0000
+From: Simon Horman <horms@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Corentin Chary <corentin.chary@gmail.com>,
-	"Luke D. Jones" <luke@ljones.dev>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Daniel Oliveira Nascimento <don@syst.com.br>,
-	Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>,
-	Matan Ziv-Av <matan@svgalib.org>,
-	Mattia Dongili <malattia@linux.it>,
-	Azael Avalos <coproscefalo@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jeff Sipek <jsipek@vmware.com>, Ajay Kaher <akaher@vmware.com>,
-	Alexey Makhalov <amakhalov@vmware.com>,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	acpica-devel@lists.linux.dev, linux-input@vger.kernel.org,
-	netdev@vger.kernel.org, chrome-platform@lists.linux.dev,
-	platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 06/19] platform: classmate-laptop: drop owner assignment
-Message-ID: <ZgVFe4MRgQNZW4WM@siri.cascardo.eti.br>
-References: <20240327-b4-module-owner-acpi-v1-0-725241a2d224@linaro.org>
- <20240327-b4-module-owner-acpi-v1-6-725241a2d224@linaro.org>
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 10/17] net: pse-pd: Add support for PSE PIs
+Message-ID: <20240328103322.GX403975@kernel.org>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-10-c1011b6ea1cb@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,65 +76,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240327-b4-module-owner-acpi-v1-6-725241a2d224@linaro.org>
+In-Reply-To: <20240326-feature_poe-v6-10-c1011b6ea1cb@bootlin.com>
 
-On Wed, Mar 27, 2024 at 08:43:53AM +0100, Krzysztof Kozlowski wrote:
-> ACPI bus core already sets the .owner, so driver does not need to.
+On Tue, Mar 26, 2024 at 03:04:47PM +0100, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> The Power Sourcing Equipment Power Interface (PSE PI) plays a pivotal role
+> in the architecture of Power over Ethernet (PoE) systems. It is essentially
+> a blueprint that outlines how one or multiple power sources are connected
+> to the eight-pin modular jack, commonly known as the Ethernet RJ45 port.
+> This connection scheme is crucial for enabling the delivery of power
+> alongside data over Ethernet cables.
+> 
+> This patch adds support for getting the PSE controller node through PSE PI
+> device subnode.
+> 
+> This supports adds a way to get the PSE PI id from the pse_pi devicetree
+> subnode of a PSE controller node simply by reading the reg property.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Acked-by: Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>
+Hi Kory,
 
-> ---
->  drivers/platform/x86/classmate-laptop.c | 5 -----
->  1 file changed, 5 deletions(-)
-> 
-> diff --git a/drivers/platform/x86/classmate-laptop.c b/drivers/platform/x86/classmate-laptop.c
-> index 2edaea2492df..87462e7c6219 100644
-> --- a/drivers/platform/x86/classmate-laptop.c
-> +++ b/drivers/platform/x86/classmate-laptop.c
-> @@ -434,7 +434,6 @@ static const struct acpi_device_id cmpc_accel_device_ids_v4[] = {
+Some minor documentation nits from my side.
+
+> diff --git a/Documentation/networking/pse-pd/pse-pi.rst b/Documentation/networking/pse-pd/pse-pi.rst
+
+...
+
+> +Table 145\u20133\u2014PSE Pinout Alternatives
+> +-----------------------------------
+
+When running make htmldocs I see the following warning:
+
+Table 145\u20133\u2014PSE Pinout Alternatives
+
+And the header is rendered as:
+
+Table 145u20133u2014PSE Pinout Alternatives
+
+I'm assuming my version of Sphinx doesn't understand the use
+of escape sequences for unicode characters here.
+
+I have observed this with (I assume this is the relevant command):
+
+$ sphinx-build --version
+sphinx-build 7.2.6
+
+$ sphinx-build --version
+sphinx-build 6.2.1
+
+...
+
+> diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+
+...
+
+>  /**
+> - * of_pse_zero_xlate - dummy function for controllers with one only control
+> - * @pcdev: a pointer to the PSE controller device
+> - * @pse_spec: PSE line specifier as found in the device tree
+> - *
+> - * This static translation function is used by default if of_xlate in
+> - * :c:type:`pse_controller_dev` is not set. It is useful for all PSE
+> - * controllers with #pse-cells = <0>.
+> + * of_load_pse_pi_pairset - load PSE PI pairsets pinout and polarity
+
+nit: of_load_pse_pi_pairsets
+
+> + * @node: a pointer of the device node
+> + * @pi: a pointer of the PSE PI to fill
+> + * @npairsets: the number of pairsets (1 or 2) used by the PI
+>   */
+> -static int of_pse_zero_xlate(struct pse_controller_dev *pcdev,
+> -			     const struct of_phandle_args *pse_spec)
+> +static int of_load_pse_pi_pairsets(struct device_node *node,
+> +				   struct pse_pi *pi,
+> +				   int npairsets)
+
+...
+
+> diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+
+...
+
+> @@ -73,11 +103,11 @@ struct pse_control;
+>   * @pse_control_head: head of internal list of requested PSE controls
+>   * @dev: corresponding driver model device struct
+>   * @of_pse_n_cells: number of cells in PSE line specifiers
+> - * @of_xlate: translation function to translate from specifier as found in the
+> - *            device tree to id as given to the PSE control ops
+>   * @nr_lines: number of PSE controls in this controller device
+>   * @lock: Mutex for serialization access to the PSE controller
+>   * @types: types of the PSE controller
+> + * @pi: table of PSE PIs described in this controller device
+> + * @of_legacy: flag set if the pse_pis devicetree node is not used
+
+nit: it looks line the documentation didn't keep up with the
+     structure during development: @no_of_pse_pi should be
+     documented instead of @of_legacy.
+
+>   */
+>  struct pse_controller_dev {
+>  	const struct pse_controller_ops *ops;
+> @@ -86,11 +116,11 @@ struct pse_controller_dev {
+>  	struct list_head pse_control_head;
+>  	struct device *dev;
+>  	int of_pse_n_cells;
+> -	int (*of_xlate)(struct pse_controller_dev *pcdev,
+> -			const struct of_phandle_args *pse_spec);
+>  	unsigned int nr_lines;
+>  	struct mutex lock;
+>  	enum ethtool_pse_types types;
+> +	struct pse_pi *pi;
+> +	bool no_of_pse_pi;
 >  };
->  
->  static struct acpi_driver cmpc_accel_acpi_driver_v4 = {
-> -	.owner = THIS_MODULE,
->  	.name = "cmpc_accel_v4",
->  	.class = "cmpc_accel_v4",
->  	.ids = cmpc_accel_device_ids_v4,
-> @@ -660,7 +659,6 @@ static const struct acpi_device_id cmpc_accel_device_ids[] = {
->  };
->  
->  static struct acpi_driver cmpc_accel_acpi_driver = {
-> -	.owner = THIS_MODULE,
->  	.name = "cmpc_accel",
->  	.class = "cmpc_accel",
->  	.ids = cmpc_accel_device_ids,
-> @@ -754,7 +752,6 @@ static const struct acpi_device_id cmpc_tablet_device_ids[] = {
->  };
->  
->  static struct acpi_driver cmpc_tablet_acpi_driver = {
-> -	.owner = THIS_MODULE,
->  	.name = "cmpc_tablet",
->  	.class = "cmpc_tablet",
->  	.ids = cmpc_tablet_device_ids,
-> @@ -996,7 +993,6 @@ static const struct acpi_device_id cmpc_ipml_device_ids[] = {
->  };
->  
->  static struct acpi_driver cmpc_ipml_acpi_driver = {
-> -	.owner = THIS_MODULE,
->  	.name = "cmpc",
->  	.class = "cmpc",
->  	.ids = cmpc_ipml_device_ids,
-> @@ -1064,7 +1060,6 @@ static const struct acpi_device_id cmpc_keys_device_ids[] = {
->  };
->  
->  static struct acpi_driver cmpc_keys_acpi_driver = {
-> -	.owner = THIS_MODULE,
->  	.name = "cmpc_keys",
->  	.class = "cmpc_keys",
->  	.ids = cmpc_keys_device_ids,
-> 
-> -- 
-> 2.34.1
-> 
+
+...
 
