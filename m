@@ -1,247 +1,122 @@
-Return-Path: <netdev+bounces-82688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D1188F32B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 00:27:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15E8A88F365
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:05:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4ECA2A76EB
-	for <lists+netdev@lfdr.de>; Wed, 27 Mar 2024 23:27:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F9011C20F62
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 00:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDE8152168;
-	Wed, 27 Mar 2024 23:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A1118D;
+	Thu, 28 Mar 2024 00:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4jzFoeV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB0715099E
-	for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 23:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82F317E
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 00:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711582041; cv=none; b=ax/oXLc2d2Z1G9s+PsAugbWYWRJw5/mzYzCSG4am42BopbVe7vOYNpJp/x5d3wkrce4E4S6xTm5t8JpLYFi1XrmA3f7/7toQhiLxfgqMvRrXFWpX/P5sG9a2k5EOJP0ndDrlZc5J1L3eFLSn4y1HDFFfYva1jDGlHK754slJ/og=
+	t=1711584309; cv=none; b=uWRHm6h4vOzUAjQ3E85NC0v10rbimxYm/AWxLHHJgIU/vG4qBhBNNDBaoSvPybmLeaA2e383BGSQO99xmD23Vp1p4I1wo5bfxwhq9lvGi9xbJv8plHGYKNyIfMcZUU3/GcvLohHJPyoDH+PeHQcrlSDzpUanXniCoD7bDKU2lYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711582041; c=relaxed/simple;
-	bh=9iqRHXiosXnDRM27eD9CCRzZXsl0KVBbmd3Fx6Tf4PI=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=C6Wfk4hUe7RU7PoKaybLo3FK3q1yNz401CdU3ERVLKdba+LDHJ4xiMjAAdBTTuY/YYACR7TcVmk7VTA8VKFLgY3gXcJi+zC8EmgxFs5muSyDv2HHCvYbotg/h80jtqqxeYLPQQRTFQbPBv76eIKgCldAg7EsFC1IJBgeSiGln+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7cbef888187so29996839f.2
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 16:27:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711582039; x=1712186839;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zn+nNCI3Y9vT/+kIQMpjFCCQ/Pi1LaMfpKeNn5LCWpQ=;
-        b=Q2ipi8zFZWR2GVuoOOui8XwVU/agpz5/wxgwSl3mWItjOCUPiOusOCAD7RBHWJYiKz
-         VVL/0YB8JtSpxT1iGeGvXxlJTv2o4wbOCGqVsqd4QJh86E0fQo81hVwoiSujFKR4dP6P
-         f5cO0nfwiWqA5qC0dh+44lVqX0EblTWK/nhtU3EIHERG70tlOLxEJJ2msYmgqziwKFFB
-         PRXYQYmpZrqJivzSYSZirJ1LDX7iXdFSb6rHQf+kJmhus422lVmnG7Y/vFDcVh8OLPpA
-         tETJyFcOllncC/Kz1IWeihCCXYgiDniVhO1f90N0ErRfqcWjHZRfSuqVq50vm/8+Bpk5
-         p/YA==
-X-Forwarded-Encrypted: i=1; AJvYcCXHjp7beQN+ZQAAW2uNmeDDmUhtw4qjW9pkbj8K+DAjqETusWsn+NyDPSE/Z5AyzbwK+F8j7BKB/iQz6xLkfW0ZPIh1A9qt
-X-Gm-Message-State: AOJu0YzRCrSvN/liBatTw4lm1+z7f1ODMHQWIf0NUFza2QjeMnVdpzWh
-	/bkmv9Wi14PxM7OSyahF+k+aoCUWtiaf133YaXWzlqp2CFIE4NxKJZJvJ5umykDcFqYQq2JVH57
-	uVhBPxp5bblofRa0lNeC/Ft+1rfcnp+U31QlPjHiL61p6l+f0yH2INTU=
-X-Google-Smtp-Source: AGHT+IERbwZ4BLxARkUTyCkw4tqyzqdnMHsmqp2Zl+5+j/uvscpy2nMCHuAzBLQg7xTuCLPTapCsdk40HAFIfHGwvHNnMs9rZ7oO
+	s=arc-20240116; t=1711584309; c=relaxed/simple;
+	bh=QfXzi0YNDFsvO8OTu50pvn3hzJPM8ReXHZFLA98loos=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=gUQJ8Y07eVjOq6rZVfgD3wS7Cie+h3ocTWgsW8NYccWdWtLAbm3UZqzFUQ7GasYuYUndYdhoT2YHWbkqcSrYbJvINDHNEV8Ko6feb9pmakmtU9oAqaEQ2rVxpvquNE63UHo90UEr0FJOYAk2WyqBSMVtlU/cFpZLJKx6JDvryXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D4jzFoeV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711584306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=RNzpMpe3zjcO2rv2cPTPhLNPeQGeEirCU3wKPzNxR/w=;
+	b=D4jzFoeVvjW0zJqxm/KOvqTIjObxnpHXYAtdEKiVrX8j4LZ7iwEAFHveTPH3XttGUNvalk
+	Kk/fHS6XWD25PUsB7tLdk34LZQDzqYALMogf3fI1iodE51o+C0RKv/PHeYrD3ovWisvlaK
+	YdsAUfJAHuIdB8YjIdpiXyicIrv4qQI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-vcdqGxDSOqaFiXMEOj8Klw-1; Wed, 27 Mar 2024 20:05:03 -0400
+X-MC-Unique: vcdqGxDSOqaFiXMEOj8Klw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D78AF185A783;
+	Thu, 28 Mar 2024 00:05:02 +0000 (UTC)
+Received: from tpad.localdomain (unknown [10.96.133.2])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AA3FC17AA0;
+	Thu, 28 Mar 2024 00:05:02 +0000 (UTC)
+Received: by tpad.localdomain (Postfix, from userid 1000)
+	id 48F7842125D75; Wed, 27 Mar 2024 21:02:13 -0300 (-03)
+Date: Wed, 27 Mar 2024 21:02:13 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next -v6] net: enable timestamp static key if CPU
+ isolation is configured
+Message-ID: <ZgSzhZBJSUyme1Lk@tpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2415:b0:47c:12e6:7d13 with SMTP id
- z21-20020a056638241500b0047c12e67d13mr38284jat.5.1711582039071; Wed, 27 Mar
- 2024 16:27:19 -0700 (PDT)
-Date: Wed, 27 Mar 2024 16:27:19 -0700
-In-Reply-To: <000000000000f2f0c0061494e610@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000716bb60614acbf37@google.com>
-Subject: Re: [syzbot] [bpf?] possible deadlock in kvfree_call_rcu
-From: syzbot <syzbot+1fa663a2100308ab6eab@syzkaller.appspotmail.com>
-To: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, 
-	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
-	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, paulmck@kernel.org, rcu@vger.kernel.org, 
-	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	urezki@gmail.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-
-syzbot has found a reproducer for the following issue on:
-
-HEAD commit:    443574b03387 riscv, bpf: Fix kfunc parameters incompatibil..
-git tree:       bpf
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=146398f9180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=1fa663a2100308ab6eab
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12055cc6180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ca53c9180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3f355021a085/disk-443574b0.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/44cf4de7472a/vmlinux-443574b0.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a99a36c7ad65/bzImage-443574b0.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1fa663a2100308ab6eab@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.8.0-syzkaller-05236-g443574b03387 #0 Not tainted
-------------------------------------------------------
-syz-executor271/5074 is trying to acquire lock:
-ffff8880b9529470 (krc.lock){....}-{2:2}, at: krc_this_cpu_lock kernel/rcu/tree.c:2960 [inline]
-ffff8880b9529470 (krc.lock){....}-{2:2}, at: add_ptr_to_bulk_krc_lock kernel/rcu/tree.c:3359 [inline]
-ffff8880b9529470 (krc.lock){....}-{2:2}, at: kvfree_call_rcu+0x18a/0x790 kernel/rcu/tree.c:3444
-
-but task is already holding lock:
-ffff888029e171f8 (&trie->lock){-...}-{2:2}, at: trie_update_elem+0xcb/0xc10 kernel/bpf/lpm_trie.c:324
-
-which lock already depends on the new lock.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
 
-the existing dependency chain (in reverse order) is:
+For systems that use CPU isolation (via nohz_full), creating or destroying
+a socket with SO_TIMESTAMP, SO_TIMESTAMPNS or SO_TIMESTAMPING with flag
+SOF_TIMESTAMPING_RX_SOFTWARE will cause a static key to be enabled/disabled.
+This in turn causes undesired IPIs to isolated CPUs.
 
--> #2 (&trie->lock){-...}-{2:2}:
-       lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       trie_delete_elem+0x96/0x6a0 kernel/bpf/lpm_trie.c:451
-       bpf_prog_2c29ac5cdc6b1842+0x42/0x46
-       bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-       __bpf_prog_run include/linux/filter.h:657 [inline]
-       bpf_prog_run include/linux/filter.h:664 [inline]
-       __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-       bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
-       trace_hrtimer_start include/trace/events/timer.h:222 [inline]
-       debug_activate kernel/time/hrtimer.c:479 [inline]
-       enqueue_hrtimer+0x335/0x3a0 kernel/time/hrtimer.c:1090
-       __hrtimer_start_range_ns kernel/time/hrtimer.c:1265 [inline]
-       hrtimer_start_range_ns+0xaa0/0xc60 kernel/time/hrtimer.c:1305
-       hrtimer_start_expires include/linux/hrtimer.h:289 [inline]
-       hrtimer_sleeper_start_expires kernel/time/hrtimer.c:1972 [inline]
-       schedule_hrtimeout_range_clock+0x277/0x480 kernel/time/hrtimer.c:2309
-       poll_schedule_timeout fs/select.c:244 [inline]
-       do_poll fs/select.c:965 [inline]
-       do_sys_poll+0xe40/0x1330 fs/select.c:1016
-       __do_sys_ppoll fs/select.c:1122 [inline]
-       __se_sys_ppoll+0x2a0/0x330 fs/select.c:1102
-       do_syscall_64+0xfb/0x240
-       entry_SYSCALL_64_after_hwframe+0x6d/0x75
+So enable the static key unconditionally, if CPU isolation is enabled,
+thus avoiding the IPIs.
 
--> #1 (hrtimer_bases.lock){-.-.}-{2:2}:
-       lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       lock_hrtimer_base kernel/time/hrtimer.c:175 [inline]
-       hrtimer_start_range_ns+0xdf/0xc60 kernel/time/hrtimer.c:1303
-       hrtimer_start include/linux/hrtimer.h:275 [inline]
-       run_page_cache_worker kernel/rcu/tree.c:3341 [inline]
-       kvfree_call_rcu+0x5e6/0x790 kernel/rcu/tree.c:3446
-       rtnl_register_internal+0x482/0x590 net/core/rtnetlink.c:265
-       rtnl_register+0x36/0x80 net/core/rtnetlink.c:315
-       ip_rt_init+0x2f5/0x3a0 net/ipv4/route.c:3719
-       ip_init+0xe/0x20 net/ipv4/ip_output.c:1664
-       inet_init+0x3d8/0x580 net/ipv4/af_inet.c:2022
-       do_one_initcall+0x238/0x830 init/main.c:1241
-       do_initcall_level+0x157/0x210 init/main.c:1303
-       do_initcalls+0x3f/0x80 init/main.c:1319
-       kernel_init_freeable+0x435/0x5d0 init/main.c:1557
-       kernel_init+0x1d/0x2a0 init/main.c:1446
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
--> #0 (krc.lock){....}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-       krc_this_cpu_lock kernel/rcu/tree.c:2960 [inline]
-       add_ptr_to_bulk_krc_lock kernel/rcu/tree.c:3359 [inline]
-       kvfree_call_rcu+0x18a/0x790 kernel/rcu/tree.c:3444
-       trie_update_elem+0x819/0xc10 kernel/bpf/lpm_trie.c:385
-       bpf_map_update_value+0x4d3/0x540 kernel/bpf/syscall.c:203
-       generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1876
-       bpf_map_do_batch+0x3e0/0x690 kernel/bpf/syscall.c:5145
-       __sys_bpf+0x377/0x810
-       __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
-       __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
-       __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
-       do_syscall_64+0xfb/0x240
-       entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-other info that might help us debug this:
-
-Chain exists of:
-  krc.lock --> hrtimer_bases.lock --> &trie->lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&trie->lock);
-                               lock(hrtimer_bases.lock);
-                               lock(&trie->lock);
-  lock(krc.lock);
-
- *** DEADLOCK ***
-
-2 locks held by syz-executor271/5074:
- #0: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #0: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #0: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: bpf_map_update_value+0x3c4/0x540 kernel/bpf/syscall.c:202
- #1: ffff888029e171f8 (&trie->lock){-...}-{2:2}, at: trie_update_elem+0xcb/0xc10 kernel/bpf/lpm_trie.c:324
-
-stack backtrace:
-CPU: 1 PID: 5074 Comm: syz-executor271 Not tainted 6.8.0-syzkaller-05236-g443574b03387 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
- krc_this_cpu_lock kernel/rcu/tree.c:2960 [inline]
- add_ptr_to_bulk_krc_lock kernel/rcu/tree.c:3359 [inline]
- kvfree_call_rcu+0x18a/0x790 kernel/rcu/tree.c:3444
- trie_update_elem+0x819/0xc10 kernel/bpf/lpm_trie.c:385
- bpf_map_update_value+0x4d3/0x540 kernel/bpf/syscall.c:203
- generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1876
- bpf_map_do_batch+0x3e0/0x690 kernel/bpf/syscall.c:5145
- __sys_bpf+0x377/0x810
- __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f485af3c8e9
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc5f419378 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007ffc5f419548 RCX: 00007f485af3c8e9
-RDX: 0000000000000038 RSI: 0000000020000000 RDI: 000000000000001a
-RBP: 00007f485afaf610 R08: 00007ffc5f419548 R09: 00007ffc5f419548
-R10: 00007ffc5f419548 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffc5f419538 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+v2: mention SOF_TIMESTAMPING_OPT_TX_SWHW in the commit log (Willem de Bruijn / Paolo Abeni)
+v3: SOF_TIMESTAMPING_OPT_TX_SWHW is irrelevant (Willem de Bruijn)
+v4: additional changelog improvements (Willem de Bruijn)
+v5: late initcall not necessary, can use subsys initcall (Willem de Bruijn)
+v6: rebase against net-next, change subject (Jakub Kicinski)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 5d36a634f468..48c725caa130 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -157,6 +157,7 @@
+ #include <net/page_pool/types.h>
+ #include <net/page_pool/helpers.h>
+ #include <net/rps.h>
++#include <linux/sched/isolation.h>
+ 
+ #include "dev.h"
+ #include "net-sysfs.h"
+@@ -11890,6 +11891,10 @@ static int __init net_dev_init(void)
+ 				       NULL, dev_cpu_dead);
+ 	WARN_ON(rc < 0);
+ 	rc = 0;
++
++	/* avoid static key IPIs to isolated CPUs */
++	if (housekeeping_enabled(HK_TYPE_MISC))
++		net_enable_timestamp();
+ out:
+ 	if (rc < 0) {
+ 		for_each_possible_cpu(i) {
+
 
