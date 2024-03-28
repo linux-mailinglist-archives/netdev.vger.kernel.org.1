@@ -1,84 +1,85 @@
-Return-Path: <netdev+bounces-82922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ADB5890325
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:35:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B9D7890326
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 16:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB6891F237AF
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:35:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE3A2293550
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D42F12FB0E;
-	Thu, 28 Mar 2024 15:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28C712FB37;
+	Thu, 28 Mar 2024 15:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJEcU8lu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJbRTXkc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53727E583
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 15:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE44E12FB03
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 15:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711640121; cv=none; b=aO63pnLlSTR0QouGE71q0I7guMbXxR3M2ZPM0RMPin0wWQx1l54jMaB9gyZrf385Ol/oQWvfkVknqD202cn2ezhBB20ZKKlx4tRRQeH8cx/WT5RQyMY7iFNUr64jOfhq0o88WGLZzc4ANO7++F8qn4gp/q4GNlItzmJt08ckFZA=
+	t=1711640122; cv=none; b=IrOiWD/MyMFCrD8QV0h9zUMALqH0ATVEf2Tg3m99yLGMgKVt6QRVrSBO/sx45KVmr1ig02RMQNtgVkR/jcJK2blo99Bg+fdUaZYchf55o32pFuh3BmjNHlgf127+29oBJ+56cjOC0a1QCPV4fSzUmcuM1p8z1Cog8eHpNZCEIIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711640121; c=relaxed/simple;
-	bh=fMfv3Ld49PT/HPbhLI9/A8ixSk9a/riZ8jLDrVurFo8=;
+	s=arc-20240116; t=1711640122; c=relaxed/simple;
+	bh=wx7WG5GbsCTYhf3900yH3LirB2/rt1lI45ZHHP/hzl4=;
 	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=bcM51I/XdugoQ0lSdJmsICCzyZi3M0y8ljoQxzrD4k9hIZbc//BnivoXRzS2Riow09h8iltBRWZdTRLgPYqAITyNa6zaGTpz96C6DFGj5OzZ4FON/wEtUw6o6Jigd0lJh+ivI3bDPrmxvz7lYRYbItfMEpPihNGK/S7V/5gI0ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJEcU8lu; arc=none smtp.client-ip=209.85.221.41
+	 MIME-Version:Content-Type; b=Kvpj2I3aW+pF8jo5VWzuFTquPCP63f20XbqFijQmH7gOhqrlYuafE7YsMBHe+KBpjWespqJ6+dxJweKT2XkdYytUc1bA9w4Wy0mkU+nxxBRD+T1Wz8q3tXnfg9a8V3MxezJ3UZxSnEjO2khF/GzOkRUoJEG/UvAfP52ifJAhr5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DJbRTXkc; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33ed4dd8659so1424054f8f.0
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 08:35:19 -0700 (PDT)
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d23114b19dso14772321fa.3
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 08:35:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711640118; x=1712244918; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711640119; x=1712244919; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JiRuc0mfwQVa6ovRxTK/A6HN16gXj4h6RMICJd+5hjM=;
-        b=aJEcU8luo+YE3ly2W/ZxMmjtg8Jf48qg2SoZLUVKGa52aBYqEKMooaei+S34hR3ZFi
-         Tu7NfuPAE1YwqKzfSmUWa/iXLdgAZ9t23rGkpK1bwPNqco4RlDkJ7dxbrjTPCgxVfpvh
-         +s2/R2VWj+fFMztMsAW3GDyT69V6MO63lFd6slDK5BLA25eVLHuqnLyQd3SX9exDn/NU
-         uoHLcqAqyLe2aa7+c7+5AXiCLSCdnAC7CZrjO59OKbbkmrstRUkpjFKs32b8yU0p8PjL
-         q2+v3Lr/sFVhwAaNsiEgn00c1o30oQyT3lvc2zseugoAtEx0OtCx1J/UQ0bvKLgbm/sw
-         JURw==
+        bh=wx7WG5GbsCTYhf3900yH3LirB2/rt1lI45ZHHP/hzl4=;
+        b=DJbRTXkcDmCiuQ4Gri+BTiyQ4q/Gq8lt8DQJ18b3si2x8ho98t1skXvkI+d70HYpGm
+         aJn0WFz+nh/k2Kbf6YSP42Wgs5YOr+yiEAjiEYaO6b1GvmpdXn4JDoI9JQ2KzQxY4e6r
+         h53WntUH/WCbM4NjT1nCkCYlUxrIKKUvJar2AYnffVBqYA1l/+qOWoax4LDdkANdAQfx
+         UA/he8MlTQRoAPfajzLwBBVj9xVQk4yqM2hMx7V3H7dQIqwRg/cPXjC+KisrDFTGH0GA
+         tcUzhu9ZSCKH9m9V2uy1vne45G0VwRP4whUczpAW/V6vLHJ83ef0tb4Cc3+5nsXg2uAg
+         GuGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711640118; x=1712244918;
+        d=1e100.net; s=20230601; t=1711640119; x=1712244919;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JiRuc0mfwQVa6ovRxTK/A6HN16gXj4h6RMICJd+5hjM=;
-        b=HrXJv/pqpaiTFvmn56TLKNsmrau9GPJRPGpiQGAYBtSyr9cL5joaDlA9ryJ3HwImmM
-         A+q7oZrvTYfhcw1o3QpVVXsEkHo99w9EKrCSH4p0opTgJ0tZmGFF7GMTTd53omJ4yagX
-         4vmrGrWfMlcxTIpcyErGmU8N2Ir4x2G6Tulk+QQUNcjEFDc1DFFnGOsBSTixrT8GmyGW
-         KGD/jl51WWf56GVvh7VfIDVg3NuJ/FCWY9EFUyE10TqoFTD/wUUONOXnYEgWY+yRAFNw
-         /ROom8onH4XAj3aLT3X2RNacXHkFBFbCfTT4qLUynyHY4SyQrpajoLIpul9VDDl24k85
-         GoxA==
-X-Gm-Message-State: AOJu0YydQq7Lsl8Hsjwk3wFGi3ZaoEc9tqbqtXWZc0k4gRWG50x4DLzS
-	aqV63DSEhkPwndDgV0VIbhwQ58Oc4jJJZ9Q17whaOVlAjIjfyTpz
-X-Google-Smtp-Source: AGHT+IEbSyv32iBGqoKwrAFYPGlxKvxWMWH2gw5BE93KCXKcKTytLafnLmpheJbPUL7jRRl2YBb36Q==
-X-Received: by 2002:a5d:4583:0:b0:343:35b5:240 with SMTP id p3-20020a5d4583000000b0034335b50240mr125415wrq.29.1711640117808;
-        Thu, 28 Mar 2024 08:35:17 -0700 (PDT)
+        bh=wx7WG5GbsCTYhf3900yH3LirB2/rt1lI45ZHHP/hzl4=;
+        b=qbznI9CsAiTiUq9MQaIyUq2XOITXw/eXitVWm8z5RvT1BX1WSMnNyZkg4YOXzlOKSD
+         fwzTJgFoxy8+nFZtrrp0qv8BzR6foWZVTVe6B8O02lxjdhyvD1VYTeONHdjROn1QBBGH
+         MTRH3wNyvZ1uYNVvDvV3GbGul7lfgSiqcuI90PO8Ou/z/P8KPTHnEWIeGMyF0sA++MVT
+         0BnWP41bXWdU4dfQupB0VvwURa8otpQUkvesavwL7PU4g+uHZmIjwo7UL/AjIXR7WVj3
+         4yAZOjmjaDLO62xggQnwzkkWpV2dYDkiB4jMjUvEa/eq0p3tiI42z9EMCss8FME4UQwL
+         z4LQ==
+X-Gm-Message-State: AOJu0Yw+WwU1n5pgTxpYwquzZQwY5cWK/Lym6XgJ28lklwEsR0RpUJdA
+	kMpZUvKPsD1yu2jHwpSIMxfXG+7p8iT7Hs4OOnkZZRyxPznzvtMT
+X-Google-Smtp-Source: AGHT+IFfkJeeQUh07kuRzzM/4d1OYVoHJbh/f34K1D1WXi/FBdgoBPMvW/35hel65Nx9qk9jxsB3AA==
+X-Received: by 2002:a05:651c:a07:b0:2d4:522e:62f3 with SMTP id k7-20020a05651c0a0700b002d4522e62f3mr2532975ljq.44.1711640119144;
+        Thu, 28 Mar 2024 08:35:19 -0700 (PDT)
 Received: from imac ([2a02:8010:60a0:0:7530:d5b0:adf6:d5c5])
-        by smtp.gmail.com with ESMTPSA id g1-20020adfa481000000b00341e7e52802sm2040302wrb.92.2024.03.28.08.35.16
+        by smtp.gmail.com with ESMTPSA id h16-20020adff4d0000000b0033e72e104c5sm2021811wrp.34.2024.03.28.08.35.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 08:35:17 -0700 (PDT)
+        Thu, 28 Mar 2024 08:35:18 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jiri
- Pirko <jiri@resnulli.us>,  Jacob Keller <jacob.e.keller@intel.com>,
-  Stanislav Fomichev <sdf@google.com>,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1] tools/net/ynl: Add extack policy attribute
- decoding
-In-Reply-To: <20240327174731.6933ed21@kernel.org> (Jakub Kicinski's message of
-	"Wed, 27 Mar 2024 17:47:31 -0700")
-Date: Thu, 28 Mar 2024 15:32:04 +0000
-Message-ID: <m2sf0ajrt7.fsf@gmail.com>
-References: <20240327160302.69378-1-donald.hunter@gmail.com>
-	<20240327174731.6933ed21@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo
+ Abeni <pabeni@redhat.com>,  Jiri Pirko <jiri@resnulli.us>,  Jacob Keller
+ <jacob.e.keller@intel.com>,  Stanislav Fomichev <sdf@google.com>,
+  donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1 0/2] netlink: Add nftables spec w/ multi
+ messages
+In-Reply-To: <ZgShpYf158Yc7ivH@calendula> (Pablo Neira Ayuso's message of
+	"Wed, 27 Mar 2024 23:45:57 +0100")
+Date: Thu, 28 Mar 2024 15:33:43 +0000
+Message-ID: <m2o7ayjrqg.fsf@gmail.com>
+References: <20240327181700.77940-1-donald.hunter@gmail.com>
+	<ZgShpYf158Yc7ivH@calendula>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -88,59 +89,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Pablo Neira Ayuso <pablo@netfilter.org> writes:
 
-> On Wed, 27 Mar 2024 16:03:02 +0000 Donald Hunter wrote:
->
-> Nice!
->
-> Some optional comments below...
->
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_VALUE_S:
->> +                policy['min-value-s'] = attr.as_scalar('s64')
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_VALUE_S:
->> +                policy['max-value-s'] = attr.as_scalar('s64')
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_VALUE_U:
->> +                policy['min-value-u'] = attr.as_scalar('u64')
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_VALUE_U:
->> +                policy['max-value-u'] = attr.as_scalar('u64')
->
-> I think the signed / unsigned thing is primarily so that decode knows
-> if its s64 or u64. Is it useful for the person seeing the decoded
-> extack whether max was signed or unsigned?
->
-> IOW are we losing any useful info if we stop the -u / -s suffixes?
->
-> Otherwise I'd vote lose them.
+> Please, Cc netfilter-devel@vger.kernel.org for netfilter related stuff.
 
-Yep, makes sense, I'll collapse these into min-value and max-value.
-
->
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MIN_LENGTH:
->> +                policy['min-length'] = attr.as_scalar('u32')
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MAX_LENGTH:
->> +                policy['max-length'] = attr.as_scalar('u32')
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_POLICY_IDX:
->> +                policy['policy-idx'] = attr.as_scalar('u32')
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_POLICY_MAXTYPE:
->> +                policy['policy-maxtype'] = attr.as_scalar('u32')
->
-> I don't think these two (policy-..) can actually pop up in extack.
-> They are for cross-referencing nested policies in policy dumps.
-> extack only carries constraints local to the attr.
->
-> Up to you if you want to keep them.
-
-Sure, I can drop these.
-
->
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_BITFIELD32_MASK:
->> +                policy['bitfield32-mask'] = attr.as_scalar('u32')
->> +            elif attr.type == Netlink.NL_POLICY_TYPE_ATTR_MASK:
->> +                policy['mask'] = attr.as_scalar('u64')
->> +        return policy
->> +
->>      def cmd(self):
->>          return self.nl_type
->>  
+Okay, should I resend then?
 
