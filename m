@@ -1,169 +1,129 @@
-Return-Path: <netdev+bounces-83113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95F7A890DB3
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:37:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24704890DBC
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:39:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 250DA1F25081
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:37:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8A94B2113D
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D4E25624;
-	Thu, 28 Mar 2024 22:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47BF2C853;
+	Thu, 28 Mar 2024 22:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="djx5LAUI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CeX/vjxD"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24131D68F;
-	Thu, 28 Mar 2024 22:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06715225CF;
+	Thu, 28 Mar 2024 22:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711665427; cv=none; b=QL6BcG9XXLcEKx2OVY5meytW59ai0Sp6rnjfQNHjIeL/dPw0MlL6Dv1yrt8IJlJdhaxYr0Or2c76uoslVgqvJbF3Mb7UNA/MmtknUp3J6fnQOnPPVBaFayWWaaHOIwXxi4gyFuStKWoJ0QWNeFm61J6p5kI6ap7Wr1ShG9PH7V0=
+	t=1711665571; cv=none; b=Q2sD969OZih307MK3vzacwHJxwOB5PPmgI8PDBJIsOP864sP0MeHMXvLlSmbRrNTe/lASbW+5rwK9z1kErrwwqh+VdMRN6Sj0iZSL8+N1G1NrAx/BHUfvvT8tHo8KjM+m1Df65PJeN8DnQ57pjh3unhZ+eNA9RpKXYTRqu5wfc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711665427; c=relaxed/simple;
-	bh=xQvSGwjpy1U6i/xX+phhJvt3/ov4BDw8GZ/yLMQj2dU=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=P4O/OD3+mKo7aNTqoiHtAnvMDtKl1l6+ava/ozWl9R5PoHdhikmepfcY1M0m5jj42OMk2lJ+kvt3CZaUizQXcJis1kGmxk6MEyTTTvGTCnlCSll0a26Qmwi5QvfMz2BP36DeVjMCUkmAZAMupGid/5hlHrHs+IY+9risyEaLRYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=djx5LAUI; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:To:From:Subject:Message-ID:Sender:
-	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=acFz8ZofxmGGcr8Ugossbm6NCpv7kLhJA9jmyA4gPP0=;
-	t=1711665425; x=1712875025; b=djx5LAUI7FnX5I56/ZNLZNWxFlCG0bFWh/HFUvIEYn8nM3U
-	ZNzAiYoz645+29heGeoeiaYBpeNkFTBhPTwwaL1pi8YJxz/kx8c0fQAFXgCTJzDhROVCB+QJe5NNj
-	s0UDHFax7KqW3RdEKKjGZUMzhAEghnwlw7Wnf/UQRQYlxx3lo27OkZ9lJZDnvGEbj1vZqr9BzJO3y
-	YFmlO6+ZFoXbgddGTsrlknQRgJsohG59/VDVu7cLE7EOBWtcLFa3XhZyhJT8Hrxmd9tE8i5iADxhc
-	3YG1GNC+F1dfNr7arbV0CvuGcQBs2aR1R/bSZekCxv+o5AWM4+hlo/H3L9myLJ3g==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rpyMo-00000001QZ0-2sTv;
-	Thu, 28 Mar 2024 23:37:02 +0100
-Message-ID: <a67ce10d440ecaf8313e4f35832305f71d2f921c.camel@sipsolutions.net>
-Subject: Re: [syzbot] [wireless?] possible deadlock in ieee80211_open
-From: Johannes Berg <johannes@sipsolutions.net>
-To: syzbot <syzbot+7526b1c2ce0b9a92e9a6@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Date: Thu, 28 Mar 2024 23:37:01 +0100
-In-Reply-To: <000000000000b146890614a58da4@google.com>
-References: <000000000000b146890614a58da4@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1711665571; c=relaxed/simple;
+	bh=SItJvabCDnAcEk1FDDPnUYg29uH0ygr0YwnH/xLN6Lg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bSEANzzWJoRLF2RHsL1HXcuKLtFFJJ3NAuEOujZvhvmmUir9aSaUnhSEJUJS3/Dt9U5ExuODxtfh5SxoAa1B30QzZwpOVKJ83Dvviu8Np6HH1h4GNPVrbtDYHv+fkt7cByb5bdPX8nwX8Ah4w4EbbwOJ5Hij/2zK8F7tR4itJHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CeX/vjxD; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-41544650225so8083935e9.2;
+        Thu, 28 Mar 2024 15:39:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711665568; x=1712270368; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DxAkMuGKIXRo2hx02pxk/kvCrTlB4fgMbIxtUPHcx7A=;
+        b=CeX/vjxDVFb+gKZePatHrHD/K8Q4U/tXXArPq9Kw/B7WdQEGri43vrz6nn+Ai8Yt6z
+         ZqSswQGbEP3e/N1/W5EClNW+hGNu7uwHLGOmO01hAyQKd9429Wk0z+nlHnemH3CeWTX3
+         8f54KDaaVtrz6/tTvYc32XzNIgEqH0MfmB+wrEO/f6T9q7y34p8PzBo+PX1ty81/6PfK
+         sDh1n8D/VQefufy07Fyjpp+69n0RiP5B5g2RnHxe0+kNCL5ALhreF+RU4V56k4QsiJzW
+         UD36UqDCaWTq5tOWulTh3rYfGNM/UrGs9lfoHonufun88JVxeWHLdERCPsckCf/1jsuK
+         meWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711665568; x=1712270368;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DxAkMuGKIXRo2hx02pxk/kvCrTlB4fgMbIxtUPHcx7A=;
+        b=aoAE6UDsD5OUqnVvmUtDmzThKtjTsafkclXG/upAsYbX20RMgVvhikb/5KPm54H5vi
+         7YFYf5aHe8wg6wQdTbcQDY4pEq8INZtAOlWCfDjRDBbxqAR0AzkWQ8wmqvu3VkMAFKCe
+         /LZSC0vc6+x30/LMbs7okxFATE0drrt/6p0f6oitCj8glskDMaLUNBrLX2MuzmQ5Kjuw
+         E4wAhdPT6Ivi71kX7zz0dalf0tDtxP3qmiT6F3oh/Sv9RZjzElYD6JdR5PHOBwz4C812
+         fJyaH+Al9+9rm+ApVs3QRyGBJ/N8TcvDOzpyJXHzohoMMNwGHRrDAlZKEcJY4wzGvn4a
+         2Jvg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwGjO0jvgti+izKkYVc7mdnL/c/DOm91kuULQtO4yWzhx8i19sGgbwfFEzRaFAVQsqGo1tgguZAw7SNyi35ATguZxCSFG/Yv/Gtp4tc36urnccG6RNfL5+VuSWfcgNwuGCwbZqLmbsELBTjdBIxe5ARrp0nwWB9d4pNf6wbzHcrQ==
+X-Gm-Message-State: AOJu0YyacI8T8Gm7SXz2mxcphhueoQ8g2CRXDuBnYKa6VMs7x07k8SXB
+	11RX2knOKQ94Q+olowB7tz2/SjMtshHkGKUNcjvxKo7kK6vZIt9B
+X-Google-Smtp-Source: AGHT+IGtuupE/qp9ctW5zpvMpCcAD6pw+81arQy9Ewg8HbRTEXTfNfS1uS63GnRpo9iBoBdI63Whow==
+X-Received: by 2002:a05:600c:4f85:b0:414:8a28:6c88 with SMTP id n5-20020a05600c4f8500b004148a286c88mr433614wmq.14.1711665568247;
+        Thu, 28 Mar 2024 15:39:28 -0700 (PDT)
+Received: from [172.27.34.173] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id u8-20020a05600c19c800b0041478393b8fsm6625632wmq.42.2024.03.28.15.39.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 15:39:28 -0700 (PDT)
+Message-ID: <d8381c87-6123-4df0-97d3-ea8d0e17c6bb@gmail.com>
+Date: Fri, 29 Mar 2024 00:39:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 8/9] mlx5: stop warning for 64KB pages
+To: Arnd Bergmann <arnd@kernel.org>, linux-kernel@vger.kernel.org,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Maxim Mikityanskiy <maxtram95@gmail.com>,
+ Daniel Borkmann <daniel@iogearbox.net>
+Cc: Arnd Bergmann <arnd@arndb.de>, Nick Desaulniers
+ <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>,
+ Justin Stitt <justinstitt@google.com>, Gal Pressman <gal@nvidia.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org, llvm@lists.linux.dev,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20240328143051.1069575-1-arnd@kernel.org>
+ <20240328143051.1069575-9-arnd@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240328143051.1069575-9-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2024-03-27 at 07:52 -0700, syzbot wrote:
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> WARNING: possible circular locking dependency detected
-> 6.8.0-syzkaller-05204-g237bb5f7f7f5 #0 Not tainted
-> ------------------------------------------------------
-> syz-executor.0/7478 is trying to acquire lock:
-> ffff888077110768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock include/n=
-et/cfg80211.h:5951 [inline]
-> ffff888077110768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: ieee80211_open+0xe7/=
-0x200 net/mac80211/iface.c:449
->=20
-> but task is already holding lock:
-> ffff888064974d20 (team->team_lock_key#17){+.+.}-{3:3}, at: team_add_slave=
-+0xad/0x2750 drivers/net/team/team.c:1973
->=20
-> which lock already depends on the new lock.
 
-Hmm.
 
-> the existing dependency chain (in reverse order) is:
->=20
-> -> #1 (team->team_lock_key#17){+.+.}-{3:3}:
->        lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->        team_port_change_check+0x51/0x1e0 drivers/net/team/team.c:2995
->        team_device_event+0x161/0x5b0 drivers/net/team/team.c:3021
->        notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
->        call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
->        call_netdevice_notifiers net/core/dev.c:2002 [inline]
->        dev_close_many+0x33c/0x4c0 net/core/dev.c:1543
->        unregister_netdevice_many_notify+0x544/0x16d0 net/core/dev.c:11071
->        macvlan_device_event+0x7bc/0x850 drivers/net/macvlan.c:1828
->        notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
->        call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
->        call_netdevice_notifiers net/core/dev.c:2002 [inline]
->        unregister_netdevice_many_notify+0xd96/0x16d0 net/core/dev.c:11096
->        unregister_netdevice_many net/core/dev.c:11154 [inline]
->        unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11033
->        unregister_netdevice include/linux/netdevice.h:3115 [inline]
->        _cfg80211_unregister_wdev+0x162/0x560 net/wireless/core.c:1206
->        ieee80211_if_remove+0x25d/0x3a0 net/mac80211/iface.c:2242
->        ieee80211_del_iface+0x19/0x30 net/mac80211/cfg.c:202
->        rdev_del_virtual_intf net/wireless/rdev-ops.h:62 [inline]
->        cfg80211_remove_virtual_intf+0x230/0x3f0 net/wireless/util.c:2847
+On 28/03/2024 16:30, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> When building with 64KB pages, clang points out that xsk->chunk_size
+> can never be PAGE_SIZE:
+> 
+> drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c:19:22: error: result of comparison of constant 65536 with expression of type 'u16' (aka 'unsigned short') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
+>          if (xsk->chunk_size > PAGE_SIZE ||
+>              ~~~~~~~~~~~~~~~ ^ ~~~~~~~~~
+> 
+> In older versions of this code, using PAGE_SIZE was the only
+> possibility, so this would have never worked on 64KB page kernels,
+> but the patch apparently did not address this case completely.
+> 
+> As Maxim Mikityanskiy suggested, 64KB chunks are really not all that
+> useful, so just shut up the warning by adding a cast.
+> 
+> Fixes: 282c0c798f8e ("net/mlx5e: Allow XSK frames smaller than a page")
+> Link: https://lore.kernel.org/netdev/20211013150232.2942146-1-arnd@kernel.org/
+> Link: https://lore.kernel.org/lkml/a7b27541-0ebb-4f2d-bd06-270a4d404613@app.fastmail.com/
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-So this was the interface being removed via nl80211 (why do we even do
-that? rtnetlink can do that too ...)
+Thanks for your patch.
 
-I guess it was a team port, since team_port_get_rtnl() must've been non-
-NULL for this netdev. That acquires the team->lock mutex, but we hold
-the wiphy mutex around unregister_netdevice().
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
-> -> #0 (&rdev->wiphy.mtx){+.+.}-{3:3}:
->        check_prev_add kernel/locking/lockdep.c:3134 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3253 [inline]
->        validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
->        __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
->        lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->        wiphy_lock include/net/cfg80211.h:5951 [inline]
->        ieee80211_open+0xe7/0x200 net/mac80211/iface.c:449
->        __dev_open+0x2d3/0x450 net/core/dev.c:1430
->        dev_open+0xae/0x1b0 net/core/dev.c:1466
->        team_port_add drivers/net/team/team.c:1214 [inline]
->        team_add_slave+0x9b3/0x2750 drivers/net/team/team.c:1974
->        do_set_master net/core/rtnetlink.c:2685 [inline]
->        do_setlink+0xe70/0x41f0 net/core/rtnetlink.c:2891
->        __rtnl_newlink net/core/rtnetlink.c:3680 [inline]
->        rtnl_newlink+0x180b/0x20a0 net/core/rtnetlink.c:3727
->        rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
-
-I guess this was actually adding it as a team slave/port, which acquired
-the team->lock mutex, but do_open acquires the wiphy lock.
-
-We _don't_ hold the wiphy mutex around dev_close() when invoked in this
-path (see nl80211_del_interface), but regardless of how we delete the
-interface, we will hold wiphy mutex around the unregister.
-
-Thing is, I'm not sure I see a good way to avoid that? Maybe we could
-defer the unregister, and just set the ieee80211_ptr to NULL to make it
-effectively dead for wireless in the meantime. Not sure.
-
-However, as far as I can tell it's not actually possible for the
-deadlock to happen, because _both_ paths will necessarily be holding the
-RTNL around them - from nl80211 (nl80211_del_interface has
-NL80211_FLAG_NEED_RTNL) and rtnetlink_rcv_msg() respectively.
-
-So ultimately, we're both holding the mutex for internal reasons, but
-given the outer RTNL, I don't see how this would really deadlock.
-
-Given that, I'm inclined to ignore this, although it'd be nice to
-silence lockdep about it somehow I guess?
-
-johannes
 
