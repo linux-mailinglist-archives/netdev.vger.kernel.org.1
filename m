@@ -1,227 +1,140 @@
-Return-Path: <netdev+bounces-82887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4E0F890191
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:20:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DAFC689019E
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 15:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5247E296E3A
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:20:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 924F6297695
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 14:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9675E1272AC;
-	Thu, 28 Mar 2024 14:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25FD12D21F;
+	Thu, 28 Mar 2024 14:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RHUE3lO8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F5383A1C
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 14:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA7112A157;
+	Thu, 28 Mar 2024 14:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711635633; cv=none; b=upQ3mAV1+nKUvO3NSh4fS2p5UCeymRYXZMIY3CkR2G+W4JjHoqhWuaowL3BGUhwX4MjMPQoIHzXhZ3Ev7F0sToPRuNrzP2IYcROqCBDG2NMxDAskULauZU/4JC4SFg7JNQdlEYLoubXr7eB1mjmk1ms2/hARj024E75VavGGstk=
+	t=1711635664; cv=none; b=rJ/d9wofLZku17Kk1hQPHyCYdvj2wy1NATn7s8O3aFe2YT3KLQrO0/u+6Aopd28NCRfJJPXlKQCSrINPW7AvWwmBJ2gz2r/Ymi1n0nFv1SK9eX9/1zwYV65W8guLG6cKveDgDTOMxobohRSHaUjI1JQyV6prLNxnNNvVYYFS2iE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711635633; c=relaxed/simple;
-	bh=Bq9LWOx+1iPt2NmZWbnO9eJmfYrUT9ZFxtW8nkO9COA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WEH9eLPDm4RHHvj0bKStC6+7aEUK6xuYYFBnVCsbFXcZp+juSKXiigK00FSVNRn3M98QnbwM06dKFS03ebMzNmmyeaYZ6AQ6tZjXCy4NF/65toNIHFA/alW9ijFzf0lIIRXTRaVopTtu6YNQ/WhwWf4QygsEMUDSkyF7u4rLc1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-366b97b571cso8290265ab.3
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:20:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711635631; x=1712240431;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EtBIqGObUrXQ9PDYL92r63zx6gFykZehyqeUGmcuBHc=;
-        b=AmtZz8nQ66W8RHlfh6jy9JFLEMgukFy7SAhCJnLZobjtaeGkdOOoQWj3mjQQWQ0Je2
-         9P5JTqUxhP/DZhKK7WPt3UsF+OtcKJ+WTDINKjkbI1fX1uiCJT/Af8HFh5NfCW2m3UmS
-         QPgQ7sEq3posXkzr2yROAG3E0hSqI5WCeQHrvprQEZVzUYtk/086smBalS57jIep07w+
-         IVPmWY/+nJpKY9P4UMZzZCUl7YrkVU9DrkT/4Dqysw+mXmF7B9SL9j+0nCXxzUSX7taB
-         SuPoxeX9gI67VlcmwXdJjmhrGrqBYpmfA77Rh7qOYC9GrN9uaC4VFrEnjquHbDXkcgB6
-         JE5w==
-X-Forwarded-Encrypted: i=1; AJvYcCU0u35wNXpe9JTTf2Y+YiOlWb6yEVslKniA+lFuX2c8HFCyA9LtZmWFXACP1XV5xStuAVRCFQcMSxQpN5GHda+wwppWSXQt
-X-Gm-Message-State: AOJu0YytLiKpvGW2G86I08lU5He4QXddXzhb4O6+yJPe/17vjG0Xl8kE
-	79Wd6Bs7iDskcAxVGw3A2cfIF/o9hHhQAjiUaLfaAEPZQSRkA0wGRszMO1zbIbkm8Eh0f8vgPZu
-	X5Y7FmtTJBMuG34bvNG/gY2/LVXw0aE8cGlAfV9d+KNzytQxX1+GAPvw=
-X-Google-Smtp-Source: AGHT+IF2okDFYYACtM78GHxJSW7p6ypgkem81yHhPqKP6LvZ5bVld3W2oLnEEXSYlqAtJNOeFP5QVMMUjRI2y5nX0LRea7OuEUMl
+	s=arc-20240116; t=1711635664; c=relaxed/simple;
+	bh=JfRqZIJmC4PjPJChHR0VcjE2fBSwvEm7Ufw1q6CvlgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QDUbV/tTXOSgqS7yfHRoXpDy/3r9jp92fPCtjsymmkPtJPEheKFqhGXn4kyAJOyrLyiV3+u/Sqerv8a7+/6e/YdgJUA6/bq+EIgoBeWwZeuk0VwLSDWiFF9KsJ/vsAvRTpdgNM801ENjfC2p6+ZFYMa867idK9sBfV7YEwmoKr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RHUE3lO8; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BE24BC0005;
+	Thu, 28 Mar 2024 14:20:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1711635653;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JfRqZIJmC4PjPJChHR0VcjE2fBSwvEm7Ufw1q6CvlgU=;
+	b=RHUE3lO8NtqEgRc3pjmj5y2bQA9xBIQMm9X2ZtXnFQA1dIekleMA6uXYAOllJWrfLVdOPP
+	BCYGUxPetyp53sqdouL5ZtlcI+19d/z7BSVmn+ZR4iI7YfhUr8Ka9mbo/MdAX0BLlVNPBb
+	EGRc3a8KGHoaZBGlWFuYe7PdUP7opIOVdCXqFzUeL+T9i0RFi/OOmx3OS2Npr1DkA+AJaw
+	U36MGbbB9D5A7tNDwdZgu2UjdSa3sN7D5G8zKPMESdoo8uvPHsMqVKTpz0ISRY2n8y7D8W
+	mXj/iQepjdQ0ZTL8qBk5rrXDYfws0JMVnUuNOSV+nZBkV/uQLXtQFIHWRxtZjw==
+Date: Thu, 28 Mar 2024 15:20:46 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, Dent Project
+ <dentproject@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Rob Herring <robh+dt@kernel.org>, Russell
+ King <linux@armlinux.org.uk>, Conor Dooley <conor+dt@kernel.org>, Jakub
+ Kicinski <kuba@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russ Weight <russ.weight@linux.dev>, "David S.
+ Miller" <davem@davemloft.net>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Paolo Abeni <pabeni@redhat.com>, Mark Brown <broonie@kernel.org>,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <20240328152046.0b908024@kmaincent-XPS-13-7390>
+In-Reply-To: <5230d786-44a8-45a0-ab0d-e1aa4ab6a836@lunn.ch>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+	<20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
+	<171146756753.2253156.218733720090104400.robh@kernel.org>
+	<5230d786-44a8-45a0-ab0d-e1aa4ab6a836@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d81:b0:368:b289:38b2 with SMTP id
- h1-20020a056e021d8100b00368b28938b2mr64156ila.1.1711635630923; Thu, 28 Mar
- 2024 07:20:30 -0700 (PDT)
-Date: Thu, 28 Mar 2024 07:20:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c430800614b93936@google.com>
-Subject: [syzbot] [net?] possible deadlock in hsr_dev_xmit (2)
-From: syzbot <syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello,
+On Thu, 28 Mar 2024 13:32:09 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-syzbot found the following issue on:
+> On Tue, Mar 26, 2024 at 10:39:28AM -0500, Rob Herring wrote:
+> >=20
+> > On Tue, 26 Mar 2024 15:04:48 +0100, Kory Maincent wrote: =20
+> > > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> > >=20
+> > > PSE PI setup may encompass multiple PSE controllers or auxiliary circ=
+uits
+> > > that collectively manage power delivery to one Ethernet port.
+> > > Such configurations might support a range of PoE standards and require
+> > > the capability to dynamically configure power delivery based on the
+> > > operational mode (e.g., PoE2 versus PoE4) or specific requirements of
+> > > connected devices. In these instances, a dedicated PSE PI node becomes
+> > > essential for accurately documenting the system architecture. This no=
+de
+> > > would serve to detail the interactions between different PSE controll=
+ers,
+> > > the support for various PoE modes, and any additional logic required =
+to
+> > > coordinate power delivery across the network infrastructure.
+> > >=20
+> > > The old usage of "#pse-cells" is unsuficient as it carries only the P=
+SE PI
+> > > index information.
+> > >=20
+> > > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> > > --- =20
+> > My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_binding_chec=
+k'
+> > on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> >=20
+> > yamllint warnings/errors:
+> >=20
+> > dtschema/dtc warnings/errors:
+> >=20
+> >=20
+> > doc reference errors (make refcheckdocs):
+> > Warning: Documentation/devicetree/bindings/net/pse-pd/pse-controller.ya=
+ml
+> > references a file that doesn't exist:
+> > Documentation/networking/pse-pd/pse-pi.rst
+> > Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:
+> > Documentation/networking/pse-pd/pse-pi.rst =20
+>=20
+> Is this a false positive?
 
-HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11cc4c51180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fe78468a74fdc3b7
-dashboard link: https://syzkaller.appspot.com/bug?extid=fbf74291c3b7e753b481
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
+I suppose so as the file is added in the patch 10.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/55a16212fbdf/disk-fe46a7dd.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/704972635ac7/vmlinux-fe46a7dd.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a04b0d8c481f/bzImage-fe46a7dd.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-6.8.0-syzkaller-08951-gfe46a7dd189e #0 Not tainted
---------------------------------------------
-kworker/u8:3/49 is trying to acquire lock:
-ffff888050f26da0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff888050f26da0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: hsr_dev_xmit+0x13e/0x1d0 net/hsr/hsr_device.c:229
-
-but task is already holding lock:
-ffff88807cdaeda0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff88807cdaeda0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: send_hsr_supervision_frame+0x276/0xad0 net/hsr/hsr_device.c:310
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&hsr->seqnr_lock);
-  lock(&hsr->seqnr_lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-9 locks held by kworker/u8:3/49:
- #0: ffff88802a81f948 ((wq_completion)bat_events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
- #0: ffff88802a81f948 ((wq_completion)bat_events){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
- #1: ffffc90000b97d00 ((work_completion)(&(&bat_priv->nc.work)->work)
-){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
-){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
- #2: ffffc90000a08ca0 ((&hsr->announce_timer)){+.-.}-{0:0}
-, at: call_timer_fn+0xc0/0x600 kernel/time/timer.c:1789
- #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hsr_announce+0xa3/0x370 net/hsr/hsr_device.c:387
- #4: ffff88807cdaeda0 (&hsr->seqnr_lock
-){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-){+.-.}-{2:2}, at: send_hsr_supervision_frame+0x276/0xad0 net/hsr/hsr_device.c:310
- #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hsr_forward_skb+0xae/0x2400 net/hsr/hsr_forward.c:614
- #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
- #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
- #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4260
- #7: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #7: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #7: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: br_dev_xmit+0x1b9/0x1a10 net/bridge/br_device.c:44
- #8: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
- #8: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
- #8: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4260
-
-stack backtrace:
-CPU: 1 PID: 49 Comm: kworker/u8:3 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Workqueue: bat_events batadv_nc_worker
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_deadlock kernel/locking/lockdep.c:3062 [inline]
- validate_chain+0x15c1/0x58e0 kernel/locking/lockdep.c:3856
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- hsr_dev_xmit+0x13e/0x1d0 net/hsr/hsr_device.c:229
- __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
- netdev_start_xmit include/linux/netdevice.h:4917 [inline]
- xmit_one net/core/dev.c:3531 [inline]
- dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
- __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
- dev_queue_xmit include/linux/netdevice.h:3091 [inline]
- br_dev_queue_push_xmit+0x701/0x8d0 net/bridge/br_forward.c:53
- NF_HOOK+0x3a7/0x460 include/linux/netfilter.h:314
- br_forward_finish+0xe5/0x140 net/bridge/br_forward.c:66
- NF_HOOK+0x3a7/0x460 include/linux/netfilter.h:314
- __br_forward+0x489/0x660 net/bridge/br_forward.c:115
- deliver_clone net/bridge/br_forward.c:131 [inline]
- maybe_deliver+0xb3/0x150 net/bridge/br_forward.c:190
- br_flood+0x2e4/0x660 net/bridge/br_forward.c:236
- br_dev_xmit+0x118c/0x1a10
- __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
- netdev_start_xmit include/linux/netdevice.h:4917 [inline]
- xmit_one net/core/dev.c:3531 [inline]
- dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
- __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
- dev_queue_xmit include/linux/netdevice.h:3091 [inline]
- hsr_xmit net/hsr/hsr_forward.c:380 [inline]
- hsr_forward_do net/hsr/hsr_forward.c:471 [inline]
- hsr_forward_skb+0x183f/0x2400 net/hsr/hsr_forward.c:619
- send_hsr_supervision_frame+0x548/0xad0 net/hsr/hsr_device.c:333
- hsr_announce+0x1a9/0x370 net/hsr/hsr_device.c:389
- call_timer_fn+0x17e/0x600 kernel/time/timer.c:1792
- expire_timers kernel/time/timer.c:1843 [inline]
- __run_timers kernel/time/timer.c:2408 [inline]
- __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2419
- run_timer_base kernel/time/timer.c:2428 [inline]
- run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2438
- __do_softirq+0x2bc/0x943 kernel/softirq.c:554
- do_softirq+0x11b/0x1e0 kernel/softirq.c:455
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
- spin_unlock_bh include/linux/spinlock.h:396 [inline]
- batadv_nc_purge_paths+0x30f/0x3b0 net/batman-adv/network-coding.c:471
- batadv_nc_worker+0x328/0x610 net/batman-adv/network-coding.c:720
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
