@@ -1,211 +1,117 @@
-Return-Path: <netdev+bounces-82835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2D388FE4E
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:46:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 772C388FE58
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 12:48:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B645D2951A5
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:46:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E25D3B23965
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 11:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A967D06B;
-	Thu, 28 Mar 2024 11:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7D756441;
+	Thu, 28 Mar 2024 11:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eKDotHXu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zT58PkwV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5A42E3FE
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 11:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBBC5380D
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 11:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711626398; cv=none; b=uno6n7CjDUEjHGtlyD8wm/0HfwVXDqjwcFyr3u6oYG1JHOEXnH1Xv3ImBjvvXP5fNxlvj1qR0I2D8CbSe3Ssfr+Gw/J/t0ubIXFfk2kQUD8nFf50bDVha0YoTp0vYRXXGpC5nQrF5yKtehIpio8gh2TiCUYaB0JXeVVUJb015mg=
+	t=1711626529; cv=none; b=vCUCNe1PzrZ9sJdYlM2OqOf2gDhkMZUysRZkuYhHAvvOWKHTda4msBXYD5Ooqu0apmZPz7Iroyd3qoWQrutIKSPKfrCC00pjEDfCWPkjYZMX5JhPBP5COlzScEZSFGu0Qujpmz68a1f9DyEGDmv50XDIp9Z9LRxlC1t1gXR3gk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711626398; c=relaxed/simple;
-	bh=jd50ccBDmt6hfv7/MdhphQmNaMN9Yc1zWRCQCEWQGJs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P3moIG8WVFxUoiE+Or7ezdMzmGkXtOsTbxy3Anw4Sv3fls4o5QXtoI+hOIuDbZ760o4GnBd0zmEVx+5RzuVdR2iv/KkGDXTBRJ9AUA1BgWVYYeimtmE9dpB4eAGUwXnR8LmopGWocnc74rVoVt9BHhThvABB85seGnvAXr3kWaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eKDotHXu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65381C433C7;
-	Thu, 28 Mar 2024 11:46:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711626397;
-	bh=jd50ccBDmt6hfv7/MdhphQmNaMN9Yc1zWRCQCEWQGJs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eKDotHXu+veeELVCiF/IpiHPTI5PlSRQeftHjWipIhucI2ennUtM1GnHG0SQtt0ra
-	 1yGJ7aKCno5sRi6bl97djZmNTRLbLinniGPCHccPSlflyH+jCECO0C9XtPWlNSjVDT
-	 y922mr6oxOzySDoUCeICJMJoMt3NG6DN5psR1g37N9glgvdFc2KQiMgrQhqMsMTyNS
-	 ODc7QFvvJqIKo+cgEA1AA49okRvSNIelw4BSMsACF2e/iwQXyjr2IdD1FtuPmFW+cJ
-	 36pEwnND5LKiQKFxkrfoUSDhrZbBqXJ23tPcLoHp1r4+Sc4Uun1Ix4SMtSN203f5g0
-	 2lM8pnIKqmYjw==
-Date: Thu, 28 Mar 2024 11:46:33 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v2] igc: Add MQPRIO offload support
-Message-ID: <20240328114633.GI403975@kernel.org>
-References: <20240212-igc_mqprio-v2-1-587924e6b18c@linutronix.de>
+	s=arc-20240116; t=1711626529; c=relaxed/simple;
+	bh=fFWAM7aDWzcp6y6UIHXrKDrn/vPVbGKoJkanz0+nyYQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tSlLB14m3r445j38HMLKw3cWwBzzx2yzXSRVd1QD4KQ26g2XdPbCTRlii+uZuNnudkJtTOPHo3PgQHVdNU/5p/PNxUgv9aX1wjlMJoGBT7HolLQ+xHSr9nG8sOxP2Y+qo1UkWYMkN89yT8zJHBErskdAXYtpSBcNwnQciBNwpqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zT58PkwV; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56c2cfdd728so8959a12.1
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 04:48:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711626526; x=1712231326; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fFWAM7aDWzcp6y6UIHXrKDrn/vPVbGKoJkanz0+nyYQ=;
+        b=zT58PkwVeSrMYBhH4mzVKjqm8Gb6w69p6+dY0xz+yT1FVK/lO/m08dfvta47MF4Qe3
+         CyYv3c3UnxXaXSH6TRFCJQWXiSJODOtuFO9xF7L5JZNCBChCN/DTHiLwgWyfyOyFl+p2
+         eeQlOHAffgbTcaSHmeimPj+i1GGUk1UxByFWPn7cuN0NpA+YFUF1Cra/90Ehd6XiSKXo
+         pJCFgiCFl/46qDxEJgoJ6FWcENH7RbEIPSwyEudiGfMRbL7zLKJZXbeLc2oyS3+7ZBeT
+         4jfWzTqA43gfv8lxyBm+dzgky404QjkInrzn7i3OSNe+4rHEB/+FG34pnipO1QGvLwdV
+         zf6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711626526; x=1712231326;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fFWAM7aDWzcp6y6UIHXrKDrn/vPVbGKoJkanz0+nyYQ=;
+        b=BzWKMlkTDt44PCCVSObaw8alp0pWF97+i22TBgxqbZosE01xIwwmtPgx8cZm+fyX9O
+         QS+RHMhRkVskZnxaRK2ZBZ7wyWIUQQHMQg3H7VDCA4m2rt+cmhgwIZhRhiSd5OL6fZBY
+         bkors59xWsuc/I4XbtjledXzzrfT5XGa3R87+0AEfPXe1RoHKVGKvRjj5fm4qLrzPj00
+         jNPrnY3M+DUTpgATunY+8Av1Ia0HhZSVNLX4BJoib8PFHTLoZduZRFAgv1E7892byS7y
+         xHAeghFm15xJpp1rmh39NLYrCjcjEdhulwRyatlcZ8bJtNw5jj7tE1Fd5hhHiqfksSm5
+         7VIw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8BqgYcK8OnhH7hAii4eCa4gagt9AXzH2uZ/G2NBCWEVCZqmszvvgagmanFf5pd3VQET+8uFpWtXKJVdX0srPX60EG3mHn
+X-Gm-Message-State: AOJu0Yw2pJ9q69Yd1ww+c6dK+XjC62OpaSd9l79FinjBHwKFu3QgoNbg
+	nTbWqxCcOE5IE2b0NQO2O8V2TcvcEX/lOqKZKV93OikCjBYyHFm2zzf1t0gNn8pOxnWD5ImMkJh
+	hLSlzmDMU+lAE8w2GzH2JnWqqrqSEAlYrprwB
+X-Google-Smtp-Source: AGHT+IGqnYw+sySY96g0LyDux434D9RXsTE6M9BXDodVM+OiDk90Z2Y6TxzJrWUA3XY3y1/BPiP9d/Yg/0jkzhK73kc=
+X-Received: by 2002:aa7:d68c:0:b0:56c:cd5:6e42 with SMTP id
+ d12-20020aa7d68c000000b0056c0cd56e42mr152766edr.6.1711626524891; Thu, 28 Mar
+ 2024 04:48:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240212-igc_mqprio-v2-1-587924e6b18c@linutronix.de>
+References: <20240327040213.3153864-1-kuba@kernel.org> <20240328113202.GH403975@kernel.org>
+In-Reply-To: <20240328113202.GH403975@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 28 Mar 2024 12:48:33 +0100
+Message-ID: <CANn89iJMn+wVBv7uNWTRJ_kOC2=vMmEcGmM5K_nk74LKxUwm_w@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: remove gfp_mask from napi_alloc_skb()
+To: Simon Horman <horms@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
+	pabeni@redhat.com, Alexander Lobakin <aleksander.lobakin@intel.com>, alexs@kernel.org, 
+	siyanteng@loongson.cn, jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, mcoquelin.stm32@gmail.com, 
+	intel-wired-lan@lists.osuosl.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 26, 2024 at 02:34:54PM +0100, Kurt Kanzenbach wrote:
-> Add support for offloading MQPRIO. The hardware has four priorities as well
-> as four queues. Each queue must be a assigned with a unique priority.
-> 
-> However, the priorities are only considered in TSN Tx mode. There are two
-> TSN Tx modes. In case of MQPRIO the Qbv capability is not required.
-> Therefore, use the legacy TSN Tx mode, which performs strict priority
-> arbitration.
-> 
-> Example for mqprio with hardware offload:
-> 
-> |tc qdisc replace dev ${INTERFACE} handle 100 parent root mqprio num_tc 4 \
-> |   map 0 0 0 0 0 1 2 3 0 0 0 0 0 0 0 0 \
-> |   queues 1@0 1@1 1@2 1@3 \
-> |   hw 1
-> 
-> The mqprio Qdisc also allows to configure the `preemptible_tcs'. However,
-> frame preemption is not supported yet.
-> 
-> Tested on Intel i225 and implemented by following data sheet section 7.5.2,
-> Transmit Scheduling.
-> 
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+On Thu, Mar 28, 2024 at 12:32=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Tue, Mar 26, 2024 at 09:02:12PM -0700, Jakub Kicinski wrote:
+> > __napi_alloc_skb() is napi_alloc_skb() with the added flexibility
+> > of choosing gfp_mask. This is a NAPI function, so GFP_ATOMIC is
+> > implied. The only practical choice the caller has is whether to
+> > set __GFP_NOWARN. But that's a false choice, too, allocation failures
+> > in atomic context will happen, and printing warnings in logs,
+> > effectively for a packet drop, is both too much and very likely
+> > non-actionable.
+> >
+> > This leads me to a conclusion that most uses of napi_alloc_skb()
+> > are simply misguided, and should use __GFP_NOWARN in the first
+> > place. We also have a "standard" way of reporting allocation
+> > failures via the queue stat API (qstats::rx-alloc-fail).
+> >
+> > The direct motivation for this patch is that one of the drivers
+> > used at Meta calls napi_alloc_skb() (so prior to this patch without
+> > __GFP_NOWARN), and the resulting OOM warning is the top networking
+> > warning in our fleet.
+> >
+> > Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
-
-> diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-> index 5f92b3c7c3d4..73502a0b4df7 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
-> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-> @@ -547,6 +547,15 @@
->  
->  #define IGC_MAX_SR_QUEUES		2
->  
-> +#define IGC_TXARB_TXQ_PRIO_0_SHIFT	0
-> +#define IGC_TXARB_TXQ_PRIO_1_SHIFT	2
-> +#define IGC_TXARB_TXQ_PRIO_2_SHIFT	4
-> +#define IGC_TXARB_TXQ_PRIO_3_SHIFT	6
-> +#define IGC_TXARB_TXQ_PRIO_0_MASK	GENMASK(1, 0)
-> +#define IGC_TXARB_TXQ_PRIO_1_MASK	GENMASK(3, 2)
-> +#define IGC_TXARB_TXQ_PRIO_2_MASK	GENMASK(5, 4)
-> +#define IGC_TXARB_TXQ_PRIO_3_MASK	GENMASK(7, 6)
-> +
->  /* Receive Checksum Control */
->  #define IGC_RXCSUM_CRCOFL	0x00000800   /* CRC32 offload enable */
->  #define IGC_RXCSUM_PCSD		0x00002000   /* packet checksum disabled */
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-
-...
-
-> @@ -106,7 +109,26 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
->  	wr32(IGC_QBVCYCLET_S, 0);
->  	wr32(IGC_QBVCYCLET, NSEC_PER_SEC);
->  
-> +	/* Reset mqprio TC configuration. */
-> +	netdev_reset_tc(adapter->netdev);
-> +
-> +	/* Restore the default Tx arbitration: Priority 0 has the highest
-> +	 * priority and is assigned to queue 0 and so on and so forth.
-> +	 */
-> +	txarb = rd32(IGC_TXARB);
-> +	txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
-> +		   IGC_TXARB_TXQ_PRIO_1_MASK |
-> +		   IGC_TXARB_TXQ_PRIO_2_MASK |
-> +		   IGC_TXARB_TXQ_PRIO_3_MASK);
-> +
-> +	txarb |= 0x00 << IGC_TXARB_TXQ_PRIO_0_SHIFT;
-> +	txarb |= 0x01 << IGC_TXARB_TXQ_PRIO_1_SHIFT;
-> +	txarb |= 0x02 << IGC_TXARB_TXQ_PRIO_2_SHIFT;
-> +	txarb |= 0x03 << IGC_TXARB_TXQ_PRIO_3_SHIFT;
-> +	wr32(IGC_TXARB, txarb);
-
-Hi Kurt,
-
-It looks like the above would be a good candidate for using FIELD_PREP,
-in which case the _SHIFT #defines can likely be removed.
-
-Also, the logic above seems to be replicated in igc_tsn_enable_offload.
-Perhaps a helper is appropriate.
-
-> +
->  	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
-> +	adapter->flags &= ~IGC_FLAG_TSN_LEGACY_ENABLED;
->  
->  	return 0;
->  }
-> @@ -123,6 +145,50 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
->  	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_TSN);
->  	wr32(IGC_TXPBS, IGC_TXPBSIZE_TSN);
->  
-> +	if (adapter->strict_priority_enable) {
-> +		u32 txarb;
-> +		int err;
-> +
-> +		err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
-> +		if (err)
-> +			return err;
-> +
-> +		for (i = 0; i < adapter->num_tc; i++) {
-> +			err = netdev_set_tc_queue(adapter->netdev, i, 1,
-> +						  adapter->queue_per_tc[i]);
-> +			if (err)
-> +				return err;
-> +		}
-> +
-> +		/* In case the card is configured with less than four queues. */
-> +		for (; i < IGC_MAX_TX_QUEUES; i++)
-> +			adapter->queue_per_tc[i] = i;
-> +
-> +		/* Configure queue priorities according to the user provided
-> +		 * mapping.
-> +		 */
-> +		txarb = rd32(IGC_TXARB);
-> +		txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
-> +			   IGC_TXARB_TXQ_PRIO_1_MASK |
-> +			   IGC_TXARB_TXQ_PRIO_2_MASK |
-> +			   IGC_TXARB_TXQ_PRIO_3_MASK);
-> +		txarb |= adapter->queue_per_tc[3] << IGC_TXARB_TXQ_PRIO_0_SHIFT;
-> +		txarb |= adapter->queue_per_tc[2] << IGC_TXARB_TXQ_PRIO_1_SHIFT;
-> +		txarb |= adapter->queue_per_tc[1] << IGC_TXARB_TXQ_PRIO_2_SHIFT;
-> +		txarb |= adapter->queue_per_tc[0] << IGC_TXARB_TXQ_PRIO_3_SHIFT;
-> +		wr32(IGC_TXARB, txarb);
-> +
-> +		/* Enable legacy TSN mode which will do strict priority without
-> +		 * any other TSN features.
-> +		 */
-> +		tqavctrl = rd32(IGC_TQAVCTRL);
-> +		tqavctrl |= IGC_TQAVCTRL_TRANSMIT_MODE_TSN;
-> +		tqavctrl &= ~IGC_TQAVCTRL_ENHANCED_QAV;
-> +		wr32(IGC_TQAVCTRL, tqavctrl);
-> +
-> +		return 0;
-> +	}
-> +
->  	for (i = 0; i < adapter->num_tx_queues; i++) {
->  		struct igc_ring *ring = adapter->tx_ring[i];
->  		u32 txqctl = 0;
-
-...
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
