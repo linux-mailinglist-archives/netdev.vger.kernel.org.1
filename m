@@ -1,177 +1,194 @@
-Return-Path: <netdev+bounces-82699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD9588F4D2
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:39:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A9488F4DB
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:42:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2CDB1F30F13
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:38:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A84AC1C261EE
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64E422EE8;
-	Thu, 28 Mar 2024 01:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554D61804A;
+	Thu, 28 Mar 2024 01:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="amffU/x0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB39439AFD
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 01:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC284D29E
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 01:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711589839; cv=none; b=ZodoiYsCi2cw6ey/O1qxduzW/RzE3DVDG7qqNQ69Wv2AG6l0mFMdCdEgry+C/FDk/JnrbrkhXZrSWHUDNvBSU00uC+DMU3F1vbhAlhemunl3vO2cKE4v19SEFhmG66GL+F2Yc3pBYNYhPwEQfyHS7Ek/J93Vy3HMe4U0qMSUNLo=
+	t=1711590162; cv=none; b=AdHiLJ/vOlgGcx09liu5GYM/qrVRQA9QdeyjPdzJ9ckkxQp9aXjflVRMwO+vteKESN3TTSBDQPD86ViPyoggMC22TMXC13+qbH6u8/i6/8I8ZSny+du57bT2pTw3IdpLrRZOllr9TvPQXan+OgYtrkgg0RiRayXzLcmMTfBMXVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711589839; c=relaxed/simple;
-	bh=0PXBV+XsQFF1qQr9BQWAxqxWMVqsMgeG34vwDH5X3vs=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=i+xy0w98i0V3cYyaE2mB6WKGT6wRtNPggdYmjqUQiqwBmjL6LQEzFx9WiKKRz56qYTQq67L9inA3g8hDR8AcdJ4ON7ZoCytxzD6W56jftev8/lhbmfaS/0KRk4gOXS3gcsb9EU0jno9COplz2ro1amYYVfGrzGJLKt2PUpoZawc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-368996867f0so3716155ab.1
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 18:37:17 -0700 (PDT)
+	s=arc-20240116; t=1711590162; c=relaxed/simple;
+	bh=xllegEYyIZMK02qj1Gk4ytrBu4a/+9PZfvN7d690eks=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XZpwWcZ1dI037dklOb9HD45jz/bN7s7w2m3pR2sOW/nkWJRO10oODTcHf5gn0VTbkyzOF+fW1gP7fx//bo/ztsrZMg7wWmBQXJJ26kuvspW36MBRFwHMyqSqRyMjDhKdE3iWtTTgtisBIz/2u+PsaDv70BmKOnDcnQlXAafFGtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=amffU/x0; arc=none smtp.client-ip=209.85.161.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5a4930d9c48so71232eaf.1
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 18:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711590160; x=1712194960; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=czxS4t81Dmi/uYnZl3buo2l0xGMl2l97jLzliCzgeMk=;
+        b=amffU/x0B8fLCN5qx5RuykUOri19NFtb4OsIf/Cfj1x/Qu58v27qqa1tcH3Yl7+h6n
+         hmfv02hRb4kbaW5gdsSXIMhi79jlCWkJivWExAfc5oZ3gt9vaH+O7ukXzPHFhYCygNbZ
+         tMZEwM3eUueieBYVxr3vVwYQtIsv0giAW8vik5IFB9oZCQkvVFKWCWIxeOgiYT2T3HQu
+         pYy6xBv7tQyCDvl3XfDa9OsyPcwH5duK/6BwZMJBUsJLWzza2p4ziIPu5+4ggjNI+t1M
+         Bt62bLM6Q8hSFojwoLYBeNcMMYbFpHVgKxIfizWC/4FwfozMMfi1VA+9n135kiLQOkOS
+         PVcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711589837; x=1712194637;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sd6cZws7s3j1CmzuJQzJmY1iOL4n/PGz5SWGIACnpt8=;
-        b=lkON11ZsT7ixwD/x2m71HffN88TYYGFEPM0VTMJ/xi7BLB+kqW4ThSt7nsQrCX8px/
-         XHGMyuPnS5d3FS1i9z9rmVU4OUeKaX1cR8Fnq0gFS9PakmRaZD8pSoKQ3bbXkPubESeu
-         wJmtLd7xfV3+RbPTmmcUuZoanotL8P+r/0xqpr5IFB1Qc29ulxvuM6luZPR6AGKTERCD
-         mFI/ye3ipbPcQDC9Xhe9SjqVDSpgfWJsm2QQXsAnT1Ib+IgkcW2g36+/qB1HwHLg+o7O
-         +rkcdbrSU9VyhWGUH2NLLGZVc+8Wf/eYw29tOZqA6fzfIXWvV9oghveRaZ99QInzauqu
-         l0Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCWhCbcxhC6VgCCa/6RfAUSYt6fbCLjW/JJ9FwVcDDpl/nCixxMPgVPRpeejl/tj5QA1MlMs55Dc+U0Ic+sGI9S6F6Yjs83S
-X-Gm-Message-State: AOJu0Yz8jR4jUtHhysAhb1sQw3cdsJH9lSpqRUIHxulw8ktOsfMJwrvR
-	Ao+8Al1PZMfm7RAmrfBdxc08fxvM/JbFN0rzsWxvHDXvyAkPq7gIc/8U2hGr4I6qMhnEUHyAXkQ
-	zcH8WNL5y3DYBi1fAmOoxTeDSl2P42MfKKHNu9Wb2YSLqgIw9XayXWMw=
-X-Google-Smtp-Source: AGHT+IFlvLB8emNotRqYRLvmA3j46U4XOsfI22YqJ6yR7lHtLTb8gya8KwRVSp1PXLi6yUBBMHXi1h3smdm8xNZ4nMz98CbwXNv5
+        d=1e100.net; s=20230601; t=1711590160; x=1712194960;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=czxS4t81Dmi/uYnZl3buo2l0xGMl2l97jLzliCzgeMk=;
+        b=BsHwa5w0eOrGwACh9R3G2uem118AExlWDlF/eJsd6mh3Gw+Y99AS5GrLxZHl2EzV7z
+         z6VorKvCGjPQkO+w87cPk3O/7hPy40SA5jk0HBp/W3FLif/14ZRCJfaRTU+etqWDLRHU
+         KNXtDpcBwNONLUPMfsD4Obp7gzVCb0k6lOWTXdlv5F7hXvp4nKUAitZC78ewkkN9h56w
+         f/XbYwr+WqVHmtmYtEpVzNCsoam2e8uqZu/Nx1LxHRYQ/kBHiktsp6yYNAe9cpFBWERE
+         e8mknIdpsBmkmyjuQZ++RPnCHWJ2pWB9zLY9TvFBgO6LkM0t1gOR760L+Z+0SrXQ5usM
+         UcOw==
+X-Forwarded-Encrypted: i=1; AJvYcCVGq58trHQaWvUjWZXz8jTFCEdy5uO/IqxtDHk8rSVAy6jZv3dIvz3fCiG7nilb4dW1vVs1UxnuutS5uO+OAE7Su1tFFU7H
+X-Gm-Message-State: AOJu0YyXC+Lm2v3uy9gcYu6LOUR0uc8tU9o0UYJOK0eIPfxFAJgxRdHQ
+	PFHEWsT+3luPlhugs/Bu1aLvoLX8xMXxh11qkbePjSFHaGK+sDvNWKcNWimqFB2BIr6rQssWoWR
+	rhSwWSLm5qAwiTc4SCR/BtEIy/NKMeG8uN/R6DQ==
+X-Google-Smtp-Source: AGHT+IF7mAD6XLmR4n3Gt/pClSzupL0+3U5AGiMLZ/7qav1f6YrsKvLOZpqZD1c+WfnbDN3udqxetHFYPB/m+t6gm1o=
+X-Received: by 2002:a4a:a647:0:b0:5a4:6ac7:de6d with SMTP id
+ j7-20020a4aa647000000b005a46ac7de6dmr2030707oom.1.1711590159712; Wed, 27 Mar
+ 2024 18:42:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2163:b0:368:727e:ec80 with SMTP id
- s3-20020a056e02216300b00368727eec80mr39235ilv.5.1711589837054; Wed, 27 Mar
- 2024 18:37:17 -0700 (PDT)
-Date: Wed, 27 Mar 2024 18:37:17 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003d360f0614ae902b@google.com>
-Subject: [syzbot] [kernel?] BUG: using smp_processor_id() in preemptible code
- in pwq_release_workfn
-From: syzbot <syzbot+60f75ab7624f6e44392b@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+References: <20240327082128.942818-1-wenjian1@xiaomi.com> <40b3371a-5966-4140-922e-7c62a1c73e6c@intel.com>
+In-Reply-To: <40b3371a-5966-4140-922e-7c62a1c73e6c@intel.com>
+From: Jian Wen <wenjianhn@gmail.com>
+Date: Thu, 28 Mar 2024 09:42:03 +0800
+Message-ID: <CAMXzGWKmo7VDZw=xymcfcqC1diusBsj0QeV1zVHDCzgqeqk_gw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] devlink: use kvzalloc() to allocate devlink
+ instance resources
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: jiri@mellanox.com, edumazet@google.com, davem@davemloft.net, 
+	Jian Wen <wenjian1@xiaomi.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Wed, Mar 27, 2024 at 6:15=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Jian Wen <wenjianhn@gmail.com>
+> Date: Wed, 27 Mar 2024 16:21:28 +0800
+>
+> > During live migration of a virtual machine, the SR-IOV VF need to be
+> > re-registered. It may fail when the memory is badly fragmented.
+> >
+> > The related log is as follows.
+> >
+> > Mar  1 18:54:12  kernel: hv_netvsc 6045bdaa-c0d1-6045-bdaa-c0d16045bdaa=
+ eth0: VF slot 1 added
+> > ...
+> > Mar  1 18:54:13  kernel: kworker/0:0: page allocation failure: order:7,=
+ mode:0x40dc0(GFP_KERNEL|__GFP_COMP|__GFP_ZERO), nodemask=3D(null),cpuset=
+=3D/,mems_allowed=3D0
+> > Mar  1 18:54:13  kernel: CPU: 0 PID: 24006 Comm: kworker/0:0 Tainted: G=
+            E     5.4...x86_64 #1
+> > Mar  1 18:54:13  kernel: Hardware name: Microsoft Corporation Virtual M=
+achine/Virtual Machine, BIOS 090008  12/07/2018
+> > Mar  1 18:54:13  kernel: Workqueue: events work_for_cpu_fn
+> > Mar  1 18:54:13  kernel: Call Trace:
+> > Mar  1 18:54:13  kernel: dump_stack+0x8b/0xc8
+> > Mar  1 18:54:13  kernel: warn_alloc+0xff/0x170
+> > Mar  1 18:54:13  kernel: __alloc_pages_slowpath+0x92c/0xb2b
+> > Mar  1 18:54:13  kernel: ? get_page_from_freelist+0x1d4/0x1140
+> > Mar  1 18:54:13  kernel: __alloc_pages_nodemask+0x2f9/0x320
+> > Mar  1 18:54:13  kernel: alloc_pages_current+0x6a/0xb0
+> > Mar  1 18:54:13  kernel: kmalloc_order+0x1e/0x70
+> > Mar  1 18:54:13  kernel: kmalloc_order_trace+0x26/0xb0
+> > Mar  1 18:54:13  kernel: ? __switch_to_asm+0x34/0x70
+> > Mar  1 18:54:13  kernel: __kmalloc+0x276/0x280
+> > Mar  1 18:54:13  kernel: ? _raw_spin_unlock_irqrestore+0x1e/0x40
+> > Mar  1 18:54:13  kernel: devlink_alloc+0x29/0x110
+> > Mar  1 18:54:13  kernel: mlx5_devlink_alloc+0x1a/0x20 [mlx5_core]
+> > Mar  1 18:54:13  kernel: init_one+0x1d/0x650 [mlx5_core]
+> > Mar  1 18:54:13  kernel: local_pci_probe+0x46/0x90
+> > Mar  1 18:54:13  kernel: work_for_cpu_fn+0x1a/0x30
+> > Mar  1 18:54:13  kernel: process_one_work+0x16d/0x390
+> > Mar  1 18:54:13  kernel: worker_thread+0x1d3/0x3f0
+> > Mar  1 18:54:13  kernel: kthread+0x105/0x140
+> > Mar  1 18:54:13  kernel: ? max_active_store+0x80/0x80
+> > Mar  1 18:54:13  kernel: ? kthread_bind+0x20/0x20
+> > Mar  1 18:54:13  kernel: ret_from_fork+0x3a/0x50
+> >
+> > Changes since v1:
+> > - Use struct_size(devlink, priv, priv_size) as suggested by Alexander L=
+obakin
+> >
+> > Signed-off-by: Jian Wen <wenjian1@xiaomi.com>
+>
+> Since it actually fixes a bug splat, you may want to send it with prefix
+> "net" instead of "net-next" and add a "Fixes:" tag here blaming the
+> first commit which added Devlink instance allocation. Let's see what
+> others think.
+Many commits that replace kzalloc()  with kvzalloc() don't include the
+"Fixes:'' tag.
 
-syzbot found the following issue on:
-
-HEAD commit:    61df575632d6 libbpf: Add new sec_def "sk_skb/verdict"
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=17683185180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=60f75ab7624f6e44392b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0d2d0f91bfad/disk-61df5756.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0b0f2fd80260/vmlinux-61df5756.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0450c835a85f/bzImage-61df5756.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+60f75ab7624f6e44392b@syzkaller.appspotmail.com
-
-BUG: using smp_processor_id() in preemptible [00000000] code: pool_workqueue_/3
-caller is pv_init_node kernel/locking/qspinlock_paravirt.h:284 [inline]
-caller is __pv_queued_spin_lock_slowpath+0x192/0xc60 kernel/locking/qspinlock.c:439
-CPU: 1 PID: 3 Comm: pool_workqueue_ Not tainted 6.8.0-syzkaller-05238-g61df575632d6 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- pv_init_node kernel/locking/qspinlock_paravirt.h:284 [inline]
- __pv_queued_spin_lock_slowpath+0x192/0xc60 kernel/locking/qspinlock.c:439
- pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
- queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
- queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
- lockdep_lock+0x1b0/0x2b0 kernel/locking/lockdep.c:144
- lockdep_unregister_key+0x20d/0x540 kernel/locking/lockdep.c:6456
- wq_unregister_lockdep kernel/workqueue.c:4655 [inline]
- pwq_release_workfn+0x6e0/0x840 kernel/workqueue.c:4958
- kthread_worker_fn+0x4bf/0xab0 kernel/kthread.c:841
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
-BUG: using __this_cpu_add() in preemptible [00000000] code: pool_workqueue_/3
-caller is __pv_queued_spin_lock_slowpath+0x945/0xc60 kernel/locking/qspinlock.c:565
-CPU: 1 PID: 3 Comm: pool_workqueue_ Not tainted 6.8.0-syzkaller-05238-g61df575632d6 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- __pv_queued_spin_lock_slowpath+0x945/0xc60 kernel/locking/qspinlock.c:565
- pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
- queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
- queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
- lockdep_lock+0x1b0/0x2b0 kernel/locking/lockdep.c:144
- lockdep_unregister_key+0x20d/0x540 kernel/locking/lockdep.c:6456
- wq_unregister_lockdep kernel/workqueue.c:4655 [inline]
- pwq_release_workfn+0x6e0/0x840 kernel/workqueue.c:4958
- kthread_worker_fn+0x4bf/0xab0 kernel/kthread.c:841
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
-BUG: using __this_cpu_add() in preemptible [00000000] code: pool_workqueue_/3
-caller is lockdep_unlock+0x16a/0x300 kernel/locking/lockdep.c:157
-CPU: 1 PID: 3 Comm: pool_workqueue_ Not tainted 6.8.0-syzkaller-05238-g61df575632d6 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- lockdep_unlock+0x16a/0x300 kernel/locking/lockdep.c:157
- lockdep_unregister_key+0x45c/0x540 kernel/locking/lockdep.c:6471
- wq_unregister_lockdep kernel/workqueue.c:4655 [inline]
- pwq_release_workfn+0x6e0/0x840 kernel/workqueue.c:4958
- kthread_worker_fn+0x4bf/0xab0 kernel/kthread.c:841
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
+Jiri, what do you think?
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>
+> > ---
+> >  net/devlink/core.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/devlink/core.c b/net/devlink/core.c
+> > index 7f0b093208d7..f49cd83f1955 100644
+> > --- a/net/devlink/core.c
+> > +++ b/net/devlink/core.c
+> > @@ -314,7 +314,7 @@ static void devlink_release(struct work_struct *wor=
+k)
+> >       mutex_destroy(&devlink->lock);
+> >       lockdep_unregister_key(&devlink->lock_key);
+> >       put_device(devlink->dev);
+> > -     kfree(devlink);
+> > +     kvfree(devlink);
+> >  }
+> >
+> >  void devlink_put(struct devlink *devlink)
+> > @@ -420,7 +420,7 @@ struct devlink *devlink_alloc_ns(const struct devli=
+nk_ops *ops,
+> >       if (!devlink_reload_actions_valid(ops))
+> >               return NULL;
+> >
+> > -     devlink =3D kzalloc(sizeof(*devlink) + priv_size, GFP_KERNEL);
+> > +     devlink =3D kvzalloc(struct_size(devlink, priv, priv_size), GFP_K=
+ERNEL);
+> >       if (!devlink)
+> >               return NULL;
+> >
+> > @@ -455,7 +455,7 @@ struct devlink *devlink_alloc_ns(const struct devli=
+nk_ops *ops,
+> >       return devlink;
+> >
+> >  err_xa_alloc:
+> > -     kfree(devlink);
+> > +     kvfree(devlink);
+> >       return NULL;
+> >  }
+> >  EXPORT_SYMBOL_GPL(devlink_alloc_ns);
+>
+> Thanks,
+> Olek
 
