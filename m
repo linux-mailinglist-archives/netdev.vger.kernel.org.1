@@ -1,146 +1,124 @@
-Return-Path: <netdev+bounces-82708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C2FE88F532
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 03:18:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D59E788F55A
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 03:26:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 854BB1C261A7
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:17:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F36A29874C
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE5117758;
-	Thu, 28 Mar 2024 02:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FF9F513;
+	Thu, 28 Mar 2024 02:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="B6Qz/nis"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Dn17sc3e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844C2BE6C
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 02:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8996D2599
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 02:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711592275; cv=none; b=rdRFcLBNburoJFCcqk4Fgdd1Z4IcfQenWOwcjjUImo0VpW0+/TsejN32Hiq6zFWNjrWNDvqoliH/Mz7kLjygvvkT6LSoDh56E4SXpaqLxQeRzjOMPoluefzd0GGfDaqNQA/QgK6dUDuEWFnfw9/sFbR+XaqwEyrb2BO9VLA2Lzk=
+	t=1711592791; cv=none; b=Fd8EjH7tbUwFWVoXxXeFj0XI8FhWQgZsI9PdQZ5yP7gSotxVA7X40kRVmBI08bWtvYTciZN+/c8hi5LdJo66UHP+L78XoabM/G1htwL3Go/RE2/AfqXB1k6M3187/11NFx0JIegdhAQXu0ZB+sPbg4YFZDignEKa/92pv1m8huY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711592275; c=relaxed/simple;
-	bh=dkVEVkIRKFA1HU/GHjJVqfG3aWdxOeI8rHcQ0XmMwyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jc+RQ4ihD7llEek6chcKymqY8/1icxVwojE89/bVe6USVvAzNF/YpWb9lJqoAwnrsp9ARMI0rmMFVOp77PRpQcPhBCQs2CS7Dx8QnCzCzoQ5qWZ/awDWvfyxJ2NNz981274UrZDeg8/49s9NRRPBml9Bg1nq1w7VMxInEIt4+rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=B6Qz/nis; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3c3df13fe31so321665b6e.0
-        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 19:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1711592272; x=1712197072; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=keS6Nwe0n85aMullLK89O4ZfPm3brRYudBEywgHPkJg=;
-        b=B6Qz/nisNY7pYUSBCvdEYvIAMMV+Q+pbaRB5qFCZPWkOVpm6g0YVM0q8P6aFCmSc6T
-         ylacUaGGc4HtDEMJBOOARBE+9OiJAXpaEhLLlCKq4aRqBTQjnU2MhGlK/w2NQd7vmSKa
-         U/9fxY+FbSNKUq9jXuNiPQqTz52SEj8/lzGydJXANi3hO7/m/aq9e0J0gYFynJ2sW15P
-         bg7I1fVWW+sxmZzSSdD0HiezCyH6eoDE7538vJCBmQhiK7a5Jz2Z/ERkDLF9GP57bupm
-         1lFpSd/8HKIEgw7md0DY20oR4ecVoJu06kbfFJGRDSZF0QjhpNTCe3zO2omOukfKLXuk
-         Dbpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711592272; x=1712197072;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=keS6Nwe0n85aMullLK89O4ZfPm3brRYudBEywgHPkJg=;
-        b=shtaRZg9IuuMZIwmnf8XPEYCp34fSbhq7hl0aIH9G7s/dqmdXcue3s6At9bzyavXUS
-         EnYUG7LiOyAdc8RwNmDYWfCJ3bwoaY/8B+a/Dx48Y8xDNyP/HjFb+ETdvmXC0tkbphO5
-         9tWqwHR+cVHdUb7hOw9VYTj2kxrQwj418yhMB1CzAk7LywEuMoQZsUm1B6EQvA2pYr5y
-         rI1N9u4j35o4+GoadxYcWJJg1evgsXt8TNePWiIsrTCA5RP7IsVwxcmC+JN8fiXQpcAx
-         GNAyFITEW5hPbsibdmzBkhPmOPJM3sVHstTYlDQEdb71xoQ+d3XsR2KigpA5dcTGGVPY
-         XwTA==
-X-Gm-Message-State: AOJu0YwsbMjxEL/qhWt8rGD7HR2ec+auujHKy9qG3lpj5kQhA1AKpD9Z
-	YH5JJF6qbiyXSVprPsVglbMHbCW8oXoQGyHFSCkf3MVJIVoh6AxhXwWnCSue+qg=
-X-Google-Smtp-Source: AGHT+IHhEsEKL34cj599L67qta76NDeIsmKhsJsCWCDbWUC+Uz5go9X9wRjf5pzAxXlSv04DefJ+bg==
-X-Received: by 2002:a05:6808:23cc:b0:3c3:e0bf:ceb6 with SMTP id bq12-20020a05680823cc00b003c3e0bfceb6mr2092552oib.17.1711592272524;
-        Wed, 27 Mar 2024 19:17:52 -0700 (PDT)
-Received: from hermes.local (204-195-123-203.wavecable.com. [204.195.123.203])
-        by smtp.gmail.com with ESMTPSA id k196-20020a633dcd000000b005ceeeea1816sm199508pga.77.2024.03.27.19.17.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 19:17:52 -0700 (PDT)
-Date: Wed, 27 Mar 2024 19:17:50 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Yedaya <yedaya.ka@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] ip: Make errors direct to "list" instead of "show"
-Message-ID: <20240327191750.2fa35c98@hermes.local>
-In-Reply-To: <ZgHwYUtxrDP1Y+BS@abode>
-References: <20240325204837.3010-1-yedaya.ka@gmail.com>
-	<20240325141920.0fe4cb61@hermes.local>
-	<ZgHwYUtxrDP1Y+BS@abode>
+	s=arc-20240116; t=1711592791; c=relaxed/simple;
+	bh=rPJHUU8D1GksjG1QFEQXmcYv5lxhv8iHvUj4guXE8Ao=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bVqVhkjGOvDYSYlxYFaKZlfwYdd389fEMaXM4XghiUvVBVIVCsuaV7ODGYpD0Awpcxms0XqaIV1LmuiwgScLW76bEKtiYwD8Nb6X6lT2wBurethHk/4q8wTZFFxnwMa1iCjiheTuOl+JOZqrXVpcAe1Y5420Pa9WMnQeH73+Crc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Dn17sc3e; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711592786; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=h7Efqa5U1w854uuMyvMUXImLQ6eZ4awmcIDJ8psKwA8=;
+	b=Dn17sc3eSJfX+vna8zK40g0kAM3Ll3LnPOg+HVKklZ0BmCBNf7CwLNt0RRLID90y0VlNZuUXq05XzUAvDaruhcViDHBmGWbYiH22nj95ffzT1Ulrp1zvvgc7iIf5jHNlj8u0yss0FW2ICGahYG97F3biJXuUv8DYvh6FLh/jnL8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R871e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W3QHOBc_1711592783;
+Received: from 30.221.148.146(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3QHOBc_1711592783)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Mar 2024 10:26:25 +0800
+Message-ID: <7a73eac4-5b28-49eb-9709-6c7e404257f8@linux.alibaba.com>
+Date: Thu, 28 Mar 2024 10:26:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/2] virtio-net: support dim profile
+ fine-tuning
+To: Jakub Kicinski <kuba@kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ "David S. Miller" <davem@davemloft.net>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, vadim.fedorenko@linux.dev,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>
+References: <1711531146-91920-1-git-send-email-hengqi@linux.alibaba.com>
+ <1711531146-91920-3-git-send-email-hengqi@linux.alibaba.com>
+ <556ec006-6157-458d-b9c8-86436cb3199d@intel.com>
+ <20240327173258.21c031a8@kernel.org>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <20240327173258.21c031a8@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 25 Mar 2024 23:45:05 +0200
-Yedaya <yedaya.ka@gmail.com> wrote:
 
-> On Mon, Mar 25, 2024 at 02:19:20PM -0700, Stephen Hemminger wrote:
-> > On Mon, 25 Mar 2024 22:48:37 +0200
-> > Yedaya Katsman <yedaya.ka@gmail.com> wrote:
-> >  =20
-> > > The usage text and man pages only have "list" in them, but the errors
-> > > when using "ip ila list" and "ip addrlabel list" incorrectly direct to
-> > > running the "show" subcommand. Make them consistent by mentioning "li=
-st"
-> > > instead.
-> > >=20
-> > > Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com> =20
-> >=20
-> > That is because ip command treats "list" and "show" the same.
-> > Would it be better to do the same in all sub commands?
-> > =20
-> I'm not sure what else you're talking about changing, I couldn't find
-> anywhere where a "show" is referenced in output. Do you mean treating
-> "show" and "list" the same everywhere?
 
-Almost all of iproute utils allow list, show, or lst.
+在 2024/3/28 上午8:32, Jakub Kicinski 写道:
+> On Wed, 27 Mar 2024 15:45:50 +0100 Alexander Lobakin wrote:
+>>> +/* This is copied from NET_DIM_RX_EQE_PROFILES in DIM library */
+>>> +#define VIRTNET_DIM_RX_PKTS 256
+>>> +static struct dim_cq_moder rx_eqe_conf[] = {
+>>> +	{.usec = 1,   .pkts = VIRTNET_DIM_RX_PKTS,},
+>>> +	{.usec = 8,   .pkts = VIRTNET_DIM_RX_PKTS,},
+>>> +	{.usec = 64,  .pkts = VIRTNET_DIM_RX_PKTS,},
+>>> +	{.usec = 128, .pkts = VIRTNET_DIM_RX_PKTS,},
+>>> +	{.usec = 256, .pkts = VIRTNET_DIM_RX_PKTS,}
+>>> +};
+>> This is wrong.
+>> This way you will have one global table for ALL the virtio devices in
+>> the system, while Ethtool performs configuration on a per-netdevice basis.
+>> What you need is to have 1 dim_cq_moder per each virtio netdevice,
+>> embedded somewhere into its netdev_priv(). Then
+>> virtio_dim_{rx,tx}_work() will take profiles from there, not the global
+>> struct. The global struct can stay here as const to initialize default
+>> per-netdevice params.
+> I've been wondering lately if adaptive IRQ moderation isn't exactly
+> the kind of heuristic we would be best off deferring to BPF.
+> I have done 0 experiments -- are the thresholds enough
+> or do more interesting algos come to mind for anyone?
 
-You found a couple of places that may not.
-Perhaps this will fix it.
+Hi Jakub.
 
-=46rom f65a5b0d0757ab7d9c57d0962ca903dd095ce20b Mon Sep 17 00:00:00 2001
-From: Stephen Hemminger <stephen@networkplumber.org>
-Date: Wed, 27 Mar 2024 16:55:09 -0700
-Subject: [PATCH] ipila: allow show, list and lst as synonyms
+I totally agree with your idea. In order to get the best practices for 
+virtio DIM on our DPUs,
+I actually spent a lot of energy on tuning, similar to the current 
+custom profile list and virtio
+ctrlq asynchronousization. There are some other tuning methods that may 
+not be applicable to
+other manufacturers, so they are cannot be released for the time being.
 
-Across ip commands show, list and misspelling lst are treated
-the same.
+But anyway, adding a dim_bpf interface similar to native XDP (located at 
+the beginning
+of net_dim()) I think would be good, if you and BPF maintainers (Cc'd) 
+are willing for a new bpf type
+to be introduced. dim_bpf allows devices that want to implement best 
+practices for adaptive
+IRQ moderation to implement custom logic.
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- ip/ipila.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Also, I think the existing patches are still necessary, and this 
+provides the simplest and most
+direct way to tune.
 
-diff --git a/ip/ipila.c b/ip/ipila.c
-index f4387e03..80f34f29 100644
---- a/ip/ipila.c
-+++ b/ip/ipila.c
-@@ -301,7 +301,9 @@ int do_ipila(int argc, char **argv)
- 		return do_add(argc-1, argv+1);
- 	if (matches(*argv, "delete") =3D=3D 0)
- 		return do_del(argc-1, argv+1);
--	if (matches(*argv, "list") =3D=3D 0)
-+	if (matches(*argv, "show") =3D=3D 0 ||
-+	    matches(*argv, "lst") =3D=3D 0 ||
-+	    matches(*argv, "list") =3D=3D 0)
- 		return do_list(argc-1, argv+1);
-=20
- 	fprintf(stderr, "Command \"%s\" is unknown, try \"ip ila help\".\n",
---=20
-2.43.0
+Thanks!
+
+
 
 
