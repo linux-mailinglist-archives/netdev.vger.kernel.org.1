@@ -1,132 +1,123 @@
-Return-Path: <netdev+bounces-83110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007ED890D8B
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:23:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2BCE890D95
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 23:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAB701F276F0
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:23:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6166AB21CC9
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 22:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD2613B797;
-	Thu, 28 Mar 2024 22:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC4A1384B3;
+	Thu, 28 Mar 2024 22:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="F854slZW";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KV+i3NsX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nR3ONRho"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout6-smtp.messagingengine.com (fout6-smtp.messagingengine.com [103.168.172.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD46E13AA43;
-	Thu, 28 Mar 2024 22:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3325412DDAC
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 22:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711664497; cv=none; b=hSEHDrA5HlWJ7vwAkIcJRDHko0UTsIaGd69JMsJTGX4ICHDb1UF3+/J53l8ojnFrKUapion6riCi0RXNh6q85PWqPC63UdqWs0p2JkhWKwx4ZaAUv8FSREN+X8SPtLg/tVy4dkJki1YF6JvIj7b5AXS572BZMGDptc1Emr4qQbA=
+	t=1711664916; cv=none; b=usvDsn0P1pm3fZ+fsW3Wk9f79I1q+ZpU4snPkK6cMShcquYGTp/yXALpUZjZ4D3dcCGyR/2sk9wMpYPLvl/H6Sodo2YALfCQAaWdFSGLZd2GlLa9Dd/1VDI1IvMF+l93xF69nVz1HKFOBJQmw2cwkB/D4YMRsIoHmcoO/pgrRPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711664497; c=relaxed/simple;
-	bh=mOFwk6M1zhT1iOVUqY/hGGV5E3pwFDgAZwnWalX/pJQ=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=OIeph8P2SNHt90RLN2Wp7xl1b/BsornDw10/RO4XNMfnrTP9eEQAbRJGvJ8/JtTDAFviHhJuqudJgs6332i1Zd8ZPgOZSY6Imf/6/c3XHubAlYyWVzZovZgedcYi554WHqHThiokuUB6KAzVjZGEpOTkernoBRA7vom4MH5tLdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=F854slZW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KV+i3NsX; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.nyi.internal (Postfix) with ESMTP id E0D0D138011A;
-	Thu, 28 Mar 2024 18:21:34 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Thu, 28 Mar 2024 18:21:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1711664494;
-	 x=1711750894; bh=cqhIx11127blwZEBTGU6eCEpapLLuESTyHFNcTJ+wAY=; b=
-	F854slZWo+i70tZfg0AmmCv4sr3It6R7pYK6uu3HjukPxABjiXNO5XylMrSp/Jn6
-	srSLcsw2L9p50Grj4CBz853jcn3U6o4+RUcwwgH55s6+/IIURt5P+eqcmAkKYv7N
-	FONPhqwkNpes2XrXmxtDYH5eHXxY+svSxIgBUOftX4JaG+uUu4RlOWoXI0P6v9L2
-	wpKx/coJJOqekcDB7G6Qh6+ICfb8kPYeYI8BQw9cxaO7Dd2ymb7D65g6d8T/Rhom
-	6yuyz0K1NaPoI3z3zpNn4vUdy5PTcu8y+1Qv1jEeBg68wn1BfUB6c8f6y/2vI4A4
-	sWBvFTTFenv9lkFM/He+VQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1711664494; x=
-	1711750894; bh=cqhIx11127blwZEBTGU6eCEpapLLuESTyHFNcTJ+wAY=; b=K
-	V+i3NsX5NVTQf7lx8NVGlCi0ND2m63KVz90bXf1WdyOXTYP5kcOTYcDfxN5DPuUo
-	Z2nWC8+DWGnA0gIGf5/bmBbQ8vTIh+DjTBR+cHR3rmFUAqcEYsbhCqcBZyLduNqy
-	8ZkPcqTjFhDCHBZGRn3q5RWSP7cOzLJwpCEdzwf0zKLW88UxCNODRdHFPKjQAX+T
-	u2A2vg5hy6H9BJlMPSPHX3eOuCAIOc6Vhkr7afdWU1DZFF9GwJF1N3hzStdIl7hu
-	elT4qJP/1RkI4ttkEChmbCa2UxjipPQXFU9zZl/0W74o7olUDnBLoNc7tcfxZ97g
-	+nZKfoATFKb/7hQBxdzVA==
-X-ME-Sender: <xms:bu0FZlBJwW7ueuyC4kpoPA5sN5dLnRoH0TaoyJP9MKk5o8Wh7wXJvw>
-    <xme:bu0FZjgz4A135ve_MYMJFqRJ2e8-TQkp871my8WhxYh7UR33hPkHkU13e3xpT3fjc
-    FgoCxzYRxonsByalnM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudduledgudehlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedf
-    tehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrf
-    grthhtvghrnhepgeefjeehvdelvdffieejieejiedvvdfhleeivdelveehjeelteegudek
-    tdfgjeevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    eprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:bu0FZgl3ehV8e4nLHD9CiSYyObE_6DOOvK5W2UflW3ueShY7mJst5w>
-    <xmx:bu0FZvwwRvt8IScU4eWOmIWsERzNk5WKaTDuip_GpJa_91i6wp-B6Q>
-    <xmx:bu0FZqQHeflmfFT5iRMLz1Z8KiHe5vXkUgyiXaWpc4ulOuFx4LjbWA>
-    <xmx:bu0FZiY1fLk30sOTiaJawo29_qspSahZdJWUEirxNEFul09XEphSaA>
-    <xmx:bu0FZjSvJhTpLjRx7TrKvKT33ho63rBL0584nLjGYTIkTQtV1Y5-2Q>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 8C232B6008F; Thu, 28 Mar 2024 18:21:34 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-333-gbfea15422e-fm-20240327.001-gbfea1542
+	s=arc-20240116; t=1711664916; c=relaxed/simple;
+	bh=eEhouD3IOSrRPQ5JUilgmokM1mem5EMCfIufBd4bx0I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O2+xz0kJs0zM3snL6ReCkeUYBJxT8gvCl9P2ciBjLA2rmYHVV0IFK9C4tdhSztgJ84Xhj4Zqig3WrI9iRX0sCkquVCipLHhefPlvvxKhosFHyWNmqBNikPzFIus1XpTjqm1Ju8CPAwPFrxbc51Qw7zdbgLBQOPss6Oi731Y8Ihw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nR3ONRho; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33ddd1624beso926523f8f.1
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 15:28:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711664913; x=1712269713; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cM5BqpIjNpc3SVp5qd4EaNi1mFFZ1EgjlVdiqB9qVp8=;
+        b=nR3ONRhodqeNDIejwhVfh6EHa7QRdBfBVn8M80SKaZD2YuyuVr98LNptIRY7I7sJtr
+         uXJso4+bTM31w4kAyktl1lqFi8+MAjuXQY7L6SNyXaRBqlanpg6FLKWzUgrhChe78E1e
+         O7kjMuUriWerb2Xp3JTfUS0dYEAObq+dx6cspP5puiVk8M7r9VVdEomiYSfTN8KzEG4r
+         FgH8g67JH1ibvZnzAGpWpo7NEQay72VozHe2uJuBVcqWHCH89Bio9H/iv3rczkEink5G
+         x29U+oNNfA1UAsUNbF2mdCbFKEzMxNv0b7+HDOQe+BzAnH7jcwnte7W4xr9o8PXzHsDh
+         ADXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711664913; x=1712269713;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cM5BqpIjNpc3SVp5qd4EaNi1mFFZ1EgjlVdiqB9qVp8=;
+        b=fAu+kMV/JCgL/WpWKpe8T+o91nCNQIlr4zZVjcjCLUDRDvzYfzHnoNf0oXDgGjj6t+
+         enLvE+aa3USG5EPyd8H+Zp7x+po/zYeL1BZdEs+L0rXjHG5n9roJn4lDPfPC3BuyqjLH
+         4b+AQMgbXVvPlvbCodbKi95PWz2yXuaJy8dfv+eAHSTNApLj9TEQryV/F4Vi3WW7nHlv
+         HD3RKInerti+D9JsoG27uaLbDhSQkoYW5xrct7017qPd6eVzxBkaHt16vQdOsNcEt/Vy
+         JpcHpPhmsH81Ta9XLWOquuIdBguvLxOKY5QiGCvqIsRzvCKGBe8LPXMA5M5umxRUObYN
+         2++w==
+X-Forwarded-Encrypted: i=1; AJvYcCXhJyrpqA2XIgpNTmSiY60Pp8hclyodMMosxOpVt7HmOslmkHCtXgc4OUUrCa5ryO15mpAfGuwazLxf4sm7FDd1mLwkxk4p
+X-Gm-Message-State: AOJu0YztZWsXxQXBNt5BVlNHtas7IqI+H5sPD9lu7J9V/M0N0yRubshu
+	DwL2QoxaZrzf2wUVUiHEoWU1cwBtznpfo5kRnyznfN9b1XtxGRMj9qHF58Hu
+X-Google-Smtp-Source: AGHT+IHOpigh5LGMyOv0K98WmGq6fT6xBqlMtmZctRRgsKrmDhyGyvfbxc96GhYdszOWUAU5RtvyMw==
+X-Received: by 2002:a5d:5408:0:b0:33e:c0f0:c159 with SMTP id g8-20020a5d5408000000b0033ec0f0c159mr3070515wrv.10.1711664913331;
+        Thu, 28 Mar 2024 15:28:33 -0700 (PDT)
+Received: from [172.27.34.173] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id n35-20020a05600c502300b004149744dc49sm3604786wmr.22.2024.03.28.15.28.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 15:28:33 -0700 (PDT)
+Message-ID: <a7f042f9-7e74-457b-876a-6a7427a55847@gmail.com>
+Date: Fri, 29 Mar 2024 00:28:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <24a4f667-6eef-484d-8f9c-129d3ddf70a1@app.fastmail.com>
-In-Reply-To: 
- <CAFhGd8pTdJNzmxhUaCpDkWpYiAP0Gvm6K=o+w5uE-g20M7u3rA@mail.gmail.com>
-References: <20240328143051.1069575-1-arnd@kernel.org>
- <20240328143051.1069575-9-arnd@kernel.org>
- <CAFhGd8pTdJNzmxhUaCpDkWpYiAP0Gvm6K=o+w5uE-g20M7u3rA@mail.gmail.com>
-Date: Thu, 28 Mar 2024 23:21:14 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Justin Stitt" <justinstitt@google.com>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, "Saeed Mahameed" <saeedm@nvidia.com>,
- "Leon Romanovsky" <leon@kernel.org>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Nathan Chancellor" <nathan@kernel.org>,
- "Jonathan Lemon" <jonathan.lemon@gmail.com>,
- "Maxim Mikityanskiy" <maxtram95@gmail.com>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Nick Desaulniers" <ndesaulniers@google.com>,
- "Bill Wendling" <morbo@google.com>, "Tariq Toukan" <tariqt@nvidia.com>,
- "Gal Pressman" <gal@nvidia.com>, Netdev <netdev@vger.kernel.org>,
- linux-rdma@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH 8/9] mlx5: stop warning for 64KB pages
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/8] mlx5e misc patches
+To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>
+References: <20240326222022.27926-1-tariqt@nvidia.com>
+ <20240328092501.3a2e5531@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240328092501.3a2e5531@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 28, 2024, at 23:09, Justin Stitt wrote:
-> On Thu, Mar 28, 2024 at 7:32=E2=80=AFAM Arnd Bergmann <arnd@kernel.org=
-> wrote:
+
+
+On 28/03/2024 18:25, Jakub Kicinski wrote:
+> On Wed, 27 Mar 2024 00:20:14 +0200 Tariq Toukan wrote:
+>> This patchset includes small features and misc code enhancements for the
+>> mlx5e driver.
 >>
->> From: Arnd Bergmann <arnd@arndb.de>
+>> Patches 1-4 by Gal improves the mlx5e ethtool stats implementation, for
+>> example by using standard helpers ethtool_sprintf/puts.
 >>
->> When building with 64KB pages, clang points out that xsk->chunk_size
->> can never be PAGE_SIZE:
->
-> This is under W=3D1 right? Otherwise this is a mighty annoying warning.
+>> Patch 5 by Carolina adds exposure of RX packet drop counters of VFs/SFs
+>> on their representor.
+>>
+>> Patch 6 by me adds a reset option for the FW command interface debugfs
+>> stats entries. This allows explicit FW command interface stats reset
+>> between different runs of a test case.
+>>
+>> Patches 7 and 8 are simple cleanups.
+> 
+> This is purely mlx5 changes, since you're not listed as the maintainer
+> it'd be good to add an note to the cover letter explaining your
+> expectations. 
 
-At the moment yes. I'm fairly sure that I've covered all the
-common cases with thousands of randconfig builds, so we should
-be able to make it the default when this series is fully merged.
+This is targeted for net-next. I should add myself in the proper mlx5 
+maintainers section. We'll submit a patch for that.
 
-     Arnd
+> Otherwise you may have just typo'ed the subject and
+> have actually meant it for mlx5-next.
+> 
+
 
