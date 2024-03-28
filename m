@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-83023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94052890711
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:22:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C83F5890716
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33F9D1F25B1D
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:22:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8464F287305
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0767EF00;
-	Thu, 28 Mar 2024 17:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A1D7EF1D;
+	Thu, 28 Mar 2024 17:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t4I3A/48"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3O5deGf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A320F5A780;
-	Thu, 28 Mar 2024 17:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CEA7EF0E;
+	Thu, 28 Mar 2024 17:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711646564; cv=none; b=sGS3BfPr3kwLG5ugmzPRoTlXO9zepV309apmA2dzx5ivf9zeI1C4DJopEXJPsrBGLKfc4oP9btRpa5Nh08vsDhwG0WgG+339tPH2fJRN2VpWMima1id2ecF6ScMm0TGpEukpdN/0GrndWA2T5q9XdmYtJBluxNj7TZlxAmNxXTo=
+	t=1711646594; cv=none; b=Li8vz7Um2IugvEB2X6ZHtNPQWNB+4qJfDsfo+HSmQ5IefiHdRA5TI0K54t55F7oy+9kuBX+CylmAodd8jJEe3Xw983Pww1kNNyoCizqahoLd0qgZmoBqfS9QKqZZ67HpwdS1eLY4uL+xHFcdtzDUN9Gt3FXCsNiFSRKAleOW8Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711646564; c=relaxed/simple;
-	bh=zvaTfL5i0i12k1PkvRyuQpdi6paxqsJzTnBVoQrSthA=;
+	s=arc-20240116; t=1711646594; c=relaxed/simple;
+	bh=ocaxfsxN2RcUH0BomGmZ305cwqYXx8cqNkONuTikcDY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EzQZCpzBVMwx1U5/PeIwLDU4yJxbmP2M8D/OvDSMKvR9ZlPNtGIq5yNa/UmO4ZJB+PRK6+0c3ZXA3CQBvvytxjpDGomfdzDYIJ17REIovKY9O9hhJMdm7jk+Sq8pBU/Aq6xW6ifir+6MtBMR63rq/EEAr0hARbKsQhRDCoZH7l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t4I3A/48; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFC3FC433C7;
-	Thu, 28 Mar 2024 17:22:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=IcUa0T5lbz17wDF2en2PyfFxA1qbs6l2ppe3A+rul/3VcZHTggg5eCAbxcASv2V+KxhdDe+K85cZFq1/ezWDxDf7Xsm7kJ2ScstrA+djkoQFfOFX+DQ9i5DIbenjCOO/S94JgSbIvoaw9+2u971aJH7iYNc7wdlXBAKO2TkN/2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3O5deGf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6415BC433F1;
+	Thu, 28 Mar 2024 17:23:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711646564;
-	bh=zvaTfL5i0i12k1PkvRyuQpdi6paxqsJzTnBVoQrSthA=;
+	s=k20201202; t=1711646593;
+	bh=ocaxfsxN2RcUH0BomGmZ305cwqYXx8cqNkONuTikcDY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t4I3A/48nhIb+L1iaJu5fwn1VAQusll0dPaugv+hKN7sjAQkljRIPiUqP5lSUd/yi
-	 Ta/Sy95JRaawTvdMkFdyHR8n1la7mVSEtFHpZWB/DDCjkQ6PRa3+Bkl28a5E9LX+30
-	 6r9vdgnnGXKsgJuddSVGo3+JkoqBT42A84nAkYZ/DP54F1/pE5lzvew/Lld6PqO/a3
-	 lmLuanHA+4EUqZ7FKx/8A2ed3REAma5J8+ytAdYllHGir+mOzpXHnY1s5eb/FAxO49
-	 zFOaqyyiZ3rOA++2e59cWssHVrkhA4iul4UbGTgUKieYInytY/e73XzG0lIYuySS0C
-	 WZr5vBSFqrQxQ==
-Date: Thu, 28 Mar 2024 17:22:39 +0000
+	b=m3O5deGfX9GRSgL/Psat0maVZbp8A5TWl7tIDu1qVpVTHzTsAIMlWJvZKr0FYIrfC
+	 d+B+HZQLBuSmScwh6J68J1Yod66oGgjz5r7U4txDFOXCctZWmBveQVUSeKb3DhRC1u
+	 HYYXh69lgfDQy0D93Hwh4xJ/OgXp1SpmVyQInq1Beh6eLgd0WpeaMSLNxDUsr2DF1D
+	 thZTaqRVCa0wVkLbWy371zuWYs0av2KNhf/ZAZ67f8Q4z5HUP41IMNGBkp10ZJUkKo
+	 pDw2eyNRQAwgDWtN5ojgraW5dW9r298ioLakOjobNgfloTOKUDYF9POjTE7KDxePJC
+	 IlRMDzgtkOIsQ==
+Date: Thu, 28 Mar 2024 17:23:09 +0000
 From: Simon Horman <horms@kernel.org>
 To: Ivan Vecera <ivecera@redhat.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, mschmidt@redhat.com,
 	aleksandr.loktionov@intel.com, jesse.brandeburg@intel.com,
 	anthony.l.nguyen@intel.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH iwl-next v2 2/7] i40e: Refactor argument of several
- client notification functions
-Message-ID: <20240328172239.GA651713@kernel.org>
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH iwl-next v2 1/7] i40e: Remove flags field from i40e_veb
+Message-ID: <20240328172309.GB651713@kernel.org>
 References: <20240327075733.8967-1-ivecera@redhat.com>
- <20240327075733.8967-3-ivecera@redhat.com>
+ <20240327075733.8967-2-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,19 +62,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240327075733.8967-3-ivecera@redhat.com>
+In-Reply-To: <20240327075733.8967-2-ivecera@redhat.com>
 
-On Wed, Mar 27, 2024 at 08:57:28AM +0100, Ivan Vecera wrote:
-> Commit 0ef2d5afb12d ("i40e: KISS the client interface") simplified
-> the client interface so in practice it supports only one client
-> per i40e netdev. But we have still 2 notification functions that
-> uses as parameter a pointer to VSI of netdevice associated with
-> the client. After the mentioned commit only possible and used
-> VSI is the main (LAN) VSI.
-> So refactor these functions so they are called with PF pointer argument
-> and the associated VSI (LAN) is taken inside them.
+On Wed, Mar 27, 2024 at 08:57:27AM +0100, Ivan Vecera wrote:
+> The field is initialized always to zero and it is never read.
+> Remove it.
 > 
 > Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 > Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
