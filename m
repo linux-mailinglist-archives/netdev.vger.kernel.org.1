@@ -1,306 +1,177 @@
-Return-Path: <netdev+bounces-82698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960D088F4A3
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:32:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FD9588F4D2
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 02:39:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B941E1C294BF
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:32:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2CDB1F30F13
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 01:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F7E2231F;
-	Thu, 28 Mar 2024 01:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dl2D4tOl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64E422EE8;
+	Thu, 28 Mar 2024 01:37:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA72208A1;
-	Thu, 28 Mar 2024 01:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB39439AFD
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 01:37:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711589514; cv=none; b=RSOWBgOxMQEgXJ9Jjb0/rGy5d8arx9vesJftHi8fPjbwPON5/RLozE/NONX6z7m6HgUMludu0HzUZ/hUhy8ZPwo/lApSwIDkGnTN+qPzICVCpRYks1nYXZ+wjo9lvqD/OSg5bGyFHJ7evbqZi3ogcklNeP1IOFayIPDWhRsLbvY=
+	t=1711589839; cv=none; b=ZodoiYsCi2cw6ey/O1qxduzW/RzE3DVDG7qqNQ69Wv2AG6l0mFMdCdEgry+C/FDk/JnrbrkhXZrSWHUDNvBSU00uC+DMU3F1vbhAlhemunl3vO2cKE4v19SEFhmG66GL+F2Yc3pBYNYhPwEQfyHS7Ek/J93Vy3HMe4U0qMSUNLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711589514; c=relaxed/simple;
-	bh=ZPHoP+U6egCqtffgS6mzJuO1iUvCE60EFu7PhNy6b6U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ug0NqaB60fiet4iYhVI85kcPuDkeJaAAIW/XRQ41vNrIjhfBog0V1bKpvoSameRLoCaMU9auajwYRpVQtUFfz4g82B9H0i2N/ztsgftS6eiGNRGojGHj3V9DPp85GCAf+aeEji7kRZpRYKcckpUgiCxJx4iWac2GAnbEBRB8tAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dl2D4tOl; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711589514; x=1743125514;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZPHoP+U6egCqtffgS6mzJuO1iUvCE60EFu7PhNy6b6U=;
-  b=dl2D4tOl98rlkHAgAerhCFWvoEiGCKdFdWsC6ZlgLBqsk7YF+Pc+iuRW
-   bNxWiJ6sm4fkhZbYzzWAVPu0EZNq0ersbqsyjo6dHJbFpipx6cunfGYCr
-   LpAbYUjIoaPii2n/8mtf78hoWqxRGWWKB6j8fuX4NsHSmViRK66tHWx+m
-   DsZLKtZRNom05YY+65AEw7nerypfLtq/zujIrSINA6FZbOcUUBiNy3KPY
-   cFrnUGu5MBscpckQaVfvaws37MMwVXa7bulPtl4GlNvijREKAyhu7suJZ
-   GwbI2D2UR/1Y8X6bxr7bTrDJx1HVz9zhtoUpB/5S9og/vsR/nETlDzZO1
-   A==;
-X-CSE-ConnectionGUID: tOLFZhF/TeiVsQgOnSb3bA==
-X-CSE-MsgGUID: uQDfXAEWTNCKwHxyGgMwJw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11026"; a="17453287"
-X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="17453287"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2024 18:31:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,160,1708416000"; 
-   d="scan'208";a="16311832"
-Received: from lkp-server01.sh.intel.com (HELO be39aa325d23) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 27 Mar 2024 18:31:47 -0700
-Received: from kbuild by be39aa325d23 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rpecL-0001fw-02;
-	Thu, 28 Mar 2024 01:31:45 +0000
-Date: Thu, 28 Mar 2024 09:31:15 +0800
-From: kernel test robot <lkp@intel.com>
-To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Simon Horman <horms@kernel.org>,
-	Pawel Dembicki <paweldembicki@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 07/16] net: dsa: vsc73xx: Add vlan filtering
-Message-ID: <202403280937.NcxkkP5s-lkp@intel.com>
-References: <20240325204344.2298241-8-paweldembicki@gmail.com>
+	s=arc-20240116; t=1711589839; c=relaxed/simple;
+	bh=0PXBV+XsQFF1qQr9BQWAxqxWMVqsMgeG34vwDH5X3vs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=i+xy0w98i0V3cYyaE2mB6WKGT6wRtNPggdYmjqUQiqwBmjL6LQEzFx9WiKKRz56qYTQq67L9inA3g8hDR8AcdJ4ON7ZoCytxzD6W56jftev8/lhbmfaS/0KRk4gOXS3gcsb9EU0jno9COplz2ro1amYYVfGrzGJLKt2PUpoZawc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-368996867f0so3716155ab.1
+        for <netdev@vger.kernel.org>; Wed, 27 Mar 2024 18:37:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711589837; x=1712194637;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sd6cZws7s3j1CmzuJQzJmY1iOL4n/PGz5SWGIACnpt8=;
+        b=lkON11ZsT7ixwD/x2m71HffN88TYYGFEPM0VTMJ/xi7BLB+kqW4ThSt7nsQrCX8px/
+         XHGMyuPnS5d3FS1i9z9rmVU4OUeKaX1cR8Fnq0gFS9PakmRaZD8pSoKQ3bbXkPubESeu
+         wJmtLd7xfV3+RbPTmmcUuZoanotL8P+r/0xqpr5IFB1Qc29ulxvuM6luZPR6AGKTERCD
+         mFI/ye3ipbPcQDC9Xhe9SjqVDSpgfWJsm2QQXsAnT1Ib+IgkcW2g36+/qB1HwHLg+o7O
+         +rkcdbrSU9VyhWGUH2NLLGZVc+8Wf/eYw29tOZqA6fzfIXWvV9oghveRaZ99QInzauqu
+         l0Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCWhCbcxhC6VgCCa/6RfAUSYt6fbCLjW/JJ9FwVcDDpl/nCixxMPgVPRpeejl/tj5QA1MlMs55Dc+U0Ic+sGI9S6F6Yjs83S
+X-Gm-Message-State: AOJu0Yz8jR4jUtHhysAhb1sQw3cdsJH9lSpqRUIHxulw8ktOsfMJwrvR
+	Ao+8Al1PZMfm7RAmrfBdxc08fxvM/JbFN0rzsWxvHDXvyAkPq7gIc/8U2hGr4I6qMhnEUHyAXkQ
+	zcH8WNL5y3DYBi1fAmOoxTeDSl2P42MfKKHNu9Wb2YSLqgIw9XayXWMw=
+X-Google-Smtp-Source: AGHT+IFlvLB8emNotRqYRLvmA3j46U4XOsfI22YqJ6yR7lHtLTb8gya8KwRVSp1PXLi6yUBBMHXi1h3smdm8xNZ4nMz98CbwXNv5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240325204344.2298241-8-paweldembicki@gmail.com>
+X-Received: by 2002:a05:6e02:2163:b0:368:727e:ec80 with SMTP id
+ s3-20020a056e02216300b00368727eec80mr39235ilv.5.1711589837054; Wed, 27 Mar
+ 2024 18:37:17 -0700 (PDT)
+Date: Wed, 27 Mar 2024 18:37:17 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003d360f0614ae902b@google.com>
+Subject: [syzbot] [kernel?] BUG: using smp_processor_id() in preemptible code
+ in pwq_release_workfn
+From: syzbot <syzbot+60f75ab7624f6e44392b@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	linux-kernel@vger.kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Pawel,
+Hello,
 
-kernel test robot noticed the following build warnings:
+syzbot found the following issue on:
 
-[auto build test WARNING on net-next/main]
+HEAD commit:    61df575632d6 libbpf: Add new sec_def "sk_skb/verdict"
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=17683185180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=60f75ab7624f6e44392b
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pawel-Dembicki/net-dsa-vsc73xx-use-read_poll_timeout-instead-delay-loop/20240326-053458
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240325204344.2298241-8-paweldembicki%40gmail.com
-patch subject: [PATCH net-next v7 07/16] net: dsa: vsc73xx: Add vlan filtering
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20240328/202403280937.NcxkkP5s-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 23de3862dce582ce91c1aa914467d982cb1a73b4)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240328/202403280937.NcxkkP5s-lkp@intel.com/reproduce)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202403280937.NcxkkP5s-lkp@intel.com/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0d2d0f91bfad/disk-61df5756.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0b0f2fd80260/vmlinux-61df5756.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0450c835a85f/bzImage-61df5756.xz
 
-All warnings (new ones prefixed by >>):
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+60f75ab7624f6e44392b@syzkaller.appspotmail.com
 
-   In file included from drivers/net/dsa/vitesse-vsc73xx-core.c:20:
-   In file included from include/linux/iopoll.h:14:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from drivers/net/dsa/vitesse-vsc73xx-core.c:20:
-   In file included from include/linux/iopoll.h:14:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from drivers/net/dsa/vitesse-vsc73xx-core.c:20:
-   In file included from include/linux/iopoll.h:14:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   In file included from drivers/net/dsa/vitesse-vsc73xx-core.c:22:
-   In file included from include/linux/of_mdio.h:12:
-   In file included from include/linux/phy.h:16:
-   In file included from include/linux/ethtool.h:18:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:10:
-   In file included from include/linux/mm.h:2208:
-   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/net/dsa/vitesse-vsc73xx-core.c:1451:11: warning: variable 'ret' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-    1451 |         else if (vsc73xx_port_get_pvid(vsc, port, &vid, false) &&
-         |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1452 |                  vid == vlan->vid)
-         |                  ~~~~~~~~~~~~~~~~
-   drivers/net/dsa/vitesse-vsc73xx-core.c:1455:6: note: uninitialized use occurs here
-    1455 |         if (ret)
-         |             ^~~
-   drivers/net/dsa/vitesse-vsc73xx-core.c:1451:7: note: remove the 'if' if its condition is always true
-    1451 |         else if (vsc73xx_port_get_pvid(vsc, port, &vid, false) &&
-         |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1452 |                  vid == vlan->vid)
-         |                  ~~~~~~~~~~~~~~~~~
-    1453 |                 ret = vsc73xx_vlan_clear_pvid(vsc, port, operate_on_storage,
->> drivers/net/dsa/vitesse-vsc73xx-core.c:1451:11: warning: variable 'ret' is used uninitialized whenever '&&' condition is false [-Wsometimes-uninitialized]
-    1451 |         else if (vsc73xx_port_get_pvid(vsc, port, &vid, false) &&
-         |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/dsa/vitesse-vsc73xx-core.c:1455:6: note: uninitialized use occurs here
-    1455 |         if (ret)
-         |             ^~~
-   drivers/net/dsa/vitesse-vsc73xx-core.c:1451:11: note: remove the '&&' if its condition is always true
-    1451 |         else if (vsc73xx_port_get_pvid(vsc, port, &vid, false) &&
-         |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/dsa/vitesse-vsc73xx-core.c:1393:9: note: initialize the variable 'ret' to silence this warning
-    1393 |         int ret;
-         |                ^
-         |                 = 0
-   9 warnings generated.
+BUG: using smp_processor_id() in preemptible [00000000] code: pool_workqueue_/3
+caller is pv_init_node kernel/locking/qspinlock_paravirt.h:284 [inline]
+caller is __pv_queued_spin_lock_slowpath+0x192/0xc60 kernel/locking/qspinlock.c:439
+CPU: 1 PID: 3 Comm: pool_workqueue_ Not tainted 6.8.0-syzkaller-05238-g61df575632d6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
+ pv_init_node kernel/locking/qspinlock_paravirt.h:284 [inline]
+ __pv_queued_spin_lock_slowpath+0x192/0xc60 kernel/locking/qspinlock.c:439
+ pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
+ queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
+ queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+ lockdep_lock+0x1b0/0x2b0 kernel/locking/lockdep.c:144
+ lockdep_unregister_key+0x20d/0x540 kernel/locking/lockdep.c:6456
+ wq_unregister_lockdep kernel/workqueue.c:4655 [inline]
+ pwq_release_workfn+0x6e0/0x840 kernel/workqueue.c:4958
+ kthread_worker_fn+0x4bf/0xab0 kernel/kthread.c:841
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+BUG: using __this_cpu_add() in preemptible [00000000] code: pool_workqueue_/3
+caller is __pv_queued_spin_lock_slowpath+0x945/0xc60 kernel/locking/qspinlock.c:565
+CPU: 1 PID: 3 Comm: pool_workqueue_ Not tainted 6.8.0-syzkaller-05238-g61df575632d6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
+ __pv_queued_spin_lock_slowpath+0x945/0xc60 kernel/locking/qspinlock.c:565
+ pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
+ queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
+ queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+ lockdep_lock+0x1b0/0x2b0 kernel/locking/lockdep.c:144
+ lockdep_unregister_key+0x20d/0x540 kernel/locking/lockdep.c:6456
+ wq_unregister_lockdep kernel/workqueue.c:4655 [inline]
+ pwq_release_workfn+0x6e0/0x840 kernel/workqueue.c:4958
+ kthread_worker_fn+0x4bf/0xab0 kernel/kthread.c:841
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+BUG: using __this_cpu_add() in preemptible [00000000] code: pool_workqueue_/3
+caller is lockdep_unlock+0x16a/0x300 kernel/locking/lockdep.c:157
+CPU: 1 PID: 3 Comm: pool_workqueue_ Not tainted 6.8.0-syzkaller-05238-g61df575632d6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
+ lockdep_unlock+0x16a/0x300 kernel/locking/lockdep.c:157
+ lockdep_unregister_key+0x45c/0x540 kernel/locking/lockdep.c:6471
+ wq_unregister_lockdep kernel/workqueue.c:4655 [inline]
+ pwq_release_workfn+0x6e0/0x840 kernel/workqueue.c:4958
+ kthread_worker_fn+0x4bf/0xab0 kernel/kthread.c:841
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
 
 
-vim +1451 drivers/net/dsa/vitesse-vsc73xx-core.c
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-  1380	
-  1381	static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
-  1382					 const struct switchdev_obj_port_vlan *vlan,
-  1383					 struct netlink_ext_ack *extack)
-  1384	{
-  1385		bool untagged = vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED;
-  1386		bool pvid = vlan->flags & BRIDGE_VLAN_INFO_PVID;
-  1387		struct dsa_port *dp = dsa_to_port(ds, port);
-  1388		enum vsc73xx_port_vlan_conf port_vlan_conf;
-  1389		struct vsc73xx_bridge_vlan *vsc73xx_vlan;
-  1390		struct vsc73xx_vlan_summary summary;
-  1391		struct vsc73xx *vsc = ds->priv;
-  1392		bool operate_on_storage;
-  1393		int ret;
-  1394		u16 vid;
-  1395	
-  1396		/* Be sure to deny alterations to the configuration done by tag_8021q.
-  1397		 */
-  1398		if (vid_is_dsa_8021q(vlan->vid)) {
-  1399			NL_SET_ERR_MSG_MOD(extack,
-  1400					   "Range 3072-4095 reserved for dsa_8021q operation");
-  1401			return -EBUSY;
-  1402		}
-  1403	
-  1404		/* The processed vlan->vid is excluded from the search because the VLAN
-  1405		 * can be re-added with a different set of flags, so it's easiest to
-  1406		 * ignore its old flags from the VLAN database software copy.
-  1407		 */
-  1408		vsc73xx_bridge_vlan_summary(vsc, port, &summary, vlan->vid);
-  1409	
-  1410		/* VSC73XX allow only three untagged states: none, one or all */
-  1411		if ((untagged && summary.num_tagged > 0 && summary.num_untagged > 0) ||
-  1412		    (!untagged && summary.num_untagged > 1)) {
-  1413			NL_SET_ERR_MSG_MOD(extack,
-  1414					   "Port can have only none, one or all untagged vlan");
-  1415			return -EBUSY;
-  1416		}
-  1417	
-  1418		vsc73xx_vlan = vsc73xx_bridge_vlan_find(vsc, vlan->vid);
-  1419	
-  1420		if (!vsc73xx_vlan) {
-  1421			vsc73xx_vlan = kzalloc(sizeof(*vsc73xx_vlan), GFP_KERNEL);
-  1422			if (!vsc73xx_vlan)
-  1423				return -ENOMEM;
-  1424	
-  1425			vsc73xx_vlan->vid = vlan->vid;
-  1426			vsc73xx_vlan->portmask = 0;
-  1427			vsc73xx_vlan->untagged = 0;
-  1428	
-  1429			INIT_LIST_HEAD(&vsc73xx_vlan->list);
-  1430			list_add_tail(&vsc73xx_vlan->list, &vsc->vlans);
-  1431		}
-  1432	
-  1433		vsc73xx_vlan->portmask |= BIT(port);
-  1434	
-  1435		if (untagged)
-  1436			vsc73xx_vlan->untagged |= BIT(port);
-  1437		else
-  1438			vsc73xx_vlan->untagged &= ~BIT(port);
-  1439	
-  1440		/* CPU port must be always tagged because port separation is based on
-  1441		 * tag_8021q.
-  1442		 */
-  1443		if (port == CPU_PORT)
-  1444			goto update_vlan_table;
-  1445	
-  1446		operate_on_storage = vsc73xx_tag_8021q_active(dp);
-  1447	
-  1448		if (pvid)
-  1449			ret = vsc73xx_vlan_set_pvid(vsc, port, vlan->vid,
-  1450						    operate_on_storage, false);
-> 1451		else if (vsc73xx_port_get_pvid(vsc, port, &vid, false) &&
-  1452			 vid == vlan->vid)
-  1453			ret = vsc73xx_vlan_clear_pvid(vsc, port, operate_on_storage,
-  1454						      false);
-  1455		if (ret)
-  1456			goto err;
-  1457	
-  1458		if (operate_on_storage)
-  1459			goto update_vlan_table;
-  1460	
-  1461		port_vlan_conf = VSC73XX_VLAN_FILTER;
-  1462	
-  1463		if (summary.num_tagged == 0 && untagged)
-  1464			port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
-  1465		vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
-  1466	
-  1467		if (port_vlan_conf == VSC73XX_VLAN_FILTER_UNTAG_ALL)
-  1468			goto update_vlan_table;
-  1469	
-  1470		if (untagged) {
-  1471			ret = vsc73xx_vlan_set_untagged_hw(vsc, port, vlan->vid);
-  1472		} else if (summary.num_untagged == 1) {
-  1473			vid = vsc73xx_find_first_vlan_untagged(vsc, port);
-  1474			ret = vsc73xx_vlan_set_untagged_hw(vsc, port, vid);
-  1475		}
-  1476		if (ret)
-  1477			goto err;
-  1478	
-  1479	update_vlan_table:
-  1480		ret = vsc73xx_update_vlan_table(vsc, port, vlan->vid, true);
-  1481		if (!ret)
-  1482			return 0;
-  1483	err:
-  1484		list_del(&vsc73xx_vlan->list);
-  1485		kfree(vsc73xx_vlan);
-  1486		return ret;
-  1487	}
-  1488	
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
