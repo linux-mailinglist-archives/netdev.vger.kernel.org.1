@@ -1,217 +1,371 @@
-Return-Path: <netdev+bounces-82741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC0B88F8A4
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:27:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7697588F8D1
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 08:32:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D24F21C23193
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:27:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D36F2995EE
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 07:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709924086A;
-	Thu, 28 Mar 2024 07:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA8C224D0;
+	Thu, 28 Mar 2024 07:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WFEApc/Q"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lCyZvEsi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8AE13ACC
-	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A22E4CB38
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 07:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711610838; cv=none; b=XZHE3DBepFdE2otT2NKzVSeMJz6wyQtoQisieDUHxum0Ctd5cafkJuFyAyWT+njBrF2ewX3/MYF/IV/xPjSzsZsFAXbrrBSftZaP/BTcX3lxYn6Bn0xBgNvUA3c2AYs6/BwZhaZAd4S7vXH7LLRbQqJpikiGfN+41++kSXtGV50=
+	t=1711611140; cv=none; b=srlSkPqgtqRLQNJH0/beGaxMUn+13EjVj/a0WkHWopUcY7kYIdqPBKIv+AcZV14f2MBrScYG1k1Fd+fbdbkYaQR0fWvvqfuEMgd/CXF6KGOUTwRivUG0k2cD4OZUUOaCzYxShtD794tOwwrY0X8vjnaRIjG4x1fHj6LjCZsJbFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711610838; c=relaxed/simple;
-	bh=FGOCHa3EhFa3HIyJ/PFKeDbO5GhEkKXAXND/mfhQ5pk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=td8rc26nHtQztDpwzsK0z06ZhpAiJRKQkh6QGbLkAtc7yoUCiGzeL/DoeZ5HHJkDxSferymy+81tT2HU++cCQBHlJ2tczaQhry3fay8UKoaCHKPXyJL7ab6YYDfcqfg/4kllnioHrdMZNMdaMi0U/SOS6I58wHSp7PCdgCTNHUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WFEApc/Q; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711610835;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KJsf2Zq8ihabw+fkEvplCz/+JnMA4uyfwf4KQrKrSy0=;
-	b=WFEApc/QF+lrZTKsA79FaVeZETqRaLGYNxJi0FadEMCquqAFxfBv2orXP9Lkm3xly3eUDp
-	Tzdn+TX/VCZa5YFaCsoXOPt/w7b2XRZZ8n+WUh2gCzwkzulANPdDyyg2197jXZIfnGjuDj
-	UNZhNMDE6BWfC88Vhtxv2SOKHwKZ8dA=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-BzKpjRoJNJ2dkLxFTJ1fbA-1; Thu, 28 Mar 2024 03:27:11 -0400
-X-MC-Unique: BzKpjRoJNJ2dkLxFTJ1fbA-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5158a57abd4so417232e87.3
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 00:27:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711610829; x=1712215629;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KJsf2Zq8ihabw+fkEvplCz/+JnMA4uyfwf4KQrKrSy0=;
-        b=Anqli48L+K5l4gSFBm3nNu8++ZrPdrZ0fCvmHz03QnAef2N41pUnzBUyoo60hlnvFt
-         L+ec9Pwg8CWnY3+WB1Yi7ZN8fRhN/Ig2p9KDkFz0huzAW7/st0XVPaRkpobyQICn8ndV
-         yAc7a3CUBFvPI8tJcgd7PelfHjw/gXgkZ2z9jyylsWNikDD50XwOewqUEPEW6IbrQi9U
-         +Q83pK07ehvViGrw/JGbm7xktLfIIi5QRTS8w/l+s0+mTLbk5Amg21LBNd8EfjvwMNPl
-         D+cQMh5IhoQT+uBUa+bPgG8Orxg69uRbFcbZ1hjRi+57X6n48NERxoTkIGflGLzkBe+K
-         SjdQ==
-X-Gm-Message-State: AOJu0Yx+puUr1CB8yEMs2O7t9D5VjQ2nSNvGduyu4CCh8Rol9Yik3Aja
-	uhbIxVqNE2b9WEhIcR+PtKMp1uUhaiDwfy0TiQJxmwDZf43hZQdZ++p7twVM+VdlDrSfkYE6x9j
-	oqDe6t31DCzFbF6Ga3VUqLWjmJst4+sQ0OaJx41pjZGddhUxfCOxX/w==
-X-Received: by 2002:ac2:47e3:0:b0:515:ad59:d46a with SMTP id b3-20020ac247e3000000b00515ad59d46amr1337981lfp.21.1711610829524;
-        Thu, 28 Mar 2024 00:27:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHfVqZFjbVnnpCY1gucIL320hz2IsqZ+CfIoaRXCeWu7IcUMtHjxAZk3eLcHOqKKTNkP6JiMg==
-X-Received: by 2002:ac2:47e3:0:b0:515:ad59:d46a with SMTP id b3-20020ac247e3000000b00515ad59d46amr1337963lfp.21.1711610828980;
-        Thu, 28 Mar 2024 00:27:08 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f0:5969:7af8:be53:dc56:3ccc])
-        by smtp.gmail.com with ESMTPSA id d23-20020a50fb17000000b0056c051e59bfsm501076edq.9.2024.03.28.00.27.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 00:27:08 -0700 (PDT)
-Date: Thu, 28 Mar 2024 03:27:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 2/2] virtio-net: support dim profile
- fine-tuning
-Message-ID: <20240328032636-mutt-send-email-mst@kernel.org>
-References: <1711531146-91920-1-git-send-email-hengqi@linux.alibaba.com>
- <1711531146-91920-3-git-send-email-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1711611140; c=relaxed/simple;
+	bh=NB+ZcMdRlFv1nhFzQJEkcZIMRID0ordT2RdMq+lvTgg=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=ra/RCQm0LrM9hA/jzebx5tk5rrvgCbLGgqcUeGTXn9IFkoetqnWrfMqoYBvk8MmOhQ/hnOtagd284gnpHnFaqmH6mAEnIMYjqgiqf6GzzoOlASqMZMH5FpbEt6xM4gqvVlE1bhb3Oted45+rG2msmMxl3pmmImJ1aHfxvMww9lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lCyZvEsi; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711611131; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=WlaUiAM+QDhtvEnaj9MvDLchvWViVUAtkZQToFbedzg=;
+	b=lCyZvEsixLghRwjodHN7Q1XD0BhY3yhM90bpLiNJMu383GxAj4++UT8dUy0Nag9twEpyYUr3QSJAqdIU397q70ntqVL8W8PdYB6uEsPIA4sMUzNUwpEGMcH3PX9XGLUg2vXqoFvpfV6GtQK/d4bVtPE/nzc1zCuz4tZeP+/qFsY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3SYYoE_1711611130;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3SYYoE_1711611130)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Mar 2024 15:32:11 +0800
+Message-ID: <1711610846.0120149-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v6 02/10] virtio_ring: packed: remove double check of the unmap ops
+Date: Thu, 28 Mar 2024 15:27:26 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240327111430.108787-1-xuanzhuo@linux.alibaba.com>
+ <20240327111430.108787-3-xuanzhuo@linux.alibaba.com>
+ <CACGkMEsG7+mNx4WqhAuhrpk1bhLEwrTzngT5q=CZ_aHkzRasVg@mail.gmail.com>
+In-Reply-To: <CACGkMEsG7+mNx4WqhAuhrpk1bhLEwrTzngT5q=CZ_aHkzRasVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1711531146-91920-3-git-send-email-hengqi@linux.alibaba.com>
 
-On Wed, Mar 27, 2024 at 05:19:06PM +0800, Heng Qi wrote:
-> Virtio-net has different types of back-end device
-> implementations. In order to effectively optimize
-> the dim library's gains for different device
-> implementations, let's use the new interface params
-> to fine-tune the profile list.
-> 
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 52 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index e709d44..9b6c727 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -57,6 +57,16 @@
->  
->  #define VIRTNET_DRIVER_VERSION "1.0.0"
->  
-> +/* This is copied from NET_DIM_RX_EQE_PROFILES in DIM library */
+On Thu, 28 Mar 2024 14:56:47 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Wed, Mar 27, 2024 at 7:14=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > In the functions vring_unmap_extra_packed and vring_unmap_desc_packed,
+> > multiple checks are made whether unmap is performed and whether it is
+> > INDIRECT.
+> >
+> > These two functions are usually called in a loop, and we should put the
+> > check outside the loop.
+> >
+> > And we unmap the descs with VRING_DESC_F_INDIRECT on the same path with
+> > other descs, that make the thing more complex. If we distinguish the
+> > descs with VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> >
+> > For desc with VRING_DESC_F_INDIRECT flag:
+> > 1. only one desc of the desc table is used, we do not need the loop
+> >     Theoretically, indirect descriptors could be chained.
+> >     But now, that is not supported by "add", so we ignore this case.
+> > 2. the called unmap api is difference from the other desc
+> > 3. the vq->premapped is not needed to check
+> > 4. the vq->indirect is not needed to check
+> > 5. the state->indir_desc must not be null
+>
+> It doesn't explain the connection to the goal of this series. If it's
+> not a must I'd suggest moving it to a separate patch.
 
-So maybe move it to a header and reuse?
+
+The "no store dma ..." depends this.
+
+I will add this message in next version.
 
 
-> +#define VIRTNET_DIM_RX_PKTS 256
-> +static struct dim_cq_moder rx_eqe_conf[] = {
-> +	{.usec = 1,   .pkts = VIRTNET_DIM_RX_PKTS,},
-> +	{.usec = 8,   .pkts = VIRTNET_DIM_RX_PKTS,},
-> +	{.usec = 64,  .pkts = VIRTNET_DIM_RX_PKTS,},
-> +	{.usec = 128, .pkts = VIRTNET_DIM_RX_PKTS,},
-> +	{.usec = 256, .pkts = VIRTNET_DIM_RX_PKTS,}
-> +};
-> +
->  static const unsigned long guest_offloads[] = {
->  	VIRTIO_NET_F_GUEST_TSO4,
->  	VIRTIO_NET_F_GUEST_TSO6,
-> @@ -3584,7 +3594,10 @@ static void virtnet_rx_dim_work(struct work_struct *work)
->  		if (!rq->dim_enabled)
->  			continue;
->  
-> -		update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
-> +		if (dim->profile_ix >= ARRAY_SIZE(rx_eqe_conf))
-> +			dim->profile_ix = ARRAY_SIZE(rx_eqe_conf) - 1;
-> +
-> +		update_moder = rx_eqe_conf[dim->profile_ix];
->  		if (update_moder.usec != rq->intr_coal.max_usecs ||
->  		    update_moder.pkts != rq->intr_coal.max_packets) {
->  			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
-> @@ -3627,6 +3640,34 @@ static int virtnet_should_update_vq_weight(int dev_flags, int weight,
->  	return 0;
->  }
->  
-> +static int virtnet_update_profile(struct virtnet_info *vi,
-> +				  struct kernel_ethtool_coalesce *kc)
-> +{
-> +	int i;
-> +
-> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-> +		for (i = 0; i < NET_DIM_PARAMS_NUM_PROFILES; i++)
-> +			if (kc->rx_eqe_profs[i].comps)
-> +				return -EINVAL;
-> +	} else {
-> +		for (i = 0; i < NET_DIM_PARAMS_NUM_PROFILES; i++) {
-> +			if (kc->rx_eqe_profs[i].usec != rx_eqe_conf[i].usec ||
-> +			    kc->rx_eqe_profs[i].pkts != rx_eqe_conf[i].pkts ||
-> +			    kc->rx_eqe_profs[i].comps)
-> +				return -EINVAL;
-> +		}
-> +
-> +		return 0;
-> +	}
-> +
-> +	for (i = 0; i < NET_DIM_PARAMS_NUM_PROFILES; i++) {
-> +		rx_eqe_conf[i].usec = kc->rx_eqe_profs[i].usec;
-> +		rx_eqe_conf[i].pkts = kc->rx_eqe_profs[i].pkts;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int virtnet_set_coalesce(struct net_device *dev,
->  				struct ethtool_coalesce *ec,
->  				struct kernel_ethtool_coalesce *kernel_coal,
-> @@ -3653,6 +3694,10 @@ static int virtnet_set_coalesce(struct net_device *dev,
->  		}
->  	}
->  
-> +	ret = virtnet_update_profile(vi, kernel_coal);
-> +	if (ret)
-> +		return ret;
-> +
->  	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
->  		ret = virtnet_send_notf_coal_cmds(vi, ec);
->  	else
-> @@ -3689,6 +3734,10 @@ static int virtnet_get_coalesce(struct net_device *dev,
->  			ec->tx_max_coalesced_frames = 1;
->  	}
->  
-> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> +		memcpy(kernel_coal->rx_eqe_profs, rx_eqe_conf,
-> +		       sizeof(rx_eqe_conf));
-> +
->  	return 0;
->  }
->  
-> @@ -3868,7 +3917,8 @@ static int virtnet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
->  
->  static const struct ethtool_ops virtnet_ethtool_ops = {
->  	.supported_coalesce_params = ETHTOOL_COALESCE_MAX_FRAMES |
-> -		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
-> +		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
-> +		ETHTOOL_COALESCE_RX_EQE_PROFILE,
->  	.get_drvinfo = virtnet_get_drvinfo,
->  	.get_link = ethtool_op_get_link,
->  	.get_ringparam = virtnet_get_ringparam,
-> -- 
-> 1.8.3.1
+>
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>
+> Rethink this, it looks to me it would complicate the codes furtherly.
+>
+> For example, vring_map_xxx() helpers will check premappred and
+> use_dma_api by itself. But in the case of vring_unmap() you want to
+> move those checks to the caller. This will result in tricky codes that
+> are hard to understand.
+>
+> We need to be consistent here.
+>
+> If we try to optimize unmap we need to optimize map as well. But
+> generally it would complicate the logic of the caller if we want to
+> let the caller to differ. Ideally, the caller of those function should
+> know nothing about use_dma_api, premapped and other.
 
+
+The key is that we can check "use_dma_api, premapped" to skip the loop.
+If the vring_unmap_xxx is called, the "use_dma_api, premapped" is checked in
+advance, so that is a waste to check thest again.
+
+
+>
+> > ---
+> >  drivers/virtio/virtio_ring.c | 78 ++++++++++++++++++------------------
+> >  1 file changed, 40 insertions(+), 38 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index 03360073bd4a..a2838fe1cc08 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -1214,6 +1214,7 @@ static u16 packed_last_used(u16 last_used_idx)
+> >         return last_used_idx & ~(-(1 << VRING_PACKED_EVENT_F_WRAP_CTR));
+> >  }
+> >
+> > +/* caller must check vring_need_unmap_buffer() */
+> >  static void vring_unmap_extra_packed(const struct vring_virtqueue *vq,
+> >                                      const struct vring_desc_extra *ext=
+ra)
+> >  {
+> > @@ -1221,33 +1222,18 @@ static void vring_unmap_extra_packed(const stru=
+ct vring_virtqueue *vq,
+> >
+> >         flags =3D extra->flags;
+> >
+> > -       if (flags & VRING_DESC_F_INDIRECT) {
+> > -               if (!vq->use_dma_api)
+> > -                       return;
+> > -
+> > -               dma_unmap_single(vring_dma_dev(vq),
+> > -                                extra->addr, extra->len,
+> > -                                (flags & VRING_DESC_F_WRITE) ?
+> > -                                DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> > -       } else {
+> > -               if (!vring_need_unmap_buffer(vq))
+> > -                       return;
+> > -
+> > -               dma_unmap_page(vring_dma_dev(vq),
+> > -                              extra->addr, extra->len,
+> > -                              (flags & VRING_DESC_F_WRITE) ?
+> > -                              DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> > -       }
+> > +       dma_unmap_page(vring_dma_dev(vq),
+> > +                      extra->addr, extra->len,
+> > +                      (flags & VRING_DESC_F_WRITE) ?
+> > +                      DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> >  }
+> >
+> > +/* caller must check vring_need_unmap_buffer() */
+> >  static void vring_unmap_desc_packed(const struct vring_virtqueue *vq,
+> >                                     const struct vring_packed_desc *des=
+c)
+> >  {
+> >         u16 flags;
+> >
+> > -       if (!vring_need_unmap_buffer(vq))
+> > -               return;
+> > -
+> >         flags =3D le16_to_cpu(desc->flags);
+> >
+> >         dma_unmap_page(vring_dma_dev(vq),
+> > @@ -1323,7 +1309,7 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
+> >                         total_sg * sizeof(struct vring_packed_desc),
+> >                         DMA_TO_DEVICE);
+> >         if (vring_mapping_error(vq, addr)) {
+> > -               if (vq->premapped)
+> > +               if (!vring_need_unmap_buffer(vq))
+> >                         goto free_desc;
+>
+> I would do this to make it much more easier to be read and avoid the warn:
+>
+> if (vring_mapping_error(vq, addr))
+>         goto unmap_release;
+>
+> unmap_release:
+>         if (vring_need_unmap_buffer(vq))
+>                 for (i =3D 0, xxx)
+> free_desc:
+>         kfree(desc);
+>
+> or it could be
+>
+> unmap_release:
+>       if (!vring_need_unmap_buffer(vq))
+>             goto free_desc;
+>
+> Still tricky but better.
+
+I am ok.
+
+
+>
+> >
+> >                 goto unmap_release;
+> > @@ -1338,10 +1324,11 @@ static int virtqueue_add_indirect_packed(struct=
+ vring_virtqueue *vq,
+> >                 vq->packed.desc_extra[id].addr =3D addr;
+> >                 vq->packed.desc_extra[id].len =3D total_sg *
+> >                                 sizeof(struct vring_packed_desc);
+> > -               vq->packed.desc_extra[id].flags =3D VRING_DESC_F_INDIRE=
+CT |
+> > -                                                 vq->packed.avail_used=
+_flags;
+> >         }
+> >
+> > +       vq->packed.desc_extra[id].flags =3D VRING_DESC_F_INDIRECT |
+> > +               vq->packed.avail_used_flags;
+>
+> An example of the tricky code, I think you do this because you want to
+> differ indirect in detach_buf_packed():
+>
+> flags =3D vq->packed.desc_extra[id].flags;
+>
+>
+> > +
+> >         /*
+> >          * A driver MUST NOT make the first descriptor in the list
+> >          * available before all subsequent descriptors comprising
+> > @@ -1382,6 +1369,8 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
+> >  unmap_release:
+> >         err_idx =3D i;
+> >
+> > +       WARN_ON(!vring_need_unmap_buffer(vq));
+> > +
+> >         for (i =3D 0; i < err_idx; i++)
+> >                 vring_unmap_desc_packed(vq, &desc[i]);
+> >
+> > @@ -1475,12 +1464,13 @@ static inline int virtqueue_add_packed(struct v=
+irtqueue *_vq,
+> >                         desc[i].len =3D cpu_to_le32(sg->length);
+> >                         desc[i].id =3D cpu_to_le16(id);
+> >
+> > -                       if (unlikely(vq->use_dma_api)) {
+> > +                       if (vring_need_unmap_buffer(vq)) {
+> >                                 vq->packed.desc_extra[curr].addr =3D ad=
+dr;
+> >                                 vq->packed.desc_extra[curr].len =3D sg-=
+>length;
+> > -                               vq->packed.desc_extra[curr].flags =3D
+> > -                                       le16_to_cpu(flags);
+> >                         }
+> > +
+> > +                       vq->packed.desc_extra[curr].flags =3D le16_to_c=
+pu(flags);
+> > +
+> >                         prev =3D curr;
+> >                         curr =3D vq->packed.desc_extra[curr].next;
+> >
+> > @@ -1530,6 +1520,8 @@ static inline int virtqueue_add_packed(struct vir=
+tqueue *_vq,
+> >
+> >         vq->packed.avail_used_flags =3D avail_used_flags;
+> >
+> > +       WARN_ON(!vring_need_unmap_buffer(vq));
+> > +
+> >         for (n =3D 0; n < total_sg; n++) {
+> >                 if (i =3D=3D err_idx)
+> >                         break;
+> > @@ -1599,7 +1591,9 @@ static void detach_buf_packed(struct vring_virtqu=
+eue *vq,
+> >         struct vring_desc_state_packed *state =3D NULL;
+> >         struct vring_packed_desc *desc;
+> >         unsigned int i, curr;
+> > +       u16 flags;
+> >
+> > +       flags =3D vq->packed.desc_extra[id].flags;
+>
+> Can we check vq->indirect && indir_desc here? Then we don't need
+> special care to store flags in desc_extra.
+
+
+No.
+
+When vq->indirect is true, but the desc may has not indirect flag.
+
+Thanks.
+
+
+>
+> >         state =3D &vq->packed.desc_state[id];
+> >
+> >         /* Clear data ptr. */
+> > @@ -1609,22 +1603,32 @@ static void detach_buf_packed(struct vring_virt=
+queue *vq,
+> >         vq->free_head =3D id;
+> >         vq->vq.num_free +=3D state->num;
+> >
+> > -       if (unlikely(vq->use_dma_api)) {
+> > -               curr =3D id;
+> > -               for (i =3D 0; i < state->num; i++) {
+> > -                       vring_unmap_extra_packed(vq,
+> > -                                                &vq->packed.desc_extra=
+[curr]);
+> > -                       curr =3D vq->packed.desc_extra[curr].next;
+> > +       if (!(flags & VRING_DESC_F_INDIRECT)) {
+> > +               if (vring_need_unmap_buffer(vq)) {
+> > +                       curr =3D id;
+> > +                       for (i =3D 0; i < state->num; i++) {
+> > +                               vring_unmap_extra_packed(vq,
+> > +                                                        &vq->packed.de=
+sc_extra[curr]);
+> > +                               curr =3D vq->packed.desc_extra[curr].ne=
+xt;
+> > +                       }
+> >                 }
+> > -       }
+> >
+> > -       if (vq->indirect) {
+> > +               if (ctx)
+> > +                       *ctx =3D state->indir_desc;
+> > +       } else {
+> > +               const struct vring_desc_extra *extra;
+> >                 u32 len;
+> >
+> > +               if (vq->use_dma_api) {
+> > +                       extra =3D &vq->packed.desc_extra[id];
+> > +                       dma_unmap_single(vring_dma_dev(vq),
+> > +                                        extra->addr, extra->len,
+> > +                                        (flags & VRING_DESC_F_WRITE) ?
+> > +                                        DMA_FROM_DEVICE : DMA_TO_DEVIC=
+E);
+> > +               }
+> > +
+> >                 /* Free the indirect table, if any, now that it's unmap=
+ped. */
+> >                 desc =3D state->indir_desc;
+> > -               if (!desc)
+> > -                       return;
+> >
+> >                 if (vring_need_unmap_buffer(vq)) {
+> >                         len =3D vq->packed.desc_extra[id].len;
+> > @@ -1634,8 +1638,6 @@ static void detach_buf_packed(struct vring_virtqu=
+eue *vq,
+> >                 }
+> >                 kfree(desc);
+> >                 state->indir_desc =3D NULL;
+> > -       } else if (ctx) {
+> > -               *ctx =3D state->indir_desc;
+> >         }
+> >  }
+> >
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
+> Thanks
+>
 
