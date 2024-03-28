@@ -1,150 +1,108 @@
-Return-Path: <netdev+bounces-83040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAC18907C2
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:55:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D13E78907EA
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 19:05:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1DD41F284CF
-	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 17:55:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 723381F262E3
+	for <lists+netdev@lfdr.de>; Thu, 28 Mar 2024 18:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7A7130493;
-	Thu, 28 Mar 2024 17:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DFA131BB7;
+	Thu, 28 Mar 2024 18:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IffZ6Zq7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jw0Azdvr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEB240856;
-	Thu, 28 Mar 2024 17:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE3512F391
+	for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 18:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711648512; cv=none; b=rCNusSNWawPdtBev9rBxKvcMyWP4CBPziROQ4R7k7qEJdo8fyKomF5XgdGotdff+qMx2bv5UDISv7ANR/fk/+cInznBOysVsO6VklJDYm2pEeEcJcXiP9Y6cNuHOWyH4Mc5TE31H9UR+qbHN0OG4a66Hu7rxcZwaubM6O+hoHaQ=
+	t=1711649107; cv=none; b=LzizOuJeyzUTIkcP6Yiul538NLz6uTVqAOg2BgQIN5RVlSJpYUqfLiCslQ4l9rm+Q3JoS06L2VVhCc6sUtsSllJQ9SKXp+9GBtjcsj8/02G6+tfvy4CWDzsxuzxHFm3IAtdjeELVqA2poO9bTfbiQMLcKN5BJtrvAH85l/a7TmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711648512; c=relaxed/simple;
-	bh=o/ViFlzn9DcSB6zcA7kLtK65QCPH/Ss4D4l1HH9emKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qp3gRY+mBkqKv6pmLXP6ISa1//f9MbZliapH+/irw3ssTL02eMwD/AVllUrx6yRDq6OO+holO5Y+mf5v7ScJUN7LY7TthnoWS6HbwZjgVm6yy8iXHwGW+32KpKDoBXUSxLb4d0AjiruXxcZKihacu6ewvgWSShA6rfOdnhLFeY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IffZ6Zq7; arc=none smtp.client-ip=209.85.216.42
+	s=arc-20240116; t=1711649107; c=relaxed/simple;
+	bh=nuK04bZ5oslOthMQ4lVLof11GO1EGLvX/wxmyW7M/nQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=LB40fpB/yt4GXdGrQY892JoV08EPQnhj6mmZeZZma6qqotp9zNSMk7jFD1PpRSesfPfkZ/4gy56x46SmeK2MMjWPimbykBRFNMvXWviPXVifW5oxiA2QYaQJ8niLTDj84sV1eqsDv35anG964VWXxmr8S5bE26FwDfCemPxKAkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jw0Azdvr; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-29e0a1fd9a7so980847a91.2;
-        Thu, 28 Mar 2024 10:55:11 -0700 (PDT)
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-788598094c4so55506785a.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 11:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711648511; x=1712253311; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yWQ5s/MasTSk4jjQrdrW05L8Qpoj2heGIDr+tGSERBM=;
-        b=IffZ6Zq7mdTlgFNOXYKYk8APhEZ+jnWd5P7vwV8L5bZgdd5YBj99UAEtTmBYfmR5vI
-         gExwSz+/raqBzCXL2yKp/akDSbKK4j7V/ZzyD8CH9e+ylDWW1RtX0MbZa14kZfmILufE
-         /t3NJ3FtHc4hJDtK0Ox1C+/15dK6UqLmvleGLbLMkMMCfZBj2UHcoQ7dL8xtIpJRwJl+
-         H89s8wOuwf68ipXVqoyOIbAlimD9s8bMgjmEGEgfJ7gGYdhKPob06n89IRUa+tQvD5gm
-         KwmFbmNMvYYX6vVqLyGIRIBIAYpr3u0zZqWZMKvv+Sxeh0voL1kH9oCsa0rVhT+AlTSF
-         o8DQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711648511; x=1712253311;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1711649105; x=1712253905; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yWQ5s/MasTSk4jjQrdrW05L8Qpoj2heGIDr+tGSERBM=;
-        b=igCQB4QFsYScQJeP3cRiQxUa5qmLNqpZC5tOlwX33nWNCf888oEZxhRUtBNw6Az6De
-         ayrIpJosrt6iJl7D+ax3xPKN8uCp/jyESYD8z8rs9mXeYrLD1DY3pPv92MZJu2F5f23t
-         NWhdBQuIEovlxVw0gsUf00ja9tHjqs2nBCcP6Ogwtv1JjTs+xRuwYXtQQCZMB4MhtLu3
-         7Rjbh5TEQQTDwCBcOds3vpthVYN3CT+bF3kfHE76b2X36+qhh5oqjYbuTbt5YNGJTxJY
-         aLRmt/G4WfGjB2+dKLvjCvG91AleXJG/H49ITYfiFvNR1IR9hafdcTG6r9wS6YfgpJQ8
-         awuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXuGa0nZKrEsNS7AXHHBRX65WF9XiM3fFvpPsn3s2rxTK/FMqe7m4o9cyoHYzwTFthYPh/CRYANPbWi0C0UEr2FCaOA1ZKayBxC+DCIuj8jS4RmiRYVxh2oEX60+KNM4p7RiuNdFSZg2iSNS7s50CRed6fjNUC1FAHnjyDZEGJ1wzDUIw1SUqXjMIkioK/ok0h0W6hrDTsvkbBRQfY6oi8aRzzmf7IzP8dSJJOq9iCUeyAARKJJXE3OY2FQCQp4TbB4QQ==
-X-Gm-Message-State: AOJu0YyzHv5stqt7AuVoBIO8Gpz08IsWdmauhSa1iX/DxA1OW/oUtjV3
-	6bf5HpY87l7xy1IlctxEQ2/KuciA1G63gA5DB1HzsuIdcZk1r+n7
-X-Google-Smtp-Source: AGHT+IEL2KsBed1zz8v9qIzuDDeEt0qqVBch3QKL5XMgY1v1rvbtZioXqmZcYbMTotvgHuw38SY6bw==
-X-Received: by 2002:a17:90a:e7c6:b0:29b:d748:fae5 with SMTP id kb6-20020a17090ae7c600b0029bd748fae5mr155051pjb.32.1711648510684;
-        Thu, 28 Mar 2024 10:55:10 -0700 (PDT)
-Received: from google.com ([2620:15c:9d:2:493e:82a3:49f9:d88])
-        by smtp.gmail.com with ESMTPSA id z2-20020a17090ab10200b0029c7963a33fsm3791215pjq.10.2024.03.28.10.55.08
+        bh=sxRjqNnvdF7ZPp1g7/U1YFRgJVDUpSznFhQFeF1O+XU=;
+        b=Jw0AzdvrvB6+6HYLbqnTwGV54RTV8KWlJFMVwjdJRM+x7U5owEEDOPZaQ6Iie1L/5L
+         aiK82pAAH4647kJPH6RxDhT56IM/unpZxh3fGa7BYF4O31sFx6P1iKvyDS8ilswgj7Hi
+         a2QWQtrouAnvWx2B4m8M9ugcX+pa2u+LPk+V5iBhtQBOvAiV6TR7FPfMh0AOeU9kXZhv
+         lBlIoQgDGA9YiJMyZvpcDCtfXrINHXVJ9+C5T5zORmyy848gHf5qw2Wz463ADkSau/oY
+         2PQ1qebh9+JdXHwPQxj8oqh3XteUYE+Q6O4KQVghU9A9ASn/Dc2XSnJ4gIBkLE1QML4I
+         LcUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711649105; x=1712253905;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=sxRjqNnvdF7ZPp1g7/U1YFRgJVDUpSznFhQFeF1O+XU=;
+        b=GWzxLb9E6EOi5oLh2uzt+q/S37YAblgJ7FrKRceC4f/efoZ42nOxcrVDtwkhSxlfup
+         TDkO+Xtn3pgyEfG4jJANuxERhlmuM+wZ//TqKSrFTV9swxPxIG6Q9n+8eSpexN4Uo0L9
+         MTMWz37LvWvpJNPwNPXsqZ7jkBwb2UYj5c32aiOjYa6DKbxMDxIpyZsvYhtimsd2JIm8
+         qn+SSbyYZf3eSHMLiJbSOL3Xd/eGpNGpu35/tPDpxYW1GSCNUeXH7vACRM5eu11ZApEr
+         tqdHbolvcbo7osOXQkw6w6S6wLk0sUPvmJl9racg3f+aGvJ2X4KY5J3FIS6ANphAa2+S
+         gKdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVIsooApJXnng7PheNQcGmVUjtBK50p9Ij2+XbnXCslyfgLfVuTHOJkqJi83kqpU7dgCp3SRMagnTN4/4EYNRR0rPEbdYu/
+X-Gm-Message-State: AOJu0Yx9s8GzNdaBVD7mz1cuN5K2ijVJRbEG5WoHqGp4rnFlND3R/ucA
+	JccaJWaTO0zjd430uHGWZfOYkA27ef8bk9sHhZxLsCFjNwwvUQrQ
+X-Google-Smtp-Source: AGHT+IHRZ8ehx5tbBHZ7XueHCsvGB/XRtKcpqItWBinz4D8FWa6Bm1IqlU4WImxsER9KbGMJYjyKiQ==
+X-Received: by 2002:ad4:4a0b:0:b0:696:52f7:d856 with SMTP id m11-20020ad44a0b000000b0069652f7d856mr3028481qvz.23.1711649105252;
+        Thu, 28 Mar 2024 11:05:05 -0700 (PDT)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id u10-20020ad45aaa000000b00696a47179a1sm844388qvg.14.2024.03.28.11.05.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 10:55:10 -0700 (PDT)
-Date: Thu, 28 Mar 2024 10:55:07 -0700
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Corentin Chary <corentin.chary@gmail.com>,
-	"Luke D. Jones" <luke@ljones.dev>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Thadeu Lima de Souza Cascardo <cascardo@holoscopio.com>,
-	Daniel Oliveira Nascimento <don@syst.com.br>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-	Matan Ziv-Av <matan@svgalib.org>,
-	Mattia Dongili <malattia@linux.it>,
-	Azael Avalos <coproscefalo@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jeff Sipek <jsipek@vmware.com>, Ajay Kaher <akaher@vmware.com>,
-	Alexey Makhalov <amakhalov@vmware.com>,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	acpica-devel@lists.linux.dev, linux-input@vger.kernel.org,
-	netdev@vger.kernel.org, chrome-platform@lists.linux.dev,
-	platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 02/19] Input: atlas: - drop owner assignment
-Message-ID: <ZgWu-33aKyCOjRBX@google.com>
-References: <20240327-b4-module-owner-acpi-v1-0-725241a2d224@linaro.org>
- <20240327-b4-module-owner-acpi-v1-2-725241a2d224@linaro.org>
+        Thu, 28 Mar 2024 11:05:04 -0700 (PDT)
+Date: Thu, 28 Mar 2024 14:05:04 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Marcelo Tosatti <mtosatti@redhat.com>, 
+ netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Frederic Weisbecker <frederic@kernel.org>, 
+ Valentin Schneider <vschneid@redhat.com>, 
+ Paolo Abeni <pabeni@redhat.com>
+Message-ID: <6605b15094f38_2b8cd6294f5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ZgSzhZBJSUyme1Lk@tpad>
+References: <ZgSzhZBJSUyme1Lk@tpad>
+Subject: Re: [PATCH net-next -v6] net: enable timestamp static key if CPU
+ isolation is configured
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327-b4-module-owner-acpi-v1-2-725241a2d224@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 27, 2024 at 08:43:49AM +0100, Krzysztof Kozlowski wrote:
-> ACPI bus core already sets the .owner, so driver does not need to.
+Marcelo Tosatti wrote:
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> For systems that use CPU isolation (via nohz_full), creating or destroying
+> a socket with SO_TIMESTAMP, SO_TIMESTAMPNS or SO_TIMESTAMPING with flag
+> SOF_TIMESTAMPING_RX_SOFTWARE will cause a static key to be enabled/disabled.
+> This in turn causes undesired IPIs to isolated CPUs.
+> 
+> So enable the static key unconditionally, if CPU isolation is enabled,
+> thus avoiding the IPIs.
+> 
+> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-
-But please fix the stray colon in the subject.
-
-> 
-> ---
-> 
-> Depends on the first patch.
-> ---
->  drivers/input/misc/atlas_btns.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/input/misc/atlas_btns.c b/drivers/input/misc/atlas_btns.c
-> index 3c9bbd04e143..5b9be2957746 100644
-> --- a/drivers/input/misc/atlas_btns.c
-> +++ b/drivers/input/misc/atlas_btns.c
-> @@ -127,7 +127,6 @@ MODULE_DEVICE_TABLE(acpi, atlas_device_ids);
->  static struct acpi_driver atlas_acpi_driver = {
->  	.name	= ACPI_ATLAS_NAME,
->  	.class	= ACPI_ATLAS_CLASS,
-> -	.owner	= THIS_MODULE,
->  	.ids	= atlas_device_ids,
->  	.ops	= {
->  		.add	= atlas_acpi_button_add,
-> 
-> -- 
-> 2.34.1
-> 
-
--- 
-Dmitry
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
