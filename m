@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-83233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04C888916E5
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:33:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 815268916E6
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:34:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADD2E1F2445B
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:33:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2009A1F24214
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:34:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEC956455;
-	Fri, 29 Mar 2024 10:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dqAG/k1T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671E22D783;
+	Fri, 29 Mar 2024 10:34:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AD655E4A
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 10:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C7227471;
+	Fri, 29 Mar 2024 10:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711708393; cv=none; b=OZ+aiki6dqquidsHt8W0BwB2bcd7B5FtMlFKelnNz+wczBufD0Fjw4QskeDIVwFRa1WYLXMSES+0AUA/8Pi7lOUnB7IDT9MDblZ33trSvHccUF7BfaA4oOnaOaxtMIfSQYuPdE80GLmR0f2qE/0+kQcKKbsaaueacBXpuVpAGbU=
+	t=1711708455; cv=none; b=nmAFwJ9UlLoobmhNT/p74Jb5I29Qn3dxh4gmGa1/biKyRvZQzJlKFboybhA+ruiY6aobMVJ+YRyTmwChOMc4CqTixwMZQDs/ochGnevTnMpb/6FJ1N0pkbQ/mxRkiAqYYuJkPtUR2N9az/v82FxP/Mg3oU+eWQN95WAexolPwbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711708393; c=relaxed/simple;
-	bh=DD6Jah54JvVvy/pv9fBbtNuZFBhf+OamddQ7th7HeoE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tnLtR+J0Qn43XGnxgxsOruZ2swvtNXuhOUq6VpgYUfOgAFkE4/oWQnwt9FG6hRYJZo/s/KZP3KQVb04kenFos8nYfrFdHfEcr1aguEl4zTX1M/VevkHoBgyUH87gTQVAPZhDUQ34E0vKK+9RMigtyM+aPD8LOZ2WPu+NQt0j9Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dqAG/k1T; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a46cd9e7fcaso236869666b.1
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 03:33:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1711708389; x=1712313189; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NwoDgUONbFIzKdwbbRbTYAlPST0Ig55g88KHArxxc/c=;
-        b=dqAG/k1TZGFK4J69GU1sKJ28uJU+FZ/elLKmkiZyngpDgrYgKVxj4yV2jUlZI5ZYFh
-         32lgdO1Fw9aOxq1q+Khep/2Ulz0y4+ctNTp/GvPzWdZj8m9vnMcMzo/3MncVQm84XNwl
-         CwDkLkCBPpNDsbVWNWhWKcT3161witvdQJvxQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711708389; x=1712313189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NwoDgUONbFIzKdwbbRbTYAlPST0Ig55g88KHArxxc/c=;
-        b=JTy1MT4jyHCqGiAa12U5OnpMfzFoumdzCbizOdRtJZG8YmkoOCA6a1tgYWiYSjky1G
-         TO9C/xXJNLw+lhjUOD65Sd30abdZGYJZzJDA/wj44g60zK18AP+Dj3HwWQDzu9UyQHdh
-         86clmTGTl/rogp4k+JdGYkaj8VBfPNYbQJnurqUCXXdSPNelJ8KHvkKKLwXLSSr4b4+k
-         caWJHKbDNwaEJmeO4ZJKzAWf+fgTH4+6LE9fpK5GmYiMcIrkMf3DdFZW90FYNqtHWIRm
-         aj5BHjQaIQYBEll2p0VIUZaamtvgdnWya7Ohv+PJMVLrnTLpwGzSk5Up2FB3WpUDYhih
-         ukSA==
-X-Forwarded-Encrypted: i=1; AJvYcCUvopBzMhN8A83F9SoylC4zx7zUAKeRIJiP2aUV8N/w8KWGCuOkrrnfwukmLYziWnvnnkKFM65vGZlesqdZsVxyMyN4m0yS
-X-Gm-Message-State: AOJu0Yw3UmQfJZSprC3RCrSiJXwQgLoBHfvYI1IcTjnT+TFZx6NUaF1b
-	dTR2Cpwb1jo9+sZbE3YLS1n2gxfpbFdsgmxGn9HTEOTkei/RSOeXCW1q3tAwOP28sKxsSHfsbhq
-	tsDEorkF8BYUPZXfY5GZFsY+QzIyf6SiEwpMs
-X-Google-Smtp-Source: AGHT+IGVGcA9bR6UFeCQVCvMVEPcupaxgap9YC4ODdnvUbwCtxUjIvbwg3uzTjmWUTuBUs4WUwHGNMCIfALbUmIQgiA=
-X-Received: by 2002:a17:906:f58a:b0:a4e:3c1a:d6c with SMTP id
- cm10-20020a170906f58a00b00a4e3c1a0d6cmr709159ejd.9.1711708388649; Fri, 29 Mar
- 2024 03:33:08 -0700 (PDT)
+	s=arc-20240116; t=1711708455; c=relaxed/simple;
+	bh=KG92pe3DBAHh2WhqPReKxHjjE5aM10J77GB1apHyhss=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=NbWkYSB8A+6h00DlhUxoaVl0BB4oZ1L96qrGuqdW7phonrMSuNC3NF57+uMPYLYB2anhUBYlFu32XAe75V/U1ZfWmPbA15Q5AURC73e9fCGqZCURhLknkmmylLCXAlFmLBIeXILGURCRb8o/BRmL6Phyoz6JweNm3oUUqJA5Wqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4V5cCh4rz0zNmlF;
+	Fri, 29 Mar 2024 18:32:00 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id B3863140259;
+	Fri, 29 Mar 2024 18:34:03 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 29 Mar 2024 18:34:02 +0800
+Message-ID: <d6c779a5-e4b1-4f21-b4f0-6b37b212890f@huawei.com>
+Date: Fri, 29 Mar 2024 18:34:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240328123805.3886026-1-srish.srinivasan@broadcom.com> <2024032945-unheated-evacuee-6e0a@gregkh>
-In-Reply-To: <2024032945-unheated-evacuee-6e0a@gregkh>
-From: Srish Srinivasan <srish.srinivasan@broadcom.com>
-Date: Fri, 29 Mar 2024 16:02:57 +0530
-Message-ID: <CA+1BbzyCr4sFS8qQ4U6g6mi-sD72y==ubBd2bxXiRLEvvx8-KQ@mail.gmail.com>
-Subject: Re: [PATCH 6.1.y] net: tls: handle backlogging of crypto requests
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	vakul.garg@nxp.com, davejwatson@fb.com, netdev@vger.kernel.org, 
-	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.makhalov@broadcom.com>, 
-	Vasavi Sirnapalli <vasavi.sirnapalli@broadcom.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Simon Horman <horms@kernel.org>, Sasha Levin <sashal@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <jiri@resnulli.us>, <horms@kernel.org>,
+	<rkannoth@marvell.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V6 net-next 3/4] net: hns3: dump more reg info based on
+ ras mod
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20240327114330.1826631-1-shaojijie@huawei.com>
+ <20240327114330.1826631-4-shaojijie@huawei.com>
+ <20240328191130.47242c8f@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20240328191130.47242c8f@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Fri, Mar 29, 2024 at 2:53=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
+
+on 2024/3/29 10:11, Jakub Kicinski wrote:
+> On Wed, 27 Mar 2024 19:43:29 +0800 Jijie Shao wrote:
+>> +	}, {
+>> +		.reg_name = "MIB_TX/RX_BAD_PKTS",
+>> +		.reg_offset_group = {19, 18, 29, 28},
+>> +		.group_size = 4
+>> +	}, {
+>> +		.reg_name = "MIB_TX/RX_GOOD_PKTS",
+>> +		.reg_offset_group = {21, 20, 31, 30},
+>> +		.group_size = 4
+>> +	}, {
+>> +		.reg_name = "MIB_TX/RX_TOTAL_PKTS",
+>> +		.reg_offset_group = {23, 22, 33, 32},
+>> +		.group_size = 4
+>> +	}, {
+>> +		.reg_name = "MIB_TX/RX_PAUSE_PKTS",
+>> +		.reg_offset_group = {25, 24, 35, 34},
+>> +		.group_size = 4
+>> +	}, {
+>> +		.reg_name = "MIB_TX_ERR_ALL_PKTS",
+>> +		.reg_offset_group = {27, 26},
+>> +		.group_size = 2
+>> +	}, {
+>> +		.reg_name = "MIB_RX_FCS_ERR_PKTS",
+>> +		.reg_offset_group = {37, 36},
+>> +		.group_size = 2
+> These seem to be duplicating standard stats from rtnl_link_stats64,
+> ethtool_pause_stats, ethtool_eth_mac_stats, etc.
 >
-> On Thu, Mar 28, 2024 at 06:08:05PM +0530, Srish Srinivasan wrote:
-> > From: Jakub Kicinski <kuba@kernel.org>
-> >
-> > commit 8590541473188741055d27b955db0777569438e3 upstream
-> >
-> > Since we're setting the CRYPTO_TFM_REQ_MAY_BACKLOG flag on our
-> > requests to the crypto API, crypto_aead_{encrypt,decrypt} can return
-> >  -EBUSY instead of -EINPROGRESS in valid situations. For example, when
-> > the cryptd queue for AESNI is full (easy to trigger with an
-> > artificially low cryptd.cryptd_max_cpu_qlen), requests will be enqueued
-> > to the backlog but still processed. In that case, the async callback
-> > will also be called twice: first with err =3D=3D -EINPROGRESS, which it
-> > seems we can just ignore, then with err =3D=3D 0.
-> >
-> > Compared to Sabrina's original patch this version uses the new
-> > tls_*crypt_async_wait() helpers and converts the EBUSY to
-> > EINPROGRESS to avoid having to modify all the error handling
-> > paths. The handling is identical.
-> >
-> > Fixes: a54667f6728c ("tls: Add support for encryption using async offlo=
-ad accelerator")
-> > Fixes: 94524d8fc965 ("net/tls: Add support for async decryption of tls =
-records")
-> > Co-developed-by: Sabrina Dubroca <sd@queasysnail.net>
-> > Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> > Link: https://lore.kernel.org/netdev/9681d1febfec295449a62300938ed2ae66=
-983f28.1694018970.git.sd@queasysnail.net/
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > Signed-off-by: David S. Miller <davem@davemloft.net>
-> > Signed-off-by: Sasha Levin <sashal@kernel.org>
-> > [Srish: fixed merge-conflict in stable branch linux-6.1.y,
-> > needs to go on top of https://lore.kernel.org/stable/20240307155930.913=
-525-1-lee@kernel.org/]
-> > Signed-off-by: Srish Srinivasan <srish.srinivasan@broadcom.com>
-> > ---
-> >  net/tls/tls_sw.c | 22 ++++++++++++++++++++++
-> >  1 file changed, 22 insertions(+)
->
-> Now queued up, thanks.
->
+> You can add device specific stats, but please don't duplicate
+> stats for which we have standard APIs.
 
-Greg, this patch (i.e. v1) has hunk failures.
+Yeah, but these are not duplicate stats for ethtool or debugfs.
 
-Just now I have sent v2 for this patch (after resolving hunks).
-Requesting you to queue up v2:
-https://lore.kernel.org/stable/20240329102540.3888561-1-srish.srinivasan@br=
-oadcom.com/T/#m164567a5bd32085931a1b1367ae12e4102870111
+Generally, driver will reset to restore the normal state.
+After the reset, many registers are cleared. Therefore,
+it is difficult to analyze the reason of RAS.
 
-Sorry for the inconvenience.
+We wang to add this information only when RAS is occurring, And
+these information will help to analyze the reason of RAS.
 
-> greg k-h
+these information does not appear in any new API.
+
+Therefore, we hope that we can add this information to
+reduce the difficulty of analyzing certain issues.
+
+Jijie
+
 
