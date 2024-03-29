@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-83193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40E4289152E
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:29:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F2789152F
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:29:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA9B5286696
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 08:29:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F4A11C228CE
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 08:29:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4B74AEDE;
-	Fri, 29 Mar 2024 08:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B704C45974;
+	Fri, 29 Mar 2024 08:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NOFiDmbz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJ7w7TE1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741F563BF
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 08:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE524E1DC
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 08:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711700940; cv=none; b=p5Tgf3YcOylfF13yzFhDFfdHOxAt0mU0X+FTJpJ+FIpZ6BR1ZS4p1diGHhigRnRRj/vEk/hub3PIu6ZyXbxoEWhHK8L4KXf8Z3D0eiCx9Hg1VMUDA3TyJg2vSaXIyfbmY8d1R6/JlqdbyrPhjcto/NOiHUYOeZ0z7tx26tt8cBI=
+	t=1711700942; cv=none; b=g2MrxUyoBTeWAHeRbnPuWsL+WDSO+6ajxbm2u0O2MdvRZ1VdXOhimVIz8SCveMe3kdSaJMl//WmhduDJJaI38FMJgmf+YApsFjIsYR8JuYe/mzVJutTQQt3YY0Lq1oFbCa8PFwrZFlVrWXTWKOY+3y4DREZME1dkP58C3OVZgdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711700940; c=relaxed/simple;
-	bh=RQPxMvBYHIyv/Z2PhyXGdx336liJQSNR0+PnKub8rls=;
+	s=arc-20240116; t=1711700942; c=relaxed/simple;
+	bh=H4TEqdUVbh8I+Omh2NGLbbmus6qQx/nnFb3BZD9dHsw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jauh1iG+8nrlZ5RBwOFoL+RN8EPD7BhvYu7jawBIvfKV8W1FV8hH45XaaMVU4WMiSd+FOvlcM6S+KAyL7k8s8AipwdJE3CZ/uxmc2fD+TX6FKgvnJ+OhDo5r1YhqIHK5aGVmsqUF4YT49nknUlytyv7VI7IxEPX6qRDYlLATtKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NOFiDmbz; arc=none smtp.client-ip=209.85.167.174
+	 MIME-Version; b=HrS2cJ5vr5X5Y4SmLwsswnqfHfnibThMLQa3cw8AaujN5b5xwnYSkYbmAfRq91btWMLxYf4NRgl4qO52WR/773jR6SG2AFH94x6/ZA/7rSoRvX2m9TH4EpwIcycHEXqBR38F3GU3h9U4BdsVjQxGM9H5+l4gT5YTK6JYzXMrRBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lJ7w7TE1; arc=none smtp.client-ip=209.85.167.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3c3f7259bbcso3917b6e.0
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 01:28:58 -0700 (PDT)
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c396fec63aso687004b6e.0
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 01:29:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711700937; x=1712305737; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711700940; x=1712305740; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LcW0b9cmvjU+oQ3Sf479izV870s0snA3M4JZt9csdVI=;
-        b=NOFiDmbz+RzwQmrV8gSt2kOnRb/83FCfCsgfThtbQ2kP5mh9dzlQuPVOreCJN/0Yc7
-         oAz5OVMBuTnw/wMZDFCzkzHmtKKVu0EP0hrMMDw1k11l7eBO7pBvSjFIlPGlJS40BUWh
-         YjB0UfKL/tCm1X/EAyKDtrYoQn1LCOKj9xGU0fXGA9lwTDlgeSVBm45/uMq7IXIQC7+Q
-         OMD3y7MWS9652iIwE9H5l4ed3NuVac7zfxeuTJ8zoJ1FPw2rrB1PIdE6r9O/WzDjvHPq
-         kFf3HzekmUmABZYh5tqfn2Fz9nZJfZ114sKGumtzyLVs1lWsDWIN+HzfWnxYVsdma/kC
-         +r5A==
+        bh=qDj/WIGUGuQbjJfn4pkBI2FIlOuEIDvQborRQXjGDFE=;
+        b=lJ7w7TE1zBjvO/TwQMOkookeU+1naG53crgJHGu+szwXDxadRY190GAVtaz3ZpJ5aq
+         kOpsOmMuSfIaLcTDAyb79YvPLgxyeuujZla2RCMn1gmpIhXyvC/nNWLZ5F0QJl9+1Vz5
+         fAdi+uGxqni46jXsMM8wxGAoy83wsfb7xSFUDFQQiPd+plV7y5kak14OPvfbtng72Eqd
+         ZsMYouYiOt7zwMotL549r/2R1GCagFd0j82K0S0mJV/BwBPnaFx37Wjc+k0c/IE6T3C6
+         rQC+EWGfqeBWexdjE55sOkq8X2YgqQirCaOUSEIzgBxaGRzNjVDM691nhpWlit7tI/sK
+         V8Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711700937; x=1712305737;
+        d=1e100.net; s=20230601; t=1711700940; x=1712305740;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LcW0b9cmvjU+oQ3Sf479izV870s0snA3M4JZt9csdVI=;
-        b=UoE5TUE2KceFMPzpRh4kuWb3yzGZfRSOqxrN0VPWKYBq20KAkTRHq8EjV8WiL204m0
-         n5eVRaAqnMIOxyxdIs1dbs+fI6Qse1TIw/5GILGIBDC7dT5+sNB5I8nL6Bz+kkHGVSFC
-         2gJjs/KKCkhl1Y6MAPWhBqHo2iYqyUFxzw4cqKOTns6GMM8BaB78s3mxhzU3FHAFzmjx
-         95tukbzIZaBuuvD394+XiR4tSxw/+1pM9pWcF2UsFoOWDVqlW95dukbpnKTAP0ScP9Xw
-         wa8HpOD8goPKyYo+D5lPQUmvK1fZb4i5Xwu2O8cSv7NO7T8iN6gs9FXSqi9u2rnEayB7
-         JgNA==
-X-Gm-Message-State: AOJu0YwDrw8agvuGsSzv6vt9/V2kXmz0ixrgGseZfhekgZ+BGz6jSSTp
-	OrGC4bSQXVFzdXpdFSRyKD8g82ml0PimoMS+LiBOY4EXKk0fmVI23OrInqc3ORnBykUW
-X-Google-Smtp-Source: AGHT+IH5PG7QzLbJvZbySzi8WotLj6SX+FIOp0akpcf9MSUW0J2QIZlp7/cII6D6tThPZEpF6h9nQQ==
-X-Received: by 2002:a05:6808:1649:b0:3c3:dbf0:174a with SMTP id az9-20020a056808164900b003c3dbf0174amr1711462oib.10.1711700937026;
-        Fri, 29 Mar 2024 01:28:57 -0700 (PDT)
+        bh=qDj/WIGUGuQbjJfn4pkBI2FIlOuEIDvQborRQXjGDFE=;
+        b=VqOU3OWV+XzJuRzeQl+Kl5dTNevJZBE45ddEkIlPnfybFWE+mUn2au8bWIAKOBuDda
+         vSbpndq3dvJKln/vcwF/FDpOWR398rZL6vXRPEcH3Yg1//OECGcGaVX4awjImJq0Qpy3
+         FIKR/ykxG9aj/4ENNckMZ/+TJsyFLpBrgw6k+pRLXyfSTFCvR3de+Gb/AZlUU0ZUzwgH
+         qBGpzWKB2Fnsn0i8lRDduriYi4QFA/X5BRcnuiyOLl+sRU5BvlReGd7OiDHSuQEqaTZX
+         ejEQNWL2z6/MB1z1fuCMUwNCW2vZQn34sbWCVzW5OoOTkRhqUgmAKX7Kr0uaSkwMhTT0
+         /asg==
+X-Gm-Message-State: AOJu0Yw26GokxMlrhKWXMTMbtXiEtHmtPh3p34x2nvdLMynkoPE38lmr
+	AhuAKhrRaRAqZ7xKXv6bmShdqfamtta8ElRm1YwxYVK4kTdkqsTEzRrYP/4JZpQeyeDa
+X-Google-Smtp-Source: AGHT+IGhT9m1Uv7hItTGBa8XANLkom25bTWMu0oDcv7ApqjiR+GrUZI108ItY0f44DyWMnPCmu/swg==
+X-Received: by 2002:a05:6808:320b:b0:3c3:d80c:ee5f with SMTP id cb11-20020a056808320b00b003c3d80cee5fmr2110317oib.51.1711700939913;
+        Fri, 29 Mar 2024 01:28:59 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id b12-20020a056a000a8c00b006e5a915a9e7sm2656020pfl.10.2024.03.29.01.28.54
+        by smtp.gmail.com with ESMTPSA id b12-20020a056a000a8c00b006e5a915a9e7sm2656020pfl.10.2024.03.29.01.28.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 01:28:56 -0700 (PDT)
+        Fri, 29 Mar 2024 01:28:59 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -77,9 +77,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Stanislav Fomichev <sdf@google.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next 1/4] Documentation: netlink: add a YAML spec for team
-Date: Fri, 29 Mar 2024 16:28:44 +0800
-Message-ID: <20240329082847.1902685-2-liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 2/4] net: team: rename team to team_core for linking
+Date: Fri, 29 Mar 2024 16:28:45 +0800
+Message-ID: <20240329082847.1902685-3-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240329082847.1902685-1-liuhangbin@gmail.com>
 References: <20240329082847.1902685-1-liuhangbin@gmail.com>
@@ -91,239 +91,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a YAML specification for team.
+Similar with commit 08d323234d10 ("net: fou: rename the source for linking"),
+We'll need to link two objects together to form the team module.
+This means the source can't be called team, the build system expects
+team.o to be the combined object.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- Documentation/netlink/specs/team.yaml | 206 ++++++++++++++++++++++++++
- MAINTAINERS                           |   1 +
- 2 files changed, 207 insertions(+)
- create mode 100644 Documentation/netlink/specs/team.yaml
+ Documentation/netlink/specs/team.yaml    | 2 --
+ drivers/net/team/Makefile                | 1 +
+ drivers/net/team/{team.c => team_core.c} | 0
+ 3 files changed, 1 insertion(+), 2 deletions(-)
+ rename drivers/net/team/{team.c => team_core.c} (100%)
 
 diff --git a/Documentation/netlink/specs/team.yaml b/Documentation/netlink/specs/team.yaml
-new file mode 100644
-index 000000000000..907f54c1f2e3
---- /dev/null
+index 907f54c1f2e3..c13529e011c9 100644
+--- a/Documentation/netlink/specs/team.yaml
 +++ b/Documentation/netlink/specs/team.yaml
-@@ -0,0 +1,206 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: team
-+
-+protocol: genetlink-legacy
-+
-+doc: |
-+  Network team device driver.
-+
-+c-family-name: team-genl-name
-+c-version-name: team-genl-version
-+kernel-policy: global
-+uapi-header: linux/if_team.h
-+
-+definitions:
-+  -
-+    name: string-max-len
-+    type: const
-+    value: 32
-+  -
-+    name: genl-change-event-mc-grp-name
-+    type: const
-+    value: change_event
-+
-+attribute-sets:
-+  -
-+    name: team
-+    doc:
-+      The team nested layout of get/set msg looks like
-+          [TEAM_ATTR_LIST_OPTION]
-+              [TEAM_ATTR_ITEM_OPTION]
-+                  [TEAM_ATTR_OPTION_*], ...
-+              [TEAM_ATTR_ITEM_OPTION]
-+                  [TEAM_ATTR_OPTION_*], ...
-+              ...
-+          [TEAM_ATTR_LIST_PORT]
-+              [TEAM_ATTR_ITEM_PORT]
-+                  [TEAM_ATTR_PORT_*], ...
-+              [TEAM_ATTR_ITEM_PORT]
-+                  [TEAM_ATTR_PORT_*], ...
-+              ...
-+    name-prefix: team-attr-
-+    attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: team-ifindex
-+        type: u32
-+      -
-+        name: list-option
-+        type: nest
-+        nested-attributes: item-option
-+      -
-+        name: list-port
-+        type: nest
-+        nested-attributes: item-port
-+  -
-+    name: item-option
-+    name-prefix: team-attr-item-
-+    attr-cnt-name: __team-attr-item-option-max
-+    attr-max-name: team-attr-item-option-max
-+    attributes:
-+      -
-+        name: option-unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: option
-+        type: nest
-+        nested-attributes: attr-option
-+  -
-+    name: attr-option
-+    name-prefix: team-attr-option-
-+    attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: name
-+        type: string
-+        checks:
-+          max-len: string-max-len
-+          unterminated-ok: true
-+      -
-+        name: changed
-+        type: flag
-+      -
-+        name: type
-+        type: u8
-+      -
-+        name: data
-+        type: binary
-+      -
-+        name: removed
-+        type: flag
-+      -
-+        name: port-ifindex
-+        type: u32
-+        doc: for per-port options
-+      -
-+        name: array-index
-+        type: u32
-+        doc: for array options
-+  -
-+    name: item-port
-+    name-prefix: team-attr-item-
-+    attr-cnt-name: __team-attr-item-port-max
-+    attr-max-name: team-attr-item-port-max
-+    attributes:
-+      -
-+        name: port-unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: port
-+        type: nest
-+        nested-attributes: attr-port
-+  -
-+    name: attr-port
-+    name-prefix: team-attr-port-
-+    attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: ifindex
-+        type: u32
-+      -
-+        name: changed
-+        type: flag
-+      -
-+        name: linkup
-+        type: flag
-+      -
-+        name: speed
-+        type: u32
-+      -
-+        name: duplex
-+        type: u8
-+      -
-+        name: removed
-+        type: flag
-+
-+operations:
-+  list:
-+    -
-+      name: noop
-+      doc: No operation
-+      value: 0
-+      attribute-set: team
-+      dont-validate: [ strict ]
-+
-+      do:
-+        # Actually it only reply the team netlink family
-+        reply:
-+          attributes:
-+            - team-ifindex
-+
-+    -
-+      name: options-set
-+      doc: Set team options
-+      attribute-set: team
-+      dont-validate: [ strict ]
-+      flags: [ admin-perm ]
-+
-+      do:
-+        request: &option_attrs
-+          attributes:
-+            - team-ifindex
-+            - list-option
-+        reply: *option_attrs
-+
-+    -
-+      name: options-get
-+      doc: Get team options info
-+      attribute-set: team
-+      dont-validate: [ strict ]
-+      flags: [ admin-perm ]
-+
-+      do:
-+        request:
-+          attributes:
-+            - team-ifindex
-+        reply: *option_attrs
-+
-+    -
-+      name: port-list-get
-+      doc: Get team ports info
-+      attribute-set: team
-+      dont-validate: [ strict ]
-+      flags: [ admin-perm ]
-+
-+      do:
-+        request:
-+          attributes:
-+            - team-ifindex
-+        reply: &port_attrs
-+          attributes:
-+            - team-ifindex
-+            - list-port
-+            - item-port
-+            - attr-port
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6a233e1a3cf2..909c2c531d8e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21665,6 +21665,7 @@ TEAM DRIVER
- M:	Jiri Pirko <jiri@resnulli.us>
- L:	netdev@vger.kernel.org
- S:	Supported
-+F:	Documentation/netlink/specs/team.yaml
- F:	drivers/net/team/
- F:	include/linux/if_team.h
- F:	include/uapi/linux/if_team.h
+@@ -202,5 +202,3 @@ operations:
+           attributes:
+             - team-ifindex
+             - list-port
+-            - item-port
+-            - attr-port
+diff --git a/drivers/net/team/Makefile b/drivers/net/team/Makefile
+index f582d81a5091..244db32c1060 100644
+--- a/drivers/net/team/Makefile
++++ b/drivers/net/team/Makefile
+@@ -3,6 +3,7 @@
+ # Makefile for the network team driver
+ #
+ 
++team-y:= team_core.o
+ obj-$(CONFIG_NET_TEAM) += team.o
+ obj-$(CONFIG_NET_TEAM_MODE_BROADCAST) += team_mode_broadcast.o
+ obj-$(CONFIG_NET_TEAM_MODE_ROUNDROBIN) += team_mode_roundrobin.o
+diff --git a/drivers/net/team/team.c b/drivers/net/team/team_core.c
+similarity index 100%
+rename from drivers/net/team/team.c
+rename to drivers/net/team/team_core.c
 -- 
 2.43.0
 
