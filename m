@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-83139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 585E889105C
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:30:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A89789105B
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:30:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF1FFB21C66
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:30:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0E961F22700
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDEB017576;
-	Fri, 29 Mar 2024 01:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1088D179B7;
+	Fri, 29 Mar 2024 01:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cv7GnLgI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahj6Sh0x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E7B12B83
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 01:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1AA1755C;
+	Fri, 29 Mar 2024 01:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711675832; cv=none; b=Hcto60jVZ+sUeu2537E5Ie13WqN8p82LXNWKRtdgyb6Tx+eyNYTiI9J7yElbvJc1DpGZxuzXneThleaz3HyNbgi3omQnhci3SUGhs9WLWtInJxGoDmW6urbLlzzOyYCv+rHmKjAycmSavLw90PwIkNNnLAnUcgsWETZ9xMQS62c=
+	t=1711675833; cv=none; b=Y/hyJMUenWnTUTuX7+2RBuX2zHLgyXwiFE4gWjo01tO6Ht3xn9DFykpIDCIbCUD1jzJDCNw+/LTAoPPyP3vNsf9gtS9gd2Jzhw/RSfWq68k0JjG95Bk4XWco84M70tqXRnk36A9vdHrco0rzRYYss/sIrBkSOKFwFrsYdSnCv0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711675832; c=relaxed/simple;
-	bh=KqG1/6CNOZ3/zscWyJ6iaAoQm4UN8htqnkzRjpthG2k=;
+	s=arc-20240116; t=1711675833; c=relaxed/simple;
+	bh=eBjlW0K96wcTvRKhkZN5uyozDovWwaLiajHg/TN/CFw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nqbGZZffg6AYB3KOqUEhGBPC8GlQQ3c9ZK2z2FbGI6tZvrWnvgvoX70zK9WFhtZKuLZvizC56y784QwnTEReasArri2qq5NwILfhXBtmDCUqoyPeM7/OMjJpI3HvsAw3ylj+ZKlhFFBcoiXm4kHQgvw0JmnwAksU1DClhKS83K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cv7GnLgI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9EEAFC43330;
+	 In-Reply-To:To:Cc; b=cqlgbzRHGpA9KqGIFCpOWG+9+Ik+rBdJfOIJ7jIVIBZr41rV2KsO810GNiqfYIn9Lt8l458WvVZXVz80bAblZx8m66HqY4q3aUF/BhdWpce1qiDOCs+DZiZn50p08gpF8KY26skF24sCvs7BZPWB7WB2NebWNUVPuHojZfXGbEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahj6Sh0x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AC31C433C7;
 	Fri, 29 Mar 2024 01:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711675832;
-	bh=KqG1/6CNOZ3/zscWyJ6iaAoQm4UN8htqnkzRjpthG2k=;
+	bh=eBjlW0K96wcTvRKhkZN5uyozDovWwaLiajHg/TN/CFw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cv7GnLgIPd8XQzjdw0hg2IgzshjoaT92/3mhtn1tBGRYV4HMClp5wHj2px59ROo5q
-	 qKLJnmu19Tv6MVT5h5nY2y0dYeWuwRFDXi+1HiAV9qqgVzpArG9oH7I3b5LUsNNozx
-	 9mhrY/jEWY80k2Gz9CajET2StFxfVYgDX7rsqB3vbWjUVxqdKChgf85bjpMlE34x1J
-	 vQGuRut5qzv7RCkEeeVT0pNajpeQZ9Pilnkk9NklqWdy2sHW740LV93Lrlwy1mFtQR
-	 Fm3ZjbtXf+u/jPdTVjYnVq7rHO8gZPnfPJYjwWXKpLsbKojOGbqyxtCYSitoC6Fg8R
-	 7e4puL/RmxAGQ==
+	b=ahj6Sh0xrl5V3WSegy5w1BIBmYGNv/8Y8g3LFyOnCFifm9f4SoU1VNFx6HWRpH0kB
+	 kWg8ntItwy4hmEV5HakojPhvVAdOd6E3Kt6E4kJC9gmL+zwh4XVgJt2Fh3wYRfgXke
+	 Xn7P3BnsizEw1yWwx5ya3gIDDLdJXtISism06l0rVHJp7cUKK0yMB5ByTMc++Ispjd
+	 VQsbDJ+Al//9aqgVQd9nn69SYGO6jI9X3VwNL1HCcl+cHZusDebrM8VzNGqx6zGgh+
+	 jfrsRyJ0R1AuRQfF3bYhItirPjv5HKs/8FgBH2GnecTVbBqrDttjkxVYZcevZgVRvo
+	 dRrwZO4TIfvlA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 87AF1D2D0EB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7D768D95054;
 	Fri, 29 Mar 2024 01:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] xen-netfront: Add missing skb_mark_for_recycle
+Subject: Re: [PATCH] ptp: MAINTAINERS: drop Jeff Sipek
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171167583255.32458.14379553283592807838.git-patchwork-notify@kernel.org>
+ <171167583250.32458.9139932821919314899.git-patchwork-notify@kernel.org>
 Date: Fri, 29 Mar 2024 01:30:32 +0000
-References: <171154167446.2671062.9127105384591237363.stgit@firesoul>
-In-Reply-To: <171154167446.2671062.9127105384591237363.stgit@firesoul>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, arthurborsboom@gmail.com,
- ilias.apalodimas@linaro.org, wei.liu@kernel.org, paul@xen.org,
- kuba@kernel.org, kirjanov@gmail.com, dkirjanov@suse.de,
- kernel-team@cloudflare.com, security@xenproject.org,
- andrew.cooper3@citrix.com, xen-devel@lists.xenproject.org
+References: <20240327081413.306054-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20240327081413.306054-1-krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: akaher@vmware.com, amakhalov@vmware.com, pv-drivers@vmware.com,
+ richardcochran@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 27 Mar 2024 13:14:56 +0100 you wrote:
-> Notice that skb_mark_for_recycle() is introduced later than fixes tag in
-> 6a5bcd84e886 ("page_pool: Allow drivers to hint on SKB recycling").
+On Wed, 27 Mar 2024 09:14:13 +0100 you wrote:
+> Emails to Jeff Sipek bounce:
 > 
-> It is believed that fixes tag were missing a call to page_pool_release_page()
-> between v5.9 to v5.14, after which is should have used skb_mark_for_recycle().
-> Since v6.6 the call page_pool_release_page() were removed (in 535b9c61bdef
-> ("net: page_pool: hide page_pool_release_page()") and remaining callers
-> converted (in commit 6bfef2ec0172 ("Merge branch
-> 'net-page_pool-remove-page_pool_release_page'")).
+>   Your message to jsipek@vmware.com couldn't be delivered.
+>   Recipient is not authorized to accept external mail
+>   Status code: 550 5.7.1_ETR
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] xen-netfront: Add missing skb_mark_for_recycle
-    https://git.kernel.org/netdev/net/c/037965402a01
+  - ptp: MAINTAINERS: drop Jeff Sipek
+    https://git.kernel.org/netdev/net/c/fa84513997e9
 
 You are awesome, thank you!
 -- 
