@@ -1,112 +1,122 @@
-Return-Path: <netdev+bounces-83328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0887C891B62
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 14:24:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90AA9891B83
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 14:26:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2CC3289064
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:24:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A29AB25F36
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:26:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C82A172BB3;
-	Fri, 29 Mar 2024 12:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56192142E8D;
+	Fri, 29 Mar 2024 12:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BBpS68+a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GyLg1Qbn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B4E142905;
-	Fri, 29 Mar 2024 12:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD58174EC9;
+	Fri, 29 Mar 2024 12:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715703; cv=none; b=dwdgGM9TTN0xYQ+3v51lIH/q+Ekb09AFSSU+J6Uc4pSVawKj9vjKNjPuQ4yMFNzcx6Eja/aP9IBFFCNi4tZfgdOef6X+aBNrbMfp82jPjy4Nk5COOA4NAph4j1+7O05+ymfAHhA9x9QiYeDCQe5LbqnIx3JpX6JrlUK7IjPI2rk=
+	t=1711715725; cv=none; b=nxh6vttoYLgHbysWR3vwC6PmLLvTcbXCpi2x1Gv6Xifqck3nqxdse3PxrYUReiRCu8eb9sQqwQZ1I0YY+Rsjp+waM7fM1Zv1jE2Wbk/NEGlUZEheqfHRLMDMrvaNqgy4/jhscDRXhbcNFipi/XWk8wZ5b2H0/KVRxhJ2kmsAQ8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715703; c=relaxed/simple;
-	bh=/ff5m3Zms0CWVB8orfwGazc8g2xENcIWok7CRnZDuBY=;
+	s=arc-20240116; t=1711715725; c=relaxed/simple;
+	bh=PmkpG9xyozHyIEXJIgQk0WwwHU4/pWTCqDE1hBXAblc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r7YCOCh3yp7czx0CGLY7jiVPNcB4Q1Gt2kbMmyR5qfzsSvvGRezEUfdb33PXPG5Bnhx+yM3ZLz43a7YCS44wScnoT4EtJ83hejcSc7la3tRteDALJ4sb9QkLpJpbQJS8xzTkhd8pAUVe8iiAG0QSZCoHJ0ENeBVBm1O1CE6P2uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BBpS68+a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83EB3C433C7;
-	Fri, 29 Mar 2024 12:35:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KUoPyb9GEZkIhL6iffXwc1Zt0V7AIZV2a8E4vvvgOmzkufUOwcqdJWFxQTOopC4QD5+kRYmObvrJ3PfqKnHAIPxR798fIAbSIh4AhCxFLO8cnYtETjPx0mDEe8q/UpagCNTsW/XV1tD+khLAzsqwOOa7QskOP09zCqbxmEROBZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GyLg1Qbn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B332C43390;
+	Fri, 29 Mar 2024 12:35:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715702;
-	bh=/ff5m3Zms0CWVB8orfwGazc8g2xENcIWok7CRnZDuBY=;
+	s=k20201202; t=1711715724;
+	bh=PmkpG9xyozHyIEXJIgQk0WwwHU4/pWTCqDE1hBXAblc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BBpS68+axyXRek01E0ijZY8o+mB9r3sE3bn4BGojZvJFtYNtuwW3zhFFtL/vT6aSW
-	 zXA1ZTiE6L1bvG5Z64h09rlbKh00A+HWWjdRByLRNlTPuEyifuYwuiJbsxUyaOoa0+
-	 9h1NxPV4ipbGGJ4Cch8bht9Y32bXHK1pseTLw3R0I/1FsBzwF/smUpMib/cWsTPmd2
-	 pBBs7Ca41l4bwEhdIAZkgShMuDY20I/yqaF0dFGS5CFtf5LPyUqaYkZof7aV5+ig/w
-	 BqrMlK6N2Y+RTJVc5YpPdfVZYXqRFXwrFiwqY4O7RQAC4gAFFnQORTEA6GuXVCimMh
-	 JW+1RraChE8yw==
+	b=GyLg1Qbn/tS+uk3ErVBnZIiPXcy9HFQ9vkP1x0KVDkNmUtp8pq+fbkunDPN7O4eQq
+	 uD0TWBljWne22qX6VPe+QdG6fDtrZP1pNCSFZCMK9yEI9jTmcetbAEQi9vdmHpuQXs
+	 JYR0+lQ79cnI3cPXgdqoff2oKmW5flDv7Y4vD9M3Rjv0rbU5VqL/+/7TyYflIq6RcU
+	 Rf2YWskOR13E/2qhPhHXAL45fqU9zSMreQ3km+PKDtf5K+6+OQvPVouRK3gQKHlnRY
+	 +3CLn9+J3UAEgtw5Am2tBjjIUNgk4W1tOKu4hv9oRalef3zVyQjRmNwtGe8rDKP3fz
+	 E2dT4kR2RXHBA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Markus Elfring <elfring@users.sourceforge.net>,
+	Sven Eckelmann <sven@narfation.org>,
+	Simon Wunderlich <sw@simonwunderlich.de>,
 	Sasha Levin <sashal@kernel.org>,
-	drivers@pensando.io,
+	mareklindner@neomailbox.ch,
+	a@unstable.cc,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	nitya.sunkad@amd.com,
+	b.a.t.m.a.n@lists.open-mesh.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 08/15] ionic: set adminq irq affinity
-Date: Fri, 29 Mar 2024 08:34:31 -0400
-Message-ID: <20240329123445.3086536-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 02/11] batman-adv: Return directly after a failed batadv_dat_select_candidates() in batadv_dat_forward_data()
+Date: Fri, 29 Mar 2024 08:35:08 -0400
+Message-ID: <20240329123522.3086878-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240329123445.3086536-1-sashal@kernel.org>
-References: <20240329123445.3086536-1-sashal@kernel.org>
+In-Reply-To: <20240329123522.3086878-1-sashal@kernel.org>
+References: <20240329123522.3086878-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.273
+X-stable-base: Linux 4.19.311
 Content-Transfer-Encoding: 8bit
 
-From: Shannon Nelson <shannon.nelson@amd.com>
+From: Markus Elfring <elfring@users.sourceforge.net>
 
-[ Upstream commit c699f35d658f3c21b69ed24e64b2ea26381e941d ]
+[ Upstream commit ffc15626c861f811f9778914be004fcf43810a91 ]
 
-We claim to have the AdminQ on our irq0 and thus cpu id 0,
-but we need to be sure we set the affinity hint to try to
-keep it there.
+The kfree() function was called in one case by
+the batadv_dat_forward_data() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+* Thus return directly after a batadv_dat_select_candidates() call failed
+  at the beginning.
+
+* Delete the label “out” which became unnecessary with this refactoring.
+
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+Acked-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/pensando/ionic/ionic_lif.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/batman-adv/distributed-arp-table.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index d718c1a6d5fc7..e7d868da6a380 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -1874,9 +1874,12 @@ static int ionic_lif_adminq_init(struct ionic_lif *lif)
+diff --git a/net/batman-adv/distributed-arp-table.c b/net/batman-adv/distributed-arp-table.c
+index af380dc877e31..6930d414138e1 100644
+--- a/net/batman-adv/distributed-arp-table.c
++++ b/net/batman-adv/distributed-arp-table.c
+@@ -648,7 +648,7 @@ static bool batadv_dat_send_data(struct batadv_priv *bat_priv,
  
- 	napi_enable(&qcq->napi);
+ 	cand = batadv_dat_select_candidates(bat_priv, ip, vid);
+ 	if (!cand)
+-		goto out;
++		return ret;
  
--	if (qcq->flags & IONIC_QCQ_F_INTR)
-+	if (qcq->flags & IONIC_QCQ_F_INTR) {
-+		irq_set_affinity_hint(qcq->intr.vector,
-+				      &qcq->intr.affinity_mask);
- 		ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
- 				IONIC_INTR_MASK_CLEAR);
-+	}
+ 	batadv_dbg(BATADV_DBG_DAT, bat_priv, "DHT_SEND for %pI4\n", &ip);
  
- 	qcq->flags |= IONIC_QCQ_F_INITED;
+@@ -692,7 +692,6 @@ static bool batadv_dat_send_data(struct batadv_priv *bat_priv,
+ 		batadv_orig_node_put(cand[i].orig_node);
+ 	}
  
+-out:
+ 	kfree(cand);
+ 	return ret;
+ }
 -- 
 2.43.0
 
