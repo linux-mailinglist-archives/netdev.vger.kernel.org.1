@@ -1,131 +1,169 @@
-Return-Path: <netdev+bounces-83280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4689289185C
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:10:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2096689189D
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:22:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0458284AE9
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:10:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0A1E1F2430E
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D2585C6C;
-	Fri, 29 Mar 2024 12:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8FA33CD0;
+	Fri, 29 Mar 2024 12:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jRYHvtK1"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="O7Fi0g/C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA4F85C61;
-	Fri, 29 Mar 2024 12:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A388529C
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 12:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711714174; cv=none; b=bDsLNoS5HuhOS+B27T4ZSI0pDDnziMRWRaBUwWQrfsz8X//F76srDhfG2FXBRCYOVyxHolw8QTVL1j8s36x9Z18eHBkHecAUT7Le/gpw9Po8tHQ0ek15Z3ze5U9t+OpSUPijdbHSotZ+6Ie9VyLjYuMNVjybYgtZKzvyFCGM7yM=
+	t=1711714951; cv=none; b=IV5jK5kkzCdeK8sO55FNuJMkBU0qqiE0UiZfPb8MN6qPl/vxqJavfXM0xGnnBYJGN2oYMBPwVeuIv2M97HEMzgWZISi7yneD0IlOGK+NCwdBGaPkt9QghU6Di1PjQcENSzBJoKJKfpkkX5jUI+mt5L/+gcdu5AVrN77RqyEMFWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711714174; c=relaxed/simple;
-	bh=c1vtujffcN4qAMoRTIoYkCUUIFjdmgIs6rF3ALOV3hY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=b1OR4xghSMO1bvzqO6QHC8VfaM86c8+J/3iK/8GMEmtSgo6KGOqSjPuMnfNsq1IrdkcIvs+9Ys4XUTQem3TqcPZ3Y5pj8K3lSgYX0oqcvTsgsnkB41WpMyqY/ekNVrT8+NZLbHPIG9+sKcBHuRhBcOkAwDbesLdfPIkYtlYr4dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jRYHvtK1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3A66C433C7;
-	Fri, 29 Mar 2024 12:09:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711714173;
-	bh=c1vtujffcN4qAMoRTIoYkCUUIFjdmgIs6rF3ALOV3hY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=jRYHvtK1j7Za7E1ZwbAZfu718vlA6rXtHfbnjej2VpOxC1Chs4dsSjbs4Kigthl//
-	 j9vg7Gg7V9EDGsOFixuUcRu7r91cHwDI8UMcH0zsjB56AhgTF71+56hm08326C1x9J
-	 y2hKQoKV9nEcJRw02qOEAL3H4wBlFAQ7lhNfaZxMatvS+9qpS9FWzz0QTQLKcd1yi2
-	 TisP8arukJvcXj7cpspONYqRGq/AvD7qsNM866yBuS0O3xn17rAOQOjpaILrkdhiLw
-	 2EfdzzM3KW8x832C+Y4DGvsli3YVQOS1cwN+Twg/gvMgy6KVdmeo/Vl4b9+rXOtMqB
-	 /dBpJp5LzYKUA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 29 Mar 2024 13:08:53 +0100
-Subject: [PATCH net 2/2] selftests: mptcp: join: fix dev in check_endpoint
+	s=arc-20240116; t=1711714951; c=relaxed/simple;
+	bh=leo+Yi4AfSnMVg8mcM4Xju1MFqd5FSUEovb4t8XjI+U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ns+FLlgXQrP5/V5qZBNjt9XZ/cRTJ3dzceTIvFNCsC2ckvjenVuz7vLUzWvhReW+VOt5+ceONAYC+r6TKWLFKPfDfP7TGuLS61izjRWn/fhksc1p0kOnWpFS384l6uVre8MIkstwZ8q/lpJ8OeYh+XCsL1MFumSYQ2hs/TpWTWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=O7Fi0g/C; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so19048071fa.0
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 05:22:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711714946; x=1712319746; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
+        b=O7Fi0g/C5yTqgLj7PJ0zyXIg+iImbY+SKVFGN4a9Zq5xCNky6TjQyYrzlUaERurNpf
+         7LwKDBDW9EciAYhebOlUrfpp7gkwdxw3ffcHgzjAsYvU5YXkkSuF6xm7T7Dgu9iSQ5kl
+         +qqXXyD8PAwdjUTX/VSPOgkEthVy/fYMcmg7/Pdkk27h8K4cpeyzmcdoVIWAeGJYcA4p
+         vgxV5p/AfEY+VZYpyf4uBNc2jICO/cR9owEcZUd+mnQwV27PeBiF08/M0whYSW9XQNrn
+         V/j9jsc5tyhLkFsz1U2crr4Z9BGHhaJ+fjWQ7temGRIJI9xLKbhip75WdFHFUSwGtyRq
+         rj0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711714946; x=1712319746;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
+        b=uiWSKT7edgz8CiRW7Rebv0I2hhsOzndKaz/w6wMsoBAk43XQa6AVVisUwAVFfve/rn
+         Wa/Z/ONjxbRMZKp2T+GyJbqtBSbaaiyIJPDTfSrtWFxW7wzf7/kW94d0cwcrRSPmEKSw
+         1+PfHIlwvI5pVA6STmoHACMruSl+l8WaWT6KqYWVVt29k0es8eW1+LWHbV82Mdk8HJYN
+         IOAy7JQREuLyU7H73vLmCYCsqfZEUkV8PNtqx+BdRqohHMUIRUDC8lQXSrqIXbx4FtHX
+         XUeuMijUkuh4PmLW17SemVdyi4FYFOl2KVRr2M1iAN9Y0cC7HRogvwn672Ag1yV9hFch
+         3OCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW8mv1GbqnVo9kYAKmlg3KzVa23GRDvR1KEUwNz8cQhiSKUtb/IrfCfl/vElVSkP+ml2JUjO5zjE1sk5Pa2bc41zULuGga9
+X-Gm-Message-State: AOJu0YxyCbePfz9uPAcanzwe2d/MwQtjaefcO4L451GzbNHNE/MUAXSt
+	HbJjHUurDTq+7KeCXsRbPqGxU8ImfJI49/Bxp7uTP0PD0h7LPHc3E1EGDYkvkkjQsVt3paH2jV3
+	PbbJagnug/WsSp1g5VJxmpwrxaHNsDiCzot0tQw==
+X-Google-Smtp-Source: AGHT+IE+HnSCJL2quawa1K1lMrp38Nm79TgJqcEd/z4x+7H7IfVDrdpUOVuBJN0I2Fw0lOyMRLNfqEQZZUdPpNwT2ZM=
+X-Received: by 2002:a2e:8350:0:b0:2d3:5480:92aa with SMTP id
+ l16-20020a2e8350000000b002d3548092aamr644831ljh.25.1711714946358; Fri, 29 Mar
+ 2024 05:22:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240329-upstream-net-20240329-fallback-mib-v1-2-324a8981da48@kernel.org>
-References: <20240329-upstream-net-20240329-fallback-mib-v1-0-324a8981da48@kernel.org>
-In-Reply-To: <20240329-upstream-net-20240329-fallback-mib-v1-0-324a8981da48@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <tanggeliang@kylinos.cn>, stable@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1539; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=CG3/mlos+ef5k7KNLzfPX4+PsklI6wPoeaw8MLwrud4=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmBq9ybOsiuCWb5DCppU2p1oFh1Opo5xshrkxij
- LiDXPKR6/qJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZgavcgAKCRD2t4JPQmmg
- czY9D/9OnksBcpV96oDSwJcZUsXdvV1bR6rbZkJQK4NBf6TDRrGZHQrOb3mvkS9pI/SGzK+DSPn
- OFbA5vWXTH51PAChiKMeYg9LPXcd3F3rG6NuHKQ/LUQevvs3Vv95a1DTQMRYS2yb/NEl21DjPKQ
- SEzZ0/ungq0k4vTCvNpUTNFz1/vIkezkWN241Vxinwl80MC5QfpCsjSgtr1wHIX+FEbWQK7Jc91
- vMIygXOpeboDeDo0sMz9oFqwHS6hFxav7pKnMexuwtwrRalKDfxgvEhIyVeIbxZ1M9Ob1+NHl01
- 4kA1iFBbRJuUAInLQzhVp5XIp/nQAjttYKrPrk+rcDSXGI0vzSjB2DRQMY56cOdcsFfaitOnCCZ
- ZKaqh9TAOjz4bNII1wAZ7I9+rG8fwIWWXQlvphbXPSgu1PSKzsCHG79Af2O+hAsFwjy+nvInpP/
- Xu3qGAVrMUIuy3XhesKlSwPNyfeEnRbhRbi77xPLvHxJpp/p+SlFbAq2xiyDibQFEQ6WN+HCWJs
- Sw3wM67lE8Q6Gu9eL8BurWm0zonKqsWFUYRnP2PEjxm/Mn0bXOTEeNpiU+IzDDzz6kNN67VZ8A3
- 0DH4V8i6QSzkLenLuQpXpgAS6Pr6BntWv48OtTFMYMUCKylBETifhHuD7k2wHmv9IJtbXiJW/G+
- 53QzYK2MQ4VG0MQ==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+ <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com> <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
+In-Reply-To: <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 29 Mar 2024 13:22:15 +0100
+Message-ID: <CAMRc=Mfeez9kXkkVxdmUk5dy=L=rbnYkYujO6jSCT5WAyUw2HA@mail.gmail.com>
+Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
+	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, David Airlie <airlied@redhat.com>, 
+	Gerd Hoffmann <kraxel@redhat.com>, Gurchetan Singh <gurchetansingh@chromium.org>, 
+	Chia-I Wu <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
+	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
+	linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+On Fri, Mar 29, 2024 at 12:35=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> On 29/03/2024 11:27, Bartosz Golaszewski wrote:
+> > On Wed, Mar 27, 2024 at 1:45=E2=80=AFPM Krzysztof Kozlowski
+> > <krzysztof.kozlowski@linaro.org> wrote:
+> >>
+> >> virtio core already sets the .owner, so driver does not need to.
+> >>
+> >> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> >>
+> >> ---
+> >>
+> >> Depends on the first patch.
+> >> ---
+> >>  drivers/gpio/gpio-virtio.c | 1 -
+> >>  1 file changed, 1 deletion(-)
+> >>
+> >> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
+> >> index fcc5e8c08973..9fae8e396c58 100644
+> >> --- a/drivers/gpio/gpio-virtio.c
+> >> +++ b/drivers/gpio/gpio-virtio.c
+> >> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver =3D=
+ {
+> >>         .remove                 =3D virtio_gpio_remove,
+> >>         .driver                 =3D {
+> >>                 .name           =3D KBUILD_MODNAME,
+> >> -               .owner          =3D THIS_MODULE,
+> >>         },
+> >>  };
+> >>  module_virtio_driver(virtio_gpio_driver);
+> >>
+> >> --
+> >> 2.34.1
+> >>
+> >
+> > Applied, thanks!
+>
+> I expressed dependency in two places: cover letter and this patch.
+> Please drop it, because without dependency this won't work. Patch could
+> go with the dependency and with your ack or next cycle.
+>
+> Best regards,
+> Krzysztof
+>
 
-There's a bug in pm_nl_check_endpoint(), 'dev' didn't be parsed correctly.
-If calling it in the 2nd test of endpoint_tests() too, it fails with an
-error like this:
+Dropped, and:
 
- creation  [FAIL] expected '10.0.2.2 id 2 subflow dev dev' \
-                     found '10.0.2.2 id 2 subflow dev ns2eth2'
-
-The reason is '$2' should be set to 'dev', not '$1'. This patch fixes it.
-
-Fixes: 69c6ce7b6eca ("selftests: mptcp: add implicit endpoint test case")
-Cc: stable@vger.kernel.org
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 5e9211e89825..e4403236f655 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -729,7 +729,7 @@ pm_nl_check_endpoint()
- 			[ -n "$_flags" ]; flags="flags $_flags"
- 			shift
- 		elif [ $1 = "dev" ]; then
--			[ -n "$2" ]; dev="dev $1"
-+			[ -n "$2" ]; dev="dev $2"
- 			shift
- 		elif [ $1 = "id" ]; then
- 			_id=$2
-@@ -3610,6 +3610,8 @@ endpoint_tests()
- 		local tests_pid=$!
- 
- 		wait_mpj $ns2
-+		pm_nl_check_endpoint "creation" \
-+			$ns2 10.0.2.2 id 2 flags subflow dev ns2eth2
- 		chk_subflow_nr "before delete" 2
- 		chk_mptcp_info subflows 1 subflows 1
- 
-
--- 
-2.43.0
-
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
