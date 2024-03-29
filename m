@@ -1,54 +1,53 @@
-Return-Path: <netdev+bounces-83347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E28C8920D1
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:48:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EEE892036
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:19:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C1DBB32087
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:17:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE3AF1F2757B
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27AF14C582;
-	Fri, 29 Mar 2024 14:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4A88529D;
+	Fri, 29 Mar 2024 15:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hsLKCdEz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LsNdJ1Lt"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4051811182;
-	Fri, 29 Mar 2024 14:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F791C0DF0;
+	Fri, 29 Mar 2024 15:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711724223; cv=none; b=gXp3zlRMUqkH/2PDGYjWA938/qYdLIw1+2IxhQxNlt2HWYJLO/jU665OsnQyAHvBhqiWk7a+iL0+nLIDYdaVz1cfjC3d1R0O4axdSAfglTd6YDBnq1Qsgboh27EbBDP+v+F8SKYDJiwirUAu/BPQijywNth+M8JD0zWzlegrsI4=
+	t=1711724694; cv=none; b=IlZH3657twegKr73ekRtNroEIRjp/1k7GwLGw9jDr3HWg0c3fzZPi0Hk8HVAO9npYi+gM1oqkar4Jqncwk04Lo9yxTPWdLnyivvUv7sOblI1dfaM2r+sRPGRvigYC9Wr4928LedyudjEvB/zg7Mc1CK1BW/Y+XmLNBcZmljXk48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711724223; c=relaxed/simple;
-	bh=yj+WaMPcDC4PmfXN0UoEz2VQHz+OShndoiecKuggxIQ=;
+	s=arc-20240116; t=1711724694; c=relaxed/simple;
+	bh=QPr73epDnfNI9hRAKDsQGY9i3JJUvUIidZoLlIKWyZk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WZZwbJypHJ90HcynK/LyTNRtNNwAOtfc0qP98AP1/f5Aokqcgf2LK6ysTeFSGET2z5LR+riWYwiJXnpc07dQtwFA37NHlXn8Db0/x+VL/TQhmk7XZ9f84Wn71e8hZpGZRh8Z8wkkD75uxWfj5Sw3ZQRrWGESzX/Ba9s0kO0uH1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hsLKCdEz; arc=none smtp.client-ip=217.70.183.199
+	 MIME-Version:Content-Type; b=jtu/NgmqF5wDafDcNp5CmDOBcNoQ4+VzsxcGLz9eYF/Kk9EWoiTVaioN44VxcRfWBuJxCaBZniy6IjxMt5c0RgFdWLTvgqaCVQn/xZ5tMCA25u0wvmVROgetk78RoLty5IOhB/CxRNeRuuJ/mjxVdR1zW1PoTOc1fYojQBTbOng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LsNdJ1Lt; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 677A5FF807;
-	Fri, 29 Mar 2024 14:56:58 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2FD9560007;
+	Fri, 29 Mar 2024 15:04:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1711724219;
+	t=1711724684;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mTj4FeukY1YJcV4SBWzPdB8d+BFYvBZVOFx5d16Wyso=;
-	b=hsLKCdEzurQ82WXwjX3trgShtaiIxve5JRIeTgufUAUg96HSmVjf3GLNFOw2wJ8GvgvaSd
-	b0mU4AoOQLevyKJnFqcOsGkDwk08wrNu63+mVz99bKlMk8VS5EZie5FX+ZDSnZ0arG9dwB
-	phQl/UrHgMwqjuSCgEittZC/OxKtBOzfRthhfl62A+kobnJUR5DBEVOg5Zq1ZDoIh/zdar
-	R1lmEA7QFAOTC/gCtAhhUnSAokZ/Hohztelg5K57xIXzWrFQqEQZfOefK5pqKjZpEq0W0g
-	Xv8KYUT/ikok1azhPDUxITboub1F2nE/5s1kZ4HMFqmQHrp2n9vwPDf9XO+FRw==
-Date: Fri, 29 Mar 2024 15:56:57 +0100
+	bh=QPr73epDnfNI9hRAKDsQGY9i3JJUvUIidZoLlIKWyZk=;
+	b=LsNdJ1Lt0oJ9z0mqz6TlbRI8l1mbDgKIJ5zzl1ossv03wcL9woRWFh0Gs6Y9IS6u8yP+Px
+	feUGQi6RcodKm4JuX4SmPB6VcliyuE8qbxiqqaIHt3T59gAu2qHrmZ8rsGWDECrKXCecX4
+	VDS/Cs+qOCwzdBYXDm4frT8frQL1XzXx3xsMYhvop37l58/1Ler289gm9xR+nPBn+ZPAhY
+	I08bFEm98VVZuCNWibrS/bcgr+Y+tzdLCAz6IJQG6ok0viZfUfY60mGt1R+8jjseSb432x
+	E/FLe3PPXfkaBmFlgNtS+QIckH/IyKpmto5Y6MPAUPKBXNLYMlmzdSNGZHPgXw==
+Date: Fri, 29 Mar 2024 16:04:42 +0100
 From: Kory Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
  <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
  <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
@@ -56,18 +55,17 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
  <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
  Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
  devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v6 17/17] net: pse-pd: Add TI TPS23881 PSE
- controller driver
-Message-ID: <20240329155657.7939ac4b@kmaincent-XPS-13-7390>
-In-Reply-To: <6bbc6b86-3947-4679-ac0b-fde50129d0f6@lunn.ch>
+Subject: Re: [PATCH net-next v6 13/17] net: pse-pd: Use regulator framework
+ within PSE framework
+Message-ID: <20240329160442.0333a117@kmaincent-XPS-13-7390>
+In-Reply-To: <20240326-feature_poe-v6-13-c1011b6ea1cb@bootlin.com>
 References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
-	<20240326-feature_poe-v6-17-c1011b6ea1cb@bootlin.com>
-	<6bbc6b86-3947-4679-ac0b-fde50129d0f6@lunn.ch>
+	<20240326-feature_poe-v6-13-c1011b6ea1cb@bootlin.com>
 Organization: bootlin
 X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -80,35 +78,32 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 28 Mar 2024 17:24:17 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+On Tue, 26 Mar 2024 15:04:50 +0100
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-> > +static int tps23881_flash_fw_part(struct i2c_client *client,
-> > +				  const char *fw_name,
-> > +				  const struct tps23881_fw_conf *fw_conf) =20
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 >=20
-> Does the device actually have flash? Or is this just downloading to
-> SRAM?
-
-It is downloading to SRAM.
-
+> Integrate the regulator framework to the PSE framework for enhanced
+> access to features such as voltage, power measurement, and limits, which
+> are akin to regulators. Additionally, PSE features like port priorities
+> could potentially enhance the regulator framework. Note that this
+> integration introduces some implementation complexity, including wrapper
+> callbacks, but the potential benefits make it worthwhile.
 >=20
-> > +{
-> > +	const struct firmware *fw =3D NULL;
-> > +	int i, ret;
-> > +
-> > +	ret =3D request_firmware(&fw, fw_name, &client->dev);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	dev_info(&client->dev, "Flashing %s\n", fw_name); =20
+> Regulator are using enable counter with specific behavior.
+> Two calls to regulator_disable will trigger kernel warnings.
+> If the counter exceeds one, regulator_disable call won't disable the
+> PSE PI. These behavior isn't suitable for PSE control.
+> Added a boolean 'enabled' state to prevent multiple calls to
+> regulator_enable/disable. These calls will only be called from PSE
+> framework as it won't have any regulator children, therefore no mutex are
+> needed to safeguards this boolean.
 >=20
-> If this is a one-time thing whenever there is a new firmware version
-> dropped into /lib/firmware, this would be O.K. However, if this
-> happens every boot, i would use dev_dbg().
+> regulator_get needs the consumer device pointer. Use PSE as regulator
+> provider and consumer device until we have RJ45 ports represented in
+> the Kernel.
 
-Ok I will change to dev_dbg then.
-Thanks!
+Oleksij, could you verify this patch does not break pse_regulator driver?
 
 Regards,
 --=20
