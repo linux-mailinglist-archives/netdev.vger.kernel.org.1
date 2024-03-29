@@ -1,355 +1,215 @@
-Return-Path: <netdev+bounces-83418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9634B892352
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:28:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB5589235C
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:31:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8C421C2123F
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:28:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 016C0285F38
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C1C137903;
-	Fri, 29 Mar 2024 18:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D28120319;
+	Fri, 29 Mar 2024 18:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hq5sy/8o"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1S2vUMBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D9E1369A7
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AD9320B
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711736900; cv=none; b=hrs2qbnPgGBW3gfXilrFbfWS7Jf/eggy2GYy9B3QASVOHxZJFiy0ltWwEOe4B0Zf3Jxl2PCD0c1ogJ0vkKkhDGoDKiJW5SbNm9nrU7s5q6QEbuqch74RYqsXi9uiZCEnuLd6hGr2ASipvrTrfKUwodPbprFzIIKQF+wUTy0HB+I=
+	t=1711737057; cv=none; b=GmLHnin/z58eRTLvSTWy9FXobOl3HErpDV1V13QIqkCgOB1iFZtQJZmovxvAyJahVA/vJcksVVI4NhwhF4xI0y4kojgCqRjqLlSLpo59Dty64kjCVosimsIAZGZSnFhZaHpOIedkom+Ag8k3p2dXLLeZlRN8tLh/I8AgrUHfoyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711736900; c=relaxed/simple;
-	bh=aaTxx/gxFQ4PytepyKlYYbI3sL2CzQNsV3HkRrmNumU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M4qJGj7a6nny8pq6TItSHnRADnK4EX6y9CP8Y1XUie/ORqmujKQQbCaYaf3a1rUAbcOGj8dY/l8RF599Hjn2aUvcZUpjHr0NFH6kMGDRx3HCYX1Y++DAsB/QfT7BIP+UTeisc/fxZXTC88SeP72OkKKHP1bluW+dqxvyZvlNYes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hq5sy/8o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D404C433C7;
-	Fri, 29 Mar 2024 18:28:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711736899;
-	bh=aaTxx/gxFQ4PytepyKlYYbI3sL2CzQNsV3HkRrmNumU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hq5sy/8oIsmtqsHP7KbybzBi1Q46Xnl+aOvV1MHAc7FGXfsGFvU7DlecZ4+kcivV3
-	 yt3Kmk7xRQWxyiXiAqfqh6yRFlxXsCe6gTDnVKaP9Xdja2G0MRp+qxt5tYBRjVuyTQ
-	 5s9f+xHvK5WWRho5/HtV51ZKwhMov0PWoVwt4k7yusk9CmnGlud+j8YKeJ3AOskuUj
-	 5McCtrihxIEH8E6zN9LtAyMibiPlCIWt82cITUwiDYW++J//beyGAxvJxMrhhK4p8Q
-	 agc22RiosSfMwOs9OqB3mSpu10eCJ2AV/8DyjOEZA/HSRVQSqqzgzeAqOedJxj1iUb
-	 HNmmGAOEpTyhw==
-Date: Fri, 29 Mar 2024 18:28:16 +0000
-From: Simon Horman <horms@kernel.org>
-To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: Re: [PATCH iwl-next v1 1/5] ixgbe: Add support for E610 FW Admin
- Command Interface
-Message-ID: <20240329182816.GP651713@kernel.org>
-References: <20240327155422.25424-1-piotr.kwapulinski@intel.com>
- <20240327155422.25424-2-piotr.kwapulinski@intel.com>
+	s=arc-20240116; t=1711737057; c=relaxed/simple;
+	bh=q9fXlZD4J6SyprbSToxogXpZJfLmJA+jrif1BLLHFwo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pvVlig+Z8DnoiS5iAbKKy7UsNO4Ra9Wy5lOPHDtC0UxWNGHI6IwUDN5dsz8O8wsv3mvDK7g+7sizcRimZ/EZaT70BdGQcFzTaWXzsIndYYGN2QtQpwHFHkoDRsgBoaACtBtvpPrrlCda6Zyqc1b5j6Bd6f4M+wjk3nrtWazqwyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1S2vUMBb; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60cd073522cso36718707b3.1
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:30:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711737054; x=1712341854; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+gP11uoZxESr3DBeQAiaY/Mbz9A5zQu11DjgzkeSGxw=;
+        b=1S2vUMBbw9RMylz1LFcmbjNRlmVa86IJ2qRcNjfpGSBrpqcELcJd39e5jgE/Lm7pLf
+         19CvMHlYZ8J9LF6vaBJossFy1WiFdvYKlZ5dDiBc7RVIGhw6cS/XDIX9k/NOTk6ROyXZ
+         NXPg2y+1Zl+3adb6C5Gcb9LYDLOWap58KsAUxJn+gZ7MW5NBi+yDLpyAKEny4gV2tlaB
+         OFfly+IyclE3vKxSN5x9AgyvdbqaRVQrVkyuOb4XKK3FoSkQoiYzjJ5CC3erPuXG+UWw
+         u33IwdHJjaMN08e3IroIc4XXnzsCBNhXl0nVoGlFs4+jOWnvuPdza502CsogSSDbD3iM
+         Ztdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711737054; x=1712341854;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+gP11uoZxESr3DBeQAiaY/Mbz9A5zQu11DjgzkeSGxw=;
+        b=hu5sY66cXh9/7jDs+bSGXa4o14PncA/li7LVn5H9UuttQvzY0/XbE0FEjTYz54J2fD
+         U0Sd4sc8vyhkzqzwNfu/72RflQisTiDLUf2cKL81MyWh+0zpEez6bwIv/fRgaMCK6V+7
+         GX9LyiyxidHX4z6x1shnk8us0ua690h/GYyVoGe39708lUTPfqcVQguwrHhuEg11STCt
+         ES6OpstujKTcBVBG3UZTDEH0iKVKQ9npTLP0WQ5CevY3RHHxRSa5n7LM7Z8dboDR2g3E
+         f/RbGTV58TfvNWwCcj3NOkzEFgxKynWkYNb+9PCvObWj9mW86fWXbeEGLvTK9WMWTfY+
+         WirQ==
+X-Gm-Message-State: AOJu0Yx21VJ2f7iUnE9hHDcle+3OFa0hdH7k2VpJWd870pXJPW0fKwfT
+	/JgK8Modeyqag43D2CXg+6Iu1iHLoJv1jZ6nRRprhp3tIHZovTTrtwGpNgSg8C0beM1SL9gKQ8S
+	iH+FLRlaNJg==
+X-Google-Smtp-Source: AGHT+IHZDPsIt50Budojh0tsEgFd1V9V2vDjPz+/Rt8aMEQNG4NELpqg78AGjeGkWx2hzn851AFZvUMKo4siNQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:f910:0:b0:611:7166:1a4d with SMTP id
+ x16-20020a81f910000000b0061171661a4dmr789183ywm.3.1711737054570; Fri, 29 Mar
+ 2024 11:30:54 -0700 (PDT)
+Date: Fri, 29 Mar 2024 18:30:53 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327155422.25424-2-piotr.kwapulinski@intel.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240329183053.644630-1-edumazet@google.com>
+Subject: [PATCH net-next] ipv6: remove RTNL protection from inet6_dump_fib()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 27, 2024 at 04:54:18PM +0100, Piotr Kwapulinski wrote:
-> Add low level support for Admin Command Interface (ACI). ACI is the
-> Firmware interface used by a driver to communicate with E610 adapter. Add
-> the following ACI features:
-> - data structures, macros, register definitions
-> - commands handling
-> - events handling
-> 
-> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ixgbe/Makefile     |    4 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c |  505 ++++++++
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   19 +
->  drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   71 +-
->  .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 1063 +++++++++++++++++
->  drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |   15 +
->  6 files changed, 1671 insertions(+), 6 deletions(-)
->  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
->  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
->  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
->  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/Makefile b/drivers/net/ethernet/intel/ixgbe/Makefile
-> index 4fb0d9e..e0444ae 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/Makefile
-> +++ b/drivers/net/ethernet/intel/ixgbe/Makefile
-> @@ -1,5 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
-> -# Copyright(c) 1999 - 2018 Intel Corporation.
-> +# Copyright(c) 1999 - 2024 Intel Corporation.
->  #
->  # Makefile for the Intel(R) 10GbE PCI Express ethernet driver
->  #
-> @@ -9,7 +9,7 @@ obj-$(CONFIG_IXGBE) += ixgbe.o
->  ixgbe-objs := ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
->                ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
->                ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o \
-> -              ixgbe_xsk.o
-> +              ixgbe_xsk.o ixgbe_e610.o
->  
->  ixgbe-$(CONFIG_IXGBE_DCB) +=  ixgbe_dcb.o ixgbe_dcb_82598.o \
->                                ixgbe_dcb_82599.o ixgbe_dcb_nl.o
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+No longer hold hold RTNL while calling inet6_dump_fib().
 
-...
+Also change return value for a completed dump,
+so that NLMSG_DONE can be appended to current skb,
+saving one recvmsg() system call.
 
-> +/**
-> + * ixgbe_aci_send_cmd_execute - execute sending FW Admin Command to FW Admin
-> + * Command Interface
-> + * @hw: pointer to the HW struct
-> + * @desc: descriptor describing the command
-> + * @buf: buffer to use for indirect commands (NULL for direct commands)
-> + * @buf_size: size of buffer for indirect commands (0 for direct commands)
-> + *
-> + * Admin Command is sent using CSR by setting descriptor and buffer in specific
-> + * registers.
-> + *
-> + * Return: the exit code of the operation.
-> + * * - 0 - success.
-> + * * - -EIO - CSR mechanism is not enabled.
-> + * * - -EBUSY - CSR mechanism is busy.
-> + * * - -EINVAL - buf_size is too big or
-> + * invalid argument buf or buf_size.
-> + * * - -ETIME - Admin Command X command timeout.
-> + * * - -EIO - Admin Command X invalid state of HICR register or
-> + * Admin Command failed because of bad opcode was returned or
-> + * Admin Command failed with error Y.
-> + */
-> +static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
-> +				      struct ixgbe_aci_desc *desc,
-> +				      void *buf, u16 buf_size)
-> +{
-> +	u32 *tmp_buf __free(kfree) = NULL;
-> +	u32 *raw_desc = (u32 *)desc;
-> +	u32 hicr, i, tmp_buf_size;
-> +	bool valid_buf = false;
-> +	u16 opcode;
-> +
-> +	hw->aci.last_status = IXGBE_ACI_RC_OK;
-> +
-> +	/* It's necessary to check if mechanism is enabled */
-> +	hicr = IXGBE_READ_REG(hw, IXGBE_PF_HICR);
-> +
-> +	if (!(hicr & IXGBE_PF_HICR_EN))
-> +		return -EIO;
-> +
-> +	if (hicr & IXGBE_PF_HICR_C)
-> +		return -EBUSY;
-> +
-> +	opcode = desc->opcode;
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: David Ahern <dsahern@kernel.org>
+---
+ net/ipv6/ip6_fib.c | 51 +++++++++++++++++++++++-----------------------
+ 1 file changed, 26 insertions(+), 25 deletions(-)
 
-The type of opcode is u16, host byte order.
-But the type of desc->opcode is __le16, little endien.
-This does not seem right.
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index 5c558dc1c6838681c2848412dced72a41fe764be..284002a2a890526960c1360ebab4378bb8bb43f8 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -623,23 +623,22 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
+ 	struct rt6_rtnl_dump_arg arg = {
+ 		.filter.dump_exceptions = true,
+ 		.filter.dump_routes = true,
+-		.filter.rtnl_held = true,
++		.filter.rtnl_held = false,
+ 	};
+ 	const struct nlmsghdr *nlh = cb->nlh;
+ 	struct net *net = sock_net(skb->sk);
+-	unsigned int h, s_h;
+ 	unsigned int e = 0, s_e;
++	struct hlist_head *head;
+ 	struct fib6_walker *w;
+ 	struct fib6_table *tb;
+-	struct hlist_head *head;
+-	int res = 0;
++	unsigned int h, s_h;
++	int err = 0;
+ 
++	rcu_read_lock();
+ 	if (cb->strict_check) {
+-		int err;
+-
+ 		err = ip_valid_fib_dump_req(net, nlh, &arg.filter, cb);
+ 		if (err < 0)
+-			return err;
++			goto unlock;
+ 	} else if (nlmsg_len(nlh) >= sizeof(struct rtmsg)) {
+ 		struct rtmsg *rtm = nlmsg_data(nlh);
+ 
+@@ -660,8 +659,10 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
+ 		 * 2. allocate and initialize walker.
+ 		 */
+ 		w = kzalloc(sizeof(*w), GFP_ATOMIC);
+-		if (!w)
+-			return -ENOMEM;
++		if (!w) {
++			err = -ENOMEM;
++			goto unlock;
++		}
+ 		w->func = fib6_dump_node;
+ 		cb->args[2] = (long)w;
+ 	}
+@@ -675,46 +676,46 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
+ 		tb = fib6_get_table(net, arg.filter.table_id);
+ 		if (!tb) {
+ 			if (rtnl_msg_family(cb->nlh) != PF_INET6)
+-				goto out;
++				goto unlock;
+ 
+ 			NL_SET_ERR_MSG_MOD(cb->extack, "FIB table does not exist");
+-			return -ENOENT;
++			err = -ENOENT;
++			goto unlock;
+ 		}
+ 
+ 		if (!cb->args[0]) {
+-			res = fib6_dump_table(tb, skb, cb);
+-			if (!res)
++			err = fib6_dump_table(tb, skb, cb);
++			if (!err)
+ 				cb->args[0] = 1;
+ 		}
+-		goto out;
++		goto unlock;
+ 	}
+ 
+ 	s_h = cb->args[0];
+ 	s_e = cb->args[1];
+ 
+-	rcu_read_lock();
+ 	for (h = s_h; h < FIB6_TABLE_HASHSZ; h++, s_e = 0) {
+ 		e = 0;
+ 		head = &net->ipv6.fib_table_hash[h];
+ 		hlist_for_each_entry_rcu(tb, head, tb6_hlist) {
+ 			if (e < s_e)
+ 				goto next;
+-			res = fib6_dump_table(tb, skb, cb);
+-			if (res != 0)
+-				goto out_unlock;
++			err = fib6_dump_table(tb, skb, cb);
++			if (err != 0)
++				goto out;
+ next:
+ 			e++;
+ 		}
+ 	}
+-out_unlock:
+-	rcu_read_unlock();
++out:
+ 	cb->args[1] = e;
+ 	cb->args[0] = h;
+-out:
+-	res = res < 0 ? res : skb->len;
+-	if (res <= 0)
++
++unlock:
++	rcu_read_unlock();
++	if (err <= 0)
+ 		fib6_dump_end(cb);
+-	return res;
++	return err;
+ }
+ 
+ void fib6_metric_set(struct fib6_info *f6i, int metric, u32 val)
+@@ -2506,7 +2507,7 @@ int __init fib6_init(void)
+ 		goto out_kmem_cache_create;
+ 
+ 	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETROUTE, NULL,
+-				   inet6_dump_fib, 0);
++				   inet6_dump_fib, RTNL_FLAG_DUMP_UNLOCKED);
+ 	if (ret)
+ 		goto out_unregister_subsys;
+ 
+-- 
+2.44.0.478.gd926399ef9-goog
 
-Flagged by Sparse.
-
-There are a number of problems flagged by Sparse in this patch-set.
-Please make sure the patchset is Sparse-clean..
-
-> +
-> +	if (buf_size > IXGBE_ACI_MAX_BUFFER_SIZE)
-> +		return -EINVAL;
-> +
-> +	if (buf)
-> +		desc->flags |= cpu_to_le16(IXGBE_ACI_FLAG_BUF);
-> +
-> +	if (desc->flags & cpu_to_le16(IXGBE_ACI_FLAG_BUF)) {
-> +		if ((buf && !buf_size) ||
-> +		    (!buf && buf_size))
-> +			return -EINVAL;
-> +		if (buf && buf_size)
-> +			valid_buf = true;
-> +	}
-> +
-> +	if (valid_buf) {
-> +		if (buf_size % 4 == 0)
-> +			tmp_buf_size = buf_size;
-> +		else
-> +			/* Allow aligned PF_HIBA access */
-> +			tmp_buf_size = (buf_size & (u16)(~0x03)) + 4;
-> +
-> +		tmp_buf = kmalloc(tmp_buf_size, GFP_KERNEL);
-> +		if (!tmp_buf)
-> +			return -ENOMEM;
-> +
-> +		/* tmp_buf will be firstly filled with 0xFF and after
-> +		 * that the content of buf will be written into it.
-> +		 * This approach lets us use valid buf_size and
-> +		 * prevents us from reading past buf area
-> +		 * when buf_size mod 4 not equal to 0.
-> +		 */
-> +		memset(tmp_buf, 0xFF, tmp_buf_size);
-> +		memcpy(tmp_buf, buf, buf_size);
-> +
-> +		if (tmp_buf_size > IXGBE_ACI_LG_BUF)
-> +			desc->flags |= cpu_to_le16(IXGBE_ACI_FLAG_LB);
-> +
-> +		desc->datalen = cpu_to_le16(buf_size);
-> +
-> +		if (desc->flags & cpu_to_le16(IXGBE_ACI_FLAG_RD))
-> +			for (i = 0; i < tmp_buf_size / 4; i++)
-> +				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i),
-> +						le32_to_cpu(tmp_buf[i]));
-> +	}
-> +
-> +	/* Descriptor is written to specific registers */
-> +	for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
-> +		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i),
-> +				le32_to_cpu(raw_desc[i]));
-> +
-> +	/* SW has to set PF_HICR.C bit and clear PF_HICR.SV and
-> +	 * PF_HICR_EV
-> +	 */
-> +	hicr = (IXGBE_READ_REG(hw, IXGBE_PF_HICR) | IXGBE_PF_HICR_C) &
-> +	       ~(IXGBE_PF_HICR_SV | IXGBE_PF_HICR_EV);
-> +	IXGBE_WRITE_REG(hw, IXGBE_PF_HICR, hicr);
-> +
-> +#define MAX_SLEEP_RESP_US 1000
-> +#define MAX_TMOUT_RESP_SYNC_US 100000000
-> +
-> +	/* Wait for sync Admin Command response */
-> +	read_poll_timeout(IXGBE_READ_REG, hicr,
-> +			  (hicr & IXGBE_PF_HICR_SV) ||
-> +			  !(hicr & IXGBE_PF_HICR_C),
-> +			  MAX_SLEEP_RESP_US, MAX_TMOUT_RESP_SYNC_US, true, hw,
-> +			  IXGBE_PF_HICR);
-> +
-> +#define MAX_TMOUT_RESP_ASYNC_US 150000000
-> +
-> +	/* Wait for async Admin Command response */
-> +	read_poll_timeout(IXGBE_READ_REG, hicr,
-> +			  (hicr & IXGBE_PF_HICR_EV) ||
-> +			  !(hicr & IXGBE_PF_HICR_C),
-> +			  MAX_SLEEP_RESP_US, MAX_TMOUT_RESP_ASYNC_US, true, hw,
-> +			  IXGBE_PF_HICR);
-> +
-> +	/* Read sync Admin Command response */
-> +	if ((hicr & IXGBE_PF_HICR_SV)) {
-> +		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
-> +			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
-> +			raw_desc[i] = cpu_to_le32(raw_desc[i]);
-> +		}
-> +	}
-> +
-> +	/* Read async Admin Command response */
-> +	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
-> +		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
-> +			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
-> +			raw_desc[i] = cpu_to_le32(raw_desc[i]);
-> +		}
-> +	}
-> +
-> +	/* Handle timeout and invalid state of HICR register */
-> +	if (hicr & IXGBE_PF_HICR_C)
-> +		return -ETIME;
-> +
-> +	if (!(hicr & IXGBE_PF_HICR_SV) && !(hicr & IXGBE_PF_HICR_EV))
-> +		return -EIO;
-> +
-> +	/* For every command other than 0x0014 treat opcode mismatch
-> +	 * as an error. Response to 0x0014 command read from HIDA_2
-> +	 * is a descriptor of an event which is expected to contain
-> +	 * different opcode than the command.
-> +	 */
-> +	if (desc->opcode != opcode &&
-> +	    opcode != cpu_to_le16(ixgbe_aci_opc_get_fw_event))
-> +		return -EIO;
-> +
-> +	if (desc->retval) {
-> +		hw->aci.last_status = (enum ixgbe_aci_err)desc->retval;
-> +		return -EIO;
-> +	}
-> +
-> +	/* Write a response values to a buf */
-> +	if (valid_buf) {
-> +		for (i = 0; i < tmp_buf_size / 4; i++) {
-> +			tmp_buf[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
-> +			tmp_buf[i] = cpu_to_le32(tmp_buf[i]);
-> +		}
-> +		memcpy(buf, tmp_buf, buf_size);
-> +	}
-> +
-> +	return 0;
-> +}
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-
-...
-
-> +/**
-> + * struct ixgbe_aq_desc - Admin Command (AC) descriptor
-
-nit: ixgbe_aci_desc
-
-     ./scripts/kernel-doc -none is your friend here
-
-> + * @flags: IXGBE_ACI_FLAG_* flags
-> + * @opcode: Admin command opcode
-> + * @datalen: length in bytes of indirect/external data buffer
-> + * @retval: return value from firmware
-> + * @cookie_high: opaque data high-half
-> + * @cookie_low: opaque data low-half
-> + * @params: command-specific parameters
-> + *
-> + * Descriptor format for commands the driver posts via the
-> + * Admin Command Interface (ACI).
-> + * The firmware writes back onto the command descriptor and returns
-> + * the result of the command. Asynchronous events that are not an immediate
-> + * result of the command are written to the Admin Command Interface (ACI) using
-> + * the same descriptor format. Descriptors are in little-endian notation with
-> + * 32-bit words.
-> + */
-> +struct ixgbe_aci_desc {
-> +	__le16 flags;
-> +	__le16 opcode;
-> +	__le16 datalen;
-> +	__le16 retval;
-> +	__le32 cookie_high;
-> +	__le32 cookie_low;
-> +	union {
-> +		u8 raw[16];
-> +		struct ixgbe_aci_cmd_get_ver get_ver;
-> +		struct ixgbe_aci_cmd_driver_ver driver_ver;
-> +		struct ixgbe_aci_cmd_get_exp_err exp_err;
-> +		struct ixgbe_aci_cmd_req_res res_owner;
-> +		struct ixgbe_aci_cmd_list_caps get_cap;
-> +		struct ixgbe_aci_cmd_disable_rxen disable_rxen;
-> +		struct ixgbe_aci_cmd_get_phy_caps get_phy;
-> +		struct ixgbe_aci_cmd_set_phy_cfg set_phy;
-> +		struct ixgbe_aci_cmd_restart_an restart_an;
-> +		struct ixgbe_aci_cmd_get_link_status get_link_status;
-> +		struct ixgbe_aci_cmd_set_event_mask set_event_mask;
-> +		struct ixgbe_aci_cmd_get_link_topo get_link_topo;
-> +		struct ixgbe_aci_cmd_get_link_topo_pin get_link_topo_pin;
-> +		struct ixgbe_aci_cmd_sff_eeprom read_write_sff_param;
-> +		struct ixgbe_aci_cmd_nvm nvm;
-> +		struct ixgbe_aci_cmd_nvm_checksum nvm_checksum;
-> +	} params;
-> +};
-
-...
 
