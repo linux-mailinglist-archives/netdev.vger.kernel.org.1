@@ -1,75 +1,63 @@
-Return-Path: <netdev+bounces-83265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 361268917E8
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:35:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B108917F5
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:39:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E05A1285556
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:35:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 989101C21BC2
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F6B6E2C3;
-	Fri, 29 Mar 2024 11:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660AB48CC6;
+	Fri, 29 Mar 2024 11:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l1P5UfsW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FgQEXk5g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89D46A34B
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D8E2E3E5
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711712142; cv=none; b=dkODtYgqyNwi7EbXjl4r8CKHk08F8I8uZTOOdnyfx227DcVtiU7WarPXHvgaQ8dtW4n1CEzutApwQrJX9uoX5KNzbf1RiXHo0Y4EOLG/WbWELoPWh22u9YSbqGcSGFUXECR4+q/8zRe0wzyZASQO73gxMio4rWFgH5KBQFI57nw=
+	t=1711712371; cv=none; b=qWl6MSG49VCkErPJIX83FJu10MpWNMvNVXvGfnGVhQJ2d4eY3kJR8lWFTxJ4qV6HfXNdD8aEs2zFArH5NsBSOXyjwGqyi8B4U4voD5qQ/zwTjfDcY+b04ZhKZP3GzRdEUN0/osmT8KqN6I/daFolr/jrcfuIIgp/os4oBIOW2S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711712142; c=relaxed/simple;
-	bh=rTBkgbqY6fJlg+R5mG7/nmv3uvnCknOKMRSsuyxn8xk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r5uGE5iO1vtxy+D0oM+4RVIdCWxroq9vO358ONrj0DgsbAdNcSjd5CqC4Vp8t03tI9GFVud2GhquE05UgvxiUZHYZnrGI1uWG86DuD5nvfkaNDq3/blocHCB3IezO57COJyYeMm/gOaEFVmb4bewbPa39U4AKRfby10rxdndH9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=l1P5UfsW; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33ec7e38b84so1321573f8f.1
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 04:35:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711712138; x=1712316938; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SHWnqVWhESCF28jPQj1jqSBG2HWFvDAYH4hNZmw67to=;
-        b=l1P5UfsWMaios8DSGcOK8XZrmJuIEnLGt6X7D2d3UWqXtlTP+XL2xL5C9ZgtMn7rpZ
-         7g2GJbf6pYruEQg0BTU+Mtwih+gnwZXrTGvfQDyIyB1R4WsMBkfiDPKY4e/IKmaXDSKU
-         vdENM/+GlnbXAYIABxSp5NwQ9lthejVc0mBv4eWhSD8CjNk7B9vnyANEx+1oEcWLwuVP
-         W6Gexkx1lA6q1QBbKUoA77sSUEgk4IQRMQqQZGv3z0Vy+IkqALptS6w0twCjT0oFlFKv
-         oPE7SmnrtJHGUtFbTPHMie0paPQeb0YBrQ/R5ZPQNmh9T+aW8Ls/tKhZXHF7/BAK/+6K
-         yyvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711712138; x=1712316938;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SHWnqVWhESCF28jPQj1jqSBG2HWFvDAYH4hNZmw67to=;
-        b=B8K+PoLL/3Cw3H1t3HdJOHTNpLilQEXhHclhl6+dB3KJXa1yOoHVQCR/8aU4EMFUAx
-         eshpHcY3Nn9E0z58SBT7ImfQ3lhTnD4mdsHtuMvii8GU8VdyUbnZ+NgdRWbUR2Lc5EF3
-         sgNS1NezXouR9dLn3FwU7kwUFFTCBhn4IURU+7sZqio0b8rKtsxFprnamxG3wyPBLsSt
-         qniaW8tn+P7xfiH4QYAiCSuS1GpgdMcZvCkrhHTtO/QJ4FQHQZdC3wJQWOl+p7n1XRcp
-         cDpjTXBc/esD/sdcPge9qy5DYp0a6k7/E1Kvs9+ET7v/eUv7FI20fHoC3onTTvmzfT10
-         xyIw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzxZLEIW7Z4yia6HFtM0mt/fJJMDiILtOnk3kosorhDlOUKMFsFAC01aZzL4A2z1q4h2odKycf/XtGIpZh7xsUZaXsSGwX
-X-Gm-Message-State: AOJu0YwYJqfwE/jgXsaDb7UCGRYaV054RsaYQ7G9coDctHBb7L7b75jF
-	oYxk04IvWUaYhtpFCabkTxfO1SQ9u8NFWU3N2wJfaEriJM/l9EDTN1ZlUhIuNKo=
-X-Google-Smtp-Source: AGHT+IErTnUou0HaGnzrNWoIoQAUN1hmJepx7dgqCCJjDop9Ee4NvMHttnyDMc4spmgneYx5tVGNiw==
-X-Received: by 2002:a5d:63c4:0:b0:341:d912:1fec with SMTP id c4-20020a5d63c4000000b00341d9121fecmr1210632wrw.49.1711712138011;
-        Fri, 29 Mar 2024 04:35:38 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.223.50])
-        by smtp.gmail.com with ESMTPSA id bq24-20020a5d5a18000000b0033e45930f35sm4026809wrb.6.2024.03.29.04.35.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Mar 2024 04:35:37 -0700 (PDT)
-Message-ID: <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
-Date: Fri, 29 Mar 2024 12:35:33 +0100
+	s=arc-20240116; t=1711712371; c=relaxed/simple;
+	bh=hKYtQkSeZ5ltpeJ0N8ysOEzYzpezyP4+EXMnh1ySvx0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=pjgOfbntHkrnVvFPJ2qmUgdQjZO54/BhGPPGoyuxNJPSOLRqRN7NLlsx44/sIVb5xnBXtsqMecmRSI4uMs5GcZ5DITUf1RBlweITixGLBESTyk7MzMOM0g1lTTFJcla6e0woyI4XkI+XRv5SfyBiAyI790vcGcMjIthWyg5p/IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FgQEXk5g; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711712369; x=1743248369;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=hKYtQkSeZ5ltpeJ0N8ysOEzYzpezyP4+EXMnh1ySvx0=;
+  b=FgQEXk5gz0cYo7AqcQj4mGOpNVX82dSUxJv3nZcXqaFb5bwEJWb5PLvI
+   lCepgkFndkI9jVVujhdhNHiC45mWtS8/raJAVaEOlBQwdV8oGko7Ofr/k
+   uLIAG0O7/HekOQ03RH4ZktflS/e5hBHBwArhaoKehZZCUUjVBUSnBkXkb
+   wtCy0I69NbwMUxUPSfHp54URPG4ZWIcVbzOccMTbRnYZg80Tomt77XDvS
+   I8kxyZrsRm20jO1NGics8Pk8eGyqEaQFL7op6Jj9X92P9CQC6oGNbe2uO
+   iooGTKm3RgZegszh+pPqAFElYDE0XEdOk9P2X25timNv0qOB7ibqssg5R
+   w==;
+X-CSE-ConnectionGUID: 5CQzrPrySRCA+T0pWwALyA==
+X-CSE-MsgGUID: aw91iNjTSzqkqt9bm+tceQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="9855562"
+X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
+   d="scan'208";a="9855562"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 04:39:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
+   d="scan'208";a="16988890"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.35.198]) ([10.246.35.198])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 04:39:27 -0700
+Message-ID: <7ded72b3-4c22-43d4-a5b5-191ef643c6c1@linux.intel.com>
+Date: Fri, 29 Mar 2024 12:39:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,142 +65,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- David Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
- <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
- Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
- Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
- <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- Anton Yakovlev <anton.yakovlev@opensynergy.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
- iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
- kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-sound@vger.kernel.org
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
- <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] ice: Reset VF on Tx MDD
+ event
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Wojciech Drewek <wojciech.drewek@intel.com>, netdev@vger.kernel.org,
+ pawel.chmielewski@intel.com, anthony.l.nguyen@intel.com,
+ Liang-Min Wang <liang-min.wang@intel.com>, intel-wired-lan@lists.osuosl.org
+References: <20240326164455.735739-1-marcin.szycik@linux.intel.com>
+ <20240328173450.GH651713@kernel.org>
+ <fbf9dae9-c023-4b15-b3d8-6b19240f59b0@linux.intel.com>
 Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com>
+In-Reply-To: <fbf9dae9-c023-4b15-b3d8-6b19240f59b0@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 29/03/2024 11:27, Bartosz Golaszewski wrote:
-> On Wed, Mar 27, 2024 at 1:45 PM Krzysztof Kozlowski
-> <krzysztof.kozlowski@linaro.org> wrote:
->>
->> virtio core already sets the .owner, so driver does not need to.
->>
->> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>
->> ---
->>
->> Depends on the first patch.
->> ---
->>  drivers/gpio/gpio-virtio.c | 1 -
->>  1 file changed, 1 deletion(-)
->>
->> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
->> index fcc5e8c08973..9fae8e396c58 100644
->> --- a/drivers/gpio/gpio-virtio.c
->> +++ b/drivers/gpio/gpio-virtio.c
->> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver = {
->>         .remove                 = virtio_gpio_remove,
->>         .driver                 = {
->>                 .name           = KBUILD_MODNAME,
->> -               .owner          = THIS_MODULE,
->>         },
->>  };
->>  module_virtio_driver(virtio_gpio_driver);
->>
->> --
->> 2.34.1
->>
+
+
+On 29.03.2024 12:31, Marcin Szycik wrote:
 > 
-> Applied, thanks!
+> 
+> On 28.03.2024 18:34, Simon Horman wrote:
+>> On Tue, Mar 26, 2024 at 05:44:55PM +0100, Marcin Szycik wrote:
+>>> In cases when VF sends malformed packets that are classified as malicious,
+>>> sometimes it causes Tx queue to freeze. This frozen queue can be stuck
+>>> for several minutes being unusable. This behavior can be reproduced with
+>>> a faulty userspace app running on VF.
+>>>
+>>> When Malicious Driver Detection event occurs and the mdd-auto-reset-vf
+>>> private flag is set, perform a graceful VF reset to quickly bring VF back
+>>> to operational state. Add a log message to notify about the cause of
+>>> the reset. Add a helper for this to be reused for both TX and RX events.
+>>>
+>>> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>>> Co-developed-by: Liang-Min Wang <liang-min.wang@intel.com>
+>>> Signed-off-by: Liang-Min Wang <liang-min.wang@intel.com>
+>>> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>>
+>> Hi Marcin,
+>>
+>> If I read this correctly then a reset may be performed for several
+>> different conditions - values of different registers - for a VF
+>> as checked in a for loop.
+>>
+>> I am wondering if multiple resets could occur for the same VF within
+>> an iteration of the for loop - because more than one of the conditions is
+>> met. And, if so, is this ok?
+> 
+> Hi Simon,
+> 
+> Good point. Nothing too bad should happen, as ice_reset_vf() acquires mutex lock
 
-I expressed dependency in two places: cover letter and this patch.
-Please drop it, because without dependency this won't work. Patch could
-go with the dependency and with your ack or next cycle.
+Sorry, that mutex doesn't matter much here, as we'd call another ice_reset_vf()
+after previous one is done anyway.
 
-Best regards,
-Krzysztof
-
+> (in fact two locks), so several resets would just happen in sequence. However,
+> it doesn't make much sense to reset VF multiple times, so maybe instead of issuing
+> reset on each condition, I'll set some flag, and after checking all registers I'll
+> trigger reset if that flag is set. What do you think?
+> 
+> Thanks,
+> Marcin
 
