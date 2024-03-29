@@ -1,85 +1,131 @@
-Return-Path: <netdev+bounces-83176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1604A89132F
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 06:31:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9083891351
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 06:44:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F7721C22524
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 05:31:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 641F3288DCE
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 05:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0EB3BBE3;
-	Fri, 29 Mar 2024 05:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439253C466;
+	Fri, 29 Mar 2024 05:44:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AKexp1E2"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RgO3vYVm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5981D2232A
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 05:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16C22232A;
+	Fri, 29 Mar 2024 05:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711690311; cv=none; b=rr3oFJ8X2EkSREeF8nwRYjLYUY1IrlM238plUZZofbgwIkgw1OCPgluyWzu5xe7RZfNeJOrCzfuDVWjR4cJ5KacQ8dGdmUrWOwO+FD2p0T/YHJv/449U6CzoY0g8vxlk+WdaUlhiVh5bVlq41JPJkyt+w9w21yGJRaAgWRP1h1o=
+	t=1711691083; cv=none; b=o3oq4KJB8iJ73gsxUY9Y+ssfwd2JwrgegOSzUflMjAQpdyhMloX7J5arakpU3mniSlDafNR2R6Tm4MBLqgZmGJMEceBf8JY81POo92GE0SiZsEJtHe2Ju9rglz/hDRhtVRTD+eSgxYpA6ZQna1tWQriuOj0jycEooCzHKY3JjpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711690311; c=relaxed/simple;
-	bh=k8Cr7OAeZOxEl1Mq9doorzeoodfWH4GqnXyMkzgpLl4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kZqqET+kbPS5KCAZWGCPAMbl67T02zxw2WEr5FU1ABM8XT9frq4n3ezPmdYqwjjI7pICmfBDJwjuesxR2TlKkZcRCS3mXLAw1nZQZB2NIUM+bja/uSSKrW5+sBcOZEDyc1PyYRyq9Zgq3QArTYe1wICxGBm8OAJxIvCobWk2UVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AKexp1E2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F081C433C7;
-	Fri, 29 Mar 2024 05:31:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711690311;
-	bh=k8Cr7OAeZOxEl1Mq9doorzeoodfWH4GqnXyMkzgpLl4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AKexp1E2wh0GWz82ezCcBmPvICC+cl1y1o8LbMK5qFDYMNaESRGPatSNi5+bNB0RB
-	 Z0d2uNl07MyEpew4vF37OgacnkM5HJV9UsMD84tkI1KZMBJytTWnp8eiZt0cj5FNrT
-	 pEduIhwpXZgmp1E3nEKUBEZ3z3LaEomEdWHBuDGXB2YxHJo3vcYhXq04pHeNLjJ8Cy
-	 j1JAcl4+DER/DAMgZpQWmxN6TNLFiVjxRncwc1ZeMni+cTiecezHgkfueSsRU8YFNv
-	 utBkQiSx/b246eN0ogNDyQw1FpLUmzsy+I+JSltiw5qmdGoq2BqIKf0j2UPiyxjGLy
-	 6dMLoEF7YqIdg==
-Date: Thu, 28 Mar 2024 22:31:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
- <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
- <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>
-Subject: Re: [net 06/10] net/mlx5: RSS, Block changing channels number when
- RXFH is configured
-Message-ID: <20240328223149.0aeae1a3@kernel.org>
-In-Reply-To: <20240326144646.2078893-7-saeed@kernel.org>
-References: <20240326144646.2078893-1-saeed@kernel.org>
-	<20240326144646.2078893-7-saeed@kernel.org>
+	s=arc-20240116; t=1711691083; c=relaxed/simple;
+	bh=38KMRfI89ZrY3PEuXOBb0T9854grl5dkmHeXd43cZf0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=Dnf79qCY6XJ9ZsORKbQFgjEExBKR3LZI+UGaDsfktTQBkz3CsiOKhRSLcRTGE30wBwZphTqEGZBnYwXvYQzfESo/OkMLLI7okXjactDyfs1Vt+J3cRqJ7AW8o+KtkK323H7/u5v9ndZAqb9UHhySsOCieI75AeO5LrpUy0FPKfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RgO3vYVm; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42T5gh9B025814;
+	Fri, 29 Mar 2024 05:44:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:date:subject:mime-version:content-type
+	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=MAw
+	NgM10bZWkhq9ut0z5aUokVTCPHLtp9okCypZLUCA=; b=RgO3vYVm/mIwfFYdLRz
+	kby7FJgcsM5Dpi14yVJFeNToFfqoKejpCQ5q838inez7kcViY6tkjSLJ0P80dZQ8
+	aiPGdWCKjL8J1nL+xp8WNMZU2Dt3B8TlxSyQkvrmBnVa2B9BLB/s8G0YinuWMo7y
+	UM84bwESCB8lJ2uqEOHXni1UoSTdCLJ6pdAJxS6HyJ8gbkNOtVz2ERuMgthNtRTA
+	F2KyDZ2HtecSS1Ao34W/T+dxPwzPgZK3j86v3pzUHxlcPSXwtJGEW83Kto7OFgHJ
+	TUS37VUR4O6Xjfyc7oAvTk21Nc6/Fp5NnL3/+VH8SqAcCB/NQ0RYlUFMb39F4inD
+	Gkg==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x5qqn0044-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Mar 2024 05:44:16 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42T5iFLG025161
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Mar 2024 05:44:15 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 28 Mar
+ 2024 22:44:14 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Thu, 28 Mar 2024 22:44:13 -0700
+Subject: [PATCH] wifi: mac80211: correctly document struct mesh_table
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-ID: <20240328-mesh_table-kerneldoc-v1-1-174c4df341b1@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIACxVBmYC/x3MQQrCMBBG4auUWTuQpkGqVxGRJP01g2kqGVGh9
+ O5Gl9/ivZUUVaB07FaqeInKUhr6XUcx+XIDy9RM1lhnBjvyDE2Xpw8ZfEctyNMSeR96GH/AODh
+ HLX1UXOXz357OzcErOFRfYvrN3lKRocqzl0Lb9gUGfqN/hgAAAA==
+To: Johannes Berg <johannes@sipsolutions.net>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Randy Dunlap
+	<rdunlap@infradead.org>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: IxLy9ROgPNO2-E9CuGD-5ow-R9MWikEn
+X-Proofpoint-ORIG-GUID: IxLy9ROgPNO2-E9CuGD-5ow-R9MWikEn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-29_04,2024-03-28_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ adultscore=0 lowpriorityscore=0 bulkscore=0 suspectscore=0 mlxscore=0
+ malwarescore=0 spamscore=0 clxscore=1015 priorityscore=1501
+ mlxlogscore=704 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403210001 definitions=main-2403290046
 
-On Tue, 26 Mar 2024 07:46:42 -0700 Saeed Mahameed wrote:
-> Changing the channels number after configuring the receive
-> flow hash indirection table may alter the RSS table size.
-> The previous configuration may no longer be compatible with
-> the new receive flow hash indirection table.
-> 
-> Block changing the channels number when RXFH is configured.
+Currently kernel-doc -Wall reports:
 
-Do I understand correctly that this will block all set_channels
-calls after indir table changes? This may be a little too risky
-for a fix. Perhaps okay for net-next, but not a fix.
+net/mac80211/ieee80211_i.h:687: warning: missing initial short description on line:
+ * struct mesh_table
 
-I'd think that setting indir table and then increasing the number 
-of channels is a pretty legit maneuver, or even best practice
-to allocate a queue outside of RSS.
+So add a short description.
 
-Is it possible to make a narrower change, only rejecting the truly
-problematic transitions?
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Link: https://lore.kernel.org/linux-wireless/a009a21a-56d7-4a1a-aaf9-feefa5acc561@infradead.org/
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ net/mac80211/ieee80211_i.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
+index bd507d6b65e3..3b3eb3162441 100644
+--- a/net/mac80211/ieee80211_i.h
++++ b/net/mac80211/ieee80211_i.h
+@@ -684,7 +684,7 @@ struct mesh_csa_settings {
+ };
+ 
+ /**
+- * struct mesh_table
++ * struct mesh_table - mesh hash table
+  *
+  * @known_gates: list of known mesh gates and their mpaths by the station. The
+  * gate's mpath may or may not be resolved and active.
+
+---
+base-commit: 8ea3f4f1a1b4242d5fc273f41aa7c86f6b40178c
+change-id: 20240328-mesh_table-kerneldoc-6b1e0a9e8344
+
 
