@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-83136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C778D89102A
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:12:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41B6E891028
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:12:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68A72B22F94
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:12:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E03301F282BB
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2768712E40;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2502512B83;
 	Fri, 29 Mar 2024 01:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AXIROsVg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isaHxLrb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0125711C92;
-	Fri, 29 Mar 2024 01:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0122E11720
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 01:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711674711; cv=none; b=fK+CgcsqKuLD0ALUNI4rg5uI0Opws77lRqlwgp7j6JDEaUrWgXOb9dgrZNa52mKpjKC+EzqCn+YvObovgAH8uUqvVFUvJTergcycKsHHQFnL4wVdldDsPRYOZdCV1feu0FKQAylyvLEny8OJW7ZrVV9njAtnp/C5YakyC6wCKM0=
+	t=1711674711; cv=none; b=r/9ded+Dje3rrnjopTtVvApl2Ci4ljjN7mnyV6ZROgNY+Tyu6jCIH21gi676zwrml1rKZURmiTxt2nDf42c72FNxxhhQSdQJr1YKGrSgynl4JDOGgRAygjQT4qYP/5Qsa1Cr5YZg8j5/hWUzAOyL5UuoWpgxtpnm9GVvQDllu9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711674711; c=relaxed/simple;
-	bh=SQ6TUd9cj+EdPwKpn8ySIV1bKiClRtYh4HYNF//HnjY=;
+	bh=eNot05C6SBw9+CZh/rzn/KwYPL9cnerMuPg3a/1QOJo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RiZgQFWS2kx0UeXwQK0Nr17xZ8MFYP0bzCX/DdEBv85HHJlGRpSiChfCqhZfAd88/7CFr1X5vb6BYpB25MDM6ngat2ZknwhOuquI1vUHWiCR8+2TByjw8N390Yk8TEWNZR7tHnpGnUM9qD91UyqUedb57wtQuO67BFn7ELmFs5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AXIROsVg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CAC5C433F1;
+	 In-Reply-To:To:Cc; b=eGsCQB53SWP8HDihvgxWBjT7Z6KHN9Y8U6q2ofDfwEYAG9JX/xfjGhaXdV3Vqg+JbbLkuE9c5UkK/n7q4WAklwbI2MDUckn4CbTTlpO7eySR5ibmgVwhtrhsnesAM/k0YlGFgV0ZcaL2q32fNb/iRfK/Gkt7nDK2Lr3uhaP7ges=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isaHxLrb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8EF82C43394;
 	Fri, 29 Mar 2024 01:11:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711674710;
-	bh=SQ6TUd9cj+EdPwKpn8ySIV1bKiClRtYh4HYNF//HnjY=;
+	bh=eNot05C6SBw9+CZh/rzn/KwYPL9cnerMuPg3a/1QOJo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AXIROsVgLK0Pfo9J0LJUbQdfTP4lb/+qbwqe8CMR+yfveHBey6c2DoenaIywWUYJP
-	 If7cKuzZYsYO11dJxlYhUGl3M6R3dzJjINL7nd6ujjC4fDKsRAjexXR9JzGcrlqzJt
-	 qUp3GvGGHnpLMjBCGc0JBYJYrG8NoJpkuJL/S8JknTjl1Z+2zYXlTzgew4soGOqwvY
-	 2yQheAGRl8U7JYqi1CmN46yg1TeMJrNOBfI7qDOVSgZRYYRYatNM0Kl0ZJXeBH2btS
-	 M0Fp4b2wkznf6c6J2vWg7xqp1y/WP5puLijJbeXW+L5Iv4eWNvL6C1BbcD7ISSPME6
-	 mgSRqihGUvp7A==
+	b=isaHxLrbvEQ81ufM+aubh5bvjM2C/EBdYiQT6HXC02a/26AYuyHFAvkTpYOqnqp3O
+	 DbmtOV/fTUWG74LYZMyhGrJpEjimO1PXYmqkbOYmWppY8FvYi2qcTfUeP2bGBFxrAx
+	 jfYAuCFlILFYdUk0xxztXQYoxcIdmfnE6AOYcDGCx3jW/J/wVHWA4V1QaYt7/IOnTg
+	 eusDibMlzcuzdHqVG3V3A2JqHHT9KUIP6vPmAoemY6kaN+itlZVlSKHH8zKLD1+Hll
+	 /Gu9Ruf1RpRjaOfLLgzs35FrNwOHwJOHTldeHRMbWaZnhI/TRLpqtHlpkpqe6+QQh+
+	 ZE0jjM/hsCyIw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 760E0D2D0E1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F4B2D95054;
 	Fri, 29 Mar 2024 01:11:50 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,69 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/14] selftests: Fixes for kernel CI
+Subject: Re: [PATCHv3 net-next 0/2] doc/netlink/specs: Add vlan support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171167471047.20385.6346072073205983156.git-patchwork-notify@kernel.org>
+ <171167471051.20385.16149210851709967859.git-patchwork-notify@kernel.org>
 Date: Fri, 29 Mar 2024 01:11:50 +0000
-References: <cover.1711464583.git.petrm@nvidia.com>
-In-Reply-To: <cover.1711464583.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, shuah@kernel.org,
- razor@blackwall.org, liuhangbin@gmail.com, vladimir.oltean@nxp.com,
- bpoirier@nvidia.com, idosch@nvidia.com, jiri@nvidia.com,
- linux-kselftest@vger.kernel.org, mlxsw@nvidia.com
+References: <20240327123130.1322921-1-liuhangbin@gmail.com>
+In-Reply-To: <20240327123130.1322921-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, donald.hunter@gmail.com,
+ jiri@resnulli.us, jacob.e.keller@intel.com, sdf@google.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 26 Mar 2024 17:54:27 +0100 you wrote:
-> As discussed on the bi-weekly call on Jan 30, and in mailing around
-> kernel CI effort, some changes are desirable in the suite of forwarding
-> selftests the better to work with the CI tooling. Namely:
+On Wed, 27 Mar 2024 20:31:27 +0800 you wrote:
+> Add vlan support in rt_link spec.
 > 
-> - The forwarding selftests use a configuration file where names of
->   interfaces are defined and various variables can be overridden. There
->   is also forwarding.config.sample that users can use as a template to
->   refer to when creating the config file. What happens a fair bit is
->   that users either do not know about this at all, or simply forget, and
->   are confused by cryptic failures about interfaces that cannot be
->   created.
+> Hangbin Liu (2):
+>   ynl: support hex display_hint for integer
+>   doc/netlink/specs: Add vlan attr in rt_link spec
 > 
-> [...]
+>  Documentation/netlink/specs/rt_link.yaml | 80 +++++++++++++++++++++++-
+>  tools/net/ynl/lib/ynl.py                 |  5 +-
+>  2 files changed, 82 insertions(+), 3 deletions(-)
 
 Here is the summary with links:
-  - [net-next,01/14] selftests: net: libs: Change variable fallback syntax
-    https://git.kernel.org/netdev/net-next/c/fa61e9aec97f
-  - [net-next,02/14] selftests: forwarding.config.sample: Move overrides to lib.sh
-    https://git.kernel.org/netdev/net-next/c/fd36fd26ae7c
-  - [net-next,03/14] selftests: forwarding: README: Document customization
-    https://git.kernel.org/netdev/net-next/c/0cb862871fe7
-  - [net-next,04/14] selftests: forwarding: ipip_lib: Do not import lib.sh
-    https://git.kernel.org/netdev/net-next/c/0faa565bc4a7
-  - [net-next,05/14] selftests: forwarding: Move several selftests
-    https://git.kernel.org/netdev/net-next/c/40d269c000bd
-  - [net-next,06/14] selftests: forwarding: Ditch skip_on_veth()
-    https://git.kernel.org/netdev/net-next/c/0c499a351777
-  - [net-next,07/14] selftests: forwarding: Change inappropriate log_test_skip() calls
-    https://git.kernel.org/netdev/net-next/c/677f394956e8
-  - [net-next,08/14] selftests: lib: Define more kselftest exit codes
-    https://git.kernel.org/netdev/net-next/c/51ccf267beb2
-  - [net-next,09/14] selftests: forwarding: Have RET track kselftest framework constants
-    https://git.kernel.org/netdev/net-next/c/596c8819cb78
-  - [net-next,10/14] selftests: forwarding: Convert log_test() to recognize RET values
-    https://git.kernel.org/netdev/net-next/c/a923af1ceee7
-  - [net-next,11/14] selftests: forwarding: Support for performance sensitive tests
-    https://git.kernel.org/netdev/net-next/c/e16a8d209c33
-  - [net-next,12/14] selftests: forwarding: Mark performance-sensitive tests
-    https://git.kernel.org/netdev/net-next/c/e10391092aca
-  - [net-next,13/14] selftests: forwarding: router_mpath_nh_lib: Don't skip, xfail on veth
-    https://git.kernel.org/netdev/net-next/c/6db870bbf788
-  - [net-next,14/14] selftests: forwarding: Add a test for testing lib.sh functionality
-    https://git.kernel.org/netdev/net-next/c/8ff2d7abfb6f
+  - [PATCHv3,net-next,1/2] ynl: support hex display_hint for integer
+    https://git.kernel.org/netdev/net-next/c/b334f5ed3d91
+  - [PATCHv3,net-next,2/2] doc/netlink/specs: Add vlan attr in rt_link spec
+    https://git.kernel.org/netdev/net-next/c/782c1084b9fa
 
 You are awesome, thank you!
 -- 
