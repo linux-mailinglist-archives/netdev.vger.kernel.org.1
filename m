@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-83475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F398D8926A3
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 23:12:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10F18926A6
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 23:16:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5711283F21
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 22:12:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 945741F22EAF
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 22:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8738913CFA8;
-	Fri, 29 Mar 2024 22:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61F813CF91;
+	Fri, 29 Mar 2024 22:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E0pT12sl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E887D39FD6;
-	Fri, 29 Mar 2024 22:12:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13A413C9AF
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 22:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711750330; cv=none; b=j7hSsPOLq1kERq0GSa6k+MXlehN1DPwi2k6D/Xa0+EjLNhCZwiacFaMYIjM+9MJqn190FvHMzb2bLsJk+LvHzwVH/j5plCzzZO4GeiHXqTLTuslucB0KzrUwi/dqZINb01ES5UBPbVeV6Cy42qnqbofDfJEZw9KmC1JJFB1KvEA=
+	t=1711750565; cv=none; b=pbCPTsLcVWyGAGY1F+FGFHESEMB7jZkSNc4VY5Jj4bsM/MvDfdgXv1TToeeZrfDTUIXW6qXwoXC3JFktv1qRvZmGPVXhJAnrpUB+pSkLLNgflhRLkU0oKJgtHJQqPNQLjsJ3CLEMEbDMRkfkivs0GqreaS5/Jl7q/EnKMuY0Bh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711750330; c=relaxed/simple;
-	bh=4pyAcfmQivB1ekKoU0AtYp3wcKhIcJ+R2eM65+IthZk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SfigRfo5/Uim0BVvEDTIcbuFDYqMdNqZgyAUrlQ2bnpIfA5o6QZyc4qNA394xCV4cbz//O/tklE3+v56YUbtg380gSm0AjKbOvFetVLHjdqrVYvEjpCzMCW1Tni6q66LhSTn2Cqn3dWmZxoRlt89S6VpIgfuAuw6PpcxMk0tBgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Date: Fri, 29 Mar 2024 23:12:04 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Stanislav Fomichev <sdf@google.com>, donald.hunter@redhat.com,
-	fw@strlen.de, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net-next v1 2/2] tools/net/ynl: Add multi message support
- to ynl
-Message-ID: <Zgc8tPPX2fdJ1AJP@calendula>
-References: <20240327181700.77940-1-donald.hunter@gmail.com>
- <20240327181700.77940-3-donald.hunter@gmail.com>
- <20240328175729.15208f4a@kernel.org>
- <m234s9jh0k.fsf@gmail.com>
- <20240329084346.7a744d1e@kernel.org>
- <m2plvcj27b.fsf@gmail.com>
- <CAD4GDZw0RW3B2n5vC-q-XLpQ_bCg0iP13qvOa=cjK37CPLJsKg@mail.gmail.com>
- <20240329144639.0b42dc19@kernel.org>
+	s=arc-20240116; t=1711750565; c=relaxed/simple;
+	bh=433Lz/Y3OL0GQmpw2bh29J8eaSo3lDFYM4WPs7r2AHc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y+9IJzHKm45lSQzI5sQDQ3ESRohOGHktP1IoC3/2MZDYbG7/ZnGA54+NjzaZkVyj+92VdfZJAmsa7lCe6zNXXtqPIbBvVgZrJctatYhNc3yh8wwJB9RRLEf+BbB3t3MdLRjAw85MkkO2wZCEFFzZao2jz+HoVuA6ZfMJjyi6Z/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E0pT12sl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3AC2C433F1;
+	Fri, 29 Mar 2024 22:16:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711750565;
+	bh=433Lz/Y3OL0GQmpw2bh29J8eaSo3lDFYM4WPs7r2AHc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=E0pT12slbEikvN3kyB87rQiIImPF/oVqRQPnogyTOrpr92SJK1j9FSQj+w3/pZCP4
+	 U845PaNqG0eXU58dSpySkBqyCipND6psVqJ7ahMozKcWyxSBkQdsAtZ7CmaFNJNe77
+	 1zkVSVRPsJefmfh8p3m6sh82nMCRWL5CSE6D14GTW4jXGAJNk7NdueVoe1fSBG/tyi
+	 vPinNQ+7/uKgJMHUupYlPB+JgU1DurTsHYatBO2gTKECco1hfuiw2s1GlARyYRNqYQ
+	 voMTXmfnHpyQYB35iN+lTQJVKLNcebxHadiEe4oDDZBvtVIPR+5oGton2vpLWhoMhD
+	 mHMppPCV34aUw==
+Date: Fri, 29 Mar 2024 15:16:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ simon.horman@corigine.com, anthony.l.nguyen@intel.com, edumazet@google.com,
+ pabeni@redhat.com, idosch@nvidia.com, przemyslaw.kitszel@intel.com,
+ marcin.szycik@linux.intel.com
+Subject: Re: [PATCH net-next 0/3] ethtool: Max power support
+Message-ID: <20240329151603.77981289@kernel.org>
+In-Reply-To: <20240329092321.16843-1-wojciech.drewek@intel.com>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240329144639.0b42dc19@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 29, 2024 at 02:46:39PM -0700, Jakub Kicinski wrote:
-> On Fri, 29 Mar 2024 21:01:09 +0000 Donald Hunter wrote:
-> > There's no response for 'batch-begin' or 'batch-end'. We may need a
-> > per op spec property to tell us if a request will be acknowledged.
-> 
-> :(
-> 
-> Pablo, could we possibly start processing the ACK flags on those
-> messages? Maybe the existing user space doesn't set ACK so nobody
-> would notice?
-> 
-> I don't think the messages are otherwise marked as special from 
-> the "netlink layer" perspective.
+On Fri, 29 Mar 2024 10:23:18 +0100 Wojciech Drewek wrote:
+> Some ethernet modules use nonstandard power levels [1]. Extend ethtool
+> module implementation to support new attributes that will allow user
+> to change maximum power. Rename structures and functions to be more
+> generic. Introduce an example of the new API in ice driver.
 
-It is possible to explore this. I don't have a use-case for NLM_F_ACK
-and the begin marker message at this stage.
+I'm no SFP expert but seems reasonable.
 
-Thanks.
+Would be good to insert more references to the SFP / CMIS specs
+which describe the standard registers.
+
+Also the series is suffering from lack of docs and spec, please
+update both:
+
+  Documentation/networking/ethtool-netlink.rst
+  Documentation/netlink/specs/ethtool.yaml
 
