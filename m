@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-83368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 803D08920D9
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:50:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF5D892151
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:11:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C8FF1F26DAD
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:50:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22664B28654
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EF54EB23;
-	Fri, 29 Mar 2024 15:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98184AEED;
+	Fri, 29 Mar 2024 15:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUBvihu/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5gBlwWo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3863D966;
-	Fri, 29 Mar 2024 15:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C497F3D966
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 15:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711727429; cv=none; b=UtJ1F91lPoqON0C0A7ESrdemOw1Fj/+2PYV2EiJYTPl/Z+Nm1YQyvg59ON7lEV+a7XUml5L+SnBQ8Wg/xrOsZ/2SvGVio+89Tig+ovhPOSSjwt0NxzlJNsySSmYOIXHP44GTHbfaWXPLe1Ywdx9k/gYUL0S19gEN6nZXHA3FFFc=
+	t=1711727433; cv=none; b=lp0gr5rs9asEYWSmDZfiwWX0WDo4UnGkRJpJIsixBn6klwHi0A0Es7YtRVU3MXyw2gsQfz8eqNCLRn5Ilrsc4bXlTj+SuLk5bYyWxIQLRro/OKfpK/ec7bdndtQdfPNOUohdl+yfCYy4wbhC1tmzs7OM8HXgQ0No++LQbfE5dbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711727429; c=relaxed/simple;
-	bh=1Gb9js9o92vHoW2ztLDWmNequldYaphj6neZme3mpUQ=;
+	s=arc-20240116; t=1711727433; c=relaxed/simple;
+	bh=iXNOxNAkASdORsLJ7puMXP3tc4aCJ3Ub+JKIoW59HBY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JJ9FMLfn8V3iiQaFwjav3J9CaF9K5JI3O6blgG5PMLPMa7JQtObcv2tNgH8tldgS3Zpd8PGPmLjeu69wqX2zbSUqW4eB/4c6yznAQa+PTkpfxF/Dwfwv2k6fTccxAu2/NRdL3bC/FWntPmT/W7vUmKTQS9ipmklMqalFXrRMpqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUBvihu/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5429CC43390;
-	Fri, 29 Mar 2024 15:50:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YdxfAFRcHhrj0asl0HdkVfGluo4UWwHsbWHxigMzUWZhcQ7rBf1VBoEOtbcKtkyywj/JEkeuT0NuK7Ms1JXXU1p4OoMSW376yAOU4gj6MweP6aydQAcnDWU8iw2slKCDdZvcAgQX5PMgH7gynfqZEOrk+1jIjVtAU2Lp/SaGyP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5gBlwWo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3ECE0C43399;
+	Fri, 29 Mar 2024 15:50:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711727429;
-	bh=1Gb9js9o92vHoW2ztLDWmNequldYaphj6neZme3mpUQ=;
+	s=k20201202; t=1711727433;
+	bh=iXNOxNAkASdORsLJ7puMXP3tc4aCJ3Ub+JKIoW59HBY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RUBvihu/ul2t4K55eznxMPDb5Iq17zPcOlLL+gU1QLSR8T8uhh0i9PIrawRpRafg1
-	 Szrqtp37PCF4Gkf3RUbqVrm07rlPkmOYYKyGpKF6XReUQNmpiLQ71lJn6THihy3aTh
-	 AV1sKL22lRKO2/aKrLQTdQ3qTM2W3akzqzorkDh0cCZYdJPGtJenOCRS4cU7AqW472
-	 dzblLuwtWvImC2Df7zbH3jVUeYGFmAJGiNub79LaxpL1QsbX7WyYJ+MC06WTL2WYG1
-	 yeAu5Sn4UVl01g116UOeI2MTJ7VzXlNALxZw+cOiioj2YmcPKcZQeEX4LeT5Pl2o9K
-	 vhZQrlvigejrQ==
+	b=s5gBlwWohlXT/QH43dwcEYwdHHwRISaRjAQXUiAxympkNKjaZ+N+EEEpOoDnGylKg
+	 AF1zP6ZbauBnuCmtCv0g3ChLjtHyY5zZ7NQB+huk92NZQWPnKvdUgcuZSB2lWyG9be
+	 y4Bog/sYJ7q6+APnpXfQT9zhLQU1XwDsxxKCGvMjwTJWvM4auWYKgbpEUC6wCpVNEV
+	 FX3+Qddl74vW5ta2t2C+c4Pne9H/p2BKAdoKlfWXUgvuR5lNDH/hNw1+RkiLTzTBN7
+	 LvqUNFNPrVFao6+JdphPaodZaD9R9ktgVmb90+PMzgWe6tXC2og/ef3P55qdau/ctx
+	 w816w/nlMz8MA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 40B34D84BAF;
-	Fri, 29 Mar 2024 15:50:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2B681D84BAF;
+	Fri, 29 Mar 2024 15:50:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,75 +52,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v1] mlxbf_gige: stop interface during shutdown
+Subject: Re: [PATCH v5 net-next 00/15] af_unix: Rework GC.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171172742926.17508.15910798895938463118.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 15:50:29 +0000
-References: <20240325210929.25362-1-davthompson@nvidia.com>
-In-Reply-To: <20240325210929.25362-1-davthompson@nvidia.com>
-To: David Thompson <davthompson@nvidia.com>
+ <171172743317.17508.11772802399675256509.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 15:50:33 +0000
+References: <20240325202425.60930-1-kuniyu@amazon.com>
+In-Reply-To: <20240325202425.60930-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, u.kleine-koenig@pengutronix.de, leon@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 25 Mar 2024 17:09:29 -0400 you wrote:
-> The mlxbf_gige driver intermittantly encounters a NULL pointer
-> exception while the system is shutting down via "reboot" command.
-> The mlxbf_driver will experience an exception right after executing
-> its shutdown() method.  One example of this exception is:
+On Mon, 25 Mar 2024 13:24:10 -0700 you wrote:
+> When we pass a file descriptor to an AF_UNIX socket via SCM_RIGTHS,
+> the underlying struct file of the inflight fd gets its refcount bumped.
+> If the fd is of an AF_UNIX socket, we need to track it in case it forms
+> cyclic references.
 > 
-> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000070
-> Mem abort info:
->   ESR = 0x0000000096000004
->   EC = 0x25: DABT (current EL), IL = 32 bits
->   SET = 0, FnV = 0
->   EA = 0, S1PTW = 0
->   FSC = 0x04: level 0 translation fault
-> Data abort info:
->   ISV = 0, ISS = 0x00000004
->   CM = 0, WnR = 0
-> user pgtable: 4k pages, 48-bit VAs, pgdp=000000011d373000
-> [0000000000000070] pgd=0000000000000000, p4d=0000000000000000
-> Internal error: Oops: 96000004 [#1] SMP
-> CPU: 0 PID: 13 Comm: ksoftirqd/0 Tainted: G S         OE     5.15.0-bf.6.gef6992a #1
-> Hardware name: https://www.mellanox.com BlueField SoC/BlueField SoC, BIOS 4.0.2.12669 Apr 21 2023
-> pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> pc : mlxbf_gige_handle_tx_complete+0xc8/0x170 [mlxbf_gige]
-> lr : mlxbf_gige_poll+0x54/0x160 [mlxbf_gige]
-> sp : ffff8000080d3c10
-> x29: ffff8000080d3c10 x28: ffffcce72cbb7000 x27: ffff8000080d3d58
-> x26: ffff0000814e7340 x25: ffff331cd1a05000 x24: ffffcce72c4ea008
-> x23: ffff0000814e4b40 x22: ffff0000814e4d10 x21: ffff0000814e4128
-> x20: 0000000000000000 x19: ffff0000814e4a80 x18: ffffffffffffffff
-> x17: 000000000000001c x16: ffffcce72b4553f4 x15: ffff80008805b8a7
-> x14: 0000000000000000 x13: 0000000000000030 x12: 0101010101010101
-> x11: 7f7f7f7f7f7f7f7f x10: c2ac898b17576267 x9 : ffffcce720fa5404
-> x8 : ffff000080812138 x7 : 0000000000002e9a x6 : 0000000000000080
-> x5 : ffff00008de3b000 x4 : 0000000000000000 x3 : 0000000000000001
-> x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000000000
-> Call trace:
->  mlxbf_gige_handle_tx_complete+0xc8/0x170 [mlxbf_gige]
->  mlxbf_gige_poll+0x54/0x160 [mlxbf_gige]
->  __napi_poll+0x40/0x1c8
->  net_rx_action+0x314/0x3a0
->  __do_softirq+0x128/0x334
->  run_ksoftirqd+0x54/0x6c
->  smpboot_thread_fn+0x14c/0x190
->  kthread+0x10c/0x110
->  ret_from_fork+0x10/0x20
-> Code: 8b070000 f9000ea0 f95056c0 f86178a1 (b9407002)
+> Let's say we send a fd of AF_UNIX socket A to B and vice versa and
+> close() both sockets.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v1] mlxbf_gige: stop interface during shutdown
-    https://git.kernel.org/netdev/net/c/09ba28e1cd3c
+  - [v5,net-next,01/15] af_unix: Allocate struct unix_vertex for each inflight AF_UNIX fd.
+    https://git.kernel.org/netdev/net-next/c/1fbfdfaa5902
+  - [v5,net-next,02/15] af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
+    https://git.kernel.org/netdev/net-next/c/29b64e354029
+  - [v5,net-next,03/15] af_unix: Link struct unix_edge when queuing skb.
+    https://git.kernel.org/netdev/net-next/c/42f298c06b30
+  - [v5,net-next,04/15] af_unix: Bulk update unix_tot_inflight/unix_inflight when queuing skb.
+    https://git.kernel.org/netdev/net-next/c/22c3c0c52d32
+  - [v5,net-next,05/15] af_unix: Iterate all vertices by DFS.
+    https://git.kernel.org/netdev/net-next/c/6ba76fd2848e
+  - [v5,net-next,06/15] af_unix: Detect Strongly Connected Components.
+    https://git.kernel.org/netdev/net-next/c/3484f063172d
+  - [v5,net-next,07/15] af_unix: Save listener for embryo socket.
+    https://git.kernel.org/netdev/net-next/c/aed6ecef55d7
+  - [v5,net-next,08/15] af_unix: Fix up unix_edge.successor for embryo socket.
+    https://git.kernel.org/netdev/net-next/c/dcf70df2048d
+  - [v5,net-next,09/15] af_unix: Save O(n) setup of Tarjan's algo.
+    https://git.kernel.org/netdev/net-next/c/ba31b4a4e101
+  - [v5,net-next,10/15] af_unix: Skip GC if no cycle exists.
+    https://git.kernel.org/netdev/net-next/c/77e5593aebba
+  - [v5,net-next,11/15] af_unix: Avoid Tarjan's algorithm if unnecessary.
+    https://git.kernel.org/netdev/net-next/c/ad081928a8b0
+  - [v5,net-next,12/15] af_unix: Assign a unique index to SCC.
+    https://git.kernel.org/netdev/net-next/c/bfdb01283ee8
+  - [v5,net-next,13/15] af_unix: Detect dead SCC.
+    https://git.kernel.org/netdev/net-next/c/a15702d8b3aa
+  - [v5,net-next,14/15] af_unix: Replace garbage collection algorithm.
+    https://git.kernel.org/netdev/net-next/c/4090fa373f0e
+  - [v5,net-next,15/15] selftest: af_unix: Test GC for SCM_RIGHTS.
+    https://git.kernel.org/netdev/net-next/c/2aa0cff26ed5
 
 You are awesome, thank you!
 -- 
