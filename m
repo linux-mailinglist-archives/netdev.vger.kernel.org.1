@@ -1,50 +1,67 @@
-Return-Path: <netdev+bounces-83267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 927BE8917F6
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:40:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D20389180D
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:43:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 169EDB20B3F
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:40:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F25161F22D85
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE566A325;
-	Fri, 29 Mar 2024 11:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825A92AEEA;
+	Fri, 29 Mar 2024 11:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uyQxH1Ue"
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="S5/V92NF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56FD85A0FB
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 163A844C65;
+	Fri, 29 Mar 2024 11:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711712431; cv=none; b=e6LrBdiUxDws4vm6CUzagKbPppaX+B59aCMSKwvGMowqoSSs43sfIaSCsNOKD/zpjSsMwf59ibUkV5abPbKnDjjfBGgrI7LAlZtZ6MJ9rD/+fkMUlF15eWnLpkxtXWzQgUwjf65+1I9JCQ8CY0FhsqhvfUL2jEg3DarjW9H3C9c=
+	t=1711712634; cv=none; b=BB4hj+Lgi1pfnQ48W+/GEK6pYO3aubAl/89OxkX53+NYMnTeA0bO96gPn4Jogtq7SDQWr48U6wv0aXdYSi2OFAYpSOPIvAtzvIyJlxPDjL27nO3eQpStq9JhnWJ+hjsC5TASfvM54jDJhq7ZBgvPH2C++VHKiTxAaI2I/1tJhuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711712431; c=relaxed/simple;
-	bh=yIHVj5QFIu06ebTETsM94QzH/xYvHdLLaAYo3KFLfvY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cKQ/HLi5YBIr2tgfnqciLrlCp53nWkwwYYzSGrLKo/Ib+JmQi04UEa3KPo6o4YiyHK+nslCmZaJlGHkLSJqj19kaDAzn/HAph6aPtmzLinqKY2HXulxluGaKJIozmGGBZxgVhxcH+FJfzKqkGaPvb0Ac5LGX9dHz9B7N8bJRsHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uyQxH1Ue; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B534C433C7;
-	Fri, 29 Mar 2024 11:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711712430;
-	bh=yIHVj5QFIu06ebTETsM94QzH/xYvHdLLaAYo3KFLfvY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uyQxH1UeQJQ881nQbkQSlXnhj607Jrq/dfjPHZitEaKP7Rx7C6CZr7vC8q+k5IhSv
-	 k1krX6CG9lr+luIeZ1ezOwP3+g/fjxkxKdBMy0q7RBmHwqjTQ9I6tacgsmAnVHjako
-	 N7S/vWU1jjWi4HjZEt0crvBB6bDci1hpZMcFmKswwypx+vsztYikLjUBDr+UaQoJj+
-	 24duZzvFul58/BD4Qvxl8jvr4R/bqerha8unuHGttNlxQRMfsud7/40hqux0jpjcv9
-	 ukZj0oYuxTdb/zka44yxyRqqM3ryC/zxjAqs4Zm2W0WPW7/v32BjtvhdjbRzc94/4T
-	 s1bxG/yNf4VgA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D1F1D2D0EE;
-	Fri, 29 Mar 2024 11:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711712634; c=relaxed/simple;
+	bh=ikoQNMMPUGesR1bkcRId9V2HyehtlVGvNHjsqT5czD4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kjBQtOZSmmlNNZWM4elHkb7Lnwp8mOkk9qjuvOUnoLHdqQ7MvNtF6rREDgZzvatPElihLttmJzaE8HF4NTIzHATHJJNO7ALXmnbuudWx49e+WAUqvlWcVi81pAs96Mqi18HK+8XJ5I4fTqsFKEyzMi/ouzdnpza3Vrf8D3yuyzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=S5/V92NF; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 5DA9C100003;
+	Fri, 29 Mar 2024 14:43:23 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1711712603; bh=ikoQNMMPUGesR1bkcRId9V2HyehtlVGvNHjsqT5czD4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=S5/V92NF4UMpgfnAS6mULbcqqFOqgQsSmK9KSnbB3648Ypf+JAnvWdSqPaMEoHyrK
+	 p+j+tENx45A0BeS7jsojrZh+ZgjGNU2F2XvDWs6+Sy2Zhzr6CGrkjMCa6O6/BwsLSD
+	 8AT578oex2PiFQyVwL5dQlM4FmtbUBmHMK/1+8iZdh++eeNCdkmOdJOZif6Tn0vz4j
+	 uIpqmo7RfwUU1DQIyZgkR0QsauXFVYU/T/1rVpsUUsAfiPGH7C1yMqaGD/S4N7zlgV
+	 /hhCQ4mhaCznkAHX6o3G2a143Sf/nZuoZWSGqju/4Sc7jYlZFsy2UENZaQ/N0Moyv+
+	 bweuckDdpXtww==
+Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Fri, 29 Mar 2024 14:42:01 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 29 Mar
+ 2024 14:41:41 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Sunil Goutham
+	<sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha sowjanya
+	<gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>, hariprasad
+	<hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH 6.1 0/1] octeontx2-af: Add validation of lmac
+Date: Fri, 29 Mar 2024 14:41:32 +0300
+Message-ID: <20240329114133.45456-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,50 +69,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4 0/5] gro: various fixes related to UDP tunnels
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171171243044.24069.3118700921840357850.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 11:40:30 +0000
-References: <20240326113403.397786-1-atenart@kernel.org>
-In-Reply-To: <20240326113403.397786-1-atenart@kernel.org>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, steffen.klassert@secunet.com,
- willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 184490 [Mar 29 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 14 0.3.14 5a0c43d8a1c3c0e5b0916cc02a90d4b950c01f96, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;mx1.t-argos.ru.ru:7.1.1;t-argos.ru:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/03/29 10:56:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/03/29 08:22:00 #24505801
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 26 Mar 2024 12:33:57 +0100 you wrote:
-> Hello,
-> 
-> We found issues when a UDP tunnel endpoint is in a different netns than
-> where UDP GRO happens. This kind of setup is actually quite diverse,
-> from having one leg of the tunnel on a remove host, to having a tunnel
-> between netns (eg. being bridged in another one or on the host). In our
-> case that UDP tunnel was geneve.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v4,1/5] udp: do not accept non-tunnel GSO skbs landing in a tunnel
-    https://git.kernel.org/netdev/net/c/3d010c8031e3
-  - [net,v4,2/5] gro: fix ownership transfer
-    https://git.kernel.org/netdev/net/c/ed4cccef64c1
-  - [net,v4,3/5] udp: do not transition UDP GRO fraglist partial checksums to unnecessary
-    https://git.kernel.org/netdev/net/c/f0b8c3034556
-  - [net,v4,4/5] udp: prevent local UDP tunnel packets from being GROed
-    https://git.kernel.org/netdev/net/c/64235eabc4b5
-  - [net,v4,5/5] selftests: net: gro fwd: update vxlan GRO test expectations
-    https://git.kernel.org/netdev/net/c/0fb101be97ca
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+With the addition of new MAC blocks like CN10K RPM and CN10KB
+RPM_USX, LMACs are noncontiguous. Though in most of the functions,
+lmac validation checks exist but in few functions they are missing.
+The problem has been fixed by the following patch which can be
+cleanly applied to the 6.1.y branch.
 
