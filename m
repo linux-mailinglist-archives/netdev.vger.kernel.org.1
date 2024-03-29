@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-83187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0F08913EE
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 07:54:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 189B58913EF
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 07:54:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D6ED1F22B50
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 06:54:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 933471F222C2
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 06:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA77C3D0DF;
-	Fri, 29 Mar 2024 06:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5483C482;
+	Fri, 29 Mar 2024 06:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4t9tEX1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlAnn09j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AD11171D
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 06:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DB23D984
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 06:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711695275; cv=none; b=MYSUlElFejHYifh36OIvZ4uC0QNT+oHVAQjshTNVLVXQ6yUq/JApxXZiShKc4+Lp1bAuYy7R3lUVJKRLPjE2XVQrLs4f8bopYj75p3mlpobR4UBqc7H5d10nwO8o5yqCEex2+Gu5XzQebFmebfY+fsY4eKsuAvLnftAN4rIptVo=
+	t=1711695278; cv=none; b=BAApEYLRVjlbib1j5JFN2OaRuLPG6EyaIjg4CO8F3ZL+t3I+7QLZWkhIhzxx8YOdIULKCf8x24ybqGMKytl6jrDMrNMwgd1ppyYyGoBWN+mdinlL9hqZ4bTiay6lIlZcaPk1B52trHnrmv9ZGjTne9ZI6xBertwxePQ/9d8xXrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711695275; c=relaxed/simple;
-	bh=nw6SLJmfoYVtKpCubbexbfjoUIEze/0O8AKGgyA2Zag=;
+	s=arc-20240116; t=1711695278; c=relaxed/simple;
+	bh=CNQZlCUYh6uUtBWugyz6LfE8TEoG6TSskO4pMW61DrY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JDr+kGiGTVBpCl190Bd80Om5/KDkz1cwORyUPSFLOoQy7sFm57IJv5ZjHgF32s2sTl0AIfeVjK20cbRXUltrtlzqxoeVVLv2x4Bah3i/fk3OO0fzXKQqd14K1MZyNj2LxQJTDG65uThRtPYlgGMTfgDaRiC8Fi1rZdUp1VFcZB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l4t9tEX1; arc=none smtp.client-ip=209.85.167.171
+	 MIME-Version; b=SbZB4LDUwkMxQuZQXodn5PDgLfFAdToK4ubdnkItXbRMYAnMy+j/ZM3P2yoRsGVU/MHR5OATTmMnPaLY7v+sQvmGiASthdvImE+/tiSBR8+XFJ35IjVvsXb29LsYmnxI6mvyEX33K2paaQQvZoP3/QAl1leWleHHtFkkBgXUO54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlAnn09j; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c3eb9cb820so460796b6e.0
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 23:54:33 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e6fb9a494aso1509195b3a.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 23:54:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711695272; x=1712300072; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711695275; x=1712300075; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YdpeYvmmCtcqLz0dT69HOU3c4NjDhc5J4OJ8Ce0JhK4=;
-        b=l4t9tEX1t4+eQxl9x/lEdkthekHE3eQ3OeBT57dMI7OOVHTWfFyOUIWa7wKVmpdleD
-         y/vWbn1kF0EwEeuanP70F1smN5z9nqqq/S6BFwpgYWwQt/bNRw76S4tO2ZN+aT/5d3jO
-         MywAdAu71MAcrkm4vo85zDo1rAaLAs7JYWrlkd0RgrR+kCqrWd18LoefhNssoSZxA6sZ
-         pPwZmG7Qwo7kyBz6UOsVZgUssPPtu4ndTAXZFuebtH9O+LTJE7C8XeYRRobRAYb5RzNt
-         JBr0E9PTGDV/Bz/MjavhqYmtvleYBSk8qljMqPQfyvJORL1bmwDS9R3XnHd5vvT3GJFW
-         Vc2A==
+        bh=UYHX2R3hemhMx/vn2+vN9n7DMd//UCgZgAPcnQkEfC8=;
+        b=YlAnn09jdOMcPaptACvy4QspXaMTLJzBVSC38McsYilTQcexH3ZueML3B5fiF5+rl6
+         gQPsAueKT/lxbaqmMvafKQ4VWHQBuj18+BVDJUQZoHPjJN6w6bsGd/M1Eb1V03BsusAQ
+         ol5ba0+5paxIsIMacsHtKtXN4fgcoWeKDEjyUbf2Qe/Den57VAmVINMeqA+5RUVZj6uI
+         58z/be192y4vrUyvmGkgw+0mj3RrbFJrpf3cgRcs6W3DwUXExmhTz9LzReWBjn4q97Fy
+         o20ZiBroTmPdQwIlVAKGSikOcMZE6PJ2hWqF/Wg6LCMvPESLRNOUj+Mj/xblbvdqTaOE
+         VAqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711695272; x=1712300072;
+        d=1e100.net; s=20230601; t=1711695275; x=1712300075;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YdpeYvmmCtcqLz0dT69HOU3c4NjDhc5J4OJ8Ce0JhK4=;
-        b=FSQO1KgV4bUF9T6Wsp7oM6WY9ea0/v4bwsTmUaxaYpFW2ELqN3i1QFnkGPPvUt0NZA
-         7G+xzHiOa+etBHfHyhE+imLaj0KfAbWVCt6cSM0Dt8gN4Cd+JS1B+nLAcd+ePktSSqz+
-         hE0niPZDJs1Ol/mpgYSTum5fOCgKXsI/Z6IMzgYJPrED8MuWF4t/3Xa4vV6f4A4p49H3
-         mpLR8qjoOpYumpFoJwgitMZiRPTxHg32pyJm4bWFzyxO+bBc1DYUtRKQBF1KtDUNZig5
-         MowMpPAUbdaUMkBqSnBoXpnwd4pV1kWFAgit9V7u1ibvWrWR2nhAZJuCfF1XWnPq0ojI
-         jJMQ==
-X-Gm-Message-State: AOJu0YzIWIbGAFKJhHfsM/MJ8unlSh66Www6D+wnaTvihs1U9wGiVaj3
-	/ZoclnFo2zKJglMoe1GDYIKqsA88JNjhQgO4WwuOEXd3M4knXzNpXPokzPKuEBxptiEB
-X-Google-Smtp-Source: AGHT+IHjB9w5yf+mlV6vZrodenVPe+4bb3uvGHqpP8nmCCXeSnkPJBKm/n2D7hvqb0SaR40cup4LWQ==
-X-Received: by 2002:a05:6808:1281:b0:3c3:e621:51e3 with SMTP id a1-20020a056808128100b003c3e62151e3mr1722738oiw.41.1711695272559;
-        Thu, 28 Mar 2024 23:54:32 -0700 (PDT)
+        bh=UYHX2R3hemhMx/vn2+vN9n7DMd//UCgZgAPcnQkEfC8=;
+        b=t0xXJh+A549GhQ+m60frgpzEFd+wx8dJW0a2Y241mwV4AClJddWZr6+JIbOOrAHMXM
+         qoQeCscnCHAN2boMp5OSiEu9+6l769P1+pce1nXnd5hnhhtyi1nEqTTtqRmJxdVJqT1Z
+         xea2IXWLHQAz+WBAjLAuyQhDXGOevNrwfxLpkNLc+kD36ZIr+qwXBN1LZn/bXMwQ/VRq
+         qwOuJNbDlGKza/Bg3Nds3kfZ8HfWWgM+Yf85mqtTtLQOrBni0KO6pvtKZwL05PUHcWOd
+         CeEgAWUuRfQ+w/CWKQbY1adgFG/kTCCd4DB3ZaiLIaTS5CQ60QQTSk4s4afIWZ23uYr3
+         C3zw==
+X-Gm-Message-State: AOJu0Yx2xCz81SRSmgwu58J+91oOUnuIO5n+iQ9ttHJsAbD9PN4cxe/G
+	cpUeomhwVp1bpk/nuBpYpRbM0bvBcIoDBWBGsVw0hORGn57XKW0Sw+5N2Gdxx8sgZhwV
+X-Google-Smtp-Source: AGHT+IH5BdcvsvQjOfor89MW744Zd/WsKOHGWf7NzSspiFEVuRotSHRsrCvqfNofdEi+unhfbqQHEA==
+X-Received: by 2002:a05:6a00:3a18:b0:6ea:babb:f9c0 with SMTP id fj24-20020a056a003a1800b006eababbf9c0mr1586468pfb.16.1711695275518;
+        Thu, 28 Mar 2024 23:54:35 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id g8-20020aa79dc8000000b006e56da42e24sm2423251pfq.158.2024.03.28.23.54.29
+        by smtp.gmail.com with ESMTPSA id g8-20020aa79dc8000000b006e56da42e24sm2423251pfq.158.2024.03.28.23.54.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 23:54:32 -0700 (PDT)
+        Thu, 28 Mar 2024 23:54:35 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -77,9 +77,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Stanislav Fomichev <sdf@google.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next 1/2] ynl: rename array-nest to indexed-array
-Date: Fri, 29 Mar 2024 14:54:22 +0800
-Message-ID: <20240329065423.1736120-2-liuhangbin@gmail.com>
+Subject: [PATCHv2 net-next 2/2] ynl: support binary/u32 sub-type for indexed-array
+Date: Fri, 29 Mar 2024 14:54:23 +0800
+Message-ID: <20240329065423.1736120-3-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240329065423.1736120-1-liuhangbin@gmail.com>
 References: <20240329065423.1736120-1-liuhangbin@gmail.com>
@@ -91,291 +91,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some implementations, like bonding, has nest array with same attr type.
-To support all kinds of entries under one nest array. As disscussed[1],
-let's rename array-nest to indexed-array, and assuming the value is
-a nest by passing the type via sub-type.
+Add binary/u32 sub-type support for indexed-array to display bond
+arp and ns targets. Here is what the result looks like:
 
-[1] https://lore.kernel.org/netdev/20240312100105.16a59086@kernel.org/
+ # ip link add bond0 type bond mode 1 \
+   arp_ip_target 192.168.1.1,192.168.1.2 ns_ip6_target 2001::1,2001::2
+ # ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/rt_link.yaml \
+   --do getlink --json '{"ifname": "bond0"}' --output-json | jq '.linkinfo'
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
+    "arp-ip-target": [
+      "192.168.1.1",
+      "192.168.1.2"
+    ],
+    [...]
+    "ns-ip6-target": [
+      "2001::1",
+      "2001::2"
+    ],
+
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- Documentation/netlink/genetlink-c.yaml        |  2 +-
- Documentation/netlink/genetlink-legacy.yaml   |  2 +-
- Documentation/netlink/genetlink.yaml          |  2 +-
- Documentation/netlink/netlink-raw.yaml        |  2 +-
- Documentation/netlink/specs/nlctrl.yaml       |  6 ++++--
- Documentation/netlink/specs/rt_link.yaml      |  3 ++-
- Documentation/netlink/specs/tc.yaml           | 21 ++++++++++++-------
- .../netlink/genetlink-legacy.rst              | 10 +++++++--
- tools/net/ynl/lib/ynl.py                      | 13 +++++++-----
- tools/net/ynl/ynl-gen-c.py                    | 18 ++++++++++------
- 10 files changed, 52 insertions(+), 27 deletions(-)
+ .../userspace-api/netlink/genetlink-legacy.rst       | 12 +++++++++---
+ tools/net/ynl/lib/ynl.py                             |  5 +++++
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
-index 4dfd899a1661..4f803eaac6d8 100644
---- a/Documentation/netlink/genetlink-c.yaml
-+++ b/Documentation/netlink/genetlink-c.yaml
-@@ -158,7 +158,7 @@ properties:
-               type: &attr-type
-                 enum: [ unused, pad, flag, binary,
-                         uint, sint, u8, u16, u32, u64, s32, s64,
--                        string, nest, array-nest, nest-type-value ]
-+                        string, nest, indexed-array, nest-type-value ]
-               doc:
-                 description: Documentation of the attribute.
-                 type: string
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index b48ad3b1cc32..8db0e22fa72c 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -201,7 +201,7 @@ properties:
-                 description: The netlink attribute type
-                 enum: [ unused, pad, flag, binary, bitfield32,
-                         uint, sint, u8, u16, u32, u64, s32, s64,
--                        string, nest, array-nest, nest-type-value ]
-+                        string, nest, indexed-array, nest-type-value ]
-               doc:
-                 description: Documentation of the attribute.
-                 type: string
-diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
-index ebd6ee743fcc..b036227b46f1 100644
---- a/Documentation/netlink/genetlink.yaml
-+++ b/Documentation/netlink/genetlink.yaml
-@@ -124,7 +124,7 @@ properties:
-               type: &attr-type
-                 enum: [ unused, pad, flag, binary,
-                         uint, sint, u8, u16, u32, u64, s32, s64,
--                        string, nest, array-nest, nest-type-value ]
-+                        string, nest, indexed-array, nest-type-value ]
-               doc:
-                 description: Documentation of the attribute.
-                 type: string
-diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
-index a76e54cbadbc..914aa1c0a273 100644
---- a/Documentation/netlink/netlink-raw.yaml
-+++ b/Documentation/netlink/netlink-raw.yaml
-@@ -222,7 +222,7 @@ properties:
-                 description: The netlink attribute type
-                 enum: [ unused, pad, flag, binary, bitfield32,
-                         u8, u16, u32, u64, s8, s16, s32, s64,
--                        string, nest, array-nest, nest-type-value,
-+                        string, nest, indexed-array, nest-type-value,
-                         sub-message ]
-               doc:
-                 description: Documentation of the attribute.
-diff --git a/Documentation/netlink/specs/nlctrl.yaml b/Documentation/netlink/specs/nlctrl.yaml
-index b1632b95f725..a36535350bdb 100644
---- a/Documentation/netlink/specs/nlctrl.yaml
-+++ b/Documentation/netlink/specs/nlctrl.yaml
-@@ -65,11 +65,13 @@ attribute-sets:
-         type: u32
-       -
-         name: ops
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: op-attrs
-       -
-         name: mcast-groups
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: mcast-group-attrs
-       -
-         name: policy
-diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-index 81a5a3d1b04d..e5dcb2cf1724 100644
---- a/Documentation/netlink/specs/rt_link.yaml
-+++ b/Documentation/netlink/specs/rt_link.yaml
-@@ -1690,7 +1690,8 @@ attribute-sets:
-         type: binary
-       -
-         name: hw-s-info
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: hw-s-info-one
-       -
-         name: l3-stats
-diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
-index 324fa182cd14..dbcf19e494ec 100644
---- a/Documentation/netlink/specs/tc.yaml
-+++ b/Documentation/netlink/specs/tc.yaml
-@@ -1937,7 +1937,8 @@ attribute-sets:
-         nested-attributes: tc-ematch-attrs
-       -
-         name: act
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-act-attrs
-       -
-         name: police
-@@ -2077,7 +2078,8 @@ attribute-sets:
-         type: u32
-       -
-         name: tin-stats
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-cake-tin-stats-attrs
-       -
-         name: deficit
-@@ -2297,7 +2299,8 @@ attribute-sets:
-         type: string
-       -
-         name: act
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-act-attrs
-       -
-         name: key-eth-dst
-@@ -2798,7 +2801,8 @@ attribute-sets:
-         type: string
-       -
-         name: act
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-act-attrs
-       -
-         name: mask
-@@ -2951,7 +2955,8 @@ attribute-sets:
-         type: u32
-       -
-         name: act
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-act-attrs
-       -
-         name: flags
-@@ -3324,7 +3329,8 @@ attribute-sets:
-         nested-attributes: tc-police-attrs
-       -
-         name: act
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-act-attrs
-   -
-     name: tc-taprio-attrs
-@@ -3542,7 +3548,8 @@ attribute-sets:
-         nested-attributes: tc-police-attrs
-       -
-         name: act
--        type: array-nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-act-attrs
-       -
-         name: indev
 diff --git a/Documentation/userspace-api/netlink/genetlink-legacy.rst b/Documentation/userspace-api/netlink/genetlink-legacy.rst
-index 70a77387f6c4..1ee1647d0ee8 100644
+index 1ee1647d0ee8..d43b9d802527 100644
 --- a/Documentation/userspace-api/netlink/genetlink-legacy.rst
 +++ b/Documentation/userspace-api/netlink/genetlink-legacy.rst
-@@ -46,10 +46,16 @@ For reference the ``multi-attr`` array may look like this::
+@@ -66,9 +66,15 @@ looks like::
+       [MEMBER1]
+       [MEMBER2]
  
- where ``ARRAY-ATTR`` is the array entry type.
- 
--array-nest
-+indexed-array
- ~~~~~~~~~~
- 
--``array-nest`` creates the following structure::
-+``indexed-array`` wraps the entire array in an extra attribute (hence
-+limiting its size to 64kB). The ``ENTRY`` nests are special and have the
-+index of the entry as their type instead of normal attribute type.
+-It wraps the entire array in an extra attribute (hence limiting its size
+-to 64kB). The ``ENTRY`` nests are special and have the index of the entry
+-as their type instead of normal attribute type.
++Other ``sub-type`` like ``u32`` means there is only one member as described
++in ``sub-type`` in the ``ENTRY``. The structure looks like::
 +
-+A ``sub-type`` is needed to describe what type in the ``ENTRY``. A ``nest``
-+``sub-type`` means there are nest arrays in the ``ENTRY``, with the structure
-+looks like::
++  [SOME-OTHER-ATTR]
++  [ARRAY-ATTR]
++    [ENTRY]
++      [MEMBER1]
++    [ENTRY]
++      [MEMBER1]
  
-   [SOME-OTHER-ATTR]
-   [ARRAY-ATTR]
+ type-value
+ ~~~~~~~~~~
 diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index e73b027c5624..d088bcbcadec 100644
+index d088bcbcadec..4c9caba4ebf9 100644
 --- a/tools/net/ynl/lib/ynl.py
 +++ b/tools/net/ynl/lib/ynl.py
-@@ -584,15 +584,18 @@ class YnlFamily(SpecFamily):
-                 decoded = self._formatted_string(decoded, attr_spec.display_hint)
+@@ -594,6 +594,11 @@ class YnlFamily(SpecFamily):
+             if attr_spec["sub-type"] == 'nest':
+                 subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
+                 decoded.append({ item.type: subattrs })
++            elif attr_spec["sub-type"] == 'binary' or attr_spec["sub-type"] == 'u32':
++                subattrs = item.as_bin()
++                if attr_spec.display_hint:
++                    subattrs = self._formatted_string(subattrs, attr_spec.display_hint)
++                decoded.append(subattrs)
+             else:
+                 raise Exception(f'Unknown {attr_spec["sub-type"]} with name {attr_spec["name"]}')
          return decoded
- 
--    def _decode_array_nest(self, attr, attr_spec):
-+    def _decode_array_attr(self, attr, attr_spec):
-         decoded = []
-         offset = 0
-         while offset < len(attr.raw):
-             item = NlAttr(attr.raw, offset)
-             offset += item.full_len
- 
--            subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
--            decoded.append({ item.type: subattrs })
-+            if attr_spec["sub-type"] == 'nest':
-+                subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
-+                decoded.append({ item.type: subattrs })
-+            else:
-+                raise Exception(f'Unknown {attr_spec["sub-type"]} with name {attr_spec["name"]}')
-         return decoded
- 
-     def _decode_nest_type_value(self, attr, attr_spec):
-@@ -686,8 +689,8 @@ class YnlFamily(SpecFamily):
-                 decoded = attr.as_scalar(attr_spec['type'], attr_spec.byte_order)
-                 if 'enum' in attr_spec:
-                     decoded = self._decode_enum(decoded, attr_spec)
--            elif attr_spec["type"] == 'array-nest':
--                decoded = self._decode_array_nest(attr, attr_spec)
-+            elif attr_spec["type"] == 'indexed-array':
-+                decoded = self._decode_array_attr(attr, attr_spec)
-             elif attr_spec["type"] == 'bitfield32':
-                 value, selector = struct.unpack("II", attr.raw)
-                 if 'enum' in attr_spec:
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index a451cbfbd781..c0b90c104d92 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -841,8 +841,11 @@ class AttrSet(SpecAttrSet):
-             t = TypeBitfield32(self.family, self, elem, value)
-         elif elem['type'] == 'nest':
-             t = TypeNest(self.family, self, elem, value)
--        elif elem['type'] == 'array-nest':
--            t = TypeArrayNest(self.family, self, elem, value)
-+        elif elem['type'] == 'indexed-array' and 'sub-type' in elem:
-+            if elem["sub-type"] == 'nest':
-+                t = TypeArrayNest(self.family, self, elem, value)
-+            else:
-+                raise Exception(f'new_attr: unsupported sub-type {elem["sub-type"]}')
-         elif elem['type'] == 'nest-type-value':
-             t = TypeNestTypeValue(self.family, self, elem, value)
-         else:
-@@ -1055,7 +1058,7 @@ class Family(SpecFamily):
-                     if nested in self.root_sets:
-                         raise Exception("Inheriting members to a space used as root not supported")
-                     inherit.update(set(spec['type-value']))
--                elif spec['type'] == 'array-nest':
-+                elif spec['type'] == 'indexed-array':
-                     inherit.add('idx')
-                 self.pure_nested_structs[nested].set_inherited(inherit)
- 
-@@ -1619,9 +1622,12 @@ def _multi_parse(ri, struct, init_lines, local_vars):
-     multi_attrs = set()
-     needs_parg = False
-     for arg, aspec in struct.member_list():
--        if aspec['type'] == 'array-nest':
--            local_vars.append(f'const struct nlattr *attr_{aspec.c_name};')
--            array_nests.add(arg)
-+        if aspec['type'] == 'indexed-array' and 'sub-type' in aspec:
-+            if aspec["sub-type"] == 'nest':
-+                local_vars.append(f'const struct nlattr *attr_{aspec.c_name};')
-+                array_nests.add(arg)
-+            else:
-+                raise Exception(f'Not supported sub-type {aspec["sub-type"]}')
-         if 'multi-attr' in aspec:
-             multi_attrs.add(arg)
-         needs_parg |= 'nested-attributes' in aspec
 -- 
 2.43.0
 
