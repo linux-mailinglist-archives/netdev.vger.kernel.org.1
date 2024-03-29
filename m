@@ -1,169 +1,207 @@
-Return-Path: <netdev+bounces-83281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2096689189D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:22:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78AC18918BE
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0A1E1F2430E
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:22:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A74F1C24314
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8FA33CD0;
-	Fri, 29 Mar 2024 12:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DB013699A;
+	Fri, 29 Mar 2024 12:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="O7Fi0g/C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jks7vi/X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A388529C
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 12:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D815E135A50;
+	Fri, 29 Mar 2024 12:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711714951; cv=none; b=IV5jK5kkzCdeK8sO55FNuJMkBU0qqiE0UiZfPb8MN6qPl/vxqJavfXM0xGnnBYJGN2oYMBPwVeuIv2M97HEMzgWZISi7yneD0IlOGK+NCwdBGaPkt9QghU6Di1PjQcENSzBJoKJKfpkkX5jUI+mt5L/+gcdu5AVrN77RqyEMFWA=
+	t=1711715217; cv=none; b=dY5WgfvqVIL8OdnfQmubLAU4r1wZIosmAvLhA80Pnd9XUlGPs7DowK0FN2Cfs5ee6jz6clVUzxY+HuOvwPocehSTF4DJNn30gqizxRTqHPNg9L2wC0FgOya5d19GxX1AznGx3QmX+BypgCFF3si6UhX7cWaXyDImwtzXlwd6PnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711714951; c=relaxed/simple;
-	bh=leo+Yi4AfSnMVg8mcM4Xju1MFqd5FSUEovb4t8XjI+U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ns+FLlgXQrP5/V5qZBNjt9XZ/cRTJ3dzceTIvFNCsC2ckvjenVuz7vLUzWvhReW+VOt5+ceONAYC+r6TKWLFKPfDfP7TGuLS61izjRWn/fhksc1p0kOnWpFS384l6uVre8MIkstwZ8q/lpJ8OeYh+XCsL1MFumSYQ2hs/TpWTWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=O7Fi0g/C; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so19048071fa.0
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 05:22:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711714946; x=1712319746; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
-        b=O7Fi0g/C5yTqgLj7PJ0zyXIg+iImbY+SKVFGN4a9Zq5xCNky6TjQyYrzlUaERurNpf
-         7LwKDBDW9EciAYhebOlUrfpp7gkwdxw3ffcHgzjAsYvU5YXkkSuF6xm7T7Dgu9iSQ5kl
-         +qqXXyD8PAwdjUTX/VSPOgkEthVy/fYMcmg7/Pdkk27h8K4cpeyzmcdoVIWAeGJYcA4p
-         vgxV5p/AfEY+VZYpyf4uBNc2jICO/cR9owEcZUd+mnQwV27PeBiF08/M0whYSW9XQNrn
-         V/j9jsc5tyhLkFsz1U2crr4Z9BGHhaJ+fjWQ7temGRIJI9xLKbhip75WdFHFUSwGtyRq
-         rj0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711714946; x=1712319746;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TdH2/uZDyLmBSFlZ529ZdmMTMc2xJjXR5We9XRvPLc8=;
-        b=uiWSKT7edgz8CiRW7Rebv0I2hhsOzndKaz/w6wMsoBAk43XQa6AVVisUwAVFfve/rn
-         Wa/Z/ONjxbRMZKp2T+GyJbqtBSbaaiyIJPDTfSrtWFxW7wzf7/kW94d0cwcrRSPmEKSw
-         1+PfHIlwvI5pVA6STmoHACMruSl+l8WaWT6KqYWVVt29k0es8eW1+LWHbV82Mdk8HJYN
-         IOAy7JQREuLyU7H73vLmCYCsqfZEUkV8PNtqx+BdRqohHMUIRUDC8lQXSrqIXbx4FtHX
-         XUeuMijUkuh4PmLW17SemVdyi4FYFOl2KVRr2M1iAN9Y0cC7HRogvwn672Ag1yV9hFch
-         3OCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW8mv1GbqnVo9kYAKmlg3KzVa23GRDvR1KEUwNz8cQhiSKUtb/IrfCfl/vElVSkP+ml2JUjO5zjE1sk5Pa2bc41zULuGga9
-X-Gm-Message-State: AOJu0YxyCbePfz9uPAcanzwe2d/MwQtjaefcO4L451GzbNHNE/MUAXSt
-	HbJjHUurDTq+7KeCXsRbPqGxU8ImfJI49/Bxp7uTP0PD0h7LPHc3E1EGDYkvkkjQsVt3paH2jV3
-	PbbJagnug/WsSp1g5VJxmpwrxaHNsDiCzot0tQw==
-X-Google-Smtp-Source: AGHT+IE+HnSCJL2quawa1K1lMrp38Nm79TgJqcEd/z4x+7H7IfVDrdpUOVuBJN0I2Fw0lOyMRLNfqEQZZUdPpNwT2ZM=
-X-Received: by 2002:a2e:8350:0:b0:2d3:5480:92aa with SMTP id
- l16-20020a2e8350000000b002d3548092aamr644831ljh.25.1711714946358; Fri, 29 Mar
- 2024 05:22:26 -0700 (PDT)
+	s=arc-20240116; t=1711715217; c=relaxed/simple;
+	bh=CPX3OnrdqIFFPhBn3/TnrLN6TtcZUvZ0qwfihG7VHS0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uQLtmGBLz2bOSR6sDM77ZNKnLPppCayB6arji2yL30ntw+7A6eRXIsHtuZoNpE83SobosIcNYE9kpRepyiPN2cEtDdp/1HGPQaVc788tfyh5FzgzaPRk4lZqvJ8wNpb3P/jge3sglA/jwrfe/ZmkXLDpjk8PC7NcebTAiCFEtww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jks7vi/X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FEC5C43609;
+	Fri, 29 Mar 2024 12:26:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711715216;
+	bh=CPX3OnrdqIFFPhBn3/TnrLN6TtcZUvZ0qwfihG7VHS0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jks7vi/XndTTxfkLCA3mYLKuGX+w3GL29o5kA0FQVG5xde2BHrBIxjYCms853w7/V
+	 iqhyFuo7Qe16TZGHrA9wzJZJCgOjAFtUPK7SNii3fIh09GY6UbAIxE+/ud5ONTf6+n
+	 /CdWNKKVRkcfuNfHwHtQx2k9QP2Ogfsh7p00mqRQYMrZN/+Fz1HtYG93XJa5KN+2g8
+	 rct0cUl9BvT46MHbn1ai11nVzfPjrOCTswMtNYt5sL8lvkeTHZZtZMLK+XE6PpDm/W
+	 vzDhfzowSQWsoICPa32od6WSHjMJK2zGK4gPQ9SN4F8wm6w2XY+j7IQLiuV1ntUwpw
+	 iOKyL6r/CLVMQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>,
+	kernel test robot <lkp@intel.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.8 03/68] bnx2x: Fix firmware version string character counts
+Date: Fri, 29 Mar 2024 08:24:59 -0400
+Message-ID: <20240329122652.3082296-3-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240329122652.3082296-1-sashal@kernel.org>
+References: <20240329122652.3082296-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
- <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com> <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
-In-Reply-To: <1303b572-719e-410d-a11a-3f17a5bb3b63@linaro.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 29 Mar 2024 13:22:15 +0100
-Message-ID: <CAMRc=Mfeez9kXkkVxdmUk5dy=L=rbnYkYujO6jSCT5WAyUw2HA@mail.gmail.com>
-Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, David Airlie <airlied@redhat.com>, 
-	Gerd Hoffmann <kraxel@redhat.com>, Gurchetan Singh <gurchetansingh@chromium.org>, 
-	Chia-I Wu <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
-	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
-	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
-	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
-	linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.8.2
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 29, 2024 at 12:35=E2=80=AFPM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 29/03/2024 11:27, Bartosz Golaszewski wrote:
-> > On Wed, Mar 27, 2024 at 1:45=E2=80=AFPM Krzysztof Kozlowski
-> > <krzysztof.kozlowski@linaro.org> wrote:
-> >>
-> >> virtio core already sets the .owner, so driver does not need to.
-> >>
-> >> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> >>
-> >> ---
-> >>
-> >> Depends on the first patch.
-> >> ---
-> >>  drivers/gpio/gpio-virtio.c | 1 -
-> >>  1 file changed, 1 deletion(-)
-> >>
-> >> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-> >> index fcc5e8c08973..9fae8e396c58 100644
-> >> --- a/drivers/gpio/gpio-virtio.c
-> >> +++ b/drivers/gpio/gpio-virtio.c
-> >> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver =3D=
+From: Kees Cook <keescook@chromium.org>
+
+[ Upstream commit 5642c82b9463c3263c086efb002516244bd4c668 ]
+
+A potential string truncation was reported in bnx2x_fill_fw_str(),
+when a long bp->fw_ver and a long phy_fw_ver might coexist, but seems
+unlikely with real-world hardware.
+
+Use scnprintf() to indicate the intent that truncations are tolerated.
+
+While reading this code, I found a collection of various buffer size
+counting issues. None looked like they might lead to a buffer overflow
+with current code (the small buffers are 20 bytes and might only ever
+consume 10 bytes twice with a trailing %NUL). However, early truncation
+(due to a %NUL in the middle of the string) might be happening under
+likely rare conditions. Regardless fix the formatters and related
+functions:
+
+- Switch from a separate strscpy() to just adding an additional "%s" to
+  the format string that immediately follows it in bnx2x_fill_fw_str().
+- Use sizeof() universally instead of using unbound defines.
+- Fix bnx2x_7101_format_ver() and bnx2x_null_format_ver() to report the
+  number of characters written, not including the trailing %NUL (as
+  already done with the other firmware formatting functions).
+- Require space for at least 1 byte in bnx2x_get_ext_phy_fw_version()
+  for the trailing %NUL.
+- Correct the needed buffer size in bnx2x_3_seq_format_ver().
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202401260858.jZN6vD1k-lkp@intel.com/
+Cc: Ariel Elior <aelior@marvell.com>
+Cc: Sudarsana Kalluru <skalluru@marvell.com>
+Cc: Manish Chopra <manishc@marvell.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Link: https://lore.kernel.org/r/20240126041044.work.220-kees@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c    |  9 +++++----
+ .../net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c    |  2 +-
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c   | 14 +++++++-------
+ 3 files changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+index e9c1e1bb55806..528441b28c4ef 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+@@ -147,10 +147,11 @@ void bnx2x_fill_fw_str(struct bnx2x *bp, char *buf, size_t buf_len)
+ 
+ 		phy_fw_ver[0] = '\0';
+ 		bnx2x_get_ext_phy_fw_version(&bp->link_params,
+-					     phy_fw_ver, PHY_FW_VER_LEN);
+-		strscpy(buf, bp->fw_ver, buf_len);
+-		snprintf(buf + strlen(bp->fw_ver), 32 - strlen(bp->fw_ver),
+-			 "bc %d.%d.%d%s%s",
++					     phy_fw_ver, sizeof(phy_fw_ver));
++		/* This may become truncated. */
++		scnprintf(buf, buf_len,
++			 "%sbc %d.%d.%d%s%s",
++			 bp->fw_ver,
+ 			 (bp->common.bc_ver & 0xff0000) >> 16,
+ 			 (bp->common.bc_ver & 0xff00) >> 8,
+ 			 (bp->common.bc_ver & 0xff),
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+index 81d232e6d05fe..0bc7690cdee16 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+@@ -1132,7 +1132,7 @@ static void bnx2x_get_drvinfo(struct net_device *dev,
+ 	}
+ 
+ 	memset(version, 0, sizeof(version));
+-	bnx2x_fill_fw_str(bp, version, ETHTOOL_FWVERS_LEN);
++	bnx2x_fill_fw_str(bp, version, sizeof(version));
+ 	strlcat(info->fw_version, version, sizeof(info->fw_version));
+ 
+ 	strscpy(info->bus_info, pci_name(bp->pdev), sizeof(info->bus_info));
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c
+index 02808513ffe45..ea310057fe3af 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c
+@@ -6163,8 +6163,8 @@ static void bnx2x_link_int_ack(struct link_params *params,
+ 
+ static int bnx2x_null_format_ver(u32 spirom_ver, u8 *str, u16 *len)
  {
-> >>         .remove                 =3D virtio_gpio_remove,
-> >>         .driver                 =3D {
-> >>                 .name           =3D KBUILD_MODNAME,
-> >> -               .owner          =3D THIS_MODULE,
-> >>         },
-> >>  };
-> >>  module_virtio_driver(virtio_gpio_driver);
-> >>
-> >> --
-> >> 2.34.1
-> >>
-> >
-> > Applied, thanks!
->
-> I expressed dependency in two places: cover letter and this patch.
-> Please drop it, because without dependency this won't work. Patch could
-> go with the dependency and with your ack or next cycle.
->
-> Best regards,
-> Krzysztof
->
+-	str[0] = '\0';
+-	(*len)--;
++	if (*len)
++		str[0] = '\0';
+ 	return 0;
+ }
+ 
+@@ -6173,7 +6173,7 @@ static int bnx2x_format_ver(u32 num, u8 *str, u16 *len)
+ 	u16 ret;
+ 
+ 	if (*len < 10) {
+-		/* Need more than 10chars for this format */
++		/* Need more than 10 chars for this format */
+ 		bnx2x_null_format_ver(num, str, len);
+ 		return -EINVAL;
+ 	}
+@@ -6188,8 +6188,8 @@ static int bnx2x_3_seq_format_ver(u32 num, u8 *str, u16 *len)
+ {
+ 	u16 ret;
+ 
+-	if (*len < 10) {
+-		/* Need more than 10chars for this format */
++	if (*len < 9) {
++		/* Need more than 9 chars for this format */
+ 		bnx2x_null_format_ver(num, str, len);
+ 		return -EINVAL;
+ 	}
+@@ -6208,7 +6208,7 @@ int bnx2x_get_ext_phy_fw_version(struct link_params *params, u8 *version,
+ 	int status = 0;
+ 	u8 *ver_p = version;
+ 	u16 remain_len = len;
+-	if (version == NULL || params == NULL)
++	if (version == NULL || params == NULL || len == 0)
+ 		return -EINVAL;
+ 	bp = params->bp;
+ 
+@@ -11546,7 +11546,7 @@ static int bnx2x_7101_format_ver(u32 spirom_ver, u8 *str, u16 *len)
+ 	str[2] = (spirom_ver & 0xFF0000) >> 16;
+ 	str[3] = (spirom_ver & 0xFF000000) >> 24;
+ 	str[4] = '\0';
+-	*len -= 5;
++	*len -= 4;
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
 
-Dropped, and:
-
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
