@@ -1,141 +1,95 @@
-Return-Path: <netdev+bounces-83422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 242358923BE
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:58:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F028923DC
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 20:10:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1C3F286DB7
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:58:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 834361C21E74
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463F82D603;
-	Fri, 29 Mar 2024 18:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 984161369A7;
+	Fri, 29 Mar 2024 19:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbmMQRT8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hIRTQ2bA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8225B1DA5E
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D2313280B;
+	Fri, 29 Mar 2024 19:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711738687; cv=none; b=MeZpMuFCcKC8xKv3OcqKAj0Zmk2gM011+kJShhXeVGnmQfEWwrqmyOoWQpQbVlieqh+msL/5CcGiLqfQE+tdOByIVde2EaOnl+94a4aDsQCAufyfhFkWeqYU63tRAayhRfLnzwB0yf8vX6+7GyGI4EY4Rac6PQTOu+nkZoSdCkI=
+	t=1711739430; cv=none; b=fT5ef7pVjxA/n2yN5nTjtsjlflr2mQN045rkSiDHr5FZj+tZPNc5YtAOR6+VJQEzxjS2LI6VU5MHCl8KzlBYrpyyOtfg54avkWUZhcg+JdtDIMQQFLfbBLWBZvXc4NJASb5UJwwtH4Ty9VBQL15UgACOssZYTK9sPZSEsohGcOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711738687; c=relaxed/simple;
-	bh=2G8dMSgNF4KoD5LZNOG1TPHGo4bTqByXtaH/mThuBXo=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=rF+k0rwLU57Oo7XFZ/yIwmXaFsjg+NMOAotZUHdrqbMt/MOdM0nw83VzZK7LhoeW73ut2++8nd21bZoqEARns0KnW44l/TFtZtDuXvRhmmsgve0+iCOaSaCyfcjwjDPHDNZ0JcR/7Tmjubut9CmnlRG3OGZ9mfw7vmgK0H8jiyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QbmMQRT8; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-513e10a4083so2545551e87.1
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711738683; x=1712343483; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=48mci/pDZnhCMSbvKXEITuIIGd16776VX6sVUJ3t11A=;
-        b=QbmMQRT8H7SSHC00VVGo876ROy90bBNRfdC6wdkoYT14rohtbDxJ4KQKhpH40BUm2E
-         n2h1SCC30OPFw5ZjLMbCd/B4PYPDGUfmBBvGV1vQQyDXhM9ZQEq61WhbrE0KV7wVfWIz
-         fRhPvrdvNlV+7zCv7/MWap+EH9av3yIP9zCiJ3mUuyR2X+na2dpym6txmBQlqEPZxil7
-         otC5e0wYCvMDDjatCvwSNjHKvNTOG1ZczwUahZE0uIQ3nIty4Z2mtXbpqg0VQGW6Txpi
-         Ew2iTclThHRTJv8WDW3D+57iDp8IY7WbFHZNq4IMfAW9Mg+SkBCOexOe8GjVHGiWGpoI
-         tmKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711738683; x=1712343483;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=48mci/pDZnhCMSbvKXEITuIIGd16776VX6sVUJ3t11A=;
-        b=OXkJJLF1bsqP+EVkpYoN/Q1rGechvckTUpgAVG88wNdZSQF91cvOl6PkF26AGiFyfA
-         LmMOLpIrlzxnje7rkJoopcdd4pKgYR83uU74w561vQxyol+mXaYRvgMopTqhPmTqUHOc
-         aYyQEMkNBhmWJe4f8bor2myoemfQrnL0JAQ47xOQ+nC9Lxl0RCibHS8DXmm4Gx8Tk/cd
-         Hpie7ox4/fDxphV/y0kIfhcfyQk68NdK8xjNna+z0TMBoqXc8Q5RI4BWtvOeOjpvdhj7
-         vvtascp81YYVbgsz5f0k2i3I8hE4aLwHWYui4T/0GQ3qoQlYDrRujHFqcnUyFqhmbeY+
-         23Jg==
-X-Gm-Message-State: AOJu0YxJyldq+0SGGFUB87+eAyAvOBosNk4ws/MvbdHJ81iONrR6LmjP
-	vEib5R9eUBByO1+SXEXEhfZ0h5RjmVyrhsLug++FbPJrD5IrdpMj
-X-Google-Smtp-Source: AGHT+IE9BxerfhV68aZKRqPgbxx40GiwX+2HjKRoCeRaEhebIKV9qWooIzYFUpc6E3zBrK9JJrb3vg==
-X-Received: by 2002:ac2:5a5a:0:b0:515:a62a:8e3d with SMTP id r26-20020ac25a5a000000b00515a62a8e3dmr1919950lfn.11.1711738683296;
-        Fri, 29 Mar 2024 11:58:03 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:3c9d:7a51:4242:88e2])
-        by smtp.gmail.com with ESMTPSA id u22-20020a05600c139600b00414906f1ea1sm6180785wmf.17.2024.03.29.11.58.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 11:58:02 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jiri
- Pirko <jiri@resnulli.us>,  Jacob Keller <jacob.e.keller@intel.com>,
-  Stanislav Fomichev <sdf@google.com>,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 2/2] tools/net/ynl: Add multi message
- support to ynl
-In-Reply-To: <20240329084346.7a744d1e@kernel.org> (Jakub Kicinski's message of
-	"Fri, 29 Mar 2024 08:43:46 -0700")
-Date: Fri, 29 Mar 2024 18:57:28 +0000
-Message-ID: <m2plvcj27b.fsf@gmail.com>
-References: <20240327181700.77940-1-donald.hunter@gmail.com>
-	<20240327181700.77940-3-donald.hunter@gmail.com>
-	<20240328175729.15208f4a@kernel.org> <m234s9jh0k.fsf@gmail.com>
-	<20240329084346.7a744d1e@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1711739430; c=relaxed/simple;
+	bh=L9zWUTqD7rQIOv7MARtUdRVPPLRxucdz38zbiQL5wMg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bBfGpezrjCXX8S5QIZwHLDskVtC+rtVSxI0IRqH265KJM8AChALcc96VH0inLbMuz3X8eAukvv30UyxaJy53TDg5sq0Td+V08KApZlDexTmcGwoWsl0cft1WC/z4dCiY7/gXNYlb1e5KzrOR1lWI9PNdMSefllnvcZWX1Qg1d9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hIRTQ2bA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EF5B9C43394;
+	Fri, 29 Mar 2024 19:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711739430;
+	bh=L9zWUTqD7rQIOv7MARtUdRVPPLRxucdz38zbiQL5wMg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hIRTQ2bAo+ohJH15n2Ah4oCrZvCpTY/0C08YlWCX6rn0ZOswh7XnucCJuNsAgbtIk
+	 QHY5BjtWiucVvpjiT7bcDjnXFbit9MUyXHJX8NV5WrjSjKp8n26SRvoQz0qnPmmsLl
+	 YN93xpegJxCLSrbmao2DRY9ejonvzpPSDD/WtbX7qpWH9CfYv2A1YpbEODNhBfYBdv
+	 iDdeW03b0E3Hdv41QpMnjty1VHzbUtKhptDDO7o83whvuAKhXDABn6DdKRbD7ETGDV
+	 FJOztG2/+5QOCD5CfGNcMbhd7JNyz0ZOaytJIb3oXYFhIDHH+wDRy0PuMREldgC7wG
+	 TPRzjryI7ZoPQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDD43D84BAF;
+	Fri, 29 Mar 2024 19:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: fix usable ports on 88e6020
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171173942990.5976.15448141381612932240.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 19:10:29 +0000
+References: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
+In-Reply-To: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ lukma@denx.de, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux@ew.tq-group.com, michael.krummsdorf@tq-group.com
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Hello:
 
-> On Fri, 29 Mar 2024 13:37:31 +0000 Donald Hunter wrote:
->> > We'd only support multiple "do" requests, I wonder if we should somehow
->> > call this out. Is --multi-do unnecessary extra typing?  
->> 
->> I prefer --multi but will update the help text to say "DO-OPERATIION"
->> and "... several do operations".
->
-> Alright, technically doing multi-dump should also work, but maybe
-> there's less of a benefit there, so we can keep the multi focused
-> on do for now.
->
-> Looking at the code again, are you sure we'll process all the responses
-> not just the first one?
->
-> Shouldn't this:
->
-> +                    del reqs_by_seq[nl_msg.nl_seq]
->                      done = True
->
-> be something like:
->
-> 		del reqs_by_seq[nl_msg.nl_seq]
-> 		done = len(reqs_by_seq) == 0
->
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Hmm yes, that's a good catch. I need to check the DONE semantics for
-these nftables batch operations.
+On Tue, 26 Mar 2024 13:36:54 +0100 you wrote:
+> From: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+> 
+> The switch has 4 ports with 2 internal PHYs, but ports are numbered up
+> to 6, with ports 0, 1, 5 and 6 being usable.
+> 
+> Fixes: 71d94a432a15 ("net: dsa: mv88e6xxx: add support for MV88E6020 switch")
+> Signed-off-by: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> 
+> [...]
 
-> Would be good to add an example of multi executing some get operations.
+Here is the summary with links:
+  - net: dsa: mv88e6xxx: fix usable ports on 88e6020
+    https://git.kernel.org/netdev/net/c/625aefac340f
 
-I think this was a blind spot on my part because nftables doesn't
-support batch for get operations:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-https://elixir.bootlin.com/linux/latest/source/net/netfilter/nf_tables_api.c#L9092
 
-I'll need to try using multi for gets without any batch messages and see how
-everything behaves.
-
-> My other concern is the formatting of the response. For mutli we should
-> probably retain the indexes, e.g. 3 dos should produce an array with a
-> length of 3, some of the entries may be None if the command only acked.
-> Would that make sense?
-
-As I said, a blind spot on my part - I didn't really think there was a
-need to do anything for None responses but if get can work then an array
-of responses will be needed.
 
