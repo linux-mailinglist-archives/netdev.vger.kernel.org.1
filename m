@@ -1,822 +1,102 @@
-Return-Path: <netdev+bounces-83212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09F228915C0
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:26:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 820288915AD
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77DD21F22C00
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:26:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2267F1F22BE9
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B860F3EA8A;
-	Fri, 29 Mar 2024 09:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7248124B2F;
+	Fri, 29 Mar 2024 09:23:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AfYq7n6+"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rk2pJ0EC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B99540867
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 09:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CEC1EB4B;
+	Fri, 29 Mar 2024 09:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711704351; cv=none; b=nUawZXwsTMTMr1NsbNMlwWL2rcOzhDGykc5dXvplgTvu/ir+URqUPORlYrsLJ9qKRTsvhTEjhpuq+Gq90F5cjnsgQS+wzmP0DEgUNRLdUyC1QuMQUjBQxfDQ1WPya35sy9j/jCuDjFe+3uovukLQFx6Yg+azjyM9taYapg0Cxq8=
+	t=1711704239; cv=none; b=XUCEcYUkr8TW79f1o8/YzdBc7RY7x727VBg0eJ/fu1dXytVh16dX4ClY4WW3slCoCaSUIX1IKtPTS4YtfVYz6qFUeh6Hwgp0l7+ZyG/6WTbYzTRbvVgINNRKR4NnCExSNElWBTf5y6bSemZ13k3lC1Vpge3QmIRsB5399amEA+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711704351; c=relaxed/simple;
-	bh=Y9CqrKl53Ske4ILI9lXD+tMwZ8stKJdibrX4YniAq3Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rVSMCTJDT+/JrMxT7T+zHAVptg5CA3gJgsGgRvzTWNhCt0tSS/Y87pOqscThslDN+vmYIuJH6yG+Sa5YX9NeEFL3m6std6LSe+z7LI/7um+rtELcipJKXoS/f5inkRWn1oFvXpo/aDlyVJFlKCbiDR/wRgZIy6oNCGOKCyxhhNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AfYq7n6+; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711704349; x=1743240349;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Y9CqrKl53Ske4ILI9lXD+tMwZ8stKJdibrX4YniAq3Q=;
-  b=AfYq7n6+NSf+wvhsjbPnolHWsUe+isjH43REM1mXQQ6CGp2GdrwYeFfW
-   VUOh4/iulv1ackA4SEifFzDdc0Yysjy3IU5CYT/fgdX7yuWrUqqJsAScT
-   hIXKTtLZnF7jfTk+/H1FNeacNF/ZdnH0fXDSbVJK70THTlGSElNRcGXMV
-   2FIwhVavMZ+j0G1Ne12u/+8msVB4qyaNySlWBOVnHbc+5xJlCF1p2M77N
-   2FEwJChI0FkUSg5+7dg+gh8V+L3TRSnRL6kZZQuC0ofLb/LDVPxNdaqzd
-   walukhmTUAgjEku/56s62h5TfEUAFP3+2MNlxVUb+tyc/W1i/aq3VrBqX
-   g==;
-X-CSE-ConnectionGUID: n9vNndZERs2ccFq23umKCg==
-X-CSE-MsgGUID: +6rTrVDBQpeoPm+f9Dv92A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="7107035"
-X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
-   d="scan'208";a="7107035"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 02:25:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
-   d="scan'208";a="16986861"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa008.fm.intel.com with ESMTP; 29 Mar 2024 02:25:37 -0700
-Received: from rozewie.igk.intel.com (unknown [10.211.8.69])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id C928134943;
-	Fri, 29 Mar 2024 09:25:33 +0000 (GMT)
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	simon.horman@corigine.com,
-	anthony.l.nguyen@intel.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	idosch@nvidia.com,
-	przemyslaw.kitszel@intel.com,
-	marcin.szycik@linux.intel.com
-Subject: [PATCH net-next 3/3] ice: Implement ethtool max power configuration
-Date: Fri, 29 Mar 2024 10:23:21 +0100
-Message-Id: <20240329092321.16843-4-wojciech.drewek@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240329092321.16843-1-wojciech.drewek@intel.com>
-References: <20240329092321.16843-1-wojciech.drewek@intel.com>
+	s=arc-20240116; t=1711704239; c=relaxed/simple;
+	bh=TJLlT4e+J+W29O7RPoscY0Kx/HZJD7XHBxAVhA1Z4yE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AvjmE74eXY/0u8OHv8T7R9ATCXFV84H9054eXa+MtvdR+n7CVioWi9Un/ge54LEdMMp06UD8W54nwf5IVjOAjyPbQIcTxV+QO4V8F4vHSNMOvimuad5BGPByXUujbTRm0VfitJiI2tUInUltya7N3o3ElAcypBLY4eHtmcwyeFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rk2pJ0EC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A19CC433C7;
+	Fri, 29 Mar 2024 09:23:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1711704238;
+	bh=TJLlT4e+J+W29O7RPoscY0Kx/HZJD7XHBxAVhA1Z4yE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rk2pJ0ECAK8VZR08hGtUpvk2jcUwb8uwf/zsiXY47gJAGOYYtZwaX0D15LCaGpwUX
+	 sfSirqBMfhTex6ui8V0GEiL6TNOSQ0vfJ7AncyMA95SALmxGkNQCNNkTnbcAbPHwH1
+	 wmfmm+X/RvlLoXQZW3N8zFN1jM01X/hIB4CB8px0=
+Date: Fri, 29 Mar 2024 10:23:55 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Srish Srinivasan <srish.srinivasan@broadcom.com>
+Cc: stable@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com,
+	kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, vakul.garg@nxp.com, davejwatson@fb.com,
+	netdev@vger.kernel.org, ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com, vasavi.sirnapalli@broadcom.com,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>, Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH 6.1.y] net: tls: handle backlogging of crypto requests
+Message-ID: <2024032945-unheated-evacuee-6e0a@gregkh>
+References: <20240328123805.3886026-1-srish.srinivasan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240328123805.3886026-1-srish.srinivasan@broadcom.com>
 
-Implement get_module_power_cfg and set_module_power_cfg ethtool ops.
-Only a part of the parameters provided by those callbacks are going
-to be supported, power policy is not on one of them.
-Introduce new NVM module, Cage Max Power Override which allows
-to change default max power values in the cages. This module
-have an array of 8 words, each one of them is associated with
-different cage. If ICE_AQC_NVM_CMPO_ENABLE bit is set then
-firmware will use maximum power stored in the given word.
+On Thu, Mar 28, 2024 at 06:08:05PM +0530, Srish Srinivasan wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> commit 8590541473188741055d27b955db0777569438e3 upstream
+> 
+> Since we're setting the CRYPTO_TFM_REQ_MAY_BACKLOG flag on our
+> requests to the crypto API, crypto_aead_{encrypt,decrypt} can return
+>  -EBUSY instead of -EINPROGRESS in valid situations. For example, when
+> the cryptd queue for AESNI is full (easy to trigger with an
+> artificially low cryptd.cryptd_max_cpu_qlen), requests will be enqueued
+> to the backlog but still processed. In that case, the async callback
+> will also be called twice: first with err == -EINPROGRESS, which it
+> seems we can just ignore, then with err == 0.
+> 
+> Compared to Sabrina's original patch this version uses the new
+> tls_*crypt_async_wait() helpers and converts the EBUSY to
+> EINPROGRESS to avoid having to modify all the error handling
+> paths. The handling is identical.
+> 
+> Fixes: a54667f6728c ("tls: Add support for encryption using async offload accelerator")
+> Fixes: 94524d8fc965 ("net/tls: Add support for async decryption of tls records")
+> Co-developed-by: Sabrina Dubroca <sd@queasysnail.net>
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> Link: https://lore.kernel.org/netdev/9681d1febfec295449a62300938ed2ae66983f28.1694018970.git.sd@queasysnail.net/
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> [Srish: fixed merge-conflict in stable branch linux-6.1.y,
+> needs to go on top of https://lore.kernel.org/stable/20240307155930.913525-1-lee@kernel.org/]
+> Signed-off-by: Srish Srinivasan <srish.srinivasan@broadcom.com>
+> ---
+>  net/tls/tls_sw.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 
-The overall sum of the powers in the board cannot exceed
-board maximum, which is stored in EMP settings NVM module.
-Before changing the maximum power check if the new value will not
-broke this limit.
+Now queued up, thanks.
 
-Minimum limit per cage is based on the type of the cage, SFP or
-QSFP.
-
-Maximum limit per cage is calculated with below formula:
-max_power_per_board - (number_of_cages - 1) * min_power_per_cage
-
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h          |   2 +
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  21 +
- drivers/net/ethernet/intel/ice/ice_common.c   |  46 ++
- drivers/net/ethernet/intel/ice/ice_common.h   |   3 +
- drivers/net/ethernet/intel/ice/ice_devlink.c  |  14 +-
- drivers/net/ethernet/intel/ice/ice_ethtool.c  | 461 ++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_nvm.c      |   2 +-
- drivers/net/ethernet/intel/ice/ice_nvm.h      |   3 +
- drivers/net/ethernet/intel/ice/ice_type.h     |   4 +
- 9 files changed, 550 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index c4127d5f2be3..ca145ce2b1eb 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -655,6 +655,8 @@ struct ice_pf {
- 	struct ice_agg_node vf_agg_node[ICE_MAX_VF_AGG_NODES];
- 	struct ice_dplls dplls;
- 	struct device *hwmon_dev;
-+
-+	int split_cnt;
- };
- 
- extern struct workqueue_struct *ice_lag_wq;
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 540c0bdca936..daf53e00a497 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -1497,6 +1497,10 @@ struct ice_aqc_link_topo_addr {
- struct ice_aqc_get_link_topo {
- 	struct ice_aqc_link_topo_addr addr;
- 	u8 node_part_num;
-+#define ICE_AQC_GET_LINK_TOPO_NODE_NR_SFP_PLUS		0x11
-+#define ICE_AQC_GET_LINK_TOPO_NODE_NR_SFP28		0x12
-+#define ICE_AQC_GET_LINK_TOPO_NODE_NR_QSFP_PLUS		0x13
-+#define ICE_AQC_GET_LINK_TOPO_NODE_NR_QSFP28		0x14
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_PCA9575		0x21
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL30632_80032	0x24
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_SI5383_5384	0x25
-@@ -1664,6 +1668,23 @@ struct ice_aqc_nvm {
- 	__le32 addr_low;
- };
- 
-+#define ICE_AQC_NVM_CMPO_MOD_ID			0x153
-+#define ICE_AQC_NVM_EMP_SETTINGS_MOD_ID		0x0F
-+#define ICE_AQC_NVM_MAX_PWR_LIMIT_OFFSET	0x1A
-+#define ICE_AQC_NVM_DFLT_MAX_PWR_MASK		GENMASK(7, 0)
-+#define ICE_AQC_NVM_BOARD_MAX_PWR_MASK		GENMASK(15, 8)
-+
-+#define ICE_NUM_OF_CAGES 8
-+
-+#define ICE_AQC_NVM_CMPO_ENABLE		BIT(8)
-+#define ICE_AQC_NVM_CMPO_POWER_MASK	GENMASK(7, 0)
-+
-+/* Cage Max Power override NVM module */
-+struct ice_aqc_nvm_cmpo {
-+	__le16 length;
-+	__le16 cages_cfg[ICE_NUM_OF_CAGES];
-+};
-+
- #define ICE_AQC_NVM_START_POINT			0
- 
- /* NVM Checksum Command (direct, 0x0706) */
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index f4ac3c30b124..081f6b6dbc30 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -571,6 +571,23 @@ static bool ice_is_media_cage_present(struct ice_port_info *pi)
- 					    NULL);
- }
- 
-+int ice_get_port_cage_node(struct ice_hw *hw, u8 index,
-+			   u16 *node_handle, u8 *node_part_number)
-+{
-+	struct ice_aqc_get_link_topo cmd = {};
-+
-+	cmd.addr.topo_params.node_type_ctx =
-+		FIELD_PREP(ICE_AQC_LINK_TOPO_NODE_TYPE_M,
-+			   ICE_AQC_LINK_TOPO_NODE_TYPE_CAGE);
-+	cmd.addr.topo_params.node_type_ctx |=
-+		FIELD_PREP(ICE_AQC_LINK_TOPO_NODE_CTX_M,
-+			   ICE_AQC_LINK_TOPO_NODE_CTX_GLOBAL);
-+	cmd.addr.topo_params.index = index;
-+
-+	return ice_aq_get_netlist_node(hw, &cmd, node_part_number,
-+				       node_handle);
-+}
-+
- /**
-  * ice_get_media_type - Gets media type
-  * @pi: port information structure
-@@ -5723,6 +5740,29 @@ static bool ice_is_fw_api_min_ver(struct ice_hw *hw, u8 maj, u8 min, u8 patch)
- 	return false;
- }
- 
-+/**
-+ * ice_is_fw_min_ver
-+ * @hw: pointer to the hardware structure
-+ * @maj: major version
-+ * @min: minor version
-+ * @patch: patch version
-+ *
-+ * Checks if the firmware is minimum version
-+ */
-+static bool ice_is_fw_min_ver(struct ice_hw *hw, u8 maj, u8 min, u8 patch)
-+{
-+	if (hw->fw_maj_ver > maj)
-+		return true;
-+	if (hw->fw_maj_ver == maj) {
-+		if (hw->fw_min_ver > min)
-+			return true;
-+		if (hw->fw_min_ver == min && hw->fw_patch >= patch)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- /**
-  * ice_fw_supports_link_override
-  * @hw: pointer to the hardware structure
-@@ -5736,6 +5776,12 @@ bool ice_fw_supports_link_override(struct ice_hw *hw)
- 				     ICE_FW_API_LINK_OVERRIDE_PATCH);
- }
- 
-+bool ice_fw_supports_cmpo(struct ice_hw *hw)
-+{
-+	return ice_is_fw_min_ver(hw, ICE_FW_CMPO_MAJ, ICE_FW_CMPO_MIN,
-+				 ICE_FW_CMPO_PATCH);
-+}
-+
- /**
-  * ice_get_link_default_override
-  * @ldo: pointer to the link default override struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index ffb22c7ce28b..c476fbf60400 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -96,6 +96,8 @@ bool ice_is_phy_rclk_in_netlist(struct ice_hw *hw);
- bool ice_is_clock_mux_in_netlist(struct ice_hw *hw);
- bool ice_is_cgu_in_netlist(struct ice_hw *hw);
- bool ice_is_gps_in_netlist(struct ice_hw *hw);
-+int ice_get_port_cage_node(struct ice_hw *hw, u8 index,
-+			   u16 *node_handle, u8 *node_part_number);
- int
- ice_aq_get_netlist_node(struct ice_hw *hw, struct ice_aqc_get_link_topo *cmd,
- 			u8 *node_part_number, u16 *node_handle);
-@@ -117,6 +119,7 @@ int
- ice_aq_set_phy_cfg(struct ice_hw *hw, struct ice_port_info *pi,
- 		   struct ice_aqc_set_phy_cfg_data *cfg, struct ice_sq_cd *cd);
- bool ice_fw_supports_link_override(struct ice_hw *hw);
-+bool ice_fw_supports_cmpo(struct ice_hw *hw);
- int
- ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
- 			      struct ice_port_info *pi);
-diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
-index 3c3616f0f811..8d5ce9c2ca91 100644
---- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-@@ -1604,6 +1604,14 @@ ice_devlink_set_port_split_options(struct ice_pf *pf,
- 		return;
- 	}
- 
-+	pf->split_cnt = options[active_idx].pmd;
-+
-+	/* As FW supports only port split options for whole device,
-+	 * set port split options only for first PF.
-+	 */
-+	if (pf->hw.pf_id != 0)
-+		return;
-+
- 	/* find the biggest available port split count */
- 	for (i = 0; i < option_count; i++)
- 		attrs->lanes = max_t(int, attrs->lanes, options[i].pmd);
-@@ -1648,11 +1656,7 @@ int ice_devlink_create_pf_port(struct ice_pf *pf)
- 	attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
- 	attrs.phys.port_number = pf->hw.bus.func;
- 
--	/* As FW supports only port split options for whole device,
--	 * set port split options only for first PF.
--	 */
--	if (pf->hw.pf_id == 0)
--		ice_devlink_set_port_split_options(pf, &attrs);
-+	ice_devlink_set_port_split_options(pf, &attrs);
- 
- 	ice_devlink_set_switch_id(pf, &attrs.switch_id);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 255a9c8151b4..b38a984b44a2 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -4297,6 +4297,465 @@ ice_get_module_eeprom(struct net_device *netdev,
- 	return 0;
- }
- 
-+/**
-+ * ice_get_min_pwr_allowed - Get min power allowed
-+ * @hw: pointer to the hardware structure
-+ * @extack: extended ACK from the Netlink message
-+ *
-+ * Values are constant based on the cage type.
-+ * Return value in mW.
-+ */
-+static int ice_get_min_pwr_allowed(struct ice_hw *hw,
-+				   struct netlink_ext_ack *extack)
-+{
-+	u8 node_part_number;
-+	u16 node_handle;
-+	int err;
-+
-+	err = ice_get_port_cage_node(hw, 0, &node_handle, &node_part_number);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to get cage node handle");
-+		return err;
-+	}
-+
-+	switch (node_part_number) {
-+	case ICE_AQC_GET_LINK_TOPO_NODE_NR_SFP_PLUS:
-+	case ICE_AQC_GET_LINK_TOPO_NODE_NR_SFP28:
-+		return 1000;
-+	case ICE_AQC_GET_LINK_TOPO_NODE_NR_QSFP_PLUS:
-+	case ICE_AQC_GET_LINK_TOPO_NODE_NR_QSFP28:
-+		return 1500;
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
-+/**
-+ * ice_pwr_nvm_to_ethtool - Convert NVM values to ethtool
-+ * @pwr: power from NVM
-+ */
-+static u32 ice_pwr_nvm_to_ethtool(u32 pwr)
-+{
-+	/* ethtool takes power values in mW */
-+	pwr *= 1000;
-+	/* 0.5 W resolution */
-+	pwr /= 2;
-+
-+	return pwr;
-+}
-+
-+/**
-+ * ice_pwr_ethtool_to_nvm - Convert ethtool values to NVM
-+ * @pwr: power from ethtool, in mW
-+ */
-+static u32 ice_pwr_ethtool_to_nvm(u32 pwr)
-+{
-+	/* 0.5 W resolution */
-+	pwr *= 2;
-+	/* ethtool takes power values in mW */
-+	pwr /= 1000;
-+
-+	return pwr;
-+}
-+
-+/**
-+ * ice_get_num_of_cages - Get number of cages in the board
-+ * @hw: pointer to the hardware structure
-+ *
-+ * We have as many cages as netlist nodes of cage type.
-+ */
-+static int ice_get_num_of_cages(struct ice_hw *hw)
-+{
-+	int i, err, cage_count = 0;
-+	u8 node_part_number;
-+	u16 node_handle;
-+
-+	for (i = 0; i < ICE_NUM_OF_CAGES; i++) {
-+		err = ice_get_port_cage_node(hw, i, &node_handle,
-+					     &node_part_number);
-+		if (!err && node_handle)
-+			cage_count++;
-+	}
-+
-+	return cage_count;
-+}
-+
-+/**
-+ * ice_get_board_max_pwr - Get max power allowed per board
-+ * @hw: pointer to the hardware structure
-+ *
-+ * Board maximum power is stored in EMP settings NVM module
-+ */
-+static int ice_get_board_max_pwr(struct ice_hw *hw)
-+{
-+	u16 board_max_pwr;
-+	__le16 data;
-+	int err;
-+
-+	err = ice_acquire_nvm(hw, ICE_RES_READ);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_EMP_SETTINGS_MOD_ID,
-+			      ICE_AQC_NVM_MAX_PWR_LIMIT_OFFSET,
-+			      sizeof(data), &data,
-+			      true, false, NULL);
-+	if (err) {
-+		ice_release_nvm(hw);
-+		return err;
-+	}
-+
-+	ice_release_nvm(hw);
-+
-+	board_max_pwr = __le16_to_cpu(data);
-+	board_max_pwr = FIELD_GET(ICE_AQC_NVM_BOARD_MAX_PWR_MASK,
-+				  board_max_pwr);
-+
-+	return ice_pwr_nvm_to_ethtool(board_max_pwr);
-+}
-+
-+/**
-+ * ice_get_max_pwr_allowed - Get max power allowed per cage
-+ * @hw: pointer to the hardware structure
-+ * @min_pwr_allowed: min allowed power
-+ * @cage_count: number of cages in the board
-+ */
-+static int ice_get_max_pwr_allowed(struct ice_hw *hw, u32 min_pwr_allowed,
-+				   int cage_count)
-+{
-+	int board_max_pwr;
-+
-+	board_max_pwr = ice_get_board_max_pwr(hw);
-+	if (board_max_pwr < 0)
-+		return board_max_pwr;
-+
-+	return board_max_pwr - (cage_count - 1) * min_pwr_allowed;
-+}
-+
-+/**
-+ * ice_get_cage_idx - Get index to the cage
-+ * @pf: pointer to the PF structure
-+ * @cage_count: number of cages in the board
-+ * @extack: extended ACK from the Netlink message
-+ *
-+ * Get index to the cage and validate if the given PF
-+ * is associated with the cage.
-+ */
-+static int ice_get_cage_idx(struct ice_pf *pf, int cage_count,
-+			    struct netlink_ext_ack *extack)
-+{
-+	/* if there is only on cage, PF 0 is responsoble for it */
-+	if (cage_count == 1) {
-+		if (pf->hw.pf_id == 0)
-+			return 0;
-+		goto err;
-+	} else if (cage_count == 4) {
-+		/* if there are 4 cages, than port split is not supported
-+		 * so each PF is responsoble for its cage
-+		 */
-+		return pf->hw.pf_id;
-+	} else if (cage_count == 2) {
-+		/* We have 2 cages, PF 0 always takes care of the first one.
-+		 * If the split_cnt is 2 than PF 1 takes care of the second cage.
-+		 * If the split_cnt is 4 than PF 2 takes care of the second cage.
-+		 * If the split_cnt is 8 than PF 4 takes care of the second cage.
-+		 * So, the formula for the second cage is pf_id * 2 == split_cnt
-+		 */
-+		if (pf->hw.pf_id == 0 || pf->hw.pf_id * 2 == pf->split_cnt)
-+			return pf->hw.pf_id;
-+	}
-+
-+err:
-+	NL_SET_ERR_MSG_MOD(extack, "Cage maximum power cannot be requested for selected port");
-+
-+	return -EPERM;
-+}
-+
-+/**
-+ * ice_get_dflt_max_pwr - Get dflt max power
-+ * @hw: pointer to the hardware structure
-+ *
-+ * Default max power is stored in EMP settings NVM module
-+ */
-+static int ice_get_dflt_max_pwr(struct ice_hw *hw)
-+{
-+	__le16 data;
-+	u16 pwr;
-+	int ret;
-+
-+	ret = ice_acquire_nvm(hw, ICE_RES_READ);
-+	if (ret)
-+		return ret;
-+
-+	ret = ice_aq_read_nvm(hw, ICE_AQC_NVM_EMP_SETTINGS_MOD_ID,
-+			      ICE_AQC_NVM_MAX_PWR_LIMIT_OFFSET, sizeof(data),
-+			      &data, true, false, NULL);
-+	if (ret) {
-+		ice_release_nvm(hw);
-+		return ret;
-+	}
-+
-+	ice_release_nvm(hw);
-+
-+	pwr = __le16_to_cpu(data);
-+	pwr = FIELD_GET(ICE_AQC_NVM_DFLT_MAX_PWR_MASK, pwr);
-+
-+	return ice_pwr_nvm_to_ethtool(pwr);
-+}
-+
-+/**
-+ * ice_get_max_pwr_set - Get currently set max power
-+ * @hw: pointer to the hardware structure
-+ * @idx: index of the cage
-+ *
-+ * If cmpo enable bit is set, use the value from
-+ * CMPO module otherwise use default value.
-+ */
-+static int ice_get_max_pwr_set(struct ice_hw *hw, int idx)
-+{
-+	struct ice_aqc_nvm_cmpo data;
-+	int max_pwr_set;
-+	u16 temp;
-+	int ret;
-+
-+	ret = ice_acquire_nvm(hw, ICE_RES_READ);
-+	if (ret)
-+		return ret;
-+
-+	ret = ice_aq_read_nvm(hw, ICE_AQC_NVM_CMPO_MOD_ID, 0, sizeof(data),
-+			      &data, true, false, NULL);
-+	if (ret) {
-+		ice_release_nvm(hw);
-+		return ret;
-+	}
-+
-+	ice_release_nvm(hw);
-+
-+	temp = le16_to_cpu(data.cages_cfg[idx]);
-+
-+	if (FIELD_GET(ICE_AQC_NVM_CMPO_ENABLE, temp)) {
-+		max_pwr_set = FIELD_GET(ICE_AQC_NVM_CMPO_POWER_MASK, temp);
-+		return ice_pwr_nvm_to_ethtool(max_pwr_set);
-+	} else {
-+		return ice_get_dflt_max_pwr(hw);
-+	}
-+}
-+
-+/**
-+ * ice_get_module_power_cfg - Get device's power setting
-+ * @dev: network device
-+ * @params: output parameters
-+ * @extack: extended ACK from the Netlink message
-+ *
-+ * We care only about min_pwr_allowed, max_pwr_allowed and max_pwr_set params.
-+ */
-+static int
-+ice_get_module_power_cfg(struct net_device *dev,
-+			 struct ethtool_module_power_params *params,
-+			 struct netlink_ext_ack *extack)
-+{
-+	int min_pwr_allowed, max_pwr_allowed, max_pwr_set, cage_count;
-+	struct ice_netdev_priv *np = netdev_priv(dev);
-+	struct ice_vsi *vsi = np->vsi;
-+	struct ice_pf *pf = vsi->back;
-+	struct ice_hw *hw = &pf->hw;
-+	int idx;
-+
-+	if (!ice_fw_supports_cmpo(hw)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Cage maximum power request is unsupported by the current firmware");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	cage_count = ice_get_num_of_cages(hw);
-+
-+	idx = ice_get_cage_idx(pf, cage_count, extack);
-+	if (idx < 0)
-+		return idx;
-+
-+	min_pwr_allowed = ice_get_min_pwr_allowed(hw, extack);
-+	if (min_pwr_allowed < 0) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to get min power limit");
-+		return min_pwr_allowed;
-+	}
-+
-+	max_pwr_allowed = ice_get_max_pwr_allowed(hw, min_pwr_allowed,
-+						  cage_count);
-+	if (max_pwr_allowed < 0) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to get max power limit");
-+		return max_pwr_allowed;
-+	}
-+
-+	max_pwr_set = ice_get_max_pwr_set(hw, idx);
-+	if (max_pwr_set < 0) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to get max power currently set");
-+		return max_pwr_set;
-+	}
-+
-+	params->min_pwr_allowed = min_pwr_allowed;
-+	params->max_pwr_allowed = max_pwr_allowed;
-+	params->max_pwr_set = max_pwr_set;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_check_board_pwr_sum - Check if the new sum exceeds the board maximum.
-+ * @hw: pointer to the hardware structure
-+ * @data: current power config from NVM
-+ * @idx: index of the cage we want to update
-+ * @power: new power value from ethtool
-+ * @cage_count: number of cages in the board
-+ * @extack: extended ACK from the Netlink message
-+ *
-+ * Get number of cages, board maximum and default power value.
-+ * Add up all values. If cmpo enable bit is set, use the value from
-+ * CMPO module otherwise use default value.
-+ */
-+static int
-+ice_check_board_pwr_sum(struct ice_hw *hw, struct ice_aqc_nvm_cmpo *data,
-+			int idx, u32 power, int cage_count,
-+			struct netlink_ext_ack *extack)
-+{
-+	int board_max_pwr, dflt_pwr, max_pwr_set, sum = 0;
-+	u16 temp;
-+	int i;
-+
-+	board_max_pwr = ice_get_board_max_pwr(hw);
-+	if (board_max_pwr < 0)
-+		return board_max_pwr;
-+
-+	dflt_pwr = ice_get_dflt_max_pwr(hw);
-+	if (dflt_pwr < 0)
-+		return dflt_pwr;
-+
-+	for (i = 0; i < cage_count; i++) {
-+		temp = le16_to_cpu(data->cages_cfg[i]);
-+
-+		/* skipping the cage we want to update with the new value, we
-+		 * want to add the new power, not the value from NVM
-+		 */
-+		if (i == idx)
-+			continue;
-+
-+		if (FIELD_GET(ICE_AQC_NVM_CMPO_ENABLE, temp)) {
-+			max_pwr_set = FIELD_GET(ICE_AQC_NVM_CMPO_POWER_MASK,
-+						temp);
-+			sum += ice_pwr_nvm_to_ethtool(max_pwr_set);
-+		} else {
-+			sum += dflt_pwr;
-+		}
-+	}
-+
-+	sum += power;
-+
-+	if (sum > board_max_pwr) {
-+		NL_SET_ERR_MSG_MOD(extack, "Sum of power values is out of range: overbudgeting board level.");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_set_module_power_cfg - Update device's power setting
-+ * @dev: network device
-+ * @params: new power config
-+ * @extack: extended ACK from the Netlink message
-+ *
-+ * We care only about max_pwr_set and max_pwr_reset params.
-+ */
-+static int
-+ice_set_module_power_cfg(struct net_device *dev,
-+			 const struct ethtool_module_power_params *params,
-+			 struct netlink_ext_ack *extack)
-+{
-+	struct ice_netdev_priv *np = netdev_priv(dev);
-+	struct ice_vsi *vsi = np->vsi;
-+	struct ice_pf *pf = vsi->back;
-+	struct ice_aqc_nvm_cmpo data;
-+	struct ice_hw *hw = &pf->hw;
-+	int idx, ret, cage_count;
-+	u16 power;
-+
-+	if (params->policy) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unsupported power parameter.");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (!ice_fw_supports_cmpo(hw)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Cage maximum power request is unsupported by the current firmware.");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (params->max_pwr_set % 500) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unsupported power resolution, use 500 mW resolution.");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	cage_count = ice_get_num_of_cages(hw);
-+
-+	idx = ice_get_cage_idx(pf, cage_count, extack);
-+	if (idx < 0)
-+		return idx;
-+
-+	ret = ice_acquire_nvm(hw, ICE_RES_READ);
-+	if (ret)
-+		return ret;
-+
-+	ret = ice_aq_read_nvm(hw, ICE_AQC_NVM_CMPO_MOD_ID, 0, sizeof(data),
-+			      &data, true, false, NULL);
-+	if (ret) {
-+		ice_release_nvm(hw);
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to read NVM power config.");
-+		return ret;
-+	}
-+
-+	ice_release_nvm(hw);
-+
-+	power = ice_pwr_ethtool_to_nvm(params->max_pwr_set);
-+
-+	if (power) {
-+		ret = ice_check_board_pwr_sum(hw, &data, idx,
-+					      params->max_pwr_set, cage_count,
-+					      extack);
-+		if (ret)
-+			return ret;
-+
-+		data.cages_cfg[idx] =
-+			cpu_to_le16(power & ICE_AQC_NVM_CMPO_POWER_MASK);
-+		data.cages_cfg[idx] |= cpu_to_le16(ICE_AQC_NVM_CMPO_ENABLE);
-+	} else {
-+		data.cages_cfg[idx] &= ~cpu_to_le16(ICE_AQC_NVM_CMPO_ENABLE);
-+	}
-+
-+	ret = ice_acquire_nvm(hw, ICE_RES_WRITE);
-+	if (ret)
-+		return ret;
-+
-+	ret = ice_aq_update_nvm(hw, ICE_AQC_NVM_CMPO_MOD_ID, 2,
-+				sizeof(data.cages_cfg), data.cages_cfg,
-+				false, 0, NULL);
-+	if (ret) {
-+		ice_release_nvm(hw);
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to update NVM power config.");
-+		return ret;
-+	}
-+
-+	ret = ice_nvm_write_activate(&pf->hw, ICE_AQC_NVM_ACTIV_REQ_EMPR,
-+				     NULL);
-+	if (ret) {
-+		ice_release_nvm(hw);
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to save NVM power config.");
-+		return ret;
-+	}
-+
-+	ice_release_nvm(hw);
-+
-+	dev_info(ice_pf_to_dev(pf), "Reboot is required to complete power change.");
-+
-+	return 0;
-+}
-+
- static const struct ethtool_ops ice_ethtool_ops = {
- 	.cap_rss_ctx_supported  = true,
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
-@@ -4344,6 +4803,8 @@ static const struct ethtool_ops ice_ethtool_ops = {
- 	.set_fecparam		= ice_set_fecparam,
- 	.get_module_info	= ice_get_module_info,
- 	.get_module_eeprom	= ice_get_module_eeprom,
-+	.get_module_power_cfg	= ice_get_module_power_cfg,
-+	.set_module_power_cfg	= ice_set_module_power_cfg,
- };
- 
- static const struct ethtool_ops ice_ethtool_safe_mode_ops = {
-diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.c b/drivers/net/ethernet/intel/ice/ice_nvm.c
-index d4e05d2cb30c..f3ef1211acd7 100644
---- a/drivers/net/ethernet/intel/ice/ice_nvm.c
-+++ b/drivers/net/ethernet/intel/ice/ice_nvm.c
-@@ -18,7 +18,7 @@
-  *
-  * Read the NVM using the admin queue commands (0x0701)
-  */
--static int
-+int
- ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset, u16 length,
- 		void *data, bool last_command, bool read_shadow_ram,
- 		struct ice_sq_cd *cd)
-diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.h b/drivers/net/ethernet/intel/ice/ice_nvm.h
-index 774c2317967d..63cdc6bdac58 100644
---- a/drivers/net/ethernet/intel/ice/ice_nvm.h
-+++ b/drivers/net/ethernet/intel/ice/ice_nvm.h
-@@ -14,6 +14,9 @@ struct ice_orom_civd_info {
- 
- int ice_acquire_nvm(struct ice_hw *hw, enum ice_aq_res_access_type access);
- void ice_release_nvm(struct ice_hw *hw);
-+int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
-+		    u16 length, void *data, bool last_command,
-+		    bool read_shadow_ram, struct ice_sq_cd *cd);
- int
- ice_read_flat_nvm(struct ice_hw *hw, u32 offset, u32 *length, u8 *data,
- 		  bool read_shadow_ram);
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 08ec5efdafe6..91506ddc5419 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -1152,6 +1152,10 @@ struct ice_aq_get_set_rss_lut_params {
- #define ICE_FW_API_LINK_OVERRIDE_MIN		5
- #define ICE_FW_API_LINK_OVERRIDE_PATCH		2
- 
-+#define ICE_FW_CMPO_MAJ				7
-+#define ICE_FW_CMPO_MIN				4
-+#define ICE_FW_CMPO_PATCH			1
-+
- #define ICE_SR_WORDS_IN_1KB		512
- 
- /* AQ API version for LLDP_FILTER_CONTROL */
--- 
-2.40.1
-
+greg k-h
 
