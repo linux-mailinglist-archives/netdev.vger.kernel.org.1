@@ -1,111 +1,139 @@
-Return-Path: <netdev+bounces-83174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BB4F891316
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 06:10:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F7E889132C
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 06:29:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5BBFB22DC9
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 05:10:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF10E289396
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 05:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C949D3B1A4;
-	Fri, 29 Mar 2024 05:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0103BBE8;
+	Fri, 29 Mar 2024 05:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nWa6yq7q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="luWyhTZd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3503A27B;
-	Fri, 29 Mar 2024 05:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5E18494;
+	Fri, 29 Mar 2024 05:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711689031; cv=none; b=OfY5ufbp+qurTnRhyfMUWY47TlN32OjerCHxWNiLnAeIgymKOmkg+nu8AIS3vn1BlFEKnBxuZBgmVxfPvw54C/tavN1Bcdoh/AyCVAVcV8YpoU1ztOUrEbc2WGFNyzTTpUW4YUNyCDC5ETP1Wh7x97m/i0qiLo9g0Ybuc07yf0A=
+	t=1711690180; cv=none; b=W01mAHahEKMIpYW+5QcKhBm876bkV/2PhoiSYAh9RXfwLRMWmRtmNt7HFgj5ikoMnB0805Un+BWrdYMGxTZoMcp3q7INP0LcCcQovzGX9MhLNsQ6u9oUbrDMHbYV8acqVXD7Q1Fc3YcEZrjPjt2mRgyDontooltIUOJDNLwHZYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711689031; c=relaxed/simple;
-	bh=JTlplW2/Out9DISgdpv3W0wq4268A6szm5K/uLb8+M4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tCeYh/B6qsgWeSWhPHpxRY3Lrwt3/Ii3nz2G2i8XhnxKNwJRflHd2upiBiK/gkjJRZ28jR8tubQMPstrVRJBTOvGaH8P9duadRb6rAIAdhtK0pUSDnnsrnYVRt+8D7O09kttUOjX7OwZIQndH8WZPe/mjkFv3EEd2qxzqIi4CT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nWa6yq7q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2CE90C43390;
-	Fri, 29 Mar 2024 05:10:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711689031;
-	bh=JTlplW2/Out9DISgdpv3W0wq4268A6szm5K/uLb8+M4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nWa6yq7q0+RkYhBkUumSxNQlbGHy/y8vaJShXUfvvnWsticJ7QRiexJr9pvtKzF0L
-	 VF2u1sTAt1cyN2Uaw7C9FUp/xkc9WXItgrBsqZjABHyBdH4O4A1Jbp3JI2U3aNKVPa
-	 PHLeHoF8sME4ifJ8LI3agjOPzrXDwHRbpJVCqwBXjcp9lJpPgT4KIIq1206OqjbqqU
-	 YfQaboUPO/Bkgo8xsORi8zjPETbGH+XLB/py9xvx+QucO6GiZhpcg39fnoffgb7fML
-	 OKLeV8eJY3C8NbGqimf3ZS82clxP5b0D4jxijQh6iG5J0JBTu5B9HpAmwUfWCJG6uc
-	 3+JwNmWddmB3g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 169F6D2D0EB;
-	Fri, 29 Mar 2024 05:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711690180; c=relaxed/simple;
+	bh=ZOl/Bo99tToaWRhqhSoUQflRSQemaKlEpXFd9o9Gttk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=PxUuaPOcTIj9QQedzwBnCayX3xC07fzxOegOe7FX8qExgck7x2D/QSA7NjCspJ/V+nQCfLecuFYvU4DVnDdyoqIQBsFvJcu64AB3X3NuoJZausKAKOvp7KaMEeMIQne66ZYlnt7oj3Yh+E0HWOpbG/OIqPSFB7+csQH/ry/g9Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=luWyhTZd; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6e6f4ad4c57so1378328b3a.2;
+        Thu, 28 Mar 2024 22:29:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711690178; x=1712294978; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k18c6xmm/eyPrEWQ3tkt+ZDWH10CDlh6h0RH3Bi3qC0=;
+        b=luWyhTZdloMMQc1OKGWhj73srxsVfkFGXqkmAaACjAXsLbDZUVN9HhCY1WekUnxdW9
+         /Qv2gNj4UAJpN7XoC7LqT4d/ihwyrjAFIbMvzSzwxMc1kVdXArjygNqg+DPdIl8f+WC5
+         ohxe/as9BS6DnkF4tJFpgqekZpgivQtSej5BMBeqiLoVG58zWUzB25r436Q6K59bG8FL
+         GDWF58cOzf2cgKQ9ZHWj0TAe1yd5AX/BJebjD75X7tPhJOFUZr/G7rOFBdK+2flFuxkN
+         GIoRbqjB4hoNHPs7D9UKWqqtU9nlUOh9xeTk91+/bRqyL4w5gcfuK78KMHogo46TQlnK
+         +7iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711690178; x=1712294978;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=k18c6xmm/eyPrEWQ3tkt+ZDWH10CDlh6h0RH3Bi3qC0=;
+        b=EnQsA1t6rxj67hUKuaAm8kbx8n4lWUSaS9QibY+yh7RROwl4/d7qSfe7dhQeljSS6+
+         /4HxN99aBtJn1Lr1NjFL35h4x8OXYDkW4eBBIn4TXGb2j9mttWYGhpW8kgKt3UcQD3LZ
+         h1BVi1Y340IqnFhEGOUWswOoNIx1vaJg8McFuJxgWx91hkJEWV88UmPveRK/Rwh6u13B
+         zBegLvJnDblwtmh6bH4+ejgLORYRe9bZyRFkhXf7B+9p7W3fO8nGQPtcGmpmG8c8yHdG
+         6nNvWDach/EoRjo+qS40MfCrCjqVUfIaCvPd4FR3PW1pGy+dqp9f8NzMzF2g6nuJPnRT
+         mMkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVnTJuWcqDMJYkiVM+muIxrLvxRko/vOKry+Ks0f8I19HefSWkme0O/raAnZZkNKtGZZxC4nZ2qfpv1yRbcjUhLVQRAmu21vy1WR4Na51p/rSu3ewfhMHTkpULNoqDKSnZ7zOU0utwHdA2/d4rRvTfYin+uROztQDYS
+X-Gm-Message-State: AOJu0Yzqisr0qPAlKgE7/4dbQNS5T+6BWgiF1M9lwZiIPSCe4nCpT5en
+	vWCG+w5Vr5aHWQhMLhOTC7YVfnJh3GEzeUzB2dxvcwv2n+i78q/J
+X-Google-Smtp-Source: AGHT+IGF0zcDXBCDqaaqa/Kc9ue+cRHKReQB2M9kPl0XrXRl7s+yKAQU7+YMrGsaWmIr628uT6J05g==
+X-Received: by 2002:a05:6a21:398b:b0:1a3:e168:4deb with SMTP id ad11-20020a056a21398b00b001a3e1684debmr1460271pzc.32.1711690177987;
+        Thu, 28 Mar 2024 22:29:37 -0700 (PDT)
+Received: from localhost ([98.97.36.54])
+        by smtp.gmail.com with ESMTPSA id u10-20020a170902e5ca00b001e042dc5202sm2603318plf.80.2024.03.28.22.29.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 22:29:37 -0700 (PDT)
+Date: Thu, 28 Mar 2024 22:29:36 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, 
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+ Edward Adam Davis <eadavis@qq.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: syzbot+c4f4d25859c2e5859988@syzkaller.appspotmail.com, 
+ 42.hyeyoo@gmail.com, 
+ andrii@kernel.org, 
+ ast@kernel.org, 
+ bpf@vger.kernel.org, 
+ daniel@iogearbox.net, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kafai@fb.com, 
+ kpsingh@kernel.org, 
+ kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ namhyung@kernel.org, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ peterz@infradead.org, 
+ songliubraving@fb.com, 
+ syzkaller-bugs@googlegroups.com, 
+ yhs@fb.com
+Message-ID: <660651c0707f5_22b5520880@john.notmuch>
+In-Reply-To: <87ttkuber7.fsf@cloudflare.com>
+References: <000000000000dc9aca0613ec855c@google.com>
+ <tencent_F436364A347489774B677A3D13367E968E09@qq.com>
+ <CAADnVQJQvcZOA_BbFxPqNyRbMdKTBSMnf=cKvW7NJ8LxxP54sA@mail.gmail.com>
+ <87y1a6biie.fsf@cloudflare.com>
+ <87ttkuber7.fsf@cloudflare.com>
+Subject: Re: [PATCH] bpf, sockmap: fix deadlock in rcu_report_exp_cpu_mult
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next RESEND v6 0/7] Fix missing PHY-to-MAC RX clock
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171168903108.21197.8126750416012356121.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 05:10:31 +0000
-References: <20240326-rxc_bugfix-v6-0-24a74e5c761f@bootlin.com>
-In-Reply-To: <20240326-rxc_bugfix-v6-0-24a74e5c761f@bootlin.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, clement.leger@bootlin.com,
- maxime.chevallier@bootlin.com, miquel.raynal@bootlin.com,
- thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- rmk+kernel@armlinux.org.uk, xiaoning.wang@nxp.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 26 Mar 2024 14:32:06 +0100 you wrote:
-> Hello everyone,
+Jakub Sitnicki wrote:
+> On Mon, Mar 25, 2024 at 01:23 PM +01, Jakub Sitnicki wrote:
 > 
-> This is version six of my series that addresses the issue with some MAC/PHY
-> combinations.
+> [...]
 > 
-> Notable changes in v6:
->   - Corrected trailers
+> > But we also need to cover sock_map_unref->sock_sock_map_del_link called
+> > from sock_hash_delete_elem. It also grabs a spin lock.
+> 
+> On second look, no need to disable interrupts in
+> sock_map_unref->sock_sock_map_del_link. Call is enclosed in the critical
+> section in sock_hash_delete_elem that has been updated.
+> 
+> I have a question, though, why are we patching sock_hash_free? It
+> doesn't get called unless there are no more existing users of the BPF
+> map. So nothing can mutate it from interrupt context.
 > 
 > [...]
 
-Here is the summary with links:
-  - [RESEND,net-next,v6,1/7] net: phylink: add PHY_F_RXC_ALWAYS_ON to PHY dev flags
-    https://git.kernel.org/netdev/net-next/c/21d9ba5bc551
-  - [RESEND,net-next,v6,2/7] net: phylink: add rxc_always_on flag to phylink_pcs
-    https://git.kernel.org/netdev/net-next/c/dceb393a0a8e
-  - [RESEND,net-next,v6,3/7] net: stmmac: don't rely on lynx_pcs presence to check for a PHY
-    https://git.kernel.org/netdev/net-next/c/10658e99d952
-  - [RESEND,net-next,v6,4/7] net: stmmac: Support a generic PCS field in mac_device_info
-    https://git.kernel.org/netdev/net-next/c/f7bff228a616
-  - [RESEND,net-next,v6,5/7] net: stmmac: Signal to PHY/PCS drivers to keep RX clock on
-    https://git.kernel.org/netdev/net-next/c/58329b03a595
-  - [RESEND,net-next,v6,6/7] net: phy: qcom: at803x: Avoid hibernating if MAC requires RX clock
-    https://git.kernel.org/netdev/net-next/c/30dc5873967e
-  - [RESEND,net-next,v6,7/7] net: pcs: rzn1-miic: Init RX clock early if MAC requires it
-    https://git.kernel.org/netdev/net-next/c/0f671b3b6edf
+Agree sock_hash_free should be only after all refs are dropped.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Edward, did you want to send a v2 for this? Also if you want fixing the
+sockmap case as well would be useful. Also happy to finish up the patches
+if you would rather not.
 
-
+Thanks,
+John
 
