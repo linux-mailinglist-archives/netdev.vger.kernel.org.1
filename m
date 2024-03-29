@@ -1,99 +1,102 @@
-Return-Path: <netdev+bounces-83371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD31B892106
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:56:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17332892134
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:06:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D9CC1F28284
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:56:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47EF71C234BD
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DA56A355;
-	Fri, 29 Mar 2024 15:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911FD58127;
+	Fri, 29 Mar 2024 16:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKF8iGrY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIza9N1y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D33458127;
-	Fri, 29 Mar 2024 15:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F794A0A;
+	Fri, 29 Mar 2024 16:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711727795; cv=none; b=Gac01Crop7e71fpKUmjfP2oG2Wit4oUn1i/TKb/vgwfoCzB9/t0FFVcF6pZdgzhQR2LzlCqcMjm0ma20CUk8OIRitIBHUlNdI0kFspgbM6BgD30Cc7QEWpfn1HwjSGe/0jMGDJEQj0B/G5wUOXVt6a+ojS4bbLi+L3JNK6NjqgA=
+	t=1711728361; cv=none; b=qNQX41RLDACmE/CEzYXmQA5Dpz8EDXGmAH3sFWO/FHZLb0H/B4yHa4BgsYUxiuyYr3R9dvcNFM0G0xLaGPjZyUNhUwhNyk3A0zAC6tXzIcFV8TdJ0UXsDtUtn/Qy9sql5E7YCtQXPU30dtWqsLsdr87muyW1BN5Z9uZi3MmqQAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711727795; c=relaxed/simple;
-	bh=VA70TNqp6rYzQYotXWnZ+cUWcG2KLwGIWVRMg4W58hI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ga+dXH0WFBYqOQMwF/vhYPqDROZtou4zwyHZ0DBgosJbhPI/+4oX0a9JI20NoUbzFrR2UNAB4R14gIKwkEbF8yjmJnWDargQmzCl5oA6BKtritXdsPALwqqU4oX0hOosB0c5tlf0V+fvVh3uv09MWCCQ/f/BEpA5Oc6XMIl6PIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKF8iGrY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5620BC433F1;
-	Fri, 29 Mar 2024 15:56:34 +0000 (UTC)
+	s=arc-20240116; t=1711728361; c=relaxed/simple;
+	bh=xAO0MOQRzEEHjfZUz8OrPjqUg3u4o2CfCpy2srumAxk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A31sncvEAaknn9JCVhfpMPHE5xXRA2Pkr8zXciDpsrSVc0jJyhD5Cn8lhsl/03yy8hkDXGx64d8Z0PwlY8FhgVkwns57h4Xx8qLXvScJwpSE9KMI5viozQv6qXRIQ70NhQMjL1QUJtsi4I2Z9zO36mABnpuOApb4NIGhcm1tx/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIza9N1y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81F24C433C7;
+	Fri, 29 Mar 2024 16:06:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711727794;
-	bh=VA70TNqp6rYzQYotXWnZ+cUWcG2KLwGIWVRMg4W58hI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YKF8iGrYZpeLAzpZzAjVwo8jER3GDAKAo/jvGZ1UIugsYar3NoYAWxlJpaAl7laWC
-	 aJlB1viEM8FksuT3y32RSj9DPOwoI+M0cUQCF4ZJ9J2R705vArNy3RnjoymR4RrUjh
-	 HqOfl9Pj6YIheIKJnOa6q4VrsD8vku3qnQBNG5+8xXumz3PoGiOZttcJnnjWSd8VgO
-	 hUdLx64jOODV5wpWzwY3FQWESPokYUdoVSdXn8i5exbWhjENUN03b36VNrE9UZRk7k
-	 1u6WDZf+qn3mxwnYc9YKO8AJcj1PKiMHgCFsfzkFyJLuo/7seaJyavE89mFyfxFYUl
-	 E15HBw2b8IETA==
-Date: Fri, 29 Mar 2024 08:56:33 -0700
+	s=k20201202; t=1711728360;
+	bh=xAO0MOQRzEEHjfZUz8OrPjqUg3u4o2CfCpy2srumAxk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dIza9N1y3l9JKIw6+LpZ03JLXJS88OxCXzEFA4tXyE8deP2YTqiF6Ix/CqO5d4L2u
+	 9XG5OhZ9A+qUaoAhklw4xJywfW0gFRtFOWXn2eFG+L4noEJYXrimNTA5HF78yHniyE
+	 rQ53xhtD+ZEEbeDsR+bKBJjHeslW3TmVkoxHHRpsqjoAZVdxJvJPOThIUNiVdT9/N8
+	 myuE8F4mpu5h5N7muxqm5mofNcGanBiOyP6HgQiWpDGIcP2AyQP7B3FuklFAY+vZVD
+	 cwR8KJ8kH7HUa/BAdygNIf2nFLf5qfecP/f9ZQu0+All7aRRoFLgimv6WiRRLOdT9Q
+	 DPJsk6zX8JpIg==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: aleksander.lobakin@intel.com, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, Taras Chornyi <taras.chornyi@plvision.eu>,
- quic_jjohnson@quicinc.com, kvalo@kernel.org, leon@kernel.org,
- dennis.dalessandro@cornelisnetworks.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/5] net: marvell: prestera: allocate dummy
- net_device dynamically
-Message-ID: <20240329085633.2cfae5e5@kernel.org>
-In-Reply-To: <20240328235214.4079063-3-leitao@debian.org>
-References: <20240328235214.4079063-1-leitao@debian.org>
-	<20240328235214.4079063-3-leitao@debian.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	jbacik@fb.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: reuseaddr_conflict: add missing new line at the end of the output
+Date: Fri, 29 Mar 2024 09:05:59 -0700
+Message-ID: <20240329160559.249476-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 28 Mar 2024 16:52:02 -0700 Breno Leitao wrote:
-> -	init_dummy_netdev(&sdma->napi_dev);
-> +	sdma->napi_dev = alloc_netdev_dummy(0);
-> +	if (!sdma->napi_dev) {
-> +		dev_err(dev, "not able to initialize dummy device\n");
-> +		goto err_alloc_dummy;
-> +	}
-> +
->  
+The netdev CI runs in a VM and captures serial, so stdout and
+stderr get combined. Because there's a missing new line in
+stderr the test ends up corrupting KTAP:
 
-duplicated empty line here
+  # Successok 1 selftests: net: reuseaddr_conflict
 
-> -	netif_napi_add(&sdma->napi_dev, &sdma->rx_napi, prestera_sdma_rx_poll);
-> +	netif_napi_add(sdma->napi_dev, &sdma->rx_napi, prestera_sdma_rx_poll);
->  	napi_enable(&sdma->rx_napi);
->  
->  	return 0;
->  
-> +err_alloc_dummy:
-> +	prestera_hw_event_handler_unregister(sw, PRESTERA_EVENT_TYPE_RXTX,
-> +					     prestera_rxtx_handle_event);
->  err_evt_register:
->  err_tx_init:
->  	prestera_sdma_tx_fini(sdma);
-> @@ -682,6 +690,7 @@ static void prestera_sdma_switch_fini(struct prestera_switch *sw)
->  	prestera_sdma_tx_fini(sdma);
->  	prestera_sdma_rx_fini(sdma);
->  	dma_pool_destroy(sdma->desc_pool);
-> +	kfree(sdma->napi_dev);
+which should have been:
 
-Why kfree()? Let's use free_netdev() consistently, in case one day
-we have to undo something alloc_netdev_dummy() has done.
+  # Success
+  ok 1 selftests: net: reuseaddr_conflict
+
+Fixes: 422d8dc6fd3a ("selftest: add a reuseaddr test")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+Low risk and seems worth backporting to stable, hence the fixes tag.
+
+CC: shuah@kernel.org
+CC: jbacik@fb.com
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/reuseaddr_conflict.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/net/reuseaddr_conflict.c b/tools/testing/selftests/net/reuseaddr_conflict.c
+index 7c5b12664b03..bfb07dc49518 100644
+--- a/tools/testing/selftests/net/reuseaddr_conflict.c
++++ b/tools/testing/selftests/net/reuseaddr_conflict.c
+@@ -109,6 +109,6 @@ int main(void)
+ 	fd1 = open_port(0, 1);
+ 	if (fd1 >= 0)
+ 		error(1, 0, "Was allowed to create an ipv4 reuseport on an already bound non-reuseport socket with no ipv6");
+-	fprintf(stderr, "Success");
++	fprintf(stderr, "Success\n");
+ 	return 0;
+ }
+-- 
+2.44.0
+
 
