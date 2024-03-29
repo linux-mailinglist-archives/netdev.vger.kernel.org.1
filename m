@@ -1,118 +1,116 @@
-Return-Path: <netdev+bounces-83622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5263893344
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:38:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02669893333
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E3BE283DA1
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:38:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 341811F20EDE
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7F4155758;
-	Sun, 31 Mar 2024 16:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCFFC154BF0;
+	Sun, 31 Mar 2024 16:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="eh3CqDiO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h02OONrK"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC621552F8;
-	Sun, 31 Mar 2024 16:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7851482E7;
+	Sun, 31 Mar 2024 16:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711902521; cv=fail; b=dZURQHO0Pw8zA/CKMsJ1z1xjBkvT6Eosd4NU4xdBwFIuIQc7rsrZTs4dW/DtIPyOyHVYO5egageYl7fnPDBCo7h59mxW760r3sww1MBXdvmELBl8cjDZ91NHcBNAeTlRsrhdaKFA/4XsRq+eCGFcIaViN6YAEGe7AzISbp22LxM=
+	t=1711902516; cv=fail; b=jzFqbVqFlLIF2d29i7+YfCa914J4t7i95JWhtfdDvxhHt/yl2p8PTnFOAR6IUhUnodTPAbP6DnEVFAVP1XCt6ioJ+tQt+lYyiVOrLlIcTj/OLcOxuYQhuCPCbV48MHK9d2fMrF8yxBCP6H/ig6pIZPno8Luh8xQ6zgi7NjBdZGY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711902521; c=relaxed/simple;
-	bh=PsFO1FMw5hnntPRnMKOaKjRwVASCvx6bLvn3qH2unjs=;
+	s=arc-20240116; t=1711902516; c=relaxed/simple;
+	bh=8nfNkzh2/Qk/0WJb9WTzyiOj7a5Z5k2XIv/M2Qs+IV4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kbqwYthmzMs0JHrstYb9oPauO22D7RIzkkzWl+hesyziPFllWAoQW09MGTDiHQd1f6kbZtF010ZMXWEgvRdZwLAYSgpT05iXKQcNTPEaHDG3snn1SQKRa/g4hXvj3jatG8hbAuniiXyJFYNT6eShRXUssLrDuQ7rVltfCQZvrh4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=paul-moore.com; spf=fail smtp.mailfrom=paul-moore.com; dkim=fail (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=eh3CqDiO reason="signature verification failed"; arc=none smtp.client-ip=209.85.128.171; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; arc=fail smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=paul-moore.com
+	 To:Cc:Content-Type; b=navydjdWF8ZFkZU/QONDvqTSnStPAHzqbAYxljhgKWi4ewOww1kgDGdHMKuQCy5iiUADrTKPHWhMQCfFCcj3MxtPNo2SbCaLi9U1uq2OQqmIArmUGutYEyGGkGVLToaLegEkUV6ecX+6U2jd9Abg9DTSYoVnjx7FdbrSNzb7wXM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; dkim=fail (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h02OONrK reason="signature verification failed"; arc=none smtp.client-ip=209.85.221.54; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=fail smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 6968E208DB;
-	Sun, 31 Mar 2024 18:28:35 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id CB161208E1;
+	Sun, 31 Mar 2024 18:28:31 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y6CCrgg6n-rc; Sun, 31 Mar 2024 18:28:33 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	with ESMTP id PIAd1lYUSM4l; Sun, 31 Mar 2024 18:28:29 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id C3FC1208CC;
-	Sun, 31 Mar 2024 18:28:30 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com C3FC1208CC
+	by a.mx.secunet.com (Postfix) with ESMTPS id D433B208D0;
+	Sun, 31 Mar 2024 18:28:29 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D433B208D0
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id B6C1B800058;
-	Sun, 31 Mar 2024 18:28:30 +0200 (CEST)
+	by mailout2.secunet.com (Postfix) with ESMTP id C5299800057;
+	Sun, 31 Mar 2024 18:28:29 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:28:30 +0200
+ 15.1.2507.35; Sun, 31 Mar 2024 18:28:29 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 16:23:28 +0000
-X-sender: <netdev+bounces-83463-peter.schumann=secunet.com@vger.kernel.org>
+ 15.1.2507.17; Sun, 31 Mar 2024 16:23:31 +0000
+X-sender: <netdev+bounces-83464-peter.schumann=secunet.com@vger.kernel.org>
 X-Receiver: <peter.schumann@secunet.com>
  ORCPT=rfc822;peter.schumann@secunet.com NOTIFY=NEVER;
  X-ExtendedProps=BQAVABYAAgAAAAUAFAARAJ05ab4WgQhHsqdZ7WUjHykPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGAAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249UGV0ZXIgU2NodW1hbm41ZTcFAAsAFwC+AAAAQ5IZ35DtBUiRVnd98bETxENOPURCNCxDTj1EYXRhYmFzZXMsQ049RXhjaGFuZ2UgQWRtaW5pc3RyYXRpdmUgR3JvdXAgKEZZRElCT0hGMjNTUERMVCksQ049QWRtaW5pc3RyYXRpdmUgR3JvdXBzLENOPXNlY3VuZXQsQ049TWljcm9zb2Z0IEV4Y2hhbmdlLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUADgARAC7JU/le071Fhs0mWv1VtVsFAB0ADwAMAAAAbWJ4LWVzc2VuLTAxBQA8AAIAAA8ANgAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5EaXNwbGF5TmFtZQ8ADwAAAFNjaHVtYW5uLCBQZXRlcgUADAACAAAFAGwAAgAABQBYABcASAAAAJ05ab4WgQhHsqdZ7WUjHylDTj1TY2h1bWFubiBQZXRlcixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc
 	2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
-X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoAi5Hp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBPAAAAi4oAAAUABAAUIAEAAAAaAAAAcGV0ZXIuc2NodW1hbm5Ac2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAZAAPAAMAAABIdWI=
+X-HeloDomain: a.mx.secunet.com
+X-ExtendedProps: BQBjAAoAtpHp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBpAAAAi4oAAAUABAAUIAEAAAAaAAAAcGV0ZXIuc2NodW1hbm5Ac2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAZAAPAAMAAABIdWI=
 X-Source: SMTP:Default MBX-DRESDEN-01
-X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 16957
+X-SourceIPAddress: 62.96.220.36
+X-EndOfInjectedXHeaders: 15790
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=netdev+bounces-83463-peter.schumann=secunet.com@vger.kernel.org; receiver=peter.schumann@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com DDBC9200BB
-Authentication-Results: b.mx.secunet.com;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="eh3CqDiO"
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=netdev+bounces-83464-peter.schumann=secunet.com@vger.kernel.org; receiver=peter.schumann@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 216ED20897
 X-Original-To: netdev@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal: i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711747073; cv=none; b=IEFpzL+j6s4ROoZ9m+WmRtsDbZPWvRPaAOlVul1gnl+922OJOoBjb/HuCJ3iwPEDK1mF78WeWA2yuFgsFHBrCRseNrUIdkld7b6M1n5XUBTydlOahTDDwsLfuL7ySFyoJqk9bIJUeJ23RDhu4gE9DfMFDCA3hZRkhoyIXuxxLsQ=
+	t=1711747613; cv=none; b=o3hT6rBlhYRPp3nILeYSgLH5jgw3/ahNcI+sDsQW7a6Oq02j3c5prNzS0n5vJx9TVbZQcqIgvdV9HTstLuoPtW/jT0vcYIvofBPyJUl7qtv3N1ZcCALaUGLdrgZBAPv1JUH+kyrmT9ybQHjLzeMASpgNwI0hFSXpPucdmpDSanw=
 ARC-Message-Signature: i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711747073; c=relaxed/simple;
-	bh=qXxP9z1f9YIuDyEcTXldM/7w/7mNjSwV0ZwC3PgLpPs=;
+	s=arc-20240116; t=1711747613; c=relaxed/simple;
+	bh=GY2kYFst4z/jzDluAZKuRs3VnNLG/lJw8nm0VcFYikM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iZ+pad2noemRe/01E+nppjp0MEObj20OFHLBqEFQEGbrVDPrsnpzyZC3j6TkMX+iAI2SKfkfJZPryA9cdSbs8cT3eg17kcjOG/cgErTzcq5nIutU/92Nh3E4lr+/BIvO4oIGAREmu6M1jc+n/mYLSZOyKHVmg0y8K4fveH/xl18=
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=eh3CqDiO; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	 To:Cc:Content-Type; b=bvWQ2A0CseIsL9FgYjN6zPufVIpQqiRzxpxfWWir2S2bRrkalHeIYKni2SW9MnB9+iKThkvwKO+Zn5Zssl7qqHveQk51ff9EJpUn5NhPHVmY4QJ0TF4i9BP87FJsd1aA9g47SAdGsUrEEJEsLIDX4ANMZG8S1Gjnd1qw8tZdsRM=
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h02OONrK; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1711747070; x=1712351870; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711747610; x=1712352410; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5SK0aBd2Tg31RqeqE4efItlHudPBAE0xGZkol4kgIAk=;
-        b=eh3CqDiO/ILBM1o5Ike9xgWVppnr/6nU6Wz4cfl8fRvc2Tgi1/fBtVRtIWYTWDMKau
-         vVTbv78S4hRF6PSluag5YgKwILHMV6pCFCXWEvjHB7An/vD2npvCki/aQYeYNKkq9+vm
-         XCH6qUkq+YkCcar7lh3vJW14LIVzMOqpUzEb5OJW/C79skYDsPFCVpOZgBezr9c4wYi9
-         4CK0DOMNzLtislLVM9yQdSDVApHSu0jE7oN+fcC7dS9/NfOIPvZm4IEeNkRiWuwx7rb6
-         7L03w0rrFbr3Kw4rj0ioArMxEEJUECm9Bv0grqR+n7AnXY79/phZXa9PEkvgNQTgpM9C
-         rJYg==
+        bh=Kvv9NiziDyCYu9Ssy1MqwcYz3Obg+5qR7kJAYV5rLhc=;
+        b=h02OONrKn+4k88m3UEDllV8o8JUuB2NguuTGHZzCXHNiOAa9yBQIiaGmfQsGVV86q3
+         vwTm5pN9qCEJWhO3/1dihonK9iCD1MV6zVd13EikzldfB4dxhYg+3Wg6vO0czEsr1HAc
+         Xnut8+4zSVKD/nOdEua3WuEO6t2FYuiIILMfvrA145eDAhyL+bLHHiztPM0IEukc3eMT
+         QwkIybVK8O22yg5D4IKFhCt9QnTfLrqtSCdTICpGqqxHghVj4Ift5u/IfjSrR2EkEVNe
+         CwHVBQEan1clULUfxVR4imy+rZpP4IILFDkrBGL8rfHg7ZbgGF/FY9ZH05/vNFFyN9i4
+         L+ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711747070; x=1712351870;
+        d=1e100.net; s=20230601; t=1711747610; x=1712352410;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5SK0aBd2Tg31RqeqE4efItlHudPBAE0xGZkol4kgIAk=;
-        b=e7cVRi3/WlH6zhm2UHjhxjMNGMzCdBw0kiRNGZrD3F9Sy2FYI6dT0JzxAm6Q8e6/Y4
-         N3+Uhs00X1PHInoevWtoON7kMo8YWAkAs4VfYnTFSThnVc4wethbrw0HVWBw0e/Ww8oP
-         2EHTf37tsviNgSPAsg1JCId8d2geyyarVnyRYeZCsBQTTglBD/mlMiy2m2I4yB/sB6H1
-         bYnryK66excoEb9oSigbbsNp5+vkXgQw7SzIZXX1nq1+dSgmDcEhlO/DuoioUPXVaBc0
-         LXX7/KWDbTf9Q3O0NH+g7IOBDp/X/SNjkr3lY+cQM6yuiJnb9QzodPZNl8FR24dTed+C
-         yheg==
-X-Forwarded-Encrypted: i=1; AJvYcCUERtuOlGCNh+VMXzI33ZvBPsWzR2U2kdDvLuwNR7FnXsCvMA6GzCyTrDZsc8eU//coZbvHPe7F+R6hGzULlGg4z+TFtqPj
-X-Gm-Message-State: AOJu0YzcaDsBlcNbpASJA/SjYACTyIQrziKr/0R/QADNO9vmVTVlTSYN
-	fBH5u2AgnCCd3ByQxdGLKpOww36/eR1eh479SZIeXMFtTJ1As+WzAcJV4BnOch2p+YzXPFxySgk
-	ocDfstnl3/uh1PiAfXlkT8RCWbKlGKStG4TJy
-X-Google-Smtp-Source: AGHT+IGFGTkGUMvueIT/Rbb7ioKXQmsJLC9q2uWVMLN0FJu8IukA0N8cMfmV+QovgZ4y/9qL51xfw0+ynHKqeUiSvEg=
-X-Received: by 2002:a05:690c:dd0:b0:614:5b8c:9b9 with SMTP id
- db16-20020a05690c0dd000b006145b8c09b9mr1542912ywb.9.1711747070429; Fri, 29
- Mar 2024 14:17:50 -0700 (PDT)
+        bh=Kvv9NiziDyCYu9Ssy1MqwcYz3Obg+5qR7kJAYV5rLhc=;
+        b=AZml1tLtFlyP9+6qzsr/Y/Kp5igFrK2oUC/WIz//Zmu/5fSRzhVpw37aRWeKK6hdX/
+         FxsJBUEiOwP7rnH9cVh0eWtHbz2qaashwfXDE6sVeXzEDIGZGpGu23nNdVQXdmSsPoym
+         +exTdbi8fY0pCW6bB8Bl9QHeCnAfsqlPKJyaAjnrOHw5Qw9qdI1S9gC2eq0WbnVy6iHQ
+         7tLKPnU50UXa4ii7btWPm2rqB3S45MtzAeOOLaaKgubovEhMNhC+usRZ5ijfKdVYpIhu
+         bTcuciA022kGsoViz3poqnsJ0p8W9ojwHusnFV0FwDvrqrw9MTAV+LH+DM//g3kcbyjr
+         T4ig==
+X-Forwarded-Encrypted: i=1; AJvYcCUms6Y8mQXobn6Doc4LggzSXZfoQDIm/IKPAkO+/bgLih/BXEZjjKJJx2V38SsUeCaJy1R/1BisLsDktGAF092Q8+cQmdOHd3i65roTYjtnFDPo2/M4ZlO8bb6wJr5fOR5UJWeLxlciGCxFLtE/mIj3WRxJMuCKajUX
+X-Gm-Message-State: AOJu0YwDLEfVDuSKNNImIfCehbMu01XecTBUg/BxEe3Dr2BLV02Sld8L
+	HnQdjTLXkZXA3IHu11Z7n/x+G0xL6V5UIl2p3WAyQ6nodkCzPQbShE13cVc4xK07Mw0KAcUpPfT
+	hd4UbQzqEaNrmK52fddVQ5NxZI1I=
+X-Google-Smtp-Source: AGHT+IEhPG1B/8mDvGNpkDj4PWCUpLjQ708pGc8G6bha6o2gM1Lwf8UNLZI5EJ57kTgt1wZPIajCKtTg1SeDSsMj41A=
+X-Received: by 2002:a05:6000:24a:b0:33e:4238:8615 with SMTP id
+ m10-20020a056000024a00b0033e42388615mr1774070wrz.40.1711747609718; Fri, 29
+ Mar 2024 14:26:49 -0700 (PDT)
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -120,427 +118,69 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327120036.233641-1-mic@digikod.net> <bd62ac88-81bc-cee2-639a-a0ca79843265@huawei-partners.com>
- <CAHC9VhRN4deUerWtxxGypFH1o+NRD=Z+U96H2qB0xv+0d6ekEA@mail.gmail.com>
-In-Reply-To: <CAHC9VhRN4deUerWtxxGypFH1o+NRD=Z+U96H2qB0xv+0d6ekEA@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 29 Mar 2024 17:17:39 -0400
-Message-ID: <CAHC9VhSbOLR+yFbC6081UL87L2-SNV+gOBi2tD1YE7Th5hsGCw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] lsm: Check and handle error priority for
- socket_bind and socket_connect
-To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Cc: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>, "Serge E . Hallyn" <serge@hallyn.com>, 
-	yusongping <yusongping@huawei.com>, artem.kuzin@huawei.com
+References: <20240329094906.18147-1-ubizjak@gmail.com> <20240329094906.18147-2-ubizjak@gmail.com>
+In-Reply-To: <20240329094906.18147-2-ubizjak@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 29 Mar 2024 14:26:38 -0700
+Message-ID: <CAADnVQLZnkm8psPvmUOS1FDacXdJPxQ79rQJ33F00dkS9czw1Q@mail.gmail.com>
+Subject: Re: [PATCH RESEND bpf 1/2] x86/bpf: Fix IP after emitting call depth accounting
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: X86 ML <x86@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	=?UTF-8?Q?Joan_Bruguera_Mic=C3=B3?= <joanbrugueram@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Fri, Mar 29, 2024 at 4:07=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
-ote:
+On Fri, Mar 29, 2024 at 2:49=E2=80=AFAM Uros Bizjak <ubizjak@gmail.com> wro=
+te:
 >
-> On Thu, Mar 28, 2024 at 11:11=E2=80=AFAM Ivanov Mikhail
-> <ivanov.mikhail1@huawei-partners.com> wrote:
-> > On 3/27/2024 3:00 PM, Micka=C3=ABl Sala=C3=BCn wrote:
-> > > Because the security_socket_bind and the security_socket_bind hooks a=
-re
-> > > called before the network stack, it is easy to introduce error code
-> > > inconsistencies. Instead of adding new checks to current and future
-> > > LSMs, let's fix the related hook instead. The new checks are already
-> > > (partially) implemented by SELinux and Landlock, and it should not
-> > > change user space behavior but improve error code consistency instead=
-.
-> >
-> > It would probably be better to allow the network stack to perform such
-> > checks before calling LSM hooks. This may lead to following improvement=
-s:
+> From: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
 >
-> ...
+> Adjust the IP passed to `emit_patch` so it calculates the correct offset
+> for the CALL instruction if `x86_call_depth_emit_accounting` emits code.
+> Otherwise we will skip some instructions and most likely crash.
 >
-> > This may result in adding new method to socket->ops.
+> Fixes: b2e9dfe54be4 ("x86/bpf: Emit call depth accounting if required")
+> Link: https://lore.kernel.org/lkml/20230105214922.250473-1-joanbrugueram@=
+gmail.com/
+> Signed-off-by: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  arch/x86/net/bpf_jit_comp.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> I don't think there is a "may result" here, it will *require* a new
-> socket::proto_ops function (addr_validate?).  If you want to pursue
-> this with the netdev folks to see if they would be willing to adopt
-> such an approach I think that would be a great idea.  Just be warned,
-> there have been difficulties in the past when trying to get any sort
-> of LSM accommodations from the netdev folks.
-
-[Dropping alexey.kodanev@oracle.com due to email errors (unknown recipient)=
-]
-
-I'm looking at the possibility of doing the above and this is slowly
-coming back to me as to why we haven't seriously tried this in the
-past.  It's not as simple as calling one level down into a proto_ops
-function table, the proto_ops function table would then need to jump
-down into an associated proto function table.  Granted we aren't
-talking per-packet overhead, but I can see this having a measurable
-impact on connections/second benchmarks which likely isn't going to be
-a welcome change.
-
---=20
-paul-moore.com
-
-X-sender: <linux-security-module+bounces-2441-steffen.klassert=3Dcunet.com@=
-vger.kernel.org>
-X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Dc822;steffen.klassert@se=
-cunet.com NOTIFY=3DVER; X-ExtendedProps=3DAVABYAAgAAAAUAFAARAPDFCS25BAlDktI=
-I2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSX=
-NSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAA=
-AUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChG=
-WURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwA=
-XAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG=
-1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHc=
-m91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29u=
-ZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAw=
-AAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC=
-5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAwAAgAAB=
-QBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbixPVT1V=
-c2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1J=
-lc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1pY3Jvc2=
-9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb=
-3VwRXhwYW5zaW9uBQAjAAIAAQ=3D=0A=
-X-CreatedBy: MSExchange15
-X-HeloDomain: a.mx.secunet.com
-X-ExtendedProps: BQBjAAoAi5Hp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
-9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
-AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBQAAAAi4oAAAUABAAUIAEAAAAcAAAAc3RlZmZl=
-bi5rbGFzc2VydEBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQA=
-CAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBkAA8AAwAAAEh1Yg=3D=0A=
-X-Source: SMTP:Default MBX-DRESDEN-01
-X-SourceIPAddress: 62.96.220.36
-X-EndOfInjectedXHeaders: 17034
-Received: from cas-essen-01.secunet.de (10.53.40.201) by
- mbx-dresden-01.secunet.de (10.53.40.199) with Microsoft SMTP Server
- (version=3DS1_2, cipher=3DS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.37; Fri, 29 Mar 2024 22:18:02 +0100
-Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-01.secunet.de
- (10.53.40.201) with Microsoft SMTP Server (version=3DS1_2,
- cipher=3DS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Fri, 29 Mar 2024 22:18:02 +0100
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 83C28208A3
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:18:02 +0100 (CET)
-X-Virus-Scanned: by secunet
-X-Spam-Flag: NO
-X-Spam-Score: -5.051
-X-Spam-Level:
-X-Spam-Status: No, score=3D.051 tagged_above=3D99 required=3D1
-	tests=3DAYES_00=3D.9, DKIM_SIGNED=3D1, DKIM_VALID=3D.1,
-	DKIM_VALID_AU=3D.1, HEADER_FROM_DIFFERENT_DOMAINS=3D249,
-	MAILING_LIST_MULTI=3D, RCVD_IN_DNSWL_MED=3D.3, SPF_HELO_NONE=3D001,
-	SPF_PASS=3D.001] autolearn=3Dm autolearn_force=3D
-Authentication-Results: a.mx.secunet.com (amavisd-new);
-	dkim=3Dss (2048-bit key) header.d=3Dul-moore.com
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6rWfpHsXJeIC for <steffen.klassert@secunet.com>;
-	Fri, 29 Mar 2024 22:17:58 +0100 (CET)
-Received-SPF: Pass (sender SPF authorized) identity=3Dilfrom; client-ip=139=
-.178.88.99; helo=3D.mirrors.kernel.org; envelope-from=3Dnux-security-module=
-+bounces-2441-steffen.klassert=3Dcunet.com@vger.kernel.org; receiver=3Deffe=
-n.klassert@secunet.com=20
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 7949C20897
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99]=
-)
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 7949C20897
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:17:58 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
-5.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6F93284999
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 21:17:56 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6173B13B2B8;
-	Fri, 29 Mar 2024 21:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=3Dss (2048-bit key) header.d=3Dul-moore.com header.i=3Daul-moore.com =
-header.b=3Dh3CqDiO"
-X-Original-To: linux-security-module@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.1=
-28.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F05413792C
-	for <linux-security-module@vger.kernel.org>; Fri, 29 Mar 2024 21:17:51 +00=
-00 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=3Dne smtp.client-ip 9=
-.85.128.173
-ARC-Seal: i=3D a=3Da-sha256; d=3Dbspace.kernel.org; s=3Dc-20240116;
-	t=1711747073; cv=3Dne; b=3D0xxMrCvFvLIw7D410s0q3glAahyW/+EQm15kv5rP/KobURH=
-q0XpJsVzIHhLpPhUSQAMe5xP95NbG3uA6gS4o20mk3XEe+Ax+xauQ5EXkCwaDrt/OEtSIcWdQQe=
-Jbtc07hUGIFEY59MEey0aIPa2ekWA73VosMT7YiXtHX6MVAARC-Message-Signature: i=3D =
-a=3Da-sha256; d=3Dbspace.kernel.org;
-	s=3Dc-20240116; t=1711747073; c=3Dlaxed/simple;
-	bh=3DxP9z1f9YIuDyEcTXldM/7w/7mNjSwV0ZwC3PgLpPs=3D=0A=
-	h=3DME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=3D+pad2noemRe/01E+nppjp0MEObj20OFHLBqEFQEGbrVDPrsnp=
-zyZC3j6TkMX+iAI2SKfkfJZPryA9cdSbs8cT3eg17kcjOG/cgErTzcq5nIutU/92Nh3E4lr+/BI=
-vO4oIGAREmu6M1jc+n/mYLSZOyKHVmg0y8K4fveH/xl18ARC-Authentication-Results: i=
-=3D smtp.subspace.kernel.org; dmarc=3Dss (p=3Dne dis=3Dne) header.from=3Dul=
--moore.com; spf=3Dss smtp.mailfrom=3Dul-moore.com; dkim=3Dss (2048-bit key)=
- header.d=3Dul-moore.com header.i=3Daul-moore.com header.b=3D3CqDiO; arc=3D=
-ne smtp.client-ip 9.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dss (p=3Dne dis=3D=
-ne) header.from=3Dul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=3Dss smtp.mailfrom=3D=
-ul-moore.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-61149e5060=
-2so17688927b3.0
-        for <linux-security-module@vger.kernel.org>; Fri, 29 Mar 2024 14:17=
-:51 -0700 (PDT)
-DKIM-Signature: v=3D a=3Da-sha256; c=3Dlaxed/relaxed;
-        d=3Dul-moore.com; s=3Dogle; t=1711747070; x=1712351870; darn=3Der.k=
-ernel.org;
-        h=3Dntent-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3DK0aBd2Tg31RqeqE4efItlHudPBAE0xGZkol4kgIAk=3D=0A=
-        b=3D3CqDiO/ILBM1o5Ike9xgWVppnr/6nU6Wz4cfl8fRvc2Tgi1/fBtVRtIWYTWDMKa=
-u
-         vVTbv78S4hRF6PSluag5YgKwILHMV6pCFCXWEvjHB7An/vD2npvCki/aQYeYNKkq9+=
-vm
-         XCH6qUkq+YkCcar7lh3vJW14LIVzMOqpUzEb5OJW/C79skYDsPFCVpOZgBezr9c4wY=
-i9
-         4CK0DOMNzLtislLVM9yQdSDVApHSu0jE7oN+fcC7dS9/NfOIPvZm4IEeNkRiWuwx7r=
-b6
-         7L03w0rrFbr3Kw4rj0ioArMxEEJUECm9Bv0grqR+n7AnXY79/phZXa9PEkvgNQTgpM=
-9C
-         rJYg=3D=0A=
-X-Google-DKIM-Signature: v=3D a=3Da-sha256; c=3Dlaxed/relaxed;
-        d=1E100.net; s 230601; t=1711747070; x=1712351870;
-        h=3Dntent-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3DK0aBd2Tg31RqeqE4efItlHudPBAE0xGZkol4kgIAk=3D=0A=
-        b=3D7gkbCbMPuVxTRRjx9JBP4VfAihO2hPCp2YXAEWnSLdbiDiZ4DTWU6L5BH7XcDUS=
-B
-         /wU+n3p5Aj/p+cQpX5QEXfTzDlmXh+oLF7kC/OHUSw2L+D1kVUoA7TYv/ofQqvilgD=
-Qm
-         /IM+U3tX7wvz2mCkRpMF/8DOnhzRs/6R4RdbwmdnhEE028sOQnGFPGRHLv+j1JSRPo=
-4+
-         5fyk3JjZaV8SJ6c2JZtr27PKwVLIuxBTlDE41KlhYvxXJ5+VX+kn0AXM3cfmbGJje8=
-JI
-         51LflsTAAX2hdaXgqzPSidnVT4nviYPyQaqDYdLBN8bdF680rKvzulj7IPIpcu1LU8=
-OS
-         19MA=3D=0A=
-X-Forwarded-Encrypted: i=3D AJvYcCW1iHuqoUPf8eeB4lTRfg9A+9rDZzuxqsat70M7Y8L=
-7BtDcZdIgYuLy+9RGTx/ryj6FiQGpKCzMI05nIjQcjpdJhG5OIZH6isoZv548gSfOilUMblfw
-X-Gm-Message-State: AOJu0YyCrk2d1/wzo8za3da7BrXdJ0hNdy0nji6DM1yDcbRysdDzVVc=
-6
-	xJv8eOMJ6jTZ7UBEroyfLUYyL47RnAK4xXX2WrY89pXneGxcq01Sz1w5BICx1w8zubHrziIdwk=
-V
-	jyuOikvzrduDLkAiUHxfxmX3A0TmD8gSjvxWy
-X-Google-Smtp-Source: AGHT+IGFGTkGUMvueIT/Rbb7ioKXQmsJLC9q2uWVMLN0FJu8IukA0=
-N8cMfmV+QovgZ4y/9qL51xfw0+ynHKqeUiSvEgX-Received: by 2002:a05:690c:dd0:b0:6=
-14:5b8c:9b9 with SMTP id
- db16-20020a05690c0dd000b006145b8c09b9mr1542912ywb.9.1711747070429; Fri, 29
- Mar 2024 14:17:50 -0700 (PDT)
-Precedence: bulk
-X-Mailing-List: linux-security-module@vger.kernel.org
-List-Id: <linux-security-module.vger.kernel.org>
-List-Subscribe: <mailto:linux-security-module+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-security-module+unsubscribe@vger.kernel.org=
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index a7ba8e178645..09f7dc9d4d65 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -479,9 +479,10 @@ static int emit_call(u8 **pprog, void *func, void *i=
+p)
 >
-MIME-Version: 1.0
-References: <20240327120036.233641-1-mic@digikod.net> <bd62ac88-81bc-cee2-6=
-39a-a0ca79843265@huawei-partners.com>
- <CAHC9VhRN4deUerWtxxGypFH1o+NRD=3DU96H2qB0xv+0d6ekEA@mail.gmail.com>
-In-Reply-To: <CAHC9VhRN4deUerWtxxGypFH1o+NRD=3DU96H2qB0xv+0d6ekEA@mail.gmai=
-l.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 29 Mar 2024 17:17:39 -0400
-Message-ID: <CAHC9VhSbOLR+yFbC6081UL87L2-SNV+gOBi2tD1YE7Th5hsGCw@mail.gmail=
-.com>
-Subject: Re: [PATCH v1 1/2] lsm: Check and handle error priority for
- socket_bind and socket_connect
-To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Cc: =3DTF-8?B?TWlja2HDq2wgU2FsYcO8bg=3D=3Dic@digikod.net>,=20
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,=20
-	Eric Dumazet <edumazet@google.com>, =3DTF-8?Q?G=C3=BCnther_Noack?=3Dnoack@=
-google.com>,=20
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>,=20
-	Muhammad Usama Anjum <usama.anjum@collabora.com>, "Serge E . Hallyn" <serg=
-e@hallyn.com>,=20
-	yusongping <yusongping@huawei.com>, artem.kuzin@huawei.com
-Content-Type: text/plain; charset=3DTF-8"
-Content-Transfer-Encoding: quoted-printable
-Return-Path: linux-security-module+bounces-2441-steffen.klassert=3Dcunet.co=
-m@vger.kernel.org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 21:18:02.5569
- (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: da0fa88a-324e-4f61-834d-08dc=
-5035b7b8
-X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
-X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.201
-X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-01.s=
-ecunet.de
-X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dx-dres=
-den-01.secunet.de:TOTAL-HUB=3D442|SMR=3D358(SMRDE=3D034|SMRC=3D323(SMRCL=3D=
-101|X-SMRCR=3D323))|CAT=3D083(CATOS=3D012
- (CATSM=3D012(CATSM-Malware
- Agent=3D012))|CATRESL=3D039(CATRESLP2R=3D021)|CATORES=3D027
- (CATRS=3D027(CATRS-Index Routing
- Agent=3D026))|CATORT=3D002(CATRT=3D002(CATRT-Journal Agent=3D001
- )));2024-03-29T21:18:03.005Z
-X-MS-Exchange-Forest-ArrivalHubServer: mbx-dresden-01.secunet.de
-X-MS-Exchange-Organization-AuthSource: cas-essen-01.secunet.de
-X-MS-Exchange-Organization-AuthAs: Anonymous
-X-MS-Exchange-Organization-FromEntityHeader: Internet
-X-MS-Exchange-Organization-OriginalSize: 10697
-X-MS-Exchange-Organization-HygienePolicy: Standard
-X-MS-Exchange-Organization-MessageLatency: SRV=CAs-essen-01.secunet.de:TOTA=
-L-FE=3D008|SMR=3D008(SMRPI=3D006(SMRPI-FrontendProxyAgent=3D006))
-X-MS-Exchange-Organization-AVStamp-Enterprise: 1.0
-X-MS-Exchange-Organization-Recipient-Limit-Verified: True
-X-MS-Exchange-Organization-TotalRecipientCount: 1
-X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
--482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
-0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
-6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
-X-MS-Exchange-Forest-RulesExecuted: mbx-dresden-01
-X-MS-Exchange-Organization-RulesExecuted: mbx-dresden-01
-X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAdkFAAAPAAADH4sIAAAAAAAEAHVVy24b=
-NxSlrLdk2S3STX
- cX6SJJYSu2EyCtEbhp0QdUxGiAdFcUBjVDeViNSJXkSNGuv9Dv6KI/
- 0F3+pF/Sc8mRrCYIMBpwSN7Dc8+5l/rz+CdD3zt9QtfS0cWXJ3Rxdv
- GUZKCnl2fP/v3j71fX9EpWJV1b6xQ9X2L8gl+nC54YZ3ZxRWtng7oc
- Da7wEPB+Lqoa74s7vPPzy/NzAH59TZOVNHZF13peSF1y0HMdp8aLNH
- X+oqjkWunTpXTBKOffOYfiMU8eXzx7HOGfXJ6d0atrHKqzuXz7V0mv
- ZSnf/mP+F3JF36hMVl5RKBR5lVVOh82Nt9lchZupNjlJ/D64WFg79y
- Sd2sJlsixVTlM1Y204zqiwtm5OPshsfkI6kPakpN9QsKRNcDavMkXK
- Oesos/kOSpvMGq99UCbTyo9pYjCWOdkZyTzX5hbYa8oKlYEDwMDPKR
- Mi41kVqjtWL19f+xMqVXjgaabfRF5OlTKolALOitBj+KT2UZEZydJh
- abPFesgGaKS5eUR6sSzVAmdyyht6/d1Lbao3kcBLvErLGfMXsvaFrc
- qcjA07rQppbhVBfUd+KSHCVBVypaHDtAoM7uxqXxm6E2SzoxzREuQk
- 0DoegsCpnJYbAOIJAQdAH3C26/c94aWlcjBsQb7KioRVC1Abybay4B
- Ayec5KwceF3EBWeAKMmWV83lUzZ2H8tgfG43E9uroLdcpXJTI1+4Yu
- VChsREyVdnpll34bPKHcmgcBWWgz51xADmCS7t/h3SeejqW21mVJnz
- v1e6Wd+hzbcADDJOTLS/AM9gb4KBiTBW0NPQQVd7OSpc5RH189GhNN
- ZrSxFa0liovFqpyvYm0FTmStQ7FVNVcr1iHVo1fgNuOlTe0L7GBGnC
- n7kdtlLAZWHWVCcgk+EuPJLj8Z7kIl3aISIVeuJFj9WPkQEaUzKj9J
- fFgP1BDbrgzlejbTGSRB/7DKzHIpEbYusBrcpmZyq7hrNpDFRULoMH
- ZaZrhjFhY6QBhI5OzivURhzGjwy7fOLpcMJkv1Rm3GcwQZtXphnczK
- eCVSXik+Si1wmaWa9vSwMnNj1wbGZXqpUS+PfmW8yYMFlSiziBgSbe
- u9nuoSNxDTy22kjgU55SZJtxTcwONRhiX6Fafypmld4wvsir6sC/iR
- ZOJSQvtpW3l0S3BabWGiWKMBq8UVwDcHWpcRfOx6Hm27whqFLlipEr
- SQDC41mEu72hoNdsUV0JWozJjQ+6UXV2u/AztklIqN8Fu1WI4Ge+Co
- FY8a1vEGi0jvoIDzD07Giwmp4hpDpqNBkGXUFO2O/xFuAYJ4rkAHn8
- Q7Z4KcTCzcqALfRmwBtJO+cgw8GiB9mSHQ8HVkVDzUP8bfgzVcpiYr
- FtKhA9aFRimXeq4grfYs9a2tC24KHAlmJTxS9UUYK+n0lDXf/y/lWS
- EORLMp2s2GOMQjWgei1RLtg0azK0RX9DBui26rIe6Jdhx3mvwefSiq
- J0RP9Dui2xWHnYb4THTTJ94x8BCBjYbo4xEHGLca7XhQH2dhW1scYd
- AUrV5DfBIDAYvPd2YijSHGeLCEEJAEGgOChmj2xQB7WuLwWHyMVcyk
- nZ24LR3REUct0YlQrQSC2C7zbKWdcfKjvhgOI+2amBg0Od8EONzxiQ
- kmJji3jZCuuIdtaSntT5+7bQmzJQYpkYTf3qa8S+RQUJpJCPuJdDhk
- 2BAH7ZhIwmywNdgA5E4UpNNlvQ+afEqvzcp3UiKwdSTavdrN+sQO5q
- PX6ZSEmVJOmSbaMZd+CulF/JT4lkP67G4xh2kVz+HecXhSIknzVoTF
- 4Egc7xEYcgk1xKdRopR+4gNMZITJvjhOqqbw5FeSOr23NHqdLaXdk6
- AiSKqZdqrt1taInXdbg+pEOMdaTGjYb0die/L2kyNpczJiNx5EQeKe
- 3rY+eQDhBjHrVGbRtaQMC4XPAdoqkhnGQcJJNiXlD2JUFOoYo6PULP
- 8Btex2bXoLAAABCskDPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGlu
- Zz0idXRmLTE2Ij8+DQo8RW1haWxTZXQ+DQogIDxWZXJzaW9uPjE1Lj
- AuMC4wPC9WZXJzaW9uPg0KICA8RW1haWxzPg0KICAgIDxFbWFpbCBT
- dGFydEluZGV4PSI0NCIgUG9zaXRpb249IlNpZ25hdHVyZSI+DQogIC
- AgICA8RW1haWxTdHJpbmc+cGF1bEBwYXVsLW1vb3JlLmNvbTwvRW1h
- aWxTdHJpbmc+DQogICAgPC9FbWFpbD4NCiAgICA8RW1haWwgU3Rhcn
- RJbmRleD0iMTMwIj4NCiAgICAgIDxFbWFpbFN0cmluZz5pdmFub3Yu
- bWlraGFpbDFAaHVhd2VpLXBhcnRuZXJzLmNvbTwvRW1haWxTdHJpbm
- c+DQogICAgPC9FbWFpbD4NCiAgICA8RW1haWwgU3RhcnRJbmRleD0i
- MTMzMyI+DQogICAgICA8RW1haWxTdHJpbmc+YWxleGV5LmtvZGFuZX
- ZAb3JhY2xlLmNvbTwvRW1haWxTdHJpbmc+DQogICAgPC9FbWFpbD4N
- CiAgPC9FbWFpbHM+DQo8L0VtYWlsU2V0PgEL0QE8P3htbCB2ZXJzaW
- 9uPSIxLjAiIGVuY29kaW5nPSJ1dGYtMTYiPz4NCjxVcmxTZXQ+DQog
- IDxWZXJzaW9uPjE1LjAuMC4wPC9WZXJzaW9uPg0KICA8VXJscz4NCi
- AgICA8VXJsIFN0YXJ0SW5kZXg9IjE5MTMiIFR5cGU9IlVybCI+DQog
- ICAgICA8VXJsU3RyaW5nPnBhdWwtbW9vcmUuY29tPC9VcmxTdHJpbm
- c+DQogICAgPC9Vcmw+DQogIDwvVXJscz4NCjwvVXJsU2V0PgEMwAc8
- P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJ1dGYtMTYiPz4NCj
- xDb250YWN0U2V0Pg0KICA8VmVyc2lvbj4xNS4wLjAuMDwvVmVyc2lv
- bj4NCiAgPENvbnRhY3RzPg0KICAgIDxDb250YWN0IFN0YXJ0SW5kZX
- g9IjMyIiBQb3NpdGlvbj0iU2lnbmF0dXJlIj4NCiAgICAgIDxQZXJz
- b24gU3RhcnRJbmRleD0iMzIiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg
- 0KICAgICAgICA8UGVyc29uU3RyaW5nPlBhdWwgTW9vcmU8L1BlcnNv
- blN0cmluZz4NCiAgICAgIDwvUGVyc29uPg0KICAgICAgPEVtYWlscz
- 4NCiAgICAgICAgPEVtYWlsIFN0YXJ0SW5kZXg9IjQ0IiBQb3NpdGlv
- bj0iU2lnbmF0dXJlIj4NCiAgICAgICAgICA8RW1haWxTdHJpbmc+cG
- F1bEBwYXVsLW1vb3JlLmNvbTwvRW1haWxTdHJpbmc+DQogICAgICAg
- IDwvRW1haWw+DQogICAgICA8L0VtYWlscz4NCiAgICAgIDxDb250YW
- N0U3RyaW5nPlBhdWwgTW9vcmUgJmx0O3BhdWxAcGF1bC1tb29yZS5j
- b208L0NvbnRhY3RTdHJpbmc+DQogICAgPC9Db250YWN0Pg0KICAgID
- xDb250YWN0IFN0YXJ0SW5kZXg9IjExMSI+DQogICAgICA8UGVyc29u
- IFN0YXJ0SW5kZXg9IjExMSI+DQogICAgICAgIDxQZXJzb25TdHJpbm
- c+SXZhbm92IE1pa2hhaWw8L1BlcnNvblN0cmluZz4NCiAgICAgIDwv
- UGVyc29uPg0KICAgICAgPEVtYWlscz4NCiAgICAgICAgPEVtYWlsIF
- N0YXJ0SW5kZXg9IjEzMCI+DQogICAgICAgICAgPEVtYWlsU3RyaW5n
- Pml2YW5vdi5taWtoYWlsMUBodWF3ZWktcGFydG5lcnMuY29tPC9FbW
- FpbFN0cmluZz4NCiAgICAgICAgPC9FbWFpbD4NCiAgICAgIDwvRW1h
- aWxzPg0KICAgICAgPENvbnRhY3RTdHJpbmc+SXZhbm92IE1pa2hhaW
- wNCiZndDsgJmx0O2l2YW5vdi5taWtoYWlsMUBodWF3ZWktcGFydG5l
- cnMuY29tPC9Db250YWN0U3RyaW5nPg0KICAgIDwvQ29udGFjdD4NCi
- AgPC9Db250YWN0cz4NCjwvQ29udGFjdFNldD4BDs8BUmV0cmlldmVy
- T3BlcmF0b3IsMTAsMDtSZXRyaWV2ZXJPcGVyYXRvciwxMSwxO1Bvc3
- REb2NQYXJzZXJPcGVyYXRvciwxMCwwO1Bvc3REb2NQYXJzZXJPcGVy
- YXRvciwxMSwwO1Bvc3RXb3JkQnJlYWtlckRpYWdub3N0aWNPcGVyYX
- RvciwxMCwwO1Bvc3RXb3JkQnJlYWtlckRpYWdub3N0aWNPcGVyYXRv
- ciwxMSwwO1RyYW5zcG9ydFdyaXRlclByb2R1Y2VyLDIwLDE1
-X-MS-Exchange-Forest-IndexAgent: 1 3357
-X-MS-Exchange-Forest-EmailMessageHash: 7C7AEC4C
-X-MS-Exchange-Forest-Language: en
-X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
+>  static int emit_rsb_call(u8 **pprog, void *func, void *ip)
+>  {
+> +       void *adjusted_ip;
+>         OPTIMIZER_HIDE_VAR(func);
+> -       x86_call_depth_emit_accounting(pprog, func);
+> -       return emit_patch(pprog, func, ip, 0xE8);
+> +       adjusted_ip =3D ip + x86_call_depth_emit_accounting(pprog, func);
 
-On Fri, Mar 29, 2024 at 4:07=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
-ote:
+Why not just
+ip +=3D x86_call_depth_emit_accounting(pprog, func);
+
+?
+
+> +       return emit_patch(pprog, func, adjusted_ip, 0xE8);
+>  }
 >
-> On Thu, Mar 28, 2024 at 11:11=E2=80=AFAM Ivanov Mikhail
-> <ivanov.mikhail1@huawei-partners.com> wrote:
-> > On 3/27/2024 3:00 PM, Micka=C3=ABl Sala=C3=BCn wrote:
-> > > Because the security_socket_bind and the security_socket_bind hooks a=
-re
-> > > called before the network stack, it is easy to introduce error code
-> > > inconsistencies. Instead of adding new checks to current and future
-> > > LSMs, let's fix the related hook instead. The new checks are already
-> > > (partially) implemented by SELinux and Landlock, and it should not
-> > > change user space behavior but improve error code consistency instead=
-.
-> >
-> > It would probably be better to allow the network stack to perform such
-> > checks before calling LSM hooks. This may lead to following improvement=
-s:
+>  static int emit_jump(u8 **pprog, void *func, void *ip)
+> --
+> 2.44.0
 >
-> ...
->
-> > This may result in adding new method to socket->ops.
->
-> I don't think there is a "may result" here, it will *require* a new
-> socket::proto_ops function (addr_validate?).  If you want to pursue
-> this with the netdev folks to see if they would be willing to adopt
-> such an approach I think that would be a great idea.  Just be warned,
-> there have been difficulties in the past when trying to get any sort
-> of LSM accommodations from the netdev folks.
 
-[Dropping alexey.kodanev@oracle.com due to email errors (unknown recipient)=
-]
-
-I'm looking at the possibility of doing the above and this is slowly
-coming back to me as to why we haven't seriously tried this in the
-past.  It's not as simple as calling one level down into a proto_ops
-function table, the proto_ops function table would then need to jump
-down into an associated proto function table.  Granted we aren't
-talking per-packet overhead, but I can see this having a measurable
-impact on connections/second benchmarks which likely isn't going to be
-a welcome change.
-
---=20
-paul-moore.com
-
-X-sender: <netdev+bounces-83463-steffen.klassert=3Dcunet.com@vger.kernel.or=
+X-sender: <netdev+bounces-83464-steffen.klassert=3Dcunet.com@vger.kernel.or=
 g>
 X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Dc822;steffen.klassert@se=
 cunet.com NOTIFY=3DVER; X-ExtendedProps=3DAVABYAAgAAAAUAFAARAPDFCS25BAlDktI=
@@ -563,192 +203,189 @@ X-CreatedBy: MSExchange15
 X-HeloDomain: a.mx.secunet.com
 X-ExtendedProps: BQBjAAoAi5Hp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
 9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
-AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBRAAAAi4oAAAUABAAUIAEAAAAcAAAAc3RlZmZl=
+AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBqAAAAi4oAAAUABAAUIAEAAAAcAAAAc3RlZmZl=
 bi5rbGFzc2VydEBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQA=
 CAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBkAA8AAwAAAEh1Yg=3D=0A=
 X-Source: SMTP:Default MBX-DRESDEN-01
 X-SourceIPAddress: 62.96.220.36
-X-EndOfInjectedXHeaders: 16836
+X-EndOfInjectedXHeaders: 15806
 Received: from cas-essen-01.secunet.de (10.53.40.201) by
  mbx-dresden-01.secunet.de (10.53.40.199) with Microsoft SMTP Server
  (version=3DS1_2, cipher=3DS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.37; Fri, 29 Mar 2024 22:18:06 +0100
+ 15.1.2507.37; Fri, 29 Mar 2024 22:27:05 +0100
 Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-01.secunet.de
  (10.53.40.201) with Microsoft SMTP Server (version=3DS1_2,
  cipher=3DS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Fri, 29 Mar 2024 22:18:06 +0100
+ Transport; Fri, 29 Mar 2024 22:27:05 +0100
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id ED14E208A3
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:18:06 +0100 (CET)
+	by a.mx.secunet.com (Postfix) with ESMTP id D2D3020897
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:27:05 +0100 (CET)
 X-Virus-Scanned: by secunet
 X-Spam-Flag: NO
-X-Spam-Score: -2.751
+X-Spam-Score: -2.749
 X-Spam-Level:
-X-Spam-Status: No, score=3D.751 tagged_above=3D99 required=3D1
+X-Spam-Status: No, score=3D.749 tagged_above=3D99 required=3D1
 	tests=3DAYES_00=3D.9, DKIM_SIGNED=3D1, DKIM_VALID=3D.1,
-	DKIM_VALID_AU=3D.1, HEADER_FROM_DIFFERENT_DOMAINS=3D249,
+	DKIM_VALID_AU=3D.1, FREEMAIL_FORGED_FROMDOMAIN=3D001,
+	FREEMAIL_FROM=3D001, HEADER_FROM_DIFFERENT_DOMAINS=3D249,
 	MAILING_LIST_MULTI=3D, RCVD_IN_DNSWL_NONE=3D.0001,
 	SPF_HELO_NONE=3D001, SPF_PASS=3D.001]
 	autolearn=3Davailable autolearn_force=3D
 Authentication-Results: a.mx.secunet.com (amavisd-new);
-	dkim=3Dss (2048-bit key) header.d=3Dul-moore.com
+	dkim=3Dss (2048-bit key) header.d=3Dail.com
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oDDZ24243v52 for <steffen.klassert@secunet.com>;
-	Fri, 29 Mar 2024 22:18:03 +0100 (CET)
+	with ESMTP id loUNJzs71Z7j for <steffen.klassert@secunet.com>;
+	Fri, 29 Mar 2024 22:27:04 +0100 (CET)
 Received-SPF: Pass (sender SPF authorized) identity=3Dilfrom; client-ip=147=
-.75.48.161; helo=3D.mirrors.kernel.org; envelope-from=3Dtdev+bounces-83463-=
-steffen.klassert=3Dcunet.com@vger.kernel.org; receiver=3Deffen.klassert@sec=
-unet.com=20
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com C717420897
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161]=
-)
+.75.199.223; helo=3D.mirrors.kernel.org; envelope-from=3Dtdev+bounces-83464=
+-steffen.klassert=3Dcunet.com@vger.kernel.org; receiver=3Deffen.klassert@se=
+cunet.com=20
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 8242220892
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223=
+])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id C717420897
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:18:02 +0100 (CET)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 8242220892
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:27:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
 5.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA490B2280D
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 21:17:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FB5A1C20AE8
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 21:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59A813BAEF;
-	Fri, 29 Mar 2024 21:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79EE13BC09;
+	Fri, 29 Mar 2024 21:26:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=3Dss (2048-bit key) header.d=3Dul-moore.com header.i=3Daul-moore.com =
-header.b=3Dh3CqDiO"
+	dkim=3Dss (2048-bit key) header.d=3Dail.com header.i=3Dmail.com header.b=
+=3D02OONrK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.1=
-28.171])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221=
+.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABE238FAD
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 21:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910E138FAD;
+	Fri, 29 Mar 2024 21:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=3Dne smtp.client-ip 9=
-.85.128.171
+.85.221.54
 ARC-Seal: i=3D a=3Da-sha256; d=3Dbspace.kernel.org; s=3Dc-20240116;
-	t=1711747073; cv=3Dne; b=3DFpzL+j6s4ROoZ9m+WmRtsDbZPWvRPaAOlVul1gnl+922OJO=
-oBjb/HuCJ3iwPEDK1mF78WeWA2yuFgsFHBrCRseNrUIdkld7b6M1n5XUBTydlOahTDDwsLfuL7y=
-SFyoJqk9bIJUeJ23RDhu4gE9DfMFDCA3hZRkhoyIXuxxLsQARC-Message-Signature: i=3D =
+	t=1711747613; cv=3Dne; b=3DhT6rBlhYRPp3nILeYSgLH5jgw3/ahNcI+sDsQW7a6Oq02j3=
+c5prNzS0n5vJx9TVbZQcqIgvdV9HTstLuoPtW/jT0vcYIvofBPyJUl7qtv3N1ZcCALaUGLdrgZB=
+APv1JUH+kyrmT9ybQHjLzeMASpgNwI0hFSXpPucdmpDSanwARC-Message-Signature: i=3D =
 a=3Da-sha256; d=3Dbspace.kernel.org;
-	s=3Dc-20240116; t=1711747073; c=3Dlaxed/simple;
-	bh=3DxP9z1f9YIuDyEcTXldM/7w/7mNjSwV0ZwC3PgLpPs=3D=0A=
+	s=3Dc-20240116; t=1711747613; c=3Dlaxed/simple;
+	bh=3D2kYFst4z/jzDluAZKuRs3VnNLG/lJw8nm0VcFYikM=3D=0A=
 	h=3DME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=3D+pad2noemRe/01E+nppjp0MEObj20OFHLBqEFQEGbrVDPrsnp=
-zyZC3j6TkMX+iAI2SKfkfJZPryA9cdSbs8cT3eg17kcjOG/cgErTzcq5nIutU/92Nh3E4lr+/BI=
-vO4oIGAREmu6M1jc+n/mYLSZOyKHVmg0y8K4fveH/xl18ARC-Authentication-Results: i=
-=3D smtp.subspace.kernel.org; dmarc=3Dss (p=3Dne dis=3Dne) header.from=3Dul=
--moore.com; spf=3Dss smtp.mailfrom=3Dul-moore.com; dkim=3Dss (2048-bit key)=
- header.d=3Dul-moore.com header.i=3Daul-moore.com header.b=3D3CqDiO; arc=3D=
-ne smtp.client-ip 9.85.128.171
+	 To:Cc:Content-Type; b=3DWQ2A0CseIsL9FgYjN6zPufVIpQqiRzxpxfWWir2S2bRrkalHe=
+IYKni2SW9MnB9+iKThkvwKO+Zn5Zssl7qqHveQk51ff9EJpUn5NhPHVmY4QJ0TF4i9BP87FJsd1=
+aA9g47SAdGsUrEEJEsLIDX4ANMZG8S1Gjnd1qw8tZdsRMARC-Authentication-Results: i=
+=3D smtp.subspace.kernel.org; dmarc=3Dss (p=3Dne dis=3Dne) header.from=3Dai=
+l.com; spf=3Dss smtp.mailfrom=3Dail.com; dkim=3Dss (2048-bit key) header.d=
+=3Dail.com header.i=3Dmail.com header.b=3D2OONrK; arc=3Dne smtp.client-ip 9=
+.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dss (p=3Dne dis=3D=
-ne) header.from=3Dul-moore.com
+ne) header.from=3Dail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=3Dss smtp.mailfrom=3D=
-ul-moore.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-611639a0e4=
-eso21177477b3.0
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 14:17:51 -0700 (PDT)
+ail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-341c9926f98=
+so1441462f8f.1;
+        Fri, 29 Mar 2024 14:26:51 -0700 (PDT)
 DKIM-Signature: v=3D a=3Da-sha256; c=3Dlaxed/relaxed;
-        d=3Dul-moore.com; s=3Dogle; t=1711747070; x=1712351870; darn=3Der.k=
-ernel.org;
+        d=3Dail.com; s 230601; t=1711747610; x=1712352410; darn=3Der.kernel=
+.org;
         h=3Dntent-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3DK0aBd2Tg31RqeqE4efItlHudPBAE0xGZkol4kgIAk=3D=0A=
-        b=3D3CqDiO/ILBM1o5Ike9xgWVppnr/6nU6Wz4cfl8fRvc2Tgi1/fBtVRtIWYTWDMKa=
-u
-         vVTbv78S4hRF6PSluag5YgKwILHMV6pCFCXWEvjHB7An/vD2npvCki/aQYeYNKkq9+=
-vm
-         XCH6qUkq+YkCcar7lh3vJW14LIVzMOqpUzEb5OJW/C79skYDsPFCVpOZgBezr9c4wY=
-i9
-         4CK0DOMNzLtislLVM9yQdSDVApHSu0jE7oN+fcC7dS9/NfOIPvZm4IEeNkRiWuwx7r=
-b6
-         7L03w0rrFbr3Kw4rj0ioArMxEEJUECm9Bv0grqR+n7AnXY79/phZXa9PEkvgNQTgpM=
-9C
-         rJYg=3D=0A=
+        bh=3Dv9NiziDyCYu9Ssy1MqwcYz3Obg+5qR7kJAYV5rLhc=3D=0A=
+        b=3D2OONrKn+4k88m3UEDllV8o8JUuB2NguuTGHZzCXHNiOAa9yBQIiaGmfQsGVV86q=
+3
+         vwTm5pN9qCEJWhO3/1dihonK9iCD1MV6zVd13EikzldfB4dxhYg+3Wg6vO0czEsr1H=
+Ac
+         Xnut8+4zSVKD/nOdEua3WuEO6t2FYuiIILMfvrA145eDAhyL+bLHHiztPM0IEukc3e=
+MT
+         QwkIybVK8O22yg5D4IKFhCt9QnTfLrqtSCdTICpGqqxHghVj4Ift5u/IfjSrR2EkEV=
+Ne
+         CwHVBQEan1clULUfxVR4imy+rZpP4IILFDkrBGL8rfHg7ZbgGF/FY9ZH05/vNFFyN9=
+i4
+         L+ZQ=3D=0A=
 X-Google-DKIM-Signature: v=3D a=3Da-sha256; c=3Dlaxed/relaxed;
-        d=1E100.net; s 230601; t=1711747070; x=1712351870;
+        d=1E100.net; s 230601; t=1711747610; x=1712352410;
         h=3Dntent-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3DK0aBd2Tg31RqeqE4efItlHudPBAE0xGZkol4kgIAk=3D=0A=
-        b=E7cVRi3/WlH6zhm2UHjhxjMNGMzCdBw0kiRNGZrD3F9Sy2FYI6dT0JzxAm6Q8e6/Y=
-4
-         N3+Uhs00X1PHInoevWtoON7kMo8YWAkAs4VfYnTFSThnVc4wethbrw0HVWBw0e/Ww8=
-oP
-         2EHTf37tsviNgSPAsg1JCId8d2geyyarVnyRYeZCsBQTTglBD/mlMiy2m2I4yB/sB6=
-H1
-         bYnryK66excoEb9oSigbbsNp5+vkXgQw7SzIZXX1nq1+dSgmDcEhlO/DuoioUPXVaB=
-c0
-         LXX7/KWDbTf9Q3O0NH+g7IOBDp/X/SNjkr3lY+cQM6yuiJnb9QzodPZNl8FR24dTed=
-+C
-         yheg=3D=0A=
-X-Forwarded-Encrypted: i=3D AJvYcCUERtuOlGCNh+VMXzI33ZvBPsWzR2U2kdDvLuwNR7F=
-nXsCvMA6GzCyTrDZsc8eU//coZbvHPe7F+R6hGzULlGg4z+TFtqPj
-X-Gm-Message-State: AOJu0YzcaDsBlcNbpASJA/SjYACTyIQrziKr/0R/QADNO9vmVTVlTSY=
-N
-	fBH5u2AgnCCd3ByQxdGLKpOww36/eR1eh479SZIeXMFtTJ1As+WzAcJV4BnOch2p+YzXPFxySg=
-k
-	ocDfstnl3/uh1PiAfXlkT8RCWbKlGKStG4TJy
-X-Google-Smtp-Source: AGHT+IGFGTkGUMvueIT/Rbb7ioKXQmsJLC9q2uWVMLN0FJu8IukA0=
-N8cMfmV+QovgZ4y/9qL51xfw0+ynHKqeUiSvEgX-Received: by 2002:a05:690c:dd0:b0:6=
-14:5b8c:9b9 with SMTP id
- db16-20020a05690c0dd000b006145b8c09b9mr1542912ywb.9.1711747070429; Fri, 29
- Mar 2024 14:17:50 -0700 (PDT)
+        bh=3Dv9NiziDyCYu9Ssy1MqwcYz3Obg+5qR7kJAYV5rLhc=3D=0A=
+        b=3Dml1tLtFlyP9+6qzsr/Y/Kp5igFrK2oUC/WIz//Zmu/5fSRzhVpw37aRWeKK6hdX=
+/
+         FxsJBUEiOwP7rnH9cVh0eWtHbz2qaashwfXDE6sVeXzEDIGZGpGu23nNdVQXdmSsPo=
+ym
+         +exTdbi8fY0pCW6bB8Bl9QHeCnAfsqlPKJyaAjnrOHw5Qw9qdI1S9gC2eq0WbnVy6i=
+HQ
+         7tLKPnU50UXa4ii7btWPm2rqB3S45MtzAeOOLaaKgubovEhMNhC+usRZ5ijfKdVYpI=
+hu
+         bTcuciA022kGsoViz3poqnsJ0p8W9ojwHusnFV0FwDvrqrw9MTAV+LH+DM//g3kcby=
+jr
+         T4ig=3D=0A=
+X-Forwarded-Encrypted: i=3D AJvYcCUms6Y8mQXobn6Doc4LggzSXZfoQDIm/IKPAkO+/bg=
+Lih/BXEZjjKJJx2V38SsUeCaJy1R/1BisLsDktGAF092Q8+cQmdOHd3i65roTYjtnFDPo2/M4Zl=
+O8bb6wJr5fOR5UJWeLxlciGCxFLtE/mIj3WRxJMuCKajUX
+X-Gm-Message-State: AOJu0YwDLEfVDuSKNNImIfCehbMu01XecTBUg/BxEe3Dr2BLV02Sld8=
+L
+	HnQdjTLXkZXA3IHu11Z7n/x+G0xL6V5UIl2p3WAyQ6nodkCzPQbShE13cVc4xK07Mw0KAcUpPf=
+T
+	hd4UbQzqEaNrmK52fddVQ5NxZI1IX-Google-Smtp-Source: AGHT+IEhPG1B/8mDvGNpkDj4=
+PWCUpLjQ708pGc8G6bha6o2gM1Lwf8UNLZI5EJ57kTgt1wZPIajCKtTg1SeDSsMj41AX-Receiv=
+ed: by 2002:a05:6000:24a:b0:33e:4238:8615 with SMTP id
+ m10-20020a056000024a00b0033e42388615mr1774070wrz.40.1711747609718; Fri, 29
+ Mar 2024 14:26:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327120036.233641-1-mic@digikod.net> <bd62ac88-81bc-cee2-6=
-39a-a0ca79843265@huawei-partners.com>
- <CAHC9VhRN4deUerWtxxGypFH1o+NRD=3DU96H2qB0xv+0d6ekEA@mail.gmail.com>
-In-Reply-To: <CAHC9VhRN4deUerWtxxGypFH1o+NRD=3DU96H2qB0xv+0d6ekEA@mail.gmai=
-l.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 29 Mar 2024 17:17:39 -0400
-Message-ID: <CAHC9VhSbOLR+yFbC6081UL87L2-SNV+gOBi2tD1YE7Th5hsGCw@mail.gmail=
+References: <20240329094906.18147-1-ubizjak@gmail.com> <20240329094906.1814=
+7-2-ubizjak@gmail.com>
+In-Reply-To: <20240329094906.18147-2-ubizjak@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 29 Mar 2024 14:26:38 -0700
+Message-ID: <CAADnVQLZnkm8psPvmUOS1FDacXdJPxQ79rQJ33F00dkS9czw1Q@mail.gmail=
 .com>
-Subject: Re: [PATCH v1 1/2] lsm: Check and handle error priority for
- socket_bind and socket_connect
-To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Cc: =3DTF-8?B?TWlja2HDq2wgU2FsYcO8bg=3D=3Dic@digikod.net>,=20
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,=20
-	Eric Dumazet <edumazet@google.com>, =3DTF-8?Q?G=C3=BCnther_Noack?=3Dnoack@=
-google.com>,=20
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>,=20
-	Muhammad Usama Anjum <usama.anjum@collabora.com>, "Serge E . Hallyn" <serg=
-e@hallyn.com>,=20
-	yusongping <yusongping@huawei.com>, artem.kuzin@huawei.com
+Subject: Re: [PATCH RESEND bpf 1/2] x86/bpf: Fix IP after emitting call dep=
+th accounting
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: X86 ML <x86@kernel.org>, bpf <bpf@vger.kernel.org>,=20
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kern=
+el.org>,=20
+	=3DTF-8?Q?Joan_Bruguera_Mic=C3=B3?=3Doanbrugueram@gmail.com>,=20
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net=
+>
 Content-Type: text/plain; charset=3DTF-8"
 Content-Transfer-Encoding: quoted-printable
-Return-Path: netdev+bounces-83463-steffen.klassert=3Dcunet.com@vger.kernel.=
+Return-Path: netdev+bounces-83464-steffen.klassert=3Dcunet.com@vger.kernel.=
 org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 21:18:06.9907
+X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 21:27:05.8796
  (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: bb0b4948-f2f7-4c56-35b5-08dc=
-5035ba5d
+X-MS-Exchange-Organization-Network-Message-Id: 6a725642-594b-4e0f-2297-08dc=
+5036fb91
 X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
 X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.201
 X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-01.s=
 ecunet.de
 X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dx-dres=
-den-01.secunet.de:TOTAL-HUB=3D412|SMR=3D344(SMRDE=3D034|SMRC=3D309(SMRCL=3D=
-101|X-SMRCR=3D310))|CAT=3D067(CATOS=3D015
- (CATSM=3D014(CATSM-Malware
- Agent=3D014))|CATRESL=3D020(CATRESLP2R=3D017)|CATORES=3D030
- (CATRS=3D030(CATRS-Index Routing Agent=3D029)));2024-03-29T21:18:07.405Z
+den-01.secunet.de:TOTAL-HUB=3D406|SMR=3D353(SMRDE=3D050|SMRC=3D302(SMRCL=3D=
+102|X-SMRCR=3D303))|CAT=3D052(CATOS=3D011
+ (CATSM=3D011(CATSM-Malware
+ Agent=3D011))|CATRESL=3D020(CATRESLP2R=3D001)|CATORES=3D018
+ (CATRS=3D018(CATRS-Index Routing Agent=3D017)));2024-03-29T21:27:06.276Z
 X-MS-Exchange-Forest-ArrivalHubServer: mbx-dresden-01.secunet.de
 X-MS-Exchange-Organization-AuthSource: cas-essen-01.secunet.de
 X-MS-Exchange-Organization-AuthAs: Anonymous
 X-MS-Exchange-Organization-FromEntityHeader: Internet
-X-MS-Exchange-Organization-OriginalSize: 10555
+X-MS-Exchange-Organization-OriginalSize: 9939
 X-MS-Exchange-Organization-HygienePolicy: Standard
 X-MS-Exchange-Organization-MessageLatency: SRV=CAs-essen-01.secunet.de:TOTA=
-L-FE=3D005|SMR=3D005(SMRPI=3D003(SMRPI-FrontendProxyAgent=3D003))
+L-FE=3D009|SMR=3D008(SMRPI=3D006(SMRPI-FrontendProxyAgent=3D006))
 X-MS-Exchange-Organization-AVStamp-Enterprise: 1.0
 X-MS-Exchange-Organization-Recipient-Limit-Verified: True
 X-MS-Exchange-Organization-TotalRecipientCount: 1
@@ -758,138 +395,478 @@ X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
 6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
 X-MS-Exchange-Forest-RulesExecuted: mbx-dresden-01
 X-MS-Exchange-Organization-RulesExecuted: mbx-dresden-01
-X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAdkFAAAPAAADH4sIAAAAAAAEAHVVy24b=
-NxSlrLdk2S3STX
- cX6SJJYSu2EyCtEbhp0QdUxGiAdFcUBjVDeViNSJXkSNGuv9Dv6KI/
- 0F3+pF/Sc8mRrCYIMBpwSN7Dc8+5l/rz+CdD3zt9QtfS0cWXJ3Rxdv
- GUZKCnl2fP/v3j71fX9EpWJV1b6xQ9X2L8gl+nC54YZ3ZxRWtng7oc
- Da7wEPB+Lqoa74s7vPPzy/NzAH59TZOVNHZF13peSF1y0HMdp8aLNH
- X+oqjkWunTpXTBKOffOYfiMU8eXzx7HOGfXJ6d0atrHKqzuXz7V0mv
- ZSnf/mP+F3JF36hMVl5RKBR5lVVOh82Nt9lchZupNjlJ/D64WFg79y
- Sd2sJlsixVTlM1Y204zqiwtm5OPshsfkI6kPakpN9QsKRNcDavMkXK
- Oesos/kOSpvMGq99UCbTyo9pYjCWOdkZyTzX5hbYa8oKlYEDwMDPKR
- Mi41kVqjtWL19f+xMqVXjgaabfRF5OlTKolALOitBj+KT2UZEZydJh
- abPFesgGaKS5eUR6sSzVAmdyyht6/d1Lbao3kcBLvErLGfMXsvaFrc
- qcjA07rQppbhVBfUd+KSHCVBVypaHDtAoM7uxqXxm6E2SzoxzREuQk
- 0DoegsCpnJYbAOIJAQdAH3C26/c94aWlcjBsQb7KioRVC1Abybay4B
- Ayec5KwceF3EBWeAKMmWV83lUzZ2H8tgfG43E9uroLdcpXJTI1+4Yu
- VChsREyVdnpll34bPKHcmgcBWWgz51xADmCS7t/h3SeejqW21mVJnz
- v1e6Wd+hzbcADDJOTLS/AM9gb4KBiTBW0NPQQVd7OSpc5RH189GhNN
- ZrSxFa0liovFqpyvYm0FTmStQ7FVNVcr1iHVo1fgNuOlTe0L7GBGnC
- n7kdtlLAZWHWVCcgk+EuPJLj8Z7kIl3aISIVeuJFj9WPkQEaUzKj9J
- fFgP1BDbrgzlejbTGSRB/7DKzHIpEbYusBrcpmZyq7hrNpDFRULoMH
- ZaZrhjFhY6QBhI5OzivURhzGjwy7fOLpcMJkv1Rm3GcwQZtXphnczK
- eCVSXik+Si1wmaWa9vSwMnNj1wbGZXqpUS+PfmW8yYMFlSiziBgSbe
- u9nuoSNxDTy22kjgU55SZJtxTcwONRhiX6Fafypmld4wvsir6sC/iR
- ZOJSQvtpW3l0S3BabWGiWKMBq8UVwDcHWpcRfOx6Hm27whqFLlipEr
- SQDC41mEu72hoNdsUV0JWozJjQ+6UXV2u/AztklIqN8Fu1WI4Ge+Co
- FY8a1vEGi0jvoIDzD07Giwmp4hpDpqNBkGXUFO2O/xFuAYJ4rkAHn8
- Q7Z4KcTCzcqALfRmwBtJO+cgw8GiB9mSHQ8HVkVDzUP8bfgzVcpiYr
- FtKhA9aFRimXeq4grfYs9a2tC24KHAlmJTxS9UUYK+n0lDXf/y/lWS
- EORLMp2s2GOMQjWgei1RLtg0azK0RX9DBui26rIe6Jdhx3mvwefSiq
- J0RP9Dui2xWHnYb4THTTJ94x8BCBjYbo4xEHGLca7XhQH2dhW1scYd
- AUrV5DfBIDAYvPd2YijSHGeLCEEJAEGgOChmj2xQB7WuLwWHyMVcyk
- nZ24LR3REUct0YlQrQSC2C7zbKWdcfKjvhgOI+2amBg0Od8EONzxiQ
- kmJji3jZCuuIdtaSntT5+7bQmzJQYpkYTf3qa8S+RQUJpJCPuJdDhk
- 2BAH7ZhIwmywNdgA5E4UpNNlvQ+afEqvzcp3UiKwdSTavdrN+sQO5q
- PX6ZSEmVJOmSbaMZd+CulF/JT4lkP67G4xh2kVz+HecXhSIknzVoTF
- 4Egc7xEYcgk1xKdRopR+4gNMZITJvjhOqqbw5FeSOr23NHqdLaXdk6
- AiSKqZdqrt1taInXdbg+pEOMdaTGjYb0die/L2kyNpczJiNx5EQeKe
- 3rY+eQDhBjHrVGbRtaQMC4XPAdoqkhnGQcJJNiXlD2JUFOoYo6PULP
- 8Btex2bXoLAAABCskDPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGlu
- Zz0idXRmLTE2Ij8+DQo8RW1haWxTZXQ+DQogIDxWZXJzaW9uPjE1Lj
- AuMC4wPC9WZXJzaW9uPg0KICA8RW1haWxzPg0KICAgIDxFbWFpbCBT
- dGFydEluZGV4PSI0NCIgUG9zaXRpb249IlNpZ25hdHVyZSI+DQogIC
- AgICA8RW1haWxTdHJpbmc+cGF1bEBwYXVsLW1vb3JlLmNvbTwvRW1h
- aWxTdHJpbmc+DQogICAgPC9FbWFpbD4NCiAgICA8RW1haWwgU3Rhcn
- RJbmRleD0iMTMwIj4NCiAgICAgIDxFbWFpbFN0cmluZz5pdmFub3Yu
- bWlraGFpbDFAaHVhd2VpLXBhcnRuZXJzLmNvbTwvRW1haWxTdHJpbm
- c+DQogICAgPC9FbWFpbD4NCiAgICA8RW1haWwgU3RhcnRJbmRleD0i
- MTMzMyI+DQogICAgICA8RW1haWxTdHJpbmc+YWxleGV5LmtvZGFuZX
- ZAb3JhY2xlLmNvbTwvRW1haWxTdHJpbmc+DQogICAgPC9FbWFpbD4N
- CiAgPC9FbWFpbHM+DQo8L0VtYWlsU2V0PgEL0QE8P3htbCB2ZXJzaW
- 9uPSIxLjAiIGVuY29kaW5nPSJ1dGYtMTYiPz4NCjxVcmxTZXQ+DQog
- IDxWZXJzaW9uPjE1LjAuMC4wPC9WZXJzaW9uPg0KICA8VXJscz4NCi
- AgICA8VXJsIFN0YXJ0SW5kZXg9IjE5MTMiIFR5cGU9IlVybCI+DQog
- ICAgICA8VXJsU3RyaW5nPnBhdWwtbW9vcmUuY29tPC9VcmxTdHJpbm
- c+DQogICAgPC9Vcmw+DQogIDwvVXJscz4NCjwvVXJsU2V0PgEMwAc8
- P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJ1dGYtMTYiPz4NCj
- xDb250YWN0U2V0Pg0KICA8VmVyc2lvbj4xNS4wLjAuMDwvVmVyc2lv
- bj4NCiAgPENvbnRhY3RzPg0KICAgIDxDb250YWN0IFN0YXJ0SW5kZX
- g9IjMyIiBQb3NpdGlvbj0iU2lnbmF0dXJlIj4NCiAgICAgIDxQZXJz
- b24gU3RhcnRJbmRleD0iMzIiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg
- 0KICAgICAgICA8UGVyc29uU3RyaW5nPlBhdWwgTW9vcmU8L1BlcnNv
+X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAWoEAAAPAAADH4sIAAAAAAAEAJVU227b=
+RhAd6i5Zkls3Rd
+ GXYpAnX3Q3fZHqpLYTF3Vhw0GStkBf5BW5ktaiSHa5iu1egP5RH/rY
+ x/5Jv6SzS8o24MhOhAU1mjlz5szMUv+Uz3z8VooanjKJnW4NO62OjU
+ xhp2d3//vzr4NT/EEGER6KXy/YBPdmA2Psj6ZMeA0nmD7HSxko3quU
+ ntMhrmDaw+8D5uOhnI1mXDI8Fc6/f+PeBTkHiW96hyDJPHAvZpFCNe
+ Z4/ApDFkXcRRXgOZ8K1Q+ZcsbnGAUoFDrMc2YeUzwycCeQkjsKg+Ew
+ 4kpzDQNpIi8OTk5Q+JGSM0eJwEcxxPOr3e0+MXh9l4dq3Df0zHGCma
+ +EPzpH7YiI1OUNzXVGRPJSRBwv6QjPw2giQlIy5XepI2S+i9OAWvDE
+ hHvX6EgWjRvzuYgrHvVw0OFdd8i37AG3cfUpSWkOwmEPj6ZxWx4aUX
+ irR0uW/JeZkNx9uqapToQ/6eFYqTDqNZteIHljwqXPvUYgR01vMvWa
+ tMTNVru11Wnb3U6n0dlq2Tub9XZ9wQqamvaNGPncrdMQ64Prj18hvn
+ B6eODxKy7wjWIyeBcIFbzDPRap/Vt9N9CXzBfcw8NATqbM93HPNY59
+ EYw4k4PgquFzZdD1el1/IZPOuKknRgE9tf4FLY6qhw0Hf8ct3NjYSJ
+ BtHAqP7sWY+SPu1nBTL4pLs6bVjTW65DRmj8e/62vJilwxHFKxEW2C
+ NR8qNngoqpmE7/IrZDsDtsvbO7vb9laj0eoOd1yn69ru9ha2W61t20
+ 6ae7iaBlFnjxfd38e6vdOtdXFDf7Vb2hMppoRDgpS51uber852cX09
+ DGUwqiFtycX14cx35rYI5wO5ly2jwYczIP5mtGP8iUPMvOTc7Yvwa4
+ NJPmev3h6fHv989Lr/3fHLo/6PB69XNeOaAdUT0MMv7mqi536e5Gom
+ fbz9H7kLraEIa9i6OtqNk+Z67yjFZ4ShwMfVr5R+Gl+jHyjURJWSpn
+ j20Rzf6MetqkdauSP6bk/4x6KNXsym4YdtM361Og3bbrQMW6UEkIJ0
+ GrJpC8p0IJOCTAayKSudB8hDgewcFPIWfAqFLOQImYVKBnLkL0CRjI
+ oFX0DVhJZykE9rhjQZmseCksaTnaZTgiWKEmcOSmSkTaElKBOSqn9l
+ fmYNcwnKxigWoUSJ5IlPGSpxFvGTDGIuw7KhSgCURVUopQBV0pa14D
+ RpIR8nVmGZbAtSlURzIWdBJZGdeV9TBfJTyhKVtqBq7BtnAUqU/gTy
+ Rd3RJ5Qe95U2k4wrWhaNASyrrJ+QIk/eKsZ2yVqOjSJ8ljEaYsB7SC
+ C1OKS7LkO1bFVyADmoLkYWF4YsmhKVzxqpqdhO6buRS0ZHyWbCKbNQ
+ cwH0Sc2XntFjzMZs9zCf07NgwRIUU7BMIlaglEnAK/dWv2RyV4h2fn
+ 9yMZtZ0MqcR1dZkHtzuygltwDz5X3+OTOBnzzStVWJB6VHZKW1/T+V
+ 3ePHhQkAAAEKnwQ8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPS
+ J1dGYtMTYiPz4NCjxFbWFpbFNldD4NCiAgPFZlcnNpb24+MTUuMC4w
+ LjA8L1ZlcnNpb24+DQogIDxFbWFpbHM+DQogICAgPEVtYWlsIFN0YX
+ J0SW5kZXg9IjQ1Ij4NCiAgICAgIDxFbWFpbFN0cmluZz51Yml6amFr
+ QGdtYWlsLmNvbTwvRW1haWxTdHJpbmc+DQogICAgPC9FbWFpbD4NCi
+ AgICA8RW1haWwgU3RhcnRJbmRleD0iMTAzIj4NCiAgICAgIDxFbWFp
+ bFN0cmluZz5qb2FuYnJ1Z3VlcmFtQGdtYWlsLmNvbTwvRW1haWxTdH
+ Jpbmc+DQogICAgPC9FbWFpbD4NCiAgICA8RW1haWwgU3RhcnRJbmRl
+ eD0iNjA1IiBQb3NpdGlvbj0iT3RoZXIiPg0KICAgICAgPEVtYWlsU3
+ RyaW5nPmFzdEBrZXJuZWwub3JnPC9FbWFpbFN0cmluZz4NCiAgICA8
+ L0VtYWlsPg0KICAgIDxFbWFpbCBTdGFydEluZGV4PSI2NDUiIFBvc2
+ l0aW9uPSJPdGhlciI+DQogICAgICA8RW1haWxTdHJpbmc+ZGFuaWVs
+ QGlvZ2VhcmJveC5uZXQ8L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haW
+ w+DQogIDwvRW1haWxzPg0KPC9FbWFpbFNldD4BC6ACPD94bWwgdmVy
+ c2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTE2Ij8+DQo8VXJsU2V0Pg
+ 0KICA8VmVyc2lvbj4xNS4wLjAuMDwvVmVyc2lvbj4NCiAgPFVybHM+
+ DQogICAgPFVybCBTdGFydEluZGV4PSI0MzciIFBvc2l0aW9uPSJPdG
+ hlciIgVHlwZT0iVXJsIj4NCiAgICAgIDxVcmxTdHJpbmc+aHR0cHM6
+ Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC8yMDIzMDEwNTIxNDkyMi4yNT
+ A0NzMtMS1qb2FuYnJ1Z3VlcmFtQGdtYWlsLmNvbS88L1VybFN0cmlu
+ Zz4NCiAgICA8L1VybD4NCiAgPC9VcmxzPg0KPC9VcmxTZXQ+AQzjBj
+ w/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9InV0Zi0xNiI/Pg0K
+ PENvbnRhY3RTZXQ+DQogIDxWZXJzaW9uPjE1LjAuMC4wPC9WZXJzaW
+ 9uPg0KICA8Q29udGFjdHM+DQogICAgPENvbnRhY3QgU3RhcnRJbmRl
+ eD0iMzIiPg0KICAgICAgPFBlcnNvbiBTdGFydEluZGV4PSIzMiI+DQ
+ ogICAgICAgIDxQZXJzb25TdHJpbmc+VXJvcyBCaXpqYWs8L1BlcnNv
  blN0cmluZz4NCiAgICAgIDwvUGVyc29uPg0KICAgICAgPEVtYWlscz
- 4NCiAgICAgICAgPEVtYWlsIFN0YXJ0SW5kZXg9IjQ0IiBQb3NpdGlv
- bj0iU2lnbmF0dXJlIj4NCiAgICAgICAgICA8RW1haWxTdHJpbmc+cG
- F1bEBwYXVsLW1vb3JlLmNvbTwvRW1haWxTdHJpbmc+DQogICAgICAg
- IDwvRW1haWw+DQogICAgICA8L0VtYWlscz4NCiAgICAgIDxDb250YW
- N0U3RyaW5nPlBhdWwgTW9vcmUgJmx0O3BhdWxAcGF1bC1tb29yZS5j
- b208L0NvbnRhY3RTdHJpbmc+DQogICAgPC9Db250YWN0Pg0KICAgID
- xDb250YWN0IFN0YXJ0SW5kZXg9IjExMSI+DQogICAgICA8UGVyc29u
- IFN0YXJ0SW5kZXg9IjExMSI+DQogICAgICAgIDxQZXJzb25TdHJpbm
- c+SXZhbm92IE1pa2hhaWw8L1BlcnNvblN0cmluZz4NCiAgICAgIDwv
- UGVyc29uPg0KICAgICAgPEVtYWlscz4NCiAgICAgICAgPEVtYWlsIF
- N0YXJ0SW5kZXg9IjEzMCI+DQogICAgICAgICAgPEVtYWlsU3RyaW5n
- Pml2YW5vdi5taWtoYWlsMUBodWF3ZWktcGFydG5lcnMuY29tPC9FbW
- FpbFN0cmluZz4NCiAgICAgICAgPC9FbWFpbD4NCiAgICAgIDwvRW1h
- aWxzPg0KICAgICAgPENvbnRhY3RTdHJpbmc+SXZhbm92IE1pa2hhaW
- wNCiZndDsgJmx0O2l2YW5vdi5taWtoYWlsMUBodWF3ZWktcGFydG5l
- cnMuY29tPC9Db250YWN0U3RyaW5nPg0KICAgIDwvQ29udGFjdD4NCi
- AgPC9Db250YWN0cz4NCjwvQ29udGFjdFNldD4BDs8BUmV0cmlldmVy
- T3BlcmF0b3IsMTAsMTtSZXRyaWV2ZXJPcGVyYXRvciwxMSwxO1Bvc3
- REb2NQYXJzZXJPcGVyYXRvciwxMCwwO1Bvc3REb2NQYXJzZXJPcGVy
- YXRvciwxMSwwO1Bvc3RXb3JkQnJlYWtlckRpYWdub3N0aWNPcGVyYX
- RvciwxMCwwO1Bvc3RXb3JkQnJlYWtlckRpYWdub3N0aWNPcGVyYXRv
- ciwxMSwwO1RyYW5zcG9ydFdyaXRlclByb2R1Y2VyLDIwLDE4
-X-MS-Exchange-Forest-IndexAgent: 1 3357
-X-MS-Exchange-Forest-EmailMessageHash: 7C7AEC4C
+ 4NCiAgICAgICAgPEVtYWlsIFN0YXJ0SW5kZXg9IjQ1Ij4NCiAgICAg
+ ICAgICA8RW1haWxTdHJpbmc+dWJpempha0BnbWFpbC5jb208L0VtYW
+ lsU3RyaW5nPg0KICAgICAgICA8L0VtYWlsPg0KICAgICAgPC9FbWFp
+ bHM+DQogICAgICA8Q29udGFjdFN0cmluZz5Vcm9zIEJpemphayAmbH
+ Q7dWJpempha0BnbWFpbC5jb208L0NvbnRhY3RTdHJpbmc+DQogICAg
+ PC9Db250YWN0Pg0KICAgIDxDb250YWN0IFN0YXJ0SW5kZXg9IjgzIj
+ 4NCiAgICAgIDxQZXJzb24gU3RhcnRJbmRleD0iODMiPg0KICAgICAg
+ ICA8UGVyc29uU3RyaW5nPkpvYW4gQnJ1Z3VlcmE8L1BlcnNvblN0cm
+ luZz4NCiAgICAgIDwvUGVyc29uPg0KICAgICAgPEVtYWlscz4NCiAg
+ ICAgICAgPEVtYWlsIFN0YXJ0SW5kZXg9IjEwMyI+DQogICAgICAgIC
+ AgPEVtYWlsU3RyaW5nPmpvYW5icnVndWVyYW1AZ21haWwuY29tPC9F
+ bWFpbFN0cmluZz4NCiAgICAgICAgPC9FbWFpbD4NCiAgICAgIDwvRW
+ 1haWxzPg0KICAgICAgPENvbnRhY3RTdHJpbmc+Sm9hbiBCcnVndWVy
+ YSBNaWPDsyAmbHQ7am9hbmJydWd1ZXJhbUBnbWFpbC5jb208L0Nvbn
+ RhY3RTdHJpbmc+DQogICAgPC9Db250YWN0Pg0KICA8L0NvbnRhY3Rz
+ Pg0KPC9Db250YWN0U2V0PgEOzgFSZXRyaWV2ZXJPcGVyYXRvciwxMC
+ wxO1JldHJpZXZlck9wZXJhdG9yLDExLDE7UG9zdERvY1BhcnNlck9w
+ ZXJhdG9yLDEwLDA7UG9zdERvY1BhcnNlck9wZXJhdG9yLDExLDA7UG
+ 9zdFdvcmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDEwLDA7UG9z
+ dFdvcmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDExLDA7VHJhbn
+ Nwb3J0V3JpdGVyUHJvZHVjZXIsMjAsNw=3D=0A=
+X-MS-Exchange-Forest-IndexAgent: 1 3061
+X-MS-Exchange-Forest-EmailMessageHash: 35AF81FD
 X-MS-Exchange-Forest-Language: en
 X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
 
-On Fri, Mar 29, 2024 at 4:07=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
-ote:
+On Fri, Mar 29, 2024 at 2:49=E2=80=AFAM Uros Bizjak <ubizjak@gmail.com> wro=
+te:
 >
-> On Thu, Mar 28, 2024 at 11:11=E2=80=AFAM Ivanov Mikhail
-> <ivanov.mikhail1@huawei-partners.com> wrote:
-> > On 3/27/2024 3:00 PM, Micka=C3=ABl Sala=C3=BCn wrote:
-> > > Because the security_socket_bind and the security_socket_bind hooks a=
-re
-> > > called before the network stack, it is easy to introduce error code
-> > > inconsistencies. Instead of adding new checks to current and future
-> > > LSMs, let's fix the related hook instead. The new checks are already
-> > > (partially) implemented by SELinux and Landlock, and it should not
-> > > change user space behavior but improve error code consistency instead=
-.
-> >
-> > It would probably be better to allow the network stack to perform such
-> > checks before calling LSM hooks. This may lead to following improvement=
-s:
+> From: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
 >
-> ...
+> Adjust the IP passed to `emit_patch` so it calculates the correct offset
+> for the CALL instruction if `x86_call_depth_emit_accounting` emits code.
+> Otherwise we will skip some instructions and most likely crash.
 >
-> > This may result in adding new method to socket->ops.
+> Fixes: b2e9dfe54be4 ("x86/bpf: Emit call depth accounting if required")
+> Link: https://lore.kernel.org/lkml/20230105214922.250473-1-joanbrugueram@=
+gmail.com/
+> Signed-off-by: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  arch/x86/net/bpf_jit_comp.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> I don't think there is a "may result" here, it will *require* a new
-> socket::proto_ops function (addr_validate?).  If you want to pursue
-> this with the netdev folks to see if they would be willing to adopt
-> such an approach I think that would be a great idea.  Just be warned,
-> there have been difficulties in the past when trying to get any sort
-> of LSM accommodations from the netdev folks.
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index a7ba8e178645..09f7dc9d4d65 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -479,9 +479,10 @@ static int emit_call(u8 **pprog, void *func, void *i=
+p)
+>
+>  static int emit_rsb_call(u8 **pprog, void *func, void *ip)
+>  {
+> +       void *adjusted_ip;
+>         OPTIMIZER_HIDE_VAR(func);
+> -       x86_call_depth_emit_accounting(pprog, func);
+> -       return emit_patch(pprog, func, ip, 0xE8);
+> +       adjusted_ip =3D ip + x86_call_depth_emit_accounting(pprog, func);
 
-[Dropping alexey.kodanev@oracle.com due to email errors (unknown recipient)=
-]
+Why not just
+ip +=3D x86_call_depth_emit_accounting(pprog, func);
 
-I'm looking at the possibility of doing the above and this is slowly
-coming back to me as to why we haven't seriously tried this in the
-past.  It's not as simple as calling one level down into a proto_ops
-function table, the proto_ops function table would then need to jump
-down into an associated proto function table.  Granted we aren't
-talking per-packet overhead, but I can see this having a measurable
-impact on connections/second benchmarks which likely isn't going to be
-a welcome change.
+?
 
---=20
-paul-moore.com
+> +       return emit_patch(pprog, func, adjusted_ip, 0xE8);
+>  }
+>
+>  static int emit_jump(u8 **pprog, void *func, void *ip)
+> --
+> 2.44.0
+>
+
+X-sender: <linux-kernel+bounces-125445-steffen.klassert=3Dcunet.com@vger.ke=
+rnel.org>
+X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Dc822;steffen.klassert@se=
+cunet.com NOTIFY=3DVER; X-ExtendedProps=3DAVABYAAgAAAAUAFAARAPDFCS25BAlDktI=
+I2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSX=
+NSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAA=
+AUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChG=
+WURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwA=
+XAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG=
+1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHc=
+m91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29u=
+ZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAw=
+AAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC=
+5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAwAAgAAB=
+QBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbixPVT1V=
+c2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1J=
+lc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1pY3Jvc2=
+9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb=
+3VwRXhwYW5zaW9uBQAjAAIAAQ=3D=0A=
+X-CreatedBy: MSExchange15
+X-HeloDomain: b.mx.secunet.com
+X-ExtendedProps: BQBjAAoAtpHp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
+9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
+AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBsAAAAi4oAAAUABAAUIAEAAAAcAAAAc3RlZmZl=
+bi5rbGFzc2VydEBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQA=
+CAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBkAA8AAwAAAEh1Yg=3D=0A=
+X-Source: SMTP:Default MBX-DRESDEN-01
+X-SourceIPAddress: 62.96.220.37
+X-EndOfInjectedXHeaders: 15923
+Received: from cas-essen-02.secunet.de (10.53.40.202) by
+ mbx-dresden-01.secunet.de (10.53.40.199) with Microsoft SMTP Server
+ (version=3DS1_2, cipher=3DS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.37; Fri, 29 Mar 2024 22:27:17 +0100
+Received: from b.mx.secunet.com (62.96.220.37) by cas-essen-02.secunet.de
+ (10.53.40.202) with Microsoft SMTP Server (version=3DS1_2,
+ cipher=3DS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Fri, 29 Mar 2024 22:27:17 +0100
+Received: from localhost (localhost [127.0.0.1])
+	by b.mx.secunet.com (Postfix) with ESMTP id A01F52032C
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:27:17 +0100 (CET)
+X-Virus-Scanned: by secunet
+X-Spam-Flag: NO
+X-Spam-Score: -2.749
+X-Spam-Level:
+X-Spam-Status: No, score=3D.749 tagged_above=3D99 required=3D1
+	tests=3DAYES_00=3D.9, DKIM_SIGNED=3D1, DKIM_VALID=3D.1,
+	DKIM_VALID_AU=3D.1, FREEMAIL_FORGED_FROMDOMAIN=3D001,
+	FREEMAIL_FROM=3D001, HEADER_FROM_DIFFERENT_DOMAINS=3D249,
+	MAILING_LIST_MULTI=3D, RCVD_IN_DNSWL_NONE=3D.0001,
+	SPF_HELO_NONE=3D001, SPF_PASS=3D.001] autolearn=3Dm autolearn_force=3D
+Authentication-Results: a.mx.secunet.com (amavisd-new);
+	dkim=3Dss (2048-bit key) header.d=3Dail.com
+Received: from b.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id s3774IfGRhS4 for <steffen.klassert@secunet.com>;
+	Fri, 29 Mar 2024 22:27:13 +0100 (CET)
+Received-SPF: Pass (sender SPF authorized) identity=3Dilfrom; client-ip=147=
+.75.80.249; helo=3D.mirrors.kernel.org; envelope-from=3Dnux-kernel+bounces-=
+125445-steffen.klassert=3Dcunet.com@vger.kernel.org; receiver=3Deffen.klass=
+ert@secunet.com=20
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com AC91D200BB
+Authentication-Results: b.mx.secunet.com;
+	dkim=3Dss (2048-bit key) header.d=3Dail.com header.i=3Dmail.com header.b=
+=3D02OONrK"
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249]=
+)
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by b.mx.secunet.com (Postfix) with ESMTPS id AC91D200BB
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:27:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
+5.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FEB71F24381
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 21:27:13 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC5013CAAE;
+	Fri, 29 Mar 2024 21:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=3Dss (2048-bit key) header.d=3Dail.com header.i=3Dmail.com header.b=
+=3D02OONrK"
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221=
+.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910E138FAD;
+	Fri, 29 Mar 2024 21:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=3Dne smtp.client-ip 9=
+.85.221.54
+ARC-Seal: i=3D a=3Da-sha256; d=3Dbspace.kernel.org; s=3Dc-20240116;
+	t=1711747613; cv=3Dne; b=3DhT6rBlhYRPp3nILeYSgLH5jgw3/ahNcI+sDsQW7a6Oq02j3=
+c5prNzS0n5vJx9TVbZQcqIgvdV9HTstLuoPtW/jT0vcYIvofBPyJUl7qtv3N1ZcCALaUGLdrgZB=
+APv1JUH+kyrmT9ybQHjLzeMASpgNwI0hFSXpPucdmpDSanwARC-Message-Signature: i=3D =
+a=3Da-sha256; d=3Dbspace.kernel.org;
+	s=3Dc-20240116; t=1711747613; c=3Dlaxed/simple;
+	bh=3D2kYFst4z/jzDluAZKuRs3VnNLG/lJw8nm0VcFYikM=3D=0A=
+	h=3DME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=3DWQ2A0CseIsL9FgYjN6zPufVIpQqiRzxpxfWWir2S2bRrkalHe=
+IYKni2SW9MnB9+iKThkvwKO+Zn5Zssl7qqHveQk51ff9EJpUn5NhPHVmY4QJ0TF4i9BP87FJsd1=
+aA9g47SAdGsUrEEJEsLIDX4ANMZG8S1Gjnd1qw8tZdsRMARC-Authentication-Results: i=
+=3D smtp.subspace.kernel.org; dmarc=3Dss (p=3Dne dis=3Dne) header.from=3Dai=
+l.com; spf=3Dss smtp.mailfrom=3Dail.com; dkim=3Dss (2048-bit key) header.d=
+=3Dail.com header.i=3Dmail.com header.b=3D2OONrK; arc=3Dne smtp.client-ip 9=
+.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dss (p=3Dne dis=3D=
+ne) header.from=3Dail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=3Dss smtp.mailfrom=3D=
+ail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-341c9926f98=
+so1441462f8f.1;
+        Fri, 29 Mar 2024 14:26:51 -0700 (PDT)
+DKIM-Signature: v=3D a=3Da-sha256; c=3Dlaxed/relaxed;
+        d=3Dail.com; s 230601; t=1711747610; x=1712352410; darn=3Der.kernel=
+.org;
+        h=3Dntent-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Dv9NiziDyCYu9Ssy1MqwcYz3Obg+5qR7kJAYV5rLhc=3D=0A=
+        b=3D2OONrKn+4k88m3UEDllV8o8JUuB2NguuTGHZzCXHNiOAa9yBQIiaGmfQsGVV86q=
+3
+         vwTm5pN9qCEJWhO3/1dihonK9iCD1MV6zVd13EikzldfB4dxhYg+3Wg6vO0czEsr1H=
+Ac
+         Xnut8+4zSVKD/nOdEua3WuEO6t2FYuiIILMfvrA145eDAhyL+bLHHiztPM0IEukc3e=
+MT
+         QwkIybVK8O22yg5D4IKFhCt9QnTfLrqtSCdTICpGqqxHghVj4Ift5u/IfjSrR2EkEV=
+Ne
+         CwHVBQEan1clULUfxVR4imy+rZpP4IILFDkrBGL8rfHg7ZbgGF/FY9ZH05/vNFFyN9=
+i4
+         L+ZQ=3D=0A=
+X-Google-DKIM-Signature: v=3D a=3Da-sha256; c=3Dlaxed/relaxed;
+        d=1E100.net; s 230601; t=1711747610; x=1712352410;
+        h=3Dntent-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3Dv9NiziDyCYu9Ssy1MqwcYz3Obg+5qR7kJAYV5rLhc=3D=0A=
+        b=3Dml1tLtFlyP9+6qzsr/Y/Kp5igFrK2oUC/WIz//Zmu/5fSRzhVpw37aRWeKK6hdX=
+/
+         FxsJBUEiOwP7rnH9cVh0eWtHbz2qaashwfXDE6sVeXzEDIGZGpGu23nNdVQXdmSsPo=
+ym
+         +exTdbi8fY0pCW6bB8Bl9QHeCnAfsqlPKJyaAjnrOHw5Qw9qdI1S9gC2eq0WbnVy6i=
+HQ
+         7tLKPnU50UXa4ii7btWPm2rqB3S45MtzAeOOLaaKgubovEhMNhC+usRZ5ijfKdVYpI=
+hu
+         bTcuciA022kGsoViz3poqnsJ0p8W9ojwHusnFV0FwDvrqrw9MTAV+LH+DM//g3kcby=
+jr
+         T4ig=3D=0A=
+X-Forwarded-Encrypted: i=3D AJvYcCUms6Y8mQXobn6Doc4LggzSXZfoQDIm/IKPAkO+/bg=
+Lih/BXEZjjKJJx2V38SsUeCaJy1R/1BisLsDktGAF092Q8+cQmdOHd3i65roTYjtnFDPo2/M4Zl=
+O8bb6wJr5fOR5UJWeLxlciGCxFLtE/mIj3WRxJMuCKajUX
+X-Gm-Message-State: AOJu0YwDLEfVDuSKNNImIfCehbMu01XecTBUg/BxEe3Dr2BLV02Sld8=
+L
+	HnQdjTLXkZXA3IHu11Z7n/x+G0xL6V5UIl2p3WAyQ6nodkCzPQbShE13cVc4xK07Mw0KAcUpPf=
+T
+	hd4UbQzqEaNrmK52fddVQ5NxZI1IX-Google-Smtp-Source: AGHT+IEhPG1B/8mDvGNpkDj4=
+PWCUpLjQ708pGc8G6bha6o2gM1Lwf8UNLZI5EJ57kTgt1wZPIajCKtTg1SeDSsMj41AX-Receiv=
+ed: by 2002:a05:6000:24a:b0:33e:4238:8615 with SMTP id
+ m10-20020a056000024a00b0033e42388615mr1774070wrz.40.1711747609718; Fri, 29
+ Mar 2024 14:26:49 -0700 (PDT)
+Precedence: bulk
+X-Mailing-List: linux-kernel@vger.kernel.org
+List-Id: <linux-kernel.vger.kernel.org>
+List-Subscribe: <mailto:linux-kernel+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-kernel+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240329094906.18147-1-ubizjak@gmail.com> <20240329094906.1814=
+7-2-ubizjak@gmail.com>
+In-Reply-To: <20240329094906.18147-2-ubizjak@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 29 Mar 2024 14:26:38 -0700
+Message-ID: <CAADnVQLZnkm8psPvmUOS1FDacXdJPxQ79rQJ33F00dkS9czw1Q@mail.gmail=
+.com>
+Subject: Re: [PATCH RESEND bpf 1/2] x86/bpf: Fix IP after emitting call dep=
+th accounting
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: X86 ML <x86@kernel.org>, bpf <bpf@vger.kernel.org>,=20
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kern=
+el.org>,=20
+	=3DTF-8?Q?Joan_Bruguera_Mic=C3=B3?=3Doanbrugueram@gmail.com>,=20
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net=
+>
+Content-Type: text/plain; charset=3DTF-8"
+Content-Transfer-Encoding: quoted-printable
+Return-Path: linux-kernel+bounces-125445-steffen.klassert=3Dcunet.com@vger.=
+kernel.org
+X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 21:27:17.6856
+ (UTC)
+X-MS-Exchange-Organization-Network-Message-Id: cbecf88b-6e62-4b3a-91cd-08dc=
+5037029a
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.37
+X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
+X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.s=
+ecunet.de
+X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dx-dres=
+den-01.secunet.de:TOTAL-HUB=3D424|SMR=3D371(SMRDE=3D050|SMRC=3D320(SMRCL=3D=
+102|X-SMRCR=3D320))|CAT=3D051(CATOS=3D011
+ (CATSM=3D011(CATSM-Malware
+ Agent=3D010))|CATRESL=3D020(CATRESLP2R=3D001)|CATORES=3D018
+ (CATRS=3D018(CATRS-Index Routing Agent=3D017)));2024-03-29T21:27:18.099Z
+X-MS-Exchange-Forest-ArrivalHubServer: mbx-dresden-01.secunet.de
+X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Exchange-Organization-FromEntityHeader: Internet
+X-MS-Exchange-Organization-OriginalSize: 10057
+X-MS-Exchange-Organization-HygienePolicy: Standard
+X-MS-Exchange-Organization-MessageLatency: SRV=CAs-essen-02.secunet.de:TOTA=
+L-FE=3D007|SMR=3D007(SMRPI=3D005(SMRPI-FrontendProxyAgent=3D005))
+X-MS-Exchange-Organization-AVStamp-Enterprise: 1.0
+X-MS-Exchange-Organization-Recipient-Limit-Verified: True
+X-MS-Exchange-Organization-TotalRecipientCount: 1
+X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
+-482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
+0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
+6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
+X-MS-Exchange-Forest-RulesExecuted: mbx-dresden-01
+X-MS-Exchange-Organization-RulesExecuted: mbx-dresden-01
+X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAWoEAAAPAAADH4sIAAAAAAAEAJVU227b=
+RhAd6i5Zkls3Rd
+ GXYpAnX3Q3fZHqpLYTF3Vhw0GStkBf5BW5ktaiSHa5iu1egP5RH/rY
+ x/5Jv6SzS8o24MhOhAU1mjlz5szMUv+Uz3z8VooanjKJnW4NO62OjU
+ xhp2d3//vzr4NT/EEGER6KXy/YBPdmA2Psj6ZMeA0nmD7HSxko3quU
+ ntMhrmDaw+8D5uOhnI1mXDI8Fc6/f+PeBTkHiW96hyDJPHAvZpFCNe
+ Z4/ApDFkXcRRXgOZ8K1Q+ZcsbnGAUoFDrMc2YeUzwycCeQkjsKg+Ew
+ 4kpzDQNpIi8OTk5Q+JGSM0eJwEcxxPOr3e0+MXh9l4dq3Df0zHGCma
+ +EPzpH7YiI1OUNzXVGRPJSRBwv6QjPw2giQlIy5XepI2S+i9OAWvDE
+ hHvX6EgWjRvzuYgrHvVw0OFdd8i37AG3cfUpSWkOwmEPj6ZxWx4aUX
+ irR0uW/JeZkNx9uqapToQ/6eFYqTDqNZteIHljwqXPvUYgR01vMvWa
+ tMTNVru11Wnb3U6n0dlq2Tub9XZ9wQqamvaNGPncrdMQ64Prj18hvn
+ B6eODxKy7wjWIyeBcIFbzDPRap/Vt9N9CXzBfcw8NATqbM93HPNY59
+ EYw4k4PgquFzZdD1el1/IZPOuKknRgE9tf4FLY6qhw0Hf8ct3NjYSJ
+ BtHAqP7sWY+SPu1nBTL4pLs6bVjTW65DRmj8e/62vJilwxHFKxEW2C
+ NR8qNngoqpmE7/IrZDsDtsvbO7vb9laj0eoOd1yn69ru9ha2W61t20
+ 6ae7iaBlFnjxfd38e6vdOtdXFDf7Vb2hMppoRDgpS51uber852cX09
+ DGUwqiFtycX14cx35rYI5wO5ly2jwYczIP5mtGP8iUPMvOTc7Yvwa4
+ NJPmev3h6fHv989Lr/3fHLo/6PB69XNeOaAdUT0MMv7mqi536e5Gom
+ fbz9H7kLraEIa9i6OtqNk+Z67yjFZ4ShwMfVr5R+Gl+jHyjURJWSpn
+ j20Rzf6MetqkdauSP6bk/4x6KNXsym4YdtM361Og3bbrQMW6UEkIJ0
+ GrJpC8p0IJOCTAayKSudB8hDgewcFPIWfAqFLOQImYVKBnLkL0CRjI
+ oFX0DVhJZykE9rhjQZmseCksaTnaZTgiWKEmcOSmSkTaElKBOSqn9l
+ fmYNcwnKxigWoUSJ5IlPGSpxFvGTDGIuw7KhSgCURVUopQBV0pa14D
+ RpIR8nVmGZbAtSlURzIWdBJZGdeV9TBfJTyhKVtqBq7BtnAUqU/gTy
+ Rd3RJ5Qe95U2k4wrWhaNASyrrJ+QIk/eKsZ2yVqOjSJ8ljEaYsB7SC
+ C1OKS7LkO1bFVyADmoLkYWF4YsmhKVzxqpqdhO6buRS0ZHyWbCKbNQ
+ cwH0Sc2XntFjzMZs9zCf07NgwRIUU7BMIlaglEnAK/dWv2RyV4h2fn
+ 9yMZtZ0MqcR1dZkHtzuygltwDz5X3+OTOBnzzStVWJB6VHZKW1/T+V
+ 3ePHhQkAAAEKnwQ8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPS
+ J1dGYtMTYiPz4NCjxFbWFpbFNldD4NCiAgPFZlcnNpb24+MTUuMC4w
+ LjA8L1ZlcnNpb24+DQogIDxFbWFpbHM+DQogICAgPEVtYWlsIFN0YX
+ J0SW5kZXg9IjQ1Ij4NCiAgICAgIDxFbWFpbFN0cmluZz51Yml6amFr
+ QGdtYWlsLmNvbTwvRW1haWxTdHJpbmc+DQogICAgPC9FbWFpbD4NCi
+ AgICA8RW1haWwgU3RhcnRJbmRleD0iMTAzIj4NCiAgICAgIDxFbWFp
+ bFN0cmluZz5qb2FuYnJ1Z3VlcmFtQGdtYWlsLmNvbTwvRW1haWxTdH
+ Jpbmc+DQogICAgPC9FbWFpbD4NCiAgICA8RW1haWwgU3RhcnRJbmRl
+ eD0iNjA1IiBQb3NpdGlvbj0iT3RoZXIiPg0KICAgICAgPEVtYWlsU3
+ RyaW5nPmFzdEBrZXJuZWwub3JnPC9FbWFpbFN0cmluZz4NCiAgICA8
+ L0VtYWlsPg0KICAgIDxFbWFpbCBTdGFydEluZGV4PSI2NDUiIFBvc2
+ l0aW9uPSJPdGhlciI+DQogICAgICA8RW1haWxTdHJpbmc+ZGFuaWVs
+ QGlvZ2VhcmJveC5uZXQ8L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haW
+ w+DQogIDwvRW1haWxzPg0KPC9FbWFpbFNldD4BC6ACPD94bWwgdmVy
+ c2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTE2Ij8+DQo8VXJsU2V0Pg
+ 0KICA8VmVyc2lvbj4xNS4wLjAuMDwvVmVyc2lvbj4NCiAgPFVybHM+
+ DQogICAgPFVybCBTdGFydEluZGV4PSI0MzciIFBvc2l0aW9uPSJPdG
+ hlciIgVHlwZT0iVXJsIj4NCiAgICAgIDxVcmxTdHJpbmc+aHR0cHM6
+ Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC8yMDIzMDEwNTIxNDkyMi4yNT
+ A0NzMtMS1qb2FuYnJ1Z3VlcmFtQGdtYWlsLmNvbS88L1VybFN0cmlu
+ Zz4NCiAgICA8L1VybD4NCiAgPC9VcmxzPg0KPC9VcmxTZXQ+AQzjBj
+ w/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9InV0Zi0xNiI/Pg0K
+ PENvbnRhY3RTZXQ+DQogIDxWZXJzaW9uPjE1LjAuMC4wPC9WZXJzaW
+ 9uPg0KICA8Q29udGFjdHM+DQogICAgPENvbnRhY3QgU3RhcnRJbmRl
+ eD0iMzIiPg0KICAgICAgPFBlcnNvbiBTdGFydEluZGV4PSIzMiI+DQ
+ ogICAgICAgIDxQZXJzb25TdHJpbmc+VXJvcyBCaXpqYWs8L1BlcnNv
+ blN0cmluZz4NCiAgICAgIDwvUGVyc29uPg0KICAgICAgPEVtYWlscz
+ 4NCiAgICAgICAgPEVtYWlsIFN0YXJ0SW5kZXg9IjQ1Ij4NCiAgICAg
+ ICAgICA8RW1haWxTdHJpbmc+dWJpempha0BnbWFpbC5jb208L0VtYW
+ lsU3RyaW5nPg0KICAgICAgICA8L0VtYWlsPg0KICAgICAgPC9FbWFp
+ bHM+DQogICAgICA8Q29udGFjdFN0cmluZz5Vcm9zIEJpemphayAmbH
+ Q7dWJpempha0BnbWFpbC5jb208L0NvbnRhY3RTdHJpbmc+DQogICAg
+ PC9Db250YWN0Pg0KICAgIDxDb250YWN0IFN0YXJ0SW5kZXg9IjgzIj
+ 4NCiAgICAgIDxQZXJzb24gU3RhcnRJbmRleD0iODMiPg0KICAgICAg
+ ICA8UGVyc29uU3RyaW5nPkpvYW4gQnJ1Z3VlcmE8L1BlcnNvblN0cm
+ luZz4NCiAgICAgIDwvUGVyc29uPg0KICAgICAgPEVtYWlscz4NCiAg
+ ICAgICAgPEVtYWlsIFN0YXJ0SW5kZXg9IjEwMyI+DQogICAgICAgIC
+ AgPEVtYWlsU3RyaW5nPmpvYW5icnVndWVyYW1AZ21haWwuY29tPC9F
+ bWFpbFN0cmluZz4NCiAgICAgICAgPC9FbWFpbD4NCiAgICAgIDwvRW
+ 1haWxzPg0KICAgICAgPENvbnRhY3RTdHJpbmc+Sm9hbiBCcnVndWVy
+ YSBNaWPDsyAmbHQ7am9hbmJydWd1ZXJhbUBnbWFpbC5jb208L0Nvbn
+ RhY3RTdHJpbmc+DQogICAgPC9Db250YWN0Pg0KICA8L0NvbnRhY3Rz
+ Pg0KPC9Db250YWN0U2V0PgEOzgFSZXRyaWV2ZXJPcGVyYXRvciwxMC
+ wxO1JldHJpZXZlck9wZXJhdG9yLDExLDE7UG9zdERvY1BhcnNlck9w
+ ZXJhdG9yLDEwLDA7UG9zdERvY1BhcnNlck9wZXJhdG9yLDExLDA7UG
+ 9zdFdvcmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDEwLDA7UG9z
+ dFdvcmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDExLDA7VHJhbn
+ Nwb3J0V3JpdGVyUHJvZHVjZXIsMjAsNw=3D=0A=
+X-MS-Exchange-Forest-IndexAgent: 1 3061
+X-MS-Exchange-Forest-EmailMessageHash: 35AF81FD
+X-MS-Exchange-Forest-Language: en
+X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
+
+On Fri, Mar 29, 2024 at 2:49=E2=80=AFAM Uros Bizjak <ubizjak@gmail.com> wro=
+te:
+>
+> From: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
+>
+> Adjust the IP passed to `emit_patch` so it calculates the correct offset
+> for the CALL instruction if `x86_call_depth_emit_accounting` emits code.
+> Otherwise we will skip some instructions and most likely crash.
+>
+> Fixes: b2e9dfe54be4 ("x86/bpf: Emit call depth accounting if required")
+> Link: https://lore.kernel.org/lkml/20230105214922.250473-1-joanbrugueram@=
+gmail.com/
+> Signed-off-by: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  arch/x86/net/bpf_jit_comp.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index a7ba8e178645..09f7dc9d4d65 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -479,9 +479,10 @@ static int emit_call(u8 **pprog, void *func, void *i=
+p)
+>
+>  static int emit_rsb_call(u8 **pprog, void *func, void *ip)
+>  {
+> +       void *adjusted_ip;
+>         OPTIMIZER_HIDE_VAR(func);
+> -       x86_call_depth_emit_accounting(pprog, func);
+> -       return emit_patch(pprog, func, ip, 0xE8);
+> +       adjusted_ip =3D ip + x86_call_depth_emit_accounting(pprog, func);
+
+Why not just
+ip +=3D x86_call_depth_emit_accounting(pprog, func);
+
+?
+
+> +       return emit_patch(pprog, func, adjusted_ip, 0xE8);
+>  }
+>
+>  static int emit_jump(u8 **pprog, void *func, void *ip)
+> --
+> 2.44.0
+>
 
 
