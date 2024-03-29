@@ -1,83 +1,114 @@
-Return-Path: <netdev+bounces-83145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB67891089
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:50:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 248AD891090
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:51:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 235531F22A12
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:50:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9AD91F22C34
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2857517999;
-	Fri, 29 Mar 2024 01:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8ygBb6H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D75182DA;
+	Fri, 29 Mar 2024 01:51:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A998820
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 01:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from sgoci-sdnproxy-3.icoremail.net (sgoci-sdnproxy-3.icoremail.net [129.150.43.208])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50AA5182A1;
+	Fri, 29 Mar 2024 01:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.43.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711677000; cv=none; b=KF+I37HwhVAMGfhcGlC0A2x2cBJ5U431svOAQfAtH55Sg8FX6gz19YbfVV9zP1hx70YFUzMGuO+cI3wY1SNSBL7Q26m5AF76t7G6I7Y2QVDGoJH/FwfD13NLHwJfv9x3xEXjHZyrDnF1vhUw63lZvr3hWapeBHicYbGEpWvfY4Y=
+	t=1711677061; cv=none; b=Cdbp6rW0AiBh4iT0TgVYytdUZLjL+B/rCrgi7Jq1cqkoA1IHcadEFFNw9ZlpaCIPIPYcqZTn0UR8RMxdQw+MwjRXXrGRrdLkN8LEQewd+Tqs3pYSjJPKmJIeom5xy2x9ZP6tZqKzMEC6QPCQFLa87R+bJvWaKz9GWLpgq1mDAh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711677000; c=relaxed/simple;
-	bh=EW0qdte+pvWo7EStyNqltxnkl18LVi77cfIxajjVvAE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HvKHVBXbipY4OIaliLEsmN+EorUQUC9uU6J/EIZ/hVSulAb2RSkBX0Ewt/OjbR42YraAxW7+sve3+M7jkfKOd3K+2IMChQyUilcmCDHHd5TKNoVtDP9LQh24pyxdk1FamhNJhPJ4iNRq4y7sVB2rXpgt6fADjdnTA3L1IeDjkkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8ygBb6H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30540C433C7;
-	Fri, 29 Mar 2024 01:49:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711676999;
-	bh=EW0qdte+pvWo7EStyNqltxnkl18LVi77cfIxajjVvAE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=S8ygBb6HV5Iu0+aD/YX78SGGofNO+tzOmUgQAcgeDEQGcM0Wvdmq+xvYN3EXGHhQe
-	 qWLbDB74DeHniNtLcEjeTzBw/yxKNr9ABiO5131y4f3RisaCE01DjQyWnYBqz9xdE2
-	 4uipYttliNY41Gye2wBWH1dJfSyi687EFLI94kShoJXuKFToYpDSRsn2BM/icPI2TM
-	 lj8aWQl5kYVDgAFmr64WH+rjH+gsUdexpZUh6BzxNNlPilwVN224xgabvVVZuIAT+d
-	 eK23X5x36l0W2UjTcRYEvekU6JuH3c5ylevsJ19gXYutqXPbwIAbfkJA1s8E36XypQ
-	 Wipm7bGH0HiUw==
-Date: Thu, 28 Mar 2024 18:49:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Jian Wen <wenjianhn@gmail.com>, <jiri@mellanox.com>,
- <edumazet@google.com>, <davem@davemloft.net>, "Jian Wen"
- <wenjian1@xiaomi.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2] devlink: use kvzalloc() to allocate devlink
- instance resources
-Message-ID: <20240328184958.3638e5a0@kernel.org>
-In-Reply-To: <40b3371a-5966-4140-922e-7c62a1c73e6c@intel.com>
-References: <20240327082128.942818-1-wenjian1@xiaomi.com>
-	<40b3371a-5966-4140-922e-7c62a1c73e6c@intel.com>
+	s=arc-20240116; t=1711677061; c=relaxed/simple;
+	bh=kdQyyQBMIEjlK+X0qlZWblq2x6AYDkJPK7XzD/A9dp0=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Ql7rDGZKlcOwY2krqCJDUXiu3W+pNviORyNlZDIIuA26pqDBLBw3q6/1VIIQSyQo6GX8RnweUnjQyt0TjZ6ssA5v0JFnW/77x7FoVr232DhTYGEAE0Eo6AjdDoFRV16+77UpeG2s5FnL3J+2t2dxIdHdMSH4AqK80Sqqp3m/+pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.43.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from ubuntu.localdomain (unknown [218.12.17.138])
+	by mail-app4 (Coremail) with SMTP id cS_KCgDXZ7tgHgZmtKiBAQ--.26409S2;
+	Fri, 29 Mar 2024 09:50:33 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	jreuter@yaina.de,
+	horms@kernel.org,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH net v2] ax25: fix use-after-free bugs caused by ax25_ds_del_timer
+Date: Fri, 29 Mar 2024 09:50:23 +0800
+Message-Id: <20240329015023.9223-1-duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgDXZ7tgHgZmtKiBAQ--.26409S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7GFykXFWUCFW7GFW3Kr18Grg_yoW8JF1rpF
+	WqgF17AFZ7ZryUKa1kWFn7Wr1UAryjq3ykCFy8CF4S9wn7Xa4DJFy8K3yvqFW7GFZ5Jr1k
+	Cw18Ww45uFn09F7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
+	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvf
+	C2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUPAWYFdZkKbgADsg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Wed, 27 Mar 2024 11:15:08 +0100 Alexander Lobakin wrote:
-> > Changes since v1:
-> > - Use struct_size(devlink, priv, priv_size) as suggested by Alexander Lobakin
+When the ax25 device is detaching, the ax25_dev_device_down()
+calls ax25_ds_del_timer() to cleanup the slave_timer. When
+the timer handler is running, the ax25_ds_del_timer() that
+calls del_timer() in it will return directly. As a result,
+the use-after-free bugs could happen, one of the scenarios
+is shown below:
 
-The change log should go under ---
-and would be great to include a link to the previous version (from lore)
+      (Thread 1)          |      (Thread 2)
+                          | ax25_ds_timeout()
+ax25_dev_device_down()    |
+  ax25_ds_del_timer()     |
+    del_timer()           |
+  ax25_dev_put() //FREE   |
+                          |  ax25_dev-> //USE
 
-> > Signed-off-by: Jian Wen <wenjian1@xiaomi.com>  
-> 
-> Since it actually fixes a bug splat, you may want to send it with prefix
-> "net" instead of "net-next" and add a "Fixes:" tag here blaming the
-> first commit which added Devlink instance allocation. Let's see what
-> others think.
+In order to mitigate bugs, when the device is detaching, use
+timer_shutdown_sync() to stop the timer.
 
-That's my initial reaction as well. We often treat memory
-pressure improvements as fixes. But thinking more we would
-need to check if any of the drivers puts a DMA buffer in its priv.
-Some FW mailbox, maybe? It's possible.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+---
+Changes in v2:
+  - Call timer_shutdown_sync() in ax25_dev_device_down().
+
+ net/ax25/ax25_dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
+index c5462486dbc..282ec581c07 100644
+--- a/net/ax25/ax25_dev.c
++++ b/net/ax25/ax25_dev.c
+@@ -105,7 +105,7 @@ void ax25_dev_device_down(struct net_device *dev)
+ 	spin_lock_bh(&ax25_dev_lock);
+ 
+ #ifdef CONFIG_AX25_DAMA_SLAVE
+-	ax25_ds_del_timer(ax25_dev);
++	timer_shutdown_sync(&ax25_dev->dama.slave_timer);
+ #endif
+ 
+ 	/*
+-- 
+2.17.1
+
 
