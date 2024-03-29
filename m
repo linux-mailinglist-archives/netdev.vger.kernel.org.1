@@ -1,144 +1,205 @@
-Return-Path: <netdev+bounces-83168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F3F891233
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 04:56:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A33A891262
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 05:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C5A2B212D2
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 03:56:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F24C71F22783
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 04:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B6B38FB6;
-	Fri, 29 Mar 2024 03:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0273B185;
+	Fri, 29 Mar 2024 04:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gyGiD1Wy"
+	dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b="dlRoWXaV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0953538DEC
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 03:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28697125D6
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 04:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711684568; cv=none; b=PcQFXgTBInslOCf5KZwTwIs0Lqg99+Y/77yrqGqurRURWlP2JGApfyOEesyH60sPSDWj7/DuaNIM8Hize69AzKJ7kzvxjCM6nh5mshJuUSWKO0IHvSb8j8m7yOE47sIHW+bm2NfzzlLRLhK4/vf+GBn295I71+tTU3L30kLM36E=
+	t=1711686357; cv=none; b=rXhjDf7cvyVIFcIw2AICuQb5FYE2NWRa/dMaajEG/lo91ROrMwR4KCYciFEQNVyJbdHSlap8Gfo9m/e8PmuygEGQrFmHY6cCldVN9m3qH7hwc0Tq39Ul0rr4+U/pYK99TQvnM6S0UQP1+9V3LZVmIwBOldIqEKsp/5lODFCewgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711684568; c=relaxed/simple;
-	bh=LJdVzIjhdB6S/DcfelzDKPP9Yk+5ga0skvUpr5ygfQM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gbpbBVPcdX/xdC2bsZcGlm4ZuEnlCHKUfYlVaMhHpejtEE9Kc1XTfAe6XoKXV9ZXcLCq5P6ms8pYJw5RxkKEa5XBbZYLH8eTUPgb+djNJXtlxgexJXqiTQLexNTOZGjLY/Ctnzwtgayhq5djXp5/EAUTtmFoVtLKxeMc4tmyItQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gyGiD1Wy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711684566;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LJdVzIjhdB6S/DcfelzDKPP9Yk+5ga0skvUpr5ygfQM=;
-	b=gyGiD1Wyt+1Jhi83kuzdCNeLA3KxmqJ6x+wJBZW3eahEfRuahfIEzaDFnCPrGqTeCp71QT
-	3VCLYRE5BmjaoJKw4pS0ME+helrX6ZlWXWrNCV5f8mjBN0eb7XcmbBzcOnOb3AefSR0We9
-	O6fy+fdU3Tulx1KyCcX2S3WgouojH6M=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-MHL6bNGoPgyxXACHnpZSzA-1; Thu, 28 Mar 2024 23:56:03 -0400
-X-MC-Unique: MHL6bNGoPgyxXACHnpZSzA-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5dbddee3694so958633a12.1
-        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 20:56:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711684563; x=1712289363;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LJdVzIjhdB6S/DcfelzDKPP9Yk+5ga0skvUpr5ygfQM=;
-        b=wDdmWBbae5tb61dKd8MH5oIZuGbZJR87cFyakZDYP+G80zCjLAnzx7S+6eq5I/RbOX
-         Fa3r97xlNYqd0XC/fdVjgO+O74zvw64XkwrWBvWk0WlmJSorj1KNSBz3VAydaVnTvMFh
-         eXn/i+wVpJlgUbFQ2OiMsaBDN/bE/waSSw61M+cDbuhN3CYLQHvjiK4cGelRqq6+P/No
-         tAgw9al2+2o2920k24RijSwfQ81AxsrIlex4RoydDLmnKgmch9cujBU2Tg26R3kYpi6b
-         sr8UU+0cZXJM6Afy0WZkwpeIwmxtQ0z0dOemiiJ4B/Xhf5Rd+Oml1921Hw2aWA3tMPGS
-         TmAw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5SVjygx724Zokg3eHv98iUIB58C57g5sGIoYSUBdTZG5xSSJoUNwlxSP9MTpTROwhrnYvVI4bsuOWiGWeV9mZ3dqgIyHG
-X-Gm-Message-State: AOJu0YzIeaXgm8APYL6Ffd72UzCvM3NK2fbUZ7/a7vF6kJl2KC4AJvvx
-	OOZ0fISCO0OdLGUbaFdnfBvoFFn0pZuAAwcDfSO7EOtoFils9cIPH/2UhQNHQ+ywzqYEXB2aCX6
-	byU5+qHYUswmIKvvCqNKDXoYsMXD8kMvtVBtxbE+bz6aktPdGRpjyG131YAchr7sCj0VzFvwK6m
-	wxykEj54MVVJFG7Bjqg14iDVV9NKoK
-X-Received: by 2002:a17:90a:d515:b0:2a0:8d17:948d with SMTP id t21-20020a17090ad51500b002a08d17948dmr1838134pju.1.1711684562672;
-        Thu, 28 Mar 2024 20:56:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF5WpbyriUxjePwEjGO5X6q+YKYhB1eZJaJgrj4rVieoGSzVLIkn+ALnR8ZipwbzdgGvrRXqkbuUUu/vp0RL8A=
-X-Received: by 2002:a17:90a:d515:b0:2a0:8d17:948d with SMTP id
- t21-20020a17090ad51500b002a08d17948dmr1838120pju.1.1711684562345; Thu, 28 Mar
- 2024 20:56:02 -0700 (PDT)
+	s=arc-20240116; t=1711686357; c=relaxed/simple;
+	bh=nNay1aV4TfSASqPJjXCxeAzelDK7osT+yJa9FnMByoA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UWmc7/jYFVMJIwUpeSsBZsSEQwIJ7+Cviaho8niHCtAw23vLIh3EYrzTnV4RnrRTghTN9BEonBT5BGeW7xVfPyguR5FKiKWJGxouat/ZGlI7OfTDjNvt1DrKGokPjzTGD7TN6ARgO4jyt0uf50frhhUbwDX3IwTwfcmdf0SJatU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz; spf=pass smtp.mailfrom=fe-bounces.faucet.nz; dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b=dlRoWXaV; arc=none smtp.client-ip=149.28.215.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.faucet.nz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=faucet.nz;
+ h=Content-Transfer-Encoding: MIME-Version: Message-Id: Date: Subject: Cc:
+ To: From; q=dns/txt; s=fe-4ed8c67516; t=1711686350;
+ bh=CMNwW1fTsHqMDxsO3OxcQETZvoxbiQrweBGQH4nUay8=;
+ b=dlRoWXaVQOdOuQOARy8mpfgbkrf3f53IJHGJQccuZnkM6Jkb4Ywx30QT4oX7pE8l1SWhSrAw5
+ AqhzbOUlfnl0iroK7EBDHmipINGPa6VRPTettiSg8UbF2UsqCbn7ebkhQ2fWK4SHgmHyDzX9yF5
+ Rmt4/frqpWL5HQ23/STS4bo=
+From: Brad Cowie <brad@faucet.nz>
+To: bpf@vger.kernel.org
+Cc: lorenzo@kernel.org, memxor@gmail.com, pablo@netfilter.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ song@kernel.org, john.fastabend@gmail.com, sdf@google.com,
+ jolsa@kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, Brad Cowie <brad@faucet.nz>
+Subject: [PATCH bpf-next] net: netfilter: Make ct zone id configurable for bpf ct helper functions
+Date: Fri, 29 Mar 2024 17:14:30 +1300
+Message-Id: <20240329041430.2176860-1-brad@faucet.nz>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240320101912.28210-1-w_angrong@163.com> <20240321025920-mutt-send-email-mst@kernel.org>
- <CACGkMEuHRf0ZfBiAYxyNHB3pxuzz=QCWt5VyHPLz-+-+LM=+bg@mail.gmail.com>
-In-Reply-To: <CACGkMEuHRf0ZfBiAYxyNHB3pxuzz=QCWt5VyHPLz-+-+LM=+bg@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 29 Mar 2024 11:55:50 +0800
-Message-ID: <CACGkMEuM9bdvgH7_v6F=HT-x10+0tCzG56iuU05guwqNN1+qKQ@mail.gmail.com>
-Subject: Re: [PATCH v3] vhost/vdpa: Add MSI translation tables to iommu for
- software-managed MSI
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wang Rong <w_angrong@163.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Cindy Lu <lulu@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Report-Abuse-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-ForwardEmail-Version: 0.4.40
+X-ForwardEmail-Sender: rfc822; brad@faucet.nz, smtp.forwardemail.net,
+ 149.28.215.223
+X-ForwardEmail-ID: 660640461a1a38b2e7c2e855
 
-On Wed, Mar 27, 2024 at 5:08=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Thu, Mar 21, 2024 at 3:00=E2=80=AFPM Michael S. Tsirkin <mst@redhat.co=
-m> wrote:
-> >
-> > On Wed, Mar 20, 2024 at 06:19:12PM +0800, Wang Rong wrote:
-> > > From: Rong Wang <w_angrong@163.com>
-> > >
-> > > Once enable iommu domain for one device, the MSI
-> > > translation tables have to be there for software-managed MSI.
-> > > Otherwise, platform with software-managed MSI without an
-> > > irq bypass function, can not get a correct memory write event
-> > > from pcie, will not get irqs.
-> > > The solution is to obtain the MSI phy base address from
-> > > iommu reserved region, and set it to iommu MSI cookie,
-> > > then translation tables will be created while request irq.
-> > >
-> > > Change log
-> > > ----------
-> > >
-> > > v1->v2:
-> > > - add resv iotlb to avoid overlap mapping.
-> > > v2->v3:
-> > > - there is no need to export the iommu symbol anymore.
-> > >
-> > > Signed-off-by: Rong Wang <w_angrong@163.com>
-> >
-> > There's in interest to keep extending vhost iotlb -
-> > we should just switch over to iommufd which supports
-> > this already.
->
-> IOMMUFD is good but VFIO supports this before IOMMUFD. This patch
-> makes vDPA run without a backporting of full IOMMUFD in the production
-> environment. I think it's worth.
->
-> If you worry about the extension, we can just use the vhost iotlb
-> existing facility to do this.
->
-> Thanks
+Add ct zone id to bpf_ct_opts so that arbitrary ct zone can be
+set for xdp/tc bpf ct helper functions bpf_{xdp,skb}_ct_alloc
+and bpf_{xdp,skb}_ct_lookup.
 
-Btw, Wang Rong,
+Signed-off-by: Brad Cowie <brad@faucet.nz>
+---
+ net/netfilter/nf_conntrack_bpf.c              | 23 ++++++++++---------
+ .../testing/selftests/bpf/prog_tests/bpf_nf.c |  1 -
+ .../testing/selftests/bpf/progs/test_bpf_nf.c | 13 ++---------
+ 3 files changed, 14 insertions(+), 23 deletions(-)
 
-It looks that Cindy does have the bandwidth in working for IOMMUFD support.
-
-Do you have the will to do that?
-
-Thanks
+diff --git a/net/netfilter/nf_conntrack_bpf.c b/net/netfilter/nf_conntrack_bpf.c
+index d2492d050fe6..a0f8a64751ec 100644
+--- a/net/netfilter/nf_conntrack_bpf.c
++++ b/net/netfilter/nf_conntrack_bpf.c
+@@ -30,7 +30,6 @@
+  * @error      - Out parameter, set for any errors encountered
+  *		 Values:
+  *		   -EINVAL - Passed NULL for bpf_tuple pointer
+- *		   -EINVAL - opts->reserved is not 0
+  *		   -EINVAL - netns_id is less than -1
+  *		   -EINVAL - opts__sz isn't NF_BPF_CT_OPTS_SZ (12)
+  *		   -EPROTO - l4proto isn't one of IPPROTO_TCP or IPPROTO_UDP
+@@ -42,16 +41,14 @@
+  *		 Values:
+  *		   IPPROTO_TCP, IPPROTO_UDP
+  * @dir:       - connection tracking tuple direction.
+- * @reserved   - Reserved member, will be reused for more options in future
+- *		 Values:
+- *		   0
++ * @ct_zone    - connection tracking zone id.
+  */
+ struct bpf_ct_opts {
+ 	s32 netns_id;
+ 	s32 error;
+ 	u8 l4proto;
+ 	u8 dir;
+-	u8 reserved[2];
++	u16 ct_zone;
+ };
+ 
+ enum {
+@@ -104,11 +101,11 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
+ 			u32 timeout)
+ {
+ 	struct nf_conntrack_tuple otuple, rtuple;
++	struct nf_conntrack_zone ct_zone;
+ 	struct nf_conn *ct;
+ 	int err;
+ 
+-	if (!opts || !bpf_tuple || opts->reserved[0] || opts->reserved[1] ||
+-	    opts_len != NF_BPF_CT_OPTS_SZ)
++	if (!opts || !bpf_tuple || opts_len != NF_BPF_CT_OPTS_SZ)
+ 		return ERR_PTR(-EINVAL);
+ 
+ 	if (unlikely(opts->netns_id < BPF_F_CURRENT_NETNS))
+@@ -130,7 +127,9 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
+ 			return ERR_PTR(-ENONET);
+ 	}
+ 
+-	ct = nf_conntrack_alloc(net, &nf_ct_zone_dflt, &otuple, &rtuple,
++	nf_ct_zone_init(&ct_zone, opts->ct_zone, NF_CT_DEFAULT_ZONE_DIR, 0);
++
++	ct = nf_conntrack_alloc(net, &ct_zone, &otuple, &rtuple,
+ 				GFP_ATOMIC);
+ 	if (IS_ERR(ct))
+ 		goto out;
+@@ -152,11 +151,11 @@ static struct nf_conn *__bpf_nf_ct_lookup(struct net *net,
+ {
+ 	struct nf_conntrack_tuple_hash *hash;
+ 	struct nf_conntrack_tuple tuple;
++	struct nf_conntrack_zone ct_zone;
+ 	struct nf_conn *ct;
+ 	int err;
+ 
+-	if (!opts || !bpf_tuple || opts->reserved[0] || opts->reserved[1] ||
+-	    opts_len != NF_BPF_CT_OPTS_SZ)
++	if (!opts || !bpf_tuple || opts_len != NF_BPF_CT_OPTS_SZ)
+ 		return ERR_PTR(-EINVAL);
+ 	if (unlikely(opts->l4proto != IPPROTO_TCP && opts->l4proto != IPPROTO_UDP))
+ 		return ERR_PTR(-EPROTO);
+@@ -174,7 +173,9 @@ static struct nf_conn *__bpf_nf_ct_lookup(struct net *net,
+ 			return ERR_PTR(-ENONET);
+ 	}
+ 
+-	hash = nf_conntrack_find_get(net, &nf_ct_zone_dflt, &tuple);
++	nf_ct_zone_init(&ct_zone, opts->ct_zone, NF_CT_DEFAULT_ZONE_DIR, 0);
++
++	hash = nf_conntrack_find_get(net, &ct_zone, &tuple);
+ 	if (opts->netns_id >= 0)
+ 		put_net(net);
+ 	if (!hash)
+diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_nf.c b/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
+index b30ff6b3b81a..25c3c4e87ed5 100644
+--- a/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
++++ b/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
+@@ -103,7 +103,6 @@ static void test_bpf_nf_ct(int mode)
+ 		goto end;
+ 
+ 	ASSERT_EQ(skel->bss->test_einval_bpf_tuple, -EINVAL, "Test EINVAL for NULL bpf_tuple");
+-	ASSERT_EQ(skel->bss->test_einval_reserved, -EINVAL, "Test EINVAL for reserved not set to 0");
+ 	ASSERT_EQ(skel->bss->test_einval_netns_id, -EINVAL, "Test EINVAL for netns_id < -1");
+ 	ASSERT_EQ(skel->bss->test_einval_len_opts, -EINVAL, "Test EINVAL for len__opts != NF_BPF_CT_OPTS_SZ");
+ 	ASSERT_EQ(skel->bss->test_eproto_l4proto, -EPROTO, "Test EPROTO for l4proto != TCP or UDP");
+diff --git a/tools/testing/selftests/bpf/progs/test_bpf_nf.c b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
+index 77ad8adf68da..4adb73bc1b33 100644
+--- a/tools/testing/selftests/bpf/progs/test_bpf_nf.c
++++ b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
+@@ -45,7 +45,8 @@ struct bpf_ct_opts___local {
+ 	s32 netns_id;
+ 	s32 error;
+ 	u8 l4proto;
+-	u8 reserved[3];
++	u8 dir;
++	u16 ct_zone;
+ } __attribute__((preserve_access_index));
+ 
+ struct nf_conn *bpf_xdp_ct_alloc(struct xdp_md *, struct bpf_sock_tuple *, u32,
+@@ -84,16 +85,6 @@ nf_ct_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
+ 	else
+ 		test_einval_bpf_tuple = opts_def.error;
+ 
+-	opts_def.reserved[0] = 1;
+-	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
+-		       sizeof(opts_def));
+-	opts_def.reserved[0] = 0;
+-	opts_def.l4proto = IPPROTO_TCP;
+-	if (ct)
+-		bpf_ct_release(ct);
+-	else
+-		test_einval_reserved = opts_def.error;
+-
+ 	opts_def.netns_id = -2;
+ 	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
+ 		       sizeof(opts_def));
+-- 
+2.34.1
 
 
