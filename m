@@ -1,203 +1,94 @@
-Return-Path: <netdev+bounces-83452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E841E8924A8
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 20:54:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF528924B8
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 21:00:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C8CC284F3D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:54:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 336A91C21663
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 20:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9181813A89E;
-	Fri, 29 Mar 2024 19:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7702013A418;
+	Fri, 29 Mar 2024 20:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="GKkycvFk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8kIiXSW"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E8F12FB12;
-	Fri, 29 Mar 2024 19:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEB113A89E
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 20:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711742046; cv=none; b=ouE3rxCtJwhYADvaQnL9nlupheQcLw3+NdASrliPDQTsPbYAZh03TwttJnaEuGKCs+ylQgVLeNzleQbL6BOyvd6XwcVFBr4ilxwjUUjeb6KnmBoNFPSjdYOYOU9W8J3IaCxXdX83HKXQOvydbM39sgHd1VEX4Tk/3p3UC/NXvbE=
+	t=1711742436; cv=none; b=sGBUlJY5vM9m2lHpTBOcND9omo/ApxHPn7Hgiafw67C1pAbBpjC8gxlCpE5o9pxKGVRdsuoNDNvvDej7HwxVgs4YFXYZ7EGo/4EdDMQob2LazUlkLqZl0iZz9UtnjHV66luuq/DGwJ+jZ2a/fvJ8zjnI28FchIC9OQevi6ie1Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711742046; c=relaxed/simple;
-	bh=7FIgZdhSuFmBFq7x61DjTJQ6bzsgrfBW8fIPAWIE+MU=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=n6PikM7JyVbcz/ILB1pCaYVakWY7coAO0Q1F8epSZlNYh3fiZU7PcQUw/opb/qrJKXSpns6vPxsdE3opxDLzMku8PdSH01/QlSC9v+Qz/ZUbkHQD8vkPOMWPjfC3id0ysxdyqZ1+UJRYSMynWFOebhGytOV1nHSM/Ipvl4V5CZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=GKkycvFk; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1711742042;
-	bh=7FIgZdhSuFmBFq7x61DjTJQ6bzsgrfBW8fIPAWIE+MU=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=GKkycvFkCWp+5HTjbw8G0xXWaauEjnFnSHlwt8uaT6BT4Bg/7HmDKPatTDArsxdRm
-	 G+Lcy90jN5PMAcqWlHcl/GVZpMc1HPY/ckbwi0RXmo5Qjp0g3WKVHfyOd5TX79bwWy
-	 CfRH41Gu6cQjnLTEUjGg9EcODbPekwDb+vR3jzVzkx7zrV0z2AzNMnat27He8ow+dV
-	 UGZ1nAyaT1MDSBBJuGm+sMND3htxnkklKcJUZbF0+3ECEj/PIbmBFV+XfUKNE2vMlP
-	 PRmK74mnrrbVPG6NMDXqSyk5PY/vQDEyX9XWJ5pRTK1+y9pgiGeO/N5kkwJyYRUBFy
-	 Ba0POAplPiXKA==
-Received: from [100.113.15.66] (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: usama.anjum)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 94ED33781FCE;
-	Fri, 29 Mar 2024 19:53:50 +0000 (UTC)
-Message-ID: <c54bae70-3655-4188-aad7-358bb7897c3c@collabora.com>
-Date: Sat, 30 Mar 2024 00:54:20 +0500
+	s=arc-20240116; t=1711742436; c=relaxed/simple;
+	bh=AKC/DkGfqvN8PPgkkA9YpVmAlCuj7rSHkPl2gEJTpGI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Fh39QP1/iuC+doFZDp66xaj94ObX9k6ODd5sYtvdYd+EbbGeSGh/zi1SEJf1aMVQ34cPFaVG45AFJ6WJmo5HChLAjSbpMxg6orV/T5LviPBQdmYtLIIj4oiySLZHqtbnU0MJC/PYPOIE2JyZ5ZOobn9v1+fnqfqBtLI2IiKh2F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8kIiXSW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A92FFC43390;
+	Fri, 29 Mar 2024 20:00:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711742435;
+	bh=AKC/DkGfqvN8PPgkkA9YpVmAlCuj7rSHkPl2gEJTpGI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=g8kIiXSWssgtm29f3G9EdBMVxtTpPZql0JTtsYa5cgSTCzpDi/lQVkKQd2NpUu4h9
+	 6+1VOwKa3FEs/ZhC5VDijOjz9/AjL/6u5y0bl94b24PEdebX4flQ1RziwgT63RMyhc
+	 kri4OC/+Xn2MmmkSAlZ+7sMj4inECZ6+xDYKen931Yu5vDPCMNZUzEwdV8TVuzRDiI
+	 cZwj5C5ELjlw76ZfEGg7iikajDJ0gD4WCjWBfNEAiJsBdQ/CR5omfg9cwnB/BlNFf0
+	 I15/EuL/lB6n5/IAuG0DCaYBHTe4rn6JtW/Snp7f3hGFmprY1sLOQ/u2GSPpY/MpdN
+	 vWrXhfb1+F9wQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 981DDD84BAF;
+	Fri, 29 Mar 2024 20:00:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
- linux-kselftest@vger.kernel.org, kernel-team@android.com,
- Lokesh Gidra <lokeshgidra@google.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-mm@kvack.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v3] selftests/mm: Fix ARM related issue with fork after
- pthread_create
-To: Edward Liaw <edliaw@google.com>, linux-kernel@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Jann Horn <jannh@google.com>
-References: <20240325194100.775052-1-edliaw@google.com>
-Content-Language: en-US
-From: Muhammad Usama Anjum <usama.anjum@collabora.com>
-In-Reply-To: <20240325194100.775052-1-edliaw@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] erspan: make sure erspan_base_hdr is present in
+ skb->head
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171174243561.4906.133976208184828473.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 20:00:35 +0000
+References: <20240328112248.1101491-1-edumazet@google.com>
+In-Reply-To: <20240328112248.1101491-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+1c1cf138518bf0c53d68@syzkaller.appspotmail.com, lorenzo@kernel.org
 
-On 3/26/24 12:40 AM, Edward Liaw wrote:
-> Following issue was observed while running the uffd-unit-tests selftest
-> on ARM devices. On x86_64 no issues were detected:
-> 
-> pthread_create followed by fork caused deadlock in certain cases
-> wherein fork required some work to be completed by the created thread.
-> Used synchronization to ensure that created thread's start function has
-> started before invoking fork.
-> 
-> Signed-off-by: Lokesh Gidra <lokeshgidra@google.com>
-> [edliaw: Refactored to use atomic_bool]
-> Signed-off-by: Edward Liaw <edliaw@google.com>
-Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+Hello:
 
-> ---
-> 
-> v2: restored accidentally removed uffd_test_case_ops when merging
-> v3: fixed commit subject to use selftests/mm prefix
-> 
->  tools/testing/selftests/mm/uffd-common.c     |  3 +++
->  tools/testing/selftests/mm/uffd-common.h     |  2 ++
->  tools/testing/selftests/mm/uffd-unit-tests.c | 10 ++++++++++
->  3 files changed, 15 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/mm/uffd-common.c b/tools/testing/selftests/mm/uffd-common.c
-> index b0ac0ec2356d..7ad6ba660c7d 100644
-> --- a/tools/testing/selftests/mm/uffd-common.c
-> +++ b/tools/testing/selftests/mm/uffd-common.c
-> @@ -18,6 +18,7 @@ bool test_uffdio_wp = true;
->  unsigned long long *count_verify;
->  uffd_test_ops_t *uffd_test_ops;
->  uffd_test_case_ops_t *uffd_test_case_ops;
-> +atomic_bool ready_for_fork;
-> 
->  static int uffd_mem_fd_create(off_t mem_size, bool hugetlb)
->  {
-> @@ -518,6 +519,8 @@ void *uffd_poll_thread(void *arg)
->  	pollfd[1].fd = pipefd[cpu*2];
->  	pollfd[1].events = POLLIN;
-> 
-> +	ready_for_fork = true;
-> +
->  	for (;;) {
->  		ret = poll(pollfd, 2, -1);
->  		if (ret <= 0) {
-> diff --git a/tools/testing/selftests/mm/uffd-common.h b/tools/testing/selftests/mm/uffd-common.h
-> index cb055282c89c..cc5629c3d2aa 100644
-> --- a/tools/testing/selftests/mm/uffd-common.h
-> +++ b/tools/testing/selftests/mm/uffd-common.h
-> @@ -32,6 +32,7 @@
->  #include <inttypes.h>
->  #include <stdint.h>
->  #include <sys/random.h>
-> +#include <stdatomic.h>
-> 
->  #include "../kselftest.h"
->  #include "vm_util.h"
-> @@ -103,6 +104,7 @@ extern bool map_shared;
->  extern bool test_uffdio_wp;
->  extern unsigned long long *count_verify;
->  extern volatile bool test_uffdio_copy_eexist;
-> +extern atomic_bool ready_for_fork;
-> 
->  extern uffd_test_ops_t anon_uffd_test_ops;
->  extern uffd_test_ops_t shmem_uffd_test_ops;
-> diff --git a/tools/testing/selftests/mm/uffd-unit-tests.c b/tools/testing/selftests/mm/uffd-unit-tests.c
-> index 2b9f8cc52639..4a48dc617c6b 100644
-> --- a/tools/testing/selftests/mm/uffd-unit-tests.c
-> +++ b/tools/testing/selftests/mm/uffd-unit-tests.c
-> @@ -775,6 +775,8 @@ static void uffd_sigbus_test_common(bool wp)
->  	char c;
->  	struct uffd_args args = { 0 };
-> 
-> +	ready_for_fork = false;
-> +
->  	fcntl(uffd, F_SETFL, uffd_flags | O_NONBLOCK);
-> 
->  	if (uffd_register(uffd, area_dst, nr_pages * page_size,
-> @@ -790,6 +792,9 @@ static void uffd_sigbus_test_common(bool wp)
->  	if (pthread_create(&uffd_mon, NULL, uffd_poll_thread, &args))
->  		err("uffd_poll_thread create");
-> 
-> +	while (!ready_for_fork)
-> +		; /* Wait for the poll_thread to start executing before forking */
-> +
->  	pid = fork();
->  	if (pid < 0)
->  		err("fork");
-> @@ -829,6 +834,8 @@ static void uffd_events_test_common(bool wp)
->  	char c;
->  	struct uffd_args args = { 0 };
-> 
-> +	ready_for_fork = false;
-> +
->  	fcntl(uffd, F_SETFL, uffd_flags | O_NONBLOCK);
->  	if (uffd_register(uffd, area_dst, nr_pages * page_size,
->  			  true, wp, false))
-> @@ -838,6 +845,9 @@ static void uffd_events_test_common(bool wp)
->  	if (pthread_create(&uffd_mon, NULL, uffd_poll_thread, &args))
->  		err("uffd_poll_thread create");
-> 
-> +	while (!ready_for_fork)
-> +		; /* Wait for the poll_thread to start executing before forking */
-> +
->  	pid = fork();
->  	if (pid < 0)
->  		err("fork");
-> --
-> 2.44.0.396.g6e790dbe36-goog
-> 
-> 
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
+On Thu, 28 Mar 2024 11:22:48 +0000 you wrote:
+> syzbot reported a problem in ip6erspan_rcv() [1]
+> 
+> Issue is that ip6erspan_rcv() (and erspan_rcv()) no longer make
+> sure erspan_base_hdr is present in skb linear part (skb->head)
+> before getting @ver field from it.
+> 
+> Add the missing pskb_may_pull() calls.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net] erspan: make sure erspan_base_hdr is present in skb->head
+    https://git.kernel.org/netdev/net/c/17af420545a7
+
+You are awesome, thank you!
 -- 
-BR,
-Muhammad Usama Anjum
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
