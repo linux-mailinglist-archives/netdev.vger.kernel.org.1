@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-83296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F958919BE
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:47:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 634078919CF
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:48:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAB981C251BD
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:46:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 869451C242AC
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1178414BFB3;
-	Fri, 29 Mar 2024 12:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E1914C5AB;
+	Fri, 29 Mar 2024 12:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZcnaQuZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="no7+97aD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1E114B082;
-	Fri, 29 Mar 2024 12:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5120E13BC02;
+	Fri, 29 Mar 2024 12:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715360; cv=none; b=biKotN+96ducSbVzmB82ABv4DiS66lJWE8c6wbb5oCyKAofZBaYaJv/rAgAE3o7ZRmGrMk/eSNJD9JLce0BzPjbFwdlR/bm4O6v59Fippv/AQyBiFNvYfb6U9F0ihodPMKQPToNg+vGhEN12qqRtMDFw7Zpi4jeu3F9RdlWbP68=
+	t=1711715400; cv=none; b=ktFr2aR4ehNSpWaE6MlQuE37zDnNWXvtyLAZTvKuA75/mYO9GY/BwFhIW4MrxflihuZLlhs9uV7Yg0yv3B1SIjJw6CReAWo+PtdDYH9HFfd2ix9qPKpG9Pw5NIJRZkGZj9P3njNQXv9Nip25elrn/Sm9TVapwWucHnud/clniYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715360; c=relaxed/simple;
-	bh=KABQHWyylxn9V22SBKEYJzDMqoVOt0P7PgTKiCi3zUE=;
+	s=arc-20240116; t=1711715400; c=relaxed/simple;
+	bh=Ud992meL8XwocHeq6YdLc0QNDTmSivWui9LiSRIq/wQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HARB4ZzMlfAmFbziCXOt0+hhc9gePNuDboWCOMtRQty+YZagY+UZkOXjnoiyLBpl9kx9vDlYa2w0noejl1Gx/vmUHWAePhddIYHh0nMY4l5m05W1NNB7gCjWv4vhtOeH9ZgRSlYqDt/QdyEX+Btsk66q0Fn00QeGVckK1Z/uDLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZcnaQuZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29BBBC433C7;
-	Fri, 29 Mar 2024 12:29:18 +0000 (UTC)
+	 MIME-Version; b=odgua3pcBmWCvmv94BC2b+RSGJiCwY8Tqzdggb45ftMJSMwzu9DIQuX4/lnYPjub4te+TGBkl32VXWy7pT18y6zm2UOZbSlFUAk8YhxO1kpJiVCS7oVO+dMvMj2DkItvocAAlK6PQFiz/dPhOSydD0bDqOa/F/DwE/vRb3ZwaU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=no7+97aD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D60B4C433C7;
+	Fri, 29 Mar 2024 12:29:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715359;
-	bh=KABQHWyylxn9V22SBKEYJzDMqoVOt0P7PgTKiCi3zUE=;
+	s=k20201202; t=1711715400;
+	bh=Ud992meL8XwocHeq6YdLc0QNDTmSivWui9LiSRIq/wQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dZcnaQuZ/X4CRnuS5XQTl6sQknD2vrct5n4FOHm21bs9v568HAzI1+36a3OVVpc9Z
-	 JIa16to88F5CJk/ER13ytCXTiLzpoEfjx4a7aZwlTMgMkAKFCyiIP8c7iHYOXL66zS
-	 O+V7OU6CWhaHunghlIWgtjnQ+v5K1wZyZsEimLOSG2K58thUrvoOgpJxlmKtvLz0Gy
-	 Rq742x9xYtjlvt8Lh7sotqAbdbtT9TkzR9xnHQD359Q2wYWZ5kuIn1uh6h32TrHH6c
-	 MJixD9jP5yHHhbKYTydiYi3ihw7vKHpt8/OTybpB3cOSd3fUDpkYR8u//c2VOG4cRj
-	 Edn33GY6HEtqw==
+	b=no7+97aDOTCOFn32b5xOAk09019zDiJEGp8c7+g0Bkq+JEtS2719KEyLjn4vxK0ya
+	 HDEJEtUQFhi7pQf0UZBsThjPAQO+hatOMghrKnHPU3LHuNBRb//UHLzmAIOmJ4Ie7G
+	 Shp6QCL4XDIhmzUHuuXddvIAGaxaIDhbHNLrtwTePTsiL3vqnuGFQREMsOOPZcKfUv
+	 8+68E78mXQJHk9FEANxdvLwL27XRl7dPjybsdGs88z+FWD9Bw2u5h01TnTwht9v8fA
+	 UI8tD8aoQBtoSs3kqRRoVDUgq3XcK9AY4SaPhsrQkq3ee8cB+8c/Bk1gsuST0vMKQx
+	 KPZdrRH2KTJOw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Vinicius Peixoto <nukelet64@gmail.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc: Kees Cook <keescook@chromium.org>,
+	kernel test robot <lkp@intel.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	johan.hedberg@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 68/68] Bluetooth: Add new quirk for broken read key length on ATS2851
-Date: Fri, 29 Mar 2024 08:26:04 -0400
-Message-ID: <20240329122652.3082296-68-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 03/52] bnx2x: Fix firmware version string character counts
+Date: Fri, 29 Mar 2024 08:28:33 -0400
+Message-ID: <20240329122956.3083859-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240329122652.3082296-1-sashal@kernel.org>
-References: <20240329122652.3082296-1-sashal@kernel.org>
+In-Reply-To: <20240329122956.3083859-1-sashal@kernel.org>
+References: <20240329122956.3083859-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,87 +69,138 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.8.2
+X-stable-base: Linux 6.6.23
 Content-Transfer-Encoding: 8bit
 
-From: Vinicius Peixoto <nukelet64@gmail.com>
+From: Kees Cook <keescook@chromium.org>
 
-[ Upstream commit 48201a3b3f398be6a01f78a14b18bd5d31c47458 ]
+[ Upstream commit 5642c82b9463c3263c086efb002516244bd4c668 ]
 
-The ATS2851 controller erroneously reports support for the "Read
-Encryption Key Length" HCI command. This makes it unable to connect
-to any devices, since this command is issued by the kernel during the
-connection process in response to an "Encryption Change" HCI event.
+A potential string truncation was reported in bnx2x_fill_fw_str(),
+when a long bp->fw_ver and a long phy_fw_ver might coexist, but seems
+unlikely with real-world hardware.
 
-Add a new quirk (HCI_QUIRK_BROKEN_ENC_KEY_SIZE) to hint that the command
-is unsupported, preventing it from interrupting the connection process.
+Use scnprintf() to indicate the intent that truncations are tolerated.
 
-This is the error log from btmon before this patch:
+While reading this code, I found a collection of various buffer size
+counting issues. None looked like they might lead to a buffer overflow
+with current code (the small buffers are 20 bytes and might only ever
+consume 10 bytes twice with a trailing %NUL). However, early truncation
+(due to a %NUL in the middle of the string) might be happening under
+likely rare conditions. Regardless fix the formatters and related
+functions:
 
-> HCI Event: Encryption Change (0x08) plen 4
-        Status: Success (0x00)
-        Handle: 2048 Address: ...
-        Encryption: Enabled with E0 (0x01)
-< HCI Command: Read Encryption Key Size (0x05|0x0008) plen 2
-        Handle: 2048 Address: ...
-> HCI Event: Command Status (0x0f) plen 4
-      Read Encryption Key Size (0x05|0x0008) ncmd 1
-        Status: Unknown HCI Command (0x01)
+- Switch from a separate strscpy() to just adding an additional "%s" to
+  the format string that immediately follows it in bnx2x_fill_fw_str().
+- Use sizeof() universally instead of using unbound defines.
+- Fix bnx2x_7101_format_ver() and bnx2x_null_format_ver() to report the
+  number of characters written, not including the trailing %NUL (as
+  already done with the other firmware formatting functions).
+- Require space for at least 1 byte in bnx2x_get_ext_phy_fw_version()
+  for the trailing %NUL.
+- Correct the needed buffer size in bnx2x_3_seq_format_ver().
 
-Signed-off-by: Vinicius Peixoto <nukelet64@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202401260858.jZN6vD1k-lkp@intel.com/
+Cc: Ariel Elior <aelior@marvell.com>
+Cc: Sudarsana Kalluru <skalluru@marvell.com>
+Cc: Manish Chopra <manishc@marvell.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Link: https://lore.kernel.org/r/20240126041044.work.220-kees@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c   | 1 +
- include/net/bluetooth/hci.h | 8 ++++++++
- net/bluetooth/hci_event.c   | 3 ++-
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c    |  9 +++++----
+ .../net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c    |  2 +-
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c   | 14 +++++++-------
+ 3 files changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d31edad7a0560..0c0e06ea92863 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4481,6 +4481,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks);
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+index e9c1e1bb55806..528441b28c4ef 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+@@ -147,10 +147,11 @@ void bnx2x_fill_fw_str(struct bnx2x *bp, char *buf, size_t buf_len)
+ 
+ 		phy_fw_ver[0] = '\0';
+ 		bnx2x_get_ext_phy_fw_version(&bp->link_params,
+-					     phy_fw_ver, PHY_FW_VER_LEN);
+-		strscpy(buf, bp->fw_ver, buf_len);
+-		snprintf(buf + strlen(bp->fw_ver), 32 - strlen(bp->fw_ver),
+-			 "bc %d.%d.%d%s%s",
++					     phy_fw_ver, sizeof(phy_fw_ver));
++		/* This may become truncated. */
++		scnprintf(buf, buf_len,
++			 "%sbc %d.%d.%d%s%s",
++			 bp->fw_ver,
+ 			 (bp->common.bc_ver & 0xff0000) >> 16,
+ 			 (bp->common.bc_ver & 0xff00) >> 8,
+ 			 (bp->common.bc_ver & 0xff),
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+index bda3ccc28eca6..f920976c36f0c 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+@@ -1132,7 +1132,7 @@ static void bnx2x_get_drvinfo(struct net_device *dev,
  	}
  
- 	if (!reset)
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index bdee5d649cc61..8c36e094ec99f 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -330,6 +330,14 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_BROKEN_LE_CODED,
-+
-+	/*
-+	 * When this quirk is set, the HCI_OP_READ_ENC_KEY_SIZE command is
-+	 * skipped during an HCI_EV_ENCRYPT_CHANGE event. This is required
-+	 * for Actions Semiconductor ATS2851 based controllers, which erroneously
-+	 * claim to support it.
-+	 */
-+	HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE,
- };
+ 	memset(version, 0, sizeof(version));
+-	bnx2x_fill_fw_str(bp, version, ETHTOOL_FWVERS_LEN);
++	bnx2x_fill_fw_str(bp, version, sizeof(version));
+ 	strlcat(info->fw_version, version, sizeof(info->fw_version));
  
- /* HCI device flags */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2a5f5a7d2412b..8652cdee14b00 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3660,7 +3660,8 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 		 * controller really supports it. If it doesn't, assume
- 		 * the default size (16).
- 		 */
--		if (!(hdev->commands[20] & 0x10)) {
-+		if (!(hdev->commands[20] & 0x10) ||
-+		    test_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks)) {
- 			conn->enc_key_size = HCI_LINK_KEY_SIZE;
- 			goto notify;
- 		}
+ 	strscpy(info->bus_info, pci_name(bp->pdev), sizeof(info->bus_info));
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c
+index 02808513ffe45..ea310057fe3af 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_link.c
+@@ -6163,8 +6163,8 @@ static void bnx2x_link_int_ack(struct link_params *params,
+ 
+ static int bnx2x_null_format_ver(u32 spirom_ver, u8 *str, u16 *len)
+ {
+-	str[0] = '\0';
+-	(*len)--;
++	if (*len)
++		str[0] = '\0';
+ 	return 0;
+ }
+ 
+@@ -6173,7 +6173,7 @@ static int bnx2x_format_ver(u32 num, u8 *str, u16 *len)
+ 	u16 ret;
+ 
+ 	if (*len < 10) {
+-		/* Need more than 10chars for this format */
++		/* Need more than 10 chars for this format */
+ 		bnx2x_null_format_ver(num, str, len);
+ 		return -EINVAL;
+ 	}
+@@ -6188,8 +6188,8 @@ static int bnx2x_3_seq_format_ver(u32 num, u8 *str, u16 *len)
+ {
+ 	u16 ret;
+ 
+-	if (*len < 10) {
+-		/* Need more than 10chars for this format */
++	if (*len < 9) {
++		/* Need more than 9 chars for this format */
+ 		bnx2x_null_format_ver(num, str, len);
+ 		return -EINVAL;
+ 	}
+@@ -6208,7 +6208,7 @@ int bnx2x_get_ext_phy_fw_version(struct link_params *params, u8 *version,
+ 	int status = 0;
+ 	u8 *ver_p = version;
+ 	u16 remain_len = len;
+-	if (version == NULL || params == NULL)
++	if (version == NULL || params == NULL || len == 0)
+ 		return -EINVAL;
+ 	bp = params->bp;
+ 
+@@ -11546,7 +11546,7 @@ static int bnx2x_7101_format_ver(u32 spirom_ver, u8 *str, u16 *len)
+ 	str[2] = (spirom_ver & 0xFF0000) >> 16;
+ 	str[3] = (spirom_ver & 0xFF000000) >> 24;
+ 	str[4] = '\0';
+-	*len -= 5;
++	*len -= 4;
+ 	return 0;
+ }
+ 
 -- 
 2.43.0
 
