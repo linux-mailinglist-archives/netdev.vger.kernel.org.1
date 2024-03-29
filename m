@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-83407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C79F689230C
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:56:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC2E889230D
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:56:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29C3A285929
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:56:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61CBA28587C
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56824136E28;
-	Fri, 29 Mar 2024 17:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C82F136E07;
+	Fri, 29 Mar 2024 17:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XgWqjfi8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jcaIFOTo"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6215C136999
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 17:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C44F135A50
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 17:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711735001; cv=none; b=TH//6uFszW16lWu1tO2azCGeOCzFONqqkeiCLpQT5UURT9jACcrbdsGQp3u6uqIU6NtvSqJ2nFhDVEfzIki6ivzdhw7jPQSvoYFuW2M/N3/H5vxhxPktXzbHxdWfyfNyYuzHV35EFm9VKdcPfI+ztz9GuLvyAiRIpWeeF1BJr3A=
+	t=1711735003; cv=none; b=rPIVhhOSISfFMLs+80zw7SZAcEwnCOr/GKx2TSRj4xsTboehde+Q+Z0HV2JkdnNfPx2z4bHKLkiELYJV03QEFdZh5Y0VxFbqaW/ASS63Ib4kMqW8VucsD9oWnMI8apFJHd7fujc1Ix+0qQwOrH6p3JN7QlspBqLYVCV17P423kY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711735001; c=relaxed/simple;
-	bh=lGx5zW2Rmyji5DXogID81B8EvoL493AeagYE0QuGvf0=;
+	s=arc-20240116; t=1711735003; c=relaxed/simple;
+	bh=3rhGIef6f98nMz8D3GPujyNQTLBAdy+ayWIyhaAk8E0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l0h4/919Wg/f2dyr9oGRn4QtVsZe7LPxrrpBKg2Jaa3Ngg/cmTKkjzTO+oDp5GyCptZgrnneVujhZbx8cKLp4Tb4862hHv+xu7LEpa6MHq1giC+6EoZnZ/hf/CbBIpVSFVN99/LttgB0dIXpaXHICbC3uGDF55N75uBolQUe6Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XgWqjfi8; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=WStkED6nixrfy6ZE8xbUmphGmKuswE+sDTZDeRcXHchXpFLOfmz9SkwUzZUGEJTh1fSlK/3IJW6m2W1oKF21UPulAWJ2SsUv43jdrTAB4XSqfIOxek3uELevIPAmTGRwSvWIX+ExIkHzI/bWw+8c5u/XsOr9uxXxuyOdrDaQAvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jcaIFOTo; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711734999; x=1743270999;
+  t=1711735000; x=1743271000;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lGx5zW2Rmyji5DXogID81B8EvoL493AeagYE0QuGvf0=;
-  b=XgWqjfi8L4JSCTKZwuhxggGF6JcxQxIw9icWDmnkB+R7AZEEtyjZ2CGT
-   BsOToZkIV4W407b5IClUQRrblhjHelPdIdbFCSYqIvg/y+/F27sjKSwo4
-   wh1CLexKC1Gpn5Xrq1HshxLdzf9e47GymsZgv26uADf377TdocEQsnPfM
-   t3Hl+nzRoH3EV+9GmELPkRJmY444UAnqFg93EnR4RBQdZgblkwPowWtq8
-   2cTiQPukco78irPOTlvvpR48ZCrpPXfVr4aYK75YA0TLA1RwWuC9tRCuf
-   4wbt6lKWhsjoruXKajphszPU3olbkmUwz92hUgAMndJO3/t788gKsIhWp
-   g==;
-X-CSE-ConnectionGUID: 6DOtIYX/QBuFwZ5u1tViyA==
-X-CSE-MsgGUID: uN0AHiC3Tya1upJBxrOR0g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11028"; a="24422454"
+  bh=3rhGIef6f98nMz8D3GPujyNQTLBAdy+ayWIyhaAk8E0=;
+  b=jcaIFOTod4boh+y3QFb0/GcSVSbbQU9gkhnojZVHZQ6HCETRfbdVLvA/
+   SasHn0yaqsRj23/USRu7E58AysFO9rvIr8D/4mIPE6wxifDYpKZd8mtxY
+   oC0oIIUdEdsxXCP2fmt2bMZJRhUlITUb6w9IHWwen6V1jHmVJXJAF0BBL
+   IRDwEX+SIRrKVH8ewCGEAhohSN4RHSnekAFs7/SN0zIsPl4tm5b1Lh2QC
+   JBxgHRPoqK9V1+jKxMGufYi4CHwPWoywnFn5jG4yBFkwS5YTgXLMLt9yN
+   zBh280g/g4J8fjWgEfMrTnfNfFnb4d+2+K1YZnBsVPpwGdH+O1GlD0bKl
+   A==;
+X-CSE-ConnectionGUID: cjfRZ+8GTJuJvTU9Uk2feg==
+X-CSE-MsgGUID: 8XQb/HkOQOGIBe5IiEWGDA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11028"; a="24422462"
 X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
-   d="scan'208";a="24422454"
+   d="scan'208";a="24422462"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 10:56:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
-   d="scan'208";a="21499352"
+   d="scan'208";a="21499364"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa005.fm.intel.com with ESMTP; 29 Mar 2024 10:56:37 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 29 Mar 2024 10:56:38 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -67,9 +67,9 @@ Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	Alan Brady <alan.brady@intel.com>,
 	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 1/4] igb: simplify pci ops declaration
-Date: Fri, 29 Mar 2024 10:56:24 -0700
-Message-ID: <20240329175632.211340-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 2/4] net: intel: implement modern PM ops declarations
+Date: Fri, 29 Mar 2024 10:56:25 -0700
+Message-ID: <20240329175632.211340-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240329175632.211340-1-anthony.l.nguyen@intel.com>
 References: <20240329175632.211340-1-anthony.l.nguyen@intel.com>
@@ -83,11 +83,20 @@ Content-Transfer-Encoding: 8bit
 
 From: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-The igb driver was pre-declaring tons of functions just so that it could
-have an early declaration of the pci_driver struct.
+Switch the Intel networking drivers to use the new power management ops
+declaration formats and macros, which allows us to drop __maybe_unused,
+as well as a bunch of ifdef checking CONFIG_PM.
 
-Delete a bunch of the declarations and move the struct to the bottom of the
-file, after all the functions are declared.
+This is safe to do because the compiler drops the unused functions,
+verified by checking for any of the power management function symbols
+being present in System.map for a build without CONFIG_PM.
+
+If a driver has runtime PM, define the ops with pm_ptr(), and if the
+driver has Simple PM, use pm_sleep_ptr(), as well as the new versions of
+the macros for declaring the members of the pm_ops structs.
+
+Checked with network-enabled allnoconfig, allyesconfig, allmodconfig on
+x64_64.
 
 Reviewed-by: Alan Brady <alan.brady@intel.com>
 Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
@@ -95,99 +104,630 @@ Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igb/igb_main.c | 53 ++++++++++-------------
- 1 file changed, 24 insertions(+), 29 deletions(-)
+ drivers/net/ethernet/intel/e100.c             |  8 +++---
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 14 +++++-----
+ drivers/net/ethernet/intel/e1000e/netdev.c    | 22 +++++++---------
+ drivers/net/ethernet/intel/fm10k/fm10k_pci.c  | 10 +++----
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 10 +++----
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  8 +++---
+ drivers/net/ethernet/intel/ice/ice_main.c     | 12 +++------
+ drivers/net/ethernet/intel/igb/igb_main.c     | 26 +++++++------------
+ drivers/net/ethernet/intel/igbvf/netdev.c     |  6 ++---
+ drivers/net/ethernet/intel/igc/igc_main.c     | 24 ++++++-----------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  8 +++---
+ .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  8 +++---
+ 12 files changed, 64 insertions(+), 92 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
+index 3fcb8daaa243..9b068d40778d 100644
+--- a/drivers/net/ethernet/intel/e100.c
++++ b/drivers/net/ethernet/intel/e100.c
+@@ -3037,7 +3037,7 @@ static int __e100_power_off(struct pci_dev *pdev, bool wake)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused e100_suspend(struct device *dev_d)
++static int e100_suspend(struct device *dev_d)
+ {
+ 	bool wake;
+ 
+@@ -3046,7 +3046,7 @@ static int __maybe_unused e100_suspend(struct device *dev_d)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused e100_resume(struct device *dev_d)
++static int e100_resume(struct device *dev_d)
+ {
+ 	struct net_device *netdev = dev_get_drvdata(dev_d);
+ 	struct nic *nic = netdev_priv(netdev);
+@@ -3163,7 +3163,7 @@ static const struct pci_error_handlers e100_err_handler = {
+ 	.resume = e100_io_resume,
+ };
+ 
+-static SIMPLE_DEV_PM_OPS(e100_pm_ops, e100_suspend, e100_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(e100_pm_ops, e100_suspend, e100_resume);
+ 
+ static struct pci_driver e100_driver = {
+ 	.name =         DRV_NAME,
+@@ -3172,7 +3172,7 @@ static struct pci_driver e100_driver = {
+ 	.remove =       e100_remove,
+ 
+ 	/* Power Management hooks */
+-	.driver.pm =	&e100_pm_ops,
++	.driver.pm =	pm_sleep_ptr(&e100_pm_ops),
+ 
+ 	.shutdown =     e100_shutdown,
+ 	.err_handler = &e100_err_handler,
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 1d1e93686af2..5b43f9b194fc 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -149,8 +149,8 @@ static int e1000_vlan_rx_kill_vid(struct net_device *netdev,
+ 				  __be16 proto, u16 vid);
+ static void e1000_restore_vlan(struct e1000_adapter *adapter);
+ 
+-static int __maybe_unused e1000_suspend(struct device *dev);
+-static int __maybe_unused e1000_resume(struct device *dev);
++static int e1000_suspend(struct device *dev);
++static int e1000_resume(struct device *dev);
+ static void e1000_shutdown(struct pci_dev *pdev);
+ 
+ #ifdef CONFIG_NET_POLL_CONTROLLER
+@@ -175,16 +175,14 @@ static const struct pci_error_handlers e1000_err_handler = {
+ 	.resume = e1000_io_resume,
+ };
+ 
+-static SIMPLE_DEV_PM_OPS(e1000_pm_ops, e1000_suspend, e1000_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(e1000_pm_ops, e1000_suspend, e1000_resume);
+ 
+ static struct pci_driver e1000_driver = {
+ 	.name     = e1000_driver_name,
+ 	.id_table = e1000_pci_tbl,
+ 	.probe    = e1000_probe,
+ 	.remove   = e1000_remove,
+-	.driver = {
+-		.pm = &e1000_pm_ops,
+-	},
++	.driver.pm = pm_sleep_ptr(&e1000_pm_ops),
+ 	.shutdown = e1000_shutdown,
+ 	.err_handler = &e1000_err_handler
+ };
+@@ -5135,7 +5133,7 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused e1000_suspend(struct device *dev)
++static int e1000_suspend(struct device *dev)
+ {
+ 	int retval;
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+@@ -5147,7 +5145,7 @@ static int __maybe_unused e1000_suspend(struct device *dev)
+ 	return retval;
+ }
+ 
+-static int __maybe_unused e1000_resume(struct device *dev)
++static int e1000_resume(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index cc8c531ec3df..1c91dece75a8 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -6950,13 +6950,13 @@ static int __e1000_resume(struct pci_dev *pdev)
+ 	return 0;
+ }
+ 
+-static __maybe_unused int e1000e_pm_prepare(struct device *dev)
++static int e1000e_pm_prepare(struct device *dev)
+ {
+ 	return pm_runtime_suspended(dev) &&
+ 		pm_suspend_via_firmware();
+ }
+ 
+-static __maybe_unused int e1000e_pm_suspend(struct device *dev)
++static int e1000e_pm_suspend(struct device *dev)
+ {
+ 	struct net_device *netdev = pci_get_drvdata(to_pci_dev(dev));
+ 	struct e1000_adapter *adapter = netdev_priv(netdev);
+@@ -6979,7 +6979,7 @@ static __maybe_unused int e1000e_pm_suspend(struct device *dev)
+ 	return rc;
+ }
+ 
+-static __maybe_unused int e1000e_pm_resume(struct device *dev)
++static int e1000e_pm_resume(struct device *dev)
+ {
+ 	struct net_device *netdev = pci_get_drvdata(to_pci_dev(dev));
+ 	struct e1000_adapter *adapter = netdev_priv(netdev);
+@@ -7013,7 +7013,7 @@ static __maybe_unused int e1000e_pm_runtime_idle(struct device *dev)
+ 	return -EBUSY;
+ }
+ 
+-static __maybe_unused int e1000e_pm_runtime_resume(struct device *dev)
++static int e1000e_pm_runtime_resume(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+@@ -7032,7 +7032,7 @@ static __maybe_unused int e1000e_pm_runtime_resume(struct device *dev)
+ 	return rc;
+ }
+ 
+-static __maybe_unused int e1000e_pm_runtime_suspend(struct device *dev)
++static int e1000e_pm_runtime_suspend(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+@@ -7919,8 +7919,7 @@ static const struct pci_device_id e1000_pci_tbl[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, e1000_pci_tbl);
+ 
+-static const struct dev_pm_ops e1000_pm_ops = {
+-#ifdef CONFIG_PM_SLEEP
++static const struct dev_pm_ops e1000e_pm_ops = {
+ 	.prepare	= e1000e_pm_prepare,
+ 	.suspend	= e1000e_pm_suspend,
+ 	.resume		= e1000e_pm_resume,
+@@ -7928,9 +7927,8 @@ static const struct dev_pm_ops e1000_pm_ops = {
+ 	.thaw		= e1000e_pm_thaw,
+ 	.poweroff	= e1000e_pm_suspend,
+ 	.restore	= e1000e_pm_resume,
+-#endif
+-	SET_RUNTIME_PM_OPS(e1000e_pm_runtime_suspend, e1000e_pm_runtime_resume,
+-			   e1000e_pm_runtime_idle)
++	RUNTIME_PM_OPS(e1000e_pm_runtime_suspend, e1000e_pm_runtime_resume,
++		       e1000e_pm_runtime_idle)
+ };
+ 
+ /* PCI Device API Driver */
+@@ -7939,9 +7937,7 @@ static struct pci_driver e1000_driver = {
+ 	.id_table = e1000_pci_tbl,
+ 	.probe    = e1000_probe,
+ 	.remove   = e1000_remove,
+-	.driver   = {
+-		.pm = &e1000_pm_ops,
+-	},
++	.driver.pm = pm_ptr(&e1000e_pm_ops),
+ 	.shutdown = e1000_shutdown,
+ 	.err_handler = &e1000_err_handler
+ };
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_pci.c b/drivers/net/ethernet/intel/fm10k/fm10k_pci.c
+index d748b98274e7..92de609b7218 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k_pci.c
++++ b/drivers/net/ethernet/intel/fm10k/fm10k_pci.c
+@@ -2342,7 +2342,7 @@ static int fm10k_handle_resume(struct fm10k_intfc *interface)
+  * suspend or hibernation. This function does not need to handle lower PCIe
+  * device state as the stack takes care of that for us.
+  **/
+-static int __maybe_unused fm10k_resume(struct device *dev)
++static int fm10k_resume(struct device *dev)
+ {
+ 	struct fm10k_intfc *interface = dev_get_drvdata(dev);
+ 	struct net_device *netdev = interface->netdev;
+@@ -2369,7 +2369,7 @@ static int __maybe_unused fm10k_resume(struct device *dev)
+  * system suspend or hibernation. This function does not need to handle lower
+  * PCIe device state as the stack takes care of that for us.
+  **/
+-static int __maybe_unused fm10k_suspend(struct device *dev)
++static int fm10k_suspend(struct device *dev)
+ {
+ 	struct fm10k_intfc *interface = dev_get_drvdata(dev);
+ 	struct net_device *netdev = interface->netdev;
+@@ -2502,16 +2502,14 @@ static const struct pci_error_handlers fm10k_err_handler = {
+ 	.reset_done = fm10k_io_reset_done,
+ };
+ 
+-static SIMPLE_DEV_PM_OPS(fm10k_pm_ops, fm10k_suspend, fm10k_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(fm10k_pm_ops, fm10k_suspend, fm10k_resume);
+ 
+ static struct pci_driver fm10k_driver = {
+ 	.name			= fm10k_driver_name,
+ 	.id_table		= fm10k_pci_tbl,
+ 	.probe			= fm10k_probe,
+ 	.remove			= fm10k_remove,
+-	.driver = {
+-		.pm		= &fm10k_pm_ops,
+-	},
++	.driver.pm		= pm_sleep_ptr(&fm10k_pm_ops),
+ 	.sriov_configure	= fm10k_iov_configure,
+ 	.err_handler		= &fm10k_err_handler
+ };
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index f86578857e8a..b297f44d635f 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -16509,7 +16509,7 @@ static void i40e_shutdown(struct pci_dev *pdev)
+  * i40e_suspend - PM callback for moving to D3
+  * @dev: generic device information structure
+  **/
+-static int __maybe_unused i40e_suspend(struct device *dev)
++static int i40e_suspend(struct device *dev)
+ {
+ 	struct i40e_pf *pf = dev_get_drvdata(dev);
+ 	struct i40e_hw *hw = &pf->hw;
+@@ -16560,7 +16560,7 @@ static int __maybe_unused i40e_suspend(struct device *dev)
+  * i40e_resume - PM callback for waking up from D3
+  * @dev: generic device information structure
+  **/
+-static int __maybe_unused i40e_resume(struct device *dev)
++static int i40e_resume(struct device *dev)
+ {
+ 	struct i40e_pf *pf = dev_get_drvdata(dev);
+ 	int err;
+@@ -16606,16 +16606,14 @@ static const struct pci_error_handlers i40e_err_handler = {
+ 	.resume = i40e_pci_error_resume,
+ };
+ 
+-static SIMPLE_DEV_PM_OPS(i40e_pm_ops, i40e_suspend, i40e_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(i40e_pm_ops, i40e_suspend, i40e_resume);
+ 
+ static struct pci_driver i40e_driver = {
+ 	.name     = i40e_driver_name,
+ 	.id_table = i40e_pci_tbl,
+ 	.probe    = i40e_probe,
+ 	.remove   = i40e_remove,
+-	.driver   = {
+-		.pm = &i40e_pm_ops,
+-	},
++	.driver.pm = pm_sleep_ptr(&i40e_pm_ops),
+ 	.shutdown = i40e_shutdown,
+ 	.err_handler = &i40e_err_handler,
+ 	.sriov_configure = i40e_pci_sriov_configure,
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index ef2440f3abf8..13361a780ece 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -5023,7 +5023,7 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+  *
+  * Called when the system (VM) is entering sleep/suspend.
+  **/
+-static int __maybe_unused iavf_suspend(struct device *dev_d)
++static int iavf_suspend(struct device *dev_d)
+ {
+ 	struct net_device *netdev = dev_get_drvdata(dev_d);
+ 	struct iavf_adapter *adapter = netdev_priv(netdev);
+@@ -5051,7 +5051,7 @@ static int __maybe_unused iavf_suspend(struct device *dev_d)
+  *
+  * Called when the system (VM) is resumed from sleep/suspend.
+  **/
+-static int __maybe_unused iavf_resume(struct device *dev_d)
++static int iavf_resume(struct device *dev_d)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev_d);
+ 	struct iavf_adapter *adapter;
+@@ -5238,14 +5238,14 @@ static void iavf_shutdown(struct pci_dev *pdev)
+ 		pci_set_power_state(pdev, PCI_D3hot);
+ }
+ 
+-static SIMPLE_DEV_PM_OPS(iavf_pm_ops, iavf_suspend, iavf_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(iavf_pm_ops, iavf_suspend, iavf_resume);
+ 
+ static struct pci_driver iavf_driver = {
+ 	.name      = iavf_driver_name,
+ 	.id_table  = iavf_pci_tbl,
+ 	.probe     = iavf_probe,
+ 	.remove    = iavf_remove,
+-	.driver.pm = &iavf_pm_ops,
++	.driver.pm = pm_sleep_ptr(&iavf_pm_ops),
+ 	.shutdown  = iavf_shutdown,
+ };
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index f2b7d6ca8805..3dea0d4c767c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5321,7 +5321,6 @@ static void ice_shutdown(struct pci_dev *pdev)
+ 	}
+ }
+ 
+-#ifdef CONFIG_PM
+ /**
+  * ice_prepare_for_shutdown - prep for PCI shutdown
+  * @pf: board private structure
+@@ -5410,7 +5409,7 @@ static int ice_reinit_interrupt_scheme(struct ice_pf *pf)
+  * Power Management callback to quiesce the device and prepare
+  * for D3 transition.
+  */
+-static int __maybe_unused ice_suspend(struct device *dev)
++static int ice_suspend(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct ice_pf *pf;
+@@ -5477,7 +5476,7 @@ static int __maybe_unused ice_suspend(struct device *dev)
+  * ice_resume - PM callback for waking up from D3
+  * @dev: generic device information structure
+  */
+-static int __maybe_unused ice_resume(struct device *dev)
++static int ice_resume(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	enum ice_reset_req reset_type;
+@@ -5528,7 +5527,6 @@ static int __maybe_unused ice_resume(struct device *dev)
+ 
+ 	return 0;
+ }
+-#endif /* CONFIG_PM */
+ 
+ /**
+  * ice_pci_err_detected - warning that PCI error has been detected
+@@ -5702,7 +5700,7 @@ static const struct pci_device_id ice_pci_tbl[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, ice_pci_tbl);
+ 
+-static __maybe_unused SIMPLE_DEV_PM_OPS(ice_pm_ops, ice_suspend, ice_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(ice_pm_ops, ice_suspend, ice_resume);
+ 
+ static const struct pci_error_handlers ice_pci_err_handler = {
+ 	.error_detected = ice_pci_err_detected,
+@@ -5717,9 +5715,7 @@ static struct pci_driver ice_driver = {
+ 	.id_table = ice_pci_tbl,
+ 	.probe = ice_probe,
+ 	.remove = ice_remove,
+-#ifdef CONFIG_PM
+-	.driver.pm = &ice_pm_ops,
+-#endif /* CONFIG_PM */
++	.driver.pm = pm_sleep_ptr(&ice_pm_ops),
+ 	.shutdown = ice_shutdown,
+ 	.sriov_configure = ice_sriov_configure,
+ 	.sriov_get_vf_total_msix = ice_sriov_get_vf_total_msix,
 diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index a3f100769e39..89604c9d8e49 100644
+index 89604c9d8e49..74a998fcaa6f 100644
 --- a/drivers/net/ethernet/intel/igb/igb_main.c
 +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -106,8 +106,6 @@ static int igb_setup_all_rx_resources(struct igb_adapter *);
- static void igb_free_all_tx_resources(struct igb_adapter *);
- static void igb_free_all_rx_resources(struct igb_adapter *);
- static void igb_setup_mrqc(struct igb_adapter *);
--static int igb_probe(struct pci_dev *, const struct pci_device_id *);
--static void igb_remove(struct pci_dev *pdev);
- static void igb_init_queue_configuration(struct igb_adapter *adapter);
- static int igb_sw_init(struct igb_adapter *);
- int igb_open(struct net_device *);
-@@ -178,20 +176,6 @@ static int igb_vf_configure(struct igb_adapter *adapter, int vf);
- static int igb_disable_sriov(struct pci_dev *dev, bool reinit);
- #endif
+@@ -9426,12 +9426,12 @@ static void igb_deliver_wake_packet(struct net_device *netdev)
+ 	netif_rx(skb);
+ }
  
--static int igb_suspend(struct device *);
--static int igb_resume(struct device *);
--static int igb_runtime_suspend(struct device *dev);
--static int igb_runtime_resume(struct device *dev);
--static int igb_runtime_idle(struct device *dev);
+-static int __maybe_unused igb_suspend(struct device *dev)
++static int igb_suspend(struct device *dev)
+ {
+ 	return __igb_shutdown(to_pci_dev(dev), NULL, 0);
+ }
+ 
+-static int __maybe_unused __igb_resume(struct device *dev, bool rpm)
++static int __igb_resume(struct device *dev, bool rpm)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+@@ -9487,12 +9487,12 @@ static int __maybe_unused __igb_resume(struct device *dev, bool rpm)
+ 	return err;
+ }
+ 
+-static int __maybe_unused igb_resume(struct device *dev)
++static int igb_resume(struct device *dev)
+ {
+ 	return __igb_resume(dev, false);
+ }
+ 
+-static int __maybe_unused igb_runtime_idle(struct device *dev)
++static int igb_runtime_idle(struct device *dev)
+ {
+ 	struct net_device *netdev = dev_get_drvdata(dev);
+ 	struct igb_adapter *adapter = netdev_priv(netdev);
+@@ -9503,12 +9503,12 @@ static int __maybe_unused igb_runtime_idle(struct device *dev)
+ 	return -EBUSY;
+ }
+ 
+-static int __maybe_unused igb_runtime_suspend(struct device *dev)
++static int igb_runtime_suspend(struct device *dev)
+ {
+ 	return __igb_shutdown(to_pci_dev(dev), NULL, 1);
+ }
+ 
+-static int __maybe_unused igb_runtime_resume(struct device *dev)
++static int igb_runtime_resume(struct device *dev)
+ {
+ 	return __igb_resume(dev, true);
+ }
+@@ -10131,22 +10131,16 @@ static void igb_nfc_filter_restore(struct igb_adapter *adapter)
+ 	spin_unlock(&adapter->nfc_lock);
+ }
+ 
 -#ifdef CONFIG_PM
 -static const struct dev_pm_ops igb_pm_ops = {
 -	SET_SYSTEM_SLEEP_PM_OPS(igb_suspend, igb_resume)
 -	SET_RUNTIME_PM_OPS(igb_runtime_suspend, igb_runtime_resume,
--			igb_runtime_idle)
+-			   igb_runtime_idle)
 -};
 -#endif
--static void igb_shutdown(struct pci_dev *);
--static int igb_pci_sriov_configure(struct pci_dev *dev, int num_vfs);
- #ifdef CONFIG_IGB_DCA
- static int igb_notify_dca(struct notifier_block *, unsigned long, void *);
- static struct notifier_block dca_notifier = {
-@@ -219,19 +203,6 @@ static const struct pci_error_handlers igb_err_handler = {
++static _DEFINE_DEV_PM_OPS(igb_pm_ops, igb_suspend, igb_resume,
++			  igb_runtime_suspend, igb_runtime_resume,
++			  igb_runtime_idle);
  
- static void igb_init_dmac(struct igb_adapter *adapter, u32 pba);
- 
--static struct pci_driver igb_driver = {
--	.name     = igb_driver_name,
--	.id_table = igb_pci_tbl,
--	.probe    = igb_probe,
--	.remove   = igb_remove,
+ static struct pci_driver igb_driver = {
+ 	.name     = igb_driver_name,
+ 	.id_table = igb_pci_tbl,
+ 	.probe    = igb_probe,
+ 	.remove   = igb_remove,
 -#ifdef CONFIG_PM
 -	.driver.pm = &igb_pm_ops,
 -#endif
--	.shutdown = igb_shutdown,
--	.sriov_configure = igb_pci_sriov_configure,
--	.err_handler = &igb_err_handler
++	.driver.pm = pm_ptr(&igb_pm_ops),
+ 	.shutdown = igb_shutdown,
+ 	.sriov_configure = igb_pci_sriov_configure,
+ 	.err_handler = &igb_err_handler
+diff --git a/drivers/net/ethernet/intel/igbvf/netdev.c b/drivers/net/ethernet/intel/igbvf/netdev.c
+index b0cf310e6f7b..40ccd24ffc53 100644
+--- a/drivers/net/ethernet/intel/igbvf/netdev.c
++++ b/drivers/net/ethernet/intel/igbvf/netdev.c
+@@ -2470,7 +2470,7 @@ static int igbvf_suspend(struct device *dev_d)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused igbvf_resume(struct device *dev_d)
++static int igbvf_resume(struct device *dev_d)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev_d);
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+@@ -2957,7 +2957,7 @@ static const struct pci_device_id igbvf_pci_tbl[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, igbvf_pci_tbl);
+ 
+-static SIMPLE_DEV_PM_OPS(igbvf_pm_ops, igbvf_suspend, igbvf_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(igbvf_pm_ops, igbvf_suspend, igbvf_resume);
+ 
+ /* PCI Device API Driver */
+ static struct pci_driver igbvf_driver = {
+@@ -2965,7 +2965,7 @@ static struct pci_driver igbvf_driver = {
+ 	.id_table	= igbvf_pci_tbl,
+ 	.probe		= igbvf_probe,
+ 	.remove		= igbvf_remove,
+-	.driver.pm	= &igbvf_pm_ops,
++	.driver.pm	= pm_sleep_ptr(&igbvf_pm_ops),
+ 	.shutdown	= igbvf_shutdown,
+ 	.err_handler	= &igbvf_err_handler
+ };
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 0cd923c8ac9b..998d8c345a78 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7104,8 +7104,7 @@ static int __igc_shutdown(struct pci_dev *pdev, bool *enable_wake,
+ 	return 0;
+ }
+ 
+-#ifdef CONFIG_PM
+-static int __maybe_unused igc_runtime_suspend(struct device *dev)
++static int igc_runtime_suspend(struct device *dev)
+ {
+ 	return __igc_shutdown(to_pci_dev(dev), NULL, 1);
+ }
+@@ -7140,7 +7139,7 @@ static void igc_deliver_wake_packet(struct net_device *netdev)
+ 	netif_rx(skb);
+ }
+ 
+-static int __maybe_unused igc_resume(struct device *dev)
++static int igc_resume(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+@@ -7193,12 +7192,12 @@ static int __maybe_unused igc_resume(struct device *dev)
+ 	return err;
+ }
+ 
+-static int __maybe_unused igc_runtime_resume(struct device *dev)
++static int igc_runtime_resume(struct device *dev)
+ {
+ 	return igc_resume(dev);
+ }
+ 
+-static int __maybe_unused igc_suspend(struct device *dev)
++static int igc_suspend(struct device *dev)
+ {
+ 	return __igc_shutdown(to_pci_dev(dev), NULL, 0);
+ }
+@@ -7213,7 +7212,6 @@ static int __maybe_unused igc_runtime_idle(struct device *dev)
+ 
+ 	return -EBUSY;
+ }
+-#endif /* CONFIG_PM */
+ 
+ static void igc_shutdown(struct pci_dev *pdev)
+ {
+@@ -7328,22 +7326,16 @@ static const struct pci_error_handlers igc_err_handler = {
+ 	.resume = igc_io_resume,
+ };
+ 
+-#ifdef CONFIG_PM
+-static const struct dev_pm_ops igc_pm_ops = {
+-	SET_SYSTEM_SLEEP_PM_OPS(igc_suspend, igc_resume)
+-	SET_RUNTIME_PM_OPS(igc_runtime_suspend, igc_runtime_resume,
+-			   igc_runtime_idle)
 -};
--
- MODULE_AUTHOR("Intel Corporation, <e1000-devel@lists.sourceforge.net>");
- MODULE_DESCRIPTION("Intel(R) Gigabit Ethernet Network Driver");
- MODULE_LICENSE("GPL v2");
-@@ -647,6 +618,8 @@ struct net_device *igb_get_hw_dev(struct e1000_hw *hw)
- 	return adapter->netdev;
+-#endif
++static _DEFINE_DEV_PM_OPS(igc_pm_ops, igc_suspend, igc_resume,
++			  igc_runtime_suspend, igc_runtime_resume,
++			  igc_runtime_idle);
+ 
+ static struct pci_driver igc_driver = {
+ 	.name     = igc_driver_name,
+ 	.id_table = igc_pci_tbl,
+ 	.probe    = igc_probe,
+ 	.remove   = igc_remove,
+-#ifdef CONFIG_PM
+-	.driver.pm = &igc_pm_ops,
+-#endif
++	.driver.pm = pm_ptr(&igc_pm_ops),
+ 	.shutdown = igc_shutdown,
+ 	.err_handler = &igc_err_handler,
+ };
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index f985252c8c8d..987dd9c7206d 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -6974,7 +6974,7 @@ int ixgbe_close(struct net_device *netdev)
+ 	return 0;
  }
  
-+static struct pci_driver igb_driver;
-+
- /**
-  *  igb_init_module - Driver Registration Routine
-  *
-@@ -10157,4 +10130,26 @@ static void igb_nfc_filter_restore(struct igb_adapter *adapter)
- 
- 	spin_unlock(&adapter->nfc_lock);
+-static int __maybe_unused ixgbe_resume(struct device *dev_d)
++static int ixgbe_resume(struct device *dev_d)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev_d);
+ 	struct ixgbe_adapter *adapter = pci_get_drvdata(pdev);
+@@ -7082,7 +7082,7 @@ static int __ixgbe_shutdown(struct pci_dev *pdev, bool *enable_wake)
+ 	return 0;
  }
-+
-+#ifdef CONFIG_PM
-+static const struct dev_pm_ops igb_pm_ops = {
-+	SET_SYSTEM_SLEEP_PM_OPS(igb_suspend, igb_resume)
-+	SET_RUNTIME_PM_OPS(igb_runtime_suspend, igb_runtime_resume,
-+			   igb_runtime_idle)
-+};
-+#endif
-+
-+static struct pci_driver igb_driver = {
-+	.name     = igb_driver_name,
-+	.id_table = igb_pci_tbl,
-+	.probe    = igb_probe,
-+	.remove   = igb_remove,
-+#ifdef CONFIG_PM
-+	.driver.pm = &igb_pm_ops,
-+#endif
-+	.shutdown = igb_shutdown,
-+	.sriov_configure = igb_pci_sriov_configure,
-+	.err_handler = &igb_err_handler
-+};
-+
- /* igb_main.c */
+ 
+-static int __maybe_unused ixgbe_suspend(struct device *dev_d)
++static int ixgbe_suspend(struct device *dev_d)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev_d);
+ 	int retval;
+@@ -11588,14 +11588,14 @@ static const struct pci_error_handlers ixgbe_err_handler = {
+ 	.resume = ixgbe_io_resume,
+ };
+ 
+-static SIMPLE_DEV_PM_OPS(ixgbe_pm_ops, ixgbe_suspend, ixgbe_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(ixgbe_pm_ops, ixgbe_suspend, ixgbe_resume);
+ 
+ static struct pci_driver ixgbe_driver = {
+ 	.name      = ixgbe_driver_name,
+ 	.id_table  = ixgbe_pci_tbl,
+ 	.probe     = ixgbe_probe,
+ 	.remove    = ixgbe_remove,
+-	.driver.pm = &ixgbe_pm_ops,
++	.driver.pm = pm_sleep_ptr(&ixgbe_pm_ops),
+ 	.shutdown  = ixgbe_shutdown,
+ 	.sriov_configure = ixgbe_pci_sriov_configure,
+ 	.err_handler = &ixgbe_err_handler
+diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+index 9c960017a6de..3161a13079fe 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
++++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+@@ -4300,7 +4300,7 @@ static int ixgbevf_change_mtu(struct net_device *netdev, int new_mtu)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused ixgbevf_suspend(struct device *dev_d)
++static int ixgbevf_suspend(struct device *dev_d)
+ {
+ 	struct net_device *netdev = dev_get_drvdata(dev_d);
+ 	struct ixgbevf_adapter *adapter = netdev_priv(netdev);
+@@ -4317,7 +4317,7 @@ static int __maybe_unused ixgbevf_suspend(struct device *dev_d)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused ixgbevf_resume(struct device *dev_d)
++static int ixgbevf_resume(struct device *dev_d)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev_d);
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+@@ -4854,7 +4854,7 @@ static const struct pci_error_handlers ixgbevf_err_handler = {
+ 	.resume = ixgbevf_io_resume,
+ };
+ 
+-static SIMPLE_DEV_PM_OPS(ixgbevf_pm_ops, ixgbevf_suspend, ixgbevf_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(ixgbevf_pm_ops, ixgbevf_suspend, ixgbevf_resume);
+ 
+ static struct pci_driver ixgbevf_driver = {
+ 	.name		= ixgbevf_driver_name,
+@@ -4863,7 +4863,7 @@ static struct pci_driver ixgbevf_driver = {
+ 	.remove		= ixgbevf_remove,
+ 
+ 	/* Power Management Hooks */
+-	.driver.pm	= &ixgbevf_pm_ops,
++	.driver.pm	= pm_sleep_ptr(&ixgbevf_pm_ops),
+ 
+ 	.shutdown	= ixgbevf_shutdown,
+ 	.err_handler	= &ixgbevf_err_handler
 -- 
 2.41.0
 
