@@ -1,100 +1,131 @@
-Return-Path: <netdev+bounces-83367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2BFD8920BA
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:43:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 803D08920D9
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D450E1C28342
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:43:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C8FF1F26DAD
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548BC1DDFC;
-	Fri, 29 Mar 2024 15:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EF54EB23;
+	Fri, 29 Mar 2024 15:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVMQHQUl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUBvihu/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E261C0DF8
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 15:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3863D966;
+	Fri, 29 Mar 2024 15:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711727028; cv=none; b=WmGHtU8lE6qAyq9+CIQrhReYG3B1Noz0AXFztf4+PVZnWAKq3Pf/N3tAZWAxjMIzHnjvBydN325ZFD36rUnHhHMqPGbD3pTOfGchfUsJ+rAwkWq6ZGuDbFClQsZY0OVdXQaQnpHzyd4h6rLnjSPrNdgKORPLjFvzMpSVJqG+uEE=
+	t=1711727429; cv=none; b=UtJ1F91lPoqON0C0A7ESrdemOw1Fj/+2PYV2EiJYTPl/Z+Nm1YQyvg59ON7lEV+a7XUml5L+SnBQ8Wg/xrOsZ/2SvGVio+89Tig+ovhPOSSjwt0NxzlJNsySSmYOIXHP44GTHbfaWXPLe1Ywdx9k/gYUL0S19gEN6nZXHA3FFFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711727028; c=relaxed/simple;
-	bh=l7MflZYo91eVIZusgFESMJFith/9tB59mQ+b1IRgnm0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ha2g0eszYiZUTIjApzHCpyIh+nhPGmYyL8Sx0sxTTMjanyHmQgwCOhTpQ2mNGvqWgOtoiEuJuNoB1T/Q4I2J0mZeF3RNmdDogNVDKkcV/6EBeLPBoYgyEvdCPcSSw23giZ5wCC/r4zIjS0oWo+yBLNRI91lOJItTIY5m7fS5aDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVMQHQUl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40FCAC433F1;
-	Fri, 29 Mar 2024 15:43:47 +0000 (UTC)
+	s=arc-20240116; t=1711727429; c=relaxed/simple;
+	bh=1Gb9js9o92vHoW2ztLDWmNequldYaphj6neZme3mpUQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JJ9FMLfn8V3iiQaFwjav3J9CaF9K5JI3O6blgG5PMLPMa7JQtObcv2tNgH8tldgS3Zpd8PGPmLjeu69wqX2zbSUqW4eB/4c6yznAQa+PTkpfxF/Dwfwv2k6fTccxAu2/NRdL3bC/FWntPmT/W7vUmKTQS9ipmklMqalFXrRMpqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUBvihu/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5429CC43390;
+	Fri, 29 Mar 2024 15:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711727027;
-	bh=l7MflZYo91eVIZusgFESMJFith/9tB59mQ+b1IRgnm0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UVMQHQUl681uyz2/eQoGCI0AuE09kj4RC8FAZ73WsTaraXCq6zrpDedTgPVjUXpbX
-	 jfqdRmqxY+H3Rfo95FSngU1yekFjawNMN5+LSv+auBRHTqC8lwTGzXayLDJseB14WE
-	 4DyNdvSjLXhZtRWJ7KJPd0S6aHh8Y2hPecb0pfWyKV1esFGwPhwq8L7s+hTSfUD1QG
-	 nM3eDsZ/SG9h2gXL0Ec+5ByuM4oqpDOUApJjwFvfBfGIk+i8Ro4tnJDnRJeFbv57Dc
-	 i5XVs6rCT0ZqGm/BzkntvGHp+WsMI2FIr5fYHzug00fZXaToS3Dm487Sl12NMwTvA1
-	 WGrPuX0AJFPrw==
-Date: Fri, 29 Mar 2024 08:43:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, Stanislav
- Fomichev <sdf@google.com>, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 2/2] tools/net/ynl: Add multi message
- support to ynl
-Message-ID: <20240329084346.7a744d1e@kernel.org>
-In-Reply-To: <m234s9jh0k.fsf@gmail.com>
-References: <20240327181700.77940-1-donald.hunter@gmail.com>
-	<20240327181700.77940-3-donald.hunter@gmail.com>
-	<20240328175729.15208f4a@kernel.org>
-	<m234s9jh0k.fsf@gmail.com>
+	s=k20201202; t=1711727429;
+	bh=1Gb9js9o92vHoW2ztLDWmNequldYaphj6neZme3mpUQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RUBvihu/ul2t4K55eznxMPDb5Iq17zPcOlLL+gU1QLSR8T8uhh0i9PIrawRpRafg1
+	 Szrqtp37PCF4Gkf3RUbqVrm07rlPkmOYYKyGpKF6XReUQNmpiLQ71lJn6THihy3aTh
+	 AV1sKL22lRKO2/aKrLQTdQ3qTM2W3akzqzorkDh0cCZYdJPGtJenOCRS4cU7AqW472
+	 dzblLuwtWvImC2Df7zbH3jVUeYGFmAJGiNub79LaxpL1QsbX7WyYJ+MC06WTL2WYG1
+	 yeAu5Sn4UVl01g116UOeI2MTJ7VzXlNALxZw+cOiioj2YmcPKcZQeEX4LeT5Pl2o9K
+	 vhZQrlvigejrQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 40B34D84BAF;
+	Fri, 29 Mar 2024 15:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] mlxbf_gige: stop interface during shutdown
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171172742926.17508.15910798895938463118.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 15:50:29 +0000
+References: <20240325210929.25362-1-davthompson@nvidia.com>
+In-Reply-To: <20240325210929.25362-1-davthompson@nvidia.com>
+To: David Thompson <davthompson@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, u.kleine-koenig@pengutronix.de, leon@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, 29 Mar 2024 13:37:31 +0000 Donald Hunter wrote:
-> > We'd only support multiple "do" requests, I wonder if we should somehow
-> > call this out. Is --multi-do unnecessary extra typing?  
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 25 Mar 2024 17:09:29 -0400 you wrote:
+> The mlxbf_gige driver intermittantly encounters a NULL pointer
+> exception while the system is shutting down via "reboot" command.
+> The mlxbf_driver will experience an exception right after executing
+> its shutdown() method.  One example of this exception is:
 > 
-> I prefer --multi but will update the help text to say "DO-OPERATIION"
-> and "... several do operations".
+> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000070
+> Mem abort info:
+>   ESR = 0x0000000096000004
+>   EC = 0x25: DABT (current EL), IL = 32 bits
+>   SET = 0, FnV = 0
+>   EA = 0, S1PTW = 0
+>   FSC = 0x04: level 0 translation fault
+> Data abort info:
+>   ISV = 0, ISS = 0x00000004
+>   CM = 0, WnR = 0
+> user pgtable: 4k pages, 48-bit VAs, pgdp=000000011d373000
+> [0000000000000070] pgd=0000000000000000, p4d=0000000000000000
+> Internal error: Oops: 96000004 [#1] SMP
+> CPU: 0 PID: 13 Comm: ksoftirqd/0 Tainted: G S         OE     5.15.0-bf.6.gef6992a #1
+> Hardware name: https://www.mellanox.com BlueField SoC/BlueField SoC, BIOS 4.0.2.12669 Apr 21 2023
+> pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> pc : mlxbf_gige_handle_tx_complete+0xc8/0x170 [mlxbf_gige]
+> lr : mlxbf_gige_poll+0x54/0x160 [mlxbf_gige]
+> sp : ffff8000080d3c10
+> x29: ffff8000080d3c10 x28: ffffcce72cbb7000 x27: ffff8000080d3d58
+> x26: ffff0000814e7340 x25: ffff331cd1a05000 x24: ffffcce72c4ea008
+> x23: ffff0000814e4b40 x22: ffff0000814e4d10 x21: ffff0000814e4128
+> x20: 0000000000000000 x19: ffff0000814e4a80 x18: ffffffffffffffff
+> x17: 000000000000001c x16: ffffcce72b4553f4 x15: ffff80008805b8a7
+> x14: 0000000000000000 x13: 0000000000000030 x12: 0101010101010101
+> x11: 7f7f7f7f7f7f7f7f x10: c2ac898b17576267 x9 : ffffcce720fa5404
+> x8 : ffff000080812138 x7 : 0000000000002e9a x6 : 0000000000000080
+> x5 : ffff00008de3b000 x4 : 0000000000000000 x3 : 0000000000000001
+> x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000000000
+> Call trace:
+>  mlxbf_gige_handle_tx_complete+0xc8/0x170 [mlxbf_gige]
+>  mlxbf_gige_poll+0x54/0x160 [mlxbf_gige]
+>  __napi_poll+0x40/0x1c8
+>  net_rx_action+0x314/0x3a0
+>  __do_softirq+0x128/0x334
+>  run_ksoftirqd+0x54/0x6c
+>  smpboot_thread_fn+0x14c/0x190
+>  kthread+0x10c/0x110
+>  ret_from_fork+0x10/0x20
+> Code: 8b070000 f9000ea0 f95056c0 f86178a1 (b9407002)
+> 
+> [...]
 
-Alright, technically doing multi-dump should also work, but maybe
-there's less of a benefit there, so we can keep the multi focused
-on do for now.
+Here is the summary with links:
+  - [net,v1] mlxbf_gige: stop interface during shutdown
+    https://git.kernel.org/netdev/net/c/09ba28e1cd3c
 
-Looking at the code again, are you sure we'll process all the responses
-not just the first one?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Shouldn't this:
 
-+                    del reqs_by_seq[nl_msg.nl_seq]
-                     done = True
-
-be something like:
-
-		del reqs_by_seq[nl_msg.nl_seq]
-		done = len(reqs_by_seq) == 0
-
-?
-
-Would be good to add an example of multi executing some get operations.
-
-My other concern is the formatting of the response. For mutli we should
-probably retain the indexes, e.g. 3 dos should produce an array with a
-length of 3, some of the entries may be None if the command only acked.
-Would that make sense?
 
