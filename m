@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-83146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4383289108A
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:50:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 594B289108C
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:50:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C03E6B20D9B
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:50:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F81F1F22EA3
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B01B17BDA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA2418643;
 	Fri, 29 Mar 2024 01:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nE0v6Jjo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R215C3m+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DFD14A8F
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 01:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541A01804A;
+	Fri, 29 Mar 2024 01:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711677030; cv=none; b=kRfLRx/64/ggZ22ZEyVpNS6237XW2/CQwqHZWSyfLlRA/cHdGyr/ZQQWnPeYKM5HbhHEz+pOuRB0p/UE+HNRFan2OIZbh0Vs/sWQg6B4jErLeT+L/Usrc0jWADtzsbrtpXEKEbhjj7CeghbJb/yiYKZVnEr2o6gQKFMZ3MbY49w=
+	t=1711677030; cv=none; b=K9tShQiHU/mW+KDdEO6txBPZmEL5U2JqXNuDHxQAao1N+oFI2euZaswG3HNcFdLLgajILkmhecgxBSjfQPCo6O+yDeSE0Hq3eR/UN5zo/robojRccmNtseTaDt4ESuxL+7PVRw59Xkl12MppBZqbcLKqsnqANOp8Ff1v3LT5tqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711677030; c=relaxed/simple;
-	bh=LadFdNAs2gpLM+Z83RwB1YgHe33AxmBjBG1qdF9v/KE=;
+	bh=TyrbEvDtkz2nyXjs2SKTqUUeTwFDMInI+ccUM9psvD8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=N314Dm8LLpd6TN35UWV5eMv+gjygblFopyftHZg0O8HZZllk38llJSJfnzRUD9tQTD8XeCA/Ov3wGB3++wW0zKve+Zf3Hk2kZ4kOueLNZDc8Qp6nMD5X0wCmMxDGSpOGY7ZzNCfekfyNyKadEusRwChv85B8dnMBMts7+RaO1wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nE0v6Jjo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E6F79C43394;
+	 In-Reply-To:To:Cc; b=fvNfWNR6hxxcyr29Zai4TE1ykIQNhJ9N2aT8S+WfmRwgjH/VYQvJ1kjhcOJtmy5UFSDfknzkEbamyEReynkm5mdM1Cb165vK5f/DB1Fr8hLnxjdR5pkYllrSxTVDAHtqkyICEGwxu3mlyy3lHP71bnWFr9+qeQaP7yHQNMUZvsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R215C3m+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CE66BC433C7;
 	Fri, 29 Mar 2024 01:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711677030;
-	bh=LadFdNAs2gpLM+Z83RwB1YgHe33AxmBjBG1qdF9v/KE=;
+	s=k20201202; t=1711677029;
+	bh=TyrbEvDtkz2nyXjs2SKTqUUeTwFDMInI+ccUM9psvD8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nE0v6JjoY/LFuCnfpSDV7ZHt278ZCYBN+PU/uw02W6pWrVBW9aDwsIuP2TOPC6bhV
-	 FqSPdVxE7o4WWujh1RTsKe3f3JzVHQJ6VgjFGqOLdI/tKGHkYW6E3n6Au7s5HglENk
-	 BTWJv6XYrtFDbPg0m77yapwSfBkcVqgsBkVAS+ZgbDPif+10B1elw9SdFbEt5fVg6b
-	 +qXHbD2IERxu7K4njn3nxTaXyJzbS6Vn5B/mfLP83i4hxgfhUr/MLHLCBHlIiubsm1
-	 A1Xlzgui7+jhbwmBZPtugw469ia5/eAKnF8wXEtE2uJbK9+CDWnzYZj9gD76SHSuzg
-	 /+xUZ11adfNZw==
+	b=R215C3m+IWpiL1H2B7vGekMURdhvchPl9i4ZI1ine2M9gQFPgALRg0SBPJPZgsapZ
+	 gkHELWju80PifF30lwOLs/b+tZTAhQyy08OxdcPyLyuQkRVnFxXsxdnTR08f2l7S8H
+	 rVvQ+WkphZFRVe+rE/DTvGsP1MyiQ1+wXvsW3W5dfmyTSvFgIUTzivCf0Fgt0pbLLQ
+	 giEpMKZv7AGr7vV6iyRIXdq7KAUh2FEnep9avOeuZ0jEhpjcYMeX7Uap1SrQMoK2BJ
+	 4lRW1cZRaRMH9qA2AyjEnWhla6OL3DQQ1r6xZnstUsXv/pDuGpQibtnTNK7URZ8iQH
+	 irzsBWPJK2Ejg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE6E2D95064;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BB4B0D8BCE9;
 	Fri, 29 Mar 2024 01:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: remove gfp_mask from napi_alloc_skb()
+Subject: Re: [PATCH] qed: Drop useless pci_params.pm_cap
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171167702984.13430.7602410766409441835.git-patchwork-notify@kernel.org>
+ <171167702976.13430.129214121849793526.git-patchwork-notify@kernel.org>
 Date: Fri, 29 Mar 2024 01:50:29 +0000
-References: <20240327040213.3153864-1-kuba@kernel.org>
-In-Reply-To: <20240327040213.3153864-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, aleksander.lobakin@intel.com, alexs@kernel.org,
- siyanteng@loongson.cn, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
- intel-wired-lan@lists.osuosl.org
+References: <20240325224931.1462051-1-helgaas@kernel.org>
+In-Reply-To: <20240325224931.1462051-1-helgaas@kernel.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: aelior@marvell.com, manishc@marvell.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bhelgaas@google.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 26 Mar 2024 21:02:12 -0700 you wrote:
-> __napi_alloc_skb() is napi_alloc_skb() with the added flexibility
-> of choosing gfp_mask. This is a NAPI function, so GFP_ATOMIC is
-> implied. The only practical choice the caller has is whether to
-> set __GFP_NOWARN. But that's a false choice, too, allocation failures
-> in atomic context will happen, and printing warnings in logs,
-> effectively for a packet drop, is both too much and very likely
-> non-actionable.
+On Mon, 25 Mar 2024 17:49:31 -0500 you wrote:
+> From: Bjorn Helgaas <bhelgaas@google.com>
+> 
+> qed_init_pci() used pci_params.pm_cap only to cache the pci_dev.pm_cap.
+> Drop the cache and use pci_dev.pm_cap directly.
+> 
+> Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: remove gfp_mask from napi_alloc_skb()
-    https://git.kernel.org/netdev/net-next/c/6e9b01909a81
+  - qed: Drop useless pci_params.pm_cap
+    https://git.kernel.org/netdev/net-next/c/49d665b8535e
 
 You are awesome, thank you!
 -- 
