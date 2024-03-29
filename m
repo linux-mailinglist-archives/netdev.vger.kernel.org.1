@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-83304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C481891A25
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:54:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC01891A42
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:57:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17185284FF4
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:54:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2406B20D75
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6425115625F;
-	Fri, 29 Mar 2024 12:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B53157466;
+	Fri, 29 Mar 2024 12:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OvVl2VS2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VFR9aJsM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37895156259;
-	Fri, 29 Mar 2024 12:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78ECD157463;
+	Fri, 29 Mar 2024 12:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715444; cv=none; b=tC/7tNm8xL1zbwJCdQ1rImiUkkfb+HXZSNlRMENrY4Ez7oUEAJ9ZlnEgipYoexKIoF8fF8glxRE6xf5qjG3XduykMebugVL2oYzJhtKCOv/FR/1vMot7ty2Z6LvpVHKXx/SQK9X4DoFN1Xp7pZx7bQc4csdpuIfKtmkniXUJxck=
+	t=1711715472; cv=none; b=fw4ax9SHbASm/t3on6EvsuIMrqkmKF62VxanrSQbHg3RF4PrDAovsU2TJJwaScE2Gn476AUmjnB+FVl9Bos1BJavHcLdMsOjZXONgm7H8jTy9n4fKK8FcN1Dkc5oxMjFP7dXH0yuC/G52EuzBrItzVPbzxDJOidiFPXEAaY+dZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715444; c=relaxed/simple;
-	bh=KJMusQBaZ2wXF4wyQ1/zdzTdGHxScgRaikU7zMTEy9s=;
+	s=arc-20240116; t=1711715472; c=relaxed/simple;
+	bh=iZZqgKGHs4fdYu24nLgh2Il4+b4tK08w5DeGr+ZVQLo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qlQNLPt2IFYuRt4rdmgzhuNBbKwWfT/8A4BWs1rTN49updix4RW/4/fhZA+OtmtbPzVXUGd7AEtxfKn0NGXNl6XF7AIAsTlMzUZpH9WvO3coqogJ0pTEeD0qRcE+yCNaABvMMQH3hKQ7H32fZ+ozfIuwqd6S3S3oTQ/wbLsIZkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OvVl2VS2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9F7AC43390;
-	Fri, 29 Mar 2024 12:30:42 +0000 (UTC)
+	 MIME-Version; b=OMscsTKzbsIuxGEcbms4Foacbeoe6MTbWV6fsxeBITygO1UAoI1aK8VaGxQ4AuXF5ZyjmMUwpyWkM1pHc8t1jD4B0YXa8dYWa3nsYwB2ExvTzcG5mI9xtJSMUHmpehDxxxONYt42sVA0M0C50IksldfhFM5WLnRCSSuhfwKWfjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VFR9aJsM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9F7EC433F1;
+	Fri, 29 Mar 2024 12:31:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715444;
-	bh=KJMusQBaZ2wXF4wyQ1/zdzTdGHxScgRaikU7zMTEy9s=;
+	s=k20201202; t=1711715472;
+	bh=iZZqgKGHs4fdYu24nLgh2Il4+b4tK08w5DeGr+ZVQLo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OvVl2VS2Zf+QTYI+Q1h3mhXmA+updaW6GTI5f8d0Yvj0G+x8qQN/1jDozry6N+UO6
-	 pqlgXiDoJGrtDtkRI4o+pgxAaN+buiH7OyrwkN08NDAtteWEqzBSDH0BXyTMmzgE0a
-	 BhXjG9ElDzCJB5zHIvDjBpjilZfKyYBUPNFAlHMo2JqhEslORWsJ5F7P4OSTMdfubg
-	 RV7qr8IK3E5dwRzfVLQI/eCxV+PZmAi1/loqheyg6Babq0QC6pl6Z7oacpheCU0rJb
-	 jp0oOAWLNZNtv48KC0a4P3WR+GsnRhL2T0VvWcovptz6nIcSF8WlyO53SbUsnanj8k
-	 3g4QYwnzVb+fQ==
+	b=VFR9aJsMjvKjGA1823EkN1izx/leqtLWHP0ndgFKwt4W7F5IxvgglzyeNT/Hd0b2B
+	 S1CGJyBP5EmW8fQulcvPEqF9Xuku4l1URIAm7fPZK7Wo4mVCywNfjafrr83axtKD9C
+	 CaaKhb1f1F9bSPU2GGWF/oAzJ5k1XPjg959GfoovGuiNJgXgxfXuBSfhchGef1v2RO
+	 NpjiVsP2KnTkyr1UP7NDd5+0++VvnpPWEKLteJ0/cl+/97UrvJ/IAXtxTgycagYhAI
+	 irLnR/rhPtzQhson/hqpGh7FDjbta7wypqIcu8z6fRrsh1RXcAXrdCKeyt5bnYZEH+
+	 1TKXGmZvQdGUA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	drivers@pensando.io,
+	Jose.Abreu@synopsys.com,
+	hkallweit1@gmail.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	nitya.sunkad@amd.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 25/52] ionic: set adminq irq affinity
-Date: Fri, 29 Mar 2024 08:28:55 -0400
-Message-ID: <20240329122956.3083859-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 35/52] net: pcs: xpcs: Return EINVAL in the internal methods
+Date: Fri, 29 Mar 2024 08:29:05 -0400
+Message-ID: <20240329122956.3083859-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240329122956.3083859-1-sashal@kernel.org>
 References: <20240329122956.3083859-1-sashal@kernel.org>
@@ -72,41 +71,49 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.23
 Content-Transfer-Encoding: 8bit
 
-From: Shannon Nelson <shannon.nelson@amd.com>
+From: Serge Semin <fancer.lancer@gmail.com>
 
-[ Upstream commit c699f35d658f3c21b69ed24e64b2ea26381e941d ]
+[ Upstream commit f5151005d379d9ce42e327fd3b2d2aaef61cda81 ]
 
-We claim to have the AdminQ on our irq0 and thus cpu id 0,
-but we need to be sure we set the affinity hint to try to
-keep it there.
+In particular the xpcs_soft_reset() and xpcs_do_config() functions
+currently return -1 if invalid auto-negotiation mode is specified. That
+value might be then passed to the generic kernel subsystems which require
+a standard kernel errno value. Even though the erroneous conditions are
+very specific (memory corruption or buggy driver implementation) using a
+hard-coded -1 literal doesn't seem correct anyway especially when it comes
+to passing it higher to the network subsystem or printing to the system
+log.  Convert the hard-coded error values to -EINVAL then.
 
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+Tested-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/pensando/ionic/ionic_lif.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/net/pcs/pcs-xpcs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index adb0f9b01bb1e..4f05cddc65cb4 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -3468,9 +3468,12 @@ static int ionic_lif_adminq_init(struct ionic_lif *lif)
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 4dbc21f604f20..f0f41e86a4fb3 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -293,7 +293,7 @@ static int xpcs_soft_reset(struct dw_xpcs *xpcs,
+ 		dev = MDIO_MMD_VEND2;
+ 		break;
+ 	default:
+-		return -1;
++		return -EINVAL;
+ 	}
  
- 	napi_enable(&qcq->napi);
+ 	ret = xpcs_write(xpcs, dev, MDIO_CTRL1, MDIO_CTRL1_RESET);
+@@ -891,7 +891,7 @@ int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
+ 			return ret;
+ 		break;
+ 	default:
+-		return -1;
++		return -EINVAL;
+ 	}
  
--	if (qcq->flags & IONIC_QCQ_F_INTR)
-+	if (qcq->flags & IONIC_QCQ_F_INTR) {
-+		irq_set_affinity_hint(qcq->intr.vector,
-+				      &qcq->intr.affinity_mask);
- 		ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
- 				IONIC_INTR_MASK_CLEAR);
-+	}
- 
- 	qcq->flags |= IONIC_QCQ_F_INITED;
- 
+ 	if (compat->pma_config) {
 -- 
 2.43.0
 
