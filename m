@@ -1,95 +1,88 @@
-Return-Path: <netdev+bounces-83135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41B6E891028
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:12:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D93A6891042
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:15:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E03301F282BB
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:12:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 652691F2855E
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2502512B83;
-	Fri, 29 Mar 2024 01:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5A8125AC;
+	Fri, 29 Mar 2024 01:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isaHxLrb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJ6LWBK5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0122E11720
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 01:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A50EAE7;
+	Fri, 29 Mar 2024 01:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711674711; cv=none; b=r/9ded+Dje3rrnjopTtVvApl2Ci4ljjN7mnyV6ZROgNY+Tyu6jCIH21gi676zwrml1rKZURmiTxt2nDf42c72FNxxhhQSdQJr1YKGrSgynl4JDOGgRAygjQT4qYP/5Qsa1Cr5YZg8j5/hWUzAOyL5UuoWpgxtpnm9GVvQDllu9M=
+	t=1711674932; cv=none; b=Z6Qn5TFYhmN5hhXNuilpaLK2wWhI4x7Of/baGHqoN+JjMGgtxX41ZEDfd0vP2LDlQmW48Yb7sZQZZxPSnoxjOWSRFoMBGzEgezjhoCrkJ7glbZU3gSfbqdgkfRLb4wAJ+UkuphGXZMOfs4ZttIHeoH2FIlthhq3qLiXPXlcTE9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711674711; c=relaxed/simple;
-	bh=eNot05C6SBw9+CZh/rzn/KwYPL9cnerMuPg3a/1QOJo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eGsCQB53SWP8HDihvgxWBjT7Z6KHN9Y8U6q2ofDfwEYAG9JX/xfjGhaXdV3Vqg+JbbLkuE9c5UkK/n7q4WAklwbI2MDUckn4CbTTlpO7eySR5ibmgVwhtrhsnesAM/k0YlGFgV0ZcaL2q32fNb/iRfK/Gkt7nDK2Lr3uhaP7ges=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isaHxLrb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8EF82C43394;
-	Fri, 29 Mar 2024 01:11:50 +0000 (UTC)
+	s=arc-20240116; t=1711674932; c=relaxed/simple;
+	bh=L+KoOGPYyJgMGSggg1e+hhW5fHDdsDhMFRNKBhximbs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Trr1/kuh/1tbfJxIhtDbZCBWnZRW7H/fNMgqFxe35yPJQFcbFapikyhae55ndLFcJsWkHAntY1n/V/frA1mQ97XbxICiQ3WZ6226QmmuZ/QUx7kIqUmkkWw3lwx7bCGNoYGKwbEz4WOaex04dKWVS4LhAB9mcsQ85ed22lptK8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJ6LWBK5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E82C433F1;
+	Fri, 29 Mar 2024 01:15:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711674710;
-	bh=eNot05C6SBw9+CZh/rzn/KwYPL9cnerMuPg3a/1QOJo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=isaHxLrbvEQ81ufM+aubh5bvjM2C/EBdYiQT6HXC02a/26AYuyHFAvkTpYOqnqp3O
-	 DbmtOV/fTUWG74LYZMyhGrJpEjimO1PXYmqkbOYmWppY8FvYi2qcTfUeP2bGBFxrAx
-	 jfYAuCFlILFYdUk0xxztXQYoxcIdmfnE6AOYcDGCx3jW/J/wVHWA4V1QaYt7/IOnTg
-	 eusDibMlzcuzdHqVG3V3A2JqHHT9KUIP6vPmAoemY6kaN+itlZVlSKHH8zKLD1+Hll
-	 /Gu9Ruf1RpRjaOfLLgzs35FrNwOHwJOHTldeHRMbWaZnhI/TRLpqtHlpkpqe6+QQh+
-	 ZE0jjM/hsCyIw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F4B2D95054;
-	Fri, 29 Mar 2024 01:11:50 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1711674931;
+	bh=L+KoOGPYyJgMGSggg1e+hhW5fHDdsDhMFRNKBhximbs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nJ6LWBK5bJHcKOmpsNqB8nU9jKtW5yYR1tL9NUztqGQlgE0xS47YFI+E009LvzAQ/
+	 wToaCF3kKrWQEGlOP/cOEeMSkNb8ucwLFXCb0DMDnfkihAqVoSHDPloml5SiJhMV6l
+	 swiSu2dSNBWsdamKhaNM4LVtBWQi1UOpzNX/gzBDawkCHrSznt7yUgEMKGKYahJXqi
+	 QrlumioCOTZsTxwohsa3qYocj8BFBHWN7YXGVIHP8wvzUzBM2FPJAG5/hd69A9DSfp
+	 7f7bFby5wWMR3xVXQt4QX9nDSiy2LQH4UUaYitsGtlQa07gRgLh41dRuenfMnuz/n2
+	 cnBtfDtLQHkag==
+Date: Thu, 28 Mar 2024 18:15:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, edumazet@google.com,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, rostedt@goodmis.org,
+ davem@davemloft.net, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Jason Xing  <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v2 3/3] tcp: add location into reset trace
+ process
+Message-ID: <20240328181530.0d9229cb@kernel.org>
+In-Reply-To: <3186e70ecd98893710f829723f866ab92250ea74.camel@redhat.com>
+References: <20240325062831.48675-1-kerneljasonxing@gmail.com>
+	<20240325062831.48675-4-kerneljasonxing@gmail.com>
+	<3186e70ecd98893710f829723f866ab92250ea74.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv3 net-next 0/2] doc/netlink/specs: Add vlan support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171167471051.20385.16149210851709967859.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 01:11:50 +0000
-References: <20240327123130.1322921-1-liuhangbin@gmail.com>
-In-Reply-To: <20240327123130.1322921-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, donald.hunter@gmail.com,
- jiri@resnulli.us, jacob.e.keller@intel.com, sdf@google.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 27 Mar 2024 20:31:27 +0800 you wrote:
-> Add vlan support in rt_link spec.
+On Tue, 26 Mar 2024 12:08:01 +0100 Paolo Abeni wrote:
+> > -	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
+> > +	TP_PROTO(
+> > +		const struct sock *sk,
+> > +		const struct sk_buff *skb,
+> > +		void *location),  
 > 
-> Hangbin Liu (2):
->   ynl: support hex display_hint for integer
->   doc/netlink/specs: Add vlan attr in rt_link spec
-> 
->  Documentation/netlink/specs/rt_link.yaml | 80 +++++++++++++++++++++++-
->  tools/net/ynl/lib/ynl.py                 |  5 +-
->  2 files changed, 82 insertions(+), 3 deletions(-)
+> Very minor nit: the above lines should be aligned with the open
+> bracket.
 
-Here is the summary with links:
-  - [PATCHv3,net-next,1/2] ynl: support hex display_hint for integer
-    https://git.kernel.org/netdev/net-next/c/b334f5ed3d91
-  - [PATCHv3,net-next,2/2] doc/netlink/specs: Add vlan attr in rt_link spec
-    https://git.kernel.org/netdev/net-next/c/782c1084b9fa
+Yes, and a very odd way of breaking it up. Empty line after ( but
+) not on a separate line.
 
-You are awesome, thank you!
+> No need to repost just for this, but let's wait for Eric's feedback.
+
+Erring on the side of caution I'd read this:
+https://lore.kernel.org/all/CANn89iKK-qPhQ91Sq8rR_=KDWajnY2=Et2bUjDsgoQK4wxFOHw@mail.gmail.com/
+as lukewarm towards tp changes. Please repost if you think otherwise
+(with the formatting fixed)
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
