@@ -1,101 +1,136 @@
-Return-Path: <netdev+bounces-83131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84A61890FA4
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:31:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D60890FDF
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:54:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B59E31C2DC16
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 00:31:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0743F1C250DE
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 00:54:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F191A5F;
-	Fri, 29 Mar 2024 00:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B58101C6;
+	Fri, 29 Mar 2024 00:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VxB1x4Xc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gnSq8QSf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44AD5223;
-	Fri, 29 Mar 2024 00:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A710A920;
+	Fri, 29 Mar 2024 00:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711672270; cv=none; b=cJDmmfF1CIJkHNsax94VJaEbazK20ZMJWhtI6Z42eOOZqOBB5qrce7P6eHqo8xiqdaoxeHi76je88LtVkAOHgQ+iIAPYByINuLYmoGr5AX5iVidsWvy8I/KEfUOHui/g6ZEgGz5BaO47qOka6C06xoJGMhxTs6FsenMhv5VKdMI=
+	t=1711673649; cv=none; b=q2yk6zhXtQpcPqfR/iQSl+JWo9imDhH3NrKgqbnGJKYgEkWQXRZH7OKrZ31U7cMzo17/A3ojJX1kZ5gb339x+ZPlxDZF4riPydAIibDKA/0oR2wL4EUNsBBOtq/AHsCNMmhTD1IA0z4RnXxHz9z24sqRe8ZqktnVvOe7K+9qEU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711672270; c=relaxed/simple;
-	bh=qT743jPxa1XDwbNz9fp9wTjjmM0T0DFvYjRIAeLmIPY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ttQJyjxPjBq1q94wYV0p0UOV7+58CZpSw7mvIdlN3/P1HV9UFH0BGhn89y6tYaBA/5CTeQbeyofZVoesTfzl0WMaOVG1FKVlFLUbYkQ+gRO98JYLVcTtoBocQXpmCCBxB6s4cfS2bqg9CdRuA14uE77reRN+7cIjWhUxy5Z3id0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VxB1x4Xc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55175C43394;
-	Fri, 29 Mar 2024 00:31:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711672270;
-	bh=qT743jPxa1XDwbNz9fp9wTjjmM0T0DFvYjRIAeLmIPY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VxB1x4XcveMTl4sW1vWHos+K2NAEOrk2XOeynE7/cLU3qAoIAgcn6cAoXLheUOd51
-	 hkETwfxQUTvc5cTEjFCPmlbVigQc9wWvSNqifU9e25JFw9FIiUVjh/2VLziAOb8A8M
-	 I6mnp7Hj++z8FUlIsD85827iKLdrucbTaUHlo7zGvQ9KHOwSMlyZ6Ppyx9w6FbffUP
-	 8dYd9RoSpUR/E3ouqSloN7gny8wktxaB7WPWDwsRyEo50jpGFsdo0ZJ1zptH4F0k6T
-	 dQ6JXAdzQMpPY/Zp1Vhc0/2yspuTkKCKLr5K06ru3gvmGKBX/Z17DE0H1cdCeqVjYg
-	 bGtaC5SMOM/Nw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43318D2D0E1;
-	Fri, 29 Mar 2024 00:31:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711673649; c=relaxed/simple;
+	bh=ha+IHRghmbAVHSvcjd0HLzolZG/4JiB44D53GUrh8og=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=aVSV3x9hnHAYWlij8xcserM4OzAFoFlj8VKkncciKPEfaxfLw3XJYCBP/P80EKq+r6dtsRFigRVond39YktZmpV8uf921fTT7Ryb0h9LLpbd+TYU3YfEX7jPO8KMVZPKCI3BMYz0U8WtH4Wrmfvrn8zIr3cZln/Me7sR26d6jlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gnSq8QSf; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1def81ee762so3425165ad.0;
+        Thu, 28 Mar 2024 17:54:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711673648; x=1712278448; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V6Z90te2upQq9sDfDoIBzJzmTKxSiCcWRlQTQbXGLBM=;
+        b=gnSq8QSfjiMpBCnqbSPOrfeAMqz7+rZ2mX/1Au2KQ1JTknULFzZfzALHD/XZ54hWaa
+         7QCAtwT04eNOuX9azcb9Zqls5uPcKhbbLs3UV5Iwr1W4U2SClA/7EgseEFFgooekMx3K
+         596ynBefB+pHISCkNYanv/d9Jy7xaYgpQHphUnym4P3DTpnbhsZv0nsGmrfBu0apC1Dk
+         Dqu32bhspC+uBvUAN3vjbM/RjStg/RisEHBr9sPR5F4SgppIx1kJpPlxk+Zx2tnPa0b1
+         ZgsFOocYNYRdWLpbCK7O7Og+yD1+URN4TTdGasFI2vWSwZct0pT8n+gOV/IOm3Ol8FXV
+         dvZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711673648; x=1712278448;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=V6Z90te2upQq9sDfDoIBzJzmTKxSiCcWRlQTQbXGLBM=;
+        b=oLZfVSMvA2XAolVM5MAgaOd18T4ZnQQ1VTk3E3hcqvlflj1OiRdJTUZBEJ2GpWLvQr
+         Y2THDFV3SWUEKGCvfb4Jw6NbCf6E3jLsSVYyRPJyZAPXm4K2bE+HFIRoLtO2LtafAdgH
+         /tWC4MtZwdYLAyt/YzD3LZHY6tcvDY/LzEZ5EWNAQGPvDciqDp5AftZ8VmxucPYNB4qr
+         90AZTlg4tKhmxzCwme9pP70jOG5mF3kCfBO9aXpEUK/togw4Bv3J5EtjAtMUB+yVmsNB
+         0aVYR4g8AQGCNYNIF5M9QvMh43GAaeCU3SF7Z3OEwQJPSul9xVZI+xT5H+Zqflhd8E47
+         CJZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXMAgy58JyOAbDjxScAT4hhqNZqLD8glEQHBh4jfEibVLSfG2pJcf1VxbeFi6FNTGCgO/9aEotbsZ9YVEKVG1Y6F0NoXl/3/9UVvQJrcAljDo24+zir7nGJYeALi6jIRWVCxWFB
+X-Gm-Message-State: AOJu0Yxbz8qxeIWcTEQWlS5AaLc4OHMD0GgDtiaTLz2LAMYehD45gTBi
+	dpDyWB6+aRZ/GezKRzUKY1MqUvs+3LinCGMQZHDckdNG6OPd1n0J
+X-Google-Smtp-Source: AGHT+IEAOaM11FjDkEs4q9ICaVo9MrNcaHs709SammXWmp+vHQYZAxADnYGWldFyt+DhtKffjciASQ==
+X-Received: by 2002:a17:903:503:b0:1db:ce31:96b1 with SMTP id jn3-20020a170903050300b001dbce3196b1mr1071512plb.6.1711673647644;
+        Thu, 28 Mar 2024 17:54:07 -0700 (PDT)
+Received: from localhost (p4309189-ipxg22801hodogaya.kanagawa.ocn.ne.jp. [153.172.233.189])
+        by smtp.gmail.com with ESMTPSA id w4-20020a1709029a8400b001d8f111804asm2266659plp.113.2024.03.28.17.54.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 17:54:07 -0700 (PDT)
+Date: Fri, 29 Mar 2024 00:53:52 +0000 (UTC)
+Message-Id: <20240329.005352.498033770146111357.fujita.tomonori@gmail.com>
+To: wedsonaf@gmail.com
+Cc: rust-for-linux@vger.kernel.org, ojeda@kernel.org,
+ alex.gaynor@gmail.com, boqun.feng@gmail.com, gary@garyguo.net,
+ bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
+ aliceryhl@google.com, linux-kernel@vger.kernel.org,
+ walmeida@microsoft.com, fujita.tomonori@gmail.com, tmgross@umich.edu,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] rust: phy: implement `Send` for `Registration`
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20240328195457.225001-2-wedsonaf@gmail.com>
+References: <20240328195457.225001-1-wedsonaf@gmail.com>
+	<20240328195457.225001-2-wedsonaf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] selftests/mm: Fix ARM related issue with fork after
- pthread_create
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171167227027.28813.3759046936061373590.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 00:31:10 +0000
-References: <20240325194100.775052-1-edliaw@google.com>
-In-Reply-To: <20240325194100.775052-1-edliaw@google.com>
-To: Edward Liaw <edliaw@google.com>
-Cc: linux-kernel@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- akpm@linux-foundation.org, shuah@kernel.org, nathan@kernel.org,
- ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
- jannh@google.com, linux-kselftest@vger.kernel.org, kernel-team@android.com,
- lokeshgidra@google.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-mm@kvack.org, llvm@lists.linux.dev
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net.git (main)
-by Andrew Morton <akpm@linux-foundation.org>:
+On Thu, 28 Mar 2024 16:54:53 -0300
+Wedson Almeida Filho <wedsonaf@gmail.com> wrote:
 
-On Mon, 25 Mar 2024 19:40:52 +0000 you wrote:
-> Following issue was observed while running the uffd-unit-tests selftest
-> on ARM devices. On x86_64 no issues were detected:
+> From: Wedson Almeida Filho <walmeida@microsoft.com>
 > 
-> pthread_create followed by fork caused deadlock in certain cases
-> wherein fork required some work to be completed by the created thread.
-> Used synchronization to ensure that created thread's start function has
-> started before invoking fork.
+> In preparation for requiring `Send` for `Module` implementations in the
+> next patch.
 > 
-> [...]
+> Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> Cc: Trevor Gross <tmgross@umich.edu>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Wedson Almeida Filho <walmeida@microsoft.com>
+> ---
+>  rust/kernel/net/phy.rs | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+> index 96e09c6e8530..265d0e1c1371 100644
+> --- a/rust/kernel/net/phy.rs
+> +++ b/rust/kernel/net/phy.rs
+> @@ -640,6 +640,10 @@ pub struct Registration {
+>      drivers: Pin<&'static mut [DriverVTable]>,
+>  }
+>  
+> +// SAFETY: The only action allowed in a `Registration` instance is dropping it, which is safe to do
+> +// from any thread because `phy_drivers_unregister` can be called from any thread context.
+> +unsafe impl Send for Registration {}
+> +
+>  impl Registration {
+>      /// Registers a PHY driver.
+>      pub fn register(
 
-Here is the summary with links:
-  - [v3] selftests/mm: Fix ARM related issue with fork after pthread_create
-    https://git.kernel.org/netdev/net/c/8c864371b2a1
+After the following discussion, I dropped Send for Registration:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+https://lore.kernel.org/netdev/8f476b7c-4647-457b-ab45-d6a979da4e78@lunn.ch/T/
+
+If you guys think that Send can be added here, it's fine by me.
 
 
+Once this In-place module series are merged, I'll revisit the phy
+module initialization to remove `static mut DRIVERS`.
 
