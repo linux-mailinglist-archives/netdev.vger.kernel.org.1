@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-83312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30365891A82
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 14:04:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C81C891A9B
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 14:06:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F53D1C21FCE
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:04:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B646B24EA3
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0061915A49F;
-	Fri, 29 Mar 2024 12:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C9515B152;
+	Fri, 29 Mar 2024 12:32:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KO+xz6iG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8Ft3QOJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB6415A49B;
-	Fri, 29 Mar 2024 12:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB4B15B14C;
+	Fri, 29 Mar 2024 12:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715533; cv=none; b=QFpN28WRXoi45U/73Anxnisop0N4MRPrw3oXin39fBwB4iYxU+wGXfKgif3TY/uGseJOpm07sBlwd+nOUXVpsbel2UlYVR8ckiCH0wtVXQY5cOkH2HmlWPJ53VTp7Dt18xlyOb01Z55VneDBnXv/FQeEbD+uAhx6Enan+gVu0GE=
+	t=1711715553; cv=none; b=IK+wwVNmHVcAHtcpPnOVmic5pXr83h2UMUpQXjH7ht+7BVSmDNDCmlZdVOTy6oWt1hjF2Y/TL/GodNsXjpO0uvSX2KtDn+S8H8Tyk4xlHctgbJMICrrQ0vXy7VUp3RcYXpL/reoxHnRdgVHrfo34NHQTLzujGiF0T5woGGlUn/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715533; c=relaxed/simple;
-	bh=S82mcnLoAgLHLLUc/tmsd7zTZGwm1HRCO6vTX9LS/lk=;
+	s=arc-20240116; t=1711715553; c=relaxed/simple;
+	bh=V85htiRzenTUy0PNh1A5N6H+p8aGUjz8kyLJxgAgmc0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kC5nKv3T2XZ7gGsHVpEzwJ/tziDOinExaTO22FOB4e/QWLwd4BdNQKzGo+ImoewgBraK7Q7AaEeYZGE5cuBOH/qz8KpYFKulgJPMsNl1qymlWJRFviy3y3B2Ru6qZau3BDWjFindn5ERfc/9DUeXEGs11gfieyUWkazH2kkhRN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KO+xz6iG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD6C2C43390;
-	Fri, 29 Mar 2024 12:32:11 +0000 (UTC)
+	 MIME-Version; b=T30n6pXLb4dooRilS3wq/yO6Iiv+RpBKeTCcrQK/Ryy5/KHEAum/k1WrJkQPcazOoGPjjUKWxBsCQe2E+w6oPnDVhAmRxn2zQhDlYTbQd0aBtmg/WCr0axgmhCETdcLQCJXkU/rbULcs1Xl6jdYfCv6rnwSRUAq5ueKOXgvFTMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8Ft3QOJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2823CC43399;
+	Fri, 29 Mar 2024 12:32:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715533;
-	bh=S82mcnLoAgLHLLUc/tmsd7zTZGwm1HRCO6vTX9LS/lk=;
+	s=k20201202; t=1711715552;
+	bh=V85htiRzenTUy0PNh1A5N6H+p8aGUjz8kyLJxgAgmc0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KO+xz6iGzGYExW+tc6fK9ZjqI2Til+gK25fmCjCK4mIVUX0N+Y9Oi6HJPOpCMRUgm
-	 Q+RQ2eOhzLyGeaOhd5aa7HpPh+DHpLOPp9TsmrZ9PP6cJsc3tbOJLRwwy+RCixZapm
-	 06226FlibBUvBXMf/0yHaZ0z7Jv0KfBW+ipVRJ9+1VdcjjpT8iY30FCgrKctx5E0aj
-	 u2rouCRFNly7ypEWAE2zv2jqJkJORozsir9L5y6Q3eG0OpTkytvMUi4djBr0fXQaBO
-	 8Q6NQPfnWHve8N2Kc84i3+JzjOkxcqY3Etz2Aa2+bafhcHgvejs0EtzgORc2A+omyr
-	 4HCUr9KRNwj1g==
+	b=i8Ft3QOJsqFOyd0onBRCzHT9Imin3KtZtZI9/lVa10L3gSQeB7JIP3wF+FevqjEfK
+	 YNmepU0lC09iBqYSbz/7d0dyJVFlt+8R041CQGQ0IRHas4BaeEXjDxwSDafhPVDCgw
+	 vuBVhBDHdksyEI8Q5JwMQfshOq1TKM+bd9TFkJbQ7o9roKPmepjUlBucAmdAJqUGBE
+	 p50g1wqaUb9HETym2iLlnp9JMG3apzYG2xeZzXU8nLD9esXqA/paaKFa1Lb3OsNHfY
+	 ObLHrrHnXYqKarE27IDRwYk2nzyHFLuJ5j9geo72qYrCzg9CJPIUYhqr2cjFQEx0fC
+	 3jww0H3+Ge0Og==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Markus Elfring <elfring@users.sourceforge.net>,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>,
+Cc: Shannon Nelson <shannon.nelson@amd.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	mareklindner@neomailbox.ch,
-	a@unstable.cc,
-	davem@davemloft.net,
+	drivers@pensando.io,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	b.a.t.m.a.n@lists.open-mesh.org,
+	nitya.sunkad@amd.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 04/31] batman-adv: Improve exception handling in batadv_throw_uevent()
-Date: Fri, 29 Mar 2024 08:31:23 -0400
-Message-ID: <20240329123207.3085013-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 12/31] ionic: set adminq irq affinity
+Date: Fri, 29 Mar 2024 08:31:31 -0400
+Message-ID: <20240329123207.3085013-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240329123207.3085013-1-sashal@kernel.org>
 References: <20240329123207.3085013-1-sashal@kernel.org>
@@ -73,69 +72,41 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.83
 Content-Transfer-Encoding: 8bit
 
-From: Markus Elfring <elfring@users.sourceforge.net>
+From: Shannon Nelson <shannon.nelson@amd.com>
 
-[ Upstream commit 5593e9abf1cf2bf096366d8c7fd933bc69d561ce ]
+[ Upstream commit c699f35d658f3c21b69ed24e64b2ea26381e941d ]
 
-The kfree() function was called in up to three cases by
-the batadv_throw_uevent() function during error handling
-even if the passed variable contained a null pointer.
-This issue was detected by using the Coccinelle software.
+We claim to have the AdminQ on our irq0 and thus cpu id 0,
+but we need to be sure we set the affinity hint to try to
+keep it there.
 
-* Thus adjust jump targets.
-
-* Reorder kfree() calls at the end.
-
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-Acked-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/batman-adv/main.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_lif.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-index e8a4499155667..100e43f5e85aa 100644
---- a/net/batman-adv/main.c
-+++ b/net/batman-adv/main.c
-@@ -688,29 +688,31 @@ int batadv_throw_uevent(struct batadv_priv *bat_priv, enum batadv_uev_type type,
- 				  "%s%s", BATADV_UEV_TYPE_VAR,
- 				  batadv_uev_type_str[type]);
- 	if (!uevent_env[0])
--		goto out;
-+		goto report_error;
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+index fcc3faecb0600..d33cf8ee7c336 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+@@ -3216,9 +3216,12 @@ static int ionic_lif_adminq_init(struct ionic_lif *lif)
  
- 	uevent_env[1] = kasprintf(GFP_ATOMIC,
- 				  "%s%s", BATADV_UEV_ACTION_VAR,
- 				  batadv_uev_action_str[action]);
- 	if (!uevent_env[1])
--		goto out;
-+		goto free_first_env;
+ 	napi_enable(&qcq->napi);
  
- 	/* If the event is DEL, ignore the data field */
- 	if (action != BATADV_UEV_DEL) {
- 		uevent_env[2] = kasprintf(GFP_ATOMIC,
- 					  "%s%s", BATADV_UEV_DATA_VAR, data);
- 		if (!uevent_env[2])
--			goto out;
-+			goto free_second_env;
- 	}
+-	if (qcq->flags & IONIC_QCQ_F_INTR)
++	if (qcq->flags & IONIC_QCQ_F_INTR) {
++		irq_set_affinity_hint(qcq->intr.vector,
++				      &qcq->intr.affinity_mask);
+ 		ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
+ 				IONIC_INTR_MASK_CLEAR);
++	}
  
- 	ret = kobject_uevent_env(bat_kobj, KOBJ_CHANGE, uevent_env);
--out:
--	kfree(uevent_env[0]);
--	kfree(uevent_env[1]);
- 	kfree(uevent_env[2]);
-+free_second_env:
-+	kfree(uevent_env[1]);
-+free_first_env:
-+	kfree(uevent_env[0]);
+ 	qcq->flags |= IONIC_QCQ_F_INITED;
  
- 	if (ret)
-+report_error:
- 		batadv_dbg(BATADV_DBG_BATMAN, bat_priv,
- 			   "Impossible to send uevent for (%s,%s,%s) event (err: %d)\n",
- 			   batadv_uev_type_str[type],
 -- 
 2.43.0
 
