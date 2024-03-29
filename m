@@ -1,72 +1,60 @@
-Return-Path: <netdev+bounces-83404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593AC892291
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:22:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6BE98922F9
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:46:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04CCE1F220E4
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:22:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D81BC1C2552D
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC172577B;
-	Fri, 29 Mar 2024 17:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4E11369AD;
+	Fri, 29 Mar 2024 17:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxY7oCjP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63591C0DC0;
-	Fri, 29 Mar 2024 17:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AB3A923;
+	Fri, 29 Mar 2024 17:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711732918; cv=none; b=rtyRAUkUqKXJWfUvLoeIloX5PlSsLxSAqJsyX0DmnUmO2Km+NooadmqbGLxKW6DYBRO7oZ4TfhobWgkUCsjj89bGnZ1XFk1YvsFPvsMQoFd4hDP9U+gaPwQiencu/LiFpsEWW9nlQXVpJm7SM/sXqhBjXX3ahEKB7addjBKkx64=
+	t=1711734360; cv=none; b=D/2Nmrcm6H/WSwNsyA+ktsLbxhMaAL1wyfaMLwFs2fGkQ16PwNCyBMBIBGsck8PUKhrG5n7cXISO/eDtsB2w0o5o2dHSYH3bPptxcW3fAKI5iU8HeBtSsMH8E0F3vL3VMKwjRPgyGBL8rH6okW7yD4hOwda1BTU9XYs1faYm49Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711732918; c=relaxed/simple;
-	bh=VAZUIHroRXLR2qYb54Uc+5XzuFX5yye1KGM0aNQugsE=;
+	s=arc-20240116; t=1711734360; c=relaxed/simple;
+	bh=HFcDQXQ4/V0olwInsRZS2sioZwVCn9Un9HBzhqOv1RU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TUej3Svlus2KP2Oz0u8Liw4aihVkCrfaYW//Yp34g5fDgtDzHKpB1/+oMrcwR8+X/GthbuD8mMICgV5NFqsiKLGbruQhoqKaC6eohZWLgchrmGryU8Wn9QefMjnUdgUohESab2tt9ATrPhD1fGnPSEMX+HfnBAP9jDCuExceEwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a2f22bfb4e6so297350066b.0;
-        Fri, 29 Mar 2024 10:21:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711732915; x=1712337715;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wWTNK+PNnGTgTs2Ks00fI39OgjfjTZnHwFsoUqKid1M=;
-        b=izXeBXbcP7pm+veWDCBVKzdNKF9mqovkkUrQuwwxYWmCnPrLVkSLlC/iOwoVtv9ulg
-         JOtvA2p++RihUChVbhRkuMu+dqzc13pWX/IWwInuQIbin8MMrKl+XzwkaYwr5W0ZDkwa
-         9nCMBtjKTSv98an0JUqsmKeTjTi6j6GcAVbwnyiA26imwcwhXd3WouTdIM0Sf/NICDAJ
-         I20wv2/SbbV/+gSCsd2PtJUnnUiMHe23lviyVGtr6EWheYilITy3tgiH7V6w+mw3Vu8C
-         z/9eX9619Dw0yzGaSlcgOKJby4CTx1CYzPkUI0XK5xY1xGT8LyhMOdEVyMSFRSElxhZo
-         MtXg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIq7q/z1RYGtRhSyaQsLIl2IHg1OmzkvPK2OFTjY19StdwwKmbi/K0nmHTsCAv6neGZp55VeuTfyUTdCYTmOOcIMTJKsjwPMqXeCAFSdPIByLXLtzGfjKun2tXVPo1icF2JlLG
-X-Gm-Message-State: AOJu0Yy/9fo2Y3FZb7Umr2s5uw5Rl3/BayDuQF5CHJFG0oqMEEatzrxK
-	wBUZ+RyazmL5bXGOQdJ67DLk3ueFWwbQevAiz+tj/QUSTo4b2CTC
-X-Google-Smtp-Source: AGHT+IFb3iL3O2NxVjWyzZ4px7Ly4wOtUDl0HQjLybDZpYINkq1QmhOuo8RjXUBcBXho+E5uh2P1lA==
-X-Received: by 2002:a17:906:3a91:b0:a4d:f555:fd6 with SMTP id y17-20020a1709063a9100b00a4df5550fd6mr1723080ejd.29.1711732915068;
-        Fri, 29 Mar 2024 10:21:55 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
-        by smtp.gmail.com with ESMTPSA id h18-20020a17090634d200b00a44b90abb1dsm2132929ejb.110.2024.03.29.10.21.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 10:21:54 -0700 (PDT)
-Date: Fri, 29 Mar 2024 10:21:52 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: aleksander.lobakin@intel.com, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, Taras Chornyi <taras.chornyi@plvision.eu>,
-	quic_jjohnson@quicinc.com, kvalo@kernel.org, leon@kernel.org,
-	dennis.dalessandro@cornelisnetworks.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/5] net: marvell: prestera: allocate dummy
- net_device dynamically
-Message-ID: <Zgb4sEmsiDkNtvJG@gmail.com>
-References: <20240328235214.4079063-1-leitao@debian.org>
- <20240328235214.4079063-3-leitao@debian.org>
- <20240329085633.2cfae5e5@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TN6ZBJ/m3QgENynxI4kHHCqb8eHGZtaNFVM9k/SCcs3HNg/1d/kREYQkj1xXjxMgu/wtMoBTT/kv+tNa+041OwKHjQeaDypptuca0FTxAXgGP5YcyJhDnLbLOUcsgM+n066xl7JEqQcbd5/+GV6LSscryUF/ZIdHr/OsdsI4ePI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxY7oCjP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06549C433C7;
+	Fri, 29 Mar 2024 17:45:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711734359;
+	bh=HFcDQXQ4/V0olwInsRZS2sioZwVCn9Un9HBzhqOv1RU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OxY7oCjP2GoakWmVTJBFF2ww/W7egc/tuBsgT+LvgoNjXbz5XwsVTEma04/FTqDsl
+	 bMa+jHbV8m8GxuR/3uOnxSXXX+bAFfM03hL9LrQr0zf2+8yyxEAHue0ZfUkbU/2NVv
+	 HoTNsUjzowUTEggo897VrBoN5mjEpmUH6ImYGZdlTVBneXFff+v6O3ME9Yyf9hqfVy
+	 qMWU0FY3zoN41h/ZZTnr4UZncWDr+X31eue4/IjvX72xqy/MpwyKmcbWboI2BDv8cU
+	 IrtQTkRYd1Xw80UnleTlfuHSdGlTF6pbjU8sDFNyiCyRKGOfg0T1PRNuV8TMcvT8Rw
+	 0w1jwraAZ1RDg==
+Date: Fri, 29 Mar 2024 17:45:53 +0000
+From: Simon Horman <horms@kernel.org>
+To: Su Hui <suhui@nfschina.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, nathan@kernel.org,
+	ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
+	dan.carpenter@linaro.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next v3] octeontx2-pf: remove unused variables
+ req_hdr and rsp_hdr
+Message-ID: <20240329174553.GN651713@kernel.org>
+References: <20240328020723.4071539-1-suhui@nfschina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,17 +63,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240329085633.2cfae5e5@kernel.org>
+In-Reply-To: <20240328020723.4071539-1-suhui@nfschina.com>
 
-On Fri, Mar 29, 2024 at 08:56:33AM -0700, Jakub Kicinski wrote:
-> > @@ -682,6 +690,7 @@ static void prestera_sdma_switch_fini(struct prestera_switch *sw)
-> >  	prestera_sdma_tx_fini(sdma);
-> >  	prestera_sdma_rx_fini(sdma);
-> >  	dma_pool_destroy(sdma->desc_pool);
-> > +	kfree(sdma->napi_dev);
+On Thu, Mar 28, 2024 at 10:07:24AM +0800, Su Hui wrote:
+> Clang static checker(scan-buid):
+> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:503:2: warning:
+> Value stored to 'rsp_hdr' is never read [deadcode.DeadStores]
 > 
-> Why kfree()? Let's use free_netdev() consistently, in case one day
-> we have to undo something alloc_netdev_dummy() has done.
+> Remove these unused variables to save some space.
+> 
+> Signed-off-by: Su Hui <suhui@nfschina.com>
+> ---
+> v3:
+>  - using net-next in subject
+>  - split the v2 patchset into individual patches
+> v2:
+>  - add "net" in subject
 
-I should have used free_netdev() in fact. I will update.
+Thanks for the updates.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
