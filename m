@@ -1,113 +1,76 @@
-Return-Path: <netdev+bounces-83348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39EEE892036
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:19:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6F5989203F
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:20:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE3AF1F2757B
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:19:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EB3F286CF5
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4A88529D;
-	Fri, 29 Mar 2024 15:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DECC12EBD6;
+	Fri, 29 Mar 2024 15:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LsNdJ1Lt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l52XuM7R"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F791C0DF0;
-	Fri, 29 Mar 2024 15:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0BE12DD97
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 15:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711724694; cv=none; b=IlZH3657twegKr73ekRtNroEIRjp/1k7GwLGw9jDr3HWg0c3fzZPi0Hk8HVAO9npYi+gM1oqkar4Jqncwk04Lo9yxTPWdLnyivvUv7sOblI1dfaM2r+sRPGRvigYC9Wr4928LedyudjEvB/zg7Mc1CK1BW/Y+XmLNBcZmljXk48=
+	t=1711724810; cv=none; b=OM//qaSsbpBevsytZ2BkJ65/fgygy9PDNYvgo8MRHTqKGDWmbYxxmK7OtDlZq68NIXvRxgs5jAOYFJXq8hxS1GXO9uPSAItGXxVa7mtvkBdd6EllOcacMPQMsWa/RHbdrCoVQPW6X879Re/KhVvSjQh66sLTo358o1yUBbspi2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711724694; c=relaxed/simple;
-	bh=QPr73epDnfNI9hRAKDsQGY9i3JJUvUIidZoLlIKWyZk=;
+	s=arc-20240116; t=1711724810; c=relaxed/simple;
+	bh=mNNJDzZ52MTyYjoIJx2mc9EgBJqDrPMZN+gB1mfBuRE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jtu/NgmqF5wDafDcNp5CmDOBcNoQ4+VzsxcGLz9eYF/Kk9EWoiTVaioN44VxcRfWBuJxCaBZniy6IjxMt5c0RgFdWLTvgqaCVQn/xZ5tMCA25u0wvmVROgetk78RoLty5IOhB/CxRNeRuuJ/mjxVdR1zW1PoTOc1fYojQBTbOng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LsNdJ1Lt; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2FD9560007;
-	Fri, 29 Mar 2024 15:04:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1711724684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QPr73epDnfNI9hRAKDsQGY9i3JJUvUIidZoLlIKWyZk=;
-	b=LsNdJ1Lt0oJ9z0mqz6TlbRI8l1mbDgKIJ5zzl1ossv03wcL9woRWFh0Gs6Y9IS6u8yP+Px
-	feUGQi6RcodKm4JuX4SmPB6VcliyuE8qbxiqqaIHt3T59gAu2qHrmZ8rsGWDECrKXCecX4
-	VDS/Cs+qOCwzdBYXDm4frT8frQL1XzXx3xsMYhvop37l58/1Ler289gm9xR+nPBn+ZPAhY
-	I08bFEm98VVZuCNWibrS/bcgr+Y+tzdLCAz6IJQG6ok0viZfUfY60mGt1R+8jjseSb432x
-	E/FLe3PPXfkaBmFlgNtS+QIckH/IyKpmto5Y6MPAUPKBXNLYMlmzdSNGZHPgXw==
-Date: Fri, 29 Mar 2024 16:04:42 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v6 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <20240329160442.0333a117@kmaincent-XPS-13-7390>
-In-Reply-To: <20240326-feature_poe-v6-13-c1011b6ea1cb@bootlin.com>
-References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
-	<20240326-feature_poe-v6-13-c1011b6ea1cb@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=H4gzwzByFNhnZOsxkFUbUKC6erhM3xfEz2jrhPUUfkvRLRpJmLIsQ49a2Yw8yKgAmcTVmFEBxMWQXgFNdkMExsaJ3/cQXI4tO9ebRNUVd8Kw3NgIhG/fMixkqnQimqmGPaP7rzLQ+m3aoGOHT6nZRM7YsGZG+E89CM3AQ58L7Wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l52XuM7R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B026C433C7;
+	Fri, 29 Mar 2024 15:06:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711724809;
+	bh=mNNJDzZ52MTyYjoIJx2mc9EgBJqDrPMZN+gB1mfBuRE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l52XuM7RdArm1wjCOVRMVtLtml2Xl6OJL+XVi5Y0MeIys5HCSRUySfaBRa2ApUI/2
+	 OhLCoDnHdZap51f6i/JVw648R7pqvMngYtM3xDWEeJ9icX1Hka3ikfh0hYdBqd2tNx
+	 hQx7Jtlgnsi63V/VN7NXZJVFHyBffTVQuL2WM2AlA7qJ8rcu1oNyF9/OjTrMKOU0ET
+	 deA89PEUqa0dv+XEj7/MVwLwfwgiTaTvcs7V2X3maC4Rx6dHUwx6WqhLF295ncuEPG
+	 FBR+WPFn3xQEniyqKALXetmQTTw8WXvq2GB7RY6ILUsFI5xQntJEvq7hB4iTgqrPX7
+	 JQsMWKXlYh3WA==
+Date: Fri, 29 Mar 2024 08:06:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: <edumazet@google.com>, <davem@davemloft.net>, <eric.dumazet@gmail.com>,
+ <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] tcp/dccp: bypass empty buckets in
+ inet_twsk_purge()
+Message-ID: <20240329080648.3cd12eaf@kernel.org>
+In-Reply-To: <20240327192934.6843-1-kuniyu@amazon.com>
+References: <20240327191206.508114-1-edumazet@google.com>
+	<20240327192934.6843-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Mar 2024 15:04:50 +0100
-Kory Maincent <kory.maincent@bootlin.com> wrote:
+On Wed, 27 Mar 2024 12:29:34 -0700 Kuniyuki Iwashima wrote:
+> > -	for (slot = 0; slot <= hashinfo->ehash_mask; slot++) {
+> > -		struct inet_ehash_bucket *head = &hashinfo->ehash[slot];
+> > +	for (slot = 0; slot <= ehash_mask; slot++, head++) {
+> > +  
+> 
+> unnecessary blank link here.
 
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
->=20
-> Integrate the regulator framework to the PSE framework for enhanced
-> access to features such as voltage, power measurement, and limits, which
-> are akin to regulators. Additionally, PSE features like port priorities
-> could potentially enhance the regulator framework. Note that this
-> integration introduces some implementation complexity, including wrapper
-> callbacks, but the potential benefits make it worthwhile.
->=20
-> Regulator are using enable counter with specific behavior.
-> Two calls to regulator_disable will trigger kernel warnings.
-> If the counter exceeds one, regulator_disable call won't disable the
-> PSE PI. These behavior isn't suitable for PSE control.
-> Added a boolean 'enabled' state to prevent multiple calls to
-> regulator_enable/disable. These calls will only be called from PSE
-> framework as it won't have any regulator children, therefore no mutex are
-> needed to safeguards this boolean.
->=20
-> regulator_get needs the consumer device pointer. Use PSE as regulator
-> provider and consumer device until we have RJ45 ports represented in
-> the Kernel.
-
-Oleksij, could you verify this patch does not break pse_regulator driver?
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+I've seen some other core kernel contributors add empty lines after 
+for or if statements, so I think this is intentional. Not sure why
+the empty line helps, either, TBH, but we have been letting it slide 
+so far.
 
