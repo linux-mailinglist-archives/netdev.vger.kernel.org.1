@@ -1,141 +1,103 @@
-Return-Path: <netdev+bounces-83156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0069A89119D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 03:19:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 257EA8911A2
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 03:20:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95F051F23BE4
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:19:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D019A1F24293
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673071DA3A;
-	Fri, 29 Mar 2024 02:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99B12375F;
+	Fri, 29 Mar 2024 02:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CYkULqtp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UxN7uau/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB301E504
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 02:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C769225A8;
+	Fri, 29 Mar 2024 02:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711678789; cv=none; b=pU/DItRtz7RydgdTqJzx6EqQ0fTTuWNCOCGcQOrVrvcR+MKxGqCFzSPh4RrezO/jfEHUj6KtfjBLW1mjsnp850W0j1KxVp1pbcgkaFMayj7D4LJHDYetRng4SFs0S3Kle5Ma4yo1rcdNugWOAlAwnK0yviqMxbuN8TDqAptduic=
+	t=1711678832; cv=none; b=TItej8WkShHyFhp/+D0JpO+ggkKH2IXeTMRjoKrN9lY8xWEKWo7ItK74I7w1icWzYReSNJCIsDQUKzQz5PHV9uqt3bzXg8L/QXnQ4501qx6DJthSIw6F/Sq1W13JmkflInZWu2ExzA5ELFeFfB36/2yNJVtiF7GqyGPFnt/wS+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711678789; c=relaxed/simple;
-	bh=vjYhNwASg0V5g2Y+TK6645+2ZQWPSnve6CfEGIIphCY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YccokT5t4faAVHdOPt8cB248vNG0wq/L2s3n/kIdIXOl/0pnqfsq3ONiwa5lnHZ0ohAvzjhcWizbJ0SYviLkMSNdLSTrxVl2FGPdC0QDmWJ5vBYXpscBWPT3MKZ68DZVo7KT4x1HK0ICHPYYRx++IS2cf7v9aNzfpaEPyQ5ugkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CYkULqtp; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711678783; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=Z/B197cNsjXR46QvzrG56537BGJxZxD76L67Zd/+Cgo=;
-	b=CYkULqtpJOxB9eimuUQU6QFVpQ9uO0PKmF/4GaCMV10bniZu5snqU88dZWjqxoAYSl1J2i6uNeUfUSs3yNq4D/aP6biwiBUiQtwA96rFPeR3S0ZQOz27hPJ9e6IBZbiHFifTcB83wWG5KSXDY9QCQ1e5z9XloddjFqNuJB9hV5g=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W3V.fWk_1711678782;
-Received: from 30.221.147.241(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3V.fWk_1711678782)
-          by smtp.aliyun-inc.com;
-          Fri, 29 Mar 2024 10:19:43 +0800
-Message-ID: <3ca681b5-4844-4199-8e8c-d5d0dd82ea86@linux.alibaba.com>
-Date: Fri, 29 Mar 2024 10:19:40 +0800
+	s=arc-20240116; t=1711678832; c=relaxed/simple;
+	bh=scq+zhfqrpSEmaQVeGCdzdWPMSoFu4I0JJu2jmYEKVA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MPzffhpd1exm9l0x/rqmkp31yIekgXXwzrLkIG1XD1URaRKnf1fxsw/4EO6ah0zDVABi8Yx64XD7RkwiDhDSyMHwOYKalsHQOqM2dIBgn59sMwLnn1hveh4gJzCWUXJoMTWD9u7yW4IBzsiDTMuDv8uGawK8OqIVZLljUHKaLiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UxN7uau/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EEBD5C433B1;
+	Fri, 29 Mar 2024 02:20:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711678832;
+	bh=scq+zhfqrpSEmaQVeGCdzdWPMSoFu4I0JJu2jmYEKVA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UxN7uau/0swIpwP1Gpd4TqeL1OK7pHUj2QWM2Y5U9HDikHfmdEz5BSItnmI3CWuBS
+	 JoD4eFjjP0PiYfv14912z+N136MzmkhUCtfN5T9jPjDrsgy+gEU+m4p0rZ1Mm78Qn7
+	 Ug0z7zeExywdsB5z2WO/EkV/WFy8ARvLttW82sTwVY9dyoyamRuDcy3kLuOaEyy3UJ
+	 htPl1jbR9hZI9DnJtQJM7+a2FRnG2Ovb3weLX1ys0qtapMQwKsbWgQEeS3nXaFRn25
+	 CZ2p4nRK1MMx29QUwcjTdQ9vYot/isqRgLfj1bP+Kay4QcNL/C8k5yw2Q2/GxljYNp
+	 zPYGp3uVobJlQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E2D31D8BCE9;
+	Fri, 29 Mar 2024 02:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] virtio-net: fix possible dim status unrecoverable
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Daniel Jurgens <danielj@nvidia.com>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- "open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>
-References: <1711434338-64848-1-git-send-email-hengqi@linux.alibaba.com>
- <8097366d5c7dcbb916b32855d2a56189a3e6dda2.camel@redhat.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <8097366d5c7dcbb916b32855d2a56189a3e6dda2.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/3] compiler_types: add Endianness-dependent
+ __counted_by_{le,be}
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171167883192.31897.5391383378639622485.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 02:20:31 +0000
+References: <20240327142241.1745989-1-aleksander.lobakin@intel.com>
+In-Reply-To: <20240327142241.1745989-1-aleksander.lobakin@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, keescook@chromium.org, gustavoars@kernel.org,
+ nathan@kernel.org, horms@kernel.org,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, intel-wired-lan@lists.osuosl.org,
+ linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-在 2024/3/28 下午6:34, Paolo Abeni 写道:
-> On Tue, 2024-03-26 at 14:25 +0800, Heng Qi wrote:
->> When the dim worker is scheduled, if it fails to acquire the lock,
->> dim may not be able to return to the working state later.
->>
->> For example, the following single queue scenario:
->>    1. The dim worker of rxq0 is scheduled, and the dim status is
->>       changed to DIM_APPLY_NEW_PROFILE;
->>    2. The ethtool command is holding rtnl lock;
->>    3. Since the rtnl lock is already held, virtnet_rx_dim_work fails
->>       to acquire the lock and exits;
->>
->> Then, even if net_dim is invoked again, it cannot work because the
->> state is not restored to DIM_START_MEASURE.
->>
->> Patch has been tested on a VM with 16 NICs, 128 queues per NIC
->> (2kq total):
->> With dim enabled on all queues, there are many opportunities for
->> contention for RTNL lock, and this patch introduces no visible hotspots.
->> The dim performance is also stable.
->>
->> Fixes: 6208799553a8 ("virtio-net: support rx netdim")
->> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
->> Acked-by: Jason Wang <jasowang@redhat.com>
->> ---
->> v1->v2:
->>    - Update commit log. No functional changes.
->>
->>   drivers/net/virtio_net.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index c22d111..0ebe322 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -3563,8 +3563,10 @@ static void virtnet_rx_dim_work(struct work_struct *work)
->>   	struct dim_cq_moder update_moder;
->>   	int i, qnum, err;
->>   
->> -	if (!rtnl_trylock())
->> +	if (!rtnl_trylock()) {
->> +		schedule_work(&dim->work);
->>   		return;
-> I'm really scared by this change. VMs are (increasingly) used to run
-> containers orchestration, which in turns puts a lot of pressure on the
-> RTNL lock. Any rtnl_trylock+ reschedule may hang for a very long time.
-> Addressing this kind of issues later becomes _extremely_ painful, see:
->
-> https://lore.kernel.org/netdev/20231018154804.420823-1-atenart@kernel.org/
->
-> I really think a different solution is needed. What about moving
-> virtnet_send_command() under protection of a new mutex?
+On Wed, 27 Mar 2024 15:22:38 +0100 you wrote:
+> Some structures contain flexible arrays at the end and the counter for
+> them, but the counter has explicit Endianness and thus __counted_by()
+> can't be used directly.
+> 
+> To increase test coverage for potential problems without breaking
+> anything, introduce __counted_by_{le,be} defined depending on platform's
+> Endianness to either __counted_by() when applicable or noop otherwise.
+> The first user will be virtchnl2.h from idpf just as example with 9 flex
+> structures having Little Endian counters.
+> 
+> [...]
 
-Daniel did additional work:
+Here is the summary with links:
+  - [net-next,v2,1/3] compiler_types: add Endianness-dependent __counted_by_{le,be}
+    https://git.kernel.org/netdev/net-next/c/ca7e324e8ad3
+  - [net-next,v2,2/3] idpf: make virtchnl2.h self-contained
+    https://git.kernel.org/netdev/net-next/c/c00d33f1fc79
+  - [net-next,v2,3/3] idpf: sprinkle __counted_by{,_le}() in the virtchnl2 header
+    https://git.kernel.org/netdev/net-next/c/93d24acfa05e
 
-https://lore.kernel.org/all/20240328044715.266641-1-danielj@nvidia.com/
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Use spin lock to protect ctrlq access, therefore, rtnl lock can be 
-removed in rx_dim_work,
-which will make the problem non-existent.
-
-Thanks,
-Heng
-
->
-> I understand it will complicate future hardening works around cvq, but
-> really rtnl_trylock()/<spin/retry> is bad for the whole system.
->
-> Cheers,
->
-> Paolo
 
 
