@@ -1,191 +1,152 @@
-Return-Path: <netdev+bounces-83231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00708916B8
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:26:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F8998916CA
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:28:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3231AB2338B
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:26:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A40791C22C65
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59542535D2;
-	Fri, 29 Mar 2024 10:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6546064CE9;
+	Fri, 29 Mar 2024 10:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WZgRSXHK"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="dyuwjWZU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA80535B4
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 10:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002D95A4CD
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 10:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711707956; cv=none; b=PPyX+sJ0GspKsYHBb5rhldJ9dIg2GNwqKCvEw+hq1TT+Oz17w5kiMlakOm662kwo3Y6lHpmHCxPWv8hIw1l3dab4yRXyYf3FFbbg4+dY5VDJHZ8Yy7xbZW29G6BGydGyV4EPSsDNd1P6LoEpX8WYLxXBX61GUf51+WZEZJ9B1UI=
+	t=1711708055; cv=none; b=WAf+arf12Fy4V/xVcAIHVRMF/oQ99aVWl8VbrD9vki3ejVn9VAFtKDT8S4YnjORthyUoZOu9noXmUD2ujxTwOvpyXa+teNH7jzgXYXvoBPD2N85oz4ZeX/Dhmb7qlBD0RGbQm1BBiHzxMrtTCinQO1V7Q6kEwJ73gEPfuypQnGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711707956; c=relaxed/simple;
-	bh=aeLKErVvr4YSADjsNwV4Am4JYwsFoAGfSUFXEh5SdwQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=O9rWMp+4dXH6igeeK4/N6sgSLFOTJPP/+PzpeZAI1kx/i3C3+NB+5DQxzvjiQxV+2G0xF/kEixiAMyRFaTHdQxMHLG/QU4rZIo9HqI3oSKp4jfHUNSfgU6skaxWXKhGe6xbJeZBFKLSw+mu2uQYBi55xqEwwmA/b4dLWc92IhAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WZgRSXHK; arc=none smtp.client-ip=209.85.210.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-6e703e0e5deso1570062b3a.3
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 03:25:54 -0700 (PDT)
+	s=arc-20240116; t=1711708055; c=relaxed/simple;
+	bh=n8h0843dN8D5vA/PkugrZHKUYOVTJ3ipk22+mvTL/rQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NRZW6bI5bEVb1FoBiEqBo4Ri+zz4QvZziSYzIg5avc87Rh5cpSW2z1RvKiEVXRMQ4veOW+KScCnUqRFu/a7jKLkQNSzBzBPcusMkQtzq6IKu6qKGytCMPz+bBz9xGjOyRxE9uV58XVix3p74QBpdoGoKIK4USOjbqdeOMH4mP+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=dyuwjWZU; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-513d3746950so2250661e87.1
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 03:27:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1711707954; x=1712312754; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711708050; x=1712312850; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UfARX4cixMR5DHeiB+/xY+prDoGHCgK6LO36+b/JgkM=;
-        b=WZgRSXHKcw5gGgf6VaDEUAizdwbDkedfk0c56Zg8Cqf9K/w2U9T2EU7cNCI0wi8OkU
-         0sRdqxOsia6rAjPXnKs4X8wHpsiX110XKYawKPC+HHA5loZogKxpUuk66bp0hEQ3doco
-         3aq4EDfV87GwBEqTjma57UszO32mcTGxbMV7o=
+        bh=uPUqPHiAYDsvF7c6mpbUarOnTLvyyWG07eUiOIJt2gQ=;
+        b=dyuwjWZUfGWzJVysscD30kfuI2gyGOnYyqbGUlDCiWGyqIwspDyRcAC9eFt55TQL4N
+         WILwNtOpVmkAH6RhWJ5Env6RPZV06CR7mPyYYVYbhe3cH5Lkf2lHDRGq8DvyUcF8mDZK
+         RY4O9ESRZG2Von8kNqG99fYZs1oYfSfZ6QPfSiXa0Whm+GooCBUofQDP8KzW+V2gl/Ks
+         m4V83+ciic4KyZm5qF+aYKpJ6koSYpKheZAUuqpjyqFKfTpxRWd+WM0zyf54/DaM9Cfu
+         hEIMEmDg629P+tLfaGcJ5JJkJPLzByeLVH5rL9j0QQUHqoxyFDOj2qrT845zjvviERic
+         cYOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711707954; x=1712312754;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1711708050; x=1712312850;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UfARX4cixMR5DHeiB+/xY+prDoGHCgK6LO36+b/JgkM=;
-        b=PNENNZfDZDdQuLAAy3KpH8OuFEGfkdqID5DZwpZTplxA1mFs7EdOJRvHS6wQedebR7
-         rnsJt35Y8EgmfeckDtFF4GXSKjYQ1/W2saRQrnXaet2BCejrFda2QOE/ifDAxmeWeiFX
-         KyEIdTHvL7Kz0/BdjyUv3k4qqGAHdc1rkZRzUJU08ypiUrYVykO1XHQh3qkhSoTVkr/M
-         92h0xvpK7iSrhHceFO7mYL6nQ4nuUVIUJMVSwvfiWO+mmeKa+2zyRviKRJM92Cmy3jr+
-         Od4ru6gpvUKugnI2YCKFZ1Fxq3gtkCSx48m8YXgGXUncW7Mkq6pMh9supe2utp9Mq+nM
-         uxSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9zl9I/Ns7h+nJsNcZ7Cf1psipJochts4RVQki/ynzHA57jdNTRLF6RBsXwLU+Sn7hDlAK9sWMSd3Xaw6xYyLtKfI7OZxF
-X-Gm-Message-State: AOJu0YyMKe/AeH3IfR69mUT3+P2tpL7vfLSAJUoyji1Ra2vAkEt94Zzx
-	wX9XZbGnsauooiTFWFeDt4nfz9WLSjWwnu/y8411q2xsJRChgubCz9VYQ0kEFw==
-X-Google-Smtp-Source: AGHT+IFbDg4EvhOnsd7jNyxD3eJ6+MxiAseKoOLJwLRjMg/MtlPvCZTo8P+JY8xZO8NVHBLFDoCTAA==
-X-Received: by 2002:a05:6a00:9086:b0:6e6:9f03:6a6d with SMTP id jo6-20020a056a00908600b006e69f036a6dmr2063520pfb.3.1711707953828;
-        Fri, 29 Mar 2024 03:25:53 -0700 (PDT)
-Received: from srish-ubuntu-desktop.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id fi27-20020a056a00399b00b006e5571be110sm1253679pfb.214.2024.03.29.03.25.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 03:25:53 -0700 (PDT)
-From: Srish Srinivasan <srish.srinivasan@broadcom.com>
-To: gregkh@linuxfoundation.org
-Cc: ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	borisp@nvidia.com,
-	davejwatson@fb.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sashal@kernel.org,
-	sd@queasysnail.net,
-	srish.srinivasan@broadcom.com,
-	stable@vger.kernel.org,
-	vakul.garg@nxp.com,
-	vasavi.sirnapalli@broadcom.com
-Subject: [PATCH v2 6.1.y] net: tls: handle backlogging of crypto requests
-Date: Fri, 29 Mar 2024 15:55:40 +0530
-Message-Id: <20240329102540.3888561-1-srish.srinivasan@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <2024032945-unheated-evacuee-6e0a@gregkh>
-References: <2024032945-unheated-evacuee-6e0a@gregkh>
+        bh=uPUqPHiAYDsvF7c6mpbUarOnTLvyyWG07eUiOIJt2gQ=;
+        b=nsuv2L0tgRQiUCBbUfA1wrPBoj78UvlXWRY2ECnLHNxt8nzbYSNf075WJdQR0Xi69u
+         9a8GEvaiHI8F5xnhSQgScEYaRCH0lmx4CO9EGL0s9aevcd8z+j12tHNdUzTCky+vCI7z
+         azIdoqXrKEY6/ddKKS24018crfmaJJA9QPSSiLTbFZ8Jgq0OWeGubBwWNmPm9d+dVtQ4
+         1OIgdD45rwiGJlJLXLMeqV7fVBHRlY/6TuVWhpHlclidCApbvTYPb4OJHeAMIBTTNJgl
+         94Klay0efyFuXTznlYysRNFL9Ao5G9GV/+e8wBsZCcJ/aZjMPVI12hLZSdSPT3dtVVSM
+         R+NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2g8fezjeFy5gS1ZbEdRrEHHEREOODeWbhByBtEIZqUAUJFVgK4uMa991CW6FReOdCYDiBY9+rcxHbs7rQZ7XikMC3qaDx
+X-Gm-Message-State: AOJu0YxRHeuA1sNxVRTcurY/YvEXEK/Vaj7XpWRY0uNUXKHro2QS4Szv
+	z0fgKLZAG+8D8Cidof7c/lx1GZE6jT81S1RRLrwMj6cKhq5OO6p5D/8ukmUGpC0qugNV4dw3P0+
+	O4+uVcbD8CauwacqSnOTL+6V/+D3pb28IZr9UkQ==
+X-Google-Smtp-Source: AGHT+IGkJetMoIDH9w2TQurNFFXLK7XsHfl+lPbtCC+0MeMFYTkyF7Alb8el7pzIkiwo9JvBX9h3ULKBGoxrg4XKpUU=
+X-Received: by 2002:a05:6512:33ce:b0:513:af27:df1c with SMTP id
+ d14-20020a05651233ce00b00513af27df1cmr1559870lfg.11.1711708050041; Fri, 29
+ Mar 2024 03:27:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org> <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+In-Reply-To: <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 29 Mar 2024 11:27:19 +0100
+Message-ID: <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com>
+Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
+	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, David Airlie <airlied@redhat.com>, 
+	Gerd Hoffmann <kraxel@redhat.com>, Gurchetan Singh <gurchetansingh@chromium.org>, 
+	Chia-I Wu <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
+	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
+	linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jakub Kicinski <kuba@kernel.org>
+On Wed, Mar 27, 2024 at 1:45=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> virtio core already sets the .owner, so driver does not need to.
+>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>
+> ---
+>
+> Depends on the first patch.
+> ---
+>  drivers/gpio/gpio-virtio.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
+> index fcc5e8c08973..9fae8e396c58 100644
+> --- a/drivers/gpio/gpio-virtio.c
+> +++ b/drivers/gpio/gpio-virtio.c
+> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver =3D {
+>         .remove                 =3D virtio_gpio_remove,
+>         .driver                 =3D {
+>                 .name           =3D KBUILD_MODNAME,
+> -               .owner          =3D THIS_MODULE,
+>         },
+>  };
+>  module_virtio_driver(virtio_gpio_driver);
+>
+> --
+> 2.34.1
+>
 
-commit 8590541473188741055d27b955db0777569438e3 upstream
+Applied, thanks!
 
-Since we're setting the CRYPTO_TFM_REQ_MAY_BACKLOG flag on our
-requests to the crypto API, crypto_aead_{encrypt,decrypt} can return
- -EBUSY instead of -EINPROGRESS in valid situations. For example, when
-the cryptd queue for AESNI is full (easy to trigger with an
-artificially low cryptd.cryptd_max_cpu_qlen), requests will be enqueued
-to the backlog but still processed. In that case, the async callback
-will also be called twice: first with err == -EINPROGRESS, which it
-seems we can just ignore, then with err == 0.
-
-Compared to Sabrina's original patch this version uses the new
-tls_*crypt_async_wait() helpers and converts the EBUSY to
-EINPROGRESS to avoid having to modify all the error handling
-paths. The handling is identical.
-
-Fixes: a54667f6728c ("tls: Add support for encryption using async offload accelerator")
-Fixes: 94524d8fc965 ("net/tls: Add support for async decryption of tls records")
-Co-developed-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-Link: https://lore.kernel.org/netdev/9681d1febfec295449a62300938ed2ae66983f28.1694018970.git.sd@queasysnail.net/
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Srish: v2: fixed hunk failures
-        fixed merge-conflict in stable branch linux-6.1.y,
-        needs to go on top of https://lore.kernel.org/stable/20240307155930.913525-1-lee@kernel.org/]
-Signed-off-by: Srish Srinivasan <srish.srinivasan@broadcom.com>
----
- net/tls/tls_sw.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index d53587ff9..e723584fc 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -195,6 +195,17 @@ static void tls_decrypt_done(crypto_completion_data_t *data, int err)
- 	struct sock *sk;
- 	int aead_size;
- 
-+	/* If requests get too backlogged crypto API returns -EBUSY and calls
-+	 * ->complete(-EINPROGRESS) immediately followed by ->complete(0)
-+	 * to make waiting for backlog to flush with crypto_wait_req() easier.
-+	 * First wait converts -EBUSY -> -EINPROGRESS, and the second one
-+	 * -EINPROGRESS -> 0.
-+	 * We have a single struct crypto_async_request per direction, this
-+	 * scheme doesn't help us, so just ignore the first ->complete().
-+	 */
-+	if (err == -EINPROGRESS)
-+		return;
-+
- 	aead_size = sizeof(*aead_req) + crypto_aead_reqsize(aead);
- 	aead_size = ALIGN(aead_size, __alignof__(*dctx));
- 	dctx = (void *)((u8 *)aead_req + aead_size);
-@@ -268,6 +279,10 @@ static int tls_do_decryption(struct sock *sk,
- 	}
- 
- 	ret = crypto_aead_decrypt(aead_req);
-+	if (ret == -EBUSY) {
-+		ret = tls_decrypt_async_wait(ctx);
-+		ret = ret ?: -EINPROGRESS;
-+	}
- 	if (ret == -EINPROGRESS) {
- 		if (darg->async)
- 			return 0;
-@@ -451,6 +466,9 @@ static void tls_encrypt_done(crypto_completion_data_t *data, int err)
- 	struct tls_rec *rec;
- 	struct sock *sk;
- 
-+	if (err == -EINPROGRESS) /* see the comment in tls_decrypt_done() */
-+		return;
-+
- 	rec = container_of(aead_req, struct tls_rec, aead_req);
- 	msg_en = &rec->msg_encrypted;
- 
-@@ -556,6 +574,10 @@ static int tls_do_encryption(struct sock *sk,
- 	atomic_inc(&ctx->encrypt_pending);
- 
- 	rc = crypto_aead_encrypt(aead_req);
-+	if (rc == -EBUSY) {
-+		rc = tls_encrypt_async_wait(ctx);
-+		rc = rc ?: -EINPROGRESS;
-+	}
- 	if (!rc || rc != -EINPROGRESS) {
- 		atomic_dec(&ctx->encrypt_pending);
- 		sge->offset -= prot->prepend_size;
--- 
-2.39.0
+Bart
 
