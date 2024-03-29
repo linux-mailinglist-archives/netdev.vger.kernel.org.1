@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-83242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74448891712
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:50:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D452891711
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 132F1B20EDC
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:50:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D1501F217E9
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4741B69DFE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4244669DF4;
 	Fri, 29 Mar 2024 10:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYWjPCpF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OMD7mR8f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC2B657CD;
-	Fri, 29 Mar 2024 10:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBFA17F0
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 10:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711709429; cv=none; b=Xf9ll7QTLV5rfDEdwfPhhLLn14+ZMc/UqQuDLA5q/eQQ5M9QPjTuYwr414MZOQfz4Q8OoJvDllfC2Dpw3u4eG/DXR4PhFAyYlbHApB2o5lKwUpDbvkzEWTk6fVPTO60Z/ixtXrjiwDIWxchEGgmKpSi3JjIVtJ+O7PB2xDbLt08=
+	t=1711709429; cv=none; b=SVL5Fn1wqHwjR1jfS5t14d5RLCRjanvQFztqbsmBngVdfJv8hmKa6gSDBQVDuiCYms2SIgc4FTH85a4/TcT19Qz1a9FlMRlDcJtjDlU4nv+BT71Hvd2HRzTTyAI++4ensZPkQBeI5HRMP3STZP8GKVXh/BwRbgG7BBEGXdcFdR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711709429; c=relaxed/simple;
-	bh=cZb9yUcynYs3EY1tC0nL7B6G+FJShK1jMRJ0DcQTewA=;
+	bh=Bo7qXjGBRmsZ5ynDqEqpzK0dVcJE2886eAKZ+Lb7BNo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UzIpcP94J+UHys5fO+7vWBq9yV251BadHelGdFKT9bBqX05QDwKOj4CWqrpMiJpuYaJSQFBaOvvYHTlscyPn5oxq7AWZdzp/SupogcxHCTQRIwa5EuJcCDx0nQFsmPvDBEWnCpTltJTbapdXYb3xEL35EZ3GfVk5ZkCInna+rmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYWjPCpF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A13CC433C7;
+	 In-Reply-To:To:Cc; b=RdtrHlFOvjxTc0D5ptLr53WEq3M4sFC3YSBjK48my9dCS4ESZAKXOIGuFo+q8QE2kheBkUUMdojcWuUahC774MTQjBN6h44/OmxtmCjdw3CLfC8Dvops/vzD9H1xpW4tASDgElgf0LHoi/yDNvGM6I/bjWej0xxg+VwCwD7l6aA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OMD7mR8f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C290FC43330;
 	Fri, 29 Mar 2024 10:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711709428;
-	bh=cZb9yUcynYs3EY1tC0nL7B6G+FJShK1jMRJ0DcQTewA=;
+	bh=Bo7qXjGBRmsZ5ynDqEqpzK0dVcJE2886eAKZ+Lb7BNo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bYWjPCpFjiUqESOadfBHRupATXSlQHLWFX5V9/BvMSK6LHApUi/qHvax6Ot+r/IKZ
-	 lKS4di1gqEH5TUwfe2sBvqfkCUZayUjk1HsUQ/bpNd2nawG8HZcJEjihuJUCcKo5Ba
-	 05yc+LZ3qo56qUddYmUAmg4dG1dt88P4dWJnjkCBZpJ1oXwo1oOlsEjCiEax6nWNC9
-	 UWGbwW1QwLYO70jIS8x6xRes5D8bGUOUAV8Xvochbi/ujqfZ2MRi68tboaRFjC7nt0
-	 rdLk9gTBe65fU33ELlEhEEq3UD0re5c6rPmprfNuTgW5VbyHVXMwOUlaZMQTJ73d+U
-	 mnEg23E6zzZCA==
+	b=OMD7mR8fvfzR807A7i4Q5JLGpatjrHMhiwvBzVzf7ggnQnjwRYU38bQ0GSVQ8FPZf
+	 q5NheOfddos2b+L6yblid0W7dCUwccI6H6gQ4e6AwNxHxBAD166gLX0g7xqFXdb+oB
+	 BtvP+iUKq8VbuImiwfsTerVBtqY2/tWrVhIUfvS4ht9ACdPuIlaae+CyZ2Le6Zp1dt
+	 pjlmRn9Y9bVLzhuyMLkapcRYA5xIOkxryFWuFvj3ELxRuADf5J1wE8bIONocMe6+Ys
+	 Pswapwu1temVyUGsIkLIZUyW+BekuJMVqHUZrTL65ZDFq/NECouLxA6WkagM2BjIsN
+	 SG16ISZzNOYdg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 72CE7D84BBA;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8C23D84BBA;
 	Fri, 29 Mar 2024 10:50:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 RESEND] net: hsr: Use full string description when opening
- HSR network device
+Subject: Re: [PATCH net-next] net: dsa: hellcreek: Convert to gettimex64()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171170942846.27059.6312977801783703742.git-patchwork-notify@kernel.org>
+ <171170942875.27059.4296607347854552454.git-patchwork-notify@kernel.org>
 Date: Fri, 29 Mar 2024 10:50:28 +0000
-References: <20240326085649.3259424-1-lukma@denx.de>
-In-Reply-To: <20240326085649.3259424-1-lukma@denx.de>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, edumazet@google.com,
- olteanv@gmail.com, davem@davemloft.net, kuba@kernel.org,
- o.rempel@pengutronix.de, Tristram.Ha@microchip.com, bigeasy@linutronix.de,
- pabeni@redhat.com, r-gunasekaran@ti.com, horms@kernel.org,
- n.zhandarovich@fintech.ru, m-karicheri2@ti.com, ricardo@marliere.net,
- linux-kernel@vger.kernel.org
+References: <20240326-hellcreek_gettimex64-v1-1-66e26744e50c@linutronix.de>
+In-Reply-To: <20240326-hellcreek_gettimex64-v1-1-66e26744e50c@linutronix.de>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, netdev@vger.kernel.org, tglx@linutronix.de
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue, 26 Mar 2024 09:56:49 +0100 you wrote:
-> Up till now only single character ('A' or 'B') was used to provide
-> information of HSR slave network device status.
+On Tue, 26 Mar 2024 12:16:36 +0100 you wrote:
+> As of commit 916444df305e ("ptp: deprecate gettime64() in favor of
+> gettimex64()") (new) PTP drivers should rather implement gettimex64().
 > 
-> As it is also possible and valid, that Interlink network device may
-> be supported as well, the description must be more verbose. As a result
-> the full string description is now used.
+> In addition, this variant provides timestamps from the system clock. The
+> readings have to be recorded right before and after reading the lowest bits
+> of the PHC timestamp.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,RESEND] net: hsr: Use full string description when opening HSR network device
-    https://git.kernel.org/netdev/net/c/10e52ad5ced2
+  - [net-next] net: dsa: hellcreek: Convert to gettimex64()
+    https://git.kernel.org/netdev/net-next/c/385edf325efa
 
 You are awesome, thank you!
 -- 
