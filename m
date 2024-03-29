@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-83480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDE9F8926EE
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 23:50:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FB68926F2
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 23:50:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77C3C28446E
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 22:50:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 398E21F2277F
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 22:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B02335D8;
-	Fri, 29 Mar 2024 22:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CC713E02F;
+	Fri, 29 Mar 2024 22:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPl6KWXQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QriMG5bP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB0D849C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D1613D62A;
 	Fri, 29 Mar 2024 22:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711752630; cv=none; b=biBVEMUQ0pD3FmSkiJ9sxBbHb4wsOhsdC/IdJPvSVut/O5ab4dGWb/JB4h7/kIEea7Isbp+0JWXbQcGvdHqbf32MGnBZgKI7LTgHmREL4Pk2n46xU4OUudeIhI1EVYcsawHRF/XjZfg9gyAd5m3VwiZcrlemZWbTe6IRaYs1fSs=
+	t=1711752631; cv=none; b=eLispVzL4Rucdj5yrzfRgnSRePLp+Y1FD2BRZyUX76ykzaZw7VHi9YXASU31baAxoYFmxYlpOQR4UYS8gEjEpjt1zGwq62prz06qhAHc+483Hh1xmTXYFXP7I4YViQd6l9vns1N932S+E0brudJT0ir0I9KRIrHiq60XZoaVoX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711752630; c=relaxed/simple;
-	bh=d6GYHZj1nwm/xAWq38KgFLCAjeu3oj6MG7PKrVN2dik=;
+	s=arc-20240116; t=1711752631; c=relaxed/simple;
+	bh=1rWdaEawfYR3LfAF31PiRtpuMF8rLJZ44iKkxh0MscI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=epB2fowdHfquABx1fTbw/pWYcb7zELL1S85TXQhbSuZrEdOy/Iw4/M0mheG84kZyq9ge+0D74lr7YAuOo4SHQnxknXl0v6xGY3rGARafXBaZC+G0Jox/R9OWJYbvCTSHCwEFwQljA768dYbO0avYQLgSYa/IHcgODQ4U7H9VZMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QPl6KWXQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3013CC43394;
+	 In-Reply-To:To:Cc; b=Xg3OsV9Hn217vm8daSQu1usYD3ksPWTEpVZ2YL8e46SgPg+BrESFujNuqbVuhFeJowZ00pl26chFLpmFOjszBnk+xcfKA2Lv8VGoUK8QewV5y96v44UHH8h1j3HJYz3vCS+bWN/aej6pX4824HBLNpa31QWPvcxKcQWmCuSFNkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QriMG5bP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AA7FC43609;
 	Fri, 29 Mar 2024 22:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711752630;
-	bh=d6GYHZj1nwm/xAWq38KgFLCAjeu3oj6MG7PKrVN2dik=;
+	bh=1rWdaEawfYR3LfAF31PiRtpuMF8rLJZ44iKkxh0MscI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QPl6KWXQvu8etNRRr+r8OMKyD6R97QbdR9BUKsTPtOE7Kqjbj0Wzwr2xkLyiUBOCj
-	 EhPM3BDLS7sB3nqz8OwL4C5r4EVrvhikxo71yksyhl6g8RZix/5BP7LjrYPeBKOfUp
-	 wBDjGqQX99DbyBqqEiSjvjL/oqo3Zl0up2BrkC0QCEcbAAzoAyb4Ht/h7gmsISUFFH
-	 bFa5SbbqTmqpeirrBBBF0jFPoiF2SQIFEgVHTAO0enqA8UJgc7iNjAzyhoGYr0Io7u
-	 qqFGr/qSOegSrVvqT6lM2WA3H4zZrrLtdkBIK1J6oKBNL/j7HGWNFywkVMJdW0nwTT
-	 vR5M4jXKxAarQ==
+	b=QriMG5bPxFDJal3+iK1Pb0iH9WyOvvWgwweQ2/D86v3oy/13nMNRcnZgIMYLJopSY
+	 7KLJczmMCVMHyE0HUKo16Zlrh+oM1jIPi5sy2qLvR1xNCT85FR5iD28bsq3bhCic2E
+	 9agT52MvYHoRihMvi5B1sSF3/Py9XPrQj9IBRigclTJz6rtPhf6vSl/5FSEsRqKbd5
+	 AG+Y/Btm/xHAuRSBzBp5kwOLojbL6e2YNlyWE+0YcxgNg53lc484ELHLR7HwPJHh3Q
+	 zxW5r1DkUTeEdz0tQrKVSD3O2p8NxXZGc3WAWBi8z8L8dwVHWkG0HVZicER5qqp8k6
+	 laI6AElXluGGw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 22B38D2D0EB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 816E5D2D0EB;
 	Fri, 29 Mar 2024 22:50:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-03-29
+Subject: Re: [PATCH v6 0/1] Add property in dwmac-stm32 documentation
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171175263013.1693.13688049482640225166.git-patchwork-notify@kernel.org>
+ <171175263052.1693.263504657362042828.git-patchwork-notify@kernel.org>
 Date: Fri, 29 Mar 2024 22:50:30 +0000
-References: <20240329140453.2016486-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240329140453.2016486-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+References: <20240328185337.332703-1-christophe.roullier@foss.st.com>
+In-Reply-To: <20240328185337.332703-1-christophe.roullier@foss.st.com>
+To: Christophe Roullier <christophe.roullier@foss.st.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ richardcochran@gmail.com, joabreu@synopsys.com, lgirdwood@gmail.com,
+ broonie@kernel.org, marex@denx.de, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 29 Mar 2024 10:04:53 -0400 you wrote:
-> The following changes since commit 0ba80d96585662299d4ea4624043759ce9015421:
+On Thu, 28 Mar 2024 19:53:36 +0100 you wrote:
+> Introduce property in dwmac-stm32 documentation
 > 
->   octeontx2-af: Fix issue with loading coalesced KPU profiles (2024-03-29 11:45:42 +0000)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-03-29
+>  - st,ext-phyclk: is present since 2020 in driver so need to explain
+>    it and avoid dtbs check issue : views/kernel/upstream/net-next/arch/arm/boot/dts/st/stm32mp157c-dk2.dtb:
+> ethernet@5800a000: Unevaluated properties are not allowed
+> ('st,ext-phyclk' was unexpected)
+>    Furthermore this property will be use in upstream of MP13 dwmac glue. (next step)
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth 2024-03-29
-    https://git.kernel.org/netdev/net/c/365af7ace014
+  - [v6,1/1] dt-bindings: net: dwmac: Document STM32 property st,ext-phyclk
+    https://git.kernel.org/netdev/net-next/c/929107d3d2a3
 
 You are awesome, thank you!
 -- 
