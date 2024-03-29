@@ -1,231 +1,195 @@
-Return-Path: <netdev+bounces-83257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BAEE8917A3
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:24:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B888917AC
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:25:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F5CB1C21DFC
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:24:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A59CE1F22D93
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B8C6A8CA;
-	Fri, 29 Mar 2024 11:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FE46A8AB;
+	Fri, 29 Mar 2024 11:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="gRcV3oo1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FWjGKJtk"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C58B4F606;
-	Fri, 29 Mar 2024 11:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8486A33E
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711711445; cv=none; b=rD1GfBUUDili56Ji7xFrEBcyNoGatKPjvmUp3sfXZRUUykU9JCsYWfano8nwpwnrQo7MMTlwWT0lJL9u6qfCwdUHVOs7ZwfEmMLcfQPRSmfPfOipA3szdSwa9MtrFYSS5M0u4/Lsb5FowCkVotuRHwGHKbb2Vynbc5Exw0rF4t0=
+	t=1711711458; cv=none; b=EzaCF0SV+mLZoSSdNlEOR39pAcIpexWoHjCc2C+YENCtuRZbdL71JrY08Fqlag4hvsmZrL4zazqIU8hNpk5w8DujzHLIA7/IMyuMK4ziqGTogy0/F3bEyDsv87p+E4AwvfvPYrmV95ki09X3Wocyv/EitKdSPfy180chSPj4GxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711711445; c=relaxed/simple;
-	bh=Jrj6syQt8Qu+9vJQGs9hIoWtYWx8WSpMoq0M4O6W0DA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A6ltcb9gB+248Kyeja5CgEhvPl8SeGXkbMm59/kbVVHo6e9CVA6mhhjfnTVtP0liTKq2Dng9iG9kyxZRysnHSySaTBlhtC/i5dNl/m6qkKW9eoJez/ujv6p3Ii8oEreiZUQy2ll02ydIFwA3b6GwdfPPtH3tudgRjxevI69wHtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=gRcV3oo1; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1711711444; x=1743247444;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Jrj6syQt8Qu+9vJQGs9hIoWtYWx8WSpMoq0M4O6W0DA=;
-  b=gRcV3oo1WcHwDMPx7zCdyScfSCh8EaQjICxjzVkJDUnq+AZBpNFZQ3al
-   boptGZxx1M7Tdi1dyA6/z7c61JdKeFBWX1My1r6Jpdv/iczY0TqDdWLHe
-   YiIc5o7KcA6o7NAofWQJyXmrRW9j5ctLlPSVENDZFYY5bILzgdTwj5lFD
-   InciI0STENJWp53Q8Yg4YpKh7vpc4AqgaDvPbW14xHXK2jvGkyCA0frdU
-   SvwKCs3l5vwokHmKqTG2LwyPh8sFgL+sgAhwALodriN+sotyOv0JdnYlQ
-   56bw4eCb8FuOqsF0dkOfWv4gYG0CaaITYwxBVri1yBOKOOAc2sMXZvLQ3
-   A==;
-X-CSE-ConnectionGUID: /1VBts7pSJCRmgq1ilCSXw==
-X-CSE-MsgGUID: AX2flsgOTj6YYO4PNZ7U1w==
-X-IronPort-AV: E=Sophos;i="6.07,164,1708412400"; 
-   d="asc'?scan'208";a="249424125"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2024 04:24:01 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 29 Mar 2024 04:23:58 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex04.mchp-main.com (10.10.85.152)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Fri, 29 Mar 2024 04:23:54 -0700
-Date: Fri, 29 Mar 2024 11:23:06 +0000
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Conor Dooley <conor@kernel.org>
-CC: Stefan O'Rear <sorear@fastmail.com>, Pu Lehui <pulehui@huaweicloud.com>,
-	<bpf@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<netdev@vger.kernel.org>, =?iso-8859-1?Q?Bj=F6rn_T=F6pel?=
-	<bjorn@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
-	<martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
-	<song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
-	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Manu Bretelle <chantr4@gmail.com>, Pu Lehui
-	<pulehui@huawei.com>
-Subject: Re: [PATCH bpf-next 2/5] riscv, bpf: Relax restrictions on Zbb
- instructions
-Message-ID: <20240329-linguini-uncured-380cb4cff61c@wendy>
-References: <20240328124916.293173-1-pulehui@huaweicloud.com>
- <20240328124916.293173-3-pulehui@huaweicloud.com>
- <3ed9fe94-2610-41eb-8a00-a9f37fcf2b1a@app.fastmail.com>
- <20240328-ferocity-repose-c554f75a676c@spud>
+	s=arc-20240116; t=1711711458; c=relaxed/simple;
+	bh=Tt2KY5GVmmEQbIxEpnQw371Sgo3J/qWEHfjOsc2kl9Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OZmZM4bUlKmgxUdvImo9DlQdSgFaTVfyd74s+KfLM+kzRMY57vh33STQMQlij/8zXZJCK67sM9rORcDW6z+XPDKos+ur8cG2PQvgYR2jiQEyzNBq4Wb7AlOM7/Zz5LJgPBxm7jUNGVqHbrrwZgLaAbKmjApEv+q13nL5/aG2RGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FWjGKJtk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711711455;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=C8s55tLfnmRrIPQWxF9kdixgw2in2sipa9Snpr6QoMU=;
+	b=FWjGKJtkQyePyCZrXP//WfNQBXYREgTjFy8Fe+F7qeAfKvOKtThd/eBtVPVCXXaVScALQp
+	Uqnd0pewxctQRUn+SqsmLFxatnI+vcTocBwrYugpGLlPPJPJqXRnlNElzLCBVNPi/6x41s
+	Fhv2mL2jsKaNeZXVt2UWp2KQyArxbIQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-arFgGQYhMP6yQP-_5YI_4A-1; Fri, 29 Mar 2024 07:24:13 -0400
+X-MC-Unique: arFgGQYhMP6yQP-_5YI_4A-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33ecafa5d4dso469249f8f.1
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 04:24:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711711453; x=1712316253;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C8s55tLfnmRrIPQWxF9kdixgw2in2sipa9Snpr6QoMU=;
+        b=O1Zi8Jnk6c77FEtB0Gimsb/Qbg78MC/Ou3B+aD9x4m+o909suWo4QQOb7OYgM6ICQn
+         ti6EyG2mCGc5+W7+s+csi4vYFMRxu7OFTLRuxevlnM0qO92BoV5g67QfwsACRrw3SC9M
+         NwmuCr5i22FWsbb+wRdQ+0KmY3FeiQm12sTn/qNCedqkDDP2s4jeIlRsSW6qnzXooUp6
+         P7K9p8WQ4oC6Goni8BAtJx8Ej6YwOLGuN+dbzifnJKPmKn5Xvwj8xBtdtXchFiztQRAJ
+         newT1JiALTqFj5iJUK8VeIDn3+gHj/yb5BXWUnC4Od5lT8ij7zaYl327/1/1q2FHStQr
+         h+uQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcLq4BDxYMUb146IiO8As0TDecPNoH4pk4xG/p/0tUAa98xhqjqX5J0PJ0Fb1VjERggdjoNy9dW6i1pRzacpK2NuYizcxp
+X-Gm-Message-State: AOJu0YzI6+n14PsZiZ4ZxpP4ZM0LEMM7tVdnwl1mct7vIoxeruMth4GU
+	5Q0wfkFSd3K+u+FFns54O9fJIjZsZ2OXbK7o+Q9ey7/3ZRp+pmglTMVzlK5mP5y3pg/gip1IHJC
+	mlrm95hr3//wRe9fFQfqhKwEhOyeus2yGBZqTCSj0jBwK7fL/INYPjg==
+X-Received: by 2002:adf:eb82:0:b0:33d:32f7:c85 with SMTP id t2-20020adfeb82000000b0033d32f70c85mr1068943wrn.0.1711711452782;
+        Fri, 29 Mar 2024 04:24:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGEQeJkOkNGs01IN92BAJ61pKiAvorsJpwp1Itu2OoXPkX5FABwIzkvQhKmQeYKtQxDWjJbQ==
+X-Received: by 2002:adf:eb82:0:b0:33d:32f7:c85 with SMTP id t2-20020adfeb82000000b0033d32f70c85mr1068928wrn.0.1711711452423;
+        Fri, 29 Mar 2024 04:24:12 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-249-47.dyn.eolo.it. [146.241.249.47])
+        by smtp.gmail.com with ESMTPSA id m10-20020a056000008a00b0033ec91c9eadsm3958165wrx.53.2024.03.29.04.24.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 04:24:11 -0700 (PDT)
+Message-ID: <9f29a7b0bb641b132ddfee6c773c4c504c7f2edd.camel@redhat.com>
+Subject: Re: [PATCH net-next 3/4] udp: avoid calling sock_def_readable() if
+ possible
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>,  Willem de Bruijn <willemb@google.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+Date: Fri, 29 Mar 2024 12:24:10 +0100
+In-Reply-To: <CANn89iKexr_2Ept9kAmfib6p3-UcrnqhUf=TFq1Mrug6P+Kg_Q@mail.gmail.com>
+References: <20240328144032.1864988-1-edumazet@google.com>
+	 <20240328144032.1864988-4-edumazet@google.com>
+	 <db5a01a1256d4cc5cf418cd6cb5b076fc959ae21.camel@redhat.com>
+	 <CANn89iKexr_2Ept9kAmfib6p3-UcrnqhUf=TFq1Mrug6P+Kg_Q@mail.gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3w5FiosotNHZDrPp"
-Content-Disposition: inline
-In-Reply-To: <20240328-ferocity-repose-c554f75a676c@spud>
 
---3w5FiosotNHZDrPp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, 2024-03-29 at 11:52 +0100, Eric Dumazet wrote:
+> On Fri, Mar 29, 2024 at 11:22=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> >=20
+> > On Thu, 2024-03-28 at 14:40 +0000, Eric Dumazet wrote:
+> > > sock_def_readable() is quite expensive (particularly
+> > > when ep_poll_callback() is in the picture).
+> > >=20
+> > > We must call sk->sk_data_ready() when :
+> > >=20
+> > > - receive queue was empty, or
+> > > - SO_PEEK_OFF is enabled on the socket, or
+> > > - sk->sk_data_ready is not sock_def_readable.
+> > >=20
+> > > We still need to call sk_wake_async().
+> > >=20
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > ---
+> > >  net/ipv4/udp.c | 14 +++++++++++---
+> > >  1 file changed, 11 insertions(+), 3 deletions(-)
+> > >=20
+> > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > index d2fa9755727ce034c2b4bca82bd9e72130d588e6..5dfbe4499c0f89f94af9e=
+e1fb64559dd672c1439 100644
+> > > --- a/net/ipv4/udp.c
+> > > +++ b/net/ipv4/udp.c
+> > > @@ -1492,6 +1492,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk,=
+ struct sk_buff *skb)
+> > >       struct sk_buff_head *list =3D &sk->sk_receive_queue;
+> > >       int rmem, err =3D -ENOMEM;
+> > >       spinlock_t *busy =3D NULL;
+> > > +     bool becomes_readable;
+> > >       int size, rcvbuf;
+> > >=20
+> > >       /* Immediately drop when the receive queue is full.
+> > > @@ -1532,12 +1533,19 @@ int __udp_enqueue_schedule_skb(struct sock *s=
+k, struct sk_buff *skb)
+> > >        */
+> > >       sock_skb_set_dropcount(sk, skb);
+> > >=20
+> > > +     becomes_readable =3D skb_queue_empty(list);
+> > >       __skb_queue_tail(list, skb);
+> > >       spin_unlock(&list->lock);
+> > >=20
+> > > -     if (!sock_flag(sk, SOCK_DEAD))
+> > > -             INDIRECT_CALL_1(sk->sk_data_ready, sock_def_readable, s=
+k);
+> > > -
+> > > +     if (!sock_flag(sk, SOCK_DEAD)) {
+> > > +             if (becomes_readable ||
+> > > +                 sk->sk_data_ready !=3D sock_def_readable ||
+> > > +                 READ_ONCE(sk->sk_peek_off) >=3D 0)
+> > > +                     INDIRECT_CALL_1(sk->sk_data_ready,
+> > > +                                     sock_def_readable, sk);
+> > > +             else
+> > > +                     sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
+> > > +     }
+> >=20
+> > I understood this change showed no performances benefit???
+> >=20
+> > I guess the atomic_add_return() MB was hiding some/most of
+> > sock_def_readable() cost?
+>=20
+> It did show benefits in the epoll case, because ep_poll_callback() is
+> very expensive.
+>=20
+> I think you are referring to a prior discussion we had while still
+> using netperf tests, which do not use epoll.
 
-On Thu, Mar 28, 2024 at 10:07:23PM +0000, Conor Dooley wrote:
+Indeed.
 
-> As I said on IRC to you earlier, I think the Kconfig options here are in
-> need of a bit of a spring cleaning - they should be modified to explain
-> their individual purposes, be that enabling optimisations in the kernel
-> or being required for userspace. I'll try to send a patch for that if
-> I remember tomorrow.
+> Eliminating sock_def_readable() was avoiding the smp_mb() we have in
+> wq_has_sleeper()
+> and this was not a convincing win : The apparent cost of this smp_mb()
+> was high in moderate traffic,
+> but gradually became small if the cpu was fully utilized.
+>=20
+> The atomic_add_return() cost is orthogonal (I see it mostly on ARM64 plat=
+forms)
 
-Something like this:
+Thanks for the additional details.
 
--- >8 --
-commit 5125504beaedd669b082bf74b02003a77360670f
-Author: Conor Dooley <conor.dooley@microchip.com>
-Date:   Fri Mar 29 11:13:22 2024 +0000
+FTR, I guessed that (part of) atomic_add_return() cost comes from the
+implied additional barrier (compared to plain adomic_add()) and the
+barrier in sock_def_readable() was relatively cheap in the presence of
+the previous one and become more visible after moving to adomic_add().=20
 
-    RISC-V: clarify what some RISCV_ISA* config options do
-   =20
-    During some discussion on IRC yesterday and on Pu's bpf patch [1]
-    I noticed that these RISCV_ISA* Kconfig options are not really clear
-    about their implications. Many of these options have no impact on what
-    userspace is allowed to do, for example an application can use Zbb
-    regardless of whether or not the kernel does. Change the help text to
-    try and clarify whether or not an option affects just the kernel, or
-    also userspace. None of these options actually control whether or not an
-    extension is detected dynamically as that's done regardless of Kconfig
-    options, so drop any text that implies the option is required for
-    dynamic detection, rewording them as "do x when y is detected".
-   =20
-    Link: https://lore.kernel.org/linux-riscv/20240328-ferocity-repose-c554=
-f75a676c@spud/ [1]
-    Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-    ---
-    I did this based on top of Samuel's changes dropping the MMU
-    requurements just in case, but I don't think there's a conflict:
-    https://lore.kernel.org/linux-riscv/20240227003630.3634533-4-samuel.hol=
-land@sifive.com/
+In any case LGTM, thanks!
 
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index d8a777f59402..f327a8ac648f 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -501,8 +501,8 @@ config RISCV_ISA_SVNAPOT
- 	depends on RISCV_ALTERNATIVE
- 	default y
- 	help
--	  Allow kernel to detect the Svnapot ISA-extension dynamically at boot
--	  time and enable its usage.
-+	  Add support for the Svnapot ISA-extension when it is detected by
-+	  the kernel at boot.
-=20
- 	  The Svnapot extension is used to mark contiguous PTEs as a range
- 	  of contiguous virtual-to-physical translations for a naturally
-@@ -520,9 +520,9 @@ config RISCV_ISA_SVPBMT
- 	depends on RISCV_ALTERNATIVE
- 	default y
- 	help
--	   Adds support to dynamically detect the presence of the Svpbmt
--	   ISA-extension (Supervisor-mode: page-based memory types) and
--	   enable its usage.
-+	   Add support for the Svpbmt ISA-extension (Supervisor-mode:
-+	   page-based memory types) when it is detected by the kernel at
-+	   boot.
-=20
- 	   The memory type for a page contains a combination of attributes
- 	   that indicate the cacheability, idempotency, and ordering
-@@ -541,14 +541,15 @@ config TOOLCHAIN_HAS_V
- 	depends on AS_HAS_OPTION_ARCH
-=20
- config RISCV_ISA_V
--	bool "VECTOR extension support"
-+	bool "Vector extension support"
- 	depends on TOOLCHAIN_HAS_V
- 	depends on FPU
- 	select DYNAMIC_SIGFRAME
- 	default y
- 	help
- 	  Say N here if you want to disable all vector related procedure
--	  in the kernel.
-+	  in the kernel. Without this option enabled, neither the kernel nor
-+	  userspace may use vector.
-=20
- 	  If you don't know what to do here, say Y.
-=20
-@@ -606,8 +607,8 @@ config RISCV_ISA_ZBB
- 	depends on RISCV_ALTERNATIVE
- 	default y
- 	help
--	   Adds support to dynamically detect the presence of the ZBB
--	   extension (basic bit manipulation) and enable its usage.
-+	   Add support for enabling optimisations in the kernel when the
-+	   Zbb extension is detected at boot.
-=20
- 	   The Zbb extension provides instructions to accelerate a number
- 	   of bit-specific operations (count bit population, sign extending,
-@@ -623,9 +624,9 @@ config RISCV_ISA_ZICBOM
- 	select RISCV_DMA_NONCOHERENT
- 	select DMA_DIRECT_REMAP
- 	help
--	   Adds support to dynamically detect the presence of the ZICBOM
--	   extension (Cache Block Management Operations) and enable its
--	   usage.
-+	   Add support for the Zicbom extension (Cache Block Management
-+	   Operations) and enable its use in the kernel when it is detected
-+	   at boot.
-=20
- 	   The Zicbom extension can be used to handle for example
- 	   non-coherent DMA support on devices that need it.
-@@ -684,7 +685,8 @@ config FPU
- 	default y
- 	help
- 	  Say N here if you want to disable all floating-point related procedure
--	  in the kernel.
-+	  in the kernel. Without this option enabled, neither the kernel nor
-+	  userspace may use vector.
-=20
- 	  If you don't know what to do here, say Y.
-=20
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-
---3w5FiosotNHZDrPp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgakmgAKCRB4tDGHoIJi
-0i5uAQDpfKrD3sCVEMzQmkCAyMoGFe2KN23qp4Qq8wsF4GUwWAEAolnPKacUQiAa
-bHyHhXo7v4OmhrqQ8dWqPmvM5Fqb4Q8=
-=a121
------END PGP SIGNATURE-----
-
---3w5FiosotNHZDrPp--
 
