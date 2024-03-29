@@ -1,137 +1,203 @@
-Return-Path: <netdev+bounces-83451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EE908924A5
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 20:53:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E841E8924A8
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 20:54:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FDF01C213F1
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:53:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C8CC284F3D
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7997613A403;
-	Fri, 29 Mar 2024 19:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9181813A89E;
+	Fri, 29 Mar 2024 19:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="izfIS6r5"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="GKkycvFk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB5010942;
-	Fri, 29 Mar 2024 19:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E8F12FB12;
+	Fri, 29 Mar 2024 19:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711741988; cv=none; b=tSRYUhfsvrbFrIvVc2i2FkMfu21U0cWMTH6rvft3iY+BFMxzwZiAbpwoHt6TIfYMtYNHWk2GVSe1DTBRN8T+Ft3AZsd5ayB2Qj6iEcIZrPdexY5p/NSLGETC3pVi690XfuVoBvTOBi5onzmxfdew7M8BWKUozJZr954oBz2aff4=
+	t=1711742046; cv=none; b=ouE3rxCtJwhYADvaQnL9nlupheQcLw3+NdASrliPDQTsPbYAZh03TwttJnaEuGKCs+ylQgVLeNzleQbL6BOyvd6XwcVFBr4ilxwjUUjeb6KnmBoNFPSjdYOYOU9W8J3IaCxXdX83HKXQOvydbM39sgHd1VEX4Tk/3p3UC/NXvbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711741988; c=relaxed/simple;
-	bh=hYQtK+VuVvgg8lPKFuE+XCfswrikJuLqP6/ufQ7d/Zc=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=lkaRzYd/TeGyPNHmQxBbAF1ozJLam3uOUzM6j7+VaRS5RNSYkkf1a+cSb8GzQ94gudXjAEXpwv9bSjKAF/NiPXGEII8nyTDMeuKZpd3w1FrtKQ1xYgAa7JxDNNZ5gqpZjrfDME/4FcRpQVBgfAZL2St9h8+wHDlU95jwd/rxCs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=izfIS6r5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8603C433F1;
-	Fri, 29 Mar 2024 19:53:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711741987;
-	bh=hYQtK+VuVvgg8lPKFuE+XCfswrikJuLqP6/ufQ7d/Zc=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=izfIS6r5t8/x4rdeXFXlHXwMsJJbw+TZI4vbaTo8m+X69nsBEth/UgoYcgRpm0dem
-	 SBqPLIWdVFZvUYwHBOz/itAniKM8CFN4o6zRBAsCvU6/7cgmYmSDqBEuDxrsA5OO56
-	 W0/rVaRsYEhiqSyCLSExvDfnxmrQobrNtfDA12+mYTNFHza0y6POs36qkGXERlj9xy
-	 dDAIQEqp1+CMokROovkG7Qv348koI4o5weLFwd+uELWpIGV30bM1qjWpq4H9Jbx5FG
-	 A3N2/l1pZdL+iSkxDx13RZDxt+4jwBs0O3uG5rRNhCoMxhX2ZbImYzQ42wjcHAT4Wt
-	 2DubPdflwrsOw==
-Date: Fri, 29 Mar 2024 12:53:06 -0700 (PDT)
-From: Mat Martineau <martineau@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-cc: netdev@vger.kernel.org, Matthieu Baerts <matttbe@kernel.org>, 
-    Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    mptcp@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH net] mptcp: prevent BPF accessing lowat from a subflow
- socket.
-In-Reply-To: <d8cb7d8476d66cb0812a6e29cd1e626869d9d53e.1711738080.git.pabeni@redhat.com>
-Message-ID: <2a68e09b-936c-447d-bfe8-bd043c94306c@kernel.org>
-References: <d8cb7d8476d66cb0812a6e29cd1e626869d9d53e.1711738080.git.pabeni@redhat.com>
+	s=arc-20240116; t=1711742046; c=relaxed/simple;
+	bh=7FIgZdhSuFmBFq7x61DjTJQ6bzsgrfBW8fIPAWIE+MU=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=n6PikM7JyVbcz/ILB1pCaYVakWY7coAO0Q1F8epSZlNYh3fiZU7PcQUw/opb/qrJKXSpns6vPxsdE3opxDLzMku8PdSH01/QlSC9v+Qz/ZUbkHQD8vkPOMWPjfC3id0ysxdyqZ1+UJRYSMynWFOebhGytOV1nHSM/Ipvl4V5CZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=GKkycvFk; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1711742042;
+	bh=7FIgZdhSuFmBFq7x61DjTJQ6bzsgrfBW8fIPAWIE+MU=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=GKkycvFkCWp+5HTjbw8G0xXWaauEjnFnSHlwt8uaT6BT4Bg/7HmDKPatTDArsxdRm
+	 G+Lcy90jN5PMAcqWlHcl/GVZpMc1HPY/ckbwi0RXmo5Qjp0g3WKVHfyOd5TX79bwWy
+	 CfRH41Gu6cQjnLTEUjGg9EcODbPekwDb+vR3jzVzkx7zrV0z2AzNMnat27He8ow+dV
+	 UGZ1nAyaT1MDSBBJuGm+sMND3htxnkklKcJUZbF0+3ECEj/PIbmBFV+XfUKNE2vMlP
+	 PRmK74mnrrbVPG6NMDXqSyk5PY/vQDEyX9XWJ5pRTK1+y9pgiGeO/N5kkwJyYRUBFy
+	 Ba0POAplPiXKA==
+Received: from [100.113.15.66] (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 94ED33781FCE;
+	Fri, 29 Mar 2024 19:53:50 +0000 (UTC)
+Message-ID: <c54bae70-3655-4188-aad7-358bb7897c3c@collabora.com>
+Date: Sat, 30 Mar 2024 00:54:20 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ linux-kselftest@vger.kernel.org, kernel-team@android.com,
+ Lokesh Gidra <lokeshgidra@google.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mm@kvack.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v3] selftests/mm: Fix ARM related issue with fork after
+ pthread_create
+To: Edward Liaw <edliaw@google.com>, linux-kernel@vger.kernel.org,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Jann Horn <jannh@google.com>
+References: <20240325194100.775052-1-edliaw@google.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <20240325194100.775052-1-edliaw@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 29 Mar 2024, Paolo Abeni wrote:
+On 3/26/24 12:40 AM, Edward Liaw wrote:
+> Following issue was observed while running the uffd-unit-tests selftest
+> on ARM devices. On x86_64 no issues were detected:
+> 
+> pthread_create followed by fork caused deadlock in certain cases
+> wherein fork required some work to be completed by the created thread.
+> Used synchronization to ensure that created thread's start function has
+> started before invoking fork.
+> 
+> Signed-off-by: Lokesh Gidra <lokeshgidra@google.com>
+> [edliaw: Refactored to use atomic_bool]
+> Signed-off-by: Edward Liaw <edliaw@google.com>
+Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
 
-> Alexei reported the following splat:
->
-> WARNING: CPU: 32 PID: 3276 at net/mptcp/subflow.c:1430 subflow_data_ready+0x147/0x1c0
-> Modules linked in: dummy bpf_testmod(O) [last unloaded: bpf_test_no_cfi(O)]
-> CPU: 32 PID: 3276 Comm: test_progs Tainted: GO       6.8.0-12873-g2c43c33bfd23
-> Call Trace:
->  <TASK>
->  mptcp_set_rcvlowat+0x79/0x1d0
->  sk_setsockopt+0x6c0/0x1540
->  __bpf_setsockopt+0x6f/0x90
->  bpf_sock_ops_setsockopt+0x3c/0x90
->  bpf_prog_509ce5db2c7f9981_bpf_test_sockopt_int+0xb4/0x11b
->  bpf_prog_dce07e362d941d2b_bpf_test_socket_sockopt+0x12b/0x132
->  bpf_prog_348c9b5faaf10092_skops_sockopt+0x954/0xe86
->  __cgroup_bpf_run_filter_sock_ops+0xbc/0x250
->  tcp_connect+0x879/0x1160
->  tcp_v6_connect+0x50c/0x870
->  mptcp_connect+0x129/0x280
->  __inet_stream_connect+0xce/0x370
->  inet_stream_connect+0x36/0x50
->  bpf_trampoline_6442491565+0x49/0xef
->  inet_stream_connect+0x5/0x50
->  __sys_connect+0x63/0x90
->  __x64_sys_connect+0x14/0x20
->
-
-Thanks Paolo, change LGTM:
-
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-
-
-> The root cause of the issue is that bpf allows accessing mptcp-level
-> proto_ops from a tcp subflow scope.
-
-What should we do about this root cause going forward? Does this fall on 
-the MPTCP subsystem to add special checks in places where proto_ops are 
-accessed via sk_socket? Or is there a more generic way to catch this?
-
-- Mat
-
-
->
-> Fix the issue detecting the problematic call and preventing any action.
->
-> Reported-by: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/482
-> Fixes: 5684ab1a0eff ("mptcp: give rcvlowat some love")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 > ---
-> net/mptcp/sockopt.c | 4 ++++
-> 1 file changed, 4 insertions(+)
->
-> diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-> index dcd1c76d2a3b..73fdf423de44 100644
-> --- a/net/mptcp/sockopt.c
-> +++ b/net/mptcp/sockopt.c
-> @@ -1493,6 +1493,10 @@ int mptcp_set_rcvlowat(struct sock *sk, int val)
-> 	struct mptcp_subflow_context *subflow;
-> 	int space, cap;
->
-> +	/* bpf can land here with a wrong sk type */
-> +	if (sk->sk_protocol == IPPROTO_TCP)
-> +		return -EINVAL;
+> 
+> v2: restored accidentally removed uffd_test_case_ops when merging
+> v3: fixed commit subject to use selftests/mm prefix
+> 
+>  tools/testing/selftests/mm/uffd-common.c     |  3 +++
+>  tools/testing/selftests/mm/uffd-common.h     |  2 ++
+>  tools/testing/selftests/mm/uffd-unit-tests.c | 10 ++++++++++
+>  3 files changed, 15 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/mm/uffd-common.c b/tools/testing/selftests/mm/uffd-common.c
+> index b0ac0ec2356d..7ad6ba660c7d 100644
+> --- a/tools/testing/selftests/mm/uffd-common.c
+> +++ b/tools/testing/selftests/mm/uffd-common.c
+> @@ -18,6 +18,7 @@ bool test_uffdio_wp = true;
+>  unsigned long long *count_verify;
+>  uffd_test_ops_t *uffd_test_ops;
+>  uffd_test_case_ops_t *uffd_test_case_ops;
+> +atomic_bool ready_for_fork;
+> 
+>  static int uffd_mem_fd_create(off_t mem_size, bool hugetlb)
+>  {
+> @@ -518,6 +519,8 @@ void *uffd_poll_thread(void *arg)
+>  	pollfd[1].fd = pipefd[cpu*2];
+>  	pollfd[1].events = POLLIN;
+> 
+> +	ready_for_fork = true;
 > +
-> 	if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
-> 		cap = sk->sk_rcvbuf >> 1;
-> 	else
-> -- 
-> 2.43.2
->
->
+>  	for (;;) {
+>  		ret = poll(pollfd, 2, -1);
+>  		if (ret <= 0) {
+> diff --git a/tools/testing/selftests/mm/uffd-common.h b/tools/testing/selftests/mm/uffd-common.h
+> index cb055282c89c..cc5629c3d2aa 100644
+> --- a/tools/testing/selftests/mm/uffd-common.h
+> +++ b/tools/testing/selftests/mm/uffd-common.h
+> @@ -32,6 +32,7 @@
+>  #include <inttypes.h>
+>  #include <stdint.h>
+>  #include <sys/random.h>
+> +#include <stdatomic.h>
+> 
+>  #include "../kselftest.h"
+>  #include "vm_util.h"
+> @@ -103,6 +104,7 @@ extern bool map_shared;
+>  extern bool test_uffdio_wp;
+>  extern unsigned long long *count_verify;
+>  extern volatile bool test_uffdio_copy_eexist;
+> +extern atomic_bool ready_for_fork;
+> 
+>  extern uffd_test_ops_t anon_uffd_test_ops;
+>  extern uffd_test_ops_t shmem_uffd_test_ops;
+> diff --git a/tools/testing/selftests/mm/uffd-unit-tests.c b/tools/testing/selftests/mm/uffd-unit-tests.c
+> index 2b9f8cc52639..4a48dc617c6b 100644
+> --- a/tools/testing/selftests/mm/uffd-unit-tests.c
+> +++ b/tools/testing/selftests/mm/uffd-unit-tests.c
+> @@ -775,6 +775,8 @@ static void uffd_sigbus_test_common(bool wp)
+>  	char c;
+>  	struct uffd_args args = { 0 };
+> 
+> +	ready_for_fork = false;
+> +
+>  	fcntl(uffd, F_SETFL, uffd_flags | O_NONBLOCK);
+> 
+>  	if (uffd_register(uffd, area_dst, nr_pages * page_size,
+> @@ -790,6 +792,9 @@ static void uffd_sigbus_test_common(bool wp)
+>  	if (pthread_create(&uffd_mon, NULL, uffd_poll_thread, &args))
+>  		err("uffd_poll_thread create");
+> 
+> +	while (!ready_for_fork)
+> +		; /* Wait for the poll_thread to start executing before forking */
+> +
+>  	pid = fork();
+>  	if (pid < 0)
+>  		err("fork");
+> @@ -829,6 +834,8 @@ static void uffd_events_test_common(bool wp)
+>  	char c;
+>  	struct uffd_args args = { 0 };
+> 
+> +	ready_for_fork = false;
+> +
+>  	fcntl(uffd, F_SETFL, uffd_flags | O_NONBLOCK);
+>  	if (uffd_register(uffd, area_dst, nr_pages * page_size,
+>  			  true, wp, false))
+> @@ -838,6 +845,9 @@ static void uffd_events_test_common(bool wp)
+>  	if (pthread_create(&uffd_mon, NULL, uffd_poll_thread, &args))
+>  		err("uffd_poll_thread create");
+> 
+> +	while (!ready_for_fork)
+> +		; /* Wait for the poll_thread to start executing before forking */
+> +
+>  	pid = fork();
+>  	if (pid < 0)
+>  		err("fork");
+> --
+> 2.44.0.396.g6e790dbe36-goog
+> 
+> 
+
+-- 
+BR,
+Muhammad Usama Anjum
 
