@@ -1,181 +1,120 @@
-Return-Path: <netdev+bounces-83182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7618913A3
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 07:18:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 350B78913C3
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 07:31:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F06D1F2293C
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 06:18:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF8671F22BD8
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 06:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA9D3D57E;
-	Fri, 29 Mar 2024 06:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE75A5F;
+	Fri, 29 Mar 2024 06:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="Kam7qLGr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hQsNlhpA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7286D2EB10;
-	Fri, 29 Mar 2024 06:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B66838FA7
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 06:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711693114; cv=none; b=eD9JPsxKmp2SBQ25QiMJCmy587wwHiLffkjfLvVVWZEfbx5v3lXj5lfzHn5N2b6h4Ws7PdOtEVAedNDzftNXhPjwBlSLYQLkqbM1QCdWUtbWFsmcB/mmZval19XiKBNdnh30uDWsYH8cXavcMlRcT0733wFQEp4OSOmsyGvKwmM=
+	t=1711693897; cv=none; b=ZrNtqG+4b/lF9+RkJSGfPnTNMJECIuyKFg5lulWg0id1cjn32+42fP4T7OcW/oC7MfjNiZJz94rgHJWuF85wT+UqJEQM3X6F786n3mB9EV2GbPV8wRyiPJkrPUDnj+mWR9DJGWbUenC5b5DxsP7xzgajgYPBBHzz0/0o+KxDbmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711693114; c=relaxed/simple;
-	bh=9P/L6fxn/w4t7hiR+TWitilOuCTkQCtiYAExJA/lG2Y=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=X2ii0JbZ4qzMSXOxe4Su3ViH5y39pkEWvRrMyYRrAgqqVKBDXjQtuRQe3Bg/TL3bdCPbHfWaiwELo+SrJ1wZ0Nu5QQaZ1GHitUJBIwrQC2U8H12zFVdoUCc3AQV+2VX6ipvg0Rewf/4f3Al3it6zdo0/ax1cmBdNcrt3m04Wd0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=Kam7qLGr; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id 34CC2100002;
-	Fri, 29 Mar 2024 09:18:12 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1711693092; bh=rqEcWZ3+sGyg3O09VGLq6x5c0eRiRIjQxWTmaBzhEz0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=Kam7qLGruZ0sMACNNPPBjqhXHlv7Lh3mKTV1xGFp43qbkQ+X+kf4LLRxU6BsYqSDZ
-	 kvxNjiZk/ndMf8LChMYWu3RD+sYkoTGNczUaOd+V++H97SIHGtegtR2b1/ofAFjq3T
-	 T4RKNU6255fCaQQIGhunmKzwsS1nOqliwQ7Ox9BFze5/7mDbxzheP/da1rIQCtDcrI
-	 aVe9FUmWhWDgDF+EGc+VJsjCwtY/xSzI/MFkX+pr//jSwdKLIqjEqVrkZ/m1kqRuQi
-	 Yt0EPdvtCCaF735GMIhI+TtV0tlGKp4cu7ENzxjFyNC04mkvlaMUYyVDk1fjHnF+2V
-	 +MWGbeRNvVxYQ==
-Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Fri, 29 Mar 2024 09:16:58 +0300 (MSK)
-Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 29 Mar
- 2024 09:16:38 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Divya Koppera <Divya.Koppera@microchip.com>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH net] net: phy: micrel: Fix potential null pointer dereference
-Date: Fri, 29 Mar 2024 09:16:31 +0300
-Message-ID: <20240329061631.33199-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1711693897; c=relaxed/simple;
+	bh=5aM3pUD0MWZusWlY5JUCnBQEzBYx9oWVSEfURSLwXDk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C1krZaD8p1XHtbM3otYjkd7NWJuBP6Ws0R8iSn9YUehQETdyMYvZJ4dgGayotbh10pXZqw9l+qd1SPs2e8nGFu767CD57cl5Cv2Oqnnq6At75lWFExUhUUF6+FC9Sft8qjvyoX9d4TGRhGb+jOP2s33DZyEX5rPTlYJt5vSQckE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hQsNlhpA; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56c63f4a468so3067a12.0
+        for <netdev@vger.kernel.org>; Thu, 28 Mar 2024 23:31:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711693894; x=1712298694; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5aM3pUD0MWZusWlY5JUCnBQEzBYx9oWVSEfURSLwXDk=;
+        b=hQsNlhpA5d9hEKvhLf31F1NLaTeaYWyCJcu+hNOmqYwHXqBqdaxx2NHWjnVU/5uKnM
+         /mDi14cgC25xA7Ze5NCDINaGnS2Ds6kWQlwKkGmobnivECx+SsXnP++x/fgLq9lCq55b
+         50irVh0M7Fpr4YLCBQuXV7XCH++2PpSCHfEPEV7w97fN+Ea1ZH0J34Zt3LmZKeaqboAo
+         tQRXgRHvhxJM+JjJz4sp1c8IZex5fHbsM9L1n3DOl5gmvF7MwC2oDNM6eHI37Ji+Gt+H
+         KUv+oMrm0KtL+ihKRpg4qyBvsOk9ozjLKGoKP70kMpkkW0Vs3wEjwycU6GPX7z8ZvH7p
+         WIgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711693894; x=1712298694;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5aM3pUD0MWZusWlY5JUCnBQEzBYx9oWVSEfURSLwXDk=;
+        b=iGWw48ytuVPTXnwZNERVslICUobIfFvYvnReVBi5TapoqkmQtmcRfySJE0348MyX70
+         qo3/G763dQX7xPp8EqSyX8htS9t7SSTV8tU1ASxGb1Y6MX7XRho4C37RNBswJ11s9KOu
+         Ox6T05FIfQf92gyo+i85kEmUwHJdVqQLKRhh6P22HNISOZ2rk/uYSCzEdk2Qyu8i+N9B
+         vQDV/2csIcqSjVKzb7UYPBc5gLnXEgzxuJfN5FdLZXNIpwGJwXF19/m37DqN+KEReDf5
+         lIQ1yUWInTBOptEhhZcuok6z0coeQHfPbxsGZXtIIYBQhMH4ojCzm4Pz4Df/8Gll4+nr
+         ocPw==
+X-Forwarded-Encrypted: i=1; AJvYcCUamj4y95fbDAbeM8Gq6VO5bwBUwDDL7OP5tEi2Xr71i3UqFyYJAnwa+9JFTcCvHHpX3UCEtuigFjOTKL3BOnYmp0LDu5O6
+X-Gm-Message-State: AOJu0Yzj1hO6IVPU9po83gsjI7Nwpy4xmSPV6gI0iaT71DIuYudILNUk
+	UM9p0vDZUOL+06dUJVfEfN5cVe2lEB078wqFxI+Ge3qyYr564eX4IbgZUppURRHeCOg9MGsbV7P
+	znrtHb8AHR7e7HKvjne06kT6YBbp/VZQTXvlx
+X-Google-Smtp-Source: AGHT+IFlGtdWua/Kk52SVK7MJkBb4Li8Z6SguWT+HYAzo1aQ+5hkWp6vpQXSHKuAf4H39r+CPN96dFe4k5K60kJCEVM=
+X-Received: by 2002:a05:6402:524b:b0:56c:5dc:ed7 with SMTP id
+ t11-20020a056402524b00b0056c05dc0ed7mr127861edd.4.1711693893486; Thu, 28 Mar
+ 2024 23:31:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 184480 [Mar 29 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 14 0.3.14 5a0c43d8a1c3c0e5b0916cc02a90d4b950c01f96, {Tracking_from_domain_doesnt_match_to}, mx1.t-argos.ru.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;t-argos.ru:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/03/29 03:32:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/03/29 02:35:00 #24501233
-X-KSMG-AntiVirus-Status: Clean, skipped
+References: <20240328170309.2172584-1-edumazet@google.com> <20240328170309.2172584-4-edumazet@google.com>
+ <CAL+tcoCOwddRuis=3NYOXv0Qwuw9qaLPHY2OAOPyYamKwBHbQg@mail.gmail.com>
+In-Reply-To: <CAL+tcoCOwddRuis=3NYOXv0Qwuw9qaLPHY2OAOPyYamKwBHbQg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 29 Mar 2024 07:31:19 +0100
+Message-ID: <CANn89iLpY7iWppW1Vxze6Gf0ki5YFN9qF-w=+ig+=YfLqaLZyg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/8] net: enqueue_to_backlog() change vs not
+ running device
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In lan8814_get_sig_rx() and lan8814_get_sig_tx() ptp_parse_header() may
-return NULL as ptp_header due to abnormal packet type or corrupted packet.
-Fix this bug by adding ptp_header check.
+On Fri, Mar 29, 2024 at 4:21=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Fri, Mar 29, 2024 at 1:07=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > If the device attached to the packet given to enqueue_to_backlog()
+> > is not running, we drop the packet.
+> >
+> > But we accidentally increase sd->dropped, giving false signals
+> > to admins: sd->dropped should be reserved to cpu backlog pressure,
+> > not to temporary glitches at device dismantles.
+>
+> It seems that drop action happening is intended in this case (see
+> commit e9e4dd3267d0c ("net: do not process device backlog during
+> unregistration")). We can see the strange/unexpected behaviour at
+> least through simply taking a look at /proc/net/softnet_stat file.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+I disagree.
 
-Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
----
- drivers/net/phy/micrel.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+We are dismantling a device, temporary drops are expected, and this
+patch adds a more precise drop_reason.
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 8b8634600c51..0f8a8ad7ea0b 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -2537,7 +2537,7 @@ static void lan8814_txtstamp(struct mii_timestamper *mii_ts,
- 	}
- }
- 
--static void lan8814_get_sig_rx(struct sk_buff *skb, u16 *sig)
-+static bool lan8814_get_sig_rx(struct sk_buff *skb, u16 *sig)
- {
- 	struct ptp_header *ptp_header;
- 	u32 type;
-@@ -2547,7 +2547,11 @@ static void lan8814_get_sig_rx(struct sk_buff *skb, u16 *sig)
- 	ptp_header = ptp_parse_header(skb, type);
- 	skb_pull_inline(skb, ETH_HLEN);
- 
-+	if (!ptp_header)
-+		return false;
-+
- 	*sig = (__force u16)(ntohs(ptp_header->sequence_id));
-+	return true;
- }
- 
- static bool lan8814_match_rx_skb(struct kszphy_ptp_priv *ptp_priv,
-@@ -2559,7 +2563,8 @@ static bool lan8814_match_rx_skb(struct kszphy_ptp_priv *ptp_priv,
- 	bool ret = false;
- 	u16 skb_sig;
- 
--	lan8814_get_sig_rx(skb, &skb_sig);
-+	if (!lan8814_get_sig_rx(skb, &skb_sig))
-+		return ret;
- 
- 	/* Iterate over all RX timestamps and match it with the received skbs */
- 	spin_lock_irqsave(&ptp_priv->rx_ts_lock, flags);
-@@ -2834,7 +2839,7 @@ static int lan8814_ptpci_adjfine(struct ptp_clock_info *ptpci, long scaled_ppm)
- 	return 0;
- }
- 
--static void lan8814_get_sig_tx(struct sk_buff *skb, u16 *sig)
-+static bool lan8814_get_sig_tx(struct sk_buff *skb, u16 *sig)
- {
- 	struct ptp_header *ptp_header;
- 	u32 type;
-@@ -2842,7 +2847,11 @@ static void lan8814_get_sig_tx(struct sk_buff *skb, u16 *sig)
- 	type = ptp_classify_raw(skb);
- 	ptp_header = ptp_parse_header(skb, type);
- 
-+	if (!ptp_header)
-+		return false;
-+
- 	*sig = (__force u16)(ntohs(ptp_header->sequence_id));
-+	return true;
- }
- 
- static void lan8814_match_tx_skb(struct kszphy_ptp_priv *ptp_priv,
-@@ -2856,7 +2865,8 @@ static void lan8814_match_tx_skb(struct kszphy_ptp_priv *ptp_priv,
- 
- 	spin_lock_irqsave(&ptp_priv->tx_queue.lock, flags);
- 	skb_queue_walk_safe(&ptp_priv->tx_queue, skb, skb_tmp) {
--		lan8814_get_sig_tx(skb, &skb_sig);
-+		if (!lan8814_get_sig_tx(skb, &skb_sig))
-+			continue;
- 
- 		if (memcmp(&skb_sig, &seq_id, sizeof(seq_id)))
- 			continue;
-@@ -2910,7 +2920,8 @@ static bool lan8814_match_skb(struct kszphy_ptp_priv *ptp_priv,
- 
- 	spin_lock_irqsave(&ptp_priv->rx_queue.lock, flags);
- 	skb_queue_walk_safe(&ptp_priv->rx_queue, skb, skb_tmp) {
--		lan8814_get_sig_rx(skb, &skb_sig);
-+		if (!lan8814_get_sig_rx(skb, &skb_sig))
-+			continue;
- 
- 		if (memcmp(&skb_sig, &rx_ts->seq_id, sizeof(rx_ts->seq_id)))
- 			continue;
--- 
-2.30.2
+I have seen admins being worried about this counter being not zero on
+carefully tuned hosts.
 
+If you think we have to carry these drops forever in
+/proc/net/softnet_stat, you will have give
+a more precise reason than "This was intentionally added in 2015"
+
+e9e4dd3267d0c5234c changelog was very long, but said nothing
+about why sd->dropped _had_ to be updated.
 
