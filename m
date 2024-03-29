@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-83221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B420C891651
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:50:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18DFD891652
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:50:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5B7C1C22F2A
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:50:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46BC11C23FFB
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C690E50A72;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77BA50A7C;
 	Fri, 29 Mar 2024 09:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpURVzf2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQK5wIan"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD3F4D9E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD784EB5C;
 	Fri, 29 Mar 2024 09:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711705831; cv=none; b=qd2iPnhxGTm7Ef1Mt9mcsPaXMR3t72CWJT7fcIuDyfHBk/hhDz1+ozdlQ06dISKDJM/xgTzBEX5pjjeDd8lz0bi4vrhtsjmGhTgSMidxp254UchefesM67hCXIc7T0xUKP7Cd536iwZQp/T/5QWQPhv45JWwh6+SuUfB/zEvd14=
+	t=1711705831; cv=none; b=lFGibctv+W8xxyaNp5aVAyiYOgxJvGeQG6agY8XhWck9Me1b/BlLrH7JOjwFMR+9gf7w/zI4J2qylzxV2hwkdTPbs9nD8PRvv41au8pY2S2yf7SH/+h56yr0qWGHwR3rex7EjYlmhTJC8DFS7kDwk+0Xq2dF5kpaPw4c8uB3L5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711705831; c=relaxed/simple;
-	bh=2rRdkz47cqYTeL1U6l+teCPoMHd8pgrqQtj2K4BJCJw=;
+	bh=eMTLoTHaMEdpuznPin6LB7cDg9T39PigSeGqe4vpejU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DGLRgdkSe3ApHF982vYqOlSSB59FhkfbWBwsKzqIIst5Cs9TkCIdBeqH5aGveTGrO0cbN2XAaO3aZ+AJ9Ro6YUkEd0G0b/qTqqzt2aNpDRMEiuA5mcnch1YzhX4R2ckrqb+jpU2PmpVnZ8yKca7hjJMMmx0vYU6z2tgQyk0pt+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BpURVzf2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 42F25C43394;
+	 In-Reply-To:To:Cc; b=UEQPrPytrRJYmPCFoijIql/MFqTp1EeGrw8GqCGw5GAv6w31XzBlOlhTy7HOvpNCgzjpRPLiudDalG3Bn8m23Sutyg4svz3zgisagloUMIMbEhNnW8dUM1qIcO1agYLnyNL512IE20XQEpheLLAW2e8vpK9WQu7FMo3YHa9qCpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nQK5wIan; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3A269C43390;
 	Fri, 29 Mar 2024 09:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711705831;
-	bh=2rRdkz47cqYTeL1U6l+teCPoMHd8pgrqQtj2K4BJCJw=;
+	bh=eMTLoTHaMEdpuznPin6LB7cDg9T39PigSeGqe4vpejU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BpURVzf2whtdThobM14Y0UE2sXO8VEioZzyYJfyj+yPssP3LttmmJu+5577bwZsPs
-	 KgxV87tC1t7bHqbYzP4AGOIy41YEcC+t4qYy/oo2g+Oa6AZ/RpBRa3k9BVkgowFbGi
-	 2nb+5f60B4KxqchodFay0UJcVJ0S8EUCWroInuUw8Ykx0yc8EHWl2IJE+r6asrAaOm
-	 qr5c7Ho1MW71me2COcOTbinNkAYg3kcWExrP+HAayaio/Dm8UF7k7aJD8cjQepJBvX
-	 tvkWUAowQhn3oSr5XYPXuLsRW0zODTEe2Fv0BPu/sUdnXf1CExnCX1FRC3++6BUfCY
-	 kRnE0LMxS3Y+g==
+	b=nQK5wIanCx2nLHoDH+Itou/s5izdW83nB/jIhIwQyHn4SLTvrx9nWGilnRH8Iy2b1
+	 e6opLLE1bGzwQDWzyD2Xb0OVZHLQniYh5115ygKriz8qH8GoZWRqH3Lo1xiiORW3pm
+	 ISl/YrDorj5KuIpXyDZcm3zTM0LlNVHQTFGxGOBVxSSmAIcxq9yD+5OJ7X2AtxEwi1
+	 pvmhoxqF2l/CokkIqJ6ecTh/0YcdcPJ49YeALvsZQZqZMKqiXMF/4RtB9vJ8lh+FCa
+	 QIMSMik8QV/eHk+hJ9Dhn3n62EFd1UDAfXwnFE2M7hHXPQdpLsOuFVlEdbUl/gU6ny
+	 b4Gx3y1z76CcA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2B189D2D0EB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1DCA1D84BBA;
 	Fri, 29 Mar 2024 09:50:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next,RESEND] net/smc: make smc_hash_sk/smc_unhash_sk
- static
+Subject: Re: [PATCH net-next v4 0/3] make skip_sw actually skip software
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171170583117.24694.14035587476923647131.git-patchwork-notify@kernel.org>
+ <171170583110.24694.10907029333516266808.git-patchwork-notify@kernel.org>
 Date: Fri, 29 Mar 2024 09:50:31 +0000
-References: <20240326072952.2717904-1-shaozhengchao@huawei.com>
-In-Reply-To: <20240326072952.2717904-1-shaozhengchao@huawei.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, guwen@linux.alibaba.com, weiyongjun1@huawei.com,
- yuehaibing@huawei.com
+References: <20240325204740.1393349-1-ast@fiberby.net>
+In-Reply-To: <20240325204740.1393349-1-ast@fiberby.net>
+To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, mleitner@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llu@fiberby.dk
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue, 26 Mar 2024 15:29:52 +0800 you wrote:
-> smc_hash_sk and smc_unhash_sk are only used in af_smc.c, so make them
-> static and remove the output symbol. They can be called under the path
-> .prot->hash()/unhash().
+On Mon, 25 Mar 2024 20:47:33 +0000 you wrote:
+> Hi,
 > 
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+> During development of flower-route[1], which I
+> recently presented at FOSDEM[2], I noticed that
+> CPU usage, would increase the more rules I installed
+> into the hardware for IP forwarding offloading.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,RESEND] net/smc: make smc_hash_sk/smc_unhash_sk static
-    https://git.kernel.org/netdev/net-next/c/af398bd0cb21
+  - [net-next,v4,1/3] net: sched: cls_api: add skip_sw counter
+    https://git.kernel.org/netdev/net-next/c/f631ef39d819
+  - [net-next,v4,2/3] net: sched: cls_api: add filter counter
+    https://git.kernel.org/netdev/net-next/c/2081fd3445fe
+  - [net-next,v4,3/3] net: sched: make skip_sw actually skip software
+    https://git.kernel.org/netdev/net-next/c/047f340b36fc
 
 You are awesome, thank you!
 -- 
