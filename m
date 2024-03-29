@@ -1,113 +1,118 @@
-Return-Path: <netdev+bounces-83666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48FC489347D
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 19:07:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C11F3893334
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A32A3B2288C
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 17:07:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F26E51C2276F
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957F015E803;
-	Sun, 31 Mar 2024 16:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01835154C02;
+	Sun, 31 Mar 2024 16:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h02OONrK"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="YMHcBIpi"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A900915E5DD;
-	Sun, 31 Mar 2024 16:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65284153BCE;
+	Sun, 31 Mar 2024 16:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=62.96.220.36
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711903421; cv=pass; b=aR8K6VZ9ZMgdTBXB/7901zkzwKiECp5aP1e+Y83uz34h09R09sCyJueTBOa3opSsbFA9tCd6BTYB/FgBD2X/mTkH88PRNJjkxLPywvbAG/l6SPJM3bFhOrJ+jn0VG62etzJaCs996PAb5jVUR0XQSi0VguA4hHb14EXZ80klaag=
+	t=1711902516; cv=pass; b=uxBR8plI9SIT4blI7ZGQEdVaBad+rQd1FyHfJonCY/30QjlnFr1/YuF1efiW+XJJMrZ9DTuhOHK9qag2oJ4aiT3YqhduD/hIj01Ij8UitR2HhWTD6JvdJHD7dgsTutv/FoDnRqBTIhz7sE0hBhfFGUVxPWBzTcEEudCm8U10oFc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711903421; c=relaxed/simple;
-	bh=GY2kYFst4z/jzDluAZKuRs3VnNLG/lJw8nm0VcFYikM=;
+	s=arc-20240116; t=1711902516; c=relaxed/simple;
+	bh=50M3LT8mnuywmJNlkQScxlgjVAIlHyjJG8qloVonzuk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JLDRIWY5SW5f4KShKZE1ZxzjB4AT7CRR8qYlFGWyh2uzrmbM4OApbKuzwVC1AzjJV5+u2Rfn/Gkt6VDw85Lo5uMcnwURgGh5417R6HgeVD4tBq1B5hB6eQGocRlOcXBZQgdy/V68cCs10ETQzgb2xMWXyKKsIod1bzGDP0WPHTo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h02OONrK; arc=none smtp.client-ip=209.85.221.54; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=pass smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=oOd/8OBu0fcPh9rxr0CtBduQ5rzcvCpDYD++jopXZt9lyduk39nxqi8hnjscb5gcGf+gLva6+wvjA3KBt2CecToNRVqH6TsskJBH2ho+yauERQ+1RuPuHMYwZAGvzDX6NkdYpyOMBWGx+GH2sdRp0BjTUid1V9QJ7JTyU6LqIms=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=fail smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=YMHcBIpi; arc=none smtp.client-ip=209.85.128.179; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; arc=pass smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=paul-moore.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 3BFE3208B8;
-	Sun, 31 Mar 2024 18:43:38 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id EF4EB208E4;
+	Sun, 31 Mar 2024 18:28:32 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NtO42jLyj0i9; Sun, 31 Mar 2024 18:43:37 +0200 (CEST)
+	with ESMTP id 57j9JQEUMWjX; Sun, 31 Mar 2024 18:28:31 +0200 (CEST)
 Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id E4BEE208C7;
-	Sun, 31 Mar 2024 18:43:34 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com E4BEE208C7
+	by a.mx.secunet.com (Postfix) with ESMTPS id 360FA208D8;
+	Sun, 31 Mar 2024 18:28:30 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 360FA208D8
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id D61C4800060;
-	Sun, 31 Mar 2024 18:43:34 +0200 (CEST)
+	by mailout2.secunet.com (Postfix) with ESMTP id 29B0C800057;
+	Sun, 31 Mar 2024 18:28:30 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:43:34 +0200
+ 15.1.2507.35; Sun, 31 Mar 2024 18:28:29 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 16:36:41 +0000
-X-sender: <netdev+bounces-83464-peter.schumann=secunet.com@vger.kernel.org>
-X-Receiver: <peter.schumann@secunet.com> ORCPT=rfc822;peter.schumann@secunet.com
+ 15.1.2507.17; Sun, 31 Mar 2024 16:23:32 +0000
+X-sender: <netdev+bounces-83465-peter.schumann=secunet.com@vger.kernel.org>
+X-Receiver: <peter.schumann@secunet.com>
+ ORCPT=rfc822;peter.schumann@secunet.com NOTIFY=NEVER;
+ X-ExtendedProps=BQAVABYAAgAAAAUAFAARAJ05ab4WgQhHsqdZ7WUjHykPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGAAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249UGV0ZXIgU2NodW1hbm41ZTcFAAsAFwC+AAAAQ5IZ35DtBUiRVnd98bETxENOPURCNCxDTj1EYXRhYmFzZXMsQ049RXhjaGFuZ2UgQWRtaW5pc3RyYXRpdmUgR3JvdXAgKEZZRElCT0hGMjNTUERMVCksQ049QWRtaW5pc3RyYXRpdmUgR3JvdXBzLENOPXNlY3VuZXQsQ049TWljcm9zb2Z0IEV4Y2hhbmdlLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUADgARAC7JU/le071Fhs0mWv1VtVsFAB0ADwAMAAAAbWJ4LWVzc2VuLTAxBQA8AAIAAA8ANgAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5EaXNwbGF5TmFtZQ8ADwAAAFNjaHVtYW5uLCBQZXRlcgUADAACAAAFAGwAAgAABQBYABcASAAAAJ05ab4WgQhHsqdZ7WUjHylDTj1TY2h1bWFubiBQZXRlcixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc
+	2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
-X-HeloDomain: mbx-dresden-01.secunet.de
-X-ExtendedProps: BQBjAAoAdkemlidQ3AgFADcAAgAADwA8AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50Lk9yZ2FuaXphdGlvblNjb3BlEQAAAAAAAAAAAAAAAAAAAAAADwA/AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLk1haWxEZWxpdmVyeVByaW9yaXR5DwADAAAATG93
-X-Source: SMTP:Default MBX-ESSEN-02
-X-SourceIPAddress: 10.53.40.199
-X-EndOfInjectedXHeaders: 10456
+X-HeloDomain: b.mx.secunet.com
+X-ExtendedProps: BQBjAAoAtpHp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgCEAAAAi4oAAAUABAAUIAEAAAAaAAAAcGV0ZXIuc2NodW1hbm5Ac2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAZAAPAAMAAABIdWI=
+X-Source: SMTP:Default MBX-DRESDEN-01
+X-SourceIPAddress: 62.96.220.37
+X-EndOfInjectedXHeaders: 17024
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=netdev+bounces-83464-peter.schumann=secunet.com@vger.kernel.org; receiver=peter.schumann@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 216ED20897
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=netdev+bounces-83465-peter.schumann=secunet.com@vger.kernel.org; receiver=peter.schumann@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 31136200BB
+Authentication-Results: b.mx.secunet.com;
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="YMHcBIpi"
 X-Original-To: netdev@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal: i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711747613; cv=none; b=o3hT6rBlhYRPp3nILeYSgLH5jgw3/ahNcI+sDsQW7a6Oq02j3c5prNzS0n5vJx9TVbZQcqIgvdV9HTstLuoPtW/jT0vcYIvofBPyJUl7qtv3N1ZcCALaUGLdrgZBAPv1JUH+kyrmT9ybQHjLzeMASpgNwI0hFSXpPucdmpDSanw=
+	t=1711748061; cv=none; b=IhAuqo04ElD606skfooNLm/UZkBKnID82OjkuXK7r/qpuGoXe9BUrYa0DaxnsXRxRTHV6y2x+rArTkYpXvwH7PctJDyt6j2TYdJFf7bsvlDm8TxCcCyxjvrDG7C9kZ0j3tsxirEUCzERxNCB9HqeseliUTavW6oXHxxWHoi7Cp0=
 ARC-Message-Signature: i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711747613; c=relaxed/simple;
-	bh=GY2kYFst4z/jzDluAZKuRs3VnNLG/lJw8nm0VcFYikM=;
+	s=arc-20240116; t=1711748061; c=relaxed/simple;
+	bh=50M3LT8mnuywmJNlkQScxlgjVAIlHyjJG8qloVonzuk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bvWQ2A0CseIsL9FgYjN6zPufVIpQqiRzxpxfWWir2S2bRrkalHeIYKni2SW9MnB9+iKThkvwKO+Zn5Zssl7qqHveQk51ff9EJpUn5NhPHVmY4QJ0TF4i9BP87FJsd1aA9g47SAdGsUrEEJEsLIDX4ANMZG8S1Gjnd1qw8tZdsRM=
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h02OONrK; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=as2K8qmVZqwXtgmr0LI9fUb3Kl8RDqp13AQJ3SEeNG+70ERX+4biYHe1KDkKdbuAWhhgyGdjekI+m/mSUxuyAn3ELn1IZnSUYIlliBepO387THtDsmUygDx4n6Btf5wYOCkqu6pX47jf7TB/8xMPeG4Vo137SLT8XlIecbRVp0k=
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=YMHcBIpi; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711747610; x=1712352410; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1711748058; x=1712352858; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Kvv9NiziDyCYu9Ssy1MqwcYz3Obg+5qR7kJAYV5rLhc=;
-        b=h02OONrKn+4k88m3UEDllV8o8JUuB2NguuTGHZzCXHNiOAa9yBQIiaGmfQsGVV86q3
-         vwTm5pN9qCEJWhO3/1dihonK9iCD1MV6zVd13EikzldfB4dxhYg+3Wg6vO0czEsr1HAc
-         Xnut8+4zSVKD/nOdEua3WuEO6t2FYuiIILMfvrA145eDAhyL+bLHHiztPM0IEukc3eMT
-         QwkIybVK8O22yg5D4IKFhCt9QnTfLrqtSCdTICpGqqxHghVj4Ift5u/IfjSrR2EkEVNe
-         CwHVBQEan1clULUfxVR4imy+rZpP4IILFDkrBGL8rfHg7ZbgGF/FY9ZH05/vNFFyN9i4
-         L+ZQ==
+        bh=vIMHZaDV3wX5X/mP8vILSA3tsnYggDxtMi+vTwU7OY8=;
+        b=YMHcBIpiXyp5v0KrwBJ0Y1s2XnC6BUh97Rt05RbaPDWnQ5yncJbRRQ4bpQ1DvCfFyb
+         c087fMlQmqN7DDpRyLBIQqPdsJEiFsuSm2asxqRw4bTPYZs0UUSY9k3tVxa7RLZWr/+H
+         +3mbQyr+4wOT8rytF947HQrMh4gAO/EygFRiXqiZvPUNfFGWYRppJUuzj5s1jPwRtPrs
+         TrHnXhs6ZqmpBajfXab81hUulMHZOPuxSG2ThE+5NbKs6wfqPACS1RFY7Sl4Sl2OXji5
+         T5XKNj2Hy69Q3VTwHuEer0avbRFYAP+/bZBNhSGfatQjGkwMXjxiw4LESd+IPURiJm6J
+         6wag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711747610; x=1712352410;
+        d=1e100.net; s=20230601; t=1711748058; x=1712352858;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Kvv9NiziDyCYu9Ssy1MqwcYz3Obg+5qR7kJAYV5rLhc=;
-        b=AZml1tLtFlyP9+6qzsr/Y/Kp5igFrK2oUC/WIz//Zmu/5fSRzhVpw37aRWeKK6hdX/
-         FxsJBUEiOwP7rnH9cVh0eWtHbz2qaashwfXDE6sVeXzEDIGZGpGu23nNdVQXdmSsPoym
-         +exTdbi8fY0pCW6bB8Bl9QHeCnAfsqlPKJyaAjnrOHw5Qw9qdI1S9gC2eq0WbnVy6iHQ
-         7tLKPnU50UXa4ii7btWPm2rqB3S45MtzAeOOLaaKgubovEhMNhC+usRZ5ijfKdVYpIhu
-         bTcuciA022kGsoViz3poqnsJ0p8W9ojwHusnFV0FwDvrqrw9MTAV+LH+DM//g3kcbyjr
-         T4ig==
-X-Forwarded-Encrypted: i=1; AJvYcCUms6Y8mQXobn6Doc4LggzSXZfoQDIm/IKPAkO+/bgLih/BXEZjjKJJx2V38SsUeCaJy1R/1BisLsDktGAF092Q8+cQmdOHd3i65roTYjtnFDPo2/M4ZlO8bb6wJr5fOR5UJWeLxlciGCxFLtE/mIj3WRxJMuCKajUX
-X-Gm-Message-State: AOJu0YwDLEfVDuSKNNImIfCehbMu01XecTBUg/BxEe3Dr2BLV02Sld8L
-	HnQdjTLXkZXA3IHu11Z7n/x+G0xL6V5UIl2p3WAyQ6nodkCzPQbShE13cVc4xK07Mw0KAcUpPfT
-	hd4UbQzqEaNrmK52fddVQ5NxZI1I=
-X-Google-Smtp-Source: AGHT+IEhPG1B/8mDvGNpkDj4PWCUpLjQ708pGc8G6bha6o2gM1Lwf8UNLZI5EJ57kTgt1wZPIajCKtTg1SeDSsMj41A=
-X-Received: by 2002:a05:6000:24a:b0:33e:4238:8615 with SMTP id
- m10-20020a056000024a00b0033e42388615mr1774070wrz.40.1711747609718; Fri, 29
- Mar 2024 14:26:49 -0700 (PDT)
+        bh=vIMHZaDV3wX5X/mP8vILSA3tsnYggDxtMi+vTwU7OY8=;
+        b=uoHVUfDLC4DWFIfru8+fov/6KGTsW1MmR6xqdgJa0ZwDokwzs6YFo2knHPLWB/ROAL
+         qsi5imkejJmFqKZqJ6sr/wejwOAtVNoVNeSGSmqsmSF8Xrcj5HCn1cLMX1Ljqz8qdCGC
+         7jG/1seL592tiUukU30+RKaglfpuJ6gYA8jpZGIC0C8HHwJjXEVEti1fT/wY/HS7IMUg
+         3kXZN26ymG8e2S0+hqypPJMjEp/QfsQj63frMD5FYcGwyuLOZPrjcyodcvuL5zF4V7/K
+         OcG75BYen5EpcUMrXZ8pDrSk6dF5BQZATfBgQXoh3IFejhB6HDgL0jMkSoipydMJOlGV
+         /siA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2kKpT1OpsihgTQBlnZylDfTVURRuey4C3HaPv5f5hq0Zk/siPgKCK0ojrUTVaJOOO5yorgBfam6m0wmFQHmfmYXE7iJk6
+X-Gm-Message-State: AOJu0YxT4zf6tHhtWM22Kipq7yJ4KbKpQZvdlkAfVQzMIKjgtF1mDEEx
+	5kqE6IP9tkZ+/fMDytVoa+erAIUMtN04yXP9N/idtKFzHKFA41775RFtBSrWX6SNVps8rnbPJiL
+	YBzrEo71kAusiSQxFArGWWPC3n1HpwyZ1jTZx
+X-Google-Smtp-Source: AGHT+IH9pj0gJOAEZqutXLhCgImC4M5PTgqiAEIOD8jNv+vPhXBfVScVMRmBh9ONVHsoONfJu6nKmSY/GEubTYGORdE=
+X-Received: by 2002:a81:84cd:0:b0:609:3c37:a624 with SMTP id
+ u196-20020a8184cd000000b006093c37a624mr3517304ywf.35.1711748058196; Fri, 29
+ Mar 2024 14:34:18 -0700 (PDT)
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -115,66 +120,87 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329094906.18147-1-ubizjak@gmail.com> <20240329094906.18147-2-ubizjak@gmail.com>
-In-Reply-To: <20240329094906.18147-2-ubizjak@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 29 Mar 2024 14:26:38 -0700
-Message-ID: <CAADnVQLZnkm8psPvmUOS1FDacXdJPxQ79rQJ33F00dkS9czw1Q@mail.gmail.com>
-Subject: Re: [PATCH RESEND bpf 1/2] x86/bpf: Fix IP after emitting call depth accounting
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: X86 ML <x86@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	=?UTF-8?Q?Joan_Bruguera_Mic=C3=B3?= <joanbrugueram@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+References: <20240327120036.233641-1-mic@digikod.net>
+In-Reply-To: <20240327120036.233641-1-mic@digikod.net>
+From: Paul Moore <paul@paul-moore.com>
+Date: Fri, 29 Mar 2024 17:34:07 -0400
+Message-ID: <CAHC9VhR42y0BaUPB_BgW+8oadDc36xPJRzEqh9Mwqa1RaMMZXQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] lsm: Check and handle error priority for
+ socket_bind and socket_connect
+To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
+Cc: linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>, 
+	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, "Serge E . Hallyn" <serge@hallyn.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Fri, Mar 29, 2024 at 2:49=E2=80=AFAM Uros Bizjak <ubizjak@gmail.com> wro=
-te:
+On Wed, Mar 27, 2024 at 8:00=E2=80=AFAM Micka=C3=ABl Sala=C3=BCn <mic@digik=
+od.net> wrote:
 >
-> From: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
+> Because the security_socket_bind and the security_socket_bind hooks are
+> called before the network stack, it is easy to introduce error code
+> inconsistencies. Instead of adding new checks to current and future
+> LSMs, let's fix the related hook instead. The new checks are already
+> (partially) implemented by SELinux and Landlock, and it should not
+> change user space behavior but improve error code consistency instead.
 >
-> Adjust the IP passed to `emit_patch` so it calculates the correct offset
-> for the CALL instruction if `x86_call_depth_emit_accounting` emits code.
-> Otherwise we will skip some instructions and most likely crash.
+> The first check is about the minimal sockaddr length according to the
+> address family. This improves the security of the AF_INET and AF_INET6
+> sockaddr parsing for current and future LSMs.
 >
-> Fixes: b2e9dfe54be4 ("x86/bpf: Emit call depth accounting if required")
-> Link: https://lore.kernel.org/lkml/20230105214922.250473-1-joanbrugueram@=
-gmail.com/
-> Signed-off-by: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
-> Cc: Alexei Starovoitov <ast@kernel.org>
-> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> The second check is about AF_UNSPEC. This fixes error priority for bind
+> on PF_INET6 socket when SELinux (and potentially others) is enabled.
+> Indeed, the IPv6 network stack first checks the sockaddr length (-EINVAL
+> error) before checking the family (-EAFNOSUPPORT error). See commit
+> bbf5a1d0e5d0 ("selinux: Fix error priority for bind with AF_UNSPEC on
+> PF_INET6 socket").
+>
+> The third check is about consistency between socket family and address
+> family. Only AF_INET and AF_INET6 are tested (by Landlock tests), so no
+> other protocols are checked for now.
+>
+> These new checks should enable to simplify current LSM implementations,
+> but we may want to first land this patch on all stable branches.
+
+[Dropping Alexey Kodanev due to email problems]
+
+This isn't something I would want to see backported to the various
+stable trees, this is a consolidation and cleanup for future work, not
+really a bugfix.  If an individual LSM is currently missing an address
+sanity check that should be resolved with a targeted patch that can be
+safely backported without affecting other LSMs.
+
+Now, all that doesn't mean I don't think this is a good idea.
+Assuming we can't get the network stack to validate addresses before
+calling into these LSM hooks, I think this is an improvement over the
+current approach.  I would like to see the patchset include individual
+patches which do the desired adjustments to the Smack, TOMOYO,
+AppArmor, Landlock, and SELinux code now that the sanity checks have
+migrated to the LSM layer.  I expect that to be fairly
+straightforward, but given all the corner cases I want to make sure
+all the individual LSMs are okay with the changes.
+
+> A following patch adds new tests improving AF_UNSPEC test coverage for
+> Landlock.
+>
+> Cc: Alexey Kodanev <alexey.kodanev@oracle.com>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: G=C3=BCnther Noack <gnoack@google.com>
+> Cc: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+> Cc: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> Cc: Paul Moore <paul@paul-moore.com>
+> Cc: Serge E. Hallyn <serge@hallyn.com>
+> Fixes: 20510f2f4e2d ("security: Convert LSM into a static interface")
+> Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@digikod.net>
 > ---
->  arch/x86/net/bpf_jit_comp.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> index a7ba8e178645..09f7dc9d4d65 100644
-> --- a/arch/x86/net/bpf_jit_comp.c
-> +++ b/arch/x86/net/bpf_jit_comp.c
-> @@ -479,9 +479,10 @@ static int emit_call(u8 **pprog, void *func, void *i=
-p)
->
->  static int emit_rsb_call(u8 **pprog, void *func, void *ip)
->  {
-> +       void *adjusted_ip;
->         OPTIMIZER_HIDE_VAR(func);
-> -       x86_call_depth_emit_accounting(pprog, func);
-> -       return emit_patch(pprog, func, ip, 0xE8);
-> +       adjusted_ip =3D ip + x86_call_depth_emit_accounting(pprog, func);
+>  security/security.c | 96 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 96 insertions(+)
 
-Why not just
-ip +=3D x86_call_depth_emit_accounting(pprog, func);
-
-?
-
-> +       return emit_patch(pprog, func, adjusted_ip, 0xE8);
->  }
->
->  static int emit_jump(u8 **pprog, void *func, void *ip)
-> --
-> 2.44.0
->
+--=20
+paul-moore.com
 
 
