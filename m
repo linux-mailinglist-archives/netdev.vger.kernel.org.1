@@ -1,166 +1,122 @@
-Return-Path: <netdev+bounces-83316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D6A891ACA
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 14:10:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66776891AD6
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 14:11:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AE6B1F2875A
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:10:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D56231F297A5
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933D115EFC6;
-	Fri, 29 Mar 2024 12:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9785E15FA64;
+	Fri, 29 Mar 2024 12:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B59uAkC7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5EWxjKZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690E515EFC2;
-	Fri, 29 Mar 2024 12:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B47815F41F;
+	Fri, 29 Mar 2024 12:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715583; cv=none; b=akU4ejQ8Uivc5TpqEnlR/MOnOuN0vcN9FS8N5ly2mYgyujhK46H61jSRGU+LTaBPvTIdRCTUaGZHomPkMxx7bUlp93qKrMH59i0rvRx0N7cLso1+klYfhOwE3dlBGaQpN7NdnsX/dZslVFRWVichNXw/oCYa3yTSq1vp248wj14=
+	t=1711715599; cv=none; b=fIKUcDWsQONpsvMxUv+QX2qOdeqUZ1FfrG/4Sey3UmmhulEWemrEiZIHgglvlQOXQ/faueSCOp4Jv8ncYFaQetJQBSKmGYCY7VRWrlWBXn+dotgbr4cGRcpGXQF0CiOMwS7SxRZHDeG9G8cVawaITCkjDZDLkMe6F/hcYHuw0PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715583; c=relaxed/simple;
-	bh=0JtsYJXLKTpwPDDeMYYcj8Jdj9ASxamAkp23qC74TwA=;
+	s=arc-20240116; t=1711715599; c=relaxed/simple;
+	bh=5Xp9deLXuySM3FPbHSvWVecwYQM4gNJbCeO4/lmlir8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RetHz6Y0chiYMozTbbj1QoVO9SQswYs7KoiGdKWelmRJpAm53XQ0CDED99gU/UyhYoYMeWGwLAJJl+oCzXMxoI1q6OIoUteZOW/gIJQLVG2ewltoK8U0UTvDlQ7OgjwnpBBglBUPuh1VT/kKGxFiW7KGX0/zDZdOCllSi0n2/MY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B59uAkC7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D04E7C433C7;
-	Fri, 29 Mar 2024 12:33:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=N6+APxkHobFVx932Sdyy0u8G6w9uU4Sv4JyiDCF1I9M00wERoGOhnxlH9NlEE0OQLruyyLxxoSL7ZLEz8X2cWgQ3cW1zrGpqSGG0i85+rCIlfPSM7w2FaYhGoCWLZNc0ClMhTK+N2LXN2EkwhjHhcz7x+S57OcP3IMQ7M8SMfc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5EWxjKZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB702C43390;
+	Fri, 29 Mar 2024 12:33:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715583;
-	bh=0JtsYJXLKTpwPDDeMYYcj8Jdj9ASxamAkp23qC74TwA=;
+	s=k20201202; t=1711715599;
+	bh=5Xp9deLXuySM3FPbHSvWVecwYQM4gNJbCeO4/lmlir8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=B59uAkC7tmX66qdtUVYOgSoMg0jbOQVUVxTSZVyA5mK+bjpWdZb1iXddAVnry87cB
-	 PNbtV0B9jlDSLNJ3XGqVLo+46RK8m7ZSCKI5KyMKyPspS6MEo9ty4jq3UhplRiUbTn
-	 YUyzfkv6sWyNUyif/Yw2k6cHthHrDIvH2lyx2UdoyyoNt5/JLUAY70dQhZqRemvAJ4
-	 pM3ZnG5x/IdzAK4kkfXJjPobe+LfZZXXdj2d8qITr/4pZ0EJhT9GZ7tXHDAWxfnbew
-	 EoAQgTKZGnrWbADexlXFtDc8O7uowSwuJbCKyVMndantTC0SezujbabDi/DOqIS23I
-	 zBoz1R8kNQLbg==
+	b=N5EWxjKZbhO3j9ydGM0JVE3X7hNvZfL5hhyL3W3ftUvIw+x6GuY67Drlp+6ZeEug+
+	 pNZamQPWYFfdO6Xh1tAv4kA2gEhJukQJmiu7Q5vN8Sqd/RoHbf/izdz2ntbl/23kEh
+	 6sjye3+qpBm5S2AvR14eBuFgcYCNNvECN09BQXaS2mv6Oq5YqylkynyP26p2f/5i1B
+	 xh7nMnFC8oS2AiWbC1VdFCieWAdXZnKGTUsEr329QBVEByhogvtPWziRm4mXywGTxY
+	 HQkY/tVeCDwcFmAAxke63tkjwEp4JFyNsUnPsU5ugvKvJCCeIUtfTYldpW/Yduw8i4
+	 UgRQ5+ile8nJg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Markus Elfring <elfring@users.sourceforge.net>,
+	Sven Eckelmann <sven@narfation.org>,
+	Simon Wunderlich <sw@simonwunderlich.de>,
 	Sasha Levin <sashal@kernel.org>,
+	mareklindner@neomailbox.ch,
+	a@unstable.cc,
 	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
-	linux-s390@vger.kernel.org,
+	pabeni@redhat.com,
+	b.a.t.m.a.n@lists.open-mesh.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 29/31] net/smc: reduce rtnl pressure in smc_pnet_create_pnetids_list()
-Date: Fri, 29 Mar 2024 08:31:48 -0400
-Message-ID: <20240329123207.3085013-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 02/20] batman-adv: Return directly after a failed batadv_dat_select_candidates() in batadv_dat_forward_data()
+Date: Fri, 29 Mar 2024 08:32:50 -0400
+Message-ID: <20240329123316.3085691-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240329123207.3085013-1-sashal@kernel.org>
-References: <20240329123207.3085013-1-sashal@kernel.org>
+In-Reply-To: <20240329123316.3085691-1-sashal@kernel.org>
+References: <20240329123316.3085691-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.83
+X-stable-base: Linux 5.15.153
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Markus Elfring <elfring@users.sourceforge.net>
 
-[ Upstream commit 00af2aa93b76b1bade471ad0d0525d4d29ca5cc0 ]
+[ Upstream commit ffc15626c861f811f9778914be004fcf43810a91 ]
 
-Many syzbot reports show extreme rtnl pressure, and many of them hint
-that smc acquires rtnl in netns creation for no good reason [1]
+The kfree() function was called in one case by
+the batadv_dat_forward_data() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
-This patch returns early from smc_pnet_net_init()
-if there is no netdevice yet.
+* Thus return directly after a batadv_dat_select_candidates() call failed
+  at the beginning.
 
-I am not even sure why smc_pnet_create_pnetids_list() even exists,
-because smc_pnet_netdev_event() is also calling
-smc_pnet_add_base_pnetid() when handling NETDEV_UP event.
+* Delete the label “out” which became unnecessary with this refactoring.
 
-[1] extract of typical syzbot reports
-
-2 locks held by syz-executor.3/12252:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.4/12253:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.1/12257:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.2/12261:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.0/12265:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.3/12268:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.4/12271:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.1/12274:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.2/12280:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Jan Karcher <jaka@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Tony Lu <tonylu@linux.alibaba.com>
-Cc: Wen Gu <guwen@linux.alibaba.com>
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-Link: https://lore.kernel.org/r/20240302100744.3868021-1-edumazet@google.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+Acked-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/smc/smc_pnet.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ net/batman-adv/distributed-arp-table.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-index 25fb2fd186e22..21b8bf23e4ee6 100644
---- a/net/smc/smc_pnet.c
-+++ b/net/smc/smc_pnet.c
-@@ -802,6 +802,16 @@ static void smc_pnet_create_pnetids_list(struct net *net)
- 	u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
- 	struct net_device *dev;
+diff --git a/net/batman-adv/distributed-arp-table.c b/net/batman-adv/distributed-arp-table.c
+index 42dcdf5fd76a1..c091b2a70d22d 100644
+--- a/net/batman-adv/distributed-arp-table.c
++++ b/net/batman-adv/distributed-arp-table.c
+@@ -684,7 +684,7 @@ static bool batadv_dat_forward_data(struct batadv_priv *bat_priv,
  
-+	/* Newly created netns do not have devices.
-+	 * Do not even acquire rtnl.
-+	 */
-+	if (list_empty(&net->dev_base_head))
-+		return;
-+
-+	/* Note: This might not be needed, because smc_pnet_netdev_event()
-+	 * is also calling smc_pnet_add_base_pnetid() when handling
-+	 * NETDEV_UP event.
-+	 */
- 	rtnl_lock();
- 	for_each_netdev(net, dev)
- 		smc_pnet_add_base_pnetid(net, dev, ndev_pnetid);
+ 	cand = batadv_dat_select_candidates(bat_priv, ip, vid);
+ 	if (!cand)
+-		goto out;
++		return ret;
+ 
+ 	batadv_dbg(BATADV_DBG_DAT, bat_priv, "DHT_SEND for %pI4\n", &ip);
+ 
+@@ -728,7 +728,6 @@ static bool batadv_dat_forward_data(struct batadv_priv *bat_priv,
+ 		batadv_orig_node_put(cand[i].orig_node);
+ 	}
+ 
+-out:
+ 	kfree(cand);
+ 	return ret;
+ }
 -- 
 2.43.0
 
