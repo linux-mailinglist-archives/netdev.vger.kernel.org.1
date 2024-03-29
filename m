@@ -1,141 +1,109 @@
-Return-Path: <netdev+bounces-83394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A6B48921D4
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:39:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86028921F7
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:56:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAD1AB25047
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:39:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63FC71F24DEF
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3F86A8D2;
-	Fri, 29 Mar 2024 16:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9D84EB46;
+	Fri, 29 Mar 2024 16:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uW7qxP8y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S2NyHfSc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC1422075;
-	Fri, 29 Mar 2024 16:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2AC3C120;
+	Fri, 29 Mar 2024 16:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711730379; cv=none; b=W0SvH0vhQF5Daz/mkL2FjSexSefYH+RudWNOQ9mM9pziEPMGYTFGKxWLV92lKlTFzZ4/ZvBwKl3nsGXRWqGpWwDSP2Cg2gwzkMhgceq7Mn3Bn6E1kxg4/U2K+q/Y68BX4OncRfDy9EueLLmOrqFvagA1GRau7CB9enAwYRmnRGY=
+	t=1711731358; cv=none; b=hIeZMx//3Zh3n1R55J6wJxkPAtqFBjFuxNgskxZ0LIlrU+UY2nIkKgxP/aHw9tTXzpzwNEdE5ejR1MD960lJBcbOAl/AmzzJZE8NfLFzRBhWOaWfQUQQJXr+XCu9w8MS7m0EY/3Lrg5Lpn97byKCo28B9gBK+S64AYJVI2Y8nMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711730379; c=relaxed/simple;
-	bh=bg+h7PlnfTedz1YBjzApxZkMOAnsBGDd8/EzMTXhZfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dFqDq9Fg2X0yRxLQCIq4kT74ICYEQkQ9Ig+AV/efNoNp6CpybpsL4e3Jyq4r4aFWahKP8xbk1E4uWsOACZiyzlpiwTBlfGuxlVcBWACjSC8KNy5BpcE1QOlHAXFaic/nr72DLOu7evcB0CXVangeKuZi8wxvigdTvQSTIgSahRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uW7qxP8y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4D9DC433C7;
-	Fri, 29 Mar 2024 16:39:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711730378;
-	bh=bg+h7PlnfTedz1YBjzApxZkMOAnsBGDd8/EzMTXhZfQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uW7qxP8y8ACgUR891lLqNXK4nRCSSexkXmk3NVlX/43RdUbJKhMUBo+3F7ImHHCLd
-	 EgMy3VnFONlXXBX8N/84xV65QgEoe3byfIcVSoYOnvkYvas222h0lZkI0ts/7GK5dK
-	 RXDBa+pCTcdJsCx5bNqP+0NeWpjfPDjTw0LzbJBD2TGFbdPiUtd9S2xCHSf/YkWg3h
-	 LkeVRnbJmAa4tPbrg134PWkZdQ7HBQC4t3veXbL+goDjmVnDap5Tj4fOkvn8ClJwbk
-	 uuZW1rzs8wZhLpPlp2dMwsOxB3VXY8Xf/XxfLnuX/VdqMAE2Sw5BpezoMJa9uZRiGz
-	 dYTGMY6Ps7ZVQ==
-Date: Fri, 29 Mar 2024 22:09:34 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Allen <allen.lkml@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Allen Pais <apais@linux.microsoft.com>,
-	linux-kernel@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-	Kees Cook <keescook@chromium.org>, Hector Martin <marcan@marcan.st>,
-	Sven Peter <sven@svenpeter.dev>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-	Paul Cercueil <paul@crapouillou.net>, Eugeniy.Paltsev@synopsys.com,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Viresh Kumar <vireshk@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Leo Li <leoyang.li@nxp.com>, zw@zh-kernel.org,
-	Zhou Wang <wangzhou1@hisilicon.com>, haijie1@huawei.com,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	logang@deltatee.com, Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>,
-	Patrice Chotard <patrice.chotard@foss.st.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>, peter.ujfalusi@gmail.com,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Jassi Brar <jassisinghbrar@gmail.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	maintainers@bluecherrydvr.com, aubin.constans@microchip.com,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Manuel Lauss <manuel.lauss@gmail.com>,
-	=?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-	"jh80.chung" <jh80.chung@samsung.com>, oakad@yahoo.com,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>, brucechang@via.com.tw,
-	HaraldWelte@viatech.com, pierre@ossman.eu, duncan.sands@free.fr,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Oliver Neukum <oneukum@suse.com>,
-	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-mediatek@lists.infradead.org,
-	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-	"linux-mmc @ vger . kernel . org" <linux-mmc@vger.kernel.org>,
-	Linux-OMAP <linux-omap@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-	linux-s390@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH 2/9] dma: Convert from tasklet to BH workqueue
-Message-ID: <ZgbuxmxncU0-0jhA@matsya>
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-3-apais@linux.microsoft.com>
- <ZgUGXTKPVhrA1tam@matsya>
- <2e9257af-c123-406b-a189-eaebeecc1d71@app.fastmail.com>
- <ZgW3j1qkLA-QU4iM@matsya>
- <CAOMdWSKY9D75FM3bswUfXn2o7bGtrei3G5kLt6JdcdOPDXaG8g@mail.gmail.com>
+	s=arc-20240116; t=1711731358; c=relaxed/simple;
+	bh=RV3VRFSxY52XIFyp4YJivtHZiq5gbFXa9jWiDKfQaI4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qWEPPCQAo6fGTapJQcdUynzztZwTT/81cQQhZ26wOt7JZCxMqiO8oDnIuHaXc/DtznH3Wgv2HilNXfuMxXe2QZed+k5c9ggNnK7PwSNM/C6sLXQf0+MuOMRLx8wlVDexCW/QEUrcDxJCgDjdr0jCeiL584cc1dXlvQ+wUYuWA4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S2NyHfSc; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711731356; x=1743267356;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RV3VRFSxY52XIFyp4YJivtHZiq5gbFXa9jWiDKfQaI4=;
+  b=S2NyHfScMD9xphw4hOcvqzBYMn+nEyEm39mNMaIH/XHPW1XQVeNvEiOL
+   v563e73Ljhd3GC/vO2/yiseEg6K8YLYDCOh2wBfB2FMxtVscI8q6zj2SH
+   jHV8T81CPiU6kBSoC6zDrXoS5DSrMwlmvHQZKlK0hIxFLBAelIccde3hu
+   d55vPzNLXkyFeg9PaHJjKTvCJSnkm3W8/n0dhhddpjCA72O8wqgYgv9ke
+   7y5EYrl3CSkMfOM5626Z/TDm+Obup7vaJxA0vJN1l2Y/9w0o0WQe6giUV
+   2YrAAcgsVrP3t4jmjsbYCUNXru3f/+kTLpTM65EbZvj4+h7Np+YCa0v/m
+   Q==;
+X-CSE-ConnectionGUID: ZvOZmYCPSRScSTzfAImb3w==
+X-CSE-MsgGUID: PHL6ekUSQIKhsOdDXpE2Wg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11028"; a="18072461"
+X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
+   d="scan'208";a="18072461"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 09:55:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
+   d="scan'208";a="17100373"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa008.fm.intel.com with ESMTP; 29 Mar 2024 09:55:53 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/2] page_pool: allow direct bulk recycling
+Date: Fri, 29 Mar 2024 17:55:05 +0100
+Message-ID: <20240329165507.3240110-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOMdWSKY9D75FM3bswUfXn2o7bGtrei3G5kLt6JdcdOPDXaG8g@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On 28-03-24, 12:39, Allen wrote:
+Previously, there was no reliable way to check whether it's safe to use
+direct PP cache. The drivers were passing @allow_direct to the PP
+recycling functions and that was it. Bulk recycling is used by
+xdp_return_frame_bulk() on .ndo_xdp_xmit() frames completion where
+the page origin is unknown, thus the direct recycling has never been
+tried.
+Now that we have at least 2 ways of checking if we're allowed to perform
+direct recycling -- pool->p.napi (Jakub) and pool->cpuid (Lorenzo), we
+can use them when doing bulk recycling as well. Just move that logic
+from the skb core to the PP core and call it before
+__page_pool_put_page() every time @allow_direct is false.
+Under high .ndo_xdp_xmit() traffic load, the win is 2-3% Pps assuming
+the sending driver uses xdp_return_frame_bulk() on Tx completion.
 
-> > I think that is very great idea. having this wrapped in dma_chan would
-> > be very good way as well
-> >
-> > Am not sure if Allen is up for it :-)
-> 
->  Thanks Arnd, I know we did speak about this at LPC. I did start
-> working on using completion. I dropped it as I thought it would
-> be easier to move to workqueues.
-> 
-> Vinod, I would like to give this a shot and put out a RFC, I would
-> really appreciate review and feedback.
+Alexander Lobakin (2):
+  page_pool: check for PP direct cache locality later
+  page_pool: try direct bulk recycling
 
-Sounds like a good plan to me
+ include/linux/skbuff.h | 12 ++++----
+ net/core/page_pool.c   | 38 ++++++++++++++++++++---
+ net/core/skbuff.c      | 70 +++++++++++++-----------------------------
+ net/ipv4/esp4.c        |  2 +-
+ net/ipv6/esp6.c        |  2 +-
+ 5 files changed, 63 insertions(+), 61 deletions(-)
 
 -- 
-~Vinod
+2.44.0
+
 
