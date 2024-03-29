@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-83152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4363D89114D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 03:08:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FF64891161
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 03:10:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F306228CE1F
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:08:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A00291F24614
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA50224C9;
-	Fri, 29 Mar 2024 02:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF992134B;
+	Fri, 29 Mar 2024 02:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MdQcq9fd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jF+h+IEq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2625F11182;
-	Fri, 29 Mar 2024 02:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BA23FE23;
+	Fri, 29 Mar 2024 02:07:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711677748; cv=none; b=tUS9CV09X+59z2jCWxCLX9yWXepSjdN+HWM3YJmTDE/FNp5maOBbRApLAla4QY/1HPrVdJp85trmQL+TphVc0CEOuxTq7IRm36Ede3NuletGPGl7kl4TLmXiKh/ehP2YVytRG2QuJnS4P2upZWh3qnTD4l3Y1ao2w2LZMqShcSE=
+	t=1711678037; cv=none; b=D0JeEgd+qYYvHXUPhG1MkyMmXQnDlB83mrK9uhjwfBHiWcm/6ZypS2zgj9kGLp46yjAe067s5AFWTiRmYVg83blqILduO+4L4QwRfsc1w/rn8bMQTIYjo1ZCp1emeuuNOj5IIjlBNji2V9VGYkC8P4ULQvx0wgJSufbx4aDl/uI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711677748; c=relaxed/simple;
-	bh=bZ9pG4B9nGRafy5pviDQ+t6Ja+dC+HfN6Fq7ez+Awgc=;
+	s=arc-20240116; t=1711678037; c=relaxed/simple;
+	bh=KnFsRG5uU0swr/0jv8y6Fz/zFZwoBCacd2B8giAjCcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q4XWUHWVi6VZMXlPtKRE3pMqgieidnLrZzoJCY2XfINUPqKbP5Vh5ZOI1bU0uShWfkl0rYboHOtcQz76mUpy0eXsvuKqVWhMwNV219/glHv9YRNvBrOzvhdTSv2JtedFbA9I6yEaUClTrs5TfQhGpMBST8Jh3IDZFZOr6iSdD8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MdQcq9fd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25140C43394;
-	Fri, 29 Mar 2024 02:02:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QVCdlYx2xVhmBC1GqbSahQotG2z/PMCZ2gdTsGAo3edkZ7RlETTXVjDTKQ84Fz7yc9HXcmO8npRKF1CkpN4CinkMsaOR4QoPAy2SAW+wEKFdiP8VAzq1UXJGOKWMFJBoqQY6A0YmwV5LP2MV+vCH1HNoYBcNxymj7ne4HROc8mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jF+h+IEq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D681AC433F1;
+	Fri, 29 Mar 2024 02:07:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711677747;
-	bh=bZ9pG4B9nGRafy5pviDQ+t6Ja+dC+HfN6Fq7ez+Awgc=;
+	s=k20201202; t=1711678036;
+	bh=KnFsRG5uU0swr/0jv8y6Fz/zFZwoBCacd2B8giAjCcI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MdQcq9fdpZ3+rq7tnElCgdpKheh5fsIXzBZxJC6H1Pe5v1OOpJ+sX+3WQYH6wNxzE
-	 b2z092UtDjwySkpSyV4wBq03YBJsYgUv4orlgGSg4NNeBrcvjDDJ2qn/hzE6QOp1lu
-	 inBskuyyIP+TAJ4FTu9Mqx/qYmm3KE6X+VssQ9P969jFDHVsAuHIbgqkEK74QAXG6B
-	 6JMSnliZrsunORKsrBTOa+BACDoHe8H6CnZQzNlNvyzNDNJxAIxgq7GvSgjItBw0G5
-	 r1G8zEEQkqEKcEfmpJa+T27xGChezdVJl/bKiTvApZD7T3So+CelQSvYDPidPDI6eX
-	 yCieP7/osw9Og==
-Date: Thu, 28 Mar 2024 19:02:26 -0700
+	b=jF+h+IEqR0QUUAB2rJXByyFaCEX1Bl7QVhHo/R6c7P9G8PmUL5L2CEYLDeJfb+wUa
+	 JAvZCsKIKJwaDWoYKREO+k2IWXHQxQHX06tnMDO4sRsSyR4qKmGUJV/aXsSbaSjY8+
+	 I76WHfpuNYxfLSASyrqD8dOG/FPEuekP7JZ+oSASwjCxxbsFsOzXifca2AvmG49phI
+	 yJcdFl+BWJ3Xg4/P0oGEOQ2RAmGh65GigNz+RrfEI5Fg2OypUvb4e7UHGOPF9C3Y5D
+	 5vRVxy5B3T855aF4mgrbBv19VbhgFXa0of82DC7LNrRGM9N+C6o9mw7fuMIf10LHBf
+	 1gDOKOM6GEAMA==
+Date: Thu, 28 Mar 2024 19:07:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Stefan Eichenberger <eichest@gmail.com>, Dimitri
- Fedrau <dima.fedrau@gmail.com>, Kory Maincent <kory.maincent@bootlin.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, Shay Agroskin
- <shayagr@amazon.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/3] net: ethtool: Add impedance mismatch
- result code to cable test
-Message-ID: <20240328190226.7aab8b76@kernel.org>
-In-Reply-To: <20240327162918.2426792-2-paweldembicki@gmail.com>
-References: <20240327162918.2426792-1-paweldembicki@gmail.com>
-	<20240327162918.2426792-2-paweldembicki@gmail.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <jiri@resnulli.us>, <horms@kernel.org>, <rkannoth@marvell.com>,
+ <shenjian15@huawei.com>, <wangjie125@huawei.com>, <liuyonglong@huawei.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V6 net-next 4/4] net: hns3: add support to query scc
+ version by devlink info
+Message-ID: <20240328190714.16e3f86a@kernel.org>
+In-Reply-To: <20240327114330.1826631-5-shaojijie@huawei.com>
+References: <20240327114330.1826631-1-shaojijie@huawei.com>
+	<20240327114330.1826631-5-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,12 +64,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 27 Mar 2024 17:29:13 +0100 Pawel Dembicki wrote:
-> This commit introduces a new result code:
-> ETHTOOL_A_CABLE_RESULT_CODE_IMPEDANCE_MISMATCH
-> which represents the results of a cable test indicating abnormal impedance.
+On Wed, 27 Mar 2024 19:43:30 +0800 Jijie Shao wrote:
+> From: Hao Chen <chenhao418@huawei.com>
+> 
+> Add support to query scc version by devlink info for device V3.
 
-I'm not a cable expert but going purely by the language
-abnormal != mismatch. Mismatch indicates there are two
-values we are comparing.
+What's SCC? Does none of the generic versions fit the bill?
+https://docs.kernel.org/next/networking/devlink/devlink-info.html#generic-versions
+
+If not you still have to document the meaning of this component
+in Documentation/networking/devlink/hns3.rst
+-- 
+pw-bot: cr
 
