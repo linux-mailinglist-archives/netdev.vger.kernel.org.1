@@ -1,141 +1,110 @@
-Return-Path: <netdev+bounces-83331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F1A6891F5E
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:03:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8069D891F92
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04BD41F30C63
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:03:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DD751F286C3
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 695DF1422C1;
-	Fri, 29 Mar 2024 13:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C357913280D;
+	Fri, 29 Mar 2024 13:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mRpzkkk/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ndj+0JXz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8FA85C52
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 13:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135BA1386DF
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 13:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711718506; cv=none; b=m4OHNU+Fceo4lmLPPYYwhG984O2N8H1zLQS17k/VoaBtoJJnrtda41+vjvKzDV9lGu+tOgSuHraIy2T/Ji3Xql3EislpiCQ1Xl/92ACW2iQLhAwXrBm4r+D4/Cz51ekRtE3V4rKFLpBIYoJaerW6w8DQCKHjbxcX/djKy2mjj5U=
+	t=1711719479; cv=none; b=KAka30uTPASMYT4/fvHf0gZfHg2hVnYMj3K7epTMxgYRKQg4wtWiXlvUzZvAAjlGKW9miv2QAwMokjO0UyhSVzc3/nW1NZAeZ/GHKjGomS+X7vnVhRmzLBP6QyKyBSNIMUZNTuLekYUALZgi18TTjpJEN0XQ3+Dr+qDUSUWC5Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711718506; c=relaxed/simple;
-	bh=RAhOseKWHqjGtVoiQ7a2nR2D+WRBJpAPx8SCmHJSxcc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UD+JpT/EuUSjAe8P0EdZMnNsCKCrvYZzbvg7hIS9ZDs3cPVAenWYpSH9w6ZPkHQEOW+wyrdr2jWyT2XhAoeZcuE28xqvwCZX/eGN6MbbL1ppgXUn8BVtbomo3uoFpaYLrGRPz+dtoCnsEs0vJbDh43yvtxjEJjWvSkFvgTfWq/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mRpzkkk/; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56c2cfdd728so8008a12.1
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 06:21:44 -0700 (PDT)
+	s=arc-20240116; t=1711719479; c=relaxed/simple;
+	bh=tfUUWCNoq9kFJLfvUTTjKmqN7g+6jThD/f2anfKUYv4=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=MXk5Hbnshb0p3GJa1/74fn/d1WT9vm4user6875qaqwo4t384ackHhMfBsk0IjeoTnUKH1XikolXCmwjazkGVQrlQ50kyCviJ1Qh+J1JV4t1cJYCLxP2CZi17uSAd7SNz6p7W9deakheCS1mZ+N7kbq1+Apes5hpu7k3pwCAIrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ndj+0JXz; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-34175878e3cso1471603f8f.0
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 06:37:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711718503; x=1712323303; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J6Qr+2wZkDiWc+QhngmAmneq974QF4QT4bvvKPeEeCI=;
-        b=mRpzkkk/qOu1huMf7Y1GSiuMGohxIBM4rnlP2tBZoxrQY2yoJxd3ADqafDnSUdQYOp
-         MpzADVyy9tn0zskIXC//tGWfCK/4wBmfYJxQPW5tF4MZY+Nvg3QiZy/rRVelNbg1Uscc
-         Llhi1aZ+jZizXWES7IMGcZAtAwbyNiLeOE1lHXespehUyIy4kKpk+5h0+fEIW6wcnarh
-         8FbWrhxF9Esm911DWgFBqbpHvgHrAKwIDpbm1WHkr8Q8tB/VXO+5UiKAE0/bHuTBEp92
-         XZ69dUpYiANFfyUzMr752lXHxksyRyCwXjB4i382sYGFM1F5G55g4twyKY5pMJ/AoGZ9
-         2h/A==
+        d=gmail.com; s=20230601; t=1711719476; x=1712324276; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nPR+823zDrd6O3LCyJcV/VFZ3iNVilyhRfEvKjg5OPg=;
+        b=Ndj+0JXzT18aYm7wwtVPsCpSdp4yNUl/fpyFf1xqmI9iFPbGSruARmVVzSEW4ZXdgo
+         8+cTgUFT5gr8c0AH4uQeaNfAGld+eNlpSZp7ZVHPtZS+Y7NbvP7oVjnYpXbyqMi4H8+m
+         in0YoBCTiYICTbY4GRIvJcJiDdGWZEQaJpCDKU4ifWGHY6QruyhQVXlJHDftaD5Hqpsv
+         0ZcG1QJvYEulxEi61AddHgoxb+hjqeo1a/fHUZwAgf+zhi7QQEoNumKHmQ23GYSO0IWY
+         NrV+WHgDAkuZn0tGIvzvs0uwuRPQAoXU94S8SlkSHlNjgvgsh9a17jAnW/e2WQeXikSQ
+         46uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711718503; x=1712323303;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J6Qr+2wZkDiWc+QhngmAmneq974QF4QT4bvvKPeEeCI=;
-        b=wS8F2ZglSVQp5uFJZRV5maw258QIj9PQpDRGcQNJOOz4JEWdUyg8SBmGhAu0EPO6/N
-         gi2QsVIfz4FpVYJMxJTAMrGaFj4RDzm+zwhDghoMUMKBkDPWutEWD1SWp+crjBmvgkjc
-         uvSYuXYgOV9VTDrJzcL1jNgmtm+4eSuo0shQmN8Tw2NLI96Ej3yEeEXs6j35/1f0Aqoi
-         GgmauJQ4bT2CyxykH0O6YmBe1aqfNHiEgboUsTOhCiA5vQPY3Rrbits+HgvUTE0I601r
-         D7TIomE0lK28rbvU9h7TQaCP5YxbwwRefiE5VMqHuuEU2Rwic7rZtcIPsA5urb+RnpIk
-         5Ldg==
-X-Forwarded-Encrypted: i=1; AJvYcCUm2PqfTJnSndGGcClUDbtDpSdqNC0bZoxiLYrFNPPzpRB2kw6LqbddsGFjZ5MneeYQVeckCH51fSkfOyZJy5eLaBruOBUT
-X-Gm-Message-State: AOJu0Yy8MbSrLwG4d4gE+wxOF0jrhxLvmEH0kNB7c8VjdfzPanTjwg00
-	LSE9dG+ZiSIVVZqhh2a55FqmoF/acFdlgOALlcmJ0rM4H5GbyMXzNG+Dqo8OccdhaEKVlQkbUKr
-	hykt+djq6b6vWYHaOJxGP+Jqq2dn/wNlXbuhm
-X-Google-Smtp-Source: AGHT+IFyUO0LdXXBQqKbbrkev8q9MSFk85GtCswxxjiFZg14xnRhOn+ConDZ24SXfudvkm8YB3u16z3CQV5DlRSNzKM=
-X-Received: by 2002:a05:6402:35d1:b0:56c:63dc:c02b with SMTP id
- z17-20020a05640235d100b0056c63dcc02bmr106182edc.0.1711718502598; Fri, 29 Mar
- 2024 06:21:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711719476; x=1712324276;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nPR+823zDrd6O3LCyJcV/VFZ3iNVilyhRfEvKjg5OPg=;
+        b=tCAM2qJ+V0HS/NyiDnq/y9Yo5BxbM9JMBif/SVA/8YQd9iFuKRk3tPkZdw3lZtgchV
+         QWGdC2QKt6yI/WkfzqLYiN5Xtx0+Q6Zq6hTAncyHJxfYPgkD/YL26PYn4eG5E7xEhfPl
+         lTWqWlsDEkctHyaD/dS/OxnR5932HrcfrdiT6+m3XsUVVtLgdev2STq1WnLRgT+QfCUX
+         qCp3ivSucLWLNMoLdl3MFyp7I+5HImmqR0PXAE7YmPmrK8+izQLDnQmknL9xNHt3md7I
+         6+OzOsE6WXnZqrMuHbzRejuvQgyGl67799/KMSplKOEm3GRNntCrrainP1U76rC1rO+Y
+         0N8Q==
+X-Gm-Message-State: AOJu0YwyqWiGZevuqWvITPdP68u/bo10Sqec2Ubd3PcPYY/ZOeOqc+Qz
+	Q/tnU90RqjNorEut7tNr61c6fiUB5cX60OKArnodkQMBRZjW/1X8
+X-Google-Smtp-Source: AGHT+IGcTDyKQOc8ugksjUPFMI5nTxRIK3e0We3VaClVLCd9sFpk9EaADAgD75gDz8d5u8QnWpbp6g==
+X-Received: by 2002:a5d:5888:0:b0:341:c766:fbc9 with SMTP id n8-20020a5d5888000000b00341c766fbc9mr1582160wrf.1.1711719476078;
+        Fri, 29 Mar 2024 06:37:56 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:3c9d:7a51:4242:88e2])
+        by smtp.gmail.com with ESMTPSA id v17-20020adfe291000000b0034174566ec4sm4217204wri.16.2024.03.29.06.37.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 06:37:55 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jiri
+ Pirko <jiri@resnulli.us>,  Breno Leitao <leitao@debian.org>,  Alessandro
+ Marcolini <alessandromarcolini99@gmail.com>,  donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1 2/3] doc: netlink: Add hyperlinks to
+ generated Netlink docs
+In-Reply-To: <20240328183844.00025fa2@kernel.org> (Jakub Kicinski's message of
+	"Thu, 28 Mar 2024 18:38:44 -0700")
+Date: Fri, 29 Mar 2024 13:05:12 +0000
+Message-ID: <m27chljiif.fsf@gmail.com>
+References: <20240326201311.13089-1-donald.hunter@gmail.com>
+	<20240326201311.13089-3-donald.hunter@gmail.com>
+	<20240328183844.00025fa2@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329105610.922675-1-dawei.li@shingroup.cn> <20240329105610.922675-2-dawei.li@shingroup.cn>
-In-Reply-To: <20240329105610.922675-2-dawei.li@shingroup.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 29 Mar 2024 14:21:28 +0100
-Message-ID: <CANn89iJzuw8_ti4P4tJ_A3Fd0QCjHTBjasbm_J3N8up=gK8Aow@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] net/iucv: Avoid explicit cpumask var
- allocation on stack
-To: Dawei Li <dawei.li@shingroup.cn>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	ioana.ciornei@nxp.com, wintera@linux.ibm.com, twinkler@linux.ibm.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Fri, Mar 29, 2024 at 11:57=E2=80=AFAM Dawei Li <dawei.li@shingroup.cn> w=
-rote:
->
-> For CONFIG_CPUMASK_OFFSTACK=3Dy kernel, explicit allocation of cpumask
-> variable on stack is not recommended since it can cause potential stack
-> overflow.
->
-> Instead, kernel code should always use *cpumask_var API(s) to allocate
-> cpumask var in config-neutral way, leaving allocation strategy to
-> CONFIG_CPUMASK_OFFSTACK.
->
-> Use *cpumask_var API(s) to address it.
->
-> Signed-off-by: Dawei Li <dawei.li@shingroup.cn>
-> ---
->  net/iucv/iucv.c | 37 ++++++++++++++++++++++++++-----------
->  1 file changed, 26 insertions(+), 11 deletions(-)
->
-> diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-> index a4ab615ca3e3..b51f46ec32f9 100644
-> --- a/net/iucv/iucv.c
-> +++ b/net/iucv/iucv.c
-> @@ -520,14 +520,19 @@ static void iucv_setmask_mp(void)
->   */
->  static void iucv_setmask_up(void)
->  {
-> -       cpumask_t cpumask;
-> +       cpumask_var_t cpumask;
->         int cpu;
->
-> +       if (!alloc_cpumask_var(&cpumask, GFP_KERNEL))
-> +               return;
+Jakub Kicinski <kuba@kernel.org> writes:
 
-This can not be right. iucv_setmask_up() is not supposed to fail.
+> On Tue, 26 Mar 2024 20:13:10 +0000 Donald Hunter wrote:
+>>      return headroom(level) + "[" + ", ".join(inline(i) for i in list_) + "]"
+>>  
+>> +def rst_ref(prefix: str, name: str) -> str:
+>
+> I think python coding guidelines call for 2 empty lines between
+> functions? There's another place where this is violated in the patch.
 
-Since iucv_setmask_up() is only called with iucv_register_mutex held,
-you could simply add a 'static' for @cpumask variable.
+Good catch. I'll fix in v2.
 
+> FWIW I also feel like the using the global directly is a bit too hacky.
+> Dunno how much work it'd be to pass it in, but if it's a lot let's at
+> least define it at the start of the file and always have "global family"
+> before the use?
 
-
-> +
->         /* Disable all cpu but the first in cpu_irq_cpumask. */
-> -       cpumask_copy(&cpumask, &iucv_irq_cpumask);
-> -       cpumask_clear_cpu(cpumask_first(&iucv_irq_cpumask), &cpumask);
-> -       for_each_cpu(cpu, &cpumask)
-> +       cpumask_copy(cpumask, &iucv_irq_cpumask);
-> +       cpumask_clear_cpu(cpumask_first(&iucv_irq_cpumask), cpumask);
-> +       for_each_cpu(cpu, cpumask)
->                 smp_call_function_single(cpu, iucv_block_cpu, NULL, 1);
-> +
-> +       free_cpumask_var(cpumask);
->  }
+I will just bite the bullet and pass a parameter in everywhere for v2.
 
