@@ -1,76 +1,57 @@
-Return-Path: <netdev+bounces-83415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B4BB892323
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:06:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBA3892333
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:17:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEE301C20E14
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:06:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 409EDB21687
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6331327ED;
-	Fri, 29 Mar 2024 18:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4B01DA4C;
+	Fri, 29 Mar 2024 18:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e0Xduiym"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JufO63/U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C553533CC4
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9885F13777B
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711735604; cv=none; b=OKJabklI69EdABTAutjb7dFeMRl3BvbSULe2/PqRpBFCRQHoBx76QF28EHEQxSrKN2KjILqTWro34Bdgon3TH/2AXYrCjwWK7fxKjQ+xBCBA0hxVgWn6+qg7z4BmXWZvr/1faO2GU4i6JwwU5RlIzcAuOZkZ5ddK+4GGIngFPGg=
+	t=1711736215; cv=none; b=J87PQmsA3/lHr1Tz8ZEZybvR7zriLeTqfWXSUzYhZtXCDraCXW4QK8cLNHj0xrCT7eU2InQY1zr6jpsVO+irpaKzBnzB+NXoKAAJcn0PaZtWGjQD8mF3gezXhxHEw+C0iOsH6gWZCPxRbKxs//4VB3MGHf8MYOuR5FiTZIs3LyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711735604; c=relaxed/simple;
-	bh=0Ctkc+RGXBQT6208+acgxNUi0VdYj+MIkSItUaKZE5Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s+aCOs8IbXTD+o9GtG7ltUiDT++x+LJwiRK0CwkAx1WU21vRPHZYuiwS5tsmbHvCaTbUOze604Il8YSziWJypnzF7ksXireCEMKFYZ3P+efhCO667cXqjIonq0YtD3ERAyrdlzQO9Tsgq2qroqpT0AAaQQgnTgzokMvideW4I2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e0Xduiym; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711735603; x=1743271603;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0Ctkc+RGXBQT6208+acgxNUi0VdYj+MIkSItUaKZE5Q=;
-  b=e0XduiymtbbVX/hb+I60Fgz18iDxVH5yGGdN8sgOLQF/jUW8klpSe7wU
-   k1+Oz9Baf9Ee40BxMFlSMlfcP5ceV2y1Dzj2AuPFM6o+OPhq3Rk8/qvlq
-   X/4YcAWtU36IOLux5zCbZUFxB/V8EVIV7qtQidsaN0CjVNxvk8KUHUfSr
-   vi8mtzZiG8xN1bWmSNjm2eAo22z9BzRByxzq3bOV6ZUp6rCmCx+156j2J
-   GTWSZtVxPE7+ONXbzfhc39rNEdGojsXOGX/4b0UG7m6CprcmdjJiU6Hoq
-   RFcAqer82uDJfDxp0MkuYH3X87P3qJi32uImcGscOkA2QKXo40Hi+qT42
-   Q==;
-X-CSE-ConnectionGUID: IpO55iGRQ4uItyJ3WXQQmw==
-X-CSE-MsgGUID: lKYJHe7nRG6btywCrwGxeA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11028"; a="6826713"
-X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
-   d="scan'208";a="6826713"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 11:06:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
-   d="scan'208";a="17447159"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa007.jf.intel.com with ESMTP; 29 Mar 2024 11:06:41 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	s=arc-20240116; t=1711736215; c=relaxed/simple;
+	bh=sXz78RV7YN0s8/6a2RonuFVZ/rZy7ZQ35FKJvpkxMj4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a/sOf0KGCUXCbUIxxJFa5AKbht1PDhVeJqOWaHR7axpEPjAOMDFqvp2Arrj/Ye76/phIOqBcpM35pbnJI9438+xiLLyxRpI+AcHGSXfRd4q80i9YafXGvikIq/T/VZYPNqgK2A++Fv05k+67r14b50rP2KBdVHgmGKjuFb9aPzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JufO63/U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A43BAC433F1;
+	Fri, 29 Mar 2024 18:16:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711736215;
+	bh=sXz78RV7YN0s8/6a2RonuFVZ/rZy7ZQ35FKJvpkxMj4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JufO63/UqAlmE4GqVRimRMl+23162+G+1ZPLIJHsP2xUhdqY4zqYgBC3zpUcQub+4
+	 VmlTArGr5+mJ8KqCEvAp7cpRlvx8mJ477cuWQ/2y5+xct5lQFaoOGWaDXntAhcddsx
+	 X4+k5MBer1oLNArFSAwyxrZjsSO2dSJ5YqMreWPi9iZrmgaIcfy0gFJiI1XaThVEFF
+	 EVe8bRkrzFy4yf8ytGz2/b4I6ZETFA8kHRy4EP4smNdN9H2aWuzbKKtDyovqiA3yOC
+	 rhL4zHfogdaZNgTW12b/76p4G3pQpWUTkQXdlvi4SrbaLESzxgkOzJE+qfVkfG/lUU
+	 /r2cmiEqGmQIw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Ivan Vecera <ivecera@redhat.com>,
-	anthony.l.nguyen@intel.com,
-	horms@kernel.org,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net] i40e: Fix VF MAC filter removal
-Date: Fri, 29 Mar 2024 11:06:37 -0700
-Message-ID: <20240329180638.211412-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	nicolas.dichtel@6wind.com,
+	sdf@google.com
+Subject: [PATCH net-next] tools: ynl: add ynl_dump_empty() helper
+Date: Fri, 29 Mar 2024 11:16:51 -0700
+Message-ID: <20240329181651.319326-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,64 +60,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Ivan Vecera <ivecera@redhat.com>
+Checking if dump is empty requires a couple of casts.
+Add a convenient wrapper.
 
-Commit 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove
-administratively set MAC") fixed an issue where untrusted VF was
-allowed to remove its own MAC address although this was assigned
-administratively from PF. Unfortunately the introduced check
-is wrong because it causes that MAC filters for other MAC addresses
-including multi-cast ones are not removed.
+Add an example use in the netdev sample, loopback is always
+present so an empty dump is an error.
 
-<snip>
-	if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
-	    i40e_can_vf_change_mac(vf))
-		was_unimac_deleted = true;
-	else
-		continue;
-
-	if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
-	...
-</snip>
-
-The else path with `continue` effectively skips any MAC filter
-removal except one for primary MAC addr when VF is allowed to do so.
-Fix the check condition so the `continue` is only done for primary
-MAC address.
-
-Fixes: 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove administratively set MAC")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+CC: nicolas.dichtel@6wind.com
+CC: sdf@google.com
+---
+ tools/net/ynl/lib/ynl.h        | 12 ++++++++++++
+ tools/net/ynl/samples/netdev.c |  2 ++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 83a34e98bdc7..4efcee7e6feb 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -3139,11 +3139,12 @@ static int i40e_vc_del_mac_addr_msg(struct i40e_vf *vf, u8 *msg)
- 		/* Allow to delete VF primary MAC only if it was not set
- 		 * administratively by PF or if VF is trusted.
- 		 */
--		if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
--		    i40e_can_vf_change_mac(vf))
--			was_unimac_deleted = true;
--		else
--			continue;
-+		if (ether_addr_equal(addr, vf->default_lan_addr.addr)) {
-+			if (i40e_can_vf_change_mac(vf))
-+				was_unimac_deleted = true;
-+			else
-+				continue;
-+		}
+diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
+index 9842e85a8c57..eef7c6324ed4 100644
+--- a/tools/net/ynl/lib/ynl.h
++++ b/tools/net/ynl/lib/ynl.h
+@@ -91,6 +91,18 @@ void ynl_sock_destroy(struct ynl_sock *ys);
+ 	     !ynl_dump_obj_is_last(iter);				\
+ 	     iter = ynl_dump_obj_next(iter))
  
- 		if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
- 			ret = -EINVAL;
++/**
++ * ynl_dump_empty() - does the dump have no entries
++ * @dump: pointer to the dump list, as returned by a dump call
++ *
++ * Check if the dump is empty, i.e. contains no objects.
++ * Dump calls return NULL on error, and terminator element if empty.
++ */
++static inline bool ynl_dump_empty(void *dump)
++{
++	return dump == (void *)YNL_LIST_END;
++}
++
+ int ynl_subscribe(struct ynl_sock *ys, const char *grp_name);
+ int ynl_socket_get_fd(struct ynl_sock *ys);
+ int ynl_ntf_check(struct ynl_sock *ys);
+diff --git a/tools/net/ynl/samples/netdev.c b/tools/net/ynl/samples/netdev.c
+index 591b90e21890..3e7b29bd55d5 100644
+--- a/tools/net/ynl/samples/netdev.c
++++ b/tools/net/ynl/samples/netdev.c
+@@ -100,6 +100,8 @@ int main(int argc, char **argv)
+ 		if (!devs)
+ 			goto err_close;
+ 
++		if (ynl_dump_empty(devs))
++			fprintf(stderr, "Error: no devices reported\n");
+ 		ynl_dump_foreach(devs, d)
+ 			netdev_print_device(d, 0);
+ 		netdev_dev_get_list_free(devs);
 -- 
-2.41.0
+2.44.0
 
 
