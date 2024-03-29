@@ -1,150 +1,130 @@
-Return-Path: <netdev+bounces-83207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0240891592
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:14:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9C08915BD
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:26:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D14311C219E1
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:14:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C3BD1C22A6C
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52043BBE6;
-	Fri, 29 Mar 2024 09:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CD62B9B0;
+	Fri, 29 Mar 2024 09:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gi2j3e/A"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LttTPZGE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A78F39FD1
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 09:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9521E4A99C
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 09:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711703635; cv=none; b=ma/2mA/vDnqVJoZ4oKT5cSHF4s8KHYpiikLveZlc2pfSenRmk0vgoHZ5ilB50iadDfuRvfPyWEphnUc/ltlvIWUjPrUzqlnU2LIBLvqu7h2hpfGK6ThMoANefGiFeq/MRFSrbryvpwdkzprcunt5grVjVgrrQZDbyVLvkWf3VNI=
+	t=1711704347; cv=none; b=TOndugsR1R5zQB09dCaf5fwzWjcwyZ15IVPx92Psk9MjW8CH3OYMDRc9nzVE2RYfH5G7ASPx63OPxshzQnf4EIe1J+C3tvSkrjNTOnAVxMlBvrcOKgAkCLBd2As85HEXyhKpO5UQyh6lHcTfyfyaBfxUDjsjt6iR+t114CIma5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711703635; c=relaxed/simple;
-	bh=akT/+1m979mnMY8W24pHHlJgtSiN7wS1/4jpNy67k+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MqO7c4+Uqlqg2MKoz3UPpR8xfCXzCMBzZCALtnUcgVMH3H6VPpr1YtiiuJVl/m0k2Xnxgub6Dm/OrPdD6lkruanRj25nztiKnYvnpLYy15WhqZPOSDya8wQNiZZQwdxTi0YmFcWg3GbcxLNFmnfwyOjaDW6kQmMjMlx9SbLWmng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gi2j3e/A; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711703633;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fNcjblgFWtJyfRZQGhShJokchfuADezTJbCospP1zbg=;
-	b=gi2j3e/AIgYoqBD3CB0MtLPmnNzIxS9tbnYQKRxP7r0aNhk7eBNhvYC8Py9bnl2zqBIl/w
-	Ex8PnbU6G/QxPbfGrqldd85SHhLYCfJ+CBdMBbnG9uR70IUg3bR8WD0GrxgYBoYCmvz6Np
-	oT2PsY0TPmsi8rcdWVD0TxZ5prwLjac=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-exQHVatLN3y41EvL8R9xOA-1; Fri, 29 Mar 2024 05:13:50 -0400
-X-MC-Unique: exQHVatLN3y41EvL8R9xOA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4154b265b93so3736445e9.0
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 02:13:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711703629; x=1712308429;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fNcjblgFWtJyfRZQGhShJokchfuADezTJbCospP1zbg=;
-        b=ihFlhGNuaRHtDOELOQfOB3Q8URcSk5oK16pghRHEuWfArk4FBJObrdsbh0R3TrnUpL
-         2SktaVpBq3X0M5YcyTMMDE1F1FjTS4cL4indFBnNbZXtGCmHPReqp1Q7nT/i0eta+B2o
-         zb6gUeAEDNbLRPZaWAbfGsaiTmzz3zkOGpZJzHuG6khowtD+RqlA3U6uzhnGhkKD/NgI
-         YIBQLLrhOuhMlvmHoq2c1cDRIoA7vjll9zQBmZUuH31EnLtaakrnvDVFxDcEuKF7igbO
-         3peF0ZMzJ73vFQVVMJfS7MrNe8SmJkqKZZRIy5pxptsC0lHJ4GHc4olXuJaU8RTTHi+b
-         fdqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVg9e0z5XA6lq2oW2a3qqlGrbxPUqEflD1IEgDBfJc35NDhiaSE20eIOgc+A4PjKHV+oZqSzlSv1+aeTUnvPmlCSFZ8CEsP
-X-Gm-Message-State: AOJu0Yye/fK5m68hSc1FaL1ajzSOumidBfdFgrnbPGZ0qe4jXwfGFLPo
-	ZoFQvkPinV/RWPbG3ZVkSxEgH4fgu8PO3AyVk92juyC4B/RNiIgER8bevoo7m5ia5Dmmo2oGIu5
-	9ihjTbVQ3tH4nD3Cc6duthU9GEyhVThq9NRcsSc9u7GnbGH49N5exEUrzzCCxtg==
-X-Received: by 2002:a05:600c:1c02:b0:414:7e73:1f8c with SMTP id j2-20020a05600c1c0200b004147e731f8cmr1166588wms.37.1711703628793;
-        Fri, 29 Mar 2024 02:13:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFyPL8GxMdOr4ky5DOhJ/P8CJcnmJMjnl87YcfQ0EhBPj83zpwUaDSXxDFy2h/tPN+47fKb+Q==
-X-Received: by 2002:a05:600c:1c02:b0:414:7e73:1f8c with SMTP id j2-20020a05600c1c0200b004147e731f8cmr1166566wms.37.1711703628288;
-        Fri, 29 Mar 2024 02:13:48 -0700 (PDT)
-Received: from redhat.com ([2.52.20.36])
-        by smtp.gmail.com with ESMTPSA id he5-20020a05600c540500b00414895d014fsm4767231wmb.41.2024.03.29.02.13.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 02:13:47 -0700 (PDT)
-Date: Fri, 29 Mar 2024 05:13:44 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Wang Rong <w_angrong@163.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Cindy Lu <lulu@redhat.com>
-Subject: Re: [PATCH v3] vhost/vdpa: Add MSI translation tables to iommu for
- software-managed MSI
-Message-ID: <20240329051334-mutt-send-email-mst@kernel.org>
-References: <20240320101912.28210-1-w_angrong@163.com>
- <20240321025920-mutt-send-email-mst@kernel.org>
- <CACGkMEuHRf0ZfBiAYxyNHB3pxuzz=QCWt5VyHPLz-+-+LM=+bg@mail.gmail.com>
- <CACGkMEuM9bdvgH7_v6F=HT-x10+0tCzG56iuU05guwqNN1+qKQ@mail.gmail.com>
+	s=arc-20240116; t=1711704347; c=relaxed/simple;
+	bh=SiFhzy8Dzb88IW3DhGTg7DK++p/eHDcqL5kDh9xXjbw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pbnK8eBX5vXEbcMoGeGjO7kDVA1KnN4syt+3I0MGFpLfA4H8zr8Xz4pt9bxig1E305xhbofvdnW5KXHgLIpYPJmNfjJ8zjwrl7nrdXKjW92e8inLcbUfvXBYiR543rvxWLyumO6OYzsJZJ7WKN8hv29eS8PPtpzAjOJ3NIzLI5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LttTPZGE; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711704346; x=1743240346;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SiFhzy8Dzb88IW3DhGTg7DK++p/eHDcqL5kDh9xXjbw=;
+  b=LttTPZGEQ5/r/WkM+7CY3/deWIvUiiO02VqvyDmorGx2bnwZ5Kw33viw
+   RvwriAz52CCP0Dfr1gmmmnCrjX6f4T6mRgRozEhOhjf9sve5LZdpQv6+N
+   rUF2URGE70v1qr8QvxxjqJOAGxYiYfvsvXIy5MeHNM+svDsOtuC3RdV9F
+   1zaE6djIdGjm8Stwsfz2Gp0rrHhYBFBBzLazVxUQKHQA7ws+ZdyDMfQAB
+   ywFztgnTA6CjUymx+nVrt2+vezpCQD/q7DeGrMTe56iZbZsvdLLpwm6Gn
+   Uy5u3I1qypHCKlxmc/vuhGxuLQ+waJLIWuYKUnGMOBJkrpZ7DnQ4aCzZB
+   g==;
+X-CSE-ConnectionGUID: YdjKs4QcRByJQHATRSuIbg==
+X-CSE-MsgGUID: m/Q4KiwOTi6RwlYRNTqvWw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="7107013"
+X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
+   d="scan'208";a="7107013"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 02:25:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
+   d="scan'208";a="16986841"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa008.fm.intel.com with ESMTP; 29 Mar 2024 02:25:34 -0700
+Received: from rozewie.igk.intel.com (unknown [10.211.8.69])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id E9EDF3433E;
+	Fri, 29 Mar 2024 09:25:30 +0000 (GMT)
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	simon.horman@corigine.com,
+	anthony.l.nguyen@intel.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	idosch@nvidia.com,
+	przemyslaw.kitszel@intel.com,
+	marcin.szycik@linux.intel.com
+Subject: [PATCH net-next 0/3] ethtool: Max power support
+Date: Fri, 29 Mar 2024 10:23:18 +0100
+Message-Id: <20240329092321.16843-1-wojciech.drewek@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEuM9bdvgH7_v6F=HT-x10+0tCzG56iuU05guwqNN1+qKQ@mail.gmail.com>
 
-On Fri, Mar 29, 2024 at 11:55:50AM +0800, Jason Wang wrote:
-> On Wed, Mar 27, 2024 at 5:08 PM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > On Thu, Mar 21, 2024 at 3:00 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Wed, Mar 20, 2024 at 06:19:12PM +0800, Wang Rong wrote:
-> > > > From: Rong Wang <w_angrong@163.com>
-> > > >
-> > > > Once enable iommu domain for one device, the MSI
-> > > > translation tables have to be there for software-managed MSI.
-> > > > Otherwise, platform with software-managed MSI without an
-> > > > irq bypass function, can not get a correct memory write event
-> > > > from pcie, will not get irqs.
-> > > > The solution is to obtain the MSI phy base address from
-> > > > iommu reserved region, and set it to iommu MSI cookie,
-> > > > then translation tables will be created while request irq.
-> > > >
-> > > > Change log
-> > > > ----------
-> > > >
-> > > > v1->v2:
-> > > > - add resv iotlb to avoid overlap mapping.
-> > > > v2->v3:
-> > > > - there is no need to export the iommu symbol anymore.
-> > > >
-> > > > Signed-off-by: Rong Wang <w_angrong@163.com>
-> > >
-> > > There's in interest to keep extending vhost iotlb -
-> > > we should just switch over to iommufd which supports
-> > > this already.
-> >
-> > IOMMUFD is good but VFIO supports this before IOMMUFD. This patch
-> > makes vDPA run without a backporting of full IOMMUFD in the production
-> > environment. I think it's worth.
-> >
-> > If you worry about the extension, we can just use the vhost iotlb
-> > existing facility to do this.
-> >
-> > Thanks
-> 
-> Btw, Wang Rong,
-> 
-> It looks that Cindy does have the bandwidth in working for IOMMUFD support.
+Some ethernet modules use nonstandard power levels [1]. Extend ethtool
+module implementation to support new attributes that will allow user
+to change maximum power. Rename structures and functions to be more
+generic. Introduce an example of the new API in ice driver.
 
-I think you mean she does not.
+Ethtool examples:
+$ ethtool --show-module enp1s0f0np0
+Module parameters for enp1s0f0np0:
+power-min-allowed: 1000 mW
+power-max-allowed: 3000 mW
+power-max-set: 1500 mW
 
-> Do you have the will to do that?
-> 
-> Thanks
+$ ethtool --set-module enp1s0f0np0 power-max-set 4000
+
+This idea was originally discussed here [2]
+
+[1] https://www.fs.com/de-en/products/69111.html
+[2] https://lore.kernel.org/netdev/MW4PR11MB57768054635E8DEF841BB2A9FDE3A@MW4PR11MB5776.namprd11.prod.outlook.com/
+
+Wojciech Drewek (3):
+  ethtool: Make module API more generic
+  ethtool: Introduce max power support
+  ice: Implement ethtool max power configuration
+
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  21 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |  46 ++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   3 +
+ drivers/net/ethernet/intel/ice/ice_devlink.c  |  14 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  | 461 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_nvm.c      |   2 +-
+ drivers/net/ethernet/intel/ice/ice_nvm.h      |   3 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   4 +
+ .../net/ethernet/mellanox/mlxsw/core_env.c    |   2 +-
+ .../net/ethernet/mellanox/mlxsw/core_env.h    |   2 +-
+ drivers/net/ethernet/mellanox/mlxsw/minimal.c |   8 +-
+ .../mellanox/mlxsw/spectrum_ethtool.c         |   8 +-
+ include/linux/ethtool.h                       |  35 +-
+ include/uapi/linux/ethtool_netlink.h          |   4 +
+ net/ethtool/module.c                          | 102 +++-
+ net/ethtool/netlink.h                         |   2 +-
+ 17 files changed, 669 insertions(+), 50 deletions(-)
+
+-- 
+2.40.1
 
 
