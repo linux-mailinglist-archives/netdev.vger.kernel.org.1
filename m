@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-83314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69F8C891AA9
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 14:07:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED9D891AC6
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 14:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C3B91C2579A
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:07:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BFFA1C25C4B
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AA515CD75;
-	Fri, 29 Mar 2024 12:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B725A15ECC3;
+	Fri, 29 Mar 2024 12:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NY0AB8Zr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BgSV/DS9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA1715CD73;
-	Fri, 29 Mar 2024 12:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B75415ECF1;
+	Fri, 29 Mar 2024 12:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715565; cv=none; b=Mx/ongL2qTAWiwwE9cKRsLf7njC/uT/jHjKtiWNmKA5uhP4wYuF3JORijuFzr/gJ71JSgd/ZrKdmO9X3V2c5rVItkS1nLknPz8mOqwQzoqLyxzFQGLHDoNfWjw67PKBVrm3KzZ3ah8J67D1WHP5LYp+ExlPoHxn69rsCXC8QC6A=
+	t=1711715581; cv=none; b=pcaWzBqfh6Bo6cY/MsSKsU/TEzmxCTbfP9fzdjdRHvUgsPC9GbD58bdyWBRth3Xg4jVHZ+7UwHlldxpcqWai7ZgVh+mu8txJNxhJPEZ2/DdpdeFy6IfQHtwJqoE81kb8sxqMtXNcYN5P3hHQMvSF2P+t1PTceV3vDSVCP4Kfos4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715565; c=relaxed/simple;
-	bh=L71kAJ31XL2R0p9Jjp/TNWJTYZ2KQR6EOvJiH99UwsM=;
+	s=arc-20240116; t=1711715581; c=relaxed/simple;
+	bh=aSBzOgThcesMCBVYD8sSDS7JOXh9jaKZ0CAgz+tz7fo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eNiIhP8n4hh8tZD8mO+jIkRmkqw0Ga2egYxhHamZNtSZbHjOPDw5YRRWvsM+oXbZ2nLznnrEOF8QCqJpR8dA2Xrlq5cT3FU8MRKkL8iuTaOXYMarpf2Czl3Qa6qxV3aSLWzaBkNpR2xkXvtMV8/QP4L0DpNsAaBeR5CuZ2GMz7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NY0AB8Zr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD187C433B2;
-	Fri, 29 Mar 2024 12:32:43 +0000 (UTC)
+	 MIME-Version; b=Mzr6VZMhj6WDYiuBYPrn4dGjdk9aGbaEOy/mFiILmPvy0b0Fwi7bd5zOfb5okQk9CTKkcvjEvVU+TGK/QSZPSSNuwOToWgeSgxlZNXMFZmndtXiUOQUgX7OX3kiw1B2oD32TJregFUkw2Jh5ilZ6nigyLo+pdDnOoNVJ/sRTrPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BgSV/DS9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F27AEC433C7;
+	Fri, 29 Mar 2024 12:32:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715565;
-	bh=L71kAJ31XL2R0p9Jjp/TNWJTYZ2KQR6EOvJiH99UwsM=;
+	s=k20201202; t=1711715581;
+	bh=aSBzOgThcesMCBVYD8sSDS7JOXh9jaKZ0CAgz+tz7fo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NY0AB8ZrlMgvjO/0F2aUUC3eDuQccAD1eoiU7NyQTPKUsOm21Z+0zVs8ZS4paf9CA
-	 oPAM9JiP8grBNqF23zyL8H+KmjeJWM6z1yy6zW3DGN6NVS3zFh4+x8+Lql19DvdMud
-	 /Jwp34EEqBJ4O0gN0rTFGhbUYUin0w8YLXVLPI/dF51Podf1sxA0FDsGBzlo8Ie+U7
-	 vxTOBvw6iPs/SepU8/KKmBprsvEV+cdJZyd+uqM/CHraNTs+ZnN07hJoA6WmwAOWre
-	 BhCQxkHr7asBGZLIu9To7Lvel3Cq3//vPdnvM5SvcXFIL8Hmg5ZN5I9w1FjWUAcDkO
-	 yUPptpweVBb4g==
+	b=BgSV/DS9GtEYrrVc0c9FZNlU/th0nUCZD18XrvwqIFj9SbnKnCSjfVvBP44bJh330
+	 GlCFuA2SaeGKxphOrmGraHpYGT22VDCIr8KegiRTbSZDSae17xQ4RnneR7LU8RW1/M
+	 gf7CGi6vd8Ap4oU35gJoJJeWFSunIMoPaPLJ6wf3Jr055rSRFhOWbicFkh5E1IFi43
+	 mWNz9/6ycvv20+6aRJDy+xUW31DMiux1stVghCiuuGNdmqpG7uwyeo/7Ri8o6Lrf+s
+	 eAT7ovrvya9gFw9ImhlohUDj+2etamv0j5nM0bI4xvAoWazq+0VIF85OfGn6KHyULg
+	 Sy5Fwy8/+J/ww==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Serge Semin <fancer.lancer@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Rafal Romanowski <rafal.romanowski@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	Jose.Abreu@synopsys.com,
-	hkallweit1@gmail.com,
+	jesse.brandeburg@intel.com,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 18/31] net: pcs: xpcs: Return EINVAL in the internal methods
-Date: Fri, 29 Mar 2024 08:31:37 -0400
-Message-ID: <20240329123207.3085013-18-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 28/31] ice: use relative VSI index for VFs instead of PF VSI number
+Date: Fri, 29 Mar 2024 08:31:47 -0400
+Message-ID: <20240329123207.3085013-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240329123207.3085013-1-sashal@kernel.org>
 References: <20240329123207.3085013-1-sashal@kernel.org>
@@ -71,49 +73,102 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.83
 Content-Transfer-Encoding: 8bit
 
-From: Serge Semin <fancer.lancer@gmail.com>
+From: Jacob Keller <jacob.e.keller@intel.com>
 
-[ Upstream commit f5151005d379d9ce42e327fd3b2d2aaef61cda81 ]
+[ Upstream commit 11fbb1bfb5bc8c98b2d7db9da332b5e568f4aaab ]
 
-In particular the xpcs_soft_reset() and xpcs_do_config() functions
-currently return -1 if invalid auto-negotiation mode is specified. That
-value might be then passed to the generic kernel subsystems which require
-a standard kernel errno value. Even though the erroneous conditions are
-very specific (memory corruption or buggy driver implementation) using a
-hard-coded -1 literal doesn't seem correct anyway especially when it comes
-to passing it higher to the network subsystem or printing to the system
-log.  Convert the hard-coded error values to -EINVAL then.
+When initializing over virtchnl, the PF is required to pass a VSI ID to the
+VF as part of its capabilities exchange. The VF driver reports this value
+back to the PF in a variety of commands. The PF driver validates that this
+value matches the value it sent to the VF.
 
-Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-Tested-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Some hardware families such as the E700 series could use this value when
+reading RSS registers or communicating directly with firmware over the
+Admin Queue.
+
+However, E800 series hardware does not support any of these interfaces and
+the VF's only use for this value is to report it back to the PF. Thus,
+there is no requirement that this value be an actual VSI ID value of any
+kind.
+
+The PF driver already does not trust that the VF sends it a real VSI ID.
+The VSI structure is always looked up from the VF structure. The PF does
+validate that the VSI ID provided matches a VSI associated with the VF, but
+otherwise does not use the VSI ID for any purpose.
+
+Instead of reporting the VSI number relative to the PF space, report a
+fixed value of 1. When communicating with the VF over virtchnl, validate
+that the VSI number is returned appropriately.
+
+This avoids leaking information about the firmware of the PF state.
+Currently the ice driver only supplies a VF with a single VSI. However, it
+appears that virtchnl has some support for allowing multiple VSIs. I did
+not attempt to implement this. However, space is left open to allow further
+relative indexes if additional VSIs are provided in future feature
+development. For this reason, keep the ice_vc_isvalid_vsi_id function in
+place to allow extending it for multiple VSIs in the future.
+
+This change will also simplify handling of live migration in a future
+series. Since we no longer will provide a real VSI number to the VF, there
+will be no need to keep track of this number when migrating to a new host.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/pcs/pcs-xpcs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 9 ++-------
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h | 9 +++++++++
+ 2 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index 3f882bce37f42..d126273daab4f 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -262,7 +262,7 @@ static int xpcs_soft_reset(struct dw_xpcs *xpcs,
- 		dev = MDIO_MMD_VEND2;
- 		break;
- 	default:
--		return -1;
-+		return -EINVAL;
- 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 6c03ebf81ffda..e2a737157c3dc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -500,7 +500,7 @@ static int ice_vc_get_vf_res_msg(struct ice_vf *vf, u8 *msg)
+ 	vfres->rss_lut_size = ICE_VSIQF_HLUT_ARRAY_SIZE;
+ 	vfres->max_mtu = ice_vc_get_max_frame_size(vf);
  
- 	ret = xpcs_write(xpcs, dev, MDIO_CTRL1, MDIO_CTRL1_RESET);
-@@ -904,7 +904,7 @@ int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
- 			return ret;
- 		break;
- 	default:
--		return -1;
-+		return -EINVAL;
- 	}
+-	vfres->vsi_res[0].vsi_id = vf->lan_vsi_num;
++	vfres->vsi_res[0].vsi_id = ICE_VF_VSI_ID;
+ 	vfres->vsi_res[0].vsi_type = VIRTCHNL_VSI_SRIOV;
+ 	vfres->vsi_res[0].num_queue_pairs = vsi->num_txq;
+ 	ether_addr_copy(vfres->vsi_res[0].default_mac_addr,
+@@ -546,12 +546,7 @@ static void ice_vc_reset_vf_msg(struct ice_vf *vf)
+  */
+ bool ice_vc_isvalid_vsi_id(struct ice_vf *vf, u16 vsi_id)
+ {
+-	struct ice_pf *pf = vf->pf;
+-	struct ice_vsi *vsi;
+-
+-	vsi = ice_find_vsi(pf, vsi_id);
+-
+-	return (vsi && (vsi->vf == vf));
++	return vsi_id == ICE_VF_VSI_ID;
+ }
  
- 	if (compat->pma_config) {
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.h b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+index b5a3fd8adbb4e..6073d3b2d2d65 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.h
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+@@ -18,6 +18,15 @@
+  */
+ #define ICE_MAX_MACADDR_PER_VF		18
+ 
++/* VFs only get a single VSI. For ice hardware, the VF does not need to know
++ * its VSI index. However, the virtchnl interface requires a VSI number,
++ * mainly due to legacy hardware.
++ *
++ * Since the VF doesn't need this information, report a static value to the VF
++ * instead of leaking any information about the PF or hardware setup.
++ */
++#define ICE_VF_VSI_ID	1
++
+ struct ice_virtchnl_ops {
+ 	int (*get_ver_msg)(struct ice_vf *vf, u8 *msg);
+ 	int (*get_vf_res_msg)(struct ice_vf *vf, u8 *msg);
 -- 
 2.43.0
 
