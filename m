@@ -1,202 +1,259 @@
-Return-Path: <netdev+bounces-83227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9651889168C
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:10:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A741A8916B2
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:23:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8CD91C2230B
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:10:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E1D91F23577
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6224A524D3;
-	Fri, 29 Mar 2024 10:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B01535B4;
+	Fri, 29 Mar 2024 10:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLg4l/Ql"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC086524AA;
-	Fri, 29 Mar 2024 10:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C741535D0;
+	Fri, 29 Mar 2024 10:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711707034; cv=none; b=j1uyf9TDKIu8+NNax/3+z2oYW9Xr2mAacr0cACa1h+m3FBoH+CzYxqls2r34Z4CMrTHvk2cquZVt9+2hoNBQNEhgjeqb2ytuZ27k2AQXt66ZNWeZipYUpVJyAXdzkSD/SRPsIpN7gwEG8LUYUNxQYMDG7QKKXG/iFlLHhQRHY84=
+	t=1711707789; cv=none; b=GdHh4g9yzfnpKxe7cG2pzh3Td1b0ZmUlvvkGi0Kqk2ZDuOULv3uzebEbN0puQ24f0rOHOywYf2h4fPt4PHz1a75nwy4rDByyHBZbcRxjfyrVNGO4JpJb7VJFyK+VWh54mNTh13JvpK71uYwLtymKujt+4u0W0Tyf9z4hm0iqXlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711707034; c=relaxed/simple;
-	bh=w7g6I0XBH1zUDRQIq3sT4lHswdF1zZZjTZgR0tQTy28=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C6r6IIsDGbeu7nN9BrdoXwuyi0/JJhVhzoZYhYgMIXOc6e6AO6W7Rb9m74R9gVqKCzgQpm3bv4SNtd0AskZ1AgPq8nKRXhITtKsNfbOaolSoBWGmnNAFMK10z+to899o8musWSTk5CCFh0qS+DuhHLc3E3cjytoPnereJO0LIUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V5bkl4ZRNz4f3jkg;
-	Fri, 29 Mar 2024 18:10:23 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id B82E91A12A3;
-	Fri, 29 Mar 2024 18:10:27 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP3 (Coremail) with SMTP id _Ch0CgCnaKCPkwZm3Js0IQ--.42308S2;
-	Fri, 29 Mar 2024 18:10:23 +0800 (CST)
-Message-ID: <e995a1f1-0b48-4ce3-a061-5cbe68beb6dd@huaweicloud.com>
-Date: Fri, 29 Mar 2024 18:10:23 +0800
+	s=arc-20240116; t=1711707789; c=relaxed/simple;
+	bh=m5vhWQy+PY6+1d7TO9Fvs0/o49rPQMvxSJXHB6kgO00=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UTjH72D2Ig8hhqpcfzxC9/+2hMsiK5V1pA0HWTWrWJ+5eHYO1XqKMBvDkHYIuyvcOE53uIpo/4YWJkZbm2+n67iaZwz4jIOg8TaSfskJXvCYGlcn7F6rjdiNokxsBesl9xfYgScoLfLSlna4iU/RZPVPi0j+SpFnCE3vqljoaqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DLg4l/Ql; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a46ea03c2a5so338199166b.1;
+        Fri, 29 Mar 2024 03:23:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711707786; x=1712312586; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+TUuNHvMMKVcm/3UfHRwY6GOFwJQHmIlXuumJcrhUmc=;
+        b=DLg4l/QlMccvDPYL2XBfTlC2LoNL8GdOmNj7aXrctPM4knQMrLEzMZIMBQP4muAUyf
+         LPbPO6ZcqwZIUcy6LRYfUWSw/Tblv3LANbroch9staXUrRbVW20Paox6DUgLoi9sGkVY
+         HoEfdUnkgUiCrdwh5wipvz/ajWcrUBEUq9EMqKzanzVr+3cYEU5KHthR04HPNysDrHjU
+         MJSdZ5jRh6Tl75s376gefHJc31Ft+Y8GOxabpLM7L+JFKdc3boxqyCH64RzdegYQVbTi
+         DMsVnnpbDli8IYpWmozESyggJCWOvefmXJSZUHzLjfWr+tVSxI/lPwFdnmaN+tuNZBDF
+         fY2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711707786; x=1712312586;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+TUuNHvMMKVcm/3UfHRwY6GOFwJQHmIlXuumJcrhUmc=;
+        b=h01Laec7Nez8Ovih3ZORcAUeofJ5Nez+1EN1TFA9KWwXZn14+0vhbkU/jXOfZE7HIk
+         9aBWF+G4yaN9F31OdkVkCn44sK1kUMNOkGcV0ShxsWCsOl00FEpkjbS+zUKy0IFor2Fd
+         NsAnuFn58kTlMJ9L4Y7KzFA+4Re1wUJGbMmuwWsyNTH9+q1Fe9T8U3JlyhX4RoX9PPgT
+         jumDScgr+6sbxeRreygCkQB5SA2H5ozJ0T2MOo2kyXc1E6hx9CgVPn8wKQXlEMyZ4IEY
+         lg9IJdjS3FBki3TCOW8UAt6MvtOF94vzAYKYmGpO7eFLoX5FNVjibRq1g2PFWCDH81Fo
+         WWdg==
+X-Forwarded-Encrypted: i=1; AJvYcCXAtAO+TpM8veCjl3eQbH7KpEn6skrikH5hZ8get2wOyKlnFh3o0d5gm0r7if3R88yrI5+UucGfdEkzQFBdshBDoRd0Pe0jOyvKP1kkyxsB/KgVUzkMCBacw28pIrqa3YoV8Y7FQAHMHk9n
+X-Gm-Message-State: AOJu0YzQXjrhxfjbIDLevU3jOMLeRjMqz8gcjR34cxD/y1fpbh4ykDCh
+	D+KbqefFaEXiFUasscYscOUk0fjKhUQ6aZvWXLs2oNxu0r4t1jAWTa/BwhgFs6m3+MVFXRtU5FM
+	CI2JKBprSuJkvORevdTr+mmLzcBY=
+X-Google-Smtp-Source: AGHT+IEM9j09EY9K64dThaPlzNEMucWJvjtsaSQQpo3iufZFv63EqCRunseFvN9pd0WyrZgZ0pmZNqaxK2eYcKhD9t4=
+X-Received: by 2002:a17:906:d95:b0:a44:e5ed:3d5d with SMTP id
+ m21-20020a1709060d9500b00a44e5ed3d5dmr1815750eji.9.1711707785510; Fri, 29 Mar
+ 2024 03:23:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 0/5] Support local vmtest for riscv64
-Content-Language: en-US
-To: Eduard Zingerman <eddyz87@gmail.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Manu Bretelle <chantr4@gmail.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20240328124916.293173-1-pulehui@huaweicloud.com>
- <32b3358903bf8ba408812a2636f39a275493eb91.camel@gmail.com>
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <32b3358903bf8ba408812a2636f39a275493eb91.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_Ch0CgCnaKCPkwZm3Js0IQ--.42308S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxur1Uur1rtFyxWFW3tF1fWFg_yoW5KrWfpr
-	WrA3ZakF1kXF17tF1xGa1DuF42qwn5ta17Ww18G34rua1qyFnYgFsYya10gay3Zw4UGw4Y
-	ya9IgFyYkFn5u3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI
-	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
-	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY
-	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6x
-	AIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UdxhLUUUUU=
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+References: <20240329034243.7929-1-kerneljasonxing@gmail.com>
+ <20240329034243.7929-3-kerneljasonxing@gmail.com> <CANn89iK35sZ7yYLfRb+m475b7kg+LHw4nV9qHWP7aQtLvBoeMA@mail.gmail.com>
+In-Reply-To: <CANn89iK35sZ7yYLfRb+m475b7kg+LHw4nV9qHWP7aQtLvBoeMA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 29 Mar 2024 18:22:28 +0800
+Message-ID: <CAL+tcoBt0DxdSbb5PES8uYgeyBqThUyS_J4d3hUuxZv8=J0H9A@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/3] trace: tcp: fully support trace_tcp_send_reset
+To: Eric Dumazet <edumazet@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com, rostedt@goodmis.org, 
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Mar 29, 2024 at 5:07=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Fri, Mar 29, 2024 at 4:43=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Prior to this patch, what we can see by enabling trace_tcp_send is
+> > only happening under two circumstances:
+> > 1) active rst mode
+> > 2) non-active rst mode and based on the full socket
+> >
+> > That means the inconsistency occurs if we use tcpdump and trace
+> > simultaneously to see how rst happens.
+> >
+> > It's necessary that we should take into other cases into considerations=
+,
+> > say:
+> > 1) time-wait socket
+> > 2) no socket
+> > ...
+> >
+> > By parsing the incoming skb and reversing its 4-tuple can
+> > we know the exact 'flow' which might not exist.
+> >
+> > Samples after applied this patch:
+> > 1. tcp_send_reset: skbaddr=3DXXX skaddr=3DXXX src=3Dip:port dest=3Dip:p=
+ort
+> > state=3DTCP_ESTABLISHED
+> > 2. tcp_send_reset: skbaddr=3D000...000 skaddr=3DXXX src=3Dip:port dest=
+=3Dip:port
+> > state=3DUNKNOWN
+> > Note:
+> > 1) UNKNOWN means we cannot extract the right information from skb.
+> > 2) skbaddr/skaddr could be 0
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  include/trace/events/tcp.h | 39 ++++++++++++++++++++++++++++++++++++--
+> >  net/ipv4/tcp_ipv4.c        |  4 ++--
+> >  net/ipv6/tcp_ipv6.c        |  3 ++-
+> >  3 files changed, 41 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+> > index 194425f69642..289438c54227 100644
+> > --- a/include/trace/events/tcp.h
+> > +++ b/include/trace/events/tcp.h
+> > @@ -78,11 +78,46 @@ DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
+> >   * skb of trace_tcp_send_reset is the skb that caused RST. In case of
+> >   * active reset, skb should be NULL
+> >   */
+> > -DEFINE_EVENT(tcp_event_sk_skb, tcp_send_reset,
+> > +TRACE_EVENT(tcp_send_reset,
+> >
+> >         TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
+> >
+> > -       TP_ARGS(sk, skb)
+> > +       TP_ARGS(sk, skb),
+> > +
+> > +       TP_STRUCT__entry(
+> > +               __field(const void *, skbaddr)
+> > +               __field(const void *, skaddr)
+> > +               __field(int, state)
+> > +               __array(__u8, saddr, sizeof(struct sockaddr_in6))
+> > +               __array(__u8, daddr, sizeof(struct sockaddr_in6))
+> > +       ),
+> > +
+> > +       TP_fast_assign(
+> > +               __entry->skbaddr =3D skb;
+> > +               __entry->skaddr =3D sk;
+> > +               /* Zero means unknown state. */
+> > +               __entry->state =3D sk ? sk->sk_state : 0;
+> > +
+> > +               memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
+> > +               memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
+> > +
+> > +               if (sk && sk_fullsock(sk)) {
+> > +                       const struct inet_sock *inet =3D inet_sk(sk);
+> > +
+> > +                       TP_STORE_ADDR_PORTS(__entry, inet, sk);
+> > +               } else {
+>
+> To be on the safe side, I would test if (skb) here.
+> We have one caller with skb =3D=3D NULL, we might have more in the future=
+.
 
+Thanks for the review.
 
-On 2024/3/29 17:08, Eduard Zingerman wrote:
-> On Thu, 2024-03-28 at 12:49 +0000, Pu Lehui wrote:
->> Patch 1 is to enable cross platform testing for local vmtest. The
->> remaining patch adds local vmtest support for riscv64. It relies on
->> commit [0] [1] for better regression.
->>
->> We can now perform cross platform testing for riscv64 bpf using the
->> following command:
->>
->> PLATFORM=riscv64 CROSS_COMPILE=riscv64-linux-gnu- \
->>      tools/testing/selftests/bpf/vmtest.sh -- \
->>          ./test_progs -d \
->>              \"$(cat tools/testing/selftests/bpf/DENYLIST.riscv64 \
->>                  | cut -d'#' -f1 \
->>                  | sed -e 's/^[[:space:]]*//' \
->>                        -e 's/[[:space:]]*$//' \
->>                  | tr -s '\n' ','\
->>              )\"
->>
->> The test platform is x86_64 architecture, and the versions of relevant
->> components are as follows:
->>      QEMU: 8.2.0
->>      CLANG: 17.0.6 (align to BPF CI)
->>      OpenSBI: 1.3.1 (default by QEMU)
->>      ROOTFS: ubuntu jammy (generated by [2])
->>
->> Link: https://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux.git/commit/?id=ea6873118493 [0]
->> Link: https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git/commit/?id=443574b033876c85 [1]
->> Link: https://github.com/libbpf/ci/blob/main/rootfs/mkrootfs_debian.sh [2]
-> 
-> Hello,
-> 
-> I wanted to do a test run for this patch-set but did not figure out
-> how to build rootfs for riscv64 system.
-> 
-> I modified mkrootfs_debian.sh as below, but build command fails:
-> 
-> $ ./rootfs/mkrootfs_debian.sh -d jammy -a riscv64 -m http://de.archive.ubuntu.com/ubuntu
-> ...
-> E: Couldn't download http://de.archive.ubuntu.com/ubuntu/dists/jammy/main/binary-riscv64/Packages
-> 
-> Apparently jammy does not have binaries built for riscv64, or I'm failing to find correct mirror.
-> Could you please provide some instructions on how to prepare rootfs?
+How about changing '} else {' to '} else if (skb) {', then if we go
+into this else-if branch, we will print nothing, right? I'll test it
+in this case.
 
-Hi Eduard, We need the mirror repository of ubuntu-ports, you could try 
-http://de.ports.ubuntu.com/.
+>
+> > +                       /*
+> > +                        * We should reverse the 4-tuple of skb, so lat=
+er
+> > +                        * it can print the right flow direction of rst=
+.
+> > +                        */
+> > +                       TP_STORE_ADDR_PORTS_SKB(skb, entry->daddr, entr=
+y->saddr);
+> > +               }
+> > +       ),
+> > +
+> > +       TP_printk("skbaddr=3D%p skaddr=3D%p src=3D%pISpc dest=3D%pISpc =
+state=3D%s",
+> > +                 __entry->skbaddr, __entry->skaddr,
+> > +                 __entry->saddr, __entry->daddr,
+> > +                 __entry->state ? show_tcp_state_name(__entry->state) =
+: "UNKNOWN")
+> >  );
+> >
+> >  /*
+> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> > index a22ee5838751..d5c4a969c066 100644
+> > --- a/net/ipv4/tcp_ipv4.c
+> > +++ b/net/ipv4/tcp_ipv4.c
+> > @@ -868,10 +868,10 @@ static void tcp_v4_send_reset(const struct sock *=
+sk, struct sk_buff *skb)
+> >          */
+> >         if (sk) {
+> >                 arg.bound_dev_if =3D sk->sk_bound_dev_if;
+> > -               if (sk_fullsock(sk))
+> > -                       trace_tcp_send_reset(sk, skb);
+> >         }
+>
+> Remove the { } ?
 
-> 
-> Thanks,
-> Eduard
-> 
-> --
-> 
-> diff --git a/rootfs/mkrootfs_debian.sh b/rootfs/mkrootfs_debian.sh
-> index dfe957e..1d5b769 100755
-> --- a/rootfs/mkrootfs_debian.sh
-> +++ b/rootfs/mkrootfs_debian.sh
-> @@ -16,6 +16,7 @@ CPUTABLE="${CPUTABLE:-/usr/share/dpkg/cputable}"
->   
->   deb_arch=$(dpkg --print-architecture)
->   distro="bullseye"
-> +mirror=""
->   
->   function usage() {
->       echo "Usage: $0 [-a | --arch architecture] [-h | --help]
-> @@ -25,6 +26,7 @@ By default build an image for the architecture of the host running the script.
->   
->       -a | --arch:    architecture to build the image for. Default (${deb_arch})
->       -d | --distro:  distribution to build. Default (${distro})
-> +    -m | --mirror:  mirror for distribution to build. Default (${mirror})
->   "
->   }
->   
-> @@ -44,7 +46,7 @@ function qemu_static() {
->       # Given a Debian architecture find the location of the matching
->       # qemu-${gnu_arch}-static binary.
->       gnu_arch=$(debian_to_gnu "${1}")
-> -    echo "qemu-${gnu_arch}-static"
-> +    echo "qemu-${gnu_arch}"
->   }
->   
->   function check_requirements() {
-> @@ -95,7 +97,7 @@ function check_requirements() {
->       fi
->   }
->   
-> -TEMP=$(getopt  -l "arch:,distro:,help" -o "a:d:h" -- "$@")
-> +TEMP=$(getopt  -l "arch:,distro:,mirror:,help" -o "a:d:m:h" -- "$@")
->   if [ $? -ne 0 ]; then
->       usage
->   fi
-> @@ -113,6 +115,10 @@ while true; do
->               distro="$2"
->               shift 2
->               ;;
-> +        --mirror | -m)
-> +            mirror="$2"
-> +            shift 2
-> +            ;;
->           --help | -h)
->               usage
->               exit
-> @@ -162,7 +168,8 @@ debootstrap --include="$packages" \
->       --arch="${deb_arch}" \
->       "$@" \
->       "${distro}" \
-> -    "$root"
-> +    "$root" \
-> +    "${mirror}"
->   
->   qemu=$(which $(qemu_static ${deb_arch}))
->   
+Yes, I forgot to remove them.
 
+Thanks,
+Jason
+
+>
+>
+> >
+> > +       trace_tcp_send_reset(sk, skb);
+> > +
+> >         BUILD_BUG_ON(offsetof(struct sock, sk_bound_dev_if) !=3D
+> >                      offsetof(struct inet_timewait_sock, tw_bound_dev_i=
+f));
+> >
+> > diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+> > index 3f4cba49e9ee..8e9c59b6c00c 100644
+> > --- a/net/ipv6/tcp_ipv6.c
+> > +++ b/net/ipv6/tcp_ipv6.c
+> > @@ -1113,7 +1113,6 @@ static void tcp_v6_send_reset(const struct sock *=
+sk, struct sk_buff *skb)
+> >         if (sk) {
+> >                 oif =3D sk->sk_bound_dev_if;
+> >                 if (sk_fullsock(sk)) {
+> > -                       trace_tcp_send_reset(sk, skb);
+> >                         if (inet6_test_bit(REPFLOW, sk))
+> >                                 label =3D ip6_flowlabel(ipv6h);
+> >                         priority =3D READ_ONCE(sk->sk_priority);
+> > @@ -1129,6 +1128,8 @@ static void tcp_v6_send_reset(const struct sock *=
+sk, struct sk_buff *skb)
+> >                         label =3D ip6_flowlabel(ipv6h);
+> >         }
+> >
+> > +       trace_tcp_send_reset(sk, skb);
+> > +
+> >         tcp_v6_send_response(sk, skb, seq, ack_seq, 0, 0, 0, oif, 1,
+> >                              ipv6_get_dsfield(ipv6h), label, priority, =
+txhash,
+> >                              &key);
+> > --
+> > 2.37.3
+> >
 
