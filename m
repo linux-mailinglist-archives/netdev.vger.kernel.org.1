@@ -1,147 +1,192 @@
-Return-Path: <netdev+bounces-83387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E5EC892188
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:22:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9325F89218E
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 332E92878D9
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:22:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D926DB22668
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3F485925;
-	Fri, 29 Mar 2024 16:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8EF85925;
+	Fri, 29 Mar 2024 16:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5mYIRFy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jfxNd2Iz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18564E1BE
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 16:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711729330; cv=none; b=dib1nzdWMrN2AtPg4/5WjmvsDP3MXa5ElSNgT0CoWoyZzUqpYAgwJzyBLKnk/zUSN0BJTIO6tVhDx7Z2y6feIb+gW5wEdiJNJJigOqQzW5+TYseyeoM3yqxosD92gmPT8laVIyz+ok2VmZ/vlWb8jQT6lMc8+UcQt2J8EnhG9x0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711729330; c=relaxed/simple;
-	bh=riODE1dPTaLbQpz/0beewzGEpd2nIe52VyxmuEiuHaY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZBa5v4Ve/Sqmi1YDVhfJ726IZjXGw2JE1nFxrnSFXleu9VoUU1ZOlE+TY2kxJW29WoaDfxzEMae5gXbMuhvIw7zw6K/B0Se9Y7qgyOnHjJ+nPh65OfUhQtygYehr1XAfDx/wyHb3ub0m1b6m2RxEQiQRr9Rh5yAPygxRfrC+faU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z5mYIRFy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711729327;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fmEyRcPuEinvJiX6Dq129jlFJ6SCvYGxlVcOYHlmNDQ=;
-	b=Z5mYIRFysSKKhXSsiWcg2tj7AzXJCNCgb3TiuUYiVFy3QmUBQSiB63Nh8M/YEQoUTiCekF
-	6LIOVq/R9D/ebdKobrHe1mIn7zQRHwsDeKRg4A/WtkqUp/tu1A6ywlFUoAg/o6Pfx0/f8q
-	Xyvk+mgkR35fTovgn1YY7JrrCOHK/ko=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-2dA5FpKtOjmjx222IXZLhg-1; Fri, 29 Mar 2024 12:22:06 -0400
-X-MC-Unique: 2dA5FpKtOjmjx222IXZLhg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-341cdbcbd62so616441f8f.1
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 09:22:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711729325; x=1712334125;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fmEyRcPuEinvJiX6Dq129jlFJ6SCvYGxlVcOYHlmNDQ=;
-        b=udVYRwd31x9lhfyY23fDcfiTpVvPmSrQp6vesSdsvPiADwf7SBAMl69c1JoqqDbjR4
-         MbYAyRlCbjZYY5JugbWt2IxB+B+TejS+nS+iygBFG6dSJcP0yY2VLHJVv/k0PnfYFkkY
-         +e1/eGu6RA5WD8I1IRsia2irCk2DScf/p/l3p87zKG57BnzKi8JvvBeHvm7kASeD6/CW
-         Ppea2jyr7PaS6D5kpsQT/QPRscbT8K98NXKympLiW1INXGwmIKcGDqZ77pWL3OrSBEfw
-         6YtlLFfthZA8uzTssRTBRxfNyu+8OLaWaHNbcysd+06GvXBKSE8f8kpKHYj97P6KT93R
-         /RmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXJU787T8oRvb3rVvwhMVR837cbvNDDEVwA/pQWFwqbOnuL+xSAtvEdIkTfaNbAZafBzSZjgVVgK2Ps1VGJ13y5TeG+58BA
-X-Gm-Message-State: AOJu0Yy/BjeLEUUshKALtHHmKMuNetENt1DDbINgMcD9imgXTu3dEWOq
-	CoFnUVGdaxzECboOqa9bjpCfzLPCm3qs1PMxbNFzb0Eg67zQPYOsxUlcBU8PfHOSa7U/MFnPFeU
-	XFGEbnS98ICm22KEOyvkxeEsbyh6CZPGz37+H/hc3+vMkPm6Dvi4C3g==
-X-Received: by 2002:adf:f810:0:b0:33e:7750:781d with SMTP id s16-20020adff810000000b0033e7750781dmr1813661wrp.56.1711729325173;
-        Fri, 29 Mar 2024 09:22:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEbg6+AHNtlfHpBhKeqnWBXMq04cVofQNecZMc0Hx1QL8O3mLHrvSVma3HCLwksp4G60St5Bw==
-X-Received: by 2002:adf:f810:0:b0:33e:7750:781d with SMTP id s16-20020adff810000000b0033e7750781dmr1813641wrp.56.1711729324802;
-        Fri, 29 Mar 2024 09:22:04 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-33.business.telecomitalia.it. [87.12.25.33])
-        by smtp.gmail.com with ESMTPSA id u4-20020adff884000000b00341d9e8cc62sm4478654wrp.100.2024.03.29.09.22.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 09:22:04 -0700 (PDT)
-Date: Fri, 29 Mar 2024 17:22:00 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Marco Pinna <marco.pinn95@gmail.com>
-Cc: stefanha@redhat.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, ggarcia@deic.uab.cat, jhansen@vmware.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vge.kernel.org
-Subject: Re: [PATCH net v2] vsock/virtio: fix packet delivery to tap device
-Message-ID: <tglqxtqa47wu53idfssswmrb6ulhnkdlavt27qoxhp2hniwgxc@j3fmzh5wowbc>
-References: <20240329161259.411751-1-marco.pinn95@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A8228DC0
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 16:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711729413; cv=fail; b=kcWkBhSQy2QoLmG314B4/BqIsh53rjVMgFMH29x3+8uJ1y1F+b6eIR0s3hdogV47DseRzMdZi6F6W5BA36QjnMyEUh2/NAgHGjg0UwzGd83WuRTKA12Sl3pV3ijo5TfyPL1a4yjvw1d6KSbcb3CrJ9X9sSuDu9xfh0F2D7hX+b0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711729413; c=relaxed/simple;
+	bh=s/Dg1JtGsQZuQYHVL7BTxMF3FD/xcmxyOdbTYS14pe4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=f4FcJXSelbjRJQ2/L+cf3GmaIzMG7sZMBWOv8rp3LjVUYIQwr+elAvjpAYGvf2wVee9xK8KPJBHBSmPp2dL77DxJjZQDvdXsY4olKWklW/79TOYA8nn+C2IsIiRvRqYje43JjZRSH4bh3I3CMEEs+CLIO1Zqr6s3x9eLa1J+H+A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jfxNd2Iz; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711729412; x=1743265412;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=s/Dg1JtGsQZuQYHVL7BTxMF3FD/xcmxyOdbTYS14pe4=;
+  b=jfxNd2Iz0CYzt0EmIw4favFbVM6z9ORz7d0oliuww/RJAcg3FZQUHOIa
+   PYYIK2biaROgfvX3u39gTPd9BcLEkPwQmPfrS+i0T00YfL4qmMzh4hriZ
+   tevV7lI9C0QsFQrk1fT2G9WIgDRK/E+V37dBuf2iWMX6k4Si1wvGKtxEL
+   V0z9qZXLqcCXDyUvEXOlzybaWcGbLOrBLYmS9j+afk0ABK8fKKbQPrgEH
+   II6bcIZe7EMzQTiHqjguSR5due2yP5K/kuBilASTPllnmdd6zwVCpKUfz
+   p6pJ8Cic8I3K4XaK5dPI28/4mhKleiEVF4Qm3oJyaKScHYifso484R9BX
+   A==;
+X-CSE-ConnectionGUID: RB1mp8euTzePvOOLR4kn2Q==
+X-CSE-MsgGUID: QAa8r6E8T7+dfN8p1SSu9w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11028"; a="7112531"
+X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
+   d="scan'208";a="7112531"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 09:23:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
+   d="scan'208";a="40164945"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Mar 2024 09:23:31 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 29 Mar 2024 09:23:31 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 29 Mar 2024 09:23:31 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 29 Mar 2024 09:23:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SAgbSOdLw+go/QtPoebRI1QR4UQt3VYj2KJ7JrBt8vSwUnVVbUBQbLFaqG/jzdFDUQMGBwF70yES2TPYRMrZ/k+iKLyKIhuNTRVJOldhscRPbFtHR4bAkasfX3JbO2ExEDLzBWhMVOF/BPanGdDvnKeD36MVfW2ATaQrMWOHviUpprp/GxHmxBQvs0a+Dzys5w1uNBV12DyEEJ12+Vh5xlIvErh1al5/aFk03LCv4eTUKcXJx/mcPUOeL/XNZ9LdRDoBFQUa+PGMGdyl+Rkl5Efuxm2fYr4OBCh0LWMsx9lcoGyehgHcsBC+EeyaJ+pu09G9EBRjBkZTpb8Hk8yLSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=h4R8GBWA63WH4EVoWhl5GdYg1A17UX0s4vly2LFsOZ0=;
+ b=ZV5ffSSvpb2KvSl2jcIUmeghJzp97t9VNKfeG+fFV6bCr9IQPxtV7yB2Q6Cc90MBYZUfE+0bMEtA4nmq/L10dJjgzebe86HK1skhZCo1qerGh2hgJHBuz7Hbg3P5ES1n6Hi8vMfs0lnvMmdq1S4zbYKpCCoTQVyx6TxDQvsqCytlrfE9HM7rjxpw4iuS5PKpeR3IqrCpiRAOFrZkqRKmi3snVlA3SbwWwwL19TAEyLJQCZlTLTpGVWgztyWWWraEf355jG4QUyq5FTkqhQzWhbOO++6UMfzoCCAqU8bbQm0nU+vm6UbyE1JsP4yZGfyul4ZQssGcaSqW8bLiHJo86w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by IA0PR11MB7837.namprd11.prod.outlook.com (2603:10b6:208:406::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Fri, 29 Mar
+ 2024 16:23:28 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308%4]) with mapi id 15.20.7409.031; Fri, 29 Mar 2024
+ 16:23:28 +0000
+Message-ID: <ec2aa7da-a3dc-36f2-39bc-052e9ba97de0@intel.com>
+Date: Fri, 29 Mar 2024 09:23:25 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v4 iwl-next 00/12] Introduce ETH56G PHY model for E825C
+ products
+To: Karol Kolacinski <karol.kolacinski@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <jesse.brandeburg@intel.com>
+References: <20240329161730.47777-14-karol.kolacinski@intel.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20240329161730.47777-14-karol.kolacinski@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0071.namprd04.prod.outlook.com
+ (2603:10b6:303:6b::16) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240329161259.411751-1-marco.pinn95@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|IA0PR11MB7837:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Rk7/4h9/hnY5/5IRZENyoKIYnCmMxFTFFjyeToTS6PgEExKVy2yQdevKoNQdPr0HPwQPdS6Ua0LUwUE2Q749CNLsmopt7Pu27SfYBGUGvUmlS95WRIN4t2NJkA9udIz5SO7XW489m4Vg7d9QNdYi49KxvPoZ+nY0bQIPDJyTM7GFF5DjyQrr2XkXazJYsZl7Hp4BNnl2SMH+lMDC/ZAvqljg2K5N4SqBGlXIx9gq+N9wZ4RFe43RA0IvH9Jm9zQ0HuyQ3eCqDuJnCZkJS4KIEZJi7xG0pKVCEykZb+7NWi8j4KpHpiSxeZ1k/Q+g3atZHyXU3JhIijjnQS0xjwECmNUPP1JQ46A7DHc6PDQjgHn3/7jhD9LxKzZGgADyUmaGdJTmDraz27RpKoN6sw7NqiaKoyRt67UCRkHxDZbBpF6qpxlGnlbqJRikHjO3gQemvUyiTBW53eZ22Hm57CxBagdacUpHIeThnDL852Nu+pvWbbLP12z0esRkPly/Krhbb6GzX8+dK3tvRVq3UzoU5J+hfIX9Ud9fvCYpaMTo70nJh4YaPa3gvNMqJbQuVf6/h9gV6NC67wkhc4FcSlVomUU1GkZbHjag9kU3qRJSF8gtVBSWCzLbbg2Sg9TW8o+X
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MjhPclRyTWVkcWRUb0RtcVAwMHlEZDFxb09jS1FidWExeWdMcmRxdHNVdVZo?=
+ =?utf-8?B?eVU3anNZWmw2TE9XSCt0Y2lnd3RZR0tTZk5zUnB6OW42dXNPWVB4bVdkSHhR?=
+ =?utf-8?B?U2l2cTQ4cGhXVWpxRU4vSyt3OCs3dFprWnZpQXI2L3pyT3hYNFQyd29kaTJk?=
+ =?utf-8?B?MXJBN2k5T2xreVdIbWpqbGlMcGd2VitKL3pFM2VDQjdBYWJFQ0orQmZ1andt?=
+ =?utf-8?B?Vm5YdlE2OTA1MngxRngvMmhpQzhXem8vRDBqRXcxUnJDcUlMOVVNREF1VmtT?=
+ =?utf-8?B?MnEySFcvOGo0Q3JCVEFHbTByQm4xQzhEZktib2JqMGNvb3hRbVlEMGd0RFNa?=
+ =?utf-8?B?U1Fqb0NROG9kR0tIMWVMMUtFcDBqamM0OEFDVlhIUGcxV3I1NWNweWRkQWJF?=
+ =?utf-8?B?elFXanVTLzd3S2FjQUlDMExYUUkyRHNHVGQ1UFZ3VzE4aUdqOS90U2NnNnJ1?=
+ =?utf-8?B?NEhuVUp5U0tMSnJBV3B6T1dkM1U0a1pPYVp2NVFhNUpuVFNUKytNTjZ0NCtK?=
+ =?utf-8?B?TEVwNm1qL2lRcEN0bzc5Vlh1U0RRVE1wUGNPZU0rb0l5d0gyZ21TS2tCeWxP?=
+ =?utf-8?B?UExTRXJhZlRKRTFzSXllR0p1alpUSE1FWmh2WnlBR01WV1VTbWlLbWRuSVpm?=
+ =?utf-8?B?NjI3YnFpUmxacmxGYWVkRExHSTRGNjc1bFBtVkk2SmhDUWMrZWNsWTlxdzlP?=
+ =?utf-8?B?S0ZmNm1udjNWSEhPZ2Y3WEZ6NGxobUJuYUE2WHN5K1VyL2VoS1hYK0xVOTJ4?=
+ =?utf-8?B?MklkazRuaTJCUGxpSVpEMWs4T1BMVTBDUlh0Wk5vN21rSnQwNnZpa0t6S2RH?=
+ =?utf-8?B?Sjc2R0tWZldzaFdBWk05NHBGYUkzMHJYYldlOHE2bUdkSHNlSlBKTkI4T3E1?=
+ =?utf-8?B?VXYyOXRGM21GYlhiQ282Mi9IY1dPcVBqbGlDNUdnb2JQbFl3NmdvYkZwempu?=
+ =?utf-8?B?N28zYlBWaXM3NTZkYWpnSnpwYkVaRFFpQ3RqOEJWZXMrNVBzVE43UDY4NmdM?=
+ =?utf-8?B?RklPSmwxbUtzaEJWN2NyeFlKVnIvL0pXNWZWeVJIL3Z4dlJvYVpOcUxVV2V0?=
+ =?utf-8?B?bGxLeGIxSnJxclIvWkRyQVpLK3ZQc2VsTGE1MVMrWFVYaDVPajdEdWhQUzcx?=
+ =?utf-8?B?RVhlUEVpV3AxSklVZXMwMEh0bWx5NXF5K0xHcGhSS2M5S2h4V0thQ01rVGs1?=
+ =?utf-8?B?eG9mTzJqVzRXekxBdTNialprbnMzNjhoODNPYnNkRldmdFB2dEMwVjBvd1ZL?=
+ =?utf-8?B?STlXT2RGc2crbDZpQVVwZjQ2VXFaMlZOM09vaERnNXRyVUw1b0NJMVpUMjg1?=
+ =?utf-8?B?Y3VwL01IdmM4SHJ4cUZLVmU4Tko0Uk9aOEtCSW1RNVAxUCt2OXNXTnN1d2Iv?=
+ =?utf-8?B?ckVwVnNHZjVPL0JudlRzc040eDk4aXovcGFDTHhjUXd2MFN5RkxhaWduSGNG?=
+ =?utf-8?B?WmJsVUQxOXBJMFI2QWJHN0JMVFhCN3RyZnpqeHhaVkwyVEJCbHlGbUplcU1t?=
+ =?utf-8?B?ZGpLM0o3WTV2VDZDb2hHRjJqUTlCNWVkOEtWNG5xalJ0QjFiVERkUzRnZzF1?=
+ =?utf-8?B?VUU1SklvVjVxdENZaVIxa3JxZ252bk9xT2x3TEdEV1N6eStRYUo5WUtyMWFR?=
+ =?utf-8?B?bkk1dWZ2T3lvQTJsb05jeGkxamNJN1lDRmNHNVJlNEtqWExDcCttZU1mOEhr?=
+ =?utf-8?B?TjhCODlLT1RxUFBZTkVoZWtFNFMyd1M1OFNZUDVIZ2ZTQ2RkUTRCU2s5SFVH?=
+ =?utf-8?B?cWcvcFBRMXNKV1RkQUF0S2NjZWZiL004d2ZTbm1rb2MzWjB1dWE1UUw1Q3lh?=
+ =?utf-8?B?VEJJcGVRVkdGUjBGREo3dXUwWnA0YTFpY0lqRE1lbUZzTG83YUVyY2NXdXVz?=
+ =?utf-8?B?bWI3eFAydUl3RFBnTll5VGdybHRuejNMNUpJZjhpelZ4enlWbEl0bnBQV2Iy?=
+ =?utf-8?B?OGVlUnZ0TmV3V25PZFBwTEw0Y2JEMUpTd3JKZXNJc1Y2czlQb1U2R2FYUy9K?=
+ =?utf-8?B?TEh6cWZNZkNnMWwxNmZ4T21hQTRvZER4NDdRVFNMWkxmZUVYVlViN0RFeDRN?=
+ =?utf-8?B?ZmNGd0NlVnZMTnRWc0xrRmkvOEFRK3k4V3pFZkhWWmZHMU5TY1g3M3Q5dzRL?=
+ =?utf-8?B?d0dGMmh1SER1N09LNURxOWxlbTlNRzVQc0JtdXNPcVl0VVB2UjVRVE16WjVp?=
+ =?utf-8?B?VEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c947d6ca-affd-4f7b-cbcf-08dc500c913f
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 16:23:28.8584
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CN5ctgVwV0I0LXElDn8NIgjnAFG9rs6CD/8Igbt3wAYubGpeKaOt9IvN8+RgRYkN1OGTvGM4BBEFn64ljwP9GqX+Vc3xb4EbLy+YPP072sE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7837
+X-OriginatorOrg: intel.com
 
-On Fri, Mar 29, 2024 at 05:12:59PM +0100, Marco Pinna wrote:
->Commit 82dfb540aeb2 ("VSOCK: Add virtio vsock vsockmon hooks") added
->virtio_transport_deliver_tap_pkt() for handing packets to the
->vsockmon device. However, in virtio_transport_send_pkt_work(),
->the function is called before actually sending the packet (i.e.
->before placing it in the virtqueue with virtqueue_add_sgs() and checking
->whether it returned successfully).
->Queuing the packet in the virtqueue can fail even multiple times.
->However, in virtio_transport_deliver_tap_pkt() we deliver the packet
->to the monitoring tap interface only the first time we call it.
->This certainly avoids seeing the same packet replicated multiple times
->in the monitoring interface, but it can show the packet sent with the
->wrong timestamp or even before we succeed to queue it in the virtqueue.
->
->Move virtio_transport_deliver_tap_pkt() after calling virtqueue_add_sgs()
->and making sure it returned successfully.
->
->Fixes: 82dfb540aeb2 ("VSOCK: Add virtio vsock vsockmon hooks")
->Cc: stable@vge.kernel.org
->Signed-off-by: Marco Pinna <marco.pinn95@gmail.com>
->---
-> net/vmw_vsock/virtio_transport.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 1748268e0694..ee5d306a96d0 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -120,7 +120,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
-> 		if (!skb)
-> 			break;
->
->-		virtio_transport_deliver_tap_pkt(skb);
-> 		reply = virtio_vsock_skb_reply(skb);
-> 		sgs = vsock->out_sgs;
-> 		sg_init_one(sgs[out_sg], virtio_vsock_hdr(skb),
->@@ -170,6 +169,8 @@ virtio_transport_send_pkt_work(struct work_struct *work)
-> 			break;
-> 		}
->
->+		virtio_transport_deliver_tap_pkt(skb);
->+
-> 		if (reply) {
-> 			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
-> 			int val;
->-- 
->2.44.0
->
+On 3/29/2024 9:09 AM, Karol Kolacinski wrote:
+> E825C products have a different PHY model than E822, E823 and E810 products.
+> This PHY is ETH56G and its support is necessary to have functional PTP stack
+> for E825C products.
+
+It hasn't been 24 hours since the v3 [1]; for larger changes, you should 
+wait longer than that [2].
+
+Also, where's the changelog?
+
+Thanks,
+Tony
+
+[1] 
+https://docs.kernel.org/process/maintainer-netdev.html#resending-after-review
+
+[2] 
+https://lore.kernel.org/intel-wired-lan/20240327075015.7c13a71b@kernel.org/
 
 
