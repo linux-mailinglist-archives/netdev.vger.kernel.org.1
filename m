@@ -1,72 +1,78 @@
-Return-Path: <netdev+bounces-83401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB079892249
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:04:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 896B5892289
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:17:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AE351F26A46
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:04:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 163311F21DEC
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC30813BC2E;
-	Fri, 29 Mar 2024 17:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="HXt1rRSU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BB14EB3C;
+	Fri, 29 Mar 2024 17:16:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8B513BC16;
-	Fri, 29 Mar 2024 17:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5ADB4A0A;
+	Fri, 29 Mar 2024 17:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711731749; cv=none; b=B+2q1Lmi+vDbtoucqHXjP5FByYKInShN7MsIn9xHW7mXR08yozWyLka1ljQETzp630gNzEVy+5cIpac0dQ6w5XbQS5z+7KLV43mdEeBZOIZyA5PsC0pwtuoaTvC3dqlnrRPpn3UcJlluPHhxebUYuhZY0N1lErwKEdmcTvDJhrU=
+	t=1711732616; cv=none; b=QRyq1oYCSSRF1xWQJz4XTmG+/jN/IR7fjhl4yYfXLxxGWkUabc+bd/ewuxS4/5giZMZcFln9tEDHXs0b5byltNOfaZ89oNlMUWhtWtMxtXNO7KK0raIeAocG54/mRfWv/um+M2c6UgjBUlDtu1TYc+3C5PTbe2lwAfT6ohBod0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711731749; c=relaxed/simple;
-	bh=45WLEJ28RFs0kDxDzV1vgx4LKvs08EaGM5USiAFGOAw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SsVt+7rIeR8R9xtUZHemQcvPBW9eREf8xZbU+DPNibQqLMO75KOqRIfEVWMQo53jdth4y9Nee5e2GAjKf9dRQDRl3DOzvAAGajdgWJSzIMfMYTRFGpGp6faKmuAs5bf+dSqnULNP05ZOHqgMOy3WmYTH1FRFwePHUBkAZMsSigY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=HXt1rRSU; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from rrs24-12-35.corp.microsoft.com (unknown [131.107.147.137])
-	by linux.microsoft.com (Postfix) with ESMTPSA id E709B20E6F50;
-	Fri, 29 Mar 2024 10:02:27 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E709B20E6F50
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1711731748;
-	bh=FBEap9UriasmuWH1luz/pYU8Vj/ov3W7GcXI5HcE8Oc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HXt1rRSU2n8RHfjdj+dQSPpD5mqqmQZS2xo1RoJb1Tx7aw63Shmx6szGeIXPbhjJ9
-	 KCJAEVxyAoSUBA0s8+2FYyT4zuT5SAC4MIJ9rIwYY/l4JyWAWCSaJhyxH+uk29eM4h
-	 Z+uxKwMTyQKbiiWtAXBnNEC7siWDf+GZGFaxGqY8=
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-To: Edward Cree <ecree.xilinx@gmail.com>,
-	Martin Habets <habetsm.xilinx@gmail.com>,
+	s=arc-20240116; t=1711732616; c=relaxed/simple;
+	bh=89L2hT9j8ZH6xSeMx6kL7OhHLwv6S7ZBlgaulX44G44=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NPB8GEM+Op48eZr50p3oDa9VzeW9F4ewtuLxgOKH5PzugadEyMHBCuyOcMWZEsJC2KucbF6w3HG96xHOtQzAbb91BWprLk7aIxhs0mR2d/R/GvvD+kbDXGf/PeyaUrrFH6k4kLrhm/h8CFBXDc/IA9+Se7D7fP9b0qEf7BiEV/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5688eaf1165so2959601a12.1;
+        Fri, 29 Mar 2024 10:16:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711732613; x=1712337413;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hTKsJeBejVR4zYvKMWuByymkgZTrO1JGV3ZTFtbHxR4=;
+        b=tuJ2ey8+GG+zk96U7tLwCO1SvZTVoEySfkn1oobKXU6nmn51pjw8loJvz+UbnzsxkC
+         f/XGDtokUzlmNEpkSHpAb/WjzzRpRMA8LFNSvZGtk61PJPWLtAuwO4KwbjFF7SRs8VPM
+         vIyU+S+KZyK/vrb9WoddiviowDXizlaoQmX2DSlMGCpPlwplehqtzyTedo8tk33UAZb9
+         DatxeqByDRJvSVO1QUNY1b/s07PybBaq+4d2iAP3Cm3qiaQO0JNTqMmaD4LNuY9EtCy5
+         xXNgAyoOPCsEoHARohKVxPw8kLbq6a1SUaeKtrwNJR1Z91sZcFnrLKsBGBDqvmTqzwuZ
+         xItQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUs7xFaHMCz26LScjSJINMurrdbHG8cM6OFoIpmYhklOuAkbWd9AhtHrz9zTJkXQma9RkVLAV/OBeB9vOUXfVcxOhxj+Tce2GvnaYFv+zj4bUOkz8U9fcwpgNfr4nhekOk1EyDNR3e4VgyGu8KHsKdfmHDpYGp8QdP+G3/
+X-Gm-Message-State: AOJu0YzchfvLFw2ttwBw7Ul/qcvhHKfqL1e+9Vy3sDhQFv7RMWIv+f4z
+	qu37o/x2sWbkXVUwyx5neP6WcaS8RaOD+AgVHkAotKqaFfkNXG0wjVTOlFo7
+X-Google-Smtp-Source: AGHT+IEOhTAJ2kk+k1zB7aww/76+35nhb1XyeU1rgxU55vXVijPYjJ5oUVM1Xv+Gs065gM9lKqmFxg==
+X-Received: by 2002:a05:6402:34d4:b0:56b:9b11:9594 with SMTP id w20-20020a05640234d400b0056b9b119594mr2715983edc.2.1711732613087;
+        Fri, 29 Mar 2024 10:16:53 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id u23-20020aa7d897000000b0056ba017ca7fsm2191542edq.87.2024.03.29.10.16.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 10:16:52 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: hengqi@linux.alibaba.com,
+	xuanzhuo@linux.alibaba.com,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Easwar Hariharan <eahariha@linux.microsoft.com>,
-	netdev@vger.kernel.org (open list:SFC NETWORK DRIVER),
-	linux-net-drivers@amd.com (open list:SFC NETWORK DRIVER),
+	Andrew Melnychenko <andrew@daynix.com>
+Cc: rbc@meta.com,
+	riel@surriel.com,
+	stable@vger.kernel.org,
+	qemu-devel@nongnu.org,
+	virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
 	linux-kernel@vger.kernel.org (open list)
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM DRIVERS),
-	dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	intel-gfx@lists.freedesktop.org (open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS),
-	intel-xe@lists.freedesktop.org (open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS),
-	nouveau@lists.freedesktop.org (open list:DRM DRIVER FOR NVIDIA GEFORCE/QUADRO GPUS),
-	linux-i2c@vger.kernel.org (open list:I2C SUBSYSTEM HOST DRIVERS),
-	linux-media@vger.kernel.org (open list:BTTV VIDEO4LINUX DRIVER),
-	linux-fbdev@vger.kernel.org (open list:FRAMEBUFFER LAYER)
-Subject: [PATCH v0 10/14] sfc: falcon: Make I2C terminology more inclusive
-Date: Fri, 29 Mar 2024 17:00:34 +0000
-Message-Id: <20240329170038.3863998-11-eahariha@linux.microsoft.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240329170038.3863998-1-eahariha@linux.microsoft.com>
-References: <20240329170038.3863998-1-eahariha@linux.microsoft.com>
+Subject: [PATCH net v3] virtio_net: Do not send RSS key if it is not supported
+Date: Fri, 29 Mar 2024 10:16:41 -0700
+Message-ID: <20240329171641.366520-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,35 +81,133 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I2C v7, SMBus 3.2, and I3C specifications have replaced "master/slave"
-with more appropriate terms. Inspired by and following on to Wolfram's
-series to fix drivers/i2c/[1], fix the terminology for users of
-I2C_ALGOBIT bitbanging interface, now that the approved verbiage exists
-in the specification.
+There is a bug when setting the RSS options in virtio_net that can break
+the whole machine, getting the kernel into an infinite loop.
 
-Compile tested, no functionality changes intended
+Running the following command in any QEMU virtual machine with virtionet
+will reproduce this problem:
 
-[1]: https://lore.kernel.org/all/20240322132619.6389-1-wsa+renesas@sang-engineering.com/
+    # ethtool -X eth0  hfunc toeplitz
 
-Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+This is how the problem happens:
+
+1) ethtool_set_rxfh() calls virtnet_set_rxfh()
+
+2) virtnet_set_rxfh() calls virtnet_commit_rss_command()
+
+3) virtnet_commit_rss_command() populates 4 entries for the rss
+scatter-gather
+
+4) Since the command above does not have a key, then the last
+scatter-gatter entry will be zeroed, since rss_key_size == 0.
+sg_buf_size = vi->rss_key_size;
+
+5) This buffer is passed to qemu, but qemu is not happy with a buffer
+with zero length, and do the following in virtqueue_map_desc() (QEMU
+function):
+
+  if (!sz) {
+      virtio_error(vdev, "virtio: zero sized buffers are not allowed");
+
+6) virtio_error() (also QEMU function) set the device as broken
+
+    vdev->broken = true;
+
+7) Qemu bails out, and do not repond this crazy kernel.
+
+8) The kernel is waiting for the response to come back (function
+virtnet_send_command())
+
+9) The kernel is waiting doing the following :
+
+      while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+	     !virtqueue_is_broken(vi->cvq))
+	      cpu_relax();
+
+10) None of the following functions above is true, thus, the kernel
+loops here forever. Keeping in mind that virtqueue_is_broken() does
+not look at the qemu `vdev->broken`, so, it never realizes that the
+vitio is broken at QEMU side.
+
+Fix it by not sending RSS commands if the feature is not available in
+the device.
+
+Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
+Cc: stable@vger.kernel.org
+Cc: qemu-devel@nongnu.org
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/ethernet/sfc/falcon/falcon.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changelog:
 
-diff --git a/drivers/net/ethernet/sfc/falcon/falcon.c b/drivers/net/ethernet/sfc/falcon/falcon.c
-index 7a1c9337081b..147e7c8e3c02 100644
---- a/drivers/net/ethernet/sfc/falcon/falcon.c
-+++ b/drivers/net/ethernet/sfc/falcon/falcon.c
-@@ -367,7 +367,7 @@ static const struct i2c_algo_bit_data falcon_i2c_bit_operations = {
- 	.getsda		= falcon_getsda,
- 	.getscl		= falcon_getscl,
- 	.udelay		= 5,
--	/* Wait up to 50 ms for slave to let us pull SCL high */
-+	/* Wait up to 50 ms for client to let us pull SCL high */
- 	.timeout	= DIV_ROUND_UP(HZ, 20),
- };
+V2:
+  * Moved from creating a valid packet, by rejecting the request
+    completely
+V3:
+  * Got some good feedback from and Xuan Zhuo and Heng Qi, and reworked
+    the rejection path.
+
+---
+ drivers/net/virtio_net.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index c22d1118a133..c4a21ec51adf 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3807,6 +3807,7 @@ static int virtnet_set_rxfh(struct net_device *dev,
+ 			    struct netlink_ext_ack *extack)
+ {
+ 	struct virtnet_info *vi = netdev_priv(dev);
++	bool update = false;
+ 	int i;
+ 
+ 	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
+@@ -3814,13 +3815,24 @@ static int virtnet_set_rxfh(struct net_device *dev,
+ 		return -EOPNOTSUPP;
+ 
+ 	if (rxfh->indir) {
++		if (!vi->has_rss)
++			return -EOPNOTSUPP;
++
+ 		for (i = 0; i < vi->rss_indir_table_size; ++i)
+ 			vi->ctrl->rss.indirection_table[i] = rxfh->indir[i];
++		update = true;
+ 	}
+-	if (rxfh->key)
++
++	if (rxfh->key) {
++		if (!vi->has_rss && !vi->has_rss_hash_report)
++			return -EOPNOTSUPP;
++
+ 		memcpy(vi->ctrl->rss.key, rxfh->key, vi->rss_key_size);
++		update = true;
++	}
+ 
+-	virtnet_commit_rss_command(vi);
++	if (update)
++		virtnet_commit_rss_command(vi);
+ 
+ 	return 0;
+ }
+@@ -4729,13 +4741,15 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
+ 		vi->has_rss_hash_report = true;
+ 
+-	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS))
++	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
+ 		vi->has_rss = true;
+ 
+-	if (vi->has_rss || vi->has_rss_hash_report) {
+ 		vi->rss_indir_table_size =
+ 			virtio_cread16(vdev, offsetof(struct virtio_net_config,
+ 				rss_max_indirection_table_length));
++	}
++
++	if (vi->has_rss || vi->has_rss_hash_report) {
+ 		vi->rss_key_size =
+ 			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
  
 -- 
-2.34.1
+2.43.0
 
 
