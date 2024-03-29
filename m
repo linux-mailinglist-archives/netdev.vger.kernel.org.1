@@ -1,112 +1,229 @@
-Return-Path: <netdev+bounces-83477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CBB48926BC
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 23:28:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E87AC8926C1
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 23:30:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9990B22215
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 22:28:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 214381C20F55
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 22:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC2E13D252;
-	Fri, 29 Mar 2024 22:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A0513BAD7;
+	Fri, 29 Mar 2024 22:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="IEoMp3dl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="af3tEf4r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AAA13CFAE
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 22:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6BB28DC1
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 22:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711751275; cv=none; b=ld4msDiO5ldLmE5ulTYOTOC9otMBeyzqPieKBlQPkz3rCrocCnxEJOIkxv5MrIRhN90ozWEoPS3KmzM8G9SW4iErocVJ9h8rz26gFu+3JC2z1vajfvPK0O5jpVcHIOSo8JG3H6jDZ6ISqB4DNSwvjzIBJddNQQrm/x49ce+rSsM=
+	t=1711751395; cv=none; b=r8+B1IFFag2HuI6zBBZXeH+ixu4+v7LcY5wOF3/6wgJ223E0kn3xcKcwo+b9S0QAED6F64X45+Ly5CTR1T3QpysOskVw+gmCEHA7C6kqyn9w3eNJ9i4Hl/Myvb/UKIYrlUrLJA2ZIcn/zPzyZPRsgS1BxBM9vsbq2bHqgBZeDjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711751275; c=relaxed/simple;
-	bh=OItPe4IxJL0pCs1NqBvO0JG+rzxeP0lBb2Zs+NNTtBM=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=gAT02SQ31oQAitaAEND2nCHqouGdAOaMOAGE3FLVbzj6J9sNNJdShR0/in3d6i2gvpAOneCsVQElS5Xo+BfdjDuCSuViyoOZlwv9esXMC4/gMtq9DQc2ryhFsqFVEIBeBaFqqq0eV2dwGFVzqBYlGOQrusIlG/msfbGOpEBsZtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=IEoMp3dl; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51381021af1so3304478e87.0
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 15:27:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1711751272; x=1712356072; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OItPe4IxJL0pCs1NqBvO0JG+rzxeP0lBb2Zs+NNTtBM=;
-        b=IEoMp3dlIWtpBiY2R9r6Kivqjltt3CHCUbiRTzTAZPfpkfE5AJLRgykkK7kyPPwgvW
-         1jJpa1/VUWJ4gFg/zQPQXj2IoV4U2mZ/jglOfijIu691GmWPLDvromMNYRjJwrwIUHLU
-         KY0umPL3tQhomdW99GxRiayRU2kdXJQ4+rh5/FsMIpze/UOEhK1Bf/7dpDHrbx/FKuWJ
-         UQIqSRcE4xJXF/11HckRQ3axggF+24rFyeTqlCrRnS2X6zVkDnlatBPr5EVvbatkxWI8
-         YVY3fumZuTcDrBIBvUiQPBPGSo9g1H3mI3R6tuzoaSZC7vRFnguCSINo3T34ylHMNKv0
-         OI2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711751272; x=1712356072;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OItPe4IxJL0pCs1NqBvO0JG+rzxeP0lBb2Zs+NNTtBM=;
-        b=fcyVyjtqcagQVpqSBt8egDsfxzOlpUry1LB9qhWgfnYyXMYrlh8b+Gtp8Kw2QRs2Q6
-         0A+ABWic+0wfm5IKq70u3mDDhzhR1dzVP4a2DJ7jtcBob+xa2WTVKDsXtVMBw2nE/hAt
-         JEZsSKTgRjuN3/hEFbZhIHPl0LsqWXbqBhhNFs3jUh10VRNBsM13xn3sXSeFGMNIxEwd
-         vxOdseN8gIDSd9gxogKZkByrqoB1ieB+CILikiWiPC0fhH7eOOR6F9YBAq6GzPY5vJZV
-         AMxEXYz8jP18w//jeFIJe9ZHmA7pNMcDKgjPeBYBil1L5kXYoiqAaDP0TpNOoO6RmR3E
-         dw3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUmr/VFGcu0nP3mZR7/diPDnFA3PULgzctiUrmJL531xH5/QpuTHRSd+cxvfUwsvrzK1nK3pqQ7FzxEUXLOcfZKd5WA9esl
-X-Gm-Message-State: AOJu0YzezBCA9Q3VE2nh8yJCzc/8sN9cnC6PyBKqRjGnOsPiuRh3Rt2Y
-	j26BZMGMUuIwzPivtz8VoFVuSuFVbuAp55+Co6r4UU49Ql17bjE9LOeqZ2E9I0U=
-X-Google-Smtp-Source: AGHT+IHMmXVGYK4oukisP78/fV5DWJ//WlRa6i3lXOGdqxqsLxiY7kMWE+d0zU8MiSuQc0nB3HJWxA==
-X-Received: by 2002:ac2:4d92:0:b0:515:d176:dfd1 with SMTP id g18-20020ac24d92000000b00515d176dfd1mr2034213lfe.56.1711751271625;
-        Fri, 29 Mar 2024 15:27:51 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1a6])
-        by smtp.gmail.com with ESMTPSA id z11-20020a170906240b00b00a46be5169f1sm2396680eja.181.2024.03.29.15.27.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 15:27:50 -0700 (PDT)
-References: <00000000000090fe770614a1ab17@google.com>
- <0000000000007a208d0614a9a9e0@google.com> <87le63bfuf.fsf@cloudflare.com>
- <CAADnVQK7rpbNbo4XQRfX2G6v7Mx=2rZNu6D9my9KCi+jRpTUJw@mail.gmail.com>
-User-agent: mu4e 1.6.10; emacs 29.2
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: syzbot <syzbot+d4066896495db380182e@syzkaller.appspotmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, bpf
- <bpf@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, John
- Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Network Development
- <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, syzkaller-bugs
- <syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [bpf?] [net?] possible deadlock in
- ahci_single_level_irq_intr
-Date: Fri, 29 Mar 2024 23:27:06 +0100
-In-reply-to: <CAADnVQK7rpbNbo4XQRfX2G6v7Mx=2rZNu6D9my9KCi+jRpTUJw@mail.gmail.com>
-Message-ID: <87cyrcbrmi.fsf@cloudflare.com>
+	s=arc-20240116; t=1711751395; c=relaxed/simple;
+	bh=YclD2gFKAd0KYU/nqrMwp6tntz6Bp0xkpGNnD7iuj3c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rJ7Bn5B+eJPtxb4RNqsOXTzMjoxUUJ5pI/JOpQlNhT4ZcDDv6O01CZ1g3k27TriDuD2V9f4K/PGRphgNiz/gM/TFCcH5mAojrujO3pTOIJTI+aIIUz1rLn0diYOJV7K7HUs8cBglYDPH5ri6aPJNGmrNMWJbh0ZerjwDrcQhuoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=af3tEf4r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A38DC433F1;
+	Fri, 29 Mar 2024 22:29:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711751395;
+	bh=YclD2gFKAd0KYU/nqrMwp6tntz6Bp0xkpGNnD7iuj3c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=af3tEf4riCb4f2NQ149pjvDrIXXmmP43YUOkyHbXZ+M94QTqDI0JCGEF6C9SwDi2v
+	 UbNo6lur4NhXefe9RSrYlvWkEgyygoEXlsnzAgBuwTthmMcxP2nKYOexYi7y8EYgAU
+	 s+LYfSGZY1szJRSJJk68i3GvMqw/Vxj3slvg7t75/MisPpwS+jb6RoyLsnYv0RKoVL
+	 12qu5ji4XYH50ruUZsUfcfxQseOwTzwtSilm9SNsMlGhgFPnOmb3sh5+EZ9kkw1axQ
+	 GhY5mxcMFxbnq+OPRpafTOvZpCjxq7fMQ4RgncWl/e6+tXnFeaTluLTysE2h8/dy/H
+	 aDL1nOLZRHWXA==
+Date: Fri, 29 Mar 2024 15:29:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ simon.horman@corigine.com, anthony.l.nguyen@intel.com, edumazet@google.com,
+ pabeni@redhat.com, idosch@nvidia.com, przemyslaw.kitszel@intel.com,
+ marcin.szycik@linux.intel.com
+Subject: Re: [PATCH net-next 2/3] ethtool: Introduce max power support
+Message-ID: <20240329152954.26a7ce75@kernel.org>
+In-Reply-To: <20240329092321.16843-3-wojciech.drewek@intel.com>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
+	<20240329092321.16843-3-wojciech.drewek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 27, 2024 at 02:43 PM -07, Alexei Starovoitov wrote:
-> On Wed, Mar 27, 2024 at 1:05=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.=
-com> wrote:
->>
->> #syz test: git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git mas=
-ter
->>
->> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
->
-> Great. Please submit it officially. Hopefully bpf CI also will be happy.
+On Fri, 29 Mar 2024 10:23:20 +0100 Wojciech Drewek wrote:
+> Some modules use nonstandard power levels. Adjust ethtool
+> module implementation to support new attributes that will allow user
+> to change maximum power.
+> 
+> Add three new get attributes:
+> ETHTOOL_A_MODULE_MAX_POWER_SET (used for set as well) - currently set
+>   maximum power in the cage
 
-Will do.
+1) I'd keep the ETHTOOL_A_MODULE_POWER_ prefix, consistently.
 
-Just had to verify if we need a similar check for map_update_elem.
+2) The _SET makes it sound like an action. Can we go with
+   ETHTOOL_A_MODULE_POWER_MAX ? Or ETHTOOL_A_MODULE_POWER_LIMIT?
+   Yes, ETHTOOL_A_MODULE_POWER_LIMIT
+        ETHTOOL_A_MODULE_POWER_MAX
+        ETHTOOL_A_MODULE_POWER_MIN
+   would sound pretty good to me.
+
+> ETHTOOL_A_MODULE_MIN_POWER_ALLOWED - minimum power allowed in the
+>   cage reported by device
+> ETHTOOL_A_MODULE_MAX_POWER_ALLOWED - maximum power allowed in the
+>   cage reported by device
+> 
+> Add two new set attributes:
+> ETHTOOL_A_MODULE_MAX_POWER_SET (used for get as well) - change
+>   maximum power in the cage to the given value (milliwatts)
+> ETHTOOL_A_MODULE_MAX_POWER_RESET - reset maximum power setting to the
+>   default value
+> 
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> ---
+>  include/linux/ethtool.h              | 17 +++++--
+>  include/uapi/linux/ethtool_netlink.h |  4 ++
+>  net/ethtool/module.c                 | 74 ++++++++++++++++++++++++++--
+>  net/ethtool/netlink.h                |  2 +-
+>  4 files changed, 87 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index f3af6b31c9f1..74ed8997443a 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -510,10 +510,18 @@ struct ethtool_module_eeprom {
+>   * @policy: The power mode policy enforced by the host for the plug-in module.
+>   * @mode: The operational power mode of the plug-in module. Should be filled by
+>   *	device drivers on get operations.
+> + * @min_pwr_allowed: minimum power allowed in the cage reported by device
+> + * @max_pwr_allowed: maximum power allowed in the cage reported by device
+> + * @max_pwr_set: maximum power currently set in the cage
+> + * @max_pwr_reset: restore default minimum power
+>   */
+>  struct ethtool_module_power_params {
+>  	enum ethtool_module_power_mode_policy policy;
+>  	enum ethtool_module_power_mode mode;
+> +	u32 min_pwr_allowed;
+> +	u32 max_pwr_allowed;
+> +	u32 max_pwr_set;
+> +	u8 max_pwr_reset;
+
+bool ?
+
+> diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
+> index 3f89074aa06c..f7cd446b2a83 100644
+> --- a/include/uapi/linux/ethtool_netlink.h
+> +++ b/include/uapi/linux/ethtool_netlink.h
+> @@ -882,6 +882,10 @@ enum {
+>  	ETHTOOL_A_MODULE_HEADER,		/* nest - _A_HEADER_* */
+>  	ETHTOOL_A_MODULE_POWER_MODE_POLICY,	/* u8 */
+>  	ETHTOOL_A_MODULE_POWER_MODE,		/* u8 */
+> +	ETHTOOL_A_MODULE_MAX_POWER_SET,		/* u32 */
+> +	ETHTOOL_A_MODULE_MIN_POWER_ALLOWED,	/* u32 */
+> +	ETHTOOL_A_MODULE_MAX_POWER_ALLOWED,	/* u32 */
+> +	ETHTOOL_A_MODULE_MAX_POWER_RESET,	/* u8 */
+
+flag ?
+
+> @@ -77,6 +86,7 @@ static int module_fill_reply(struct sk_buff *skb,
+>  			     const struct ethnl_reply_data *reply_base)
+>  {
+>  	const struct module_reply_data *data = MODULE_REPDATA(reply_base);
+> +	u32 temp;
+
+tmp ? temp sounds too much like temperature in context of power
+
+>  static int
+>  ethnl_set_module(struct ethnl_req_info *req_info, struct genl_info *info)
+>  {
+>  	struct ethtool_module_power_params power = {};
+>  	struct ethtool_module_power_params power_new;
+> -	const struct ethtool_ops *ops;
+>  	struct net_device *dev = req_info->dev;
+>  	struct nlattr **tb = info->attrs;
+> +	const struct ethtool_ops *ops;
+>  	int ret;
+> +	bool mod;
+>  
+>  	ops = dev->ethtool_ops;
+>  
+> -	power_new.policy = nla_get_u8(tb[ETHTOOL_A_MODULE_POWER_MODE_POLICY]);
+>  	ret = ops->get_module_power_cfg(dev, &power, info->extack);
+>  	if (ret < 0)
+>  		return ret;
+>  
+> -	if (power_new.policy == power.policy)
+> +	power_new.max_pwr_set = power.max_pwr_set;
+> +	power_new.policy = power.policy;
+> +
+> +	ethnl_update_u32(&power_new.max_pwr_set,
+> +			 tb[ETHTOOL_A_MODULE_MAX_POWER_SET], &mod);
+> +	if (mod) {
+
+I think we can use if (tb[ETHTOOL_A_MODULE_MAX_POWER_SET]) here
+Less error prone for future additions.
+
+> +		if (power_new.max_pwr_set > power.max_pwr_allowed) {
+> +			NL_SET_ERR_MSG(info->extack, "Provided value is higher than maximum allowed");
+
+NL_SET_ERR_MSG_ATTR() to point at the bad attribute.
+
+> +			return -EINVAL;
+
+ERANGE?
+
+> +		} else if (power_new.max_pwr_set < power.min_pwr_allowed) {
+> +			NL_SET_ERR_MSG(info->extack, "Provided value is lower than minimum allowed");
+> +			return -EINVAL;
+> +		}
+> +	}
+> +
+> +	ethnl_update_policy(&power_new.policy,
+> +			    tb[ETHTOOL_A_MODULE_POWER_MODE_POLICY], &mod);
+> +	ethnl_update_u8(&power_new.max_pwr_reset,
+> +			tb[ETHTOOL_A_MODULE_MAX_POWER_RESET], &mod);
+
+I reckon reset should not be allowed if none of the max_pwr values 
+are set (i.e. most likely driver doesn't support the config)?
+
+> +	if (!mod)
+>  		return 0;
+>  
+> +	if (power_new.max_pwr_reset && power_new.max_pwr_set) {
+
+Mmm. How is that gonna work? The driver is going to set max_pwr_set
+to what's currently configured. So the user is expected to send
+ETHTOOL_A_MODULE_MAX_POWER_SET = 0
+ETHTOOL_A_MODULE_MAX_POWER_RESET = 1
+to reset?
+
+Just:
+
+	if (tb[ETHTOOL_A_MODULE_MAX_POWER_RESET] &&
+	    tb[ETHTOOL_A_MODULE_MAX_POWER_SET])
+
+And you can validate this before doing any real work.
+
+> +		NL_SET_ERR_MSG(info->extack, "Maximum power set and reset cannot be used at the same time");
+> +		return 0;
+> +	}
+> +
+>  	ret = ops->set_module_power_cfg(dev, &power_new, info->extack);
+>  	return ret < 0 ? ret : 1;
+>  }
+-- 
+pw-bot: cr
 
