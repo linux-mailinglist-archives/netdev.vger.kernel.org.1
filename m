@@ -1,144 +1,111 @@
-Return-Path: <netdev+bounces-83204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E5F89157D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:10:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FD6C891589
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 10:13:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D063F1F22AC2
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:10:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7D42B211D0
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 09:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B327037152;
-	Fri, 29 Mar 2024 09:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D9237711;
+	Fri, 29 Mar 2024 09:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eaY/ZtZH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KkPja7bJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5F53BBC9;
-	Fri, 29 Mar 2024 09:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9F73D3B6
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 09:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711703453; cv=none; b=baQcKNQHaQYvjZbl41zkbNXGvObO65wparssmJf9XZxSjcfRD08WqaoxQ5U6fWBtgSv7OzLtAGpS4MLybdVtJ3km8RHRWoo6Ab9mLAyzjYdyl45vgWALBnY6hJvfGiCe8AbKEKBfTXILeh2QdIwGBDu6UqCrAcrLFNN9szPzOfA=
+	t=1711703596; cv=none; b=G4uqjscLoyEUcLUaKNz6c1CZidQd1lS1QrRhXfZ+3TJGbYrJ6aVV81LJcfQ5D7kVznMBhV9qlgYVBqT06NmP5zDJ8njBSA0WPGHXLbB15FcrsFp9pw2jIZAsCJ6ZK/mjB/UKrxOe2oNHnMxKvc3DEVQHtwgcx2eh7yCw4GoUp3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711703453; c=relaxed/simple;
-	bh=vY/FJp6qrT1tKYNcxeFTW8hugbxrKmwQdnT/CQhbR5Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EzVxlZCtF+mjD3SzmhwRGLk5J+h7T8eZoqMYiI/E4aPhPxDWSg7Vg3piEgMay6Z7K4GCouKh3a/RFd5VApIfyWtpuOOneGig0T+kikN6XDJu+UL/Cp1NtjBUDLnQEY1qVZbdU8Dqz4gi8fbEyrk8dQ5guAaeLvKnWcqm62cutyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eaY/ZtZH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1C95C433F1;
-	Fri, 29 Mar 2024 09:10:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711703453;
-	bh=vY/FJp6qrT1tKYNcxeFTW8hugbxrKmwQdnT/CQhbR5Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=eaY/ZtZHjovhpyorRysQzrSvwlw75euFhSBKmnQXN4v3DgdaYp9046mnYet+XRpW3
-	 UUrxLttZ7gI1jUpxEbQQjFNAiRz6I9nWbPkcba4rCc7sZG5DrddxBrsqU5WkVHSoOF
-	 nSACZAw+mLwl4P4zWoBvKykmU8ETj3EN/OamHwKM8/rmKw6gs3rAIdkvqAk9isEVr+
-	 1rzLlkIN3JNVSuxTuNBiyA6701F/jmtzQkGj8RkHqbbZY1jcZxV9i0erMg+H5FZ2jk
-	 gsu+08acrGMvte6ez3tsgZ6iH7cUMCz1cB/n86GRorzHlrV+l13H1HrjsYEC8GHTAx
-	 KLmHKeBN7f5oA==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Conor Dooley <conor.dooley@microchip.com>, Alexandre Ghiti
- <alexghiti@rivosinc.com>
-Cc: Conor Dooley <conor@kernel.org>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Emil Renner Berthing <kernel@esmil.dk>, Samuel
- Holland <samuel.holland@sifive.com>, =?utf-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@rivosinc.com>,
- linux-riscv@lists.infradead.org, Andy Chiu <andy.chiu@sifive.com>, Jakub
- Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: RISC-V for-next/fixes (cont'd from PW sync)
-In-Reply-To: <20240329-fanning-woven-7dbb6cfdde9b@wendy>
-References: <87ttkro3b5.fsf@all.your.base.are.belong.to.us>
- <20240327-irrigate-unread-d9de28174437@spud>
- <CAHVXubgMTe83sYaNO+SG=90=k5scaQrpApveTCO163MhUc1tdA@mail.gmail.com>
- <20240329-fanning-woven-7dbb6cfdde9b@wendy>
-Date: Fri, 29 Mar 2024 10:10:49 +0100
-Message-ID: <87sf09pfmu.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1711703596; c=relaxed/simple;
+	bh=1zERkjtrtlC581CcROudIVVXpAA03k89ji5eS+5BuYo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GDSJ+x9e6BWc9R3zhU7xnxBaDf+Tw5/Y2DSaEtPa/A96e2QCZfzTo45B31V+5TxfMQP6KiYol0+GHbUmdZcuC0ZqMLccb2z5XlbY5W79nIrKRxxrA5lVVhj+/sPAAznG7GFRQGgjdSZFFqXBN8eJ3W4GTfQTsw4qerqZp5oWxb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KkPja7bJ; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56c2cfdd728so6175a12.1
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 02:13:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711703593; x=1712308393; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VC/2DNYfpXPCFDeLwAU/UqglY0mCl+CZh+iTkFzj+Zw=;
+        b=KkPja7bJsAG8stMGYJvce/yJ2ERbGd7/tikfhxIgHm2DkHD7w3lNMKhS+KBNfPqukk
+         IAr7f0mSuCmeB96K2xfE9YJpbLpV14CeE8MKHzwtEN8onG+5mc0TZWMIRdDhfeLSzbMF
+         ulmXak9u54Q9HHZElU9B/9OW0M+7vbmbsTQ3kxlDPaie9lRyFI3iTwtOxqb/dtDowf0V
+         7vS9CwAb/+aCT2hQH5w7YVEqUIrvweJMAcSTq+Y9MRQN6jIz2DDmo/VRr0UIzPFnkqly
+         4A1RFM9WR3nnvJQUQ55VRGeu6IbSCqGviwK29XacY4VVQ+3Ab3t1RJ1d+gMGndYDs2aD
+         E6Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711703593; x=1712308393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VC/2DNYfpXPCFDeLwAU/UqglY0mCl+CZh+iTkFzj+Zw=;
+        b=W3Fsx+7qx1Jn8nmlEqV1pbIR0vBV27O8Rw5VGi1206lVIVOYbvyEBHrUQPHKNfsxDs
+         QqxufkuYcd2PuxoajdtFZJzSJHGzvp/SJ9RMCDMJINhV5XJOoXsFysxG7a8lbU/fH1lG
+         CCz7OwoqdRLjAqRUlhF6k1BnPjHtTSC2xklIc1GlLetLRwBSkb3GihZSYv5+8gkRLABI
+         GPWKKmIo2WLA530eBV2jMk8T5kizgWGu/7/SgAskRmE5KY2vPMDi5X44wm+/vZPQGxz9
+         r2w/+qPauRjMoZdPa00vfISOo7Z5eoiAEE4izZtR4Ww102s5ZXsnYp1EWiLx3W6403kB
+         iw4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX7GqqHjQiBcFvJkzBq0CYjGAi+nxtcXIMRJqvoQ8WFf6PJrgWh31q93fltMwpoRbPOCXCU08R5KVcIgMRA17M05H/wpVfF
+X-Gm-Message-State: AOJu0YwYjF3uNqGmnyMh33sx/r5hOVZzoisrlAypyANxjQTpfclz4or9
+	zCyH/E7viuyI2MrVSwkwhzIYaBewxNw/z87WRqcUZ5KmzckN+hWi/aQem9QueMYg8dcAnhdUTZg
+	4csq/3cLrH9vJhGxhU4P2ivNREUpnQB/ybCQ2
+X-Google-Smtp-Source: AGHT+IFlPhyvUlzfE7rTjsKrKisU2QouFz5YiSOmxPdDEKV0jtaMbzUzboFdcxhgTOLzWZAGDEUUIxfEqGpgqQOhzJQ=
+X-Received: by 2002:aa7:d784:0:b0:56c:cd5:6e42 with SMTP id
+ s4-20020aa7d784000000b0056c0cd56e42mr136121edq.6.1711703593362; Fri, 29 Mar
+ 2024 02:13:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240329034243.7929-1-kerneljasonxing@gmail.com> <20240329034243.7929-4-kerneljasonxing@gmail.com>
+In-Reply-To: <20240329034243.7929-4-kerneljasonxing@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 29 Mar 2024 10:13:02 +0100
+Message-ID: <CANn89iJw8x-LqgsWOeJQQvgVg6DnL5aBRLi10QN2WBdr+X4k=w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/3] tcp: add location into reset trace process
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com, rostedt@goodmis.org, 
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Conor Dooley <conor.dooley@microchip.com> writes:
-
-> On Fri, Mar 29, 2024 at 07:46:38AM +0100, Alexandre Ghiti wrote:
->> On Wed, Mar 27, 2024 at 9:32=E2=80=AFPM Conor Dooley <conor@kernel.org> =
-wrote:
->> >
->> > On Wed, Mar 27, 2024 at 08:57:50PM +0100, Bj=C3=B6rn T=C3=B6pel wrote:
->> > > Hi,
->> > >
->> > > I figured I'd put some words on the "how to update the RISC-V
->> > > for-next/fixes branches [1]" that came up on the patchwork call toda=
-y.
->> > >
->> > > In RISC-V land, the for-next branch is used for features, and typica=
-lly
->> > > sent as a couple of PRs to Linus when the merge window is open. The
->> > > fixes branch is sent as PR(s) between the RCs of a release.
->> > >
->> > > Today, the baseline for for-next/fixes is the CURRENT_RELEASE-rc1, a=
-nd
->> > > features/fixes are based on that.
->> > >
->> > > This has IMO a couple of issues:
->> > >
->> > > 1. fixes is missing the non-RISC-V fixes from releases later than
->> > >    -rc1, which makes it harder for contributors.
->>=20
->> The syzbot report [1] requires fixes in mm [2], if we don't update
->> fixes on top of the latest -rcX, we'll keep hitting this bug, so
->> rebasing -fixes on top of the latest -rcX is necessary to me.
+On Fri, Mar 29, 2024 at 4:43=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-> No non-ff rebasing of branches unless its 101% required, please. This
-> seems like a justifiable reason to merge the rc it appears in into the
-> riscv branches though.
+> From: Jason Xing <kernelxing@tencent.com>
+>
+> In addition to knowing the 4-tuple of the flow which generates RST,
+> the reason why it does so is very important because we have some
+> cases where the RST should be sent and have no clue which one
+> exactly.
+>
+> Adding location of reset process can help us more, like what
+> trace_kfree_skb does.
 
-Are you talking past each other? I'm *not* saying rebase (agree with
-Conor!). I'm saying "let's move fixes up to the point to include the
-merge (and whatever on Linus' tip at the point of merge), i.e.
-*ff-only*.
+Well, I would prefer a drop_reason here, even if there is no 'dropped' pack=
+et.
 
-Now, rest your eyes on this fabulous cartoon:
+This would be more stable than something based on function names that
+could be changed.
 
-  Linus' master
-  |
-  v
-  o o <-- RISC-V fixes
-  | |
-  . .
-  . .
-=20=20
-  Linus accepts the PR...
-=20=20
-  o <-- Merge tag 'riscv-for-linus-meh-rc7'...
-  |\
-  o o <-- RISC-V fixes
-  | |
-  . .
-  . .
-=20=20
-  and then move fixes, git merge --ff-only:
-=20=20
-  o <-- Merge tag 'riscv-for-linus-meh-rc7'..., RISC-V fixes
-  |\
-  o o=20
-  | |
-  . .
-  . .
+tracepoints do not have to get ugly, we can easily get stack traces if need=
+ed.
 
-Clearer?
-
-
-Bj=C3=B6rn
+perf record -a -g  -e tcp:tcp_send_reset ...
 
