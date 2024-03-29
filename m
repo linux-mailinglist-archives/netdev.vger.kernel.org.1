@@ -1,78 +1,72 @@
-Return-Path: <netdev+bounces-83400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC2489220A
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:01:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB079892249
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:04:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 617D5287A2D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:01:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AE351F26A46
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D06F137776;
-	Fri, 29 Mar 2024 17:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC30813BC2E;
+	Fri, 29 Mar 2024 17:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="clBmNzVr"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="HXt1rRSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22991369A4;
-	Fri, 29 Mar 2024 17:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8B513BC16;
+	Fri, 29 Mar 2024 17:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711731646; cv=none; b=CF0C36p+NjgYobo0ff1vqF9KW41FiFg3qXchlP1SkO19fWm4kgHWYgaKC+lqzM54WUvdX0KLKmAZMW79hzw659yRb8mLKw8NLpl53sgyHZUC4gNArwX6iaRq/9OBBEHxOm0Tpk1cbXyNjFs8cLCNOTsw7dPMsfx/Jng+4kNUx1g=
+	t=1711731749; cv=none; b=B+2q1Lmi+vDbtoucqHXjP5FByYKInShN7MsIn9xHW7mXR08yozWyLka1ljQETzp630gNzEVy+5cIpac0dQ6w5XbQS5z+7KLV43mdEeBZOIZyA5PsC0pwtuoaTvC3dqlnrRPpn3UcJlluPHhxebUYuhZY0N1lErwKEdmcTvDJhrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711731646; c=relaxed/simple;
-	bh=WeazQOW8wdRtFlvcL7dquXjhXH5BZ+2tlYJx7xq4fYk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NyFcQ2czxyryTfuhg3M4GwlKZLMvOeNih5bfnblrlCVxSyLymklW4RwEHQCNOi4jCskVPaea5yXj1yNNKYeMpVPd/uzxaVDylBRbxeXiLi+ynwf3h+RYPo4czXsJANKSSCgH3VJYvwo8l23pi6AejRJmNqhz1VsnS1EeUfh+/N8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=clBmNzVr; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711731645; x=1743267645;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WeazQOW8wdRtFlvcL7dquXjhXH5BZ+2tlYJx7xq4fYk=;
-  b=clBmNzVrqSq2uTJAlEqkcyM/sxSeDlXc66C7r5V0lDS6VDY0Pe3xfc0z
-   4IMSWgt6m5ZyHz92WY5YWwuL+6Wz1OZyc834R1cisVvSIoZduIr8gd3qC
-   aSCzVCVLE4MipwZcpK6bFJwTYzD4Su9L7MHNp9e8IBALG7OFsVO76+j/o
-   54MnF9zO4kNam0lEWtsVXnTgDxOtYZMnbCP+I/I6wi749nqfdClp+EuGS
-   uz6K95Sy4Zyx3ymgihb3n2sEx17Ay2kCFX36Muw7bE2RBDpiIoS4LqU/r
-   ARlmE3pfPGeyXonvjj6UxgvgkO0nxS9lCOp8ITaWQaI4AcYSOqDoUIg/J
-   w==;
-X-CSE-ConnectionGUID: 0ETOfJjmQPC6Ct/S41zHHQ==
-X-CSE-MsgGUID: B/CLeIGPSbewe3DOtgEe1Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11028"; a="18367623"
-X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
-   d="scan'208";a="18367623"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 10:00:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
-   d="scan'208";a="48231990"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa001.fm.intel.com with ESMTP; 29 Mar 2024 10:00:41 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1711731749; c=relaxed/simple;
+	bh=45WLEJ28RFs0kDxDzV1vgx4LKvs08EaGM5USiAFGOAw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=SsVt+7rIeR8R9xtUZHemQcvPBW9eREf8xZbU+DPNibQqLMO75KOqRIfEVWMQo53jdth4y9Nee5e2GAjKf9dRQDRl3DOzvAAGajdgWJSzIMfMYTRFGpGp6faKmuAs5bf+dSqnULNP05ZOHqgMOy3WmYTH1FRFwePHUBkAZMsSigY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=HXt1rRSU; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from rrs24-12-35.corp.microsoft.com (unknown [131.107.147.137])
+	by linux.microsoft.com (Postfix) with ESMTPSA id E709B20E6F50;
+	Fri, 29 Mar 2024 10:02:27 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E709B20E6F50
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1711731748;
+	bh=FBEap9UriasmuWH1luz/pYU8Vj/ov3W7GcXI5HcE8Oc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=HXt1rRSU2n8RHfjdj+dQSPpD5mqqmQZS2xo1RoJb1Tx7aw63Shmx6szGeIXPbhjJ9
+	 KCJAEVxyAoSUBA0s8+2FYyT4zuT5SAC4MIJ9rIwYY/l4JyWAWCSaJhyxH+uk29eM4h
+	 Z+uxKwMTyQKbiiWtAXBnNEC7siWDf+GZGFaxGqY8=
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+To: Edward Cree <ecree.xilinx@gmail.com>,
+	Martin Habets <habetsm.xilinx@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 2/2] netdev_queues: fix -Wshadow / Sparse shadow warnings throughout the file
-Date: Fri, 29 Mar 2024 18:00:00 +0100
-Message-ID: <20240329170000.3241460-3-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240329170000.3241460-1-aleksander.lobakin@intel.com>
-References: <20240329170000.3241460-1-aleksander.lobakin@intel.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Easwar Hariharan <eahariha@linux.microsoft.com>,
+	netdev@vger.kernel.org (open list:SFC NETWORK DRIVER),
+	linux-net-drivers@amd.com (open list:SFC NETWORK DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM DRIVERS),
+	dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	intel-gfx@lists.freedesktop.org (open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS),
+	intel-xe@lists.freedesktop.org (open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS),
+	nouveau@lists.freedesktop.org (open list:DRM DRIVER FOR NVIDIA GEFORCE/QUADRO GPUS),
+	linux-i2c@vger.kernel.org (open list:I2C SUBSYSTEM HOST DRIVERS),
+	linux-media@vger.kernel.org (open list:BTTV VIDEO4LINUX DRIVER),
+	linux-fbdev@vger.kernel.org (open list:FRAMEBUFFER LAYER)
+Subject: [PATCH v0 10/14] sfc: falcon: Make I2C terminology more inclusive
+Date: Fri, 29 Mar 2024 17:00:34 +0000
+Message-Id: <20240329170038.3863998-11-eahariha@linux.microsoft.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240329170038.3863998-1-eahariha@linux.microsoft.com>
+References: <20240329170038.3863998-1-eahariha@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,198 +75,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix the following spam coming from <net/netdev_queues.h> when building
-with W=12 and/or C=1:
+I2C v7, SMBus 3.2, and I3C specifications have replaced "master/slave"
+with more appropriate terms. Inspired by and following on to Wolfram's
+series to fix drivers/i2c/[1], fix the terminology for users of
+I2C_ALGOBIT bitbanging interface, now that the approved verbiage exists
+in the specification.
 
-Clang:
+Compile tested, no functionality changes intended
 
-drivers/net/ethernet/intel/idpf/idpf_txrx.c:1992:9: warning: declaration shadows a local variable [-Wshadow]
- 1992 |         return netif_txq_maybe_stop(nq, IDPF_DESC_UNUSED(tx_q), size, size);
-      |                ^
-./include/net/netdev_queues.h:137:11: note: expanded from macro 'netif_txq_maybe_stop'
-  137 |                         _res = netif_txq_try_stop(txq, get_desc, start_thrs); \
-      |                                ^
-./include/net/netdev_queues.h:92:7: note: expanded from macro 'netif_txq_try_stop'
-   92 |                 int _res;                                               \
-      |                     ^
-drivers/net/ethernet/intel/idpf/idpf_txrx.c:1992:9: note: previous declaration is here
-./include/net/netdev_queues.h:133:7: note: expanded from macro 'netif_txq_maybe_stop'
-  133 |                 int _res;                                               \
-      |                     ^
+[1]: https://lore.kernel.org/all/20240322132619.6389-1-wsa+renesas@sang-engineering.com/
 
-Sparse:
-
-drivers/net/ethernet/intel/idpf/idpf_txrx.c:1992:16: warning: symbol '_res' shadows an earlier one
-drivers/net/ethernet/intel/idpf/idpf_txrx.c:1992:16: originally declared here
-
-Use __UNIQUE_ID() in all of the macros which declare local variables.
-
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 ---
- include/net/netdev_queues.h | 54 +++++++++++++++++++++++++++----------
- 1 file changed, 40 insertions(+), 14 deletions(-)
+ drivers/net/ethernet/sfc/falcon/falcon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index 1ec408585373..317d6bfe32c7 100644
---- a/include/net/netdev_queues.h
-+++ b/include/net/netdev_queues.h
-@@ -87,14 +87,14 @@ struct netdev_stat_ops {
-  * be updated before invoking the macros.
-  */
+diff --git a/drivers/net/ethernet/sfc/falcon/falcon.c b/drivers/net/ethernet/sfc/falcon/falcon.c
+index 7a1c9337081b..147e7c8e3c02 100644
+--- a/drivers/net/ethernet/sfc/falcon/falcon.c
++++ b/drivers/net/ethernet/sfc/falcon/falcon.c
+@@ -367,7 +367,7 @@ static const struct i2c_algo_bit_data falcon_i2c_bit_operations = {
+ 	.getsda		= falcon_getsda,
+ 	.getscl		= falcon_getscl,
+ 	.udelay		= 5,
+-	/* Wait up to 50 ms for slave to let us pull SCL high */
++	/* Wait up to 50 ms for client to let us pull SCL high */
+ 	.timeout	= DIV_ROUND_UP(HZ, 20),
+ };
  
--#define netif_txq_try_stop(txq, get_desc, start_thrs)			\
-+#define _netif_txq_try_stop(txq, get_desc, start_thrs, _res)		\
- 	({								\
- 		int _res;						\
- 									\
- 		netif_tx_stop_queue(txq);				\
- 		/* Producer index and stop bit must be visible		\
- 		 * to consumer before we recheck.			\
--		 * Pairs with a barrier in __netif_txq_completed_wake(). \
-+		 * Pairs with a barrier in ___netif_txq_completed_wake(). \
- 		 */							\
- 		smp_mb__after_atomic();					\
- 									\
-@@ -107,16 +107,20 @@ struct netdev_stat_ops {
- 			_res = -1;					\
- 		}							\
- 		_res;							\
--	})								\
-+	})
-+#define netif_txq_try_stop(txq, get_desc, start_thrs)			\
-+	_netif_txq_try_stop(txq, get_desc, start_thrs,			\
-+			    __UNIQUE_ID(res_))
- 
- /**
-- * netif_txq_maybe_stop() - locklessly stop a Tx queue, if needed
-+ * _netif_txq_maybe_stop() - locklessly stop a Tx queue, if needed
-  * @txq:	struct netdev_queue to stop/start
-  * @get_desc:	get current number of free descriptors (see requirements below!)
-  * @stop_thrs:	minimal number of available descriptors for queue to be left
-  *		enabled
-  * @start_thrs:	minimal number of descriptors to re-enable the queue, can be
-  *		equal to @stop_thrs or higher to avoid frequent waking
-+ * @_res: __UNIQUE_ID() to avoid variable name clash
-  *
-  * All arguments may be evaluated multiple times, beware of side effects.
-  * @get_desc must be a formula or a function call, it must always
-@@ -128,7 +132,8 @@ struct netdev_stat_ops {
-  *	 1 if the queue was left enabled
-  *	-1 if the queue was re-enabled (raced with waking)
-  */
--#define netif_txq_maybe_stop(txq, get_desc, stop_thrs, start_thrs)	\
-+#define _netif_txq_maybe_stop(txq, get_desc, stop_thrs, start_thrs,	\
-+			      _res)					\
- 	({								\
- 		int _res;						\
- 									\
-@@ -136,7 +141,10 @@ struct netdev_stat_ops {
- 		if (unlikely(get_desc < stop_thrs))			\
- 			_res = netif_txq_try_stop(txq, get_desc, start_thrs); \
- 		_res;							\
--	})								\
-+	})
-+#define netif_txq_maybe_stop(txq, get_desc, stop_thrs, start_thrs)	\
-+	_netif_txq_maybe_stop(txq, get_desc, stop_thrs, start_thrs,	\
-+			      __UNIQUE_ID(res_))
- 
- /* Variant of netdev_tx_completed_queue() which guarantees smp_mb() if
-  * @bytes != 0, regardless of kernel config.
-@@ -152,7 +160,7 @@ netdev_txq_completed_mb(struct netdev_queue *dev_queue,
- }
- 
- /**
-- * __netif_txq_completed_wake() - locklessly wake a Tx queue, if needed
-+ * ___netif_txq_completed_wake() - locklessly wake a Tx queue, if needed
-  * @txq:	struct netdev_queue to stop/start
-  * @pkts:	number of packets completed
-  * @bytes:	number of bytes completed
-@@ -160,6 +168,7 @@ netdev_txq_completed_mb(struct netdev_queue *dev_queue,
-  * @start_thrs:	minimal number of descriptors to re-enable the queue
-  * @down_cond:	down condition, predicate indicating that the queue should
-  *		not be woken up even if descriptors are available
-+ * @_res: __UNIQUE_ID() to avoid variable name clash
-  *
-  * All arguments may be evaluated multiple times.
-  * @get_desc must be a formula or a function call, it must always
-@@ -171,15 +180,15 @@ netdev_txq_completed_mb(struct netdev_queue *dev_queue,
-  *	 1 if the queue was already enabled (or disabled but @down_cond is true)
-  *	-1 if the queue was left unchanged (@start_thrs not reached)
-  */
--#define __netif_txq_completed_wake(txq, pkts, bytes,			\
--				   get_desc, start_thrs, down_cond)	\
-+#define ___netif_txq_completed_wake(txq, pkts, bytes, get_desc,		\
-+				    start_thrs, down_cond, _res)	\
- 	({								\
- 		int _res;						\
- 									\
- 		/* Report to BQL and piggy back on its barrier.		\
- 		 * Barrier makes sure that anybody stopping the queue	\
- 		 * after this point sees the new consumer index.	\
--		 * Pairs with barrier in netif_txq_try_stop().		\
-+		 * Pairs with barrier in _netif_txq_try_stop().		\
- 		 */							\
- 		netdev_txq_completed_mb(txq, pkts, bytes);		\
- 									\
-@@ -194,30 +203,43 @@ netdev_txq_completed_mb(struct netdev_queue *dev_queue,
- 		}							\
- 		_res;							\
- 	})
-+#define __netif_txq_completed_wake(txq, pkts, bytes, get_desc,		\
-+				   start_thrs, down_cond)		\
-+	___netif_txq_completed_wake(txq, pkts, bytes, get_desc,		\
-+				    start_thrs, down_cond,		\
-+				    __UNIQUE_ID(res_))
- 
- #define netif_txq_completed_wake(txq, pkts, bytes, get_desc, start_thrs) \
- 	__netif_txq_completed_wake(txq, pkts, bytes, get_desc, start_thrs, false)
- 
- /* subqueue variants follow */
- 
--#define netif_subqueue_try_stop(dev, idx, get_desc, start_thrs)		\
-+#define _netif_subqueue_try_stop(dev, idx, get_desc, start_thrs, txq)	\
- 	({								\
- 		struct netdev_queue *txq;				\
- 									\
- 		txq = netdev_get_tx_queue(dev, idx);			\
- 		netif_txq_try_stop(txq, get_desc, start_thrs);		\
- 	})
-+#define netif_subqueue_try_stop(dev, idx, get_desc, start_thrs)		\
-+	_netif_subqueue_try_stop(dev, idx, get_desc, start_thrs,	\
-+				 __UNIQUE_ID(txq_))
- 
--#define netif_subqueue_maybe_stop(dev, idx, get_desc, stop_thrs, start_thrs) \
-+#define _netif_subqueue_maybe_stop(dev, idx, get_desc, stop_thrs,	\
-+				   start_thrs, txq)			\
- 	({								\
- 		struct netdev_queue *txq;				\
- 									\
- 		txq = netdev_get_tx_queue(dev, idx);			\
- 		netif_txq_maybe_stop(txq, get_desc, stop_thrs, start_thrs); \
- 	})
-+#define netif_subqueue_maybe_stop(dev, idx, get_desc, stop_thrs,	\
-+				  start_thrs)				\
-+	_netif_subqueue_maybe_stop(dev, idx, get_desc, stop_thrs,	\
-+				   start_thrs, __UNIQUE_ID(txq_))
- 
--#define netif_subqueue_completed_wake(dev, idx, pkts, bytes,		\
--				      get_desc, start_thrs)		\
-+#define _netif_subqueue_completed_wake(dev, idx, pkts, bytes, get_desc,	\
-+				       start_thrs, txq)			\
- 	({								\
- 		struct netdev_queue *txq;				\
- 									\
-@@ -225,5 +247,9 @@ netdev_txq_completed_mb(struct netdev_queue *dev_queue,
- 		netif_txq_completed_wake(txq, pkts, bytes,		\
- 					 get_desc, start_thrs);		\
- 	})
-+#define netif_subqueue_completed_wake(dev, idx, pkts, bytes, get_desc,	\
-+				      start_thrs)			\
-+	_netif_subqueue_completed_wake(dev, idx, pkts, bytes, get_desc,	\
-+				       start_thrs, __UNIQUE_ID(txq_))
- 
- #endif
 -- 
-2.44.0
+2.34.1
 
 
