@@ -1,79 +1,101 @@
-Return-Path: <netdev+bounces-83130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E95F890F16
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:20:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84A61890FA4
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3433B22410
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 00:20:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B59E31C2DC16
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 00:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749EE6FC7;
-	Fri, 29 Mar 2024 00:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F191A5F;
+	Fri, 29 Mar 2024 00:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEAyJAOT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VxB1x4Xc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9896AC2;
-	Fri, 29 Mar 2024 00:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44AD5223;
+	Fri, 29 Mar 2024 00:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711671590; cv=none; b=t9hPlM9tlrb6zNOuGwyeol1m8Os1nmzNM5dUp9qLrlcV9Vm+rBMiMk91vo7fp/XLkWS/II/RY4LYc8FrDCnGDj4Hvlrpu1qrqUo7Ty//Q514BbQnoZbk0CiTM6TerG6VhuibYWq1KldM+moter2S+Ir8O0MLbZgeSda5vF6b6fk=
+	t=1711672270; cv=none; b=cJDmmfF1CIJkHNsax94VJaEbazK20ZMJWhtI6Z42eOOZqOBB5qrce7P6eHqo8xiqdaoxeHi76je88LtVkAOHgQ+iIAPYByINuLYmoGr5AX5iVidsWvy8I/KEfUOHui/g6ZEgGz5BaO47qOka6C06xoJGMhxTs6FsenMhv5VKdMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711671590; c=relaxed/simple;
-	bh=y9/z8+XhCbfFbaLLyeRnzsdTgsjZGO7uq8rSJrvXQP4=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=fU0tXnmK0goqhanxMEH/GnFZ5aEOl5JWo0i9yt8chZmfSThLxxuKYxIPiX5X6NiZ7iKzDRd8oSGBpOg3l5cgH0BdYBrMfJrhRZf4wK/DVowlMBLyQ6ouRhIVooSZitkJtZbHg2kpnuFXASFXryWRnQtPyuMFUV4gY5nhhOCS3bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEAyJAOT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 24D2BC43390;
-	Fri, 29 Mar 2024 00:19:50 +0000 (UTC)
+	s=arc-20240116; t=1711672270; c=relaxed/simple;
+	bh=qT743jPxa1XDwbNz9fp9wTjjmM0T0DFvYjRIAeLmIPY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ttQJyjxPjBq1q94wYV0p0UOV7+58CZpSw7mvIdlN3/P1HV9UFH0BGhn89y6tYaBA/5CTeQbeyofZVoesTfzl0WMaOVG1FKVlFLUbYkQ+gRO98JYLVcTtoBocQXpmCCBxB6s4cfS2bqg9CdRuA14uE77reRN+7cIjWhUxy5Z3id0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VxB1x4Xc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 55175C43394;
+	Fri, 29 Mar 2024 00:31:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711671590;
-	bh=y9/z8+XhCbfFbaLLyeRnzsdTgsjZGO7uq8rSJrvXQP4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=aEAyJAOTD6YqwK/8lJ3BRcIuN0crVrXCtkabNSX/Kwif+N38LncoHhCx3GIW++GSK
-	 VCuV/hcl58nUClV840gQzQC9cx1486g6yUTX0wqfj/J9bPSYMNHNIOhVz5a1yyZSdL
-	 6ebNhVBmdv9INOSy/4wgEcEuViiGXzQXF0EUWg7h3MSzZ3jbdgKVV3VMo2SkD6uHRl
-	 cVHBeCvSOwuAgI3HEybQ+UiLa+dqLWKxCEl9l2BYdfQ9cGxA59iYJI8SMzDyRBWCUB
-	 ZnjK2AhGAL0VniQNsaAu/Cs9iw9KUasqkWa9lYyGsudrIXPRrlOjdPhFc1nSTk3d0h
-	 F/o19ja5w5aAw==
+	s=k20201202; t=1711672270;
+	bh=qT743jPxa1XDwbNz9fp9wTjjmM0T0DFvYjRIAeLmIPY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VxB1x4XcveMTl4sW1vWHos+K2NAEOrk2XOeynE7/cLU3qAoIAgcn6cAoXLheUOd51
+	 hkETwfxQUTvc5cTEjFCPmlbVigQc9wWvSNqifU9e25JFw9FIiUVjh/2VLziAOb8A8M
+	 I6mnp7Hj++z8FUlIsD85827iKLdrucbTaUHlo7zGvQ9KHOwSMlyZ6Ppyx9w6FbffUP
+	 8dYd9RoSpUR/E3ouqSloN7gny8wktxaB7WPWDwsRyEo50jpGFsdo0ZJ1zptH4F0k6T
+	 dQ6JXAdzQMpPY/Zp1Vhc0/2yspuTkKCKLr5K06ru3gvmGKBX/Z17DE0H1cdCeqVjYg
+	 bGtaC5SMOM/Nw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 18BC6D2D0E1;
-	Fri, 29 Mar 2024 00:19:50 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.9-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240328143117.26574-1-pabeni@redhat.com>
-References: <20240328143117.26574-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240328143117.26574-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.9-rc2
-X-PR-Tracked-Commit-Id: 18685451fc4e546fc0e718580d32df3c0e5c8272
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 50108c352db70405b3d71d8099d0b3adc3b3352c
-Message-Id: <171167159009.21457.12914171393763552657.pr-tracker-bot@kernel.org>
-Date: Fri, 29 Mar 2024 00:19:50 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43318D2D0E1;
+	Fri, 29 Mar 2024 00:31:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] selftests/mm: Fix ARM related issue with fork after
+ pthread_create
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171167227027.28813.3759046936061373590.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 00:31:10 +0000
+References: <20240325194100.775052-1-edliaw@google.com>
+In-Reply-To: <20240325194100.775052-1-edliaw@google.com>
+To: Edward Liaw <edliaw@google.com>
+Cc: linux-kernel@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ akpm@linux-foundation.org, shuah@kernel.org, nathan@kernel.org,
+ ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
+ jannh@google.com, linux-kselftest@vger.kernel.org, kernel-team@android.com,
+ lokeshgidra@google.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-mm@kvack.org, llvm@lists.linux.dev
 
-The pull request you sent on Thu, 28 Mar 2024 15:31:17 +0100:
+Hello:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.9-rc2
+This patch was applied to netdev/net.git (main)
+by Andrew Morton <akpm@linux-foundation.org>:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/50108c352db70405b3d71d8099d0b3adc3b3352c
+On Mon, 25 Mar 2024 19:40:52 +0000 you wrote:
+> Following issue was observed while running the uffd-unit-tests selftest
+> on ARM devices. On x86_64 no issues were detected:
+> 
+> pthread_create followed by fork caused deadlock in certain cases
+> wherein fork required some work to be completed by the created thread.
+> Used synchronization to ensure that created thread's start function has
+> started before invoking fork.
+> 
+> [...]
 
-Thank you!
+Here is the summary with links:
+  - [v3] selftests/mm: Fix ARM related issue with fork after pthread_create
+    https://git.kernel.org/netdev/net/c/8c864371b2a1
 
+You are awesome, thank you!
 -- 
 Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
