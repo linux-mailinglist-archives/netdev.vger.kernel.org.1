@@ -1,215 +1,113 @@
-Return-Path: <netdev+bounces-83419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB5589235C
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:31:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7FF989236D
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:37:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 016C0285F38
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:31:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6492B1F23DD1
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D28120319;
-	Fri, 29 Mar 2024 18:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1S2vUMBb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208BB39FEB;
+	Fri, 29 Mar 2024 18:37:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AD9320B
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9667CAD2D
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711737057; cv=none; b=GmLHnin/z58eRTLvSTWy9FXobOl3HErpDV1V13QIqkCgOB1iFZtQJZmovxvAyJahVA/vJcksVVI4NhwhF4xI0y4kojgCqRjqLlSLpo59Dty64kjCVosimsIAZGZSnFhZaHpOIedkom+Ag8k3p2dXLLeZlRN8tLh/I8AgrUHfoyA=
+	t=1711737452; cv=none; b=rr5CenBfLQ+PB2Ug+l4j/QgwVn7XN5SGojsLQ+NnAUy0uYFnbdPScCxrOBgk9n+ISr5tWysd4udLIuma80TEM/eUonCVhcXXnviEZ0D55OsyrIEtb0OMA8xWfTcVN7wjgkKePR3lnKNZz7rH/S/mbr8q220YqQqFoZXBZo/RD6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711737057; c=relaxed/simple;
-	bh=q9fXlZD4J6SyprbSToxogXpZJfLmJA+jrif1BLLHFwo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pvVlig+Z8DnoiS5iAbKKy7UsNO4Ra9Wy5lOPHDtC0UxWNGHI6IwUDN5dsz8O8wsv3mvDK7g+7sizcRimZ/EZaT70BdGQcFzTaWXzsIndYYGN2QtQpwHFHkoDRsgBoaACtBtvpPrrlCda6Zyqc1b5j6Bd6f4M+wjk3nrtWazqwyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1S2vUMBb; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60cd073522cso36718707b3.1
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711737054; x=1712341854; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+gP11uoZxESr3DBeQAiaY/Mbz9A5zQu11DjgzkeSGxw=;
-        b=1S2vUMBbw9RMylz1LFcmbjNRlmVa86IJ2qRcNjfpGSBrpqcELcJd39e5jgE/Lm7pLf
-         19CvMHlYZ8J9LF6vaBJossFy1WiFdvYKlZ5dDiBc7RVIGhw6cS/XDIX9k/NOTk6ROyXZ
-         NXPg2y+1Zl+3adb6C5Gcb9LYDLOWap58KsAUxJn+gZ7MW5NBi+yDLpyAKEny4gV2tlaB
-         OFfly+IyclE3vKxSN5x9AgyvdbqaRVQrVkyuOb4XKK3FoSkQoiYzjJ5CC3erPuXG+UWw
-         u33IwdHJjaMN08e3IroIc4XXnzsCBNhXl0nVoGlFs4+jOWnvuPdza502CsogSSDbD3iM
-         Ztdw==
+	s=arc-20240116; t=1711737452; c=relaxed/simple;
+	bh=F2gfhsww7XTA3P50A1RX32InMlF8Q/9z+ZW7DdeTxgM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qmGl26BHCWX8kZUgRqnlvOJQogEHx79OC/kor4CDeymctE5U58mFvQfX5rB1JS94z0Ti25efL6iISUpBU47HfdT8FbN84vofg7i3DS9PBfJn5vv6LWhyio4X2d33LOPvQF2FHFnbSM0mbTLV3AZnyt7/U3IsFtaLN5dGbYsLl8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-368a41081baso20444075ab.3
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:37:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711737054; x=1712341854;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1711737450; x=1712342250;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+gP11uoZxESr3DBeQAiaY/Mbz9A5zQu11DjgzkeSGxw=;
-        b=hu5sY66cXh9/7jDs+bSGXa4o14PncA/li7LVn5H9UuttQvzY0/XbE0FEjTYz54J2fD
-         U0Sd4sc8vyhkzqzwNfu/72RflQisTiDLUf2cKL81MyWh+0zpEez6bwIv/fRgaMCK6V+7
-         GX9LyiyxidHX4z6x1shnk8us0ua690h/GYyVoGe39708lUTPfqcVQguwrHhuEg11STCt
-         ES6OpstujKTcBVBG3UZTDEH0iKVKQ9npTLP0WQ5CevY3RHHxRSa5n7LM7Z8dboDR2g3E
-         f/RbGTV58TfvNWwCcj3NOkzEFgxKynWkYNb+9PCvObWj9mW86fWXbeEGLvTK9WMWTfY+
-         WirQ==
-X-Gm-Message-State: AOJu0Yx21VJ2f7iUnE9hHDcle+3OFa0hdH7k2VpJWd870pXJPW0fKwfT
-	/JgK8Modeyqag43D2CXg+6Iu1iHLoJv1jZ6nRRprhp3tIHZovTTrtwGpNgSg8C0beM1SL9gKQ8S
-	iH+FLRlaNJg==
-X-Google-Smtp-Source: AGHT+IHZDPsIt50Budojh0tsEgFd1V9V2vDjPz+/Rt8aMEQNG4NELpqg78AGjeGkWx2hzn851AFZvUMKo4siNQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:f910:0:b0:611:7166:1a4d with SMTP id
- x16-20020a81f910000000b0061171661a4dmr789183ywm.3.1711737054570; Fri, 29 Mar
- 2024 11:30:54 -0700 (PDT)
-Date: Fri, 29 Mar 2024 18:30:53 +0000
+        bh=DLH3G/wi97DU/DtrnW/ODIbuNOVKTyxl862AdQPOt0k=;
+        b=jLLvjeXu09W0RBg3M5fdpJBnHz655u9c5HCkmRiqfIF3o7qrjX0G0RQ5Hv2DKZi2N0
+         GzY4fLTHGAcZZKKLLzNAwk6arDQO3QPJgapk0PPvSZk/Y5//flAsgBQicIPEVzZWDn45
+         XRwWkD+ODqH+WR1k1VT9J15dh0p8YsjJnBZDs/yBhZ/kjkcHYFa0NfmiywEeXoOggEM+
+         VDjr6t67u5XKwuCifhIAir3ZPN6emjS1u8B3JYLKDjRxvFYFHo5yAYYa1ah+bCQsvAI9
+         XuVShbVzfWINxyYKh0sYR0EqxoqQI86UHEuP0r+jaJe1liXbn0Im2m41SPXC1rHBw0ix
+         bTeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWnjQMiEs1fn40GMJStxa8SJtARmjiF0gobm1c6/JVKJhVMZfYWlsR5dGtPvkiPcMXrfhRWaStjake8Gq6xKPG35vA+J3o5
+X-Gm-Message-State: AOJu0YyxTTH4SUlICL4wdTcgkaKu6812vUJujfE16UtGFblskpB0gmHs
+	+BoFhnqymcz7ElBUGfPUQGCPBBf4OUz0gb5gt128kYgSJ8ss8PaKbPVfGjD1nN2aeKIT6KDAgjR
+	+KOAJRZTfCakiylqXMA7QV+5EUJgCFU+f1iXv5fYuJboTQv50MxZxEhU=
+X-Google-Smtp-Source: AGHT+IFRfpXx1VnfI0V7Zv8tfOUmGGmfvDvfktxzjg0GMDbH6xeORJdCTMoNoHwSU1EO7q6fta4nRuojWuGCc7GjOPpRVjDT3z+b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240329183053.644630-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: remove RTNL protection from inet6_dump_fib()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a92:c267:0:b0:368:9839:d232 with SMTP id
+ h7-20020a92c267000000b003689839d232mr182469ild.4.1711737449863; Fri, 29 Mar
+ 2024 11:37:29 -0700 (PDT)
+Date: Fri, 29 Mar 2024 11:37:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a5ee120614d0eef8@google.com>
+Subject: [syzbot] Monthly net report (Mar 2024)
+From: syzbot <syzbot+liste7bfc894f5476da05e96@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-No longer hold hold RTNL while calling inet6_dump_fib().
+Hello net maintainers/developers,
 
-Also change return value for a completed dump,
-so that NLMSG_DONE can be appended to current skb,
-saving one recvmsg() system call.
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>
+During the period, 25 new issues were detected and 14 were fixed.
+In total, 83 issues are still open and 1401 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  5716    Yes   WARNING in rxrpc_alloc_data_txbuf
+                   https://syzkaller.appspot.com/bug?extid=150fa730f40bce72aa05
+<2>  4782    Yes   WARNING in sock_map_delete_elem
+                   https://syzkaller.appspot.com/bug?extid=2f4f478b78801c186d39
+<3>  4300    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<4>  3586    Yes   WARNING in sock_hash_delete_elem
+                   https://syzkaller.appspot.com/bug?extid=1c04a1e4ae355870dc7a
+<5>  981     Yes   possible deadlock in __dev_queue_xmit (3)
+                   https://syzkaller.appspot.com/bug?extid=3b165dac15094065651e
+<6>  896     Yes   INFO: task hung in rfkill_global_led_trigger_worker (2)
+                   https://syzkaller.appspot.com/bug?extid=2e39bc6569d281acbcfb
+<7>  684     Yes   unregister_netdevice: waiting for DEV to become free (8)
+                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+<8>  509     No    possible deadlock in __lock_task_sighand (2)
+                   https://syzkaller.appspot.com/bug?extid=34267210261c2cbba2da
+<9>  378     Yes   KMSAN: uninit-value in nci_rx_work
+                   https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534
+<10> 323     Yes   INFO: rcu detected stall in tc_modify_qdisc
+                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
+
 ---
- net/ipv6/ip6_fib.c | 51 +++++++++++++++++++++++-----------------------
- 1 file changed, 26 insertions(+), 25 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 5c558dc1c6838681c2848412dced72a41fe764be..284002a2a890526960c1360ebab4378bb8bb43f8 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -623,23 +623,22 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 	struct rt6_rtnl_dump_arg arg = {
- 		.filter.dump_exceptions = true,
- 		.filter.dump_routes = true,
--		.filter.rtnl_held = true,
-+		.filter.rtnl_held = false,
- 	};
- 	const struct nlmsghdr *nlh = cb->nlh;
- 	struct net *net = sock_net(skb->sk);
--	unsigned int h, s_h;
- 	unsigned int e = 0, s_e;
-+	struct hlist_head *head;
- 	struct fib6_walker *w;
- 	struct fib6_table *tb;
--	struct hlist_head *head;
--	int res = 0;
-+	unsigned int h, s_h;
-+	int err = 0;
- 
-+	rcu_read_lock();
- 	if (cb->strict_check) {
--		int err;
--
- 		err = ip_valid_fib_dump_req(net, nlh, &arg.filter, cb);
- 		if (err < 0)
--			return err;
-+			goto unlock;
- 	} else if (nlmsg_len(nlh) >= sizeof(struct rtmsg)) {
- 		struct rtmsg *rtm = nlmsg_data(nlh);
- 
-@@ -660,8 +659,10 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 		 * 2. allocate and initialize walker.
- 		 */
- 		w = kzalloc(sizeof(*w), GFP_ATOMIC);
--		if (!w)
--			return -ENOMEM;
-+		if (!w) {
-+			err = -ENOMEM;
-+			goto unlock;
-+		}
- 		w->func = fib6_dump_node;
- 		cb->args[2] = (long)w;
- 	}
-@@ -675,46 +676,46 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 		tb = fib6_get_table(net, arg.filter.table_id);
- 		if (!tb) {
- 			if (rtnl_msg_family(cb->nlh) != PF_INET6)
--				goto out;
-+				goto unlock;
- 
- 			NL_SET_ERR_MSG_MOD(cb->extack, "FIB table does not exist");
--			return -ENOENT;
-+			err = -ENOENT;
-+			goto unlock;
- 		}
- 
- 		if (!cb->args[0]) {
--			res = fib6_dump_table(tb, skb, cb);
--			if (!res)
-+			err = fib6_dump_table(tb, skb, cb);
-+			if (!err)
- 				cb->args[0] = 1;
- 		}
--		goto out;
-+		goto unlock;
- 	}
- 
- 	s_h = cb->args[0];
- 	s_e = cb->args[1];
- 
--	rcu_read_lock();
- 	for (h = s_h; h < FIB6_TABLE_HASHSZ; h++, s_e = 0) {
- 		e = 0;
- 		head = &net->ipv6.fib_table_hash[h];
- 		hlist_for_each_entry_rcu(tb, head, tb6_hlist) {
- 			if (e < s_e)
- 				goto next;
--			res = fib6_dump_table(tb, skb, cb);
--			if (res != 0)
--				goto out_unlock;
-+			err = fib6_dump_table(tb, skb, cb);
-+			if (err != 0)
-+				goto out;
- next:
- 			e++;
- 		}
- 	}
--out_unlock:
--	rcu_read_unlock();
-+out:
- 	cb->args[1] = e;
- 	cb->args[0] = h;
--out:
--	res = res < 0 ? res : skb->len;
--	if (res <= 0)
-+
-+unlock:
-+	rcu_read_unlock();
-+	if (err <= 0)
- 		fib6_dump_end(cb);
--	return res;
-+	return err;
- }
- 
- void fib6_metric_set(struct fib6_info *f6i, int metric, u32 val)
-@@ -2506,7 +2507,7 @@ int __init fib6_init(void)
- 		goto out_kmem_cache_create;
- 
- 	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETROUTE, NULL,
--				   inet6_dump_fib, 0);
-+				   inet6_dump_fib, RTNL_FLAG_DUMP_UNLOCKED);
- 	if (ret)
- 		goto out_unregister_subsys;
- 
--- 
-2.44.0.478.gd926399ef9-goog
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
