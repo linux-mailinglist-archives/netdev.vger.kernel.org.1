@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-83292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B3289198D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:43:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CAA68919A7
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 13:45:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53183285016
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:43:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBA62286836
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17621494DE;
-	Fri, 29 Mar 2024 12:29:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B149C14A61A;
+	Fri, 29 Mar 2024 12:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nA1ttXm9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FoMiZSBX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7359E1494DA;
-	Fri, 29 Mar 2024 12:29:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F9214A612;
+	Fri, 29 Mar 2024 12:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715341; cv=none; b=PgAKlW6dBdNn/AnOneGnG+CnsTMCciP47QvGt1PNUeXdOoe8b/eUYpnLiwo1jWtB+LmSMZaohkwXnX+2ylkqEFC9+JTn5LLRJAKaxulRcCmSEnefCF+OIk0K9CCWP9aRfXTJa1lA25vMoYyRbpBM1FSeh4y0Qt5YVWq+LW19pA8=
+	t=1711715348; cv=none; b=D4H8mAeqGdU9FMW0fS+yL3n7oKaN6M3QcJVSKkz0r3h0yVRZ96P6g4i5Gzb/LKnEr6rtdQSLNS16q/P8/y3+1bmg38ZRgg4avbtl80wCwXeo+doClxpTy+iSfzqMFAqkV7G2iN9fg0x/MGC9Y1caZSo1oghH5XTZL3sfN0RV7iQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715341; c=relaxed/simple;
-	bh=VBbr5zV+DGiCnpCpxIGYBmWTVXJfvphyBATaBXAmY8w=;
+	s=arc-20240116; t=1711715348; c=relaxed/simple;
+	bh=r04ih+R+QLaanuRfoFajyez1KZEQnSMxlDoyFKVImUo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YiJNsYADNvd/QmYdBfvohMZqrCuW4lFTKr5sTMKetUvWSvK/q3uhxtYBqfVYByN4tyK39wyZVQHdtxpd9+wqomkh8Z7CFBvsaueT/QLWfn7scb3ZOAIXxPur9Dbf3YIp+W/EmH4c2HfgSMX/ILcYluWDJvpmoHdaykm5DYL5/Gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nA1ttXm9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19BA0C433A6;
-	Fri, 29 Mar 2024 12:29:00 +0000 (UTC)
+	 MIME-Version; b=QSq6ZsiuOsX/kd7Jg1gsC35pDQUb/9MyE7dO6iI/KPFNCCN1U5WBWWKfn6W4rQYOgmGGrS76sA2p4NEHz5bk6Ywc4LKKztk90sP7UbO1nRQ06JzOI+X92nvB0ctF0ZhBRTZEJRCn39EaamHKDRDGxv+6UwrTj4ywBZHGreb3AVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FoMiZSBX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03001C433C7;
+	Fri, 29 Mar 2024 12:29:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715341;
-	bh=VBbr5zV+DGiCnpCpxIGYBmWTVXJfvphyBATaBXAmY8w=;
+	s=k20201202; t=1711715348;
+	bh=r04ih+R+QLaanuRfoFajyez1KZEQnSMxlDoyFKVImUo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nA1ttXm9PKt3XZj729XZD22+k9T98SG4dFAnpAo9Iey9W72Ip38tn5P7f3PjEUwAp
-	 Pkid58TI2m2FKLxK1lwH/HFU1eZqEY9NSVWN2FOqlDriA/tm3Y+z8X1IemCLW07XZt
-	 7QdXTEtSokD9Qf1HcPFt8Pj3pDCK7lcEqCt/xo2idkDUynIg7SqzOTRnWnn6auv9wc
-	 qYMVZXuSTMkAS6WVFi7Eeni8n2WsIPgc91+Mcgj86ANrVsMXn6KoCadYd3c5ffxm1v
-	 GSyHZ5f0/M+byGTr+CQ0nbuINpQBbvk6nd15hWuPbL3mJ275J/tdo803sWs/5pd7ws
-	 BvEs6h/XaVfAw==
+	b=FoMiZSBXaX66qA5yzAw6pVlpnsY65CqqkXDIrxJWoilmBUv4z4sD0Yn8fRK9ZS5FK
+	 ClAMjWTXWIywCBfLb6QZECrvR40JADAU1ZlflYhjtYaAZYJ9qYIbgMPY143rAGNizN
+	 jT9TKA66iVDB5tTzbVyXvW/TgRwPeYI/MYHeU4TsUcZJehmfaYEamE92WTQKE9KuNy
+	 bmsMkiNKs46Zr865dYSw6nuDhvXj5jba6Poiel/8vdd5roPv8V/bDfYL8yBthdzBRv
+	 oasIN0XPYi/L1/5mq+3V0NfTZYv/eVR44pWNG1XlVKcbOAaM2T6YiAebnr6Xy85uSA
+	 dZWsxRfAhzVxQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	syzbot+d050d437fe47d479d210@syzkaller.appspotmail.com,
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Rafal Romanowski <rafal.romanowski@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
+	jesse.brandeburg@intel.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 58/68] wifi: cfg80211: check A-MSDU format more carefully
-Date: Fri, 29 Mar 2024 08:25:54 -0400
-Message-ID: <20240329122652.3082296-58-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.8 63/68] ice: use relative VSI index for VFs instead of PF VSI number
+Date: Fri, 29 Mar 2024 08:25:59 -0400
+Message-ID: <20240329122652.3082296-63-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240329122652.3082296-1-sashal@kernel.org>
 References: <20240329122652.3082296-1-sashal@kernel.org>
@@ -71,89 +73,102 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.8.2
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+From: Jacob Keller <jacob.e.keller@intel.com>
 
-[ Upstream commit 9ad7974856926129f190ffbe3beea78460b3b7cc ]
+[ Upstream commit 11fbb1bfb5bc8c98b2d7db9da332b5e568f4aaab ]
 
-If it looks like there's another subframe in the A-MSDU
-but the header isn't fully there, we can end up reading
-data out of bounds, only to discard later. Make this a
-bit more careful and check if the subframe header can
-even be present.
+When initializing over virtchnl, the PF is required to pass a VSI ID to the
+VF as part of its capabilities exchange. The VF driver reports this value
+back to the PF in a variety of commands. The PF driver validates that this
+value matches the value it sent to the VF.
 
-Reported-by: syzbot+d050d437fe47d479d210@syzkaller.appspotmail.com
-Link: https://msgid.link/20240226203405.a731e2c95e38.I82ce7d8c0cc8970ce29d0a39fdc07f1ffc425be4@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Some hardware families such as the E700 series could use this value when
+reading RSS registers or communicating directly with firmware over the
+Admin Queue.
+
+However, E800 series hardware does not support any of these interfaces and
+the VF's only use for this value is to report it back to the PF. Thus,
+there is no requirement that this value be an actual VSI ID value of any
+kind.
+
+The PF driver already does not trust that the VF sends it a real VSI ID.
+The VSI structure is always looked up from the VF structure. The PF does
+validate that the VSI ID provided matches a VSI associated with the VF, but
+otherwise does not use the VSI ID for any purpose.
+
+Instead of reporting the VSI number relative to the PF space, report a
+fixed value of 1. When communicating with the VF over virtchnl, validate
+that the VSI number is returned appropriately.
+
+This avoids leaking information about the firmware of the PF state.
+Currently the ice driver only supplies a VF with a single VSI. However, it
+appears that virtchnl has some support for allowing multiple VSIs. I did
+not attempt to implement this. However, space is left open to allow further
+relative indexes if additional VSIs are provided in future feature
+development. For this reason, keep the ice_vc_isvalid_vsi_id function in
+place to allow extending it for multiple VSIs in the future.
+
+This change will also simplify handling of live migration in a future
+series. Since we no longer will provide a real VSI number to the VF, there
+will be no need to keep track of this number when migrating to a new host.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/wireless/util.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 9 ++-------
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h | 9 +++++++++
+ 2 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/net/wireless/util.c b/net/wireless/util.c
-index d1ce3bee27973..b9d15f369378b 100644
---- a/net/wireless/util.c
-+++ b/net/wireless/util.c
-@@ -791,15 +791,19 @@ ieee80211_amsdu_subframe_length(void *field, u8 mesh_flags, u8 hdr_type)
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 6f2328a049bf1..7b550d7d96b68 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -499,7 +499,7 @@ static int ice_vc_get_vf_res_msg(struct ice_vf *vf, u8 *msg)
+ 	vfres->rss_lut_size = ICE_LUT_VSI_SIZE;
+ 	vfres->max_mtu = ice_vc_get_max_frame_size(vf);
  
- bool ieee80211_is_valid_amsdu(struct sk_buff *skb, u8 mesh_hdr)
+-	vfres->vsi_res[0].vsi_id = vf->lan_vsi_num;
++	vfres->vsi_res[0].vsi_id = ICE_VF_VSI_ID;
+ 	vfres->vsi_res[0].vsi_type = VIRTCHNL_VSI_SRIOV;
+ 	vfres->vsi_res[0].num_queue_pairs = vsi->num_txq;
+ 	ether_addr_copy(vfres->vsi_res[0].default_mac_addr,
+@@ -545,12 +545,7 @@ static void ice_vc_reset_vf_msg(struct ice_vf *vf)
+  */
+ bool ice_vc_isvalid_vsi_id(struct ice_vf *vf, u16 vsi_id)
  {
--	int offset = 0, remaining, subframe_len, padding;
-+	int offset = 0, subframe_len, padding;
+-	struct ice_pf *pf = vf->pf;
+-	struct ice_vsi *vsi;
+-
+-	vsi = ice_find_vsi(pf, vsi_id);
+-
+-	return (vsi && (vsi->vf == vf));
++	return vsi_id == ICE_VF_VSI_ID;
+ }
  
- 	for (offset = 0; offset < skb->len; offset += subframe_len + padding) {
-+		int remaining = skb->len - offset;
- 		struct {
- 		    __be16 len;
- 		    u8 mesh_flags;
- 		} hdr;
- 		u16 len;
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.h b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+index 60dfbe05980aa..3a41158691532 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.h
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+@@ -19,6 +19,15 @@
+ #define ICE_MAX_MACADDR_PER_VF		18
+ #define ICE_FLEX_DESC_RXDID_MAX_NUM	64
  
-+		if (sizeof(hdr) > remaining)
-+			return false;
++/* VFs only get a single VSI. For ice hardware, the VF does not need to know
++ * its VSI index. However, the virtchnl interface requires a VSI number,
++ * mainly due to legacy hardware.
++ *
++ * Since the VF doesn't need this information, report a static value to the VF
++ * instead of leaking any information about the PF or hardware setup.
++ */
++#define ICE_VF_VSI_ID	1
 +
- 		if (skb_copy_bits(skb, offset + 2 * ETH_ALEN, &hdr, sizeof(hdr)) < 0)
- 			return false;
- 
-@@ -807,7 +811,6 @@ bool ieee80211_is_valid_amsdu(struct sk_buff *skb, u8 mesh_hdr)
- 						      mesh_hdr);
- 		subframe_len = sizeof(struct ethhdr) + len;
- 		padding = (4 - subframe_len) & 0x3;
--		remaining = skb->len - offset;
- 
- 		if (subframe_len > remaining)
- 			return false;
-@@ -825,7 +828,7 @@ void ieee80211_amsdu_to_8023s(struct sk_buff *skb, struct sk_buff_head *list,
- {
- 	unsigned int hlen = ALIGN(extra_headroom, 4);
- 	struct sk_buff *frame = NULL;
--	int offset = 0, remaining;
-+	int offset = 0;
- 	struct {
- 		struct ethhdr eth;
- 		uint8_t flags;
-@@ -839,10 +842,14 @@ void ieee80211_amsdu_to_8023s(struct sk_buff *skb, struct sk_buff_head *list,
- 		copy_len = sizeof(hdr);
- 
- 	while (!last) {
-+		int remaining = skb->len - offset;
- 		unsigned int subframe_len;
- 		int len, mesh_len = 0;
- 		u8 padding;
- 
-+		if (copy_len > remaining)
-+			goto purge;
-+
- 		skb_copy_bits(skb, offset, &hdr, copy_len);
- 		if (iftype == NL80211_IFTYPE_MESH_POINT)
- 			mesh_len = __ieee80211_get_mesh_hdrlen(hdr.flags);
-@@ -852,7 +859,6 @@ void ieee80211_amsdu_to_8023s(struct sk_buff *skb, struct sk_buff_head *list,
- 		padding = (4 - subframe_len) & 0x3;
- 
- 		/* the last MSDU has no padding */
--		remaining = skb->len - offset;
- 		if (subframe_len > remaining)
- 			goto purge;
- 		/* mitigate A-MSDU aggregation injection attacks */
+ struct ice_virtchnl_ops {
+ 	int (*get_ver_msg)(struct ice_vf *vf, u8 *msg);
+ 	int (*get_vf_res_msg)(struct ice_vf *vf, u8 *msg);
 -- 
 2.43.0
 
