@@ -1,113 +1,118 @@
-Return-Path: <netdev+bounces-83600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDEBD8932CE
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:28:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE4BF893269
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:07:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4876C1F22C05
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:28:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D9CD1C209EA
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEEF147C82;
-	Sun, 31 Mar 2024 16:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BAE149DE0;
+	Sun, 31 Mar 2024 16:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bI+U+9iL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtFEeVUc"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1518E1474D7
-	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 16:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7F51465A3;
+	Sun, 31 Mar 2024 16:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=62.96.220.36
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711902384; cv=fail; b=d1uMOZrW6UJBXJNafPdc2xnIeMel5l5/S31yn/53gw3LNHWt2BiaEcVM4se/rf151GptWhYUABHs4oVIB005eFXzpwqd4S/mkD7pEzAuoJ+uAik5gStk1C43HDBpjjyM2iIbw5BddyTPejHeNoDtR6iQPjue7f0hTZVeXejI6Ng=
+	t=1711900991; cv=pass; b=VEPeFLzT2LRalY5HlPRRDpSaBo+lybtv4i83s3N26X1+jV4/kjO+dSXKjLDWTmCzC4S/qTvp6vyGHsYNY+eMwQEbNbvKuqNu9vixblu6xxgtPWl0KnClwD/E1+xbbQKiYjz7iMt5T4WjLeA0g4HKB9rF3y6nN2xbBboyb6QPztc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711902384; c=relaxed/simple;
-	bh=WYrLnd5VJ+w8tGoOoxXgy3WX373NxHkTc+nBr5+yjG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=okOxpZCIw62eTFhrpHgAYbmedSajsbT/RxomTls/FTQC+1rtyXHf4hLrdmCXn03PWJ9gTwJOlsmuw7E6yRV6PN8g9Yu8kKLe9sG7KmdJMI7BlQ5Nn6tgvaNqn65CplMePAcxlk6P2hU/JZlZZoeyir6EMEEkqAuXbGvqoo9Qz5s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bI+U+9iL; arc=none smtp.client-ip=10.30.226.201; arc=fail smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+	s=arc-20240116; t=1711900991; c=relaxed/simple;
+	bh=ZkGv2aECxPpKjlvqInjY5t6BAWJ1JpiWyKfHeeHLgFY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZIxfH6zgoCyO6MM+PZrSZv/lpNryUH7qP9fKGiuVCbZ9j9ed2IPXOl37WSJiXVeUKHhRzst7xcRRMX60Qx8p/hwe1ZbhmmEf4mG81KgOAauLVbkAI0vbtg6PM94HHT6MehrSehEeXBUTz82hPAQJMCiI/tduOmCbTk1Nd5maKWI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtFEeVUc; arc=none smtp.client-ip=209.85.221.54; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=pass smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id C5BC8207C6;
-	Sun, 31 Mar 2024 18:26:21 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 5F873208C7;
+	Sun, 31 Mar 2024 18:03:08 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NV5KtWBsDNRb; Sun, 31 Mar 2024 18:26:21 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	with ESMTP id j4TdwtMfbLfU; Sun, 31 Mar 2024 18:03:07 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 2C7D520892;
-	Sun, 31 Mar 2024 18:26:20 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2C7D520892
+	by a.mx.secunet.com (Postfix) with ESMTPS id AF81C2083E;
+	Sun, 31 Mar 2024 18:03:07 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com AF81C2083E
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 2005C80004E;
-	Sun, 31 Mar 2024 18:26:20 +0200 (CEST)
+	by mailout2.secunet.com (Postfix) with ESMTP id A2556800057;
+	Sun, 31 Mar 2024 18:03:07 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:26:19 +0200
+ 15.1.2507.35; Sun, 31 Mar 2024 18:03:07 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 16:23:32 +0000
-X-sender: <netdev+bounces-83467-peter.schumann=secunet.com@vger.kernel.org>
-X-Receiver: <peter.schumann@secunet.com>
- ORCPT=rfc822;peter.schumann@secunet.com NOTIFY=NEVER;
- X-ExtendedProps=BQAVABYAAgAAAAUAFAARAJ05ab4WgQhHsqdZ7WUjHykPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGAAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249UGV0ZXIgU2NodW1hbm41ZTcFAAsAFwC+AAAAQ5IZ35DtBUiRVnd98bETxENOPURCNCxDTj1EYXRhYmFzZXMsQ049RXhjaGFuZ2UgQWRtaW5pc3RyYXRpdmUgR3JvdXAgKEZZRElCT0hGMjNTUERMVCksQ049QWRtaW5pc3RyYXRpdmUgR3JvdXBzLENOPXNlY3VuZXQsQ049TWljcm9zb2Z0IEV4Y2hhbmdlLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUADgARAC7JU/le071Fhs0mWv1VtVsFAB0ADwAMAAAAbWJ4LWVzc2VuLTAxBQA8AAIAAA8ANgAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5EaXNwbGF5TmFtZQ8ADwAAAFNjaHVtYW5uLCBQZXRlcgUADAACAAAFAGwAAgAABQBYABcASAAAAJ05ab4WgQhHsqdZ7WUjHylDTj1TY2h1bWFubiBQZXRlcixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc
-	2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
+ 15.1.2507.17; Sun, 31 Mar 2024 15:52:40 +0000
+X-sender: <netdev+bounces-83468-steffen.klassert=secunet.com@vger.kernel.org>
+X-Receiver: <steffen.klassert@secunet.com>
+ ORCPT=rfc822;steffen.klassert@secunet.com NOTIFY=NEVER;
+ X-ExtendedProps=BQAVABYAAgAAAAUAFAARAPDFCS25BAlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAwAAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9ye
+	TogRmFsc2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
 X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoAPpLp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgCkAAAAi4oAAAUABAAUIAEAAAAaAAAAcGV0ZXIuc2NodW1hbm5Ac2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAZAAPAAMAAABIdWI=
-X-Source: SMTP:Default MBX-DRESDEN-01
+X-ExtendedProps: BQBjAAoAeAxrGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAYgAKAKAAAADLigAABQBkAA8AAwAAAEh1Yg==
+X-Source: SMTP:Default MBX-ESSEN-01
 X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 10908
+X-EndOfInjectedXHeaders: 23417
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.48.161; helo=sy.mirrors.kernel.org; envelope-from=netdev+bounces-83467-peter.schumann=secunet.com@vger.kernel.org; receiver=peter.schumann@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 6BFD82032C
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.199.223; helo=ny.mirrors.kernel.org; envelope-from=netdev+bounces-83468-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 6B25C200BB
 Authentication-Results: b.mx.secunet.com;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bI+U+9iL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtFEeVUc"
 X-Original-To: netdev@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal: i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711748801; cv=none; b=hLKYXnQEay5o+2wB5f0ryqS+rZ4ZW/pWleHMXwjhbqTEO9laLXYaP0C6ZTYGVrNw+Tt5OVQ/RQaNUat82Rt+EhBBWWqzcvErd7KDsFj0u4E1bDi1tepghJvI1eyyM+7gjw9B2Jl5hWUWRNj3KHwymj9hNAeWQKdXyYcIelmzd6g=
+	t=1711749199; cv=none; b=YcUIPWpHs7mLZnVdaPh2sGq8r5F5xF21yFPDxMZ/gm0YeJrT/TWfFs/Gh9WnFRa71L3nMBK9Nnv6q1uk/kZxQqMajeyclU7BgxRjaaMsw/eReYwfsEd5M1f1xxGZ/6c71chWZmsbAHPSHVYj437pvbvRgRDUvYwenfjdDa7AKfY=
 ARC-Message-Signature: i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711748801; c=relaxed/simple;
-	bh=WYrLnd5VJ+w8tGoOoxXgy3WX373NxHkTc+nBr5+yjG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Da0PmiKj4OjIEt8CupTNYdDoBOgmm/fmvFKxeKWlbCItOgbA0gtxxxkd4hPTd3TIzWfN6pUedIOpwdyyZE0XgLyjFKerPpbHIyQsmI5+UNZ2pzKJU7SOGYeO/z+jep+WWfr4R1gtnmwquWEj0SLan7cV63m1nEY70J0ZSUYgjHc=
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bI+U+9iL; arc=none smtp.client-ip=10.30.226.201
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711748800;
-	bh=WYrLnd5VJ+w8tGoOoxXgy3WX373NxHkTc+nBr5+yjG4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bI+U+9iL3hiAq1i9X3EfgmszunTmib3XIbrxUXRflu3eiFNobwQTe80Nf79MnqiG8
-	 t3e98Rgu7Jq4Mk3ZE4Fdq4v43fw9On7zw5k3qEWPs63RVIGvHxkkIqzruRT0wC46jl
-	 9q2y63dRk0GsdQxnFxFqQ44B8lisQgn22oS7gpVRPtSnINNdrbZMtXLzpz7n7rYzER
-	 WwmL/vzkFrdHEj9I9WpPRcCiHv3J4pPbcwn/oyA4gO058KPdy3NpRp992LZOHjmd3M
-	 ax2/pQcD7XZi71fGhCFm+oewMT3YFpCaojmdBqcEOVTku7zALR43tPlo8iANKnkNbS
-	 495lKCzcWHj0w==
-Date: Fri, 29 Mar 2024 14:46:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>, Pablo Neira Ayuso
- <pablo@netfilter.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, Stanislav
- Fomichev <sdf@google.com>, donald.hunter@redhat.com, fw@strlen.de
-Subject: Re: [PATCH net-next v1 2/2] tools/net/ynl: Add multi message
- support to ynl
-Message-ID: <20240329144639.0b42dc19@kernel.org>
-In-Reply-To: <CAD4GDZw0RW3B2n5vC-q-XLpQ_bCg0iP13qvOa=cjK37CPLJsKg@mail.gmail.com>
-References: <20240327181700.77940-1-donald.hunter@gmail.com>
-	<20240327181700.77940-3-donald.hunter@gmail.com>
-	<20240328175729.15208f4a@kernel.org>
-	<m234s9jh0k.fsf@gmail.com>
-	<20240329084346.7a744d1e@kernel.org>
-	<m2plvcj27b.fsf@gmail.com>
-	<CAD4GDZw0RW3B2n5vC-q-XLpQ_bCg0iP13qvOa=cjK37CPLJsKg@mail.gmail.com>
+	s=arc-20240116; t=1711749199; c=relaxed/simple;
+	bh=ZkGv2aECxPpKjlvqInjY5t6BAWJ1JpiWyKfHeeHLgFY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N4wUMXak4yyRayehjv1ar0r8EyyPLMwBc3uJ0bwl/C4uF0p7B7G/bWOwvNeZYeq6b3W3Vcfr0NdbT29Ffwzm149FPXaVcG2iO3WP/b1G80f4/vw74ISsQwa8epN/zn528A3NyNmNXX0nycQdjpBblQ7EyQAtFDKts98b9c+Xxik=
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtFEeVUc; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711749195; x=1712353995; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oSnIkrXKOxIFx664NuP3H7hYth27RezAKOIyptzRih0=;
+        b=DtFEeVUcXHxQSM1acoLPB3xIZ2HSM6vWTSGbB4Vn2PTFo59S2qm9Wdb/PYmKmlkt7q
+         bweDNoN2FkFdd+biODVbvTAWaLZraY63rTLXLI3Uj2YXC5gXRj51NmN6ndvk0CmDMb0e
+         HIob6o5pR32SYbzkWHSn4Jg4Btu/S+g0UAjgMXPRMh1EcOgJV/whXSYiykrw7f/6s77P
+         /H5ZCsxnDWl4kNYCj9mzXKbfqQBAv6Lnt80sLG1vRk3gD9HqNaAkNP/seJmggh7Vb0eo
+         x3i++yNtv1UR3TkN0hCOiKzOfpwFxG/x3+oaCYHUq4IcorpsSpcrx239+6AZFAOrQdbA
+         WyHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711749195; x=1712353995;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oSnIkrXKOxIFx664NuP3H7hYth27RezAKOIyptzRih0=;
+        b=oKWLVHtPvz9J+QXVTc54yStjx+NkapzU4nW5NsuqPQ5h82t98mF43eq2fZPnUSPhaT
+         MGdf9ycXYZkO41VrOpN62JqHNhZQR/quC5iGCtAX8SbX3Zql03mdeT6pd9hdt04AMwNI
+         v7s3h6cmiqq3SNt6pWwVBYRqxOm+JPpZT5yDuDLXj7HFAWYEdMSKpeIILWSrLfRqeGmF
+         0Wu0zy7UE5pH6ZQnPhhEBhM4jmoqIk7Jl9U1SyEn4ioN3y3x18oyrKxSulpIT55d/yc8
+         64AGB3PNnhGmaMJktfTQg6iokvhAcecEo9Sr4wvXZuzD5l1KTyylDAgGYGp2D5OwKZyP
+         iGgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUd4xvQHL/oaQCMtCuugnR3C+1mNP+kYnHMed8zOGO5hdRvAX21HlPyuCzWSAKy8Bt5pMwgz3toD1E3Xn4ARVBMo22+kQWtIVLj26ICYQSx1B5RhgBvSbm3JXQKMiyRL5E4gFZ/VAumoFjE2Vcpg7zLq5/DEIrGAbwW
+X-Gm-Message-State: AOJu0YyKhnyWxAp7UfXLi6lEMSL4950T9e1nKDvTnmG9yMcApYpszSgu
+	6nlrYsSq1udaQLoImKyk+HbI3U4g2GsYOT0pZe1ZoHsOJsdjCd5+EVv1QU8gEWIM6DBowMLNfme
+	dpizDXQEt670AhG7mMjM3Cbt2ZFB5CMSUPpA=
+X-Google-Smtp-Source: AGHT+IESQ34cqmbczYM0CtTFQ4n7hfhahLrps7uGUEuczD5xhOvFv09EChC/YJ/FIRR8VtuzAy4gIzrPZKwGa0EMMVQ=
+X-Received: by 2002:a5d:6d49:0:b0:341:e4f4:4399 with SMTP id
+ k9-20020a5d6d49000000b00341e4f44399mr1687491wri.68.1711749195364; Fri, 29 Mar
+ 2024 14:53:15 -0700 (PDT)
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -115,33 +120,171 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+References: <20240329094906.18147-1-ubizjak@gmail.com> <20240329094906.18147-3-ubizjak@gmail.com>
+In-Reply-To: <20240329094906.18147-3-ubizjak@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 29 Mar 2024 14:53:03 -0700
+Message-ID: <CAADnVQ+6D++hCXaP=aK+Q5wienMzhHo3h9YCvpA_7sHjMt+q6A@mail.gmail.com>
+Subject: Re: [PATCH RESEND bpf 2/2] x86/bpf: Fix IP for relocating call depth accounting
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: X86 ML <x86@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	=?UTF-8?Q?Joan_Bruguera_Mic=C3=B3?= <joanbrugueram@gmail.com>, 
+	Ingo Molnar <mingo@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Fri, 29 Mar 2024 21:01:09 +0000 Donald Hunter wrote:
-> There's no response for 'batch-begin' or 'batch-end'. We may need a
-> per op spec property to tell us if a request will be acknowledged.
+On Fri, Mar 29, 2024 at 2:49=E2=80=AFAM Uros Bizjak <ubizjak@gmail.com> wro=
+te:
+>
+> From: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
+>
+> The recently introduced support for %rip-relative relocations in the
+> call thunk template assumes that the code is being patched in-place,
+> so the destination of the relocation matches the address of the code.
+> This is not true for the call depth accounting emitted by the BPF JIT,
+> so the calculated address is wrong and usually causes a page fault.
 
-:(
+Could you share the link to what this 'rip-relative' relocation is ?
 
-Pablo, could we possibly start processing the ACK flags on those
-messages? Maybe the existing user space doesn't set ACK so nobody
-would notice?
+> Pass the destination IP when the BPF JIT emits call depth accounting.
+>
+> Fixes: 17bce3b2ae2d ("x86/callthunks: Handle %rip-relative relocations in=
+ call thunk template")
 
-I don't think the messages are otherwise marked as special from 
-the "netlink layer" perspective.
+Ohh. It's buried inside that patch.
+Pls make commit log a bit more clear that that commit 17bce3b2ae2d
+broke x86_call_depth_emit_accounting logic.
 
-> > I think this was a blind spot on my part because nftables doesn't
-> > support batch for get operations:
-> >
-> > https://elixir.bootlin.com/linux/latest/source/net/netfilter/nf_tables_api.c#L9092
-> >
-> > I'll need to try using multi for gets without any batch messages and see how
-> > everything behaves.  
-> 
-> Okay, so it can be made to work. Will incorporate into the next revision:
+> Signed-off-by: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
+> Reviewed-by: Uros Bizjak <ubizjak@gmail.com>
+> Acked-by: Ingo Molnar <mingo@kernel.org>
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  arch/x86/include/asm/alternative.h |  4 ++--
+>  arch/x86/kernel/callthunks.c       |  4 ++--
+>  arch/x86/net/bpf_jit_comp.c        | 19 ++++++++-----------
+>  3 files changed, 12 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/alternative.h b/arch/x86/include/asm/al=
+ternative.h
+> index fcd20c6dc7f9..67b68d0d17d1 100644
+> --- a/arch/x86/include/asm/alternative.h
+> +++ b/arch/x86/include/asm/alternative.h
+> @@ -117,7 +117,7 @@ extern void callthunks_patch_builtin_calls(void);
+>  extern void callthunks_patch_module_calls(struct callthunk_sites *sites,
+>                                           struct module *mod);
+>  extern void *callthunks_translate_call_dest(void *dest);
+> -extern int x86_call_depth_emit_accounting(u8 **pprog, void *func);
+> +extern int x86_call_depth_emit_accounting(u8 **pprog, void *func, void *=
+ip);
+>  #else
+>  static __always_inline void callthunks_patch_builtin_calls(void) {}
+>  static __always_inline void
+> @@ -128,7 +128,7 @@ static __always_inline void *callthunks_translate_cal=
+l_dest(void *dest)
+>         return dest;
+>  }
+>  static __always_inline int x86_call_depth_emit_accounting(u8 **pprog,
+> -                                                         void *func)
+> +                                                         void *func, voi=
+d *ip)
+>  {
+>         return 0;
+>  }
+> diff --git a/arch/x86/kernel/callthunks.c b/arch/x86/kernel/callthunks.c
+> index 30335182b6b0..e92ff0c11db8 100644
+> --- a/arch/x86/kernel/callthunks.c
+> +++ b/arch/x86/kernel/callthunks.c
+> @@ -314,7 +314,7 @@ static bool is_callthunk(void *addr)
+>         return !bcmp(pad, insn_buff, tmpl_size);
+>  }
+>
+> -int x86_call_depth_emit_accounting(u8 **pprog, void *func)
+> +int x86_call_depth_emit_accounting(u8 **pprog, void *func, void *ip)
+>  {
+>         unsigned int tmpl_size =3D SKL_TMPL_SIZE;
+>         u8 insn_buff[MAX_PATCH_LEN];
+> @@ -327,7 +327,7 @@ int x86_call_depth_emit_accounting(u8 **pprog, void *=
+func)
+>                 return 0;
+>
+>         memcpy(insn_buff, skl_call_thunk_template, tmpl_size);
+> -       apply_relocation(insn_buff, tmpl_size, *pprog,
+> +       apply_relocation(insn_buff, tmpl_size, ip,
 
-Great!
+Did the logic inside apply_relocation() change to have
+a new meaning for 'dest' and 'src'?
+Answering to myself... yes. in that commit.
+Better commit log would have made the code review so much easier.
+
+>                          skl_call_thunk_template, tmpl_size);
+>
+>         memcpy(*pprog, insn_buff, tmpl_size);
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index 09f7dc9d4d65..f2e8769f5eee 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -481,7 +481,7 @@ static int emit_rsb_call(u8 **pprog, void *func, void=
+ *ip)
+>  {
+>         void *adjusted_ip;
+>         OPTIMIZER_HIDE_VAR(func);
+> -       adjusted_ip =3D ip + x86_call_depth_emit_accounting(pprog, func);
+> +       adjusted_ip =3D ip + x86_call_depth_emit_accounting(pprog, func, =
+ip);
+
+Now I see why you added extra var in the previous patch.
+Should have mentioned it in the commit log.
+
+>         return emit_patch(pprog, func, adjusted_ip, 0xE8);
+>  }
+>
+> @@ -1973,20 +1973,17 @@ st:                     if (is_imm8(insn->off))
+>
+>                         /* call */
+>                 case BPF_JMP | BPF_CALL: {
+> -                       int offs;
+> +                       u8 *ip =3D image + addrs[i - 1];
+>
+>                         func =3D (u8 *) __bpf_call_base + imm32;
+>                         if (tail_call_reachable) {
+>                                 RESTORE_TAIL_CALL_CNT(bpf_prog->aux->stac=
+k_depth);
+> -                               if (!imm32)
+> -                                       return -EINVAL;
+> -                               offs =3D 7 + x86_call_depth_emit_accounti=
+ng(&prog, func);
+> -                       } else {
+> -                               if (!imm32)
+> -                                       return -EINVAL;
+> -                               offs =3D x86_call_depth_emit_accounting(&=
+prog, func);
+> +                               ip +=3D 7;
+>                         }
+> -                       if (emit_call(&prog, func, image + addrs[i - 1] +=
+ offs))
+> +                       if (!imm32)
+> +                               return -EINVAL;
+> +                       ip +=3D x86_call_depth_emit_accounting(&prog, fun=
+c, ip);
+> +                       if (emit_call(&prog, func, ip))
+>                                 return -EINVAL;
+>                         break;
+>                 }
+> @@ -2836,7 +2833,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf=
+_tramp_image *im, void *rw_im
+>                  * Direct-call fentry stub, as such it needs accounting f=
+or the
+>                  * __fentry__ call.
+>                  */
+> -               x86_call_depth_emit_accounting(&prog, NULL);
+> +               x86_call_depth_emit_accounting(&prog, NULL, image);
+
+Overall it all makes sense.
+Pls respin with more precise commit logs.
 
 
