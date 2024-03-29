@@ -1,263 +1,147 @@
-Return-Path: <netdev+bounces-83356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5D7389207C
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 16:32:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C277E892128
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C49428649F
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:32:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B357EB2272C
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 15:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BE817E;
-	Fri, 29 Mar 2024 15:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025F51C288;
+	Fri, 29 Mar 2024 15:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jIq89dIQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUnOUR7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B87B1C06
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 15:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322D41FBA;
+	Fri, 29 Mar 2024 15:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711726330; cv=none; b=tKcu3TgmHWlBomIRynfRB5wGiTQR3Alddbl5u+UbIB9IFK21vpgV6xfia510k30atar8hJ01KClFbRWvtxA5P9c6NXhthsGGNQjnRUGtrgviZwGGkxzkkJGWUR/NjCEyfNaLy33yDoct6D8/vukQXRi3g4pLZO6AP9KZtBjvbK0=
+	t=1711726810; cv=none; b=HdL6QUR0uK57/gTcFmuwvsxwp7Is231eNnIyOK3oJoSeiErgq7txZMZXkemJ706h/3MmF23TBwrqyhDa9y9T797U3gTA7l+PYCyGN3Vb9GQ6TMhG45bwnPk+c/GXRpXpOdQ5QM7Yl7gPnUD9NcZZiU/zvvniuIML2PnCNLTipfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711726330; c=relaxed/simple;
-	bh=f3d556cLhbNhaXPV7Njw3Rtk9Y+pUetTRY0/92RRbfo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BdDSsXf697AYjUGm9qwSKd6SDK+/xfnDJ402I4iOoq2fLJKBOkeZD73MdZHMdEE8IdFEKIO3dwjmXS2Q0YA9ERCvxO74o/QDTZEr/ny1A1i/N9F3sI4FnKBhOi2YZfqPbAqZu4PRIOG17OLDuB0y+pSo5GJ+ZO+u947NEr9LMiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jIq89dIQ; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-611e89cf3b5so33867817b3.3
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 08:32:08 -0700 (PDT)
+	s=arc-20240116; t=1711726810; c=relaxed/simple;
+	bh=XCgoZLnAXnGDp3scNF5htnbob5J7JStC8D45eQoM9R4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oCDryKTCwNBa1XESY+HXrS2fCn9Ozuiym1DVVy5CR6Vvze0hKrsJPXVEBXqEViTLFl7Ah4vNuiXZkU1sw6aoJwNBYy/7swRzdJ6OJ4/g2oFdS5u6stGkcvDtlZvAxMIncnK4B4wXmzWtYqljaYhhZLEz+CdqsKwIqq45swgykpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MUnOUR7H; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-53fa455cd94so1519286a12.2;
+        Fri, 29 Mar 2024 08:40:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711726327; x=1712331127; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xmI3x6N+H2eGhdvvwaXrGDU49PCgb+8fxWs2HOJvcPA=;
-        b=jIq89dIQWeIcUdhJe5iiTS8wbnCCMULswLiueLoA8VXtgFrjkBTgMTkkrUVtr8S861
-         3XW/T/eGzVqUdydPi79y9dHBCjHlsZkxvGrbs7S7wjxK34ypeQ+8k3WVwvQ9t8R+JyIX
-         Gu1x0xDiWTwjRRf3T/mFchAQ7D0A1qvEHXHljW6Fylzb5T2rH2lgA6RMnlozpKuMWuHU
-         LKL7f05vNonQ7GaCxNz6b7TDupVWgSlDvZQ45uNlsMkt/XIhfZAn5KoM30PEJyQgZZ4X
-         oShG2eBUkDxuvnbyS+TAcyva98cCyEBnjiVT8BlWeej7cU9iiKWcl5p06b/BPz2GTWFp
-         Dwfg==
+        d=gmail.com; s=20230601; t=1711726808; x=1712331608; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iN31wd2vCkiTGMz1OBtEaB4JW8VyiA1XbISlyEebr3E=;
+        b=MUnOUR7HY6vwYa92neIZHYGUvH5I1dF1Bo7/9/nYC/METJ1LcvRfTJ3UrdSMmUe6FC
+         gOsAAcZI5fuMBtnYd1XYteTpD7iilDnzNJGQCDkjNtdSbNtsjQ+H+tT/p1giGio6N6XG
+         c/fOoWgNLNBTXbnefO75MQyI51dLo+b1SVQJb2BkA3/hB5pZIlony882eQZu9ZFNh0ep
+         33bUFemjBqO3ZNk+x0tiQjkOnJ9fcXv2MQdOFypkFGG4FahpdXL6b/Vj7wCz/gfVSbTO
+         MJv/wJzO/jQ7Kdcxmde4Pb9pySSflIuFcgkUN32tfKWGxoR+Pm6mK6F5SJkvChQwYmRp
+         iBRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711726327; x=1712331127;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xmI3x6N+H2eGhdvvwaXrGDU49PCgb+8fxWs2HOJvcPA=;
-        b=j73k1v1jLrhAhx14bH3BfNAYWbP4Q7pC8PqFW0P7mHnrupIb2krMDh+AOIlveN/SqN
-         0Lgt4QUMMJNcNo2ZVxnW7YxHsEXPMYwycQrG8mSN4qaWmFhETbrk+u58uVgLe+ztdGv5
-         WBBFO1GtFpjXcwPWI5Hl8Wa44LciMThTmydwqG10Bj16ZllN7dvJO0K5K4g4sgJ1zf1H
-         wtPxvvs+dZiA0mgp9q2IEFimpo6HLMX2foHcxFBysnqM/Jj1As7tItpVsSQwUA1ycBmc
-         0N8/jPNxShACyoIfXxUCMNe8bggSlNiFRw3TGPzSz1Gq/n9Z00m2EJWu7BV4h38eN2C2
-         BV3g==
-X-Gm-Message-State: AOJu0Yz2yO5GBG3POXFpr6v1Nx9Q34hILpVUsjWMZhv4XC+X4A56j2TF
-	PgKCyv72Skrc0xcntgou3/cERQvnn+fGOqmLH77oKvIHlH2et0edxkw/1VFe1grN+zAA0+VsV7S
-	jgcauYn+mNg==
-X-Google-Smtp-Source: AGHT+IEJIYe5bpmlKFYLmHnw4R9RfNNQ/0KsYWW6SxkLHKDjFIDam5qfzxkeK7dVkttRnRIbntCOfc/uvrzCBg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a0d:cc01:0:b0:611:9c16:6cb8 with SMTP id
- o1-20020a0dcc01000000b006119c166cb8mr594204ywd.10.1711726327569; Fri, 29 Mar
- 2024 08:32:07 -0700 (PDT)
-Date: Fri, 29 Mar 2024 15:32:03 +0000
+        d=1e100.net; s=20230601; t=1711726808; x=1712331608;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iN31wd2vCkiTGMz1OBtEaB4JW8VyiA1XbISlyEebr3E=;
+        b=UZeXNTugUFF7ZLvxjcEC/t4b+REmywz0B1oaHxSC/FPLuIS2hcg1pnvyr0iY283ORN
+         J5yEbOt82e+srx1WEoeZxx18mHADhxIVjqxIVbQNtO4YiNF84vQOwZMaHanx1QVhiyzi
+         30wGweoNPXMcu+4ZWuBv3tB2/AoFu/tSpvKnPAWTc7R6lGG+QXfoQhPIQ7qjxKDGkZ/v
+         ZJQajuGvmLhkcxFBNd/VvXMN8OomN4lQ8AYg3AZRV7z5QGBJz9SzBiYDR89eJ0i3NxkZ
+         b5QdJT8wzr3pwABneBZST1fjtCVvHVrB0uBTt6LeVO0XZJ6PaIXbQAQEZLISaKtvJJrU
+         M9VA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJOnvfqDstoGNWqya9c2CpvRlfeBuOGCz4oaW4BjNSstCi+JbsgNWSWKPkJTvDezGHP1l1yt3hbnjRuFMnFnP+ODAPa9B0KTgUzCTR4wBP509TYdlj1Yoc63C0gBx0PyATOTXRoU50jgTOCW5LOyzh02XO+PpOPZrzO6aKzu2WEDkkG11VeaYfUts4cuOCmJsj3BdXu8Ah9dTKuzXBAT0pXxXfErO3rzYezy4btqFL9YZzGWecZIDTEK13C8CLPsUfnn+9dXWOLXiWYAyrOYsmXUR2uml0icj4IJpVvUdrtlcQ8t8eBsSlQqEEb3VDGg==
+X-Gm-Message-State: AOJu0Yzacj+0ODnB61m4DFEwTd9U4g+aPd/faEYvzFALoBq7a3kkjEky
+	RWWg6gr0dcatrVIFarTUu05/TalspZjQ1+zHRsDZleqZmcPuyvLR
+X-Google-Smtp-Source: AGHT+IF0O7HII5MYlv2g0E+BHBSm5qRGKAR+0KxI+xwk6+g8c7fXn65jtKX0C7ci+tZdnr/ge20LGw==
+X-Received: by 2002:a05:6a20:3c90:b0:1a5:6bfb:76de with SMTP id b16-20020a056a203c9000b001a56bfb76demr2694088pzj.2.1711726808383;
+        Fri, 29 Mar 2024 08:40:08 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id m9-20020a170902db0900b001dd578121d4sm3581907plx.204.2024.03.29.08.40.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 08:40:07 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Fri, 29 Mar 2024 08:40:05 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Simon Horman <horms@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	=?iso-8859-1?Q?Ma=EDra?= Canal <mcanal@igalia.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Kees Cook <keescook@chromium.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: Re: [PATCH v2 12/14] sh: Add support for suppressing warning
+ backtraces
+Message-ID: <d7663e19-74d5-478d-becc-0a080075e7d6@roeck-us.net>
+References: <20240325175248.1499046-1-linux@roeck-us.net>
+ <20240325175248.1499046-13-linux@roeck-us.net>
+ <20240327144431.GL403975@kernel.org>
+ <320aacc6-b7e5-4c3d-948e-d0743ab26c5d@roeck-us.net>
+ <20240327193920.GV403975@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240329153203.345203-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp/dccp: do not care about families in inet_twsk_purge()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327193920.GV403975@kernel.org>
 
-We lost ability to unload ipv6 module a long time ago.
+On Wed, Mar 27, 2024 at 07:39:20PM +0000, Simon Horman wrote:
+[ ... ]
+> > > 
+> > > Hi Guenter,
+> > > 
+> > > a minor nit from my side: this change results in a Kernel doc warning.
+> > > 
+> > >       .../bug.h:29: warning: expecting prototype for _EMIT_BUG_ENTRY(). Prototype was for HAVE_BUG_FUNCTION() instead
+> > > 
+> > > Perhaps either the new code should be placed above the Kernel doc,
+> > > or scripts/kernel-doc should be enhanced?
+> > > 
+> > 
+> > Thanks a lot for the feedback.
+> > 
+> > The definition block needs to be inside CONFIG_DEBUG_BUGVERBOSE,
+> > so it would be a bit odd to move it above the documentation
+> > just to make kerneldoc happy. I am not really sure that to do
+> > about it.
+> 
+> FWIIW, I agree that would be odd.
+> But perhaps the #ifdef could also move above the Kernel doc?
+> Maybe not a great idea, but the best one I've had so far.
+> 
 
-Instead of calling expensive inet_twsk_purge() twice,
-we can handle all families in one round.
+I did that for the next version of the patch series. It is a bit more
+clumsy, so I left it as separate patch on top of this patch. I'd
+still like to get input from others before making the change final.
 
-Also remove an extra line added in my prior patch,
-per Kuniyuki Iwashima feedback.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Link: https://lore.kernel.org/netdev/20240327192934.6843-1-kuniyu@amazon.com/
----
- include/net/inet_timewait_sock.h | 2 +-
- include/net/tcp.h                | 2 +-
- net/dccp/ipv4.c                  | 2 +-
- net/dccp/ipv6.c                  | 6 ------
- net/ipv4/inet_timewait_sock.c    | 9 +++------
- net/ipv4/tcp_ipv4.c              | 2 +-
- net/ipv4/tcp_minisocks.c         | 6 +++---
- net/ipv6/tcp_ipv6.c              | 6 ------
- 8 files changed, 10 insertions(+), 25 deletions(-)
-
-diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
-index f28da08a37b4e97f366279be47192019c901ed47..2a536eea9424ea4fad65a1321217b07d2346e638 100644
---- a/include/net/inet_timewait_sock.h
-+++ b/include/net/inet_timewait_sock.h
-@@ -111,7 +111,7 @@ static inline void inet_twsk_reschedule(struct inet_timewait_sock *tw, int timeo
- 
- void inet_twsk_deschedule_put(struct inet_timewait_sock *tw);
- 
--void inet_twsk_purge(struct inet_hashinfo *hashinfo, int family);
-+void inet_twsk_purge(struct inet_hashinfo *hashinfo);
- 
- static inline
- struct net *twsk_net(const struct inet_timewait_sock *twsk)
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 6ae35199d3b3c159ba029ff74b109c56a7c7d2fc..6eaad953385e15772e8267b94ad7bf8864c18a2d 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -353,7 +353,7 @@ void tcp_rcv_established(struct sock *sk, struct sk_buff *skb);
- void tcp_rcv_space_adjust(struct sock *sk);
- int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp);
- void tcp_twsk_destructor(struct sock *sk);
--void tcp_twsk_purge(struct list_head *net_exit_list, int family);
-+void tcp_twsk_purge(struct list_head *net_exit_list);
- ssize_t tcp_splice_read(struct socket *sk, loff_t *ppos,
- 			struct pipe_inode_info *pipe, size_t len,
- 			unsigned int flags);
-diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-index 44b033fe1ef6859df0703c7e580cf20c771ad479..9fc9cea4c251bfb94904f1ba3b42f54fd9195dd0 100644
---- a/net/dccp/ipv4.c
-+++ b/net/dccp/ipv4.c
-@@ -1039,7 +1039,7 @@ static void __net_exit dccp_v4_exit_net(struct net *net)
- 
- static void __net_exit dccp_v4_exit_batch(struct list_head *net_exit_list)
- {
--	inet_twsk_purge(&dccp_hashinfo, AF_INET);
-+	inet_twsk_purge(&dccp_hashinfo);
- }
- 
- static struct pernet_operations dccp_v4_ops = {
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index ded07e09f8135aaf6aaa08f0adcb009d8614223c..c8ca703dc331a1a030e380daba7bcf6d382d79d6 100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -1119,15 +1119,9 @@ static void __net_exit dccp_v6_exit_net(struct net *net)
- 	inet_ctl_sock_destroy(pn->v6_ctl_sk);
- }
- 
--static void __net_exit dccp_v6_exit_batch(struct list_head *net_exit_list)
--{
--	inet_twsk_purge(&dccp_hashinfo, AF_INET6);
--}
--
- static struct pernet_operations dccp_v6_ops = {
- 	.init   = dccp_v6_init_net,
- 	.exit   = dccp_v6_exit_net,
--	.exit_batch = dccp_v6_exit_batch,
- 	.id	= &dccp_v6_pernet_id,
- 	.size   = sizeof(struct dccp_v6_pernet),
- };
-diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-index b0cc07d9a568c5dc52bd29729862bcb03e5d595d..e28075f0006e333897ad379ebc8c87fc3f9643bd 100644
---- a/net/ipv4/inet_timewait_sock.c
-+++ b/net/ipv4/inet_timewait_sock.c
-@@ -264,7 +264,7 @@ void __inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo, bool rearm)
- EXPORT_SYMBOL_GPL(__inet_twsk_schedule);
- 
- /* Remove all non full sockets (TIME_WAIT and NEW_SYN_RECV) for dead netns */
--void inet_twsk_purge(struct inet_hashinfo *hashinfo, int family)
-+void inet_twsk_purge(struct inet_hashinfo *hashinfo)
- {
- 	struct inet_ehash_bucket *head = &hashinfo->ehash[0];
- 	unsigned int ehash_mask = hashinfo->ehash_mask;
-@@ -273,7 +273,6 @@ void inet_twsk_purge(struct inet_hashinfo *hashinfo, int family)
- 	struct sock *sk;
- 
- 	for (slot = 0; slot <= ehash_mask; slot++, head++) {
--
- 		if (hlist_nulls_empty(&head->chain))
- 			continue;
- 
-@@ -288,15 +287,13 @@ void inet_twsk_purge(struct inet_hashinfo *hashinfo, int family)
- 					     TCPF_NEW_SYN_RECV))
- 				continue;
- 
--			if (sk->sk_family != family ||
--			    refcount_read(&sock_net(sk)->ns.count))
-+			if (refcount_read(&sock_net(sk)->ns.count))
- 				continue;
- 
- 			if (unlikely(!refcount_inc_not_zero(&sk->sk_refcnt)))
- 				continue;
- 
--			if (unlikely(sk->sk_family != family ||
--				     refcount_read(&sock_net(sk)->ns.count))) {
-+			if (refcount_read(&sock_net(sk)->ns.count)) {
- 				sock_gen_put(sk);
- 				goto restart;
- 			}
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a22ee58387518ac5ea602d0f66be41dfa0f4c1ee..1e0a9762f92e608c99ef7781dbdaa1ba9479b39d 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -3501,7 +3501,7 @@ static void __net_exit tcp_sk_exit_batch(struct list_head *net_exit_list)
- {
- 	struct net *net;
- 
--	tcp_twsk_purge(net_exit_list, AF_INET);
-+	tcp_twsk_purge(net_exit_list);
- 
- 	list_for_each_entry(net, net_exit_list, exit_list) {
- 		inet_pernet_hashinfo_free(net->ipv4.tcp_death_row.hashinfo);
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index f0761f060a8376236983a660eea48a6e0ba94de4..5b21a07ddf9aa5593d21cb856f0e0ea2f45b1eef 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -388,7 +388,7 @@ void tcp_twsk_destructor(struct sock *sk)
- }
- EXPORT_SYMBOL_GPL(tcp_twsk_destructor);
- 
--void tcp_twsk_purge(struct list_head *net_exit_list, int family)
-+void tcp_twsk_purge(struct list_head *net_exit_list)
- {
- 	bool purged_once = false;
- 	struct net *net;
-@@ -396,9 +396,9 @@ void tcp_twsk_purge(struct list_head *net_exit_list, int family)
- 	list_for_each_entry(net, net_exit_list, exit_list) {
- 		if (net->ipv4.tcp_death_row.hashinfo->pernet) {
- 			/* Even if tw_refcount == 1, we must clean up kernel reqsk */
--			inet_twsk_purge(net->ipv4.tcp_death_row.hashinfo, family);
-+			inet_twsk_purge(net->ipv4.tcp_death_row.hashinfo);
- 		} else if (!purged_once) {
--			inet_twsk_purge(&tcp_hashinfo, family);
-+			inet_twsk_purge(&tcp_hashinfo);
- 			purged_once = true;
- 		}
- 	}
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 3f4cba49e9ee6520987993dcea082e6065b4688b..5ae74f661d25f9328af2a771bd801065a6522308 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -2389,15 +2389,9 @@ static void __net_exit tcpv6_net_exit(struct net *net)
- 	inet_ctl_sock_destroy(net->ipv6.tcp_sk);
- }
- 
--static void __net_exit tcpv6_net_exit_batch(struct list_head *net_exit_list)
--{
--	tcp_twsk_purge(net_exit_list, AF_INET6);
--}
--
- static struct pernet_operations tcpv6_net_ops = {
- 	.init	    = tcpv6_net_init,
- 	.exit	    = tcpv6_net_exit,
--	.exit_batch = tcpv6_net_exit_batch,
- };
- 
- int __init tcpv6_init(void)
--- 
-2.44.0.478.gd926399ef9-goog
-
+Thanks,
+Guenter
 
