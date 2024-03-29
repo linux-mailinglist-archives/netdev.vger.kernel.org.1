@@ -1,101 +1,94 @@
-Return-Path: <netdev+bounces-83273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B955189182C
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:50:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78AF189182E
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 12:50:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCD9A1C20F23
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:50:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35C161F22BDE
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 11:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4E654737;
-	Fri, 29 Mar 2024 11:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF8A6A357;
+	Fri, 29 Mar 2024 11:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="b8ZZZ7wn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcV5zTKP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7AE3D0A1;
-	Fri, 29 Mar 2024 11:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CE954737;
+	Fri, 29 Mar 2024 11:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711713003; cv=none; b=XIMBRwcE8mAWk735JFUod1iesrTGRKVcDb1x1tyyNTUUD8ahERRovC6VOjukwXy9kp8h8q2BbHYoHaD7eWo93FaiaUsB1gtSSPU+6w2As1GEwlfiN1EV/Vi9467UH4YNmMFj9ZE2PawWJNka4LXuLJruEALmxJqOzYuIsjImk+c=
+	t=1711713028; cv=none; b=tbHEmoM8Z8nuti+nDUYtJW28BwB7oYLQbeY/j5PbLixO3X+TFaP0hNzbnKWbT5m1j7S5N+hp3NS5as1aA8FNPz+hNzXHNPYNz8iWXextxUq7X7Sp9IQRGHPfub55D6arDwYKou9+u5c7KocSpfApAttbQYRTFuEk/q+tN4tcxYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711713003; c=relaxed/simple;
-	bh=TRstkE3u+0gcwMpKi9ozzrepkqrfjWhnAKA/qyO9J0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rLJTNfCzgb53djb31enwh5FI9LItGbaasaYi/6vniGLDdsGqLBlgdwi6HHJeleD/l+IbjNhGuybQC4bWqvJtqNr0JwPlh4+b6Ym7QIP5N4YYZcckDU5pPnoI3P612U1nm54RMvLekb9zehejfARlahFEJoHpeOstSghqV30lgyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=b8ZZZ7wn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEFDDC433F1;
-	Fri, 29 Mar 2024 11:50:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1711713002;
-	bh=TRstkE3u+0gcwMpKi9ozzrepkqrfjWhnAKA/qyO9J0Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b8ZZZ7wnoGxIUIS0XfXdi7vHLi2KK2cZoy+AWOzR2W1SyFblQFupKC4vPeuiAS6jR
-	 bRlblvBHKizduBPi6C9q/JofEyoivV0OF4JL+caK+rkuyrQxTmQevs95ubKsO/nvBn
-	 TXH2IWcfc9e4qhZEVZrzfggAUhw8b+V5/0YV7MrY=
-Date: Fri, 29 Mar 2024 12:49:59 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Srish Srinivasan <srish.srinivasan@broadcom.com>
-Cc: ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
-	borisp@nvidia.com, davejwatson@fb.com, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, john.fastabend@gmail.com,
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
-	sashal@kernel.org, sd@queasysnail.net, stable@vger.kernel.org,
-	vakul.garg@nxp.com, vasavi.sirnapalli@broadcom.com
-Subject: Re: [PATCH v2 6.1.y] net: tls: handle backlogging of crypto requests
-Message-ID: <2024032945-payer-many-c4a3@gregkh>
-References: <2024032945-unheated-evacuee-6e0a@gregkh>
- <20240329102540.3888561-1-srish.srinivasan@broadcom.com>
+	s=arc-20240116; t=1711713028; c=relaxed/simple;
+	bh=sf+asqxprd7GPK8qQVfc44quhQ5MK4xF5ACJAjA1v5A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Fh3zm4IBLMet0e7GaSG5+OfwYeKruzv03k0b4cmUfg1HTyfR9RNR15OYKtZe2rSOWFJ9B3fLNJUkvGNpbXXPwteTg2BNW0q2NEcRU2Aq1TScywqoCvx2n9dtWtoIacBCABOUrup9VkBHEjZESkEbcfT6HrT2V6z/4NHfZReerk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcV5zTKP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E43DC433C7;
+	Fri, 29 Mar 2024 11:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711713028;
+	bh=sf+asqxprd7GPK8qQVfc44quhQ5MK4xF5ACJAjA1v5A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BcV5zTKP4t9eHMaxpEyO5SalY7u5yMDQqd9EhRnjPWBveEJrueutgooAgVkMAvQ8r
+	 TFiaAM2hKOhH+r7PAWz7tCGGt/I6aAW5ulIjMFmJW/0iPM60jGerHjsPPjnZtm5v8d
+	 wxMICdN5Hn9PRO0anA3K2LI10X+3XEcoQInMetM4Kk33MASqBT8XNCjxMK4u0ZG090
+	 +P1RUXmPLtzVtwLrESNeXsNdT5AVa9EgoyFQsr3o23lEWbIhseElGSd9oyj3+72t0m
+	 mvlG1fqeDviZrWgCPianyATh6bS7CHVxiRyDHznGCP+i7uRd/9xYbyGH2OvusvDfLX
+	 51Ac7lNZ6Hu5g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0CFE2D84BBA;
+	Fri, 29 Mar 2024 11:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240329102540.3888561-1-srish.srinivasan@broadcom.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net Patch] octeontx2-af: Fix issue with loading coalesced KPU
+ profiles
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171171302804.30113.8957090574149995586.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 11:50:28 +0000
+References: <20240326122149.4377-1-hkelam@marvell.com>
+In-Reply-To: <20240326122149.4377-1-hkelam@marvell.com>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com,
+ jerinj@marvell.com, lcherian@marvell.com, sbhatta@marvell.com,
+ naveenm@marvell.com, edumazet@google.com, pabeni@redhat.com
 
-On Fri, Mar 29, 2024 at 03:55:40PM +0530, Srish Srinivasan wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
-> 
-> commit 8590541473188741055d27b955db0777569438e3 upstream
-> 
-> Since we're setting the CRYPTO_TFM_REQ_MAY_BACKLOG flag on our
-> requests to the crypto API, crypto_aead_{encrypt,decrypt} can return
->  -EBUSY instead of -EINPROGRESS in valid situations. For example, when
-> the cryptd queue for AESNI is full (easy to trigger with an
-> artificially low cryptd.cryptd_max_cpu_qlen), requests will be enqueued
-> to the backlog but still processed. In that case, the async callback
-> will also be called twice: first with err == -EINPROGRESS, which it
-> seems we can just ignore, then with err == 0.
-> 
-> Compared to Sabrina's original patch this version uses the new
-> tls_*crypt_async_wait() helpers and converts the EBUSY to
-> EINPROGRESS to avoid having to modify all the error handling
-> paths. The handling is identical.
-> 
-> Fixes: a54667f6728c ("tls: Add support for encryption using async offload accelerator")
-> Fixes: 94524d8fc965 ("net/tls: Add support for async decryption of tls records")
-> Co-developed-by: Sabrina Dubroca <sd@queasysnail.net>
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> Link: https://lore.kernel.org/netdev/9681d1febfec295449a62300938ed2ae66983f28.1694018970.git.sd@queasysnail.net/
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: David S. Miller <davem@davemloft.net>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> [Srish: v2: fixed hunk failures
->         fixed merge-conflict in stable branch linux-6.1.y,
->         needs to go on top of https://lore.kernel.org/stable/20240307155930.913525-1-lee@kernel.org/]
+Hello:
 
-Identical do what I queued up for v1, but oh well :)
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-thanks,
+On Tue, 26 Mar 2024 17:51:49 +0530 you wrote:
+> The current implementation for loading coalesced KPU profiles has
+> a limitation.  The "offset" field, which is used to locate profiles
+> within the profile is restricted to a u16.
+> 
+> This restricts the number of profiles that can be loaded. This patch
+> addresses this limitation by increasing the size of the "offset" field.
+> 
+> [...]
 
-greg k-h
+Here is the summary with links:
+  - [net] octeontx2-af: Fix issue with loading coalesced KPU profiles
+    https://git.kernel.org/netdev/net/c/0ba80d965856
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
