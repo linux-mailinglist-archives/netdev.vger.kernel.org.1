@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-83141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A89789105B
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:30:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23A0A891062
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 02:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0E961F22700
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:30:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7FFEB21CC0
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 01:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1088D179B7;
-	Fri, 29 Mar 2024 01:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471C21EB2C;
+	Fri, 29 Mar 2024 01:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahj6Sh0x"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q5xgAT22"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1AA1755C;
-	Fri, 29 Mar 2024 01:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2B51E51F;
+	Fri, 29 Mar 2024 01:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711675833; cv=none; b=Y/hyJMUenWnTUTuX7+2RBuX2zHLgyXwiFE4gWjo01tO6Ht3xn9DFykpIDCIbCUD1jzJDCNw+/LTAoPPyP3vNsf9gtS9gd2Jzhw/RSfWq68k0JjG95Bk4XWco84M70tqXRnk36A9vdHrco0rzRYYss/sIrBkSOKFwFrsYdSnCv0Q=
+	t=1711675834; cv=none; b=sk2h1bWUpjDLdqWSTV3dQwEtN/6S2qQxgsKEzolTQFtdoF2ltLCFB/Tv9Zxf8pxP2vJjN6uxfcZeaqOyTH8oYVTgS+cY32GjdCiD+YJjvRNiT4PpJfaanp1yFcBhRZadoFrGFNgUJ/MMuLZdkSq3bBQSWl72/Uzgdqhe7Um+UP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711675833; c=relaxed/simple;
-	bh=eBjlW0K96wcTvRKhkZN5uyozDovWwaLiajHg/TN/CFw=;
+	s=arc-20240116; t=1711675834; c=relaxed/simple;
+	bh=tSKjOurxTImfcZRINn6L0HX8JmpfpDZHjiLkqPQspzM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cqlgbzRHGpA9KqGIFCpOWG+9+Ik+rBdJfOIJ7jIVIBZr41rV2KsO810GNiqfYIn9Lt8l458WvVZXVz80bAblZx8m66HqY4q3aUF/BhdWpce1qiDOCs+DZiZn50p08gpF8KY26skF24sCvs7BZPWB7WB2NebWNUVPuHojZfXGbEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahj6Sh0x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AC31C433C7;
-	Fri, 29 Mar 2024 01:30:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=RQNFIppUpEcfR0+en9skdXUqXZCJIno0zpZrDif244FTfmQ6bYwWQxWt8tY9ObxBtvmph5W+u8egn/jO0/vvFgXRZzUGxaqs6iUjPIPYb/bfpzU33J/PkqB6I1ZtzQFHsm0Wm/rkTldKnDpskEGzNVfDj4zY5wAPgl98oVA9VAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q5xgAT22; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D2E0FC43399;
+	Fri, 29 Mar 2024 01:30:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711675832;
-	bh=eBjlW0K96wcTvRKhkZN5uyozDovWwaLiajHg/TN/CFw=;
+	s=k20201202; t=1711675833;
+	bh=tSKjOurxTImfcZRINn6L0HX8JmpfpDZHjiLkqPQspzM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ahj6Sh0xrl5V3WSegy5w1BIBmYGNv/8Y8g3LFyOnCFifm9f4SoU1VNFx6HWRpH0kB
-	 kWg8ntItwy4hmEV5HakojPhvVAdOd6E3Kt6E4kJC9gmL+zwh4XVgJt2Fh3wYRfgXke
-	 Xn7P3BnsizEw1yWwx5ya3gIDDLdJXtISism06l0rVHJp7cUKK0yMB5ByTMc++Ispjd
-	 VQsbDJ+Al//9aqgVQd9nn69SYGO6jI9X3VwNL1HCcl+cHZusDebrM8VzNGqx6zGgh+
-	 jfrsRyJ0R1AuRQfF3bYhItirPjv5HKs/8FgBH2GnecTVbBqrDttjkxVYZcevZgVRvo
-	 dRrwZO4TIfvlA==
+	b=q5xgAT22unENvm56ivkfpLyA12NIc6t2mdMXc7YvFhjpawgDplIzfsiLaTqPXFR20
+	 OAcg6qgSrOVsA4KCd6jLprPtFKHKzsgpSUIqTbZlhsQ4XgneoJmG59VKVaTTFPfysl
+	 gRkFijrTnyLcE9RvWMXN3NBXYVJN2S4U8iusEqSgVemTJQzvMi5QxrK9KjYBoCrZax
+	 9oV4FnNBeRBG6B5XGTLJ5qrB2VqOjyOcTKEYSkyZKcR/8tO+BZHAEaqL7mg4z0e4Ro
+	 T/iSRsPieoVci07LQ5OWkr5RZUUjEC+/tBJBpGCG1xHNPcjMB0YmE90bHrZaVlTreN
+	 coYpYmRIrVI3A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7D768D95054;
-	Fri, 29 Mar 2024 01:30:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C3901D8BD1D;
+	Fri, 29 Mar 2024 01:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ptp: MAINTAINERS: drop Jeff Sipek
+Subject: Re: [net-next,v4 0/2] ravb: Support describing the MDIO bus
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171167583250.32458.9139932821919314899.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 01:30:32 +0000
-References: <20240327081413.306054-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20240327081413.306054-1-krzysztof.kozlowski@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: akaher@vmware.com, amakhalov@vmware.com, pv-drivers@vmware.com,
- richardcochran@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <171167583378.32458.14130024450721126576.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Mar 2024 01:30:33 +0000
+References: <20240325153451.2366083-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20240325153451.2366083-1-niklas.soderlund+renesas@ragnatech.se>
+To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
+	=?utf-8?q?se=3E?=@codeaurora.org
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ geert+renesas@glider.be, claudiu.beznea.uj@bp.renesas.com,
+ yoshihiro.shimoda.uh@renesas.com, biju.das.jz@bp.renesas.com,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 27 Mar 2024 09:14:13 +0100 you wrote:
-> Emails to Jeff Sipek bounce:
+On Mon, 25 Mar 2024 16:34:49 +0100 you wrote:
+> Hello,
 > 
->   Your message to jsipek@vmware.com couldn't be delivered.
->   Recipient is not authorized to accept external mail
->   Status code: 550 5.7.1_ETR
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> This series adds support to the binding and driver of the Renesas
+> Ethernet AVB to described the MDIO bus. Currently the driver uses the OF
+> node of the device itself when registering the MDIO bus. This forces any
+> MDIO bus properties the MDIO core should react on to be set on the
+> device OF node. This is confusing and non of the MDIO bus properties are
+> described in the Ethernet AVB bindings.
 > 
 > [...]
 
 Here is the summary with links:
-  - ptp: MAINTAINERS: drop Jeff Sipek
-    https://git.kernel.org/netdev/net/c/fa84513997e9
+  - [net-next,v4,1/2] dt-bindings: net: renesas,etheravb: Add optional MDIO bus node
+    https://git.kernel.org/netdev/net-next/c/a87590c45c87
+  - [net-next,v4,2/2] ravb: Add support for an optional MDIO mode
+    https://git.kernel.org/netdev/net-next/c/2c60c4c008d4
 
 You are awesome, thank you!
 -- 
