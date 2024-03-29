@@ -1,87 +1,121 @@
-Return-Path: <netdev+bounces-83405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6BE98922F9
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:46:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C223289230B
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:56:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D81BC1C2552D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:46:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4BB41C211A8
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 17:56:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4E11369AD;
-	Fri, 29 Mar 2024 17:46:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FAEF130AF3;
+	Fri, 29 Mar 2024 17:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxY7oCjP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ET+xXQz4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AB3A923;
-	Fri, 29 Mar 2024 17:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0F513664E
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 17:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711734360; cv=none; b=D/2Nmrcm6H/WSwNsyA+ktsLbxhMaAL1wyfaMLwFs2fGkQ16PwNCyBMBIBGsck8PUKhrG5n7cXISO/eDtsB2w0o5o2dHSYH3bPptxcW3fAKI5iU8HeBtSsMH8E0F3vL3VMKwjRPgyGBL8rH6okW7yD4hOwda1BTU9XYs1faYm49Y=
+	t=1711735000; cv=none; b=VaoOL6tntd3JVs4EIsBnjuzRy7wyPiJWS6wMuZTa3JMlPxTeFklu9D5QnrHfSqGuJSu4RlmidEpED0ZIEDTsky21kI2LtI4CqKhFcxcDDDxdDhN1j4iF2hmTofnEbEEAaBELzy18O0QHS8OR2jOW3tyGhTGuPwVOJXx8b90q8Ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711734360; c=relaxed/simple;
-	bh=HFcDQXQ4/V0olwInsRZS2sioZwVCn9Un9HBzhqOv1RU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TN6ZBJ/m3QgENynxI4kHHCqb8eHGZtaNFVM9k/SCcs3HNg/1d/kREYQkj1xXjxMgu/wtMoBTT/kv+tNa+041OwKHjQeaDypptuca0FTxAXgGP5YcyJhDnLbLOUcsgM+n066xl7JEqQcbd5/+GV6LSscryUF/ZIdHr/OsdsI4ePI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxY7oCjP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06549C433C7;
-	Fri, 29 Mar 2024 17:45:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711734359;
-	bh=HFcDQXQ4/V0olwInsRZS2sioZwVCn9Un9HBzhqOv1RU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OxY7oCjP2GoakWmVTJBFF2ww/W7egc/tuBsgT+LvgoNjXbz5XwsVTEma04/FTqDsl
-	 bMa+jHbV8m8GxuR/3uOnxSXXX+bAFfM03hL9LrQr0zf2+8yyxEAHue0ZfUkbU/2NVv
-	 HoTNsUjzowUTEggo897VrBoN5mjEpmUH6ImYGZdlTVBneXFff+v6O3ME9Yyf9hqfVy
-	 qMWU0FY3zoN41h/ZZTnr4UZncWDr+X31eue4/IjvX72xqy/MpwyKmcbWboI2BDv8cU
-	 IrtQTkRYd1Xw80UnleTlfuHSdGlTF6pbjU8sDFNyiCyRKGOfg0T1PRNuV8TMcvT8Rw
-	 0w1jwraAZ1RDg==
-Date: Fri, 29 Mar 2024 17:45:53 +0000
-From: Simon Horman <horms@kernel.org>
-To: Su Hui <suhui@nfschina.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, nathan@kernel.org,
-	ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
-	dan.carpenter@linaro.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next v3] octeontx2-pf: remove unused variables
- req_hdr and rsp_hdr
-Message-ID: <20240329174553.GN651713@kernel.org>
-References: <20240328020723.4071539-1-suhui@nfschina.com>
+	s=arc-20240116; t=1711735000; c=relaxed/simple;
+	bh=B0J8vkgydgY6hjz5a7hDxWoIA655uUs7SqG77i58rzI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HoR0bMzn8PFdkp1A3ee+wfFJOYwjsH8Yybi3L+qt6/9I1dNaKjDxQDiXXM7wcyZSaJ9qRQum36CzIT6hZ0Gi2hyPzyWN1INF4JwXpBZMCKanBwRnfMPI24bParqL4df57X7t2mcs3Z+/LvR+b8YaRgFzSrPeFD1KGHJ4jetzwm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ET+xXQz4; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711734998; x=1743270998;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=B0J8vkgydgY6hjz5a7hDxWoIA655uUs7SqG77i58rzI=;
+  b=ET+xXQz4KU6Y0sAaDugbCZlCAqZxIhNA4MWRQXi9QnMwMLzIf3VvY1Jo
+   iLuJIRRujJHtF8Qggjjs2M4IZzzvfG3DQtl4Tf6+ilmP+8wL/W27ptXUb
+   BNyMwrmIGvC3VsdN3mI60QSJXywFht2lfcjUoWsMvzyru6V+bjR6DoKwz
+   sPACYC91o6LFqxBJX7YcynC9AU8dlRDS8d0V8dC4/wolvr4x2WM/hk1o/
+   T0XIRdnqqyWrxLqJzrAmLmq2QUUZBBrL2jdQmOhrFY4krS6r5byOtCIY2
+   RJWSQHE+ToCLozFsnv3dFyNL9O+4ZtumYY81TbfElmfU3+02bJksMS2CY
+   w==;
+X-CSE-ConnectionGUID: GxEFiz2ST5iZxEpPYN3u9A==
+X-CSE-MsgGUID: vjP9j1XBQtKyWhch+rn7nw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11028"; a="24422445"
+X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
+   d="scan'208";a="24422445"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 10:56:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,165,1708416000"; 
+   d="scan'208";a="21499348"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa005.fm.intel.com with ESMTP; 29 Mar 2024 10:56:37 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/4][pull request] Intel Wired LAN Driver Updates 2024-03-29 (net: intel)
+Date: Fri, 29 Mar 2024 10:56:23 -0700
+Message-ID: <20240329175632.211340-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240328020723.4071539-1-suhui@nfschina.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 28, 2024 at 10:07:24AM +0800, Su Hui wrote:
-> Clang static checker(scan-buid):
-> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:503:2: warning:
-> Value stored to 'rsp_hdr' is never read [deadcode.DeadStores]
-> 
-> Remove these unused variables to save some space.
-> 
-> Signed-off-by: Su Hui <suhui@nfschina.com>
-> ---
-> v3:
->  - using net-next in subject
->  - split the v2 patchset into individual patches
-> v2:
->  - add "net" in subject
+This series contains updates to most Intel drivers.
 
-Thanks for the updates.
+Jesse moves declaration of pci_driver struct to remove need for forward
+declarations in igb and converts Intel drivers to user newer power
+management ops.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Sasha reworks power management flow on igc to avoid using rtnl_lock()
+during those flows.
+
+Maciej reorganizes i40e_nvm file to avoid forward declarations.
+
+The following are changes since commit da493dbb1f2a156a1b6d8d8a447f2c3affe43678:
+  Merge branch 'af_unix-rework-gc'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 1GbE
+
+Jesse Brandeburg (2):
+  igb: simplify pci ops declaration
+  net: intel: implement modern PM ops declarations
+
+Maciej Fijalkowski (1):
+  i40e: avoid forward declarations in i40e_nvm.c
+
+Sasha Neftin (1):
+  igc: Refactor runtime power management flow
+
+ drivers/net/ethernet/intel/e100.c             |    8 +-
+ drivers/net/ethernet/intel/e1000/e1000_main.c |   14 +-
+ drivers/net/ethernet/intel/e1000e/netdev.c    |   22 +-
+ drivers/net/ethernet/intel/fm10k/fm10k_pci.c  |   10 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |   10 +-
+ drivers/net/ethernet/intel/i40e/i40e_nvm.c    | 1050 ++++++++---------
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |    8 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   12 +-
+ drivers/net/ethernet/intel/igb/igb_main.c     |   59 +-
+ drivers/net/ethernet/intel/igbvf/netdev.c     |    6 +-
+ drivers/net/ethernet/intel/igc/igc_main.c     |   56 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |    8 +-
+ .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |    8 +-
+ 13 files changed, 602 insertions(+), 669 deletions(-)
+
+-- 
+2.41.0
 
 
