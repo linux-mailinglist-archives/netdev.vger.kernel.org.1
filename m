@@ -1,113 +1,134 @@
-Return-Path: <netdev+bounces-83420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7FF989236D
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:37:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C83B892391
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 19:51:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6492B1F23DD1
-	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:37:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 682201C20C3D
+	for <lists+netdev@lfdr.de>; Fri, 29 Mar 2024 18:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208BB39FEB;
-	Fri, 29 Mar 2024 18:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3B23FE48;
+	Fri, 29 Mar 2024 18:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/XlrUVg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9667CAD2D
-	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8613E3D0AD
+	for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 18:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711737452; cv=none; b=rr5CenBfLQ+PB2Ug+l4j/QgwVn7XN5SGojsLQ+NnAUy0uYFnbdPScCxrOBgk9n+ISr5tWysd4udLIuma80TEM/eUonCVhcXXnviEZ0D55OsyrIEtb0OMA8xWfTcVN7wjgkKePR3lnKNZz7rH/S/mbr8q220YqQqFoZXBZo/RD6A=
+	t=1711738266; cv=none; b=b8dOlYakY/fjnEHU49BTW+I0fcicFkPb1PoKgYL4fZ35kgu+wpKYdAGBqYMGQwrpRBQryW6BkownDYDRsOB2H2LmC08PYPnZdT28pvSnoDJFcWon+r9nn5mzk18WFfqbn6zpyTjip+OSZ8u/Gihim0UpUj9iLHS4puYnp1XJr80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711737452; c=relaxed/simple;
-	bh=F2gfhsww7XTA3P50A1RX32InMlF8Q/9z+ZW7DdeTxgM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qmGl26BHCWX8kZUgRqnlvOJQogEHx79OC/kor4CDeymctE5U58mFvQfX5rB1JS94z0Ti25efL6iISUpBU47HfdT8FbN84vofg7i3DS9PBfJn5vv6LWhyio4X2d33LOPvQF2FHFnbSM0mbTLV3AZnyt7/U3IsFtaLN5dGbYsLl8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-368a41081baso20444075ab.3
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 11:37:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711737450; x=1712342250;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DLH3G/wi97DU/DtrnW/ODIbuNOVKTyxl862AdQPOt0k=;
-        b=jLLvjeXu09W0RBg3M5fdpJBnHz655u9c5HCkmRiqfIF3o7qrjX0G0RQ5Hv2DKZi2N0
-         GzY4fLTHGAcZZKKLLzNAwk6arDQO3QPJgapk0PPvSZk/Y5//flAsgBQicIPEVzZWDn45
-         XRwWkD+ODqH+WR1k1VT9J15dh0p8YsjJnBZDs/yBhZ/kjkcHYFa0NfmiywEeXoOggEM+
-         VDjr6t67u5XKwuCifhIAir3ZPN6emjS1u8B3JYLKDjRxvFYFHo5yAYYa1ah+bCQsvAI9
-         XuVShbVzfWINxyYKh0sYR0EqxoqQI86UHEuP0r+jaJe1liXbn0Im2m41SPXC1rHBw0ix
-         bTeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnjQMiEs1fn40GMJStxa8SJtARmjiF0gobm1c6/JVKJhVMZfYWlsR5dGtPvkiPcMXrfhRWaStjake8Gq6xKPG35vA+J3o5
-X-Gm-Message-State: AOJu0YyxTTH4SUlICL4wdTcgkaKu6812vUJujfE16UtGFblskpB0gmHs
-	+BoFhnqymcz7ElBUGfPUQGCPBBf4OUz0gb5gt128kYgSJ8ss8PaKbPVfGjD1nN2aeKIT6KDAgjR
-	+KOAJRZTfCakiylqXMA7QV+5EUJgCFU+f1iXv5fYuJboTQv50MxZxEhU=
-X-Google-Smtp-Source: AGHT+IFRfpXx1VnfI0V7Zv8tfOUmGGmfvDvfktxzjg0GMDbH6xeORJdCTMoNoHwSU1EO7q6fta4nRuojWuGCc7GjOPpRVjDT3z+b
+	s=arc-20240116; t=1711738266; c=relaxed/simple;
+	bh=tcqWZa7vAgYqVfEKtTYMRoETyY0uk7xPdEJmlLmv2hU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WrjcArYBZHLPx+kJ6TGoqnimZ9gZWQ7NePdgg5abgiufJO5cVnmRILDZLC5RLm+WweR2d7D5XL8/kr/5WJ88gQJi2ab3P2ovv3OOl8IF5NYbuhYZXZ1wF382vN8Mhj/Z51ZBKBg3S4uWZxyVvud9tH0O/y7KzsTIc007vlV8kvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K/XlrUVg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711738263;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=W8dzUgdlpUNa2rUoysoERPwae2lgTaSmib26erqINq0=;
+	b=K/XlrUVgPYiyvTq6xib302qUiENMDRJp1jnNqH63fW+hIPrC3Cbvylen3HLuTDnaYD5Vb/
+	qZIyU1/z8J/98p5Nr1VieuzwPc4wQyhuOtS979fuaiAa75GLmoDsoVqldoKZ2i7sQpcJPJ
+	1d1wGbOfZEjxlr66IvdGef4T3PfdfpI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-210-ZTgBXhmTOfGzXh-REwQkxw-1; Fri,
+ 29 Mar 2024 14:50:58 -0400
+X-MC-Unique: ZTgBXhmTOfGzXh-REwQkxw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D3992804803;
+	Fri, 29 Mar 2024 18:50:57 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.119])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C9A48492BC8;
+	Fri, 29 Mar 2024 18:50:55 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	mptcp@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net] mptcp: prevent BPF accessing lowat from a subflow socket.
+Date: Fri, 29 Mar 2024 19:50:36 +0100
+Message-ID: <d8cb7d8476d66cb0812a6e29cd1e626869d9d53e.1711738080.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c267:0:b0:368:9839:d232 with SMTP id
- h7-20020a92c267000000b003689839d232mr182469ild.4.1711737449863; Fri, 29 Mar
- 2024 11:37:29 -0700 (PDT)
-Date: Fri, 29 Mar 2024 11:37:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a5ee120614d0eef8@google.com>
-Subject: [syzbot] Monthly net report (Mar 2024)
-From: syzbot <syzbot+liste7bfc894f5476da05e96@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-Hello net maintainers/developers,
+Alexei reported the following splat:
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
+ WARNING: CPU: 32 PID: 3276 at net/mptcp/subflow.c:1430 subflow_data_ready+0x147/0x1c0
+ Modules linked in: dummy bpf_testmod(O) [last unloaded: bpf_test_no_cfi(O)]
+ CPU: 32 PID: 3276 Comm: test_progs Tainted: GO       6.8.0-12873-g2c43c33bfd23
+ Call Trace:
+  <TASK>
+  mptcp_set_rcvlowat+0x79/0x1d0
+  sk_setsockopt+0x6c0/0x1540
+  __bpf_setsockopt+0x6f/0x90
+  bpf_sock_ops_setsockopt+0x3c/0x90
+  bpf_prog_509ce5db2c7f9981_bpf_test_sockopt_int+0xb4/0x11b
+  bpf_prog_dce07e362d941d2b_bpf_test_socket_sockopt+0x12b/0x132
+  bpf_prog_348c9b5faaf10092_skops_sockopt+0x954/0xe86
+  __cgroup_bpf_run_filter_sock_ops+0xbc/0x250
+  tcp_connect+0x879/0x1160
+  tcp_v6_connect+0x50c/0x870
+  mptcp_connect+0x129/0x280
+  __inet_stream_connect+0xce/0x370
+  inet_stream_connect+0x36/0x50
+  bpf_trampoline_6442491565+0x49/0xef
+  inet_stream_connect+0x5/0x50
+  __sys_connect+0x63/0x90
+  __x64_sys_connect+0x14/0x20
 
-During the period, 25 new issues were detected and 14 were fixed.
-In total, 83 issues are still open and 1401 have been fixed so far.
+The root cause of the issue is that bpf allows accessing mptcp-level
+proto_ops from a tcp subflow scope.
 
-Some of the still happening issues:
+Fix the issue detecting the problematic call and preventing any action.
 
-Ref  Crashes Repro Title
-<1>  5716    Yes   WARNING in rxrpc_alloc_data_txbuf
-                   https://syzkaller.appspot.com/bug?extid=150fa730f40bce72aa05
-<2>  4782    Yes   WARNING in sock_map_delete_elem
-                   https://syzkaller.appspot.com/bug?extid=2f4f478b78801c186d39
-<3>  4300    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<4>  3586    Yes   WARNING in sock_hash_delete_elem
-                   https://syzkaller.appspot.com/bug?extid=1c04a1e4ae355870dc7a
-<5>  981     Yes   possible deadlock in __dev_queue_xmit (3)
-                   https://syzkaller.appspot.com/bug?extid=3b165dac15094065651e
-<6>  896     Yes   INFO: task hung in rfkill_global_led_trigger_worker (2)
-                   https://syzkaller.appspot.com/bug?extid=2e39bc6569d281acbcfb
-<7>  684     Yes   unregister_netdevice: waiting for DEV to become free (8)
-                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-<8>  509     No    possible deadlock in __lock_task_sighand (2)
-                   https://syzkaller.appspot.com/bug?extid=34267210261c2cbba2da
-<9>  378     Yes   KMSAN: uninit-value in nci_rx_work
-                   https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534
-<10> 323     Yes   INFO: rcu detected stall in tc_modify_qdisc
-                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
-
+Reported-by: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/482
+Fixes: 5684ab1a0eff ("mptcp: give rcvlowat some love")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/mptcp/sockopt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index dcd1c76d2a3b..73fdf423de44 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -1493,6 +1493,10 @@ int mptcp_set_rcvlowat(struct sock *sk, int val)
+ 	struct mptcp_subflow_context *subflow;
+ 	int space, cap;
+ 
++	/* bpf can land here with a wrong sk type */
++	if (sk->sk_protocol == IPPROTO_TCP)
++		return -EINVAL;
++
+ 	if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
+ 		cap = sk->sk_rcvbuf >> 1;
+ 	else
+-- 
+2.43.2
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
