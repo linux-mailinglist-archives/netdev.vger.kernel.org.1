@@ -1,111 +1,220 @@
-Return-Path: <netdev+bounces-83488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595DF8928E8
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 03:36:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF5B58928F4
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 03:56:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A341FB2226B
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 02:36:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29621C20FB8
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 02:56:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADD27F8;
-	Sat, 30 Mar 2024 02:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A6A1877;
+	Sat, 30 Mar 2024 02:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jHWkLFv8"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B7E17CD;
-	Sat, 30 Mar 2024 02:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6D68F5C;
+	Sat, 30 Mar 2024 02:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711766158; cv=none; b=OFalO2thJQuPlVYlGf+pYC6ntr9FDJOzrrsqG1q9Zx1tew5xfV1ea+Bl3v8fU5vissgyStq6PALfgeEw8Q9RBdsbHZb0OV5zecCpBZkOrZKVe/m301JF8XxLNNsi4a2A1p1fQrPcSynDl6LPIBhPF5wzAx9u5WC/p8qzPNtqRgA=
+	t=1711767385; cv=none; b=srSi5DaXDzC/5B4/0GJA1Ks62t656nSc5Da4NIMwguI95/AXNEkrWRncTgnjHY9/lRrpO+GbpSNc9MCwo8uV7gWpwmoywssXQDk7qN3ROAuaDPmNh1cahZnIrrVByiMqbe8O11vLAoyaGWjeUzbQxfwXiP6zMePXOUr4qH3HjJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711766158; c=relaxed/simple;
-	bh=Z8aquzYwrhiTPT1lynRcdUTIL4sI4DuQGZPhxVeaKGg=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=UnbFOcMoqLrzUoRW1fZsG6hxaeAjRFunznG/p/o8bnP9yKUl+JiXH65e3OSiir0ixmdEEOqh+HLniHcqIuQyrhZm7Ln/+82lsbQnVEe2gRgseZuJJek8HChugf9fu7w93Izx2cZRuM+qU/su8tJB62YOOLn5Wiu6XjVKcgajcDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4V61Xl57Vzz29dPH;
-	Sat, 30 Mar 2024 10:33:11 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 919B61400D3;
-	Sat, 30 Mar 2024 10:35:53 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sat, 30 Mar 2024 10:35:52 +0800
-Message-ID: <b679e900-22e3-47c6-b9bb-7aba56efcf31@huawei.com>
-Date: Sat, 30 Mar 2024 10:35:51 +0800
+	s=arc-20240116; t=1711767385; c=relaxed/simple;
+	bh=ok6Xi4r2K06RgcDE9nmIMbn+6DIbBOa43maW16T1yVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rs3Gj2yq+hNpGXrtg1EpwbiNgUpdbH2qFQ957pAIukZkY9Gpjxej25C7IKDYDClz9cnsUxf1A00AJeO11PqSeWcHYo+ZYnG+3462RV/vc9Wvhln2VP+JCwTphezuiqvMrTR3nGsoWgx0ph9QKGr/SHJ+3y4uPZBXEf4jzmcAfts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jHWkLFv8; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711767382; x=1743303382;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ok6Xi4r2K06RgcDE9nmIMbn+6DIbBOa43maW16T1yVI=;
+  b=jHWkLFv8tyGsu+dC9xzv5tEjOdhkFr3QO7XxQlcj19Xf8C4hhiWLoVm8
+   Q49XU+5go5eeNlJO0Om1xoOxINI3bePYx74F75PjBet1Nj26HlbcTGoLe
+   ugZFa8z/LPt7VeRcnzTGj/kqR5RRYbFi43PbSE+KJ3u08LXKe8mCb890J
+   RW16iICAcldH3zxM6Ssy2Kkhf38cGI2m68dp61Xw2v32e3/KTzbogdrl9
+   BkGcZLYIBR0/XK8O2HYwhPX3j/oHJqpU3rZTPbbDR1xywhWZi3k7ha6Ic
+   Ujm3C3zgY9sL7bS11c9VMiHmy91obrGlw+Ioansz9vh/9am+ufvUxIDEM
+   w==;
+X-CSE-ConnectionGUID: PqcPxvQdQ2qeSbuftC1T5w==
+X-CSE-MsgGUID: yHdOxQqLROSP2JDu/+FuXg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11028"; a="7088278"
+X-IronPort-AV: E=Sophos;i="6.07,166,1708416000"; 
+   d="scan'208";a="7088278"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2024 19:56:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,166,1708416000"; 
+   d="scan'208";a="16971233"
+Received: from lkp-server01.sh.intel.com (HELO be39aa325d23) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 29 Mar 2024 19:56:17 -0700
+Received: from kbuild by be39aa325d23 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rqOtC-0003tW-1e;
+	Sat, 30 Mar 2024 02:56:14 +0000
+Date: Sat, 30 Mar 2024 10:55:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	=?iso-8859-1?Q?S=F8ren?= Andersen <san@skov.dk>
+Subject: Re: [PATCH net-next v1 5/9] net: dsa: microchip: add support for
+ different DCB app configurations
+Message-ID: <202403301034.rVoygO9P-lkp@intel.com>
+References: <20240328160518.2396238-6-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <jiri@resnulli.us>, <horms@kernel.org>,
-	<rkannoth@marvell.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V6 net-next 3/4] net: hns3: dump more reg info based on
- ras mod
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20240327114330.1826631-1-shaojijie@huawei.com>
- <20240327114330.1826631-4-shaojijie@huawei.com>
- <20240328191130.47242c8f@kernel.org>
- <d6c779a5-e4b1-4f21-b4f0-6b37b212890f@huawei.com>
- <20240329081501.4460ad4d@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20240329081501.4460ad4d@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240328160518.2396238-6-o.rempel@pengutronix.de>
 
+Hi Oleksij,
 
-on 2024/3/29 23:15, Jakub Kicinski wrote:
-> On Fri, 29 Mar 2024 18:34:02 +0800 Jijie Shao wrote:
->>> These seem to be duplicating standard stats from rtnl_link_stats64,
->>> ethtool_pause_stats, ethtool_eth_mac_stats, etc.
->>>
->>> You can add device specific stats, but please don't duplicate
->>> stats for which we have standard APIs.
->> Yeah, but these are not duplicate stats for ethtool or debugfs.
-> Can you say more? I mean there are APIs to expose MIB counters.
-> Perhaps your driver doesn't implement those APIs today.
-> But (1) it should, and (2) once it does it will be a duplicate.
+kernel test robot noticed the following build errors:
 
-Sorry for the wrong reply before, these stats are already included
-in the ethtool -S stats.
+[auto build test ERROR on net-next/main]
 
-According to the suggestions provided by the chip, the statistics help
-analyze the cause of the MAC-related abnormal interrupt.
+url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/net-dsa-add-support-for-DCB-get-set-apptrust-configuration/20240329-000847
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240328160518.2396238-6-o.rempel%40pengutronix.de
+patch subject: [PATCH net-next v1 5/9] net: dsa: microchip: add support for different DCB app configurations
+config: i386-randconfig-012-20240330 (https://download.01.org/0day-ci/archive/20240330/202403301034.rVoygO9P-lkp@intel.com/config)
+compiler: gcc-12 (Ubuntu 12.3.0-9ubuntu2) 12.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240330/202403301034.rVoygO9P-lkp@intel.com/reproduce)
 
->> Generally, driver will reset to restore the normal state.
->> After the reset, many registers are cleared. Therefore,
->> it is difficult to analyze the reason of RAS.
-> Perhaps I'm missing the significance of the reset when it comes
-> to counters reported via standard APIs. Are rtnl_link_stats64
-> going to behave differently across a reset than these debug entries?
->
-1. These statistics are the same as rtnl_link_stats64. However, these are not updated in real time.
-    They are updated only when users query them or driver updates them every 5 minutes.
-    However, these are cleared after the reset, which makes debugging difficult.
-2. Currently, only a few MIB statistics are required, not all.
-3. Are you suggesting that we use rtnl_link_stats64 to provide MIB statistics?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202403301034.rVoygO9P-lkp@intel.com/
 
->> We wang to add this information only when RAS is occurring, And
->> these information will help to analyze the reason of RAS.
->>
->> these information does not appear in any new API.
->>
->> Therefore, we hope that we can add this information to
->> reduce the difficulty of analyzing certain issues.
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+WARNING: modpost: missing MODULE_DESCRIPTION() in kernel/rcu/rcuscale.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in kernel/rcu/refscale.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in kernel/time/time_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in kernel/trace/preemptirq_delay_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in kernel/torture.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in mm/dmapool_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_cp737.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_cp860.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_cp862.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_cp866.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_cp936.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_cp949.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_cp950.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_iso8859-2.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_iso8859-5.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_iso8859-7.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_iso8859-13.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/mac-cyrillic.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/mac-gaelic.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/mac-roman.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/nls/nls_ucs2_utils.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/bcachefs/mean_and_variance_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/binfmt_misc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/minix/minix.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/efs/efs.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/qnx4/qnx4.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in fs/qnx6/qnx6.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in security/keys/trusted-keys/trusted.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in crypto/algif_hash.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in block/t10-pi.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in lib/kunit/kunit.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in lib/kunit/kunit-test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in lib/kunit/kunit-example-test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in lib/crypto/libarc4.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpio/gpio-gw-pld.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/video/backlight/rt4831-backlight.o
+WARNING: modpost: drivers/acpi/apei/einj: section mismatch in reference: einj_driver+0x8 (section: .data) -> einj_remove (section: .exit.text)
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/clk-gate_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/virtio/virtio.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/virtio/virtio_ring.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/regulator/max20411-regulator.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/tty/n_hdlc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/lp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/nvram.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/ppdev.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_kunit_helpers.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_buddy_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_cmdline_parser_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_connector_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_damage_helper_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_dp_mst_helper_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_exec_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_format_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_framebuffer_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_gem_shmem_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_managed_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_mm_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_modes_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_plane_helper_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_probe_helper_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tests/drm_rect_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/bridge/sil-sii8620.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/tiny/gm12u320.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-kunit.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-ram.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-raw-ram.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/misc/open-dice.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/scsi/scsi_common.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/scsi/aha1740.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/auxdisplay/charlcd.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/auxdisplay/hd44780_common.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/host/xhci-pci-renesas.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/mon/usbmon.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/usb_debug.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/mxuport.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/usb-serial-simple.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/symbolserial.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/input/tests/input_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/tuners/tda9887.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/rc-core.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/v4l2-core/v4l2-async.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/v4l2-core/v4l2-fwnode.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hwmon/mr75203.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/watchdog/twl4030_wdt.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/core/pwrseq_simple.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/core/pwrseq_sd8787.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/core/pwrseq_emmc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/core/sdio_uart.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/firmware/google/gsmi.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/of/of_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_simpleondemand.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_performance.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-gpio.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/parport/parport.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mdpy.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mbochs.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kobject/kobject-example.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kobject/kset-example.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kprobes/kprobe_example.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kprobes/kretprobe_example.o
+>> ERROR: modpost: "ietf_dscp_to_ieee8021q_tt" [drivers/net/dsa/microchip/ksz_switch.ko] undefined!
+>> ERROR: modpost: "ieee8021q_tt_to_tc" [drivers/net/dsa/microchip/ksz_switch.ko] undefined!
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
