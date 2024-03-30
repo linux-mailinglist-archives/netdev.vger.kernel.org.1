@@ -1,231 +1,127 @@
-Return-Path: <netdev+bounces-83492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CF01892936
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 05:15:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 966F3892963
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 05:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9479B224DF
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 04:15:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E200AB22A7E
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 04:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818848F77;
-	Sat, 30 Mar 2024 04:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797EE3FF1;
+	Sat, 30 Mar 2024 04:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="lotuHB3Y"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n+1uMRMx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E6A8827
-	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 04:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602524C8C
+	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 04:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711772139; cv=none; b=ITnrtPqGRDyAEYBkfhgbsh5aFy+ZM2zLRr7hwybBANXJpXD852oR/vSMXwlFqyScQsVpjzdHJi2LXhr1bPv9+bsYdLVqTc74VNitoIIvyaJ1hFhH9iIlyUTfEA2eKYwgjlfBh9YuNQ06YA6nAudoWnLxDca0l7wgQyLsDx4GiIo=
+	t=1711774086; cv=none; b=GwHZKRi/eml6DlBfGSsMb9rsgOFmqC01rgfyOKIQ/1xXi2qjT7DgGH6g0fY8dMEzxhulb/hoNvmkwDCaEalFiWMrQkH3weA0ynPOv68afoh+/1lAl9L+L0bR0cui/jDALYp9DGb8nZYI40aVd4jeKGmIC/dhJdzSK2eaaWR9GFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711772139; c=relaxed/simple;
-	bh=qgobxYsoW4+2TT3KspAAgbFZjvWwlDQJ1EahoxZ6SUc=;
+	s=arc-20240116; t=1711774086; c=relaxed/simple;
+	bh=nOmQV1H9fSp2x3NrALQj4COL96kktnMWzhB6qZiX8aw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T5GlSkyd6Aw85bpCxz/f6zyp7PI/dI+gCi/wHHkThzWa0IW1G5RbJ8fdIO3SC5YiiAiUsDqaWM7JXuMsHrxRDvl0I6XfuOfgL57g2tmqNEW/xiqW5t/8OOc9Jf4BHnsXFBYECwDKEFDNjXz7pTU3AeE6YSYQ5WU7VwgT9wI1OqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=lotuHB3Y; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5d8b887bb0cso1930138a12.2
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 21:15:33 -0700 (PDT)
+	 To:Cc:Content-Type; b=M48dreyTolvY2cnQgLIZAjXp6uEm0TNSoZJFPvOn3NX33jGh4rbuopaUy3UiQgx/b3SwQEDrAqctPWwBtJS0OZKLq4E+ubZXd8rfLHtesOMaRONXw+IjdWQc7FQGOaJg/33goxAx4COg99paYcS/9XNbipGaA4ij2yDX6ZjqMbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=n+1uMRMx; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dc23bf7e5aaso2431834276.0
+        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 21:48:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1711772130; x=1712376930; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ofE4DiMnvHuiRZX1XlrIQJQuThx3U4684j2Vrwr4bOc=;
-        b=lotuHB3YqxI5vNiMNQShMPcZpMVUJ465SPLPfA2ZffKWYhtiIpcCAVyZSTq4l0PlVm
-         cPPfJ5K6RIbzdDn0T2br/TIueszyxszgWUTJ380vTjs5mQUui38KoyOVDnG1aNFg3ojX
-         qT7UlrcsXggaNQXe9AuPEuT0Sb7F0MLi7Nw6l+TH1U0d7yiQ+7KnPDVXHegP8jKCK6Em
-         Uow1+d0qBdtY/BbdJh5NtxxGHAY5F7ea4QmX/AcK49wR4lbjbtMz9p1a1106CIP7G/p2
-         F5jxnpW89ievSd3eMy5KK8/Cy/eyEh2UtRV9jEB1VoadAT58X+0FxQfYCzwBApOxWs6q
-         CZyA==
+        d=linaro.org; s=google; t=1711774083; x=1712378883; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dQUNU9HstbNDcHNvryhhTFYLom8Nu8/8eMQ1j/SNHfY=;
+        b=n+1uMRMxRpHwhG8KTbbVJRplyvBND8i+sroyADt9uuGsXcIVPiet/79t2DhVti8yaZ
+         JXx3tMNtWdggLvh9aYy49rNtN09DCcJBt55gB9kQD27tAbcS7smMjLOGnNIY62/rs2QK
+         P8d0lKce4ndHoWZtmIUEvPoZ2LrLAp1s+Rxbhm8HDMtNoDGKy4vX33CC9MvYByGuoea4
+         iL0qxUnVobapkYQ6F399p7WoFHlIprij6tNxx4wwFEZ5PKfwSHoKWGYzYNuD0MkuXuIf
+         +gaYRH3sYXk4Dr/uvUUZ24Qz7endvnF+AtHrstT+wrxzeD9D2kfYEVlxgP94U7xW3xGW
+         mA2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711772130; x=1712376930;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ofE4DiMnvHuiRZX1XlrIQJQuThx3U4684j2Vrwr4bOc=;
-        b=jaUNrFy5R5LVMqGtvZbyBqqIpwSpxXDNegxoDyWqpRXPrIW5KdpaXNUaajfMJkTBq6
-         KAc44jVpyPmp2MFeMB0nWoUyE9yo/DfFR4SukWhlNpmBjJOoztEg3w/3Flw5hJB0fx7a
-         d72Dsp5oVItjssS7whLTpqM8Z/h3XA8dbzxIYXqPO20tu4CTwF0aznkXKdYzfAJ97S7b
-         4MOW1j1h7SHUQyChx3PqSPU4jKSBhu9AYz6wLW7Q3TIp+DK5lGmmQpL1BXdUlNzsxQhB
-         0i2sffJ3LY1jz8rJFM44hB4vmFsJI/qPoul7V3J5sGvousLf0MVjeQl/Nak8w3refFTq
-         LcbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0V0kT1hg3xojbGb15ks3ZqtFHdLIRrtKVkNgBct4Vf3pNdjTtjF2vMrJ03s2CgtraJ6T3J9t/PzAqYpKeq3PvLC60coj0
-X-Gm-Message-State: AOJu0YwDZOjPcvrk1o1FpkUYZlJNVhIW3E+xew6mb4HA1FOLgkd7Ew+7
-	mWXyseVhgwWQ8mOJImh/zLT0Gl0nTBSyWEBH9GWHBTlybAzP8mm1I5UeUE4qQX3zteoWjisbZzU
-	9+jyJ19XJDbCbZxnmsHzEw11O3tA30zwMCwwjPA==
-X-Google-Smtp-Source: AGHT+IGgndwZ3xqfDhf4CyJqUlqHUpBRYWacoRvVkoWzKCTwU3GtudllRjOr+s4vd+S8mdhVeoofK0l9Hh+AwBW0mGw=
-X-Received: by 2002:a05:6a20:17a2:b0:1a3:67fd:46b1 with SMTP id
- bl34-20020a056a2017a200b001a367fd46b1mr3653617pzb.36.1711772130610; Fri, 29
- Mar 2024 21:15:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711774083; x=1712378883;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dQUNU9HstbNDcHNvryhhTFYLom8Nu8/8eMQ1j/SNHfY=;
+        b=SFhzkbs2SM41iAvs+EylN9h8bs/4Sfgm8NpuAzaZChc0BNqIohIZGLi6s2Ds9G4fWW
+         Y/0GOaHwjsCrfqxeV1+DAMUy00KbZSCK4Vjv+5OSkZaSKigl7l6iSFsx9SPqE0L4UcY7
+         FUPVpRT3pymWiib42o2sAiP1gzFViFxqNc5TZEeXPQRMr28m15AUWnViWVhlYCcXm75L
+         yUXgB0d3wSY+TsZhJ1ZGmDqK3tAAZh07VFxWJ7J2s57RBrBVjtgO5z+hr93scyH6KUEF
+         klIPBMcWvMGn5t2kZhz1iYSGhfUiPILZbgS6vW2yNTMjuWYYJul9nmfn3iNYYv24Wz7L
+         Hd1w==
+X-Forwarded-Encrypted: i=1; AJvYcCXRuVSegW3hjlToWGsunjEH4R9HT+9lcg72jpMhxCCW0kpc8tH+rZJOS9HL4UhsAHLB9FEKnkzsiDQtINdUppFdi+nymAsz
+X-Gm-Message-State: AOJu0Yx+XpoyNARIUB+G8kpmOnRuhrmAszR00jA604EIFoRYCUdcrrs7
+	LPEFYZTPPZ58V1A2QwdCcILuq2t3m7ZL9VitqBLLSnOVjARiUle0D8bw+J0DsramEQ/8RyERjEF
+	X500M53qqpyu6S2K98Undw0QuXN23gLox19D75Q==
+X-Google-Smtp-Source: AGHT+IFWm8FRcfrc1FaMw38a0VeaKMDMlu7uCNCYORdT1l9V5pI2sSVpSQMKObFG5zVf0CeqF6rlwAr3XTYwJkWkMCE=
+X-Received: by 2002:a25:10c4:0:b0:dd1:7a16:7b4 with SMTP id
+ 187-20020a2510c4000000b00dd17a1607b4mr3520574ybq.31.1711774083391; Fri, 29
+ Mar 2024 21:48:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
- <20240311093526.1010158-2-dongmenglong.8@bytedance.com> <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
- <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
- <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
- <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
- <CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
- <CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com>
- <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
- <CALz3k9g-U8ih=ycJPRbyU9x_9cp00fNkU3PGQ6jP0WJ+=uKmqQ@mail.gmail.com>
- <CALz3k9jG5Jrqw=BGjt05yMkEF-1u909GbBYrV-02W0dQtm6KQQ@mail.gmail.com>
- <20240328111330.194dcbe5@gandalf.local.home> <CAEf4BzYgzOti+Hfdn3SUCjuofGedXRSGApVDD+K2TdG6oNE-pw@mail.gmail.com>
-In-Reply-To: <CAEf4BzYgzOti+Hfdn3SUCjuofGedXRSGApVDD+K2TdG6oNE-pw@mail.gmail.com>
-From: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
-Date: Sat, 30 Mar 2024 12:16:52 +0800
-Message-ID: <CALz3k9hm6U90K8+d7SprXiKvscRjFno83idqYneHEVwgs4pCiw@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
- to record and check the accessed args
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	X86 ML <x86@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Quentin Monnet <quentin@isovalent.com>, bpf <bpf@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
+References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
+In-Reply-To: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Sat, 30 Mar 2024 06:47:52 +0200
+Message-ID: <CAA8EJprpmC6+ePxw_G6y9YEszndq1VonS1HP=aP9OVHNm42LLw@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific firmware overrides
+To: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: ath10k@lists.infradead.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 30, 2024 at 7:28=E2=80=AFAM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
+On Wed, 6 Mar 2024 at 10:16, Dmitry Baryshkov
+<dmitry.baryshkov@linaro.org> wrote:
 >
-> On Thu, Mar 28, 2024 at 8:10=E2=80=AFAM Steven Rostedt <rostedt@goodmis.o=
-rg> wrote:
-> >
-> > On Thu, 28 Mar 2024 22:43:46 +0800
-> > =E6=A2=A6=E9=BE=99=E8=91=A3 <dongmenglong.8@bytedance.com> wrote:
-> >
-> > > I have done a simple benchmark on creating 1000
-> > > trampolines. It is slow, quite slow, which consume up to
-> > > 60s. We can't do it this way.
-> > >
-> > > Now, I have a bad idea. How about we introduce
-> > > a "dynamic trampoline"? The basic logic of it can be:
-> > >
-> > > """
-> > > save regs
-> > > bpfs =3D trampoline_lookup_ip(ip)
-> > > fentry =3D bpfs->fentries
-> > > while fentry:
-> > >   fentry(ctx)
-> > >   fentry =3D fentry->next
-> > >
-> > > call origin
-> > > save return value
-> > >
-> > > fexit =3D bpfs->fexits
-> > > while fexit:
-> > >   fexit(ctx)
-> > >   fexit =3D fexit->next
-> > >
-> > > xxxxxx
-> > > """
-> > >
-> > > And we lookup the "bpfs" by the function ip in a hash map
-> > > in trampoline_lookup_ip. The type of "bpfs" is:
-> > >
-> > > struct bpf_array {
-> > >   struct bpf_prog *fentries;
-> > >  struct bpf_prog *fexits;
-> > >   struct bpf_prog *modify_returns;
-> > > }
-> > >
-> > > When we need to attach the bpf progA to function A/B/C,
-> > > we only need to create the bpf_arrayA, bpf_arrayB, bpf_arrayC
-> > > and add the progA to them, and insert them to the hash map
-> > > "direct_call_bpfs", and attach the "dynamic trampoline" to
-> > > A/B/C. If bpf_arrayA exist, just add progA to the tail of
-> > > bpf_arrayA->fentries. When we need to attach progB to
-> > > B/C, just add progB to bpf_arrayB->fentries and
-> > > bpf_arrayB->fentries.
-> > >
-> > > Compared to the trampoline, extra overhead is introduced
-> > > by the hash lookuping.
-> > >
-> > > I have not begun to code yet, and I am not sure the overhead is
-> > > acceptable. Considering that we also need to do hash lookup
-> > > by the function in kprobe_multi, maybe the overhead is
-> > > acceptable?
-> >
-> > Sounds like you are just recreating the function management that ftrace
-> > has. It also can add thousands of trampolines very quickly, because it =
-does
-> > it in batches. It takes special synchronization steps to attach to fent=
-ry.
-> > ftrace (and I believe multi-kprobes) updates all the attachments for ea=
-ch
-> > step, so the synchronization needed is only done once.
-> >
-> > If you really want to have thousands of functions, why not just registe=
-r it
-> > with ftrace itself. It will give you the arguments via the ftrace_regs
-> > structure. Can't you just register a program as the callback?
-> >
-> > It will probably make your accounting much easier, and just let ftrace
-> > handle the fentry logic. That's what it was made to do.
-> >
+> On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
+> modem DSP via the TQFTPserv. These MBN files are signed by the device
+> vendor, can only be used with the particular SoC or device.
 >
-> I thought I'll just ask instead of digging through code, sorry for
-> being lazy :) Is there any way to pass pt_regs/ftrace_regs captured
-> before function execution to a return probe (fexit/kretprobe)? I.e.,
-> how hard is it to pass input function arguments to a kretprobe? That's
-> the biggest advantage of fexit over kretprobe, and if we can make
-> these original pt_regs/ftrace_regs available to kretprobe, then
-> multi-kretprobe will effectively be this multi-fexit.
-
-Yes, we can use multi-kretprobe instead of multi-fexit
-if we can obtain the function args in kretprobe.
-
-I think it's hard. The reason that we can obtain the
-function args is that we have a trampoline, and it
-call the origin function for FEXIT. If we do the same
-for multi-kretprobe, we need to modify ftrace_regs_caller
-to:
-
-ftrace_regs_caller
-|
-__ftrace_ops_list_func
-|
-call all multi-kprobe callbacks
-|
-call orgin
-|
-call all multi-kretprobe callbacks
-|
-call bpf trampoline(for TRACING)
-
-However, this logic conflicts with bpf trampoline,
-as it can also call the origin function. What's more,
-the FENTRY should be called before the "call origin"
-above.
-
-I'm sure if I understand correctly, as I have not
-figured out how multi-kretprobe works in fprobe.
-
-Thanks!
-Menglong Dong
-
+> Unfortunately different firmware versions come with different features.
+> For example firmware for SDM845 doesn't use single-chan-info-per-channel
+> feature, while firmware for QRB2210 / QRB4210 requires that feature.
 >
-> > -- Steve
+> Allow board DT files to override the subdir of the fw dir used to lookup
+> the firmware-N.bin file decribing corresponding WiFi firmware.
+> For example, adding firmware-name = "qrb4210" property will make the
+> driver look for the firmware-N.bin first in ath10k/WCN3990/hw1.0/qrb4210
+> directory and then fallback to the default ath10k/WCN3990/hw1.0 dir.
+>
+> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> ---
+> Changes in v2:
+> - Fixed the comment about the default board name being NULL (Kalle)
+> - Expanded commit message to provide examples for firmware paths (Kalle)
+> - Added a note regarding board-2.bin to the commit message (Kalle)
+> - Link to v1: https://lore.kernel.org/r/20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org
+>
+> ---
+> Dmitry Baryshkov (4):
+>       dt-bindings: net: wireless: ath10k: describe firmware-name property
+>       wifi: ath10k: support board-specific firmware overrides
+>       arm64: dts: qcom: qrb2210-rb1: add firmware-name qualifier to WiFi node
+>       arm64: dts: qcom: qrb4210-rb1: add firmware-name qualifier to WiFi node
+
+Kalle, Jeff, is there anything pending on me on this series?
+
+-- 
+With best wishes
+Dmitry
 
