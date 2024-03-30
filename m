@@ -1,118 +1,122 @@
-Return-Path: <netdev+bounces-83619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B200893338
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:37:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 028DD893312
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:34:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDE231C22803
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:37:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23C351C2236E
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E411552E2;
-	Sun, 31 Mar 2024 16:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB2AA1E885;
+	Sun, 31 Mar 2024 16:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKS5psrv"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AgKIFxWL"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C6B154424
-	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 16:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2FC14600D;
+	Sun, 31 Mar 2024 16:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711902517; cv=pass; b=uPB8SQUhHrcDxMfb3zhPXSCGRIoyOT1qbqBJEWhTOSuAMgt9HXI5Bp6VkFc1BBzk1a3gRhcK0bvNyqIceYY2kCatBz7p0wosGB/oz0vBOSEy+T7v5regb1SOGZ/GBqqSfyUPEkd7lSbYStSKJmtCWMYYLQFEWNhWE7Ue/wJm+SM=
+	t=1711902485; cv=fail; b=MbhteM3Ilx4ig5iSJl3rEOVbrgFJBjbBNsV0qlzV4QTERbwqlGVt7n3HOElQ0ofl3acsNkwwf7yhtc8gv6mLWu7WteHnnDTDPPVaEellw+YQUMEDUF8gNz9oTvd2uJ0afPU3aE3/IV52Xz0AJQND9TquvFShQc9OzTa/pmlMiww=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711902517; c=relaxed/simple;
-	bh=+aOsqWyoskE37ffBGxozTaxmzQ63Pdv0Yuac/lns4Uk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wmht9KdH7hgV6pV/wP5m3jFZN669hlwUoZVTcB1KNUqn67j2muDnezt1P09m6U2A8wgbJPWXMvm4+AW0MTQUbbbKRsLePnwCIcrG9nV5v6U7Na8c6MzqXGHwo7Z0mwnxlo5BSUzGKGK9xjiNRBcYMfrI5PTaZN6rllLXH/Z6hpI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKS5psrv; arc=none smtp.client-ip=209.85.218.47; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=pass smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711902485; c=relaxed/simple;
+	bh=7vMNjIQTTLzF5+Qpjv6y2HZaO1EeCqI4ON+1sm6e4Ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sdM+1edOyHBgA3BWZQ9CMWMx+S3TgFWG/4xSGbDtQm6IBLbNQw6voW+gU5S/e9T28YS+9lLFl/Pqor2G4GSQEckgOAVqcT7i+JXWkezIBXO9+mthvnBoP11l3YdGngK3KQ0DVUwEKpwNQ3jnYkutwfxi9yEAlAmEGmyL1jg91Xo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lunn.ch; spf=fail smtp.mailfrom=lunn.ch; dkim=fail (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AgKIFxWL reason="signature verification failed"; arc=none smtp.client-ip=156.67.10.101; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; arc=fail smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=lunn.ch
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 8C1B5208D1;
-	Sun, 31 Mar 2024 18:28:33 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 78AD620728;
+	Sun, 31 Mar 2024 18:28:01 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xQOShptWU-Vm; Sun, 31 Mar 2024 18:28:32 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	with ESMTP id Dl2jSrIytgLT; Sun, 31 Mar 2024 18:28:00 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 94173208DB;
-	Sun, 31 Mar 2024 18:28:30 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 94173208DB
+	by a.mx.secunet.com (Postfix) with ESMTPS id E302E20820;
+	Sun, 31 Mar 2024 18:27:59 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com E302E20820
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 882BB800057;
-	Sun, 31 Mar 2024 18:28:30 +0200 (CEST)
+	by mailout1.secunet.com (Postfix) with ESMTP id D4ED1800057;
+	Sun, 31 Mar 2024 18:27:59 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:28:30 +0200
+ 15.1.2507.35; Sun, 31 Mar 2024 18:27:59 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
  15.1.2507.17; Sun, 31 Mar 2024 16:23:50 +0000
-X-sender: <netdev+bounces-83506-peter.schumann=secunet.com@vger.kernel.org>
+X-sender: <netdev+bounces-83507-peter.schumann=secunet.com@vger.kernel.org>
 X-Receiver: <peter.schumann@secunet.com>
  ORCPT=rfc822;peter.schumann@secunet.com NOTIFY=NEVER;
  X-ExtendedProps=BQAVABYAAgAAAAUAFAARAJ05ab4WgQhHsqdZ7WUjHykPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGAAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249UGV0ZXIgU2NodW1hbm41ZTcFAAsAFwC+AAAAQ5IZ35DtBUiRVnd98bETxENOPURCNCxDTj1EYXRhYmFzZXMsQ049RXhjaGFuZ2UgQWRtaW5pc3RyYXRpdmUgR3JvdXAgKEZZRElCT0hGMjNTUERMVCksQ049QWRtaW5pc3RyYXRpdmUgR3JvdXBzLENOPXNlY3VuZXQsQ049TWljcm9zb2Z0IEV4Y2hhbmdlLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUADgARAC7JU/le071Fhs0mWv1VtVsFAB0ADwAMAAAAbWJ4LWVzc2VuLTAxBQA8AAIAAA8ANgAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5EaXNwbGF5TmFtZQ8ADwAAAFNjaHVtYW5uLCBQZXRlcgUADAACAAAFAGwAAgAABQBYABcASAAAAJ05ab4WgQhHsqdZ7WUjHylDTj1TY2h1bWFubiBQZXRlcixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc
 	2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
-X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoAmdjp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBUAAAAnIoAAAUABAAUIAEAAAAaAAAAcGV0ZXIuc2NodW1hbm5Ac2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAZAAPAAMAAABIdWI=
+X-HeloDomain: a.mx.secunet.com
+X-ExtendedProps: BQBjAAoAwNjp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBpAAAAnIoAAAUABAAUIAEAAAAaAAAAcGV0ZXIuc2NodW1hbm5Ac2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAZAAPAAMAAABIdWI=
 X-Source: SMTP:Default MBX-DRESDEN-01
-X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 23281
+X-SourceIPAddress: 62.96.220.36
+X-EndOfInjectedXHeaders: 11491
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.80.249; helo=am.mirrors.kernel.org; envelope-from=netdev+bounces-83506-peter.schumann=secunet.com@vger.kernel.org; receiver=peter.schumann@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com CC72A2025D
-Authentication-Results: b.mx.secunet.com;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKS5psrv"
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.80.249; helo=am.mirrors.kernel.org; envelope-from=netdev+bounces-83507-peter.schumann=secunet.com@vger.kernel.org; receiver=peter.schumann@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com E1FC520847
 X-Original-To: netdev@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal: i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711810056; cv=none; b=kpAEiarcQT9ZKL8zkBLI3bYHdb4UPNfUSuRr4q5ma2mf07ZDZjRjXhRQJQky2xU727WA0yLZk9W/er4E+2pzlftO5YJIw4VIQ+8nDheAfoS8bn/aMkkEuoNvbL+LArXVTphehXDK+CCACtKLIsPGIKhiMVxc5IXUd34HVTp2sU0=
+	t=1711810403; cv=none; b=VrO6J8Hi+SBymX6+G5k3Ud8x7blzHf4q7Un8U6HDTfCcAzT4feZ1IAepX0YzqrNRbWaj6sVRlwcJW0hQh2XaqpefkR4Sl2gkocyv4v1p3KRon1liM9mPgLHk8XrtVDkI9/lTyxhV5mKiovFXgO/D2P2uamXtEBKUKCzDezwG5NM=
 ARC-Message-Signature: i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711810056; c=relaxed/simple;
-	bh=+aOsqWyoskE37ffBGxozTaxmzQ63Pdv0Yuac/lns4Uk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=StC5t7/L7/eIQs48jhztrltYYbv+kq+2SmywsOf71ocSV2VJxZooWd/CgH+F5BrFmP6CQJSNyo/TzOTsU/wDwbGCXLA8c1GVDKBHnmf5aOJ2FEN6N6mBAq9GBQdRXSi7lVyxnBu/ZhTLF+trMrJ3iamkkJQUxuSQOUsup0zEdWk=
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKS5psrv; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711810053; x=1712414853; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W300fuzuiZ6ceqhX7gLlM/xiZgFGQPmf5CCO5UJDT4A=;
-        b=LKS5psrvu6VD0Vy0XmHvxU0tYBUza3aPlkENTlN44rTuVpkyOncR8vrDXgjLSGlSpo
-         XyAEgQdi/zAIR7UBOlfQHv5Zg9dzD/CzkQnJC2CFsXlOalF+wmXa9eV5TiLN4dN7Y5JK
-         axAd4w5J13IiCHjE+24O5/JOx2fvBJ9sXbZcK5bUfoC6Ay6nrX/MZg/snlEYMkFR2Cui
-         Tei7L41jRdqGT2/YqISJnNFxa3zXWoeh4rpC26AOg7yBtTJKrNmDBEe5r3DRGbnO6ML8
-         a5t0b1NGuhHzOV8skLpRyduyl6WcZrpGQRh+qpGHBrL0KObbIUtC5jmwvMyM9wNprAaZ
-         am5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711810053; x=1712414853;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W300fuzuiZ6ceqhX7gLlM/xiZgFGQPmf5CCO5UJDT4A=;
-        b=NKu9Pp1a2ghx9ZbVk4kKftIAAM96OGtyMIjGJKqW5z7KxSgOFohsohE+BucPu5yrNw
-         j6BiHl0gXHQMLOsFlLueGKIuxaAFSY8EgWQZ0a91fxpNKmyzPdMBzYPVAQJhM2n6ZMa3
-         OBWd8Gbjk0jio2VpKKPWFoD+nTHtGvkawh0TYncvCRVbZlwtpVyo88nqZKvIXIf/CD86
-         /2YY4dY73sqZIDbutxAzbn1zz0qnmO72w9L5yPcggOVeJC4fM/aZDD7ysrwYG9TrAPbK
-         9kc4j4B6WWVYteCVH1KllRDbk5wvLTBx7j5ksCnr9+P5JBX+/oG9JhLgWi37SsxxJl15
-         nUUA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwDoCdjn83mi0iRy83jwpIgWSwWC7lLmDoo/ick0NAKQlLj7aRcSKoL97J10QHNZNxSGUup496fgTUOOIGHfWSZcAbmUhd
-X-Gm-Message-State: AOJu0Yy3BZK2J29DwON/qSNa6FW0BV0kmRo8309Kv4rLOiajrtsj4Z8p
-	IArCs7mzn03uCBEiV01/CaHEXOSCbDgS7KSWlZKx1GUz5A7yhYBI+ibLMWnemXcKaovN1UH9P4n
-	PuU+xt6DOsO2PfFDZht63el4Fye8IB5IyUKg=
-X-Google-Smtp-Source: AGHT+IH1b7DfIUMD1an/uRfFG6fdu7nOA43JkZRFapeDTcDyRfEm7vuGo96xJl8uCvqM11MV+heUKrQV3A3Ar9V9uCk=
-X-Received: by 2002:a17:907:1c90:b0:a4e:2220:f748 with SMTP id
- nb16-20020a1709071c9000b00a4e2220f748mr3821844ejc.40.1711810052521; Sat, 30
- Mar 2024 07:47:32 -0700 (PDT)
+	s=arc-20240116; t=1711810403; c=relaxed/simple;
+	bh=gJx0oB7ZzuoCNKkwsr1UzGLJ3CRfFELmHureG9uOYGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oDelDfSdHTx21mIJ0hem715uqMg/JEbBvu+QI/n4j2Dk5mc8GbK+VtSdOJISO50a39BBZcXcTZecoAszKR55fvrHsgPXRjIkkmjNpNVTs/51Np0JtRcq77T52D8q+mY13M2OFNo9qBat6UJf/PFGufjBrguPYjOpPuK3LA1Ni/8=
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AgKIFxWL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=caGVOX2RZ69c4hjscPFCuCKDrFK7z35V6qvgjgO6mvs=; b=AgKIFxWLgU4PMlGPkeuWts4Sdx
+	C1uk2GClcr5WI35QPJ/c+zppgblTWKdov5NwQ4Y/rlf4kRO+pXEefeYiuH/9vvqcMMhtsW5bKoOSc
+	ptiP23T99yvkYQ4yFYT1LkW6GjFn1aaNnXMQ/2LbdTSWKkldN1777vtFbSTbTQ5A4V60=;
+Date: Sat, 30 Mar 2024 15:52:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 17/17] net: pse-pd: Add TI TPS23881 PSE
+ controller driver
+Message-ID: <8186fea6-c1f4-403b-b717-83c1dd3ad826@lunn.ch>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-17-c1011b6ea1cb@bootlin.com>
+ <6bbc6b86-3947-4679-ac0b-fde50129d0f6@lunn.ch>
+ <20240329155657.7939ac4b@kmaincent-XPS-13-7390>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -120,209 +124,545 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329154225.349288-1-edumazet@google.com> <20240329154225.349288-7-edumazet@google.com>
-In-Reply-To: <20240329154225.349288-7-edumazet@google.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 30 Mar 2024 22:46:55 +0800
-Message-ID: <CAL+tcoBa1g1Ps5V_P1TqVtGWD482AvSy=wgvvUMT3RCHH+x2=Q@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 6/8] net: rps: change input_queue_tail_incr_save()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240329155657.7939ac4b@kmaincent-XPS-13-7390>
 Content-Transfer-Encoding: quoted-printable
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Hello Eric,
+On Fri, Mar 29, 2024 at 03:56:57PM +0100, Kory Maincent wrote:
+> On Thu, 28 Mar 2024 17:24:17 +0100
+> Andrew Lunn <andrew@lunn.ch> wrote:
+>=20
+> > > +static int tps23881_flash_fw_part(struct i2c_client *client,
+> > > +				  const char *fw_name,
+> > > +				  const struct tps23881_fw_conf *fw_conf) =20
+> >=20
+> > Does the device actually have flash? Or is this just downloading to
+> > SRAM?
+>=20
+> It is downloading to SRAM.
 
-On Fri, Mar 29, 2024 at 11:43=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> input_queue_tail_incr_save() is incrementing the sd queue_tail
-> and save it in the flow last_qtail.
->
-> Two issues here :
->
-> - no lock protects the write on last_qtail, we should use appropriate
->   annotations.
->
-> - We can perform this write after releasing the per-cpu backlog lock,
->   to decrease this lock hold duration (move away the cache line miss)
->
-> Also move input_queue_head_incr() and rps helpers to include/net/rps.h,
-> while adding rps_ prefix to better reflect their role.
->
-> v2: Fixed a build issue (Jakub and kernel build bots)
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  include/linux/netdevice.h | 15 ---------------
->  include/net/rps.h         | 23 +++++++++++++++++++++++
->  net/core/dev.c            | 20 ++++++++++++--------
->  3 files changed, 35 insertions(+), 23 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 1c31cd2691d32064613836141fbdeeebc831b21f..14f19cc2616452d7e6afbbaa5=
-2f8ad3e61a419e9 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3249,21 +3249,6 @@ struct softnet_data {
->         call_single_data_t      defer_csd;
->  };
->
-> -static inline void input_queue_head_incr(struct softnet_data *sd)
-> -{
-> -#ifdef CONFIG_RPS
-> -       sd->input_queue_head++;
-> -#endif
-> -}
-> -
-> -static inline void input_queue_tail_incr_save(struct softnet_data *sd,
-> -                                             unsigned int *qtail)
-> -{
-> -#ifdef CONFIG_RPS
-> -       *qtail =3D ++sd->input_queue_tail;
-> -#endif
-> -}
-> -
->  DECLARE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
->
->  static inline int dev_recursion_level(void)
-> diff --git a/include/net/rps.h b/include/net/rps.h
-> index 7660243e905b92651a41292e04caf72c5f12f26e..10ca25731c1ef766715fe7ee4=
-15ad0b71ec643a8 100644
-> --- a/include/net/rps.h
-> +++ b/include/net/rps.h
-> @@ -122,4 +122,27 @@ static inline void sock_rps_record_flow(const struct=
- sock *sk)
->  #endif
->  }
->
-> +static inline u32 rps_input_queue_tail_incr(struct softnet_data *sd)
-> +{
-> +#ifdef CONFIG_RPS
-> +       return ++sd->input_queue_tail;
-> +#else
-> +       return 0;
-> +#endif
-> +}
-> +
-> +static inline void rps_input_queue_tail_save(u32 *dest, u32 tail)
-> +{
-> +#ifdef CONFIG_RPS
-> +       WRITE_ONCE(*dest, tail);
-> +#endif
-> +}
+So maybe rename these functions.
 
-I wonder if we should also call this new helper to WRITE_ONCE
-last_qtail in the set_rps_cpu()?
+	Andrew
 
-Thanks,
-Jason
+X-sender: <netdev+bounces-83507-steffen.klassert=3Dsecunet.com@vger.kernel.=
+org>
+X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Drfc822;steffen.klassert@=
+secunet.com NOTIFY=3DNEVER; X-ExtendedProps=3DBQAVABYAAgAAAAUAFAARAPDFCS25B=
+AlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURh=
+dGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQB=
+HAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3=
+VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4Y=
+wUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5n=
+ZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl=
+2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ0=
+49Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAH=
+QAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5z=
+cG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAw=
+AAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbi=
+xPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQ=
+XV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1p=
+Y3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmV=
+yc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ=3D=3D
+X-CreatedBy: MSExchange15
+X-HeloDomain: b.mx.secunet.com
+X-ExtendedProps: BQBjAAoAwNjp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
+9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
+AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBtAAAAnIoAAAUABAAUIAEAAAAcAAAAc3RlZmZl=
+bi5rbGFzc2VydEBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQA=
+CAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBkAA8AAwAAAEh1Yg=3D=3D
+X-Source: SMTP:Default MBX-DRESDEN-01
+X-SourceIPAddress: 62.96.220.37
+X-EndOfInjectedXHeaders: 11630
+Received: from cas-essen-02.secunet.de (10.53.40.202) by
+ mbx-dresden-01.secunet.de (10.53.40.199) with Microsoft SMTP Server
+ (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.37; Sat, 30 Mar 2024 15:53:36 +0100
+Received: from b.mx.secunet.com (62.96.220.37) by cas-essen-02.secunet.de
+ (10.53.40.202) with Microsoft SMTP Server (version=3DTLS1_2,
+ cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Fronte=
+nd
+ Transport; Sat, 30 Mar 2024 15:53:36 +0100
+Received: from localhost (localhost [127.0.0.1])
+	by b.mx.secunet.com (Postfix) with ESMTP id AFDEC20322
+	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 15:53:36 +0100 (CET)
+X-Virus-Scanned: by secunet
+X-Spam-Flag: NO
+X-Spam-Score: -2.751
+X-Spam-Level:
+X-Spam-Status: No, score=3D-2.751 tagged_above=3D-999 required=3D2.1
+	tests=3D[BAYES_00=3D-1.9, DKIM_SIGNED=3D0.1, DKIM_VALID=3D-0.1,
+	DKIM_VALID_AU=3D-0.1, HEADER_FROM_DIFFERENT_DOMAINS=3D0.249,
+	MAILING_LIST_MULTI=3D-1, RCVD_IN_DNSWL_NONE=3D-0.0001,
+	SPF_HELO_NONE=3D0.001, SPF_PASS=3D-0.001] autolearn=3Dham autolearn_force=
+=3Dno
+Authentication-Results: a.mx.secunet.com (amavisd-new);
+	dkim=3Dpass (1024-bit key) header.d=3Dlunn.ch
+Received: from b.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 1bKMfFGP__Qt for <steffen.klassert@secunet.com>;
+	Sat, 30 Mar 2024 15:53:35 +0100 (CET)
+Received-SPF: Pass (sender SPF authorized) identity=3Dmailfrom; client-ip=
+=3D147.75.80.249; helo=3Dam.mirrors.kernel.org; envelope-from=3Dnetdev+boun=
+ces-83507-steffen.klassert=3Dsecunet.com@vger.kernel.org; receiver=3Dsteffe=
+n.klassert@secunet.com=20
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com C1C5D2025D
+Authentication-Results: b.mx.secunet.com;
+	dkim=3Dpass (1024-bit key) header.d=3Dlunn.ch header.i=3D@lunn.ch header.b=
+=3D"AgKIFxWL"
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249]=
+)
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by b.mx.secunet.com (Postfix) with ESMTPS id C1C5D2025D
+	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 15:53:34 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
+5.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B0831F21EBE
+	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 14:53:34 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BFD383B5;
+	Sat, 30 Mar 2024 14:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=3Dpass (1024-bit key) header.d=3Dlunn.ch header.i=3D@lunn.ch header.b=
+=3D"AgKIFxWL"
+X-Original-To: netdev@vger.kernel.org
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8311C0DEF;
+	Sat, 30 Mar 2024 14:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=3Dnone smtp.client-ip=
+=3D156.67.10.101
+ARC-Seal: i=3D1; a=3Drsa-sha256; d=3Dsubspace.kernel.org; s=3Darc-20240116;
+	t=3D1711810403; cv=3Dnone; b=3DVrO6J8Hi+SBymX6+G5k3Ud8x7blzHf4q7Un8U6HDTfC=
+cAzT4feZ1IAepX0YzqrNRbWaj6sVRlwcJW0hQh2XaqpefkR4Sl2gkocyv4v1p3KRon1liM9mPgL=
+Hk8XrtVDkI9/lTyxhV5mKiovFXgO/D2P2uamXtEBKUKCzDezwG5NM=3D
+ARC-Message-Signature: i=3D1; a=3Drsa-sha256; d=3Dsubspace.kernel.org;
+	s=3Darc-20240116; t=3D1711810403; c=3Drelaxed/simple;
+	bh=3DgJx0oB7ZzuoCNKkwsr1UzGLJ3CRfFELmHureG9uOYGw=3D;
+	h=3DDate:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=3DoDelDfSdHTx21mIJ0hem715=
+uqMg/JEbBvu+QI/n4j2Dk5mc8GbK+VtSdOJISO50a39BBZcXcTZecoAszKR55fvrHsgPXRjIkkm=
+jNpNVTs/51Np0JtRcq77T52D8q+mY13M2OFNo9qBat6UJf/PFGufjBrguPYjOpPuK3LA1Ni/8=
+=3D
+ARC-Authentication-Results: i=3D1; smtp.subspace.kernel.org; dmarc=3Dpass (=
+p=3Dnone dis=3Dnone) header.from=3Dlunn.ch; spf=3Dpass smtp.mailfrom=3Dlunn=
+.ch; dkim=3Dpass (1024-bit key) header.d=3Dlunn.ch header.i=3D@lunn.ch head=
+er.b=3DAgKIFxWL; arc=3Dnone smtp.client-ip=3D156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dpass (p=3Dnone di=
+s=3Dnone) header.from=3Dlunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=3Dpass smtp.mailfrom=
+=3Dlunn.ch
+DKIM-Signature: v=3D1; a=3Drsa-sha256; q=3Ddns/txt; c=3Drelaxed/relaxed; d=
+=3Dlunn.ch;
+	s=3D20171124; h=3DIn-Reply-To:Content-Disposition:Content-Type:MIME-Versio=
+n:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject=
+:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3DcaGVOX2RZ69c4hjscPFCuCKDrFK7z35V6qvgjgO6mvs=3D; b=3DAgKIFxWLgU4PMlGPk=
+euWts4Sdx
+	C1uk2GClcr5WI35QPJ/c+zppgblTWKdov5NwQ4Y/rlf4kRO+pXEefeYiuH/9vvqcMMhtsW5bKo=
+OSc
+	ptiP23T99yvkYQ4yFYT1LkW6GjFn1aaNnXMQ/2LbdTSWKkldN1777vtFbSTbTQ5A4V60=3D;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rqa4f-00Bj1W-9i; Sat, 30 Mar 2024 15:52:49 +0100
+Date: Sat, 30 Mar 2024 15:52:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 17/17] net: pse-pd: Add TI TPS23881 PSE
+ controller driver
+Message-ID: <8186fea6-c1f4-403b-b717-83c1dd3ad826@lunn.ch>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-17-c1011b6ea1cb@bootlin.com>
+ <6bbc6b86-3947-4679-ac0b-fde50129d0f6@lunn.ch>
+ <20240329155657.7939ac4b@kmaincent-XPS-13-7390>
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3Dus-ascii
+Content-Disposition: inline
+In-Reply-To: <20240329155657.7939ac4b@kmaincent-XPS-13-7390>
+Return-Path: netdev+bounces-83507-steffen.klassert=3Dsecunet.com@vger.kerne=
+l.org
+X-MS-Exchange-Organization-OriginalArrivalTime: 30 Mar 2024 14:53:36.7613
+ (UTC)
+X-MS-Exchange-Organization-Network-Message-Id: bcacc45f-6eaf-4034-2c6e-08dc=
+50c92dd9
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.37
+X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
+X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.s=
+ecunet.de
+X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-dr=
+esden-01.secunet.de:TOTAL-HUB=3D0.415|SMR=3D0.342(SMRDE=3D0.035|SMRC=3D0.30=
+6(SMRCL=3D0.101|X-SMRCR=3D0.306))|CAT=3D0.073(CATOS=3D0.014
+ (CATSM=3D0.014(CATSM-Malware
+ Agent=3D0.013))|CATRESL=3D0.041(CATRESLP2R=3D0.018)|CATORES=3D0.014
+ (CATRS=3D0.014(CATRS-Index Routing
+ Agent=3D0.013))|CATORT=3D0.001(CATRT=3D0.001(CATRT-Journal Agent=3D0.001
+ )));2024-03-30T14:53:37.211Z
+X-MS-Exchange-Forest-ArrivalHubServer: mbx-dresden-01.secunet.de
+X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Exchange-Organization-FromEntityHeader: Internet
+X-MS-Exchange-Organization-OriginalSize: 7920
+X-MS-Exchange-Organization-HygienePolicy: Standard
+X-MS-Exchange-Organization-MessageLatency: SRV=3Dcas-essen-02.secunet.de:TO=
+TAL-FE=3D0.034|SMR=3D0.007(SMRPI=3D0.004(SMRPI-FrontendProxyAgent=3D0.004))=
+|SMS=3D0.027
+X-MS-Exchange-Organization-AVStamp-Enterprise: 1.0
+X-MS-Exchange-Organization-Recipient-Limit-Verified: True
+X-MS-Exchange-Organization-TotalRecipientCount: 1
+X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
+-482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
+0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
+6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
+X-MS-Exchange-Forest-RulesExecuted: mbx-dresden-01
+X-MS-Exchange-Organization-RulesExecuted: mbx-dresden-01
+X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAdkBAAAPAAADH4sIAAAAAAAEAJWRTU/b=
+QBCGx5+xDalQD5
+ znWEiEHANNalVQpKpS1UZUpXdru9nUrswa2Wus/AV+NTNrCuqhh9qr
+ zc7M+z4z6zz41xo/tdUc16LF7N0cszQ7Q2EwPc3P3+bny29rnKWLNJ
+ 3jl6bdkazSUmmDQ9sYlU+TCyTCj7In52qEMGCxzLOzfLEcvay60ptW
+ Dfi11xrfCxt8qCk4keXFC4yV/M46I0wlsaJO5q7LTlerRbGtRVcW26
+ G4E61505m2lwarTBayrnik4/F3/gzBfz+y0Z1BWdLAx0TU4lb9h++p
+ 98tkQ0GFrUXx4ciiRt7HRnVoSoUbdV9JhUKaXtT1Dktxr9De6RKvW6
+ xYRdvvnhpsmkHXjdhU+heaZgTdfL9aXz59o8+G9X+rrOBkmkyTmwZv
+ xe6nwlbxxbh7R616LU1F81vNnwuN/wtnAFzwPAg8B/Zpge+C70PgOl
+ 7kQAS0IjoHAAFMKB9BHEAyWlwH9mjx2fedgMVObJVxyOIwdOCVdREz
+ gNeUJCVhDxkSEoRKnHQgAT+EKIQZ5clI5AlXjygkAVkOILb659IBeT
+ 12TWgkOtN4JBiZtPZg34XI552TNqQSQ0Ym7TEcho/Hww3DCwMAAAEK
+ 6gE8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJ1dGYtMTYiPz
+ 4NCjxFbWFpbFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8L1ZlcnNp
+ b24+DQogIDxFbWFpbHM+DQogICAgPEVtYWlsIFN0YXJ0SW5kZXg9Ij
+ ExNyIgUG9zaXRpb249IlNpZ25hdHVyZSI+DQogICAgICA8RW1haWxT
+ dHJpbmc+YW5kcmV3QGx1bm4uY2g8L0VtYWlsU3RyaW5nPg0KICAgID
+ wvRW1haWw+DQogIDwvRW1haWxzPg0KPC9FbWFpbFNldD4BDKIEPD94
+ bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTE2Ij8+DQo8Q2
+ 9udGFjdFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8L1ZlcnNpb24+
+ DQogIDxDb250YWN0cz4NCiAgICA8Q29udGFjdCBTdGFydEluZGV4PS
+ IxMDQiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg0KICAgICAgPFBlcnNv
+ biBTdGFydEluZGV4PSIxMDQiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg
+ 0KICAgICAgICA8UGVyc29uU3RyaW5nPkFuZHJldyBMdW5uPC9QZXJz
+ b25TdHJpbmc+DQogICAgICA8L1BlcnNvbj4NCiAgICAgIDxFbWFpbH
+ M+DQogICAgICAgIDxFbWFpbCBTdGFydEluZGV4PSIxMTciIFBvc2l0
+ aW9uPSJTaWduYXR1cmUiPg0KICAgICAgICAgIDxFbWFpbFN0cmluZz
+ 5hbmRyZXdAbHVubi5jaDwvRW1haWxTdHJpbmc+DQogICAgICAgIDwv
+ RW1haWw+DQogICAgICA8L0VtYWlscz4NCiAgICAgIDxDb250YWN0U3
+ RyaW5nPkFuZHJldyBMdW5uICZsdDthbmRyZXdAbHVubi5jaDwvQ29u
+ dGFjdFN0cmluZz4NCiAgICA8L0NvbnRhY3Q+DQogIDwvQ29udGFjdH
+ M+DQo8L0NvbnRhY3RTZXQ+AQ7OAVJldHJpZXZlck9wZXJhdG9yLDEw
+ LDE7UmV0cmlldmVyT3BlcmF0b3IsMTEsMDtQb3N0RG9jUGFyc2VyT3
+ BlcmF0b3IsMTAsMDtQb3N0RG9jUGFyc2VyT3BlcmF0b3IsMTEsMDtQ
+ b3N0V29yZEJyZWFrZXJEaWFnbm9zdGljT3BlcmF0b3IsMTAsMDtQb3
+ N0V29yZEJyZWFrZXJEaWFnbm9zdGljT3BlcmF0b3IsMTEsMDtUcmFu
+ c3BvcnRXcml0ZXJQcm9kdWNlciwyMCw2
+X-MS-Exchange-Forest-IndexAgent: 1 1482
+X-MS-Exchange-Forest-EmailMessageHash: BAB86D88
+X-MS-Exchange-Forest-Language: en
+X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
 
-> +
-> +static inline void rps_input_queue_head_incr(struct softnet_data *sd)
-> +{
-> +#ifdef CONFIG_RPS
-> +       sd->input_queue_head++;
-> +#endif
-> +}
-> +
->  #endif /* _NET_RPS_H */
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 0a8ccb0451c30a39f8f8b45d26b7e5548b8bfba4..79073bbc9a644049cacf84333=
-10f4641745049e9 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4611,7 +4611,7 @@ static int get_rps_cpu(struct net_device *dev, stru=
-ct sk_buff *skb,
->                 if (unlikely(tcpu !=3D next_cpu) &&
->                     (tcpu >=3D nr_cpu_ids || !cpu_online(tcpu) ||
->                      ((int)(per_cpu(softnet_data, tcpu).input_queue_head =
--
-> -                     rflow->last_qtail)) >=3D 0)) {
-> +                     READ_ONCE(rflow->last_qtail))) >=3D 0)) {
->                         tcpu =3D next_cpu;
->                         rflow =3D set_rps_cpu(dev, skb, rflow, next_cpu);
->                 }
-> @@ -4666,7 +4666,7 @@ bool rps_may_expire_flow(struct net_device *dev, u1=
-6 rxq_index,
->                 cpu =3D READ_ONCE(rflow->cpu);
->                 if (rflow->filter =3D=3D filter_id && cpu < nr_cpu_ids &&
->                     ((int)(per_cpu(softnet_data, cpu).input_queue_head -
-> -                          rflow->last_qtail) <
-> +                          READ_ONCE(rflow->last_qtail)) <
->                      (int)(10 * flow_table->mask)))
->                         expire =3D false;
->         }
-> @@ -4801,6 +4801,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, =
-int cpu,
->         unsigned long flags;
->         unsigned int qlen;
->         int max_backlog;
-> +       u32 tail;
->
->         reason =3D SKB_DROP_REASON_DEV_READY;
->         if (!netif_running(skb->dev))
-> @@ -4825,8 +4826,11 @@ static int enqueue_to_backlog(struct sk_buff *skb,=
- int cpu,
->                                 napi_schedule_rps(sd);
->                 }
->                 __skb_queue_tail(&sd->input_pkt_queue, skb);
-> -               input_queue_tail_incr_save(sd, qtail);
-> +               tail =3D rps_input_queue_tail_incr(sd);
->                 backlog_unlock_irq_restore(sd, &flags);
-> +
-> +               /* save the tail outside of the critical section */
-> +               rps_input_queue_tail_save(qtail, tail);
->                 return NET_RX_SUCCESS;
->         }
->
-> @@ -5904,7 +5908,7 @@ static void flush_backlog(struct work_struct *work)
->                 if (skb->dev->reg_state =3D=3D NETREG_UNREGISTERING) {
->                         __skb_unlink(skb, &sd->input_pkt_queue);
->                         dev_kfree_skb_irq(skb);
-> -                       input_queue_head_incr(sd);
-> +                       rps_input_queue_head_incr(sd);
->                 }
->         }
->         backlog_unlock_irq_enable(sd);
-> @@ -5913,7 +5917,7 @@ static void flush_backlog(struct work_struct *work)
->                 if (skb->dev->reg_state =3D=3D NETREG_UNREGISTERING) {
->                         __skb_unlink(skb, &sd->process_queue);
->                         kfree_skb(skb);
-> -                       input_queue_head_incr(sd);
-> +                       rps_input_queue_head_incr(sd);
->                 }
->         }
->         local_bh_enable();
-> @@ -6041,7 +6045,7 @@ static int process_backlog(struct napi_struct *napi=
-, int quota)
->                         rcu_read_lock();
->                         __netif_receive_skb(skb);
->                         rcu_read_unlock();
-> -                       input_queue_head_incr(sd);
-> +                       rps_input_queue_head_incr(sd);
->                         if (++work >=3D quota)
->                                 return work;
->
-> @@ -11455,11 +11459,11 @@ static int dev_cpu_dead(unsigned int oldcpu)
->         /* Process offline CPU's input_pkt_queue */
->         while ((skb =3D __skb_dequeue(&oldsd->process_queue))) {
->                 netif_rx(skb);
-> -               input_queue_head_incr(oldsd);
-> +               rps_input_queue_head_incr(oldsd);
->         }
->         while ((skb =3D skb_dequeue(&oldsd->input_pkt_queue))) {
->                 netif_rx(skb);
-> -               input_queue_head_incr(oldsd);
-> +               rps_input_queue_head_incr(oldsd);
->         }
->
->         return 0;
-> --
-> 2.44.0.478.gd926399ef9-goog
->
->
+On Fri, Mar 29, 2024 at 03:56:57PM +0100, Kory Maincent wrote:
+> On Thu, 28 Mar 2024 17:24:17 +0100
+> Andrew Lunn <andrew@lunn.ch> wrote:
+>=20
+> > > +static int tps23881_flash_fw_part(struct i2c_client *client,
+> > > +				  const char *fw_name,
+> > > +				  const struct tps23881_fw_conf *fw_conf) =20
+> >=20
+> > Does the device actually have flash? Or is this just downloading to
+> > SRAM?
+>=20
+> It is downloading to SRAM.
+
+So maybe rename these functions.
+
+	Andrew
+
+X-sender: <linux-kernel+bounces-125749-steffen.klassert=3Dsecunet.com@vger.=
+kernel.org>
+X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Drfc822;steffen.klassert@=
+secunet.com NOTIFY=3DNEVER; X-ExtendedProps=3DBQAVABYAAgAAAAUAFAARAPDFCS25B=
+AlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURh=
+dGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQB=
+HAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3=
+VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4Y=
+wUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5n=
+ZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl=
+2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ0=
+49Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAH=
+QAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5z=
+cG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAw=
+AAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbi=
+xPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQ=
+XV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1p=
+Y3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmV=
+yc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ=3D=3D
+X-CreatedBy: MSExchange15
+X-HeloDomain: a.mx.secunet.com
+X-ExtendedProps: BQBjAAoAwNjp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
+9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
+AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBuAAAAnIoAAAUABAAUIAEAAAAcAAAAc3RlZmZl=
+bi5rbGFzc2VydEBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQA=
+CAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBkAA8AAwAAAEh1Yg=3D=3D
+X-Source: SMTP:Default MBX-DRESDEN-01
+X-SourceIPAddress: 62.96.220.36
+X-EndOfInjectedXHeaders: 11449
+Received: from cas-essen-02.secunet.de (10.53.40.202) by
+ mbx-dresden-01.secunet.de (10.53.40.199) with Microsoft SMTP Server
+ (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.37; Sat, 30 Mar 2024 15:53:46 +0100
+Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-02.secunet.de
+ (10.53.40.202) with Microsoft SMTP Server (version=3DTLS1_2,
+ cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Fronte=
+nd
+ Transport; Sat, 30 Mar 2024 15:53:46 +0100
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 0092E2087C
+	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 15:53:46 +0100 (CET)
+X-Virus-Scanned: by secunet
+X-Spam-Flag: NO
+X-Spam-Score: -5.051
+X-Spam-Level:
+X-Spam-Status: No, score=3D-5.051 tagged_above=3D-999 required=3D2.1
+	tests=3D[BAYES_00=3D-1.9, DKIM_SIGNED=3D0.1, DKIM_VALID=3D-0.1,
+	DKIM_VALID_AU=3D-0.1, HEADER_FROM_DIFFERENT_DOMAINS=3D0.249,
+	MAILING_LIST_MULTI=3D-1, RCVD_IN_DNSWL_MED=3D-2.3, SPF_HELO_NONE=3D0.001,
+	SPF_PASS=3D-0.001] autolearn=3Dunavailable autolearn_force=3Dno
+Authentication-Results: a.mx.secunet.com (amavisd-new);
+	dkim=3Dpass (1024-bit key) header.d=3Dlunn.ch
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id q78oTPU6yoBB for <steffen.klassert@secunet.com>;
+	Sat, 30 Mar 2024 15:53:45 +0100 (CET)
+Received-SPF: Pass (sender SPF authorized) identity=3Dmailfrom; client-ip=
+=3D139.178.88.99; helo=3Dsv.mirrors.kernel.org; envelope-from=3Dlinux-kerne=
+l+bounces-125749-steffen.klassert=3Dsecunet.com@vger.kernel.org; receiver=
+=3Dsteffen.klassert@secunet.com=20
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 3C0B120847
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99]=
+)
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 3C0B120847
+	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 15:53:45 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
+5.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 423C9282229
+	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 14:53:43 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9648539FD4;
+	Sat, 30 Mar 2024 14:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=3Dpass (1024-bit key) header.d=3Dlunn.ch header.i=3D@lunn.ch header.b=
+=3D"AgKIFxWL"
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8311C0DEF;
+	Sat, 30 Mar 2024 14:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=3Dnone smtp.client-ip=
+=3D156.67.10.101
+ARC-Seal: i=3D1; a=3Drsa-sha256; d=3Dsubspace.kernel.org; s=3Darc-20240116;
+	t=3D1711810403; cv=3Dnone; b=3DVrO6J8Hi+SBymX6+G5k3Ud8x7blzHf4q7Un8U6HDTfC=
+cAzT4feZ1IAepX0YzqrNRbWaj6sVRlwcJW0hQh2XaqpefkR4Sl2gkocyv4v1p3KRon1liM9mPgL=
+Hk8XrtVDkI9/lTyxhV5mKiovFXgO/D2P2uamXtEBKUKCzDezwG5NM=3D
+ARC-Message-Signature: i=3D1; a=3Drsa-sha256; d=3Dsubspace.kernel.org;
+	s=3Darc-20240116; t=3D1711810403; c=3Drelaxed/simple;
+	bh=3DgJx0oB7ZzuoCNKkwsr1UzGLJ3CRfFELmHureG9uOYGw=3D;
+	h=3DDate:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=3DoDelDfSdHTx21mIJ0hem715=
+uqMg/JEbBvu+QI/n4j2Dk5mc8GbK+VtSdOJISO50a39BBZcXcTZecoAszKR55fvrHsgPXRjIkkm=
+jNpNVTs/51Np0JtRcq77T52D8q+mY13M2OFNo9qBat6UJf/PFGufjBrguPYjOpPuK3LA1Ni/8=
+=3D
+ARC-Authentication-Results: i=3D1; smtp.subspace.kernel.org; dmarc=3Dpass (=
+p=3Dnone dis=3Dnone) header.from=3Dlunn.ch; spf=3Dpass smtp.mailfrom=3Dlunn=
+.ch; dkim=3Dpass (1024-bit key) header.d=3Dlunn.ch header.i=3D@lunn.ch head=
+er.b=3DAgKIFxWL; arc=3Dnone smtp.client-ip=3D156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dpass (p=3Dnone di=
+s=3Dnone) header.from=3Dlunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=3Dpass smtp.mailfrom=
+=3Dlunn.ch
+DKIM-Signature: v=3D1; a=3Drsa-sha256; q=3Ddns/txt; c=3Drelaxed/relaxed; d=
+=3Dlunn.ch;
+	s=3D20171124; h=3DIn-Reply-To:Content-Disposition:Content-Type:MIME-Versio=
+n:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject=
+:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3DcaGVOX2RZ69c4hjscPFCuCKDrFK7z35V6qvgjgO6mvs=3D; b=3DAgKIFxWLgU4PMlGPk=
+euWts4Sdx
+	C1uk2GClcr5WI35QPJ/c+zppgblTWKdov5NwQ4Y/rlf4kRO+pXEefeYiuH/9vvqcMMhtsW5bKo=
+OSc
+	ptiP23T99yvkYQ4yFYT1LkW6GjFn1aaNnXMQ/2LbdTSWKkldN1777vtFbSTbTQ5A4V60=3D;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rqa4f-00Bj1W-9i; Sat, 30 Mar 2024 15:52:49 +0100
+Date: Sat, 30 Mar 2024 15:52:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 17/17] net: pse-pd: Add TI TPS23881 PSE
+ controller driver
+Message-ID: <8186fea6-c1f4-403b-b717-83c1dd3ad826@lunn.ch>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-17-c1011b6ea1cb@bootlin.com>
+ <6bbc6b86-3947-4679-ac0b-fde50129d0f6@lunn.ch>
+ <20240329155657.7939ac4b@kmaincent-XPS-13-7390>
+Precedence: bulk
+X-Mailing-List: linux-kernel@vger.kernel.org
+List-Id: <linux-kernel.vger.kernel.org>
+List-Subscribe: <mailto:linux-kernel+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-kernel+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3Dus-ascii
+Content-Disposition: inline
+In-Reply-To: <20240329155657.7939ac4b@kmaincent-XPS-13-7390>
+Return-Path: linux-kernel+bounces-125749-steffen.klassert=3Dsecunet.com@vge=
+r.kernel.org
+X-MS-Exchange-Organization-OriginalArrivalTime: 30 Mar 2024 14:53:46.0227
+ (UTC)
+X-MS-Exchange-Organization-Network-Message-Id: 4173286b-f2f8-48eb-586a-08dc=
+50c9335e
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
+X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
+X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.s=
+ecunet.de
+X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-dr=
+esden-01.secunet.de:TOTAL-HUB=3D0.409|SMR=3D0.340(SMRDE=3D0.035|SMRC=3D0.30=
+5(SMRCL=3D0.100|X-SMRCR=3D0.305))|CAT=3D0.068(CATOS=3D0.011
+ (CATSM=3D0.011(CATSM-Malware
+ Agent=3D0.010))|CATRESL=3D0.040(CATRESLP2R=3D0.018)|CATORES=3D0.014
+ (CATRS=3D0.014(CATRS-Index Routing Agent=3D0.013)));2024-03-30T14:53:46.46=
+7Z
+X-MS-Exchange-Forest-ArrivalHubServer: mbx-dresden-01.secunet.de
+X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Exchange-Organization-FromEntityHeader: Internet
+X-MS-Exchange-Organization-OriginalSize: 7799
+X-MS-Exchange-Organization-HygienePolicy: Standard
+X-MS-Exchange-Organization-MessageLatency: SRV=3Dcas-essen-02.secunet.de:TO=
+TAL-FE=3D0.034|SMR=3D0.007(SMRPI=3D0.005(SMRPI-FrontendProxyAgent=3D0.005))=
+|SMS=3D0.028
+X-MS-Exchange-Organization-AVStamp-Enterprise: 1.0
+X-MS-Exchange-Organization-Recipient-Limit-Verified: True
+X-MS-Exchange-Organization-TotalRecipientCount: 1
+X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
+-482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
+0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
+6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
+X-MS-Exchange-Forest-RulesExecuted: mbx-dresden-01
+X-MS-Exchange-Organization-RulesExecuted: mbx-dresden-01
+X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAdkBAAAPAAADH4sIAAAAAAAEAJWRTU/b=
+QBCGx5+xDalQD5
+ znWEiEHANNalVQpKpS1UZUpXdru9nUrswa2Wus/AV+NTNrCuqhh9qr
+ zc7M+z4z6zz41xo/tdUc16LF7N0cszQ7Q2EwPc3P3+bny29rnKWLNJ
+ 3jl6bdkazSUmmDQ9sYlU+TCyTCj7In52qEMGCxzLOzfLEcvay60ptW
+ Dfi11xrfCxt8qCk4keXFC4yV/M46I0wlsaJO5q7LTlerRbGtRVcW26
+ G4E61505m2lwarTBayrnik4/F3/gzBfz+y0Z1BWdLAx0TU4lb9h++p
+ 98tkQ0GFrUXx4ciiRt7HRnVoSoUbdV9JhUKaXtT1Dktxr9De6RKvW6
+ xYRdvvnhpsmkHXjdhU+heaZgTdfL9aXz59o8+G9X+rrOBkmkyTmwZv
+ xe6nwlbxxbh7R616LU1F81vNnwuN/wtnAFzwPAg8B/Zpge+C70PgOl
+ 7kQAS0IjoHAAFMKB9BHEAyWlwH9mjx2fedgMVObJVxyOIwdOCVdREz
+ gNeUJCVhDxkSEoRKnHQgAT+EKIQZ5clI5AlXjygkAVkOILb659IBeT
+ 12TWgkOtN4JBiZtPZg34XI552TNqQSQ0Ym7TEcho/Hww3DCwMAAAEK
+ 6gE8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJ1dGYtMTYiPz
+ 4NCjxFbWFpbFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8L1ZlcnNp
+ b24+DQogIDxFbWFpbHM+DQogICAgPEVtYWlsIFN0YXJ0SW5kZXg9Ij
+ ExNyIgUG9zaXRpb249IlNpZ25hdHVyZSI+DQogICAgICA8RW1haWxT
+ dHJpbmc+YW5kcmV3QGx1bm4uY2g8L0VtYWlsU3RyaW5nPg0KICAgID
+ wvRW1haWw+DQogIDwvRW1haWxzPg0KPC9FbWFpbFNldD4BDKIEPD94
+ bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTE2Ij8+DQo8Q2
+ 9udGFjdFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8L1ZlcnNpb24+
+ DQogIDxDb250YWN0cz4NCiAgICA8Q29udGFjdCBTdGFydEluZGV4PS
+ IxMDQiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg0KICAgICAgPFBlcnNv
+ biBTdGFydEluZGV4PSIxMDQiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg
+ 0KICAgICAgICA8UGVyc29uU3RyaW5nPkFuZHJldyBMdW5uPC9QZXJz
+ b25TdHJpbmc+DQogICAgICA8L1BlcnNvbj4NCiAgICAgIDxFbWFpbH
+ M+DQogICAgICAgIDxFbWFpbCBTdGFydEluZGV4PSIxMTciIFBvc2l0
+ aW9uPSJTaWduYXR1cmUiPg0KICAgICAgICAgIDxFbWFpbFN0cmluZz
+ 5hbmRyZXdAbHVubi5jaDwvRW1haWxTdHJpbmc+DQogICAgICAgIDwv
+ RW1haWw+DQogICAgICA8L0VtYWlscz4NCiAgICAgIDxDb250YWN0U3
+ RyaW5nPkFuZHJldyBMdW5uICZsdDthbmRyZXdAbHVubi5jaDwvQ29u
+ dGFjdFN0cmluZz4NCiAgICA8L0NvbnRhY3Q+DQogIDwvQ29udGFjdH
+ M+DQo8L0NvbnRhY3RTZXQ+AQ7OAVJldHJpZXZlck9wZXJhdG9yLDEw
+ LDE7UmV0cmlldmVyT3BlcmF0b3IsMTEsMTtQb3N0RG9jUGFyc2VyT3
+ BlcmF0b3IsMTAsMDtQb3N0RG9jUGFyc2VyT3BlcmF0b3IsMTEsMDtQ
+ b3N0V29yZEJyZWFrZXJEaWFnbm9zdGljT3BlcmF0b3IsMTAsMDtQb3
+ N0V29yZEJyZWFrZXJEaWFnbm9zdGljT3BlcmF0b3IsMTEsMDtUcmFu
+ c3BvcnRXcml0ZXJQcm9kdWNlciwyMCw2
+X-MS-Exchange-Forest-IndexAgent: 1 1482
+X-MS-Exchange-Forest-EmailMessageHash: BAB86D88
+X-MS-Exchange-Forest-Language: en
+X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
+
+On Fri, Mar 29, 2024 at 03:56:57PM +0100, Kory Maincent wrote:
+> On Thu, 28 Mar 2024 17:24:17 +0100
+> Andrew Lunn <andrew@lunn.ch> wrote:
+>=20
+> > > +static int tps23881_flash_fw_part(struct i2c_client *client,
+> > > +				  const char *fw_name,
+> > > +				  const struct tps23881_fw_conf *fw_conf) =20
+> >=20
+> > Does the device actually have flash? Or is this just downloading to
+> > SRAM?
+>=20
+> It is downloading to SRAM.
+
+So maybe rename these functions.
+
+	Andrew
 
 
