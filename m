@@ -1,120 +1,147 @@
-Return-Path: <netdev+bounces-83520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F059892C6B
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 19:28:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78597892C88
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 19:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4507D1F21E02
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 18:28:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 168731F22D00
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 18:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39215405D8;
-	Sat, 30 Mar 2024 18:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2802AF01;
+	Sat, 30 Mar 2024 18:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BAnkdZ4A"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QfVgdyAj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE733BB3D;
-	Sat, 30 Mar 2024 18:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E2D8475
+	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 18:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711823330; cv=none; b=pkt9/JQFKD5yT/eWedL3QZ9c+uqVAZqGYuNCcBB49ddKQkGuWK3hnkqepaDMW57ccoh1yCEzSWmnMnJS4nho1515dWI8hFZ2qie8bfPXjGazjG+j0ldb94e738hQVfIlT6znKKQOzJUC6eshf8680VePV4B4tu1cYk93V9G3Kwc=
+	t=1711823558; cv=none; b=TAFThch+jrTmXYoCWxIcqBp4QKMfVJAGoSQGacmBH82eoT7mmJ4tzk908ycSS8hdaYXS2K4JSgrt99+zIHyXdnZTb+SC7qpGaaOgDz1BaQG7Zl+0YDkijJ/IVBkzMe5/5sbJNlbIASlSXwI5fhYc0TI4N9Z/4Z6lklql37PtRJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711823330; c=relaxed/simple;
-	bh=O/UyUM9ICeUerTlWR6Rtm1KUdN7PcCQaxk9upPhEBE8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L2g0unnO5O3FkBmdV8tpVpxy5OtrjWnb9UBbMKAon8l9GDs3xMlUBWShfaCQhW7aC2hcM6DOkA5VgkRadHobKSxcrgI8ggcB8YbMFcdmAin9pJPfbI/7xjAUIgmwyOgxx/fp8LrGIlVP0l5WXZB8wUqZC3uV2DeMEp2FqXUfWMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BAnkdZ4A; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eOnCxHAyWMBBmrA31QsaFBeo10V11qo0IeZKOpN/ZkM=; b=BAnkdZ4AFLsdBYGg9hDj/OEdIB
-	HObTuni4MRaU0PoKGPwlAtjY0tYlpgMLsFmzRL9YBoCKEH4/UCV1r6pmG2mzAY1aIiAV9Q+foy27C
-	boy059PfyozEJxNJqHg3sgu4C5/93MuWxmhCB1fjhjGh1VNCjAMBOant8uIDY71Hko6LEOMcxLo2P
-	KbP1AdeFuiUfyH+2LBbzXz8ISCUCipZd1annA3RPugiN3Ip/gLoLS9PLceY2K/4+VJUekek/WeVM4
-	UyW2Z62ifqdIt0MXXFnB86WFCTZCnunl8WR9zrxOb2rvUqRdZauSKtpT8SswQTMG0Q+DAMvpzZWq3
-	7iet8kkA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40144)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rqdR9-00036h-00;
-	Sat, 30 Mar 2024 18:28:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rqdR4-0003rW-Hn; Sat, 30 Mar 2024 18:28:10 +0000
-Date: Sat, 30 Mar 2024 18:28:10 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Naveen Mamindlapalli <naveenm@marvell.com>
-Cc: Julien Panis <jpanis@baylibre.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>
-Subject: Re: [PATCH net-next v5 1/3] net: ethernet: ti: Add accessors for
- struct k3_cppi_desc_pool members
-Message-ID: <ZghZur10+3WvZnDu@shell.armlinux.org.uk>
-References: <20240223-am65-cpsw-xdp-basic-v5-0-bc1739170bc6@baylibre.com>
- <20240223-am65-cpsw-xdp-basic-v5-1-bc1739170bc6@baylibre.com>
- <SJ2PR18MB5635B9F20BB6CE1CC945F3B2A23B2@SJ2PR18MB5635.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1711823558; c=relaxed/simple;
+	bh=jm8kJOwQFVJgL3xkL4fOmV6WCusotZmlid8T/BX4WCI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=opIjXzhNCYisyr/nnPcD8d4omorbOHK4LW20jDm34hvdHslSeDkIQ8x8pnH66Urmk+jJ49DSq7ni5XyRTM2/Iv3nIr8EUTYU5FwRr5UHlEzPB/ekmcHSjRLibilnEeQR0fNpTQMlcVdoZz7hdjNKiQJlpSMciXY51fxjULp2SiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QfVgdyAj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:
+	Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cduKxWraeVuUd3kDqGCl+qTU2SbqER1TOLyU2ai1hD4=; b=QfVgdyAj2puBh2c8mWi6IggO2f
+	q0VA0An+FZ77Scs3aOg8S5+pYSAKZBDSNxKjGVeW4TiRkTmovNTQ+WpqPJD6pwcwD84qoxfLJSy0W
+	b2bO6IfZhWbX0FtXdZD3ogvW9ClLKo+9lOmWB2R5jwF/nI/XD+OPq7pkEHc6w4hA+IGM=;
+Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
+	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rqdVC-00Bjfq-70; Sat, 30 Mar 2024 19:32:26 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next v2 0/7] net: Add generic support for netdev LEDs
+Date: Sat, 30 Mar 2024 13:31:57 -0500
+Message-Id: <20240330-v6-8-0-net-next-mv88e6xxx-leds-v4-v2-0-fc5beb9febc5@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SJ2PR18MB5635B9F20BB6CE1CC945F3B2A23B2@SJ2PR18MB5635.namprd18.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJ1aCGYC/42NQQ7CIBREr9L8td9QQEBX3sN0geVrSSo1UAmm6
+ d0lje5dzGLyMvMWSBQ9JTg1C0TKPvkp1MJ3DfSDDXdC72oHzrhkolWYFRpkGGiuKTM+sjGkSik
+ 4kkuYJdqr1k4Ld+BWQv15Rrr5sjku8NtBV8ng0zzF9ybP7ca/Hv2HJ7eVG2YlqV7xo6Dz+Aph3
+ w/Qrev6AfgoyizaAAAA
+To: Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Gregory Clement <gregory.clement@bootlin.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2806; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=jm8kJOwQFVJgL3xkL4fOmV6WCusotZmlid8T/BX4WCI=;
+ b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBmCFq1Dw6YPhK6SO61fnVXIPLeYzX5aDd4qQgGh
+ o+C88N3UgSJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZghatQAKCRDmvw3LpmlM
+ hJgSD/wOF77l0Z5kMJltHlCaloO9MAWXZQVdxqE0nwIul9i/aBg6BhZboAPPmdFXx52RvGAWghj
+ nyeSTg+nViJf5ijvfVKmp+gILOyr1f0o11CPLeeMWjKQcmt6LV25KoHcin51AbKbOB1buZV0adK
+ NjQ7OwJOvEYn84h6Kx/x7mTNUC+nbHHxvsnqa7VaOkS2WZTn9CM8V76imis6kifDZM70Q2C7dqP
+ Vw5L3+rWq9vBmPFn4Wjcm2p6uJTl7xllOYbne+fyQCc2ZUCzroxkR/6Gt0LxfJBr48f+z/doytv
+ DZNsGdbxDdVkHtLgidqdADUVdVHjVgWGTqYKw3/PTP/TjTt4rx6wD0TWpDsCwRTNWHlRHyxndJz
+ 3CBjQn/EabEijUYTUtQZWBKx4nDtm5U0+3ugEdt3OCvuQ+HAsjICcXAx4I7gTm2+IUDGZQJI0oh
+ yBdfXPJV/CE1/x1Af0fRdS033mGd1hygDXbviHYl87cV+yEx5cftPVnw7E3f3OleKKxcrCBiTO7
+ ToosUr5o8EiehZMEt/AvpwZ+SKKuGHVqK3qBoNZw0M3w2VnILrvtv+3GnKbfgAb/SNtm5ydelgK
+ 3/d8gViEKwxP5nA30dXpGzRW/KvNzw8OZ85S4fdtxIKA1B9pXv4sGw+jSthJrvjmMkW5k+gHkLW
+ qJimAcbez+oRzaQ==
+X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
+ fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-On Thu, Mar 28, 2024 at 12:06:56PM +0000, Naveen Mamindlapalli wrote:
-> > diff --git a/drivers/net/ethernet/ti/k3-cppi-desc-pool.c b/drivers/net/ethernet/ti/k3-
-> > cppi-desc-pool.c
-> > index 05cc7aab1ec8..fe8203c05731 100644
-> > --- a/drivers/net/ethernet/ti/k3-cppi-desc-pool.c
-> > +++ b/drivers/net/ethernet/ti/k3-cppi-desc-pool.c
-> > @@ -132,5 +132,17 @@ size_t k3_cppi_desc_pool_avail(struct
-> > k3_cppi_desc_pool *pool)  }  EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_avail);
-> > 
-> > +size_t k3_cppi_desc_pool_desc_size(struct k3_cppi_desc_pool *pool) {
-> > +	return pool->desc_size;
-> 
-> Don't you need to add NULL check on pool ptr since this function is exported?
+For some devices, the MAC controls the LEDs in the RJ45 connector, not
+the PHY. This patchset provides generic support for such LEDs, and
+adds the first user, mv88e6xxx.
 
-What bearing does exporting a function have on whether it should check
-for NULL?
+The common code netdev_leds_setup() is passed a DT node containing the
+LEDs and a structure of operations to act on the LEDs. The core will
+then create an cdev LED for each LED found in the device tree node.
 
-Given that this function returns size_t, it can't return an error
-number. So what value would it return if "pool" were NULL? It can
-only return a positive integer or zero.
+The callbacks are passed the netdev, and the index of the LED. In
+order to make use of this within DSA, helpers are added to convert a
+netdev to a ds and port.
 
-Also, the argument should be const as the function doesn't modify the
-contents of "pool".
+The mv88e6xxx has been extended to add basic support for the 6352
+LEDs. Only software control is added, but the API supports hardware
+offload which can be added to the mv88e6xxx driver later.
 
+For testing and demonstration, the Linksys Mamba aka. wrt1900ac has
+the needed DT nodes added to describe its LEDs.
+
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+---
+Changes in v2:
+- Validate maximum number of LEDs in core code
+- Change Kconfig due to 0-day reports
+- Link to v1: https://lore.kernel.org/r/20240317-v6-8-0-net-next-mv88e6xxx-leds-v4-v1-0-80a4e6c6293e@lunn.ch
+
+---
+Andrew Lunn (7):
+      dsa: move call to driver port_setup after creation of netdev.
+      net: Add helpers for netdev LEDs
+      net: dsa: mv88e6xxx: Add helpers for 6352 LED blink and brightness
+      net: dsa: mv88e6xxx: Tie the low level LED functions to device ops
+      net: dsa: Add helpers to convert netdev to ds or port index
+      dsa: mv88e6xxx: Create port/netdev LEDs
+      arm: boot: dts: mvebu: linksys-mamba: Add Ethernet LEDs
+
+ .../boot/dts/marvell/armada-xp-linksys-mamba.dts   |  66 +++++++
+ drivers/net/dsa/mv88e6xxx/Kconfig                  |   1 +
+ drivers/net/dsa/mv88e6xxx/chip.c                   | 125 ++++++++++++-
+ drivers/net/dsa/mv88e6xxx/chip.h                   |  19 ++
+ drivers/net/dsa/mv88e6xxx/port.c                   |  93 ++++++++++
+ drivers/net/dsa/mv88e6xxx/port.h                   |  76 +++++++-
+ include/net/dsa.h                                  |  17 ++
+ include/net/netdev_leds.h                          |  45 +++++
+ net/Kconfig                                        |  11 ++
+ net/core/Makefile                                  |   1 +
+ net/core/netdev-leds.c                             | 201 +++++++++++++++++++++
+ net/dsa/devlink.c                                  |  17 +-
+ net/dsa/dsa.c                                      |   3 +
+ net/dsa/user.c                                     |   8 +
+ net/dsa/user.h                                     |   7 -
+ 15 files changed, 665 insertions(+), 25 deletions(-)
+---
+base-commit: 537c2e91d3549e5d6020bb0576cf9b54a845255f
+change-id: 20240316-v6-8-0-net-next-mv88e6xxx-leds-v4-ab77d73d52a4
+
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Andrew Lunn <andrew@lunn.ch>
+
 
