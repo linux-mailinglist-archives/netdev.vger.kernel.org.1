@@ -1,212 +1,186 @@
-Return-Path: <netdev+bounces-83509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A00892BE0
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 16:37:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59895892BE6
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 16:54:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 967162833DC
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 15:37:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A0D82827D0
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 15:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802A639870;
-	Sat, 30 Mar 2024 15:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4BB038F84;
+	Sat, 30 Mar 2024 15:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JpIRs6Pi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB15DA936
-	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 15:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB301C0DEF
+	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 15:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711813042; cv=none; b=fT4d1q911Lrk0LVomIKsDznkMZKwEHTEHZpVOPs8/vYdem2k8ZY0mWc6Xk3cN0gTpX9Fap155RNTR4yH6Hx2LmwlHGlxchDQuBR9rRkLlsVUEiLC6tPSymHWWBdmslzIOyxonrbVzgsLNnexBhZeizRr3SgiFkR8h7mHSMNfQGM=
+	t=1711814082; cv=none; b=PeZPqSrh73IQysY8ux6a+CyEFT0Vfr2jGSAD1w3AHzxrOoRaUEnmm61YXsEYaWeqPP0wqxFhv7+V04vlYwlZLFKIt9Mnd5GSZNNcVyAWF1ngWFN7QviawufMkCc4Ka1TvQolrMUQAkKlMsmeZMkdO8Aaw4Kq4DyNinvCHedxfXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711813042; c=relaxed/simple;
-	bh=vgtFhFwFbOea+3AmtFfRNh2xC265q1Zl/KH7546DBKQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PE0pCMN79vEadibxY+T8Ax6pHK1UVaS0tFxboi/dFtvSe+c1fZEbxxsduEkI8pHGQHk5ghGu9530rMQU2vi7+6aJR+GbIozLsUTW7LHQIqyjT+1y5sp5SjOyqGBVsDGgfzNhg8DMVD4jnIMsJHAs7Rj08H3E+EoxF0GI6K7dqbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7cf265cb019so234512339f.3
-        for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 08:37:20 -0700 (PDT)
+	s=arc-20240116; t=1711814082; c=relaxed/simple;
+	bh=S68HL3CFOxnsPBzCmCkKy6vtamevZ5S1Jmc1PGM5ID4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=n3bEpkiyHxqJYsvPttxpU0EZ58keV22w97IpDXXifdYqio6wizBejb9Jpn+ZvMhV2U2GXz2gGlebS2v4i42TBMmO4YpKHZbfuPh9xZRjrF7+Wr4GDKJYeMrQMVIc7UhiX5j6qMC06zJ6XATjiAkeIOtcTMANk/RpyojRBJo6RDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JpIRs6Pi; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6148da519efso4191717b3.2
+        for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 08:54:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711814080; x=1712418880; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dBL/ljz5qtMkaFmqNOK6k+Oflk/0oSx1QZlDLwvmaAQ=;
+        b=JpIRs6Pimkf2dMZEMEfUIf+JFbL//yiTsngXBbG7gZgrteUbOv9zgkTPgz5W0r2TIK
+         F2KsyKl2HjDbvw5c0mSyXssW0DbnhqxUjjh8sdwckpWjMe4XZVJhomJ9W1x0Gr9KUuBg
+         cIjblftMS38OX6H0Jsanrx/1tqCDXNEVPSSOgkR3fshEIUoFLxQZ2tZurGbdKbYuCWd8
+         2t7n5727vumXdX1UonEIl2YeQsh/O+EMu0/RiunAhOxXllKGN2ynYt10eRnIe33nIL6K
+         Zly2yo57vNs+NsfleELpi+dW8HLJhckkSuNViHd/pWTQBZi+eKkcoWpgy77K7nv74hx+
+         xHag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711813040; x=1712417840;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1711814080; x=1712418880;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=RqzAfSKVxdBEri+4K9r9QsCGLgVhiUDc48m3eJVBWdk=;
-        b=WakHWEcBc6O63vFlav5LYBNqTXv/Uh3++/SJ527e+ybZ/EW77kB23UmfFbCz8wCyAR
-         B/Ky/cmQ3Q2R5hEwjhNtDzmpYvZSzN4YgGvAXHUK+8LseRFRoJgd45aPUKNe76UMv3rp
-         cNb4bNRzqWtXB1w7l3igGEd6OQLqHYsC/9AvTAjkBaZQPzpFSmennIpIa5j3izizIqsd
-         YmFKVnAK5ivcrigdgsIX7jXOCp+uVXfUnXbPA5JNAZacT7PS5XuZ32SApDv58T67K234
-         w3JEmIosp2Iv0T2e+y/3+wgab8ZnsE36STCB6FfXDpyDMnkBR2JOjDTg+m5k/n1NnMUz
-         PWpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVtsaH5sVL6JkXRMh+/Opmt3D4c8UCZ0G9eAErtPz3rAGj6trcOKRqRbfd+SW1l8mFCCN0u1Xq/gO3jT5AeD5bAU89Bg3P
-X-Gm-Message-State: AOJu0Yx6zl9FDcXkeSFq0E+rSvUMX8Vmc3vQ6UbzQediNPizk+CRNBzL
-	cVgDeShsUDpGmDss+OZRCAQBh9FsX8bRuRHUodp7GSxh4wjbzI+I8RIipBXyTp0NFsE06nZ6OWp
-	iK08/wTpTEKNwPUVKJhabjS34TpfHIQIrguA9m4hISkmv6LXsoRrhvCI=
-X-Google-Smtp-Source: AGHT+IGJt2ZtnpPlSnY6kTHAcJvYfKhuXsl7IMKuTjxVGv0V/5G3tG+XCqMq/WpNLtbB2zVrqwyJmHaWMXK/99j0YHJqttimcZeD
+        bh=dBL/ljz5qtMkaFmqNOK6k+Oflk/0oSx1QZlDLwvmaAQ=;
+        b=Jwvv9aj9nOmdG/yUnbqe0+9PuW7I/10YQ+qx5Krs4Cj8KchQ9CoW8OP1xh+Cf29pdK
+         7tr6TwtQnLP2ci/6fpbwwkDAmUDvRhd+KyXUcChhU00jWWOdAmHFZW7suHNDPMB3wPs7
+         iQt71ROosITHNCMm25Sz9PlzvSNXRaqRcohr/lqaz/mtnG56Quagsd4/+Whu7GoIsFwa
+         tRPeo6vFZOpbEGOiZNYLSOU9XC2pABcSPlAcqucia0ajn6ZFUjgCY5slNItrJKAIaLLl
+         ACtaKbYS153zmdjGOatgokrriFtFMu2WeAW8gNgKs2EN5Qgd9FZ9k4zfwrU0NckAn5dI
+         y6lA==
+X-Gm-Message-State: AOJu0Yypg2WCuRdQJwTiU8ebd49wrVdbR48R8mb+4a/f37nuswSUWLG4
+	9hKFSp6BF+hQR4QxO1kXZzRE95JrTJkO2iwX0Le6bRlsoM9mO7vJkfsYl7abWbg5W9/f/od+71z
+	fYxFnOCYkPA==
+X-Google-Smtp-Source: AGHT+IFnx49Ds8YEyIdrJP/ioajvFA9z+emTWuNzEowKInCbLKSzJ6doNusIZTz0GOEyLULBPObiTQAVgdWi9Q==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:260b:b0:dc6:dfd9:d423 with SMTP
+ id dw11-20020a056902260b00b00dc6dfd9d423mr429635ybb.3.1711814079990; Sat, 30
+ Mar 2024 08:54:39 -0700 (PDT)
+Date: Sat, 30 Mar 2024 15:54:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2d8c:b0:7d0:3aa9:94ee with SMTP id
- k12-20020a0566022d8c00b007d03aa994eemr102563iow.3.1711813039936; Sat, 30 Mar
- 2024 08:37:19 -0700 (PDT)
-Date: Sat, 30 Mar 2024 08:37:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002aea130614e28812@google.com>
-Subject: [syzbot] [virtualization?] bpf boot error: WARNING: refcount bug in __free_pages_ok
-From: syzbot <syzbot+689655a7402cc18ace0a@syzkaller.appspotmail.com>
-To: ast@kernel.org, daniel@iogearbox.net, jasowang@redhat.com, 
-	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev, 
-	xuanzhuo@linux.alibaba.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240330155438.2462326-1-edumazet@google.com>
+Subject: [PATCH net-next] batman-adv: bypass empty buckets in batadv_purge_orig_ref()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Marek Lindner <mareklindner@neomailbox.ch>, 
+	Simon Wunderlich <sw@simonwunderlich.de>, Antonio Quartulli <a@unstable.cc>, 
+	Sven Eckelmann <sven@narfation.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Many syzbot reports are pointing to soft lockups in
+batadv_purge_orig_ref() [1]
 
-syzbot found the following issue on:
+Root cause is unknown, but we can avoid spending too much
+time there and perhaps get more interesting reports.
 
-HEAD commit:    6dae957c8eef bpf: fix possible file descriptor leaks in ve..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=14ec025e180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7b667bc37450fdcd
-dashboard link: https://syzkaller.appspot.com/bug?extid=689655a7402cc18ace0a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+[1]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/94b03853b65f/disk-6dae957c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7375c1b6b108/vmlinux-6dae957c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/126013ac11e1/bzImage-6dae957c.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+689655a7402cc18ace0a@syzkaller.appspotmail.com
-
-Key type pkcs7_test registered
-Block layer SCSI generic (bsg) driver version 0.4 loaded (major 239)
-io scheduler mq-deadline registered
-io scheduler kyber registered
-io scheduler bfq registered
-input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
-ACPI: button: Power Button [PWRF]
-input: Sleep Button as /devices/LNXSYSTM:00/LNXSLPBN:00/input/input1
-ACPI: button: Sleep Button [SLPF]
-ioatdma: Intel(R) QuickData Technology Driver 5.00
-ACPI: \_SB_.LNKC: Enabled at IRQ 11
-virtio-pci 0000:00:03.0: virtio_pci: leaving for legacy driver
-ACPI: \_SB_.LNKD: Enabled at IRQ 10
-virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy driver
-ACPI: \_SB_.LNKB: Enabled at IRQ 10
-virtio-pci 0000:00:06.0: virtio_pci: leaving for legacy driver
-virtio-pci 0000:00:07.0: virtio_pci: leaving for legacy driver
-N_HDLC line discipline registered with maxframe=4096
-Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
-00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
-00:04: ttyS1 at I/O 0x2f8 (irq = 3, base_baud = 115200) is a 16550A
-00:05: ttyS2 at I/O 0x3e8 (irq = 6, base_baud = 115200) is a 16550A
-00:06: ttyS3 at I/O 0x2e8 (irq = 7, base_baud = 115200) is a 16550A
-Non-volatile memory driver v1.3
-Linux agpgart interface v0.103
-ACPI: bus type drm_connector registered
-[drm] Initialized vgem 1.0.0 20120112 for vgem on minor 0
-[drm] Initialized vkms 1.0.0 20180514 for vkms on minor 1
-Console: switching to colour frame buffer device 128x48
-platform vkms: [drm] fb0: vkmsdrmfb frame buffer device
-usbcore: registered new interface driver udl
-brd: module loaded
-loop: module loaded
-zram: Added device: zram0
-null_blk: disk nullb0 created
-null_blk: module loaded
-Guest personality initialized and is inactive
-VMCI host device registered (name=vmci, major=10, minor=118)
-Initialized host personality
-usbcore: registered new interface driver rtsx_usb
-usbcore: registered new interface driver viperboard
-usbcore: registered new interface driver dln2
-usbcore: registered new interface driver pn533_usb
-nfcsim 0.2 initialized
-usbcore: registered new interface driver port100
-usbcore: registered new interface driver nfcmrvl
-Loading iSCSI transport class v2.0-870.
-virtio_scsi virtio0: 1/0/0 default/read/poll queues
-------------[ cut here ]------------
-refcount_t: decrement hit 0; leaking memory.
-WARNING: CPU: 1 PID: 1 at lib/refcount.c:31 refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
+watchdog: BUG: soft lockup - CPU#0 stuck for 27s! [kworker/u4:6:621]
 Modules linked in:
-CPU: 1 PID: 1 Comm: swapper/0 Not tainted 6.9.0-rc1-syzkaller-00160-g6dae957c8eef #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-RIP: 0010:refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
-Code: b2 00 00 00 e8 97 cf e9 fc 5b 5d c3 cc cc cc cc e8 8b cf e9 fc c6 05 8e 73 e8 0a 01 90 48 c7 c7 e0 33 1f 8c e8 c7 6b ac fc 90 <0f> 0b 90 90 eb d9 e8 6b cf e9 fc c6 05 6b 73 e8 0a 01 90 48 c7 c7
-RSP: 0000:ffffc90000066e18 EFLAGS: 00010246
-RAX: eee901a1fb7e2300 RBX: ffff888146687e7c RCX: ffff8880166d0000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000004 R08: ffffffff815800c2 R09: fffffbfff1c396e0
-R10: dffffc0000000000 R11: fffffbfff1c396e0 R12: ffffea000502edc0
-R13: ffffea000502edc8 R14: 1ffffd4000a05db9 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000000e132000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1141 [inline]
- __free_pages_ok+0xc60/0xd90 mm/page_alloc.c:1270
- make_alloc_exact+0xa3/0xf0 mm/page_alloc.c:4829
- vring_alloc_queue drivers/virtio/virtio_ring.c:319 [inline]
- vring_alloc_queue_split+0x20a/0x600 drivers/virtio/virtio_ring.c:1108
- vring_create_virtqueue_split+0xc6/0x310 drivers/virtio/virtio_ring.c:1158
- vring_create_virtqueue+0xca/0x110 drivers/virtio/virtio_ring.c:2683
- setup_vq+0xe9/0x2d0 drivers/virtio/virtio_pci_legacy.c:131
- vp_setup_vq+0xbf/0x330 drivers/virtio/virtio_pci_common.c:189
- vp_find_vqs_msix+0x8b2/0xc80 drivers/virtio/virtio_pci_common.c:331
- vp_find_vqs+0x4c/0x4e0 drivers/virtio/virtio_pci_common.c:408
- virtio_find_vqs include/linux/virtio_config.h:233 [inline]
- virtscsi_init+0x8db/0xd00 drivers/scsi/virtio_scsi.c:887
- virtscsi_probe+0x3ea/0xf60 drivers/scsi/virtio_scsi.c:945
- virtio_dev_probe+0x991/0xaf0 drivers/virtio/virtio.c:311
- really_probe+0x2b8/0xad0 drivers/base/dd.c:656
- __driver_probe_device+0x1a2/0x390 drivers/base/dd.c:798
- driver_probe_device+0x50/0x430 drivers/base/dd.c:828
- __driver_attach+0x45f/0x710 drivers/base/dd.c:1214
- bus_for_each_dev+0x239/0x2b0 drivers/base/bus.c:368
- bus_add_driver+0x347/0x620 drivers/base/bus.c:673
- driver_register+0x23a/0x320 drivers/base/driver.c:246
- virtio_scsi_init+0x65/0xe0 drivers/scsi/virtio_scsi.c:1083
- do_one_initcall+0x248/0x880 init/main.c:1238
- do_initcall_level+0x157/0x210 init/main.c:1300
- do_initcalls+0x3f/0x80 init/main.c:1316
- kernel_init_freeable+0x435/0x5d0 init/main.c:1548
- kernel_init+0x1d/0x2b0 init/main.c:1437
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
+irq event stamp: 6182794
+ hardirqs last  enabled at (6182793): [<ffff8000801dae10>] __local_bh_enable_ip+0x224/0x44c kernel/softirq.c:386
+ hardirqs last disabled at (6182794): [<ffff80008ad66a78>] __el1_irq arch/arm64/kernel/entry-common.c:533 [inline]
+ hardirqs last disabled at (6182794): [<ffff80008ad66a78>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:551
+ softirqs last  enabled at (6182792): [<ffff80008aab71c4>] spin_unlock_bh include/linux/spinlock.h:396 [inline]
+ softirqs last  enabled at (6182792): [<ffff80008aab71c4>] batadv_purge_orig_ref+0x114c/0x1228 net/batman-adv/originator.c:1287
+ softirqs last disabled at (6182790): [<ffff80008aab61dc>] spin_lock_bh include/linux/spinlock.h:356 [inline]
+ softirqs last disabled at (6182790): [<ffff80008aab61dc>] batadv_purge_orig_ref+0x164/0x1228 net/batman-adv/originator.c:1271
+CPU: 0 PID: 621 Comm: kworker/u4:6 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Workqueue: bat_events batadv_purge_orig
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+ pc : should_resched arch/arm64/include/asm/preempt.h:79 [inline]
+ pc : __local_bh_enable_ip+0x228/0x44c kernel/softirq.c:388
+ lr : __local_bh_enable_ip+0x224/0x44c kernel/softirq.c:386
+sp : ffff800099007970
+x29: ffff800099007980 x28: 1fffe00018fce1bd x27: dfff800000000000
+x26: ffff0000d2620008 x25: ffff0000c7e70de8 x24: 0000000000000001
+x23: 1fffe00018e57781 x22: dfff800000000000 x21: ffff80008aab71c4
+x20: ffff0001b40136c0 x19: ffff0000c72bbc08 x18: 1fffe0001a817bb0
+x17: ffff800125414000 x16: ffff80008032116c x15: 0000000000000001
+x14: 1fffe0001ee9d610 x13: 0000000000000000 x12: 0000000000000003
+x11: 0000000000000000 x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : 00000000005e5789 x7 : ffff80008aab61dc x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000001 x3 : 0000000000000000
+x2 : 0000000000000006 x1 : 0000000000000080 x0 : ffff800125414000
+Call trace:
+  __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
+  arch_local_irq_enable arch/arm64/include/asm/irqflags.h:49 [inline]
+  __local_bh_enable_ip+0x228/0x44c kernel/softirq.c:386
+  __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
+  _raw_spin_unlock_bh+0x3c/0x4c kernel/locking/spinlock.c:210
+  spin_unlock_bh include/linux/spinlock.h:396 [inline]
+  batadv_purge_orig_ref+0x114c/0x1228 net/batman-adv/originator.c:1287
+  batadv_purge_orig+0x20/0x70 net/batman-adv/originator.c:1300
+  process_one_work+0x694/0x1204 kernel/workqueue.c:2633
+  process_scheduled_works kernel/workqueue.c:2706 [inline]
+  worker_thread+0x938/0xef4 kernel/workqueue.c:2787
+  kthread+0x288/0x310 kernel/kthread.c:388
+  ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 PID: 0 Comm: swapper/1 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+ pc : arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:51
+ lr : default_idle_call+0xf8/0x128 kernel/sched/idle.c:103
+sp : ffff800093a17d30
+x29: ffff800093a17d30 x28: dfff800000000000 x27: 1ffff00012742fb4
+x26: ffff80008ec9d000 x25: 0000000000000000 x24: 0000000000000002
+x23: 1ffff00011d93a74 x22: ffff80008ec9d3a0 x21: 0000000000000000
+x20: ffff0000c19dbc00 x19: ffff8000802d0fd8 x18: 1fffe00036804396
+x17: ffff80008ec9d000 x16: ffff8000802d089c x15: 0000000000000001
+x14: 1fffe00036805f10 x13: 0000000000000000 x12: 0000000000000003
+x11: 0000000000000001 x10: 0000000000000003 x9 : 0000000000000000
+x8 : 00000000000ce8d1 x7 : ffff8000804609e4 x6 : 0000000000000000
+x5 : 0000000000000001 x4 : 0000000000000001 x3 : ffff80008ad6aac0
+x2 : 0000000000000000 x1 : ffff80008aedea60 x0 : ffff800125436000
+Call trace:
+  __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
+  arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:49
+  cpuidle_idle_call kernel/sched/idle.c:170 [inline]
+  do_idle+0x1f0/0x4e8 kernel/sched/idle.c:312
+  cpu_startup_entry+0x5c/0x74 kernel/sched/idle.c:410
+  secondary_start_kernel+0x198/0x1c0 arch/arm64/kernel/smp.c:272
+  __secondary_switched+0xb8/0xbc arch/arm64/kernel/head.S:404
 
-
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Marek Lindner <mareklindner@neomailbox.ch>
+Cc: Simon Wunderlich <sw@simonwunderlich.de>
+Cc: Antonio Quartulli <a@unstable.cc>
+Cc: Sven Eckelmann <sven@narfation.org>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/batman-adv/originator.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
+index 71c143d4b6d05f70acb9ef678b9313e06e3ed79e..ac74f6ead62d5ed4bd8b153153fa494c367fbff6 100644
+--- a/net/batman-adv/originator.c
++++ b/net/batman-adv/originator.c
+@@ -1266,6 +1266,8 @@ void batadv_purge_orig_ref(struct batadv_priv *bat_priv)
+ 	/* for all origins... */
+ 	for (i = 0; i < hash->size; i++) {
+ 		head = &hash->table[i];
++		if (hlist_empty(head))
++			continue;
+ 		list_lock = &hash->list_locks[i];
+ 
+ 		spin_lock_bh(list_lock);
+-- 
+2.44.0.478.gd926399ef9-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
