@@ -1,99 +1,97 @@
-Return-Path: <netdev+bounces-83502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFE01892B0B
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 13:01:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42E56892B33
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 13:28:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1020E1C20C5C
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 12:01:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB2631F22400
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 12:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940B536AE4;
-	Sat, 30 Mar 2024 12:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C55381C9;
+	Sat, 30 Mar 2024 12:28:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29FB1E896;
-	Sat, 30 Mar 2024 12:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECF6EBB;
+	Sat, 30 Mar 2024 12:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711800081; cv=none; b=WJbbV270t/ooVwRu27l3kpbpO/LNp3fBVfRjqDSUiCBL1/yhmqeX05AdQ5vC9vo421dyQlYdRNrAG/3dLmqvHvHH3IOXbqbnkcRGS5ljWtW9WpuJVFyUYBq7iefT2u8Y2EsHJMJjqK0UHGQnJZOlWMwRiKLeHwXjs5A0t2k/zBc=
+	t=1711801681; cv=none; b=XMC/96MZSbgwj61e0gdowqy0FCkjyu42MF09+oZiehSzpXvXiQVif54H/QB7/7yjK1rzsj7HeoPAFMnOzD6V2AwAjUVxit3L3JxPr5vYhgR/ECEEBgtTqUEKtIfSHrSC4sSOLYRLy9SOuq8HJq5lL8u6QAzrzO2majlhjCWz12w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711800081; c=relaxed/simple;
-	bh=fT3FnLwhlqo35Pj+pAK551GXQXi8alEtZAKvfSYeaHU=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Gysezl9oW2wx2m1NIwuS5aCuwl7HEGn2RtF3oLAyvdICdI9EdoKb99h/KeqXZzq3y49d/36QaSMvGlijVKast3vaki1kT/opXa8XfqWWufE7zSFpHwMOXGVeeMdlmccqp9Eb+dtVlMhV0NpG4fjzqbWHbE5Lf0g0516IE1P/Sc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4V6G542s8Wz29lQT;
-	Sat, 30 Mar 2024 19:58:32 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id A15F21A0172;
-	Sat, 30 Mar 2024 20:01:14 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Sat, 30 Mar
- 2024 20:01:14 +0800
-Subject: Re: [PATCH RFC 01/10] mm: Move the page fragment allocator from
- page_alloc into its own file
-To: Christophe Leroy <christophe.leroy@csgroup.eu>, "davem@davemloft.net"
-	<davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, David Howells
-	<dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>
-References: <20240328133839.13620-1-linyunsheng@huawei.com>
- <20240328133839.13620-2-linyunsheng@huawei.com>
- <b5fe4c81-a7e6-4620-b0b6-a56ce7a2c304@csgroup.eu>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <9e03b278-aaeb-d11c-d2e0-d45ca5e97346@huawei.com>
-Date: Sat, 30 Mar 2024 20:01:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1711801681; c=relaxed/simple;
+	bh=+XibKb/dVHl63f9D33WQCt1jS1SK+C5P2v4d73y4tCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hUlyYf7p366bQRa3JZqk4Cp6bt37v50Ad3tUe7DYPNyanyqj99e1dCTiSTgXuvgwT+fSzrSs80v6G5q+b6u+2UarYDQe0HTRHd0TzZRnzRuGeTC0ForTLXT+Bg6hepPoE3PO+qDKaEuJdXYoZLRM0KjuONFa5sumGwDZErecWTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0898C433F1;
+	Sat, 30 Mar 2024 12:27:56 +0000 (UTC)
+Date: Sat, 30 Mar 2024 08:27:55 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>, Alexei
+ Starovoitov <alexei.starovoitov@gmail.com>, Jiri Olsa <jolsa@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, "David S.
+ Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Dave
+ Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet
+ <quentin@isovalent.com>, bpf <bpf@vger.kernel.org>, linux-arm-kernel
+ <linux-arm-kernel@lists.infradead.org>, LKML
+ <linux-kernel@vger.kernel.org>, linux-riscv
+ <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>,
+ linux-trace-kernel@vger.kernel.org, "open list:KERNEL SELFTEST FRAMEWORK"
+ <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add
+ support to record and check the accessed args
+Message-ID: <20240330082755.1cbeb8c6@rorschach.local.home>
+In-Reply-To: <CAEf4BzYgzOti+Hfdn3SUCjuofGedXRSGApVDD+K2TdG6oNE-pw@mail.gmail.com>
+References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
+	<20240311093526.1010158-2-dongmenglong.8@bytedance.com>
+	<CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
+	<CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
+	<CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
+	<CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
+	<CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
+	<CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com>
+	<CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
+	<CALz3k9g-U8ih=ycJPRbyU9x_9cp00fNkU3PGQ6jP0WJ+=uKmqQ@mail.gmail.com>
+	<CALz3k9jG5Jrqw=BGjt05yMkEF-1u909GbBYrV-02W0dQtm6KQQ@mail.gmail.com>
+	<20240328111330.194dcbe5@gandalf.local.home>
+	<CAEf4BzYgzOti+Hfdn3SUCjuofGedXRSGApVDD+K2TdG6oNE-pw@mail.gmail.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b5fe4c81-a7e6-4620-b0b6-a56ce7a2c304@csgroup.eu>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2024/3/30 1:19, Christophe Leroy wrote:
-> 
-> 
-> Le 28/03/2024 à 14:38, Yunsheng Lin a écrit :
->> Inspired by [1], but use free_unref_page() to replace free_the_page()
->> instead of __free_pages(), use VM_BUG_ON() to catch that we can use
->> free_unref_page() directly, also add its own header file.
->>
->> As the API is only used by the networking, it may make sense to
->> move it to the networking directory like the page_pool does in the
->> future if we can make the free_unref_page() callable outside of the
->> mm subsystem. And we can utilize that to decouple the 'struct page'
->> in the networking subsystem in the future.
-> 
-> I'm wondering if this page fragment allocator could replace the page 
-> fragment allocator used in powerpc to allocate fragment of pages for 
-> page tables.
+On Fri, 29 Mar 2024 16:28:33 -0700
+Andrii Nakryiko <andrii.nakryiko@gmail.com> wrote:
 
-From a quick glance, it seems possible. If there are potential users
-other than the networking for this API, we can keep it in mm subsystem
-for now as this patch does and see how thing will evolve.
+> I thought I'll just ask instead of digging through code, sorry for
+> being lazy :) Is there any way to pass pt_regs/ftrace_regs captured
+> before function execution to a return probe (fexit/kretprobe)? I.e.,
+> how hard is it to pass input function arguments to a kretprobe? That's
+> the biggest advantage of fexit over kretprobe, and if we can make
+> these original pt_regs/ftrace_regs available to kretprobe, then
+> multi-kretprobe will effectively be this multi-fexit.
 
-> 
-> See arch/powerpc/mm/pgtable-frag.c
-> 
-> Christophe
-> 
+This should be possible with the updates that Masami is doing with the
+fgraph code.
+
+-- Steve
 
