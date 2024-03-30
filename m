@@ -1,197 +1,277 @@
-Return-Path: <netdev+bounces-83505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B028C892B49
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 14:13:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2C3E892B96
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 15:47:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F09042821A4
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 13:13:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 013741C20CDA
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 14:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7BD1DFF4;
-	Sat, 30 Mar 2024 13:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5092E3F7;
+	Sat, 30 Mar 2024 14:47:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="s4j9+5zN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="T332CDzy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKS5psrv"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow7-smtp.messagingengine.com (flow7-smtp.messagingengine.com [103.168.172.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0281FB5;
-	Sat, 30 Mar 2024 13:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FAB27711
+	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 14:47:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711804409; cv=none; b=X9Ltip7zthj9aqpST+wx2sE85OL4e1dv4iGo1bJYPymg4sFydx0aNaC8r9mlYq4oZ+aK1nNb60wrIfNHCYsMaHn2QMscWel8wPjEHYYTXdhB3Mim+UEjha/3Rmg1dZ4rwwroEppBzZ34ApMgzrX0xmAbn1zUmhCYqeNSSpo6xeY=
+	t=1711810056; cv=none; b=kpAEiarcQT9ZKL8zkBLI3bYHdb4UPNfUSuRr4q5ma2mf07ZDZjRjXhRQJQky2xU727WA0yLZk9W/er4E+2pzlftO5YJIw4VIQ+8nDheAfoS8bn/aMkkEuoNvbL+LArXVTphehXDK+CCACtKLIsPGIKhiMVxc5IXUd34HVTp2sU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711804409; c=relaxed/simple;
-	bh=oYWNSLB7Z3OmKkRKaMdt+xkwR1s947tnLcLU8T4RTrU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A+MGrDpKH4eFNwmmnDrY1yESgFCJgICElw2WPUziiTdXmwB2ISQwVb7hH/l97xvffCiwww6oKpOwdB0NPFJy1pvwE9w2Mq2bxWN+/akEqJ3Iakn+HiBh2npfl0BkNlD56HZXD0Sl6Xn3vM7WN/hltLcAfIJifTTr7j3U+wOk7Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=s4j9+5zN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=T332CDzy; arc=none smtp.client-ip=103.168.172.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailflow.nyi.internal (Postfix) with ESMTP id 6C2B7200215;
-	Sat, 30 Mar 2024 09:13:22 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Sat, 30 Mar 2024 09:13:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm1; t=1711804402; x=1711808002; bh=DH
-	XZ2gkIcVCkQdzHyEOYWm/LRH13Sc+9ts+wLRwRTE4=; b=s4j9+5zN9N2Oy5Wqb8
-	16YQluyk3DEE+/Kc7VcyV7GgnsAFssOD6UUAWA+Duh9DzU8us0RWQXOyRlG0t3zu
-	RamIKWUeCeWsJDx576RlAlyJTizC+LcyOYC6ryhQInQs1Z5Jm5pizoOgA7S/2Kxt
-	oadd4N/6PqvO3k8TGhQPYND7U+QfJXoLSzMpMta2JxCjNqgZCVAW3XKB+GM3Kq2T
-	jMx5loESWFPVvAMnHRiWucQi4K9j2Ko1dW4SPvAUhAD38E9B6P3n8bvB7qI+lFhh
-	pkelvNpM+WDFc1PDK8cE675fUyfOefWpXED4t4j3p4b6EVRppehy09ZbQnhZR5C2
-	Ve6Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1711804402; x=1711808002; bh=DHXZ2gkIcVCkQ
-	dzHyEOYWm/LRH13Sc+9ts+wLRwRTE4=; b=T332CDzybdOPUGRlmaDKfrA1hAED8
-	gR/BWTgcmwkOe/U0VpYLzk9xYuAk6VTGkLsnEWGLhjRoC/XMUUniTgb3kqiruvuq
-	F4rbd5JEv0vF51iojqiXKcFZfk/+Mr/L55QxXJnQmLNBe8UvujFiVh3dT11+6JQz
-	4GCaFVLN2cfw2e+v4F/dY8uEHpwrzPBv1+qXaOW3VGRtDNAHf6Ut4yAkv0DpAspD
-	BGGHcitbs8HEgclm6wuf6oRUI+C4HzAR/Dj378Mdndd8jO8aQuyJpAZoNE4Xqw6z
-	ck2XDUP3emSCQRgNYP+aRF0jd7mPROuQfmrH9X3GydKvdKGtY/6QWp+7w==
-X-ME-Sender: <xms:8Q8IZjvHBFzNn1XsPUf7WqtF07UZZ_NmTS5jiJ4juis3mqC1wrLB0Q>
-    <xme:8Q8IZkfyYZU63a5yS8cMODWdwY15vU400YDoTIjgrmlOvhynUcqRc0vcLufL1-NMi
-    9Byb-TOs-a_ztAhT9U>
-X-ME-Received: <xmr:8Q8IZmxKNH0ANM3d0qv2nny-gXcdIMyFHRFheqQm3sbeFDgsiviqJSKv04R_IjXV1oNkiXw2WFzqYWtbKqIyd6pbY1e5-srewbSz>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledruddvhedgvdeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefpihhklhgr
-    shcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvsh
-    grshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeehudelteetkefg
-    ffefudefuedvjeeivdekhfevieefgeffheeltddvvefhfeetgeenucevlhhushhtvghruf
-    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggvrhhl
-    uhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
-X-ME-Proxy: <xmx:8Q8IZiMklNKIFXsjhLoJVAWfsTb-331eBq9-kEyoKFUFmOWtPYZKiA>
-    <xmx:8Q8IZj-ZEqgeVBJ8_Q-WmARCvPkwyh0vg4Q4nNjuT21_PZh6wfDNEw>
-    <xmx:8Q8IZiV2lK7WlSjHPGsDZO-P0WfYli8i_iLmKSFo0HwI8uvZ7vpSgg>
-    <xmx:8Q8IZkcdFSrK11KRr6YFQM4t7f4h29wE6RPWj5-LGUXcCGWwBl0yhw>
-    <xmx:8g8IZnXEr36MyWR291UoN0yIS9SwkuBUHS348t3HJ8JIsheerXEJlpD3pRI>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 30 Mar 2024 09:13:19 -0400 (EDT)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Cc: linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Rob Herring <robh@kernel.org>
-Subject: [net-next,v2] dt-bindings: net: renesas,ethertsn: Create child-node for MDIO bus
-Date: Sat, 30 Mar 2024 14:12:28 +0100
-Message-ID: <20240330131228.1541227-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1711810056; c=relaxed/simple;
+	bh=+aOsqWyoskE37ffBGxozTaxmzQ63Pdv0Yuac/lns4Uk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=StC5t7/L7/eIQs48jhztrltYYbv+kq+2SmywsOf71ocSV2VJxZooWd/CgH+F5BrFmP6CQJSNyo/TzOTsU/wDwbGCXLA8c1GVDKBHnmf5aOJ2FEN6N6mBAq9GBQdRXSi7lVyxnBu/ZhTLF+trMrJ3iamkkJQUxuSQOUsup0zEdWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKS5psrv; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a466a27d30aso344513566b.1
+        for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 07:47:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711810053; x=1712414853; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W300fuzuiZ6ceqhX7gLlM/xiZgFGQPmf5CCO5UJDT4A=;
+        b=LKS5psrvu6VD0Vy0XmHvxU0tYBUza3aPlkENTlN44rTuVpkyOncR8vrDXgjLSGlSpo
+         XyAEgQdi/zAIR7UBOlfQHv5Zg9dzD/CzkQnJC2CFsXlOalF+wmXa9eV5TiLN4dN7Y5JK
+         axAd4w5J13IiCHjE+24O5/JOx2fvBJ9sXbZcK5bUfoC6Ay6nrX/MZg/snlEYMkFR2Cui
+         Tei7L41jRdqGT2/YqISJnNFxa3zXWoeh4rpC26AOg7yBtTJKrNmDBEe5r3DRGbnO6ML8
+         a5t0b1NGuhHzOV8skLpRyduyl6WcZrpGQRh+qpGHBrL0KObbIUtC5jmwvMyM9wNprAaZ
+         am5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711810053; x=1712414853;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W300fuzuiZ6ceqhX7gLlM/xiZgFGQPmf5CCO5UJDT4A=;
+        b=NKu9Pp1a2ghx9ZbVk4kKftIAAM96OGtyMIjGJKqW5z7KxSgOFohsohE+BucPu5yrNw
+         j6BiHl0gXHQMLOsFlLueGKIuxaAFSY8EgWQZ0a91fxpNKmyzPdMBzYPVAQJhM2n6ZMa3
+         OBWd8Gbjk0jio2VpKKPWFoD+nTHtGvkawh0TYncvCRVbZlwtpVyo88nqZKvIXIf/CD86
+         /2YY4dY73sqZIDbutxAzbn1zz0qnmO72w9L5yPcggOVeJC4fM/aZDD7ysrwYG9TrAPbK
+         9kc4j4B6WWVYteCVH1KllRDbk5wvLTBx7j5ksCnr9+P5JBX+/oG9JhLgWi37SsxxJl15
+         nUUA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwDoCdjn83mi0iRy83jwpIgWSwWC7lLmDoo/ick0NAKQlLj7aRcSKoL97J10QHNZNxSGUup496fgTUOOIGHfWSZcAbmUhd
+X-Gm-Message-State: AOJu0Yy3BZK2J29DwON/qSNa6FW0BV0kmRo8309Kv4rLOiajrtsj4Z8p
+	IArCs7mzn03uCBEiV01/CaHEXOSCbDgS7KSWlZKx1GUz5A7yhYBI+ibLMWnemXcKaovN1UH9P4n
+	PuU+xt6DOsO2PfFDZht63el4Fye8IB5IyUKg=
+X-Google-Smtp-Source: AGHT+IH1b7DfIUMD1an/uRfFG6fdu7nOA43JkZRFapeDTcDyRfEm7vuGo96xJl8uCvqM11MV+heUKrQV3A3Ar9V9uCk=
+X-Received: by 2002:a17:907:1c90:b0:a4e:2220:f748 with SMTP id
+ nb16-20020a1709071c9000b00a4e2220f748mr3821844ejc.40.1711810052521; Sat, 30
+ Mar 2024 07:47:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240329154225.349288-1-edumazet@google.com> <20240329154225.349288-7-edumazet@google.com>
+In-Reply-To: <20240329154225.349288-7-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 30 Mar 2024 22:46:55 +0800
+Message-ID: <CAL+tcoBa1g1Ps5V_P1TqVtGWD482AvSy=wgvvUMT3RCHH+x2=Q@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 6/8] net: rps: change input_queue_tail_incr_save()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The bindings for Renesas Ethernet TSN was just merged in v6.9 and the
-design for the bindings followed that of other Renesas Ethernet drivers
-and thus did not force a child-node for the MDIO bus. As there
-are no upstream drivers or users of this binding yet take the
-opportunity to correct this and force the usage of a child-node for the
-MDIO bus.
+Hello Eric,
 
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-Reviewed-by: Rob Herring <robh@kernel.org>
----
-* Changes since v1
-- Expand on history in commit message.
+On Fri, Mar 29, 2024 at 11:43=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> input_queue_tail_incr_save() is incrementing the sd queue_tail
+> and save it in the flow last_qtail.
+>
+> Two issues here :
+>
+> - no lock protects the write on last_qtail, we should use appropriate
+>   annotations.
+>
+> - We can perform this write after releasing the per-cpu backlog lock,
+>   to decrease this lock hold duration (move away the cache line miss)
+>
+> Also move input_queue_head_incr() and rps helpers to include/net/rps.h,
+> while adding rps_ prefix to better reflect their role.
+>
+> v2: Fixed a build issue (Jakub and kernel build bots)
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/linux/netdevice.h | 15 ---------------
+>  include/net/rps.h         | 23 +++++++++++++++++++++++
+>  net/core/dev.c            | 20 ++++++++++++--------
+>  3 files changed, 35 insertions(+), 23 deletions(-)
+>
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 1c31cd2691d32064613836141fbdeeebc831b21f..14f19cc2616452d7e6afbbaa5=
+2f8ad3e61a419e9 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3249,21 +3249,6 @@ struct softnet_data {
+>         call_single_data_t      defer_csd;
+>  };
+>
+> -static inline void input_queue_head_incr(struct softnet_data *sd)
+> -{
+> -#ifdef CONFIG_RPS
+> -       sd->input_queue_head++;
+> -#endif
+> -}
+> -
+> -static inline void input_queue_tail_incr_save(struct softnet_data *sd,
+> -                                             unsigned int *qtail)
+> -{
+> -#ifdef CONFIG_RPS
+> -       *qtail =3D ++sd->input_queue_tail;
+> -#endif
+> -}
+> -
+>  DECLARE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
+>
+>  static inline int dev_recursion_level(void)
+> diff --git a/include/net/rps.h b/include/net/rps.h
+> index 7660243e905b92651a41292e04caf72c5f12f26e..10ca25731c1ef766715fe7ee4=
+15ad0b71ec643a8 100644
+> --- a/include/net/rps.h
+> +++ b/include/net/rps.h
+> @@ -122,4 +122,27 @@ static inline void sock_rps_record_flow(const struct=
+ sock *sk)
+>  #endif
+>  }
+>
+> +static inline u32 rps_input_queue_tail_incr(struct softnet_data *sd)
+> +{
+> +#ifdef CONFIG_RPS
+> +       return ++sd->input_queue_tail;
+> +#else
+> +       return 0;
+> +#endif
+> +}
+> +
+> +static inline void rps_input_queue_tail_save(u32 *dest, u32 tail)
+> +{
+> +#ifdef CONFIG_RPS
+> +       WRITE_ONCE(*dest, tail);
+> +#endif
+> +}
 
-Hello,
+I wonder if we should also call this new helper to WRITE_ONCE
+last_qtail in the set_rps_cpu()?
 
-The Ethernet TSN driver is still in review and have not been merged and
-no usage of the bindings are merged either. So while this breaks the
-binding it effects no one. So we can correct this mistake without
-breaking any use-cases before we need to support any backward
-compatibility.
----
- .../bindings/net/renesas,ethertsn.yaml        | 33 ++++++++-----------
- 1 file changed, 14 insertions(+), 19 deletions(-)
+Thanks,
+Jason
 
-diff --git a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-index ea35d19be829..b4680a1d0a06 100644
---- a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-+++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-@@ -71,16 +71,8 @@ properties:
-     enum: [0, 2000]
-     default: 0
- 
--  '#address-cells':
--    const: 1
+> +
+> +static inline void rps_input_queue_head_incr(struct softnet_data *sd)
+> +{
+> +#ifdef CONFIG_RPS
+> +       sd->input_queue_head++;
+> +#endif
+> +}
+> +
+>  #endif /* _NET_RPS_H */
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 0a8ccb0451c30a39f8f8b45d26b7e5548b8bfba4..79073bbc9a644049cacf84333=
+10f4641745049e9 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -4611,7 +4611,7 @@ static int get_rps_cpu(struct net_device *dev, stru=
+ct sk_buff *skb,
+>                 if (unlikely(tcpu !=3D next_cpu) &&
+>                     (tcpu >=3D nr_cpu_ids || !cpu_online(tcpu) ||
+>                      ((int)(per_cpu(softnet_data, tcpu).input_queue_head =
 -
--  '#size-cells':
--    const: 0
--
--patternProperties:
--  "^ethernet-phy@[0-9a-f]$":
--    type: object
--    $ref: ethernet-phy.yaml#
-+  mdio:
-+    $ref: /schemas/net/mdio.yaml#
-     unevaluatedProperties: false
- 
- required:
-@@ -94,8 +86,7 @@ required:
-   - resets
-   - phy-mode
-   - phy-handle
--  - '#address-cells'
--  - '#size-cells'
-+  - mdio
- 
- additionalProperties: false
- 
-@@ -122,14 +113,18 @@ examples:
-         tx-internal-delay-ps = <2000>;
-         phy-handle = <&phy3>;
- 
--        #address-cells = <1>;
--        #size-cells = <0>;
-+        mdio {
-+            #address-cells = <1>;
-+            #size-cells = <0>;
- 
--        phy3: ethernet-phy@3 {
--            compatible = "ethernet-phy-ieee802.3-c45";
--            reg = <0>;
--            interrupt-parent = <&gpio4>;
--            interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
-             reset-gpios = <&gpio1 23 GPIO_ACTIVE_LOW>;
-+            reset-post-delay-us = <4000>;
-+
-+            phy3: ethernet-phy@0 {
-+                compatible = "ethernet-phy-ieee802.3-c45";
-+                reg = <0>;
-+                interrupt-parent = <&gpio4>;
-+                interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
-+            };
-         };
-     };
--- 
-2.44.0
-
+> -                     rflow->last_qtail)) >=3D 0)) {
+> +                     READ_ONCE(rflow->last_qtail))) >=3D 0)) {
+>                         tcpu =3D next_cpu;
+>                         rflow =3D set_rps_cpu(dev, skb, rflow, next_cpu);
+>                 }
+> @@ -4666,7 +4666,7 @@ bool rps_may_expire_flow(struct net_device *dev, u1=
+6 rxq_index,
+>                 cpu =3D READ_ONCE(rflow->cpu);
+>                 if (rflow->filter =3D=3D filter_id && cpu < nr_cpu_ids &&
+>                     ((int)(per_cpu(softnet_data, cpu).input_queue_head -
+> -                          rflow->last_qtail) <
+> +                          READ_ONCE(rflow->last_qtail)) <
+>                      (int)(10 * flow_table->mask)))
+>                         expire =3D false;
+>         }
+> @@ -4801,6 +4801,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, =
+int cpu,
+>         unsigned long flags;
+>         unsigned int qlen;
+>         int max_backlog;
+> +       u32 tail;
+>
+>         reason =3D SKB_DROP_REASON_DEV_READY;
+>         if (!netif_running(skb->dev))
+> @@ -4825,8 +4826,11 @@ static int enqueue_to_backlog(struct sk_buff *skb,=
+ int cpu,
+>                                 napi_schedule_rps(sd);
+>                 }
+>                 __skb_queue_tail(&sd->input_pkt_queue, skb);
+> -               input_queue_tail_incr_save(sd, qtail);
+> +               tail =3D rps_input_queue_tail_incr(sd);
+>                 backlog_unlock_irq_restore(sd, &flags);
+> +
+> +               /* save the tail outside of the critical section */
+> +               rps_input_queue_tail_save(qtail, tail);
+>                 return NET_RX_SUCCESS;
+>         }
+>
+> @@ -5904,7 +5908,7 @@ static void flush_backlog(struct work_struct *work)
+>                 if (skb->dev->reg_state =3D=3D NETREG_UNREGISTERING) {
+>                         __skb_unlink(skb, &sd->input_pkt_queue);
+>                         dev_kfree_skb_irq(skb);
+> -                       input_queue_head_incr(sd);
+> +                       rps_input_queue_head_incr(sd);
+>                 }
+>         }
+>         backlog_unlock_irq_enable(sd);
+> @@ -5913,7 +5917,7 @@ static void flush_backlog(struct work_struct *work)
+>                 if (skb->dev->reg_state =3D=3D NETREG_UNREGISTERING) {
+>                         __skb_unlink(skb, &sd->process_queue);
+>                         kfree_skb(skb);
+> -                       input_queue_head_incr(sd);
+> +                       rps_input_queue_head_incr(sd);
+>                 }
+>         }
+>         local_bh_enable();
+> @@ -6041,7 +6045,7 @@ static int process_backlog(struct napi_struct *napi=
+, int quota)
+>                         rcu_read_lock();
+>                         __netif_receive_skb(skb);
+>                         rcu_read_unlock();
+> -                       input_queue_head_incr(sd);
+> +                       rps_input_queue_head_incr(sd);
+>                         if (++work >=3D quota)
+>                                 return work;
+>
+> @@ -11455,11 +11459,11 @@ static int dev_cpu_dead(unsigned int oldcpu)
+>         /* Process offline CPU's input_pkt_queue */
+>         while ((skb =3D __skb_dequeue(&oldsd->process_queue))) {
+>                 netif_rx(skb);
+> -               input_queue_head_incr(oldsd);
+> +               rps_input_queue_head_incr(oldsd);
+>         }
+>         while ((skb =3D skb_dequeue(&oldsd->input_pkt_queue))) {
+>                 netif_rx(skb);
+> -               input_queue_head_incr(oldsd);
+> +               rps_input_queue_head_incr(oldsd);
+>         }
+>
+>         return 0;
+> --
+> 2.44.0.478.gd926399ef9-goog
+>
+>
 
