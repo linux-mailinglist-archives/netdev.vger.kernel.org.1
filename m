@@ -1,120 +1,109 @@
-Return-Path: <netdev+bounces-83533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FA66892D6F
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 22:10:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C97892D93
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 22:57:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 546691C20E09
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 21:10:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09F911F21B94
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 21:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F2E4C629;
-	Sat, 30 Mar 2024 21:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4035D482E5;
+	Sat, 30 Mar 2024 21:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lmT1BZSV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PBZbgQcq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39EA82AF13
-	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 21:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9788217D2
+	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 21:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711833031; cv=none; b=WrQhQxRo6DfULhTj6TsCGB6LofQfoBuxDCt2D/TtQew1L1J8171bWygFIKyOoQr7jolBlWGKRWWQL6Mm1ZSXEpIyNFS9d8CikM9Ato82v4bA52dusuXprGdxVA3QyM9KyQrsK9krR8oRQ18Etl+x9HAcK2/rNyWlmgujRB9Pkcw=
+	t=1711835831; cv=none; b=o3bmGg6pkxuKNLm23H/EqQl645mc3BI/3oNOnCmXXZeDTufy4S/7XoTQckaCTsQgQPfJ1oCkaO6nIW3MXaFEVFyHktLJfRbH2yk609gThZggBQh+G6ND84LMgOQYRvJsHTSzLdM/7WchqsReFhlSICSnm9tENjPKVSVZFcZUWmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711833031; c=relaxed/simple;
-	bh=lpW/z88igPmtu+dPk6Bg5/M6be2ELRWCA4fiw4xQTvk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HS1sar1YmDqu1EiUhLsWX/F2qG+ZSKSVVh+BSA+y2eCEt8wgmoH6EJ9zOexB4dWkyFhGQqTnvcW2fbygrJDhDG875bRm2eppfhSCtuoKGGjO06HGP0lMNqNrLmjauiG/vzXcvf4flhuFdNGGG2951cca1G1K2F1rrX2aoNYOPro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lmT1BZSV; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33edbc5932bso2153952f8f.3
-        for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 14:10:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711833028; x=1712437828; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z97AIqHn2/5k70KD5v0TW9sEzFkZvtBMo+aOjA2W+M0=;
-        b=lmT1BZSVVSPKWGgHfiytoJ+Ofrl4SkHaGZqmtLrRr9Xtp6NWN1fSkkfDwoAbSdPKGU
-         7iICPbSYSWkoUys1nOax8ZNlxpQfq4PQJQ4TymEVCw3PkJzQTsCq7v7Undarn/f2KJj9
-         ZG4QV60NcMb/lSCxXyT6TtbE/T3KI3GB/GjHWCbpmLOwf1Xb6WgjMLkLJ88lBAMR3Vur
-         CTO1dryBej7ge6pn6C0Ijq3VRNqgK7SDTIyRth+3AeL0ZiRSUM93anFDVLadFESufJPL
-         bPQQDMAzZMQiOF9PaZz+2bEIT1afJiAv9xX20LWUpM+NNBMnbp5GWBAf9our8hpGlmtU
-         k/IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711833028; x=1712437828;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z97AIqHn2/5k70KD5v0TW9sEzFkZvtBMo+aOjA2W+M0=;
-        b=Z3V/da6Xz3DRp1xb2kWJvS4XMbNXnBs3jNIiApzfHCED05rvbFlBzMG46PmYth9sgO
-         +SvEIZGIjOMJ4yHJTqFIvf9K4xFIfssfD8Fq5Ib8PzmyN8ahKgBdVbDKrM8Gzi9Ujp8H
-         Yj55CnL6Uc/WHdSnI2bDfW28ZKFHjMFpJH+aanyiUtxtzf9OkFvm9Sm6GbQNlJccCz9+
-         Pe7IczzArNBu+gADF538Ynxg9IWJQIvizj/AsaOSVma2Hgr+nB4CKFQXS25GD9flxh/U
-         xN474rnGNVBCjAfhQoLXjz5PHQrmKoLdmYYD0OrxhiGUPy3FVvYv4fz/go1DY9HuJsaF
-         DBAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOTrI+i6c4KpEmf2l6yQ2FBhPUFcqZKLVGzCKLZrjWBIbfBuFG2Pn9O2Q1s4+aZAxdvd0qmTRY2CJwUU9hbjJtoC4QlhNe
-X-Gm-Message-State: AOJu0YyipnUvvoL4YBTQ3jANCs6RsHGG8mK0cx4Ss72Fj2Lhl6zkk2OV
-	zQQain5LobUn1FL24TAHzy3J+rz3cROArg3/5CIXmctNs/UQ1R4czd/2Q27h+3o=
-X-Google-Smtp-Source: AGHT+IG/PwnuOG9GW/J71lWsyeYoc0pzt0O0RZTv5vm8EGRV8pODCFgM8sdpdU3qeNoyycuNuSNCcw==
-X-Received: by 2002:a05:6000:4009:b0:33d:6fd8:90d3 with SMTP id cp9-20020a056000400900b0033d6fd890d3mr5016445wrb.4.1711833028607;
-        Sat, 30 Mar 2024 14:10:28 -0700 (PDT)
-Received: from krzk-bin.. ([178.197.223.16])
-        by smtp.gmail.com with ESMTPSA id f12-20020a056000036c00b00341ce80ea66sm7288097wrf.82.2024.03.30.14.10.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Mar 2024 14:10:28 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [net-next PATCH 2/2] net: dsa: sja1105: drop driver owner assignment
-Date: Sat, 30 Mar 2024 22:10:23 +0100
-Message-Id: <20240330211023.100924-2-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240330211023.100924-1-krzysztof.kozlowski@linaro.org>
-References: <20240330211023.100924-1-krzysztof.kozlowski@linaro.org>
+	s=arc-20240116; t=1711835831; c=relaxed/simple;
+	bh=p8JMrR3aXxDyceVxKGrjVePzewVWjN37i/MfiACxrRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ccWt3HBLvS2OtGm3Ycn21Leg/8+JZXm2Z9Ar33psizw6Ywv3BgORO6Ckh90tqq6sWTFhv2V/gQpr631zW6reHM8kdXGh044T2C270gIj2TzxdFBYQ+TjGsrSta6WOIIbwiRgt+z9HVlYHX4ep4OLtsd+CphA2ThRAj3Ga1w3Cdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PBZbgQcq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IZ0VCe3iNf6wEVXOTCw6lmBDLZ7NjriGD/YDnR3wMN4=; b=PBZbgQcqz+Z/9+/z5NNgXvLHao
+	y+Z95swHz8k9SInML7Cx6typz+jPac5PQ8x2QOVjZiHrhxDhb6tkgljD806DlPmYqcV54edGZmbCl
+	y8BmaRaIJM2yB2pDVuq/vtwhzgL16ybpZWuM+0dzv0/X9Nml7k+SAMK9FfVrBl/aRKLQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rqghD-00BkPE-0K; Sat, 30 Mar 2024 22:57:03 +0100
+Date: Sat, 30 Mar 2024 22:57:02 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	simon.horman@corigine.com, anthony.l.nguyen@intel.com,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	idosch@nvidia.com, przemyslaw.kitszel@intel.com,
+	marcin.szycik@linux.intel.com
+Subject: Re: [PATCH net-next 0/3] ethtool: Max power support
+Message-ID: <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240329092321.16843-1-wojciech.drewek@intel.com>
 
-Core in spi_register_driver() already sets the .owner, so driver
-does not need to.
+On Fri, Mar 29, 2024 at 10:23:18AM +0100, Wojciech Drewek wrote:
+> Some ethernet modules use nonstandard power levels [1]. Extend ethtool
+> module implementation to support new attributes that will allow user
+> to change maximum power. Rename structures and functions to be more
+> generic. Introduce an example of the new API in ice driver.
+> 
+> Ethtool examples:
+> $ ethtool --show-module enp1s0f0np0
+> Module parameters for enp1s0f0np0:
+> power-min-allowed: 1000 mW
+> power-max-allowed: 3000 mW
+> power-max-set: 1500 mW
+> 
+> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- drivers/net/dsa/sja1105/sja1105_main.c | 1 -
- 1 file changed, 1 deletion(-)
+We have had a device tree property for a long time:
 
-diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
-index 6646f7fb0f90..fc262348a134 100644
---- a/drivers/net/dsa/sja1105/sja1105_main.c
-+++ b/drivers/net/dsa/sja1105/sja1105_main.c
-@@ -3456,7 +3456,6 @@ MODULE_DEVICE_TABLE(spi, sja1105_spi_ids);
- static struct spi_driver sja1105_driver = {
- 	.driver = {
- 		.name  = "sja1105",
--		.owner = THIS_MODULE,
- 		.of_match_table = of_match_ptr(sja1105_dt_ids),
- 	},
- 	.id_table = sja1105_spi_ids,
--- 
-2.34.1
+  maximum-power-milliwatt:
+    minimum: 1000
+    default: 1000
+    description:
+      Maximum module power consumption Specifies the maximum power consumption
+      allowable by a module in the slot, in milli-Watts. Presently, modules can
+      be up to 1W, 1.5W or 2W.
 
+Could you flip the name around to be consistent with DT?
+
+> minimum-power-allowed: 1000 mW
+> maximum-power-allowed: 3000 mW
+> maximum-power-set: 1500 mW
+
+Also, what does minimum-power-allowed actually tell us? Do you imagine
+it will ever be below 1W because of bad board design? Do you have a
+bad board design which does not allow 1W?
+
+Also, this is about the board, the SFP cage, not the actual SFP
+module?  Maybe the word cage needs to be in these names?
+
+Do we want to be able to enumerate what the module itself supports?
+If so, we need to include module in the name, to identify the numbers
+are about the module, not the cage.
+
+    Andrew
 
