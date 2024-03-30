@@ -1,208 +1,197 @@
-Return-Path: <netdev+bounces-83504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F2D4892B39
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 13:41:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B028C892B49
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 14:13:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B92D282DD8
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 12:41:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F09042821A4
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 13:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377AE12B6C;
-	Sat, 30 Mar 2024 12:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7BD1DFF4;
+	Sat, 30 Mar 2024 13:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="s4j9+5zN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="T332CDzy"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from flow7-smtp.messagingengine.com (flow7-smtp.messagingengine.com [103.168.172.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46ED71C0DFD;
-	Sat, 30 Mar 2024 12:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0281FB5;
+	Sat, 30 Mar 2024 13:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711802496; cv=none; b=LGmwZNFXyCCsqWnLR4pjHJOk+gQm4hrUh+SxA5w+zR/HODre8mfihPKwWy3zer3udQ+6bjabYjRp8oAIeXh7kxaXajQ2DwsmeDW90oIwsO+gzg3qWCKOV0FuODyROel8ZBy20IA9R6JnrJhvAfUAxMxHK+FqpgA0zbmnpFOgmfU=
+	t=1711804409; cv=none; b=X9Ltip7zthj9aqpST+wx2sE85OL4e1dv4iGo1bJYPymg4sFydx0aNaC8r9mlYq4oZ+aK1nNb60wrIfNHCYsMaHn2QMscWel8wPjEHYYTXdhB3Mim+UEjha/3Rmg1dZ4rwwroEppBzZ34ApMgzrX0xmAbn1zUmhCYqeNSSpo6xeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711802496; c=relaxed/simple;
-	bh=Q/Ts2ZkLLxwryuuyznDOCeo07lzHRru1XTR0ifhcknc=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=QeXbyu+JQ15TkWwMTJpSj5/Y9CCwKD2LdYGqMe33m41PSpZ6P/rS+lU864GSBvUsuw1dJg+25WOSyisI35iXTaN4pWZR3RW7qO85WrnMgp0dIoIOeYdCmtJSQmqjaLc6aZphtVppbhr7Mvkv0CVTNMIR3YwPUsJbFuONoDlMwFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4V6H084bcpzNmfB;
-	Sat, 30 Mar 2024 20:39:20 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id DE05E140156;
-	Sat, 30 Mar 2024 20:41:24 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Sat, 30 Mar
- 2024 20:41:24 +0800
-Subject: Re: [PATCH net-next 1/2] page_pool: check for PP direct cache
- locality later
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>,
-	=?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
-	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20240329165507.3240110-1-aleksander.lobakin@intel.com>
- <20240329165507.3240110-2-aleksander.lobakin@intel.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <5699d031-d6d2-9cae-7025-2589eb60c0a0@huawei.com>
-Date: Sat, 30 Mar 2024 20:41:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1711804409; c=relaxed/simple;
+	bh=oYWNSLB7Z3OmKkRKaMdt+xkwR1s947tnLcLU8T4RTrU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A+MGrDpKH4eFNwmmnDrY1yESgFCJgICElw2WPUziiTdXmwB2ISQwVb7hH/l97xvffCiwww6oKpOwdB0NPFJy1pvwE9w2Mq2bxWN+/akEqJ3Iakn+HiBh2npfl0BkNlD56HZXD0Sl6Xn3vM7WN/hltLcAfIJifTTr7j3U+wOk7Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=s4j9+5zN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=T332CDzy; arc=none smtp.client-ip=103.168.172.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailflow.nyi.internal (Postfix) with ESMTP id 6C2B7200215;
+	Sat, 30 Mar 2024 09:13:22 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Sat, 30 Mar 2024 09:13:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm1; t=1711804402; x=1711808002; bh=DH
+	XZ2gkIcVCkQdzHyEOYWm/LRH13Sc+9ts+wLRwRTE4=; b=s4j9+5zN9N2Oy5Wqb8
+	16YQluyk3DEE+/Kc7VcyV7GgnsAFssOD6UUAWA+Duh9DzU8us0RWQXOyRlG0t3zu
+	RamIKWUeCeWsJDx576RlAlyJTizC+LcyOYC6ryhQInQs1Z5Jm5pizoOgA7S/2Kxt
+	oadd4N/6PqvO3k8TGhQPYND7U+QfJXoLSzMpMta2JxCjNqgZCVAW3XKB+GM3Kq2T
+	jMx5loESWFPVvAMnHRiWucQi4K9j2Ko1dW4SPvAUhAD38E9B6P3n8bvB7qI+lFhh
+	pkelvNpM+WDFc1PDK8cE675fUyfOefWpXED4t4j3p4b6EVRppehy09ZbQnhZR5C2
+	Ve6Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1711804402; x=1711808002; bh=DHXZ2gkIcVCkQ
+	dzHyEOYWm/LRH13Sc+9ts+wLRwRTE4=; b=T332CDzybdOPUGRlmaDKfrA1hAED8
+	gR/BWTgcmwkOe/U0VpYLzk9xYuAk6VTGkLsnEWGLhjRoC/XMUUniTgb3kqiruvuq
+	F4rbd5JEv0vF51iojqiXKcFZfk/+Mr/L55QxXJnQmLNBe8UvujFiVh3dT11+6JQz
+	4GCaFVLN2cfw2e+v4F/dY8uEHpwrzPBv1+qXaOW3VGRtDNAHf6Ut4yAkv0DpAspD
+	BGGHcitbs8HEgclm6wuf6oRUI+C4HzAR/Dj378Mdndd8jO8aQuyJpAZoNE4Xqw6z
+	ck2XDUP3emSCQRgNYP+aRF0jd7mPROuQfmrH9X3GydKvdKGtY/6QWp+7w==
+X-ME-Sender: <xms:8Q8IZjvHBFzNn1XsPUf7WqtF07UZZ_NmTS5jiJ4juis3mqC1wrLB0Q>
+    <xme:8Q8IZkfyYZU63a5yS8cMODWdwY15vU400YDoTIjgrmlOvhynUcqRc0vcLufL1-NMi
+    9Byb-TOs-a_ztAhT9U>
+X-ME-Received: <xmr:8Q8IZmxKNH0ANM3d0qv2nny-gXcdIMyFHRFheqQm3sbeFDgsiviqJSKv04R_IjXV1oNkiXw2WFzqYWtbKqIyd6pbY1e5-srewbSz>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledruddvhedgvdeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefpihhklhgr
+    shcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvsh
+    grshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeehudelteetkefg
+    ffefudefuedvjeeivdekhfevieefgeffheeltddvvefhfeetgeenucevlhhushhtvghruf
+    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggvrhhl
+    uhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
+X-ME-Proxy: <xmx:8Q8IZiMklNKIFXsjhLoJVAWfsTb-331eBq9-kEyoKFUFmOWtPYZKiA>
+    <xmx:8Q8IZj-ZEqgeVBJ8_Q-WmARCvPkwyh0vg4Q4nNjuT21_PZh6wfDNEw>
+    <xmx:8Q8IZiV2lK7WlSjHPGsDZO-P0WfYli8i_iLmKSFo0HwI8uvZ7vpSgg>
+    <xmx:8Q8IZkcdFSrK11KRr6YFQM4t7f4h29wE6RPWj5-LGUXcCGWwBl0yhw>
+    <xmx:8g8IZnXEr36MyWR291UoN0yIS9SwkuBUHS348t3HJ8JIsheerXEJlpD3pRI>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 30 Mar 2024 09:13:19 -0400 (EDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Rob Herring <robh@kernel.org>
+Subject: [net-next,v2] dt-bindings: net: renesas,ethertsn: Create child-node for MDIO bus
+Date: Sat, 30 Mar 2024 14:12:28 +0100
+Message-ID: <20240330131228.1541227-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240329165507.3240110-2-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 2024/3/30 0:55, Alexander Lobakin wrote:
-> Since we have pool->p.napi (Jakub) and pool->cpuid (Lorenzo) to check
-> whether it's safe to use direct recycling, we can use both globally for
-> each page instead of relying solely on @allow_direct argument.
-> Let's assume that @allow_direct means "I'm sure it's local, don't waste
-> time rechecking this" and when it's false, try the mentioned params to
-> still recycle the page directly. If neither is true, we'll lose some
-> CPU cycles, but then it surely won't be hotpath. On the other hand,
-> paths where it's possible to use direct cache, but not possible to
-> safely set @allow_direct, will benefit from this move.
-> The whole propagation of @napi_safe through a dozen of skb freeing
-> functions can now go away, which saves us some stack space.
-> 
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/linux/skbuff.h | 12 ++++----
->  net/core/page_pool.c   | 31 +++++++++++++++++--
->  net/core/skbuff.c      | 70 +++++++++++++-----------------------------
->  net/ipv4/esp4.c        |  2 +-
->  net/ipv6/esp6.c        |  2 +-
->  5 files changed, 58 insertions(+), 59 deletions(-)
-> 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index dadd3f55d549..f7f6e42c6814 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -3515,25 +3515,25 @@ int skb_pp_cow_data(struct page_pool *pool, struct sk_buff **pskb,
->  		    unsigned int headroom);
->  int skb_cow_data_for_xdp(struct page_pool *pool, struct sk_buff **pskb,
->  			 struct bpf_prog *prog);
-> -bool napi_pp_put_page(struct page *page, bool napi_safe);
-> +bool napi_pp_put_page(struct page *page);
->  
->  static inline void
-> -skb_page_unref(const struct sk_buff *skb, struct page *page, bool napi_safe)
-> +skb_page_unref(const struct sk_buff *skb, struct page *page)
->  {
->  #ifdef CONFIG_PAGE_POOL
-> -	if (skb->pp_recycle && napi_pp_put_page(page, napi_safe))
-> +	if (skb->pp_recycle && napi_pp_put_page(page))
->  		return;
->  #endif
->  	put_page(page);
->  }
->  
->  static inline void
-> -napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
-> +napi_frag_unref(skb_frag_t *frag, bool recycle)
->  {
->  	struct page *page = skb_frag_page(frag);
->  
->  #ifdef CONFIG_PAGE_POOL
-> -	if (recycle && napi_pp_put_page(page, napi_safe))
-> +	if (recycle && napi_pp_put_page(page))
->  		return;
->  #endif
->  	put_page(page);
-> @@ -3549,7 +3549,7 @@ napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
->   */
->  static inline void __skb_frag_unref(skb_frag_t *frag, bool recycle)
->  {
-> -	napi_frag_unref(frag, recycle, false);
-> +	napi_frag_unref(frag, recycle);
->  }
->  
->  /**
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index dd364d738c00..9d56257e444b 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -690,8 +690,7 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
->  			page_pool_dma_sync_for_device(pool, page,
->  						      dma_sync_size);
->  
-> -		if (allow_direct && in_softirq() &&
-> -		    page_pool_recycle_in_cache(page, pool))
-> +		if (allow_direct && page_pool_recycle_in_cache(page, pool))
->  			return NULL;
->  
->  		/* Page found as candidate for recycling */
-> @@ -716,9 +715,35 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
->  	return NULL;
->  }
->  
-> +static bool page_pool_napi_local(const struct page_pool *pool)
-> +{
-> +	const struct napi_struct *napi;
-> +	u32 cpuid;
-> +
-> +	if (unlikely(!in_softirq()))
-> +		return false;
-> +
-> +	/* Allow direct recycle if we have reasons to believe that we are
-> +	 * in the same context as the consumer would run, so there's
-> +	 * no possible race.
-> +	 * __page_pool_put_page() makes sure we're not in hardirq context
-> +	 * and interrupts are enabled prior to accessing the cache.
-> +	 */
-> +	cpuid = smp_processor_id();
-> +	if (READ_ONCE(pool->cpuid) == cpuid)
-> +		return true;
-> +
-> +	napi = READ_ONCE(pool->p.napi);
-> +
-> +	return napi && READ_ONCE(napi->list_owner) == cpuid;
-> +}
-> +
->  void page_pool_put_unrefed_page(struct page_pool *pool, struct page *page,
->  				unsigned int dma_sync_size, bool allow_direct)
->  {
-> +	if (!allow_direct)
+The bindings for Renesas Ethernet TSN was just merged in v6.9 and the
+design for the bindings followed that of other Renesas Ethernet drivers
+and thus did not force a child-node for the MDIO bus. As there
+are no upstream drivers or users of this binding yet take the
+opportunity to correct this and force the usage of a child-node for the
+MDIO bus.
 
-It seems we are changing some semantics here, in_softirq() is checked
-even if allow_direct is true before this patch. And it seems in_softirq()
-is not checked if allow_direct is true after this patch? I think we might
-need some assertion to ensure @allow_direct really means "I'm sure it's
-local, don't waste time rechecking this". As my understanding, it is really
-hard to debug this kind of problem, so in_softirq() is always checking.
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Reviewed-by: Rob Herring <robh@kernel.org>
+---
+* Changes since v1
+- Expand on history in commit message.
 
-Perhaps add something like WARN_ONCE() or DEBUG_NET_WARN_ON_ONCE for
-allow_direct being true case to catch the API misuse?
+Hello,
 
-> +		allow_direct = page_pool_napi_local(pool);
-> +
->  	page = __page_pool_put_page(pool, page, dma_sync_size, allow_direct);
->  	if (page && !page_pool_recycle_in_ring(pool, page)) {
->  		/* Cache full, fallback to free pages */
-> @@ -969,7 +994,7 @@ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
->  static void page_pool_disable_direct_recycling(struct page_pool *pool)
->  {
->  	/* Disable direct recycling based on pool->cpuid.
-> -	 * Paired with READ_ONCE() in napi_pp_put_page().
-> +	 * Paired with READ_ONCE() in page_pool_napi_local().
->  	 */
->  	WRITE_ONCE(pool->cpuid, -1);
->  
+The Ethernet TSN driver is still in review and have not been merged and
+no usage of the bindings are merged either. So while this breaks the
+binding it effects no one. So we can correct this mistake without
+breaking any use-cases before we need to support any backward
+compatibility.
+---
+ .../bindings/net/renesas,ethertsn.yaml        | 33 ++++++++-----------
+ 1 file changed, 14 insertions(+), 19 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+index ea35d19be829..b4680a1d0a06 100644
+--- a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
++++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+@@ -71,16 +71,8 @@ properties:
+     enum: [0, 2000]
+     default: 0
+ 
+-  '#address-cells':
+-    const: 1
+-
+-  '#size-cells':
+-    const: 0
+-
+-patternProperties:
+-  "^ethernet-phy@[0-9a-f]$":
+-    type: object
+-    $ref: ethernet-phy.yaml#
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
+     unevaluatedProperties: false
+ 
+ required:
+@@ -94,8 +86,7 @@ required:
+   - resets
+   - phy-mode
+   - phy-handle
+-  - '#address-cells'
+-  - '#size-cells'
++  - mdio
+ 
+ additionalProperties: false
+ 
+@@ -122,14 +113,18 @@ examples:
+         tx-internal-delay-ps = <2000>;
+         phy-handle = <&phy3>;
+ 
+-        #address-cells = <1>;
+-        #size-cells = <0>;
++        mdio {
++            #address-cells = <1>;
++            #size-cells = <0>;
+ 
+-        phy3: ethernet-phy@3 {
+-            compatible = "ethernet-phy-ieee802.3-c45";
+-            reg = <0>;
+-            interrupt-parent = <&gpio4>;
+-            interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+             reset-gpios = <&gpio1 23 GPIO_ACTIVE_LOW>;
++            reset-post-delay-us = <4000>;
++
++            phy3: ethernet-phy@0 {
++                compatible = "ethernet-phy-ieee802.3-c45";
++                reg = <0>;
++                interrupt-parent = <&gpio4>;
++                interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
++            };
+         };
+     };
+-- 
+2.44.0
 
 
