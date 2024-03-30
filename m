@@ -1,125 +1,119 @@
-Return-Path: <netdev+bounces-83513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1DC892BF7
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 17:12:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40193892BFF
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 17:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44C2F2830BF
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 16:12:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D66A0B211B8
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 16:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C713C473;
-	Sat, 30 Mar 2024 16:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82BF3A1D3;
+	Sat, 30 Mar 2024 16:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzxvaHr6"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Y2tp6sQa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955FB3BBCC
-	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 16:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161DDEAC6;
+	Sat, 30 Mar 2024 16:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711815146; cv=none; b=hdKrh6BBcACwZT61TOUFqZ05malzWM+WIX7zWKbo0qlpYUxt9yu2P9NP7a/wlb578lkYNFVShP6hZFL1jpdQ4t9hDHAB438/tjfx78l7asOkW/h/5J+U3peZcRFPm2jwEuagi0RtwOD10I6+JyFQjHRYCjDroA8gxj2oiDaVzQU=
+	t=1711815653; cv=none; b=mS6rVh5T/lZGK8wYPPxiInu59YJakJ7q1MXTMZzo+xYZwJGtSraU8JC5CpDXqofLK+Yp6Vt37MZIksZ4m3e1uACyQEnWLLtAT42lQXIqiaWAts8ZHDF3wNH6RRyLaSFLqHUPp5VjK6ZtJszYL/DUBgOMRVfEY5vozRoc0kwNnmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711815146; c=relaxed/simple;
-	bh=gb0wbzYCn+s6xl2Y1JhOPZbAeNk0nN+B1cjFTzYSqac=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eiRafXhaQc1rH1KSVyVShOmhOCRKzJa0seYr05xX1xTuAPnd8Ul+a3Q1tFlu1yG2QBPTJUqFiiek+SQs6c8CUNT3yxXGUTvm/uHr/JhziaFBxXvi688krhzVqEZvE818nIAHZ0eGxOMYdj/OtjttBPK1gKEfKJz5M+9N78o47z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OzxvaHr6; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d700beb60bso52310421fa.1
-        for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 09:12:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711815143; x=1712419943; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oplGzIl08heQJGCvOWbH0pzNYHmcuI8DAip8sdVS/cY=;
-        b=OzxvaHr69gBbJTCkvYR0OqPROzYrJKkzbucNW5LL77pqpu8GKrRMUqWtjQV/gkW1xH
-         uaqOXLmM+WFA8nNPqYeaLMZ7JIrrrNh3G54hFMgJVqWb3eGYvz+hCi5m6sxFrgw/Il4I
-         pMfOJJI1OmFebNjrIv9ZufswBHxA/z3xCH91oqfwB3Bj02l9HT6ARjhq+YwJl1WJieBq
-         T6zXCB9V73ZtQO0bpH6/PRvHQNsbhqGTpHjbvofac3CN4U/45ddDO5+Fx3RGuS3Yb76l
-         QW2uw3uR7x7vxHgElMiLC5EqghLJpfd7qLK6pLuRrS9unwyLFijZOHEXCf2uLrKQVWt7
-         WIEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711815143; x=1712419943;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oplGzIl08heQJGCvOWbH0pzNYHmcuI8DAip8sdVS/cY=;
-        b=GE+THAkI00TGTaevQYJ7AsZrqpF4lD4Vo37rL0GFoDXup5bDbz+7sWoHHkLLDjjsrM
-         hIJWmwOTv6M9ThbUjbQ8Skv4h2aTiM1drKd7eCu4bgWeqj7LK0kDBlMVCdBqxVqy7woa
-         /A0PguAabQY+yuQqafqV6Wq63yGEfM8yPtRL21O8idBxZefG+ft0ZhJNn36PHjTbaD0v
-         pgCwfxmCJ6aEllra5g6SZafxXv1zjQ0x9ziymC3ZmCE15hHiO60SxDrPXuo6Fr6k6Yra
-         uHHIureAN9QQoc3DjBytUyKQUxn0zXkh3uNLAwxQw6opq93zGHDhsmK8cmZMG0VtvoO4
-         tevg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxWpRKii/DR5oiFxu1vGqWMSF5JaJSiBbEdbJqVrMC8LohaIRENzyDk+S1Pf/b4zP5Fo2qVEUSSjdil2fN1B1QssK3sxqV
-X-Gm-Message-State: AOJu0YwiphxSg+qAp/JHs7HYkQgF2hc99NsIbVRJIAB8MY18JCTp1izK
-	GXhl9k1vDw5ESK4oyqek9O/E3rhQITnRF2G9Rt5OYGoOm5ccA8NO004rgshkAOauP6x2s6G9HIW
-	p6pIG7ni9S4tAi3xFuThlnbrCT9E=
-X-Google-Smtp-Source: AGHT+IHHaPR/6PemL3v6Nwx8QwVHFTp8p6ZbR6H8yp2Py8jxyz/n+xlSgu1t2wgsbB3deCApO/hXOrdQ7EWBpkoQbgI=
-X-Received: by 2002:a2e:91d1:0:b0:2d6:d043:f6fc with SMTP id
- u17-20020a2e91d1000000b002d6d043f6fcmr4129766ljg.48.1711815142486; Sat, 30
- Mar 2024 09:12:22 -0700 (PDT)
+	s=arc-20240116; t=1711815653; c=relaxed/simple;
+	bh=JNC8qozkgWlE+Q6kdtHfr0XlvCkJCAqLu0MAE1TEAq8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m+WrL2f7eXA8QKozheTgtynh9tR1Mkhmu0+yvSb/Waw66WKvAnc6YogIpWcM2U7GOSLy5Zn2f9hWYhwc0eQp2nA3c6dARB4QsGQuBesijf+qVWtaWiw5AfCQf3A1pP6jGz+TFDZYo4VIzWrvKRIyD+NoxFUtE6EHzLeocwsMVw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Y2tp6sQa; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=cDTgdTBVRUAZH0p6pwQw4KmwuQ/wNotFO0UsYy13RVs=; b=Y2tp6sQaaVk+sBrRRF0N2ANzw+
+	DJpIXWD4/mDjC2onipuC4uQQKeMs9aRsg/HT1VDwSIKGc3eP+vcLSjAkEbNMPmxTFdVHs6lWfg7Gw
+	MRd9D7hy/FJ+Fu6galftDA1RcyU74rR0nEHQh8Q4Cxw6xr3YPPMLQOXe5cjp/5oS3B9U2a8qsTQYh
+	/hPhHfrFJzmqDas7HWCJG9CrAVgTtD/r+gVTNc9TggRnbyE2zKQl5LZKhL3JxZMjhuQXGolftCOkc
+	NuOgeZu/HfHF4oCfUz6DmYc0A3cejB9ptDTqCWReNGWxbCCDxIVLAhruxGaoU9AB6p90lRi48gqLZ
+	zMJ8rFMw==;
+Received: from [50.53.2.121] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rqbRm-00000003mZz-0NbX;
+	Sat, 30 Mar 2024 16:20:46 +0000
+Message-ID: <1c69304c-abaf-46e4-b58d-a4f9b30a8f5f@infradead.org>
+Date: Sat, 30 Mar 2024 09:20:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329154225.349288-1-edumazet@google.com>
-In-Reply-To: <20240329154225.349288-1-edumazet@google.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 31 Mar 2024 00:11:46 +0800
-Message-ID: <CAL+tcoA_LxLei9ZT+RH16w_vamy1Ka6OJDXjwJNB6kPo2a_sPw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 0/8] net: rps: misc changes
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] wifi: mac80211: remove ieee80211_set_hw_80211_encap()
+Content-Language: en-US
+To: Jeff Johnson <quic_jjohnson@quicinc.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240329-mac80211-kdoc-retval-v1-0-5e4d1ad6c250@quicinc.com>
+ <20240329-mac80211-kdoc-retval-v1-1-5e4d1ad6c250@quicinc.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240329-mac80211-kdoc-retval-v1-1-5e4d1ad6c250@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 29, 2024 at 11:42=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> Make RPS/RFS a bit more efficient with better cache locality
-> and heuristics.
->
-> Aso shrink include/linux/netdevice.h a bit.
->
-> v2: fixed a build issue in patch 6/8 with CONFIG_RPS=3Dn
->     (Jakub and kernel build bots)
->
-> Eric Dumazet (8):
->   net: move kick_defer_list_purge() to net/core/dev.h
->   net: move dev_xmit_recursion() helpers to net/core/dev.h
->   net: enqueue_to_backlog() change vs not running device
->   net: make softnet_data.dropped an atomic_t
->   net: enqueue_to_backlog() cleanup
->   net: rps: change input_queue_tail_incr_save()
->   net: rps: add rps_input_queue_head_add() helper
->   net: rps: move received_rps field to a better location
->
->  include/linux/netdevice.h | 38 ++------------------
->  include/net/rps.h         | 28 +++++++++++++++
->  net/core/dev.c            | 73 ++++++++++++++++++++++-----------------
->  net/core/dev.h            | 23 ++++++++++--
->  net/core/net-procfs.c     |  3 +-
->  5 files changed, 95 insertions(+), 70 deletions(-)
 
-For this series, feel free to add:
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+On 3/29/24 13:27, Jeff Johnson wrote:
+> While fixing kernel-doc issues it was discovered that the
+> ieee80211_set_hw_80211_encap() prototype doesn't actually have an
+> implementation, so remove it.
+> 
+> Note the implementation was rmeoved in patch 6aea26ce5a4c ("mac80211:
+> rework tx encapsulation offload API").
+> 
+> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 
-Thanks!
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
 
->
-> --
-> 2.44.0.478.gd926399ef9-goog
->
->
+Thanks.
+
+> ---
+>  include/net/mac80211.h | 12 ------------
+>  1 file changed, 12 deletions(-)
+> 
+> diff --git a/include/net/mac80211.h b/include/net/mac80211.h
+> index 353488ab94a2..e6a11a982ca8 100644
+> --- a/include/net/mac80211.h
+> +++ b/include/net/mac80211.h
+> @@ -7478,18 +7478,6 @@ u32 ieee80211_calc_rx_airtime(struct ieee80211_hw *hw,
+>  u32 ieee80211_calc_tx_airtime(struct ieee80211_hw *hw,
+>  			      struct ieee80211_tx_info *info,
+>  			      int len);
+> -/**
+> - * ieee80211_set_hw_80211_encap - enable hardware encapsulation offloading.
+> - *
+> - * This function is used to notify mac80211 that a vif can be passed raw 802.3
+> - * frames. The driver needs to then handle the 802.11 encapsulation inside the
+> - * hardware or firmware.
+> - *
+> - * @vif: &struct ieee80211_vif pointer from the add_interface callback.
+> - * @enable: indicate if the feature should be turned on or off
+> - */
+> -bool ieee80211_set_hw_80211_encap(struct ieee80211_vif *vif, bool enable);
+> -
+>  /**
+>   * ieee80211_get_fils_discovery_tmpl - Get FILS discovery template.
+>   * @hw: pointer obtained from ieee80211_alloc_hw().
+> 
+
+-- 
+#Randy
 
