@@ -1,272 +1,154 @@
-Return-Path: <netdev+bounces-83496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09E6B8929D7
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 10:01:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C94F892A1F
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 10:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46D4C282B95
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 09:01:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1326283515
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 09:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A0ABA34;
-	Sat, 30 Mar 2024 09:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C6818045;
+	Sat, 30 Mar 2024 09:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nle+vzJj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="THahwfNx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2F7847E;
-	Sat, 30 Mar 2024 09:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA534179A6;
+	Sat, 30 Mar 2024 09:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711789276; cv=none; b=LJliKGtxdDA5DncUU3WQ86IqJfxxDdmZL62lReMe091FMMVzSAkVNUab0eixlHeqVTjIQ9EEtdUySkdcLp6rFtixRUTTmQdeeFsygIBsVZzOYDo25RMQNI1crLiHrVMDdGnqz68Wu6CyxrARRiiLwfKV6AS/7WwNSvW09W60zck=
+	t=1711792390; cv=none; b=mpWDHS1F3wTtWsrdo9JalfPe3/cC5sdrW3x+j3Mhl2qX/mKKcmtQrcVYo/6+C1CUL0Ez+KfJqHWl49lm7nHDrDYKemOFGVluge795hNNCsnK1NKxy+KxbLOAxurgw1URU5iSxDtLts5OeTAkiC/OBsej9NxIIaM5Cx6wRgnkvzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711789276; c=relaxed/simple;
-	bh=CFUfaZfb7X/JJv0DB5cn0CBJrMrECWzMZrlMK1UCZYA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o3BMwVDUvqhNVOZ/cIBlL/eEF8qwRIumKR1fMWrSA7H4zcSOpuQv/ioQzXQqrodsIUyARBuvkzwtgX1F3ahG1oBV9JsqyrWjN58qqzsylGWNrONt419EuA+HV2Hnb6GN/l1yLYA/QgPCW6C6kp/GDTzIPXK00zlXkPjIpLmtnu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nle+vzJj; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d6ee6c9945so20258311fa.3;
-        Sat, 30 Mar 2024 02:01:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711789272; x=1712394072; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cbl/CLMq3nWKqNjaubWInMz1kaQBbZVVwZ4B6Yhcsik=;
-        b=Nle+vzJjShWs0Ti3+DNi47la3wp5ECIHDAW+EvbhX+Ton8pxr5GAT+OKLN9tkpsdWp
-         7pmY92Vv0JN9muB7m6ZKKOed2eTaDIbVC7yQe3iYoQYmuzNt6FG/2CRXCn5axo5T0Er+
-         mIawl+AjZ9LcJ+2LwfqLqtGS9Swzi333W06D5Rkope/9r9oRpQjGT7vy46uzFz6Xcl6b
-         S77spLQ2G+CQpl+4BKwdDBzhD3S36TpnXk6mrY+NzXkbO3VsCQIQvMCBSh38nAhwLdwg
-         DDcnS4Gu8cVLbgH/tpVDy41vXbLuY8G8wYbQmHDkXrHBBWVRq9R4WCn8orBArD2q7glw
-         BXGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711789272; x=1712394072;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cbl/CLMq3nWKqNjaubWInMz1kaQBbZVVwZ4B6Yhcsik=;
-        b=SissUbPdoWrUM0u1xqTsea9iktJot0W8ikz/21w6oDLw29oHo1E/zyykrKQer/3OWO
-         qPdKEegxJqdMg3v5GqOnOKWhyGLwFbh6p2b85j1Ts+6BbLFl9oFkAqze+79DH3UTgvpX
-         8eHg+dcra2W81v3T0kNwO/Rz19x/a4qUnJoY4xXfsGku0ULlQwIKn/HG4uSfeFFaQsvQ
-         uTzuZm8A/9h9KcYqL8SvAcdlpvE/AK5/d243lGtC7Es8bpk5HpBF6YLgEqB9CQU7scmf
-         XLKGETg+gvfwQ/3vIK2nDBH9GUewEyTA+wZonkJx4DDqfRJaO4cU3mQBB6idP5IB1mep
-         Hw+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXMPjsPXXatSVDH641eiZD9Tylx5ujw2zvU8pLsO9HYR1XJhfBDwIOO8cDOnkZQvsFw51iNGrNYsj+ZOC9s/nmtelqQeBg/s4CmUPCyx03PDGJu4fX5flrhGr2i0fu9s/8eCySMSfdAa696W6WVC4RItEDieQnLUtLc
-X-Gm-Message-State: AOJu0YxogawIyIXt1FmwtLXKYPIfA7/NqcoJp2+CkbXskVq401KWqBS9
-	dv/uHIbm1VAuF/Vdv+59bCR/JaF94WfnbXteVNB+T1wBqWVEkaHONlAM1xQ2s4fdMV8thx39cxA
-	tPcarlYh9vw0yYnOBdeRY+OsGAlI=
-X-Google-Smtp-Source: AGHT+IGeaymGC7cAQwieQg4TakZq0ARBnpQFix3PExtV6ez87eomevGZHhs6eDxl1CtxiB/HrZm8Uq2a8idogtbdJIc=
-X-Received: by 2002:a2e:8612:0:b0:2d6:a5ce:b261 with SMTP id
- a18-20020a2e8612000000b002d6a5ceb261mr2175202lji.25.1711789271815; Sat, 30
- Mar 2024 02:01:11 -0700 (PDT)
+	s=arc-20240116; t=1711792390; c=relaxed/simple;
+	bh=6kh34bHcthGqlHrO/Hn60opsPoAyecYkLcoCkMkdVOQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eQQp3EMaMVKmsC828+X8GSd/LdpIXo+B0bVjyxC/Nsxns9PdxXvFjch6Z1kIhyXmPtL2NYVwqOQwAnJScfJjFJrKTPRQEPrv5pSQllXA/Hz618+d8V+HZ88OF0iA53MteXZFaprKAvYf94+GqPuOnvaarGGV1mDtrxZL1n36BqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=THahwfNx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB8C9C433C7;
+	Sat, 30 Mar 2024 09:53:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711792390;
+	bh=6kh34bHcthGqlHrO/Hn60opsPoAyecYkLcoCkMkdVOQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=THahwfNxDpwSqq4X1JODLYsXP3knH5oY3pZR9qCtxwGIvE2hEJ84TlhEzjwH2nIQ8
+	 zE/u/jaFZPwNzoTS43sx9UlNLF4+IvtIWnB/V5G0ydmaIibX9l8HrIMxKWh+n+qFL6
+	 Nqs3AA3BCTOgRSH81hLLCquAhLv3PEpHAU/zLdCTLzhwElda6bZD/KKRRgE6bCud4o
+	 tL0FihIpWuxFDYlXNlUVBResWRZTxNs1+e15n+TE9hQQKyNsxXIi2LnIDHI7I9rjau
+	 GNJtSHJPDoMqXJham5+BO3ROpnZloute8wm6Uvzc7dtzZYEsszatBsKNomPp2EfsdZ
+	 MJ6+yXQGXqpHg==
+Message-ID: <d1c55f68-8afa-4f94-a7f6-8dba339c8790@kernel.org>
+Date: Sat, 30 Mar 2024 10:53:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329094906.18147-1-ubizjak@gmail.com> <20240329094906.18147-3-ubizjak@gmail.com>
- <CAADnVQ+6D++hCXaP=aK+Q5wienMzhHo3h9YCvpA_7sHjMt+q6A@mail.gmail.com>
-In-Reply-To: <CAADnVQ+6D++hCXaP=aK+Q5wienMzhHo3h9YCvpA_7sHjMt+q6A@mail.gmail.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Sat, 30 Mar 2024 10:01:04 +0100
-Message-ID: <CAFULd4b6juiw3wC3Z61V9=-UnA+NGyUt4231vC14UnGAATk6tA@mail.gmail.com>
-Subject: Re: [PATCH RESEND bpf 2/2] x86/bpf: Fix IP for relocating call depth accounting
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: X86 ML <x86@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	=?UTF-8?Q?Joan_Bruguera_Mic=C3=B3?= <joanbrugueram@gmail.com>, 
-	Ingo Molnar <mingo@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net] mptcp: prevent BPF accessing lowat from a subflow
+ socket.
+Content-Language: en-GB
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, mptcp@lists.linux.dev, bpf@vger.kernel.org
+References: <d8cb7d8476d66cb0812a6e29cd1e626869d9d53e.1711738080.git.pabeni@redhat.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <d8cb7d8476d66cb0812a6e29cd1e626869d9d53e.1711738080.git.pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 29, 2024 at 10:53=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Fri, Mar 29, 2024 at 2:49=E2=80=AFAM Uros Bizjak <ubizjak@gmail.com> w=
-rote:
-> >
-> > From: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
-> >
-> > The recently introduced support for %rip-relative relocations in the
-> > call thunk template assumes that the code is being patched in-place,
-> > so the destination of the relocation matches the address of the code.
-> > This is not true for the call depth accounting emitted by the BPF JIT,
-> > so the calculated address is wrong and usually causes a page fault.
->
-> Could you share the link to what this 'rip-relative' relocation is ?
+Hi Paolo,
 
-Please see the "RIP relative addressing" section in [1].
+On 29/03/2024 19:50, Paolo Abeni wrote:
+> Alexei reported the following splat:
+> 
+>  WARNING: CPU: 32 PID: 3276 at net/mptcp/subflow.c:1430 subflow_data_ready+0x147/0x1c0
+>  Modules linked in: dummy bpf_testmod(O) [last unloaded: bpf_test_no_cfi(O)]
+>  CPU: 32 PID: 3276 Comm: test_progs Tainted: GO       6.8.0-12873-g2c43c33bfd23
+>  Call Trace:
+>   <TASK>
+>   mptcp_set_rcvlowat+0x79/0x1d0
+>   sk_setsockopt+0x6c0/0x1540
+>   __bpf_setsockopt+0x6f/0x90
+>   bpf_sock_ops_setsockopt+0x3c/0x90
+>   bpf_prog_509ce5db2c7f9981_bpf_test_sockopt_int+0xb4/0x11b
+>   bpf_prog_dce07e362d941d2b_bpf_test_socket_sockopt+0x12b/0x132
+>   bpf_prog_348c9b5faaf10092_skops_sockopt+0x954/0xe86
+>   __cgroup_bpf_run_filter_sock_ops+0xbc/0x250
+>   tcp_connect+0x879/0x1160
+>   tcp_v6_connect+0x50c/0x870
+>   mptcp_connect+0x129/0x280
+>   __inet_stream_connect+0xce/0x370
+>   inet_stream_connect+0x36/0x50
+>   bpf_trampoline_6442491565+0x49/0xef
+>   inet_stream_connect+0x5/0x50
+>   __sys_connect+0x63/0x90
+>   __x64_sys_connect+0x14/0x20
+> 
+> The root cause of the issue is that bpf allows accessing mptcp-level
+> proto_ops from a tcp subflow scope.
+> 
+> Fix the issue detecting the problematic call and preventing any action.
 
-[1] https://compas.cs.stonybrook.edu/~nhonarmand/courses/sp17/cse506/ref/as=
-sembly.html
+Thank you for having looked at that! The patch looks good to me as well:
 
-In our case:
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-The callthunks patching creates a call thunk template in the .rodata
-section (please see arch/x86/kernel/callthunks.c)  that is later
-copied to the .text section at the correct place. The template uses
-X86_call_depth in the pcpu_hot structure. Previously, the template
-used absolute location for X86_call_depth and the linker resolved the
-address in the template to this absolute location. There is no issue
-when this template is copied to the various places in the .text
-section.
+FYI, the patch was also OK for our CI, but we don't run all BPF tests.
 
-When we want to use PC relative relocations (to reduce the code size),
-then the linker calculates the address of the variable in the template
-according to the PC in the .rodata section. If we want to copy the
-template to its final location, then the address of X86_call_depth,
-relative to the PC, has to be adjusted, as explained in
-arch/x86/kernel/alternative.c, in the comment above apply_reloc_n
-macro.
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-Uros.
-
-> > Pass the destination IP when the BPF JIT emits call depth accounting.
-> >
-> > Fixes: 17bce3b2ae2d ("x86/callthunks: Handle %rip-relative relocations =
-in call thunk template")
->
-> Ohh. It's buried inside that patch.
-> Pls make commit log a bit more clear that that commit 17bce3b2ae2d
-> broke x86_call_depth_emit_accounting logic.
->
-> > Signed-off-by: Joan Bruguera Mic=C3=B3 <joanbrugueram@gmail.com>
-> > Reviewed-by: Uros Bizjak <ubizjak@gmail.com>
-> > Acked-by: Ingo Molnar <mingo@kernel.org>
-> > Cc: Alexei Starovoitov <ast@kernel.org>
-> > Cc: Daniel Borkmann <daniel@iogearbox.net>
-> > ---
-> >  arch/x86/include/asm/alternative.h |  4 ++--
-> >  arch/x86/kernel/callthunks.c       |  4 ++--
-> >  arch/x86/net/bpf_jit_comp.c        | 19 ++++++++-----------
-> >  3 files changed, 12 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/alternative.h b/arch/x86/include/asm/=
-alternative.h
-> > index fcd20c6dc7f9..67b68d0d17d1 100644
-> > --- a/arch/x86/include/asm/alternative.h
-> > +++ b/arch/x86/include/asm/alternative.h
-> > @@ -117,7 +117,7 @@ extern void callthunks_patch_builtin_calls(void);
-> >  extern void callthunks_patch_module_calls(struct callthunk_sites *site=
-s,
-> >                                           struct module *mod);
-> >  extern void *callthunks_translate_call_dest(void *dest);
-> > -extern int x86_call_depth_emit_accounting(u8 **pprog, void *func);
-> > +extern int x86_call_depth_emit_accounting(u8 **pprog, void *func, void=
- *ip);
-> >  #else
-> >  static __always_inline void callthunks_patch_builtin_calls(void) {}
-> >  static __always_inline void
-> > @@ -128,7 +128,7 @@ static __always_inline void *callthunks_translate_c=
-all_dest(void *dest)
-> >         return dest;
-> >  }
-> >  static __always_inline int x86_call_depth_emit_accounting(u8 **pprog,
-> > -                                                         void *func)
-> > +                                                         void *func, v=
-oid *ip)
-> >  {
-> >         return 0;
-> >  }
-> > diff --git a/arch/x86/kernel/callthunks.c b/arch/x86/kernel/callthunks.=
-c
-> > index 30335182b6b0..e92ff0c11db8 100644
-> > --- a/arch/x86/kernel/callthunks.c
-> > +++ b/arch/x86/kernel/callthunks.c
-> > @@ -314,7 +314,7 @@ static bool is_callthunk(void *addr)
-> >         return !bcmp(pad, insn_buff, tmpl_size);
-> >  }
-> >
-> > -int x86_call_depth_emit_accounting(u8 **pprog, void *func)
-> > +int x86_call_depth_emit_accounting(u8 **pprog, void *func, void *ip)
-> >  {
-> >         unsigned int tmpl_size =3D SKL_TMPL_SIZE;
-> >         u8 insn_buff[MAX_PATCH_LEN];
-> > @@ -327,7 +327,7 @@ int x86_call_depth_emit_accounting(u8 **pprog, void=
- *func)
-> >                 return 0;
-> >
-> >         memcpy(insn_buff, skl_call_thunk_template, tmpl_size);
-> > -       apply_relocation(insn_buff, tmpl_size, *pprog,
-> > +       apply_relocation(insn_buff, tmpl_size, ip,
->
-> Did the logic inside apply_relocation() change to have
-> a new meaning for 'dest' and 'src'?
-> Answering to myself... yes. in that commit.
-> Better commit log would have made the code review so much easier.
->
-> >                          skl_call_thunk_template, tmpl_size);
-> >
-> >         memcpy(*pprog, insn_buff, tmpl_size);
-> > diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> > index 09f7dc9d4d65..f2e8769f5eee 100644
-> > --- a/arch/x86/net/bpf_jit_comp.c
-> > +++ b/arch/x86/net/bpf_jit_comp.c
-> > @@ -481,7 +481,7 @@ static int emit_rsb_call(u8 **pprog, void *func, vo=
-id *ip)
-> >  {
-> >         void *adjusted_ip;
-> >         OPTIMIZER_HIDE_VAR(func);
-> > -       adjusted_ip =3D ip + x86_call_depth_emit_accounting(pprog, func=
-);
-> > +       adjusted_ip =3D ip + x86_call_depth_emit_accounting(pprog, func=
-, ip);
->
-> Now I see why you added extra var in the previous patch.
-> Should have mentioned it in the commit log.
->
-> >         return emit_patch(pprog, func, adjusted_ip, 0xE8);
-> >  }
-> >
-> > @@ -1973,20 +1973,17 @@ st:                     if (is_imm8(insn->off))
-> >
-> >                         /* call */
-> >                 case BPF_JMP | BPF_CALL: {
-> > -                       int offs;
-> > +                       u8 *ip =3D image + addrs[i - 1];
-> >
-> >                         func =3D (u8 *) __bpf_call_base + imm32;
-> >                         if (tail_call_reachable) {
-> >                                 RESTORE_TAIL_CALL_CNT(bpf_prog->aux->st=
-ack_depth);
-> > -                               if (!imm32)
-> > -                                       return -EINVAL;
-> > -                               offs =3D 7 + x86_call_depth_emit_accoun=
-ting(&prog, func);
-> > -                       } else {
-> > -                               if (!imm32)
-> > -                                       return -EINVAL;
-> > -                               offs =3D x86_call_depth_emit_accounting=
-(&prog, func);
-> > +                               ip +=3D 7;
-> >                         }
-> > -                       if (emit_call(&prog, func, image + addrs[i - 1]=
- + offs))
-> > +                       if (!imm32)
-> > +                               return -EINVAL;
-> > +                       ip +=3D x86_call_depth_emit_accounting(&prog, f=
-unc, ip);
-> > +                       if (emit_call(&prog, func, ip))
-> >                                 return -EINVAL;
-> >                         break;
-> >                 }
-> > @@ -2836,7 +2833,7 @@ static int __arch_prepare_bpf_trampoline(struct b=
-pf_tramp_image *im, void *rw_im
-> >                  * Direct-call fentry stub, as such it needs accounting=
- for the
-> >                  * __fentry__ call.
-> >                  */
-> > -               x86_call_depth_emit_accounting(&prog, NULL);
-> > +               x86_call_depth_emit_accounting(&prog, NULL, image);
->
-> Overall it all makes sense.
-> Pls respin with more precise commit logs.
 
