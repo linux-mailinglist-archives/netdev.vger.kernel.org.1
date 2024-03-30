@@ -1,127 +1,136 @@
-Return-Path: <netdev+bounces-83493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 966F3892963
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 05:48:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A16D689296C
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 06:09:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E200AB22A7E
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 04:48:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EF601F228EB
+	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 05:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797EE3FF1;
-	Sat, 30 Mar 2024 04:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n+1uMRMx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D76C79F0;
+	Sat, 30 Mar 2024 05:09:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.65.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602524C8C
-	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 04:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418523FF1;
+	Sat, 30 Mar 2024 05:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.65.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711774086; cv=none; b=GwHZKRi/eml6DlBfGSsMb9rsgOFmqC01rgfyOKIQ/1xXi2qjT7DgGH6g0fY8dMEzxhulb/hoNvmkwDCaEalFiWMrQkH3weA0ynPOv68afoh+/1lAl9L+L0bR0cui/jDALYp9DGb8nZYI40aVd4jeKGmIC/dhJdzSK2eaaWR9GFc=
+	t=1711775345; cv=none; b=gfLWY1ioFi9jl1ZBFjmxmFW2tHmdP96al/rViDheOnyYsGPNiY/6rojsa6KuCViu6ospo8JqIPmrQ5kYhXxI4fWTd13oBUM7loEJ816ctuoV5AIOJRDqdy8LJMFGF588bEGNcNoJZnlMJ+26z+gcXZ2kaQlCf0QR+U0nKFsVYlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711774086; c=relaxed/simple;
-	bh=nOmQV1H9fSp2x3NrALQj4COL96kktnMWzhB6qZiX8aw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M48dreyTolvY2cnQgLIZAjXp6uEm0TNSoZJFPvOn3NX33jGh4rbuopaUy3UiQgx/b3SwQEDrAqctPWwBtJS0OZKLq4E+ubZXd8rfLHtesOMaRONXw+IjdWQc7FQGOaJg/33goxAx4COg99paYcS/9XNbipGaA4ij2yDX6ZjqMbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=n+1uMRMx; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dc23bf7e5aaso2431834276.0
-        for <netdev@vger.kernel.org>; Fri, 29 Mar 2024 21:48:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711774083; x=1712378883; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dQUNU9HstbNDcHNvryhhTFYLom8Nu8/8eMQ1j/SNHfY=;
-        b=n+1uMRMxRpHwhG8KTbbVJRplyvBND8i+sroyADt9uuGsXcIVPiet/79t2DhVti8yaZ
-         JXx3tMNtWdggLvh9aYy49rNtN09DCcJBt55gB9kQD27tAbcS7smMjLOGnNIY62/rs2QK
-         P8d0lKce4ndHoWZtmIUEvPoZ2LrLAp1s+Rxbhm8HDMtNoDGKy4vX33CC9MvYByGuoea4
-         iL0qxUnVobapkYQ6F399p7WoFHlIprij6tNxx4wwFEZ5PKfwSHoKWGYzYNuD0MkuXuIf
-         +gaYRH3sYXk4Dr/uvUUZ24Qz7endvnF+AtHrstT+wrxzeD9D2kfYEVlxgP94U7xW3xGW
-         mA2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711774083; x=1712378883;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dQUNU9HstbNDcHNvryhhTFYLom8Nu8/8eMQ1j/SNHfY=;
-        b=SFhzkbs2SM41iAvs+EylN9h8bs/4Sfgm8NpuAzaZChc0BNqIohIZGLi6s2Ds9G4fWW
-         Y/0GOaHwjsCrfqxeV1+DAMUy00KbZSCK4Vjv+5OSkZaSKigl7l6iSFsx9SPqE0L4UcY7
-         FUPVpRT3pymWiib42o2sAiP1gzFViFxqNc5TZEeXPQRMr28m15AUWnViWVhlYCcXm75L
-         yUXgB0d3wSY+TsZhJ1ZGmDqK3tAAZh07VFxWJ7J2s57RBrBVjtgO5z+hr93scyH6KUEF
-         klIPBMcWvMGn5t2kZhz1iYSGhfUiPILZbgS6vW2yNTMjuWYYJul9nmfn3iNYYv24Wz7L
-         Hd1w==
-X-Forwarded-Encrypted: i=1; AJvYcCXRuVSegW3hjlToWGsunjEH4R9HT+9lcg72jpMhxCCW0kpc8tH+rZJOS9HL4UhsAHLB9FEKnkzsiDQtINdUppFdi+nymAsz
-X-Gm-Message-State: AOJu0Yx+XpoyNARIUB+G8kpmOnRuhrmAszR00jA604EIFoRYCUdcrrs7
-	LPEFYZTPPZ58V1A2QwdCcILuq2t3m7ZL9VitqBLLSnOVjARiUle0D8bw+J0DsramEQ/8RyERjEF
-	X500M53qqpyu6S2K98Undw0QuXN23gLox19D75Q==
-X-Google-Smtp-Source: AGHT+IFWm8FRcfrc1FaMw38a0VeaKMDMlu7uCNCYORdT1l9V5pI2sSVpSQMKObFG5zVf0CeqF6rlwAr3XTYwJkWkMCE=
-X-Received: by 2002:a25:10c4:0:b0:dd1:7a16:7b4 with SMTP id
- 187-20020a2510c4000000b00dd17a1607b4mr3520574ybq.31.1711774083391; Fri, 29
- Mar 2024 21:48:03 -0700 (PDT)
+	s=arc-20240116; t=1711775345; c=relaxed/simple;
+	bh=nYsJpAvl6D6Ldufd73Rjy7YF1XYSzElH1fykgREgPxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nPDDajRC5sef6WYcCenUzFrJabkj3nFiAaNM8jxBguQE+fYD0jUXLYNwIYYdx/DfR8ex7tUilcegtdOsom4YdWhROAmwHDAxg4AfPonb2M1mMwD3xYUyVNldguOl29V8JvaRRyAAWjRH+cUhqKQq6qdlYHWWn1MFfLqI2qghuRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shingroup.cn; spf=pass smtp.mailfrom=shingroup.cn; arc=none smtp.client-ip=114.132.65.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shingroup.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shingroup.cn
+X-QQ-mid: bizesmtpsz13t1711775229tdi4p2
+X-QQ-Originating-IP: RfTYRleHqifmaUL5vg3HHBAADHtyt3J2efZxDgCsTa0=
+Received: from localhost ( [112.0.147.175])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sat, 30 Mar 2024 13:07:07 +0800 (CST)
+X-QQ-SSF: 01400000000000704000000A0000000
+X-QQ-FEAT: OtIeQkg1QQHVkELNGhnn3Ao/OxN3u837g2WY2miXs+dKwNICeHodGDXYI+XIN
+	MLiksvoY6OK484p/H1Pd7HcbM0rICeev22amIC6/BI2BPXdj7hZR/NjRgIzO0ujc7AJYyuh
+	hSs4kN6XesHATJzk7YtHOv0oscVKSJDG1YcCID61KeNwB//v/SP6Vco5Zi0zVzK2CryiHy7
+	MDlcbxtiVcvQbWgHR9uJniyBUgkXuWUpSRm9PGge+rsWbj+CoXH7KA5p92J+1tMYPfc3pMS
+	a2+D1HW1CQDyFXgH/iGbdQU2wmJ3Udzd7Q8BgYnuoVkISFF2Z3cH4G9BqZDzzOAp62v8M7U
+	2sZsZTz6rWN4NWIO+LXnMPEd2Ftx/MDN8OxPXGUXp3ZrWXMIP1dg4Nut1Jfsg==
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 10889329762490604258
+Date: Sat, 30 Mar 2024 13:07:06 +0800
+From: Dawei Li <dawei.li@shingroup.cn>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	ioana.ciornei@nxp.com, wintera@linux.ibm.com,
+	twinkler@linux.ibm.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net/iucv: Avoid explicit cpumask var
+ allocation on stack
+Message-ID: <4E49057A4198779C+Zged+hXhxE4GksiL@centos8>
+References: <20240329105610.922675-1-dawei.li@shingroup.cn>
+ <20240329105610.922675-2-dawei.li@shingroup.cn>
+ <CANn89iJzuw8_ti4P4tJ_A3Fd0QCjHTBjasbm_J3N8up=gK8Aow@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
-In-Reply-To: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Sat, 30 Mar 2024 06:47:52 +0200
-Message-ID: <CAA8EJprpmC6+ePxw_G6y9YEszndq1VonS1HP=aP9OVHNm42LLw@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific firmware overrides
-To: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: ath10k@lists.infradead.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iJzuw8_ti4P4tJ_A3Fd0QCjHTBjasbm_J3N8up=gK8Aow@mail.gmail.com>
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:shingroup.cn:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-On Wed, 6 Mar 2024 at 10:16, Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> wrote:
->
-> On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
-> modem DSP via the TQFTPserv. These MBN files are signed by the device
-> vendor, can only be used with the particular SoC or device.
->
-> Unfortunately different firmware versions come with different features.
-> For example firmware for SDM845 doesn't use single-chan-info-per-channel
-> feature, while firmware for QRB2210 / QRB4210 requires that feature.
->
-> Allow board DT files to override the subdir of the fw dir used to lookup
-> the firmware-N.bin file decribing corresponding WiFi firmware.
-> For example, adding firmware-name = "qrb4210" property will make the
-> driver look for the firmware-N.bin first in ath10k/WCN3990/hw1.0/qrb4210
-> directory and then fallback to the default ath10k/WCN3990/hw1.0 dir.
->
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> ---
-> Changes in v2:
-> - Fixed the comment about the default board name being NULL (Kalle)
-> - Expanded commit message to provide examples for firmware paths (Kalle)
-> - Added a note regarding board-2.bin to the commit message (Kalle)
-> - Link to v1: https://lore.kernel.org/r/20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org
->
-> ---
-> Dmitry Baryshkov (4):
->       dt-bindings: net: wireless: ath10k: describe firmware-name property
->       wifi: ath10k: support board-specific firmware overrides
->       arm64: dts: qcom: qrb2210-rb1: add firmware-name qualifier to WiFi node
->       arm64: dts: qcom: qrb4210-rb1: add firmware-name qualifier to WiFi node
+Hi Eric,
 
-Kalle, Jeff, is there anything pending on me on this series?
+On Fri, Mar 29, 2024 at 02:21:28PM +0100, Eric Dumazet wrote:
+> On Fri, Mar 29, 2024 at 11:57 AM Dawei Li <dawei.li@shingroup.cn> wrote:
+> >
+> > For CONFIG_CPUMASK_OFFSTACK=y kernel, explicit allocation of cpumask
+> > variable on stack is not recommended since it can cause potential stack
+> > overflow.
+> >
+> > Instead, kernel code should always use *cpumask_var API(s) to allocate
+> > cpumask var in config-neutral way, leaving allocation strategy to
+> > CONFIG_CPUMASK_OFFSTACK.
+> >
+> > Use *cpumask_var API(s) to address it.
+> >
+> > Signed-off-by: Dawei Li <dawei.li@shingroup.cn>
+> > ---
+> >  net/iucv/iucv.c | 37 ++++++++++++++++++++++++++-----------
+> >  1 file changed, 26 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
+> > index a4ab615ca3e3..b51f46ec32f9 100644
+> > --- a/net/iucv/iucv.c
+> > +++ b/net/iucv/iucv.c
+> > @@ -520,14 +520,19 @@ static void iucv_setmask_mp(void)
+> >   */
+> >  static void iucv_setmask_up(void)
+> >  {
+> > -       cpumask_t cpumask;
+> > +       cpumask_var_t cpumask;
+> >         int cpu;
+> >
+> > +       if (!alloc_cpumask_var(&cpumask, GFP_KERNEL))
+> > +               return;
+> 
+> This can not be right. iucv_setmask_up() is not supposed to fail.
+> 
+> Since iucv_setmask_up() is only called with iucv_register_mutex held,
+> you could simply add a 'static' for @cpumask variable.
 
--- 
-With best wishes
-Dmitry
+Correct, iucv_register_mutex is a global lock and can serialize access
+on static cpumask var.
+
+I will respin V2 as you suggested.
+
+Thanks,
+
+    Dawei
+> 
+> 
+> 
+> > +
+> >         /* Disable all cpu but the first in cpu_irq_cpumask. */
+> > -       cpumask_copy(&cpumask, &iucv_irq_cpumask);
+> > -       cpumask_clear_cpu(cpumask_first(&iucv_irq_cpumask), &cpumask);
+> > -       for_each_cpu(cpu, &cpumask)
+> > +       cpumask_copy(cpumask, &iucv_irq_cpumask);
+> > +       cpumask_clear_cpu(cpumask_first(&iucv_irq_cpumask), cpumask);
+> > +       for_each_cpu(cpu, cpumask)
+> >                 smp_call_function_single(cpu, iucv_block_cpu, NULL, 1);
+> > +
+> > +       free_cpumask_var(cpumask);
+> >  }
+> 
 
