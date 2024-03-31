@@ -1,186 +1,197 @@
-Return-Path: <netdev+bounces-83576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB18893120
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 11:45:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9A2289316F
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 13:20:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65FFD1F21A4E
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 09:45:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AACC1F218D8
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 11:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C794475804;
-	Sun, 31 Mar 2024 09:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179D51448C3;
+	Sun, 31 Mar 2024 11:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BEgd9mU6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7i9IAHs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8B5757E6;
-	Sun, 31 Mar 2024 09:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32B51442FB
+	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 11:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711878339; cv=none; b=ZIa7eI86OMI0DoAC/l+C0JBx0r17V35WgUIUv7fb8mLrA9LYJXgBNKFMaWeY1eeBp1s09+lbPAqUPcM0vnQXCAzTfsTepwmiVSm9NirJXThxfGo0hZUVPPwkhmqGMUBauhgLuYNTGIcOn0UmJlMo6UDBb3GjMWGJUoqeyvjbc2E=
+	t=1711884041; cv=none; b=F0E5owfASl/kZxeE8nwwr2mznD4ifmjDa8bNd0qW26GG3HjpBoPtyWXPUQ6zlcUPMmjjvQqhdMcpeiqzGClFtQtPMdS5e1hKZhYjERi8pXzDjn8LEg/3qCjn22lxYLFpfnU8IArQT0alUcEbBHrxkPpaQBnpflwSZAcuALppvaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711878339; c=relaxed/simple;
-	bh=N4vnvTqeAlAn6JmV4Z6vFOV4lqVDcyG+FoyDCNbrDNg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XryDGTznOo3dFjAbAKs/heah/g+WKc8JTZViTE872NSGsjuLFYXxQvhtqmB8b72wHx0JKrtw1ZMGpaj0VRELMJWf09ZBnjhidu1345Tl4z6iFnMnG2/xAxluGFhsag9ck4UIWhoK5LuVKqyqrRlYOnHQaiaKcpY18i6N5JO7m20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BEgd9mU6; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a4e61accceaso32611766b.2;
-        Sun, 31 Mar 2024 02:45:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711878336; x=1712483136; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ukh0ZTJfrA6xX77cDNXcMVE26JamLLj3wpfAUbyE8mc=;
-        b=BEgd9mU65NxDBWnaoNRMywDH7h1F6kF4bHHZIMaMxsNLFJPWQmPQLJLy9GUNx/0r3u
-         cBUSPVm7Mjz2tp4N6C1qfe2Pr7nBOhX8N4Uly/3i2A4jlhvB0JtNkIaqc6gtIOKWZwFo
-         bf3bkyvtvcSEsA6pQoOqAJZq5V+ro+p7ZJxip36w6ay7N15NP/OtHyKMWrC/NiFuI6Ll
-         13CH0z6YWXRlgHqmZevtBtEfRmSA+q3/MLChOnM79MQwYnVJeDSjnxT4xuEUECg13JR6
-         gSg4vsJySoqprKT5eZlepJrcM4p+AB9LWtlzGV8lBJ2fCKFXfNvftUYJO15JD0mjC1aO
-         vApQ==
+	s=arc-20240116; t=1711884041; c=relaxed/simple;
+	bh=HA92dRzVt3vZdgr5pQJY02em2UTWtsR+GLFyMiGbHw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z+bIvAM7zEp10fEy9KXQ02RUwUGMZEf6Q5L5WAtVANwx+XG39iT3ghfrgfKSE6u4o4y8YEH2qj5R7oIurAcI/aGiU4AI8M+wPe17hbJqrvysif5qeYJQ1U8eOpgc/vBAcSsFV5lH0AUEf11J5FnDNfRYb3wj3U4WHToQBarrs0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c7i9IAHs; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711884038;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZAFJ+0SeTqdsqNS6GC0N4AccV7yeFgGXHpRB2cwbNo4=;
+	b=c7i9IAHsKuupMX+QQPKbD7KgxC0UmvECMDPWeIvRD1pNKLUFH4axWG4pdtxcuX1LmGnPO3
+	gM2r3MOoObjgNNk0gWim29dzL+FITCqjEbrZuABlRIdOhAzG92Y5aSzV59s9BLlwdbVclF
+	t6IoszosnTZQ9ptY4RWIPTQb15+RIGE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-617-Db-kotJjNbG3IhsybiX86w-1; Sun, 31 Mar 2024 07:20:35 -0400
+X-MC-Unique: Db-kotJjNbG3IhsybiX86w-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4140bf38378so21134495e9.1
+        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 04:20:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711878336; x=1712483136;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ukh0ZTJfrA6xX77cDNXcMVE26JamLLj3wpfAUbyE8mc=;
-        b=elU8GOfn6WFHkbLYAgEj6XrLoom3UoTu288ruct0B486v2qaipa+NAmZI/AdZ6hfDZ
-         Aqt426QfX7UtAw0I4WwA6Ih9qt2H2/Xy5aAXPEYuG5EbjI7hOkZDZ0C7fAOKG6iPPsK/
-         GdeTTynZVTEvZcVQFRICz2QTmkMUV5V8ZGPqGo6gUK55VbkozrpLoTJJOLbDIt+VNKc/
-         HDXbu8lILIdPuexFtUwABcaoBxf9/AI0B/NvV/5ScnSTODCY5KEkxzxsJhwPFXYrmbfj
-         WVhv1mh43l+lbBZ1t9A29ldxsIwwgT7Fpe0F9Y5uvWcXArLRX8Typ1pi9Dwpoa2ivnSJ
-         yqzw==
-X-Forwarded-Encrypted: i=1; AJvYcCUuc8q+5wrqoapIVMuvKFkenPNoTv+RzpkTEOP+XTW/0pOX+jY+M+LeZ81yYfsy49BHHwf9+f+FLoOzUW2Fg9V7F7jn
-X-Gm-Message-State: AOJu0YwsZMrWR5e+78brYfxioXtMfw7Ms8AASQ3oUOs3WVgQh3wlWMze
-	cZ9tzRyFJAHUyOAkCcjz5M9XmJaws/MawBN78UnYt9z92N+tI11NBA2TfoHsGHUMBHNvsGJDvas
-	aclrSdOXM3jKvpZ4f0aEJMJM+9ss=
-X-Google-Smtp-Source: AGHT+IHzAecqJ0qab4ntl4tPlGW/4zRjO2MVXQLPmidrRodJRxn2Kgf8NE4swtcG8N4SqfLT1q6SneaiZRG3O3oue+w=
-X-Received: by 2002:a17:906:300a:b0:a46:d041:28e0 with SMTP id
- 10-20020a170906300a00b00a46d04128e0mr3763433ejz.59.1711878335928; Sun, 31 Mar
- 2024 02:45:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711884034; x=1712488834;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZAFJ+0SeTqdsqNS6GC0N4AccV7yeFgGXHpRB2cwbNo4=;
+        b=F/3aQNBdxkSHhyZ7sW+r1uAGFEGsx4eKSbCrAj19s//XiJemeo3QaDbhbBob8dbvxW
+         PXk6bvLQ7eg836hHb44/KgcBd5EGY9q9NCeYEkWDXs1ZVSGViC3fc8dtHFS2MxuHtKK2
+         v0fDuzlyxWG73qK7+vCdQfT9k1G/FRGqPbsG/KE6oUC7nfCG380hXNlpez3SSgyZx4eV
+         dHEcw2qEA76DAW/bvtRXu9sTo1YmEwGi75Mayg2VUnT5Ptsj+hKmjXMgPl+lfrxkMNwW
+         +P7Qy+2TOe71XVBPNMBMRVhpNdDI4++dVsTLUb8lsAtpFXRTVrtAFXB2PGz3hS8b8yhJ
+         i97Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVGym49xrmVswV6ovgKaMs/MuKME7FZ142a7noVLWScxx1y3z6ExqTvU0C+oS5iU7PXStv9JnHzucBfexiEj775V3QjUFSB
+X-Gm-Message-State: AOJu0Yw3/EaaOGQhTutJpfmVl6b0TN1GZF7WKH26PgJ3b9BaNWiC5mB+
+	5O3F/kmJik9mvQLvxGVK7rBJqy6DkrGe4ZaflHPkB/lSYeFrxvtzcafd2rRPWB7iZbM6aBuinq2
+	FEPsCxwtvjdDgbLIP8AuVvnzEi+Zs2UhAGkuK7csYLIrPAfJrXSSSMA==
+X-Received: by 2002:a05:600c:220f:b0:413:e19:337f with SMTP id z15-20020a05600c220f00b004130e19337fmr6115863wml.22.1711884034569;
+        Sun, 31 Mar 2024 04:20:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEhoN6xvj4jps7JZJhPCGbovoaf04BQIV4BBUP7925nSfWx1HPIV5PQzN7Ku2MIo02ql2sOQw==
+X-Received: by 2002:a05:600c:220f:b0:413:e19:337f with SMTP id z15-20020a05600c220f00b004130e19337fmr6115845wml.22.1711884033951;
+        Sun, 31 Mar 2024 04:20:33 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:173:c52c:ce6f:ec9c:ca7c:7200])
+        by smtp.gmail.com with ESMTPSA id u22-20020a05600c139600b004148d7b889asm14465567wmf.8.2024.03.31.04.20.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Mar 2024 04:20:33 -0700 (PDT)
+Date: Sun, 31 Mar 2024 07:20:24 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 01/22] virtio: store owner from modules with
+ register_virtio_driver()
+Message-ID: <20240331071546-mutt-send-email-mst@kernel.org>
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329134037.92124-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240329134037.92124-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 31 Mar 2024 17:44:59 +0800
-Message-ID: <CAL+tcoCo6i+=HJViR1UwFZ+6Ch7-0LCAAa7cP0+mUHSPEr+9bg@mail.gmail.com>
-Subject: Re: [PATCH net] bpf, skmsg: fix NULL pointer dereference in sk_psock_skb_ingress_enqueue
-To: john.fastabend@gmail.com, edumazet@google.com, jakub@cloudflare.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, daniel@iogearbox.net, 
-	ast@kernel.org
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, 
-	syzbot+aa8c8ec2538929f18f2d@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
 
-On Fri, Mar 29, 2024 at 9:40=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> Fix NULL pointer data-races in sk_psock_skb_ingress_enqueue() which
-> syzbot reported [1].
->
-> [1]
-> BUG: KCSAN: data-race in sk_psock_drop / sk_psock_skb_ingress_enqueue
->
-> write to 0xffff88814b3278b8 of 8 bytes by task 10724 on cpu 1:
->  sk_psock_stop_verdict net/core/skmsg.c:1257 [inline]
->  sk_psock_drop+0x13e/0x1f0 net/core/skmsg.c:843
->  sk_psock_put include/linux/skmsg.h:459 [inline]
->  sock_map_close+0x1a7/0x260 net/core/sock_map.c:1648
->  unix_release+0x4b/0x80 net/unix/af_unix.c:1048
->  __sock_release net/socket.c:659 [inline]
->  sock_close+0x68/0x150 net/socket.c:1421
->  __fput+0x2c1/0x660 fs/file_table.c:422
->  __fput_sync+0x44/0x60 fs/file_table.c:507
->  __do_sys_close fs/open.c:1556 [inline]
->  __se_sys_close+0x101/0x1b0 fs/open.c:1541
->  __x64_sys_close+0x1f/0x30 fs/open.c:1541
->  do_syscall_64+0xd3/0x1d0
->  entry_SYSCALL_64_after_hwframe+0x6d/0x75
->
-> read to 0xffff88814b3278b8 of 8 bytes by task 10713 on cpu 0:
->  sk_psock_data_ready include/linux/skmsg.h:464 [inline]
->  sk_psock_skb_ingress_enqueue+0x32d/0x390 net/core/skmsg.c:555
->  sk_psock_skb_ingress_self+0x185/0x1e0 net/core/skmsg.c:606
->  sk_psock_verdict_apply net/core/skmsg.c:1008 [inline]
->  sk_psock_verdict_recv+0x3e4/0x4a0 net/core/skmsg.c:1202
->  unix_read_skb net/unix/af_unix.c:2546 [inline]
->  unix_stream_read_skb+0x9e/0xf0 net/unix/af_unix.c:2682
->  sk_psock_verdict_data_ready+0x77/0x220 net/core/skmsg.c:1223
->  unix_stream_sendmsg+0x527/0x860 net/unix/af_unix.c:2339
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0x140/0x180 net/socket.c:745
->  ____sys_sendmsg+0x312/0x410 net/socket.c:2584
->  ___sys_sendmsg net/socket.c:2638 [inline]
->  __sys_sendmsg+0x1e9/0x280 net/socket.c:2667
->  __do_sys_sendmsg net/socket.c:2676 [inline]
->  __se_sys_sendmsg net/socket.c:2674 [inline]
->  __x64_sys_sendmsg+0x46/0x50 net/socket.c:2674
->  do_syscall_64+0xd3/0x1d0
->  entry_SYSCALL_64_after_hwframe+0x6d/0x75
->
-> value changed: 0xffffffff83d7feb0 -> 0x0000000000000000
->
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 0 PID: 10713 Comm: syz-executor.4 Tainted: G        W          6.8.0=
--syzkaller-08951-gfe46a7dd189e #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 02/29/2024
->
-> Prior to this, commit 4cd12c6065df ("bpf, sockmap: Fix NULL pointer
-> dereference in sk_psock_verdict_data_ready()") fixed one NULL pointer
-> similarly due to no protection of saved_data_ready. Here is another
-> different caller causing the same issue because of the same reason. So
-> we should protect it with sk_callback_lock read lock because the writer
-> side in the sk_psock_drop() uses "write_lock_bh(&sk->sk_callback_lock);".
+On Wed, Mar 27, 2024 at 01:40:54PM +0100, Krzysztof Kozlowski wrote:
+> Modules registering driver with register_virtio_driver() might forget to
+> set .owner field.  i2c-virtio.c for example has it missing.  The field
+> is used by some of other kernel parts for reference counting
+> (try_module_get()), so it is expected that drivers will set it.
+> 
+> Solve the problem by moving this task away from the drivers to the core
+> amba bus code, just like we did for platform_driver in
+> commit 9447057eaff8 ("platform_device: use a macro instead of
+> platform_driver_register").
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Should I use 'read_lock(&sk->sk_callback_lock);' in bpf_tcp_ingress()
-to protect sk_callback_lock field? If it's ok, I will do it in another
-patch.
 
-Thanks,
-Jason
 
->
-> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
-> Reported-by: syzbot+aa8c8ec2538929f18f2d@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Daa8c8ec2538929f18f2d
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+This makes sense. So this will be:
+
+Fixes: 3cfc88380413 ("i2c: virtio: add a virtio i2c frontend driver")
+Cc: "Jie Deng" <jie.deng@intel.com>
+
+and I think I will pick this patch for this cycle to fix
+the bug. The cleanups can go in the next cycle.
+
+
 > ---
->  net/core/skmsg.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index 4d75ef9d24bf..67c4c01c5235 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -552,7 +552,9 @@ static int sk_psock_skb_ingress_enqueue(struct sk_buf=
-f *skb,
->         msg->skb =3D skb;
->
->         sk_psock_queue_msg(psock, msg);
-> +       read_lock_bh(&sk->sk_callback_lock);
->         sk_psock_data_ready(sk, psock);
-> +       read_unlock_bh(&sk->sk_callback_lock);
->         return copied;
+>  Documentation/driver-api/virtio/writing_virtio_drivers.rst | 1 -
+>  drivers/virtio/virtio.c                                    | 6 ++++--
+>  include/linux/virtio.h                                     | 7 +++++--
+>  3 files changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/driver-api/virtio/writing_virtio_drivers.rst b/Documentation/driver-api/virtio/writing_virtio_drivers.rst
+> index e14c58796d25..e5de6f5d061a 100644
+> --- a/Documentation/driver-api/virtio/writing_virtio_drivers.rst
+> +++ b/Documentation/driver-api/virtio/writing_virtio_drivers.rst
+> @@ -97,7 +97,6 @@ like this::
+>  
+>  	static struct virtio_driver virtio_dummy_driver = {
+>  		.driver.name =  KBUILD_MODNAME,
+> -		.driver.owner = THIS_MODULE,
+>  		.id_table =     id_table,
+>  		.probe =        virtio_dummy_probe,
+>  		.remove =       virtio_dummy_remove,
+> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> index f173587893cb..9510c551dce8 100644
+> --- a/drivers/virtio/virtio.c
+> +++ b/drivers/virtio/virtio.c
+> @@ -362,14 +362,16 @@ static const struct bus_type virtio_bus = {
+>  	.remove = virtio_dev_remove,
+>  };
+>  
+> -int register_virtio_driver(struct virtio_driver *driver)
+> +int __register_virtio_driver(struct virtio_driver *driver, struct module *owner)
+>  {
+>  	/* Catch this early. */
+>  	BUG_ON(driver->feature_table_size && !driver->feature_table);
+>  	driver->driver.bus = &virtio_bus;
+> +	driver->driver.owner = owner;
+> +
+>  	return driver_register(&driver->driver);
 >  }
->
-> --
-> 2.37.3
->
+> -EXPORT_SYMBOL_GPL(register_virtio_driver);
+> +EXPORT_SYMBOL_GPL(__register_virtio_driver);
+>  
+>  void unregister_virtio_driver(struct virtio_driver *driver)
+>  {
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index b0201747a263..26c4325aa373 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -170,7 +170,7 @@ size_t virtio_max_dma_size(const struct virtio_device *vdev);
+>  
+>  /**
+>   * struct virtio_driver - operations for a virtio I/O driver
+> - * @driver: underlying device driver (populate name and owner).
+> + * @driver: underlying device driver (populate name).
+>   * @id_table: the ids serviced by this driver.
+>   * @feature_table: an array of feature numbers supported by this driver.
+>   * @feature_table_size: number of entries in the feature table array.
+> @@ -208,7 +208,10 @@ static inline struct virtio_driver *drv_to_virtio(struct device_driver *drv)
+>  	return container_of(drv, struct virtio_driver, driver);
+>  }
+>  
+> -int register_virtio_driver(struct virtio_driver *drv);
+> +/* use a macro to avoid include chaining to get THIS_MODULE */
+> +#define register_virtio_driver(drv) \
+> +	__register_virtio_driver(drv, THIS_MODULE)
+> +int __register_virtio_driver(struct virtio_driver *drv, struct module *owner);
+>  void unregister_virtio_driver(struct virtio_driver *drv);
+>  
+>  /* module_virtio_driver() - Helper macro for drivers that don't do
+> 
+> -- 
+> 2.34.1
+
 
