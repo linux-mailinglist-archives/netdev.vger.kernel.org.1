@@ -1,207 +1,124 @@
-Return-Path: <netdev+bounces-83580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB848931AB
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 15:23:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D91218931B9
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 15:43:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B16D8281F37
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 13:23:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D97F282084
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 13:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6061448F5;
-	Sun, 31 Mar 2024 13:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171D51448F2;
+	Sun, 31 Mar 2024 13:43:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fn2rK449"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="llXxBf08"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9222EB08;
-	Sun, 31 Mar 2024 13:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0687B286AC;
+	Sun, 31 Mar 2024 13:43:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711891389; cv=none; b=LPxdNPTQYubClB+XrBga/fM3q6b52sArWKdtMvUMFTuO3Tej33gYNZiFiv4pnAPcmdwPBP2hWK7cBgt3+48fRjN3K+neN9F9zziSj7LdkEs9bmmBevxCnTwoq5Mm35gxgltZGga6VgLzqkVQXdQi8YASKsCaN9S+SYOG6Tc69no=
+	t=1711892589; cv=none; b=PFa0IEZfh70ay22iLAePWbcuh+6q6PDwpPWypbMQyiFEGU6M3DfU5bht7bIGRN+w4OmfiB6zH14vCBMZFzjADe4+shmaHZdt/hRyp0PwZYwR2dkfS1eFPRvTQJNhsRjlUSsCJz7zH7Up6KGBE+/yd63Rr8GqZnU1FHYQt3KlN9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711891389; c=relaxed/simple;
-	bh=0JdnalII33ICqSebxleFo2xxjuuYod6bhO/Ywq4s8/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NoqUlETmyZI73zoxV6OcludGi++MNrPXCy3rOOm5RDyI93jqu2eeAsi5vw7e+/yy7SxC/RSgvkcRQLwDh8NBTBMe5ERbg8cDzWdICLXXYX2pZJyxyhc4gJgx/BfUmjK3u5M1OEzpHIKpf1MmpkN6LChuLD1AdlAnX7CefSDV0KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fn2rK449; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711891378; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=DNVFJe7fzXJ46hFedS/yET7Jx+L9l6utZ/e9Xt9A6X8=;
-	b=fn2rK449UwxAktwc06z/gHLkd7nxrhpX7uWiykXzVdT27RatS3BoIPlE5eLtg6xVpZ4vhBovaNpCHm5sBSnjugXpmKstOdcgg8XnbUlUPScpMFRS5/wRJtR0TMJgr9R1dn/nzhr7qwc8K5EOPw/egpB6h/ifdb36uJXH57tgDSM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0W3bgCBV_1711891376;
-Received: from 30.121.31.164(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3bgCBV_1711891376)
-          by smtp.aliyun-inc.com;
-          Sun, 31 Mar 2024 21:22:57 +0800
-Message-ID: <8b6f03a9-1afb-42ef-82aa-7eaf7517133c@linux.alibaba.com>
-Date: Sun, 31 Mar 2024 21:22:55 +0800
+	s=arc-20240116; t=1711892589; c=relaxed/simple;
+	bh=5WAZo0YdO8tl/MrJZpa7MSmvaD8PDaPvNABs/C71lOA=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=aRvUJsRRuxjnsR20KcViJQePpin9HNYjmevU4YvAy1lLyntPyEgCUWbI0Or6pH7AB+ME9ALMjacPHceHWGIy41rClMUXRYRgGfoD7pnFPqcYouosv9dw/ZkLpZGrDBxkqTMNhWyI3TE3edEF524Nm1Y4pWKbsql3vCfm1DO3M48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=llXxBf08; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42V6tCV4026639;
+	Sun, 31 Mar 2024 13:43:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2023-11-20;
+ bh=SI1+6SSXH/ywVAxQnlKQBvhjdj8fDahRPDX7qgRXuBc=;
+ b=llXxBf08i84mCXGGL1SgRiEu9sne49JNPwzcdyvgOiG8LdN1GmQlXhfpS5EB2Q/SVNqz
+ 4MZNHWndvBpFc688GPlG4Tp9bmhoVbxs0X3e/VRz5hjsjmBAh0wCQ+7hFdhLRSy/6ny0
+ YQSauFnWQwPhLcXjhBWrh9qn9Vtzqlp9z4rzDyABupNJ2FNfeEz+pQcFO7v5eUbOhJ5c
+ X/6wHiuzLjdbkn6kh3Ij13HuQ1rpQuzZn+OCRjPVTZ05zCAnXcQm/ylFWTkVz8yxLNyU
+ K2q/4puxzqIwwWU6SQm/ja8Cgepl899Pm2i8rOeKXOhiGVWw6/pGOxDv+Nt2bwUlcFz4 3Q== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3x695eh62y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 31 Mar 2024 13:43:01 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 42VBVW70040452;
+	Sun, 31 Mar 2024 13:43:00 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3x6964hgwk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 31 Mar 2024 13:43:00 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42VDgxX3015876;
+	Sun, 31 Mar 2024 13:42:59 GMT
+Received: from ca-common-hq.us.oracle.com (ca-common-hq.us.oracle.com [10.211.9.209])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3x6964hgud-1;
+	Sun, 31 Mar 2024 13:42:59 +0000
+From: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
+To: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        maheshb@google.com, edumazet@google.com
+Cc: gia-khanh.nguyen@oracle.com
+Subject: [PATCH net-next] Add handling of NETDEV_DOWN event
+Date: Sun, 31 Mar 2024 06:41:28 -0700
+Message-Id: <1711892489-27931-1-git-send-email-venkat.x.venkatsubra@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-31_10,2024-03-28_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0
+ mlxlogscore=999 adultscore=0 bulkscore=0 phishscore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403210000 definitions=main-2403310104
+X-Proofpoint-GUID: ogmosjuspuc58hl-5uxRx0Nw0uQii6ia
+X-Proofpoint-ORIG-GUID: ogmosjuspuc58hl-5uxRx0Nw0uQii6ia
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] virtio_net: Do not send RSS key if it is not
- supported
-To: Breno Leitao <leitao@debian.org>
-Cc: rbc@meta.com, riel@surriel.com, stable@vger.kernel.org,
- qemu-devel@nongnu.org,
- "open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Melnychenko <andrew@daynix.com>
-References: <20240329171641.366520-1-leitao@debian.org>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240329171641.366520-1-leitao@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
+When ethP is the parent interface of ipvlan interface ethC,
+and you do
 
+# ip link set ethP down
 
-在 2024/3/30 上午1:16, Breno Leitao 写道:
-> There is a bug when setting the RSS options in virtio_net that can break
-> the whole machine, getting the kernel into an infinite loop.
->
-> Running the following command in any QEMU virtual machine with virtionet
-> will reproduce this problem:
->
->      # ethtool -X eth0  hfunc toeplitz
->
-> This is how the problem happens:
->
-> 1) ethtool_set_rxfh() calls virtnet_set_rxfh()
->
-> 2) virtnet_set_rxfh() calls virtnet_commit_rss_command()
->
-> 3) virtnet_commit_rss_command() populates 4 entries for the rss
-> scatter-gather
->
-> 4) Since the command above does not have a key, then the last
-> scatter-gatter entry will be zeroed, since rss_key_size == 0.
-> sg_buf_size = vi->rss_key_size;
->
-> 5) This buffer is passed to qemu, but qemu is not happy with a buffer
-> with zero length, and do the following in virtqueue_map_desc() (QEMU
-> function):
->
->    if (!sz) {
->        virtio_error(vdev, "virtio: zero sized buffers are not allowed");
->
-> 6) virtio_error() (also QEMU function) set the device as broken
->
->      vdev->broken = true;
->
-> 7) Qemu bails out, and do not repond this crazy kernel.
->
-> 8) The kernel is waiting for the response to come back (function
-> virtnet_send_command())
->
-> 9) The kernel is waiting doing the following :
->
->        while (!virtqueue_get_buf(vi->cvq, &tmp) &&
-> 	     !virtqueue_is_broken(vi->cvq))
-> 	      cpu_relax();
->
-> 10) None of the following functions above is true, thus, the kernel
-> loops here forever. Keeping in mind that virtqueue_is_broken() does
-> not look at the qemu `vdev->broken`, so, it never realizes that the
-> vitio is broken at QEMU side.
->
-> Fix it by not sending RSS commands if the feature is not available in
-> the device.
->
-> Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
-> Cc: stable@vger.kernel.org
-> Cc: qemu-devel@nongnu.org
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
-> Changelog:
->
-> V2:
->    * Moved from creating a valid packet, by rejecting the request
->      completely
-> V3:
->    * Got some good feedback from and Xuan Zhuo and Heng Qi, and reworked
->      the rejection path.
->
-> ---
->   drivers/net/virtio_net.c | 22 ++++++++++++++++++----
->   1 file changed, 18 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c22d1118a133..c4a21ec51adf 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3807,6 +3807,7 @@ static int virtnet_set_rxfh(struct net_device *dev,
->   			    struct netlink_ext_ack *extack)
->   {
->   	struct virtnet_info *vi = netdev_priv(dev);
-> +	bool update = false;
->   	int i;
->   
->   	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-> @@ -3814,13 +3815,24 @@ static int virtnet_set_rxfh(struct net_device *dev,
->   		return -EOPNOTSUPP;
->   
->   	if (rxfh->indir) {
-> +		if (!vi->has_rss)
-> +			return -EOPNOTSUPP;
-> +
->   		for (i = 0; i < vi->rss_indir_table_size; ++i)
->   			vi->ctrl->rss.indirection_table[i] = rxfh->indir[i];
-> +		update = true;
->   	}
-> -	if (rxfh->key)
-> +
-> +	if (rxfh->key) {
-> +		if (!vi->has_rss && !vi->has_rss_hash_report)
-> +			return -EOPNOTSUPP;
-> +
->   		memcpy(vi->ctrl->rss.key, rxfh->key, vi->rss_key_size);
-> +		update = true;
-> +	}
->   
-> -	virtnet_commit_rss_command(vi);
-> +	if (update)
-> +		virtnet_commit_rss_command(vi);
->   
->   	return 0;
->   }
-> @@ -4729,13 +4741,15 @@ static int virtnet_probe(struct virtio_device *vdev)
->   	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
->   		vi->has_rss_hash_report = true;
->   
-> -	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS))
-> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
->   		vi->has_rss = true;
->   
-> -	if (vi->has_rss || vi->has_rss_hash_report) {
->   		vi->rss_indir_table_size =
->   			virtio_cread16(vdev, offsetof(struct virtio_net_config,
->   				rss_max_indirection_table_length));
-> +	}
-> +
-> +	if (vi->has_rss || vi->has_rss_hash_report) {
->   		vi->rss_key_size =
->   			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
->   
+ethC's link state is not brought down.
 
-Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
+In the below example, ens5 is the host interface which is the 
+parent of the ipvlan interface eth0 in the container.
 
-Thanks.
+Host:
 
+[root@gkn-podman-x64 ~]# ip link set ens5 down
+[root@gkn-podman-x64 ~]# ip -d link show dev ens5
+3: ens5: <BROADCAST,MULTICAST> mtu 9000 qdisc mq state DOWN 
+      ...
+[root@gkn-podman-x64 ~]#
 
+Container:
+
+[root@testnode-ol8 /]# ip -d link show dev eth0
+2: eth0@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9000 state UNKNOWN 
+        ...
+    ipvlan mode l2 bridge 
+[root@testnode-ol8 /]#
+
+eth0 continues to remain UP.
+
+macvlan already addresses this handling of NETDEV_DOWN event.
+Adding the same functionality to ipvlan.
+
+Venkat Venkatsubra (1):
+  ipvlan: handle NETDEV_DOWN event
+
+ drivers/net/ipvlan/ipvlan_main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+-- 
+1.8.3.1
 
 
