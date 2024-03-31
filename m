@@ -1,94 +1,88 @@
-Return-Path: <netdev+bounces-83688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 012478935B8
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 22:20:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D15D98935E2
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 22:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2162C1C21514
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 20:20:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86D08284EA5
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 20:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3031474D9;
-	Sun, 31 Mar 2024 20:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3385F1482EA;
+	Sun, 31 Mar 2024 20:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwEQXYEG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjISdKjJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99375145B0E
-	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 20:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588DA433A6
+	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 20:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711916444; cv=none; b=AVBxG9S11G8H5G7/fvxyl6xw/lkUl9b2uUxLi/YC58eNXiAiSsXX8PdER3+AxlXgO2X0I57JmoGZUPQhmNAXw7RVg9yolj27gEwY8NiO+NsKHx+fgOUsYVwetoS9zoPgZcQR2OA4Hqb9LkZFqwtQYj/Jm6T/D4jad20nTRRWLqA=
+	t=1711917031; cv=none; b=H+e9NOa864MYM0+cLlMEEY3evNXHHZ6Nkv0weGpaaRN2/VOs2N9wEeUOgGeW0qxv47UquWSKFH4ZEKXGQ4gqaCavmGqhUe6v8Uo2ImO3pRYo7l9gG8jYk9/4Sk6MSS1LI47gkgUxzuY6migl2XA8zYnVXg6CG2E+dTVkbC4H2Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711916444; c=relaxed/simple;
-	bh=pw6ynhZlliocTZxNsLu4uszjDWeDXBnouTCCdjYhWiY=;
+	s=arc-20240116; t=1711917031; c=relaxed/simple;
+	bh=zKeTMexv2M9gZTFL99lSfrRPEl4ZwfNguWU3Tzt2U7Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VJ0uQ5W2l43bCPGyg4gbLZEN7aPhAhbDeQ+QA2/mRBX5K48m23Rt+V4OMttlPtGxaB3LGlEFbSB173slwsIKmbu66Gq0tXmAJf+BEJI7IO2vJqdJuXak3xWByWTfM8EgwNe566AaEHzBbiH0z4pth7hCyp2H0ZZR31Yvp4E4jfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dwEQXYEG; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=HlwoN8FUWpFti1PRR/POzO9CbnJmbN6OZFTAYK2YZBCBdB5huB30Usoit67fq6YDdXUHRMe1ofv3XvQAup+j0NHamoknHGd+IwQgPLeHs4TSP39Ongfakv0XFkcisWNgNosAh6iluVDv39BQJnJOpXBJ4vCdkxL9mZJDjmG5bQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WjISdKjJ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711916441;
+	s=mimecast20190719; t=1711917028;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FRRVj/JjKizxzXFDRSo3l/T54pHZqeXumE93BFWpnkg=;
-	b=dwEQXYEGH0YB+fDeXVH7gGwKA45ulahfDCZOP+GVq4aXoIU5LRKQjIbpWK9hOlcuVe/7K6
-	+Z37tFSU8ZviF/ivDUMyT7f8BkENemiKi6ER5lE2fIOWq+SrVBcFIE/7doOkAmZjVTvIMW
-	AJ7uHenA7DeA/NRGcLTcCXQR20z5nVo=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=YS9a3ltUP9MHJSlPOoblUJDC1YtE0AudZuifCNAqSJM=;
+	b=WjISdKjJsaFcjSeIWt9V61s22D9gdcwm9xxg4KrMJOPuNkUAldn8/fxovuBixPW7dnmySM
+	zIRr9eGke+nnSIbyu35uHwQaSuBxBZI+obfEHqfkFjVcXXbPAQxq39GVwTcPV8uhNe+aYC
+	D4pS+yUQaE+5I6DQu/3ZhiJb3a1bR2I=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-50-PH_poJfpP5uXiAoXF3C_GQ-1; Sun, 31 Mar 2024 16:20:39 -0400
-X-MC-Unique: PH_poJfpP5uXiAoXF3C_GQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a466c7b0587so253960366b.0
-        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 13:20:39 -0700 (PDT)
+ us-mta-34-ZQeSQiKQP4iajzqBR6AQkA-1; Sun, 31 Mar 2024 16:30:26 -0400
+X-MC-Unique: ZQeSQiKQP4iajzqBR6AQkA-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5689f41cf4dso2948115a12.3
+        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 13:30:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711916438; x=1712521238;
+        d=1e100.net; s=20230601; t=1711917025; x=1712521825;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FRRVj/JjKizxzXFDRSo3l/T54pHZqeXumE93BFWpnkg=;
-        b=Fqhqhwyz9ysIQbOqOtuCdO7ls+b0uIN/98X/R/Z7ikubPNOahPKTWtwyYd1Biqba58
-         7jXXOCmBHTw82qXAxnc/uFzJmWK0gIfiRTH9GAcNVmZ9A0TpQGk8vQSRtZxlpABYOSJc
-         Ydp/1td/zXL7kFR4yvNeksRo6ZV4VEaoheV+YHawJWv37TIGnJDVbu4G9kQmIFft2B46
-         uudhbhmZKRRdNFsqWNbIsS2/Nx5BowojJbQL8TqDF0QKUmITvg8tj+o3ULJtBQoHV6q+
-         gEVBTDc2pgyTx6AQbMie+nEI8xJUSQ/OfXTdtzvxPbw2FSP9eJMe3v0s0HQ0Y1A5uSmc
-         9ypg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJSmjwXYWHaBC7yFQ82VjYsBVwDGjvKDP9sLMcvfksJ/HlkwI73ghvcgp5qqCDgHJ8yrgkHey7q3K41UwbUCaJUz/Z1Ma9
-X-Gm-Message-State: AOJu0Yx58qzVmDmuFpIrXfbEGjEHK4jZMnABi/8hiNizh837Jrvz9th+
-	c+UrbK02TGtcG0apwzDv/YedM7OzMZ+UrnwBaOxtkv+RCnx9ZfeTrrPllR9hel8xf2d46nBMW3j
-	o/F37X/IrY5413yWe7gXwSpwMx+TV9dFKcldTOZbyn0YYsIBxFmtz+w==
-X-Received: by 2002:a17:907:3181:b0:a4e:663a:3cf4 with SMTP id xe1-20020a170907318100b00a4e663a3cf4mr1328714ejb.6.1711916438434;
-        Sun, 31 Mar 2024 13:20:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpknzv8VBlqoGJZhO+j/gEtYVNu8noUyOMoh3rGDewOFPJPPTVRdkL5QIIU1wPMo3a8degxA==
-X-Received: by 2002:a17:907:3181:b0:a4e:663a:3cf4 with SMTP id xe1-20020a170907318100b00a4e663a3cf4mr1328694ejb.6.1711916437852;
-        Sun, 31 Mar 2024 13:20:37 -0700 (PDT)
+        bh=YS9a3ltUP9MHJSlPOoblUJDC1YtE0AudZuifCNAqSJM=;
+        b=oM2eb3xosTDfMxlnlgO1xIBm6qbe0jlK1aOiYPf/CT/ShmFSnx0powv7HoKfqyZpfi
+         53K2uq44w/dXUZ5RbtLHhwHGBi8SBpOt7IiLsEAJWKpJXS4n7wuA4dTaPE2TW9rl37bk
+         ddlQwddDu3VDGG5UstMsxjeX4zkhK3l8N0lI2zUlenzwnDsapQDHQwiK+UcOZgPXWMx7
+         I/yJcktcYgTtng1ePe6WGKsBVnblnoU5zYlOJm61rfpA5rtrvQlyApJj58iR5g01Gsx5
+         fPTAiujeDRK+SSdZIVIikY2HjvN3LpFXk58i69RGM4CtnXtidDQ3yFUBbS4WlozW8rWR
+         QALA==
+X-Forwarded-Encrypted: i=1; AJvYcCWzT7DcXzBsEcCXcPLzmHYw9lgmFptUr0f55zPpTtLJqBLKAFHbuQVgnuDtDuieKX31doSdbwvi+s9LsP79VzNA/FTN+G2M
+X-Gm-Message-State: AOJu0YxGXoWw8E3ld2gk3A6qKQSfuecC+h29fKe3oL1FO7Yj1Mm25cTT
+	gaRGE0KMmaUKx3QRTjRr13E6mmOFbimwX3WQECHOws6E0uxqQaYQMqp5oDMDbRHUMiFRez/1Cgi
+	E5iG3mGp4akgKIet8CymZRUTqs4IpM2blkGCMQVe9cbRwE/p69p9z8Q==
+X-Received: by 2002:a50:8d07:0:b0:56c:17be:5b03 with SMTP id s7-20020a508d07000000b0056c17be5b03mr5781234eds.36.1711917024842;
+        Sun, 31 Mar 2024 13:30:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGsaZkRJsBtE3C/KRuI5NnqdY65rPDdd/YOopmOpx1kVws7xNKoe8KhbCY/E8xsXpyk75bzxw==
+X-Received: by 2002:a50:8d07:0:b0:56c:17be:5b03 with SMTP id s7-20020a508d07000000b0056c17be5b03mr5781222eds.36.1711917024296;
+        Sun, 31 Mar 2024 13:30:24 -0700 (PDT)
 Received: from redhat.com ([2a02:14f:172:9c27:9486:684f:de6:8ab8])
-        by smtp.gmail.com with ESMTPSA id q2-20020a170906b28200b00a4655976025sm4495364ejz.82.2024.03.31.13.20.33
+        by smtp.gmail.com with ESMTPSA id bf18-20020a0564021a5200b0056bd13ce50esm4752138edb.44.2024.03.31.13.30.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Mar 2024 13:20:37 -0700 (PDT)
-Date: Sun, 31 Mar 2024 16:20:30 -0400
+        Sun, 31 Mar 2024 13:30:23 -0700 (PDT)
+Date: Sun, 31 Mar 2024 16:30:19 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: hengqi@linux.alibaba.com, xuanzhuo@linux.alibaba.com,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Melnychenko <andrew@daynix.com>, rbc@meta.com,
-	riel@surriel.com, stable@vger.kernel.org, qemu-devel@nongnu.org,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v3] virtio_net: Do not send RSS key if it is not
- supported
-Message-ID: <20240331160618-mutt-send-email-mst@kernel.org>
-References: <20240329171641.366520-1-leitao@debian.org>
+To: syzbot <syzbot+689655a7402cc18ace0a@syzkaller.appspotmail.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, jasowang@redhat.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [syzbot] [virtualization?] bpf boot error: WARNING: refcount bug
+ in __free_pages_ok
+Message-ID: <20240331162212-mutt-send-email-mst@kernel.org>
+References: <0000000000002aea130614e28812@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,144 +91,153 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240329171641.366520-1-leitao@debian.org>
+In-Reply-To: <0000000000002aea130614e28812@google.com>
 
-On Fri, Mar 29, 2024 at 10:16:41AM -0700, Breno Leitao wrote:
-> There is a bug when setting the RSS options in virtio_net that can break
-> the whole machine, getting the kernel into an infinite loop.
+On Sat, Mar 30, 2024 at 08:37:19AM -0700, syzbot wrote:
+> Hello,
 > 
-> Running the following command in any QEMU virtual machine with virtionet
-> will reproduce this problem:
+> syzbot found the following issue on:
 > 
->     # ethtool -X eth0  hfunc toeplitz
+> HEAD commit:    6dae957c8eef bpf: fix possible file descriptor leaks in ve..
+> git tree:       bpf
+> console output: https://syzkaller.appspot.com/x/log.txt?x=14ec025e180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=7b667bc37450fdcd
+> dashboard link: https://syzkaller.appspot.com/bug?extid=689655a7402cc18ace0a
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 > 
-> This is how the problem happens:
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/94b03853b65f/disk-6dae957c.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/7375c1b6b108/vmlinux-6dae957c.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/126013ac11e1/bzImage-6dae957c.xz
 > 
-> 1) ethtool_set_rxfh() calls virtnet_set_rxfh()
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+689655a7402cc18ace0a@syzkaller.appspotmail.com
 > 
-> 2) virtnet_set_rxfh() calls virtnet_commit_rss_command()
-> 
-> 3) virtnet_commit_rss_command() populates 4 entries for the rss
-> scatter-gather
-> 
-> 4) Since the command above does not have a key, then the last
-> scatter-gatter entry will be zeroed, since rss_key_size == 0.
-> sg_buf_size = vi->rss_key_size;
-> 
-> 5) This buffer is passed to qemu, but qemu is not happy with a buffer
-> with zero length, and do the following in virtqueue_map_desc() (QEMU
-> function):
-> 
->   if (!sz) {
->       virtio_error(vdev, "virtio: zero sized buffers are not allowed");
-> 
-> 6) virtio_error() (also QEMU function) set the device as broken
-> 
->     vdev->broken = true;
-> 
-> 7) Qemu bails out, and do not repond this crazy kernel.
-> 
-> 8) The kernel is waiting for the response to come back (function
-> virtnet_send_command())
-> 
-> 9) The kernel is waiting doing the following :
-> 
->       while (!virtqueue_get_buf(vi->cvq, &tmp) &&
-> 	     !virtqueue_is_broken(vi->cvq))
-> 	      cpu_relax();
-> 
-> 10) None of the following functions above is true, thus, the kernel
-> loops here forever. Keeping in mind that virtqueue_is_broken() does
-> not look at the qemu `vdev->broken`, so, it never realizes that the
-> vitio is broken at QEMU side.
-> 
-> Fix it by not sending RSS commands if the feature is not available in
-> the device.
-> 
-> Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
-> Cc: stable@vger.kernel.org
+> Key type pkcs7_test registered
+> Block layer SCSI generic (bsg) driver version 0.4 loaded (major 239)
+> io scheduler mq-deadline registered
+> io scheduler kyber registered
+> io scheduler bfq registered
+> input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+> ACPI: button: Power Button [PWRF]
+> input: Sleep Button as /devices/LNXSYSTM:00/LNXSLPBN:00/input/input1
+> ACPI: button: Sleep Button [SLPF]
+> ioatdma: Intel(R) QuickData Technology Driver 5.00
+> ACPI: \_SB_.LNKC: Enabled at IRQ 11
+> virtio-pci 0000:00:03.0: virtio_pci: leaving for legacy driver
+> ACPI: \_SB_.LNKD: Enabled at IRQ 10
+> virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy driver
+> ACPI: \_SB_.LNKB: Enabled at IRQ 10
+> virtio-pci 0000:00:06.0: virtio_pci: leaving for legacy driver
+> virtio-pci 0000:00:07.0: virtio_pci: leaving for legacy driver
+> N_HDLC line discipline registered with maxframe=4096
+> Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+> 00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+> 00:04: ttyS1 at I/O 0x2f8 (irq = 3, base_baud = 115200) is a 16550A
+> 00:05: ttyS2 at I/O 0x3e8 (irq = 6, base_baud = 115200) is a 16550A
+> 00:06: ttyS3 at I/O 0x2e8 (irq = 7, base_baud = 115200) is a 16550A
+> Non-volatile memory driver v1.3
+> Linux agpgart interface v0.103
+> ACPI: bus type drm_connector registered
+> [drm] Initialized vgem 1.0.0 20120112 for vgem on minor 0
+> [drm] Initialized vkms 1.0.0 20180514 for vkms on minor 1
+> Console: switching to colour frame buffer device 128x48
+> platform vkms: [drm] fb0: vkmsdrmfb frame buffer device
+> usbcore: registered new interface driver udl
+> brd: module loaded
+> loop: module loaded
+> zram: Added device: zram0
+> null_blk: disk nullb0 created
+> null_blk: module loaded
+> Guest personality initialized and is inactive
+> VMCI host device registered (name=vmci, major=10, minor=118)
+> Initialized host personality
+> usbcore: registered new interface driver rtsx_usb
+> usbcore: registered new interface driver viperboard
+> usbcore: registered new interface driver dln2
+> usbcore: registered new interface driver pn533_usb
+> nfcsim 0.2 initialized
+> usbcore: registered new interface driver port100
+> usbcore: registered new interface driver nfcmrvl
+> Loading iSCSI transport class v2.0-870.
+> virtio_scsi virtio0: 1/0/0 default/read/poll queues
+> ------------[ cut here ]------------
+> refcount_t: decrement hit 0; leaking memory.
+> WARNING: CPU: 1 PID: 1 at lib/refcount.c:31 refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
+> Modules linked in:
+> CPU: 1 PID: 1 Comm: swapper/0 Not tainted 6.9.0-rc1-syzkaller-00160-g6dae957c8eef #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+> RIP: 0010:refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
+> Code: b2 00 00 00 e8 97 cf e9 fc 5b 5d c3 cc cc cc cc e8 8b cf e9 fc c6 05 8e 73 e8 0a 01 90 48 c7 c7 e0 33 1f 8c e8 c7 6b ac fc 90 <0f> 0b 90 90 eb d9 e8 6b cf e9 fc c6 05 6b 73 e8 0a 01 90 48 c7 c7
+> RSP: 0000:ffffc90000066e18 EFLAGS: 00010246
+> RAX: eee901a1fb7e2300 RBX: ffff888146687e7c RCX: ffff8880166d0000
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: 0000000000000004 R08: ffffffff815800c2 R09: fffffbfff1c396e0
+> R10: dffffc0000000000 R11: fffffbfff1c396e0 R12: ffffea000502edc0
+> R13: ffffea000502edc8 R14: 1ffffd4000a05db9 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000000 CR3: 000000000e132000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  reset_page_owner include/linux/page_owner.h:25 [inline]
+>  free_pages_prepare mm/page_alloc.c:1141 [inline]
+>  __free_pages_ok+0xc60/0xd90 mm/page_alloc.c:1270
+>  make_alloc_exact+0xa3/0xf0 mm/page_alloc.c:4829
+>  vring_alloc_queue drivers/virtio/virtio_ring.c:319 [inline]
+>  vring_alloc_queue_split+0x20a/0x600 drivers/virtio/virtio_ring.c:1108
+>  vring_create_virtqueue_split+0xc6/0x310 drivers/virtio/virtio_ring.c:1158
+>  vring_create_virtqueue+0xca/0x110 drivers/virtio/virtio_ring.c:2683
+>  setup_vq+0xe9/0x2d0 drivers/virtio/virtio_pci_legacy.c:131
+>  vp_setup_vq+0xbf/0x330 drivers/virtio/virtio_pci_common.c:189
+>  vp_find_vqs_msix+0x8b2/0xc80 drivers/virtio/virtio_pci_common.c:331
+>  vp_find_vqs+0x4c/0x4e0 drivers/virtio/virtio_pci_common.c:408
+>  virtio_find_vqs include/linux/virtio_config.h:233 [inline]
+>  virtscsi_init+0x8db/0xd00 drivers/scsi/virtio_scsi.c:887
+>  virtscsi_probe+0x3ea/0xf60 drivers/scsi/virtio_scsi.c:945
+>  virtio_dev_probe+0x991/0xaf0 drivers/virtio/virtio.c:311
+>  really_probe+0x2b8/0xad0 drivers/base/dd.c:656
+>  __driver_probe_device+0x1a2/0x390 drivers/base/dd.c:798
+>  driver_probe_device+0x50/0x430 drivers/base/dd.c:828
+>  __driver_attach+0x45f/0x710 drivers/base/dd.c:1214
+>  bus_for_each_dev+0x239/0x2b0 drivers/base/bus.c:368
+>  bus_add_driver+0x347/0x620 drivers/base/bus.c:673
+>  driver_register+0x23a/0x320 drivers/base/driver.c:246
+>  virtio_scsi_init+0x65/0xe0 drivers/scsi/virtio_scsi.c:1083
+>  do_one_initcall+0x248/0x880 init/main.c:1238
+>  do_initcall_level+0x157/0x210 init/main.c:1300
+>  do_initcalls+0x3f/0x80 init/main.c:1316
+>  kernel_init_freeable+0x435/0x5d0 init/main.c:1548
+>  kernel_init+0x1d/0x2b0 init/main.c:1437
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+>  </TASK>
 
-net has its own stable process, don't CC stable on net patches.
+We keep seeing this report and I'm stumped.
+Jason any idea?
 
-
-> Cc: qemu-devel@nongnu.org
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+> 
 > ---
-> Changelog:
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
 > 
-> V2:
->   * Moved from creating a valid packet, by rejecting the request
->     completely
-> V3:
->   * Got some good feedback from and Xuan Zhuo and Heng Qi, and reworked
->     the rejection path.
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 > 
-> ---
->  drivers/net/virtio_net.c | 22 ++++++++++++++++++----
->  1 file changed, 18 insertions(+), 4 deletions(-)
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
 > 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c22d1118a133..c4a21ec51adf 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3807,6 +3807,7 @@ static int virtnet_set_rxfh(struct net_device *dev,
->  			    struct netlink_ext_ack *extack)
->  {
->  	struct virtnet_info *vi = netdev_priv(dev);
-> +	bool update = false;
->  	int i;
->  
->  	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-> @@ -3814,13 +3815,24 @@ static int virtnet_set_rxfh(struct net_device *dev,
->  		return -EOPNOTSUPP;
->  
->  	if (rxfh->indir) {
-> +		if (!vi->has_rss)
-> +			return -EOPNOTSUPP;
-> +
->  		for (i = 0; i < vi->rss_indir_table_size; ++i)
->  			vi->ctrl->rss.indirection_table[i] = rxfh->indir[i];
-> +		update = true;
->  	}
-> -	if (rxfh->key)
-> +
-> +	if (rxfh->key) {
-> +		if (!vi->has_rss && !vi->has_rss_hash_report)
-> +			return -EOPNOTSUPP;
-
-
-What's the logic here? Is it || or &&? A comment can't hurt.
-
-> +
->  		memcpy(vi->ctrl->rss.key, rxfh->key, vi->rss_key_size);
-> +		update = true;
-> +	}
->  
-> -	virtnet_commit_rss_command(vi);
-> +	if (update)
-> +		virtnet_commit_rss_command(vi);
->  
->  	return 0;
->  }
-> @@ -4729,13 +4741,15 @@ static int virtnet_probe(struct virtio_device *vdev)
->  	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
->  		vi->has_rss_hash_report = true;
->  
-> -	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS))
-> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
->  		vi->has_rss = true;
->  
-> -	if (vi->has_rss || vi->has_rss_hash_report) {
->  		vi->rss_indir_table_size =
->  			virtio_cread16(vdev, offsetof(struct virtio_net_config,
->  				rss_max_indirection_table_length));
-> +	}
-> +
-> +	if (vi->has_rss || vi->has_rss_hash_report) {
->  		vi->rss_key_size =
->  			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
->  
-> -- 
-> 2.43.0
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
 
