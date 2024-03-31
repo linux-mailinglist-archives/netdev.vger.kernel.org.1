@@ -1,197 +1,223 @@
-Return-Path: <netdev+bounces-83577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A2289316F
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 13:20:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06BE889318E
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 14:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AACC1F218D8
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 11:20:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FE74281E34
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 12:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179D51448C3;
-	Sun, 31 Mar 2024 11:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB47F144314;
+	Sun, 31 Mar 2024 12:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7i9IAHs"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="Y07VpYWF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32B51442FB
-	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 11:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711884041; cv=none; b=F0E5owfASl/kZxeE8nwwr2mznD4ifmjDa8bNd0qW26GG3HjpBoPtyWXPUQ6zlcUPMmjjvQqhdMcpeiqzGClFtQtPMdS5e1hKZhYjERi8pXzDjn8LEg/3qCjn22lxYLFpfnU8IArQT0alUcEbBHrxkPpaQBnpflwSZAcuALppvaM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711884041; c=relaxed/simple;
-	bh=HA92dRzVt3vZdgr5pQJY02em2UTWtsR+GLFyMiGbHw4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z+bIvAM7zEp10fEy9KXQ02RUwUGMZEf6Q5L5WAtVANwx+XG39iT3ghfrgfKSE6u4o4y8YEH2qj5R7oIurAcI/aGiU4AI8M+wPe17hbJqrvysif5qeYJQ1U8eOpgc/vBAcSsFV5lH0AUEf11J5FnDNfRYb3wj3U4WHToQBarrs0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c7i9IAHs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711884038;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZAFJ+0SeTqdsqNS6GC0N4AccV7yeFgGXHpRB2cwbNo4=;
-	b=c7i9IAHsKuupMX+QQPKbD7KgxC0UmvECMDPWeIvRD1pNKLUFH4axWG4pdtxcuX1LmGnPO3
-	gM2r3MOoObjgNNk0gWim29dzL+FITCqjEbrZuABlRIdOhAzG92Y5aSzV59s9BLlwdbVclF
-	t6IoszosnTZQ9ptY4RWIPTQb15+RIGE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-Db-kotJjNbG3IhsybiX86w-1; Sun, 31 Mar 2024 07:20:35 -0400
-X-MC-Unique: Db-kotJjNbG3IhsybiX86w-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4140bf38378so21134495e9.1
-        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 04:20:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711884034; x=1712488834;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZAFJ+0SeTqdsqNS6GC0N4AccV7yeFgGXHpRB2cwbNo4=;
-        b=F/3aQNBdxkSHhyZ7sW+r1uAGFEGsx4eKSbCrAj19s//XiJemeo3QaDbhbBob8dbvxW
-         PXk6bvLQ7eg836hHb44/KgcBd5EGY9q9NCeYEkWDXs1ZVSGViC3fc8dtHFS2MxuHtKK2
-         v0fDuzlyxWG73qK7+vCdQfT9k1G/FRGqPbsG/KE6oUC7nfCG380hXNlpez3SSgyZx4eV
-         dHEcw2qEA76DAW/bvtRXu9sTo1YmEwGi75Mayg2VUnT5Ptsj+hKmjXMgPl+lfrxkMNwW
-         +P7Qy+2TOe71XVBPNMBMRVhpNdDI4++dVsTLUb8lsAtpFXRTVrtAFXB2PGz3hS8b8yhJ
-         i97Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVGym49xrmVswV6ovgKaMs/MuKME7FZ142a7noVLWScxx1y3z6ExqTvU0C+oS5iU7PXStv9JnHzucBfexiEj775V3QjUFSB
-X-Gm-Message-State: AOJu0Yw3/EaaOGQhTutJpfmVl6b0TN1GZF7WKH26PgJ3b9BaNWiC5mB+
-	5O3F/kmJik9mvQLvxGVK7rBJqy6DkrGe4ZaflHPkB/lSYeFrxvtzcafd2rRPWB7iZbM6aBuinq2
-	FEPsCxwtvjdDgbLIP8AuVvnzEi+Zs2UhAGkuK7csYLIrPAfJrXSSSMA==
-X-Received: by 2002:a05:600c:220f:b0:413:e19:337f with SMTP id z15-20020a05600c220f00b004130e19337fmr6115863wml.22.1711884034569;
-        Sun, 31 Mar 2024 04:20:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEhoN6xvj4jps7JZJhPCGbovoaf04BQIV4BBUP7925nSfWx1HPIV5PQzN7Ku2MIo02ql2sOQw==
-X-Received: by 2002:a05:600c:220f:b0:413:e19:337f with SMTP id z15-20020a05600c220f00b004130e19337fmr6115845wml.22.1711884033951;
-        Sun, 31 Mar 2024 04:20:33 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:173:c52c:ce6f:ec9c:ca7c:7200])
-        by smtp.gmail.com with ESMTPSA id u22-20020a05600c139600b004148d7b889asm14465567wmf.8.2024.03.31.04.20.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Mar 2024 04:20:33 -0700 (PDT)
-Date: Sun, 31 Mar 2024 07:20:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 01/22] virtio: store owner from modules with
- register_virtio_driver()
-Message-ID: <20240331071546-mutt-send-email-mst@kernel.org>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA30290A;
+	Sun, 31 Mar 2024 12:07:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711886869; cv=fail; b=TRHL7Gf4Esi8/RQlnvt3+kRZGJVQq0hd1Y9kaySJnfDosRnjiKRQmKpSaMrkh5mMw4LMHnh3RzqRZoGhVNxch2yiAUtaltVy6/HzIWy6CbGPkwW8yHwk85DacoW47A9C/wttGXRnL5jWkvMhgXnKaRhlT70MnAqLC7zuwNHq34s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711886869; c=relaxed/simple;
+	bh=daogCPqBhWXV63Vka9bV7W+7SXBs/NWzzpJsHSkUpiw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sPUiPraqaDYtzAYJGMgpbxUKSe7ZsGnOvdBbRJpuRGN1kZi9lxf0ADNkmQXud1qrmnw5upGY3nzAdIrYvPU6OgqqCjYm65RRXxIPTXeOqwIruL0esmKFqJ3JjXUx9eYGWWTdWDNQzoG0ZLQy6Ebge7deFCGKAwChGvWO+Pvt3eI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=Y07VpYWF; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42VAgM4q003453;
+	Sun, 31 Mar 2024 05:07:24 -0700
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2040.outbound.protection.outlook.com [104.47.73.40])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3x6j8g25es-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 31 Mar 2024 05:07:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QuA82HrbFDxffSMMFi6ApSoqUmYWr8QNLTOn5vGd1RNbro+zaYUGsM2hojmdUCK9qitpHnEL2s+RjdnxJqHnH8tfhboKin+gbdCMQtTA3wGyYBEHc1TyKmxX9cK54uzrUdsbGj0zlnyYhkyP80uR88GWB7F4iq9r5ld4txtDTlQGPPRPGG72coP/qeQOrrETbCJMIvV/Dv+gLxP80XfGZG4IA254ctS/lMkSWrgMmBs/1maRgYOPOBxuIfCvYaeXvyOh4HNZkgAudCIGFHPbm2j9g3SyEGjfeFhlFtIfxTvkM/wLgsA6SwK64VIeeyI0SN5awIrqnG+FJHmVCYwaMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=daogCPqBhWXV63Vka9bV7W+7SXBs/NWzzpJsHSkUpiw=;
+ b=avJ6BocpzwFHEC19cVxwbjpfETeZ3r02nXuokkQf09+wzh/LIFyr6WB/s2w7PyZ5esS27+8zJgvpXLvEf3nmjQF/YoAVlosquGVM0M8Z5Rhf9Fo2y9+7Ncmwd28hzyYZJZnEHSjob779TK35JJxH7D2LIzki7UbnWC1WyMk+HVtbc14Tb8rJDlE+5hvDP7DXIdOaK1ujqahS7RLjqf9q5nVs7XP7ErltudeEutexlE39d/Y6xOgx8suZcMTmZeX4nS6WVU9BKFHhhe71UyOL6vQ0cRuh1Td3fOl+0vrUyscvyAnJdrBD85j5245jGUmix53Gy0Nv96ScBUElcDbtpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=daogCPqBhWXV63Vka9bV7W+7SXBs/NWzzpJsHSkUpiw=;
+ b=Y07VpYWF/gD3/cxmVffTN5jubYhke3plJAte/V7gkf+yTof98MAc4zb6M+2mjF2WbQAOnFd0aXlUmZTSe45nAK4ivLR0fySoh5hlFmsHMNwehO7ArRnjKtbGoWidGjWv49UOsc4yVaqXrgRBqMrELNoVmDzJtwuXLSCATmeYWak=
+Received: from BY3PR18MB4707.namprd18.prod.outlook.com (2603:10b6:a03:3ca::23)
+ by BN9PR18MB4298.namprd18.prod.outlook.com (2603:10b6:408:11c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.45; Sun, 31 Mar
+ 2024 12:07:19 +0000
+Received: from BY3PR18MB4707.namprd18.prod.outlook.com
+ ([fe80::1f55:2359:3c4d:2c81]) by BY3PR18MB4707.namprd18.prod.outlook.com
+ ([fe80::1f55:2359:3c4d:2c81%5]) with mapi id 15.20.7409.042; Sun, 31 Mar 2024
+ 12:07:19 +0000
+From: Sai Krishna Gajula <saikrishnag@marvell.com>
+To: Oliver Neukum <oneukum@suse.com>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: "syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com"
+	<syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com>
+Subject: RE: [PATCH net-next] usbnet: fix cyclical race on disconnect with
+ work queue
+Thread-Topic: [PATCH net-next] usbnet: fix cyclical race on disconnect with
+ work queue
+Thread-Index: AQHag2P6HvS3NH3Sc0u2PISNJphXbg==
+Date: Sun, 31 Mar 2024 12:07:18 +0000
+Message-ID: 
+ <BY3PR18MB47078BF3C2AC43AF71D068F9A0382@BY3PR18MB4707.namprd18.prod.outlook.com>
+References: <20240321124758.6302-1-oneukum@suse.com>
+ <SA1PR18MB470955BBB332D3A9F9A6F247A0312@SA1PR18MB4709.namprd18.prod.outlook.com>
+ <04cfa214-4d45-48b1-87ba-500e3e501977@suse.com>
+In-Reply-To: <04cfa214-4d45-48b1-87ba-500e3e501977@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY3PR18MB4707:EE_|BN9PR18MB4298:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ Q/yHKT5nqubJjI8EKZn/GsL2OnndGW45LBX7hZ2Ucr921sw3a4xT4bAA9/T0ukEsMSZ/rCHJfpVEmdTbFL4VnYh6xhWTfEydezNxifOADM9QdnL4d1feeZ7f5SeL7jdtZ+Gn9oC/WYJh3pp4jCiUYNwweqDNRQFHFQlQ4l9pPEb14m0z7FVJQ5Sh0VeEr1Mv5E+uOD1wGNhE/kXGAGolgbvu/XtOh81pfEsWwWfVUFV2QaqRnh/7bYQmfr7xNu6XE2glI5jraV/d06fcXfRLxoLOyYvqljLlqpzgHmMg5+9THfRao2icoK7efY1DZOuJuDh7IwKAAJnXZJmclRR4WCk95X4uqvfhJAfeal89biLIaFdqlR1uVLJqMivZPAB0CYIe42TyCcQ52+6BMJK/V4qrcwuipkOi7AIbzQ44Y5UdZln/A4HukeEcDJjOR3A23a30YENDpKk31bU/NYQwoD/Z/c1emmHDeJOY+rtjsuwYL4XcDHuVLEhWz6lxBkI/VabXgTE4VFL6hj1we/7GI1A/r41jaInH5CxUleBB33YNmKCTxxMQRaNgkd7pQWk0zI1Ms7iPCe1YW6BPRANoz+uRFqMh4HIvSHoIhe4u0DHUjkf86JiKJnCz5Vr08bThTLhVJoJxGIbLYZGPdATucsOxoTJxyG5vQHjtgrR4iYE=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4707.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-8?B?eHpiTWJhcXl5Wlg0L3dzeWhGZ0tGaE5RM3BoT1JVdVcyemkrSlpTbE8xckdv?=
+ =?utf-8?B?bFJ5TlB3M2xUazBIN1hucVJYWmZHd1pDM0ZkM1ZzakxHMUR4VnFFQzVCaStq?=
+ =?utf-8?B?ZzFJZlQzSDVBMjA2M0p0YzQ1YzRXeHFHRHY0bmRRYUhRU0M5QkZ6QXF6dS9z?=
+ =?utf-8?B?dXhPY0I5RUxySkZIL1VYWmo5UU9QU2FOWFBuVmdQMVhGdFdGWFFOelFtbS9l?=
+ =?utf-8?B?bkEvcEp4QWNuSmEwQ0NHNExqRVZRV3BtRjFMYmJwcThUVEZOWlcyR21zc1ZK?=
+ =?utf-8?B?NkNmUVJ5WUs5cmpKaExncUo2V3RCdURWY3pYU3hSV1dEQm9DTXI0a05abzRF?=
+ =?utf-8?B?VldkWXJ6QzhPb05ORGViT3JSQndyejJZaGVkOVp1Smt0RFd2ZlRYdjF1K0VI?=
+ =?utf-8?B?czFxenljZjFURS9JT3pDcnBadkQvOWZNL2hOek9ObnVQOWh4MnRYQ2xwR3U3?=
+ =?utf-8?B?Z3VyN1ZLbm1vRStYQVN5YlBFTWZwa2lWYy9pZUdZY3l0NEk2WTZBUW1kTEg3?=
+ =?utf-8?B?VGVCVkNYMksyQ3c0MnpyRCtoVWZmTS8xZlhlbjBnaTVLUjZsSmlXRm5MRngx?=
+ =?utf-8?B?VUNWS3oxQzZJVU05Lyt1eTRxdy9YbWJMN0xiT3AxbEkzUEI3Z2FQRytqYlIz?=
+ =?utf-8?B?dFRKZWNRbmlnWFhvZTFLeWF5YUx3UUk1WVI0RXlLUDlBM2NLZ2lPaVhiV1ZW?=
+ =?utf-8?B?aWtMeHdYYUtaRElBbnZHZmNsUVJ3M0JRYlA3NVRFVjhMSFRYS3R0N3RkRm51?=
+ =?utf-8?B?ZjdPQ2Nnd2tzK1dNTTJVM3NNb1BlSFF2YVZxQjVjL3ZCMFdLczJjendET2d2?=
+ =?utf-8?B?dEtxOEZUTnRKOEJsUzNTcXZwcWtGRE52VnRyQUZhbStTKzQ1c29KbzFxNXA5?=
+ =?utf-8?B?REhaZjVpQldyRHhiSjBCYVROdmlqQ0YvTWVzeUdvMUI4K1FCY0pWMHNVUk5o?=
+ =?utf-8?B?ZktTYTdwSGV4WXFBVFhSdVh0RVMrNUFMamhLUE96SWNpR3pIRE0rYmUrUjFp?=
+ =?utf-8?B?SEJIL0J3dlRJUTNaVGtHZ3FTVldsSGczN0JJQUVNVm9BaFV6L1dCczRVenBI?=
+ =?utf-8?B?TmRjM29XdHV3aW5yaG5yUEdnd3plU1pWMU5YUWM3UXZzM2NZUnBXT1haSEMr?=
+ =?utf-8?B?QUlFOEtxaUsxeXN4dUlZZUFRU0cvQVNtVndOK2dGeXZvLzQyZmJhYnlhZE9r?=
+ =?utf-8?B?S1pjNnRYd3hNMnhzY3o5Vng1ME4vMVNtNWxMdVpoUG1qVmx0cjZBOUhQYXJK?=
+ =?utf-8?B?WDhLTEdYcmtPdjRGSUR0MitLQ1d3MlA0RnZuR3lCOWxRa0h2WWl3STkzU2dF?=
+ =?utf-8?B?YzdycENMc1p1cFp6K1BsM2txRld1eUVEUjBTeVNlY2gzTWhtL21RZ29GN3NZ?=
+ =?utf-8?B?NUJtOWI2b3N5K1hEOElRa25RQkFTZEpEYjRIVHVncDRESUhPYnNaMWFTL0dO?=
+ =?utf-8?B?dkxlV2dtVmd1c2NrSkhpNlZ5VzRiY2pXem1GMW5pcE5wdnlyRDJVS25ITkVi?=
+ =?utf-8?B?Sks4OGZydXlqNENpa29FNGZDanY1MkhJdkEvdFM3RW1panhCRDVmZGltOFcz?=
+ =?utf-8?B?RWk5TG1DR0dJMUY2eURqWHhuQWkvOU1tVFBuQTVxQ0kwSFE2QWJ1bDFwaCth?=
+ =?utf-8?B?dHloa3l2cjZ1VmM5UkhLQm9CQUNGTVFRc0JsUXFYT3A0ZXMvQ1dnRlZzRjlX?=
+ =?utf-8?B?WEdRWVpQaU9lbEdlc0EwQk1HTWkyNzJaNjNYOXNLWmdoWFhMZlh3TEVhNThp?=
+ =?utf-8?B?K0tDTjdUN3Q5Sm0wV25nU1VhYk9PT3I5TVliaERGQWNFVTFLK3N0djh1WWtI?=
+ =?utf-8?B?eWpmSnVjeXZhczY1SVc4VGllOEVPTGhlSG5Uc01YdnVmSThlZ0wxc0E0cWZu?=
+ =?utf-8?B?TmpOeE5SNi9sQVhid0lTK3paanFMb1FRYy9Wdi9PZVdFVUhVVjVHK3lMS3Ay?=
+ =?utf-8?B?a25CU3BmUzRuOGVtc1RQczVjazNnZE9iekZScldpdmE0azRsYVdqUU8raUlL?=
+ =?utf-8?B?Nm1LU3lGTEYrb1EyN0phSjUrejk2c1RreXdIdjFrOWdPWkhCdHYwUW4yNVR0?=
+ =?utf-8?B?RWJxMm4rQldpcE1ISTB2QVlGYnFhWTdvTEkyaG9RTkNJSlliZmp3SkxxeU9y?=
+ =?utf-8?Q?PyMsgKObEF/aFBdanN6o2RSWI?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4707.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 42d87d66-2ce7-4650-ff2e-08dc517b1d25
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Mar 2024 12:07:19.1000
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lqqXe+5Ks1aybhAfwfjStDQoO/xSaJWAn8fmF5Lvl5tb2I2bCV5Cfx/0XmNJvI0pta4cZ/Ww79PnklH7FUZA3Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR18MB4298
+X-Proofpoint-ORIG-GUID: pBHId8Tku4ezlmOC1dxrTzelhSzZSYlB
+X-Proofpoint-GUID: pBHId8Tku4ezlmOC1dxrTzelhSzZSYlB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-31_09,2024-03-28_01,2023-05-22_02
 
-On Wed, Mar 27, 2024 at 01:40:54PM +0100, Krzysztof Kozlowski wrote:
-> Modules registering driver with register_virtio_driver() might forget to
-> set .owner field.  i2c-virtio.c for example has it missing.  The field
-> is used by some of other kernel parts for reference counting
-> (try_module_get()), so it is expected that drivers will set it.
-> 
-> Solve the problem by moving this task away from the drivers to the core
-> amba bus code, just like we did for platform_driver in
-> commit 9447057eaff8 ("platform_device: use a macro instead of
-> platform_driver_register").
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-
-
-This makes sense. So this will be:
-
-Fixes: 3cfc88380413 ("i2c: virtio: add a virtio i2c frontend driver")
-Cc: "Jie Deng" <jie.deng@intel.com>
-
-and I think I will pick this patch for this cycle to fix
-the bug. The cleanups can go in the next cycle.
-
-
-> ---
->  Documentation/driver-api/virtio/writing_virtio_drivers.rst | 1 -
->  drivers/virtio/virtio.c                                    | 6 ++++--
->  include/linux/virtio.h                                     | 7 +++++--
->  3 files changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/driver-api/virtio/writing_virtio_drivers.rst b/Documentation/driver-api/virtio/writing_virtio_drivers.rst
-> index e14c58796d25..e5de6f5d061a 100644
-> --- a/Documentation/driver-api/virtio/writing_virtio_drivers.rst
-> +++ b/Documentation/driver-api/virtio/writing_virtio_drivers.rst
-> @@ -97,7 +97,6 @@ like this::
->  
->  	static struct virtio_driver virtio_dummy_driver = {
->  		.driver.name =  KBUILD_MODNAME,
-> -		.driver.owner = THIS_MODULE,
->  		.id_table =     id_table,
->  		.probe =        virtio_dummy_probe,
->  		.remove =       virtio_dummy_remove,
-> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-> index f173587893cb..9510c551dce8 100644
-> --- a/drivers/virtio/virtio.c
-> +++ b/drivers/virtio/virtio.c
-> @@ -362,14 +362,16 @@ static const struct bus_type virtio_bus = {
->  	.remove = virtio_dev_remove,
->  };
->  
-> -int register_virtio_driver(struct virtio_driver *driver)
-> +int __register_virtio_driver(struct virtio_driver *driver, struct module *owner)
->  {
->  	/* Catch this early. */
->  	BUG_ON(driver->feature_table_size && !driver->feature_table);
->  	driver->driver.bus = &virtio_bus;
-> +	driver->driver.owner = owner;
-> +
->  	return driver_register(&driver->driver);
->  }
-> -EXPORT_SYMBOL_GPL(register_virtio_driver);
-> +EXPORT_SYMBOL_GPL(__register_virtio_driver);
->  
->  void unregister_virtio_driver(struct virtio_driver *driver)
->  {
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index b0201747a263..26c4325aa373 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -170,7 +170,7 @@ size_t virtio_max_dma_size(const struct virtio_device *vdev);
->  
->  /**
->   * struct virtio_driver - operations for a virtio I/O driver
-> - * @driver: underlying device driver (populate name and owner).
-> + * @driver: underlying device driver (populate name).
->   * @id_table: the ids serviced by this driver.
->   * @feature_table: an array of feature numbers supported by this driver.
->   * @feature_table_size: number of entries in the feature table array.
-> @@ -208,7 +208,10 @@ static inline struct virtio_driver *drv_to_virtio(struct device_driver *drv)
->  	return container_of(drv, struct virtio_driver, driver);
->  }
->  
-> -int register_virtio_driver(struct virtio_driver *drv);
-> +/* use a macro to avoid include chaining to get THIS_MODULE */
-> +#define register_virtio_driver(drv) \
-> +	__register_virtio_driver(drv, THIS_MODULE)
-> +int __register_virtio_driver(struct virtio_driver *drv, struct module *owner);
->  void unregister_virtio_driver(struct virtio_driver *drv);
->  
->  /* module_virtio_driver() - Helper macro for drivers that don't do
-> 
-> -- 
-> 2.34.1
-
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE9saXZlciBOZXVrdW0gPG9u
+ZXVrdW1Ac3VzZS5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwgTWFyY2ggMjcsIDIwMjQgODo0MSBQ
+TQ0KPiBUbzogU2FpIEtyaXNobmEgR2FqdWxhIDxzYWlrcmlzaG5hZ0BtYXJ2ZWxsLmNvbT47IE9s
+aXZlciBOZXVrdW0NCj4gPG9uZXVrdW1Ac3VzZS5jb20+OyBkYXZlbUBkYXZlbWxvZnQubmV0OyBl
+ZHVtYXpldEBnb29nbGUuY29tOw0KPiBrdWJhQGtlcm5lbC5vcmc7IHBhYmVuaUByZWRoYXQuY29t
+OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4gdXNiQHZnZXIua2VybmVsLm9yZzsg
+bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiBDYzogc3l6Ym90Kzk2NjViZjU1YjFjODI4
+YmJjZDhhQHN5emthbGxlci5hcHBzcG90bWFpbC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRDSCBu
+ZXQtbmV4dF0gdXNibmV0OiBmaXggY3ljbGljYWwgcmFjZSBvbg0KPiBkaXNjb25uZWN0IHdpdGgg
+d29yayBxdWV1ZQ0KPiANCj4gDQo+IE9uIDMvMjIvMjQgMTg6NDMsIFNhaSBLcmlzaG5hIEdhanVs
+YSB3cm90ZToNCj4gPg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9t
+OiBPbGl2ZXIgTmV1a3VtIDxvbmV1a3VtQHN1c2UuY29tPg0KPiA+PiBTZW50OiBUaHVyc2RheSwg
+TWFyY2ggMjEsIDIwMjQgNjoxNyBQTQ0KPiA+PiBUbzogZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1
+bWF6ZXRAZ29vZ2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiA+PiBwYWJlbmlAcmVkaGF0LmNv
+bTsgbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgbGludXgtdXNiQHZnZXIua2VybmVsLm9yZzsNCj4g
+Pj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiA+PiBDYzogT2xpdmVyIE5ldWt1bSA8
+b25ldWt1bUBzdXNlLmNvbT47DQo+ID4+IHN5emJvdCs5NjY1YmY1NWIxYzgyOGJiY2Q4YUBzeXpr
+YWxsZXIuYXBwc3BvdG1haWwuY29tDQo+ID4+IFN1YmplY3Q6IFtQQVRDSCBuZXQtbmV4dF0gdXNi
+bmV0OiBmaXggY3ljbGljYWwgcmFjZSBvbiBkaXNjb25uZWN0DQo+ID4+IHdpdGggd29yayBxdWV1
+ZQ0KPiA+DQo+ID4gVGhpcyBwYXRjaCBzZWVtcyB0byBiZSBhIGZpeCwgaW4gdGhhdCBjYXNlIHRo
+ZSBzdWJqZWN0IG5lZWQgdG8gYmUgd2l0aA0KPiA+IFtQQVRDSCBuZXRdDQo+IA0KPiBPSw0KPiA+
+DQo+ID4+DQo+ID4+IFRoZSB3b3JrIGNhbiBzdWJtaXQgVVJCcyBhbmQgdGhlIFVSQnMgY2FuIHNj
+aGVkdWxlIHRoZSB3b3JrLg0KPiA+PiBUaGlzIGN5Y2xlIG5lZWRzIHRvIGJlIGJyb2tlbiwgd2hl
+biBhIGRldmljZSBpcyB0byBiZSBzdG9wcGVkLg0KPiA+PiBVc2UgYSBmbGFnIHRvIGRvIHNvLg0K
+PiA+Pg0KPiA+PiBGaXhlczogZjI5ZmMyNTk5NzZlOSAoIltQQVRDSF0gVVNCOiB1c2JuZXQgKDEv
+OSkgY2xlYW4gdXAgZnJhbWluZyIpDQo+ID4NCj4gPiBQbGVhc2UgdXNlIGNvcnJlY3QgRml4ZXM6
+IHN0eWxlICdGaXhlczogPDEyIGNoYXJzIG9mIHNoYTE+ICgiPHRpdGxlIGxpbmU+IiknIC0gaWU6
+DQo+ICdGaXhlczogZjI5ZmMyNTk5NzZlICgiW1BBVENIXSBVU0I6IHVzYm5ldCAoMS85KSBjbGVh
+biB1cCBmcmFtaW5nIiknDQo+IA0KPiBFaG0sIHdoYXQgZXhhY3RseSBkaWQgSSBkbyBkaWZmZXJl
+bnRseQ0KDQpDaGVja3BhdGNoIHRyaWdnZXJzIHdhcm5pbmcgaWYgd2UgZ2l2ZSBGaXhlcyB0YWco
+ZjI5ZmMyNTk5NzZlIC05LSkgbW9yZSB0aGFuIDEyIGNoYXJzLiBJdCBpcyBhZHZpc2FibGUgdG8g
+Zm9sbG93IHRoZSB1cHN0cmVhbWluZyBwcm9jZXNzIHN0ZXBzIHRvIGhhdmUgdW5pZm9ybWl0eSBh
+Y3Jvc3MgcGF0Y2hlcy4NCg0KPiANCj4gPj4gLS0tIGEvZHJpdmVycy9uZXQvdXNiL3VzYm5ldC5j
+DQo+ID4+ICsrKyBiL2RyaXZlcnMvbmV0L3VzYi91c2JuZXQuYw0KPiA+PiBAQCAtNDY3LDEwICs0
+NjcsMTIgQEAgc3RhdGljIGVudW0gc2tiX3N0YXRlIGRlZmVyX2JoKHN0cnVjdCB1c2JuZXQNCj4g
+Pj4gKmRldiwgc3RydWN0IHNrX2J1ZmYgKnNrYiwgIHZvaWQgdXNibmV0X2RlZmVyX2tldmVudCAo
+c3RydWN0IHVzYm5ldA0KPiA+PiAqZGV2LCBpbnQgd29yaykNCj4gPg0KPiA+IHNwYWNlIHByb2hp
+Yml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJw0KPiAN
+Cj4gSSBhbSBzb3JyeSwgYnV0IHRoaXMgaXMgdGhlIGNvbnRleHQgb2YgdGhlIGRpZmYuIFlvdSBh
+cmUgbm90IHN1Z2dlc3RpbmcgdG8gbWl4DQo+IGdyYXRpdGlvdXMgZm9ybWF0IGNoYW5nZXMgaW50
+byBhIGJ1ZyBmaXgsIGFyZSB5b3U/DQoNCkNoZWNrcGF0Y2ggZG9lcyBhIHByaW1hcnkgY2hlY2sg
+YW5kIHRyaWdnZXJlZCB3YXJuaW5nIGlmIHdlIHVzZSBzcGFjZSBiZXR3ZWVuIGZuIG5hbWUgYW5k
+ICcoJy4gIEl0IGlzIGFkdmlzYWJsZSB0byBmb2xsb3cgdGhlIHVwc3RyZWFtaW5nIHByb2Nlc3Mg
+c3RlcHMoY2xlYW4gY2hlY2twYXRjaCBvdXRwdXQpIHRvIGhhdmUgdW5pZm9ybWl0eSBhY3Jvc3Mg
+cGF0Y2hlcy4gQWxzbyBjaGVjayBjb21tZW50cyBmcm9tIEdyZWdraCBib3QgcmVnYXJkaW5nIHRo
+aXMgcGF0Y2guDQoNCj4gDQo+ID4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L3VzYi91c2Ju
+ZXQuaCBiL2luY2x1ZGUvbGludXgvdXNiL3VzYm5ldC5oDQo+ID4+IGluZGV4DQo+ID4+IDlmMDhh
+NTg0ZDcwNy4uZDI2NTk5ZmFhYjMzIDEwMDY0NA0KPiA+PiAtLS0gYS9pbmNsdWRlL2xpbnV4L3Vz
+Yi91c2JuZXQuaA0KPiA+PiArKysgYi9pbmNsdWRlL2xpbnV4L3VzYi91c2JuZXQuaA0KPiA+PiBA
+QCAtNzYsOCArNzYsMjYgQEAgc3RydWN0IHVzYm5ldCB7DQo+ID4+ICAgIwkJZGVmaW5lIEVWRU5U
+X0xJTktfQ0hBTkdFCTExDQo+ID4+ICAgIwkJZGVmaW5lIEVWRU5UX1NFVF9SWF9NT0RFCTEyDQo+
+ID4+ICAgIwkJZGVmaW5lIEVWRU5UX05PX0lQX0FMSUdOCTEzDQo+ID4+ICsvKg0KPiA+PiArICog
+dGhpcyBvbmUgaXMgc3BlY2lhbCwgYXMgaXQgaW5kaWNhdGVzIHRoYXQgdGhlIGRldmljZSBpcyBn
+b2luZw0KPiA+PiArYXdheQ0KPiA+PiArICogdGhlcmUgYXJlIGN5Y2xpYyBkZXBlbmRlbmNpZXMg
+YmV0d2VlbiB0YXNrbGV0LCB0aW1lciBhbmQgYmgNCj4gPj4gKyAqIHRoYXQgbXVzdCBiZSBicm9r
+ZW4NCj4gPj4gKyAqLw0KPiA+DQo+ID4gTmV0d29ya2luZyBibG9jayBjb21tZW50cyBkb24ndCB1
+c2UgYW4gZW1wdHkgLyogbGluZSwgdXNlIC8qIENvbW1lbnQuLi4NCj4gDQo+IE9LDQo+IA0KPiAJ
+UmVnYXJkcw0KPiAJCU9saXZlcg0KDQo=
 
