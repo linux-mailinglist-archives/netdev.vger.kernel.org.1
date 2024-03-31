@@ -1,103 +1,129 @@
-Return-Path: <netdev+bounces-83535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82EBD892D97
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 23:14:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 749D6892E50
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 04:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD34F1C20DE5
-	for <lists+netdev@lfdr.de>; Sat, 30 Mar 2024 22:14:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2C111F2185B
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 02:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F864AEFE;
-	Sat, 30 Mar 2024 22:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69384628;
+	Sun, 31 Mar 2024 02:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WAQ3uGBN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZ9D70uV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C2641C93
-	for <netdev@vger.kernel.org>; Sat, 30 Mar 2024 22:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA3D184E;
+	Sun, 31 Mar 2024 02:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711836856; cv=none; b=ET1Z3thUny7dCCkpC8lbUebGMy5Plrtw6hvPlf/UJkksxBeLbmw1ghzEaCGB4mURAd074f3qtBzUYMarYvRF614ab6MmcXulApsm2/AWHxcSS4meNk4xemu+sLA9LGeMAe5fjb5xaN1coMfmUABfnU7im3jdIJCj5hwISMynSTc=
+	t=1711852445; cv=none; b=Pj9ztFoeNFC8W8Bmk7O2Z5NF1FqYCQSQXvXHwYXp92impW8yqIqXKztodGBRpXQU5wfGBPjF30T0jKjGp+dRMIVrE9+rHt+E/sK11cG0ccYiCxhujgs6p0ewfBT+tyH81Ba1BpjFwcgtUyVZk4Fx9c+IJDc8Pbb3UqAFDp4kjvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711836856; c=relaxed/simple;
-	bh=htnwxaRYLoNkryWLJaBVSFOfS9tn6Oh5EBSghNzeRHE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q2reOn0VT70EDOh7dna04qpxZe84BLB7BiD9y/VeQ6ly9aFwPhVqy1eWaKESospD71beZBL20aEdIGypfjBPmMd5m04+WfJtonrC+U0P6N7eG8FeuxbCnVBE+GEUIlHWjCKZxDJEUKQTsJzVHLIsEGpD4f9dPMvsSvg7l/ZEbCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WAQ3uGBN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=E3M9C94KlYgWkxVnJ7peUnv4RFU6IKeHU/i44aG+ovM=; b=WAQ3uGBNwM5q1A2jNEp8fqa4y4
-	JAPFdkTelMrUfMAR1POls1sGXQYtQhs18rv/qsFXdzweD1Q+mSVouU8wxfgek9U/hyINTk4SSk4Kx
-	yGhGJ2J93d1KR7+sE78wwu9AikmLOwitEiZB3TRceJ7vybO9GqK7qDxwvkkMuc+q6+TM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rqgxm-00BkRL-2u; Sat, 30 Mar 2024 23:14:10 +0100
-Date: Sat, 30 Mar 2024 23:14:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	simon.horman@corigine.com, anthony.l.nguyen@intel.com,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	idosch@nvidia.com, przemyslaw.kitszel@intel.com,
-	marcin.szycik@linux.intel.com
-Subject: Re: [PATCH net-next 2/3] ethtool: Introduce max power support
-Message-ID: <07572365-1c9f-4948-ad2f-4d56c6d4e4ab@lunn.ch>
-References: <20240329092321.16843-1-wojciech.drewek@intel.com>
- <20240329092321.16843-3-wojciech.drewek@intel.com>
+	s=arc-20240116; t=1711852445; c=relaxed/simple;
+	bh=+9xtEveTESmqEmgqfqi/AHy+l/CY7o7HoCu99ORDDcA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PCxe4cBbfRJV3gpTvYKFbbR/6Oo8CmYNpvDoIAdyEoT+Fst6iaUXtghvq3ijq3w1+V6jl8iuUhxs26iFUlXrzTxzkigqaTs5dnoEnR/bLxwsiIwpFFcP1wwql0Rd0L+n+/bc3NcLBp7LSIEUyTq3KbDcKWe4NXrWGbBy3k5Tsu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZ9D70uV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A71FCC433B2;
+	Sun, 31 Mar 2024 02:34:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711852444;
+	bh=+9xtEveTESmqEmgqfqi/AHy+l/CY7o7HoCu99ORDDcA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=PZ9D70uVOm8Q1eV7TepfO1FkN+1k1kWNkT6Ku6f/2s6iTAOV7tZxn2zhkvPsVyaFX
+	 RPw7j/3dyOXbWPTqh7GDBBmESHoa0/CSjp3BgTh7gbx5KJ1tdiDym07g+AY4FzPgQS
+	 DKX7tgoR9K9mHdV/+tGZPsttPaEAScJJhqA81HNprVN9Fu9EJ0XTEzkGTvbaVJb6Hx
+	 Qzks5PLB5vorWVg53klblNq3phtjvnvFZqLRpBY/lb0TuCBuxS4GgeeCTYGb+VI6ok
+	 zfc1qtwfOHsXCTucSL4Xb61hPPubFgtHkxN2eCV1J182QybCpwgfTt0/4sSb25g/FL
+	 PUk6ZaAAFbN5g==
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-513d23be0b6so3396180e87.0;
+        Sat, 30 Mar 2024 19:34:04 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVDkGXqULJb0iTE30zok3Z/DcAitzYB9HUyf5pQ/qSbH7TnoDghRS696d3Z3Bc7u3vJtKOCIyp0hkqFnVKFWXLHRnz0A8czvwM7M2KtNDkdHOpr2c074bO9nltfNZLNpXSwZIksKCLZNGtZiA0bHX646SeY+kLLS+WUzjnVm4MKEuoM
+X-Gm-Message-State: AOJu0YzWfQ4zDI0K2CTviHTVM/YUaXaFBBv4MmJVL07IxX6zt/sEhULv
+	8wYbpd4A6ohvhE1X1s1afNGS2g9DPx2m3V/0v8z3Oa7dpCwciQaRAnkxDrAd98WqSrH+OiQMNXB
+	qPMEzBdnsGuo/e1Si+icML8zVNFY=
+X-Google-Smtp-Source: AGHT+IGpEQPL0v7g3+p+5E8g7HGnWQKzlMop6CryhqCRVmhK61t313PDdp5vf1ukKDWFXpyLX2tmge1Ix/vKXAwQ4u4=
+X-Received: by 2002:a2e:9914:0:b0:2d4:6aba:f1a9 with SMTP id
+ v20-20020a2e9914000000b002d46abaf1a9mr4254960lji.40.1711852443253; Sat, 30
+ Mar 2024 19:34:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240329092321.16843-3-wojciech.drewek@intel.com>
+References: <20240326144741.3094687-1-arnd@kernel.org> <20240326144741.3094687-2-arnd@kernel.org>
+ <87jzlohhbc.fsf@intel.com> <cb853762-06d4-401c-a1c8-07a0c031b499@app.fastmail.com>
+ <87edbwglle.fsf@intel.com> <07c604d1-6304-4ff8-844b-03c3d5c727ad@app.fastmail.com>
+In-Reply-To: <07c604d1-6304-4ff8-844b-03c3d5c727ad@app.fastmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sun, 31 Mar 2024 11:33:27 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARmABUDDTFtp_HCqKid7=8011wk0HMgHYGHWOLunhpxXA@mail.gmail.com>
+Message-ID: <CAK7LNARmABUDDTFtp_HCqKid7=8011wk0HMgHYGHWOLunhpxXA@mail.gmail.com>
+Subject: Re: [PATCH 01/12] kbuild: make -Woverride-init warnings more consistent
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>, Arnd Bergmann <arnd@kernel.org>, 
+	linux-kbuild@vger.kernel.org, Harry Wentland <harry.wentland@amd.com>, 
+	Alex Deucher <alexander.deucher@amd.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Lucas De Marchi <lucas.demarchi@intel.com>, Oded Gabbay <ogabbay@kernel.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Linus Walleij <linus.walleij@linaro.org>, 
+	Joel Stanley <joel@jms.id.au>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrew Morton <akpm@linux-foundation.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, dri-devel@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>, linux-mm@kvack.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 29, 2024 at 10:23:20AM +0100, Wojciech Drewek wrote:
-> Some modules use nonstandard power levels. Adjust ethtool
-> module implementation to support new attributes that will allow user
-> to change maximum power.
-> 
-> Add three new get attributes:
-> ETHTOOL_A_MODULE_MAX_POWER_SET (used for set as well) - currently set
->   maximum power in the cage
-> ETHTOOL_A_MODULE_MIN_POWER_ALLOWED - minimum power allowed in the
->   cage reported by device
-> ETHTOOL_A_MODULE_MAX_POWER_ALLOWED - maximum power allowed in the
->   cage reported by device
+On Wed, Mar 27, 2024 at 6:23=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
+:
+>
+> On Wed, Mar 27, 2024, at 08:50, Jani Nikula wrote:
+> > On Tue, 26 Mar 2024, "Arnd Bergmann" <arnd@arndb.de> wrote:
+> >> On Tue, Mar 26, 2024, at 21:24, Jani Nikula wrote:
+> >>> On Tue, 26 Mar 2024, Arnd Bergmann <arnd@kernel.org> wrote:
+> >>
+> >> It works now.
+> >>
+> >> The original __diag_ignore_all() only did it for gcc-8 and above
+> >> because that was initially needed to suppress warnings that
+> >> got added in that version, but this was always a mistake.
+> >>
+> >> 689b097a06ba ("compiler-gcc: Suppress -Wmissing-prototypes
+> >> warning for all supported GCC") made it work correctly.
+> >
+> > Oh, nice! Then I think we'd like to go back to __diag_ignore_all() in
+> > i915 and xe.
+> >
+> > The diff is below. I'm fine with you squashing it to your patch, or if
+> > you want me to turn it into a proper patch for you to pick up in your
+> > series, that's fine too. Just let me know.
+>
+> I think I'd prefer to keep my patch simpler for the moment and
+> get that merged through the kbuild tree, it already touches
+> too many places at once.
+>
+> It may be better for me to just drop the drivers/gpu/ part of
+> my patch so you can just just take your patch through the
+> drm tree. I actually have a similar patch for the amdgpu driver
+> that I can send if you like this option better.
+>
+>     Arnd
+>
 
-I'm confused. The cage has two power pins, if you look at the table
-here:
 
-https://www.embrionix.com/resource/how-to-design-with-video-SFP
 
-There is VccT and VccR. I would expect there is a power regulator
-supplying these pins. By default, you can draw 1W from that
-regulator. The board however might be designed to support more power,
-so those regulators could supply more power. And the board has also
-been designed to dump the heat if more power is consumed.
+Applied to linux-kbuild/fixes.
+Thanks.
 
-So, ETHTOOL_A_MODULE_MIN_POWER_ALLOWED is about the minimum power that
-regulator can supply? Does that make any sense?
-
-ETHTOOL_A_MODULE_MAX_POWER_ALLOWED is about the maximum power the
-regulator can supply and the cooling system can dump heat?
-
-Then what does ETHTOOL_A_MODULE_MAX_POWER_SET mean? power in the cage?
-The cage is passive. It does not consume power. It is the module which
-does. Is this telling the module it can consume up to this amount of
-power?
-
-	Andrew
+--=20
+Best Regards
+Masahiro Yamada
 
