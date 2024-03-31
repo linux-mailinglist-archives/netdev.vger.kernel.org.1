@@ -1,237 +1,111 @@
-Return-Path: <netdev+bounces-83684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BA4F893547
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 19:49:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E5FC893563
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 20:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FFA21C2392B
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 17:49:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F12284D50
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FB914535B;
-	Sun, 31 Mar 2024 17:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D576145B2A;
+	Sun, 31 Mar 2024 18:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="WCsvNNkZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HL8hyC0W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5BD12DD96
-	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 17:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B97145B1C
+	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 18:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711907369; cv=none; b=G2L5SDmMyG2nWgj3OAih9OEpPTBaU3Av81zVNWaYryYGBx+n0jPGnVhvrJjErXIxT7VIya0/WTPn4uvbQMDo/wdcD4+zGjYX3DQFEEBZIgoBgojLvSrwn50fCQSSRxoNijWYRgILbMRmFHjcLVYVh6huZF2gQRqDIfhbu+pJbMI=
+	t=1711909671; cv=none; b=Z+ATVazlv8gReqQ3O6V2ljDwH9AwVO05JzOoWEYe76AlvZy2Dvc5E+QAZssbgNIOub50nPfV9fSjVAy7yOoRqcrSX1lquGGJjvayiDKCjoadoYpAj9y7IWLTAYGwSCyqTF91RvHfiCcewZZlSRj8+9qy5LNxurFJZVYUkXR4xTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711907369; c=relaxed/simple;
-	bh=M9PKvfM1XUlJ0yz9fk8ZoJ3lQb4yr51ocsoenz5m5wU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CjCRt78aUndlF/7uq7KV/hvfcMvZQzKQ959uGAtaDHeIytg3zwUEEGzxangfayipg/5KDqKPhoGoMssMyqJrFpPYpXL37yMTHkB4sTtI5P01h5vxwujdgNkadsg2Hb89uqHjQMy62y3nTpI5Jiyt+e7FrA04PEBsYoVszj6FAz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=WCsvNNkZ; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7cc01644f51so190169939f.2
-        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 10:49:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1711907367; x=1712512167; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wfXG+wF/tlnzwlpe6WnuuMRMbwNdJXyeLBAyx26A1ms=;
-        b=WCsvNNkZbr0QOheJJPKfdpCrPQuw8lubWFXMKkpnzzAiddBfOm58EVKY/3yHFLAzxN
-         37D6vkD9MeK9UlTW0W3a3wQPhhpV1UMRbkWok8ITOdkICQra0flPbJF9EY7Ck3dP1X7O
-         +/V0NaaqLd0sns+6nrvUb7mpmzwuPLDUeI7zr8aseEFvYEPLyvxj0JElNFYrPZn2b08C
-         5Gk5sJfSVvRqQeQQa7Ax0dZITu/4W+cOxPuyI0ydLBZmj0aI4P/eVit2SN4RRlMaLYvx
-         Jm/Oq8i9dU2k+xQ3PIuCIBkGCYarWFX297oeqA+pySYdk+W/zSdmOK0jzvb86lIvfo8m
-         Wr4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711907367; x=1712512167;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wfXG+wF/tlnzwlpe6WnuuMRMbwNdJXyeLBAyx26A1ms=;
-        b=PBEj3212k7HmhP+kEhm1fc95Bd1pcomIECCXc1ZSMzMhbNpZ3xoEWvXpzVpXejjcHx
-         8R1+MSkvbfNzoRKLdzD4U+gbTElo3OdPAefOL2xtjx3XPPqG4TIK+qYkaZVDyJc+U72C
-         64yqK7mZ03WwnlkqnopKl8oBMzSsn9R79xcjODyCo+RYY+QB8GKcPE1BCrC6P6X5Gdw0
-         s5PGVgkw9aFoUVg+EN/mNPiDkLaI1hnER37ZCg2995Cq5v9BGZqdPC7BfsUPAEiAxjfQ
-         9TrW66ubP1GE3XI8kldeSdQipj+/pu3RcQW1NJ6WNSJ4VSX/uoF92pYPreRrGIuSMPae
-         0EBw==
-X-Forwarded-Encrypted: i=1; AJvYcCWujzwK6bLrnlD7bSHMilHEMZt4jer9KZ1zLNzrrgeTIcrBZHDGkuqT5AdAoeZeTSqmbbNM+hNJaiWu7AhED6ZCB3fbF4n1
-X-Gm-Message-State: AOJu0YwuuTTLIsiEIWCTxDKqMmKNxWxp84OcyQghClY+hEkAWNHZ8V6h
-	vKqN7o5nb5V+kP+ZQ/ypWSr2qbpX0qwHnZ/CxIqjUUPUFMhLeZSkU03PijoD6Tg=
-X-Google-Smtp-Source: AGHT+IH22sqGdmww4qFmYTNoUoblTRsZ8MDo9UbAH2NhKT2PnzajCNIkvwGlbGpFRCb0Dt+t3AU9/g==
-X-Received: by 2002:a6b:6e0b:0:b0:7d0:bee7:b660 with SMTP id d11-20020a6b6e0b000000b007d0bee7b660mr2804375ioh.4.1711907366685;
-        Sun, 31 Mar 2024 10:49:26 -0700 (PDT)
-Received: from [100.64.0.1] ([170.85.6.190])
-        by smtp.gmail.com with ESMTPSA id d11-20020a5d964b000000b007cc840d1d0bsm2217439ios.25.2024.03.31.10.49.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 31 Mar 2024 10:49:26 -0700 (PDT)
-Message-ID: <c8e3507b-cab0-4215-9936-cd706f043103@sifive.com>
-Date: Sun, 31 Mar 2024 12:49:23 -0500
+	s=arc-20240116; t=1711909671; c=relaxed/simple;
+	bh=mqV57eRZ6VoXvr3aBmrVYg1f738OdoqmYDtIlFCSrY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oTmGg7vz1j6jPGJvp1Fk+a8jmDNKo6m65XaMdmhS0Tr14JJ+cdXphSxeXNVkosChZrpwVNmYf4HeWHJLJF1+d5qFOAddF+zOpPMG/VvTCmrhGuzlp50gS+kVxLx+TeN7CbBVCYTjr1lyvf/8RBHXaTZqrupIkkky4YkxSBl0OsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HL8hyC0W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EF88C433C7;
+	Sun, 31 Mar 2024 18:27:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711909671;
+	bh=mqV57eRZ6VoXvr3aBmrVYg1f738OdoqmYDtIlFCSrY8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HL8hyC0WsH91RQqowJxxTGHU1PH70duMJZ96hHGu8QSp7WQbKC6XNFX4o9/PWJt8n
+	 pxRmcI7c9hKqMLSja7rizQVs48arwZvX3x7xBq5TmfwAbBiMkj654x47C0CBHS6BEV
+	 K1jVqR+FZKOp7Rb4lO4KS72T9swsVW274A4O1GM91c+Ac5F8VeW38+eUT1BmqEm0Li
+	 3VMR2TkFjHgp+v+03tEj5fNC4+Ox+w2XDnDq2wGGEs2DZ8sUdvcW+EdSm7xStjjg8x
+	 i6wT9or1a3BAT0bNEzvuOXBu5TSD3IKnPR/taVevfRKXui6Ix57VZWKH08YiIl6yXl
+	 i1a4R2aZbv+7Q==
+Date: Sun, 31 Mar 2024 19:27:47 +0100
+From: Simon Horman <horms@kernel.org>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: Wojciech Drewek <wojciech.drewek@intel.com>, netdev@vger.kernel.org,
+	pawel.chmielewski@intel.com, anthony.l.nguyen@intel.com,
+	Liang-Min Wang <liang-min.wang@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] ice: Reset VF on Tx MDD
+ event
+Message-ID: <20240331182747.GC26556@kernel.org>
+References: <20240326164455.735739-1-marcin.szycik@linux.intel.com>
+ <20240328173450.GH651713@kernel.org>
+ <fbf9dae9-c023-4b15-b3d8-6b19240f59b0@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 2/5] riscv, bpf: Relax restrictions on Zbb
- instructions
-To: Conor Dooley <conor.dooley@microchip.com>, Conor Dooley <conor@kernel.org>
-Cc: Stefan O'Rear <sorear@fastmail.com>, Pu Lehui <pulehui@huaweicloud.com>,
- bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
- netdev@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Manu Bretelle <chantr4@gmail.com>, Pu Lehui <pulehui@huawei.com>
-References: <20240328124916.293173-1-pulehui@huaweicloud.com>
- <20240328124916.293173-3-pulehui@huaweicloud.com>
- <3ed9fe94-2610-41eb-8a00-a9f37fcf2b1a@app.fastmail.com>
- <20240328-ferocity-repose-c554f75a676c@spud>
- <20240329-linguini-uncured-380cb4cff61c@wendy>
-From: Samuel Holland <samuel.holland@sifive.com>
-Content-Language: en-US
-In-Reply-To: <20240329-linguini-uncured-380cb4cff61c@wendy>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fbf9dae9-c023-4b15-b3d8-6b19240f59b0@linux.intel.com>
 
-Hi Conor,
-
-Looks good except for one typo.
-
-On 2024-03-29 6:23 AM, Conor Dooley wrote:
-> On Thu, Mar 28, 2024 at 10:07:23PM +0000, Conor Dooley wrote:
-> 
->> As I said on IRC to you earlier, I think the Kconfig options here are in
->> need of a bit of a spring cleaning - they should be modified to explain
->> their individual purposes, be that enabling optimisations in the kernel
->> or being required for userspace. I'll try to send a patch for that if
->> I remember tomorrow.
-> 
-> Something like this:
-> 
-> -- >8 --
-> commit 5125504beaedd669b082bf74b02003a77360670f
-> Author: Conor Dooley <conor.dooley@microchip.com>
-> Date:   Fri Mar 29 11:13:22 2024 +0000
-> 
->     RISC-V: clarify what some RISCV_ISA* config options do
->     
->     During some discussion on IRC yesterday and on Pu's bpf patch [1]
->     I noticed that these RISCV_ISA* Kconfig options are not really clear
->     about their implications. Many of these options have no impact on what
->     userspace is allowed to do, for example an application can use Zbb
->     regardless of whether or not the kernel does. Change the help text to
->     try and clarify whether or not an option affects just the kernel, or
->     also userspace. None of these options actually control whether or not an
->     extension is detected dynamically as that's done regardless of Kconfig
->     options, so drop any text that implies the option is required for
->     dynamic detection, rewording them as "do x when y is detected".
->     
->     Link: https://lore.kernel.org/linux-riscv/20240328-ferocity-repose-c554f75a676c@spud/ [1]
->     Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
->     ---
->     I did this based on top of Samuel's changes dropping the MMU
->     requurements just in case, but I don't think there's a conflict:
->     https://lore.kernel.org/linux-riscv/20240227003630.3634533-4-samuel.holland@sifive.com/
-> 
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index d8a777f59402..f327a8ac648f 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -501,8 +501,8 @@ config RISCV_ISA_SVNAPOT
->  	depends on RISCV_ALTERNATIVE
->  	default y
->  	help
-> -	  Allow kernel to detect the Svnapot ISA-extension dynamically at boot
-> -	  time and enable its usage.
-> +	  Add support for the Svnapot ISA-extension when it is detected by
-> +	  the kernel at boot.
->  
->  	  The Svnapot extension is used to mark contiguous PTEs as a range
->  	  of contiguous virtual-to-physical translations for a naturally
-> @@ -520,9 +520,9 @@ config RISCV_ISA_SVPBMT
->  	depends on RISCV_ALTERNATIVE
->  	default y
->  	help
-> -	   Adds support to dynamically detect the presence of the Svpbmt
-> -	   ISA-extension (Supervisor-mode: page-based memory types) and
-> -	   enable its usage.
-> +	   Add support for the Svpbmt ISA-extension (Supervisor-mode:
-> +	   page-based memory types) when it is detected by the kernel at
-> +	   boot.
->  
->  	   The memory type for a page contains a combination of attributes
->  	   that indicate the cacheability, idempotency, and ordering
-> @@ -541,14 +541,15 @@ config TOOLCHAIN_HAS_V
->  	depends on AS_HAS_OPTION_ARCH
->  
->  config RISCV_ISA_V
-> -	bool "VECTOR extension support"
-> +	bool "Vector extension support"
->  	depends on TOOLCHAIN_HAS_V
->  	depends on FPU
->  	select DYNAMIC_SIGFRAME
->  	default y
->  	help
->  	  Say N here if you want to disable all vector related procedure
-> -	  in the kernel.
-> +	  in the kernel. Without this option enabled, neither the kernel nor
-> +	  userspace may use vector.
->  
->  	  If you don't know what to do here, say Y.
->  
-> @@ -606,8 +607,8 @@ config RISCV_ISA_ZBB
->  	depends on RISCV_ALTERNATIVE
->  	default y
->  	help
-> -	   Adds support to dynamically detect the presence of the ZBB
-> -	   extension (basic bit manipulation) and enable its usage.
-> +	   Add support for enabling optimisations in the kernel when the
-> +	   Zbb extension is detected at boot.
->  
->  	   The Zbb extension provides instructions to accelerate a number
->  	   of bit-specific operations (count bit population, sign extending,
-> @@ -623,9 +624,9 @@ config RISCV_ISA_ZICBOM
->  	select RISCV_DMA_NONCOHERENT
->  	select DMA_DIRECT_REMAP
->  	help
-> -	   Adds support to dynamically detect the presence of the ZICBOM
-> -	   extension (Cache Block Management Operations) and enable its
-> -	   usage.
-> +	   Add support for the Zicbom extension (Cache Block Management
-> +	   Operations) and enable its use in the kernel when it is detected
-> +	   at boot.
->  
->  	   The Zicbom extension can be used to handle for example
->  	   non-coherent DMA support on devices that need it.
-> @@ -684,7 +685,8 @@ config FPU
->  	default y
->  	help
->  	  Say N here if you want to disable all floating-point related procedure
-> -	  in the kernel.
-> +	  in the kernel. Without this option enabled, neither the kernel nor
-> +	  userspace may use vector.
-
-s/vector/floating point/ here.
-
-Regards,
-Samuel
-
->  
->  	  If you don't know what to do here, say Y.
->  
+On Fri, Mar 29, 2024 at 12:31:58PM +0100, Marcin Szycik wrote:
 > 
 > 
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+> On 28.03.2024 18:34, Simon Horman wrote:
+> > On Tue, Mar 26, 2024 at 05:44:55PM +0100, Marcin Szycik wrote:
+> >> In cases when VF sends malformed packets that are classified as malicious,
+> >> sometimes it causes Tx queue to freeze. This frozen queue can be stuck
+> >> for several minutes being unusable. This behavior can be reproduced with
+> >> a faulty userspace app running on VF.
+> >>
+> >> When Malicious Driver Detection event occurs and the mdd-auto-reset-vf
+> >> private flag is set, perform a graceful VF reset to quickly bring VF back
+> >> to operational state. Add a log message to notify about the cause of
+> >> the reset. Add a helper for this to be reused for both TX and RX events.
+> >>
+> >> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> >> Co-developed-by: Liang-Min Wang <liang-min.wang@intel.com>
+> >> Signed-off-by: Liang-Min Wang <liang-min.wang@intel.com>
+> >> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> > 
+> > Hi Marcin,
+> > 
+> > If I read this correctly then a reset may be performed for several
+> > different conditions - values of different registers - for a VF
+> > as checked in a for loop.
+> > 
+> > I am wondering if multiple resets could occur for the same VF within
+> > an iteration of the for loop - because more than one of the conditions is
+> > met. And, if so, is this ok?
+> 
+> Hi Simon,
+> 
+> Good point. Nothing too bad should happen, as ice_reset_vf() acquires mutex lock
+> (in fact two locks), so several resets would just happen in sequence. However,
+> it doesn't make much sense to reset VF multiple times, so maybe instead of issuing
+> reset on each condition, I'll set some flag, and after checking all registers I'll
+> trigger reset if that flag is set. What do you think?
 
+Thanks Marcin,
+
+FWIIW, that sounds like a good approach to me.
+
+-- 
+pw-bot: changes-requested
 
