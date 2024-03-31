@@ -1,111 +1,122 @@
-Return-Path: <netdev+bounces-83685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5FC893563
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 20:27:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31312893574
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 20:52:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F12284D50
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:27:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FA99282041
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D576145B2A;
-	Sun, 31 Mar 2024 18:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F330146D49;
+	Sun, 31 Mar 2024 18:52:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HL8hyC0W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FSwuYCM+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B97145B1C
-	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 18:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96AA214430E
+	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 18:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711909671; cv=none; b=Z+ATVazlv8gReqQ3O6V2ljDwH9AwVO05JzOoWEYe76AlvZy2Dvc5E+QAZssbgNIOub50nPfV9fSjVAy7yOoRqcrSX1lquGGJjvayiDKCjoadoYpAj9y7IWLTAYGwSCyqTF91RvHfiCcewZZlSRj8+9qy5LNxurFJZVYUkXR4xTQ=
+	t=1711911133; cv=none; b=mrsUP3ldcdPEKMJezL0uEvkd+fwutw8xahpGMS7KxAHI0HVqlvDuQj6jpqKINZPW6rb+BFW/ZdrvvFISBwJoxwM85xueHPoE/qIiI+0KgVpt7orc68n26wR9Xq+ZKRFXxamr9GLQoWHOgWdHa7v2pZNvy8txaqKScyTBgOO5rbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711909671; c=relaxed/simple;
-	bh=mqV57eRZ6VoXvr3aBmrVYg1f738OdoqmYDtIlFCSrY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oTmGg7vz1j6jPGJvp1Fk+a8jmDNKo6m65XaMdmhS0Tr14JJ+cdXphSxeXNVkosChZrpwVNmYf4HeWHJLJF1+d5qFOAddF+zOpPMG/VvTCmrhGuzlp50gS+kVxLx+TeN7CbBVCYTjr1lyvf/8RBHXaTZqrupIkkky4YkxSBl0OsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HL8hyC0W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EF88C433C7;
-	Sun, 31 Mar 2024 18:27:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711909671;
-	bh=mqV57eRZ6VoXvr3aBmrVYg1f738OdoqmYDtIlFCSrY8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HL8hyC0WsH91RQqowJxxTGHU1PH70duMJZ96hHGu8QSp7WQbKC6XNFX4o9/PWJt8n
-	 pxRmcI7c9hKqMLSja7rizQVs48arwZvX3x7xBq5TmfwAbBiMkj654x47C0CBHS6BEV
-	 K1jVqR+FZKOp7Rb4lO4KS72T9swsVW274A4O1GM91c+Ac5F8VeW38+eUT1BmqEm0Li
-	 3VMR2TkFjHgp+v+03tEj5fNC4+Ox+w2XDnDq2wGGEs2DZ8sUdvcW+EdSm7xStjjg8x
-	 i6wT9or1a3BAT0bNEzvuOXBu5TSD3IKnPR/taVevfRKXui6Ix57VZWKH08YiIl6yXl
-	 i1a4R2aZbv+7Q==
-Date: Sun, 31 Mar 2024 19:27:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Marcin Szycik <marcin.szycik@linux.intel.com>
-Cc: Wojciech Drewek <wojciech.drewek@intel.com>, netdev@vger.kernel.org,
-	pawel.chmielewski@intel.com, anthony.l.nguyen@intel.com,
-	Liang-Min Wang <liang-min.wang@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] ice: Reset VF on Tx MDD
- event
-Message-ID: <20240331182747.GC26556@kernel.org>
-References: <20240326164455.735739-1-marcin.szycik@linux.intel.com>
- <20240328173450.GH651713@kernel.org>
- <fbf9dae9-c023-4b15-b3d8-6b19240f59b0@linux.intel.com>
+	s=arc-20240116; t=1711911133; c=relaxed/simple;
+	bh=Cani6to3UjHzeXHQNNKD1CkRKn1f0WiKSoOsz37nhyU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nle1gDfAC6wZpwWLDOFoFeY9xu4SB8m0rKVaTmvxnDfApZoI+GDu0ndIKEIefX0lp5mD0vkVs5eCHySca59HvRlnPFeOK1GmczXAl+8oQzk0AklGbisIAcPOKoK4zE2Pdx1I1DybXpUSkLZKWbdEbdK+VPQ23JgY/C/E7iiCsjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FSwuYCM+; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-34005b5927eso2630635f8f.1
+        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 11:52:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711911130; x=1712515930; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j9Izg/EBEx0o13Szorrfhcc9j42L/Bu5maJxbAyaQWg=;
+        b=FSwuYCM+M4qDV0TF9D74nF/srbIRtqMrMTwO4c0FpcxgesoJzTmT4l7y5FmOsM4sv3
+         YsxqThNHd8Xx5/Yo+oMvEtCfGhoyRgCbu3OzuCKW7TatvFT23YDuLefNZA//IzvtlyHO
+         FPQEfFLaQhk0xAQMLZimyMsgTjGW0FPc0LIgE5ZP/uQOog+SZF4uKQbLLQS/tWEkQmc7
+         mvIh6O2Zk6jqqloVysxHG28swZ8OuV8iDKyKI7ACT0r5mQQRXLDkQevY5cmZqMBjAcvq
+         XIr1ieCxic0zndGIfERtDPLvu200d0XUaJmtuFCGV/9QP/dqDnzRuuf+3bmti11IuGRG
+         aTrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711911130; x=1712515930;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j9Izg/EBEx0o13Szorrfhcc9j42L/Bu5maJxbAyaQWg=;
+        b=aYQFEkPCEKv7PTqKskN7nWgyTSfAEB1+JmuXDQYwCW2lesgSEKPxLYv19CTuEgzHyY
+         S6qIQA4kLtVUTCYZxcJJ6mTD9fyglQdafKRq/eREFY32ZG9ShmbxBFhIGv7y82H3iA6r
+         eXtAu714oUVkgTp+FUN1bCEi5AIiQMGdP/V/WUzDO5EXFXrAE4SOlXN2XpFywQc3EEXM
+         8DMBpiX7xzGmQMyW66RTQabdADxof93URodU5tFUuYQHfcjXsfDCeydVFvIx2ViQAthh
+         UcA7NBBU1GTvqtby5CrRUvTHMlbF/e6U5ZXR+DOEpPWIbaH5uoMzqHd75lMIDZilAYJY
+         iiYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWoZYxGhp+z5fVuiJnfLj8ev0QUYNgjQoVJdK4ZnVDi3rFcZjF4k66UILzL6MThN6H/uErnRYgRsTl5v8Gsf8KMnyF1aUn
+X-Gm-Message-State: AOJu0Yy03MrTLCjG4J3bs/hnR2LJ8/rcT+DTTHXIqooPMFNrCo05YAX6
+	VmOHbAQM5vYzw6be3XDEKfYUKY5Ua8/WU6xIprDzuRwUuhKR+sow
+X-Google-Smtp-Source: AGHT+IGYVT7MF0ypohlh5j+qvG5oNU8lJHD0eTmbvgjjS6WSUl9rdWOum+M3uh3TSSyWdc2AlsMfyw==
+X-Received: by 2002:a05:6000:1568:b0:343:3a51:ad65 with SMTP id 8-20020a056000156800b003433a51ad65mr4507960wrz.38.1711911129534;
+        Sun, 31 Mar 2024 11:52:09 -0700 (PDT)
+Received: from [172.27.19.119] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id l3-20020a5d5603000000b0033e03d37685sm9492891wrv.55.2024.03.31.11.52.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 31 Mar 2024 11:52:09 -0700 (PDT)
+Message-ID: <e32e34b7-df22-4ff8-a2e4-04e2caaf489f@gmail.com>
+Date: Sun, 31 Mar 2024 21:52:06 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fbf9dae9-c023-4b15-b3d8-6b19240f59b0@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/8] net/mlx5e: Expose the VF/SF RX drop counter
+ on the representor
+To: Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>,
+ Aya Levin <ayal@nvidia.com>
+References: <20240326222022.27926-1-tariqt@nvidia.com>
+ <20240326222022.27926-6-tariqt@nvidia.com>
+ <20240328111831.GA403975@kernel.org> <20240328092132.47877242@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240328092132.47877242@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 29, 2024 at 12:31:58PM +0100, Marcin Szycik wrote:
-> 
-> 
-> On 28.03.2024 18:34, Simon Horman wrote:
-> > On Tue, Mar 26, 2024 at 05:44:55PM +0100, Marcin Szycik wrote:
-> >> In cases when VF sends malformed packets that are classified as malicious,
-> >> sometimes it causes Tx queue to freeze. This frozen queue can be stuck
-> >> for several minutes being unusable. This behavior can be reproduced with
-> >> a faulty userspace app running on VF.
-> >>
-> >> When Malicious Driver Detection event occurs and the mdd-auto-reset-vf
-> >> private flag is set, perform a graceful VF reset to quickly bring VF back
-> >> to operational state. Add a log message to notify about the cause of
-> >> the reset. Add a helper for this to be reused for both TX and RX events.
-> >>
-> >> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> >> Co-developed-by: Liang-Min Wang <liang-min.wang@intel.com>
-> >> Signed-off-by: Liang-Min Wang <liang-min.wang@intel.com>
-> >> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> > 
-> > Hi Marcin,
-> > 
-> > If I read this correctly then a reset may be performed for several
-> > different conditions - values of different registers - for a VF
-> > as checked in a for loop.
-> > 
-> > I am wondering if multiple resets could occur for the same VF within
-> > an iteration of the for loop - because more than one of the conditions is
-> > met. And, if so, is this ok?
-> 
-> Hi Simon,
-> 
-> Good point. Nothing too bad should happen, as ice_reset_vf() acquires mutex lock
-> (in fact two locks), so several resets would just happen in sequence. However,
-> it doesn't make much sense to reset VF multiple times, so maybe instead of issuing
-> reset on each condition, I'll set some flag, and after checking all registers I'll
-> trigger reset if that flag is set. What do you think?
 
-Thanks Marcin,
 
-FWIIW, that sounds like a good approach to me.
+On 28/03/2024 18:21, Jakub Kicinski wrote:
+> On Thu, 28 Mar 2024 11:18:31 +0000 Simon Horman wrote:
+>>> The "rx_vport_out_of_buffer" equals the sum of all
+>>> Q counters out_of_buffer values allocated on the VF/SF.
+>>
+>> Hi Carolina and Tariq,
+>>
+>> I am wondering if any consideration was given to making this
+>> a generic counter. Buffer exhaustion sounds like something that
+>> other NICs may report too.
+> 
+> I think it's basically rx_missed_errors from rtnl_link_stats64.
+> mlx5 doesn't currently report it at all, AFAICT.
+> 
 
--- 
-pw-bot: changes-requested
+We expose it in ethtool stats.
+Note that the "local" RX buffer exhaustion counter exists for a long time.
+
+Here we introduce in the representor kind of a "remote" version of the 
+counter, to help providers monitor RX drops that occur in the customers' 
+side.
+
+It follows the local counter hence currently it is not generic.
 
