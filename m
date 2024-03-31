@@ -1,144 +1,214 @@
-Return-Path: <netdev+bounces-83587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DDC389322A
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 18:01:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEB0C8931F8
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:24:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 903D5B2146F
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 16:01:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CFDE281707
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 14:24:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53794145342;
-	Sun, 31 Mar 2024 16:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E84A1448CE;
+	Sun, 31 Mar 2024 14:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QriMG5bP"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="FeEduH3y"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DB6145340;
-	Sun, 31 Mar 2024 16:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=62.96.220.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711900898; cv=pass; b=pD8Uvo+Fu735KWGeahlOeDbqpwxlVdLO6dGvzSUZk2+u2smMy7K2mCyNOvAOQkmx0MxTZ6g6oLI1/hrO88/i6bVqlHhXl/PbMTSwm88jLLWIx4A8IyBdztWASEcmAeg0snvLOMFpPCoBw0WEJmTT2wEcoos6zKVPzYL+y59E91s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711900898; c=relaxed/simple;
-	bh=1rWdaEawfYR3LfAF31PiRtpuMF8rLJZ44iKkxh0MscI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-ID:Date:References:
-	 In-Reply-To:To:Cc; b=BXnUfc8M215Lp4CF3t2NUkEtfQYj3TdrFFkYNuTfPV0P/zuYpHtRLKTHYaA6bf9StZ1cnS8qkyb8faA8CDmIkLIvqUdgheqDXz3FjJZ69XlZcTw6T+VKX6deYVU2Gh2RF1BGKtJSV7aZZPYqa3p+2jVxjE++igaAKLyjmg7YYnI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QriMG5bP; arc=none smtp.client-ip=10.30.226.201; arc=pass smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id DE28A20799;
-	Sun, 31 Mar 2024 18:01:33 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MONWvnqNRudz; Sun, 31 Mar 2024 18:01:32 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4422EB08
+	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 14:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711895060; cv=none; b=HxjalImC7qI1sb74E8GgayZhsw0UIzrhvJF6rT4VlGeBuoBYl3CQ3hiItGoTmTXvH3686v22oO/2+Iix6LQ15cXh0+uCKa5xog4GKS33fraavYCqTcI7FqYOjxaoWUH9jzd3jcaFa4mdK241IO0jGuxnd+W+N6tO5QE3v193LFg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711895060; c=relaxed/simple;
+	bh=NIMVcTtVhHbqBbSGKs4tcm1rlGj/qEgfgNzDsBHR5AY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jLp8Nq0l32Wiwz0S6eMykZxc9k4igCTtKsd4iapMNckbCaAInL1aLIGQsHzBdZmn/4k2ueTIuhrJM1K/pcsQvYb/X4gkj+YziT1YEHeOxAkD3NWEK7sUpPhP1khDem761ww5QZf1fMghcvL9dB6QlKSfJQZ6bsY8KcaqWIzw3fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=FeEduH3y; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 942FE207D8;
-	Sun, 31 Mar 2024 18:01:32 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 942FE207D8
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 8663A80004A;
-	Sun, 31 Mar 2024 18:01:32 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:01:32 +0200
-Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 15:52:41 +0000
-X-sender: <netdev+bounces-83482-steffen.klassert=secunet.com@vger.kernel.org>
-X-Receiver: <steffen.klassert@secunet.com>
- ORCPT=rfc822;steffen.klassert@secunet.com NOTIFY=NEVER;
- X-ExtendedProps=BQAVABYAAgAAAAUAFAARAPDFCS25BAlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAwAAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9ye
-	TogRmFsc2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
-X-CreatedBy: MSExchange15
-X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoA+Q1rGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAYgAKAHcAAADMigAABQBkAA8AAwAAAEh1Yg==
-X-Source: SMTP:Default MBX-ESSEN-01
-X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 12207
-X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.199.223; helo=ny.mirrors.kernel.org; envelope-from=netdev+bounces-83482-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com E4B95200BB
-Authentication-Results: b.mx.secunet.com;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QriMG5bP"
-X-Original-To: netdev@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal: i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711752631; cv=none; b=eLispVzL4Rucdj5yrzfRgnSRePLp+Y1FD2BRZyUX76ykzaZw7VHi9YXASU31baAxoYFmxYlpOQR4UYS8gEjEpjt1zGwq62prz06qhAHc+483Hh1xmTXYFXP7I4YViQd6l9vns1N932S+E0brudJT0ir0I9KRIrHiq60XZoaVoX0=
-ARC-Message-Signature: i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711752631; c=relaxed/simple;
-	bh=1rWdaEawfYR3LfAF31PiRtpuMF8rLJZ44iKkxh0MscI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xg3OsV9Hn217vm8daSQu1usYD3ksPWTEpVZ2YL8e46SgPg+BrESFujNuqbVuhFeJowZ00pl26chFLpmFOjszBnk+xcfKA2Lv8VGoUK8QewV5y96v44UHH8h1j3HJYz3vCS+bWN/aej6pX4824HBLNpa31QWPvcxKcQWmCuSFNkM=
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QriMG5bP; arc=none smtp.client-ip=10.30.226.201
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711752630;
-	bh=1rWdaEawfYR3LfAF31PiRtpuMF8rLJZ44iKkxh0MscI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QriMG5bPxFDJal3+iK1Pb0iH9WyOvvWgwweQ2/D86v3oy/13nMNRcnZgIMYLJopSY
-	 7KLJczmMCVMHyE0HUKo16Zlrh+oM1jIPi5sy2qLvR1xNCT85FR5iD28bsq3bhCic2E
-	 9agT52MvYHoRihMvi5B1sSF3/Py9XPrQj9IBRigclTJz6rtPhf6vSl/5FSEsRqKbd5
-	 AG+Y/Btm/xHAuRSBzBp5kwOLojbL6e2YNlyWE+0YcxgNg53lc484ELHLR7HwPJHh3Q
-	 zxW5r1DkUTeEdz0tQrKVSD3O2p8NxXZGc3WAWBi8z8L8dwVHWkG0HVZicER5qqp8k6
-	 laI6AElXluGGw==
-Content-Type: text/plain; charset="utf-8"
-Precedence: bulk
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 5047887F1E;
+	Sun, 31 Mar 2024 16:24:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1711895056;
+	bh=bCdicDafxJzTPN6RIRxqiWS7Nl/e57ev0THPblaPhYA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FeEduH3y1YMpKYQpWwtSB7k6k6M+i/g6Ko32OuEYX7kiSLverE+9qtcLOUStXS2EU
+	 W94n3fN32XaCKq7PX87lqUYrWJoTOEsugyD7Yc2jHxzmve8G7hjiqlSVFrvmPi/Bbq
+	 9V9ekzIhi0M+UQf9vHdfdwX5s8ZCg90PLaeJVOlNZjIWk60V4mQYoGyeaMo9asKG6V
+	 6Gc0iMFxDOna/8bmfV5k1SHXxs8+d4gYIxiNrVufraNaLPK/ns+elH83z/oydSS/++
+	 SCMxG7vFFUW+8DmEuat3nqE6SChoOjQIrgfly94clQZJSbpqijwWfBVAfwdedAnC2u
+	 iaA9ScVBNSN0g==
+From: Marek Vasut <marex@denx.de>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH 1/2] net: ks8851: Inline ks8851_rx_skb()
+Date: Sun, 31 Mar 2024 16:21:45 +0200
+Message-ID: <20240331142353.93792-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6 0/1] Add property in dwmac-stm32 documentation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-ID: <171175263052.1693.263504657362042828.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 22:50:30 +0000
-References: <20240328185337.332703-1-christophe.roullier@foss.st.com>
-In-Reply-To: <20240328185337.332703-1-christophe.roullier@foss.st.com>
-To: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- richardcochran@gmail.com, joabreu@synopsys.com, lgirdwood@gmail.com,
- broonie@kernel.org, marex@denx.de, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Hello:
+Both ks8851_rx_skb_par() and ks8851_rx_skb_spi() call netif_rx(skb),
+inline the netif_rx(skb) call directly into ks8851_common.c and drop
+the .rx_skb callback and ks8851_rx_skb() wrapper. This removes one
+indirect call from the driver, no functional change otherwise.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+---
+ drivers/net/ethernet/micrel/ks8851.h        |  3 ---
+ drivers/net/ethernet/micrel/ks8851_common.c | 12 +-----------
+ drivers/net/ethernet/micrel/ks8851_par.c    | 11 -----------
+ drivers/net/ethernet/micrel/ks8851_spi.c    | 11 -----------
+ 4 files changed, 1 insertion(+), 36 deletions(-)
 
-On Thu, 28 Mar 2024 19:53:36 +0100 you wrote:
-> Introduce property in dwmac-stm32 documentation
-> 
->  - st,ext-phyclk: is present since 2020 in driver so need to explain
->    it and avoid dtbs check issue : views/kernel/upstream/net-next/arch/arm/boot/dts/st/stm32mp157c-dk2.dtb:
-> ethernet@5800a000: Unevaluated properties are not allowed
-> ('st,ext-phyclk' was unexpected)
->    Furthermore this property will be use in upstream of MP13 dwmac glue. (next step)
-> 
-> [...]
-
-Here is the summary with links:
-  - [v6,1/1] dt-bindings: net: dwmac: Document STM32 property st,ext-phyclk
-    https://git.kernel.org/netdev/net-next/c/929107d3d2a3
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/micrel/ks8851.h
+index e5ec0a363aff8..31f75b4a67fd7 100644
+--- a/drivers/net/ethernet/micrel/ks8851.h
++++ b/drivers/net/ethernet/micrel/ks8851.h
+@@ -368,7 +368,6 @@ union ks8851_tx_hdr {
+  * @rdfifo: FIFO read callback
+  * @wrfifo: FIFO write callback
+  * @start_xmit: start_xmit() implementation callback
+- * @rx_skb: rx_skb() implementation callback
+  * @flush_tx_work: flush_tx_work() implementation callback
+  *
+  * The @statelock is used to protect information in the structure which may
+@@ -423,8 +422,6 @@ struct ks8851_net {
+ 					  struct sk_buff *txp, bool irq);
+ 	netdev_tx_t		(*start_xmit)(struct sk_buff *skb,
+ 					      struct net_device *dev);
+-	void			(*rx_skb)(struct ks8851_net *ks,
+-					  struct sk_buff *skb);
+ 	void			(*flush_tx_work)(struct ks8851_net *ks);
+ };
+ 
+diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
+index 0bf13b38b8f5b..896d43bb8883d 100644
+--- a/drivers/net/ethernet/micrel/ks8851_common.c
++++ b/drivers/net/ethernet/micrel/ks8851_common.c
+@@ -231,16 +231,6 @@ static void ks8851_dbg_dumpkkt(struct ks8851_net *ks, u8 *rxpkt)
+ 		   rxpkt[12], rxpkt[13], rxpkt[14], rxpkt[15]);
+ }
+ 
+-/**
+- * ks8851_rx_skb - receive skbuff
+- * @ks: The device state.
+- * @skb: The skbuff
+- */
+-static void ks8851_rx_skb(struct ks8851_net *ks, struct sk_buff *skb)
+-{
+-	ks->rx_skb(ks, skb);
+-}
+-
+ /**
+  * ks8851_rx_pkts - receive packets from the host
+  * @ks: The device information.
+@@ -309,7 +299,7 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
+ 					ks8851_dbg_dumpkkt(ks, rxpkt);
+ 
+ 				skb->protocol = eth_type_trans(skb, ks->netdev);
+-				ks8851_rx_skb(ks, skb);
++				netif_rx(skb);
+ 
+ 				ks->netdev->stats.rx_packets++;
+ 				ks->netdev->stats.rx_bytes += rxlen;
+diff --git a/drivers/net/ethernet/micrel/ks8851_par.c b/drivers/net/ethernet/micrel/ks8851_par.c
+index 2a7f298542670..381b9cd285ebd 100644
+--- a/drivers/net/ethernet/micrel/ks8851_par.c
++++ b/drivers/net/ethernet/micrel/ks8851_par.c
+@@ -210,16 +210,6 @@ static void ks8851_wrfifo_par(struct ks8851_net *ks, struct sk_buff *txp,
+ 	iowrite16_rep(ksp->hw_addr, txp->data, len / 2);
+ }
+ 
+-/**
+- * ks8851_rx_skb_par - receive skbuff
+- * @ks: The device state.
+- * @skb: The skbuff
+- */
+-static void ks8851_rx_skb_par(struct ks8851_net *ks, struct sk_buff *skb)
+-{
+-	netif_rx(skb);
+-}
+-
+ static unsigned int ks8851_rdreg16_par_txqcr(struct ks8851_net *ks)
+ {
+ 	return ks8851_rdreg16_par(ks, KS_TXQCR);
+@@ -298,7 +288,6 @@ static int ks8851_probe_par(struct platform_device *pdev)
+ 	ks->rdfifo = ks8851_rdfifo_par;
+ 	ks->wrfifo = ks8851_wrfifo_par;
+ 	ks->start_xmit = ks8851_start_xmit_par;
+-	ks->rx_skb = ks8851_rx_skb_par;
+ 
+ #define STD_IRQ (IRQ_LCI |	/* Link Change */	\
+ 		 IRQ_RXI |	/* RX done */		\
+diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
+index 2f803377c9f9d..670c1de966db8 100644
+--- a/drivers/net/ethernet/micrel/ks8851_spi.c
++++ b/drivers/net/ethernet/micrel/ks8851_spi.c
+@@ -298,16 +298,6 @@ static unsigned int calc_txlen(unsigned int len)
+ 	return ALIGN(len + 4, 4);
+ }
+ 
+-/**
+- * ks8851_rx_skb_spi - receive skbuff
+- * @ks: The device state
+- * @skb: The skbuff
+- */
+-static void ks8851_rx_skb_spi(struct ks8851_net *ks, struct sk_buff *skb)
+-{
+-	netif_rx(skb);
+-}
+-
+ /**
+  * ks8851_tx_work - process tx packet(s)
+  * @work: The work strucutre what was scheduled.
+@@ -435,7 +425,6 @@ static int ks8851_probe_spi(struct spi_device *spi)
+ 	ks->rdfifo = ks8851_rdfifo_spi;
+ 	ks->wrfifo = ks8851_wrfifo_spi;
+ 	ks->start_xmit = ks8851_start_xmit_spi;
+-	ks->rx_skb = ks8851_rx_skb_spi;
+ 	ks->flush_tx_work = ks8851_flush_tx_work_spi;
+ 
+ #define STD_IRQ (IRQ_LCI |	/* Link Change */	\
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+2.43.0
 
 
