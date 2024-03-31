@@ -1,123 +1,115 @@
-Return-Path: <netdev+bounces-83569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A107893100
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 11:03:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FAF4893105
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 11:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A37132816F6
-	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 09:03:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5CE01F21B52
+	for <lists+netdev@lfdr.de>; Sun, 31 Mar 2024 09:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAFF6E5EC;
-	Sun, 31 Mar 2024 08:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441CF2AD32;
+	Sun, 31 Mar 2024 09:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hnenQLRM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JKkf22qL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268C16BB23;
-	Sun, 31 Mar 2024 08:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF221C0DE5
+	for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 09:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711875284; cv=none; b=E4rQwWbkqg7K7yiK0NQohFpheOREtj0q9rO4gbb8ASZbrLjvWKnm8ELAVhVpDhh59JWB7qqirRyyFXdkSg4mmvzV0CCvAJMq//3SmkruaB1ouIzy/LAHxiy/4hgy1TrUmEW+EWJ9a4J9gYTyYllqvSFejCGJB1WMXS5NpyW+48Y=
+	t=1711875932; cv=none; b=GDhHN3nG0FkJgI6y9tXlRu27sho7aNbzAHqupl053nkeTb8QRWLHUvqc2nDfN53kmbWXRZ1WAysRS7taYilklhCoPuGOv0WCOQ5nJOfU/MmoE1CFfPo5baFsrsVOJWpspEajucoZS5jRsgvHKG5A7XDLdzQ/hhmBLSkl6vTo1jE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711875284; c=relaxed/simple;
-	bh=vq+yVxHBNYz1MHfaG/f7xwyOH/JCSiaOQmS2/BWaKb4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X95HGmomnKacIV++w9omnMkcSokfK68zNLLLyUpGsJ/6uGcHIykxe0dV0sTeXB+z2taWdF21qgjZq7TxUgclgYmfcgXXTNns0KcfGej3oR4VrNPWDQzVVXhLR2vKl9yuXLrGsj+iNRbszKS5TWGe27ctRTvsJjb/WXtMqs/aOEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hnenQLRM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C27EC433C7;
-	Sun, 31 Mar 2024 08:54:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711875283;
-	bh=vq+yVxHBNYz1MHfaG/f7xwyOH/JCSiaOQmS2/BWaKb4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hnenQLRMWEJv9JsczxYuZzPYE00Uygwtk+6KJaj7VtKppqD3jESbEZdPnql67BOpo
-	 eqmFnEQ1SJiM3jstS2wrxcASOgOz4ebv0R5/ZBvg1B5GgmfsA91HkBGyDeeMQyVbbQ
-	 H4J8hGHP4wMoRvMsWljXdQVJmxy8MmbJx14eOLuPtyJgGLM2LIbl7tUaryLrCvXRKj
-	 phEsy+C1a6v67TaG4O+aL9r9ngSNDC/h14r1sP4+HgOb8fRSrkX9mUIFMVrnGmQCf2
-	 zSYkg5X9xzs1/RCURPXm/tYgVfmuijIs9FpoDGZgmsDVFLYbgqvB+c1zLMEzShnInA
-	 f76qTV/KTCz8w==
-Date: Sun, 31 Mar 2024 09:54:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: aleksander.lobakin@intel.com, kuba@kernel.org, davem@davemloft.net,
-	pabeni@redhat.com, edumazet@google.com,
-	Taras Chornyi <taras.chornyi@plvision.eu>,
-	quic_jjohnson@quicinc.com, kvalo@kernel.org, leon@kernel.org,
-	dennis.dalessandro@cornelisnetworks.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/5] net: marvell: prestera: allocate dummy
- net_device dynamically
-Message-ID: <20240331085438.GA26556@kernel.org>
-References: <20240328235214.4079063-1-leitao@debian.org>
- <20240328235214.4079063-3-leitao@debian.org>
+	s=arc-20240116; t=1711875932; c=relaxed/simple;
+	bh=T3TbQ221nO1Il/6EQXBBuyWZkfJXamANSLShzFjxjWU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hdfWMF55XziBhD+DNMysSDlVyUCAz5KKOUUk7sR8+jG1KH7BFclbr/Hkd/nGNKGpjai2SBgDsSrn5oU/KBd4A7ucQm3cRgJ729FXtmdoFs9WHHX2izACU7bqWyURayAXk21nZGc6q13ZusrA7ieRtA/+4GFZJbHzbfzXJP6nA+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JKkf22qL; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5a4b35ff84eso2034384eaf.2
+        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 02:05:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711875930; x=1712480730; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ky119Wmn9lN3itBVAspC/BbZzZjapLFOG2bFm8WtvRY=;
+        b=JKkf22qLc7bL34IrBvR7/FSZC3Ds6Kt8UzyqtExXUJsPHYXmGrY9R+vge8j+s23979
+         XMc1Vd084a1R3GXiMWpKYr+8bXNaOKA6sQpsPyXhOH8sZ01XgD3bM5tTDongEqe/vjMc
+         B8+lH4p3a5gRlyoX1zeJmh+h7qaYGOutERR3yXEtWMiOj1z+uxrk+5foMzbodHtPSAuR
+         BuW63xaz3kqlbe+Q0NNITSOvShWClbFRfcUck7vrulMHE3Qa3CXloYk5bXFuqgTsdGWs
+         JUymIbQJYcpRb445A58u2pwIZ5KKQXL1v3nB+mDIRmm0hbtcvPJ9Qg1sQBp52PBjx0Zp
+         mYWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711875930; x=1712480730;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ky119Wmn9lN3itBVAspC/BbZzZjapLFOG2bFm8WtvRY=;
+        b=OYM02JA5QIrLohjsYuYvoUS0cAFmAuneRZTC2WF2CfJcKLOAOmtMLnb/kMGwHack4k
+         TPitosh/VAMXSSR4QKDn73A/selJTRQNQlfkbKmp72f9dpsRy/dMNddyEh1mQUZwdfIm
+         gHqsak+Q/SwLu9EGkFTZvyCJoge/vMCZyGSuXNmJQw+6EH4uotZGysvk6k7GBtBVFNX6
+         C/oQKpT52wsKdJRkgZMVCEjCKFTzmFMpUPGvrS63wgJeLv9jD6h5XnoE8EOlBDdot/qI
+         CsQLHpa9ea0K0VFvuVAm6zpfqg4O7+eWxQZyO8ZvStwqCLzUC0d6VARQ7GzJFvmiE3pS
+         s2AQ==
+X-Gm-Message-State: AOJu0YxEy35JhiDHQKvk1MIhdY+zOx5jTzhq4PiKTY50sBhoi5IWYqkN
+	/rrXx6PN4v/N+joQqKxCmuFDQh9rQbMOM+7GLFBUKTGDX6t/ddET
+X-Google-Smtp-Source: AGHT+IGWJlzjzT5DVCzi9/z73tCArAcJ7nYGcahi/w09HQ/aa5Kl9BT1U3gr+kB4vbHocoeCPjsw4w==
+X-Received: by 2002:a05:6358:70cc:b0:17e:8b66:a983 with SMTP id h12-20020a05635870cc00b0017e8b66a983mr7934504rwh.21.1711875929568;
+        Sun, 31 Mar 2024 02:05:29 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([60.209.131.72])
+        by smtp.gmail.com with ESMTPSA id o3-20020a056a00214300b006e6288ef4besm5695333pfk.54.2024.03.31.02.05.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Mar 2024 02:05:29 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next] tcp/dccp: complete lockless accesses to sk->sk_max_ack_backlog
+Date: Sun, 31 Mar 2024 17:05:21 +0800
+Message-Id: <20240331090521.71965-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240328235214.4079063-3-leitao@debian.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 28, 2024 at 04:52:02PM -0700, Breno Leitao wrote:
-> Embedding net_device into structures prohibits the usage of flexible
-> arrays in the net_device structure. For more details, see the discussion
-> at [1].
-> 
-> Un-embed the net_device from the private struct by converting it
-> into a pointer. Then use the leverage the new alloc_netdev_dummy()
-> helper to allocate and initialize dummy devices.
-> 
-> [1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  .../net/ethernet/marvell/prestera/prestera_rxtx.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_rxtx.c b/drivers/net/ethernet/marvell/prestera/prestera_rxtx.c
+From: Jason Xing <kernelxing@tencent.com>
 
-...
+Since commit 099ecf59f05b ("net: annotate lockless accesses to
+sk->sk_max_ack_backlog") decided to handle the sk_max_ack_backlog
+locklessly, there is one more function mostly called in TCP/DCCP
+cases. So this patch completes it:)
 
-> @@ -654,13 +654,21 @@ static int prestera_sdma_switch_init(struct prestera_switch *sw)
->  	if (err)
->  		goto err_evt_register;
->  
-> -	init_dummy_netdev(&sdma->napi_dev);
-> +	sdma->napi_dev = alloc_netdev_dummy(0);
-> +	if (!sdma->napi_dev) {
-> +		dev_err(dev, "not able to initialize dummy device\n");
-> +		goto err_alloc_dummy;
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ include/net/inet_connection_sock.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi Breno,
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index ccf171f7eb60..d94f787fdf40 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -284,7 +284,7 @@ static inline int inet_csk_reqsk_queue_len(const struct sock *sk)
+ 
+ static inline int inet_csk_reqsk_queue_is_full(const struct sock *sk)
+ {
+-	return inet_csk_reqsk_queue_len(sk) >= sk->sk_max_ack_backlog;
++	return inet_csk_reqsk_queue_len(sk) >= READ_ONCE(sk->sk_max_ack_backlog);
+ }
+ 
+ bool inet_csk_reqsk_queue_drop(struct sock *sk, struct request_sock *req);
+-- 
+2.37.3
 
-This goto will result in the function returning err.
-But err is 0 here. Perhaps it should be set to a negative error value
-instead?
-
-Flagged by Smatch.
-
-> +	}
-> +
->  
-> -	netif_napi_add(&sdma->napi_dev, &sdma->rx_napi, prestera_sdma_rx_poll);
-> +	netif_napi_add(sdma->napi_dev, &sdma->rx_napi, prestera_sdma_rx_poll);
->  	napi_enable(&sdma->rx_napi);
->  
->  	return 0;
->  
-> +err_alloc_dummy:
-> +	prestera_hw_event_handler_unregister(sw, PRESTERA_EVENT_TYPE_RXTX,
-> +					     prestera_rxtx_handle_event);
->  err_evt_register:
->  err_tx_init:
->  	prestera_sdma_tx_fini(sdma);
-
-...
 
