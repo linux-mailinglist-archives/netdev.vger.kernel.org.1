@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-83708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BFA58937E0
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 05:54:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D015B8937E1
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 05:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF5BC281523
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 03:54:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46C70B20FC4
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 03:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9613F5382;
-	Mon,  1 Apr 2024 03:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E765382;
+	Mon,  1 Apr 2024 03:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YiSteSqE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="evphzsQI"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105A31362
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 03:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB752900
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 03:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711943660; cv=none; b=VYZ7chmiAn0ntedUztS//fLdgfY8PjcDXeCsHerqMwG48SWgIZAvcyL/W45xjV4HWTkD7BFDpvDmqDkHpm2mMHV5awmQMM/saY9ytnQe8vJW53387stg84Q/HXcUm0yhN0YRr0tO225uM1+Kdx9wwmY184YtmIwA1wnWSxaYjDI=
+	t=1711943669; cv=none; b=sjE2Q/WHW+z3VSvydoheidUr5QNJeEFrZ1ZqM57fvg74M+JBamDpUsYR9jBcAh3G0WFIT37CQnneS36qSbIvcpeR5BTM3fMH8S4KCjKqsa/uEUJoatqJSsm2qm5koLKTBti8i88Lwkd9fkJ1ksxI4BhMxObJcnAGlTFV7mcOmMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711943660; c=relaxed/simple;
-	bh=Qe28pRCJxJls1ow+k4RxJQYhPV2gxMaS3RZ6ERpz9bo=;
+	s=arc-20240116; t=1711943669; c=relaxed/simple;
+	bh=rO2MpXEnA5lJ3PnVWjtu4Id7Bc2Nen4BUGpkbmuP2NU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mzOkP382rn7FONWdZ8n41Wb6OTWJRHJvYzPxmSyLojFOi1ikOvEmHRn8xiMfmt750pdLLAcUKhcCLOeoC/oyywptJPNY0fslIG+B6I2eV5Ea/0yaQWeNSLWzq2bBFMVCCEcHB6Bjdn7qwFhBMRQfDshkKxcqe0XWzsCDlKTMwT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YiSteSqE; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version:Content-Type; b=XlhN8Td3yQHl/EaHjLPd0gP5sVB9SaZfmnAipNgFgaXLxOFSeZ6ISHqQ9raLdr47vXmdKta+7qgbMN24YhVL5xQGzSLWxY6FmTmgF7Bceid3aCiHNGz1+Zpc7ZJ/q0C1wOuOVaQ/p81q2U2pXRiGU3Q1jiJQJzw6tAtUq9e2kgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=evphzsQI; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6e6b729669bso3165359b3a.3
-        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 20:54:18 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6e6b729669bso3165403b3a.3
+        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 20:54:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1711943658; x=1712548458; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1711943667; x=1712548467; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=za7bKxM04aZAgzTrJxaAjWvgHPwQZblO+XhJYZ/nQdc=;
-        b=YiSteSqEqdLvoIHzpFmS58HAZgoUCdi6/9/xh3K2W1a/28merwCPGW4HEQMdpgIa5x
-         t2Iu/39Qojtg6cNLKd3NKHYshbe6PZ3K6gEcQbRNxxqMadwmpbI+ft5yWb2d6Iw2zBJS
-         eOKZLDaCoidEnc+v6fooBZ3BdDVDDDGPnEv5c=
+        bh=xuE3VnBqMuSperiTqR8BuLLQZMQckOOFQZAiTAI55VA=;
+        b=evphzsQIcrEnVK/KwIwlPJwkkc3oV4BtTrcHxUAD5RiB3JsO/hvbg+gmU8YWu92iIW
+         DN81eru5TiUNDEQ0wIDwFfy2ATQ6AF9ukoP0IQc/q3oqRrW19n1jxCQRhrZSuPxra8m+
+         cPYH4NVD5PryEaNd1vNnjWgTRSmJ4KdaCS2dc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711943658; x=1712548458;
+        d=1e100.net; s=20230601; t=1711943667; x=1712548467;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=za7bKxM04aZAgzTrJxaAjWvgHPwQZblO+XhJYZ/nQdc=;
-        b=uWaJoT76sW4hMw2iyiewZ2Dry86IISnVYNnYOZEfH3g6QvX7XU57UUakVRH1oGwcg1
-         i3KGO2iuYZQxKNlY7mB+cfhoK4f+6nitZh3pXqMUl7jS4VK8tcxh7vv2l0abQaPlcRXA
-         imwCeKeevtSh+NUk3gshfjnNz4JgFkJzNJYUlp6f0XYzoFY7gZEcpTJN7qEdcMQ2YlEa
-         XuTJRmhMQgm/QNjhJ7EqczE4WPAXQACSnZgwVcaYJHI4W7fNK+kcy4NvA/sKTywwroPr
-         UDY+KvpAjoc+7zi/w9YZF7+/KLV1VYLbtu6ySjrQG8RXxRHm/WVwUcm9+nW7G1E1DP7C
-         2q6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXaBj8M234HPitlc/g/bSbOBnu0+BDesTqz/xu4CQWd2ZtIbdQBvzwrCpO006HApG7PkSU/oiFK62mov0oRo449+7toT/A8
-X-Gm-Message-State: AOJu0YxW2bRgARV9uZVptjM36P6iGL6TMOJTFdRjWMMgVZGxd0AFaTZH
-	G3yrOWJc12N1OwsYxO24t5Zmk9HzrQ9TfydWMs+7aKX7PRNS7A8HWrizxTfVTw==
-X-Google-Smtp-Source: AGHT+IGww6pSunneW72swmQS3zlzcYw+nQGdUM1BsWYStJCg38YP2A5zaUP0ymu9+RJn4HSsbWByYg==
-X-Received: by 2002:a05:6a00:a23:b0:6ea:f351:1df9 with SMTP id p35-20020a056a000a2300b006eaf3511df9mr8899073pfh.23.1711943658044;
-        Sun, 31 Mar 2024 20:54:18 -0700 (PDT)
+        bh=xuE3VnBqMuSperiTqR8BuLLQZMQckOOFQZAiTAI55VA=;
+        b=Q6i6Tq8PIRV0x4EXtbvr5yykjI3GZe6MW/Z8pLO+GKt/swzpgstEwoCiqLZSKIJ/SU
+         z0t0JZoIZdfTdujF/xyuXg/cCwTaguKtrm3D8mM2WtAzEZQ7+E59w478risIHclEHVUO
+         pEikFXfFgLdy4JoS9vOUhABt30GAXSjcwkfDkSEvRaNgrNt6dg7cYMdc4ldJbJLBDgoH
+         Pd1vSh+5hCFPbxBO6dPXxzvE9jjakq0UM9z74l/PDoyieD6BdPkQVNYeySICR+DtfqAN
+         ifCt73H5uy9W5P6RV+kRO1wJD2566m6ECTfeDqHtKkB5FkHk90AFm1ht4KSkYU6kw3Yq
+         DLVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8cs8SfjWrDliP4rDX5HccNomoOPtSxFZU7SCdXPhbdn7fjijKto9kJSrtADvdQdJsH7G8oPw8Mi3AO7RPr+fhL6G3q0ag
+X-Gm-Message-State: AOJu0YwDirfX3MRA/x5wSmAzg1eoWdIVDcmGEJHg3VUZy1smzQsyyt1E
+	XmE4HwVHeaYwijmRA/vKRDh67J5aFGBrs6OYbX9t37tRaC1Zyu+/sqwarc6FWQ==
+X-Google-Smtp-Source: AGHT+IHH8aO0K1LolGxAAojoERED0v6RiQ5ifv3y6EjgQbAIcvtjQn8GTZ8Iy7bfmr+pK9KQ6H3K8w==
+X-Received: by 2002:a05:6a00:a23:b0:6ea:f351:1df9 with SMTP id p35-20020a056a000a2300b006eaf3511df9mr8899372pfh.23.1711943666891;
+        Sun, 31 Mar 2024 20:54:26 -0700 (PDT)
 Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id j26-20020a62b61a000000b006e73d1c0c0esm6860781pff.154.2024.03.31.20.54.14
+        by smtp.gmail.com with ESMTPSA id j26-20020a62b61a000000b006e73d1c0c0esm6860781pff.154.2024.03.31.20.54.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Mar 2024 20:54:17 -0700 (PDT)
+        Sun, 31 Mar 2024 20:54:26 -0700 (PDT)
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 To: michael.chan@broadcom.com
 Cc: davem@davemloft.net,
@@ -70,12 +70,11 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	netdev@vger.kernel.org,
 	pabeni@redhat.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
 	Somnath Kotur <somnath.kotur@broadcom.com>,
 	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next 1/7] bnxt_en: Add delay to handle Downstream Port Containment (DPC) AER
-Date: Sun, 31 Mar 2024 20:57:24 -0700
-Message-Id: <20240401035730.306790-2-pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next 2/7] bnxt_en: Enable XPS by default on driver load
+Date: Sun, 31 Mar 2024 20:57:25 -0700
+Message-Id: <20240401035730.306790-3-pavan.chebbi@broadcom.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20240401035730.306790-1-pavan.chebbi@broadcom.com>
 References: <20240401035730.306790-1-pavan.chebbi@broadcom.com>
@@ -86,50 +85,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a65fb7061500f1a4"
+	boundary="0000000000002d3f59061500f288"
 
---000000000000a65fb7061500f1a4
+--0000000000002d3f59061500f288
 Content-Transfer-Encoding: 8bit
 
-From: Vikas Gupta <vikas.gupta@broadcom.com>
+From: Somnath Kotur <somnath.kotur@broadcom.com>
 
-In case of DPC, after issuing the hot reset, the
-kernel waits for 100ms for the device to complete
-the reset. However on some older chips, the firmware
-may take up to 1 second to complete the reset, only
-after which the driver can restart the card.
+Enable XPS on default during NIC open. The choice of
+Tx queue is based on the CPU executing the thread that
+submits the Tx request. The pool of Tx queues will be
+spread evenly across both device-attached NUMA nodes(local)
+and remote NUMA nodes.
 
-Introduce delay of 900ms to handle this scenario on
-the older chipsets.
-
-Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
+Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 45 ++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index b4db4b1aaffb..6e24a341ad28 100644
+index 6e24a341ad28..54955f878b73 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -15550,6 +15550,10 @@ static pci_ers_result_t bnxt_io_slot_reset(struct pci_dev *pdev)
+@@ -11804,6 +11804,45 @@ static void bnxt_cfg_usr_fltrs(struct bnxt *bp)
+ 		bnxt_cfg_one_usr_fltr(bp, usr_fltr);
+ }
  
- 	netdev_info(bp->dev, "PCI Slot Reset\n");
- 
-+	if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS) &&
-+	    test_bit(BNXT_STATE_PCI_CHANNEL_IO_FROZEN, &bp->state))
-+		msleep(900);
++static int bnxt_set_xps_mapping(struct bnxt *bp)
++{
++	int numa_node = dev_to_node(&bp->pdev->dev);
++	unsigned int q_idx, map_idx, cpu, i;
++	const struct cpumask *cpu_mask_ptr;
++	int nr_cpus = num_online_cpus();
++	cpumask_t *q_map;
++	int rc = 0;
 +
- 	rtnl_lock();
++	q_map = kcalloc(bp->tx_nr_rings_per_tc, sizeof(*q_map), GFP_KERNEL);
++	if (!q_map)
++		return -ENOMEM;
++
++	/* Create CPU mask for all TX queues across MQPRIO traffic classes.
++	 * Each TC has the same number of TX queues. The nth TX queue for each
++	 * TC will have the same CPU mask.
++	 */
++	for (i = 0;  i < nr_cpus;  i++) {
++		map_idx = i % bp->tx_nr_rings_per_tc;
++		cpu = cpumask_local_spread(i, numa_node);
++		cpu_mask_ptr = get_cpu_mask(cpu);
++		cpumask_or(&q_map[map_idx], &q_map[map_idx], cpu_mask_ptr);
++	}
++
++	/* Register CPU mask for each TX queue excluding the ones marked for XDP */
++	for (q_idx = 0; q_idx < bp->dev->real_num_tx_queues; q_idx++) {
++		map_idx = q_idx % bp->tx_nr_rings_per_tc;
++		rc = netif_set_xps_queue(bp->dev, &q_map[map_idx], q_idx);
++		if (rc) {
++			netdev_warn(bp->dev, "Error setting XPS for q:%d\n", q_idx);
++			break;
++		}
++	}
++
++	kfree(q_map);
++
++	return rc;
++}
++
+ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ {
+ 	int rc = 0;
+@@ -11866,8 +11905,12 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ 		}
+ 	}
  
- 	if (pci_enable_device(pdev)) {
+-	if (irq_re_init)
++	if (irq_re_init) {
+ 		udp_tunnel_nic_reset_ntf(bp->dev);
++		rc = bnxt_set_xps_mapping(bp);
++		if (rc)
++			netdev_warn(bp->dev, "failed to set xps mapping\n");
++	}
+ 
+ 	if (bp->tx_nr_rings_xdp < num_possible_cpus()) {
+ 		if (!static_key_enabled(&bnxt_xdp_locking_key))
 -- 
 2.39.1
 
 
---000000000000a65fb7061500f1a4
+--0000000000002d3f59061500f288
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -200,14 +244,14 @@ pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
 Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBj2eejvF0mN5pMVty1cAmOZwLBYRUM4
-EAPEGZeGsce1MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQw
-MTAzNTQxOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHWuw+84JMh/CgL4Fy1ECyCaspXU6oEs
+cj799/+PSLNZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQw
+MTAzNTQyN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBALxuYFvaGehyDJMDJNnXL+TLNWDFaoN7WjEZ8JeDDF2pB/iXF
-KvqM8Djc/8y0f2BG2kZufFXv5Njis/GEPHXI8JYaSxevU2drjl7fn8FmLaLCZTE4L3C8JbI/qFc6
-JdI0XVlpTPG1CLYzvO9MoT1J5A/MfaYuHvT3NyxeovwQaFT3qCXp/YhC+FRdNp4S7p1wD8pm0rFv
-lhkZ66UDsr5E8NDGwN4357iTJ/HiUECkOiciaRZ7PTomas1EWDdImjMhE/wg/t3Q4UpIwX3VKIGQ
-BtQFCIZzl+xMJjgKCmvvAncnE52l+w3RA6B3mfm/0ObPHcmijjt5x9ZpV2e2Lfub
---000000000000a65fb7061500f1a4--
+ATANBgkqhkiG9w0BAQEFAASCAQAWNO97H1v+1ueGFbqKTLB2N0G307GzAc6fVeyMrdbjl4WKhza5
+Ri/ptuJtIkgVZ4XoLEjHqJLH1NSfBt+L0RwAk08Omh81MPgZOMgboojkZPeV4W4CjKdeuZOVCCR7
+53XCadu4PPEZM91XqoPRucXoxAhMCbUeeui+4XdCCZ1D0Mp56/dYb8aYbT36GEai+Hm9my/Mxy/U
+8w2wU4DBQNrZovxRAJPLLNae1LbyfcIP3vTATdLSnFS7Q81ZBcRLmHHXDsY1EFWtOPzgwRcGy32T
+jHdWnsmy4GVQdKdYwD1Zkswo0IFoIhFFfRB0X5q8CxZSx5/A4Qji1foJeVm1Rc5N
+--0000000000002d3f59061500f288--
 
