@@ -1,134 +1,194 @@
-Return-Path: <netdev+bounces-83719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F0189381F
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 07:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E4389382F
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 08:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 552791F211E6
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 05:46:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 659C51F212A9
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 06:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5638C1D;
-	Mon,  1 Apr 2024 05:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="zHJwuD5F"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E0FB8F5C;
+	Mon,  1 Apr 2024 06:11:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476782595
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 05:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671A98F51
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 06:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711950356; cv=none; b=InTkLnVnPkNTO1aL1sqx1yenv1pAxR6uVGw6Gf/9aSc0cV7mq8zdYPnO/ArGsDtoFFzfrtUROIv7kzMgZuwBC8lMIhE8wf1bRgdQFHkcL4AyBEXyBQIqDSS7Dj/JhYEo/LS2e/wsPTlB+oR9HDXO+psyNDZXT+XZt406ddMuhV8=
+	t=1711951890; cv=none; b=WtjTgvjinaUAnzkHrNA8QI9uB2+TXIicNree8wrxV0hi8TyMXosF2/QiX3IpKZcdHhJFvXX7kgGIu1LavKbNrsgakChMtiYNlyDHDoAKrTbG6P93eJgBd+I2hA4sdHvAnuoU8chaUJaGwQddJxAV2n+/SGILwZVfhqlofseS3B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711950356; c=relaxed/simple;
-	bh=qLMJZ2SI70DLe6+gQvsCQlVLb5KCc6uLkn67cl62yrc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OUcvvXHHp5tRLn0pAZkn8jpWPXzrN4qAeWuwiYGokLObp8lB7ycFEKy+nfyRx3aRkNG7SbKs5rqY2RepYkJKF7bqG2YEXfHsb5Xcq0oUAg7D+MkhpYpb+ohF2DJfos+uWksbMQ2h9ETlrA/qjmcGPAtvMVHBh32y9KQdbFQFVvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=zHJwuD5F; arc=none smtp.client-ip=95.143.172.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=david-bauer.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
-Received: (qmail 11617 invoked by uid 988); 1 Apr 2024 05:45:49 -0000
-Authentication-Results: perseus.uberspace.de;
-	auth=pass (plain)
-Received: from unknown (HELO unkown) (::1)
-	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Mon, 01 Apr 2024 07:45:49 +0200
-Message-ID: <8ab8b3b5-a582-4002-90d9-56beefc7c682@david-bauer.net>
-Date: Mon, 1 Apr 2024 07:45:48 +0200
+	s=arc-20240116; t=1711951890; c=relaxed/simple;
+	bh=5RzfPD80g1MajIdzMSOBq3UGYhnnxMPtHW7ucZlPId8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=DsVipc5FLFTx4FDIr5c70z9O8tenSsqJkr+uTgGsr91/xg2XSzeJT0VeRQ1Ut/WsWknqQknx1szMsf8Q93MbtHHvUKQlkel8+vyBhEUOLThSQ1te0yP6MHJ6b4GrfGx96+Bre/n5DMxCuSjLdfNchsYGK1WhkOJNQcVVPE1/CzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7cf179c3da4so421258039f.2
+        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 23:11:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711951887; x=1712556687;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QU2ivE4+RjX4u7lvetSsWaIm0V+DKP8bcLz4UjQG+xE=;
+        b=u4U/u8sgkjkAoviRKJkBjH7tJnehA1WorWX1BhxPz6n9nOX44/iDWTm1uUromtUr7E
+         7Vz55TXgg1MQqCOqkQRbL/OliId1P8QKqwBepfM//V2uqXRVMOMWQVE+7oBfCHGRKI7/
+         UxbYj0EFQKZr6nRoE0A8/HKzMqtWVWlNoEAFBIywMF59+3nyIrKvpZ9ckjybDjApmovn
+         QhuZ44vzz+RpRkpoFX8c+0HD10JyYnMwVdOGNBPVC/Ofv4zY68thBnNQbU/zDBjFXllc
+         1SNNKJ5bP6GPexZcXNeRH5PgCgVqlcSGzRcMDizSZMRPoWaUULLuOQAxXJ103dRZbPHq
+         2zxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHgWrGpZzMVj2N1za8zI1IGdC43p/dOOkNBCxxx+x0Ll5sczfLWOYqaMO8FDfp1ZqrBbMMdPCDrwkE9188Ro9Poq1rYBon
+X-Gm-Message-State: AOJu0YzvmREs43ooRHo84EH5tW5Eab6ksukyLtKY/bpAABHGgLkPyM0c
+	vojhGMomYzqMlSIsd9skvKCBzSNyMDR5vI5FrQq3QbuYbG0OLZyGG8edWueNGdc+gG4bI750y6E
+	IAQg2EXXYckt1dzX2bj0PZ0xZPP/9j2wHF0ZnhzFxuOCWEbxQuA657ww=
+X-Google-Smtp-Source: AGHT+IFFH6jMD6jhXSfTF/8n97fODaGx9BtJ8w+g5dRBic/6Guq06rzc6t84WkYWl8Ho+6ArVPMQ+Qnlo52F0GamU4iwMJBJkhwQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] vxlan: drop packets from invalid src-address
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, amcohen@nvidia.com, netdev@vger.kernel.org,
- Ido Schimmel <idosch@nvidia.com>
-References: <20240331211434.61100-1-mail@david-bauer.net>
- <20240401030408.GA1638983@maili.marvell.com>
-Content-Language: en-US
-From: David Bauer <mail@david-bauer.net>
-In-Reply-To: <20240401030408.GA1638983@maili.marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Bar: ---
-X-Rspamd-Report: BAYES_HAM(-2.999999) XM_UA_NO_VERSION(0.01) MIME_GOOD(-0.1)
-X-Rspamd-Score: -3.089999
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=david-bauer.net; s=uberspace;
-	h=from:to:cc:subject:date;
-	bh=qLMJZ2SI70DLe6+gQvsCQlVLb5KCc6uLkn67cl62yrc=;
-	b=zHJwuD5FGW+B5LqkySv09LQFSDGYYktsOVcciXe/L23ocNJmfetH5rxLLbvg2Ji2hSbtUnC3o/
-	tUE7sB6388D+78KcMwFZ+fnwo1W4ilyP0kE2EXJdu7mMwE/H2VxrKIYB5rrD88YNWIesIzUIyXoP
-	HvvOveolDmvpHjz69ydzgTGAuw0DGkE6PEcemGe9RBoUqA5q9oYHauL7onHbJn/ABeya/Sj+a0rl
-	/UU+sCFkTU4KFafVZzFnkcHCmg8AWix8AiuSpTBcOGM4epRRK0WVs4EJxKW/y/mS3FRGAAS1fdOh
-	eF35ZxWfXDTAglsaXxUaZ5d4J+/P+wnfaTMd2wlruCPo794gqmg+g4KNAXUYGEinisnHsk0Cs5Gu
-	+ZynlNj6kHQ+tS7yq4oR0NK8wlzKhSZ2gXD/FPZQz2eLWiFCUI/gcU1cXohUlB0lcnKjVfq5oal9
-	gJG/VafFdJZuKMXLTQBd02M4Y8nB3YQ2hwG22OqeC/NPNUE3scQMl5/q7zO5jUsBOyDhevLM/Fkd
-	7g4I8NmN0+m1kIRfS3taC8ng1JPEFj0DJgQtfTn9ZKcnN1oivLKFfB8GhYqAVKOn/7UYaqP4b7qp
-	Hw7geevdMnpDAOmfC2/LjCFS+RRWwmlK1h319UGiun7OqKFU1AVpfIvtSDINZwj5SNjTtARWWqUj
-	A=
+X-Received: by 2002:a05:6638:2727:b0:47c:a3e:2f25 with SMTP id
+ m39-20020a056638272700b0047c0a3e2f25mr328200jav.6.1711951887643; Sun, 31 Mar
+ 2024 23:11:27 -0700 (PDT)
+Date: Sun, 31 Mar 2024 23:11:27 -0700
+In-Reply-To: <000000000000c430800614b93936@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000022c6b2061502dcbb@google.com>
+Subject: Re: [syzbot] [net?] possible deadlock in hsr_dev_xmit (2)
+From: syzbot <syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Ratheesh,
+syzbot has found a reproducer for the following issue on:
 
-On 4/1/24 05:04, Ratheesh Kannoth wrote:
-> On 2024-04-01 at 02:44:34, David Bauer (mail@david-bauer.net) wrote:
->> The VXLAN driver currently does not check if the inner layer2
->> source-address is valid.
->>
->> In case source-address snooping/learning is enabled, a entry in the FDB
->> for the invalid address is created with the layer3 address of the tunnel
->> endpoint.
-> what is root cause of creation of invalid MAC from an L3 address ? could you
-> add that as well to commit message.
+HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=166a86e5180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1e5b814e91787669
+dashboard link: https://syzkaller.appspot.com/bug?extid=fbf74291c3b7e753b481
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10526855180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15e0f5c3180000
 
-I sadly can not elaborate on this further as the state happens sporadically
-after weeks of operation. For more details, see
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5f73b6ef963d/disk-480e035f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/46c949396aad/vmlinux-480e035f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e3b4d0f5a5f8/bzImage-480e035f.xz
 
-https://lore.kernel.org/all/15ee0cc7-9252-466b-8ce7-5225d605dde8@david-bauer.net/T/
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com
 
-Best
-David
+============================================
+WARNING: possible recursive locking detected
+6.8.0-syzkaller-08073-g480e035fc4c7 #0 Not tainted
+--------------------------------------------
+ksoftirqd/1/23 is trying to acquire lock:
+ffff8880744d6da0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffff8880744d6da0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: hsr_dev_xmit+0x13e/0x1d0 net/hsr/hsr_device.c:229
 
-> 
->>
->> If the frame happens to have a non-unicast address set, all this
->> non-unicast traffic is subsequently not flooded to the tunnel network
->> but sent to the learnt host in the FDB. To make matters worse, this FDB
->> entry does not expire.
->>
->> Apply the same filtering for packets as it is done for bridges. This not
->> only drops these invalid packets but avoids them from being learnt into
->> the FDB.
->>
->> Suggested-by: Ido Schimmel <idosch@nvidia.com>
->> Signed-off-by: David Bauer <mail@david-bauer.net>
->> ---
->>   drivers/net/vxlan/vxlan_core.c | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
->> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
->> index 3495591a5c29..ba319fc21957 100644
->> --- a/drivers/net/vxlan/vxlan_core.c
->> +++ b/drivers/net/vxlan/vxlan_core.c
->> @@ -1615,6 +1615,10 @@ static bool vxlan_set_mac(struct vxlan_dev *vxlan,
->>   	if (ether_addr_equal(eth_hdr(skb)->h_source, vxlan->dev->dev_addr))
->>   		return false;
->>
->> +	/* Ignore packets from invalid src-address */
->> +	if (!is_valid_ether_addr(eth_hdr(skb)->h_source))
->> +		return false;
->> +
->>   	/* Get address from the outer IP header */
->>   	if (vxlan_get_sk_family(vs) == AF_INET) {
->>   		saddr.sin.sin_addr.s_addr = ip_hdr(skb)->saddr;
->> --
->> 2.43.0
->>
+but task is already holding lock:
+ffff88802383ada0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffff88802383ada0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: send_hsr_supervision_frame+0x276/0xad0 net/hsr/hsr_device.c:310
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&hsr->seqnr_lock);
+  lock(&hsr->seqnr_lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+7 locks held by ksoftirqd/1/23:
+ #0: ffffc900001d7a40 ((&hsr->announce_timer)){+.-.}-{0:0}, at: call_timer_fn+0xc0/0x600 kernel/time/timer.c:1789
+ #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hsr_announce+0xa3/0x370 net/hsr/hsr_device.c:387
+ #2: ffff88802383ada0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ #2: ffff88802383ada0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: send_hsr_supervision_frame+0x276/0xad0 net/hsr/hsr_device.c:310
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hsr_forward_skb+0xae/0x2400 net/hsr/hsr_forward.c:614
+ #4: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
+ #4: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
+ #4: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4260
+ #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: br_dev_xmit+0x1b9/0x1a10 net/bridge/br_device.c:44
+ #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
+ #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
+ #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4260
+
+stack backtrace:
+CPU: 1 PID: 23 Comm: ksoftirqd/1 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ check_deadlock kernel/locking/lockdep.c:3062 [inline]
+ validate_chain+0x15c1/0x58e0 kernel/locking/lockdep.c:3856
+ __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+ _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ hsr_dev_xmit+0x13e/0x1d0 net/hsr/hsr_device.c:229
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
+ __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ br_dev_queue_push_xmit+0x701/0x8d0 net/bridge/br_forward.c:53
+ NF_HOOK+0x3a7/0x460 include/linux/netfilter.h:314
+ br_forward_finish+0xe5/0x140 net/bridge/br_forward.c:66
+ NF_HOOK+0x3a7/0x460 include/linux/netfilter.h:314
+ __br_forward+0x489/0x660 net/bridge/br_forward.c:115
+ deliver_clone net/bridge/br_forward.c:131 [inline]
+ maybe_deliver+0xb3/0x150 net/bridge/br_forward.c:190
+ br_flood+0x2e4/0x660 net/bridge/br_forward.c:236
+ br_dev_xmit+0x118c/0x1a10
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
+ __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ hsr_xmit net/hsr/hsr_forward.c:380 [inline]
+ hsr_forward_do net/hsr/hsr_forward.c:471 [inline]
+ hsr_forward_skb+0x183f/0x2400 net/hsr/hsr_forward.c:619
+ send_hsr_supervision_frame+0x548/0xad0 net/hsr/hsr_device.c:333
+ hsr_announce+0x1a9/0x370 net/hsr/hsr_device.c:389
+ call_timer_fn+0x17e/0x600 kernel/time/timer.c:1792
+ expire_timers kernel/time/timer.c:1843 [inline]
+ __run_timers kernel/time/timer.c:2408 [inline]
+ __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2419
+ run_timer_base kernel/time/timer.c:2428 [inline]
+ run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2438
+ __do_softirq+0x2bc/0x943 kernel/softirq.c:554
+ run_ksoftirqd+0xc5/0x130 kernel/softirq.c:924
+ smpboot_thread_fn+0x544/0xa30 kernel/smpboot.c:164
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
