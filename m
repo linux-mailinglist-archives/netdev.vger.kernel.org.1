@@ -1,191 +1,209 @@
-Return-Path: <netdev+bounces-83795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01E11894459
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 19:32:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07FDE89446C
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 19:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C7E51C2131C
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 17:32:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73AC8B2182E
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 17:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17593481BF;
-	Mon,  1 Apr 2024 17:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309384D5A1;
+	Mon,  1 Apr 2024 17:43:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="scdquVFc"
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="pv12/5Hs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647E93EA68
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 17:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EE83FE55;
+	Mon,  1 Apr 2024 17:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711992764; cv=none; b=flTVgVKlf8341MhuPv9jJseIk34j8RIb4icLBLo0qQjzB75ghE/aXM8V2kYpWfskkxX2qQ9qaG0QQRipt6XRG3fA4E8GQwSzb1LmNdFfDb6kxw1MpJ8xJLbkZvxOz22ujpwBAzdU2JG2WHqggzOXspeLTUNa7oA/xzytBa5Avv0=
+	t=1711993388; cv=none; b=Qf/25BBGCiNZOKE+ISYx2Lz1Sy81+q1JSlP1SMptCRxzkwpkC9dInQPuY1so6D8Ppfokya/Bi+zy+j4ne1BNY9QKMYvDuHf5dEr/b9b7REiBQ4ufzVpa18zHKZQbOh9Th8y1ZFLNr2U2r3MiU4XPpqOAPrLZXpG7+u6gyonl1aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711992764; c=relaxed/simple;
-	bh=Wg37/YISO61lXe1dDH0ZVS28MSUe8UGvGxQ7lRnVddU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AdHG9jGDXrjyQlRFBWO1nwyl9kzM/Y4lW/PVQxyXBbcDK+5bc46y5QrBJ+9fB/48152EkljDYwMb9ypp4v+e+Pgv5Ief9icKbLEjlnGcFcT1uAWnb74meUsBViwY756g2o9i/9oIaD6miQjToKW4fZKWPX4Ks1T/DHEYv4Gq1Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=scdquVFc; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1711992762; x=1743528762;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=IsraToyvJ3wKbhsnudYX2b95chOr3a1EfVG7EmU/13g=;
-  b=scdquVFc52rW2pU31JhI0rJabXb2A04p8705ueNOdzxa3VTcCXWtN3gI
-   bW/sMzxogJcFgiV9eR2L6YqpVjF8/jOVNXefyAzE3VUKLBiCkmFgwNe6M
-   cdmJql69G8rjD7j/H0W4N1JW3mhmRZTT7jjvJBpcfb1b1priY+MQgOUOL
-   g=;
-X-IronPort-AV: E=Sophos;i="6.07,172,1708387200"; 
-   d="scan'208";a="408233549"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 17:32:35 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:37342]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.22:2525] with esmtp (Farcaster)
- id e8d4679a-2140-4105-9ba5-cfff4616553c; Mon, 1 Apr 2024 17:32:34 +0000 (UTC)
-X-Farcaster-Flow-ID: e8d4679a-2140-4105-9ba5-cfff4616553c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 1 Apr 2024 17:32:31 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.100.32) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 1 Apr 2024 17:32:28 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 2/2] af_unix: Remove lock dance in unix_peek_fds().
-Date: Mon, 1 Apr 2024 10:31:25 -0700
-Message-ID: <20240401173125.92184-3-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240401173125.92184-1-kuniyu@amazon.com>
-References: <20240401173125.92184-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1711993388; c=relaxed/simple;
+	bh=JgU8DwGeS6UdB0ISiaIplMMPCy9sdLqL6ijz1fpUNqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X9HqYuXMS9d4FSODIYOUhni0nmE5qo7ZjftpwTTOj0AoXrIhfeZGit6HMJB48Zj0qCQg0/nPZ+DVn+x9lcGoPV1J2OQHao43+XCdSa9ndDaCgVdrAhY/klGaL3+kOJEYBe4ezcW5RbVZ/o7N3sgmTziQNmjhbXY3sHtwhZ2m9CE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=pv12/5Hs; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+Date: Mon, 1 Apr 2024 20:36:58 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1711993018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HV1qp1NUlPyvoGDoA7alKszkCgDl8gSbryMc5j01V3w=;
+	b=pv12/5HsDAD0zZShi3p6j4DD+fYgUUCNL0ULdWiHMD7c2HpDZQ1MyjmL+zK/q34wzeGIoP
+	Ve4oGM3aY/bMsC0AwfykPos0qCIe3Gdwu/Bpg5A5FVZuEbpilkIwah9Dfe/wcUlF+HbofV
+	nDKEsGmyoSHXuJS4M6KVhieirpwBUdA=
+From: Andrey Kalachev <kalachev@swemel.ru>
+To: syzbot <syzbot+f07cc9be8d1d226947ed@syzkaller.appspotmail.com>
+Cc: andriin@fb.com, ast@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, jmorris@namei.org, john.fastabend@gmail.com,
+	kafai@fb.com, kpsingh@chromium.org, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+	serge@hallyn.com, songliubraving@fb.com,
+	syzkaller-bugs@googlegroups.com, yhs@fb.com, miklos@szeredi.hu,
+	linux-unionfs@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: general protection fault in security_inode_getattr
+Message-ID: <ZgrwugCEDH2fLJXK@ural>
+References: <0000000000008caae305ab9a5318@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <0000000000008caae305ab9a5318@google.com>
 
-In the previous GC implementation, the shape of the inflight socket
-graph was not expected to change while GC was in progress.
+On Wed, Jul 29, 2020 at 01:23:18PM -0700, syzbot wrote:
+>Hello,
+>
+>syzbot found the following issue on:
+>
+>HEAD commit:    92ed3019 Linux 5.8-rc7
+>git tree:       upstream
+>console output: https://syzkaller.appspot.com/x/log.txt?x=140003ac900000
+>kernel config:  https://syzkaller.appspot.com/x/.config?x=84f076779e989e69
+>dashboard link: https://syzkaller.appspot.com/bug?extid=f07cc9be8d1d226947ed
+>compiler:       gcc (GCC) 10.1.0-syz 20200507
+>
+>Unfortunately, I don't have any reproducer for this issue yet.
+>
+>IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>Reported-by: syzbot+f07cc9be8d1d226947ed@syzkaller.appspotmail.com
+>
+>general protection fault, probably for non-canonical address 0xdffffc000000000c: 0000 [#1] PREEMPT SMP KASAN
+>KASAN: null-ptr-deref in range [0x0000000000000060-0x0000000000000067]
+>CPU: 0 PID: 9214 Comm: syz-executor.3 Not tainted 5.8.0-rc7-syzkaller #0
+>Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+>RIP: 0010:d_backing_inode include/linux/dcache.h:549 [inline]
+>RIP: 0010:security_inode_getattr+0x46/0x140 security/security.c:1276
+>Code: 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 04 01 00 00 48 b8 00 00 00 00 00 fc ff df 49 8b 5d 08 48 8d 7b 60 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 d7 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b
+>RSP: 0018:ffffc9000d41f638 EFLAGS: 00010206
+>RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000f539000
+>RDX: 000000000000000c RSI: ffffffff8354f8ee RDI: 0000000000000060
+>RBP: ffffc9000d41f810 R08: 0000000000000001 R09: ffff88804edc2dc8
+>R10: 0000000000000000 R11: 00000000000ebc58 R12: ffff888089f10170
+>R13: ffffc9000d41f810 R14: 00000000000007ff R15: 0000000000000000
+>FS:  00007f3599717700(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
+>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>CR2: 0000001b2c12c000 CR3: 0000000099919000 CR4: 00000000001406f0
+>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>Call Trace:
+> vfs_getattr+0x22/0x60 fs/stat.c:121
+> ovl_copy_up_one+0x13b/0x1870 fs/overlayfs/copy_up.c:850
+> ovl_copy_up_flags+0x14b/0x1d0 fs/overlayfs/copy_up.c:931
+> ovl_maybe_copy_up+0x140/0x190 fs/overlayfs/copy_up.c:963
+> ovl_open+0xba/0x270 fs/overlayfs/file.c:147
+> do_dentry_open+0x501/0x1290 fs/open.c:828
+> do_open fs/namei.c:3243 [inline]
+> path_openat+0x1bb9/0x2750 fs/namei.c:3360
+> do_filp_open+0x17e/0x3c0 fs/namei.c:3387
+> file_open_name+0x290/0x400 fs/open.c:1124
+> acct_on+0x78/0x770 kernel/acct.c:207
+> __do_sys_acct kernel/acct.c:286 [inline]
+> __se_sys_acct kernel/acct.c:273 [inline]
+> __x64_sys_acct+0xab/0x1f0 kernel/acct.c:273
+> do_syscall_64+0x60/0xe0 arch/x86/entry/common.c:384
+> entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>RIP: 0033:0x45c369
+>Code: 8d b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 5b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+>RSP: 002b:00007f3599716c78 EFLAGS: 00000246 ORIG_RAX: 00000000000000a3
+>RAX: ffffffffffffffda RBX: 0000000000000700 RCX: 000000000045c369
+>RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000020000440
+>RBP: 000000000078bf30 R08: 0000000000000000 R09: 0000000000000000
+>R10: 0000000000000000 R11: 0000000000000246 R12: 000000000078bf0c
+>R13: 00007ffda41ffbef R14: 00007f35997179c0 R15: 000000000078bf0c
+>Modules linked in:
+>---[ end trace d1398a63985d3915 ]---
+>RIP: 0010:d_backing_inode include/linux/dcache.h:549 [inline]
+>RIP: 0010:security_inode_getattr+0x46/0x140 security/security.c:1276
+>Code: 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 04 01 00 00 48 b8 00 00 00 00 00 fc ff df 49 8b 5d 08 48 8d 7b 60 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 d7 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b
+>RSP: 0018:ffffc9000d41f638 EFLAGS: 00010206
+>RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000f539000
+>RDX: 000000000000000c RSI: ffffffff8354f8ee RDI: 0000000000000060
+>RBP: ffffc9000d41f810 R08: 0000000000000001 R09: ffff88804edc2dc8
+>R10: 0000000000000000 R11: 00000000000ebc58 R12: ffff888089f10170
+>R13: ffffc9000d41f810 R14: 00000000000007ff R15: 0000000000000000
+>FS:  00007f3599717700(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
+>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>CR2: 0000000020000440 CR3: 0000000099919000 CR4: 00000000001406f0
+>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>
+>
+>---
+>This report is generated by a bot. It may contain errors.
+>See https://goo.gl/tpsmEJ for more information about syzbot.
+>syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+>syzbot will keep track of this issue. See:
+>https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-MSG_PEEK was tricky because it could install inflight fd silently
-and transform the graph.
+Hello,
 
-Let's say we peeked a fd, which was a listening socket, and accept()ed
-some embryo sockets from it.  The garbage collection algorithm would
-have been confused because the set of sockets visited in scan_inflight()
-would change within the same GC invocation.
+I've found that the bug fixed by commit:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0af950f57fefabab628f1963af881e6b9bfe7f38
+merged with mainline here:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?id=be3c213150dc4370ef211a78d78457ff166eba4e
 
-That's why we placed spin_lock(&unix_gc_lock) and spin_unlock() in
-unix_peek_fds() with a fat comment.
+Kernel release 6.5 include the fixed code.
 
-In the new GC implementation, we no longer garbage-collect the socket
-if it exists in another queue, that is, if it has a bridge to another
-SCC.  Also, accept() will require the lock if it has edges.
+Hence, the stable kernels up to 6.5 still affected.
+I've got early version (4.19.139) from syzbot report, here is the first time when been reported.
+Maybe previous versions are also affected, I haven't checked it.
 
-Thus, we need not do the complicated lock dance.
+I've only deal with stable 5.10 and 6.1, here I can confirm the issue.
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- include/net/af_unix.h |  1 -
- net/unix/af_unix.c    | 42 ------------------------------------------
- net/unix/garbage.c    |  2 +-
- 3 files changed, 1 insertion(+), 44 deletions(-)
+The tracing results showed that GPF caused by the dentry shared between two processes.
+Suppose we have a regular file `A` onto lower overlayfs layer, metacopy=on.
+P1 execute link syscall ( `A` link to `B`), P2 do open `B`.
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 226a8da2cbe3..7311b77edfc7 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -17,7 +17,6 @@ static inline struct unix_sock *unix_get_socket(struct file *filp)
- }
- #endif
- 
--extern spinlock_t unix_gc_lock;
- extern unsigned int unix_tot_inflight;
- void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver);
- void unix_del_edges(struct scm_fp_list *fpl);
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 78be8b520cef..61ecfa9c9c6b 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1814,48 +1814,6 @@ static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
- {
- 	scm->fp = scm_fp_dup(UNIXCB(skb).fp);
--
--	/*
--	 * Garbage collection of unix sockets starts by selecting a set of
--	 * candidate sockets which have reference only from being in flight
--	 * (total_refs == inflight_refs).  This condition is checked once during
--	 * the candidate collection phase, and candidates are marked as such, so
--	 * that non-candidates can later be ignored.  While inflight_refs is
--	 * protected by unix_gc_lock, total_refs (file count) is not, hence this
--	 * is an instantaneous decision.
--	 *
--	 * Once a candidate, however, the socket must not be reinstalled into a
--	 * file descriptor while the garbage collection is in progress.
--	 *
--	 * If the above conditions are met, then the directed graph of
--	 * candidates (*) does not change while unix_gc_lock is held.
--	 *
--	 * Any operations that changes the file count through file descriptors
--	 * (dup, close, sendmsg) does not change the graph since candidates are
--	 * not installed in fds.
--	 *
--	 * Dequeing a candidate via recvmsg would install it into an fd, but
--	 * that takes unix_gc_lock to decrement the inflight count, so it's
--	 * serialized with garbage collection.
--	 *
--	 * MSG_PEEK is special in that it does not change the inflight count,
--	 * yet does install the socket into an fd.  The following lock/unlock
--	 * pair is to ensure serialization with garbage collection.  It must be
--	 * done between incrementing the file count and installing the file into
--	 * an fd.
--	 *
--	 * If garbage collection starts after the barrier provided by the
--	 * lock/unlock, then it will see the elevated refcount and not mark this
--	 * as a candidate.  If a garbage collection is already in progress
--	 * before the file count was incremented, then the lock/unlock pair will
--	 * ensure that garbage collection is finished before progressing to
--	 * installing the fd.
--	 *
--	 * (*) A -> B where B is on the queue of A or B is on the queue of C
--	 * which is on the queue of listening socket A.
--	 */
--	spin_lock(&unix_gc_lock);
--	spin_unlock(&unix_gc_lock);
- }
- 
- static void unix_destruct_scm(struct sk_buff *skb)
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 89ea71d9297b..12a4ec27e0d4 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -183,7 +183,7 @@ static void unix_free_vertices(struct scm_fp_list *fpl)
- 	}
- }
- 
--DEFINE_SPINLOCK(unix_gc_lock);
-+static DEFINE_SPINLOCK(unix_gc_lock);
- unsigned int unix_tot_inflight;
- 
- void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver)
--- 
-2.30.2
+   P1          P2
+
+   sys_link
+               sys_open
+                 ovl_lookup B -- lookup non existent `B`, alloc `B` dentry
+                   ovl_alloc_entry -- non existent file, zero filled ovl_entry
+
+     ovl_link -- link A to B, use same dentry `B`, dentry associated with
+     `A`, lower layer file now.
+
+   sys_link -- return to userspace, zero filled ovl_entry `B` untouched
+
+                     ovl_open B, reuse the same dentry `B`
+                       ovl_copy_up_one
+                         ovl_path_lower
+                           ovl_numlower(oe) -- return 0, numlower in zero filled ovl_entry `oe`
+                         ovl_path_lower -- return zero filled `struct path`
+                         vfs_getattr(struct path, ..)
+                           security_inode_getattr(struct path, ...)
+                             d_backing_inode(path->dentry) -- NULL dereference, GPF
+
+Stable kernel v6.1 can be easy fixed by 4 mainline commits transfer:
+
+0af950f57fef ovl: move ovl_entry into ovl_inode
+163db0da3515 ovl: factor out ovl_free_entry() and ovl_stack_*() helpers
+5522c9c7cbd2 ovl: use ovl_numlower() and ovl_lowerstack() accessors
+a6ff2bc0be17 ovl: use OVL_E() and OVL_E_FLAGS() accessors
+
+Just commit 5522c9c7cbd2 has conflict caused by
+4609e1f18e19c ("fs: port ->permission() to pass mnt_idmap").
+It is enough to change mnt_idmap() call to mnt_user_ns(),
+in the rejected hunk.
+
+--
+Andrey Kalachev
+Software Engineer,
+Swemel
 
 
