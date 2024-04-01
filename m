@@ -1,109 +1,156 @@
-Return-Path: <netdev+bounces-83806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D119189452B
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 21:04:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFDB189455A
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 21:14:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4F0281FFD
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 19:04:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 754021F21D9D
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 19:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC89B4F5ED;
-	Mon,  1 Apr 2024 19:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NEtZqFxV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577EB4EB38;
+	Mon,  1 Apr 2024 19:14:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay161.nicmail.ru (relay161.nicmail.ru [91.189.117.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F69249E4;
-	Mon,  1 Apr 2024 19:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BE7F9DF;
+	Mon,  1 Apr 2024 19:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.189.117.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711998262; cv=none; b=UyFVuU7ZG3z72ke8IPxmNAayUBgkR01MpaBce6P8tpOrU80ty+6kqKVnWEkTo8cb5Hyr0zOvxhleM3Mf3gO48y27iKNqBEdMmPKhPMpL85uXUZG0NV+ORu2BsHTRaiHkPFTKcTcIpPS34gXh0dlswbZniWi8aMV4nc+cDz5n1ac=
+	t=1711998879; cv=none; b=H70dkixAJa95aQtKsrv09XirPpneP7kGE7cQ48L6aH4dXKMF7D80Kt934ZqR4TiFJHwKsQvEb3/POSTK4hhKkKmPWGWmmsaV8KOxtDVZmP/Q04KOxDW66DrS09n0X/eWmkFzR0d1VAEohmtExBd4LwSJ63VFyP/d72kGkRGpUsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711998262; c=relaxed/simple;
-	bh=AgTHelVsz+bSEWE8bp2UzifCO3HT/TL0k8z89kPZWx4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kDCKjim72ddtk6Y7CmM+JdfzWOC/5wOJY8t1ODgEqWzWakomCpuiVkuAHL6z/fIvcVBmp6NUFCiUrOURHp6KXLuKnChNPWw9GMF/mIHky8IouuKTrasi98QgErXB+Lfz6APWE8FmLZt9yBuat1mGZESDIiHRkLd281vfVS1yZlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NEtZqFxV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8329DC433C7;
-	Mon,  1 Apr 2024 19:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711998262;
-	bh=AgTHelVsz+bSEWE8bp2UzifCO3HT/TL0k8z89kPZWx4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NEtZqFxVDPiQStJtMES0JB/NfEqkor7ZgBCpa+95nYcRaLw0JMoMEHC3TZtCXpj6w
-	 cSKhcXYTWXcAfF+Szrs8ZjGHr19yDM2lQsA5mreQWq3HYIdwmz4qJpQB89kG6Rqx2d
-	 Hd+ors9yNwRXrkkAFDZoOTTJZZZtR9aD20xXfAle9shsWaA3ME2/8L7O8lz7UO06Ij
-	 JD0fUzFOnRccH+xrK6Jua/oKR7k9gJjkpkTZuHkBjBkv42cXyrWIOAySs+uLCLIQJQ
-	 zETJFd4y+PgfUth9jleAUqxLMeKAKit49sSg7PoX4Q93XOhCvNw3IrynCAVVtx4Bzg
-	 ygFaahykuUccQ==
-Date: Mon, 1 Apr 2024 12:04:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Jason Gunthorpe <jgg@nvidia.com>, Christoph
- Hellwig <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd
- Bergmann <arnd@arndb.de>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
- <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Aron Silverton <aron.silverton@oracle.com>,
- linux-kernel@vger.kernel.org, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Junxian Huang <huangjunxian6@hisilicon.com>
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240401120420.4d33a89b@kernel.org>
-In-Reply-To: <20240401181033.GB11187@unreal>
-References: <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
-	<2024032248-ardently-ribcage-a495@gregkh>
-	<510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
-	<Zf2n02q0GevGdS-Z@C02YVCJELVCG>
-	<20240322135826.1c4655e2@kernel.org>
-	<e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
-	<20240322154027.5555780a@kernel.org>
-	<1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
-	<20240401123003.GC73174@unreal>
-	<20240401075003.70f5cb4b@kernel.org>
-	<20240401181033.GB11187@unreal>
+	s=arc-20240116; t=1711998879; c=relaxed/simple;
+	bh=YR6SwtEB9iVv8d+5rPYbn/tSsvDoRzDhnJ5NJNFiXlI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BDQ+j6Solqp7p8QyND4STNEJMbHTLU/ZeOgxim8bmgIvSlQwbqCUQibIsRIiODGUxHXlHSuJRGftUJtpCszR/VbWsSY1oeSNejzxlh0f5qhHduxJfxe2u2pKpXsxf9LWJWAA8DvHhf2DFDn6Zu1sEFvFLnGE8rIOXMYTY3AptFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ancud.ru; spf=pass smtp.mailfrom=ancud.ru; arc=none smtp.client-ip=91.189.117.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ancud.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ancud.ru
+Received: from [10.28.138.148] (port=9468 helo=mitx-gfx..)
+	by relay.hosting.mail.nic.ru with esmtp (Exim 5.55)
+	(envelope-from <kiryushin@ancud.ru>)
+	id 1rrN6s-0004bm-4Y;
+	Mon, 01 Apr 2024 22:14:22 +0300
+Received: from [87.245.155.195] (account kiryushin@ancud.ru HELO mitx-gfx..)
+	by incarp1101.mail.hosting.nic.ru (Exim 5.55)
+	with id 1rrN6s-009QGW-0v;
+	Mon, 01 Apr 2024 22:14:22 +0300
+From: Nikita Kiryushin <kiryushin@ancud.ru>
+To: Michael Chan <mchan@broadcom.com>
+Cc: Nikita Kiryushin <kiryushin@ancud.ru>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Michael Chan <michael.chan@broadcom.com>
+Subject: [PATCH net-next v3] tg3: Remove residual error handling in tg3_suspend
+Date: Mon,  1 Apr 2024 22:14:18 +0300
+Message-Id: <20240401191418.361747-1-kiryushin@ancud.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-MS-Exchange-Organization-SCL: -1
 
-On Mon, 1 Apr 2024 21:10:33 +0300 Leon Romanovsky wrote:
-> > Sorry, I have a completely different reading of that thread.
-> > Thanks for bringing it up, tho.  
-> 
-> Different people have different opinions, and it is fine.
+As of now, tg3_power_down_prepare always ends with success, but
+the error handling code from former tg3_set_power_state call is still here.
 
-Agreed! I think the core of our disagreement is whether and when
-one set of people get to force their set of choices on other people.
-Far be it from me to try to force my opinions in RDMA or the kernel
-as a whole.
+This code became unreachable in commit c866b7eac073 ("tg3: Do not use
+legacy PCI power management").
 
-> > As I said multiple times I agree that configuring custom parameters
-> > in RDMA is a necessity. Junxian's approach of putting such code in
-> > the RDMA driver / subsystem is more than reasonable. Even better,
-> > it looks like the API is fairly narrowly defined.  
-> 
-> It was a tiny example, which emphasizes the need for a common way.
-> 
-> If we were listen to average RDMA driver author, we would find ourselves
-> with gazillion different sysfs knobs which do nothing except sending
-> raw data to FW. As a subsystem, we don't want to waste our time in
-> not-beneficial to the subsystem code.
+Remove (now unreachable) error handling code for simplification and change
+tg3_power_down_prepare to a void function as its result is no more checked.
 
-No disagreement here either, there's a trade-off here between what
-you call waste of time and what I'd call fostering organic
-collaboration. Even without taking your priorities into account -
-whether reviewing device APIs is beneficial is (a) subjective, 
-(b) subsystem dependent, so you should be allowed to make your choice
-(within the bounds of Linus's trust). But what I keep arguing is that
-so should we :|
+Signed-off-by: Nikita Kiryushin <kiryushin@ancud.ru>
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+---
+v3:
+  - Change commit message wording as
+    Jakub Kicinski <kuba@kernel.org> requested
+v2: https://lore.kernel.org/netdev/a6f3f931-17eb-4e53-9220-f81e7b311a8c@ancud.ru/
+  - Change tg3_power_down_prepare() to a void function as
+    Michael Chan <michael.chan@broadcom.com> suggested
+v1: https://lore.kernel.org/netdev/4e7e11f8-03b5-4289-9475-d3b4e105d40a@ancud.ru/
+ drivers/net/ethernet/broadcom/tg3.c | 30 ++++-------------------------
+ 1 file changed, 4 insertions(+), 26 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 04964bbe08cf..bc36926a57cf 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -4019,7 +4019,7 @@ static int tg3_power_up(struct tg3 *tp)
+ 
+ static int tg3_setup_phy(struct tg3 *, bool);
+ 
+-static int tg3_power_down_prepare(struct tg3 *tp)
++static void tg3_power_down_prepare(struct tg3 *tp)
+ {
+ 	u32 misc_host_ctrl;
+ 	bool device_should_wake, do_low_power;
+@@ -4263,7 +4263,7 @@ static int tg3_power_down_prepare(struct tg3 *tp)
+ 
+ 	tg3_ape_driver_state_change(tp, RESET_KIND_SHUTDOWN);
+ 
+-	return 0;
++	return;
+ }
+ 
+ static void tg3_power_down(struct tg3 *tp)
+@@ -18090,7 +18090,6 @@ static int tg3_suspend(struct device *device)
+ {
+ 	struct net_device *dev = dev_get_drvdata(device);
+ 	struct tg3 *tp = netdev_priv(dev);
+-	int err = 0;
+ 
+ 	rtnl_lock();
+ 
+@@ -18114,32 +18113,11 @@ static int tg3_suspend(struct device *device)
+ 	tg3_flag_clear(tp, INIT_COMPLETE);
+ 	tg3_full_unlock(tp);
+ 
+-	err = tg3_power_down_prepare(tp);
+-	if (err) {
+-		int err2;
+-
+-		tg3_full_lock(tp, 0);
+-
+-		tg3_flag_set(tp, INIT_COMPLETE);
+-		err2 = tg3_restart_hw(tp, true);
+-		if (err2)
+-			goto out;
+-
+-		tg3_timer_start(tp);
+-
+-		netif_device_attach(dev);
+-		tg3_netif_start(tp);
+-
+-out:
+-		tg3_full_unlock(tp);
+-
+-		if (!err2)
+-			tg3_phy_start(tp);
+-	}
++	tg3_power_down_prepare(tp);
+ 
+ unlock:
+ 	rtnl_unlock();
+-	return err;
++	return 0;
+ }
+ 
+ static int tg3_resume(struct device *device)
+-- 
+2.34.1
+
 
