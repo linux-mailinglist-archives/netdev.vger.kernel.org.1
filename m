@@ -1,217 +1,146 @@
-Return-Path: <netdev+bounces-83783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E695C894441
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 19:23:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F09894447
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 19:24:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E020B21A6A
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 17:23:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A4661F22F0C
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 17:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F5154FA5;
-	Mon,  1 Apr 2024 17:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DA34C61B;
+	Mon,  1 Apr 2024 17:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOI3GsCd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ixFD8Mn+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F00353E07;
-	Mon,  1 Apr 2024 17:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724A44AEF0
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 17:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711992147; cv=none; b=RnMa1RMd8v80/SirNrxuCTaAUjqg1/ULpedR3W9FHFfiWCniZNQyvwH7GoAeZ56dVJ68oWKpVIn8id/8EtqL9O1wJmHxpxq6RrudQE71OgTkH7IHIBDUoFhkPMtM7QDDDgDOevl/1SVX18gHcnFmhnM2LXvqaOleQ+CwKFW8uhg=
+	t=1711992269; cv=none; b=PjWl/R/BxaACOSO5F1BumvotgZDHSlR3WXIRIDQg3jefID++iQCZ2NbdzgJBKOQ7e7ILOc4AXvwfCQ1opls/ZwhKvJEDf94AoYO3gPTnPpS+90HZjbb3hSYRFpQ5KHRhjEPJULtp/d9Cx9gA53dW/PHfVKT4bq9ga+QA8r0zJ64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711992147; c=relaxed/simple;
-	bh=xw2fSt3BPp5V8iNV7DJ3a94MeIEOICDQVGI97xUAnZc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LtlaT+0l8BxplxO6imRJNkUl+Vp55unD75H/y9eff0G7bL4I4X8Iev73cm8Ogj7ZkrPq+gZpMxz+Ph86EbY0ZWzzey/D1ruKBikAZbU+O+drBa3wzqeFt6LFzh85vnew1Y0cQOFSPN4gs5QzLTspYdkUQCPaU5MNxO13YUIAHkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KOI3GsCd; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4156e5c1c7eso1470505e9.1;
-        Mon, 01 Apr 2024 10:22:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711992144; x=1712596944; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NgPeZhzTZ788WN0jjZdJYqbUvceJFXHDXpD1Py9NPLc=;
-        b=KOI3GsCdX241Lq2dVgjBUrj+ItAxkyfVEiGVv4HJL3qU8viW2lts/xvMfC8CRZE2g0
-         2iBB8t2AXx8i0CVn+fsR0onM1riocEe5zKO/xNP+YldvsgvQiMvxHtC7krF0Wl5KOfd2
-         dHwciyWuaFnV7fS/AX+i5HsCLL+EZ4yXr21RFB1LnhpguEXfGK5HTM7eigT0BNLADdr/
-         X6o4pxZsJrvoU+mJbgJD8ThCrPegL4Sxt2jtg00HEoCjh3q0DoSQYr4UCGH8Zb0h94Pz
-         bVqZE8eL5jbt6IvibqdUAIUa4TIwV1IOMkdbTXzloHpGsY7QMjtKfY8MZSeWRClWV65C
-         CMlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711992144; x=1712596944;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NgPeZhzTZ788WN0jjZdJYqbUvceJFXHDXpD1Py9NPLc=;
-        b=lbzM7vVW88/Obxqw3v2yRgrMQyAn7dUOAycJ+HstZXaAdP7LxVF1Qgm8ye6cdDXFnZ
-         cR+8oUs7fVNP9Gv9PsRSP2bxv/6coeLk2+J8UvCdIUPkJwKc6c98ncx0gOK+OHm5zFM8
-         CUk1BFmYd1T+7VLyDonccQ5GWJN4lV8lo4jjvGo6uTFRjGlALSiSJ86cmHad+J+bUZhO
-         jfURErIeHIywH8U3GyRT5HTwQDT5/xBxdRiVzTK19e7iA6LADdbuwcrG/RDeBkafxMMk
-         rxDl9boEuEhT8jvK4OBozFiTLmuspXrbeXraElXgaV8S5MJAGf66/2ZYSsegtxQDTtGZ
-         lPsA==
-X-Forwarded-Encrypted: i=1; AJvYcCVAvJahnkQGy0driBxtDlZRbhdE3sNMqYwqHA1n+fK4vzckyoGgiHR0FAxAB+lCI5Q9c5XN1cuoMxd1x/i2oawgHVszBNERnfS6ZHD4Em0M4b2h8BycvIGTvVNG16rabk2/dJykEdaPnRriu7lNSbQMvFvViJPZZh6i
-X-Gm-Message-State: AOJu0Yw2LOlamw8uH5WyEs4AFa88SWEmPkyCmkkfWTFotMM3zC9NF6p6
-	VZp2D9vswWPRt8+RN9WkR6/+8iTNkBQWY4Hf+G6eoQpa+HnGasfZ+CCRl2i6
-X-Google-Smtp-Source: AGHT+IGDm9V39i/631xCWYmvLNeaIhpUNQ+uXk5p1/MjgyRw6sTTRjQlm0NOw2oq4hejtcwExTJTvA==
-X-Received: by 2002:a05:600c:5123:b0:414:37f:2798 with SMTP id o35-20020a05600c512300b00414037f2798mr8851789wms.6.1711992143906;
-        Mon, 01 Apr 2024 10:22:23 -0700 (PDT)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id t20-20020a05600c199400b0041401eb021asm15273108wmq.24.2024.04.01.10.22.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Apr 2024 10:22:22 -0700 (PDT)
-From: Uros Bizjak <ubizjak@gmail.com>
-To: x86@kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>,
-	Uros Bizjak <ubizjak@gmail.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH bpf v2 2/2] x86/bpf: Fix IP for relocating call depth accounting
-Date: Mon,  1 Apr 2024 19:19:00 +0200
-Message-ID: <20240401172157.5717-3-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240401172157.5717-1-ubizjak@gmail.com>
-References: <20240401172157.5717-1-ubizjak@gmail.com>
+	s=arc-20240116; t=1711992269; c=relaxed/simple;
+	bh=m0cubPE+66/HNVb0tCXaJV2I1wHNyVVF0MufGRQXBG4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oDrGXHpd4qJl+9qet0mUBKzVWRh3vC8zmWEjjnrPSi7seexbBhWVBKZseNO1RRzwXr7eNoO0/8fDsGPB9g5pydkPzQ1/KW+WLlmxGBrbmVcfFp5a1yWe5gORDl/RBW9hneKXTiAy61UIAR3dkYpqfEIzVnZyJU3jowN/5LJB73k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ixFD8Mn+; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711992268; x=1743528268;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=m0cubPE+66/HNVb0tCXaJV2I1wHNyVVF0MufGRQXBG4=;
+  b=ixFD8Mn+eRdlZb2GzL7zHWmzdTZed/oGUMEnRq0xU9tLuGh7mqr4ozFh
+   4llYEddlouTsFOWFYebC/Q5prQTrFCPbNT8wpFyzRfJXT0pdKVCV9fjJZ
+   omrvzqYk3ePIQhkg+OD3LZI5M3R5SBZJniaMY38ntluirwFpwvIH1rKOe
+   +JkLnrpd3l4ifB+yzrQ0n+2l/bKYWBq8VrAN+52+D/lN2VT0NtURfzcA6
+   VhR3YxbJhYX82pggp/Ttw1TfCGNcIhv56+M6rQiQALeSZ5FLvaLtXFrEM
+   v60eFv4cAxgVlOFFWi8fZq0Li+kVh202O9r36VefElmA/4VnAHJI8pkBt
+   g==;
+X-CSE-ConnectionGUID: iaQNDm1nS9ywg+2wLhwhsw==
+X-CSE-MsgGUID: l9hOtuYMSo60chL6oThRTg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="29606137"
+X-IronPort-AV: E=Sophos;i="6.07,172,1708416000"; 
+   d="scan'208";a="29606137"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 10:24:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,172,1708416000"; 
+   d="scan'208";a="55235076"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa001.jf.intel.com with ESMTP; 01 Apr 2024 10:24:27 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/8][pull request] Intel Wired LAN Driver Updates 2024-04-01 (ice)
+Date: Mon,  1 Apr 2024 10:24:10 -0700
+Message-ID: <20240401172421.1401696-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Joan Bruguera Micó <joanbrugueram@gmail.com>
+This series contains updates to ice driver only.
 
-The recently introduced support for %rip-relative relocations in the
-call thunk template:
+Michal Schmidt changes flow for gettimex64 to use host-side spinlock
+rather than hardware semaphore for lighter-weight locking.
 
-  17bce3b2ae2d ("x86/callthunks: Handle %rip-relative relocations in call thunk template")
+Steven adds ability for switch recipes to be re-used when firmware
+supports it.
 
-assumes that the code is being patched in-place, so the destination
-of the relocation matches the address of the code. This is not true
-for the call depth accounting emitted by the BPF JIT, so the calculated
-address is wrong and usually causes a page fault.
+Thorsten Blum removes unwanted newlines in netlink messaging.
 
-Pass the destination IP when the BPF JIT emits call depth accounting.
+Michal Swiatkowski and Piotr re-organize devlink related code; renaming,
+moving, and consolidating it to a single location. Michal also
+simplifies the devlink init and cleanup path to occur under a single
+lock call.
 
-Fixes: 17bce3b2ae2d ("x86/callthunks: Handle %rip-relative relocations in call thunk template")
-Signed-off-by: Joan Bruguera Micó <joanbrugueram@gmail.com>
-Reviewed-by: Uros Bizjak <ubizjak@gmail.com>
-Acked-by: Ingo Molnar <mingo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
----
- arch/x86/include/asm/alternative.h |  4 ++--
- arch/x86/kernel/callthunks.c       |  4 ++--
- arch/x86/net/bpf_jit_comp.c        | 19 ++++++++-----------
- 3 files changed, 12 insertions(+), 15 deletions(-)
+The following are changes since commit 3b4cf29bdab08328dfab5bb7b41a62937ea5b379:
+  Merge branch 'net-rps-misc'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
 
-diff --git a/arch/x86/include/asm/alternative.h b/arch/x86/include/asm/alternative.h
-index fcd20c6dc7f9..67b68d0d17d1 100644
---- a/arch/x86/include/asm/alternative.h
-+++ b/arch/x86/include/asm/alternative.h
-@@ -117,7 +117,7 @@ extern void callthunks_patch_builtin_calls(void);
- extern void callthunks_patch_module_calls(struct callthunk_sites *sites,
- 					  struct module *mod);
- extern void *callthunks_translate_call_dest(void *dest);
--extern int x86_call_depth_emit_accounting(u8 **pprog, void *func);
-+extern int x86_call_depth_emit_accounting(u8 **pprog, void *func, void *ip);
- #else
- static __always_inline void callthunks_patch_builtin_calls(void) {}
- static __always_inline void
-@@ -128,7 +128,7 @@ static __always_inline void *callthunks_translate_call_dest(void *dest)
- 	return dest;
- }
- static __always_inline int x86_call_depth_emit_accounting(u8 **pprog,
--							  void *func)
-+							  void *func, void *ip)
- {
- 	return 0;
- }
-diff --git a/arch/x86/kernel/callthunks.c b/arch/x86/kernel/callthunks.c
-index 30335182b6b0..e92ff0c11db8 100644
---- a/arch/x86/kernel/callthunks.c
-+++ b/arch/x86/kernel/callthunks.c
-@@ -314,7 +314,7 @@ static bool is_callthunk(void *addr)
- 	return !bcmp(pad, insn_buff, tmpl_size);
- }
- 
--int x86_call_depth_emit_accounting(u8 **pprog, void *func)
-+int x86_call_depth_emit_accounting(u8 **pprog, void *func, void *ip)
- {
- 	unsigned int tmpl_size = SKL_TMPL_SIZE;
- 	u8 insn_buff[MAX_PATCH_LEN];
-@@ -327,7 +327,7 @@ int x86_call_depth_emit_accounting(u8 **pprog, void *func)
- 		return 0;
- 
- 	memcpy(insn_buff, skl_call_thunk_template, tmpl_size);
--	apply_relocation(insn_buff, tmpl_size, *pprog,
-+	apply_relocation(insn_buff, tmpl_size, ip,
- 			 skl_call_thunk_template, tmpl_size);
- 
- 	memcpy(*pprog, insn_buff, tmpl_size);
-diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-index e55745f512e1..df5fac428408 100644
---- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -480,7 +480,7 @@ static int emit_call(u8 **pprog, void *func, void *ip)
- static int emit_rsb_call(u8 **pprog, void *func, void *ip)
- {
- 	OPTIMIZER_HIDE_VAR(func);
--	ip += x86_call_depth_emit_accounting(pprog, func);
-+	ip += x86_call_depth_emit_accounting(pprog, func, ip);
- 	return emit_patch(pprog, func, ip, 0xE8);
- }
- 
-@@ -1972,20 +1972,17 @@ st:			if (is_imm8(insn->off))
- 
- 			/* call */
- 		case BPF_JMP | BPF_CALL: {
--			int offs;
-+			u8 *ip = image + addrs[i - 1];
- 
- 			func = (u8 *) __bpf_call_base + imm32;
- 			if (tail_call_reachable) {
- 				RESTORE_TAIL_CALL_CNT(bpf_prog->aux->stack_depth);
--				if (!imm32)
--					return -EINVAL;
--				offs = 7 + x86_call_depth_emit_accounting(&prog, func);
--			} else {
--				if (!imm32)
--					return -EINVAL;
--				offs = x86_call_depth_emit_accounting(&prog, func);
-+				ip += 7;
- 			}
--			if (emit_call(&prog, func, image + addrs[i - 1] + offs))
-+			if (!imm32)
-+				return -EINVAL;
-+			ip += x86_call_depth_emit_accounting(&prog, func, ip);
-+			if (emit_call(&prog, func, ip))
- 				return -EINVAL;
- 			break;
- 		}
-@@ -2835,7 +2832,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *rw_im
- 		 * Direct-call fentry stub, as such it needs accounting for the
- 		 * __fentry__ call.
- 		 */
--		x86_call_depth_emit_accounting(&prog, NULL);
-+		x86_call_depth_emit_accounting(&prog, NULL, image);
- 	}
- 	EMIT1(0x55);		 /* push rbp */
- 	EMIT3(0x48, 0x89, 0xE5); /* mov rbp, rsp */
+Michal Schmidt (3):
+  ice: add ice_adapter for shared data across PFs on the same NIC
+  ice: avoid the PTP hardware semaphore in gettimex64 path
+  ice: fold ice_ptp_read_time into ice_ptp_gettimex64
+
+Michal Swiatkowski (2):
+  ice: move ice_devlink.[ch] to devlink folder
+  ice: hold devlink lock for whole init/cleanup
+
+Piotr Raczynski (1):
+  ice: move devlink port code to a separate file
+
+Steven Zou (1):
+  ice: Add switch recipe reusing feature
+
+Thorsten Blum (1):
+  ice: Remove newlines in NL_SET_ERR_MSG_MOD
+
+ drivers/net/ethernet/intel/ice/Makefile       |   7 +-
+ .../ice/{ice_devlink.c => devlink/devlink.c}  | 463 +-----------------
+ .../ice/{ice_devlink.h => devlink/devlink.h}  |   0
+ .../ethernet/intel/ice/devlink/devlink_port.c | 430 ++++++++++++++++
+ .../ethernet/intel/ice/devlink/devlink_port.h |  12 +
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ drivers/net/ethernet/intel/ice/ice_adapter.c  | 116 +++++
+ drivers/net/ethernet/intel/ice/ice_adapter.h  |  28 ++
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |   2 +
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   2 +-
+ drivers/net/ethernet/intel/ice/ice_eswitch.c  |   2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   1 -
+ drivers/net/ethernet/intel/ice/ice_main.c     |  18 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  33 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |   3 +
+ drivers/net/ethernet/intel/ice/ice_repr.c     |   3 +-
+ drivers/net/ethernet/intel/ice/ice_switch.c   | 187 ++++++-
+ drivers/net/ethernet/intel/ice/ice_switch.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   2 +
+ 20 files changed, 814 insertions(+), 500 deletions(-)
+ rename drivers/net/ethernet/intel/ice/{ice_devlink.c => devlink/devlink.c} (77%)
+ rename drivers/net/ethernet/intel/ice/{ice_devlink.h => devlink/devlink.h} (100%)
+ create mode 100644 drivers/net/ethernet/intel/ice/devlink/devlink_port.c
+ create mode 100644 drivers/net/ethernet/intel/ice/devlink/devlink_port.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.h
+
 -- 
-2.42.0
+2.41.0
 
 
