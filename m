@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-83736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFB888939B1
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 11:45:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 054DF8939B7
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 11:47:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 035702845CE
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 09:45:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 998FE1F221AA
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 09:47:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908F310A03;
-	Mon,  1 Apr 2024 09:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723AD10965;
+	Mon,  1 Apr 2024 09:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="sma4FM2C"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="H4IgENyy"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DCF10961;
-	Mon,  1 Apr 2024 09:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E245D10953;
+	Mon,  1 Apr 2024 09:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711964730; cv=none; b=eBr3VJPKRDpBTLNWj5EXUXqSfIBqC/L0vY1hZocR7s1nueODIKFT7pG7InPhVYPQIv4i5WNoAucp4QVRIybW/ludeZ5oxjKe78Ax40eNDXjhifGs06hZP6n0SXmB6FH6wNNQj6kf2SA660FtiTTXj53xLGd+nXyqUfBFTZP4v9s=
+	t=1711964826; cv=none; b=PtWMBoBcbeO1UaxVIgrNFYygzIaHQv0nBl1C12U3a9oiAV74HloTojlz0ImASKnYAYSo3rd7LmX/EyIMy5VpVPEz4RKMSOJeeir5d4yZBS2aRm+Mm4udIGWqve/q8qDr7732cEU0J36YjjSEC3lEUl+IC9I44O593+Hf3/Js/bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711964730; c=relaxed/simple;
-	bh=eV+OvalZWLRK2mZGJdcqHlgvFQZDOg9+43ahVhwnX4w=;
+	s=arc-20240116; t=1711964826; c=relaxed/simple;
+	bh=ikA8MDST2pXkX5fvpsetPaZ87FEe2/XOnEPeV5hEdWc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=AY/uzJhB8OAgCJfDsNM0+TvIJMQmh1co1OhW0wlLHg0sQTc9DZGy2cjsq22UyqtKYEDs4mxEIbt8KgqUH7IsrPMKRuj2EZPv0OTbEQPZV5f587W17ApG42Ce8fDB8B5Ve0rmOpcbtqboGN8HarwRwUjo0bo+uYO1D1HDMw/IKDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=sma4FM2C; arc=none smtp.client-ip=198.47.23.249
+	 In-Reply-To:Content-Type; b=YBP11AElH8/llXWXaGYWd1mITBrldcD8ZrRqvfUnpWidoMr7542/2E08xIdZZcagqORttP+3dzc8ymRdFQ5xQluux2izxl4EkLKJwM/o2yFdDs8bknoIJDR7drEfQwEFM6+wZ12sHVeGyS/8yX5ePsK5Akn2qqUmPX9ZZZyv3DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=H4IgENyy; arc=none smtp.client-ip=198.47.19.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4319j4nf036416;
-	Mon, 1 Apr 2024 04:45:04 -0500
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4319kfaK037664;
+	Mon, 1 Apr 2024 04:46:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1711964704;
-	bh=3S2xvaZ3v3wuVPNr46fhQGhxReU2KliWLP656lV+sEM=;
+	s=ti-com-17Q1; t=1711964801;
+	bh=GhP5JL9UrBvNzC+YjH3zvQlQUkQUerqqI1bJfe0019Q=;
 	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=sma4FM2C/aBAqHuRfafteu9eXRuxPfrq7n1AEVDTbRR4bIbinVr4cGOUs1Koh8bo2
-	 8qfe8b31iQ3SYRtlO6LnPT1Hi4LSP4CMK61lPDhjxkhicq5fap7kuDW65FiMc/qXBc
-	 7L4YHeyEZbhbYz7iHwg1xtRere5puEdkWYgRVQms=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4319j4wm002750
+	b=H4IgENyyXQHgD5rNK0yeyIHVyoOglcgg4xT2+pOB9jY/2df7+qBPpgMXVW97bg3As
+	 LobVu9YNnPiDOG1A2e5WC5J0gefE7hUPEhDSwW57BJFBbmvxBZ8VaBxAYJggYvwSDz
+	 YMPLaM9L37H1FsKoZicAqY78aGP0uZgzSiFxeiKM=
+Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4319kegB059389
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 1 Apr 2024 04:45:04 -0500
-Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+	Mon, 1 Apr 2024 04:46:41 -0500
+Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 1
- Apr 2024 04:45:04 -0500
+ Apr 2024 04:46:40 -0500
 Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE102.ent.ti.com
  (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 1 Apr 2024 04:45:04 -0500
+ Frontend Transport; Mon, 1 Apr 2024 04:46:40 -0500
 Received: from [172.24.227.220] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4319ix0W075731;
-	Mon, 1 Apr 2024 04:45:00 -0500
-Message-ID: <b40ba4a7-e2b0-46e6-a5b8-2dfaa6bbbabd@ti.com>
-Date: Mon, 1 Apr 2024 15:14:59 +0530
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4319ix0X075731;
+	Mon, 1 Apr 2024 04:46:36 -0500
+Message-ID: <d7c1adc3-e9b2-4ed8-b16e-e36474c4b5f5@ti.com>
+Date: Mon, 1 Apr 2024 15:16:36 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,8 +65,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/3] net: ethernet: ti: am65-cpsw: Enable RX
- HW timestamp only for PTP packets
+Subject: Re: [PATCH net-next v4 3/3] net: ethernet: ti: am65-cpsw-ethtool:
+ Update rx_filters for CPSW's timestamping capability
 Content-Language: en-US
 To: Jakub Kicinski <kuba@kernel.org>
 CC: Dan Carpenter <dan.carpenter@linaro.org>,
@@ -84,29 +84,23 @@ CC: Dan Carpenter <dan.carpenter@linaro.org>,
         "David S. Miller" <davem@davemloft.net>,
         <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
 References: <20240327054234.1906957-1-c-vankar@ti.com>
- <20240327054234.1906957-2-c-vankar@ti.com>
- <20240329145904.0b7cb60f@kernel.org>
+ <20240327054234.1906957-3-c-vankar@ti.com>
+ <20240329145517.7b46a15a@kernel.org>
 From: Chintan Vankar <c-vankar@ti.com>
-In-Reply-To: <20240329145904.0b7cb60f@kernel.org>
+In-Reply-To: <20240329145517.7b46a15a@kernel.org>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
 
 
-On 30/03/24 03:29, Jakub Kicinski wrote:
-> On Wed, 27 Mar 2024 11:12:33 +0530 Chintan Vankar wrote:
->> To prevent port lock up, disable TSTAMP_EN bit in CPTS_CONTROL
->> register. The workaround for timestamping received packets is to
->> utilize the CPTS Event FIFO that records timestamps corresponding to
->> certain events, with one such event being the reception of an
->> Ethernet packet with the EtherType field set to Precision Time
->> Protocol (PTP).
+On 30/03/24 03:25, Jakub Kicinski wrote:
+> On Wed, 27 Mar 2024 11:12:34 +0530 Chintan Vankar wrote:
+>> Update supported hwtstamp_rx_filters values for CPSW's timestamping
+>> capability.
 > 
-> You mention EtherType here but the drive retains L4 support,
-> which is somewhat confusing. Perhaps mention L4 / UDP ports
-> here, too.
+> Is there a reason this is not part of the previous patch?
 
-Okay. I will update message with your suggestion.
-
+No there is no reason to make it as independent patch, I will combine
+this patch with previous patch in next version.
 
