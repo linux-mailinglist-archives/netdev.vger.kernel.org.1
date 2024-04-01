@@ -1,189 +1,211 @@
-Return-Path: <netdev+bounces-83759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82B15893BA0
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 15:54:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85275893BAA
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 15:57:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B23771C213BF
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 13:54:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32F11B219D3
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 13:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223443FE3E;
-	Mon,  1 Apr 2024 13:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF0D3FE52;
+	Mon,  1 Apr 2024 13:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c29yWJov"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="fz8bYd9L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5AC3F8F1;
-	Mon,  1 Apr 2024 13:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674283FBAA
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 13:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711979639; cv=none; b=tQWzCsmlMbfa4nu4nMmBeNLBSw/Wa18pE4srCoW/WALjyTW3Xk/AcipeATv+JqWKfAbNJw9lYl7wvp/GNd4e3YGHmtto4f0VbP4C/WIlCB84O2qSiN/RlrL2PO2gQjA3Adxh30lRR96/7qnIp0TceatzAxC3urqzGxj7im+MjUo=
+	t=1711979811; cv=none; b=tzKPJY6RntZpVUoJvpH5GLbYIhD4WAr3mZ09FFzu17NOpXmZgusU2UdsguJ7+J06z2YDEt5IyjZkm0VbCRU0lYT858ECpqNaacmcybyY96j+n9XZH+T8XWGhfwYNCA30GWgURMQoTfzAGz4QoJ03XlftrEHwSU0tcdBRC+4MDGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711979639; c=relaxed/simple;
-	bh=dmYCendNfZLK2ZYRN4P3XHXSgHmLS9K4qfGr3Ifd3v0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u6zYjs94S03IZeCtmtIlyX/0RK17WPiPjQkkDmYDdljlVx5Ikj7KZ0xlYzZkJBOfdBVG1MpITp77wpluPmQpDILA0kJhTsyLJuHYzRXhvMhIcA7cyKxg5+Zg8gi+oK1VsYYFRNPRyFN8P2/SZACqIjf4YrJy966YDreftmU1DIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c29yWJov; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADA0CC433C7;
-	Mon,  1 Apr 2024 13:53:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711979638;
-	bh=dmYCendNfZLK2ZYRN4P3XHXSgHmLS9K4qfGr3Ifd3v0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c29yWJov1MPD3KNJnAc3J10X31RIJx5rJ8pZ9aMASTtRIDHTlXt3YBkMhR/2MmTeW
-	 zKg7sKvzusvvzXvEpqIv8nO9JilxGOlGDD9rpErvCQJiT/+cOIdnykZR54Pb5hp73A
-	 n3db2XvRlrrFuw27hXNlQVFklZF/bwBt1Tvksi8eyn/LaeBo2QoMfURHysv0Ra+tcm
-	 5GNCZFCSDd/aMOWF7fV3ver/b2jE5QU8+WhPmhCzIjV1dmrOHawVXzxIdY9jTI6kkp
-	 3RzhX7bCaKGHmMTJC3G9ZTma+EDhOVW6r/AdWBj3gvJJLSd3U3a0S7GGRMCCfrXnpN
-	 BcEw/0JlvpOew==
-Date: Mon, 1 Apr 2024 14:53:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Steve French <smfrench@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 26/26] netfs, afs: Use writeback retry to deal with
- alternate keys
-Message-ID: <20240401135351.GD26556@kernel.org>
-References: <20240328163424.2781320-1-dhowells@redhat.com>
- <20240328163424.2781320-27-dhowells@redhat.com>
+	s=arc-20240116; t=1711979811; c=relaxed/simple;
+	bh=z1rTJoyh3kQXvkGEjaAw0+Naoqr1iRiwfgcJUP92xuI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fYDoY0ZSALGMgNcxBnkUsieVtjn6PJBD7oFuVl/mkYPeUdDS3ArouPe+uE5CggKHApfLIzIjqgxyaIH3CbFlmT5cdGw+Dy1U5QP/u88esMvx7uJPaflcKI0pvAx456BcDpqdEw2/qmM/SyxdGzJg7O2EtspHXch8BftwgLzJhcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=fz8bYd9L; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-696315c9da5so31184136d6.2
+        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 06:56:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ieee.org; s=google; t=1711979808; x=1712584608; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vIsXdWS2cI3BbLNz71YpvwQlJrZcsPNHY/5w7NcKrRM=;
+        b=fz8bYd9L+JabwXldZE05Yl/j+Oi4XD6t+j/8TGsWhXDXp+AWmtP8g9sqz+CxCDnTcL
+         1ur6FsCnX09mjwkXo1Gfm/fg08UOpPSWZhA6PczDg1MvneLrHgnldnIHwb/1qCCgAdIU
+         mX0ut28tK1k/L/e+r0DVRX29MkCHHbVXeX27o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711979808; x=1712584608;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vIsXdWS2cI3BbLNz71YpvwQlJrZcsPNHY/5w7NcKrRM=;
+        b=SKBjDybZ0Kq0ZsPuyL5fyaypuTCyoEDt2MjBoMVxHxKXTEKEwUJ0NM7IPw3lnDoQwg
+         FDlkEO5xHzHVaohRNWWeVpDC+zYB9nOFI4BOc3QiZrJ1pIhMoisZvH/9B7iE7jbhxS/y
+         irgcpvqtSy2scX3WSOvQIOdvdFvwBiGcfCdHJLXBuf0mENzYid812Idt7Plk+H7ENIDD
+         zNwNxDWZMSrdgiON5l+2kWGfQtieojgZhJMjAIch8Hgg21VYtKyxUpnaJgTHD5ANPFr2
+         6urP92UEj5WXRO0zt/ccvVI007BQt24j/su2MpYqEm5qVqGXzgSxQRgdXn1LTN9sw7Yh
+         Hs/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV2eGMH4+AcD94qGdzqIfvsvrzltPWgDTZws6qq+aVHIZ7Mkl9Wy0DO+1XHIa5IIKUHY6LcuTtx2FaFTfZdHYaFnPeUS2Pp
+X-Gm-Message-State: AOJu0YyMukA2IZuxDHUDgSzQexQk1f49jzJgvLfehC/dgsmjSL8D4HWn
+	pUIv8oA41+EAcandpl8m/S5qQh70X/qdapMXBC7BKXke1GZ5jXkxhVwhcLBHrQ==
+X-Google-Smtp-Source: AGHT+IHpdiBgFqnnvm7ZVM+aGDyiKaOSAKL0YQHlrY6jrtN7YVvCa34VaG+vG8E4TcajtXcF8JkbXA==
+X-Received: by 2002:a0c:f7cc:0:b0:699:514:3046 with SMTP id f12-20020a0cf7cc000000b0069905143046mr3624538qvo.15.1711979808249;
+        Mon, 01 Apr 2024 06:56:48 -0700 (PDT)
+Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
+        by smtp.googlemail.com with ESMTPSA id s2-20020a0562140ca200b006990539c0aasm1418385qvs.137.2024.04.01.06.56.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Apr 2024 06:56:47 -0700 (PDT)
+Message-ID: <c03b8113-e1be-4cf3-a85c-43de15163ab1@ieee.org>
+Date: Mon, 1 Apr 2024 08:56:46 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240328163424.2781320-27-dhowells@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 4/5] net: ipa: allocate dummy net_device
+ dynamically
+To: Breno Leitao <leitao@debian.org>, aleksander.lobakin@intel.com,
+ kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, Alex Elder <elder@kernel.org>
+Cc: quic_jjohnson@quicinc.com, kvalo@kernel.org, leon@kernel.org,
+ dennis.dalessandro@cornelisnetworks.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240328235214.4079063-1-leitao@debian.org>
+ <20240328235214.4079063-5-leitao@debian.org>
+Content-Language: en-US
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20240328235214.4079063-5-leitao@debian.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 28, 2024 at 04:34:18PM +0000, David Howells wrote:
+On 3/28/24 6:52 PM, Breno Leitao wrote:
+> Embedding net_device into structures prohibits the usage of flexible
+> arrays in the net_device structure. For more details, see the discussion
+> at [1].
+> 
+> Un-embed the net_device from the private struct by converting it
+> into a pointer. Then use the leverage the new alloc_netdev_dummy()
+> helper to allocate and initialize dummy devices.
+> 
+> [1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-...
+Thanks for pointing this out, I didn't notice the earlier
+discussion.  Embedding the dummy netdev in this case was
+probably done to eliminate the chance of an unlikely
+allocation error at init time.  It is not at all necessary.
 
-> +void afs_issue_write(struct netfs_io_subrequest *subreq)
->  {
-> +	struct netfs_io_request *wreq = subreq->rreq;
->  	struct afs_operation *op;
-> -	struct afs_wb_key *wbk = NULL;
-> -	loff_t size = iov_iter_count(iter);
-> +	struct afs_vnode *vnode = AFS_FS_I(wreq->inode);
-> +	unsigned long long pos = subreq->start + subreq->transferred;
-> +	size_t len = subreq->len - subreq->transferred;
->  	int ret = -ENOKEY;
->  
-> -	_enter("%s{%llx:%llu.%u},%llx,%llx",
-> +	_enter("R=%x[%x],%s{%llx:%llu.%u},%llx,%zx",
-> +	       wreq->debug_id, subreq->debug_index,
->  	       vnode->volume->name,
->  	       vnode->fid.vid,
->  	       vnode->fid.vnode,
->  	       vnode->fid.unique,
-> -	       size, pos);
-> +	       pos, len);
->  
-> -	ret = afs_get_writeback_key(vnode, &wbk);
-> -	if (ret) {
-> -		_leave(" = %d [no keys]", ret);
+I had to go find the rest of your series.  If at least one patch
+is addressed to me in a series, please copy me on all of them.
+
+I see the dummy netdev now gets "fully initialized" but that's
+a one-time thing, and seems harmless.  But given that, shouldn't
+the result of alloc_dummy_netdev() also have a free_dummy_netdev()
+(rather than simply calling kfree(dummy_netdev))?  (And I now
+see that Jakub made a similar remark.)
+
+More below.
+
+> ---
+>   drivers/net/ipa/gsi.c | 12 ++++++++----
+>   drivers/net/ipa/gsi.h |  2 +-
+>   2 files changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ipa/gsi.c b/drivers/net/ipa/gsi.c
+> index 9a0b1fe4a93a..d2db54cbd46d 100644
+> --- a/drivers/net/ipa/gsi.c
+> +++ b/drivers/net/ipa/gsi.c
+> @@ -1730,10 +1730,10 @@ static int gsi_channel_setup_one(struct gsi *gsi, u32 channel_id)
+>   	gsi_channel_program(channel, true);
+>   
+>   	if (channel->toward_ipa)
+> -		netif_napi_add_tx(&gsi->dummy_dev, &channel->napi,
+> +		netif_napi_add_tx(gsi->dummy_dev, &channel->napi,
+>   				  gsi_channel_poll);
+>   	else
+> -		netif_napi_add(&gsi->dummy_dev, &channel->napi,
+> +		netif_napi_add(gsi->dummy_dev, &channel->napi,
+>   			       gsi_channel_poll);
+>   
+>   	return 0;
+> @@ -2369,12 +2369,14 @@ int gsi_init(struct gsi *gsi, struct platform_device *pdev,
+>   	/* GSI uses NAPI on all channels.  Create a dummy network device
+>   	 * for the channel NAPI contexts to be associated with.
+>   	 */
+> -	init_dummy_netdev(&gsi->dummy_dev);
+> +	gsi->dummy_dev = alloc_netdev_dummy(0);
+> +	if (!gsi->dummy_dev)
+> +		return -ENOMEM;
+>   	init_completion(&gsi->completion);
+>   
+>   	ret = gsi_reg_init(gsi, pdev);
+>   	if (ret)
 > -		return ret;
-> -	}
-> +#if 0 // Error injection
-> +	if (subreq->debug_index == 3)
-> +		return netfs_write_subrequest_terminated(subreq, -ENOANO, false);
->  
-> -	op = afs_alloc_operation(wbk->key, vnode->volume);
-> -	if (IS_ERR(op)) {
-> -		afs_put_wb_key(wbk);
-> -		return -ENOMEM;
-> +	if (!test_bit(NETFS_SREQ_RETRYING, &subreq->flags)) {
-> +		set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
-> +		return netfs_write_subrequest_terminated(subreq, -EAGAIN, false);
->  	}
-> +#endif
-> +
-> +	op = afs_alloc_operation(wreq->netfs_priv, vnode->volume);
-> +	if (IS_ERR(op))
-> +		return netfs_write_subrequest_terminated(subreq, -EAGAIN, false);
->  
->  	afs_op_set_vnode(op, 0, vnode);
-> -	op->file[0].dv_delta = 1;
-> +	op->file[0].dv_delta	= 1;
->  	op->file[0].modification = true;
-> -	op->store.pos = pos;
-> -	op->store.size = size;
-> -	op->flags |= AFS_OPERATION_UNINTR;
-> -	op->ops = &afs_store_data_operation;
-> +	op->store.pos		= pos;
-> +	op->store.size		= len,
+> +		goto err_reg_exit;
 
-nit: this is probably more intuitively written using len;
+Assuming you change it to not just use kfree() to free the
+dummy netdev, the above call won't work.  You'll want to do
+something like:
 
-> +	op->flags		|= AFS_OPERATION_UNINTR;
-> +	op->ops			= &afs_store_data_operation;
->  
-> -try_next_key:
->  	afs_begin_vnode_operation(op);
->  
-> -	op->store.write_iter = iter;
-> -	op->store.i_size = max(pos + size, vnode->netfs.remote_i_size);
-> -	op->mtime = inode_get_mtime(&vnode->netfs.inode);
-> +	op->store.write_iter	= &subreq->io_iter;
-> +	op->store.i_size	= umax(pos + len, vnode->netfs.remote_i_size);
-> +	op->mtime		= inode_get_mtime(&vnode->netfs.inode);
->  
->  	afs_wait_for_operation(op);
-> -
-> -	switch (afs_op_error(op)) {
-> +	ret = afs_put_operation(op);
-> +	switch (ret) {
->  	case -EACCES:
->  	case -EPERM:
->  	case -ENOKEY:
->  	case -EKEYEXPIRED:
->  	case -EKEYREJECTED:
->  	case -EKEYREVOKED:
-> -		_debug("next");
-> -
-> -		ret = afs_get_writeback_key(vnode, &wbk);
-> -		if (ret == 0) {
-> -			key_put(op->key);
-> -			op->key = key_get(wbk->key);
-> -			goto try_next_key;
-> -		}
-> +		/* If there are more keys we can try, use the retry algorithm
-> +		 * to rotate the keys.
-> +		 */
-> +		if (wreq->netfs_priv2)
-> +			set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
->  		break;
->  	}
->  
-> -	afs_put_wb_key(wbk);
-> -	_leave(" = %d", afs_op_error(op));
-> -	return afs_put_operation(op);
-> +	netfs_write_subrequest_terminated(subreq, ret < 0 ? ret : subreq->len, false);
->  }
->  
->  /*
+	if (ret)
+		goto err_netdev_free;
 
-...
+. . .
+
+err_netdev_free:
+	free_dummy_netdev(gsi->dummy_dev);
+err_reg_exit:
+
+
+>   
+>   	ret = gsi_irq_init(gsi, pdev);	/* No matching exit required */
+>   	if (ret)
+> @@ -2389,6 +2391,7 @@ int gsi_init(struct gsi *gsi, struct platform_device *pdev,
+>   	return 0;
+>   
+>   err_reg_exit:
+> +	kfree(gsi->dummy_dev);
+>   	gsi_reg_exit(gsi);
+>   
+>   	return ret;
+> @@ -2400,6 +2403,7 @@ void gsi_exit(struct gsi *gsi)
+>   	mutex_destroy(&gsi->mutex);
+>   	gsi_channel_exit(gsi);
+
+Please call the free here, so the cleanup is done in
+exactly the reverse order of the initialization.
+
+					-Alex
+
+>   	gsi_reg_exit(gsi);
+> +	kfree(gsi->dummy_dev);
+>   }
+>   
+>   /* The maximum number of outstanding TREs on a channel.  This limits
+> diff --git a/drivers/net/ipa/gsi.h b/drivers/net/ipa/gsi.h
+> index 42063b227c18..6b7ec2a39676 100644
+> --- a/drivers/net/ipa/gsi.h
+> +++ b/drivers/net/ipa/gsi.h
+> @@ -155,7 +155,7 @@ struct gsi {
+>   	struct mutex mutex;		/* protects commands, programming */
+>   	struct gsi_channel channel[GSI_CHANNEL_COUNT_MAX];
+>   	struct gsi_evt_ring evt_ring[GSI_EVT_RING_COUNT_MAX];
+> -	struct net_device dummy_dev;	/* needed for NAPI */
+> +	struct net_device *dummy_dev;	/* needed for NAPI */
+>   };
+>   
+>   /**
+
 
