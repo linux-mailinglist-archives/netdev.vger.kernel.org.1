@@ -1,214 +1,214 @@
-Return-Path: <netdev+bounces-83714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3283B8937E6
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 05:55:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08A438937FD
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 06:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61A1E2815FC
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 03:55:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5424FB20FD4
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 04:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FE15CBD;
-	Mon,  1 Apr 2024 03:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D4B749F;
+	Mon,  1 Apr 2024 04:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ksr9vbM4"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="HcNqsiZL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E723B5382
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 03:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B1D8F5D
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 04:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711943706; cv=none; b=eDLjO0LZOypmxlvsngpWTCR+V76eaOOPQRiH0Kp07vGyLFH+d0W4ywyZY3CNtkBBhaKub3mxLm4sElzBgvJgsdtz/A1wtUXAESuxeT6COgHTDF5x3k/ltOC8j2DQeKXYmRruP04i98VWwqo5hprkNAnfrpRnTAZkUiPTGif9V1M=
+	t=1711945119; cv=none; b=vDA2cfT69Nzrky5c/XUk1NVE5TvEXF0BueJOizjkj3PSH8a8qNJRL8EzgrjglolyHNJoTaHCN/Y6kz270peayOENPjswSiEO+tGIvCnNkewI2AV3LWUmO5Z97XNNVA5sRp0YglsBnVn0EB7nhsx4rwr32+XaBsJUsWZ595/oMIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711943706; c=relaxed/simple;
-	bh=Sw0+7BLxyfE/cxFpUiyXsg+I3/tE2uw/nrEBopyVHY0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jtW+FfdCiQN+9WMHb6qofdmMtbU1Lk+8ylfYiE6A8Bc/MwqZ4cIFbX9vl4dT4mud9t2hgIgxahEQkEgUrvUmKBKi5shgZ9JhU93qLcQMPy1JBRyfmx44O/R1VAynScUpwrRdu1ZSd5k08UP2w4XOLO4Uw0NAf0REmd/NKaXR8bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ksr9vbM4; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3c3e2e18db7so2458464b6e.0
-        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 20:55:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1711943704; x=1712548504; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UImoD6jWbwESHi15bSVpmYLawqoHbLGC4bQ9Z6wY4go=;
-        b=Ksr9vbM4fKNS+3M34fWUK7fQuGRQC4ZMBhR8vfqbvqPzOsKETggorr6D6gZy4ZvIe8
-         QVZKyIQadvPlFbeXKuRFHOrkAazmx8eLl/JCZVeEIn0huHHqtcU7TXLPhvSHW34or5X1
-         5jPcVwwmlzeOOK0T50aNitncxfo5xJFbGED3o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711943704; x=1712548504;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UImoD6jWbwESHi15bSVpmYLawqoHbLGC4bQ9Z6wY4go=;
-        b=WOIc+X+oxYT/PXJ70FM5xgIps1AwH31WFGwTt7Zg7Uw3Dt41zn3Y3zY1IDAeq+KNxo
-         YhMwLAkTzehbWmkBwIw6MTxS0tXNBIP3M3rACUnfJSrqBHhgvKPZohjB4hp5BPM/mYVi
-         7jk/snU86LZf7fLcrzi5JQ6r3QNmLzHwkVl93ea2mOULfL/lK4/VdooRv15/pDQy9EJb
-         sIi4pTBwvrTFZ3SU5trxMhzFo7bHrxGoGXQx1Rh4wGDT2FqdwVF37OuPgYZleWYOTLTA
-         OklYqvsTlTmHQwPZKuF4qQBJpHfkEDEV8sM5lj+DbZsdkYWlJmWj2qkcLvPtReaK8Dqe
-         RMJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXzQYzks5PxZfIhIqrOhPldnAdeU3EgPkOgeX+7PrSyav8obQTxuAjDK+BocummTFcfkzE+11RGHScOQPpIzDSeDWzdy2yU
-X-Gm-Message-State: AOJu0YzXzzflQl8ag7WxzP5RkUKkngU/ImQx3yqP1nMwxJvQyh1F+VpI
-	HIziJK+pJgMBPRn1wg2IUmXCnKICMvYAzHzGdSobnsqyw2JX/giqiH454P0cLQ==
-X-Google-Smtp-Source: AGHT+IHSFBLxqKfwBYFhWQUcPLu79xM0tEg3agHZiy5LI1aOxWfQi37HgZXaOSegYnMxUKSZxpp62g==
-X-Received: by 2002:a05:6808:3a0c:b0:3c3:d731:ae51 with SMTP id gr12-20020a0568083a0c00b003c3d731ae51mr15293684oib.29.1711943703486;
-        Sun, 31 Mar 2024 20:55:03 -0700 (PDT)
-Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id j26-20020a62b61a000000b006e73d1c0c0esm6860781pff.154.2024.03.31.20.55.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Mar 2024 20:55:02 -0700 (PDT)
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-To: michael.chan@broadcom.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	gospo@broadcom.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next 7/7] bnxt_en: Add warning message about disallowed speed change
-Date: Sun, 31 Mar 2024 20:57:30 -0700
-Message-Id: <20240401035730.306790-8-pavan.chebbi@broadcom.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20240401035730.306790-1-pavan.chebbi@broadcom.com>
-References: <20240401035730.306790-1-pavan.chebbi@broadcom.com>
+	s=arc-20240116; t=1711945119; c=relaxed/simple;
+	bh=V5s0F38KFqCBsS+AJtRAqdV7JUSqcQgBZ099t8q+dUE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FnBJqUCWkgVEzP11W5DMPAImE2JFMFeX11JmOami2Y049cB+raX/UZcAiQolDwnh+Ti326S/umSuRvhym85Q9cLnW8aBfeLjpzrtr9C0aJkN+DGOGRYdOAx97aH3GN0FFWrNsSUAduD23wKiLsZgIZ/I53cDv44sY2N0vCRCCGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=HcNqsiZL; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4311muqH017402;
+	Sun, 31 Mar 2024 21:18:17 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:content-transfer-encoding:in-reply-to; s=pfpt0220;
+	 bh=7Ru/fkW5cyWdfdJ46vsJxkMQdTtu1+h9T0Ywckdp0+I=; b=HcNqsiZLCObp
+	vFWG2BJOOTMvZBMlLGIf4Z3WyPzAlQwyxZ9F6ng+xpIS6zwFNQGkg9NNhXQiSTXc
+	CuLpj12FKHOOU4+L7mIxUbcWjvJef5TTU3jR0sDme5ovaeg6BDrwqTJzatvndr21
+	CFAEA8wF9wenpUfNeanU4FMq+4cSW4TbGH9HDzy6vlMX53pGLyQ0aIuHZpSgWSsb
+	1hfFmck1dIA6EIv88F2aJvOLCFC9GYQKjrZDWHlOfkvXLBM3Sd0qa/toRvQqvgAI
+	Btkf166Wz5XFGDIK8daOoEndLHXjs5ttBGCUQjzr4Kx7yRiQkJMbuZfQgKK5PsT9
+	dTevmxBz6g==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3x7kkcg9xv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 31 Mar 2024 21:18:16 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sun, 31 Mar 2024 21:18:15 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sun, 31 Mar 2024 21:18:15 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id D61603F7051;
+	Sun, 31 Mar 2024 21:18:11 -0700 (PDT)
+Date: Mon, 1 Apr 2024 09:48:10 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Marek Vasut <marex@denx.de>
+CC: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+        Uwe
+ =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+        Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Dmitry Torokhov
+	<dmitry.torokhov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Mark Brown <broonie@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Ronald Wahl <ronald.wahl@raritan.com>,
+        Simon Horman
+	<horms@kernel.org>
+Subject: Re: [PATCH 2/2] net: ks8851: Handle softirqs at the end of IRQ
+ thread to fix hang
+Message-ID: <20240401041810.GA1639126@maili.marvell.com>
+References: <20240331142353.93792-1-marex@denx.de>
+ <20240331142353.93792-2-marex@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000005f0b08061500f4e8"
-
---0000000000005f0b08061500f4e8
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240331142353.93792-2-marex@denx.de>
+X-Proofpoint-GUID: WwQBC43Z3B1z1LD0h9yKUB5jCDq1Sfk6
+X-Proofpoint-ORIG-GUID: WwQBC43Z3B1z1LD0h9yKUB5jCDq1Sfk6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-01_01,2024-03-28_01,2023-05-22_02
 
-From: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+On 2024-03-31 at 19:51:46, Marek Vasut (marex@denx.de) wrote:
+> The ks8851_irq() thread may call ks8851_rx_pkts() in case there are
+> any packets in the MAC FIFO, which calls netif_rx(). This netif_rx()
+> implementation is guarded by local_bh_disable() and local_bh_enable().
+> The local_bh_enable() may call do_softirq() to run softirqs in case
+> any are pending. One of the softirqs is net_rx_action, which ultimately
+> reaches the driver .start_xmit callback. If that happens, the system
+> hangs. The entire call chain is below:
+>
+> ks8851_start_xmit_par from netdev_start_xmit
+> netdev_start_xmit from dev_hard_start_xmit
+> dev_hard_start_xmit from sch_direct_xmit
+> sch_direct_xmit from __dev_queue_xmit
+> __dev_queue_xmit from __neigh_update
+> __neigh_update from neigh_update
+> neigh_update from arp_process.constprop.0
+> arp_process.constprop.0 from __netif_receive_skb_one_core
+> __netif_receive_skb_one_core from process_backlog
+> process_backlog from __napi_poll.constprop.0
+> __napi_poll.constprop.0 from net_rx_action
+> net_rx_action from __do_softirq
+> __do_softirq from call_with_stack
+> call_with_stack from do_softirq
+> do_softirq from __local_bh_enable_ip
+> __local_bh_enable_ip from netif_rx
+> netif_rx from ks8851_irq
+> ks8851_irq from irq_thread_fn
+> irq_thread_fn from irq_thread
+> irq_thread from kthread
+> kthread from ret_from_fork
+>
+> The hang happens because ks8851_irq() first locks a spinlock in
+> ks8851_par.c ks8851_lock_par() spin_lock_irqsave(&ksp->lock, ...)
+> and with that spinlock locked, calls netif_rx(). Once the execution
+> reaches ks8851_start_xmit_par(), it calls ks8851_lock_par() again
+> which attempts to claim the already locked spinlock again, and the
+> hang happens.
+>
+> Move the do_softirq() call outside of the spinlock protected section
+> of ks8851_irq() by disabling BHs around the entire spinlock protected
+> section of ks8851_irq() handler. Place local_bh_enable() outside of
+> the spinlock protected section, so that it can trigger do_softirq()
+> without the ks8851_par.c ks8851_lock_par() spinlock being held, and
+> safely call ks8851_start_xmit_par() without attempting to lock the
+> already locked spinlock.
+>
+> Since ks8851_irq() is protected by local_bh_disable()/local_bh_enable()
+> now, replace netif_rx() with __netif_rx() which is not duplicating the
+> local_bh_disable()/local_bh_enable() calls.
+>
+> Fixes: 797047f875b5 ("net: ks8851: Implement Parallel bus operations")
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> ---
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
+> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Ronald Wahl <ronald.wahl@raritan.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: netdev@vger.kernel.org
+> ---
+>  drivers/net/ethernet/micrel/ks8851_common.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
+> index 896d43bb8883d..b6b727e651f3d 100644
+> --- a/drivers/net/ethernet/micrel/ks8851_common.c
+> +++ b/drivers/net/ethernet/micrel/ks8851_common.c
+> @@ -299,7 +299,7 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
+>  					ks8851_dbg_dumpkkt(ks, rxpkt);
+>
+>  				skb->protocol = eth_type_trans(skb, ks->netdev);
+> -				netif_rx(skb);
+> +				__netif_rx(skb);
+>
+>  				ks->netdev->stats.rx_packets++;
+>  				ks->netdev->stats.rx_bytes += rxlen;
+> @@ -325,11 +325,15 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
+>   */
+>  static irqreturn_t ks8851_irq(int irq, void *_ks)
+>  {
+> +	bool need_bh_off = !(hardirq_count() | softirq_count());
+IMO, in_task() macro would be better.
 
-Some chips may not allow changing default speed when dual rate
-transceivers modules are used. Firmware on those chips will
-indicate the same to the driver.
+>  	struct ks8851_net *ks = _ks;
+>  	unsigned handled = 0;
+>  	unsigned long flags;
+>  	unsigned int status;
+>
+> +	if (need_bh_off)
+> +		local_bh_disable();
+This threaded irq's thread function (ks8851_irq()) will always run in process context, right ?
+Do you need "if(need_bh_off)" loop?
 
-Add a warning message when speed change is not supported
-because a dual rate transceiver is detected by the NIC.
-
-Signed-off-by: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 1494b550299a..e64c681e2be8 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -2525,6 +2525,11 @@ static bool bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
- 		}
- 		return false;
- 	}
-+	case ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_DUAL_DATA_RATE_NOT_SUPPORTED:
-+		netdev_warn(bp->dev,
-+			    "Speed change not supported with dual rate transceivers on this board\n"
-+			    );
-+		break;
- 	default:
- 		netdev_err(bp->dev, "FW reported unknown error type %u\n",
- 			   err_type);
--- 
-2.39.1
-
-
---0000000000005f0b08061500f4e8
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINs5buLW3xxv4UXC6u+aXkC2O2cHK6o/
-xnstcQudl8SeMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQw
-MTAzNTUwNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCFfLoeQ5fZr8m3E4s27lSQyxdM2GKb7JghayYIDz4T7SUrWmd/
-HekVbNWVBDlDrsWmY5VlikMptpClZZfLm65D8xnjgOWOZoI8SQBKDIPAkUy6zHoM7lw32gJ912x1
-SvU6ppFUZjRsGKV4HfL8vFFtEFxe5FRVafHcPtPCJ005XJAsYPW4QI1gYM9I/LZYWkm0KujzyhxB
-P89XNM4Q7imtkk42oVaEm2T4ZbLKvsdorTxDbP33u5u106wkHuYqTEEbdFWB5eFhVhIP8irKT3Y6
-MQRE7PKwxMwQ7KqqoqdHijW8bIKWfe9RvT/8zYYtahkk+zmSoPXr4rQxREagLGZd
---0000000000005f0b08061500f4e8--
+> +
+>  	ks8851_lock(ks, &flags);
+>
+>  	status = ks8851_rdreg16(ks, KS_ISR);
+> @@ -406,6 +410,9 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+>  	if (status & IRQ_LCI)
+>  		mii_check_link(&ks->mii);
+>
+> +	if (need_bh_off)
+> +		local_bh_enable();
+> +
+>  	return IRQ_HANDLED;
+>  }
+>
+> --
+> 2.43.0
+>
 
