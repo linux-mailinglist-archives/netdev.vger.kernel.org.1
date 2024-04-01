@@ -1,167 +1,111 @@
-Return-Path: <netdev+bounces-83693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B738936EF
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 04:28:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49796893715
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 04:41:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C5B281161
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 02:28:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F31B31F2169F
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 02:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1540D1113;
-	Mon,  1 Apr 2024 02:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569E7385;
+	Mon,  1 Apr 2024 02:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="P9LU1I5j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XRzFfaeI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9901362
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 02:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92737F
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 02:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711938511; cv=none; b=s505Jo71SytWaEt1ZrFcs4+HIJkT6/fYn0h5syTMJFxWsqOAfWn7FW2I3OvRB6YWiWe5KceMdu5sUC2ckD1vuyz5SFm1AzdlAKd0pmYmJX3y1aN7MsxO0agboqOEW9uzTEzIzL8y41ast3IH5TgfFFJnwrdYctF2bR9cZzBnFLA=
+	t=1711939314; cv=none; b=jkvaCIdKDlHHOtNrYGFX0AssYV3IRbcCE1qbCFS6dzXh+iXjW0ZD4Q4A4Sno/EvsO5mheIrsAnT1tCJ6eucBgKbUF9c6igDzJeR6Qf+Mguh3G7yWl7a2a9qOzTN2E4tQvcfcmxLkZm9AdGsIsi2pOYxIavxw9eDr9T1URypGwec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711938511; c=relaxed/simple;
-	bh=lKYTnWKj8aFybgNfcmvkcPZSxsoRl/ozkQQU3rEQW/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xznt+sXoiEs5xVdFGUUUkAPA089fmBKUsWAybdva2yStRkf0l5u6wZWKUGBF1sMPjYbwCnsr+hhsDarTTStlviEt7+jlUK/VhWo5GpqiU8uG1KWRLSGaetB3j0U+/SJle/CW2Yq8WvWwwd2LqRPivMjVycR75dtO5VnGKHsK6kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=P9LU1I5j; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e6afb754fcso3468367b3a.3
-        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 19:28:29 -0700 (PDT)
+	s=arc-20240116; t=1711939314; c=relaxed/simple;
+	bh=ZlRFDz0rwEINNL7l2OtL4tNYMWx3UFbDKsWl/05KEZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qDoWyerDj0KV24DCHnpeTyrgeKtYLuiKOy5w945WAnUOZ70YMBnWGuqk6PFaOLyvSgbxTiI8+AT8L1dhNa9gTauLihStBBwXclJBt4N0vGQL6cO1Ft6lybVsDoxGZGdIYAk2UizOVyHlWuru+qr5jPVkcPKHD82mT0UaynnFdUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XRzFfaeI; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-29de4e12d12so2600344a91.3
+        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 19:41:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1711938509; x=1712543309; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IXMeLoImPZ33R4zJ3SWpn56WCPhsxXC6Los6ajh1i8M=;
-        b=P9LU1I5jukjBMKO1LqMu6jlbfGHWLyHQxqQEbnkNnlfzzWygJn8dddUXQxUiTYGYJk
-         pIU80nb/2WZVl3/N78k9aRjLZDKKH6J8167B9QXy68cqQHfQubEORLoFjlDhJVM7VM3B
-         6Na+rY+eTZa0JSAL6z3h7R/HVgj9AeTdTOE8/TY6IYzAzKStiN8pUlJs4+N6Qa/6A3ya
-         7EDlKJEIHYKWInZL5oH0u5OH7XiI1OuKJWLwWhynNDiDm4rNYpwWeBGxtyJngpicWEL+
-         88rxTY76vW1XtH7NDjlmMxvBnSri98lhy/GpFpqlgYW5itg2Oxs+cqcpgtblJ2t/vYuY
-         YDog==
+        d=gmail.com; s=20230601; t=1711939312; x=1712544112; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fZBK8EROkRYcxdsl5FONOU0dSuBeSDS3QhcopJ/WLBw=;
+        b=XRzFfaeINzFW87InFbQLDkD7Lus5ZF6Fu2enzOsKlHfsGFa/1Io36MfQas2GmmoP90
+         khv4kXFhGCagjVHfUKj7sFaz3phJ3YYtQ82LpOuMfmF53cB0WVd5BD63qobcmBUW3W5H
+         jitRsxIWrguyRwNlKBth6bc+qJwku+KkiruF8pWAUnKzVGi0RK1jxFGsYjBF6n4kVL/z
+         5fnlQ/YeMLiIKqYno6CLTnUImlaBS9lvTV8g1Cw6iv9N7y3K6ISfyQvZFXtJ95Sq8q9u
+         FTijJAOR/8UfApkP0pPaMl/R2AJAA69zE37UmvWZQoCmnI2qb0ph7wB/X8E9j45257Nh
+         sfcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711938509; x=1712543309;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IXMeLoImPZ33R4zJ3SWpn56WCPhsxXC6Los6ajh1i8M=;
-        b=TiyGB4LA8W2TcseYIZ40jaCgfVFvr6kYb6X+VSsM57H7FKY7uITOsB7lH2/0rMoa3J
-         Df5eyEhGiXJ2LMh+yJFuH/5ym6KnuftAXb5VS589BWhn6MFLf6lxLiJ6ZaYTahmV0ZSr
-         o4A3U8ZAYFicdp75jYqWdb8aCTS43yRFaR0FOtHMUiUfaV5RZK64H0kbfGW9gj4FzW4q
-         0bKLfxmmb5WZ5cfJ/5EzKfuoZEIpjObdHapRN+xh2LrW0ZmfP5PYJiEzvuWB6ZLnTx6U
-         ByIAVddeKk21LKKhfl7HiEIXM4Ig5nioMJ7YEbU8STasWyK/78gY23MyJJcG73/hhBUb
-         Z9cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1uOFCqYBqt5LLez3Bq2Fa9LnOQ2KMDXf2wnfXrCKAYRLqnyryBTSFqFWiAZSZMzt72dzVpU5dTpR18+NUBALVmpOaLJKD
-X-Gm-Message-State: AOJu0YxzxsFxyTsPVN5S9p+1JNcqta+L+9WdFYxhu2zhwPFMOIYFdoiC
-	SSxmZLJMmydw6gl3f9J+MZYz1TFJjJy9vvadg2bCmk73fl8gUk8A+BmMvFCVGz2mE1hoIS7CEq1
-	NkTUMzEDJPfxbWilZOc4XDoqk4IlFrisjcxSU5Q==
-X-Google-Smtp-Source: AGHT+IGzGQQaneP5xALvw57pZKTHGiCwen67uykrwqg6rWGJrnO4HP/K70Vm6Xhliw5Ne2x0YoSn10U7kH5Lflzm9D8=
-X-Received: by 2002:a05:6a20:550a:b0:1a3:6a74:2e6a with SMTP id
- ko10-20020a056a20550a00b001a36a742e6amr8586402pzb.14.1711938508724; Sun, 31
- Mar 2024 19:28:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711939312; x=1712544112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fZBK8EROkRYcxdsl5FONOU0dSuBeSDS3QhcopJ/WLBw=;
+        b=IxbZTleer7YxaN2S+uS7JQlAlEHvq+zIt8x831ESEP9Hbo+Ja2QCH6eGypO3vG4Asm
+         kFs00xFh2yEHxZW/A9zpYArWrvgFj3bc+YKBpRr0AYvZxKTB2P9IJkVZ62RC/xDZ2zPS
+         pCqewZTkpXrZu9WCiz5uDTno2ZTURetJQNmAavNONGRKd5CggnJ13uAx6oFplGOGUmQf
+         M/5M2uQoZvXEVmIzsRuAeyPkuPBTghL+USQP4DRSQk5/g4qBYRqB4Z3L4e36Te/ud/4y
+         Z+Ps609uar2JJ063NSta3QdyH4F4swJ6B41l/ZrV4zPrBNd68rgvTDm6jnzbnt7Ne4L5
+         zXyw==
+X-Gm-Message-State: AOJu0Yyk5Vdu3UpA2PbfEQ9pmXe9seWMWna7sgFOGTrVRqbM0aBo8IwN
+	RsvSv/wu21AP5b8wlHt4izM4NVnmEfQZbS9F/lFbqKlBVg7Ao+IU
+X-Google-Smtp-Source: AGHT+IF8pa87fsspDBSgtIVYgelZAgAN8qB6o1KxG9i18Tym3nuoElKx0RxT6mo5v8eur60Ovbr3jA==
+X-Received: by 2002:a17:90a:d149:b0:29d:f1e9:a9d2 with SMTP id t9-20020a17090ad14900b0029df1e9a9d2mr5448164pjw.49.1711939312175;
+        Sun, 31 Mar 2024 19:41:52 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id z2-20020a17090ab10200b0029c7963a33fsm8717439pjq.10.2024.03.31.19.41.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Mar 2024 19:41:51 -0700 (PDT)
+Date: Mon, 1 Apr 2024 10:41:46 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCHv3 net-next 2/4] net: team: rename team to team_core for
+ linking
+Message-ID: <Zgoe6i-kf_u-_E2R@Laptop-X1>
+References: <20240329082847.1902685-1-liuhangbin@gmail.com>
+ <20240329082847.1902685-3-liuhangbin@gmail.com>
+ <20240329150804.7189ced3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
- <20240311093526.1010158-2-dongmenglong.8@bytedance.com> <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
- <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
- <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
- <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
- <CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
- <CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com>
- <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
- <CALz3k9g-U8ih=ycJPRbyU9x_9cp00fNkU3PGQ6jP0WJ+=uKmqQ@mail.gmail.com>
- <CALz3k9jG5Jrqw=BGjt05yMkEF-1u909GbBYrV-02W0dQtm6KQQ@mail.gmail.com>
- <20240328111330.194dcbe5@gandalf.local.home> <CALz3k9idLX10+Gh18xWepwtgvp4VZ3zQfY4aoNXn0gCh8Fs_fA@mail.gmail.com>
- <20240330153722.65104301@gandalf.local.home>
-In-Reply-To: <20240330153722.65104301@gandalf.local.home>
-From: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
-Date: Mon, 1 Apr 2024 10:28:17 +0800
-Message-ID: <CALz3k9j_RGqSMdN+GvbHEjRqMWYe4R9VNZRANG7jbfL_jVpoVg@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
- to record and check the accessed args
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	X86 ML <x86@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Quentin Monnet <quentin@isovalent.com>, bpf <bpf@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240329150804.7189ced3@kernel.org>
 
-On Sun, Mar 31, 2024 at 3:34=E2=80=AFAM Steven Rostedt <rostedt@goodmis.org=
-> wrote:
->
-> On Sat, 30 Mar 2024 11:18:29 +0800
-> =E6=A2=A6=E9=BE=99=E8=91=A3 <dongmenglong.8@bytedance.com> wrote:
->
-> > > If you really want to have thousands of functions, why not just regis=
-ter it
-> > > with ftrace itself. It will give you the arguments via the ftrace_reg=
-s
-> > > structure. Can't you just register a program as the callback?
-> > >
-> >
-> > Ennn...I don't understand. The main purpose for
-> > me to use TRACING is:
-> >
-> > 1. we can directly access the memory, which is more
-> >    efficient.
->
-> I'm not sure what you mean by the above. Access what memory?
->
+On Fri, Mar 29, 2024 at 03:08:04PM -0700, Jakub Kicinski wrote:
+> On Fri, 29 Mar 2024 16:28:45 +0800 Hangbin Liu wrote:
+> > diff --git a/Documentation/netlink/specs/team.yaml b/Documentation/netlink/specs/team.yaml
+> > index 907f54c1f2e3..c13529e011c9 100644
+> > --- a/Documentation/netlink/specs/team.yaml
+> > +++ b/Documentation/netlink/specs/team.yaml
+> > @@ -202,5 +202,3 @@ operations:
+> >            attributes:
+> >              - team-ifindex
+> >              - list-port
+> > -            - item-port
+> > -            - attr-port
+> 
+> I think you squashed this into the wrong patch :S
 
-We need to use the helper of bpf_probe_read_kernel
-when we read "skb->sk" in kprobe, and the "skb" is the
-1st arg in ip_rcv(). And we can directly read "skb->sk"
-in tracing, which is more efficient. Isn't it?
+Ah, my bad. I need more careful and double checks before post them...
 
-> > 2. we can obtain the function args in FEXIT, which
-> >     kretprobe can't do it. And this is the main reason.
->
-> I didn't mention kretprobe. If you need access to the exit of the functio=
-n,
-> you can use Masami's fgraph update.
->
->  fentry -> ftrace_trampoline -> your_code
->
-> For fgraph:
->
->  fentry -> ftrace_trampoline -> fgraph [sets up return call] -> your_entr=
-y_code
->
->  function ret -> fgraph_ret_handler -> your_exit_code
->
-> And you will be able to pass data from the entry to the exit code,
-> including parameters.
-
-Yeah, the fgraph sounds like a nice solution to my problem.
-I'll have a try on it.
-
-Thanks!
-Menglong Dong
-
->
-> -- Steve
->
->
+Hangbin
 
