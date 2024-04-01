@@ -1,228 +1,97 @@
-Return-Path: <netdev+bounces-83724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3747D8938AC
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 09:36:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B13DD8938CF
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 10:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8C7B281A3C
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 07:36:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 657DD1F2163F
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 08:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D24B66C;
-	Mon,  1 Apr 2024 07:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B4DD51C;
+	Mon,  1 Apr 2024 08:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSkGR8e9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hOeBJ2DT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C70BE65;
-	Mon,  1 Apr 2024 07:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6182FD515
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 08:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711956981; cv=none; b=DpjNTtLpxJrpHSeV1Nqep3for3bgj73hVrE4UiYCNS+Mh9b0SNd/NNjnJGdkansjRmt7xvfUhlYybcbxAHINqmjpXQFDYkvfmmqK+qshYT4MbmyFYTw+qd7yyjkHLsootJlq31FKPZRVZWvie8ktsOhd3YlVIB/3AXOUixDLc8c=
+	t=1711958811; cv=none; b=X8nZQ+Zewu8pErq5CO4fhvXGAW4RQ2P4BidO+Mxchqo8UVifXsRCQhFmFuv25bzJzRqOa5UZ1Oufzpt7lZIW6zYVm676A8gpn/BpdPU8olbMUYEOoMgwcokamspoaOsKzqmt3orRHMGXm/uh8rsUjUYKVtTBsNIGhg6FEpU2yMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711956981; c=relaxed/simple;
-	bh=Y33lald868AEFBEAzQQpl5KnbN/ZlQxowvXyePULSIY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Umuvz2/rmPf6m20WwNpxw5tO/9EhpaKYRg5lpvIUParT5x98v3Mx2eVezMI85HbTG3/7HvnMTRVBn9/njsIdF9aMPRgOOSPyvCntOJnR/cIagWnu0w/6W8xWNvFgvsZJAb8pieL/Fe1yLjhu2cwdIqlJYfsM7xJhq3ELBWQPLDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VSkGR8e9; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6ead4093f85so3438931b3a.3;
-        Mon, 01 Apr 2024 00:36:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711956979; x=1712561779; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X29dP94IyIxocgonpYmxURR3c3KlW1OjV0nE8Ec6lII=;
-        b=VSkGR8e9khGPrSLHUoeA+S+M+gnNt4a34zWWHfz01St0jtyj6jiOMqVbSOHtIXXF8V
-         l0BrxfEJEpBHS8J8W8V6iSWIh608TEZ+LGBmYVn+wwdXAO8TopxQpPBOVAE9xLikJsnD
-         kAwN4fgW1QGUJULZkqR5Tf8fuEeSoADvW7M0y4Yh6sNWVNauVnFbQMVLSmqhWl9svdEn
-         8qj76NvinCe8gJ+fTk/qvpoF5aKdfQRRimgfeW1ILnL/UDzzO2CcLQP230LYPe96Ytlw
-         hU6fPj80FGIFg8/1eO+xed9Sbfk5e+jkp5iqyoUDFs1e3culqaVK+YZxJgUikMpIYtaD
-         5NtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711956979; x=1712561779;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X29dP94IyIxocgonpYmxURR3c3KlW1OjV0nE8Ec6lII=;
-        b=QLEficJl2C8LVlzwkpzkaPlvR/r+qm1h6VpApTNj0dWxg9wgf+u1wd99HVhUDG7AuV
-         OzTr363ZQHfHP6hkm2f45HYm64do3StwlAzd9V8UIXyNCyodU84eKCl8AY7E7CPv8YXq
-         LQW0TyxALv1HX2XGUc5QBoiDouzj0xbTB6BEXwVbTDb7F/PzGKo+YADXArhyt/4gbsV4
-         yZWY+Mu7RQd3p37KxxCVENSlEsgYSNqGTFpR9a/Knp7nK3e5p+JeoDKhMQ/hUDG1gtkU
-         C0m65c81VdHmXZUMLA4u6OzOw0nzcsrmkx2aKM5lD8tJTxdxvUd5tMAa7UvDXboKXBsE
-         hAiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXC7oCdEobhT//klukzP4BtVeIFIdnC9mB+EYcJH5gxTnFw2tI8CTF7PuVqa/52k5u9mbl9Ewoc1K7ZD/FDo/lezdGnyUlaCjVr/Ji8d1tDCAUq
-X-Gm-Message-State: AOJu0YwJHeMeIefD2qRXboodNiq7QdJ2lMB0NyjDWsfMFFZn92nPaZXL
-	SVpHAhxaczeAG5UxaVgN+L6ksh+L20K2MAukVNs5MhwOKbeXbbCS5oPk0KqPTZk=
-X-Google-Smtp-Source: AGHT+IHpfRDhf7L5dWjzJRD9FKkRWD2qCxAKFikMfaxquj2dXrnJJzZKq8ak0+xUPV9CBNSZk/M4vw==
-X-Received: by 2002:a05:6a21:9212:b0:1a3:e4fe:f6f1 with SMTP id tl18-20020a056a21921200b001a3e4fef6f1mr7831361pzb.58.1711956978931;
-        Mon, 01 Apr 2024 00:36:18 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id im15-20020a170902bb0f00b001e0f54ac3desm8363497plb.258.2024.04.01.00.36.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Apr 2024 00:36:18 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	rostedt@goodmis.org,
+	s=arc-20240116; t=1711958811; c=relaxed/simple;
+	bh=8UebOuTJBhPPkYw51jyujYO9dmpHZI0JM4BT9ioA+NE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T6fk/WRpHSLsCk95yO8jwG99UiK18w2RBIlTArVgB31EhecVVdDchQj3E+LA6bBfOgjxAFKEHtM5ZHUEQhxgVLuf7lp18P3wDJZ2KAswwtTk04HtK+1kRjMsvG/q1J7ogli+Pj6eayU+UZAJEXitOftR4C+Y3XTy+32sb3aJN8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hOeBJ2DT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711958809;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8UebOuTJBhPPkYw51jyujYO9dmpHZI0JM4BT9ioA+NE=;
+	b=hOeBJ2DTdun+bL8q99F/S0WbgPxjevxZJBqurTNXZxWO47tPiG1NNUQJI37Bzw5b9+CUcy
+	LjEXjc22VExHVg0kS6YTb2T6h3Lh5gVQkA2KcmAlB5xRg9K7V0uVFv3WJCjDgjFMcN/fML
+	jLCwIAQxb2tNhKtmh9f+VR7byd/K304=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-38-pUqHvB_DNi2mQ8J8yUxjWg-1; Mon, 01 Apr 2024 04:06:45 -0400
+X-MC-Unique: pUqHvB_DNi2mQ8J8yUxjWg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 59F70851784;
+	Mon,  1 Apr 2024 08:06:44 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.124])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1B4C03C21;
+	Mon,  1 Apr 2024 08:06:41 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: horms@kernel.org
+Cc: dave.stevenson@raspberrypi.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jtornosm@redhat.com,
 	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
 	pabeni@redhat.com,
-	davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v4 2/2] trace: tcp: fully support trace_tcp_send_reset
-Date: Mon,  1 Apr 2024 15:36:05 +0800
-Message-Id: <20240401073605.37335-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240401073605.37335-1-kerneljasonxing@gmail.com>
-References: <20240401073605.37335-1-kerneljasonxing@gmail.com>
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] net: usb: ax88179_178a: non necessary second random mac address
+Date: Mon,  1 Apr 2024 10:06:19 +0200
+Message-ID: <20240401080620.7092-1-jtornosm@redhat.com>
+In-Reply-To: <20240327160052.GP403975@kernel.org>
+References: <20240327160052.GP403975@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-From: Jason Xing <kernelxing@tencent.com>
+Hello Simon,
 
-Prior to this patch, what we can see by enabling trace_tcp_send is
-only happening under two circumstances:
-1) active rst mode
-2) non-active rst mode and based on the full socket
+Returning after Easter.
 
-That means the inconsistency occurs if we use tcpdump and trace
-simultaneously to see how rst happens.
+I'm sorry I didn't understand you, I have to learn more about the procedure.
+I hope to do it better now.
 
-It's necessary that we should take into other cases into considerations,
-say:
-1) time-wait socket
-2) no socket
-...
+Thanks for your help
 
-By parsing the incoming skb and reversing its 4-tuple can
-we know the exact 'flow' which might not exist.
-
-Samples after applied this patch:
-1. tcp_send_reset: skbaddr=XXX skaddr=XXX src=ip:port dest=ip:port
-state=TCP_ESTABLISHED
-2. tcp_send_reset: skbaddr=000...000 skaddr=XXX src=ip:port dest=ip:port
-state=UNKNOWN
-Note:
-1) UNKNOWN means we cannot extract the right information from skb.
-2) skbaddr/skaddr could be 0
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/trace/events/tcp.h | 40 ++++++++++++++++++++++++++++++++++++--
- net/ipv4/tcp_ipv4.c        |  7 +++----
- net/ipv6/tcp_ipv6.c        |  3 ++-
- 3 files changed, 43 insertions(+), 7 deletions(-)
-
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index cf14b6fcbeed..5c04a61a11c2 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -78,11 +78,47 @@ DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
-  * skb of trace_tcp_send_reset is the skb that caused RST. In case of
-  * active reset, skb should be NULL
-  */
--DEFINE_EVENT(tcp_event_sk_skb, tcp_send_reset,
-+TRACE_EVENT(tcp_send_reset,
- 
- 	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
- 
--	TP_ARGS(sk, skb)
-+	TP_ARGS(sk, skb),
-+
-+	TP_STRUCT__entry(
-+		__field(const void *, skbaddr)
-+		__field(const void *, skaddr)
-+		__field(int, state)
-+		__array(__u8, saddr, sizeof(struct sockaddr_in6))
-+		__array(__u8, daddr, sizeof(struct sockaddr_in6))
-+	),
-+
-+	TP_fast_assign(
-+		__entry->skbaddr = skb;
-+		__entry->skaddr = sk;
-+		/* Zero means unknown state. */
-+		__entry->state = sk ? sk->sk_state : 0;
-+
-+		memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
-+		memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
-+
-+		if (sk && sk_fullsock(sk)) {
-+			const struct inet_sock *inet = inet_sk(sk);
-+
-+			TP_STORE_ADDR_PORTS(__entry, inet, sk);
-+		} else if (skb) {
-+			const struct tcphdr *th = (const struct tcphdr *)skb->data;
-+			/*
-+			 * We should reverse the 4-tuple of skb, so later
-+			 * it can print the right flow direction of rst.
-+			 */
-+			TP_STORE_ADDR_PORTS_SKB(skb, th, entry->daddr, entry->saddr);
-+		}
-+	),
-+
-+	TP_printk("skbaddr=%p skaddr=%p src=%pISpc dest=%pISpc state=%s",
-+		  __entry->skbaddr, __entry->skaddr,
-+		  __entry->saddr, __entry->daddr,
-+		  __entry->state ? show_tcp_state_name(__entry->state) : "UNKNOWN")
- );
- 
- /*
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a22ee5838751..0d47b48f8cfd 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -866,11 +866,10 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
- 	 * routing might fail in this case. No choice here, if we choose to force
- 	 * input interface, we will misroute in case of asymmetric route.
- 	 */
--	if (sk) {
-+	if (sk)
- 		arg.bound_dev_if = sk->sk_bound_dev_if;
--		if (sk_fullsock(sk))
--			trace_tcp_send_reset(sk, skb);
--	}
-+
-+	trace_tcp_send_reset(sk, skb);
- 
- 	BUILD_BUG_ON(offsetof(struct sock, sk_bound_dev_if) !=
- 		     offsetof(struct inet_timewait_sock, tw_bound_dev_if));
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 3f4cba49e9ee..8e9c59b6c00c 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1113,7 +1113,6 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
- 	if (sk) {
- 		oif = sk->sk_bound_dev_if;
- 		if (sk_fullsock(sk)) {
--			trace_tcp_send_reset(sk, skb);
- 			if (inet6_test_bit(REPFLOW, sk))
- 				label = ip6_flowlabel(ipv6h);
- 			priority = READ_ONCE(sk->sk_priority);
-@@ -1129,6 +1128,8 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
- 			label = ip6_flowlabel(ipv6h);
- 	}
- 
-+	trace_tcp_send_reset(sk, skb);
-+
- 	tcp_v6_send_response(sk, skb, seq, ack_seq, 0, 0, 0, oif, 1,
- 			     ipv6_get_dsfield(ipv6h), label, priority, txhash,
- 			     &key);
--- 
-2.37.3
+Best regards
+José Ignacio
 
 
