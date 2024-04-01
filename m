@@ -1,293 +1,171 @@
-Return-Path: <netdev+bounces-83742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A98893A51
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 12:49:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 434C7893A78
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 13:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA7021F21458
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 10:49:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEE441F211CB
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 11:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CAF200A9;
-	Mon,  1 Apr 2024 10:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5764D2030A;
+	Mon,  1 Apr 2024 11:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q60fcdFE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kC0rG/Qp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5055C1CA8F
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 10:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC57200AE;
+	Mon,  1 Apr 2024 11:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711968556; cv=none; b=HlSuZqsnIX3ZuVmrxwSKziqrUpsWz21W4RQp65FkgHKt8/3KpyVQDQQEKoYW77n+BHiPPMbs44jftlNBJWUEqEUCtlTChZwnvpEeH28PJ8gtbbFkuJYGqpdJBxDzmSJi21NuXFQ6sGxE1EPqQr4fbdJ3feIlGT8dRcDz2rHYOww=
+	t=1711969218; cv=none; b=t0+F+VuCARAlCf94LponACUZVvBfWl/DJm0SCbzBIbmnEfUNsBJWFHaJSQBh96E+Dt30xqLQrKPe3Iqw16PNEZGHP7kHsiC68DtxP9ZaNfZkSx6mQ0wncMzZD47IONCgozxs9FYQJP6I/R1VO9YdscBgEZlSL1UQGJTM6bRhuo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711968556; c=relaxed/simple;
-	bh=QJMJfCdLEuJ+FfMXIfDmDR+++PbMg13/naaZeMO3ZkM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cm/S1bZicN3582AhOHM8+VIX/GJXhIGkBdAEMCnLhYyrDQlwsM7mNa9Dz60ZSz3lI0/b/Qe6wJKe70hfWVd7ZnPY872QmufeKSePFUM91B6YQsTnOc1tF0aoaYzPeC7pHLKABvU2rvHLNqK8Hfcewg+FnP1CZx4DNJMpWodP1mQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q60fcdFE; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1e0b889901bso29895415ad.1
-        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 03:49:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711968553; x=1712573353; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tKCS9QdnAwWbuZtYBI4sT1iLB4Tt93btjF36mrIzaXY=;
-        b=q60fcdFEN4aNls9TEmF7ITGr2b9XQR2XAyKsqz4xSEAhGn6afQws0uCalOxuCQm20Q
-         BOuO+rD79N8bosPS0H1mekcXxAlJE5gRKc5ShT9Qo2UZXzn5Fcjn0vj9psT2yn+1ooyH
-         n+nVSUy7u6A47xsRykHLDj+fBxRQn74JEBHSTk7qHDVey/00vvEqcY67FptMghTpATFv
-         AiLBPDs5LcZU7qCq0q9V1Xb/eMfPjIGJu4HKMTeqx1zQu+FXiJ+2Xdve94lS+KeESGar
-         kAwZQ3P8ElobJG5x14x4MMwQcUPI54/RwlPtI82y49cYqGYm0TxCtoH6/cM66R9r1/TR
-         rDJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711968553; x=1712573353;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tKCS9QdnAwWbuZtYBI4sT1iLB4Tt93btjF36mrIzaXY=;
-        b=WoAtm8LLVRpM3KeDyaB8M3lI3Wgf+YG/bwsww3iVk9zL2SV3F3PfcWQzUkqok0dFj4
-         8kdZV/5+Zky5sztNSSNnKpa0BJdBKqF4xUUWMnC1KVpdrN4IphHusKq7jDq7FdlijYy0
-         BXnvpzADjvN9GPDCgLWiuW/zpJbWaZX1hS0OVQKyWc3uaEzZwMo9JJf97lpL1R5YsB/q
-         7dpu74YIwemS2W5HfGDPTvIXEAmHMtllx9A30+3NdAknBg/Cu90rBOmEzHrvWoFLkfaV
-         HXFtc0GlyQAdhnYPRoU+iNCR5r/ELIICQYFQTxeZT1moSnoqUGIJeaqfs7XlyJ072sD+
-         0DYw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZOfNbrEwHkiy25K9XKDrXGz9Z9zERrnG+wTi0BsritCqYvoU1Ry3vBd548WXlhAKVACXiG4AYrilRewgkFq0aCRSmClcJ
-X-Gm-Message-State: AOJu0YzRy+zcU/n/9pzQPuHvRUa4T4kP49RscXJYHZndlgMlr+CnzyUx
-	coaaiWu3csphnAFTbEmQ3h2SE/SC6Djk92goqNXuv+GqV6QRYaBA/wb4ZN+cjA==
-X-Google-Smtp-Source: AGHT+IFF770fgs+yMHKwTIlLL3P039OFnIkWdfZJY4CvGxJUM7y7krgfn19E1tYKv8Gdk6uxTqFDKA==
-X-Received: by 2002:a17:902:e802:b0:1e0:b862:5330 with SMTP id u2-20020a170902e80200b001e0b8625330mr10121788plg.54.1711968553329;
-        Mon, 01 Apr 2024 03:49:13 -0700 (PDT)
-Received: from thinkpad ([103.28.246.102])
-        by smtp.gmail.com with ESMTPSA id u1-20020a170902e5c100b001e0b5eee802sm8552693plf.123.2024.04.01.03.49.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Apr 2024 03:49:12 -0700 (PDT)
-Date: Mon, 1 Apr 2024 16:19:08 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Baochen Qiang <quic_bqiang@quicinc.com>
-Cc: ath11k@lists.infradead.org, linux-wireless@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, mhi@lists.linux.dev,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 1/3] bus: mhi: host: add mhi_power_down_keep_dev()
-Message-ID: <20240401104908.GA234427@thinkpad>
-References: <20240305021320.3367-1-quic_bqiang@quicinc.com>
- <20240305021320.3367-2-quic_bqiang@quicinc.com>
+	s=arc-20240116; t=1711969218; c=relaxed/simple;
+	bh=w5luFLfUfnHBVCxJtXFMS1UvIwxlGGuv7RTuG/oMpkg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IExIYJijtgsRPMtTiO4gNMRE6yviMMsOh7fSUDJuCztrDSz4LTu1JTNH47InlC+iAQcihT/8SzUECE0K31TVa08/IiUwz1nhhkhP4THUSGkhw/IhjYxrEXo54EsFwRfM1Zxn/0lL6FIfNS0lyHa9DpvYkd3lyCwaqsAPd5Am8ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kC0rG/Qp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B140C433F1;
+	Mon,  1 Apr 2024 11:00:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711969217;
+	bh=w5luFLfUfnHBVCxJtXFMS1UvIwxlGGuv7RTuG/oMpkg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kC0rG/QpgKYIets+b8eOPVKqwKUJQKQyRK66SQxjqRYhrKj5WK0mrYPb9QZnx+t7n
+	 iRFuIYVmKlg+Q4sGGhfJcQ91Cvj4k0P/m1QrVVB7TQRgQPe5fYvSPYWBb5jasIDlG1
+	 Wphin9/HwqAXIuWj7PMd33YQ++xBE3rqrtVcyxkytyCdq1EqZEG7TeThTMOQu8e+cl
+	 2moq4gdJeigRj1zY1fB3vfnhc5SUCVZvydby/2S1j5DWe6W5ID2vdADcVdnDwrzJ1O
+	 hHL9I9elYKWO3xo+vzyLBwgPDMKaOt+hD0Z5qkWYR4NEnzDzI1a3ip3HCRlNxkEa79
+	 I4HGqXW/dfdow==
+Message-ID: <f45ad3e1-4433-422e-be28-17deaba4ade1@kernel.org>
+Date: Mon, 1 Apr 2024 13:00:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240305021320.3367-2-quic_bqiang@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] bpf: fix null ptr deref in dev_map_enqueue
+To: Edward Adam Davis <eadavis@qq.com>,
+ syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
+ haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com,
+ song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+References: <00000000000069ee1a06149ff00c@google.com>
+ <tencent_EF4FAF8DF125F00D8D9237DDCC5DE9990307@qq.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <tencent_EF4FAF8DF125F00D8D9237DDCC5DE9990307@qq.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 05, 2024 at 10:13:18AM +0800, Baochen Qiang wrote:
-> ath11k fails to resume:
-> 
-> ath11k_pci 0000:06:00.0: timeout while waiting for restart complete
-> 
-> This happens because when calling mhi_sync_power_up() the MHI subsystem
-> eventually calls device_add() from mhi_create_devices() but the device
-> creation is deferred:
-> 
-> mhi mhi0_IPCR: Driver qcom_mhi_qrtr force probe deferral
-> 
-> The reason for deferring device creation is explained in dpm_prepare():
-> 
->         /*
->          * It is unsafe if probing of devices will happen during suspend or
->          * hibernation and system behavior will be unpredictable in this case.
->          * So, let's prohibit device's probing here and defer their probes
->          * instead. The normal behavior will be restored in dpm_complete().
->          */
-> 
-> Because the device probe is deferred, the qcom_mhi_qrtr_probe() is not
-> called and thus MHI channels are not prepared:
-> 
-> So what this means that QRTR is not delivering messages and the QMI connection
-> is not working between ath11k and the firmware, resulting a failure in firmware
-> initialization.
-> 
-> To fix this add new function mhi_power_down_keep_dev() which doesn't destroy
-> the devices for channels during power down. This way we avoid probe defer issue
-> and finally can get ath11k hibernation working with the following patches.
-> 
-> Tested-on: WCN6855 hw2.0 PCI WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
-> 
-> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
 
-Applied to mhi-next! Note that this patch is also available in mhi-immutable
-branch for ath11k maintainers to pull into their tree.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/mani/mhi.git/log/?h=mhi-immutable
-
-- Mani
-
-> Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-> Reviewed-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+On 31/03/2024 11.08, Edward Adam Davis wrote:
+> [Syzbot reported]
+> general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
+> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+> CPU: 0 PID: 5179 Comm: syz-executor120 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+> RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+> Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 e6 45 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 d0 8b 3b 00 4c 8b 7d 00 48 83 c5
+> RSP: 0018:ffffc90003b0f688 EFLAGS: 00010246
+> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888025258000
+> RDX: 0000000000000000 RSI: ffff888024035070 RDI: 0000000000000000
+> RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff55e
+> R10: 0000000000000004 R11: ffff888025258000 R12: ffff8880157d8000
+> R13: ffff888024035070 R14: dffffc0000000000 R15: ffff8880b943c088
+> FS:  00007fd0098e46c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00000000200009c0 CR3: 0000000025314000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>   <TASK>
+>   __xdp_do_redirect_frame net/core/filter.c:4384 [inline]
+>   xdp_do_redirect_frame+0x20d/0x4d0 net/core/filter.c:4438
+>   xdp_test_run_batch net/bpf/test_run.c:336 [inline]
+>   bpf_test_run_xdp_live+0xe8a/0x1e90 net/bpf/test_run.c:384
+>   bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
+>   bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
+>   __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
+>   __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+>   __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+>   __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
+>   do_syscall_64+0xfb/0x240
+>   entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> RIP: 0033:0x7fd00992a0d9
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 81 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fd0098e4238 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+> RAX: ffffffffffffffda RBX: 00007fd0099b43e8 RCX: 00007fd00992a0d9
+> RDX: 0000000000000050 RSI: 0000000020000240 RDI: 000000000000000a
+> RBP: 00007fd0099b43e0 R08: 00007fd0098e46c0 R09: 00007fd0098e46c0
+> R10: 00007fd0098e46c0 R11: 0000000000000246 R12: 00007fd009981060
+> R13: 0000000000000016 R14: 00007fffcb70c160 R15: 00007fffcb70c248
+>   </TASK>
+> [Fix]
+> On the execution path of bpf_prog_test_run(), due to ri->map being NULL,
+> ri->tgtvalue was not set correctly.
+> 
+> Reported-and-tested-by: syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 > ---
->  drivers/bus/mhi/host/internal.h |  4 +++-
->  drivers/bus/mhi/host/pm.c       | 42 ++++++++++++++++++++++++++++-----
->  include/linux/mhi.h             | 18 +++++++++++++-
->  3 files changed, 56 insertions(+), 8 deletions(-)
+>   kernel/bpf/devmap.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/bus/mhi/host/internal.h b/drivers/bus/mhi/host/internal.h
-> index 5fe49311b8eb..aaad40a07f69 100644
-> --- a/drivers/bus/mhi/host/internal.h
-> +++ b/drivers/bus/mhi/host/internal.h
-> @@ -80,6 +80,7 @@ enum dev_st_transition {
->  	DEV_ST_TRANSITION_FP,
->  	DEV_ST_TRANSITION_SYS_ERR,
->  	DEV_ST_TRANSITION_DISABLE,
-> +	DEV_ST_TRANSITION_DISABLE_DESTROY_DEVICE,
->  	DEV_ST_TRANSITION_MAX,
->  };
->  
-> @@ -90,7 +91,8 @@ enum dev_st_transition {
->  	dev_st_trans(MISSION_MODE,	"MISSION MODE")		\
->  	dev_st_trans(FP,		"FLASH PROGRAMMER")	\
->  	dev_st_trans(SYS_ERR,		"SYS ERROR")		\
-> -	dev_st_trans_end(DISABLE,	"DISABLE")
-> +	dev_st_trans(DISABLE,		"DISABLE")		\
-> +	dev_st_trans_end(DISABLE_DESTROY_DEVICE, "DISABLE (DESTROY DEVICE)")
->  
->  extern const char * const dev_state_tran_str[DEV_ST_TRANSITION_MAX];
->  #define TO_DEV_STATE_TRANS_STR(state) (((state) >= DEV_ST_TRANSITION_MAX) ? \
-> diff --git a/drivers/bus/mhi/host/pm.c b/drivers/bus/mhi/host/pm.c
-> index 8b40d3f01acc..11c0e751f223 100644
-> --- a/drivers/bus/mhi/host/pm.c
-> +++ b/drivers/bus/mhi/host/pm.c
-> @@ -468,7 +468,8 @@ static int mhi_pm_mission_mode_transition(struct mhi_controller *mhi_cntrl)
->  }
->  
->  /* Handle shutdown transitions */
-> -static void mhi_pm_disable_transition(struct mhi_controller *mhi_cntrl)
-> +static void mhi_pm_disable_transition(struct mhi_controller *mhi_cntrl,
-> +				      bool destroy_device)
->  {
->  	enum mhi_pm_state cur_state;
->  	struct mhi_event *mhi_event;
-> @@ -530,8 +531,16 @@ static void mhi_pm_disable_transition(struct mhi_controller *mhi_cntrl)
->  	dev_dbg(dev, "Waiting for all pending threads to complete\n");
->  	wake_up_all(&mhi_cntrl->state_event);
->  
-> -	dev_dbg(dev, "Reset all active channels and remove MHI devices\n");
-> -	device_for_each_child(&mhi_cntrl->mhi_dev->dev, NULL, mhi_destroy_device);
-> +	/*
-> +	 * Only destroy the 'struct device' for channels if indicated by the
-> +	 * 'destroy_device' flag. Because, during system suspend or hibernation
-> +	 * state, there is no need to destroy the 'struct device' as the endpoint
-> +	 * device would still be physically attached to the machine.
-> +	 */
-> +	if (destroy_device) {
-> +		dev_dbg(dev, "Reset all active channels and remove MHI devices\n");
-> +		device_for_each_child(&mhi_cntrl->mhi_dev->dev, NULL, mhi_destroy_device);
-> +	}
->  
->  	mutex_lock(&mhi_cntrl->pm_mutex);
->  
-> @@ -821,7 +830,10 @@ void mhi_pm_st_worker(struct work_struct *work)
->  			mhi_pm_sys_error_transition(mhi_cntrl);
->  			break;
->  		case DEV_ST_TRANSITION_DISABLE:
-> -			mhi_pm_disable_transition(mhi_cntrl);
-> +			mhi_pm_disable_transition(mhi_cntrl, false);
-> +			break;
-> +		case DEV_ST_TRANSITION_DISABLE_DESTROY_DEVICE:
-> +			mhi_pm_disable_transition(mhi_cntrl, true);
->  			break;
->  		default:
->  			break;
-> @@ -1175,7 +1187,8 @@ int mhi_async_power_up(struct mhi_controller *mhi_cntrl)
->  }
->  EXPORT_SYMBOL_GPL(mhi_async_power_up);
->  
-> -void mhi_power_down(struct mhi_controller *mhi_cntrl, bool graceful)
-> +static void __mhi_power_down(struct mhi_controller *mhi_cntrl, bool graceful,
-> +			     bool destroy_device)
->  {
->  	enum mhi_pm_state cur_state, transition_state;
->  	struct device *dev = &mhi_cntrl->mhi_dev->dev;
-> @@ -1211,15 +1224,32 @@ void mhi_power_down(struct mhi_controller *mhi_cntrl, bool graceful)
->  	write_unlock_irq(&mhi_cntrl->pm_lock);
->  	mutex_unlock(&mhi_cntrl->pm_mutex);
->  
-> -	mhi_queue_state_transition(mhi_cntrl, DEV_ST_TRANSITION_DISABLE);
-> +	if (destroy_device)
-> +		mhi_queue_state_transition(mhi_cntrl,
-> +					   DEV_ST_TRANSITION_DISABLE_DESTROY_DEVICE);
-> +	else
-> +		mhi_queue_state_transition(mhi_cntrl,
-> +					   DEV_ST_TRANSITION_DISABLE);
->  
->  	/* Wait for shutdown to complete */
->  	flush_work(&mhi_cntrl->st_worker);
->  
->  	disable_irq(mhi_cntrl->irq[0]);
->  }
-> +
-> +void mhi_power_down(struct mhi_controller *mhi_cntrl, bool graceful)
-> +{
-> +	__mhi_power_down(mhi_cntrl, graceful, true);
-> +}
->  EXPORT_SYMBOL_GPL(mhi_power_down);
->  
-> +void mhi_power_down_keep_dev(struct mhi_controller *mhi_cntrl,
-> +			       bool graceful)
-> +{
-> +	__mhi_power_down(mhi_cntrl, graceful, false);
-> +}
-> +EXPORT_SYMBOL_GPL(mhi_power_down_keep_dev);
-> +
->  int mhi_sync_power_up(struct mhi_controller *mhi_cntrl)
->  {
->  	int ret = mhi_async_power_up(mhi_cntrl);
-> diff --git a/include/linux/mhi.h b/include/linux/mhi.h
-> index 77b8c0a26674..cde01e133a1b 100644
-> --- a/include/linux/mhi.h
-> +++ b/include/linux/mhi.h
-> @@ -630,12 +630,28 @@ int mhi_async_power_up(struct mhi_controller *mhi_cntrl);
->  int mhi_sync_power_up(struct mhi_controller *mhi_cntrl);
->  
->  /**
-> - * mhi_power_down - Start MHI power down sequence
-> + * mhi_power_down - Power down the MHI device and also destroy the
-> + *                  'struct device' for the channels associated with it.
-> + *                  See also mhi_power_down_keep_dev() which is a variant
-> + *                  of this API that keeps the 'struct device' for channels
-> + *                  (useful during suspend/hibernation).
->   * @mhi_cntrl: MHI controller
->   * @graceful: Link is still accessible, so do a graceful shutdown process
->   */
->  void mhi_power_down(struct mhi_controller *mhi_cntrl, bool graceful);
->  
-> +/**
-> + * mhi_power_down_keep_dev - Power down the MHI device but keep the 'struct
-> + *                           device' for the channels associated with it.
-> + *                           This is a variant of 'mhi_power_down()' and
-> + *                           useful in scenarios such as suspend/hibernation
-> + *                           where destroying of the 'struct device' is not
-> + *                           needed.
-> + * @mhi_cntrl: MHI controller
-> + * @graceful: Link is still accessible, so do a graceful shutdown process
-> + */
-> +void mhi_power_down_keep_dev(struct mhi_controller *mhi_cntrl, bool graceful);
-> +
->  /**
->   * mhi_unprepare_after_power_down - Free any allocated memory after power down
->   * @mhi_cntrl: MHI controller
-> -- 
-> 2.25.1
-> 
+> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+> index 4e2cdbb5629f..ef20de14154a 100644
+> --- a/kernel/bpf/devmap.c
+> +++ b/kernel/bpf/devmap.c
+> @@ -86,6 +86,7 @@ struct bpf_dtab {
+>   static DEFINE_PER_CPU(struct list_head, dev_flush_list);
+>   static DEFINE_SPINLOCK(dev_map_lock);
+>   static LIST_HEAD(dev_map_list);
+> +static bool is_valid_dst(struct bpf_dtab_netdev *obj, struct xdp_frame *xdpf);
+>   
+>   static struct hlist_head *dev_map_create_hash(unsigned int entries,
+>   					      int numa_node)
+> @@ -536,7 +537,10 @@ int dev_xdp_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
+>   int dev_map_enqueue(struct bpf_dtab_netdev *dst, struct xdp_frame *xdpf,
+>   		    struct net_device *dev_rx)
+>   {
+> -	struct net_device *dev = dst->dev;
+> +	struct net_device *dev;
+> +	if (!is_valid_dst(dst, xdpf))
 
--- 
-மணிவண்ணன் சதாசிவம்
+This is overkill, because __xdp_enqueue() already contains most of the
+checks in is_valid_dst().
+
+Why not:
+
+  if (!dst)
+	return -EINVAL;
+
+
+> +		return -EINVAL;
+> +	dev = dst->dev;
+>   
+>   	return __xdp_enqueue(dev, xdpf, dev_rx, dst->xdp_prog);
+>   }
+
+
+Is this fix pampering over another issue?
+
+To repeat myself:
+I think something is wrong in xdp_test_run_batch().
+The `ri->tgt_value` is being set in __bpf_xdp_redirect_map(), but I
+cannot see __bpf_xdp_redirect_map() being used in xdp_test_run_batch().
+
+Is this a case of XDP program returning XDP_REDIRECT without having
+called the BPF helper for redirect?
+
+--Jesper
 
