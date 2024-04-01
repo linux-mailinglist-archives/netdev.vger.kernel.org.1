@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-83753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9695F893B84
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 15:36:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 797C2893B85
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 15:36:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F14C41F2206E
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 13:36:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5588B20A73
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 13:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CE73F9FD;
-	Mon,  1 Apr 2024 13:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F1C3FB29;
+	Mon,  1 Apr 2024 13:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="k5ypIJpu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NpYGXAXQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8315C3FB29
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 13:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECD53FB07
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 13:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711978576; cv=none; b=E6uPb/XwPEKLki+IlqW2ja96BijgfBil7Vm0r6gswItmSoahS0KylXlRjiGalJpfGjONP4w9z6brqj9VQ52i3T3ZpsrEXt4Oj4ndypHHzwn+EKpj4Sxj6CD80vJPbNioIveoaK0F3rAfp2wvS56kHmpuRpxs5SGMbZ+1yTsE8fg=
+	t=1711978578; cv=none; b=S9elZAYmF3i6pNXokQ6MHLeCzF3cDXMmAPUf2ocfIPfThcqtY2cWyUuFDrxszIpgIeFfcxSopCPnns0dpdEaTZigQM8hSrfWipAR6dKemrrvscFGGIevvw8JtYei7B3efSIAgQYO1UyMmZn+X9eyjUW2AqQgBq79xYiZh9oIpPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711978576; c=relaxed/simple;
-	bh=kQjFgWgNTPOE+tvEYg/fcwHA2KwB8/r4hq+NnvwjDnk=;
+	s=arc-20240116; t=1711978578; c=relaxed/simple;
+	bh=Ba8ZRPcHIpN0lalX1MJan4IYyVadQnFD5BsiVvTcBu0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XphiLl31Ub/Sk+mGUGSDGbV6DrmnpZh02G/3bP5iklSNzoFYUTc1yKC0Sop+hD9++1qodIFXV53AV4UM0nfxZ7PpafwLPxdopSsVYB9Lql0XAVEDkJq81pFuV2A1ncdF3zlDw0tZ5UxH2QBKv1tYCDmb0dqBLvHhcDsUoBubi1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=k5ypIJpu; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=Hatuy41z38D/O/gO7pFSUz0yjfa7OYewWLQzlXKRtOrsWWGUJiOTBj8H92pYeRLyiKkP9wIC5g+J2dlRX7Eugn5gxKCy3BWGd/EyqnJUQZuD9ibRW6Z+z0ScoDGHbUHd5o81KwlV3DUENwunG4ZGjbotKtGxwCqJwMo7HBgbvps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NpYGXAXQ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,18 +36,19 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=MQkbzDCMjvD/j514nS3sL7oKG5IQsBk7PsTbAZ2Chlo=; b=k5
-	ypIJpuhWbfWT5MVS2QWryL7uAlPkgH34HgHRgjl71DDWck2I9e6deep54ydspW+KsdHAO+XB+IB60
-	0L/Bt8UQnx1g2fs25jtkHpKO+SQ+c1UKF8vaSEJ7sE2Z3WPjiNIZP4X4XDdwFVGvtuH0Vcg1Y2nHX
-	o4GnrjVgQiSNfVk=;
+	In-Reply-To:References; bh=horO3WQSlmE1YpmKxwySgRee+ScV5A7WgNw1ql2FvsM=; b=Np
+	YGXAXQ3P9Piy5h+8ojpDaHbb5lgg45zrNZvJTSG2+eivvZgnJbuNb9YQp42Ej1ld7OIWu85HtZj8I
+	bDGa23ddibORIIDrL/qzbtOaieKeedueU/DUADJizJ1ITzMBRAOppwUnGQ6q8kpVsOiFpYz9MddOP
+	MVZ74Dwr54HnmDk=;
 Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rrHpa-00BrFx-NC; Mon, 01 Apr 2024 15:36:10 +0200
+	id 1rrHpd-00BrFx-CJ; Mon, 01 Apr 2024 15:36:13 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Mon, 01 Apr 2024 08:35:47 -0500
-Subject: [PATCH net-next v3 2/7] net: Add helpers for netdev LEDs
+Date: Mon, 01 Apr 2024 08:35:48 -0500
+Subject: [PATCH net-next v3 3/7] net: dsa: mv88e6xxx: Add helpers for 6352
+ LED blink and brightness
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-2-221b3fa55f78@lunn.ch>
+Message-Id: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-3-221b3fa55f78@lunn.ch>
 References: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-0-221b3fa55f78@lunn.ch>
 In-Reply-To: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-0-221b3fa55f78@lunn.ch>
 To: Florian Fainelli <f.fainelli@gmail.com>, 
@@ -67,323 +68,226 @@ To: Florian Fainelli <f.fainelli@gmail.com>,
  Gregory Clement <gregory.clement@bootlin.com>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9076; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=kQjFgWgNTPOE+tvEYg/fcwHA2KwB8/r4hq+NnvwjDnk=;
- b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBmCrhAvE5/Olez4mgWxddYAvyKwNzTBJvWt7Nl1
- 8TjjqtVZg+JAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZgq4QAAKCRDmvw3LpmlM
- hHcfEACPWqUD+Nj429XibLd0mrWOrpgKJkfll538T6wra2gWqh9iNaRQ2JErVlz9jY3odrS8HcE
- yqts9WO535TnlsR/A8y/wXMpSSWRbHwAH/nFY7W9Qz49OZ6i8KhxpT/7gEO3/gVa37np3bwja49
- oxlJ82wvLtQQY+WzKmOmUESRJQwUoGIxo1S2rgx1EBeKUD5vfSuKrU1oIXBmaWyT/m+VK/i+9mB
- zjo93sY5gAms4yHaHDG0VdAw6rmYIhqVuJUUcjz5m+GHDkg2et8fDnUs70UBlugNworlyxAsSNn
- SGdqCOP5NBdROGkx2n0KlqlzWgKogk0LINQVWhozXLWbggbOKXkzmQLWG8DLHG2Z1KrhQZ/DmUO
- 1k7bJaG1EMccMs8xRf2bpvIeFA5Ir4vfIi/oJ3BEUyR/UtRo6N3hNN+JBiJhWE5W5dTXeJq7IeF
- m8STwearXKYvjK20JPaoG88Mr7PgXRnsn8Tq17xZae/OBNepQwqxu3tKAf3REoBBLhWpf77iFm6
- eiJxNmbfMoj+fA+Re25R3TEsHD0fps33RqTwy2mzxoQIFrdPWjJFmtPst1OwZkFcoSai1XTNf+b
- 7w9hL+5iGHJKvk2SkmJtqGaBkLEAI9Zc4fTm3RO4N6REQE5ba25W/Bk4hM2tLh3ZTXXFluLDTV9
- wgJSV4QnnMXoG2Q==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8530; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=Ba8ZRPcHIpN0lalX1MJan4IYyVadQnFD5BsiVvTcBu0=;
+ b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBmCrhB/85He6vDXpBQGnKw40yi8zeNVOYzwlenQ
+ HiFcEYb4DyJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZgq4QQAKCRDmvw3LpmlM
+ hLtwD/4sNDBVK/lmDrW2kUkLuXkenbWzTYeof7duj51W47y5mXNb+YgPsW75gNkgdPpNkSuDI4f
+ mcqSMtlObCKxqwOFCYVr+teq34sQw2zaErlW8Ypozo9DxRhpN09BI+XEp1fKDZxjJawnv5FQXYw
+ +9zmuEZRQsAVTRC3S/SRF1cVxf0MEon/jaJ5R638F0qQKpacfMJ9wRkGEiRZkxWrvpISfkMOEGC
+ x/hMI0lBgADOpv2mo0Ri46nfV8B+k9jU1zskPrUEhqT8eqK23GRY0NoIrw4//bGzfPi4j1AvSB5
+ Bqi1EyjHH+BBWN86ORjZQxE/Zqf0Xr+XfimCCyic0v3JPZ5rKb4joRUOnK3UWlzZq1zIN06ocBl
+ NUix+MbwQUOBn6/4IZdBQztuNWmJ2IzfckYZJXEta99yqrpnmnw2mvJ1h/f0tmZJBuu+FrBsr12
+ usu5btLwZLqt/NUJVaAqqGacuD5nGMmENwanv2DtbO9ySTS3ZWr2EdtA0SXWeMxLcTv7kRvHtgF
+ nSGyeatjqrxw+ZVHlJIXp2YCJKoargHYgy2zVd9H+PB5sB2bk2e/cdUtFgYiJaRE2zC9reGITRl
+ 9ii/COMH2mC2ERp0FUkkXlhTQZvfGIcsSc+IsDFnRPtciNqZNd3LMMShuOV9dypYduB4kV5XrzT
+ c9cdAZEZylBTtEA==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-Add a set of helpers for parsing the standard device tree properties
-for LEDs as part of an ethernet device, and registering them with the
-LED subsystem. This code can be used by any sort of netdev driver,
-including plain MAC, DSA switches or pure switchdev switch driver.
+The 6352 family has two LEDs per port for ports 0-4. Ports 5 and 6
+share a couple of LEDs. Add support functions to set the brightness,
+i.e. on or off, and to make the LEDs blink at a fixed rate.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- include/net/netdev_leds.h |  45 +++++++++++
- net/Kconfig               |  11 +++
- net/core/Makefile         |   1 +
- net/core/netdev-leds.c    | 201 ++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 258 insertions(+)
+ drivers/net/dsa/mv88e6xxx/port.c | 93 ++++++++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/port.h | 76 +++++++++++++++++++++++++++++++-
+ 2 files changed, 168 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/netdev_leds.h b/include/net/netdev_leds.h
-new file mode 100644
-index 000000000000..239f492f29f5
---- /dev/null
-+++ b/include/net/netdev_leds.h
-@@ -0,0 +1,45 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+/*
-+ * Helpers used for creating and managing LEDs on a netdev MAC
-+ * driver.
-+ */
-+
-+#ifndef _NET_NETDEV_LEDS_H
-+#define _NET_NETDEV_LEDS_H
-+
-+struct netdev_leds_ops {
-+	int (*brightness_set)(struct net_device *ndev, u8 led,
-+			      enum led_brightness brightness);
-+	int (*blink_set)(struct net_device *ndev, u8 led,
-+			 unsigned long *delay_on,  unsigned long *delay_off);
-+	int (*hw_control_is_supported)(struct net_device *ndev, u8 led,
-+				       unsigned long flags);
-+	int (*hw_control_set)(struct net_device *ndev, u8 led,
-+			      unsigned long flags);
-+	int (*hw_control_get)(struct net_device *ndev, u8 led,
-+			      unsigned long *flags);
-+};
-+
-+#ifdef CONFIG_NETDEV_LEDS
-+int netdev_leds_setup(struct net_device *ndev, struct device_node *np,
-+		      struct list_head *list, struct netdev_leds_ops *ops,
-+		      int max_leds);
-+
-+void netdev_leds_teardown(struct list_head *list, struct net_device *ndev);
-+
-+#else
-+static inline int netdev_leds_setup(struct net_device *ndev,
-+				    struct device_node *np,
-+				    struct list_head *list,
-+				    struct netdev_leds_ops *ops)
-+{
-+	return 0;
-+}
-+
-+static inline void netdev_leds_teardown(struct list_head *list,
-+					struct net_device *ndev)
-+{
-+}
-+#endif /* CONFIG_NETDEV_LEDS */
-+
-+#endif /* _NET_PORT_LEDS_H */
-diff --git a/net/Kconfig b/net/Kconfig
-index 3e57ccf0da27..753dfd11f014 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -516,4 +516,15 @@ config NET_TEST
+diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
+index 5394a8cf7bf1..37315a4aa9cf 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.c
++++ b/drivers/net/dsa/mv88e6xxx/port.c
+@@ -1723,3 +1723,96 @@ int mv88e6393x_port_set_policy(struct mv88e6xxx_chip *chip, int port,
  
- 	  If unsure, say N.
- 
-+config NETDEV_LEDS
-+	bool "NETDEV helper code for MAC LEDs"
-+	select LEDS_CLASS
-+	select LEDS_TRIGGERS
-+	select LEDS_TRIGGER_NETDEV
-+	help
-+	  NICs and Switches often contain LED controllers. When the LEDs
-+	  are part of the MAC, the MAC driver, aka netdev driver, should
-+	  make the LEDs available. NETDEV_LEDS offers a small library
-+	  of code to help MAC drivers do this.
+ 	return mv88e6393x_port_policy_write(chip, port, ptr, reg);
+ }
 +
- endif   # if NET
-diff --git a/net/core/Makefile b/net/core/Makefile
-index 21d6fbc7e884..d04ce07541b5 100644
---- a/net/core/Makefile
-+++ b/net/core/Makefile
-@@ -42,3 +42,4 @@ obj-$(CONFIG_BPF_SYSCALL) += sock_map.o
- obj-$(CONFIG_BPF_SYSCALL) += bpf_sk_storage.o
- obj-$(CONFIG_OF)	+= of_net.o
- obj-$(CONFIG_NET_TEST) += net_test.o
-+obj-$(CONFIG_NETDEV_LEDS) += netdev-leds.o
-diff --git a/net/core/netdev-leds.c b/net/core/netdev-leds.c
-new file mode 100644
-index 000000000000..802dd819a991
---- /dev/null
-+++ b/net/core/netdev-leds.c
-@@ -0,0 +1,201 @@
-+// SPDX-License-Identifier: GPL-2.0+
++/* Offset 0x16: LED Control Register */
 +
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/leds.h>
-+#include <linux/netdevice.h>
-+#include <linux/of.h>
-+#include <linux/slab.h>
-+#include <net/netdev_leds.h>
-+
-+struct netdev_led {
-+	struct list_head led_list;
-+	struct led_classdev led_cdev;
-+	struct netdev_leds_ops *ops;
-+	struct net_device *ndev;
-+	u8 index;
-+};
-+
-+#define to_netdev_led(d) container_of(d, struct netdev_led, led_cdev)
-+
-+static int netdev_brightness_set(struct led_classdev *led_cdev,
-+				 enum led_brightness value)
++static int mv88e6352_port_led_write(struct mv88e6xxx_chip *chip, int port,
++				    u16 pointer, u16 data)
 +{
-+	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
++	u16 reg = MV88E6352_PORT_LED_CTL_UPDATE | pointer | data;
 +
-+	return netdev_led->ops->brightness_set(netdev_led->ndev,
-+					       netdev_led->index,
-+					       value);
++	return mv88e6xxx_port_write(chip, port, MV88E6352_PORT_LED_CTL, reg);
 +}
 +
-+static int netdev_blink_set(struct led_classdev *led_cdev,
-+			    unsigned long *delay_on, unsigned long *delay_off)
++static int mv88e6352_port_led_read(struct mv88e6xxx_chip *chip, int port,
++				   u16 pointer, u16 *data)
 +{
-+	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
-+
-+	return netdev_led->ops->blink_set(netdev_led->ndev,
-+					  netdev_led->index,
-+					  delay_on, delay_off);
-+}
-+
-+static __maybe_unused int
-+netdev_hw_control_is_supported(struct led_classdev *led_cdev,
-+			       unsigned long flags)
-+{
-+	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
-+
-+	return netdev_led->ops->hw_control_is_supported(netdev_led->ndev,
-+							netdev_led->index,
-+							flags);
-+}
-+
-+static __maybe_unused int netdev_hw_control_set(struct led_classdev *led_cdev,
-+						unsigned long flags)
-+{
-+	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
-+
-+	return netdev_led->ops->hw_control_set(netdev_led->ndev,
-+					       netdev_led->index,
-+					       flags);
-+}
-+
-+static __maybe_unused int netdev_hw_control_get(struct led_classdev *led_cdev,
-+						unsigned long *flags)
-+{
-+	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
-+
-+	return netdev_led->ops->hw_control_get(netdev_led->ndev,
-+					       netdev_led->index,
-+					       flags);
-+}
-+
-+static struct device *
-+netdev_hw_control_get_device(struct led_classdev *led_cdev)
-+{
-+	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
-+
-+	return &netdev_led->ndev->dev;
-+}
-+
-+static int netdev_led_setup(struct net_device *ndev, struct device_node *led,
-+			    struct list_head *list, struct netdev_leds_ops *ops,
-+			    int max_leds)
-+{
-+	struct led_init_data init_data = {};
-+	struct device *dev = &ndev->dev;
-+	struct netdev_led *netdev_led;
-+	struct led_classdev *cdev;
-+	u32 index;
 +	int err;
++	u16 val;
 +
-+	netdev_led = devm_kzalloc(dev, sizeof(*netdev_led), GFP_KERNEL);
-+	if (!netdev_led)
-+		return -ENOMEM;
-+
-+	netdev_led->ndev = ndev;
-+	netdev_led->ops = ops;
-+	cdev = &netdev_led->led_cdev;
-+
-+	err = of_property_read_u32(led, "reg", &index);
++	err = mv88e6xxx_port_write(chip, port, MV88E6352_PORT_LED_CTL, pointer);
 +	if (err)
 +		return err;
 +
-+	if (index >= max_leds)
-+		return -EINVAL;
-+
-+	netdev_led->index = index;
-+
-+	if (ops->brightness_set)
-+		cdev->brightness_set_blocking = netdev_brightness_set;
-+	if (ops->blink_set)
-+		cdev->blink_set = netdev_blink_set;
-+#ifdef CONFIG_LEDS_TRIGGERS
-+	if (ops->hw_control_is_supported)
-+		cdev->hw_control_is_supported = netdev_hw_control_is_supported;
-+	if (ops->hw_control_set)
-+		cdev->hw_control_set = netdev_hw_control_set;
-+	if (ops->hw_control_get)
-+		cdev->hw_control_get = netdev_hw_control_get;
-+	cdev->hw_control_trigger = "netdev";
-+#endif
-+	cdev->hw_control_get_device = netdev_hw_control_get_device;
-+	cdev->max_brightness = 1;
-+	init_data.fwnode = of_fwnode_handle(led);
-+	init_data.devname_mandatory = true;
-+
-+	init_data.devicename = dev_name(dev);
-+	err = devm_led_classdev_register_ext(dev, cdev, &init_data);
++	err = mv88e6xxx_port_read(chip, port, MV88E6352_PORT_LED_CTL, &val);
 +	if (err)
 +		return err;
 +
-+	INIT_LIST_HEAD(&netdev_led->led_list);
-+	list_add(&netdev_led->led_list, list);
++	*data = val & MV88E6352_PORT_LED_CTL_DATA_MASK;
 +
 +	return 0;
 +}
 +
-+/**
-+ * netdev_leds_setup - Parse DT node and create LEDs for netdev
-+ *
-+ * @ndev: struct netdev for the MAC
-+ * @np: ethernet-node in device tree
-+ * @list: list to add LEDs to
-+ * @ops: structure of ops to manipulate the LED.
-+ * @max_leds: maximum number of LEDs support by netdev.
-+ *
-+ * Parse the device tree node, as described in
-+ * ethernet-controller.yaml, and find any LEDs. For each LED found,
-+ * ensure the reg value is less than max_leds, create an LED and
-+ * register it with the LED subsystem. The LED will be added to the
-+ * list, which can be shared by all netdevs of the device. The ops
-+ * structure contains the callbacks needed to control the LEDs.
-+ *
-+ * Return 0 in success, otherwise an negative error code.
-+ */
-+int netdev_leds_setup(struct net_device *ndev, struct device_node *np,
-+		      struct list_head *list, struct netdev_leds_ops *ops,
-+		      int max_leds)
++int mv88e6352_port_led_brightness_set(struct mv88e6xxx_chip *chip, int port,
++				      u8 led, enum led_brightness value)
 +{
-+	struct device_node *leds, *led;
 +	int err;
++	u16 val;
 +
-+	leds = of_get_child_by_name(np, "leds");
-+	if (!leds)
-+		return 0;
++	if (port > 5)
++		return -EOPNOTSUPP;
 +
-+	for_each_available_child_of_node(leds, led) {
-+		err = netdev_led_setup(ndev, led, list, ops, max_leds);
-+		if (err) {
-+			of_node_put(led);
-+			return err;
-+		}
++	err = mv88e6352_port_led_read(chip, port,
++				      MV88E6352_PORT_LED_CTL_PTR_LED01,
++				      &val);
++	if (err)
++		return err;
++
++	if (led == 0) {
++		val &= ~MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_MASK;
++		if (value)
++			val |= MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_ON;
++		else
++			val |= MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_OFF;
++	} else {
++		val &= ~MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_MASK;
++		if (value)
++			val |= MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_ON;
++		else
++			val |= MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_OFF;
 +	}
-+
-+	return 0;
++	return mv88e6352_port_led_write(chip, port,
++					MV88E6352_PORT_LED_CTL_PTR_LED01,
++					val);
 +}
-+EXPORT_SYMBOL_GPL(netdev_leds_setup);
 +
-+/**
-+ * netdev_leds_teardown - Remove LEDs for a netdev
-+ *
-+ * @list: list to add LEDs to teardown
-+ * @ndev: The netdev for which LEDs should be removed
-+ *
-+ * Unregister all LEDs for a given netdev, freeing up any allocated
-+ * memory.
-+ */
-+void netdev_leds_teardown(struct list_head *list, struct net_device *ndev)
++int mv88e6352_port_led_blink_set(struct mv88e6xxx_chip *chip, int port, u8 led,
++				 unsigned long *delay_on,
++				 unsigned long *delay_off)
 +{
-+	struct netdev_led *netdev_led;
-+	struct led_classdev *cdev;
-+	struct device *dev;
++	int err;
++	u16 val;
 +
-+	list_for_each_entry(netdev_led, list, led_list) {
-+		if (netdev_led->ndev != ndev)
-+			continue;
-+		dev = &netdev_led->ndev->dev;
-+		cdev = &netdev_led->led_cdev;
-+		devm_led_classdev_unregister(dev, cdev);
++	if (port > 5)
++		return -EOPNOTSUPP;
++
++	/* Reset default is 84ms */
++	*delay_on = 84 / 2;
++	*delay_off = 84 / 2;
++	err = mv88e6352_port_led_read(chip, port,
++				      MV88E6352_PORT_LED_CTL_PTR_LED01,
++				      &val);
++	if (err)
++		return err;
++
++	if (led == 0) {
++		val &= ~MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_MASK;
++		val |= MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_BLINK;
++	} else {
++		val &= ~MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_MASK;
++		val |= MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_BLINK;
 +	}
++	return mv88e6352_port_led_write(chip, port,
++					MV88E6352_PORT_LED_CTL_PTR_LED01,
++					val);
 +}
-+EXPORT_SYMBOL_GPL(netdev_leds_teardown);
+diff --git a/drivers/net/dsa/mv88e6xxx/port.h b/drivers/net/dsa/mv88e6xxx/port.h
+index 86deeb347cbc..72556e4d154c 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.h
++++ b/drivers/net/dsa/mv88e6xxx/port.h
+@@ -294,6 +294,76 @@
+ /* Offset 0x13: OutFiltered Counter */
+ #define MV88E6XXX_PORT_OUT_FILTERED	0x13
+ 
++/* Offset 0x16: LED Control */
++#define MV88E6352_PORT_LED_CTL					0x16
++#define MV88E6352_PORT_LED_CTL_UPDATE				0x8000
++#define MV88E6352_PORT_LED_CTL_PTR_LED01			0x0000
++#define MV88E6352_PORT_LED_CTL_PTR_STRETCH_BLINK		0x6000
++#define MV88E6352_PORT_LED_CTL_PTR_SPECIAL			0x7000
++#define MV88E6352_PORT_LED_CTL_DATA_MASK			0x03ff
++/* Ports 0-4 */
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_P2_SPECIAL	0x0000
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_10_100_ACT	0x0010
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_1000		0x0030
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_P1_SPECIAL	0x0040
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_10_1000_ACT	0x0060
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_10_1000		0x0070
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_ACT		0x0080
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_100		0x0090
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_100_ACT		0x00A0
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_10_100		0x00B0
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_PTP_ACT		0x00C0
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_BLINK		0x00D0
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_OFF		0x00E0
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_ON		0x00F0
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_MASK		0x00F0
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED1_LINK_ACT		0x0000
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_100_1000_ACT	0x0001
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_1000_ACT		0x0002
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_LINK_ACT		0x0003
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_P0_SPECIAL	0x0004
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_DUPLEX_COL	0x0006
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_10_1000_ACT	0x0007
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_LINK		0x0008
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_10		0x0009
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_10_ACT		0x000A
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_100_1000		0x000B
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_PTP_ACT		0x000C
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_BLINK		0x000D
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_OFF		0x000E
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_ON		0x000F
++#define MV88E6352_PORT_LED_CTL_DATA_LED01_LED0_MASK		0x000F
++
++/* Port 5 */
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P6_ACT		0x0000
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_FIBER_1000_ACT	0x0010
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_FIBER_100_ACT   0x0020
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_FIBER		0x0030
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P5_ACT		0x0040
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P6_LINK		0x0050
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P6_DUPLEX_COL	0x0060
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P6_LINK_ACT	0x0070
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P0_SPECIAL	0x0080
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P1_SPECIAL	0x0090
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P2_SPECIAL	0x00A0
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P6_PTP_ACT	0x00C0
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_BLINK		0x00D0
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_OFF		0x00E0
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_ON		0x00F0
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED1_P5_LINK_ACT	0x0000
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_FIBER_100_ACT	0x0001
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_FIBER_1000_ACT	0x0002
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_P0_SPECIAL	0x0003
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_P1_SPECIAL	0x0004
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_P2_SPECIAL	0x0005
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_P5_DUPLEX_COL	0x0006
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_P5_LINK_ACT	0x0007
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_P6_LINK_ACT	0x0008
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_BLINK		0x000D
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_OFF		0x000E
++#define MV88E6352_PORT_LED_CTL_DATA5_LED01_LED0_ON		0x000F
++/* Port 6 does not have any LEDs */
++
+ /* Offset 0x18: IEEE Priority Mapping Table */
+ #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE			0x18
+ #define MV88E6390_PORT_IEEE_PRIO_MAP_TABLE_UPDATE		0x8000
+@@ -459,5 +529,9 @@ int mv88e6xxx_port_hidden_write(struct mv88e6xxx_chip *chip, int block,
+ int mv88e6xxx_port_hidden_wait(struct mv88e6xxx_chip *chip);
+ int mv88e6xxx_port_hidden_read(struct mv88e6xxx_chip *chip, int block, int port,
+ 			       int reg, u16 *val);
+-
++int mv88e6352_port_led_brightness_set(struct mv88e6xxx_chip *chip, int port,
++				      u8 led, enum led_brightness value);
++int mv88e6352_port_led_blink_set(struct mv88e6xxx_chip *chip, int port, u8 led,
++				 unsigned long *delay_on,
++				 unsigned long *delay_off);
+ #endif /* _MV88E6XXX_PORT_H */
 
 -- 
 2.43.0
