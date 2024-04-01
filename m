@@ -1,194 +1,140 @@
-Return-Path: <netdev+bounces-83720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E4389382F
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 08:11:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A28C89387E
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 08:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 659C51F212A9
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 06:11:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7AF4281689
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 06:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E0FB8F5C;
-	Mon,  1 Apr 2024 06:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946E78C1E;
+	Mon,  1 Apr 2024 06:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbUTHQio"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671A98F51
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 06:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12D18BF0
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 06:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711951890; cv=none; b=WtjTgvjinaUAnzkHrNA8QI9uB2+TXIicNree8wrxV0hi8TyMXosF2/QiX3IpKZcdHhJFvXX7kgGIu1LavKbNrsgakChMtiYNlyDHDoAKrTbG6P93eJgBd+I2hA4sdHvAnuoU8chaUJaGwQddJxAV2n+/SGILwZVfhqlofseS3B8=
+	t=1711954472; cv=none; b=RG8TN0s2+d9Ahxl3ZvzNXjsvJI/0BjO7nRNwBPHlktXAtya9i24cFXRRwzVsNpgfRYlUHMMubTbe79kg7+XTTKQQFd0JTU3U+S74de89mSYnj7Y0ot8ZmDumR46MlOcYrTY2J1BbVFaZ7gsrRYAkBn9thl1vFrMj9FYYNmE64qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711951890; c=relaxed/simple;
-	bh=5RzfPD80g1MajIdzMSOBq3UGYhnnxMPtHW7ucZlPId8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=DsVipc5FLFTx4FDIr5c70z9O8tenSsqJkr+uTgGsr91/xg2XSzeJT0VeRQ1Ut/WsWknqQknx1szMsf8Q93MbtHHvUKQlkel8+vyBhEUOLThSQ1te0yP6MHJ6b4GrfGx96+Bre/n5DMxCuSjLdfNchsYGK1WhkOJNQcVVPE1/CzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7cf179c3da4so421258039f.2
-        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 23:11:28 -0700 (PDT)
+	s=arc-20240116; t=1711954472; c=relaxed/simple;
+	bh=hByuSLBCnuOVtmhAskM8G1u47JQv+PH0hneK0bNGe3M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=beC336wp5sD9pP7OOgu5li4objAEs+FjIydkQYetPn1FQ2uS+tG3qH6rJhilIl1kdSz7hGcl2t+aLnFqbxMDmEJCAwNfKZxpuMOWlDlX9/tP5kUi3lpLDRmQvrrCQHrf4cczL5e1qiFDRPEj3ry7NhiXoFcMcXzp2aXzcX2Jmhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbUTHQio; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-341730bfc46so2769476f8f.3
+        for <netdev@vger.kernel.org>; Sun, 31 Mar 2024 23:54:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711954469; x=1712559269; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=867rfgFbwucklmHRuK22F9Opm/qe0O8SJm6+mshhg5c=;
+        b=MbUTHQiojBwAzkd/ixZwxMoKI6TBTOyoCo1QoNqYME7CCo4txTjSSboZq3Zx9x/rT5
+         ODCQ8dDEeNc4b75ioZRdRGJyaXm58BfJZ52rGBZqcp+nCirVEvwDmzfZx6tztDHZeND5
+         Ba8jAJ10ZsVl6UWKIKxVpJQ1aUyvpHPTmRSRSyqLexxWpl5zwoZhuvordqFL8qnVikkB
+         j1eAi2hL0/82bsAwBfNmt2/S3QSLM9DXA+gOhLFnBDasyhysqtjq8F0q8nl0skMmDSr3
+         G+TG0AyYFa/TcLLt+gh4rXACuElwqLw13QOHm2IlMMInsrKozvGqrTGfor2rqZmfbcQi
+         foWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711951887; x=1712556687;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1711954469; x=1712559269;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QU2ivE4+RjX4u7lvetSsWaIm0V+DKP8bcLz4UjQG+xE=;
-        b=u4U/u8sgkjkAoviRKJkBjH7tJnehA1WorWX1BhxPz6n9nOX44/iDWTm1uUromtUr7E
-         7Vz55TXgg1MQqCOqkQRbL/OliId1P8QKqwBepfM//V2uqXRVMOMWQVE+7oBfCHGRKI7/
-         UxbYj0EFQKZr6nRoE0A8/HKzMqtWVWlNoEAFBIywMF59+3nyIrKvpZ9ckjybDjApmovn
-         QhuZ44vzz+RpRkpoFX8c+0HD10JyYnMwVdOGNBPVC/Ofv4zY68thBnNQbU/zDBjFXllc
-         1SNNKJ5bP6GPexZcXNeRH5PgCgVqlcSGzRcMDizSZMRPoWaUULLuOQAxXJ103dRZbPHq
-         2zxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHgWrGpZzMVj2N1za8zI1IGdC43p/dOOkNBCxxx+x0Ll5sczfLWOYqaMO8FDfp1ZqrBbMMdPCDrwkE9188Ro9Poq1rYBon
-X-Gm-Message-State: AOJu0YzvmREs43ooRHo84EH5tW5Eab6ksukyLtKY/bpAABHGgLkPyM0c
-	vojhGMomYzqMlSIsd9skvKCBzSNyMDR5vI5FrQq3QbuYbG0OLZyGG8edWueNGdc+gG4bI750y6E
-	IAQg2EXXYckt1dzX2bj0PZ0xZPP/9j2wHF0ZnhzFxuOCWEbxQuA657ww=
-X-Google-Smtp-Source: AGHT+IFFH6jMD6jhXSfTF/8n97fODaGx9BtJ8w+g5dRBic/6Guq06rzc6t84WkYWl8Ho+6ArVPMQ+Qnlo52F0GamU4iwMJBJkhwQ
+        bh=867rfgFbwucklmHRuK22F9Opm/qe0O8SJm6+mshhg5c=;
+        b=pl/QiqDEd9QgBZ5IWxBHbOdmuBjiAEKQGoSEd1wkfK6fRXLXp42MOEmijNj/QQWU5T
+         Mps0oDrYGz+MF3QlXWhjOrIwcWaXab23iiMTpKWrZ1VSg6+ixThmGOZ042AuAqryH/+T
+         FgOcdxxzM3O5iMCb4tb9Le0BpSFwZYwVPmtJLyT4FTKCy9kZdLYPrdQGwPHgqP17MPBZ
+         C5iWTBIE3Xmklmtl5RvxuqaQvlEue8pW8iVP8aS/Xdj2yzRXAtl6zCLtKa5ZBRYgx13Y
+         iK2nxewi7qqkx7vma2+Ge3PFGGu3DJeogZR5GvXbZM9NZaqPUdhEoHf1Nw3sxRyIblmE
+         WB7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWmkcX0OrG+1sgqiomU2nvWvzJ00FZjo2LbEpFwkAnV5/+bEtT1ux7718alZMv0B45Y6gafMJIhKC3N0Tr58NmM8nx0CHXR
+X-Gm-Message-State: AOJu0YxifpweqlTjAoGfPQ2zpvPlmHAeox8t1OzTh5bcKPyLU3bOW2XI
+	ZaxXlceqai6Jms7uzuInUNoW37+a9oBdhGIZ1u2a2w43EbzN9yRb
+X-Google-Smtp-Source: AGHT+IEDi1NXDLbLrWscjddjgnF/pNv4fcqA16BIIo3fiQ8QTSQYMtp/5BWrR8ovQUk/VoCYl3mAEg==
+X-Received: by 2002:a5d:6391:0:b0:33e:7001:b80 with SMTP id p17-20020a5d6391000000b0033e70010b80mr5366470wru.68.1711954468829;
+        Sun, 31 Mar 2024 23:54:28 -0700 (PDT)
+Received: from [172.27.19.119] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id i9-20020a0560001ac900b0033e41e1ad93sm10784207wry.57.2024.03.31.23.54.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 31 Mar 2024 23:54:28 -0700 (PDT)
+Message-ID: <87ca050f-5643-4b90-8768-1d624e367cac@gmail.com>
+Date: Mon, 1 Apr 2024 09:54:26 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2727:b0:47c:a3e:2f25 with SMTP id
- m39-20020a056638272700b0047c0a3e2f25mr328200jav.6.1711951887643; Sun, 31 Mar
- 2024 23:11:27 -0700 (PDT)
-Date: Sun, 31 Mar 2024 23:11:27 -0700
-In-Reply-To: <000000000000c430800614b93936@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000022c6b2061502dcbb@google.com>
-Subject: Re: [syzbot] [net?] possible deadlock in hsr_dev_xmit (2)
-From: syzbot <syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-syzbot has found a reproducer for the following issue on:
-
-HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=166a86e5180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1e5b814e91787669
-dashboard link: https://syzkaller.appspot.com/bug?extid=fbf74291c3b7e753b481
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10526855180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15e0f5c3180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5f73b6ef963d/disk-480e035f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/46c949396aad/vmlinux-480e035f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e3b4d0f5a5f8/bzImage-480e035f.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fbf74291c3b7e753b481@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-6.8.0-syzkaller-08073-g480e035fc4c7 #0 Not tainted
---------------------------------------------
-ksoftirqd/1/23 is trying to acquire lock:
-ffff8880744d6da0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff8880744d6da0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: hsr_dev_xmit+0x13e/0x1d0 net/hsr/hsr_device.c:229
-
-but task is already holding lock:
-ffff88802383ada0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff88802383ada0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: send_hsr_supervision_frame+0x276/0xad0 net/hsr/hsr_device.c:310
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&hsr->seqnr_lock);
-  lock(&hsr->seqnr_lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-7 locks held by ksoftirqd/1/23:
- #0: ffffc900001d7a40 ((&hsr->announce_timer)){+.-.}-{0:0}, at: call_timer_fn+0xc0/0x600 kernel/time/timer.c:1789
- #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hsr_announce+0xa3/0x370 net/hsr/hsr_device.c:387
- #2: ffff88802383ada0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
- #2: ffff88802383ada0 (&hsr->seqnr_lock){+.-.}-{2:2}, at: send_hsr_supervision_frame+0x276/0xad0 net/hsr/hsr_device.c:310
- #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hsr_forward_skb+0xae/0x2400 net/hsr/hsr_forward.c:614
- #4: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
- #4: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
- #4: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4260
- #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #5: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: br_dev_xmit+0x1b9/0x1a10 net/bridge/br_device.c:44
- #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
- #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
- #6: ffffffff8e132080 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4260
-
-stack backtrace:
-CPU: 1 PID: 23 Comm: ksoftirqd/1 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_deadlock kernel/locking/lockdep.c:3062 [inline]
- validate_chain+0x15c1/0x58e0 kernel/locking/lockdep.c:3856
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- hsr_dev_xmit+0x13e/0x1d0 net/hsr/hsr_device.c:229
- __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
- netdev_start_xmit include/linux/netdevice.h:4917 [inline]
- xmit_one net/core/dev.c:3531 [inline]
- dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
- __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
- dev_queue_xmit include/linux/netdevice.h:3091 [inline]
- br_dev_queue_push_xmit+0x701/0x8d0 net/bridge/br_forward.c:53
- NF_HOOK+0x3a7/0x460 include/linux/netfilter.h:314
- br_forward_finish+0xe5/0x140 net/bridge/br_forward.c:66
- NF_HOOK+0x3a7/0x460 include/linux/netfilter.h:314
- __br_forward+0x489/0x660 net/bridge/br_forward.c:115
- deliver_clone net/bridge/br_forward.c:131 [inline]
- maybe_deliver+0xb3/0x150 net/bridge/br_forward.c:190
- br_flood+0x2e4/0x660 net/bridge/br_forward.c:236
- br_dev_xmit+0x118c/0x1a10
- __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
- netdev_start_xmit include/linux/netdevice.h:4917 [inline]
- xmit_one net/core/dev.c:3531 [inline]
- dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
- __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
- dev_queue_xmit include/linux/netdevice.h:3091 [inline]
- hsr_xmit net/hsr/hsr_forward.c:380 [inline]
- hsr_forward_do net/hsr/hsr_forward.c:471 [inline]
- hsr_forward_skb+0x183f/0x2400 net/hsr/hsr_forward.c:619
- send_hsr_supervision_frame+0x548/0xad0 net/hsr/hsr_device.c:333
- hsr_announce+0x1a9/0x370 net/hsr/hsr_device.c:389
- call_timer_fn+0x17e/0x600 kernel/time/timer.c:1792
- expire_timers kernel/time/timer.c:1843 [inline]
- __run_timers kernel/time/timer.c:2408 [inline]
- __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2419
- run_timer_base kernel/time/timer.c:2428 [inline]
- run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2438
- __do_softirq+0x2bc/0x943 kernel/softirq.c:554
- run_ksoftirqd+0xc5/0x130 kernel/softirq.c:924
- smpboot_thread_fn+0x544/0xa30 kernel/smpboot.c:164
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net 06/10] net/mlx5: RSS, Block changing channels number when
+ RXFH is configured
+To: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ Carolina Jubran <cjubran@nvidia.com>
+References: <20240326144646.2078893-1-saeed@kernel.org>
+ <20240326144646.2078893-7-saeed@kernel.org>
+ <20240328223149.0aeae1a3@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240328223149.0aeae1a3@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+
+On 29/03/2024 8:31, Jakub Kicinski wrote:
+> On Tue, 26 Mar 2024 07:46:42 -0700 Saeed Mahameed wrote:
+>> Changing the channels number after configuring the receive
+>> flow hash indirection table may alter the RSS table size.
+>> The previous configuration may no longer be compatible with
+>> the new receive flow hash indirection table.
+>>
+>> Block changing the channels number when RXFH is configured.
+> 
+> Do I understand correctly that this will block all set_channels
+> calls after indir table changes?
+
+Right.
+
+> This may be a little too risky
+> for a fix. Perhaps okay for net-next, but not a fix.
+> 
+
+This fixes an issue introduced only in v6.7, not before that.
+
+> I'd think that setting indir table and then increasing the number
+> of channels is a pretty legit maneuver, or even best practice
+> to allocate a queue outside of RSS.
+> 
+> Is it possible to make a narrower change, only rejecting the truly
+> problematic transitions?
+> 
+
+The rationale of having a "single flow" or "single "logic" is to make it 
+simple, and achieve a fine user experience.
+
+Otherwise, users would, for example, question why increasing the number 
+of channels (after setting the indir table) from 24 channels to 120 
+works, but doesn't work when trying with 130 channels, although max num 
+channels is much higher.
+
+The required order looks pretty natural: first set the desired num of 
+channels, and only then set your indirection table.
+
+At the end, there are pros and cons for each solution.
+If you still strongly prefer narrowing it down only to the truly 
+problematic transitions, then we'll have no big issue in changing this.
 
