@@ -1,270 +1,179 @@
-Return-Path: <netdev+bounces-83829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24BE48947ED
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 01:48:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AC0E8947F1
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 01:49:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47BB31C219B9
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:48:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C44B62813F9
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E10D605CE;
-	Mon,  1 Apr 2024 23:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB0B5730C;
+	Mon,  1 Apr 2024 23:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PJ+b+Yy5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vfaAFvG+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FBF5FBA5
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 23:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243C756760
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 23:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712015146; cv=none; b=uxWsqBN+DLu/rmK3qFqd9luAVnXroEQdMj50yErKVvitQ0pn0gNj0fn7KL27k9r3pdyDbg0/a5ePS5m2YDyvLqmYBOvNhUyD4OBr5KKhfdTjYKUuCRz0GafFjnxvJCEK8AOFVRppHxPfB1apFVg4S84GW8CP3ktxaIHG1bRQkQg=
+	t=1712015338; cv=none; b=CT9/Pfyq/pjMWfMvwxbvy0bvW1umfD6cb+3z54ryIjFLscsnFYHNOeHrxT4qOe3Ve0G9fH7lQgqDiwAmckGaDk3Br3vjyoe9adMRrRzY5oyuLYKLZNIL6ka2H/A+TCkwKT4qf7TgIVkfk6RYTJ9NjUWLdpDFfP34SVlmIWX2/SY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712015146; c=relaxed/simple;
-	bh=T+r5MN0wKWkjv/eITFuRd7ZDeIMaevp8ktEOAZXCBSo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MS9mp6otDU0/prHQmo5A5tDx0LWZFvSgwjVHmiPo1B0Wup4UUV7UTQRL9lFlWZsime3v5GUTqr1Zo+NbvOfcofhRJp7FfOr8GqSVecLgaHiwixGakUaPuRuCW5+RHssqEH1das5cwsQLx8QfWiTX6XAHv9tHKw5CyWwX0VRV438=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PJ+b+Yy5; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1712015338; c=relaxed/simple;
+	bh=4JhNkEpOiWMttmklKDS6dB8Whz9xSe93GiSKkFueDRI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JuYF2rCwNd8c6RSi9XYfzxOm5AqLtCFetx0nedFWpoWtWEHs2nanxqYh6RinOPk7xjpHom2uuQmxwNMtc1cJWEdPwyU+z21+G6Pj0b45owUcH2p4dowfKTZytb2n+kMl9SrBNxRLceVZl4XjhYk42BChjWXH+cJ0gbjIqAQ4Rm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vfaAFvG+; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ea815e1c1eso4311595b3a.0
-        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 16:45:44 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-614bc5c53a1so27507887b3.1
+        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 16:48:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712015144; x=1712619944; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7x9CpIazFdTR4Zq3OOfIkhN9CyfFJTEzyO4IvebVf/Y=;
-        b=PJ+b+Yy5VKuBMG7SxvPYx4moHt8w0Jap/Cw11iV+MwlCFQGe5Qa3pQiQil0m0Yfa2E
-         34q59/xfMhO5MsYIGmbKxE4sFCtmw/2e9vXd3ME4lbGMj8zAuT/XZ2kLlXtg9g7s2HFG
-         X9kzi6SIbFP71KXZESyb5vwUmIsntuv+5ESaKcDMD6p/Jh62UuLsQ9IQMzl9eH+MrTIh
-         AEmnvVqdio2G4Nma1EZDZGLuQH5HBABCn6NPzS+5FQIMQoru3ufhyhKBhzAWdDBTmWff
-         9y22uxF+Gd6BXvRatF7DFgwKZbYuNzJhzZCcC1+Jj2UFTW1lY5T5Uxi19uXlP5DVN5hE
-         19QA==
+        d=google.com; s=20230601; t=1712015336; x=1712620136; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BeCArdFCgR6hPIyqHhpmGoh9zohrxgi2vCDzv1Uvsng=;
+        b=vfaAFvG+mOqrKjbH9Ge0oDljZh/cSXm67PclGL+fcN/avO/woLbSPb5FLBQg6uXzLD
+         dSp0OBr2PDyfRibpQSC9Pf+upEsj7RNSFzbFreM7ZqaVhqlhTrQT1xiu2arpA14YTk/u
+         B6i6l0MZe+oOAzJEVDR5uwn+9Si+qJtNHjFZADP9xSHIz8a7epD4LZxRVqqN3WQTw+hc
+         jTptohz3JTm6T1N4n2nnQoH2VXzgbD5gTZmanjnieO1HNHHgLDv+dEVqaLe4025qShDl
+         Fh5+f7Ib09HcHAXUA3IaZB8LaCS/nqGZwikS8+sOb2Zm1mW7SinOyKRevnhJdYOBqSP3
+         S5xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712015144; x=1712619944;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7x9CpIazFdTR4Zq3OOfIkhN9CyfFJTEzyO4IvebVf/Y=;
-        b=oYy4pDz8AUgGco7LPVCEqLf55peTbo3ovZFcbRk9RZIx+u/qrsB2oXUC6tZwvTtPmW
-         3ptH9bmQKv3xV5irsN877F6CalNyLKCZbl1pmeXlZSx+nwJEvUZccfFEh5P9g9LYRjNp
-         LsQAbzBehZHsbBkXdxWG9XTrdgD6742tI6zQTQs9WYQfWJfk3ooPzfS98psevX9v44kM
-         GcjXcgz9b8x8LyVTfoo5CAtHqKfrn83y2koA4oqLrHjIl9kw+NITKE5hZujEmFbG8REL
-         fSaexAsgsgdzg1bG0WTHq/Q4foMI4Xz/MNRenRfrRxdsTQj/mUYHMKoFwToK2x4DzXIk
-         bQlQ==
-X-Gm-Message-State: AOJu0YwktXmHqFJBMcFNFunpH3DrRJhrys+VwLHsbz//wmKRhlibb+nM
-	mMBU9TE/VErAO2ELFe8YZS/Dm5Uc8Ksw4q/vYEGYh8Llg+5ycaS/7YmflRF1TLn8Jj6NnKM4Nsm
-	hi3vHVkCaQNqFup9py/1LGAt7q9u4yiSbfjZYCW4lRRg1XLh/kMZxqPWaM+d+gDuibvmzj0dl4I
-	dTbHZsvGVpwGdCX8whF65HBQLmULQ0h+fD88gKP1pZI2nPjhDT0vXHQbOi2rk=
-X-Google-Smtp-Source: AGHT+IHxXT/yLL2cd2rNrldpnEy/7nGDMyQzRcgHUJLn8ajOjZ2fO60/quZkbOYxInCtgd4AjE3Y9oES7raKn1ME0A==
-X-Received: from hramamurthy-gve.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:141e])
- (user=hramamurthy job=sendgmr) by 2002:a05:6a00:a1c:b0:6e6:b9a8:5ce8 with
- SMTP id p28-20020a056a000a1c00b006e6b9a85ce8mr252030pfh.6.1712015143610; Mon,
- 01 Apr 2024 16:45:43 -0700 (PDT)
-Date: Mon,  1 Apr 2024 23:45:30 +0000
-In-Reply-To: <20240401234530.3101900-1-hramamurthy@google.com>
+        d=1e100.net; s=20230601; t=1712015336; x=1712620136;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BeCArdFCgR6hPIyqHhpmGoh9zohrxgi2vCDzv1Uvsng=;
+        b=dBdKjutSqDABMntCT5uu+aF2Jh8OvxHC2HbzVdwKPzUIX4c4PWrHDUqUONwQC9rQoW
+         7rvdCsFGgHSO9tMNjT7MzvslfWAIxMz4RXgdK9RMyIDHtarRUfQvQyFoaXvIrjVla4A0
+         h9D82JYFUaK4cHBYF7EXg49jB60fGw3GnEOYpU6+XFoFmBy+l82YkZv+a4MOsBwEzI20
+         Dmpqy8s6q9xhWLzkoytMpaEemd5TARHSd8Za9axJRSD1Ds0+IlLQ7pcRjq/aJCyRBb4x
+         e+JDGlstnJD6m0q8Qzg7oXYtWGV5TKJhLGMJc68fFichGvL1b6aRxQZGykQi92uuEpUi
+         0d4Q==
+X-Gm-Message-State: AOJu0YxzUQsabZlqgX63+WrKLKWasN6VUqjVE5jBrzfpR9/4/zQLJVt1
+	6BQQYEu+gtCQ8JXYsVItO64cBJ7g45YWLfj372xcBC2ZQNK6KSF5/GJEQO49ECvlzy6/jKUxA9z
+	dldVPS63bQjoeax8f6QSucw==
+X-Google-Smtp-Source: AGHT+IENg/l0w7lJnqGpT/qHSwpQYol/8NlTdFPuRBHCAciA1BzQJQzDQqMPR1/kH8jhEkZOGWe/9UtkbBomwoKlsA==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a05:6902:1006:b0:dcc:94b7:a7a3 with
+ SMTP id w6-20020a056902100600b00dcc94b7a7a3mr769132ybt.12.1712015336258; Mon,
+ 01 Apr 2024 16:48:56 -0700 (PDT)
+Date: Mon, 01 Apr 2024 23:48:52 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240401234530.3101900-1-hramamurthy@google.com>
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240401234530.3101900-6-hramamurthy@google.com>
-Subject: [PATCH net-next 5/5] gve: add support to change ring size via ethtool
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: jeroendb@google.com, pkaligineedi@google.com, shailend@google.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	willemb@google.com, rushilg@google.com, jfraker@google.com, 
-	linux-kernel@vger.kernel.org, Harshitha Ramamurthy <hramamurthy@google.com>
-Content-Type: text/plain; charset="UTF-8"
+X-B4-Tracking: v=1; b=H4sIAONHC2YC/x3NwQrCMAyA4VcZORvoaq3iq4iHro0uoNlI6nCMv
+ bvF43f5/w2MlMng2m2gtLDxJA39oYM8JnkScmkG73xwwfVoVSXPK7Lk16cQVk2ZkBaSavguPOG ILh39KZ7jEOIFWmlWevD3f7nd9/0HcnYlG3UAAAA=
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1712015335; l=3378;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=4JhNkEpOiWMttmklKDS6dB8Whz9xSe93GiSKkFueDRI=; b=NKg6XG8BN99gUBI3M2EOxgxK+kUU1xCXzro+M6vtMFE/7+A6dbh9K6zgb0yyqbNaih+k6ztsO
+ bX+IDfR2tSbBc3Hz4yHOB8t7lA0pR91YNefcOSR+Ppvq3Y+FZM5/PuR
+X-Mailer: b4 0.12.3
+Message-ID: <20240401-strncpy-include-trace-events-mdio-h-v1-1-9cb5a4cda116@google.com>
+Subject: [PATCH] trace: events: cleanup deprecated strncpy uses
+From: Justin Stitt <justinstitt@google.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-Allow the user to change ring size via ethtool if
-supported by the device. The driver relies on the
-ring size ranges queried from device to validate
-ring sizes requested by the user.
+strncpy() is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+For 2 out of 3 of these changes we can simply swap in strscpy() as it
+guarantess NUL-termination which is needed for the following trace
+print.
+
+trace_rpcgss_context() should use memcpy as its format specifier %.*s
+allows for the length to be specifier (__entry->len). Due to this,
+acceptor does not technically need to be NUL-terminated. Moreover,
+swapping in strscpy() and keeping everything else the same could result
+in truncation of the source string by one byte. To remedy this, we could
+use `len + 1` but I am unsure of the size of the destination buffer so a
+simple memcpy should suffice.
+|	TP_printk("win_size=%u expiry=%lu now=%lu timeout=%u acceptor=%.*s",
+|		__entry->window_size, __entry->expiry, __entry->now,
+|		__entry->timeout, __entry->len, __get_str(acceptor))
+
+I suspect acceptor not to naturally be a NUL-terminated string due to
+the presence of some stringify methods.
+|	.crstringify_acceptor	= gss_stringify_acceptor,
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
- drivers/net/ethernet/google/gve/gve.h         |  8 ++
- drivers/net/ethernet/google/gve/gve_ethtool.c | 85 +++++++++++++++++--
- drivers/net/ethernet/google/gve/gve_main.c    | 16 ++--
- 3 files changed, 95 insertions(+), 14 deletions(-)
+Note: build-tested only.
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 669cacdae4f4..e97633b68e25 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -1159,6 +1159,14 @@ int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split);
- /* Reset */
- void gve_schedule_reset(struct gve_priv *priv);
- int gve_reset(struct gve_priv *priv, bool attempt_teardown);
-+void gve_get_curr_alloc_cfgs(struct gve_priv *priv,
-+			     struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
-+			     struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
-+			     struct gve_rx_alloc_rings_cfg *rx_alloc_cfg);
-+int gve_adjust_config(struct gve_priv *priv,
-+		      struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
-+		      struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
-+		      struct gve_rx_alloc_rings_cfg *rx_alloc_cfg);
- int gve_adjust_queues(struct gve_priv *priv,
- 		      struct gve_queue_config new_rx_config,
- 		      struct gve_queue_config new_tx_config);
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index dbe05402d40b..815dead31673 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -490,8 +490,8 @@ static void gve_get_ringparam(struct net_device *netdev,
- {
- 	struct gve_priv *priv = netdev_priv(netdev);
+Found with: $ rg "strncpy\("
+---
+ include/trace/events/mdio.h   | 2 +-
+ include/trace/events/rpcgss.h | 2 +-
+ include/trace/events/sock.h   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/trace/events/mdio.h b/include/trace/events/mdio.h
+index 0f241cbe00ab..285b3e4f83ba 100644
+--- a/include/trace/events/mdio.h
++++ b/include/trace/events/mdio.h
+@@ -25,7 +25,7 @@ TRACE_EVENT_CONDITION(mdio_access,
+ 	),
  
--	cmd->rx_max_pending = priv->rx_desc_cnt;
--	cmd->tx_max_pending = priv->tx_desc_cnt;
-+	cmd->rx_max_pending = priv->max_rx_desc_cnt;
-+	cmd->tx_max_pending = priv->max_tx_desc_cnt;
- 	cmd->rx_pending = priv->rx_desc_cnt;
- 	cmd->tx_pending = priv->tx_desc_cnt;
+ 	TP_fast_assign(
+-		strncpy(__entry->busid, bus->id, MII_BUS_ID_SIZE);
++		strscpy(__entry->busid, bus->id, MII_BUS_ID_SIZE);
+ 		__entry->read = read;
+ 		__entry->addr = addr;
+ 		__entry->regnum = regnum;
+diff --git a/include/trace/events/rpcgss.h b/include/trace/events/rpcgss.h
+index ba2d96a1bc2f..274c297f1b15 100644
+--- a/include/trace/events/rpcgss.h
++++ b/include/trace/events/rpcgss.h
+@@ -618,7 +618,7 @@ TRACE_EVENT(rpcgss_context,
+ 		__entry->timeout = timeout;
+ 		__entry->window_size = window_size;
+ 		__entry->len = len;
+-		strncpy(__get_str(acceptor), data, len);
++		memcpy(__get_str(acceptor), data, len);
+ 	),
  
-@@ -503,20 +503,93 @@ static void gve_get_ringparam(struct net_device *netdev,
- 		kernel_cmd->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_DISABLED;
- }
+ 	TP_printk("win_size=%u expiry=%lu now=%lu timeout=%u acceptor=%.*s",
+diff --git a/include/trace/events/sock.h b/include/trace/events/sock.h
+index fd206a6ab5b8..1d0b98e6b2cc 100644
+--- a/include/trace/events/sock.h
++++ b/include/trace/events/sock.h
+@@ -109,7 +109,7 @@ TRACE_EVENT(sock_exceed_buf_limit,
+ 	),
  
-+static int gve_adjust_ring_sizes(struct gve_priv *priv,
-+				 u16 new_tx_desc_cnt,
-+				 u16 new_rx_desc_cnt)
-+{
-+	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
-+	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
-+	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
-+	struct gve_qpl_config new_qpl_cfg;
-+	int err;
-+
-+	/* get current queue configuration */
-+	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
-+				&tx_alloc_cfg, &rx_alloc_cfg);
-+
-+	/* copy over the new ring_size from ethtool */
-+	tx_alloc_cfg.ring_size = new_tx_desc_cnt;
-+	rx_alloc_cfg.ring_size = new_rx_desc_cnt;
-+
-+	/* qpl_cfg is not read-only, it contains a map that gets updated as
-+	 * rings are allocated, which is why we cannot use the yet unreleased
-+	 * one in priv.
-+	 */
-+	qpls_alloc_cfg.qpl_cfg = &new_qpl_cfg;
-+	tx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
-+	rx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
-+
-+	if (netif_running(priv->dev)) {
-+		err = gve_adjust_config(priv, &qpls_alloc_cfg,
-+					&tx_alloc_cfg, &rx_alloc_cfg);
-+		if (err)
-+			return err;
-+	}
-+
-+	/* Set new ring_size for the next up */
-+	priv->tx_desc_cnt = new_tx_desc_cnt;
-+	priv->rx_desc_cnt = new_rx_desc_cnt;
-+
-+	return 0;
-+}
-+
-+static int gve_validate_req_ring_size(struct gve_priv *priv, u16 new_tx_desc_cnt,
-+				      u16 new_rx_desc_cnt)
-+{
-+	/* check for valid range */
-+	if (new_tx_desc_cnt < priv->min_tx_desc_cnt ||
-+	    new_tx_desc_cnt > priv->max_tx_desc_cnt ||
-+	    new_rx_desc_cnt < priv->min_rx_desc_cnt ||
-+	    new_rx_desc_cnt > priv->max_rx_desc_cnt) {
-+		dev_err(&priv->pdev->dev, "Requested descriptor count out of range\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!is_power_of_2(new_tx_desc_cnt) || !is_power_of_2(new_rx_desc_cnt)) {
-+		dev_err(&priv->pdev->dev, "Requested descriptor count has to be a power of 2\n");
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
- static int gve_set_ringparam(struct net_device *netdev,
- 			     struct ethtool_ringparam *cmd,
- 			     struct kernel_ethtool_ringparam *kernel_cmd,
- 			     struct netlink_ext_ack *extack)
- {
- 	struct gve_priv *priv = netdev_priv(netdev);
-+	u16 new_tx_cnt, new_rx_cnt;
-+	int err;
-+
-+	err = gve_set_hsplit_config(priv, kernel_cmd->tcp_data_split);
-+	if (err)
-+		return err;
- 
--	if (priv->tx_desc_cnt != cmd->tx_pending ||
--	    priv->rx_desc_cnt != cmd->rx_pending) {
--		dev_info(&priv->pdev->dev, "Modify ring size is not supported.\n");
-+	if (cmd->tx_pending == priv->tx_desc_cnt && cmd->rx_pending == priv->rx_desc_cnt)
-+		return 0;
-+
-+	if (!priv->modify_ring_size_enabled) {
-+		dev_err(&priv->pdev->dev, "Modify ring size is not supported.\n");
- 		return -EOPNOTSUPP;
- 	}
- 
--	return gve_set_hsplit_config(priv, kernel_cmd->tcp_data_split);
-+	new_tx_cnt = cmd->tx_pending;
-+	new_rx_cnt = cmd->rx_pending;
-+
-+	if (gve_validate_req_ring_size(priv, new_tx_cnt, new_rx_cnt))
-+		return -EINVAL;
-+
-+	return gve_adjust_ring_sizes(priv, new_tx_cnt, new_rx_cnt);
- }
- 
- static int gve_user_reset(struct net_device *netdev, u32 *flags)
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 470447c0490f..a515e5af843c 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -1314,10 +1314,10 @@ static void gve_rx_get_curr_alloc_cfg(struct gve_priv *priv,
- 	cfg->rx = priv->rx;
- }
- 
--static void gve_get_curr_alloc_cfgs(struct gve_priv *priv,
--				    struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
--				    struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
--				    struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
-+void gve_get_curr_alloc_cfgs(struct gve_priv *priv,
-+			     struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
-+			     struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
-+			     struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
- {
- 	gve_qpls_get_curr_alloc_cfg(priv, qpls_alloc_cfg);
- 	gve_tx_get_curr_alloc_cfg(priv, tx_alloc_cfg);
-@@ -1867,10 +1867,10 @@ static int gve_xdp(struct net_device *dev, struct netdev_bpf *xdp)
- 	}
- }
- 
--static int gve_adjust_config(struct gve_priv *priv,
--			     struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
--			     struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
--			     struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
-+int gve_adjust_config(struct gve_priv *priv,
-+		      struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
-+		      struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
-+		      struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
- {
- 	int err;
- 
--- 
-2.44.0.478.gd926399ef9-goog
+ 	TP_fast_assign(
+-		strncpy(__entry->name, prot->name, 32);
++		strscpy(__entry->name, prot->name, 32);
+ 		__entry->sysctl_mem[0] = READ_ONCE(prot->sysctl_mem[0]);
+ 		__entry->sysctl_mem[1] = READ_ONCE(prot->sysctl_mem[1]);
+ 		__entry->sysctl_mem[2] = READ_ONCE(prot->sysctl_mem[2]);
+
+---
+base-commit: 928a87efa42302a23bb9554be081a28058495f22
+change-id: 20240401-strncpy-include-trace-events-mdio-h-0a325676b468
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
 
 
