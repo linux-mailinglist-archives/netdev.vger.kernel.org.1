@@ -1,227 +1,109 @@
-Return-Path: <netdev+bounces-83805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE204894518
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 20:59:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D119189452B
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 21:04:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB0E31C218BF
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 18:59:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4F0281FFD
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 19:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3EC53E15;
-	Mon,  1 Apr 2024 18:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC89B4F5ED;
+	Mon,  1 Apr 2024 19:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SsO8skZ6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NEtZqFxV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52A751C44;
-	Mon,  1 Apr 2024 18:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F69249E4;
+	Mon,  1 Apr 2024 19:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711997921; cv=none; b=SxNRR03arNzIt4Kna1KOERYGt9UlPBXUXwlORR0oGdjvcVaTZaEMBLt9xmMF0eS+SG1uJT+eCAqTD/HJOGl8pXFtRG3zNnqhPMHtm3eylUJkT/gOrh0wszcRCNf3M1MoDD2OnV0cJFepgep/rMGnNQ3BZqp03CRkRNntzVyMjK8=
+	t=1711998262; cv=none; b=UyFVuU7ZG3z72ke8IPxmNAayUBgkR01MpaBce6P8tpOrU80ty+6kqKVnWEkTo8cb5Hyr0zOvxhleM3Mf3gO48y27iKNqBEdMmPKhPMpL85uXUZG0NV+ORu2BsHTRaiHkPFTKcTcIpPS34gXh0dlswbZniWi8aMV4nc+cDz5n1ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711997921; c=relaxed/simple;
-	bh=hI/RWjwibOQvhGr3H9JhTRg25qqIumyDdBv7QP2SSBA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sDPvl+Ixb/zVk6ylJD1xsRFxKX6k3lpn79hGcWoZgGKXVCSYy6P1JZSMQmEQ0/Ev5cCZ4Vy13gekglXMkORrfSWeQA+s91SCpn26H5G08iSTeBRvu7Zro/kJmqFLwV0FGrNOlqrpGbLSYeAnOoDJF8AnEn9B0nu8hwWVnBSWg0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SsO8skZ6; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-415a84ea9bbso986115e9.2;
-        Mon, 01 Apr 2024 11:58:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711997918; x=1712602718; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=52WgDeZ/MSi+nlkJeaj0YRfT+cyhyIXYkcaJohsx7Ts=;
-        b=SsO8skZ6m6lQoPZkCjmGR6bP9pDf/7hdxScqglt6KfV8k2v1FmWwtskatZK630Mifo
-         WBQLOzlilmGdy5z6oAl2RPRfxW7cWjfQgue9Ozi/GkrTg62GQu7aibBz486JuutKKYRK
-         zODZSSkx9lZPXVwbQnJPPVhMhSP1glm0UHcWC/qZPunIHeRZQMRxwvkqDZVCUXXj3x2p
-         E9cCCJ7dBpab/GaRJ1ypaqxjBvnwpMHvdCSF5klhmCvr353EWKV2GEz7oHI5AfPgdhYF
-         jpGG32SLolUdgmnEbFu1o37/nx+FIRhe9otvj7asxjkjYD4TvVTBnOoRbuQ2OVStjStx
-         CZCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711997918; x=1712602718;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=52WgDeZ/MSi+nlkJeaj0YRfT+cyhyIXYkcaJohsx7Ts=;
-        b=uh4DXN796SuL5dtQzI6oXNLZ8RjuZgau5rtrrdOcRWziZ0ek+P8fJuvo/F8OvXRrvZ
-         +woF1gztH9VPL16rVILTQzT3tnfJpAEMARIrg3+lVEMll7xSLekDgMwcZSgiZgFTHeXf
-         6TT+Cc6q8o0uVspWTeiikVlwD6m4CQL34as3ECul8TkouSTP/5izhfwV9eUlP42dmwaH
-         lPU+Q5+ysur2vTz/jbgjFI4I49yT4ASX41jk1xntXNKGb19n6TswYAPi8NnXSGLVxjfM
-         EoHISjUDcYW7aoSXrV0arEsNCHGG69MzFO0qRx2a5rdw5Lc+vqTj7m6U/dewwKjYvTpj
-         Cg7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUxoHexaPnSrlSQjYEpFbR1oXslwRjERQG1r8KUJcRVaa9G6XYYQMuTKXq6qE9ezkMDzDzOs2dvbebb1W0rR5MLFXe97Izlodenpcf3pjfZHJYwhOVFpA0ozCbow11nNTca6dxh+yIHNv+Ufpm+K07DB+FjFTUPvOfy
-X-Gm-Message-State: AOJu0Yx+Xe+JSuMaRkRl6xXJvN292IDDXP8lpdYpDVYA7NQcOkM9qqkO
-	tH9+VfbM+7PIQPCCqR+xsoDq9ibFBwf0U9rqll2VIxrWXSoF2ckXWqquR6Vb
-X-Google-Smtp-Source: AGHT+IEHr7EZ2h1N5yq1Ku1nuFDteF4OF+6ZhDrojd7YRlZ3roesKxqxxE/SNg4oYXmPNd01Sv1/7w==
-X-Received: by 2002:a05:600c:4656:b0:415:6dae:771d with SMTP id n22-20020a05600c465600b004156dae771dmr1115722wmo.7.1711997918212;
-        Mon, 01 Apr 2024 11:58:38 -0700 (PDT)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id c9-20020a7bc2a9000000b0041552dbc539sm10950986wmk.11.2024.04.01.11.58.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Apr 2024 11:58:37 -0700 (PDT)
-From: Uros Bizjak <ubizjak@gmail.com>
-To: x86@kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>,
-	Uros Bizjak <ubizjak@gmail.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH RESEND bpf v2 2/2] x86/bpf: Fix IP for relocating call depth accounting
-Date: Mon,  1 Apr 2024 20:55:30 +0200
-Message-ID: <20240401185821.224068-3-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240401185821.224068-1-ubizjak@gmail.com>
-References: <20240401185821.224068-1-ubizjak@gmail.com>
+	s=arc-20240116; t=1711998262; c=relaxed/simple;
+	bh=AgTHelVsz+bSEWE8bp2UzifCO3HT/TL0k8z89kPZWx4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kDCKjim72ddtk6Y7CmM+JdfzWOC/5wOJY8t1ODgEqWzWakomCpuiVkuAHL6z/fIvcVBmp6NUFCiUrOURHp6KXLuKnChNPWw9GMF/mIHky8IouuKTrasi98QgErXB+Lfz6APWE8FmLZt9yBuat1mGZESDIiHRkLd281vfVS1yZlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NEtZqFxV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8329DC433C7;
+	Mon,  1 Apr 2024 19:04:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711998262;
+	bh=AgTHelVsz+bSEWE8bp2UzifCO3HT/TL0k8z89kPZWx4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NEtZqFxVDPiQStJtMES0JB/NfEqkor7ZgBCpa+95nYcRaLw0JMoMEHC3TZtCXpj6w
+	 cSKhcXYTWXcAfF+Szrs8ZjGHr19yDM2lQsA5mreQWq3HYIdwmz4qJpQB89kG6Rqx2d
+	 Hd+ors9yNwRXrkkAFDZoOTTJZZZtR9aD20xXfAle9shsWaA3ME2/8L7O8lz7UO06Ij
+	 JD0fUzFOnRccH+xrK6Jua/oKR7k9gJjkpkTZuHkBjBkv42cXyrWIOAySs+uLCLIQJQ
+	 zETJFd4y+PgfUth9jleAUqxLMeKAKit49sSg7PoX4Q93XOhCvNw3IrynCAVVtx4Bzg
+	 ygFaahykuUccQ==
+Date: Mon, 1 Apr 2024 12:04:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Jason Gunthorpe <jgg@nvidia.com>, Christoph
+ Hellwig <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd
+ Bergmann <arnd@arndb.de>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
+ <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Aron Silverton <aron.silverton@oracle.com>,
+ linux-kernel@vger.kernel.org, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Junxian Huang <huangjunxian6@hisilicon.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240401120420.4d33a89b@kernel.org>
+In-Reply-To: <20240401181033.GB11187@unreal>
+References: <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
+	<2024032248-ardently-ribcage-a495@gregkh>
+	<510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+	<Zf2n02q0GevGdS-Z@C02YVCJELVCG>
+	<20240322135826.1c4655e2@kernel.org>
+	<e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+	<20240322154027.5555780a@kernel.org>
+	<1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+	<20240401123003.GC73174@unreal>
+	<20240401075003.70f5cb4b@kernel.org>
+	<20240401181033.GB11187@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Joan Bruguera Micó <joanbrugueram@gmail.com>
+On Mon, 1 Apr 2024 21:10:33 +0300 Leon Romanovsky wrote:
+> > Sorry, I have a completely different reading of that thread.
+> > Thanks for bringing it up, tho.  
+> 
+> Different people have different opinions, and it is fine.
 
-The commit:
+Agreed! I think the core of our disagreement is whether and when
+one set of people get to force their set of choices on other people.
+Far be it from me to try to force my opinions in RDMA or the kernel
+as a whole.
 
-  59bec00ace28 ("x86/percpu: Introduce %rip-relative addressing to PER_CPU_VAR()")
+> > As I said multiple times I agree that configuring custom parameters
+> > in RDMA is a necessity. Junxian's approach of putting such code in
+> > the RDMA driver / subsystem is more than reasonable. Even better,
+> > it looks like the API is fairly narrowly defined.  
+> 
+> It was a tiny example, which emphasizes the need for a common way.
+> 
+> If we were listen to average RDMA driver author, we would find ourselves
+> with gazillion different sysfs knobs which do nothing except sending
+> raw data to FW. As a subsystem, we don't want to waste our time in
+> not-beneficial to the subsystem code.
 
-made PER_CPU_VAR() to use rip-relative addressing, hence
-INCREMENT_CALL_DEPTH macro and skl_call_thunk_template got rip-relative
-asm code inside of it. A follow up commit:
-
-  17bce3b2ae2d ("x86/callthunks: Handle %rip-relative relocations in call thunk template")
-
-changed x86_call_depth_emit_accounting() to use apply_relocation(),
-but mistakenly assumed that the code is being patched in-place (where
-the destination of the relocation matches the address of the code),
-using *pprog as the destination ip. This is not true for the call depth
-accounting, emitted by the BPF JIT, so the calculated address was wrong,
-JIT-ed BPF progs on kernels with call depth tracking got broken and
-usually caused a page fault.
-
-Pass the destination IP when the BPF JIT emits call depth accounting.
-
-Fixes: 17bce3b2ae2d ("x86/callthunks: Handle %rip-relative relocations in call thunk template")
-Signed-off-by: Joan Bruguera Micó <joanbrugueram@gmail.com>
-Reviewed-by: Uros Bizjak <ubizjak@gmail.com>
-Acked-by: Ingo Molnar <mingo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
----
-v2: Add more details to the commit message.
----
- arch/x86/include/asm/alternative.h |  4 ++--
- arch/x86/kernel/callthunks.c       |  4 ++--
- arch/x86/net/bpf_jit_comp.c        | 19 ++++++++-----------
- 3 files changed, 12 insertions(+), 15 deletions(-)
-
-diff --git a/arch/x86/include/asm/alternative.h b/arch/x86/include/asm/alternative.h
-index fcd20c6dc7f9..67b68d0d17d1 100644
---- a/arch/x86/include/asm/alternative.h
-+++ b/arch/x86/include/asm/alternative.h
-@@ -117,7 +117,7 @@ extern void callthunks_patch_builtin_calls(void);
- extern void callthunks_patch_module_calls(struct callthunk_sites *sites,
- 					  struct module *mod);
- extern void *callthunks_translate_call_dest(void *dest);
--extern int x86_call_depth_emit_accounting(u8 **pprog, void *func);
-+extern int x86_call_depth_emit_accounting(u8 **pprog, void *func, void *ip);
- #else
- static __always_inline void callthunks_patch_builtin_calls(void) {}
- static __always_inline void
-@@ -128,7 +128,7 @@ static __always_inline void *callthunks_translate_call_dest(void *dest)
- 	return dest;
- }
- static __always_inline int x86_call_depth_emit_accounting(u8 **pprog,
--							  void *func)
-+							  void *func, void *ip)
- {
- 	return 0;
- }
-diff --git a/arch/x86/kernel/callthunks.c b/arch/x86/kernel/callthunks.c
-index 30335182b6b0..e92ff0c11db8 100644
---- a/arch/x86/kernel/callthunks.c
-+++ b/arch/x86/kernel/callthunks.c
-@@ -314,7 +314,7 @@ static bool is_callthunk(void *addr)
- 	return !bcmp(pad, insn_buff, tmpl_size);
- }
- 
--int x86_call_depth_emit_accounting(u8 **pprog, void *func)
-+int x86_call_depth_emit_accounting(u8 **pprog, void *func, void *ip)
- {
- 	unsigned int tmpl_size = SKL_TMPL_SIZE;
- 	u8 insn_buff[MAX_PATCH_LEN];
-@@ -327,7 +327,7 @@ int x86_call_depth_emit_accounting(u8 **pprog, void *func)
- 		return 0;
- 
- 	memcpy(insn_buff, skl_call_thunk_template, tmpl_size);
--	apply_relocation(insn_buff, tmpl_size, *pprog,
-+	apply_relocation(insn_buff, tmpl_size, ip,
- 			 skl_call_thunk_template, tmpl_size);
- 
- 	memcpy(*pprog, insn_buff, tmpl_size);
-diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-index e55745f512e1..df5fac428408 100644
---- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -480,7 +480,7 @@ static int emit_call(u8 **pprog, void *func, void *ip)
- static int emit_rsb_call(u8 **pprog, void *func, void *ip)
- {
- 	OPTIMIZER_HIDE_VAR(func);
--	ip += x86_call_depth_emit_accounting(pprog, func);
-+	ip += x86_call_depth_emit_accounting(pprog, func, ip);
- 	return emit_patch(pprog, func, ip, 0xE8);
- }
- 
-@@ -1972,20 +1972,17 @@ st:			if (is_imm8(insn->off))
- 
- 			/* call */
- 		case BPF_JMP | BPF_CALL: {
--			int offs;
-+			u8 *ip = image + addrs[i - 1];
- 
- 			func = (u8 *) __bpf_call_base + imm32;
- 			if (tail_call_reachable) {
- 				RESTORE_TAIL_CALL_CNT(bpf_prog->aux->stack_depth);
--				if (!imm32)
--					return -EINVAL;
--				offs = 7 + x86_call_depth_emit_accounting(&prog, func);
--			} else {
--				if (!imm32)
--					return -EINVAL;
--				offs = x86_call_depth_emit_accounting(&prog, func);
-+				ip += 7;
- 			}
--			if (emit_call(&prog, func, image + addrs[i - 1] + offs))
-+			if (!imm32)
-+				return -EINVAL;
-+			ip += x86_call_depth_emit_accounting(&prog, func, ip);
-+			if (emit_call(&prog, func, ip))
- 				return -EINVAL;
- 			break;
- 		}
-@@ -2835,7 +2832,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *rw_im
- 		 * Direct-call fentry stub, as such it needs accounting for the
- 		 * __fentry__ call.
- 		 */
--		x86_call_depth_emit_accounting(&prog, NULL);
-+		x86_call_depth_emit_accounting(&prog, NULL, image);
- 	}
- 	EMIT1(0x55);		 /* push rbp */
- 	EMIT3(0x48, 0x89, 0xE5); /* mov rbp, rsp */
--- 
-2.42.0
-
+No disagreement here either, there's a trade-off here between what
+you call waste of time and what I'd call fostering organic
+collaboration. Even without taking your priorities into account -
+whether reviewing device APIs is beneficial is (a) subjective, 
+(b) subsystem dependent, so you should be allowed to make your choice
+(within the bounds of Linus's trust). But what I keep arguing is that
+so should we :|
 
