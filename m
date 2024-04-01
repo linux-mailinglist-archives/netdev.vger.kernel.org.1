@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-83828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D12D8947EB
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 01:47:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24BE48947ED
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 01:48:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA0941F23925
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:47:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47BB31C219B9
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69795FBA1;
-	Mon,  1 Apr 2024 23:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E10D605CE;
+	Mon,  1 Apr 2024 23:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Df6Zv/SK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PJ+b+Yy5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAD55D8FD
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 23:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FBF5FBA5
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 23:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712015144; cv=none; b=BgpOHbytU76nvJ2CqJUGxxx6IHN8kAf9HscIlJSZE0lJftWA8YC0uC8U44MuqeoAwmxm5GB7mnYlWARWfXdyS1zL448QNDviQgOex1jASWfUcYtxuskVjl1xEgmIFGegT2GNp/hLCTd5D/QZqI0Y+YuFO5Ua2VYI+ECgOifluXo=
+	t=1712015146; cv=none; b=uxWsqBN+DLu/rmK3qFqd9luAVnXroEQdMj50yErKVvitQ0pn0gNj0fn7KL27k9r3pdyDbg0/a5ePS5m2YDyvLqmYBOvNhUyD4OBr5KKhfdTjYKUuCRz0GafFjnxvJCEK8AOFVRppHxPfB1apFVg4S84GW8CP3ktxaIHG1bRQkQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712015144; c=relaxed/simple;
-	bh=wpaOzUKZe6m41VJhMrZmFbZtbx1NJZMDb9aKqCk1HAc=;
+	s=arc-20240116; t=1712015146; c=relaxed/simple;
+	bh=T+r5MN0wKWkjv/eITFuRd7ZDeIMaevp8ktEOAZXCBSo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QyZwQMWYZ8VxVpEE1JLEEorLzIpnka3ZghZoLzbxheQ8z7H7BGeOrMsTAeISRi/M0zTx3PCZGcLONMZtFTuMgHeC17pVMQuJ1erJK4SUYpew12zbl4zxZbcRd6VLpDe5nNEE5lism27rugu+Iwk/W0bxgRSNtusmIGgcLY8Eof4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Df6Zv/SK; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=MS9mp6otDU0/prHQmo5A5tDx0LWZFvSgwjVHmiPo1B0Wup4UUV7UTQRL9lFlWZsime3v5GUTqr1Zo+NbvOfcofhRJp7FfOr8GqSVecLgaHiwixGakUaPuRuCW5+RHssqEH1das5cwsQLx8QfWiTX6XAHv9tHKw5CyWwX0VRV438=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PJ+b+Yy5; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e20573ef3dso31294125ad.1
-        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 16:45:42 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ea815e1c1eso4311595b3a.0
+        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 16:45:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712015142; x=1712619942; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712015144; x=1712619944; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DEKaQ6KAeMPWO9dtuQ6KA+UswlqpBXRhAE4EEfNny0E=;
-        b=Df6Zv/SKtWu+T9fwjBMY2viIe2nmpbrNhDxJybsuROI919TgWhoCmbazid38TzPx8P
-         TtDQXJL4rKumCL8MJybDtvy73slGcRs5xpvaHEBWLyOJN5QzDsqAq2bv4maNq0xEKCwL
-         bJFrlFr4MtnQ/OQRsP5SxKgq0IKM7VkAMNbi4grP/wHFbIantsteCFOvJVotjjzcr5iY
-         CDilthfuosgVoqmk3a0gLyBnsZ5HBNX8vXH3TwaOq204jlYznuJB3/yYZQShqjBRODKc
-         d7Yu6MM8K2zeoNrNCPAOHHStg22UAtPkgowDuZVvxifEujLfC6pZ6ZMiYA1CIj5ixPW8
-         kidg==
+        bh=7x9CpIazFdTR4Zq3OOfIkhN9CyfFJTEzyO4IvebVf/Y=;
+        b=PJ+b+Yy5VKuBMG7SxvPYx4moHt8w0Jap/Cw11iV+MwlCFQGe5Qa3pQiQil0m0Yfa2E
+         34q59/xfMhO5MsYIGmbKxE4sFCtmw/2e9vXd3ME4lbGMj8zAuT/XZ2kLlXtg9g7s2HFG
+         X9kzi6SIbFP71KXZESyb5vwUmIsntuv+5ESaKcDMD6p/Jh62UuLsQ9IQMzl9eH+MrTIh
+         AEmnvVqdio2G4Nma1EZDZGLuQH5HBABCn6NPzS+5FQIMQoru3ufhyhKBhzAWdDBTmWff
+         9y22uxF+Gd6BXvRatF7DFgwKZbYuNzJhzZCcC1+Jj2UFTW1lY5T5Uxi19uXlP5DVN5hE
+         19QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712015142; x=1712619942;
+        d=1e100.net; s=20230601; t=1712015144; x=1712619944;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DEKaQ6KAeMPWO9dtuQ6KA+UswlqpBXRhAE4EEfNny0E=;
-        b=bfdLLv8MchhDITGyPjdavs+lU5BFeDI4+jnFTPx81tqo261KwmqaYNefKdGDGp7Kaj
-         sRP1Nl1B50JOF1mlLUSxHHB1AEjZMMAglwNjft1CfO0Kmgv59P5/wbQmBhJ/Oc0GcBBl
-         YumHtJ12MmWHuMQQDZ1EC02H5mu3HeMG3cgC0g8Lj3tBmfgqph0qZTAOLBNjsiC0dPKA
-         eOiD+Qq6QsHeR8SnX6pDNEHSdfkQhU9HBf+ujAvQ3F1nKBFv2VTL+G9sDCMKADuoorqf
-         x9h44hHMVSR66l0dW+uXqcMtkNmOnX3gnH2EPUZQwLttJPRRPJKzT6xdEpvd78eSgQaa
-         HWnw==
-X-Gm-Message-State: AOJu0YwCokgEJS7tgB1vXyZvfTnRkIIL9HB4HfXI9oza/urfM6y+3Lw9
-	0c1qaK+yStk8FR8C3Pqh1SrwivOwJqra7DVr8XzjCrlw9N+xEbN9eTzRCq9+/jIL+OuadTMmR47
-	xoEGLmsu7MrLV8PlBLpdDcf6fw3Pe9Vdd3YQmeYM4HVnlFV6l3zNKSbXvu0xCyu5dFwta6habih
-	db09YkVoymDCpCTseIO1WVOY4BhrkUVhd/YTa7lDMDMGaoHVP8o9fIjqPbRvE=
-X-Google-Smtp-Source: AGHT+IEFwS5Z6zr+ZYfTQEzPuI+9uZ0WffSIQt9jTChPWGH4dIrQ5vd1dTDCGXzmtoo03Z8BVdd8AkExGL442jOsWw==
+        bh=7x9CpIazFdTR4Zq3OOfIkhN9CyfFJTEzyO4IvebVf/Y=;
+        b=oYy4pDz8AUgGco7LPVCEqLf55peTbo3ovZFcbRk9RZIx+u/qrsB2oXUC6tZwvTtPmW
+         3ptH9bmQKv3xV5irsN877F6CalNyLKCZbl1pmeXlZSx+nwJEvUZccfFEh5P9g9LYRjNp
+         LsQAbzBehZHsbBkXdxWG9XTrdgD6742tI6zQTQs9WYQfWJfk3ooPzfS98psevX9v44kM
+         GcjXcgz9b8x8LyVTfoo5CAtHqKfrn83y2koA4oqLrHjIl9kw+NITKE5hZujEmFbG8REL
+         fSaexAsgsgdzg1bG0WTHq/Q4foMI4Xz/MNRenRfrRxdsTQj/mUYHMKoFwToK2x4DzXIk
+         bQlQ==
+X-Gm-Message-State: AOJu0YwktXmHqFJBMcFNFunpH3DrRJhrys+VwLHsbz//wmKRhlibb+nM
+	mMBU9TE/VErAO2ELFe8YZS/Dm5Uc8Ksw4q/vYEGYh8Llg+5ycaS/7YmflRF1TLn8Jj6NnKM4Nsm
+	hi3vHVkCaQNqFup9py/1LGAt7q9u4yiSbfjZYCW4lRRg1XLh/kMZxqPWaM+d+gDuibvmzj0dl4I
+	dTbHZsvGVpwGdCX8whF65HBQLmULQ0h+fD88gKP1pZI2nPjhDT0vXHQbOi2rk=
+X-Google-Smtp-Source: AGHT+IHxXT/yLL2cd2rNrldpnEy/7nGDMyQzRcgHUJLn8ajOjZ2fO60/quZkbOYxInCtgd4AjE3Y9oES7raKn1ME0A==
 X-Received: from hramamurthy-gve.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:141e])
- (user=hramamurthy job=sendgmr) by 2002:a17:903:41d1:b0:1e0:c580:4960 with
- SMTP id u17-20020a17090341d100b001e0c5804960mr1068554ple.8.1712015141826;
- Mon, 01 Apr 2024 16:45:41 -0700 (PDT)
-Date: Mon,  1 Apr 2024 23:45:29 +0000
+ (user=hramamurthy job=sendgmr) by 2002:a05:6a00:a1c:b0:6e6:b9a8:5ce8 with
+ SMTP id p28-20020a056a000a1c00b006e6b9a85ce8mr252030pfh.6.1712015143610; Mon,
+ 01 Apr 2024 16:45:43 -0700 (PDT)
+Date: Mon,  1 Apr 2024 23:45:30 +0000
 In-Reply-To: <20240401234530.3101900-1-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240401234530.3101900-1-hramamurthy@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240401234530.3101900-5-hramamurthy@google.com>
-Subject: [PATCH net-next 4/5] gve: add support to read ring size ranges from
- the device
+Message-ID: <20240401234530.3101900-6-hramamurthy@google.com>
+Subject: [PATCH net-next 5/5] gve: add support to change ring size via ethtool
 From: Harshitha Ramamurthy <hramamurthy@google.com>
 To: netdev@vger.kernel.org
 Cc: jeroendb@google.com, pkaligineedi@google.com, shailend@google.com, 
@@ -85,270 +84,186 @@ Cc: jeroendb@google.com, pkaligineedi@google.com, shailend@google.com,
 	linux-kernel@vger.kernel.org, Harshitha Ramamurthy <hramamurthy@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add support to read ring size change capability and the
-min and max descriptor counts from the device and store it
-in the driver. Also accommodate a special case where the
-device does not provide minimum ring size depending on the
-version of the device. In that case, rely on default values
-for the minimums.
+Allow the user to change ring size via ethtool if
+supported by the device. The driver relies on the
+ring size ranges queried from device to validate
+ring sizes requested by the user.
 
 Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
 ---
- drivers/net/ethernet/google/gve/gve.h        | 10 +++
- drivers/net/ethernet/google/gve/gve_adminq.c | 71 +++++++++++++++++---
- drivers/net/ethernet/google/gve/gve_adminq.h | 45 ++++++++-----
- 3 files changed, 102 insertions(+), 24 deletions(-)
+ drivers/net/ethernet/google/gve/gve.h         |  8 ++
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 85 +++++++++++++++++--
+ drivers/net/ethernet/google/gve/gve_main.c    | 16 ++--
+ 3 files changed, 95 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 693d4b7d818b..669cacdae4f4 100644
+index 669cacdae4f4..e97633b68e25 100644
 --- a/drivers/net/ethernet/google/gve/gve.h
 +++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -50,6 +50,10 @@
- /* PTYPEs are always 10 bits. */
- #define GVE_NUM_PTYPES	1024
+@@ -1159,6 +1159,14 @@ int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split);
+ /* Reset */
+ void gve_schedule_reset(struct gve_priv *priv);
+ int gve_reset(struct gve_priv *priv, bool attempt_teardown);
++void gve_get_curr_alloc_cfgs(struct gve_priv *priv,
++			     struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
++			     struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
++			     struct gve_rx_alloc_rings_cfg *rx_alloc_cfg);
++int gve_adjust_config(struct gve_priv *priv,
++		      struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
++		      struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
++		      struct gve_rx_alloc_rings_cfg *rx_alloc_cfg);
+ int gve_adjust_queues(struct gve_priv *priv,
+ 		      struct gve_queue_config new_rx_config,
+ 		      struct gve_queue_config new_tx_config);
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index dbe05402d40b..815dead31673 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -490,8 +490,8 @@ static void gve_get_ringparam(struct net_device *netdev,
+ {
+ 	struct gve_priv *priv = netdev_priv(netdev);
  
-+/* Default minimum ring size */
-+#define GVE_DEFAULT_MIN_TX_RING_SIZE 256
-+#define GVE_DEFAULT_MIN_RX_RING_SIZE 512
-+
- #define GVE_DEFAULT_RX_BUFFER_SIZE 2048
+-	cmd->rx_max_pending = priv->rx_desc_cnt;
+-	cmd->tx_max_pending = priv->tx_desc_cnt;
++	cmd->rx_max_pending = priv->max_rx_desc_cnt;
++	cmd->tx_max_pending = priv->max_tx_desc_cnt;
+ 	cmd->rx_pending = priv->rx_desc_cnt;
+ 	cmd->tx_pending = priv->tx_desc_cnt;
  
- #define GVE_MAX_RX_BUFFER_SIZE 4096
-@@ -712,6 +716,12 @@ struct gve_priv {
- 	u16 num_event_counters;
- 	u16 tx_desc_cnt; /* num desc per ring */
- 	u16 rx_desc_cnt; /* num desc per ring */
-+	u16 max_tx_desc_cnt;
-+	u16 max_rx_desc_cnt;
-+	u16 min_tx_desc_cnt;
-+	u16 min_rx_desc_cnt;
-+	bool modify_ring_size_enabled;
-+	bool default_min_ring_size;
- 	u16 tx_pages_per_qpl; /* Suggested number of pages per qpl for TX queues by NIC */
- 	u64 max_registered_pages;
- 	u64 num_registered_pages; /* num pages registered with NIC */
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index faeff20cd370..b2b619aa2310 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.c
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -32,6 +32,8 @@ struct gve_device_option *gve_get_next_option(struct gve_device_descriptor *desc
- 	return option_end > descriptor_end ? NULL : (struct gve_device_option *)option_end;
+@@ -503,20 +503,93 @@ static void gve_get_ringparam(struct net_device *netdev,
+ 		kernel_cmd->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_DISABLED;
  }
  
-+#define GVE_DEVICE_OPTION_NO_MIN_RING_SIZE	8
++static int gve_adjust_ring_sizes(struct gve_priv *priv,
++				 u16 new_tx_desc_cnt,
++				 u16 new_rx_desc_cnt)
++{
++	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
++	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
++	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
++	struct gve_qpl_config new_qpl_cfg;
++	int err;
 +
- static
- void gve_parse_device_option(struct gve_priv *priv,
- 			     struct gve_device_descriptor *device_descriptor,
-@@ -41,7 +43,8 @@ void gve_parse_device_option(struct gve_priv *priv,
- 			     struct gve_device_option_dqo_rda **dev_op_dqo_rda,
- 			     struct gve_device_option_jumbo_frames **dev_op_jumbo_frames,
- 			     struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
--			     struct gve_device_option_buffer_sizes **dev_op_buffer_sizes)
-+			     struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
-+			     struct gve_device_option_modify_ring **dev_op_modify_ring)
- {
- 	u32 req_feat_mask = be32_to_cpu(option->required_features_mask);
- 	u16 option_length = be16_to_cpu(option->option_length);
-@@ -165,6 +168,27 @@ void gve_parse_device_option(struct gve_priv *priv,
- 				 "Buffer Sizes");
- 		*dev_op_buffer_sizes = (void *)(option + 1);
- 		break;
-+	case GVE_DEV_OPT_ID_MODIFY_RING:
-+		if (option_length < GVE_DEVICE_OPTION_NO_MIN_RING_SIZE ||
-+		    req_feat_mask != GVE_DEV_OPT_REQ_FEAT_MASK_MODIFY_RING) {
-+			dev_warn(&priv->pdev->dev, GVE_DEVICE_OPTION_ERROR_FMT,
-+				 "Modify Ring", (int)sizeof(**dev_op_modify_ring),
-+				 GVE_DEV_OPT_REQ_FEAT_MASK_MODIFY_RING,
-+				 option_length, req_feat_mask);
-+			break;
-+		}
++	/* get current queue configuration */
++	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
++				&tx_alloc_cfg, &rx_alloc_cfg);
 +
-+		if (option_length > sizeof(**dev_op_modify_ring)) {
-+			dev_warn(&priv->pdev->dev,
-+				 GVE_DEVICE_OPTION_TOO_BIG_FMT, "Modify Ring");
-+		}
++	/* copy over the new ring_size from ethtool */
++	tx_alloc_cfg.ring_size = new_tx_desc_cnt;
++	rx_alloc_cfg.ring_size = new_rx_desc_cnt;
 +
-+		*dev_op_modify_ring = (void *)(option + 1);
++	/* qpl_cfg is not read-only, it contains a map that gets updated as
++	 * rings are allocated, which is why we cannot use the yet unreleased
++	 * one in priv.
++	 */
++	qpls_alloc_cfg.qpl_cfg = &new_qpl_cfg;
++	tx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
++	rx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
 +
-+		/* device has not provided min ring size */
-+		if (option_length == GVE_DEVICE_OPTION_NO_MIN_RING_SIZE)
-+			priv->default_min_ring_size = true;
-+		break;
- 	default:
- 		/* If we don't recognize the option just continue
- 		 * without doing anything.
-@@ -183,7 +207,8 @@ gve_process_device_options(struct gve_priv *priv,
- 			   struct gve_device_option_dqo_rda **dev_op_dqo_rda,
- 			   struct gve_device_option_jumbo_frames **dev_op_jumbo_frames,
- 			   struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
--			   struct gve_device_option_buffer_sizes **dev_op_buffer_sizes)
-+			   struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
-+			   struct gve_device_option_modify_ring **dev_op_modify_ring)
- {
- 	const int num_options = be16_to_cpu(descriptor->num_device_options);
- 	struct gve_device_option *dev_opt;
-@@ -204,7 +229,8 @@ gve_process_device_options(struct gve_priv *priv,
- 		gve_parse_device_option(priv, descriptor, dev_opt,
- 					dev_op_gqi_rda, dev_op_gqi_qpl,
- 					dev_op_dqo_rda, dev_op_jumbo_frames,
--					dev_op_dqo_qpl, dev_op_buffer_sizes);
-+					dev_op_dqo_qpl, dev_op_buffer_sizes,
-+					dev_op_modify_ring);
- 		dev_opt = next_opt;
- 	}
- 
-@@ -738,6 +764,12 @@ static void gve_set_default_desc_cnt(struct gve_priv *priv,
- {
- 	priv->tx_desc_cnt = be16_to_cpu(descriptor->tx_queue_entries);
- 	priv->rx_desc_cnt = be16_to_cpu(descriptor->rx_queue_entries);
-+
-+	/* set default ranges */
-+	priv->max_tx_desc_cnt = priv->tx_desc_cnt;
-+	priv->max_rx_desc_cnt = priv->rx_desc_cnt;
-+	priv->min_tx_desc_cnt = priv->tx_desc_cnt;
-+	priv->min_rx_desc_cnt = priv->rx_desc_cnt;
- }
- 
- static void gve_enable_supported_features(struct gve_priv *priv,
-@@ -747,7 +779,9 @@ static void gve_enable_supported_features(struct gve_priv *priv,
- 					  const struct gve_device_option_dqo_qpl
- 					  *dev_op_dqo_qpl,
- 					  const struct gve_device_option_buffer_sizes
--					  *dev_op_buffer_sizes)
-+					  *dev_op_buffer_sizes,
-+					  const struct gve_device_option_modify_ring
-+					  *dev_op_modify_ring)
- {
- 	/* Before control reaches this point, the page-size-capped max MTU from
- 	 * the gve_device_descriptor field has already been stored in
-@@ -778,12 +812,33 @@ static void gve_enable_supported_features(struct gve_priv *priv,
- 			 "BUFFER SIZES device option enabled with max_rx_buffer_size of %u, header_buf_size of %u.\n",
- 			 priv->max_rx_buffer_size, priv->header_buf_size);
- 	}
-+
-+	/* Read and store ring size ranges given by device */
-+	if (dev_op_modify_ring &&
-+	    (supported_features_mask & GVE_SUP_MODIFY_RING_MASK)) {
-+		priv->modify_ring_size_enabled = true;
-+
-+		/* max ring size for DQO QPL should not be overwritten because of device limit */
-+		if (priv->queue_format != GVE_DQO_QPL_FORMAT) {
-+			priv->max_rx_desc_cnt = be16_to_cpu(dev_op_modify_ring->max_rx_ring_size);
-+			priv->max_tx_desc_cnt = be16_to_cpu(dev_op_modify_ring->max_tx_ring_size);
-+		}
-+		if (priv->default_min_ring_size) {
-+			/* If device hasn't provided minimums, use default minimums */
-+			priv->min_tx_desc_cnt = GVE_DEFAULT_MIN_TX_RING_SIZE;
-+			priv->min_rx_desc_cnt = GVE_DEFAULT_MIN_RX_RING_SIZE;
-+		} else {
-+			priv->min_rx_desc_cnt = be16_to_cpu(dev_op_modify_ring->min_rx_ring_size);
-+			priv->min_tx_desc_cnt = be16_to_cpu(dev_op_modify_ring->min_tx_ring_size);
-+		}
++	if (netif_running(priv->dev)) {
++		err = gve_adjust_config(priv, &qpls_alloc_cfg,
++					&tx_alloc_cfg, &rx_alloc_cfg);
++		if (err)
++			return err;
 +	}
++
++	/* Set new ring_size for the next up */
++	priv->tx_desc_cnt = new_tx_desc_cnt;
++	priv->rx_desc_cnt = new_rx_desc_cnt;
++
++	return 0;
++}
++
++static int gve_validate_req_ring_size(struct gve_priv *priv, u16 new_tx_desc_cnt,
++				      u16 new_rx_desc_cnt)
++{
++	/* check for valid range */
++	if (new_tx_desc_cnt < priv->min_tx_desc_cnt ||
++	    new_tx_desc_cnt > priv->max_tx_desc_cnt ||
++	    new_rx_desc_cnt < priv->min_rx_desc_cnt ||
++	    new_rx_desc_cnt > priv->max_rx_desc_cnt) {
++		dev_err(&priv->pdev->dev, "Requested descriptor count out of range\n");
++		return -EINVAL;
++	}
++
++	if (!is_power_of_2(new_tx_desc_cnt) || !is_power_of_2(new_rx_desc_cnt)) {
++		dev_err(&priv->pdev->dev, "Requested descriptor count has to be a power of 2\n");
++		return -EINVAL;
++	}
++	return 0;
++}
++
+ static int gve_set_ringparam(struct net_device *netdev,
+ 			     struct ethtool_ringparam *cmd,
+ 			     struct kernel_ethtool_ringparam *kernel_cmd,
+ 			     struct netlink_ext_ack *extack)
+ {
+ 	struct gve_priv *priv = netdev_priv(netdev);
++	u16 new_tx_cnt, new_rx_cnt;
++	int err;
++
++	err = gve_set_hsplit_config(priv, kernel_cmd->tcp_data_split);
++	if (err)
++		return err;
+ 
+-	if (priv->tx_desc_cnt != cmd->tx_pending ||
+-	    priv->rx_desc_cnt != cmd->rx_pending) {
+-		dev_info(&priv->pdev->dev, "Modify ring size is not supported.\n");
++	if (cmd->tx_pending == priv->tx_desc_cnt && cmd->rx_pending == priv->rx_desc_cnt)
++		return 0;
++
++	if (!priv->modify_ring_size_enabled) {
++		dev_err(&priv->pdev->dev, "Modify ring size is not supported.\n");
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	return gve_set_hsplit_config(priv, kernel_cmd->tcp_data_split);
++	new_tx_cnt = cmd->tx_pending;
++	new_rx_cnt = cmd->rx_pending;
++
++	if (gve_validate_req_ring_size(priv, new_tx_cnt, new_rx_cnt))
++		return -EINVAL;
++
++	return gve_adjust_ring_sizes(priv, new_tx_cnt, new_rx_cnt);
  }
  
- int gve_adminq_describe_device(struct gve_priv *priv)
+ static int gve_user_reset(struct net_device *netdev, u32 *flags)
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 470447c0490f..a515e5af843c 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -1314,10 +1314,10 @@ static void gve_rx_get_curr_alloc_cfg(struct gve_priv *priv,
+ 	cfg->rx = priv->rx;
+ }
+ 
+-static void gve_get_curr_alloc_cfgs(struct gve_priv *priv,
+-				    struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
+-				    struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
+-				    struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
++void gve_get_curr_alloc_cfgs(struct gve_priv *priv,
++			     struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
++			     struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
++			     struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
  {
- 	struct gve_device_option_buffer_sizes *dev_op_buffer_sizes = NULL;
- 	struct gve_device_option_jumbo_frames *dev_op_jumbo_frames = NULL;
-+	struct gve_device_option_modify_ring *dev_op_modify_ring = NULL;
- 	struct gve_device_option_gqi_rda *dev_op_gqi_rda = NULL;
- 	struct gve_device_option_gqi_qpl *dev_op_gqi_qpl = NULL;
- 	struct gve_device_option_dqo_rda *dev_op_dqo_rda = NULL;
-@@ -815,9 +870,9 @@ int gve_adminq_describe_device(struct gve_priv *priv)
+ 	gve_qpls_get_curr_alloc_cfg(priv, qpls_alloc_cfg);
+ 	gve_tx_get_curr_alloc_cfg(priv, tx_alloc_cfg);
+@@ -1867,10 +1867,10 @@ static int gve_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ 	}
+ }
  
- 	err = gve_process_device_options(priv, descriptor, &dev_op_gqi_rda,
- 					 &dev_op_gqi_qpl, &dev_op_dqo_rda,
--					 &dev_op_jumbo_frames,
--					 &dev_op_dqo_qpl,
--					 &dev_op_buffer_sizes);
-+					 &dev_op_jumbo_frames, &dev_op_dqo_qpl,
-+					 &dev_op_buffer_sizes,
-+					 &dev_op_modify_ring);
- 	if (err)
- 		goto free_device_descriptor;
+-static int gve_adjust_config(struct gve_priv *priv,
+-			     struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
+-			     struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
+-			     struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
++int gve_adjust_config(struct gve_priv *priv,
++		      struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
++		      struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
++		      struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
+ {
+ 	int err;
  
-@@ -878,7 +933,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 
- 	gve_enable_supported_features(priv, supported_features_mask,
- 				      dev_op_jumbo_frames, dev_op_dqo_qpl,
--				      dev_op_buffer_sizes);
-+				      dev_op_buffer_sizes, dev_op_modify_ring);
- 
- free_device_descriptor:
- 	dma_pool_free(priv->adminq_pool, descriptor, descriptor_bus);
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
-index 3ff2028a7472..beedf2353847 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.h
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-@@ -133,6 +133,16 @@ struct gve_device_option_buffer_sizes {
- 
- static_assert(sizeof(struct gve_device_option_buffer_sizes) == 8);
- 
-+struct gve_device_option_modify_ring {
-+	__be32 supported_featured_mask;
-+	__be16 max_rx_ring_size;
-+	__be16 max_tx_ring_size;
-+	__be16 min_rx_ring_size;
-+	__be16 min_tx_ring_size;
-+};
-+
-+static_assert(sizeof(struct gve_device_option_modify_ring) == 12);
-+
- /* Terminology:
-  *
-  * RDA - Raw DMA Addressing - Buffers associated with SKBs are directly DMA
-@@ -142,28 +152,31 @@ static_assert(sizeof(struct gve_device_option_buffer_sizes) == 8);
-  *       the device for read/write and data is copied from/to SKBs.
-  */
- enum gve_dev_opt_id {
--	GVE_DEV_OPT_ID_GQI_RAW_ADDRESSING = 0x1,
--	GVE_DEV_OPT_ID_GQI_RDA = 0x2,
--	GVE_DEV_OPT_ID_GQI_QPL = 0x3,
--	GVE_DEV_OPT_ID_DQO_RDA = 0x4,
--	GVE_DEV_OPT_ID_DQO_QPL = 0x7,
--	GVE_DEV_OPT_ID_JUMBO_FRAMES = 0x8,
--	GVE_DEV_OPT_ID_BUFFER_SIZES = 0xa,
-+	GVE_DEV_OPT_ID_GQI_RAW_ADDRESSING	= 0x1,
-+	GVE_DEV_OPT_ID_GQI_RDA			= 0x2,
-+	GVE_DEV_OPT_ID_GQI_QPL			= 0x3,
-+	GVE_DEV_OPT_ID_DQO_RDA			= 0x4,
-+	GVE_DEV_OPT_ID_MODIFY_RING		= 0x6,
-+	GVE_DEV_OPT_ID_DQO_QPL			= 0x7,
-+	GVE_DEV_OPT_ID_JUMBO_FRAMES		= 0x8,
-+	GVE_DEV_OPT_ID_BUFFER_SIZES		= 0xa,
- };
- 
- enum gve_dev_opt_req_feat_mask {
--	GVE_DEV_OPT_REQ_FEAT_MASK_GQI_RAW_ADDRESSING = 0x0,
--	GVE_DEV_OPT_REQ_FEAT_MASK_GQI_RDA = 0x0,
--	GVE_DEV_OPT_REQ_FEAT_MASK_GQI_QPL = 0x0,
--	GVE_DEV_OPT_REQ_FEAT_MASK_DQO_RDA = 0x0,
--	GVE_DEV_OPT_REQ_FEAT_MASK_JUMBO_FRAMES = 0x0,
--	GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL = 0x0,
--	GVE_DEV_OPT_REQ_FEAT_MASK_BUFFER_SIZES = 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_GQI_RAW_ADDRESSING	= 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_GQI_RDA		= 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_GQI_QPL		= 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_DQO_RDA		= 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_JUMBO_FRAMES		= 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_DQO_QPL		= 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_BUFFER_SIZES		= 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_MODIFY_RING		= 0x0,
- };
- 
- enum gve_sup_feature_mask {
--	GVE_SUP_JUMBO_FRAMES_MASK = 1 << 2,
--	GVE_SUP_BUFFER_SIZES_MASK = 1 << 4,
-+	GVE_SUP_MODIFY_RING_MASK	= 1 << 0,
-+	GVE_SUP_JUMBO_FRAMES_MASK	= 1 << 2,
-+	GVE_SUP_BUFFER_SIZES_MASK	= 1 << 4,
- };
- 
- #define GVE_DEV_OPT_LEN_GQI_RAW_ADDRESSING 0x0
 -- 
 2.44.0.478.gd926399ef9-goog
 
