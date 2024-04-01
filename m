@@ -1,364 +1,272 @@
-Return-Path: <netdev+bounces-83732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EBC9893952
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 11:17:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21585893960
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 11:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 451AF281606
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 09:17:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F311B212E0
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 09:28:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB7B10788;
-	Mon,  1 Apr 2024 09:17:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C1AFC17;
+	Mon,  1 Apr 2024 09:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xcd29iyD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l39R/X7e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385A5101C5
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 09:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711963051; cv=none; b=JGwBjLuwzi9+ywRRve2RucgCbRgLnXUQSjJMpa2AGAzrHJJlMjWo8JoplO92j2esOr/avfCKbKy0+ASR1+cUPsSGXvtVzGls6rdXx4SqrFOAlLzMX7DGi95XzB7q7ynqNe8QiJWIJk0nwy+7sYnqyXCVaArcjeY6SrqO2d6PuJo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711963051; c=relaxed/simple;
-	bh=5/iDvp/nPe9B//EsL+rSUwAprYIokXxMWYn+t4/tEsc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cw5L4fmVCNkd38ums5uZLvWA+v6IakzTJ3Gy2ivY6WhrdxQezOp5j1KYnhkIfq6oTsypoguJ9urES1sWYLNZ1jGWkxrsKZely4ip6YYhZs0gcBnGt/eWymQWBoJqfbYqMjrcW0SKaMnh/i3SGFsZgQJ5rNKy/ZoSEzMbqBMQzYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Xcd29iyD; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d6fd3cfaceso42952881fa.3
-        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 02:17:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1711963047; x=1712567847; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wFire2TfkAwEnyOQx5Uh2xr+3TBtrz+ZDlTxBm0FM1Q=;
-        b=Xcd29iyDq6uSo3lcXb1HTjaQLNmJUIXC8FwG+YtmnF4Ij8ppZHbMkVx1CjxLz43hwr
-         sMmOK0VRCFDcxLAUkzvcPwXBSYyrfAyqB1ieYEl5L+hs0dv3Sri8X3RFizOCMCTVhTKx
-         F94LWbWkSdkiH1w1ntba8ngi5AFen5hUSQosM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711963047; x=1712567847;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wFire2TfkAwEnyOQx5Uh2xr+3TBtrz+ZDlTxBm0FM1Q=;
-        b=KKekFgklA8hSohUe5bQxUrvFO8L8Z6wLwedL7XEmrEkTFXaX7hlCuSzn1/I0Rq0PB6
-         9RmAjH+z4oFAozkzmr/hBMmjpWliJGQhTN3yKKw6Y39svnIY5ZDe8Yp6/8rCU0ScY+dL
-         WJ753XScCxT754DuSFCtas5kFGNzen/abBcPYmN84QB63Tu2bwFNuwl1sF1DLCTucr15
-         G71vIhRApk62EE80bDdqbVU4+28Ckt1tYAEOFNvi0rAmT7lmg2SH0s7wkUMu4WNAFLpi
-         vqCW7/kDiHTrnL+QxbFnvd9VqJgf42xTDUbu3LcnHlR6eSXJmjF5L5hwCdpZ6esaBelG
-         XsuA==
-X-Gm-Message-State: AOJu0YxQJUV7emUujNRVU/elhzarZLqH1ySt9fe68FwyDUSnHoDp/lCj
-	kEAtLGWcYGXAq4qxJN5MeIsLzJbFbRbgyl9nEQcrkb7z/o2c50jVVqA1S+59c8vGnhIZa6sogqX
-	BmXmx/+PLZWChTlEHhjG6/s8D0AQVCSwq88fi
-X-Google-Smtp-Source: AGHT+IFNDGRqdsgXpKkTsrsBXOs0zhB6Vye936XG1Ja/v5Uz4XVNqCIxSj4nHBJcBIY6HhvGG++5DWlSJxvbiJXs/+M=
-X-Received: by 2002:a2e:911a:0:b0:2d4:714b:4c5d with SMTP id
- m26-20020a2e911a000000b002d4714b4c5dmr6556468ljg.44.1711963047242; Mon, 01
- Apr 2024 02:17:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4096110799
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 09:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711963718; cv=fail; b=u7YqGbqJ7DrOoo5sqxmvXd/fGf3CnB+88a2wYE4HWfVwDvcbzdVnOpHEKJB048i6ucsC1HHosexYjonXxBiEVO/z22+4VwPu9dL+BKa1Ax+S1JCFrP8bNxXzzGE55SBt+4z9bXW/OOFDcdJde/z+vBkjCPCmzp7xffNfDBkNElg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711963718; c=relaxed/simple;
+	bh=cxjjTzj/KR5gfHSv6KU5mXMAtn1WgiXlOJY7TKAhdwo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CPjCT0MloE5gQCLIUFaO/TzCgTqzOBgyt4SfRec6SR9gwgUCH7gyD0BFLqS5idKRFSpeTIqFYoaPDA3jsZM834lZwcasr1maIRZtZGfJ4b0HWCiw6VVdDUJhh1XB/3WEr/k5virUKHFJw64n/JlWUjcpj8Ml0vPmIPsT4ApZiEA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l39R/X7e; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711963716; x=1743499716;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=cxjjTzj/KR5gfHSv6KU5mXMAtn1WgiXlOJY7TKAhdwo=;
+  b=l39R/X7emJNF+dG96EQa21hN511pXJMj4HVJdlu5Xm0PwUZOop/jMmo0
+   2ghfbun+B8ACuUJZ1mw3jFXYzxcrJKjnWbZTuTiuot3ctXntKOE6wwD9p
+   UnqrT22XIyleKC2B5DkrW6QlK9TzPbRSuKVEr3+VxPgZ7Xj1Aw/EjRb6d
+   tz2JVQDTsXP4y3usrb5biOX2je7ZWf8q5kuy6z6r6bZJGGiFx1oWBx+B1
+   sgSIsTV8u/GAweYtvmG3ksZvPcqctiKiB1Htdv8UTV/SC50a/BraqF2Je
+   TIyKEUKDRgyPnmeax4f8ieekGKKGT3/lO01jI2D+zF7E9r26fTksDn+iA
+   Q==;
+X-CSE-ConnectionGUID: vEipl27HTk+Wh4k/a51FWw==
+X-CSE-MsgGUID: m51q/U20T5ytTc7Kc8b6hA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11030"; a="6946956"
+X-IronPort-AV: E=Sophos;i="6.07,171,1708416000"; 
+   d="scan'208";a="6946956"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 02:28:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,171,1708416000"; 
+   d="scan'208";a="17746595"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Apr 2024 02:28:35 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 1 Apr 2024 02:28:34 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 1 Apr 2024 02:28:34 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 1 Apr 2024 02:28:34 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 1 Apr 2024 02:28:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KdSdye4IbWPd/LQNnu1gcA8icRTDsqJUgYlHO5GrBP5K5Lb6ZvxKHOQU9Ky4DBqyQeiLD929BXkm57dXQVTIVTzeP2X0L/B1YaBeOnBHH2E1l23olalpxq25kmKER9XPgQSv05pWHh1ibjZuTLcrpS2Pbb1a3bVts3SljyIsjke5OWJQyXkE8DKea/2IkosDitaVONQOPyRBVr0ihQkrUjVvJnkuk6M91jGVGCmFLBJ0yvg1r0ACNqylEGbPIb2hUXTtkokBTTlADohofcqIXkKdB7Lvs2t+u1pCVLgNQ8zWp54BYe+MhJEfSnb+R01/0+E4T9URUU43zLrdhM/4+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=unU2jlJL/+kXJeQW+SU6gwjwelj6CNS3hgKrsNDbLLs=;
+ b=BSoCTgpRAnwJG03WDA90K9CVFrkzvGDtEYGmmVwyUXjAyPfs4wPIg90BICh6IYuGEg36iZkP6PmeXd2uHaJPUILnSzV6HJr0fMy+oGroeaTu+SIpEu5yuAqJtZJmA9CInRWduAM1zaL3Fcgcy9o47SeGEc/dJgnD5UNHpJSUXblLarU9NMVR2LsQHhvbBoX1NQssuJvjAtvkb5H9sXdCkkrMfEPTP6iNo1OmGVUlmzh+I/v5SEUaa0VOUC3LHUVhu72l4Xk1d1Uax7AaJNf04s79gzSDGVtFJzgqldroXwBTIs+CZb0f92GPY9vjmybM4d/O/J9hnqTYXgOlpY5XYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by IA0PR11MB7911.namprd11.prod.outlook.com (2603:10b6:208:40e::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Mon, 1 Apr
+ 2024 09:28:31 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::66c9:72ce:62ab:73c2]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::66c9:72ce:62ab:73c2%6]) with mapi id 15.20.7452.019; Mon, 1 Apr 2024
+ 09:28:30 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Marcin Szycik
+	<marcin.szycik@linux.intel.com>, "Kubiak, Michal" <michal.kubiak@intel.com>
+Subject: RE: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on all
+ profiles
+Thread-Topic: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on all
+ profiles
+Thread-Index: AQHadGrpJu5mvKk/u0ubhKlFLxaJ6LFIE/7AgAZohICABMXh8A==
+Date: Mon, 1 Apr 2024 09:28:30 +0000
+Message-ID: <PH0PR11MB5013EC7967F8B7694B2F5C8C963F2@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20240312105259.2450-1-michal.swiatkowski@linux.intel.com>
+ <PH0PR11MB50130FD5A519919523197C7C96362@PH0PR11MB5013.namprd11.prod.outlook.com>
+ <ZgZ6/6/R+5EfQvbb@mev-dev>
+In-Reply-To: <ZgZ6/6/R+5EfQvbb@mev-dev>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|IA0PR11MB7911:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Joog2f5ASoB59vHdgyAgfKaYqIT+eaFekUevTytoeqWZ1Zo+iS5nt2yiMo0YFWcNB+CDlynbxUJN89en1gV98VRtRV4hcrhPSsnhtUTrbac7msjAzy4NZkRHOaVscV6/76qsZiRpAHUISnNLskbZRM1obDok/TIkSI26YFIRCRHVxoff5EY560ceJS5cBzYfFWRwMbHc5KeCJ1pzp8vyabS2z4tvyg5kwbMDjRxf31/j68AskANZDNDXCpukrvYGE/8TmaWi5zHkz/JNkOMccoX85jZz4L7ZvUnWrL/5YlbEq7uRMXw4Rt9QqNst4dwl8uPrxnjW5A8IYbiLz9fMVAYIysM8IZMCTrQI7Qa3SqrL/O2Bg9Tzou0wkpn5cvoex53wcQ0GfFIM1yTjAz29te5K2F6oA5UFYECraIUmPXDKBkljLYqnNHRXjVThwGG0P34kfDbQSke4499D0FGgXOPgS1JSSrNbXIzVIMHxl4rZ3zZufaqW8vo6aOom22cnfRj4ntH3WV1QU1OzMjOrqoZTpwdbAhbHc+8YtgpujFZ/xMyWBvxpOYUtt/LvodgMnogEgyhfe36RnPMLclTE88nrTaNDMyAn3pdlOQKSrPA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XHhQAcT2Szk1qy2OU2JuGYrONUcpwPxT6mIjRsp6oqTLRkaQRMvBww464Ldv?=
+ =?us-ascii?Q?R2oZ1VtuiM4BAy1+qM9P2o47dlYC2+vaZdS9BP+MIEY1iCOvF23EZM4vMdFD?=
+ =?us-ascii?Q?c3SNaMcAlQ7Vhl3n/Ft5mmZ+eHtfavEYmdV4f2RP3fl8y/zMYFxaw4ibJ/Lq?=
+ =?us-ascii?Q?3ibTjXuokVAMqjo/39HN0/zvZdq6PNDc8kpu2wOsRP6czXP26pntUIFUUAZq?=
+ =?us-ascii?Q?QXUdP4prf7J4Y5HiwCFEYIOns9bTxFv1itDBalVXuV4zmeyK9sGWDXMRW99v?=
+ =?us-ascii?Q?Y18ewV+1qXjbggi/Sps6TqQCiJ4mEhERKYsIDnbzSr+F/bL1wlOUgSrpD7pO?=
+ =?us-ascii?Q?CXRngO4/ZoSMW3RGP05MD2Er69BGia1IIHRn6EJgHS6pI18clN5310gGWwQN?=
+ =?us-ascii?Q?ndWjugYEXprZb/y3hzxfyLbyqivfT/kqjo9cZ3kcske14OWaGUyHwb/IDKVB?=
+ =?us-ascii?Q?5qxpzQCBOFHjrR/eIg4ckK7UXJvVlnA/nrw6KzbljcVbPly3oCIY3u3rjgtZ?=
+ =?us-ascii?Q?96/jnaCQn/RDDGQCvuv0A3LahFJypjh0mlteAigFk62yQT5BeMuXKW2MhLdx?=
+ =?us-ascii?Q?O58x4vy42CnVjkXlFFdQ3mDUOugLTbMWznD/YmFcmXjsuRADFlaVcIWGabd2?=
+ =?us-ascii?Q?p4ZOtJdcJN1GDQOSzWFWN744gks8spf/qL3N93BCaH1NkwJhpZJZiPWDAGWP?=
+ =?us-ascii?Q?EMDNBI5GK4+gW9g1OgANNOn3KTITiHJsuO+c+x4PrOHFybZOFgL47qh7J8lr?=
+ =?us-ascii?Q?yXWErtXRC7N4iwK4aRYGEuQJ0vMv2PPKISK2BqUEy6LsIYOhMxMtw7caCNOo?=
+ =?us-ascii?Q?b76fLXfDu4ONeaW7h5OgiPm7+fQldEyE/6hUo/719wSbpK1gR0GnWKwTBUka?=
+ =?us-ascii?Q?NhrImdjQyAf51dn7HgmVXi4JiLsclks1FZCP5FensP/VTpfx5/l+UASWYExN?=
+ =?us-ascii?Q?D2NGv/O8G9VoWtVBOHCWZWNSZd5AZX9+Uaz4yR+vQPouSYYKC/CWCrTkOAg5?=
+ =?us-ascii?Q?Hl24XNbPN5z3c6uewZ0CUrQYlTuor0ejnEaHZz685i177bkL2RoKcQzf1nBo?=
+ =?us-ascii?Q?MZErY+YBrcReBqYBlxb5Od64yfuyccMHaO+1v5xkkb7LblZjooHN5BnLGoFt?=
+ =?us-ascii?Q?DIL6h5fNxX5+JQhnkkXAAKeUQ/tbR0Kmqema5FWqO27fKY0Ph+mtzsDO1d2Q?=
+ =?us-ascii?Q?sHE9gfIANXCz7KJ3McA81ZI+bAUuBJPQbeWomBmrJbb+PCav/GYoqwrhOp/B?=
+ =?us-ascii?Q?C5XR+K1S+I5CgM5r95vkBQfb1AOCyFphOvPjKn1UdmGgFxCCBMhVIJNYlRGh?=
+ =?us-ascii?Q?RKgFPLgamwZOZygcG49fH2TUGSmT/FIx7kEGpcDeT7ss6upHFN6ymncMZ5Ir?=
+ =?us-ascii?Q?X6i/gnJLcZyoYgkbWziOjycWq/yMUaTTMQI4g3EUXDPqzxRX1O3rnenr72m2?=
+ =?us-ascii?Q?apk50TN1OyxK54HMtITdIp+nJSqjw2vNPwwJndiFAyC4TjlMbJEytZBVYkoE?=
+ =?us-ascii?Q?F8XkbHuFxdf6H0ZuJyqEu2O839keETqItGbgEnU0+UzLnBXmGbvkT2xeNys5?=
+ =?us-ascii?Q?YD6KZEvwad1NwtYQGyozyBTA2Ev0AqOrKs9C6XZHWglSdw7SNwbS2yWkZuEA?=
+ =?us-ascii?Q?sQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240401090531.574575-1-parav@nvidia.com> <20240401090531.574575-3-parav@nvidia.com>
-In-Reply-To: <20240401090531.574575-3-parav@nvidia.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 1 Apr 2024 14:47:15 +0530
-Message-ID: <CAH-L+nOY0A41GBrKw03a1ZLpkppGOKAfYb8VacQ=VyTUzsWdkQ@mail.gmail.com>
-Subject: Re: [net-next 2/2] mlx5/core: Support max_io_eqs for a function
-To: Parav Pandit <parav@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, saeedm@nvidia.com, 
-	leon@kernel.org, jiri@resnulli.us, shayd@nvidia.com, danielj@nvidia.com, 
-	dchumak@nvidia.com, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	Jiri Pirko <jiri@nvidia.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000534d2f0615057510"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8e83851-6e7a-41d4-8d10-08dc522e182d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Apr 2024 09:28:30.7011
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wF7k6GEYkqne3XlcI3twNoXjECyWPMjjWsntX0UrZCMyOyrnjeokIT7WQ9KikZT76TZEcQYjGJeGhYpM2fwDEyOm25awsAeEAwF2yzQ0870=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7911
+X-OriginatorOrg: intel.com
 
---000000000000534d2f0615057510
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> -----Original Message-----
+> From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Sent: Friday, March 29, 2024 1:56 PM
+> To: Buvaneswaran, Sujai <sujai.buvaneswaran@intel.com>
+> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Marcin Szyc=
+ik
+> <marcin.szycik@linux.intel.com>; Kubiak, Michal <michal.kubiak@intel.com>
+> Subject: Re: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on =
+all
+> profiles
+>=20
+> On Mon, Mar 25, 2024 at 06:36:56AM +0000, Buvaneswaran, Sujai wrote:
+> > > -----Original Message-----
+> > > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > > Of Michal Swiatkowski
+> > > Sent: Tuesday, March 12, 2024 4:23 PM
+> > > To: intel-wired-lan@lists.osuosl.org
+> > > Cc: netdev@vger.kernel.org; Marcin Szycik
+> > > <marcin.szycik@linux.intel.com>; Kubiak, Michal
+> > > <michal.kubiak@intel.com>; Michal Swiatkowski
+> > > <michal.swiatkowski@linux.intel.com>
+> > > Subject: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on
+> > > all profiles
+> > >
+> > > A simple non-tunnel rule (e.g. matching only on destination MAC) in
+> > > hardware will be hit only if the packet isn't a tunnel. In software
+> > > execution of the same command, the rule will match both tunnel and
+> non-tunnel packets.
+> > >
+> > > Change the hardware behaviour to match tunnel and non-tunnel packets
+> > > in this case. Do this by considering all profiles when adding
+> > > non-tunnel rule (rule not added on tunnel, or not redirecting to tunn=
+el).
+> > >
+> > > Example command:
+> > > tc filter add dev pf0 ingress protocol ip flower skip_sw action mirre=
+d \
+> > > 	egress redirect dev pr0
+> > >
+> > > It should match also tunneled packets, the same as command with
+> > > skip_hw will do in software.
+> > >
+> > > Fixes: 9e300987d4a8 ("ice: VXLAN and Geneve TC support")
+> > > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> > > Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+> > > Signed-off-by: Michal Swiatkowski
+> > > <michal.swiatkowski@linux.intel.com>
+> > > ---
+> > > v1 --> v2:
+> > >  * fix commit message sugested by Marcin
+> > > ---
+> > >  drivers/net/ethernet/intel/ice/ice_tc_lib.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > Hi,
+> >
+> > We are seeing error while adding HW tc rules on PF with the latest net-
+> queue patches. This issue is blocking the validation of latest net-queue
+> Switchdev patches.
+> >
+> > + tc filter add dev ens5f0np0 ingress protocol ip prio 1 flower
+> > + src_mac b4:96:91:9f:65:58 dst_mac 52:54:00:00:16:01 skip_sw action
+> > + mirred egress redirect dev eth0
+> > Error: ice: Unable to add filter due to error.
+> > We have an error talking to the kernel
+> > + tc filter add dev ens5f0np0 ingress protocol ip prio 1 flower
+> > + src_mac b4:96:91:9f:65:58 dst_mac 52:54:00:00:16:02 skip_sw action
+> > + mirred egress redirect dev eth1
+> > Error: ice: Unable to add filter due to error.
+> > We have an error talking to the kernel
+>=20
+> Hi,
+>=20
+> The same command is working fine on my setup. I suspect that it isn't rel=
+ated
+> to this patch. The change is only in command validation, there is no
+> functional changes here that can cause error during adding filters which
+> previously was working fine.
+>=20
+> Can you share more information about the setup? It was the first filter a=
+dded
+> on the PF? Did you do sth else before checking tc?
 
-On Mon, Apr 1, 2024 at 2:36=E2=80=AFPM Parav Pandit <parav@nvidia.com> wrot=
-e:
->
-> Implement get and set for the maximum IO event queues for SF and VF.
-> This enables administrator on the hypervisor to control the maximum
-> IO event queues which are typically used to derive the maximum and
-> default number of net device channels or rdma device completion vectors.
->
-> Signed-off-by: Parav Pandit <parav@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> ---
->  .../mellanox/mlx5/core/esw/devlink_port.c     |  2 +
->  .../net/ethernet/mellanox/mlx5/core/eswitch.h |  7 ++
->  .../mellanox/mlx5/core/eswitch_offloads.c     | 94 +++++++++++++++++++
->  3 files changed, 103 insertions(+)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c b=
-/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-> index d8e739cbcbce..76d1ed93c773 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-> @@ -98,6 +98,8 @@ static const struct devlink_port_ops mlx5_esw_pf_vf_dl_=
-port_ops =3D {
->         .port_fn_ipsec_packet_get =3D mlx5_devlink_port_fn_ipsec_packet_g=
-et,
->         .port_fn_ipsec_packet_set =3D mlx5_devlink_port_fn_ipsec_packet_s=
-et,
->  #endif /* CONFIG_XFRM_OFFLOAD */
-> +       .port_fn_max_io_eqs_get =3D mlx5_devlink_port_fn_max_io_eqs_get,
-> +       .port_fn_max_io_eqs_set =3D mlx5_devlink_port_fn_max_io_eqs_set,
->  };
->
->  static void mlx5_esw_offloads_sf_devlink_port_attrs_set(struct mlx5_eswi=
-tch *esw,
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/=
-net/ethernet/mellanox/mlx5/core/eswitch.h
-> index 349e28a6dd8d..50ce1ea20dd4 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> @@ -573,6 +573,13 @@ int mlx5_devlink_port_fn_ipsec_packet_get(struct dev=
-link_port *port, bool *is_en
->  int mlx5_devlink_port_fn_ipsec_packet_set(struct devlink_port *port, boo=
-l enable,
->                                           struct netlink_ext_ack *extack)=
-;
->  #endif /* CONFIG_XFRM_OFFLOAD */
-> +int mlx5_devlink_port_fn_max_io_eqs_get(struct devlink_port *port,
-> +                                       u32 *max_io_eqs,
-> +                                       struct netlink_ext_ack *extack);
-> +int mlx5_devlink_port_fn_max_io_eqs_set(struct devlink_port *port,
-> +                                       u32 max_io_eqs,
-> +                                       struct netlink_ext_ack *extack);
-> +
->  void *mlx5_eswitch_get_uplink_priv(struct mlx5_eswitch *esw, u8 rep_type=
-);
->
->  int __mlx5_eswitch_set_vport_vlan(struct mlx5_eswitch *esw,
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b=
-/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> index baaae628b0a0..9d9a06a25cac 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> @@ -66,6 +66,8 @@
->
->  #define MLX5_ESW_FT_OFFLOADS_DROP_RULE (1)
->
-> +#define MLX5_ESW_MAX_CTRL_EQS 4
-> +
->  static struct esw_vport_tbl_namespace mlx5_esw_vport_tbl_mirror_ns =3D {
->         .max_fte =3D MLX5_ESW_VPORT_TBL_SIZE,
->         .max_num_groups =3D MLX5_ESW_VPORT_TBL_NUM_GROUPS,
-> @@ -4557,3 +4559,95 @@ int mlx5_devlink_port_fn_ipsec_packet_set(struct d=
-evlink_port *port,
->         return err;
->  }
->  #endif /* CONFIG_XFRM_OFFLOAD */
-> +
-> +int mlx5_devlink_port_fn_max_io_eqs_get(struct devlink_port *port, u32 *=
-max_io_eqs,
-> +                                       struct netlink_ext_ack *extack)
-> +{
-> +       struct mlx5_eswitch *esw =3D mlx5_devlink_eswitch_nocheck_get(por=
-t->devlink);
-> +       struct mlx5_vport *vport =3D mlx5_devlink_port_vport_get(port);
-> +       int query_out_sz =3D MLX5_ST_SZ_BYTES(query_hca_cap_out);
-> +       u16 vport_num =3D vport->vport;
-> +       void *query_ctx;
-> +       void *hca_caps;
-> +       u32 max_eqs;
-> +       int err;
-> +
-> +       if (!MLX5_CAP_GEN(esw->dev, vhca_resource_manager)) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Device doesn't support VHCA m=
-anagement");
-> +               return -EOPNOTSUPP;
-> +       }
-> +
-> +       query_ctx =3D kzalloc(query_out_sz, GFP_KERNEL);
-> +       if (!query_ctx)
-> +               return -ENOMEM;
-> +
-> +       mutex_lock(&esw->state_lock);
-> +       err =3D mlx5_vport_get_other_func_cap(esw->dev, vport_num, query_=
-ctx,
-> +                                           MLX5_CAP_GENERAL);
-> +       if (err) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Failed getting HCA caps");
-> +               goto out;
-> +       }
-> +
-> +       hca_caps =3D MLX5_ADDR_OF(query_hca_cap_out, query_ctx, capabilit=
-y);
-> +       max_eqs =3D MLX5_GET(cmd_hca_cap, hca_caps, max_num_eqs);
-> +       if (max_eqs < MLX5_ESW_MAX_CTRL_EQS)
-> +               *max_io_eqs =3D 0;
-> +       else
-> +               *max_io_eqs =3D max_eqs - MLX5_ESW_MAX_CTRL_EQS;
-> +out:
-[Kalesh]: Missing " kfree(query_ctx);" here?
-> +       mutex_unlock(&esw->state_lock);
-> +       return 0;
-[Kalesh] "return err;" to propagate the error back to the caller?
-> +}
-> +
-> +int mlx5_devlink_port_fn_max_io_eqs_set(struct devlink_port *port, u32 m=
-ax_io_eqs,
-> +                                       struct netlink_ext_ack *extack)
-> +{
-> +       struct mlx5_eswitch *esw =3D mlx5_devlink_eswitch_nocheck_get(por=
-t->devlink);
-> +       struct mlx5_vport *vport =3D mlx5_devlink_port_vport_get(port);
-> +       int query_out_sz =3D MLX5_ST_SZ_BYTES(query_hca_cap_out);
-> +       u16 vport_num =3D vport->vport;
-> +       u16 max_eqs =3D max_io_eqs + MLX5_ESW_MAX_CTRL_EQS;
-> +       void *query_ctx;
-> +       void *hca_caps;
-> +       int err;
-> +
-> +       if (!MLX5_CAP_GEN(esw->dev, vhca_resource_manager)) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Device doesn't support VHCA m=
-anagement");
-> +               return -EOPNOTSUPP;
-> +       }
-> +
-> +       if (max_io_eqs + MLX5_ESW_MAX_CTRL_EQS > USHRT_MAX) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Supplied value out of range")=
-;
-> +               return -EINVAL;
-> +       }
-> +
-> +       mutex_lock(&esw->state_lock);
-> +
-> +       query_ctx =3D kzalloc(query_out_sz, GFP_KERNEL);
-> +       if (!query_ctx) {
-> +               err =3D -ENOMEM;
-> +               goto out;
-> +       }
-> +
-> +       err =3D mlx5_vport_get_other_func_cap(esw->dev, vport_num, query_=
-ctx,
-> +                                           MLX5_CAP_GENERAL);
-> +       if (err) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Failed getting HCA caps");
-> +               goto out_free;
-> +       }
-> +
-> +       hca_caps =3D MLX5_ADDR_OF(query_hca_cap_out, query_ctx, capabilit=
-y);
-> +       MLX5_SET(cmd_hca_cap, hca_caps, max_num_eqs, max_eqs);
-> +
-> +       err =3D mlx5_vport_set_other_func_cap(esw->dev, hca_caps, vport_n=
-um,
-> +                                           MLX5_SET_HCA_CAP_OP_MOD_GENER=
-AL_DEVICE);
-> +       if (err)
-> +               NL_SET_ERR_MSG_MOD(extack, "Failed setting HCA roce cap")=
-;
-> +
-> +out_free:
-> +       kfree(query_ctx);
-> +out:
-> +       mutex_unlock(&esw->state_lock);
-> +       return err;
-> +}
-> --
-> 2.26.2
->
->
+Hi Michal,
+I have used the setup with latest upstream dev-queue kernel and this issue =
+is observed while adding HW tc rules on PF using
+'Script A' from below link.
+https://edc.intel.com/content/www/us/en/design/products/ethernet/appnote-e8=
+10-eswitch-switchdev-mode-config-guide/script-a-switchdev-mode-with-linux-b=
+ridge-configuration/
 
+This issue is reproducible on two of our setups with latest upstream kernel=
+ - 6.9.0-rc1+. Please check and let me know if more information is needed.
 
---=20
-Regards,
-Kalesh A P
-
---000000000000534d2f0615057510
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIBr+DwGEhf2mEP1sbWVt57pjG5ChuZ7udhINsVTBrdCRMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQwMTA5MTcyN1owaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCUs/wwTrsT
-vDJ5wZXkb+f4U6kulIZoK6OQlX/g5unI5etD9RB3iFPChwUMcHMV2wt9fCPZCWSC76zRlFOzNlj2
-GQ8NBGqEcWB/yR4ggw/GTB5B1nUMhMZQEoOng0/vmAkRjnhp+KL63X7Ls9SYCmcrUo0sA99z2qGl
-naUM0VQP3UVITWWAGZgViXzdSX/e04OkZBQQjXPVhxPAQoaB105lKyw6xP/JAD9EwgBkpcR6pGHk
-vy/gXRDJ8cM8vOprAff4luOgoqIr1l572zfCN4g6zMuOdQ1LA5zgLAdg2tpirMf4APE30NV/Y99/
-ln1V7IHfEBGTTRnGQLmvWCYa4A1S
---000000000000534d2f0615057510--
+Thanks,
+Sujai B
+>=20
+> Thanks,
+> Michal
+> >
+> > Thanks,
+> > Sujai B
 
