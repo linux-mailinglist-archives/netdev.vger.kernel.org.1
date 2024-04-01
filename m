@@ -1,213 +1,164 @@
-Return-Path: <netdev+bounces-83817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4B27894668
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:11:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E09A8946B7
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C838F1C21571
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 21:11:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8247F281C19
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 21:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E79954744;
-	Mon,  1 Apr 2024 21:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CA355782;
+	Mon,  1 Apr 2024 21:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="OEW11DWb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xqJlfgFm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD3753E35
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 21:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6586E54F9D
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 21:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712005861; cv=none; b=SnqJXAFFJYwgUu/bBVFE2Cn+WMBuA/LU4CzFLGCn//Uldl92yI6OzVrMFiEZvCoQ1Q1Bmmp7BUKwtys/JbM+6FCcGRxtYwLPhhEEkXCjzMwvLGwTuwB9o02/uhFUMiLokqJcfnpFLIqZYgN1lDq6pBcSOmlUAG7Ca59dxJC7AY0=
+	t=1712008248; cv=none; b=napsiTZbEjcvLVmn9g2APl6DZQT/+Y7tQu8OSsAXuA/8Llxm4qmf+Dkk6ZwLatDQ31x045bgxG/UuHq1WUL+Io0KCsZsn3d4j3dDt8knr7kBp00Eww2FXuG3MzbsFdAGpKTFTIEJOHbUYsaycRclzpLK/3ulBMRJAErmc+btyng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712005861; c=relaxed/simple;
-	bh=5cFw+aKMckvT6un6PhKtWxll1dYTEg/fPHXeIpygFu0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aA4H3kWSN0atBWX8Q+FVCYfdPNyYYUyBvpS9lZ2C+9iIyDdTqvN31+3E0SQ3+K/vC9yLa9HQ5+7NQWiuOZ9EUGqdE8WhncfJLvYgvquAGa6Z4XnIzN33uobfKEZjaBfSWtpdG3zGbVw3CO1jZL+6L+VXQ8N7fwlbeiTCtIqQG+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=OEW11DWb; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1712008248; c=relaxed/simple;
+	bh=LvCBtM2YQSeJABfcqD051PDiGGBI0pmlfrMCxzUoMmE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=a8uVDqT9Eqq5zJiRdK/u0RHiQ1RDQTjH3oIbp+wW5I4KfS0ajlbqpG8Bm3TjxHg2KkvDMyOEEccMRW40fCLsnpJD1mULetmFq9c4BCRSRv+2aHFL9w6CcDua9z+A0cKZ0x0/WiJGJATaupzkZVxMPugbdcMP8qTTTdSUMgJayj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xqJlfgFm; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a4ee41269so82239777b3.0
+        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 14:50:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712005860; x=1743541860;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=w8Li1olECDVm2QJV/gZBZH+lL32Z1MBvK0pFA6Ffk3Q=;
-  b=OEW11DWbbCeIaVWCq2B/CTF6Plntctr9Os0yNSBfTFzYCVksXde9JkbQ
-   6rjUk2tnlXhuf6dW3Rju/ucKciAqVzbd6geb6d50S/ZybBNimyWMM7VgA
-   IePsT523r6pB43nn5NbVqi3f42xYTMtkWxDHC4Yy8GSB4rYFV6t+jr+UE
-   A=;
-X-IronPort-AV: E=Sophos;i="6.07,173,1708387200"; 
-   d="scan'208";a="386826438"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 21:10:54 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:24437]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.83:2525] with esmtp (Farcaster)
- id 88f183ae-5c7f-48de-8046-5afc0e42fb5f; Mon, 1 Apr 2024 21:10:52 +0000 (UTC)
-X-Farcaster-Flow-ID: 88f183ae-5c7f-48de-8046-5afc0e42fb5f
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 1 Apr 2024 21:10:52 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.100.32) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Mon, 1 Apr 2024 21:10:49 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, syzkaller
-	<syzkaller@googlegroups.com>
-Subject: [PATCH v2 net] ipv6: Fix infinite recursion in fib6_dump_done().
-Date: Mon, 1 Apr 2024 14:10:04 -0700
-Message-ID: <20240401211003.25274-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=google.com; s=20230601; t=1712008246; x=1712613046; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XLIDZpDBHrtC9mQGuM4295zuVNtkbE3PLQnEnnfrBMA=;
+        b=xqJlfgFmw8EVSNp5ix6dcbeyrN7dLmOMFe9SHW+OycpRPRgMAHRgN2t5LerU4HRTdT
+         KmTrH+Dk4u2rRCeuRD3GD/R/X6W3ZDBgF95+9kiqJ2I1ulsuINi0c55F0JSK7v0tHOHH
+         5fVHW8PZ4eTjTLqREeHKCeaxxS0GMHCwWtZZ7uCn+j5eCpwkm3Fln1UBQM/YOZrjUNap
+         89LDl067TluOt9qOfbERA1tzFi47zLt0YDEFJU7IY8+QjHQaO2D2X1+rxkjg5/4wV0Fz
+         0BEuUIgSpyjQ73z9thH5OhAUZrxiIFff8QaSdDFXTzxRvVuOjhyDGaxgB+5D/XxdXYzc
+         H5lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712008246; x=1712613046;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XLIDZpDBHrtC9mQGuM4295zuVNtkbE3PLQnEnnfrBMA=;
+        b=PQ5DTf4AM5vOIrhOcvHqF3CyKqXmNiv064ZIBp4cb0C4iH8Xw0Nw+5Dq/OpHIu8XFn
+         Gde8k88Ah7ne2Aar+NToV6JejO0cRJZkDXGcvorXswigisbXLbFbdgP6DY7iI2tFzwPT
+         AiyIQr0UaqkUJSHluuOcUWZZRlFSZvzle8/+SIBij9SwlYRwfww4L3pOpTf/81HQR5We
+         GFk2C44fQshInoEDyo/hWSjSWv8u0pqUI/8Ts8IjzhmoE6A2sQQEN3iaIKRWuwCEeicv
+         VNsr8z9hVFyTEuRWYAz/FiRa8+iJyQQGrSMXMg4Yp+dxrfqos/RI+hnUf8IXMQjuhUB4
+         d47Q==
+X-Gm-Message-State: AOJu0YwN86w11pPookLBRcGSAwQDM/vGZHRvCl/ikKdqCTSr2YdGszNc
+	T+1btwP8Aqro5pob04d3urN+6AVDmyt+pi3bPogg4JCZJbaG6zwOhNRogOLCWE3uTIOqyfhtnmp
+	Ys1DaCftdlWYFnzyNF8rNYmpGVFN1Ek8oT9ZORvGVp9WmMMq416GJfCfjMd4pNjRlxKCH4y4Shf
+	o4GlUfX9eToxPO8xhmZxOwBwBhZh996luexFRx/qU4No6wEZFKsQNDmirdPoo=
+X-Google-Smtp-Source: AGHT+IHruwWq4JyI/hLsIFHmVo+4Qge4gKmr6iKc/6xRaXQRVz5Jk7BCEwSZk+LRAFeal/Y+Ugr7hvswKysh+BY5+Q==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:b337:405b:46e7:9bd9])
+ (user=almasrymina job=sendgmr) by 2002:a05:6902:2503:b0:dc9:c54e:c5eb with
+ SMTP id dt3-20020a056902250300b00dc9c54ec5ebmr3429870ybb.7.1712008246111;
+ Mon, 01 Apr 2024 14:50:46 -0700 (PDT)
+Date: Mon,  1 Apr 2024 14:50:36 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240401215042.1877541-1-almasrymina@google.com>
+Subject: [PATCH net-next v3 0/3] Minor cleanups to skb frag ref/unref
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Ayush Sawal <ayush.sawal@chelsio.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger <stephen@networkplumber.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Boris Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, 
+	Dragos Tatulea <dtatulea@nvidia.com>, Maxim Mikityanskiy <maxtram95@gmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, 
+	"=?UTF-8?q?Ahelenia=20Ziemia=C5=84ska?=" <nabijaczleweli@nabijaczleweli.xyz>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, David Howells <dhowells@redhat.com>, 
+	Florian Westphal <fw@strlen.de>, Aleksander Lobakin <aleksander.lobakin@intel.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Johannes Berg <johannes.berg@intel.com>, 
+	Liang Chen <liangchen.linux@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-syzkaller reported infinite recursive calls of fib6_dump_done() during
-netlink socket destruction.  [1]
+v3:
+- Fixed patchwork build errors/warnings from patch-by-patch modallconfig
+  build
 
-From the log, syzkaller sent an AF_UNSPEC RTM_GETROUTE message, and then
-the response was generated.  The following recvmmsg() resumed the dump
-for IPv6, but the first call of inet6_dump_fib() failed at kzalloc() due
-to the fault injection.  [0]
+v2:
+- Removed RFC tag.
+- Rebased on net-next after the merge window opening.
+- Added 1 patch at the beginning, "net: make napi_frag_unref reuse
+  skb_page_unref" because a recent patch introduced some code
+  duplication that can also be improved.
+- Addressed feedback from Dragos & Yunsheng.
+- Added Dragos's Reviewed-by.
 
-  12:01:34 executing program 3:
-  r0 = socket$nl_route(0x10, 0x3, 0x0)
-  sendmsg$nl_route(r0, ... snip ...)
-  recvmmsg(r0, ... snip ...) (fail_nth: 8)
+This series is largely motivated by a recent discussion where there was
+some confusion on how to properly ref/unref pp pages vs non pp pages:
 
-Here, fib6_dump_done() was set to nlk_sk(sk)->cb.done, and the next call
-of inet6_dump_fib() set it to nlk_sk(sk)->cb.args[3].  syzkaller stopped
-receiving the response halfway through, and finally netlink_sock_destruct()
-called nlk_sk(sk)->cb.done().
+https://lore.kernel.org/netdev/CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com/T/#t
 
-fib6_dump_done() calls fib6_dump_end() and nlk_sk(sk)->cb.done() if it
-is still not NULL.  fib6_dump_end() rewrites nlk_sk(sk)->cb.done() by
-nlk_sk(sk)->cb.args[3], but it has the same function, not NULL, calling
-itself recursively and hitting the stack guard page.
+There is some subtely there because pp uses page->pp_ref_count for
+refcounting, while non-pp uses get_page()/put_page() for ref counting.
+Getting the refcounting pairs wrong can lead to kernel crash.
 
-To avoid the issue, let's set the destructor after kzalloc().
+Additionally currently it may not be obvious to skb users unaware of
+page pool internals how to properly acquire a ref on a pp frag. It
+requires checking of skb->pp_recycle & is_pp_page() to make the correct
+calls and may require some handling at the call site aware of arguable pp
+internals.
 
-[0]:
-FAULT_INJECTION: forcing a failure.
-name failslab, interval 1, probability 0, space 0, times 0
-CPU: 1 PID: 432110 Comm: syz-executor.3 Not tainted 6.8.0-12821-g537c2e91d354-dirty #11
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl (lib/dump_stack.c:117)
- should_fail_ex (lib/fault-inject.c:52 lib/fault-inject.c:153)
- should_failslab (mm/slub.c:3733)
- kmalloc_trace (mm/slub.c:3748 mm/slub.c:3827 mm/slub.c:3992)
- inet6_dump_fib (./include/linux/slab.h:628 ./include/linux/slab.h:749 net/ipv6/ip6_fib.c:662)
- rtnl_dump_all (net/core/rtnetlink.c:4029)
- netlink_dump (net/netlink/af_netlink.c:2269)
- netlink_recvmsg (net/netlink/af_netlink.c:1988)
- ____sys_recvmsg (net/socket.c:1046 net/socket.c:2801)
- ___sys_recvmsg (net/socket.c:2846)
- do_recvmmsg (net/socket.c:2943)
- __x64_sys_recvmmsg (net/socket.c:3041 net/socket.c:3034 net/socket.c:3034)
+This series is a minor refactor with a couple of goals:
 
-[1]:
-BUG: TASK stack guard page was hit at 00000000f2fa9af1 (stack is 00000000b7912430..000000009a436beb)
-stack guard page: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 223719 Comm: kworker/1:3 Not tainted 6.8.0-12821-g537c2e91d354-dirty #11
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-Workqueue: events netlink_sock_destruct_work
-RIP: 0010:fib6_dump_done (net/ipv6/ip6_fib.c:570)
-Code: 3c 24 e8 f3 e9 51 fd e9 28 fd ff ff 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 41 57 41 56 41 55 41 54 55 48 89 fd <53> 48 8d 5d 60 e8 b6 4d 07 fd 48 89 da 48 b8 00 00 00 00 00 fc ff
-RSP: 0018:ffffc9000d980000 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffffffff84405990 RCX: ffffffff844059d3
-RDX: ffff8881028e0000 RSI: ffffffff84405ac2 RDI: ffff88810c02f358
-RBP: ffff88810c02f358 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000224 R12: 0000000000000000
-R13: ffff888007c82c78 R14: ffff888007c82c68 R15: ffff888007c82c68
-FS:  0000000000000000(0000) GS:ffff88811b100000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffc9000d97fff8 CR3: 0000000102309002 CR4: 0000000000770ef0
-PKRU: 55555554
-Call Trace:
- <#DF>
- </#DF>
- <TASK>
- fib6_dump_done (net/ipv6/ip6_fib.c:572 (discriminator 1))
- fib6_dump_done (net/ipv6/ip6_fib.c:572 (discriminator 1))
- ...
- fib6_dump_done (net/ipv6/ip6_fib.c:572 (discriminator 1))
- fib6_dump_done (net/ipv6/ip6_fib.c:572 (discriminator 1))
- netlink_sock_destruct (net/netlink/af_netlink.c:401)
- __sk_destruct (net/core/sock.c:2177 (discriminator 2))
- sk_destruct (net/core/sock.c:2224)
- __sk_free (net/core/sock.c:2235)
- sk_free (net/core/sock.c:2246)
- process_one_work (kernel/workqueue.c:3259)
- worker_thread (kernel/workqueue.c:3329 kernel/workqueue.c:3416)
- kthread (kernel/kthread.c:388)
- ret_from_fork (arch/x86/kernel/process.c:153)
- ret_from_fork_asm (arch/x86/entry/entry_64.S:256)
-Modules linked in:
+1. skb users should be able to ref/unref a frag using
+   [__]skb_frag_[un]ref() functions without needing to understand pp
+   concepts and pp_ref_count vs get/put_page() differences.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
-Conflict with:
-https://lore.kernel.org/netdev/20240329183053.644630-1-edumazet@google.com/
+2. reference counting functions should have a mirror opposite. I.e. there
+   should be a foo_unref() to every foo_ref() with a mirror opposite
+   implementation (as much as possible).
 
-Changes:
-  v2: Removed the garbage in the head of description
-  v1: https://lore.kernel.org/netdev/20240401205020.22723-1-kuniyu@amazon.com/
----
- net/ipv6/ip6_fib.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+This is RFC to collect feedback if this change is desirable, but also so
+that I don't race with the fix for the issue Dragos is seeing for his
+crash.
 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 5c558dc1c683..7209419cfb0e 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -651,19 +651,19 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 	if (!w) {
- 		/* New dump:
- 		 *
--		 * 1. hook callback destructor.
--		 */
--		cb->args[3] = (long)cb->done;
--		cb->done = fib6_dump_done;
--
--		/*
--		 * 2. allocate and initialize walker.
-+		 * 1. allocate and initialize walker.
- 		 */
- 		w = kzalloc(sizeof(*w), GFP_ATOMIC);
- 		if (!w)
- 			return -ENOMEM;
- 		w->func = fib6_dump_node;
- 		cb->args[2] = (long)w;
-+
-+		/* 2. hook callback destructor.
-+		 */
-+		cb->args[3] = (long)cb->done;
-+		cb->done = fib6_dump_done;
-+
- 	}
- 
- 	arg.skb = skb;
+https://lore.kernel.org/lkml/CAHS8izN436pn3SndrzsCyhmqvJHLyxgCeDpWXA4r1ANt3RCDLQ@mail.gmail.com/T/
+
+Cc: Dragos Tatulea <dtatulea@nvidia.com>
+
+Mina Almasry (3):
+  net: make napi_frag_unref reuse skb_page_unref
+  net: mirror skb frag ref/unref helpers
+  net: remove napi_frag_unref
+
+ .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c |  2 +-
+ drivers/net/ethernet/marvell/sky2.c           |  2 +-
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c    |  2 +-
+ drivers/net/ethernet/sun/cassini.c            |  4 +-
+ drivers/net/veth.c                            |  2 +-
+ include/linux/skbuff.h                        | 44 +++++++-------
+ net/core/skbuff.c                             | 58 ++++++-------------
+ net/ipv4/esp4.c                               |  2 +-
+ net/ipv6/esp6.c                               |  2 +-
+ net/tls/tls_device.c                          |  2 +-
+ net/tls/tls_device_fallback.c                 |  2 +-
+ net/tls/tls_strp.c                            |  2 +-
+ 12 files changed, 54 insertions(+), 70 deletions(-)
+
 -- 
-2.30.2
+2.44.0.478.gd926399ef9-goog
 
 
