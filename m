@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-83769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED944893C86
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 17:03:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A15893CC8
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 17:21:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DD4B1F22414
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 15:03:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66DC11F22244
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 15:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704B94502B;
-	Mon,  1 Apr 2024 15:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37ABB45BF9;
+	Mon,  1 Apr 2024 15:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nu30xVjt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fg5ZiGTn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA9F4501C
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 15:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C344AECF;
+	Mon,  1 Apr 2024 15:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711983797; cv=none; b=WPkeIVwJSNGOoDtfGkRlavxtSxejETyjG8HcfVtI/iqoMA1nsx7huoK9g54xVMUpeMlpDUZEE0tlzymUPd9m2rPDiYO2LM7ihockpsMUkd34gjtEAKdIg0pp9o9VuZtX0MfKs6FwceY1REALOBKSnoUHjfpT8DsCC4Ja7CODTF0=
+	t=1711984861; cv=none; b=LJfUwPRhG2oGlq+1RC721rqrELoqzc10mFDSKSh/4xPU2ik5i2iWtRstDII2q+/VawE26Uiaetf71w4yyocfT0T0k/WG+BrLzF4dc1Lp/2m9AwSD+TSNwiXcOrrm8duGXwzU0waCUQu8QoiWC47+MiHABL2uzzd7Q8aQoWbC+2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711983797; c=relaxed/simple;
-	bh=kiOJAYp7gp5kQYKKLzbkNIKsend0a8KCs6fakv2C1ug=;
+	s=arc-20240116; t=1711984861; c=relaxed/simple;
+	bh=ZBiBE3qZkHMm5Z23/govMm0X9TLV1iM7mEWgmk1P+oU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mko/CJ1xWJP2nXuQfiMmsDzcnVZM2dLkXZzvgDNjRJqOK57myWBfXEd7wINjslL/31iXHZLyt5se9Qf+dM3/36hzCG1I5hOdEGzzJIdGBx1Qw02FCvOJnYaFSD/OclwNzKoAhcrO5gC0ASbvLEcrClzJHaeG1i9Js57GNCSkVM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nu30xVjt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 592CFC433F1;
-	Mon,  1 Apr 2024 15:03:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=AcYJbAI+ndsmzJ1PTcHkdkL+WQAKwXPxktbH9JKxR7NgkQGb6jkgLPXiblc0W9yRBhzvKWP0+hJ+JsA8nRzST+hRu7Oylo31nYw71oooqBMt3OLdvO/VzOkBA3sXEbFokRi1FkAjQyPRUefEvdgKt9DScChMHNu+glvwoDcb+i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fg5ZiGTn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED925C433F1;
+	Mon,  1 Apr 2024 15:20:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711983796;
-	bh=kiOJAYp7gp5kQYKKLzbkNIKsend0a8KCs6fakv2C1ug=;
+	s=k20201202; t=1711984860;
+	bh=ZBiBE3qZkHMm5Z23/govMm0X9TLV1iM7mEWgmk1P+oU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nu30xVjttwvQBfIXgabyWStlopbuNZ9J1HpEmeE4GHr4fUqhM74jMBE9SDD+B3JN5
-	 vutrnClFHz8QvDWpwboAn4teOyDPBtvk3RrI7t1GhnDjzmALyRspT2/8Bh/4S5Ao8T
-	 e0cH1SifVthCpdmS4zvg+PiGGYBUCB7rGBINMRFouVxQJSAQKSHovu0nacXX7qy/cG
-	 dRwIEoQ1i9x9y+IwyqilDnCCb2eWADuSQuZAaLS94XXQAgwJJYxJ8Cdef2a5j1voj2
-	 qPLBKZ/NX6T7gN3+Dos9gDsKLzc4oWuB2Sf+dth6intY+I9ULjuZtmnbUBLmLDv9BT
-	 w5+BmCWh550Cg==
-Date: Mon, 1 Apr 2024 08:03:15 -0700
+	b=fg5ZiGTnwlWG59PKdduv+jm4pSBi8QM4G2Ox8yiViz/oWewJH5UFDzxvoxjcsmEYD
+	 pfUV3qkXIQW2Wgmb4vUz4L9E+SbduzgENEqefxfLzhRiTFXMsVSvYVmHsECK8jm3td
+	 nY5Ot3wf05bG59/VOI8568Rk3RPD309vB8RcTtEBhMJIwYdmbvwUnZUqQP/96ojCOz
+	 xi+zHt9sEuuwr8ZT/uTO/xh5J+84+71XEjmwhf7pVtxkPqMZIzFijlgVFLfyJ5TVyR
+	 JZHNlktj75gRwnYciOqFeq6WvxOkHX3cHX6TxpAtDTl+Hl1C6I/MWyx8hb302+tmqf
+	 spggwy8/Rj3MQ==
+Date: Mon, 1 Apr 2024 08:20:59 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Saeed Mahameed
- <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Aya Levin
- <ayal@nvidia.com>
-Subject: Re: [PATCH net-next 5/8] net/mlx5e: Expose the VF/SF RX drop
- counter on the representor
-Message-ID: <20240401080315.0e96850e@kernel.org>
-In-Reply-To: <e32e34b7-df22-4ff8-a2e4-04e2caaf489f@gmail.com>
-References: <20240326222022.27926-1-tariqt@nvidia.com>
-	<20240326222022.27926-6-tariqt@nvidia.com>
-	<20240328111831.GA403975@kernel.org>
-	<20240328092132.47877242@kernel.org>
-	<e32e34b7-df22-4ff8-a2e4-04e2caaf489f@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Breno Leitao <leitao@debian.org>, hengqi@linux.alibaba.com,
+ xuanzhuo@linux.alibaba.com, Jason Wang <jasowang@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Andrew Melnychenko <andrew@daynix.com>,
+ rbc@meta.com, riel@surriel.com, stable@vger.kernel.org,
+ qemu-devel@nongnu.org, "open list:VIRTIO CORE AND NET DRIVERS"
+ <virtualization@lists.linux.dev>, "open list:NETWORKING DRIVERS"
+ <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v3] virtio_net: Do not send RSS key if it is not
+ supported
+Message-ID: <20240401082059.77df2ff0@kernel.org>
+In-Reply-To: <20240331160618-mutt-send-email-mst@kernel.org>
+References: <20240329171641.366520-1-leitao@debian.org>
+	<20240331160618-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,27 +67,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 31 Mar 2024 21:52:06 +0300 Tariq Toukan wrote:
-> >> Hi Carolina and Tariq,
-> >>
-> >> I am wondering if any consideration was given to making this
-> >> a generic counter. Buffer exhaustion sounds like something that
-> >> other NICs may report too.  
-> > 
-> > I think it's basically rx_missed_errors from rtnl_link_stats64.
-> > mlx5 doesn't currently report it at all, AFAICT.
+On Sun, 31 Mar 2024 16:20:30 -0400 Michael S. Tsirkin wrote:
+> > Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
+> > Cc: stable@vger.kernel.org  
 > 
-> We expose it in ethtool stats.
-> Note that the "local" RX buffer exhaustion counter exists for a long time.
-> 
-> Here we introduce in the representor kind of a "remote" version of the 
-> counter, to help providers monitor RX drops that occur in the customers' 
-> side.
-> 
-> It follows the local counter hence currently it is not generic.
+> net has its own stable process, don't CC stable on net patches.
 
-I thought you'd say that, but we can't apply the rules selectively.
-Everyone has "local" counters already when we add the generic ones.
-Especially when we start broadening the "have" to encompass other
-generations of HW / netdev instance types.
+Not any more, FWIW:
+
+  1.5.7. Stable tree
+
+  While it used to be the case that netdev submissions were not
+  supposed to carry explicit CC: stable@vger.kernel.org tags that is no
+  longer the case today. Please follow the standard stable rules in
+  Documentation/process/stable-kernel-rules.rst, and make sure you
+  include appropriate Fixes tags!
+
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#stable-tree
 
