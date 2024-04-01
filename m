@@ -1,372 +1,187 @@
-Return-Path: <netdev+bounces-83728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 249F4893909
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 10:39:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D849B89393A
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 11:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2B771F214B4
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 08:39:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FAF71F21ABE
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 09:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E65BA49;
-	Mon,  1 Apr 2024 08:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFB8FBF7;
+	Mon,  1 Apr 2024 09:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="rkQF+VlW"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sO5llBTk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2067.outbound.protection.outlook.com [40.107.243.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D832F3A;
-	Mon,  1 Apr 2024 08:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5A6FC08;
+	Mon,  1 Apr 2024 09:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711960740; cv=fail; b=R9mVXzwj5pkC1OVjmiJfTt5f6nAC14iomrDIqa3t4BnF93XFqRd0+EKyp2+ylMlps2tjIffwjNOyYhDDEJbCq/Vud1tqxGDDlvFMB6SPt2fWkwYS1BIEzhy0lPGKwtwUQhxvcaykHRGGG7Q998dv4jIKRmM8rW9dmCI3+RsHS04=
+	t=1711962368; cv=fail; b=HjwaqLst8Se+dqOK6O6w0I/APkYfMrCWwE95DHK6yI5cJAVDDlsuDjbIg/uw6mH+ZGGs1kM8PSHFA1MnrJIRIY8ph5cFJJJtpPx3EFJZbBl5EmqhBz2po6kvwxYB/mJypJXd2Qt4c0zNbmXvQPNxxn0M2nkwCALotUcijg9gkYc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711960740; c=relaxed/simple;
-	bh=PUIbA9BOPm7Q+N+WIq/+7JOhTXf7Yqvge5eHH6BUdLk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eKwV++9hlzSfHJSQN4vRJWB0kMdXk2UpsKj1JHC6DY6YNtWVBUQy77Iltj/a28j6XJ9gUooQUJrK40TqNdvYIJt+B7jZqdz4Ri1Up3L9pLRSFu+2QaNhViVw5NJ07qWRBb4hSwARv6p3c6XR2pZSUPhsTVinE7cUgjDGh4fJmwI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=rkQF+VlW; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4318D9Kh003499;
-	Mon, 1 Apr 2024 01:38:50 -0700
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3x7kkcguwe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Apr 2024 01:38:50 -0700 (PDT)
+	s=arc-20240116; t=1711962368; c=relaxed/simple;
+	bh=3RQhNvI/a+/G/CNiwQT9BUomL9k1rJaJNPucEigaXKg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ewfoB2nRVVMTawHjyG7s9txowPSJN/B8BYp1wYUxI+Mx/gCq77K9+msOKzhQVcj046b8KrwDPofnjycXAYBRp3n55GVcdDgFStn+DQJLbW0s50cV2LpbojFSO2/p5r6CL5TKVfGGdkdVT7yg44i/8Kuh9aNp6DI3o0uc2oromKs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sO5llBTk; arc=fail smtp.client-ip=40.107.243.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JdTOuAIXTPBI1AUP8VmyU6NBd3k7nlpAbFaJzF60trOCNC0T7gX0P0PZD+gvrSIOLhUoVjlA78g4pWd3uOdCdKaZgJXEMKreHDC/qdn4cJMWLNShEc6FLsKIBzKEM4J+fnunPY/s7u3NVGpIPhCnXAKXJMmksFISSvQy5pp39cGJyEQ9dnxA00b2Kch406otuy0m5EFoOiPIutT135wS3KqclhK6Dfe16Z0Oa59HC5KmuAORYE+7A5Fux42Yw5WqpgD3bbcwr/nnky1rAWg6kq3Dcxsor3LP/EH/dDBMRKpk5d4MgZ4xrAIrLOavr0OqC4z9UHayWvd+tuP274rsBA==
+ b=gye/UyrHBLGuWAm8dlLaXzs3TnDU50g9W2dYCrRmG37ytBX6m6SEL8gXDz7UHHCsVplylwe/w3GWBElcIk8vmiwUOL4t3z8MkIJp4E0WiaPm1iKLospljMrdIj4dA1UTVIwF2m9NRZ8yzAkoY67NP2zf4bv5vjzXKyWUIATtBXE7e02HGR66q1TwrpTuDIt2dyHYbfwhmM/Tg6WUjreDecpxxfamX6niePpNzQ74ejKZuPvzvgceH8+0dntLIhblVF8XLiI+rFxvqGjX0h6K8Z3VPRk8ZdhjaAdhbV78504Upmbuy1x7+5PM258efoq6i1USN+cl6km+TGInEidlGg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QWK4O9pzEHr+EDNTx5EvJlr2ck4BVNQVhpABG2ecaMQ=;
- b=nZJ59L/Wl/K9OzRkK5V+sypjaLZ3fU1AxJP07IKVGF9DJC/rkZ2OfYgW07OJeu2fjJ7Qo+CeDOrHeLC3+QX5/+RoYbEXFio2FdZYytAwAJCIdnuO3ozdwzYEjbqpzucpwqDpEuue8VxrqNFZLAnWwJx4T9nXyDDkm3f2kFtR1OgPPy00zdMFVjjdufq1QdG1+HqWzGfdDkiSfCLUj92B3hNcG9oZKP/ZdvGHIbYqiO5BbJ7GKbK/ERZ6HnmlwXK8z5Z2kuDPtYAe0lKmDAgMe5Js7b9GXEcuE7+gmjczz6KpbUBLxxak3PBkc0wOxYhrRHbWdPL26LwbcBy/iggWUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
+ bh=rjwbf5IO4kJkSBaQDg53aNMfV/fKVVhUlHFeOxuF4AQ=;
+ b=lQKrXOGbq/lDYvVsDrCQz+Mm4Uz3ElRhSfKB2HWGRDCDob+QgLNMgqvbFVTWl/KTzF5oFRTHiGHCKeodICpDxSB3644ef4HLaFoC8UfHvC/Jfuoq74dRhKanAA1wVThiwpNO9O/VQqbTxiLD4iG1z8ypguxphI9OTZ6181bopF8HQ93YXV5RrbaXtPBFMgVigFe8n6YNcbdccgpqur2OdLBsVXDZbWhbepBVbHVaJ2Z8XVEb4xciN5Zsk3hdjGlLBZzDEs12vxU4PHnEQ+DLV9AX4D4GsHKipAGzMFtt9Lg+KiKFhwfX04fIGqPSYDC0HTssadUs2Jqrx88YZn6eLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QWK4O9pzEHr+EDNTx5EvJlr2ck4BVNQVhpABG2ecaMQ=;
- b=rkQF+VlWKHzXLH8gRvEe8yLWvC8RAvWyEhu+0jGEfCAMjWC+hJ98EwaOBZHMLhsiwCL6NjaeouKxuQmLogTQpdjIkLofR1IP5xP/kKpMsqU/QwFIBdfuhk20oO8wUCb9J32lrRNygaYraN4mb0OSil57oMoCUGqYmkMYTnMDesg=
-Received: from PH0PR18MB4474.namprd18.prod.outlook.com (2603:10b6:510:ea::22)
- by CO1PR18MB4809.namprd18.prod.outlook.com (2603:10b6:303:ec::6) with
+ bh=rjwbf5IO4kJkSBaQDg53aNMfV/fKVVhUlHFeOxuF4AQ=;
+ b=sO5llBTkQ+uzMDIA045xcDrSstEDnfv0VBLtpgiSJLClKOmuLJnz+NY3ZfLl94bvLIvzXyxbtIdz/UgJrWPeqHuH/4dcIIiIqVyTHZczuqiTujB9BWuRiqje/qOUg8l/sIuwLV7ix3qeLY3l4/fSBm+TLr+RuqsirKIjfXI33t+V3jZPt83q8MA6NIsMwKaTou/0OFvVmO2hz3rMOsK/dYpiH/4pWIsiUFkYAf8aaHBE6f/Yk9YCbKMi9JKiSj886YHHFsqU89yu7vc+W6YnmBky4+c4WjNqjaIQd0KIaulQwIDGZK9/MHqvs8RJC/HVfY8DFa16vG6hFp6ifmTXCA==
+Received: from SJ0PR03CA0387.namprd03.prod.outlook.com (2603:10b6:a03:3a1::32)
+ by MW6PR12MB8898.namprd12.prod.outlook.com (2603:10b6:303:246::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 1 Apr
- 2024 08:38:46 +0000
-Received: from PH0PR18MB4474.namprd18.prod.outlook.com
- ([fe80::d068:f07:a59b:eb2f]) by PH0PR18MB4474.namprd18.prod.outlook.com
- ([fe80::d068:f07:a59b:eb2f%6]) with mapi id 15.20.7409.042; Mon, 1 Apr 2024
- 08:38:46 +0000
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula <gakula@marvell.com>,
-        Jerin Jacob <jerinj@marvell.com>, Linu Cherian <lcherian@marvell.com>,
-        Subbaraya Sundeep Bhatta
-	<sbhatta@marvell.com>,
-        Naveen Mamindlapalli <naveenm@marvell.com>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com"
-	<pabeni@redhat.com>
-Subject: ] Re: [net-next Patch] octeontx2-af: map management port always to
- first PF
-Thread-Topic: ] Re: [net-next Patch] octeontx2-af: map management port always
- to first PF
-Thread-Index: AQHahBADL0TiP64nPEWg/DZao7Q9dg==
-Date: Mon, 1 Apr 2024 08:38:46 +0000
-Message-ID: 
- <PH0PR18MB4474061FA888A03A74CE2D5DDE3F2@PH0PR18MB4474.namprd18.prod.outlook.com>
-References: <20240327160348.3023-1-hkelam@marvell.com>
- <20240328145819.GN403975@kernel.org>
-In-Reply-To: <20240328145819.GN403975@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR18MB4474:EE_|CO1PR18MB4809:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- 5DIpk5/oB27e+nh2QEjByO418s7V/hcq3XeCKzi9aYt1Ik5S5H/0hY9apZ9Pr6apO/gWKGchNLE03ya5cXuk+RtjuBcH/evSfIqyQn0BtUCD2WA6+KwKamSP+h1CObZQd6rdN4oq4UlkhHwyWQ3uXUfKy2vtos2xGCUIgLVmYQosrdhPOFs7fDXMJa8de1h9ylaQWzSsfcxP4bvN+7dKkKGN41sJHp0pg4QZpijH82dOXoyNj+1QSZXyaryfqAlcezdUHsa5e/+QBcL7UvvqwdS2jFc9vKaSiEVRvckMKjPaKH+XM2NqNq8IL4sMk8A1Ur64HusnecMZgQwU7tT6LXxqVt5UI1fwUxh9zKmCWpPKS1ZzrkVLqlq/725EuWQ0NealzW4WGB0g8T9oi/bgpfkt2lN8SQmhvv62rkOmjvnFALbV5fr3ow3Env8luDF+Q9JmZS7iSRMcukhXvs69mEjf6DtAFhfBytl6Nb5OLCg4O508Lr+0rg/otYBWPHYLPAghv0BodwwYBVp/oHPG4ySF/RRx9XU33B0cKadzPGUx7daPUybq5bL/zynVfqB7dP+MUJv2czOIikTSLIBMIL5IJ7dPZJJhsZdGKHcfcJHr4MmtMppOBwdV4CFMPGcZI9Q2UR+YZ2SBykzR2uldvOe5sSGH3tUEDzjQlnpTY4g=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4474.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?pnuW7mZu2mn0zQKwR4gfQdPKWYlNvDS9RFIcrgmEYqnI2Yt9UGPaXgKXurkI?=
- =?us-ascii?Q?HRHnV2hHyOjXmef9iru9u/h82bEqhKZknuvC5P/HxxzhQS3N1jkFJhAuds1H?=
- =?us-ascii?Q?ByAl41hZd/eIqYo4N+hs4ZJZumvNV4XGK7pYHFCfeRUnprXEHuN+GmgjEo2N?=
- =?us-ascii?Q?8xJ1T+/kWyKJR2nPJ9FxhSKsU2k56OH8hksAb8DveAiELB921iyIabySEoBl?=
- =?us-ascii?Q?p1qHzhEH7WQZRTikcSQIBUA+J8NtpTArXgvSgWVLlB2v4JF0TODyOWCMIrbY?=
- =?us-ascii?Q?WYbK3CKq/D0vhQim4DKJc7+GCLZI0lrs5bcrKeCxkNQcSJkOginATZ+QpcNm?=
- =?us-ascii?Q?GdNDMUqUEYxkB6hlneHcOw2BWdx65MtY+3vQKIvskde0qGke556E1+9RGQIB?=
- =?us-ascii?Q?zY36vBfDiC9gvD+KBAUYKTOTfBaZXZo2XawWh2QEweP6Qnedmed5phghXlzI?=
- =?us-ascii?Q?TJQx8FKVkWkXIstc/Z5Qhg6BhWKdog8pXtcYn4poG1OKgnqo6HDhBJj6ggsF?=
- =?us-ascii?Q?GDUVCEJCD1qUGJctNqpSnCMzVlCwHUkRk+EGRsyI4hCz+vJ2Q0of9iKpH27k?=
- =?us-ascii?Q?Bko6/nKPc+4ZMSzrtEyw0pqnme7LMLy0Tqv7j/zTMvciFoEyKLi3DB713h1e?=
- =?us-ascii?Q?m2NV0HHaZWPrOPx299Hde2Np/NNK3vvF5WrF9twNIizvUMtV4g5t2EzcwSoA?=
- =?us-ascii?Q?lWYV32qpP6SsOo6MRl9p7GyOshXdZ6IYcYR3i18tOkireFtRh8phA3GTqOCj?=
- =?us-ascii?Q?OnnXiJk18Lysr6AC3+sAg8Y1OmEalqvtuals2hKPjSIKKFdRtGCE0ZT0g2EY?=
- =?us-ascii?Q?8wQqqLgdZjZqX1ejisQeuv7m/Koh/enbXwR718sq+dCz9So3hZxI9cU+8Jqn?=
- =?us-ascii?Q?NgJuXMcyLLI0pK2SUfUxLTLi+uV+D7YE1uvxuKbxQn+VHzSwoijHotTHppHv?=
- =?us-ascii?Q?MYZAaS7b1F4+gnHndpQ0ZQaql7ButQV+7UihJ066ngtjPeCtl3gNKeNHdtOT?=
- =?us-ascii?Q?7Df1A+fI6S8wneATzcmKU6MEq+OPxuDawn/vdJeHzrVWS/W4O9jPQyxzbEcq?=
- =?us-ascii?Q?5cNefSuf/TI1dP+cL40mPy02CmUWeClArx5gOeM8PwA+3tKQRXoWsk3XDU/k?=
- =?us-ascii?Q?UftWbs98fZMgsyMgzzDcZ2P+zaSSE1Nu6hf3DrMiK/35D9jQE2CYfI4VdLQP?=
- =?us-ascii?Q?pUyZB1HNOfK0Rb4ZaK39BWjR8tqbRr2JYEkqaNv4wCSmMEz573SctFtGz0Bz?=
- =?us-ascii?Q?6J4KVSMG9cunvUeC9MPMOKorfkpKao7S26tbfnW6P7VhKCtdyaOEbli/td60?=
- =?us-ascii?Q?UAqonhfFz1t9d0b3sYhjKhfHCKisMe2fQP3x4YOYh/c8oYq6QLR6PpOa1iN8?=
- =?us-ascii?Q?UB3eQQXjzLF5ofpFXtfU7Rj5AyCfL06/IQldsOa8Gs5N28SV4D8fK3SgGR0C?=
- =?us-ascii?Q?IdX+gOTuEiOjxaeZAMcI3MC/BvVpx0Jb9/Q0smq5O5Ng+5vKFCfRN3zYOx0y?=
- =?us-ascii?Q?6XCu34SWDmnBKoZxGcHvEymoRoWfPEa2MeifMVya4KdRerC3EgXUT97GhhCt?=
- =?us-ascii?Q?ZSJbt/ZHXNCIc7Ee2d4=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 2024 09:06:03 +0000
+Received: from SJ1PEPF00001CDC.namprd05.prod.outlook.com
+ (2603:10b6:a03:3a1:cafe::6) by SJ0PR03CA0387.outlook.office365.com
+ (2603:10b6:a03:3a1::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.43 via Frontend
+ Transport; Mon, 1 Apr 2024 09:06:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ1PEPF00001CDC.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Mon, 1 Apr 2024 09:06:03 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 1 Apr 2024
+ 02:05:50 -0700
+Received: from sw-mtx-036.mtx.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Mon, 1 Apr 2024 02:05:48 -0700
+From: Parav Pandit <parav@nvidia.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <corbet@lwn.net>
+CC: <saeedm@nvidia.com>, <leon@kernel.org>, <jiri@resnulli.us>,
+	<shayd@nvidia.com>, <danielj@nvidia.com>, <dchumak@nvidia.com>,
+	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>, Parav Pandit
+	<parav@nvidia.com>
+Subject: [net-next 0/2] devlink: Add port function attribute for IO EQs
+Date: Mon, 1 Apr 2024 12:05:29 +0300
+Message-ID: <20240401090531.574575-1-parav@nvidia.com>
+X-Mailer: git-send-email 2.26.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4474.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 883dfa61-47d1-4179-49f1-08dc52272584
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Apr 2024 08:38:46.6123
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDC:EE_|MW6PR12MB8898:EE_
+X-MS-Office365-Filtering-Correlation-Id: d675bd8a-b0f6-4350-0455-08dc522af4fb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	UeEj6/IwRd0Z1xjNR0UzVUSaTHOL7hInLFwUHYTQ+oJJiM/gfYye/LoRAd5/UE2nPQYHNB+J35cP2jevOti8qqgVgG7NyeILhKbHlvHwkerqLaiBOMGzI5RjJ37TLZahZd6E5M2/TBN6iBcVsb6l6kpaCeM5PlI05yaCRt9Z9ny7GiccgGRfV/ca34Y0Wy9AjBlL3UzyvWetOkTwSPaYxGfFKgV1o7OMHvXQHsBWiU1G4opeB9G2ujgA1GSbBcqwOn0UCQe/ltoEyTdVtJdPZi0ux4kQ+DzBj7WFl4ECUvskBoPOB9lRhQMwfTfrY8ooZ9V8Df69AaH25owtY001DdpnSWxeSs2f2nAx18L/DN4WXBpRgj0j5e1oZApsmdgiFwveoj92/tUoOVfNeETEtk3O6p+89Y8HnAI0hOSr/T5Hivx+RRsdBCIDBRzyi3XhKbUwgqu3ER/Dp7IG0M1BAzP7US+p1jcRBiis/mP1P9vjwbOQBl/P8vg9xn0Braq52jI/3eY+mTD+RkpNd8v0T4HX1w63KJRb8cUwg8cNSEc7O81J7cSncfUQNL2qYMPs2atr5sGRrAhEYLieTtyaLrTSyN4q9ZSqMQecMrh0NFd2B9HTgs/PM3qattlC7bnoYkm7+b88dxZP45L2VE6wnxLXWEWJxHCc8yTyeYmPBYs2Lt3ZZym3zBB6JcpT2H2Mto/hOgsSgLfAUHsrP5z5SwKNSK2FWYs4Xexgfn/YWdpg/g2IVfw9VFzFvzD4K2EQ
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(7416005)(376005)(82310400014)(36860700004)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2024 09:06:03.0557
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UwWcCRUBpvDLJ4TZoTtBaxQtowz36hku/hKse3id5PQWon+p/y0iHqs93Jk5I3rFq7ibVSoLi7baAh+8Hb6a3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR18MB4809
-X-Proofpoint-GUID: WNa7aTWDX4HJmdq7VYaUwKtfnPeFFSrK
-X-Proofpoint-ORIG-GUID: WNa7aTWDX4HJmdq7VYaUwKtfnPeFFSrK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-01_05,2024-03-28_01,2023-05-22_02
+X-MS-Exchange-CrossTenant-Network-Message-Id: d675bd8a-b0f6-4350-0455-08dc522af4fb
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CDC.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8898
 
+Currently, PCI SFs and VFs use IO event queues to deliver netdev per
+channel events. The number of netdev channels is a function of IO
+event queues. In the second scenario of an RDMA device, the
+completion vectors are also a function of IO event queues. Currently, an
+administrator on the hypervisor has no means to provision the number
+of IO event queues for the SF device or the VF device. Device/firmware
+determines some arbitrary value for these IO event queues. Due to this,
+the SF netdev channels are unpredictable, and consequently, the
+performance is too.
 
-Hi Simon,
+This short series introduces a new port function attribute: max_io_eqs.
+The goal is to provide administrators at the hypervisor level with the
+ability to provision the maximum number of IO event queues for a
+function. This gives the control to the administrator to provision
+right number of IO event queues and have predictable performance.
 
-Thanks for the review, see inline=20
+Examples of when an administrator provisions (set) maximum number of
+IO event queues when using switchdev mode:
 
-> On Wed, Mar 27, 2024 at 09:33:48PM +0530, Hariprasad Kelam wrote:
-> > The user can enable or disable any MAC block or a few ports of the
-> > block. The management port's interface name varies depending on the
-> > setup of the user if its not mapped to the first pf.
-> >
-> > The management port mapping is now configured to always connect to the
-> > first PF. This patch implements this change.
-> >
-> > Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-> > Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
->=20
-> Hi Hariprasad and Sunil,
->=20
-> some feedback from my side.
->=20
-> > ---
-> >  .../net/ethernet/marvell/octeontx2/af/mbox.h  |  5 +-
-> >  .../ethernet/marvell/octeontx2/af/rvu_cgx.c   | 60 +++++++++++++++----
-> >  2 files changed, 53 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > index eb2a20b5a0d0..105d2e8f25df 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > @@ -638,7 +638,10 @@ struct cgx_lmac_fwdata_s {
-> >  	/* Only applicable if SFP/QSFP slot is present */
-> >  	struct sfp_eeprom_s sfp_eeprom;
-> >  	struct phy_s phy;
-> > -#define LMAC_FWDATA_RESERVED_MEM 1021
-> > +	u32 lmac_type;
-> > +	u32 portm_idx;
-> > +	u64 mgmt_port:1;
-> > +#define LMAC_FWDATA_RESERVED_MEM 1019
-> >  	u64 reserved[LMAC_FWDATA_RESERVED_MEM];
-> >  };
-> >
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > index 72e060cf6b61..446344801576 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > @@ -118,15 +118,40 @@ static void rvu_map_cgx_nix_block(struct rvu
-> *rvu, int pf,
-> >  		pfvf->nix_blkaddr =3D BLKADDR_NIX1;
-> >  }
-> >
-> > -static int rvu_map_cgx_lmac_pf(struct rvu *rvu)
-> > +static bool rvu_cgx_is_mgmt_port(struct rvu *rvu, int cgx_id, int
-> > +lmac_id) {
-> > +	struct cgx_lmac_fwdata_s *fwdata;
-> > +
-> > +	fwdata =3D  &rvu->fwdata->cgx_fw_data_usx[cgx_id][lmac_id];
-> > +	if (fwdata->mgmt_port)
-> > +		return true;
-> > +
-> > +	return false;
->=20
-> nit: I think this could be more succinctly expressed as:
->=20
-> 	return !!fwdata->mgmt_port;
-> ACK, will fix in V2.=20
+  $ devlink port show pci/0000:06:00.0/1
+      pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
+          function:
+          hw_addr 00:00:00:00:00:00 roce enable max_io_eqs 10
 
-> > +}
-> > +
-> > +static void __rvu_map_cgx_lmac_pf(struct rvu *rvu, int pf, int cgx,
-> > +int lmac)
-> >  {
-> >  	struct npc_pkind *pkind =3D &rvu->hw->pkind;
-> > +	int numvfs, hwvfs;
-> > +	int free_pkind;
-> > +
-> > +	rvu->pf2cgxlmac_map[pf] =3D cgxlmac_id_to_bmap(cgx, lmac);
-> > +	rvu->cgxlmac2pf_map[CGX_OFFSET(cgx) + lmac] =3D 1 << pf;
->=20
-> This isn't strictly related to this patch, but here it seems implied that=
- pf is not
-> negative and <=3D 63, as
-> rvu->cgxlmac2pf_map[CGX_OFFSET(cgx) + lmac] is only 64 bits wide.
->=20
-> So firstly I wonder if pf should be unsigned
->=20
-> > +	free_pkind =3D rvu_alloc_rsrc(&pkind->rsrc);
-> > +	pkind->pfchan_map[free_pkind] =3D ((pf) & 0x3F) << 16;
->=20
-> Here pf is masked off so it is not more than 63.
-> But that seems to conflict with the assumption above that it is <=3D 63.
->=20
-> If there is a concern about it being larger, it should be capped in the f=
-or loop
-> that calls __rvu_map_cgx_lmac_pf() ?
->=20
-     Max PF value is from 0 to 63  will address  proposed change in V2.
-> > +	rvu_map_cgx_nix_block(rvu, pf, cgx, lmac);
-> > +	rvu->cgx_mapped_pfs++;
-> > +	rvu_get_pf_numvfs(rvu, pf, &numvfs, &hwvfs);
-> > +	rvu->cgx_mapped_vfs +=3D numvfs;
-> > +}
-> > +
-> > +static int rvu_map_cgx_lmac_pf(struct rvu *rvu) {
-> >  	int cgx_cnt_max =3D rvu->cgx_cnt_max;
-> >  	int pf =3D PF_CGXMAP_BASE;
-> >  	unsigned long lmac_bmap;
-> > -	int size, free_pkind;
-> >  	int cgx, lmac, iter;
-> > -	int numvfs, hwvfs;
-> > +	int size;
-> >
-> >  	if (!cgx_cnt_max)
-> >  		return 0;
-> > @@ -155,6 +180,24 @@ static int rvu_map_cgx_lmac_pf(struct rvu *rvu)
-> >  		return -ENOMEM;
-> >
-> >  	rvu->cgx_mapped_pfs =3D 0;
-> > +
-> > +	/* Map mgmt port always to first PF */
-> > +	for (cgx =3D 0; cgx < cgx_cnt_max; cgx++) {
-> > +		if (!rvu_cgx_pdata(cgx, rvu))
-> > +			continue;
-> > +		lmac_bmap =3D cgx_get_lmac_bmap(rvu_cgx_pdata(cgx, rvu));
-> > +		for_each_set_bit(iter, &lmac_bmap, rvu->hw->lmac_per_cgx)
-> {
-> > +			lmac =3D cgx_get_lmacid(rvu_cgx_pdata(cgx, rvu), iter);
-> > +			if (rvu_cgx_is_mgmt_port(rvu, cgx, lmac)) {
-> > +				__rvu_map_cgx_lmac_pf(rvu, pf, cgx, lmac);
-> > +				pf++;
-> > +				goto non_mgmtport_mapping;
-> > +			}
-> > +		}
-> > +	}
-> > +
-> > +non_mgmtport_mapping:
-> > +
-> >  	for (cgx =3D 0; cgx < cgx_cnt_max; cgx++) {
-> >  		if (!rvu_cgx_pdata(cgx, rvu))
-> >  			continue;
-> > @@ -162,14 +205,9 @@ static int rvu_map_cgx_lmac_pf(struct rvu *rvu)
-> >  		for_each_set_bit(iter, &lmac_bmap, rvu->hw->lmac_per_cgx)
-> {
-> >  			lmac =3D cgx_get_lmacid(rvu_cgx_pdata(cgx, rvu),
-> >  					      iter);
-> > -			rvu->pf2cgxlmac_map[pf] =3D cgxlmac_id_to_bmap(cgx,
-> lmac);
-> > -			rvu->cgxlmac2pf_map[CGX_OFFSET(cgx) + lmac] =3D 1
-> << pf;
-> > -			free_pkind =3D rvu_alloc_rsrc(&pkind->rsrc);
-> > -			pkind->pfchan_map[free_pkind] =3D ((pf) & 0x3F) <<
-> 16;
-> > -			rvu_map_cgx_nix_block(rvu, pf, cgx, lmac);
-> > -			rvu->cgx_mapped_pfs++;
-> > -			rvu_get_pf_numvfs(rvu, pf, &numvfs, &hwvfs);
-> > -			rvu->cgx_mapped_vfs +=3D numvfs;
-> > +			if (rvu_cgx_is_mgmt_port(rvu, cgx, lmac))
-> > +				continue;
-> > +			__rvu_map_cgx_lmac_pf(rvu, pf, cgx, lmac);
-> >  			pf++;
-> >  		}
-> >  	}
->=20
-> There seems to be a fair amount of code duplication above.
-> If we can assume that there is always a management port, then perhaps the
-> following is simpler (compile tested only!).
->=20
-> And if not, I'd suggest moving the outermost for loop and everything with=
-in it
-> into a helper with a parameter such that it can handle the (first?) manag=
-ement
-> port on one invocation, and non management ports on the next invocation.
->=20
+  $ devlink port function set pci/0000:06:00.0/1 max_io_eqs 20
 
-Management ports might not be available on all devices,  we will go with op=
-tion2.
+  $ devlink port show pci/0000:06:00.0/1
+      pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
+          function:
+          hw_addr 00:00:00:00:00:00 roce enable max_io_eqs 20
 
-    Thanks,
-    Hariprasad k
+This sets the corresponding maximum IO event queues of the function
+before it is enumerated. Thus, when the VF/SF driver reads the
+capability from the device, it sees the value provisioned by the
+hypervisor. The driver is then able to configure the number of channels
+for the net device, as well as the number of completion vectors
+for the RDMA device. The device/firmware also honors the provisioned
+value, hence any VF/SF driver attempting to create IO EQs
+beyond provisioned value results in an error.
 
->  static int rvu_map_cgx_lmac_pf(struct rvu *rvu)  {
->  	struct npc_pkind *pkind =3D &rvu->hw->pkind;
->  	int cgx_cnt_max =3D rvu->cgx_cnt_max;
-> -	int pf =3D PF_CGXMAP_BASE;
-> +	int next_pf =3D PF_CGXMAP_BASE + 1;
->  	unsigned long lmac_bmap;
->  	int size, free_pkind;
->  	int cgx, lmac, iter;
-> @@ -158,10 +167,20 @@ static int rvu_map_cgx_lmac_pf(struct rvu *rvu)
->  	for (cgx =3D 0; cgx < cgx_cnt_max; cgx++) {
->  		if (!rvu_cgx_pdata(cgx, rvu))
->  			continue;
-> +
->  		lmac_bmap =3D cgx_get_lmac_bmap(rvu_cgx_pdata(cgx, rvu));
->  		for_each_set_bit(iter, &lmac_bmap, rvu->hw->lmac_per_cgx)
-> {
-> +			int pf;
-> +
->  			lmac =3D cgx_get_lmacid(rvu_cgx_pdata(cgx, rvu),
->  					      iter);
-> +
-> +			/* Always use first PF for management port */
-> +			if (rvu_cgx_is_mgmt_port(rvu, cgx, lmac))
-> +				pf =3D PF_CGXMAP_BASE;
-> +			else
-> +				pf =3D next_pf++;
-> +
->  			rvu->pf2cgxlmac_map[pf] =3D cgxlmac_id_to_bmap(cgx,
-> lmac);
->  			rvu->cgxlmac2pf_map[CGX_OFFSET(cgx) + lmac] =3D 1
-> << pf;
->  			free_pkind =3D rvu_alloc_rsrc(&pkind->rsrc);
+With above setting now, the administrator is able to achieve the 2x
+performance on SFs with 20 channels. In second example when SF was
+provisioned for a container with 2 cpus, the administrator provisioned only
+2 IO event queues, thereby saving device resources.
+
+With the above settings now in place, the administrator achieved 2x
+performance with the SF device with 20 channels. In the second example,
+when the SF was provisioned for a container with 2 CPUs, the administrator
+provisioned only 2 IO event queues, thereby saving device resources.
+
+Parav Pandit (2):
+  devlink: Support setting max_io_eqs
+  mlx5/core: Support max_io_eqs for a function
+
+ .../networking/devlink/devlink-port.rst       | 25 +++++
+ .../mellanox/mlx5/core/esw/devlink_port.c     |  2 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  7 ++
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 94 +++++++++++++++++++
+ include/net/devlink.h                         | 14 +++
+ include/uapi/linux/devlink.h                  |  1 +
+ net/devlink/port.c                            | 52 ++++++++++
+ 7 files changed, 195 insertions(+)
+
+-- 
+2.26.2
+
 
