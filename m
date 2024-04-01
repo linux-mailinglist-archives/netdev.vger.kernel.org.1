@@ -1,145 +1,111 @@
-Return-Path: <netdev+bounces-83823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A99A8947C5
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 01:33:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777A18947E3
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 01:46:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B4F11C21A88
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:33:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1EB3B226AB
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B7D56B8E;
-	Mon,  1 Apr 2024 23:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE72E57301;
+	Mon,  1 Apr 2024 23:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="L0/osbP6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A78cqvpR"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C1056B89;
-	Mon,  1 Apr 2024 23:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB1D5D468
+	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 23:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712014381; cv=none; b=QZmlQwkWuIbjDvvhfIWk/5qm2C+99kZx5EXzqPe8IyJHnbYZCDHJcGNUvDzumEj8yEzfqkgLao6QDOQAINXUeHydHxyyqlxfX/6RDwjm1RW8ivw9sfvas6Ct4x3yVSDEZuv/Qc/igXOzFdxFEn04923GvdjIcRXdroxxn+DwbIM=
+	t=1712015136; cv=none; b=FZ7P9mcfnatFEnGTq6OChZn4ZzbUQqWZLiq+PGb0RqcajxHJ//49gFiW3yfDx60sw0C2ijovV1gltna/xblMHsvviX/Li2FhZZIDp76frE7uhkfDhfkxS/vG4GB+4iAmQAObgQQgPGoOqa73MLAqcj4+DDgU9kyNhleGVgA/tyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712014381; c=relaxed/simple;
-	bh=XrT8Zc+MIc5QsRMtn3u55h8rZpt1I7g+0BByqeu8h9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Hm4GW35GSjxW8vc7mfDNoSjeKQ3qDbFNdT3vmQzEKxjZnFURsrF88aMhnF+GPLSre79GeqYXcVOrHgo/4/OsbHECmeSmXlL9b5PNc7yQsdz6YVNvbgq7RHzLfhvVtQNQvQvScqF0pxvwk2SaLkyh3LlBDRAbRi9tC4MNaxWgFNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=L0/osbP6; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1712014375;
-	bh=59mICa2IHox9XLs87Vsm5NCsqztonbzUGO+e98ooKsM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=L0/osbP6kf4hnBKCIVy5fx3ROz2bfF01ePD6dTAVAjdLhCbFlg2sfpZhKmQR9fTY+
-	 h2BEx5G94hCf7WnhNqASKpvfp/FhckbOK9zQVYvK+ozrq25YvUu10v4GJUSDHsMSv2
-	 4IVF00RQdjetLsUnpBJx6IGG6nMxJ35InEeZdZKrWCNGbOQ++h64epW7P7rdsy7PDj
-	 lrWL6YcTuf09bPkHLgzapSJQnUNYFdZjCJmAvrUvi5FW9FOThyLmgOxsgDKD48xXMt
-	 tzPVSncRsMbtZd+MwadClGPrqAySV3z6uN6AvDCCAKzmPwwNPejQCt3Ht8EuvojUqg
-	 fvrVyVS4QG/RA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4V7nPL6ykPz4wcn;
-	Tue,  2 Apr 2024 10:32:54 +1100 (AEDT)
-Date: Tue, 2 Apr 2024 10:32:53 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Eric Dumazet <edumazet@google.com>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20240402103253.3b54a1cf@canb.auug.org.au>
+	s=arc-20240116; t=1712015136; c=relaxed/simple;
+	bh=q5uE5iIpFjbvKfuGGktEA4wK8XXiUacQzrox64rZSzo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HqKAIhvHjdTtCqoFHDNEeRCSqRWWoZmoYuqlt3cwSUBBDLNd1sNBAD1Brzc+U9aFpx8xEGYqVls/meQFU/nqeRbuyconW7CUfOVy5/5+2DGuaT/hIQzqWd2IhzSPOJFHxWV+O55XWtz1bRkaBDx2dhoqhJx68cJRTUeeQG8kYJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A78cqvpR; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e0b5e79a57so35418575ad.2
+        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 16:45:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712015135; x=1712619935; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0lch/oP7Pyow2mOgtViPyCMQBf/BJiF1sWKaTfWLjhE=;
+        b=A78cqvpR7R+B92Mp9TTjkt2YZJC6XDosu/Evmsf83AuI6Irf7YYi5K/Qguddp407Jl
+         7P41IMfcPuFNHbHxeGYB6JWcbxsC6hlYpDmEKYUCEsAVX66qIenLdOXs4Mxenv1EaGiP
+         TOY81ias6PiemT9G0jQa0O7Ew5qHb9EoTgIzMeWcylUZPYiZZT44Hb+2T8pauwWLg/Yn
+         yJ7ISJtn1J7zhz/LbXMuxWKSycR4KcrEQPVSayKMSjdg8VgNn0ZcePzYgPmpumbhBzMG
+         VhAZFzsAYJrH8kicMsDpknspXij+thoRxpkkWJkAb+e/oBXIp/viJZTW4ThGxh+xg0Cp
+         k0Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712015135; x=1712619935;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0lch/oP7Pyow2mOgtViPyCMQBf/BJiF1sWKaTfWLjhE=;
+        b=Of86Xr3EovYu9upjRZnmmQPYkeamofv0+M1mgSQgR2crZyQTJEFSpdZeewrENCGMv/
+         bHODSB2tSstmAq6PZc+rSKHyTpegwudk3F5sS7XjWx6MRXJi9tW589JbXJJtjBXUgBXN
+         CQb7L8eymqIHuGzrcg2JoV6GUxSVm4Z9KNw3Y2GP8662KhmDE/FDIlCI+5gSzpublhyJ
+         sfgciXNW6OoC1ve5JEX9z8ZdIl8gSiKMdyk8UV4WnuXRi4dr1wcTh9jXFKXIN2Xw7EMq
+         0sMROMktD8CC9PKBbUa/5RwWGjac55rUCOiPUywD2zcJr8ZFucu3AORSVch+HAE5UPBE
+         OsYQ==
+X-Gm-Message-State: AOJu0YyJ9OCtqP2sieNAEfYwQwbF9hJc4wp1Q4rr7CZOMfzlfK5fgeWD
+	RwYjeTcSvy/hdQTwxCoQ1uu4bZkU19KaIbyIWgXiJYmq/ISAN/lXSuV6axhfcps2wlqC5ff1O9j
+	qrUhGUjTuV5RPMhhbMxVQHjBPZ2sbyoEREb3rIU9eZfePVdRsx5VCiq7891mr4JoNOWmRrqF/RF
+	FL8c4edjv1mSJspTROQD6tb9+LK2ffsWEgT/bJ9t59is7B8QBqoqVYCwwgH2c=
+X-Google-Smtp-Source: AGHT+IGKCrhOkLN2VTUrJY6La4PQSYEAiXiUKfPlWl7BZjDzITPI7XOz0p+SS0KSUbrF9v0Y8Bb6t1E0+u9AuN7qDA==
+X-Received: from hramamurthy-gve.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:141e])
+ (user=hramamurthy job=sendgmr) by 2002:a17:903:2288:b0:1e2:45bf:abae with
+ SMTP id b8-20020a170903228800b001e245bfabaemr111761plh.6.1712015134632; Mon,
+ 01 Apr 2024 16:45:34 -0700 (PDT)
+Date: Mon,  1 Apr 2024 23:45:25 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/4cCA5Hw1boWFJmaQY2dnncK";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240401234530.3101900-1-hramamurthy@google.com>
+Subject: [PATCH net-next 0/5] gve: enable ring size changes
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com, pkaligineedi@google.com, shailend@google.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, rushilg@google.com, jfraker@google.com, 
+	linux-kernel@vger.kernel.org, Harshitha Ramamurthy <hramamurthy@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
---Sig_/4cCA5Hw1boWFJmaQY2dnncK
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This series enables support to change ring size via ethtool
+in gve.
 
-Hi all,
+The first three patches deal with some clean up, setting
+default values for the ring sizes and related fields. The
+last two patches enable ring size changes.
 
-Today's linux-next merge of the net-next tree got a conflict in:
+Harshitha Ramamurthy (5):
+  gve: simplify setting decriptor count defaults
+  gve: make the completion and buffer ring size equal for DQO
+  gve: set page count for RX QPL for GQI and DQO queue formats
+  gve: add support to read ring size ranges from the device
+  gve: add support to change ring size via ethtool
 
-  net/ipv4/ip_gre.c
+ drivers/net/ethernet/google/gve/gve.h         |  35 +++--
+ drivers/net/ethernet/google/gve/gve_adminq.c  | 146 ++++++++++--------
+ drivers/net/ethernet/google/gve/gve_adminq.h  |  48 +++---
+ drivers/net/ethernet/google/gve/gve_ethtool.c |  85 +++++++++-
+ drivers/net/ethernet/google/gve/gve_main.c    |  30 ++--
+ drivers/net/ethernet/google/gve/gve_rx.c      |   2 +-
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c  |   7 +-
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c  |   4 +-
+ 8 files changed, 235 insertions(+), 122 deletions(-)
 
-between commit:
+-- 
+2.44.0.478.gd926399ef9-goog
 
-  17af420545a7 ("erspan: make sure erspan_base_hdr is present in skb->head")
-
-from the net tree and commit:
-
-  5832c4a77d69 ("ip_tunnel: convert __be16 tunnel flags to bitmaps")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc net/ipv4/ip_gre.c
-index 57ddcd8c62f6,3c46a7fef8db..000000000000
---- a/net/ipv4/ip_gre.c
-+++ b/net/ipv4/ip_gre.c
-@@@ -276,19 -279,14 +279,19 @@@ static int erspan_rcv(struct sk_buff *s
-  	iph =3D ip_hdr(skb);
-  	if (is_erspan_type1(gre_hdr_len)) {
-  		ver =3D 0;
-- 		tunnel =3D ip_tunnel_lookup(itn, skb->dev->ifindex,
-- 					  tpi->flags | TUNNEL_NO_KEY,
-+ 		__set_bit(IP_TUNNEL_NO_KEY_BIT, flags);
-+ 		tunnel =3D ip_tunnel_lookup(itn, skb->dev->ifindex, flags,
-  					  iph->saddr, iph->daddr, 0);
-  	} else {
- +		if (unlikely(!pskb_may_pull(skb,
- +					    gre_hdr_len + sizeof(*ershdr))))
- +			return PACKET_REJECT;
- +
-  		ershdr =3D (struct erspan_base_hdr *)(skb->data + gre_hdr_len);
-  		ver =3D ershdr->ver;
- +		iph =3D ip_hdr(skb);
-- 		tunnel =3D ip_tunnel_lookup(itn, skb->dev->ifindex,
-- 					  tpi->flags | TUNNEL_KEY,
-+ 		__set_bit(IP_TUNNEL_KEY_BIT, flags);
-+ 		tunnel =3D ip_tunnel_lookup(itn, skb->dev->ifindex, flags,
-  					  iph->saddr, iph->daddr, tpi->key);
-  	}
- =20
-
---Sig_/4cCA5Hw1boWFJmaQY2dnncK
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYLRCUACgkQAVBC80lX
-0Gx0XQf9HXhr1nHFOqTHOJ8OYptgp7GXzTXCpZoEqPBYBLQ39wLFon1ufsFDT+Yb
-Vk8X6DR7Ak4TFDmt/Flzb8xdEEspsIVumLmH+RCBC8mYToM/yJyldIMD89v2fmuk
-uUK6dpM6WpNKsKUBasSIRMi3Uu0jryi7DvAmmP4DunKiRfpCxNwrDbljUu6sWRKk
-x7lOxJhbw/ctBE6RiNLKG27jNrHR5UtCVg2zJp8hmo3mqkC8vLBxH/sRpV8K4Xxq
-uZIZIkDeEN7kahTaK4RashI4hjfg+Et1tFIrAO/oFjeOBiuA2sxgTA0BqzrNxW1V
-3XOTE8xhVeDjBeLGSzkt/ZbfHDK0lA==
-=5j3D
------END PGP SIGNATURE-----
-
---Sig_/4cCA5Hw1boWFJmaQY2dnncK--
 
