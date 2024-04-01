@@ -1,211 +1,189 @@
-Return-Path: <netdev+bounces-83758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37E0E893B89
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 15:36:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B15893BA0
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 15:54:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E719C28229E
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 13:36:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B23771C213BF
+	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 13:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F252240870;
-	Mon,  1 Apr 2024 13:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223443FE3E;
+	Mon,  1 Apr 2024 13:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="K9szebRD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c29yWJov"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5456A4085E
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 13:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5AC3F8F1;
+	Mon,  1 Apr 2024 13:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711978588; cv=none; b=EUA2UfOYErzAnK33z12tponyVPS4rdDUC3zoOb/fpcw59s2vofXaKfDVMLUF5f5rEdJarbANA/Y/WpqW3qHLKRDnbZuG1z7++gbVoRCGUQwqr+EnoYEduH7vPyGkrsP9Et8DZS6FznkEwj4OUBHogNoq1InxDarXA9S932XauoU=
+	t=1711979639; cv=none; b=tQWzCsmlMbfa4nu4nMmBeNLBSw/Wa18pE4srCoW/WALjyTW3Xk/AcipeATv+JqWKfAbNJw9lYl7wvp/GNd4e3YGHmtto4f0VbP4C/WIlCB84O2qSiN/RlrL2PO2gQjA3Adxh30lRR96/7qnIp0TceatzAxC3urqzGxj7im+MjUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711978588; c=relaxed/simple;
-	bh=T4hHSCqSyUP8uN3eUppXBTMJHEC7jNr+/N/npfR2Ba4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OwzvSnyaH51ekAkgVnuCwVTtenA95ful2ieal+wQJ94zr79/Hqv/FL4fKRj7/ftyBffYnEwD1SR0Cz5uP/KjW5adyUWEBo2sZlPW8Q8w99VEJb40h77QHPqqmyeGlZditaymbY77yD/qmMSm7FX1aI/s9nFMQHUAoJaMKv8Dpfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=K9szebRD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=3YRt0gr+yx7yiv5+KJ+D1BgjqflOQhh375/OUfItcZA=; b=K9
-	szebRDVPARXusir2d9lpp/4EmgcYJ0NwjiNcM7XCd3RyJ+duqhtCdYtAN38/Hjvdvlb6371QeXK8j
-	LPBs8cJf0SjH7DGH3idBt26Rf3Ye1QHhEHyN5nCQCkYCktTEmvdi1eH3KXWdpHXxMyZL6DfbJ57k8
-	28mPwHPtJ13MSFE=;
-Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
-	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rrHpo-00BrFx-0z; Mon, 01 Apr 2024 15:36:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-Date: Mon, 01 Apr 2024 08:35:52 -0500
-Subject: [PATCH net-next v3 7/7] arm: boot: dts: mvebu: linksys-mamba: Add
- Ethernet LEDs
+	s=arc-20240116; t=1711979639; c=relaxed/simple;
+	bh=dmYCendNfZLK2ZYRN4P3XHXSgHmLS9K4qfGr3Ifd3v0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6zYjs94S03IZeCtmtIlyX/0RK17WPiPjQkkDmYDdljlVx5Ikj7KZ0xlYzZkJBOfdBVG1MpITp77wpluPmQpDILA0kJhTsyLJuHYzRXhvMhIcA7cyKxg5+Zg8gi+oK1VsYYFRNPRyFN8P2/SZACqIjf4YrJy966YDreftmU1DIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c29yWJov; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADA0CC433C7;
+	Mon,  1 Apr 2024 13:53:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711979638;
+	bh=dmYCendNfZLK2ZYRN4P3XHXSgHmLS9K4qfGr3Ifd3v0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c29yWJov1MPD3KNJnAc3J10X31RIJx5rJ8pZ9aMASTtRIDHTlXt3YBkMhR/2MmTeW
+	 zKg7sKvzusvvzXvEpqIv8nO9JilxGOlGDD9rpErvCQJiT/+cOIdnykZR54Pb5hp73A
+	 n3db2XvRlrrFuw27hXNlQVFklZF/bwBt1Tvksi8eyn/LaeBo2QoMfURHysv0Ra+tcm
+	 5GNCZFCSDd/aMOWF7fV3ver/b2jE5QU8+WhPmhCzIjV1dmrOHawVXzxIdY9jTI6kkp
+	 3RzhX7bCaKGHmMTJC3G9ZTma+EDhOVW6r/AdWBj3gvJJLSd3U3a0S7GGRMCCfrXnpN
+	 BcEw/0JlvpOew==
+Date: Mon, 1 Apr 2024 14:53:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+	linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 26/26] netfs, afs: Use writeback retry to deal with
+ alternate keys
+Message-ID: <20240401135351.GD26556@kernel.org>
+References: <20240328163424.2781320-1-dhowells@redhat.com>
+ <20240328163424.2781320-27-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-7-221b3fa55f78@lunn.ch>
-References: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-0-221b3fa55f78@lunn.ch>
-In-Reply-To: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-0-221b3fa55f78@lunn.ch>
-To: Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Gregory Clement <gregory.clement@bootlin.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2890; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=T4hHSCqSyUP8uN3eUppXBTMJHEC7jNr+/N/npfR2Ba4=;
- b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBmCrhCFqWZwVStP3xVRQLj3X3L+3pptgOf2vBmw
- cuWB49G5myJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZgq4QgAKCRDmvw3LpmlM
- hMeyD/0VlIf2O/pDJsF+4o5KWIZkKhsQCVlvyv2IyvdWB/EjupeMTSYYYEVz2O8b5anZ+qlK4mC
- M6OSksVG8NmHQHODa/E5tUyfkVlbASqMsw2CkBkRze/Jrs6m/ob2doF45DukQVDIehlX47dUcIU
- Y0Rp4bzEggHAvNcvuCLiXyDYMpjABzpzHOt5TaiyXcL2g+OX9BMG2BZeeZOr6InOkd9t+uz+cpC
- H6Gnn3S98o2ZGjY4lJkFHuu2P7wwoNHINAZkSlK6KPSoaI2xrAM31osF0NnMbMRBfWgvxR8rcwB
- 7p1Btcy8qaHg3iNemae+z81dcseUgCkS/jldZy4gd0X6Q4SlDOT8ux2TQFCmvbwmTOC+3WOQTzK
- 4jAaZF09l89MKzKH4EEyC59Ln/JlVT307xFW77KBnbJMclzG00Br4zACVHHc3WPpDL3aiMWx+9k
- RvsgYdO0CXNFsh6u9lRdh0IOK9y5/NRA/gJmHdpNBdTcSu+G+0EmX/+UJcshtjTR7Lig4YLw529
- MHKHLoxA4LqrZpt2j3BpyTDd9MFCgMIV3Qo4awB0f2b6yPIUJU3yr/bP1GAR0/rChIH4yy8yz/f
- 18W8gN9RE1TStJMkswPfUVh4QGp/63H+ulwUNleIhiFRzjLWJ8OR2e5UeLIEhZiIc2IU7o9gq99
- pUtHEr/Mri7RtGw==
-X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
- fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240328163424.2781320-27-dhowells@redhat.com>
 
-List the front panel Ethernet LEDs in the switch section of the
-device tree. They can then be controlled via /sys/class/led/
+On Thu, Mar 28, 2024 at 04:34:18PM +0000, David Howells wrote:
 
-The node contains a label property to influence the name of the LED.
-Without it, all the LEDs get the name lan:white, which classes, and so
-some get a number appended. lan:white_1, lan:white_2, etc. Using the
-label the LEDs are named lan1:front, lan2:front, lan3:front, where
-lanX indicates the interface name, and front indicates they are on the
-front of the box.
+...
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
----
- .../boot/dts/marvell/armada-xp-linksys-mamba.dts   | 66 ++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
+> +void afs_issue_write(struct netfs_io_subrequest *subreq)
+>  {
+> +	struct netfs_io_request *wreq = subreq->rreq;
+>  	struct afs_operation *op;
+> -	struct afs_wb_key *wbk = NULL;
+> -	loff_t size = iov_iter_count(iter);
+> +	struct afs_vnode *vnode = AFS_FS_I(wreq->inode);
+> +	unsigned long long pos = subreq->start + subreq->transferred;
+> +	size_t len = subreq->len - subreq->transferred;
+>  	int ret = -ENOKEY;
+>  
+> -	_enter("%s{%llx:%llu.%u},%llx,%llx",
+> +	_enter("R=%x[%x],%s{%llx:%llu.%u},%llx,%zx",
+> +	       wreq->debug_id, subreq->debug_index,
+>  	       vnode->volume->name,
+>  	       vnode->fid.vid,
+>  	       vnode->fid.vnode,
+>  	       vnode->fid.unique,
+> -	       size, pos);
+> +	       pos, len);
+>  
+> -	ret = afs_get_writeback_key(vnode, &wbk);
+> -	if (ret) {
+> -		_leave(" = %d [no keys]", ret);
+> -		return ret;
+> -	}
+> +#if 0 // Error injection
+> +	if (subreq->debug_index == 3)
+> +		return netfs_write_subrequest_terminated(subreq, -ENOANO, false);
+>  
+> -	op = afs_alloc_operation(wbk->key, vnode->volume);
+> -	if (IS_ERR(op)) {
+> -		afs_put_wb_key(wbk);
+> -		return -ENOMEM;
+> +	if (!test_bit(NETFS_SREQ_RETRYING, &subreq->flags)) {
+> +		set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+> +		return netfs_write_subrequest_terminated(subreq, -EAGAIN, false);
+>  	}
+> +#endif
+> +
+> +	op = afs_alloc_operation(wreq->netfs_priv, vnode->volume);
+> +	if (IS_ERR(op))
+> +		return netfs_write_subrequest_terminated(subreq, -EAGAIN, false);
+>  
+>  	afs_op_set_vnode(op, 0, vnode);
+> -	op->file[0].dv_delta = 1;
+> +	op->file[0].dv_delta	= 1;
+>  	op->file[0].modification = true;
+> -	op->store.pos = pos;
+> -	op->store.size = size;
+> -	op->flags |= AFS_OPERATION_UNINTR;
+> -	op->ops = &afs_store_data_operation;
+> +	op->store.pos		= pos;
+> +	op->store.size		= len,
 
-diff --git a/arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts b/arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts
-index ea859f7ea042..0784fd0355b2 100644
---- a/arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts
-+++ b/arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts
-@@ -19,6 +19,7 @@
- /dts-v1/;
- #include <dt-bindings/gpio/gpio.h>
- #include <dt-bindings/input/input.h>
-+#include <dt-bindings/leds/common.h>
- #include "armada-xp-mv78230.dtsi"
- 
- / {
-@@ -276,26 +277,91 @@ ethernet-ports {
- 			ethernet-port@0 {
- 				reg = <0>;
- 				label = "lan4";
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_WHITE>;
-+						function = LED_FUNCTION_LAN;
-+						label = "front";
-+						default-state = "keep";
-+					};
-+				};
- 			};
- 
- 			ethernet-port@1 {
- 				reg = <1>;
- 				label = "lan3";
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_WHITE>;
-+						function = LED_FUNCTION_LAN;
-+						label = "front";
-+						default-state = "keep";
-+					};
-+				};
- 			};
- 
- 			ethernet-port@2 {
- 				reg = <2>;
- 				label = "lan2";
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_WHITE>;
-+						function = LED_FUNCTION_LAN;
-+						label = "front";
-+						default-state = "keep";
-+					};
-+				};
- 			};
- 
- 			ethernet-port@3 {
- 				reg = <3>;
- 				label = "lan1";
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_WHITE>;
-+						function = LED_FUNCTION_LAN;
-+						label = "front";
-+						default-state = "keep";
-+					};
-+				};
- 			};
- 
- 			ethernet-port@4 {
- 				reg = <4>;
- 				label = "internet";
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_WHITE>;
-+						function = LED_FUNCTION_WAN;
-+						label = "front";
-+						default-state = "keep";
-+					};
-+				};
- 			};
- 
- 			ethernet-port@5 {
+nit: this is probably more intuitively written using len;
 
--- 
-2.43.0
+> +	op->flags		|= AFS_OPERATION_UNINTR;
+> +	op->ops			= &afs_store_data_operation;
+>  
+> -try_next_key:
+>  	afs_begin_vnode_operation(op);
+>  
+> -	op->store.write_iter = iter;
+> -	op->store.i_size = max(pos + size, vnode->netfs.remote_i_size);
+> -	op->mtime = inode_get_mtime(&vnode->netfs.inode);
+> +	op->store.write_iter	= &subreq->io_iter;
+> +	op->store.i_size	= umax(pos + len, vnode->netfs.remote_i_size);
+> +	op->mtime		= inode_get_mtime(&vnode->netfs.inode);
+>  
+>  	afs_wait_for_operation(op);
+> -
+> -	switch (afs_op_error(op)) {
+> +	ret = afs_put_operation(op);
+> +	switch (ret) {
+>  	case -EACCES:
+>  	case -EPERM:
+>  	case -ENOKEY:
+>  	case -EKEYEXPIRED:
+>  	case -EKEYREJECTED:
+>  	case -EKEYREVOKED:
+> -		_debug("next");
+> -
+> -		ret = afs_get_writeback_key(vnode, &wbk);
+> -		if (ret == 0) {
+> -			key_put(op->key);
+> -			op->key = key_get(wbk->key);
+> -			goto try_next_key;
+> -		}
+> +		/* If there are more keys we can try, use the retry algorithm
+> +		 * to rotate the keys.
+> +		 */
+> +		if (wreq->netfs_priv2)
+> +			set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+>  		break;
+>  	}
+>  
+> -	afs_put_wb_key(wbk);
+> -	_leave(" = %d", afs_op_error(op));
+> -	return afs_put_operation(op);
+> +	netfs_write_subrequest_terminated(subreq, ret < 0 ? ret : subreq->len, false);
+>  }
+>  
+>  /*
 
+...
 
