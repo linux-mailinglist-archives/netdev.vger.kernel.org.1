@@ -1,113 +1,151 @@
-Return-Path: <netdev+bounces-83932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB3C894EA6
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:25:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8A2894EB1
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8B51F2362D
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:25:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE67E281495
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F1257894;
-	Tue,  2 Apr 2024 09:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B3B5820C;
+	Tue,  2 Apr 2024 09:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sQZucdhh";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="t7amywlH"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="pp2t2qtC"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25C557323;
-	Tue,  2 Apr 2024 09:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3476958105
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 09:28:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712049917; cv=none; b=AFPgrTvZmFRE8IH8Fz7h3wCYHlJACVwxVN7j8k14AXQKzj+Z0C8eElpiI4+q0+wISlmz3K3FB2PEIjqMMoNANskX4h/D2xBlyB0/lITXkKam6j98H20L19GKN5fXlsNe5FzhY3i3V5pf70pMiPXxkzlyLEpH88JiPqi7kT5nKG4=
+	t=1712050124; cv=none; b=XxgjYTEVrkQQZtonTKTe3VmoDsC6Isy7hGMUFw3Q8InZ5j58+98Za6rZkUEEcUvs/yFtppw8jufs2JQQX4PdHPPG79mLlmm5BxBbvf56Y3TgZWaq0uZB3dwDgl4QfIiWWDpAUwrw9EelnayuUTWge1EVC32hJ5K0Ljvd1YcHN1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712049917; c=relaxed/simple;
-	bh=D+pmTJbWD+F5FqLLVUmPGKhvuuWcaJlICv2fiuRLyOA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BiMtNEjEZyJkTlGaRJ2TsJZ9y1j9M3fW2ULkFCT4Qm3cYkDRyIr4UW1Gba4Hx3LMTU6MGsvpZHZvUFAAuxTnKJNSBPo8kXQi5J5ZlZtSfUoYbx8dwz1vJfw0KZakXG3QhWiSzNnCIPVQgiDljsqjvWkV9KKpFw2W/+uTMKdz/QQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sQZucdhh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=t7amywlH; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1712049908;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gxnU7oHDRvp2KKF4I0w+Kk9loooljsfq/6TvcopJ+7o=;
-	b=sQZucdhhQgMO5Ub+2Bs5zKZwhGZhWDZq8Mzo8Nb6wtWyyY8QiM6jWdXjFlN1EzlOxDD8GS
-	3mq6hIH/aPV9iVke03eUBejlFlW5yYzEkfTdoUZKgnpMD6Lb+/n2wuV0JPlP8u5ArNpCgA
-	Dx12Z25LyjjUJPiGJsrhWpHJOl+R30Qv2pGyq5eholxM2Qn9nnUUVkIX5yqqu41iZcTZQK
-	pybYPVzDYdB9rdXq1OlYPJ8ubMLy1de8gRySvOznWT2ffzJaAAEz0kW/lZUGw5335D92Qu
-	pnMgy/B3GR7ml4RHAspOuGp4hpotADKcxTmFW+kfAGoNs6/JIyn94/fUfY6S6g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1712049908;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gxnU7oHDRvp2KKF4I0w+Kk9loooljsfq/6TvcopJ+7o=;
-	b=t7amywlHQ/7Ooi3w3AkZlkjifY46KwOg8Sjbg0P2ctA3ECbK6LB+5mh1AhvWM28e7KRWuZ
-	7k9GgRKqQPwWpsBQ==
-To: =?utf-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS1?=
- =?utf-8?B?4KS+4KSwKQ==?= <maheshb@google.com>
-Cc: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com,
- luto@kernel.org, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, arnd@arndb.de,
- geert@linux-m68k.org, peterz@infradead.org, hannes@cmpxchg.org,
- sohil.mehta@intel.com, rick.p.edgecombe@intel.com, nphamcs@gmail.com,
- palmer@sifive.com, keescook@chromium.org, legion@kernel.org,
- mark.rutland@arm.com, mszeredi@redhat.com, casey@schaufler-ca.com,
- reibax@gmail.com, davem@davemloft.net, brauner@kernel.org,
- linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
- linux-arch@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
-In-Reply-To: <CAF2d9jjA8iM1AoPUhQPK62tdd7gPnCnt51f_NMhOAs546rU3dA@mail.gmail.com>
-References: <CAMuE1bHBky9NGP22PVHKdi2+WniwxiLSmMnwRM6wm36sU8W4jA@mail.gmail.com>
- <878r29hjds.ffs@tglx>
- <CAMuE1bF9ioo39_08Eh26X4WOtnvJ1geJ=WRVt5DhU8gEbYJNdA@mail.gmail.com>
- <87o7asdd65.ffs@tglx>
- <CAF2d9jjA8iM1AoPUhQPK62tdd7gPnCnt51f_NMhOAs546rU3dA@mail.gmail.com>
-Date: Tue, 02 Apr 2024 11:24:59 +0200
-Message-ID: <87il10ce1g.ffs@tglx>
+	s=arc-20240116; t=1712050124; c=relaxed/simple;
+	bh=SaHdWyZMielfHTNhw3NZ6AoIsZ4bpjd1xazWDgacU6s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XU+ZCTXUIh6bjblkUxEKAaXHuXKqey/IIVrErl5CIr1b28V0pDCCooKOQDgQFD4tW+q7nIjdBAX0SpoEOy906wXvtn4dM+/YRGCxeqSB7Yn/toQDs1i6bC3LWzW5gqoFVbC1c3WEyMPgBZ3bUK9xAcqve+s+CoME/DaWMXAbcqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=pp2t2qtC; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-34372e3db28so143139f8f.2
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 02:28:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1712050120; x=1712654920; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xHNO1hVo3g5ZBLDGdpQZsS60/lEQyobzAsIONNu4tIs=;
+        b=pp2t2qtCWDiGQLyQqPARVDwxvcBVwwGYo33TajhoD42IISsp//iDcUz4u6a4zqhKKf
+         uWGC2gL1pux+vBTZ0ASUY8L1+YHccWVioFhBRef8ntUZJbmwTiLDqrOtw4bmnlmHxKFw
+         pHP4F1ET9e19HWOuBGQ/JemjjzprfCd637XEjibbz7WE5JfPhd+yDUPVe4OR9OqKTped
+         /g55uo9sD+dQgdEc7y0R5yCxYXcI82GZvbcKjVi9+EY+n3BdGOI4scvfzfQh2jLod/sD
+         PNiyFimgXDdvYX9LvwIle1OsFAlgPg2V6D+sZGVEkurvTetYxr4LQsxuPH7xuzpHNicU
+         hoKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712050120; x=1712654920;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xHNO1hVo3g5ZBLDGdpQZsS60/lEQyobzAsIONNu4tIs=;
+        b=DOt3lRVVJFj4Xvt1DIK4cmv1lJuP2DKnH07kRrTAnS1oxGIyYS+b0VDuU6lT/OMY0i
+         x3qN0VfO38IXpmpUTmj4Zl2Kc19WvNPAf/qKfTycreWXQ3939Muq38F7wcZuapZHCKui
+         ZzNZkt/Tmok9NfnzzLKac0u2IcBZ72XuxcWiED7Ss/vQXrc8bQIB1chaj0xs+W0QzVPd
+         hHXJw8x0lH1Fv9HuPykAVk/yOjv///3zlSC8aEbtvHnalXaoBVe+Y/hkyo4WLqMSZj4l
+         ERmgv9o9AHUTgYTdNnrAz/mw+FkD4Gb/KyQI0HykMc+zWz+i12KuZrmR+5y2qjoSNLLQ
+         YA2g==
+X-Forwarded-Encrypted: i=1; AJvYcCXIggTHu5AnO1eAYT623F0cKpEfxrOYESLGmlu5iPADcJLZzIGaItzz9RBCtmNTp7WjiK+/47QnW2Lo+jtNMBjkvmi9TEh6
+X-Gm-Message-State: AOJu0YxlUdJwH4ckVU8IRJlGXMpyK6jfRkWi8MB5TZwJ0em+Si4a/WgT
+	+N+GdiYmkvXtL2TvVZXLkLSYVvKgM6ZYcKFhbfoXkWqwc9fGOXTsFFQ2UNDJQp0=
+X-Google-Smtp-Source: AGHT+IEI24f1p1p1BLDEE6iJrpvuBCcj4zOyiUqGHCc+h7DoytXVrqcMxVKkFly4F3F5rVn71rvUOA==
+X-Received: by 2002:adf:e011:0:b0:33e:7896:a9d7 with SMTP id s17-20020adfe011000000b0033e7896a9d7mr8560010wrh.67.1712050120249;
+        Tue, 02 Apr 2024 02:28:40 -0700 (PDT)
+Received: from [192.168.0.106] (176.111.182.227.kyiv.volia.net. [176.111.182.227])
+        by smtp.gmail.com with ESMTPSA id en19-20020a056000421300b0034365152f2asm1170910wrb.97.2024.04.02.02.28.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Apr 2024 02:28:39 -0700 (PDT)
+Message-ID: <7fc8264a-a383-4682-a144-8d91fe3971d9@blackwall.org>
+Date: Tue, 2 Apr 2024 12:28:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
+Content-Language: en-US
+To: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, =?UTF-8?Q?Linus_L=C3=BCssing?=
+ <linus.luessing@c0d3.blue>, linux-kernel@vger.kernel.org,
+ bridge@lists.linux.dev
+References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 01 2024 at 22:42, Mahesh Bandewar (=E0=A4=AE=E0=A4=B9=E0=A5=87=
-=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=BE=E0=A4=B0) =
-wrote:
-> On Mon, Apr 1, 2024 at 1:46=E2=80=AFPM Thomas Gleixner <tglx@linutronix.d=
-e> wrote:
->> So if there is a backwards compability issue with PTP_SYS_OFFSET2, then
->> you need to introduce PTP_SYS_OFFSET3. The PTP_SYS_*2 variants were
->> introduced to avoid backwards compatibility issues as well, but
->> unfortunately that did not address the reserved fields problem for
->> PTP_SYS_OFFSET2. PTP_SYS_OFFSET_EXTENDED2 should just work, but maybe
->> the PTP maintainers want a full extension to '3'. Either way is fine.
->>
-> https://patchwork.kernel.org/project/netdevbpf/patch/20240104212436.32760=
-57-1-maheshb@google.com/
->
-> This was my attempt to solve a similar issue with the new ioctl op to
-> avoid backward compatibility issues.  Instead of flags I used the
-> clockid_t in a similar fashion.
+On 4/2/24 03:10, Joseph Huang wrote:
+> There is a use case where one would like to enable multicast snooping
+> on a bridge but disable multicast flooding on all bridge ports so that
+> registered multicast traffic will only reach the intended recipients and
+> unregistered multicast traffic will be dropped. However, with existing
+> bridge ports' mcast_flood flag implementation, it doesn't work as desired.
+> 
+> This patchset aims to make multicast snooping work even when multicast
+> flooding is disabled on the bridge ports, without changing the semantic of
+> the mcast_flood flag too much. Patches 1 to 4 attempt to address this issue.
+> 
+> Also, in a network where more than one multicast snooping capable bridges
+> are interconnected without multicast routers being present, multicast
+> snooping fails if:
+> 
+>    1. The source is not directly attached to the Querier
+>    2. The listener is beyond the mrouter port of the bridge where the
+>       source is directly attached
+>    3. A hardware offloading switch is involved
+> 
+> When all of the conditions are met, the listener will not receive any
+> multicast packets from the source. Patches 5 to 10 attempt to address this
+> issue. Specifically, patches 5 to 8 set up the infrastructure, patch 9
+> handles unregistered multicast packets forwarding, and patch 10 handles
+> registered multicast packets forwarding to the mrouter port.
+> 
+> The patches were developed against 5.15, and forward-ported to 6.8.
+> Tests were done on a Pi 4B + Marvell 6393X Eval board with a single
+> switch chip with no VLAN.
+> 
+> V1 -> V2:
+> - Moved the bulk of the change from the bridge to the mv88e6xxx driver.
+> - Added more patches (specifically 3 and 4) to workaround some more
+>    issues with multicast flooding being disabled.
+> 
+> v1 here:
+> https://patchwork.kernel.org/project/netdevbpf/cover/20210504182259.5042-1-Joseph.Huang@garmin.com/
+> 
 
-Works as well. I'm not seing the point for CLOCK_MONOTONIC and the
-change logs are not really telling anything about the problem being
-solved....
+For the bridge patches:
+Nacked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Thanks,
+You cannot break the multicast flood flag to add support for a custom
+use-case. This is unacceptable. The current bridge behaviour is correct
+your patch 02 doesn't fix anything, you should configure the bridge
+properly to avoid all those problems, not break protocols.
 
-        tglx
+Your special use case can easily be solved by a user-space helper or
+eBPF and nftables. You can set the mcast flood flag and bypass the
+bridge for these packets. I basically said the same in 2021, if this is
+going to be in the bridge it should be hidden behind an option that is
+default off. But in my opinion adding an option to solve such special
+cases is undesirable, they can be easily solved with what's currently
+available.
+
+
 
