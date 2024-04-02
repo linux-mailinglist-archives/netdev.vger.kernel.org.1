@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-83936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 881B5894ECB
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:35:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED66B894ECF
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:35:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 156A81F22C56
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:35:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64C13B24531
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AF058228;
-	Tue,  2 Apr 2024 09:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDC558AC0;
+	Tue,  2 Apr 2024 09:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aYBvx3th"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RVLOkDGS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7321E525
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 09:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0651258AAC
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 09:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712050539; cv=none; b=CUOFQMfYg/TJguqHTT2Eb7Cb0RqCa87iudFqqEkpNcQBq9njVNT9yZIStBA21l9TBSuti0yMhgATJWE6J2cCd3+IOBvvjJqYH4sJ1U5QonPchwOUYbImGzzxJoIR+G7jS/ByMaGrpNJTMvi2FnqwwmS9MhN03ioxT9tX6DEchMU=
+	t=1712050544; cv=none; b=HrDKCKNFmH8ka5b0hhomlEtNpKTTXyo966nwxc3oXZK4Ocq6CATl+fgdxbfdz4FZqgL+G93uXHCJmvyxCCD8nwAe1PwG7O+LJ0X2Tq5nd2jfzMHK7BWmIulB+/Lejazwew5vfpu6v6Sq8l9gnzji+nfdiqdMsH8eA5gddkL3kNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712050539; c=relaxed/simple;
-	bh=FUHlpvQyN1efWvroWvswyMxrhwQ98V/kAEVp4PErJy0=;
+	s=arc-20240116; t=1712050544; c=relaxed/simple;
+	bh=rpMwjBvsulNLSdj7VTFpSmssyr2QEGqZUpUB2lcxPgE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KkDIc/Be84Tve+qezLlt4VkHgmureLB5fZ39KUiFDD+thyv2LfwLkaA4HysvND4dr6Ad5zsYo6VpiXlbB2AC2cAjBb11D3a1ftJVd8uvwltDqE4tyCvzb9hMhKzsul0yiw2PcrUiRlXDAEsgleAsYAXyM0MTxqLoggF0Se5zN6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aYBvx3th; arc=none smtp.client-ip=209.85.160.43
+	 MIME-Version:Content-Type; b=GCbb+ij5vk3bBC2n5qlrnQO9im93QxlJlfD5ebnHfPtnDMWBeIfQSnbYXbdxoo9c5MCOvRjBi2q1/S+730cxgGC5EQPQy9sksjnmut5n7OkY/UA2d6KWre0mOmxq0Wlf0MiH5NqsbsrGOTPhpyM4Mow5HclBrqenv/evKxQADIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RVLOkDGS; arc=none smtp.client-ip=209.85.167.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-22e691c754cso437041fac.2
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 02:35:37 -0700 (PDT)
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3c3f16f9c81so2327346b6e.1
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 02:35:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1712050537; x=1712655337; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1712050542; x=1712655342; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=P0WOMoWOF667ES2q5lxVkv1CFX/bJar9MFPKJsTgFpU=;
-        b=aYBvx3th8dM7XdO/g4ZSXXVqL0ZWSYDpSM5O+gqruAWWtIBXxL7BEzShtB2SM8L5wI
-         eZwR2SkMOroIFzTR5n2vDOwMhA74+njWbrHdpGEIWoEoHVIyUCH6A0xwE7diw3yDwCvD
-         kfs5zscEhmvQVurk0fW/glpGZGY8FYQyS+NRw=
+        bh=Ku0mrkb12wJLxrj5c2WKpVbSR0MFXMV9Y6xNWDL8Rkw=;
+        b=RVLOkDGSqT0dZcU4xTQcv3MAkDzca4rMh9zs83us+EVwhVqQVaJft5byPgZXDBxPFR
+         0dQE1eZQis4KVZ7BC9E3omXk37ERcuOrrXB/HjcsgbruiZGWKzwyU6DCBFXWI+RTArcF
+         vlILZvDqaPBvfuuWdascJbH8yNvBgMzp4n5pk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712050537; x=1712655337;
+        d=1e100.net; s=20230601; t=1712050542; x=1712655342;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P0WOMoWOF667ES2q5lxVkv1CFX/bJar9MFPKJsTgFpU=;
-        b=nXIjmKMhn2j475WDy7UqTAqFtn+Ta5ZURl/slhX146L1Hm9ddSGnbY7JOGS+78NPhs
-         /pjWS4uFjY9rvRHwSuzNGL5Ab73MK/8BLsCi/LPueWmhfAida5Psl4a0JUE5N/Lh2os+
-         C10rUTznRAouA2/v32ZzpRbL2ZTEHZt2jMWZFzn0oIMxMsr4vgXXcXjWpqBFtxR9s986
-         0cBFVeONKWcodo+iWs1ada1voY0NiUerF+tiZjr6QZOzwAwEaFHFeotzyFuCv/D0mk8h
-         seolT81gAOOpcmZ0ExShGSjSi1i6h4u96PLOGLRZ5epmCmjzVBlhgQuJD/4zgUmyp674
-         DHew==
-X-Forwarded-Encrypted: i=1; AJvYcCVubLNmcAA3+j3qDiisMxd/yTFiv3utdLb8N0ZsHNuBhaQsK/E8rI0WSFbsy5SBMvvps7YUkJFFoZ9Uf5VQfPFUjFdZm6vy
-X-Gm-Message-State: AOJu0YzuUxN3wVSIFfSTXSImVwJ68ap+nota6dCL6g8kuh8NuLQWZ+eY
-	4hByciukxaHjtz4AhjBVAu+KTkSEuVLK6uyP1g2mHQ9TAwc1oHM3ZYtVBhL0GA==
-X-Google-Smtp-Source: AGHT+IGZOsSRpYaJVS9anIOzP9+MFO/W+gxqI5MxyXvSsTAz3CJauoN6TADR7rEf+587CvKHQ9X/Dw==
-X-Received: by 2002:a05:6870:898d:b0:22a:4ea0:d8ff with SMTP id f13-20020a056870898d00b0022a4ea0d8ffmr11957828oaq.51.1712050536817;
-        Tue, 02 Apr 2024 02:35:36 -0700 (PDT)
+        bh=Ku0mrkb12wJLxrj5c2WKpVbSR0MFXMV9Y6xNWDL8Rkw=;
+        b=uGMEYuDi0rFwP+ngBHhRFDIoFs6jxl3V4ylfGyxEpArTsgkZ2JpbPEPWbid9Hn2Lym
+         pDqKgdh4Bcw85qO/T6n2elqch6Jju/BKAmyO0VmO8v2ifWif7OkcMVzhpQ+v7ALAmrbV
+         4rIgsWNUvI983Gmc4T39aRpcqAVrjH15v9jwLHTPVierc9ZrZELNrsBJTfWQ9M51vIf0
+         +9qdWTnjJVxOSo2quka5fKZ52njEG9ldFiu/4/qQg4civUm7++up54paUtDkItG7n6Wk
+         g0iJHp15GuTPzh/rgEq4WxuOaOv3ZYtlhcPRD5ObUBVEbb3TDCanUPiyqg6PNBVucO4l
+         3C7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWOBX0rouIVN8fls63E/Ay1xQfFReQ8pMCPX4c8ldro/3084ItL4O3DaadN8yTI8lcdUivUHa/D4QO8WuTNjYdV0lw/iEmP
+X-Gm-Message-State: AOJu0YzIWqhNOTMt5A9dKn3MmXm+7f8UuuZp+72Va2Tq/KZaRuvHYxp2
+	18FGDWfhpwuJEZ80iE5W0IfVkjd3TKM6iVUXMfg6BM8mZomimBIdqJHuMmThrA==
+X-Google-Smtp-Source: AGHT+IFiuVpILg70wiGv8r5X+NsgBtJqToTHENs2I2VW8W6CRKF96LwGx1hZPS/FZeLDbIA+S3xWYw==
+X-Received: by 2002:a05:6870:2393:b0:22d:f9e1:dbce with SMTP id e19-20020a056870239300b0022df9e1dbcemr12266085oap.6.1712050541740;
+        Tue, 02 Apr 2024 02:35:41 -0700 (PDT)
 Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id q19-20020a62e113000000b006e5a3db5875sm9702087pfh.13.2024.04.02.02.35.33
+        by smtp.gmail.com with ESMTPSA id q19-20020a62e113000000b006e5a3db5875sm9702087pfh.13.2024.04.02.02.35.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 02:35:36 -0700 (PDT)
+        Tue, 02 Apr 2024 02:35:41 -0700 (PDT)
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 To: michael.chan@broadcom.com
 Cc: davem@davemloft.net,
@@ -71,10 +71,11 @@ Cc: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
 	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next v2 2/7] bnxt_en: Enable XPS by default on driver load
-Date: Tue,  2 Apr 2024 02:37:48 -0700
-Message-Id: <20240402093753.331120-3-pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next v2 3/7] bnxt_en: Allocate page pool per numa node
+Date: Tue,  2 Apr 2024 02:37:49 -0700
+Message-Id: <20240402093753.331120-4-pavan.chebbi@broadcom.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20240402093753.331120-1-pavan.chebbi@broadcom.com>
 References: <20240402093753.331120-1-pavan.chebbi@broadcom.com>
@@ -85,98 +86,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001ee6d3061519d414"
+	boundary="00000000000069c34c061519d4c9"
 
---0000000000001ee6d3061519d414
+--00000000000069c34c061519d4c9
 Content-Transfer-Encoding: 8bit
 
 From: Somnath Kotur <somnath.kotur@broadcom.com>
 
-Enable XPS on default during NIC open. The choice of
-Tx queue is based on the CPU executing the thread that
-submits the Tx request. The pool of Tx queues will be
-spread evenly across both device-attached NUMA nodes(local)
-and remote NUMA nodes.
+Driver's Page Pool allocation code looks at the node local
+to the PCIe device to determine where to allocate memory.
+In scenarios where the core count per NUMA node is low (< default rings)
+it makes sense to exhaust page pool allocations on
+Node 0 first and then moving on to allocating page pools
+for the remaining rings from Node 1.
+
+With this patch, and the following configuration on the NIC
+$ ethtool -L ens1f0np0 combined 16
+(core count/node = 12, first 12 rings on node#0, last 4 rings node#1)
+and traffic redirected to a ring on node#1 , we see a performance
+improvement of ~20%
 
 Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 ---
-v2: Fixed formatting issues (double spaces, 80 chars)
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 46 ++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 6e24a341ad28..44b9332c147e 100644
+index 44b9332c147e..9fca1dee6486 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -11804,6 +11804,46 @@ static void bnxt_cfg_usr_fltrs(struct bnxt *bp)
- 		bnxt_cfg_one_usr_fltr(bp, usr_fltr);
+@@ -3559,14 +3559,15 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
  }
  
-+static int bnxt_set_xps_mapping(struct bnxt *bp)
-+{
-+	int numa_node = dev_to_node(&bp->pdev->dev);
-+	unsigned int q_idx, map_idx, cpu, i;
-+	const struct cpumask *cpu_mask_ptr;
-+	int nr_cpus = num_online_cpus();
-+	cpumask_t *q_map;
-+	int rc = 0;
-+
-+	q_map = kcalloc(bp->tx_nr_rings_per_tc, sizeof(*q_map), GFP_KERNEL);
-+	if (!q_map)
-+		return -ENOMEM;
-+
-+	/* Create CPU mask for all TX queues across MQPRIO traffic classes.
-+	 * Each TC has the same number of TX queues. The nth TX queue for each
-+	 * TC will have the same CPU mask.
-+	 */
-+	for (i = 0; i < nr_cpus; i++) {
-+		map_idx = i % bp->tx_nr_rings_per_tc;
-+		cpu = cpumask_local_spread(i, numa_node);
-+		cpu_mask_ptr = get_cpu_mask(cpu);
-+		cpumask_or(&q_map[map_idx], &q_map[map_idx], cpu_mask_ptr);
-+	}
-+
-+	/* Register CPU mask for each TX queue except the ones marked for XDP */
-+	for (q_idx = 0; q_idx < bp->dev->real_num_tx_queues; q_idx++) {
-+		map_idx = q_idx % bp->tx_nr_rings_per_tc;
-+		rc = netif_set_xps_queue(bp->dev, &q_map[map_idx], q_idx);
-+		if (rc) {
-+			netdev_warn(bp->dev, "Error setting XPS for q:%d\n",
-+				    q_idx);
-+			break;
-+		}
-+	}
-+
-+	kfree(q_map);
-+
-+	return rc;
-+}
-+
- static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+-				   struct bnxt_rx_ring_info *rxr)
++				   struct bnxt_rx_ring_info *rxr,
++				   int numa_node)
  {
- 	int rc = 0;
-@@ -11866,8 +11906,12 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 		}
- 	}
+ 	struct page_pool_params pp = { 0 };
  
--	if (irq_re_init)
-+	if (irq_re_init) {
- 		udp_tunnel_nic_reset_ntf(bp->dev);
-+		rc = bnxt_set_xps_mapping(bp);
-+		if (rc)
-+			netdev_warn(bp->dev, "failed to set xps mapping\n");
-+	}
+ 	pp.pool_size = bp->rx_agg_ring_size;
+ 	if (BNXT_RX_PAGE_MODE(bp))
+ 		pp.pool_size += bp->rx_ring_size;
+-	pp.nid = dev_to_node(&bp->pdev->dev);
++	pp.nid = numa_node;
+ 	pp.napi = &rxr->bnapi->napi;
+ 	pp.netdev = bp->dev;
+ 	pp.dev = &bp->pdev->dev;
+@@ -3586,7 +3587,8 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
  
- 	if (bp->tx_nr_rings_xdp < num_possible_cpus()) {
- 		if (!static_key_enabled(&bnxt_xdp_locking_key))
+ static int bnxt_alloc_rx_rings(struct bnxt *bp)
+ {
+-	int i, rc = 0, agg_rings = 0;
++	int numa_node = dev_to_node(&bp->pdev->dev);
++	int i, rc = 0, agg_rings = 0, cpu;
+ 
+ 	if (!bp->rx_ring)
+ 		return -ENOMEM;
+@@ -3597,10 +3599,15 @@ static int bnxt_alloc_rx_rings(struct bnxt *bp)
+ 	for (i = 0; i < bp->rx_nr_rings; i++) {
+ 		struct bnxt_rx_ring_info *rxr = &bp->rx_ring[i];
+ 		struct bnxt_ring_struct *ring;
++		int cpu_node;
+ 
+ 		ring = &rxr->rx_ring_struct;
+ 
+-		rc = bnxt_alloc_rx_page_pool(bp, rxr);
++		cpu = cpumask_local_spread(i, numa_node);
++		cpu_node = cpu_to_node(cpu);
++		netdev_dbg(bp->dev, "Allocating page pool for rx_ring[%d] on numa_node: %d\n",
++			   i, cpu_node);
++		rc = bnxt_alloc_rx_page_pool(bp, rxr, cpu_node);
+ 		if (rc)
+ 			return rc;
+ 
 -- 
 2.39.1
 
 
---0000000000001ee6d3061519d414
+--00000000000069c34c061519d4c9
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -247,14 +238,14 @@ pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
 Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJd97eQmYBVSub+nKi+x5n3k8vkkPguA
-LM/dsxT6cNsZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQw
-MjA5MzUzN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEID4o2CzmSIOitATcZlDWMdG3BEs6OZsE
+RUzK7WYqOrKHMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQw
+MjA5MzU0MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAjuNyNNSpo/j5z/7dIiIlaycnUghRqCxGzU55nQ/33vp0lFrJM
-IYw4vPY+ND4lnBr4YUMNwPedvOfLT365NrhHdO1heKOoubimVSC/7OOzMV+sjbgEF+0MedamrdaA
-2Z2VW1990QPFIRhu9jM1XUrR4iJpok9T1yeAL/Ey1s3PTHhZPF2yKC4HUaMSKV4dbDAunDdDr8KF
-LJgYR96lIV2kBVBA2mEdIxihVAaL934bTVwuAQDxlPxUPc3keHuFMhBXkEi8YRsMQfdEZVrItNCZ
-Dc9meNqy/9s2PeR3gRSji+9T3gTTamRJFxxH2txwBRcoVKa5D0mDRMiFoYR+YaC7
---0000000000001ee6d3061519d414--
+ATANBgkqhkiG9w0BAQEFAASCAQAkXp16DO8jior69NrOhPi2jVnmStKAJCdCt+72ju3chZFFajBO
+6ifTS8u/Y4ZBW/vm2rnq5bPpNs9sELgGpmQhVmzfFmPZ/rwTjzYXYNqaLdDr857LwH1Wo8FWWAAR
+mIkQjMPuR6MeJ/4VAp32abBYqdOjiw/s0FukslkuFr/HLriXosV5tSIzN82e3GCnJAwfV75P6lwu
+NwAv511cJF26sw6xVvUa4ZkB1c0CO/OdYhgF8bUnWfAh8GXN472Xp7BbTrFbybPcJagF/MM+iEUv
+DdUMVG3CalNdts5/C6h3489NdH8ZSRO14OHV9udbRBHTL21TK9CRHKDWF6o6d/15
+--00000000000069c34c061519d4c9--
 
