@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-84064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C58895674
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:18:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41CEE895689
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:25:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DA03282D48
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:18:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9F1B1F22B6B
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9606186151;
-	Tue,  2 Apr 2024 14:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB10786268;
+	Tue,  2 Apr 2024 14:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dfVAw2iR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aTMpo1PZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FC886146;
-	Tue,  2 Apr 2024 14:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B1E84037;
+	Tue,  2 Apr 2024 14:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712067486; cv=none; b=dE9zQOaLyxbcYZ1m4bpk4R7A+VZGCSxu4m3Q46l4YzckkLOSW3AF927cdhFJTbMCA3vXTIDmwcurRGzeeR3TBTxHq4TwP6jaxEAhaZKTTF38j20o4KIb188SiKmwEfXDqqkVPU/OOJOETsWLfYh6TAnEf/q08exkPLfY2mz328A=
+	t=1712067927; cv=none; b=mXAZ6mVZFMgyYtLkrn3a/5meHOPcCrFkOSP5nLQC87ZKhm/HjIU9XVfybN2kEkQU/KoAyeyd/Qpj/22w1Eu6+mR/29RzRc+nMOwJwrkXp00svX8M5SK9BhKz6DEBQn5Fjnp5/+UdLhMVw0vCjzE8uVLHmWf77/Toml2TmpRv6Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712067486; c=relaxed/simple;
-	bh=JXeMgDJf7NztdBYQwze7zpUZgNxk5FTdMBjGNHLcJyc=;
+	s=arc-20240116; t=1712067927; c=relaxed/simple;
+	bh=05KPAcK7dAHejAqXCS3gStMEGMQcesXYI/mYO3QHKbg=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=B2Iuy2UTt3mMaFwLQv+JXSZ5YylfzILugMpDuV2OzFnoKSBQNypK2WEt79kmHVitn/x4shutQw6GZKMM+31L17KW7FqrIhd3JlSwRvM/ixgseWWrXEm/CXOC3/Bfj81M4BJyaHu6Y4RyWlx08yZr7yRFwnfQnJg+DzmiEuJgPlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dfVAw2iR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57FA2C433F1;
-	Tue,  2 Apr 2024 14:18:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=OgHywx5MSREv/NCu7hGcC6HSVB8mKFKXo5JbhnSu2MwsIV/St0YMZ9MutXHaSfAd5QNhKK60OYHkCi7Z1EIVlH1wHHWqVqv+kkPOfDhWC9cicKSCkmS9LDw7imYL/Ss71rVGOoAtn4ew59U2CG9La6c3lRZA/UR3mbE2schXapM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aTMpo1PZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99FECC433F1;
+	Tue,  2 Apr 2024 14:25:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712067485;
-	bh=JXeMgDJf7NztdBYQwze7zpUZgNxk5FTdMBjGNHLcJyc=;
+	s=k20201202; t=1712067927;
+	bh=05KPAcK7dAHejAqXCS3gStMEGMQcesXYI/mYO3QHKbg=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=dfVAw2iRAvypeK/Zlw38Hf7kCcsuNwEhmQfBge96A/7PycL6UubyOuVvmKNRhslrZ
-	 oNMfs3i2an13hurYmIouOhXwU0P7YwaKep4CpvN9DQOtyYOXS6BZSwcsdI9SEJ6VzA
-	 J5WhBcosWO0m1/FPgwgQ4g5iwFvLaNkajPW7lBdqd+N+nu7hvFWMhPYBJZUM3RJ4KD
-	 9LXtsG9PhmP3zt1699OP/kxI+DGr59xUutBN6wJ6BNEDepT71pRFxMer7JyIZ/6vZh
-	 x0xWH8Nlw7f36+WcOiVt+7thgJjsCnDL3yrWnwaFMwUp/OxG3rfLNZe8aYzDY/t9pi
-	 LsntEkP/9ghMg==
+	b=aTMpo1PZGrw4qjemIspGevm8YLHd2f/XrXbhGu3W9kgoM99qOUtJWV0Q8wTv7foSh
+	 IxUF/IdqAwa09OU7wlFmkoL0wH1VLwZ1GjlU/FnLR3kODxIL7BcswcOFUNt/J8kL/N
+	 1SCMR5XQxyX9jJvyECbCP3cuVoZq4T6iAi/CFNB9W1eonl2PZYx+sGPhB70uFlUsqr
+	 FSHsrn9UzLA2ljcisrcmoyCiH8vwodEUACVpX8gDOpdT3yr73f7bbnu84lL4GLjtrb
+	 C5u8/sWIZnRDlnKnUvP8M2sya7/64U8HFSKg0+OlrqPS6q16Y1euvumdy7mtWOA69f
+	 0RmSF7TtmDAug==
 From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Conor Dooley <conor.dooley@microchip.com>, Conor Dooley <conor@kernel.org>
-Cc: Stefan O'Rear <sorear@fastmail.com>, Pu Lehui <pulehui@huaweicloud.com>,
- bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
+To: Pu Lehui <pulehui@huaweicloud.com>, Stefan O'Rear <sorear@fastmail.com>,
+ Conor Dooley <conor@kernel.org>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
  netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, Daniel
  Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
  Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
@@ -56,14 +56,14 @@ Cc: Stefan O'Rear <sorear@fastmail.com>, Pu Lehui <pulehui@huaweicloud.com>,
  <pulehui@huawei.com>
 Subject: Re: [PATCH bpf-next 2/5] riscv, bpf: Relax restrictions on Zbb
  instructions
-In-Reply-To: <20240329-linguini-uncured-380cb4cff61c@wendy>
+In-Reply-To: <ed3debc9-f2a9-41fb-9cf9-dc6419de5c01@huaweicloud.com>
 References: <20240328124916.293173-1-pulehui@huaweicloud.com>
  <20240328124916.293173-3-pulehui@huaweicloud.com>
  <3ed9fe94-2610-41eb-8a00-a9f37fcf2b1a@app.fastmail.com>
  <20240328-ferocity-repose-c554f75a676c@spud>
- <20240329-linguini-uncured-380cb4cff61c@wendy>
-Date: Tue, 02 Apr 2024 16:18:02 +0200
-Message-ID: <87il0zrgpx.fsf@all.your.base.are.belong.to.us>
+ <ed3debc9-f2a9-41fb-9cf9-dc6419de5c01@huaweicloud.com>
+Date: Tue, 02 Apr 2024 16:25:24 +0200
+Message-ID: <87cyr7rgdn.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,106 +73,51 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Conor Dooley <conor.dooley@microchip.com> writes:
+Pu Lehui <pulehui@huaweicloud.com> writes:
 
-> On Thu, Mar 28, 2024 at 10:07:23PM +0000, Conor Dooley wrote:
+> On 2024/3/29 6:07, Conor Dooley wrote:
+>> On Thu, Mar 28, 2024 at 03:34:31PM -0400, Stefan O'Rear wrote:
+>>> On Thu, Mar 28, 2024, at 8:49 AM, Pu Lehui wrote:
+>>>> From: Pu Lehui <pulehui@huawei.com>
+>>>>
+>>>> This patch relaxes the restrictions on the Zbb instructions. The hardw=
+are
+>>>> is capable of recognizing the Zbb instructions independently, eliminat=
+ing
+>>>> the need for reliance on kernel compile configurations.
+>>>
+>>> This doesn't make sense to me.
+>>=20
+>> It doesn't make sense to me either. Of course the hardware's capability
+>> to understand an instruction is independent of whether or not a
+>> toolchain is capable of actually emitting the instruction.
+>>=20
+>>> RISCV_ISA_ZBB is defined as:
+>>>
+>>>             Adds support to dynamically detect the presence of the ZBB
+>>>             extension (basic bit manipulation) and enable its usage.
+>>>
+>>> In other words, RISCV_ISA_ZBB=3Dn should disable everything that attemp=
+ts
+>>> to detect Zbb at runtime. It is mostly relevant for code size reduction,
+>>> which is relevant for BPF since if RISCV_ISA_ZBB=3Dn all rvzbb_enabled()
+>>> checks can be constant-folded.
 >
->> As I said on IRC to you earlier, I think the Kconfig options here are in
->> need of a bit of a spring cleaning - they should be modified to explain
->> their individual purposes, be that enabling optimisations in the kernel
->> or being required for userspace. I'll try to send a patch for that if
->> I remember tomorrow.
->
-> Something like this:
->
-> -- >8 --
-> commit 5125504beaedd669b082bf74b02003a77360670f
-> Author: Conor Dooley <conor.dooley@microchip.com>
-> Date:   Fri Mar 29 11:13:22 2024 +0000
->
->     RISC-V: clarify what some RISCV_ISA* config options do
->=20=20=20=20=20
->     During some discussion on IRC yesterday and on Pu's bpf patch [1]
->     I noticed that these RISCV_ISA* Kconfig options are not really clear
->     about their implications. Many of these options have no impact on what
->     userspace is allowed to do, for example an application can use Zbb
->     regardless of whether or not the kernel does. Change the help text to
->     try and clarify whether or not an option affects just the kernel, or
->     also userspace. None of these options actually control whether or not=
- an
->     extension is detected dynamically as that's done regardless of Kconfig
->     options, so drop any text that implies the option is required for
->     dynamic detection, rewording them as "do x when y is detected".
->=20=20=20=20=20
->     Link: https://lore.kernel.org/linux-riscv/20240328-ferocity-repose-c5=
-54f75a676c@spud/ [1]
->     Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
->     ---
->     I did this based on top of Samuel's changes dropping the MMU
->     requurements just in case, but I don't think there's a conflict:
->     https://lore.kernel.org/linux-riscv/20240227003630.3634533-4-samuel.h=
-olland@sifive.com/
->
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index d8a777f59402..f327a8ac648f 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -501,8 +501,8 @@ config RISCV_ISA_SVNAPOT
->  	depends on RISCV_ALTERNATIVE
->  	default y
->  	help
-> -	  Allow kernel to detect the Svnapot ISA-extension dynamically at boot
-> -	  time and enable its usage.
-> +	  Add support for the Svnapot ISA-extension when it is detected by
-> +	  the kernel at boot.
->=20=20
->  	  The Svnapot extension is used to mark contiguous PTEs as a range
->  	  of contiguous virtual-to-physical translations for a naturally
-> @@ -520,9 +520,9 @@ config RISCV_ISA_SVPBMT
->  	depends on RISCV_ALTERNATIVE
->  	default y
->  	help
-> -	   Adds support to dynamically detect the presence of the Svpbmt
-> -	   ISA-extension (Supervisor-mode: page-based memory types) and
-> -	   enable its usage.
-> +	   Add support for the Svpbmt ISA-extension (Supervisor-mode:
-> +	   page-based memory types) when it is detected by the kernel at
-> +	   boot.
->=20=20
->  	   The memory type for a page contains a combination of attributes
->  	   that indicate the cacheability, idempotency, and ordering
-> @@ -541,14 +541,15 @@ config TOOLCHAIN_HAS_V
->  	depends on AS_HAS_OPTION_ARCH
->=20=20
->  config RISCV_ISA_V
-> -	bool "VECTOR extension support"
-> +	bool "Vector extension support"
->  	depends on TOOLCHAIN_HAS_V
->  	depends on FPU
->  	select DYNAMIC_SIGFRAME
->  	default y
->  	help
->  	  Say N here if you want to disable all vector related procedure
-> -	  in the kernel.
-> +	  in the kernel. Without this option enabled, neither the kernel nor
-> +	  userspace may use vector.
->=20=20
->  	  If you don't know what to do here, say Y.
->=20=20
-> @@ -606,8 +607,8 @@ config RISCV_ISA_ZBB
->  	depends on RISCV_ALTERNATIVE
->  	default y
->  	help
-> -	   Adds support to dynamically detect the presence of the ZBB
-> -	   extension (basic bit manipulation) and enable its usage.
-> +	   Add support for enabling optimisations in the kernel when the
+> Thanks for review. My initial thought was the same as yours, but after=20
+> discussions [0] and test verifications, the hardware can indeed=20
+> recognize the zbb instruction even if the kernel has not enabled=20
+> CONFIG_RISCV_ISA_ZBB. As Conor mentioned, we are just acting as a JIT to=
+=20
+> emit zbb instruction here. Maybe is_hw_zbb_capable() will be better?
 
-I don't care much, but "optimizations" here -- for consistency reasons!
-[1] ;-)
+I still think Lehui's patch is correct; Building a kernel that can boot
+on multiple platforms (w/ or w/o Zbb support) and not having Zbb insn in
+the kernel proper, and iff Zbb is available at run-time the BPF JIT will
+emit Zbb.
 
-Nice change!
+For these kind of optimizations, (IMO) it's better to let the BPF JIT
+decide at run-time.
 
-Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
 
-[1] https://lwn.net/Articles/636286/
+Bj=C3=B6rn
 
