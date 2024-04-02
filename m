@@ -1,117 +1,145 @@
-Return-Path: <netdev+bounces-84060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048D1895607
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:02:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E830895643
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:10:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36E181C220EE
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:02:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49FD0285819
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C2D84FCC;
-	Tue,  2 Apr 2024 14:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB818129E78;
+	Tue,  2 Apr 2024 14:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="CPtOGAR4"
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="JVs4qOJy"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E512582893;
-	Tue,  2 Apr 2024 14:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2C085C52;
+	Tue,  2 Apr 2024 14:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712066533; cv=none; b=lP6bOkWHPQnTs/6fIMWYPgCuinn1GEuFtSA9PnXh/eJ/FD+MJF1Xc9wSaNMHlct6bBJ2FU8pMfE+liFAEi7IpQA+vOwYuAyDfF0kpbGBkXCCliMu5wMO6sxm8+f7QCpm1F01TXrD5MX718ZS/ngqbpJtqTbnFzmYKEpY0aBxw5I=
+	t=1712066983; cv=none; b=ZyQJaUJuaSAAxQxBiUB1nAu15uAtozxCFO4j47iC2aBx5sDcvQFlzZJwd4IQlcNz4SYDdMICGSIWTAOCSj3kiuLjJDUcW+7jRkj+QxA8YrZhCajPGEG4dFpgZiSRT6Gvqjpb7Rq5QKMk3y0uZTuY4Y26uUhtcQZehsoPZHuWPSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712066533; c=relaxed/simple;
-	bh=MOhwCxMQctbQFU+axR1Gekz5rCSR4g5hpIDWONlTUOc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ohKxYHQDZPh8MqlZAaVFEMpb8E/oyUn7tndSGW8sSGmR+bdO+BxSXJUtR7TJydOhlmjewLDx8K8hRfenXMEO92sS/UflEAR++v6b75OjRydhV9V9JB6sH93h7fDiZBK7GqM0W52UlQ6vCGtkYJ/yh4W9ZVVOdMVb85zA0CTm9z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=CPtOGAR4; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+	s=arc-20240116; t=1712066983; c=relaxed/simple;
+	bh=o9zg2EYP3VfME7dTRKvMGNy5dt/wZYuKnQ/u1Qb2bmk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=G6oMmAXaU5icwT8kNA6UC9jLLd9MGLHkESlQ6FJwdp+pouWkXVJvACOtK6/hveEO8dDh0VV1KeG2ILSP4yy6y5GbEBazXSRi207hGO8gKxhuOYczk7T0eebfpApgGEK9ZN7hgIbYwvy236ZO3aXWwAUGJSD9K8dXeOpzS2gPfT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=JVs4qOJy; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=sDKSBKctIHDpPvXzGMLCuAyCRKl5uTk+wKlRRmtyYU8=; b=CPtOGAR4IzTp1fXZss506ooEAh
-	61WURTi40li+u+jDmEa2wooqXUZTNEm1PkmZFeqN48swERppVnyqRhInsf3ExyJBJ7RemR1SSTvTL
-	I/WY6e/RbmANMoB7LMyiT0IyN+gQMNTOrR4NDfUgBA6XGKJzYeUu9gUpF1g+1yo1N8q68jQy9Yj4+
-	1Xb2oRGPbig7E5Ts0kZ7pgbpHE3VhvdBBgy19P3z56xnHqgJrD6372tlzjo32n7p/K+drreEMRYG1
-	SJsT02XTfZaeYZD1We0RtoOkIvudvKgIKO3yvKfUvmIVDeFYaUobxZiyZnDFtFYJR7EbceJ+HeYxv
-	+IREPgLQ==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rreiE-000C7B-Cn; Tue, 02 Apr 2024 16:02:06 +0200
-Received: from [178.197.248.12] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rreiD-00Er11-12;
-	Tue, 02 Apr 2024 16:02:05 +0200
-Subject: Re: [PATCH bpf-next 2/2] selftests/bpf: Add testcase where 7th
- argment is struct
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20240331092405.822571-1-pulehui@huaweicloud.com>
- <20240331092405.822571-3-pulehui@huaweicloud.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <967f996f-f660-4615-696e-95c5db0542ad@iogearbox.net>
-Date: Tue, 2 Apr 2024 16:02:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:References:Reply-To:Cc:To:From:Subject:MIME-Version:Date:
+	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	In-Reply-To:References; bh=dqvRXQEZOjC607wRxzYnb2l3bFAM7p6fyF69p9Uu1wc=;
+	t=1712066981; x=1712498981; b=JVs4qOJy8tPoEAVSmdzq2Z0buwo32F0KEq5zLrZIYJuBtUM
+	OwMTxoakhZe3ffuk2KlmfM616EBQjySd3Sbbx4LurafhcTqtwzYji4aC/xKBeA9vay825pLscAXK6
+	Frxc4IcR/PNel4mrcnHCy8Zy6NwQSlTZhI2GRhmO/EKoQLdoEsuLJQFVQ2fj988NjdYQcD2/UaTXk
+	KhDE2ZMAzEvqYK/uN+UpO5PH+ywF1nOCoJxf6/GeZRhol1JD+7+4YgsKTjhKwNNx4S/hr/2pmD4lB
+	A8zQTrdgAeE9yEdofNAaaYAyxLIgaeHEHnP4K0JIbtfCGf0cjNJtjoRmYV3qo12A==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1rreN7-0002lq-56; Tue, 02 Apr 2024 15:40:17 +0200
+Message-ID: <72e39571-7122-4f6a-9252-83e663e4b703@leemhuis.info>
+Date: Tue, 2 Apr 2024 15:40:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240331092405.822571-3-pulehui@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27233/Tue Apr  2 10:26:21 2024)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] u64_stats: fix u64_stats_init() for lockdep when used
+ repeatedly in one file
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+To: =?UTF-8?B?UGV0ciBUZXNhxZnDrWs=?= <petr@tesarici.cz>,
+ Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Linux regressions mailing list <regressions@lists.linux.dev>,
+ open list <linux-kernel@vger.kernel.org>, stable@kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev <netdev@vger.kernel.org>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>,
+ Linux regressions mailing list <regressions@lists.linux.dev>
+References: <20240306111157.29327-1-petr@tesarici.cz>
+ <20240311182516.1e2eebd8@meshulam.tesarici.cz>
+ <CANn89iKQpSaF5KG5=dT_o=WBeZtCiLcN768eUdYvUew-dLbKaA@mail.gmail.com>
+ <20240311192118.31cfc1fb@meshulam.tesarici.cz>
+ <764f2b10-9791-4861-9bef-7160fdb8f3ae@leemhuis.info>
+Content-Language: en-US, de-DE
+In-Reply-To: <764f2b10-9791-4861-9bef-7160fdb8f3ae@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1712066981;5f967a66;
+X-HE-SMSGID: 1rreN7-0002lq-56
 
-On 3/31/24 11:24 AM, Pu Lehui wrote:
-> From: Pu Lehui <pulehui@huawei.com>
+Hi. Top-posting for once, to make this easily accessible to everyone.
+
+Hmmm, looks like Petr's patch for a (minor) 6.8 regression didn't make
+any progress in the past two weeks.
+
+Does nobody care? Did nobody merge it because no tree feels really
+appropriate? Or am I missing something obvious and making a fool out of
+myself by asking these questions? :D
+
+Ciao, Thorsten
+
+#regzbot ignore-activity
+
+On 18.03.24 15:23, Linux regression tracking (Thorsten Leemhuis) wrote:
+> On 11.03.24 19:21, Petr Tesařík wrote:
+>> On Mon, 11 Mar 2024 18:43:59 +0100
+>> Eric Dumazet <edumazet@google.com> wrote:
+>>> On Mon, Mar 11, 2024 at 6:25 PM Petr Tesařík <petr@tesarici.cz> wrote:
+>>>> On Wed,  6 Mar 2024 12:11:57 +0100
+>>>> Petr Tesarik <petr@tesarici.cz> wrote:
+>>>>  
+>>>>> Fix bogus lockdep warnings if multiple u64_stats_sync variables are
+>>>>> initialized in the same file.
+>>>>>
+>>>>> With CONFIG_LOCKDEP, seqcount_init() is a macro which declares:
+>>>>>
+>>>>>       static struct lock_class_key __key;
+>>>>>
+>>>>> Since u64_stats_init() is a function (albeit an inline one), all calls
+>>>>> within the same file end up using the same instance, effectively treating
+>>>>> them all as a single lock-class.  
+>>>> What happens with this fix now?
+>>>>
+>>>> IIUC it should be reviewed by Eric, but I don't know through which tree
+>>>> it should be merged. Any plans yet?  
+>>>
+>>> I thought I gave a reply, but apparently not .
+>>>
+>>> Reviewed-by: Eric Dumazet <edumazet@google.com>
+>>
+>> Thank you!
 > 
-> Add testcase where 7th argument is struct for architectures with 8
-> argument registers, and increase the complexity of the struct.
+> Great. Just wondering, as there afaics was no activity since about one
+> week: what is the plan forward here?
 > 
-> Signed-off-by: Pu Lehui <pulehui@huawei.com>
-> ---
->   .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 19 ++++++++++
->   .../selftests/bpf/prog_tests/tracing_struct.c | 13 +++++++
->   .../selftests/bpf/progs/tracing_struct.c      | 35 +++++++++++++++++++
->   3 files changed, 67 insertions(+)
-
-The last test from this patch fails BPF CI, ptal :
-
-https://github.com/kernel-patches/bpf/actions/runs/8497262674/job/23275690303
-https://github.com/kernel-patches/bpf/actions/runs/8497262674/job/23275690364
-
-Notice: Success: 519/3592, Skipped: 53, Failed: 1
-Error: #391 tracing_struct
-   Error: #391 tracing_struct
-   test_fentry:PASS:tracing_struct__open_and_load 0 nsec
-   libbpf: prog 'test_struct_arg_16': failed to attach: ERROR: strerror_r(-524)=22
-   libbpf: prog 'test_struct_arg_16': failed to auto-attach: -524
-   test_fentry:FAIL:tracing_struct__attach unexpected error: -524 (errno 524)
-Test Results:
-              bpftool: PASS
-           test_progs: FAIL (returned 1)
-Error: Process completed with exit code 1.
+> Is the "through which tree it should be merged" question still
+> unresolved? I quickly looked and it seems two of the last tree changes
+> to that file over the past years went through net-next (the other one
+> through the tip tree). That's why I CCed the other two net maintainers
+> and the net list now.
+> 
+> Or is the plan to merge this after the merge window? Or only merge it
+> for 6.10, as it are bogus lockdep warnings that are being fixed?
+> 
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> --
+> Everything you wanna know about Linux kernel regression tracking:
+> https://linux-regtracking.leemhuis.info/about/#tldr
+> If I did something stupid, please tell me, as explained on that page.
+> 
+> #regzbot poke
+> 
+> 
 
