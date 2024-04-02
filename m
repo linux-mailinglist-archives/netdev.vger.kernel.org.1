@@ -1,191 +1,200 @@
-Return-Path: <netdev+bounces-83991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23CFA895303
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:32:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A5CB895347
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:38:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476861C22C67
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:32:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD7011F25CBD
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6CA58AB0;
-	Tue,  2 Apr 2024 12:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5E179B87;
+	Tue,  2 Apr 2024 12:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iYSI7g/k"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ER3+BCEx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025DC1DFD0
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 12:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712061122; cv=fail; b=CG9XsBPTXfpej8lx/209Xyy/Fouyee+Ank7hSnwD+TdYRgNjjMclSAYSTVsczpFu0vjAm3PdPTSwhX3cXwXhivOISv8pVAfuFPrzi4nnBZY/zkFL8/dinNWdIivtTc+cg90/dEIJZvgrxrphT7sMALEz6bw0OcntV8GIWCyV8V4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712061122; c=relaxed/simple;
-	bh=mAsjXVAVto4TJbog0NCKXQC/rmSCv4oOsFAWLipR8WM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=o1eD76n7Wg4dHE7tUDKnPI19c/bPxzqUitLhVzIhrbb11e7FOamgDve2ttN4Y4Z6O0S4ZvJIg3HBaAvBhLj1ZByRyZlT4TUgZLmmI7OlLXlMPqxXQcDa4LgQ3Ddalf+uEW0dWobcDgWwbSzgFwc2MGYlCCs18LpojOdr4CFqn+s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iYSI7g/k; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712061121; x=1743597121;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mAsjXVAVto4TJbog0NCKXQC/rmSCv4oOsFAWLipR8WM=;
-  b=iYSI7g/k2ZPgSRK15mekQfbDP1mwsVsF/sUGTaEBpPYuzWn5/HswaSlG
-   z/gQpr2CUZ5q+uu7vUuscYciH2gNl8Oq4L6EF8gCyGi1j/Mo1v+vB4WtO
-   l8YPo4bdlMrdOUCQYnA81QCAuePHTo13WDik1RDT+2JQg4qIWe7GkRjtx
-   pjBjhs3p29Zy6Uf6SY0OYw3vFhujT4gYDfUqTmqFqjgyp+pOqmqjIViAJ
-   PGvx5XD4tEz4dtc4FuRoG27U0XEDGDCgAff6mNS9r3QFl7XpjY8e4RxxN
-   p/QL2ait6Rw/ftiMHH8qgtDEoF+SXlEEB4OhO8DX+E5qik5day+ta/ibT
-   Q==;
-X-CSE-ConnectionGUID: DMRUhoyBSFWk3nkqFgYRqA==
-X-CSE-MsgGUID: rgEv/kSwQfimWrbuh2bxtw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="7096202"
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="7096202"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 05:32:00 -0700
-X-CSE-ConnectionGUID: lot8+QIrSXCzpvAKFPgOgQ==
-X-CSE-MsgGUID: 4cXvY1jrRECnLy9YRVeMEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="18108272"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Apr 2024 05:32:00 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Apr 2024 05:31:59 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Apr 2024 05:31:58 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 05:31:58 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495AFBE5E
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 12:37:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712061438; cv=none; b=V13B4w8uQ+fCxbbjTRei08L1kkuF27675K2yYmGbk9Qu6r1syjwGxhdaJ4q/yyCmQxtNYcLr3iFrBOzpp92XWGeA4jIZdGODJa088k2wtHBNuDeLf33E65SJtXu3L26Z84nIZDR6DhMJZznnMhrhhOqNAJQzF9kY1pxrLNZK4qI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712061438; c=relaxed/simple;
+	bh=Qu/thyLPHHn0dIsAazNLNFWOHhrh+WcA58vfrfbcEb0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IlOGpW9frs4YXFKBhOBRVGUg1Uh5rdoogCyAMeRWrpKKFmgqi0nr1qxKfT3baj+h43YfK/Dub8QxO7zkzRhCqRkOrc2emMDOFrO/U2D9aLzPAHXXk3iwWqGpdHJhL4EoSKcNiMq6zB016JlBphQf6feObvp7Fgsytz/w3+UQG94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ER3+BCEx; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 432C7EtV015490;
+	Tue, 2 Apr 2024 05:37:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pfpt0220; bh=nABfr2eZJWXLo6GDKTH3Bu
+	LXVF4ty6pxtnkXaJYV12U=; b=ER3+BCExzywymsuWYLDX5oh5/ZJotsbFL8MJDW
+	1BEn3XQ1DcZZ4EMaBieaikXLq0jF+8l/mepOSaHwKhEymfBbVel+z0+TeuqjRxXv
+	lV6ttDLMj8YdJWEOxBNENbUHGuE8orA83pGvcLbeg7q+wBGGjDioi9hRM9+WRoSM
+	Lytr6F/vZW1sjQIhiei0yAqUQal59b1HJQxUSVNQzTlRyRaWFDgJfA1TVywyO6QN
+	7yjZaUxJPvThVmSukmugsPTj5iVALwH6zKCeY7jmsqvlY7DSccURpIp4aDap6E4H
+	bZz6oWrsqMugNxJekxuWVFnnleHjfjHbeC8Bvx6xJBArsXgg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3x8hr703gr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Apr 2024 05:37:01 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 2 Apr 2024 05:31:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eqkq+QIMbdaucPLMEx0Ty+UX9I0Ylqb69jjheQ6PzsEL+TdHlaTHo1fbNgGjLXowj+vj2u8bWXlyOUDYbyGe5ZStENFyKy3BXbWOkn69/ROSlygvSUgn6vItgiHnRnm+JQJ8GG0nUN2nwNuzTNzFTfH15kbzL0usWJRXZcb6iWYe+Iyk+jq1siDcjpJVloKaz8SFBPUyStY0bdrk7lW73tf561wrQRnrRmuigQ0qiIyctpPRhEc+pFYYFCwzpHcR9xIhEbG/FZlAQQjMvXZN3nM7fTeTrYb1Ax7CGrpQlHrOrq6KsotdlBlHTql8hE+ajhhE69BvzM/3hD/0k/6BuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mAsjXVAVto4TJbog0NCKXQC/rmSCv4oOsFAWLipR8WM=;
- b=FdIYdKm/UZGAgcx1jFOCcspx9CoiuvW19o5p9PmL6hWt8Hb7/yI01vbJCNwNqrBQbKdBto6F8V2rTLDfQvuOWXWCwlHBSOXtAysLAcVo7jrvtbyr9E2gjuYZ15RSePLzrmDuSRwCyhG+IuNz+EErt6wKy68uS6q9UKKsUhBc5xunDxCeC5XE4oF2wwzsILG5TB8QGNNuwkldzd5G3qAC5EeOf5RxGyT2JablKr6FfW6cEgxJH195AZrDnPX4Pa69WUdMS6FL1rFewUI9ipzc4EEMy5yekM7CyEQPh2I1D4ovPhZXqrmLnqDXo/u/NKCaNr/aE6XBrUIW9ThtWL1x4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5800.namprd11.prod.outlook.com (2603:10b6:303:186::21)
- by SN7PR11MB6560.namprd11.prod.outlook.com (2603:10b6:806:26c::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Tue, 2 Apr
- 2024 12:31:56 +0000
-Received: from MW4PR11MB5800.namprd11.prod.outlook.com
- ([fe80::b022:a668:b398:77a4]) by MW4PR11MB5800.namprd11.prod.outlook.com
- ([fe80::b022:a668:b398:77a4%7]) with mapi id 15.20.7452.019; Tue, 2 Apr 2024
- 12:31:56 +0000
-From: "Kolacinski, Karol" <karol.kolacinski@intel.com>
-To: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>
-Subject: Re: [PATCH v4 iwl-next 00/12] Introduce ETH56G PHY model for E825C
- products
-Thread-Topic: [PATCH v4 iwl-next 00/12] Introduce ETH56G PHY model for E825C
- products
-Thread-Index: AQHagfSfyhXuhZGZmkykrlYPlfQpk7FO5u+AgAYGqLE=
-Date: Tue, 2 Apr 2024 12:31:56 +0000
-Message-ID: <MW4PR11MB580062A340F9A03B3780EF64863E2@MW4PR11MB5800.namprd11.prod.outlook.com>
-References: <20240329161730.47777-14-karol.kolacinski@intel.com>
- <ec2aa7da-a3dc-36f2-39bc-052e9ba97de0@intel.com>
-In-Reply-To: <ec2aa7da-a3dc-36f2-39bc-052e9ba97de0@intel.com>
-Accept-Language: pl-PL, en-US
-Content-Language: pl-PL
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5800:EE_|SN7PR11MB6560:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /iPtlagWKIdJNfRYhkt3uaE+/c5PfUNYMynr1PuELnpiH5C0awM5FIOWgXqpsV8WARTrB51VIlRXr+jcwMEWQBf1wjPmjFuZy0Lq86FqIDJ18NLWALXMxOmsAY24zM9TJV+SLxCFegqGvwscy1j6r8Eyt9i6hUJmv3lhu8zzh1QhDr+eWEcGvLcAno53YwxY7As88nmqIR0dxiS9RctyRPf6rtccLR15gDnRzjblDl6XI6roQUFSaxpuSY/PB+rUtxuvCJ3zbSY62YA0WxwAyK/7i8VkmHriNGphJHfXfhaFAgHVNKVLqrTQn5URpK/KKV3rgp/v87zwJyiOAvRu74dVCgsJOWqjTws9+Uv9xp+CA3oL74ftH8NJ/v5g/enEKBKBRoy4/e9m19edj+BG/Ufd5a4/vt9qyPye7xG7ouKKKF82zj2rFB6L9sM4FotuhMzV+kFJ7BwIUmnVvpxTM92S//vCEMCqu3+GR81Ta0oJ7K0uom/MQxAHFS/hgK9QU++kbUdtPc0EXdiu11K6VqyGRnvET1tQUQaGOOiVTGPjNkPS1kWdHcsAKsRTszsm4WyHLZi1b80wmmKzzTVvuP5uQ4g5AX2Ztw2mQbQJfkCHgFHDxzjNzI8lOlHmGgeMtFX+YtgGN3sAVp3bIaKFBKXu8stea2tYZBgRkx8PDRk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5800.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-2?Q?3w+bpPP9N9kN9KDiMTOlCDmJaQoHJs/qQzDpqvU9O3o/YC1AEJycqUifyj?=
- =?iso-8859-2?Q?mV2m6f9HRbUoqZYfyhivc8B0WnOngULKUQxG/glWzPWj4ul0pnHwpsbmjV?=
- =?iso-8859-2?Q?wjWiK/8fBm0weZq+S2KOwlNMtr+MwTaf0Ygqbi+DjstgCSphq2wyhkyiYY?=
- =?iso-8859-2?Q?p8GTqX6gn0QIC+DaKAPDiVtHNi0O1kFGEWuJEU1K21O4XTlC2IAWHJ+xIC?=
- =?iso-8859-2?Q?XA74t2KjXWJpmKaPa62eHXTvYynGnylHLKPqdspq4wQlKYm9+RsZTEMrGJ?=
- =?iso-8859-2?Q?i192JK1A97cjFC3UCfvPQJlveA9CQOi3649N7oF/HliMxNSU4qPi8hTMzr?=
- =?iso-8859-2?Q?B8bFbnB8fk8AJgi0Gub7iTviL57BVjdL+u4da9ErEdNRCx9/jQd4PL5+4o?=
- =?iso-8859-2?Q?tyLmIJg/NH7NRRwfuPvQsAaZD22S/zOLjE/0Mq67u0uwPR+0JEMvGtaAUq?=
- =?iso-8859-2?Q?com21mrL5LyAG8kAdoA5bNSWb9nCmjM7R2/4lDapzdRCCuWqUoUjT3JR4G?=
- =?iso-8859-2?Q?AjMCIqlwWFpD2ufMFzIStCwqnARjJSOgDDYceAt84+dtSqWI+ZltYWf8Kf?=
- =?iso-8859-2?Q?uwD+532lCZ1bKlbXYNNl1cotVjV0Ehzern9c4BT7ejfpsH0oXTCR/mdZ9Y?=
- =?iso-8859-2?Q?LvZVO+vlp0Vue9sto+lsrNLm5VYhwYztDnhFKmxrsVgKGXytPsgN/1QuU8?=
- =?iso-8859-2?Q?AQ0islunKgMyxXixho0eNEf4eWLnixQ95jZkjZODboKQwftaodziv9V+0C?=
- =?iso-8859-2?Q?HCVnt/Sc/viEWpgq2oniPxf62Nc/MHRTKzNzwG/x5RhZS4WTraStGwiiz6?=
- =?iso-8859-2?Q?OV/uZZ9OWyVXIzsKbrnPeke+WbPZZbfqSYBSWafQAeFwO9RhOZyJkVsWcm?=
- =?iso-8859-2?Q?uVKdSOcUQZ9fN3EyGDzv2ZQx/U8HBoZCCCTHZVc988KM8QWsHBSshROWCY?=
- =?iso-8859-2?Q?gzeUE6ao92HUcYVinXVEfYoNnZif9emCBDxfOqROyJ2lmZWWvb6C5u6mxw?=
- =?iso-8859-2?Q?fLhiVzqv/aZ8I+jagusEjc0KFI08tjuWsX69bZ4R6/ViOghxA/QxgGaw46?=
- =?iso-8859-2?Q?1WsrxgmJiiqGwVgKF+gXhPgLDsPb4pdJXf089k1W9EDWbwry1k50uslZij?=
- =?iso-8859-2?Q?MeZzRV8irgbk629EhAxI+jr1WuZJwXvXCeKObH8HVtesqGkWJYfcR1aGlj?=
- =?iso-8859-2?Q?2fWEg7fLVy6y1IzINQaLEn5k34qZSlx5kf9qq6LFxSHYP7vILaHHGnMQCJ?=
- =?iso-8859-2?Q?EQXynNMZGdSReo/mD+A/cIy2ytv+NpYqVM8ygQvqvff5Cox8jx4gddi3Om?=
- =?iso-8859-2?Q?FRH4WK3YxDsKyPxp3ecpa+DG9HtwtRs1UvyoFIXRY/HX9fEe1Tgk/rodBB?=
- =?iso-8859-2?Q?ALkHRySQSstBVgbyrMwH96B1aHacdlWC6Y+BZSukmc9FH8atEZJEQ1UV//?=
- =?iso-8859-2?Q?lwuR3jp0PQrSV3x130s50ygvy5Y1uhH8a4IZWSJj6hrx2bsHmEeAPeY5ld?=
- =?iso-8859-2?Q?cSOVymvZmnXqQJrXa4isiMimUQt/rjY+flkVk8hjYXoaw64EYUH3w/oYdB?=
- =?iso-8859-2?Q?RnwSIJvmSuZ2kFjpVqmTk6K/d8mPs/IX/LNSWijJLFbhSLB6zJQJ2WgHp3?=
- =?iso-8859-2?Q?OL+bJPC+Hj7p71soILHYcfN47uKwLvO2t/DlF2cPT/i3TK3/doP8iytg?=
- =?iso-8859-2?Q?=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+ 15.2.1544.4; Tue, 2 Apr 2024 05:37:00 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 2 Apr 2024 05:37:00 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 7E4D83F704E;
+	Tue,  2 Apr 2024 05:36:57 -0700 (PDT)
+Date: Tue, 2 Apr 2024 18:06:56 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+CC: <netdev@vger.kernel.org>, <virtualization@lists.linux.dev>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jason Wang
+	<jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3 2/3] virtio-net: refactor dim
+ initialization/destruction
+Message-ID: <20240402123656.GA1648445@maili.marvell.com>
+References: <1712059988-7705-1-git-send-email-hengqi@linux.alibaba.com>
+ <1712059988-7705-3-git-send-email-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5800.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90c5098d-76ca-429f-a0ab-08dc5310e258
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2024 12:31:56.1541
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HDDkykSLWsOssgmG+Vv7xF9rgzsQrpEdH5quMn74DJjpCFAXy6i9pKrfo7F8IYnjNivgm5++9jK2mOi4Ye5mJi2vGyjOrHkKEA9xW8B6lfE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6560
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1712059988-7705-3-git-send-email-hengqi@linux.alibaba.com>
+X-Proofpoint-GUID: ryZxHkdfYVeGC0BLJT07fjvDFqP3-or9
+X-Proofpoint-ORIG-GUID: ryZxHkdfYVeGC0BLJT07fjvDFqP3-or9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-02_06,2024-04-01_01,2023-05-22_02
 
-Hi Anthony,=0A=
-=0A=
-On 3/29/2024 9:23 AM, Anthony L Nguyen wrote:=0A=
-> It hasn't been 24 hours since the v3 [1]; for larger changes, you should=
-=0A=
-> wait longer than that [2].=0A=
-=0A=
-I'm really sorry, I forgot about 24h rule.=0A=
-=0A=
-=0A=
-> Also, where's the changelog?=0A=
-=0A=
-The only thing that changed between V1 and V4 was patch 07/12, which had=0A=
-only minor changes and it has the changelog.=0A=
-Should I also include which patches were changed in the cover letter?=0A=
-=0A=
-Thanks,=0A=
-Karol=
+On 2024-04-02 at 17:43:07, Heng Qi (hengqi@linux.alibaba.com) wrote:
+> Extract the initialization and destruction actions
+> of dim for use in the next patch.
+>
+> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> ---
+>  drivers/net/virtio_net.c | 37 ++++++++++++++++++++++++++-----------
+>  1 file changed, 26 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index e709d44..5c56fdc 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2278,6 +2278,13 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
+>  	return err;
+>  }
+>
+> +static void virtnet_dim_clean(struct virtnet_info *vi,
+> +			      int start_qnum, int end_qnum)
+> +{
+> +	for (; start_qnum <= end_qnum; start_qnum++)
+> +		cancel_work_sync(&vi->rq[start_qnum].dim.work);
+> +}
+> +
+>  static int virtnet_open(struct net_device *dev)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
+> @@ -2301,11 +2308,9 @@ static int virtnet_open(struct net_device *dev)
+>  err_enable_qp:
+>  	disable_delayed_refill(vi);
+>  	cancel_delayed_work_sync(&vi->refill);
+> -
+> -	for (i--; i >= 0; i--) {
+> +	virtnet_dim_clean(vi, 0, i);
+> +	for (i--; i >= 0; i--)
+>  		virtnet_disable_queue_pair(vi, i);
+Now function argument is  "i", not "i - 1".
+Is it intentional ? commit message did not indicate any fixes.
+
+> -		cancel_work_sync(&vi->rq[i].dim.work);
+> -	}
+>
+>  	return err;
+>  }
+> @@ -2470,7 +2475,7 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
+>
+>  	if (running) {
+>  		napi_disable(&rq->napi);
+> -		cancel_work_sync(&rq->dim.work);
+> +		virtnet_dim_clean(vi, qindex, qindex);
+>  	}
+>
+>  	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_unmap_free_buf);
+> @@ -2720,10 +2725,9 @@ static int virtnet_close(struct net_device *dev)
+>  	/* Make sure refill_work doesn't re-enable napi! */
+>  	cancel_delayed_work_sync(&vi->refill);
+>
+> -	for (i = 0; i < vi->max_queue_pairs; i++) {
+> +	virtnet_dim_clean(vi, 0, vi->max_queue_pairs - 1);
+> +	for (i = 0; i < vi->max_queue_pairs; i++)
+>  		virtnet_disable_queue_pair(vi, i);
+> -		cancel_work_sync(&vi->rq[i].dim.work);
+> -	}
+>
+>  	return 0;
+>  }
+> @@ -4422,6 +4426,19 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>  	return ret;
+>  }
+>
+> +static void virtnet_dim_init(struct virtnet_info *vi)
+> +{
+> +	int i;
+> +
+> +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+> +		return;
+> +
+> +	for (i = 0; i < vi->max_queue_pairs; i++) {
+> +		INIT_WORK(&vi->rq[i].dim.work, virtnet_rx_dim_work);
+> +		vi->rq[i].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
+> +	}
+> +}
+> +
+>  static int virtnet_alloc_queues(struct virtnet_info *vi)
+>  {
+>  	int i;
+> @@ -4441,6 +4458,7 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
+>  		goto err_rq;
+>
+>  	INIT_DELAYED_WORK(&vi->refill, refill_work);
+> +	virtnet_dim_init(vi);
+>  	for (i = 0; i < vi->max_queue_pairs; i++) {
+>  		vi->rq[i].pages = NULL;
+>  		netif_napi_add_weight(vi->dev, &vi->rq[i].napi, virtnet_poll,
+> @@ -4449,9 +4467,6 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
+>  					 virtnet_poll_tx,
+>  					 napi_tx ? napi_weight : 0);
+>
+> -		INIT_WORK(&vi->rq[i].dim.work, virtnet_rx_dim_work);
+> -		vi->rq[i].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
+> -
+>  		sg_init_table(vi->rq[i].sg, ARRAY_SIZE(vi->rq[i].sg));
+>  		ewma_pkt_len_init(&vi->rq[i].mrg_avg_pkt_len);
+>  		sg_init_table(vi->sq[i].sg, ARRAY_SIZE(vi->sq[i].sg));
+> --
+> 1.8.3.1
+>
 
