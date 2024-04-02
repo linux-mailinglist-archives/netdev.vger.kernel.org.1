@@ -1,97 +1,104 @@
-Return-Path: <netdev+bounces-84038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE57895599
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:42:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE008955A3
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:43:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A41A228974D
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:42:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9B5E281B61
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:43:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9DD86120;
-	Tue,  2 Apr 2024 13:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D3E84FA0;
+	Tue,  2 Apr 2024 13:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IcCMCPMO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p6r5D6bI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47B584A58;
-	Tue,  2 Apr 2024 13:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D851B86244
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712065317; cv=none; b=hmIyQT9Ek6wP9OTgwUAnVEKWf51oLHDWcfT80iP+nVvTdMOTDQjbvRySZUFOoxiuAXeZ0PR9djnmxbQjQwX21iF2963ue8+88PdsI+AbPdM35Kpor9FGgabeCJOSxQhc2LyhncvSLNQgSd2UFeGMc4eRgS2O+w6Ew+1fpCQUsNs=
+	t=1712065378; cv=none; b=o+1TkQEJGhVMKq7uvQ6IJPliwUzGmHyxT0rYAo63fjw2oDFMKrF6IF16TQShVn5HYLX4YZnFWquxcciqGz70eH4Z84NQ2s9LaaKImOEoMnvhYmaHSuzaLZY4Py57t5PxPi7pdOWrL6SLD5Nnmv/CSwUxf9qPaUl4Q6V5KDc/MsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712065317; c=relaxed/simple;
-	bh=h261wTULooISsYtb6+TmMP33loVu5QDHmmBO7yc6Ggo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SwjzF2ICiRDuaigzQl7SumtLv2RT2eXYzV0xP/+pEp+EkHOJhPh0UCk1hPjFW0ejS8M73sM/WTsTzQVk25DF0jnpX+LsQY4oSi6EwdKOM+9wjWaSKStkxywd2OLOD/j2yhERHV94E/Wk+Yj9CdwS9lt/fhWBQK10oleiD6OkeTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IcCMCPMO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0194BC433C7;
-	Tue,  2 Apr 2024 13:41:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712065317;
-	bh=h261wTULooISsYtb6+TmMP33loVu5QDHmmBO7yc6Ggo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=IcCMCPMOf8zIl358tEnMsbCmxFeHbcpDV+e6r8KULCJpgOsp/YwF8/BTFb+BrSOoW
-	 pyyg5ufFumXX5FtAbyCOyiC0GkfXWAvK1Xqdu+z2w3NlNZQrYvHwXiKOZ/H7hRukc0
-	 iqRloDI+sBHF/55tPw9lEeHOoHbJANigyCJ7Lcjr7oVsG1AwZkS1yKTrvtw/kzSPk6
-	 u3Y0mJ+whvFHbkF26tRfSOSksHQp0ne99KsFogfw8IdXmsNHPEAEWvmulXBX79pyXr
-	 4YdR9pfekieTs0/BAUpxTeq+rUJwRrjrHsuDnd46NUA2Z390UuXZusWlA3g0oOHG2q
-	 Rs+tljYe/g+gA==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui
- <pulehui@huawei.com>, Pu Lehui <pulehui@huaweicloud.com>
-Subject: Re: [PATCH bpf-next 0/2] Add 12-argument support for RV64 bpf
- trampoline
-In-Reply-To: <20240331092405.822571-1-pulehui@huaweicloud.com>
-References: <20240331092405.822571-1-pulehui@huaweicloud.com>
-Date: Tue, 02 Apr 2024 15:41:54 +0200
-Message-ID: <87plv7rie5.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1712065378; c=relaxed/simple;
+	bh=i+b1uHVl9rRn+1rrSUi2nuadkeRDlrk+KQBy0RwN1AE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YeHmV0gjq24jf3YDQQyQjxJ9NMPGmw0wX0j/kSXHf15GaZp56Tjrjoo50PqPfHyCxC4OyLAIJRiLEcycyTqz1BYg5vIvSJvKKUSuGG4psb14nJHPuVyRtr6NjUTKaUmdX1T9J4Dr1F1pJpvZSQ4Fiu8RmtuNf08UxClxXBYmX+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p6r5D6bI; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso33776a12.1
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 06:42:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712065375; x=1712670175; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i+b1uHVl9rRn+1rrSUi2nuadkeRDlrk+KQBy0RwN1AE=;
+        b=p6r5D6bIPmyLErQhE/9qVAWKOrKo7F9mgPQd18uZsLU/rklwA8TZ1JcU6TbJYkhA6D
+         anim8c7fFnqS5VN9H+naHjjhPPUkwi2nDVM23ljMRWQXqyKOOMGWjmYbV8w2u0GnO09k
+         svVPkq7hw+dIiuVAjKWNB91mQnuucYShfBI/paGHyFtGlaq4sUZ86pPiXRKYF2nFAJod
+         aBcqa7jvkE1+6qCQnHUq7i4kEOGT9KMq8nN5xR0gcBgASH/r2Vu3dTuuQmbiOL6x4luT
+         VBnpD+/4rQT+XH5+VEuLaBZttcxlTNQCJAmZtqYR1EAGunzQ8t821ByZrBxWV6TaoQWz
+         nTFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712065375; x=1712670175;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i+b1uHVl9rRn+1rrSUi2nuadkeRDlrk+KQBy0RwN1AE=;
+        b=nA7AxgOhraKsfcbZRYD9YEMHiZP04uSYgRHFBVqoSeSZbjm/vRSuG575W4n7Smky7R
+         YuMmnsrO+4o0FqB1RlNKBSt6knEeewzdHtdhImoqrRIIihK+6aWLRHxC6KRmNRvMgdFF
+         F59xmzn7jQ97IoiHNxWBaHEz6BOm2Qy6nD2INpdIzDh32GAAibp9x4TQWswEXTJrxGXt
+         3+pMsSNG6fs1Q/G+6HGzRhXJhOiPxyCSzSp14yChznhsuU7ynvuGZY4zHqHK5P89SMyr
+         aP9KwoKjU0xSotVLvYtyhNzYf1ryGp/3SwJMYx+n2WXAtk/Ox365copuBW8qmNkqS4zX
+         U8NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUpvLmEEAVGjGbkvu85X3ud/FbjaTyZVq3kV4O1GyzdMWpWNWeldjHQClkKHxIQTgIyBK9SjCOYVVSqvi/EPg82K4PxxMdN
+X-Gm-Message-State: AOJu0YymOistBwRH38PNiBbWM+ydHTnK3acyOuDn5Jep7qcnYaonq1cC
+	z5NUEQymgBcjnk13hhCvSJkANO2yvpfDaB0WAjsL8PCwKLNQFTBzDTMbMxtzDQJTQ/uaGtHgCDo
+	oMbpC9d4MQLey0egMXvYu98IrdES+TZ1B8j47
+X-Google-Smtp-Source: AGHT+IGhJs/xxLuIQ5mlNdSVPp6/sP0TMNItnsrSUwbE9ucDH0CPqmo3gxOVreWdtd51AqX7mTFBgMz53LdQb8hx9z4=
+X-Received: by 2002:aa7:c752:0:b0:56c:522f:6799 with SMTP id
+ c18-20020aa7c752000000b0056c522f6799mr552042eds.5.1712065374969; Tue, 02 Apr
+ 2024 06:42:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240306111157.29327-1-petr@tesarici.cz> <20240311182516.1e2eebd8@meshulam.tesarici.cz>
+ <CANn89iKQpSaF5KG5=dT_o=WBeZtCiLcN768eUdYvUew-dLbKaA@mail.gmail.com>
+ <20240311192118.31cfc1fb@meshulam.tesarici.cz> <764f2b10-9791-4861-9bef-7160fdb8f3ae@leemhuis.info>
+ <72e39571-7122-4f6a-9252-83e663e4b703@leemhuis.info>
+In-Reply-To: <72e39571-7122-4f6a-9252-83e663e4b703@leemhuis.info>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Apr 2024 15:42:44 +0200
+Message-ID: <CANn89iKfMTGyyMB-x74J5bgzhM1RxSvuNhvXyWWv4DO8MZakSQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] u64_stats: fix u64_stats_init() for lockdep when used
+ repeatedly in one file
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: =?UTF-8?B?UGV0ciBUZXNhxZnDrWs=?= <petr@tesarici.cz>, 
+	"David S. Miller" <davem@davemloft.net>, open list <linux-kernel@vger.kernel.org>, stable@kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Pu Lehui <pulehui@huaweicloud.com> writes:
-
-> This patch adds 12 function arguments support for riscv64 bpf
-> trampoline. The current bpf trampoline supports <=3D sizeof(u64) bytes
-> scalar arguments [0] and <=3D 16 bytes struct arguments [1]. Therefore, we
-> focus on the situation where scalars are at most XLEN bits and
-> aggregates whose total size does not exceed 2=C3=97XLEN bits in the riscv
-> calling convention [2].
+On Tue, Apr 2, 2024 at 3:40=E2=80=AFPM Linux regression tracking (Thorsten
+Leemhuis) <regressions@leemhuis.info> wrote:
 >
-> Link: https://elixir.bootlin.com/linux/v6.8/source/kernel/bpf/btf.c#L6184=
- [0]
-> Link: https://elixir.bootlin.com/linux/v6.8/source/kernel/bpf/btf.c#L6769=
- [1]
-> Link: https://github.com/riscv-non-isa/riscv-elf-psabi-doc/releases/downl=
-oad/draft-20230929-e5c800e661a53efe3c2678d71a306323b60eb13b/riscv-abi.pdf [=
-2]
+> Hi. Top-posting for once, to make this easily accessible to everyone.
 >
-> Pu Lehui (2):
->   riscv, bpf: Add 12-argument support for RV64 bpf trampoline
->   selftests/bpf: Add testcase where 7th argment is struct
+> Hmmm, looks like Petr's patch for a (minor) 6.8 regression didn't make
+> any progress in the past two weeks.
+>
+> Does nobody care? Did nobody merge it because no tree feels really
+> appropriate? Or am I missing something obvious and making a fool out of
+> myself by asking these questions? :D
 
-Thank you!
-
-For the series:
-
-Acked-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
-Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
+It happens, please resend the patch.
 
