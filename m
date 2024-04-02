@@ -1,152 +1,171 @@
-Return-Path: <netdev+bounces-83947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F99894FD7
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:17:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38F9A895064
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28832B24D38
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 10:17:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBE251F22371
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 10:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57ED5B5D6;
-	Tue,  2 Apr 2024 10:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE585F87D;
+	Tue,  2 Apr 2024 10:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P/19zu7H"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="cI+CGaOE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180EF5FB8A
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 10:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A459E5EE97
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 10:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712052986; cv=none; b=nUbSx+qiPNDtQuP0WtYYu98FH5U/thN+8xvYZ9MjzoRnvIuvGtV18WqkUjs7kj/c0h3D5CoJPxU3yVG7WX4eEnQW60naTLRwo8R0GEjG+nbnwQh8jeb49mZgruu/g2VhworZsHhLQ2WwTRoy6XAgBljQzMPtpeRmi2O+FPwvp6g=
+	t=1712054129; cv=none; b=TDy3LoqgPqsO30gVXU8sgYg29d86FIMe0YJFl8Sy+Y0nzRRXnszT7nNaDMfGP0XyQTwFqxVwte8C2OQDZ/YxCI0cwZSURz6iY77iqsjzxJnL5N9r5oxgNFiv9voI0SXPdAmwQ6VHoly9HtnSbpPAObRVzsSlQ4P/LPkWSBBlxAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712052986; c=relaxed/simple;
-	bh=uzac7wtIrnnrBvtOLPs8xaD+ikoHcCxqEerEJoMcBFs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jSgveFIfu9orp9RXXglTwqFeqfCO3WFyHK2guOMwc9VrEf/jkpGY1A8Muiq7ST+QLPLuccUdpVvTaoWWN2Mwg8my+l8qiq+E94vmWH1aszsXeOBxxNYRezoDjtenIIzzh9rXA38G5uNb+Ul6vvdRGs1wJWHDIvf25fiiC/ZWLGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=P/19zu7H; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dcc4de7d901so3942698276.0
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 03:16:22 -0700 (PDT)
+	s=arc-20240116; t=1712054129; c=relaxed/simple;
+	bh=gm/ub3GiZq9SNWEfLYxrU9N6dJbEL0XROTTbGOG4WtA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HgODWSee1kX4p8IYY8O1q5ajiCU8O0Xfddk6r1GcsTf4L6b2N0yDkDyg1iFeCovKU8dOt0hOVdwCJdSATUjMB7f3u7zoT7rX1Nce4wUFHB/8KnjT08tKSGm5CiNDlBYcETN8THI86d28XFEIR2TKFRkhqv4FFGPpA6vscLFjeTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=cI+CGaOE; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-415515178ceso23987115e9.0
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 03:35:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712052982; x=1712657782; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uzac7wtIrnnrBvtOLPs8xaD+ikoHcCxqEerEJoMcBFs=;
-        b=P/19zu7HhxbqaSZ6tddIYer72gYo22iX74gtm9EbTCsCnmBPVJH56wwx8ina7pHQt+
-         p316gGtpPFNSmMfwYWkooiGf4ik567MMKWJ1fJRb+NnesXmt8S3KOmo1hW/O3yH2uIjf
-         F3SkY7DH8iAQRrcIIOMQyR6tAgVMpinRoEFcTiHyz/45wguXP951zWOOFOEZRV1uWbyn
-         hNrtfhYos8BjukR2a9x7YTIu1mvVMtxWlxNTeXM3ZTuCTXqrHvRkpW0RunoXYl2P2zer
-         H5n509H2Aw3xqdmsadb2X73YaIOldxZWd5/O5TrVs5Wt5fl9C6M1vCFRqYXRh0oRA0v7
-         HRhw==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1712054125; x=1712658925; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VPpJN3A2gIdeLf753gUAk7Ivbl+pQSVyK6KyrqY9EVI=;
+        b=cI+CGaOEPuQRBCZDXbX/G778rm652y29jMckOX6jT5mmUpfKsUhylTUIFeyMorwKwP
+         sicnxrUK4m/wBNRbRsvOi035gLfuW4ppClwe+Y3/9FbM7WmpzHm6jtdlHXAlJ/cmIf2A
+         nm4nGpazAG9pKOWHhHAuQAjKKTZjWnZXrA1ZwpFL27wRHpXhyPJow0g9MDYoKO+sjv4e
+         aEBMCYfZtApYfQ7Vd0RwAsbdNagviJrsW0LFJEkWrYld4XeX8HimIdV7lLqfioCXvb5B
+         sdwve1ufUq7bSgxSfNIyUc+ZC5AUJgNHdKwG0VSIOTxdVwjfz+YYNvChB+jLFzE52GON
+         xm6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712052982; x=1712657782;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1712054125; x=1712658925;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uzac7wtIrnnrBvtOLPs8xaD+ikoHcCxqEerEJoMcBFs=;
-        b=cpeN5kqK4LqLVu0ea8FVDPzhfXElxWslcalrIeplavIFuxOAHHD/9bhO0nwg7l5ArQ
-         aws6fsTcs0mMr77ogYf6hiaX/g7lkciIziCuBtsUZ1PI765+DRVoMkbcBnucw+wr1FLj
-         gml0oIvpJtG8x7EqdS6bzohjgVrLv4lpCE7hStKDF+xRDJUA4ajwXNC5sL8kFOBBSs1r
-         uH6nYW3PzCwjIpkyB0qNeiUpypBEH2S5VvT1f+dJQbbIkoBrRRDrRldDndPjNAIZAwXJ
-         EFauMEHqbY5WRptGiJUfUR7+WVykMYmd4H4Up/t1MQp3gPqzOw6f0AJx4ck5NB1uTZuR
-         lSKg==
-X-Forwarded-Encrypted: i=1; AJvYcCVcMoLJTuEps4MCKhLpIa++l7XImmbPJvVYA/CRWAgG9hX7NVnBCEV6IltpAaXq6oCA2bYIu71s76yfdocS9sbeFkB+yZGg
-X-Gm-Message-State: AOJu0Yx9FKpoG4a8ZrxGb0jwpUrPxEFLuSHV39sUOOMDjB4IohotUXtL
-	5qqenywmAdhJkcl6zT5o/IgwbLlcSKIqB6LnHCOXe8KbQW6G3HUeDbON3q/uZ9Wb3FwIgTQmzFk
-	boGo8rMjrLwdd/wwOvmdyd1zyGSRWooXHvMVPCQ==
-X-Google-Smtp-Source: AGHT+IHzjYx5u+Am4EzQhN6aMsFTdxF/7ehGqP9AXe12JTbN0HclFOy9oE6Q1Tva+ZRKMaaQSSepEoCeBcfLH2AuW+A=
-X-Received: by 2002:a25:b191:0:b0:dcd:b034:b504 with SMTP id
- h17-20020a25b191000000b00dcdb034b504mr9487652ybj.27.1712052982018; Tue, 02
- Apr 2024 03:16:22 -0700 (PDT)
+        bh=VPpJN3A2gIdeLf753gUAk7Ivbl+pQSVyK6KyrqY9EVI=;
+        b=MWHupX76U1J8YZOayPI0jVUw+5X8ujGZJs3o4TxFMhRMaMQjd1oATPhCKZ2p5U+nrL
+         G5CE6POvO7K1an3o63vQZcvZSlpcAZzdvuOV8PigtPV85rMx4attKUDvHI5QHS98weQA
+         5kEuObK7am/J63VrjPcS5nLe4R/kQfpceNrGXhtWBOE0Q4HpDQi87CN420emXExypo5p
+         I0ILLyPwLOMF0V8SrtVIN2N9VLr2Iig/Xeo3ujPp4/x2ng6GIy7fvTMLRuEHiWqMVnBx
+         o2h0Tkqx0VTF3+/oSFCYbCABfCoPnYXG6NH7uyH1yOtA7O+ecdVTZ6kC5ex7yaLAe3Qp
+         4kLQ==
+X-Gm-Message-State: AOJu0YxH3Lds/iPXGgQS9VWYv19UEj9Vz3j4r6pqB/YI+0J9wx434lPq
+	4X+mmHYEzxBKaF+KvqGwF8kETKb/ZNCUIjp4mQErnDLBgmPeLWFx5b1IAyMRtwo=
+X-Google-Smtp-Source: AGHT+IHsgrnrPNsVtFEYMmyvdA0IP4naNOkLV9wwcdrJ1kcXwbmMfv/ieru6N3dZglg6Qp/UJgrMNg==
+X-Received: by 2002:a05:600c:1391:b0:414:624c:aaf with SMTP id u17-20020a05600c139100b00414624c0aafmr7781328wmf.35.1712054125033;
+        Tue, 02 Apr 2024 03:35:25 -0700 (PDT)
+Received: from [127.0.1.1] ([84.102.31.74])
+        by smtp.gmail.com with ESMTPSA id bu7-20020a056000078700b00343587cfa7dsm1825769wrb.77.2024.04.02.03.35.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 03:35:24 -0700 (PDT)
+From: Julien Panis <jpanis@baylibre.com>
+Subject: [PATCH net-next v6 0/3] Add minimal XDP support to TI AM65 CPSW
+ Ethernet driver
+Date: Tue, 02 Apr 2024 12:33:42 +0200
+Message-Id: <20240223-am65-cpsw-xdp-basic-v6-0-212eeff5bd5f@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-10-apais@linux.microsoft.com> <CAPDyKFpuKadPQv6+61C2pE4x4FE-DUC5W6WCCPu9Nb2DnDB56g@mail.gmail.com>
- <ZgWZDtNU4tCwqyeu@slm.duckdns.org>
-In-Reply-To: <ZgWZDtNU4tCwqyeu@slm.duckdns.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Tue, 2 Apr 2024 12:15:45 +0200
-Message-ID: <CAPDyKFp5KET0HR+8MwO4cf0O6W2kyFqHoKcVf5jbgBuLuQUcFA@mail.gmail.com>
-Subject: Re: [PATCH 9/9] mmc: Convert from tasklet to BH workqueue
-To: Tejun Heo <tj@kernel.org>
-Cc: Allen Pais <apais@linux.microsoft.com>, linux-kernel@vger.kernel.org, 
-	keescook@chromium.org, vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev, 
-	florian.fainelli@broadcom.com, rjui@broadcom.com, sbranden@broadcom.com, 
-	paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com, 
-	manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com, 
-	leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com, 
-	haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de, 
-	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, afaerber@suse.de, 
-	logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com, 
-	robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org, 
-	orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com, 
-	patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org, 
-	jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com, kys@microsoft.com, 
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
-	jassisinghbrar@gmail.com, mchehab@kernel.org, maintainers@bluecherrydvr.com, 
-	aubin.constans@microchip.com, manuel.lauss@gmail.com, mirq-linux@rere.qmqm.pl, 
-	jh80.chung@samsung.com, oakad@yahoo.com, hayashi.kunihiko@socionext.com, 
-	mhiramat@kernel.org, brucechang@via.com.tw, HaraldWelte@viatech.com, 
-	pierre@ossman.eu, duncan.sands@free.fr, stern@rowland.harvard.edu, 
-	oneukum@suse.com, openipmi-developer@lists.sourceforge.net, 
-	dmaengine@vger.kernel.org, asahi@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org, 
-	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, linux-mediatek@lists.infradead.org, 
-	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, linux-omap@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAbfC2YC/42Qy27CMBBFfyXyGrd+47Dqf1QVmrGH4oqYyEYpC
+ PHvNdm1iqos53HPHM2dVSqJKtt1d1ZoSjWdcyvcpmPhCPmTeIqtZkooI5TSHAZneRjrN7/GkSP
+ UFLiJ6JW3wqPxrCVblzgWyOH4zH6NkFN9bfv7AVI+pUz7STwXx0KHdJ3Pv7NMF57pemEfbXJM9
+ XIut9lrkvP8X4VJcsn7g0AXMIKW4g3hdkpY6CWchxk5qRUYxQUXMrgAEADRLWD0CoxuGBt7Y6C
+ P3sCSjVmBMQ2jvXYSnAbj8Tdm062IKzKWbKQgjF+wsCssbMNgkFvdy63A8Pcnj8fjB6OUq6lHA
+ gAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Sumit Semwal <sumit.semwal@linaro.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Ratheesh Kannoth <rkannoth@marvell.com>, 
+ Naveen Mamindlapalli <naveenm@marvell.com>, 
+ "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+ Julien Panis <jpanis@baylibre.com>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1712054122; l=2651;
+ i=jpanis@baylibre.com; s=20230526; h=from:subject:message-id;
+ bh=gm/ub3GiZq9SNWEfLYxrU9N6dJbEL0XROTTbGOG4WtA=;
+ b=GSlVZrWGJwzlJnxckCzDVEvZs4b14/SyDtoDMqNQbUxbb4fIckpjXClyULnbfZTkOkO9rfv6X
+ 63aNWrMjj82DF7DIkGkelTjUAdpqND60CpJXCSwdsZSY/IT0LQXEina
+X-Developer-Key: i=jpanis@baylibre.com; a=ed25519;
+ pk=8eSM4/xkiHWz2M1Cw1U3m2/YfPbsUdEJPCWY3Mh9ekQ=
 
-On Thu, 28 Mar 2024 at 17:21, Tejun Heo <tj@kernel.org> wrote:
->
-> Hello,
->
-> On Thu, Mar 28, 2024 at 01:53:25PM +0100, Ulf Hansson wrote:
-> > At this point we have suggested to drivers to switch to use threaded
-> > irq handlers (and regular work queues if needed too). That said,
-> > what's the benefit of using the BH work queue?
->
-> BH workqueues should behave about the same as tasklets which have more
-> limited interface and is subtly broken in an expensive-to-fix way (around
-> freeing in-flight work item), so the plan is to replace tasklets with BH
-> workqueues and remove tasklets from the kernel.
+This patch adds XDP support to TI AM65 CPSW Ethernet driver.
 
-Seems like a good approach!
+The following features are implemented: NETDEV_XDP_ACT_BASIC,
+NETDEV_XDP_ACT_REDIRECT, and NETDEV_XDP_ACT_NDO_XMIT.
 
->
-> The [dis]advantages of BH workqueues over threaded IRQs or regular threaded
-> workqueues are the same as when you compare them to tasklets. No thread
-> switching overhead, so latencies will be a bit tighter. Wheteher that
-> actually matters really depends on the use case. Here, the biggest advantage
-> is that it's mostly interchangeable with tasklets and can thus be swapped
-> easily.
+Zero-copy and non-linear XDP buffer supports are NOT implemented.
 
-Right, thanks for clarifying!
+Besides, the page pool memory model is used to get better performance.
 
-However, the main question is then - if/when it makes sense to use the
-BH workqueue for an mmc host driver. Unless there are some HW
-limitations, a threaded irq handler should be sufficient, I think.
+Signed-off-by: Julien Panis <jpanis@baylibre.com>
+---
+Changes in v6:
+- In k3_cppi_*() functions, use const qualifier when the content of
+pool is not modified.
+- Add allow_direct bool parameter to am65_cpsw_alloc_skb() function
+for direct use by page_pool_put_full_page().
+- Link to v5: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v5-0-bc1739170bc6@baylibre.com
 
-That said, moving to threaded irq handlers is a different topic and
-doesn't prevent us from moving to BH workqueues as it seems like a
-step in the right direction.
+Changes in v5:
+- In k3_cppi_desc_pool_destroy(), free memory allocated for desc_infos.
+- Link to v4: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v4-0-2e45e5dec048@baylibre.com
 
-Kind regards
-Uffe
+Changes in v4:
+- Add skb_mark_for_recycle() in am65_cpsw_nuss_rx_packets() function.
+- Specify napi page pool parameter in am65_cpsw_create_xdp_rxqs() function.
+- Add benchmark numbers (with VS without page pool) in the commit description.
+- Add xdp_do_flush() in am65_cpsw_run_xdp() function for XDP_REDIRECT case.
+- Link to v3: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v3-0-5d944a9d84a0@baylibre.com
+
+Changes in v3:
+- Fix a potential issue with TX buffer type, which is now set for each buffer.
+- Link to v2: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com
+
+Changes in v2:
+- Use page pool memory model instead of MEM_TYPE_PAGE_ORDER0.
+- In am65_cpsw_alloc_skb(), release reference on the page pool page
+in case of error returned by build_skb().
+- [nit] Cleanup am65_cpsw_nuss_common_open/stop() functions.
+- [nit] Arrange local variables in reverse xmas tree order.
+- Link to v1: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v1-1-9f0b6cbda310@baylibre.com
+
+---
+Julien Panis (3):
+      net: ethernet: ti: Add accessors for struct k3_cppi_desc_pool members
+      net: ethernet: ti: Add desc_infos member to struct k3_cppi_desc_pool
+      net: ethernet: ti: am65-cpsw: Add minimal XDP support
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 537 +++++++++++++++++++++++++---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  13 +
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.c |  37 ++
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.h |   4 +
+ 4 files changed, 541 insertions(+), 50 deletions(-)
+---
+base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+change-id: 20240223-am65-cpsw-xdp-basic-4db828508b48
+
+Best regards,
+-- 
+Julien Panis <jpanis@baylibre.com>
+
 
