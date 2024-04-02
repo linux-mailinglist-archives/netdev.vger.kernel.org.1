@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-84074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8F989576D
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:50:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31793895783
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD5892827D0
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:50:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 623001C20940
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E955512B16E;
-	Tue,  2 Apr 2024 14:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E93DB81AB6;
+	Tue,  2 Apr 2024 14:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xUa2OvTe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="305pCUs/"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D401312BF1A
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 14:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11AB3398A
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 14:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712069226; cv=none; b=W6ygggY7HefJ6B512i9xWOXJDufb6IlGW6qgbcw7nikdHNNRFuCP+pk4XgjLCtfRxBBT8My5Wzny1OJ2VU/DAkDVYNU2pxZN4TYDDpPQI/32mi2JCgdBIIG8EKSfXRUGmEoJcfrr0Wgw8QMl12VyD7Iw/IrJrW3g1R5FsaPeXEM=
+	t=1712069587; cv=none; b=U1LzgwhlA7/4ZPMHMCsqY9X2abHGi0RVZzYy4wBi+PoSSIyurBDrb2Jd5NWd3d1ikMEsVBb8SfqEPIe/U15tbETll8HRKiNVxRjPmPMlU6WWnN2Om8bdDxU/1WjE+97RfPUfjaM89T97W2vYhxyWHmsl02BXkAluELPJL4B0qy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712069226; c=relaxed/simple;
-	bh=5gVABkMLIooki29CTEhk5ztVc0rTxa8efvz91lPk5rE=;
+	s=arc-20240116; t=1712069587; c=relaxed/simple;
+	bh=HV7zLIBJLSGwjahJgSVXvpcI/rngZP/3Q/XiFUTbLrY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MO3xuojtfqw0g58El8pLRHITohZvaaAb85UlN0lVQeJDLTP9jLW51qLWnmReHGflJyFNg/D2pjWnvAcdfDFjwatXNBmwamHGq0YiIvfJ0PQqPN15nYkM5qhziioEWohhQyOI6IGFeY5Vq82dTP6c0zEskFtTtRfuX0W9VBpmrvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xUa2OvTe; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=JCoPu93Hvh05quXC3ay5+UmTn4jso9/lufXJ77AiIMVds7RSKi/KrDhiw0xI9b5HIUCnJktJ5H3Mvj0HuWQyocHs+dcVg0bPof5x+god+wB/BHoPVIK6SVpALIe6ADz4rdI0IzKsd+fHNqdmIsV0MuKpPGgC6DgnEN0Z9owA+d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=305pCUs/; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=uGpqUoHSVCC5gRmLbiguK1uZTk9mnHjL1ZF9cg88S9E=; b=xUa2OvTenT3IZEgiEX95IO1VVf
-	tcBk4H+OZPh5247FnsxvswV4+n4LzkmWWKNc9JDSQkjycnaeV7GeF8UW+9q7HE6QE1oSmfxHhnT13
-	vImRyj/5zRYqSDCCKVtqClJTwX/dR0S8AHRtsVEVAtcjfecIg20pKDLMmmr808WmENGw=;
+	bh=eOYGeU8zVgOXLLkcl8kxoaRkqhvrkHQcK86uuV0YpBQ=; b=305pCUs/ZO+uIQnNfe52Za6VL7
+	Hh4K86PWCIVFnZiya076vP51zTgydYfDBJeOfCoRdQKwFYn9sbOQ5h/CzXUFXC5tmYhflPtqSX2az
+	7eOZPBvaAnCrrI9SpxHzfVrCHTNiYFqT3pk9Ps3z5bDFyfmQ6c/3DGqgLWBrYYqFmVB4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rrfPa-00BxIj-GK; Tue, 02 Apr 2024 16:46:54 +0200
-Date: Tue, 2 Apr 2024 16:46:54 +0200
+	id 1rrfVW-00BxKe-Ab; Tue, 02 Apr 2024 16:53:02 +0200
+Date: Tue, 2 Apr 2024 16:53:02 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: netdev@vger.kernel.org, idosch@nvidia.com, edumazet@google.com,
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Wojciech Drewek <wojciech.drewek@intel.com>, netdev@vger.kernel.org,
+	idosch@nvidia.com, edumazet@google.com,
 	marcin.szycik@linux.intel.com, anthony.l.nguyen@intel.com,
-	kuba@kernel.org, intel-wired-lan@lists.osuosl.org,
-	pabeni@redhat.com, przemyslaw.kitszel@intel.com
+	intel-wired-lan@lists.osuosl.org, pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com
 Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
-Message-ID: <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
+Message-ID: <06f5880d-94e3-454e-b056-9bf2059a52fe@lunn.ch>
 References: <20240329092321.16843-1-wojciech.drewek@intel.com>
  <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
  <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+ <20240402072547.0ac0f186@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,86 +64,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+In-Reply-To: <20240402072547.0ac0f186@kernel.org>
 
-On Tue, Apr 02, 2024 at 01:38:59PM +0200, Wojciech Drewek wrote:
-> 
-> 
-> On 30.03.2024 22:57, Andrew Lunn wrote:
-> > On Fri, Mar 29, 2024 at 10:23:18AM +0100, Wojciech Drewek wrote:
-> >> Some ethernet modules use nonstandard power levels [1]. Extend ethtool
-> >> module implementation to support new attributes that will allow user
-> >> to change maximum power. Rename structures and functions to be more
-> >> generic. Introduce an example of the new API in ice driver.
-> >>
-> >> Ethtool examples:
-> >> $ ethtool --show-module enp1s0f0np0
-> >> Module parameters for enp1s0f0np0:
-> >> power-min-allowed: 1000 mW
-> >> power-max-allowed: 3000 mW
-> >> power-max-set: 1500 mW
-> >>
-> >> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
+On Tue, Apr 02, 2024 at 07:25:47AM -0700, Jakub Kicinski wrote:
+> On Tue, 2 Apr 2024 13:38:59 +0200 Wojciech Drewek wrote:
+> > > Also, this is about the board, the SFP cage, not the actual SFP
+> > > module?  Maybe the word cage needs to be in these names?  
 > > 
-> > We have had a device tree property for a long time:
-> > 
-> >   maximum-power-milliwatt:
-> >     minimum: 1000
-> >     default: 1000
-> >     description:
-> >       Maximum module power consumption Specifies the maximum power consumption
-> >       allowable by a module in the slot, in milli-Watts. Presently, modules can
-> >       be up to 1W, 1.5W or 2W.
-> > 
-> > Could you flip the name around to be consistent with DT?
+> > It's about cage. Thanks for bringing it to my attention because now I
+> > see it might be misleading. I'm extending {set|show}-module command
+> > but the changes are about max power in the cage. With that in mind
+> > I agree that adding 'cage' to the names makes sense.
 > 
-> Yea, I'm open to any name suggestion although I don't like the unit in the parameter name :) 
+> Noob question, what happens if you plug a module with higher power
+> needs into the cage?
 
-That is a DT thing. Helps make the units of an ABI obvious. However,
-milliwatts is pretty standard with the kernel of user APIs, e.g. all
-hwmon calls use milliwatts.
+https://www.optcore.net/wp-content/uploads/2017/04/QSFP-MSA.pdf
 
-> >> minimum-power-allowed: 1000 mW
-> >> maximum-power-allowed: 3000 mW
-> >> maximum-power-set: 1500 mW
-> > 
-> > Also, what does minimum-power-allowed actually tell us? Do you imagine
-> > it will ever be below 1W because of bad board design? Do you have a
-> > bad board design which does not allow 1W?
-> 
-> Yes. in case of QSFP we don't support 1W, 1.5W is the minimum.
+Section 3.2:
 
-So if i plug in a 1W QSFP device, it will let the magic smoke out
-because it is force fed 1.5W?
+ It is recommended that the host, through the management interface,
+ identify the power consumption class of the module before allowing the
+ module to go into high power mode.
 
-Looking at
-https://www.optcore.net/wp-content/uploads/2017/04/QSFP-MSA.pdf table
-7 it indicates different power budget classifications. Power level 1
-is a Maximum power of 1.5W. So does your parameter represent this?  It
-is the minimum maximum power? And your other parameter is the maximum
-maximum power?
+So it should start in lower power mode. Table 7 suggests the module
+can assume 1.5W, since that is the lowest power level.
 
-I agree with Jakub here, there needs to be documentation added
-explaining in detail what these parameters mean, and ideally,
-references to the specification.
-
-Does
-
-$ ethtool --set-module enp1s0f0np0 power-max-set 4000
-
-actually talk to the SFP module and tell it the maximum power it can
-consume. So in this case, it is not the cage, but the module?
-
-Or is it talking to some entity which is managing the overall power
-consumption of a number of cages, and asking it to allocate a maximum
-of 4W to this cage. It might return an error message saying there is
-no power budget left?
-
-Or is it doing both?
-
-Sorry to be picky, but at some point, somebody is going to want to
-implement this in the Linux SFP driver, and we want a consistent
-implementation cross different implementations.
-
-	Andrew
+   Andrew
 
