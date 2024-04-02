@@ -1,102 +1,86 @@
-Return-Path: <netdev+bounces-84138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73530895B83
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:15:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFC36895B8D
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:17:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26230282C2C
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:15:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 749F51F212A8
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF1515AD81;
-	Tue,  2 Apr 2024 18:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CBD15ADAF;
+	Tue,  2 Apr 2024 18:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QrrTfE5e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j+yjw4zb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC21D15AAD7
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 18:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7985915AD93;
+	Tue,  2 Apr 2024 18:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712081706; cv=none; b=bZsNTCMvT5mmA8MO7hXyHgkGRX9k+aNA3bqYGhG5ziKP1n0WM4YL+e5D77w8WuCCidK4ptG1RqzvYj9mkkEyLnDNZ73FUrv9KXnYWSjymFD8XhONJuumYlzLC068gVGg5sbY6AtnfvBCC3mJwpgNYcHOQcr3nCTMjK2oOKnYYDg=
+	t=1712081831; cv=none; b=qDW2INzw0z1uaHJtOoF3RDfj1eWoOPRfaykjSgWBNm1b4G0Xs/E6gjA1etdQ5KeUo4Pr7WGhckbv37/Xw1TRMmYSzAzMj27vywnA7xBJNCbGLiSGRqlMHCpadzo4rXwwguVKNXY53R2au8D5jEy7MHiu+ljqC5xXNw+GG9/dMrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712081706; c=relaxed/simple;
-	bh=46KRqglWord9rtMJP1zH3v5q6uz/1865w6V7OrJf2L8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a4kRUM+fFLp0mUssnV+LYbEBNUe4CzMMWP1hJNeBkFh5AOOz/k81YBtmd63OMUQ4t65rhqKg0Tcf113oPXRq3GSB6JBP6LhPP5qB5KwSEsAYddhxZtvtHGW6tonh8tLJsbC0l5THzKkxsy4bk7iRzWBqUxlrWiMSSqjfgkVa4UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QrrTfE5e; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a46ea03c2a5so24278266b.1
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 11:15:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712081703; x=1712686503; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=46KRqglWord9rtMJP1zH3v5q6uz/1865w6V7OrJf2L8=;
-        b=QrrTfE5eHT9Ks7P91fL9DWFfHfSPMbXGPLy61CxZpOMOXgBWxr6K9tzWe7KV1LXtIL
-         udB6dXq7MEVactyVz7QR1KUUbajVJ+MjxUDGIw51tVRm6QDeSG7+V04e/rkmQFJfu+cC
-         po/iuhj8u9lncJwajFBU46fPI5Rc/XtxZamDbI1cHO4RinWnQJ/TFgiNtFEnKhdw0dXz
-         YPeHgAwj8QB41RsA0p1iprvkWLRrtQdI6Z56jNtRs2YZXNj+e7AGtswL08ODqeYamH8T
-         Xl6oz2QuH0fGXg2NhozatSLqwzp2v3nCEyi/UTXQ4QIMmgBYkd4fi8k6XBioVPldu+F6
-         aYZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712081703; x=1712686503;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=46KRqglWord9rtMJP1zH3v5q6uz/1865w6V7OrJf2L8=;
-        b=HjDLt7lVuix0WeKLoos5mCxBb3ioJKoUWaxK6EbyrvTxm5V8I90khe8D7DxdMn+dQQ
-         HVt/yR7077wLvrwSFPmTMamZl3FTj8TnQJpZabtDMQJKzW76FPl7kJnwFgODvEs8gKpA
-         Gl9a4PDWg6eZUG106D1upQcEHhq2sW1Lrwxvul0ce5lyUhR7ttLsICllo6QxxYt42R4O
-         D0mlRqDvNmMs3d1cnup/iIgOJQYUclfBK6HN3mRxX9XkPVJD0zKKO9KzBaF1S3cIeasb
-         IwmTw7AWqE1phJz0C7qF3llkiMs4MHlHqSJEIf2INkWTqTidyi5PDKEEaXvnEuhGjouV
-         Vvww==
-X-Forwarded-Encrypted: i=1; AJvYcCWwYjCHrQsZG7Tnc7MFOm5tLzamTNgy3Ip6OdYrKVDkHsZmW9vPIV7zumnaABDUZ7hx6F/WoF0urFHvOiQuH5F4kUU01IqL
-X-Gm-Message-State: AOJu0YyWPy4LQeKwhmSJB6MH3m39a+ytL9ZxNMHAuhtA/qdw4Ti0T5d9
-	CItQWKVUCSxhU/ThwpawATg5pY7qsn0ScIM+bL+s3sHiZVT0TNB19QDgwteMeHxwzZEAkDbqA5q
-	pNJm5SzC0OOMdNPjDNEi0+WtIbp5vUYm3mdTK9xpTFEryF7oxqzAP
-X-Google-Smtp-Source: AGHT+IHP5t0nrM9tmIdN/vj1cEcR9X51TIZOinjwJqg520IJ7wC6cLJyegvw1MPl9rlRhm9Xs3DTLyD/c/Q7svlAuPk=
-X-Received: by 2002:a17:906:488:b0:a4e:1d5f:73ae with SMTP id
- f8-20020a170906048800b00a4e1d5f73aemr216379eja.12.1712081703092; Tue, 02 Apr
- 2024 11:15:03 -0700 (PDT)
+	s=arc-20240116; t=1712081831; c=relaxed/simple;
+	bh=0ARxQ9cttIE0P2km3rZwYbhh6JliaUfiHYwzzaExkGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nl7tryfoaBhtwZg0zYm85HH5uHtvPW2p3xeSIZgChNn1dWNwioTxOokKirEwA+uJVQ1lhYPSXN+LwhBoXKz5ynJFZLUnp3Kh5GwUO6v2HYVCDIgrPaj6wTtHcww0fjDoPOCoDFilWFNmo00KdtwKIsEc5fn6Qge6894vj3MTC+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j+yjw4zb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81759C43390;
+	Tue,  2 Apr 2024 18:17:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712081831;
+	bh=0ARxQ9cttIE0P2km3rZwYbhh6JliaUfiHYwzzaExkGE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j+yjw4zbZrlaNcUDJqfUE1ixZtxbFznrXU41+a50ZKjM18TdEcXy7iCKOK1++lPZC
+	 l56y++MenbvUEkO+T8DPS7RkQQTktGT31vMpgMvsDF/TquT2gp6WMPiv9fhhM685A1
+	 QWEW/yo54O55Hvv+3X/XoCgOxGGTZrRDzn3HRIi9LYU47NwkPyNor16r7gEFiCaEhK
+	 /2PVXeM1GJKFzq44zMrRda/Y1oNWRCm7FVvPshqW+P6tyilCpXVaMbvs7Skvorzf+R
+	 iU4CizFo8Y3jtTcCT9gRupQ9keLHAXkwj2zPJ7q3xEiWc3j5WulFe+Ffohs6F28Gc8
+	 MDboiPygc/dAQ==
+Date: Tue, 2 Apr 2024 11:17:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, quic_jjohnson@quicinc.com, kvalo@kernel.org,
+ dennis.dalessandro@cornelisnetworks.com, Jiri Pirko <jiri@resnulli.us>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list
+ <linux-kernel@vger.kernel.org>, Dennis Dalessandro
+ <dennis.dalessandro@intel.com>, RDMA mailing list
+ <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: create a dummy net_device allocator
+Message-ID: <20240402111709.1551dbca@kernel.org>
+In-Reply-To: <20240402180155.GM11187@unreal>
+References: <20240327200809.512867-1-leitao@debian.org>
+	<20240402180155.GM11187@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329191907.1808635-1-jrife@google.com> <20240329191907.1808635-2-jrife@google.com>
- <007e30b4-31aa-41b0-9e19-f7e2a385773e@linux.dev>
-In-Reply-To: <007e30b4-31aa-41b0-9e19-f7e2a385773e@linux.dev>
-From: Jordan Rife <jrife@google.com>
-Date: Tue, 2 Apr 2024 11:14:45 -0700
-Message-ID: <CADKFtnScmu+57KURFEUG5s8Qcx6NfAgF1XNfjT+fSZNLqV4amQ@mail.gmail.com>
-Subject: Re: [PATCH v1 bpf-next 1/8] selftests/bpf: Introduce sock_addr_testmod
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Daan De Meyer <daan.j.demeyer@gmail.com>, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Martin and Andrii,
+On Tue, 2 Apr 2024 21:01:55 +0300 Leon Romanovsky wrote:
+> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> > Signed-off-by: Breno Leitao <leitao@debian.org>  
+> 
+> Exciting read for people who remember this conversation:
+> """
+> > I prefer to see some new wrapper over plain alloc_netdev, which will
+> > create this dummy netdevice. For example, alloc_dummy_netdev(...).  
+> 
+> Nope, no bona fide APIs for hacky uses.
+> """
+> https://lore.kernel.org/linux-rdma/20240311112532.71f1cb35@kernel.org/
 
-> This function can be made as a new kfunc in bpf_testmod.c. The
-> sock_create_kern() could be moved to here also. Take a look at the
-> register_btf_kfunc_id_set() usage in bpf_testmod.c and how those registered
-> kfunc(s) can be called by the bpf prog in progs/*.
-
-Thanks for the feedback. I will explore this approach and see if I can
-get rid of the additional test module.
-
--Jordan
+Still my preference, but there's only so many hours in the day
+to keep explaining things. I'd rather we made some progress.
 
