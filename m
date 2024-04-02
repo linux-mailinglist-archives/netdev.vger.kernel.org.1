@@ -1,143 +1,191 @@
-Return-Path: <netdev+bounces-83990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 611128952FE
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:31:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CFA895303
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:32:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 161B71F25F26
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:31:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476861C22C67
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46C63611A;
-	Tue,  2 Apr 2024 12:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6CA58AB0;
+	Tue,  2 Apr 2024 12:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="vdjQ06Bg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iYSI7g/k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AA9179BC
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 12:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712061098; cv=none; b=KoHwv+/NZR0P6krvuBNX3z95TTakVlxW5dLJhRXJqNWDC6Nn1HsYW28pTPlKmbVMYxH9WVuVZZT464fzKk5SeRGN4VnQ4fC8dUIorLUp7fvVJwunpWsnX9Q+x661BjGs1JVbLdlw6f3uQpv1U4emTtcMEN0tlOYsl0AfSnxRNcQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712061098; c=relaxed/simple;
-	bh=u4TqurvDSYaDyG20izaiR67Vx1pyxp7agqu+p333Hp0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KYR40avmWevA1r3UgrylVl5dks818UjGOfqEAZqUNvtMuwtJst/TKfEzMf2pCVO/4trM5/upLihotkCE/XTvM7QPFc0r/GL3OuOthRPe6oIe9j9/IlCrpFDNTFjhIxh9hgm0hkuVRdPpW/qKFaTQC7VVaFdbdF96jBcQlvfa988=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=vdjQ06Bg; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4161bd0a4ecso3729535e9.1
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 05:31:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712061095; x=1712665895; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8cPdJ2DC4s1xwaIRwwZa1ZKVK0gXJ5ygNpZWfwADz78=;
-        b=vdjQ06Bg9SW73eO+9usQ+Y1Lij390Spo9PuqH7mBJZE1n1gaP6ESBW4HOFuoBTxdfw
-         6WdqmFImO1SPczmEqIrZTavszcO/txTcM+mxNpVXlNeaxhMXjaK9rCVprRLcfEA3JBLM
-         DuofQNQfuh1PnNlbP9vhEUMEXRHCgrxY4LrhFM6R2nxW2zE+79vrx3pI/usN7t6HRnMq
-         Zhyyqmnktx8K+TKiqh2vTPzNDyVBQ2+jpz2eQqnkGv6ih56AiM04GNBJDiV40Z1GAf5e
-         9semdD8xFVc2tUvgAvsiB2ffWMtOdaEk4beFiA6c4dlBsiH60Xt/824zT045VR7L8La5
-         3grg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712061095; x=1712665895;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8cPdJ2DC4s1xwaIRwwZa1ZKVK0gXJ5ygNpZWfwADz78=;
-        b=l6EaVv66cvfIGkkcPiT1WPebrAw3LGBtPwN0AtfS1Z+PBcVryrmUKqhgviP9sxTcwq
-         uVvFCP72zK1v91HEH4Vr50/lvXZIWkD/UoljZXc9obk2R6gY+Bj7pa9BWQJ5XosAopJR
-         ZEoq2Nh/7eH6slKbIrW1VLX9IcXVhFRzwIXKW4u+Gzr7KWX2rc0OAVKF6qt3u/9KK1aE
-         lbRDrIJyRxAv1qsl0ogn6wfmerPUDl09qIUtcEVcSiQ+TQ7mzL1JQnCMcdTsahXEjBXg
-         8bVoJUF68ouACRs+YU1YSIFTQw8MVIHx/ZUwFL1GLYtyQ8XoPHekSUFcddoE56IVYfM9
-         /uOw==
-X-Gm-Message-State: AOJu0YyruW/v5/Sjbxj7uRdIGSg+hlpe+KUw6+MJQ8gOTTXLTw5Z/lMn
-	mM9mfhLH5iKw+KFn57YfaymKOSaJIUbVywUrR7Hsa0voklG0OAjAL+8XFRF6ciUnEzfyxicD/QS
-	a8xs=
-X-Google-Smtp-Source: AGHT+IH6F276XKPfLLESEg2CvuS6EJ1WD9Utu2NYmDX0fj9u/h9oL4neKmhrTYQ8XusSQEJO4uh4nQ==
-X-Received: by 2002:a7b:cd0c:0:b0:414:610b:13c3 with SMTP id f12-20020a7bcd0c000000b00414610b13c3mr9266507wmj.27.1712061094941;
-        Tue, 02 Apr 2024 05:31:34 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id bq24-20020a5d5a18000000b0033e45930f35sm14305489wrb.6.2024.04.02.05.31.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 05:31:34 -0700 (PDT)
-Date: Tue, 2 Apr 2024 14:31:31 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, victor@mojatatu.com,
-	kuba@kernel.org, pctammela@mojatatu.com, martin@strongswan.org,
-	horms@kernel.org, Johannes Berg <johannes.berg@intel.com>
-Subject: Re: [PATCH net-next v2 1/2] rtnetlink: add guard for RTNL
-Message-ID: <Zgv6o3rcgFu1DXpV@nanopsycho>
-References: <20240328082748.b6003379b15b.I9da87266ad39fff647828b5822e6ac8898857b71@changeid>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025DC1DFD0
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 12:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712061122; cv=fail; b=CG9XsBPTXfpej8lx/209Xyy/Fouyee+Ank7hSnwD+TdYRgNjjMclSAYSTVsczpFu0vjAm3PdPTSwhX3cXwXhivOISv8pVAfuFPrzi4nnBZY/zkFL8/dinNWdIivtTc+cg90/dEIJZvgrxrphT7sMALEz6bw0OcntV8GIWCyV8V4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712061122; c=relaxed/simple;
+	bh=mAsjXVAVto4TJbog0NCKXQC/rmSCv4oOsFAWLipR8WM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=o1eD76n7Wg4dHE7tUDKnPI19c/bPxzqUitLhVzIhrbb11e7FOamgDve2ttN4Y4Z6O0S4ZvJIg3HBaAvBhLj1ZByRyZlT4TUgZLmmI7OlLXlMPqxXQcDa4LgQ3Ddalf+uEW0dWobcDgWwbSzgFwc2MGYlCCs18LpojOdr4CFqn+s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iYSI7g/k; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712061121; x=1743597121;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mAsjXVAVto4TJbog0NCKXQC/rmSCv4oOsFAWLipR8WM=;
+  b=iYSI7g/k2ZPgSRK15mekQfbDP1mwsVsF/sUGTaEBpPYuzWn5/HswaSlG
+   z/gQpr2CUZ5q+uu7vUuscYciH2gNl8Oq4L6EF8gCyGi1j/Mo1v+vB4WtO
+   l8YPo4bdlMrdOUCQYnA81QCAuePHTo13WDik1RDT+2JQg4qIWe7GkRjtx
+   pjBjhs3p29Zy6Uf6SY0OYw3vFhujT4gYDfUqTmqFqjgyp+pOqmqjIViAJ
+   PGvx5XD4tEz4dtc4FuRoG27U0XEDGDCgAff6mNS9r3QFl7XpjY8e4RxxN
+   p/QL2ait6Rw/ftiMHH8qgtDEoF+SXlEEB4OhO8DX+E5qik5day+ta/ibT
+   Q==;
+X-CSE-ConnectionGUID: DMRUhoyBSFWk3nkqFgYRqA==
+X-CSE-MsgGUID: rgEv/kSwQfimWrbuh2bxtw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="7096202"
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="7096202"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 05:32:00 -0700
+X-CSE-ConnectionGUID: lot8+QIrSXCzpvAKFPgOgQ==
+X-CSE-MsgGUID: 4cXvY1jrRECnLy9YRVeMEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="18108272"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Apr 2024 05:32:00 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Apr 2024 05:31:59 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Apr 2024 05:31:58 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 05:31:58 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 2 Apr 2024 05:31:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eqkq+QIMbdaucPLMEx0Ty+UX9I0Ylqb69jjheQ6PzsEL+TdHlaTHo1fbNgGjLXowj+vj2u8bWXlyOUDYbyGe5ZStENFyKy3BXbWOkn69/ROSlygvSUgn6vItgiHnRnm+JQJ8GG0nUN2nwNuzTNzFTfH15kbzL0usWJRXZcb6iWYe+Iyk+jq1siDcjpJVloKaz8SFBPUyStY0bdrk7lW73tf561wrQRnrRmuigQ0qiIyctpPRhEc+pFYYFCwzpHcR9xIhEbG/FZlAQQjMvXZN3nM7fTeTrYb1Ax7CGrpQlHrOrq6KsotdlBlHTql8hE+ajhhE69BvzM/3hD/0k/6BuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mAsjXVAVto4TJbog0NCKXQC/rmSCv4oOsFAWLipR8WM=;
+ b=FdIYdKm/UZGAgcx1jFOCcspx9CoiuvW19o5p9PmL6hWt8Hb7/yI01vbJCNwNqrBQbKdBto6F8V2rTLDfQvuOWXWCwlHBSOXtAysLAcVo7jrvtbyr9E2gjuYZ15RSePLzrmDuSRwCyhG+IuNz+EErt6wKy68uS6q9UKKsUhBc5xunDxCeC5XE4oF2wwzsILG5TB8QGNNuwkldzd5G3qAC5EeOf5RxGyT2JablKr6FfW6cEgxJH195AZrDnPX4Pa69WUdMS6FL1rFewUI9ipzc4EEMy5yekM7CyEQPh2I1D4ovPhZXqrmLnqDXo/u/NKCaNr/aE6XBrUIW9ThtWL1x4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5800.namprd11.prod.outlook.com (2603:10b6:303:186::21)
+ by SN7PR11MB6560.namprd11.prod.outlook.com (2603:10b6:806:26c::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Tue, 2 Apr
+ 2024 12:31:56 +0000
+Received: from MW4PR11MB5800.namprd11.prod.outlook.com
+ ([fe80::b022:a668:b398:77a4]) by MW4PR11MB5800.namprd11.prod.outlook.com
+ ([fe80::b022:a668:b398:77a4%7]) with mapi id 15.20.7452.019; Tue, 2 Apr 2024
+ 12:31:56 +0000
+From: "Kolacinski, Karol" <karol.kolacinski@intel.com>
+To: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>
+Subject: Re: [PATCH v4 iwl-next 00/12] Introduce ETH56G PHY model for E825C
+ products
+Thread-Topic: [PATCH v4 iwl-next 00/12] Introduce ETH56G PHY model for E825C
+ products
+Thread-Index: AQHagfSfyhXuhZGZmkykrlYPlfQpk7FO5u+AgAYGqLE=
+Date: Tue, 2 Apr 2024 12:31:56 +0000
+Message-ID: <MW4PR11MB580062A340F9A03B3780EF64863E2@MW4PR11MB5800.namprd11.prod.outlook.com>
+References: <20240329161730.47777-14-karol.kolacinski@intel.com>
+ <ec2aa7da-a3dc-36f2-39bc-052e9ba97de0@intel.com>
+In-Reply-To: <ec2aa7da-a3dc-36f2-39bc-052e9ba97de0@intel.com>
+Accept-Language: pl-PL, en-US
+Content-Language: pl-PL
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB5800:EE_|SN7PR11MB6560:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /iPtlagWKIdJNfRYhkt3uaE+/c5PfUNYMynr1PuELnpiH5C0awM5FIOWgXqpsV8WARTrB51VIlRXr+jcwMEWQBf1wjPmjFuZy0Lq86FqIDJ18NLWALXMxOmsAY24zM9TJV+SLxCFegqGvwscy1j6r8Eyt9i6hUJmv3lhu8zzh1QhDr+eWEcGvLcAno53YwxY7As88nmqIR0dxiS9RctyRPf6rtccLR15gDnRzjblDl6XI6roQUFSaxpuSY/PB+rUtxuvCJ3zbSY62YA0WxwAyK/7i8VkmHriNGphJHfXfhaFAgHVNKVLqrTQn5URpK/KKV3rgp/v87zwJyiOAvRu74dVCgsJOWqjTws9+Uv9xp+CA3oL74ftH8NJ/v5g/enEKBKBRoy4/e9m19edj+BG/Ufd5a4/vt9qyPye7xG7ouKKKF82zj2rFB6L9sM4FotuhMzV+kFJ7BwIUmnVvpxTM92S//vCEMCqu3+GR81Ta0oJ7K0uom/MQxAHFS/hgK9QU++kbUdtPc0EXdiu11K6VqyGRnvET1tQUQaGOOiVTGPjNkPS1kWdHcsAKsRTszsm4WyHLZi1b80wmmKzzTVvuP5uQ4g5AX2Ztw2mQbQJfkCHgFHDxzjNzI8lOlHmGgeMtFX+YtgGN3sAVp3bIaKFBKXu8stea2tYZBgRkx8PDRk=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5800.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-2?Q?3w+bpPP9N9kN9KDiMTOlCDmJaQoHJs/qQzDpqvU9O3o/YC1AEJycqUifyj?=
+ =?iso-8859-2?Q?mV2m6f9HRbUoqZYfyhivc8B0WnOngULKUQxG/glWzPWj4ul0pnHwpsbmjV?=
+ =?iso-8859-2?Q?wjWiK/8fBm0weZq+S2KOwlNMtr+MwTaf0Ygqbi+DjstgCSphq2wyhkyiYY?=
+ =?iso-8859-2?Q?p8GTqX6gn0QIC+DaKAPDiVtHNi0O1kFGEWuJEU1K21O4XTlC2IAWHJ+xIC?=
+ =?iso-8859-2?Q?XA74t2KjXWJpmKaPa62eHXTvYynGnylHLKPqdspq4wQlKYm9+RsZTEMrGJ?=
+ =?iso-8859-2?Q?i192JK1A97cjFC3UCfvPQJlveA9CQOi3649N7oF/HliMxNSU4qPi8hTMzr?=
+ =?iso-8859-2?Q?B8bFbnB8fk8AJgi0Gub7iTviL57BVjdL+u4da9ErEdNRCx9/jQd4PL5+4o?=
+ =?iso-8859-2?Q?tyLmIJg/NH7NRRwfuPvQsAaZD22S/zOLjE/0Mq67u0uwPR+0JEMvGtaAUq?=
+ =?iso-8859-2?Q?com21mrL5LyAG8kAdoA5bNSWb9nCmjM7R2/4lDapzdRCCuWqUoUjT3JR4G?=
+ =?iso-8859-2?Q?AjMCIqlwWFpD2ufMFzIStCwqnARjJSOgDDYceAt84+dtSqWI+ZltYWf8Kf?=
+ =?iso-8859-2?Q?uwD+532lCZ1bKlbXYNNl1cotVjV0Ehzern9c4BT7ejfpsH0oXTCR/mdZ9Y?=
+ =?iso-8859-2?Q?LvZVO+vlp0Vue9sto+lsrNLm5VYhwYztDnhFKmxrsVgKGXytPsgN/1QuU8?=
+ =?iso-8859-2?Q?AQ0islunKgMyxXixho0eNEf4eWLnixQ95jZkjZODboKQwftaodziv9V+0C?=
+ =?iso-8859-2?Q?HCVnt/Sc/viEWpgq2oniPxf62Nc/MHRTKzNzwG/x5RhZS4WTraStGwiiz6?=
+ =?iso-8859-2?Q?OV/uZZ9OWyVXIzsKbrnPeke+WbPZZbfqSYBSWafQAeFwO9RhOZyJkVsWcm?=
+ =?iso-8859-2?Q?uVKdSOcUQZ9fN3EyGDzv2ZQx/U8HBoZCCCTHZVc988KM8QWsHBSshROWCY?=
+ =?iso-8859-2?Q?gzeUE6ao92HUcYVinXVEfYoNnZif9emCBDxfOqROyJ2lmZWWvb6C5u6mxw?=
+ =?iso-8859-2?Q?fLhiVzqv/aZ8I+jagusEjc0KFI08tjuWsX69bZ4R6/ViOghxA/QxgGaw46?=
+ =?iso-8859-2?Q?1WsrxgmJiiqGwVgKF+gXhPgLDsPb4pdJXf089k1W9EDWbwry1k50uslZij?=
+ =?iso-8859-2?Q?MeZzRV8irgbk629EhAxI+jr1WuZJwXvXCeKObH8HVtesqGkWJYfcR1aGlj?=
+ =?iso-8859-2?Q?2fWEg7fLVy6y1IzINQaLEn5k34qZSlx5kf9qq6LFxSHYP7vILaHHGnMQCJ?=
+ =?iso-8859-2?Q?EQXynNMZGdSReo/mD+A/cIy2ytv+NpYqVM8ygQvqvff5Cox8jx4gddi3Om?=
+ =?iso-8859-2?Q?FRH4WK3YxDsKyPxp3ecpa+DG9HtwtRs1UvyoFIXRY/HX9fEe1Tgk/rodBB?=
+ =?iso-8859-2?Q?ALkHRySQSstBVgbyrMwH96B1aHacdlWC6Y+BZSukmc9FH8atEZJEQ1UV//?=
+ =?iso-8859-2?Q?lwuR3jp0PQrSV3x130s50ygvy5Y1uhH8a4IZWSJj6hrx2bsHmEeAPeY5ld?=
+ =?iso-8859-2?Q?cSOVymvZmnXqQJrXa4isiMimUQt/rjY+flkVk8hjYXoaw64EYUH3w/oYdB?=
+ =?iso-8859-2?Q?RnwSIJvmSuZ2kFjpVqmTk6K/d8mPs/IX/LNSWijJLFbhSLB6zJQJ2WgHp3?=
+ =?iso-8859-2?Q?OL+bJPC+Hj7p71soILHYcfN47uKwLvO2t/DlF2cPT/i3TK3/doP8iytg?=
+ =?iso-8859-2?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240328082748.b6003379b15b.I9da87266ad39fff647828b5822e6ac8898857b71@changeid>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5800.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90c5098d-76ca-429f-a0ab-08dc5310e258
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2024 12:31:56.1541
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HDDkykSLWsOssgmG+Vv7xF9rgzsQrpEdH5quMn74DJjpCFAXy6i9pKrfo7F8IYnjNivgm5++9jK2mOi4Ye5mJi2vGyjOrHkKEA9xW8B6lfE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6560
+X-OriginatorOrg: intel.com
 
-Thu, Mar 28, 2024 at 08:27:49AM CET, johannes@sipsolutions.net wrote:
->From: Johannes Berg <johannes.berg@intel.com>
->
->The new guard/scoped_gard can be useful for the RTNL as well,
->so add a guard definition for it. It gets used like
->
-> {
->   guard(rtnl)();
->   // RTNL held until end of block
-> }
->
->or
->
->  scoped_guard(rtnl) {
->    // RTNL held in this block
->  }
->
->as with any other guard/scoped_guard.
->
->Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-
-Since you add couple of helpers, I believe it is a nice custom to add a
-couple of patches that actually uses them. Would that make sense?
-
-
->---
->v2: resend
->---
-> include/linux/rtnetlink.h | 3 +++
-> 1 file changed, 3 insertions(+)
->
->diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
->index cdfc897f1e3c..a7da7dfc06a2 100644
->--- a/include/linux/rtnetlink.h
->+++ b/include/linux/rtnetlink.h
->@@ -7,6 +7,7 @@
-> #include <linux/netdevice.h>
-> #include <linux/wait.h>
-> #include <linux/refcount.h>
->+#include <linux/cleanup.h>
-> #include <uapi/linux/rtnetlink.h>
-> 
-> extern int rtnetlink_send(struct sk_buff *skb, struct net *net, u32 pid, u32 group, int echo);
->@@ -46,6 +47,8 @@ extern int rtnl_is_locked(void);
-> extern int rtnl_lock_killable(void);
-> extern bool refcount_dec_and_rtnl_lock(refcount_t *r);
-> 
->+DEFINE_LOCK_GUARD_0(rtnl, rtnl_lock(), rtnl_unlock())
->+
-> extern wait_queue_head_t netdev_unregistering_wq;
-> extern atomic_t dev_unreg_count;
-> extern struct rw_semaphore pernet_ops_rwsem;
->-- 
->2.44.0
->
+Hi Anthony,=0A=
+=0A=
+On 3/29/2024 9:23 AM, Anthony L Nguyen wrote:=0A=
+> It hasn't been 24 hours since the v3 [1]; for larger changes, you should=
+=0A=
+> wait longer than that [2].=0A=
+=0A=
+I'm really sorry, I forgot about 24h rule.=0A=
+=0A=
+=0A=
+> Also, where's the changelog?=0A=
+=0A=
+The only thing that changed between V1 and V4 was patch 07/12, which had=0A=
+only minor changes and it has the changelog.=0A=
+Should I also include which patches were changed in the cover letter?=0A=
+=0A=
+Thanks,=0A=
+Karol=
 
