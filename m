@@ -1,157 +1,166 @@
-Return-Path: <netdev+bounces-84035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B8B3895578
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:33:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F05B8895568
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:31:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBF59284A30
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:33:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D09A1C20F1F
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C6285267;
-	Tue,  2 Apr 2024 13:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69E683CB8;
+	Tue,  2 Apr 2024 13:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fkDlNi/C"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IHPCaquH"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2086.outbound.protection.outlook.com [40.107.243.86])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6410784FCC
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:32:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712064765; cv=fail; b=iYDmtnM9AwCxYryukEeuq6aIonKgt9YuGHdyrKKnby/JilCG4mwLMSUGfr3q5/mMF5EsGwceJ3WDfBgnoCEz4ti9j7/VR6jtm9/fHYOqRVDcZVDdaYakYpSjSRAizMCj/Zq0e0Pp9/NempJncgpvXRohvIUcIdT5lHWOYYTsOFY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712064765; c=relaxed/simple;
-	bh=i3WiLWWw/U1XJBDiqbdWWB7AIJsxgAbbOO+gLee/vsw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tw0SMBbhuM0fmZ4wLS+LIFTDs+sFCGJEAUFJAA3dEbGEKlIfi7c4tPEjbx+rdVECQ9X02uF8/TkoLUSRrUMnd3BfEIdmsnmpXDXpF5WcOJbII7UYLKl1iFYajNkDHEeg35i5a+3wW93yqZqYBOgwX/LmCdWQc43q0J0RFhVLHPc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fkDlNi/C; arc=fail smtp.client-ip=40.107.243.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hPcrJDUVMMS+ViyHuf9kwI8HqhlQAThV/Y5J0DGEl9yNvZBAU+VewQ/OZ97BcwPvQ3diFci5nECXqw+UXaKcS8Ip3lnEg/JSkRZZBRFn7Y8tG9rcDtCtl1Pxt03WPaOgYy1pJRtMY/zwADkO5KrzaqL8hrSWH/ITWOqqauUwZR6gl2RklVqIgyhzOdMwsVWHK+SbC5BefyH0kJpHAC2sBkFMtiwXnwjbrrR1P3m/tcqRA6BdiFawmri4afpHtoNznQOkrFx1gUZdtc6j6N+JysijJpBJzCun0fTJlJ+eqFVIF8y8LEie1cYnd3rEqKvZT8xayIw8a5h6d7hkwbKEOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MV4en/8ULq+35GWrwuYQo8yPeubaGb9eLR9fWK408oY=;
- b=OON8yTwohcpcwYhwOxtTMWGwgTYw4v9zDJpWKPKod5feYN2uMmsJBbIsjy/TIWCHiQ5+ny/IbUirSknsISELcBRSG+TIw9PP28uqoYWoBktc+8wd0iZl/RVyWwuOTBQN8vD4Uaew+F65eUhJyugxt51nEfwQnBUXbtfdyxIS1KIN9hl4Cgx1yaMeK4l+VUGQSib+YbccDjtsbCl5wfOOahaeli7wKFJCy/3icsj7BABexbHF3ytxQYAbcw2s7wXLM23hc0syPLyPuhR1oY3Mm6DhAGRwruDeWtNppqvIn/ZPZIOShU7rEZn7Yo2LwIgyT7zs7Iccky73QOXdbM8srA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MV4en/8ULq+35GWrwuYQo8yPeubaGb9eLR9fWK408oY=;
- b=fkDlNi/CIhSK7KZ5qU9bdkdwstlXRIK+IyJT2QBGVeRaqSAtORfgk5u+DhfZU/XxJLGpPh9xQsvdcDYwg9+iK+ABkUTKyHe9XNsaJ4cAT6osZw7NRzz/9wBHMps+uVPV78OBml9TCkUC7q99GpoDKXdWTIuoU/02SpEPDnF5wFfgIMq6lJDlefnDKBkKkRxQLhcWYh8e6sEIwsmW+SI+p4kkLX647RbAXTedpvEZXKdF5ba3Q+E7td897qSgELvVi7znvWQyk2VKSla32RQ1CfqesWwvX5mCOd0IqJBjC8/7Mj3ocYCAg6/kIwq67eGNZPvcNXOZ+HrJeHz9kJq+bg==
-Received: from DM6PR14CA0040.namprd14.prod.outlook.com (2603:10b6:5:18f::17)
- by BL3PR12MB6450.namprd12.prod.outlook.com (2603:10b6:208:3b9::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
- 2024 13:32:38 +0000
-Received: from CY4PEPF0000EDD1.namprd03.prod.outlook.com
- (2603:10b6:5:18f:cafe::33) by DM6PR14CA0040.outlook.office365.com
- (2603:10b6:5:18f::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
- Transport; Tue, 2 Apr 2024 13:32:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EDD1.mail.protection.outlook.com (10.167.241.205) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Tue, 2 Apr 2024 13:32:37 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 2 Apr 2024
- 06:32:13 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Tue, 2 Apr
- 2024 06:32:12 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server id 15.2.1258.12 via Frontend Transport; Tue, 2 Apr
- 2024 06:32:09 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jianbo Liu
-	<jianbol@nvidia.com>, Parav Pandit <parav@nvidia.com>, Moshe Shemesh
-	<moshe@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next V2 11/11] net/mlx5: Don't call give_pages() if request 0 page
-Date: Tue, 2 Apr 2024 16:30:43 +0300
-Message-ID: <20240402133043.56322-12-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240402133043.56322-1-tariqt@nvidia.com>
-References: <20240402133043.56322-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5A960B96
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712064710; cv=none; b=bUSJJBebG6XKAMI/LUlN4tyUWuX0bQOl4SAHVBRjoyCL/GjQvIPeMecUiHYLaGB0Qe4u5cP+i0EQNwGRER2JPxA1EgBHlRh1AJW5N85399sCStyaWawten06HEWzlKQj6ERmTkoRPv+WyKk66TTNdlGkkhWDd9SuwfPFyuOyVaE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712064710; c=relaxed/simple;
+	bh=FkJWSeFrHHNU8ZJGF36MFsyAMjsxBufarNGtN2k4+cM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ffnAbAtZHKreUUjbC2nnU8aoDASPHxMCNQFFYhnmCj143LBL/bgtTmjaq+gYQu03rGc0hp2lfRbMg3SVFsF66Oz5Z6k2aI2orNo1dy7wov4/VEi/y7cQmyk3KH7nILwHs/5ZIq/abS/ufdOi7QSkC/yXNPZ/IZgA4rFYqpea6b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IHPCaquH; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Bu4Xh24fb/o5+r+GHF1CQx8gl9GRGMS15plEnXkGgwM=; b=IHPCaquHt+qEIj78bvm91twt5l
+	8dI084x/6chCnik8Gm72S7ivvq1fRfr82I+cR0CpxE/Soi6dQxmGpdSpHokcPzpH+P8lsD56HPai1
+	ye3V6XkJ9SLXQYFjxM3yB4GIpRIoBrpKZFejdhnwyl0Wa1eGIu/tPCaanj5hPh9BRUuY6PNpv4aHE
+	/2/wCqZ9+sFT1DSD0NnhDpXQp7PmWcfVJvW2qcBFas9szlCiNJRk+XEQw1QgVF8MJ9F5jjchkc8Py
+	F5zL6fCb5ZOLMcL4+wJ83j7Vr/pe+gDzbKjxADOiS4FkNx/vwjS3RmqCofCr1+oyYXnLbL2K7jleH
+	vLcwax0w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54560)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rreEi-0006lL-0z;
+	Tue, 02 Apr 2024 14:31:36 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rreEg-0006zB-Iq; Tue, 02 Apr 2024 14:31:34 +0100
+Date: Tue, 2 Apr 2024 14:31:34 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 5/7] net: dsa: Add helpers to convert netdev
+ to ds or port index
+Message-ID: <ZgwItu4gETdLbHWi@shell.armlinux.org.uk>
+References: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-0-221b3fa55f78@lunn.ch>
+ <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-5-221b3fa55f78@lunn.ch>
+ <20240402105652.mrweu2rnend3n3tf@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD1:EE_|BL3PR12MB6450:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6cd36111-4b33-4195-8c2f-08dc53195ced
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	XT9tTl6MMgwrhUsvSNm5moGfPoEw8/5SGTP1etyLC3HCrV0P5qGNaNtyDOTyPcLl2SMPEYB6+rzX+DN171b1QyigshepyMY0qJhQKbp2Sm1tFo7NKH1HJloy/yhl+9Z57xLU4kGGnxb3FxkiprTD261TxpUd8eaMIbaZIPkBrp1ku/YBJTeH+c5N68p7/5qkaVUoRzXexbSjtsqnIuDVwvzP0xyEDabrcAc4MwLfWmbgQt/IC4DEWYjxz+KavBoQy7fz/3yaKqK1bGLUMhUkpP7xt0MKixSD1qtfbeEO5FXOj2q2eZa1Ga1gchocMbwREnoLj9VGqyKi6KlTOHxtYeaaU5G824QJgSrm56skm6BkfbrTMknBVe+mbOIajISgKxigkS9WxqLoPL0DNxEM3scv9nXIXHkKdfNPP9CnRHBsYKqBmC8AJGuCqvhgMjkCKPQ8lS0ogZP7wnnQS05mYltshtB62CuwqtapgpDnc7eGwyq+RxHM+io6G7xSMBWgvLZ2Rw4xbzeQSF/tAYTB7S+KWBKgl5PybKhQe1/Zod/nPT/o8NshO/zC6tM/4vgz6VCmcBXkt4pttKNNI2BBmZiYJbI1ZEs7AmPrD/wu+EA649OdYqeen6rnkjPvMUWlgVZQ9o6WfezQsAxJ/jPBhmLFNHbDj7pWCq7Epy+3JBpbMWKDuDmeR7b1R3oGibkCU1Q15O+uW+PewwR4VogJvCRMpJGfVw7xlPy3GZhIoPpXIu2GuOvSnydJg+qTDwgB
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(376005)(82310400014)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 13:32:37.6721
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6cd36111-4b33-4195-8c2f-08dc53195ced
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EDD1.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6450
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240402105652.mrweu2rnend3n3tf@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Jianbo Liu <jianbol@nvidia.com>
+On Tue, Apr 02, 2024 at 01:56:52PM +0300, Vladimir Oltean wrote:
+> On Mon, Apr 01, 2024 at 08:35:50AM -0500, Andrew Lunn wrote:
+> > The LED helpers make use of a struct netdev. Add helpers a DSA driver
+> > can use to convert a netdev to a struct dsa_switch and the port index.
+> > 
+> > To do this, dsa_user_to_port() has to be made available out side of
+> > net/dev, to convert the inline function in net/dsa/user.h into a
+> > normal function, and export it.
+> > 
+> > Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> > ---
+> 
+> I think the API we have today is sufficient: we have dsa_port_to_netdev(),
+> introduced at Vivien's request rather than exporting dsa_user_to_port().
+> 
+> Also, I believe that having a single API function which returns a single
+> struct dsa_port *, from which we force the caller to get the dp->ds and
+> dp->index, is better (cheaper) than requiring 2 API functions, one for
+> getting the ds and the other for the index.
 
-Firmware will return 0 on query BOOT/INIT PAGES for non-page supplier
-functions (external host PF/VF/SF), so no page is needed to be
-allocated for them.
+Yes, I would tend to agree having done this for my experimental phylink
+changes. struct dsa_port seems to make the most sense:
 
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Parav Pandit <parav@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 3 +++
- 1 file changed, 3 insertions(+)
+static inline struct dsa_port *
+dsa_phylink_to_port(struct phylink_config *config)
+{
+        return container_of(config, struct dsa_port, pl_config);
+}
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-index dcf58efac159..d894a88fa9f2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-@@ -660,6 +660,9 @@ int mlx5_satisfy_startup_pages(struct mlx5_core_dev *dev, int boot)
- 	mlx5_core_dbg(dev, "requested %d %s pages for func_id 0x%x\n",
- 		      npages, boot ? "boot" : "init", func_id);
- 
-+	if (!npages)
-+		return 0;
-+
- 	return give_pages(dev, func_id, npages, 0, mlx5_core_is_ecpf(dev));
- }
- 
+which then means e.g.:
+
+static void mv88e6xxx_mac_config(struct phylink_config *config,
+                                 unsigned int mode,
+                                 const struct phylink_link_state *state)
+{
+        struct dsa_port *dp = dsa_phylink_to_port(config);
+        struct mv88e6xxx_chip *chip = dp->ds->priv;
+        int port = dp->index;
+        int err = 0;
+
+        mv88e6xxx_reg_lock(chip);
+
+        if (mode != MLO_AN_PHY || !mv88e6xxx_phy_is_internal(chip, port)) {
+                err = mv88e6xxx_port_config_interface(chip, port,
+                                                      state->interface);
+                if (err && err != -EOPNOTSUPP)
+                        goto err_unlock;
+        }
+
+err_unlock:
+        mv88e6xxx_reg_unlock(chip);
+
+        if (err && err != -EOPNOTSUPP)
+                dev_err(dp->ds->dev, "p%d: failed to configure MAC/PCS\n",
+                        port);
+}
+
+vs the current code:
+
+static void mv88e6xxx_mac_config(struct dsa_switch *ds, int port,
+                                 unsigned int mode,
+                                 const struct phylink_link_state *state)
+{
+        struct mv88e6xxx_chip *chip = ds->priv;
+        int err = 0;
+
+        mv88e6xxx_reg_lock(chip);
+
+        if (mode != MLO_AN_PHY || !mv88e6xxx_phy_is_internal(chip, port)) {
+                err = mv88e6xxx_port_config_interface(chip, port,
+                                                      state->interface);
+                if (err && err != -EOPNOTSUPP)
+                        goto err_unlock;
+        }
+
+err_unlock:
+        mv88e6xxx_reg_unlock(chip);
+
+        if (err && err != -EOPNOTSUPP)
+                dev_err(ds->dev, "p%d: failed to configure MAC/PCS\n", port);
+}
+
 -- 
-2.31.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
