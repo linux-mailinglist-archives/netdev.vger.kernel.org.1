@@ -1,73 +1,79 @@
-Return-Path: <netdev+bounces-83905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46983894C82
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:18:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8487E894CB6
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:36:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01B1528130E
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:18:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B61F41C21C52
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4010D38DE1;
-	Tue,  2 Apr 2024 07:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A61B3B788;
+	Tue,  2 Apr 2024 07:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="IAtvSeqI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="feOc3UGH"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com [209.85.167.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA3A2BD00;
-	Tue,  2 Apr 2024 07:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68FB2BD1C;
+	Tue,  2 Apr 2024 07:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712042288; cv=none; b=ay63G4QzhoF/NTY4R9E4ye8TOzdnU9rmkihHkOi5EdyZv1sovt/oZx0peFfq8BvRu1T2xbWrZpDMHzVVfx2BV+AUiSCwHRJ4hMnvuIXYmILIpx9FlzdJzZsbA9NZf9Yzpvfc29tkbh6/o8TI3aZJiqx3i/XJBFCCfgzcw6WiqMc=
+	t=1712043394; cv=none; b=Qly2A858kZ98LARLN2h47sxIIyjAHqmzpvNJAWVEiX1Yh0BU6NpEqLKpA7FQgFG2nfETFsihifM5Vo4SsNw/7iY2jz4MOgSUb5UquORoBGUnMLRdMyA2FuskAOWlT5KEXrHQXIQL1fMELZXEFMuHeIfnnlCSEQvl0Y4NQWsjHos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712042288; c=relaxed/simple;
-	bh=AIIUnIQYVsm7lRDeuM3Eiv+P07h/G4w5XeAzewovPAM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EVbOwr52kg9pV0B3P1COBCX0WJdq5yLpJX90mdVS4IyDSmS2OuPZhg+yg5VBxA7MkYniTS+8eIYcYczMBAqsDUOP2Te6Sdt6PcyzvAbI0UIy6fuDPaqLdlEGwjqb/nSNcBZYYpYLtDQZkYZUsh8jrpkJqAne5bYuP5VpzJ31Drw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=IAtvSeqI; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1712042286; x=1743578286;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=AIIUnIQYVsm7lRDeuM3Eiv+P07h/G4w5XeAzewovPAM=;
-  b=IAtvSeqIrAM7p+VEDzBHvQ8V+w1q3OJKxgvYsZc0xu8iO7m1rIV48UHs
-   6v25Bk4x6aGEqosrcMvPwjMqDt1Eoi93WkTuiN+q4IQ+cOpOG1eZ3yF8q
-   fXrTBj4BBwPFKYwTjy264ybc62wT9eGvnOIQ3YeACvNGwnR+SEtEZnDkI
-   gg2jhpv2fVVAUUahengX2DoMdkUjpIFdvLNsR5ZZST1KXSunRqrIXd3g/
-   iHH0Ts/pUR3o6KfblnRYm8a8xaF0/EZTIQmbmNREyyP3UKswPrc66baZb
-   fCp6JogOQVbJy15NGcFonl0tDCw3CzlXZb0YxFQJnhuXOWMrv3WEIP2r3
-   A==;
-X-CSE-ConnectionGUID: YYBWl9GrQb6mGB1zAkjL6g==
-X-CSE-MsgGUID: f6W66RxjRf+27EMubxg8/A==
-X-IronPort-AV: E=Sophos;i="6.07,174,1708412400"; 
-   d="scan'208";a="19119228"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Apr 2024 00:18:05 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Apr 2024 00:17:46 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 00:17:44 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<Divya.Koppera@microchip.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, Horatiu Vultur <horatiu.vultur@microchip.com>
-Subject: [PATCH net] net: phy: micrel: lan8814: Fix when enabling/disabling 1-step timestamping
-Date: Tue, 2 Apr 2024 09:16:34 +0200
-Message-ID: <20240402071634.2483524-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1712043394; c=relaxed/simple;
+	bh=zox4SvndtX2IQYH7dF2si0RyU8QV/fnDqLEkZtb7Hc0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uTWIPzfGzgeeLAdX5vtED1p6GQqotq1BNqL0meG+kwx654ORs7zAarGefivGBBHlRR1kvQaCUNCP9TblMNlb4fNT0ATJU+NM1Iuv7RWeL14/LaBTWuiforDRkdqlHvoCQTC53/wi0EIEeRr7NMZcQrUOohDneP7PsdoxPsGM48o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=feOc3UGH; arc=none smtp.client-ip=209.85.167.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f195.google.com with SMTP id 5614622812f47-3c3d404225dso2782281b6e.3;
+        Tue, 02 Apr 2024 00:36:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712043391; x=1712648191; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IOSjhq4e8oxtj3qoYtkivIs58UqN+jVmwQhUZgEoH9Y=;
+        b=feOc3UGHWsQXqqkSERZyjzl3dgDJRo9PK8jWuCfGROJaOsfJng6cDVu2xUhKqQxCUL
+         XevMbXPTZhvRNLYQmNRAfBWW55Jz1M7JW7g9MemG5gRVLuB1wVrJnv1ZfQw+SJErD28K
+         bp2qlsYQ34hNL2HsuckQxARZvGpyL8UWsdGGHc9WAbvgCUcrsQS5E2TboUJgLIvFKMx4
+         2zYt2wEd7IThK0ZhittMT9v3w/vFaHRfnb5H5AvLX4VldSPZ5AJPIwuwyY15mmCBucSN
+         p8bOCfzBPUtNmDizapHm9Pk2wP07g9ID5hZ2oDeBii0Yb36MREge0C65VT1sb+yUl43+
+         26RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712043391; x=1712648191;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IOSjhq4e8oxtj3qoYtkivIs58UqN+jVmwQhUZgEoH9Y=;
+        b=iLe9nRQ3MDiSZTZg78JwUNkhczLTH8Bw59L4B8+eDdWleQh2HPm5MiT1h8bCYG8UV1
+         ZGVSpSgduFGp/HKdEojqo3g/lhDkczzkM3KcusnouWRcDeJLn5zzJ2OS3ukCCS/IJxb2
+         prAPGvPK9IS6ZrKkjN+m1iH3vBJz6rVFd49wpj1G2LvCksSROFJXDnk2dEpYtnXF6lHQ
+         370D0iWllT8BHcXexg/4NCTBEjSq66KTVLZ7Er2iIYMb5vEAfju8r4RV8cQ8El8Nd79y
+         gtQ9wLHoaFsKkmMFgdwSBTgO3bwPBisFKIRruGWFg1qV0pIx+Q9SA22avSFq3//f21Ew
+         JolA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtrTuylhCoLVI2HnM4LLwIwXytqhsGneYCY2cR21pNYks6lPEnf6q1pBe0Kxi5SmkXgJ2qenMAXTf3IBQ7qvPCuutKRqZV
+X-Gm-Message-State: AOJu0YzeZx3E1nhTeURolREXQM/0P99ENJ67D2Tl5hzt6pBMOO5bN5Dz
+	CJc+ydnBd7rj4UilDy2K8s7TQnnoz+urlukPFTxVxlKlvoPYUuPLTgBLDOp6IvIJHube9dvOWw=
+	=
+X-Google-Smtp-Source: AGHT+IF3+j06WxIYHgTCU8OLKQ8y4EXT06Ty4po+TJM8RiHUA84r+T1QS9NlVpI+1c5fvZIN5ph7vw==
+X-Received: by 2002:a05:6808:1246:b0:3c4:e208:b784 with SMTP id o6-20020a056808124600b003c4e208b784mr9342057oiv.27.1712043391580;
+        Tue, 02 Apr 2024 00:36:31 -0700 (PDT)
+Received: from localhost.localdomain ([2604:abc0:1234:22::2])
+        by smtp.gmail.com with ESMTPSA id ef1-20020a056808234100b003c3e07cc6a1sm2036927oib.46.2024.04.02.00.36.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 00:36:31 -0700 (PDT)
+From: Coia Prant <coiaprant@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Coia Prant <coiaprant@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 2/2] net: usb: qmi_wwan: add Lonsung U8300/U9300 product Update the net usb qmi_wwan driver to support Longsung U8300/U9300.
+Date: Tue,  2 Apr 2024 00:36:27 -0700
+Message-Id: <20240402073627.1753526-1-coiaprant@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,56 +81,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-There are 2 issues with the blamed commit.
-1. When the phy is initialized, it would enable the disabled of UDPv4
-   checksums. The UDPv6 checksum is already enabled by default. So when
-   1-step is configured then it would clear these flags.
-2. After the 1-step is configured, then if 2-step is configured then the
-   1-step would be still configured because it is not clearing the flag.
-   So the sync frames will still have origin timestamps set.
+Enabling DTR on this modem was necessary to ensure stable operation.
 
-Fix this by reading first the value of the register and then
-just change bit 12 as this one determines if the timestamp needs to
-be inserted in the frame, without changing any other bits.
+ID 1c9e:9b05 OMEGA TECHNOLOGY (U8300)
+ID 1c9e:9b3c OMEGA TECHNOLOGY (U9300)
 
-Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+U8300
+ /: Bus
+    |__ Port 1: Dev 3, If 0, Class=Vendor Specific Class, Driver=option, 480M (Debug)
+        ID 1c9e:9b05 OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 1, Class=Vendor Specific Class, Driver=option, 480M (Modem / AT)
+        ID 1c9e:9b05 OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 2, Class=Vendor Specific Class, Driver=option, 480M (AT)
+        ID 1c9e:9b05 OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 3, Class=Vendor Specific Class, Driver=option, 480M (AT / Pipe / PPP)
+        ID 1c9e:9b05 OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 4, Class=Vendor Specific Class, Driver=qmi_wwan, 480M (NDIS / GobiNet / QMI WWAN)
+        ID 1c9e:9b05 OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 5, Class=Vendor Specific Class, Driver=, 480M (ADB)
+        ID 1c9e:9b05 OMEGA TECHNOLOGY
+
+U9300
+ /: Bus
+    |__ Port 1: Dev 3, If 0, Class=Vendor Specific Class, Driver=, 480M (ADB)
+        ID 1c9e:9b3c OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 1, Class=Vendor Specific Class, Driver=option, 480M (Modem / AT)
+        ID 1c9e:9b3c OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 2, Class=Vendor Specific Class, Driver=option, 480M (AT)
+        ID 1c9e:9b3c OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 3, Class=Vendor Specific Class, Driver=option, 480M (AT / Pipe / PPP)
+        ID 1c9e:9b3c OMEGA TECHNOLOGY
+    |__ Port 1: Dev 3, If 4, Class=Vendor Specific Class, Driver=qmi_wwan, 480M (NDIS / GobiNet / QMI WWAN)
+        ID 1c9e:9b3c OMEGA TECHNOLOGY
+
+Tested successfully using Modem Manager on U9300.
+Tested successfully using qmicli on U9300.
+
+Signed-off-by: Coia Prant <coiaprant@gmail.com>
+Cc: stable@vger.kernel.org
 ---
- drivers/net/phy/micrel.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/net/usb/qmi_wwan.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 8b8634600c519..242f433d9184d 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -2431,6 +2431,7 @@ static int lan8814_hwtstamp(struct mii_timestamper *mii_ts,
- 	struct lan8814_ptp_rx_ts *rx_ts, *tmp;
- 	int txcfg = 0, rxcfg = 0;
- 	int pkt_ts_enable;
-+	int tx_mod;
- 
- 	ptp_priv->hwts_tx_type = config->tx_type;
- 	ptp_priv->rx_filter = config->rx_filter;
-@@ -2477,9 +2478,14 @@ static int lan8814_hwtstamp(struct mii_timestamper *mii_ts,
- 	lanphy_write_page_reg(ptp_priv->phydev, 5, PTP_RX_TIMESTAMP_EN, pkt_ts_enable);
- 	lanphy_write_page_reg(ptp_priv->phydev, 5, PTP_TX_TIMESTAMP_EN, pkt_ts_enable);
- 
--	if (ptp_priv->hwts_tx_type == HWTSTAMP_TX_ONESTEP_SYNC)
-+	tx_mod = lanphy_read_page_reg(ptp_priv->phydev, 5, PTP_TX_MOD);
-+	if (ptp_priv->hwts_tx_type == HWTSTAMP_TX_ONESTEP_SYNC) {
- 		lanphy_write_page_reg(ptp_priv->phydev, 5, PTP_TX_MOD,
--				      PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_);
-+				      tx_mod | PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_);
-+	} else if (ptp_priv->hwts_tx_type == HWTSTAMP_TX_ON) {
-+		lanphy_write_page_reg(ptp_priv->phydev, 5, PTP_TX_MOD,
-+				      tx_mod & ~PTP_TX_MOD_TX_PTP_SYNC_TS_INSERT_);
-+	}
- 
- 	if (config->rx_filter != HWTSTAMP_FILTER_NONE)
- 		lan8814_config_ts_intr(ptp_priv->phydev, true);
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index e2e181378f41..3dd8a2e24837 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1380,6 +1380,8 @@ static const struct usb_device_id products[] = {
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9801, 3)},	/* Telewell TW-3G HSPA+ */
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9803, 4)},	/* Telewell TW-3G HSPA+ */
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9b01, 3)},	/* XS Stick W100-2 from 4G Systems */
++	{QMI_QUIRK_SET_DTR(0x1c9e, 0x9b05, 4)},	/* Longsung U8300 */
++	{QMI_QUIRK_SET_DTR(0x1c9e, 0x9b3c, 4)},	/* Longsung U9300 */
+ 	{QMI_FIXED_INTF(0x0b3c, 0xc000, 4)},	/* Olivetti Olicard 100 */
+ 	{QMI_FIXED_INTF(0x0b3c, 0xc001, 4)},	/* Olivetti Olicard 120 */
+ 	{QMI_FIXED_INTF(0x0b3c, 0xc002, 4)},	/* Olivetti Olicard 140 */
 -- 
-2.34.1
+2.39.2
 
 
