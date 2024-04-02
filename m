@@ -1,113 +1,123 @@
-Return-Path: <netdev+bounces-84190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18CA0895F9E
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 00:33:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB4B895FA8
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 00:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C19891F2369A
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:33:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89FFB24FD7
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F07A23778;
-	Tue,  2 Apr 2024 22:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9F0224D7;
+	Tue,  2 Apr 2024 22:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZtpnuJTs"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="y8gs3/kN";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/S3kigRc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B3422EF5
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 22:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D22F1D6AE;
+	Tue,  2 Apr 2024 22:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712097208; cv=none; b=aJ5dYxcG7wAeg4+lddarEilGdmpXfRFOGGdn6BBOjSZKNZVReVOzoCujzqAWxgfN7QXB2YaTx1xrgcSd5bSmlBSfS+KMqDX5SRY4F+/qd5N+9OBcp+NXep1d5dRuAj2OrsuhWuGx3aVSttQl8dK/+jzTg1pnW1aCPExZGIo++wA=
+	t=1712097452; cv=none; b=W10TqsaPvy5VnnlmThzMZBeFgxDZOjLBb3GGNNh17bIpp2lcCYgQVV/Ny27yjt1URfxO0PVhgRDAa3lW1Rzk3RPUEvLnRmFCrP+NWTS/GlnUozRTu7bf0MwzlT9Q8uDI0/CULHYDoe0RGFSy6GEw5PqJgZ4ULQXqg6M/1BFhu7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712097208; c=relaxed/simple;
-	bh=kkzlSA66i26GYwqP48fW+uIkvk54teFui2Jrdf90kTM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BRDy7OjFyKLdXsrv0JIsckO4QPLw8onuuAh6jLoudpTXN74P5lrTFt2eWP09za7N5LeG1yLR6AOL8PWeyKsiz1iiD96IGeYRuBb63BoxkR1rPXrbrNAW6W/HlXWL74rpcfD49GyYzy2J92tK/RNnToiCkx+ua3nto9xYlsTwTXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZtpnuJTs; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e5a1261d-0366-4459-b78c-86557d6e1834@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712097204;
+	s=arc-20240116; t=1712097452; c=relaxed/simple;
+	bh=RTJ4TUWlWWd2tTYwH9K2+rCPELvAiNcHn8N7wtsQdE4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uGv4B2I9IO7Vu7D2acS2jIBX/gxlkKM4ATuqG+QfjxQjmx/2Pht0zs2TkEkZUIX/lnkI30+++eVc1mZD0VJ0Gk7auouuAUcs6wVE3Iqfs0OPjkwcKfr+msubxKZqnG2ro6pMSSxTJm048CRtQer5Ay8E8FlJeUQnwMF8Kbte+1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=y8gs3/kN; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/S3kigRc; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1712097449;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8S9cgMSyZXFXQwkW18aRhug4biM7UCnBGh847SJ+7ak=;
-	b=ZtpnuJTsEoaGToEeRIPVsngQ6SP0HDjZo4AX3xGVWx57B+V9xFeemlcIC7Tr2v3wGnG1Q4
-	/yz+6FW6Hxuf5wf8AuXJkNGtdvU9VohoiDrFTFRtyg5A4YgwUwQbf0gj+7B66nNHcecRNP
-	8rCpXv387lfHd/Byk3qyJ4ggr26l6Nw=
-Date: Tue, 2 Apr 2024 15:33:18 -0700
+	bh=clN786LC8NAM+WdiMM9dgE3xxt8pA/vNnE2Z1vIrTT0=;
+	b=y8gs3/kNhqVMDT69laurybXNrUUQLXSrWBlCfk7pYoQcD7sK8QMi2tcLxZzkUPDz1X8GFu
+	rDsIpWZ0dnEQluAc24xXlL4OxvWeX0lwaDKuqO838hTIEmqov7noMajRVkE4KsmiJRAFsQ
+	3vsSR5JyyO2QIU4l+hPyGZvLBGQ96v5jvXV9Sh2ifVY5GBGOQaIHT3bmPElkDDpBp7Nr3v
+	ou/q6j9YcqJz8Gz30kQRCGPebZaTDn7VkUNbbI+KO5BTEDOOP2q3L7BLEWF1I1ZZ1YOXaG
+	C79sLoWN91aYOfwqYOMJ0rCrI198o5Dd+BP7sBJx9J4T5MaI6XiMi2qXJC8CcQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1712097449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=clN786LC8NAM+WdiMM9dgE3xxt8pA/vNnE2Z1vIrTT0=;
+	b=/S3kigRc0yKHbucTfmxketx4NbcQwgEjHo9AEoMAW71rZkqIq1rlQldWDmbV8LlyBHHCAK
+	2c+UPz+ei3Kc93DA==
+To: =?utf-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS1?=
+ =?utf-8?B?4KS+4KSwKQ==?= <maheshb@google.com>
+Cc: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com,
+ luto@kernel.org, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, arnd@arndb.de,
+ geert@linux-m68k.org, peterz@infradead.org, hannes@cmpxchg.org,
+ sohil.mehta@intel.com, rick.p.edgecombe@intel.com, nphamcs@gmail.com,
+ palmer@sifive.com, keescook@chromium.org, legion@kernel.org,
+ mark.rutland@arm.com, mszeredi@redhat.com, casey@schaufler-ca.com,
+ reibax@gmail.com, davem@davemloft.net, brauner@kernel.org,
+ linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
+ linux-arch@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
+In-Reply-To: <CAF2d9jj6km7aVSqgcOE-b-A-WDH2TJNGzGy-5MRyw5HrzbqhaA@mail.gmail.com>
+References: <CAMuE1bHBky9NGP22PVHKdi2+WniwxiLSmMnwRM6wm36sU8W4jA@mail.gmail.com>
+ <878r29hjds.ffs@tglx>
+ <CAMuE1bF9ioo39_08Eh26X4WOtnvJ1geJ=WRVt5DhU8gEbYJNdA@mail.gmail.com>
+ <87o7asdd65.ffs@tglx>
+ <CAF2d9jjA8iM1AoPUhQPK62tdd7gPnCnt51f_NMhOAs546rU3dA@mail.gmail.com>
+ <87il10ce1g.ffs@tglx>
+ <CAF2d9jj6km7aVSqgcOE-b-A-WDH2TJNGzGy-5MRyw5HrzbqhaA@mail.gmail.com>
+Date: Wed, 03 Apr 2024 00:37:28 +0200
+Message-ID: <877chfcrx3.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 bpf-next 4/8] selftests/bpf: Add recv_msg_from_client
- to network helpers
-To: Jordan Rife <jrife@google.com>
-Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Daan De Meyer <daan.j.demeyer@gmail.com>, bpf@vger.kernel.org
-References: <20240329191907.1808635-1-jrife@google.com>
- <20240329191907.1808635-5-jrife@google.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240329191907.1808635-5-jrife@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 3/29/24 12:18 PM, Jordan Rife wrote:
-> +int recvmsg_from_client(int sockfd, struct sockaddr_storage *src_addr)
-> +{
-> +	struct timeval tv;
-> +	struct msghdr hdr;
-> +	struct iovec iov;
-> +	char data[64];
-> +	fd_set rfds;
-> +
-> +	FD_ZERO(&rfds);
-> +	FD_SET(sockfd, &rfds);
-> +
-> +	tv.tv_sec = 2;
-> +	tv.tv_usec = 0;
-> +
-> +	if (select(sockfd + 1, &rfds, NULL, NULL, &tv) <= 0 ||
+On Tue, Apr 02 2024 at 14:16, Mahesh Bandewar (=E0=A4=AE=E0=A4=B9=E0=A5=87=
+=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=BE=E0=A4=B0) =
+wrote:
+> On Tue, Apr 2, 2024 at 2:25=E2=80=AFAM Thomas Gleixner <tglx@linutronix.d=
+e> wrote:
+>> Works as well. I'm not seing the point for CLOCK_MONOTONIC and the
+>> change logs are not really telling anything about the problem being
+>> solved....
+>>
+> https://lore.kernel.org/lkml/20240104212431.3275688-1-maheshb@google.com/=
+T/#:~:text=3D*%20[PATCHv3%20net%2Dnext%200/3]%20add%20ptp_gettimex64any()%2=
+0API,21:24%20Mahesh%20Bandewar%200%20siblings%2C%200%20replies;
+>
+> This is the cover letter where I tried to explain the need for this.
 
-The socket fd created by the helpers in network_helpers.c should be a blocking 
-socket and has a 3s default delay. select should not be needed. Try to stay with 
-the default. If the default turned out to be too flaky in the bpf CI in the 
-future, one default change is easier.
+The justification for a patch needs to be in the change log and not in
+the cover letter because the cover letter is not part of the git
+history.
 
-> +	    !FD_ISSET(sockfd, &rfds))
-> +		return -1;
-> +
-> +	memset(&iov, 0, sizeof(iov));
-> +	iov.iov_base = data;
-> +	iov.iov_len = sizeof(data);
-> +
-> +	memset(&hdr, 0, sizeof(hdr));
-> +	hdr.msg_name = src_addr;
-> +	hdr.msg_namelen = sizeof(struct sockaddr_storage);
-> +	hdr.msg_iov = &iov;
-> +	hdr.msg_iovlen = 1;
-> +
-> +	return recvmsg(sockfd, &hdr, 0);
-> +}
+> Granted, my current use case is for CLOCK_MONOTONIC_RAW but just
+> because I don't have a use case doesn't mean someone else may not have
+> it and hence added it.
+
+Then why did you not five other clock IDs? Someone else might have a
+use case, no?
+
+While a syscall/ioctl should be flexible for future use, the kernel does
+not add features just because there might be some use case. It's
+documented how this works.
+
+Thanks,
+
+        tglx
 
 
