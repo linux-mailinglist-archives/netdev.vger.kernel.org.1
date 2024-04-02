@@ -1,86 +1,98 @@
-Return-Path: <netdev+bounces-84139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFC36895B8D
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:17:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA4D0895B9A
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 749F51F212A8
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:17:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A83151F22F4A
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CBD15ADAF;
-	Tue,  2 Apr 2024 18:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F9B15AD9F;
+	Tue,  2 Apr 2024 18:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j+yjw4zb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MS+tO2fd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7985915AD93;
-	Tue,  2 Apr 2024 18:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E7115AD95;
+	Tue,  2 Apr 2024 18:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712081831; cv=none; b=qDW2INzw0z1uaHJtOoF3RDfj1eWoOPRfaykjSgWBNm1b4G0Xs/E6gjA1etdQ5KeUo4Pr7WGhckbv37/Xw1TRMmYSzAzMj27vywnA7xBJNCbGLiSGRqlMHCpadzo4rXwwguVKNXY53R2au8D5jEy7MHiu+ljqC5xXNw+GG9/dMrI=
+	t=1712082048; cv=none; b=gORMsbb2O+LFtvN3/SCRG7wkkFN0iVYJrTiHSQQkFcoCoNDHAe13+7lesZjvPHllj3CAtNv/3iEndyU2WQP3D0f+Xez5xBB5nWMtcSrzKSx+ywv4gKd6Gh/9WnjMXuggrJwdpa6pPqrTpSVQJh7Bg8gVctbKcgy8vND7pjQziP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712081831; c=relaxed/simple;
-	bh=0ARxQ9cttIE0P2km3rZwYbhh6JliaUfiHYwzzaExkGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nl7tryfoaBhtwZg0zYm85HH5uHtvPW2p3xeSIZgChNn1dWNwioTxOokKirEwA+uJVQ1lhYPSXN+LwhBoXKz5ynJFZLUnp3Kh5GwUO6v2HYVCDIgrPaj6wTtHcww0fjDoPOCoDFilWFNmo00KdtwKIsEc5fn6Qge6894vj3MTC+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j+yjw4zb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81759C43390;
-	Tue,  2 Apr 2024 18:17:10 +0000 (UTC)
+	s=arc-20240116; t=1712082048; c=relaxed/simple;
+	bh=R+dnlvAnN+zOtr2CXbdtuCPTkxZEygoWJCnVX6je7zY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ASGrNsNyTZV0v0+ttvnm/vLd2vdPRrj/pbe//BwwN5DF6w973euuxdrB0A9ToHc+WlohnzPdQQHg+I5kFA3oRJ13RS1Mm/fbFFBSltz9LNzxza/6xMBEQ6ND0UU1zUVxyOhouyHk07/+kFH+m5ezBX9WoL2ffgjlrexQzWot29k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MS+tO2fd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51A76C43390;
+	Tue,  2 Apr 2024 18:20:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712081831;
-	bh=0ARxQ9cttIE0P2km3rZwYbhh6JliaUfiHYwzzaExkGE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j+yjw4zbZrlaNcUDJqfUE1ixZtxbFznrXU41+a50ZKjM18TdEcXy7iCKOK1++lPZC
-	 l56y++MenbvUEkO+T8DPS7RkQQTktGT31vMpgMvsDF/TquT2gp6WMPiv9fhhM685A1
-	 QWEW/yo54O55Hvv+3X/XoCgOxGGTZrRDzn3HRIi9LYU47NwkPyNor16r7gEFiCaEhK
-	 /2PVXeM1GJKFzq44zMrRda/Y1oNWRCm7FVvPshqW+P6tyilCpXVaMbvs7Skvorzf+R
-	 iU4CizFo8Y3jtTcCT9gRupQ9keLHAXkwj2zPJ7q3xEiWc3j5WulFe+Ffohs6F28Gc8
-	 MDboiPygc/dAQ==
-Date: Tue, 2 Apr 2024 11:17:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, quic_jjohnson@quicinc.com, kvalo@kernel.org,
- dennis.dalessandro@cornelisnetworks.com, Jiri Pirko <jiri@resnulli.us>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>, Dennis Dalessandro
- <dennis.dalessandro@intel.com>, RDMA mailing list
- <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: create a dummy net_device allocator
-Message-ID: <20240402111709.1551dbca@kernel.org>
-In-Reply-To: <20240402180155.GM11187@unreal>
-References: <20240327200809.512867-1-leitao@debian.org>
-	<20240402180155.GM11187@unreal>
+	s=k20201202; t=1712082047;
+	bh=R+dnlvAnN+zOtr2CXbdtuCPTkxZEygoWJCnVX6je7zY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MS+tO2fdHButcdLwRwDMczgoVv7JLOqbWb/gslRHTG50HvGg9Z5dDC/9cCi66iNH6
+	 6g9qe/7/q3c23lNJhEPx0o023ZkiHkvXElbJmxGDv/MkUG8PxSOwpzyaZv/rYdGzuA
+	 c/KbwaggUEglG4kB4yZUik3qyAouF0Nn4ui4XJrXq53+oE40IMfYUDwiGHEAo8YIOw
+	 nc/hOsgjltNjbcdAZbcFvgRkSxN/vcx/uFhwyx2529tTPl4nT5e4lYMkJMZ5oGncs6
+	 UxZIBENP+xABjcAHkoZFRB4k1UvH2DtfHYHCNSAnPVNyYBwzR4YHm1fJdMjCHBFds7
+	 YnZJdBL9B70Vg==
+Date: Tue, 2 Apr 2024 19:20:43 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: snps,dwmac: Align
+ 'snps,priority' type definition
+Message-ID: <20240402-surprise-helmet-9f7c0eb6839c@spud>
+References: <20240401204422.1692359-2-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ESvyQlaQyigU/fBK"
+Content-Disposition: inline
+In-Reply-To: <20240401204422.1692359-2-robh@kernel.org>
 
-On Tue, 2 Apr 2024 21:01:55 +0300 Leon Romanovsky wrote:
-> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Breno Leitao <leitao@debian.org>  
-> 
-> Exciting read for people who remember this conversation:
-> """
-> > I prefer to see some new wrapper over plain alloc_netdev, which will
-> > create this dummy netdevice. For example, alloc_dummy_netdev(...).  
-> 
-> Nope, no bona fide APIs for hacky uses.
-> """
-> https://lore.kernel.org/linux-rdma/20240311112532.71f1cb35@kernel.org/
 
-Still my preference, but there's only so many hours in the day
-to keep explaining things. I'd rather we made some progress.
+--ESvyQlaQyigU/fBK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Apr 01, 2024 at 03:44:22PM -0500, Rob Herring wrote:
+> 'snps,priority' is also defined in dma/snps,dw-axi-dmac.yaml as a
+> uint32-array. It's preferred to have a single type for a given property
+> name, so update the type in snps,dwmac schema to match.
+>=20
+> Signed-off-by: Rob Herring <robh@kernel.org>
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+--ESvyQlaQyigU/fBK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgxMewAKCRB4tDGHoIJi
+0ulmAQCkfrNLqe+sPJxSI8sQY0KUogTFYjfGdbu8F+QOuBqi6gD/Rbh3ZV9LoT5H
+lpqNx32GQ3q94ffF/QC3E6OWnnG36A4=
+=qjGs
+-----END PGP SIGNATURE-----
+
+--ESvyQlaQyigU/fBK--
 
