@@ -1,68 +1,67 @@
-Return-Path: <netdev+bounces-83940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54504894ED7
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:37:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1418894ED8
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF991B2322F
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:36:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 007D51C22A5F
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CA058ABB;
-	Tue,  2 Apr 2024 09:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1F759155;
+	Tue,  2 Apr 2024 09:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RJaeFxGy"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HzwqU7Io"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CBE5B5C5
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 09:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A9458105
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 09:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712050573; cv=none; b=AosyXdWQxVYiLy8Vpt1+3e78hHD48JQS9ajjkmJJS+KwCIdh2XcaLYIqLd5wqsdaAj9IYIqjhfVeRaSWp5M1eRLBBx0w47QxKqgxcBbrYmzlBxQiLo7zqLfGkfESa35mVXnHc/GqEuLzrtKvdPAkTc68ndFkuqpKM3UwE4Ovn/8=
+	t=1712050578; cv=none; b=TkKNViV51A5fMc+3BTZOQeGgSGY2lq7/SNrMWlvc2idH8a+SCprzs6lfKW3dwioQhMZeXLGZJuvE0WK7vtoh2RHxPLhhhSGe39aCjLcv6PvMBGeQiuLXTq3vPBV/UKxdiK6vY6sLXg0N/b5rld0F7cfVHiJ1WTCuaUFPZ6TAVnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712050573; c=relaxed/simple;
-	bh=Pza4zDdRsgeGApP31ha2hoQfoFkhkWEIE6UMJajtl+I=;
+	s=arc-20240116; t=1712050578; c=relaxed/simple;
+	bh=oiVjuNphKIaHqFRrboIBJTKQkyPa+m93OQ0UI2bySpU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ifEzrPCt648pDKM+RPgb6+dfCTZIXACePjT04+MGU0IWGvZ7adOG75QZ7OBLPqJHeYt5iqTvdDxB99GiMUu/mESs2t0+tDMg4cHvzdGRMnjHk2fHMVNr6l1IQQgiIDWWsnrPszJs2/V2p1jv+b3FrApxmBv5p1iMZHBXG938GsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RJaeFxGy; arc=none smtp.client-ip=209.85.210.172
+	 MIME-Version:Content-Type; b=YVfILrCKRsum92wtqIU8JHqvfgpOAxEaCyFh4gfEQUAZOWv60YuvKzH7S98qp8tUd1kBj72JKvDR/qO2JDE4w2febkkn1cX9+gEvsTjZk6ATLhOSAnXQQx7BQG6ikSwQGOP3WJX6oOfE5HR6jqCR4ihyUGiJfiUgT7WnN86m2lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=HzwqU7Io; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6ea8ee55812so4863197b3a.0
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 02:36:10 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6eaf1005fcaso1935778b3a.3
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 02:36:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1712050570; x=1712655370; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1712050576; x=1712655376; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5IAVACq6jP/cnQv/1LuzbyIHZaSCUI8bfJCgpgtsfV0=;
-        b=RJaeFxGyalchFXD/lqF4C6R+ZL8yk3e5wr0uIxHwlpcWAaHGbifq2aPjkNQRCCYKJc
-         orX6UJf87eO77VNUyvGEMGT/3e6R+BzVFzw4FWdbAFp2MEhLPoCrvdJov3F1b3bRuC6i
-         wA8p6YryrnKRK2AR4msjdoif+Ch8Lu0y0jfy8=
+        bh=b+m4kHHFYY28ecUPVtXSzISJ47PGkToHXp4+3MPAI0Y=;
+        b=HzwqU7IomKP0y41F+euZp6liOr+/ayK2jSBaYVPHs7kJUwvZKLY4IgfVOFH9PjNAb1
+         BPBxoCSTJaWhip64lXcYcFkFsR9k9G4sUWksSOPNUyGodfiigAwhqs+4w1z1cdQG7IWh
+         W0/JeIeGbI/sFrJJkoF9imZnPIa3NmqCbDR0U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712050570; x=1712655370;
+        d=1e100.net; s=20230601; t=1712050576; x=1712655376;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5IAVACq6jP/cnQv/1LuzbyIHZaSCUI8bfJCgpgtsfV0=;
-        b=ALCvw6FFb+hFXR2mpUs5JV2tM6lJ5cYNi6VfIVgO4fkpqtzZsYsrkwZYe1Vawxbd5A
-         PTCrVqlahu8K3V9gNX/DJvv4xPmj0DvhURkY7YDaeyX9jSq/2sKps1GbRzXGX/RIRqnO
-         4q9jc6WAZd9tZR4aMgurP+r0x+yEoc4sIN9iB+R1J2IAPKHN192WOloJO0m1+xgPnQJi
-         kf2z6vERXXAAhgbQ+WjkFzJZSYhNXp6p2k6Q0xiaO4tfwOjBaDTrw2apA4p2QXGpYWRR
-         EMv8CoOdXnjLRIdC+puFpuM6mk/zib8TBvDhKtQKUn0GYRONq9gWSGp1P+NTj+NFNzg3
-         eDQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXgmWFCnThceqC33iyxaMH+5xzgKzKr+ZWKHUCHAs0Wqje6OFvbF8Hn/LrVT6tzhywjjeW7ZoHwGgD9nOboSOMrxW4SoekJ
-X-Gm-Message-State: AOJu0YwRsyiM+/WpgdDwzZ0z4g8tTpcOP1mGDJu0XrE5Z0uQna6JYwil
-	Co5TyK4yxfGs1pMvR8CTZWa98AkeIC1H6nL+XtCH3AfnMC1DZ3vYeVrignQspgD0Y77tDgtNMCI
-	LrkyO
-X-Google-Smtp-Source: AGHT+IG367UfImQNBCgNQFMsesjMvFvF8OXx6udeIcJXRjBl+vGQTr7xeLDVdMc32vYbrNhUATtFOQ==
-X-Received: by 2002:a05:6a21:a586:b0:1a5:742b:8d88 with SMTP id gd6-20020a056a21a58600b001a5742b8d88mr14624477pzc.3.1712050569866;
-        Tue, 02 Apr 2024 02:36:09 -0700 (PDT)
+        bh=b+m4kHHFYY28ecUPVtXSzISJ47PGkToHXp4+3MPAI0Y=;
+        b=u/dLUb7HOpIFsx7vef6CezopBYFAuYbk9mfUKx9XGhh/XEgnszU2BDsf2OZwb00pkl
+         KW1AVOc3b+PQOfYBUTm6GT805fQKKZf/+c8JzIf9TDr9OHF5n3YMMjqTu0NUY/GFTSwL
+         IKLSvYNf3yZIxwmfI5usinA6HOCPI8WB2S8R9i9ggfQWzZH3kNROeM88IAguloS+wp2h
+         68CmELOhKTD6BPH9vfljnUn/F4x5s48oVbhQJfYjTmGFFzPFZCENyvKFqpdHwtaKukTK
+         y6KpND/4+e7nGeOE1WEBEVkurM2vhhGgnkyB0DW/RM/8hWsBATFXnDAQGN/0QSnIG4js
+         oi6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXw4Zydbf2NbWgmYYZU4sV5QZEkDXZWUvl0gAj622NgN8xgJx6hdVdTH2ERS8/yH/ajw+89ndMuW6NtUDAh+utqCxYtkDMQ
+X-Gm-Message-State: AOJu0YwZ2U92GtZvbVkQWfNaedR8oHMCmsO+H91k0U/LrDcJH4xKbDtC
+	3iup1x2IwS9o9dpeXhNREnEDIp0cPJ8gBhP1jZ7iC7/ygzg81U4EYoR2QiMhTw==
+X-Google-Smtp-Source: AGHT+IGbNtXE6g0K0VOYFL1D+6UbcJQBQ5eu/VLBjJe60v1aSS3+CB8HavEzt/PmqyJhqAZaejX8tg==
+X-Received: by 2002:a05:6a00:2d17:b0:6e5:eab8:4db8 with SMTP id fa23-20020a056a002d1700b006e5eab84db8mr12274751pfb.17.1712050576314;
+        Tue, 02 Apr 2024 02:36:16 -0700 (PDT)
 Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id q19-20020a62e113000000b006e5a3db5875sm9702087pfh.13.2024.04.02.02.36.07
+        by smtp.gmail.com with ESMTPSA id q19-20020a62e113000000b006e5a3db5875sm9702087pfh.13.2024.04.02.02.36.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 02:36:09 -0700 (PDT)
+        Tue, 02 Apr 2024 02:36:15 -0700 (PDT)
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 To: michael.chan@broadcom.com
 Cc: davem@davemloft.net,
@@ -71,10 +70,13 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	netdev@vger.kernel.org,
 	pabeni@redhat.com,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
 	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next v2 6/7] bnxt_en: Update firmware interface to 1.10.3.39
-Date: Tue,  2 Apr 2024 02:37:52 -0700
-Message-Id: <20240402093753.331120-7-pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next v2 7/7] bnxt_en: Add warning message about disallowed speed change
+Date: Tue,  2 Apr 2024 02:37:53 -0700
+Message-Id: <20240402093753.331120-8-pavan.chebbi@broadcom.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20240402093753.331120-1-pavan.chebbi@broadcom.com>
 References: <20240402093753.331120-1-pavan.chebbi@broadcom.com>
@@ -85,436 +87,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001947a9061519d67a"
+	boundary="00000000000078e707061519d68e"
 
---0000000000001947a9061519d67a
+--00000000000078e707061519d68e
 Content-Transfer-Encoding: 8bit
 
-This updated interface supports backing store APIs to
-configure host FW trace buffers, updates transceivers ID
-types, updates to TrueFlow features and other changes
-for the basic L2 features.
+From: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
 
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Some chips may not allow changing default speed when dual rate
+transceivers modules are used. Firmware on those chips will
+indicate the same to the driver.
+
+Add a warning message when speed change is not supported
+because a dual rate transceiver is detected by the NIC.
+
+Signed-off-by: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 ---
-v2: Fixed email address in the commit log.
+v2: Fixed formatting of netdev_warn to avoid unnecessary
+line break.
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h | 184 +++++++++++++-----
- 1 file changed, 137 insertions(+), 47 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
-index e957abd704db..06ea86c80be1 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
-@@ -468,6 +468,10 @@ struct cmd_nums {
- 	#define HWRM_TF_GLOBAL_CFG_GET                    0x2fdUL
- 	#define HWRM_TF_IF_TBL_SET                        0x2feUL
- 	#define HWRM_TF_IF_TBL_GET                        0x2ffUL
-+	#define HWRM_TF_RESC_USAGE_SET                    0x300UL
-+	#define HWRM_TF_RESC_USAGE_QUERY                  0x301UL
-+	#define HWRM_TF_TBL_TYPE_ALLOC                    0x302UL
-+	#define HWRM_TF_TBL_TYPE_FREE                     0x303UL
- 	#define HWRM_TFC_TBL_SCOPE_QCAPS                  0x380UL
- 	#define HWRM_TFC_TBL_SCOPE_ID_ALLOC               0x381UL
- 	#define HWRM_TFC_TBL_SCOPE_CONFIG                 0x382UL
-@@ -495,6 +499,7 @@ struct cmd_nums {
- 	#define HWRM_TFC_IF_TBL_SET                       0x398UL
- 	#define HWRM_TFC_IF_TBL_GET                       0x399UL
- 	#define HWRM_TFC_TBL_SCOPE_CONFIG_GET             0x39aUL
-+	#define HWRM_TFC_RESC_USAGE_QUERY                 0x39bUL
- 	#define HWRM_SV                                   0x400UL
- 	#define HWRM_DBG_READ_DIRECT                      0xff10UL
- 	#define HWRM_DBG_READ_INDIRECT                    0xff11UL
-@@ -604,8 +609,8 @@ struct hwrm_err_output {
- #define HWRM_VERSION_MAJOR 1
- #define HWRM_VERSION_MINOR 10
- #define HWRM_VERSION_UPDATE 3
--#define HWRM_VERSION_RSVD 15
--#define HWRM_VERSION_STR "1.10.3.15"
-+#define HWRM_VERSION_RSVD 39
-+#define HWRM_VERSION_STR "1.10.3.39"
- 
- /* hwrm_ver_get_input (size:192b/24B) */
- struct hwrm_ver_get_input {
-@@ -1328,8 +1333,9 @@ struct hwrm_async_event_cmpl_error_report_base {
- 	#define ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_INVALID_SIGNAL           0x2UL
- 	#define ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_NVM                      0x3UL
- 	#define ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_DOORBELL_DROP_THRESHOLD  0x4UL
--	#define ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_THERMAL_THRESHOLD        0x5UL
--	#define ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_LAST                    ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_THERMAL_THRESHOLD
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_THERMAL_THRESHOLD             0x5UL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_DUAL_DATA_RATE_NOT_SUPPORTED  0x6UL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_LAST                         ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_DUAL_DATA_RATE_NOT_SUPPORTED
- };
- 
- /* hwrm_async_event_cmpl_error_report_pause_storm (size:128b/16B) */
-@@ -1478,6 +1484,30 @@ struct hwrm_async_event_cmpl_error_report_thermal {
- 	#define ASYNC_EVENT_CMPL_ERROR_REPORT_THERMAL_EVENT_DATA1_TRANSITION_DIR_LAST       ASYNC_EVENT_CMPL_ERROR_REPORT_THERMAL_EVENT_DATA1_TRANSITION_DIR_INCREASING
- };
- 
-+/* hwrm_async_event_cmpl_error_report_dual_data_rate_not_supported (size:128b/16B) */
-+struct hwrm_async_event_cmpl_error_report_dual_data_rate_not_supported {
-+	__le16	type;
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_TYPE_MASK            0x3fUL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_TYPE_SFT             0
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_TYPE_HWRM_ASYNC_EVENT  0x2eUL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_TYPE_LAST             ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_TYPE_HWRM_ASYNC_EVENT
-+	__le16	event_id;
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_EVENT_ID_ERROR_REPORT 0x45UL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_EVENT_ID_LAST        ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_EVENT_ID_ERROR_REPORT
-+	__le32	event_data2;
-+	u8	opaque_v;
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_V          0x1UL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_OPAQUE_MASK 0xfeUL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_OPAQUE_SFT 1
-+	u8	timestamp_lo;
-+	__le16	timestamp_hi;
-+	__le32	event_data1;
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_EVENT_DATA1_ERROR_TYPE_MASK                        0xffUL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_EVENT_DATA1_ERROR_TYPE_SFT                         0
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_EVENT_DATA1_ERROR_TYPE_DUAL_DATA_RATE_NOT_SUPPORTED  0x6UL
-+	#define ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_EVENT_DATA1_ERROR_TYPE_LAST                         ASYNC_EVENT_CMPL_ERROR_REPORT_DUAL_DATA_RATE_NOT_SUPPORTED_EVENT_DATA1_ERROR_TYPE_DUAL_DATA_RATE_NOT_SUPPORTED
-+};
-+
- /* hwrm_func_reset_input (size:192b/24B) */
- struct hwrm_func_reset_input {
- 	__le16	req_type;
-@@ -1781,6 +1811,9 @@ struct hwrm_func_qcaps_output {
- 	#define FUNC_QCAPS_RESP_FLAGS_EXT2_ROCE_VF_RESOURCE_MGMT_SUPPORTED       0x100000UL
- 	#define FUNC_QCAPS_RESP_FLAGS_EXT2_UDCC_SUPPORTED                        0x200000UL
- 	#define FUNC_QCAPS_RESP_FLAGS_EXT2_TIMED_TX_SO_TXTIME_SUPPORTED          0x400000UL
-+	#define FUNC_QCAPS_RESP_FLAGS_EXT2_SW_MAX_RESOURCE_LIMITS_SUPPORTED      0x800000UL
-+	#define FUNC_QCAPS_RESP_FLAGS_EXT2_TF_INGRESS_NIC_FLOW_SUPPORTED         0x1000000UL
-+	#define FUNC_QCAPS_RESP_FLAGS_EXT2_LPBK_STATS_SUPPORTED                  0x2000000UL
- 	__le16	tunnel_disable_flag;
- 	#define FUNC_QCAPS_RESP_TUNNEL_DISABLE_FLAG_DISABLE_VXLAN      0x1UL
- 	#define FUNC_QCAPS_RESP_TUNNEL_DISABLE_FLAG_DISABLE_NGE        0x2UL
-@@ -1791,10 +1824,8 @@ struct hwrm_func_qcaps_output {
- 	#define FUNC_QCAPS_RESP_TUNNEL_DISABLE_FLAG_DISABLE_MPLS       0x40UL
- 	#define FUNC_QCAPS_RESP_TUNNEL_DISABLE_FLAG_DISABLE_PPPOE      0x80UL
- 	__le16	xid_partition_cap;
--	#define FUNC_QCAPS_RESP_XID_PARTITION_CAP_KTLS_TKC     0x1UL
--	#define FUNC_QCAPS_RESP_XID_PARTITION_CAP_KTLS_RKC     0x2UL
--	#define FUNC_QCAPS_RESP_XID_PARTITION_CAP_QUIC_TKC     0x4UL
--	#define FUNC_QCAPS_RESP_XID_PARTITION_CAP_QUIC_RKC     0x8UL
-+	#define FUNC_QCAPS_RESP_XID_PARTITION_CAP_TX_CK     0x1UL
-+	#define FUNC_QCAPS_RESP_XID_PARTITION_CAP_RX_CK     0x2UL
- 	u8	device_serial_number[8];
- 	__le16	ctxs_per_partition;
- 	u8	unused_2[2];
-@@ -1844,6 +1875,7 @@ struct hwrm_func_qcfg_output {
- 	#define FUNC_QCFG_RESP_FLAGS_FAST_RESET_ALLOWED           0x1000UL
- 	#define FUNC_QCFG_RESP_FLAGS_MULTI_ROOT                   0x2000UL
- 	#define FUNC_QCFG_RESP_FLAGS_ENABLE_RDMA_SRIOV            0x4000UL
-+	#define FUNC_QCFG_RESP_FLAGS_ROCE_VNIC_ID_VALID           0x8000UL
- 	u8	mac_address[6];
- 	__le16	pci_id;
- 	__le16	alloc_rsscos_ctx;
-@@ -1955,7 +1987,7 @@ struct hwrm_func_qcfg_output {
- 	#define FUNC_QCFG_RESP_DB_PAGE_SIZE_2MB   0x9UL
- 	#define FUNC_QCFG_RESP_DB_PAGE_SIZE_4MB   0xaUL
- 	#define FUNC_QCFG_RESP_DB_PAGE_SIZE_LAST FUNC_QCFG_RESP_DB_PAGE_SIZE_4MB
--	u8	unused_2[2];
-+	__le16	roce_vnic_id;
- 	__le32	partition_min_bw;
- 	#define FUNC_QCFG_RESP_PARTITION_MIN_BW_BW_VALUE_MASK             0xfffffffUL
- 	#define FUNC_QCFG_RESP_PARTITION_MIN_BW_BW_VALUE_SFT              0
-@@ -2003,6 +2035,8 @@ struct hwrm_func_qcfg_output {
- 	__le32	roce_max_srq_per_vf;
- 	__le32	roce_max_gid_per_vf;
- 	__le16	xid_partition_cfg;
-+	#define FUNC_QCFG_RESP_XID_PARTITION_CFG_TX_CK     0x1UL
-+	#define FUNC_QCFG_RESP_XID_PARTITION_CFG_RX_CK     0x2UL
- 	u8	unused_7;
- 	u8	valid;
- };
-@@ -2229,10 +2263,8 @@ struct hwrm_func_cfg_input {
- 	__le32	roce_max_srq_per_vf;
- 	__le32	roce_max_gid_per_vf;
- 	__le16	xid_partition_cfg;
--	#define FUNC_CFG_REQ_XID_PARTITION_CFG_KTLS_TKC     0x1UL
--	#define FUNC_CFG_REQ_XID_PARTITION_CFG_KTLS_RKC     0x2UL
--	#define FUNC_CFG_REQ_XID_PARTITION_CFG_QUIC_TKC     0x4UL
--	#define FUNC_CFG_REQ_XID_PARTITION_CFG_QUIC_RKC     0x8UL
-+	#define FUNC_CFG_REQ_XID_PARTITION_CFG_TX_CK     0x1UL
-+	#define FUNC_CFG_REQ_XID_PARTITION_CFG_RX_CK     0x2UL
- 	__le16	unused_2;
- };
- 
-@@ -2416,6 +2448,7 @@ struct hwrm_func_drv_rgtr_input {
- 	#define FUNC_DRV_RGTR_REQ_FLAGS_RSS_STRICT_HASH_TYPE_SUPPORT     0x100UL
- 	#define FUNC_DRV_RGTR_REQ_FLAGS_NPAR_1_2_SUPPORT                 0x200UL
- 	#define FUNC_DRV_RGTR_REQ_FLAGS_ASYM_QUEUE_CFG_SUPPORT           0x400UL
-+	#define FUNC_DRV_RGTR_REQ_FLAGS_TF_INGRESS_NIC_FLOW_MODE         0x800UL
- 	__le32	enables;
- 	#define FUNC_DRV_RGTR_REQ_ENABLES_OS_TYPE             0x1UL
- 	#define FUNC_DRV_RGTR_REQ_ENABLES_VER                 0x2UL
-@@ -3636,19 +3669,22 @@ struct hwrm_func_backing_store_cfg_v2_input {
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_FP_TQM_RING   0x6UL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_MRAV          0xeUL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_TIM           0xfUL
--	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_TKC           0x13UL
--	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_RKC           0x14UL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_MP_TQM_RING   0x15UL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_SQ_DB_SHADOW  0x16UL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_RQ_DB_SHADOW  0x17UL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_SRQ_DB_SHADOW 0x18UL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_CQ_DB_SHADOW  0x19UL
--	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_QUIC_TKC      0x1aUL
--	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_QUIC_RKC      0x1bUL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_TBL_SCOPE     0x1cUL
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_XID_PARTITION 0x1dUL
--	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_INVALID       0xffffUL
--	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_LAST         FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_INVALID
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_SRT_TRACE       0x1eUL
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_SRT2_TRACE      0x1fUL
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_CRT_TRACE       0x20UL
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_CRT2_TRACE      0x21UL
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_RIGP0_TRACE     0x22UL
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_L2_HWRM_TRACE   0x23UL
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_ROCE_HWRM_TRACE 0x24UL
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_INVALID         0xffffUL
-+	#define FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_LAST           FUNC_BACKING_STORE_CFG_V2_REQ_TYPE_INVALID
- 	__le16	instance;
- 	__le32	flags;
- 	#define FUNC_BACKING_STORE_CFG_V2_REQ_FLAGS_PREBOOT_MODE        0x1UL
-@@ -3707,17 +3743,22 @@ struct hwrm_func_backing_store_qcfg_v2_input {
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_FP_TQM_RING         0x6UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_MRAV                0xeUL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_TIM                 0xfUL
--	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_TKC                 0x13UL
--	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_RKC                 0x14UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_TX_CK               0x13UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_RX_CK               0x14UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_MP_TQM_RING         0x15UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_SQ_DB_SHADOW        0x16UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_RQ_DB_SHADOW        0x17UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_SRQ_DB_SHADOW       0x18UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_CQ_DB_SHADOW        0x19UL
--	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_QUIC_TKC            0x1aUL
--	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_QUIC_RKC            0x1bUL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_TBL_SCOPE           0x1cUL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_XID_PARTITION_TABLE 0x1dUL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_SRT_TRACE           0x1eUL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_SRT2_TRACE          0x1fUL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_CRT_TRACE           0x20UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_CRT2_TRACE          0x21UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_RIGP0_TRACE         0x22UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_L2_HWRM_TRACE       0x23UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_ROCE_HWRM_TRACE     0x24UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_INVALID             0xffffUL
- 	#define FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_LAST               FUNC_BACKING_STORE_QCFG_V2_REQ_TYPE_INVALID
- 	__le16	instance;
-@@ -3740,15 +3781,18 @@ struct hwrm_func_backing_store_qcfg_v2_output {
- 	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_FP_TQM_RING   0x6UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_MRAV          0xeUL
- 	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_TIM           0xfUL
--	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_TKC           0x13UL
--	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_RKC           0x14UL
- 	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_MP_TQM_RING   0x15UL
--	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_QUIC_TKC      0x1aUL
--	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_QUIC_RKC      0x1bUL
- 	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_TBL_SCOPE     0x1cUL
- 	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_XID_PARTITION 0x1dUL
--	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_INVALID       0xffffUL
--	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_LAST         FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_INVALID
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_SRT_TRACE       0x1eUL
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_SRT2_TRACE      0x1fUL
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_CRT_TRACE       0x20UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_CRT2_TRACE      0x21UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_RIGP0_TRACE     0x22UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_L2_HWRM_TRACE   0x23UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_ROCE_HWRM_TRACE 0x24UL
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_INVALID         0xffffUL
-+	#define FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_LAST           FUNC_BACKING_STORE_QCFG_V2_RESP_TYPE_INVALID
- 	__le16	instance;
- 	__le32	flags;
- 	__le64	page_dir;
-@@ -3841,19 +3885,22 @@ struct hwrm_func_backing_store_qcaps_v2_input {
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_FP_TQM_RING   0x6UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_MRAV          0xeUL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TIM           0xfUL
--	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_KTLS_TKC      0x13UL
--	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_KTLS_RKC      0x14UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_MP_TQM_RING   0x15UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SQ_DB_SHADOW  0x16UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RQ_DB_SHADOW  0x17UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRQ_DB_SHADOW 0x18UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CQ_DB_SHADOW  0x19UL
--	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_QUIC_TKC      0x1aUL
--	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_QUIC_RKC      0x1bUL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TBL_SCOPE     0x1cUL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_XID_PARTITION 0x1dUL
--	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_INVALID       0xffffUL
--	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_LAST         FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_INVALID
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRT_TRACE       0x1eUL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRT2_TRACE      0x1fUL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CRT_TRACE       0x20UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CRT2_TRACE      0x21UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RIGP0_TRACE     0x22UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_L2_HWRM_TRACE   0x23UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_ROCE_HWRM_TRACE 0x24UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_INVALID         0xffffUL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_LAST           FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_INVALID
- 	u8	rsvd[6];
- };
- 
-@@ -3873,19 +3920,22 @@ struct hwrm_func_backing_store_qcaps_v2_output {
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_FP_TQM_RING   0x6UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_MRAV          0xeUL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_TIM           0xfUL
--	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_KTLS_TKC      0x13UL
--	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_KTLS_RKC      0x14UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_MP_TQM_RING   0x15UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_SQ_DB_SHADOW  0x16UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_RQ_DB_SHADOW  0x17UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_SRQ_DB_SHADOW 0x18UL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_CQ_DB_SHADOW  0x19UL
--	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_QUIC_TKC      0x1aUL
--	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_QUIC_RKC      0x1bUL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_TBL_SCOPE     0x1cUL
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_XID_PARTITION 0x1dUL
--	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_INVALID       0xffffUL
--	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_LAST         FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_INVALID
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_SRT_TRACE       0x1eUL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_SRT2_TRACE      0x1fUL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_CRT_TRACE       0x20UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_CRT2_TRACE      0x21UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_RIGP0_TRACE     0x22UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_L2_HWRM_TRACE   0x23UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_ROCE_HWRM_TRACE 0x24UL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_INVALID         0xffffUL
-+	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_LAST           FUNC_BACKING_STORE_QCAPS_V2_RESP_TYPE_INVALID
- 	__le16	entry_size;
- 	__le32	flags;
- 	#define FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_ENABLE_CTX_KIND_INIT            0x1UL
-@@ -3990,6 +4040,7 @@ struct hwrm_func_drv_if_change_output {
- 	__le32	flags;
- 	#define FUNC_DRV_IF_CHANGE_RESP_FLAGS_RESC_CHANGE           0x1UL
- 	#define FUNC_DRV_IF_CHANGE_RESP_FLAGS_HOT_FW_RESET_DONE     0x2UL
-+	#define FUNC_DRV_IF_CHANGE_RESP_FLAGS_CAPS_CHANGE           0x4UL
- 	u8	unused_0[3];
- 	u8	valid;
- };
-@@ -4472,7 +4523,11 @@ struct hwrm_port_phy_qcfg_output {
- 	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_QSFP      (0xcUL << 24)
- 	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_QSFPPLUS  (0xdUL << 24)
- 	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_QSFP28    (0x11UL << 24)
--	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_LAST     PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_QSFP28
-+	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_QSFPDD    (0x18UL << 24)
-+	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_QSFP112   (0x1eUL << 24)
-+	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_SFPDD     (0x1fUL << 24)
-+	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_CSFP      (0x20UL << 24)
-+	#define PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_LAST     PORT_PHY_QCFG_RESP_XCVR_IDENTIFIER_TYPE_CSFP
- 	__le16	fec_cfg;
- 	#define PORT_PHY_QCFG_RESP_FEC_CFG_FEC_NONE_SUPPORTED           0x1UL
- 	#define PORT_PHY_QCFG_RESP_FEC_CFG_FEC_AUTONEG_SUPPORTED        0x2UL
-@@ -7380,7 +7435,7 @@ struct hwrm_cfa_l2_filter_free_output {
- 	u8	valid;
- };
- 
--/* hwrm_cfa_l2_filter_cfg_input (size:320b/40B) */
-+/* hwrm_cfa_l2_filter_cfg_input (size:384b/48B) */
- struct hwrm_cfa_l2_filter_cfg_input {
- 	__le16	req_type;
- 	__le16	cmpl_ring;
-@@ -7399,12 +7454,22 @@ struct hwrm_cfa_l2_filter_cfg_input {
- 	#define CFA_L2_FILTER_CFG_REQ_FLAGS_TRAFFIC_L2          (0x1UL << 2)
- 	#define CFA_L2_FILTER_CFG_REQ_FLAGS_TRAFFIC_ROCE        (0x2UL << 2)
- 	#define CFA_L2_FILTER_CFG_REQ_FLAGS_TRAFFIC_LAST       CFA_L2_FILTER_CFG_REQ_FLAGS_TRAFFIC_ROCE
-+	#define CFA_L2_FILTER_CFG_REQ_FLAGS_REMAP_OP_MASK       0x30UL
-+	#define CFA_L2_FILTER_CFG_REQ_FLAGS_REMAP_OP_SFT        4
-+	#define CFA_L2_FILTER_CFG_REQ_FLAGS_REMAP_OP_NO_UPDATE    (0x0UL << 4)
-+	#define CFA_L2_FILTER_CFG_REQ_FLAGS_REMAP_OP_BYPASS_LKUP  (0x1UL << 4)
-+	#define CFA_L2_FILTER_CFG_REQ_FLAGS_REMAP_OP_ENABLE_LKUP  (0x2UL << 4)
-+	#define CFA_L2_FILTER_CFG_REQ_FLAGS_REMAP_OP_LAST        CFA_L2_FILTER_CFG_REQ_FLAGS_REMAP_OP_ENABLE_LKUP
- 	__le32	enables;
- 	#define CFA_L2_FILTER_CFG_REQ_ENABLES_DST_ID                 0x1UL
- 	#define CFA_L2_FILTER_CFG_REQ_ENABLES_NEW_MIRROR_VNIC_ID     0x2UL
-+	#define CFA_L2_FILTER_CFG_REQ_ENABLES_PROF_FUNC              0x4UL
-+	#define CFA_L2_FILTER_CFG_REQ_ENABLES_L2_CONTEXT_ID          0x8UL
- 	__le64	l2_filter_id;
- 	__le32	dst_id;
- 	__le32	new_mirror_vnic_id;
-+	__le32	prof_func;
-+	__le32	l2_context_id;
- };
- 
- /* hwrm_cfa_l2_filter_cfg_output (size:128b/16B) */
-@@ -8466,7 +8531,15 @@ struct hwrm_tunnel_dst_port_query_input {
- 	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_SRV6         0xfUL
- 	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_VXLAN_GPE    0x10UL
- 	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_GRE          0x11UL
--	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_LAST        TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_GRE
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR       0x12UL
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES01 0x13UL
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES02 0x14UL
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES03 0x15UL
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES04 0x16UL
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES05 0x17UL
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES06 0x18UL
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES07 0x19UL
-+	#define TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_LAST              TUNNEL_DST_PORT_QUERY_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES07
- 	u8	tunnel_next_proto;
- 	u8	unused_0[6];
- };
-@@ -8514,7 +8587,15 @@ struct hwrm_tunnel_dst_port_alloc_input {
- 	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_SRV6         0xfUL
- 	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_VXLAN_GPE    0x10UL
- 	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_GRE          0x11UL
--	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_LAST        TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_GRE
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR       0x12UL
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES01 0x13UL
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES02 0x14UL
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES03 0x15UL
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES04 0x16UL
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES05 0x17UL
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES06 0x18UL
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES07 0x19UL
-+	#define TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_LAST              TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES07
- 	u8	tunnel_next_proto;
- 	__be16	tunnel_dst_port_val;
- 	u8	unused_0[4];
-@@ -8565,7 +8646,15 @@ struct hwrm_tunnel_dst_port_free_input {
- 	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_SRV6         0xfUL
- 	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_VXLAN_GPE    0x10UL
- 	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_GRE          0x11UL
--	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_LAST        TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_GRE
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR       0x12UL
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES01 0x13UL
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES02 0x14UL
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES03 0x15UL
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES04 0x16UL
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES05 0x17UL
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES06 0x18UL
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES07 0x19UL
-+	#define TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_LAST              TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_ULP_DYN_UPAR_RES07
- 	u8	tunnel_next_proto;
- 	__le16	tunnel_dst_port_id;
- 	u8	unused_0[4];
-@@ -8860,7 +8949,7 @@ struct hwrm_stat_generic_qstats_output {
- 	u8	valid;
- };
- 
--/* generic_sw_hw_stats (size:1408b/176B) */
-+/* generic_sw_hw_stats (size:1472b/184B) */
- struct generic_sw_hw_stats {
- 	__le64	pcie_statistics_tx_tlp;
- 	__le64	pcie_statistics_rx_tlp;
-@@ -8884,6 +8973,7 @@ struct generic_sw_hw_stats {
- 	__le64	hw_db_recov_dbs_dropped;
- 	__le64	hw_db_recov_drops_serviced;
- 	__le64	hw_db_recov_dbs_recovered;
-+	__le64	hw_db_recov_oo_drop_count;
- };
- 
- /* hwrm_fw_reset_input (size:192b/24B) */
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 3982858a59a1..795f3f957eb5 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -2525,6 +2525,9 @@ static bool bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
+ 		}
+ 		return false;
+ 	}
++	case ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_DUAL_DATA_RATE_NOT_SUPPORTED:
++		netdev_warn(bp->dev, "Speed change not supported with dual rate transceivers on this board\n");
++		break;
+ 	default:
+ 		netdev_err(bp->dev, "FW reported unknown error type %u\n",
+ 			   err_type);
 -- 
 2.39.1
 
 
---0000000000001947a9061519d67a
+--00000000000078e707061519d68e
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -585,14 +202,14 @@ pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
 Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAG+PDAJZCH9XzI47/HOqEBumF1Y23PB
-+MEq4Mj3mzsZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQw
-MjA5MzYxMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDFMpc54umDQDzddhF2aP5S+JLHfHbXe
+BEBHqL6SY7SoMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQw
+MjA5MzYxNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBUONi2w3+ffSR7CDCxv+GULPiewIBv8av+hQP25Cyf47yh4Lgb
-mU3rwBtuHfSsC8hdILtx0jr//LC/dj8ySACVd/0RdGUCadruKJ6gWYUC7yh+cScMX/PuZ9Wf2+E0
-pTO3IvUoZhXVEXWvPFAKyVrcxaZIBfLkyfvpO0QFr0USu8/nRqbE7898hP8QcTK7ZS3+Vl/zv1Ls
-S09BQ4bYFA5XupH56HzMaUb+2UPnCPij/eewLh8SWOQ30UJVz1A8YBFBsAnGU8qiz0aR5tk2fic7
-AUZSsv23682OvcDZfiaReTeX7rQJNU1f5M6beVxbOTa5XLgcCwctlpwsv3RRE697
---0000000000001947a9061519d67a--
+ATANBgkqhkiG9w0BAQEFAASCAQCftb5x4Pr0/dVC6vJBRyg8yYTaMcfIdnnZJtzMGBZAEGb1gs6N
+YDe1WLIVDxupJ7VpFBPKdfYbkM4BcyohufyrAt1Rj2bH+V/NHBW0X9pvUGWkHh1+Ro8VCkjgr0aK
+ioAbMLOG+XJpSfdUV9lUD5cKwUIaVBEO5k94R9gQwWHpIXC+PpFDGcGwqJCa60Fk+fjr4BbSR1AY
+1GpP3zFyLFGQdXxtXREbboSzJtqe8bvW/cLEcOMS25X4geZXMZLK3yGjEYIx1jz7NRyJ/e65adzj
+9DUjE1zJaNnKNgICzyD+gmG/ALD5m5HE5l7V5vegRCvJq6X5Lhf9JrS1KssYRhtS
+--00000000000078e707061519d68e--
 
