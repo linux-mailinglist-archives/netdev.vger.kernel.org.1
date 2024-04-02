@@ -1,129 +1,89 @@
-Return-Path: <netdev+bounces-84198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7A7789603F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:37:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADC53896040
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B0AA286C35
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:37:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69D2C286B06
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546BE627E8;
-	Tue,  2 Apr 2024 23:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19ADD5026B;
+	Tue,  2 Apr 2024 23:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vOz2VT5k"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MGAuIqam"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD6B47A7A;
-	Tue,  2 Apr 2024 23:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247313E487;
+	Tue,  2 Apr 2024 23:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712101011; cv=none; b=LHldC0l+pjNqKTjTBHeaUnluHHBSSQ6xnDbXcec2vnTWbibXIfVeY78+z0fPZbiOETqE4LXZ1WX2j7zdAq5ZusY4Pgw9KM4HmjKZjti/icP8EXHf2f3IPKpJIQzV0bsLIZDpS9RItb/YlanySjL0HdMVuFakdAuwgxG+q2IDO84=
+	t=1712101057; cv=none; b=m+eOPt02N3M8Qgn8pgwY4cF3KAFm4dfo9bG67hMeUT0lUQTmg85f2A0E0qgweR5CvYati/YaFz5nyKBTe1DBiF5kCnVlBxoHjExYpWsHVIjVUeZKUXGi1o9yLVJEADlpFBKfjfhii7KwsjndUullL3y4xnQgnwfm0esgvoFzj2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712101011; c=relaxed/simple;
-	bh=Dpyjy7FbNMVlaBP9LefRx5qTyMXKApH7CZ86AbTlxhU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p9EQw8hvoEps5cp28+QZLp9ez7oW3x3ldwK1RT2fVvAsVhFGfE2DxAmVkI5HdPMS3X/Z+ipP1s77+X5Foj1xcfTHGCVrr/8HpqJdkevrCo8lLv7hhvTfuy6AYhpSFwAhtY2iyEyH+zSo5gpNxSsVFo3/LNXJxcjwxJLgFRQ2y/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vOz2VT5k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FA2EC43394;
-	Tue,  2 Apr 2024 23:36:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712101010;
-	bh=Dpyjy7FbNMVlaBP9LefRx5qTyMXKApH7CZ86AbTlxhU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vOz2VT5kWvZXtN+BYpqYBB2Rn9eMgN4iRDfoFI3AdSqdcjwdYJLmsLdq7wEjOTGJ1
-	 SaPlC8J+1s8XfU/t7nS3oCg81dM9VV16bqbiByEC4Ho0PfUY5W67Ljsx4wv3aID6Cx
-	 zPeD90H3Bj5KAvhDO5kEsZ79xslKJCVOaT55BMn7tXGTTV8Af8wWEdfqKJ2ztC0hzB
-	 9Ko8IljPtQ8JNrcRgODoL+Q2NmcOszyjWZbC7olZsqyrw0ihFwAAcHzoUXqixkC+/A
-	 L2Y3bTSe5SacTsNJ6sk1fh/CC5pL6Kv8nsgSfX25lLCKgmYTEb8EB/0nxiQOW0V4no
-	 i5wj/UXqra4og==
-Date: Tue, 2 Apr 2024 16:36:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
- <pabeni@redhat.com>, <shuah@kernel.org>, <sdf@google.com>,
- <donald.hunter@gmail.com>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next 7/7] testing: net-drv: add a driver test for
- stats reporting
-Message-ID: <20240402163649.4fdc2d3b@kernel.org>
-In-Reply-To: <8734s3idys.fsf@nvidia.com>
-References: <20240402010520.1209517-1-kuba@kernel.org>
-	<20240402010520.1209517-8-kuba@kernel.org>
-	<87bk6rit8f.fsf@nvidia.com>
-	<20240402103111.7d190fb1@kernel.org>
-	<8734s3idys.fsf@nvidia.com>
+	s=arc-20240116; t=1712101057; c=relaxed/simple;
+	bh=+ODrOgaH+i3zGrDGCN9VqXnzlahNw8ThMoXJDbGJEHk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SLdE1Os/5dMt1PeBqFMLI2SNg8la4SLkZasRfWQZr+Zc51/7VhkuORhsgF99Q+bxyBWoPvHUNxVTv1exiVN54392EOFrjtHTvoEi0BuFimXTRJ1YK1hBjEC2fS7GrplwwH6qAU+7nIcnY8FJpdNrT0Edj2mdM/3C7j2bL2cxgI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MGAuIqam; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=czqakSuEwNxUKTTR2ylWGLpQOSR/+zx9zGf/y+PgSNM=; b=MGAuIqamqxv4U5Isqea8yjDp1c
+	UPR9t9sx3/b6eE7edPol/vtifmZ4P2iL6g26IOkYIEjy8ZrcWJxhQ3ye85Lq5v8drGewYb7ZGlwAw
+	ljIvddpHksjAQbYytCuvQHFITFSJFSKy0OBY8dRN7ZyjxmpuoMZhaGpiIh50Mq2QYO1U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rrnh1-00Bztx-0H; Wed, 03 Apr 2024 01:37:27 +0200
+Date: Wed, 3 Apr 2024 01:37:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dimitri Fedrau <dima.fedrau@gmail.com>,
+	Stefan Eichenberger <eichest@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/3] net: ethtool: Add impedance mismatch
+ result code to cable test
+Message-ID: <50748ea1-4b53-4b6c-b08b-1ad230d838b7@lunn.ch>
+References: <20240402201123.2961909-1-paweldembicki@gmail.com>
+ <20240402201123.2961909-2-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240402201123.2961909-2-paweldembicki@gmail.com>
 
-On Wed, 3 Apr 2024 00:04:14 +0200 Petr Machata wrote:
-> > Yes, I was wondering about that. It must be doable, IIRC 
-> > the multi-threading API "injects" args from a tuple.
-> > I was thinking something along the lines of:
-> >
-> >     with NetDrvEnv(__file__) as cfg:
-> >         ksft_run([check_pause, check_fec, pkt_byte_sum],
-> >                  args=(cfg, ))
-> >
-> > I got lazy, let me take a closer look. Another benefit
-> > will be that once we pass in "env" / cfg - we can "register" 
-> > objects in there for auto-cleanup (in the future, current
-> > tests don't need cleanup)  
+On Tue, Apr 02, 2024 at 10:11:19PM +0200, Pawel Dembicki wrote:
+> Some PHYs can recognize during a cable test if the impedance in the cable
+> is okay. They can detect reflections caused by impedance discontinuity
+> between a regular 100 Ohm cable and an abnormal part with a higher or
+> lower impedance.
 > 
-> Yeah, though some of those should probably just be their own context
-> managers IMHO, not necessarily hooked to cfg. I'm thinking something
-> fairly general, so that the support boilerplate doesn't end up costing
-> an arm and leg:
+> This commit introduces a new result code:
+> ETHTOOL_A_CABLE_RESULT_CODE_IMPEDANCE_MISMATCH,
+> which represents the results of a cable test indicating issues with
+> impedance integrity.
 > 
->     with build("ip route add 192.0.2.1/28 nexthop via 192.0.2.17",
->                "ip route del 192.0.2.1/28"),
->          build("ip link set dev %s master %s" % (swp1, h1),
->                "ip link set dev %s nomaster" % swp1):
->         le_test()
->
-> Dunno. I guess it makes sense to have some of the common stuff
-> predefined, e.g. "with vrf() as h1". And then the stuff that's typically
-> in lib.sh's setup() and cleanup(), can be losslessly hooked up to cfg.
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-I was thinking of something along the lines of:
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-def test_abc(cfg):
-    cfg.build("ip route add 192.0.2.1/28 nexthop via 192.0.2.17",
-              "ip route del 192.0.2.1/28")
-    cfg.build("ip link set dev %s master %s" % (swp1, h1),
-              "ip link set dev %s nomaster" % swp1)
-
-optionally we could then also:
-
-     thing = cfg.build("ip link set dev %s master %s" % (swp1, h1),
-                       "ip link set dev %s nomaster" % swp1)
-
-     # ... some code which may raise ...
-
-     # unlink to do something else with the device
-     del thing
-     # ... more code ... 
-
-cfg may not be best here, could be cleaner to create a "test" object,
-always pass it in as the first param, and destroy it after each test.
-
-> This is what I ended up gravitating towards after writing a handful of
-> LNST tests anyway. The scoping makes it clear where the object exists,
-> lifetime is taken care of, it's all ponies rainbows basically. At least
-> as long as your object lifetimes can be cleanly nested, which admittedly
-> is not always.
-
-Should be fairly easy to support all cases - "with", "recording on
-cfg/test" and del.  Unfortunately in the two tests I came up with
-quickly for this series cleanup is only needed for the env itself.
-It's a bit awkward to add the lifetime helpers without any users.
+    Andrew
 
