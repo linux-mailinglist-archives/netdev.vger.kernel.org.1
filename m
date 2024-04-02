@@ -1,79 +1,86 @@
-Return-Path: <netdev+bounces-84066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F98D89568C
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:25:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD279895693
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:27:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38631282FB4
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:25:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96773283091
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E924486120;
-	Tue,  2 Apr 2024 14:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301ED8662B;
+	Tue,  2 Apr 2024 14:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e1kyeqs+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YCFwJB0b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C234280BEE
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 14:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072A786268;
+	Tue,  2 Apr 2024 14:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712067949; cv=none; b=hcxVdFljYaNATLwY4Vd0H1VE82BHguDlrDm7B1qIEQN2RnPptAbeWIY8WkxELn06nGLvlJeK/U2LQ4ETzCG2F4TYwbXnl3j13vUJO9u+4rwI2o//dTsDFmElUfZjACgEkRFBX7oONu0JpXnECIQQppsa0uCRTJCMp3QlwykhlsA=
+	t=1712068050; cv=none; b=ktGx2OlBIrIhNGh1pSOAkXc3GJ4F4EqWtSe1YL98AceBK1kKNPJwSWcV+mUg2EMxmXQuuB2Cgo0BsVRymxLH1lJ1X3fwr+2yj4ozUvKK9DLyt1Nay0KiyuoWHp+lJDiX64KXL1u/Q0VGnV2ffHvMtEC3R2FzbAAXWF0OSZTsLXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712067949; c=relaxed/simple;
-	bh=cjKN5hbtCPmpzdSHcCawK2S+8/qL/Ksj9dPaudgrNeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g1hwDxIcgFhdPzg2eBU1lN0xzYf9F9LftCSDaNll7XZXctKMAq3BGVzSl++Rn1cEfiqqxKI6Tsi+V7mL8qMYbOwiJQrorDv7XeUX3oDcsLjYfLxdsWvrYTeqt/t+V9DoGvHxwPhfP5+fbZxxBRq7gbzqMi7fKoqD74i/MCnq414=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1kyeqs+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D338FC433C7;
-	Tue,  2 Apr 2024 14:25:48 +0000 (UTC)
+	s=arc-20240116; t=1712068050; c=relaxed/simple;
+	bh=IzdgC28MCw382UmcvE80JbhG7kFhsjaPi3qZble+/xc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=u2T1MZYxgY6uW6LWYIGnQJ/anz0RzI6NAbRTEC+OxAqVLQ3+E8SCIzA8gQcatWX887ccMHL6eiW7gGNWv8a7T8U8d278wM7jgn9tje7bT0TGTO8K/h4vjYbXczFBLmwMrWixzIQRWwqpKy3n3qiRPseGyyR2coYgkTERHE1sGYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YCFwJB0b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FC12C433F1;
+	Tue,  2 Apr 2024 14:27:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712067949;
-	bh=cjKN5hbtCPmpzdSHcCawK2S+8/qL/Ksj9dPaudgrNeQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e1kyeqs+mVApLka41jrcEPhGi2XtTDLVZijg91eIslOiToJyHw97oDPnlNvoYnJEs
-	 +nSlXeIdxGzF4u0nqszEIG5gT4HJHGU2CGWmhk4LYO/xKYy3KjuubPYH2k2niJiPUv
-	 UOScB+KvgpJ8TaCOFZ71eGFUCfoNUunWhQUW3JFi5opa8PO4Nmdm/nHr/x3aubDIKe
-	 d7+OHjGPp10F2XTIl3CPnOqW3TvbgR0bD1/4lBZQsq0DhqKvAvqRJswQUs25rYr8nR
-	 f2BUC39/qIAQfM3hQZx/vi9N6K9ks4b9rMKrPFrodZMZP6bd1N1q7PlT3mjDmyNSaY
-	 wga5TdOcOfSUw==
-Date: Tue, 2 Apr 2024 07:25:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>,
- <idosch@nvidia.com>, <edumazet@google.com>,
- <marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
- <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
- <przemyslaw.kitszel@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power
- support
-Message-ID: <20240402072547.0ac0f186@kernel.org>
-In-Reply-To: <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
-References: <20240329092321.16843-1-wojciech.drewek@intel.com>
-	<38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
-	<a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+	s=k20201202; t=1712068049;
+	bh=IzdgC28MCw382UmcvE80JbhG7kFhsjaPi3qZble+/xc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=YCFwJB0bPOnFodPVyWzYmgybAvddl2vQVOuciUH3pi/+hSrYYoNIOb05ZCfIA9B36
+	 rLgIbNX0aBjC2m78e9ccK+8WIspvxrLd41yAwLXT501ap4yHAnUmQWHxnwcAN7HPVc
+	 +YN8MyH0ay8Y6tedjiayxHUSiKv3tC4vTaRK9aae5/EQs9rt34aPFjL/DJmxjO7x0V
+	 zZMo58NzYH//7jm0o4kcv9wfaxAO3qnq1KViwPQkZAXMfp7eWQs1pQb8kwV/HqlALS
+	 N0bUDRfQldmpy0pPEzraCWp54To21/iNs0UNDfqDvK3sbHbWO06f2Qpkzm9z2JQDJO
+	 hh40dD82AO4iA==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Manu Bretelle
+ <chantr4@gmail.com>, Pu Lehui <pulehui@huawei.com>, Pu Lehui
+ <pulehui@huaweicloud.com>
+Subject: Re: [PATCH bpf-next 2/5] riscv, bpf: Relax restrictions on Zbb
+ instructions
+In-Reply-To: <20240328124916.293173-3-pulehui@huaweicloud.com>
+References: <20240328124916.293173-1-pulehui@huaweicloud.com>
+ <20240328124916.293173-3-pulehui@huaweicloud.com>
+Date: Tue, 02 Apr 2024 16:27:26 +0200
+Message-ID: <878r1vrga9.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2 Apr 2024 13:38:59 +0200 Wojciech Drewek wrote:
-> > Also, this is about the board, the SFP cage, not the actual SFP
-> > module?  Maybe the word cage needs to be in these names?  
-> 
-> It's about cage. Thanks for bringing it to my attention because now I
-> see it might be misleading. I'm extending {set|show}-module command
-> but the changes are about max power in the cage. With that in mind
-> I agree that adding 'cage' to the names makes sense.
+Pu Lehui <pulehui@huaweicloud.com> writes:
 
-Noob question, what happens if you plug a module with higher power
-needs into the cage?
+> From: Pu Lehui <pulehui@huawei.com>
+>
+> This patch relaxes the restrictions on the Zbb instructions. The hardware
+> is capable of recognizing the Zbb instructions independently, eliminating
+> the need for reliance on kernel compile configurations.
+>
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+
+Should this patch really be part of this series?
+
+
+Bj=C3=B6rn
 
