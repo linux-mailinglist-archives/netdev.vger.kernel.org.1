@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-83857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2986894A1E
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:39:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 524B4894A27
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:51:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 306A01C235D9
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 03:39:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38648B2459B
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 03:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334BD171A7;
-	Tue,  2 Apr 2024 03:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB111758D;
+	Tue,  2 Apr 2024 03:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NeoTVboq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hROEiqAF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B98168B1;
-	Tue,  2 Apr 2024 03:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1261426F;
+	Tue,  2 Apr 2024 03:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712029177; cv=none; b=BoC4f+tnemD8WawLufzBV9rRjEJq+9H8Pw+sdenJFzc2xPFpl65yj56FKSkDLMDTfqeWiiECMC3B7G8/oxTzYPuNJoUBm60Z4zC9dckm1ncrLI7uQtNf1qRPy7WuGRPgXqFLHIeCxDa7UEBvLCZ1bLVxMlE/YkADXHt6bzVqRyU=
+	t=1712029866; cv=none; b=ZXmX39UaRBIu5eYE7WNggFC/6YZnLMpnSIm7Zz1bCMq7uIkes3F478qYobxab+5R31UydOIjQ19csGpgyUyUk+AP15I9WuZGCUDfgWB4yk+Cpl0Yo4quVGB20W8etxc9m6imF1q5SxMYRCernAe9KRzfIOlPYf8IGRsIwMNP0KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712029177; c=relaxed/simple;
-	bh=AhZFt650FjHiZiK7t3kloCcpXnANwBg3DLM9eGPOABI=;
+	s=arc-20240116; t=1712029866; c=relaxed/simple;
+	bh=WMeus+9z+os5yRKCGjNzYgYzIutPvTegtUqNJyOVU14=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bPhJVrYqlob9DYoWDItRVizHhO6+30e2JhJdlnTHsM2VdOChFsS3GxSGIoon3wL5NQNoIMaSzVh3xhtjLoxaNzbbnyMJJl/KsDTsPalgYS3FNuvACDtPz7M+r6+NcYbY5++WQHEtIc1M8UE5fcfMTlc4vmyS5uxtuCRa6fFQNlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NeoTVboq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2407C433C7;
-	Tue,  2 Apr 2024 03:39:35 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WCOAKpJytJelPyWZ7Nn1l+omLAzTU4ze3jcCc/dPPDRVUManC0uqxcARWqBiQn5lEo1/2Py3Lzp5R6FmOMCbsL9uc+q5XqmsurJGprC/rz4EqJHMpEVS5MsSCJ7OEozBR9M0qytANwioFyqKhLj1lH9p7FeooMnBjPOcLcNn1Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hROEiqAF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEE14C433C7;
+	Tue,  2 Apr 2024 03:51:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712029176;
-	bh=AhZFt650FjHiZiK7t3kloCcpXnANwBg3DLM9eGPOABI=;
+	s=k20201202; t=1712029866;
+	bh=WMeus+9z+os5yRKCGjNzYgYzIutPvTegtUqNJyOVU14=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NeoTVboq0hrFXwwVfLw3RBjVGzAbH9+N67EkM03olDz3wrXwUCVdx0BO07Z6dme+X
-	 73bDSlintCyyBuIHxfHB5/TatZTUQM68vZQdvBky2R/3qjfouMzSdGraQCge2N/25o
-	 0bY9rf4kLN+Xqu7zFNNMXFfN1Fqs5PTaYQLFT5ZnMbF6jo/P3gq1hc4cr3kLtLKu9j
-	 eKFJnZMxzGV7Xx+hDIeXa2nUSWg4z4iF2GxOkyWKik0b7rq3otb1tmk8POSoh242Ac
-	 ynKsJsF/vH6pZLmh/jwJw93m3xYLoKAe5NpfFmx56mxjk+Nt9+TAFaStVWZKZZrJmB
-	 M1sGPBm2mw9Lg==
-Date: Mon, 1 Apr 2024 20:39:35 -0700
+	b=hROEiqAF8JPVjwyxxVNXQgq/D3Y3t1UkjQdUAmA7XeXMQvX3ZOIDoZjXCGQ51VH60
+	 9dsOPlorjq3/QEZLR3DPiVKtesMRUWqkA8B29el0rgQ2+oNmfM2fYe94Hzhz5b2ho0
+	 37Dhly3rlc0QVL9doCxoQJiWmEAK0r7R8+4VlP/3DODB/p6G3VpogOEqkiEZrKXYaE
+	 GlCJ4LNQpbW/d1mWrazakeepPhZZDv7gBTVrUx/uqe4zsiyLPKT8oZSilRhxxYmxH9
+	 eUB47u2ZohGT6QC0mbO+zuWQwjJU20q8caWN5f2ur46Nys9+KeW9JpERDNqtEk6zeR
+	 gp4RoglGM+nNw==
+Date: Mon, 1 Apr 2024 20:51:03 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <jiri@resnulli.us>, <horms@kernel.org>, <rkannoth@marvell.com>,
- <shenjian15@huawei.com>, <wangjie125@huawei.com>, <liuyonglong@huawei.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V6 net-next 3/4] net: hns3: dump more reg info based on
- ras mod
-Message-ID: <20240401203935.58be6396@kernel.org>
-In-Reply-To: <b679e900-22e3-47c6-b9bb-7aba56efcf31@huawei.com>
-References: <20240327114330.1826631-1-shaojijie@huawei.com>
-	<20240327114330.1826631-4-shaojijie@huawei.com>
-	<20240328191130.47242c8f@kernel.org>
-	<d6c779a5-e4b1-4f21-b4f0-6b37b212890f@huawei.com>
-	<20240329081501.4460ad4d@kernel.org>
-	<b679e900-22e3-47c6-b9bb-7aba56efcf31@huawei.com>
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
+ patches@lists.linux.dev, linux-kernel@vger.kernel.org,
+ torvalds@linux-foundation.org, akpm@linux-foundation.org,
+ linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
+ lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
+ f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, srw@sladewatkins.net,
+ rwarsow@gmx.de, conor@kernel.org, allen.lkml@gmail.com, broonie@kernel.org,
+ Netdev <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Arnd Bergmann <arnd@arndb.de>, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH 6.8 000/399] 6.8.3-rc1 review
+Message-ID: <20240401205103.606cba95@kernel.org>
+In-Reply-To: <CA+G9fYuHZ9TCsGYMuxisqSFVoJ3brQx4C5Xk7=FJ+23PHbhKWw@mail.gmail.com>
+References: <20240401152549.131030308@linuxfoundation.org>
+	<CA+G9fYuHZ9TCsGYMuxisqSFVoJ3brQx4C5Xk7=FJ+23PHbhKWw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,31 +67,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 30 Mar 2024 10:35:51 +0800 Jijie Shao wrote:
-> >> Generally, driver will reset to restore the normal state.
-> >> After the reset, many registers are cleared. Therefore,
-> >> it is difficult to analyze the reason of RAS.  
-> > Perhaps I'm missing the significance of the reset when it comes
-> > to counters reported via standard APIs. Are rtnl_link_stats64
-> > going to behave differently across a reset than these debug entries?
-> >  
-> 1. These statistics are the same as rtnl_link_stats64. However, these are not updated in real time.
->     They are updated only when users query them or driver updates them every 5 minutes.
->     However, these are cleared after the reset, which makes debugging difficult.
+On Tue, 2 Apr 2024 01:10:11 +0530 Naresh Kamboju wrote:
+> The following kernel BUG: unable to handle page fault for address and followed
+> by Kernel panic - not syncing: Fatal exception in interrupt noticed
+> on the qemu-i386 running  selftests: net: pmtu.sh test case and the kernel
+> built with kselftest merge net configs with clang.
+> 
+> We are investigating this problem on qemu-i386.
 
-This explanation is a bit hard to understand because you use 'these'
-and 'they', and I'm not sure whether you're referring to rtnl stats
-or the debugfs stats :S Please make the commit description more clear
-when reposting.
-
-> 2. Currently, only a few MIB statistics are required, not all.
-> 3. Are you suggesting that we use rtnl_link_stats64 to provide MIB statistics?
-
-Reporting via the standard APIs is the first step. You report pause
-stats here, for instance, but do not implement
-ethtool_ops::get_pause_stats.
-
-If the semantics of the debugfs stats are useful for debug that's
-fine. But (1) support the standard APIs first, (2) clearly describe
-how the debugfs ones differ.
+One-off or does it repro?
 
