@@ -1,150 +1,175 @@
-Return-Path: <netdev+bounces-84165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1BCA895D85
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:25:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7652D895DA8
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60C0A1F22CBD
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:25:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BDE4286917
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0508115D5D5;
-	Tue,  2 Apr 2024 20:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C327815E5B0;
+	Tue,  2 Apr 2024 20:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LcDPxNI4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHYMgMwq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7821E15D5B3
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 20:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3939315E215
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 20:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712089532; cv=none; b=KwLv5PYeeGHuJ45eDTS2obmkCz4SIfSf8YDilwOJRY0QGDVeUvNEYHVaya80vc8zhhBFoYdwP512M0in/o3MXOBwoK6M0nyx6LnW1cW6dXhsqRIS5EADT1M2QISbCIYrbsRvkI4sc7haHcs5SyEQhkRCDUSw34C9xErjZuqr9Qc=
+	t=1712090020; cv=none; b=Kkbumud3ceMz7xVIGON+XSPmLF7kvVDGgoMU4QK5fBu/nLRwD8BUro+8Tqsaizz+ZjhNTGSLBHeRWVEBC2mclAQzmb0cWN3IwvfFguQTW68FQuLWtJHbeNoS9BRoFf1E9Cki36Rx9rYZ1ozqWoQrJZlYPYzeZHtp/dntsHs/APA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712089532; c=relaxed/simple;
-	bh=Ju9jET8eBe9jgdDFaMRbN2AKk4OovlxEj3nYzgHIOBg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=brluotoveqlQCg9DrpC+SXJSU1lvmghQ2ePm+RBSZgnvBEp07R++wpfrUAv5h0U7/8vw1Sn4vJJtNqXkuBrINDXffRejSxOvz4h30HIkOEez5fZj9l50tKNUDMN4jsdzMybCRMH/EzWFPRBAU6tT7q7TC83RcJUutNAxh+N0zsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LcDPxNI4; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-53fa455cd94so4176177a12.2
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 13:25:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712089530; x=1712694330; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=qzQQHoJQ11iL4ZRq1RRJUHfxyNKqnhQT5F/85QjSLyE=;
-        b=LcDPxNI4/Rn4NpiNj8nFBowNpkVQJYLG0RYnfC2599V5KBwD6/VgsAlAdtJDklKuRN
-         Gvc6Eg5eO8qbhL7bRh+aJgY7h0Z9F/khFqtGH7/JW7INxd8BEpZnZmFWOdb2L2qNMkMe
-         R8qwcSTAS4p8luq5F+5sMVNHL7hpvgQ+3llBnMkNWnrKsHoLSL9g44lm2NZTXkr782ny
-         9qZNDOPs8qiqkarO3yk3/U6HKwqJB0oh00DTjEPc0xoc+Q6WeC2bSqbQziatJJh0Q42Z
-         lCtDi02n4xLNwyi8XEiMQqKfocZov4+O1qZSRGh487XC4eEuz7yCcRKdY+GWU4Y8s9XY
-         7Aiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712089530; x=1712694330;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qzQQHoJQ11iL4ZRq1RRJUHfxyNKqnhQT5F/85QjSLyE=;
-        b=MStYGJomcHx2ZKgbnJ3LB56Z7Pff6aB2V0mQOImCwNKqBOCSyz8DhSm5rdu/jGh3XI
-         C3v08vMjzQ/sDoOwKrXs8Cl08l1/bBUYijrP4A2aRrfzI1HDJ164M9hjWAxzFgdr39bn
-         3llNGtE7CByR5WJAKlao+ywKKCuPp5Ikbk0QfkxSPMLN/Q1uFH3vdVK655Zlgawljof7
-         CyWUnkrcTDcGd2FssFoQWm1IAOrbhJxP3eJ7rDZZQ6aQTNtYwtAvCYeFYR7K6rcCVGsk
-         7Y1vxOCEmVyM3tjwvAgVx6s8v0Jzy6/zXgh2m0FaH8WC1YM4cBHc+uqFoX9xfkUqfb93
-         gX5g==
-X-Gm-Message-State: AOJu0YzdfLQkWd94qi6wmw3v0SAjtq3zy0LhyarCV3mlxBa6MsnBcAQ+
-	GESr1OEQQMQmtPLcBg/xqpTnuW9VOr8k7iEGsPkJK60UIFbhEb35iZf8JfrDgP6GMlVghy+GoLR
-	llj7aXJW6rxtQIKcJFdF26km94fQ=
-X-Google-Smtp-Source: AGHT+IGngoKDuzCxvM9UepNkHp+ktQwyY9hfan6KLWWtdcJSgo7qrvIRP29btItHDsGC+UTo303GrDgOttbuu2r8lCQ=
-X-Received: by 2002:a17:90a:db49:b0:29f:c827:bc8c with SMTP id
- u9-20020a17090adb4900b0029fc827bc8cmr11617961pjx.18.1712089529894; Tue, 02
- Apr 2024 13:25:29 -0700 (PDT)
+	s=arc-20240116; t=1712090020; c=relaxed/simple;
+	bh=ROySLNzi2sYnSa/JtIXRjIYuaaAEqJzMqCJdYS2UTqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JmPHRFn5MOZXnSWIYexZ1JW/go5/B2i3hfaNEZRIrD2rGJgqkFcu1hs6Ce24tVHY/hbixdndT4l0hGEjJCCYPwgCeLWSydh475NnZj5QKaCdMufx5XwzXpoltiidwk5U57wbXf5T3nWxHTdz7GyPUEoda10BUmAxxl1WWdbjM7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IHYMgMwq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712090018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XkVVzn7sUlZgXUm5P4BgsrM9gYYoxT1YIoFUz7D2uhU=;
+	b=IHYMgMwqCFuSQ+/WsA9pbp/btV9ZM+hx+rHMH6kMcgixeugjRrlXtw44Zi1SzcgHIA/YFO
+	IMYrUaBpnZBh/cfBMyt0c62UAiCCQnhfnVyNq7QuZYaAwc5JSTSWGoJmwRiaoUsixLbS8y
+	DIAnpL4H+LHgJ2xxgWpbG9k3aSzPSBM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-209-ywO5jcPyNGiEQomcpy8Y7w-1; Tue, 02 Apr 2024 16:33:32 -0400
+X-MC-Unique: ywO5jcPyNGiEQomcpy8Y7w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 16C6F946322;
+	Tue,  2 Apr 2024 20:33:31 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EF28B17AA0;
+	Tue,  2 Apr 2024 20:33:26 +0000 (UTC)
+Date: Tue, 2 Apr 2024 16:33:21 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	David Hildenbrand <david@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Paolo Bonzini <pbonzini@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gonglei <arei.gonglei@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Cristian Marussi <cristian.marussi@arm.com>,
+	Viresh Kumar <vireshk@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	David Airlie <airlied@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Alexander Graf <graf@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v2 06/25] virtio_blk: drop owner assignment
+Message-ID: <20240402203321.GD2507314@fedora>
+References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
+ <20240331-module-owner-virtio-v2-6-98f04bfaf46a@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171154167446.2671062.9127105384591237363.stgit@firesoul>
- <CALUcmU=xOR1j9Asdv0Ny7x=o4Ckz80mDjbuEnJC0Z_Aepu0Zzw@mail.gmail.com> <CALUcmUkvpnq+CKSCn=cuAfxXOGU22fkBx4QD4u2nZYGM16DD6A@mail.gmail.com>
-In-Reply-To: <CALUcmUkvpnq+CKSCn=cuAfxXOGU22fkBx4QD4u2nZYGM16DD6A@mail.gmail.com>
-From: Arthur Borsboom <arthurborsboom@gmail.com>
-Date: Tue, 2 Apr 2024 22:25:13 +0200
-Message-ID: <CALUcmUn0__izGAS-8gDL2h2Ceg9mdkFnLmdOgvAfO7sqxXK1-Q@mail.gmail.com>
-Subject: Re: [PATCH net] xen-netfront: Add missing skb_mark_for_recycle
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, Ilias Apalodimas <ilias.apalodimas@linaro.org>, wei.liu@kernel.org, 
-	paul@xen.org, Jakub Kicinski <kuba@kernel.org>, kirjanov@gmail.com, dkirjanov@suse.de, 
-	kernel-team@cloudflare.com, security@xenproject.org, 
-	andrew.cooper3@citrix.com, xen-devel@lists.xenproject.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="n4/kSvCMF0M05hCx"
+Content-Disposition: inline
+In-Reply-To: <20240331-module-owner-virtio-v2-6-98f04bfaf46a@linaro.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-After having a better look, I have found the patch in linux-next
 
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=0cd74ffcf4fb0536718241d59d2c124578624d83
+--n4/kSvCMF0M05hCx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2 Apr 2024 at 10:20, Arthur Borsboom <arthurborsboom@gmail.com> wrote:
->
-> On Fri, 29 Mar 2024 at 10:47, Arthur Borsboom <arthurborsboom@gmail.com> wrote:
-> >
-> > On Wed, 27 Mar 2024 at 13:15, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
-> > >
-> > > Notice that skb_mark_for_recycle() is introduced later than fixes tag in
-> > > 6a5bcd84e886 ("page_pool: Allow drivers to hint on SKB recycling").
-> > >
-> > > It is believed that fixes tag were missing a call to page_pool_release_page()
-> > > between v5.9 to v5.14, after which is should have used skb_mark_for_recycle().
-> > > Since v6.6 the call page_pool_release_page() were removed (in 535b9c61bdef
-> > > ("net: page_pool: hide page_pool_release_page()") and remaining callers
-> > > converted (in commit 6bfef2ec0172 ("Merge branch
-> > > 'net-page_pool-remove-page_pool_release_page'")).
-> > >
-> > > This leak became visible in v6.8 via commit dba1b8a7ab68 ("mm/page_pool: catch
-> > > page_pool memory leaks").
-> > >
-> > > Fixes: 6c5aa6fc4def ("xen networking: add basic XDP support for xen-netfront")
-> > > Reported-by: Arthur Borsboom <arthurborsboom@gmail.com>
-> > > Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> > > ---
-> > > Compile tested only, can someone please test this
-> >
-> > I have tested this patch on Xen 4.18.1 with VM (Arch Linux) kernel 6.9.0-rc1.
-> >
-> > Without the patch there are many trace traces and cloning the Linux
-> > mainline git repository resulted in failures (same with kernel 6.8.1).
-> > The patched kernel 6.9.0-rc1 performs as expected; cloning the git
-> > repository was successful and no kernel traces observed.
-> > Hereby my tested by:
-> >
-> > Tested-by: Arthur Borsboom <arthurborsboom@gmail.com>
-> >
-> >
-> >
-> > >  drivers/net/xen-netfront.c |    1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
-> > > index ad29f370034e..8d2aee88526c 100644
-> > > --- a/drivers/net/xen-netfront.c
-> > > +++ b/drivers/net/xen-netfront.c
-> > > @@ -285,6 +285,7 @@ static struct sk_buff *xennet_alloc_one_rx_buffer(struct netfront_queue *queue)
-> > >                 return NULL;
-> > >         }
-> > >         skb_add_rx_frag(skb, 0, page, 0, 0, PAGE_SIZE);
-> > > +       skb_mark_for_recycle(skb);
-> > >
-> > >         /* Align ip header to a 16 bytes boundary */
-> > >         skb_reserve(skb, NET_IP_ALIGN);
-> > >
-> > >
->
-> I don't see this patch yet in linux-next.
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log
->
-> Any idea in which kernel release this patch will be included?
+On Sun, Mar 31, 2024 at 10:43:53AM +0200, Krzysztof Kozlowski wrote:
+> virtio core already sets the .owner, so driver does not need to.
+>=20
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>=20
+> ---
+>=20
+> Depends on the first patch.
+> ---
+>  drivers/block/virtio_blk.c | 1 -
+>  1 file changed, 1 deletion(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--n4/kSvCMF0M05hCx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmYMa5EACgkQnKSrs4Gr
+c8j8dggAqO8KJXvt+0JqXmgxsfDAxN196OA9Q6Rm7VF0fuMhGpVUUh/iuOtkH59k
+ho0oB9szUvz/1tXZEJPtShx/omt2iENmq22unjzWE7ZmNimALVjtXPaZNTCkYxJn
+Z9//Ks9v/lHCNFzLjSiKC94ktRVJLDXSmG7uEpbeutDrzN9TWRJ8DNnylKmm+qWR
+VDiL3/2+03gC5B/LovTli4ozZuS4JlG37Tnh2Z8ACNrcFC74nv45KtNuQLR+hNy8
+12jEUGkhADWps+fQH7bZebswT9ePfwTfA1xh0pXeeWKCkaiKcgFhZH+JcNQLkwkx
+fC80yZK4qnvU1SmzK2tpfzAk7jUMtQ==
+=5tJl
+-----END PGP SIGNATURE-----
+
+--n4/kSvCMF0M05hCx--
+
 
