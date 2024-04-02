@@ -1,136 +1,163 @@
-Return-Path: <netdev+bounces-84041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE0D28955BF
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:50:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D839D8955E0
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:57:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4086F1F231CC
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:50:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D0DE288C73
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF42984A27;
-	Tue,  2 Apr 2024 13:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFDD82893;
+	Tue,  2 Apr 2024 13:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WiBOleVC"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="niYyKOf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512D15D47A;
-	Tue,  2 Apr 2024 13:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712065813; cv=none; b=Ot+BlLdtbmlCBtbEHhlmU07sz5pYSvo/QMUzjoILJwT0lUY94Bab8xb9T6BFcWusLDsNZqJJLLqBQUz0vsB89PDEuOG8rL/lmLQMnnbUvT3Vui7ce4JSLsMWKfm1OwIEdttvWGoTZedpqhuaKpRSjdFPjqNZeaVyr84JbZDPWWw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712065813; c=relaxed/simple;
-	bh=GSsExJ2Cweiqv3U9XKAHuGsEXUUvZAgvUg0YJmbTYl0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e4UklczkKTqPvBH5EOoerj1+2aVOSri7IPMZ9H0Q9f7i0Zs3vHp/1QeWb8o9jbMsPuKbpuih8v5caiGL8SDC+O+jmLMDztwsxpyffYMkc230Var9T9HrfMi+UveHMWDk+Rv/tPYHX7x7bt9WfP87/VKUF66XUNPqipRYv0rxsf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WiBOleVC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=GbhkBxn+Q4MglL3Lf04y1O0cOhqs2SZS9H0XUJs9VK0=; b=WiBOleVCJwBRPqHpBXE8Ef/U+G
-	OXNriYeqoB6MRc7eicL0W9EYhGR5ajRr5dPJ3uNYPlNNIbBC0HxhOjk7DX+2wrYxTMNRua2n+Ouyd
-	DcF7rtkkHvFur+rvqAyiGx3S/0gqFEQDFnWt/53GQX4zgJY1vfLs/j7thO2twHL23gXVKutcSLr+t
-	NeyTrxfYKNeV1LKFgJ6lvMdTakw5Id9g+QsR+G9BFveVUS00EP3jajyAUvlglUWEbHpm7lDgYooWA
-	4eTco3FzRs32jC95CiPlQWcfUG6OgLsQ8riL7aDKCl/kqEz3RxVb1iYaSkQowHA0A5pYpDU9hP4uD
-	ELWzNoKg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37898)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rreWN-0006no-2a;
-	Tue, 02 Apr 2024 14:49:51 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rreWK-00070E-DE; Tue, 02 Apr 2024 14:49:48 +0100
-Date: Tue, 2 Apr 2024 14:49:48 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next 2/3] net: stmmac: add support for RZ/N1 GMAC
-Message-ID: <ZgwM/FIKTuN4vkQA@shell.armlinux.org.uk>
-References: <20240402-rzn1-gmac1-v1-0-5be2b2894d8c@bootlin.com>
- <20240402-rzn1-gmac1-v1-2-5be2b2894d8c@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFE665BBB
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712066232; cv=fail; b=Vakzb36tjFYmsTLK7k0TuPciSyjMhqrFizvN02QTgRCwpmEsEzcopQnMn2Yfa72R0jYaGE42N9dbzsVPqi4NmxTCRbjVu3mc7PN+exmqTglNEzwEdhKeYCANM3pC6+BBhXu+EZVeBc+maovNN0toq6OIS/DZX488L7uHcAcwIFQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712066232; c=relaxed/simple;
+	bh=ZD/FWnddwSdTXwT4pjuNRNVWHsHzbs+iDAHga7kBjtc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TV8sk2voZ7z3us2ca/7cQr9DQhLc3M7NuB4XlXfTJszk9vKgQ+4GaI9TBSlhA+wqNqP7UyPP78p/NCtfQFXqBw5nFSyLVDCEVsLqgLk22Qq9VcJ6Mn7nD8YQAy/g/pJ3LHSMOWLd8UHnVYCKmVGczUGXzZ4AN+jRkgYeWWhXeUY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=niYyKOf3; arc=fail smtp.client-ip=40.107.236.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MWmRFJg+5XY/zfvzXtQkTCq8PhAx8iV/Qi3iVcwdrzZxp1bq9wm1DZFzLbz8lz63h/ZhiL4nicFKFaFwNEMLEkVite0rO1pRLrx3fUlTqL+8IdSc9RcGlhN37StI5st03Ja/UCnhq8c7G2c6zaNAWt0OagGXX5n5dAK16eCTtvoN5JyCuWuUGpYHkwQUDGPeVoJvdWiNFbsRxxttkefGsI863y9NYCtOHGuHZuXv2hoFKsGI4cafJhckmCihV14z+rYjAEWezOvMb5p5IKKeP5dncmNgWSwDZbia2YbbftnlVmz09D9dDOPD8VjJn7SZN54EsVBBT5y+dSQr4VfMUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FFbSAva/HMNjTA9hFL5COJkwE5mEKLmLgU8ewb0srZ4=;
+ b=CP+RVlgHuGPbDc6/PSQtlu2f3QQyzVOd2RHxQMiGZF9XtsmLF1WaW8KUdf3CK0HSFmr0KEXFsadevBuvnp7uDzP/PNfX7bmBERVTRkkRaYzrEWUvgivf0jAQVenvilwWHLOLI+h6an835F5SYiC7yKObSGEvYCl0qwUXHEIcrzBbVL4DxrxZ7RIH2N6Zzp05CauvsQqdt6x/OR/BhSENDz9QvVBUUxxZ1wpAWM+4euw3BXyjYPADfDvnwb3vfAi/7JHUOWNLBX7Ous9sa6S02+3PrzvzE3UzMSaFK0mhrvbQe6lPdJZsHLDDl5fUT/SnIFVNVW3cqEMaSKqnt96YUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FFbSAva/HMNjTA9hFL5COJkwE5mEKLmLgU8ewb0srZ4=;
+ b=niYyKOf3qA6GyZWVKPj8zvbNZFeDeBz0K8GBRkORqjvilleCTiYfn+304wtp25/Ei7Y1q2kli3LbwF+gHMD15x0y30vY3RX3R150kCMw+JPjyofhymWVca4YiRWmgEaFx7hrl8a3pZ6vKqLV/zD2O8uUO/Fzj7V9tJp42XRTnN9WW0wg+IC5QQS8gI7kemGqOGWx3SaaeMPFkkhaqh+C3thOUvD1NSer9ydQSLh4cxYfc9o/HgmbIdLoA7z43CRXsO5jgPy1X+wtEMehdch15pLh3JbQomM4Nhn2hAydIIw/XR8+MS8zvxSSg3PCb+6R54VubN6k9JxUfLjulcHyFw==
+Received: from CH0P221CA0035.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:11d::22)
+ by MN0PR12MB5953.namprd12.prod.outlook.com (2603:10b6:208:37c::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
+ 2024 13:57:06 +0000
+Received: from CH2PEPF0000013F.namprd02.prod.outlook.com
+ (2603:10b6:610:11d:cafe::92) by CH0P221CA0035.outlook.office365.com
+ (2603:10b6:610:11d::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
+ Transport; Tue, 2 Apr 2024 13:57:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF0000013F.mail.protection.outlook.com (10.167.244.71) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Tue, 2 Apr 2024 13:57:05 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 2 Apr 2024
+ 06:56:51 -0700
+Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Tue, 2 Apr
+ 2024 06:56:47 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>, "Petr
+ Machata" <petrm@nvidia.com>, <mlxsw@nvidia.com>
+Subject: [PATCH net-next 00/15] mlxsw: Preparations for improving performance
+Date: Tue, 2 Apr 2024 15:54:13 +0200
+Message-ID: <cover.1712062203.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240402-rzn1-gmac1-v1-2-5be2b2894d8c@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000013F:EE_|MN0PR12MB5953:EE_
+X-MS-Office365-Filtering-Correlation-Id: 22b8c461-7677-4b14-b5a9-08dc531cc7cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	J6DyiZ+STsTmUq1Kp0WresrB/hqjgVtrm90lIiKrvFPaki+Z3HKlFOEDCh22qoS0SS86u2b8uJTiFVU67aeuUePoQVJceLuDjzxVGuJdUKLOUtOLZgp3jVF9zsaQZDNKqGLgofJkotyQqxwI7JqRw71d+zfmsIep960TBo1otn2opwI2MGLJlPmpH+IAN/TPIDW4fOLWyEbXa5ClLr3zBScyWewntxlr0shhqCq0siDZr43W8ZdCyeNA/t2vlTfB6qzyrQBnKHsOmowKq+2q1/jhMrIEx5NphD3PWA1VIVj+gRLtqnkbfayKhvBAn3kuozq8s6HG7/Rh1qVY+2EfBwxRCBVmfTHT3Dlm90WePOlshSyMmfNU4yV+oucUEs7mIkB0f/yaLqfupLzAaDK7MRNMPedppShEKAiMFZaDwx9TjkJPnUQw84kv0ByCF1LKbp5xMOFCHckYj7IwVLqVpF38s/czjbsFVuCvZi2gBSa4C1ig0sJ7nPiF4/J8VmKPBOokrRgN7LKniyjWLqNLMZAFVkwsb/xG+A9+O5GD9WFlpfSOHWx3IVipc9Ktfg4pTtA1tqHWwMQ3/NGW/j+boIMD6Cciugs9huQZ0zOrMRkfm/Y3ea1kxlONBXca6xi2rcigRq5wN8sy26foU7OWty5vOFLkPJuR2VRBIKFkvjqRCGTKpqb6JWnNtdAQv94xx0VMlymSyklSjnG67yyF24FfMZjdcAHEGQifdiKTrVvPyFGUhSKswl/KjG8sKxM0
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 13:57:05.4673
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22b8c461-7677-4b14-b5a9-08dc531cc7cf
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF0000013F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5953
 
-On Tue, Apr 02, 2024 at 02:37:01PM +0200, Romain Gantois wrote:
-> +	ret = stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ndev = platform_get_drvdata(pdev);
-> +	priv = netdev_priv(ndev);
-> +
-> +	pcs_node = of_parse_phandle(np, "pcs-handle", 0);
-> +	if (pcs_node) {
-> +		pcs = miic_create(dev, pcs_node);
-> +		of_node_put(pcs_node);
-> +		if (IS_ERR(pcs))
-> +			return PTR_ERR(pcs);
-> +
-> +		priv->hw->phylink_pcs = pcs;
-> +	}
+Amit Cohen writes:
 
-I'm afraid that this fails at one of the most basic principles of kernel
-multi-threaded programming. stmmac_dvr_probe() as part of its work calls
-register_netdev() which publishes to userspace the network device.
+mlxsw driver will use NAPI for event processing in a next patch set.
+Some additional improvements will be added later. This patch set
+prepares the code for NAPI usage and refactor some relevant areas. See
+more details in commit messages.
 
-Everything that is required must be setup _prior_ to publication to
-userspace to avoid races, because as soon as the network device is
-published, userspace can decide to bring that interface up. If one
-hasn't finished the initialisation, the interface can be brought up
-before that initialisation is complete.
+Patch Set overview:
+Patches #1-#2 are preparations for patch #3
+Patch #3 setups tasklets as part of queue initializtion
+Patch #4 removes handling of unlikely scenario
+Patch #5 removes unused counters
+Patch #6 makes style change in mlxsw_pci_eq_tasklet()
+Patch #7-#10 poll command interface instead of EQ0 usage
+Patches #11-#12 make style change and break the function
+mlxsw_pci_cq_tasklet()
+Patches #13-#14 remove functions which can be replaced by a stored value
+Patch #15 improves accessing to descriptor queue instance
 
-I don't see anything obvious in the stmmac data structures that would
-allow you to hook in at an appropriate point before the
-register_netdev() but after the netdev has been created. The
-priv->hw data structure is created by stmmac_hwif_init()
+Amit Cohen (15):
+  mlxsw: pci: Move mlxsw_pci_eq_{init, fini}()
+  mlxsw: pci: Move mlxsw_pci_cq_{init, fini}()
+  mlxsw: pci: Do not setup tasklet from operation
+  mlxsw: pci: Arm CQ doorbell regardless of number of completions
+  mlxsw: pci: Remove unused counters
+  mlxsw: pci: Make style changes in mlxsw_pci_eq_tasklet()
+  mlxsw: pci: Poll command interface for each cmd_exec()
+  mlxsw: pci: Rename MLXSW_PCI_EQS_COUNT
+  mlxsw: pci: Use only one event queue
+  mlxsw: pci: Remove unused wait queue
+  mlxsw: pci: Make style change in mlxsw_pci_cq_tasklet()
+  mlxsw: pci: Break mlxsw_pci_cq_tasklet() into tasklets per queue type
+  mlxsw: pci: Remove mlxsw_pci_sdq_count()
+  mlxsw: pci: Remove mlxsw_pci_cq_count()
+  mlxsw: pci: Store DQ pointer as part of CQ structure
 
-I see that drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c is also
-guilty of this as well, and should be fixed. It's even worse because it
-does a truck load of stuff after stmmac_dvr_probe() which it most
-definitely should not be doing.
-
-I definitely get the feeling that the structure of the stmmac driver
-is really getting out of hand, and is making stuff harder for people,
-and it's not improving over time - in fact, it's getting worse. It
-needs a *lot* of work to bring it back to a sane model.
+ drivers/net/ethernet/mellanox/mlxsw/pci.c    | 492 ++++++++++---------
+ drivers/net/ethernet/mellanox/mlxsw/pci_hw.h |   4 +-
+ 2 files changed, 250 insertions(+), 246 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
