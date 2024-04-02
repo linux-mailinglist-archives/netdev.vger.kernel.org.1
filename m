@@ -1,159 +1,194 @@
-Return-Path: <netdev+bounces-84110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D6578959C4
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:32:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6131C8959D4
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:37:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABF371F22EFA
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:32:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3436282E30
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5124159205;
-	Tue,  2 Apr 2024 16:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEE11598F9;
+	Tue,  2 Apr 2024 16:37:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EalIXek4"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="sDabu/dS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02ED35B692;
-	Tue,  2 Apr 2024 16:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34330133283
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 16:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712075569; cv=none; b=OkNKhVjXQpcvC9pBtc8nsV/+/PuoBZdOYiWZCCi+aXbevXXETv9RXpINvOhJGxTertJR2h4IA5KgNwRbSRCwTQCFRoBFyacG1aocbttiz8YBBtlvGmU+ySjDu88xn2B03uGN9fRkfQq0I4hy07OZ7JGZ9MrQS7x3ROkF2r+A+rk=
+	t=1712075847; cv=none; b=q9uvpoy776ZfbhRmbCjKBESyU91pISGQ9OdkGGyVZzRYMLs+wztmuYcVeEWh6mUkgTEwQaqHs44BaRJ6Sqs9NfAQu7LwMzrh6E4rje3dp6baMgELQXjDJPu+UXudtHPEE5Eqii/+fGJGHlzIZC5ImSz6o9hkYQxwyw/crqIOCbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712075569; c=relaxed/simple;
-	bh=OhhVIjDcqe8g+hQ+LDlCyECZheLKdw94N9qys8UDy/c=;
-	h=From:Subject:To:Cc:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=a51FOXWJejLnrZPmlMpPWXERPs4o/LvSsqFOxntVNp5tkBLEkW+hXaKgmREQnScZkQgXmKFP7bB4DiVkz74wtx9UivNLhw6G271y71zgtql305VNmHy4ytl1ww3Z8yp1snyzbusEvHSccsWoy9qDTtXLh0ZsAaHRWCIalaxtc3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EalIXek4; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4161d73d855so5548015e9.1;
-        Tue, 02 Apr 2024 09:32:47 -0700 (PDT)
+	s=arc-20240116; t=1712075847; c=relaxed/simple;
+	bh=Ftu1/YtbphAuRzS6+kzLDjRXWgk3WQY3tSjLqYtXoRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VJNGtLShqZcuekoeWkrhcO1df/WAG6icJMWpYssIHwHPrjqcYImgDJlcmcPPc/91lmH/dsFB1FQGZVtyq5JdB12gH8FvYR8mVwE4rwaeIqnEB5QP9rig+ZtUAQc5VWlq9zEL2+EPayDacS1So2WR0own+teXy3Ku2e2puwE4JRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=sDabu/dS; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6152ad16cd6so8896957b3.2
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 09:37:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712075566; x=1712680366; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:references:cc:to:subject:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=47eBT3ynKSSdXwM18wwMFfMaKyRoZYguxUBUem9SbTM=;
-        b=EalIXek47nJ8yVUy7Smr0hy3bXJVrP84/pB4/W/zfD08uhHTz3dGmsvOhOlszBdNsq
-         FN0KHY5zeYiwVXHPRixwFox1A0CB6RKQPSMED2uQI1tQmWxDgA0lWavZUmpqCexGDTe9
-         4BM9DqdyxzYVcv9wL3xS1q2CTvtDFYR7XsMdTbc+i8r631A5KdKu4zt2EcmjoOa8ChuD
-         E14Lhtk4jgCSm8seVbaWe65t/ppM8zJyPkHHQEvv8inc5mVC6aqLHMUCxEMDKWL2O8Ld
-         EqDsRt76cpmrpEPRpWMvMnWBWnBEt8H921Eonsb0S08ivwadqjiYIkemQCJawqwKhyks
-         d54A==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1712075844; x=1712680644; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pnOInSmpy9bn+aaODUeRXpb9+P4vfUZ3Y7TCRowdO0U=;
+        b=sDabu/dSRtqn0dx6tyS0O49fXEZIRrsI+ze7l7TbzEpSj2zAhSW9ZDOXRuHT3Y+1UW
+         lN69Um1eOHXkq7nxBcAAit3PlpJks8XdEJ7PlLT0WR9Y6zh/mwv/xuwHDXLftfvIT3Kj
+         t3pPX2NfQhWerL1A+0RobGUjdBsCu72DHmkHtmq9Mgk5J0VdaiNOqW3IS899rP1JsKit
+         gBoufAajIobSbgiFWgq40Jwg6kJ4q8e63gAMa08sA2iT2ke5SDMtsK0WO1NEgyczP09a
+         s5siSxMhTAU8xhz+2LqP82hiWeoV2cqq91TcHT7LtkfemtaihwMmbBdWeR5GY+TM10Po
+         W4TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712075566; x=1712680366;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:references:cc:to:subject:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=47eBT3ynKSSdXwM18wwMFfMaKyRoZYguxUBUem9SbTM=;
-        b=ZEhzVjoWDTxr4ZD1La4moRHt4Z/hwnoy5LkunalJSuhORTgHbI+YyfAzvBPu4kyOyt
-         OCmHCx8Is4m4paRwlVOk/wjpA8yuHCh/0eBuLTMnUAokjAUjSlryOy0pF63V/8cBgqED
-         d0FvDaEEpZ5pITXGRRSyvNXMDPWzGa0GU3k2+hSrCAyqFnC84JWlosabXE73Eg41OKAo
-         a4x4FJ/JESoFnbAKj/A80iUE925ouoh8QE5Ss8sp/y5f1Wank8vXjWeQTMzEcNtHqcEj
-         bZn/+7jJgWBrXOkIqWD2tEUqSZckUvbjAE39lK9e8qxDvLoQ/Qn5ebC2dK+A1VnLu5gm
-         V11Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVCrCXDkh5VP8TofhRAqfxyYZeFD9rWEYkHCXyJNvwMfm7Hlb0BTd+tu+6HexR5ekQNWxhwvdHB6SRQ70CjaIGmPADofsu6jjYxEJ+lAW81p/byxksfHy22N3zw3rGKfC8wv4OU
-X-Gm-Message-State: AOJu0YxR+alPwDps13FoOLUI3nCdJGgrjAND4ihty3GAuuCGwxocq44x
-	dPp15dG4G6deudiQTNkOa7fy29WKNdNWQ/RQrCVwfjGjOzQG4m6f
-X-Google-Smtp-Source: AGHT+IGJZydWlDRfkV7i4KmZOfZhCIWU4rygkI2aJzYNZ6RuLcECuhBO0pmLlMAmX8y0lweAhjl42w==
-X-Received: by 2002:adf:a494:0:b0:33e:bf34:4af1 with SMTP id g20-20020adfa494000000b0033ebf344af1mr2034206wrb.39.1712075566032;
-        Tue, 02 Apr 2024 09:32:46 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id r8-20020adfb1c8000000b0033e206a0a7asm14639052wra.26.2024.04.02.09.32.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Apr 2024 09:32:45 -0700 (PDT)
-From: Edward Cree <ecree.xilinx@gmail.com>
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-To: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@infradead.org>,
- Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
- Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
- Saeed Mahameed <saeedm@nvidia.com>,
- Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <20240207072435.14182-1-saeed@kernel.org>
- <Zcx53N8lQjkpEu94@infradead.org>
- <ZczntnbWpxUFLxjp@C02YVCJELVCG.dhcp.broadcom.net>
- <20240214175735.GG1088888@nvidia.com> <20240304160237.GA2909161@nvidia.com>
- <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
- <2024032248-ardently-ribcage-a495@gregkh>
- <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
- <Zf2n02q0GevGdS-Z@C02YVCJELVCG> <20240322135826.1c4655e2@kernel.org>
- <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
- <20240322154027.5555780a@kernel.org>
- <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
-Message-ID: <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
-Date: Tue, 2 Apr 2024 17:32:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1712075844; x=1712680644;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pnOInSmpy9bn+aaODUeRXpb9+P4vfUZ3Y7TCRowdO0U=;
+        b=UeijLomDaWoxGwnBvZiQM0mq29HqnAwYnpLijT1YvpCPUS7CWF6QHCeU1rvC9N9mD3
+         rmoUZioC6J4AShVvQ0hfphvvGwXCKDtDgS+LhvsmNSu1/3SBrdgguss/r82b8JV2LaEf
+         yMMVT+ZNVdDO2nnQPGt7t3rXTGVQJzb719XB2cB+cDBSnggTmwiYuDjkToYFBI+XqFLU
+         x9YpLvGh37NLUVgUii577n8EBw5KETIDmRWhxaWrUqI+W8YIsLMGmiiiUcYe18m/AOLD
+         U5izo7EP2u3Mxb8xYJHMcwZENtH59jmdKzWfWtizud6YWG4H42UNAtEnh/VdYVvfKQ0x
+         PiKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWNKBo6KRgWlKsG3CpHMjkIJJEBT/Lk86a7wfeahPvtw4Kyin84z9Vz6Y79O5c0H9nKSy0jXoZCljT5PYkXtY07fWT4Aunq
+X-Gm-Message-State: AOJu0YwNDAcnEw/WQsKCdwTDOZPcg7cIKQ9tep+SRq/qFLC8Oo3TjmtF
+	DCaHvgakrLOgYhhx5cTfJ4Fqdz4pSsugbwgkEigY+M7N83fpMPDjAAKZoQCENVo71SC1A1Kvg0C
+	/KuLW5nXNSxhAWaNpjCXtQ16oWUVOBT1+6IUO
+X-Google-Smtp-Source: AGHT+IHg05AFU9nr3+SMcgPtwjdHnLUy82kmkDRwQcJfbthoidtVj0A0aODVQD98B5W/7F7yMV8QINVB7xURcXWgV5c=
+X-Received: by 2002:a0d:fbc5:0:b0:609:8ed6:c491 with SMTP id
+ l188-20020a0dfbc5000000b006098ed6c491mr12628665ywf.26.1712075844110; Tue, 02
+ Apr 2024 09:37:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+References: <20240402134133.2352776-1-edumazet@google.com>
+In-Reply-To: <20240402134133.2352776-1-edumazet@google.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 2 Apr 2024 12:37:12 -0400
+Message-ID: <CAM0EoMkL4UVOjy1mj-w04kned3e0czuRAiyfq9cWzP4PBWwWYw@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: fix lockdep splat in qdisc_tree_reduce_backlog()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 26/03/2024 14:57, David Ahern wrote:
-> The proposal is an attempt at a common interface and common tooling to a
-> degree but independent of any specific subsystem of which many are
-> supported by the device.
+On Tue, Apr 2, 2024 at 9:41=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> qdisc_tree_reduce_backlog() is called with the qdisc lock held,
+> not RTNL.
+>
+> We must use qdisc_lookup_rcu() instead of qdisc_lookup()
+>
+> syzbot reported:
+>
+> WARNING: suspicious RCU usage
+> 6.1.74-syzkaller #0 Not tainted
+> -----------------------------
+> net/sched/sch_api.c:305 suspicious rcu_dereference_protected() usage!
+>
+> other info that might help us debug this:
+>
+> rcu_scheduler_active =3D 2, debug_locks =3D 1
+> 3 locks held by udevd/1142:
+>   #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire =
+include/linux/rcupdate.h:306 [inline]
+>   #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock inc=
+lude/linux/rcupdate.h:747 [inline]
+>   #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: net_tx_action+0x6=
+4a/0x970 net/core/dev.c:5282
+>   #1: ffff888171861108 (&sch->q.lock){+.-.}-{2:2}, at: spin_lock include/=
+linux/spinlock.h:350 [inline]
+>   #1: ffff888171861108 (&sch->q.lock){+.-.}-{2:2}, at: net_tx_action+0x75=
+4/0x970 net/core/dev.c:5297
+>   #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire =
+include/linux/rcupdate.h:306 [inline]
+>   #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock inc=
+lude/linux/rcupdate.h:747 [inline]
+>   #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: qdisc_tree_reduce=
+_backlog+0x84/0x580 net/sched/sch_api.c:792
+>
+> stack backtrace:
+> CPU: 1 PID: 1142 Comm: udevd Not tainted 6.1.74-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 01/25/2024
+> Call Trace:
+>  <TASK>
+>   [<ffffffff85b85f14>] __dump_stack lib/dump_stack.c:88 [inline]
+>   [<ffffffff85b85f14>] dump_stack_lvl+0x1b1/0x28f lib/dump_stack.c:106
+>   [<ffffffff85b86007>] dump_stack+0x15/0x1e lib/dump_stack.c:113
+>   [<ffffffff81802299>] lockdep_rcu_suspicious+0x1b9/0x260 kernel/locking/=
+lockdep.c:6592
+>   [<ffffffff84f0054c>] qdisc_lookup+0xac/0x6f0 net/sched/sch_api.c:305
+>   [<ffffffff84f037c3>] qdisc_tree_reduce_backlog+0x243/0x580 net/sched/sc=
+h_api.c:811
+>   [<ffffffff84f5b78c>] pfifo_tail_enqueue+0x32c/0x4b0 net/sched/sch_fifo.=
+c:51
+>   [<ffffffff84fbcf63>] qdisc_enqueue include/net/sch_generic.h:833 [inlin=
+e]
+>   [<ffffffff84fbcf63>] netem_dequeue+0xeb3/0x15d0 net/sched/sch_netem.c:7=
+23
+>   [<ffffffff84eecab9>] dequeue_skb net/sched/sch_generic.c:292 [inline]
+>   [<ffffffff84eecab9>] qdisc_restart net/sched/sch_generic.c:397 [inline]
+>   [<ffffffff84eecab9>] __qdisc_run+0x249/0x1e60 net/sched/sch_generic.c:4=
+15
+>   [<ffffffff84d7aa96>] qdisc_run+0xd6/0x260 include/net/pkt_sched.h:125
+>   [<ffffffff84d85d29>] net_tx_action+0x7c9/0x970 net/core/dev.c:5313
+>   [<ffffffff85e002bd>] __do_softirq+0x2bd/0x9bd kernel/softirq.c:616
+>   [<ffffffff81568bca>] invoke_softirq kernel/softirq.c:447 [inline]
+>   [<ffffffff81568bca>] __irq_exit_rcu+0xca/0x230 kernel/softirq.c:700
+>   [<ffffffff81568ae9>] irq_exit_rcu+0x9/0x20 kernel/softirq.c:712
+>   [<ffffffff85b89f52>] sysvec_apic_timer_interrupt+0x42/0x90 arch/x86/ker=
+nel/apic/apic.c:1107
+>   [<ffffffff85c00ccb>] asm_sysvec_apic_timer_interrupt+0x1b/0x20 arch/x86=
+/include/asm/idtentry.h:656
+>
+> Fixes: d636fc5dd692 ("net: sched: add rcu annotations around qdisc->qdisc=
+_sleeping")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-[ Let me prefix this by noting that I'm speaking personally here, and
-  not representing the position of my employer. ]
+LGTM.
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-You can't have a "common interface" and yet be "independent" of anything
- that could give semantics to that interface.  What you have is a common
- *transport*, used to connect to a *vendor* interface.
-If you can't even bring yourself to be honest about that, it's no wonder
- you're getting maintainer pushback.
+cheers,
+jamal
 
-Do we need to go all the way back to operating systems 101 and point out
- that one of the fundamental jobs of a kernel is to *abstract* the
- hardware, and provide *services* to userspace rather than mere devices?
-
-Frankly, this whole thread reads to me like certain vendors whining that
- they weren't expecting to have to get their new features *reviewed* by
- upstream — possibly they thought devlink params would just get rubber-
- stamped — and now they're finding that the kernel's quality standards
- still apply.
-Complaining that devlink params "don't scale" is disingenuous.  Patches
- aren't languishing for want of reviewer resources; it's just that it
- takes *submitter* time and effort to bring them up to the quality level
- that's required, and occasionally the vendor has to (shock! horror!)
- tell the world what one of their magic knobs actually *does*.
-
-If all the configuration of these Complex Devices™ goes through fwctl
- backdoors, where exactly is anyone going to discover the commonalities
- to underlie the generic interfaces of the next generation?  What would
- configuring plain vanilla netdevs be like today if, instead of a set of
- well-defined cross-vendor APIs, ethtool (say) had been a mechanism to
- write arbitrary values to hardware registers on the NIC?
-These commonalities are key to allowing a product category to mature.  I
- realise vendors in many cases don't want that to happen, because mature
- products are largely commoditised and thus don't command huge margins;
- but Linux isn't here to serve vendors' interests at the expense of
- users.
-
-On 23/03/2024 01:27, Saeed Mahameed wrote:
-> It is obvious to everyone that in the AI era, everyone needs
-> customization
-
-It's always possible to argue that the New Thing is qualitatively
- different from anything that went before, that these "multibillion
- gate devices" need to be able to break the rules.
-But the truth is, you aren't that special.
-
--e
+> ---
+>  net/sched/sch_api.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> index 65e05b0c98e461953aa8d98020142f0abe3ad8a7..60239378d43fb7adfe3926f92=
+7f3883f09673c16 100644
+> --- a/net/sched/sch_api.c
+> +++ b/net/sched/sch_api.c
+> @@ -809,7 +809,7 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int=
+ n, int len)
+>                 notify =3D !sch->q.qlen && !WARN_ON_ONCE(!n &&
+>                                                        !qdisc_is_offloade=
+d);
+>                 /* TODO: perform the search on a per txq basis */
+> -               sch =3D qdisc_lookup(qdisc_dev(sch), TC_H_MAJ(parentid));
+> +               sch =3D qdisc_lookup_rcu(qdisc_dev(sch), TC_H_MAJ(parenti=
+d));
+>                 if (sch =3D=3D NULL) {
+>                         WARN_ON_ONCE(parentid !=3D TC_H_ROOT);
+>                         break;
+> --
+> 2.44.0.478.gd926399ef9-goog
+>
 
