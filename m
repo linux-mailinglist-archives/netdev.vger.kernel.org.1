@@ -1,285 +1,158 @@
-Return-Path: <netdev+bounces-84036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B630D8955D8
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:54:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE508955B5
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:46:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 493EFB2E8F4
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:42:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED58AB2B06D
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0013E84FB1;
-	Tue,  2 Apr 2024 13:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B1A85289;
+	Tue,  2 Apr 2024 13:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxJJEnJt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e1X9DR4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092AE84FC3
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181058529D
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:41:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712065265; cv=none; b=cZVFQsCS4k3j35O0X6mtWQuUdUqHpAafBHPH5xPoFowjqEan2WidxQ0mFhT2CNC+NU9h9Oi7gJxSeO0NAdATz9GGhMQF2fTVdhEf+sILoHszB2Ir6plcNovc5HkP+9WpqQ6KILiMw62f2QxNQPybm40cVejVuoJtaE8Vp1/Lq/8=
+	t=1712065297; cv=none; b=FM9xHPurrgl/EAAIgEYYjCZUUSfquDIdFNbfzPgTtYEPSn0tpZWrpXkVuyduqlHF3jG0sp9EPDbg9RvRUO1AdHtY52f9dFStNFwV1xpmCYRWAszaE1iVwr5maFRjcB422FzysMJZBlW5xo2oZhRQM5Y5MHapSqdcO3dCmWFVxAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712065265; c=relaxed/simple;
-	bh=bLhC0nbwq22GNe56gDAASa+q7vHPfdzGoLdGaCOBqW4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=P8VSrQxKSFHdjgQHfOvsQfbtvCtY78j2hcDTdRNhYb5am6XJWysBDU4aHn42Ankd0yiEOLkq4mpUuaGt75I97aYskplHYisITAVjIoTBtkFx6Tn+rAbGkWa7jPhp08+EmzGEeDxwU9OCAAb5tRx839vJDJrWn5H82cn1uIE471s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JxJJEnJt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712065263;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bLhC0nbwq22GNe56gDAASa+q7vHPfdzGoLdGaCOBqW4=;
-	b=JxJJEnJtGQyRV0ATynHp2HWGYE+V3EoMLtiM0Yiylit0IJ1W0a0FIqLdIOaZReLYfxDK84
-	2Jq1FKsD8LvKd0lVM+by3smjEpRPZbetzPO9kGuKxpwxYVc9w5zm57yORu6x1qtajqq11T
-	bRbMn2jIQcxiDn8yf2YPQkSIiaFn4t0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-bNQKh7xnN2y7oNGFLlX3TA-1; Tue, 02 Apr 2024 09:41:01 -0400
-X-MC-Unique: bNQKh7xnN2y7oNGFLlX3TA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-343740ca794so104507f8f.0
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 06:41:01 -0700 (PDT)
+	s=arc-20240116; t=1712065297; c=relaxed/simple;
+	bh=e7shh6yvPp1H4Y9GQe3wl5NHoVp7Q6tMX29LS/sgd6w=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZfM0gA5oh//MScRZuBKaganj3NEiPBtnGLduRv2t9whi1KwnLKtDfwuaFhaDbrfsHrQ2OAOnJkMw6KElgIxT95Q1C2R6m2gs/LQGwA8Cxxa5034Z8brclpuPm6eMXGKhXhDGdqUcLLewug6HgQH7NY4B0ZrRovAKuqb8/bpdRN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e1X9DR4S; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6144de213f3so67122687b3.3
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 06:41:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712065295; x=1712670095; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=E5/Tfr7oT3omjdwQVsb0qbCvSVq7DuG2CimWzMCciK8=;
+        b=e1X9DR4S2G++Kbn+wmg4aBxDagSDPJOVUIdXr68PNg6zAL/CfukHs9WlZRG9hXqMoN
+         /NyTvOVB42aImeke6iO0r81ku+cE4hPwvZM7YHwttizB6X2dN5B4aD8Adp7ZqanYsoRh
+         4ByIM9EnM3mb9mIFktLrrcCcdfA0vmmHBxFMwGZoTXXF8Kn2yV9kbTyZqqDP/onMbMmY
+         cXkNsk2eOq5sft75qCts+qWue8IrQBmzyD5Dw142QLf4D2AWWFpozKVsgSh0ukTI79mE
+         mPSMzPridMGNwMFrHpma/DF2yOj8iLP0tzXFV3UBeABxtGxW9gQ9Lo+iAh24Jg94N6qp
+         eleQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712065260; x=1712670060;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+        d=1e100.net; s=20230601; t=1712065295; x=1712670095;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=bLhC0nbwq22GNe56gDAASa+q7vHPfdzGoLdGaCOBqW4=;
-        b=vC+/Sbod4fdvxNEAvHTx/RX2Zv1oHSLWZpIA5uaZcNHFbewSR+wXJ0i+8sFjdNOSin
-         57Zv3IWsXn10eIGqU/l6N0uqJUNx9A3f1lFG4fF+7d4XGrAmQeAPc22cUGAT2uPpmq5X
-         B1naH98n3JajXQA0myhh2rpXhcqK1FWMVteSmGslCc1RCOSyztZJlTir3afByy7l+TpD
-         VAc/VGAhZPRtz0nAWZxKlXH+Uu9R+RTPikbPWHVzVZ/+NimTQVDOW97/pOubb5YkQIH2
-         8oGjms00bVVOd1XLS7MNvPsRX5t4cDDrx8z65xuFkjVxRrwmi3ITutkR/Q+2i+MbAirq
-         if3w==
-X-Forwarded-Encrypted: i=1; AJvYcCVtnjCGju0J5UoAgLxJrbJyXFqTOQm8zROCzaJ0BtDiNOR61YtObXDvi0atU1MyUTfw6GchXkgugmtW+MPXqSfoxC5W0uBC
-X-Gm-Message-State: AOJu0YwNTiBESyoojglEFZP8eDiUSGLePVWvrKdDzqhjOC+lolH5yZtr
-	guePOWrve1mMTp76sGBnqMYHxNLz0ZS1RrEvJpDRWAiKJIX7+WUsHayku/I7Zg4czN+U/1OgGzF
-	YZ4qd36aww4ZSfnoRVsylloBLHUruxMd0ARVHbMxVhjMRoojemcUW2A==
-X-Received: by 2002:adf:f810:0:b0:341:c58e:fba0 with SMTP id s16-20020adff810000000b00341c58efba0mr8694584wrp.4.1712065260602;
-        Tue, 02 Apr 2024 06:41:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFUZ+KFQdz5fyIiIaLpMcW2XZfx+7GjcB6NPAuyTy52H8wcP9rgqSuw4hZOdoAj2+rEnF5MOg==
-X-Received: by 2002:adf:f810:0:b0:341:c58e:fba0 with SMTP id s16-20020adff810000000b00341c58efba0mr8694558wrp.4.1712065260190;
-        Tue, 02 Apr 2024 06:41:00 -0700 (PDT)
-Received: from pstanner-thinkpadt14sgen1.remote.csb (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id p13-20020a5d48cd000000b003432d61d6b7sm14163445wrs.51.2024.04.02.06.40.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 06:40:59 -0700 (PDT)
-Message-ID: <a893d61e125d58d8e6757c5f1a591682f6ca934c.camel@redhat.com>
-Subject: Re: [PATCH 0/2] PCI: Add and use pcim_iomap_region()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>,  Realtek linux nic maintainers
- <nic_swsd@realtek.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, David Miller
- <davem@davemloft.net>
-Cc: "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, 
-	"netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>
-Date: Tue, 02 Apr 2024 15:40:58 +0200
-In-Reply-To: <348fa275-3922-4ad1-944e-0b5d1dd3cff5@gmail.com>
-References: <982b02cb-a095-4131-84a7-24817ac68857@gmail.com>
-	 <4cf0d7710a74095a14bedc68ba73612943683db4.camel@redhat.com>
-	 <348fa275-3922-4ad1-944e-0b5d1dd3cff5@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        bh=E5/Tfr7oT3omjdwQVsb0qbCvSVq7DuG2CimWzMCciK8=;
+        b=G7NubSdAxMcRMEnoPxPNBuk3YYGfz4KGDDNUniHqOCy9P5KFa8KXQ6gX5H0rwxgSwK
+         G1CpCrzPDFIJyNWcYo4CP1aODeLPQbIgOAySyv2/s89tm7b5E6p25HcuqED6STorhuMm
+         eLUaaUFcW55cBidDiGG5gmJhw/id6TRORpcaU+4bAA9i8IMvM5sEn1AJgiQbipfxqycx
+         rDHIz2MJAItN08KEt9CO/4pNZh64GH3FA9K4HYpwKglma4HdiUYd+1THdP+hFY8kSy0S
+         /3nqzo42iGZFS3G3lw5BLSj3y5P0G6J5O1exRln+MGPrgbnVorvrnkP3l/92u0HT57zd
+         4wtw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyKLZWAqWp2JcV0rnn8zwqO9Hlp41w7dFv54D7Y7ImblJp8h5OS3oIy3HBh8Vej2C38r08VrVh0sFeuMjwXqxYzEbzlPg8
+X-Gm-Message-State: AOJu0YwEnfIU/rjpuYfibfoVijzbvmShVYZb5mpeN91Rbdt+TzKEnEDn
+	JUuV8Wy4FV+FONAwcy50AVTmhmxpbL4x/vrqGpcaWQONWSmV9nPoHb6VpfRf9aGFuFLFwIQ01uu
+	t2Ie4TQgYQA==
+X-Google-Smtp-Source: AGHT+IFKEothRvOQHcOYwimWRtFX0X5DplDu/F7VcaXZoVJYN4vUeuWHVTHzGtsRtnsCUZprc3xDJPSTBByR0w==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:a045:0:b0:615:4295:2871 with SMTP id
+ x66-20020a81a045000000b0061542952871mr73462ywg.7.1712065295027; Tue, 02 Apr
+ 2024 06:41:35 -0700 (PDT)
+Date: Tue,  2 Apr 2024 13:41:33 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240402134133.2352776-1-edumazet@google.com>
+Subject: [PATCH net] net/sched: fix lockdep splat in qdisc_tree_reduce_backlog()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2024-03-28 at 18:35 +0100, Heiner Kallweit wrote:
-> On 27.03.2024 14:20, Philipp Stanner wrote:
-> > On Wed, 2024-03-27 at 12:52 +0100, Heiner Kallweit wrote:
-> > > Several drivers use the following sequence for a single BAR:
-> > > rc =3D pcim_iomap_regions(pdev, BIT(bar), name);
-> > > if (rc)
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error;
-> > > addr =3D pcim_iomap_table(pdev)[bar];
-> > >=20
-> > > Let's create a simpler (from implementation and usage
-> > > perspective)
-> > > pcim_iomap_region() for this use case.
-> >=20
-> > I like that idea =E2=80=93 in fact, I liked it so much that I wrote tha=
-t
-> > myself, although it didn't make it vor v6.9 ^^
-> >=20
-> > You can look at the code here [1]
-> >=20
-> > Since my series cleans up the PCI devres API as much as possible,
-> > I'd
-> > argue that prefering it would be better.
-> >=20
-> Thanks for the hint. I'm not in a hurry, so yes: We should refactor
-> the
-> pcim API, and then add functionality.
+qdisc_tree_reduce_backlog() is called with the qdisc lock held,
+not RTNL.
 
-Thx for the feedback so far. See my answers below:
+We must use qdisc_lookup_rcu() instead of qdisc_lookup()
 
->=20
-> > But maybe you could do a review, since you're now also familiar
-> > with
-> > the code?
-> >=20
-> I'm not subscribed to linux-pci, so I missed the cover letter, but
-> had a
-> look at the patches in patchwork. Few remarks:
->=20
-> Instead of first adding a lot of new stuff and then cleaning up, I'd
-> propose to start with some cleanups. E.g. patch 7 could come first,
-> this would already allow to remove member mwi from struct pci_devres.
+syzbot reported:
 
-I guess patches 5, 6, 7 and 8 could come first.
-However, 9 has to be last because it kills the legacy struct pci_devres
-in pci.h and can only do so once the old functions use the new API
-below (patches 1, 2 and 4).
-So one could say patches 5-9 form a row, aiming at blowing up that
-struct, and relying on 1, 2 and 4 to do so.
+WARNING: suspicious RCU usage
+6.1.74-syzkaller #0 Not tainted
+-----------------------------
+net/sched/sch_api.c:305 suspicious rcu_dereference_protected() usage!
 
->=20
-> By the way, in patch 7 it may be a little simpler to have the
-> following
-> sequence:
->=20
-> rc =3D pci_set_mwi()
-> if (rc)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error
-> rc =3D devm_add_action_or_reset(.., __pcim_clear_mwi, ..);
-> if (rc)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error
->=20
-> This would avoid the call to devm_remove_action().
->=20
-> We briefly touched the point whether the proposed new function
-> returns
-> NULL or an ERR_PTR. I find it annoying that often the kernel doc
-> function
-> description doesn't mention whether a function returns NULL or an
-> ERR_PTR
-> in the error case.
+other info that might help us debug this:
 
-All my functions' docstrings do explicitely name the return code. It's
-indeed important to always do that except for super trivial things, I
-agree
+rcu_scheduler_active = 2, debug_locks = 1
+3 locks held by udevd/1142:
+  #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:306 [inline]
+  #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
+  #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: net_tx_action+0x64a/0x970 net/core/dev.c:5282
+  #1: ffff888171861108 (&sch->q.lock){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:350 [inline]
+  #1: ffff888171861108 (&sch->q.lock){+.-.}-{2:2}, at: net_tx_action+0x754/0x970 net/core/dev.c:5297
+  #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:306 [inline]
+  #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
+  #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: qdisc_tree_reduce_backlog+0x84/0x580 net/sched/sch_api.c:792
 
-> So I have to look at the function code. It's also a
-> typical bug source.
-> We won't solve this in general here. But I think we should be in line
-> with what related functions do.
-> The iomap() functions typically return NULL in the error case.
-> Therefore
-> I'd say any new pcim_...iomap...() function should return NULL too.=20
+stack backtrace:
+CPU: 1 PID: 1142 Comm: udevd Not tainted 6.1.74-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+Call Trace:
+ <TASK>
+  [<ffffffff85b85f14>] __dump_stack lib/dump_stack.c:88 [inline]
+  [<ffffffff85b85f14>] dump_stack_lvl+0x1b1/0x28f lib/dump_stack.c:106
+  [<ffffffff85b86007>] dump_stack+0x15/0x1e lib/dump_stack.c:113
+  [<ffffffff81802299>] lockdep_rcu_suspicious+0x1b9/0x260 kernel/locking/lockdep.c:6592
+  [<ffffffff84f0054c>] qdisc_lookup+0xac/0x6f0 net/sched/sch_api.c:305
+  [<ffffffff84f037c3>] qdisc_tree_reduce_backlog+0x243/0x580 net/sched/sch_api.c:811
+  [<ffffffff84f5b78c>] pfifo_tail_enqueue+0x32c/0x4b0 net/sched/sch_fifo.c:51
+  [<ffffffff84fbcf63>] qdisc_enqueue include/net/sch_generic.h:833 [inline]
+  [<ffffffff84fbcf63>] netem_dequeue+0xeb3/0x15d0 net/sched/sch_netem.c:723
+  [<ffffffff84eecab9>] dequeue_skb net/sched/sch_generic.c:292 [inline]
+  [<ffffffff84eecab9>] qdisc_restart net/sched/sch_generic.c:397 [inline]
+  [<ffffffff84eecab9>] __qdisc_run+0x249/0x1e60 net/sched/sch_generic.c:415
+  [<ffffffff84d7aa96>] qdisc_run+0xd6/0x260 include/net/pkt_sched.h:125
+  [<ffffffff84d85d29>] net_tx_action+0x7c9/0x970 net/core/dev.c:5313
+  [<ffffffff85e002bd>] __do_softirq+0x2bd/0x9bd kernel/softirq.c:616
+  [<ffffffff81568bca>] invoke_softirq kernel/softirq.c:447 [inline]
+  [<ffffffff81568bca>] __irq_exit_rcu+0xca/0x230 kernel/softirq.c:700
+  [<ffffffff81568ae9>] irq_exit_rcu+0x9/0x20 kernel/softirq.c:712
+  [<ffffffff85b89f52>] sysvec_apic_timer_interrupt+0x42/0x90 arch/x86/kernel/apic/apic.c:1107
+  [<ffffffff85c00ccb>] asm_sysvec_apic_timer_interrupt+0x1b/0x20 arch/x86/include/asm/idtentry.h:656
 
-Well, the thought behind it was that to be more verbose and precise is
-better than absolute consistency.
+Fixes: d636fc5dd692 ("net: sched: add rcu annotations around qdisc->qdisc_sleeping")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/sched/sch_api.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'd agree that we could go for pure NULL implementations for functions
-that just ioremap(), but the more sophisticated PCI wrappers do several
-things at once:
- * perform sanity (region ranges etc.) checks on user input
- * do region requests
- * iomap
- * do devres specific stuff, including allocations
-
-Especially informing a user specifically about -EBUSY is very valuable
-IMO. It certainly is for our use case (Nvidia graphics cards with
-several 'competing' drivers) where several drivers could try to grab
-the same BAR. A user should get the info "someone is using that thing
-already". With NULL he'd just see "failed loading driver for some
-reason".
-
-So I think the bes thing would be to remain consistent *within* PCI,
-since all PCI users should only ever use PCI functions anyways and not
-ioremap() things manually.
-
-So PCI should be as consistent as possible, I think. pcim_iomap()
-unfortunately has 50 callers.
-The cleanest way would be to port them to a pcim_iomap() that returns
-an ERR_PTR(), but I don't have capacity for that right now.
-
->=20
-> Then you add support for mapping BAR's partially. I never had such a
-> use
-> case. Are there use cases for this?
-
-Yes (I was surprised by that as well). Patch #10's vboxvideo does that
-and mapps a BAR partially.
-
-The function pcim_iomap_region_range() just also takes care of a
-partial region request. It could have been used as an alternative for
-solving patch #10's issues.
-
-
-> Maybe we could omit this for now, if it helps to reduce the
-> complexity
-> of the refactoring.
->=20
-> I also have bisectability in mind, therefore my personal preference
-> would
-> be to make the single patches as small as possible. Not sure whether
-> there's
-> a way to reduce the size of what currently is the first patch of the
-> series.
-
-Well, the implementation is 100% based on common infrastructure that's
-also used by pcim_iomap_region() (that would be enum
-pcim_addr_devres_typ).
-
-One could argue that as long as no one uses the function, it can cause
-trouble =E2=80=93 and once someone uses it there would be a use case.
-I tested the function previously and it behaved as intended.
-
-But, indeed, I'm not sure whether it really hurts to remove or keep it.
-I'm quite indifferent about it.
-
-Regards,
-P.
-
->=20
-> > Greetings,
-> > P.
-> >=20
-> > [1]
-> > https://lore.kernel.org/all/20240301112959.21947-1-pstanner@redhat.com/
-> >=20
-> >=20
-> > >=20
-> > > Note: The check for !pci_resource_len() is included in
-> > > pcim_iomap(), so we don't have to duplicate it.
-> > >=20
-> > > Make r8169 the first user of the new function.
-> > >=20
-> > > I'd prefer to handle this via the PCI tree.
-> > >=20
-> > > Heiner Kallweit (2):
-> > > =C2=A0 PCI: Add pcim_iomap_region
-> > > =C2=A0 r8169: use new function pcim_iomap_region()
-> > >=20
-> > > =C2=A0drivers/net/ethernet/realtek/r8169_main.c |=C2=A0 8 +++----
-> > > =C2=A0drivers/pci/devres.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 | 28
-> > > +++++++++++++++++++++++
-> > > =C2=A0include/linux/pci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 |=C2=A0 2 ++
-> > > =C2=A03 files changed, 33 insertions(+), 5 deletions(-)
-> > >=20
-> >=20
->=20
-> Heiner
->=20
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index 65e05b0c98e461953aa8d98020142f0abe3ad8a7..60239378d43fb7adfe3926f927f3883f09673c16 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -809,7 +809,7 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+ 		notify = !sch->q.qlen && !WARN_ON_ONCE(!n &&
+ 						       !qdisc_is_offloaded);
+ 		/* TODO: perform the search on a per txq basis */
+-		sch = qdisc_lookup(qdisc_dev(sch), TC_H_MAJ(parentid));
++		sch = qdisc_lookup_rcu(qdisc_dev(sch), TC_H_MAJ(parentid));
+ 		if (sch == NULL) {
+ 			WARN_ON_ONCE(parentid != TC_H_ROOT);
+ 			break;
+-- 
+2.44.0.478.gd926399ef9-goog
 
 
