@@ -1,226 +1,184 @@
-Return-Path: <netdev+bounces-83956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C811895149
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:03:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7363E89515B
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:04:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC57FB27A87
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:02:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9314B27D73
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2205D749;
-	Tue,  2 Apr 2024 11:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18614605C6;
+	Tue,  2 Apr 2024 11:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yrf2aKiB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TceTocz4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C1B65BB7;
-	Tue,  2 Apr 2024 11:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712055732; cv=fail; b=u/L0PCWAVML2G8KpPSQqjStTCqw7bdzPOakplwaJdUenhoySJSv8RgkmWWGHjMoGgD2gYYDIWL/ucj0XR91RfQoS8AlTkkqEw/8xHFzi7xStGJ7RD+tvf3pQIMOTbi1lBsdtGJ/Ww3EBh10sYcRp683wRbQdCBXk5Ihs0nrdj8k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712055732; c=relaxed/simple;
-	bh=BiIfw+AaHVEwzLCw0RW8QjCfyoqe1LRd31XbXk2jGAI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CIi0o0CRN2EXQYWO/Q8bMqwCDYIP3s628+MNTDJKx81AJMO/Xa98e9uas5icN/g3wpsHocPtz3VBq1YrmGN0R+Bqow0UrfYKwhf/G3gSNU7EWP765HxGwgYWOaYC4YSrRVHrxsGFGszia8yqNfbTPADwMIIzttX89jGYP0SyJf0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yrf2aKiB; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712055730; x=1743591730;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=BiIfw+AaHVEwzLCw0RW8QjCfyoqe1LRd31XbXk2jGAI=;
-  b=Yrf2aKiB7V54PBdeYbrP/v30vKa2T2uhnOr3lou0SCvLf3S+uOJHikzN
-   LlIj6NLvUdxe/UNvYAYCLKgvK/WiL1bJz8NBVu/5iUH6xpVUrDYvr0vfy
-   YNdLdo5BEQrqDWxf5Xvsvt54R8aY5m4QeXxAxVltrfus7gMKymD+QNQW/
-   6mA0POyzMuBNSEy0qMu5y+F2UOHTokE02OWBJoQutkZ3vFQeyny5lrDOK
-   0fmWuM/PFIEot1n/Y8JVn6Xw7WPExn6ftfrosnWj0Iz1ESpZmh84aEGV+
-   XISJxoG625MsSPxoeiayBKWGxkiI1/GmLnIhLknS7Y09voHtD+Wu2cG5s
-   A==;
-X-CSE-ConnectionGUID: QsyrPwxnTCiy/d8uQowGsA==
-X-CSE-MsgGUID: vtUBko0aR0mDbIO8d9POWA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="7432264"
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="7432264"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 04:02:07 -0700
-X-CSE-ConnectionGUID: jzUWew9eR/OF+sWMyacwfg==
-X-CSE-MsgGUID: E6VCOupIQhinOPjJUh/FwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="22688633"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Apr 2024 04:02:06 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Apr 2024 04:02:05 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 04:02:05 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 2 Apr 2024 04:02:05 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W0G13dSeF5ClyhVNXqpg5zVP5HvF7mjA5XrwHAXAGYvL0qBg9ceHITPvObEHNSdNV3QNyw4+wM4YlGujsgaq1KxKN+rbq4XaHpUobASoQpGnPlp/WAWSaxQRPef6YNVKLqlVSY0ebA2/TKhAqnciCtsNfZdNDCDH5/SI2hPrb/dufp+Qlkv62XK8cEbWoSV9CYFbI0QP/YC/aNkynC4ShFEb/Du9hQzi0S+iJa/K4MqAm6kXA7YUa5GgR7AuoEfvf35K1oGhIaaX7khmJQzhtKG+E0+sFbpRUM+t/n1euNBj2Tkg9xo/ikqXddQq4DitauJSlyLPafO8epC9aMqx7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tlUUHpsfhIPmkhx/LrATLRSF4Ev3D6bhW8TNfIROXK0=;
- b=b1aCnEyQ947+3svgIt/nJIcv6bGMimWxSfuDEGo8U/7DyJPz7ng1TmWmT48lnZHtwB8Gl27Jck1zFUKMRampGfbIJ+K71YqMutjtvCdWDqWST70NUqJ1pbX1JBVMnL15u0tjjXQs80upEMikWRXa+HouecAWsa+2TOPGLtss9Oy2hMXvgva4uBSLl1NRAv2EYRY6f03bG7ncepa3CPFepN3fURIM/o39WZxb/OYwP4LntnS33RX0YMnp0MAK0RjYnbprzVJRm5tkylDR3vfcXTDeJ143iXPHWYUdYshngfGrHFyuB0SwtmanQ1cSZUVDur/36jh6reJxGMc5FazX8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by DM4PR11MB5970.namprd11.prod.outlook.com (2603:10b6:8:5d::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.25; Tue, 2 Apr 2024 11:02:03 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9%6]) with mapi id 15.20.7452.019; Tue, 2 Apr 2024
- 11:02:03 +0000
-Message-ID: <94f7ec98-4219-46cd-ac6c-8177a0bc37ce@intel.com>
-Date: Tue, 2 Apr 2024 13:00:58 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v5 00/21] ice: add PFCP filter
- support
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-CC: Jakub Kicinski <kuba@kernel.org>, Yury Norov <yury.norov@gmail.com>, "Andy
- Shevchenko" <andy@kernel.org>, <linux-s390@vger.kernel.org>,
-	<ntfs3@lists.linux.dev>, Wojciech Drewek <wojciech.drewek@intel.com>, "Ido
- Schimmel" <idosch@nvidia.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	<dm-devel@redhat.com>, <linux-kernel@vger.kernel.org>, Jiri Pirko
-	<jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>, Marcin Szycik
-	<marcin.szycik@linux.intel.com>, Alexander Potapenko <glider@google.com>,
-	Simon Horman <horms@kernel.org>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>, <netdev@vger.kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
-	<linux-btrfs@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>
-References: <20240201122216.2634007-1-aleksander.lobakin@intel.com>
- <c90e7c78-47e9-46d0-a4e5-cb4aca737d11@intel.com>
- <20240207070535.37223e13@kernel.org>
- <4f4f3d68-7978-44c4-a7d3-6446b88a1c8e@intel.com>
- <73c972e5c3889d7e5af24047e6ee8932210b6a63.camel@linux.ibm.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <73c972e5c3889d7e5af24047e6ee8932210b6a63.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI1P293CA0021.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:3::14) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D1664CE9
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 11:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712055842; cv=none; b=U4I5+lGE9ae1EFdQ7AUVMq1ETw22VumJU1UbRo260R7bC9U12Om39kN0cSuDCgEHZp+aoe3UA/E357+bWfgJTGipzqjBQUNJfFJAECkm4VU1d/qaV6+DkEJm5I9hCEJ8aoil08JhSu0Ym4zSGgHVkloKdka0MPb9S6GmkzDc4Mg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712055842; c=relaxed/simple;
+	bh=lE6kl+kfprg6l+685lfC8nwP0KKvlBsCynRbW86bRao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SA6bXdh4iw7fxAbx9Nxq+GihTKFhkTA4rcVkyiW3UMQvdGTcPzGmTShovx8z3F+339gndLYmJ+qQlD4La9NmLPT5akA+YSI5VmYdHFz30m2Vb0q6Lr5rSEPtD4nKVXL9aHB6IneRlrwTrGxj2DEVU7hLWX1yLgy7Zjup+vIQOnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TceTocz4; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a46ba938de0so660703766b.3
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 04:03:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712055838; x=1712660638; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=92plEj3upt88EqVeQpnLDQO6nBTMFEX1DSkUDbyVjFk=;
+        b=TceTocz4ElrBOIl2LXswa7tdyByHJDV/6XxVR+yLsrDU7d+NLSh7vvpi+D4dRWWxMD
+         0AAnrSEpdcdiQpkOqeuy/c395mRtU8n6NPuC3e/xHjKm00EeYNwDGIV5exTHPrzKEqsr
+         ccxIgPTaR7/8xn4SY8tk7Fs8xHJ3lGQClmLhNRv8OfWDQExtyPeN6WwN+vlSNZpTEDMe
+         FCjXf3a1+KhrFAkQAXstYaTUozJOaHdEi3H043KUED8rnpukVVWkZEPVdVLzJvOsTPJc
+         PadIi03Ly9pr58BaQfjjIdI0v9dNzbnnHKlZCUauQ56KBaOk+W7GE9HLJ2+0ctcskrTM
+         DENQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712055838; x=1712660638;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=92plEj3upt88EqVeQpnLDQO6nBTMFEX1DSkUDbyVjFk=;
+        b=hGeJ6dhmhw26H9yx13auyegoHQIVue9ibuW7L0hoTaypa+UuaPUOfgYtzAUqvL52WJ
+         z2TGrr1Vmh9lleJwqvwmHniWwfljfjvA7wsUbcZGJ4zJpZU0ZnjKo/xOLD8Q6MG+w/ba
+         jkKMNbDgy2H5JKTPcTgqlrpQFnQ/7Owjd09bXxqZB+hfT0JDpen6W+lLiTGWR42WRL2f
+         JEII3CmVXzk2a/IsdM0VKwNw1xPJDhcGw8BcBi3b8Sr5qvcDCfHfdazXK4i9OumsU1X0
+         FK/2ISaORphSb1oiaxV7jIuOsOawn9aWB/4MCrbSqCtJI/y3TwsvrNlc8CgTVmOFP9Lx
+         OfIg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3DtUCfXPirK6k3UlrsxIWpTY/Pt2ceeoyt7o7EuNn4ghzvtFxZM3NpWVMzpyDLAWVGdLkm+tnOG48/sViR3gTGgQJyvlk
+X-Gm-Message-State: AOJu0Yw/UE7ZHVbpKu6iJXhVEiYoV+adTpSfHiuLZ0Q6jzqFesudfd8+
+	Zq9KBuSnGbSRaHV+EjFi1XoElqmV5I1zQTjjrIZyDpKvrnak7mWK
+X-Google-Smtp-Source: AGHT+IHk35z6f4EmAV9t/9ST+mwzxvuOxLpM1WR8oVTMw+G4UuZV9S3xqGRtlUb2H7/GRrYNpJEmSA==
+X-Received: by 2002:a17:906:e83:b0:a46:e8dc:5d51 with SMTP id p3-20020a1709060e8300b00a46e8dc5d51mr7665786ejf.25.1712055838146;
+        Tue, 02 Apr 2024 04:03:58 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d700:2000::b2c])
+        by smtp.gmail.com with ESMTPSA id e5-20020a1709061e8500b00a4e07760215sm6377441ejj.69.2024.04.02.04.03.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 04:03:57 -0700 (PDT)
+Date: Tue, 2 Apr 2024 14:03:55 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 6/7] dsa: mv88e6xxx: Create port/netdev LEDs
+Message-ID: <20240402110355.oruwspikc2u56qzh@skbuf>
+References: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-0-221b3fa55f78@lunn.ch>
+ <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-0-221b3fa55f78@lunn.ch>
+ <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-6-221b3fa55f78@lunn.ch>
+ <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-6-221b3fa55f78@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DM4PR11MB5970:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IW0QnOG9h1vbIX+Y8eMKbcmX0SPXVezRQ2P+L0djGwWJAM0IGSuBYbOmPWV033gNAdLD8BLfkgAv+C9g8m0dfunok3HMlFgHz/Aei6CwtwaySyZeMp4FFZeIaq/IrCC1IVkm+CdMAZKu4InodXzrCMwLO5dhOVmWUElurQ8tA1PoSolY4txiLnNea2t3/p/TcZc0KTgrwXDMbm64Henxiu0OLk8PgV1qvE5c62Dfl2FVZ8pWekrZeY9ah51tfMv+fIK7LGQOOC0jR9QoQt3DiSaujiqdX2ZnUh0SIibK5RFPlVNxYyxH6ZF5lJPqvDccTz88Tnd0mKwqN9GNUQ5A2W4QileU8oiWbUfUQw9UGQR/xoR9SF0TTGduC7nfumO6ri1GFbO+dPDexvstoK1xVBzjgqbnxQwORb6/M2s/jhAF11++MvFw6rwQKAoyC7nn7ONYzSClj9hmnv1XPFuTedxypGZ3epzRgoR9AwN/1wuVir5BBy/0PFPFI+uvYZWPzVzSw8kiD/7iUtpC+Rn+M2K38Gq0mHK38fvrUYPMQz6fVXIs1SzcRY9FyOpYd5WeXKrHFWhYQxSHfuyN+JIPkNITBTsYeNu2tbsXb5Zw8SbSwWAZMiHLJHD6pkf0AC6AO/526GSmeL7NTBsa+UJ63GHB72q1Jk0A77KGzFDEjYk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WnlPVWUvWkdEait6bWlWSkdMVzYzSXVaUjdObFpQSEhpUmsrWVZRZnZtVnBz?=
- =?utf-8?B?Z09lenhIdmYvd2pjRnhCclhwWEZjeTgzcmtmMmc5VDV3VFV5NmM5dmFMMWRU?=
- =?utf-8?B?dlYyNysvbnZ5ZTZuU0lzVUdTUzdJd0VMcGNZRWdiYzNydEN4d1hRNUZ0c1NC?=
- =?utf-8?B?eVVVZ3JrUENWcHhRcHR3K0ZoMmtVcklrQWxpbTVGTVBzUXJGWllhREtrZFVR?=
- =?utf-8?B?b3huUjNjNTZjUXBaeDVlNzdpZzc0WXZFM0g1SG01VHQ0MXo3Q1p5b2hTTGNJ?=
- =?utf-8?B?SVcwYkpQcVJpK0FXa3BUK05UVjZhRmpwWUtQRGI0NExyMDdQVFNIbDNBbzFw?=
- =?utf-8?B?VUJDYzc0T1VoY2g5R05wTnpRK0F2SjIyaWtzMFlZSTlhSmVIcUpBQjlJYTNz?=
- =?utf-8?B?MEFzdTlvdmQ1M21lSlUyNzJPVXpXaThRYW9ramFRVDE3NXU1RU4rQnZETm9I?=
- =?utf-8?B?TEgrRjI2T0FmMjIzZlluUjMyRTNDWUQ3SHRHWEJTMnQ0WDV4Nnd1anFVUHla?=
- =?utf-8?B?TGRyMXFDVXhLY3dYb2FNNDFkd0JkRVV6aUFRNjk3OENONEllTG5EYi9rVmhC?=
- =?utf-8?B?V2hQYlM5SkMwNTZhSkx1RWhIT0JaZnlMUTZzUnJ2allMaVkxOFNIc1h6bXNo?=
- =?utf-8?B?dGo0eFFxdCtVSXlhSnM1ajhJbk40dTJQSVRWbFpaNU1SeG1YK0JHT2sxaHU1?=
- =?utf-8?B?NVlJUm5nZ1V1NkFGemJoYlNjajg0cnFTeFNmRUdkOGNoVVFBRlExK3FxQTRW?=
- =?utf-8?B?Z1NMMmpwcWt5aENCSjFwWjQ1a3FEdVlsdVFqc2NpQXZoSG8xblpyUjV6T0F1?=
- =?utf-8?B?ZSs4Y2l5OTlXbHZZdER0Q3VpSC9mdklOR2QxMjdwMDh0UWUzUVNaYThXek5G?=
- =?utf-8?B?RjgzRUJJQzI1OHpYK1V4dG5zMTB4eVZ6SkFsNnY5VlZRdVBpdDNGT0g4b1d2?=
- =?utf-8?B?eGNIUElxc05kK1FQeHdPKy83NXg4WkZJVHZXNmhmazVreWRJUXpJeHMxcWpv?=
- =?utf-8?B?RWJaMVYyanorT1BHcUh2UnhOU1RBU2xTMmJHRHBDc1BXN3hua1FvWWYvaUdQ?=
- =?utf-8?B?cmVaeENOUUJqc2g2MlU1blZwMXFzaXMxVGZ0dUtudU92V3R5bU9rMWZqNFFV?=
- =?utf-8?B?SGN4MWNndHh5RVBaZ3dCa2Z0a0wxaG12V3V2NGpOT0FZV0F2bDk1ekNhVVRT?=
- =?utf-8?B?ODREVWUvai9qWDBJYWlia1IxZUNmRmtlWTg5VDU0Y1lodlBDZzV1ZVh3QitT?=
- =?utf-8?B?akRBeFIwalhRZ0xIYWgrOHNjY1N0UGJuNmxKQnYrd0ttMUxadjJLOTdrMVlp?=
- =?utf-8?B?RElzbnFDczNoTDVrK1QwVFdnREQrMWhla3VORUtkYlhvSHZNMUxiT2pvTllr?=
- =?utf-8?B?NHZQRXcwUncza01pWG50Ky9Kdm41T20yNUxVWHBCa3Foak44MWsyNllDNnUr?=
- =?utf-8?B?NzQzRUM2YnYrb0lmWTJ0Sm55UWhzQWV0dXJjMEdvdDlnU2ptYWxUN0JETDhw?=
- =?utf-8?B?S0Jkd2FMeXJlTWRONllCdnA3dENqREpxWlZIRDkwa3NJVlB5QnZ0VmNEZFBn?=
- =?utf-8?B?Yk42QWZLbmoxbm1HeGVXNTE0SHFHSnVncUlRV211cEJKU3MvYlNHN0Y1MjR3?=
- =?utf-8?B?bVhtUkdtNU1xSGVuaDJmWDc0VzNEMXIrMVh4ek4wd0hpcTVZSXYxYXdnMURR?=
- =?utf-8?B?RkJNZ09DWW9zcjZhR3FKK0M3R3phYVFsRDZNNFNtcDNhOVBjcURMVzJjQUhl?=
- =?utf-8?B?enFQZmZCQ3Z3NlErU1E0NTBjeW43ZlZwZGFZRytTUURPVjM2T3d4Qk9KNGVq?=
- =?utf-8?B?YW1NM3ZRMWgrdlprbCtYSTRUMlBEUU5kQW5ZRlpIcmw5bTJjaTNUYnJURmc0?=
- =?utf-8?B?QUpOaG9obko3Z0FLdWNDVjFPSnkrb0FoSTgzbUhJUHNZNE1ONGJONHBxN3RM?=
- =?utf-8?B?QkFyYklja3Jhbks2UE9SM29Vb3NDSERMRmFMTElqQXlWL1BFS1ovRzFXU0t4?=
- =?utf-8?B?UVNvTjRwUHBLeXFPS1AybzF6eWRkOFFOZHVmUStQVFRySjFRaGVHbWNPL3Yr?=
- =?utf-8?B?cFMyZ2ZJblZVRHUreXhpQjVvTVREUWYrenNHUVFaNHE5aGFjSzJ3WWt1YnIy?=
- =?utf-8?B?emp1Q0dadmVTZlIzQ1pHZjk0eFRPNmhXc1pZT05Cb0pTV21wRzZnTnp3b0w3?=
- =?utf-8?B?dkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1261f33c-39e0-4f5a-1f82-08dc53045404
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 11:02:03.6752
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7sc823f/8TkRu8WOHENfnge3qEbUBgqZDA3A7EX3e1j+gfQp04MndNW4lhq14w3tvznFb5ALa8cuo7N0/u8mYtlEElRL/Q7JiG0a+vejDkQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5970
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-6-221b3fa55f78@lunn.ch>
+ <20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-6-221b3fa55f78@lunn.ch>
 
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-Date: Tue, 02 Apr 2024 12:59:19 +0200
+On Mon, Apr 01, 2024 at 08:35:51AM -0500, Andrew Lunn wrote:
+> @@ -4006,6 +4106,7 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
+>  
+>  static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
+>  {
+> +	struct dsa_port *dp = dsa_to_port(ds, port);
+>  	struct mv88e6xxx_chip *chip = ds->priv;
+>  	int err;
+>  
+> @@ -4016,13 +4117,26 @@ static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
+>  			return err;
+>  	}
+>  
+> -	return mv88e6xxx_setup_devlink_regions_port(ds, port);
+> +	err  = mv88e6xxx_setup_devlink_regions_port(ds, port);
+> +	if (err)
+> +		return err;
+> +
+> +	if (dp->dn) {
+> +		err = netdev_leds_setup(dp->user, dp->dn, &chip->leds,
+> +					&mv88e6xxx_netdev_leds_ops, 2);
 
-> On Mon, 2024-02-12 at 12:35 +0100, Alexander Lobakin wrote:
->> From: Jakub Kicinski <kuba@kernel.org>
->> Date: Wed, 7 Feb 2024 07:05:35 -0800
->>
->>> On Tue, 6 Feb 2024 13:46:44 +0100 Alexander Lobakin wrote:
->>>>> Add support for creating PFCP filters in switchdev mode. Add pfcp module
->>>>> that allows to create a PFCP-type netdev. The netdev then can be passed to
->>>>> tc when creating a filter to indicate that PFCP filter should be created.  
->>>>
->>>> I believe folks agreed that bitmap_{read,write}() should stay inline,
->>>> ping then?
->>>
->>> Well, Dave dropped this from PW, again. Can you ping people to give you
->>
->> Why was it dropped? :D
->>
->>> the acks and repost? What's your plan?
->>
->> Ufff, I thought people read their emails...
->>
->> Yury, Konstantin, s390 folks? Could you please give some missing acks? I
->> don't want to ping everyone privately :z
->>
->> Thanks,
->> Olek
->>
+This (dereferencing dp->user regardless of dp->type) is a dangerous
+thing to do. Let alone the fact that dp->user is NULL for DSA ports. It
+is actually in a union with struct net_device *conduit, for CPU ports.
+So you're also setting up LEDs for the conduit interface here...
+
+Please make it conditional on dsa_port_is_user(), and same for teardown.
+
+> +		if (err)
+> +			mv88e6xxx_teardown_devlink_regions_port(ds, port);
+> +	}
+> +	return err;
+>  }
+>  
+>  static void mv88e6xxx_port_teardown(struct dsa_switch *ds, int port)
+>  {
+> +	struct dsa_port *dp = dsa_to_port(ds, port);
+>  	struct mv88e6xxx_chip *chip = ds->priv;
+>  
+> +	netdev_leds_teardown(&chip->leds, dp->user);
+> +
+>  	mv88e6xxx_teardown_devlink_regions_port(ds, port);
+>  
+>  	if (chip->info->ops->pcs_ops &&
+> @@ -6397,6 +6511,7 @@ static struct mv88e6xxx_chip *mv88e6xxx_alloc_chip(struct device *dev)
+>  	INIT_LIST_HEAD(&chip->mdios);
+>  	idr_init(&chip->policies);
+>  	INIT_LIST_HEAD(&chip->msts);
+> +	INIT_LIST_HEAD(&chip->leds);
+>  
+>  	return chip;
+>  }
+> diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+> index 64f8bde68ccf..b70e74203b31 100644
+> --- a/drivers/net/dsa/mv88e6xxx/chip.h
+> +++ b/drivers/net/dsa/mv88e6xxx/chip.h
+> @@ -432,6 +432,9 @@ struct mv88e6xxx_chip {
+>  
+>  	/* Bridge MST to SID mappings */
+>  	struct list_head msts;
+> +
+> +	/* LEDs associated to the ports */
+> +	struct list_head leds;
+>  };
+>  
+>  struct mv88e6xxx_bus_ops {
+> @@ -668,6 +671,15 @@ struct mv88e6xxx_ops {
+>  	int (*led_blink_set)(struct mv88e6xxx_chip *chip, int port, u8 led,
+>  			     unsigned long *delay_on,
+>  			     unsigned long *delay_off);
+> +	int (*led_hw_control_is_supported)(struct mv88e6xxx_chip *chip,
+> +					   int port, u8 led,
+> +					   unsigned long flags);
+> +	int (*led_hw_control_set)(struct mv88e6xxx_chip *chip,
+> +				  int port, u8 led,
+> +				  unsigned long flags);
+> +	int (*led_hw_control_get)(struct mv88e6xxx_chip *chip,
+> +				  int port, u8 led,
+> +				  unsigned long *flags);
+>  };
+>  
+>  struct mv88e6xxx_irq_ops {
 > 
-> I do see an Acked-by from Peter Oberparleiter for the s390/cio bit, so
-> as far as I can tell the s390 part has all Acks necessary, no?
-
-The series was already taken to net-next :D
-
+> -- 
+> 2.43.0
 > 
-> Thanks,
-> Niklas
 
-Thanks,
-Olek
 
