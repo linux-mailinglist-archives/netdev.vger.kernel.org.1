@@ -1,76 +1,97 @@
-Return-Path: <netdev+bounces-84118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D51895A63
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 19:08:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A385A895A6B
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 19:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C52A1282555
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 17:08:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 404351F217EE
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 17:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61D7159910;
-	Tue,  2 Apr 2024 17:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6330159905;
+	Tue,  2 Apr 2024 17:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p562LXWq"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="SZK7JqIY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD9E15990A;
-	Tue,  2 Apr 2024 17:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DCF132C38;
+	Tue,  2 Apr 2024 17:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712077648; cv=none; b=TkxrRaxPlk1cmi9/qH8WaHYhf5USmAvIxFO+oCODTRxTyXI8zu4Y7895h7Npyl5zTiMD/tBW7NWJuf80kvh9/PLkfEDtQ9ZEC8/vgqcZvs0F9iSoLb0peKtH5qPF7sQokhfypA9gLILtWSkGTGkWoD2iDTd59JBXFjxqDiUweO8=
+	t=1712077825; cv=none; b=oSPygG61mUXoQARU8YHLTtCuMHKku+yScE6hbD7n8xJAPCzHCrEynkpJasGOJwpflZuaVB9OFkB0MsDMv8cw4cCKWShdMpNdfdnRySus6TdAyJwg1Grnwhq1LBaaEUOoMNmQyVB8s3ZLndEXMcaF+hvmkdpt+I/Y+n0aRwe8eoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712077648; c=relaxed/simple;
-	bh=N2mTXtynJzd6hDyCQblGT1NKDEqb1Nqa7bobWw39oGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gdLtAKfsl/2qEei/yn+U8vtT4RfeXwmwSR3PsSRf0kRXx3uGeDuFjWNAi+vhKoV6eEQlQ3gzSvmgMZ3vRh9eTmjGiq2o3T+dutEiogkSx2KcIJAJE6Y4f1INQ1NeM0j5wXVB+7DaS4C0fx1/aveDhlyIvJmNKMNp4fiV+dhWNSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p562LXWq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED93C433F1;
-	Tue,  2 Apr 2024 17:07:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712077648;
-	bh=N2mTXtynJzd6hDyCQblGT1NKDEqb1Nqa7bobWw39oGo=;
+	s=arc-20240116; t=1712077825; c=relaxed/simple;
+	bh=HF/7wros3imLgQh1dI6bjYbQnodA/QtlZyCB0sW0qgA=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=nvGfTTbJX9Lotd8NsW3yZJqh5IqUYtk9pwzWp5V+yd4FvBLM++iEP8m++9qV+UzBxMFNb/xulOUWsFAD1g0SkC2DS7x35cZJUE6wHO7UJau6RDR8ht6KfDXNmu/QgibsJyV4PcZQmk97H/dSWZ+jXQFy66K7jfptw+BRWWX0R0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=SZK7JqIY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49E26C433C7;
+	Tue,  2 Apr 2024 17:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1712077824;
+	bh=HF/7wros3imLgQh1dI6bjYbQnodA/QtlZyCB0sW0qgA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p562LXWqGCwJ52oQOOMED/b2EvAEZDHuuAQR0R1sLV5mK2tKhQNjyLsKpPCKCXqFy
-	 fkyVgMYpyrBCp0ipdutnv3f7ky5N5sNmPRti00JuZpjEDqn/rYnHeqSPaeoMCjZphi
-	 4pCyW5KKF6wmR2+68I8TdjSPxz7oYrKT67mv/LQ1wnTl86UWDLzbTIJUgygAkSxkHv
-	 ZQ7f+RQv3eTZzDYtDlZZqFUaap6biCPIfGCg9/MeHx5wITgtUaRKzacRhwYjzORMj5
-	 f1vZPh3rSEyWE1gtW0LPQMg/pUmnk67xMugToHOHB5t8nh+T4f3XFZTymhOJtlTU97
-	 ZJugRBCdGz3pw==
-Date: Tue, 2 Apr 2024 10:07:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: <Arun.Ramadoss@microchip.com>
-Cc: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
- <Woojung.Huh@microchip.com>, <pabeni@redhat.com>,
- <o.rempel@pengutronix.de>, <edumazet@google.com>, <f.fainelli@gmail.com>,
- <kernel@pengutronix.de>, <san@skov.dk>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next v1 4/8] net: dsa: microchip: ksz8: Refactor
- ksz8_r_dyn_mac_table() for readability
-Message-ID: <20240402100726.0516e762@kernel.org>
-In-Reply-To: <e559c5c81e90039f17b555b66c5b3837d410c489.camel@microchip.com>
-References: <20240402131339.1525330-1-o.rempel@pengutronix.de>
-	<20240402131339.1525330-5-o.rempel@pengutronix.de>
-	<e559c5c81e90039f17b555b66c5b3837d410c489.camel@microchip.com>
+	b=SZK7JqIY4+EnQ8cqKq3vtIyq4RVVkQj77PcnyPW4AJ0+1nbGD+dj2SIwpyVLycUsS
+	 +JRFJLVwCpJcA+zybd/6s/BFuyfhZog57mZR6CSJYuBNxd3d/3KdcMh7b8DghjHRuD
+	 oez+HfA0aq+TRD0f3LpXnnoNvVjd1YwXGPhIVTO8=
+Date: Tue, 2 Apr 2024 10:10:23 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Mike Rapoport <rppt@linux.ibm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, xingwei lee
+ <xrivendell7@gmail.com>, davem@davemloft.net, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ samsun1006219@gmail.com, Linus Torvalds <torvalds@linux-foundation.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+Subject: Re: BUG: unable to handle kernel paging request in
+ crypto_sha3_update
+Message-Id: <20240402101023.aea0f8ed981903077dcd9e6b@linux-foundation.org>
+In-Reply-To: <ZgwfoSj7GqFiOOsc@linux.ibm.com>
+References: <CABOYnLzjayx369ygmr0PsGYGeRpnBnaH1XPqfbispL5nAeOJ9w@mail.gmail.com>
+	<ZgvDe6fdJzgb8aZZ@gondor.apana.org.au>
+	<ZgwfoSj7GqFiOOsc@linux.ibm.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 2 Apr 2024 15:44:30 +0000 Arun.Ramadoss@microchip.com wrote:
-> >         int rc;  
-> 
-> If rc is initialized with 0, we don't need to assign rc = 0 in the
-> success path.
+On Tue, 2 Apr 2024 18:09:21 +0300 Mike Rapoport <rppt@linux.ibm.com> wrote:
 
-Not so sure -- it's easier for the compiler to catch uninitialized
-variables than "accidentally stale" values.
+> On Tue, Apr 02, 2024 at 04:36:11PM +0800, Herbert Xu wrote:
+> > On Wed, Mar 20, 2024 at 10:57:53AM +0800, xingwei lee wrote:
+> > >
+> > >   syscall(__NR_bind, /*fd=*/r[0], /*addr=*/0x20000000ul, /*addrlen=*/0x58ul);
+> > >   res = syscall(__NR_accept, /*fd=*/r[0], /*peer=*/0ul, /*peerlen=*/0ul);
+> > >   if (res != -1)
+> > >     r[1] = res;
+> > >   res = syscall(__NR_memfd_secret, /*flags=*/0ul);
+> > >   if (res != -1)
+> > >     r[2] = res;
+> > 
+> > So this is the key to the issue.  The whole point of memfd_secret is
+> > to make the pages inaccessible to the kernel.  The issue is those
+> > pages are then gifted to the kernel through sendmsg.  Somewhere
+> > along the line someone is supposed to throw up an error about this,
+> > or map the pages properly.  I guess neither happened which is why
+> > we end up with a page fault.
+> 
+> Yeah, there was a bug in folio_is_secretmem() that should have throw an
+> error about this.
+> 
+> David Hildenbrand sent a fix, it's in Andrew's tree
+> 
+> https://lore.kernel.org/all/20240326143210.291116-1-david@redhat.com
+
+I'll send "mm/secretmem: fix GUP-fast succeeding on secretmem folios"
+upstream this week.
+
 
