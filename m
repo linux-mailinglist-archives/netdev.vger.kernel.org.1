@@ -1,133 +1,102 @@
-Return-Path: <netdev+bounces-83901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3DB6894BC2
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 08:48:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D914C894BE1
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 08:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47601B224CC
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:48:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78234B210E5
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:54:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB642BD00;
-	Tue,  2 Apr 2024 06:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7DE2C18D;
+	Tue,  2 Apr 2024 06:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="CYEdOCNC"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="OimO5uzb"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAFC1D6AA
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 06:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC842C689
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 06:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712040512; cv=none; b=GuryefxyoPiNpRrUGSWXbd3oO9hvUsviSwBeFOj2P2wtc+GEV+cbMBsXL3ovx5PjGHsn/sD1EfHmdkCnfa1Z2BNPtG0Tm3emNOLU3DErOFZtu9Ziyx4V9+eS0BG7QDp5Rnz8uwdqZrUczMvptY0WzoFUqqKWwFNhziFi87tmFGU=
+	t=1712040839; cv=none; b=B36uCifxjsr4z79DosIG+166+LlIaGz6M2CQMad7FGXk+68MY0c02Lmbc2r354v0X26v4XNY6GcHK4/qfnIEgWwrMuuTB3ELvjNk/sdZuqko3BdewLotYuO6Yur8BRYledZUdQadeNSkOCXMmQDPG72BwywTTpTUQTaCKPfIawE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712040512; c=relaxed/simple;
-	bh=BLYZIYrI3eP9TkCtA5Q+0oc9w6kwxCFrP22vfC4tzxg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tJ17JwIUJKzoDyQyr+8xLuUKOIqJhhYIRC+qGa/BCjn4bvfcMZJL0stum2Ek4FygovBm0YO4ncGuGgPs7djIBybywcxh+kxb7L4r4E1OLEOWMvZi3YteuVJroz/HX+mx4B5QcgmtQn8yQmSWK3ybSzNuZXGZI/SilDo9lzUfayI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=CYEdOCNC; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=eToL6K57tsD3Qp3xjDv4huV4667uj1xTWdGaNrEayy4=; b=CYEdOCNCa05eWtA4vN53d/X+D4
-	PD+tV/LN3PMFUqcsQIvif8pTTal9sfHDqrNQn/rFpkfILl8sZ5m112eRAEh/hfh6nFAwc/iZWZ45j
-	SUaXDaaR1u2MEZz1a/xU9lSEX5B561ATtoSwDsEJJHGeDkV+8FDCjb9xlnAsq8QFwaaxS7Ddnr7Sz
-	zTCoy1L8nParCyur6U97LWHcG+nfVlyRQRfLt7HU31IulzwSFAaJKSdlWTZ0QzK8Zqbhn0LPh+AzK
-	63q9w50z9MaDDcup9YfwOM78Fth7RZqG3CO+mEn3Ti4pyodJeBg2kw+SlCx/nzqkkQ9Oesl1vcJRO
-	5L3aZVAw==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <esben@geanix.com>)
-	id 1rrXwP-0002j0-HW; Tue, 02 Apr 2024 08:48:17 +0200
-Received: from [185.17.218.86] (helo=localhost)
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <esben@geanix.com>)
-	id 1rrXwP-00EbSs-00;
-	Tue, 02 Apr 2024 08:48:17 +0200
-From: Esben Haabendal <esben@geanix.com>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  Sergey
- Ryazanov <ryazanov.s.a@gmail.com>,  Paolo Abeni <pabeni@redhat.com>,  Eric
- Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 05/22] ovpn: implement interface
- creation/destruction via netlink
-In-Reply-To: <57a773fc-dc1e-4f8b-b60b-13582e6d057c@openvpn.net> (Antonio
-	Quartulli's message of "Tue, 26 Mar 2024 22:44:01 +0100")
-References: <20240304150914.11444-1-antonio@openvpn.net>
-	<20240304150914.11444-6-antonio@openvpn.net>
-	<871q7yz77t.fsf@geanix.com>
-	<57a773fc-dc1e-4f8b-b60b-13582e6d057c@openvpn.net>
-Date: Tue, 02 Apr 2024 08:48:16 +0200
-Message-ID: <871q7ogszz.fsf@geanix.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1712040839; c=relaxed/simple;
+	bh=I6xkTTHDQobcfuQ7jSo+03xbCMBsOZWR3ABxB+JP87k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DAe7NQPllQfIf84v0wbzgovsFt5jv5LNQJ7b5E1+nqhxiGvN0PXBJk6p562d3u+tEgP+9yH55+rVRFrwUWmNq17SDuHDZhusakiHt2Q2bZwx4yAXpmsVB0+vr1kxSfm3c2IZkieRXX85hxs2ZYoHyGfXnw4WthVRQUmyw4JL2wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=OimO5uzb; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41564adfd5dso10196525e9.1
+        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 23:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1712040836; x=1712645636; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/mlo4k5ykNOdwOWWAIw74MKJh++DOS5Cjw1XaL53BFs=;
+        b=OimO5uzbFrjRjPsAsIDFgjvsujVQPoDkz/F4cGzOCf2uM9f0DkVxdZOoJZZI0Z1+DM
+         Qsess/J9PtZrKrDgHKVFkZ4FxKoJog9teRTkNbrSQ4L6zh/qCLXeK5opuLvk1er2aYDh
+         r0aoxCIqwB+u6Y+Ggks5doqnTlkzhRqrtiwazskmFi3JChDA3g7WoyKwHZ4PZR0oOCG8
+         wa72jtimqy9SSuNABVJReI2BG3zGJ8ZaCU7jKpTY+g6bk9Jj9Vzov7HhhAee7MzxLVXM
+         kuj3ctLlm0E07HlBmRO51ftvcvITPHMllIV+lqSvUUa5hd3anM5QFCvaem4LGPvXMX5Z
+         WH5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712040836; x=1712645636;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/mlo4k5ykNOdwOWWAIw74MKJh++DOS5Cjw1XaL53BFs=;
+        b=D6I0dJOQV98kFlUWS3ML1F5hFEsckLJg0lI7DZTTweSOH8HjMe6JZU/byM7Q7HlFnk
+         G7yb5Pkl/5MS4MjdTjteSZ+yrXQEWmpmGuE3lp93AuqUESzecCWvb96kbDzBgzrqijHw
+         RSGNXaxBvWB2FmOTqmihjEp3rFM3X2HfkPoWeCF/vyL0cg3Nctd8HT8IKRRyL3Ka2qon
+         sNSUVqtDuBKvQrsVObAl8Ph94sMwwkYQgQoiFN+r+zIUmlOZ03HQ7NO/Uqm2qHwplKBS
+         4kj7GOI9F4CN12WWpZ7DfWmUkb35bVgABIxrxD0owi/T0IPB/InYmqkx0s5E27lyaX9R
+         ewfQ==
+X-Gm-Message-State: AOJu0Yyf9ri4WQ1GF1xFabEk9K/RVyUuAaLcYON4pNZ5Fdij0IyuPiTR
+	efaSqctAvXogiwhWrgGLMGrQ/APGMHrKSgGzWDrEyCDUZgH0MLE4Mk/Wrd7gbwI=
+X-Google-Smtp-Source: AGHT+IGdi8gVIOnB+pOObvx+i7VDoG9HrUnHHAHu40TwteeYgn7Kpl/RFmUGcRpKP0RjWYg1xTQDig==
+X-Received: by 2002:a05:600c:154b:b0:414:cd1:e46d with SMTP id f11-20020a05600c154b00b004140cd1e46dmr8184396wmg.23.1712040836000;
+        Mon, 01 Apr 2024 23:53:56 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:8e1e:60a:a44e:113e? ([2a01:e0a:b41:c160:8e1e:60a:a44e:113e])
+        by smtp.gmail.com with ESMTPSA id fm12-20020a05600c0c0c00b004156a55592fsm4015958wmb.6.2024.04.01.23.53.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Apr 2024 23:53:55 -0700 (PDT)
+Message-ID: <241c5948-5912-4a6f-b76e-48ed87a2ea81@6wind.com>
+Date: Tue, 2 Apr 2024 08:53:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Authenticated-Sender: esben@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27232/Mon Apr  1 10:23:51 2024)
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] tools: ynl: add ynl_dump_empty() helper
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ sdf@google.com
+References: <20240329181651.319326-1-kuba@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <20240329181651.319326-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Antonio Quartulli <antonio@openvpn.net> writes:
+Le 29/03/2024 à 19:16, Jakub Kicinski a écrit :
+> Checking if dump is empty requires a couple of casts.
+> Add a convenient wrapper.
+> 
+> Add an example use in the netdev sample, loopback is always
+> present so an empty dump is an error.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> On 25/03/2024 16:01, Esben Haabendal wrote:
->> Antonio Quartulli <antonio@openvpn.net> writes:
->> 
->>> Allow userspace to create and destroy an interface using netlink
->>> commands.
->>>
->>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
->>> ---
->>>   drivers/net/ovpn/netlink.c | 50 ++++++++++++++++++++++++++++++++++++++
->>>   1 file changed, 50 insertions(+)
->>>
->>> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
->>> index 2e855ce145e7..02b41034f615 100644
->>> --- a/drivers/net/ovpn/netlink.c
->>> +++ b/drivers/net/ovpn/netlink.c
->>> @@ -154,7 +154,57 @@ static void ovpn_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb
->>>   		dev_put(ovpn->dev);
->>>   }
->>>   +static int ovpn_nl_new_iface(struct sk_buff *skb, struct genl_info *info)
->>> +{
->>> +	enum ovpn_mode mode = OVPN_MODE_P2P;
->>> +	struct net_device *dev;
->>> +	char *ifname;
->>> +	int ret;
->>> +
->>> +	if (!info->attrs[OVPN_A_IFNAME])
->>> +		return -EINVAL;
->>> +
->>> +	ifname = nla_data(info->attrs[OVPN_A_IFNAME]);
->>> +
->>> +	if (info->attrs[OVPN_A_MODE]) {
->>> +		mode = nla_get_u8(info->attrs[OVPN_A_MODE]);
->>> +		netdev_dbg(dev, "%s: setting device (%s) mode: %u\n", __func__, ifname,
->>> +			   mode);
->> Maybe print out the message even if the default mode is used, as the
->> mode is applied in ovpn_iface_create anyways.
->
-> Being this a debug message, my reasoning was "let's print what we got via
-> netlink" (if nothing is printed, we know we are applying the default).
->
-> Otherwise, when printing "P2P" we wouldn't be able to understand if it was set
-> by default or received via netlink.
->
-> Does it make sense?
-
-Yes, reasoning is sane. And the prefixing with __func__ should help
-making it clear.
-
-/Esben
+Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
