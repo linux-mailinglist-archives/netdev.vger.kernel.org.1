@@ -1,104 +1,133 @@
-Return-Path: <netdev+bounces-83900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D466F894B86
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 08:36:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3DB6894BC2
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 08:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 617D5B21515
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:36:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47601B224CC
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266A42556F;
-	Tue,  2 Apr 2024 06:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB642BD00;
+	Tue,  2 Apr 2024 06:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="CYEdOCNC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EB4249E4
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 06:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAFC1D6AA
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 06:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712039788; cv=none; b=lo/lx0WMc58XpKkL+Nw+WR1mQTttzLjA9iXNkb8eaaHhKXTX8qYrnyTF4epctFpF6dMo3ZuxrHtMR+rJwISxtrvcPiaDkGinqW/g+p10LvVR2DI0r5drgrG+ELnCT/wAHIV2eSJvt0Ut7PHXtveBFxJKOi42Bydz3dcDQA+dcic=
+	t=1712040512; cv=none; b=GuryefxyoPiNpRrUGSWXbd3oO9hvUsviSwBeFOj2P2wtc+GEV+cbMBsXL3ovx5PjGHsn/sD1EfHmdkCnfa1Z2BNPtG0Tm3emNOLU3DErOFZtu9Ziyx4V9+eS0BG7QDp5Rnz8uwdqZrUczMvptY0WzoFUqqKWwFNhziFi87tmFGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712039788; c=relaxed/simple;
-	bh=UpNhgPX5pJk/ucZAJ9d2nkFuwOYtfcnkbRYGSoOgZQw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Mwj4yJDUcodzZafmyzHP2qQeJ67Vefq0X+jtVysZLidBaaLGQ5RW+ZcGQMA2AuTZ1ZxClT/E/9jAH695MCzIIZLQ2epXda52fOVe9PHs4MYq4D01ZgnlNKwXP5sycTRIq2IDfGi7ykLmm3YPRpDz9lbq47f7ZV2N89wqxngXeOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7cbf1d5d35bso516607539f.0
-        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 23:36:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712039786; x=1712644586;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lGgcl9N6u4wFnOxqWzVNRb0CjVaO5JkGiuxXchA0GQk=;
-        b=HrgioRsBUk+Qk4I32Dg5fdtUfwZ4c/r9OjP17oX836wxF4d7nuqjRN/JBy7lJbKYUc
-         3VCa8BhpMEjurZN5Jgd2ZHhTiKkqH2tLDHsQMJElZYSXbqJqq9aRHAskfVNEgSzwNWp3
-         QlGBiCQ7a5Rgq9ofR0zTxisa5lho05lzIkAneqJdCENmNQLUPeO+eCJVQvgJanyViiZP
-         9N3u2x8edzbjLNC7KAfGCaOcL9G92xlmCWdFjYNNO4Z9dr5z+NFmjzxvLdRpkfMPXU9z
-         qPUEigduz7Z9TczjrlM8iHpZRXsfYjNNS84HuvChWh9H6ym4NALLW8ZNE/62MYSx3UCb
-         DmvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJIMPNEMa8OKO/nhWAkAfjSaLt6uDq1RudQp8667bhb7oMOYQxmIbTK3+h+1XM/1yXd19SrQzl+BcipwIB+fDq5H7Gi1yo
-X-Gm-Message-State: AOJu0Ywt1xEqpDBDLty5i7qIvPRI9iYT/FSMXx8KZxnXRHHV3PwSOMwB
-	t4tJjCwcSAn6ehhX/pkBq6fmC6IX7i0SwQ/uogkuyIEuZx20T3up6TLrDEhK3CtuyZjdb6ThkYB
-	n4uKQMVK5h5Y9Z7lvzegtSi/suisEGxQcgrXhKXAQRsDGw5AmDcp/pmA=
-X-Google-Smtp-Source: AGHT+IEYEj6d0xT19iBjCW1jFVxSMYZmKm6iRawu+ptTIk8DytC+tb2aDqS3iXamWTGcIVzecHQ6ajlR7ZhU3e8ZqeewW08gnmN3
+	s=arc-20240116; t=1712040512; c=relaxed/simple;
+	bh=BLYZIYrI3eP9TkCtA5Q+0oc9w6kwxCFrP22vfC4tzxg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tJ17JwIUJKzoDyQyr+8xLuUKOIqJhhYIRC+qGa/BCjn4bvfcMZJL0stum2Ek4FygovBm0YO4ncGuGgPs7djIBybywcxh+kxb7L4r4E1OLEOWMvZi3YteuVJroz/HX+mx4B5QcgmtQn8yQmSWK3ybSzNuZXGZI/SilDo9lzUfayI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=CYEdOCNC; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=eToL6K57tsD3Qp3xjDv4huV4667uj1xTWdGaNrEayy4=; b=CYEdOCNCa05eWtA4vN53d/X+D4
+	PD+tV/LN3PMFUqcsQIvif8pTTal9sfHDqrNQn/rFpkfILl8sZ5m112eRAEh/hfh6nFAwc/iZWZ45j
+	SUaXDaaR1u2MEZz1a/xU9lSEX5B561ATtoSwDsEJJHGeDkV+8FDCjb9xlnAsq8QFwaaxS7Ddnr7Sz
+	zTCoy1L8nParCyur6U97LWHcG+nfVlyRQRfLt7HU31IulzwSFAaJKSdlWTZ0QzK8Zqbhn0LPh+AzK
+	63q9w50z9MaDDcup9YfwOM78Fth7RZqG3CO+mEn3Ti4pyodJeBg2kw+SlCx/nzqkkQ9Oesl1vcJRO
+	5L3aZVAw==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1rrXwP-0002j0-HW; Tue, 02 Apr 2024 08:48:17 +0200
+Received: from [185.17.218.86] (helo=localhost)
+	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <esben@geanix.com>)
+	id 1rrXwP-00EbSs-00;
+	Tue, 02 Apr 2024 08:48:17 +0200
+From: Esben Haabendal <esben@geanix.com>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  Sergey
+ Ryazanov <ryazanov.s.a@gmail.com>,  Paolo Abeni <pabeni@redhat.com>,  Eric
+ Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 05/22] ovpn: implement interface
+ creation/destruction via netlink
+In-Reply-To: <57a773fc-dc1e-4f8b-b60b-13582e6d057c@openvpn.net> (Antonio
+	Quartulli's message of "Tue, 26 Mar 2024 22:44:01 +0100")
+References: <20240304150914.11444-1-antonio@openvpn.net>
+	<20240304150914.11444-6-antonio@openvpn.net>
+	<871q7yz77t.fsf@geanix.com>
+	<57a773fc-dc1e-4f8b-b60b-13582e6d057c@openvpn.net>
+Date: Tue, 02 Apr 2024 08:48:16 +0200
+Message-ID: <871q7ogszz.fsf@geanix.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2b07:b0:47e:c09b:69e with SMTP id
- fm7-20020a0566382b0700b0047ec09b069emr472329jab.0.1712039785822; Mon, 01 Apr
- 2024 23:36:25 -0700 (PDT)
-Date: Mon, 01 Apr 2024 23:36:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000468fff06151753a0@google.com>
-Subject: [syzbot] bpf-next build error (6)
-From: syzbot <syzbot+1f0620b0141e43a84282@syzkaller.appspotmail.com>
-To: ast@kernel.org, daniel@iogearbox.net, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27232/Mon Apr  1 10:23:51 2024)
 
-Hello,
+Antonio Quartulli <antonio@openvpn.net> writes:
 
-syzbot found the following issue on:
+> On 25/03/2024 16:01, Esben Haabendal wrote:
+>> Antonio Quartulli <antonio@openvpn.net> writes:
+>> 
+>>> Allow userspace to create and destroy an interface using netlink
+>>> commands.
+>>>
+>>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+>>> ---
+>>>   drivers/net/ovpn/netlink.c | 50 ++++++++++++++++++++++++++++++++++++++
+>>>   1 file changed, 50 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
+>>> index 2e855ce145e7..02b41034f615 100644
+>>> --- a/drivers/net/ovpn/netlink.c
+>>> +++ b/drivers/net/ovpn/netlink.c
+>>> @@ -154,7 +154,57 @@ static void ovpn_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb
+>>>   		dev_put(ovpn->dev);
+>>>   }
+>>>   +static int ovpn_nl_new_iface(struct sk_buff *skb, struct genl_info *info)
+>>> +{
+>>> +	enum ovpn_mode mode = OVPN_MODE_P2P;
+>>> +	struct net_device *dev;
+>>> +	char *ifname;
+>>> +	int ret;
+>>> +
+>>> +	if (!info->attrs[OVPN_A_IFNAME])
+>>> +		return -EINVAL;
+>>> +
+>>> +	ifname = nla_data(info->attrs[OVPN_A_IFNAME]);
+>>> +
+>>> +	if (info->attrs[OVPN_A_MODE]) {
+>>> +		mode = nla_get_u8(info->attrs[OVPN_A_MODE]);
+>>> +		netdev_dbg(dev, "%s: setting device (%s) mode: %u\n", __func__, ifname,
+>>> +			   mode);
+>> Maybe print out the message even if the default mode is used, as the
+>> mode is applied in ovpn_iface_create anyways.
+>
+> Being this a debug message, my reasoning was "let's print what we got via
+> netlink" (if nothing is printed, we know we are applying the default).
+>
+> Otherwise, when printing "P2P" we wouldn't be able to understand if it was set
+> by default or received via netlink.
+>
+> Does it make sense?
 
-HEAD commit:    e478cf26c556 Merge branch 'bpf-fix-a-couple-of-test-failur..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=168bc92d180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7b667bc37450fdcd
-dashboard link: https://syzkaller.appspot.com/bug?extid=1f0620b0141e43a84282
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Yes, reasoning is sane. And the prefixing with __func__ should help
+making it clear.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1f0620b0141e43a84282@syzkaller.appspotmail.com
-
-failed to run ["make" "-j" "64" "ARCH=x86_64" "CC=clang" "bzImage"]: exit status 2
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+/Esben
 
