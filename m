@@ -1,170 +1,125 @@
-Return-Path: <netdev+bounces-84128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79D51895AD4
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 19:39:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD0FC895AF2
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 19:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAD731C21D94
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 17:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 742A41C22301
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 17:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6086915A4BD;
-	Tue,  2 Apr 2024 17:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C504C15AAA7;
+	Tue,  2 Apr 2024 17:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tKVKUlw1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeKkoUAh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3437F17582;
-	Tue,  2 Apr 2024 17:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F570157E74;
+	Tue,  2 Apr 2024 17:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712079546; cv=none; b=kjAHJucMepUq61tjI1ZqWsKfhv3BMre2Ju3HxlbQt1GjvbKb7ddzuYhCrXGHfa/I4V3XOfneo5qL5ZG4aRLV2vxRlgMq8y304xU8CdsHQSw3+HnB1M2CdpWsYRTPmHx4hPr2Y6iteDR1/q8yQlBZv/bOuAa2Bc+5OgNn+daT5KI=
+	t=1712079836; cv=none; b=m6yifVd15DH5voW1Y2YzIJNOIRe2w7XQruyKwfCQZ21k3Wu1ykhq6eCDDxQM1tXvq4Wizw9NT7IVQTavBw7EA6+VzXqFBRr4yw4supQGG/1kBiMcMIkiAd4hSAmGWy9qomX8Onro21ThEoAvlT8EA+WCQWhIof11+mjA8uLbpcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712079546; c=relaxed/simple;
-	bh=iuUzdNaQSKYbJhisLenP0E9J+WcZmYbuya8DASpXt2s=;
+	s=arc-20240116; t=1712079836; c=relaxed/simple;
+	bh=9uFKBEZ+jTSZSHC4IJ8ZjKJhk+5U54ScceL4P119hY4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S38gH699ud7fJi6leIoQyKhhnNZr6mTZOoeDZX7blJ6vZI/zJderesXNGm9b2Cc2a2Wd4AAufnagE/paHCb86ukNAGIQfrqFVhK0vf/3rwNoDz3EV0cWxjQiJfQdX90TCTVOxeb3vlV1s9Ax+yBmNTB992YLyIax80nw62S7+AY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tKVKUlw1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E4EFC433F1;
-	Tue,  2 Apr 2024 17:39:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712079545;
-	bh=iuUzdNaQSKYbJhisLenP0E9J+WcZmYbuya8DASpXt2s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tKVKUlw15t7FfFKLMMtxwRqwjPeFGT36YApX7IhVNk3b/q3ijsFahhBFtlje5u+No
-	 l2/U9B75nnNLyZ6U2sHgLyfwP69C7AnTfc2nvctjtN0kQfvXwG6zH27EKxgph1JuUV
-	 1lNGWeIaZ+PYxIDuAVSoSbGen5qcTP889I6D7552on12CgDSmX90EcD3o//b8ngv3l
-	 PmqNUInpu6ypYoHSUx5klqlwCUXyyRfEY6ttbU0SxI5lFnhCJ5svNDwU147MfiOXqV
-	 tcyuQdf+U/buPHlFGCD28ZWYSfgcpozRWVFkGuQ7gRsVE/H0BVKmmsPXrryHBBEaTb
-	 IwMWaZypB+Snw==
-Date: Tue, 2 Apr 2024 18:38:59 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>
-Cc: Pu Lehui <pulehui@huaweicloud.com>, Stefan O'Rear <sorear@fastmail.com>,
-	bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Manu Bretelle <chantr4@gmail.com>,
-	Pu Lehui <pulehui@huawei.com>
-Subject: Re: [PATCH bpf-next 2/5] riscv, bpf: Relax restrictions on Zbb
- instructions
-Message-ID: <20240402-ample-preview-c84edb69db1b@spud>
-References: <20240328124916.293173-1-pulehui@huaweicloud.com>
- <20240328124916.293173-3-pulehui@huaweicloud.com>
- <3ed9fe94-2610-41eb-8a00-a9f37fcf2b1a@app.fastmail.com>
- <20240328-ferocity-repose-c554f75a676c@spud>
- <ed3debc9-f2a9-41fb-9cf9-dc6419de5c01@huaweicloud.com>
- <87cyr7rgdn.fsf@all.your.base.are.belong.to.us>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WAdP20zVWkxclSipFvQI4+Dffvenxo9ghh8ww72iaJiQl6W3ZmMosgbTex/f8Kh7I0TbCh2WtzhU+8bpqIzyzN6BjmG6JjL4rl3CwBW5E+u5xp764vFAZhRYQUy/ouRfWYSnq28plAFtDQJtymlS7YifALi6LvO5umUX9FBtx+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FeKkoUAh; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a4e8904bd71so128904566b.1;
+        Tue, 02 Apr 2024 10:43:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712079833; x=1712684633; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=q1U6HAKXhhezsA9SEW8MoU/AGoBW+xsxrufA0vT6Ds4=;
+        b=FeKkoUAhP8efx+DgeKRR5cDO+J4gSI/IJFO+5RxPhXgOz6PbO+CVVviexfYeTin64O
+         /ajJ5x1kFXLXj2e0RddTHpv6USb0AEVvw03jIzfvL3mdMthKi94IUBiuxV1n5uqsdY5B
+         EJshDyZ5rKdlc/CqWKVZ/tuErssVqr5YjMNkrT+HNWK6oVd99om9pB47uHRhAnqTUN7y
+         7cdAko25r2w5sm+jJzSsMIyFHSkfdrUxGAf+PGQtsq51lpi4x7RGYTSYOL0VaDotvha4
+         hJdKWnrtO982o1LaHWsOg5ZpKWcTVm1FFwv8WHQf/UEIWvgwXjBjQYkMGU3A17hoAebT
+         Bavw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712079833; x=1712684633;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q1U6HAKXhhezsA9SEW8MoU/AGoBW+xsxrufA0vT6Ds4=;
+        b=pGf6PN34m4SuF1hI8+W4kLfykd4AAmi7AlE7DUdqifuwPBQ3e/lxqqr68TwddS3j62
+         2WKNWexIIu+tgc9UkryyzLX5W9C/0xLLHSi8SDyAbMQBciEPnSdTnO/UBEjpsHQy/NW6
+         4+H3Ap0uz95PzGByAMTHSuKvi8BBBzEFOhGmOHOFjw0uW4kwVF27yw+VqsfMA4zidHqN
+         TyM81QaEQibh4F2VCBs8hAuB6SaJa9te13E2fU+h9zQkze7lmiGUQbGXN15rcqLUROkZ
+         8gQLQNWmcSpAHyK0KMe7wIIK+PADKu6gW04PjR+zT1bDj5ORIjip4foAVFc3nEr62Mhb
+         ld7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXalBsL6oLGKWYp0NlWBV9VJZKYy+SC0VFNAoLHTQpap8PDa4HTtHd+PTD8MnA4jV+GyEJe0i2NMQWZrYiImy8blnmG5V/7dYI+BgIfMar0FEICqkGazxpVItdpWjftvaemQ5TE
+X-Gm-Message-State: AOJu0YzmdCw4pf0VMKuhTdRPW4rAVUJhzGMW8ZNWkeDBGqDSW4uQq+DM
+	UGwmcvW7bFSYibwQR9wrhV2gJ/sFCYxO5xEZNrxhjfI+JdvneFbQ
+X-Google-Smtp-Source: AGHT+IGbjo9a7II81wJZE7yvGIsqmk4ELHWFPT0Xo4t03Mb3LTWDHJDj0Vy415xHzy+PwPE+bj14Lg==
+X-Received: by 2002:a17:907:ea8:b0:a4e:51aa:b409 with SMTP id ho40-20020a1709070ea800b00a4e51aab409mr7562662ejc.59.1712079833049;
+        Tue, 02 Apr 2024 10:43:53 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d700:2000::b2c])
+        by smtp.gmail.com with ESMTPSA id gl20-20020a170906e0d400b00a46c39e6a47sm6832789ejb.148.2024.04.02.10.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 10:43:51 -0700 (PDT)
+Date: Tue, 2 Apr 2024 20:43:48 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>,
+	linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
+Message-ID: <20240402174348.wosc37adyub5o7xu@skbuf>
+References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
+ <7fc8264a-a383-4682-a144-8d91fe3971d9@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rDUw0N+1zEfzL5kD"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87cyr7rgdn.fsf@all.your.base.are.belong.to.us>
+In-Reply-To: <7fc8264a-a383-4682-a144-8d91fe3971d9@blackwall.org>
 
+Hi Nikolai,
 
---rDUw0N+1zEfzL5kD
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 02, 2024 at 12:28:38PM +0300, Nikolay Aleksandrov wrote:
+> For the bridge patches:
+> Nacked-by: Nikolay Aleksandrov <razor@blackwall.org>
+> 
+> You cannot break the multicast flood flag to add support for a custom
+> use-case. This is unacceptable. The current bridge behaviour is correct
+> your patch 02 doesn't fix anything, you should configure the bridge
+> properly to avoid all those problems, not break protocols.
+> 
+> Your special use case can easily be solved by a user-space helper or
+> eBPF and nftables. You can set the mcast flood flag and bypass the
+> bridge for these packets. I basically said the same in 2021, if this is
+> going to be in the bridge it should be hidden behind an option that is
+> default off. But in my opinion adding an option to solve such special
+> cases is undesirable, they can be easily solved with what's currently
+> available.
 
-On Tue, Apr 02, 2024 at 04:25:24PM +0200, Bj=F6rn T=F6pel wrote:
-> Pu Lehui <pulehui@huaweicloud.com> writes:
->=20
-> > On 2024/3/29 6:07, Conor Dooley wrote:
-> >> On Thu, Mar 28, 2024 at 03:34:31PM -0400, Stefan O'Rear wrote:
-> >>> On Thu, Mar 28, 2024, at 8:49 AM, Pu Lehui wrote:
-> >>>> From: Pu Lehui <pulehui@huawei.com>
-> >>>>
-> >>>> This patch relaxes the restrictions on the Zbb instructions. The har=
-dware
-> >>>> is capable of recognizing the Zbb instructions independently, elimin=
-ating
-> >>>> the need for reliance on kernel compile configurations.
-> >>>
-> >>> This doesn't make sense to me.
-> >>=20
-> >> It doesn't make sense to me either. Of course the hardware's capability
-> >> to understand an instruction is independent of whether or not a
-> >> toolchain is capable of actually emitting the instruction.
-> >>=20
-> >>> RISCV_ISA_ZBB is defined as:
-> >>>
-> >>>             Adds support to dynamically detect the presence of the ZBB
-> >>>             extension (basic bit manipulation) and enable its usage.
-> >>>
-> >>> In other words, RISCV_ISA_ZBB=3Dn should disable everything that atte=
-mpts
-> >>> to detect Zbb at runtime. It is mostly relevant for code size reducti=
-on,
-> >>> which is relevant for BPF since if RISCV_ISA_ZBB=3Dn all rvzbb_enable=
-d()
-> >>> checks can be constant-folded.
-> >
-> > Thanks for review. My initial thought was the same as yours, but after=
-=20
-> > discussions [0] and test verifications, the hardware can indeed=20
-> > recognize the zbb instruction even if the kernel has not enabled=20
-> > CONFIG_RISCV_ISA_ZBB. As Conor mentioned, we are just acting as a JIT t=
-o=20
-> > emit zbb instruction here. Maybe is_hw_zbb_capable() will be better?
->=20
-> I still think Lehui's patch is correct; Building a kernel that can boot
-> on multiple platforms (w/ or w/o Zbb support) and not having Zbb insn in
-> the kernel proper, and iff Zbb is available at run-time the BPF JIT will
-> emit Zbb.
+I appreciate your time is limited, but could you please translate your
+suggestion, and detail your proposed alternative a bit, for those of us
+who are not very familiar with IP multicast snooping?
 
-This sentence is -ENOPARSE to me, did you accidentally omit some words?
-Additionally he config option has nothing to do with building kernels that
-boot on multiple platforms, it only controls whether optimisations for Zbb
-are built so that if Zbb is detected they can be used.
+Bypass the bridge for which packets? General IGMP/MLD queries? Wouldn't
+that break snooping? And then do what with the packets, forward them in
+another software layer than the bridge?
 
-> For these kind of optimizations, (IMO) it's better to let the BPF JIT
-> decide at run-time.
-
-Why is bpf a different case to any other user in this regard?
-I think that the commit message is misleading and needs to be changed,
-because the point "the hardware is capable of recognising the Zbb
-instructions independently..." is completely unrelated to the purpose
-of the config option. Of course the hardware understanding the option
-has nothing to do with kernel configuration. The commit message needs to
-explain why bpf is a special case and is exempt from an=20
-
-I totally understand any point about bpf being different in terms of
-needing toolchain support, but IIRC it was I who pointed out up-thread.
-The part of the conversation that you're replying to here is about the
-semantics of the Kconfig option and the original patch never mentioned
-trying to avoid a dependency on toolchains at all, just kernel
-configurations. The toolchain requirements I don't think are even super
-hard to fulfill either - the last 3 versions of ld and lld all meet the
-criteria.
-
-
---rDUw0N+1zEfzL5kD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgxCswAKCRB4tDGHoIJi
-0mUNAP4xNbI++bzEaHK6ZDR1lMX+P5ARgZL9DZ1skHQEVLlnYAD9GL99/nj02IYH
-DN80f4mQlfeKWfcBAemilpEjnr5KugQ=
-=6qti
------END PGP SIGNATURE-----
-
---rDUw0N+1zEfzL5kD--
+I also don't quite understand the suggestion of turning on mcast flooding:
+isn't Joseph saying that he wants it off for the unregistered multicast
+data traffic?
 
