@@ -1,179 +1,226 @@
-Return-Path: <netdev+bounces-83830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC0E8947F1
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 01:49:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB093894842
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 02:13:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C44B62813F9
-	for <lists+netdev@lfdr.de>; Mon,  1 Apr 2024 23:49:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C65F1F2275E
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 00:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB0B5730C;
-	Mon,  1 Apr 2024 23:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36818F70;
+	Tue,  2 Apr 2024 00:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vfaAFvG+"
+	dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b="lSwN5YDN";
+	dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b="htZ0hujm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-000eb902.pphosted.com (mx0b-000eb902.pphosted.com [205.220.177.212])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243C756760
-	for <netdev@vger.kernel.org>; Mon,  1 Apr 2024 23:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712015338; cv=none; b=CT9/Pfyq/pjMWfMvwxbvy0bvW1umfD6cb+3z54ryIjFLscsnFYHNOeHrxT4qOe3Ve0G9fH7lQgqDiwAmckGaDk3Br3vjyoe9adMRrRzY5oyuLYKLZNIL6ka2H/A+TCkwKT4qf7TgIVkfk6RYTJ9NjUWLdpDFfP34SVlmIWX2/SY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712015338; c=relaxed/simple;
-	bh=4JhNkEpOiWMttmklKDS6dB8Whz9xSe93GiSKkFueDRI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JuYF2rCwNd8c6RSi9XYfzxOm5AqLtCFetx0nedFWpoWtWEHs2nanxqYh6RinOPk7xjpHom2uuQmxwNMtc1cJWEdPwyU+z21+G6Pj0b45owUcH2p4dowfKTZytb2n+kMl9SrBNxRLceVZl4XjhYk42BChjWXH+cJ0gbjIqAQ4Rm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vfaAFvG+; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-614bc5c53a1so27507887b3.1
-        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 16:48:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712015336; x=1712620136; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BeCArdFCgR6hPIyqHhpmGoh9zohrxgi2vCDzv1Uvsng=;
-        b=vfaAFvG+mOqrKjbH9Ge0oDljZh/cSXm67PclGL+fcN/avO/woLbSPb5FLBQg6uXzLD
-         dSp0OBr2PDyfRibpQSC9Pf+upEsj7RNSFzbFreM7ZqaVhqlhTrQT1xiu2arpA14YTk/u
-         B6i6l0MZe+oOAzJEVDR5uwn+9Si+qJtNHjFZADP9xSHIz8a7epD4LZxRVqqN3WQTw+hc
-         jTptohz3JTm6T1N4n2nnQoH2VXzgbD5gTZmanjnieO1HNHHgLDv+dEVqaLe4025qShDl
-         Fh5+f7Ib09HcHAXUA3IaZB8LaCS/nqGZwikS8+sOb2Zm1mW7SinOyKRevnhJdYOBqSP3
-         S5xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712015336; x=1712620136;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BeCArdFCgR6hPIyqHhpmGoh9zohrxgi2vCDzv1Uvsng=;
-        b=dBdKjutSqDABMntCT5uu+aF2Jh8OvxHC2HbzVdwKPzUIX4c4PWrHDUqUONwQC9rQoW
-         7rvdCsFGgHSO9tMNjT7MzvslfWAIxMz4RXgdK9RMyIDHtarRUfQvQyFoaXvIrjVla4A0
-         h9D82JYFUaK4cHBYF7EXg49jB60fGw3GnEOYpU6+XFoFmBy+l82YkZv+a4MOsBwEzI20
-         Dmpqy8s6q9xhWLzkoytMpaEemd5TARHSd8Za9axJRSD1Ds0+IlLQ7pcRjq/aJCyRBb4x
-         e+JDGlstnJD6m0q8Qzg7oXYtWGV5TKJhLGMJc68fFichGvL1b6aRxQZGykQi92uuEpUi
-         0d4Q==
-X-Gm-Message-State: AOJu0YxzUQsabZlqgX63+WrKLKWasN6VUqjVE5jBrzfpR9/4/zQLJVt1
-	6BQQYEu+gtCQ8JXYsVItO64cBJ7g45YWLfj372xcBC2ZQNK6KSF5/GJEQO49ECvlzy6/jKUxA9z
-	dldVPS63bQjoeax8f6QSucw==
-X-Google-Smtp-Source: AGHT+IENg/l0w7lJnqGpT/qHSwpQYol/8NlTdFPuRBHCAciA1BzQJQzDQqMPR1/kH8jhEkZOGWe/9UtkbBomwoKlsA==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a05:6902:1006:b0:dcc:94b7:a7a3 with
- SMTP id w6-20020a056902100600b00dcc94b7a7a3mr769132ybt.12.1712015336258; Mon,
- 01 Apr 2024 16:48:56 -0700 (PDT)
-Date: Mon, 01 Apr 2024 23:48:52 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF9510E4;
+	Tue,  2 Apr 2024 00:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.212
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712016776; cv=fail; b=psbwAgbI5WZYKtA1OL0C+XxS7bBrEX6BOhr5N2/cbnfqxEQ6o2MpayZak2CZVJWtxI7VrDY8//bY3MF86bUuQ5fVGYJFagO/iy/XDKT7sv2nhP0hKv693SPYJbAKjwIADlNLtBlWj6UJ4bAV5ATyJNi96wY0HnEVZFQXlCceGy8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712016776; c=relaxed/simple;
+	bh=0KY8WUPQ5/njZz42Rr5DucHs0Y/+IKCbQV8ShgaJ2NE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aBMOqHsl3bNCnpOi0ZJfymLFwadHRporpwiUy43IL2te9fGrN56qAl/CQsbEZ723acFuRzGspCjrUu2WpBg6z7y0Tj2hxrjYMq5iOacqMyDW5Z4Lv6JRKY0b1+LCz8Aio/+Q/ymps9Z3ElhUMEAN890Nhgn5GkiDoJ71aXxq3Uk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=garmin.com; spf=pass smtp.mailfrom=garmin.com; dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b=lSwN5YDN; dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b=htZ0hujm; arc=fail smtp.client-ip=205.220.177.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=garmin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garmin.com
+Received: from pps.filterd (m0220298.ppops.net [127.0.0.1])
+	by mx0a-000eb902.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 431J09KU001847;
+	Mon, 1 Apr 2024 19:12:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garmin.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pps1; bh=2F6GRq8z7beR
+	ghwKokkmfCAMQOkAUXVV66t4OmNExWs=; b=lSwN5YDNqVURUnqrIsGpL5cNAtGi
+	5Sn7WU55tIEQuygLf5Tx+PI1f8k587v5KAtd9TbHPToMThbLBco9VqS/gn2AAiTa
+	aaUMoXzb9ybwlN6KH1SaT/6tbnuMQTVNNoeI7MjyxW6KwMsGpJGJz4dQ72Ozi2P+
+	ROg4h7TFC29t7dsDuDbbQF6SQYkjUHDxz6K8XCyF68l9/8kIeFgCur0ux22D3dD7
+	sRbfeqvkPL3LQRKXU9hh5ngDfyXL2ahpvBbZnFsFKKQyungmUYNX7D2q2HIMpid+
+	O6gawZAfj2PKbqXtWnHcXV6RKqMPx+T1jLD8T0k5dvUSsadDvYbzS47eGQ==
+Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2040.outbound.protection.outlook.com [104.47.56.40])
+	by mx0a-000eb902.pphosted.com (PPS) with ESMTPS id 3x7st3jbtv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Apr 2024 19:12:14 -0500 (CDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DdaRVLPaSPw0DxB0Q6Ccdl7GyhRbFKoX9okR8aqbd5B/OwG04dSietxqZ9huRDQjQh8RZE+A7GW6ZENwkgVMV6JFP4BMDOhR08K43BE0S6irxBuFNR7VTieg3IStWLcFCbBlf+kvvn/DB2n0fsAvEo7epsitXX2ochomDDFuA3mVEtU3mLMHOlxBJ3BblRZv8txldzCmweSPSmt+TfDvd1GmlgPz8YaRnjoW2fZ8y2clTsGubN7s6NGYs/kZ50ecZZ5Z0mjE9Zvi6mQF63pZPx16mQp99wX+NWpNUeoi/p9d0vvv8jFv1KjFNTWrWv5FaY4nTDKsP60xilPN1xmDrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2F6GRq8z7beRghwKokkmfCAMQOkAUXVV66t4OmNExWs=;
+ b=AwnvUjlj1xNvdJhGeNR/UI9L1h9lWh5DwPPI5akucSXCQRTFrUwi+Upokd1A7AUeitLIJRZSGRpar7NeoUBrrmtutzgc5l2Uj1B4jr1qek3KUx3W/rKs6t4qeVd9mr/HX6vXiplS2zSR/S3/EoIu8iV1OJ5dopjqbGnaVVp+xeZt36qmxr6TnGGWaOKYabXXfgRg6ex2JH/LTI9R7P0wJNMeyU4oPSZkg3sFXoN5v5CWvQG7GssPI4iesoxSODFZHkzt3Gqkr2osCN8xL1/ppIwjo+Xbz8bZe6i1BbvWfXeA0O1eNkxKUugyuQSMwmuRKI73qZKGbt+Ep4AOAu4Epg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 204.77.163.244) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=garmin.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=garmin.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garmin.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2F6GRq8z7beRghwKokkmfCAMQOkAUXVV66t4OmNExWs=;
+ b=htZ0hujmaqaLLDg5x5OP28sr+8BgMiQ1JldHzSRe1cYosIkmaw2gU/VHuh6fgyb6SxeqYwVKz5WReELz1lofIvYWrYMktIqWYCBAlqjdxiXuo3VmTgpr9WJiizn/+tlY2jGA5SCaI9HGBzOiogocqrwRQCHRQ5ohTRJFLTXhoHf/A6m0w0ByMLwygQgMG/MDJIOG1YvB0AGOpPLy5wkBjzuudNrbQ5oEzd1GsxWwfF11Cii84ZhflMbcM8VHLSjoF4h/Cp9IT+Fey7EX7wFtiw0muiA5NZoikd1h5ovHAWk8hYD8sx5JYCC+CUT98IEv8AaZc4fR5g1A8ZF2nmqKxQ==
+Received: from BY3PR03CA0006.namprd03.prod.outlook.com (2603:10b6:a03:39a::11)
+ by BY5PR04MB6978.namprd04.prod.outlook.com (2603:10b6:a03:220::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
+ 2024 00:12:12 +0000
+Received: from SJ5PEPF000001CB.namprd05.prod.outlook.com
+ (2603:10b6:a03:39a:cafe::87) by BY3PR03CA0006.outlook.office365.com
+ (2603:10b6:a03:39a::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
+ Transport; Tue, 2 Apr 2024 00:12:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 204.77.163.244)
+ smtp.mailfrom=garmin.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=garmin.com;
+Received-SPF: Pass (protection.outlook.com: domain of garmin.com designates
+ 204.77.163.244 as permitted sender) receiver=protection.outlook.com;
+ client-ip=204.77.163.244; helo=edgetransport.garmin.com; pr=C
+Received: from edgetransport.garmin.com (204.77.163.244) by
+ SJ5PEPF000001CB.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Tue, 2 Apr 2024 00:12:11 +0000
+Received: from cv1wpa-exmb3.ad.garmin.com (10.5.144.73) by
+ olawpa-edge5.garmin.com (10.60.4.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 1 Apr 2024 19:12:03 -0500
+Received: from cv1wpa-exmb5.ad.garmin.com (10.5.144.75) by
+ cv1wpa-exmb3.ad.garmin.com (10.5.144.73) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.37; Mon, 1 Apr 2024 19:12:11 -0500
+Received: from kc3wpa-exmb3.ad.garmin.com (10.65.32.83) by
+ cv1wpa-exmb5.ad.garmin.com (10.5.144.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.32; Mon, 1 Apr 2024 19:12:10 -0500
+Received: from CAR-4RCMR33.ad.garmin.com (10.5.209.17) by mail.garmin.com
+ (10.65.32.83) with Microsoft SMTP Server id 15.2.1258.32 via Frontend
+ Transport; Mon, 1 Apr 2024 19:12:10 -0500
+From: Joseph Huang <Joseph.Huang@garmin.com>
+To: <netdev@vger.kernel.org>
+CC: Joseph Huang <Joseph.Huang@garmin.com>, Andrew Lunn <andrew@lunn.ch>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, "Roopa
+ Prabhu" <roopa@nvidia.com>,
+        Nikolay Aleksandrov <razor@blackwall.org>,
+        =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>,
+        <linux-kernel@vger.kernel.org>, <bridge@lists.linux.dev>
+Subject: [PATCH RFC net-next 00/10] MC Flood disable and snooping
+Date: Mon, 1 Apr 2024 20:10:59 -0400
+Message-ID: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAONHC2YC/x3NwQrCMAyA4VcZORvoaq3iq4iHro0uoNlI6nCMv
- bvF43f5/w2MlMng2m2gtLDxJA39oYM8JnkScmkG73xwwfVoVSXPK7Lk16cQVk2ZkBaSavguPOG ILh39KZ7jEOIFWmlWevD3f7nd9/0HcnYlG3UAAAA=
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1712015335; l=3378;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=4JhNkEpOiWMttmklKDS6dB8Whz9xSe93GiSKkFueDRI=; b=NKg6XG8BN99gUBI3M2EOxgxK+kUU1xCXzro+M6vtMFE/7+A6dbh9K6zgb0yyqbNaih+k6ztsO
- bX+IDfR2tSbBc3Hz4yHOB8t7lA0pR91YNefcOSR+Ppvq3Y+FZM5/PuR
-X-Mailer: b4 0.12.3
-Message-ID: <20240401-strncpy-include-trace-events-mdio-h-v1-1-9cb5a4cda116@google.com>
-Subject: [PATCH] trace: events: cleanup deprecated strncpy uses
-From: Justin Stitt <justinstitt@google.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CB:EE_|BY5PR04MB6978:EE_
+X-MS-Office365-Filtering-Correlation-Id: bdbcba8e-1416-4f5f-4ca1-08dc52a98b45
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	P1MfPhxRxEpAcu5phYF58jcN63bV/P0vqz50T6DTNugHfunTr6mnjV+WTIH2lPQJvmIyTg2OTEptGkVte+1rCUxjNX+NYGMCwrQFTYhianPrP3OH9USFTH8oiVdrzyEQFDpgzvRkSgPzL5oaBQvCE6m+TFpjmTfJRaugNbk96NnX1oaEBteOaOkQNr+25QKuPq0LQVrnoyrYNdvtulPge9oBrOnXAYOtx/11vsVX7enmjQwtsj72YcsY1B8M+tnpNk2+VOzLYDWYm/I7iinHkfQwsgFQRalIZCPZvgLjx7PHyixfPo9VlfqGFgIbvp5K18DmjSLNBelBY95i38TKziOU4m+Ix8sFPd60IJoFu44YR8j7p4tzf5BCaCkg12Lo+RwYVk2BbZcrzC3MyWHGHy2GXUHNWoX0eD1eg61TIY1b/zJiMXujwhCLKvecl29gJ6yU2XcA+XnKOCG9In1Kk5aUH5dHqllnsvk1rM8ZR4L9Xq1fwpJvEaYb9YLijGMOidGhXVUkCfWvstyTMnLDX+htaCJyKbk4fcgLQN1P0MbRK03Iwm6u5O9bCIZMd9RdRwDu4jnl+MBXmDA9Zra8ZlcRkQllcHxNpYrcBlBa7NuAcnCrpADaP/KpX7KnhkKH8Oj/YmDYmFw97dIjyf3jB4yMXTqwrK6qGBRPSTDiQTWqtVDXWldwRh34OlmoGpHZTBLd5OUAB2+0IiPRM/hpGQ==
+X-Forefront-Antispam-Report: 
+	CIP:204.77.163.244;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:edgetransport.garmin.com;PTR:extedge.garmin.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(376005)(7416005)(1800799015);DIR:OUT;SFP:1102;
+X-OriginatorOrg: garmin.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 00:12:11.7886
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bdbcba8e-1416-4f5f-4ca1-08dc52a98b45
+X-MS-Exchange-CrossTenant-Id: 38d0d425-ba52-4c0a-a03e-2a65c8e82e2d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=38d0d425-ba52-4c0a-a03e-2a65c8e82e2d;Ip=[204.77.163.244];Helo=[edgetransport.garmin.com]
+X-MS-Exchange-CrossTenant-AuthSource: 
+	SJ5PEPF000001CB.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6978
+X-Proofpoint-GUID: 9L95mypQc4ZMl3pyBenU3YkYEwRlhqUM
+X-Proofpoint-ORIG-GUID: 9L95mypQc4ZMl3pyBenU3YkYEwRlhqUM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-01_16,2024-04-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ lowpriorityscore=0 bulkscore=0 adultscore=0 clxscore=1011 spamscore=0
+ mlxscore=0 impostorscore=0 suspectscore=0 mlxlogscore=999
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403210001 definitions=main-2404010168
 
-strncpy() is deprecated for use on NUL-terminated destination strings
-[1] and as such we should prefer more robust and less ambiguous string
-interfaces.
+There is a use case where one would like to enable multicast snooping
+on a bridge but disable multicast flooding on all bridge ports so that
+registered multicast traffic will only reach the intended recipients and
+unregistered multicast traffic will be dropped. However, with existing
+bridge ports' mcast_flood flag implementation, it doesn't work as desired.
 
-For 2 out of 3 of these changes we can simply swap in strscpy() as it
-guarantess NUL-termination which is needed for the following trace
-print.
+This patchset aims to make multicast snooping work even when multicast
+flooding is disabled on the bridge ports, without changing the semantic of
+the mcast_flood flag too much. Patches 1 to 4 attempt to address this issue.
 
-trace_rpcgss_context() should use memcpy as its format specifier %.*s
-allows for the length to be specifier (__entry->len). Due to this,
-acceptor does not technically need to be NUL-terminated. Moreover,
-swapping in strscpy() and keeping everything else the same could result
-in truncation of the source string by one byte. To remedy this, we could
-use `len + 1` but I am unsure of the size of the destination buffer so a
-simple memcpy should suffice.
-|	TP_printk("win_size=%u expiry=%lu now=%lu timeout=%u acceptor=%.*s",
-|		__entry->window_size, __entry->expiry, __entry->now,
-|		__entry->timeout, __entry->len, __get_str(acceptor))
+Also, in a network where more than one multicast snooping capable bridges
+are interconnected without multicast routers being present, multicast
+snooping fails if:
 
-I suspect acceptor not to naturally be a NUL-terminated string due to
-the presence of some stringify methods.
-|	.crstringify_acceptor	= gss_stringify_acceptor,
+  1. The source is not directly attached to the Querier
+  2. The listener is beyond the mrouter port of the bridge where the
+     source is directly attached
+  3. A hardware offloading switch is involved
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
----
-Note: build-tested only.
+When all of the conditions are met, the listener will not receive any
+multicast packets from the source. Patches 5 to 10 attempt to address this
+issue. Specifically, patches 5 to 8 set up the infrastructure, patch 9
+handles unregistered multicast packets forwarding, and patch 10 handles
+registered multicast packets forwarding to the mrouter port.
 
-Found with: $ rg "strncpy\("
----
- include/trace/events/mdio.h   | 2 +-
- include/trace/events/rpcgss.h | 2 +-
- include/trace/events/sock.h   | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+The patches were developed against 5.15, and forward-ported to 6.8.
+Tests were done on a Pi 4B + Marvell 6393X Eval board with a single
+switch chip with no VLAN.
 
-diff --git a/include/trace/events/mdio.h b/include/trace/events/mdio.h
-index 0f241cbe00ab..285b3e4f83ba 100644
---- a/include/trace/events/mdio.h
-+++ b/include/trace/events/mdio.h
-@@ -25,7 +25,7 @@ TRACE_EVENT_CONDITION(mdio_access,
- 	),
- 
- 	TP_fast_assign(
--		strncpy(__entry->busid, bus->id, MII_BUS_ID_SIZE);
-+		strscpy(__entry->busid, bus->id, MII_BUS_ID_SIZE);
- 		__entry->read = read;
- 		__entry->addr = addr;
- 		__entry->regnum = regnum;
-diff --git a/include/trace/events/rpcgss.h b/include/trace/events/rpcgss.h
-index ba2d96a1bc2f..274c297f1b15 100644
---- a/include/trace/events/rpcgss.h
-+++ b/include/trace/events/rpcgss.h
-@@ -618,7 +618,7 @@ TRACE_EVENT(rpcgss_context,
- 		__entry->timeout = timeout;
- 		__entry->window_size = window_size;
- 		__entry->len = len;
--		strncpy(__get_str(acceptor), data, len);
-+		memcpy(__get_str(acceptor), data, len);
- 	),
- 
- 	TP_printk("win_size=%u expiry=%lu now=%lu timeout=%u acceptor=%.*s",
-diff --git a/include/trace/events/sock.h b/include/trace/events/sock.h
-index fd206a6ab5b8..1d0b98e6b2cc 100644
---- a/include/trace/events/sock.h
-+++ b/include/trace/events/sock.h
-@@ -109,7 +109,7 @@ TRACE_EVENT(sock_exceed_buf_limit,
- 	),
- 
- 	TP_fast_assign(
--		strncpy(__entry->name, prot->name, 32);
-+		strscpy(__entry->name, prot->name, 32);
- 		__entry->sysctl_mem[0] = READ_ONCE(prot->sysctl_mem[0]);
- 		__entry->sysctl_mem[1] = READ_ONCE(prot->sysctl_mem[1]);
- 		__entry->sysctl_mem[2] = READ_ONCE(prot->sysctl_mem[2]);
+V1 -> V2:
+- Moved the bulk of the change from the bridge to the mv88e6xxx driver.
+- Added more patches (specifically 3 and 4) to workaround some more
+  issues with multicast flooding being disabled.
 
----
-base-commit: 928a87efa42302a23bb9554be081a28058495f22
-change-id: 20240401-strncpy-include-trace-events-mdio-h-0a325676b468
+v1 here:
+https://patchwork.kernel.org/project/netdevbpf/cover/20210504182259.5042-1-Joseph.Huang@garmin.com/
 
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
+
+Joseph Huang (10):
+  net: bridge: Flood Queries even when mc flood is disabled
+  net: bridge: Always multicast_flood Reports
+  net: bridge: Always flood local subnet mc packets
+  net: dsa: mv88e6xxx: Add all hosts mc addr to ATU
+  net: dsa: Add support for PORT_MROUTER attribute
+  net: dsa: mv88e6xxx: Track soft bridge objects
+  net: dsa: mv88e6xxx: Track bridge mdb objects
+  net: dsa: mv88e6xxx: Convert MAB to use bit flags
+  net: dsa: mv88e6xxx: Enable mc flood for mrouter port
+  net: dsa: mv88e6xxx: Offload mrouter port
+
+ drivers/net/dsa/mv88e6xxx/Kconfig       |  12 +
+ drivers/net/dsa/mv88e6xxx/chip.c        | 439 +++++++++++++++++++++++-
+ drivers/net/dsa/mv88e6xxx/chip.h        |  16 +-
+ drivers/net/dsa/mv88e6xxx/global1_atu.c |   3 +-
+ include/net/dsa.h                       |   2 +
+ net/bridge/br_device.c                  |   5 +-
+ net/bridge/br_forward.c                 |   3 +-
+ net/bridge/br_input.c                   |   5 +-
+ net/bridge/br_multicast.c               |  21 +-
+ net/bridge/br_private.h                 |   6 +
+ net/dsa/port.c                          |  11 +
+ net/dsa/port.h                          |   2 +
+ net/dsa/user.c                          |   6 +
+ 13 files changed, 502 insertions(+), 29 deletions(-)
+
+-- 
+2.17.1
 
 
