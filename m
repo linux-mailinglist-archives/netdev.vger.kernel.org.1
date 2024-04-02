@@ -1,132 +1,127 @@
-Return-Path: <netdev+bounces-84180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE42895E21
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:55:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEA4D895E78
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:10:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BC311F2237A
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:55:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 881591F23BE4
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 21:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4CAD15E5B5;
-	Tue,  2 Apr 2024 20:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63F015E209;
+	Tue,  2 Apr 2024 21:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nZ6R3ck/"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="ouhGV+Ur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00A815E20F
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 20:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1704B15E200;
+	Tue,  2 Apr 2024 21:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712091261; cv=none; b=MK0vt67/7e/DHuChevaCkWLBRxwEisr5y1CcDycZPrOd0uicAnGSzSxafLDdVyCfUHyU49XwDP3vLUu2r0VPZ7+K6UFgzAGQ0t0yCpEOC3frpj3gxzqStR+deiyNl/JDs6v3axVVjQpngAi5sKgJYUCtzn3rQwXVrUfrQ49J+ZA=
+	t=1712092249; cv=none; b=oXDZH6gLFEJgzPw+j6jx1Y9+3dOHxQrGplm174+PiCvn+cSF9nBWIiWDfGlI1++bEbZRz9q3TWJsr4w2JxxHSt3vRhRN50x5NsDEi7UbaxSYiivcYl876ITlH3PFrfX3wdlmSKUlcpUtBuyeJjLs8+zQJwcLfTWIbLrRtaanwIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712091261; c=relaxed/simple;
-	bh=0dh4rks8DZA/rerPBvDhaWIFWqaos7zitKUPtS5xdI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GEMK/uvG80RQLCJaYY6qafC5nBdw2+j6S2pVbcNyZ236Q6u5lXI1dIxWNiWyBAqyssb9ALnJyoQZfkngVP7rusewwnbkq3c/mVNBIGkW/I94H4vlctj7mCWi1hl2lvLXSp+J7ST/Jnsi3TkSuPtLKIyw+FrHUmJtow986LCdDQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nZ6R3ck/; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712091260; x=1743627260;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0dh4rks8DZA/rerPBvDhaWIFWqaos7zitKUPtS5xdI8=;
-  b=nZ6R3ck/8QwaZ7un8a+Wv2X59Oi9gCa8V0zzo235AAX/C/ZoCsZZoY04
-   FfOtdlhNkNUdeLNdCHEykOR/9gKNWifq6C1eiEy5O6vTe+KnLkUF5unG3
-   ab5iJATqvt1UEQrBDqA04X+gocN9TrZ6mWWJMRjl3UddB3yqgoDZgMYY6
-   f6lBuCQY/uuyNAbzpCySn4SItq7jnX3Ew6qy562Bb46tsvqCBk+BTVMMh
-   ejd6PxaVwoRRLUYilEKCJd8oO0N5vXQZh4rMxzqb1xDqg4GzItopNwL9h
-   i/1+/PpSditpig9IVooRHVIZ/3a1p4jCGje++7dmJiBTX1EVdkPvnhHfr
-   A==;
-X-CSE-ConnectionGUID: 2rrvzvYUTp6+R2kQFmGQcQ==
-X-CSE-MsgGUID: m6FrZCC2RDeJSWPHzDCk4A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="7160769"
-X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
-   d="scan'208";a="7160769"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 13:54:19 -0700
-X-CSE-ConnectionGUID: 4I50Zde3Rmmq0cv3i9cDCQ==
-X-CSE-MsgGUID: 2qdnQGE5TwWDZ4JscXzFzg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
-   d="scan'208";a="18306073"
-Received: from lkp-server02.sh.intel.com (HELO 90ee3aa53dbd) ([10.239.97.151])
-  by fmviesa008.fm.intel.com with ESMTP; 02 Apr 2024 13:54:16 -0700
-Received: from kbuild by 90ee3aa53dbd with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rrl93-0001XZ-3B;
-	Tue, 02 Apr 2024 20:54:13 +0000
-Date: Wed, 3 Apr 2024 04:53:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v3 3/3] virtio-net: support dim profile
- fine-tuning
-Message-ID: <202404030423.IyBzs9Jd-lkp@intel.com>
-References: <1712059988-7705-4-git-send-email-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1712092249; c=relaxed/simple;
+	bh=VDHNmPR75jbDet7a94lKLLoM+37d0gOeLXruir8XK2A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SWVoWDI05FQN3AAi/N5w6p2iK4RwiqwvkWe7ESJmHp2pem7WfBKYf1OfA4MCAke0sE+Qkwc2Ffiq7LpNCoqmPf8+tstNcjHnikqTTOwb/J5pd9i+fgPqRxccS9c+onBkGCvfswRDnNeeo9L79GvvZDRtvk0s4WH5uUG2B7HNihs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=ouhGV+Ur; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1712092237;
+	bh=VDHNmPR75jbDet7a94lKLLoM+37d0gOeLXruir8XK2A=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ouhGV+Ur5q0YndpUrFAr27tDCG1tuKQAg9UnTFJAPvzzIlnqC7JjFI815/PLm/gfY
+	 SVJGRCCQOLhzA8TAZcrvUehXey9aSfv9CEpsKozc04HlDkBvBlOLpOwgBRe5r+TewW
+	 QkHZqz1n/ztFgrQaTJEtrmrW+jUc0SSywo/0Rdbo=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Tue, 02 Apr 2024 23:10:34 +0200
+Subject: [PATCH v3] fs/proc/proc_sysctl.c: always initialize i_uid/i_gid
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1712059988-7705-4-git-send-email-hengqi@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20240402-sysctl-net-ownership-v3-1-366b1a76d48a@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAEl0DGYC/4XNzw6CMAwG8FchOzvDuoF/Tr6H8TBmdU3MICsOC
+ eHdHZxMjLG3r/n66yQYIyGLYzGJiImY2pCD3hTCeRvuKOmas4ASTKlVJXlk1z9kwF62Q8DInjr
+ ZOINqhxbR1iKfdhFv9FrZ8yVnT9y3cVy/JLVs/4BJSSWhMXWVx8IBTgMSMzv/9NtcFYua4EMC+
+ CFBluy+MVbrsq7MtzTP8xtc/CpwBwEAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+ "Eric W. Biederman" <ebiederm@xmission.com>, 
+ Joel Granados <j.granados@samsung.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luis Chamberlain <mcgrof@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ stable@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1712092237; l=1832;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=VDHNmPR75jbDet7a94lKLLoM+37d0gOeLXruir8XK2A=;
+ b=3d5SEnUKrYRSHwfNL8QNXWIJisGyNdAhCaS42oJchWZe5GQKUgQbWYtuL17x95HYYGZcRbduG
+ 8n9cGvk/GywCBxXzn+SvcMiKIUCHN38TRshTmCCzOFnyqo79kyiotjx
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-Hi Heng,
+Commit 5ec27ec735ba ("fs/proc/proc_sysctl.c: fix the default values of i_uid/i_gid on /proc/sys inodes.")
+added defaults for i_uid/i_gid when set_ownership() is not implemented.
+It missed to also adjust net_ctl_set_ownership() to use the same default
+values in case the computation of a better value fails.
 
-kernel test robot noticed the following build warnings:
+Instead always initialize i_uid/i_gid inside the sysfs core so
+set_ownership() can safely skip setting them.
 
-[auto build test WARNING on net-next/main]
+Fixes: 5ec27ec735ba ("fs/proc/proc_sysctl.c: fix the default values of i_uid/i_gid on /proc/sys inodes.")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+Changes in v3:
+- Rebase onto v6.9-rc1
+- Reword commit message and mention correct fixed commit
+- Link to v2: https://lore.kernel.org/r/20240322-sysctl-net-ownership-v2-1-a8b4a3306542@weissschuh.net
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/ethtool-provide-customized-dim-profile-management/20240402-201527
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1712059988-7705-4-git-send-email-hengqi%40linux.alibaba.com
-patch subject: [PATCH net-next v3 3/3] virtio-net: support dim profile fine-tuning
-config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20240403/202404030423.IyBzs9Jd-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240403/202404030423.IyBzs9Jd-lkp@intel.com/reproduce)
+Changes in v2:
+- Move the fallback logic to the sysctl core
+- Link to v1: https://lore.kernel.org/r/20240315-sysctl-net-ownership-v1-1-2b465555a292@weissschuh.net
+---
+ fs/proc/proc_sysctl.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404030423.IyBzs9Jd-lkp@intel.com/
+diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+index 37cde0efee57..9e34ab9c21e4 100644
+--- a/fs/proc/proc_sysctl.c
++++ b/fs/proc/proc_sysctl.c
+@@ -479,12 +479,10 @@ static struct inode *proc_sys_make_inode(struct super_block *sb,
+ 			make_empty_dir_inode(inode);
+ 	}
+ 
++	inode->i_uid = GLOBAL_ROOT_UID;
++	inode->i_gid = GLOBAL_ROOT_GID;
+ 	if (root->set_ownership)
+ 		root->set_ownership(head, table, &inode->i_uid, &inode->i_gid);
+-	else {
+-		inode->i_uid = GLOBAL_ROOT_UID;
+-		inode->i_gid = GLOBAL_ROOT_GID;
+-	}
+ 
+ 	return inode;
+ }
 
-All warnings (new ones prefixed by >>):
+---
+base-commit: 4cece764965020c22cff7665b18a012006359095
+change-id: 20240315-sysctl-net-ownership-bc4e17eaeea6
 
-   In file included from net/packet/af_packet.c:86:
->> include/linux/virtio_net.h:15:34: warning: 'rx_eqe_conf' defined but not used [-Wunused-const-variable=]
-      15 | static const struct dim_cq_moder rx_eqe_conf[] = {
-         |                                  ^~~~~~~~~~~
-
-
-vim +/rx_eqe_conf +15 include/linux/virtio_net.h
-
-    12	
-    13	/* This is copied from NET_DIM_RX_EQE_PROFILES in DIM library */
-    14	#define VIRTNET_DIM_RX_PKTS 256
-  > 15	static const struct dim_cq_moder rx_eqe_conf[] = {
-    16		{.usec = 1,   .pkts = VIRTNET_DIM_RX_PKTS,},
-    17		{.usec = 8,   .pkts = VIRTNET_DIM_RX_PKTS,},
-    18		{.usec = 64,  .pkts = VIRTNET_DIM_RX_PKTS,},
-    19		{.usec = 128, .pkts = VIRTNET_DIM_RX_PKTS,},
-    20		{.usec = 256, .pkts = VIRTNET_DIM_RX_PKTS,}
-    21	};
-    22	
-
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thomas Weißschuh <linux@weissschuh.net>
+
 
