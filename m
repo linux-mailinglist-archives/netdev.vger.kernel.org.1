@@ -1,94 +1,102 @@
-Return-Path: <netdev+bounces-83863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD4E894A4A
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:10:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79D8894A4F
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:12:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FEBBB215E1
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 04:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C902286710
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 04:12:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C0B175AD;
-	Tue,  2 Apr 2024 04:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852D8175BF;
+	Tue,  2 Apr 2024 04:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iZLi/Jis"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkTzWbGD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90C315E96;
-	Tue,  2 Apr 2024 04:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43FA0168B1;
+	Tue,  2 Apr 2024 04:12:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712031029; cv=none; b=crEknnn/UISmW6tyxBT4biKpk9m+o+z376Q0T7i5tygQ6HmXsGE51Xx9X/girIBnuvQ9zVsQAfPoshVFbVdMQceJsKUli3JjLCY6WXpPdaMIf0qzoMsgb0C3tH4Vk/aR7sXWhJL57Q9FbvcJSJE2otDH4ashP2Klkv4gaA+JfDY=
+	t=1712031155; cv=none; b=WWGAcXRZBG6WqcYFo/kcCH5a5j/yLX3toKSm3um8JujzmesowbABT1jaxLFhK01MotoXEK7xbLvvHu76aD6qN1DOIV/3AZecCXPoh0DI0AJfkap00rj8z3cUPVcpMSL9VUooBEYkZKaiIyHSZnscbQjhAZI9B3H2FMQIAI//u+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712031029; c=relaxed/simple;
-	bh=SBs90Y5ttoDDVvNSham9+zrWHG5GensFCQ441PcbOOw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mfdtZQuaPkmjI+WhIONbE48ObTY8eOmbq1C+6FX9kqa2T8Z7xgRicVT4yLEMlQT8K0TQgcLEm7cHxiaHXlT2xBmzFCi86AocJeSEzU++YLK/sjFQXSktMqpZnN9AvsPwtlEqLClSTJbj1/R+OHB20/knccwnVAV/YZsFA6f7htI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iZLi/Jis; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 652A4C433F1;
-	Tue,  2 Apr 2024 04:10:28 +0000 (UTC)
+	s=arc-20240116; t=1712031155; c=relaxed/simple;
+	bh=aI3eJF8HniXat2ib1QyBX8zCGp45TAApFBysvadGBQs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=noVgS2SVCt8ST8HcgSW+vNT5yM6YTB2kvMzM5h9Md/Hyi/DhO+2/FLepbpY6osHTfoCDfVwIbX2PRmGxum5CO0NrgUgCWw+l9iiL+/XMMZ4y353fO0rgUexLmXMA7rdI4xD9yAkwUnVUluuuiGqV2AIBWLwRybJW8vH/kDDst3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkTzWbGD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 672A3C433C7;
+	Tue,  2 Apr 2024 04:12:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712031028;
-	bh=SBs90Y5ttoDDVvNSham9+zrWHG5GensFCQ441PcbOOw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iZLi/Jis0uM+dXR7kvhNquGpUPnEILCB2aiy/A4O+gOyHATDQk1/xm2Bva5EdHM50
-	 t9AcCQpA/8m1Fqiji0Z/Qw0gz+IFPcya4MDA7Qq4fOjgA9IT4zmGmUrz+6+Uh3xpqZ
-	 r+471FAqVanIZZJHRpiHorxT+8OPZJbMiob6248x23Bz+zowkp9Yj6CUaBGzkxGEZO
-	 VrvAN3JbXbvtrrXYu9Amw259sWz4A9h5KuOk5qPQakOggXFDo6rAwubO8v85JU19gY
-	 MmFypySYM7xY+72K2gymZlp5VJwJaSO4Swm5F6KitePUXv4j2rCNI9fPUomGo3mabA
-	 QBooaQTB7abKA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 55282D9A156;
-	Tue,  2 Apr 2024 04:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1712031154;
+	bh=aI3eJF8HniXat2ib1QyBX8zCGp45TAApFBysvadGBQs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nkTzWbGDGnmj8/6m7801zLy+B6JjA/ZXpJtp/FkRdEg9tN9IzGfm0CgMNlSQZ95KA
+	 HqxuhIuo0Z8jXpeg7+WS8AqPQMI3opBF15vPciltVh6dp1j4k9FufIgrSaC/5V2kCt
+	 YEPK5SKsvPPG6KBRWKu0WIHe8/jRr1UzS/lOZBFygL9M7mX0OYThU3fLemJ6C6UhXx
+	 eZZxq598IWatnRW/We9rCVsWeiyKs8JcHDpSLnBbSEV5DuEgCQtyF4olFeKEa5c0ou
+	 eYO3Jbd1Y/f6t6QROP/ViG0ZZliYkzMGtNSo1LuXTlS+lLNb7DndsBZc/K6DXHLcv+
+	 82IVNF+FUIJlA==
+Date: Mon, 1 Apr 2024 21:12:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dexuan Cui <decui@microsoft.com>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>, "linux-hyperv@vger.kernel.org"
+ <linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Wei Hu <weh@microsoft.com>, stephen
+ <stephen@networkplumber.org>, KY Srinivasan <kys@microsoft.com>, Paul
+ Rosswurm <paulros@microsoft.com>, "olaf@aepfle.de" <olaf@aepfle.de>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "leon@kernel.org" <leon@kernel.org>, Long Li
+ <longli@microsoft.com>, "ssengar@linux.microsoft.com"
+ <ssengar@linux.microsoft.com>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "daniel@iogearbox.net"
+ <daniel@iogearbox.net>, "john.fastabend@gmail.com"
+ <john.fastabend@gmail.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "ast@kernel.org" <ast@kernel.org>, "sharmaajay@microsoft.com"
+ <sharmaajay@microsoft.com>, "hawk@kernel.org" <hawk@kernel.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH net] net: mana: Fix Rx DMA datasize and skb_over_panic
+Message-ID: <20240401211232.57b17081@kernel.org>
+In-Reply-To: <CY5PR21MB37590FD539C1E380FBDC96B0BF3E2@CY5PR21MB3759.namprd21.prod.outlook.com>
+References: <1711748213-30517-1-git-send-email-haiyangz@microsoft.com>
+	<CY5PR21MB375904FD3437BA610E6BDBD1BF392@CY5PR21MB3759.namprd21.prod.outlook.com>
+	<CH2PR21MB1480E02C74E7BB5A52A71859CA3F2@CH2PR21MB1480.namprd21.prod.outlook.com>
+	<CY5PR21MB37590FD539C1E380FBDC96B0BF3E2@CY5PR21MB3759.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND bpf v2 0/2] x86/bpf: Fixes for the BPF JIT with
- retbleed=stuff
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171203102833.24910.7566029980709800852.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Apr 2024 04:10:28 +0000
-References: <20240401185821.224068-1-ubizjak@gmail.com>
-In-Reply-To: <20240401185821.224068-1-ubizjak@gmail.com>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: x86@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to bpf/bpf.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
-
-On Mon,  1 Apr 2024 20:55:28 +0200 you wrote:
-> From: Joan Bruguera Micó <joanbrugueram@gmail.com>
+On Tue, 2 Apr 2024 01:23:08 +0000 Dexuan Cui wrote:
+> > > I suggest the Fixes tag should be updated. Otherwise the fix
+> > > looks good to me.  
+> > 
+> > Thanks for the suggestion. I actually thought about this before
+> > submission.
+> > I was worried about someone back ports the jumbo frame feature,
+> > they may not automatically know this patch should be backported
+> > too.   
 > 
-> Fixes two issues that cause kernels panic when using the BPF JIT with
-> the call depth tracking / stuffing mitigation for Skylake processors
-> (`retbleed=stuff`). Both issues can be triggered by running simple
-> BPF programs (e.g. running the test suite should trigger both).
+> The jumbo frame commit (2fbbd712baf1) depends on the MTU
+> commit (2fbbd712baf1), so adding "Fixes: 2fbbd712baf1" (
+> instead of "Fixes: ca9c54d2d6a5") might make it easier for people
+> to notice and pick up this fix.
 > 
-> [...]
+> I'm OK if the patch remains as is. Just wanted to make  sure I
+> understand the issue here.
 
-Here is the summary with links:
-  - [RESEND,bpf,v2,1/2] x86/bpf: Fix IP after emitting call depth accounting
-    https://git.kernel.org/bpf/bpf/c/9d98aa088386
-  - [RESEND,bpf,v2,2/2] x86/bpf: Fix IP for relocating call depth accounting
-    https://git.kernel.org/bpf/bpf/c/6a537453000a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Please update the tag to where the bug was actually first exposed.
 
