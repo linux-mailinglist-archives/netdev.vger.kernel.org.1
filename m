@@ -1,245 +1,318 @@
-Return-Path: <netdev+bounces-84121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB43895A76
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 19:13:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B398959D6
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:38:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C53062820BD
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 17:13:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9097D281048
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41C4159911;
-	Tue,  2 Apr 2024 17:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D8C5B692;
+	Tue,  2 Apr 2024 16:38:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KYeyfyN/"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ibc/5XXc"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2079.outbound.protection.outlook.com [40.107.94.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCF1132C38;
-	Tue,  2 Apr 2024 17:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712077999; cv=fail; b=qWc00eqqGD2KEZfWtGGBgwASLSzFLLYd/Qt/+PBof6sAeCo8HZY53ZkHfl0AVstZhdxcZlB4tNm9TKfpu6UquOOLWp4r+2BMrAHL57OrHM8zH/DODiMXVYXsaKORjFezxGdbiLdQtq5uldXpT/wwS8HVYWcwWso4ylb0pkouf7w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712077999; c=relaxed/simple;
-	bh=1OuzzTtxSMBqpGwexdzfsw4hl2xVjfWDzwV5y/4Dylo=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=qZPTODLLwyKlaH/9Ex3GULNpP2ef/f8x9zzYAmZG/STuvUFB+8Pf3jSkeXESKM5Qa9oc/vMSFK/PKfI1UtLjsnMiDh79wZV/2CMS9jdzxc8ARut3Ca/XIXsHr1aNtzoAXHTJDQiYz6dYVay1H1VTI7i9PIOW6wRqeel9+2desDU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KYeyfyN/; arc=fail smtp.client-ip=40.107.94.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rp9heHB2uODa/1/rxxRBVVdTo7Uk8biyDVtGLXkwMLg8FwTMo1ruMbvIuKHaVCqn503lIoPT+ioSIvpbc7Hv+n+WLQrb2aDCY3L2aDEcrDuXEfPygCos+xwDIapdVdrMiqWatOinAkCkRgBY2PdAWzazezNdTVxAvmxxlr0P2q35vpLhe61UNg5Z99BFUcKc1mC+MGDUkCnb+gswZF+t0eOaYDzZBOGB8xI6UT696Ud3ukQhlRun1gO5GCyqQiMBFyaavpMEI5Vv4zV5DfSfDofDg1+DEKvZWKy5L4i10f2uSPObd8Q0mPwNiQyGvnYWXYSkoBGPLOfSjVpsb+toLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RIia0A8SAWIVXlTCLuJplzx4JBbjBxINphAW3trDDAg=;
- b=CNpYhYEqaFa4VupZoS6KIFTXVQoNspgpcoCyRMdFQF6pK0OdL09hsDtvSpHtitsx3DzIjAvuIWfzmq/iQa8JS2IsEP7TXkJL7LDGXVfIjd1C7hMpCnzWVdnkuZ75idTHy+qU2GX4N175T/IoGcnYHXWrAMHy67MZSYW0DPa8xSI589kdP6E0lYvJ5wvqhtz11hPH4+mdDj4n+ezZa/yhaKHfLIflKaqlBGzxcbtqZ0gmPNYSx9uQK13hj5YV0s8oylElWDtEKnhqd2wn9UZWdGQ4DFV3zUXkl+0T+BDdk5iK3vcb4YzHTi9sg8HU7p1hflfLF+Wt4zXENaSvJNcmWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RIia0A8SAWIVXlTCLuJplzx4JBbjBxINphAW3trDDAg=;
- b=KYeyfyN/0DSoA0sD0GsypOwsABFjLNB660EF6g2S4GvfhDArKJ8vFnEa5tbUuKExvzwk/ToVcSmbFSr5Rj3K6+rTJ8wYgyxPWxZcezeZakR/NUxxfP9F+NeAWpszJWz5+31TNpc6dmFFrA4wfTqm3ckLm8tqPkSndQ7XKFJh3Aiu+3YTs3iHDYibDbDz5WFnvQnGJJG/jSgkzkE7mSInkZkB3TLse3++E3Cd9Icv3mHRUnQJEdvB9SC0GYrb/w+wVC7RkzAR38b4oDIWfxt5vdlwXGl0NBA+ch29OfFjfyFfkrHxwHB2pIF90krs8HB3LHnd9HQRDeZt2W9lNQHKXA==
-Received: from PH8PR21CA0002.namprd21.prod.outlook.com (2603:10b6:510:2ce::16)
- by PH0PR12MB7080.namprd12.prod.outlook.com (2603:10b6:510:21d::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
- 2024 17:13:11 +0000
-Received: from SJ1PEPF00001CE6.namprd03.prod.outlook.com
- (2603:10b6:510:2ce:cafe::4e) by PH8PR21CA0002.outlook.office365.com
- (2603:10b6:510:2ce::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.9 via Frontend
- Transport; Tue, 2 Apr 2024 17:13:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF00001CE6.mail.protection.outlook.com (10.167.242.22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Tue, 2 Apr 2024 17:13:04 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 2 Apr 2024
- 10:12:40 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Tue, 2 Apr
- 2024 10:12:35 -0700
-References: <20240402010520.1209517-1-kuba@kernel.org>
- <20240402010520.1209517-8-kuba@kernel.org>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <shuah@kernel.org>, <sdf@google.com>,
-	<donald.hunter@gmail.com>, <linux-kselftest@vger.kernel.org>,
-	<petrm@nvidia.com>
-Subject: Re: [PATCH net-next 7/7] testing: net-drv: add a driver test for
- stats reporting
-Date: Tue, 2 Apr 2024 18:37:44 +0200
-In-Reply-To: <20240402010520.1209517-8-kuba@kernel.org>
-Message-ID: <87bk6rit8f.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B965159205
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 16:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712075924; cv=none; b=WhCude0YYvzoOdMVm401vZI+MBvXcXZ0eaG5t7krSAsJ85lx8+xfz6sux6LktI6pWbzkeDMnDr9Vh53qEfERM5ZhULMrvgWoqxzklZkRo4hm8j0+IEJxal67PNMuW5yosMPkOEp7PxkM55k8C0RZJZD3cFhubIJyIUmDg5nKVx8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712075924; c=relaxed/simple;
+	bh=3+q76VA2DZj4uOi3eVzPqvRAw5fHP2dAapflKsNgOag=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VL5mRVtslRYwazo2/8e0iYz+FSdcF5PvlooQR0cgebKeTYbqVN++aoAb7avI/dlLiwiEwZQnzxEZjmbWhCbNJJ00hzyM3B/93Dgv/alTL1MGkHN4s+7pZc1/GV8K6V/9n2+wxCNXxGnWbvwbSZwFfvUPJEnqnH/9iDLICk9jDiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ibc/5XXc; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5a4a102145fso2926480eaf.3
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 09:38:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1712075921; x=1712680721; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bywku0FkcXl3hfvmY3UtEc0wqdzAeFYpWFlaV8eQrok=;
+        b=ibc/5XXcfjuMCTi+Frr9bBPquzV4YqVvz6qcnPQYREpJNzo+M1mjnxK0cgDe41mDJe
+         W3r4lnFxiAfBtQCEtZ19jkrVBa1haunQMpplb1amYCYIfdIQ4tvi4gPj4d7Ix71G9KtL
+         wPpZxascBXpTZc7wDo04o3KkRDWH4TlTgRyKsd+4Pp2OUAeb51NwERJMmzTIN5HQ1Uhi
+         e9Q8Ujtjtu4DoF64P7otmWLHemw6EWAsztqQGpwz0q5gGDnb9Cjlhrw3hYyX8ETRgUM9
+         ZEXulH88/tf/ckldmtJKWDCXNwUs8ZpmW9/+7XUSkytVH1FD0ddpEzgd7c6T3pVHDJ5R
+         ZaqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712075921; x=1712680721;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bywku0FkcXl3hfvmY3UtEc0wqdzAeFYpWFlaV8eQrok=;
+        b=VtcKGy+yAmE77epaOMYyO9BsRmyM+dpqcK1Zh8rkie8vf1GtSbzg0tyx8QMmquSsc5
+         5lEisTsYS7fThjrTJ8PC5AlpkQFIXeIrtiUj1xhD1FjiXXYFREJLCKHA3d/DoLMXEn0b
+         siJ+TdI00rq1+TnC73ASdqndj7839kqe1qHdUoL+dtUvLIlJci8/LZ0g5dV2b9fGJR3v
+         TQuS7sQn6fBM9IjZkFRywvGpvPUzpF0Hv1k/W3ZOEambZkU5OOIXOEZqK1YU5EQ+jwso
+         AZ4VuTDceP6UaQq1rLfyNOFFxMa4XKhYRAUtOytgi2RF33enK0Ht36+puTgquz+XWmNt
+         TBQw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWeNcaDUalID5ER8Fx9vbcAilpXK/wV8Z+WsCR7NqgsRljKH5Pvb5ZCgOOj0WCRUv92aAaBH0gauedgUCKc3jv32SKxuZg
+X-Gm-Message-State: AOJu0YzYuvn/269XMx9VOs5Q6sVlAtFfwXRslPudsLTi46gN/1qCbVUy
+	tuO8NYbJk9b2dbfDMKX/O7bJGteijMLd7W4arN5l/lcIot52RwuyczEFj8QopupnJhI2P/5zFFP
+	a6dIqPg6qvfkIwdimihoAPCie9biD27XThh/qKowl4RBR7ew=
+X-Google-Smtp-Source: AGHT+IEwkNsHNl1uHIT6nDQlgI1k3sVQ2k0qS78o9+8wQu1MqTB6utYjidJ2q2NOqpedie34dGyRQ0Q+00nZ/7Ji174=
+X-Received: by 2002:a05:6358:3408:b0:183:4d1d:8697 with SMTP id
+ h8-20020a056358340800b001834d1d8697mr9010762rwd.24.1712075921022; Tue, 02 Apr
+ 2024 09:38:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE6:EE_|PH0PR12MB7080:EE_
-X-MS-Office365-Filtering-Correlation-Id: 264f0cf5-08cf-4038-63fd-08dc533828b9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	VF9lCG4w9orVGS6DMegRFcKG0+N1cAnYezBUIpx8VTgpVdLHdHSy289oYCM+CPqRh33/MsOUR3YOGrokgkMPkNWqcj1uqI6IWDbGyeuO+vhP/gCFgUVNpiiJ6JhyiIO89vlWxNadQeS6YwGC8ki27o2bzQ9qdF4kAwF5ocFwzqxVi1tgk+unTdHDKau69geRWBt2V6fid3cbKbIcolAaaIWMgciyQ5slE7WHVD1nC/ExpAT2m1pQr6TMxod+VhCwc4lCdZcMbK242jO/hn/WVMedsshLi/mAESUZt3F6PhcdR5Nxfp+/3EoIzSnYsVCUkOiGpZb60LBgCWFmOiBcketlrsLZ3qOKvz7ekDCQ2Wr2K2koK1dPA7JXJ/sd7Am0SQCyEWUnWEVrqajtpOOOw4wwrgVo3im7K74XKSG/fcAkaPwlxBtJvDePOzv7fgHLdOg3OKuGIHt5NKI5WOtX0TbdJggFclXTkUr3wdK7UnzBCYxwbTF8e3AmZ6MrQYD8SyqD2FDypjVBXSkxmmW2eGhft50ToozYXv/nkJXLQdgKP/JSkh+zG0jUQLTHWpJs0U1BOXJZBCBzOA3s/O9l+klyayuHGR3bY21ixJyhJkPDe5i8HPkEd9Hm1lMt/zk2B0xqfP9o4dykDSYn6yfDy3JkYrFNnUxt4BBSjTYe3hrWitYnoTjfemhuP734/7IgwzAGDkj1le3OE9N13beAPm+lbyRu04vfke6hO62BkkHNLubpx0b1DHuvRBVAPdEt
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 17:13:04.5030
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 264f0cf5-08cf-4038-63fd-08dc533828b9
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE6.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7080
+References: <CAM0EoMmO9pz7Y3ZMVL-QYAUB3kuxNQyK8h4OY-V1T99aE_Qbig@mail.gmail.com>
+ <20240402020048.25103-1-renmingshuai@huawei.com>
+In-Reply-To: <20240402020048.25103-1-renmingshuai@huawei.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 2 Apr 2024 12:38:29 -0400
+Message-ID: <CAM0EoMnPK3hHCWF0aQOcSXJyqWsZ-xBwK5Vs8tw1uVSFp=QrnA@mail.gmail.com>
+Subject: Re: [PATCH RFC net 1/1] net/sched: Fix mirred to self recursion
+To: renmingshuai <renmingshuai@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, jiri@resnulli.us, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	victor@mojatatu.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> Add a very simple test to make sure drivers report expected
-> stats. Drivers which implement FEC or pause configuration
-> should report relevant stats. Qstats must be reported,
-> at least packet and byte counts, and they must match
-> total device stats.
+On Mon, Apr 1, 2024 at 10:15=E2=80=AFPM renmingshuai <renmingshuai@huawei.c=
+om> wrote:
 >
-> Tested with netdevsim, bnxt, in-tree and installed.
+> > On Wed, Mar 27, 2024 at 6:57=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.=
+com> wrote:
+> > >
+> > > On Wed, Mar 27, 2024 at 9:23=E2=80=AFAM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Wed, Mar 27, 2024 at 12:03=E2=80=AFAM Jamal Hadi Salim <jhs@moja=
+tatu.com> wrote:
+> > > > >
+> > > > > When the mirred action is used on a classful egress qdisc and a p=
+acket is
+> > > > > mirrored or redirected to self we hit a qdisc lock deadlock.
+> > > > > See trace below.
+> > > > >
+> > > > > [..... other info removed for brevity....]
+> > > > > [   82.890906]
+> > > > > [   82.890906] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> > > > > [   82.890906] WARNING: possible recursive locking detected
+> > > > > [   82.890906] 6.8.0-05205-g77fadd89fe2d-dirty #213 Tainted: G   =
+     W
+> > > > > [   82.890906] --------------------------------------------
+> > > > > [   82.890906] ping/418 is trying to acquire lock:
+> > > > > [   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
+> > > > > __dev_queue_xmit+0x1778/0x3550
+> > > > > [   82.890906]
+> > > > > [   82.890906] but task is already holding lock:
+> > > > > [   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
+> > > > > __dev_queue_xmit+0x1778/0x3550
+> > > > > [   82.890906]
+> > > > > [   82.890906] other info that might help us debug this:
+> > > > > [   82.890906]  Possible unsafe locking scenario:
+> > > > > [   82.890906]
+> > > > > [   82.890906]        CPU0
+> > > > > [   82.890906]        ----
+> > > > > [   82.890906]   lock(&sch->q.lock);
+> > > > > [   82.890906]   lock(&sch->q.lock);
+> > > > > [   82.890906]
+> > > > > [   82.890906]  *** DEADLOCK ***
+> > > > > [   82.890906]
+> > > > > [..... other info removed for brevity....]
+> > > > >
+> > > > > Example setup (eth0->eth0) to recreate
+> > > > > tc qdisc add dev eth0 root handle 1: htb default 30
+> > > > > tc filter add dev eth0 handle 1: protocol ip prio 2 matchall \
+> > > > >      action mirred egress redirect dev eth0
+> > > > >
+> > > > > Another example(eth0->eth1->eth0) to recreate
+> > > > > tc qdisc add dev eth0 root handle 1: htb default 30
+> > > > > tc filter add dev eth0 handle 1: protocol ip prio 2 matchall \
+> > > > >      action mirred egress redirect dev eth1
+> > > > >
+> > > > > tc qdisc add dev eth1 root handle 1: htb default 30
+> > > > > tc filter add dev eth1 handle 1: protocol ip prio 2 matchall \
+> > > > >      action mirred egress redirect dev eth0
+> > > > >
+> > > > > We fix this by adding a per-cpu, per-qdisc recursion counter whic=
+h is
+> > > > > incremented the first time a root qdisc is entered and on a secon=
+d attempt
+> > > > > enter the same root qdisc from the top, the packet is dropped to =
+break the
+> > > > > loop.
+> > > > >
+> > > > > Reported-by: renmingshuai@huawei.com
+> > > > > Closes: https://lore.kernel.org/netdev/20240314111713.5979-1-renm=
+ingshuai@huawei.com/
+> > > > > Fixes: 3bcb846ca4cf ("net: get rid of spin_trylock() in net_tx_ac=
+tion()")
+> > > > > Fixes: e578d9c02587 ("net: sched: use counter to break reclassify=
+ loops")
+> > > > > Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+> > > > > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> > > > > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> > > > > ---
+> > > > >  include/net/sch_generic.h |  2 ++
+> > > > >  net/core/dev.c            |  9 +++++++++
+> > > > >  net/sched/sch_api.c       | 12 ++++++++++++
+> > > > >  net/sched/sch_generic.c   |  2 ++
+> > > > >  4 files changed, 25 insertions(+)
+> > > > >
+> > > > > diff --git a/include/net/sch_generic.h b/include/net/sch_generic.=
+h
+> > > > > index cefe0c4bdae3..f9f99df037ed 100644
+> > > > > --- a/include/net/sch_generic.h
+> > > > > +++ b/include/net/sch_generic.h
+> > > > > @@ -125,6 +125,8 @@ struct Qdisc {
+> > > > >         spinlock_t              busylock ____cacheline_aligned_in=
+_smp;
+> > > > >         spinlock_t              seqlock;
+> > > > >
+> > > > > +       u16 __percpu            *xmit_recursion;
+> > > > > +
+> > > > >         struct rcu_head         rcu;
+> > > > >         netdevice_tracker       dev_tracker;
+> > > > >         /* private data */
+> > > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > > index 9a67003e49db..2b712388c06f 100644
+> > > > > --- a/net/core/dev.c
+> > > > > +++ b/net/core/dev.c
+> > > > > @@ -3789,6 +3789,13 @@ static inline int __dev_xmit_skb(struct sk=
+_buff *skb, struct Qdisc *q,
+> > > > >         if (unlikely(contended))
+> > > > >                 spin_lock(&q->busylock);
+> > > >
+> > > > This could hang here (busylock)
+> > >
+> > > Notice the goto free_skb_list has an spin_unlock(&q->busylock);  in
+> > > its code vicinity. Am I missing something?
+> > >
+> > > >
+> > > > >
+> > > > > +       if (__this_cpu_read(*q->xmit_recursion) > 0) {
+> > > > > +               __qdisc_drop(skb, &to_free);
+> > > > > +               rc =3D NET_XMIT_DROP;
+> > > > > +               goto free_skb_list;
+> > > > > +       }
+> > > >
+> > > >
+> > > > I do not think we want to add yet another cache line miss and
+> > > > complexity in tx fast path.
+> > > >
+> > >
+> > > I empathize. The cache miss is due to a per-cpu variable? Otherwise
+> > > that seems to be in the vicinity of the other fields being accessed i=
+n
+> > > __dev_xmit_skb()
+> > >
+> > > > I think that mirred should  use a separate queue to kick a transmit
+> > > > from the top level.
+> > > >
+> > > > (Like netif_rx() does)
+> > > >
+> > >
+> > > Eric, here's my concern: this would entail restructuring mirred
+> > > totally just to cater for one use case which is in itself _a bad
+> > > config_ for egress qdisc case only. Mirred is very heavily used in
+> > > many use cases and changing its behavior could likely introduce other
+> > > corner cases for some use cases which we would be chasing for a while=
+.
+> > > Not to forget now we have to go via an extra transient queue.
+> > > If i understood what you are suggesting is to add an equivalent of
+> > > backlog queu for the tx side? I am assuming in a very similar nature
+> > > to backlog, meaning per cpu fired by softirq? or is it something
+> > > closer to qdisc->gso_skb
+> > > For either of those cases, the amount of infrastructure code there is
+> > > not a few lines of code. And then there's the desire to break the loo=
+p
+> > > etc.
+> > >
+> > > Some questions regarding your proposal - something I am not following
+> > > And i may have misunderstood what you are suggesting, but i am missin=
+g
+> > > what scenario mirred can directly call tcf_dev_queue_xmit() (see my
+> > > comment below)..
+> > >
+> > > > Using a softnet.xmit_qdisc_recursion (not a qdisc-per-cpu thing),
+> > > > would allow mirred to bypass this additional queue
+> > > > in most cases.
+> > > >
+> > > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > > > index cb37817d6382c29117afd8ce54db6dba94f8c930..62ba5ef554860496ee9=
+28f7ed6b7c3ea46b8ee1d
+> > > > 100644
+> > > > --- a/include/linux/netdevice.h
+> > > > +++ b/include/linux/netdevice.h
+> > > > @@ -3217,7 +3217,8 @@ struct softnet_data {
+> > > >  #endif
+> > > >         /* written and read only by owning cpu: */
+> > > >         struct {
+> > > > -               u16 recursion;
+> > > > +               u8 recursion;
+> > > > +               u8 qdisc_recursion;
+> > > >                 u8  more;
+> > > >  #ifdef CONFIG_NET_EGRESS
+> > > >                 u8  skip_txqueue;
+> > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > index 9a67003e49db87f3f92b6c6296b3e7a5ca9d9171..7ac59835edef657e955=
+8d4d4fc0a76b171aace93
+> > > > 100644
+> > > > --- a/net/core/dev.c
+> > > > +++ b/net/core/dev.c
+> > > > @@ -4298,7 +4298,9 @@ int __dev_queue_xmit(struct sk_buff *skb, str=
+uct
+> > > > net_device *sb_dev)
+> > > >
+> > > >         trace_net_dev_queue(skb);
+> > > >         if (q->enqueue) {
+> > > > +               __this_cpu_inc(softnet_data.xmit.qdisc_recursion);
+> > >
+> > > This increments the count by 1..
+> > >
+> > > >                 rc =3D __dev_xmit_skb(skb, q, dev, txq);
+> > > > +               __this_cpu_dec(softnet_data.xmit.qdisc_recursion);
+> > > >                 goto out;
+> > > >         }
+> > > >
+> > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> > > > index 5b38143659249e66718348e0ec4ed3c7bc21c13d..0f5f02e6744397d33ae=
+2a72670ba7131aaa6942e
+> > > > 100644
+> > > > --- a/net/sched/act_mirred.c
+> > > > +++ b/net/sched/act_mirred.c
+> > > > @@ -237,8 +237,13 @@ tcf_mirred_forward(bool at_ingress, bool
+> > > > want_ingress, struct sk_buff *skb)
+> > > >  {
+> > > >         int err;
+> > > >
+> > > > -       if (!want_ingress)
+> > > > -               err =3D tcf_dev_queue_xmit(skb, dev_queue_xmit);
+> > > > +       if (!want_ingress) {
+> > > > +               if (__this_cpu_read(softnet_data.xmit.qdisc_recursi=
+on)) {
+> > >
+> > > Where does the defered
+> > > So this will always be 1 assuming the defer queue will have to be
+> > > something like a workqueue
+> >
+> > Sorry, sent too fast - meant we would always enter here..
+> Is there a final fix?
+
+That fix should work - but you can view this as "discussion in progress" ;-=
 >
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  tools/testing/selftests/drivers/net/stats.py | 85 ++++++++++++++++++++
->  1 file changed, 85 insertions(+)
->  create mode 100755 tools/testing/selftests/drivers/net/stats.py
->
-> diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
-> new file mode 100755
-> index 000000000000..751cca2869b8
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/stats.py
-> @@ -0,0 +1,85 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +from lib.py import ksft_run, ksft_in, ksft_true, KsftSkipEx, KsftXfailEx
-> +from lib.py import EthtoolFamily, NetdevFamily, RtnlFamily, NlError
-> +from lib.py import NetDrvEnv
-> +
-> +cfg = None
-> +ethnl = EthtoolFamily()
-> +netfam = NetdevFamily()
-> +rtnl = RtnlFamily()
-> +
-> +
-> +def check_pause() -> None:
-> +    global cfg, ethnl
-> +
-> +    try:
-> +        ethnl.pause_get({"header": {"dev-index": cfg.ifindex}})
-> +    except NlError as e:
-> +        if e.error == 95:
-> +            raise KsftXfailEx("pause not supported by the device")
-> +        raise
-> +
-> +    data = ethnl.pause_get({"header": {"dev-index": cfg.ifindex,
-> +                                       "flags": {'stats'}}})
-> +    ksft_true(data['stats'], "driver does not report stats")
-> +
-> +
-> +def check_fec() -> None:
-> +    global ethnl
-> +
-> +    try:
-> +        ethnl.fec_get({"header": {"dev-index": cfg.ifindex}})
-> +    except NlError as e:
-> +        if e.error == 95:
-> +            raise KsftXfailEx("FEC not supported by the device")
-> +        raise
-> +
-> +    data = ethnl.fec_get({"header": {"dev-index": cfg.ifindex,
-> +                                     "flags": {'stats'}}})
-> +    ksft_true(data['stats'], "driver does not report stats")
-> +
-> +
-> +def pkt_byte_sum() -> None:
-> +    global cfg, netfam, rtnl
-> +
-> +    def get_qstat(test):
-> +        global netfam
-> +        stats = netfam.qstats_get({}, dump=True)
-> +        if stats:
-> +            for qs in stats:
-> +                if qs["ifindex"]== test.ifindex:
-> +                    return qs
-> +
-> +    qstat = get_qstat(cfg)
-> +    if qstat is None:
-> +        raise KsftSkipEx("qstats not supported by the device")
-> +
-> +    for key in ['tx-packets', 'tx-bytes', 'rx-packets', 'rx-bytes']:
-> +        ksft_in(key, qstat, "Drivers should always report basic keys")
-> +
-> +    # Compare stats, rtnl stats and qstats must match,
-> +    # but the interface may be up, so do a series of dumps
-> +    # each time the more "recent" stats must be higher or same.
-> +    def stat_cmp(rstat, qstat):
-> +        for key in ['tx-packets', 'tx-bytes', 'rx-packets', 'rx-bytes']:
-> +            if rstat[key] != qstat[key]:
-> +                return rstat[key] - qstat[key]
-> +        return 0
-> +
-> +    for _ in range(10):
-> +        rtstat = rtnl.getlink({"ifi-index": cfg.ifindex})['stats']
-> +        if stat_cmp(rtstat, qstat) < 0:
-> +            raise Exception("RTNL stats are lower, fetched later")
-> +        qstat = get_qstat(cfg)
-> +        if stat_cmp(rtstat, qstat) > 0:
-> +            raise Exception("Qstats are lower, fetched later")
-> +
-> +
-> +if __name__ == "__main__":
-> +    cfg = NetDrvEnv(__file__)
-> +    try:
-> +        ksft_run([check_pause, check_fec, pkt_byte_sum])
-> +    finally:
-> +        del cfg
 
-Yeah, this would be usually done through context managers, as I mention
-in the other e-mail. But then cfg would be lexically scoped, which IMHO
-is a good thing, but then it needs to be passed around as an argument,
-and that makes the ksft_run() invocation a bit messy:
-
-    with NetDrvEnv(__file__) as cfg:
-        ksft_run([lambda: check_pause(cfg),
-                  lambda: check_fec(cfg),
-                  lambda: pkt_byte_sum(cfg)])
-
-Dunno, maybe it could forward *args **kwargs to the cases? But then it
-loses some of the readability again.
+cheers,
+jamal
 
