@@ -1,377 +1,150 @@
-Return-Path: <netdev+bounces-84163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF54895D5F
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:12:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1BCA895D85
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:25:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1D581F2401A
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:12:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60C0A1F22CBD
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD6D15D5C5;
-	Tue,  2 Apr 2024 20:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0508115D5D5;
+	Tue,  2 Apr 2024 20:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IegChvxo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LcDPxNI4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BC815D5D3;
-	Tue,  2 Apr 2024 20:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7821E15D5B3
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 20:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712088715; cv=none; b=mG6DfVDDQb4I3AVO9NxG1s/Z9CogSs8iybPFEMeI0oaDAj6WgqHdV80pgZGxzPYNs+FjSY9CtFjg5iqvr4wbtyo2RjNAOJsLT4gt+/6OYnm4/8TmWbk0aysF/RXiCtjPfstMxbUyTnB+wEbMP91hGi86e2F75Bk9465drpbRXfk=
+	t=1712089532; cv=none; b=KwLv5PYeeGHuJ45eDTS2obmkCz4SIfSf8YDilwOJRY0QGDVeUvNEYHVaya80vc8zhhBFoYdwP512M0in/o3MXOBwoK6M0nyx6LnW1cW6dXhsqRIS5EADT1M2QISbCIYrbsRvkI4sc7haHcs5SyEQhkRCDUSw34C9xErjZuqr9Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712088715; c=relaxed/simple;
-	bh=Xl1YewxDylWIO2dZkm8zwCYMzPwKRG8PgxV4KCekhtQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OdLscCr3qedC6+bcOJ9EFWsUlX9h8T/H1w4YCBhyt4uyQS7pz5XKcvE+IA9neo9vsAip/VuZd1WGar9B2AvJKBLFcIpVpFZo/uYrP7ih2GgB9ubx62oA13vEQb4Q3+YolS10iZWNaMyOXWSLJhKFY4yauDq5OCQq6YAUUTrf3ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IegChvxo; arc=none smtp.client-ip=209.85.208.47
+	s=arc-20240116; t=1712089532; c=relaxed/simple;
+	bh=Ju9jET8eBe9jgdDFaMRbN2AKk4OovlxEj3nYzgHIOBg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=brluotoveqlQCg9DrpC+SXJSU1lvmghQ2ePm+RBSZgnvBEp07R++wpfrUAv5h0U7/8vw1Sn4vJJtNqXkuBrINDXffRejSxOvz4h30HIkOEez5fZj9l50tKNUDMN4jsdzMybCRMH/EzWFPRBAU6tT7q7TC83RcJUutNAxh+N0zsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LcDPxNI4; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56df9c119a4so447058a12.0;
-        Tue, 02 Apr 2024 13:11:52 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-53fa455cd94so4176177a12.2
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 13:25:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712088711; x=1712693511; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XQb6wWI55VWZ7l2V0zWTjrCkmpGa/fvx/M1pkRbMvxw=;
-        b=IegChvxoJHJUAZGqLx8YYkfBnA6kq2BwTPAZO/0MQE0D2fkTkc3jKhqF27a9+sIX07
-         FB42hwX/AGQM7GFchWBkM9a59Eci2BdV7x+MBNSV1D+j3PFlmLFf84jTHgayAbSQR4g9
-         VizmsgQWOJ+FgbTPMfKhlDNyRIHA6DYn7LVQxsG9WlCJmVMqj4lTs7foRr1YQ9t3nfAG
-         aB5M6TYEWMqFaoyjMe6+xUyVUObRg3dlHMAgB3mDBEySomtbbfJPpFM98/dzIBTGeqVu
-         SaSToJC56z9msEBXB8X0m65BKqAzjZ8CGNQSHVpTfVLxGYz5sVSZuTD0y/e3kSaAYnAB
-         IxCA==
+        d=gmail.com; s=20230601; t=1712089530; x=1712694330; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qzQQHoJQ11iL4ZRq1RRJUHfxyNKqnhQT5F/85QjSLyE=;
+        b=LcDPxNI4/Rn4NpiNj8nFBowNpkVQJYLG0RYnfC2599V5KBwD6/VgsAlAdtJDklKuRN
+         Gvc6Eg5eO8qbhL7bRh+aJgY7h0Z9F/khFqtGH7/JW7INxd8BEpZnZmFWOdb2L2qNMkMe
+         R8qwcSTAS4p8luq5F+5sMVNHL7hpvgQ+3llBnMkNWnrKsHoLSL9g44lm2NZTXkr782ny
+         9qZNDOPs8qiqkarO3yk3/U6HKwqJB0oh00DTjEPc0xoc+Q6WeC2bSqbQziatJJh0Q42Z
+         lCtDi02n4xLNwyi8XEiMQqKfocZov4+O1qZSRGh487XC4eEuz7yCcRKdY+GWU4Y8s9XY
+         7Aiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712088711; x=1712693511;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XQb6wWI55VWZ7l2V0zWTjrCkmpGa/fvx/M1pkRbMvxw=;
-        b=wa3EgZaQU9Bm95tLH1Qu8f3zKG+vaBV5xsTDUHu/6fWhtU+JQqxZJpWWDLWLeuC4kj
-         MoQc6MRuLOP3cTWs6mPp0DzG29kt970r2ob/I4y4uwjagaYlKjehp5jzEWxakwoUCE+U
-         c7/xmRYWYwFc7PBbMmBcT0xIWNdaCG55UAknfty4+Avf7qiQ3xhNQXF2Z+KCgXCmteb1
-         d5zaKOJi4hQ1MkLr8uxOIGffdU6CoQ2tfqh2xwJ68IZXRaxPJTdMc25c+OPxKnMma3tg
-         3VIKXBEegxva1n+oIfG90XDgEKvwWeaDr7umdFyrAF93+0CDkXv5AzSMEuSA2bFWYynF
-         gV+A==
-X-Forwarded-Encrypted: i=1; AJvYcCX3YQ6bWctBQW2S62hsbBQPz5C4Uauxt388A6DVopoA838XZHPBnGLGVHXSq0XiBbrvPh5pEyZdzZNbLQ+jT5ZgSMWkWevSjNhQWXaA
-X-Gm-Message-State: AOJu0YzY667nXxn9JdgsKt5Q9bVZEfav8xK8TJi3VGicKi3R8oZhWRme
-	+d7H4E3lps3YpnBlPGw8Xe0CHWOVIl8eM+Neo7d5T/y3yKmsGlcXGsrPi/R7X8U=
-X-Google-Smtp-Source: AGHT+IFkXNBNt8uCe83nWR9wQQkxTjn3pVDhJZ4cnifn/4gyxj1yo4UU7J0DMjy4L2gJL0Q0bx4oRg==
-X-Received: by 2002:a17:906:6bca:b0:a4e:e4:7b66 with SMTP id t10-20020a1709066bca00b00a4e00e47b66mr495137ejs.19.1712088711052;
-        Tue, 02 Apr 2024 13:11:51 -0700 (PDT)
-Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id re26-20020a170906d8da00b00a474ef94fddsm6903829ejb.70.2024.04.02.13.11.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 13:11:50 -0700 (PDT)
-From: Pawel Dembicki <paweldembicki@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Pawel Dembicki <paweldembicki@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>,
-	Dimitri Fedrau <dima.fedrau@gmail.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 3/3] net: phy: marvell: implement cable-test for 88E308X/88E609X family
-Date: Tue,  2 Apr 2024 22:11:20 +0200
-Message-Id: <20240402201123.2961909-3-paweldembicki@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240402201123.2961909-1-paweldembicki@gmail.com>
-References: <20240402201123.2961909-1-paweldembicki@gmail.com>
+        d=1e100.net; s=20230601; t=1712089530; x=1712694330;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qzQQHoJQ11iL4ZRq1RRJUHfxyNKqnhQT5F/85QjSLyE=;
+        b=MStYGJomcHx2ZKgbnJ3LB56Z7Pff6aB2V0mQOImCwNKqBOCSyz8DhSm5rdu/jGh3XI
+         C3v08vMjzQ/sDoOwKrXs8Cl08l1/bBUYijrP4A2aRrfzI1HDJ164M9hjWAxzFgdr39bn
+         3llNGtE7CByR5WJAKlao+ywKKCuPp5Ikbk0QfkxSPMLN/Q1uFH3vdVK655Zlgawljof7
+         CyWUnkrcTDcGd2FssFoQWm1IAOrbhJxP3eJ7rDZZQ6aQTNtYwtAvCYeFYR7K6rcCVGsk
+         7Y1vxOCEmVyM3tjwvAgVx6s8v0Jzy6/zXgh2m0FaH8WC1YM4cBHc+uqFoX9xfkUqfb93
+         gX5g==
+X-Gm-Message-State: AOJu0YzdfLQkWd94qi6wmw3v0SAjtq3zy0LhyarCV3mlxBa6MsnBcAQ+
+	GESr1OEQQMQmtPLcBg/xqpTnuW9VOr8k7iEGsPkJK60UIFbhEb35iZf8JfrDgP6GMlVghy+GoLR
+	llj7aXJW6rxtQIKcJFdF26km94fQ=
+X-Google-Smtp-Source: AGHT+IGngoKDuzCxvM9UepNkHp+ktQwyY9hfan6KLWWtdcJSgo7qrvIRP29btItHDsGC+UTo303GrDgOttbuu2r8lCQ=
+X-Received: by 2002:a17:90a:db49:b0:29f:c827:bc8c with SMTP id
+ u9-20020a17090adb4900b0029fc827bc8cmr11617961pjx.18.1712089529894; Tue, 02
+ Apr 2024 13:25:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <171154167446.2671062.9127105384591237363.stgit@firesoul>
+ <CALUcmU=xOR1j9Asdv0Ny7x=o4Ckz80mDjbuEnJC0Z_Aepu0Zzw@mail.gmail.com> <CALUcmUkvpnq+CKSCn=cuAfxXOGU22fkBx4QD4u2nZYGM16DD6A@mail.gmail.com>
+In-Reply-To: <CALUcmUkvpnq+CKSCn=cuAfxXOGU22fkBx4QD4u2nZYGM16DD6A@mail.gmail.com>
+From: Arthur Borsboom <arthurborsboom@gmail.com>
+Date: Tue, 2 Apr 2024 22:25:13 +0200
+Message-ID: <CALUcmUn0__izGAS-8gDL2h2Ceg9mdkFnLmdOgvAfO7sqxXK1-Q@mail.gmail.com>
+Subject: Re: [PATCH net] xen-netfront: Add missing skb_mark_for_recycle
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, Ilias Apalodimas <ilias.apalodimas@linaro.org>, wei.liu@kernel.org, 
+	paul@xen.org, Jakub Kicinski <kuba@kernel.org>, kirjanov@gmail.com, dkirjanov@suse.de, 
+	kernel-team@cloudflare.com, security@xenproject.org, 
+	andrew.cooper3@citrix.com, xen-devel@lists.xenproject.org
+Content-Type: text/plain; charset="UTF-8"
 
-This commit implements VCT in 88E308X/88E609X Family.
+After having a better look, I have found the patch in linux-next
 
-It require two workarounds with some magic configuration.
-Regular use require only one register configuration. But Open Circuit
-require second workaround.
-It cause implementation two phases for fault length measuring.
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=0cd74ffcf4fb0536718241d59d2c124578624d83
 
-Fast Ethernet PHY have implemented very simple version of VCT. It's
-complitley different than vct5 or vct7.
-
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-
----
-v3:
-  - resend only
-v2:
-  - change 'm88e3082_vct_distrfln_2_cm' to static
-  - simplify 'm88e3082_vct_cable_test_get_status'
-  - replace magic numbers in MII_BMCR configuration
-  - remove unnecessary backup of MII_BMCR register
-  - use ETHTOOL_A_CABLE_RESULT_CODE_IMPEDANCE_MISMATCH for impedance
-    mismatch
-
- drivers/net/phy/marvell.c | 208 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 208 insertions(+)
-
-diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
-index fae7eb57ee2c..7c00f47e4ded 100644
---- a/drivers/net/phy/marvell.c
-+++ b/drivers/net/phy/marvell.c
-@@ -279,6 +279,23 @@
- #define MII_VCT7_CTRL_METERS			BIT(10)
- #define MII_VCT7_CTRL_CENTIMETERS		0
- 
-+#define MII_VCT_TXPINS			0x1A
-+#define MII_VCT_RXPINS			0x1B
-+#define MII_VCT_TXPINS_ENVCT		BIT(15)
-+#define MII_VCT_TXRXPINS_VCTTST		GENMASK(14, 13)
-+#define MII_VCT_TXRXPINS_VCTTST_SHIFT	13
-+#define MII_VCT_TXRXPINS_VCTTST_OK	0
-+#define MII_VCT_TXRXPINS_VCTTST_SHORT	1
-+#define MII_VCT_TXRXPINS_VCTTST_OPEN	2
-+#define MII_VCT_TXRXPINS_VCTTST_FAIL	3
-+#define MII_VCT_TXRXPINS_AMPRFLN	GENMASK(12, 8)
-+#define MII_VCT_TXRXPINS_AMPRFLN_SHIFT	8
-+#define MII_VCT_TXRXPINS_DISTRFLN	GENMASK(7, 0)
-+#define MII_VCT_TXRXPINS_DISTRFLN_MAX	0xff
-+
-+#define M88E3082_PAIR_A		BIT(0)
-+#define M88E3082_PAIR_B		BIT(1)
-+
- #define LPA_PAUSE_FIBER		0x180
- #define LPA_PAUSE_ASYM_FIBER	0x100
- 
-@@ -301,6 +318,12 @@ static struct marvell_hw_stat marvell_hw_stats[] = {
- 	{ "phy_receive_errors_fiber", 1, 21, 16},
- };
- 
-+enum {
-+	M88E3082_VCT_OFF,
-+	M88E3082_VCT_PHASE1,
-+	M88E3082_VCT_PHASE2,
-+};
-+
- struct marvell_priv {
- 	u64 stats[ARRAY_SIZE(marvell_hw_stats)];
- 	char *hwmon_name;
-@@ -310,6 +333,7 @@ struct marvell_priv {
- 	u32 last;
- 	u32 step;
- 	s8 pair;
-+	u8 vct_phase;
- };
- 
- static int marvell_read_page(struct phy_device *phydev)
-@@ -2417,6 +2441,188 @@ static int marvell_vct7_cable_test_get_status(struct phy_device *phydev,
- 	return 0;
- }
- 
-+static int m88e3082_vct_cable_test_start(struct phy_device *phydev)
-+{
-+	struct marvell_priv *priv = phydev->priv;
-+	int ret;
-+
-+	/* It needs some magic workarounds described in VCT manual for this PHY.
-+	 */
-+	ret = phy_write(phydev, 29, 0x0003);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = phy_write(phydev, 30, 0x6440);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (priv->vct_phase == M88E3082_VCT_PHASE1) {
-+		ret = phy_write(phydev, 29, 0x000a);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = phy_write(phydev, 30, 0x0002);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	ret = phy_write(phydev, MII_BMCR,
-+			BMCR_RESET | BMCR_SPEED100 | BMCR_FULLDPLX);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = phy_write(phydev, MII_VCT_TXPINS, MII_VCT_TXPINS_ENVCT);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = phy_write(phydev, 29, 0x0003);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = phy_write(phydev, 30, 0x0);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (priv->vct_phase == M88E3082_VCT_OFF) {
-+		priv->vct_phase = M88E3082_VCT_PHASE1;
-+		priv->pair = 0;
-+
-+		return 0;
-+	}
-+
-+	ret = phy_write(phydev, 29, 0x000a);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = phy_write(phydev, 30, 0x0);
-+	if (ret < 0)
-+		return ret;
-+
-+	priv->vct_phase = M88E3082_VCT_PHASE2;
-+
-+	return 0;
-+}
-+
-+static int m88e3082_vct_cable_test_report_trans(int result, u8 distance)
-+{
-+	switch (result) {
-+	case MII_VCT_TXRXPINS_VCTTST_OK:
-+		if (distance == MII_VCT_TXRXPINS_DISTRFLN_MAX)
-+			return ETHTOOL_A_CABLE_RESULT_CODE_OK;
-+		return ETHTOOL_A_CABLE_RESULT_CODE_IMPEDANCE_MISMATCH;
-+	case MII_VCT_TXRXPINS_VCTTST_SHORT:
-+		return ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT;
-+	case MII_VCT_TXRXPINS_VCTTST_OPEN:
-+		return ETHTOOL_A_CABLE_RESULT_CODE_OPEN;
-+	default:
-+		return ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
-+	}
-+}
-+
-+static u32 m88e3082_vct_distrfln_2_cm(u8 distrfln)
-+{
-+	if (distrfln < 24)
-+		return 0;
-+
-+	/* Original function for meters: y = 0.7861x - 18.862 */
-+	return (7861 * distrfln - 188620) / 100;
-+}
-+
-+static int m88e3082_vct_cable_test_get_status(struct phy_device *phydev,
-+					      bool *finished)
-+{
-+	u8 tx_vcttst_res, rx_vcttst_res, tx_distrfln, rx_distrfln;
-+	struct marvell_priv *priv = phydev->priv;
-+	int ret, tx_result, rx_result;
-+	bool done_phase = true;
-+
-+	*finished = false;
-+
-+	ret = phy_read(phydev, MII_VCT_TXPINS);
-+	if (ret < 0)
-+		return ret;
-+	else if (ret & MII_VCT_TXPINS_ENVCT)
-+		return 0;
-+
-+	tx_distrfln = ret & MII_VCT_TXRXPINS_DISTRFLN;
-+	tx_vcttst_res = (ret & MII_VCT_TXRXPINS_VCTTST) >>
-+			MII_VCT_TXRXPINS_VCTTST_SHIFT;
-+
-+	ret = phy_read(phydev, MII_VCT_RXPINS);
-+	if (ret < 0)
-+		return ret;
-+
-+	rx_distrfln = ret & MII_VCT_TXRXPINS_DISTRFLN;
-+	rx_vcttst_res = (ret & MII_VCT_TXRXPINS_VCTTST) >>
-+			MII_VCT_TXRXPINS_VCTTST_SHIFT;
-+
-+	*finished = true;
-+
-+	switch (priv->vct_phase) {
-+	case M88E3082_VCT_PHASE1:
-+		tx_result = m88e3082_vct_cable_test_report_trans(tx_vcttst_res,
-+								 tx_distrfln);
-+		rx_result = m88e3082_vct_cable_test_report_trans(rx_vcttst_res,
-+								 rx_distrfln);
-+
-+		ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A,
-+					tx_result);
-+		ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_B,
-+					rx_result);
-+
-+		if (tx_vcttst_res == MII_VCT_TXRXPINS_VCTTST_OPEN) {
-+			done_phase = false;
-+			priv->pair |= M88E3082_PAIR_A;
-+		} else if (tx_distrfln < MII_VCT_TXRXPINS_DISTRFLN_MAX) {
-+			u8 pair = ETHTOOL_A_CABLE_PAIR_A;
-+			u32 cm = m88e3082_vct_distrfln_2_cm(tx_distrfln);
-+
-+			ethnl_cable_test_fault_length(phydev, pair, cm);
-+		}
-+
-+		if (rx_vcttst_res == MII_VCT_TXRXPINS_VCTTST_OPEN) {
-+			done_phase = false;
-+			priv->pair |= M88E3082_PAIR_B;
-+		} else if (rx_distrfln < MII_VCT_TXRXPINS_DISTRFLN_MAX) {
-+			u8 pair = ETHTOOL_A_CABLE_PAIR_B;
-+			u32 cm = m88e3082_vct_distrfln_2_cm(rx_distrfln);
-+
-+			ethnl_cable_test_fault_length(phydev, pair, cm);
-+		}
-+
-+		break;
-+	case M88E3082_VCT_PHASE2:
-+		if (priv->pair & M88E3082_PAIR_A &&
-+		    tx_vcttst_res == MII_VCT_TXRXPINS_VCTTST_OPEN &&
-+		    tx_distrfln < MII_VCT_TXRXPINS_DISTRFLN_MAX) {
-+			u8 pair = ETHTOOL_A_CABLE_PAIR_A;
-+			u32 cm = m88e3082_vct_distrfln_2_cm(tx_distrfln);
-+
-+			ethnl_cable_test_fault_length(phydev, pair, cm);
-+		}
-+		if (priv->pair & M88E3082_PAIR_B &&
-+		    rx_vcttst_res == MII_VCT_TXRXPINS_VCTTST_OPEN &&
-+		    rx_distrfln < MII_VCT_TXRXPINS_DISTRFLN_MAX) {
-+			u8 pair = ETHTOOL_A_CABLE_PAIR_B;
-+			u32 cm = m88e3082_vct_distrfln_2_cm(rx_distrfln);
-+
-+			ethnl_cable_test_fault_length(phydev, pair, cm);
-+		}
-+
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	if (!done_phase) {
-+		*finished = false;
-+		return m88e3082_vct_cable_test_start(phydev);
-+	}
-+	if (*finished)
-+		priv->vct_phase = M88E3082_VCT_OFF;
-+	return 0;
-+}
-+
- #ifdef CONFIG_HWMON
- struct marvell_hwmon_ops {
- 	int (*config)(struct phy_device *phydev);
-@@ -3300,6 +3506,8 @@ static struct phy_driver marvell_drivers[] = {
- 		.read_status = marvell_read_status,
- 		.resume = genphy_resume,
- 		.suspend = genphy_suspend,
-+		.cable_test_start = m88e3082_vct_cable_test_start,
-+		.cable_test_get_status = m88e3082_vct_cable_test_get_status,
- 	},
- 	{
- 		.phy_id = MARVELL_PHY_ID_88E1112,
--- 
-2.25.1
-
+On Tue, 2 Apr 2024 at 10:20, Arthur Borsboom <arthurborsboom@gmail.com> wrote:
+>
+> On Fri, 29 Mar 2024 at 10:47, Arthur Borsboom <arthurborsboom@gmail.com> wrote:
+> >
+> > On Wed, 27 Mar 2024 at 13:15, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+> > >
+> > > Notice that skb_mark_for_recycle() is introduced later than fixes tag in
+> > > 6a5bcd84e886 ("page_pool: Allow drivers to hint on SKB recycling").
+> > >
+> > > It is believed that fixes tag were missing a call to page_pool_release_page()
+> > > between v5.9 to v5.14, after which is should have used skb_mark_for_recycle().
+> > > Since v6.6 the call page_pool_release_page() were removed (in 535b9c61bdef
+> > > ("net: page_pool: hide page_pool_release_page()") and remaining callers
+> > > converted (in commit 6bfef2ec0172 ("Merge branch
+> > > 'net-page_pool-remove-page_pool_release_page'")).
+> > >
+> > > This leak became visible in v6.8 via commit dba1b8a7ab68 ("mm/page_pool: catch
+> > > page_pool memory leaks").
+> > >
+> > > Fixes: 6c5aa6fc4def ("xen networking: add basic XDP support for xen-netfront")
+> > > Reported-by: Arthur Borsboom <arthurborsboom@gmail.com>
+> > > Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> > > ---
+> > > Compile tested only, can someone please test this
+> >
+> > I have tested this patch on Xen 4.18.1 with VM (Arch Linux) kernel 6.9.0-rc1.
+> >
+> > Without the patch there are many trace traces and cloning the Linux
+> > mainline git repository resulted in failures (same with kernel 6.8.1).
+> > The patched kernel 6.9.0-rc1 performs as expected; cloning the git
+> > repository was successful and no kernel traces observed.
+> > Hereby my tested by:
+> >
+> > Tested-by: Arthur Borsboom <arthurborsboom@gmail.com>
+> >
+> >
+> >
+> > >  drivers/net/xen-netfront.c |    1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
+> > > index ad29f370034e..8d2aee88526c 100644
+> > > --- a/drivers/net/xen-netfront.c
+> > > +++ b/drivers/net/xen-netfront.c
+> > > @@ -285,6 +285,7 @@ static struct sk_buff *xennet_alloc_one_rx_buffer(struct netfront_queue *queue)
+> > >                 return NULL;
+> > >         }
+> > >         skb_add_rx_frag(skb, 0, page, 0, 0, PAGE_SIZE);
+> > > +       skb_mark_for_recycle(skb);
+> > >
+> > >         /* Align ip header to a 16 bytes boundary */
+> > >         skb_reserve(skb, NET_IP_ALIGN);
+> > >
+> > >
+>
+> I don't see this patch yet in linux-next.
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log
+>
+> Any idea in which kernel release this patch will be included?
 
