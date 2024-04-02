@@ -1,194 +1,245 @@
-Return-Path: <netdev+bounces-84111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6131C8959D4
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:37:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB43895A76
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 19:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3436282E30
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:37:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C53062820BD
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 17:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEE11598F9;
-	Tue,  2 Apr 2024 16:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41C4159911;
+	Tue,  2 Apr 2024 17:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="sDabu/dS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KYeyfyN/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2079.outbound.protection.outlook.com [40.107.94.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34330133283
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 16:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712075847; cv=none; b=q9uvpoy776ZfbhRmbCjKBESyU91pISGQ9OdkGGyVZzRYMLs+wztmuYcVeEWh6mUkgTEwQaqHs44BaRJ6Sqs9NfAQu7LwMzrh6E4rje3dp6baMgELQXjDJPu+UXudtHPEE5Eqii/+fGJGHlzIZC5ImSz6o9hkYQxwyw/crqIOCbk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712075847; c=relaxed/simple;
-	bh=Ftu1/YtbphAuRzS6+kzLDjRXWgk3WQY3tSjLqYtXoRM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VJNGtLShqZcuekoeWkrhcO1df/WAG6icJMWpYssIHwHPrjqcYImgDJlcmcPPc/91lmH/dsFB1FQGZVtyq5JdB12gH8FvYR8mVwE4rwaeIqnEB5QP9rig+ZtUAQc5VWlq9zEL2+EPayDacS1So2WR0own+teXy3Ku2e2puwE4JRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=sDabu/dS; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6152ad16cd6so8896957b3.2
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 09:37:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1712075844; x=1712680644; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pnOInSmpy9bn+aaODUeRXpb9+P4vfUZ3Y7TCRowdO0U=;
-        b=sDabu/dSRtqn0dx6tyS0O49fXEZIRrsI+ze7l7TbzEpSj2zAhSW9ZDOXRuHT3Y+1UW
-         lN69Um1eOHXkq7nxBcAAit3PlpJks8XdEJ7PlLT0WR9Y6zh/mwv/xuwHDXLftfvIT3Kj
-         t3pPX2NfQhWerL1A+0RobGUjdBsCu72DHmkHtmq9Mgk5J0VdaiNOqW3IS899rP1JsKit
-         gBoufAajIobSbgiFWgq40Jwg6kJ4q8e63gAMa08sA2iT2ke5SDMtsK0WO1NEgyczP09a
-         s5siSxMhTAU8xhz+2LqP82hiWeoV2cqq91TcHT7LtkfemtaihwMmbBdWeR5GY+TM10Po
-         W4TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712075844; x=1712680644;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pnOInSmpy9bn+aaODUeRXpb9+P4vfUZ3Y7TCRowdO0U=;
-        b=UeijLomDaWoxGwnBvZiQM0mq29HqnAwYnpLijT1YvpCPUS7CWF6QHCeU1rvC9N9mD3
-         rmoUZioC6J4AShVvQ0hfphvvGwXCKDtDgS+LhvsmNSu1/3SBrdgguss/r82b8JV2LaEf
-         yMMVT+ZNVdDO2nnQPGt7t3rXTGVQJzb719XB2cB+cDBSnggTmwiYuDjkToYFBI+XqFLU
-         x9YpLvGh37NLUVgUii577n8EBw5KETIDmRWhxaWrUqI+W8YIsLMGmiiiUcYe18m/AOLD
-         U5izo7EP2u3Mxb8xYJHMcwZENtH59jmdKzWfWtizud6YWG4H42UNAtEnh/VdYVvfKQ0x
-         PiKA==
-X-Forwarded-Encrypted: i=1; AJvYcCWNKBo6KRgWlKsG3CpHMjkIJJEBT/Lk86a7wfeahPvtw4Kyin84z9Vz6Y79O5c0H9nKSy0jXoZCljT5PYkXtY07fWT4Aunq
-X-Gm-Message-State: AOJu0YwNDAcnEw/WQsKCdwTDOZPcg7cIKQ9tep+SRq/qFLC8Oo3TjmtF
-	DCaHvgakrLOgYhhx5cTfJ4Fqdz4pSsugbwgkEigY+M7N83fpMPDjAAKZoQCENVo71SC1A1Kvg0C
-	/KuLW5nXNSxhAWaNpjCXtQ16oWUVOBT1+6IUO
-X-Google-Smtp-Source: AGHT+IHg05AFU9nr3+SMcgPtwjdHnLUy82kmkDRwQcJfbthoidtVj0A0aODVQD98B5W/7F7yMV8QINVB7xURcXWgV5c=
-X-Received: by 2002:a0d:fbc5:0:b0:609:8ed6:c491 with SMTP id
- l188-20020a0dfbc5000000b006098ed6c491mr12628665ywf.26.1712075844110; Tue, 02
- Apr 2024 09:37:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCF1132C38;
+	Tue,  2 Apr 2024 17:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712077999; cv=fail; b=qWc00eqqGD2KEZfWtGGBgwASLSzFLLYd/Qt/+PBof6sAeCo8HZY53ZkHfl0AVstZhdxcZlB4tNm9TKfpu6UquOOLWp4r+2BMrAHL57OrHM8zH/DODiMXVYXsaKORjFezxGdbiLdQtq5uldXpT/wwS8HVYWcwWso4ylb0pkouf7w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712077999; c=relaxed/simple;
+	bh=1OuzzTtxSMBqpGwexdzfsw4hl2xVjfWDzwV5y/4Dylo=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=qZPTODLLwyKlaH/9Ex3GULNpP2ef/f8x9zzYAmZG/STuvUFB+8Pf3jSkeXESKM5Qa9oc/vMSFK/PKfI1UtLjsnMiDh79wZV/2CMS9jdzxc8ARut3Ca/XIXsHr1aNtzoAXHTJDQiYz6dYVay1H1VTI7i9PIOW6wRqeel9+2desDU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KYeyfyN/; arc=fail smtp.client-ip=40.107.94.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rp9heHB2uODa/1/rxxRBVVdTo7Uk8biyDVtGLXkwMLg8FwTMo1ruMbvIuKHaVCqn503lIoPT+ioSIvpbc7Hv+n+WLQrb2aDCY3L2aDEcrDuXEfPygCos+xwDIapdVdrMiqWatOinAkCkRgBY2PdAWzazezNdTVxAvmxxlr0P2q35vpLhe61UNg5Z99BFUcKc1mC+MGDUkCnb+gswZF+t0eOaYDzZBOGB8xI6UT696Ud3ukQhlRun1gO5GCyqQiMBFyaavpMEI5Vv4zV5DfSfDofDg1+DEKvZWKy5L4i10f2uSPObd8Q0mPwNiQyGvnYWXYSkoBGPLOfSjVpsb+toLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RIia0A8SAWIVXlTCLuJplzx4JBbjBxINphAW3trDDAg=;
+ b=CNpYhYEqaFa4VupZoS6KIFTXVQoNspgpcoCyRMdFQF6pK0OdL09hsDtvSpHtitsx3DzIjAvuIWfzmq/iQa8JS2IsEP7TXkJL7LDGXVfIjd1C7hMpCnzWVdnkuZ75idTHy+qU2GX4N175T/IoGcnYHXWrAMHy67MZSYW0DPa8xSI589kdP6E0lYvJ5wvqhtz11hPH4+mdDj4n+ezZa/yhaKHfLIflKaqlBGzxcbtqZ0gmPNYSx9uQK13hj5YV0s8oylElWDtEKnhqd2wn9UZWdGQ4DFV3zUXkl+0T+BDdk5iK3vcb4YzHTi9sg8HU7p1hflfLF+Wt4zXENaSvJNcmWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RIia0A8SAWIVXlTCLuJplzx4JBbjBxINphAW3trDDAg=;
+ b=KYeyfyN/0DSoA0sD0GsypOwsABFjLNB660EF6g2S4GvfhDArKJ8vFnEa5tbUuKExvzwk/ToVcSmbFSr5Rj3K6+rTJ8wYgyxPWxZcezeZakR/NUxxfP9F+NeAWpszJWz5+31TNpc6dmFFrA4wfTqm3ckLm8tqPkSndQ7XKFJh3Aiu+3YTs3iHDYibDbDz5WFnvQnGJJG/jSgkzkE7mSInkZkB3TLse3++E3Cd9Icv3mHRUnQJEdvB9SC0GYrb/w+wVC7RkzAR38b4oDIWfxt5vdlwXGl0NBA+ch29OfFjfyFfkrHxwHB2pIF90krs8HB3LHnd9HQRDeZt2W9lNQHKXA==
+Received: from PH8PR21CA0002.namprd21.prod.outlook.com (2603:10b6:510:2ce::16)
+ by PH0PR12MB7080.namprd12.prod.outlook.com (2603:10b6:510:21d::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
+ 2024 17:13:11 +0000
+Received: from SJ1PEPF00001CE6.namprd03.prod.outlook.com
+ (2603:10b6:510:2ce:cafe::4e) by PH8PR21CA0002.outlook.office365.com
+ (2603:10b6:510:2ce::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.9 via Frontend
+ Transport; Tue, 2 Apr 2024 17:13:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ1PEPF00001CE6.mail.protection.outlook.com (10.167.242.22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Tue, 2 Apr 2024 17:13:04 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 2 Apr 2024
+ 10:12:40 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Tue, 2 Apr
+ 2024 10:12:35 -0700
+References: <20240402010520.1209517-1-kuba@kernel.org>
+ <20240402010520.1209517-8-kuba@kernel.org>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <shuah@kernel.org>, <sdf@google.com>,
+	<donald.hunter@gmail.com>, <linux-kselftest@vger.kernel.org>,
+	<petrm@nvidia.com>
+Subject: Re: [PATCH net-next 7/7] testing: net-drv: add a driver test for
+ stats reporting
+Date: Tue, 2 Apr 2024 18:37:44 +0200
+In-Reply-To: <20240402010520.1209517-8-kuba@kernel.org>
+Message-ID: <87bk6rit8f.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240402134133.2352776-1-edumazet@google.com>
-In-Reply-To: <20240402134133.2352776-1-edumazet@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 2 Apr 2024 12:37:12 -0400
-Message-ID: <CAM0EoMkL4UVOjy1mj-w04kned3e0czuRAiyfq9cWzP4PBWwWYw@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: fix lockdep splat in qdisc_tree_reduce_backlog()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE6:EE_|PH0PR12MB7080:EE_
+X-MS-Office365-Filtering-Correlation-Id: 264f0cf5-08cf-4038-63fd-08dc533828b9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	VF9lCG4w9orVGS6DMegRFcKG0+N1cAnYezBUIpx8VTgpVdLHdHSy289oYCM+CPqRh33/MsOUR3YOGrokgkMPkNWqcj1uqI6IWDbGyeuO+vhP/gCFgUVNpiiJ6JhyiIO89vlWxNadQeS6YwGC8ki27o2bzQ9qdF4kAwF5ocFwzqxVi1tgk+unTdHDKau69geRWBt2V6fid3cbKbIcolAaaIWMgciyQ5slE7WHVD1nC/ExpAT2m1pQr6TMxod+VhCwc4lCdZcMbK242jO/hn/WVMedsshLi/mAESUZt3F6PhcdR5Nxfp+/3EoIzSnYsVCUkOiGpZb60LBgCWFmOiBcketlrsLZ3qOKvz7ekDCQ2Wr2K2koK1dPA7JXJ/sd7Am0SQCyEWUnWEVrqajtpOOOw4wwrgVo3im7K74XKSG/fcAkaPwlxBtJvDePOzv7fgHLdOg3OKuGIHt5NKI5WOtX0TbdJggFclXTkUr3wdK7UnzBCYxwbTF8e3AmZ6MrQYD8SyqD2FDypjVBXSkxmmW2eGhft50ToozYXv/nkJXLQdgKP/JSkh+zG0jUQLTHWpJs0U1BOXJZBCBzOA3s/O9l+klyayuHGR3bY21ixJyhJkPDe5i8HPkEd9Hm1lMt/zk2B0xqfP9o4dykDSYn6yfDy3JkYrFNnUxt4BBSjTYe3hrWitYnoTjfemhuP734/7IgwzAGDkj1le3OE9N13beAPm+lbyRu04vfke6hO62BkkHNLubpx0b1DHuvRBVAPdEt
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 17:13:04.5030
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 264f0cf5-08cf-4038-63fd-08dc533828b9
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CE6.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7080
 
-On Tue, Apr 2, 2024 at 9:41=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> qdisc_tree_reduce_backlog() is called with the qdisc lock held,
-> not RTNL.
->
-> We must use qdisc_lookup_rcu() instead of qdisc_lookup()
->
-> syzbot reported:
->
-> WARNING: suspicious RCU usage
-> 6.1.74-syzkaller #0 Not tainted
-> -----------------------------
-> net/sched/sch_api.c:305 suspicious rcu_dereference_protected() usage!
->
-> other info that might help us debug this:
->
-> rcu_scheduler_active =3D 2, debug_locks =3D 1
-> 3 locks held by udevd/1142:
->   #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire =
-include/linux/rcupdate.h:306 [inline]
->   #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock inc=
-lude/linux/rcupdate.h:747 [inline]
->   #0: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: net_tx_action+0x6=
-4a/0x970 net/core/dev.c:5282
->   #1: ffff888171861108 (&sch->q.lock){+.-.}-{2:2}, at: spin_lock include/=
-linux/spinlock.h:350 [inline]
->   #1: ffff888171861108 (&sch->q.lock){+.-.}-{2:2}, at: net_tx_action+0x75=
-4/0x970 net/core/dev.c:5297
->   #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire =
-include/linux/rcupdate.h:306 [inline]
->   #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock inc=
-lude/linux/rcupdate.h:747 [inline]
->   #2: ffffffff87c729a0 (rcu_read_lock){....}-{1:2}, at: qdisc_tree_reduce=
-_backlog+0x84/0x580 net/sched/sch_api.c:792
->
-> stack backtrace:
-> CPU: 1 PID: 1142 Comm: udevd Not tainted 6.1.74-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 01/25/2024
-> Call Trace:
->  <TASK>
->   [<ffffffff85b85f14>] __dump_stack lib/dump_stack.c:88 [inline]
->   [<ffffffff85b85f14>] dump_stack_lvl+0x1b1/0x28f lib/dump_stack.c:106
->   [<ffffffff85b86007>] dump_stack+0x15/0x1e lib/dump_stack.c:113
->   [<ffffffff81802299>] lockdep_rcu_suspicious+0x1b9/0x260 kernel/locking/=
-lockdep.c:6592
->   [<ffffffff84f0054c>] qdisc_lookup+0xac/0x6f0 net/sched/sch_api.c:305
->   [<ffffffff84f037c3>] qdisc_tree_reduce_backlog+0x243/0x580 net/sched/sc=
-h_api.c:811
->   [<ffffffff84f5b78c>] pfifo_tail_enqueue+0x32c/0x4b0 net/sched/sch_fifo.=
-c:51
->   [<ffffffff84fbcf63>] qdisc_enqueue include/net/sch_generic.h:833 [inlin=
-e]
->   [<ffffffff84fbcf63>] netem_dequeue+0xeb3/0x15d0 net/sched/sch_netem.c:7=
-23
->   [<ffffffff84eecab9>] dequeue_skb net/sched/sch_generic.c:292 [inline]
->   [<ffffffff84eecab9>] qdisc_restart net/sched/sch_generic.c:397 [inline]
->   [<ffffffff84eecab9>] __qdisc_run+0x249/0x1e60 net/sched/sch_generic.c:4=
-15
->   [<ffffffff84d7aa96>] qdisc_run+0xd6/0x260 include/net/pkt_sched.h:125
->   [<ffffffff84d85d29>] net_tx_action+0x7c9/0x970 net/core/dev.c:5313
->   [<ffffffff85e002bd>] __do_softirq+0x2bd/0x9bd kernel/softirq.c:616
->   [<ffffffff81568bca>] invoke_softirq kernel/softirq.c:447 [inline]
->   [<ffffffff81568bca>] __irq_exit_rcu+0xca/0x230 kernel/softirq.c:700
->   [<ffffffff81568ae9>] irq_exit_rcu+0x9/0x20 kernel/softirq.c:712
->   [<ffffffff85b89f52>] sysvec_apic_timer_interrupt+0x42/0x90 arch/x86/ker=
-nel/apic/apic.c:1107
->   [<ffffffff85c00ccb>] asm_sysvec_apic_timer_interrupt+0x1b/0x20 arch/x86=
-/include/asm/idtentry.h:656
->
-> Fixes: d636fc5dd692 ("net: sched: add rcu annotations around qdisc->qdisc=
-_sleeping")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-LGTM.
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Jakub Kicinski <kuba@kernel.org> writes:
 
-cheers,
-jamal
-
+> Add a very simple test to make sure drivers report expected
+> stats. Drivers which implement FEC or pause configuration
+> should report relevant stats. Qstats must be reported,
+> at least packet and byte counts, and they must match
+> total device stats.
+>
+> Tested with netdevsim, bnxt, in-tree and installed.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  net/sched/sch_api.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tools/testing/selftests/drivers/net/stats.py | 85 ++++++++++++++++++++
+>  1 file changed, 85 insertions(+)
+>  create mode 100755 tools/testing/selftests/drivers/net/stats.py
 >
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index 65e05b0c98e461953aa8d98020142f0abe3ad8a7..60239378d43fb7adfe3926f92=
-7f3883f09673c16 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -809,7 +809,7 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int=
- n, int len)
->                 notify =3D !sch->q.qlen && !WARN_ON_ONCE(!n &&
->                                                        !qdisc_is_offloade=
-d);
->                 /* TODO: perform the search on a per txq basis */
-> -               sch =3D qdisc_lookup(qdisc_dev(sch), TC_H_MAJ(parentid));
-> +               sch =3D qdisc_lookup_rcu(qdisc_dev(sch), TC_H_MAJ(parenti=
-d));
->                 if (sch =3D=3D NULL) {
->                         WARN_ON_ONCE(parentid !=3D TC_H_ROOT);
->                         break;
-> --
-> 2.44.0.478.gd926399ef9-goog
->
+> diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
+> new file mode 100755
+> index 000000000000..751cca2869b8
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/stats.py
+> @@ -0,0 +1,85 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +from lib.py import ksft_run, ksft_in, ksft_true, KsftSkipEx, KsftXfailEx
+> +from lib.py import EthtoolFamily, NetdevFamily, RtnlFamily, NlError
+> +from lib.py import NetDrvEnv
+> +
+> +cfg = None
+> +ethnl = EthtoolFamily()
+> +netfam = NetdevFamily()
+> +rtnl = RtnlFamily()
+> +
+> +
+> +def check_pause() -> None:
+> +    global cfg, ethnl
+> +
+> +    try:
+> +        ethnl.pause_get({"header": {"dev-index": cfg.ifindex}})
+> +    except NlError as e:
+> +        if e.error == 95:
+> +            raise KsftXfailEx("pause not supported by the device")
+> +        raise
+> +
+> +    data = ethnl.pause_get({"header": {"dev-index": cfg.ifindex,
+> +                                       "flags": {'stats'}}})
+> +    ksft_true(data['stats'], "driver does not report stats")
+> +
+> +
+> +def check_fec() -> None:
+> +    global ethnl
+> +
+> +    try:
+> +        ethnl.fec_get({"header": {"dev-index": cfg.ifindex}})
+> +    except NlError as e:
+> +        if e.error == 95:
+> +            raise KsftXfailEx("FEC not supported by the device")
+> +        raise
+> +
+> +    data = ethnl.fec_get({"header": {"dev-index": cfg.ifindex,
+> +                                     "flags": {'stats'}}})
+> +    ksft_true(data['stats'], "driver does not report stats")
+> +
+> +
+> +def pkt_byte_sum() -> None:
+> +    global cfg, netfam, rtnl
+> +
+> +    def get_qstat(test):
+> +        global netfam
+> +        stats = netfam.qstats_get({}, dump=True)
+> +        if stats:
+> +            for qs in stats:
+> +                if qs["ifindex"]== test.ifindex:
+> +                    return qs
+> +
+> +    qstat = get_qstat(cfg)
+> +    if qstat is None:
+> +        raise KsftSkipEx("qstats not supported by the device")
+> +
+> +    for key in ['tx-packets', 'tx-bytes', 'rx-packets', 'rx-bytes']:
+> +        ksft_in(key, qstat, "Drivers should always report basic keys")
+> +
+> +    # Compare stats, rtnl stats and qstats must match,
+> +    # but the interface may be up, so do a series of dumps
+> +    # each time the more "recent" stats must be higher or same.
+> +    def stat_cmp(rstat, qstat):
+> +        for key in ['tx-packets', 'tx-bytes', 'rx-packets', 'rx-bytes']:
+> +            if rstat[key] != qstat[key]:
+> +                return rstat[key] - qstat[key]
+> +        return 0
+> +
+> +    for _ in range(10):
+> +        rtstat = rtnl.getlink({"ifi-index": cfg.ifindex})['stats']
+> +        if stat_cmp(rtstat, qstat) < 0:
+> +            raise Exception("RTNL stats are lower, fetched later")
+> +        qstat = get_qstat(cfg)
+> +        if stat_cmp(rtstat, qstat) > 0:
+> +            raise Exception("Qstats are lower, fetched later")
+> +
+> +
+> +if __name__ == "__main__":
+> +    cfg = NetDrvEnv(__file__)
+> +    try:
+> +        ksft_run([check_pause, check_fec, pkt_byte_sum])
+> +    finally:
+> +        del cfg
+
+Yeah, this would be usually done through context managers, as I mention
+in the other e-mail. But then cfg would be lexically scoped, which IMHO
+is a good thing, but then it needs to be passed around as an argument,
+and that makes the ksft_run() invocation a bit messy:
+
+    with NetDrvEnv(__file__) as cfg:
+        ksft_run([lambda: check_pause(cfg),
+                  lambda: check_fec(cfg),
+                  lambda: pkt_byte_sum(cfg)])
+
+Dunno, maybe it could forward *args **kwargs to the cases? But then it
+loses some of the readability again.
 
