@@ -1,293 +1,380 @@
-Return-Path: <netdev+bounces-83959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D798951B2
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:21:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 117AF8951C4
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:25:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 237801C22227
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:21:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B860F2854E6
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:25:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39D9679E2;
-	Tue,  2 Apr 2024 11:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0D5626A0;
+	Tue,  2 Apr 2024 11:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EKlXe2li"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lWhKns/u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DC164A98
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 11:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712056898; cv=none; b=t9pKBEoqHie9O9XzMo4cT2Wum1ukmBCMuBUNNc60ot8Cshw5yKHdv5jFwtY2uPUCdt9dVYikYBQ31vGIiZwYG5+Trh1BOm/2zls9/XoUYg+RBuLMNQ1d6tvSCNtYFpbjefvvRsK38HR5pFn6hkZa9iEpFNR1D87f3oKlKr4gktE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712056898; c=relaxed/simple;
-	bh=DPNntHHbbVBuZpxtrcAASRP6mPwIxQPQpS3DBx0mYro=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HIsWibeuRc9e1mn4eo8GuvqswST4DB37FyJ9p04w8fJ56lmiktD00WcX7zkQYweH4j8mFu1bCtKhItKBQLSiDmysCoS9GynFmgIWjoqXOCix4UNPLzbA5D00I1mbW6s2NpO3+Wad4uRAm8KMnKoHNDdCQ7FMQYg9KsWAEhw50XA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=EKlXe2li; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d6c9678cbdso66612401fa.2
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 04:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712056894; x=1712661694; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hgU+nZuiX4o0PnBgeKWW+EtIi7N1M71d0zV+QPmKFhc=;
-        b=EKlXe2li85dRXuFbn9pa7C0iU3FhF/L+H6Dgia1M8BKiZTHVMrWX5aVtVI7rQqEmWA
-         4/BTS2WCnmqHd/LggzKoxHzGcqUQrTflo1oXHsxPgK1Y737G02oxXLeLocowXcvovagX
-         HDR4TGnRtWUap9iI13WxJaHqBax124hhDBcYsmpcNWlZrqGDb7FTF57solr1j6pItKcB
-         YVF1X1ccRXiS22LbOgWprFKHCJkRFgEyybuVYcobLKDg4f57zGnWG0N+Vn9IZs6XzHV3
-         Fmpgc4eNzUG+icEuPMPW+HyFo9lGYjWRGef/tGK5iDiTD+E+NA/a0GxttMQ6rxSB8GOg
-         6CSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712056894; x=1712661694;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hgU+nZuiX4o0PnBgeKWW+EtIi7N1M71d0zV+QPmKFhc=;
-        b=okiuRvE+SuCYbKc4u+WWMcpXPiU5fULJ7y0g0RXgvvzQdX2VFC2P0cBOkmfQ9kzFdL
-         N8Mi/+0dJwQC21yJ6NeMYgR3tluiZp7/afQv8pTjLPLqmymZuiEgNRwtAd7sOJepzBKv
-         wEYt25c6dgqSzI73wp6HHKk+k0EOfrmuUBcwHpesguCwZFHxEHTs0CsDhbuXVxUHq8cY
-         osiI/GDGbQKhDw2X0XgSUkaIqezt1V6LpFEef0QtR5czpE5nnmtR5WW9rmD5W/8AUXNu
-         hycokxPpFuChldqk6eeRkmmw9H2iyIfDFKszF4gk6HHd6kXDWiQvgeK8wCEmno34gPAi
-         awww==
-X-Forwarded-Encrypted: i=1; AJvYcCXfrk3pF9OZESt+aNZN62HTETXcY0oNKUs6sRnLD+/viOdVMsBMG+l3d5WPtug0IuwTSyzhHVdsM8csOQ4dhXHhiPLoTEAs
-X-Gm-Message-State: AOJu0YwUlhYeIKgRc7Cy+3J0k7I5zOuuJXYswFBqhBDjRhfjv/97Qf+H
-	5oxx2P5paDAZoYFSD3OSo28SIjXXQZZ/DRRKK/4XnGLef1XoMzUZPF8PEAwskwY=
-X-Google-Smtp-Source: AGHT+IGUgv/nFejl9dY+nxeDofI2G44Drc4/N4dAbJlhZL1H0IE7lOaZ6fKO8N2RwLmw/tJcnDgCVw==
-X-Received: by 2002:a2e:890b:0:b0:2d6:c4ec:782 with SMTP id d11-20020a2e890b000000b002d6c4ec0782mr8428163lji.49.1712056894282;
-        Tue, 02 Apr 2024 04:21:34 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id o12-20020adfa10c000000b00341bb338407sm13969803wro.99.2024.04.02.04.21.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 04:21:33 -0700 (PDT)
-Date: Tue, 2 Apr 2024 13:21:32 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Karthik Sundaravel <ksundara@redhat.com>
-Cc: jesse.brandeburg@intel.com, wojciech.drewek@intel.com,
-	sumang@marvell.com, jacob.e.keller@intel.com,
-	anthony.l.nguyen@intel.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, pmenzel@molgen.mpg.de,
-	michal.swiatkowski@linux.intel.com, rjarry@redhat.com,
-	aharivel@redhat.com, vchundur@redhat.com, cfontain@redhat.com
-Subject: Re: [PATCH v7] ice: Add get/set hw address for VFs using devlink
- commands
-Message-ID: <ZgvqPHYj3jS7vGHO@nanopsycho>
-References: <20240402092254.3891-1-ksundara@redhat.com>
- <20240402092254.3891-2-ksundara@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C72058AB0
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 11:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712057120; cv=fail; b=SmcF8h3MUZZeRvnGnMK2o43Rq/MG75NYhabmb1kQII6Nh7JocHwfiMGfx+nJ4Kg+8QVrlM91o8/SyCBJn2+op1nxUUjpKRXRK2mufsFDg01j9Sbnjovr3svTbCiAUJaO8YEfrVuBy70EilCxQhjZ2P7xr5SI4hRvHeJlDmg5ZV0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712057120; c=relaxed/simple;
+	bh=FTUrDzGFrgRvcO9Ui+rCs25zfwMQRRGexixa9r9wcMY=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=aH7qavJC4CzcXIafQ94J/2NY7YhJSzKq/6vbAW3WkpCjRReYlV2KmzmXyB1x0tSH19dwa8JBHQ5kiAd0yniQTZ2ep9NBcRwClaDJIbfNHtyFZjeYWncrjqwb9Z6s+w1rJRQeoaBsDIFKTI/hHpNOOVpKW8lfQmIYPiRByyvJOmo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lWhKns/u; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712057118; x=1743593118;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=FTUrDzGFrgRvcO9Ui+rCs25zfwMQRRGexixa9r9wcMY=;
+  b=lWhKns/uBhSxe59ejo5Hltb4eiR2sHHoCuS1/E/HASJ+R6ESUIN/XEcT
+   +kCcUrNA2RqnpkhmLoiQVeIR82OraaAWCkOC/rc2N1WPeHa1Y0Ar3uwDj
+   LqBv1aSVJZCmPDAO5Z8woPoT+IVp2odtLk5QpbIzCzuNQNKZGbXatq58K
+   LsKOl3WBDj3X22KG/J9ZSeerI4xsg/4shsTN8kHrNi7psM/Aadk1Qbkgo
+   a5IzsQ3pT8m+TZvJpnoGvS6VNCrrJKsYS53Plh42eEDdhkSxF90N2ndjb
+   LFaMqk7i5iOnk5ea5OGkqruCqcHwIf8AE8Ld3SFK4Vxcznq5cKXFeEme/
+   w==;
+X-CSE-ConnectionGUID: e4gm8ruTRCi87vjAkcJJXQ==
+X-CSE-MsgGUID: 1WvZmFzbRa2sV7cz+Dfa8w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="18672315"
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="18672315"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 04:25:18 -0700
+X-CSE-ConnectionGUID: h69XtmRKQR2mbWFFbsVqnA==
+X-CSE-MsgGUID: olG7mWmnR5+jBR8kDdynLQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="18057517"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Apr 2024 04:25:17 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Apr 2024 04:25:16 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Apr 2024 04:25:15 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 04:25:15 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 2 Apr 2024 04:25:15 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J2BdE/ZtSVpx7o67/ZLT6kKkAOXgEqGytb+rkE8d5Ft78xTBaSkhuNdM0qX0ttV51PraJ4Z21Pf46jOm4utdlypMOrNETGYv3NN0uhQzv6OB8mbEO9kdqPxxC6yLvKWjxBqaGxacoS2+6giy06hSV8YwpSxUmKlJl7mtW3IJf3nTFFVYSUqTcmYUndQcmIwMUBqqIts1Nds2iHyLoCTCYjHpblIJ8k5mq+PddzB/LRldAUGP2j/1IsIi1ZRLEinnF8k/vud0wKaam5xuHu+R8SpEuKoLps8Am08NQ5jvRdmy61KyyhG1owEqbJw+WTfAry7EW87gZ/yWNZgxLP8FXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0vZK/G72CbRGvt5LrAFacul7/pUlZNY4/9pAMpIr7Xk=;
+ b=FxaQQ4fmMiW5igk+9dSHkwx2pd07vyjraK3zdC2BNonJE8vrk9UUhnO4JubX7Hs9cY276UVVr8yIqszTgL4vrJys3KS9+Azj3Sj82b5rMKjDVlYslsvYMl+GhMWR+zXk6o2EpavHJuPrbaxLrb01CKOIaSe67iHQu6gwtTWXtxpGEnpbRSzsPHTxHEdcz7c9xg0H+9maAyZnSqFf0UiRX3bY6gF0e/Il2SBqTG3WoppJYCD73ts/R7UcTm1hgHS/ST+N/meKlgHkBddA6dXvxAn/ba+7uDzxpSZo4tBzEcECDtJcHok07b2r5oG0Xrqhg7QUemqPJGb3g2cMcFIirg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by DS0PR11MB7631.namprd11.prod.outlook.com (2603:10b6:8:14e::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.22; Tue, 2 Apr
+ 2024 11:25:13 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Tue, 2 Apr 2024
+ 11:25:13 +0000
+Message-ID: <f7c6264e-9a16-4232-aba2-fde91eb51fb7@intel.com>
+Date: Tue, 2 Apr 2024 13:25:07 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] ethtool: Introduce max power support
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<anthony.l.nguyen@intel.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<idosch@nvidia.com>, <przemyslaw.kitszel@intel.com>,
+	<marcin.szycik@linux.intel.com>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
+ <20240329092321.16843-3-wojciech.drewek@intel.com>
+ <20240329152954.26a7ce75@kernel.org>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <20240329152954.26a7ce75@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI1P293CA0021.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:3::14) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240402092254.3891-2-ksundara@redhat.com>
-
-Tue, Apr 02, 2024 at 11:22:54AM CEST, ksundara@redhat.com wrote:
->Changing the MAC address of the VFs is currently unsupported via devlink.
->Add the function handlers to set and get the HW address for the VFs.
->
->Signed-off-by: Karthik Sundaravel <ksundara@redhat.com>
->---
-> drivers/net/ethernet/intel/ice/ice_devlink.c | 63 +++++++++++++++++++-
-> drivers/net/ethernet/intel/ice/ice_sriov.c   | 62 +++++++++++++++++++
-> drivers/net/ethernet/intel/ice/ice_sriov.h   |  8 +++
-> 3 files changed, 132 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
->index 80dc5445b50d..10735715403a 100644
->--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
->+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
->@@ -1576,6 +1576,66 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
-> 	devlink_port_unregister(&pf->devlink_port);
-> }
-> 
->+/**
->+ * ice_devlink_port_get_vf_fn_mac - .port_fn_hw_addr_get devlink handler
->+ * @port: devlink port structure
->+ * @hw_addr: MAC address of the port
->+ * @hw_addr_len: length of MAC address
->+ * @extack: extended netdev ack structure
->+ *
->+ * Callback for the devlink .port_fn_hw_addr_get operation
->+ * Return: zero on success or an error code on failure.
->+ */
->+
->+static int ice_devlink_port_get_vf_fn_mac(struct devlink_port *port,
->+					  u8 *hw_addr, int *hw_addr_len,
->+					  struct netlink_ext_ack *extack)
->+{
->+	struct ice_vf *vf = container_of(port, struct ice_vf, devlink_port);
->+
->+	ether_addr_copy(hw_addr, vf->dev_lan_addr);
->+	*hw_addr_len = ETH_ALEN;
->+
->+	return 0;
->+}
->+
->+/**
->+ * ice_devlink_port_set_vf_fn_mac - .port_fn_hw_addr_set devlink handler
->+ * @port: devlink port structure
->+ * @hw_addr: MAC address of the port
->+ * @hw_addr_len: length of MAC address
->+ * @extack: extended netdev ack structure
->+ *
->+ * Callback for the devlink .port_fn_hw_addr_set operation
->+ * Return: zero on success or an error code on failure.
->+ */
->+static int ice_devlink_port_set_vf_fn_mac(struct devlink_port *port,
->+					  const u8 *hw_addr,
->+					  int hw_addr_len,
->+					  struct netlink_ext_ack *extack)
->+
->+{
->+	struct devlink_port_attrs *attrs = &port->attrs;
->+	struct devlink_port_pci_vf_attrs *pci_vf;
->+	struct devlink *devlink = port->devlink;
->+	struct ice_pf *pf;
->+	u8 mac[ETH_ALEN];
-
-Why you need this extra variable?
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|DS0PR11MB7631:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Lwe/V2b0WxuhMvT8+7NmibmK+Qvmyl+4OC0NppNLROXJBHl2/gCs+v32H1aQvZ2B5F6Oq9b0JKHrFl0X82t65WJ92fcw/5sLR7OTd6AWcUCpeoz2pCVVCCWMjbUFetnEvTmWLoltVV+GtUVy9ra6ZUwXDfZh8tfv0jr3ebYfzWDzauGfWYQLh918V39xk7QVI63V6M8oN8+3vWyfi8MBTVf7hFIUxQECNb27veiE34kx2+g73eXGxB6RkJ3YLENxGjKW5jzw77OpXz9Eqqe2onIPC0ExmtS6WI5ozH3qERC4dRXWlG5/b/1aYtiXAulLANAqJm4UlqtmUjozaUSw0r4lg3Xhy16WS6cHUC0TcZMQfVu/xf1xnlHbe6cvK+BtgBUVPrSITioWo/juz6GDd/XXbto2Fn2zz/43Qs0yO3xoRpUO20XiuDzKHMy8uHJodVU01zJ54qfdRpi4rCeZjK43yqVK/1GQw6XBxjI7ZmkjUN7pJ5cE5F7TwbhQVy9cJvPHBnR+e3Q9y3swRyYT7CexNhpm65O1TvvcyiHYBPIIxQ8k0RiUL1NFGQO/NN9gy2K4Olmd9UaRVs7QoxJr8PVjVfgMTA0Hhhur2gCrCXfyj6sH60NvgYMdaXojAAxW284iU3T4rKy3U9jVMegtor+W54usJW+w+nskiI1beO4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UlV4NTNGbEszR1RxaStvQUFqWCsvVFY3U1NqM05sMzZ0UHZBWUkwRmU4RlNj?=
+ =?utf-8?B?ZlJvWU9SSmJQMk14bS8zb0FyNGdGOWtTMVdaWXVTYVZMMEVxVXNiYTVGanhT?=
+ =?utf-8?B?YlhDRjRCWXdTamtLWWFScEFpa3V1ZnJLOUJaRWJBeEt5RVFQZ1N2M0lCQWFp?=
+ =?utf-8?B?TE43RThKUkorT3VEZzJJUFhRSGJqelZWUEF1OWYxMjltUzdzV3hWRnp0MU80?=
+ =?utf-8?B?SkJtSkUrWXBMMW4yWUN4UUxZZURKNytPclJwRzYvZ1lwRjdFNVJ3dU5hUmY3?=
+ =?utf-8?B?SHRWdERMdjhyWmM5VzRpdGxiWUlxSU92WExTNEVNdFJVZkZhR205UU9aQ2hT?=
+ =?utf-8?B?OEQxdVhHM3NQTWdlekpvVy9LRDBEbGk0d0RRaWcrTzFURG5zcDVsd3FaMkd6?=
+ =?utf-8?B?UzFKV1pRU2lpdlVubGs4NVdWSnYwaUIxYWVRcFJaekNBQ2w0aSthcmorWTd2?=
+ =?utf-8?B?aDFCZmM3Uitya1F5aGRwOTlOcU5mSkw1UTZDZkFqY2JaNkJwMnJVN2QyMkpN?=
+ =?utf-8?B?QkJBR0FDZXBEME1EMGtaSnArOXZMdURid2h2ejFvMlZWdWtCNDErQkRmZ0hC?=
+ =?utf-8?B?K1BoaW0zZ2hTQndYK0cvRWNCNTFMaXVRMGxpRXNjY05PRTZVNDh0bkZrVzI0?=
+ =?utf-8?B?TlRWbVNUM0c4RUhSSVdrQktEdmVOd1oxaGowRXRNQkw1LzloMnBvQkhmT1BS?=
+ =?utf-8?B?S1A3aWgyVld5NkVKVVluL0lPUk1ZajZ0Y2ZHYXdvOTU3ZHc1eUtjUWNvZTVF?=
+ =?utf-8?B?UGgveTEwSEtwTUt4UnBSbVQ2aVJWQnFZVW4zaXErdjI4RVdwd3FjWVdJZVdh?=
+ =?utf-8?B?QTUzNTVscnFZYkRLVlAvRVZycW5neWRhTkxQeWcvMTBocEVrSS96cGZoQjYw?=
+ =?utf-8?B?ZE90SU1XVFhGUjZXLzNlQzNuTll5LzN0UWhXamw5YXIzRmNPd2UrUzVEOGZx?=
+ =?utf-8?B?a3hzeTNxN2Q1NFVoR25DSHhTVVU0dy9FT0hJVlYrelRaT25Id3dLdkhLQk1F?=
+ =?utf-8?B?VXUvOU51amdoYUtnV1lBQWMwTzFwR1QwSGhJN24zTlhTdGcrSU9iL0tRZTlh?=
+ =?utf-8?B?K3p0SEZvTmJRNGVZUFJ1enROOUpOQVpGSzJDV240N3NBWDVITGdpYUxOYWZI?=
+ =?utf-8?B?a3JhcVJKYlBvTHc5di9BdFpNbGFDTm1DMENmNXIvMzBCWU1xampRNk12bHVP?=
+ =?utf-8?B?YzQ5RFI3c1Qramx6dU1tanNBTGNWUFJXeGxhMzF3V0dyQk1rSmlsNzIzMjY3?=
+ =?utf-8?B?bUU3Y1VpeVBSVzJ3NWlPU1Jhb2V3dVUyaDE4MXA0d0puWEpVV2Z4YXU0Qjh2?=
+ =?utf-8?B?TWxnUFFEY1pHckpIaS9IaUV2MTdaZk4yeEc4Sk1Wdi9FUlRDTmhqemFabWJV?=
+ =?utf-8?B?MkxUNlVNRHNxTUw0REhUMU8zSlBsSS9ZaStjcTI0MHBhd2I2Q08zaE5zSkpa?=
+ =?utf-8?B?dUpYRHdHRnVJcklPc0VjU2JvWnNWZFRUbTNCTXFCV0hmZGdHTlAyektEcUsv?=
+ =?utf-8?B?TUl0ZEhqZVZCZW9Sdlh4RDFQNjRWNHJDcDY0T2VyWGpqdGlCR3B3TGlwUVBU?=
+ =?utf-8?B?R0V1dklrd1NNWlczeHZscEhKOXFQbTM2bWFzcTlMcFJURkNNRE5xeEVybEpm?=
+ =?utf-8?B?WUdlQTJLNDJ3eHVWd25vUVpJRFZzeUY5S2V3dWsxbzV2U3JGeTlZcGpISGpV?=
+ =?utf-8?B?dGtzeFVJSDJJUlJpbndTUlU0dGthekgzc0lXSytKQnRLMWhvbGxrQkJ2YmhF?=
+ =?utf-8?B?c1NrWTZmblQxSEp4WnE1Z2wrZUZiTElwNEwvZlFXK29vWG9JNEZmS3RTcnlv?=
+ =?utf-8?B?T09zd21hOFN2STlNbGw1Ulh6ZFhMQy9FUEZ0TG1FREpYM0JrNGdEY0lRY2Zr?=
+ =?utf-8?B?dWVCd2NMOWlQaW5rbnpPWTZLdjNUcDR3RWJOekdjdllDV0tmclA2QnRMcDBa?=
+ =?utf-8?B?K0tQVFBOc283THg2R3lmVmZ3RitGcnNudEVBLy9OZllRWm5obnFNditaeTRL?=
+ =?utf-8?B?L3RXWC9vWVhTM3Z6ejdsclp1TXJxdUJCZ3RGQkQwZDhDdVI2YS90eSt3cFY3?=
+ =?utf-8?B?SWxJK0hWc1MwQmdZalpOd2p5RUZ2eVZyeVNKY0FKYVdCN3FOWUlQeGsrL0cw?=
+ =?utf-8?B?U0tTZkRwOU5rcGY0dFM5eE5QMklFeU0wZjltSXQ2bXlUY2hheGk2VW9rUlVL?=
+ =?utf-8?B?NXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74d89ff4-eb3a-4e9c-3a95-08dc53079079
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 11:25:13.6053
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JkoqEi8x4haMzY8Q5l14X7p7ITVs6CdoWiqD3oLt04p70AzuutFEwMNaDeD+yqiu0Dn6bMVTcBEW/ZdehHsRyOHNpYQ5L836UJcjdbfDRnI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7631
+X-OriginatorOrg: intel.com
 
 
->+	u16 vf_id;
->+
->+	pf = devlink_priv(devlink);
->+	pci_vf = &attrs->pci_vf;
->+	vf_id = pci_vf->vf;
->+
->+	ether_addr_copy(mac, hw_addr);
->+
->+	return ice_set_vf_fn_mac(pf, vf_id, mac);
->+}
->+
->+static const struct devlink_port_ops ice_devlink_vf_port_ops = {
->+	.port_fn_hw_addr_get = ice_devlink_port_get_vf_fn_mac,
->+	.port_fn_hw_addr_set = ice_devlink_port_set_vf_fn_mac,
->+};
->+
-> /**
->  * ice_devlink_create_vf_port - Create a devlink port for this VF
->  * @vf: the VF to create a port for
->@@ -1611,7 +1671,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
-> 	devlink_port_attrs_set(devlink_port, &attrs);
-> 	devlink = priv_to_devlink(pf);
+
+On 29.03.2024 23:29, Jakub Kicinski wrote:
+> On Fri, 29 Mar 2024 10:23:20 +0100 Wojciech Drewek wrote:
+>> Some modules use nonstandard power levels. Adjust ethtool
+>> module implementation to support new attributes that will allow user
+>> to change maximum power.
+>>
+>> Add three new get attributes:
+>> ETHTOOL_A_MODULE_MAX_POWER_SET (used for set as well) - currently set
+>>   maximum power in the cage
 > 
->-	err = devlink_port_register(devlink, devlink_port, vsi->idx);
->+	err = devlink_port_register_with_ops(devlink, devlink_port,
->+					     vsi->idx, &ice_devlink_vf_port_ops);
-> 	if (err) {
-> 		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
-> 			vf->vf_id, err);
->diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
->index 31314e7540f8..b1e5cd188fd7 100644
->--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
->+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
->@@ -1216,6 +1216,68 @@ ice_get_vf_cfg(struct net_device *netdev, int vf_id, struct ifla_vf_info *ivi)
-> 	return ret;
-> }
+> 1) I'd keep the ETHTOOL_A_MODULE_POWER_ prefix, consistently.
 > 
->+/**
->+ * ice_set_vf_fn_mac
->+ * @pf: PF to be configure
->+ * @vf_id: VF identifier
->+ * @mac: MAC address
->+ *
->+ * program VF MAC address
->+ */
->+int ice_set_vf_fn_mac(struct ice_pf *pf, u16 vf_id, u8 *mac)
->+{
->+	struct device *dev;
->+	struct ice_vf *vf;
->+	int ret;
->+
->+	dev = ice_pf_to_dev(pf);
->+	if (is_multicast_ether_addr(mac)) {
->+		dev_err(dev, "%pM not a valid unicast address\n", mac);
->+		return -EINVAL;
->+	}
->+
->+	vf = ice_get_vf_by_id(pf, vf_id);
->+	if (!vf)
->+		return -EINVAL;
->+
->+	/* nothing left to do, unicast MAC already set */
->+	if (ether_addr_equal(vf->dev_lan_addr, mac) &&
->+	    ether_addr_equal(vf->hw_lan_addr, mac)) {
->+		ret = 0;
->+		goto out_put_vf;
->+	}
->+
->+	ret = ice_check_vf_ready_for_cfg(vf);
->+	if (ret)
->+		goto out_put_vf;
->+
->+	mutex_lock(&vf->cfg_lock);
->+
->+	/* VF is notified of its new MAC via the PF's response to the
->+	 * VIRTCHNL_OP_GET_VF_RESOURCES message after the VF has been reset
->+	 */
->+	ether_addr_copy(vf->dev_lan_addr, mac);
->+	ether_addr_copy(vf->hw_lan_addr, mac);
->+	if (is_zero_ether_addr(mac)) {
->+		/* VF will send VIRTCHNL_OP_ADD_ETH_ADDR message with its MAC */
->+		vf->pf_set_mac = false;
->+		dev_info(dev, "Removing MAC on VF %d. VF driver will be reinitialized\n",
->+			 vf->vf_id);
->+	} else {
->+		/* PF will add MAC rule for the VF */
->+		vf->pf_set_mac = true;
->+		dev_info(dev, "Setting MAC %pM on VF %d. VF driver will be reinitialized\n",
->+			 mac, vf_id);
->+	}
->+
->+	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
->+	mutex_unlock(&vf->cfg_lock);
->+
->+out_put_vf:
->+	ice_put_vf(vf);
->+	return ret;
->+}
->+
-> /**
->  * ice_set_vf_mac
->  * @netdev: network interface device structure
->diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.h b/drivers/net/ethernet/intel/ice/ice_sriov.h
->index 346cb2666f3a..11cc522b1d9f 100644
->--- a/drivers/net/ethernet/intel/ice/ice_sriov.h
->+++ b/drivers/net/ethernet/intel/ice/ice_sriov.h
->@@ -28,6 +28,7 @@
-> #ifdef CONFIG_PCI_IOV
-> void ice_process_vflr_event(struct ice_pf *pf);
-> int ice_sriov_configure(struct pci_dev *pdev, int num_vfs);
->+int ice_set_vf_fn_mac(struct ice_pf *pf, u16 vf_id, u8 *mac);
-> int ice_set_vf_mac(struct net_device *netdev, int vf_id, u8 *mac);
-> int
-> ice_get_vf_cfg(struct net_device *netdev, int vf_id, struct ifla_vf_info *ivi);
->@@ -76,6 +77,13 @@ ice_sriov_configure(struct pci_dev __always_unused *pdev,
-> 	return -EOPNOTSUPP;
-> }
+> 2) The _SET makes it sound like an action. Can we go with
+>    ETHTOOL_A_MODULE_POWER_MAX ? Or ETHTOOL_A_MODULE_POWER_LIMIT?
+>    Yes, ETHTOOL_A_MODULE_POWER_LIMIT
+>         ETHTOOL_A_MODULE_POWER_MAX
+>         ETHTOOL_A_MODULE_POWER_MIN
+>    would sound pretty good to me.
+
+Makes sense, although ETHTOOL_A_MODULE_POWER_LIMIT does not say if
+it's max or min limit. What about:
+ETHTOOL_A_MODULE_POWER_MAX_LIMIT
+ETHTOOL_A_MODULE_POWER_UPPER_LIMIT
+
 > 
->+static inline int
->+ice_set_vf_fn_mac(struct ice_pf __always_unused *pf,
->+		  u16 __always_unused vf_id, u8 __always_unused *mac)
->+{
->+	return -EOPNOTSUPP;
->+}
->+
-> static inline int
-> ice_set_vf_mac(struct net_device __always_unused *netdev,
-> 	       int __always_unused vf_id, u8 __always_unused *mac)
->-- 
->2.39.3 (Apple Git-146)
->
+>> ETHTOOL_A_MODULE_MIN_POWER_ALLOWED - minimum power allowed in the
+>>   cage reported by device
+>> ETHTOOL_A_MODULE_MAX_POWER_ALLOWED - maximum power allowed in the
+>>   cage reported by device
+>>
+>> Add two new set attributes:
+>> ETHTOOL_A_MODULE_MAX_POWER_SET (used for get as well) - change
+>>   maximum power in the cage to the given value (milliwatts)
+>> ETHTOOL_A_MODULE_MAX_POWER_RESET - reset maximum power setting to the
+>>   default value
+>>
+>> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>> ---
+>>  include/linux/ethtool.h              | 17 +++++--
+>>  include/uapi/linux/ethtool_netlink.h |  4 ++
+>>  net/ethtool/module.c                 | 74 ++++++++++++++++++++++++++--
+>>  net/ethtool/netlink.h                |  2 +-
+>>  4 files changed, 87 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+>> index f3af6b31c9f1..74ed8997443a 100644
+>> --- a/include/linux/ethtool.h
+>> +++ b/include/linux/ethtool.h
+>> @@ -510,10 +510,18 @@ struct ethtool_module_eeprom {
+>>   * @policy: The power mode policy enforced by the host for the plug-in module.
+>>   * @mode: The operational power mode of the plug-in module. Should be filled by
+>>   *	device drivers on get operations.
+>> + * @min_pwr_allowed: minimum power allowed in the cage reported by device
+>> + * @max_pwr_allowed: maximum power allowed in the cage reported by device
+>> + * @max_pwr_set: maximum power currently set in the cage
+>> + * @max_pwr_reset: restore default minimum power
+>>   */
+>>  struct ethtool_module_power_params {
+>>  	enum ethtool_module_power_mode_policy policy;
+>>  	enum ethtool_module_power_mode mode;
+>> +	u32 min_pwr_allowed;
+>> +	u32 max_pwr_allowed;
+>> +	u32 max_pwr_set;
+>> +	u8 max_pwr_reset;
+> 
+> bool ?
+
+Makes sense
+
+> 
+>> diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
+>> index 3f89074aa06c..f7cd446b2a83 100644
+>> --- a/include/uapi/linux/ethtool_netlink.h
+>> +++ b/include/uapi/linux/ethtool_netlink.h
+>> @@ -882,6 +882,10 @@ enum {
+>>  	ETHTOOL_A_MODULE_HEADER,		/* nest - _A_HEADER_* */
+>>  	ETHTOOL_A_MODULE_POWER_MODE_POLICY,	/* u8 */
+>>  	ETHTOOL_A_MODULE_POWER_MODE,		/* u8 */
+>> +	ETHTOOL_A_MODULE_MAX_POWER_SET,		/* u32 */
+>> +	ETHTOOL_A_MODULE_MIN_POWER_ALLOWED,	/* u32 */
+>> +	ETHTOOL_A_MODULE_MAX_POWER_ALLOWED,	/* u32 */
+>> +	ETHTOOL_A_MODULE_MAX_POWER_RESET,	/* u8 */
+> 
+> flag ?
+
+Agree
+
+> 
+>> @@ -77,6 +86,7 @@ static int module_fill_reply(struct sk_buff *skb,
+>>  			     const struct ethnl_reply_data *reply_base)
+>>  {
+>>  	const struct module_reply_data *data = MODULE_REPDATA(reply_base);
+>> +	u32 temp;
+> 
+> tmp ? temp sounds too much like temperature in context of power
+
+I'll change the name
+
+> 
+>>  static int
+>>  ethnl_set_module(struct ethnl_req_info *req_info, struct genl_info *info)
+>>  {
+>>  	struct ethtool_module_power_params power = {};
+>>  	struct ethtool_module_power_params power_new;
+>> -	const struct ethtool_ops *ops;
+>>  	struct net_device *dev = req_info->dev;
+>>  	struct nlattr **tb = info->attrs;
+>> +	const struct ethtool_ops *ops;
+>>  	int ret;
+>> +	bool mod;
+>>  
+>>  	ops = dev->ethtool_ops;
+>>  
+>> -	power_new.policy = nla_get_u8(tb[ETHTOOL_A_MODULE_POWER_MODE_POLICY]);
+>>  	ret = ops->get_module_power_cfg(dev, &power, info->extack);
+>>  	if (ret < 0)
+>>  		return ret;
+>>  
+>> -	if (power_new.policy == power.policy)
+>> +	power_new.max_pwr_set = power.max_pwr_set;
+>> +	power_new.policy = power.policy;
+>> +
+>> +	ethnl_update_u32(&power_new.max_pwr_set,
+>> +			 tb[ETHTOOL_A_MODULE_MAX_POWER_SET], &mod);
+>> +	if (mod) {
+> 
+> I think we can use if (tb[ETHTOOL_A_MODULE_MAX_POWER_SET]) here
+> Less error prone for future additions.
+
+Yep, makes sense
+
+> 
+>> +		if (power_new.max_pwr_set > power.max_pwr_allowed) {
+>> +			NL_SET_ERR_MSG(info->extack, "Provided value is higher than maximum allowed");
+> 
+> NL_SET_ERR_MSG_ATTR() to point at the bad attribute.
+
+Sure
+
+> 
+>> +			return -EINVAL;
+> 
+> ERANGE?
+
+Agree
+
+> 
+>> +		} else if (power_new.max_pwr_set < power.min_pwr_allowed) {
+>> +			NL_SET_ERR_MSG(info->extack, "Provided value is lower than minimum allowed");
+>> +			return -EINVAL;
+>> +		}
+>> +	}
+>> +
+>> +	ethnl_update_policy(&power_new.policy,
+>> +			    tb[ETHTOOL_A_MODULE_POWER_MODE_POLICY], &mod);
+>> +	ethnl_update_u8(&power_new.max_pwr_reset,
+>> +			tb[ETHTOOL_A_MODULE_MAX_POWER_RESET], &mod);
+> 
+> I reckon reset should not be allowed if none of the max_pwr values 
+> are set (i.e. most likely driver doesn't support the config)?
+
+Hmmm, I think we can allow to reset if the currently set limit is the default one.
+Right now only the driver could catch such scenario because we don't have a parameter
+that driver could use to inform the ethtool about the default value.
+I hope that answers your question since I'm not 100% sure if that's what you asked about :)
+
+> 
+>> +	if (!mod)
+>>  		return 0;
+>>  
+>> +	if (power_new.max_pwr_reset && power_new.max_pwr_set) {
+> 
+> Mmm. How is that gonna work? The driver is going to set max_pwr_set
+> to what's currently configured. So the user is expected to send
+> ETHTOOL_A_MODULE_MAX_POWER_SET = 0
+> ETHTOOL_A_MODULE_MAX_POWER_RESET = 1
+> to reset?
+
+Yes, that was my intention. Using both of those attributes at the same time is not allowed.
+
+> 
+> Just:
+> 
+> 	if (tb[ETHTOOL_A_MODULE_MAX_POWER_RESET] &&
+> 	    tb[ETHTOOL_A_MODULE_MAX_POWER_SET])
+> 
+> And you can validate this before doing any real work.
+
+Hmmm, makes sense
+
+> 
+>> +		NL_SET_ERR_MSG(info->extack, "Maximum power set and reset cannot be used at the same time");
+>> +		return 0;
+>> +	}
+>> +
+>>  	ret = ops->set_module_power_cfg(dev, &power_new, info->extack);
+>>  	return ret < 0 ? ret : 1;
+>>  }
 
