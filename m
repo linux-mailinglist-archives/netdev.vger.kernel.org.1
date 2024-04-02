@@ -1,132 +1,248 @@
-Return-Path: <netdev+bounces-83942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A438894EF1
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:44:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB4AE894F2B
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F2041F218A7
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:44:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A2F51C20BC8
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C8358203;
-	Tue,  2 Apr 2024 09:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDDE58ADB;
+	Tue,  2 Apr 2024 09:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PXNRyBrm"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="nvhlaD+a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB0847A53
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 09:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988F75731E
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 09:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712051049; cv=none; b=kFWA+Wv17yaPECHML/ySt6QQTrGp54Pn0C62R47PGolpDuO7knJjSJxplQMY/xyTigfpbY6j+9GoqgMGw0vhhu2VBcmu8x9S9v/fqXcEUXC1vSmuPoKOqP6xuTUFoT4E3FPynuD9Xd1eOZTVV15RGaVtfSMIfCrR7V4Cp7yStxg=
+	t=1712051603; cv=none; b=gzA5nTNXB4bgyHTfC6c8Kff30Amh92WIp7+F+lxy081Il3wOEMVxX1QG2vcWEJ/R3DFkrk55vEkdwhm2EaRHa/GS2YxxH2KK556X3irhviSMQnMw6VSSFUUSBmp6m8Fs7F0qA6I/bTY+LHHHKg8r+1QbARH+n85GZDjspso3xZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712051049; c=relaxed/simple;
-	bh=1nbyZ7+9SpgY593Qq1WCH+zJ79nvBInwvRDFndmHnfw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bjYWmEpFdMRDlOy4ymF1HUhqyxyDcF4KZZc4ofBvUYcdNCxejgGsTPkwtp1ZkLO7e1k5bj75/1nq2HaB2UGZHYzlf0NKzuYTwnTvYL9BZDA2EYTlkNdPi13btrDzJLJukdqTM6/Z6hhG6oHF7g2SxvQkVNbglilpD+zjgC/jBC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PXNRyBrm; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56dec96530bso4612a12.0
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 02:44:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712051046; x=1712655846; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BpSM8hFsyo5Obyhrx854SpDzmsBWUlzyTmjUnSt2t8Y=;
-        b=PXNRyBrm0ZHYODCH3qKMo3LFmLXq9s4Or/96pH9sXcKy5ADJqNGlnW6yyhlg0a1afr
-         gNahkwjzTbg0ot28uHDxs77T+Xozi4lHZ0Ws0kQhp2Dzs1ok1rJixAae8h9Sf0K5/S35
-         hyy3GxvKLGltVkS65vpozPzrDKE7O3B+Fxdks/dwMC+j743lfOzGOsFq7SGVth4hnSM+
-         UnAqDDT7wlbCS/T/NQcyt9buGegydBLoTL0AyFk+UuR4crCG60ubdypR3sMSxARULQEn
-         lo607IJO2NUkrLPjF2kAgQeosolBAILoRZ9OMZcZ0iCUakWcoevdXmGbnwILOEt4vn7C
-         yatA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712051046; x=1712655846;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BpSM8hFsyo5Obyhrx854SpDzmsBWUlzyTmjUnSt2t8Y=;
-        b=upyYXmBu8K1a4Bn/86OyzUP6Wp/B05KU1xJZI5c5qxyUQCXDJMfDIGFXERdHEQRVHv
-         NZBVSJ6GicXkG2vk6nSzPQseJ/kdpK2ZtIsHjZxw7+7ShE2EADK3XQ4UP6ZE+dDm/qgz
-         9Qkbko68nnncpFD1g6PBhG0zCXYrANq7kPvH+M9r3S1hHjV6tIJejmVkVAv7jCZCFEwS
-         2T27n+M2Lq7kt6vnjCalFVd9IojA5CHe4ZDTp6hiahW+Xtn3mOEJFjq9S4NoAFbjeOvH
-         Vp2cu5/extDzEUdXWwtkQPyARXf/ozCDFlYY/fV7pNpqUP+P0MSJMkC0IMTtiWh/M0VG
-         GqjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV32zmuGnXx6diBghmCcUCuug/q6KCG/z1VmhMLLiBRgeWbJmIzGY70qp6NTpvSXjbhGgrQse9O93YXZrgn7Jj5Td9pw+Xq
-X-Gm-Message-State: AOJu0Yx7fPJljDKX560mikqP3BYJfgThh7rn32+UH0LLOV7zNKnHderU
-	PyXPQ9dMXe1wETiDvPWP3QxkM+oQ3TzaM27oa4dTfhIF2V+xFYlSCyNPJRfmFOGk1cOUoOHnzSA
-	xXWMR9G5kSujLEO4Z/8CHixl6f+UhNfq1SdPj
-X-Google-Smtp-Source: AGHT+IHSdicgtaGtIHgXLgCtu9lak9iy9Sn9Th+YwvL2uit/nzKJ/4W0z9bJqO3PI3uuakBvj9PszgLY8VfEjFHD90Y=
-X-Received: by 2002:a05:6402:430b:b0:56d:cb23:e043 with SMTP id
- m11-20020a056402430b00b0056dcb23e043mr386732edc.5.1712051045632; Tue, 02 Apr
- 2024 02:44:05 -0700 (PDT)
+	s=arc-20240116; t=1712051603; c=relaxed/simple;
+	bh=H92Z8U2YBFFdaC4L6X13E2f0ZVakp5ra2dp91kdypcc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TKX3Z4mmx+Ts/S4EhToaod012newFjt/G2ls9QbA1cPpinJ9KynSzIpHF7A29U/Dneo7rW7QWEEOHDG/knhHQwdTx2YfsJMKD+xC5yrDFyGCVty0tSDgrveSyasUCmJG7GrPJjil49YyyyTzdRuUSx2JsnzbAXcfdyI4cb+Hd1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=nvhlaD+a; arc=none smtp.client-ip=83.166.143.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4V83923hzMzct9;
+	Tue,  2 Apr 2024 11:53:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1712051590;
+	bh=H92Z8U2YBFFdaC4L6X13E2f0ZVakp5ra2dp91kdypcc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nvhlaD+aptQO/JRmneq8ZnxYjv4HOJIA3KIc1BP3n8jL9jutIVsnzyzcovfquN3iu
+	 NN6ZYAImAt84ML8xfof0x+yJaNwuEwn+1LjmiVdczc2Qhv1Dt/3KBKveAKodKPAEk+
+	 8zi7/Sid/sQfs4+wPc7sXSTxoDXdUTr9Lds8fcy4=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4V83913wxVz3Y;
+	Tue,  2 Apr 2024 11:53:09 +0200 (CEST)
+Date: Tue, 2 Apr 2024 11:53:09 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: TaheraFahimi <fahimitahera@gmail.com>
+Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, outreachy@lists.linux.dev, netdev@vger.kernel.org, 
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Jann Horn <jannh@google.com>
+Subject: Re: [PATCH v2] landlock: Add abstract unix socket connect
+ restrictions
+Message-ID: <20240401.ieC2uqua5sha@digikod.net>
+References: <ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240401211003.25274-1-kuniyu@amazon.com>
-In-Reply-To: <20240401211003.25274-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Apr 2024 11:43:51 +0200
-Message-ID: <CANn89iKD8MhvSWySOUiteh=mxjt6uB6ZzRco1W-LMWWRD4K1PQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net] ipv6: Fix infinite recursion in fib6_dump_done().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzkaller <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000>
+X-Infomaniak-Routing: alpha
 
-On Mon, Apr 1, 2024 at 11:10=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> syzkaller reported infinite recursive calls of fib6_dump_done() during
-> netlink socket destruction.  [1]
->
-> From the log, syzkaller sent an AF_UNSPEC RTM_GETROUTE message, and then
-> the response was generated.  The following recvmmsg() resumed the dump
-> for IPv6, but the first call of inet6_dump_fib() failed at kzalloc() due
-> to the fault injection.  [0]
->
->   12:01:34 executing program 3:
->   r0 =3D socket$nl_route(0x10, 0x3, 0x0)
->   sendmsg$nl_route(r0, ... snip ...)
->   recvmmsg(r0, ... snip ...) (fail_nth: 8)
->
-> Here, fib6_dump_done() was set to nlk_sk(sk)->cb.done, and the next call
-> of inet6_dump_fib() set it to nlk_sk(sk)->cb.args[3].  syzkaller stopped
-> receiving the response halfway through, and finally netlink_sock_destruct=
-()
-> called nlk_sk(sk)->cb.done().
+Thanks for this patch.  Please CC the netdev mailing list too, they may
+be interested by this feature. I also added a few folks that previously
+showed their interest for this feature.
 
-It was not clear to me why we call inet6_dump_fib() a second time
-after the first call returned -ENOMEM
+On Thu, Mar 28, 2024 at 05:12:13PM -0600, TaheraFahimi wrote:
+> Abstract unix sockets are used for local interprocess communication without
+> relying on filesystem. Since landlock has no restriction for connecting to
+> a UNIX socket in the abstract namespace, a sandboxed process can connect to
+> a socket outside the sandboxed environment. Access to such sockets should
+> be scoped the same way ptrace access is limited.
 
-It seems to be caused by rtnl_dump_all(), if the skb had info from
-IPv4 (skb->len !=3D 0)
+This is good but it would be better to explain that Landlock doesn't
+currently control abstract unix sockets and that it would make sense for
+a sandbox.
 
-"ip -6 ro" alone is not triggering the bug.
 
->
-> fib6_dump_done() calls fib6_dump_end() and nlk_sk(sk)->cb.done() if it
-> is still not NULL.  fib6_dump_end() rewrites nlk_sk(sk)->cb.done() by
-> nlk_sk(sk)->cb.args[3], but it has the same function, not NULL, calling
-> itself recursively and hitting the stack guard page.
->
-> To avoid the issue, let's set the destructor after kzalloc().
->
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> 
+> For a landlocked process to be allowed to connect to a target process, it
+> must have a subset of the target process’s rules (the connecting socket
+> must be in a sub-domain of the listening socket). This patch adds a new
+> LSM hook for connect function in unix socket with the related access rights.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Because of compatibility reasons, and because Landlock should be
+flexible, we need to extend the user space interface.  As explained in
+the GitHub issue, we need to add a new "scoped" field to the
+landlock_ruleset_attr struct. This field will optionally contain a
+LANDLOCK_RULESET_SCOPED_ABSTRACT_UNIX_SOCKET flag to specify that this
+ruleset will deny any connection from within the sandbox to its parents
+(i.e. any parent sandbox or not-sandboxed processes).
+
+> 
+> Link to first draft:
+> 	https://lore.kernel.org/outreachy/20240328.ShoR4Iecei8o@digikod.net/
+
+You can move this sentence in the below changelog.
+
+> 
+
+You can add this:
+
+Closes: https://github.com/landlock-lsm/linux/issues/7
+
+> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
+
+Your Git (or email app) configuration doesn't use the same name as here.
+
+Please run ./scripts/checkpatch.pl on this patch and fix the warnings.
+
+> 
+> ----
+> Changes in v2:
+> - Remove wrapper functions, noted by Casey Schaufler <casey@schaufler-ca.com>
+> ---
+>  security/landlock/task.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+> 
+> diff --git a/security/landlock/task.c b/security/landlock/task.c
+> index 849f5123610b..67528f87b7de 100644
+> --- a/security/landlock/task.c
+> +++ b/security/landlock/task.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/lsm_hooks.h>
+>  #include <linux/rcupdate.h>
+>  #include <linux/sched.h>
+> +#include <net/sock.h>
+>  
+>  #include "common.h"
+>  #include "cred.h"
+> @@ -108,9 +109,48 @@ static int hook_ptrace_traceme(struct task_struct *const parent)
+>  	return task_ptrace(parent, current);
+>  }
+>  
+> +static bool unix_sock_is_scoped(struct sock *const sock,
+
+For consistency with task_is_scoped(), you can rename this to
+sock_is_scoped().
+
+> +				struct sock *const other)
+> +{
+> +	bool is_scoped = true;
+> +
+> +	/* get the ruleset of connecting sock*/
+
+These comments don't help more than the following line, you can remove
+them.
+
+> +	const struct landlock_ruleset *const dom_sock =
+
+According to the name it looks like the domain of the socket but it is
+just the domain of the current task. Just "dom" would be clearer and
+more consistent with security/landlock/fs.c
+
+> +		landlock_get_current_domain();
+> +
+> +	if (!dom_sock)
+> +		return true;
+> +
+> +	/* get credential of listening sock*/
+> +	const struct cred *cred_other = get_cred(other->sk_peer_cred);
+
+We have a get but not a put call, so the credentials will never be
+freed.  The put call must be called before any return, so you
+probably need to follow the goto/error pattern.
+
+In the context of these LSM hooks, only unix_listen() sets the "other"
+socket credential, and unix_listen() is guarded by unix_state_lock()
+which locks unix_sk(s)->lock .  When security_unix_stream_connect() or
+security_unix_may_send() are called, unix_sk(s)->lock is locked as well,
+which protects the credentials against race-conditions (TOCTOU:
+time-of-check to time-of-use).  We should then make that explicit with
+this assertion (which also documents it):
+
+lockdep_assert_held(&unix_sk(other)->lock);
+
+In theory it is then not required to call get_cred().  However, because
+the performance impact should be negligible and to avoid a potential
+use-after-free (not possible in theory with the current code), it would
+be safer to still call get/put.  It would be worse to have a
+use-after-free rather than an access control issue.
+
+Another thing to keep in mind is that for this hook to be
+race-condition-free, the credential must not change anyway.  A comment
+should highlight that.
+
+> +
+> +	if (!cred_other)
+> +		return true;
+> +
+> +	/* retrieve the landlock_rulesets */
+> +	const struct landlock_ruleset *dom_parent;
+
+All declarations should be at the top of functions.
+
+> +
+> +	rcu_read_lock();
+
+No need for this RCU lock because the lock is managed by
+unix_state_lock() in this case.
+
+> +	dom_parent = landlock_cred(cred_other)->domain;
+> +	is_scoped = domain_scope_le(dom_parent, dom_sock);
+> +	rcu_read_unlock();
+> +
+> +	return is_scoped;
+> +}
+> +
+> +static int hook_unix_stream_connect(struct sock *const sock,
+> +				    struct sock *const other,
+> +				    struct sock *const newsk)
+> +{
+> +	if (unix_sock_is_scoped(sock, other))
+> +		return 0;
+> +	return -EPERM;
+> +}
+> +
+>  static struct security_hook_list landlock_hooks[] __ro_after_init = {
+>  	LSM_HOOK_INIT(ptrace_access_check, hook_ptrace_access_check),
+>  	LSM_HOOK_INIT(ptrace_traceme, hook_ptrace_traceme),
+> +	LSM_HOOK_INIT(unix_stream_connect, hook_unix_stream_connect),
+
+Please add a hook for security_unix_may_send() too, it should be quite
+similar, and simplify the patch's subject accordingly.
+
+You now need to add tests (in a dedicated patch) extending
+tools/testing/selftests/landlock/ptrace_test.c (I'll rename the file
+later).
+
+These tests should also check with unnamed and named unix sockets.  I
+guess the current code doesn't differentiate them and control all kind
+of unix sockets.  Because they must explicitly be passed, sockets
+created with socketpair(2) (i.e. unnamed socket) should never be denied.
+
+>  };
+>  
+>  __init void landlock_add_task_hooks(void)
+> -- 
+> 2.34.1
+> 
+> 
 
