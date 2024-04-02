@@ -1,123 +1,164 @@
-Return-Path: <netdev+bounces-84191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB4B895FA8
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 00:37:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE9A1895FC3
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 00:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89FFB24FD7
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:37:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 395511F254FE
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9F0224D7;
-	Tue,  2 Apr 2024 22:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBADC225A2;
+	Tue,  2 Apr 2024 22:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="y8gs3/kN";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/S3kigRc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="myO5Dx2G"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D22F1D6AE;
-	Tue,  2 Apr 2024 22:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712097452; cv=none; b=W10TqsaPvy5VnnlmThzMZBeFgxDZOjLBb3GGNNh17bIpp2lcCYgQVV/Ny27yjt1URfxO0PVhgRDAa3lW1Rzk3RPUEvLnRmFCrP+NWTS/GlnUozRTu7bf0MwzlT9Q8uDI0/CULHYDoe0RGFSy6GEw5PqJgZ4ULQXqg6M/1BFhu7o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712097452; c=relaxed/simple;
-	bh=RTJ4TUWlWWd2tTYwH9K2+rCPELvAiNcHn8N7wtsQdE4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=uGv4B2I9IO7Vu7D2acS2jIBX/gxlkKM4ATuqG+QfjxQjmx/2Pht0zs2TkEkZUIX/lnkI30+++eVc1mZD0VJ0Gk7auouuAUcs6wVE3Iqfs0OPjkwcKfr+msubxKZqnG2ro6pMSSxTJm048CRtQer5Ay8E8FlJeUQnwMF8Kbte+1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=y8gs3/kN; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/S3kigRc; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1712097449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=clN786LC8NAM+WdiMM9dgE3xxt8pA/vNnE2Z1vIrTT0=;
-	b=y8gs3/kNhqVMDT69laurybXNrUUQLXSrWBlCfk7pYoQcD7sK8QMi2tcLxZzkUPDz1X8GFu
-	rDsIpWZ0dnEQluAc24xXlL4OxvWeX0lwaDKuqO838hTIEmqov7noMajRVkE4KsmiJRAFsQ
-	3vsSR5JyyO2QIU4l+hPyGZvLBGQ96v5jvXV9Sh2ifVY5GBGOQaIHT3bmPElkDDpBp7Nr3v
-	ou/q6j9YcqJz8Gz30kQRCGPebZaTDn7VkUNbbI+KO5BTEDOOP2q3L7BLEWF1I1ZZ1YOXaG
-	C79sLoWN91aYOfwqYOMJ0rCrI198o5Dd+BP7sBJx9J4T5MaI6XiMi2qXJC8CcQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1712097449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=clN786LC8NAM+WdiMM9dgE3xxt8pA/vNnE2Z1vIrTT0=;
-	b=/S3kigRc0yKHbucTfmxketx4NbcQwgEjHo9AEoMAW71rZkqIq1rlQldWDmbV8LlyBHHCAK
-	2c+UPz+ei3Kc93DA==
-To: =?utf-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS1?=
- =?utf-8?B?4KS+4KSwKQ==?= <maheshb@google.com>
-Cc: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com,
- luto@kernel.org, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, arnd@arndb.de,
- geert@linux-m68k.org, peterz@infradead.org, hannes@cmpxchg.org,
- sohil.mehta@intel.com, rick.p.edgecombe@intel.com, nphamcs@gmail.com,
- palmer@sifive.com, keescook@chromium.org, legion@kernel.org,
- mark.rutland@arm.com, mszeredi@redhat.com, casey@schaufler-ca.com,
- reibax@gmail.com, davem@davemloft.net, brauner@kernel.org,
- linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
- linux-arch@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
-In-Reply-To: <CAF2d9jj6km7aVSqgcOE-b-A-WDH2TJNGzGy-5MRyw5HrzbqhaA@mail.gmail.com>
-References: <CAMuE1bHBky9NGP22PVHKdi2+WniwxiLSmMnwRM6wm36sU8W4jA@mail.gmail.com>
- <878r29hjds.ffs@tglx>
- <CAMuE1bF9ioo39_08Eh26X4WOtnvJ1geJ=WRVt5DhU8gEbYJNdA@mail.gmail.com>
- <87o7asdd65.ffs@tglx>
- <CAF2d9jjA8iM1AoPUhQPK62tdd7gPnCnt51f_NMhOAs546rU3dA@mail.gmail.com>
- <87il10ce1g.ffs@tglx>
- <CAF2d9jj6km7aVSqgcOE-b-A-WDH2TJNGzGy-5MRyw5HrzbqhaA@mail.gmail.com>
-Date: Wed, 03 Apr 2024 00:37:28 +0200
-Message-ID: <877chfcrx3.ffs@tglx>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3064A1E531;
+	Tue,  2 Apr 2024 22:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.100
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712097999; cv=fail; b=eKMkKrY1NtiV/onLEyR5PYDOuieam95LgNDf8x5ZaC4qlc2pCekIjHl5VAvwUOI4TIQHkRvRUdTIArM3Zoy3oXZNNv3v387Z/b8tHRACh7c3M8k6XRrAnVrTH0ihxdsJW70vv0pyy5cJ+Xlu/4H1lvTDAYfcLTwaYBtEOAi388c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712097999; c=relaxed/simple;
+	bh=k+nWOgMc+AVH9NBJykPI+Tw2+BqOJTcHABNFcCwqUrI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=XeqPU8rwYAc/t7tpGpnbhOiXShxo9xW9xFtcmqEU2imzPedK/D7bVr/d9A3qeCNNWH81UQ9qvO4vNzhYLlhhW7asziUMaqmHSMaKjNWP2LnmpJhwYa0Firl0lgpynVBQ9zNLlQ3Utkk1EqxtGjZnVsC+T6acmV7rJbFFtIRvMsY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=myO5Dx2G; arc=fail smtp.client-ip=40.107.236.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CjwG5U8VslcnJHKo76/DH1iBmkE+IY7Zff2nRiggkkIV4G8iOayhDV9Se3pA8dfZbrH/qq2QoSTSUGJvuKzEcPJw13+mThNXOO6w4qVYnRKFFk/0wRFFEqiinqUTb+4sgwciOJbvxJLdkHhwolh3sZ9/q0rPBA4tWiljaSXv8pd0KJf0FUDzSBaxV+OD9G3FamgIqhxchwsevGy+VBEUtYWeUjvIvfOtBTjlqFOzFvTbS1xK92aTz5c3iEcZ0Xm1FRYJ+boJ+f/8lavv+6cvbB5roapxrzSVcIhGQd5iHxa/LeiM49oWtXTQUykPf3dNyQnIJidfv2Vai/XKEhzLiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k+nWOgMc+AVH9NBJykPI+Tw2+BqOJTcHABNFcCwqUrI=;
+ b=iFDR1BRnXMQm//RRXxmruG4u2O3ehtg7HcIcH9BbLUXQUaTxBWVFsUhc0LcYLNo2c2uxD3vkG7f+BHDrhaVnTQVp2T4Yc3QANuCtxII19GmHQoGGM7p11am6jyL+s8tGZv711g8lbBJxYjndGdOawsOErAVVr/AdHc1naiL8TJThJmsHN1saMtLArL4gp7N/DV43TnOSsu0pF5iWAz4MMG4K7Ckt/+dSrFiY0U426575kKf/3tjDN51mcRnLN6SYfIThOKd5LJSlq8yfGFGLxNzxIdGjwsit8Kw0icbVwzUe9HbV/xhiz4CeeXN14LxcOveiHwiv6Sw8o6FHS3breg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k+nWOgMc+AVH9NBJykPI+Tw2+BqOJTcHABNFcCwqUrI=;
+ b=myO5Dx2GbsKyWdniTx1PKy4/Hq9W723fmokA5KuGT2PellGYV6w09d4GnepcWLrMtKmCvHfkKEWn+8z7EwmYrKz4DqyjC8jHPUmyOqjTthS9NC0eUTPloduJN3/rMbpskYZAfSpOVPFkh3URL5uSA5NZ9Su/eFVs7GwSEEh4R6J0Dw6/LD8ZnIyeyK9+eZN0VdBp/Ks8GmyvqzBl9nwJTQ3ZahqNjwoh0A6uuexi24Vp4E481Phh4Fayh6RSAmarQVQIbWWOjjZW9nUTY9XMswduHmZ/Va0qy15VRNlJ/qtNpdb4LdMGpMob3lyMzFzFaQpiQIiYInSHJ67b1JV7NQ==
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by DS7PR12MB5982.namprd12.prod.outlook.com (2603:10b6:8:7d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
+ 2024 22:46:34 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7409.042; Tue, 2 Apr 2024
+ 22:46:34 +0000
+Date: Tue, 2 Apr 2024 19:46:32 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
+	Itay Avraham <itayavr@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	linux-kernel@vger.kernel.org,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Junxian Huang <huangjunxian6@hisilicon.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240402224632.GT946323@nvidia.com>
+References: <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+ <Zf2n02q0GevGdS-Z@C02YVCJELVCG>
+ <20240322135826.1c4655e2@kernel.org>
+ <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+ <20240322154027.5555780a@kernel.org>
+ <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+ <20240401123003.GC73174@unreal>
+ <20240401075003.70f5cb4b@kernel.org>
+ <20240402184554.GQ946323@nvidia.com>
+ <20240402143607.0357d71a@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240402143607.0357d71a@kernel.org>
+X-ClientProxiedBy: SA1PR03CA0014.namprd03.prod.outlook.com
+ (2603:10b6:806:2d3::10) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|DS7PR12MB5982:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ZqWftw9d/T6wvcJ8buhGIzTrLa4zy/3tVYNE5k7Xj05y0KkzvO0ttcQ4oY9/V9vDnEmyDkAxX+dSE8B/mFyVSqDL8ypo125A2bXjFZCmE96vQm69gQ5LBpdfAmSfth7XrjnnmISVSnwVmhEW0ujd16f0aw1/X06jKJoaogLCcPJcB96uUNeTcOi25DtZtajZFSCv005m5SInisQtYkO4WhG62/4svlGvr9pYQgJfMZQa3gH8YJ4K/ajprZlM+i0avaa0OduGGzUD5oF/kJod/p26CZ9pEJSqK+dnS3UIEaOXbrVpPVGHzjKSL+ividUINJVWidad9BJbZgzKOz2/CgeDyBv/SYMX9gmXQoA8j9mC65RmtG0aD3fO2QT/5CIAX0L0bOMVngIw1pPs6QSDpMBhjnL4G7upVxHTZaZd5XDEuvmdbMCl9/2lJipNfYuEgBYCKBH1WjpMN7BLivdwc1Cr2BUmpvHRzeJRXjY27XfRCs5cFZtBzyLkMhmtvxvTyGtYLH+ka3YuSKmdIGqf8impFiDz9Tw7aAlCyBGlk82wvujWBb4AjLyWZafuCgoDPrY54T3r+GLhDTblCvgxSt7aN6N4IpsR7UuKFkg1XZxeicnQU05682zHMn9sD+PcrdEgjGSDf6rIp8h3bElL2pxb6qPG+F59NvPulnRTT00=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?bquabETt/oZEQpfVuuvF1vJFkhrUpsaYQnjZcW0UBg8cgPck5919NArehhP3?=
+ =?us-ascii?Q?CDriHiTs+t0YLbNSgyhu/86y1NzPmrRzn2ofq8FKich08LR/zQCNrHXdy3PL?=
+ =?us-ascii?Q?0fPDN5tkJaUuFdAP0gup7AApTMvZ4xf7LdHXq0s46HcX3Ox2oVgFonkHrbDA?=
+ =?us-ascii?Q?gNYn8Snw4cIqV13WomAtTVkrbVgzf+KYRINhcJ1MQrF0CC7YcPKyvm+eCiMh?=
+ =?us-ascii?Q?V2mpZzEbLKBXRpKHG16oj79B0xMugNGKRg9rDjim7yapoT8Z5K4MbSDAsbnm?=
+ =?us-ascii?Q?eQqL7WqsOfofZ49HgA59G1r1BrxE1aY9FmYkBT5VHO0v/ZgteMkM8RbkY/Ya?=
+ =?us-ascii?Q?917S6nCHGBNzY7YT27YdLkfraPtP90MwBejnB2AnWwL2EosMBezjmVxeSMHJ?=
+ =?us-ascii?Q?AvbAb23lXPXRaVojaCmMAH7AxpfXbt8Kr0fCr2gSoa7Uz9ovYeNvugpcRUPZ?=
+ =?us-ascii?Q?lxSy7q10HDNqBsMzmwB8CMiPbtTSfg8q7OBUXJsBzF84hel7hZO0EFaZ3Piz?=
+ =?us-ascii?Q?hFsrGIxcytFTcab6iKP/PkzFEUqXZUHcCeTQ4yPrvMLj5ECC0rjgOR3LrOJc?=
+ =?us-ascii?Q?Og7eVND+6hoVBoPkkxhX3qXFuX8cDRf/6F8XIh1F8bDGp0YYJAtN7jgT43KS?=
+ =?us-ascii?Q?K8U1zwehSBlES1mRdawgQOd9cX3eCJL6eSny1iitEjdAb8zPuEYmlGeEJXrB?=
+ =?us-ascii?Q?ycfCmsADWUChZkiH0lP7V5YFjLiZ8GuK4zROsKJDEq6nSJAQQ5wPztXqtbPC?=
+ =?us-ascii?Q?Au5g8n0Nj2ZR4LoBlUKA/9H+0mPLcLFAupRA9YS/1PaYewdk45rVvkjr6FcB?=
+ =?us-ascii?Q?zoP+En6UUOycRShREY7Tyvo9XCMIv2Pyge7hxCGgb5GHJiv9W2ztCP28jlzh?=
+ =?us-ascii?Q?S0EOefldKJ0TxzgCeAQ9rWt2RiFsiEKQPK92Kg3O7Ucy/PDt4L95ShnNhQx3?=
+ =?us-ascii?Q?yQ1Awose7hzlJurQSHBsElLHemiQcX/lsn+LT6YcnEZFPfOC0NOOQiisfViD?=
+ =?us-ascii?Q?krjnOjuvPklK8mppFwrUObwaulc0Aigw9ZJF0jCx6XDdKr9U6Nf0PushKAi8?=
+ =?us-ascii?Q?eRxsKDANDC5iI5W+St0od8OPWuzIsZXIJcVjLRRxCFLcSRYWSkrZQPiqB0hn?=
+ =?us-ascii?Q?vwXtTdlQCphLW2EkzM1xxYZmPU81pJy6KVmBtIhUb4q/GQto0TI9TUaIGE6t?=
+ =?us-ascii?Q?mVCFIkXcC67Zb2+aSBEHhF8fOaQs/E8CH0g8W72ZduiXUNA4/teshmtxfxKS?=
+ =?us-ascii?Q?OO/0/SwelfQ1hgFz5XHT/kSXXGGf4NSTOXty5T9D98Ym15yhaR5/xqjWB0ts?=
+ =?us-ascii?Q?wacAfyBZRlK07g6DGB1Y9pSMWuYmkZb01lYSkq2eZurFhRSRrg0BCu8ijamr?=
+ =?us-ascii?Q?gq4nndleqsTsPRQwnU1j0kKdk5yHHbxseaNkvsuw1gPZ3BbEdHq1fjNrd+Xn?=
+ =?us-ascii?Q?KCXUI21JOAjpAbxJs4mxIQN7rwfQjuoGj9xqGduq2UBJaUpLmqol5z7+C55A?=
+ =?us-ascii?Q?6csULc6rtr9w4MAb/r0vp6FghcsJTVv42GS7qs7IpLOOOkQz0yhfNnG6fZdp?=
+ =?us-ascii?Q?OxKC5N823aVXelmjvh2UB4Lw5ghSrIm1bxXnmOWA?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a1220773-a3f1-4b21-853d-08dc5366bf29
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 22:46:33.9973
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: okXt3mA2zFRu3OzfWtLJx1ZdLN4/2CGpK6PMW6nkL5QvOLT0hl1ahDzbcuh4hgBd
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5982
 
-On Tue, Apr 02 2024 at 14:16, Mahesh Bandewar (=E0=A4=AE=E0=A4=B9=E0=A5=87=
-=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=BE=E0=A4=B0) =
-wrote:
-> On Tue, Apr 2, 2024 at 2:25=E2=80=AFAM Thomas Gleixner <tglx@linutronix.d=
-e> wrote:
->> Works as well. I'm not seing the point for CLOCK_MONOTONIC and the
->> change logs are not really telling anything about the problem being
->> solved....
->>
-> https://lore.kernel.org/lkml/20240104212431.3275688-1-maheshb@google.com/=
-T/#:~:text=3D*%20[PATCHv3%20net%2Dnext%200/3]%20add%20ptp_gettimex64any()%2=
-0API,21:24%20Mahesh%20Bandewar%200%20siblings%2C%200%20replies;
+On Tue, Apr 02, 2024 at 02:36:07PM -0700, Jakub Kicinski wrote:
+
+> > FWIW, I've been trying to push RDMA away from driver created sysfs for
+> > a while now. Aside from the API complexity, implementations have
+> > messed up using the sysfs APIs and resulted in some significant
+> > problems :(
 >
-> This is the cover letter where I tried to explain the need for this.
+> Sure, agreed, but off-topic.
 
-The justification for a patch needs to be in the change log and not in
-the cover letter because the cover letter is not part of the git
-history.
+It is not - I don't want a huge amount of sysfs in drivers to replace
+what fwctl will do for pretty solid technical reasons.
 
-> Granted, my current use case is for CLOCK_MONOTONIC_RAW but just
-> because I don't have a use case doesn't mean someone else may not have
-> it and hence added it.
+I do object, as snarky as I was, to you saying RDMA should take on a
+whole bunch of read/write sysfs in drivers that netdev would not
+accept as a "reasonable" direction.
 
-Then why did you not five other clock IDs? Someone else might have a
-use case, no?
-
-While a syscall/ioctl should be flexible for future use, the kernel does
-not add features just because there might be some use case. It's
-documented how this works.
-
-Thanks,
-
-        tglx
-
+Jason
 
