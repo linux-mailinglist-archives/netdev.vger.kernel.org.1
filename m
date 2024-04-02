@@ -1,91 +1,136 @@
-Return-Path: <netdev+bounces-83983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32EC98952CA
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:20:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AF8C8952DB
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E171828158F
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:20:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A28EB2721D
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB12178B4E;
-	Tue,  2 Apr 2024 12:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E67275813;
+	Tue,  2 Apr 2024 12:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pRdBfDCo"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="D5h1znKe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEA678B50;
-	Tue,  2 Apr 2024 12:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F55D6FE24
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 12:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712060400; cv=none; b=h2Om8w8vKcJtkKvJZ/rTuWjXV+7y/rT1aHI7YLUABJfXx6DrADsyLbGMii9htpytqS6duY18j7n5EBkcCmBr6RtRP7SBbeC8TbtwFPS6tLsm5wsvV/FiIkeM07GZuRcQKL/MxxKgMHcYF/CaaxJPDAMOux1hiH4CrCC9ORL2cxU=
+	t=1712060582; cv=none; b=HDO7ejqBPiOpFX3FETi79nrkpvsXMhSPSA9lVHoscHQxkEMwHPXqWG4zZe+vVrh0hCjP4mmPaTDXkoJOC13YRGwnTOa1IsD9dMnt5zHz4qrCeiQEcroUtQN5hgTbCyxRBQB5IeyiC+3vJYbaTHkIRp7MY1Rb5OhvEtCQP/mE5tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712060400; c=relaxed/simple;
-	bh=10zaNQjO6cD0u802nObkF2rIFEWC9XMzwL4o5CgNn5k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H8dutkog5OrXT5LWnaqtpYZrkXT9RHTwuvOk4UPJLIcMb7Td5bHoj3Suv8KBrf+b1Igy28T/vLGSgkGHJsNUwuU+QoBZJrLf4wu047LeTGO3m7nJ26XRr5R+W1decWivqV/sEo9nhAtgE2DZgVVXbxdcnDvxf6FsguK2v6WEJjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pRdBfDCo; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1712060394; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=MRQA2S5++ydiyrHI6q0p5IMDBBaTSk6Hs3CzM+V9A6o=;
-	b=pRdBfDCoYmdI1rBKdi6yYxKXmof6g5/j2wc3hwk7fQpgiwCAI3TahQEPog3seizS+VjQaLl58sT4iU9xNW3pWNho4R4K86f/Brwe1eNgW52IS9JokOTztuvbgTxi3vg0g5m4Nv/+TiK3JinXlkmRzbqoy/HfjoxkHTTVUR5DvRg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3oRGU8_1712060393;
-Received: from 30.221.148.49(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3oRGU8_1712060393)
-          by smtp.aliyun-inc.com;
-          Tue, 02 Apr 2024 20:19:54 +0800
-Message-ID: <359c5369-da09-49ba-a900-415f41911fa8@linux.alibaba.com>
-Date: Tue, 2 Apr 2024 20:19:52 +0800
+	s=arc-20240116; t=1712060582; c=relaxed/simple;
+	bh=mbQkOL4j8TAxgxaiur0s+4odmPmLL8jNl5O0N2Gbx6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FWikp1X0yqBr1TKbSjtdAjW06JK4Cg+I7xcc97y+tBYmbAmnDVMcMjB3sZDC1XsdFgle98tSfUBLvid7aJv3cOtPCMc7BEGxlbcsvhWcFcTf9ajbDAqttLpt76Ci3SMek5chNv6FcWdSsOu+WTMfnlmYDavMqpMSVciGT4BrT+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=D5h1znKe; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-341d381d056so3365962f8f.0
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 05:22:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712060577; x=1712665377; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hyNzutW1FQE4t1aQ4mfpd/YSE5qsNE6pWpPL5goeFFg=;
+        b=D5h1znKeeJfViZNxUPoT9GEfmzEqXV7XPGNIqcaKD+gVSEVEwFtRZNIEdwzgzLyLs2
+         CF4XeCki69bduHJhv9XyxRUIi49wnczRDK9zon1ZC5nX6/uXOiXnsVO9EMkcnidNp1ow
+         Rw6amyyLZExblrVdPhq5S0s0063l9/mIiSOk8XBxc/bdtUv0Z5jrUbp8cmEpfVT9bwYR
+         Oz+eslpGbI0+V1cSXLagF5n/9VyhpLPoz521Fc/EVvT00oGU8/6N06cpT1JYzi2UxZLL
+         v3r1dOEOrFHrk8oBE4hUIS8DFlur3JSd6/cty0oxzvsNeOzrbjcmdrud5/SsJdV0niYZ
+         XiBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712060577; x=1712665377;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hyNzutW1FQE4t1aQ4mfpd/YSE5qsNE6pWpPL5goeFFg=;
+        b=aHrnMaG7Q/iRWAYOrZpPYf2Nu8jY3x8kPrBRQe1c3u4eRK7+jQfHIBvbcgUiIA6iZg
+         Wh+zKHMjcUCW5oojbWmLKdPXuaDfjlqoL8MXiQo9JpJTeMzYBg4+Nf4nU7nwROb6JhsN
+         PAs3IW3j2kU/L7vbKPV2NSFfpGSb71TkHrYZfthYXcwm0HsPMCxVmyI3vlItFgXlZmxH
+         m9dacX1AgkEVxRfz7GpVqd9CCE3zk5DK+SVvjH2C4q0qbqkRleh3vjlTQSIxkbwlo7jU
+         5mrLNpG83ZJfwoPuWS6rUhI02EJqSfHb4iMui6kBvHXd3RqARL4CnDWY9UfbPxPMMQgZ
+         kurA==
+X-Gm-Message-State: AOJu0YymdikZ1zsw4KniTzHP8j0DVq3Uat7w/M6lbjcBqJaO+UQ3HFNT
+	jIkB4HUmGauWOEAb0KmcfLIdMvi8vZ7MPG0ip2ME2Xpc/xancFFMMwkAxmrsAnY=
+X-Google-Smtp-Source: AGHT+IEzHmxKqdfVU/diHTYxIgjX4CQovk82hIat+prg79lMhsBnYRwPd7+z0+9NwtZvlA9K/H5O7w==
+X-Received: by 2002:a05:6000:1887:b0:343:472e:cdd1 with SMTP id a7-20020a056000188700b00343472ecdd1mr6978812wri.69.1712060577242;
+        Tue, 02 Apr 2024 05:22:57 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id v28-20020a5d591c000000b00341d4722a9asm13987679wrd.21.2024.04.02.05.22.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 05:22:56 -0700 (PDT)
+Date: Tue, 2 Apr 2024 14:22:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCHv4 net-next 1/4] Documentation: netlink: add a YAML spec
+ for team
+Message-ID: <Zgv4nfZzH1mXAByx@nanopsycho>
+References: <20240401031004.1159713-1-liuhangbin@gmail.com>
+ <20240401031004.1159713-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH ethtool-next] netlink: fix typo in coalesce_reply_cb()
-To: gaoxingwang <gaoxingwang1@huawei.com>
-Cc: idosch@nvidia.com, kuba@kernel.org, liaichun@huawei.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, yanan@huawei.com,
- Jiri Pirko <jiri@resnulli.us>, mkubecek@suse.cz
-References: <ZgvpKNFcBw-39SOD@nanopsycho>
- <20240402121618.3575706-1-gaoxingwang1@huawei.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240402121618.3575706-1-gaoxingwang1@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240401031004.1159713-2-liuhangbin@gmail.com>
 
-
-
-在 2024/4/2 下午8:16, gaoxingwang 写道:
-> Add missing colon in coalesce_reply_cb()
+Mon, Apr 01, 2024 at 05:10:01AM CEST, liuhangbin@gmail.com wrote:
+>Add a YAML specification for team.
 >
-> Fixes: ec573f209dfd (netlink: settings: add netlink support for coalesce tx aggr params)
-> Signed-off-by: Gao Xingwang <gaoxingwang1@huawei.com>
-> ---
->   netlink/coalesce.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/netlink/coalesce.c b/netlink/coalesce.c
-> index bc34d3d..bb93f9b 100644
-> --- a/netlink/coalesce.c
-> +++ b/netlink/coalesce.c
-> @@ -93,7 +93,7 @@ int coalesce_reply_cb(const struct nlmsghdr *nlhdr, void *data)
->   		 tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_BYTES]);
->   	show_u32("tx-aggr-max-frames", "tx-aggr-max-frames:\t",
->   		 tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_FRAMES]);
-> -	show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs\t",
-> +	show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs:\t",
->   		 tb[ETHTOOL_A_COALESCE_TX_AGGR_TIME_USECS]);
->   	show_cr();
->   
+>Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
+Small note/question below.
+
+[..]
+
+
+>+    name: attr-option
+>+    name-prefix: team-attr-option-
+>+    attributes:
+>+      -
+>+        name: unspec
+>+        type: unused
+>+        value: 0
+>+      -
+>+        name: name
+>+        type: string
+>+        checks:
+>+          max-len: string-max-len
+>+          unterminated-ok: true
+>+      -
+>+        name: changed
+>+        type: flag
+>+      -
+>+        name: type
+>+        type: u8
+>+      -
+>+        name: data
+>+        type: binary
+
+For the record, this is incomplete as this is not of type "binary" but
+rather a type determined by TEAM_ATTR_OPTION_TYPE.
+My rejected patch:
+https://lore.kernel.org/all/20240219172525.71406-7-jiri@resnulli.us/
+Makes that possible to be implemented in ynl.
+
+Jakub, still not willing to pull this in?
+
+[..]
 
