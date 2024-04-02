@@ -1,104 +1,84 @@
-Return-Path: <netdev+bounces-84196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF192896002
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:21:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 670E689603C
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFC6E1C21AB2
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:21:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98F481C228EA
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3545B41C7F;
-	Tue,  2 Apr 2024 23:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E722A481AB;
+	Tue,  2 Apr 2024 23:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mSr+xnQt"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oXLEo1uE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A727224FA;
-	Tue,  2 Apr 2024 23:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCC747A7A;
+	Tue,  2 Apr 2024 23:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712100068; cv=none; b=HOESzb0VQ+p74EZJIgxuVlZt1hRGGHwU8UI2IaG5i7hOHqnrJG9bSHrYQt71GObe2g50USbdAD7XwUFOhD0zVo01ejfXirbNgiG2j7HDrrdx3TWnAAYIzEnWcTWBy5JoAi02Q7zEjW1gpPksfSLW3WL9uYkU+mm6Ll/Pri+wTaY=
+	t=1712101007; cv=none; b=eZcec+GbvvHUen/sTbJLuqs7PV8Eyn12wC8MXYdLDso+UKVl+aJHhgqcAtArNDFFXCB4vD0HjDLQ4LjF1old34NDK2Szj5ILa4+gDX22p0lOhVXF1bdJVpnp879d7yqm/k91i5bmeN8GCjCyPb0Uu5TqcnRs+L7nCePpa/bLwrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712100068; c=relaxed/simple;
-	bh=cX+vqzisIaO+Ki2taFXWqjs59rFDcLk4j/9kjaZxcoo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DgMXQzD16Pb5lFump+19v7VH13cjC7+IjzFzCYmfjwEbgFJDNpcH+m31etulYItefXq3WlOOay5QVts+MrLB3dVFziRIW+NBnhmF5yUOhjAI9eScP29NjD2++vM51zniGtivpQg5HPx72iFgbcxGJprJZokYCzvQrFV8JUKdEDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mSr+xnQt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D811C433C7;
-	Tue,  2 Apr 2024 23:21:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712100067;
-	bh=cX+vqzisIaO+Ki2taFXWqjs59rFDcLk4j/9kjaZxcoo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mSr+xnQtCqlsnDXqJW+hxekB0mMivwMlYiG2WjLkXZM7jKOcWaxEO81IfBqBShDAD
-	 BHi92j4RZeX+ZvmL0lFfK09+Lbo+zkaBvX9zcwmjXw+umzS8iQhZmuKCDXph/DOZV7
-	 IWJm+OQbt/FQn2ulp0qZvMyQwxPmhkPXkfAUsCFKA6tB82Ch0VtjSGhR2IEDIrJijs
-	 OsdZEHZISeI/v+r9tS/P0OHGWzBJeD7pp/+Eo01IFWEGCWsmrD6eUqV2WT6DIAs3Yx
-	 EzsB/KqpfrKXcl4o8HgY8FfNlLbmVYEuVWm12FJ8/felKWiMKAyWRi3fliIO8+z2qe
-	 edHU3fl4BlQzQ==
-Date: Tue, 2 Apr 2024 16:21:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>, David Ahern <dsahern@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoph Hellwig
- <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
- <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Aron Silverton <aron.silverton@oracle.com>,
- linux-kernel@vger.kernel.org, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Junxian Huang <huangjunxian6@hisilicon.com>
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240402162106.11112e99@kernel.org>
-In-Reply-To: <20240402224632.GT946323@nvidia.com>
-References: <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
-	<Zf2n02q0GevGdS-Z@C02YVCJELVCG>
-	<20240322135826.1c4655e2@kernel.org>
-	<e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
-	<20240322154027.5555780a@kernel.org>
-	<1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
-	<20240401123003.GC73174@unreal>
-	<20240401075003.70f5cb4b@kernel.org>
-	<20240402184554.GQ946323@nvidia.com>
-	<20240402143607.0357d71a@kernel.org>
-	<20240402224632.GT946323@nvidia.com>
+	s=arc-20240116; t=1712101007; c=relaxed/simple;
+	bh=Pv4VdVU6AL/zgFp+IP6jN/D+L9T9b6LguUX+RYDiHDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E9PFJWnTCm+SKWeK9dx979bQQnDA/3LJcbIoM2l7GbBXKWhpyOry/DkJwoGnbYbneBlW+BJoljSm1ZTj/2eXEUAppnVe3R161vqBt9JyLiWKDsYtNhjxNpSHKwot7A6sKl19QifprihVm0auvLYcF8BYRE6fXlVT0O2nABLxbJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oXLEo1uE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=EKRbw7NrczqOiFhiNTqUO47JW87hwrD+azsj7HQRFNg=; b=oXLEo1uEawo2N9Skr61q82c+uj
+	ZHFAGBrKN4TN+ZIklUoTUcW2YhmJKCHFPON/5lfLGQwGu1GcPC/HWebVzhf+Wx1RB/QxDpSHgnDu6
+	2GWxsOlmhB8VntfIOm0odVljR3+Vlpm5sIxLflEIsjWTiojP5pDYUC7YCat139GmdblQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rrng8-00Bzsp-UL; Wed, 03 Apr 2024 01:36:32 +0200
+Date: Wed, 3 Apr 2024 01:36:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>,
+	Dimitri Fedrau <dima.fedrau@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/3] net: phy: marvell: add basic support of
+ 88E308X/88E609X family
+Message-ID: <640e3d8a-3b27-404a-bf0f-0e3016b6fe10@lunn.ch>
+References: <20240402201123.2961909-1-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240402201123.2961909-1-paweldembicki@gmail.com>
 
-On Tue, 2 Apr 2024 19:46:32 -0300 Jason Gunthorpe wrote:
-> On Tue, Apr 02, 2024 at 02:36:07PM -0700, Jakub Kicinski wrote:
-> > > FWIW, I've been trying to push RDMA away from driver created sysfs for
-> > > a while now. Aside from the API complexity, implementations have
-> > > messed up using the sysfs APIs and resulted in some significant
-> > > problems :(  
-> >
-> > Sure, agreed, but off-topic.  
+On Tue, Apr 02, 2024 at 10:11:18PM +0200, Pawel Dembicki wrote:
+> This patch implements only basic support.
 > 
-> It is not - I don't want a huge amount of sysfs in drivers to replace
-> what fwctl will do for pretty solid technical reasons.
+> It covers PHY used in multiple IC:
+> PHY: 88E3082, 88E3083
+> Switch: 88E6096, 88E6097
 > 
-> I do object, as snarky as I was, to you saying RDMA should take on a
-> whole bunch of read/write sysfs in drivers that netdev would not
-> accept as a "reasonable" direction.
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-Repeating myself a bit - I'm not saying you should take the sysfs
-patches. Just that RDMA configuration belongs in the RDMA subsystem.
-I don't want to suggest another solution, because frankly given
-our "no direct FW interface exposure" I don't have much experience
-maintaining such APIs upstream. It'd be vain of me to make suggestions.
-Also I don't want to sound like I'm giving you my "blessing" to do
-whatever, since my personal beliefs(?) remain unchanged. But they
-carry little weight when netdevs or traffic which ends up in netdev
-are not involved.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
