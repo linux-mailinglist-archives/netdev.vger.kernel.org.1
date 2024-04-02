@@ -1,89 +1,102 @@
-Return-Path: <netdev+bounces-84137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB4B895B7B
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:10:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73530895B83
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:15:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49340285CBB
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26230282C2C
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268C415AAD3;
-	Tue,  2 Apr 2024 18:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF1515AD81;
+	Tue,  2 Apr 2024 18:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9snK8mI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QrrTfE5e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0211215AAC4
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 18:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC21D15AAD7
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 18:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712081423; cv=none; b=hq2teGVnHw+yLExfmDyrQMn3Ojp7tEsP7El7A9PpLBjlMUJX5OeTBcx6QiA0O/Nv2vScV5WmjrQlXlTUGHmQoismTQd1P2tj+DcmJHLcCH1+8c+ATamzQky5x7JAyJQMyojML8+uy85VLYxvT8wuZW9GEn0A8AV3/nDWXqhjETI=
+	t=1712081706; cv=none; b=bZsNTCMvT5mmA8MO7hXyHgkGRX9k+aNA3bqYGhG5ziKP1n0WM4YL+e5D77w8WuCCidK4ptG1RqzvYj9mkkEyLnDNZ73FUrv9KXnYWSjymFD8XhONJuumYlzLC068gVGg5sbY6AtnfvBCC3mJwpgNYcHOQcr3nCTMjK2oOKnYYDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712081423; c=relaxed/simple;
-	bh=PZtnS6DseM/bkpdApTTu4OlsczIe4rPTnKfc+6i6cEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PpSGoEdxjhYVKmquG4vQ3b5pg/CS3T11RQabgBm9O4gy8DcW48kma7ExOckkDX7RfIaxqVvMXn06c4Z7ptauWktSHpR0mJgkBiDwjRLHHTQlx2A2kuSMbQIwky+gVPk85954P5WR6c9YNCEVlEZiA75Cr/2/UJ+gW9YbTMbVijw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9snK8mI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4EEFC433F1;
-	Tue,  2 Apr 2024 18:10:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712081422;
-	bh=PZtnS6DseM/bkpdApTTu4OlsczIe4rPTnKfc+6i6cEY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o9snK8mIJc3ocAh+tbYz4aSybieGT4M4avj5Q0l23K/+wIER8QSUKLLzN1IWsYFs5
-	 6eU8qWDA/wCyTWVD+BWGsit5453BaYL3+kd9wqjbNcxjC5of971eO9Ta4+JlpiO2Mm
-	 lMpDCq749jtUjC8b53m7ujz0kv4frdKIFvokw1AdD0qrON01LQ+pi9Er6GTSKMRJHV
-	 VXAbZ0vXxPeLHgDZa1WTBCeb052u5FAB4jJj0Kq/X5/p2RBRtnsNGV0g29qT+f2CQ5
-	 JX3vaz8YG3361mYD7zcxPrmpjZxchtZMKAkc0u8ag0nrO51GwRiOsc9oW6A4syvDrV
-	 4n5b6VNxa+dag==
-Date: Tue, 2 Apr 2024 19:08:48 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Bauer <mail@david-bauer.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, amcohen@nvidia.com, netdev@vger.kernel.org,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [PATCH net-next] vxlan: drop packets from invalid src-address
-Message-ID: <20240402180848.GT26556@kernel.org>
-References: <20240331211434.61100-1-mail@david-bauer.net>
+	s=arc-20240116; t=1712081706; c=relaxed/simple;
+	bh=46KRqglWord9rtMJP1zH3v5q6uz/1865w6V7OrJf2L8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a4kRUM+fFLp0mUssnV+LYbEBNUe4CzMMWP1hJNeBkFh5AOOz/k81YBtmd63OMUQ4t65rhqKg0Tcf113oPXRq3GSB6JBP6LhPP5qB5KwSEsAYddhxZtvtHGW6tonh8tLJsbC0l5THzKkxsy4bk7iRzWBqUxlrWiMSSqjfgkVa4UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QrrTfE5e; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a46ea03c2a5so24278266b.1
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 11:15:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712081703; x=1712686503; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=46KRqglWord9rtMJP1zH3v5q6uz/1865w6V7OrJf2L8=;
+        b=QrrTfE5eHT9Ks7P91fL9DWFfHfSPMbXGPLy61CxZpOMOXgBWxr6K9tzWe7KV1LXtIL
+         udB6dXq7MEVactyVz7QR1KUUbajVJ+MjxUDGIw51tVRm6QDeSG7+V04e/rkmQFJfu+cC
+         po/iuhj8u9lncJwajFBU46fPI5Rc/XtxZamDbI1cHO4RinWnQJ/TFgiNtFEnKhdw0dXz
+         YPeHgAwj8QB41RsA0p1iprvkWLRrtQdI6Z56jNtRs2YZXNj+e7AGtswL08ODqeYamH8T
+         Xl6oz2QuH0fGXg2NhozatSLqwzp2v3nCEyi/UTXQ4QIMmgBYkd4fi8k6XBioVPldu+F6
+         aYZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712081703; x=1712686503;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=46KRqglWord9rtMJP1zH3v5q6uz/1865w6V7OrJf2L8=;
+        b=HjDLt7lVuix0WeKLoos5mCxBb3ioJKoUWaxK6EbyrvTxm5V8I90khe8D7DxdMn+dQQ
+         HVt/yR7077wLvrwSFPmTMamZl3FTj8TnQJpZabtDMQJKzW76FPl7kJnwFgODvEs8gKpA
+         Gl9a4PDWg6eZUG106D1upQcEHhq2sW1Lrwxvul0ce5lyUhR7ttLsICllo6QxxYt42R4O
+         D0mlRqDvNmMs3d1cnup/iIgOJQYUclfBK6HN3mRxX9XkPVJD0zKKO9KzBaF1S3cIeasb
+         IwmTw7AWqE1phJz0C7qF3llkiMs4MHlHqSJEIf2INkWTqTidyi5PDKEEaXvnEuhGjouV
+         Vvww==
+X-Forwarded-Encrypted: i=1; AJvYcCWwYjCHrQsZG7Tnc7MFOm5tLzamTNgy3Ip6OdYrKVDkHsZmW9vPIV7zumnaABDUZ7hx6F/WoF0urFHvOiQuH5F4kUU01IqL
+X-Gm-Message-State: AOJu0YyWPy4LQeKwhmSJB6MH3m39a+ytL9ZxNMHAuhtA/qdw4Ti0T5d9
+	CItQWKVUCSxhU/ThwpawATg5pY7qsn0ScIM+bL+s3sHiZVT0TNB19QDgwteMeHxwzZEAkDbqA5q
+	pNJm5SzC0OOMdNPjDNEi0+WtIbp5vUYm3mdTK9xpTFEryF7oxqzAP
+X-Google-Smtp-Source: AGHT+IHP5t0nrM9tmIdN/vj1cEcR9X51TIZOinjwJqg520IJ7wC6cLJyegvw1MPl9rlRhm9Xs3DTLyD/c/Q7svlAuPk=
+X-Received: by 2002:a17:906:488:b0:a4e:1d5f:73ae with SMTP id
+ f8-20020a170906048800b00a4e1d5f73aemr216379eja.12.1712081703092; Tue, 02 Apr
+ 2024 11:15:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240331211434.61100-1-mail@david-bauer.net>
+References: <20240329191907.1808635-1-jrife@google.com> <20240329191907.1808635-2-jrife@google.com>
+ <007e30b4-31aa-41b0-9e19-f7e2a385773e@linux.dev>
+In-Reply-To: <007e30b4-31aa-41b0-9e19-f7e2a385773e@linux.dev>
+From: Jordan Rife <jrife@google.com>
+Date: Tue, 2 Apr 2024 11:14:45 -0700
+Message-ID: <CADKFtnScmu+57KURFEUG5s8Qcx6NfAgF1XNfjT+fSZNLqV4amQ@mail.gmail.com>
+Subject: Re: [PATCH v1 bpf-next 1/8] selftests/bpf: Introduce sock_addr_testmod
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Daan De Meyer <daan.j.demeyer@gmail.com>, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Mar 31, 2024 at 11:14:34PM +0200, David Bauer wrote:
-> The VXLAN driver currently does not check if the inner layer2
-> source-address is valid.
-> 
-> In case source-address snooping/learning is enabled, a entry in the FDB
-> for the invalid address is created with the layer3 address of the tunnel
-> endpoint.
-> 
-> If the frame happens to have a non-unicast address set, all this
-> non-unicast traffic is subsequently not flooded to the tunnel network
-> but sent to the learnt host in the FDB. To make matters worse, this FDB
-> entry does not expire.
-> 
-> Apply the same filtering for packets as it is done for bridges. This not
-> only drops these invalid packets but avoids them from being learnt into
-> the FDB.
-> 
-> Suggested-by: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: David Bauer <mail@david-bauer.net>
+Martin and Andrii,
 
-Hi David and Ido,
+> This function can be made as a new kfunc in bpf_testmod.c. The
+> sock_create_kern() could be moved to here also. Take a look at the
+> register_btf_kfunc_id_set() usage in bpf_testmod.c and how those registered
+> kfunc(s) can be called by the bpf prog in progs/*.
 
-I wonder if this is an appropriate candidate for 'net', with a Fixes tag.
-It does seem to address a user-visible problem.
+Thanks for the feedback. I will explore this approach and see if I can
+get rid of the additional test module.
 
-...
+-Jordan
 
