@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-83894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3072894B02
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:59:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E677894B03
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F399628300F
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:59:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2227B22410
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67E41E534;
-	Tue,  2 Apr 2024 05:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075CB21340;
+	Tue,  2 Apr 2024 05:59:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jm0ImZcg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mXVKzOG8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9781C287
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 05:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3481862E
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 05:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712037544; cv=none; b=FpYS4MaZXy1gb4vvNILrusfwllAjcXzIfcZpycIXxi+bxlW2byNPkdfwmRTAXCXqTJW2J77Eg6dw4orR5C36+MO4u7ovzpjumvlKYUoRh/mofiwgyTxGKGkLqcbVIUfWsTY5q2KyXKS2pyzzWPj3IFbG7V79Nzem/z1MC3JLy3g=
+	t=1712037545; cv=none; b=L5ozDepgH5LwOoq2S+wH+bs6aTUs2Czovu2EkkfQGZjU+ijgUdm+ErA6QvtFsIkMN1maXFCfYlm6Zsm6YM4gd7XKhtadOU1DONclpolbdX6sZ9UUMvkemM9paL1/XnZnXz0E7wlbCXhyyw6xe100YOOrU3iRpw0cxU/0O84NmQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712037544; c=relaxed/simple;
-	bh=w8fn6+LGaLVqhS8crIsqZ0BUgFZZpm5jp8uYVJr9sWo=;
+	s=arc-20240116; t=1712037545; c=relaxed/simple;
+	bh=wvKMTNgAe1hezUcUgYIskyDhvLfQTRzL4d6cbfc9M/c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m79RJ8yXekZDPR23Z2S76v+4m2qTGi1IDSxODeBAvtR0xkCzJZIXHYGkMeyF5yDAyIvQwxz/n6joM+rYq3TTuGcIVLei+XiK/AJJ9/gWSUZ6fvW7T8Ng9PiFVHLaBBurCqoaWU5aBStZKn/kKi1jIPL+Qo0/l1YpGqGxKp5CPSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jm0ImZcg; arc=none smtp.client-ip=209.85.218.41
+	 MIME-Version:Content-Type; b=YzLKJmJ1ZoOBiEmR1jqARD6ARZX1IWOJbwNX0jqGjTUnWZDtfCWWSKv3SreYM4F72L2uyMTA7lXZTayShdw4sulI50d2CxBwhgD8b7SQK9rLCqL6JVLOjxWr+yVtVMPtGt+XcQiF4AovuaSh3y+5E3QlcVnBgE8Sze6wUeG9PtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mXVKzOG8; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a472f8c6a55so592082666b.0
-        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 22:59:02 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d485886545so78372941fa.2
+        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 22:59:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712037541; x=1712642341; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712037542; x=1712642342; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EWFVQ4guP4fCF27EbKTTsXrsTp0zlLou+J3gTsJX728=;
-        b=jm0ImZcgh8zus9ld/S7zQWcK7dlor1LaHkjflZy6UJPKiUk8NyS4WjtXyDdDWTKQJR
-         WhcJtg/NBT3iI3UibjyeHd5mRnp0vilJNOgMAixSnVnlo8c0i567JIJzcs2wmR/IjJ8N
-         VCEkNVKBr6VZtpFypV9HgXyv2Xhl0b381Fl3taB5SXPm5kPOLgZcXHJ5ALRcMUdLS9h4
-         w51a/76/JW71k4f3uyBr3BoYY/s9ldUr9JRF8QDkOev6UqSxBnD6Z3aoXonWPCKWkfWa
-         uCC5V66BuKl7OWgJa6jIwEfMGFtzpOs1x4nfxTzNbaOE4i06hmUyyO8dcSeBIDDfggZd
-         nBXw==
+        bh=fScNHd38fKXVunjONxLTs2Bfy7uVYSFHE6CXgTpd1f0=;
+        b=mXVKzOG8C/5n6ihTez5khMLYq28Rp6n4BPJxkLTFa86ZMLXQan6ST7HOFkjavu7qHi
+         jCR4hAbqI/qCB7fBGL12PQozcwGZT+CJUL5AI+gwe61reqHjF+7HTvyKIZW51UR2pss4
+         Yze+TKaYMCY3Xu/iRtNorB91RhKVLQZuKHUTNfSe1/DwaBTmxeSIAvDPOFG2jSU+9STI
+         W8OEC9fAN5UNPzdTI30cKcSTvlXno6W41d3C0Bb5yfgjBFR3v+4UsebAnSZFPz3u5qSv
+         ePQEdF88+4cWz5xCo8Jab2rH2h3lNTl1roVtyRZHw54yLPm716fa/cRK19Ye+/TGnLxC
+         D/dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712037541; x=1712642341;
+        d=1e100.net; s=20230601; t=1712037542; x=1712642342;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EWFVQ4guP4fCF27EbKTTsXrsTp0zlLou+J3gTsJX728=;
-        b=oih3pTE8jz6oYg62EXJseaF1yMmsx7j6oGfN2RW/TTUKA/KrtKefq1to21YqjPW7Ws
-         2MeGO2eLoy7fKbP8wQx4Roiqyx4QeUTmVtFLmOm+NydLHyvLaZPvKrdyYMvQkoAb+2Ce
-         aMtlX/hplY6nfW1sldOssvwDAgPTUI2ftBbqPM6M0cZqJotZitd22WnvscgfMKTEcK2/
-         3EzsC+TLq3Mo53QmF+VFSofJlHPYCbjIs+mBNliRxewx/29WdJbeVZta2eEKgBlgSvaP
-         mYH0GC4BQrub/Y6Hr6NTZO/0KnMQz9GfK11Bf0ML+p2LTqWZJztct8fq/rQRQTv6m6mU
-         ffLg==
-X-Gm-Message-State: AOJu0YzHAVrPVb7lBvnxlj4yLXBNEXs/Gkxh8T3lUggN+O6K3GpAmw2o
-	c4VU6MI325sL6Cd9McBUprnJQlaqjTixnfs2UYAq68iECabR68vZ
-X-Google-Smtp-Source: AGHT+IHyOmxdylBaAdGtX/ALZTJpDWBg6b5kPKmI9BNtudTkN/YuGQq1gam6eJPJ65nGBFzhgC+wjQ==
-X-Received: by 2002:a17:906:c958:b0:a48:45e7:5d46 with SMTP id fw24-20020a170906c95800b00a4845e75d46mr6876565ejb.22.1712037541454;
-        Mon, 01 Apr 2024 22:59:01 -0700 (PDT)
+        bh=fScNHd38fKXVunjONxLTs2Bfy7uVYSFHE6CXgTpd1f0=;
+        b=FpCyHkpyjzDYLcJNeLFzM+bDJotd7yb7TXA3UFXKm2FLTsWHwt5iK5OOdE3eiKBn2q
+         /shBPKD2kGeJUrKR3tIKNphwgXWH5gDspSJFZeNEy5/y4CEw4uXhbHpTGYWwZKf3PEu/
+         0342B59CAkSYvRE/Y1sDVFiKfxQeNHXzGXh2Knky6+FuMH8autAsNTzSUOK/uLOSnCkY
+         m5TTts4lOpRy4v61DP0HlmyzQKOjuAHaXjZ3j44GdXuA6cWshBxAKpd9ZAHuBgY/SwFQ
+         acTz6YzuCmNGEzoIw4qwGVHuOS6eKDb2iKJCNo5DK/XqzGa9aCp854d+G2MNxBcUoIaj
+         6OLQ==
+X-Gm-Message-State: AOJu0Yx/7wguNea01yzoUGAn2zdYa7d7Oh9FvAOa+6wFEZCyYsT0QvM+
+	9hOBwJ0zC9aW98Ke0WcdrSr32XgeXZ7MzfkwCx2eum5qyuQhTVQ5
+X-Google-Smtp-Source: AGHT+IHQq01t+zLvi4gg/ASiwTxLItUQ0scBfNMl90zXnqrMIzSsGRvxMThIGdcwSbPtpWgKrDvmzA==
+X-Received: by 2002:a2e:740d:0:b0:2d6:cd05:1899 with SMTP id p13-20020a2e740d000000b002d6cd051899mr456510ljc.17.1712037542419;
+        Mon, 01 Apr 2024 22:59:02 -0700 (PDT)
 Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id cd1-20020a170906b34100b00a4a396ba54asm6136636ejb.93.2024.04.01.22.59.00
+        by smtp.gmail.com with ESMTPSA id cd1-20020a170906b34100b00a4a396ba54asm6136636ejb.93.2024.04.01.22.59.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 01 Apr 2024 22:59:01 -0700 (PDT)
 From: Eric Woudstra <ericwouds@gmail.com>
@@ -79,9 +79,9 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	Daniel Golle <daniel@makrotopia.org>
 Cc: netdev@vger.kernel.org,
 	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v3 net-next 5/6] net: phy: realtek: add rtl822x_c45_get_features() to set supported ports
-Date: Tue,  2 Apr 2024 07:58:47 +0200
-Message-ID: <20240402055848.177580-6-ericwouds@gmail.com>
+Subject: [PATCH v3 net-next 6/6] net: sfp: add quirk for another multigig RollBall transceiver
+Date: Tue,  2 Apr 2024 07:58:48 +0200
+Message-ID: <20240402055848.177580-7-ericwouds@gmail.com>
 X-Mailer: git-send-email 2.42.1
 In-Reply-To: <20240402055848.177580-1-ericwouds@gmail.com>
 References: <20240402055848.177580-1-ericwouds@gmail.com>
@@ -91,53 +91,32 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Sets ETHTOOL_LINK_MODE_TP_BIT and ETHTOOL_LINK_MODE_MII_BIT in
-phydev->supported.
+From: Marek Behún <kabel@kernel.org>
 
+Add quirk for another RollBall copper transceiver: Turris RTSFP-2.5G,
+containing 2.5g capable RTL8221B PHY.
+
+Signed-off-by: Marek Behún <kabel@kernel.org>
 Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 ---
- drivers/net/phy/realtek.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/net/phy/sfp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index af5e77fd6576..b483aa3800e2 100644
---- a/drivers/net/phy/realtek.c
-+++ b/drivers/net/phy/realtek.c
-@@ -844,6 +844,16 @@ static int rtl822xb_read_status(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl822x_c45_get_features(struct phy_device *phydev)
-+{
-+	linkmode_set_bit(ETHTOOL_LINK_MODE_TP_BIT,
-+			 phydev->supported);
-+	linkmode_set_bit(ETHTOOL_LINK_MODE_MII_BIT,
-+			 phydev->supported);
-+
-+	return genphy_c45_pma_read_abilities(phydev);
-+}
-+
- static int rtl822x_c45_config_aneg(struct phy_device *phydev)
- {
- 	bool changed = false;
-@@ -1273,6 +1283,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.name           = "RTL8221B-VB-CG 2.5Gbps PHY (C45)",
- 		.config_init    = rtl822xb_config_init,
- 		.get_rate_matching = rtl822xb_get_rate_matching,
-+		.get_features   = rtl822x_c45_get_features,
- 		.config_aneg    = rtl822x_c45_config_aneg,
- 		.read_status    = rtl822xb_c45_read_status,
- 		.suspend        = genphy_c45_pma_suspend,
-@@ -1294,6 +1305,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.name           = "RTL8221B-VN-CG 2.5Gbps PHY (C45)",
- 		.config_init    = rtl822xb_config_init,
- 		.get_rate_matching = rtl822xb_get_rate_matching,
-+		.get_features   = rtl822x_c45_get_features,
- 		.config_aneg    = rtl822x_c45_config_aneg,
- 		.read_status    = rtl822xb_c45_read_status,
- 		.suspend        = genphy_c45_pma_suspend,
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index f75c9eb3958e..6e7639fc64dd 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -506,6 +506,7 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
++	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
+ 	SFP_QUIRK_F("Turris", "RTSFP-10", sfp_fixup_rollball),
+ 	SFP_QUIRK_F("Turris", "RTSFP-10G", sfp_fixup_rollball),
+ };
 -- 
 2.42.1
 
