@@ -1,74 +1,65 @@
-Return-Path: <netdev+bounces-84142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBCD895BC5
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:32:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D06B895BC6
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A74628380F
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:32:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E5491C20FB5
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 18:32:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B2415AD89;
-	Tue,  2 Apr 2024 18:31:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F370815B102;
+	Tue,  2 Apr 2024 18:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hy6CAgtd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Blm56ri0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A8215AAD6
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 18:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6437615AD86;
+	Tue,  2 Apr 2024 18:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712082716; cv=none; b=SzU2XseyIv74ezUo5fYcbyLD3br1tZ3WeisGAknAFZ51mmmf53AM5o5Kj9jyPWUhWV52El4TVSTkObz842fzqQNaRHFQ2UEy5EDTTNkouNCbeIchDseKHmpRzKULimZWdu2+9MAYP1Hdbkav5AjGLB/LqwQsDDWJyqoBKuXgOkQ=
+	t=1712082758; cv=none; b=m/WRFeDh1t1KJ8hG8ReWxHbrttcG7TY7fv9n38UCcbBHx2JYrL3pQlhMQPdGxdS28D0Vfb7o+pf98s4HjHpZJ921vF3iNHLB/UW8vilUH9pyPzbQJJav6tgSucGzo/N6CP2wxN1uoMtcF4V6hKIIOu9ep5Cc6MdS/wQeI9LnhEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712082716; c=relaxed/simple;
-	bh=ZtEzkevvYrbsBCpk4vt2VpxG94oQF7dBbJS1xUxcuHo=;
+	s=arc-20240116; t=1712082758; c=relaxed/simple;
+	bh=56IvtkOVy7cYW39VJv3cYm8/WXzWR/XaCzSn86nROLg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z7FSe0mIL7hnmJ0lfm/0dioQdeHRQ/bYEWX91/y5867YKDZwWkJdekh6awDDQgL6XV5DB9N2An6i/iveJC6MZnUcNtHis53AMq08x1Gx22L35g2eRLD66tg3M9YTDFEs2jV7cLy7uPf27DCN/gSyr3CCBaxbKlTUT2xQnXYzsRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hy6CAgtd; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a47385a4379so29980866b.0
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 11:31:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712082713; x=1712687513; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D1RyXym3lIAycfrQv2LUeFbMEteI3ICy1L3WtaJTa/E=;
-        b=Hy6CAgtd7ZBzhD9CzL3jzFdTxhiUGFMFO2zZrrg79huiXZkYcFkWoJ89l3CuQReml7
-         F+qROgrxeYkfP1lY6lD2AYF+R7LkAIblebaLb9dXilYMDyzFfvwmAEZmfTqxfuX+iWVZ
-         OlsXcFRTcX1ZVQJBhBXNUamGbayg86NRQN1VDJO9zP9Cp+zsGSN4Az/u7YyuPeV5//6l
-         MX2x7gb/pWPKW/rvHdYoSi/Zfx4qbNogbvfOhH8g/dQNN0N6Tm5pbDNLP7OdB+KmCrPG
-         ve2RZBNXrooqM+jEWc3u+LghnxqF2CGECuXRjXabfbjkTOQP1URqWLtcLtdLBHZcaPY3
-         cvoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712082713; x=1712687513;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D1RyXym3lIAycfrQv2LUeFbMEteI3ICy1L3WtaJTa/E=;
-        b=lakqBHNnQSipggZFgaGEAeL/cpgj/20mijHf4jeoBVMnz+ns25rUPUd1pI2J1hImEg
-         IupYxN/7HnI67VwILB50azXl5k/6G4C3pwZxmLpll4mLG3vKWkKxKtmE33SKzZA9r7pq
-         5Laq729d1eVZsTVgfziTCHQzOmL9YsKjHq/LPrVa2IR+Fc22rVt8fT3pudmxVUC30neK
-         zqy7wW4sqwRsp2oSxFe4BKfK9kdvLSLjwHnzQJcvkY5oSlDdiuxPOOqEWAXKdXHasmlD
-         E3/6E5NIrzFBpg4TjuKjhi4xW1bxnvdgS2v2naOtHq5BiekPsMQt0ua3KpEjh83naGzX
-         XwvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHfVO4Dhq0Af0AjfCo+42jBGyMr0RjwD11cg3uLhFpCGscV7Vi/LKHqt9d6v8zWm++8rSe8fRu2XEx/yJJJ1SL2MK+AD+b
-X-Gm-Message-State: AOJu0Yz2B93+cwGOpbjHgMRICFK0Bdw+k8xVKY3ogPrsVLpuo+LOyGpr
-	oFDpSrqv9UA9lpU6MJxvsFePj+ICmBQTSd4r77LtxZ4FyAk8DP8R
-X-Google-Smtp-Source: AGHT+IE3p+d9Hj9mTWrlr8eVQJpSqqRwTtCnQCYQYjdZ9H6/msWZTWZwCQ+Vco5YX90dfwUpKBlwdg==
-X-Received: by 2002:a17:906:9b1:b0:a4a:3b69:66a0 with SMTP id q17-20020a17090609b100b00a4a3b6966a0mr237786eje.15.1712082712957;
-        Tue, 02 Apr 2024 11:31:52 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id q17-20020a17090609b100b00a4e0a98befdsm6792934eje.213.2024.04.02.11.31.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Apr 2024 11:31:52 -0700 (PDT)
-Message-ID: <c493af30-053e-4f05-be81-fb701a84951a@gmail.com>
-Date: Tue, 2 Apr 2024 20:31:50 +0200
+	 In-Reply-To:Content-Type; b=TvRUFp+6pei5yWUc0Ud4RHCbokeaF9SaR0dPKvr9jRX6CzkUqjJpJKXzRF2wjYVv6wRGAGJf0XudI3bt9/oWwxvYpkXI5VLjd94kDtK8A48+76bLHH3Ly6WmOXlJBiuzYLqtthbG+UeKv364KLlUzydf0wM8EC3SIKze2kGQMis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Blm56ri0; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712082757; x=1743618757;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=56IvtkOVy7cYW39VJv3cYm8/WXzWR/XaCzSn86nROLg=;
+  b=Blm56ri0biEfZUieSpnnU3+LSQ0EZiEga/Qj8b+zYj3JFojDV9TuWQHT
+   8QeHdAO8rZqQCGyZ+fwu4+fTk8PYYkfLhRj7NiV/FQRiYK0SQ6FunK1hg
+   5eAGOCf+NO2cOZLZCsGjdHyqb9TjZhNGw3BXH2Fj77VfNPsxZPGZo5PZj
+   pTiJvzqYsYaNKaYr1anso4QH2kRcbGQBaXmpGdhgMNdEZ/vOLayO6aCjE
+   IZq10QTKZRv55Osk7rtpCxMo8NkoujU8mIlR/hQnAXQW8/9YwO0XFc1Bi
+   xJRtt0BCCQoOSS4Za3fGXfH4rNi5x+33yNxCHuiBENeoTaDCa371TuWlV
+   Q==;
+X-CSE-ConnectionGUID: +jm6HFuLQUSicGNP40kEbg==
+X-CSE-MsgGUID: dXaDzmDoQAir5Vxc+lf/Zw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="10240491"
+X-IronPort-AV: E=Sophos;i="6.07,175,1708416000"; 
+   d="scan'208";a="10240491"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 11:32:36 -0700
+X-CSE-ConnectionGUID: Tk7eASW7TM+bdx0LKden0Q==
+X-CSE-MsgGUID: j7pN286VQ0G7h9zhvr5LTA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,175,1708416000"; 
+   d="scan'208";a="41306852"
+Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.245.163.187]) ([10.245.163.187])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 11:32:31 -0700
+Message-ID: <b3f92716-9532-4bef-94d7-502689fc2b04@linux.intel.com>
+Date: Tue, 2 Apr 2024 21:32:28 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,43 +67,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 5/6] net: phy: realtek: add
- rtl822x_c45_get_features() to set supported ports
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org
-References: <20240402055848.177580-1-ericwouds@gmail.com>
- <20240402055848.177580-6-ericwouds@gmail.com>
- <ZgwnHhUnWXC0buuT@makrotopia.org>
+Subject: Re: [Intel-wired-lan] [PATCH 1/3] e1000e: Remove redundant runtime
+ resume for ethtool_ops
+To: Bjorn Helgaas <helgaas@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Sasha Neftin <sasha.neftin@intel.com>, netdev@vger.kernel.org,
+ "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+ linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+ intel-wired-lan@lists.osuosl.org, Zheng Yan <zheng.z.yan@intel.com>,
+ Konstantin Khlebnikov <khlebnikov@openvz.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+References: <20240325222951.1460656-1-helgaas@kernel.org>
+ <20240325222951.1460656-2-helgaas@kernel.org>
 Content-Language: en-US
-From: Eric Woudstra <ericwouds@gmail.com>
-In-Reply-To: <ZgwnHhUnWXC0buuT@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8
+From: "naamax.meir" <naamax.meir@linux.intel.com>
+In-Reply-To: <20240325222951.1460656-2-helgaas@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-On 4/2/24 17:41, Daniel Golle wrote:
-> On Tue, Apr 02, 2024 at 07:58:47AM +0200, Eric Woudstra wrote:
->> Sets ETHTOOL_LINK_MODE_TP_BIT and ETHTOOL_LINK_MODE_MII_BIT in
->> phydev->supported.
+On 3/26/2024 00:29, Bjorn Helgaas wrote:
+> From: Bjorn Helgaas <bhelgaas@google.com>
 > 
-> Why ETHTOOL_LINK_MODE_MII_BIT? None of those phys got MII as external
-> interface. Or am I getting something wrong here?
+> e60b22c5b7e5 ("e1000e: fix accessing to suspended device") added
+> ethtool_ops.begin() and .complete(), which used pm_runtime_get_sync() to
+> resume suspended devices before any ethtool_ops callback and allow suspend
+> after it completed.
 > 
+> 3ef672ab1862 ("e1000e: ethtool unnecessarily takes device out of RPM
+> suspend") removed ethtool_ops.begin() and .complete() and instead did
+> pm_runtime_get_sync() only in the individual ethtool_ops callbacks that
+> access device registers.
+> 
+> Subsequently, f32a21376573 ("ethtool: runtime-resume netdev parent before
+> ethtool ioctl ops") added pm_runtime_get_sync() in the dev_ethtool() path,
+> so the device is resumed before *any* ethtool_ops callback, as it was
+> before 3ef672ab1862.
+> 
+> Remove most runtime resumes from ethtool_ops, which are now redundant
+> because the resume has already been done by dev_ethtool().  This is
+> essentially a revert of 3ef672ab1862 ("e1000e: ethtool unnecessarily takes
+> device out of RPM suspend").
+> 
+> There are a couple subtleties:
+> 
+>    - Prior to 3ef672ab1862, the device was resumed only for the duration of
+>      a single ethtool callback.  3ef672ab1862 changed e1000_set_phys_id() so
+>      the device was resumed for ETHTOOL_ID_ACTIVE and remained resumed until
+>      a subsequent callback for ETHTOOL_ID_INACTIVE.  Preserve that part of
+>      3ef672ab1862 so the device will not be runtime suspended while in the
+>      ETHTOOL_ID_ACTIVE state.
+> 
+>    - 3ef672ab1862 added "if (!pm_runtime_suspended())" in before reading the
+>      STATUS register in e1000_get_settings().  This was racy and is now
+>      unnecessary because dev_ethtool() has resumed the device already, so
+>      revert that.
+> 
+> Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+> ---
+>   drivers/net/ethernet/intel/e1000e/ethtool.c | 62 ++-------------------
+>   1 file changed, 6 insertions(+), 56 deletions(-)
 
-I have copied it from my rtl8153:
-
-# ethtool enu1u1
-Settings for enu1u1:
-	Supported ports: [ TP	 MII ]
-
-But I see on rtl8125 it is indeed only TP, so it looks like I chose the
-wrong example. I'll remove MII then if, this should not be there.
-
-The thing is, if no ports are set here, then from ethtool it looks like
-all ports are supported.
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
 
