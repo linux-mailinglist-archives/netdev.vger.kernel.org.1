@@ -1,218 +1,181 @@
-Return-Path: <netdev+bounces-84160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22BFA895CFC
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 21:49:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC24895D61
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 22:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4664E1C2189D
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 19:49:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF98D1C230CE
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 20:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10F315CD4B;
-	Tue,  2 Apr 2024 19:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B75215DBAE;
+	Tue,  2 Apr 2024 20:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="dJo13Rmz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LOyLDeEg"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11023014.outbound.protection.outlook.com [52.101.61.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4126115B962;
-	Tue,  2 Apr 2024 19:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712087345; cv=fail; b=kGcQ5jgD745gQg8q7lNOxpAxCcaNI3PjM3RXjF/jh2AfU+l2JDik9eQHe2B4QpqdMIA3pPw3vQRKqamFK3SQI2mDTyVbR2EaEBdYxv+kl5pzFNgQYxWjy91RdBZ0J6PJx9mLTTjHlPB1jvlBU061pQIEeVWyc1KFY4GoeehVhXI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712087345; c=relaxed/simple;
-	bh=4gBmlB4QnMdCB+qk9ADDH37vSQfTnSAo4LreeoM8wMs=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=I2YKeoHIN6mcqoRspqk8u3PxhW1c/PJP3+LlRegLEghE3mZgaXm2yXn6zkN4TiF5AOra3Ef0D7KOd6FpEtyFtplDW4895ahzcxdETF5KX2AaTcUqPJpFKpH2v0uMpTEDphA++jrEVjzao6tBafg9b3vMNpk5b6o3DTyLvBmo2WA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=dJo13Rmz; arc=fail smtp.client-ip=52.101.61.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OMGFc0QDtCdbcN6ggkf7uVCtBk0jrj7ExFa3LOtcFwlR1lrYtQbpBSZUuy+7Ycym3JmmkGjyXbd0KmZsHL0GYT1DSXggEl863W1ywXpgRc43FDnwxA+n5F4v1irxqMEd9OPQyPfLkVRvkKA+xorXFFgZPEdDmsP5Pqqa12wfTcZfeMxDoHKxGBsMdNPeLUf6Xk2n0vDBoAzwo6SpmU2N+lAKcVhHNTUGrrWOuUB20MPN/j9QCk2VqBb2KX3temCKh8ahHas9LXIVFtXUYKuyl5svdglMCLzxGTq5wOQ19OtnSaV6YCOhA25S1YEiac2Vdf3y3Y5s5OBjlTNdNe28kQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UFe7qoE8AgyF+oBe3ahfOVxaBndjPKn7fevGnNeAFb8=;
- b=b+prY48cy8HUbwEcZP+krkjF/b8N9sbE2M1xBwfpbWVDntE/YuY3Ad6hHPVoQg21UPet+FtvTZusmVDqHdBfuO9q1YVHGNpYJeFIYb27LChXw+KecDXhFu9sXiNuhwJiTIDFfWG6vbsPOzZM7S0t6hVxvTFK2XezsG1Bn/2X144JitLvxS+Kq/FOsGt2+wT5GBMPsK23UndLqXWktjlJNgMQ6eaNqUN7kCNIW6ORIC158vIWrX1LcaQJfTUz8yzsBBig+UTr4pIWibOGmqu7Gz9P8SiFKkE+YJPfgU2d2e5nzd1oprY0yrwy0gZMgfa3oZgdmefSohjpy8iFhEg7ig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UFe7qoE8AgyF+oBe3ahfOVxaBndjPKn7fevGnNeAFb8=;
- b=dJo13Rmz2hxqisS7QD3pvAYpHd9Wqm9BenVIZjPewUSQl93D/WYB+jtlisi+PnYvVusFzPYpG1+1L3F1qZT345HQOROgx0gfS99tRmI0lkuAVSSBY5S/wBLT/XBbwqzL5MUqXm0lsUQBhXulT8Qe4/xQNoQvh8KFHdp0l6iuKHk=
-Received: from BY5PR21MB1443.namprd21.prod.outlook.com (2603:10b6:a03:21f::18)
- by LV2PR21MB3109.namprd21.prod.outlook.com (2603:10b6:408:17a::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.8; Tue, 2 Apr
- 2024 19:49:01 +0000
-Received: from BY5PR21MB1443.namprd21.prod.outlook.com
- ([fe80::6528:5de6:5ea4:c1ab]) by BY5PR21MB1443.namprd21.prod.outlook.com
- ([fe80::6528:5de6:5ea4:c1ab%6]) with mapi id 15.20.7472.007; Tue, 2 Apr 2024
- 19:49:01 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: haiyangz@microsoft.com,
-	decui@microsoft.com,
-	stephen@networkplumber.org,
-	kys@microsoft.com,
-	paulros@microsoft.com,
-	olaf@aepfle.de,
-	vkuznets@redhat.com,
-	davem@davemloft.net,
-	wei.liu@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	leon@kernel.org,
-	longli@microsoft.com,
-	ssengar@linux.microsoft.com,
-	linux-rdma@vger.kernel.org,
-	daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	ast@kernel.org,
-	sharmaajay@microsoft.com,
-	hawk@kernel.org,
-	tglx@linutronix.de,
-	shradhagupta@linux.microsoft.com,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net,v2] net: mana: Fix Rx DMA datasize and skb_over_panic
-Date: Tue,  2 Apr 2024 12:48:36 -0700
-Message-Id: <1712087316-20886-1-git-send-email-haiyangz@microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-Content-Type: text/plain
-X-ClientProxiedBy: MW4PR03CA0107.namprd03.prod.outlook.com
- (2603:10b6:303:b7::22) To BY5PR21MB1443.namprd21.prod.outlook.com
- (2603:10b6:a03:21f::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D93815E5A5
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 20:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712088721; cv=none; b=Fo6oN+5P3g4tC4GnzrkBhDKcas543PAGiAYS9CB1Kq3WNIT91EZnbsvkqml50jMcbaGHmLK1JIDph3t5hZsX2yTE5IOh7s3RmGsjtbfnATXa6AIaTXQPveQ9omwgjXrqPgRrutRioiudtg4HAOlUwAR9MbvygKlMIUrxKiO6MdE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712088721; c=relaxed/simple;
+	bh=eXiWsMvZZG2RmREpe/OR0bmezRlbNy8wjN4Mp+uGxUs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fqeHOMSRbaz6XT/XjjuQdyxvoASSFnEfNgUwea5TZJ7A7MTuG5vsICjQl0+h0EdC2U2qc17YAvwOBJl9yc68CdfRHgZXHsc3is1pq6TNHs2R00mKEqbHaqFQhMWpfrsggjlNyG/g6IGAVZU40gMeVymfGlyCSvUuXgPLmMx260Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LOyLDeEg; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712088719; x=1743624719;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eXiWsMvZZG2RmREpe/OR0bmezRlbNy8wjN4Mp+uGxUs=;
+  b=LOyLDeEgTNvIPgaoLBlYWBERfGWggXsrSjIGEcrCzmd1nEG+lKYRql1p
+   Vj1Ph5WRtPWAk994kjyly6/orOkFkIiw39Co1qcHdfI1sPTRQZ0TPEUp6
+   VbCec0f1dYcfddnLTID6dCuu6lA8gqyar64BfQJ2W5Nub71/ENmekICpq
+   MOa1vDzuIs7DVkhhaz3qgMFCaFoKk3OwQnOI9Cy+0f01HnACyUrMv9tIY
+   ugS0E63wqFdy8ZIFzfZfGRxDtqBozQACQRIDmXZQoqd71UyQY3AkpaeQh
+   26RqqTS+jDgrtwcbKbG6+2t3gyKHYq7OwpHIJ7GBB/QChhh93YtmGA7Ny
+   Q==;
+X-CSE-ConnectionGUID: 4Tki0nWnSc6A8sFu7otRnQ==
+X-CSE-MsgGUID: BCtoltizTm+CO2XPgYq1AQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="17857944"
+X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
+   d="scan'208";a="17857944"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 13:11:58 -0700
+X-CSE-ConnectionGUID: zvwFfhDpSyisT0fB2OUcaw==
+X-CSE-MsgGUID: PiQirJWUQaGhIuJYyYoVpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
+   d="scan'208";a="18004659"
+Received: from lkp-server02.sh.intel.com (HELO 90ee3aa53dbd) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 02 Apr 2024 13:11:55 -0700
+Received: from kbuild by 90ee3aa53dbd with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rrkU3-0001VR-2q;
+	Tue, 02 Apr 2024 20:11:52 +0000
+Date: Wed, 3 Apr 2024 04:11:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3 1/3] ethtool: provide customized dim profile
+ management
+Message-ID: <202404030318.707Oc9CJ-lkp@intel.com>
+References: <1712059988-7705-2-git-send-email-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Sender: LKML haiyangz <lkmlhyz@microsoft.com>
-X-MS-Exchange-MessageSentRepresentingType: 2
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR21MB1443:EE_|LV2PR21MB3109:EE_
-X-LD-Processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
- utpIEJEpquoNgr/Kz+LkAgOs2GFghWgRYbOGS65AHSbUf83g7z7Syb0/Oo5l/BcQgXm0r2dLARvrZFWeOhr5lY6LRnZTfJgxTnllO85762DgteBhgex7dbmN0mvR1eLMFvVYSamMJ0e02C6O4WQIXckt5bqwx63L6mLlLwU9lIM8fZcLB1G2n95em0qGr8vJPQx6yV43wswHALgTUwgD3ZEEhJLnH4M48IiPUd8rshImo4MzbizanM8a/KqhvK3EbgUy4hPzNYNDpee30g+XKKHgfIDTwDFzi2tPWHHF01Od9VvbksdHMmXL+vjdkf+RCL/Y+uHht8hkSeA5sXJ4qzseWAdrVZn1y70BqgLppu7d3FJWciXP739uN5f8W3ijCa0npVTtc5KgOrU22EGBp5DOsi6e7onse41GquWafbL7aP7daFeZyx0s++S2wH4v8vGU+nwpiOGfXVd54G6IZlWxjsIp1YSUeyaFDSDY3eerbV4I8sb/VJSro3DnXgeEbWFcJxePVQvp+rvnER8zi981++Lv1JEs6Azm9vWfRR1nXTreUk9eEqr7c4rNpzrNQtT/1KoDBQbn7HumDDlKUrEup5nx+8Fd6Qr2XCNh0LLeaM0N/kCCj9ucMpyeLyiFiDQc3c/D5l7VlgrUeE7mmiFnW4xf60unc8Im5HAaeAXexbOZ+S8PC4R1cu5bwi6eDrggrf6Pw9J0pGdzO7XDpNDUCtfQPx7O/i5NE511fiA=
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1443.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(52116005)(376005)(7416005)(366007)(38350700005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?tfZjtemBw0aCr4zZY+T+fFYfHMBfMNq0KEfy9LQGhE2Fzsn+LCEseKWT4r2v?=
- =?us-ascii?Q?c7be/fSn8lGXAJ6mtgHwHvBgP899s+WEbhQmVQ/Y+nfroYU7elWj4xVZlLJ1?=
- =?us-ascii?Q?RAlp8VITW5Ol+m8FTku6ZAtIMHvA/j6aPZl9QSEV3eOxVvqnjvjyrmBa9/4F?=
- =?us-ascii?Q?9BokaVAH3ND3rkTfK0MOGRSwYI9xrI9DB6hEiD+Ph3vYSxbRudr9Hb601D9T?=
- =?us-ascii?Q?RH69WfuzQpqqSu3Tbc8pPn5iwvjPc9dsiM56mn6LyVo0GqV1gj6kmK8w+huu?=
- =?us-ascii?Q?VdPUkm8P7lcs6ekyR+kExhG8gYulv0CGawxxzz6tpI5wC7zdPCPQ1iI++6w4?=
- =?us-ascii?Q?C3SXovbPl9AKdrvNDTBC27JBXqjr2CiB5LEtbLEM5XLNGQb9WxIZJyHJGuHM?=
- =?us-ascii?Q?GuI/DDr6PV3httkZBdd0FS2Xx09Z7zclHUHD5ac09mYe+nGIBUxTUm/n9vbM?=
- =?us-ascii?Q?LnMwzZZtPG8vp8oeMXNJclqfaBEFXPcsbPW901D/vxx3EhWm31irh0Oihkv8?=
- =?us-ascii?Q?9wmaygTbFvt+eNj15CRe8odBgjCl2VpJ62+fptAiyojrHE+P+/01efPauiuQ?=
- =?us-ascii?Q?NxQA5A2CZhMSp2hOmDx3EK+p2Xl3BeCISZ8zb/B8zwy/rI0yhshQq1OAEo+D?=
- =?us-ascii?Q?5VoK2d9e/8Xoldc1R9VrrMT7Njn3plaMnbOt2XG0zu/DiNu9asampr7dhldy?=
- =?us-ascii?Q?MFU38jmUnbSs2o/EIozex2xP/JstCblJ3bfvcUc6eec7w34M/5+GnA+WLKfs?=
- =?us-ascii?Q?R0OvKoSGBvXi8sYnPaFxm+HboNgAzwKy0LiVQddukHNpJvUOdw6u98EFLGto?=
- =?us-ascii?Q?39nEh0P585LBpVztNrtpJiihWEWf3VxzgFhlrouRRJwhd2qX4kgyfqCDQp1k?=
- =?us-ascii?Q?Ni/W8x67v/n55QltEoBL7ithi1R7yeQ2tBmnkZDpeI+jE6ufzbH3UAARMi23?=
- =?us-ascii?Q?ij2RrJvqe0vaslz3ZyfFoov0pYBt8OBZSuRsAX8HmOtQ/veUbCAWPffXZpRc?=
- =?us-ascii?Q?rBx7FY0B73uD1BTBsBzenbpGlJg9htboUaOCibbZvBM36TP+/IW2+GAQxF8N?=
- =?us-ascii?Q?bdNcwOgDMoXBG1hx8XLZQT1L0jx85oIqaoE5oBT5097kSFvQH43AySUGE/bo?=
- =?us-ascii?Q?dHKTXg7I7TSWPzdPsGtY18LEGo0Fr6PbKzyIjeSmP7ZepfokR0EC7D0C3lzL?=
- =?us-ascii?Q?gvm/0O00PkzHw/xuMk2C3HhaGiR2sX8qO9cKdK2F94XjmFgv/dH0Ca0HsgU4?=
- =?us-ascii?Q?GelG2DcwMKnfKdAkg0spUnY644rRpSY4AmwvNdY9IdYmt7CU9qfGZydpK6NL?=
- =?us-ascii?Q?G1GT78N01Yj1CoIw2lzmAbMRzTbDr6EPY0tzJok8dN1t8fAXHH2URuvZJGIs?=
- =?us-ascii?Q?N0c2ZuyZ2nkYGQsyhL/JYLPWcTIC1PmWOuY3YW7g6ZkoOephUXibAFV1Lsk9?=
- =?us-ascii?Q?3PXJYvQ3IlfrocF/ug63vIsh3epnb/oz9Xeh8naVBtjBtG/pnALfO/p6Xesu?=
- =?us-ascii?Q?JUbKJXXDD6EF2hNMnTgHaqpSsIVEzHtdMF/UosWG7XUP+hbWlmbsCDz+/n5A?=
- =?us-ascii?Q?4Xqmqp1baT88tG0vx54e+phRnz47JAAnR2dKK36r?=
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d2d56c1-e5b2-4da1-28cf-08dc534df08a
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1443.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 19:49:00.9383
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e7w2inb/BBwOsuNgCWvjYjdUWsLU3sjky53PCNa9r+0Pgxngf73SubsQtkDYYjvhu9S/cdDBpz+uWDsqh1u9kg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR21MB3109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1712059988-7705-2-git-send-email-hengqi@linux.alibaba.com>
 
-mana_get_rxbuf_cfg() aligns the RX buffer's DMA datasize to be
-multiple of 64. So a packet slightly bigger than mtu+14, say 1536,
-can be received and cause skb_over_panic.
+Hi Heng,
 
-Sample dmesg:
-[ 5325.237162] skbuff: skb_over_panic: text:ffffffffc043277a len:1536 put:1536 head:ff1100018b517000 data:ff1100018b517100 tail:0x700 end:0x6ea dev:<NULL>
-[ 5325.243689] ------------[ cut here ]------------
-[ 5325.245748] kernel BUG at net/core/skbuff.c:192!
-[ 5325.247838] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-[ 5325.258374] RIP: 0010:skb_panic+0x4f/0x60
-[ 5325.302941] Call Trace:
-[ 5325.304389]  <IRQ>
-[ 5325.315794]  ? skb_panic+0x4f/0x60
-[ 5325.317457]  ? asm_exc_invalid_op+0x1f/0x30
-[ 5325.319490]  ? skb_panic+0x4f/0x60
-[ 5325.321161]  skb_put+0x4e/0x50
-[ 5325.322670]  mana_poll+0x6fa/0xb50 [mana]
-[ 5325.324578]  __napi_poll+0x33/0x1e0
-[ 5325.326328]  net_rx_action+0x12e/0x280
+kernel test robot noticed the following build warnings:
 
-As discussed internally, this alignment is not necessary. To fix
-this bug, remove it from the code. So oversized packets will be
-marked as CQE_RX_TRUNCATED by NIC, and dropped.
+[auto build test WARNING on net-next/main]
 
-Cc: stable@vger.kernel.org
-Fixes: 2fbbd712baf1 ("net: mana: Enable RX path to handle various MTU sizes")
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
-Reviewed-by: Dexuan Cui <decui@microsoft.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/ethtool-provide-customized-dim-profile-management/20240402-201527
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/1712059988-7705-2-git-send-email-hengqi%40linux.alibaba.com
+patch subject: [PATCH net-next v3 1/3] ethtool: provide customized dim profile management
+config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20240403/202404030318.707Oc9CJ-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240403/202404030318.707Oc9CJ-lkp@intel.com/reproduce)
 
----
-V2: updated the "Fixes" tag. The code change remains the same.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404030318.707Oc9CJ-lkp@intel.com/
 
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 2 +-
- include/net/mana/mana.h                       | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+All warnings (new ones prefixed by >>):
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 59287c6e6cee..d8af5e7e15b4 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -601,7 +601,7 @@ static void mana_get_rxbuf_cfg(int mtu, u32 *datasize, u32 *alloc_size,
- 
- 	*alloc_size = mtu + MANA_RXBUF_PAD + *headroom;
- 
--	*datasize = ALIGN(mtu + ETH_HLEN, MANA_RX_DATA_ALIGN);
-+	*datasize = mtu + ETH_HLEN;
- }
- 
- static int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu)
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 76147feb0d10..4eeedf14711b 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -39,7 +39,6 @@ enum TRI_STATE {
- #define COMP_ENTRY_SIZE 64
- 
- #define RX_BUFFERS_PER_QUEUE 512
--#define MANA_RX_DATA_ALIGN 64
- 
- #define MAX_SEND_BUFFERS_PER_QUEUE 256
- 
+>> net/ethtool/coalesce.c:363: warning: Function parameter or struct member 'extack' not described in 'ethnl_update_profile'
+
+
+vim +363 net/ethtool/coalesce.c
+
+   340	
+   341	/**
+   342	 * ethnl_update_profile - get a nla nest with four child nla nests from userspace.
+   343	 * @dst: data get from the driver and modified by ethnl_update_profile.
+   344	 * @nests: nest attr ETHTOOL_A_COALESCE_*X_*QE_PROFILE to set driver's profile.
+   345	 * @mod: whether the data is modified
+   346	 *
+   347	 * Layout of nests:
+   348	 *   Nested ETHTOOL_A_COALESCE_*X_*QE_PROFILE attr
+   349	 *     Nested ETHTOOL_A_MODERATIONS_MODERATION attr
+   350	 *       ETHTOOL_A_MODERATION_USEC attr
+   351	 *       ETHTOOL_A_MODERATION_PKTS attr
+   352	 *       ETHTOOL_A_MODERATION_COMPS attr
+   353	 *     ...
+   354	 *     Nested ETHTOOL_A_MODERATIONS_MODERATION attr
+   355	 *       ETHTOOL_A_MODERATION_USEC attr
+   356	 *       ETHTOOL_A_MODERATION_PKTS attr
+   357	 *       ETHTOOL_A_MODERATION_COMPS attr
+   358	 */
+   359	static inline void ethnl_update_profile(struct dim_cq_moder *dst,
+   360						const struct nlattr *nests,
+   361						bool *mod,
+   362						struct netlink_ext_ack *extack)
+ > 363	{
+   364		struct nlattr *tb_moder[ARRAY_SIZE(coalesce_set_profile_policy)];
+   365		struct dim_cq_moder profs[NET_DIM_PARAMS_NUM_PROFILES];
+   366		struct nlattr *nest;
+   367		int ret, rem, i = 0;
+   368	
+   369		if (!nests)
+   370			return;
+   371	
+   372		nla_for_each_nested(nest, nests, rem) {
+   373			if (WARN_ONCE(nla_type(nest) != ETHTOOL_A_MODERATIONS_MODERATION,
+   374				      "unexpected nest attrtype %u\n", nla_type(nest)))
+   375				return;
+   376	
+   377			ret = nla_parse_nested(tb_moder,
+   378					       ARRAY_SIZE(coalesce_set_profile_policy) - 1,
+   379					       nest, coalesce_set_profile_policy,
+   380					       extack);
+   381			if (ret ||
+   382			    !tb_moder[ETHTOOL_A_MODERATION_USEC] ||
+   383			    !tb_moder[ETHTOOL_A_MODERATION_PKTS] ||
+   384			    !tb_moder[ETHTOOL_A_MODERATION_COMPS]) {
+   385				NL_SET_ERR_MSG(extack, "wrong ETHTOOL_A_MODERATION_* attribute\n");
+   386				return;
+   387			}
+   388	
+   389			profs[i].usec = nla_get_u16(tb_moder[ETHTOOL_A_MODERATION_USEC]);
+   390			profs[i].pkts = nla_get_u16(tb_moder[ETHTOOL_A_MODERATION_PKTS]);
+   391			profs[i].comps = nla_get_u16(tb_moder[ETHTOOL_A_MODERATION_COMPS]);
+   392	
+   393			if (dst[i].usec != profs[i].usec || dst[i].pkts != profs[i].pkts ||
+   394			    dst[i].comps != profs[i].comps)
+   395				*mod = true;
+   396	
+   397			i++;
+   398		}
+   399	
+   400		memcpy(dst, profs, sizeof(profs));
+   401	}
+   402	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
