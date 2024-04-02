@@ -1,143 +1,115 @@
-Return-Path: <netdev+bounces-83906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8487E894CB6
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:36:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92CC2894CE7
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B61F41C21C52
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:36:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D9862822D0
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A61B3B788;
-	Tue,  2 Apr 2024 07:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FFA3D0B8;
+	Tue,  2 Apr 2024 07:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="feOc3UGH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjgpnG3t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com [209.85.167.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68FB2BD1C;
-	Tue,  2 Apr 2024 07:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16E03CF74
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 07:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712043394; cv=none; b=Qly2A858kZ98LARLN2h47sxIIyjAHqmzpvNJAWVEiX1Yh0BU6NpEqLKpA7FQgFG2nfETFsihifM5Vo4SsNw/7iY2jz4MOgSUb5UquORoBGUnMLRdMyA2FuskAOWlT5KEXrHQXIQL1fMELZXEFMuHeIfnnlCSEQvl0Y4NQWsjHos=
+	t=1712044269; cv=none; b=BIhovAFTP33nQuxfgwLCY3iocL1tjzWp3mCIpBYq+fKiQN6VkcL4MmuXE2d7p9p2CGTD+XtN7SeR5w5iuTFSkxcGxgVe/jJkbsnikKqDWin8fGZk4xxtv2eoOMxbTA/QrM8gtGK7z9QSkwmVKGn65NsIdBJwBe83lT3goznHozM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712043394; c=relaxed/simple;
-	bh=zox4SvndtX2IQYH7dF2si0RyU8QV/fnDqLEkZtb7Hc0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uTWIPzfGzgeeLAdX5vtED1p6GQqotq1BNqL0meG+kwx654ORs7zAarGefivGBBHlRR1kvQaCUNCP9TblMNlb4fNT0ATJU+NM1Iuv7RWeL14/LaBTWuiforDRkdqlHvoCQTC53/wi0EIEeRr7NMZcQrUOohDneP7PsdoxPsGM48o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=feOc3UGH; arc=none smtp.client-ip=209.85.167.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f195.google.com with SMTP id 5614622812f47-3c3d404225dso2782281b6e.3;
-        Tue, 02 Apr 2024 00:36:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712043391; x=1712648191; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IOSjhq4e8oxtj3qoYtkivIs58UqN+jVmwQhUZgEoH9Y=;
-        b=feOc3UGHWsQXqqkSERZyjzl3dgDJRo9PK8jWuCfGROJaOsfJng6cDVu2xUhKqQxCUL
-         XevMbXPTZhvRNLYQmNRAfBWW55Jz1M7JW7g9MemG5gRVLuB1wVrJnv1ZfQw+SJErD28K
-         bp2qlsYQ34hNL2HsuckQxARZvGpyL8UWsdGGHc9WAbvgCUcrsQS5E2TboUJgLIvFKMx4
-         2zYt2wEd7IThK0ZhittMT9v3w/vFaHRfnb5H5AvLX4VldSPZ5AJPIwuwyY15mmCBucSN
-         p8bOCfzBPUtNmDizapHm9Pk2wP07g9ID5hZ2oDeBii0Yb36MREge0C65VT1sb+yUl43+
-         26RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712043391; x=1712648191;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IOSjhq4e8oxtj3qoYtkivIs58UqN+jVmwQhUZgEoH9Y=;
-        b=iLe9nRQ3MDiSZTZg78JwUNkhczLTH8Bw59L4B8+eDdWleQh2HPm5MiT1h8bCYG8UV1
-         ZGVSpSgduFGp/HKdEojqo3g/lhDkczzkM3KcusnouWRcDeJLn5zzJ2OS3ukCCS/IJxb2
-         prAPGvPK9IS6ZrKkjN+m1iH3vBJz6rVFd49wpj1G2LvCksSROFJXDnk2dEpYtnXF6lHQ
-         370D0iWllT8BHcXexg/4NCTBEjSq66KTVLZ7Er2iIYMb5vEAfju8r4RV8cQ8El8Nd79y
-         gtQ9wLHoaFsKkmMFgdwSBTgO3bwPBisFKIRruGWFg1qV0pIx+Q9SA22avSFq3//f21Ew
-         JolA==
-X-Forwarded-Encrypted: i=1; AJvYcCXtrTuylhCoLVI2HnM4LLwIwXytqhsGneYCY2cR21pNYks6lPEnf6q1pBe0Kxi5SmkXgJ2qenMAXTf3IBQ7qvPCuutKRqZV
-X-Gm-Message-State: AOJu0YzeZx3E1nhTeURolREXQM/0P99ENJ67D2Tl5hzt6pBMOO5bN5Dz
-	CJc+ydnBd7rj4UilDy2K8s7TQnnoz+urlukPFTxVxlKlvoPYUuPLTgBLDOp6IvIJHube9dvOWw=
-	=
-X-Google-Smtp-Source: AGHT+IF3+j06WxIYHgTCU8OLKQ8y4EXT06Ty4po+TJM8RiHUA84r+T1QS9NlVpI+1c5fvZIN5ph7vw==
-X-Received: by 2002:a05:6808:1246:b0:3c4:e208:b784 with SMTP id o6-20020a056808124600b003c4e208b784mr9342057oiv.27.1712043391580;
-        Tue, 02 Apr 2024 00:36:31 -0700 (PDT)
-Received: from localhost.localdomain ([2604:abc0:1234:22::2])
-        by smtp.gmail.com with ESMTPSA id ef1-20020a056808234100b003c3e07cc6a1sm2036927oib.46.2024.04.02.00.36.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 00:36:31 -0700 (PDT)
-From: Coia Prant <coiaprant@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Coia Prant <coiaprant@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] net: usb: qmi_wwan: add Lonsung U8300/U9300 product Update the net usb qmi_wwan driver to support Longsung U8300/U9300.
-Date: Tue,  2 Apr 2024 00:36:27 -0700
-Message-Id: <20240402073627.1753526-1-coiaprant@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1712044269; c=relaxed/simple;
+	bh=PZt8fmx8gOLs4VILhco3ToiwYNJQfxyFdPVTqzkQXWQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qMgYfw4KzR/J18LdQL9AM5bcEf8hZ9HEIDFemcrb+1pMpCgktPN+eZmdUOhr6NjH2qEocOjtz7PhFgVcOtetxFt1eN7uU/mT2n5XAPY+Svd39kUhHuehmgywHN2Dly511RHbnkMhVwi+/W93BMB0K1H14goRiXYqkMIPF2lP+3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tjgpnG3t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1C24C43394;
+	Tue,  2 Apr 2024 07:51:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712044269;
+	bh=PZt8fmx8gOLs4VILhco3ToiwYNJQfxyFdPVTqzkQXWQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tjgpnG3tE+KCQnaj9M73nywhzRmPg6mYPTpMVIhm2RuF44wS54pyyo3I8qVsHVwpv
+	 hgwCBVqk1yUDgI1hJpNtPiBj9rIon61slOw50WjhQUrCUggboCvE+WFsRg0x4Bm8Pq
+	 QaYD3DAZzIsPZYrHkhdusaXz6KlPRyTQ1WJdlkBqvJKwDIuqsTcdx0hX4k3CpSbn5X
+	 D0z6DWvJasQtsD3vDIZsACcFaJ3bEXFWuRPzcvtKE/dCwiItGHZzUBgfbZGE7NuXun
+	 zWLDqxdTO/4AEjs35Yqnzzlr4FKidiagvlW+0EBU7fNg4Q71Lr5i1fkBc3mNupxMHv
+	 lvke49wxkjErg==
+Date: Tue, 2 Apr 2024 10:51:04 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Feng Wang <wangfe@google.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net
+Subject: Re: [PATCH] [PATCH ipsec] xfrm: Store ipsec interface index
+Message-ID: <20240402075104.GD11187@unreal>
+References: <20240318231328.2086239-1-wangfe@google.com>
+ <20240319084235.GA12080@unreal>
+ <CADsK2K_65Wytnr5y+5Biw=ebtb-+hO=K7hxhSNJd6X+q9nAieg@mail.gmail.com>
+ <ZfpnCIv+8eYd7CpO@gauss3.secunet.de>
+ <CADsK2K-WFG2+2NQ08xBq89ty-G-xcoV517Eq5D7kNePcT4z0MQ@mail.gmail.com>
+ <20240321093248.GC14887@unreal>
+ <CADsK2K8=B=Yv4i6rzNdbuc-C6yc-pw6RSuRvKbsL2qYjsO9seg@mail.gmail.com>
+ <20240401142707.GD73174@unreal>
+ <CADsK2K-VLdiuxeP82bmuGvmU6z848mLpk+JBYdhXppOq0B76VA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADsK2K-VLdiuxeP82bmuGvmU6z848mLpk+JBYdhXppOq0B76VA@mail.gmail.com>
 
-Enabling DTR on this modem was necessary to ensure stable operation.
+On Mon, Apr 01, 2024 at 11:09:41AM -0700, Feng Wang wrote:
+> Thanks Leon for answering my question.  In the above example, if we can
+> pass the xfrm interface id to the HW, then HW can distinguish them based on
+> it. That's what my patch is trying to do.
 
-ID 1c9e:9b05 OMEGA TECHNOLOGY (U8300)
-ID 1c9e:9b3c OMEGA TECHNOLOGY (U9300)
+From partial grep, it looks like "xfrm interface id" is actually netdevice
+index. If this is the case, HW doesn't need to know about it, because
+packet offload is performed by specific device and skb_iif will be equal
+to that index anyway.
 
-U8300
- /: Bus
-    |__ Port 1: Dev 3, If 0, Class=Vendor Specific Class, Driver=option, 480M (Debug)
-        ID 1c9e:9b05 OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 1, Class=Vendor Specific Class, Driver=option, 480M (Modem / AT)
-        ID 1c9e:9b05 OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 2, Class=Vendor Specific Class, Driver=option, 480M (AT)
-        ID 1c9e:9b05 OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 3, Class=Vendor Specific Class, Driver=option, 480M (AT / Pipe / PPP)
-        ID 1c9e:9b05 OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 4, Class=Vendor Specific Class, Driver=qmi_wwan, 480M (NDIS / GobiNet / QMI WWAN)
-        ID 1c9e:9b05 OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 5, Class=Vendor Specific Class, Driver=, 480M (ADB)
-        ID 1c9e:9b05 OMEGA TECHNOLOGY
+> Would you please take this into consideration? If needed, I can improve my
+> patch.
 
-U9300
- /: Bus
-    |__ Port 1: Dev 3, If 0, Class=Vendor Specific Class, Driver=, 480M (ADB)
-        ID 1c9e:9b3c OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 1, Class=Vendor Specific Class, Driver=option, 480M (Modem / AT)
-        ID 1c9e:9b3c OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 2, Class=Vendor Specific Class, Driver=option, 480M (AT)
-        ID 1c9e:9b3c OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 3, Class=Vendor Specific Class, Driver=option, 480M (AT / Pipe / PPP)
-        ID 1c9e:9b3c OMEGA TECHNOLOGY
-    |__ Port 1: Dev 3, If 4, Class=Vendor Specific Class, Driver=qmi_wwan, 480M (NDIS / GobiNet / QMI WWAN)
-        ID 1c9e:9b3c OMEGA TECHNOLOGY
+As a standalone patch, it is not correct. If you have a real use case,
+please send together with code which uses it.
 
-Tested successfully using Modem Manager on U9300.
-Tested successfully using qmicli on U9300.
+Thanks
 
-Signed-off-by: Coia Prant <coiaprant@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/net/usb/qmi_wwan.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index e2e181378f41..3dd8a2e24837 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1380,6 +1380,8 @@ static const struct usb_device_id products[] = {
- 	{QMI_FIXED_INTF(0x1c9e, 0x9801, 3)},	/* Telewell TW-3G HSPA+ */
- 	{QMI_FIXED_INTF(0x1c9e, 0x9803, 4)},	/* Telewell TW-3G HSPA+ */
- 	{QMI_FIXED_INTF(0x1c9e, 0x9b01, 3)},	/* XS Stick W100-2 from 4G Systems */
-+	{QMI_QUIRK_SET_DTR(0x1c9e, 0x9b05, 4)},	/* Longsung U8300 */
-+	{QMI_QUIRK_SET_DTR(0x1c9e, 0x9b3c, 4)},	/* Longsung U9300 */
- 	{QMI_FIXED_INTF(0x0b3c, 0xc000, 4)},	/* Olivetti Olicard 100 */
- 	{QMI_FIXED_INTF(0x0b3c, 0xc001, 4)},	/* Olivetti Olicard 120 */
- 	{QMI_FIXED_INTF(0x0b3c, 0xc002, 4)},	/* Olivetti Olicard 140 */
--- 
-2.39.2
-
+> 
+> Thanks,
+> 
+> Feng
+> 
+> 
+> 
+> 
+> On Mon, Apr 1, 2024 at 7:27 AM Leon Romanovsky <leon@kernel.org> wrote:
+> 
+> > On Fri, Mar 22, 2024 at 12:14:44PM -0700, Feng Wang wrote:
+> > > Hi Leon and Steffen,
+> > >
+> > > Thanks for providing me with the information. I went through the offload
+> > > driver code but I didn't find any solution for my case.  Is there any
+> > > existing solution available?  For example, there are 2 IPSec sessions
+> > with
+> > > the same xfrm_selector results, when trying to encrypt the packet, how to
+> > > find out which session this packet belongs to?
+> >
+> > HW catches packets based on match criteria of source and destination. If
+> > source, destination and other match criteria are the same for different
+> > sessions, then from HW perspective, it is the same session.
+> >
+> > Thanks
+> >
 
