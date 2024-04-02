@@ -1,134 +1,267 @@
-Return-Path: <netdev+bounces-84017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B8F89553A
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:22:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 694E789554B
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80EF528998E
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:22:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D5CC28DAC2
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65A183CBD;
-	Tue,  2 Apr 2024 13:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F2D823DD;
+	Tue,  2 Apr 2024 13:26:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qN33QKup"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0QvUGak"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0C680631
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1AD60B96;
+	Tue,  2 Apr 2024 13:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712064102; cv=none; b=hHtN8RHY4zS5VodTmLJZcJ/SR5J6fTgSHFNzxVTguB9HsLHaBQNunOFjBwqHgOpghI9UrglREZ0PmGk5+7EBCklNhTylzVuXxlBipYP4VZ2WK4Alcr0G/bo+ji23gY0YjPTn6nSmJVELbbvadfgFq1YSl72WUhdIEI3mOG0COGQ=
+	t=1712064400; cv=none; b=C5DtNcgA1AK47FSGSup5SVCrYoqMq+sopbR0bfeKFvGTnmF3rxdwgbONW5vFxfdLyc0J6YqTQS5yGRAMAA2BGzMG9KJZjyaqPBcmQ8l0QxMuJUZqspsGPmQGY86jPldQnp8+QsyOUOTy3Pj1JFY2JdDzSSyk9oqDlb8djMcPpR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712064102; c=relaxed/simple;
-	bh=b3kmnv1FDRxwV263u4ew1pheWis3dH1OItiCNoIagzM=;
+	s=arc-20240116; t=1712064400; c=relaxed/simple;
+	bh=hlqVVxyxG9QM5oLoAbqmZw1d52KMspKeP5w+isXcmUU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L0djfDGSSofGJF/snuGwS8Br72usfejEUpbvDRKq8ZwgGQ6YnEk6BQSmF54k7r7D+Nidu5peyMYH8satXqAEvBf9LcpyRnTSkk+PTNNEYdRMC8VzTK6RlM3KETMaKZL+x6VKoE6x0nH/Oo6g8iqdNgiztF5lDJx3DA4ysGf3Jw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qN33QKup; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A0B3C43390;
-	Tue,  2 Apr 2024 13:21:40 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=nLBcZ9+we1dbJSXInThoDvENohMDzPABVUJUvZtzwsonUMYi9wtqvLSJ5ySnsmR7/7rBwoUA04XiEy4AAZsgbjv7THEQhlGLGwjHCQIcRGdQ4O4zgVXWeVhqEpkadYLPEmROErgcMbneW7RyouHsG3ZCk0+lh2pJ3ewO3/MqQrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0QvUGak; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B01C433F1;
+	Tue,  2 Apr 2024 13:26:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712064102;
-	bh=b3kmnv1FDRxwV263u4ew1pheWis3dH1OItiCNoIagzM=;
+	s=k20201202; t=1712064399;
+	bh=hlqVVxyxG9QM5oLoAbqmZw1d52KMspKeP5w+isXcmUU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qN33QKupi9NOPvpCLUY4DNWqiSyGXd4lBa+IuG63gFtpeSKMgghnynCphAZ4moJsq
-	 2ZW42stgH+Kr36ffXBAWsJeBmnja5ktSCMQXhlb1clU1IyvazaT68+R75ALc9whV2n
-	 69K9MM7uhzSpqXPW94CVPUhnzuMmMdJN5TbQO/bSmal3+LgH/Li9ZrHWH3wnnQeVt9
-	 HVX38469AXyGFy9LXgHt4xACIhYNE3H8Jak+JGvX2uRQiVs+zmkxgQkSFH1qLVIFw/
-	 FT5IeH7SNYrZF2FWcj0Wql40puqe/zDeBCuWJvqVYSkwrdJr42rxknT4xtnzMW4nY3
-	 QGDvsI9oQAhNg==
-Date: Tue, 2 Apr 2024 16:21:37 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: ICMP_PARAMETERPROB and ICMP_TIME_EXCEEDED during connect
-Message-ID: <20240402132137.GJ11187@unreal>
-References: <20240326133412.47cf6d99@kernel.org>
- <CADVnQymqFELYQqpoDsxh=z2XxvhMSvdUfCyjgRYeA1QaesnpEg@mail.gmail.com>
- <20240326165554.541551c3@kernel.org>
- <CANn89iJDxv2hkT7-KCaizu3r44HpT=xbvRtMXjxd-LUQS=Br8g@mail.gmail.com>
+	b=J0QvUGakpXWyePXz3YTw9UULDkBXS8HtxsPzUwn3eHy3mDLAVRUKrHObi27q2RJvn
+	 bmrgx1/nPFt8iR7FvNti3ADybQDmbXLZqgO3bmEcTihr7zKjZjCrSbocAKlD5S05pQ
+	 VVO41SLuxOzHlVtoVUPLkNquXKs/g3koyxBRPqVuLSmSWYuFnHug0hwYTMGJSiNXms
+	 Mgbnps1L/GRy2pgbMMp31/rcwQghSfhjowzBw5F+PsosXirsDyGWbhZ3lj95Pan0sJ
+	 6MbAagg+umYcYoFBAePZ4JR0c0IIkW5vOtEKVU1yCyJ0Rcu9zdkCB/ze/NOkngD1Z/
+	 5hVV4kbZktECA==
+Date: Tue, 2 Apr 2024 08:26:37 -0500
+From: Rob Herring <robh@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <20240402132637.GA3744978-robh@kernel.org>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJDxv2hkT7-KCaizu3r44HpT=xbvRtMXjxd-LUQS=Br8g@mail.gmail.com>
+In-Reply-To: <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
 
-On Wed, Mar 27, 2024 at 02:05:17PM +0100, Eric Dumazet wrote:
-> On Wed, Mar 27, 2024 at 12:55 AM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Tue, 26 Mar 2024 23:03:26 +0100 Neal Cardwell wrote:
-> > > On Tue, Mar 26, 2024 at 9:34 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> > > >
-> > > > Hi!
-> > > >
-> > > > I got a report from a user surprised/displeased that ICMP_TIME_EXCEEDED
-> > > > breaks connect(), while TCP RFCs say it shouldn't. Even pointing a
-> > > > finger at Linux, RFC5461:
-> > > >
-> > > >    A number of TCP implementations have modified their reaction to all
-> > > >    ICMP soft errors and treat them as hard errors when they are received
-> > > >    for connections in the SYN-SENT or SYN-RECEIVED states.  For example,
-> > > >    this workaround has been implemented in the Linux kernel since
-> > > >    version 2.0.0 (released in 1996) [Linux].  However, it should be
-> > > >    noted that this change violates section 4.2.3.9 of [RFC1122], which
-> > > >    states that these ICMP error messages indicate soft error conditions
-> > > >    and that, therefore, TCP MUST NOT abort the corresponding connection.
-> > > >
-> > > > Is there any reason we continue with this behavior or is it just that
-> > > > nobody ever sent a patch?
-> > >
-> > > Back in November of 2023 Eric did merge a patch to bring the
-> > > processing in line with section 4.2.3.9 of [RFC1122]:
-> > >
-> > > 0a8de364ff7a tcp: no longer abort SYN_SENT when receiving some ICMP
-> > >
-> > > However, the fixed behavior did not meet some expectations of Vagrant
-> > > (see the netdev thread "Bug report connect to VM with Vagrant"), so
-> > > for now it got reverted:
-> > >
-> > > b59db45d7eba tcp: Revert no longer abort SYN_SENT when receiving some ICMP
-> > >
-> > > I think the hope was to root-cause the Vagrant issue, fix Vagrant's
-> > > assumptions, then resubmit Eric's commit. Eric mentioned on Jan 8,
-> > > 2024: "We will submit the patch again for 6.9, once we get to the root
-> > > cause." But I don't think anyone has had time to do that yet.
-> >
-> > Ah.
-> >
-> > Thank you!!
+On Tue, Mar 26, 2024 at 03:04:48PM +0100, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> For the record, Leon Romanovsky brought this issue directly to Linus
-> Torvalds, stating that I broke things.
-
-Just to make it clear, Linus was involved after we didn't progress for
-more than one month after initial starting "Bug report connect to VM with Vagrant",
-while approaching to merge window.
-https://lore.kernel.org/netdev/MN2PR12MB44863139E562A59329E89DBEB982A@MN2PR12MB4486.namprd12.prod.outlook.com/
-
-Despite long standing netdev patch flow: apply fast -> revert fast, this
-patch was treated differently.
-
+> PSE PI setup may encompass multiple PSE controllers or auxiliary circuits
+> that collectively manage power delivery to one Ethernet port.
+> Such configurations might support a range of PoE standards and require
+> the capability to dynamically configure power delivery based on the
+> operational mode (e.g., PoE2 versus PoE4) or specific requirements of
+> connected devices. In these instances, a dedicated PSE PI node becomes
+> essential for accurately documenting the system architecture. This node
+> would serve to detail the interactions between different PSE controllers,
+> the support for various PoE modes, and any additional logic required to
+> coordinate power delivery across the network infrastructure.
 > 
-> It tooks weeks before Shachar did some debugging, but with no
-> conclusion I recall.
-
-Shachar didn't do debugging, she didn't write the bisected patch.
-She is verification engineer who was ready to run ANY tests and try
-ANY debug patch which you wanted.
-
+> The old usage of "#pse-cells" is unsuficient as it carries only the PSE PI
+> index information.
 > 
-> This kind of stuff makes me not very eager to work on this point.
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
 > 
+> Changes in v3:
+> - New patch
+> 
+> Changes in v4:
+> - Remove $def
+> - Fix pairset-names item list
+> - Upgrade few properties description
+> - Update the commit message
+> 
+> Changes in v5:
+> - Fix yamllint error.
+> - Replace underscore by dash in properties names.
+> - Add polarity-supported property.
+> 
+> Changes in v6:
+> - Reorder the pairset pinout table documentation to shrink the lines size.
+> - Remove pairset and polarity as required fields.
+> - Add vpwr-supply regulator supply.
+> ---
+>  .../bindings/net/pse-pd/pse-controller.yaml        | 102 ++++++++++++++++++++-
+>  1 file changed, 99 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml b/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> index 2d382faca0e6..03f7f215c162 100644
+> --- a/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> @@ -13,6 +13,7 @@ description: Binding for the Power Sourcing Equipment (PSE) as defined in the
+>  
+>  maintainers:
+>    - Oleksij Rempel <o.rempel@pengutronix.de>
+> +  - Kory Maincent <kory.maincent@bootlin.com>
+>  
+>  properties:
+>    $nodename:
+> @@ -22,11 +23,106 @@ properties:
+>      description:
+>        Used to uniquely identify a PSE instance within an IC. Will be
+>        0 on PSE nodes with only a single output and at least 1 on nodes
+> -      controlling several outputs.
+> +      controlling several outputs which are not described in the pse-pis
+> +      subnode. This property is deprecated, please use pse-pis instead.
+>      enum: [0, 1]
+>  
+> -required:
+> -  - "#pse-cells"
+> +  pse-pis:
+> +    type: object
+> +    description:
+> +      Overview of the PSE PIs provided by the controller.
+> +
+> +    properties:
+> +      "#address-cells":
+> +        const: 1
+> +
+> +      "#size-cells":
+> +        const: 0
+> +
+> +    required:
+> +      - "#address-cells"
+> +      - "#size-cells"
+> +
+> +    patternProperties:
+> +      "^pse-pi@[0-9a-f]+$":
+> +        type: object
+> +        description:
+> +          PSE PI for power delivery via pairsets, compliant with IEEE
+> +          802.3-2022, Section 145.2.4. Each pairset comprises a positive and
+> +          a negative VPSE pair, adhering to the pinout configurations
+> +          detailed in the standard.
+> +          See Documentation/networking/pse-pd/pse-pi.rst for details.
+> +
+> +        properties:
+> +          reg:
+> +            description:
+> +              Address describing the PSE PI index.
+> +            maxItems: 1
+> +
+> +          "#pse-cells":
+> +            const: 0
+> +
+> +          pairset-names:
+> +            $ref: /schemas/types.yaml#/definitions/string-array
+> +            description:
+> +              Names of the pairsets as per IEEE 802.3-2022, Section 145.2.4.
+> +              Valid values are "alternative-a" and "alternative-b". Each name
 
-OK, so it is not important at the end.
+Don't state constraints in prose which are defined as schema 
+constraints.
+
+> +              should correspond to a phandle in the 'pairset' property
+> +              pointing to the power supply for that pairset.
+> +            minItems: 1
+> +            maxItems: 2
+> +            items:
+> +              enum:
+> +                - alternative-a
+> +                - alternative-b
+> +
+> +          pairsets:
+> +            $ref: /schemas/types.yaml#/definitions/phandle-array
+> +            description:
+> +              List of phandles, each pointing to the power supply for the
+> +              corresponding pairset named in 'pairset-names'. This property
+> +              aligns with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
+> +              PSE Pinout Alternatives (as per IEEE 802.3-2022 Table 145\u20133)
+> +              |-----------|---------------|---------------|---------------|---------------|
+> +              | Conductor | Alternative A | Alternative A | Alternative B | Alternative B |
+> +              |           |    (MDI-X)    |     (MDI)     |      (X)      |      (S)      |
+> +              |-----------|---------------|---------------|---------------|---------------|
+> +              | 1         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
+> +              | 2         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
+> +              | 3         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
+> +              | 4         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
+> +              | 5         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
+> +              | 6         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
+> +              | 7         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
+> +              | 8         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
+> +            minItems: 1
+> +            maxItems: 2
+
+"pairsets" does not follow the normal design pattern of foos, foo-names, 
+and #foo-cells. You could add #foo-cells I suppose, but what would cells 
+convey? I don't think it's a good fit for what you need.
+
+The other oddity is the number of entries and the names are fixed. That 
+is usually defined per consumer. 
+
+As each entry is just a power rail, why can't the regulator binding be 
+used here?
+
+> +
+> +          polarity-supported:
+> +            $ref: /schemas/types.yaml#/definitions/string-array
+> +            description:
+> +              Polarity configuration supported by the PSE PI pairsets.
+> +            minItems: 1
+> +            maxItems: 4
+> +            items:
+> +              enum:
+> +                - MDI-X
+> +                - MDI
+> +                - X
+> +                - S
+> +
+> +          vpwr-supply:
+> +            description: Regulator power supply for the PSE PI.
+
+I don't see this being used anywhere.
+
+> +
+> +        required:
+> +          - reg
+> +          - "#pse-cells"
+> +
+> +oneOf:
+> +  - required:
+> +      - "#pse-cells"
+> +  - required:
+> +      - pse-pis
+>  
+>  additionalProperties: true
+>  
+> 
+> -- 
+> 2.25.1
+> 
 
