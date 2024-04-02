@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-83877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4051D894AA5
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:50:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EADC8894AAA
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:51:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5140C286842
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 04:50:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55682869D1
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 04:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2673517C6D;
-	Tue,  2 Apr 2024 04:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D29199C7;
+	Tue,  2 Apr 2024 04:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E+6UZRsF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SC+xfTyn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5542175A9;
-	Tue,  2 Apr 2024 04:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833EA19477
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 04:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712033429; cv=none; b=cLGrEkpHuECwOF4l2Z5TwpYFE3uX4ec7wIYHFyHDK/Vsl0UrbuOFBiebK01a91bGMbRXDMyIVFcDP+QLUcCwRBCaTTL8Ou7nqVUOSWYNHtYyowW3diEwUmJA2+UFG4Dw39mn0SDsV0Jorom8/bqCCsue4jIkeZ6wPte8NRWmLtM=
+	t=1712033435; cv=none; b=mtIB1eoy9TiisCzM2YQjshq+bOZnWmAayj96CRTs+YIXlUFG+ZQIbd8z8vxPA0v//KfblPw/Pml+r7p8aOradvwynNhAozm2G0ALUFkSqiNITQ51MfL3/nZdO8nsapp4MLuNEPfqtxXnEBtFBADpv0H9F+TBpxgduFLKbaZkWwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712033429; c=relaxed/simple;
-	bh=nHHWCjMhRh6CPqMNONkTsy8+0GPYXavAgdEu3JRVI/g=;
+	s=arc-20240116; t=1712033435; c=relaxed/simple;
+	bh=yFZ/MVmRw2wFDE3hB0K6UAIGlEHWoGVz5lDIPk1b2vw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FhScFzdgTKhIaE0gcsToFqYJLoklsQcRRpQFy3OW3Sg73ZM6xVuOA1OVCSQ4FD2uHfF/+mafP1ujt5OgbkfE9rYvVsRN6CM5fH4VKp7L1VlL+eVUXCjMLCa7jKebXb8xwmnUhXWFFm+wZIrU4lURX3zF/irRAnhsF53XitxYIdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E+6UZRsF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 633F5C433C7;
-	Tue,  2 Apr 2024 04:50:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qfUB353mkzima10BqodK+o8vHilSnb2dlBvhahvq+KIvebwb8KbnUUQQDqB/u4cJcr0BmisW8gUTAq45ShLLkuxcNoYizJkNtl7w8uTx0NJP+NZQiStwP6JGYTyKRnHaWZZ2ySs8egKiAPiUexUrTrZc6hZDdb8XgekWTKDbC40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SC+xfTyn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CC970C433C7;
+	Tue,  2 Apr 2024 04:50:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712033428;
-	bh=nHHWCjMhRh6CPqMNONkTsy8+0GPYXavAgdEu3JRVI/g=;
+	s=k20201202; t=1712033434;
+	bh=yFZ/MVmRw2wFDE3hB0K6UAIGlEHWoGVz5lDIPk1b2vw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=E+6UZRsFmbiPaSUetiBItB0Zn5fYCxeGL7ZqJHo66GLbawfTMJMqlhqcY/o51dW7X
-	 RMWFrVDRPndjWyYoZytx6AY0ehmXFc+x0Msybhcp5tPWkTrHAwK65C4p05XX3IXLg1
-	 kBTlqaF7+Uzlt1/IrHMjRg4dhN9FZBO6wo8E7rqdypGIiB6Cxc78DVls0GNbWGd83s
-	 z3SJPbujicHzJt+qOA7+CSc+hm3BH9vinZsx2aKh+l1O21llSeO6/Kl0wIt5+BWH2D
-	 syPlTpFXk3AaKzkFrxoCX6+7+9Lb7IY996OZF9QP7AW7eL12FkHSS6n0deWfjvuE8+
-	 nloYTcjBexrjQ==
+	b=SC+xfTynDraeHBJHIHmBpYtEW7tOVnynX0qovuJk5zt38AVc91JOtBJldA4VCjFJF
+	 UUKUI5RbaBm4ExWCDl2lS0F8LpeG4a3nCRtEG1WCUp9oKyzBCDdZicperOfqRtXb4w
+	 3Zvd+LaZbN7NGg3Ws+2Tmp6E39J2m/fVmeele1bhZHz7p2jsxehTcvshJ2KW78xFa5
+	 YSvUvKHhCP7ysEqBwsSreS0AGV55JzDPb3cMNGkIqT+aBy2d0uviSTdqNTRxEqgvnR
+	 6vHYS3kErbeRyklKyviFYvm5QHG78sDXXy9GnU0ufA7KN32M5JHJ41sELUNxxZ1t9m
+	 LyNUXRAg/pyoA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 53179D9A158;
-	Tue,  2 Apr 2024 04:50:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C3E54D9A156;
+	Tue,  2 Apr 2024 04:50:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] mptcp: fix fallback MIB counter and wrong var in
- selftests
+Subject: Re: [PATCH net-next] inet: preserve const qualifier in inet_csk()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171203342833.12415.12309302923089138092.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Apr 2024 04:50:28 +0000
-References: <20240329-upstream-net-20240329-fallback-mib-v1-0-324a8981da48@kernel.org>
-In-Reply-To: <20240329-upstream-net-20240329-fallback-mib-v1-0-324a8981da48@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shuah@kernel.org, fw@strlen.de, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- dcaratti@redhat.com, stable@vger.kernel.org, cpaasch@apple.com,
- tanggeliang@kylinos.cn
+ <171203343479.12415.12810215407100077228.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Apr 2024 04:50:34 +0000
+References: <20240329144931.295800-1-edumazet@google.com>
+In-Reply-To: <20240329144931.295800-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 29 Mar 2024 13:08:51 +0100 you wrote:
-> Here are two fixes related to MPTCP.
+On Fri, 29 Mar 2024 14:49:31 +0000 you wrote:
+> We can change inet_csk() to propagate its argument const qualifier,
+> thanks to container_of_const().
 > 
-> The first patch fixes when the MPTcpExtMPCapableFallbackACK MIB counter
-> is modified: it should only be incremented when a connection was using
-> MPTCP options, but then a fallback to TCP has been done. This patch also
-> checks the counter is not incremented by mistake during the connect
-> selftests. This counter was wrongly incremented since its introduction
-> in v5.7.
+> We have to fix few places that had mistakes, like tcp_bound_rto().
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] mptcp: don't account accept() of non-MPC client as fallback to TCP
-    https://git.kernel.org/netdev/net/c/7a1b3490f47e
-  - [net,2/2] selftests: mptcp: join: fix dev in check_endpoint
-    https://git.kernel.org/netdev/net/c/40061817d95b
+  - [net-next] inet: preserve const qualifier in inet_csk()
+    https://git.kernel.org/netdev/net-next/c/58169ec9c403
 
 You are awesome, thank you!
 -- 
