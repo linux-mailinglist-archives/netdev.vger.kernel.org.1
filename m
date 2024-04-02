@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-84012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488FF895502
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:16:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9D268954FB
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:15:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D36961F23F39
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:16:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 743E328A427
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1631E132C1C;
-	Tue,  2 Apr 2024 13:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2754586255;
+	Tue,  2 Apr 2024 13:13:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7CA85C76
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBCE839FF
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712063636; cv=none; b=kmZeL7SYyPysnG+Z8Qix6VgBwdOP+UO45lxVuSguVDt+jEgw1yELEZRi7EBup+hGYmQRogVLAKhPgqnt58yWL7OT4pNaxrXlEGhy2n1BDaIIih3khdZ3JXJkbLegVEO48Zv9+TPKq6Xoxdlk+F4i1gH3l7P8myXIna54YIB4SKQ=
+	t=1712063635; cv=none; b=hEJ/RszzDXEyvYYlzLfZO6lBLDuD9cHXZCCKbf4/70TCRfctAKESjjRMYAaHny4Bfn8jXVGKqWhej4rYbMz9j/fIPgE9/o6U6t0dc87eQHEmYaqeYDwzzw3KsPSdKht9Jd//Nur/pogoZwdIURmGC/5kSDhnd8rBNjGlcUrYQ8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712063636; c=relaxed/simple;
-	bh=i1PFc7lD0popc40JSZRnhqej4YBxofX5vZ/4vsj7PXc=;
+	s=arc-20240116; t=1712063635; c=relaxed/simple;
+	bh=uOg2vF7fRLrSjYw1eIzhj6r2skvFhdyta34SjX2k1jw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cMmWPKiI8hdN+YkWi9zswYPE+VyY7uiJqDjs+Oo+Vdx8UDIGfanqIbMb7n+gQ7J3ww7EYifeJl5RNOE+Cuf6d34B15tVHAqKN3Df60cIUbL6WqcD5WKUXp1oX3Y6oLWB5SpTgE64pfLlPV7Gwp+ubdMoxWplc84y1kLemOvzJP8=
+	 MIME-Version; b=iYVC8LJnfKtm52oEjCboAQ6ad1nXq+ef9f4ZJIzkg0+MX7QcimEhpwSEaeAFHgJNXu1/vzJZiLVvAUhk1K79PGta+feHgl9/R0LDoTpZerkK1XoeH3rzyih2Ikx20+uesjhcHVs5RxYsNkt1Cgo6rnVYdhLAc3FITLQdQpvswZQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,15 +33,15 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rrdxN-0007Nm-MW; Tue, 02 Apr 2024 15:13:41 +0200
+	id 1rrdxN-0007No-MW; Tue, 02 Apr 2024 15:13:41 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rrdxM-009zW9-Ie; Tue, 02 Apr 2024 15:13:40 +0200
+	id 1rrdxM-009zWB-Jl; Tue, 02 Apr 2024 15:13:40 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rrdxM-006Opi-1V;
+	id 1rrdxM-006Ops-1Y;
 	Tue, 02 Apr 2024 15:13:40 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -59,9 +59,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	netdev@vger.kernel.org,
 	UNGLinuxDriver@microchip.com,
 	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
-Subject: [PATCH net-next v1 6/8] net: dsa: microchip: ksz8_r_dyn_mac_table(): ksz: do not return EAGAIN on timeout
-Date: Tue,  2 Apr 2024 15:13:37 +0200
-Message-Id: <20240402131339.1525330-7-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v1 7/8] net: dsa: microchip: ksz8_r_dyn_mac_table(): return read/write error if we got any
+Date: Tue,  2 Apr 2024 15:13:38 +0200
+Message-Id: <20240402131339.1525330-8-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240402131339.1525330-1-o.rempel@pengutronix.de>
 References: <20240402131339.1525330-1-o.rempel@pengutronix.de>
@@ -77,47 +77,77 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-EAGAIN was not used by previous code and not used by  current code. So,
-remove it and use proper error value.
+The read/write path may fail. So, return error if we got it.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/dsa/microchip/ksz8795.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ drivers/net/dsa/microchip/ksz8795.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index d5ec4b9772752..401f77055cc27 100644
+index 401f77055cc27..27dfcc645567d 100644
 --- a/drivers/net/dsa/microchip/ksz8795.c
 +++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -396,7 +396,7 @@ static int ksz8_valid_dyn_entry(struct ksz_device *dev, u8 *data)
+@@ -385,12 +385,16 @@ static int ksz8_valid_dyn_entry(struct ksz_device *dev, u8 *data)
+ 	int timeout = 100;
+ 	const u32 *masks;
+ 	const u16 *regs;
++	int ret;
  
- 	/* Entry is not ready for accessing. */
- 	if (*data & masks[DYNAMIC_MAC_TABLE_NOT_READY]) {
--		return -EAGAIN;
-+		return -ETIMEDOUT;
+ 	masks = dev->info->masks;
+ 	regs = dev->info->regs;
+ 
+ 	do {
+-		ksz_read8(dev, regs[REG_IND_DATA_CHECK], data);
++		ret = ksz_read8(dev, regs[REG_IND_DATA_CHECK], data);
++		if (ret)
++			return ret;
++
+ 		timeout--;
+ 	} while ((*data & masks[DYNAMIC_MAC_TABLE_NOT_READY]) && timeout);
+ 
+@@ -399,7 +403,9 @@ static int ksz8_valid_dyn_entry(struct ksz_device *dev, u8 *data)
+ 		return -ETIMEDOUT;
  	/* Entry is ready for accessing. */
  	} else {
- 		ksz_read8(dev, regs[REG_IND_DATA_8], data);
-@@ -431,15 +431,14 @@ static int ksz8_r_dyn_mac_table(struct ksz_device *dev, u16 addr, u8 *mac_addr,
- 	ksz_write16(dev, regs[REG_IND_CTRL_0], ctrl_addr);
+-		ksz_read8(dev, regs[REG_IND_DATA_8], data);
++		ret = ksz_read8(dev, regs[REG_IND_DATA_8], data);
++		if (ret)
++			return ret;
+ 
+ 		/* There is no valid entry in the table. */
+ 		if (*data & masks[DYNAMIC_MAC_TABLE_MAC_EMPTY])
+@@ -428,7 +434,9 @@ static int ksz8_r_dyn_mac_table(struct ksz_device *dev, u16 addr, u8 *mac_addr,
+ 	ctrl_addr = IND_ACC_TABLE(TABLE_DYNAMIC_MAC | TABLE_READ) | addr;
+ 
+ 	mutex_lock(&dev->alu_mutex);
+-	ksz_write16(dev, regs[REG_IND_CTRL_0], ctrl_addr);
++	ret = ksz_write16(dev, regs[REG_IND_CTRL_0], ctrl_addr);
++	if (ret)
++		goto unlock_alu;
  
  	ret = ksz8_valid_dyn_entry(dev, &data);
--	if (ret == -EAGAIN) {
--		if (addr == 0)
--			*entries = 0;
--		goto unlock_alu;
--	} else if (ret == -ENXIO) {
-+	if (ret == -ENXIO) {
- 		*entries = 0;
+ 	if (ret == -ENXIO) {
+@@ -439,7 +447,10 @@ static int ksz8_r_dyn_mac_table(struct ksz_device *dev, u16 addr, u8 *mac_addr,
+ 	if (ret)
  		goto unlock_alu;
- 	}
  
+-	ksz_read64(dev, regs[REG_IND_DATA_HI], &buf);
++	ret = ksz_read64(dev, regs[REG_IND_DATA_HI], &buf);
 +	if (ret)
 +		goto unlock_alu;
 +
- 	ksz_read64(dev, regs[REG_IND_DATA_HI], &buf);
  	data_hi = (u32)(buf >> 32);
  	data_lo = (u32)buf;
+ 
+@@ -462,7 +473,6 @@ static int ksz8_r_dyn_mac_table(struct ksz_device *dev, u16 addr, u8 *mac_addr,
+ 
+ 	mac_addr[1] = (u8)data_hi;
+ 	mac_addr[0] = (u8)(data_hi >> 8);
+-	ret = 0;
+ 
+ unlock_alu:
+ 	mutex_unlock(&dev->alu_mutex);
 -- 
 2.39.2
 
