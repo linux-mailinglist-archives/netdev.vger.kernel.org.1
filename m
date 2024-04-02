@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-83881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8E36894AAB
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:53:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04169894AAC
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6592D286461
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 04:53:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33F031C2216A
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 04:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6032217C67;
-	Tue,  2 Apr 2024 04:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4900A17C6D;
+	Tue,  2 Apr 2024 04:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMOVRy7G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y3IBmQpm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB4CF9DF
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 04:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256BB17BBE
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 04:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712033589; cv=none; b=CKYb9UlG84y5YFx1AoU5acnZUUNh8BnclWIYGYtHo6lxQpIVvoyNU/BB5w+KZugRKiDCtUZUUr4UtbvdA2IOoEw6lfATu/nO8HQ/UsrYxMsOslpeaYvhxc3xUjPsEjEQ+mTweVng8EECKg7gfRSek9Zyks5yQICs2rXM2FY/3Kk=
+	t=1712033629; cv=none; b=LkZ/jUDM5hJG90c4zSXDVhsnGWng86oKbVMO9TBZncTIkUUii6HitGpkvPl0s67/iap+fCXVEbZ1OWP9Fs5CE9bOLjI52W9u2bUeMmtv5kQ6QMMZogWVIz35vO/0yoH/TnnChdD3m4yerD6GD4Oo4iqDwKx9Jopd8D/2OBGjEcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712033589; c=relaxed/simple;
-	bh=ozDyEikwzlEWA5qTdaqdrlM+WLOHtnhui5XzsiZl3lA=;
+	s=arc-20240116; t=1712033629; c=relaxed/simple;
+	bh=+PeFQ0pHHjyE8xUPMlec0rllsDBswD8q9iVXdS6tk1k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nGgFhyBAUJQvi8CZ7sMO+o6e/o55h6gXhZ/QUvtRUvdy+vX96VJjgzRLK9FxpTmhr6pQl5JYRgqKtUdMT1We3ATfirq1KFUsc1QecsYNJmw4o5xO3OGjTY8I64WS4t9dcLWFmq2kUIU8wQ9IKlETTpzsHSRn9RwhLxDMjxC8XLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qMOVRy7G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EB8EC433C7;
-	Tue,  2 Apr 2024 04:53:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=s9+phRK387Qkuv4pQSqye2Mc99Go25onuDUMYbMtN4WnU5JFrXzp3LehOjYmE6OE1OGQ6rJnadjGs2eO2QS1XXNSeUZhM+kt1sTSa0L7ENwYV2R4DXEKvkEwk2zPKVT+HWn9dxA/q5YJU+O5WPA+z2k8H+2JfncqkAtuXezY1oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y3IBmQpm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19794C433F1;
+	Tue,  2 Apr 2024 04:53:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712033588;
-	bh=ozDyEikwzlEWA5qTdaqdrlM+WLOHtnhui5XzsiZl3lA=;
+	s=k20201202; t=1712033628;
+	bh=+PeFQ0pHHjyE8xUPMlec0rllsDBswD8q9iVXdS6tk1k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qMOVRy7G6aK79dWmXri9PyU6pO/4rPF6GqvoG7bGM2SZBO4Fq8ajUPggwGM7ae9er
-	 8+BatpM1uC7XG5/Sc1Rq/pFB7+fs1HH2MIW9W3FJCyPNjDe7g2CRSYmIxOe+8yfZ47
-	 RZF/4l7d3IzvjqexKLHyLRSCes5Z9je/riRZ/cbgUvwHm/4APLaouyJNbTZ+Bng4S5
-	 IngSmq+5JeAQztjetISrsI4kUdJ3hHAp3c8LuKThTuiKmfYn0ff+20mY0Gif+GBvZy
-	 0ABM3255hMyJsq+kfdnQeJGxydZ1ShrTAiVSyPkuxM4RmaFvOAICiaZLRZE2nS96u+
-	 RRU/pauZU/P7g==
-Date: Mon, 1 Apr 2024 21:53:07 -0700
+	b=Y3IBmQpm+2DwRn3xHvbN8Y2Qd+9bydxf5x2XolD1dXkv7MksrGmbcQiA+hGPFNEfh
+	 rhwXMMHBNp7MSQyJyhz8HmSiWRxGcXlaJABPbMJTHPvlr3h7HqkKtQ4gxvHEgiAb/A
+	 aDhTCpgYY6E1fJJ1O8A68zJwr/XQiiP1Mcq5otn4/1VY4s3VbC5h0zQznlyVv/ezTn
+	 8p4ZfcFlYUjKZKd5oIOoLKk81KM9MTxjVMC/gsZf5spsRKQLmmORvGBGJWCoOq19t3
+	 ov+xzP8u4EiJ0ryFFdOHcXf1ygo5/rjUob9qnQ4t/ejsmMpVPeVweVbyI3GaSVELm0
+	 907Sp6208KhLw==
+Date: Mon, 1 Apr 2024 21:53:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Cc: michael.chan@broadcom.com, davem@davemloft.net, edumazet@google.com,
  gospo@broadcom.com, netdev@vger.kernel.org, pabeni@redhat.com, Somnath
- Kotur <somnath.kotur@broadcom.com>
-Subject: Re: [PATCH net-next 2/7] bnxt_en: Enable XPS by default on driver
- load
-Message-ID: <20240401215307.5bcb5cb7@kernel.org>
-In-Reply-To: <20240401035730.306790-3-pavan.chebbi@broadcom.com>
+ Kotur <somnath.kotur@broadcom.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH net-next 5/7] bnxt_en: Add XDP Metadata support
+Message-ID: <20240401215347.18dc2cd3@kernel.org>
+In-Reply-To: <20240401035730.306790-6-pavan.chebbi@broadcom.com>
 References: <20240401035730.306790-1-pavan.chebbi@broadcom.com>
-	<20240401035730.306790-3-pavan.chebbi@broadcom.com>
+	<20240401035730.306790-6-pavan.chebbi@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,18 +63,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 31 Mar 2024 20:57:25 -0700 Pavan Chebbi wrote:
-> +	for (i = 0;  i < nr_cpus;  i++) {
-
-double spaces here
-
-> +		map_idx = i % bp->tx_nr_rings_per_tc;
-> +		cpu = cpumask_local_spread(i, numa_node);
-> +		cpu_mask_ptr = get_cpu_mask(cpu);
-> +		cpumask_or(&q_map[map_idx], &q_map[map_idx], cpu_mask_ptr);
-> +	}
+On Sun, 31 Mar 2024 20:57:28 -0700 Pavan Chebbi wrote:
+> +static inline struct sk_buff *bnxt_copy_skb(struct bnxt_napi *bnapi, u8 *data,
+> +					    unsigned int len,
+> +					    dma_addr_t mapping)
+> +{
+> +	return bnxt_copy_data(bnapi, data, len, mapping);
+> +}
 > +
-> +	/* Register CPU mask for each TX queue excluding the ones marked for XDP */
+> +static inline struct sk_buff *bnxt_copy_xdp(struct bnxt_napi *bnapi,
 
-don't go over 80 chars when you don't have to
+No inlines in C sources unless you have measured perf difference
 
