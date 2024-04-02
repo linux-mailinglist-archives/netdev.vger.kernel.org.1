@@ -1,139 +1,105 @@
-Return-Path: <netdev+bounces-84006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A9F68954E4
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:14:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02AD68954F6
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9F181C239BE
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:14:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3475E1C220EF
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8498664D;
-	Tue,  2 Apr 2024 13:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pLBmLWbF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55CE84037;
+	Tue,  2 Apr 2024 13:13:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D7B84A52;
-	Tue,  2 Apr 2024 13:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D7F8287D
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712063487; cv=none; b=Ab+4DOG88HjoOiv4xBM47NxBmgiUFTY3Hy9u7A04HCzOSu5NaXU36utXhJrr9XqYteA58Vepp88PWfxm6gwz+AkPWWY6MSEYgos95d9h2owMCb5CDLtcG02ywQd3NJT2J8z8KmBjuZNtjiGNR8lguydLm74MZtOuQ/1o9cukWos=
+	t=1712063633; cv=none; b=R+NX1+i5BA7TO2CwcRagHpxNN3ksMrpcEcSlcsFgD/JsUF3V2JuGYjqeaa48Hn5XkgDhPMBG7i8RDq2+j+uPYlI6abHmIpzH4C1XNUGE2UpAaLNQHGnvb97rKcczUuu8NS5cpWK9sjKxZSrmkddsVSGblYZtOebFJz4z8DzfOWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712063487; c=relaxed/simple;
-	bh=9zAsnZKUtdaB+0oUBoSFWoiBkfOWRDSb/L5GPa9FOno=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YxBMH/vw9BRleuY+Tgiarjh9bwd72GPxFeu0mmPcJREbnWAJBZN/yKpfG4Kaaw+TbuiZXI9i0CP5GUV3A+mByQFFdOpijlcJdW5RjXrn4OVvBEWp4ZFd+dDZ7/Uk5W0BYB24fbqwaTmKHhiEhGZq2SnC/vrbfUdgjDel2Xq/w7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pLBmLWbF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECE50C433F1;
-	Tue,  2 Apr 2024 13:11:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712063486;
-	bh=9zAsnZKUtdaB+0oUBoSFWoiBkfOWRDSb/L5GPa9FOno=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pLBmLWbFq8b7R4iZ1CSvRnROpQc318dtdynLw3zTplx/2SSnxsPhnBaGB0KWLxJLw
-	 gtTVGsvy4tfXtBGJpBXwq9+p3MCPwkvK/hDkMvCwjFUh5usnZu6XFTibfhvcKn+2H6
-	 bNq+gdNLc+F4UpxqMWgGKmEwi+KPVyCSJwAIqsT2U4GGmN/LnMTaAplp/AjMnXlBu3
-	 Ft/ordeAQQOyjQYy8NAB2+7Nq/5pKWCsboYnCGnNR1VKTyBFWEf/lcch7254rsWnWE
-	 MLVvNT3x0cyP38rdvhtkwlombEcbUi6JLHcn3CjFq0MSnQTG+8Cf+UPPNEYFD7jwHP
-	 CjyG1mwKRgoUQ==
-Date: Tue, 2 Apr 2024 18:41:22 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Allen Pais <apais@linux.microsoft.com>, linux-kernel@vger.kernel.org,
-	tj@kernel.org, keescook@chromium.org, marcan@marcan.st,
-	sven@svenpeter.dev, florian.fainelli@broadcom.com,
-	rjui@broadcom.com, sbranden@broadcom.com, paul@crapouillou.net,
-	Eugeniy.Paltsev@synopsys.com, manivannan.sadhasivam@linaro.org,
-	vireshk@kernel.org, Frank.Li@nxp.com, leoyang.li@nxp.com,
-	zw@zh-kernel.org, wangzhou1@hisilicon.com, haijie1@huawei.com,
-	shawnguo@kernel.org, s.hauer@pengutronix.de, sean.wang@mediatek.com,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	afaerber@suse.de, logang@deltatee.com, daniel@zonque.org,
-	haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-	andersson@kernel.org, konrad.dybcio@linaro.org, orsonzhai@gmail.com,
-	baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
-	patrice.chotard@foss.st.com, wens@csie.org,
-	jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com,
-	kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, jassisinghbrar@gmail.com, mchehab@kernel.org,
-	maintainers@bluecherrydvr.com, aubin.constans@microchip.com,
-	ulf.hansson@linaro.org, manuel.lauss@gmail.com,
-	mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com,
-	hayashi.kunihiko@socionext.com, mhiramat@kernel.org,
-	brucechang@via.com.tw, HaraldWelte@viatech.com, pierre@ossman.eu,
-	duncan.sands@free.fr, stern@rowland.harvard.edu, oneukum@suse.com,
-	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-mediatek@lists.infradead.org,
-	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH 2/9] dma: Convert from tasklet to BH workqueue
-Message-ID: <ZgwD-iScEb9zzB8H@matsya>
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-3-apais@linux.microsoft.com>
- <CACRpkdaSBGe0EFm1gK-7qPK4e6T2H1dxFXjhJqO2hWCm1-bNdA@mail.gmail.com>
+	s=arc-20240116; t=1712063633; c=relaxed/simple;
+	bh=EHoM22GRydz72htz26DdckIjRjxIqIKBM9jYuxEu6XM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ASYcrI3ii5RXnHfF/DUH4FBuWGBYM1R7pBPOkTyqxt1YmjVk+e2NktN3F/IZq8Gpu7gsVaQYxATPi3Da4NHuOPiParTjgPCbJTlCZ7qxS8tEaqWnK0e2YcvhHfVaoe+D1WHOUGXlty/1EZGa8Ns0gmGz2+Zs0iz497OMOFQefpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rrdxN-0007Ng-MW; Tue, 02 Apr 2024 15:13:41 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rrdxM-009zW0-D7; Tue, 02 Apr 2024 15:13:40 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rrdxM-006Ooh-15;
+	Tue, 02 Apr 2024 15:13:40 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
+Subject: [PATCH net-next v1 0/8] net: dsa: microchip: ksz8: refactor FDB dump path 
+Date: Tue,  2 Apr 2024 15:13:31 +0200
+Message-Id: <20240402131339.1525330-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdaSBGe0EFm1gK-7qPK4e6T2H1dxFXjhJqO2hWCm1-bNdA@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 02-04-24, 14:25, Linus Walleij wrote:
-> Hi Allen,
-> 
-> thanks for your patch!
-> 
-> On Wed, Mar 27, 2024 at 5:03 PM Allen Pais <apais@linux.microsoft.com> wrote:
-> 
-> > The only generic interface to execute asynchronously in the BH context is
-> > tasklet; however, it's marked deprecated and has some design flaws. To
-> > replace tasklets, BH workqueue support was recently added. A BH workqueue
-> > behaves similarly to regular workqueues except that the queued work items
-> > are executed in the BH context.
-> >
-> > This patch converts drivers/dma/* from tasklet to BH workqueue.
-> >
-> > Based on the work done by Tejun Heo <tj@kernel.org>
-> > Branch: git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
-> >
-> > Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-> (...)
-> > diff --git a/drivers/dma/ste_dma40.c b/drivers/dma/ste_dma40.c
-> (...)
-> >         if (d40c->pending_tx)
-> > -               tasklet_schedule(&d40c->tasklet);
-> > +               queue_work(system_bh_wq, &d40c->work);
-> 
-> Why is "my" driver not allowed to use system_bh_highpri_wq?
-> 
-> I can't see the reasoning between some drivers using system_bh_wq
-> and others being highpri?
-> 
-> Given the DMA usecase I would expect them all to be high prio.
+Refactor FDB dump code path for Microchip KSZ8xxx series. This series
+mostly makes some cosmetic reworks and allows to forward errors detected
+by the regmap.
 
-It didnt use tasklet_hi_schedule(), I guess Allen has done the
-conversion of tasklet_schedule -> system_bh_wq and tasklet_hi_schedule
--> system_bh_highpri_wq
+Oleksij Rempel (8):
+  net: dsa: microchip: Remove unused FDB timestamp support in
+    ksz8_r_dyn_mac_table()
+  net: dsa: microchip: Make ksz8_r_dyn_mac_table() static
+  net: dsa: microchip: ksz8: Refactor ksz8_fdb_dump()
+  net: dsa: microchip: ksz8: Refactor ksz8_r_dyn_mac_table() for
+    readability
+  net: dsa: microchip: ksz8: Unify variable naming in
+    ksz8_r_dyn_mac_table()
+  net: dsa: microchip: ksz8_r_dyn_mac_table(): ksz: do not return EAGAIN
+    on timeout
+  net: dsa: microchip: ksz8_r_dyn_mac_table(): return read/write error
+    if we got any
+  net: dsa: microchip: ksz8_r_dyn_mac_table(): use entries variable to
+    signal 0 entries
 
-Anyway, we are going to use a dma queue so should be better performance
+ drivers/net/dsa/microchip/ksz8.h        |   2 -
+ drivers/net/dsa/microchip/ksz8795.c     | 144 ++++++++++++------------
+ drivers/net/dsa/microchip/ksz8795_reg.h |   1 +
+ 3 files changed, 75 insertions(+), 72 deletions(-)
 
 -- 
-~Vinod
+2.39.2
+
 
