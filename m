@@ -1,108 +1,156 @@
-Return-Path: <netdev+bounces-83887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5240894AB8
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:01:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33FCB894AE8
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:43:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90300286B5E
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:01:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25C1C1C22074
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C78B18028;
-	Tue,  2 Apr 2024 05:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187571805E;
+	Tue,  2 Apr 2024 05:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GKQ2fQqV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nQ9eMqNF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA11918651
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 05:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C2617BD5
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 05:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712034085; cv=none; b=sOsJqka3vMJ1GSwfuvd8er8ErBUSpvccp4xKU36e2Xte2Hijgff/ZtXKTqF80J1qFLNVnU2WAdKfUlpMBgaXj9lDFwJQqJMSV2uwz3wFCswLSIGr8TtZUpK21FJYMJOMrKUqTF4eMbydxVmHKMYX6V15daV5jGKt5/sAaqxDIvw=
+	t=1712036597; cv=none; b=KQjqm363Td0aREUAa7vgvAFEnLu/fD1gEsO7VbmYjBMGuWmJLzku5ROcWbYwJVuQ37CAH0tz3MOn4XYxRGmUC8HCujCqDqHXuh2h2gjO6Wf0Qg6asF5O5AcYKTj7ZwmvPNAn1VqEFAeNo7V8oHvCEyl9kzZ2niks/JPwEeTDUVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712034085; c=relaxed/simple;
-	bh=NlyBxPHAyNv7/T8iQ/z8RSMGympsoOOW1QAfZRFQQYM=;
+	s=arc-20240116; t=1712036597; c=relaxed/simple;
+	bh=TUTob1DnNgGtqXSzjC4an0vYfwqKWZaOUgtv0d79Qg8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mbrVBMljrd9By557O0YFNWSnZhwK5wwiUSKd2xYqW1l8LUymmPPs1gNM5WwIbbKDQQ1MBQ+9b+ChuY2sWeIDAWZCRjtzZ8u95MJH95yjHm3b18Z54yKUAggJlR/ybB/VTAznOYseY7x4RxsMxW19O+d0GT5sDnzog1VfFmJMlTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GKQ2fQqV; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4d44fb48077so1719034e0c.0
-        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 22:01:23 -0700 (PDT)
+	 To:Cc:Content-Type; b=mX5VGvdcpHsYy0XuqupP71LzwOR9I4TVG4J4amT+tl9V8qheyaoK9yAoaqg0o/46aLz9LNbBQq7nivSPPprfon7d9Q66MGQVm68YorQ19un+BaewvyQ6/z1zigdc21jLDFmpQyf/s5myZoP+o8BlAhyJAEotIwHmIYXU48D3StQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nQ9eMqNF; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-34373f95c27so3394f8f.1
+        for <netdev@vger.kernel.org>; Mon, 01 Apr 2024 22:43:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712034083; x=1712638883; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q1gSlS8fLmBzxegVrsxC5VK6VZWbcNLQNxJqECmZ5UM=;
-        b=GKQ2fQqV2eSfPoBaW8hY1Sqrk08lLy85JT6OGGNhs7KxkFJ20EtcBM0FAYx/q7XNmm
-         V8pAcO0kdGSE5yk1Kpw1gjJIELD7LO/5Cqc17zZgbKrhMAlM4PPhEasSyRPJJwrqIemi
-         Ar5sF0Ux/1vXUUnsvWGWYVNpsrnUuuaqa7EWljbWCgRKCMGlejzZsMb4d5iRG9XPHmPE
-         EHtKRyQi62w1xWlt1Ge4jPJfhsaubao+LYCCOftNgF7ENPiLZrXwqibmOkg71uzqjHaV
-         XrcCO3hhxWRwux+eHF0CAZCQM9eZS8ZJB44yCmbSLSycYo9sGjawuOffFhgO4SEFMwE4
-         XRtA==
+        d=google.com; s=20230601; t=1712036594; x=1712641394; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ElrucjJAh1FRwBd0ssTMvr49phQYXRtbH2c4ZoKFETc=;
+        b=nQ9eMqNFyJImIS8Gyw9frHNQ2FKKcjsm81Nh/Pb9dGKst3j86Xw4cOJnQvFDj+7PG/
+         U59aoqLYP7a8q+PF2j3vbFOJ3hUJrOIllCt6Dm0YchHNKUUNw9+VtyMH/n6/ax/3ngeq
+         99KhaxFsXG3eD/IobKgLON6JSEsk2fGJd9ot946L/LjY8CkAz+wJXH0ADOIdHNq7bp3V
+         ymaQ2wEi+9trLpr/9x6KLIrk22JhAeeE5DtxCANeKqpVPRR064ab8H/FLOFPN/pB5NhO
+         f/QKIygl9Eo6hmVvdwAXY7dYQWG15/3dON4hx7rDGEsmj7wXpsgc0BlDrtZBsLmB/GGa
+         mUsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712034083; x=1712638883;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q1gSlS8fLmBzxegVrsxC5VK6VZWbcNLQNxJqECmZ5UM=;
-        b=PJ3URJKYMbXryxxmaR8U7kRHUyFhft5sdMiVpvG52TFLT1CnpEGLDL33NJAe1TwIO1
-         /5DqQDGk22aSVVAUuJEsNwkt93xaYR2oe0wrmTy6pk5qmNrEcTTOmBakRmCSOtO/aL4f
-         hZv0d7AthsayzrrV4mh+5HtrNvMo29wqbnlSlAWFtpy/MeKkHKmlxsnfOG2J+4Al+LW2
-         t4Rl0hg9VZbGPIFQIhLbKNsW5Xlfo/OpUZ21R7QQAam9JEjL2Z7AKZI6UmOn0l7rhwpm
-         m19BL2ONQo4z8Pjax4uwEsmi/HVmbeKqbBX3+XeKJb3owhFIjA+pj+2F/hKpmVJ8UUf5
-         TrYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjuaPWM1gkHbhzm2eJqKT/yv6F8djThHnIRYmryrc5sEC8cR/6qX19bFCe23FlmG8BsD8NoynIG1yF+4IUCzJkjvCgxzXh
-X-Gm-Message-State: AOJu0YwJjENCdISGkssNLN8jjm0N3yCn3snIVasovGf1/CHE6+m1DtPX
-	zLrzHLdDgus5x67o0lWVc2Dv5+XWes+Ys5RLkRt10B3f+ca/unB43YvXzp/bcJI7J07eiipNGzL
-	I+aDVjjdSoK076YbQ0Un5KbzMUaap8YmXBZk4Jw==
-X-Google-Smtp-Source: AGHT+IFbWd87Vw4lUKJrcGZtFq6L8tz7Pk5A3fnIVM0X6MCy+GrJJQRDnUgtXO3nhQHsmMS7Qn2OwbW+bWyfrDvPcd0=
-X-Received: by 2002:a05:6122:a05:b0:4d8:787c:4a6c with SMTP id
- 5-20020a0561220a0500b004d8787c4a6cmr9108749vkn.5.1712034082741; Mon, 01 Apr
- 2024 22:01:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712036594; x=1712641394;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ElrucjJAh1FRwBd0ssTMvr49phQYXRtbH2c4ZoKFETc=;
+        b=B3qU5PKJe3JFA2hv0YazgpBEVD8JSNhBvbcz9FJb1DxG78Fvod8Z57H4X/lC8V6MSE
+         gQGusmgzXiVdTnmdvpRomQ10YnWaNx09bJ1johKiaxDcktCAnYo/HBBu85Cx/CgTGWnb
+         OQZFcllqCC6V6WoN6/seweJhl4JLGT9p0Snxre7Jmau08BI2ThcN65G/8KnAuNbPuOyj
+         +t2vZ5HmCaXkULxIaJL8tMjN+4RqSlRfjnX1tM7Bst7EpAkwUH7l/Wnv60MwCQ1f8dJd
+         nxZfwV/3gu68PySrvQ7++oau+pjbdHDgqKGCkp5Nqet0e/F5lo2ZmSOg69p5ejlJVr31
+         x9Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCXDeW3sBVQx2rzituuCEprXurgK+zDIb4/Jql43M7NvaQqSYyyXh3xj2mKfDVoCclhHQHIeQHUBIJ3EvVc47XF5EqD+akwb
+X-Gm-Message-State: AOJu0YxLd3NIKFruFBh6Dt0fhMQrwQEqhrXqtWCx4ohirXwLshtDQNHN
+	FdYB9TxxLkG/XZeY6OOXhz8ryzi0/vBljgd2bbDURLsPV/SsdFqyUw/f7i65ooGXretM4aWOt3q
+	u3QYpnjIi8QfX2r3/BaeAGz+xoHWibBJtXmMI
+X-Google-Smtp-Source: AGHT+IFiBqJRjrw72zSUpiTWSfBG18M5uU9g2uQeWa4ZYJfGErQRY1gN3b2iLLy53yu4DnLzCKNFKFKedUna4nqcdtw=
+X-Received: by 2002:adf:eb82:0:b0:341:a13d:4f73 with SMTP id
+ t2-20020adfeb82000000b00341a13d4f73mr8208252wrn.0.1712036593542; Mon, 01 Apr
+ 2024 22:43:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240401152549.131030308@linuxfoundation.org> <CA+G9fYuHZ9TCsGYMuxisqSFVoJ3brQx4C5Xk7=FJ+23PHbhKWw@mail.gmail.com>
- <20240401205103.606cba95@kernel.org>
-In-Reply-To: <20240401205103.606cba95@kernel.org>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 2 Apr 2024 10:31:11 +0530
-Message-ID: <CA+G9fYu+U1kkxt+OGyg=qSr3PfZipuazaANNTdfKvdY_zQBxyg@mail.gmail.com>
-Subject: Re: [PATCH 6.8 000/399] 6.8.3-rc1 review
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, 
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	torvalds@linux-foundation.org, akpm@linux-foundation.org, linux@roeck-us.net, 
-	shuah@kernel.org, patches@kernelci.org, lkft-triage@lists.linaro.org, 
-	pavel@denx.de, jonathanh@nvidia.com, f.fainelli@gmail.com, 
-	sudipm.mukherjee@gmail.com, srw@sladewatkins.net, rwarsow@gmx.de, 
-	conor@kernel.org, allen.lkml@gmail.com, broonie@kernel.org, 
-	Netdev <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Arnd Bergmann <arnd@arndb.de>, Eric Dumazet <edumazet@google.com>
+References: <CAMuE1bHBky9NGP22PVHKdi2+WniwxiLSmMnwRM6wm36sU8W4jA@mail.gmail.com>
+ <878r29hjds.ffs@tglx> <CAMuE1bF9ioo39_08Eh26X4WOtnvJ1geJ=WRVt5DhU8gEbYJNdA@mail.gmail.com>
+ <87o7asdd65.ffs@tglx>
+In-Reply-To: <87o7asdd65.ffs@tglx>
+From: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
+Date: Mon, 1 Apr 2024 22:42:47 -0700
+Message-ID: <CAF2d9jjA8iM1AoPUhQPK62tdd7gPnCnt51f_NMhOAs546rU3dA@mail.gmail.com>
+Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com, luto@kernel.org, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, arnd@arndb.de, geert@linux-m68k.org, peterz@infradead.org, 
+	hannes@cmpxchg.org, sohil.mehta@intel.com, rick.p.edgecombe@intel.com, 
+	nphamcs@gmail.com, palmer@sifive.com, keescook@chromium.org, 
+	legion@kernel.org, mark.rutland@arm.com, mszeredi@redhat.com, 
+	casey@schaufler-ca.com, reibax@gmail.com, davem@davemloft.net, 
+	brauner@kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
+	linux-arch@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2 Apr 2024 at 09:21, Jakub Kicinski <kuba@kernel.org> wrote:
+On Mon, Apr 1, 2024 at 1:46=E2=80=AFPM Thomas Gleixner <tglx@linutronix.de>=
+ wrote:
 >
-> On Tue, 2 Apr 2024 01:10:11 +0530 Naresh Kamboju wrote:
-> > The following kernel BUG: unable to handle page fault for address and followed
-> > by Kernel panic - not syncing: Fatal exception in interrupt noticed
-> > on the qemu-i386 running  selftests: net: pmtu.sh test case and the kernel
-> > built with kselftest merge net configs with clang.
+> Sagi!
+>
+> On Thu, Mar 28 2024 at 17:40, Sagi Maimon wrote:
+> > On Sat, Mar 23, 2024 at 2:38=E2=80=AFAM Thomas Gleixner <tglx@linutroni=
+x.de> wrote:
+> >> On top this needs an analyis whether any of the gettimex64()
+> >> implementations does something special instead of invoking the
+> >> ptp_read_system_prets() and ptp_read_system_postts() helpers as close =
+as
+> >> possible to the PCH readout, but that's not rocket science either. It'=
+s
+> >> just 21 callbacks to look at.
+> >>
+> > I like your suggestion, thanks!
+> > it is what our user space needs from the kernel and with minimum kernel=
+ changes.
+> > I will write it, test it and upload it with your permission (it is you
+> > idea after all).
+>
+> You don't need permission. I made a suggestion and when you are doing the
+> work I'm not in a position to veto posting it. We have an explicit tag
+> for that 'Suggested-by:', which only says that someone suggested it to
+> you, but then you went and implemented it, made sure it works etc.
+>
+> >> It might also require a new set of variant '3' IOTCLS to make that fla=
+g
+> >> field work, but that's not going to make the change more complex and
+> >> it's an exercise left to the experts of that IOCTL interface.
+> >>
+> > I think that I understand your meaning.
+> > There is a backward compatibility problem here.
 > >
-> > We are investigating this problem on qemu-i386.
+> > Existing user space application using PTP_SYS_OFFSET_EXTENDED ioctl
+> > won't have any problems because of the "extoff->rsv[0] ||
+> > extoff->rsv[1] || extoff->rsv[2]" test, but what about all old user
+> > space applications using: PTP_SYS_OFFSET ?
 >
-> One-off or does it repro?
+> So if there is a backwards compability issue with PTP_SYS_OFFSET2, then
+> you need to introduce PTP_SYS_OFFSET3. The PTP_SYS_*2 variants were
+> introduced to avoid backwards compatibility issues as well, but
+> unfortunately that did not address the reserved fields problem for
+> PTP_SYS_OFFSET2. PTP_SYS_OFFSET_EXTENDED2 should just work, but maybe
+> the PTP maintainers want a full extension to '3'. Either way is fine.
+>
+https://patchwork.kernel.org/project/netdevbpf/patch/20240104212436.3276057=
+-1-maheshb@google.com/
 
-one-off.
-I have tried reproducing this problem and no luck yet.
+This was my attempt to solve a similar issue with the new ioctl op to
+avoid backward compatibility issues.  Instead of flags I used the
+clockid_t in a similar fashion.
 
-- Naresh
+Thanks,
+
+> Thanks,
+>
+>         tglx
+>
+>
 
