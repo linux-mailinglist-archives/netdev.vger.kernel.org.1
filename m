@@ -1,145 +1,147 @@
-Return-Path: <netdev+bounces-84061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E830895643
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:10:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2FF895646
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 16:10:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49FD0285819
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:10:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D78D285B89
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB818129E78;
-	Tue,  2 Apr 2024 14:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF6D12C7F8;
+	Tue,  2 Apr 2024 14:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="JVs4qOJy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWY+gtZs"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2C085C52;
-	Tue,  2 Apr 2024 14:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17E112BF1B;
+	Tue,  2 Apr 2024 14:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712066983; cv=none; b=ZyQJaUJuaSAAxQxBiUB1nAu15uAtozxCFO4j47iC2aBx5sDcvQFlzZJwd4IQlcNz4SYDdMICGSIWTAOCSj3kiuLjJDUcW+7jRkj+QxA8YrZhCajPGEG4dFpgZiSRT6Gvqjpb7Rq5QKMk3y0uZTuY4Y26uUhtcQZehsoPZHuWPSE=
+	t=1712066986; cv=none; b=VsthtT81RJem/avA7MeSlXucb+Z4WR+4FDNoZiVjvTvKOvfgBPAU0hE6TI/MftWNA6roi0QQJskdsRvLovmUj319qPLuJ7tgETKAEfbycz/g3anHdTkeM4TvWe7Qjac9TDjSSGDWIi7JLH8davt1p/xFRfhtdLTGG/TL5h7Ou6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712066983; c=relaxed/simple;
-	bh=o9zg2EYP3VfME7dTRKvMGNy5dt/wZYuKnQ/u1Qb2bmk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=G6oMmAXaU5icwT8kNA6UC9jLLd9MGLHkESlQ6FJwdp+pouWkXVJvACOtK6/hveEO8dDh0VV1KeG2ILSP4yy6y5GbEBazXSRi207hGO8gKxhuOYczk7T0eebfpApgGEK9ZN7hgIbYwvy236ZO3aXWwAUGJSD9K8dXeOpzS2gPfT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=JVs4qOJy; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:References:Reply-To:Cc:To:From:Subject:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=dqvRXQEZOjC607wRxzYnb2l3bFAM7p6fyF69p9Uu1wc=;
-	t=1712066981; x=1712498981; b=JVs4qOJy8tPoEAVSmdzq2Z0buwo32F0KEq5zLrZIYJuBtUM
-	OwMTxoakhZe3ffuk2KlmfM616EBQjySd3Sbbx4LurafhcTqtwzYji4aC/xKBeA9vay825pLscAXK6
-	Frxc4IcR/PNel4mrcnHCy8Zy6NwQSlTZhI2GRhmO/EKoQLdoEsuLJQFVQ2fj988NjdYQcD2/UaTXk
-	KhDE2ZMAzEvqYK/uN+UpO5PH+ywF1nOCoJxf6/GeZRhol1JD+7+4YgsKTjhKwNNx4S/hr/2pmD4lB
-	A8zQTrdgAeE9yEdofNAaaYAyxLIgaeHEHnP4K0JIbtfCGf0cjNJtjoRmYV3qo12A==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1rreN7-0002lq-56; Tue, 02 Apr 2024 15:40:17 +0200
-Message-ID: <72e39571-7122-4f6a-9252-83e663e4b703@leemhuis.info>
-Date: Tue, 2 Apr 2024 15:40:16 +0200
+	s=arc-20240116; t=1712066986; c=relaxed/simple;
+	bh=7tl7YgY+MKV1mJK0tEzWTAATtwUoG8kyzmnl3sQmnGA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=chlC+XRsR+WAiEJ6CgLX5JDMuMx5ROTwE14fXKjP+NzR1mVuMKxquiSo4ZFy/0fVjriouSmrHT0sO/oo+M15IEHIXtpSSnUCmaWFJ4WAAUDZWY+p9VWitsrSHK5LkTfvGwAJKFk6wHr6XSX1RoyI7gJJ3U3a7YSTeB0jbnEm24U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PWY+gtZs; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6eaf9565e6bso1701048b3a.2;
+        Tue, 02 Apr 2024 07:09:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712066984; x=1712671784; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/yao6M8BZe8LPQTSQBWB5LPvC1cQXjIBVUMQ/S2AXRQ=;
+        b=PWY+gtZsVAA1DcBJHroz6N+/vo/C5GiLw5yllhUvudUiRmbm9uC1caPwqGOHtfAP6o
+         r38aoO4Jf1o+0TtuH084g6ERtkt7Ot3T1zHjSqwYT20DVmsdGLslgWR4T0pVnlw6u4uS
+         94IpP8cTglgjnjrGJDwOFBKh4dXeO2tWWtB0WI3pVDs76q9weoUzTF3r7d4a+56YZP9B
+         25WdsufdOz/EB+8GNqbOImqv8L1GA/kW+xNCy2rioGv299HZaShEJmp9rW92l5CiDwEy
+         muFZ/76nYJBQaP1rmr5fwgUvFrKCNtfAKJraHPb+MkNOo3qZhztImkxD1IsLTPIDInAk
+         ARFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712066984; x=1712671784;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/yao6M8BZe8LPQTSQBWB5LPvC1cQXjIBVUMQ/S2AXRQ=;
+        b=VNnKTKv3JWJuFn02tSEW/pJEJhtYJDJqa1mtYcBiVm0gQMaQ4eFlD3QEY7SFdbQzkZ
+         woOzvDOzHpBlre8v5NBLARv826yLPGCeYAmphLMS3jaWzHlpe+po1YIQmpnLW6Cyyfi9
+         9deMfhW/Fxa7R/QMHHmsQkm/ofx4y26a4NEMIaHMiPvDwSYJGcXynvUlPtQI5ThZ+cfy
+         0mMuNDHBKkT4dgWwgeTFMx9TsvxXfCSnysGs171xDb9YNym0dq6VhQv/eI9AtZE74Z4y
+         ctRCnGlhupcNEp2SUPA/voorrHCUIwa8cIaZTFHJTH8EyxYoJw56NNbk0L9+/Q6LCBdo
+         KQaw==
+X-Forwarded-Encrypted: i=1; AJvYcCVEltULL66K+SYjGPGD8UrMRIuCGiVarFk7X4I3qayDy0vp3N1nQphgEGT6LmTE030uEEmwaDbrJQqroFB7rn53rAd5
+X-Gm-Message-State: AOJu0YxZc1Y57NHJZ0RGJnPvLSeJ3/Muvjtze56yeO+N5qj1lo9vjZr1
+	QWmq8Zx18chdcOPOspVTHB5Pjc8RDr/t5OOZMRyi85WrkEN6IbvH
+X-Google-Smtp-Source: AGHT+IF2tGblpwSmVjYysthYWlwftyqFV6Z4Z0GvepkHJlYkEQODcyRSbo8LLmO+W+sk6sLfCnXAww==
+X-Received: by 2002:a05:6a21:6d8e:b0:1a5:6c73:74b9 with SMTP id wl14-20020a056a216d8e00b001a56c7374b9mr12511738pzb.48.1712066983898;
+        Tue, 02 Apr 2024 07:09:43 -0700 (PDT)
+Received: from localhost ([98.97.36.54])
+        by smtp.gmail.com with ESMTPSA id h17-20020a62b411000000b006e647059cccsm9828830pfn.33.2024.04.02.07.09.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 07:09:43 -0700 (PDT)
+Date: Tue, 02 Apr 2024 07:09:42 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, 
+ bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ kernel-team@cloudflare.com, 
+ xingwei lee <xrivendell7@gmail.com>, 
+ yue sun <samsun1006219@gmail.com>, 
+ syzbot+bc922f476bd65abbd466@syzkaller.appspotmail.com, 
+ syzbot+d4066896495db380182e@syzkaller.appspotmail.com, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Edward Adam Davis <eadavis@qq.com>, 
+ Shung-Hsi Yu <shung-hsi.yu@suse.com>
+Message-ID: <660c11a6b3315_1cee208d3@john.notmuch>
+In-Reply-To: <20240402104621.1050319-1-jakub@cloudflare.com>
+References: <20240402104621.1050319-1-jakub@cloudflare.com>
+Subject: RE: [PATCH bpf] bpf, sockmap: Prevent lock inversion deadlock in map
+ delete elem
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] u64_stats: fix u64_stats_init() for lockdep when used
- repeatedly in one file
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-To: =?UTF-8?B?UGV0ciBUZXNhxZnDrWs=?= <petr@tesarici.cz>,
- Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- open list <linux-kernel@vger.kernel.org>, stable@kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev <netdev@vger.kernel.org>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>,
- Linux regressions mailing list <regressions@lists.linux.dev>
-References: <20240306111157.29327-1-petr@tesarici.cz>
- <20240311182516.1e2eebd8@meshulam.tesarici.cz>
- <CANn89iKQpSaF5KG5=dT_o=WBeZtCiLcN768eUdYvUew-dLbKaA@mail.gmail.com>
- <20240311192118.31cfc1fb@meshulam.tesarici.cz>
- <764f2b10-9791-4861-9bef-7160fdb8f3ae@leemhuis.info>
-Content-Language: en-US, de-DE
-In-Reply-To: <764f2b10-9791-4861-9bef-7160fdb8f3ae@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1712066981;5f967a66;
-X-HE-SMSGID: 1rreN7-0002lq-56
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi. Top-posting for once, to make this easily accessible to everyone.
+Jakub Sitnicki wrote:
+> syzkaller started using corpuses where a BPF tracing program deletes
+> elements from a sockmap/sockhash map. Because BPF tracing programs can be
+> invoked from any interrupt context, locks taken during a map_delete_elem
+> operation must be hardirq-safe. Otherwise a deadlock due to lock inversion
+> is possible, as reported by lockdep:
+> 
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(&htab->buckets[i].lock);
+>                                local_irq_disable();
+>                                lock(&host->lock);
+>                                lock(&htab->buckets[i].lock);
+>   <Interrupt>
+>     lock(&host->lock);
+> 
+> Locks in sockmap are hardirq-unsafe by design. We expects elements to be
+> deleted from sockmap/sockhash only in task (normal) context with interrupts
+> enabled, or in softirq context.
+> 
+> Detect when map_delete_elem operation is invoked from a context which is
+> _not_ hardirq-unsafe, that is interrupts are disabled, and bail out with an
+> error.
+> 
+> Note that map updates are not affected by this issue. BPF verifier does not
+> allow updating sockmap/sockhash from a BPF tracing program today.
+> 
+> Reported-by: xingwei lee <xrivendell7@gmail.com>
+> Reported-by: yue sun <samsun1006219@gmail.com>
+> Reported-by: syzbot+bc922f476bd65abbd466@syzkaller.appspotmail.com
+> Reported-and-tested-by: syzbot+d4066896495db380182e@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=d4066896495db380182e
+> Closes: https://syzkaller.appspot.com/bug?extid=bc922f476bd65abbd466
+> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> ---
+> Cc: John Fastabend <john.fastabend@gmail.com>
+> Cc: Edward Adam Davis <eadavis@qq.com>
+> Cc: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+> ---
+>  net/core/sock_map.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-Hmmm, looks like Petr's patch for a (minor) 6.8 regression didn't make
-any progress in the past two weeks.
+Agree.
 
-Does nobody care? Did nobody merge it because no tree feels really
-appropriate? Or am I missing something obvious and making a fool out of
-myself by asking these questions? :D
-
-Ciao, Thorsten
-
-#regzbot ignore-activity
-
-On 18.03.24 15:23, Linux regression tracking (Thorsten Leemhuis) wrote:
-> On 11.03.24 19:21, Petr Tesařík wrote:
->> On Mon, 11 Mar 2024 18:43:59 +0100
->> Eric Dumazet <edumazet@google.com> wrote:
->>> On Mon, Mar 11, 2024 at 6:25 PM Petr Tesařík <petr@tesarici.cz> wrote:
->>>> On Wed,  6 Mar 2024 12:11:57 +0100
->>>> Petr Tesarik <petr@tesarici.cz> wrote:
->>>>  
->>>>> Fix bogus lockdep warnings if multiple u64_stats_sync variables are
->>>>> initialized in the same file.
->>>>>
->>>>> With CONFIG_LOCKDEP, seqcount_init() is a macro which declares:
->>>>>
->>>>>       static struct lock_class_key __key;
->>>>>
->>>>> Since u64_stats_init() is a function (albeit an inline one), all calls
->>>>> within the same file end up using the same instance, effectively treating
->>>>> them all as a single lock-class.  
->>>> What happens with this fix now?
->>>>
->>>> IIUC it should be reviewed by Eric, but I don't know through which tree
->>>> it should be merged. Any plans yet?  
->>>
->>> I thought I gave a reply, but apparently not .
->>>
->>> Reviewed-by: Eric Dumazet <edumazet@google.com>
->>
->> Thank you!
-> 
-> Great. Just wondering, as there afaics was no activity since about one
-> week: what is the plan forward here?
-> 
-> Is the "through which tree it should be merged" question still
-> unresolved? I quickly looked and it seems two of the last tree changes
-> to that file over the past years went through net-next (the other one
-> through the tip tree). That's why I CCed the other two net maintainers
-> and the net list now.
-> 
-> Or is the plan to merge this after the merge window? Or only merge it
-> for 6.10, as it are bogus lockdep warnings that are being fixed?
-> 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
-> 
-> #regzbot poke
-> 
-> 
+Acked-by: John Fastabend <john.fastabend@gmail.com>
 
