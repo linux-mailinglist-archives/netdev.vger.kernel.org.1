@@ -1,145 +1,240 @@
-Return-Path: <netdev+bounces-84013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F87895503
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:16:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B0A895513
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 15:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D53E28B0E8
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:16:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F23628A06F
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DAA132C36;
-	Tue,  2 Apr 2024 13:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2145782892;
+	Tue,  2 Apr 2024 13:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G1NWipWd"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006178615A
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A717A158
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 13:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712063637; cv=none; b=Hot4+1NKJKW0ePshYc84d+5M4J36sJA5Wxt77CFBWTyd/bigluYv2rrvr6EfVmrb94eKiW3lS8Ra/OKBRHO3e18FPAhcD9z3VwHHG9ZayNbBFP2DPVIlDPIqxIX4KtzafEA7UPelLgYadpaFsS1ZCl4cUIjxiLZrZPqmdAS8Fh0=
+	t=1712063884; cv=none; b=rPhiCLxJjrvAn6zvipUGj49unJ7DG7AWYjqzrIh8oJTmrUMzrm6JDm/tVfnFBVUcIG9uEjouQAIokEODPSz+HYrjtU+rvkXO3vpO/Mllk8SYP8IwEEzH30W/qDGelmdaI8kfvAnoOpZtU/rjEOcRwqbY5NrfbOLKkMP31AG3wDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712063637; c=relaxed/simple;
-	bh=UsatnV/EHjv/xbeltr+10uYRbmZdlwrwWcR2idpTWts=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HPT9aOwJRGNWIlTMco32ncvQqUF9EN1Y5Rc9bxO7iISzrwj1Uj8ntN7sz3ZS3jRbh0jy8tRWSgSvjCsURy2MC54rweHMOF1ryY0Slf/8H7xhqYixCBXIWCptKQ00pAkY4cuyUxGc7yAF9LCue+lmzX5L5IsZ21OinAbqtzBpwQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rrdxN-0007Nn-MW; Tue, 02 Apr 2024 15:13:41 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rrdxM-009zWC-JI; Tue, 02 Apr 2024 15:13:40 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rrdxM-006Oq4-1c;
-	Tue, 02 Apr 2024 15:13:40 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
-Subject: [PATCH net-next v1 8/8] net: dsa: microchip: ksz8_r_dyn_mac_table(): use entries variable to signal 0 entries
-Date: Tue,  2 Apr 2024 15:13:39 +0200
-Message-Id: <20240402131339.1525330-9-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240402131339.1525330-1-o.rempel@pengutronix.de>
-References: <20240402131339.1525330-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1712063884; c=relaxed/simple;
+	bh=PU8e+iIYGTu09EvDAIMMFH5RenifQoc8Af+tvO74/d4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Y132f1uvOI6WW/HQ1QxiyAHq0sHCx6D4qWNMZx6HvmkXeARd/3WUemsndUW7JQVT7YUfIa9yFUlU4nZgOJlP59N0Qd8vO5inLcY3ki8giZIsoXSvayg8D3lplG9J8FqyzNAWf0VAf6PScC7rD4YaLTWoQwFWT3i9DG0YdCiR3jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G1NWipWd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712063881;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PU8e+iIYGTu09EvDAIMMFH5RenifQoc8Af+tvO74/d4=;
+	b=G1NWipWdzFnJ/GzYsSeowR0v3qR+I+ur0UoB8gFLA7driGIY1vnN+ozREY5PotLeMElhbE
+	9sk5vy2s2IdxxIkhnsUMyoaCvMaRdljblKc/QLemVCRrW62ewk+ER3PjG4oApRuq2Ik9xU
+	X4LFjkLnuzXjvNo49zY3tWsZNQaoSXU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-617-9QWfBYN1Po6UIY5tGN2cjQ-1; Tue, 02 Apr 2024 09:17:59 -0400
+X-MC-Unique: 9QWfBYN1Po6UIY5tGN2cjQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4155db7b540so6262665e9.1
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 06:17:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712063879; x=1712668679;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PU8e+iIYGTu09EvDAIMMFH5RenifQoc8Af+tvO74/d4=;
+        b=ppnbzS2ssndIrJaNTxXz4MYiDNUMH6MByEgRnsZMgqjb6EpIRgGuil+HsVHTsuBPF8
+         ogwkslEnfSrpwlNjU0DAcragithubseRoBpDxJu4aVTN/yVAHsfLmDwSOs2isICI9Dih
+         fdZ3pF4eq5en3D2ZKggKuOWvOnq0pLjN4VSfF/EQ4od33fX1zac8XQaakGV/tyTSRcu3
+         m+Nq5MKPEz238Z1MZU01LLHkL1aavZ5CSPb/dK6Wbiy+ABQw/pycaEciTS11D+xsPseZ
+         sO3daqrCYZ67ZHEyIcWtQsE9+w4S6rXSfbY9Et68YrCSDtNn/MSWYToDl+oAzY02bF+X
+         HN/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVG8SgWM3cbE14URCJ56frTaqhqk0Q/wylahbAf5DL8Quji8qYGzZ2389dYJSMgtdWzIJDuGYFVYR6AY2ShCFYuv3MzD3Sk
+X-Gm-Message-State: AOJu0Yw2io3dYD8sbPuC2exRo6+xcRvQy78vzle7v6PQuyeJUQ/lztMo
+	oBBRpKAKL0wqt0QPbGPdZm8iMxF78qafur1EspiijcmX3NqhWGH1qEJWovsU2nHAL/fCRFCWCAF
+	ywzTvTIfcmXqTw0eRjD7ufbgqbafWx1WAjjmuLsZ4lOB/2FUc4LxFyQ==
+X-Received: by 2002:a05:600c:5114:b0:414:8070:cdc9 with SMTP id o20-20020a05600c511400b004148070cdc9mr9709309wms.2.1712063878759;
+        Tue, 02 Apr 2024 06:17:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFxChee4ihAhzMMU+U8ThOu2Z8pGkOAaAkyDBP2LZiAO+4fIE+eH5KfxbBik1I6m4qtaE/rHg==
+X-Received: by 2002:a05:600c:5114:b0:414:8070:cdc9 with SMTP id o20-20020a05600c511400b004148070cdc9mr9709294wms.2.1712063878345;
+        Tue, 02 Apr 2024 06:17:58 -0700 (PDT)
+Received: from pstanner-thinkpadt14sgen1.remote.csb (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id m28-20020a05600c3b1c00b00414688af147sm21201064wms.20.2024.04.02.06.17.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 06:17:57 -0700 (PDT)
+Message-ID: <a0d0b6b1269babb6a8f4e3bcceafee87bb49dcd1.camel@redhat.com>
+Subject: Re: [PATCH 0/2] PCI: Add and use pcim_iomap_region()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>,  Realtek linux nic maintainers
+ <nic_swsd@realtek.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, David Miller
+ <davem@davemloft.net>
+Cc: "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, 
+	"netdev@vger.kernel.org"
+	 <netdev@vger.kernel.org>
+Date: Tue, 02 Apr 2024 15:17:56 +0200
+In-Reply-To: <7af7182d-0f14-4111-b0c4-b57d2d24edd9@gmail.com>
+References: <982b02cb-a095-4131-84a7-24817ac68857@gmail.com>
+	 <4cf0d7710a74095a14bedc68ba73612943683db4.camel@redhat.com>
+	 <348fa275-3922-4ad1-944e-0b5d1dd3cff5@gmail.com>
+	 <7af7182d-0f14-4111-b0c4-b57d2d24edd9@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-We already have a variable to provide number of entries. So use it,
-instead of using error number.
+On Thu, 2024-03-28 at 23:03 +0100, Heiner Kallweit wrote:
+> On 28.03.2024 18:35, Heiner Kallweit wrote:
+> > On 27.03.2024 14:20, Philipp Stanner wrote:
+> > > On Wed, 2024-03-27 at 12:52 +0100, Heiner Kallweit wrote:
+> > > > Several drivers use the following sequence for a single BAR:
+> > > > rc =3D pcim_iomap_regions(pdev, BIT(bar), name);
+> > > > if (rc)
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error;
+> > > > addr =3D pcim_iomap_table(pdev)[bar];
+> > > >=20
+> > > > Let's create a simpler (from implementation and usage
+> > > > perspective)
+> > > > pcim_iomap_region() for this use case.
+> > >=20
+> > > I like that idea =E2=80=93 in fact, I liked it so much that I wrote t=
+hat
+> > > myself, although it didn't make it vor v6.9 ^^
+> > >=20
+> > > You can look at the code here [1]
+> > >=20
+> > > Since my series cleans up the PCI devres API as much as possible,
+> > > I'd
+> > > argue that prefering it would be better.
+> > >=20
+> > Thanks for the hint. I'm not in a hurry, so yes: We should refactor
+> > the
+> > pcim API, and then add functionality.
+> >=20
+> > > But maybe you could do a review, since you're now also familiar
+> > > with
+> > > the code?
+> > >=20
+> > I'm not subscribed to linux-pci, so I missed the cover letter, but
+> > had a
+> > look at the patches in patchwork. Few remarks:
+> >=20
+> > Instead of first adding a lot of new stuff and then cleaning up,
+> > I'd
+> > propose to start with some cleanups. E.g. patch 7 could come first,
+> > this would already allow to remove member mwi from struct
+> > pci_devres.
+> >=20
+> When looking at the intx members of struct pci_devres:
+> Why not simply store the initial state of bit
+> PCI_COMMAND_INTX_DISABLE
+> in struct pci_dev and restore this bit in do_pci_disable_device()?
+> This should allow us to get rid of these members.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz8795.c | 24 +++++++-----------------
- 1 file changed, 7 insertions(+), 17 deletions(-)
+Those members have been there before I touched anything.
+Patch #8 removes them entirely, so I'd say that result has been
+achieved.
 
-diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index 27dfcc645567d..813c701b71180 100644
---- a/drivers/net/dsa/microchip/ksz8795.c
-+++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -399,19 +399,11 @@ static int ksz8_valid_dyn_entry(struct ksz_device *dev, u8 *data)
- 	} while ((*data & masks[DYNAMIC_MAC_TABLE_NOT_READY]) && timeout);
- 
- 	/* Entry is not ready for accessing. */
--	if (*data & masks[DYNAMIC_MAC_TABLE_NOT_READY]) {
-+	if (*data & masks[DYNAMIC_MAC_TABLE_NOT_READY])
- 		return -ETIMEDOUT;
--	/* Entry is ready for accessing. */
--	} else {
--		ret = ksz_read8(dev, regs[REG_IND_DATA_8], data);
--		if (ret)
--			return ret;
- 
--		/* There is no valid entry in the table. */
--		if (*data & masks[DYNAMIC_MAC_TABLE_MAC_EMPTY])
--			return -ENXIO;
--	}
--	return 0;
-+	/* Entry is ready for accessing. */
-+	return ksz_read8(dev, regs[REG_IND_DATA_8], data);
- }
- 
- static int ksz8_r_dyn_mac_table(struct ksz_device *dev, u16 addr, u8 *mac_addr,
-@@ -439,13 +431,13 @@ static int ksz8_r_dyn_mac_table(struct ksz_device *dev, u16 addr, u8 *mac_addr,
- 		goto unlock_alu;
- 
- 	ret = ksz8_valid_dyn_entry(dev, &data);
--	if (ret == -ENXIO) {
--		*entries = 0;
-+	if (ret)
- 		goto unlock_alu;
--	}
- 
--	if (ret)
-+	if (data & masks[DYNAMIC_MAC_TABLE_MAC_EMPTY]) {
-+		*entries = 0;
- 		goto unlock_alu;
-+	}
- 
- 	ret = ksz_read64(dev, regs[REG_IND_DATA_HI], &buf);
- 	if (ret)
-@@ -1212,8 +1204,6 @@ int ksz8_fdb_dump(struct ksz_device *dev, int port,
- 
- 		ret = ksz8_r_dyn_mac_table(dev, i, mac, &fid, &src_port,
- 					   &entries);
--		if (ret == -ENXIO)
--			return 0;
- 		if (ret)
- 			return ret;
- 
--- 
-2.39.2
+Besides, considering the current fragmentation of devres within the PCI
+subsystem, I think it's wise to do 100% of devres operations in
+devres.c
+
+P.
+
+>=20
+> > By the way, in patch 7 it may be a little simpler to have the
+> > following
+> > sequence:
+> >=20
+> > rc =3D pci_set_mwi()
+> > if (rc)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error
+> > rc =3D devm_add_action_or_reset(.., __pcim_clear_mwi, ..);
+> > if (rc)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error
+> >=20
+> > This would avoid the call to devm_remove_action().
+> >=20
+> > We briefly touched the point whether the proposed new function
+> > returns
+> > NULL or an ERR_PTR. I find it annoying that often the kernel doc
+> > function
+> > description doesn't mention whether a function returns NULL or an
+> > ERR_PTR
+> > in the error case. So I have to look at the function code. It's
+> > also a
+> > typical bug source.
+> > We won't solve this in general here. But I think we should be in
+> > line
+> > with what related functions do.
+> > The iomap() functions typically return NULL in the error case.
+> > Therefore
+> > I'd say any new pcim_...iomap...() function should return NULL too.
+> >=20
+> > Then you add support for mapping BAR's partially. I never had such
+> > a use
+> > case. Are there use cases for this?
+> > Maybe we could omit this for now, if it helps to reduce the
+> > complexity
+> > of the refactoring.
+> >=20
+> > I also have bisectability in mind, therefore my personal preference
+> > would
+> > be to make the single patches as small as possible. Not sure
+> > whether there's
+> > a way to reduce the size of what currently is the first patch of
+> > the series.
+> >=20
+> > > Greetings,
+> > > P.
+> > >=20
+> > > [1]
+> > > https://lore.kernel.org/all/20240301112959.21947-1-pstanner@redhat.co=
+m/
+> > >=20
+> > >=20
+> > > >=20
+> > > > Note: The check for !pci_resource_len() is included in
+> > > > pcim_iomap(), so we don't have to duplicate it.
+> > > >=20
+> > > > Make r8169 the first user of the new function.
+> > > >=20
+> > > > I'd prefer to handle this via the PCI tree.
+> > > >=20
+> > > > Heiner Kallweit (2):
+> > > > =C2=A0 PCI: Add pcim_iomap_region
+> > > > =C2=A0 r8169: use new function pcim_iomap_region()
+> > > >=20
+> > > > =C2=A0drivers/net/ethernet/realtek/r8169_main.c |=C2=A0 8 +++----
+> > > > =C2=A0drivers/pci/devres.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | 28
+> > > > +++++++++++++++++++++++
+> > > > =C2=A0include/linux/pci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 |=C2=A0 2 ++
+> > > > =C2=A03 files changed, 33 insertions(+), 5 deletions(-)
+> > > >=20
+> > >=20
+> >=20
+> > Heiner
+>=20
 
 
