@@ -1,63 +1,57 @@
-Return-Path: <netdev+bounces-83858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 524B4894A27
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:51:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23315894A2C
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38648B2459B
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 03:51:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0EC328661D
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 03:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB111758D;
-	Tue,  2 Apr 2024 03:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20871758D;
+	Tue,  2 Apr 2024 03:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hROEiqAF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dqwl4w+a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1261426F;
-	Tue,  2 Apr 2024 03:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E30F168B1
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 03:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712029866; cv=none; b=ZXmX39UaRBIu5eYE7WNggFC/6YZnLMpnSIm7Zz1bCMq7uIkes3F478qYobxab+5R31UydOIjQ19csGpgyUyUk+AP15I9WuZGCUDfgWB4yk+Cpl0Yo4quVGB20W8etxc9m6imF1q5SxMYRCernAe9KRzfIOlPYf8IGRsIwMNP0KY=
+	t=1712029977; cv=none; b=cRHJQSW0VUav+FfH7xL11vUT0PMXy7IyyuMoV30pALX6lLM+Q/LAAnFOCxEc0ksOSKIZGFJBE1sNMffqzbBhM4PvrDbbhy+AYK3RU+K60GOHPjexEG9gaUkGq2Q9GgRuBpFUygg9640SMDY4gNGPu8iBSFqSO87hAUCMY2Jz9mE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712029866; c=relaxed/simple;
-	bh=WMeus+9z+os5yRKCGjNzYgYzIutPvTegtUqNJyOVU14=;
+	s=arc-20240116; t=1712029977; c=relaxed/simple;
+	bh=Fpw3cwfi4FqgvF5udbAOi8d2CP4wqBQApk8KfrjOZTY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WCOAKpJytJelPyWZ7Nn1l+omLAzTU4ze3jcCc/dPPDRVUManC0uqxcARWqBiQn5lEo1/2Py3Lzp5R6FmOMCbsL9uc+q5XqmsurJGprC/rz4EqJHMpEVS5MsSCJ7OEozBR9M0qytANwioFyqKhLj1lH9p7FeooMnBjPOcLcNn1Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hROEiqAF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEE14C433C7;
-	Tue,  2 Apr 2024 03:51:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WuIUguSnvWY9Y2YwmG2woBUXkWfu74WeFdEeh9nPgTbJNwuPGBhO/+569O7hBNn9G8iGio0mBMfuvxCP0ZNa8di3VVHaHlIWpO1wKlGFDkvYBTrqp1a0lS/+HUE6GVIZ/7tVUbidyb4iLHRfJGVSJVlsIrdwYVivlMXXq/ZncFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dqwl4w+a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B64FFC433C7;
+	Tue,  2 Apr 2024 03:52:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712029866;
-	bh=WMeus+9z+os5yRKCGjNzYgYzIutPvTegtUqNJyOVU14=;
+	s=k20201202; t=1712029977;
+	bh=Fpw3cwfi4FqgvF5udbAOi8d2CP4wqBQApk8KfrjOZTY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hROEiqAF8JPVjwyxxVNXQgq/D3Y3t1UkjQdUAmA7XeXMQvX3ZOIDoZjXCGQ51VH60
-	 9dsOPlorjq3/QEZLR3DPiVKtesMRUWqkA8B29el0rgQ2+oNmfM2fYe94Hzhz5b2ho0
-	 37Dhly3rlc0QVL9doCxoQJiWmEAK0r7R8+4VlP/3DODB/p6G3VpogOEqkiEZrKXYaE
-	 GlCJ4LNQpbW/d1mWrazakeepPhZZDv7gBTVrUx/uqe4zsiyLPKT8oZSilRhxxYmxH9
-	 eUB47u2ZohGT6QC0mbO+zuWQwjJU20q8caWN5f2ur46Nys9+KeW9JpERDNqtEk6zeR
-	 gp4RoglGM+nNw==
-Date: Mon, 1 Apr 2024 20:51:03 -0700
+	b=Dqwl4w+aVypWfS0v9fmMhqfANlA+w988QPP36Qzp5Z6aPOw96tST62R7LupJgsDQ0
+	 p6UUZ1i40JixBA6fg8ScIP5ZYu0+UsXoGADOtcuNXG5pwls19VAAQgMeaM+sF9Kqh+
+	 xTNw4jX4qNN9OZ5yCiNV859Ml/MX4SqIdsE5GfioOv+CvcHf5tnD+J7MNsId7Ja2fX
+	 HBnMmsc+Tu8aTdIo96v6eXfDyhryTBnAOxHueuZwjTwFqX7vOgcJKl8TKMfZnNmQBj
+	 WFVK75UESZUTXsM9ek+E4x+kEC+HIu3ZsvO2rgNdPFxmKkKUfQsOMHRBh93ztgLrcX
+	 JoYIzm9pi2yjw==
+Date: Mon, 1 Apr 2024 20:52:55 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
- patches@lists.linux.dev, linux-kernel@vger.kernel.org,
- torvalds@linux-foundation.org, akpm@linux-foundation.org,
- linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
- lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
- f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, srw@sladewatkins.net,
- rwarsow@gmx.de, conor@kernel.org, allen.lkml@gmail.com, broonie@kernel.org,
- Netdev <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Arnd Bergmann <arnd@arndb.de>, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH 6.8 000/399] 6.8.3-rc1 review
-Message-ID: <20240401205103.606cba95@kernel.org>
-In-Reply-To: <CA+G9fYuHZ9TCsGYMuxisqSFVoJ3brQx4C5Xk7=FJ+23PHbhKWw@mail.gmail.com>
-References: <20240401152549.131030308@linuxfoundation.org>
-	<CA+G9fYuHZ9TCsGYMuxisqSFVoJ3brQx4C5Xk7=FJ+23PHbhKWw@mail.gmail.com>
+To: Saeed Mahameed <saeedm@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, <netdev@vger.kernel.org>, Gal Pressman
+ <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH net-next] MAINTAINERS: mlx5: Add Tariq Toukan
+Message-ID: <20240401205255.2fe1d2cf@kernel.org>
+In-Reply-To: <20240401184347.53884-1-tariqt@nvidia.com>
+References: <20240401184347.53884-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,13 +61,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 2 Apr 2024 01:10:11 +0530 Naresh Kamboju wrote:
-> The following kernel BUG: unable to handle page fault for address and followed
-> by Kernel panic - not syncing: Fatal exception in interrupt noticed
-> on the qemu-i386 running  selftests: net: pmtu.sh test case and the kernel
-> built with kselftest merge net configs with clang.
+On Mon, 1 Apr 2024 21:43:47 +0300 Tariq Toukan wrote:
+> Add myself as mlx5 core and EN maintainer.
 > 
-> We are investigating this problem on qemu-i386.
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-One-off or does it repro?
+Saeed, ack?
 
