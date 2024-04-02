@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-83973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DF67895256
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:02:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B0F89525A
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:02:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A7171F22C76
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:02:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37E081F222A5
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267186E602;
-	Tue,  2 Apr 2024 12:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8538879B77;
+	Tue,  2 Apr 2024 12:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aYynJrmA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IS9FpKpo"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EA06997B;
-	Tue,  2 Apr 2024 12:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD39778691;
+	Tue,  2 Apr 2024 12:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712059341; cv=none; b=WysRzs5zh0/a0WVMVh8S1j7jwjvYZ4uwoA5+ZGCSfkr5/yvcFwkWKGooC0u90D1caDwMRFzHjF1Bdxa4DrR5hCH1n9Cc970Kbs+aVawRzwbjmjCgW2hjuI9bFuBUotTZdjHjePovLTnY9Qaga+3n1LpL96I9qwlaXFOPuNbhBNE=
+	t=1712059344; cv=none; b=HAzWSBWlnNDHHiu+2dexQ2NtZXtPOkT++vWYdVo/+QWVJgSCZ+umZOdKq/FY8HMZUQ8/urn6i+5O8yi4EEz2u3E71zj+fNJ5YeybD0bVO0eqzCoNUssQ3qTZYfC0MZKi2TltAUTC43v1lPeCMNNDLDhKGCQwpGo09ijle7Xxrm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712059341; c=relaxed/simple;
-	bh=L9kxXD48M3R+dEIlc+aRKazbrVnivr3btH9XrbQapYQ=;
+	s=arc-20240116; t=1712059344; c=relaxed/simple;
+	bh=tnh61gy3Hi24ulmSCoHJWEcsDEYuQESZN/JaYY3buA4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AWqBAm/1nuQ7eASS5R0TgNgNFSVAw8vPqzC/qoWKUQ5f93skpAv36tq4DtI9acB5QlXhSOPO6zLatOiWWS3F+mVhghDnW2TcHXPxGXAoR0OeTvonHjC5SQUo77ARGN+sNtoubWax9at8dTYglFOq6rGrwjLwZgDV5gTwDbU85+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aYynJrmA; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=UdAuEND6gXYCo+x+GqxV78jAhlhN0+h5vvSHi8E4LHQhyXMrEHsYbNMNh91CM3hp7jrGE3GErScsM7SnKGrbiZSWK+WfAgkBqVdYdM4fBLDM8hhNplWq+rSOW4IcFg1eU/Dllz/MwQUPBxy1twU0fJPqeuRHC5apOcfcqQCBd2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IS9FpKpo; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712059339; x=1743595339;
+  t=1712059343; x=1743595343;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=L9kxXD48M3R+dEIlc+aRKazbrVnivr3btH9XrbQapYQ=;
-  b=aYynJrmAMSxNR6EmuaIFUy/ny1eMobWez1O54VduMdeUcFXoy4huX90+
-   4LnIZcd2oC1TSXe9bHnkxWpkH5tThs86f9ifZUBcTZ9jguC+KJlD/YTSd
-   bdYveitvq9phExP9FWxfWgselF9r3L8Ilp61AmIZO2aLwQGnAip4ky0Ky
-   zxsQ4v8OVzmgclAWNziSbMT1fwR2COLzu51W/FhTX12T1EfHrDXKnPjPi
-   ybwHVglyBd9U2bPWD49ANJVbJiLtz4Y/tzQs8qRE1ZLMss735aN0GrncK
-   NHnbB0BHcnMMQifCQ41MoagOraXPBiujF21McBGJp+ghsOrXSnIU1Te8d
-   g==;
-X-CSE-ConnectionGUID: 6KqeoOTcTT2jAXEh2R3rnA==
-X-CSE-MsgGUID: vF2mB+I0QLCGFiwg/ixTLw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="7067035"
+  bh=tnh61gy3Hi24ulmSCoHJWEcsDEYuQESZN/JaYY3buA4=;
+  b=IS9FpKpo1OpsCI1I0I3s7/MddhIYhnX+RO+PtVXs9yQgM5IbyvoiMKOQ
+   tDJN8o/fbIeM9I9lAIFzRTaqZOyNsfzMF3uUHDQRKFIh1tMqrbCzLZYME
+   Ue7DNTgcULfDOS9ZaIqVaPRaijwfp2J4KHVidUdE8f5Ib1zBZH9BGqJBL
+   waW+1Av3E8kx0Fdlk9sZEBJTWdCGMW08mGWxxeXxIeUnVksGjL+y4nsAb
+   QfLh4CwQyLsJUQ9WBknJuEDg6sOc/SByiKAxdOvb47sqPgRR2Z/CKgASg
+   OhF6qUDnjVo5UR7eBmMY0NXCbnFpASaMe+y9Yc2k+2bCbgbZ95L1NrMQg
+   A==;
+X-CSE-ConnectionGUID: layHTusARS6Tq23BIWX5cw==
+X-CSE-MsgGUID: aeHIbWZ3Q5+/EYDo5wlEyw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="7067050"
 X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="7067035"
+   d="scan'208";a="7067050"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 05:02:19 -0700
-X-CSE-ConnectionGUID: 68MMRf1ETpO0rm7kzZcUbQ==
-X-CSE-MsgGUID: Je7BpCuCQ4Wne6MkaaoEhw==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 05:02:23 -0700
+X-CSE-ConnectionGUID: xOqx1L5FRMyvQU/VmVNICQ==
+X-CSE-MsgGUID: maPrLViuSUSX7cGqKVxuHQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="55494356"
+   d="scan'208";a="55494376"
 Received: from intel.iind.intel.com (HELO brc5..) ([10.190.162.156])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 05:02:15 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 05:02:19 -0700
 From: Tushar Vyavahare <tushar.vyavahare@intel.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc: netdev@vger.kernel.org,
 	daniel@iogearbox.net,
 	tirthendu.sarkar@intel.com,
 	tushar.vyavahare@intel.com
-Subject: [PATCH bpf-next v3 3/7] selftests/bpf: implement get_hw_ring_size function to retrieve current and max interface size
-Date: Tue,  2 Apr 2024 11:45:25 +0000
-Message-Id: <20240402114529.545475-4-tushar.vyavahare@intel.com>
+Subject: [PATCH bpf-next v3 4/7] selftests/bpf: implement set_hw_ring_size function to configure interface ring size
+Date: Tue,  2 Apr 2024 11:45:26 +0000
+Message-Id: <20240402114529.545475-5-tushar.vyavahare@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240402114529.545475-1-tushar.vyavahare@intel.com>
 References: <20240402114529.545475-1-tushar.vyavahare@intel.com>
@@ -86,32 +86,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce a new function called get_hw_size that retrieves both the
-current and maximum size of the interface and stores this information in
-the 'ethtool_ringparam' structure.
-
-Remove ethtool_channels struct from xdp_hw_metadata.c due to redefinition
-error. Remove unused linux/if.h include from flow_dissector BPF test to
-address CI pipeline failure.
+Introduce a new function called set_hw_ring_size that allows for the
+dynamic configuration of the ring size within the interface.
 
 Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
 ---
  tools/testing/selftests/bpf/network_helpers.c | 24 +++++++++++++++++++
- tools/testing/selftests/bpf/network_helpers.h |  4 ++++
- .../selftests/bpf/prog_tests/flow_dissector.c |  1 -
- tools/testing/selftests/bpf/xdp_hw_metadata.c | 14 -----------
- 4 files changed, 28 insertions(+), 15 deletions(-)
+ tools/testing/selftests/bpf/network_helpers.h |  1 +
+ 2 files changed, 25 insertions(+)
 
 diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
-index 6db27a9088e9..1cab20020f94 100644
+index 1cab20020f94..04175e16195a 100644
 --- a/tools/testing/selftests/bpf/network_helpers.c
 +++ b/tools/testing/selftests/bpf/network_helpers.c
-@@ -497,3 +497,27 @@ int get_socket_local_port(int sock_fd)
- 
- 	return -1;
+@@ -521,3 +521,27 @@ int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param)
+ 	close(sockfd);
+ 	return 0;
  }
 +
-+int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param)
++int set_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param)
 +{
 +	struct ifreq ifr = {0};
 +	int sockfd, err;
@@ -122,7 +115,7 @@ index 6db27a9088e9..1cab20020f94 100644
 +
 +	memcpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
 +
-+	ring_param->cmd = ETHTOOL_GRINGPARAM;
++	ring_param->cmd = ETHTOOL_SRINGPARAM;
 +	ifr.ifr_data = (char *)ring_param;
 +
 +	if (ioctl(sockfd, SIOCETHTOOL, &ifr) < 0) {
@@ -135,66 +128,17 @@ index 6db27a9088e9..1cab20020f94 100644
 +	return 0;
 +}
 diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testing/selftests/bpf/network_helpers.h
-index 94b9be24e39b..de4d27d201cb 100644
+index de4d27d201cb..6457445cc6e2 100644
 --- a/tools/testing/selftests/bpf/network_helpers.h
 +++ b/tools/testing/selftests/bpf/network_helpers.h
-@@ -9,8 +9,11 @@ typedef __u16 __sum16;
- #include <linux/if_packet.h>
- #include <linux/ip.h>
- #include <linux/ipv6.h>
-+#include <linux/ethtool.h>
-+#include <linux/sockios.h>
- #include <netinet/tcp.h>
- #include <bpf/bpf_endian.h>
-+#include <net/if.h>
- 
- #define MAGIC_VAL 0x1234
- #define NUM_ITER 100000
-@@ -61,6 +64,7 @@ int make_sockaddr(int family, const char *addr_str, __u16 port,
- 		  struct sockaddr_storage *addr, socklen_t *len);
+@@ -65,6 +65,7 @@ int make_sockaddr(int family, const char *addr_str, __u16 port,
  char *ping_command(int family);
  int get_socket_local_port(int sock_fd);
-+int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
+ int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
++int set_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
  
  struct nstoken;
  /**
-diff --git a/tools/testing/selftests/bpf/prog_tests/flow_dissector.c b/tools/testing/selftests/bpf/prog_tests/flow_dissector.c
-index c4773173a4e4..9e5f38739104 100644
---- a/tools/testing/selftests/bpf/prog_tests/flow_dissector.c
-+++ b/tools/testing/selftests/bpf/prog_tests/flow_dissector.c
-@@ -2,7 +2,6 @@
- #include <test_progs.h>
- #include <network_helpers.h>
- #include <error.h>
--#include <linux/if.h>
- #include <linux/if_tun.h>
- #include <sys/uio.h>
- 
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index bdf5d8180067..0859fe727da7 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -495,20 +495,6 @@ static int verify_metadata(struct xsk *rx_xsk, int rxq, int server_fd, clockid_t
- 	return 0;
- }
- 
--struct ethtool_channels {
--	__u32	cmd;
--	__u32	max_rx;
--	__u32	max_tx;
--	__u32	max_other;
--	__u32	max_combined;
--	__u32	rx_count;
--	__u32	tx_count;
--	__u32	other_count;
--	__u32	combined_count;
--};
--
--#define ETHTOOL_GCHANNELS	0x0000003c /* Get no of channels */
--
- static int rxq_num(const char *ifname)
- {
- 	struct ethtool_channels ch = {
 -- 
 2.34.1
 
