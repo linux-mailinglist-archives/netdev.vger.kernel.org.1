@@ -1,88 +1,91 @@
-Return-Path: <netdev+bounces-83982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E778952B7
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:17:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32EC98952CA
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A11FE284F3B
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:17:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E171828158F
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302BE6FE24;
-	Tue,  2 Apr 2024 12:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB12178B4E;
+	Tue,  2 Apr 2024 12:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pRdBfDCo"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA3E3D547;
-	Tue,  2 Apr 2024 12:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEA678B50;
+	Tue,  2 Apr 2024 12:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712060221; cv=none; b=n8m5xprMTXXO+Sb4vkwUmgUmnLs+QrO8+XoIgSS8+3vv147ZoexZhNWqaIP6AKzkAmxHQIqJj3KA1ern0EP3ivlnZluMyAcL+zKW+CJVCp0+THyUYh6I1CJThhpO0u3X433Ud5ktfYDG45MKouAGsbnYcysGIkVLKjwrl1bb0/k=
+	t=1712060400; cv=none; b=h2Om8w8vKcJtkKvJZ/rTuWjXV+7y/rT1aHI7YLUABJfXx6DrADsyLbGMii9htpytqS6duY18j7n5EBkcCmBr6RtRP7SBbeC8TbtwFPS6tLsm5wsvV/FiIkeM07GZuRcQKL/MxxKgMHcYF/CaaxJPDAMOux1hiH4CrCC9ORL2cxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712060221; c=relaxed/simple;
-	bh=A7iLegrAwEYBCF7LSMEZXbChtdJdTBbMPN3RLiGEuWs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dO5eycJk8MVU7ZaFVphIzcx0SVHEicvib5mi/jSHti1YBZwqncmflC4A0uahPOiBCi2MIQ425plugjbWqmJfHUda2ldcx3AaVcFJJJziMP4VTyXubYNhFkSkiW1rP9yqlkTCGFxYxshFG/HI3D8FniiK7fhvroFzdddO45CpOKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4V86Hk6WNWz1h4k5;
-	Tue,  2 Apr 2024 20:14:10 +0800 (CST)
-Received: from dggpemd500003.china.huawei.com (unknown [7.185.36.29])
-	by mail.maildlp.com (Postfix) with ESMTPS id A005A1A016C;
-	Tue,  2 Apr 2024 20:16:55 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- dggpemd500003.china.huawei.com (7.185.36.29) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 2 Apr 2024 20:16:55 +0800
-From: gaoxingwang <gaoxingwang1@huawei.com>
-To: <jiri@resnulli.us>, <mkubecek@suse.cz>
-CC: <gaoxingwang1@huawei.com>, <idosch@nvidia.com>, <kuba@kernel.org>,
-	<liaichun@huawei.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <yanan@huawei.com>
-Subject: [PATCH ethtool-next] netlink: fix typo in coalesce_reply_cb()
-Date: Tue, 2 Apr 2024 20:16:18 +0800
-Message-ID: <20240402121618.3575706-1-gaoxingwang1@huawei.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <ZgvpKNFcBw-39SOD@nanopsycho>
-References: <ZgvpKNFcBw-39SOD@nanopsycho>
+	s=arc-20240116; t=1712060400; c=relaxed/simple;
+	bh=10zaNQjO6cD0u802nObkF2rIFEWC9XMzwL4o5CgNn5k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H8dutkog5OrXT5LWnaqtpYZrkXT9RHTwuvOk4UPJLIcMb7Td5bHoj3Suv8KBrf+b1Igy28T/vLGSgkGHJsNUwuU+QoBZJrLf4wu047LeTGO3m7nJ26XRr5R+W1decWivqV/sEo9nhAtgE2DZgVVXbxdcnDvxf6FsguK2v6WEJjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pRdBfDCo; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1712060394; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=MRQA2S5++ydiyrHI6q0p5IMDBBaTSk6Hs3CzM+V9A6o=;
+	b=pRdBfDCoYmdI1rBKdi6yYxKXmof6g5/j2wc3hwk7fQpgiwCAI3TahQEPog3seizS+VjQaLl58sT4iU9xNW3pWNho4R4K86f/Brwe1eNgW52IS9JokOTztuvbgTxi3vg0g5m4Nv/+TiK3JinXlkmRzbqoy/HfjoxkHTTVUR5DvRg=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3oRGU8_1712060393;
+Received: from 30.221.148.49(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3oRGU8_1712060393)
+          by smtp.aliyun-inc.com;
+          Tue, 02 Apr 2024 20:19:54 +0800
+Message-ID: <359c5369-da09-49ba-a900-415f41911fa8@linux.alibaba.com>
+Date: Tue, 2 Apr 2024 20:19:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH ethtool-next] netlink: fix typo in coalesce_reply_cb()
+To: gaoxingwang <gaoxingwang1@huawei.com>
+Cc: idosch@nvidia.com, kuba@kernel.org, liaichun@huawei.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, yanan@huawei.com,
+ Jiri Pirko <jiri@resnulli.us>, mkubecek@suse.cz
+References: <ZgvpKNFcBw-39SOD@nanopsycho>
+ <20240402121618.3575706-1-gaoxingwang1@huawei.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <20240402121618.3575706-1-gaoxingwang1@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemd500003.china.huawei.com (7.185.36.29)
 
-Add missing colon in coalesce_reply_cb()
 
-Fixes: ec573f209dfd (netlink: settings: add netlink support for coalesce tx aggr params)
-Signed-off-by: Gao Xingwang <gaoxingwang1@huawei.com>
----
- netlink/coalesce.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/netlink/coalesce.c b/netlink/coalesce.c
-index bc34d3d..bb93f9b 100644
---- a/netlink/coalesce.c
-+++ b/netlink/coalesce.c
-@@ -93,7 +93,7 @@ int coalesce_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		 tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_BYTES]);
- 	show_u32("tx-aggr-max-frames", "tx-aggr-max-frames:\t",
- 		 tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_FRAMES]);
--	show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs\t",
-+	show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs:\t",
- 		 tb[ETHTOOL_A_COALESCE_TX_AGGR_TIME_USECS]);
- 	show_cr();
- 
--- 
-2.27.0
+在 2024/4/2 下午8:16, gaoxingwang 写道:
+> Add missing colon in coalesce_reply_cb()
+>
+> Fixes: ec573f209dfd (netlink: settings: add netlink support for coalesce tx aggr params)
+> Signed-off-by: Gao Xingwang <gaoxingwang1@huawei.com>
+> ---
+>   netlink/coalesce.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/netlink/coalesce.c b/netlink/coalesce.c
+> index bc34d3d..bb93f9b 100644
+> --- a/netlink/coalesce.c
+> +++ b/netlink/coalesce.c
+> @@ -93,7 +93,7 @@ int coalesce_reply_cb(const struct nlmsghdr *nlhdr, void *data)
+>   		 tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_BYTES]);
+>   	show_u32("tx-aggr-max-frames", "tx-aggr-max-frames:\t",
+>   		 tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_FRAMES]);
+> -	show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs\t",
+> +	show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs:\t",
+>   		 tb[ETHTOOL_A_COALESCE_TX_AGGR_TIME_USECS]);
+>   	show_cr();
+>   
+
+Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
 
 
