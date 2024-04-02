@@ -1,116 +1,193 @@
-Return-Path: <netdev+bounces-84184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 033B6895ECB
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:36:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD3C895EDE
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:43:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE07F1F276CD
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 21:36:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F2F2849AA
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 21:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C51C15E80F;
-	Tue,  2 Apr 2024 21:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0504415E5D5;
+	Tue,  2 Apr 2024 21:43:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/BcqB7h"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DSBI5n/K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A0415E80C;
-	Tue,  2 Apr 2024 21:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5369815E5C1
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 21:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712093769; cv=none; b=HwvPkUYsptrkW3Zj7/qIkclWuYJehLPZEZyGtbGrxzCQOz5bmVBeuRXgrIXg8JhJwFdjucFQq0FPjywoca0Sz5Sr+nmesyj6+QsGsuvyTV8ELxE9xkFbQNeNlKzMsesyqddzB+8gJEBgpTpmT7eFqBlK1NkKjQCbsGDVHNNbRjk=
+	t=1712094216; cv=none; b=VqiLCZQnWSS1Lc0zeJ0DtDB4VkDM312/A6OkwW4rdHK5Iuim9wvyahWj+Pui7Zzxo4Tlu+Acbmt14f5tlNPoPQ+eeibJa+4XNajNVA45bdboJXworPeYSr0GbnCyHoQQ2MiMxOl/pXgozqtsraZXVeWL+PoLrysJ/ZO5uEJPHV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712093769; c=relaxed/simple;
-	bh=R77JGoAQZP5S0g5y2bfP8VgjOnnsNP41b6UnDI/qAyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pXhzF57nzmxD3V4pVUAUe0+qEmXrQ+gSOhBGbHqM0roTWQloxciYUKLBQQp/fbmjtmCJPKXcIVPXP3/FmS2EHzEnSMLZYYjThCFt5NNRJglhxGiOmdD5cn9uImIyt8o9LeU5br9lq1dUqhFaYuDcQceYrgmyskPJvZlKsRLgt6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/BcqB7h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61D3EC433F1;
-	Tue,  2 Apr 2024 21:36:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712093768;
-	bh=R77JGoAQZP5S0g5y2bfP8VgjOnnsNP41b6UnDI/qAyA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h/BcqB7h3KKw6rPNPsob8OeNn++N2NesXRaozpuCALGFb5dmPwqog8SHMB2Ki7yJs
-	 WGk9bpU/qzIjCiZDrww4dp/+8yfHoNRNvwtEVPZb7FDpdWN2GU6RKvNxeJZJphHyiM
-	 bgaIwuyQWob4F1Z3nY+af37edcbeNx4gdmvvY2jJ4Fww/9/q5y793Xs8FeLvogrzVU
-	 /1iotnjH9tOAUIN3/mWUiwiZsbslr9kWO8CGYGLaypYe9TnOMQvorV5VB0OWLzGGSk
-	 l/XZpW3/lmWfEZwKJ9LKL4dDKsTqw0heVE80YyN+K1XWLj2ZWM/E+ApcVBSyb8+ih3
-	 t4HBIwdScI4YA==
-Date: Tue, 2 Apr 2024 14:36:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>, David Ahern <dsahern@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoph Hellwig
- <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
- <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Aron Silverton <aron.silverton@oracle.com>,
- linux-kernel@vger.kernel.org, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Junxian Huang <huangjunxian6@hisilicon.com>
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240402143607.0357d71a@kernel.org>
-In-Reply-To: <20240402184554.GQ946323@nvidia.com>
-References: <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
-	<2024032248-ardently-ribcage-a495@gregkh>
-	<510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
-	<Zf2n02q0GevGdS-Z@C02YVCJELVCG>
-	<20240322135826.1c4655e2@kernel.org>
-	<e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
-	<20240322154027.5555780a@kernel.org>
-	<1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
-	<20240401123003.GC73174@unreal>
-	<20240401075003.70f5cb4b@kernel.org>
-	<20240402184554.GQ946323@nvidia.com>
+	s=arc-20240116; t=1712094216; c=relaxed/simple;
+	bh=3r920r3sy9ONvV4TZu5TnTf81AgbCvB0ASdhZe2r0D8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tDC14op2VzkUUqW+JEokQhfdHTqDAf+Rr2ZLO+yvoprXF/E/IW4jJKvkz6qkjn9gURxS1P7gsGK6FPrHSnayeGQBMYHl+GkzCiKPZ4oeYqH6mOEUVhjUQs5Y5z//mL/x4v+jpq5OpgrZ6fXklTil0uxgNSDBhZDIaicPETUvQIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DSBI5n/K; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712094214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fVL0aLiqcK1KzUfmb79yjYH6UEgJji5kSbpVUcLouhk=;
+	b=DSBI5n/K5r7xBZpC4PQasdlcEdb4Q0vxQiJ5kk65WFxmzIUrDjpK/UMTQXc6eTU4QBpvcU
+	Bw/+MzmIUxlKTsHqSk060bo7nuFdbD3HDt0Hr6Sxz78H1loRRnn9VdIVhCHUkmUoID7S3X
+	GkQIuKVBiPuOnM89Vmv41jvV97/Ifbo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-AmbgxrlPNni1LWZWtaxxxA-1; Tue, 02 Apr 2024 17:43:33 -0400
+X-MC-Unique: AmbgxrlPNni1LWZWtaxxxA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-414042da713so1517575e9.0
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 14:43:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712094212; x=1712699012;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fVL0aLiqcK1KzUfmb79yjYH6UEgJji5kSbpVUcLouhk=;
+        b=dcYwNt9ArHgzc3g1wZ5NnhaXqEUtPYb8Xrsey8VckT3K7ZG90XOXouuXO5o00ntvLf
+         PM7+v9WmEk5BQi0PkG6bDJg42s207uBl2G6EpZ9thsvQE9eqvbNK6XgGXpQg61dTBhxm
+         SalNbHL0nU7AH+Gs9MAzWDQQBB61JqRhRhMRjl2nBtuqu33zYPnR8NM0uCDrT8RVhewL
+         XNieLwxz+3BVE0T3EDYafu16XKzWxwEG3q6UBS9SDi7wJTiXrLkwiaooBPrPp5zl1zuK
+         AoP4RR6QLlqXYO9hpTquzKhP3OTM6qK4TzVJ3zlUarPQ9hfrWAtzJ32gx18JTGpizrsn
+         ZhqA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcX9vIkaJaAmdXzjlZPOt8QJ/Ve6WVsZ+tO4p3LzndxrW2fNawC0vdBpZr9X1e+vlX97SKjEwfHl7T7R7uowQKIeaOMufS
+X-Gm-Message-State: AOJu0YzPMYFciWYW+DKjf1hvtdMSi3ziwRlHwLuD2BzyRamvwpKIXNT6
+	etSk8EDiP2Wl2djbP2XiTz+0WUSQQNLoIn8F5t8ILSkFdCXfHZtlRvHEgdSLlbidHlqlMt7HkD/
+	09V05lGqpwwC7Aes1FH8RJ5ZeYjoPSTeLDhjlj3otEK0+u/xrH3KjwQ==
+X-Received: by 2002:a05:600c:5198:b0:415:6e79:91dc with SMTP id fa24-20020a05600c519800b004156e7991dcmr593803wmb.15.1712094212056;
+        Tue, 02 Apr 2024 14:43:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/ASZOCZD4KwlBc+fiI0YXbidwMFqieDhzHwYxi6KPCQ5cxE4ZJjXpRsZKcHCLucbIsfEU8Q==
+X-Received: by 2002:a05:600c:5198:b0:415:6e79:91dc with SMTP id fa24-20020a05600c519800b004156e7991dcmr593790wmb.15.1712094211655;
+        Tue, 02 Apr 2024 14:43:31 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id bg3-20020a05600c3c8300b0041481207b23sm19458402wmb.8.2024.04.02.14.43.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 14:43:31 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id D64CD11A2284; Tue,  2 Apr 2024 23:43:30 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
+ namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com,
+ Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com,
+ jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com,
+ daniel@iogearbox.net, victor@mojatatu.com, pctammela@mojatatu.com,
+ dan.daly@intel.com, andy.fingerhut@gmail.com, chris.sommers@keysight.com,
+ mattyk@nvidia.com, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v13  00/15] Introducing P4TC (series 1)
+In-Reply-To: <20240325142834.157411-1-jhs@mojatatu.com>
+References: <20240325142834.157411-1-jhs@mojatatu.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 02 Apr 2024 23:43:30 +0200
+Message-ID: <877chfmoe5.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2 Apr 2024 15:45:54 -0300 Jason Gunthorpe wrote:
-> On Mon, Apr 01, 2024 at 07:50:03AM -0700, Jakub Kicinski wrote:
-> > On Mon, 1 Apr 2024 15:30:03 +0300 Leon Romanovsky wrote:  
-> > > HNS driver is a good example of such device. It has nothing to do with
-> > > netdev and needs common and reliable way to configure FW.  
-> > 
-> > Sorry, I have a completely different reading of that thread.
-> > Thanks for bringing it up, tho.
-> > 
-> > As I said multiple times I agree that configuring custom parameters
-> > in RDMA is a necessity. Junxian's approach of putting such code in
-> > the RDMA driver / subsystem is more than reasonable. Even better,
-> > it looks like the API is fairly narrowly defined.  
-> 
-> Uh, if I understand netdev rules aren't read/write sysfs created from
-> drivers banned? 
+Jamal Hadi Salim <jhs@mojatatu.com> writes:
 
-Neither is that true as an absolute "netdev rule" nor relevant 
-to the discussion.
+> This is the first patchset of two. In this patch we are submitting 15 whi=
+ch
+> cover the minimal viable P4 PNA architecture.
+> Please, if you want to discuss a slightly tangential subject like offload=
+ or
+> even your politics then start another thread with a different subject lin=
+e.
+> The way you do it is to change the subject line to for example
+> "<Your New Subject here> (WAS: <original subject line here>)".
+>
+> In this cover letter i am restoring text i took out in V10 which stated "=
+our
+> requirements".
+>
+> Martin, please look at patch 14 again. The bpf selftests for kfuncs is
+> sloted for series 2. Paolo, please take a look at 1, 3, 6 for the changes
+> you suggested. Marcelo, because we made changes to patch 14, I have
+> removed your reviewed-by. Can you please take another look at that patch?
+>
+> __Description of these Patches__
+>
+> These Patches are constrained entirely within the TC domain with very tiny
+> changes made in patch 1-5. eBPF is used as an infrastructure component for
+> the software datapath and no changes are made to any eBPF code, only kfun=
+cs
+> are introduced in patch 14.
+>
+> Patch #1 adds infrastructure for per-netns P4 actions that can be created=
+ on
+> as need basis for the P4 program requirement. This patch makes a small
+> incision into act_api. Patches 2-4 are minimalist enablers for P4TC and h=
+ave
+> no effect on the classical tc action (example patch#2 just increases the =
+size
+> of the action names from 16->64B).
+> Patch 5 adds infrastructure support for preallocation of dynamic actions
+> needed for P4.
+>
+> The core P4TC code implements several P4 objects.
+> 1) Patch #6 introduces P4 data types which are consumed by the rest of the
+>    code
+> 2) Patch #7 introduces the templating API. i.e. CRUD commands for templat=
+es
+> 3) Patch #8 introduces the concept of templating Pipelines. i.e CRUD
+>    commands for P4 pipelines.
+> 4) Patch #9 introduces the action templates and associated CRUD commands.
+> 5) Patch #10 introduce the action runtime infrastructure.
+> 6) Patch #11 introduces the concept of P4 table templates and associated
+>    CRUD commands for tables.
+> 7) Patch #12 introduces runtime table entry infra and associated CU
+>    commands.
+> 8) Patch #13 introduces runtime table entry infra and associated RD
+>    commands.
+> 9) Patch #14 introduces interaction of eBPF to P4TC tables via kfunc.
+> 10) Patch #15 introduces the TC classifier P4 used at runtime.
+>
+> There are a few more patches not in this patchset that deal with externs,
+> test cases, etc.
 
-> So reasonable for RDMA but unacceptable to netdev?
+Unfortunately I don't have the bandwidth to review these in details ATM,
+but I think it makes sense to have P4 be a conceptual entity in TC, and
+using eBPF as the infrastructure to execute the programs. So, on that
+conceptual level only:
 
-I don't know or care what interface guidance you provide.
-What I called reasonable is putting that code in RDMA driver
-/ subsystem.
+Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-> My brain hurts.
+[...]
 
-Maybe brains are better suited for understanding what other people
-say rather than twisting and misinterpreting..
+> To summarize in presence of eBPF: The debugging idea is probably still
+> alive.  One could dump, with proper tooling(bpftool for example), the
+> loaded eBPF code and be able to check for differences. But this is not the
+> interesting part.
+> The concept of going back from whats in the kernel to P4 is a lot more
+> difficult to implement mostly due to scoping of DSL vs general purpose. It
+> may be lost.  We have been discussing ways to use BTF and embedding
+> annotations in the eBPF code and binary but more thought is required and =
+we
+> welcome suggestions.
 
-> FWIW, I've been trying to push RDMA away from driver created sysfs for
-> a while now. Aside from the API complexity, implementations have
-> messed up using the sysfs APIs and resulted in some significant
-> problems :(
+One thought on this: I don't believe there's any strict requirement that
+the source lines in the "BTF lineinfo" information has to be C source
+code. So if the P4 compiler can relate the generated BPF instructions
+back to the original P4, couldn't it just embed the P4 program itself
+(in some suitable syntax) as the lineinfo?
 
-Sure, agreed, but off-topic.
+-Toke
+
 
