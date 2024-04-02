@@ -1,160 +1,116 @@
-Return-Path: <netdev+bounces-84183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F78895EA5
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:21:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 033B6895ECB
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F41821C23B69
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 21:21:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE07F1F276CD
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 21:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E36D15E5BA;
-	Tue,  2 Apr 2024 21:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C51C15E80F;
+	Tue,  2 Apr 2024 21:36:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RlieJNnv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/BcqB7h"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4CC15E5B1
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 21:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A0415E80C;
+	Tue,  2 Apr 2024 21:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712092909; cv=none; b=LlxmzhGICyBef88xY5ufd4I28VvLDLxQG8h+vB1Q5Wz5aoP1GyJ7eX4FNUPx22+TbIpKWBkY0aWuA58GPmBwNgLahXfxZurDarBvCbYYuj2w/EZA8w5OZAVepefJKoN3nAcKrKlp44M4TpSvTvP2+VO3XE6ErbTv+AhcSjGmDu8=
+	t=1712093769; cv=none; b=HwvPkUYsptrkW3Zj7/qIkclWuYJehLPZEZyGtbGrxzCQOz5bmVBeuRXgrIXg8JhJwFdjucFQq0FPjywoca0Sz5Sr+nmesyj6+QsGsuvyTV8ELxE9xkFbQNeNlKzMsesyqddzB+8gJEBgpTpmT7eFqBlK1NkKjQCbsGDVHNNbRjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712092909; c=relaxed/simple;
-	bh=CeTf1GnLqEGbq7mpbpnjAmCKKQFZ0fqT+cHVafZlASk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=jwTK4PU0EpR5GFZEizMQN9YgCS9HZLkkYaFFCBU96HKNyFfJiB1RBS648A2cE+yZGni+8QjE8vzof8wCAx4bOZVLjQRZ4ChmrZkl96heRsW0n5TCGfALFEV4WDDCBDsxBNzD8CX3jGfyCCaGYIoT2+GIv2m7HT8eVJpKqTh2DB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RlieJNnv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712092906;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=L+alDoiqMN7Nxu8CAo+qwAjzO+OBQsTVsBJwYvjZdYY=;
-	b=RlieJNnvIe2TYL+Z4mCYHUBvhV/xpI13OA2nHL7vFr5EJL7Mej3Il8yyEg9qcBlX+U48So
-	dY8DB9nmEwexupwUpAPeKPeprkU6Zr1hGkweW5dmi1uYvahalRMNAD2+byu82cSca+EhEJ
-	Qc5AkynbOEaF2XHEACBaDv4HRWg1rH8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-4XutR4_VOxKkOEJChBEWHA-1; Tue, 02 Apr 2024 17:21:45 -0400
-X-MC-Unique: 4XutR4_VOxKkOEJChBEWHA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-34370ba4105so522059f8f.3
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 14:21:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712092904; x=1712697704;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L+alDoiqMN7Nxu8CAo+qwAjzO+OBQsTVsBJwYvjZdYY=;
-        b=vVBOw+tmLteK6M5MDAJlxfTGLpYvZOZnSBazsjFWmZp61FohaKmlgBxOtqoHn4FzB+
-         SvHz4yzhPvKqKAycsGgvYyC8a7N6hc8aKp7DD40nLCQRSmjuPIm9WZg4bNNT2r/waz8W
-         DsATzJbIJxJg3PnLoNCEElnrwJY0D/KeCb4JVxd2wzxYlTcxMJCUdZTENU1Tf/VwlN/s
-         b4WrzOKqp0X4X48Sm9i1XZ9+bhYl2lOfvMiQGymC91j+cINR41rc/DGl4YGWm2v3oyMx
-         tJTEMxH/x4uY8LHx3XVuqckzHDUsdf5Sn8w3tbM98oP6xsA8/XpR/iSZCPacjCP4cV5p
-         m7kA==
-X-Forwarded-Encrypted: i=1; AJvYcCVxjOYV72HbNgQy6vqKWBRpVP9GfMai1EJjv6Wd9Edgd7zjvX3XZaueKLr7HsYacwrXT0PNp2hZW0L2YjSDHwvvT7EfXREH
-X-Gm-Message-State: AOJu0YzVda7zokhg8oxBQ40e2Ubuq9Z+agPMeoeWyuo/ltYVc1mIobTa
-	RUe9CYYaxizWf5ZmwDEm4Nkh8yU2xLL1LQt+CB7mmCLHokG9rwFARpAfWapFwmQmXAGWlwK455q
-	iJjW3WEUUB2iFS58XLgMNrCqthc28V++6QtaycZMtogerQedDN6ivdQ==
-X-Received: by 2002:a5d:598e:0:b0:343:4c43:b38a with SMTP id n14-20020a5d598e000000b003434c43b38amr6924827wri.17.1712092903836;
-        Tue, 02 Apr 2024 14:21:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHoLR2TiY4NlePQYEkpCrVsZpefzcsOU3LO3zWyGpNr1faKWUSZIEppdou1j4Es/gmuSNpz7Q==
-X-Received: by 2002:a5d:598e:0:b0:343:4c43:b38a with SMTP id n14-20020a5d598e000000b003434c43b38amr6924812wri.17.1712092903398;
-        Tue, 02 Apr 2024 14:21:43 -0700 (PDT)
-Received: from redhat.com ([2.52.21.244])
-        by smtp.gmail.com with ESMTPSA id f13-20020a1709062c4d00b00a4df82aa6a7sm6888784ejh.219.2024.04.02.14.21.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 14:21:42 -0700 (PDT)
-Date: Tue, 2 Apr 2024 17:21:39 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Zhu Lingshan <lingshan.zhu@intel.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>,
-	Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Kan Liang <kan.liang@linux.intel.com>
-Subject: [PATCH] vhost-vdpa: change ioctl # for VDPA_GET_VRING_SIZE
-Message-ID: <41c1c5489688abe5bfef9f7cf15584e3fb872ac5.1712092759.git.mst@redhat.com>
+	s=arc-20240116; t=1712093769; c=relaxed/simple;
+	bh=R77JGoAQZP5S0g5y2bfP8VgjOnnsNP41b6UnDI/qAyA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pXhzF57nzmxD3V4pVUAUe0+qEmXrQ+gSOhBGbHqM0roTWQloxciYUKLBQQp/fbmjtmCJPKXcIVPXP3/FmS2EHzEnSMLZYYjThCFt5NNRJglhxGiOmdD5cn9uImIyt8o9LeU5br9lq1dUqhFaYuDcQceYrgmyskPJvZlKsRLgt6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/BcqB7h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61D3EC433F1;
+	Tue,  2 Apr 2024 21:36:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712093768;
+	bh=R77JGoAQZP5S0g5y2bfP8VgjOnnsNP41b6UnDI/qAyA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=h/BcqB7h3KKw6rPNPsob8OeNn++N2NesXRaozpuCALGFb5dmPwqog8SHMB2Ki7yJs
+	 WGk9bpU/qzIjCiZDrww4dp/+8yfHoNRNvwtEVPZb7FDpdWN2GU6RKvNxeJZJphHyiM
+	 bgaIwuyQWob4F1Z3nY+af37edcbeNx4gdmvvY2jJ4Fww/9/q5y793Xs8FeLvogrzVU
+	 /1iotnjH9tOAUIN3/mWUiwiZsbslr9kWO8CGYGLaypYe9TnOMQvorV5VB0OWLzGGSk
+	 l/XZpW3/lmWfEZwKJ9LKL4dDKsTqw0heVE80YyN+K1XWLj2ZWM/E+ApcVBSyb8+ih3
+	 t4HBIwdScI4YA==
+Date: Tue, 2 Apr 2024 14:36:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoph Hellwig
+ <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
+ <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Aron Silverton <aron.silverton@oracle.com>,
+ linux-kernel@vger.kernel.org, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Junxian Huang <huangjunxian6@hisilicon.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240402143607.0357d71a@kernel.org>
+In-Reply-To: <20240402184554.GQ946323@nvidia.com>
+References: <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
+	<2024032248-ardently-ribcage-a495@gregkh>
+	<510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+	<Zf2n02q0GevGdS-Z@C02YVCJELVCG>
+	<20240322135826.1c4655e2@kernel.org>
+	<e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+	<20240322154027.5555780a@kernel.org>
+	<1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+	<20240401123003.GC73174@unreal>
+	<20240401075003.70f5cb4b@kernel.org>
+	<20240402184554.GQ946323@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-VDPA_GET_VRING_SIZE by mistake uses the already occupied
-ioctl # 0x80 and we never noticed - it happens to work
-because the direction and size are different, but confuses
-tools such as perf which like to look at just the number,
-and breaks the extra robustness of the ioctl numbering macros.
+On Tue, 2 Apr 2024 15:45:54 -0300 Jason Gunthorpe wrote:
+> On Mon, Apr 01, 2024 at 07:50:03AM -0700, Jakub Kicinski wrote:
+> > On Mon, 1 Apr 2024 15:30:03 +0300 Leon Romanovsky wrote:  
+> > > HNS driver is a good example of such device. It has nothing to do with
+> > > netdev and needs common and reliable way to configure FW.  
+> > 
+> > Sorry, I have a completely different reading of that thread.
+> > Thanks for bringing it up, tho.
+> > 
+> > As I said multiple times I agree that configuring custom parameters
+> > in RDMA is a necessity. Junxian's approach of putting such code in
+> > the RDMA driver / subsystem is more than reasonable. Even better,
+> > it looks like the API is fairly narrowly defined.  
+> 
+> Uh, if I understand netdev rules aren't read/write sysfs created from
+> drivers banned? 
 
-To fix, sort the entries and renumber the ioctl - not too late
-since it wasn't in any released kernels yet.
+Neither is that true as an absolute "netdev rule" nor relevant 
+to the discussion.
 
-Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
-Reported-by: Namhyung Kim <namhyung@kernel.org>
-Fixes: 1496c47065f9 ("vhost-vdpa: uapi to support reporting per vq size")
-Cc: "Zhu Lingshan" <lingshan.zhu@intel.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+> So reasonable for RDMA but unacceptable to netdev?
 
-Build tested only - userspace patches using this will have to adjust.
-I will merge this in a week or so unless I hear otherwise,
-and afterwards perf can update there header.
+I don't know or care what interface guidance you provide.
+What I called reasonable is putting that code in RDMA driver
+/ subsystem.
 
- include/uapi/linux/vhost.h | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+> My brain hurts.
 
-diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-index bea697390613..b95dd84eef2d 100644
---- a/include/uapi/linux/vhost.h
-+++ b/include/uapi/linux/vhost.h
-@@ -179,12 +179,6 @@
- /* Get the config size */
- #define VHOST_VDPA_GET_CONFIG_SIZE	_IOR(VHOST_VIRTIO, 0x79, __u32)
- 
--/* Get the count of all virtqueues */
--#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
--
--/* Get the number of virtqueue groups. */
--#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
--
- /* Get the number of address spaces. */
- #define VHOST_VDPA_GET_AS_NUM		_IOR(VHOST_VIRTIO, 0x7A, unsigned int)
- 
-@@ -228,10 +222,17 @@
- #define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
- 					      struct vhost_vring_state)
- 
-+
-+/* Get the count of all virtqueues */
-+#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
-+
-+/* Get the number of virtqueue groups. */
-+#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
-+
- /* Get the queue size of a specific virtqueue.
-  * userspace set the vring index in vhost_vring_state.index
-  * kernel set the queue size in vhost_vring_state.num
-  */
--#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x80,	\
-+#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
- 					      struct vhost_vring_state)
- #endif
--- 
-MST
+Maybe brains are better suited for understanding what other people
+say rather than twisting and misinterpreting..
 
+> FWIW, I've been trying to push RDMA away from driver created sysfs for
+> a while now. Aside from the API complexity, implementations have
+> messed up using the sysfs APIs and resulted in some significant
+> problems :(
+
+Sure, agreed, but off-topic.
 
