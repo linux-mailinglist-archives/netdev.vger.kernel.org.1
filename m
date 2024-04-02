@@ -1,181 +1,143 @@
-Return-Path: <netdev+bounces-83908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AE81894D00
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 09:55:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF7C894D58
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 10:20:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE6F91C219CF
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:55:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0517B2260F
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 08:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694BC3D0BE;
-	Tue,  2 Apr 2024 07:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7303D96D;
+	Tue,  2 Apr 2024 08:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="BqcSuJ0H";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="zOn4B06k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fcoh1Iai"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B769C2BD1C;
-	Tue,  2 Apr 2024 07:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712044537; cv=fail; b=BnOzqbRKs5QTcrbWZSMeAt+ecslM+25F0Y6cowOk1laje80s6ltrWbLP2riwDWFlzeOYJxT9/j8TyUj3A1PDeHS/dFUigtz19u4SbfWm3zOujEn5ve8HPz1vL1uEWjCmvufx0+x1ssqt/E7OOmz00uqxfO2YKWOvTJzEjqHB43g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712044537; c=relaxed/simple;
-	bh=CUT8y9a+ZmqjBeVkLT0Lo/M+liVo7sfi+G9vKL3dRUg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MOslUQ1Dy8U8IRmm8evrRK0TkGOdk8HQe0P9ZA1n9Kid3Nu6s7eo06+sPtwedu/1zgEaKsSXhfbZf/rdBe1FL2c1rbHoN3S/9EtUSBpkWxHbh0O79S8D9PLqAN+MuIRc+Z2fUrLyYx+q8f3LlrRSmlz7op6qJ86mM+E5PfYeBXI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=BqcSuJ0H; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=zOn4B06k; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1712044533; x=1743580533;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CUT8y9a+ZmqjBeVkLT0Lo/M+liVo7sfi+G9vKL3dRUg=;
-  b=BqcSuJ0HJpllW4nHh4ceameiO6Hxjti7N/jPdXPHcr81RC1c7Kne8fK2
-   PRVQcAXzfQByIMs1IHh5YWEzuUx6gvWyh+0udEhkcCjIKVhLCjRdT5AE8
-   LeSmOLTzD2az70m9g1sm7Ftd2yrH1sh0Eu4coFf+LkTQQF31up4Zf1DbX
-   RoZgiHOJWozKT6I3rNy+2Fd5nXtYFPZegkLzslA/CMol50OGRQzSkHAW2
-   4Ig44zF2Ex/B++1INEdx6YKIi2upvry8K4Ogb7BEtdyfletHL7/NERSm9
-   L3+xsUttbIH5AGpDVYQVO+srB88JF6vztSyfGNyS27Fv6j3fe0I1yVqYa
-   Q==;
-X-CSE-ConnectionGUID: zTpmlH8IS7yeCTSxsJrX6Q==
-X-CSE-MsgGUID: 0sIfiOMIQL+YbbxRmIqAbw==
-X-IronPort-AV: E=Sophos;i="6.07,174,1708412400"; 
-   d="scan'208";a="21014844"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Apr 2024 00:55:31 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Apr 2024 00:55:30 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 00:55:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Um4Jw54mQs3KD+VNhb7M0XGd0OhmeuHyJ9qybiEc5UVoTwp9WFVpvvCS6wVXVrb7bi1Z4THkkNAHfHSkdG5rtuxW9R1k2HZcmvv0UrfcE8C+49kecuWx2HLK4JJVrvrZ1c4XLW0RizAgSYyblvKShcfDTUZSZL3FM1B9o8kSs51le1BjPrzOZBOahSVAAttTVKPkPm1mufTT/BJi8qvDgbUx7cBSvtoJ7nFjavEB7o0TfdBAAwmKUt2d5+U4f3l6PuAmvHZ9w1WTWsSlAmSJg92QfhQZLGNaJw2fvkMRBqHpw6OtN51CPOSgVYtbqpX1sZDZp6sOdc2fKug5PDM6bg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z3LK6VyDAmCslwott2KyvemwXQnaEfmPkZxYtZbKyjQ=;
- b=Dr4LI41ElYJNoFUgjOSlJsV+TEuZaKCvYkGjRWcFoGOoFLm5l3qsQgpHiKEPj/YKXaUn5hFkaB/gM59i1YVmmPPqAkFKvG6l/SfQPcJ6IJORPvdjwVB+629QEeMK+a3Cy16tfIK5GbSuO0VypBxH1N4Pn5mowUErH00InyCBh+xo/VFI5x3JX2StHcc1sjw74OL4hfnLZbTDHBExKYXxdCfQJnBhil1mxEIY+EEwTuMM8vI/HmLhjv6NiXCVpEBAT5Lx+HL3Mdhb5TmA/ZMKbkEekZ7bxyRHMoBpQ1owd0uwQB4bKtR+47RsCfF/COVzXVtTA4AyPcqK4liCa/bpgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z3LK6VyDAmCslwott2KyvemwXQnaEfmPkZxYtZbKyjQ=;
- b=zOn4B06k/FrRq/a5ZY1LmrbxsUa1L748g2VxcTIfDV5xCLPdz79lpR6qBJwpgjuVMqlFLU9cYltO02SRIktYglyexbgUA0BvXEtvU5mmgfSyW4+s9szuV20AnJ/h9Ib4lxNN1+1QAdP+ZYVd1Uq9cmKB+/VfWZTtzbgSNjjRvF8PbNFrLmI4fmADQbETcOi+iJ0AYLCxf0UWrnq/zuHZnXcoGu7ipyoNkyyMUNccjbjvunFloZFaMTvjiiw1hM8H0Q1w4vAQnjnRBtqRNtF1VL1259uks539yOxUhVihBL8sA2Xofpw2d+FF7I99hfZK30TB8dtjSP6FNI5c/OLFaw==
-Received: from CO1PR11MB4771.namprd11.prod.outlook.com (2603:10b6:303:9f::9)
- by DS0PR11MB8116.namprd11.prod.outlook.com (2603:10b6:8:12b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Tue, 2 Apr
- 2024 07:55:28 +0000
-Received: from CO1PR11MB4771.namprd11.prod.outlook.com
- ([fe80::b78f:e89c:89a:842f]) by CO1PR11MB4771.namprd11.prod.outlook.com
- ([fe80::b78f:e89c:89a:842f%6]) with mapi id 15.20.7452.019; Tue, 2 Apr 2024
- 07:55:28 +0000
-From: <Divya.Koppera@microchip.com>
-To: <Horatiu.Vultur@microchip.com>, <andrew@lunn.ch>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, <Horatiu.Vultur@microchip.com>
-Subject: RE: [PATCH net] net: phy: micrel: lan8814: Fix when
- enabling/disabling 1-step timestamping
-Thread-Topic: [PATCH net] net: phy: micrel: lan8814: Fix when
- enabling/disabling 1-step timestamping
-Thread-Index: AQHahM3zwhdD08oLdUe6JysjzcSjGrFUm6KQ
-Date: Tue, 2 Apr 2024 07:55:28 +0000
-Message-ID: <CO1PR11MB47719CB09438652F66E084F9E23E2@CO1PR11MB4771.namprd11.prod.outlook.com>
-References: <20240402071634.2483524-1-horatiu.vultur@microchip.com>
-In-Reply-To: <20240402071634.2483524-1-horatiu.vultur@microchip.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB4771:EE_|DS0PR11MB8116:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QopjRoHMWjwJASbfIBeF7uvHraDd88ECKVz7DF82nfHto/ypqQj9IdKmEG2D2f6AGCjG3fqPZPb6/NBeENLZGaXm6ilhlWc1aUz90JAGMmoLjXS76dV446JXjNRsxEmZsdu3meRvxYJOEzMy6PG9bKLIfL9DzFqo7TBzbrEmQAxhAdcWed/bwkLr9weHxyJs/N+0iGO4eipksYDa7szENeREVcTlhbBjoMK+O7MTuvZH7t6TTSeQNM8iXpW3zh0SJYZWiV0GXwga5t3nfxWbIf+spr+Wq+DK9VqTJhRV76XqR9yLeVpoAtSGr/TPY5+rbrAng2V3Db2qUugE5aRqnqgLeS5HT5gcvCkW8WcXSZiUGC+6G0JUgxlIIzsCIu3XoKArit5fvtk8SLcxd2OdCiCzKRW99UnfX+7gCkyqk4QNsfzIi21ZieY6OjO5+Ny7aFoj94PI3okL6OePymPgRDssW9Q5XQql6Yl/w2eE2UoBYuyCOumZAisOQmbE6sqvRe/f5R3PKABEhFF6ihnb84Ql1kTmqQl3Dvdrw8qFGsLyD2KAoukwvuWToEMZQMLLyCidab45Hm1JfCBoSjHjrvoncmz8Al1h/E+T46Qxyqj5yMQpHRhJmNRAg9Slq6NbNsQ0JK/IPvU9qYYjQpBeh6DIqlE69B248j+7zic36Ow=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4771.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(7416005)(1800799015);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GS2Z3HBxhsSN2CKvaK1cVvbLLXKdVeYMvG7WutpSyvmSS1D2cswNP0GZMlWC?=
- =?us-ascii?Q?RW55DNfNXj6Cl/XexdOcv2VA+Ev5L2GJ+cBBndVCjuSGYZ+z54Jkm1xvsc3F?=
- =?us-ascii?Q?cbKm7MxuBQGCMwiEozyNsGYlKELzdF6Io3+uuyz40AveEc3oYNy3UUYZeB7A?=
- =?us-ascii?Q?Dqtd8u8gdqC4eElXTpbh1RsnPUJpI8DRgWOyYdv4hXGBtpZQtoRYKEfiW/LQ?=
- =?us-ascii?Q?uIKzOz208k5SLDNhrGCKHiaAr/j48TLp0b04kFx2vBHJIbIu0TXxv0hF/fBW?=
- =?us-ascii?Q?XxXH/KzfaMNUJf218Wtad4y0T5aV1k5r6Qs+Fbfn4zYo+kgzjYp7v9f/4Lqn?=
- =?us-ascii?Q?ufnB4gcKR8XdFQw7DNFT2xOSpuzQR4AfkQHnl4yGFXTMxt99+QRzRXwJdbN5?=
- =?us-ascii?Q?2iIfq9h/AepiR+0xtHsj2LPkpFsOrGL0qmMQj40CJgJ6J1jwNKkxAsy9D14d?=
- =?us-ascii?Q?6F6FavxMMB+guoDwEIlLcgUR28xnYfjV6SRyvIsqaaSu7FJTMiddzijNRKJ/?=
- =?us-ascii?Q?qyWxsa/yszvbPUyDLJmRw0i5/S7SrjCIr5vlxcEfcaQ4a+dVV0g+8XK19Gpg?=
- =?us-ascii?Q?RwDMz8HRCN70Is/RdlLMvIRLoADfwXYGYnTqcagwvS3iVH4QeqJByltrM5UB?=
- =?us-ascii?Q?9WaljukURNbDLWBtVkFOWs92TY5wHwVd/QFLrj+EKdOQocpw083jMMelmIo5?=
- =?us-ascii?Q?5cNOxLmrruw3P/lOD00RjjxB59QK+1Sq7DldV1Fwx9sg4jlVpE7/2ejI//r4?=
- =?us-ascii?Q?vTjX8eqMpIfzwi9KvwIDgCrWoYitNGmSyNFbAxj5NDsPs/Wq5TDAlXhVmSFl?=
- =?us-ascii?Q?Jak2P+sa0CaJfdnHaUSoAHjI+O0UkiXr6vAm5z/j4halicaPdOsOQ0TLjvU4?=
- =?us-ascii?Q?OSrCfDxk+00AHeYVlWg4WIUNYZVqVI1oXtoVXoyEczJIDpHGTKwAXNRYVJyV?=
- =?us-ascii?Q?ryzralgdfd50Yb3E9gD/hI/1H2mNTLx8xssxr/+HVbc+31G38RhiBuRiZoCW?=
- =?us-ascii?Q?/H9IKbrveb0KM8SiRMqk93BwUL14VNhieFSfO14BbPCEo361vwvl9tClhIZC?=
- =?us-ascii?Q?jGuSr1h/eUCo+AhTZnwXpdU+As/jvLCRj9e/OY0o7moRSHsoXFQJIqSDsKl3?=
- =?us-ascii?Q?vmVugM3TxK1OpCWjwsPSAylgcAxy1PD6cq08swDnYD24rdOQvqAiHgBYMuQV?=
- =?us-ascii?Q?E/vJEWbRCAB1ZQBIwjGl0R28grJ7j+vePmz/66BLCx3F0TSiqVm3d7mUysd3?=
- =?us-ascii?Q?Dw2BZxgf1nfrNPLRU342dBHHIFBeFJ77Cr/mPEm9VzGlFtSnY4yBFAMIjJ6O?=
- =?us-ascii?Q?n8CYYYef189r/u+mp+CtKlci7KYE6Du+ZfXDnIgjETpRERGYzs0Y1VTpIOuz?=
- =?us-ascii?Q?ya1+MgH62b5RiuVV5L+CmsvV3XL9xJtQB5ghoWM1M2ig328eJCFPXJtrK9+d?=
- =?us-ascii?Q?+3aIJzR8Ze0mRldaNefrGfFySQ2n5IOCl9pl+aVqnbrrzv2NxhOZGjM1yUEF?=
- =?us-ascii?Q?Rk7yTBtbQ3qE4+JZIkQP3VaOSgMx1YTZhGPqIyk0hW6r4aB0K1kcqtDQXHgj?=
- =?us-ascii?Q?tjK4b8MCEXxH+2tmVE7UDB/JKsyYAMflYkiKndewyY0pMS6RquK7/fz976vc?=
- =?us-ascii?Q?PA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB1F3D57A
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 08:20:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712046053; cv=none; b=uft7jVFlGkvnfbhu3u3nfj/5K2WaIs/VEx9NbMW0tlzEFUW0MvOx93VBHl8VjLO1AV4Q0UdZstwQiTYnkWpsrzfdqtUqmAn2+OrZZ72esukICdZ0cVrSm81V9QtLTLPSTQubKFq8l+LNQwDB6u9iraxjGHFrOggNT/i926Dsgo8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712046053; c=relaxed/simple;
+	bh=8nmFvPWj2VmRdRDKglF6WaM6wPFKqBMJEckD9LUyWD4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bHA+7k1HmL2gCePVp58gqYjqr/ov/IP25uW7jRgegwRvKIfWxevLIR0OwzOEP+FVnGwBPTOZTJTlXQCsfoXO4bODz/HgN7YYcPE2dGLNJUpMDNHZT5WVOK1dhFYhv2+Eqv0z30+o/ubJ+cnArerRjmhgfl/3d1TzgkQZehrFW8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fcoh1Iai; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-29f69710cbbso3278322a91.1
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 01:20:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712046051; x=1712650851; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=MtgDNy5Ok/k3AgC4/N+aLWeQ5ZduvA0x4teM9jNjSvQ=;
+        b=Fcoh1Iai4yP9O5O7/E0hiw4UXy6wu8lHav4kM9qzvi6Nr6boO4SL0aVaZOZj9+o+K9
+         dX41JtfWkoep0G/oYPPEjrUROhEy9lxwv8NX2Wbk81ys26LxP+bqgGB4WbvvhrySUa0N
+         6pm7q+We2dl/RI5B1ILcm1ZXj+WMAkO6ehU5GzI8VsFkUF9Pd5c/BMsOKJjDiZH+46+V
+         8wQWm/cOhbRBTDxYy0UxMKbshr7EI+Nqi/rbwaBCYivrw04xlrYKyN3tBjGtMBJnXwML
+         bdM5gOwMYjyeQHedfwlo3Q2xNXDx0GFefcDFpUsSvrNy/mkDliDA11EaSVUOWcZZePna
+         eVhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712046051; x=1712650851;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MtgDNy5Ok/k3AgC4/N+aLWeQ5ZduvA0x4teM9jNjSvQ=;
+        b=E2h+yZHdePbV/E2TH7px1iOzdUlwB9cH1F4V5n1eHBapugqD4JH1DHpKuFWXwpUZwZ
+         GmFXHH+YpKURsMR9ATL0ASI86Ks2xYZvxt2IBz40wP1xwDLjW3Y00H5tTrbda7Ahs2CA
+         5q+rJGhqe8KESCc1ygJS8rRWgYtmpU+vXjTJroKxpoxtWJCgbzRVko7tuAEirRAHZxQS
+         6VEWxOZJRebEuQeftUMQu0Cub3Nddb1N5Gd6/cADwt1P2VOSh4SVaf3RUI9WA/QYSEGg
+         Hgf2FZFoZnHSBRhO5CVpqSk0LDYBwp3XZpTU+VckKcaDB/cteaPx9o4cXDXghoVx9rEL
+         o2MA==
+X-Gm-Message-State: AOJu0YxtuCCT6V0onqV81D1t4caMtchbj7KK+0iOBspnpQ7n9kZtyN4t
+	EgwdlVKGIb4dgQNN8dv94wbuvNIjTH1Rjcc7sxYQZXQBNxdmfwTjxs0/3actVTp+88VdWRcO8gc
+	KRo/rUgQjWLdU2Yd4fU/6QPmkj5Y=
+X-Google-Smtp-Source: AGHT+IFWlqMVFBoKcV6hseAJUnZ6M3BBB/Kala7LFFLA8XcpKQEImuTrHalGIK62Lr2CNcY1VdHtmKAyvR0PSWNN5kQ=
+X-Received: by 2002:a17:90a:974b:b0:2a2:20d8:2110 with SMTP id
+ i11-20020a17090a974b00b002a220d82110mr14057235pjw.8.1712046051136; Tue, 02
+ Apr 2024 01:20:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4771.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 969e49fc-077c-47f2-8ab7-08dc52ea432e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2024 07:55:28.2191
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Gc2qYVdJxnO+NUVUZaII9+8lx7H/tnuryNwpdjoWZP/EdN7pMRG7LbFIcr9nK9vyXoS7+MDFCnTIIe1JyRiDbSa3A7sy4PLLaQ5qbEbpf5c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8116
+References: <171154167446.2671062.9127105384591237363.stgit@firesoul> <CALUcmU=xOR1j9Asdv0Ny7x=o4Ckz80mDjbuEnJC0Z_Aepu0Zzw@mail.gmail.com>
+In-Reply-To: <CALUcmU=xOR1j9Asdv0Ny7x=o4Ckz80mDjbuEnJC0Z_Aepu0Zzw@mail.gmail.com>
+From: Arthur Borsboom <arthurborsboom@gmail.com>
+Date: Tue, 2 Apr 2024 10:20:35 +0200
+Message-ID: <CALUcmUkvpnq+CKSCn=cuAfxXOGU22fkBx4QD4u2nZYGM16DD6A@mail.gmail.com>
+Subject: Re: [PATCH net] xen-netfront: Add missing skb_mark_for_recycle
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, Ilias Apalodimas <ilias.apalodimas@linaro.org>, wei.liu@kernel.org, 
+	paul@xen.org, Jakub Kicinski <kuba@kernel.org>, kirjanov@gmail.com, dkirjanov@suse.de, 
+	kernel-team@cloudflare.com, security@xenproject.org, 
+	andrew.cooper3@citrix.com, xen-devel@lists.xenproject.org
+Content-Type: text/plain; charset="UTF-8"
 
-> There are 2 issues with the blamed commit.
-> 1. When the phy is initialized, it would enable the disabled of UDPv4
->    checksums. The UDPv6 checksum is already enabled by default. So when
->    1-step is configured then it would clear these flags.
-> 2. After the 1-step is configured, then if 2-step is configured then the
->    1-step would be still configured because it is not clearing the flag.
->    So the sync frames will still have origin timestamps set.
->=20
-> Fix this by reading first the value of the register and then just change =
-bit 12 as
-> this one determines if the timestamp needs to be inserted in the frame,
-> without changing any other bits.
->=20
-> Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
-> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> ---
->  drivers/net/phy/micrel.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+On Fri, 29 Mar 2024 at 10:47, Arthur Borsboom <arthurborsboom@gmail.com> wrote:
+>
+> On Wed, 27 Mar 2024 at 13:15, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+> >
+> > Notice that skb_mark_for_recycle() is introduced later than fixes tag in
+> > 6a5bcd84e886 ("page_pool: Allow drivers to hint on SKB recycling").
+> >
+> > It is believed that fixes tag were missing a call to page_pool_release_page()
+> > between v5.9 to v5.14, after which is should have used skb_mark_for_recycle().
+> > Since v6.6 the call page_pool_release_page() were removed (in 535b9c61bdef
+> > ("net: page_pool: hide page_pool_release_page()") and remaining callers
+> > converted (in commit 6bfef2ec0172 ("Merge branch
+> > 'net-page_pool-remove-page_pool_release_page'")).
+> >
+> > This leak became visible in v6.8 via commit dba1b8a7ab68 ("mm/page_pool: catch
+> > page_pool memory leaks").
+> >
+> > Fixes: 6c5aa6fc4def ("xen networking: add basic XDP support for xen-netfront")
+> > Reported-by: Arthur Borsboom <arthurborsboom@gmail.com>
+> > Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> > ---
+> > Compile tested only, can someone please test this
+>
+> I have tested this patch on Xen 4.18.1 with VM (Arch Linux) kernel 6.9.0-rc1.
+>
+> Without the patch there are many trace traces and cloning the Linux
+> mainline git repository resulted in failures (same with kernel 6.8.1).
+> The patched kernel 6.9.0-rc1 performs as expected; cloning the git
+> repository was successful and no kernel traces observed.
+> Hereby my tested by:
+>
+> Tested-by: Arthur Borsboom <arthurborsboom@gmail.com>
+>
+>
+>
+> >  drivers/net/xen-netfront.c |    1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
+> > index ad29f370034e..8d2aee88526c 100644
+> > --- a/drivers/net/xen-netfront.c
+> > +++ b/drivers/net/xen-netfront.c
+> > @@ -285,6 +285,7 @@ static struct sk_buff *xennet_alloc_one_rx_buffer(struct netfront_queue *queue)
+> >                 return NULL;
+> >         }
+> >         skb_add_rx_frag(skb, 0, page, 0, 0, PAGE_SIZE);
+> > +       skb_mark_for_recycle(skb);
+> >
+> >         /* Align ip header to a 16 bytes boundary */
+> >         skb_reserve(skb, NET_IP_ALIGN);
+> >
+> >
 
-Reviewed-by: Divya Koppera <divya.koppera@microchip.com>
+I don't see this patch yet in linux-next.
+
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log
+
+Any idea in which kernel release this patch will be included?
 
