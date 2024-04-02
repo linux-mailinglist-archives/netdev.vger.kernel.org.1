@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-83885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D808894AB4
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:00:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 930BC894AB5
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B96391C20B5B
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:00:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C68D1F24694
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7EB18021;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2FF18042;
 	Tue,  2 Apr 2024 05:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utkm+IiU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jVBROVw9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7932917C95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80DA18035
 	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 05:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712034029; cv=none; b=OxFGojFY0VOTN4N+h40T1VLe1fa65aJlg6zk8mWbJFSu/I85NHfOuhK1fU7zTMpVbB6tZ8GdEifURWpU773atJ5wEbrCa+RHHGdF6n0X6soGj5w53g2LYB405/gZSugs3pFSCXgAFa8Oij98aMibARif2dTLze/hpMn8cdgUtDQ=
+	t=1712034029; cv=none; b=JKYjNG7dbjXqe0AmfiCvdhLug+qIQJvPVQw+Q65/5RKXk7x8tDZqExDty5Hl58HM3aqLatvDsLN3gTKrZUuy0xqbSskGlC6KIJhcgoM7xe+4YPMFL2nbL7TtssPlExxXBa1jyCC+albv3fyYUW07Bw2n2VMOLPuw0gu/BULB3wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712034029; c=relaxed/simple;
-	bh=z8Wm4nD9UBhggqzm+pchERDRiBBMHHYVSulMCkIeuSE=;
+	bh=rEFW4wGi8qx/sLAewRTdZlOBk+0BUrrVQ3dTtx7hfco=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u/54xAPWExXt1b5tOO72TOk3bJ1aAXa4LmPBS4mkI4T9MaO+McY8ZQGLrgYwrYpP6v0O4mTwdVLDxhNAIm820vffN5lJBKMjv51KnG9tSMQF83+YBTfKKf+jIrCB2R9UDtDHY2tTd8BcqW3KlghIYr0yEXLWWarCWqjY67nElkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utkm+IiU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 43DE1C433C7;
+	 In-Reply-To:To:Cc; b=Ty012UOSYyXHse0DSCjLEIGb90+3TpcMNZ1TK83FOUShfD2xw6nsKD5KjlcC7wwSvj3QhbMRHLBuWi4futqd/OBXC+l4psj+UTEyl5eL5Ked2diGCazy3L7igJ6oKeU73lWv9onZbhTIMErju7YNv27i4LNawYHFkur5O3G6aHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jVBROVw9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F0FFC43394;
 	Tue,  2 Apr 2024 05:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712034029;
-	bh=z8Wm4nD9UBhggqzm+pchERDRiBBMHHYVSulMCkIeuSE=;
+	bh=rEFW4wGi8qx/sLAewRTdZlOBk+0BUrrVQ3dTtx7hfco=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=utkm+IiUT6RlMkr3gCXeR+WWjDzGiuPW94ndLmrVSeP8flvQq1cICV6fdUXO3dmdr
-	 qToeqLD8E0Vr2OwW+j1F7tCqLj43Lip2ew/PTkw56CqJFyri4J8jP8fvMbCd2Q8Qym
-	 UUdD6Gz3KGMoHBY1DYF8mQ0/fVcGRJ8jbP33irduEFCeOFP105SRK8Mn/mhoYrdVO2
-	 kuhSG61AgxacNvG2Z1vm4/prMu24RDCed1WhOJjTzPrWgh2X9RO943BM3A1MluvXHy
-	 2iaC85vJHUd6kta3fjca+vr8ktbXbSZCnvyethAtSqoxT5gJ4HCUoB6T2xFJ+4O2Zw
-	 QrFuM7W7UMedg==
+	b=jVBROVw9FlEagtqT0Ne6HhZsITEiX5mBAJCvV7qi+m59EYmYBzmu07VyM9Km0C2rt
+	 qBYw6/BawPPG76XwEH5Xa0jepaG8TEjzZHKt0pWKid9TD/uaRKFVj2+GjEmjSm+cCq
+	 ByZvNyGvPgdrrQuiaAhS2BqS/XIHbpesDsO9TF9cwIsXygyflFTRVoE5R2hOh+HuYt
+	 PIiVGptQwWerSNHL9zrPkpNgh5R4v2w6CVgog/GexCXIvGI3On1gWprY71wPDGAstL
+	 UHktcWtk7GrfMTl1E5MTxedzoVdb6ePO8zHxd8CKhPohhp3XQXMh/VTXbHLJCDxYyW
+	 VbzKNNnK2aAQA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34D5ED8BD16;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3E99CD9A158;
 	Tue,  2 Apr 2024 05:00:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] genetlink: remove linux/genetlink.h
+Subject: Re: [PATCH net-next] ipv6: remove RTNL protection from inet6_dump_fib()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171203402921.17077.13638062733619928977.git-patchwork-notify@kernel.org>
+ <171203402925.17077.9636282571913518612.git-patchwork-notify@kernel.org>
 Date: Tue, 02 Apr 2024 05:00:29 +0000
-References: <20240329175710.291749-1-kuba@kernel.org>
-In-Reply-To: <20240329175710.291749-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, dw@davidwei.uk, jiri@resnulli.us,
- andriy.shevchenko@linux.intel.com
+References: <20240329183053.644630-1-edumazet@google.com>
+In-Reply-To: <20240329183053.644630-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, dsahern@kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 29 Mar 2024 10:57:07 -0700 you wrote:
-> There are two genetlink headers net/genetlink.h and linux/genetlink.h
-> This is similar to netlink.h, but for netlink.h both contain good
-> amount of code. For genetlink.h the linux/ version is leftover
-> from before uAPI headers were split out, it has 10 lines of code.
-> Move those 10 lines into other appropriate headers and delete
-> linux/genetlink.h.
+On Fri, 29 Mar 2024 18:30:53 +0000 you wrote:
+> No longer hold hold RTNL while calling inet6_dump_fib().
+> 
+> Also change return value for a completed dump,
+> so that NLMSG_DONE can be appended to current skb,
+> saving one recvmsg() system call.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: David Ahern <dsahern@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/3] netlink: create a new header for internal genetlink symbols
-    https://git.kernel.org/netdev/net-next/c/5bc63d3a6f46
-  - [net-next,v3,2/3] net: openvswitch: remove unnecessary linux/genetlink.h include
-    https://git.kernel.org/netdev/net-next/c/f97c9b533a1d
-  - [net-next,v3,3/3] genetlink: remove linux/genetlink.h
-    https://git.kernel.org/netdev/net-next/c/cd7209628cdb
+  - [net-next] ipv6: remove RTNL protection from inet6_dump_fib()
+    https://git.kernel.org/netdev/net-next/c/5fc68320c1fb
 
 You are awesome, thank you!
 -- 
