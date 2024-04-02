@@ -1,145 +1,239 @@
-Return-Path: <netdev+bounces-83964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 846FD8951EC
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:34:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29402895203
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 13:39:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03440B257CF
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:34:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 949D41F245B7
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 11:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7988657A7;
-	Tue,  2 Apr 2024 11:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37EB467A0C;
+	Tue,  2 Apr 2024 11:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IbcAQL61"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EDD679FE;
-	Tue,  2 Apr 2024 11:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712057681; cv=none; b=LPFtUn7Xn6UQySzwKWLf/WKCCzFkBqMqbatd/BlWvAspUR1MNGqRvB18qS5AVUCEbO+JrXJ0nyiMlkcplc2BRmgeQMvze7G6yCXeqx1Zl63XOZMn5ZQG3T7yiB2U/zneM8scp2ILoUd2uBqmtTR5kfsfM2atxHBdnqAPsSVI6Xk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712057681; c=relaxed/simple;
-	bh=NZjcNFaXHrCCSnJfeK2385qZKdr9n9dZYuteBPidjWQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Zt9HBtYxB+Xf+1xHYdsSl5wec40l79cbbaXIHfNcMVZ3zW4oWR6fKo5CjXd+hv3LQ8czwFQF7OFEhYuQPexZm8sOeytw361kTKM2vQPVeOpYJwLfo9REIPP9bNIS5RZZ/nE7DyVfrbF8WL0LdRq0qgb0b+GeFdvq6C01K/N3uMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4V85Lr6vHbz29kj0;
-	Tue,  2 Apr 2024 19:31:48 +0800 (CST)
-Received: from kwepemm600014.china.huawei.com (unknown [7.193.23.54])
-	by mail.maildlp.com (Postfix) with ESMTPS id CECE01A0172;
-	Tue,  2 Apr 2024 19:34:33 +0800 (CST)
-Received: from huawei.com (10.67.174.78) by kwepemm600014.china.huawei.com
- (7.193.23.54) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 2 Apr
- 2024 19:34:33 +0800
-From: Yi Yang <yiyang13@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<wangweiyang2@huawei.com>
-Subject: [PATCH -next] net: usb: asix: Add check for usbnet_get_endpoints
-Date: Tue, 2 Apr 2024 11:30:48 +0000
-Message-ID: <20240402113048.873130-1-yiyang13@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6F0664B7
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 11:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712057956; cv=fail; b=t+Uq+h4MWhoA6Fq2nKKlLCK4uMnIIJpv08lMPVMXMGl0Q6Ph3jsnnAvgt0LXVgT+JCHRHq55sxSKqw3NSFZozcG5DDsLYSyfFk5zylYaCvuwBVforwSxKyjFAQmaQpjEj6flclW/InlZptaK3dw0YbVkhS/xQj/JK0JZbq/63ug=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712057956; c=relaxed/simple;
+	bh=viGhDwFo5TcmLgtrdNLbypmzM+UfjE73xFG+txx1xcw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=rUnuD6aG17SHwbTly008PbfDjFsf6NslVV6qd0rjuFdncOE5QChbdFW9wpddh4SuT76TQ/G52rpPJ9F/+WUfVnrj7k+hQTNpHTNuZ5E/yYOWldKhdlCOQq52drn2BlZQ96VGr33kj6u4xDHJy8jr13xuZI2Lw2qpHinTLS/f13I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IbcAQL61; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712057955; x=1743593955;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=viGhDwFo5TcmLgtrdNLbypmzM+UfjE73xFG+txx1xcw=;
+  b=IbcAQL61P4dzml3Z4J4FqowFJ9OiFtzcSCoRxGdyW9OycHUTUtkeQfC6
+   T62xpUT/k0mTQfOLC4tT/aXk1r3Xkw7foAWSxCl/XNKrIfHyXuqa+klva
+   PONbUKqWVXPkveiZOY7bMeZL3jkXHZDhUiNYPZBv09PVKLSSs50rCHnvF
+   PwZCE6S0EqBxcR+VReOu3PgsrhgheCkN31L0oc6+V2djSNSsRhDxkIAg+
+   KqVukYro8LVGDOBcFdVFjhDQe9vbRAVfOYQpnRNpRHbMQgX7/O8ee/U6B
+   VkgRUj1eUiKBfYxyzSDlt2u6xy+oalignKOhZGm/J13gyoTDspboGQbUd
+   g==;
+X-CSE-ConnectionGUID: 5Hnd6bLLQS+ufTFXEKtjEA==
+X-CSE-MsgGUID: tCUDTPW0TROw0kWto235ig==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="18580269"
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="18580269"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 04:39:14 -0700
+X-CSE-ConnectionGUID: 23fyiQoRTECibbbDnnAWfg==
+X-CSE-MsgGUID: /8WPkf+LS42u7laHneTOhQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
+   d="scan'208";a="41189419"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Apr 2024 04:39:13 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Apr 2024 04:39:12 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Apr 2024 04:39:12 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 2 Apr 2024 04:39:12 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 2 Apr 2024 04:39:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KtPg8ivlOHZA9hRbchZlOd+Dfh/jKtbzk6xFbGYD0kcFPtg/kceoAjiQTEPWYpkPuCIiU0IQEI9AdX3rfME9Hfco4Lq4+4IgfEu2KfTfG9ntO6fgtWdBZOhRdr7+HSQ9t5XrJaGgTLDMkZqQ2mRAd1upn5QcT9vXy9Q660a1ugsG2pQSAafgVQKJMRqbOMtN6AELT1+CMI+CG5LULcjVCu8oTcWNG1AORq7fuqDZq+k6GONDHhgrlMA9eP+J24pRYebdmz9nFVVdEReRNcReIoIl9dcxO7YrqpX6w2hAr4u8/iYwoeuShlfse5UKjqBAIefflaRlVyBesT2u/cjIEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=elbY2e9FNt0KEN+LdrjHhiChnsNs4Oan5qHMZASFBFM=;
+ b=Wxx5xSoh/HiOt7QhOdGvAF6556mryRdUdNfTGPFaGAk5Pf8WdEAQ+ZrNzxR8khF1/YyQqak2VhIfxJqyif8c2Cw5isFqCUrfqBwSCywHBW0v5AgtT+6rLLxfmf8yPtj6v1xDuXQjTJ1DM84U6ojA4dS76goL039ZPpw7IESWmd1sGRbKQ2XxIOpQfC/5IWv8yB+4yj9BajZuIQSqgsup+pWtzKX7i00CkgNYCr27le2KKf9d9lWmVNIgjdBxZnvS+hgi+jE3mH6IsUW4N+rETWILSSHujUOJCPHeqsQZteoZt+eQAtyrjRWE3TOBWSDQaJ5zs3Po8qYTK03pl2mmYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by DS7PR11MB5990.namprd11.prod.outlook.com (2603:10b6:8:71::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.26; Tue, 2 Apr 2024 11:39:05 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Tue, 2 Apr 2024
+ 11:39:05 +0000
+Message-ID: <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+Date: Tue, 2 Apr 2024 13:38:59 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <idosch@nvidia.com>, <edumazet@google.com>,
+	<marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
+	<kuba@kernel.org>, <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
+ <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR0202CA0004.eurprd02.prod.outlook.com
+ (2603:10a6:803:14::17) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600014.china.huawei.com (7.193.23.54)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|DS7PR11MB5990:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7PJRy+dV3d5KB73XmOpJXNrZUIdki8usx7rYsZlokFeELL6Zhe9CwTFvOLUWjhr4CzzIl5PmYHjqeXKEPAQkweBbym5Wgp4FW1kTBgigdocLSKoOdKGRbWGZIjZY1Sk4wAKK+m6vrMSN8RE4viyiCnC3cEbO/hCe+5RMgHizzUNEneEb6bqe1rXyygektEJE4qN5tkTxupiTaDuKUVLVjYLBr6iBWLIRmoF6u7uTV2D/jodk2ZG3+y8OUYpF7+J2MRLa0Oz0bjlFg8DPxKyn7ZnrnZF3mUz8i20haB331WRkNy0k86lE2hPTuOwWpFMwiSVOlb3c6r+T6W7lUHVw+WvGUq0pqH8L216c+yBK3t9AyQqwWAt2d1cpcZOiW5iHAtF24VnZUiC2H0UL1w49wUIYNTwmmcNqqxXWmYT/r5hxG1YaE5UmaRSNaL3Nn/npQYT15Hr36TKOvKd0IhcdN7RvXpZcz8kJ/zz49/XPpxtucs6uCOYq14fhkggb+yihVJQKJ2/jZQGRCcKpHs79tMqv7EMTOs7ahm/3+ZO9zrf0vfK0k3NW1Vqg6tBJgBNe9hvmV3DGALW/QzQuB4uldpW5Zxjecvk6/XQd+jV7KYunTx9BvLLlzgzimHuHdTyQKppmAKoRE3vfhmlIUpZ0XU/WRneAFy6tlDywXSqCIEY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QW02L2FFbnRYTEVRMmhJT1NXNkJ0SmhaUFNpb1pTaXZDVE41aTQ1V3dWNldY?=
+ =?utf-8?B?azFwQk5Ba3FlWHYrYkJUSkhHU00xUm92ZFQwcUFnSjFYMGdJSW4zU0FLOUl5?=
+ =?utf-8?B?cmduSnVXZ1Q5UXo4QVdaRU5TNzR2RTY3REYrcHpETllUMVgxMVBtUVNIKytD?=
+ =?utf-8?B?YzU4ajYyNlBUWmxOMHNQZVo1cG5aOUcrSFhlOGh6aERkRHMwVnlIbndiRlgr?=
+ =?utf-8?B?U3JwRmVYL2FtdFZrUCt6TmRGY2xoekNCeTZWeXJXcFFpR2NaeitydlVlT1B3?=
+ =?utf-8?B?QVlEOXBjQ1FLcUJRMXo0RHJ1bXJXRTlrVC96N1k1MUpvb2hucG9LeUpDeTYz?=
+ =?utf-8?B?WkozKzlJMUk4SDZNdnBMVlF0SzNqMXBZVjA2NW1vWkRtVlQyMnhXQ3M4dDY4?=
+ =?utf-8?B?cjZPNWdEblhvdUFHb29DaGYvMG4yZW5hMW56UDA3M2tsSjRZMzQ5MGZRek1j?=
+ =?utf-8?B?bmtCT1BBMnM4eEVEN3JkeFlpbFlSRm8yNTlvaHhXNmJEUW55K3Byb0pRamZY?=
+ =?utf-8?B?UGFtK3hRazhvQUVkNW1vWnVQL2g4blVPdDh4OG9KQU9MUVJ0dm4xamIrcWdX?=
+ =?utf-8?B?L2QzQ05hMVlRMXNRdzMxMzBYOE5ZblVDN2xpMWhUQ3hDMWF1VXExZTZQdFJC?=
+ =?utf-8?B?UUVaRCtDdjFMQUUxdDRtOHRDei90aStVVjV4K0l6a3EzYUkzNnVhTFBpVlZu?=
+ =?utf-8?B?K0Zvc2xmVWZ5OWZUTDRML0YzVW93dGxGRk5ta3d2cldZV3poZEVmNzdIbjlt?=
+ =?utf-8?B?TGZrNnlSMXdMeEU5RlVYQVZxSkhJVjhWS25WSG9aVHhYT3UwandSSXF0dG5S?=
+ =?utf-8?B?bDNPRXBIbWVmT3R2R2ZrMXJUT0hVVG44MUdZMEtBd1FBcC9jbWVJRXZZRDRV?=
+ =?utf-8?B?NTlOTDUvb2tYNjgyS3paRkpNNEZEb0ZLZUNGU2d3R25uc0ZzM2pGR01zYWhy?=
+ =?utf-8?B?by9XVXBqZ3Q5NDJ5ZVdKanE1RDFSdVB0TFFTcHVsd1NoRmtYSGc3R0hDbnNw?=
+ =?utf-8?B?V0lPRVlNcC9lSk5QOU43dDRQQjFveEdoUU9sK2UyV1hlYVRsSzdpYXpvaHFX?=
+ =?utf-8?B?UElOeWh0aVlxSFBSMDhoMS93VG9rN2V0Um1WK09VN3I5bk1wTGtVakxTM3pn?=
+ =?utf-8?B?NGNrVDdPRGRpTmd5dFdERXpIdWNoUUF5MXpJQ0lBUVZkeStPVjd4aWFUdHhn?=
+ =?utf-8?B?UFFnQ2F0T2cvMktsTVlRNTliS0JxQjFhaEJpMmJqYk1QYUZpd015TWh4dWk2?=
+ =?utf-8?B?bExrMHpaOGl5aTJ6Zlc4bC9vY0wwL3VHdE1HOVVwbFhuclVmWE1mYU9kMHNq?=
+ =?utf-8?B?M2NEL3p0S24rYXY4WS9KR2Jpb0pFbnIrRnBiaGpaWWxlTjZ3RjByTHlKUERS?=
+ =?utf-8?B?S05uL1N5YThhaWJIWE00b1pJMGUwdkVKNnlaRG5jZkkvNFQ5SnMyQmxGSHFr?=
+ =?utf-8?B?UUd4VDVoOC9MREhVeTlZQXlsdzdNamh6UVhWSjQyRGt4aXFLYWZESzhpS0VE?=
+ =?utf-8?B?ekJwZXIvQlhpM2R0TjZSSytvam5JdDFBZWVIVDRydHdJWEpyMW0yL04vZk5x?=
+ =?utf-8?B?OExtTWdpa1drVlgrRmJGNjFXOHhiUDVMaTRRSE1kcHdPQ3FuMnNQY1czaWt2?=
+ =?utf-8?B?ZWY4REpRTXdmSUM5ckR0RkExc0pRazBZQXJOOHAvbUpHR1FTb0NJVHFENjBp?=
+ =?utf-8?B?N2kyVHR0MzRyOHk4eTVRSWdNajJBQXZJUDlWbzdYYW53YUNEdUJOVVJTcFNH?=
+ =?utf-8?B?R2hZeVRVS09tTHhsc3NZSm1GVkhpVEkrRERzUFcxdkU4M0tGWGZXQ0dBdTFl?=
+ =?utf-8?B?d0RKSklHV0w1Q0l3bjd2SzZSTXo5VFJyblpkWW5WSWRnM09NZDJhVUNGT0Uy?=
+ =?utf-8?B?eHU1cjE5MzJIcXpSZjhwN1JYT0gySUl2WnU3MWVYQmthaWlicHhpZ3hpQWE2?=
+ =?utf-8?B?Z1dvTkU3QkhGeWRYMFpleCtXSlU0Mm92dW5QaWlYM1lmTW9rYWJoV1ViUGZa?=
+ =?utf-8?B?VjhSZDZNZmlWMmZTR2pTQlVNdnJ5K2pEWTk5ZUI1c3psYmtSeUNOOStKNWY0?=
+ =?utf-8?B?bDRISThBUWNGQzZCL1hiaDk0VzF6S0tvd1ZWMkppUHdOaUpYbDFqbzVZZ0t6?=
+ =?utf-8?B?MjRDVExPNmJzeGppNzcwQ3ZZYnVTS2VBL2FvVEJ4RDByRzB4SjJrQWdDU3BK?=
+ =?utf-8?B?cGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 940daf50-6c08-4bca-d998-08dc53098074
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 11:39:05.7244
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HldfzPSAE449FcboGh+ykX3qV3BkQTBkXfkxnVKORuUvPdTtzlfA0MbFuZnmx+L/rOwt9XFvhs0NPBn7hT0FNbkN2OVab22Ds7OLReO/OQQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB5990
+X-OriginatorOrg: intel.com
 
-Add check for usbnet_get_endpoints() and return the error if it fails
-in order to transfer the error.
 
-Signed-off-by: Yi Yang <yiyang13@huawei.com>
----
- drivers/net/usb/asix_devices.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index f7cff58fe044..11417ed86d9e 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -230,7 +230,9 @@ static int ax88172_bind(struct usbnet *dev, struct usb_interface *intf)
- 	int i;
- 	unsigned long gpio_bits = dev->driver_info->data;
- 
--	usbnet_get_endpoints(dev,intf);
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret)
-+		goto out;
- 
- 	/* Toggle the GPIOs in a manufacturer/model specific way */
- 	for (i = 2; i >= 0; i--) {
-@@ -834,7 +836,9 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	dev->driver_priv = priv;
- 
--	usbnet_get_endpoints(dev, intf);
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret)
-+		goto mdio_err;
- 
- 	/* Maybe the boot loader passed the MAC address via device tree */
- 	if (!eth_platform_get_mac_address(&dev->udev->dev, buf)) {
-@@ -858,7 +862,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 		if (ret < 0) {
- 			netdev_dbg(dev->net, "Failed to read MAC address: %d\n",
- 				   ret);
--			return ret;
-+			goto mdio_err;
- 		}
- 	}
- 
-@@ -871,7 +875,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	ret = asix_read_phy_addr(dev, true);
- 	if (ret < 0)
--		return ret;
-+		goto mdio_err;
- 
- 	priv->phy_addr = ret;
- 	priv->embd_phy = ((priv->phy_addr & 0x1f) == AX_EMBD_PHY_ADDR);
-@@ -880,7 +884,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 			    &priv->chipcode, 0);
- 	if (ret < 0) {
- 		netdev_dbg(dev->net, "Failed to read STATMNGSTS_REG: %d\n", ret);
--		return ret;
-+		goto mdio_err;
- 	}
- 
- 	priv->chipcode &= AX_CHIPCODE_MASK;
-@@ -895,7 +899,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 	ret = priv->reset(dev, 0);
- 	if (ret < 0) {
- 		netdev_dbg(dev->net, "Failed to reset AX88772: %d\n", ret);
--		return ret;
-+		goto mdio_err;
- 	}
- 
- 	/* Asix framing packs multiple eth frames into a 2K usb bulk transfer */
-@@ -1258,7 +1262,9 @@ static int ax88178_bind(struct usbnet *dev, struct usb_interface *intf)
- 	int ret;
- 	u8 buf[ETH_ALEN] = {0};
- 
--	usbnet_get_endpoints(dev,intf);
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret)
-+		return ret;
- 
- 	/* Get the MAC address */
- 	ret = asix_read_cmd(dev, AX_CMD_READ_NODE_ID, 0, 0, ETH_ALEN, buf, 0);
--- 
-2.25.1
+On 30.03.2024 22:57, Andrew Lunn wrote:
+> On Fri, Mar 29, 2024 at 10:23:18AM +0100, Wojciech Drewek wrote:
+>> Some ethernet modules use nonstandard power levels [1]. Extend ethtool
+>> module implementation to support new attributes that will allow user
+>> to change maximum power. Rename structures and functions to be more
+>> generic. Introduce an example of the new API in ice driver.
+>>
+>> Ethtool examples:
+>> $ ethtool --show-module enp1s0f0np0
+>> Module parameters for enp1s0f0np0:
+>> power-min-allowed: 1000 mW
+>> power-max-allowed: 3000 mW
+>> power-max-set: 1500 mW
+>>
+>> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
+> 
+> We have had a device tree property for a long time:
+> 
+>   maximum-power-milliwatt:
+>     minimum: 1000
+>     default: 1000
+>     description:
+>       Maximum module power consumption Specifies the maximum power consumption
+>       allowable by a module in the slot, in milli-Watts. Presently, modules can
+>       be up to 1W, 1.5W or 2W.
+> 
+> Could you flip the name around to be consistent with DT?
 
+Yea, I'm open to any name suggestion although I don't like the unit in the parameter name :) 
+
+> 
+>> minimum-power-allowed: 1000 mW
+>> maximum-power-allowed: 3000 mW
+>> maximum-power-set: 1500 mW
+> 
+> Also, what does minimum-power-allowed actually tell us? Do you imagine
+> it will ever be below 1W because of bad board design? Do you have a
+> bad board design which does not allow 1W?
+
+Yes. in case of QSFP we don't support 1W, 1.5W is the minimum.
+This parameter tells the user what is the lowest limit he can set.
+
+> 
+> Also, this is about the board, the SFP cage, not the actual SFP
+> module?  Maybe the word cage needs to be in these names?
+
+It's about cage. Thanks for bringing it to my attention because now I
+see it might be misleading. I'm extending {set|show}-module command
+but the changes are about max power in the cage. With that in mind
+I agree that adding 'cage' to the names makes sense.
+
+> 
+> Do we want to be able to enumerate what the module itself supports?
+> If so, we need to include module in the name, to identify the numbers
+> are about the module, not the cage.
+
+I hope that my previous paragraph answers this as well.
+
+> 
+>     Andrew
 
