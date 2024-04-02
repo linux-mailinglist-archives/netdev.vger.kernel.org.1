@@ -1,202 +1,150 @@
-Return-Path: <netdev+bounces-84194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37CCB895FF3
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:13:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19151895FF6
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:14:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 565941C20EDF
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:13:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5E7A28534C
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 23:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571E33D3BC;
-	Tue,  2 Apr 2024 23:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094933E487;
+	Tue,  2 Apr 2024 23:14:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="UTLENcKq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rKUqR04r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723901D6AE
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 23:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41726224FA
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 23:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712099631; cv=none; b=t2owTkhyyHecnlCr+778OINHtbgm2VBHh44nDPMXuoEoWESv8pmePFLZtCfz3w+GQuUwcMA672LtxZldiRa+bawZnxB/nZgbhaue5eNoVEtez16sxWrBQoi0PZTSc/K8wbzOjvryzSLmED8kx4KEcDCbtdOqUhl4jbUruS/ioJU=
+	t=1712099657; cv=none; b=oxdf3Jw/F9AuXGdvMJb8bQIYqJ3BCJfGqqrMn7DJ89AJg5mbpyV9XRmOpLoZ2dMj/zFE5g4OSNP0Iaf86sr9nWLT8aFS8ugWk4h/hgTPUs5fmYznzSMwwE1uX9Eg/8R72Gedx1PjQgiDnw73evcL/XRbehle2LgsZL04OKPpLIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712099631; c=relaxed/simple;
-	bh=MmpZWUBB2vKBfw3rmXpNn5xt2H9k2XXIg4L+f4r28ho=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LaKCMvuP8TtTVuqEjXFUCs8cuDcX/uLfBIRFJ4B3byDU2wLK9oFX6sbLrcAp04IRwLw/ROFncXflAY5/JokPBAYFNFKRLLE9a9JFbKUF+vZNnbzw/7nDBALBkKGlvhSz9Yono1AxlWtDsq7VKnnERlg3mE2J5hcLtr9tpd1Vjas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=UTLENcKq; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-dcbf82cdf05so4858311276.2
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 16:13:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1712099628; x=1712704428; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gYMcrejXI7GPCev86KeNEsV+/yEflaCRUuzZ3qW3MXg=;
-        b=UTLENcKqEXRv2MStX+r6JXtkY72ji4GWSore7AmbzCNlyV1LHtjWKqFz4nK186iqow
-         soxtNzZ8kBhXbkvK4qyWhrNVFIsA8SrgrGWch1yUOR7B/1HbmvZCN5CCOQSWcd2HoXkO
-         M2rTW8+BcHaBU/wnEa6N7Ewm9bCc/uq3QbfbLJbE2FlFD6jEdXqT8d7+49qI6IdUGVfW
-         0SaYrn4MT4Luww2noJYZKyuzjQYXL2y1yxfV/QOneEMm542FZE+wwTu1bmsTXXgwcYiB
-         ZAMO+rzE97TNnnUxzGj0o2QWZpT84FqSV1nWlALOxMX445CE4zVFEYDVhDZBpv0AVmXs
-         sUlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712099628; x=1712704428;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gYMcrejXI7GPCev86KeNEsV+/yEflaCRUuzZ3qW3MXg=;
-        b=Ng1OYmqDkeBa6bqaO0+4qY+CvnyQly3JtrwYnxrwHGKfllRYt7BLUjSx4NOSLmAjIu
-         EtNG+EzflCJQp0KCE/dvNzxpe387XW7co2kNoISJ5tA5fWrE585qNPNGTs8CPO4ClYVc
-         Ougm5tEqYQWlVQ2twJCGcZn0Xf+mbJon8WXKXYIAWlikzRDSRjL9nQM+Ea4ANFELsiPi
-         IfZl0IhIExZNcUOKg3wjF4DLb5KWSF4CYs24LtY8ph+JZaoyB4qUjIqf3a0x+v+LojjO
-         cTHUPgmZAHtnne3hkwFV75trkzaElBmVwlmApcK7RV8JQECLadY85KYSRfJ99cEEyUV2
-         iEFQ==
-X-Gm-Message-State: AOJu0YzAKZ1yKj3jqJ+8oPaQd8YqnSyNF67r0ifngEMNfYBVGYB2O3Wh
-	wvcvaxbZd9LC/6h2fGwk5N7ZwKuEZ8SwgultdRc2t4IaFtu5wzxwmGW6cds9Wenjg2J9PT4DI95
-	1OcyGNqYN+bG025e5NdGQ/ySlVjb0CNS5Laty
-X-Google-Smtp-Source: AGHT+IEnBrm952jlWPpLFgUaPqkiKdXOguSeCjPGJCbzO/vdeND3YPYQ3vdEARGNS5GzrWokTa+QGVRndw7PdKYxXmY=
-X-Received: by 2002:a25:8b81:0:b0:dc2:398b:fa08 with SMTP id
- j1-20020a258b81000000b00dc2398bfa08mr10836302ybl.31.1712099628382; Tue, 02
- Apr 2024 16:13:48 -0700 (PDT)
+	s=arc-20240116; t=1712099657; c=relaxed/simple;
+	bh=O3GU0ImMOgJ4zCTROn++wcjJOQttinam+xM4irRp15Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TiWFnbu16h04eWVGdfSskUVw3izClrat7expQVF7qDdKtixLXBvzr+PuvIm/AObnX55hcT4qdZy5YgO4JI067TnMhwV/1bN0JtbFuNwJFuypmAPL4nsGoX11GwGkK8vLpe3MM7FXM7MNXZnBLR4Uhfal+pUuxXAHN0z+8d9S+1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rKUqR04r; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <59c52263-edd2-4585-b4f0-28c8d92d572c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712099652;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DsDOn4cgXYJbdNcryG8nZVgiiWs/27lyOYNlotPhh28=;
+	b=rKUqR04rZPve86OMI/qFw9AtOtWykNdWAVEqV6pgPLJRhJ+catFBQiOu1vcwrbagmOAZv/
+	ew0Epa+dO02Cj6qGG+gw7n7m9opvbfUIdWHa50oYUqxASe33q3a3+mjysDun3T4EGoGX11
+	8k2HAjNBiuEY5SMSjse2PyrRO45IaQA=
+Date: Tue, 2 Apr 2024 16:14:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325142834.157411-1-jhs@mojatatu.com> <877chfmoe5.fsf@toke.dk>
-In-Reply-To: <877chfmoe5.fsf@toke.dk>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 2 Apr 2024 19:13:36 -0400
-Message-ID: <CAM0EoM=dXbS-=h_oD13Rg4VcmAGFm1Je-nM0KhA4WXkO+RGpzQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 00/15] Introducing P4TC (series 1)
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com, 
-	jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, 
-	horms@kernel.org, khalidm@nvidia.com, daniel@iogearbox.net, 
-	victor@mojatatu.com, pctammela@mojatatu.com, dan.daly@intel.com, 
-	andy.fingerhut@gmail.com, chris.sommers@keysight.com, mattyk@nvidia.com, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 bpf-next 5/8] selftests/bpf: Factor out load_path and
+ defines from test_sock_addr
+To: Jordan Rife <jrife@google.com>
+Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Daan De Meyer <daan.j.demeyer@gmail.com>, bpf@vger.kernel.org
+References: <20240329191907.1808635-1-jrife@google.com>
+ <20240329191907.1808635-6-jrife@google.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240329191907.1808635-6-jrife@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Apr 2, 2024 at 5:43=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <to=
-ke@redhat.com> wrote:
->
-> Jamal Hadi Salim <jhs@mojatatu.com> writes:
->
-> > This is the first patchset of two. In this patch we are submitting 15 w=
-hich
-> > cover the minimal viable P4 PNA architecture.
-> > Please, if you want to discuss a slightly tangential subject like offlo=
-ad or
-> > even your politics then start another thread with a different subject l=
-ine.
-> > The way you do it is to change the subject line to for example
-> > "<Your New Subject here> (WAS: <original subject line here>)".
-> >
-> > In this cover letter i am restoring text i took out in V10 which stated=
- "our
-> > requirements".
-> >
-> > Martin, please look at patch 14 again. The bpf selftests for kfuncs is
-> > sloted for series 2. Paolo, please take a look at 1, 3, 6 for the chang=
-es
-> > you suggested. Marcelo, because we made changes to patch 14, I have
-> > removed your reviewed-by. Can you please take another look at that patc=
-h?
-> >
-> > __Description of these Patches__
-> >
-> > These Patches are constrained entirely within the TC domain with very t=
-iny
-> > changes made in patch 1-5. eBPF is used as an infrastructure component =
-for
-> > the software datapath and no changes are made to any eBPF code, only kf=
-uncs
-> > are introduced in patch 14.
-> >
-> > Patch #1 adds infrastructure for per-netns P4 actions that can be creat=
-ed on
-> > as need basis for the P4 program requirement. This patch makes a small
-> > incision into act_api. Patches 2-4 are minimalist enablers for P4TC and=
- have
-> > no effect on the classical tc action (example patch#2 just increases th=
-e size
-> > of the action names from 16->64B).
-> > Patch 5 adds infrastructure support for preallocation of dynamic action=
-s
-> > needed for P4.
-> >
-> > The core P4TC code implements several P4 objects.
-> > 1) Patch #6 introduces P4 data types which are consumed by the rest of =
-the
-> >    code
-> > 2) Patch #7 introduces the templating API. i.e. CRUD commands for templ=
-ates
-> > 3) Patch #8 introduces the concept of templating Pipelines. i.e CRUD
-> >    commands for P4 pipelines.
-> > 4) Patch #9 introduces the action templates and associated CRUD command=
-s.
-> > 5) Patch #10 introduce the action runtime infrastructure.
-> > 6) Patch #11 introduces the concept of P4 table templates and associate=
-d
-> >    CRUD commands for tables.
-> > 7) Patch #12 introduces runtime table entry infra and associated CU
-> >    commands.
-> > 8) Patch #13 introduces runtime table entry infra and associated RD
-> >    commands.
-> > 9) Patch #14 introduces interaction of eBPF to P4TC tables via kfunc.
-> > 10) Patch #15 introduces the TC classifier P4 used at runtime.
-> >
-> > There are a few more patches not in this patchset that deal with extern=
-s,
-> > test cases, etc.
->
-> Unfortunately I don't have the bandwidth to review these in details ATM,
-> but I think it makes sense to have P4 be a conceptual entity in TC, and
-> using eBPF as the infrastructure to execute the programs. So, on that
-> conceptual level only:
->
-> Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
->
+On 3/29/24 12:18 PM, Jordan Rife wrote:
+> diff --git a/tools/testing/selftests/bpf/sock_addr_helpers.c b/tools/testing/selftests/bpf/sock_addr_helpers.c
+> new file mode 100644
+> index 0000000000000..ff2eb09870f16
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/sock_addr_helpers.c
+> @@ -0,0 +1,46 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <unistd.h>
+> +
+> +#include <bpf/bpf.h>
+> +#include <bpf/libbpf.h>
+> +
+> +#include "cgroup_helpers.h"
+> +#include "sock_addr_helpers.h"
+> +#include "testing_helpers.h"
+> +
+> +int load_path(const char *path, enum bpf_attach_type attach_type,
+> +	      bool expect_reject)
+> +{
+> +	struct bpf_object *obj;
+> +	struct bpf_program *prog;
+> +	int err;
+> +
+> +	obj = bpf_object__open_file(path, NULL);
 
-Thanks Toke!
+Although it works, it is heading to the opposite direction by reusing things 
+from the older test_sock_addr.c.
 
-> [...]
->
-> > To summarize in presence of eBPF: The debugging idea is probably still
-> > alive.  One could dump, with proper tooling(bpftool for example), the
-> > loaded eBPF code and be able to check for differences. But this is not =
-the
-> > interesting part.
-> > The concept of going back from whats in the kernel to P4 is a lot more
-> > difficult to implement mostly due to scoping of DSL vs general purpose.=
- It
-> > may be lost.  We have been discussing ways to use BTF and embedding
-> > annotations in the eBPF code and binary but more thought is required an=
-d we
-> > welcome suggestions.
->
-> One thought on this: I don't believe there's any strict requirement that
-> the source lines in the "BTF lineinfo" information has to be C source
-> code. So if the P4 compiler can relate the generated BPF instructions
-> back to the original P4, couldn't it just embed the P4 program itself
-> (in some suitable syntax) as the lineinfo?
+test_sock_addr.c should have been moved to the test_progs. It is not run by bpf 
+CI and bits get rotten [e.g. the bug fix in patch 8]. There is also old practice 
+like bpf_object__open_file() should have been replaced with the skeleton 
+__open_and_load() instead of refactoring it out to create new use cases.
 
-I like it. Note, we do generate the P4 code embedded as comments in
-the eBPF code today.
-We'll look into it ;->
+The newer prog_tests/sock_addr.c was created when adding AF_UNIX support. It has 
+a very similar setup as the older test_sock_addr.c and the intention was to 
+finally retire test_sock_addr.c. e.g. It also has "load_fn loadfn" but is done 
+with skeleton, the program is also attached to cgroup...etc.
 
-cheers,
-jamal
+Instead of adding a new sock_addr_kern.c in patch 7, it probably will be easier 
+to add the kernel socket tests into the existing prog_tests/sock_addr.c.
+
+Also setup the netns and veth in the prog_tests/sock_addr.c instead of calling 
+out the test_sock_addr.sh (which should also go away eventually), there are 
+examples in prog_tests/ (e.g. mptcp.c).
+
+> +	err = libbpf_get_error(obj);
+> +	if (err) {
+> +		log_err(">>> Opening BPF object (%s) error.\n", path);
+> +		return -1;
+> +	}
+> +
+> +	prog = bpf_object__next_program(obj, NULL);
+> +	if (!prog)
+> +		goto err_out;
+> +
+> +	bpf_program__set_type(prog, BPF_PROG_TYPE_CGROUP_SOCK_ADDR);
+> +	bpf_program__set_expected_attach_type(prog, attach_type);
+> +	bpf_program__set_flags(prog, testing_prog_flags());
+> +
+> +	err = bpf_object__load(obj);
+> +	if (err) {
+> +		if (!expect_reject)
+> +			log_err(">>> Loading program (%s) error.\n", path);
+> +		goto err_out;
+> +	}
+> +
+> +	return bpf_program__fd(prog);
+> +err_out:
+> +	bpf_object__close(obj);
+> +	return -1;
+> +}
+
 
