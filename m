@@ -1,151 +1,143 @@
-Return-Path: <netdev+bounces-83989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053958952E7
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:25:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 611128952FE
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:31:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EFF91C2091E
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:25:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 161B71F25F26
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2584979DC5;
-	Tue,  2 Apr 2024 12:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46C63611A;
+	Tue,  2 Apr 2024 12:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y/PM2lOG"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="vdjQ06Bg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5DE76EEA
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 12:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AA9179BC
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 12:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712060731; cv=none; b=UBgW+wqG+r84wMZexUUZveB+ozOx95jK3c//6caGoPboS2Qtf8udHcsgHB6Oxq5CoAfEUaA+7ngG/UPuV5uvruRgD0smpmcfj4l1HZC05hnt5a9rcP8NazJlUew5Sjo932Md+7V82+zTDrQ8XCsTf3dGJxWlnIpQWi9a4fiKjRs=
+	t=1712061098; cv=none; b=KoHwv+/NZR0P6krvuBNX3z95TTakVlxW5dLJhRXJqNWDC6Nn1HsYW28pTPlKmbVMYxH9WVuVZZT464fzKk5SeRGN4VnQ4fC8dUIorLUp7fvVJwunpWsnX9Q+x661BjGs1JVbLdlw6f3uQpv1U4emTtcMEN0tlOYsl0AfSnxRNcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712060731; c=relaxed/simple;
-	bh=p/UeUz6BQzzlTj362U5Q+0hUyUg483V1OKi+HLKX4OI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bSbhbnstla9P8HmxlreKX1mjvForQZuEkbB75RHUbd4p3oIbnOhYr18pGoudnZdSO4kvXnr2hkeygO61KNrp3cOb9mP1oGZYtkhzJJ+NzkmJvlZQFe4x1z9E+neJM3S4gquxyJW9c9psBgzwflKRMtHsqJRWxlzs8AocndhAt+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Y/PM2lOG; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-61495e769bdso19093577b3.0
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 05:25:28 -0700 (PDT)
+	s=arc-20240116; t=1712061098; c=relaxed/simple;
+	bh=u4TqurvDSYaDyG20izaiR67Vx1pyxp7agqu+p333Hp0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KYR40avmWevA1r3UgrylVl5dks818UjGOfqEAZqUNvtMuwtJst/TKfEzMf2pCVO/4trM5/upLihotkCE/XTvM7QPFc0r/GL3OuOthRPe6oIe9j9/IlCrpFDNTFjhIxh9hgm0hkuVRdPpW/qKFaTQC7VVaFdbdF96jBcQlvfa988=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=vdjQ06Bg; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4161bd0a4ecso3729535e9.1
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 05:31:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712060727; x=1712665527; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XYDEIQksW8zQ45WbeyUEVn5ldQ4luRyFOVVyheFSkHo=;
-        b=Y/PM2lOGfwWISYEdLESt2KTtPtlHr8yg1/CGBA9FdtQYocQGHfZ+cW0YX8gg6woOzV
-         GW2SDVi0/W3ULE54zcjGLCvAVZmtCbh3VTBP3+tIbEtfDVbLhIKmqb1+a4TsXXIi5Yzk
-         SmHdUNPRN3zFBd10rSJY/qlNyGVwoVukAF36q+yItox15kUXELlUSRxcl8Mpdx9vLxmG
-         OY2lC+VOGMvXLQpb+r8L51QY+HHC99dDGGT3DX0N/M8WeSY9BE+U/oYh+6bWOLo9Abss
-         DlybL2mtVJawsbxg5WOsIutmwfbaMVxbHlwZxE2sF43N12B5PAMcfpnEeYIqUQTLlbrm
-         fqRA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712061095; x=1712665895; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8cPdJ2DC4s1xwaIRwwZa1ZKVK0gXJ5ygNpZWfwADz78=;
+        b=vdjQ06Bg9SW73eO+9usQ+Y1Lij390Spo9PuqH7mBJZE1n1gaP6ESBW4HOFuoBTxdfw
+         6WdqmFImO1SPczmEqIrZTavszcO/txTcM+mxNpVXlNeaxhMXjaK9rCVprRLcfEA3JBLM
+         DuofQNQfuh1PnNlbP9vhEUMEXRHCgrxY4LrhFM6R2nxW2zE+79vrx3pI/usN7t6HRnMq
+         Zhyyqmnktx8K+TKiqh2vTPzNDyVBQ2+jpz2eQqnkGv6ih56AiM04GNBJDiV40Z1GAf5e
+         9semdD8xFVc2tUvgAvsiB2ffWMtOdaEk4beFiA6c4dlBsiH60Xt/824zT045VR7L8La5
+         3grg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712060727; x=1712665527;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XYDEIQksW8zQ45WbeyUEVn5ldQ4luRyFOVVyheFSkHo=;
-        b=SCBVyJs/ckO1G3G/C3yZOqsKFaOdLZFNvsTx81PWGLBLdRl8kTTL7huFk+2rjx02Ye
-         GcpganKbQcVJ5EsY9A901hJCWnsvRNoW+tzEgMtZRMlZrCfBir/bg+6DeVgY/zggOhjn
-         4fTjZ5DZfknKcX8y8fvjxedgIuPzAVkyT/zmxiY7hEES+R+fPgE99mtMFl8HgkcrLXIu
-         ICdtFyb2jPy7ZWWnJ2u2ucLuT/m+PibxMwv8sCoFDBG40MnWUopodRnmJCWiY1bcnqzN
-         HMEvbF5LLSPsXX8bSlw7O0TBsvoD51ZXrazGcftqZn0pMXgYtyGTXdlSD3PgqKtu5Riz
-         nCOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqzs+vy+9wkpY82DZS24/4Pvl6duq43ddU/6o4Eab7kTO7TsAPgbr1OhsaaJZXVGfUuja0WiUbPSZ6Ou/25D/OznjAhdHi
-X-Gm-Message-State: AOJu0Yx17/4KiJPbNe5nVw6zUXwkvA6B37XT6xJcQrRNCrvWicwlBc1a
-	UEgIRFAi4JP8H+n4g9RKSZhv7M4KW5avoxSIUKnH4zkAZs3q/sUOVJG2cFC5VgVxwyN9jkRSWo/
-	6zGuhebv4lQ7+KCPYE+hLntWSASGAEawPYa8Apg==
-X-Google-Smtp-Source: AGHT+IFUrSspS0uEXi4Mtdf0lWq2f6Bt6/664idaePnQ5n7gs/Aofr4lkRbBJPYECBaOux5ZgxpPBc0T/C/GsKmHDRA=
-X-Received: by 2002:a5b:104:0:b0:dcc:ec02:38b0 with SMTP id
- 4-20020a5b0104000000b00dccec0238b0mr8733778ybx.64.1712060727251; Tue, 02 Apr
- 2024 05:25:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712061095; x=1712665895;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8cPdJ2DC4s1xwaIRwwZa1ZKVK0gXJ5ygNpZWfwADz78=;
+        b=l6EaVv66cvfIGkkcPiT1WPebrAw3LGBtPwN0AtfS1Z+PBcVryrmUKqhgviP9sxTcwq
+         uVvFCP72zK1v91HEH4Vr50/lvXZIWkD/UoljZXc9obk2R6gY+Bj7pa9BWQJ5XosAopJR
+         ZEoq2Nh/7eH6slKbIrW1VLX9IcXVhFRzwIXKW4u+Gzr7KWX2rc0OAVKF6qt3u/9KK1aE
+         lbRDrIJyRxAv1qsl0ogn6wfmerPUDl09qIUtcEVcSiQ+TQ7mzL1JQnCMcdTsahXEjBXg
+         8bVoJUF68ouACRs+YU1YSIFTQw8MVIHx/ZUwFL1GLYtyQ8XoPHekSUFcddoE56IVYfM9
+         /uOw==
+X-Gm-Message-State: AOJu0YyruW/v5/Sjbxj7uRdIGSg+hlpe+KUw6+MJQ8gOTTXLTw5Z/lMn
+	mM9mfhLH5iKw+KFn57YfaymKOSaJIUbVywUrR7Hsa0voklG0OAjAL+8XFRF6ciUnEzfyxicD/QS
+	a8xs=
+X-Google-Smtp-Source: AGHT+IH6F276XKPfLLESEg2CvuS6EJ1WD9Utu2NYmDX0fj9u/h9oL4neKmhrTYQ8XusSQEJO4uh4nQ==
+X-Received: by 2002:a7b:cd0c:0:b0:414:610b:13c3 with SMTP id f12-20020a7bcd0c000000b00414610b13c3mr9266507wmj.27.1712061094941;
+        Tue, 02 Apr 2024 05:31:34 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id bq24-20020a5d5a18000000b0033e45930f35sm14305489wrb.6.2024.04.02.05.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 05:31:34 -0700 (PDT)
+Date: Tue, 2 Apr 2024 14:31:31 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, victor@mojatatu.com,
+	kuba@kernel.org, pctammela@mojatatu.com, martin@strongswan.org,
+	horms@kernel.org, Johannes Berg <johannes.berg@intel.com>
+Subject: Re: [PATCH net-next v2 1/2] rtnetlink: add guard for RTNL
+Message-ID: <Zgv6o3rcgFu1DXpV@nanopsycho>
+References: <20240328082748.b6003379b15b.I9da87266ad39fff647828b5822e6ac8898857b71@changeid>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327160314.9982-1-apais@linux.microsoft.com> <20240327160314.9982-3-apais@linux.microsoft.com>
-In-Reply-To: <20240327160314.9982-3-apais@linux.microsoft.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 2 Apr 2024 14:25:15 +0200
-Message-ID: <CACRpkdaSBGe0EFm1gK-7qPK4e6T2H1dxFXjhJqO2hWCm1-bNdA@mail.gmail.com>
-Subject: Re: [PATCH 2/9] dma: Convert from tasklet to BH workqueue
-To: Allen Pais <apais@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, tj@kernel.org, keescook@chromium.org, 
-	vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev, 
-	florian.fainelli@broadcom.com, rjui@broadcom.com, sbranden@broadcom.com, 
-	paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com, 
-	manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com, 
-	leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com, 
-	haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de, 
-	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, afaerber@suse.de, 
-	logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com, 
-	robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org, 
-	orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com, 
-	patrice.chotard@foss.st.com, wens@csie.org, jernej.skrabec@gmail.com, 
-	peter.ujfalusi@gmail.com, kys@microsoft.com, haiyangz@microsoft.com, 
-	wei.liu@kernel.org, decui@microsoft.com, jassisinghbrar@gmail.com, 
-	mchehab@kernel.org, maintainers@bluecherrydvr.com, 
-	aubin.constans@microchip.com, ulf.hansson@linaro.org, manuel.lauss@gmail.com, 
-	mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com, 
-	hayashi.kunihiko@socionext.com, mhiramat@kernel.org, brucechang@via.com.tw, 
-	HaraldWelte@viatech.com, pierre@ossman.eu, duncan.sands@free.fr, 
-	stern@rowland.harvard.edu, oneukum@suse.com, 
-	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org, 
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	linux-mediatek@lists.infradead.org, linux-actions@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-omap@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240328082748.b6003379b15b.I9da87266ad39fff647828b5822e6ac8898857b71@changeid>
 
-Hi Allen,
-
-thanks for your patch!
-
-On Wed, Mar 27, 2024 at 5:03=E2=80=AFPM Allen Pais <apais@linux.microsoft.c=
-om> wrote:
-
-> The only generic interface to execute asynchronously in the BH context is
-> tasklet; however, it's marked deprecated and has some design flaws. To
-> replace tasklets, BH workqueue support was recently added. A BH workqueue
-> behaves similarly to regular workqueues except that the queued work items
-> are executed in the BH context.
+Thu, Mar 28, 2024 at 08:27:49AM CET, johannes@sipsolutions.net wrote:
+>From: Johannes Berg <johannes.berg@intel.com>
 >
-> This patch converts drivers/dma/* from tasklet to BH workqueue.
+>The new guard/scoped_gard can be useful for the RTNL as well,
+>so add a guard definition for it. It gets used like
 >
-> Based on the work done by Tejun Heo <tj@kernel.org>
-> Branch: git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
+> {
+>   guard(rtnl)();
+>   // RTNL held until end of block
+> }
 >
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-(...)
-> diff --git a/drivers/dma/ste_dma40.c b/drivers/dma/ste_dma40.c
-(...)
->         if (d40c->pending_tx)
-> -               tasklet_schedule(&d40c->tasklet);
-> +               queue_work(system_bh_wq, &d40c->work);
+>or
+>
+>  scoped_guard(rtnl) {
+>    // RTNL held in this block
+>  }
+>
+>as with any other guard/scoped_guard.
+>
+>Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 
-Why is "my" driver not allowed to use system_bh_highpri_wq?
+Since you add couple of helpers, I believe it is a nice custom to add a
+couple of patches that actually uses them. Would that make sense?
 
-I can't see the reasoning between some drivers using system_bh_wq
-and others being highpri?
 
-Given the DMA usecase I would expect them all to be high prio.
-
-Yours,
-Linus Walleij
+>---
+>v2: resend
+>---
+> include/linux/rtnetlink.h | 3 +++
+> 1 file changed, 3 insertions(+)
+>
+>diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+>index cdfc897f1e3c..a7da7dfc06a2 100644
+>--- a/include/linux/rtnetlink.h
+>+++ b/include/linux/rtnetlink.h
+>@@ -7,6 +7,7 @@
+> #include <linux/netdevice.h>
+> #include <linux/wait.h>
+> #include <linux/refcount.h>
+>+#include <linux/cleanup.h>
+> #include <uapi/linux/rtnetlink.h>
+> 
+> extern int rtnetlink_send(struct sk_buff *skb, struct net *net, u32 pid, u32 group, int echo);
+>@@ -46,6 +47,8 @@ extern int rtnl_is_locked(void);
+> extern int rtnl_lock_killable(void);
+> extern bool refcount_dec_and_rtnl_lock(refcount_t *r);
+> 
+>+DEFINE_LOCK_GUARD_0(rtnl, rtnl_lock(), rtnl_unlock())
+>+
+> extern wait_queue_head_t netdev_unregistering_wq;
+> extern atomic_t dev_unreg_count;
+> extern struct rw_semaphore pernet_ops_rwsem;
+>-- 
+>2.44.0
+>
 
