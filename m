@@ -1,73 +1,100 @@
-Return-Path: <netdev+bounces-83883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77823894AAD
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 06:54:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F92C894AB3
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 07:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 320FF281D45
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 04:54:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F5C286B15
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 05:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A006D17C72;
-	Tue,  2 Apr 2024 04:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8944017C9B;
+	Tue,  2 Apr 2024 05:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECYEgUpR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHscOdeq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B231F9DF
-	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 04:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AD117C7C
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 05:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712033647; cv=none; b=iuwOlErQrjCjxImWVdOoVTCPEStXu9/RYeoX3Eoi1K3nvDCmPPSuT9ccCsWB+kw4S6lrot67yEtX1lKmCpfZ0dtsSGB5EzoU/qIygveXhcC8Syq8JDU0wBjaHa3t2vs98qdor4eM3G1yKtDEIGRndysRqXSnZ3rA+8B5AUcmxbQ=
+	t=1712034029; cv=none; b=tFJhK2gPTx1L7/80OFjP5WjrwYRB9vS+Tuf7J8Ax45F6TT/BHBnUA+q0TGUR87cIof68UJKyk4UJESNH6nTUnhTXEC5WzesnFsUhgX4x1pLMGQgD+huz8/N8xG5WkEpRi+FIxwVuae2SK4rpuWP6tcR+rY0c5rutt53HQqlb/9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712033647; c=relaxed/simple;
-	bh=2f81g5IaGBxBQJWOwYHAYs+10AhgnN5h6Wg8GE0zg9U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r9A2LdboLbyc6ebzH0hMZqs3DBmviHv7zHYGX5fXzrY/3HKCmIoXPubJ1ZfgrHhhQJmMvPDg2DGpWnRFdvUXPOfqxeQl+FpPRBk4/tocU8Z/JSBhgHXUqA2p/EuDbT+CjUW8gj7WV5m844QLY/q6znH06bRDQRmcPj52BW8fLgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ECYEgUpR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80DBEC433F1;
-	Tue,  2 Apr 2024 04:54:06 +0000 (UTC)
+	s=arc-20240116; t=1712034029; c=relaxed/simple;
+	bh=HWL9flNheJcA+w3kaqCYuBzzCA4mGw57vDgmCHsfmy0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EShRfSC98Ru3Gsm7jc3NNoB6LbvBQ71QVk0LOPUMVFF4/lbjaZELQ5PAZi7jZgv4xjzmEcZF+eqMaaB3eHLchGu2cgOQndjaaiUdzKWUoANEJWXJQs5glEtAZRri//cD0DbzuDvx11S/d4MrfVjMRwPuFfzw/i/+USJjQM0ZNME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHscOdeq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3CEC1C43390;
+	Tue,  2 Apr 2024 05:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712033647;
-	bh=2f81g5IaGBxBQJWOwYHAYs+10AhgnN5h6Wg8GE0zg9U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ECYEgUpRjcXVzemUs6ETgu3V7s5yEF4qfN3ULgu59R0MD0lFmTncqqSrQEHLoSCl3
-	 uBqN2eD/GfXj3XY3M4dVx+BxFrKauzh1shwZumhhXb8Mq9NMp+d3WtrpwVg/S3HMa+
-	 opYVh+R6ON1qHSrb7NVJP1u7uZ6/4bhmOO+UUAczS0DX/63mTXNDQ/KRNAHGTxB30E
-	 49fjZfZ0eWUneDYxPZNygYnkZm/XeG2dS926H36NF9zK5IOtss/rlLF3rjam+5lJTH
-	 C0s1bqflHVjpp8xCSS0pTRAUVttRI1YTB7eThTTek4HdTmIfTc1Z2qrcv3DP5aPdpQ
-	 rGkLraohv2+rg==
-Date: Mon, 1 Apr 2024 21:54:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: michael.chan@broadcom.com, davem@davemloft.net, edumazet@google.com,
- gospo@broadcom.com, netdev@vger.kernel.org, pabeni@redhat.com, Sreekanth
- Reddy <sreekanth.reddy@broadcom.com>, Kalesh AP
- <kalesh-anakkur.purayil@broadcom.com>, Somnath Kotur
- <somnath.kotur@broadcom.com>
-Subject: Re: [PATCH net-next 7/7] bnxt_en: Add warning message about
- disallowed speed change
-Message-ID: <20240401215405.12ecd5e2@kernel.org>
-In-Reply-To: <20240401035730.306790-8-pavan.chebbi@broadcom.com>
-References: <20240401035730.306790-1-pavan.chebbi@broadcom.com>
-	<20240401035730.306790-8-pavan.chebbi@broadcom.com>
+	s=k20201202; t=1712034029;
+	bh=HWL9flNheJcA+w3kaqCYuBzzCA4mGw57vDgmCHsfmy0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nHscOdeqYccsU4spmbzbJNpMrezNfCisz+8kKG68DT4fL6rJEMdZQF5RZKi0fXIW+
+	 Tb0PXYFVEcRLoGvAf29K9JgWsLct7E7BHC90SacaAIbBdXp0u0EntCSrDAQy82rz2f
+	 Gdp7Ep9jA2j4yI/piLt/bAX0sq6xiwut6+wmSa+UH8sBLxCYvpd47cX7fgF4QXB+6n
+	 /kFZ15hwPwGAZQu4ugMn0EiDRrN6Zg9iH5xYD5lgC+XNI1szbYfgJhuRa+YFF2ubEN
+	 2UfQqzQ471ulyExXLdCWTWBtvjOwhjNFlIyHISMUf1W5Gqi6ac/A+nEnl4+aeoijhp
+	 BDJvOfDldS+wQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2CBD3D9A156;
+	Tue,  2 Apr 2024 05:00:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/4][pull request] Intel Wired LAN Driver Updates
+ 2024-03-29 (net: intel)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171203402917.17077.1793675277084228711.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Apr 2024 05:00:29 +0000
+References: <20240329175632.211340-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240329175632.211340-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
-On Sun, 31 Mar 2024 20:57:30 -0700 Pavan Chebbi wrote:
-> +		netdev_warn(bp->dev,
-> +			    "Speed change not supported with dual rate transceivers on this board\n"
-> +			    );
+Hello:
 
-closing bracket goes on the end of the previous line
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
+
+On Fri, 29 Mar 2024 10:56:23 -0700 you wrote:
+> This series contains updates to most Intel drivers.
+> 
+> Jesse moves declaration of pci_driver struct to remove need for forward
+> declarations in igb and converts Intel drivers to user newer power
+> management ops.
+> 
+> Sasha reworks power management flow on igc to avoid using rtnl_lock()
+> during those flows.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/4] igb: simplify pci ops declaration
+    https://git.kernel.org/netdev/net-next/c/47220a1e0b70
+  - [net-next,2/4] net: intel: implement modern PM ops declarations
+    https://git.kernel.org/netdev/net-next/c/75a3f93b5383
+  - [net-next,3/4] igc: Refactor runtime power management flow
+    https://git.kernel.org/netdev/net-next/c/6f31d6b643a3
+  - [net-next,4/4] i40e: avoid forward declarations in i40e_nvm.c
+    https://git.kernel.org/netdev/net-next/c/ee4300b24a32
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
