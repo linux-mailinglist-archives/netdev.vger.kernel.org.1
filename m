@@ -1,129 +1,132 @@
-Return-Path: <netdev+bounces-83995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A16B589533D
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:38:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 924F88953B1
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 14:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 407A71F255A0
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:38:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A7D7B28546
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 12:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B189E84FB0;
-	Tue,  2 Apr 2024 12:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1B979DBB;
+	Tue,  2 Apr 2024 12:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="n+ex7qwz"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="E9ALvRv3"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570B58289D;
-	Tue,  2 Apr 2024 12:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7FF1DFD0;
+	Tue,  2 Apr 2024 12:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712061407; cv=none; b=lo+jpnWQgOcsjLaKYBkLCbPPZCVBBOdFz2KHVkiNZu9wIMd0AhzkCvvVbnTB8SSOZlj3dq6eMbp4+1qUeLNrsJ1UzgFCMxkeTUQn5AWE55/NZZnp8YzdFCBJ7IGt/3h5L+P/us1NcpCOOhz+pGJiX7tMKgK4KstdeN+406tEMGw=
+	t=1712061710; cv=none; b=jifyGj8thYJWjDKbbnWsZBA1hJ34rFtRo3FJZqSwKVyrxr+YuJ4IGplE+ixAkwLSsu4SipXmoW5O3V9mPJjMdYjHmPB6qKt4fFbC5YWxv9UkoWOFMQbKXwoMI2Nqw82qOdJ8yyBb8y419SxHqq5KUaE2ifL0xzg4bC9SgxbmvaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712061407; c=relaxed/simple;
-	bh=C7wvbq7Dl7vRv/z7yWDMGXVmSzEb8Uka7KOqvcx6I1I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X7stXhmGJy+WxnC7V2lVJJI8dqgIwOK3Wpzg2kYfrTmVtVfFlVzKdfapLpIXWYkrBXY/724ho/lbY/Lv0LlRw2NdP89JR1kIzXPG5J54HMkSCR+TiLx7yQVtLzbgOZZZfZX8x36cSfntoNNP/EjicNi9pb4O91gGZfw1JDZ91wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=n+ex7qwz; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8B431FF80E;
-	Tue,  2 Apr 2024 12:36:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1712061397;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MxX4gGO1cf6dYcz+BOp+BvU3IyOz8Kkdye9gsRIK7QY=;
-	b=n+ex7qwzQ7ziFrjCxgPfwRIY61xb6tVeXZaMeutMjWVpXbMCUHDbKEsyI0mwZr1r/9juTB
-	LlSx6DLoDT/ElN66FIyi09ilOty7GXqERMlgm2rgPRUfM2mztzJqDlROd9RH2GXiUQXXvB
-	vg0qx0tP26EO3RVhZHA+gSYMCZKN//Kz4DSkWXdjUOKaCcTyNab7hEulH5SOyJADz2hfF1
-	9xmfTUaoT3TbloR0Cq3bzbyQoJleQsQ3f2iHWnNjPj3F0TyQU+2U9jz/XY8yc6aTjhb3+r
-	PSaWH+oYAEUQEzdQtbrGRP168TVlh48wwtOry6nL0joRrzaGOtrra1bu3E/18g==
-From: Romain Gantois <romain.gantois@bootlin.com>
-Date: Tue, 02 Apr 2024 14:37:02 +0200
-Subject: [PATCH net-next 3/3] ARM: dts: r9a06g032: describe GMAC1
+	s=arc-20240116; t=1712061710; c=relaxed/simple;
+	bh=1sK+VypOcmid7qwbW8cHSt6aTLQKQQ5uOqH4Z2IWETA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cJYOzgzjy6NPb4zNyNkGSwnMB/i3joRZcvqyBPwjaTylnaC9N34x3AMehdsB8okKFa8LjhK2s7P7lepmTjDe/6Rqx99xjq/zxZKSJgrYNzF2EXiDxCOxVk38UZrzQll3vd/TJcKzTy8xTksLCHQCOv5e66l760N5tzPk1ENXFu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=E9ALvRv3; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 432CY4mL002252;
+	Tue, 2 Apr 2024 12:41:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JG8OlfkiM/82pPKQvl5RNdoa+aZbT05Y5kKD3vV3B5k=;
+ b=E9ALvRv3/Pm23UJiv2p82vy4yN9qoVA0b2zs0D6X0PBBjlb44RiEk2qIy1D8fYnL49ju
+ hdY2fnVuwYIAKPGqVdC2xJuo7xbn3WmxSbkZN9WzAB7Z7HyCIp15V1k/zYZw7fshFz+V
+ D32X8oa5eD0UJPlbBjwaj9EI8Ez//pF7XEHXwY8zBxSNpSuucF9852YhnTOdjwEuN77a
+ rUZVaSIg5YVc0AXfGRDdmflsGUrwXxYLieV5SeLGlmY+xxSRBSV0sOxjag4v44U7tbbL
+ jY1lbxaERvCv81xPS40iYGmP6PFAMPIwGbRbmbDYz8BiqobQBS3Zd2/nxvctPU8xBBtF WQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x8j4gr0tv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Apr 2024 12:41:30 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 432CeUKH012188;
+	Tue, 2 Apr 2024 12:41:29 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x8j4gr0ts-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Apr 2024 12:41:29 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4329nZbw008463;
+	Tue, 2 Apr 2024 12:41:28 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x6w2txrf2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Apr 2024 12:41:28 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 432CfPLn39453118
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 2 Apr 2024 12:41:27 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EEC7A2004F;
+	Tue,  2 Apr 2024 12:41:24 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A9FFF2004E;
+	Tue,  2 Apr 2024 12:41:24 +0000 (GMT)
+Received: from [9.152.224.141] (unknown [9.152.224.141])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  2 Apr 2024 12:41:24 +0000 (GMT)
+Message-ID: <4110b0fb-0005-45b6-9996-978b9bab8beb@linux.ibm.com>
+Date: Tue, 2 Apr 2024 14:41:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240402-rzn1-gmac1-v1-3-5be2b2894d8c@bootlin.com>
-References: <20240402-rzn1-gmac1-v1-0-5be2b2894d8c@bootlin.com>
-In-Reply-To: <20240402-rzn1-gmac1-v1-0-5be2b2894d8c@bootlin.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Geert Uytterhoeven <geert+renesas@glider.be>, 
- Magnus Damm <magnus.damm@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- =?utf-8?q?Cl=C3=A9ment_L=C3=A9ger?= <clement.leger@bootlin.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, 
- Romain Gantois <romain.gantois@bootlin.com>
-X-Mailer: b4 0.13.0
-X-GND-Sasl: romain.gantois@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] net/iucv: Avoid explicit cpumask var
+ allocation on stack
+To: Dawei Li <dawei.li@shingroup.cn>, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, ioana.ciornei@nxp.com,
+        twinkler@linux.ibm.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20240331053441.1276826-1-dawei.li@shingroup.cn>
+ <20240331053441.1276826-2-dawei.li@shingroup.cn>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20240331053441.1276826-2-dawei.li@shingroup.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3KCg2rCe30HM0RqJDpyETp1Dlk6yxmTC
+X-Proofpoint-ORIG-GUID: 5wGrZzyAyOzRZBC_xPLjVLgE2LCnLnX-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-02_06,2024-04-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ bulkscore=0 impostorscore=0 suspectscore=0 clxscore=1011 malwarescore=0
+ priorityscore=1501 mlxlogscore=991 lowpriorityscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403210000 definitions=main-2404020092
 
-From: Clément Léger <clement.leger@bootlin.com>
 
-The r9a06g032 SoC of the RZ/N1 family features two GMAC devices named
-GMAC1/2, that are based on Synopsys cores. GMAC1 is connected to a
-RGMII/RMII converter that is already described in this device tree.
 
-Signed-off-by: "Clément Léger" <clement.leger@bootlin.com>
-[rgantois: commit log]
-Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
----
- arch/arm/boot/dts/renesas/r9a06g032.dtsi | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+On 31.03.24 07:34, Dawei Li wrote:
+> For CONFIG_CPUMASK_OFFSTACK=y kernel, explicit allocation of cpumask
+> variable on stack is not recommended since it can cause potential stack
+> overflow.
+> 
+> Instead, kernel code should always use *cpumask_var API(s) to allocate
+> cpumask var in config-neutral way, leaving allocation strategy to
+> CONFIG_CPUMASK_OFFSTACK.
+> 
+> Use *cpumask_var API(s) to address it.
+> 
+> Signed-off-by: Dawei Li <dawei.li@shingroup.cn>
+> ---
 
-diff --git a/arch/arm/boot/dts/renesas/r9a06g032.dtsi b/arch/arm/boot/dts/renesas/r9a06g032.dtsi
-index fa63e1afc4ef..cab7a641f95b 100644
---- a/arch/arm/boot/dts/renesas/r9a06g032.dtsi
-+++ b/arch/arm/boot/dts/renesas/r9a06g032.dtsi
-@@ -316,6 +316,25 @@ dma1: dma-controller@40105000 {
- 			data-width = <8>;
- 		};
- 
-+		gmac1: ethernet@44000000 {
-+			compatible = "renesas,r9a06g032-gmac", "renesas,rzn1-gmac", "snps,dwmac";
-+			reg = <0x44000000 0x2000>;
-+			interrupt-parent = <&gic>;
-+			interrupts = <GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 36 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>;
-+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi";
-+			clocks = <&sysctrl R9A06G032_HCLK_GMAC0>;
-+			clock-names = "stmmaceth";
-+			power-domains = <&sysctrl>;
-+			snps,multicast-filter-bins = <256>;
-+			snps,perfect-filter-entries = <128>;
-+			tx-fifo-depth = <2048>;
-+			rx-fifo-depth = <4096>;
-+			pcs-handle = <&mii_conv1>;
-+			status = "disabled";
-+		};
-+
- 		gmac2: ethernet@44002000 {
- 			compatible = "renesas,r9a06g032-gmac", "renesas,rzn1-gmac", "snps,dwmac";
- 			reg = <0x44002000 0x2000>;
-
--- 
-2.44.0
+LGTM; 
+Thank you Eric for the comment and solution with the 'static' keyword.
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
 
 
