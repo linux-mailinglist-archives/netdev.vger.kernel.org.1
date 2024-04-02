@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-83913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-83914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B97C8894D7D
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 10:31:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7200F894D85
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 10:32:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7555328296D
-	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 08:31:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A382E1C20E88
+	for <lists+netdev@lfdr.de>; Tue,  2 Apr 2024 08:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E4881772D;
-	Tue,  2 Apr 2024 08:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FAB45948;
+	Tue,  2 Apr 2024 08:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzptfXme"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="abdPi9zM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A792EAF7;
-	Tue,  2 Apr 2024 08:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D393D996
+	for <netdev@vger.kernel.org>; Tue,  2 Apr 2024 08:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712046630; cv=none; b=TEnP9aBZFIHT9q9cLes71jUU754dPTOm5pKrb/ndSaVHNQwT8LeIrzyhzH/7AjLmcH7ZG6GlgtSlC47nVisoA979mlP3hIqxUFfVC1Xj0u6uous4RwGGlm07rAqoYP7aKCEcn3OE0vAZxLq14DpVpFIzyrQdsGgx/BTPYXaSdhk=
+	t=1712046675; cv=none; b=EJ86wAhaKkoHk9zNmCm8mvolrNEOxzpBOEdT/ImYwsk9ZeR8LrhpVRD8BkdJvt/6EwYgLO0pUge0q1tKSfZ0tzNUF9ZWxuHUWHkQDoc1Jw8S2djmGiiuWkq8NAdSoN3pCqtS/pxSaWGMEqtO762buLcgEVPOILDr/qzMu1eFqeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712046630; c=relaxed/simple;
-	bh=Yp6tOq+QIQyi5+nIO0v06Gfl2kI+9Jdp7GY7P6Wta6Q=;
+	s=arc-20240116; t=1712046675; c=relaxed/simple;
+	bh=Ui0tid6TRIOKrbC2k4Bsxf46+tePZJcc0J/KJb8yQ18=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QHCnWiFaydnzESdkiedPmpkRT425DxVObXK56zYij7GOVrQglQ6+Stmcs4LQbZU2EFbAykKc++0E6TLT2bOI/PlBjpcO7w+MQm1B5tMCocwBrhVJNF3hSWodfJj9g3j/UKK9H3VrYhZpgzUmJoyPPKb6tAoVAIxduggXSBgJfqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MzptfXme; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11CDAC433F1;
-	Tue,  2 Apr 2024 08:30:27 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=js+/iFUj2nwp2tH1OdG9IFLzZRHiIWq8prZBYZghjpVtVkQnTqTF+dIjdJCNt584m6TIZNyEPedjpvG6ehHO3B/AnFR8r+zBSogLdL4hdhGOi0una+Xa/Pbd+S5Ouq5Erh9p1Sq57ZtMbt8+ZtaiFCq8vvtDBi1H+o+hLHVN/io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=abdPi9zM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5441AC43390;
+	Tue,  2 Apr 2024 08:31:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712046629;
-	bh=Yp6tOq+QIQyi5+nIO0v06Gfl2kI+9Jdp7GY7P6Wta6Q=;
+	s=k20201202; t=1712046674;
+	bh=Ui0tid6TRIOKrbC2k4Bsxf46+tePZJcc0J/KJb8yQ18=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MzptfXmea8EAAT6BfV+z3zRkEHP/d2OdUwsF67JVWH/gV1/vr9lozyUpzO5m80hTG
-	 /YRNMjd1o+7iaWTA2Z+tYXt4v9thJOSsFSgoIbKgG8zc2xKXBeS/mND48HiW8KNQae
-	 WI1or/7fD/AJU6p1kf+QI3lk3vJPsmltGj4lnxK47MEKUyWUWOr5Ev18DnAn2NVJPb
-	 QeAvE15C5LwEvdSAp27897yvqVc08e4CVhEiDiyJdZcjmPT3XLhM5qqRdIVcDa9DP+
-	 9zJ54Nc40khlIExdwrH6X3xaDi7A+yGeLUwuDLcbZR0xe0cRfck/GELT6io6BtFepn
-	 EhWdvNWlpoKyQ==
-Date: Tue, 2 Apr 2024 09:30:25 +0100
+	b=abdPi9zMVwc8B/X8IyFvJBKCg63aod2sDa3kW+A1wCDEazrCUwXpT6rhef5qf2JIS
+	 6LBD8bC6UcDh33pJvO/wZ2OIanHtFP9AHb5CmXrHpXm58cOgdeI9yAWiPFX28m2UiX
+	 7043sBdBPA+hKLFMvmyShuQPpJ/IOMv6nYsYwWq2dYmnjJfr1bFWFElwUH1SYEFrMq
+	 rLzJFw7PVX/FKhuYh/CYwuZU3pIPiRk4BZ9zOTr0VhdklYTRKOqbsSw/2Usj+HwhtB
+	 k1NvvEVyeXry+hTD3FpLhPSCNyE1N155CUy/D7H5VOl7c/0heo9nYw6939JfS+Cf2c
+	 eald+BpwQG/AQ==
+Date: Tue, 2 Apr 2024 09:31:11 +0100
 From: Simon Horman <horms@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: rkannoth@marvell.com, "David S. Miller" <davem@davemloft.net>,
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2] caif: Use UTILITY_NAME_LENGTH instead of
- hard-coding 16
-Message-ID: <20240402083025.GH26556@kernel.org>
-References: <8c1160501f69b64bb2d45ce9f26f746eec80ac77.1711787352.git.christophe.jaillet@wanadoo.fr>
+	Jakub Kicinski <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] r8169: fix issue caused by buggy BIOS on certain
+ boards with RTL8168d
+Message-ID: <20240402083111.GI26556@kernel.org>
+References: <64f2055e-98b8-45ec-8568-665e3d54d4e6@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,16 +61,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8c1160501f69b64bb2d45ce9f26f746eec80ac77.1711787352.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <64f2055e-98b8-45ec-8568-665e3d54d4e6@gmail.com>
 
-On Sat, Mar 30, 2024 at 09:32:12AM +0100, Christophe JAILLET wrote:
-> UTILITY_NAME_LENGTH is 16. So better use the former when defining the
-> 'utility_name' array. This makes the intent clearer when it is used around
-> line 260.
+On Sat, Mar 30, 2024 at 12:49:02PM +0100, Heiner Kallweit wrote:
+> On some boards with this chip version the BIOS is buggy and misses
+> to reset the PHY page selector. This results in the PHY ID read
+> accessing registers on a different page, returning a more or
+> less random value. Fix this by resetting the page selector first.
 > 
-> While at it, declare variable in reverse xmas tree style.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Fixes: f1e911d5d0df ("r8169: add basic phylib support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
+
 
