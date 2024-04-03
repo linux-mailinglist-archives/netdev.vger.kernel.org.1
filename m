@@ -1,121 +1,120 @@
-Return-Path: <netdev+bounces-84426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5D6C896ED6
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:27:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93BF0896EE0
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7F0E1C25D20
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:27:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A1431F231C4
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8A2145FF8;
-	Wed,  3 Apr 2024 12:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E20146A7C;
+	Wed,  3 Apr 2024 12:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RttR61FS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxDTG0Y0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379921465B0;
-	Wed,  3 Apr 2024 12:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E087146A75;
+	Wed,  3 Apr 2024 12:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712147215; cv=none; b=bj/l53qqTZU+tEfcl7nR+YtlBTl/EKhj2j8nGF9TIMb6qUwM9AL1J0n9Jq1VNaWjeepQ5w7rTCt/Vp9755/xdYt35aA/oDs/i1sfhzMtG9dibZneAUPbo7//C+CeAV+Xd8Hc44dtxSg5IC2jtdS2AThIVC74tZcUE4LfOgYiyqE=
+	t=1712147396; cv=none; b=UiwPJD4pUcjnnn6UYPkT4tm5Lo3xDh9MvhQcZ/ZXiUIqag09nwgWW60JKBvuV+A9bQyFFOenqH003tGOWBCvFE2j0x4f4oerujMjkzrVY/XhYw3ZsA9f3I2bvjU6DubR+1tIyt4wEr3gX8W8TeojkHOhDJ4KxUT19VqWoRVWHXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712147215; c=relaxed/simple;
-	bh=ukDQ77z0zTDgEHZ5/JvW3hHKfTwSHmNYJHt/j79mwG0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=hVEZ7JQ0KJeXqR+dgDNNS7TUuPnjcaM0rXlKlHnDHDnAiID03Rvi7dzYfoQdt5uXSlMJTw6RgIG64CiTkCGK0PVtGNCpVGrUESbWRlyEiMEH9CQJ5HiSOGIqwt8V4hPk8tLUYJNJlvJRToCABaR5rorOXceT4AjENaCYLz8MFao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RttR61FS; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41569f1896dso19420645e9.2;
-        Wed, 03 Apr 2024 05:26:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712147212; x=1712752012; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KvCLM7KWbyJGgG8sR6Sshx7UgvNmX8RL0J9lEmjrHw4=;
-        b=RttR61FSZdPQAYMdxpMrP5N8ZxrxaIBDjWHKI7FRO6o6UnOzHddtkWEQtAo2hpZJML
-         WVmq5LmZc0B2xOYwTloCl1Vxg1qRNKRzsaz9ifXtBeInV6CQyijUdfHbT/JLKV3aX2q2
-         CbtvrRLzsN7eqKGGTgPDDLRMVL8WCP8HPaFCZVSpOLiYDc0MYIvuGwvpWQDS5w76JRHn
-         6HXVRm2ZQB/omBeugfEFcJzqhRbxSKI6A7vd8oETVuwkLAOHdczicUEpwOnoLiP0jQ1i
-         2ViaF0D6kZMVaRleJw0v5/GB3O4PxHe2xRqz81XaK9c2JKfG2ebHEDUhNMJ57utV8KeC
-         swSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712147212; x=1712752012;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KvCLM7KWbyJGgG8sR6Sshx7UgvNmX8RL0J9lEmjrHw4=;
-        b=QTwdNGfdSKdKOti7w+GQVWEIgvVBaCNjvhukx/87j3ednZBBbJlkQ76UOx3g/+xn4/
-         AMWEY72xWEmcgIMI5ZBT1e44Jpj5Q8FRJ81vbeu1a2SqR8NO+9BROE60I51bE1hS0xJ1
-         gFtgl/4GpIkwJzrO/6B4dd9UdoJtp1784EvQDwKpELqwnMiDoGzqohQiCelFdmnntcJ0
-         HYS1j0ligVAgLZnbl6pXsJS7xa7TGLOhM3L+2ZFSJDjUOJM8zes1IQNySKkLCWHEAX9k
-         dVbbkF3RHVEHHid2mMduF1/KVcK+Bj/f3Fwf2rhpt9w0A24M6oQGR12euPX4BNpl14s6
-         NAGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzJIrYI7bPWFdxfqU9RDdepH1+yzbDS/KjdkA7Ddao5lLjtOTnz4A0gbEPErwc5C73/eYLPshLK5rWOkz77GhM2n9AHLlF9v+nzdX8FgFdBXpfV+L+2wykt0DUT2X+gZhZ6DD0
-X-Gm-Message-State: AOJu0Yzk4FphNoHECugevffGqaRZVHkhzrjGVmJXxGBtLNTQSPyHTSaE
-	lkHq0cfplwG9eCbaiU7hOOYkEmEe8fgY0X9xY2gfGzRkewb/bKEs
-X-Google-Smtp-Source: AGHT+IGep7sS70dltb4GELbCG0CAwiW6bPOkxxFngASD+tV+hVjy7exTGCbfsyuZXiB8HVo3AJ8ivA==
-X-Received: by 2002:adf:f48c:0:b0:343:3538:4ee4 with SMTP id l12-20020adff48c000000b0034335384ee4mr10976569wro.45.1712147212366;
-        Wed, 03 Apr 2024 05:26:52 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id bh8-20020a05600005c800b0033e7a102cfesm10876916wrb.64.2024.04.03.05.26.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Apr 2024 05:26:51 -0700 (PDT)
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-To: Leon Romanovsky <leon@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@infradead.org>,
- Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
- Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <20240304160237.GA2909161@nvidia.com>
- <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
- <2024032248-ardently-ribcage-a495@gregkh>
- <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
- <Zf2n02q0GevGdS-Z@C02YVCJELVCG> <20240322135826.1c4655e2@kernel.org>
- <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
- <20240322154027.5555780a@kernel.org>
- <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
- <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
- <20240402184832.GO11187@unreal>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <cefa2b9a-4227-969e-d31e-c19a552b9c1c@gmail.com>
-Date: Wed, 3 Apr 2024 13:26:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1712147396; c=relaxed/simple;
+	bh=17nw4mBwdw7o/BMzv+AdA/BNvdIhvtEGu58LPXIywWE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cwH9n4L7HexI9umLXjC7J399QCp/q9ebOxMQulGFht0/2Mh4+j42a/GLKHeocMy7phKoNt+fNqX9H+GOTkUfHWjTAYaeeyzpjXvnSegOu2C9cRAkuoFjRT9zT22z+QaGDMQcMGMpczZyZ/5cuWMt+AxHA7s60WD4tQQSXZo1tDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxDTG0Y0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A76B4C433C7;
+	Wed,  3 Apr 2024 12:29:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712147395;
+	bh=17nw4mBwdw7o/BMzv+AdA/BNvdIhvtEGu58LPXIywWE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qxDTG0Y0ZNLCTZsOVSyrxsIBoEhpVmvIMmny1/TM2qgOH0VUnoowjDsDOGICA1yDJ
+	 vIxUahUjS5hea8LZwB7N5FHram9vFUY1yOw8WfIfDY3ZyUsSH+dfhuBSCE2BBTDRKK
+	 NGfjCFkSaIXRNMGo09Wjp7bssxBcX9/R2tCyOO2IPgnDSY5BWibcVcd/HKiJuhvOA4
+	 ZZig2iKJjHbD1PToatsm37Hphwp7ZpogsP0qbnjOixphkNOVc1xnNMGLBCCPUiyP3j
+	 nJ47aCz+q6A4QxmnhxZHXLUghr/D6qNLW8vZmu7Gdv5lRESsRepHg61+99gv/OBWgN
+	 Zx+NK3JJAdIog==
+Date: Wed, 3 Apr 2024 13:29:49 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Stefan O'Rear <sorear@fastmail.com>, bpf@vger.kernel.org,
+	linux-riscv@lists.infradead.org, netdev@vger.kernel.org,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Manu Bretelle <chantr4@gmail.com>,
+	Pu Lehui <pulehui@huawei.com>
+Subject: Re: [PATCH bpf-next 2/5] riscv, bpf: Relax restrictions on Zbb
+ instructions
+Message-ID: <20240403-clanking-undress-b18346aa4cef@spud>
+References: <20240328124916.293173-1-pulehui@huaweicloud.com>
+ <20240328124916.293173-3-pulehui@huaweicloud.com>
+ <3ed9fe94-2610-41eb-8a00-a9f37fcf2b1a@app.fastmail.com>
+ <20240328-ferocity-repose-c554f75a676c@spud>
+ <ed3debc9-f2a9-41fb-9cf9-dc6419de5c01@huaweicloud.com>
+ <87cyr7rgdn.fsf@all.your.base.are.belong.to.us>
+ <20240402-ample-preview-c84edb69db1b@spud>
+ <871q7nr3mq.fsf@all.your.base.are.belong.to.us>
+ <20240403-gander-parting-a47c56401716@spud>
+ <d6eae62b-60fd-4f3c-92e4-7ea5f1c4fc68@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240402184832.GO11187@unreal>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="sTVykUQukqcz7+L4"
+Content-Disposition: inline
+In-Reply-To: <d6eae62b-60fd-4f3c-92e4-7ea5f1c4fc68@huaweicloud.com>
+
+
+--sTVykUQukqcz7+L4
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 02/04/2024 19:48, Leon Romanovsky wrote:
-> On Tue, Apr 02, 2024 at 05:32:44PM +0100, Edward Cree wrote:
->>  you're getting maintainer pushback.
-> 
-> May I suggest you to take a short break, collect names of people who
-> participated in this discussion and check in git history/MAINTAINERS
-> file their contribution to the linux kernel?
-Whether you like it or not, Kuba is a kernel maintainer.
-And thus, semantically, a Nack from him is "maintainer pushback".
-That remains true regardless of who else in the discussion is also
- a kernel maintainer.
+On Wed, Apr 03, 2024 at 06:05:38PM +0800, Pu Lehui wrote:
+> Hi Conor and Bj=C3=B6rn,
+>=20
+> Thanks for your explanation. I totally agree with what you said,
+> "CONFIG_RISCV_ISA_ZBB only controls whether optimizations for Zbb are bui=
+lt
+> so that if Zbb is detected they can be used.".
+>=20
+> Since the instructions emited by bpf jit are in kernel space, they should
+> indeed be aligned in this regard.
+>=20
+> PS: It's a bit difficult to understand this,=F0=9F=98=85 if I'm wrong ple=
+ase don't
+> hesitate to tell me.
 
-If you had an actual point, feel free to explain to me, without the
- veiled language, what was so 'inappropriate' about my posting.
+I think your understanding is correct. Sorry if I confused you at all!
+
+--sTVykUQukqcz7+L4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZg1LvQAKCRB4tDGHoIJi
+0mlqAQCxxkdbSEap3IEfCOExj7NWGtaUdUrEOON0RDSxpdgCYQEAtp5IpMEHfa9u
+V7IQVi50lwcIe+Z0M4FzSa+afLjRWgI=
+=AuOI
+-----END PGP SIGNATURE-----
+
+--sTVykUQukqcz7+L4--
 
