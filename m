@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-84240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13DB8896222
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:41:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE85896224
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD7231F257C2
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:41:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD5C31C2336C
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7719D1D54B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAF3286A6;
 	Wed,  3 Apr 2024 01:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEKNiE9u"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DOR7MI6q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D73515ACB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC1517C73;
 	Wed,  3 Apr 2024 01:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712108435; cv=none; b=vGnR+juFy+DTpAkEkT9SlkWj587MoLc7c2zxPYXZp7BiKTcaCKwc2RPTQHk4LGrEyv2wGA5lBryqkvQ5C8nVX+A4ebNXW31WBLv/GxsiDVhbVcGDsKg5k1gxBpPZZyB0s+Z7tNuv5UK1eHwlLxxwGThouxlAkF006JdTxTfdCHk=
+	t=1712108435; cv=none; b=VvpdsYOgTKkdmTA6W2zf9tmLHQ+ONOolE6ubVVoY+mwxoe5ydo8MCFp7qf952LhxDfXcwkiJy6z8SVW/SNLmVzgUVkRZZqHtzNfLqzmS3K7qL8kgFq/C42JHCl5jEiA0qJA7vzZpYsND3BEpbV23jU6EMHHN7u0B0UTZddGTvc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712108435; c=relaxed/simple;
-	bh=2Cqggvi+FITuLPU6Wtv6kILJujsOux5eJcik4zu5h0w=;
+	bh=wL+IEdYJmWYvqL6YGhSRDv/heRLZOmxsQKYK5ok7dr0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iTbRDnVy9Z+38O79PKzyTaYi0su+pZwdi9O0l7UcrH8jvTKTfR1hg2TIPL/ZrxzT48lXHlf9rvv1L+TXwhN6V1bsTom9wBVBEzk6woSj5+el4XLBidH5t9y0PQsj9nyJDP2jtKcP/PpADV50lcX8tg1I2yLetnaq/f9ZXl2iHFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEKNiE9u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E665CC43601;
-	Wed,  3 Apr 2024 01:40:34 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bR2+HGVBVPSa3SlBeDqZ7DVolYCCDuXxp32Eiq49+rcsn+jvwrBaInbCq0X5tWhbLpxViHIWLooYIAAXEpLioo/gfSjyhJY9ZSkxS0neSs/WyTG//mAalLw6UoxuRR9PQ46NpgjkEODtcM5JW/LqoP2WF9wRq69YV96A7L0eiOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DOR7MI6q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0EAAFC4166D;
+	Wed,  3 Apr 2024 01:40:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712108435;
-	bh=2Cqggvi+FITuLPU6Wtv6kILJujsOux5eJcik4zu5h0w=;
+	bh=wL+IEdYJmWYvqL6YGhSRDv/heRLZOmxsQKYK5ok7dr0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eEKNiE9uepjjn0InblW6b5qc1Cjff2kGHNImum7Ny2o6p/g0QHemub4K7RpYYWcpv
-	 eamDHMzJ3CAKm3I5fkkBDh6XjxrvByJ/9z2YKVrx+SN+xQWk7oYLgfeDyP3tDFuJF7
-	 mgPn/ReFV4rpRnSlzBYwPxtRh23STkx5fPOtzQSdhWSaGxI/SPsKsaD79avuKWEPVj
-	 /7adJHehvQpkdcgJ65FR0MGkBQEiw//gyDKhwTh3hAFqE2p02faFTZKYETVivEJbyY
-	 O+hI2Q+TZXnV+HEp7zAQ04Nu/fMtWaC7C+TJH4s3rmi+v3fxjV6oxYyHBYQSGSGg6B
-	 RVv543O8rgxqQ==
+	b=DOR7MI6q6PIcKUBhuhtawBBerbNddKo0xwIoDlrD+TeuyTnUgXUuZaO5PIOSUhBbS
+	 az4HerxczU43OFgv+JT52k/lIa3/n8xcoH1Uzp9Nvx31Vvn3b5sj7IvGPlfYbfMnyB
+	 wp0j43mx8NtDjZRDiQk0JAS9Jqh/39evR+c8DutMMa4FDNGB7xP4xrhTfRg2sqcIk1
+	 mwAGpI+qHyCUT1eqTXaxa6nmEfPLVY8QamWsk32f636PyWMvIwZ5ZTEJtetM+SYEwk
+	 mBzjhI90MUy9k+Kt+W0nDkMTg50N6uDb1MZh9FCimDLlmRngTSI6qFO6WjrRGOXYz4
+	 bLxMLsoTpB1sg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDB22D8BD1F;
-	Wed,  3 Apr 2024 01:40:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 03407D9A155;
+	Wed,  3 Apr 2024 01:40:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next,v2] dt-bindings: net: renesas,ethertsn: Create child-node
- for MDIO bus
+Subject: Re: [PATCH] rhashtable: Improve grammar
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171210843490.14193.13793539310642230479.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Apr 2024 01:40:34 +0000
-References: <20240330131228.1541227-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20240330131228.1541227-1-niklas.soderlund+renesas@ragnatech.se>
-To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
-	=?utf-8?q?se=3E?=@codeaurora.org
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- geert+renesas@glider.be, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, robh@kernel.org
+ <171210843500.14193.13263939591032682700.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Apr 2024 01:40:35 +0000
+References: <20240329-misc-rhashtable-v1-1-5862383ff798@gmx.net>
+In-Reply-To: <20240329-misc-rhashtable-v1-1-5862383ff798@gmx.net>
+To: =?utf-8?q?Jonathan_Neusch=C3=A4fer_via_B4_Relay_=3Cdevnull+j=2Eneuschaefer?=@codeaurora.org,
+	=?utf-8?q?=2Egmx=2Enet=40kernel=2Eorg=3E?=@codeaurora.org
+Cc: tgraf@suug.ch, herbert@gondor.apana.org.au, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, j.neuschaefer@gmx.net
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 30 Mar 2024 14:12:28 +0100 you wrote:
-> The bindings for Renesas Ethernet TSN was just merged in v6.9 and the
-> design for the bindings followed that of other Renesas Ethernet drivers
-> and thus did not force a child-node for the MDIO bus. As there
-> are no upstream drivers or users of this binding yet take the
-> opportunity to correct this and force the usage of a child-node for the
-> MDIO bus.
+On Fri, 29 Mar 2024 17:26:27 +0100 you wrote:
+> From: Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+> 
+> Change "a" to "an" according to the usual rules, fix an "if" that was
+> mistyped as "in", improve grammar in "considerable slow" ->
+> "considerably slower".
+> 
+> Signed-off-by: Jonathan Neuschäfer <j.neuschaefer@gmx.net>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] dt-bindings: net: renesas,ethertsn: Create child-node for MDIO bus
-    https://git.kernel.org/netdev/net-next/c/8da891720cd4
+  - rhashtable: Improve grammar
+    https://git.kernel.org/netdev/net-next/c/8db2509faa33
 
 You are awesome, thank you!
 -- 
