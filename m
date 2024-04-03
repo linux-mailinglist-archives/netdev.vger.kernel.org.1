@@ -1,165 +1,148 @@
-Return-Path: <netdev+bounces-84562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8C1989752B
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:25:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF9D5897531
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3F6C28E950
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:25:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 653FD1F2AD56
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9D814A0A2;
-	Wed,  3 Apr 2024 16:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B86714F9F5;
+	Wed,  3 Apr 2024 16:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sAjrqesj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L4aFAUQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD32814F122;
-	Wed,  3 Apr 2024 16:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B7414AD15
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 16:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712161523; cv=none; b=cKN9TTT8jhL+740h6rFhAvItUP+ioKeWA4gm2MQfTGq+ZUCwPZDovF99Rr6+Ki7se9ma9BIgC8r96/Tkj707v+PPUAcgGyG0v2xfm990y3DaftR0MD9QJxYVMIxo41qYmTKFNopPKV0U98YXA+W6Din73GWZOdS93K04IDgHTaM=
+	t=1712161567; cv=none; b=Ee8rjAxvl2ecz50lwrshpwKFoyXvdBPk+Ebo+WtUwXsDCW/HPvgqM+sd0NXxIFgn0WIckC7wrbAsIuuNIhK4nHNk+KYkqE5HNcJyQUC6NbaCBZqR0o+toGqtKcYxYMibuvXS8V61Mn8PYHg3uZ/SwJn2dEMJ56Z+TqAPa8Ig1nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712161523; c=relaxed/simple;
-	bh=M2KSxX/qzBohwPJ02hVjKtTS/u8IGLEnJlpOLc775+c=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=A4uFRn7AaCaSPnXdZuoAlQt2XCyqIexTOLALzFuOX8qsxVeg0HABotusZAqEfXgfyDMEgMSdi81hvMZzPXyQKXsvOSswQx7weSnB7u9qJXj4aZSx3zVrsX4gC/9pEwEp+vbQ5sEIRT/fsFMmCBfquI1S4+O2L5X7IisxvHD9MvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sAjrqesj; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 433G2mnG017749;
-	Wed, 3 Apr 2024 16:25:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=UqaB+wRnNOYEb2m53SzDiYd2Jvl8mk/TbCmsEno9obA=;
- b=sAjrqesjJ6yYZeiFMFjQW7W9xciDm/RAp2G44FYgyrNmsN74i9KhwHiFKZGvi+XZq39V
- eUn4H96aidg69kGQWvz9UdlDYiNz5tVLnueLVGzyASv+scU0wWR7qW9r/CghFpxrD5ai
- AOL01EG/FVBYwfoNH2y7XmRNqADoqlIxu6wUgy+a6f40p1318e15Mus+LGOVbGqcG9xa
- gGxFeTNqvRt8/v14QV2flcmpHQrKfixx3Sn4wdTMrOJawZlXFyhsL41dutaEVBY/U6Ay
- E27WUkn4sPhYtWug43OYjTR5p34ojzrUiWUeBwW0x1x1RKKE4KuhX6yklpUSL4md1Wt5 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9a9b02jr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 16:25:16 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 433GPGRJ023481;
-	Wed, 3 Apr 2024 16:25:16 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9a9b02jh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 16:25:16 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 433EwYjc025753;
-	Wed, 3 Apr 2024 16:25:15 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x6x2peegv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 16:25:14 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 433GP9PY25231958
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 3 Apr 2024 16:25:11 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1C71F20065;
-	Wed,  3 Apr 2024 16:25:09 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 02BE52004B;
-	Wed,  3 Apr 2024 16:25:08 +0000 (GMT)
-Received: from [9.171.60.51] (unknown [9.171.60.51])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  3 Apr 2024 16:25:07 +0000 (GMT)
-Message-ID: <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some
- unsupported operations of loopback-ism
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com,
-        twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com,
-        jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Date: Wed, 03 Apr 2024 18:25:07 +0200
-In-Reply-To: <20240324135522.108564-5-guwen@linux.alibaba.com>
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
-	 <20240324135522.108564-5-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
+	s=arc-20240116; t=1712161567; c=relaxed/simple;
+	bh=zhJxyNy5k3KtJxDj4DMEzvEUSwEqQJMheR2fesgC7gQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AGDlQgnLVi54xqV4JC2/7AtjfbGX9Ex2wPL7U1jvBxI75iJvg8/imcNurV1dB9/WTvXy7a32noSL+y+d8Q/2U5qas/0tIJAC2jj98IsQrBJr9OOqgwh2BtRQjDKq+yXbaOafotEKdQ6GQDuSCOMdKi6y4RY/CP4eoP1QEFg4BUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L4aFAUQn; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso11120a12.1
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 09:26:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712161564; x=1712766364; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aC9+MUZ0hkQNiWKrPDkDuu75k6rlOuQC/LqJgmLBGzE=;
+        b=L4aFAUQnsLdlLEJ/kZ7cA+wwroPRgLCkxh+dbR0OrAqpciynjEwizemUI3v5VEvtNI
+         h5Lz8MzYUOR2QyHxkGtiSMaH29pkeu3MT4XZ6jk1aYGXXwRRhnlvR1ft4/ouI6xdjR2k
+         QfI3lc58Dw5YSHYtgxBu5czTSB39CPil3u3/0tZp4SFT1ixt4kcjfdRiysZfPFLKAAgF
+         ZLprfSZhwLxLxzF7ip21CUVHh4DYi6c8AjyJ7bgiixBbm+vAXi8akwIwDbpAGnwN8UOV
+         E6SF9NLnKnSJkAsQBLoB/dwC2NaSz9ZGWCB8hof9h41XO3OSuuhTNc31/vZ/XUVRi6Le
+         Yr0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712161564; x=1712766364;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aC9+MUZ0hkQNiWKrPDkDuu75k6rlOuQC/LqJgmLBGzE=;
+        b=Z3ez6FdmbN0FFNbxOQIWW83cd+JrCZrVU3LZ6WVdsEqeFqT2Rzc8nxSc306ExMjCeY
+         VR8j8NVzE8yq0O0bg2CsHaM1Uyx+UkpFzdyF2be83eqoHCM5gdaVUtoVw58vmtGX5Dsj
+         InT2gM09amORGFix3mVXL2olfMx8NmRkg83REt1591hLTMVljXAX5sglHLzQ7q+Ee6Ay
+         U7Um4xckEyd41656mGvHDguyA2Go/YDwJT9CBlIoAkU/Vqqyxc5AgB14n5gmjhF2bRmz
+         SZBFvdHrluoMRrlGC212zsY6y7LEBxyHd3pnkfbK1J3qNw2UAmyLp489OXyO+gIgbAOn
+         VB9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUc5d6E0ex/stz0otr42/XY+JRdjzqx3FgSyS3thJoWpeQel/odIcn3YzRemC387X/8x5sI1hlg6b+/aopm1gR78UUMrx5c
+X-Gm-Message-State: AOJu0Yw6ncARzS1sH/Ghg1QOfhVAowJg5bdpgIUNw39EWcePqW1KRoLb
+	Jq0K7RzdDyxOnhvtmX7NQ3xjs1SOKWEFGvgZ2HYlmgOb+ShuxJ/YW/OLoVnC4iKFcon5WEoxTo8
+	oseg1A1vTH4fFm3JFJmgXhsK/AnXeYUGIMo5y
+X-Google-Smtp-Source: AGHT+IHlKZgUEymdjETApeGkPw2l7XMhhkK5AxpUcQmQrygV0guizlQvTevQtKmD74Rli0TVy65RTwhcgE9QLW/VqqY=
+X-Received: by 2002:aa7:df97:0:b0:56d:fdc5:b515 with SMTP id
+ b23-20020aa7df97000000b0056dfdc5b515mr255661edy.4.1712161563747; Wed, 03 Apr
+ 2024 09:26:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: e-maJrEYK3CrbN1gUYBUw5wqMTnGJHjI
-X-Proofpoint-ORIG-GUID: y1xl521ypI8S9m31iHqSuVR8sDJBb3t1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-03_16,2024-04-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
- suspectscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2404030112
+References: <20240403123913.4173904-1-edumazet@google.com> <67f5cb70-14a4-4455-8372-f039da2f15c2@kernel.org>
+In-Reply-To: <67f5cb70-14a4-4455-8372-f039da2f15c2@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 3 Apr 2024 18:25:52 +0200
+Message-ID: <CANn89iLQuN43FFHvSgLLY+2b-Yu2Uhy13tmrY_Q-8zX7zUcPkg@mail.gmail.com>
+Subject: Re: [PATCH net-next] ipv6: remove RTNL protection from ip6addrlbl_dump()
+To: David Ahern <dsahern@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
-> This implements some operations that loopback-ism does not support
-> currently:
->  - vlan operations, since there is no strong use-case for it.
->  - signal_event operations, since there is no event to be processed=20
-> by the loopback-ism device.
+On Wed, Apr 3, 2024 at 6:13=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
+te:
+>
+> On 4/3/24 6:39 AM, Eric Dumazet wrote:
+> > diff --git a/net/ipv6/addrlabel.c b/net/ipv6/addrlabel.c
+> > index 17ac45aa7194ce9c148ed95e14dd575d17feeb98..961e853543b64cd2060ef69=
+3ae3ad32a44780aa1 100644
+> > --- a/net/ipv6/addrlabel.c
+> > +++ b/net/ipv6/addrlabel.c
+> > @@ -234,7 +234,8 @@ static int __ip6addrlbl_add(struct net *net, struct=
+ ip6addrlbl_entry *newp,
+> >               hlist_add_head_rcu(&newp->list, &net->ipv6.ip6addrlbl_tab=
+le.head);
+> >  out:
+> >       if (!ret)
+> > -             net->ipv6.ip6addrlbl_table.seq++;
+> > +             WRITE_ONCE(net->ipv6.ip6addrlbl_table.seq,
+> > +                        net->ipv6.ip6addrlbl_table.seq + 1);
+> >       return ret;
+> >  }
+> >
+> > @@ -445,7 +446,7 @@ static void ip6addrlbl_putmsg(struct nlmsghdr *nlh,
+> >  };
+> >
+> >  static int ip6addrlbl_fill(struct sk_buff *skb,
+> > -                        struct ip6addrlbl_entry *p,
+> > +                        const struct ip6addrlbl_entry *p,
+> >                          u32 lseq,
+> >                          u32 portid, u32 seq, int event,
+> >                          unsigned int flags)
+> > @@ -498,7 +499,7 @@ static int ip6addrlbl_dump(struct sk_buff *skb, str=
+uct netlink_callback *cb)
+> >       struct net *net =3D sock_net(skb->sk);
+> >       struct ip6addrlbl_entry *p;
+> >       int idx =3D 0, s_idx =3D cb->args[0];
+> > -     int err;
+> > +     int err =3D 0;
+> >
+> >       if (cb->strict_check) {
+> >               err =3D ip6addrlbl_valid_dump_req(nlh, cb->extack);
+> > @@ -510,7 +511,7 @@ static int ip6addrlbl_dump(struct sk_buff *skb, str=
+uct netlink_callback *cb)
+> >       hlist_for_each_entry_rcu(p, &net->ipv6.ip6addrlbl_table.head, lis=
+t) {
+> >               if (idx >=3D s_idx) {
+> >                       err =3D ip6addrlbl_fill(skb, p,
+> > -                                           net->ipv6.ip6addrlbl_table.=
+seq,
+> > +                                           READ_ONCE(net->ipv6.ip6addr=
+lbl_table.seq),
+>
+> seems like this should be read once on entry, and the same value used
+> for all iterations.
 
-Hi Wen,
+I thought of that, but this will miss any update done concurrently (if
+all entries fit in a single skb)
 
-I wonder if the these operations that are not supported by loopback-ism
-should rather be marked "optional" in the struct smcd_ops, and the
-calling code should call these only when they are implemented.
+It is unclear to me what user space can do with ifal_seq
 
-Of course this would mean more changes to net/smc/smc_core.c - but
-loopback-ism could omit these "boiler-plate" functions.
+There is no clear signal like :
 
-> =C2=A0
-> +static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int smc_lo_del_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int smc_lo_set_vlan_required(struct smcd_dev *smcd)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int smc_lo_reset_vlan_required(struct smcd_dev *smcd)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int smc_lo_signal_event(struct smcd_dev *dev, struct smcd_gid
-> *rgid,
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u32 trigger_irq, u32 event_code,=
- u64
-> info)
-> +{
-> +	return 0;
-> +}
-> +
-
-Just a pattern that I saw elsewhere in the kernel...
-
-Thanks,
-Gerd
+Initial seq _before_ the dump, and seq seen _after_ the dump.
 
