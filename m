@@ -1,155 +1,146 @@
-Return-Path: <netdev+bounces-84567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B281089756F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:43:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B935E897579
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 520751F28B4B
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:43:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72C9228621F
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F174514C596;
-	Wed,  3 Apr 2024 16:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5320B1514D2;
+	Wed,  3 Apr 2024 16:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PowCscDi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0GskreP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AEBC18E20
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 16:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923CB1B7F4;
+	Wed,  3 Apr 2024 16:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712162595; cv=none; b=c0NyxUc47KwO2oH7eNA8eGWIzU3qZ9IOFx82O0pipWKw24Gm9tsJbIbWaYvCcH6wfTW5uJE3jD0Wd03JjgDXhhICpAvLOK2t4tvenGCLa9GYWyMjPJOGsSSkCdAz0FiDx1BiG2f+afE9Iu8Xfft6wVZ9H8cuZp2F4SJYxquUSRY=
+	t=1712162654; cv=none; b=CDHlBXcmPRoxxJMZbyn5VkACDhQ9TUWXXR1fqJmAvuYqfAOrxh+6nWk9q0LkSvUDORa7/ntY57CeNM79DLrbFQTcOHCTE2ELiaQeWLf8yxujw+Gv4zKEcD503q8LZPHmFh9acDj/+Wtn9gPYKd8w9hVBMvubd0dUYwNAfYW6GzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712162595; c=relaxed/simple;
-	bh=SxYWihPHi6dlXlVBrFvM6+Prgc4rgyXvKuhM5h1DUWc=;
+	s=arc-20240116; t=1712162654; c=relaxed/simple;
+	bh=M1neYOlhzngATdBbVyJaKe7fkRAK//9DrStR8GOcQu4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CVEclSGPgiHbGxiimVr787Pf3lGDwxKGKc/+ItcWdDurCz5oyThLFPTMFVMc85aIY2lHTkmrbt5kMtsu1h3nyoeZZbVppWkXksuu/z6eBjmqzq9MIWomjKFIa6U1olhqAxxITrdeK7VSiwrDPEfgYoGRfXTjTz9bVj/ZLFNhtug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PowCscDi; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56dec96530bso346a12.0
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 09:43:13 -0700 (PDT)
+	 To:Cc:Content-Type; b=HZT2XFqARwF4Z+85DrgQGT9BNu/Qrhxwgl8kP7Kvm8wgPlOlU/6YaxP4O4hledGA1mkNbcaArPbCmwBNh874p01oMZ7M+zmfhwIFzX9WxPwNE6IJi2Zzcv3q9EeX9nmUg35ytnMDbJMJvOYA0YtYAitbeCsfo+gmgvjcjnhaH6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i0GskreP; arc=none smtp.client-ip=209.85.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4da6995e58bso3887e0c.1;
+        Wed, 03 Apr 2024 09:44:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712162592; x=1712767392; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sxsAArNyvYKtfurrxMnt7Kkz3LlbeXR6c/4Xx4MR9hQ=;
-        b=PowCscDiqxADv6rOvILF9/1FW4OY4cyUGWDUJdlRALeJC7Evd6teyxWdDrAvpnr04j
-         mer9JzgYR0l2wP4o+6onrXxPPs7D2NVDZbQyO5WQ3fmJddcNZ5RMMBP+hbkGS9EVzmIu
-         1x3SkVPt3/S0E/J0DdFqC4MhrXJmuda43iUSVHJePECRrufdHH8LlnXQzo7aexytb1mG
-         qRelp/j1KahOLENCl8bhi2GWApQBkJGnh5UXxHKzESUGEY301OfAdn60vZxtgi6X2prm
-         xL6X9jDtqAV7K0i5e2jZTm+hqwyegVE6U0Z+8ILSI7mu2I+QxaYqQY0ZKou2ptIg9hU0
-         yeew==
+        d=gmail.com; s=20230601; t=1712162651; x=1712767451; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aej6QFoETxeFvbQm8/sOYYAdEcWAnghw/7Ynm8n0ucQ=;
+        b=i0GskreP3bhVFE7L+jTrP55NTeLGEOiadN1sTEIYfQZF05ZqD7aFwgcHEWZzggB27p
+         Iu9pSvcSJvv9ctMRtptjRYbadJq2t5PSTI2cbljCYV4c1eP3C39UqNHbXsHjXVWPgRF4
+         cUNtQf66y29Ij0Ux473Ma14olhaOmCPIXPj2UkCmSyIiiLfd/Et1NmcTyn3tZ2/5CroR
+         JGJgD9ELhuJW4HPsYoaybFcG5Or8NO7kPPs+wVFcewF/98zylX3MkbB9YRRmtZLed4a1
+         /rF+ytNHfDippVqXcj/p/3MB6p+36Kb2Su2g3ayZiSDGs4JicOJMXB6apxu1GA4my1On
+         wA5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712162592; x=1712767392;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sxsAArNyvYKtfurrxMnt7Kkz3LlbeXR6c/4Xx4MR9hQ=;
-        b=OPATDl/M/IdnbLrIEdmfYpbgZqGetunuzvTLcFKaTsl1Yn7P42wH0/i3Duj8Y5M3r7
-         D5YfRSAfG6vS+MQz/7Z7dR07iInNVnqEJDg6SsztDvRehJGsqrzpZiLEFolwTjps+08R
-         gsgNdui63Cjujr12VzZEDCEFGbG+12g330L2FdFBhZ5NIT2Gl9PoRDVrNL1ydPH2UjTD
-         ux7wR6Bzbgux7AoLH+2bOjRRS8HR10oPPB0KF57Na5VzRo4+CfIOmb17RHF4Ic8WDPrP
-         pGfkM0GMu5Pqal5aT1IaiUaCEhr6MZ6pbrVWECzTBM4hMTF8Ia4pc2sOWpq6RoG2+p1w
-         eg5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUvXeCcUsEXRpn/c/PY/c1tpbLJnsS57Zx5NE0EwbTd5XmL82Ts/4dVaHQ/hAISHTdz/VEQcHAmgZZi67r6zLt8JBHQl6Z+
-X-Gm-Message-State: AOJu0YztbaoV8xFJ6jr3zpdI/Dw6yHBPZQkQibgkr0z1gK8dyzEMIzxv
-	+E0OjnpxMvfEoouim56HjM0anhOJt5ZFEpwvy2OiRWjhPJloVhrASXcqglFWPqBQIYaPcMjzF2O
-	k0MIHU0RSvL0BEtc/t59QN6+f3YTyi1FMJUz6
-X-Google-Smtp-Source: AGHT+IFqFZ2aTM7meJjCdcEVHJYUZMQKj1JsQn3Bz663Wt+nZJJSRzlXdIBJXq+QPtpqeWv5HtO4CBgLrqiFiPcwl44=
-X-Received: by 2002:aa7:c418:0:b0:56e:aa7:a4ae with SMTP id
- j24-20020aa7c418000000b0056e0aa7a4aemr129690edq.5.1712162592350; Wed, 03 Apr
- 2024 09:43:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712162651; x=1712767451;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Aej6QFoETxeFvbQm8/sOYYAdEcWAnghw/7Ynm8n0ucQ=;
+        b=e8yBpGhE0mKo3L6OmYGnR55qeIfLG1anmLG/C9J7ZN+3APLmsWh6CvVnaVCYsjCiAq
+         hrNtZxk5KKZnV09ovVAOzQxwB01QW0NNKc7ScDXWNxQ0zT+i61WPf/HwALGzRKQ/BiSX
+         2r2pgmwbGI+J8jma1PQLhQpFVG8uK0yJELN2QNQ/ZEPXA5GxeVSzqk/IdcBm3yahGwRn
+         oed2hqf8dr7V23Fc6MYt4JHlKRTXO29I5BVGoVp8dN9jWEDGfcCwZ82JN9BHBfYpLw+e
+         /dx+zr5qFizvfFylmLkqTFSlx5t4y2pg5rZFtWvn0zdGhdzMxA2/t5cd0Hlv5PzNvCJT
+         s8PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpasyVqxm4S9hgcbs8dUy8q6r+F+STTWmT6MCdat3oYYGFf+6rfr/8BT6yKy29uM1AbAIolt6SJh3lZYGu+DdYx9rzuUZiacHksRrNK21d6PVKAmcA2bpy1ts6Yz9bGXjhHCps2uWJIbPr/dVtNNfyydVyE+K1ucGwYnGAjdY8ancrFK+L0hNax/c1XJjskEYv0wHpLr3QYcYae0jP0AbcIV7ty92/ff7x1UVKg/DHrQ4m6vd6MPfODU9MtPOA44TG4uH72P9SYMTl8iJ2Ymh/B+II5LqiE8dVCoxE0cInMo7xr933GhgCTU9KJIPBF0gQ+pJTOetPWCfC4PSf48Ob4/F3T0jmLDQrzHEiBXzlQ9uOWnlsVOsi4UII2DcFQsmqCVxhtgxyxlHQxh8eD2L7lMlo4zNFCgiUX02hHGzwheLA4FNBh6P5J9lVZbQvfyrD8swvpZGH79BZRxgEksXawYvBHZWkIm5bDVqAJDXTaUbQfuH7mx3HADTE5vaD85KO48aJ4TNlbvfSjEfa2sFySReyB4JFNhSFbk7HS6ecFe8=
+X-Gm-Message-State: AOJu0YwxuG7mpFcprqH+unaPXUWhDi4M8kWHnrmwwEENz8OeMEG3DaYw
+	/CXUPwT+I6xRjhFEM44yzLJqF6NH9qPNdRXdt6gxeHK+bYkky7/7uoKKDbs7asmf72EjxBTb0AM
+	t1tSGUHKch652xWodKB7wWjUMX4s=
+X-Google-Smtp-Source: AGHT+IFEFFEcpcdQfCxRWJYlDuuUETZ0sWBciDlGUMCvLnJmEBIY1oP87nAaJSL5QQDatxb4oTnFcly4MrzzQ8OrF5o=
+X-Received: by 2002:a05:6122:499a:b0:4d3:b326:5ae8 with SMTP id
+ ex26-20020a056122499a00b004d3b3265ae8mr10815788vkb.14.1712162651582; Wed, 03
+ Apr 2024 09:44:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240402215405.432863-1-hli@netflix.com> <CANn89iJOSUa2EvgENS=zc+TKtD6gOgfVn-6me1SNhwFrA2+CXw@mail.gmail.com>
- <CANn89iLyb70E+0NcYUQ7qBJ1N3UH64D4Q8EoigXw287NNQv2sg@mail.gmail.com> <b3kspnkcbj2p3c5q6rbujih72n7vouafpreg5mjsrgvf4fpu52@545rpheaixni>
-In-Reply-To: <b3kspnkcbj2p3c5q6rbujih72n7vouafpreg5mjsrgvf4fpu52@545rpheaixni>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 3 Apr 2024 18:43:01 +0200
-Message-ID: <CANn89iJ3YrSg-Y+g65vowMtBzvNokT2N7ffk4=uw33k3SsePPA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: update window_clamp together with scaling_ratio
-To: Hechao Li <hli@netflix.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
-	kernel-developers@netflix.com, Tycho Andersen <tycho@tycho.pizza>
+References: <20240327160314.9982-1-apais@linux.microsoft.com> <20240327160314.9982-2-apais@linux.microsoft.com>
+In-Reply-To: <20240327160314.9982-2-apais@linux.microsoft.com>
+From: Allen <allen.lkml@gmail.com>
+Date: Wed, 3 Apr 2024 09:43:57 -0700
+Message-ID: <CAOMdWSLavg27YZgnfE2QHjO=4RNmFx_7veAURaPG_=qWX=KMVA@mail.gmail.com>
+Subject: Re: [PATCH 1/9] hyperv: Convert from tasklet to BH workqueue
+To: Allen Pais <apais@linux.microsoft.com>
+Cc: linux-kernel@vger.kernel.org, tj@kernel.org, keescook@chromium.org, 
+	vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev, 
+	florian.fainelli@broadcom.com, rjui@broadcom.com, sbranden@broadcom.com, 
+	paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com, 
+	manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com, 
+	leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com, 
+	haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de, 
+	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
+	angelogioacchino.delregno@collabora.com, afaerber@suse.de, 
+	logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com, 
+	robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org, 
+	orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com, 
+	patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org, 
+	jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com, kys@microsoft.com, 
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
+	jassisinghbrar@gmail.com, mchehab@kernel.org, maintainers@bluecherrydvr.com, 
+	aubin.constans@microchip.com, ulf.hansson@linaro.org, manuel.lauss@gmail.com, 
+	mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com, 
+	hayashi.kunihiko@socionext.com, mhiramat@kernel.org, brucechang@via.com.tw, 
+	HaraldWelte@viatech.com, pierre@ossman.eu, duncan.sands@free.fr, 
+	stern@rowland.harvard.edu, oneukum@suse.com, 
+	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org, 
+	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
+	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	linux-mediatek@lists.infradead.org, linux-actions@lists.infradead.org, 
+	linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	linux-omap@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org, linux-usb@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 3, 2024 at 6:30=E2=80=AFPM Hechao Li <hli@netflix.com> wrote:
+> The only generic interface to execute asynchronously in the BH context is
+> tasklet; however, it's marked deprecated and has some design flaws. To
+> replace tasklets, BH workqueue support was recently added. A BH workqueue
+> behaves similarly to regular workqueues except that the queued work items
+> are executed in the BH context.
 >
-> On 24/04/03 04:49PM, Eric Dumazet wrote:
-> > On Wed, Apr 3, 2024 at 4:22=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > On Tue, Apr 2, 2024 at 11:56=E2=80=AFPM Hechao Li <hli@netflix.com> w=
-rote:
-> > > >
-> > > > After commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scal=
-e"),
-> > > > we noticed an application-level timeout due to reduced throughput. =
-This
-> > > > can be reproduced by the following minimal client and server progra=
-m.
-> > > >
-> > > > server:
-> > > >
-> > > ...
-> > > >
-> > > > Before the commit, it takes around 22 seconds to transfer 10M data.
-> > > > After the commit, it takes 40 seconds. Because our application has =
-a
-> > > > 30-second timeout, this regression broke the application.
-> > > >
-> > > > The reason that it takes longer to transfer data is that
-> > > > tp->scaling_ratio is initialized to a value that results in ~0.25 o=
-f
-> > > > rcvbuf. In our case, SO_RCVBUF is set to 65536 by the application, =
-which
-> > > > translates to 2 * 65536 =3D 131,072 bytes in rcvbuf and hence a ~28=
-k
-> > > > initial receive window.
-> > >
-> > > What driver are you using, what MTU is set ?
+> This patch converts drivers/hv/* from tasklet to BH workqueue.
 >
-> The driver is AWS ENA driver. This is cross-region/internet traffic, so
-> the MTU is 1500.
+> Based on the work done by Tejun Heo <tj@kernel.org>
+> Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
 >
-> > >
-> > > If you get a 0.25 ratio, that is because a driver is oversizing rx sk=
-bs.
-> > >
-> > > SO_RCVBUF 65536 would map indeed to 32768 bytes of payload.
-> > >
->
-> The 0.25 ratio is the initial default ratio calculated using
->
-> #define TCP_DEFAULT_SCALING_RATIO ((1200 << TCP_RMEM_TO_WIN_SCALE) / \
->                                    SKB_TRUESIZE(4096))
->
-> I think this is a constant 0.25, no?
+> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+> ---
+>  drivers/hv/channel.c      |  8 ++++----
+>  drivers/hv/channel_mgmt.c |  5 ++---
+>  drivers/hv/connection.c   |  9 +++++----
+>  drivers/hv/hv.c           |  3 +--
+>  drivers/hv/hv_balloon.c   |  4 ++--
+>  drivers/hv/hv_fcopy.c     |  8 ++++----
+>  drivers/hv/hv_kvp.c       |  8 ++++----
+>  drivers/hv/hv_snapshot.c  |  8 ++++----
+>  drivers/hv/hyperv_vmbus.h |  9 +++++----
+>  drivers/hv/vmbus_drv.c    | 19 ++++++++++---------
+>  include/linux/hyperv.h    |  2 +-
+>  11 files changed, 42 insertions(+), 41 deletions(-)
 
-This depends on skb metadata size, which changes over time.
+Wei,
 
-With MAX_SKB_FRAGS =3D=3D 17, this is .25390625
+ I need to send out a v2 as I did not include the second patch that
+updates drivers/pci/controller/pci-hyperv.c
 
-With MAX_SKB_FRAGS =3D=3D 45, this is .234375
-
-
->
-> Later with skb->len/skb->truesize, we get 0.66. However, the window
-> can't grow to this ratio because window_clamp stays at the initial
-> value, which is the initial tcp_full_space(sk), which is roughly 0.25 *
-> rcvbuf.
-
-Sure. Please address Jakub feedback about tests.
+Thanks.
 
