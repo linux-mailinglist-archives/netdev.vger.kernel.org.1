@@ -1,343 +1,189 @@
-Return-Path: <netdev+bounces-84507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E524897112
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:31:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9E3897059
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB62DB25ABA
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:31:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FB011C250C3
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5951E14AD03;
-	Wed,  3 Apr 2024 13:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911F0149DE4;
+	Wed,  3 Apr 2024 13:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KeDUproh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KmnCkyTD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914E914A4E4
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0BA1494D8;
+	Wed,  3 Apr 2024 13:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712150912; cv=none; b=Creh3avkr0pQIJc033SJRbaNA2eR7NJenX9R/KQPhOyL6aBUNzli97Fm4P9KfTsVJzexkwmbRO1LW/jJ7pZYo7wDVxhNluwzpRj3IO0rf1GzryZdQNH7tuWBAWJC9XVO2dV8vaXxbFXySsqgPDmK7Ud7rAlgdhbh/hfJK/KKrmU=
+	t=1712150394; cv=none; b=gjpRws1PIMmjRBbB2SmaXd3mGSO1kyAkQQsABkR0BhdWyb/TLBwRcEEIesDZ5NMO5916pXX8VW222nG1r0aaiEX0I/KEonKwn6OjD55+nVarxdrTsmoNQOU49aUeZvw20m+24edEypbdhQnmcM9RCvYQaPJOlj1KbxNv58liUjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712150912; c=relaxed/simple;
-	bh=la+A9Hvmq7yXG15ZEcilIfFPuZeiaCuNX79k1p9FIOw=;
+	s=arc-20240116; t=1712150394; c=relaxed/simple;
+	bh=kq5+RMCvHSKQHxJsCA0Sj8YeDyJpY+oX/LlT/96C6xo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dekwRVTd2Uh/D5AewyLGwwN7m0BHeepBXXuvsxINRD8flsinkwxWg6srGyru/WAAE9kOv3b0K1zB6PJWY8a1PRhHG//2Bh6vjtYxMfdxobR1bd2ChmWJcTDa8lUr2KPu/BXzlTAIsqafETPTOgCeLIrjdwlzMflEw5j7Zn0GlFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KeDUproh; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712150910; x=1743686910;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=la+A9Hvmq7yXG15ZEcilIfFPuZeiaCuNX79k1p9FIOw=;
-  b=KeDUproho/hmwdXvexnyU3OX1k5rYR/IqWlRKBzOpnf4TC8R37Fv3afb
-   dliSZXLRGn1dFSbzH8pJ/nQfN8ceCDOX7B+rae1zOvwzwoa7YBcRmABEL
-   s5Vgcisxn7lp0MLkO4L2x5coMgyesKtn5zbuesKVyT8/uOu9duz55Gx8W
-   4xd2TzM8KJysN9JCmvl9xhy2cu5V+Y8lt2fFAVt2cCaQaaYKfsFJhpjEi
-   eokKQsidZtMA2Xxpx5kag4NT6Pj40V2e1oCCzmEhVmI6MfQP2vXTR8AVv
-   rZTHBbPgC+VQg2iKI5eqLmkM7FVpgYRoImDp3ZXLonrJCNEPuyRg3L4d0
-   w==;
-X-CSE-ConnectionGUID: 8dBboowoQ8GPOLo9evjdWQ==
-X-CSE-MsgGUID: EXqHdqltS2i5it0d+CVHhQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7568789"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="7568789"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 06:28:28 -0700
-X-CSE-ConnectionGUID: jzOWqXKoRHqGFxc1hXGxTg==
-X-CSE-MsgGUID: nl+r5IPtQyKotqyPS+i0Cw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="41592125"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa002.fm.intel.com with ESMTP; 03 Apr 2024 06:28:25 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id DAF7E36C1C;
-	Wed,  3 Apr 2024 14:28:21 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	horms@kernel.org,
-	anthony.l.nguyen@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v3 11/12] iavf: handle SIOCSHWTSTAMP and SIOCGHWTSTAMP
-Date: Wed,  3 Apr 2024 09:19:26 -0400
-Message-Id: <20240403131927.87021-12-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
-References: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
+	 MIME-Version:Content-Type; b=hKSvL1qAIBwv6Wv8ugflknNTlRIp1G02rtTX0qt0kjyEfx3EmhO+oJ++DwE1qHSnIWJY4MBw7YV5i4To9mXCof3f+VbqcXruViknCgZUg6RQ5NsBRxVRTbCNBL5pVrl9/2vgftEpAfEQQE15WQ1GhKjEmEjYYZjQ49XVFaACBU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KmnCkyTD; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e29328289eso4704835ad.0;
+        Wed, 03 Apr 2024 06:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712150391; x=1712755191; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0HH3He2M5JGBbpn1IyUzwQbFpqNeS8i3zDjnB0NO5L0=;
+        b=KmnCkyTDVQ8LTmmPVRaWQmewlpAXMAbluotff3psu5SqqHRsDUqb1WDVVJhpfSwt6D
+         qeNPXiD3fjotHJFAO2xIhTDu3Bx3oe+wdBvY6IbvBKIfElt7gOwqeDRlVhylYKIDdexT
+         nSGvn6TGNo+YfQWpGrczNNcHUoaMNcGmqwjmVtxlfDpEVN/U/GbUQVRVZ2oLO4GyrZxa
+         gNHkqqOOx2wAUuBKryz2EH0NU0pXsiOqNgNzwCDp62Y9lC+vGqC839aRicD3013tLjGL
+         ZI0f6v61/JJWK7dxndRRMrHKcsqQ2ardbcbV/KezywD5dF9Nmrpzucf2rxV3ZNl4GM+b
+         otHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712150391; x=1712755191;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0HH3He2M5JGBbpn1IyUzwQbFpqNeS8i3zDjnB0NO5L0=;
+        b=QnGx9lj/SIqw7CmbpP1dVYK9Ebggu0GiaZNHXTPsXcRieo3oAnu9WPP7rCQBNt+Zy/
+         fWDgkEW+SJZs/u2kN5AK4Yl89SKuKF9pdDCrVHIGH1DXCCzLVcNbkyMDtKRZCq3VmkOt
+         SmSELE3MOx3LeQ0KRDyMys4Ozg/z924TAFUyUdbbkz0k2H3PrDb5xsvEIJbSKDS9ZuS3
+         QaKnbEEkHvYUGWxcoBciMiOvdATMhxMXIksdNqwp37/eMCzwHEA0yphkwnmYsfZc40N+
+         6epW8dwxlgSymkzVE5uEujjKSMrGXkQP9VqgxBBFOTRaeH4QLGDyjBOa743AofmH7hsq
+         24/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX4su6MLSBZl/joLOGT38EAsbC2D20Q2SCQF0A+b/tHZ9HOa6GuoJGTAZBaEqtE4X9ORB63Zo2BYhD+kl7e0vDR2CD5J0oXNna8ixWP9Vcl1jueZWrZhTqSIUm7YYsRF2bd5Qzf778CwXbd8pJ5OmK5wmqbTynRq84c7cxKB5Cn2bOfGsEFERW9oom1olZXTPQh1RhMqKY7GTBy6jwoaf/f5vbAX9rMkmOTT9s0SmR5PCKj3eVtI0B07KhrDP5QjrkMEvmuV9MobGmG0sl/ri94HiryfoexwHf2tWXixPOZzCiy/sHiCuJEikJEH5gr5A==
+X-Gm-Message-State: AOJu0YzYBFwfxuYK8gIJD2Ug3iQAUSCHSU5PDtYLhtXz5ojGn6dOZ9BX
+	lXHb/jKVaXX93AdLPFLNNKD3vaLulPbYuGicqnpx/Up220tv3XwuY6myKsNu
+X-Google-Smtp-Source: AGHT+IGzp4oN8GRSo/9EyN0xy1NOVYsP3l70Car4fBvR2s7g6gbB9/O+yleAACI5/eSTY78txokLLg==
+X-Received: by 2002:a17:903:d1:b0:1e2:a177:d6b with SMTP id x17-20020a17090300d100b001e2a1770d6bmr229571plc.19.1712150391428;
+        Wed, 03 Apr 2024 06:19:51 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id h1-20020a170902b94100b001dd0c5d5227sm13149194pls.193.2024.04.03.06.19.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 06:19:50 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+To: linux-kselftest@vger.kernel.org
+Cc: David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	=?UTF-8?q?Ma=C3=ADra=20Canal?= <mcanal@igalia.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Kees Cook <keescook@chromium.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	=?UTF-8?q?Ville=20Syrj=C3=A4l=C3=A4?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org,
+	kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	x86@kernel.org,
+	Guenter Roeck <linux@roeck-us.net>,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: [PATCH v3 05/15] drm: Suppress intentional warning backtraces in scaling unit tests
+Date: Wed,  3 Apr 2024 06:19:26 -0700
+Message-Id: <20240403131936.787234-6-linux@roeck-us.net>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240403131936.787234-1-linux@roeck-us.net>
+References: <20240403131936.787234-1-linux@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+The drm_test_rect_calc_hscale and drm_test_rect_calc_vscale unit tests
+intentionally trigger warning backtraces by providing bad parameters to
+the tested functions. What is tested is the return value, not the existence
+of a warning backtrace. Suppress the backtraces to avoid clogging the
+kernel log and distraction from real problems.
 
-Add handlers for the SIOCSHWTSTAMP and SIOCGHWTSTAMP ioctls which allow
-userspace to request timestamp enablement for the device. This
-support allows standard Linux applications to request the timestamping
-desired.
-
-As with other devices that support timestamping all packets, the driver
-will upgrade any request for timestamping of a specific type of packet
-to HWTSTAMP_FILTER_ALL.
-
-The current configuration is stored, so that it can be retrieved by
-SIOCGHWTSTAMP.
-
-The Tx timestamps are not implemented yet so calling SIOCSHWTSTAMP for
-Tx path will end with EOPNOTSUPP error code.
-
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
+Acked-by: Maíra Canal <mcanal@igalia.com>
+Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+Cc: David Airlie <airlied@gmail.com>
+Cc: Daniel Vetter <daniel@ffwll.ch>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- drivers/net/ethernet/intel/iavf/iavf_main.c |  25 ++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.c  | 135 ++++++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.h  |   3 +
- drivers/net/ethernet/intel/iavf/iavf_txrx.h |   1 +
- 4 files changed, 164 insertions(+)
+v2:
+- Rebased to v6.9-rc1
+- Added Tested-by:, Acked-by:, and Reviewed-by: tags
+v3:
+- Rebased to v6.9-rc2
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 6b27065af357..a2fe2d124907 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -4925,6 +4925,30 @@ static netdev_features_t iavf_fix_features(struct net_device *netdev,
- 	return iavf_fix_strip_features(adapter, features);
+ drivers/gpu/drm/tests/drm_rect_test.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/drivers/gpu/drm/tests/drm_rect_test.c b/drivers/gpu/drm/tests/drm_rect_test.c
+index 76332cd2ead8..66851769ee32 100644
+--- a/drivers/gpu/drm/tests/drm_rect_test.c
++++ b/drivers/gpu/drm/tests/drm_rect_test.c
+@@ -406,22 +406,38 @@ KUNIT_ARRAY_PARAM(drm_rect_scale, drm_rect_scale_cases, drm_rect_scale_case_desc
+ 
+ static void drm_test_rect_calc_hscale(struct kunit *test)
+ {
++	DEFINE_SUPPRESSED_WARNING(drm_calc_scale);
+ 	const struct drm_rect_scale_case *params = test->param_value;
+ 	int scaling_factor;
+ 
++	/*
++	 * drm_rect_calc_hscale() generates a warning backtrace whenever bad
++	 * parameters are passed to it. This affects all unit tests with an
++	 * error code in expected_scaling_factor.
++	 */
++	START_SUPPRESSED_WARNING(drm_calc_scale);
+ 	scaling_factor = drm_rect_calc_hscale(&params->src, &params->dst,
+ 					      params->min_range, params->max_range);
++	END_SUPPRESSED_WARNING(drm_calc_scale);
+ 
+ 	KUNIT_EXPECT_EQ(test, scaling_factor, params->expected_scaling_factor);
  }
  
-+/**
-+ * iavf_do_ioctl - Handle network device specific ioctls
-+ * @netdev: network interface device structure
-+ * @ifr: interface request data
-+ * @cmd: ioctl command
-+ *
-+ * Callback to handle the networking device specific ioctls. Used to handle
-+ * the SIOCGHWTSTAMP and SIOCSHWTSTAMP ioctl requests that configure Tx and Rx
-+ * timstamping support.
-+ */
-+static int iavf_do_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
-+{
-+	struct iavf_adapter *adapter = netdev_priv(netdev);
-+
-+	switch (cmd) {
-+	case SIOCGHWTSTAMP:
-+		return iavf_ptp_get_ts_config(adapter, ifr);
-+	case SIOCSHWTSTAMP:
-+		return iavf_ptp_set_ts_config(adapter, ifr);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static const struct net_device_ops iavf_netdev_ops = {
- 	.ndo_open		= iavf_open,
- 	.ndo_stop		= iavf_close,
-@@ -4940,6 +4964,7 @@ static const struct net_device_ops iavf_netdev_ops = {
- 	.ndo_fix_features	= iavf_fix_features,
- 	.ndo_set_features	= iavf_set_features,
- 	.ndo_setup_tc		= iavf_setup_tc,
-+	.ndo_eth_ioctl		= iavf_do_ioctl,
- };
+ static void drm_test_rect_calc_vscale(struct kunit *test)
+ {
++	DEFINE_SUPPRESSED_WARNING(drm_calc_scale);
+ 	const struct drm_rect_scale_case *params = test->param_value;
+ 	int scaling_factor;
  
- /**
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-index f1f4c260e08f..0e5cae23f9be 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-@@ -3,6 +3,135 @@
++	/*
++	 * drm_rect_calc_vscale() generates a warning backtrace whenever bad
++	 * parameters are passed to it. This affects all unit tests with an
++	 * error code in expected_scaling_factor.
++	 */
++	START_SUPPRESSED_WARNING(drm_calc_scale);
+ 	scaling_factor = drm_rect_calc_vscale(&params->src, &params->dst,
+ 					      params->min_range, params->max_range);
++	END_SUPPRESSED_WARNING(drm_calc_scale);
  
- #include "iavf.h"
- 
-+/**
-+ * iavf_ptp_disable_rx_tstamp - Disable timestamping in Rx rings
-+ * @adapter: private adapter structure
-+ *
-+ * Disable timestamp reporting for all Rx rings.
-+ */
-+static void iavf_ptp_disable_rx_tstamp(struct iavf_adapter *adapter)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < adapter->num_active_queues; i++)
-+		adapter->rx_rings[i].flags &= ~IAVF_TXRX_FLAGS_HW_TSTAMP;
-+}
-+
-+/**
-+ * iavf_ptp_enable_rx_tstamp - Enable timestamping in Rx rings
-+ * @adapter: private adapter structure
-+ *
-+ * Enable timestamp reporting for all Rx rings.
-+ */
-+static void iavf_ptp_enable_rx_tstamp(struct iavf_adapter *adapter)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < adapter->num_active_queues; i++)
-+		adapter->rx_rings[i].flags |= IAVF_TXRX_FLAGS_HW_TSTAMP;
-+}
-+
-+/**
-+ * iavf_ptp_set_timestamp_mode - Set device timestamping mode
-+ * @adapter: private adapter structure
-+ * @config: timestamping configuration request
-+ *
-+ * Set the timestamping mode requested from the SIOCSHWTSTAMP ioctl.
-+ *
-+ * Note: this function always translates Rx timestamp requests for any packet
-+ * category into HWTSTAMP_FILTER_ALL.
-+ */
-+static int iavf_ptp_set_timestamp_mode(struct iavf_adapter *adapter,
-+				       struct hwtstamp_config *config)
-+{
-+	/* Reserved for future extensions. */
-+	if (config->flags)
-+		return -EINVAL;
-+
-+	switch (config->tx_type) {
-+	case HWTSTAMP_TX_OFF:
-+		break;
-+	case HWTSTAMP_TX_ON:
-+		return -EOPNOTSUPP;
-+	default:
-+		return -ERANGE;
-+	}
-+
-+	switch (config->rx_filter) {
-+	case HWTSTAMP_FILTER_NONE:
-+		iavf_ptp_disable_rx_tstamp(adapter);
-+		break;
-+	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
-+	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
-+	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
-+	case HWTSTAMP_FILTER_PTP_V2_EVENT:
-+	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
-+	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
-+	case HWTSTAMP_FILTER_PTP_V2_SYNC:
-+	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
-+	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
-+	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
-+	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
-+	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
-+	case HWTSTAMP_FILTER_NTP_ALL:
-+	case HWTSTAMP_FILTER_ALL:
-+		if (!(iavf_ptp_cap_supported(adapter,
-+					     VIRTCHNL_1588_PTP_CAP_RX_TSTAMP)))
-+			return -EOPNOTSUPP;
-+		config->rx_filter = HWTSTAMP_FILTER_ALL;
-+		iavf_ptp_enable_rx_tstamp(adapter);
-+		break;
-+	default:
-+		return -ERANGE;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * iavf_ptp_get_ts_config - Get timestamping configuration for SIOCGHWTSTAMP
-+ * @adapter: private adapter structure
-+ * @ifr: the ioctl request structure
-+ *
-+ * Copy the current hardware timestamping configuration back to userspace.
-+ * Called in response to the SIOCGHWTSTAMP ioctl that queries a device's
-+ * current timestamp settings.
-+ */
-+int iavf_ptp_get_ts_config(struct iavf_adapter *adapter, struct ifreq *ifr)
-+{
-+	struct hwtstamp_config *config = &adapter->ptp.hwtstamp_config;
-+
-+	return copy_to_user(ifr->ifr_data, config,
-+			    sizeof(*config)) ? -EFAULT : 0;
-+}
-+
-+/**
-+ * iavf_ptp_set_ts_config - Set timestamping configuration from SIOCSHWTSTAMP
-+ * @adapter: private adapter structure
-+ * @ifr: the ioctl request structure
-+ *
-+ * Program the requested timestamping configuration from SIOCSHWTSTAMP ioctl
-+ * to the device.
-+ */
-+int iavf_ptp_set_ts_config(struct iavf_adapter *adapter, struct ifreq *ifr)
-+{
-+	struct hwtstamp_config config;
-+	int err;
-+
-+	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
-+		return -EFAULT;
-+
-+	err = iavf_ptp_set_timestamp_mode(adapter, &config);
-+	if (err)
-+		return err;
-+
-+	/* Save successful settings for future reference */
-+	adapter->ptp.hwtstamp_config = config;
-+
-+	return copy_to_user(ifr->ifr_data, &config,
-+			    sizeof(config)) ? -EFAULT : 0;
-+}
-+
- /**
-  * clock_to_adapter - Convert clock info pointer to adapter pointer
-  * @ptp_info: PTP info structure
-@@ -325,4 +454,10 @@ void iavf_ptp_process_caps(struct iavf_adapter *adapter)
- 	else if (!adapter->ptp.initialized &&
- 		 iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_READ_PHC))
- 		iavf_ptp_init(adapter);
-+
-+	/* Check if the device lost access to Rx timestamp incoming packets */
-+	if (!iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_RX_TSTAMP)) {
-+		adapter->ptp.hwtstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
-+		iavf_ptp_disable_rx_tstamp(adapter);
-+	}
+ 	KUNIT_EXPECT_EQ(test, scaling_factor, params->expected_scaling_factor);
  }
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-index 7a25647980f3..337bf184a7ea 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-@@ -21,6 +21,7 @@ struct iavf_ptp {
- 	struct list_head aq_cmds;
- 	/* Lock protecting access to the AQ command list */
- 	spinlock_t aq_cmd_lock;
-+	struct hwtstamp_config hwtstamp_config;
- 	u64 cached_phc_time;
- 	unsigned long cached_phc_updated;
- 	bool initialized;
-@@ -35,5 +36,7 @@ void iavf_ptp_process_caps(struct iavf_adapter *adapter);
- bool iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap);
- void iavf_virtchnl_send_ptp_cmd(struct iavf_adapter *adapter);
- long iavf_ptp_do_aux_work(struct ptp_clock_info *ptp);
-+int iavf_ptp_get_ts_config(struct iavf_adapter *adapter, struct ifreq *ifr);
-+int iavf_ptp_set_ts_config(struct iavf_adapter *adapter, struct ifreq *ifr);
- 
- #endif /* _IAVF_PTP_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.h b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-index 54d858303839..f77407030566 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-@@ -358,6 +358,7 @@ struct iavf_ring {
- #define IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1	BIT(3)
- #define IAVF_TXR_FLAGS_VLAN_TAG_LOC_L2TAG2	BIT(4)
- #define IAVF_RXR_FLAGS_VLAN_TAG_LOC_L2TAG2_2	BIT(5)
-+#define IAVF_TXRX_FLAGS_HW_TSTAMP		BIT(6)
- 
- 	/* stats structs */
- 	struct iavf_queue_stats	stats;
 -- 
-2.38.1
+2.39.2
 
 
