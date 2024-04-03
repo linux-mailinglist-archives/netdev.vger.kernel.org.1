@@ -1,55 +1,57 @@
-Return-Path: <netdev+bounces-84625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8D87897A37
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:45:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66625897A3C
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5249B1F22FCC
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:45:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0228D1F21AA2
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C8C156C66;
-	Wed,  3 Apr 2024 20:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9838A154BE2;
+	Wed,  3 Apr 2024 20:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u01tbEWS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PXxn38Aa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2839F14A096;
-	Wed,  3 Apr 2024 20:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98603218B
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 20:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712176954; cv=none; b=Egx3wr7Tn+HReR8usA8JM3rz4ft9frMu0QeyrgNFjZ0HhwI58+xWcW490H74Kh5hcLlkSwNRSgOHs4UjLTsnLBYFdFtQnvywEiwxhkAh63k+mnpKJ7yq3+kv38ZpIX7p8f4x6jYKzjrmTyxgsIk4ydL9OpArcQdAaxTj+wvF6RQ=
+	t=1712177208; cv=none; b=h+NhcFp+42WDcQZl13izDa/5YqFT7h/DY/LaB6Itq4DgrDqOV0BTJPfpQAP8YQiXqGWUf6xRQiwPPiPbcbnOzOvcyvmyo7nebT95/9NoGuJUMQOLXYLJvOapEcSfID2sBkHqyKu7BrWaGOqPMzrB0jpFA5yS8EeB6U76EOpJn+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712176954; c=relaxed/simple;
-	bh=gkCZ8Gqsb+rHCxtePN8Y9thSSB+jkdz1yRN2PxHLL7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=e9dyRXVXuCLyRCN0aHYga7XyaOBOyst3qRf2Q2Ldocr5/xIMBJJ+PxKWTMLsxoXkXgh69DCab4p0rtZYHby/wPoc9PGEKiYnTzwyCdeQuvxRW541OpeGrB/bvekBm8sEd/6N+Kh4tDZilFusCF4W0aaOs2uDMNaFyeeLMNAvvqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u01tbEWS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AEF5C433F1;
-	Wed,  3 Apr 2024 20:42:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712176953;
-	bh=gkCZ8Gqsb+rHCxtePN8Y9thSSB+jkdz1yRN2PxHLL7Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=u01tbEWSwImRYXCgfQpc32YLsBz8Vr1/D8bWf5BC56MA6JPWtKspxi92RNMfa6Etp
-	 A8iC+KTNN89uBknsYumCqa3R1r9KQ/IvkfcpGoVe2C0bOtDWjVFZFT6Ys9crARQ2YI
-	 NJVxqQQwF4hFjs+r6avtAFDXZusRpuGC2xY+zHNN+a0G+FEcPNNGClo3slTYSj+Oqd
-	 +hq1QO/Jd+0SqaU3srNDcWoLFCxS8eTmTVUNLeXi9ANBtIQvJU3QyuZfDRCSadr4o2
-	 gCPbij8NRZlXND6fwtFIZz3IHoZJiUhjb9zrpOILxH+LIsI3huse8dw7sk5F7m2heF
-	 Q1wMy3b9YufHQ==
-Date: Wed, 3 Apr 2024 15:42:31 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
+	s=arc-20240116; t=1712177208; c=relaxed/simple;
+	bh=OnGSvz0sMOScoXSe6Vtch6jgOwOVr16ho9dfmUTTbBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NuPuerv18VlKbhcGlGhVcILjuCKUcbcY2Vsvh1NjsNnSW+UrNhZiAWFNzNbMFTZRn6MqKI0cKPtLR0/OuP/P0GEdmJv9sDpvOkGqlv91cI9Gg6IKp4BQu/DYOjEO9FvpnLe72X8W9etAZMrS03TxUBLeoSHYpXahwk9yAZcgdRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PXxn38Aa; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Lq8H1ilh9GcLVJanCt300842Idj+hhabzlORtyAReLs=; b=PXxn38Aauj4j0XxZJsofMIaZiI
+	Hh4aNdzRslDYzn1/J8pYclvh6J+9ALDktbXSxWL2ZXqRG7GQtVqnv7maOGHNZNqIMXS9Tj219IFpH
+	s3LVKxo6rA10+MdUJqDgVL9Ea49Vwwp8TPF6safk7MB0bZBo+xAmSBo7CZTASUdDOO8E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rs7VL-00C78n-V4; Wed, 03 Apr 2024 22:46:43 +0200
+Date: Wed, 3 Apr 2024 22:46:43 +0200
+From: Andrew Lunn <andrew@lunn.ch>
 To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <20240403204231.GA1887634@bhelgaas>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 04/15] eth: fbnic: Add register init to set
+ PCIe/Ethernet device config
+Message-ID: <32deafeb-82fe-48c6-a15e-08e065963876@lunn.ch>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217492154.1598374.14769531965073029777.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,41 +60,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: <171217492154.1598374.14769531965073029777.stgit@ahduyck-xeon-server.home.arpa>
 
-On Wed, Apr 03, 2024 at 01:08:24PM -0700, Alexander Duyck wrote:
-> This patch set includes the necessary patches to enable basic Tx and Rx
-> over the Meta Platforms Host Network Interface. To do this we introduce a
-> new driver and driver and directories in the form of
-> "drivers/net/ethernet/meta/fbnic".
+> +#define wr32(reg, val)	fbnic_wr32(fbd, reg, val)
+> +#define rd32(reg)	fbnic_rd32(fbd, reg)
+> +#define wrfl()		fbnic_rd32(fbd, FBNIC_MASTER_SPARE_0)
 
->       PCI: Add Meta Platforms vendor ID
->       eth: fbnic: add scaffolding for Meta's NIC driver
->       eth: fbnic: Allocate core device specific structures and devlink interface
->       eth: fbnic: Add register init to set PCIe/Ethernet device config
->       eth: fbnic: add message parsing for FW messages
->       eth: fbnic: add FW communication mechanism
->       eth: fbnic: allocate a netdevice and napi vectors with queues
->       eth: fbnic: implement Tx queue alloc/start/stop/free
->       eth: fbnic: implement Rx queue alloc/start/stop/free
->       eth: fbnic: Add initial messaging to notify FW of our presence
->       eth: fbnic: Enable Ethernet link setup
->       eth: fbnic: add basic Tx handling
->       eth: fbnic: add basic Rx handling
->       eth: fbnic: add L2 address programming
->       eth: fbnic: write the TCAM tables used for RSS control and Rx to host
+I don't think that is considered best practices, using variables not
+passed to the macro.
 
-Random mix of initial caps in subjects.  Also kind of a mix of initial
-caps in comments, e.g.,
-
-  $ grep -Er "^\s+/\*" drivers/net/ethernet/meta/fbnic/
-
-I didn't bother to figure out which patch these typos were in:
-
-  $ codespell drivers/net/ethernet/meta/fbnic/
-  drivers/net/ethernet/meta/fbnic/fbnic_pci.c:452: ot ==> to, of, or
-  drivers/net/ethernet/meta/fbnic/fbnic_pci.c:479: Reenable ==> Re-enable
-  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c:569: caclulation ==> calculation
-  drivers/net/ethernet/meta/fbnic/fbnic_fw.c:740: conents ==> contents
-  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h:19: cachline ==> cacheline
+	Andrew
 
