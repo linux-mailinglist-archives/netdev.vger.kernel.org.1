@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-84239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49E9A896221
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:41:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA4D896223
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B26F1C235A6
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:41:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EFE71F25503
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CA31CF9C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE84D2574F;
 	Wed,  3 Apr 2024 01:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOnpSGhS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OBDVtB/7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F090168A8
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 01:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8EF17BCE;
+	Wed,  3 Apr 2024 01:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712108435; cv=none; b=YkuZ/MLVAQMdWpVH/JosRo3EoAmeDnp49l3Ie9o3sl7bruZpDppnOhQG4dHCxfbCCNIqsjyOw4usgDOMB6RNnn1avVtyMsvP892e6mOnstU1+Lpow+IOtWlgzr6bxOryZN0vAXsw17RXpPECzM6rsUbbDtyexVuzwe5Ytbjp/LY=
+	t=1712108435; cv=none; b=fCy3CPqLRFMhx/vhGsfTotWZJ3YKCHLU6CH1NuUjtQ50M6MGoa7Rwy8Qfc/RtQheJZG/QpOWO2kGvM3RL+WHya6L+uchRgEMRArVS8b3h3VOWoY+cuAF/lpFI6uwoiygC0tPpRrS9RgKxUJzT4SRiPmotph+MRS0RMcPcpyn7e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712108435; c=relaxed/simple;
-	bh=3iaCdZeo2WFwC0ne8NvezPPQERqRcxIzimAAJhbILlc=;
+	bh=Z8qTCsLw7+oMuaV/qewhvl2ECFN/UQO0aDvA4mEBrSQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LsITVUDhMSrUD3H5hep2AyAKTwvmkAglIUyYlzbHVFXCAhg9BIPYcZbLp02e2bGXXCBZI6GqkzKO6R1miqBx3jesh+ZqHd45BbCLyBod9uTch+A3pbrJYPFtVmhjvjTwcyhP/XIXym9M24VDHN1EjZaYeZ4CV6bzW4C2xi+9X34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOnpSGhS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EF138C43609;
-	Wed,  3 Apr 2024 01:40:34 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Frtkf+MnTKi79ih2EyyPz9wGoXPyd+aE1pHQ7EGw3Ly9Ltr73Dl8BlsfTJg+ghW6zs4BwsypB6WS745H6Nzv/Is2Voi/2JEjZlvivDbfuUcYs/DGolkB1fHJfEXkSlE/gctqCGr0tEQa7ApJk4ciN9aohmxXaYIm/3se2x9g970=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OBDVtB/7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 069C5C4166A;
+	Wed,  3 Apr 2024 01:40:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712108435;
-	bh=3iaCdZeo2WFwC0ne8NvezPPQERqRcxIzimAAJhbILlc=;
+	bh=Z8qTCsLw7+oMuaV/qewhvl2ECFN/UQO0aDvA4mEBrSQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oOnpSGhSYJz8OlFoDFThzc/AigAxTdD4jyIGpHJm+Jo+yFL9eJ0H5gAkNg84sGyVv
-	 gdRoPw6ati5JTMa0blxS5WMyLuvXsPPA0QBGI9XrEdgAkBg/yT3yRT30BPLk8a4I9r
-	 sxInk5mfXJ0evPtTO7GvvAm53ELyo0vKyC0d4l+eCwOYHUb3E7P0V2i7czmKROclZH
-	 htEvNN4cxKarKRQG0H54wbyUpE0x4Vrl6FhpwGLm892RbljpAyCegUTvPL2M+UhAww
-	 7PYiM2L5RGftfnPBYivz7DWQhGfVOcSJgSEJ2dqNEr9k24TWi6RykHgOIWMIDBmH9Y
-	 EFPeNGtLHXMdQ==
+	b=OBDVtB/7tU5LTpyvHP8SPA/Ha9HPwqUXGlFhpB1HRWUaeEXxARiMik9R2Jc4iDk9i
+	 u7xmtdrl2pAEita/RFv957CjPMINipBrTHwR7/F76Ck6dnkFZQw+mXP6IbJ69dQpp6
+	 Y3imF0c4luCuvMvb7NGXAvRCDjOw3tOmmfAXnm+kdHwhQS5ZKOkstfzZlnlaFuVyEz
+	 j/9I16dar9AlJlYrNA2poqYZX1TKkUnWMwlRe873JejaERmvx022EWI/RZHQu8OSf7
+	 myLMGQKnSB+yR6zDnYKy506gc7JGCmq/GUcnu6cO2qgkJYOO5J3MgxQAhKt6iMOsCk
+	 aFLh+n27LQX4w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E68BDC4314C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EE3ECD8BD1B;
 	Wed,  3 Apr 2024 01:40:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tools: ynl: add ynl_dump_empty() helper
+Subject: Re: [PATCH net-next v2 0/2] Avoid explicit cpumask var allocation on
+ stack
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171210843494.14193.18354979301638732857.git-patchwork-notify@kernel.org>
+ <171210843497.14193.16578910884878610890.git-patchwork-notify@kernel.org>
 Date: Wed, 03 Apr 2024 01:40:34 +0000
-References: <20240329181651.319326-1-kuba@kernel.org>
-In-Reply-To: <20240329181651.319326-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, nicolas.dichtel@6wind.com, sdf@google.com
+References: <20240331053441.1276826-1-dawei.li@shingroup.cn>
+In-Reply-To: <20240331053441.1276826-1-dawei.li@shingroup.cn>
+To: Dawei Li <dawei.li@shingroup.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ioana.ciornei@nxp.com, wintera@linux.ibm.com,
+ twinkler@linux.ibm.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 29 Mar 2024 11:16:51 -0700 you wrote:
-> Checking if dump is empty requires a couple of casts.
-> Add a convenient wrapper.
+On Sun, 31 Mar 2024 13:34:39 +0800 you wrote:
+> Hi,
 > 
-> Add an example use in the netdev sample, loopback is always
-> present so an empty dump is an error.
+> This is v2 of previous series[1] about cpumask var on stack for net
+> subsystem.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Change since v1:
+> - For iucv_setmask_up() which returns void to caller, just make cpumask
+>   var static which is protected by global lock iucv_register_mutex. [Eric]
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] tools: ynl: add ynl_dump_empty() helper
-    https://git.kernel.org/netdev/net-next/c/d6d647d7ba64
+  - [net-next,v2,1/2] net/iucv: Avoid explicit cpumask var allocation on stack
+    https://git.kernel.org/netdev/net-next/c/be4e1304419c
+  - [net-next,v2,2/2] net/dpaa2: Avoid explicit cpumask var allocation on stack
+    https://git.kernel.org/netdev/net-next/c/d33fe1714a44
 
 You are awesome, thank you!
 -- 
