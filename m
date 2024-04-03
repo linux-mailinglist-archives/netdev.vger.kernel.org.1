@@ -1,125 +1,151 @@
-Return-Path: <netdev+bounces-84267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EAF88962EA
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 05:24:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F438962EE
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 05:27:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88631F24567
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:24:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C5961C22275
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75E1224C6;
-	Wed,  3 Apr 2024 03:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3EE224DB;
+	Wed,  3 Apr 2024 03:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P0b/LIAQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4741BF5C;
-	Wed,  3 Apr 2024 03:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E0E1BC59
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 03:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712114688; cv=none; b=NE5zlEFLB3wXjlYhvJxGrcJy2U5PRL/en0109QSXPqtOVA3TyvG/UAQFVr+yJ+AaYGeLUUDbh52vWtbesc5mXuVI7bH2Sgd8lbWOC3NqzYtAAl/q7t/kYmWPTGhLeco34YJt5rEeyWW1kDEqqx1E6tbwjaJcy+aUdGOz9nglIDc=
+	t=1712114849; cv=none; b=sd4P0dTryK/CtnNy2/l+xcy1n9Y+ye+Ma/CpYdglCuWavsMDFETaZRQEsEr1qzBu6HQcwMG5qjI+aObqUCga0KvIvgcSJerCN9hXPollV45JAHz0TeSkX2LiWsRelsI/aGy7UTFC3g9286OQMNZ4BNmHJ1+KrchAOg1Z2sjefUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712114688; c=relaxed/simple;
-	bh=A94+6bWLEorCLEX2BhGEGxlfRcLWmEelHOFm+jGI7to=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=md2830YllWX+moVlXT30yHhfPWHc7604BVHzbe9KGkgBij5o++UTKs5jPwaZu8wloIFcPjQokgtrin0C/+dDNAIj52RdPvNRWljuI88aDP+2RG0igYWN2aji2SlMx+d6rSfuIAXy+B2fd1T+MmSVvL90bccOrH0yyCp2KdRUfIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4V8VV54Krlz4f3khf;
-	Wed,  3 Apr 2024 11:24:29 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 1D70B1A0175;
-	Wed,  3 Apr 2024 11:24:36 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP1 (Coremail) with SMTP id cCh0CgAnRQ7yywxmOR2WIw--.30244S2;
-	Wed, 03 Apr 2024 11:24:35 +0800 (CST)
-Message-ID: <0626619d-5950-497e-aa67-a13cede9b300@huaweicloud.com>
-Date: Wed, 3 Apr 2024 11:24:34 +0800
+	s=arc-20240116; t=1712114849; c=relaxed/simple;
+	bh=3DcUJUQf6Wa4OXd44pA2EifLwcLrk+26Cdl9DBdQFfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XgWMBunVruSsCefcPX1kno4ZFFI7q2UhfPiC/wgkXJ1kHpu/5tiBtbphEGzhFONEZBQxlsoWzWM3v2EUW/S/c9PBUVVZ/UWL09zC1A4DsTQi0tTlUIIjBjzVEWxGtHCQ3HdABKF/64XpV36jLeodAIEvp5ojMUSTjuDkaKRglEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P0b/LIAQ; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-29f93c4946cso4303395a91.1
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 20:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712114848; x=1712719648; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MjrhfohyyhZYXmPTuNJHBaaFu2XauoKgKxYCWVGiSIE=;
+        b=P0b/LIAQQr7DH5nhESOW074Sps9jsFTdzbj6K2dw5sVFNQS8YaptU0pzjdJK5Z5H1r
+         zMh5b8SMxdVGu7/WluAvre6vcWBFFVYSI3Z9cW1xsxo6aDiYcC8JcUiWNtcKxd00ITE/
+         BgoqjoD0pefOEcR+GxnCkPd3OmQgfP1XNFKYb3iQy7QlHuPfo7SU6fDyONjfzonf5x2H
+         /PeMowF9z7l7DsKZ40ns5gHRNqa8OZZ8xzy+Q+1Zt/H3wGNDcrHaWjl4XBWYZDznJ41L
+         BiVzHKReumnfBGZ/i+v5QlITcZUmk1EAjlaYqqSthZxcjct9NhW5xZAVT6poF28OhgbS
+         rN5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712114848; x=1712719648;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MjrhfohyyhZYXmPTuNJHBaaFu2XauoKgKxYCWVGiSIE=;
+        b=xDoEhsyoYkXGLLXPc7Q5zQgtv67AhkVRSPO9nvT5kcXKuTMe//eiRKxoom0W3FHS7A
+         L6vUEJjQg9+FrIYFYbkSA4DU3os/jk+s1UCWeUsUez2t7bXAwDz/wxCN964D0BaAmgUs
+         CnnP71zKEmJycGT5qX/DMHYt8zkXdV/AVwIW90UAF+sRIbqgS/30wsZgUGF/sHI4loV0
+         R5E/vRNwzS3xcZ8jpclPR70v/y3oSUc4M/A6Fwym5rDY5ixyrnwHqNb+aaTl0MsTnGus
+         8g1JGoBeouMNAfe9tC4ZrxU3L/OFQugabMdME2czEvrD2Z6Q9tUKtv32jN8eQRLHcdEZ
+         g+fw==
+X-Gm-Message-State: AOJu0YzpLCR14g/6bKSwyrY1SCojCp6ZrfiI3lu4ztGVL3Pebq0woDfy
+	DcA/AJxKzNIDcM8Dxnjz/mgLOkW2G6EhOP4M9HYV7O/DVzWn/2Mn
+X-Google-Smtp-Source: AGHT+IEhqjBXtuRkOF7Iv8otGypAJNTjTqNBTnrxfTRnIumvgAyT7iWglb9a4MT8sSN+DPc5SsREig==
+X-Received: by 2002:a17:90a:8b89:b0:2a2:18fb:683e with SMTP id z9-20020a17090a8b8900b002a218fb683emr10133063pjn.30.1712114847664;
+        Tue, 02 Apr 2024 20:27:27 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id gw12-20020a17090b0a4c00b002a06a806567sm10418875pjb.49.2024.04.02.20.27.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 20:27:27 -0700 (PDT)
+Date: Wed, 3 Apr 2024 11:27:22 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCHv3 net-next 2/2] ynl: support binary/u32 sub-type for
+ indexed-array
+Message-ID: <ZgzMmqWzRvdk4wzP@Laptop-X1>
+References: <20240401035651.1251874-1-liuhangbin@gmail.com>
+ <20240401035651.1251874-3-liuhangbin@gmail.com>
+ <20240401214331.149e0437@kernel.org>
+ <Zgy-0vYLeaY-lMnR@Laptop-X1>
+ <20240402193551.38a5aead@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 2/2] selftests/bpf: Add testcase where 7th
- argment is struct
-Content-Language: en-US
-To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20240331092405.822571-1-pulehui@huaweicloud.com>
- <20240331092405.822571-3-pulehui@huaweicloud.com>
- <967f996f-f660-4615-696e-95c5db0542ad@iogearbox.net>
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <967f996f-f660-4615-696e-95c5db0542ad@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAnRQ7yywxmOR2WIw--.30244S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw4xJr4UAr47XF4rGF4DArb_yoW8Wr4rpa
-	yxu34Y9rW8Xrs7Xry3AF4UZrW3JrWkWw1UZryxJayFvFyjgFyYgF40gw4Y9rn8Jrs3uw1a
-	yF4jq3y5uw4DZF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI
-	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
-	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY
-	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6x
-	AIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
-	6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFDGOUUUUU
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240402193551.38a5aead@kernel.org>
 
-
-On 2024/4/2 22:02, Daniel Borkmann wrote:
-> On 3/31/24 11:24 AM, Pu Lehui wrote:
->> From: Pu Lehui <pulehui@huawei.com>
->>
->> Add testcase where 7th argument is struct for architectures with 8
->> argument registers, and increase the complexity of the struct.
->>
->> Signed-off-by: Pu Lehui <pulehui@huawei.com>
->> ---
->>   .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 19 ++++++++++
->>   .../selftests/bpf/prog_tests/tracing_struct.c | 13 +++++++
->>   .../selftests/bpf/progs/tracing_struct.c      | 35 +++++++++++++++++++
->>   3 files changed, 67 insertions(+)
+On Tue, Apr 02, 2024 at 07:35:51PM -0700, Jakub Kicinski wrote:
+> On Wed, 3 Apr 2024 10:28:34 +0800 Hangbin Liu wrote:
+> > I didn't check other subsystem. For bonding only, if we don't have the hint.
+> > e.g.
+> > 
+> >   -
+> >     name: arp-ip-target
+> >     type: indexed-array
+> >     sub-type: u32
+> > 
+> > The result will looks like:
+> > 
+> >     "arp-ip-target": [
+> >       "c0a80101",
+> >       "c0a80102"
+> >     ],
+> > 
+> > Which looks good to me. Do you have other suggestion?
 > 
-> The last test from this patch fails BPF CI, ptal :
-> 
-> https://github.com/kernel-patches/bpf/actions/runs/8497262674/job/23275690303
-> https://github.com/kernel-patches/bpf/actions/runs/8497262674/job/23275690364
-> 
-> Notice: Success: 519/3592, Skipped: 53, Failed: 1
-> Error: #391 tracing_struct
->    Error: #391 tracing_struct
->    test_fentry:PASS:tracing_struct__open_and_load 0 nsec
->    libbpf: prog 'test_struct_arg_16': failed to attach: ERROR: 
-> strerror_r(-524)=22
->    libbpf: prog 'test_struct_arg_16': failed to auto-attach: -524
->    test_fentry:FAIL:tracing_struct__attach unexpected error: -524 (errno 
-> 524)
-> Test Results:
->               bpftool: PASS
->            test_progs: FAIL (returned 1)
-> Error: Process completed with exit code 1.
+> That doesn't look right, without the format hint if the type is u32 
+> the members should be plain integers not hex strings.
 
-Thanks for your reminder. aarch64 does not yet support bpf trampoline 
-with more than 8 parameters. I will add tracing_struct to DENYLIST.aarch64.
+OK, I can separate the binary and u32 dealing. How about like
 
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index e5ad415905c7..be42e4fc1037 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -640,6 +640,16 @@ class YnlFamily(SpecFamily):
+             if attr_spec["sub-type"] == 'nest':
+                 subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
+                 decoded.append({ item.type: subattrs })
++            elif attr_spec["sub-type"] == 'binary':
++                subattrs = item.as_bin()
++                if attr_spec.display_hint:
++                    subattrs = self._formatted_string(subattrs, attr_spec.display_hint)
++                decoded.append(subattrs)
++            elif attr_spec["sub-type"] in NlAttr.type_formats:
++                subattrs = item.as_scalar(attr_spec['sub-type'], attr_spec.byte_order)
++                if attr_spec.display_hint:
++                    subattrs = self._formatted_string(subattrs, attr_spec.display_hint)
++                decoded.append(subattrs)
+             else:
+                 raise Exception(f'Unknown {attr_spec["sub-type"]} with name {attr_spec["name"]}')
+         return decoded
+
+
+With only sub-type: u32 it shows like
+
+    "arp-ip-target": [
+      3232235777,
+      3232235778
+    ],
+
+Thanks
+Hangbin
 
