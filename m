@@ -1,73 +1,61 @@
-Return-Path: <netdev+bounces-84510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F209897150
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:39:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DD61897156
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCC551F213A5
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:39:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EE5C1C25CDD
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B619148303;
-	Wed,  3 Apr 2024 13:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377FE14830F;
+	Wed,  3 Apr 2024 13:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hXVfmlFH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A66C18E1C;
-	Wed,  3 Apr 2024 13:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ADD146D41
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712151545; cv=none; b=Qk/bfMmmfaLEuANMfHw1eJnCQTxPKqtiFvDwAps7lgZk38kwhbAzdpNgvN3/4HTRYYDF406svU7y71DLZDuKTHzwc3a46QTL8lxi+t1cDPv1BIv5HHCjjhwo59ZWAsl6fGfSkuLkL17Zo/JEZa4/AdhdGadFCUCB3UWylcDWu8w=
+	t=1712151616; cv=none; b=AcICpHjwdfMmw5ihkduorSfGnlqLTI14AbNh2ZZJle3zHBakJIG0dDigZKAREcxnrNwD0JTNqLlfqwMj+LK1zzsvhOZ5X1+us4SF9/tZBggE3sGMEpskQ7+sg9zcRP6b2OwCZrIZ34xVt/ts07EdRTQxiUkmDdIQOmNOIBZA9q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712151545; c=relaxed/simple;
-	bh=RSVUJ5mvNN/mq647F8u0GPy0owFHj4sKNcBF1bx+SMI=;
+	s=arc-20240116; t=1712151616; c=relaxed/simple;
+	bh=/NmoWUd2wFZgqSLZjmhnsRrfstqyn5vH0Qstwr4qKlQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E6Cun0hZY5lV09wOBmprljuowxyS59A0VNGwwsgWnnAQxNogPB6zdltlf8Mao+xJltxm74z9VTBw8MKXEa8FpWB336vj8AHUOmNV4tfHDOgvQEvNHfKdJ/v2TtuoGdt/cnpcpUjDBWzZav9FPjRWE3ywyGDcxTX0FczZjFgL4ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a46a7208eedso832809466b.0;
-        Wed, 03 Apr 2024 06:39:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712151542; x=1712756342;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sQZWvxGtqYUJOyAXOjn6bj9QAMTQq/STy2Dnfaguhx0=;
-        b=gJwl02+moE3OrWgukFV2BGJWmu/km8ippQWSu5iftC/BAz+v8z84wk/AwJZvP4dnbJ
-         MGnXarRqSsx7kRqhyEY6oCLeFw5FbXXfHxwnv1tnzeiVLaRwztM2z4RWcMh0va3dMjq9
-         NjVHngTw6jP1o1mxc7JxGrf9a0mcIo8do0RfeaS9TY4JKRj9oYJLaPxqglIWIJzRcFEU
-         RK9Qj4CDq4RT4TLxSvxBxflNUkIR2focILhMNvVrdyIF9SM5impv8r7o9mblR9HGZ5Sb
-         1hZbLI4s5aGLvQXeZIMm+bz9PNXMEjMODkD9UDj2gLPPIMZcpVeWcEcy+ixRd1YNYkqf
-         6BEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgczZoMkW3AyaiyRGamN4jjzj/hWcyhnLVyeWGP/oQCXEzLJyWvQCqM9Q70NuLVKKibZOB7VeTaQ5lIlQPjDJ7dmYGjkWMP/4csB4CmJRh5gA3E2KKYMyweay3yuwaApfeAZ/N
-X-Gm-Message-State: AOJu0Ywh0E9udvkWhB1SYwhZusdOfQBFii6PptkJ4EgxWPXxFucwUIgp
-	UKhwuLjj5aP9IUEBirUe3UXVtnsVMJC81D8BTef08LmvdORV23K1
-X-Google-Smtp-Source: AGHT+IHXOC6EFSz3HkXWkyVHv1Jm6dSjc4W8ZrKXv7CclLdkH+h9aQfqGLELfWL4Sk/dxIthf0ePKw==
-X-Received: by 2002:a17:906:b78e:b0:a4e:8f62:487d with SMTP id dt14-20020a170906b78e00b00a4e8f62487dmr1645298ejb.28.1712151541613;
-        Wed, 03 Apr 2024 06:39:01 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id xd2-20020a170907078200b00a4e2e16805bsm7019723ejb.11.2024.04.03.06.39.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 06:39:01 -0700 (PDT)
-Date: Wed, 3 Apr 2024 06:38:58 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Alex Elder <elder@ieee.org>
-Cc: aleksander.lobakin@intel.com, kuba@kernel.org, davem@davemloft.net,
-	pabeni@redhat.com, edumazet@google.com,
-	Alex Elder <elder@kernel.org>, quic_jjohnson@quicinc.com,
-	kvalo@kernel.org, leon@kernel.org,
-	dennis.dalessandro@cornelisnetworks.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/5] net: ipa: allocate dummy net_device
- dynamically
-Message-ID: <Zg1b8vuTs5Z+1Obv@gmail.com>
-References: <20240328235214.4079063-1-leitao@debian.org>
- <20240328235214.4079063-5-leitao@debian.org>
- <c03b8113-e1be-4cf3-a85c-43de15163ab1@ieee.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=u38ZTYqE2ljggqqojQo1I8nH23KA4OL/CpH7JCf38oF8dovqkBewHbAtoAsBop7bTTalmVaTbXraMk9Jqa0zSYdRIpmCtvIlxK61BeVOVZeTu47PpI4A4lRG6jGgu20+fA1falXdkRsIxEyFsQqOCxu4OUC6oPQrLPKCwindN4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hXVfmlFH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=u8sbv7OhCWTzdUmHM6hfOPKlrc7untzhQsAD3ri/EUY=; b=hXVfmlFHIk5JMt7p++pZrTxAiP
+	6IVs8+h3VpIBOs5t0fMS84AdqOE7ix0d11SXeIewczp3QWbbnW4vqil1lLWY1N5NX3EqBFy3D9Otg
+	ujsI5S1ZB9nfaGzP7QR2tpZaIysLJDWVVMLOWxFEAdvFugaBGIcQVS/Pml5RK2yLACP0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rs0qV-00C54I-HE; Wed, 03 Apr 2024 15:40:07 +0200
+Date: Wed, 3 Apr 2024 15:40:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: netdev@vger.kernel.org, idosch@nvidia.com, edumazet@google.com,
+	marcin.szycik@linux.intel.com, anthony.l.nguyen@intel.com,
+	kuba@kernel.org, intel-wired-lan@lists.osuosl.org,
+	pabeni@redhat.com, przemyslaw.kitszel@intel.com
+Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
+Message-ID: <7b0b3d27-c21d-4765-875b-2dd4681a2ba4@lunn.ch>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
+ <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
+ <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+ <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
+ <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,110 +64,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c03b8113-e1be-4cf3-a85c-43de15163ab1@ieee.org>
+In-Reply-To: <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
 
-Hello Alex,
-
-On Mon, Apr 01, 2024 at 08:56:46AM -0500, Alex Elder wrote:
-> Thanks for pointing this out, I didn't notice the earlier
-> discussion.  Embedding the dummy netdev in this case was
-> probably done to eliminate the chance of an unlikely
-> allocation error at init time.  It is not at all necessary.
+On Wed, Apr 03, 2024 at 03:18:44PM +0200, Wojciech Drewek wrote:
 > 
-> I had to go find the rest of your series.  If at least one patch
-> is addressed to me in a series, please copy me on all of them.
-
-Sure, do you know if there ia way to do it using git send-email
-identity?
-
-I basically sent the patch series using git setnd-email with an
-identity, and, for each patch, git send-email parses the patch and run
-scripts/get_maintainer.pl for each patch, appeneding the "important"
-people in that patch.
-
-To do what you are suggesting, I would need to have a cumulative to: and
- cc: list. Any tip here would be appreciate.
-
-> I see the dummy netdev now gets "fully initialized" but that's
-> a one-time thing, and seems harmless.  But given that, shouldn't
-> the result of alloc_dummy_netdev() also have a free_dummy_netdev()
-> (rather than simply calling kfree(dummy_netdev))?
-
-Right. I am moving to use free_netdev() now. I can us create a
-free_dummy_netdev() macro that points to free_netdev(), but, I think
-that might not be necessary.
-
-> > @@ -2369,12 +2369,14 @@ int gsi_init(struct gsi *gsi, struct platform_device *pdev,
-> >   	/* GSI uses NAPI on all channels.  Create a dummy network device
-> >   	 * for the channel NAPI contexts to be associated with.
-> >   	 */
-> > -	init_dummy_netdev(&gsi->dummy_dev);
-> > +	gsi->dummy_dev = alloc_netdev_dummy(0);
-> > +	if (!gsi->dummy_dev)
-> > +		return -ENOMEM;
-> >   	init_completion(&gsi->completion);
-> >   	ret = gsi_reg_init(gsi, pdev);
-> >   	if (ret)
-> > -		return ret;
-> > +		goto err_reg_exit;
 > 
-> Assuming you change it to not just use kfree() to free the
-> dummy netdev, the above call won't work.  You'll want to do
-> something like:
+> On 02.04.2024 16:46, Andrew Lunn wrote:
+> > On Tue, Apr 02, 2024 at 01:38:59PM +0200, Wojciech Drewek wrote:
+> >>
+> >>
+> >> On 30.03.2024 22:57, Andrew Lunn wrote:
+> >>> On Fri, Mar 29, 2024 at 10:23:18AM +0100, Wojciech Drewek wrote:
+> >>>> Some ethernet modules use nonstandard power levels [1]. Extend ethtool
+> >>>> module implementation to support new attributes that will allow user
+> >>>> to change maximum power. Rename structures and functions to be more
+> >>>> generic. Introduce an example of the new API in ice driver.
+> >>>>
+> >>>> Ethtool examples:
+> >>>> $ ethtool --show-module enp1s0f0np0
+> >>>> Module parameters for enp1s0f0np0:
+> >>>> power-min-allowed: 1000 mW
+> >>>> power-max-allowed: 3000 mW
+> >>>> power-max-set: 1500 mW
+> >>>>
+> >>>> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
+> >>>
+> >>> We have had a device tree property for a long time:
+> >>>
+> >>>   maximum-power-milliwatt:
+> >>>     minimum: 1000
+> >>>     default: 1000
+> >>>     description:
+> >>>       Maximum module power consumption Specifies the maximum power consumption
+> >>>       allowable by a module in the slot, in milli-Watts. Presently, modules can
+> >>>       be up to 1W, 1.5W or 2W.
+> >>>
+> >>> Could you flip the name around to be consistent with DT?
+> >>
+> >> Yea, I'm open to any name suggestion although I don't like the unit in the parameter name :) 
+> > 
+> > That is a DT thing. Helps make the units of an ABI obvious. However,
+> > milliwatts is pretty standard with the kernel of user APIs, e.g. all
+> > hwmon calls use milliwatts.
+> > 
+> >>>> minimum-power-allowed: 1000 mW
+> >>>> maximum-power-allowed: 3000 mW
+> >>>> maximum-power-set: 1500 mW
+> >>>
+> >>> Also, what does minimum-power-allowed actually tell us? Do you imagine
+> >>> it will ever be below 1W because of bad board design? Do you have a
+> >>> bad board design which does not allow 1W?
+> >>
+> >> Yes. in case of QSFP we don't support 1W, 1.5W is the minimum.
+> > 
+> > So if i plug in a 1W QSFP device, it will let the magic smoke out
+> > because it is force fed 1.5W?
+> > 
+> > Looking at
+> > https://www.optcore.net/wp-content/uploads/2017/04/QSFP-MSA.pdf table
+> > 7 it indicates different power budget classifications. Power level 1
+> > is a Maximum power of 1.5W. So does your parameter represent this?  It
+> > is the minimum maximum power? And your other parameter is the maximum
+> > maximum power?
 > 
-> 	if (ret)
-> 		goto err_netdev_free;
-> 
-> . . .
-> 
-> err_netdev_free:
-> 	free_dummy_netdev(gsi->dummy_dev);
-> err_reg_exit:
+> Exactly as you described, minimum-power-allowed is in fact minimum value
+> which maximum-power-set can be set to (so minimum maximum). the other
+> parameter is maximim maximum.
 
-I am not sure I followed this one. All the exit paths should free the
-device, if I have err_netdev_free: label, then it will replace
-err_reg_exit: label completely.
+Table 7 in that document is titled "Power Budget Classification". So
+how about
 
-If I apply your suggestion, it will look like the following (with some
-concerns I have).
+minimum-power-class-allowed: 1000 mW
+maximum-power-class-allowed: 3000 mW
 
-        gsi->dummy_dev = alloc_netdev_dummy(0);
-        if (!gsi->dummy_dev)
-                return -ENOMEM;
-
-        ret = gsi_reg_init(gsi, pdev);
-        if (ret)
-                goto err_netdev_free;
-
-        ret = gsi_irq_init(gsi, pdev); 
-        if (ret)
-                goto err_reg_exit;            <-- This needs to point to err_netdev_free also
-
-        ret = gsi_channel_init(gsi, count, data);
-        if (ret)
-                goto err_reg_exit;            <-- This needs to point to err_netdev_free also
-
-        mutex_init(&gsi->mutex);
-
-        return 0;
-
-  err_netdev_free:
-        free_netdev(gsi->dummy_dev);
-  err_reg_exit: 	                    <-- This label will be unused
-        gsi_reg_exit(gsi);
-
-
-That said, basically fixing the concerns above will result in the same code I
-originally proposed.
-
- > @@ -2400,6 +2403,7 @@ void gsi_exit(struct gsi *gsi)
-> >   	mutex_destroy(&gsi->mutex);
-> >   	gsi_channel_exit(gsi);
-> 
-> Please call the free here, so the cleanup is done in
-> exactly the reverse order of the initialization.
-
-Ack!
-
-Thanks for the feedback.
+	Andrew
 
