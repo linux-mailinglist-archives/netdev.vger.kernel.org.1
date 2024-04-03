@@ -1,132 +1,163 @@
-Return-Path: <netdev+bounces-84530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B419F8972F0
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:44:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D51897307
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:49:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E69F28C45E
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:44:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAD32286C48
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E465CDC9;
-	Wed,  3 Apr 2024 14:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B16D2F844;
+	Wed,  3 Apr 2024 14:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KL/hqdY7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TVGqOFy3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C4213A40B;
-	Wed,  3 Apr 2024 14:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D496A2F28
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 14:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712155491; cv=none; b=pyl4H+oKIkETLVhvfPHQXTHDvlTyeaK7hDJqNbeSuy6PbgtHx7ePwWhbN90zaOoKuHKKn58bXTtPviTDDDhyboPzKOIUiCDyDoQlUkXhX4u2flb7d3TvBs54nJz1w0p//whaCBSIvhdBwdSYvsn45mspvx6B9NLHxBiqIuFOyNY=
+	t=1712155758; cv=none; b=Sd2UEurGW6pciiwW5JlYsvciwUpZlzW7wsCU1fP/yrvi8cnqSM8yT5PBxvprtuPlNEYJe2/2cR0tt/yRQl8vKE/4TMezUdJqV4W45CqkDq1/cGiQ1uZr1nE4LZOryp0kQUOsm+q10pOAEsXmTrLcElF4qwwqTTCiIJNJKPiM34I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712155491; c=relaxed/simple;
-	bh=/bUWFCezkgyy5S4CuqWiKnU6VWsOo2TS23X0CcIeO3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=snzGs1MsU2T+2K3LeLjEUM5reRHwVsbK+h2Fj8OWU1bcmw/gqjys+OkVjkXeRed5oePx5fXrPUOBCgJ0Mq7FoIxAHllgylXXOxstAcP6AnFXvGfGdbgE1q6A/XNrW39UcLH97sV613FC4e8BoJ2fjcMWfn1GShck1XVP5MmEUzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KL/hqdY7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD74C43390;
-	Wed,  3 Apr 2024 14:44:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712155490;
-	bh=/bUWFCezkgyy5S4CuqWiKnU6VWsOo2TS23X0CcIeO3A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KL/hqdY7g7A3rt3L64YGc6y7NTX5V8jEgRH7IAkb8JOPoYIVE5QOrXyy0d/eqhXw9
-	 vY4wymhn3lErTVlrTnXatW6LuhTFrVc37KKda09EL13L58Ihpz0i36/j1CDth4MoRn
-	 rQNJJvgojQa3hyCq/7MTOiyksIwuFCX/KjEhX0aXwK4rswWATSChfDtanxwrBYF3gC
-	 Zp/K7R7J/Dc/83hOszq7jPMoIhVgdNoqzvBdYaDbknJP7SGf1VJEkxR3hjLQmZ35hZ
-	 AlRbfVhB7SyO/JkEnmBQbn7Wl+WzxvFtKRBNG1aRrQy2S6TndM+I0M3swW1nbA595R
-	 U/Oh06gBLL9ZQ==
-Date: Wed, 3 Apr 2024 09:44:48 -0500
-From: Rob Herring <robh@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
- way of describing several PSE PIs
-Message-ID: <20240403144448.GB3508225-robh@kernel.org>
-References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
- <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
- <20240402132637.GA3744978-robh@kernel.org>
- <ZgworgDAXXOpf3QV@pengutronix.de>
+	s=arc-20240116; t=1712155758; c=relaxed/simple;
+	bh=4awJPXLZISd/HEXrTQxK8Hu/xsDdgCjosSawGYmE8ZE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KDS8QpTLjeO0G9TN2gNg+DqoDta7vp9NV+37zyBzMfcwqOmhXaTmdyIDkdnxhvYn0uamwLeneaadbWJuaqf555KeDVrEBwfS6oLWDSxYYpGFXYTo0WhJ7Fd7vZ+7P4scwlWqwnLNfs5v//fFUHPwAtATO4BeA+Zs+B5WFuiWlnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TVGqOFy3; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56e0430f714so14510a12.1
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 07:49:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712155755; x=1712760555; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4awJPXLZISd/HEXrTQxK8Hu/xsDdgCjosSawGYmE8ZE=;
+        b=TVGqOFy3rF1WnRfoJVDIvnWq5wt8YvxFvPR1hKmfeKfCBxt6RIMARR/IZLkSLOq5Pa
+         JSGBNcFtta5kd8RLXFMc1cDu/Iy7NKCJx5FJKhOVt1W/ZVz3lrJ+Wl4TV/xxDNLXgtdn
+         9h0DeITlURHvJJ/HYhj0WV4+VJM5bJ8NYMFFvAqznr84EHpE/Xm19JbaGg0FuGxLEkQy
+         kL8lYeSAhAXiBTY4UbiN74yVbmXSzITd0OpzHMwAGg13DcCwcQi8I6AawEL6pCQnElan
+         CyePmJdDW8JlKidsom2n9zzqfvAnDmA+boN26i8XJcPGsRsxNPCKjXZAzBoJqzZ14kAr
+         P9OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712155755; x=1712760555;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4awJPXLZISd/HEXrTQxK8Hu/xsDdgCjosSawGYmE8ZE=;
+        b=L9TrsuRCLscyEoFdUlV2cU8MEryGVzuZEs3lSAa5NmjnfVJjehcqo+kh/gP0DsG9ag
+         /pdPZQU54lH5b2wbHhicZcmosebGi9DJtT8TG5qtGb5yoY4fDEtZVGwSxb5jwpQWcZr0
+         fLALtWrd/D2XlRpzttnYAkOd1En5FBhiWR0kQHSMUfIp0qaBakaLR0qbCw0QqUhBLrMg
+         m3lN7mh67sWOponqQfq0+EqpHXeTg2Ps92nAK7OISOOKyhcog4WH5nfkzZj8f0ZweLvD
+         eLeWa9RrA/Wp8HKP4kaZH5GMFWCeYd5MBcQ09CEE2RF7jKf5t9EzXmbC5Ehih4BJfQL9
+         JvxA==
+X-Forwarded-Encrypted: i=1; AJvYcCXS54VrXYAgYoGDIzNQWdmhHrnPjyuiV0KqTKwHUVUVE7tffe/TNLmN6mwocToupZ15NhPPT4vxDWQi4VizEMG8F6t1f5TT
+X-Gm-Message-State: AOJu0YwhE7YaScPxSOM4B/F2bfzuYJEiINsrZEKNsO1Mm4t0oDuxqbg2
+	1wq2NHlpQ+r9yboo/IHPAP+j09gTLiCsZTPT5qxhKKwDuEBXvi/qGLmi3758mSMbs5bai7zSd3c
+	Nh+TBQUI+gbh2MDcljKS1nOVpqzyoar10Quvf
+X-Google-Smtp-Source: AGHT+IHdRA9FiadBl+tCyoU/K+6T+Ezs85509lMS6QuZPI0aP/28Jem/y5QgepFgzzYC0wnrV63+ee1i/AtoLwRtDkY=
+X-Received: by 2002:a05:6402:5c7:b0:56e:ac4:e1f3 with SMTP id
+ n7-20020a05640205c700b0056e0ac4e1f3mr106849edx.7.1712155754858; Wed, 03 Apr
+ 2024 07:49:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZgworgDAXXOpf3QV@pengutronix.de>
+References: <20240402215405.432863-1-hli@netflix.com> <CANn89iJOSUa2EvgENS=zc+TKtD6gOgfVn-6me1SNhwFrA2+CXw@mail.gmail.com>
+In-Reply-To: <CANn89iJOSUa2EvgENS=zc+TKtD6gOgfVn-6me1SNhwFrA2+CXw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 3 Apr 2024 16:49:03 +0200
+Message-ID: <CANn89iLyb70E+0NcYUQ7qBJ1N3UH64D4Q8EoigXw287NNQv2sg@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: update window_clamp together with scaling_ratio
+To: Hechao Li <hli@netflix.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
+	kernel-developers@netflix.com, Tycho Andersen <tycho@tycho.pizza>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 02, 2024 at 05:47:58PM +0200, Oleksij Rempel wrote:
-> On Tue, Apr 02, 2024 at 08:26:37AM -0500, Rob Herring wrote:
-> > > +          pairsets:
-> > > +            $ref: /schemas/types.yaml#/definitions/phandle-array
-> > > +            description:
-> > > +              List of phandles, each pointing to the power supply for the
-> > > +              corresponding pairset named in 'pairset-names'. This property
-> > > +              aligns with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
-> > > +              PSE Pinout Alternatives (as per IEEE 802.3-2022 Table 145\u20133)
-> > > +              |-----------|---------------|---------------|---------------|---------------|
-> > > +              | Conductor | Alternative A | Alternative A | Alternative B | Alternative B |
-> > > +              |           |    (MDI-X)    |     (MDI)     |      (X)      |      (S)      |
-> > > +              |-----------|---------------|---------------|---------------|---------------|
-> > > +              | 1         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
-> > > +              | 2         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
-> > > +              | 3         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
-> > > +              | 4         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
-> > > +              | 5         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
-> > > +              | 6         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
-> > > +              | 7         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
-> > > +              | 8         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
-> > > +            minItems: 1
-> > > +            maxItems: 2
-> > 
-> > "pairsets" does not follow the normal design pattern of foos, foo-names, 
-> > and #foo-cells. You could add #foo-cells I suppose, but what would cells 
-> > convey? I don't think it's a good fit for what you need.
-> > 
-> > The other oddity is the number of entries and the names are fixed. That 
-> > is usually defined per consumer. 
-> > 
-> > As each entry is just a power rail, why can't the regulator binding be 
-> > used here?
-> 
-> I'm not against describing it consequent with regulator till the wire
-> end, but right now I have no idea how it should be described by using
-> regulator bindings. There are maximum 2 rails going in to PSE PI on one
-> side and 4 rails with at least 5 combinations supported by standard on
-> other side. Instead of inventing anything new, I suggested to describe
-> supported output combinations by using IEEE 802.3 standard.
+On Wed, Apr 3, 2024 at 4:22=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Tue, Apr 2, 2024 at 11:56=E2=80=AFPM Hechao Li <hli@netflix.com> wrote=
+:
+> >
+> > After commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale"),
+> > we noticed an application-level timeout due to reduced throughput. This
+> > can be reproduced by the following minimal client and server program.
+> >
+> > server:
+> >
+> ...
+> >
+> > Before the commit, it takes around 22 seconds to transfer 10M data.
+> > After the commit, it takes 40 seconds. Because our application has a
+> > 30-second timeout, this regression broke the application.
+> >
+> > The reason that it takes longer to transfer data is that
+> > tp->scaling_ratio is initialized to a value that results in ~0.25 of
+> > rcvbuf. In our case, SO_RCVBUF is set to 65536 by the application, whic=
+h
+> > translates to 2 * 65536 =3D 131,072 bytes in rcvbuf and hence a ~28k
+> > initial receive window.
+>
+> What driver are you using, what MTU is set ?
+>
+> If you get a 0.25 ratio, that is because a driver is oversizing rx skbs.
+>
+> SO_RCVBUF 65536 would map indeed to 32768 bytes of payload.
+>
+> >
+> > Later, even though the scaling_ratio is updated to a more accurate
+> > skb->len/skb->truesize, which is ~0.66 in our environment, the window
+> > stays at ~0.25 * rcvbuf. This is because tp->window_clamp does not
+> > change together with the tp->scaling_ratio update. As a result, the
+> > window size is capped at the initial window_clamp, which is also ~0.25 =
+*
+> > rcvbuf, and never grows bigger.
 
-There's 4 combinations above, what's the 5th combination? SPE?
+Sorry I missed this part. I understand better.
 
-Seems to me you just describe the 2 rails going to the connector and 
-then describe all the variations the connector supports. The PSE 
-(h/w) has little to do with which variations are supported, right? 
-For example, MDI-X vs. MDI support is determined by the PHY, right? Or 
-it has to be supported by both the PHY and PSE?
+I wonder if we should at least test (sk->sk_userlocks &
+SOCK_RCVBUF_LOCK) or something...
 
-Rob
+For autotuned flows (majority of the cases), tp->window_clamp is
+changed from tcp_rcv_space_adjust()
+
+I think we need to audit a bit more all tp->window_clamp changes.
+
+> >
+> > This patch updates window_clamp along with scaling_ratio. It changes th=
+e
+> > calculation of the initial rcv_wscale as well to make sure the scale
+> > factor is also not capped by the initial window_clamp.
+>
+> This is very suspicious.
+>
+> >
+> > A comment from Tycho Andersen <tycho@tycho.pizza> is "What happens if
+> > someone has done setsockopt(sk, TCP_WINDOW_CLAMP) explicitly; will this
+> > and the above not violate userspace's desire to clamp the window size?"=
+.
+> > This comment is not addressed in this patch because the existing code
+> > also updates window_clamp at several places without checking if
+> > TCP_WINDOW_CLAMP is set by user space. Adding this check now may break
+> > certain user space assumption (similar to how the original patch broke
+> > the assumption of buffer overhead being 50%). For example, if a user
+> > space program sets TCP_WINDOW_CLAMP but the applicaiton behavior relies
+> > on window_clamp adjusted by the kernel as of today.
+>
+> Quite frankly I would prefer we increase tcp_rmem[] sysctls, instead
+> of trying to accomodate
+> with too small SO_RCVBUF values.
+>
+> This would benefit old applications that were written 20 years ago.
 
