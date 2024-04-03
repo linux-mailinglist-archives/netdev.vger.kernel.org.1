@@ -1,56 +1,60 @@
-Return-Path: <netdev+bounces-84318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B16089685C
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:22:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03FBB89689F
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA2C128A3D7
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:22:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22DFBB294F4
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5FF12EBD0;
-	Wed,  3 Apr 2024 08:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033FC130E57;
+	Wed,  3 Apr 2024 08:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FidQLK6g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kLElWixn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53FE6BFC2;
-	Wed,  3 Apr 2024 08:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5F26FB80;
+	Wed,  3 Apr 2024 08:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712131893; cv=none; b=TIRx1sJQazHniDOMl2lxRw5oTJFmMyk587p0yrTV66M3Y6+00HWY4XTiDMJHrzbn8IedR7ouXL7ESS4zNY7qad7jstP2+sQNr1qbStOeyNhUCeA8enpfsbdvvG5BUhwec6cIZyZ7CHqr94Y3HzdT3j8ZyDs+Cg6R2XxV4TC6i0o=
+	t=1712131910; cv=none; b=jPUUd16TyBqAPwi8LQPGqna8DBVYatdKW2q9/WmS8c4aNO7FjnBuKHf3KhMVJ5enmzwgghkKvJEInitUxFi9sLeqpsxi/VlvOqRRrWu8MVz1fv5yjOq9AVWmhvjHhCTfjEvUBgaweqrDSNEXlMccXlZYUEJ1v8WYfYsrmD47gfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712131893; c=relaxed/simple;
-	bh=SH31gyLQOUjbQcsB8HrfJNW22dR7OQWuGrhgZCjvHU8=;
+	s=arc-20240116; t=1712131910; c=relaxed/simple;
+	bh=yJ2PAYn/BqgcesEAALoWnwKCP+9vQcY4vqPA3T6h0Fw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PXLgbXcXWJo5jR87y6N+M2qaHg5837eymDKdFOTlbfxnuU9ta3S8G/JYl26xecN2iYLoL56NdYFASS9hQfB0WiCwL+PQRnxA7CQkKvWK44lI9Zp3asY4F/7hdQv+k3c14Mh5fvzXuEGtXv+s8M15uzTB8h2d+5Pt9K3ImTsvBy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FidQLK6g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD697C433F1;
-	Wed,  3 Apr 2024 08:11:31 +0000 (UTC)
+	 MIME-Version; b=VQzzWP7DqWM8ErEg4h9xB9ZFX/p1mNq+xsH2dOBUiAu+bnP6HUeF4v9aPHQN2WwNipk0RoBye8eUAgGnWRWJfgE7FF4sWfEvITCMBGBSXbF8mvDECl/IsJQYiSq+DXtLlPePsVzDDhyx1gw+c/eVRCBJRJGQBqlrNZ9j5FLf0nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kLElWixn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FBC2C433C7;
+	Wed,  3 Apr 2024 08:11:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712131893;
-	bh=SH31gyLQOUjbQcsB8HrfJNW22dR7OQWuGrhgZCjvHU8=;
+	s=k20201202; t=1712131910;
+	bh=yJ2PAYn/BqgcesEAALoWnwKCP+9vQcY4vqPA3T6h0Fw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FidQLK6gJYLaHmLSbMmJq7Apfm2CmmsGY0w8vFJ9AUgB5Uvdf+QMvV5PQKVWqQAsm
-	 UDMd2GxCQgrKO2Y4/qnJXh1w61ipZJlUbr0wgYopmxLFUXvny2uvMjnn/JGYWwXtIj
-	 M07HB74PU7sW9slUtYd/dghQLUoDL0ycxWajmLD3jCfbjHh8rUfLLB6pQbseX/wRgC
-	 cfIg9+Xx3szTAegVMFufdxt8Cj6BvbFapg8ir/FoHKNqqZmtd2bIDnZoh2EGuj+K0q
-	 OLpDs6Gn5QRKlNWmZt/Zg9ZIlPjf4h0g0l0adlbszBXPhIovybmrJFgeeYLiy/60LI
-	 B1j3vM0Uy+ung==
+	b=kLElWixnuR6/r1TXlNW/C+kLhE4L3gwqjZqwBNB1iRvPKzM2ER7g+4niBeEOANZPJ
+	 lmmB7HNzp9Le5vlirfPPW7CRaTNmoWBc1263uW1C00fKh1e6g5UIFWWJIRVcPsnC2o
+	 kI7IXPUJ4BjGKD9hgARGtjLuW7Lzqf6UWsHz17AoMXRJUwaee993g73UWXtQ7fyWKM
+	 hQs4LlHUuM1bhfbn9Y7YibuU+N8vvA+aLy7bx/pjP1pO/IUIGiMtdkXWCnC7/LKOTk
+	 qiDxN3Gd2qWratpGIxHsSKjgZilvv8E3adxlwRmqq5yyZgcmiNeszjJCpV9oGqb65j
+	 N4yILxOWBTbBA==
 From: Arnd Bergmann <arnd@kernel.org>
-To: linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
 Cc: Arnd Bergmann <arnd@arndb.de>,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Kees Cook <keescook@chromium.org>,
-	Justin Stitt <justinstitt@google.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
 	netdev@vger.kernel.org
-Subject: [PATCH 26/34] isdn: kcapi: don't build unused procfs code
-Date: Wed,  3 Apr 2024 10:06:44 +0200
-Message-Id: <20240403080702.3509288-27-arnd@kernel.org>
+Subject: [PATCH 28/34] net: xgbe: remove extraneous #ifdef checks
+Date: Wed,  3 Apr 2024 10:06:46 +0200
+Message-Id: <20240403080702.3509288-29-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240403080702.3509288-1-arnd@kernel.org>
 References: <20240403080702.3509288-1-arnd@kernel.org>
@@ -64,58 +68,63 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-The procfs file is completely unused without CONFIG_PROC_FS but causes
-a compile time warning:
+When both ACPI and OF are disabled, xgbe_v1 is unused and
+causes a W=1 warning:
 
-drivers/isdn/capi/kcapi_proc.c:97:36: error: unused variable 'seq_controller_ops' [-Werror,-Wunused-const-variable]
-static const struct seq_operations seq_controller_ops = {
-drivers/isdn/capi/kcapi_proc.c:104:36: error: unused variable 'seq_contrstats_ops' [-Werror,-Wunused-const-variable]
-drivers/isdn/capi/kcapi_proc.c:179:36: error: unused variable 'seq_applications_ops' [-Werror,-Wunused-const-variable]
-drivers/isdn/capi/kcapi_proc.c:186:36: error: unused variable 'seq_applstats_ops' [-Werror,-Wunused-const-variable]
+drivers/net/ethernet/amd/xgbe/xgbe-platform.c:533:39: error: unused variable 'xgbe_v1' [-Werror,-Wunused-const-variable]
+static const struct xgbe_version_data xgbe_v1 = {
 
-Remove the file from the build in that config and make the calls into
-it conditional instead.
+There is no real point in trying to save a few bytes for the match
+tables, so just make them always visible.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/isdn/capi/Makefile | 3 ++-
- drivers/isdn/capi/kcapi.c  | 7 +++++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/amd/xgbe/xgbe-platform.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/drivers/isdn/capi/Makefile b/drivers/isdn/capi/Makefile
-index 352217ebabd8..4fd3a4d7133f 100644
---- a/drivers/isdn/capi/Makefile
-+++ b/drivers/isdn/capi/Makefile
-@@ -2,4 +2,5 @@
- # Makefile for the CAPI subsystem used by BT_CMTP
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-platform.c b/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
+index 9131020d06af..7912b3b45148 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
+@@ -538,7 +538,6 @@ static const struct xgbe_version_data xgbe_v1 = {
+ 	.tx_tstamp_workaround		= 1,
+ };
  
- obj-$(CONFIG_BT_CMTP)			+= kernelcapi.o
--kernelcapi-y				:= kcapi.o capiutil.o capi.o kcapi_proc.o
-+kernelcapi-y				:= kcapi.o capiutil.o capi.o
-+kernelcapi-$(CONFIG_PROC_FS)		+= kcapi_proc.o
-diff --git a/drivers/isdn/capi/kcapi.c b/drivers/isdn/capi/kcapi.c
-index 136ba9fe55e0..c5d13bdc239b 100644
---- a/drivers/isdn/capi/kcapi.c
-+++ b/drivers/isdn/capi/kcapi.c
-@@ -917,13 +917,16 @@ int __init kcapi_init(void)
- 		return err;
- 	}
+-#ifdef CONFIG_ACPI
+ static const struct acpi_device_id xgbe_acpi_match[] = {
+ 	{ .id = "AMDI8001",
+ 	  .driver_data = (kernel_ulong_t)&xgbe_v1 },
+@@ -546,9 +545,7 @@ static const struct acpi_device_id xgbe_acpi_match[] = {
+ };
  
--	kcapi_proc_init();
-+	if (IS_ENABLED(CONFIG_PROC_FS))
-+		kcapi_proc_init();
-+
- 	return 0;
- }
+ MODULE_DEVICE_TABLE(acpi, xgbe_acpi_match);
+-#endif
  
- void kcapi_exit(void)
- {
--	kcapi_proc_exit();
-+	if (IS_ENABLED(CONFIG_PROC_FS))
-+		kcapi_proc_exit();
+-#ifdef CONFIG_OF
+ static const struct of_device_id xgbe_of_match[] = {
+ 	{ .compatible = "amd,xgbe-seattle-v1a",
+ 	  .data = &xgbe_v1 },
+@@ -556,7 +553,6 @@ static const struct of_device_id xgbe_of_match[] = {
+ };
  
- 	cdebug_exit();
- 	destroy_workqueue(kcapi_wq);
+ MODULE_DEVICE_TABLE(of, xgbe_of_match);
+-#endif
+ 
+ static SIMPLE_DEV_PM_OPS(xgbe_platform_pm_ops,
+ 			 xgbe_platform_suspend, xgbe_platform_resume);
+@@ -564,12 +560,8 @@ static SIMPLE_DEV_PM_OPS(xgbe_platform_pm_ops,
+ static struct platform_driver xgbe_driver = {
+ 	.driver = {
+ 		.name = XGBE_DRV_NAME,
+-#ifdef CONFIG_ACPI
+ 		.acpi_match_table = xgbe_acpi_match,
+-#endif
+-#ifdef CONFIG_OF
+ 		.of_match_table = xgbe_of_match,
+-#endif
+ 		.pm = &xgbe_platform_pm_ops,
+ 	},
+ 	.probe = xgbe_platform_probe,
 -- 
 2.39.2
 
