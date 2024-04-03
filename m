@@ -1,99 +1,128 @@
-Return-Path: <netdev+bounces-84580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE7D8978A4
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:53:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BF8489781F
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 735EDB3E0D0
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:58:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75C84B2B965
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07131552E9;
-	Wed,  3 Apr 2024 17:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35990152505;
+	Wed,  3 Apr 2024 18:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PAMX5IPM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cCduND7N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E5D14E2F9
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 17:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A6B433CB;
+	Wed,  3 Apr 2024 18:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712166969; cv=none; b=fTlUQzWoQP/NJCCSwE2x86T7EBsM3rY5JHiiUYPrAkh+aro8VwfE9vKmw/8ieD//h4l452pLAemotEH+6d3n7jO8mT8G3OW5orJboIBCytNsCu5Sd94AaHaT/CUoVLVLXdvmiL665aBAPONK7A6rnstwB6SYoGGlGJvOwSqHIuM=
+	t=1712167408; cv=none; b=ozhraiIgl/tI/t6+p6x2iSYp1r/T68Iqopuv9qmKh4I6s/C4gOnUtY+nyWGe6mr/fJ3M1hfI/rPoqzGksTr5X5KvWliFd3yCMjPmz78aaj/e4g6ZUuaD9jz2pSNyhir/Z52yO27ZzKjUzkSfszBBT6DeJevTob+irE028KgD3tA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712166969; c=relaxed/simple;
-	bh=ObkVdJwv08ivHFCrYweextytvPQ0aeTOy2nxjLDjHmA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s1XzzcrltfxKLll6Rw6zk0hs9f3z/3YgmUAvZJAwrXtdj/pZ7yzXskza+lyNz0X91NPR2A9//khPC4STBEpy6aEXkcjwz4fgN9dIBpCyJuj37VHrkWL6EiU50Xr/HwyVC1xURg8ic1lKLcyrAQHCD1blX/Ebx4eE08LhGcodf4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PAMX5IPM; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56e0430f714so1460a12.1
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 10:56:07 -0700 (PDT)
+	s=arc-20240116; t=1712167408; c=relaxed/simple;
+	bh=ylgZVFHrWdJiZJ1iW6APhUGogXswDFL7SuFFgkc0/po=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=S6oII9Ht/6FMcTQFv81c9TOfD9oLp/N6hEQg7CRJ9tTXP+BcSvREv4DJUFICV5wwq/Ot0R5TZ21CyU2xUxFGCDp37aBmwB8ljsKfPOwM4AL1dfM1HeBxNgVuTk/kBhu7WJ6Ivw4kB76gNl6QtHyD8yhA65rt7ajgvOKzCJY7ufE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cCduND7N; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-516bfcc76efso125269e87.3;
+        Wed, 03 Apr 2024 11:03:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712166966; x=1712771766; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=11xHFtwF7q3QiLeNEMN61tjdixRYKBFWfF9ZOhPQfUs=;
-        b=PAMX5IPMcmHxciRkgEOFQw5qs0v/hpsytIhJO2k0hhPdyZ+KLkI8mwvz2OQJhWa/IM
-         UjbC8PMhrVknH1eBSrZspFDA4Ej+gPRN7ay+rPvllHUo0i49SGiop1GbNWwc329B/UNp
-         Uu0XXIsQ2M7Xg8pf5bfHUoZsibFI1KF++H8aaMnXpYN0bLJZAAoBTbi+/9XL8nzcFsvk
-         DBZuekRiIeztRwSVggI2PWiCuwI9gRoKYgFSUHep6lHt31Owvs5evMVBHripxhcb9aOi
-         ZqMF5KhHpAAQVZyJSeYZA12ASCZg9lrLtRuCbEGUkVNlx2u8Fd4kYLxrcxC6kGt24J8f
-         bKJg==
+        d=gmail.com; s=20230601; t=1712167405; x=1712772205; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=A/GPjX1bC89s3pKDiOr4iTqFW1vCdSA+wrVsNDwDxNc=;
+        b=cCduND7NgACZ0ze8ImTboEr7cuZryMcm+322JUUsheQtTFFZejrB46risqOE5THJIr
+         Db+1EryOK1jDIgD67bml+433itbZTUh1OTUlC8E2guzrY6tEPHsvWV0NLP6fQECplehw
+         NZcVMoPKXHrWnjKhXDIt+azNS0mcfftrbPSde6+TWaTiQwp2gviKPDwpL9M5QPZQPGAu
+         A4jesV50b+lB/o602n0ffxfanQP+lxwB72pjewq+dJrCOxYokioAPEwPimpgoS9L02Fp
+         f1vnt1dsPSR9EMABGdpwPm83w7QtCp8OD3COe751PiS+R5coOGyC7IwtNTvejfBgmBhq
+         6HIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712166966; x=1712771766;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=11xHFtwF7q3QiLeNEMN61tjdixRYKBFWfF9ZOhPQfUs=;
-        b=cTf8jOeM8DtGE93mF+Rc14vuFyFdBKPHNyCtZoYA+Fn7f+TvpS+ITSbiRWEtKcinBy
-         TB8I9NSrT3z8r10YAS1CR9T8G7oU+HoMW5aaivQ0XOy7qyiWu/UVxzVUDEB+W9OubGVk
-         D59kWdBROGmWiukq74/hnCs5bmw1jOjugfSQC/e/GmRFda3Fk5gJ16UQ9cxwuDO5I0Ai
-         xnT7B/PqkHpc2HlJSXHab3ONfBCJavfJ93afnJlEf2nv5MVLRzqvOH33RVYU5l38mOkt
-         HLUq98aitDpFgFO1pVtCehP7P+Xi/wYi7TSBIb+l1uZ5YL8DwSmwuKWf2iNpGvKwhsJP
-         WPeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUt5U8RLgZmQXyg9t/ID1Lh7nHIM/nHTGNTDl7ykxxE1Lgq+QdImQMJvtRAlUckNVUs4mrIggpRRN6MTqyrbmygCpObCk8U
-X-Gm-Message-State: AOJu0Yw4JpHAspuoqN+XtZsolrdpTwLqYO6s3qwDF4WM8288fmYzy3hV
-	qnPJC3kvKi7xrICjo0n8ojhzMNfEojuOAeAAZG3xcImJ8BXQVjL9zoEp3L62uIXT7YOQMeSqx9A
-	f0rl+YkJ3nmaCoAf0dwKsG52RUmA7GX33szPl
-X-Google-Smtp-Source: AGHT+IG77LqOz1rKLl1usZ0hkZJBuy0HNLyyG0Tl2Mu7s9l3L9PapmOi7p1Xzkwxh6hZU77AQmWbrlFY6VZiU2+Fh0c=
-X-Received: by 2002:a05:6402:3591:b0:56c:5230:de80 with SMTP id
- y17-20020a056402359100b0056c5230de80mr336611edc.2.1712166965977; Wed, 03 Apr
- 2024 10:56:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712167405; x=1712772205;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A/GPjX1bC89s3pKDiOr4iTqFW1vCdSA+wrVsNDwDxNc=;
+        b=e1LFMymJmMROEDYL+o8c7H34Hf2IXEwlITcoelNwgNB3n6E6pA7MupwG41tQSBzwDl
+         JjS6FHhnP55F2c2ktdDkwn1lFno+mLV5j2gctS2p+ZGb+ogFL/zN5MrcF3clY6SXvG94
+         6k+uwfADqRpQlJa9dEwODYdRRLwzvMKcfLBIh+YLsM98JS2GlH3ROw2OfUY1LMwpmFR8
+         6p0+p739u2UZ2b28+owtD5Mn9IdfGbCTpKjFMx+IR3PSMEVUfsMNZuyNaxAJgEWjmdbP
+         K29BqvPbFDIrFaab6WlHDQbEbJa+1ZU1CSqk9GdMJS1jJFX5eBM4gfOdRJ0klhwarZxK
+         Fnwg==
+X-Forwarded-Encrypted: i=1; AJvYcCUptbj1O9H+PRsjFzdvP92OaTmMzyg5dE18DuXY5/0Kb/+gb/zzhfBHsQdBFq+ujrxWCmzCDHkmU9mz+g1P+UE9Yt/VZ2BfRU8sbmI1VNcXMDdLhW28Lzrf1QY+LPJ3an7mFy9f
+X-Gm-Message-State: AOJu0YwWvXZC0a2JHOFEgbj4qGhWqgr7ZPZR/BNi4U0IASkSx9TMBcHo
+	NmKibtfbXgAqBpwbiRAE9ELI6t8WMbRIXgcUZdE5CqPmWR1/rRwh
+X-Google-Smtp-Source: AGHT+IEyRUvecg0QN9/sEZf6ib0h8zoehWz/cWHULxKPtojfgajVSxFN5JsBkLEueNTDZDaVhyCn2w==
+X-Received: by 2002:a05:6512:20a:b0:515:bf94:cd38 with SMTP id a10-20020a056512020a00b00515bf94cd38mr153383lfo.36.1712167404358;
+        Wed, 03 Apr 2024 11:03:24 -0700 (PDT)
+Received: from localhost (c90-143-176-166.bredband.tele2.se. [90.143.176.166])
+        by smtp.gmail.com with ESMTPSA id bi15-20020a0565120e8f00b005159412ab81sm2092597lfb.216.2024.04.03.11.03.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 11:03:23 -0700 (PDT)
+From: Casper Andersson <casper.casan@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Ravi
+ Gunasekaran <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>,
+ Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Murali Karicheri
+ <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan Carpenter
+ <dan.carpenter@linaro.org>, Ziyang Xuan <william.xuanziyang@huawei.com>,
+ Shigeru Yoshida <syoshida@redhat.com>, linux-kernel@vger.kernel.org,
+ Lukasz Majewski <lukma@denx.de>
+Subject: Re: [PATCH v4] net: hsr: Provide RedBox support (HSR-SAN)
+In-Reply-To: <20240402085850.229058-1-lukma@denx.de>
+References: <20240402085850.229058-1-lukma@denx.de>
+Date: Wed, 03 Apr 2024 20:03:22 +0200
+Message-ID: <86v84yfhn9.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403123913.4173904-1-edumazet@google.com> <67f5cb70-14a4-4455-8372-f039da2f15c2@kernel.org>
- <CANn89iLQuN43FFHvSgLLY+2b-Yu2Uhy13tmrY_Q-8zX7zUcPkg@mail.gmail.com> <64ba0629-6481-41d2-ad99-38d296e93206@kernel.org>
-In-Reply-To: <64ba0629-6481-41d2-ad99-38d296e93206@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 3 Apr 2024 19:55:51 +0200
-Message-ID: <CANn89iKsJdDgoVbukfDObR=qSQ5T_93zV7-1C+BBWb_-ks=+xA@mail.gmail.com>
-Subject: Re: [PATCH net-next] ipv6: remove RTNL protection from ip6addrlbl_dump()
-To: David Ahern <dsahern@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Apr 3, 2024 at 7:49=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
-te:
 
-> Since this a known change in behavior (however slight), it would be best
-> to add something in the commit message or a code comment so if someone
-> hits a problem and does a git bisect the problem and solution are clear.
+Hi,
 
-Ok.
+Out of curiosity, are you planning to implement the remaining RedBox
+modes too (PRP-SAN, HSR-HSR, HSR-PRP)?
 
-The cb->seq  / nl_dump_check_consistent() protocol could be implemented lat=
-er,
-if necessary.
+On 2024-04-02 10:58 +0200, Lukasz Majewski wrote:
+> Changes for v3:
+>
+> - Modify frame passed Port C (Interlink) to have RedBox's source address (SA)
+>   This fixes issue with connecting L2 switch to Interlink Port as switches
+>   drop frames with SA other than one registered in their (internal) routing
+>   tables.
+
+> +	/* When HSR node is used as RedBox - the frame received from HSR ring
+> +	 * requires source MAC address (SA) replacement to one which can be
+> +	 * recognized by SAN devices (otherwise, frames are dropped by switch)
+> +	 */
+> +	if (port->type == HSR_PT_INTERLINK)
+> +		ether_addr_copy(eth_hdr(skb)->h_source,
+> +				port->hsr->macaddress_redbox);
+
+I'm not really understanding the reason for this change. Can you explain
+it in more detail? The standard does not say to modify the SA. However,
+it also does not say to *not* modify it in HSR-SAN mode like it does in
+other places. In HSR-HSR and HSR-PRP mode modifying SA breaks the
+duplicate discard. So keeping the same behavior for all modes would be
+ideal.
+
+I imagine any HW offloaded solutions will not modify the SA, so if
+possible the SW should also behave as such.
+
+BR,
+Casper
 
