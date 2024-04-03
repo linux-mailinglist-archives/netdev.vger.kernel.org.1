@@ -1,139 +1,197 @@
-Return-Path: <netdev+bounces-84616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE01A8979B3
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:19:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9B98979B4
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BCA31C217E8
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:19:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 204A81F27151
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8B2156226;
-	Wed,  3 Apr 2024 20:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965A5155758;
+	Wed,  3 Apr 2024 20:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R9W9CZjG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ExZBYS5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6992155A25
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 20:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17919155301;
+	Wed,  3 Apr 2024 20:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712175581; cv=none; b=Aj8jjlNPYNFm2X5mav1Ep89SFEoT8hGzatWwisDOxmncXmJAaeZYv9Z/zugS77x3S6AbE/UoTW7bC0VIfteBQYD8EiNtms1P3mi86dJvikGVwaeZe3g5wesQ4jI6cmVJT+/hCF9ygU9RD5TmO5JrlRu7/zQFWrwxDteKjNKPEcM=
+	t=1712175636; cv=none; b=kxz8fJhLpdPtQaXZtJtEBFJ50egrrKqshYSsH9/zOjyGiBrJ+XwbxYY1jO3jSib5NWur/Xvho04fCxoTBatWtlK8tOwyOyniynmih4ifrD1lLHywFfDWuaEBAEqWbn5nfjrTASeiWaXBmfOTo2gdBUv6tFNbzXAFPV1Z7v2E6K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712175581; c=relaxed/simple;
-	bh=hegHlUhBasKUMZObKcLkJqe/zOi+DJrgrHKeq2FG/SE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mFZIALNTSqi5TwhdpucxCj+UJymtKjCRnWFH4Jb3UcDZmgMT3n2G6/YzbnCM3Wh3FbRYZorYZz1FxTVnuzdWev7fiaNZOgexe+6bkmL+UFdZZshsKOE8FKRDWBoY3tGEO4D2pbylf8UrtCu2Kd6H7ihKvstZmoho0ks+WxIk2xA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R9W9CZjG; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712175580; x=1743711580;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hegHlUhBasKUMZObKcLkJqe/zOi+DJrgrHKeq2FG/SE=;
-  b=R9W9CZjGoCVTwKyuPUGnILzNT+M+5ZcXIGffX963oVZ+Vm3mKhNug/C1
-   R4jxFo4OGxZAvKV8KrO3YTufzBH/LxCixNbhrcote+aRUQ9WhUisWI2yZ
-   7jbzEpc5Virrl0rl2rzPlpskKKhc891p1edhNIGmNN68rBVrCsbvDAW0i
-   O485MuFiSy5Bs+DIT42wIyZlGvLP2mUsLgSzDLTU+d28+ZmfeAu2wxcH9
-   4UpKVXsye04GBYjfM9TKPQCIiib4egotyF9esP5z4+Vz/uegxuXBfJRkY
-   SQk8wZWw5hzCLuhlwcuGZt6CeOgIu8kZWCfHbowj8lSaeg7y446SvTZfa
-   A==;
-X-CSE-ConnectionGUID: pRQ3Zx2ISum1dq2IJByOaw==
-X-CSE-MsgGUID: bumTY+8pQjGX1aEKsnb6/Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="18165815"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="18165815"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 13:19:38 -0700
-X-CSE-ConnectionGUID: S4QR8hmARO2slCFPSocE9w==
-X-CSE-MsgGUID: I80dzmceSG+G87y0fIuAjg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="18662698"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 03 Apr 2024 13:19:37 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Joshua Hay <joshua.a.hay@intel.com>,
-	anthony.l.nguyen@intel.com,
-	willemb@google.com,
-	Balazs Nemeth <bnemeth@redhat.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Salvatore Daniele <sdaniele@redhat.com>,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Krishneil Singh <krishneil.k.singh@intel.com>
-Subject: [PATCH net 3/3] idpf: fix kernel panic on unknown packet types
-Date: Wed,  3 Apr 2024 13:19:28 -0700
-Message-ID: <20240403201929.1945116-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240403201929.1945116-1-anthony.l.nguyen@intel.com>
-References: <20240403201929.1945116-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1712175636; c=relaxed/simple;
+	bh=26L3z7JQ8dnYb3HamKTUiPsI0IDXBzLWXv1MUH5FMeE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=GlPyHSdqPVHv65fxjBK6Zr8OEHH2NA2VxXPb9CrmSYLTcZWmsBxNgLprb+8//Q1Ald3I/7k9DNqvJP7t2VKoHcc3RrVhNfZPlVwJ6nWdEebTjkMtdSpOr9s99sjdJc0YzjcmOLrGT6aCklxiZ/yoxB4nhrtMjSM4WT8OPp6XggI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ExZBYS5D; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6e6c0098328so188223b3a.3;
+        Wed, 03 Apr 2024 13:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712175634; x=1712780434; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/BqhsT1/7MwxMx0TbAKW2MQtEH2uBz2kntJlFvDK9Wo=;
+        b=ExZBYS5D43vC8DSoWJSKndqh+WcPtj/fbJUQqC940C1psqPXYq79rHOtxcv+/Tub0t
+         9F0/V5xuCSyBF3zpjKlw+qGU3M7smxsWVvPd9w1lOC2ehpCdbfzrwi+pD38SvWjqvP88
+         FhfNyoedI7+7QxRiFknsfyzBCzAo3uJSJ9P7HOgPE0jSsC/O8J7WMtrlJPAI08FnTwOn
+         BwNcN3Hw82lcoi24cxeXHAeLmMt1gnk2P/ozcAVPEn7RPtMiPa/rcIihPvDAc9RDI5EL
+         pec4NFV3uq+WyKY+eKkHiAdXL9stOuSp46iD6VeY4JzThOiVCrNNSn3B/NHuhlaSK8lx
+         JUog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712175634; x=1712780434;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/BqhsT1/7MwxMx0TbAKW2MQtEH2uBz2kntJlFvDK9Wo=;
+        b=E6zlCcnTQrYf23e4kWxstuzpaKgLExbGz05JVSea3nLbynMs3FqZkfQTf8G4cU8yp9
+         fxu0/nP0SRUhVxgJt3+FK2KrovPZBHMHguMhsyeLW4dYnRFKvs5FYT2gVuaVBtLPKFtt
+         XIa10cxsIRpEib+o3F/ziIfg0koMv5WhG8Kcc2rRvVdunOfmLyDPppFNDKRKgcodPSpk
+         /2pUCuAcUdJzhOqOziVMhA/YSew4yw0kxTvevSUwDxBGoh/9tOiHBsy2UHj4C7dfOaNK
+         gWCfQqiyCkzlG44yzez4i35PVY/jEC1nPAkqO5lVRB07Hs8U49AEsYwPpHoi/I2Ef8xo
+         V4vg==
+X-Forwarded-Encrypted: i=1; AJvYcCWazh6Wrl1+tIl0z7FnY7vWZdWzJy20cUmdbCeMobcd46VDmj0E5M0brF2FOtlrOzI8yofB041iEVS62xIPdjPwsFgDIK2Yen8DsLbnWgQmeTWA88NXrTZ4eVmc
+X-Gm-Message-State: AOJu0YyzOjwn0SqrwdDL88dbirmH8qPGw6LksepeLwNG1i3kuz+mfgfk
+	an8XtPXFsFNeRiecfGZEpBP0iThJcvXny+T7xa+V2Oa2DTFzJSZM
+X-Google-Smtp-Source: AGHT+IHy8T3UBcyrK7Dk9GsYXOkUPzPUMI9LABC1YiucZ8Nyr82wfK8Bt2GY7dfxnsj5h9BWGiaROA==
+X-Received: by 2002:a05:6a00:aca:b0:6ea:c2a2:5648 with SMTP id c10-20020a056a000aca00b006eac2a25648mr762174pfl.3.1712175634194;
+        Wed, 03 Apr 2024 13:20:34 -0700 (PDT)
+Received: from localhost ([98.97.36.54])
+        by smtp.gmail.com with ESMTPSA id d9-20020a62f809000000b006eb0027f2b8sm7902856pfh.9.2024.04.03.13.20.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 13:20:33 -0700 (PDT)
+Date: Wed, 03 Apr 2024 13:20:32 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org
+Message-ID: <660dba106f0ed_1cf6b208ad@john.notmuch>
+In-Reply-To: <20240220210342.40267-2-toke@redhat.com>
+References: <20240220210342.40267-1-toke@redhat.com>
+ <20240220210342.40267-2-toke@redhat.com>
+Subject: RE: [PATCH net-next v2 1/4] net: Register system page pool as an XDP
+ memory model
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Joshua Hay <joshua.a.hay@intel.com>
+Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> To make the system page pool usable as a source for allocating XDP
+> frames, we need to register it with xdp_reg_mem_model(), so that page
+> return works correctly. This is done in preparation for using the syste=
+m
+> page pool for the XDP live frame mode in BPF_TEST_RUN; for the same
+> reason, make the per-cpu variable non-static so we can access it from
+> the test_run code as well.
+> =
 
-In the very rare case where a packet type is unknown to the driver,
-idpf_rx_process_skb_fields would return early without calling
-eth_type_trans to set the skb protocol / the network layer handler.
-This is especially problematic if tcpdump is running when such a
-packet is received, i.e. it would cause a kernel panic.
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> ---
+>  include/linux/netdevice.h |  1 +
+>  net/core/dev.c            | 13 ++++++++++++-
+>  2 files changed, 13 insertions(+), 1 deletion(-)
+> =
 
-Instead, call eth_type_trans for every single packet, even when
-the packet type is unknown.
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index c541550b0e6e..e1dfdf0c4075 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3345,6 +3345,7 @@ static inline void input_queue_tail_incr_save(str=
+uct softnet_data *sd,
+>  }
+>  =
 
-Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
-Reported-by: Balazs Nemeth <bnemeth@redhat.com>
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Tested-by: Salvatore Daniele <sdaniele@redhat.com>
-Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+>  DECLARE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
+> +DECLARE_PER_CPU_ALIGNED(struct page_pool *, system_page_pool);
+>  =
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 6dd7a66bb897..f5bc4a278074 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -2941,6 +2941,8 @@ static int idpf_rx_process_skb_fields(struct idpf_queue *rxq,
- 	rx_ptype = le16_get_bits(rx_desc->ptype_err_fflags0,
- 				 VIRTCHNL2_RX_FLEX_DESC_ADV_PTYPE_M);
- 
-+	skb->protocol = eth_type_trans(skb, rxq->vport->netdev);
-+
- 	decoded = rxq->vport->rx_ptype_lkup[rx_ptype];
- 	/* If we don't know the ptype we can't do anything else with it. Just
- 	 * pass it up the stack as-is.
-@@ -2951,8 +2953,6 @@ static int idpf_rx_process_skb_fields(struct idpf_queue *rxq,
- 	/* process RSS/hash */
- 	idpf_rx_hash(rxq, skb, rx_desc, &decoded);
- 
--	skb->protocol = eth_type_trans(skb, rxq->vport->netdev);
--
- 	if (le16_get_bits(rx_desc->hdrlen_flags,
- 			  VIRTCHNL2_RX_FLEX_DESC_ADV_RSC_M))
- 		return idpf_rx_rsc(rxq, skb, rx_desc, &decoded);
--- 
-2.41.0
+>  static inline int dev_recursion_level(void)
+>  {
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index d8dd293a7a27..cdb916a647e7 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -428,7 +428,7 @@ EXPORT_PER_CPU_SYMBOL(softnet_data);
+>   * PP consumers must pay attention to run APIs in the appropriate cont=
+ext
+>   * (e.g. NAPI context).
+>   */
+> -static DEFINE_PER_CPU_ALIGNED(struct page_pool *, system_page_pool);
+> +DEFINE_PER_CPU_ALIGNED(struct page_pool *, system_page_pool);
+>  =
 
+>  #ifdef CONFIG_LOCKDEP
+>  /*
+> @@ -11739,12 +11739,20 @@ static int net_page_pool_create(int cpuid)
+>  		.pool_size =3D SYSTEM_PERCPU_PAGE_POOL_SIZE,
+>  		.nid =3D NUMA_NO_NODE,
+>  	};
+> +	struct xdp_mem_info info;
+>  	struct page_pool *pp_ptr;
+> +	int err;
+>  =
+
+>  	pp_ptr =3D page_pool_create_percpu(&page_pool_params, cpuid);
+>  	if (IS_ERR(pp_ptr))
+>  		return -ENOMEM;
+>  =
+
+> +	err =3D xdp_reg_mem_model(&info, MEM_TYPE_PAGE_POOL, pp_ptr);
+> +	if (err) {
+> +		page_pool_destroy(pp_ptr);
+> +		return err;
+> +	}
+> +
+>  	per_cpu(system_page_pool, cpuid) =3D pp_ptr;
+>  #endif
+>  	return 0;
+> @@ -11834,12 +11842,15 @@ static int __init net_dev_init(void)
+>  out:
+>  	if (rc < 0) {
+>  		for_each_possible_cpu(i) {
+> +			struct xdp_mem_info mem =3D { .type =3D MEM_TYPE_PAGE_POOL };
+>  			struct page_pool *pp_ptr;
+>  =
+
+>  			pp_ptr =3D per_cpu(system_page_pool, i);
+>  			if (!pp_ptr)
+>  				continue;
+>  =
+
+> +			mem.id =3D pp_ptr->xdp_mem_id;
+> +			xdp_unreg_mem_model(&mem);
+
+Take it or leave it, a net_page_pool_destroy(int cpuid) would be
+symmetric here.
+
+>  			page_pool_destroy(pp_ptr);
+>  			per_cpu(system_page_pool, i) =3D NULL;
+>  		}
+
+Acked-by: John Fastabend <john.fastabend@gmail.com>=
 
