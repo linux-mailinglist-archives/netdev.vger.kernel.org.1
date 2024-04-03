@@ -1,154 +1,217 @@
-Return-Path: <netdev+bounces-84469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE37896FD8
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:05:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DC1E896FE4
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:09:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2141E2825C3
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:05:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B9F61C25092
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41591474D2;
-	Wed,  3 Apr 2024 13:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31461482EA;
+	Wed,  3 Apr 2024 13:09:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OX277Qky"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UmZc7AY1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691BE147C8C;
-	Wed,  3 Apr 2024 13:05:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1301482E1
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712149540; cv=none; b=XMzFfUWxuobmmyJxsleTxcCF36Svq1KBO1s/z0aU5XonHI25Tb8uS8Mydzsb9J/dA0GUdzRN2Y0CegS67qM1wZz6QObcJpcYwKNKXhl1v7kg3kFW69aP2ghF/EaqhAESjOR6jfVZ7/rR7X2CfNz3Jb3HnQYSjalzTxX9aNZQ8wM=
+	t=1712149754; cv=none; b=qNmDTqDJsrKPozRwzhRA8TwsLsKRplQXaUPomMXdmMaF/KLdNNumsJZ+9OdFYB1XFET8X0GAfE+xHOlX8UtP60Sxl9aNnHOps6/fHzQhmgtm98soeBnlht1vE7oxyvbq9vFD2c+te53Kz66wghwgSsDYnrSa76Ze/GOSfuTciik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712149540; c=relaxed/simple;
-	bh=wQNcHiU2egNcf6hBq6VHiTIlV1Qd3a+Jtkh3eSehbdc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KuCVSeQvITJ9NcREXKQt93zLMGTshwe7nE6P6oOANLncgw+ByaJp3jhEzFqZMxyH/fHr6OYlhHdGW2Dof5lCC4c+EfwgqbpUAor2Yx1FOp6Yh7vrzYvHB2U2AAj0DoqpyzDI+7cPPnq2jIU+c6Kma2gyz4DmTlPYlgVxNyhVpiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OX277Qky; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6992d41de57so730566d6.3;
-        Wed, 03 Apr 2024 06:05:39 -0700 (PDT)
+	s=arc-20240116; t=1712149754; c=relaxed/simple;
+	bh=KqlKWNY2noWOhT5BY+zlXqx6xrXIM2Bvzj/Vjg+wf0M=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hqWGB1ADBp9pABY6NtqFrsAILCCpYS/bmJGvF/BTW/gy+G0rknCWxkzfNXoSxGOJ7sHsdy8iB8rCFa3YodJSUhRZjJrcQGdQXAJpuxaAKyN+jawP3F7EfIw03kfw87ceDl6s6r0XO73Sq2mHkM3ASVO5+ADt67ljxcTvt0EJQHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UmZc7AY1; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcbee93a3e1so9461141276.3
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 06:09:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712149538; x=1712754338; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3E/5ZKiFCYtAT6YThoONU0/wlO4idhhu4OUR1dvPZWI=;
-        b=OX277Qky9PHiYqjYyuZgKK9bzNeufsnXwSpymo10b6XxNujD7AaDwkRif77OP/VxDh
-         rFewF3XOyyVtGiJ0SbjaPf8y/CpC7jZ35cU5shaEO8YBtfqv9LslX6NklMBEiSGwJ/CV
-         4TcvULHe5w6hfuqXQyJnjXbRNXQj7Rl6QRz2C972SiG7hO2m6mCDF4mXfUf18Irv0mVO
-         vTjKTRPG73bx6trgkss89hoqp67062QnaNJmvEVYxmW7Avg0T7mLT0U9t4VhZJj/9Zss
-         ut+CPXrQnrHReRRZhpwAB0ZwAvnlpIjDE/7JmgAhaKJ0q/jlPPafcQF2YjFcjqaqUZNL
-         9wCw==
+        d=google.com; s=20230601; t=1712149752; x=1712754552; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bYPAN2OFykX66uQ8xudVUsih4kp4k5L6NFi3C2UvLAg=;
+        b=UmZc7AY1QT9qZnSX10tHHa9Vcb9huqlD7wsmvxIPKo+i0GO877rYU+ttD7MFL4fx5T
+         v1p/uVTRv7HaT3UfhX+konzkA7rihyLxuERF7ltEmwJBbGi6tLQ2zkBudAXxU2x1w80m
+         2nj9bOxQVW8gQfgo4yOOTHArz5GI1BRv1k8eF3mEF8fjb39bmWGPfQA6RtjOlPtOMhrn
+         hSmnLAFF4gpDMs91s6MzEX7iZ9U1I74pvqNdZWr/Biz/kDxTUjRgVSlwJxLn0G+iOAeE
+         4jtOmAeYyOHdkQG/s6Efn1UEyomWiK41M7L5GST6bHjFZc3/FZtfner3X5z7UBlILHwX
+         KnuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712149538; x=1712754338;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3E/5ZKiFCYtAT6YThoONU0/wlO4idhhu4OUR1dvPZWI=;
-        b=Hz+ALWN/AEh7aebHfywJYyjXEqLHT88ilC+VzTUghoKC5Jct9yeU0piK7jK5Fk7fAG
-         kuerz2FFcd/575XNAHN+2h/Bsux1amz9lFuk52SwBWCGBLAGmilYuO/9OSoe8qQeAe2G
-         lqWngKEi2OVrzgtQsQy+E9Ta3ZsgWLD8ZM2kWP/IVW9rfgwMuqLZ0AUFVKXeqINfsjGs
-         3NvzqhamJtlNS8U+fT0+nQ//O15Ckf2tEtShd4uzo9yapdZiKWRQ2AZdR9WVy/X+nmcF
-         ViStZoKW/oGhZIzYbNYju3TYfZFoWnMx5/SCxyCX5n4efDq/cZTGfhXKCwUYH8JH//pb
-         AuRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2ItKh2W3HhLAx1IhK16eD+LXLT1ZATgI4Ahb3ETJGExo9PjG4tPrA8X/q7Y4ceAG7BvyvkgwzROhpG3CGcatq/tZhMrFiIykSOiuu28aPK9ljo1MfDMNWv685v5msKty2hYRw
-X-Gm-Message-State: AOJu0YxrYmhQ05WiHI9wCoP4dmvRP0PF75lGpyIkx9tvZYxsS/4hlk/3
-	X3cSOSdxuLJT4zCaA9nMY7G0dbMW3tnUdxlhcPEh/m8dtrmIWLnB
-X-Google-Smtp-Source: AGHT+IEoNF5/Z/Ai9ZoDxOliZjp+T9YvlFfdguVZ9qSKBVONmO0sn2K9lOiVhVkZrheX1w0JgSTOBg==
-X-Received: by 2002:a05:6214:400b:b0:699:2d9b:214f with SMTP id kd11-20020a056214400b00b006992d9b214fmr201464qvb.63.1712149538193;
-        Wed, 03 Apr 2024 06:05:38 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id kc21-20020a056214411500b00698fccd2e02sm4255923qvb.43.2024.04.03.06.05.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Apr 2024 06:05:37 -0700 (PDT)
-Message-ID: <29163687-5e76-4231-b551-46c584e5629b@gmail.com>
-Date: Wed, 3 Apr 2024 06:05:32 -0700
+        d=1e100.net; s=20230601; t=1712149752; x=1712754552;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bYPAN2OFykX66uQ8xudVUsih4kp4k5L6NFi3C2UvLAg=;
+        b=Myk9ARYx6TYy8s2Hl7ivPEnO3g/nbB+jvkHw9FgApBpimD60igiVEYGGPbZYoUpN9R
+         xhx2Vozecmboe67MfRiYD2ahB2zdyRKdyXmER0E7YNzzjHS0CifFKwMchAXMR62hgfHu
+         E01eVgEJtU8rLpfQUenzq0E62d8rdQBCWwRvk72EBQHGQocnsWtiPPET1ze0Qg0FBfOB
+         0v0J66Z4b/IU5H/8ddyk8tlbEwXQzpjD0R47H7Ja8IMJz5YDc03QsJX2ylxzJubGk8UC
+         TC76ic1gBjh057Wk8AMEpJYJLkPmxYVf8Op/1Xyq31CpAjkBRn6xybZXzolcWqCqD3Tl
+         JlXg==
+X-Forwarded-Encrypted: i=1; AJvYcCW6tUERZXWmt1MCoWUHS1mXhsXGFe9bo043Fai4fesqN4HmBdzLf+mZBEP6RBHUwIxAcWfr7h+p4ZlyT5kRrIfGMjitT31V
+X-Gm-Message-State: AOJu0YwB+/Z/zUtP12xvjcZSSEXJFIqOwEQRMNufyEVol33emMkofgu5
+	5oWQucMjyiLIIx7kpShNNgHHJYnL2DhEH7azyqgnBBUeHlc9BuYXnBwFDDt1oyLA35iuLhuFzFJ
+	83aGb01A2Gg==
+X-Google-Smtp-Source: AGHT+IFBc4TgKZHc6Jg6ksW7o7s+XzHkWwIu++RavNz6SU3vhrfcLgFmHcwPsEh6EaUsAPRo5xFGlD3UCZlxAg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1549:b0:dcd:4286:4498 with SMTP
+ id r9-20020a056902154900b00dcd42864498mr1279043ybu.6.1712149751981; Wed, 03
+ Apr 2024 06:09:11 -0700 (PDT)
+Date: Wed,  3 Apr 2024 13:09:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/9] net: dsa: add support for DCB get/set
- apptrust configuration
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
- Woojung Huh <woojung.huh@microchip.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
- David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
- Willem de Bruijn <willemb@google.com>, =?UTF-8?Q?S=C3=B8ren_Andersen?=
- <san@skov.dk>
-References: <20240403092905.2107522-1-o.rempel@pengutronix.de>
- <20240403092905.2107522-2-o.rempel@pengutronix.de>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
- xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
- X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
- AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
- ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
- SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
- nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
- qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
- YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
- FgIDAQIeAQIXgAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2DvCVAJ4u4/bPF4P3jxb4qEY8I2gS
- 6hG0gACffNWlqJ2T4wSSn+3o7CCZNd7SLSDOw00ESM+4EhAQAL/o09boR9D3Vk1Tt7+gpYr3
- WQ6hgYVON905q2ndEoA2J0dQxJNRw3snabHDDzQBAcqOvdi7YidfBVdKi0wxHhSuRBfuOppu
- pdXkb7zxuPQuSveCLqqZWRQ+Cc2QgF7SBqgznbe6Ngout5qXY5Dcagk9LqFNGhJQzUGHAsIs
- hap1f0B1PoUyUNeEInV98D8Xd/edM3mhO9nRpUXRK9Bvt4iEZUXGuVtZLT52nK6Wv2EZ1TiT
- OiqZlf1P+vxYLBx9eKmabPdm3yjalhY8yr1S1vL0gSA/C6W1o/TowdieF1rWN/MYHlkpyj9c
- Rpc281gAO0AP3V1G00YzBEdYyi0gaJbCEQnq8Vz1vDXFxHzyhgGz7umBsVKmYwZgA8DrrB0M
- oaP35wuGR3RJcaG30AnJpEDkBYHznI2apxdcuTPOHZyEilIRrBGzDwGtAhldzlBoBwE3Z3MY
- 31TOpACu1ZpNOMysZ6xiE35pWkwc0KYm4hJA5GFfmWSN6DniimW3pmdDIiw4Ifcx8b3mFrRO
- BbDIW13E51j9RjbO/nAaK9ndZ5LRO1B/8Fwat7bLzmsCiEXOJY7NNpIEpkoNoEUfCcZwmLrU
- +eOTPzaF6drw6ayewEi5yzPg3TAT6FV3oBsNg3xlwU0gPK3v6gYPX5w9+ovPZ1/qqNfOrbsE
- FRuiSVsZQ5s3AAMFD/9XjlnnVDh9GX/r/6hjmr4U9tEsM+VQXaVXqZuHKaSmojOLUCP/YVQo
- 7IiYaNssCS4FCPe4yrL4FJJfJAsbeyDykMN7wAnBcOkbZ9BPJPNCbqU6dowLOiy8AuTYQ48m
- vIyQ4Ijnb6GTrtxIUDQeOBNuQC/gyyx3nbL/lVlHbxr4tb6YkhkO6shjXhQh7nQb33FjGO4P
- WU11Nr9i/qoV8QCo12MQEo244RRA6VMud06y/E449rWZFSTwGqb0FS0seTcYNvxt8PB2izX+
- HZA8SL54j479ubxhfuoTu5nXdtFYFj5Lj5x34LKPx7MpgAmj0H7SDhpFWF2FzcC1bjiW9mjW
- HaKaX23Awt97AqQZXegbfkJwX2Y53ufq8Np3e1542lh3/mpiGSilCsaTahEGrHK+lIusl6mz
- Joil+u3k01ofvJMK0ZdzGUZ/aPMZ16LofjFA+MNxWrZFrkYmiGdv+LG45zSlZyIvzSiG2lKy
- kuVag+IijCIom78P9jRtB1q1Q5lwZp2TLAJlz92DmFwBg1hyFzwDADjZ2nrDxKUiybXIgZp9
- aU2d++ptEGCVJOfEW4qpWCCLPbOT7XBr+g/4H3qWbs3j/cDDq7LuVYIe+wchy/iXEJaQVeTC
- y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
- X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240403092905.2107522-2-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240403130908.93421-1-edumazet@google.com>
+Subject: [PATCH net] net/sched: act_skbmod: prevent kernel-infoleak
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot found that tcf_skbmod_dump() was copying four bytes
+from kernel stack to user space [1].
 
+The issue here is that 'struct tc_skbmod' has a four bytes hole.
 
-On 4/3/2024 2:28 AM, Oleksij Rempel wrote:
-> Add DCB support to get/set trust configuration for different packet
-> priority information sources. Some switch allow to choice different
-> source of packet priority classification. For example on KSZ switches it
-> is possible to configure VLAN PCP and/or DSCP sources.
+We need to clear the structure before filling fields.
 
-s/to choice/to chose/
+[1]
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+ BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
+ BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:29 [inline]
+ BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+ BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:271 [inline]
+ BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x366/0x2520 lib/iov_iter.c:185
+  instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+  copy_to_user_iter lib/iov_iter.c:24 [inline]
+  iterate_ubuf include/linux/iov_iter.h:29 [inline]
+  iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+  iterate_and_advance include/linux/iov_iter.h:271 [inline]
+  _copy_to_iter+0x366/0x2520 lib/iov_iter.c:185
+  copy_to_iter include/linux/uio.h:196 [inline]
+  simple_copy_to_iter net/core/datagram.c:532 [inline]
+  __skb_datagram_iter+0x185/0x1000 net/core/datagram.c:420
+  skb_copy_datagram_iter+0x5c/0x200 net/core/datagram.c:546
+  skb_copy_datagram_msg include/linux/skbuff.h:4050 [inline]
+  netlink_recvmsg+0x432/0x1610 net/netlink/af_netlink.c:1962
+  sock_recvmsg_nosec net/socket.c:1046 [inline]
+  sock_recvmsg+0x2c4/0x340 net/socket.c:1068
+  __sys_recvfrom+0x35a/0x5f0 net/socket.c:2242
+  __do_sys_recvfrom net/socket.c:2260 [inline]
+  __se_sys_recvfrom net/socket.c:2256 [inline]
+  __x64_sys_recvfrom+0x126/0x1d0 net/socket.c:2256
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
 
-or s/to choice/the choice/
+Uninit was stored to memory at:
+  pskb_expand_head+0x30f/0x19d0 net/core/skbuff.c:2253
+  netlink_trim+0x2c2/0x330 net/netlink/af_netlink.c:1317
+  netlink_unicast+0x9f/0x1260 net/netlink/af_netlink.c:1351
+  nlmsg_unicast include/net/netlink.h:1144 [inline]
+  nlmsg_notify+0x21d/0x2f0 net/netlink/af_netlink.c:2610
+  rtnetlink_send+0x73/0x90 net/core/rtnetlink.c:741
+  rtnetlink_maybe_send include/linux/rtnetlink.h:17 [inline]
+  tcf_add_notify net/sched/act_api.c:2048 [inline]
+  tcf_action_add net/sched/act_api.c:2071 [inline]
+  tc_ctl_action+0x146e/0x19d0 net/sched/act_api.c:2119
+  rtnetlink_rcv_msg+0x1737/0x1900 net/core/rtnetlink.c:6595
+  netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2559
+  rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6613
+  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+  netlink_unicast+0xf4c/0x1260 net/netlink/af_netlink.c:1361
+  netlink_sendmsg+0x10df/0x11f0 net/netlink/af_netlink.c:1905
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+  ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
+  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+  __sys_sendmsg net/socket.c:2667 [inline]
+  __do_sys_sendmsg net/socket.c:2676 [inline]
+  __se_sys_sendmsg net/socket.c:2674 [inline]
+  __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
 
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Uninit was stored to memory at:
+  __nla_put lib/nlattr.c:1041 [inline]
+  nla_put+0x1c6/0x230 lib/nlattr.c:1099
+  tcf_skbmod_dump+0x23f/0xc20 net/sched/act_skbmod.c:256
+  tcf_action_dump_old net/sched/act_api.c:1191 [inline]
+  tcf_action_dump_1+0x85e/0x970 net/sched/act_api.c:1227
+  tcf_action_dump+0x1fd/0x460 net/sched/act_api.c:1251
+  tca_get_fill+0x519/0x7a0 net/sched/act_api.c:1628
+  tcf_add_notify_msg net/sched/act_api.c:2023 [inline]
+  tcf_add_notify net/sched/act_api.c:2042 [inline]
+  tcf_action_add net/sched/act_api.c:2071 [inline]
+  tc_ctl_action+0x1365/0x19d0 net/sched/act_api.c:2119
+  rtnetlink_rcv_msg+0x1737/0x1900 net/core/rtnetlink.c:6595
+  netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2559
+  rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6613
+  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+  netlink_unicast+0xf4c/0x1260 net/netlink/af_netlink.c:1361
+  netlink_sendmsg+0x10df/0x11f0 net/netlink/af_netlink.c:1905
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+  ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
+  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+  __sys_sendmsg net/socket.c:2667 [inline]
+  __do_sys_sendmsg net/socket.c:2676 [inline]
+  __se_sys_sendmsg net/socket.c:2674 [inline]
+  __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
 
-With that fixed:
+Local variable opt created at:
+  tcf_skbmod_dump+0x9d/0xc20 net/sched/act_skbmod.c:244
+  tcf_action_dump_old net/sched/act_api.c:1191 [inline]
+  tcf_action_dump_1+0x85e/0x970 net/sched/act_api.c:1227
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Bytes 188-191 of 248 are uninitialized
+Memory access of size 248 starts at ffff888117697680
+Data copied to user address 00007ffe56d855f0
+
+Fixes: 86da71b57383 ("net_sched: Introduce skbmod action")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/sched/act_skbmod.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/net/sched/act_skbmod.c b/net/sched/act_skbmod.c
+index 39945b139c4817584fb9803b9e65c89fef68eca0..cd0accaf844a18e4a6a626adba5fae05df66b0a3 100644
+--- a/net/sched/act_skbmod.c
++++ b/net/sched/act_skbmod.c
+@@ -241,13 +241,13 @@ static int tcf_skbmod_dump(struct sk_buff *skb, struct tc_action *a,
+ 	struct tcf_skbmod *d = to_skbmod(a);
+ 	unsigned char *b = skb_tail_pointer(skb);
+ 	struct tcf_skbmod_params  *p;
+-	struct tc_skbmod opt = {
+-		.index   = d->tcf_index,
+-		.refcnt  = refcount_read(&d->tcf_refcnt) - ref,
+-		.bindcnt = atomic_read(&d->tcf_bindcnt) - bind,
+-	};
++	struct tc_skbmod opt;
+ 	struct tcf_t t;
+ 
++	memset(&opt, 0, sizeof(opt));
++	opt.index   = d->tcf_index;
++	opt.refcnt  = refcount_read(&d->tcf_refcnt) - ref,
++	opt.bindcnt = atomic_read(&d->tcf_bindcnt) - bind;
+ 	spin_lock_bh(&d->tcf_lock);
+ 	opt.action = d->tcf_action;
+ 	p = rcu_dereference_protected(d->skbmod_p,
 -- 
-Florian
+2.44.0.478.gd926399ef9-goog
+
 
