@@ -1,158 +1,121 @@
-Return-Path: <netdev+bounces-84425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCBFD896EA1
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:04:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D6C896ED6
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53FF0B23096
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:04:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7F0E1C25D20
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52257145B2A;
-	Wed,  3 Apr 2024 12:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8A2145FF8;
+	Wed,  3 Apr 2024 12:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UU3zeFGk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RttR61FS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66E6143891
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 12:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379921465B0;
+	Wed,  3 Apr 2024 12:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712145843; cv=none; b=rYZah9owt4GcgID6mbPov0v1ZIW5cBYVrhIEDd9YErrTKHEWxVjgng/5faf1+Xv40vCJKiejQbTeEjLYJfN+zP04ih0mTjs0eFQaNAPPr4copuZ1xeMhzVLgBHGF1B0uqj3E6pm1ntwyXULDgGgmE1GLnXsR0u6vb9Ca1eEro8w=
+	t=1712147215; cv=none; b=bj/l53qqTZU+tEfcl7nR+YtlBTl/EKhj2j8nGF9TIMb6qUwM9AL1J0n9Jq1VNaWjeepQ5w7rTCt/Vp9755/xdYt35aA/oDs/i1sfhzMtG9dibZneAUPbo7//C+CeAV+Xd8Hc44dtxSg5IC2jtdS2AThIVC74tZcUE4LfOgYiyqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712145843; c=relaxed/simple;
-	bh=p2QvsVlb5dDKU3rvnS3xF7xwbQTZQ+LkdjO1doc1L/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CK0sZnDZz9PY1vrXaR2EednVvH4wQiSzRIEXhs1lIdBqtnJxC5WxIoD4XWfHoLmeDH/HPa9exzWdd5v4COuz99ZSPf1QqSvjP4y+KNVOAhnmPWJJpvTpG5M8JdZTAi0q6ec39ZZHMMa3epBDTnlLKV/aj2gHP3cCs0NafztEAeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UU3zeFGk; arc=none smtp.client-ip=209.85.208.170
+	s=arc-20240116; t=1712147215; c=relaxed/simple;
+	bh=ukDQ77z0zTDgEHZ5/JvW3hHKfTwSHmNYJHt/j79mwG0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=hVEZ7JQ0KJeXqR+dgDNNS7TUuPnjcaM0rXlKlHnDHDnAiID03Rvi7dzYfoQdt5uXSlMJTw6RgIG64CiTkCGK0PVtGNCpVGrUESbWRlyEiMEH9CQJ5HiSOGIqwt8V4hPk8tLUYJNJlvJRToCABaR5rorOXceT4AjENaCYLz8MFao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RttR61FS; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d718efedb2so96559891fa.0
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 05:04:01 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41569f1896dso19420645e9.2;
+        Wed, 03 Apr 2024 05:26:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712145840; x=1712750640; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OQuR+ZWvALKY2pv0aAp/bCUuAX3STUaEGBYLUe2AHu0=;
-        b=UU3zeFGk2UE69ZQkmC/+5o2xlRV99+TTa/SKus2AallV02QH2d7aNeCWaHI3jMzJY5
-         FPn8WcUqMUHTgEWtDSBJkMIYifMrzV0m0pANrEZovaCVuDBOAf51baOoD3vx0d3Nn9Ax
-         3JIEiBJZZLu24YJit3RcqTpU2qc28OCO3gD0qOqJoThBAUj/AKEZIpFqt8cuZKTpa2kv
-         NbbPuu1ayinOIYeJ11qCLuQ02QZXdnhflZIOE20WYLAgO4ZVEjb1hfGwhOy/PPmDXoE5
-         oDI8D4xC1rpEEj3jkl5z2SnB4AzFK0X5+9akaNyIVl8pfwEngWt0xZjSfMIrSwZWn+/+
-         LSIw==
+        d=gmail.com; s=20230601; t=1712147212; x=1712752012; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KvCLM7KWbyJGgG8sR6Sshx7UgvNmX8RL0J9lEmjrHw4=;
+        b=RttR61FSZdPQAYMdxpMrP5N8ZxrxaIBDjWHKI7FRO6o6UnOzHddtkWEQtAo2hpZJML
+         WVmq5LmZc0B2xOYwTloCl1Vxg1qRNKRzsaz9ifXtBeInV6CQyijUdfHbT/JLKV3aX2q2
+         CbtvrRLzsN7eqKGGTgPDDLRMVL8WCP8HPaFCZVSpOLiYDc0MYIvuGwvpWQDS5w76JRHn
+         6HXVRm2ZQB/omBeugfEFcJzqhRbxSKI6A7vd8oETVuwkLAOHdczicUEpwOnoLiP0jQ1i
+         2ViaF0D6kZMVaRleJw0v5/GB3O4PxHe2xRqz81XaK9c2JKfG2ebHEDUhNMJ57utV8KeC
+         swSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712145840; x=1712750640;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1712147212; x=1712752012;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OQuR+ZWvALKY2pv0aAp/bCUuAX3STUaEGBYLUe2AHu0=;
-        b=rJhe5RrPXDA2P1YNiY2xN1N7xRvOKkPrV8SFhfK5ISRyQ/RPbyOvK+v6DisYuPZ4ay
-         Q75tzkxDVz5sx2DA+lZ63CLDiM2kgoFXHgDtJ53ju8bjTdsAF3Pn20EjP6sABdp29zKT
-         B1hvFh+6d+azUWrKd3MyDh00Hcr4PLJNSiBgd8dg4hjWKMaTzMBG6zNqDa0n6SzofhyU
-         vZkw0m1IVj8x05ksO0hRTCd7ZLzkXDTZ3kh/+lRfJcdtDI2a7YYcqerFf7/9XLRHqjNK
-         U5EY1xRVi8LKdcSmb7FJSH00PcG9687+oGc60weP6A7nMQDwrA6Ab2Qa0JAU1B5KvTLL
-         glzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUDtu3a0lTG4hReDyu0gYL3N47MElaNM5lvaXZ7Q8Mi2CPVHNYg5dO5+9hHArxHh3V1aNlt/OS//nRngua+4rKRHI7YoHh/
-X-Gm-Message-State: AOJu0YwDMvhHd9BQK2Oc+WYKK8zZX7kiupfCbD1DCOOnwu8RLd5JrPXT
-	Hw5LbqHOJmGBgNxkt39VZ//d1tPiRkse35q6XL4C0GASndnqGvj0
-X-Google-Smtp-Source: AGHT+IGteZJRS6M5tPakVDO5j9Xyuv1qCjE9Vb1dpLh8OsqV2bCnxvS38TLuzETdo5Rovt50Uiqtmw==
-X-Received: by 2002:a05:6512:3152:b0:516:7de8:335a with SMTP id s18-20020a056512315200b005167de8335amr3970576lfi.59.1712145839535;
-        Wed, 03 Apr 2024 05:03:59 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id v21-20020a05651203b500b00513ed62b64dsm2016144lfp.301.2024.04.03.05.03.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 05:03:59 -0700 (PDT)
-Date: Wed, 3 Apr 2024 15:03:55 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: hkallweit1@gmail.com, andrew@lunn.ch, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v8 07/11] net: stmmac: dwmac-loongson: Add
- multi-channel supports for loongson
-Message-ID: <7myfmz72mdp74k3pjtv6gmturdtm7pkghcwpom62hl52eafval@wmbtdwm5kitp>
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <bec0d6bf78c0dcf4797a148e3509058e46ccdb13.1706601050.git.siyanteng@loongson.cn>
- <eqecwmi3guwda3wloxcttkx2xlteupvrsetb5ro5abupwhxqyu@ypliwpyswy23>
- <e1c7b5fa-f3f8-4aa3-af4d-ca72b54d9c8c@loongson.cn>
- <f9c5c697-6c3f-4cfb-aa60-2031b450a470@loongson.cn>
- <roxfse6rf7ngnopn42f6la2ewzsaonjbrfokqjlumrpkobfvgh@7v7vblqi3mak>
- <e57a6501-c9ae-4fed-8b8f-b05f0d50e118@loongson.cn>
- <tr65rdtph43gtccnwymjfkaoumzuwc574cbzxfh2q3ipoip2eo@rzzrwtbp5m6v>
- <e6122e3f-d221-4d95-a6b8-92e67aa51a5a@loongson.cn>
+        bh=KvCLM7KWbyJGgG8sR6Sshx7UgvNmX8RL0J9lEmjrHw4=;
+        b=QTwdNGfdSKdKOti7w+GQVWEIgvVBaCNjvhukx/87j3ednZBBbJlkQ76UOx3g/+xn4/
+         AMWEY72xWEmcgIMI5ZBT1e44Jpj5Q8FRJ81vbeu1a2SqR8NO+9BROE60I51bE1hS0xJ1
+         gFtgl/4GpIkwJzrO/6B4dd9UdoJtp1784EvQDwKpELqwnMiDoGzqohQiCelFdmnntcJ0
+         HYS1j0ligVAgLZnbl6pXsJS7xa7TGLOhM3L+2ZFSJDjUOJM8zes1IQNySKkLCWHEAX9k
+         dVbbkF3RHVEHHid2mMduF1/KVcK+Bj/f3Fwf2rhpt9w0A24M6oQGR12euPX4BNpl14s6
+         NAGw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzJIrYI7bPWFdxfqU9RDdepH1+yzbDS/KjdkA7Ddao5lLjtOTnz4A0gbEPErwc5C73/eYLPshLK5rWOkz77GhM2n9AHLlF9v+nzdX8FgFdBXpfV+L+2wykt0DUT2X+gZhZ6DD0
+X-Gm-Message-State: AOJu0Yzk4FphNoHECugevffGqaRZVHkhzrjGVmJXxGBtLNTQSPyHTSaE
+	lkHq0cfplwG9eCbaiU7hOOYkEmEe8fgY0X9xY2gfGzRkewb/bKEs
+X-Google-Smtp-Source: AGHT+IGep7sS70dltb4GELbCG0CAwiW6bPOkxxFngASD+tV+hVjy7exTGCbfsyuZXiB8HVo3AJ8ivA==
+X-Received: by 2002:adf:f48c:0:b0:343:3538:4ee4 with SMTP id l12-20020adff48c000000b0034335384ee4mr10976569wro.45.1712147212366;
+        Wed, 03 Apr 2024 05:26:52 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id bh8-20020a05600005c800b0033e7a102cfesm10876916wrb.64.2024.04.03.05.26.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Apr 2024 05:26:51 -0700 (PDT)
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+To: Leon Romanovsky <leon@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@infradead.org>,
+ Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
+ Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <20240304160237.GA2909161@nvidia.com>
+ <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
+ <2024032248-ardently-ribcage-a495@gregkh>
+ <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+ <Zf2n02q0GevGdS-Z@C02YVCJELVCG> <20240322135826.1c4655e2@kernel.org>
+ <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+ <20240322154027.5555780a@kernel.org>
+ <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+ <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184832.GO11187@unreal>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <cefa2b9a-4227-969e-d31e-c19a552b9c1c@gmail.com>
+Date: Wed, 3 Apr 2024 13:26:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20240402184832.GO11187@unreal>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e6122e3f-d221-4d95-a6b8-92e67aa51a5a@loongson.cn>
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 03, 2024 at 04:09:21PM +0800, Yanteng Si wrote:
+On 02/04/2024 19:48, Leon Romanovsky wrote:
+> On Tue, Apr 02, 2024 at 05:32:44PM +0100, Edward Cree wrote:
+>>  you're getting maintainer pushback.
 > 
-> 在 2024/3/23 02:47, Serge Semin 写道:
-> > +static int loongson_dwmac_config_multi_msi(struct pci_dev *pdev,
-> > +					   struct plat_stmmacenet_data *plat,
-> > +					   struct stmmac_resources *res)
-> > +{
-> > +	int i, ret, vecs;
-> > +
-> > +	/* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
-> > +	 * --------- ----- -------- --------  ...  -------- --------
-> > +	 * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
-> > +	 */
-> > +	vecs = plat->rx_queues_to_use + plat->tx_queues_to_use + 1;
-> > +	ret = pci_alloc_irq_vectors(pdev, 1, vecs, PCI_IRQ_MSI | PCI_IRQ_LEGACY);
-> > +	if (ret < 0) {
-> > +		dev_err(&pdev->dev, "Failed to allocate PCI IRQs\n");
-> > +		return ret;
-> > +	} else if (ret >= vecs) {
-> > +		for (i = 0; i < plat->rx_queues_to_use; i++) {
-> > +			res->rx_irq[CHANNELS_NUM - 1 - i] =
-> > +				pci_irq_vector(pdev, 1 + i * 2);
-> > +		}
-> > +		for (i = 0; i < plat->tx_queues_to_use; i++) {
-> > +			res->tx_irq[CHANNELS_NUM - 1 - i] =
-> > +				pci_irq_vector(pdev, 2 + i * 2);
-> > +		}
-> > +
-> > +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-> > +	}
-> > +
-> > +	res->irq = pci_irq_vector(pdev, 0);
-> > +
-> > +	return 0;
-> > +}
-> > 
-> > Thus in case if for some reason you were able to allocate less MSI
-> > IRQs than required you'll still be able to use them. The legacy IRQ
-> > will be also available in case if MSI failed to be allocated.
-> 
-> Great, we will consider doing this in the future, but at this stage, we
-> don't want to add too much complexity.
+> May I suggest you to take a short break, collect names of people who
+> participated in this discussion and check in git history/MAINTAINERS
+> file their contribution to the linux kernel?
+Whether you like it or not, Kuba is a kernel maintainer.
+And thus, semantically, a Nack from him is "maintainer pushback".
+That remains true regardless of who else in the discussion is also
+ a kernel maintainer.
 
-This comment isn't about complexity. Moreover the code in my comment
-is simpler since the function is more coherent and doesn't have the
-redundant dependencies from the node-pointer and the
-loongson_dwmac_config_legacy() function. In addition it provides more
-flexible solution in case if there were less MSI vectors allocated
-then required.
-
--Serge(y)
-
-> 
-> 
-> Thanks,
-> 
-> Yanteng
-> 
+If you had an actual point, feel free to explain to me, without the
+ veiled language, what was so 'inappropriate' about my posting.
 
