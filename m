@@ -1,104 +1,111 @@
-Return-Path: <netdev+bounces-84338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C28D896A69
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:24:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C79896A7D
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:27:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BACD328887C
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:24:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D28B91C24E76
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A3971747;
-	Wed,  3 Apr 2024 09:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="OXXcioEY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3621473164;
+	Wed,  3 Apr 2024 09:27:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814E45D731;
-	Wed,  3 Apr 2024 09:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B01130A64
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712136258; cv=none; b=tJ5Hb2YWZzLi7r8Z9kd+VglcLFI3rk6ORiqNRFa04zPJlil1QWTT0GlIBI15YY8J26MrW5PHqjeIvdeGI6fp0vslAzdzkEK+ZBfMnKXKT1fSJjAMcYmQ8/SsORPEe94m7vNm37fBF4OHHHWnzmXFHHlsvySEHV7wT0ik/REMt2A=
+	t=1712136464; cv=none; b=fZiEyUAz0bPcFIOiUNnJiCfn+YvKvPJx8yskT5JBPC5EVkYrXZmA28xYvJH3+5EbxDsCOLmSOhVvG+3gyRSGn0BzpbSFYDvTKU+7W/08pqhxDXMqk2k1aFLTrkztjCzfrKUzm4/G4dMWXy0qmBWh8Gl3FRRyCj8u9BvtvzSQpRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712136258; c=relaxed/simple;
-	bh=3al6tDwI5lYdDTOMG5dHRvUWH7Kdpwnyp2UDmKmWL6w=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=GQ5LhfI6vgQMONGgVNE+MPfzvQl712OuPW3PHnQwBdummFbrENGT3eFLqWh12WkWpXou2TOuBc878j7cAhrTRnzPseqDIiqJjdbCamRn6jgFetgbeplo928bJ8fH4ZiL2H0WNSy3qgK50nH9NwFzQ0ib/lDkSodQYc4SLbxrtwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=OXXcioEY; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=fFNSyki+Dgz7V/b1k4oyzhBUT89XBpD9mCte8VdggJ4=; b=OXXcioEYxBmZIcDa+w1dKhpXxa
-	FtRL+g2c5eaj86MogF9DeEPpfGlAcGjCm2Vsi/NqeoBE9w73r301LM1Gg1ikoyjXeKkLBqJeEq1fv
-	OIIiR9kYfaTdzGaUAbeGnkM1RmdMIGeVOFelkI0VRQ9sY9QaxrBLXKDAOamckFfK8cBHrOcb60bAF
-	28FD5HfJBkM80lc0J7e4u4IlNL6QBmWvkBptT1b6JFkgw2Rc8n8R85/gGjb7bhBqwB7IHVlp1JgDm
-	MdRdUeXNHOsrRWx8JAhRebrfqSI72bc2Q1Qh2+q5+dF7QtJFg68Wb/NEK1P0AsLSOq9fqhq2d8iGV
-	IYNfxEtg==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rrwY7-0009g5-O2; Wed, 03 Apr 2024 11:04:51 +0200
-Received: from [178.197.248.12] (helo=linux.home)
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rrwY7-000CJ1-0b;
-	Wed, 03 Apr 2024 11:04:51 +0200
-Subject: Re: [PATCH RESEND bpf v2 0/2] x86/bpf: Fixes for the BPF JIT with
- retbleed=stuff
-To: Ingo Molnar <mingo@kernel.org>, Uros Bizjak <ubizjak@gmail.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, ast@kernel.org, x86@kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240401185821.224068-1-ubizjak@gmail.com>
- <171203102833.24910.7566029980709800852.git-patchwork-notify@kernel.org>
- <Zg0EtEkIIA45cuPT@gmail.com>
- <CAFULd4Z0RmiWu4Kf0YFBMqA7YFMd65f3J760Do8-h83zWCx9oA@mail.gmail.com>
- <Zg0Mvb6kkHceEENb@gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <504a2e70-3bd5-a9f0-60ec-49c4b17566ae@iogearbox.net>
-Date: Wed, 3 Apr 2024 11:04:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1712136464; c=relaxed/simple;
+	bh=uec4ow18waH5M96ioU8VUfQCXlDums/zztG2E9HoQrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X38ue89pJRbJwy3EfD+9f/2kkQ4HKhpa8om8FHTSNLO8Zb7g26Z9cfKp7VbLM9EEHJvhGA44Q2rwogmcphcz4fp5wgkoPM6tfiy2K/ERJN4Ylrm2ZLe3uYedXDpIAm9+kNqVs/u43wjBfbB1YURB2LCr13IECWUoXU8Wqrsuoi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtpsz9t1712136447to25xxo
+X-QQ-Originating-IP: v3mObkiEjAbS4yRONsAtMVFiN9t5G6rw1jBdvifScnw=
+Received: from localhost.localdomain ( [36.24.97.137])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 03 Apr 2024 17:27:17 +0800 (CST)
+X-QQ-SSF: 01400000000000O0Z000000A0000000
+X-QQ-FEAT: qcKkmz/zJhyozaVVHuszywMoYIUOG8nvNjDAGVbTM0FVQALAIXLxFS/h5Ifyk
+	dHkn0I+VRDcyphPAIfPgI4soypZUq6JxWtjtLFxLVJDwSPxY/ieP/Jn8NuFB8NAFAejgR+6
+	KentiBmfxeMR8B5L0PwDLrluQtwquYjGZq6A6GEvA5589XA7SLZnmYoiMSK6WqrpXquhmwU
+	t8BcHWa+19lzT4NYm1nCexvMUrqdK0U9Orx/rlqKk/Y6tza5NG85a2sjQt5KepQiZPytyt1
+	v2PkmYFaCsCxj99OxqOo4FnasQXze4X4e2DfT6g92QUU8MzVhwfS3bJSeZThuzQE77yGOWV
+	t1KKtHdt9Eo56D2skjG1u9F/6h1ikrVhAovebVOyS4Zc6Cx10BTtvNf6jmHkw==
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 10791282922348215057
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: jiawenwu@trustnetic.com,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v2 0/7] add sriov support for wangxun NICs
+Date: Wed,  3 Apr 2024 17:09:57 +0800
+Message-ID: <EF19E603F7CCA7B9+20240403092714.3027-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Zg0Mvb6kkHceEENb@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27234/Wed Apr  3 10:25:27 2024)
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 
-On 4/3/24 10:01 AM, Ingo Molnar wrote:
-> * Uros Bizjak <ubizjak@gmail.com> wrote:
-> 
->>>> Here is the summary with links:
->>>>    - [RESEND,bpf,v2,1/2] x86/bpf: Fix IP after emitting call depth accounting
->>>>      https://git.kernel.org/bpf/bpf/c/9d98aa088386
->>>>    - [RESEND,bpf,v2,2/2] x86/bpf: Fix IP for relocating call depth accounting
->>>>      https://git.kernel.org/bpf/bpf/c/6a537453000a
->>>
->>> Just wondering, which kernel version is this targeted for?
->>
->> The whole series is intended for the current mainline (v6.9), this is
->> why it is developed against the bpf (*not* bpf-next) branch.
-> 
-> I see - so bpf.git:master are current-mainline BPF fixes - that's perfect.
+Add sriov_configure for ngbe and txgbe drivers.
+Reallocate queue and irq resources when sriov is enabled.
+Add wx_msg_task in interrupts handler, which is used to process the
+configuration sent by vfs.
+Add ping_vf for wx_pf to tell vfs about pf link change.
 
-Yes, correct, that is for mainline (v6.9).
+changes v2:
+- Simon Horman:
+Fix some used uninitialised.
+- Sunil:
+Use poll + yield with delay instead of busy poll of 10 times
+in mbx_lock obtain.
+Split ndo_vf_xxx , msg_task and flow into separate patches.
 
-Thanks,
-Daniel
+Mengyuan Lou (7):
+  net: libwx: Add malibox api for wangxun pf drivers
+  net: libwx: Add sriov api for wangxun nics
+  net: libwx: Implement basic funcs for vf setting
+  net: libwx: Redesign flow when sriov is enabled
+  net: libwx: Add msg task func
+  net: ngbe: add sriov function support
+  net: txgbe: add sriov function support
+
+ drivers/net/ethernet/wangxun/libwx/Makefile   |    2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  289 +++-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |    3 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  146 +-
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.c   |  191 +++
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.h   |   86 ++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 1244 +++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.h |   19 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  100 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   63 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   10 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |    2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |   25 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   29 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |    8 +
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |    4 +-
+ 16 files changed, 2192 insertions(+), 29 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.h
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.h
+
+-- 
+2.43.2
+
 
