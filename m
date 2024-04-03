@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-84205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B946F89607F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 02:09:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C35F89608D
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 02:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B84C2835B1
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 00:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E7451F23F54
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 00:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15AFC645;
-	Wed,  3 Apr 2024 00:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E93A446BA;
+	Wed,  3 Apr 2024 00:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="DSUzGqBo"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="U1ptod+k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33777161
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 00:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470AC36C
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 00:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712102948; cv=none; b=ihvK2tdquliAFiRL3pV/pj4B07s61knoLjOfrKpkiJOVTzJkpIqGnDOzgfgbwV3ZIhhY4YKCuQsjs/DpE3uYAazBFjNHPu6VsZc7+s/rTA4CHmfP6m7FTK3Pz6Kn5EfQ0ZrPlDaUrGvACpjA58eoqN38b7V/34EwJFTBXvmSkc0=
+	t=1712103338; cv=none; b=BhYLy5aNQ2Rs7N9Ql4AhgpKe2oqjyqW4U0ogftPiH9MPeUf2IhEYGEWkFJICIMUVB2as3neAKUGWEnRHxU6/TmFFhVTRQDNtLLz9D/uSMRXKvobK6DD13jGCSQ95BiN4HWm7ADsYKnlS595i/Wjn5bFrzuBUTQEtRLbTIaJC674=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712102948; c=relaxed/simple;
-	bh=7AQb9E7tIyeR5THwZTMYND1RtsI0Xy8x3rHSNWDGSrI=;
+	s=arc-20240116; t=1712103338; c=relaxed/simple;
+	bh=LPCkjeRWMWWSeeJOeB2h2H7o2AvbMa0PqbIjbluyxKc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N2NVFh8xWCd7rSoAkXmfBh/kcrFkcYrAB5RDU6hWXN+ZZsnBuwAClRus9YOGwygAnraV9xWtRqCKfz7eM6tVP0jYDQ3AcIC/6dpKs7wJv3Ri5M9n5e+2LlGwUIicfsNdRGA0Rp9cmkzdt7DqhDv0YofIJJkHpGc70s3s+JfTFEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=DSUzGqBo; arc=none smtp.client-ip=209.85.214.180
+	 In-Reply-To:Content-Type; b=SXJuq+KgHnw2HQckhFLSOgZUMp8JSE2150HDb6HyiwEPPcY7FNFYRE48zube69TAatFEJ7rRPE15LT17eT6e8k3iMMShu87DwRiFiOaKK035ofAgLhgIJ1csyaFY8we+T4bwI6hx/R7A9Vgjb/P33hbbnE4WhfFERv/1wE9nfEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=U1ptod+k; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e0878b76f3so3518855ad.0
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 17:09:05 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5d81b08d6f2so4585122a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 17:15:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1712102945; x=1712707745; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1712103335; x=1712708135; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ma+9jmpPIrI0CqMynx6TWxGcB1iPmbIgWEOC5eOGVm4=;
-        b=DSUzGqBooTmKFVwMQ+4Y3lcPJbOdGlweKbHrRtuV1xHe5AtM03/sckLnLPGUQw2iLm
-         0t5sjTl9DAEMx1lj3y4DdpJUyDx/DzInYWpw10XviJ6sqXQCRKQG36HS0q/xn6UE6hAu
-         kDY3PoXg1rkDoSnvSnl3vKV7gyDeIWvusibcA7rVeP4jluhI1LAb2AqSQVdU2wyt7Z/Z
-         /uxxgRcVfkzicVTsXqy679ipqesZnyAos0WRGx1Da2V+w3xWREuBfpvWUf1PG0D8c+6g
-         3rl4FzVKIivghrpAQ3ThKj12Fw4b5huY7Yprr1MYEteV+urk3pg39ffmY/VQWwsjwr1E
-         NjcQ==
+        bh=pM00jwZmYNO3tMEKktR01JogzF+1t+O98oYD6goaZiM=;
+        b=U1ptod+kaM0QL8GYcBK8HO68TbWrTzBvzfZ9pwr7lC/9fLo7ypR8xSlF0IFB3yv30f
+         8krMqmYN1l4epDsiSHkxnpAs9KWJCFTxrV0HFEvhq4YuF8AEmC5Ur5sKciwu1Vtcj7XC
+         dK18B5S7OX1BbEI1UYe0cGD9S93V869ITQyb1IcErXKJmZ7O35zNb+C8k9tCd+m9DeRD
+         rqK3QTLqmFBBvjsCBLB9aBTwyK0UBhDrc13h5HLi6lIOzvJwR4+MPqC00ykEeuEZhJYl
+         GJa4VGOKAHVzRRmK5EU+cYU0zcJawQGgqjDxcZ8FxHiDfjwCOy7bzfN/VX+whJg5XCt7
+         7itA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712102945; x=1712707745;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1712103335; x=1712708135;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ma+9jmpPIrI0CqMynx6TWxGcB1iPmbIgWEOC5eOGVm4=;
-        b=H3iNm7gVeH6Dj7a/SaucOp++WLh/a1uDpyN8pwhSAIOpDd800erWrW5pmFOcwdROH8
-         S+wqGQnd+hq7gxNXApvL58aEOQlgo4y3jFZr/TnZBuJCrQuXdhLXEBn/cjBcwmeRTRet
-         XXp3PLtNX3RKt0mqLo7oFiGCbZ1cPMcLcJxz2aaZis2DeiCNesGU6FXNIRUg4xkXluH/
-         8jg7qzTihjKa/6UG3LEDPUPRLB34PcjTHGEUP3NCbEmgk687erg6AaBXvzawUpwPOAfA
-         L1u4Er+hhrYqUOgMhXOv9oNQ4/i3mO6KhJLpWSdPR0rNnqFMd7pdY8SJE9gPoG1SaJtf
-         J17w==
-X-Gm-Message-State: AOJu0Yw9ZDDJelhDo4F+TTr1EqW1NwwMUPBZywcL4+8no/CH6iRCDwrG
-	GaDFEF/pcTr0EEa3J7XKFuc66HOoMncBnVYhvH9LEtqdjvFLeUC4DN8M7zG4jxY=
-X-Google-Smtp-Source: AGHT+IFSzOAmaO/x8qtYXp1l0zpsM42EVF0i6EanFn32Y69wkvpRozXUsGTfzlAS98chD2JFGkmWrg==
-X-Received: by 2002:a17:903:32c8:b0:1e0:b628:a752 with SMTP id i8-20020a17090332c800b001e0b628a752mr1349035plr.7.1712102945308;
-        Tue, 02 Apr 2024 17:09:05 -0700 (PDT)
+        bh=pM00jwZmYNO3tMEKktR01JogzF+1t+O98oYD6goaZiM=;
+        b=qpJMfa6A/HwIPt0KOnUEoUbafKIVnKL4uL00dAoigymw8Ewl8wD4zYNS6NOgvobNZD
+         fmFqstKqGKsxndMlLCRFnugEdYwI78ufq+Hq/jAr5xmogdK25+Qzxnq1U0Qag/TY4Smi
+         bRqHT3hKQty4ToDKQsHfdtknqQhlcvh04kNTmyNZZq/3t1h63pXtgTrUBUpSvzRvwVOJ
+         8rntpAfpE9gkp6F28Cl2tLWu98HkSCP0XtQbKm3hMVKByJTtRlJcisgymAFeXeGxhyIK
+         s4NcLgSrpKE1V7tQZDKn2drbsPtqhHaUOtZuiUDyuk1YN2zvqm9nwgi5ofwax+ej+kXY
+         wMNQ==
+X-Gm-Message-State: AOJu0YwKZ8xx6WpDwcbxGIfj38OlSu3+0DIjL95+Rx+CD5Y/mrvjF+3b
+	UzTu7KF/cqX8XRtfM8703rJEasqoJfs0fdreR9AWKoyPwlw6DD9Mx55qwcY5iaY=
+X-Google-Smtp-Source: AGHT+IGk3TSX8HHpaTJFm0NNp0U3b98ZljZPvAasLFxFq+z6hp2s4c96oHv6jcmaANjVHD83+Wv16w==
+X-Received: by 2002:a17:90a:ea0b:b0:2a1:2506:b937 with SMTP id w11-20020a17090aea0b00b002a12506b937mr1307605pjy.23.1712103335346;
+        Tue, 02 Apr 2024 17:15:35 -0700 (PDT)
 Received: from ?IPV6:2a03:83e0:1156:1:1cbd:da2b:a9f2:881? ([2620:10d:c090:500::7:f97b])
-        by smtp.gmail.com with ESMTPSA id l3-20020a170903244300b001e2616fb7a9sm2875474pls.231.2024.04.02.17.09.04
+        by smtp.gmail.com with ESMTPSA id i4-20020a17090ac40400b0029f8d8db93esm12493723pjt.19.2024.04.02.17.15.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Apr 2024 17:09:05 -0700 (PDT)
-Message-ID: <c9362778-6bf7-43ea-8730-b9399349e4d6@davidwei.uk>
-Date: Tue, 2 Apr 2024 17:09:02 -0700
+        Tue, 02 Apr 2024 17:15:35 -0700 (PDT)
+Message-ID: <fd8a7bc9-4eb9-4898-be79-ab8d3af28ce7@davidwei.uk>
+Date: Tue, 2 Apr 2024 17:15:32 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,326 +75,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/7] selftests: net: add scaffolding for Netlink
- tests in Python
+Subject: Re: [PATCH net-next 4/7] selftests: nl_netdev: add a trivial Netlink
+ netdev test
+Content-Language: en-GB
 To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
 Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
  shuah@kernel.org, sdf@google.com, donald.hunter@gmail.com,
  linux-kselftest@vger.kernel.org, petrm@nvidia.com
 References: <20240402010520.1209517-1-kuba@kernel.org>
- <20240402010520.1209517-4-kuba@kernel.org>
-Content-Language: en-GB
+ <20240402010520.1209517-5-kuba@kernel.org>
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240402010520.1209517-4-kuba@kernel.org>
+In-Reply-To: <20240402010520.1209517-5-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2024-04-01 18:05, Jakub Kicinski wrote:
-> Add glue code for accessing the YNL library which lives under
-> tools/net and YAML spec files from under Documentation/.
-> Automatically figure out if tests are run in tree or not.
-> Since we'll want to use this library both from net and
-> drivers/net test targets make the library a target as well,
-> and automatically include it when net or drivers/net are
-> included. Making net/lib a target ensures that we end up
-> with only one copy of it, and saves us some path guessing.
+> Add a trivial test using YNL.
 > 
-> Add a tiny bit of formatting support to be able to output KTAP
-> from the start.
+>   $ ./tools/testing/selftests/net/nl_netdev.py
+>   KTAP version 1
+>   1..2
+>   ok 1 nl_netdev.empty_check
+>   ok 2 nl_netdev.lo_check
+> 
+> Instantiate the family once, it takes longer than the test itself.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
 > CC: shuah@kernel.org
 > CC: linux-kselftest@vger.kernel.org
 > ---
->  tools/testing/selftests/Makefile              |  7 ++
->  tools/testing/selftests/net/lib/Makefile      |  8 ++
->  .../testing/selftests/net/lib/py/__init__.py  |  6 ++
->  tools/testing/selftests/net/lib/py/consts.py  |  9 ++
->  tools/testing/selftests/net/lib/py/ksft.py    | 96 +++++++++++++++++++
->  tools/testing/selftests/net/lib/py/utils.py   | 47 +++++++++
->  tools/testing/selftests/net/lib/py/ynl.py     | 49 ++++++++++
->  7 files changed, 222 insertions(+)
->  create mode 100644 tools/testing/selftests/net/lib/Makefile
->  create mode 100644 tools/testing/selftests/net/lib/py/__init__.py
->  create mode 100644 tools/testing/selftests/net/lib/py/consts.py
->  create mode 100644 tools/testing/selftests/net/lib/py/ksft.py
->  create mode 100644 tools/testing/selftests/net/lib/py/utils.py
->  create mode 100644 tools/testing/selftests/net/lib/py/ynl.py
+>  tools/testing/selftests/net/Makefile     |  1 +
+>  tools/testing/selftests/net/nl_netdev.py | 24 ++++++++++++++++++++++++
+>  2 files changed, 25 insertions(+)
+>  create mode 100755 tools/testing/selftests/net/nl_netdev.py
 > 
-> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-> index e1504833654d..0cffdfb4b116 100644
-> --- a/tools/testing/selftests/Makefile
-> +++ b/tools/testing/selftests/Makefile
-> @@ -116,6 +116,13 @@ TARGETS += zram
->  TARGETS_HOTPLUG = cpu-hotplug
->  TARGETS_HOTPLUG += memory-hotplug
->  
-> +# Networking tests want the net/lib target, include it automatically
-> +ifneq ($(filter net ,$(TARGETS)),)
-> +ifeq ($(filter net/lib,$(TARGETS)),)
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index cb418a2346bc..5e34c93aa51b 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -34,6 +34,7 @@ TEST_PROGS += gre_gso.sh
+>  TEST_PROGS += cmsg_so_mark.sh
+>  TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
+>  TEST_PROGS += netns-name.sh
+> +TEST_PROGS += nl_netdev.py
+>  TEST_PROGS += srv6_end_dt46_l3vpn_test.sh
+>  TEST_PROGS += srv6_end_dt4_l3vpn_test.sh
+>  TEST_PROGS += srv6_end_dt6_l3vpn_test.sh
+> diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
+> new file mode 100755
+> index 000000000000..40a59857f984
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/nl_netdev.py
+> @@ -0,0 +1,24 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +from lib.py import ksft_run, ksft_pr, ksft_eq, ksft_ge, NetdevFamily
+> +
+> +
+> +nf = NetdevFamily()
+> +
+> +
+> +def empty_check() -> None:
+> +    global nf
 
-style nit: consistency in spacing
+I know you're rolling your own instead of using unittest or pytest. How
+about adding a Test class of some sort and make each test case a method?
+Then you wouldn't need to do this for each test case.
 
-> +	override TARGETS := $(TARGETS) net/lib
-> +endif
-> +endif
-> +
->  # User can optionally provide a TARGETS skiplist.  By default we skip
->  # BPF since it has cutting edge build time dependencies which require
->  # more effort to install.
-> diff --git a/tools/testing/selftests/net/lib/Makefile b/tools/testing/selftests/net/lib/Makefile
-> new file mode 100644
-> index 000000000000..5730682aeffb
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/lib/Makefile
-> @@ -0,0 +1,8 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +TEST_FILES := ../../../../../Documentation/netlink/s*
-> +TEST_FILES += ../../../../net/*
-> +
-> +TEST_INCLUDES := $(wildcard py/*.py)
-> +
-> +include ../../lib.mk
-> diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
-> new file mode 100644
-> index 000000000000..81a8d14b68f0
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/lib/py/__init__.py
-> @@ -0,0 +1,6 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +from .ksft import *
-> +from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily
-> +from .consts import KSRC
-> +from .utils import *
+Also it would allow you to share some base functionality across
+different test suites.
 
-style nit: sort alphabetically
-
-> diff --git a/tools/testing/selftests/net/lib/py/consts.py b/tools/testing/selftests/net/lib/py/consts.py
-> new file mode 100644
-> index 000000000000..f518ce79d82c
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/lib/py/consts.py
-> @@ -0,0 +1,9 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +import sys
-> +from pathlib import Path
-> +
-> +KSFT_DIR = (Path(__file__).parent / "../../..").resolve()
-> +KSRC = (Path(__file__).parent / "../../../../../..").resolve()
-> +
-> +KSFT_MAIN_NAME = Path(sys.argv[0]).with_suffix("").name
-> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-> new file mode 100644
-> index 000000000000..7c296fe5e438
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/lib/py/ksft.py
-> @@ -0,0 +1,96 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +import builtins
-> +from .consts import KSFT_MAIN_NAME
-> +
-> +KSFT_RESULT = None
+> +    devs = nf.dev_get({}, dump=True)
+> +    ksft_ge(len(devs), 1)
 > +
 > +
-> +class KsftSkipEx(Exception):
-> +    pass
+> +def lo_check() -> None:
+> +    global nf
+> +    lo_info = nf.dev_get({"ifindex": 1})
+> +    ksft_eq(len(lo_info['xdp-features']), 0)
+> +    ksft_eq(len(lo_info['xdp-rx-metadata-features']), 0)
 > +
 > +
-> +class KsftXfailEx(Exception):
-> +    pass
-> +
-> +
-> +def ksft_pr(*objs, **kwargs):
-> +    print("#", *objs, **kwargs)
-> +
-> +
-> +def ksft_eq(a, b, comment=""):
-> +    global KSFT_RESULT
-> +    if a != b:
-> +        KSFT_RESULT = False
-> +        ksft_pr("Check failed", a, "!=", b, comment)
-> +
-> +
-> +def ksft_true(a, comment=""):
-> +    global KSFT_RESULT
-> +    if not a:
-> +        KSFT_RESULT = False
-> +        ksft_pr("Check failed", a, "does not eval to True", comment)
-> +
-> +
-> +def ksft_in(a, b, comment=""):
-> +    global KSFT_RESULT
-> +    if a not in b:
-> +        KSFT_RESULT = False
-> +        ksft_pr("Check failed", a, "not in", b, comment)
-> +
-> +
-> +def ksft_ge(a, b, comment=""):
-> +    global KSFT_RESULT
-> +    if a < b:
-> +        KSFT_RESULT = False
-> +        ksft_pr("Check failed", a, "<", b, comment)
-> +
-> +
-> +def ktap_result(ok, cnt=1, case="", comment=""):
-> +    res = ""
-> +    if not ok:
-> +        res += "not "
-> +    res += "ok "
-> +    res += str(cnt) + " "
-> +    res += KSFT_MAIN_NAME
-> +    if case:
-> +        res += "." + str(case.__name__)
-> +    if comment:
-> +        res += " # " + comment
-> +    print(res)
-> +
-> +
-> +def ksft_run(cases):
-> +    totals = {"pass": 0, "fail": 0, "skip": 0, "xfail": 0}
-> +
-> +    print("KTAP version 1")
-> +    print("1.." + str(len(cases)))
-> +
-> +    global KSFT_RESULT
-> +    cnt = 0
-> +    for case in cases:
-> +        KSFT_RESULT = True
-> +        cnt += 1
-> +        try:
-> +            case()
-> +        except KsftSkipEx as e:
-> +            ktap_result(True, cnt, case, comment="SKIP " + str(e))
-> +            totals['skip'] += 1
-> +            continue
-> +        except KsftXfailEx as e:
-> +            ktap_result(True, cnt, case, comment="XFAIL " + str(e))
-> +            totals['xfail'] += 1
-> +            continue
-> +        except Exception as e:
-> +            for line in str(e).split('\n'):
-> +                ksft_pr("Exception|", line)
-> +            ktap_result(False, cnt, case)
-> +            totals['fail'] += 1
-> +            continue
-> +
-> +        ktap_result(KSFT_RESULT, cnt, case)
-> +        totals['pass'] += 1
-> +
-> +    print(
-> +        f"# Totals: pass:{totals['pass']} fail:{totals['fail']} xfail:{totals['xfail']} xpass:0 skip:{totals['skip']} error:0"
-> +    )
-> diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-> new file mode 100644
-> index 000000000000..f0d425731fd4
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/lib/py/utils.py
-> @@ -0,0 +1,47 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +import json as _json
-> +import subprocess
-> +
-> +class cmd:
-> +    def __init__(self, comm, shell=True, fail=True, ns=None, background=False):
-> +        if ns:
-> +            if isinstance(ns, NetNS):
-> +                ns = ns.name
-> +            comm = f'ip netns exec {ns} ' + comm
-> +
-> +        self.stdout = None
-> +        self.stderr = None
-> +        self.ret = None
-> +
-> +        self.comm = comm
-> +        self.proc = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE,
-> +                                     stderr=subprocess.PIPE)
-> +        if not background:
-> +            self.process(terminate=False, fail=fail)
-> +
-> +    def process(self, terminate=True, fail=None):
-> +        if terminate:
-> +            self.proc.terminate()
-> +        stdout, stderr = self.proc.communicate()
-> +        self.stdout = stdout.decode("utf-8")
-> +        self.stderr = stderr.decode("utf-8")
-> +        self.proc.stdout.close()
-> +        self.proc.stderr.close()
-> +        self.ret = self.proc.returncode
-> +
-> +        if self.proc.returncode != 0 and fail:
-> +            if len(stderr) > 0 and stderr[-1] == "\n":
-> +                stderr = stderr[:-1]
-> +            raise Exception("Command failed: %s\n%s" % (self.proc.args, stderr))
-> +
-> +
-> +def ip(args, json=None, ns=None):
-> +    cmd_str = "ip "
-> +    if json:
-> +        cmd_str += '-j '
-> +    cmd_str += args
-> +    cmd_obj = cmd(cmd_str, ns=ns)
-> +    if json:
-> +        return _json.loads(cmd_obj.stdout)
-> +    return cmd_obj
-> diff --git a/tools/testing/selftests/net/lib/py/ynl.py b/tools/testing/selftests/net/lib/py/ynl.py
-> new file mode 100644
-> index 000000000000..298bbc6b93c5
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/lib/py/ynl.py
-> @@ -0,0 +1,49 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +import sys
-> +from pathlib import Path
-> +from .consts import KSRC, KSFT_DIR
-> +from .ksft import ksft_pr, ktap_result
-> +
-> +# Resolve paths
-> +try:
-> +    if (KSFT_DIR / "kselftest-list.txt").exists():
-> +        # Running in "installed" selftests
-> +        tools_full_path = KSFT_DIR
-> +        SPEC_PATH = KSFT_DIR / "net/lib/specs"
-> +
-> +        sys.path.append(tools_full_path.as_posix())
-> +        from net.lib.ynl.lib import YnlFamily, NlError
-> +    else:
-> +        # Running in tree
-> +        tools_full_path = Path(KSRC) / "tools"
-> +        SPEC_PATH = Path(KSRC) / "Documentation/netlink/specs"
-> +
-> +        sys.path.append(tools_full_path.as_posix())
-> +        from net.ynl.lib import YnlFamily, NlError
-> +except ModuleNotFoundError as e:
-> +    ksft_pr("Failed importing `ynl` library from kernel sources")
-> +    ksft_pr(str(e))
-> +    ktap_result(True, comment="SKIP")
-> +    sys.exit(4)
-> +
-> +#
-> +# Wrapper classes, loading the right specs
-> +# Set schema='' to avoid jsonschema validation, it's slow
-> +#
-> +class EthtoolFamily(YnlFamily):
-> +    def __init__(self):
-> +        super().__init__((SPEC_PATH / Path('ethtool.yaml')).as_posix(),
-> +                         schema='')
-> +
-> +
-> +class RtnlFamily(YnlFamily):
-> +    def __init__(self):
-> +        super().__init__((SPEC_PATH / Path('rt_link.yaml')).as_posix(),
-> +                         schema='')
-> +
-> +
-> +class NetdevFamily(YnlFamily):
-> +    def __init__(self):
-> +        super().__init__((SPEC_PATH / Path('netdev.yaml')).as_posix(),
-> +                         schema='')
+> +if __name__ == "__main__":
+> +    ksft_run([empty_check, lo_check])
 
