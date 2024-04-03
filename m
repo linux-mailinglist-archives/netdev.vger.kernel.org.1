@@ -1,169 +1,175 @@
-Return-Path: <netdev+bounces-84366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16BE0896B9C
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:08:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74730896C19
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A70D1F294C8
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:08:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A67A28BFB5
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7445313DDAC;
-	Wed,  3 Apr 2024 10:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEE013667E;
+	Wed,  3 Apr 2024 10:21:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2091.outbound.protection.partner.outlook.cn [139.219.17.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6019D13D61B;
-	Wed,  3 Apr 2024 10:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712138746; cv=none; b=H8fDLAQI9Q/yhylsZnYQRO24lJKph6PRZHUoGINi8EeVHSlpJbDzkW+3g7p2J7j2I6XLjx2ZImqJx9NUJrhpGXY4gpUnCQiG+vyD02G5IWwSzuoX8h0mNRnQFe292ZRW2bpWC+2xis84dBzy1RJocMECGzJf47jQBJI8XlR6FtM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712138746; c=relaxed/simple;
-	bh=olgsQH1bTYPGG9AtE4GyA/NCpvsSuDDkBqeFOxiuFj8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tGKlibfaPsNPbwEn+J1gSbtYoY3jIWr0M2ddhux0D05nwcacx/Xbbc8cMbbPzeGGAruSZybTqZBRmMNUYJElyRUE7TTn1r25qys5Is9dBbimkivmwJ0jj9158bwgHLsJyZgz+nczl47JF7o3g9PKzAfySXa5TKi+aqqAFp+gHIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V8gNv4TDxz4f3lXX;
-	Wed,  3 Apr 2024 18:05:35 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id D3EFD1A0172;
-	Wed,  3 Apr 2024 18:05:39 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP4 (Coremail) with SMTP id gCh0CgD3R2ryKQ1m0FhPJA--.17610S2;
-	Wed, 03 Apr 2024 18:05:39 +0800 (CST)
-Message-ID: <d6eae62b-60fd-4f3c-92e4-7ea5f1c4fc68@huaweicloud.com>
-Date: Wed, 3 Apr 2024 18:05:38 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58854135A6A;
+	Wed,  3 Apr 2024 10:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.91
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712139712; cv=fail; b=kiKEvneFUqAXH13U5XfZUVQ4eLTz/urglOtm+lLgP2AB+lr36uT5YGr/4oMTBrOp+TsOst/9y/Z5TF+RSfJjz9h1EhJgv5/zpGLVs8Xwwt2RtaIb22xhstyXEsmLJ/ueMpasD95ePLepINmikmJZIbo9zyfjcnDemFXWAaXQiGg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712139712; c=relaxed/simple;
+	bh=/v/u2S9EUffNpZkb2/0vzfN/t3CGblBSo829BrbDz5s=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=R2LLzadp+DXibsoVm66EmR95Ixre+QUDus8nABtlKTBt3iyjk4z/JwqcpjgjC0ovBZ7dMX653x20N4roehigLH34oczCXINszkRmNbPkIFmNfcR3XN2FqVQTERqZ4pL66p59OWLLlmy8oUui5VOgviD4uLfGkPMQMzEQUnnxgI8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jbiDNWR3i+ryAkBjHphgzfIZwFDo3ydnzTTrc4aBgL25OgP7DMDvewLMnZulWwXSStabqz0pw2mzne3oZCmZrgBHPptduiE3cUpv2XxJgobhk24aiRQ06e1Ykhf6G2iWfuNmMLM3CLCmEzWwjN1c5l1otM5TYQCJW2GpMn4bxySeDrDv2QdKi6kTXmLmI3MN2pp4QwgsKt7b12k6T31gxyhdHU+LhZN124J/OE1MZiqK590E6Xln47iSfJay69L/Yxcx2uQJBMCvLjG3wlTzexlyny5bKCz9FxspxbHwfDnBfAqhIZgsi6FneBDcW01KVA9XTU9uH+jg2wkgy2DZPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Uwm7Yj1rJiKXjQ3qngQdNPFDVu+bsIFE5QcYP1PAZSY=;
+ b=Wltd5dod1JaG9nbkd7sguX0Ocn/ORwg7eGNwywW4ETwjwTAZN3gwHznS1kV3CbH5BDdTCSbn1FdCDRhe0GawPTeTmB/COW7LXaV9YzLnt8yAD50Q9bjp7IVtdH7hFvubf9ZyGpa1GejZIa19grCj5SLloWBdhlDhO7jvtmcF3nKcgf7Mxl40ldn21SpUvQWvg/Y53mD4wzZ6DUgQc2U6qctd18aFWu38enhEF+C+pevK1UK9ivnZGTsfw9ZnpwhNDhett0n0/E+ovRgtM2Vk/qt/MZtfggtisWV/tBm1A3okbVGRBDXn4xOXEMLpEiz0JyRYK4Tja1X+Pk3IVD9maw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:e::20) by BJSPR01MB0675.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:1c::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 3 Apr
+ 2024 10:06:06 +0000
+Received: from BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+ ([fe80::d0cf:5e2e:fd40:4aef]) by
+ BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn ([fe80::d0cf:5e2e:fd40:4aef%4])
+ with mapi id 15.20.7409.042; Wed, 3 Apr 2024 10:06:06 +0000
+From: Tan Chun Hau <chunhau.tan@starfivetech.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Simon Horman <horms@kernel.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	Jee Heng Sia <jeeheng.sia@starfivetech.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: [PATCH v6 0/1] Add StarFive JH8100 dwmac support
+Date: Wed,  3 Apr 2024 03:05:48 -0700
+Message-Id: <20240403100549.78719-1-chunhau.tan@starfivetech.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ZQ0PR01CA0020.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:2::9) To BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:e::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 2/5] riscv, bpf: Relax restrictions on Zbb
- instructions
-Content-Language: en-US
-To: Conor Dooley <conor@kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>
-Cc: Stefan O'Rear <sorear@fastmail.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Manu Bretelle <chantr4@gmail.com>, Pu Lehui <pulehui@huawei.com>
-References: <20240328124916.293173-1-pulehui@huaweicloud.com>
- <20240328124916.293173-3-pulehui@huaweicloud.com>
- <3ed9fe94-2610-41eb-8a00-a9f37fcf2b1a@app.fastmail.com>
- <20240328-ferocity-repose-c554f75a676c@spud>
- <ed3debc9-f2a9-41fb-9cf9-dc6419de5c01@huaweicloud.com>
- <87cyr7rgdn.fsf@all.your.base.are.belong.to.us>
- <20240402-ample-preview-c84edb69db1b@spud>
- <871q7nr3mq.fsf@all.your.base.are.belong.to.us>
- <20240403-gander-parting-a47c56401716@spud>
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <20240403-gander-parting-a47c56401716@spud>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3R2ryKQ1m0FhPJA--.17610S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxur17Aw43Cw47GF15Xr15twb_yoW5Ar13pa
-	95KF4Ika1DJr12y3sFyr48WrySvr1rCF45Grn8Gry8Awn8XF1xKrW2gr15CF97urZ7Kw1a
-	vr48Jry2y3Z0yaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkYb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI
-	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
-	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY
-	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6x
-	AIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv
-	6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU13rcDUUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BJSPR01MB0595:EE_|BJSPR01MB0675:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c63ce0c-943f-47b9-7cbd-08dc53c5ad29
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Q9C2VbeiJZlOIhkJj28trMIye2qahyrDBHfJ4AwzlvLwWNC1MXx4NrWV7KJ9baKAmV2V8yTKb1AaTHHVC8I2ulDeFQQSC1ZgQEhs7+FdkDE3s+9acB3glTrJin75hdUgMLKSLrbY1RfAZqizHLfkLbEvWI+141KbvP21tBBsQvCuSJpldMymXPpJWW7WGUhKJj3OmhBmvU1+cFGIjvlchW/SgApRfjCdR7lmEnxaJa7FJ9BGtTJIMynbnuw8T01s9qHY26zaxiYpoNuOEUz9eZ38wDO32Mqp1D5jQk3l0RNo9jgU8ri6rmjSJEP9xS+FRvoKw3Anj4CiWbwoxIwa2ZOISSoqT/GzGmUN1MkfqI67E/nnTKqmGBsx/WzbvDUFKaidimu3TLqFIioAgTWr9Dbg1RCnDCs6CvOXN+GCWqCSUiY0lAYy/CI6lNfGI8ULmSdRk9ddB8ZiTDv/nnMnOLAV4lSOT5hHZRDHvabRbKfrSAEFF4vRd+V0za26LziBqTnh7nr47Yg0SiV/THu13dtm087Q9MJK7q+/vfS3pIoHdd1ttb0vQsveBA3UQuxkcao9ifrDhR6j6vp5QK+BoMACHP2sQjq1OQsVDvHur6ptTP9HNR63NdxzVdZyLjq+y5L3YcCrox1sRfLxwNO8eA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(366007)(41320700004)(7416005)(1800799015)(52116005)(38350700005)(921011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?hBhU2EtEB/3Zsf5Hgx05tBbWrOGKkEwvJgF+MiaK8uporgb5HylFVGq44gde?=
+ =?us-ascii?Q?vRdeqoUZP0TWB/WZB3FuCbtc+bzvk7exy6FbA5OfM/d5S5PWMGoyrtWHWEVF?=
+ =?us-ascii?Q?ZVBe0t2+llmPi317hWp5Skzw8MmmtInyKMFy22ArTmktIEoV3ZXe7odx2vvL?=
+ =?us-ascii?Q?19ypVHUpnCJFLN4TsV5ZXABDRXFan8X3ES8yr6WuZuiGO0E+ck+H2vGCTQqn?=
+ =?us-ascii?Q?p0Ftvm0Bx03YFAEfJDWOcOg3mknGXhMKoGTvrVeCXj2MA2WHCijjGltXuj+9?=
+ =?us-ascii?Q?s0LiIeycFtPcegOQ9I789RZQiPXaoQlf5/EjHqQFn9vJju6gu285A4bHGOUw?=
+ =?us-ascii?Q?AxIo1mig4b4awhj4KUT1ske714vM2+TgdLX8lKD/Knegk3IbCrpRMrIk9JXX?=
+ =?us-ascii?Q?9oSJwG55LevJ5I9Xw3ZZvqkeJnYv1fQK5tmT51o2FBRKlfyBd/EaAWpntzh1?=
+ =?us-ascii?Q?7RgOuIN2Cj2yJVtrWYCeBx3fz5vGlixyERDZOzBpwu/OB4Texw+zOGqYw/+t?=
+ =?us-ascii?Q?5yvcOQdefUIeyqtN15abYu0iTNBu8NZJoR3wLHueOCYh3ZsBwawutQCTfLNG?=
+ =?us-ascii?Q?OFfdtm+rGNhEDz+RIcGw5CPcDfSwcvbZ+KrmsevEZuEaNe5e3GtIzKmk6+u3?=
+ =?us-ascii?Q?3+A/TAz2Da4G+uXkQ8oIhwl+u2sBTKQpTBrvUtuap5EG90q6A90jbIZXiKy4?=
+ =?us-ascii?Q?AeVPQWqTQpakrGflpwNwMDe+Oi1dYsVV8mi/fSfreeazSFI1en9NKgGy/ZYv?=
+ =?us-ascii?Q?0YvbXX7uDUL9xQBjx0hunFCAHcfbnCSBQhcEnDvLm2C2ayynB3PY+ZucZZ1B?=
+ =?us-ascii?Q?wmT8vG/7i/3pCJI9yiM+SCtx47dYnSzitF04zQSazpKYwCeRunUMrdVfl7QX?=
+ =?us-ascii?Q?zMdpgru9uD2bDEmBJub5t83AD7rGebA27MxpTebNGvvT/sdR9p3VwN9JsuVd?=
+ =?us-ascii?Q?jOXOs7ehxlXjN+I16aOADJajKf9BeQFrRw7nc2O1L2JCeYAFPGQi3uG5uUer?=
+ =?us-ascii?Q?3fV/9/ACTgYa55IH99U7wum4ajUf04zp9D0cCPG1rdGULRSk8OdAzZ41DPfz?=
+ =?us-ascii?Q?bJvUU1u4ArGxQuy8GrsrKBfyrg4Jd5xXqDIwhrV/8/ih2T/ZbjQdYdsjGK65?=
+ =?us-ascii?Q?KHTBmvX+f2ZHpvub/RuqzUwnJdlezZY8b+pItHfWyhaJM/3Fyy8cTL3iuo28?=
+ =?us-ascii?Q?07y9Vd26ZOboJlAC59qvIpMrn+jUCax1jNnI7ScgV2LQZHRQVSLRxH8b2u+E?=
+ =?us-ascii?Q?1XM5N9LH/lKwH0a34uSkA7B/e8ReL5r7rUCRB+KozX9X0Iq8txjj9Dictqej?=
+ =?us-ascii?Q?s9hNIkXxBzbTGHlqHAI6bM+5aeNPY29nBljMqI31JlLAhMeRN23pq+FWW6+I?=
+ =?us-ascii?Q?Wl3iE8M8oUSJFZqwAmqkqjdDBzQMovlrcWr5ehE1JCmHo+AwppYtgv+tVLAm?=
+ =?us-ascii?Q?ecMk0DSymt9CFb0/GKt3mJv88aR1FP8/aQnj3HCP30N//b5Kxk0OU0alAj4g?=
+ =?us-ascii?Q?e0hp/mNmMV+iAQ5svN6nRSZhgVasGvSJdGI2uI9QiKHf4vQq3CGpo1fnHa/L?=
+ =?us-ascii?Q?cD7tA4pb6BjaNFuGyHS4a8oJNMUFUc8aVLShAYFG/0fB3DIkZ4ZlpRRkXIlJ?=
+ =?us-ascii?Q?qA=3D=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c63ce0c-943f-47b9-7cbd-08dc53c5ad29
+X-MS-Exchange-CrossTenant-AuthSource: BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 10:06:05.9534
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rxEqWtCX/FEvar5n/BW0a3ZbuEaMl/xqM3jzh6oT8Wvah2mfSvMVc/36CKUtCkZHYZ3VQkuaVOfobNolFzBmjpxTCqTS4AZe3uLD18HHULc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJSPR01MB0675
 
+Add StarFive JH8100 dwmac support.
+The JH8100 dwmac shares the same driver code as the JH7110 dwmac
+and has only one reset signal.
+    
+Please refer to below:
+    
+  JH8100: reset-names = "stmmaceth";
+  JH7110: reset-names = "stmmaceth", "ahb";
+  JH7100: reset-names = "ahb";
+    
+Example usage of JH8100 in the device tree:
+    
+gmac0: ethernet@16030000 {
+        compatible = "starfive,jh8100-dwmac",
+                     "starfive,jh7110-dwmac",
+                     "snps,dwmac-5.20";
+        ...
+};
 
-On 2024/4/3 9:20, Conor Dooley wrote:
-> On Tue, Apr 02, 2024 at 09:00:45PM +0200, Björn Töpel wrote:
-> 
->>>> I still think Lehui's patch is correct; Building a kernel that can boot
->>>> on multiple platforms (w/ or w/o Zbb support) and not having Zbb insn in
->>>> the kernel proper, and iff Zbb is available at run-time the BPF JIT will
->>>> emit Zbb.
->>>
->>> This sentence is -ENOPARSE to me, did you accidentally omit some words?
->>> Additionally he config option has nothing to do with building kernels that
->>> boot on multiple platforms, it only controls whether optimisations for Zbb
->>> are built so that if Zbb is detected they can be used.
->>
->> Ugh, sorry about that! I'm probably confused myself.
-> 
-> Reading this back, I a bunch of words too, so no worries...
-> 
->>>> For these kind of optimizations, (IMO) it's better to let the BPF JIT
->>>> decide at run-time.
->>>
->>> Why is bpf a different case to any other user in this regard?
->>> I think that the commit message is misleading and needs to be changed,
->>> because the point "the hardware is capable of recognising the Zbb
->>> instructions independently..." is completely unrelated to the purpose
->>> of the config option. Of course the hardware understanding the option
-> 
-> This should have been "understanding the instructions"...
-> 
->>> has nothing to do with kernel configuration. The commit message needs to
->>> explain why bpf is a special case and is exempt from an
-> 
-> And this s/from an//...
-> 
->>> I totally understand any point about bpf being different in terms of
->>> needing toolchain support, but IIRC it was I who pointed out up-thread.
-> 
-> And "pointed that out".
-> 
-> I always make a mess of these emails that I re-write several times :)
-> 
->>> The part of the conversation that you're replying to here is about the
->>> semantics of the Kconfig option and the original patch never mentioned
->>> trying to avoid a dependency on toolchains at all, just kernel
->>> configurations. The toolchain requirements I don't think are even super
->>> hard to fulfill either - the last 3 versions of ld and lld all meet the
->>> criteria.
->>
->> Thanks for making it more clear, and I agree that the toolchain
->> requirements are not hard to fulfull.
->>
->> My view has been that "BPF is like userland", but I realize now that's
->> odd.
-> 
-> Yeah, I can understand that perspective, but it does seem rather odd to
-> someone that isn't a bpf-ist.
-> 
->> Let's make BPF similar to the rest of the RV kernel. If ZBB=n, then
->> the BPF JIT doesn't know about emitting Zbb.
-> 
+Changes in v6:
+- Removed unnecessary enum "starfive,jh8100-dwmac".
 
-Hi Conor and Björn,
+Tan Chun Hau (1):
+  dt-bindings: net: starfive,jh7110-dwmac: Add StarFive JH8100 support
 
-Thanks for your explanation. I totally agree with what you said, 
-"CONFIG_RISCV_ISA_ZBB only controls whether optimizations for Zbb are 
-built so that if Zbb is detected they can be used.".
+ .../bindings/net/starfive,jh7110-dwmac.yaml   | 28 +++++++++++++++----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
-Since the instructions emited by bpf jit are in kernel space, they 
-should indeed be aligned in this regard.
-
-PS: It's a bit difficult to understand this,😅 if I'm wrong please don't 
-hesitate to tell me.
+-- 
+2.25.1
 
 
