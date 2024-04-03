@@ -1,180 +1,98 @@
-Return-Path: <netdev+bounces-84624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15865897A2F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:44:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8D87897A37
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:45:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8168EB25783
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:44:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5249B1F22FCC
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624FF156657;
-	Wed,  3 Apr 2024 20:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C8C156C66;
+	Wed,  3 Apr 2024 20:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WorHCMwr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u01tbEWS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96CA155A59;
-	Wed,  3 Apr 2024 20:39:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2839F14A096;
+	Wed,  3 Apr 2024 20:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712176779; cv=none; b=DvnR0jCyeSr9C7gOL3NVB32pLrKdXhF69gocubZeAt2Z21N09u7287ZPk2tKCWgI8pajGUQg7ZZQEevAfouiJYH3kBxknEmXfcImNwupwq0BnthxOn11+7Z1LAwAyk8vNGEGY4Xg6e/Rnb3KdRrL/JWZnGNGwnUdtNEBilYjO14=
+	t=1712176954; cv=none; b=Egx3wr7Tn+HReR8usA8JM3rz4ft9frMu0QeyrgNFjZ0HhwI58+xWcW490H74Kh5hcLlkSwNRSgOHs4UjLTsnLBYFdFtQnvywEiwxhkAh63k+mnpKJ7yq3+kv38ZpIX7p8f4x6jYKzjrmTyxgsIk4ydL9OpArcQdAaxTj+wvF6RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712176779; c=relaxed/simple;
-	bh=i333Dhp8hwrDT8umafLwzG1JBHjU5KHx9vR1MnRS9s4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=AUWlB+p+bgA4qZhFp8I+sN9n1jUpr494T217V26z9k5zerENLRywiSvIJC0dnTf/sP1N82zXEDLmzY6f6HGFeI5lUgrlhIEY0A3VTyVNXi5NV3FGERiWDK3Kv2M4Jl4x9JQ9CLerQzkhkWoyUOAExbVZUyI5C3FQNrbH+hW8P30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WorHCMwr; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2a27ba3b1f3so153064a91.3;
-        Wed, 03 Apr 2024 13:39:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712176777; x=1712781577; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i333Dhp8hwrDT8umafLwzG1JBHjU5KHx9vR1MnRS9s4=;
-        b=WorHCMwrw1GmIFUAT/2Iboiy1avmgpx/6JdHu4QilNfWiezYMmTOspPRAg3yPB738A
-         gfN3Sv4AVBCNLWiT1A5NTnjmrVTGETNjJiu2KDb6dh5s3RazuedAidHlmxQ6xFz1hibG
-         cnH24e+wRec2gjcm1x/zbwrZ4tjRVIoy7uRE6Oa16S8/MuL7vgxicyQnyPjlNjKVEX2e
-         MZEsF3QVvWSdbMb6118raPdd+yHsvV+WOjwe4h2pQ/pP4ZF1Fwwa871U/TpwrLur5SZD
-         t+v7U6VYspPfnb7O6nrE+qcblq+etbEClJB0Hk3dAFIDXMZBYH5zR9XMknlKEg93+OvG
-         RXvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712176777; x=1712781577;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=i333Dhp8hwrDT8umafLwzG1JBHjU5KHx9vR1MnRS9s4=;
-        b=JXF9vHwmU6DhfdaGRpOG9mDjHCIAXCNwY/5JhTHlxCzIKu7WIA+2kak18ps0b/F9Rd
-         88dPJaR4Z6jChqRdYMNxL8T1ed3xmyQkzTB23E6xp93PwzRRuLai4arJsLfWhQySdL+2
-         lcBKTcSWi7tRc35LlR3AM8NkszEu+S0+DB0n0OKAFnN2DKGDIumdwQN936odZG/1DsF5
-         zXq/Hd23svcHhf9v9B+ke1dNDLG/Is2qPZ3qdGDadkeJ9OtYgoTQ9OFJGDGTe4/kGZfX
-         e2++vbziGmVZBuTFKGCIMppKxDPuVBrrIdy0dRRI8x7Ax/IuMq93Dhs5ywGmBUbbnhSR
-         iV0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUWwwjOaKgYZp4CBnjqHIaBClVdGTeeZEsVoAwz10MA1k27yPtGxChlRXF/pSonTrc+530no+9kkVdPINhFOuNqHKl2i8VEDdbZUBxVpKdlBxNGmDmP3n/y9awR
-X-Gm-Message-State: AOJu0YzFhaPPwBWjG4aF2Nb7tfdqehVqmkxU4zjMdl2y7/2nNS/fkAFx
-	fpp8w3WKtV3Vs7opSDZZoKHpAs6NfFHzNPcJhJnSzAsdCbh3hdLz
-X-Google-Smtp-Source: AGHT+IFG3GCAIdaoZ1d2VbXCvFNA9/5zeRvvPYodQX+ZYf7CZ5dXKh/vDbrAlRmZS0OmUCzmo9Cbeg==
-X-Received: by 2002:a17:90b:1081:b0:29b:b5a4:c040 with SMTP id gj1-20020a17090b108100b0029bb5a4c040mr582680pjb.46.1712176776993;
-        Wed, 03 Apr 2024 13:39:36 -0700 (PDT)
-Received: from localhost ([98.97.36.54])
-        by smtp.gmail.com with ESMTPSA id nk7-20020a17090b194700b002a253b251fasm123836pjb.30.2024.04.03.13.39.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 13:39:36 -0700 (PDT)
-Date: Wed, 03 Apr 2024 13:39:35 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, 
- KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@google.com>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org
-Message-ID: <660dbe87d8797_1cf6b2083c@john.notmuch>
-In-Reply-To: <2746b1d9-2e1f-4e66-89ed-19949a189a92@intel.com>
-References: <20240220210342.40267-1-toke@redhat.com>
- <20240220210342.40267-3-toke@redhat.com>
- <2746b1d9-2e1f-4e66-89ed-19949a189a92@intel.com>
-Subject: Re: [PATCH net-next v2 2/4] bpf: test_run: Use system page pool for
- XDP live frame mode
+	s=arc-20240116; t=1712176954; c=relaxed/simple;
+	bh=gkCZ8Gqsb+rHCxtePN8Y9thSSB+jkdz1yRN2PxHLL7Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=e9dyRXVXuCLyRCN0aHYga7XyaOBOyst3qRf2Q2Ldocr5/xIMBJJ+PxKWTMLsxoXkXgh69DCab4p0rtZYHby/wPoc9PGEKiYnTzwyCdeQuvxRW541OpeGrB/bvekBm8sEd/6N+Kh4tDZilFusCF4W0aaOs2uDMNaFyeeLMNAvvqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u01tbEWS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AEF5C433F1;
+	Wed,  3 Apr 2024 20:42:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712176953;
+	bh=gkCZ8Gqsb+rHCxtePN8Y9thSSB+jkdz1yRN2PxHLL7Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=u01tbEWSwImRYXCgfQpc32YLsBz8Vr1/D8bWf5BC56MA6JPWtKspxi92RNMfa6Etp
+	 A8iC+KTNN89uBknsYumCqa3R1r9KQ/IvkfcpGoVe2C0bOtDWjVFZFT6Ys9crARQ2YI
+	 NJVxqQQwF4hFjs+r6avtAFDXZusRpuGC2xY+zHNN+a0G+FEcPNNGClo3slTYSj+Oqd
+	 +hq1QO/Jd+0SqaU3srNDcWoLFCxS8eTmTVUNLeXi9ANBtIQvJU3QyuZfDRCSadr4o2
+	 gCPbij8NRZlXND6fwtFIZz3IHoZJiUhjb9zrpOILxH+LIsI3huse8dw7sk5F7m2heF
+	 Q1wMy3b9YufHQ==
+Date: Wed, 3 Apr 2024 15:42:31 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <20240403204231.GA1887634@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
 
-Alexander Lobakin wrote:
-> From: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Date: Tue, 20 Feb 2024 22:03:39 +0100
-> =
+On Wed, Apr 03, 2024 at 01:08:24PM -0700, Alexander Duyck wrote:
+> This patch set includes the necessary patches to enable basic Tx and Rx
+> over the Meta Platforms Host Network Interface. To do this we introduce a
+> new driver and driver and directories in the form of
+> "drivers/net/ethernet/meta/fbnic".
 
-> > The BPF_TEST_RUN code in XDP live frame mode creates a new page pool
-> > each time it is called and uses that to allocate the frames used for =
-the
-> > XDP run. This works well if the syscall is used with a high repetitio=
-ns
-> > number, as it allows for efficient page recycling. However, if used w=
-ith
-> > a small number of repetitions, the overhead of creating and tearing d=
-own
-> > the page pool is significant, and can even lead to system stalls if t=
-he
-> > syscall is called in a tight loop.
-> > =
+>       PCI: Add Meta Platforms vendor ID
+>       eth: fbnic: add scaffolding for Meta's NIC driver
+>       eth: fbnic: Allocate core device specific structures and devlink interface
+>       eth: fbnic: Add register init to set PCIe/Ethernet device config
+>       eth: fbnic: add message parsing for FW messages
+>       eth: fbnic: add FW communication mechanism
+>       eth: fbnic: allocate a netdevice and napi vectors with queues
+>       eth: fbnic: implement Tx queue alloc/start/stop/free
+>       eth: fbnic: implement Rx queue alloc/start/stop/free
+>       eth: fbnic: Add initial messaging to notify FW of our presence
+>       eth: fbnic: Enable Ethernet link setup
+>       eth: fbnic: add basic Tx handling
+>       eth: fbnic: add basic Rx handling
+>       eth: fbnic: add L2 address programming
+>       eth: fbnic: write the TCAM tables used for RSS control and Rx to host
 
-> > Now that we have a persistent system page pool instance, it becomes
-> > pretty straight forward to change the test_run code to use it. The on=
-ly
-> > wrinkle is that we can no longer rely on a custom page init callback
-> > from page_pool itself; instead, we change the test_run code to write =
-a
-> > random cookie value to the beginning of the page as an indicator that=
+Random mix of initial caps in subjects.  Also kind of a mix of initial
+caps in comments, e.g.,
 
-> > the page has been initialised and can be re-used without copying the
-> > initial data again.
-> > =
+  $ grep -Er "^\s+/\*" drivers/net/ethernet/meta/fbnic/
 
-> > The cookie is a random 128-bit value, which means the probability tha=
-t
-> > we will get accidental collisions (which would lead to recycling the
-> > wrong page values and reading garbage) is on the order of 2^-128. Thi=
-s
-> > is in the "won't happen before the heat death of the universe" range,=
- so
-> > this marking is safe for the intended usage.
-> > =
+I didn't bother to figure out which patch these typos were in:
 
-> > Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> =
-
-> Hey,
-> =
-
-> What's the status of this series, now that the window is open?
-> =
-
-> Thanks,
-> Olek
-
-Hi Toke,
-
-I read the thread from top to bottom so seems someone else notices the
-2^128 is unique numbers not the collision probability. Anywaays I'm still=
-
-a bit confused, whats the use case here? Maybe I need to understand
-what this XDP live frame mode is better?
-
-Could another solution be to avoid calling BPF_TEST_RUN multiple times
-in a row? Or perhaps have a BPF_SETUP_RUN that does the config and lets
-BPF_TEST_RUN skip the page allocation? Another idea just have the first
-run of BPF_TEST_RUN init a page pool and not destroy it.
-
-Thanks,
-John=
+  $ codespell drivers/net/ethernet/meta/fbnic/
+  drivers/net/ethernet/meta/fbnic/fbnic_pci.c:452: ot ==> to, of, or
+  drivers/net/ethernet/meta/fbnic/fbnic_pci.c:479: Reenable ==> Re-enable
+  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c:569: caclulation ==> calculation
+  drivers/net/ethernet/meta/fbnic/fbnic_fw.c:740: conents ==> contents
+  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h:19: cachline ==> cacheline
 
