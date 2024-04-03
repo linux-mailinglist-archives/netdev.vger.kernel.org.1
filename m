@@ -1,223 +1,171 @@
-Return-Path: <netdev+bounces-84364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65448896B0C
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:50:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D63896B36
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F24F28ED0C
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:50:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E11E52835FA
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE8A134CC8;
-	Wed,  3 Apr 2024 09:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3A5135A5C;
+	Wed,  3 Apr 2024 09:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KDNe7pmD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTd6vcUi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4466154725
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712137846; cv=fail; b=tK7kxxrLKHZ1e0W9XVte4RaC6Q8evit/aZm3PXC9VjY2o6S7YUOg71t6W3ERC+j0Jlh4EhC41btwjF+syizjVzqdNm7xc/nvPkDbHUA12U7wQvRbPS17urT6wNxDseEJmTDB1QBLSXAo2Zz4pEpY4oSC+N3IN3KuB0RX4O57Yt4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712137846; c=relaxed/simple;
-	bh=17Nvhs+0hCmprYgn+KAnDCRdrJWJAxmHGHN76u4EksQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=KaguaLTf7NLB/eFBZMWS/2AK4snk2zsxvPNmOedZr32mm1k6RZbdROocV5BwfRWRcLWhFVglKFK6WGPNcLq5O9qcS05YLc30Us5FlTk4ES06TOhYmWNm4dEvfndzPaWXHa66pBDKR9nmGSIbsrdQ5Km8k+vZtzR9V+cRuDHKr4E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KDNe7pmD; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712137846; x=1743673846;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=17Nvhs+0hCmprYgn+KAnDCRdrJWJAxmHGHN76u4EksQ=;
-  b=KDNe7pmDSriT4fq3DSd/3ExgmcOYf5zVqAUIYGJP/LGey1vzvnJti8DG
-   mHTe4aKMIZIy8hnt6fw6NKG10Ts7/1hE4wintWNPLpt9Q7AN69/pXg3f9
-   XqBxF7IsoUrnQEMXvkx42Fq8TPg5puOC0TMcph6GF0LSUbC/kLDquWJZX
-   2y1MYXTzZubyBxiEsJ8BWPe2z24he3YSvzSZXlP8HLbWvkiGCj+kGR1tr
-   doJMNVZ1XHqTa5eaQurydeLj2wqT3tsvCry00IG2vFZ9AJ7sAKAe22n14
-   8i5wXGsRTEObC7pgcbw7qkg72bxHhhyaxVAIZcY8c2Q5AxjQRXOODXV/l
-   A==;
-X-CSE-ConnectionGUID: SNxRUDxfSdWwl3Ec3Wd40A==
-X-CSE-MsgGUID: 886ZykBmRmWNW4tKaGhwzg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="18516111"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="18516111"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 02:50:45 -0700
-X-CSE-ConnectionGUID: XEVDlKzsRrCqjvZNk2TKgw==
-X-CSE-MsgGUID: kobBk9TqR2GYjkeoUBbFFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="18285424"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Apr 2024 02:50:44 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 3 Apr 2024 02:50:42 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 3 Apr 2024 02:50:42 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 3 Apr 2024 02:50:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W+ACCDPJ2iPm8im4pn0Vfu1c5vzkNQSkWyFgdrSWzbzUJlt2lZEVpGL95vGzVEU2R49vmDGqUVRI1ZFuFK+SfftEKdeeLN2sdJIcuORJgkbhEv59eyS4428fc31XZMt0GbpUoRZoMzaPscWPAndnls4aKAVbV7vv/96m2zdHMkIKdctCALtpyrA7BQjRk+UGRXvmQbjIFjuTjEYnVn+chaSDLqPsx9lYGbrq9smojEtYgr1qgcexxpJNO2mf3FoD5kUVZRSUf7iVomvrDc+o9RCMXfSbSEMn0qUtDi5sl0llCjubEApwgt4/OvFZrr8FqCcxeLP6ssBGVs8JhSYqLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3vT6Afc/QuaTH7Ci5QNR7l+1UZ9VHyPsSOzY34c1N4g=;
- b=C4XYU79ZhttdsRQDprHF0me9cp5ALTiEdlPbxsic4IpjfUK3DSO9FrG1cA3dPXYKyynK2f+2L8Papza//o2gGNDYYXzA0wxL77/xe4sbn/wpgzv4iieKgY/ObpoQgeqBZ6HFA7/RMlUF6mbBXh7aEVFPNfEolW0ky/v9MWVsDtULPx3Ei8IN9XmV0MWPjsQOmLFvqnlV0NvWN2Rb0ChgwWInqtahDAuCx/mFtzg2WlLLb0arVp19o19MdOfyhe8BdgpSSJ7aPz/2LRsQZjyd9+7nVrd9dF/F9vaYhz0q2e8m/SOPY5NIENO79+y29QLm2b4YYdIYJy1jD/IBm468EQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by MW4PR11MB7128.namprd11.prod.outlook.com (2603:10b6:303:22b::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Wed, 3 Apr
- 2024 09:50:40 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Wed, 3 Apr 2024
- 09:50:40 +0000
-Message-ID: <0cbbc736-f87c-4e58-a0a7-9c2d04e7b2cf@intel.com>
-Date: Wed, 3 Apr 2024 11:50:34 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] ethtool: Introduce max power support
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<anthony.l.nguyen@intel.com>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <idosch@nvidia.com>, <przemyslaw.kitszel@intel.com>,
-	<marcin.szycik@linux.intel.com>
-References: <20240329092321.16843-1-wojciech.drewek@intel.com>
- <20240329092321.16843-3-wojciech.drewek@intel.com>
- <07572365-1c9f-4948-ad2f-4d56c6d4e4ab@lunn.ch>
-Content-Language: en-US
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <07572365-1c9f-4948-ad2f-4d56c6d4e4ab@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA2P291CA0047.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1f::16) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47EA135411
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712138281; cv=none; b=FudE/jAHmjZv/YYk4+rBlUI0/PdWKwKFb6XS5hXjfK1/P8ql+04wEPkyEt7Tuc2fWOGNpHcO/+8uatuiFTa9Yx6uACgGqV70TuKoBVck+mOnaJJWMA8eg9DNI28vBh/D2F6AHROGKKJQWC3x+u+qjVChXdwUVDjr7TNZDAbyrR0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712138281; c=relaxed/simple;
+	bh=8RRynYXEEsr910DpOhWgmhyIrE00u1hABv+0y3HxPJQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dgx70rhborxVES6adzTuhkIb8e3wd6yL/9Bo69jACaHUr1YV0+iNl0yxe7jC9q3xFUn8TkGu+FP2FXEWMwSjN4VuJQNLGQnv57GGqa0rvf6OgH4pwL2583juuHWm5LROMSH0pq+k2ZXeiAU1kAalTwuJg205b6ABQ2HNGHTHrLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cTd6vcUi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712138278;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0NkjBL5bDYnfw/9r7z0I5K4fWXu8LGwC+T3Asv+pwcA=;
+	b=cTd6vcUip3O1uXuISY8o2DL1x9xfi09U/s7cAsgjY1aGYj4/R8NpEsowmv6dpEvwYf70Wh
+	CzMZOUSq3OE/uNFytQ03QcP8mDBeC164w6ydC5ETlFRTsqyCZO63EXoNt4PKG14d/frfMD
+	BISWoYINYT/mMdLBF2Wy5/Geo6Butm8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-170-O9U-eDrYPNCqf2sfS8d9zA-1; Wed, 03 Apr 2024 05:57:57 -0400
+X-MC-Unique: O9U-eDrYPNCqf2sfS8d9zA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4148b739698so28020905e9.0
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 02:57:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712138276; x=1712743076;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0NkjBL5bDYnfw/9r7z0I5K4fWXu8LGwC+T3Asv+pwcA=;
+        b=msx5FTdjOFpqOfN7S1NSTwQtLikRZMVeYE2GyVRb7wdLrTm9fWFSuk6T6A46gWYy0f
+         dcqueFbanP/iMcGOudB2qBLBpmHay4x7QBIKLrOeUJ12tnRWjX67iLj48De8QR9kauRJ
+         ExOcDyFxze6n6FGuPOSfzI3wPs6LphxffJOQ1+zO+wa4cHHVkVwwc2qbcmfdnex0ilVu
+         o56VV5FBurP/l10KI5sgUeeWL+sJDxUPAR2CRw9LGnUWFNGtfO6twoIpV2AKtBumTQqs
+         GlbaCA5hiLZL5ykiFcvfLJQ4Uqy+KGboQvfLovhaq2SOGFIAy/bYyb+2htjl9JTizJcx
+         wWJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXg0gL1/82RLDhoN0dvjLF7P6JCcZadOmsIsu2U9SoJPfcgXqtjdvgIBYGJWqpF6vhKaWEmYfWV7j9pIP3t7Xd/vILD3fXh
+X-Gm-Message-State: AOJu0Yyf9acXkYJWyEPbvRkCLHQ7NgGDbO7WEx+B+MFzXHCFYUsDphFu
+	Lagwu5Eipyi5umSqkapqPcB8Wgi7M0wHjksw5h0naRrjHJQriRlJtwjX8CEanglbB2KnrXQ+o0m
+	BqDb/8OoKFHk6IUhTOyJGJW/V+abATOEFsH4NAm7qRr9Wsu2UrslPTA==
+X-Received: by 2002:a05:600c:1c99:b0:414:8a28:6c89 with SMTP id k25-20020a05600c1c9900b004148a286c89mr12523542wms.31.1712138276246;
+        Wed, 03 Apr 2024 02:57:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFOILQPfbGHxrOwnJYPLVzz5jLbxh1TQ7R/N3HPs9ewOGHos/rV5L9Q51JZB17uMPSq+TTRmQ==
+X-Received: by 2002:a05:600c:1c99:b0:414:8a28:6c89 with SMTP id k25-20020a05600c1c9900b004148a286c89mr12523530wms.31.1712138275940;
+        Wed, 03 Apr 2024 02:57:55 -0700 (PDT)
+Received: from sgarzare-redhat ([185.95.145.60])
+        by smtp.gmail.com with ESMTPSA id m4-20020a05600c3b0400b004161b8a0310sm4955377wms.1.2024.04.03.02.57.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 02:57:55 -0700 (PDT)
+Date: Wed, 3 Apr 2024 11:57:50 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Zhu Lingshan <lingshan.zhu@intel.com>, Jason Wang <jasowang@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>, 
+	Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Kan Liang <kan.liang@linux.intel.com>
+Subject: Re: [PATCH] vhost-vdpa: change ioctl # for VDPA_GET_VRING_SIZE
+Message-ID: <qxnpqulknydwdaqn2uangg6ke6pzeo46us2xnqw37ll6m4te5m@ounccq6x7sto>
+References: <41c1c5489688abe5bfef9f7cf15584e3fb872ac5.1712092759.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|MW4PR11MB7128:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: k/4ImJSEewM6wDlpAshp8heVoKem1pssfpnzp4VfXxg9g1jw8tI7E+pDJZSuT1qSeqNLVxKRu1WQWx3V4RTHWGeADt23OMpRVUAiIWWSDgBN/QpY/Yc9LwbTC3mx24o2x3FT+BWDhy0YS6UPNYPlayqL6PqwKnZ48ikkNvhnLIYXqqMXC6lMoucbBBpMCndvAOOEiGRd76rM5wtTqwzZb/5TP8LqasiEE1kRlOAdSLlyoJcVuSvsAu55y7axGV1nREV025SBBg4txgSQMSKxAnPFK7yoloDAxWj0+5GRqLxYhhqhLQh+O7qBiP+P7T3wvfh/ecTKElycuzZm0mkZQlTCbLMBzaldqcoHD9F88Cp33lyS8oxlJ3aECBYZoAUWPZmW1BqM7I1qYaoRb6nLkFJ/7eGaua0DT/OQaj/NZojTl+upLiHoUCNAxFqT2D5V0hLLiOZ9JENCYYqS1uW19V4Y6oROv85N+VN0AeEdkWsRr4JoqsFjIrZQhbVOal/N+8jnPJFObRHMZbPvQ8Z+TL+yUQuZAUHEIcde9WmsL6Tou0PM+wnQGFTc948jX5KaGK95ciHCF/KqGW5Q0BkmclBO1TQGYHBv/egFdkAg1uo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZFZNS21adlBrYkVWYWJ2Q0RBc3BKVkhRaGk1MHh5azJHdXd6V1pLdytUZnZV?=
- =?utf-8?B?OGliekFJWUE0OXQ3NjNRbzVHWmxTZkhUU2xiSUhwTXFMS01wWklwZG9RUjNi?=
- =?utf-8?B?V0JnU0I4VTdrWnJsNTVYdWpFMkl1eU9mR2E3bnNZakVaYlh1TCsxTjFhMU5D?=
- =?utf-8?B?YWpkTW85WWRjS1RpOFBRVlIrQjJhUVEzbmp5SlIvV2UxSFkxV0gydlczakFY?=
- =?utf-8?B?SkYzQWpFQkVHWHM4THJyaXZGVnh0QUV2Rkc5dkRWc2Y0MWt1ZlFOQ0UvM0pn?=
- =?utf-8?B?ODFBNUE4YlRGOHdsMGlpTEt0eVh1dGtaOHVKc3Q4WHVXOTIzOFdKSktKOTNI?=
- =?utf-8?B?amVaYThRL09FbDdTNHdFVmFUbE85ZFJUUGNhdTFaNXp0cHNyYkN2Y2M3Mkpp?=
- =?utf-8?B?dXk3cWhqR2hueWt0ODQ4WFZYSnNzTFZlRHNURE9BM1pYQ3N4WjFRdmdOUERQ?=
- =?utf-8?B?M1ZmdlJOeTluTGx2Q1Roc3B1TDdKK0RKaU5PcU1RSHVJMzl2MVd2RytKd2dx?=
- =?utf-8?B?OGhOY2pHMml6Y0lkNmg5aUxBWXdCNnRJUDd0dTNpTFJLQzd6dnBHVGNNWDlr?=
- =?utf-8?B?S3VPcTc3aEpZOGR6SUp0UlhRREp3bXJTU3F1SkoreWlMTmVSUkFublZQMG43?=
- =?utf-8?B?QVU4MGRlYTUyTzFydnUyVFpZTzFGV3g0OVdkcHhFQ2hEZVF4R3Z5clVEMXV3?=
- =?utf-8?B?Qmlvajg3WG9qK2xjNlpXNUpKS0o0Qy9hN3FYcUhQTjRGNlZ0UkpFK2loUU5p?=
- =?utf-8?B?OFJNYnRDcmh1RHlpcnBENVR3Sm1tZzh0bzFvb1JXRElaczNiZ3lXMFRhN3lm?=
- =?utf-8?B?c3ZyZmhFdndzSWJnTHVTMXlJZExIL3VweXkzNHo3VFRRM3liVFhqYzJHdjZk?=
- =?utf-8?B?N0dIQVB3UXlFNkRoenIvVlVDdi8wMVJDLzhwK3o0UnlzeFpGcHBoUDV1Mkpq?=
- =?utf-8?B?b2ZHYm82ZisvN0lJa2YwVHdXMFRUMTF1Z0ZRM2ZxNjFSTVdjemVzZWMrTWdq?=
- =?utf-8?B?c2dpS2dweDZTdTY4TzZLOCtwNmFlUm9hUTFVNkdTeGxBVEc4Nk41cTZCQXZT?=
- =?utf-8?B?QVU5NjRQN0J5ZFhQRy9BNy83SWxPbWpPUzRzRUU5SytRVEcxL2xkNCtUWUlN?=
- =?utf-8?B?REFHZ21WT3JlU2hjTTF3YVpYbG1nOXZPNjVtYXp6WDc4WFdsUWRLTDI5anJS?=
- =?utf-8?B?MUhxQmw3QnJPTndNMXgwKzI1NTdMSlFlVU5heGlzTU9HUW16RFNDNjRTaFNC?=
- =?utf-8?B?VnBJNUJpdkdlNVZoMG8xdnFTN2trSlVRRVM5UE9MOXc4U25sVG5nN2FEQzR4?=
- =?utf-8?B?RThmSHJvSnhOUlUyd3h6MlpYREplenJDNWhpTzM3TjdzY2ZoV21UZ2ZSQmF0?=
- =?utf-8?B?cEdpYXF4T1VQM3Vza256Y1RLNUxuYys2Y2tLTWRqMm5HZldMd3pRV3Bud3J0?=
- =?utf-8?B?ME5OaFR0NTE2YUJnUHkvK2FHaXhGeDRlbXQvSXBpSkdsdi95LzIrY05aREZW?=
- =?utf-8?B?TGlrNVB5Z0ZZU0JrQ0Qzems2em05aUh5cnl6bjRHSHhsUm9pSktPWGhkZWxW?=
- =?utf-8?B?bVB4dWJaMUZUR0JRTG5TNWZpb2ZxK0ppUDRaeGZKckdFMDNac1VIVHdDVWx4?=
- =?utf-8?B?d0QyQmpmazNIVXByR3RLaVFjOTFUa2Zmb2hYTXFGM3RBRnVIcFhleVZlWjZn?=
- =?utf-8?B?UlEwL1JBQlArT3djWlVxL1l3ejlaMDJ4YUpJQlBtQzU5azdlL1ZaWmhzUmlR?=
- =?utf-8?B?V1JhQ2JaMTJTM3hXZk5vY3dxT1JUTVUwSThWZzJueDQvTmNONXFqdEVyT0Jv?=
- =?utf-8?B?bnZxQXN2eVJHV0ttMy9RVUozQUpmMEY5eHpuTm8wcWRvaXNUb3FxMGZBQ0ds?=
- =?utf-8?B?T1dEYW5ycHk5M1lVaUpndXkxT1VOaGJtTGNsS0tUbWs3S042ZG1BeW51M094?=
- =?utf-8?B?TStyNms1alNnS0N5ZzhwK0lOOUFXYnlIam1SNkZ3MG1ubFdWcDVQaUh6NHZP?=
- =?utf-8?B?TmVxTXpRYkR1UXl0eHZoZHRqMW8zdlRZSTVJREQ4WWtYNnI5dUlxUE02c1pO?=
- =?utf-8?B?a0R1eXkxRUFtejg1VmtTUlRUSjQ4ZnFBY2JxbFpNYVJNZDZ5TnpIdFRiNU5T?=
- =?utf-8?B?TVNZWm54SDVrcmp0RHlOajNBRjNHVFJjRVBVUnJNdUw0TDRLT2o5L1ZUR3J4?=
- =?utf-8?B?eEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 607d5795-6e5a-4019-5f18-08dc53c385a0
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 09:50:40.7818
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jtKYzZtqlQVPCL9tPRU0kWIrbWkF/UuXU6zfyuUWLRsv9STdBHVDC8iYk0aTKwvhhmhkKrEMwCJsh0VMzNaPmEW0IYc85ebrmwAYB/AcKlA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7128
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <41c1c5489688abe5bfef9f7cf15584e3fb872ac5.1712092759.git.mst@redhat.com>
 
+On Tue, Apr 02, 2024 at 05:21:39PM -0400, Michael S. Tsirkin wrote:
+>VDPA_GET_VRING_SIZE by mistake uses the already occupied
+>ioctl # 0x80 and we never noticed - it happens to work
+>because the direction and size are different, but confuses
+>tools such as perf which like to look at just the number,
+>and breaks the extra robustness of the ioctl numbering macros.
+>
+>To fix, sort the entries and renumber the ioctl - not too late
+>since it wasn't in any released kernels yet.
+>
+>Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
+>Reported-by: Namhyung Kim <namhyung@kernel.org>
+>Fixes: 1496c47065f9 ("vhost-vdpa: uapi to support reporting per vq size")
+>Cc: "Zhu Lingshan" <lingshan.zhu@intel.com>
+>Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>---
+>
+>Build tested only - userspace patches using this will have to adjust.
+>I will merge this in a week or so unless I hear otherwise,
+>and afterwards perf can update there header.
 
+Fortunately, we haven't released any kernels with this yet, right?
+(other than v6.9-rc*)
 
-On 30.03.2024 23:14, Andrew Lunn wrote:
-> On Fri, Mar 29, 2024 at 10:23:20AM +0100, Wojciech Drewek wrote:
->> Some modules use nonstandard power levels. Adjust ethtool
->> module implementation to support new attributes that will allow user
->> to change maximum power.
->>
->> Add three new get attributes:
->> ETHTOOL_A_MODULE_MAX_POWER_SET (used for set as well) - currently set
->>   maximum power in the cage
->> ETHTOOL_A_MODULE_MIN_POWER_ALLOWED - minimum power allowed in the
->>   cage reported by device
->> ETHTOOL_A_MODULE_MAX_POWER_ALLOWED - maximum power allowed in the
->>   cage reported by device
-> 
-> I'm confused. The cage has two power pins, if you look at the table
-> here:
-> 
-> https://www.embrionix.com/resource/how-to-design-with-video-SFP
-> 
-> There is VccT and VccR. I would expect there is a power regulator
-> supplying these pins. By default, you can draw 1W from that
-> regulator. The board however might be designed to support more power,
-> so those regulators could supply more power. And the board has also
-> been designed to dump the heat if more power is consumed.
-> 
-> So, ETHTOOL_A_MODULE_MIN_POWER_ALLOWED is about the minimum power that
-> regulator can supply? Does that make any sense?
-> 
-> ETHTOOL_A_MODULE_MAX_POWER_ALLOWED is about the maximum power the
-> regulator can supply and the cooling system can dump heat?
-> 
-> Then what does ETHTOOL_A_MODULE_MAX_POWER_SET mean? power in the cage?
-> The cage is passive. It does not consume power. It is the module which
-> does. Is this telling the module it can consume up to this amount of
-> power?
+LGTM:
 
-Right, all of those attributes describe restrictions for modules that
-can be plugged into the given cage. ETHTOOL_A_MODULE_MAX_POWER_SET is
-currently set maximum. The other two define the range of values that
-ETHTOOL_A_MODULE_MAX_POWER_SET can take.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-I hope that answers your question.
+>
+> include/uapi/linux/vhost.h | 15 ++++++++-------
+> 1 file changed, 8 insertions(+), 7 deletions(-)
+>
+>diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+>index bea697390613..b95dd84eef2d 100644
+>--- a/include/uapi/linux/vhost.h
+>+++ b/include/uapi/linux/vhost.h
+>@@ -179,12 +179,6 @@
+> /* Get the config size */
+> #define VHOST_VDPA_GET_CONFIG_SIZE	_IOR(VHOST_VIRTIO, 0x79, __u32)
+>
+>-/* Get the count of all virtqueues */
+>-#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
+>-
+>-/* Get the number of virtqueue groups. */
+>-#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
+>-
+> /* Get the number of address spaces. */
+> #define VHOST_VDPA_GET_AS_NUM		_IOR(VHOST_VIRTIO, 0x7A, unsigned int)
+>
+>@@ -228,10 +222,17 @@
+> #define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
+> 					      struct vhost_vring_state)
+>
+>+
+>+/* Get the count of all virtqueues */
+>+#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
+>+
+>+/* Get the number of virtqueue groups. */
+>+#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
+>+
+> /* Get the queue size of a specific virtqueue.
+>  * userspace set the vring index in vhost_vring_state.index
+>  * kernel set the queue size in vhost_vring_state.num
+>  */
+>-#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x80,	\
+>+#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
+> 					      struct vhost_vring_state)
+> #endif
+>-- 
+>MST
+>
+>
 
-> 
-> 	Andrew
-> 
 
