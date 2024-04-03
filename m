@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-84342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C9B1896A7F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:28:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 659B1896A7E
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:28:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B794A1F25E69
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:28:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C34B2839CB
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50E273164;
-	Wed,  3 Apr 2024 09:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FACA131BDE;
+	Wed,  3 Apr 2024 09:27:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084C3130A64
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBACE71B4F
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712136477; cv=none; b=f6Qg/jY4D0h20EsDnM8oNh8tcQwBGzdysRVOlL7sY7v/kOpSnya+5Rz1UwKfPfevciIc+HURdzKVBpxjjJfGsCNylp+vfHwNpat0MCQHRlYyP71ZQVJDQ7jUa9hH/vV0j6BC+4eA5efWLDTrAo2s2cAXzOeyuoB0++ZxS9DVkr8=
+	t=1712136476; cv=none; b=dCnjrsDH0w2uej0ISJ/QQ1rkUiP3cAAWam3L/t/lh7gcfRwpU2HCjMf8FIUyOeotkHU7/stPTRm8PSw2rzdW65MGfjdDQeHplE2vF3KakdRsn2r+tvdZ5EwLcsfDTmCCUtbLqHd22lDvRyGwRXGmIBznoovyGBvaLjAmg3ALHg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712136477; c=relaxed/simple;
-	bh=GFabwEuGbhFq8OTJ+pTL/7SFJFJKvR1KIOlB+CruWr0=;
+	s=arc-20240116; t=1712136476; c=relaxed/simple;
+	bh=WEamhaJuOUY7FTxvK4s3lFJfUkFdpmy9oo10pW4aF2g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QZ7XCfLM4FssEiN1MbBIpIQGcW1JcOx64ZhU7mGEQjvzoILippIWT0uQDffQtZqrM/pr8GRTWPUPjdkeb/XoZWuoof/bAHQde1J5wG2VvDPVlRtER2Vn98/BJZwxIQfcjm0o/H/dsz2duKkrCFHJbqsHNlC/K9WIsW5hktYPPIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.92.39.34
+	 MIME-Version; b=GyIYsfTsWjfWzPMMTzGZ7ptmY7SEu6YEsJxF3oituJ6EkxWP1biJD/ePyzwC/BhjQy46sLqnKAGGutkfUqSpJuB3OMtkOtzrCoYQbo0TaKyMi4KouZeMj8sS9qVOFN3x2ZglII8OEJ1oP5jkBjYKnXpoCNew63gXJQ6Od2iHxuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.206.34.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtpsz9t1712136459tgn98kx
-X-QQ-Originating-IP: VqGxPBgda6uCnbn0CThXlnYRYxkw4YsQgsU6Sa0MDQo=
+X-QQ-mid: bizesmtpsz9t1712136463tmkawj4
+X-QQ-Originating-IP: f9CQNfYLdoz1tgqpo9WHzAwACB98n1xRTMY2gnsw4NY=
 Received: from localhost.localdomain ( [36.24.97.137])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 03 Apr 2024 17:27:37 +0800 (CST)
+	id ; Wed, 03 Apr 2024 17:27:42 +0800 (CST)
 X-QQ-SSF: 01400000000000O0Z000000A0000000
-X-QQ-FEAT: W+onFc5Tw4MZ0na36bUABnLBbtmsQyXrKeFMMLBKcxXRQIljwKjXbj8749lGJ
-	bTnFJ6bFF1SVLtdSU2eMtH7++wStMFj15iKdOVVkqsI7dv6haGyUYtks/i1xtSUBurM6tk4
-	wfyWsJGmoLj5fOzrXXoBbxXdi/gsq1TcWh35oNKsYvEmXM0lbdBZ6ZmL6oh/24UfKTtd0qK
-	oHm+/Ox0ozyxbw0ybssd2upUAbMYksNY3cyaF01LTmYwdgHvCeAcQLOzwo3V8lsCkq0eOZU
-	aRn8yjgO7vvlGdukPueV3umZzTVhqifuM5b1ve+vGAMgxjn3c9HDbWreSXKB2A1u01bGD6u
-	x/2HRsL/PqZWQ4wQuEGM5Xp/Rvye4s5mzCjS7PxUY2WSBXCiJZLzeY9afY5hKHDc5w2mR/X
-	r1RTtR/4id++DdobSFB7WA==
+X-QQ-FEAT: Pbidb3+knnHAJ7CUDBLLjH7cCySSCw+8Zt9QrHsqRQNIsjToYixPzgPT8j5LF
+	cyTUHiZFIFzURnZNQlmJ6IAZTxSf7A5ZwNvB2SfOwWynBrcx/REP6PWDC8PknRb0ueWFiPv
+	PFq+W0WxwPgqSd6mbUMsFP4YBafjZQy1DHjAoVo426hCDuLjeakJdXLaPTtfRCYjaNaJKTK
+	cQEKo1yeEZusf7J9GjkS/HDnYlm+Uiuzua2bscEW5UiiyXgv2cffGWAqzwkxef+ve30LsAJ
+	KIcetSucSPf04JawLqjE/KEuZO44i+gA0MQrmpJMYHdVh1MWluPRYQutZ/RDY9rNOrH7Keb
+	55FqkngLpRWsGRJn0ZNNJjnq5KAr/DUqMbt8cul/PvIw8s92outxA2HfG25Vf/rwjAJ75nR
+	PJsyTVcZ4AU=
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 4149854345897228095
+X-BIZMAIL-ID: 6749961609247454752
 From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
 Cc: jiawenwu@trustnetic.com,
 	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v2 2/7] net: libwx: Add sriov api for wangxun nics
-Date: Wed,  3 Apr 2024 17:09:59 +0800
-Message-ID: <249562B2DA26BA00+20240403092714.3027-3-mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v2 3/7] net: libwx: Implement basic funcs for vf setting
+Date: Wed,  3 Apr 2024 17:10:00 +0800
+Message-ID: <BA6594D4D47BD732+20240403092714.3027-4-mengyuanlou@net-swift.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240403092714.3027-1-mengyuanlou@net-swift.com>
 References: <20240403092714.3027-1-mengyuanlou@net-swift.com>
@@ -64,381 +64,542 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 
-Implement sriov_configure interface for wangxun nics in libwx.
+Implements ndo_get_vf_config, ndo_set_vf_vlan,
+ndo_set_vf_mac, ndo_set_vf_spoofchk and
+ndo_set_vf_link_state for wangxun pf drivers.
 
 Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 ---
- drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
- drivers/net/ethernet/wangxun/libwx/wx_mbx.h   |   4 +
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 221 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_sriov.h |  10 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  38 +++
- 5 files changed, 274 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.c
- create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.h
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |   9 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   3 +
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.h   |   3 +
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 351 ++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.h |   5 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  23 ++
+ 6 files changed, 391 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/Makefile b/drivers/net/ethernet/wangxun/libwx/Makefile
-index 913a978c9032..5b996d973d29 100644
---- a/drivers/net/ethernet/wangxun/libwx/Makefile
-+++ b/drivers/net/ethernet/wangxun/libwx/Makefile
-@@ -4,4 +4,4 @@
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index 945c13d1a982..fd04386a7580 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -833,7 +833,7 @@ void wx_flush_sw_mac_table(struct wx *wx)
+ }
+ EXPORT_SYMBOL(wx_flush_sw_mac_table);
  
- obj-$(CONFIG_LIBWX) += libwx.o
+-static int wx_add_mac_filter(struct wx *wx, u8 *addr, u16 pool)
++int wx_add_mac_filter(struct wx *wx, u8 *addr, u16 pool)
+ {
+ 	u32 i;
  
--libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_mbx.o
-+libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_mbx.o wx_sriov.o
+@@ -863,8 +863,9 @@ static int wx_add_mac_filter(struct wx *wx, u8 *addr, u16 pool)
+ 	}
+ 	return -ENOMEM;
+ }
++EXPORT_SYMBOL(wx_add_mac_filter);
+ 
+-static int wx_del_mac_filter(struct wx *wx, u8 *addr, u16 pool)
++int wx_del_mac_filter(struct wx *wx, u8 *addr, u16 pool)
+ {
+ 	u32 i;
+ 
+@@ -887,6 +888,7 @@ static int wx_del_mac_filter(struct wx *wx, u8 *addr, u16 pool)
+ 	}
+ 	return -ENOMEM;
+ }
++EXPORT_SYMBOL(wx_del_mac_filter);
+ 
+ static int wx_available_rars(struct wx *wx)
+ {
+@@ -2080,7 +2082,7 @@ static int wx_set_vlvf(struct wx *wx, u32 vlan, u32 vind, bool vlan_on,
+  *
+  *  Turn on/off specified VLAN in the VLAN filter table.
+  **/
+-static int wx_set_vfta(struct wx *wx, u32 vlan, u32 vind, bool vlan_on)
++int wx_set_vfta(struct wx *wx, u32 vlan, u32 vind, bool vlan_on)
+ {
+ 	u32 bitindex, vfta, targetbit;
+ 	bool vfta_changed = false;
+@@ -2126,6 +2128,7 @@ static int wx_set_vfta(struct wx *wx, u32 vlan, u32 vind, bool vlan_on)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL(wx_set_vfta);
+ 
+ /**
+  *  wx_clear_vfta - Clear VLAN filter table
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
+index 9e219fa717a2..f2717fdf83cd 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
+@@ -25,6 +25,8 @@ void wx_init_eeprom_params(struct wx *wx);
+ void wx_get_mac_addr(struct wx *wx, u8 *mac_addr);
+ void wx_init_rx_addrs(struct wx *wx);
+ void wx_mac_set_default_filter(struct wx *wx, u8 *addr);
++int wx_add_mac_filter(struct wx *wx, u8 *addr, u16 pool);
++int wx_del_mac_filter(struct wx *wx, u8 *addr, u16 pool);
+ void wx_flush_sw_mac_table(struct wx *wx);
+ int wx_set_mac(struct net_device *netdev, void *p);
+ void wx_disable_rx(struct wx *wx);
+@@ -39,6 +41,7 @@ int wx_stop_adapter(struct wx *wx);
+ void wx_reset_misc(struct wx *wx);
+ int wx_get_pcie_msix_counts(struct wx *wx, u16 *msix_count, u16 max_msix_count);
+ int wx_sw_init(struct wx *wx);
++int wx_set_vfta(struct wx *wx, u32 vlan, u32 vind, bool vlan_on);
+ int wx_vlan_rx_add_vid(struct net_device *netdev, __be16 proto, u16 vid);
+ int wx_vlan_rx_kill_vid(struct net_device *netdev, __be16 proto, u16 vid);
+ int wx_fc_enable(struct wx *wx, bool tx_pause, bool rx_pause);
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_mbx.h b/drivers/net/ethernet/wangxun/libwx/wx_mbx.h
-index 1579096fb6ad..3c70654a8b14 100644
+index 3c70654a8b14..201efbc2db9a 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_mbx.h
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_mbx.h
-@@ -23,6 +23,10 @@
+@@ -21,8 +21,11 @@
+ #define WX_MBVFICR_VFREQ_MASK GENMASK(15, 0)
+ #define WX_MBVFICR_VFACK_MASK GENMASK(31, 16)
  
++#define WX_VT_MSGTYPE_CTS     BIT(29)
  #define WX_VT_MSGINFO_MASK    GENMASK(23, 16)
  
-+enum wxvf_xcast_modes {
-+	WXVF_XCAST_MODE_NONE = 0,
-+};
++#define WX_PF_CONTROL_MSG            BIT(8) /* PF control message */
 +
- int wx_write_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf);
- int wx_read_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf);
- int wx_check_for_rst_pf(struct wx *wx, u16 mbx_id);
+ enum wxvf_xcast_modes {
+ 	WXVF_XCAST_MODE_NONE = 0,
+ };
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-new file mode 100644
-index 000000000000..032b75f23460
---- /dev/null
+index 032b75f23460..decef4af3ee4 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -0,0 +1,221 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2015 - 2023 Beijing WangXun Technology Co., Ltd. */
+@@ -5,6 +5,7 @@
+ #include <linux/pci.h>
+ 
+ #include "wx_type.h"
++#include "wx_hw.h"
+ #include "wx_mbx.h"
+ #include "wx_sriov.h"
+ 
+@@ -219,3 +220,353 @@ int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs)
+ 	return num_vfs;
+ }
+ EXPORT_SYMBOL(wx_pci_sriov_configure);
 +
-+#include <linux/etherdevice.h>
-+#include <linux/pci.h>
-+
-+#include "wx_type.h"
-+#include "wx_mbx.h"
-+#include "wx_sriov.h"
-+
-+static void wx_vf_configuration(struct pci_dev *pdev, int event_mask)
++int wx_ndo_get_vf_config(struct net_device *netdev, int vf, struct ifla_vf_info *ivi)
 +{
-+	unsigned int vfn = (event_mask & GENMASK(5, 0));
-+	struct wx *wx = pci_get_drvdata(pdev);
++	struct wx *wx = netdev_priv(netdev);
 +
-+	bool enable = ((event_mask & BIT(31)) != 0);
++	if (vf >= wx->num_vfs)
++		return -EINVAL;
++	ivi->vf = vf;
++	memcpy(&ivi->mac, wx->vfinfo[vf].vf_mac_addr, ETH_ALEN);
 +
-+	if (enable)
-+		eth_zero_addr(wx->vfinfo[vfn].vf_mac_addr);
++	ivi->vlan = wx->vfinfo[vf].pf_vlan;
++	ivi->qos = wx->vfinfo[vf].pf_qos;
++	ivi->spoofchk = wx->vfinfo[vf].spoofchk_enabled;
++
++	ivi->trusted = wx->vfinfo[vf].trusted;
++	ivi->linkstate = wx->vfinfo[vf].link_state;
++
++	return 0;
++}
++EXPORT_SYMBOL(wx_ndo_get_vf_config);
++
++static int wx_set_vf_mac(struct wx *wx, u16 vf, unsigned char *mac_addr)
++{
++	int ret = 0;
++
++	wx_del_mac_filter(wx, wx->vfinfo[vf].vf_mac_addr, vf);
++	ret = wx_add_mac_filter(wx, mac_addr, vf);
++	if (ret >= 0)
++		memcpy(wx->vfinfo[vf].vf_mac_addr, mac_addr, ETH_ALEN);
++	else
++		memset(wx->vfinfo[vf].vf_mac_addr, 0, ETH_ALEN);
++
++	return ret;
 +}
 +
-+static void wx_alloc_vf_macvlans(struct wx *wx, u8 num_vfs)
++int wx_ndo_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
 +{
-+	struct vf_macvlans *mv_list;
-+	int num_vf_macvlans, i;
++	struct wx *wx = netdev_priv(netdev);
++	int retval = 0;
 +
-+	/* Initialize list of VF macvlans */
-+	INIT_LIST_HEAD(&wx->vf_mvs.l);
++	if (!is_valid_ether_addr(mac) || vf >= wx->num_vfs)
++		return -EINVAL;
 +
-+	num_vf_macvlans = wx->mac.num_rar_entries -
-+			  (WX_MAX_PF_MACVLANS + 1 + num_vfs);
-+	if (!num_vf_macvlans)
-+		return;
-+
-+	mv_list = kcalloc(num_vf_macvlans, sizeof(struct vf_macvlans),
-+			  GFP_KERNEL);
-+	if (mv_list) {
-+		for (i = 0; i < num_vf_macvlans; i++) {
-+			mv_list[i].vf = -1;
-+			mv_list[i].free = true;
-+			list_add(&mv_list[i].l, &wx->vf_mvs.l);
-+		}
-+		wx->mv_list = mv_list;
-+	}
-+}
-+
-+static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
-+{
-+	u32 value = 0;
-+	int i;
-+
-+	set_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
-+	wx_err(wx, "SR-IOV enabled with %d VFs\n", num_vfs);
-+
-+	/* Enable VMDq flag so device will be set in VM mode */
-+	set_bit(WX_FLAG_VMDQ_ENABLED, wx->flags);
-+	if (!wx->ring_feature[RING_F_VMDQ].limit)
-+		wx->ring_feature[RING_F_VMDQ].limit = 1;
-+	wx->ring_feature[RING_F_VMDQ].offset = num_vfs;
-+
-+	wx_alloc_vf_macvlans(wx, num_vfs);
-+	/* Initialize default switching mode VEB */
-+	wr32m(wx, WX_PSR_CTL, WX_PSR_CTL_SW_EN, WX_PSR_CTL_SW_EN);
-+
-+	/* If call to enable VFs succeeded then allocate memory
-+	 * for per VF control structures.
-+	 */
-+	wx->vfinfo = kcalloc(num_vfs, sizeof(struct vf_data_storage), GFP_KERNEL);
-+	if (!wx->vfinfo)
-+		return -ENOMEM;
-+
-+	/* enable spoof checking for all VFs */
-+	for (i = 0; i < num_vfs; i++) {
-+		/* enable spoof checking for all VFs */
-+		wx->vfinfo[i].spoofchk_enabled = true;
-+		wx->vfinfo[i].link_enable = true;
-+		/* Untrust all VFs */
-+		wx->vfinfo[i].trusted = false;
-+		/* set the default xcast mode */
-+		wx->vfinfo[i].xcast_mode = WXVF_XCAST_MODE_NONE;
-+	}
-+
-+	if (wx->mac.type == wx_mac_sp) {
-+		if (num_vfs < 32)
-+			value = WX_CFG_PORT_CTL_NUM_VT_32;
-+		else
-+			value = WX_CFG_PORT_CTL_NUM_VT_64;
++	retval = wx_set_vf_mac(wx, vf, mac);
++	if (retval >= 0) {
++		wx->vfinfo[vf].pf_set_mac = true;
++		if (!netif_running(wx->netdev))
++			wx_err(wx, "Bring the PF device up before use vfs\n");
 +	} else {
-+		value = WX_CFG_PORT_CTL_NUM_VT_8;
-+	}
-+	wr32m(wx, WX_CFG_PORT_CTL,
-+	      WX_CFG_PORT_CTL_NUM_VT_MASK,
-+	      value);
-+
-+	return 0;
-+}
-+
-+static void wx_sriov_reinit(struct wx *wx)
-+{
-+	rtnl_lock();
-+	wx->setup_tc(wx->netdev, netdev_get_num_tc(wx->netdev));
-+	rtnl_unlock();
-+}
-+
-+int wx_disable_sriov(struct wx *wx)
-+{
-+	/* If our VFs are assigned we cannot shut down SR-IOV
-+	 * without causing issues, so just leave the hardware
-+	 * available but disabled
-+	 */
-+	if (pci_vfs_assigned(wx->pdev)) {
-+		wx_err(wx, "Unloading driver while VFs are assigned.\n");
-+		return -EPERM;
-+	}
-+	/* disable iov and allow time for transactions to clear */
-+	pci_disable_sriov(wx->pdev);
-+
-+	/* set num VFs to 0 to prevent access to vfinfo */
-+	wx->num_vfs = 0;
-+
-+	/* free VF control structures */
-+	kfree(wx->vfinfo);
-+	wx->vfinfo = NULL;
-+
-+	/* free macvlan list */
-+	kfree(wx->mv_list);
-+	wx->mv_list = NULL;
-+
-+	/* set default pool back to 0 */
-+	wr32m(wx, WX_PSR_VM_CTL, WX_PSR_VM_CTL_POOL_MASK, 0);
-+	wx->ring_feature[RING_F_VMDQ].offset = 0;
-+
-+	clear_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
-+	/* Disable VMDq flag so device will be set in VM mode */
-+	if (wx->ring_feature[RING_F_VMDQ].limit == 1)
-+		clear_bit(WX_FLAG_VMDQ_ENABLED, wx->flags);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(wx_disable_sriov);
-+
-+static int wx_pci_sriov_enable(struct pci_dev *dev,
-+			       int num_vfs)
-+{
-+	struct wx *wx = pci_get_drvdata(dev);
-+	int err = 0, i;
-+
-+	err = __wx_enable_sriov(wx, num_vfs);
-+	if (err)
-+		goto err_out;
-+
-+	wx->num_vfs = num_vfs;
-+	for (i = 0; i < wx->num_vfs; i++)
-+		wx_vf_configuration(dev, (i | BIT(31)));
-+
-+	/* reset before enabling SRIOV to avoid mailbox issues */
-+	wx_sriov_reinit(wx);
-+
-+	err = pci_enable_sriov(dev, num_vfs);
-+	if (err) {
-+		wx_err(wx, "Failed to enable PCI sriov: %d\n", err);
-+		goto err_out;
++		wx_err(wx, "The VF MAC address was NOT set due to invalid\n");
 +	}
 +
-+	return num_vfs;
-+err_out:
-+	return err;
++	return retval;
++}
++EXPORT_SYMBOL(wx_ndo_set_vf_mac);
++
++static void wx_set_vmolr(struct wx *wx, u16 vf, bool aupe)
++{
++	u32 vmolr = rd32(wx, WX_PSR_VM_L2CTL(vf));
++
++	vmolr |=  WX_PSR_VM_L2CTL_BAM;
++	if (aupe)
++		vmolr |= WX_PSR_VM_L2CTL_AUPE;
++	else
++		vmolr &= ~WX_PSR_VM_L2CTL_AUPE;
++	wr32(wx, WX_PSR_VM_L2CTL(vf), vmolr);
 +}
 +
-+static int wx_pci_sriov_disable(struct pci_dev *dev)
++static void wx_set_vmvir(struct wx *wx, u16 vid, u16 qos, u16 vf)
 +{
-+	struct wx *wx = pci_get_drvdata(dev);
-+	int err;
++	u32 vmvir = vid | (qos << VLAN_PRIO_SHIFT) |
++		    WX_TDM_VLAN_INS_VLANA_DEFAULT;
 +
-+	err = wx_disable_sriov(wx);
-+
-+	/* reset before enabling SRIOV to avoid mailbox issues */
-+	if (!err)
-+		wx_sriov_reinit(wx);
-+
-+	return err;
++	wr32(wx, WX_TDM_VLAN_INS(vf), vmvir);
 +}
 +
-+static int wx_check_sriov_allowed(struct wx *wx, int num_vfs)
++static int wx_set_vf_vlan(struct wx *wx, int add, int vid, u16 vf)
 +{
-+	u16 max_vfs;
++	/* VLAN 0 is a special case, don't allow it to be removed */
++	if (!vid && !add)
++		return 0;
 +
-+	max_vfs = (wx->mac.type == wx_mac_sp) ? 63 : 7;
-+
-+	if (num_vfs > max_vfs)
-+		return -EPERM;
-+
-+	return 0;
++	return wx_set_vfta(wx, vid, vf, (bool)add);
 +}
 +
-+int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs)
++/**
++ *  wx_set_vlan_anti_spoofing - Enable/Disable VLAN anti-spoofing
++ *  @wx: pointer to hardware structure
++ *  @enable: enable or disable switch for VLAN anti-spoofing
++ *  @vf: Virtual Function pool - VF Pool to set for VLAN anti-spoofing
++ *
++ **/
++static void wx_set_vlan_anti_spoofing(struct wx *wx, bool enable, int vf)
 +{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	int err;
++	u32 index = vf / 32, vf_bit = vf % 32;
++	u32 pfvfspoof;
 +
-+	err = wx_check_sriov_allowed(wx, num_vfs);
++	pfvfspoof = rd32(wx, WX_TDM_VLAN_AS(index));
++	if (enable)
++		pfvfspoof |= BIT(vf_bit);
++	else
++		pfvfspoof &= ~BIT(vf_bit);
++	wr32(wx, WX_TDM_VLAN_AS(index), pfvfspoof);
++}
++
++static inline void wx_write_qde(struct wx *wx, u32 vf, u32 qde)
++{
++	struct wx_ring_feature *vmdq = &wx->ring_feature[RING_F_VMDQ];
++	u32 q_per_pool = __ALIGN_MASK(1, ~vmdq->mask);
++	u32 reg = 0, n = vf * q_per_pool / 32;
++	u32 i = vf * q_per_pool;
++
++	reg = rd32(wx, WX_RDM_PF_QDE(n));
++	for (i = (vf * q_per_pool - n * 32);
++	     i < ((vf + 1) * q_per_pool - n * 32);
++	     i++) {
++		if (qde == 1)
++			reg |= qde << i;
++		else
++			reg &= qde << i;
++	}
++
++	wr32(wx, WX_RDM_PF_QDE(n), reg);
++}
++
++static inline void wx_write_hide_vlan(struct wx *wx, u32 vf, u32 hide_vlan)
++{
++	struct wx_ring_feature *vmdq = &wx->ring_feature[RING_F_VMDQ];
++	u32 q_per_pool = __ALIGN_MASK(1, ~vmdq->mask);
++	u32 reg = 0, i = vf * q_per_pool;
++	u32 n = i / 32;
++
++	reg = rd32(wx, WX_RDM_PF_HIDE(n));
++	for (i = (vf * q_per_pool - n * 32);
++	     i < ((vf + 1) * q_per_pool - n * 32);
++	     i++) {
++		if (hide_vlan == 1)
++			reg |= hide_vlan << i;
++		else
++			reg &= hide_vlan << i;
++	}
++
++	wr32(wx, WX_RDM_PF_HIDE(n), reg);
++}
++
++static int wx_enable_port_vlan(struct wx *wx, int vf, u16 vlan, u8 qos)
++{
++	int err = 0;
++
++	err = wx_set_vf_vlan(wx, true, vlan, vf);
 +	if (err)
 +		return err;
++	wx_set_vmvir(wx, vlan, qos, vf);
++	wx_set_vmolr(wx, vf, false);
++	if (wx->vfinfo[vf].spoofchk_enabled)
++		wx_set_vlan_anti_spoofing(wx, true, vf);
++	wx->vfinfo[vf].vlan_count++;
++	/* enable hide vlan */
++	wx_write_qde(wx, vf, 1);
++	wx_write_hide_vlan(wx, vf, 1);
++	wx->vfinfo[vf].pf_vlan = vlan;
++	wx->vfinfo[vf].pf_qos = qos;
 +
-+	if (!num_vfs) {
-+		if (!pci_vfs_assigned(pdev)) {
-+			wx_pci_sriov_disable(pdev);
-+			return 0;
++	return err;
++}
++
++static void wx_clear_vmvir(struct wx *wx, u32 vf)
++{
++	wr32(wx, WX_TDM_VLAN_INS(vf), 0);
++}
++
++static int wx_disable_port_vlan(struct wx *wx, int vf)
++{
++	int err;
++
++	err = wx_set_vf_vlan(wx, false, wx->vfinfo[vf].pf_vlan, vf);
++	wx_clear_vmvir(wx, vf);
++	wx_set_vmolr(wx, vf, true);
++	wx_set_vlan_anti_spoofing(wx, false, vf);
++	if (wx->vfinfo[vf].vlan_count)
++		wx->vfinfo[vf].vlan_count--;
++	/* disable hide vlan */
++	wx_write_hide_vlan(wx, vf, 0);
++	wx->vfinfo[vf].pf_vlan = 0;
++	wx->vfinfo[vf].pf_qos = 0;
++
++	return err;
++}
++
++int wx_ndo_set_vf_vlan(struct net_device *netdev, int vf, u16 vlan,
++		       u8 qos, __be16 vlan_proto)
++{
++	struct wx *wx = netdev_priv(netdev);
++	int err = 0;
++
++	/* VLAN IDs accepted range 0-4094 */
++	if (vf >= wx->num_vfs || vlan > VLAN_VID_MASK - 1 || qos > 7)
++		return -EINVAL;
++
++	if (vlan || qos) {
++		/* Check if there is already a port VLAN set, if so
++		 * we have to delete the old one first before we
++		 * can set the new one.  The usage model had
++		 * previously assumed the user would delete the
++		 * old port VLAN before setting a new one but this
++		 * is not necessarily the case.
++		 */
++		if (wx->vfinfo[vf].pf_vlan) {
++			err = wx_disable_port_vlan(wx, vf);
++			if (err)
++				return err;
 +		}
++		err = wx_enable_port_vlan(wx, vf, vlan, qos);
 +
-+		wx_err(wx, "can't free VFs because some are assigned to VMs.\n");
-+		return -EBUSY;
++	} else {
++		err = wx_disable_port_vlan(wx, vf);
 +	}
 +
-+	err = wx_pci_sriov_enable(pdev, num_vfs);
-+	if (err)
-+		return err;
-+
-+	return num_vfs;
++	return err;
 +}
-+EXPORT_SYMBOL(wx_pci_sriov_configure);
++EXPORT_SYMBOL(wx_ndo_set_vf_vlan);
++
++int wx_ndo_set_vf_spoofchk(struct net_device *netdev, int vf, bool setting)
++{
++	u32 index = vf / 32, vf_bit = vf % 32;
++	struct wx *wx = netdev_priv(netdev);
++	u32 regval;
++
++	if (vf >= wx->num_vfs)
++		return -EINVAL;
++
++	wx->vfinfo[vf].spoofchk_enabled = setting;
++
++	regval = (setting << vf_bit);
++	wr32m(wx, WX_TDM_MAC_AS(index), regval | BIT(vf_bit), regval);
++
++	if (wx->vfinfo[vf].vlan_count)
++		wr32m(wx, WX_TDM_VLAN_AS(index), regval | BIT(vf_bit), regval);
++
++	return 0;
++}
++EXPORT_SYMBOL(wx_ndo_set_vf_spoofchk);
++
++static inline void wx_ping_vf(struct wx *wx, int vf)
++{
++	u32 ping;
++
++	ping = WX_PF_CONTROL_MSG;
++	if (wx->vfinfo[vf].clear_to_send)
++		ping |= WX_VT_MSGTYPE_CTS;
++	wx_write_mbx_pf(wx, &ping, 1, vf);
++}
++
++/**
++ * wx_set_vf_rx_tx - Set VF rx tx
++ * @wx: Pointer to wx struct
++ * @vf: VF identifier
++ *
++ * Set or reset correct transmit and receive for vf
++ **/
++static void wx_set_vf_rx_tx(struct wx *wx, int vf)
++{
++	u32 reg_cur_tx, reg_cur_rx, reg_req_tx, reg_req_rx;
++	u32 index, vf_bit;
++
++	vf_bit = vf % 32;
++	index = vf / 32;
++
++	reg_cur_tx = rd32(wx, WX_TDM_VF_TE(index));
++	reg_cur_rx = rd32(wx, WX_RDM_VF_RE(index));
++
++	if (wx->vfinfo[vf].link_enable) {
++		reg_req_tx = reg_cur_tx | BIT(vf_bit);
++		reg_req_rx = reg_cur_rx | BIT(vf_bit);
++		/* Enable particular VF */
++		if (reg_cur_tx != reg_req_tx)
++			wr32(wx, WX_TDM_VF_TE(index), reg_req_tx);
++		if (reg_cur_rx != reg_req_rx)
++			wr32(wx, WX_RDM_VF_RE(index), reg_req_rx);
++	} else {
++		reg_req_tx = BIT(vf_bit);
++		reg_req_rx = BIT(vf_bit);
++		/* Disable particular VF */
++		if (reg_cur_tx & reg_req_tx)
++			wr32(wx, WX_TDM_VFTE_CLR(index), reg_req_tx);
++		if (reg_cur_rx & reg_req_rx)
++			wr32(wx, WX_RDM_VFRE_CLR(index), reg_req_rx);
++	}
++}
++
++static void wx_set_vf_link_state(struct wx *wx, int vf, int state)
++{
++	wx->vfinfo[vf].link_state = state;
++	switch (state) {
++	case IFLA_VF_LINK_STATE_AUTO:
++		if (netif_running(wx->netdev))
++			wx->vfinfo[vf].link_enable = true;
++		else
++			wx->vfinfo[vf].link_enable = false;
++		break;
++	case IFLA_VF_LINK_STATE_ENABLE:
++		wx->vfinfo[vf].link_enable = true;
++		break;
++	case IFLA_VF_LINK_STATE_DISABLE:
++		wx->vfinfo[vf].link_enable = false;
++		break;
++	}
++	/* restart the VF */
++	wx->vfinfo[vf].clear_to_send = false;
++	wx_ping_vf(wx, vf);
++
++	wx_set_vf_rx_tx(wx, vf);
++}
++
++/**
++ * wx_ndo_set_vf_link_state - Set link state
++ * @netdev: network interface device structure
++ * @vf: VF identifier
++ * @state: required link state
++ *
++ * Set the link state of a specified VF, regardless of physical link state
++ **/
++int wx_ndo_set_vf_link_state(struct net_device *netdev, int vf, int state)
++{
++	struct wx *wx = netdev_priv(netdev);
++	int ret = 0;
++
++	if (vf < 0 || vf >= wx->num_vfs) {
++		wx_err(wx, "NDO set VF link - invalid VF identifier %d\n", vf);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	switch (state) {
++	case IFLA_VF_LINK_STATE_ENABLE:
++		wx_err(wx, "NDO set VF %d link state %d - not supported\n",
++		       vf, state);
++		break;
++	case IFLA_VF_LINK_STATE_DISABLE:
++	case IFLA_VF_LINK_STATE_AUTO:
++		wx_set_vf_link_state(wx, vf, state);
++		break;
++	default:
++		wx_err(wx, "NDO set VF %d - invalid link state %d\n", vf, state);
++		ret = -EINVAL;
++	}
++out:
++	return ret;
++}
++EXPORT_SYMBOL(wx_ndo_set_vf_link_state);
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-new file mode 100644
-index 000000000000..17b547ae8862
---- /dev/null
+index 17b547ae8862..6ee1fdff492b 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-@@ -0,0 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2015 - 2024 Beijing WangXun Technology Co., Ltd. */
-+
-+#ifndef _WX_SRIOV_H_
-+#define _WX_SRIOV_H_
-+
-+int wx_disable_sriov(struct wx *wx);
-+int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs);
-+
-+#endif /* _WX_SRIOV_H_ */
+@@ -6,5 +6,10 @@
+ 
+ int wx_disable_sriov(struct wx *wx);
+ int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs);
++int wx_ndo_get_vf_config(struct net_device *netdev, int vf, struct ifla_vf_info *ivi);
++int wx_ndo_set_vf_vlan(struct net_device *netdev, int vf, u16 vlan, u8 qos, __be16 vlan_proto);
++int wx_ndo_set_vf_mac(struct net_device *netdev, int vf, u8 *mac);
++int wx_ndo_set_vf_spoofchk(struct net_device *netdev, int vf, bool setting);
++int wx_ndo_set_vf_link_state(struct net_device *netdev, int vf, int state);
+ 
+ #endif /* _WX_SRIOV_H_ */
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index f29ac955dc83..c1bf8653b900 100644
+index c1bf8653b900..2e2b997f4572 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -18,6 +18,7 @@
- /* MSI-X capability fields masks */
- #define WX_PCIE_MSIX_TBL_SZ_MASK                0x7FF
- #define WX_PCI_LINK_STATUS                      0xB2
-+#define WX_MAX_PF_MACVLANS                      15
+@@ -75,6 +75,10 @@
+ #define WX_MAC_LXONOFFRXC            0x11E0C
  
- /**************** Global Registers ****************************/
- /* chip control Registers */
-@@ -88,6 +89,9 @@
- #define WX_CFG_TAG_TPID(_i)          (0x14430 + ((_i) * 4))
- #define WX_CFG_PORT_CTL_NUM_VT_MASK  GENMASK(13, 12) /* number of TVs */
+ /*********************** Receive DMA registers **************************/
++#define WX_RDM_VF_RE(_i)             (0x12004 + ((_i) * 4))
++#define WX_RDM_PF_QDE(_i)            (0x12080 + ((_i) * 4))
++#define WX_RDM_PF_HIDE(_i)           (0x12090 + ((_i) * 4))
++#define WX_RDM_VFRE_CLR(_i)          (0x120A0 + ((_i) * 4))
+ #define WX_RDM_DRP_PKT               0x12500
+ #define WX_RDM_PKT_CNT               0x12504
+ #define WX_RDM_BYTE_CNT_LSB          0x12508
+@@ -114,6 +118,9 @@
+ /*********************** Transmit DMA registers **************************/
+ /* transmit global control */
+ #define WX_TDM_CTL                   0x18000
++#define WX_TDM_VF_TE(_i)             (0x18004 + ((_i) * 4))
++#define WX_TDM_VFTE_CLR(_i)          (0x180A0 + ((_i) * 4))
++
+ /* TDM CTL BIT */
+ #define WX_TDM_CTL_TE                BIT(0) /* Transmit Enable */
+ #define WX_TDM_PB_THRE(_i)           (0x18020 + ((_i) * 4))
+@@ -244,6 +251,15 @@
+ #define WX_RSC_ST                    0x17004
+ #define WX_RSC_ST_RSEC_RDY           BIT(0)
  
-+#define WX_CFG_PORT_CTL_NUM_VT_8     FIELD_PREP(GENMASK(13, 12), 1)
-+#define WX_CFG_PORT_CTL_NUM_VT_32    FIELD_PREP(GENMASK(13, 12), 2)
-+#define WX_CFG_PORT_CTL_NUM_VT_64    FIELD_PREP(GENMASK(13, 12), 3)
- 
- /* GPIO Registers */
- #define WX_GPIO_DR                   0x14800
-@@ -161,6 +165,7 @@
- /******************************* PSR Registers *******************************/
- /* psr control */
- #define WX_PSR_CTL                   0x15000
-+#define WX_PSR_VM_CTL                0x151B0
- /* Header split receive */
- #define WX_PSR_CTL_SW_EN             BIT(18)
- #define WX_PSR_CTL_RSC_ACK           BIT(17)
-@@ -181,6 +186,7 @@
- /* mcasst/ucast overflow tbl */
- #define WX_PSR_MC_TBL(_i)            (0x15200  + ((_i) * 4))
- #define WX_PSR_UC_TBL(_i)            (0x15400 + ((_i) * 4))
-+#define WX_PSR_VM_CTL_POOL_MASK      GENMASK(12, 7)
- 
- /* VM L2 contorl */
- #define WX_PSR_VM_L2CTL(_i)          (0x15600 + ((_i) * 4))
-@@ -943,6 +949,7 @@ struct wx_ring_feature {
- enum wx_ring_f_enum {
- 	RING_F_NONE = 0,
- 	RING_F_RSS,
-+	RING_F_VMDQ,
- 	RING_F_ARRAY_SIZE  /* must be last in enum set */
++/*********************** Transmit DMA registers **************************/
++/* transmit global control */
++#define WX_TDM_ETYPE_AS(_i)          (0x18058 + ((_i) * 4))
++#define WX_TDM_MAC_AS(_i)            (0x18060 + ((_i) * 4))
++#define WX_TDM_VLAN_AS(_i)           (0x18070 + ((_i) * 4))
++#define WX_TDM_VLAN_INS(_i)          (0x18100 + ((_i) * 4))
++/* Per VF Port VLAN insertion rules */
++#define WX_TDM_VLAN_INS_VLANA_DEFAULT BIT(30) /* Always use default VLAN*/
++
+ /****************************** TDB ******************************************/
+ #define WX_TDB_PB_SZ(_i)             (0x1CC00 + ((_i) * 4))
+ #define WX_TXPKT_SIZE_MAX            0xA /* Max Tx Packet size */
+@@ -1000,6 +1016,13 @@ struct vf_data_storage {
+ 	bool link_enable;
+ 	bool trusted;
+ 	int xcast_mode;
++	bool clear_to_send;
++	u16 pf_vlan; /* When set, guest VLAN config not allowed. */
++	u16 pf_qos;
++	bool pf_set_mac;
++
++	u16 vlan_count;
++	int link_state;
  };
  
-@@ -986,9 +993,33 @@ struct wx_hw_stats {
- 	u64 qmprc;
- };
- 
-+struct vf_data_storage {
-+	struct pci_dev *vfdev;
-+	unsigned char vf_mac_addr[ETH_ALEN];
-+	bool spoofchk_enabled;
-+	bool link_enable;
-+	bool trusted;
-+	int xcast_mode;
-+};
-+
-+struct vf_macvlans {
-+	struct list_head l;
-+	int vf;
-+	bool free;
-+	bool is_macvlan;
-+	u8 vf_macvlan[ETH_ALEN];
-+};
-+
-+enum wx_pf_flags {
-+	WX_FLAG_VMDQ_ENABLED,
-+	WX_FLAG_SRIOV_ENABLED,
-+	WX_PF_FLAGS_NBITS		/* must be last */
-+};
-+
- struct wx {
- 	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
- 
-+	DECLARE_BITMAP(flags, WX_PF_FLAGS_NBITS);
- 	void *priv;
- 	u8 __iomem *hw_addr;
- 	struct pci_dev *pdev;
-@@ -1076,6 +1107,13 @@ struct wx {
- 	u64 hw_csum_rx_good;
- 	u64 hw_csum_rx_error;
- 	u64 alloc_rx_buff_failed;
-+
-+	unsigned int num_vfs;
-+	struct vf_data_storage *vfinfo;
-+	struct vf_macvlans vf_mvs;
-+	struct vf_macvlans *mv_list;
-+
-+	int (*setup_tc)(struct net_device *netdev, u8 tc);
- };
- 
- #define WX_INTR_ALL (~0ULL)
+ struct vf_macvlans {
 -- 
 2.43.2
 
