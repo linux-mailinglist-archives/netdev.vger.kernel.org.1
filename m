@@ -1,57 +1,54 @@
-Return-Path: <netdev+bounces-84621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3786F8979CE
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:33:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 672938979D0
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3874B226A0
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:33:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E47C1B22998
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FEF445953;
-	Wed,  3 Apr 2024 20:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BCE155A25;
+	Wed,  3 Apr 2024 20:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vRoo6MNq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JmGgUXU8"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE183D962
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 20:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C969146018
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 20:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712176422; cv=none; b=G3zXOtrjhnYCJfoCVIhnVeC/fV8hkYHn6RcD6F7ttg4MC3BQGu3ZR6AzZF8PjhLYVB3dSAe+Pys8aSt+9q94LRNQQPeIweZ1ISLU58z/7yr30pMfkQHYcOWKtVKsp+9p2taQtDezZPEMSNqH8Lp7+Nc2QZfUvenDupUKmmBbdD0=
+	t=1712176529; cv=none; b=FMXYmcw3nKymPltT3ugsQdwcrhusKgFMTS4JbQ+llHo53dagWjviGrAh6N5y/5to7Q5pir+IB+l1dgeSvwB1EtNfw5biG/hxQCB9yB0dIr/rECWhONUkeetMJZgRhA402J5AINBQKghnQRjuAhFZFnv2UFvzUPjxk9y7Lw7E1bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712176422; c=relaxed/simple;
-	bh=kV8yQKJMR9jgfC4VsLHdnSuZHZcDR6fGoCVZgRwm4Fo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dd96RgtxnOy8EvC06iFuzF9anFQWYoM5evGyu3ZbjaU6Q0GyFVUISLESvGB1rW+voyCpSZL4n1QNgE9NbJkm7jlKT0B38mfR5MmLXxwSXnT4+mCfmB79ohtDz6S4erYK8/MWuiTrTFs/4CYkz5HiYdCZcpXurCrvbrR39dTU9u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vRoo6MNq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=svmXAR7X5aWdFJv6efM1jOZkodKsLr7G7IbwzDTyPno=; b=vRoo6MNqzwvgcS2dgXN2VgdoKm
-	t16Bd8bWkTXCeTpqn8YGdYfyLFhSjmkwbiL6ne/dya0q60uV0fZBKTd1Rl5ResMXhcqG0DrK+xHun
-	on5IUwNYvBoIfg2XMfXedkYlbvcDnqNQLoLsGp8zvpVR0rtd5mbu76ZbhGJXH3AthwRY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rs7IW-00C74J-R3; Wed, 03 Apr 2024 22:33:28 +0200
-Date: Wed, 3 Apr 2024 22:33:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
+	s=arc-20240116; t=1712176529; c=relaxed/simple;
+	bh=+qORx5matsjqP5sTFy6Psrj5nLqFXic/oNqJWuGDQMw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=l0tgXoXhWu1jIlBiGpYqE3CfNMk4JJQjKKNx11kwz8v3wccX/pBH0GOn9f+izSLuTyePZvH8YlDdUqIzJsH1eu0g3/gFEVg2w1uOOX0sEOpKYbFw081GS0C2OVIPJHET6johvq2+NunLqmokT88YUmtxuxXza64+6E/+Psy1xxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JmGgUXU8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2198C433F1;
+	Wed,  3 Apr 2024 20:35:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712176529;
+	bh=+qORx5matsjqP5sTFy6Psrj5nLqFXic/oNqJWuGDQMw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=JmGgUXU8DLPkIFK6G+k7yofrsD8WLwWxx8jLyigy7gt627QMzvfnpx7uF5ACfOmpw
+	 M2d2J10gCu64mwNqlQK97GYj/+/sTZ8NFAsjkmcpyKXf42GS2llinho2ADMC2CCYIH
+	 jfSvWlmacKiTBUB5mW8j+zT+zVPaUmssGW7vxtb6kyDvtpPNjCs6aiH8MzFeoO891O
+	 eG9ZmvKLRneQMq753TQJRK1C68cRMoJKvY1Qk5b+gtyK0aiHFmwrWCQS5hvaMkQRx/
+	 nupoEJnjCMJML1lq+dNjgd31ck+R9O+VcdbHjZZOMyftWBsb6/057V2ZHiME+MfWqZ
+	 94f/8Nt2SMm9A==
+Date: Wed, 3 Apr 2024 15:35:26 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
 To: Alexander Duyck <alexander.duyck@gmail.com>
 Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
 	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 02/15] eth: fbnic: add scaffolding for Meta's
- NIC driver
-Message-ID: <7b4e73da-6dd7-4240-9e87-157832986dc0@lunn.ch>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <171217491384.1598374.15535514527169847181.stgit@ahduyck-xeon-server.home.arpa>
+Subject: Re: [net-next PATCH 03/15] eth: fbnic: Allocate core device specific
+ structures and devlink interface
+Message-ID: <20240403203526.GA1887417@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,21 +57,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <171217491384.1598374.15535514527169847181.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: <171217491765.1598374.8648487319055615080.stgit@ahduyck-xeon-server.home.arpa>
 
-> + * fbnic_init_module - Driver Registration Routine
-> + *
-> + * The first routine called when the driver is loaded.  All it does is
-> + * register with the PCI subsystem.
-> + **/
-> +static int __init fbnic_init_module(void)
+On Wed, Apr 03, 2024 at 01:08:37PM -0700, Alexander Duyck wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
+> 
+> At the core of the fbnic device will be the devlink interface. This
+> interface will eventually provide basic functionality in the event that
+> there are any issues with the network interface.
+> 
+> Add support for allocating the MSI-X vectors and setting up the BAR
+> mapping. With this we can start enabling various subsytems and start
+> brining up additional interfaces such the AXI fabric and the firmware
+> mailbox.
+
+> +int fbnic_alloc_irqs(struct fbnic_dev *fbd)
 > +{
-> +	int err;
+> +	unsigned int wanted_irqs = FBNIC_NON_NAPI_VECTORS;
+> +	struct pci_dev *pdev = to_pci_dev(fbd->dev);
+> +	struct msix_entry *msix_entries;
+> +	int i, num_irqs;
 > +
-> +	pr_info(DRV_SUMMARY " (%s)", fbnic_driver.name);
+> +	msix_entries = kcalloc(wanted_irqs, sizeof(*msix_entries), GFP_KERNEL);
+> +	if (!msix_entries)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < wanted_irqs; i++)
+> +		msix_entries[i].entry = i;
+> +
+> +	num_irqs = pci_enable_msix_range(pdev, msix_entries,
+> +					 FBNIC_NON_NAPI_VECTORS + 1,
+> +					 wanted_irqs);
 
-Please don't spam the kernel log like this. Drivers should only report
-when something goes wrong.
+FWIW, deprecated in favor of pci_alloc_irq_vectors().
 
-     Andrew
+> +	if (num_irqs < 0) {
+> +		dev_err(fbd->dev, "Failed to allocate MSI-X entries\n");
+> +		kfree(msix_entries);
+> +		return num_irqs;
+> +	}
+> +
+> +	if (num_irqs < wanted_irqs)
+> +		dev_warn(fbd->dev, "Allocated %d IRQs, expected %d\n",
+> +			 num_irqs, wanted_irqs);
+> +
+> +	fbd->msix_entries = msix_entries;
+> +	fbd->num_irqs = num_irqs;
+> +
+> +	return 0;
+> +}
 
