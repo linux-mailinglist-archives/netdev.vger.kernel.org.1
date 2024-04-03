@@ -1,116 +1,153 @@
-Return-Path: <netdev+bounces-84413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32723896D58
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:55:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C2C896DB7
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 644431C25338
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:55:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 316301C2291E
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219D41419BA;
-	Wed,  3 Apr 2024 10:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18330135A5F;
+	Wed,  3 Apr 2024 11:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PP++8r8Z"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dcL+CNGP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385BE136980
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 10:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E186071736;
+	Wed,  3 Apr 2024 11:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712141716; cv=none; b=dCCj3dC2DD+zmdLgLogBw66POyRkrKhnamDwUNZevC7jt0+36QVt6ILahE61Fpbd7MOuhmw2REAW7ZV77Y5GKM9ASypQip3c0is6SfT2aUhaKETZIFRzZyJK8/Vi/aI4I1bsErNnx0VHcufgP48mNhSZkMDVW3PjQSo9AHfutk8=
+	t=1712142627; cv=none; b=GJOUlFu6LUYExCyqV4yjaIVXqsw5lfOp770NwK8lGlgqUrmOxlnFwLD62WU9J9U6QHjejhsvGZs7+3zEeZz5IZSl47RN/At/wI8K6hI9YA+wEotGBujqlQDKa7XJJhnAgY4I30BAeXozLeeQYto7LFNQFe0B4HHRxj1PIvXQ1/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712141716; c=relaxed/simple;
-	bh=ACQpn9vs7GeKGUhlQvB3CXp7C7P0aciqvgBCFb4+LHI=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=m/b1q6mts8iRaqua78X1tKVN+XCg2ioTH0KieReDveTXfTRnLim2GQtxpmUEAca7fla2A4SSpxPNsIjQ9z3RsyY1kZtw1YeerKTOFTsWz4vf6T0u0K6ApDHXcdkjpBc0PrD98fiHaxoKcXPiFwPVujLAUbYMqOe+CJucwQggG/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PP++8r8Z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712141713;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JOHdI5+Rm0qGsBNAwcaXDe1QoVGd2FuT8Hymhfhq4nw=;
-	b=PP++8r8ZmpRyUlrcj2v3Wy11ek17NGtA+K5ivLqU+r7mCAyiGGdL9ovrhnzUGnsOgpN/by
-	tGxQf+ed0Eakzgrh/H+ELH5TXS2meOZ3DwyB/a6U/Ksu22jy5QXkU6TyPEVxmupwCPG+FZ
-	d7NK68gXhDAH8q+E7KPj4qOlSrJfh7s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-XFTgKXIOOraQHI6hCfH_XA-1; Wed, 03 Apr 2024 06:55:10 -0400
-X-MC-Unique: XFTgKXIOOraQHI6hCfH_XA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D0A868007BB;
-	Wed,  3 Apr 2024 10:55:08 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 97C6CC1576F;
-	Wed,  3 Apr 2024 10:55:05 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240403101422.GA7285@lst.de>
-References: <20240403101422.GA7285@lst.de> <20240403085918.GA1178@lst.de> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-16-dhowells@redhat.com> <3235934.1712139047@warthog.procyon.org.uk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
-    Jeff Layton <jlayton@kernel.org>,
-    Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 15/26] mm: Export writeback_iter()
+	s=arc-20240116; t=1712142627; c=relaxed/simple;
+	bh=PXKwheSMBDHAhole9euixLRVwgV5Y8aJZfZi6SaclZ0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Q7Xsqd1jP/GRifX5IFfj6qG/G4QDTyffIsK1tgl7XdsZlgKqUHEkEyfjCtlwAXbsFbet8KHPLrNgDUmo8ykQMdn/zB9hBloUwRuIprnamI+/uZRbYTfi9ZktxlTIOdGTTryhsjJS2UtKF3WDzYQ7b3W8RlSm1q615BEpTKjtbRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dcL+CNGP; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 433B7kJp010399;
+	Wed, 3 Apr 2024 11:10:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=PXKwheSMBDHAhole9euixLRVwgV5Y8aJZfZi6SaclZ0=;
+ b=dcL+CNGP7Eadz1zNz40SHzP4iD9G4+GZkntxxtjeyhRMzy4/LcilendHiNNhltu99x7B
+ 0v1Y15/Ok6YWwGGIoZU3s8ciYZDo8+VvJGym+B2h8paV11kPlDgk40roeoFqMMNkcCFd
+ elvGVratBa2rCY2maudjLjxtXhtL0M5ikzVREQK73Vpit/kkfkwh68hII8+1IjB4VyBu
+ qokUmsZ6zx8z6ZgITgfr30Nfwnzcbn/o8rnplON41PIgzZkjR/hkaNY0Ao08RrtEhJ79
+ VyavQIDlegdWU3Ar0YVTPyRA5U4vgiU4lya/dlWCm1y1YA/tLUP8Mg5Zp5bx55GXtI6U Gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x95y3r07d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 11:10:20 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 433BAJdM015185;
+	Wed, 3 Apr 2024 11:10:19 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x95y3r076-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 11:10:19 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4338hKvA025753;
+	Wed, 3 Apr 2024 11:10:18 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x6x2pcuhj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 11:10:18 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 433BACJ152494712
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 3 Apr 2024 11:10:14 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6824B2004B;
+	Wed,  3 Apr 2024 11:10:12 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5237120040;
+	Wed,  3 Apr 2024 11:10:11 +0000 (GMT)
+Received: from [9.171.60.51] (unknown [9.171.60.51])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  3 Apr 2024 11:10:11 +0000 (GMT)
+Message-ID: <27deaa5dbb30c467fcdaa0667ef39da86bcee03f.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH net-next v5 00/11] net/smc: SMC intra-OS shortcut
+ with loopback-ism
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, jaka@linux.ibm.com
+Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Date: Wed, 03 Apr 2024 13:10:11 +0200
+In-Reply-To: <ae3ea4bc-4a9c-416e-a593-2885fea96ae5@linux.alibaba.com>
+References: <20240324135522.108564-1-guwen@linux.alibaba.com>
+	 <ae3ea4bc-4a9c-416e-a593-2885fea96ae5@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3300437.1712141700.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 Apr 2024 11:55:00 +0100
-Message-ID: <3300438.1712141700@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ce7qubRAeV5EEZsVKMQkzEKCIjVunFNz
+X-Proofpoint-GUID: XoV1yXKEtnqtlaIox7kFaZuWPWP8Qgya
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-03_10,2024-04-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 adultscore=0
+ mlxscore=0 mlxlogscore=999 phishscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 bulkscore=0 impostorscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2403210000
+ definitions=main-2404030077
 
-Christoph Hellwig <hch@lst.de> wrote:
+On Wed, 2024-04-03 at 14:35 +0800, Wen Gu wrote:
+>=20
+>=20
+> On 2024/3/24 21:55, Wen Gu wrote:
+> > This patch set acts as the second part of the new version of [1]
+> > (The first
+> > part can be referred from [2]), the updated things of this version
+> > are listed
+> > at the end.
+>=20
+> > Change log:
+> >=20
+> > RFC v5->RFC v4:
+> > - Patch #2: minor changes in description of config SMC_LO and
+> > comments.
+> > - Patch #10: minor changes in comments and
+> > if(smc_ism_support_dmb_nocopy())
+> > =C2=A0=C2=A0 check in smcd_cdc_msg_send().
+> > - Patch #3: change smc_lo_generate_id() to smc_lo_generate_ids()
+> > and SMC_LO_CHID
+> > =C2=A0=C2=A0 to SMC_LO_RESERVED_CHID.
+> > - Patch #5: memcpy while holding the ldev->dmb_ht_lock.
+> > - Some expression changes in commit logs.
+> >=20
+>=20
+> Hi, Jan. Do you have any comments on this version and should I post a
+> new patch series without 'RFC'? Thank you.
 
-> On Wed, Apr 03, 2024 at 11:10:47AM +0100, David Howells wrote:
-> > That depends.  You put a comment on write_cache_pages() saying that pe=
-ople
-> > should use writeback_iter() instead.  w_c_p() is not marked GPL.  Is i=
-t your
-> > intention to get rid of it?
-> =
+Hi Wen,
 
-> Yes.  If you think you're not a derivate work of Linux you have no
-> business using either one.
+Jan has been out sick for a little while now, and Wenjia is expected
+back from a longer vacation tomorrow. So if you could hold off until
+begin of next week, Wenjia might have some more feedback.
 
-So why are we bothering with EXPORT_SYMBOL at all?  Why don't you just sen=
-d a
-patch replace all of them with EXPORT_SYMBOL_GPL()?
+In the meantime, I'm looking at your patchset...
 
-David
+Thank you, Gerd
+
 
 
