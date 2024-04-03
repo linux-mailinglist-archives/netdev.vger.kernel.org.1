@@ -1,151 +1,144 @@
-Return-Path: <netdev+bounces-84268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F438962EE
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 05:27:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB46896317
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 05:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C5961C22275
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:27:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4060A280EF7
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3EE224DB;
-	Wed,  3 Apr 2024 03:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481153F9E9;
+	Wed,  3 Apr 2024 03:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P0b/LIAQ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kjhZyHul"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E0E1BC59
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 03:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894CF3E48E;
+	Wed,  3 Apr 2024 03:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712114849; cv=none; b=sd4P0dTryK/CtnNy2/l+xcy1n9Y+ye+Ma/CpYdglCuWavsMDFETaZRQEsEr1qzBu6HQcwMG5qjI+aObqUCga0KvIvgcSJerCN9hXPollV45JAHz0TeSkX2LiWsRelsI/aGy7UTFC3g9286OQMNZ4BNmHJ1+KrchAOg1Z2sjefUM=
+	t=1712115597; cv=none; b=JHXxD3Ry4L+rEmGCnm5xQ0fD0cB2ZitB5lWNMWY1tOMjq4I52ab41AB/0/qpOEseM2LUoXZnqLAT+cZmAVhnwrd1zXbZZLpVfd9z8tZwmNwRGhNLhPv97Srr+44ptWfuE/Lsk+DZQ0udNqXjEfAHq3dbbDufvZwK1N7wqaohuSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712114849; c=relaxed/simple;
-	bh=3DcUJUQf6Wa4OXd44pA2EifLwcLrk+26Cdl9DBdQFfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XgWMBunVruSsCefcPX1kno4ZFFI7q2UhfPiC/wgkXJ1kHpu/5tiBtbphEGzhFONEZBQxlsoWzWM3v2EUW/S/c9PBUVVZ/UWL09zC1A4DsTQi0tTlUIIjBjzVEWxGtHCQ3HdABKF/64XpV36jLeodAIEvp5ojMUSTjuDkaKRglEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P0b/LIAQ; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-29f93c4946cso4303395a91.1
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 20:27:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712114848; x=1712719648; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MjrhfohyyhZYXmPTuNJHBaaFu2XauoKgKxYCWVGiSIE=;
-        b=P0b/LIAQQr7DH5nhESOW074Sps9jsFTdzbj6K2dw5sVFNQS8YaptU0pzjdJK5Z5H1r
-         zMh5b8SMxdVGu7/WluAvre6vcWBFFVYSI3Z9cW1xsxo6aDiYcC8JcUiWNtcKxd00ITE/
-         BgoqjoD0pefOEcR+GxnCkPd3OmQgfP1XNFKYb3iQy7QlHuPfo7SU6fDyONjfzonf5x2H
-         /PeMowF9z7l7DsKZ40ns5gHRNqa8OZZ8xzy+Q+1Zt/H3wGNDcrHaWjl4XBWYZDznJ41L
-         BiVzHKReumnfBGZ/i+v5QlITcZUmk1EAjlaYqqSthZxcjct9NhW5xZAVT6poF28OhgbS
-         rN5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712114848; x=1712719648;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MjrhfohyyhZYXmPTuNJHBaaFu2XauoKgKxYCWVGiSIE=;
-        b=xDoEhsyoYkXGLLXPc7Q5zQgtv67AhkVRSPO9nvT5kcXKuTMe//eiRKxoom0W3FHS7A
-         L6vUEJjQg9+FrIYFYbkSA4DU3os/jk+s1UCWeUsUez2t7bXAwDz/wxCN964D0BaAmgUs
-         CnnP71zKEmJycGT5qX/DMHYt8zkXdV/AVwIW90UAF+sRIbqgS/30wsZgUGF/sHI4loV0
-         R5E/vRNwzS3xcZ8jpclPR70v/y3oSUc4M/A6Fwym5rDY5ixyrnwHqNb+aaTl0MsTnGus
-         8g1JGoBeouMNAfe9tC4ZrxU3L/OFQugabMdME2czEvrD2Z6Q9tUKtv32jN8eQRLHcdEZ
-         g+fw==
-X-Gm-Message-State: AOJu0YzpLCR14g/6bKSwyrY1SCojCp6ZrfiI3lu4ztGVL3Pebq0woDfy
-	DcA/AJxKzNIDcM8Dxnjz/mgLOkW2G6EhOP4M9HYV7O/DVzWn/2Mn
-X-Google-Smtp-Source: AGHT+IEhqjBXtuRkOF7Iv8otGypAJNTjTqNBTnrxfTRnIumvgAyT7iWglb9a4MT8sSN+DPc5SsREig==
-X-Received: by 2002:a17:90a:8b89:b0:2a2:18fb:683e with SMTP id z9-20020a17090a8b8900b002a218fb683emr10133063pjn.30.1712114847664;
-        Tue, 02 Apr 2024 20:27:27 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id gw12-20020a17090b0a4c00b002a06a806567sm10418875pjb.49.2024.04.02.20.27.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 20:27:27 -0700 (PDT)
-Date: Wed, 3 Apr 2024 11:27:22 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Stanislav Fomichev <sdf@google.com>
-Subject: Re: [PATCHv3 net-next 2/2] ynl: support binary/u32 sub-type for
- indexed-array
-Message-ID: <ZgzMmqWzRvdk4wzP@Laptop-X1>
-References: <20240401035651.1251874-1-liuhangbin@gmail.com>
- <20240401035651.1251874-3-liuhangbin@gmail.com>
- <20240401214331.149e0437@kernel.org>
- <Zgy-0vYLeaY-lMnR@Laptop-X1>
- <20240402193551.38a5aead@kernel.org>
+	s=arc-20240116; t=1712115597; c=relaxed/simple;
+	bh=vsYTyHZbz3YwYaV3ajc98Gk+zAeEUCnLJQKC3yldWmo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A2Wy/eHoRv3XYBsy1OfjhKTntME/9Mw7w4bDr9ATPR2m17Mrxzmaa7ELf5V4EUmDOVOesasI+w0XGsw57ksdmtCO3UNHTSRa+Hqa/DcHbKapi2GJAMgyiqOYAdHAwHzSRJUfLKkoggBsjYK3cByu8ziIskLsuTpmHirQDbvdQB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kjhZyHul; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 432K3FI4029252;
+	Tue, 2 Apr 2024 20:39:37 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pfpt0220; bh=/BY57IBLf+yABTirJWi18E
+	+1Z/d+IYDmnVTMqS6JZfQ=; b=kjhZyHulAB+3lmLlWr/x1liznmQTLqF6MI3g6s
+	juedvaHYkO/DSp3R6AcV651ivy0hBeMvnHDjrtcnYF1KMgrgvijS8ffFrDhddxvG
+	V8vMOUDb11z6ZgOzoKjrFnN952TuMpHeyc64M62qPLtRZPZ57h+nUmrFh0iULYus
+	vS29qb3/ILPaEvJUXGkZo8eOTe9UV05fFXgJ231TI7VVMYkSCaEB7aY9d+/Cikfm
+	9kenj/FL8pm+mRQAeIDlwGRpiQ+lLFaCv3n4DI4rWBWmcbRafCODhyE/T7RcLgEe
+	WfLK2Hhu4De3VS1tw+yqmbUcqNVjkQLgG2mC8vFEFiiu1F1w==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3x809fx762-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Apr 2024 20:39:37 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 2 Apr 2024 20:39:37 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 2 Apr 2024 20:39:36 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id ADB2D3F7044;
+	Tue,  2 Apr 2024 20:39:33 -0700 (PDT)
+Date: Wed, 3 Apr 2024 09:09:32 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+CC: Sergey Shtylyov <s.shtylyov@omp.ru>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Niklas
+ =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+        <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] net: ravb: Always process TX descriptor ring
+Message-ID: <20240403033932.GA1652207@maili.marvell.com>
+References: <20240402145305.82148-1-paul.barker.ct@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20240402193551.38a5aead@kernel.org>
+In-Reply-To: <20240402145305.82148-1-paul.barker.ct@bp.renesas.com>
+X-Proofpoint-GUID: lwwmbmCWzRzUI69ZRDR5BWE6p3BzwolQ
+X-Proofpoint-ORIG-GUID: lwwmbmCWzRzUI69ZRDR5BWE6p3BzwolQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-03_02,2024-04-01_01,2023-05-22_02
 
-On Tue, Apr 02, 2024 at 07:35:51PM -0700, Jakub Kicinski wrote:
-> On Wed, 3 Apr 2024 10:28:34 +0800 Hangbin Liu wrote:
-> > I didn't check other subsystem. For bonding only, if we don't have the hint.
-> > e.g.
-> > 
-> >   -
-> >     name: arp-ip-target
-> >     type: indexed-array
-> >     sub-type: u32
-> > 
-> > The result will looks like:
-> > 
-> >     "arp-ip-target": [
-> >       "c0a80101",
-> >       "c0a80102"
-> >     ],
-> > 
-> > Which looks good to me. Do you have other suggestion?
-> 
-> That doesn't look right, without the format hint if the type is u32 
-> the members should be plain integers not hex strings.
+On 2024-04-02 at 20:23:04, Paul Barker (paul.barker.ct@bp.renesas.com) wrote:
+> The TX queue should be serviced each time the poll function is called,
+> even if the full RX work budget has been consumed. This prevents
+> starvation of the TX queue when RX bandwidth usage is high.
+>
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> ---
+> Changes from v1:
+>   * Use the correct 'Fixes' tag.
+>   * Call the new variable 'unmask' and drop the unnecessary initializer,
+>     as requested by Sergey.
+>
+>  drivers/net/ethernet/renesas/ravb_main.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index d1be030c8848..48803050abdb 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1324,12 +1324,12 @@ static int ravb_poll(struct napi_struct *napi, int budget)
+>  	int q = napi - priv->napi;
+>  	int mask = BIT(q);
+>  	int quota = budget;
+> +	bool unmask;
+>
+>  	/* Processing RX Descriptor Ring */
+>  	/* Clear RX interrupt */
+>  	ravb_write(ndev, ~(mask | RIS0_RESERVED), RIS0);
+> -	if (ravb_rx(ndev, &quota, q))
+> -		goto out;
+> +	unmask = !ravb_rx(ndev, &quota, q);
+>
+>  	/* Processing TX Descriptor Ring */
+AFAIU, TX is processed without any budget. This wont result in rx work starvation if
+TX traffic is more ?
 
-OK, I can separate the binary and u32 dealing. How about like
-
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index e5ad415905c7..be42e4fc1037 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -640,6 +640,16 @@ class YnlFamily(SpecFamily):
-             if attr_spec["sub-type"] == 'nest':
-                 subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
-                 decoded.append({ item.type: subattrs })
-+            elif attr_spec["sub-type"] == 'binary':
-+                subattrs = item.as_bin()
-+                if attr_spec.display_hint:
-+                    subattrs = self._formatted_string(subattrs, attr_spec.display_hint)
-+                decoded.append(subattrs)
-+            elif attr_spec["sub-type"] in NlAttr.type_formats:
-+                subattrs = item.as_scalar(attr_spec['sub-type'], attr_spec.byte_order)
-+                if attr_spec.display_hint:
-+                    subattrs = self._formatted_string(subattrs, attr_spec.display_hint)
-+                decoded.append(subattrs)
-             else:
-                 raise Exception(f'Unknown {attr_spec["sub-type"]} with name {attr_spec["name"]}')
-         return decoded
-
-
-With only sub-type: u32 it shows like
-
-    "arp-ip-target": [
-      3232235777,
-      3232235778
-    ],
-
-Thanks
-Hangbin
+>  	spin_lock_irqsave(&priv->lock, flags);
+> @@ -1339,6 +1339,9 @@ static int ravb_poll(struct napi_struct *napi, int budget)
+>  	netif_wake_subqueue(ndev, q);
+>  	spin_unlock_irqrestore(&priv->lock, flags);
+>
+> +	if (!unmask)
+> +		goto out;
+> +
+>  	napi_complete(napi);
+>
+>  	/* Re-enable RX/TX interrupts */
+>
+> base-commit: ea2a1cfc3b2019bdea6324acd3c03606b60d71ad
+> --
+> 2.39.2
+>
 
