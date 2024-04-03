@@ -1,113 +1,113 @@
-Return-Path: <netdev+bounces-84458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61DB8896F7E
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:54:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D51896FA2
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D40228EC64
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:54:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C131C281C6C
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A6B1494D9;
-	Wed,  3 Apr 2024 12:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4231474A2;
+	Wed,  3 Apr 2024 12:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eLOuqIBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A361494CE;
-	Wed,  3 Apr 2024 12:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC79113AA2E
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 12:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712148806; cv=none; b=lCjyI3vkFG/oC2Ah1xgaEN5MI9d2r4UW+7Olg9Iu0UcmVi3R/bhbhbH30NX+VhEqEZIYMidYUHoJAy2uhbV8dPORho2Icllg7dXZ2RChvlYO5cRgwTC7z5rGJlJNym1yE2xBDPgu9y1MyqLS4Ea7IBcbNwfzGvorNBbOVW+5czw=
+	t=1712149109; cv=none; b=D2nR7V051wse0PZEOpqHKAaGiarB2HhfresI043rPNFIiefj2qf053Y54Q9UkqIEWCX4Aj30hq6Yd+W/mGbdqO57fwVDBVFv2w56cPmrlzn8vlJyJB8wpx/uvIspS9Yvs8C6oiUygcFPvsueODc0otQ7LxrGIoyGxJIKzmZDKzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712148806; c=relaxed/simple;
-	bh=UntQTPh+2hrQn/xIlOWJaJgrauzrTj7yswbk+DwsRJs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A95FNpqmcXNG1e+AhRokIkx0T79pmZtmoXRwAN/absOaGpZE9zGhmQ/mnVUR0bZIe63IdOZAT+fAy9Zdd8kVwyYSHV9Ct+WPaXCS5ak9kPN6t0oFCH78qEug/wNoq0EFJxGlqW8Pu3OyyM9Ppq0KFr8LDhXnuVzZ16Q6pf+GDpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a46a7208eedso824936566b.0;
-        Wed, 03 Apr 2024 05:53:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712148803; x=1712753603;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q4cj6vg+PLMD3bnAnC/7BKVkE+A86qwqaG5PcVTOt18=;
-        b=a9G1Uj1tXvk8mKna/klFrPZDWk3MTIXiHofAmeS/kXnCAHX1DJNsox94yzFekHD3hN
-         HKwBhkQj30AfKNMFcidPs2Mk/+bHx9UyJ2IZ9PVbJWjNjJJmrFmYxrIxK2P67UR0zKEy
-         PO7pW4SAELMqJu0HGjzfUOiBYya+EiGMZ5nMumXYvQyhdAEhd+ipbRB3P48Ygz6nBSCh
-         qSMbh6qFzcFP/g1fSR+8/PU1VnmmeBsvoidXPdCeKT64WXxvbnph2ln6QketlF77D+WA
-         oHqKhLRDxCcIBKZyy4YsqFAdjDue7Q59u2X6Q1Ekb2ZgRuJg3P4nEQ1bRynYG9dv6LzI
-         Sgiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGLDhsG0YQlcAQXlahybcvDTcB+DqPmdbWXAzIzhT1Av8liaLceCjzug3cTSCDTsIN/J6bHtN6CrpzE0C5q/dkIxpSOunq/mWWOixJ6vNqwAicPXgIms8PYYHKX1L8H/YXeMXP+1+9wUaSAXPUqGKilJHOahCf7F9/S3RM
-X-Gm-Message-State: AOJu0YymaYaD9FcIJ+eGwabKMzk7lvQQzueGAe/tw3IwbyqO9kgxNmKS
-	m1KC+qNxPISMx16mz+eO5DYAeI+jOpK/6eguVJBnLn3FJAnaS/n3
-X-Google-Smtp-Source: AGHT+IG/LZvkvkvKke8uVXcXbrYjZ9FSvr+Pm5+/tdlPUCoe15E1D9VDt24wooC2fGJfQa9Hdwxe2A==
-X-Received: by 2002:a17:906:2284:b0:a4e:39f1:6374 with SMTP id p4-20020a170906228400b00a4e39f16374mr1812470eja.24.1712148803105;
-        Wed, 03 Apr 2024 05:53:23 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id an3-20020a17090656c300b00a4e7c2b2070sm2694127ejc.8.2024.04.03.05.53.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 05:53:16 -0700 (PDT)
-Date: Wed, 3 Apr 2024 05:53:12 -0700
-From: Breno Leitao <leitao@debian.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: hengqi@linux.alibaba.com, xuanzhuo@linux.alibaba.com,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Melnychenko <andrew@daynix.com>, rbc@meta.com,
-	riel@surriel.com, stable@vger.kernel.org, qemu-devel@nongnu.org,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v3] virtio_net: Do not send RSS key if it is not
- supported
-Message-ID: <Zg1ROBmnY0jaKvsf@gmail.com>
-References: <20240329171641.366520-1-leitao@debian.org>
- <20240331160618-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1712149109; c=relaxed/simple;
+	bh=DAkeTo88/Q8SBcOAB+webgQsBX2i+Ci1XmPfSwoxQ0Q=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=eCrmS+WYIS7YGelIkry33EJyp0vdq7MlWhOAQBClf9UIC0no+n7gUSpIIX9x9RM99GMYixrmnceI6FaRdyzm+Ilt4CXTFMwoe3yODLpdKRYB5N3H96kFRG+c7L41aAeMpmgQJsx9fycJh2bKqf3onOxOWr16y8e22J6JTUtqViU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eLOuqIBk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712149107;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5DGnORPv79MmjGVc5naevaHP+scfzBDnCLP3n2Z3Y4Q=;
+	b=eLOuqIBkzgg08Ss24ikz2T0ftxc9pO9Ihm+V1lFUSLfwiF+xwUn93GwkiCj9X+dgHhNotq
+	/+XpHO4HNpP4zGLZQGIa8NytakpI3PbYpMqz3t3wUtDlO5p1v2lSEtcPa4aZx6yeedu/vA
+	CN8IGDbZ9uqC0wyS7JlMFsxf4h+wt8w=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-522-dz7FoxU5NrCenslQwwmFtQ-1; Wed, 03 Apr 2024 08:58:24 -0400
+X-MC-Unique: dz7FoxU5NrCenslQwwmFtQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E932785A588;
+	Wed,  3 Apr 2024 12:58:22 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E17DAC04122;
+	Wed,  3 Apr 2024 12:58:19 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240403124124.GA19085@lst.de>
+References: <20240403124124.GA19085@lst.de> <20240403101422.GA7285@lst.de> <20240403085918.GA1178@lst.de> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-16-dhowells@redhat.com> <3235934.1712139047@warthog.procyon.org.uk> <3300438.1712141700@warthog.procyon.org.uk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 15/26] mm: Export writeback_iter()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240331160618-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3326106.1712149095.1@warthog.procyon.org.uk>
+Date: Wed, 03 Apr 2024 13:58:15 +0100
+Message-ID: <3326107.1712149095@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On Sun, Mar 31, 2024 at 04:20:30PM -0400, Michael S. Tsirkin wrote:
-> On Fri, Mar 29, 2024 at 10:16:41AM -0700, Breno Leitao wrote:
-> > @@ -3814,13 +3815,24 @@ static int virtnet_set_rxfh(struct net_device *dev,
-> >  		return -EOPNOTSUPP;
-> >  
-> >  	if (rxfh->indir) {
-> > +		if (!vi->has_rss)
-> > +			return -EOPNOTSUPP;
-> > +
-> >  		for (i = 0; i < vi->rss_indir_table_size; ++i)
-> >  			vi->ctrl->rss.indirection_table[i] = rxfh->indir[i];
-> > +		update = true;
-> >  	}
-> > -	if (rxfh->key)
-> > +
-> > +	if (rxfh->key) {
-> > +		if (!vi->has_rss && !vi->has_rss_hash_report)
-> > +			return -EOPNOTSUPP;
+Christoph Hellwig <hch@lst.de> wrote:
+
+> > So why are we bothering with EXPORT_SYMBOL at all?  Why don't you just
+> > send a patch replace all of them with EXPORT_SYMBOL_GPL()?
 > 
+> No my business.
+
+Clearly it is as you're gradually replacing APIs with stuff that is GPL'd.
+
+> But if you want to side track this let me just put this in here:
 > 
-> What's the logic here? Is it || or &&? A comment can't hurt.
+> NAK to the non-GPL EXPORT of writeback_iter().
 
-If txfh carries a key, then the device needs to has either has_rss or
-has_rss_hash_report "features".
+Very well, I'll switch that export to GPL.  Christian, if you can amend that
+patch in your tree?
 
-These are basically virtio features VIRTIO_NET_F_HASH_REPORT and
-VIRTIO_NET_F_RSS that are set at virtio_probe.
+David
 
-I will add the comment and respin the series.
 
