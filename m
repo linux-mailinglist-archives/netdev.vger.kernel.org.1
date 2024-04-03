@@ -1,176 +1,129 @@
-Return-Path: <netdev+bounces-84384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3142896C9B
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:34:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 425BE896CA6
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:35:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BB0728B2B9
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:34:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F225628DB16
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5041487DF;
-	Wed,  3 Apr 2024 10:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C798F13774B;
+	Wed,  3 Apr 2024 10:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BQxZwLro"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B7D1482E1;
-	Wed,  3 Apr 2024 10:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFE617BA8;
+	Wed,  3 Apr 2024 10:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712140329; cv=none; b=Rey3cTEdrXRv6QQ1qz6TLt3APBqkAviPT9Cd+ABQwy3GVPpNeLoYcCHFUyHyCqLoH+/lX5LFfywVVrcrAwGUF9nNxhHGL5NYxLe/S6y3dxYSOGIK5PNTRo7ZQfM1RTSmP7e3XAZLk51Ro/w8KnVXdFb6GjTDEyxb9YZr0Fp3Ouk=
+	t=1712140525; cv=none; b=XJiKHcISWwwTsFp/g22IMmGHuxco04aBzDcux+XSP1yr7NDhergcrCHAow6AWGxj1uLSUNxRp8yOCB5GpmN/WMDSdHaPAdcKJseQ34suart8E59/7yvVVg06hbgtegD2VblUOY+skAYPbe90BSjbemhGz+byCPn0TsarHOsDs9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712140329; c=relaxed/simple;
-	bh=AwY3Gsc9AV2Km7e7jnYZB1dUudZG7WwX8VIo6+1zDtQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FGgf20dJ24iM82z1CImETS0RPbLj+kiytt8WpuNb0aqZ0ZeNGp7LWyl66L8GODqSqlVvTHuoF1jaVQoZBsM+r5dojeooyKM93h6HEAmlOM2SBk27Ymwdo1l3jbIuSgflwFGvZ1S18hz5p68P4sjNDWpoXvpkTBtWj50tAWupRU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V8gzL2CTFz4f3lXK;
-	Wed,  3 Apr 2024 18:31:58 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 86A451A016E;
-	Wed,  3 Apr 2024 18:32:02 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP2 (Coremail) with SMTP id Syh0CgAXOg0fMA1m63l0JA--.50696S2;
-	Wed, 03 Apr 2024 18:32:00 +0800 (CST)
-Message-ID: <6feb3403-4214-4143-b0bc-c95daf8eea2b@huaweicloud.com>
-Date: Wed, 3 Apr 2024 18:31:59 +0800
+	s=arc-20240116; t=1712140525; c=relaxed/simple;
+	bh=dxuPcDMSHg6WEwqpznWa9U8ja7BsjSSnId/aW7PBfYY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=peCDn+kksfNkGJuO3KOhR7hIrhdHB+ENOhA3dGpSI1QviN5lj5EvwxQzpcrWKniOArmNabDB6+A6rRokUiRUxnEXRMiP748Lytxf6VJNPteHRLaz08vdhoIc3wevwXiViE7SNr7QtiHdSu+ruH4uFKJO2hm2aMXIjUE8ZMfVMlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BQxZwLro; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43364Zua019128;
+	Wed, 3 Apr 2024 03:35:06 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pfpt0220; bh=c7ldmWssB6B+OJa6cGc2Lj
+	S4gSz7Yqc8tAcVhXFWxd0=; b=BQxZwLro9yFL4FpWjqbCUrQu9/DDl6HdnIDA8D
+	b5c3cH+LgeEWLtFbsNZJ5V+4oi8bsKqNhs5x0MVAYzfzK9xysVctWw09dPMFzLUM
+	297ycZOtUgAzrIF/oiOnczH8n1HhF92aKY9Kd7B7RpBrs6b8bpTUS0jkTXc9Jyzs
+	LUxNpKYDKEDnQ0vHIj0Z4waB7snEihXB380rHTFW64yhqEccbc16/30EvGm6EaJ7
+	AOGvzOHELVR6764bjrk7bpJjaEqAZ2HYDokKKnCuFFw2bRRS8dXlvIzqBVqI2Ddv
+	aIuFFuBOMEy3DpHajIPcSwlTMI6s89HdQfzmw3/7tbKKBOlA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3x91h6gsp1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 03:35:06 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 3 Apr 2024 03:35:05 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 3 Apr 2024 03:35:05 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 5772C3F7044;
+	Wed,  3 Apr 2024 03:35:00 -0700 (PDT)
+Date: Wed, 3 Apr 2024 16:04:59 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+CC: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Vladimir
+ Oltean <olteanv@gmail.com>,
+        Woojung Huh <woojung.huh@microchip.com>,
+        Arun
+ Ramadoss <arun.ramadoss@microchip.com>, <kernel@pengutronix.de>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <UNGLinuxDriver@microchip.com>, David Ahern <dsahern@kernel.org>,
+        Simon
+ Horman <horms@kernel.org>,
+        Willem de Bruijn <willemb@google.com>,
+        =?iso-8859-1?Q?S=F8ren?= Andersen <san@skov.dk>
+Subject: Re: [PATCH net-next v2 2/9] net: dsa: microchip: add IPV information
+ support
+Message-ID: <20240403103459.GA1654809@maili.marvell.com>
+References: <20240403092905.2107522-1-o.rempel@pengutronix.de>
+ <20240403092905.2107522-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 0/5] Support local vmtest for riscv64
-Content-Language: en-US
-To: Eduard Zingerman <eddyz87@gmail.com>,
- Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Manu Bretelle <chantr4@gmail.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20240328124916.293173-1-pulehui@huaweicloud.com>
- <32b3358903bf8ba408812a2636f39a275493eb91.camel@gmail.com>
- <e995a1f1-0b48-4ce3-a061-5cbe68beb6dd@huaweicloud.com>
- <f91237f311f183d57c4620bc2e6099df8aefccb0.camel@gmail.com>
- <52117f9c-b691-409f-ad2a-a25f53a9433d@huaweicloud.com>
- <f20d1e2a2f5fa10f29bf1fddbaf99c3f185e8530.camel@gmail.com>
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <f20d1e2a2f5fa10f29bf1fddbaf99c3f185e8530.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:Syh0CgAXOg0fMA1m63l0JA--.50696S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxurW5Zw1xXF48tFW3Xw4rGrg_yoW5Ar1kpF
-	47CF1Ivr1DJrn8twsFya4YyFWFvrZ5GF13Z3ykJ340yF909rWIgFsakFW5ZFZruryqq3yY
-	v3y2vrWYy3ZrtaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkYb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
-	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-	xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv
-	6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IUbG2NtUUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240403092905.2107522-3-o.rempel@pengutronix.de>
+X-Proofpoint-ORIG-GUID: dYiCHvOCuwTLy81e6vH58KvuzxAt7XsV
+X-Proofpoint-GUID: dYiCHvOCuwTLy81e6vH58KvuzxAt7XsV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-03_09,2024-04-01_01,2023-05-22_02
 
+On 2024-04-03 at 14:58:58, Oleksij Rempel (o.rempel@pengutronix.de) wrote:
+> Most of Microchip KSZ switches use Internal Priority Value associated
+> with every frame. For example, it is possible to map any VLAN PCP or
+> DSCP value to IPV and at the end, map IPV to a queue.
+>
+> Since amount of IPVs is not equal to amount of queues, add this
+> information and make use of it in some functions.
+>
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
+> ---
+>
+>  	dev->dev_ops->enable_stp_addr(dev);
+>
+> +	/* Make sure driver provide plausible queue and IPV values */
+> +	if (!dev->info->num_tx_queues ||
+> +	    dev->info->num_tx_queues > dev->info->max_ipvs) {
+> +		dev_err(dev->dev, "Number of TX queues exceeds maximum supported IPVs\n");
+if dev->info->num_tx_queues == 0, error message seems to be wrong.
 
-
-On 2024/4/3 7:40, Eduard Zingerman wrote:
-> On Sat, 2024-03-30 at 18:12 +0800, Pu Lehui wrote:
-> [...]
-> 
->>> Looks like I won't be able to test this patch-set, unless you have
->>> some writeup on how to create a riscv64 dev environment at hand.
->>> Sorry for the noise
->>
->> Yeah, environmental issues are indeed a developer's nightmare. I will
->> try to do something for the newcomers of riscv64 bpf. At present, I have
->> simply built a docker local vmtest environment [0] based on Bjorn's
->> riscv-cross-builder. We can directly run vmtest within this environment.
->> Hopefully it will help.
->>
->> Link: https://github.com/pulehui/riscv-cross-builder/tree/vmtest [0]
-> 
-> Hi Pu,
-> 
-> Thank you for sharing the docker file, I've managed to run the tests
-> using it. In order to avoid creating files with root permissions I had
-> to add the following lines at the end of the Dockerfile:
-> 
-> + RUN useradd --no-create-home --uid 1000 eddy
-> + RUN passwd -d eddy
-> + RUN echo 'eddy ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-> + # vmtest.sh does 'mount -o loop',
-> + # ensure there is a loop device in the container
-> + RUN mknod /dev/loop0 b 7 20
-> 
-> Where 'eddy' is my local user with UID 1000.
-> Probably this should be made more generic.
-> I used the following command to start the container:
-> 
-> docker run -ti -u 1000:1000 \
->      --rm -v <path-to-kernel-dir>:/workspace \
->      -v <path-to-rootfs-image-dir>:/rootfs \
->      --privileged ubuntu-vmtest:latest /bin/bash
-> 
-> Also, I had to add '-d /rootfs/bpf_selftests' option for vmtest.sh in
-> order to avoid polluting user directory inside the container.
-> Maybe OUTPUT_DIR for vmtest.sh should be mounted as a separate volume.
-> 
-> I agree with Daniel, it would be great to document all of this
-
-Forgot to reply to this in my last email. It my pleasure to do this.
-
-> somewhere in the repo (or even scripted somehow).
-> 
-> Using the specified DENYLIST I get the following stats for test_progs:
-> 
->    #3/2     arena_htab/arena_htab_asm:FAIL
->    #3       arena_htab:FAIL
-
-Puranjay has submitted to riscv bpf arena and will be merged soon. So I 
-didn't add it to DENYLIST.riscv64.
-
-https://lore.kernel.org/bpf/20240326224943.86912-1-puranjay12@gmail.com/
-
->    #95      get_branch_snapshot:FAIL
->    #172/1   perf_branches/perf_branches_hw:FAIL
->    #172     perf_branches:FAIL
-
-riscv sbi pmu driver not support branch sampling yet.  The following 
-patch should be used for better regression.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux.git/commit/?id=ea6873118493
-
->    #434/3   verifier_arena/basic_alloc3:FAIL
->    #434     verifier_arena:FAIL
->    Summary: 531/3581 PASSED, 64 SKIPPED, 4 FAILED
-> 
-> Tested-by: Eduard Zingerman <eddyz87@gmail.com>
-> 
->> PS: Since the current rootfs of riscv64 is not in the INDEX, I simply
->> modified vmtest.sh to support local rootfs.
-> 
-> Could you please add this change to the patch-set?
-
-yep, will try to make it more convenient.
-
-> 
-> [...]
-
+> +		return -EINVAL;
+> +	}
+>
+>  #define KSZ9477_PORT_TC_MAP_S		4
+> -#define KSZ9477_MAX_TC_PRIO		7
+>
+>  /* CBS related registers */
+>  #define REG_PORT_MTI_QUEUE_INDEX__4	0x0900
+> --
+> 2.39.2
+>
 
