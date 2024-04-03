@@ -1,114 +1,91 @@
-Return-Path: <netdev+bounces-84629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D94B897A4A
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:58:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63549897A49
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:58:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E6FD1F22AE6
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:58:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934341C21A5F
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EA7156649;
-	Wed,  3 Apr 2024 20:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA5515624A;
+	Wed,  3 Apr 2024 20:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6CmP4sAg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2I2lCHQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6788C3B1A2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DB8155308
 	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 20:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712177922; cv=none; b=V1dSTTMAY4J67qWlJyEv4L73RBljfJe2yccu2SAaEMeSMlu9zGaUAcEHke767uaYZLQxNmqqH1QtznXOP1chfo8xjR8rXsfPSG5+dMK3dYJs7NPX8L3hPCN5zp70Vui8dTOqPesBUIhJ30Ic7AsIFBNFaFF+TFOjb5YYZZv3Vfs=
+	t=1712177920; cv=none; b=M1p1Ax0sornYy+ocx6mb5XFODSquPPGJBdDe/znpFXrGr7an8TWLm0kxLtzcw+AJ31B9njI/+tz43L+7ZqUOgtdF5/eBMghAmKFo5eHNVD87qlOnsoqxSjUsp/8442Y+VT0cp2zbw9C4klf4zQLVJ4762s8qU9FOCh3eWyfj01E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712177922; c=relaxed/simple;
-	bh=kBgiSCO5waY9X/lJfPI/a6sPQGjXHVYKnBW963/r4Kg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nte4nItxWr9tPleh46p4K+S+EkGpmAJEkzxZKgHm6KTVfB1ujDznxYVzXu94xoTT73s1zhRydKQowK5TRjl9UBTlLvG8kHE0oky8WCuFj6ToPIysZx0tbdqbPhz3r1hhfdetbPhEintpoBBTW/PnBPCJnBgTl0JsPuwsQJqeOJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6CmP4sAg; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WjkMl0dWfEY0V+5u5TEDo8ELP62Y51LdebPiPccKjUI=; b=6CmP4sAgQU2NjmBQetne8V5QLK
-	SQghVQWg9SIlL71/tfytuHktZ+9WxLUfRUZ4JfyQfSU2+8UcX74DdCK7utwCpTrIPdQgPpmfCf9fy
-	wiWJcMZYyP1hHuFicIV4FE/YRfG5d3zvKr6ovr3c+xyeZv3CANWQ3KUAMFHgSoZ9hNbE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rs7gr-00C7CP-73; Wed, 03 Apr 2024 22:58:37 +0200
-Date: Wed, 3 Apr 2024 22:58:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 07/15] eth: fbnic: allocate a netdevice and napi
- vectors with queues
-Message-ID: <8b16d2b4-ef5c-4906-b094-840150980dc1@lunn.ch>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <171217493453.1598374.2269514228508217276.stgit@ahduyck-xeon-server.home.arpa>
+	s=arc-20240116; t=1712177920; c=relaxed/simple;
+	bh=RxkrahTrphG/MPUXUeaXNtU1e5plCx8WQCYV1G077uM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q7atm3spRDMW5/WkXw7lAlj10l7x2V9UaY4xjDKUt+O3Re4gmM0KWzzkdxxAxaYTUTio7b5HjZYPAtw8jy+laZCUr2n5lNmRGtHNhMMnel30TRk4ntgAnlMpJMQS95L+hpjyW1DMvmX1Vg34SCMZn6EoIy7tLWodDJ8EA3t0X0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2I2lCHQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8358C433F1;
+	Wed,  3 Apr 2024 20:58:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712177920;
+	bh=RxkrahTrphG/MPUXUeaXNtU1e5plCx8WQCYV1G077uM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=F2I2lCHQ586KoBOKQmOFtOTiJUe0Bu8qtl0GokCZLEfapsyaPh92Nssy/+McksKaI
+	 QAHITP42tPYKlHTezR4f6Zq2h5bzX8aV3lm7Omg9QIjAM6yzDSufZjOdp7bpQmo/th
+	 8VQ/jDBs9oKOLIKKBfJjugVUlkovcS/wc1Lbh8sFj+QkIlJLrpAimWgPly3m8z/FvQ
+	 S9y2XulSKlHul7GUVV++KXmHD2OWHkgtvnl405wM399N7sxbdj11G6pozTMmWARUlf
+	 JRWBLW7y3J2dw5P966I1VnhiAxQPDdpPs4cVlZBlBAm0xidKraH3Ne96/gv73iQGGS
+	 69tBRcEEu3w3Q==
+Message-ID: <df1130b3-c695-42af-b939-05fc0a029e26@kernel.org>
+Date: Wed, 3 Apr 2024 14:58:38 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <171217493453.1598374.2269514228508217276.stgit@ahduyck-xeon-server.home.arpa>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: skbuff: generalize the skb->decrypted bit
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ borisp@nvidia.com, john.fastabend@gmail.com
+References: <20240403202139.1978143-1-kuba@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240403202139.1978143-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> +static int fbnic_dsn_to_mac_addr(u64 dsn, char *addr)
-> +{
-> +	addr[0] = (dsn >> 56) & 0xFF;
-> +	addr[1] = (dsn >> 48) & 0xFF;
-> +	addr[2] = (dsn >> 40) & 0xFF;
-> +	addr[3] = (dsn >> 16) & 0xFF;
-> +	addr[4] = (dsn >> 8) & 0xFF;
-> +	addr[5] = dsn & 0xFF;
+On 4/3/24 2:21 PM, Jakub Kicinski wrote:
+> The ->decrypted bit can be reused for other crypto protocols.
+> Remove the direct dependency on TLS, add helpers to clean up
+> the ifdefs leaking out everywhere.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> I'm going to post PSP support.. as soon as the test groundwork
+> is in place. I think this stands on its own as a cleanup.
+> 
+> CC: dsahern@kernel.org
+> CC: borisp@nvidia.com
+> CC: john.fastabend@gmail.com
+> ---
+>  include/linux/skbuff.h | 15 ++++++++++++---
+>  include/net/sock.h     |  4 +---
+>  net/Kconfig            |  3 +++
+>  net/core/sock.c        |  5 ++---
+>  net/ipv4/tcp_input.c   | 12 +++---------
+>  net/ipv4/tcp_ipv4.c    |  4 +---
+>  net/ipv4/tcp_offload.c |  4 +---
+>  net/tls/Kconfig        |  1 +
+>  8 files changed, 24 insertions(+), 24 deletions(-)
+> 
 
-u64_to_ether_addr() might work here.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-> +
-> +	return is_valid_ether_addr(addr) ? 0 : -EINVAL;
-> +}
-> +
-> +/**
-> + * fbnic_netdev_register - Initialize general software structures
-> + * @netdev: Netdev containing structure to initialize and register
-> + *
-> + * Initialize the MAC address for the netdev and register it.
-> + **/
-> +int fbnic_netdev_register(struct net_device *netdev)
-> +{
-> +	struct fbnic_net *fbn = netdev_priv(netdev);
-> +	struct fbnic_dev *fbd = fbn->fbd;
-> +	u64 dsn = fbd->dsn;
-> +	u8 addr[ETH_ALEN];
-> +	int err;
-> +
-> +	err = fbnic_dsn_to_mac_addr(dsn, addr);
-> +	if (!err) {
-> +		ether_addr_copy(netdev->perm_addr, addr);
-> +		eth_hw_addr_set(netdev, addr);
-> +	} else {
-> +		dev_err(fbd->dev, "MAC addr %pM invalid\n", addr);
-
-Rather than fail, it is more normal to allocate a random MAC address.
-
-> @@ -192,7 +266,6 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	fbnic_devlink_unregister(fbd);
->  	fbnic_devlink_free(fbd);
-> -
->  	return err;
->  }
-
-That hunk should be somewhere else.
-
-     Andrew
 
