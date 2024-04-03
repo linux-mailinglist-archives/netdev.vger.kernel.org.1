@@ -1,80 +1,113 @@
-Return-Path: <netdev+bounces-84502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E2D989710C
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D78D89703C
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:20:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F9261F213CC
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:30:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 076791F229FF
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0115614A0AA;
-	Wed,  3 Apr 2024 13:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A7B148844;
+	Wed,  3 Apr 2024 13:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EkX8js4j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="InvFh4N7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F0814A082
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90112147C6C;
+	Wed,  3 Apr 2024 13:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712150906; cv=none; b=cO+jKO3lAuh15dM6ig0xuhkcPzBiz51I50xPVR0+9G5g4ypdMF03AODkqwQQ641YYq5rZ8M7jLbyRFYOvsZQ3PgN3EjlEhnO0TuPjNKCjt6AVyu7VRnrSS7f07qpSU8zcotCCV5ru75CdVnlhsaxmrsIDS1w4GCwMv7zlJWZn8s=
+	t=1712150388; cv=none; b=RD1rfPgrcOwRWgNgD/FRhHaYDeMnSnlwOTTrK4eWIXaE09XXwUbSMFb4dX7mRhafWR0ZqpSLIwgLZRRoAW69iXQ1v3+KiYlkfWCWM7E4QFcT3hqsonYYfYGN+RZ+xvIH/tvkwvUfI9J/ynYzjnmO025is5xF1isi99aTpg87hj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712150906; c=relaxed/simple;
-	bh=3jF5J1ib1CwbZjLRl5C+ZXgg+bxZyRbwjS2nhsCb7Us=;
+	s=arc-20240116; t=1712150388; c=relaxed/simple;
+	bh=qIpKll238/HMKyMj8OXA3kK3I9zyQbT0+DzHrIXJApg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NZBZE9QKfSiF8AqrNeo/76tMoISlmeQ9K70/jfHcIlUJNjvyAsAMU5K07Xd7NVEaXLORbGyRblEnOxnUDOBEluZGtul+aXiJ8x9uNqMYWHyNvqwLSKfD8FMD9l+XqQg+oTGpDMnRdPfRpRqfM/hqkWySqvENTK9LhqW/QmtIcDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EkX8js4j; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712150905; x=1743686905;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3jF5J1ib1CwbZjLRl5C+ZXgg+bxZyRbwjS2nhsCb7Us=;
-  b=EkX8js4j+oUo3AUsP5wpCEidKm5hDcxeFL0reD0MCbAWsFwMEV6Mt+0K
-   ATAmD9Ojs347t6yaF7GSPOOFBEEbCtx5Dey6pYCrP24HmaqgIpwYzyb7D
-   4iIoTrOFxU892zI/l7hnDhXX9jiFVx9mujLWv5UvjcffdDvHlPpgfWLh/
-   +4Lse9cQLR3A5kO4fFBm3R9xMH3kAaeIYmfnVa1XYlvcYIG/6U3LIP+o9
-   W23eRMizrKorilzP+/pjJTeTaVtYLPlk+oNhs03WTekAWch6MWUT3Kk1K
-   QwoXBftiOqkRR6x4ekvWAxADhzq4O6zCSvnK5aFaRP7USu2VEq0vgGu+S
-   g==;
-X-CSE-ConnectionGUID: KLXaNHo4Qm+Cp6zdIJ5RKg==
-X-CSE-MsgGUID: 9ocC3xQmRgG5hISzt5vGdw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7568762"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="7568762"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 06:28:25 -0700
-X-CSE-ConnectionGUID: SijFEWf3RomK+xVnPyJ9FQ==
-X-CSE-MsgGUID: HsXJC4kWRN2INTHWfi2lOA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="41592091"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa002.fm.intel.com with ESMTP; 03 Apr 2024 06:28:23 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 3770F36C1B;
-	Wed,  3 Apr 2024 14:28:19 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	horms@kernel.org,
-	anthony.l.nguyen@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v3 08/12] iavf: periodically cache PHC time
-Date: Wed,  3 Apr 2024 09:19:23 -0400
-Message-Id: <20240403131927.87021-9-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
-References: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
+	 MIME-Version; b=H3UE/+DL5x6yERGzYXJ9gvUWbXTdj/1BmKA98BsvPyyBey4u8I1huCUpefzBpdQs0ZYpQeT5mr0TILO9iw/ID9ecrpiT7XzODzhDg+21FgTEW6W7WTYJMKHPt2o2ippYfhq4m3nRbqUPJ2aKl587LTgGhi6GXV4G75hryzszg4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=InvFh4N7; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1e296c7aa7cso4303095ad.1;
+        Wed, 03 Apr 2024 06:19:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712150385; x=1712755185; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vPi3jXYhV/VW7gVgCzBi2KBL1/Xcj6OVJJpN8P4Laxs=;
+        b=InvFh4N7Hb1IP9fVLAn2M2FO6/oG4l7vTjWn1rnmBl71Ep6ntedclhWog6OgqsYZA6
+         CROmiegIbIREQAxXQb3xhh4/hkvq3OrptAbkn8SFxnjxQmp2gDRaj7dWjCxfJQUCUvPU
+         RlOocwLjXHCqBpQLaW0/BJLuvTOLO5pE0teSzwK4OpqS6b8R8I448GvGvncyJnkFUQ+Y
+         gHePaXzdp/WFJGV6WVZZhKqnAeqqaIQTgYctdSYvqsi+rnJxG7louyzJcxJZXnRfPIrn
+         AHzwHkX1tiGo7BUDjbhepv+jiCOU8o7ALusoVBRKfRy7FpbUV8BKYmUXl9afA6+ol48m
+         6D2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712150385; x=1712755185;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vPi3jXYhV/VW7gVgCzBi2KBL1/Xcj6OVJJpN8P4Laxs=;
+        b=ZydZy6urPjyueBDjpIhV7V6bkvAPSh8jeA7Ubp3TbVdCWC1lD4P+Am+ejvyQiY49O5
+         0OYny4O//KjUM3pZK1kDbKXI+wBwnaZJc+zbspSIHFgA0ADnVUbay5VIA6A6iFzvjDdb
+         aN1bRxZvvjtybYDDcinAv7rNG/QAynEJP8aruCpX810HM9S8erbo8k0l9xcPKeAq+rUV
+         xl6w5fhS7Z3CFSGHCWZbplIu/k5XgM+xjkH3QbUpp3PbNF+rVtS3gwPxNFtZYeH2Emr7
+         DUIWnO/A3MOayp1htQa0EcZBJes2DQLRg8hERTKYMeHcAym9/CgQ5ieXe4tVVuiGONY1
+         G7ow==
+X-Forwarded-Encrypted: i=1; AJvYcCWlwjS9mvJ5yhRr4ph9ZOyIj4mcmrqOtsGzCQQ55pj8jGAOzgYU6y77a1tikxyA3uaNQn3ezYyE1HQM1qxFmaTN9nwj6BffUNAiUXI7mQu0lmwE6IbFb1wrWZy6rm80Ed9sc337c9ll4xhNadID4oZXNraeGHakjlNVdvh4sI26QOdHpJMtAH/v+EpsYZqcq3ae9CPCzulY0SAYJYftV9btuWLRD3Jiw9pag7s0rlguoSTX24xRZinCxRpr7HWdBAymJ4MiyveJ2NmzyNQf+vaLNxZQEwvHVtFMwyeJu9Bwx9VqMobSOlw5Ckjdzf6h/Q==
+X-Gm-Message-State: AOJu0Yw0sIzM5kbnjN9CB63lqA8l/UsoSnYrHTKkC2H0zgx+GiICF59+
+	uocPzyUSnV+BWMLfdRCFl/74u9XT2FlkHY1USi4Kz0LRNtLO/060R7lDEieE
+X-Google-Smtp-Source: AGHT+IEBdntNuCJK1g1Qd+nUbBCHvT+g3ANfVkijVSktnMtYlUtgHLeuVpmPgg+o1C+TJMJB0A4+8w==
+X-Received: by 2002:a17:902:9004:b0:1e2:5e2f:682 with SMTP id a4-20020a170902900400b001e25e2f0682mr6996194plp.2.1712150385380;
+        Wed, 03 Apr 2024 06:19:45 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id u2-20020a170902e5c200b001d8f81ecea1sm13305095plf.172.2024.04.03.06.19.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 06:19:44 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+To: linux-kselftest@vger.kernel.org
+Cc: David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	=?UTF-8?q?Ma=C3=ADra=20Canal?= <mcanal@igalia.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Kees Cook <keescook@chromium.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	=?UTF-8?q?Ville=20Syrj=C3=A4l=C3=A4?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org,
+	kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	x86@kernel.org,
+	Guenter Roeck <linux@roeck-us.net>,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: [PATCH v3 02/15] kunit: bug: Count suppressed warning backtraces
+Date: Wed,  3 Apr 2024 06:19:23 -0700
+Message-Id: <20240403131936.787234-3-linux@roeck-us.net>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240403131936.787234-1-linux@roeck-us.net>
+References: <20240403131936.787234-1-linux@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,128 +116,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+Count suppressed warning backtraces to enable code which suppresses
+warning backtraces to check if the expected backtrace(s) have been
+observed.
 
-The Rx timestamps reported by hardware may only have 32 bits of storage
-for nanosecond time. These timestamps cannot be directly reported to the
-Linux stack, as it expects 64bits of time.
+Using atomics for the backtrace count resulted in build errors on some
+architectures due to include file recursion, so use a plain integer
+for now.
 
-To handle this, the timestamps must be extended using an algorithm that
-calculates the corrected 64bit timestamp by comparison between the PHC
-time and the timestamp. This algorithm requires the PHC time to be
-captured within ~2 seconds of when the timestamp was captured.
-
-Instead of trying to read the PHC time in the Rx hotpath, the algorithm
-relies on a cached value that is periodically updated.
-
-Keep this cached time up to date by using the PTP .do_aux_work kthread
-function.
-
-The iavf_ptp_do_aux_work will reschedule itself about twice a second,
-and will check whether or not the cached PTP time needs to be updated.
-If so, it issues a VIRTCHNL_OP_1588_PTP_GET_TIME to request the time
-from the PF. The jitter and latency involved with this command aren't
-important, because the cached time just needs to be kept up to date
-within about ~2 seconds.
-
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- drivers/net/ethernet/intel/iavf/iavf_ptp.c | 52 ++++++++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.h |  1 +
- 2 files changed, 53 insertions(+)
+v2:
+- Rebased to v6.9-rc1
+- Added Tested-by:, Acked-by:, and Reviewed-by: tags
+- Introduced KUNIT_SUPPRESS_BACKTRACE configuration option
+v3:
+- Rebased to v6.9-rc2
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-index a562fe92a079..f1f4c260e08f 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-@@ -161,6 +161,55 @@ static int iavf_ptp_gettimex64(struct ptp_clock_info *ptp,
- 	return iavf_read_phc_indirect(adapter, ts, sts);
- }
+ include/kunit/bug.h | 7 ++++++-
+ lib/kunit/bug.c     | 4 +++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/include/kunit/bug.h b/include/kunit/bug.h
+index bd0fe047572b..72e9fb23bbd5 100644
+--- a/include/kunit/bug.h
++++ b/include/kunit/bug.h
+@@ -20,6 +20,7 @@
+ struct __suppressed_warning {
+ 	struct list_head node;
+ 	const char *function;
++	int counter;
+ };
  
-+/**
-+ * iavf_ptp_cache_phc_time - Cache PHC time for performing timestamp extension
-+ * @adapter: private adapter structure
-+ *
-+ * Periodically cache the PHC time in order to allow for timestamp extension.
-+ * This is required because the Tx and Rx timestamps only contain 32bits of
-+ * nanoseconds. Timestamp extension allows calculating the corrected 64bit
-+ * timestamp. This algorithm relies on the cached time being within ~1 second
-+ * of the timestamp.
-+ */
-+static void iavf_ptp_cache_phc_time(struct iavf_adapter *adapter)
-+{
-+	if (time_is_before_jiffies(adapter->ptp.cached_phc_updated + HZ)) {
-+		/* The response from virtchnl will store the time into
-+		 * cached_phc_time
-+		 */
-+		iavf_send_phc_read(adapter);
-+	}
-+}
-+
-+/**
-+ * iavf_ptp_do_aux_work - Perform periodic work required for PTP support
-+ * @ptp: PTP clock info structure
-+ *
-+ * Handler to take care of periodic work required for PTP operation. This
-+ * includes the following tasks:
-+ *
-+ *   1) updating cached_phc_time
-+ *
-+ *      cached_phc_time is used by the Tx and Rx timestamp flows in order to
-+ *      perform timestamp extension, by carefully comparing the timestamp
-+ *      32bit nanosecond timestamps and determining the corrected 64bit
-+ *      timestamp value to report to userspace. This algorithm only works if
-+ *      the cached_phc_time is within ~1 second of the Tx or Rx timestamp
-+ *      event. This task periodically reads the PHC time and stores it, to
-+ *      ensure that timestamp extension operates correctly.
-+ *
-+ * Returns: time in jiffies until the periodic task should be re-scheduled.
-+ */
-+long iavf_ptp_do_aux_work(struct ptp_clock_info *ptp)
-+{
-+	struct iavf_adapter *adapter = clock_to_adapter(ptp);
-+
-+	iavf_ptp_cache_phc_time(adapter);
-+
-+	/* Check work about twice a second */
-+	return msecs_to_jiffies(500);
-+}
-+
- /**
-  * iavf_ptp_register_clock - Register a new PTP for userspace
-  * @adapter: private adapter structure
-@@ -179,6 +228,7 @@ static int iavf_ptp_register_clock(struct iavf_adapter *adapter)
- 		 dev_name(dev));
- 	ptp_info->owner = THIS_MODULE;
- 	ptp_info->gettimex64 = iavf_ptp_gettimex64;
-+	ptp_info->do_aux_work = iavf_ptp_do_aux_work;
+ void __start_suppress_warning(struct __suppressed_warning *warning);
+@@ -28,7 +29,7 @@ bool __is_suppressed_warning(const char *function);
  
- 	adapter->ptp.clock = ptp_clock_register(ptp_info, dev);
- 	if (IS_ERR(adapter->ptp.clock))
-@@ -218,6 +268,8 @@ void iavf_ptp_init(struct iavf_adapter *adapter)
- 		return;
+ #define DEFINE_SUPPRESSED_WARNING(func)	\
+ 	struct __suppressed_warning __kunit_suppress_##func = \
+-		{ .function = __stringify(func) }
++		{ .function = __stringify(func), .counter = 0 }
+ 
+ #define START_SUPPRESSED_WARNING(func) \
+ 	__start_suppress_warning(&__kunit_suppress_##func)
+@@ -39,12 +40,16 @@ bool __is_suppressed_warning(const char *function);
+ #define IS_SUPPRESSED_WARNING(func) \
+ 	__is_suppressed_warning(func)
+ 
++#define SUPPRESSED_WARNING_COUNT(func) \
++	(__kunit_suppress_##func.counter)
++
+ #else /* CONFIG_KUNIT_SUPPRESS_BACKTRACE */
+ 
+ #define DEFINE_SUPPRESSED_WARNING(func)
+ #define START_SUPPRESSED_WARNING(func)
+ #define END_SUPPRESSED_WARNING(func)
+ #define IS_SUPPRESSED_WARNING(func) (false)
++#define SUPPRESSED_WARNING_COUNT(func) (0)
+ 
+ #endif /* CONFIG_KUNIT_SUPPRESS_BACKTRACE */
+ #endif /* __ASSEMBLY__ */
+diff --git a/lib/kunit/bug.c b/lib/kunit/bug.c
+index f93544d7a9d1..13b3d896c114 100644
+--- a/lib/kunit/bug.c
++++ b/lib/kunit/bug.c
+@@ -32,8 +32,10 @@ bool __is_suppressed_warning(const char *function)
+ 		return false;
+ 
+ 	list_for_each_entry(warning, &suppressed_warnings, node) {
+-		if (!strcmp(function, warning->function))
++		if (!strcmp(function, warning->function)) {
++			warning->counter++;
+ 			return true;
++		}
  	}
- 
-+	ptp_schedule_worker(adapter->ptp.clock, 0);
-+
- 	adapter->ptp.initialized = true;
+ 	return false;
  }
- 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-index 4f84416743e1..7a25647980f3 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-@@ -34,5 +34,6 @@ void iavf_ptp_release(struct iavf_adapter *adapter);
- void iavf_ptp_process_caps(struct iavf_adapter *adapter);
- bool iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap);
- void iavf_virtchnl_send_ptp_cmd(struct iavf_adapter *adapter);
-+long iavf_ptp_do_aux_work(struct ptp_clock_info *ptp);
- 
- #endif /* _IAVF_PTP_H_ */
 -- 
-2.38.1
+2.39.2
 
 
