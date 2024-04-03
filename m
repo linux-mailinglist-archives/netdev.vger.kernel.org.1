@@ -1,324 +1,291 @@
-Return-Path: <netdev+bounces-84345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09377896A83
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:28:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CD2F896A31
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:14:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DD97B24E2F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:28:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 052921F22CA0
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A1B131E21;
-	Wed,  3 Apr 2024 09:28:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B6673510;
+	Wed,  3 Apr 2024 09:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fjaYLWKh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EE0134CDC
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731FA7351A
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712136488; cv=none; b=qslHxrbdfuaWRT8Oy0xmp51vnTFj0GAzHlajAe93VW+0Ot8nkCbm6za7dF+fn9KF0ItrLoVTTY5pItlwkS3XKQTP5RFi/Nr8/jZnSk5VXUd8OE3bmI6owv8D5YZCTL2qYuizIvak52Quni2L/yVmc1fB15k5VCaoNJz0XxNHx6Y=
+	t=1712135528; cv=none; b=BxFYyEWCBvOMcFQSw4HYYAWY60BVkSP9ZJ53DQ3NNg7KXrERApLtqPuRnFThYIwcsRA2uKFES/xBrIWYJ9yHkacpxSVaBOWVeFtVqNb4XaugQ7A0zZqdP2UmKqKALSE17Ged1aGEdmSXSo+OHvzJJo6gqEfcXjig6KYYxedBdHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712136488; c=relaxed/simple;
-	bh=/FKzdRndG3GR39QbAZN+2IzzAjuy+MexTqCMauxzGcQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j1JsjWcOl3njkszlqeW1/dCHygPyazV9JxsaEFg1qRxtktfLr+qOqYUVz9roBNob7xJ5udqPIT5xvSDGfExdLoxHoMVuZQEZx4pU5giaai4LmH8W+/jsaVBcZLJthn5Wqb0rewsvZn83iRvVR7rYwvtUd8w4W8fS70O0ceubWBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtpsz9t1712136479t3cqu59
-X-QQ-Originating-IP: GUJ8MnxM+odFWYXXw4nLudiBPd1KIMIFPlG/gLjiFnQ=
-Received: from localhost.localdomain ( [36.24.97.137])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 03 Apr 2024 17:27:58 +0800 (CST)
-X-QQ-SSF: 01400000000000O0Z000000A0000000
-X-QQ-FEAT: 4hWLySrfH+so+2CLD5SRKhyHII6A+yF5BuuCoC1iK6CYjGJepFqAEtncDfF/1
-	eTIwumUMAa1B951XSh52Jff12xT9rIuL7Pj9f4oxlRIr/BcVcYRAy4+wBNgY1M9w8+4G4lj
-	E/6hnjzjs/RwWCMDO2eeGcKra/OPukJ2NqmYnnK6NK/bWymFMyMvKPNotCeA9Vtd90TgJWh
-	VGgtZD/N/eqx4bLzeNlRQ46wiwp0vEJaWop6xwMIkNCfQyt84KczH/BkvuQqJu7mLVXJeUi
-	ANapSUmvXef++0EGbiWd1g1ydm93FUNfilCgcJT6JJupvjG7dO2hKsXgjCbuABufOUOCm96
-	rLo/xualLmLb/2D4/hkITu2Lfz57/NQMsWk4SDlSIKq/UYzdoS1Jrl9I1PArRagVzymCfnC
-	jPyxc4kNBykvvcl1N07Bhg==
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 8283467365420937512
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: jiawenwu@trustnetic.com,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v2 7/7] net: txgbe: add sriov function support
-Date: Wed,  3 Apr 2024 17:10:04 +0800
-Message-ID: <BDE9D80ABE699DA7+20240403092714.3027-8-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240403092714.3027-1-mengyuanlou@net-swift.com>
-References: <20240403092714.3027-1-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1712135528; c=relaxed/simple;
+	bh=RJhEaRMalWxTpkdmNf5hmMoHqVFLnYA/lCnJ2XqAPoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MMcgdICArZ88VV0m7hjTxouyYhMvFqxOOuiBTJmTYe5SpCe97VVMwKGWUTOZZ3GogdoVGdDcYUfSQE4qELlGEy+qtlmQ6f69QH2ZMIj90JX80JLkUd8Qzbf9rFfoBok6JXbJApz09U14OzbcefTjfRw8rVlcR36yYvusWCrUjBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fjaYLWKh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712135525;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J15c54CCcMIO06nn28Cf6nmwQhphnGFVtOwKdjyD5N8=;
+	b=fjaYLWKhyqXHArs3Va/pcwcwDpHGixg/FigI6IxN6mEzpVtfGsnukkxHfp6+3dTk0dZMF3
+	Upv5y73cXMeHEUUHU2ZudmhrIYjAf7K4DAr/Afr1l99xvvtMOxVIxCEZ8uryF4biygbGwD
+	tVTFka2eO0hKkjaA8Ll3qXERu4FCI1g=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-284-2Tm5QR1MOOmMYdlQmBWBUw-1; Wed, 03 Apr 2024 05:12:03 -0400
+X-MC-Unique: 2Tm5QR1MOOmMYdlQmBWBUw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41407fd718dso33306485e9.1
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 02:12:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712135520; x=1712740320;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J15c54CCcMIO06nn28Cf6nmwQhphnGFVtOwKdjyD5N8=;
+        b=MGIcAMopVLu1/MxzSM6qNCfLrMB754LjIZqVhbNc75AUOSNWHmPbclTr8R1fDqBGT0
+         MWjH+VLCniyJRQkkMPUe1pOboYjyQC7dntMtF/khTSad5REkUNcpquOGmknLQMbEb0yP
+         bMbQRxD101CLfVh4tysnrb4w+a8v33EN0zCTxxamnRknlfcHd9p/xumQLIIlFBzR/l7d
+         nMnjniDL3FSYihrieAtJVoXONalhBr3vT746t7U3NazxXSyWjdnf3pXGkrczwy4CLVaQ
+         w7E9Jf0AwoSj9NBRpkH8CLRvIisq7e/5cIXsbgRrSAUJIuZv3hFUVpaAabHDEfVCIF2T
+         fW1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU4KBpkpzA4CYPMTOfPnrKDcW++iZcWllc49AeMu35d5XKwcXBW18icHQLb4CLVtqmcWT+5sLRD+R1MhkRbjEOfqUcwLhpj
+X-Gm-Message-State: AOJu0YyljnpB59RpGD9P44SkN/uxM30kSxLCyzCDWTQVwV+xzLGiSxO3
+	7j1zdNpjj5sz0V5Uab4xWonxCkTJjOnb4pgTlK+GzAcYWdl12pRafk8sxMND0Fp/11LFONu0BpJ
+	xhgxszL5iJmgzravegMDqzWf9ZLYMqHYRP4jrThnkSvrDmxxq9InFNQ==
+X-Received: by 2002:a7b:c4d3:0:b0:415:511c:f801 with SMTP id g19-20020a7bc4d3000000b00415511cf801mr9480649wmk.34.1712135520580;
+        Wed, 03 Apr 2024 02:12:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGFih+RhMxkofK6JyLWYdlvz/egMC2LyfXQGxRu0dp4sZN6dWaGuQ8viRWVji43UT/hB7g2ow==
+X-Received: by 2002:a7b:c4d3:0:b0:415:511c:f801 with SMTP id g19-20020a7bc4d3000000b00415511cf801mr9480631wmk.34.1712135520213;
+        Wed, 03 Apr 2024 02:12:00 -0700 (PDT)
+Received: from sgarzare-redhat ([185.95.145.60])
+        by smtp.gmail.com with ESMTPSA id fa14-20020a05600c518e00b004159df274d5sm5705687wmb.6.2024.04.03.02.11.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 02:11:59 -0700 (PDT)
+Date: Wed, 3 Apr 2024 11:11:53 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Luigi Leonardi <luigi.leonardi@outlook.com>
+Cc: kvm@vger.kernel.org, jasowang@redhat.com, 
+	virtualization@lists.linux.dev, mst@redhat.com, kuba@kernel.org, xuanzhuo@linux.alibaba.com, 
+	netdev@vger.kernel.org, stefanha@redhat.com, pabeni@redhat.com, davem@davemloft.net, 
+	edumazet@google.com
+Subject: Re: [PATCH net-next 2/3] vsock/virtio: add SIOCOUTQ support for all
+ virtio based transports
+Message-ID: <3n325gojjzphouapo36aowmcgt3iqjrqrmckqjjqgqmhvjdz4x@4givlk4egii3>
+References: <20240402150539.390269-1-luigi.leonardi@outlook.com>
+ <AS2P194MB2170BA1D5A32BDF70C4547B19A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <AS2P194MB2170BA1D5A32BDF70C4547B19A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 
-Add sriov_configure for driver ops.
-Add ndo_vf_ops for txgbe netdev ops.
-Add mailbox handler wx_msg_task for txgbe.
+On Tue, Apr 02, 2024 at 05:05:38PM +0200, Luigi Leonardi wrote:
+>This patch introduce support for stream_bytes_unsent in all
+>virtio based transports: virtio-transport, vhost-vsock and
+>vsock-loopback
+>
+>For all transports the unsent bytes counter is incremented
+>in virtio_transport_send_pkt_info.
+>
+>In the virtio-transport (G2H) the counter is decremented each time the host
+>notifies the guest that it consumed the skbuffs.
+>In vhost-vsock (H2G) the counter is decremented after the skbuff is queued
+>in the virtqueue.
+>In vsock-loopback the counter is decremented after the skbuff is
+>dequeued.
+>
+>Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+>---
+> drivers/vhost/vsock.c                   |  3 ++-
+> include/linux/virtio_vsock.h            |  7 ++++++
+> net/vmw_vsock/virtio_transport.c        |  3 ++-
+> net/vmw_vsock/virtio_transport_common.c | 30 +++++++++++++++++++++++++
+> net/vmw_vsock/vsock_loopback.c          |  6 +++++
+> 5 files changed, 47 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index ec20ecff85c7..9732ab944e5b 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -244,7 +244,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 					restart_tx = true;
+> 			}
+>
+>-			consume_skb(skb);
+>+			virtio_transport_consume_skb_sent(skb, true);
+> 		}
+> 	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
+> 	if (added)
+>@@ -430,6 +430,7 @@ static struct virtio_transport vhost_transport = {
+> 		.stream_rcvhiwat          = virtio_transport_stream_rcvhiwat,
+> 		.stream_is_active         = virtio_transport_stream_is_active,
+> 		.stream_allow             = virtio_transport_stream_allow,
+>+		.stream_bytes_unsent      = virtio_transport_bytes_unsent,
+>
+> 		.seqpacket_dequeue        = virtio_transport_seqpacket_dequeue,
+> 		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index c82089dee0c8..cdce8b051f98 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -134,6 +134,8 @@ struct virtio_vsock_sock {
+> 	u32 peer_fwd_cnt;
+> 	u32 peer_buf_alloc;
+>
+>+	atomic_t bytes_unsent;
+>+
+> 	/* Protected by rx_lock */
+> 	u32 fwd_cnt;
+> 	u32 last_fwd_cnt;
+>@@ -193,6 +195,11 @@ s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
+> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+> u32 virtio_transport_seqpacket_has_data(struct vsock_sock *vsk);
+>
+>+int virtio_transport_bytes_unsent(struct vsock_sock *vsk);
+>+
+>+void virtio_transport_consume_skb_sent(struct sk_buff *skb,
+>+				       bool dealloc);
+>+
+> int virtio_transport_do_socket_init(struct vsock_sock *vsk,
+> 				 struct vsock_sock *psk);
+> int
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index 1748268e0694..d3dd0d49c2b3 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -310,7 +310,7 @@ static void virtio_transport_tx_work(struct work_struct *work)
+>
+> 		virtqueue_disable_cb(vq);
+> 		while ((skb = virtqueue_get_buf(vq, &len)) != NULL) {
+>-			consume_skb(skb);
+>+			virtio_transport_consume_skb_sent(skb, true);
+> 			added = true;
+> 		}
+> 	} while (!virtqueue_enable_cb(vq));
+>@@ -518,6 +518,7 @@ static struct virtio_transport virtio_transport = {
+> 		.stream_rcvhiwat          = virtio_transport_stream_rcvhiwat,
+> 		.stream_is_active         = virtio_transport_stream_is_active,
+> 		.stream_allow             = virtio_transport_stream_allow,
+>+		.stream_bytes_unsent      = virtio_transport_bytes_unsent,
+>
+> 		.seqpacket_dequeue        = virtio_transport_seqpacket_dequeue,
+> 		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 16ff976a86e3..3a08e720aa9c 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -419,6 +419,9 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+> 		 */
+> 		rest_len -= ret;
+>
+>+		if (info->op == VIRTIO_VSOCK_OP_RW)
+>+			atomic_add(ret, &vvs->bytes_unsent);
+>+
+> 		if (WARN_ONCE(ret != skb_len,
+> 			      "'send_pkt()' returns %i, but %zu expected\n",
+> 			      ret, skb_len))
+>@@ -463,6 +466,24 @@ void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_inc_tx_pkt);
+>
+>+void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool dealloc)
+>+{
+>+	struct sock *s = skb->sk;
+>+
+>+	if (s) {
+>+		struct vsock_sock *vs = vsock_sk(s);
+>+		struct virtio_vsock_sock *vvs;
+>+
+>+		vvs = vs->trans;
+>+		if (skb->len)
+>+			atomic_sub(skb->len, &vvs->bytes_unsent);
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 15 ++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_sriov.h |  1 +
- .../net/ethernet/wangxun/txgbe/txgbe_irq.c    | 25 ++++++++++++++--
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 29 +++++++++++++++++++
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |  8 +++++
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  4 ++-
- 6 files changed, 78 insertions(+), 4 deletions(-)
+We incremented it only for VIRTIO_VSOCK_OP_RW, should we check the
+same here?
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-index e7bb523ced95..6a8976b2e7f0 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -1227,3 +1227,18 @@ void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up)
- 		wx_write_mbx_pf(wx, msgbuf, 2, i);
- }
- EXPORT_SYMBOL(wx_ping_all_vfs_with_link_status);
-+
-+/**
-+ * wx_set_all_vfs - update vfs queues
-+ * @wx: Pointer to wx struct
-+ *
-+ * Update setting transmit and receive queues for all vfs
-+ **/
-+void wx_set_all_vfs(struct wx *wx)
-+{
-+	int i;
-+
-+	for (i = 0 ; i < wx->num_vfs; i++)
-+		wx_set_vf_link_state(wx, i, wx->vfinfo[i].link_state);
-+}
-+EXPORT_SYMBOL(wx_set_all_vfs);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-index d92f7ceb0bed..50762daab805 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-@@ -14,5 +14,6 @@ int wx_ndo_set_vf_link_state(struct net_device *netdev, int vf, int state);
- void wx_msg_task(struct wx *wx);
- void wx_disable_vf_rx_tx(struct wx *wx);
- void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up);
-+void wx_set_all_vfs(struct wx *wx);
- 
- #endif /* _WX_SRIOV_H_ */
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-index b3e3605d1edb..e6be98865c2d 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-@@ -7,6 +7,7 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_phy.h"
- #include "txgbe_irq.h"
-@@ -176,6 +177,24 @@ static const struct irq_domain_ops txgbe_misc_irq_domain_ops = {
- 	.map = txgbe_misc_irq_domain_map,
- };
- 
-+static irqreturn_t txgbe_irq_handler(int irq, void *data)
-+{
-+	struct txgbe *txgbe = data;
-+	struct wx *wx = txgbe->wx;
-+	u32 eicr;
-+
-+	eicr = wx_misc_isb(wx, WX_ISB_MISC) & TXGBE_PX_MISC_IEN_MASK;
-+	if (!eicr)
-+		return IRQ_NONE;
-+	txgbe->eicr = eicr;
-+	if (eicr & TXGBE_PX_MISC_IC_VF_MBOX) {
-+		wx_msg_task(txgbe->wx);
-+		wx_intr_enable(wx, TXGBE_INTR_MISC);
-+	}
-+
-+	return IRQ_WAKE_THREAD;
-+}
-+
- static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
- {
- 	struct txgbe *txgbe = data;
-@@ -184,7 +203,7 @@ static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
- 	unsigned int sub_irq;
- 	u32 eicr;
- 
--	eicr = wx_misc_isb(wx, WX_ISB_MISC);
-+	eicr = txgbe->eicr;
- 	if (eicr & TXGBE_PX_MISC_GPIO) {
- 		sub_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_GPIO);
- 		handle_nested_irq(sub_irq);
-@@ -226,7 +245,7 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 	struct wx *wx = txgbe->wx;
- 	int hwirq, err;
- 
--	txgbe->misc.nirqs = 2;
-+	txgbe->misc.nirqs = TXGBE_IRQ_MAX;
- 	txgbe->misc.domain = irq_domain_add_simple(NULL, txgbe->misc.nirqs, 0,
- 						   &txgbe_misc_irq_domain_ops, txgbe);
- 	if (!txgbe->misc.domain)
-@@ -241,7 +260,7 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 	else
- 		txgbe->misc.irq = wx->pdev->irq;
- 
--	err = request_threaded_irq(txgbe->misc.irq, NULL,
-+	err = request_threaded_irq(txgbe->misc.irq, txgbe_irq_handler,
- 				   txgbe_misc_irq_handle,
- 				   IRQF_ONESHOT,
- 				   wx->netdev->name, txgbe);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index bd4624d14ca0..9d703321bb97 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -14,6 +14,8 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_mbx.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_hw.h"
- #include "txgbe_phy.h"
-@@ -99,6 +101,12 @@ static void txgbe_up_complete(struct wx *wx)
- 
- 	/* enable transmits */
- 	netif_tx_start_all_queues(netdev);
-+
-+	/* Set PF Reset Done bit so PF/VF Mail Ops can work */
-+	wr32m(wx, WX_CFG_PORT_CTL, WX_CFG_PORT_CTL_PFRSTD,
-+	      WX_CFG_PORT_CTL_PFRSTD);
-+	/* update setting rx tx for all active vfs */
-+	wx_set_all_vfs(wx);
- }
- 
- static void txgbe_reset(struct wx *wx)
-@@ -144,6 +152,16 @@ static void txgbe_disable_device(struct wx *wx)
- 		wx_err(wx, "%s: invalid bus lan id %d\n",
- 		       __func__, wx->bus.func);
- 
-+	if (wx->num_vfs) {
-+		/* Clear EITR Select mapping */
-+		wr32(wx, WX_PX_ITRSEL, 0);
-+		/* Mark all the VFs as inactive */
-+		for (i = 0 ; i < wx->num_vfs; i++)
-+			wx->vfinfo[i].clear_to_send = 0;
-+		/* update setting rx tx for all active vfs */
-+		wx_set_all_vfs(wx);
-+	}
-+
- 	if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
- 	      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP))) {
- 		/* disable mac transmiter */
-@@ -269,6 +287,10 @@ static int txgbe_sw_init(struct wx *wx)
- 	wx->tx_work_limit = TXGBE_DEFAULT_TX_WORK;
- 	wx->rx_work_limit = TXGBE_DEFAULT_RX_WORK;
- 
-+	wx->mbx.size = WX_VXMAILBOX_SIZE;
-+	wx->setup_tc = txgbe_setup_tc;
-+	set_bit(0, &wx->fwd_bitmask);
-+
- 	return 0;
- }
- 
-@@ -433,6 +455,11 @@ static const struct net_device_ops txgbe_netdev_ops = {
- 	.ndo_get_stats64        = wx_get_stats64,
- 	.ndo_vlan_rx_add_vid    = wx_vlan_rx_add_vid,
- 	.ndo_vlan_rx_kill_vid   = wx_vlan_rx_kill_vid,
-+	.ndo_set_vf_spoofchk    = wx_ndo_set_vf_spoofchk,
-+	.ndo_set_vf_link_state	= wx_ndo_set_vf_link_state,
-+	.ndo_get_vf_config      = wx_ndo_get_vf_config,
-+	.ndo_set_vf_vlan        = wx_ndo_set_vf_vlan,
-+	.ndo_set_vf_mac         = wx_ndo_set_vf_mac,
- };
- 
- /**
-@@ -694,6 +721,7 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	struct net_device *netdev;
- 
- 	netdev = wx->netdev;
-+	wx_disable_sriov(wx);
- 	unregister_netdev(netdev);
- 
- 	txgbe_remove_phy(txgbe);
-@@ -715,6 +743,7 @@ static struct pci_driver txgbe_driver = {
- 	.probe    = txgbe_probe,
- 	.remove   = txgbe_remove,
- 	.shutdown = txgbe_shutdown,
-+	.sriov_configure = wx_pci_sriov_configure,
- };
- 
- module_pci_driver(txgbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 93295916b1d2..22402a6d2f50 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -16,6 +16,7 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_phy.h"
- #include "txgbe_hw.h"
-@@ -179,6 +180,9 @@ static void txgbe_mac_link_down(struct phylink_config *config,
- 	struct wx *wx = phylink_to_wx(config);
- 
- 	wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
-+	wx->speed = 0;
-+	/* ping all the active vfs to let them know we are going down */
-+	wx_ping_all_vfs_with_link_status(wx, false);
- }
- 
- static void txgbe_mac_link_up(struct phylink_config *config,
-@@ -215,6 +219,10 @@ static void txgbe_mac_link_up(struct phylink_config *config,
- 	wr32(wx, WX_MAC_PKT_FLT, WX_MAC_PKT_FLT_PR);
- 	wdg = rd32(wx, WX_MAC_WDG_TIMEOUT);
- 	wr32(wx, WX_MAC_WDG_TIMEOUT, wdg);
-+
-+	wx->speed = speed;
-+	/* ping all the active vfs to let them know we are going up */
-+	wx_ping_all_vfs_with_link_status(wx, true);
- }
- 
- static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 1b4ff50d5857..28717788c348 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -71,12 +71,13 @@
- #define TXGBE_PX_MISC_ETH_LK                    BIT(18)
- #define TXGBE_PX_MISC_ETH_AN                    BIT(19)
- #define TXGBE_PX_MISC_INT_ERR                   BIT(20)
-+#define TXGBE_PX_MISC_IC_VF_MBOX                BIT(23)
- #define TXGBE_PX_MISC_GPIO                      BIT(26)
- #define TXGBE_PX_MISC_IEN_MASK                            \
- 	(TXGBE_PX_MISC_ETH_LKDN | TXGBE_PX_MISC_DEV_RST | \
- 	 TXGBE_PX_MISC_ETH_EVENT | TXGBE_PX_MISC_ETH_LK | \
- 	 TXGBE_PX_MISC_ETH_AN | TXGBE_PX_MISC_INT_ERR |   \
--	 TXGBE_PX_MISC_GPIO)
-+	 TXGBE_PX_MISC_IC_VF_MBOX | TXGBE_PX_MISC_GPIO)
- 
- /* Port cfg registers */
- #define TXGBE_CFG_PORT_ST                       0x14404
-@@ -195,6 +196,7 @@ struct txgbe {
- 	struct gpio_chip *gpio;
- 	unsigned int gpio_irq;
- 	unsigned int link_irq;
-+	u32 eicr;
- };
- 
- #endif /* _TXGBE_TYPE_H_ */
--- 
-2.43.2
+>+	}
+>+
+>+	if (dealloc)
+             ^
+What about rename it in `consume`?
+
+The rest LGTM.
+
+Thanks,
+Stefano
+
+>+		consume_skb(skb);
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>+
+> u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+> {
+> 	u32 ret;
+>@@ -891,6 +912,7 @@ int virtio_transport_do_socket_init(struct vsock_sock *vsk,
+> 		vsk->buffer_size = VIRTIO_VSOCK_MAX_BUF_SIZE;
+>
+> 	vvs->buf_alloc = vsk->buffer_size;
+>+	atomic_set(&vvs->bytes_unsent, 0);
+>
+> 	spin_lock_init(&vvs->rx_lock);
+> 	spin_lock_init(&vvs->tx_lock);
+>@@ -1090,6 +1112,14 @@ void virtio_transport_destruct(struct vsock_sock *vsk)
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_destruct);
+>
+>+int virtio_transport_bytes_unsent(struct vsock_sock *vsk)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+
+>+	return atomic_read(&vvs->bytes_unsent);
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_bytes_unsent);
+>+
+> static int virtio_transport_reset(struct vsock_sock *vsk,
+> 				  struct sk_buff *skb)
+> {
+>diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>index 6dea6119f5b2..35fd4e47b5bf 100644
+>--- a/net/vmw_vsock/vsock_loopback.c
+>+++ b/net/vmw_vsock/vsock_loopback.c
+>@@ -77,6 +77,7 @@ static struct virtio_transport loopback_transport = {
+> 		.stream_rcvhiwat          = virtio_transport_stream_rcvhiwat,
+> 		.stream_is_active         = virtio_transport_stream_is_active,
+> 		.stream_allow             = virtio_transport_stream_allow,
+>+		.stream_bytes_unsent      = virtio_transport_bytes_unsent,
+>
+> 		.seqpacket_dequeue        = virtio_transport_seqpacket_dequeue,
+> 		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
+>@@ -123,6 +124,11 @@ static void vsock_loopback_work(struct work_struct *work)
+> 	spin_unlock_bh(&vsock->pkt_queue.lock);
+>
+> 	while ((skb = __skb_dequeue(&pkts))) {
+>+		/* Decrement the bytes_sent counter without deallocating skb
+>+		 * It is freed by the receiver.
+>+		 */
+>+		virtio_transport_consume_skb_sent(skb, false);
+>+
+> 		virtio_transport_deliver_tap_pkt(skb);
+> 		virtio_transport_recv_pkt(&loopback_transport, skb);
+> 	}
+>-- 
+>2.34.1
+>
+>
 
 
