@@ -1,158 +1,136 @@
-Return-Path: <netdev+bounces-84632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 300D6897A65
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:07:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B386897A6A
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537F31C217F2
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 21:07:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C6A71C217A9
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 21:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE17C155A46;
-	Wed,  3 Apr 2024 21:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D274815664A;
+	Wed,  3 Apr 2024 21:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Qt0U+NED"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sduiYmCw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67A314C5B3
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 21:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BBB2F24
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 21:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712178475; cv=none; b=IA5WyCZ5hIjm3wyrXECSIwzgziMFrt4FnK5WLPPJX9EbBItsnUCF4My/rp58O2urYfT4zWID0p73NZJUDZRb5e/mSEFJOilc0G1Ju1oZEk05n/tPQSRGMVlodOlX9xRHqMrNVEZxf2loBMUzfDCm5rcDqpjnqhfVovGoJ6GUjE4=
+	t=1712178713; cv=none; b=a+x+xNXRMRNzJj/H/4lu/D1q3MsJGi3JORcvTZYOrYguUtdWdhmZec+RAw5r88CHUE7knq+bVrqPLG6v0n7lSYT+1wR56iAFtjc04smbwYRTClHoS4wBtY6nrD5C/LV6U/N0rz3rSi2O8n/jtH2LesSwhaKQO7iiEVfWk74I+Ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712178475; c=relaxed/simple;
-	bh=NAxXbTXljNe/Y4q6CRTIL8DlcLQmJZ+JPq3gNq41ALY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=d497gI5mdsqkQZ1MwpVUB8QrATvraSfLfYTc3Aui0iCQWadqByB5/uXwBZNs2pIA4QsyvyZ+sMRrmv6jfMU3lGyaisyFJClLaaDgTwcChNizpPF7zlZw9lAC0JZfcxaUJp5cT+P1YhSEsGhFGhNj2KHpdIVXIrWfsz3f2J+I3B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Qt0U+NED; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 433L29xh028503;
-	Wed, 3 Apr 2024 21:07:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=zu6US5qxrh9nqrNa72Oe1aQZi4GvXffEloGNo21Ijys=; b=Qt
-	0U+NED6WBW9JHrh5tCGPGFq93+qmp+/MW3nEvVgCZfJQKRDWQ1kO6p2ngB+KbI19
-	IxLMlmBaJSOkkDPdqgyNOSsobLkgcDJ0jdwHAry7nVC+boqTXN3vMUzPyfbbBUVw
-	8ZfYSVzs+vlhbB4NLgoODoA6bXi0NWd2AVhN8j9GziNicEzhzobnBaSL3gFyDKzI
-	6LQMI0SCDuOk5ldbCx2NIDq9uiEiHGEcA3rjGXH7PeYVCw113kk3lmtNh2srjf1b
-	lHicbTxAzofs5rXX0Zs9Pkc6EgEFp0CpgrVI89WYjqr/a2dJefCCThcBgbm3ELvV
-	aCPc3hgQTAarsW4xS+VA==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x9ep3r0b1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 21:07:42 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 433L7fuR004834
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 3 Apr 2024 21:07:41 GMT
-Received: from [10.227.110.203] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 3 Apr 2024
- 14:07:41 -0700
-Message-ID: <9ec98f94-94e1-4a72-9dbd-31ac95e13f06@quicinc.com>
-Date: Wed, 3 Apr 2024 14:07:40 -0700
+	s=arc-20240116; t=1712178713; c=relaxed/simple;
+	bh=skX93573gnUmEfggTKxPIaDIj031bnSSN+11TJaCx7U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LVjCjojSzqToFVtnIhIFHk8hH49nUBwPCQejMnlglOJV74GG7TKAwfy5AJC8v3jiIx/5HhUSWUlI0NQrG778J6KKavWyf+GGONNuKQ7UTwbj8X2dyZwIF04S9CjYTiX8ytwjcbZKztVMFOjwKqRHUrMXTE2YKyiyNCccNH2Krog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sduiYmCw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XefOiSETJaRTUAGyBJeKN1ejKeJwan5nmergzUjZHtw=; b=sduiYmCwI+KLYV3EKvtTyBtHnJ
+	mSWh8HCk8cBp1+q6Tf9EoxzVFhWKThqynVd9G0nsZCxopOuACrDUvU87XrXFGqc0HFe/euyyIol48
+	DVCIhIOIM1WhBQzR3pffrYC9A4u47qLmigH/CgouClNIxQ4N+nSYCav3JfmFUVemmfGU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rs7td-00C7Fv-EE; Wed, 03 Apr 2024 23:11:49 +0200
+Date: Wed, 3 Apr 2024 23:11:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 11/15] eth: fbnic: Enable Ethernet link setup
+Message-ID: <5b66da7c-f533-4092-9918-1612d9c84cb3@lunn.ch>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217495098.1598374.12824051034972793514.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 05/15] eth: fbnic: add message parsing for FW
- messages
-Content-Language: en-US
-To: Alexander Duyck <alexander.duyck@gmail.com>, <netdev@vger.kernel.org>
-CC: Alexander Duyck <alexanderduyck@fb.com>, <kuba@kernel.org>,
-        <davem@davemloft.net>, <pabeni@redhat.com>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <171217492560.1598374.8486151971412546101.stgit@ahduyck-xeon-server.home.arpa>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <171217492560.1598374.8486151971412546101.stgit@ahduyck-xeon-server.home.arpa>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: pa7OjcD_xFQEiPwb2H4CI2A-CY1psrGh
-X-Proofpoint-GUID: pa7OjcD_xFQEiPwb2H4CI2A-CY1psrGh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-03_22,2024-04-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- mlxlogscore=999 spamscore=0 suspectscore=0 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 phishscore=0 impostorscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404030143
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <171217495098.1598374.12824051034972793514.stgit@ahduyck-xeon-server.home.arpa>
 
-On 4/3/2024 1:08 PM, Alexander Duyck wrote:
-> From: Alexander Duyck <alexanderduyck@fb.com>
-> 
-> Add FW message formatting and parsing. The TLV format should
-> look very familiar to those familiar with netlink.
-> Since we don't have to deal with backward compatibility
-> we tweaked the format a little to make it easier to deal
-> with, and more appropriate for tightly coupled interfaces
-> like driver<>FW communication.
-> 
-> Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
-> ---
->  drivers/net/ethernet/meta/fbnic/Makefile    |    3 
->  drivers/net/ethernet/meta/fbnic/fbnic_tlv.c |  529 +++++++++++++++++++++++++++
->  drivers/net/ethernet/meta/fbnic/fbnic_tlv.h |  175 +++++++++
->  3 files changed, 706 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
->  create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
-[...]
-> +/**
-> + *  fbnic_tlv_msg_alloc - Allocate page and initialize FW message header
-> + *  @msg_id: Identifier for new message we are starting
-> + *
-> + *  Returns pointer to start of message, or NULL on failure.
+> +/* MAC PCS registers */
+> +#define FBNIC_CSR_START_PCS		0x10000 /* CSR section delimiter */
+> +#define FBNIC_PCS_CONTROL1_0		0x10000		/* 0x40000 */
+> +#define FBNIC_PCS_CONTROL1_RESET		CSR_BIT(15)
+> +#define FBNIC_PCS_CONTROL1_LOOPBACK		CSR_BIT(14)
+> +#define FBNIC_PCS_CONTROL1_SPEED_SELECT_ALWAYS	CSR_BIT(13)
+> +#define FBNIC_PCS_CONTROL1_SPEED_ALWAYS		CSR_BIT(6)
+> +#define FBNIC_PCS_VENDOR_VL_INTVL_0	0x10202		/* 0x40808 */
+> +#define FBNIC_PCS_VL0_0_CHAN_0		0x10208		/* 0x40820 */
+> +#define FBNIC_PCS_VL0_1_CHAN_0		0x10209		/* 0x40824 */
+> +#define FBNIC_PCS_VL1_0_CHAN_0		0x1020a		/* 0x40828 */
+> +#define FBNIC_PCS_VL1_1_CHAN_0		0x1020b		/* 0x4082c */
+> +#define FBNIC_PCS_VL2_0_CHAN_0		0x1020c		/* 0x40830 */
+> +#define FBNIC_PCS_VL2_1_CHAN_0		0x1020d		/* 0x40834 */
+> +#define FBNIC_PCS_VL3_0_CHAN_0		0x1020e		/* 0x40838 */
+> +#define FBNIC_PCS_VL3_1_CHAN_0		0x1020f		/* 0x4083c */
 
-should use Return: tag as documented at https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html#function-documentation
+Is this a licences PCS? Synopsys DesignWare?
 
-(although the kernel-doc script will accept a few variations such as Returns: or @Returns:)
+> +static void fbnic_set_led_state_asic(struct fbnic_dev *fbd, int state)
+> +{
+> +	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
+> +	u32 led_csr = FBNIC_MAC_ENET_LED_DEFAULT;
+> +
+> +	switch (state) {
+> +	case FBNIC_LED_OFF:
+> +		led_csr |= FBNIC_MAC_ENET_LED_AMBER |
+> +			   FBNIC_MAC_ENET_LED_ACTIVITY_ON;
+> +		break;
+> +	case FBNIC_LED_ON:
+> +		led_csr |= FBNIC_MAC_ENET_LED_BLUE |
+> +			   FBNIC_MAC_ENET_LED_ACTIVITY_ON;
+> +		break;
+> +	case FBNIC_LED_RESTORE:
+> +		led_csr |= FBNIC_MAC_ENET_LED_ACTIVITY_DEFAULT;
+> +
+> +		/* Don't set LEDs on if link isn't up */
+> +		if (fbd->link_state != FBNIC_LINK_UP)
+> +			break;
+> +		/* Don't set LEDs for supported autoneg modes */
+> +		if ((fbn->link_mode & FBNIC_LINK_AUTO) &&
+> +		    (fbn->link_mode & FBNIC_LINK_MODE_MASK) != FBNIC_LINK_50R2)
+> +			break;
+> +
+> +		/* Set LEDs based on link speed
+> +		 * 100G	Blue,
+> +		 * 50G	Blue & Amber
+> +		 * 25G	Amber
+> +		 */
+> +		switch (fbn->link_mode & FBNIC_LINK_MODE_MASK) {
+> +		case FBNIC_LINK_100R2:
+> +			led_csr |= FBNIC_MAC_ENET_LED_BLUE;
+> +			break;
+> +		case FBNIC_LINK_50R1:
+> +		case FBNIC_LINK_50R2:
+> +			led_csr |= FBNIC_MAC_ENET_LED_BLUE;
+> +			fallthrough;
+> +		case FBNIC_LINK_25R1:
+> +			led_csr |= FBNIC_MAC_ENET_LED_AMBER;
+> +			break;
+> +		}
+> +		break;
+> +	default:
+> +		return;
+> +	}
+> +
+> +	wr32(FBNIC_MAC_ENET_LED, led_csr);
+> +}
 
-currently scripts/kernel-doc -Wall -Werror -none $files reports:
-drivers/net/ethernet/meta/fbnic/fbnic_fw.c:244: warning: No description found for return value of 'fbnic_fw_xmit_simple_msg'
-drivers/net/ethernet/meta/fbnic/fbnic_fw.c:273: warning: No description found for return value of 'fbnic_fw_xmit_cap_msg'
-drivers/net/ethernet/meta/fbnic/fbnic_fw.c:338: warning: No description found for return value of 'fbnic_fw_xmit_ownership_msg'
-drivers/net/ethernet/meta/fbnic/fbnic_fw.c:659: warning: No description found for return value of 'fbnic_fw_xmit_comphy_set_msg'
-drivers/net/ethernet/meta/fbnic/fbnic_irq.c:33: warning: No description found for return value of 'fbnic_fw_enable_mbx'
-drivers/net/ethernet/meta/fbnic/fbnic_irq.c:111: warning: No description found for return value of 'fbnic_mac_get_link'
-drivers/net/ethernet/meta/fbnic/fbnic_irq.c:146: warning: No description found for return value of 'fbnic_mac_enable'
-drivers/net/ethernet/meta/fbnic/fbnic_mac.c:1020: warning: No description found for return value of 'fbnic_mac_init'
-drivers/net/ethernet/meta/fbnic/fbnic_netdev.c:356: warning: No description found for return value of 'fbnic_netdev_alloc'
-drivers/net/ethernet/meta/fbnic/fbnic_netdev.c:449: warning: No description found for return value of 'fbnic_netdev_register'
-drivers/net/ethernet/meta/fbnic/fbnic_pci.c:300: warning: No description found for return value of 'fbnic_probe'
-drivers/net/ethernet/meta/fbnic/fbnic_pci.c:614: warning: No description found for return value of 'fbnic_init_module'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:24: warning: No description found for return value of 'fbnic_tlv_msg_alloc'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:55: warning: No description found for return value of 'fbnic_tlv_attr_put_flag'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:97: warning: No description found for return value of 'fbnic_tlv_attr_put_value'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:141: warning: No description found for return value of '__fbnic_tlv_attr_put_int'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:161: warning: No description found for return value of 'fbnic_tlv_attr_put_mac_addr'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:178: warning: No description found for return value of 'fbnic_tlv_attr_put_string'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:204: warning: No description found for return value of 'fbnic_tlv_attr_get_unsigned'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:220: warning: No description found for return value of 'fbnic_tlv_attr_get_signed'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:244: warning: No description found for return value of 'fbnic_tlv_attr_get_string'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:264: warning: No description found for return value of 'fbnic_tlv_attr_nest_start'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:387: warning: No description found for return value of 'fbnic_tlv_attr_parse_array'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:439: warning: No description found for return value of 'fbnic_tlv_attr_parse'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:487: warning: No description found for return value of 'fbnic_tlv_msg_parse'
-drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:520: warning: No description found for return value of 'fbnic_tlv_parser_error'
-26 warnings as Errors
+Seems like you should be using /sys/class/leds and the netdev trigger.
 
-> + *
-> + *  Allocates a page and initializes message header at start of page.
-> + *  Initial message size is 1 DWORD which is just the header.
-> + **/
-
+      Andrew
 
