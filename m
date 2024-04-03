@@ -1,115 +1,142 @@
-Return-Path: <netdev+bounces-84559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43309897512
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:21:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB54897515
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:21:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E154128D6A9
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:21:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53CFA1F23822
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A97F14F114;
-	Wed,  3 Apr 2024 16:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5690F14EC77;
+	Wed,  3 Apr 2024 16:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="31tQzLjj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A21947E
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 16:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B3F14F11C
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 16:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712161284; cv=none; b=aQNJIHyKQbkwbLXA3RpbOdO/nnNHErY8FV0PK7rlSnv4thH8e9wQLiEK0aigyQ33phx57lYJOLjc939bsfVy9/TPAnsQXk61i8UGfhT7TqR6iiTXw4jB2bcsoj99x/zFmh28j3wjgMcBvq/nqFPpLT0ATwmuax4+XL46GxjM2UU=
+	t=1712161294; cv=none; b=lqOYPvzMnot12hW22HCdl+holetS2vWk346iwLFi4e5nCQJ4m8ldhBLqg8KRo8eFYFemJAN68lqEbd4khE+TIxTTmrRDFhKxf6tmXZv0H8hZCUSx3OgvWKhesZJ0DmhPhLILEseUaYZW4uCPVE5YNI9nUYRhLnycICQ/E0XNbFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712161284; c=relaxed/simple;
-	bh=TYy+T1x6y3Wb4pK29y2I8wFKAgeg0HxECAQiZGdqZ9A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=rlb1zJEf41bJwkiR6EqvtN26F6/GEGjeLsuW+8CHvOgsxAQqmP8qUZK6lKASlQQbRi66B7IsvF3tIu4DvSumE7yJBTRQN4gBBQgUJfCwGfNxUV5qYxbEn1GjaV4L8RLkn5xed/9bVWT1iXzneEgaChP/dlf+/H6dS/2cNK4lRL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-491-dc50YU_LMxG1tmXMBHUYuA-1; Wed, 03 Apr 2024 12:21:17 -0400
-X-MC-Unique: dc50YU_LMxG1tmXMBHUYuA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BD68885A5BB;
-	Wed,  3 Apr 2024 16:21:16 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 977D28173;
-	Wed,  3 Apr 2024 16:21:15 +0000 (UTC)
-Date: Wed, 3 Apr 2024 18:21:10 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com,
-	Phillip Potter <phil@philpotter.co.uk>
-Subject: Re: [PATCH v2 net] geneve: fix header validation in
- geneve[6]_xmit_skb
-Message-ID: <Zg2B9iFLlADuzlBs@hog>
-References: <20240403153017.426490-1-edumazet@google.com>
+	s=arc-20240116; t=1712161294; c=relaxed/simple;
+	bh=mGMMo3ZLfBeEvFFcEaT6KGVRAap1af/uQhQPH9tC3L8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K2yiyng0n16993Gwhh2Umv/QmW8l085untvcB0tLxSlxg4hiJSHT5+n2B2kh/bv7qEyzIZXFSXHgLqvpDWk4mVP7FI2u7AQjnpNYS0pvRBkqQ4c3IlkzObt/n8z4uVxkT+SNFUxKZoroA+2pv8MWzownWXEq13TzFaY7lCoBo28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=31tQzLjj; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e0430f714so16891a12.1
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 09:21:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712161291; x=1712766091; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hrWLuZ4ObysZMS0zaWAlDYfXTxfcPhZfcNQjqQVazpM=;
+        b=31tQzLjj0U75P+/+l2i2haApIOI2XR4r+BMyLbNHEQ+ffMkccL2oY5pwPx5HFYuMMb
+         XCDF3s5LDHcWMmqM9VuNFX6p7vVGllBHb7GXhbe77KJjOsiV3142kF1EuVHMUZ5G1MtI
+         Ca7Ccyi2m3MwJTr2TyFcx0RpHZ8CQkjp7JjS2QbBOgB212JP3SUHxtioM9gXK1+2AWbc
+         WjGDpWzC+z8Gs7ZnAUJvrlNEWa0T1/pVXuyoxtf1zkev6NszZrRKMeZYSJRUCDykw/Xq
+         oplWxotKhM5FC22kd70M4KBGzYcWMyVZqZTu+UcGAi7Bzs0z8fM0Dk1GkDfaZr/c/rec
+         Regg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712161291; x=1712766091;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hrWLuZ4ObysZMS0zaWAlDYfXTxfcPhZfcNQjqQVazpM=;
+        b=AiVFChRwe4bDRqiVLFIdufwCaDUJKo0OXDLmV02C7MuTa2pKhZRoaXiTZHmxh/wSX5
+         iGlwdFKEmZw55UbbZ8tP+CwajBvQBbHdzWOs/MqF1PzyFwywwkYIEYUe5ZFLc/c2HVD0
+         e6UZBWUFyzzcBk317R+fPIBn0BqJ6Sm7UL6UQWg61xubuaBcCtycVfmviCyNhjz4NC1U
+         SCEjRtQv0tPMk/NBkn28tr2mhoNNYOBg4/VYz8hmNx9dq0MXCrPlLIu+2ibVRRVpqW2S
+         Pg58mGMUsxWMFHHI3VuKMaZB3Retd5AEYqI6HPaKRwDlKqnhKN1omWhgRhh0azqmwHl9
+         i4Yw==
+X-Gm-Message-State: AOJu0YzIRQq6mhO2v0UqTrlQ7d3WZAsOGnB2mZ0uWF4LOmtsISnc7BN9
+	wh1TAI7XNWkjMSZUc1ISdWBXZnyElOC3dOW253A+c96AvMEhouphoWn4EaWQFnwsbXc21TOItgq
+	Ddk7/LV+3nlShj5yNImF/XfIxp4gNoIEz7NDo
+X-Google-Smtp-Source: AGHT+IHqV8nh3vs9uhNkXP0lLQJS/1dz3NMJOgbEg6uNtHu92rE4PVTE04B0MRBxCsUDGhcO1KcLKcgChP/Y6+vvnXQ=
+X-Received: by 2002:a05:6402:3591:b0:56c:5230:de80 with SMTP id
+ y17-20020a056402359100b0056c5230de80mr305436edc.2.1712161290502; Wed, 03 Apr
+ 2024 09:21:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240403153017.426490-1-edumazet@google.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+References: <20240403152844.4061814-1-almasrymina@google.com> <20240403152844.4061814-3-almasrymina@google.com>
+In-Reply-To: <20240403152844.4061814-3-almasrymina@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 3 Apr 2024 18:21:19 +0200
+Message-ID: <CANn89i+X7er9A+gF-7Q=DB_EQfWxQO5X+kPuPqMi1xGbVAV2CA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/3] net: mirror skb frag ref/unref helpers
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ayush Sawal <ayush.sawal@chelsio.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Ahern <dsahern@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Tariq Toukan <tariqt@nvidia.com>, 
+	Dragos Tatulea <dtatulea@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	Sabrina Dubroca <sd@queasysnail.net>, 
+	=?UTF-8?Q?Ahelenia_Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Florian Westphal <fw@strlen.de>, David Howells <dhowells@redhat.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	Johannes Berg <johannes.berg@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-2024-04-03, 15:30:17 +0000, Eric Dumazet wrote:
-> +static inline bool skb_vlan_inet_prepare(struct sk_buff *skb)
+On Wed, Apr 3, 2024 at 5:28=E2=80=AFPM Mina Almasry <almasrymina@google.com=
+> wrote:
+>
+> Refactor some of the skb frag ref/unref helpers for improved clarity.
+>
+> Implement napi_pp_get_page() to be the mirror counterpart of
+> napi_pp_put_page().
+>
+> Implement skb_page_ref() to be the mirror of skb_page_unref().
+>
+> Improve __skb_frag_ref() to become a mirror counterpart of
+> __skb_frag_unref(). Previously unref could handle pp & non-pp pages,
+> while the ref could only handle non-pp pages. Now both the ref & unref
+> helpers can correctly handle both pp & non-pp pages.
+>
+> Now that __skb_frag_ref() can handle both pp & non-pp pages, remove
+> skb_pp_frag_ref(), and use __skb_frag_ref() instead.  This lets us
+> remove pp specific handling from skb_try_coalesce.
+>
+> Additionally, since __skb_frag_ref() can now handle both pp & non-pp
+> pages, a latent issue in skb_shift() should now be fixed. Previously
+> this function would do a non-pp ref & pp unref on potential pp frags
+> (fragfrom). After this patch, skb_shift() should correctly do a pp
+> ref/unref on pp frags.
+>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+>
+
+...
+
+>  #if IS_ENABLED(CONFIG_PAGE_POOL)
+> +bool napi_pp_get_page(struct page *page)
 > +{
-> +=09int nhlen, maclen;
-> +=09__be16 type;
+> +       page =3D compound_head(page);
 > +
-> +=09/* Essentially this is skb_protocol(skb, true)
-> +=09 * And we get MAC len.
-> +=09 */
-> +=09type =3D __vlan_get_protocol(skb, skb->protocol, &maclen);
+> +       if (!is_pp_page(page))
+> +               return false;
 > +
-> +=09switch (type) {
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +=09case htons(ETH_P_IPV6):
-> +=09=09nhlen =3D sizeof(struct ipv6hdr);
-> +=09=09break;
-> +#endif
-> +=09case htons(ETH_P_IP):
-> +=09=09nhlen =3D sizeof(struct iphdr);
-> +=09=09break;
-> +
-> +=09default:
-> +=09=09nhlen =3D 0;
-> +=09}
-> +=09/* For ETH_P_IPV6/ETH_P_IP we make sure to pull
-> +=09 * a base network header in skb->head.
-> +=09 */
-> +=09if (pskb_may_pull(skb, maclen + nhlen))
-
-Missing ! in the condition.
-
-Otherwise looks ok to me.
-
-
-> +=09=09return false;
-> +
-> +=09skb_set_network_header(skb, maclen);
-> +=09return true;
+> +       page_pool_ref_page(page);
+> +       return true;
 > +}
+> +EXPORT_SYMBOL(napi_pp_get_page);
 
---=20
-Sabrina
-
+It seems this could be inlined (along with is_pp_page())
 
