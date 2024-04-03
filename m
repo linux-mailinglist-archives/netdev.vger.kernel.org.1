@@ -1,58 +1,50 @@
-Return-Path: <netdev+bounces-84583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B3EA8977B8
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:02:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B60F89781D
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:22:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C59F91C26483
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:02:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 662E1B3685F
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C321534E6;
-	Wed,  3 Apr 2024 18:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6698516EC0D;
+	Wed,  3 Apr 2024 17:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N9vfLw74"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0645152E0D
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 18:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435D016EC09
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 17:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712167365; cv=none; b=LiugvHE4IHYexCcZ8ZAh5hA9u7nStqL2QxlW3Icg6czzJiTOLbJvPujpgbQ+0AA03s1k/6wxfTmGAloBVf29lVGQGgCFVvw1QBwmDq4GZztGzGGUCsOjtFyyoromUCuuAqO/WFqXTcIJojJ2Kium8fiBG3agdOQRMsnMWqfND/8=
+	t=1712164829; cv=none; b=CVJMuqojSsa8VXEhcf0/n0M1JutiAPniNFcD0/ArGYq6UbsT4yh0aVO6PkFIvOjnj+L9WHhY0EcVYj4Q51CD6PvKCtxIDP8+bGwiL/Me+eKsI2LKdnT7PfCyPUGKa/JfOxl4WdOWnX9teGSUdz56RCy6IGUB82n37W61a0MUgdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712167365; c=relaxed/simple;
-	bh=WnGObgsV1CcvCJj8yb4xkruUyWL7miQ2+aDMKi/RxKM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SCyUFg5JZi++wAgZG3UMUgiF+G8aWw6V87DdxR3rVpnv4rvDW/j8oJnr4NSc6qgno/G4bJX5H82GNyWLpqYFu+dEqkSgVO01HMWrlWsfA7wiEDDz0buri34pwmajqeLZOF+6BqWffa4RTNmCWXYcQLT6nN0wc4loma9Yqa3P0fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <l.stach@pengutronix.de>)
-	id 1rs4wO-0008GE-W9; Wed, 03 Apr 2024 20:02:29 +0200
-Received: from [2a0a:edc0:0:1101:1d::28] (helo=dude02.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <l.stach@pengutronix.de>)
-	id 1rs4wN-00AE7z-7h; Wed, 03 Apr 2024 20:02:27 +0200
-From: Lucas Stach <l.stach@pengutronix.de>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org,
-	kernel@pengutronix.de,
-	patchwork-lst@pengutronix.de
-Subject: [PATCH 3/3] net: dsa: microchip: lan937x: disable VPHY output
-Date: Wed,  3 Apr 2024 20:02:26 +0200
-Message-Id: <20240403180226.1641383-3-l.stach@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240403180226.1641383-1-l.stach@pengutronix.de>
-References: <20240403180226.1641383-1-l.stach@pengutronix.de>
+	s=arc-20240116; t=1712164829; c=relaxed/simple;
+	bh=rkdmpgRa8JG8drr2B7S+0LqEQWa376GQaCUb5ljMCsA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UzSMT+jvYikOh/BhEKVJsRjWXcYy9Xhs4vMV96CLywO7Yzvh8haIJVyFles4EAePkglfqMYAek2bptFLxq+DI2W6AxGt5HWj5Jfppmm6gHcIKDFltw4PzIIW+L03jLTQRSvz5k/XdI1tGxWOJZe8gWq3OFmB9NSB9dBzlKFM6Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N9vfLw74; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E60E6C433C7;
+	Wed,  3 Apr 2024 17:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712164828;
+	bh=rkdmpgRa8JG8drr2B7S+0LqEQWa376GQaCUb5ljMCsA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=N9vfLw74MM0QZMKm4iiH6vdcoK1CnDYdW3YC7vYu3BFYiv0m6Y4G/Q7d8w7yk4Ote
+	 HRWYkVElMcb3pbxYzbCS9PjH37z5I40cE4YiIhGy09RUUGw9jnnUfHqTrCup3D+mQg
+	 DHexLQBswdMq0HS1oJPAVmtt1rC2Wrt5x1fvxm8f+T85a8UPwbInawcafapKEh1xzi
+	 W/6u/vHZFGwj9m82RvK0K19OSsh5q8f6qxS0rFusw/96ZmoYD8KyQ9QBmTPplkfZKf
+	 zyxW+y+2uNTPTg1Jdx0Z7tMC09gj+QfyGbhnyalGwSeIhqF5VFNsmKuY18G5a5yOLv
+	 mHLnvqd2y8SGg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9DFCC43168;
+	Wed,  3 Apr 2024 17:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,58 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: l.stach@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2] man: fix brief explanation of `ip netns attach NAME
+ PID`
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171216482888.20023.11202781934775693678.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Apr 2024 17:20:28 +0000
+References: <20240402020819.28433-3-public@yusuke.pub>
+In-Reply-To: <20240402020819.28433-3-public@yusuke.pub>
+To: Yusuke Ichiki <public@yusuke.pub>
+Cc: netdev@vger.kernel.org, mcroce@redhat.com, stephen@networkplumber.org
 
-While the documented VPHY out-of-reset configuration should autonegotiate
-the maximum supported link speed on the CPU interface, that doesn't work
-on RGMII links, where the VPHY negotiates 100MBit speed. This causes the
-RGMII TX interface to run with a wrong clock rate.
+Hello:
 
-Disable the VPHY output altogether, so it doesn't interfere with the
-CPU interface configuration set via fixed-link. The VPHY is a compatibility
-functionality to be able to attach network drivers without fixed-link
-support to the switch, which generally should not be needed with linux
-network drivers.
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-Signed-off-by: Lucas Stach <l.stach@pengutronix.de>
----
- drivers/net/dsa/microchip/lan937x_main.c | 3 +++
- drivers/net/dsa/microchip/lan937x_reg.h  | 4 ++++
- 2 files changed, 7 insertions(+)
+On Tue,  2 Apr 2024 11:08:17 +0900 you wrote:
+> Rewrite the explanation as it was duplicated with that of
+> `ip netns add NAME`.
+> 
+> Signed-off-by: Yusuke Ichiki <public@yusuke.pub>
+> ---
+>  man/man8/ip-netns.8.in | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
-index 04fa74c7dcbe..9db1d278ee9b 100644
---- a/drivers/net/dsa/microchip/lan937x_main.c
-+++ b/drivers/net/dsa/microchip/lan937x_main.c
-@@ -400,6 +400,9 @@ int lan937x_setup(struct dsa_switch *ds)
- 	lan937x_cfg(dev, REG_SW_GLOBAL_OUTPUT_CTRL__1,
- 		    (SW_CLK125_ENB | SW_CLK25_ENB), true);
- 
-+	/* disable VPHY output*/
-+	ksz_rmw32(dev, REG_SW_CFG_STRAP_OVR, SW_VPHY_DISABLE, SW_VPHY_DISABLE);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/dsa/microchip/lan937x_reg.h b/drivers/net/dsa/microchip/lan937x_reg.h
-index e36bcb155f54..be553e23a964 100644
---- a/drivers/net/dsa/microchip/lan937x_reg.h
-+++ b/drivers/net/dsa/microchip/lan937x_reg.h
-@@ -37,6 +37,10 @@
- #define SW_CLK125_ENB			BIT(1)
- #define SW_CLK25_ENB			BIT(0)
- 
-+/* 2 - PHY Control */
-+#define REG_SW_CFG_STRAP_OVR		0x214
-+#define SW_VPHY_DISABLE			BIT(31)
-+
- /* 3 - Operation Control */
- #define REG_SW_OPERATION		0x0300
- 
+Here is the summary with links:
+  - [iproute2] man: fix brief explanation of `ip netns attach NAME PID`
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=e67c9a73532a
+
+You are awesome, thank you!
 -- 
-2.39.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
