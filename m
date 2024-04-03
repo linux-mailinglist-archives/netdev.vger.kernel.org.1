@@ -1,70 +1,67 @@
-Return-Path: <netdev+bounces-84246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 513EC896251
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 04:10:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1843F89626C
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 04:19:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED1E11F24F6F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 02:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF8EF289F85
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 02:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117AA17729;
-	Wed,  3 Apr 2024 02:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955161865B;
+	Wed,  3 Apr 2024 02:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LCPbcesp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldzThvtW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D315F168DE;
-	Wed,  3 Apr 2024 02:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E19B259C;
+	Wed,  3 Apr 2024 02:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712110232; cv=none; b=uDzzqsoIXSKRyvCnx9uAKCsDgHNc++WBMoU3kQBzELeU848uPFqnscA9jLWEw0/xSHsPjZGj4zsmOrIUcN94KZGuK/O/Y4HP0JXkxxgWFXeFNVWD8u4gEd/9EkTmG7bhJ3tiamtjiwdhvGiXiiTc9f2MC7CpjXJO+G1OF+cBnlQ=
+	t=1712110725; cv=none; b=QhmFOPoTaoEMs+ArM4DC+P1HsemRkxSh4TuH6JPOiGvzIOJ9jZ3ELPGfXUleEO2zumaPfJnxPTJk9KdtOPldyw6+4L4FdldKorqpgr4McsWJewevaK0pcnTFYyN7vn+SynvxKiGMRrYAN2VPZGoQhG5Rqk7e4hWBNP0qPl7dYzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712110232; c=relaxed/simple;
-	bh=y6DvVEooFfS6fE42WhsK/UU1M9fwwEQd4IEC65RgZdk=;
+	s=arc-20240116; t=1712110725; c=relaxed/simple;
+	bh=R9fYilqkrq8iygPPfkADp53ieAs4A1QmT22VdM+Kzx0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LI2X7P7hnQMYmZaLe28OuoC+Q4cgsFGwOHBDHXkmeKrYYQwTtX5F2o8ez19/0R0JojALfwvMBZzvu13B/imIgiJok6LBiUMmGfrdcj+lO+Wwg6qJcZhppQAhE5Gn/aRQUqNtAtoiPjia/LaaokoI8QgsPZikPXIdKLM57WLq/2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LCPbcesp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D029C433C7;
-	Wed,  3 Apr 2024 02:10:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NdI8dlEBE0c3Drazw3K7CQqyw9X+BEK7fS175bgNll5L/lv5baDOuYi6ASltyf8dE6IQkyiGnavtJ8PgH7NR9sH/ZQFLIjNifOhM05MwBSXbrUiu2q5GeUDmgzBk9NYUVa44795TEZp50pL8cS+cOXP3zs8zHdLJrC0I0inONuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldzThvtW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46777C433F1;
+	Wed,  3 Apr 2024 02:18:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712110231;
-	bh=y6DvVEooFfS6fE42WhsK/UU1M9fwwEQd4IEC65RgZdk=;
+	s=k20201202; t=1712110724;
+	bh=R9fYilqkrq8iygPPfkADp53ieAs4A1QmT22VdM+Kzx0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LCPbcespmCZc8RnSHDEKXToJp4JYVa+JgyFU1TzjuPNUjbSGqIZkhC7AvH3irfGko
-	 u9ECvhb6Do9hyYqsSutp9jVnJHzsQ9xzcHRRIGSXg0e1TMG3uL5UD/rqvFDAPatRlj
-	 Luyg/ct38rckmpYUPG9EtTaVGaOu012+ZPTqKRAyaMko8Auradq9bGeAIeSrW37jBh
-	 V8eZsAOidVQbgbMOUpsN64u4CDZz+3VOMHG66tj+oyHQOr99LHkXZshyCmot2ie9xk
-	 G+em7l80Rl/WPk4duNzgrjwQTuQdfrH8gL35lcrASI2OrO4ZogrEy+KYWNISf6JKnf
-	 D+fIX6/wF0s0Q==
-Date: Tue, 2 Apr 2024 19:10:29 -0700
+	b=ldzThvtWNA0erTrSs7uhEuDgTYSgBfZOqKybUyWm1XIYfMZAfKiWR42lAFxRNy/Bv
+	 BvQn/gzakiVqrug9ujsyKqUbp6QZxK1ovb6Nq7+ZLf+Bj0rxRln51+iRYcNV6iY8fz
+	 o7mZHaszxC5zhBo+mYDxHB40nE5Qz6bGV+4n/aR3E9AMTmrc5WLqAknrShG8wyJ+t0
+	 nAW//8QRJECBqoAVa1dpfVuq7GKCPckzMgTVSxK5xbM6Kk+q+9ZH6kZ0GmOBN7xAPN
+	 zDOHPyA+IRksao/mg0dD/CuKqo7LmuEHSu40ukRA+FBmNVfh4xp1E1SNgoMd98l5Cq
+	 mTlHPTSY51drA==
+Date: Tue, 2 Apr 2024 19:18:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, Ayush Sawal <ayush.sawal@chelsio.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Mirko Lindner <mlindner@marvell.com>, Stephen
- Hemminger <stephen@networkplumber.org>, Tariq Toukan <tariqt@nvidia.com>,
- Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Boris
- Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>,
- Dragos Tatulea <dtatulea@nvidia.com>, Maxim Mikityanskiy
- <maxtram95@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>, Simon Horman
- <horms@kernel.org>, Yunsheng Lin <linyunsheng@huawei.com>, "Ahelenia
- =?UTF-8?B?WmllbWlhxYRza2E=?=" <nabijaczleweli@nabijaczleweli.xyz>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>, David Howells
- <dhowells@redhat.com>, Florian Westphal <fw@strlen.de>, Aleksander Lobakin
- <aleksander.lobakin@intel.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Johannes Berg <johannes.berg@intel.com>, Liang Chen
- <liangchen.linux@gmail.com>
-Subject: Re: [PATCH net-next v3 0/3] Minor cleanups to skb frag ref/unref
-Message-ID: <20240402191029.321b1609@kernel.org>
-In-Reply-To: <20240401215042.1877541-1-almasrymina@google.com>
-References: <20240401215042.1877541-1-almasrymina@google.com>
+ linux-doc@vger.kernel.org, ahmed.zaki@intel.com,
+ aleksander.lobakin@intel.com, alexandre.torgue@foss.st.com, andrew@lunn.ch,
+ cjubran@nvidia.com, corbet@lwn.net, davem@davemloft.net,
+ dtatulea@nvidia.com, edumazet@google.com, gal@nvidia.com,
+ hkallweit1@gmail.com, jacob.e.keller@intel.com, jiri@resnulli.us,
+ joabreu@synopsys.com, justinstitt@google.com, kory.maincent@bootlin.com,
+ leon@kernel.org, liuhangbin@gmail.com, maxime.chevallier@bootlin.com,
+ pabeni@redhat.com, paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com,
+ rdunlap@infradead.org, richardcochran@gmail.com, saeed@kernel.org,
+ tariqt@nvidia.com, vadim.fedorenko@linux.dev, vladimir.oltean@nxp.com,
+ wojciech.drewek@intel.com
+Subject: Re: [PATCH net-next v1 1/6] ethtool: add interface to read Tx
+ hardware timestamping statistics
+Message-ID: <20240402191842.66decfd3@kernel.org>
+In-Reply-To: <20240402205223.137565-2-rrameshbabu@nvidia.com>
+References: <20240402205223.137565-1-rrameshbabu@nvidia.com>
+	<20240402205223.137565-2-rrameshbabu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,23 +71,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  1 Apr 2024 14:50:36 -0700 Mina Almasry wrote:
-> This series is largely motivated by a recent discussion where there was
-> some confusion on how to properly ref/unref pp pages vs non pp pages:
-> 
-> https://lore.kernel.org/netdev/CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com/T/#t
-> 
-> There is some subtely there because pp uses page->pp_ref_count for
-> refcounting, while non-pp uses get_page()/put_page() for ref counting.
-> Getting the refcounting pairs wrong can lead to kernel crash.
-> 
-> Additionally currently it may not be obvious to skb users unaware of
-> page pool internals how to properly acquire a ref on a pp frag. It
-> requires checking of skb->pp_recycle & is_pp_page() to make the correct
-> calls and may require some handling at the call site aware of arguable pp
-> internals.
+On Tue,  2 Apr 2024 13:52:01 -0700 Rahul Rameshbabu wrote:
+> +/**
+> + * struct ethtool_ts_stats - HW timestamping statistics
+> + * @tx_stats: struct group for TX HW timestamping
+> + *	@pkts: Number of packets successfully timestamped by the hardware.
+> + *	@lost: Number of hardware timestamping requests where the timestamping
+> + *		information from the hardware never arrived for submission with
+> + *		the skb.
+> + *	@err: Number of arbitrary timestamp generation error events that the
+> + *		hardware encountered, exclusive of @lost statistics. Cases such
+> + *		as resource exhaustion, unavailability, firmware errors, and
+> + *		detected illogical timestamp values not submitted with the skb
+> + *		are inclusive to this counter.
+> + */
+> +struct ethtool_ts_stats {
+> +	struct_group(tx_stats,
 
-I concluded that Olek's series as good to go in, so you gotta rebase.
+Doesn't seem like the group should be documented:
+
+include/linux/ethtool.h:503: warning: Excess struct member 'tx_stats' description in 'ethtool_ts_stats'
 -- 
 pw-bot: cr
 
