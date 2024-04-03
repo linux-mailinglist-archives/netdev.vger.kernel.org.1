@@ -1,331 +1,180 @@
-Return-Path: <netdev+bounces-84574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E748897743
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 19:49:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D185589774E
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 19:49:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 514161C2415E
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:49:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 010FC1C241A3
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B7515699D;
-	Wed,  3 Apr 2024 17:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E97A1552F0;
+	Wed,  3 Apr 2024 17:28:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AH74z72t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pJpsqN23"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD60153804;
-	Wed,  3 Apr 2024 17:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF49154C12;
+	Wed,  3 Apr 2024 17:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712165090; cv=none; b=UTdbEC9XfD17VyOKC0pJv5f+JOs++h0+JBd9oNK8f9VL+/kXcxDIEWqWVSTlVpdDJnpLsnv34OSXwhcG2x3UHmiG3NtgF4ZKgNMTsJWFCu2E2QSsDTWN/vJzIXsv9AgC8D28Z2VTjreWx15fmqejWOEEpQ/dpejXwCbUvyXezas=
+	t=1712165287; cv=none; b=TFOsEpHPHvMpsXSVOrzdJ3xGTcagVMBNbbDwbmjf+qVtNIX0VuATQVq3fneF066Qom8Xs5LS2t4j+H9tYTDnf8IotFc28fiFCSiiPEGQOg+qRqzm/2YA9t5d2gVpxJlGToWYeXoivbOjEGcAVkFxtmS2i0mp2UY4NwbU6EIEgD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712165090; c=relaxed/simple;
-	bh=WSl2CWIioYtJLWZUU5CrGm4F+P0W6P1f7WrRIu4Xl+Q=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LXyyXxPzV9QN0PHXvCx51ZvoRi156SnNkXRtHoxaxgw1Jl64aQr7sPR285yqF3DJr4FCTj7ZAq0mpwpm/jOF2BnBqwIAXAv3seRd4hkCuYT9ZqceB2oTtS06+/gCSTDh3/yeUzCRKBw0G9Bitcy0TVCeh9Ciag7Vq1taaB33f7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AH74z72t; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 433GxsWX025271;
-	Wed, 3 Apr 2024 17:24:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=EgsLd81nrFvAc2UOfRG3wkL5UTIq3fQxcwLsijO8Pps=;
- b=AH74z72tniQJjt0ZNSUfJakvXumtwiskiqCLvyVUA8ITSypIycWSRiP12qT2SWhXfdrf
- WYperHvKwuCWtrTU+APBbQTNMHTbAz6vhJaTVc5wFe4oXcWq1d7UIi6kHYLFoMpaTf9P
- a0x5wYs5y9jBufASCyBrrQdT/AGRgs4nMsrHeJB9h6eBkNvJIRaseheKI7z2inaU1g1w
- +MJPlwPyaHMaYkK83YkMX2knOzx0W0oN5UczzCx7PwLkvRthhDgMLOFhMF4Q++1Gjzka
- 445Bdxhr4lIfd7k6BbzwAsGHb1TGZK36vaJSN1I5RAe/VJYt0sgpWa9kzjukoc5ckOZ8 fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9ass8579-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 17:24:43 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 433HKcnT003882;
-	Wed, 3 Apr 2024 17:20:39 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9ass8571-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 17:20:38 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 433FjUFo029616;
-	Wed, 3 Apr 2024 17:20:37 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x6ys36baa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 17:20:37 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 433HKW2i50987312
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 3 Apr 2024 17:20:34 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1CD132004B;
-	Wed,  3 Apr 2024 17:20:32 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 368E620040;
-	Wed,  3 Apr 2024 17:20:31 +0000 (GMT)
-Received: from [9.171.60.51] (unknown [9.171.60.51])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  3 Apr 2024 17:20:31 +0000 (GMT)
-Message-ID: <9a17268d4046f99b30f3620079b5749a9ddc5cd9.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH net-next v5 05/11] net/smc: implement DMB-related
- operations of loopback-ism
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com,
-        twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com,
-        jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Date: Wed, 03 Apr 2024 19:20:30 +0200
-In-Reply-To: <20240324135522.108564-6-guwen@linux.alibaba.com>
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
-	 <20240324135522.108564-6-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
+	s=arc-20240116; t=1712165287; c=relaxed/simple;
+	bh=ev9qwjumkVBT21OJLnRxmj6j+tcZWLWc9gYIuhQP4YA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ia2opbuoxHt0lFkgWDWQ6GW72TwXxCw0yfeQSJ/LhG7sn01WZkrj8WZRUJRsE4888fMYzSyz3Ech/P1f6Gxg8GCCmQni6+lw8lB91KappKy7elE43A1OQAfDim+Rx3i92Q5ooTwIdQtz8KoPEYKbLRt0tvnVMBkb7I6ZXCcHAOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pJpsqN23; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25477C433F1;
+	Wed,  3 Apr 2024 17:27:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712165286;
+	bh=ev9qwjumkVBT21OJLnRxmj6j+tcZWLWc9gYIuhQP4YA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pJpsqN23a/bTPCDYI46/mddJ60857N8gxl0704dxwCHxM5gKzPHc731EgK6XTky8d
+	 UTSvCE/t886wLCwR1UtYWv7Xweb+uKowOagxSx/lUTLkXov7Dsf3h7EJVqcumDwZqs
+	 tOZb0mWrfqCf+8IONESe5080Pxu9nMjALf/FMnCDXF9xhUlL3R67eN2rH1I5mN6bzF
+	 1n8OJA3VkfjnGjVp4Z+o4CVz2zIgJ7Dmv0gNexlQEtkyGLrPexZxzjQpZtQ6ml5ppR
+	 mZhUqv9H4p4rGkxe60L9FXP3YjGI6r2+YWhPDeKU2GGU7vXAeDQM5+N6jWyDCaqmEM
+	 CqEUGy0nok9lw==
+Date: Wed, 3 Apr 2024 18:27:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>,
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>, linux-mm@kvack.org,
+	Matthew Wilcox <willy@infradead.org>
+Subject: Re: [RFC PATCH net-next v8 06/14] page_pool: convert to use netmem
+Message-ID: <20240403172749.GP26556@kernel.org>
+References: <20240403002053.2376017-1-almasrymina@google.com>
+ <20240403002053.2376017-7-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _k7M7X341RIZlu6Ws_JCrzymVAeJc5bb
-X-Proofpoint-ORIG-GUID: GGVGokz-tYaB_sbZebDOcMVEhJjtyg1y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-03_18,2024-04-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- malwarescore=0 suspectscore=0 clxscore=1015 mlxlogscore=999
- impostorscore=0 priorityscore=1501 bulkscore=0 spamscore=0 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2404030117
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240403002053.2376017-7-almasrymina@google.com>
 
-On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
+On Tue, Apr 02, 2024 at 05:20:43PM -0700, Mina Almasry wrote:
+> Abstrace the memory type from the page_pool so we can later add support
+> for new memory types. Convert the page_pool to use the new netmem type
+> abstraction, rather than use struct page directly.
+> 
+> As of this patch the netmem type is a no-op abstraction: it's always a
+> struct page underneath. All the page pool internals are converted to
+> use struct netmem instead of struct page, and the page pool now exports
+> 2 APIs:
+> 
+> 1. The existing struct page API.
+> 2. The new struct netmem API.
+> 
+> Keeping the existing API is transitional; we do not want to refactor all
+> the current drivers using the page pool at once.
+> 
+> The netmem abstraction is currently a no-op. The page_pool uses
+> page_to_netmem() to convert allocated pages to netmem, and uses
+> netmem_to_page() to convert the netmem back to pages to pass to mm APIs,
+> 
+> Follow up patches to this series add non-paged netmem support to the
+> page_pool. This change is factored out on its own to limit the code
+> churn to this 1 patch, for ease of code review.
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-When I instrumented this to see, why I still see tons of my other
-temporary instrumentation messages from the "ism" driver, I found that
-in my setup loopback-ism is used rather infrequently.
+...
 
-I suspect this is due to how the SMC proposals are constructed in
-net/smc/af_smc.c and net/smc/smc_pnet.c - and later evaluated in
-smc_check_ism_v2_match() - where there is a first-come-first-serve
-selection.
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
 
-I wonder if one should change that to favour loopback-ism over "real"
-ISM devices - and how this could be achieved elegantly.
+...
 
-Just some food for thought... Probably little you can do on x86.
+> @@ -170,9 +172,10 @@ static inline void *page_pool_alloc_va(struct page_pool *pool,
+>  	struct page *page;
+>  
+>  	/* Mask off __GFP_HIGHMEM to ensure we can use page_address() */
+> -	page = page_pool_alloc(pool, &offset, size, gfp & ~__GFP_HIGHMEM);
+> +	page = netmem_to_page(
+> +		page_pool_alloc(pool, &offset, size, gfp & ~__GFP_HIGHMEM));
+>  	if (unlikely(!page))
+> -		return NULL;
+> +		return 0;
 
-Thanks,
-Gerd
+Hi Mina,
 
-> +static int smc_lo_register_dmb(struct smcd_dev *smcd, struct
-> smcd_dmb *dmb,
-> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *client_priv)
-> +{
-> +	struct smc_lo_dmb_node *dmb_node, *tmp_node;
-> +	struct smc_lo_dev *ldev =3D smcd->priv;
-> +	int sba_idx, rc;
-> +
-> +	/* check space for new dmb */
-> +	for_each_clear_bit(sba_idx, ldev->sba_idx_mask,
-> SMC_LO_MAX_DMBS) {
-> +		if (!test_and_set_bit(sba_idx, ldev->sba_idx_mask))
-> +			break;
-> +	}
-> +	if (sba_idx =3D=3D SMC_LO_MAX_DMBS)
-> +		return -ENOSPC;
-> +
-> +	dmb_node =3D kzalloc(sizeof(*dmb_node), GFP_KERNEL);
-> +	if (!dmb_node) {
-> +		rc =3D -ENOMEM;
-> +		goto err_bit;
-> +	}
-> +
-> +	dmb_node->sba_idx =3D sba_idx;
-> +	dmb_node->len =3D dmb->dmb_len;
-> +	dmb_node->cpu_addr =3D kzalloc(dmb_node->len, GFP_KERNEL |
-> +				=C2=A0=C2=A0=C2=A0=C2=A0 __GFP_NOWARN | __GFP_NORETRY |
-> +				=C2=A0=C2=A0=C2=A0=C2=A0 __GFP_NOMEMALLOC);
-> +	if (!dmb_node->cpu_addr) {
-> +		rc =3D -ENOMEM;
-> +		goto err_node;
-> +	}
-> +	dmb_node->dma_addr =3D SMC_DMA_ADDR_INVALID;
-> +
-> +again:
-> +	/* add new dmb into hash table */
-> +	get_random_bytes(&dmb_node->token, sizeof(dmb_node->token));
-> +	write_lock_bh(&ldev->dmb_ht_lock);
-> +	hash_for_each_possible(ldev->dmb_ht, tmp_node, list,
-> dmb_node->token) {
-> +		if (tmp_node->token =3D=3D dmb_node->token) {
-> +			write_unlock_bh(&ldev->dmb_ht_lock);
-> +			goto again;
-> +		}
-> +	}
-> +	hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
-> +	write_unlock_bh(&ldev->dmb_ht_lock);
-> +
-> +	dmb->sba_idx =3D dmb_node->sba_idx;
-> +	dmb->dmb_tok =3D dmb_node->token;
-> +	dmb->cpu_addr =3D dmb_node->cpu_addr;
-> +	dmb->dma_addr =3D dmb_node->dma_addr;
-> +	dmb->dmb_len =3D dmb_node->len;
-> +
-> +	return 0;
-> +
-> +err_node:
-> +	kfree(dmb_node);
-> +err_bit:
-> +	clear_bit(sba_idx, ldev->sba_idx_mask);
-> +	return rc;
-> +}
-> +
-> +static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct
-> smcd_dmb *dmb)
-> +{
-> +	struct smc_lo_dmb_node *dmb_node =3D NULL, *tmp_node;
-> +	struct smc_lo_dev *ldev =3D smcd->priv;
-> +
-> +	/* remove dmb from hash table */
-> +	write_lock_bh(&ldev->dmb_ht_lock);
-> +	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb-
-> >dmb_tok) {
-> +		if (tmp_node->token =3D=3D dmb->dmb_tok) {
-> +			dmb_node =3D tmp_node;
-> +			break;
-> +		}
-> +	}
-> +	if (!dmb_node) {
-> +		write_unlock_bh(&ldev->dmb_ht_lock);
-> +		return -EINVAL;
-> +	}
-> +	hash_del(&dmb_node->list);
-> +	write_unlock_bh(&ldev->dmb_ht_lock);
-> +
-> +	clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
-> +	kfree(dmb_node->cpu_addr);
-> +	kfree(dmb_node);
-> +
-> +	return 0;
-> +}
-> +
-> =C2=A0static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
-> =C2=A0{
-> =C2=A0	return -EOPNOTSUPP;
-> @@ -75,6 +164,38 @@ static int smc_lo_signal_event(struct smcd_dev
-> *dev, struct smcd_gid *rgid,
-> =C2=A0	return 0;
-> =C2=A0}
-> =C2=A0
-> +static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
-> +			=C2=A0=C2=A0=C2=A0 unsigned int idx, bool sf, unsigned int
-> offset,
-> +			=C2=A0=C2=A0=C2=A0 void *data, unsigned int size)
-> +{
-> +	struct smc_lo_dmb_node *rmb_node =3D NULL, *tmp_node;
-> +	struct smc_lo_dev *ldev =3D smcd->priv;
-> +	struct smc_connection *conn;
-> +
-> +	read_lock_bh(&ldev->dmb_ht_lock);
-> +	hash_for_each_possible(ldev->dmb_ht, tmp_node, list,
-> dmb_tok) {
-> +		if (tmp_node->token =3D=3D dmb_tok) {
-> +			rmb_node =3D tmp_node;
-> +			break;
-> +		}
-> +	}
-> +	if (!rmb_node) {
-> +		read_unlock_bh(&ldev->dmb_ht_lock);
-> +		return -EINVAL;
-> +	}
-> +	memcpy((char *)rmb_node->cpu_addr + offset, data, size);
-> +	read_unlock_bh(&ldev->dmb_ht_lock);
-> +
-> +	if (sf) {
-> +		conn =3D smcd->conn[rmb_node->sba_idx];
-> +		if (conn && !conn->killed)
-> +			tasklet_schedule(&conn->rx_tsklet);
-> +		else
-> +			return -EPIPE;
-> +	}
-> +	return 0;
-> +}
-> +
-> =C2=A0static int smc_lo_supports_v2(void)
-> =C2=A0{
-> =C2=A0	return SMC_LO_V2_CAPABLE;
-> @@ -101,14 +222,14 @@ static struct device *smc_lo_get_dev(struct
-> smcd_dev *smcd)
-> =C2=A0
-> =C2=A0static const struct smcd_ops lo_ops =3D {
-> =C2=A0	.query_remote_gid =3D smc_lo_query_rgid,
-> -	.register_dmb		=3D NULL,
-> -	.unregister_dmb		=3D NULL,
-> +	.register_dmb =3D smc_lo_register_dmb,
-> +	.unregister_dmb =3D smc_lo_unregister_dmb,
-> =C2=A0	.add_vlan_id =3D smc_lo_add_vlan_id,
-> =C2=A0	.del_vlan_id =3D smc_lo_del_vlan_id,
-> =C2=A0	.set_vlan_required =3D smc_lo_set_vlan_required,
-> =C2=A0	.reset_vlan_required =3D smc_lo_reset_vlan_required,
-> =C2=A0	.signal_event =3D smc_lo_signal_event,
-> -	.move_data		=3D NULL,
-> +	.move_data =3D smc_lo_move_data,
-> =C2=A0	.supports_v2 =3D smc_lo_supports_v2,
-> =C2=A0	.get_local_gid =3D smc_lo_get_local_gid,
-> =C2=A0	.get_chid =3D smc_lo_get_chid,
-> @@ -173,6 +294,8 @@ static void smcd_lo_unregister_dev(struct
-> smc_lo_dev *ldev)
-> =C2=A0static int smc_lo_dev_init(struct smc_lo_dev *ldev)
-> =C2=A0{
-> =C2=A0	smc_lo_generate_ids(ldev);
-> +	rwlock_init(&ldev->dmb_ht_lock);
-> +	hash_init(ldev->dmb_ht);
-> =C2=A0	return smcd_lo_register_dev(ldev);
-> =C2=A0}
-> =C2=A0
-> diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
-> index 11868e5ac732..6c4a390430f3 100644
-> --- a/net/smc/smc_loopback.h
-> +++ b/net/smc/smc_loopback.h
-> @@ -20,13 +20,26 @@
-> =C2=A0
-> =C2=A0#if IS_ENABLED(CONFIG_SMC_LO)
-> =C2=A0#define SMC_LO_MAX_DMBS		5000
-> +#define SMC_LO_DMBS_HASH_BITS	12
-> =C2=A0#define SMC_LO_RESERVED_CHID	0xFFFF
-> =C2=A0
-> +struct smc_lo_dmb_node {
-> +	struct hlist_node list;
-> +	u64 token;
-> +	u32 len;
-> +	u32 sba_idx;
-> +	void *cpu_addr;
-> +	dma_addr_t dma_addr;
-> +};
-> +
-> =C2=A0struct smc_lo_dev {
-> =C2=A0	struct smcd_dev *smcd;
-> =C2=A0	struct device dev;
-> =C2=A0	u16 chid;
-> =C2=A0	struct smcd_gid local_gid;
-> +	rwlock_t dmb_ht_lock;
-> +	DECLARE_BITMAP(sba_idx_mask, SMC_LO_MAX_DMBS);
-> +	DECLARE_HASHTABLE(dmb_ht, SMC_LO_DMBS_HASH_BITS);
-> =C2=A0};
-> =C2=A0#endif
-> =C2=A0
+This doesn't seem right, as the return type is a pointer rather than an
+integer.
 
+Flagged by Sparse.
+
+>  
+>  	return page_address(page) + offset;
+>  }
 
