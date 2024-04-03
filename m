@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-84467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E96B896FCA
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:03:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1670896FD0
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:04:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 438E71C27419
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:03:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6BEE2899C0
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0661474C0;
-	Wed,  3 Apr 2024 13:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA611482F1;
+	Wed,  3 Apr 2024 13:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dta/X+iN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jf8SQuYi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F0C146D41;
-	Wed,  3 Apr 2024 13:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF026147C90;
+	Wed,  3 Apr 2024 13:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712149429; cv=none; b=TMicV7+PJcwtWkx76WYV2IOTbJSfxxRFHha5vfc/FXz+nqQWP3SPBBUkpL8uKMqLEdS4JAtU+YWgHYewnFOnQBeE8jocyOLnBhRyNnEkd0gZ8A0WIvVcB/ZlnbKamnDM2wgHbBgKQonM5WJ3VFkphWGGfZ+tB5YmLL0/sFCdLpU=
+	t=1712149469; cv=none; b=Bq/BCT27Hd96DOLsC6EHoZL0qgqdt50sDusWzVt/TQhccVc3R3XUucXoBl92om0r8fD9SUBn8yMJBclU5kWFgDrc4WbxaeuF6NG5HMSWGuPVR6zTkCLFqdEGY/63IBZj70/1JLqHlUNgjrZt25AMDydOGhfZh/jIyZKSA3QY7II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712149429; c=relaxed/simple;
-	bh=sXBfqvDACL095C8gyRGW8pO+drlNkVJ9CcylK2BYrPc=;
+	s=arc-20240116; t=1712149469; c=relaxed/simple;
+	bh=hbshPJrhfoiAxMe08Uzd8OxBoSHcUUGIyq14hQs3qq0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b3L1Z9HmrciaA+LeVNVGgQaxplj7MAf8ZA8QAASBhjkkSWXzYs5O8cNv4galGgzMo1E05Iwvi+5rq1XfnSma7OpG4NhNHnDR4dREBk0cjGIZBesvDN4zJHyMUjcYIN/N4lTPHIyXemQ8toLEGyvMLzlbhNAH16tP5BtdsTuDc3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dta/X+iN; arc=none smtp.client-ip=209.85.214.178
+	 In-Reply-To:Content-Type; b=S/o67AxSXTynkRvJe5ofAgpaBeaVairgEkNv5mUSby+FA9DF2Qn4X8abznmySRIo0Jij+nZUeFNFdxaHzrPOfEs4Yb8B1+28bw5tO5XIbn7i/XiFR+YXNZ0znkFrROq0D46wqC6B22PWJ4ltGH+f+n+WA91VY1rMaZ6V+xfEXe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jf8SQuYi; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1e296c7aa7cso4138995ad.1;
-        Wed, 03 Apr 2024 06:03:48 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6eaf1005fcaso2990179b3a.3;
+        Wed, 03 Apr 2024 06:04:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712149428; x=1712754228; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712149467; x=1712754267; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=eMyTeEwaMwnypDyzDBWbwalG+SemBZ7Bz8fWlQzlJtI=;
-        b=Dta/X+iNFEY5tm2FZCHZip8vw7hV+L/vRcKMHIwPMpDTbUP18TVdVJwlmM0yPS76ov
-         rmq8Xc47vqk5G/EIvVBublTC87imGfGGTp7CzivWMsEtIK3Y263Dac8rbPcb7BtdzOIA
-         4lB8z2j6nUejdROp+Tksive3r4gVXxnLgoOtz74fzmZF7V3I3pNSh3H8jtoqC6ES4eEE
-         qVeAvhK4aiCZlGq1jzMd1yFbfmlxQJR2Jk6EsBYu06LcmkF1rdLtcyVpbAilSCEUBRHc
-         EQmPoVybl7xpeml4u+OMuqu/km8P0DhJ6LRX0mQkVYxJnUBuIR9BqbPdgTvzs6sgDyqM
-         fG3w==
+        bh=CYh0cMlxUyaLCd0U+9BafKU2TiVpKIgwYe7ZOLgPcu4=;
+        b=Jf8SQuYiJyfeEeQrH2CtQltaG6qXbbHyUiS6tg/EdIqus3xPdg83K/d/io31USqPml
+         f4vJ2NI2FA/3N+m/SI7cyTqldxjFOkNp5lxb5vJiJAJsrYqMRk0MFX2tbLYDyUFKJDly
+         XhjJl9LDIVHGmNOpGI7176MYtJqtT2gtRu39OwFz2pFT7gWyqvvVATv2PVsGhrzZjfz8
+         3LfVR0DoHx7We5qqqLWGAAeKJMCHgJce1DTeyb3u9+q2N7oDXvZETe/9kTyxKFhs2TzT
+         tEaUUVhtS8b/fb7OFoFDF0Y4VFhAW1pieQeT4edTHcGoaCnlCaXKhj/6QmjF5hTanwoX
+         dLcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712149428; x=1712754228;
+        d=1e100.net; s=20230601; t=1712149467; x=1712754267;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eMyTeEwaMwnypDyzDBWbwalG+SemBZ7Bz8fWlQzlJtI=;
-        b=aDdeg/yThn5KceJpLeTtnSuGBdfSm2OK2CdKauijG/x8CWDKCqGSbj0CcExyq1jIvl
-         zuYHF6yLdk2aumjV9x8+yzW5qVYLNd+3PF8MT+8yDYmMuoj3PL5Z4GIutUBM7OBunDAP
-         awc7TgzcTg0Ppjuv9w9AhklUhM484HGsjP0lLft4knEOLm52L+Y1ys9IRq8jFUl+C8C6
-         t1ybtGYVZakCHqb7g+UlvdscZkXCwsI/cDe827iVMDruWq/iaHsFXb4eprYB5hhOOIj6
-         YRV+Ex96LteLojfJ9XCcrm4QN/u3SKe4QDUJJ4PUpKOHXmDZPFXuX8XLd9HzkApQXgYB
-         Ek3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVBJwZBFdqmU9tPZhfEKmy/Kpbhz9m7RBmRxwwywA/6nBHjVpoZ863E5we+rEZCE/S+62yRzIDWKL1mdaF4tplw8UErxl/6tDCHgc1+djZbVAVc8Bl7/Fc7lVA8K1vf399x42ZQ
-X-Gm-Message-State: AOJu0YydRoYBR1q3UDubph6c9YaGJ7YH33szLSbzIi0tEGJ5dcwXtD9O
-	1jJN7UHlH6O17WG4v3Tbwd5LFkoYelqXyJVU36UbV+LcTOK0/XFc
-X-Google-Smtp-Source: AGHT+IH5x45+Q/exQ13MVFuJICWazG5LA3hGFUjXdmRz2s6EQUDBKwwOP43u8pXCpyjBRTRJEYaRoQ==
-X-Received: by 2002:a17:903:2cd:b0:1e1:214:1b67 with SMTP id s13-20020a17090302cd00b001e102141b67mr20008041plk.37.1712149427516;
-        Wed, 03 Apr 2024 06:03:47 -0700 (PDT)
+        bh=CYh0cMlxUyaLCd0U+9BafKU2TiVpKIgwYe7ZOLgPcu4=;
+        b=V/PAGdm47UD2kzULrQ0zQG8EhWlh3hTb1Ppygel/fyX4u0UvZJw7jHRJ9mPN7a5vWs
+         G5C9XuxJ64+u4SuoZhpyHJB6OND5tEg4ebNJ1jkEoqAESUVMbZK/pt3gJwRZyXZ23PSR
+         VOk6BSDmjkxAQeKhcSxEgmWw93vKr2+N4jkts5B+R/ZY57SZzIAjv9I+jK/e1fS2EJwG
+         FseXdcIP45iqoHdZdloxyNEQHZlR1qmD2X8VYq5afdNotYW1k8P2SIgcg1nhU/yKmoHM
+         tvMZKt9n+8RzdX5b/Slt55PQBCoBl/CDQS3p5DIJFO060965dK2+Qt8PEutPbs3xJfK2
+         VN4A==
+X-Forwarded-Encrypted: i=1; AJvYcCV1I+UII0JPwncOJuZrxhTiCvaixTeMDrNqKVR07dD7R+XipIUo19+rMGaCyqN6LvxRCwyJhCKkzK1pfHyu/gocj57bpVK79OolD+4oKLehWOGqf4BwWhCz7Mvkv4iUR9kvoorN
+X-Gm-Message-State: AOJu0YwQSQMQZrlPMrr4m6aDSxOEtmq0LMJ/soEB6aAXZIzgTlLy3JVs
+	c9F3MtN3UhEblLKJELIOOBfv9TcARN7xdYM88U7LwSj9hPDVfvEP
+X-Google-Smtp-Source: AGHT+IEZs6yg93R4mNQWrtjPl2vWI+pYGQDMcjjUzzDxBEJLtp0tRmj28JluC6961Q8cuxrzfEmHxw==
+X-Received: by 2002:a05:6a20:baa7:b0:1a3:d60c:f16d with SMTP id fb39-20020a056a20baa700b001a3d60cf16dmr11750114pzb.51.1712149466950;
+        Wed, 03 Apr 2024 06:04:26 -0700 (PDT)
 Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id n18-20020a170903111200b001e0bae4490fsm13177657plh.154.2024.04.03.06.03.44
+        by smtp.gmail.com with ESMTPSA id bn5-20020a056a02030500b005f073cd2bc6sm10221620pgb.82.2024.04.03.06.04.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Apr 2024 06:03:46 -0700 (PDT)
-Message-ID: <c2ad42b2-ca13-4473-834c-df4475ae268b@gmail.com>
-Date: Wed, 3 Apr 2024 06:03:43 -0700
+        Wed, 03 Apr 2024 06:04:26 -0700 (PDT)
+Message-ID: <0d0ff3bb-f651-4d51-9c51-4da2fef178e2@gmail.com>
+Date: Wed, 3 Apr 2024 06:04:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,8 +77,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 7/8] net: dsa: microchip:
- ksz8_r_dyn_mac_table(): return read/write error if we got any
+Subject: Re: [PATCH net-next v2 8/8] net: dsa: microchip:
+ ksz8_r_dyn_mac_table(): use entries variable to signal 0 entries
 To: Oleksij Rempel <o.rempel@pengutronix.de>,
  "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -89,7 +89,7 @@ Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
  =?UTF-8?Q?S=C3=B8ren_Andersen?= <san@skov.dk>
 References: <20240403125039.3414824-1-o.rempel@pengutronix.de>
- <20240403125039.3414824-8-o.rempel@pengutronix.de>
+ <20240403125039.3414824-9-o.rempel@pengutronix.de>
 Content-Language: en-US
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
@@ -125,14 +125,15 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240403125039.3414824-8-o.rempel@pengutronix.de>
+In-Reply-To: <20240403125039.3414824-9-o.rempel@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 4/3/2024 5:50 AM, Oleksij Rempel wrote:
-> The read/write path may fail. So, return error if we got it.
+> We already have a variable to provide number of entries. So use it,
+> instead of using error number.
 > 
 > Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 > Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
