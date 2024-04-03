@@ -1,333 +1,126 @@
-Return-Path: <netdev+bounces-84655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F05B8897C06
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 01:26:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3D48897C0A
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 01:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68DC01F27AAA
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:26:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19B30289721
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826B715696C;
-	Wed,  3 Apr 2024 23:26:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1777B156991;
+	Wed,  3 Apr 2024 23:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f8YBzIgS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHO2cLHC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1914D156227
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 23:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712186762; cv=fail; b=lt6u+2R7I7hhac5SvPTt0V9jG2CR2eJx65RMSilaBNa3KMH8GUesKlVKyWaGxL3sCCiOKuAKU+evrZAFkStWkRX/S9aV2Mix/Bu1Ctn9Bui162vsKFQwoQi60c3p9x0AcqGUrmuMn+LGp099dMlE+HQyYd4xK07EY1XCUsOEfCQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712186762; c=relaxed/simple;
-	bh=h5D1hhAghyHNqmUrOfIsViJr2Pvb8kRlD7jQlaD/ros=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RFBXuYEtQ9O7iYE2spK9iWh8N5uSC9sDp41yQdJJgP1fAHczhmKDSzhl8430NSqRp+pWtbhdexlt5ZvIcAcpdDYQitU3WUw7hySbg/og6ykstVj7X1r4mnGIAsg0IAuE0AaUw0dq0oEis0MPXOvb02H8lPQMJQmu+d6BajXEIhc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f8YBzIgS; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712186760; x=1743722760;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=h5D1hhAghyHNqmUrOfIsViJr2Pvb8kRlD7jQlaD/ros=;
-  b=f8YBzIgS4ArnYaXAwA6+WGRhn2oOtQC/If4Q6LxtbSLqQnZp+A/Nb5Ag
-   4YV4TGVSsKPl8wf13FyIaJLfpBqC8OMQIcrpPqL1XigyKgTP+rE0NSnmE
-   jX+boPegJZfVnzjEZjLBBzuz8BaEkXKGcEiTzyTkTOeR/DyhsZtZvP3H3
-   GJd2HmQkyKBw6PvxGb+Y+P2ikCF6ZB/PKYB7Cbrg5/7hzOigyfGNY4Kfb
-   JvkOfirGas5guzRNDoYnj5syNs4G5MUXQ/Pv0iiLg8R9sl+zycvmLMkte
-   CTLM0PmlUlLnp266HU23paS7/M4eIu9ivp+Ndei4FUoJvYPaTTXxRRiFZ
-   g==;
-X-CSE-ConnectionGUID: u59RmYsBSx6eJMisC6+GPA==
-X-CSE-MsgGUID: 7FwoCAiURxmTHca6wl6fYA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="24958265"
-X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="24958265"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 16:26:00 -0700
-X-CSE-ConnectionGUID: WJX4cfsQSdmsIlYoz6GmEQ==
-X-CSE-MsgGUID: La+CWZswQCWXHJF7KQ/spg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="18627386"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Apr 2024 16:25:59 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 3 Apr 2024 16:25:58 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 3 Apr 2024 16:25:58 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 3 Apr 2024 16:25:58 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 3 Apr 2024 16:25:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=StIRPthAMVn59cJ2GZesE4h3z84Mwanb+mCLQR9jocFT3bZIkPJW2nfLjU90nHweTBZAaDVYoWJP1nuqk4GQUl8chnIYvtVHS/qi+E5pDQLM76FTukakccBWq+WJETSQ85+XBEmNZAM3PSQgJpA2kUmZpDzclTyPQG51odzI71bpl5R8Z1NW84LiKnWkqyjYClMrqAwLy/o2ZATP8X1BjX1azARgcqQf0S1HYOEd+jY7K0PSA7UpTDTHQMRRWxhJ2n7NFDeiyOmevVZRLZ3zxhzgTwk7eSaNOlqXN/kgYZY/CQ5MJBjYzMq0pY25o7d9BTGE72VvO7q90qwaKh71tg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WCy4TQo+8u3SlFIdHd7eMRUKMru2SrSvyxZhr9mOTIU=;
- b=VobIhvWsQjWPeKCXdDMS8femietyAsvUfm3ccRgC+ryYYcUjERwsJ/jWrPnqDiz7PSvjw5QsKmgbiHyzP8RkSn7CRlv7zMHJ3fBVrRQTpK0SKA4/kShnwhV5gHW9Vvvvwx0RVESwtfmA3ItTVFft4mZZ+txhwW0PgYNWLufVHfZmyTaKmf6dnoeveRgwvO2Ql1fJnsjAug8az28wF7+ImVI+RWfk6OD2xSt8xAmEqbDPSllYV/tKR5Zdg2/wDGujaKsPi8zAgpxZ+P4Lgw1wzEZhZ6tsa5mhwB8CA5tR6gyU68P9VYRNOXTZvSpDP2Ug0h3/3VzCfA7CQLGHsH9/Tg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by MN2PR11MB4727.namprd11.prod.outlook.com (2603:10b6:208:26f::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Wed, 3 Apr
- 2024 23:25:56 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::9c80:a200:48a2:b308]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::9c80:a200:48a2:b308%4]) with mapi id 15.20.7452.019; Wed, 3 Apr 2024
- 23:25:56 +0000
-Message-ID: <59a690bc-50c6-df52-5686-ae6b231fd0f3@intel.com>
-Date: Wed, 3 Apr 2024 16:25:53 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v4 iwl-next 02/12] ice: Introduce helper to get
- tmr_cmd_reg values
-Content-Language: en-US
-To: Karol Kolacinski <karol.kolacinski@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <jesse.brandeburg@intel.com>, Jacob Keller
-	<jacob.e.keller@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-References: <20240329161730.47777-14-karol.kolacinski@intel.com>
- <20240329161730.47777-16-karol.kolacinski@intel.com>
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20240329161730.47777-16-karol.kolacinski@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0036.namprd03.prod.outlook.com
- (2603:10b6:303:8e::11) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A522156227
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 23:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712186900; cv=none; b=LoxocruKB+mV7YJYlzG9SFmt26Z50bB5PZgfKWcQ4wEkoBDgzEXgdZkox2Q4TtHGBujdNetcWdTq02a/G1HwR/0y1wVoTtlpQRMXycP//sI9IsDnnIhmQouUHLi8HEvJuJyJaWVdZLQNJF7xq0dZQuU4O0OM7Pc8fa6ZkOB7lHU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712186900; c=relaxed/simple;
+	bh=AlKgmupit+xsDzdQo/IKMY4f8l9iIwu9v+1SC0EGo9g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FRAt6zNmEN0IQR9gZz0dYLl+Ljc9J4RgPWp9ZKuBF1yXnyPPo0f122L8QCL08JWlgcqqrSxQqaX7StJqG61g/T66Vws6xP39PSaA9orBubpqMKn77MU9QXk0qXPQ1F38Kmh0K6WHK2ea/4KS2pzCgkTo+f1JR+/wcYfRvyv843M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHO2cLHC; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33edbc5932bso257148f8f.3
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 16:28:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712186897; x=1712791697; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fl8y+FFPCPA+MkGLA0mGvjwGJkU/CALoZPZaShK0Vys=;
+        b=HHO2cLHCk2vYilrmWew8FmU/X31/cqgQN9UIBZLQZ0TdK4OBUCTuaOhUNK8hd3bzph
+         6i5EfkkifDTNzfD9KxcgnQKqagTIuQWww5lOYsrCblhI7LGM8Bf8HbiJ92U6ASvuKGEp
+         xMmBOlk6edfQel+WXivp4XU/y+WZDKHtRkdOMlwMZWgOZqbbCw+Nmbyamt0l3VLELxZd
+         TJ/wLUQsWFuOP7C9JZZnaniIrJM5id90vLZgb7GMlU5SGPR6KM1nBdBJAaxDAIRym7xx
+         x3bLRExCFAdM9HZHIoplztHbit0cORYG4OENN0YPJEg6l02lpbhXPTP9HrgK5i916ofQ
+         yw5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712186897; x=1712791697;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fl8y+FFPCPA+MkGLA0mGvjwGJkU/CALoZPZaShK0Vys=;
+        b=kVODUW5PwR8r9ln0Fskc0/mGwXRyTg5wYMxdTxeLsj4WwUWo0lZTT12HvsIbikHfWx
+         H9foFkUPeiaFxhhCbHfbhlSB42ftZn99u/TyiSEw6mci+HdhRbGi9JV2TY8OcimdVwat
+         g84O07PENbNKQ9/EnsqpCggEoBOI3m/7YYGv3SCebhPKxY2nm9s2eMr+9DAQRCUqtqso
+         7bY5MMJR7yqlq7vldGeapUzF+pJKQzyaXJzLQpYNWsXBDMLERxlewfU5wtrElnNFW6O2
+         UJVf121zYOKavdgS2FnhQs9/zPJvJxe+Lm1gu4vPbhPHBNTEGNG7rXgk6NjohHui4ibQ
+         9OmA==
+X-Gm-Message-State: AOJu0YyiEBIrk1/nDIxxZ74Sx/J9yczncrC/mVKuGEiQZOuGN1+wfWc8
+	sDysc/5zTvkQvrlcsdx3jueGKM743M/L59AN9QOTUGKAiOtGzHYjmBMalzGQjuMujk9ObFzeWZh
+	V17FqJ+bpL3x67FPkyEul8Y/V4lM=
+X-Google-Smtp-Source: AGHT+IHBqRkcp76PTLszEUh58NtYfOol+YPoG4ZI+RvTHs0mxB7AMN7e9xgpJyXFyOJxAmXjhf+aryH5OcjtTzdLepM=
+X-Received: by 2002:a5d:55c1:0:b0:33e:9b42:ba5 with SMTP id
+ i1-20020a5d55c1000000b0033e9b420ba5mr598799wrw.17.1712186896289; Wed, 03 Apr
+ 2024 16:28:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|MN2PR11MB4727:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QISldy5gAMVHISRti4GiS8zEiPr/Ou4o7+BaNQD27zE/9pJZ7Lw1FW7dDuAwjx2wDYwl0LhqfrHbAORCULqSeWYjc3lEFlFPsG4kmp6JUMJQ6s6sDXZwzGesMIGLp8z6vPa1q/3xaBEp3qLYpj7jJthRJ1cs/O0JM40pSHk0C0pUvSSpabfuGPzS+ciQF7eII+m0ZRe+2CJgVFPEgcMTJn3GQZoxL/w05vim21SR5TQczDBr98XtVxxL/PEfeDNkWC5DVTd0BZ5VHWMEh0pMPZ79LcUL8wlF7DyWk922NEm67Byb5VLRq+zTBjSIUpnqk3N7wCGOxn+T9sbzJLnYe6023R2tng9WlsRdhWyxHt1YfmPrF6BnleLgt0nyMMeQAklaMmH/xKIjfY6K39/B8DLruBN/6FsSTCS0tZQ6QO9MbNXhp+wqhwpeNdw6zp5vFJ1Mh4ohs+ax72JS+9btwviK8nC2kWOMM+Kn5WwLgqIcuXfKQTOyQRttSmMY2vunRZVA1ia+PHz5hYbvdaQhClk63ToObKLdzx/elA1rs3w2UncoEFAJ5KLoRvNgSCVdUwNPnPrg3N1Sh9z9U1wZk5Zz7dn0+QJzztwKCm6Zkw0i7ixec8iubc507dI3AAvt79WKzA3wUQiG+2DOvHZOTisNzRvTyFA/U0JSI1Let3A=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dGhhZDVPNXBZeFc3cVRUUk1JNDJSeWFMLzZwUmVqZGNqSFI3VUUvNmZ3N0xn?=
- =?utf-8?B?cTlWcVpCYk9OR01rOU9ZbXdwUFR5ZFZoejRjckhyRXlZeWl3c3h5MmZEdUVK?=
- =?utf-8?B?ZTlBd1pHRmpvYUErTzVGMGFubkN4cFB5TVBaRG1YYXQwWVYvYUl6YTAxaGY4?=
- =?utf-8?B?MjZ2V2szaERoRHlwSlE0ZU5HM1pkTlE5OFhxRjZvMERGWVkxdU1lZVNYK3V0?=
- =?utf-8?B?U1VZblZHWkdCSDhkN1BvV3hFWDJoTCszKzlOc2krZHN6M3liQnFpUGxOS0hR?=
- =?utf-8?B?TExWNzEvVnlhWGYyYW5hdmJOYnppdEFPRGRObmFWeGlweU9kanNRVmswMjNk?=
- =?utf-8?B?SDlENzFPWnRrTmhZeHNPQmU0eXhSLzROMTJERWN4SHpVaFVvcyt5R0dPNXNm?=
- =?utf-8?B?SDBvakNsRUlMcXVoMGtLMmthYVlmVFBQUTVTczMxalRBNGZPS2tCRlVoVkZj?=
- =?utf-8?B?WlBLZHFQVzBkRWRybGNlVE1PcXJTelVMM0ZwWlF4a3RPTkZ1bDh4NERjQ1JM?=
- =?utf-8?B?ZnNhaDVMaWJnMVVxWktOTXlpSEYrRGZuKzdGcmdsYnplU09CdFAzRC9MZVNV?=
- =?utf-8?B?Tjl4Yk9uYjlqRHB4aHJCdTIvcDYwQWY5cWdRTmxuL0J0WEhhdUNMTldEeERJ?=
- =?utf-8?B?OWUzb3RrVWpZWU9yTC9uV2ZabXhROTNEckRtdEJ4YXJZWExiNHJWNHp2bmts?=
- =?utf-8?B?RUk4Um5Zckx6eVMzSGZHR2c3Lyt6RWxLenJFa08wVnVRdklOdmlGSGZmZHdj?=
- =?utf-8?B?RU1QSThyaGRwUVRqc2dzc1J4Y0s0Y28vV0ZPVGRtNGZYNVZjWWE5bGFTNmJG?=
- =?utf-8?B?bjQvQWhXQjNSOXJwMEpid1RYeVBuNStGK1FaZTQ3VEMydzNQbWFjTGJ5ODRW?=
- =?utf-8?B?dldzYlNGWlBaM3pHeXRxL0JvVS80SjM1Rk5KSEQ0OWJKQWtpVjNTRWZxcVlZ?=
- =?utf-8?B?OHkwaUpYOHcwVzM2NXdBKzl2SXVCd2Rlc1F3YVFlbzUvMXJVSjZua0l5Y0xN?=
- =?utf-8?B?bXMvdllWcDVvdjlqaTk0aTc0Y2IyUVNzSjVhRENJeVBBSk9sejA2Uzg4bGRh?=
- =?utf-8?B?OFI0Ykd1Unh4ejY2bmVZdU5iNm8yakRSSGU5OGlMclZMMmQ4c2JQWmFFV0Rl?=
- =?utf-8?B?SVJzajhjWEN6R2ZRKzJ2c2dkQ1llU29WTklJK2kwTWJpQUxQS3dyc0ZBK3pV?=
- =?utf-8?B?eFRjTDJvODg4RlEzQXlTUWc0d0pWSHZEbFZDS0RhOXV3K3kveGErTkg1c0lt?=
- =?utf-8?B?c1NsOFFST3lXVEVodnpSdUVqcUg4bGxxU3pFQ3FKeFBVWTJmR1dEU1JqTTI2?=
- =?utf-8?B?MjM3Mm9FNFJ3cUJjTms0QlFzRkdMZmU5VXdQekQ2clJ4TjQ5Y2N4c05nZzhE?=
- =?utf-8?B?N2tqTHNXaFcydVMzWWR4clpYMzdSTHNzVGo1cHZsb1c2UlRDV2o0b0Eyb0tD?=
- =?utf-8?B?Vjl6MTVSRHJFbzgzeTF6R0NLMHkxU3h1aXJ5dFFqNkFkMjZyNmVFdUF3S25x?=
- =?utf-8?B?Q2dzMEtqdkhqZEVUSFlNR0ZRUWgrNXQybW84eEU4SWQyR2ZUQ0VVNU1lbk9Q?=
- =?utf-8?B?TE5UM2ExbkUvVXV2VGFQS2twRmczZG1zQ09uWmloenJuVXp1S1piQk1IWDBC?=
- =?utf-8?B?N0lvYXdwQmwxMEdLOWJsSklzelVOT2RoRnI4eE5nekNLNlJHaUpYRHN3d2hr?=
- =?utf-8?B?VitZd2pxRE5jQzF0MEVhQmt0bmhBclcxeVhKOExpdm9kdlFjdnBvNFVHN05v?=
- =?utf-8?B?cTBSMDNuMWZDMGZjRi81c3Fsd0VpRFowMUZHclN3eUlyNmw1ZEJrMy95WE1s?=
- =?utf-8?B?c01ubHVIdzh0TG1yRjFlVnpiMzZrQ2NJTDhGWjVqdFJnN3c1WDdjVnBvVFRl?=
- =?utf-8?B?NzFDWEh2M3pyS1M4Y0JxVTJOWFFFY2VkTkpMUG5xcmg3a3c3eGJtRXFxUERY?=
- =?utf-8?B?ZUs2Uk4wSWY0dmlqV2JjUUFxOFBxQkRSVFVwdXY2TkF0dWFLS0JpdVFTaVUx?=
- =?utf-8?B?c0NBRVFUT1NseVpQU2tRZUEvR0h3SXRWVXd6dS9UakdmQlVPQ2k4V3ErTFNB?=
- =?utf-8?B?VkRCdkw3TlY1amtvV2Nyamx3WGhkRlE0bUg1RnZTWUxjTkFpVHgvb3gxekVk?=
- =?utf-8?B?eENSMHJHN21zQ1hGUkpiM0xWcUM4NHNTa2Q4dWFIaC96STE5NzZCeWErbVpW?=
- =?utf-8?B?MWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0cc4166d-a5ac-4c13-b38e-08dc543569b4
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 23:25:56.4787
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y6olQozLr9vb3IgTzFT6ndj7VLZAMh+RzJ5wooRzJD1QoJ/wmDQS82pyjllajBKaXQi2JgJit3mewim8J6wfSpNgmDv1z0LfxBtpZDtTkgM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4727
-X-OriginatorOrg: intel.com
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217491384.1598374.15535514527169847181.stgit@ahduyck-xeon-server.home.arpa>
+ <7b4e73da-6dd7-4240-9e87-157832986dc0@lunn.ch> <CAKgT0UeBva+gCVHbqS2DL-0dUMSmq883cE6C1JqnehgCUUDBTQ@mail.gmail.com>
+ <19c2a4be-428f-4fc6-b344-704f314aee95@lunn.ch> <CAKgT0UeZ1zzJNOcTbiJYzG0_HeDW2jFKkSSSogR-gU+-mRZhYQ@mail.gmail.com>
+ <9992d028-c51a-4086-9c98-006d980dd508@lunn.ch>
+In-Reply-To: <9992d028-c51a-4086-9c98-006d980dd508@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 3 Apr 2024 16:27:39 -0700
+Message-ID: <CAKgT0UfWO2kC8CiwbifxAqAW9kMtWpObJ6_OyN0780WwNEA-FA@mail.gmail.com>
+Subject: Re: [net-next PATCH 02/15] eth: fbnic: add scaffolding for Meta's NIC driver
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Apr 3, 2024 at 3:20=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > I would say it depends. Are you trying to boot off of all 167 devices?
+>
+> If i'm doing some sort of odd boot setup, i generally TFTP boot the
+> kernel, and then use NFS root. And i have everything built in. It not
+> finding the root fs because networking is FUBAR is pretty obvious. Bin
+> there, done that.
+>
+> Please keep in mind the users here. This is a data centre NIC, not a
+> 'grandma and grandpa' device which as the designated IT expert of the
+> family i need to help make work. Can the operators of Meta data
+> centres really not understand lsmod? Cannot look in /sys?
+>
+>        Andrew
 
+At datacenter scales stopping to triage individual issues becomes
+quite expensive. It implies that you are leaving the device in the
+failed state while you take the time to come back around and figure
+out what is going on. That is why in many cases we are not able to
+stop and run an lsmod. Usually the error is recorded, the system
+reset, and nothing comes of it unless it is a repeated issue.
 
-On 3/29/2024 9:09 AM, Karol Kolacinski wrote:
-> From: Jacob Keller <jacob.e.keller@intel.com>
-> 
-> Multiple places in the driver code need to convert enum ice_ptp_tmr_cmd
-> values into register bits for both the main timer and the PHY port
-> timers. The main MAC register has one bit scheme for timer commands,
-> while the PHY commands use a different scheme.
-> 
-> The E810 and E830 devices use the same scheme for port commands as used
-> for the main timer. However, E822 and ETH56G hardware has a separate
-> scheme used by the PHY.
-> 
-> Introduce helper functions to convert the timer command enumeration into
-> the register values, reducing some code duplication, and making it
-> easier to later refactor the individual port write commands.
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 140 ++++++++++++--------
->   drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   2 +-
->   2 files changed, 89 insertions(+), 53 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> index e86ca6cada79..c892b966c3b8 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> @@ -227,40 +227,114 @@ static u64 ice_ptp_read_src_incval(struct ice_hw *hw)
->   }
->   
->   /**
-> - * ice_ptp_src_cmd - Prepare source timer for a timer command
-> - * @hw: pointer to HW structure
-> + * ice_ptp_tmr_cmd_to_src_reg - Convert to source timer command value
-> + * @hw: pointer to HW struct
->    * @cmd: Timer command
->    *
-> - * Prepare the source timer for an upcoming timer sync command.
-> + * Returns: the source timer command register value for the given PTP timer
-> + * command.
->    */
-> -void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
-> +static u32 ice_ptp_tmr_cmd_to_src_reg(struct ice_hw *hw,
-> +				      enum ice_ptp_tmr_cmd cmd)
->   {
-> -	u32 cmd_val;
-> -	u8 tmr_idx;
-> +	u32 cmd_val, tmr_idx;
-> +
-> +	switch (cmd) {
-> +	case ICE_PTP_INIT_TIME:
-> +		cmd_val = GLTSYN_CMD_INIT_TIME;
-> +		break;
-> +	case ICE_PTP_INIT_INCVAL:
-> +		cmd_val = GLTSYN_CMD_INIT_INCVAL;
-> +		break;
-> +	case ICE_PTP_ADJ_TIME:
-> +		cmd_val = GLTSYN_CMD_ADJ_TIME;
-> +		break;
-> +	case ICE_PTP_ADJ_TIME_AT_TIME:
-> +		cmd_val = GLTSYN_CMD_ADJ_INIT_TIME;
-> +		break;
-> +	case ICE_PTP_NOP:
-> +	case ICE_PTP_READ_TIME:
-> +		cmd_val = GLTSYN_CMD_READ_TIME;
-> +		break;
-> +	default:
-> +		dev_warn(ice_hw_to_dev(hw),
-> +			 "Ignoring unrecognized timer command %u\n", cmd);
-> +		cmd_val = 0;
-> +	}
->   
->   	tmr_idx = ice_get_ptp_src_clock_index(hw);
-> -	cmd_val = tmr_idx << SEL_CPK_SRC;
-> +
-> +	return tmr_idx | cmd_val << SEL_CPK_SRC;
+Also it seems like this messaging is still being added for new
+drivers. A quick search through the code for an example comes up with
+cb7dd712189f ("octeon_ep_vf: Add driver framework and device
+initialization") which is doing the same exact thing and is even a bit
+noisier.
 
-This is not equivalent to what was returned before this patch. Is this 
-supposed to return different values now?
+Anyway I partially agree that we do need to reduce the noise scope of
+it so I will update so we only print the message if we actually
+register the driver. We can probably discuss this further for v2 when
+I get it submitted.
 
-> +}
-> +
-> +/**
-> + * ice_ptp_tmr_cmd_to_port_reg- Convert to port timer command value
-> + * @hw: pointer to HW struct
-> + * @cmd: Timer command
-> + *
-> + * Note that some hardware families use a different command register value for
-> + * the PHY ports, while other hardware families use the same register values
-> + * as the source timer.
-> + *
-> + * Returns: the PHY port timer command register value for the given PTP timer
-> + * command.
-> + */
-> +static u32 ice_ptp_tmr_cmd_to_port_reg(struct ice_hw *hw,
-> +				       enum ice_ptp_tmr_cmd cmd)
-> +{
-> +	u32 cmd_val, tmr_idx;
-> +
-> +	/* Certain hardware families share the same register values for the
-> +	 * port register and source timer register.
-> +	 */
-> +	switch (hw->ptp.phy_model) {
-> +	case ICE_PHY_E810:
-> +		return ice_ptp_tmr_cmd_to_src_reg(hw, cmd) & TS_CMD_MASK_E810;
-> +	default:
-> +		break;
-> +	}
->   
->   	switch (cmd) {
->   	case ICE_PTP_INIT_TIME:
-> -		cmd_val |= GLTSYN_CMD_INIT_TIME;
-> +		cmd_val = PHY_CMD_INIT_TIME;
->   		break;
->   	case ICE_PTP_INIT_INCVAL:
-> -		cmd_val |= GLTSYN_CMD_INIT_INCVAL;
-> +		cmd_val = PHY_CMD_INIT_INCVAL;
->   		break;
->   	case ICE_PTP_ADJ_TIME:
-> -		cmd_val |= GLTSYN_CMD_ADJ_TIME;
-> +		cmd_val = PHY_CMD_ADJ_TIME;
->   		break;
->   	case ICE_PTP_ADJ_TIME_AT_TIME:
-> -		cmd_val |= GLTSYN_CMD_ADJ_INIT_TIME;
-> +		cmd_val = PHY_CMD_ADJ_TIME_AT_TIME;
->   		break;
->   	case ICE_PTP_READ_TIME:
-> -		cmd_val |= GLTSYN_CMD_READ_TIME;
-> +		cmd_val = PHY_CMD_READ_TIME;
->   		break;
->   	case ICE_PTP_NOP:
-> +		cmd_val = 0;
->   		break;
-> +	default:
-> +		dev_warn(ice_hw_to_dev(hw),
-> +			 "Ignoring unrecognized timer command %u\n", cmd);
-> +		cmd_val = 0;
->   	}
->   
-> +	tmr_idx = ice_get_ptp_src_clock_index(hw);
-> +
-> +	return tmr_idx | cmd_val << SEL_PHY_SRC;
+Thanks,
 
-Just pointing out that this is the same as the above function in case 
-the previous needs to be changed.
-
-> +}
-> +
-
+- Alex
 
