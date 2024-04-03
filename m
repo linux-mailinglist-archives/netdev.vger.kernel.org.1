@@ -1,111 +1,162 @@
-Return-Path: <netdev+bounces-84244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB6E896229
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:43:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9EC7896247
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 04:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9AA1C23BB4
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:42:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D056DB213D8
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 02:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2491BC3C;
-	Wed,  3 Apr 2024 01:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1AB168A8;
+	Wed,  3 Apr 2024 02:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="YgwxdVkS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZf5hcBS"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 418FE1BC20;
-	Wed,  3 Apr 2024 01:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6658214F70;
+	Wed,  3 Apr 2024 02:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712108505; cv=none; b=p1oDtP+zymGzAMWVMMNujQfgwmdn0stRAAxOgTv2WYY4ZaPBXT0YZvE2lzwUeVdXMAVIXNYkP9wpIHp/4qGJ/d7HKdBKHOso6/+mOlI7XSTCVT2v/oVJjs4E7GxMkEwtIy74e8u3UkkhIgbnnRK6nNrc9woRpaj8kWH+NJFrf8c=
+	t=1712109675; cv=none; b=DB4af0ZZ4AjYgiz8pKmY/G+o3PHysU1Xsvy+l3PvLdD1vOw8DLTqB6ozqzGzK/e71iDkX9BSOfeaR52QLrLzHVJljaHHQRU9jQGlsB34/c222hrV7Wn/fIxWeG3M0M8BSCNUFY7Y0i6WEVSy723RK6iufzAkOtcsb4waffkYEh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712108505; c=relaxed/simple;
-	bh=9qzDJd4xv/KvBWlAYR/DxWB2jZFnJ/2Xwhpb1j5iYE8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=TFtTTlAlutyKr+7YVOPMMhopjGtDY9o+hsIYTi1tJR9J8s/4Igqd6C0ySUJ62C3ay4M2yk2grqWUCMmMMhqgKuXWffIqajAyo6VRFgLg7nWJUesbIMbZWpWZeadhkatNy4iXE6t1o4KjqKRqci1OrtnhYd2EXXh4R43AvfSChS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=YgwxdVkS reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=mp202wi81W+h68F3K6cSfB+qwXNEKfRZa04fWpo1DKk=; b=Y
-	gwxdVkSuDajkGl1B4EHNLzqS83dUcJJEv8+EpWJXSVVvfjRDUR3nE0zoXyoBjeOf
-	weCzWu0fA1LCCvsOt29lLz5PrWj27TsG/lwwdP8GqjhD/CQdJARyiYry1JqSRB9P
-	LzakUMlIGmrwfXWg6Iapqczh+ETBJ6ypjzsDms4yZ8=
-Received: from w_angrong$163.com ( [123.60.114.34] ) by
- ajax-webmail-wmsvr-40-109 (Coremail) ; Wed, 3 Apr 2024 09:41:20 +0800 (CST)
-Date: Wed, 3 Apr 2024 09:41:20 +0800 (CST)
-From: tab <w_angrong@163.com>
-To: "Jason Wang" <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, "Cindy Lu" <lulu@redhat.com>
-Subject: Re:Re: [PATCH v3] vhost/vdpa: Add MSI translation tables to iommu
- for software-managed MSI
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20230109(dcb5de15)
- Copyright (c) 2002-2024 www.mailtech.cn 163com
-In-Reply-To: <CACGkMEvdw4Yf2B1QGed0W7wLhOHU9+Vo_Z3h=4Yr9ReBfvuh=g@mail.gmail.com>
-References: <20240320101912.28210-1-w_angrong@163.com>
- <20240321025920-mutt-send-email-mst@kernel.org>
- <CACGkMEuHRf0ZfBiAYxyNHB3pxuzz=QCWt5VyHPLz-+-+LM=+bg@mail.gmail.com>
- <CACGkMEuM9bdvgH7_v6F=HT-x10+0tCzG56iuU05guwqNN1+qKQ@mail.gmail.com>
- <20240329051334-mutt-send-email-mst@kernel.org>
- <CACGkMEvdw4Yf2B1QGed0W7wLhOHU9+Vo_Z3h=4Yr9ReBfvuh=g@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1712109675; c=relaxed/simple;
+	bh=BpDt+tf92JC4R6bQIR0AZ9LRysFGYDVx7rMcvoGhgwA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HRam0De5ZkHeGeEwksI6r/FHzX5Os+tlFl33iXwt9GKTFm5h/wSO0pZCYhZSumu7ud81iVhwsnyhZTIFzNQa1occ0zzWcJqy1KS9fgCsKxE1eFGtKNtCS5W3uPu2rURSMxlNycy9okofZ6bgxL2BxXruPs+4H5+z7q1j+6i9ekc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HZf5hcBS; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5d8b70b39efso4177156a12.0;
+        Tue, 02 Apr 2024 19:01:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712109674; x=1712714474; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZEDMsVuuuoQ1174prvc6pVoSXIXrvtv4pXkECgOo8mQ=;
+        b=HZf5hcBSBuZTN1ZwECcybURc5NfH+uPT0BYhrjYvwY1tAzrq6RiuYN6TZlZxIZ38cY
+         b+n2HtqkeL5mooApn7RC3NWFdlTnE+PP/o91I9YhuRy+dsPac1ezv7UTxuUpDXRLoMl0
+         Lrr2JWYtzT5nJ80wTckknC9Ru5yYwwDCqsz5sCuiznPnXHHjvGGb2cQGgGGEj0Z5pVM4
+         DES/kE4f3dfadyF33wkLmwJokMh0ZV+E/C4YLIrd71j9LP8xkTX7NmGpsHMIldQ5D7Aq
+         rkyk9Qt+hjr74De4Z2zZw2mPZBYcfu2GE8JNOmdaEYNhcIu9+MkHkjl4CxfmunBA6CsR
+         2FFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712109674; x=1712714474;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZEDMsVuuuoQ1174prvc6pVoSXIXrvtv4pXkECgOo8mQ=;
+        b=G5f2nkfOGtqPRTL0Dd4tBwXxQEwlduf5wdjRWRON3wThwCUFsI2MKRB/HBTNFQJhBZ
+         zNm4i0ubPM8S2n9nH5daSpPZX8BhFqJ19+PmagYMpW5VLFLv8TkAMxyxWBp7pRhTo+yK
+         a2i4Pu1+iI7tniSjWKrvppZ3ZN4snEojiavryPgAFQ5k5luQrhNMlywm2AN+YrowdBFh
+         CnQpBm73fbX6deYBHML2ftMcqAQri4D6Q/WJOfJsK2rC7baRDqLviujM7ic74guwM3pn
+         t0bElbGEQdK6R0CnpCTbNZ5HGp+7YjHyaA+hMELEN66gqjQlFJNZ6uqQBGTpnbvVyg98
+         59sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUxMsSF88RZuusqln1yHqo7Y+p2I/8ZWBkM6DaxtfMNPUg5DUMbBjrr5cCRpOts2a9VTlEB748Z5SVjUdXlg2kYF41Z1hWtX2/8KsD5me/BtQuwulJfsAFtSOCyTluOOIsYkzCI
+X-Gm-Message-State: AOJu0Yzku680e1/sn7vB54xqY5QyAyBd/jC02LbmBibDErlJQE4/f8UA
+	D141tCNRKkCefhMHppC13nvJORwD+FeM7JPQqc2uji/a4Q8tTwRa8/lpa6hHR4H8FD8gMfMoEnB
+	5GY2DRwz368Op6YT9S1gH9jO3vxQ=
+X-Google-Smtp-Source: AGHT+IEkuAu1KEHf0qNFo3/DEdx3/SbuyX9NHysxtbJHzqInyoOkwHICDgHTkvCxXHRJIXikQW4riTdj8T+ZtnHQn1c=
+X-Received: by 2002:a17:90a:5909:b0:29d:e70f:7240 with SMTP id
+ k9-20020a17090a590900b0029de70f7240mr12467666pji.11.1712109673683; Tue, 02
+ Apr 2024 19:01:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <2d5a774d.567.18ea19e282e.Coremail.w_angrong@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:_____wD338_AswxmOKEiAA--.20431W
-X-CM-SenderInfo: xzbd0wpurqwqqrwthudrp/xtbBzxK0iGV4If3v6AABsm
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+References: <20240327110142.159851-1-cathy.cai@unisoc.com> <d1da7fdb-10f6-7f69-4820-520469c0193c@bootlin.com>
+In-Reply-To: <d1da7fdb-10f6-7f69-4820-520469c0193c@bootlin.com>
+From: cathy cai <cathycai0714@gmail.com>
+Date: Wed, 3 Apr 2024 10:01:02 +0800
+Message-ID: <CAG8gwPWFdckcoP5apUxP1E9haiet=XkRXH4LBygMN2awiVMabA@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: stmmac: Fix the problem about interrupt storm
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Cathy Cai <cathy.cai@unisoc.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, xuewen.yan94@gmail.com, 
+	cixi.geng1@unisoc.com, wade.shu@unisoc.com, zhiguo.niu@unisoc.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SSZuYnNwO25lZWQmbmJzcDt0byZuYnNwO2Rpc2N1c3MmbmJzcDtpbnRlcm5hbGx5LCZuYnNwO2Fu
-ZCZuYnNwO3RoZXJlJm5ic3A7bWF5Jm5ic3A7YmUmbmJzcDtzb21lb25lJm5ic3A7ZWxzZSZuYnNw
-O3dpbGwmbmJzcDtkbyZuYnNwO3RoYXQuCuWcqCAyMDI0LTAzLTI5IDE4OjM5OjU077yMIkphc29u
-IFdhbmciIDxqYXNvd2FuZ0ByZWRoYXQuY29tPiDlhpnpgZPvvJoKT24gRnJpLCBNYXIgMjksIDIw
-MjQgYXQgNToxM+KAr1BNIE1pY2hhZWwgUy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+IHdyb3Rl
-Og0KPg0KPiBPbiBGcmksIE1hciAyOSwgMjAyNCBhdCAxMTo1NTo1MEFNICswODAwLCBKYXNvbiBX
-YW5nIHdyb3RlOg0KPiA+IE9uIFdlZCwgTWFyIDI3LCAyMDI0IGF0IDU6MDjigK9QTSBKYXNvbiBX
-YW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPiB3cm90ZToNCj4gPiA+DQo+ID4gPiBPbiBUaHUsIE1h
-ciAyMSwgMjAyNCBhdCAzOjAw4oCvUE0gTWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNv
-bT4gd3JvdGU6DQo+ID4gPiA+DQo+ID4gPiA+IE9uIFdlZCwgTWFyIDIwLCAyMDI0IGF0IDA2OjE5
-OjEyUE0gKzA4MDAsIFdhbmcgUm9uZyB3cm90ZToNCj4gPiA+ID4gPiBGcm9tOiBSb25nIFdhbmcg
-PHdfYW5ncm9uZ0AxNjMuY29tPg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gT25jZSBlbmFibGUgaW9t
-bXUgZG9tYWluIGZvciBvbmUgZGV2aWNlLCB0aGUgTVNJDQo+ID4gPiA+ID4gdHJhbnNsYXRpb24g
-dGFibGVzIGhhdmUgdG8gYmUgdGhlcmUgZm9yIHNvZnR3YXJlLW1hbmFnZWQgTVNJLg0KPiA+ID4g
-PiA+IE90aGVyd2lzZSwgcGxhdGZvcm0gd2l0aCBzb2Z0d2FyZS1tYW5hZ2VkIE1TSSB3aXRob3V0
-IGFuDQo+ID4gPiA+ID4gaXJxIGJ5cGFzcyBmdW5jdGlvbiwgY2FuIG5vdCBnZXQgYSBjb3JyZWN0
-IG1lbW9yeSB3cml0ZSBldmVudA0KPiA+ID4gPiA+IGZyb20gcGNpZSwgd2lsbCBub3QgZ2V0IGly
-cXMuDQo+ID4gPiA+ID4gVGhlIHNvbHV0aW9uIGlzIHRvIG9idGFpbiB0aGUgTVNJIHBoeSBiYXNl
-IGFkZHJlc3MgZnJvbQ0KPiA+ID4gPiA+IGlvbW11IHJlc2VydmVkIHJlZ2lvbiwgYW5kIHNldCBp
-dCB0byBpb21tdSBNU0kgY29va2llLA0KPiA+ID4gPiA+IHRoZW4gdHJhbnNsYXRpb24gdGFibGVz
-IHdpbGwgYmUgY3JlYXRlZCB3aGlsZSByZXF1ZXN0IGlycS4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+
-IENoYW5nZSBsb2cNCj4gPiA+ID4gPiAtLS0tLS0tLS0tDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiB2
-MS0+djI6DQo+ID4gPiA+ID4gLSBhZGQgcmVzdiBpb3RsYiB0byBhdm9pZCBvdmVybGFwIG1hcHBp
-bmcuDQo+ID4gPiA+ID4gdjItPnYzOg0KPiA+ID4gPiA+IC0gdGhlcmUgaXMgbm8gbmVlZCB0byBl
-eHBvcnQgdGhlIGlvbW11IHN5bWJvbCBhbnltb3JlLg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gU2ln
-bmVkLW9mZi1ieTogUm9uZyBXYW5nIDx3X2FuZ3JvbmdAMTYzLmNvbT4NCj4gPiA+ID4NCj4gPiA+
-ID4gVGhlcmUncyBpbiBpbnRlcmVzdCB0byBrZWVwIGV4dGVuZGluZyB2aG9zdCBpb3RsYiAtDQo+
-ID4gPiA+IHdlIHNob3VsZCBqdXN0IHN3aXRjaCBvdmVyIHRvIGlvbW11ZmQgd2hpY2ggc3VwcG9y
-dHMNCj4gPiA+ID4gdGhpcyBhbHJlYWR5Lg0KPiA+ID4NCj4gPiA+IElPTU1VRkQgaXMgZ29vZCBi
-dXQgVkZJTyBzdXBwb3J0cyB0aGlzIGJlZm9yZSBJT01NVUZELiBUaGlzIHBhdGNoDQo+ID4gPiBt
-YWtlcyB2RFBBIHJ1biB3aXRob3V0IGEgYmFja3BvcnRpbmcgb2YgZnVsbCBJT01NVUZEIGluIHRo
-ZSBwcm9kdWN0aW9uDQo+ID4gPiBlbnZpcm9ubWVudC4gSSB0aGluayBpdCdzIHdvcnRoLg0KPiA+
-ID4NCj4gPiA+IElmIHlvdSB3b3JyeSBhYm91dCB0aGUgZXh0ZW5zaW9uLCB3ZSBjYW4ganVzdCB1
-c2UgdGhlIHZob3N0IGlvdGxiDQo+ID4gPiBleGlzdGluZyBmYWNpbGl0eSB0byBkbyB0aGlzLg0K
-PiA+ID4NCj4gPiA+IFRoYW5rcw0KPiA+DQo+ID4gQnR3LCBXYW5nIFJvbmcsDQo+ID4NCj4gPiBJ
-dCBsb29rcyB0aGF0IENpbmR5IGRvZXMgaGF2ZSB0aGUgYmFuZHdpZHRoIGluIHdvcmtpbmcgZm9y
-IElPTU1VRkQgc3VwcG9ydC4NCj4NCj4gSSB0aGluayB5b3UgbWVhbiBzaGUgZG9lcyBub3QuDQoN
-ClllcywgeW91IGFyZSByaWdodC4NCg0KVGhhbmtzDQoNCj4NCj4gPiBEbyB5b3UgaGF2ZSB0aGUg
-d2lsbCB0byBkbyB0aGF0Pw0KPiA+DQo+ID4gVGhhbmtzDQo+DQo=
+Hi Romain,
+
+On Sun, Mar 31, 2024 at 4:35=E2=80=AFPM Romain Gantois
+<romain.gantois@bootlin.com> wrote:
+>
+> Hello Cathy,
+>
+> On Wed, 27 Mar 2024, Cathy Cai wrote:
+>
+> > Tx queue time out then reset adapter. When reset the adapter, stmmac dr=
+iver
+> > sets the state to STMMAC_DOWN and calls dev_close() function. If an int=
+errupt
+> > is triggered at this instant after setting state to STMMAC_DOWN, before=
+ the
+> > dev_close() call.
+> >
+> ...
+> > -     set_bit(STMMAC_DOWN, &priv->state);
+> >       dev_close(priv->dev);
+> > +     set_bit(STMMAC_DOWN, &priv->state);
+> >       dev_open(priv->dev, NULL);
+> >       clear_bit(STMMAC_DOWN, &priv->state);
+> >       clear_bit(STMMAC_RESETING, &priv->state);
+>
+> If this IRQ issue can happen whenever STMMAC_DOWN is set while the net de=
+vice is
+> open, then it could also happen between the dev_open() and
+> clear_bit(STMMAC_DOWN) calls right? So you'd have to clear STMMAC_DOWN be=
+fore
+> calling dev_open() but then I don't see the usefulness of setting STMMAC_=
+DOWN
+> and clearing it immediately. Maybe closing and opening the net device sho=
+uld be
+> enough?
+>
+ Yes. It could also happen between the dev_open() and
+clear_bit(STMMAC_DOWN) calls.
+Although we did not reproduce this scenario, it should have happened
+if we had increased
+the number of test samples. In addition, I found that other people had
+similar problems before.
+The link is:
+https://lore.kernel.org/all/20210208140820.10410-11-Sergey.Semin@baikalelec=
+tronics.ru/
+
+>
+> Moreover, it seems strange to me that stmmac_interrupt() unconditionnally
+> ignores interrupts when the driver is in STMMAC_DOWN state. This seems li=
+ke
+> dangerous behaviour, since it could cause IRQ storm issues whenever somet=
+hing
+> in the driver sets this state. I'm not too familiar with the interrupt ha=
+ndling
+> in this driver, but maybe stmmac_interrupt() could clear interrupts
+> unconditionnally in the STMMAC_DOWN state?
+>
+Clear interrupts unconditionally in the STMMAC_DOWN state directly
+certainly won't cause this problem.
+This may be too rough, maybe this design has other considerations.
+
+>
+> Best Regards,
+>
+> --
+> Romain Gantois, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+
+ Best Regards,
+Cathy
 
