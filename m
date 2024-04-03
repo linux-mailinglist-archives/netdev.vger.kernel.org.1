@@ -1,57 +1,67 @@
-Return-Path: <netdev+bounces-84314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BE18896835
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:17:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98C689684E
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4F16B287DF
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:17:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6249E28460A
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673AC839FD;
-	Wed,  3 Apr 2024 08:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE3C12C81A;
+	Wed,  3 Apr 2024 08:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PT3MiuUU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tz7ILvZD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7198060D;
-	Wed,  3 Apr 2024 08:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B326EB69;
+	Wed,  3 Apr 2024 08:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712131701; cv=none; b=uB4kCn74HUO7fl3YOzzyoSvhb9g4xuwDQ8CWeC1QtEhbjCLPWZgFxdv4rk2A2VF5CF5Nin4P3NlOVGed2B49nSptYKUseE86vbZ8bwPqwgT2Y+MP45TPj5UQxyUYNFLftTDGRAEAtpyYJyvwPTIVyLPG9I5R31UuFlQi+ubHpjs=
+	t=1712131826; cv=none; b=uAI5pkgGucJoTX5nNzfuQOcxWKILrj4k4kpAQsLTLfh3Qn6yy5RKrLOLNTQ4zASL+fYUSl/LZRsYhKOtQZsa6yNoXCQycWwHfVP2wS+k5lEkVhGWZj+FghdKBDa9oxZY71vwePq4UERrXJCeyCVexaWWhrHqY+y1v2mVyI0Hfe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712131701; c=relaxed/simple;
-	bh=lKYFOQA74WUrBNKESAlJ+e055R+fsTrHN/bgM387ZAQ=;
+	s=arc-20240116; t=1712131826; c=relaxed/simple;
+	bh=WiucSDfey+Rb6VSKODVbCb1E0/6xwr83CCZttDwFyxE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AJzvmH98dwSVvUePjqEKaj61G2RLSAflTspvoUU22F8AJx9xF9po4E5eOj2eKbpevzgSr98xNJ68By/s0bsML748M8xpUBpBKN0pOG4CG6hgwbh6+ZGI4nkffPoA+QgaLxYJXCBVfS09Hzk4P8Dne8v0wR/qpARsaS4LcC8VdCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PT3MiuUU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35AB5C433F1;
-	Wed,  3 Apr 2024 08:08:19 +0000 (UTC)
+	 MIME-Version; b=UcmutEs423l2Vin/I7nPIeQEab+Yzrxn+cAB6hAJPpDA3KxKrpI55t21tTZr+wGQEm0PmN1jAaLwdo/VjcO1X7BYwn9pYccUJ+u5p/gCcobtTvXQZHjijZqTT+QXhiQBH8CURQTuGMC7SXMH5mWOezvAHoyWn8UXFr/SRIol4uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tz7ILvZD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85028C433C7;
+	Wed,  3 Apr 2024 08:10:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712131700;
-	bh=lKYFOQA74WUrBNKESAlJ+e055R+fsTrHN/bgM387ZAQ=;
+	s=k20201202; t=1712131826;
+	bh=WiucSDfey+Rb6VSKODVbCb1E0/6xwr83CCZttDwFyxE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PT3MiuUUoRKbKfg8e79CuzUU5j8DeVThGzzSbXP7Tufl9ihYjw23nkR2j6Gd+bsfK
-	 PmiK96NULKtD+T4PKVP4quu4w6VnbNK3ZmBfRcH+I5gCpO9m3IWlsbsUt2oaf+oqV7
-	 m0rMmCJvslOmatp2uk4KVRu9lK9+y9jAU1UbL+SuNFtnW0wdQpSAhg0vZiuTo+PPHc
-	 1ytWDH+QHejAcipmgYlY8tOIVRARva9FTd1Q9quxbwpC68c3HQ+5UfXWkdcakGg41B
-	 evlQBxwb3xDk4fXhi8GcHRTntCZVcARhXa0mCemSvoT2kEXem8H5EGDhiGhBvSNjT0
-	 p31fbxHliBgXg==
+	b=Tz7ILvZDBSKlkXfydHLWZoo0LaYg/BPPpzBh4G9ExyldItTq+LggHRx356xDCgMgs
+	 iqDoFL52fC3ArfKjtL+Vn1yGtnlmb5hHMYUmXMo2xyMgRBqx6dMPka4uxyOyQMVMDs
+	 SzjXYwqzpShMZxzH6dbOaqLv7vU8odUsBvkPNXvalCCxRYeuH/uFF0A9kxdWhCgXlk
+	 g6wY/Pxa4Gh0HKTYvtJUC/hpHcO11BQUc9QnP1b6Ie+P6LGcX6IiRjpqdwS2UCWH+H
+	 F76jLFqc3FaCDhY55Pd6zfq88o0iXYgQuXpt2qgQYQXPznmM/FwvG52D4AmIm1sAWk
+	 LXB2BVTileS+A==
 From: Arnd Bergmann <arnd@kernel.org>
 To: linux-kernel@vger.kernel.org,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	NeilBrown <neilb@suse.de>,
+	"J. Bruce Fields" <bfields@fieldses.org>
 Cc: Arnd Bergmann <arnd@arndb.de>,
+	Olga Kornievskaia <kolga@netapp.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH 05/34] 3c515: remove unused 'mtu' variable
-Date: Wed,  3 Apr 2024 10:06:23 +0200
-Message-Id: <20240403080702.3509288-6-arnd@kernel.org>
+Subject: [PATCH 19/34] sunrpc: suppress warnings for unused procfs functions
+Date: Wed,  3 Apr 2024 10:06:37 +0200
+Message-Id: <20240403080702.3509288-20-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240403080702.3509288-1-arnd@kernel.org>
 References: <20240403080702.3509288-1-arnd@kernel.org>
@@ -65,33 +75,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-This has never been used since the start of the git history. When building
-with W=1, the unused variable produces a gcc warning:
+There is a warning about unused variables when building with W=1 and no procfs:
 
-drivers/net/ethernet/3com/3c515.c:35:18: error: 'mtu' defined but not used [-Werror=unused-const-variable=]
+net/sunrpc/cache.c:1660:30: error: 'cache_flush_proc_ops' defined but not used [-Werror=unused-const-variable=]
+ 1660 | static const struct proc_ops cache_flush_proc_ops = {
+      |                              ^~~~~~~~~~~~~~~~~~~~
+net/sunrpc/cache.c:1622:30: error: 'content_proc_ops' defined but not used [-Werror=unused-const-variable=]
+ 1622 | static const struct proc_ops content_proc_ops = {
+      |                              ^~~~~~~~~~~~~~~~
+net/sunrpc/cache.c:1598:30: error: 'cache_channel_proc_ops' defined but not used [-Werror=unused-const-variable=]
+ 1598 | static const struct proc_ops cache_channel_proc_ops = {
+      |                              ^~~~~~~~~~~~~~~~~~~~~~
 
-Just remove it.
+These are used inside of an #ifdef, so replacing that with an
+IS_ENABLED() check lets the compiler see how they are used while
+still dropping them during dead code elimination.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: dbf847ecb631 ("knfsd: allow cache_register to return error on failure")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/net/ethernet/3com/3c515.c | 3 ---
- 1 file changed, 3 deletions(-)
+ net/sunrpc/cache.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/3com/3c515.c b/drivers/net/ethernet/3com/3c515.c
-index ba3e7aa1a28f..4725a8cfd695 100644
---- a/drivers/net/ethernet/3com/3c515.c
-+++ b/drivers/net/ethernet/3com/3c515.c
-@@ -31,9 +31,6 @@
-    Setting to > 1512 effectively disables this feature. */
- static int rx_copybreak = 200;
+diff --git a/net/sunrpc/cache.c b/net/sunrpc/cache.c
+index 95ff74706104..ab3a57965dc0 100644
+--- a/net/sunrpc/cache.c
++++ b/net/sunrpc/cache.c
+@@ -1673,12 +1673,14 @@ static void remove_cache_proc_entries(struct cache_detail *cd)
+ 	}
+ }
  
--/* Allow setting MTU to a larger size, bypassing the normal ethernet setup. */
--static const int mtu = 1500;
--
- /* Maximum events (Rx packets, etc.) to handle at each interrupt. */
- static int max_interrupt_work = 20;
+-#ifdef CONFIG_PROC_FS
+ static int create_cache_proc_entries(struct cache_detail *cd, struct net *net)
+ {
+ 	struct proc_dir_entry *p;
+ 	struct sunrpc_net *sn;
  
++	if (!IS_ENABLED(CONFIG_PROC_FS))
++		return 0;
++
+ 	sn = net_generic(net, sunrpc_net_id);
+ 	cd->procfs = proc_mkdir(cd->name, sn->proc_net_rpc);
+ 	if (cd->procfs == NULL)
+@@ -1706,12 +1708,6 @@ static int create_cache_proc_entries(struct cache_detail *cd, struct net *net)
+ 	remove_cache_proc_entries(cd);
+ 	return -ENOMEM;
+ }
+-#else /* CONFIG_PROC_FS */
+-static int create_cache_proc_entries(struct cache_detail *cd, struct net *net)
+-{
+-	return 0;
+-}
+-#endif
+ 
+ void __init cache_initialize(void)
+ {
 -- 
 2.39.2
 
