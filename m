@@ -1,230 +1,278 @@
-Return-Path: <netdev+bounces-84378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 337FF896C2A
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:24:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C5A7896C81
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 12:32:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 550701C212BA
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:24:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7CC01F210DD
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C89F13699E;
-	Wed,  3 Apr 2024 10:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="F3dSO+3r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D48142E8A;
+	Wed,  3 Apr 2024 10:31:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2137.outbound.protection.partner.outlook.cn [139.219.146.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 697D2259C;
-	Wed,  3 Apr 2024 10:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC201428F9;
+	Wed,  3 Apr 2024 10:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.137
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712139848; cv=fail; b=lfxVOxaLa9f13utMzMaxxwVMkazjZmmx6tU501zK4U4MDKcV17dVTPKAWW2phihb+biL05Sy46IK8AIO69uGbdAoajCLi5lkJlvriAHOhbhaNDaGg7/IfqXqXeItq++XMFvjuMsos8NEJdsTXcHBwcjbTY1lIxuLrqHEsavlxns=
+	t=1712140265; cv=fail; b=j+BM81DMVfPXwV8VIpzUtFUeGEPEmq8e4E9u+V4bM+nqRkX62mcpmjGBanUNSx3rrFJrIzn2J38ae+oXAQKueRu6zMuBg/pyqGYzSXK94u4a1V6UfWIcuMr+nO3Bcc5MftexPrfHU5VQ61eRn7Wjtqif0wHNcc9LvzUk96j0n6c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712139848; c=relaxed/simple;
-	bh=sPqzE6fQQocWV/5YUk9DfTs3wG3gEV+33NTxzCSqBJk=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=f5bM+pBRgv6zbSANIxGcrInbrgD6WZZmYxNWIGsPGLWGNcgYVGzE7DltV1Z/gpDRfikrbf3DN7412kKcsU/5ciqNPV81br144a75GhoMYAQAHjQ2p+KSORswaJ0jwG0tVnj7NUeCGJ5LZ/E3vq6tZaWhTF6rs5rJHbgDKOuJLRE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=F3dSO+3r; arc=fail smtp.client-ip=40.107.236.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1712140265; c=relaxed/simple;
+	bh=4GGYiaL/40Mv0a7K4QFeerFQFiJEAKSZ7gHAeR/HdZ8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=eQYsFeCMbM+3tBMoCvHtqvSs2UFV9X4hodO8C0zmOUL9GiW8HgTs/XYsiVqkLGOsEWJeWVVX74eA4tjsswkXeCXbptWOnFoCgMFeigKBxCmfc83o9B/YclF4vlKYACCP1/jWLUjrSYCqxNtly0pUG0Yc+M3aRTgI53GwU4zjwXI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TYNTDUnn1Oo8hokfzER2qEC4k6vp8yDKyoRBMKGB3whPvyWVZ8q5TDkee5UKStvHhfMTS6Y1PzwU3NEJEP0mK5satVqz9x3Re03awZL0Jb4XOHgd0mBxZA5S/XphrJUpSfgUtRXfH1YNtj+KyYCpeCTyDMGPBHgAel2/vxSUy9ThDfrUAyplkoU3ipHHCDkUJdpp2LTKf+E+NTpspYYC16Ch00CCMWRZ3w8TQsk9CEmKh0dIFRLRmoeUZlvkOItZvpLsFdfPr4YHkFoT58HUv5lzEGEgNN83UBZo4t31fiLfs3lH58wwRLnFrpjSOh+vO3KOPv2wv/whxC/svU8GeA==
+ b=FWC2poT4m8NXmY2vCa85/aYdXZ9XSKZJY00odYa6eHa8JV+hsTofYoZEUZWPKyE9mcNUxhv/D8STwUveWzDqo7oKKqajXhj8YIdLz9k/q+9mpgBjNA5eT4tzHmIXQPpk9jds3+mz2x0ZcVj4pqGJyDZKfw4siNR7M1eO7CF3g5vfzonxfBQWDEgkiGxbSNKwEoIZxzeQLhKzyEzXviXdjqs5Ytf1Ic/iqvVKULkb4fIsHwdSsNLDqAoEpNJYYVb0o+RjfQCa3FJn6ff7kDrTr2i2uNNEmwKyROAdFkF7tWZ7hhWb3xCkuUCXJPim6+raZn2+2vfZf9KEvipytIKUXA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CRXg+W+FJ/+AOmJuz7lpzQVx3lcpgTOkxV28HmFcTtM=;
- b=ABbjghZlGVjhluYp3aE+LtCD8fje6dL241BoK84s6d8jYAyNewUoX6a6izqYNuembdg6X1DLUOPw1By0QATOJJ0Dg8h01QmWMOHivWKRoMRGNL6KjmX3jyHJF5RrQ9qSVOlCub9MCt3Kw+6ce4XSizIsYcfbWHVIPhuVZ1bCZXaKQ+WtXcYO0lKQ07qEaMkPbga1TiRPOs7E4OvJcwR2Y5eKhWelPHKIE3yFbIj3r54UUExFmaypsOZ++lj60/IKwN/CefTUhi4i2espuKOjBLbV8n1s2Poc9zei9T67XwNKsqD9OEZfTy/FO2vqNOSXL7rvS2Bw3BM9YupfK31USQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CRXg+W+FJ/+AOmJuz7lpzQVx3lcpgTOkxV28HmFcTtM=;
- b=F3dSO+3rYRGXKVyDBJzv6FGuYciWVgdd+MSGzLc0v5Ol2dbCQ0+wCltnkLIVCWRA0rn1RH1yiLccTttklBjLmkrgP3RfLr2pe/ggw0fDO1TKO9n0PNMbcED/wsPp9KRu0MwAVIOcbhRUTf6Y3IjIYNHzfSyLqPsfVwrqLVNDRBV5RoixajAvo8ceO5vHsEpPB7AdUiPiqNTvmbroNQESZDvbZ0UgOiHE8Lfi9vUofaTZK15DAYTEQzyuav4xZ9K+z6qRI07PtP9Ouhgc1Z1OXtMW276ozuAv9ePGXc4UvB0jL7zEABU8G10H+sfes8/UNudiz0SL+ImqEiCYCvqvow==
-Received: from CH0P223CA0008.NAMP223.PROD.OUTLOOK.COM (2603:10b6:610:116::19)
- by DM4PR12MB7720.namprd12.prod.outlook.com (2603:10b6:8:100::12) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=ifgLHMBZOIsOrud7Jvo67XumXX5yby5YhTh8ciM/sLo=;
+ b=F3sd41xR54rSfkebB6IIrT9HMmjwSQZD3n/xa25WcpQgS5TTbkHDomMTR1pH0GqWugvYRHC2C2CvTGW5rbspI41UWcPUJYyjA8IkKW/G1RR1reON0kUsqBco1eSG7a/KHvn23hAmiTdbUYPN/pHjavdYX00SLGln/xsyyjKyxwu9rcxSmmxtAJA4gqniEQJU+EcJAcP4wo7j3q5j2HidVeZIrm71HpnORzQmc7Ndyx+e/co+i9ew6byNX1kZOhXJ1x64WSM8dUOzlA7gXEU/zPKpjiNfZRgVgXbqrvyhTGTuUa8mcUb4bkh7djg44C4N8iadBoaYEZvw2WUBIug+jA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Received: from BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:e::20) by BJSPR01MB0739.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:1e::22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 3 Apr
- 2024 10:24:03 +0000
-Received: from CH2PEPF0000013D.namprd02.prod.outlook.com
- (2603:10b6:610:116:cafe::61) by CH0P223CA0008.outlook.office365.com
- (2603:10b6:610:116::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
- Transport; Wed, 3 Apr 2024 10:24:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH2PEPF0000013D.mail.protection.outlook.com (10.167.244.69) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Wed, 3 Apr 2024 10:24:03 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 3 Apr 2024
- 03:23:46 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Wed, 3 Apr
- 2024 03:23:42 -0700
-References: <20240402010520.1209517-1-kuba@kernel.org>
- <20240402010520.1209517-8-kuba@kernel.org> <87bk6rit8f.fsf@nvidia.com>
- <20240402103111.7d190fb1@kernel.org> <8734s3idys.fsf@nvidia.com>
- <20240402163649.4fdc2d3b@kernel.org>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Petr Machata <petrm@nvidia.com>, <davem@davemloft.net>,
-	<netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<shuah@kernel.org>, <sdf@google.com>, <donald.hunter@gmail.com>,
-	<linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next 7/7] testing: net-drv: add a driver test for
- stats reporting
-Date: Wed, 3 Apr 2024 10:58:19 +0200
-In-Reply-To: <20240402163649.4fdc2d3b@kernel.org>
-Message-ID: <87y19uhhhx.fsf@nvidia.com>
+ 2024 09:56:39 +0000
+Received: from BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+ ([fe80::d0cf:5e2e:fd40:4aef]) by
+ BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn ([fe80::d0cf:5e2e:fd40:4aef%4])
+ with mapi id 15.20.7409.042; Wed, 3 Apr 2024 09:56:39 +0000
+From: ChunHau Tan <chunhau.tan@starfivetech.com>
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Emil Renner Berthing <kernel@esmil.dk>, Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+	<conor+dt@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Simon Horman <horms@kernel.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Andrew Halaney
+	<ahalaney@redhat.com>, Jisheng Zhang <jszhang@kernel.org>,
+	=?iso-8859-1?Q?Uwe_Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Russell
+ King <rmk+kernel@armlinux.org.uk>, Leyfoon Tan
+	<leyfoon.tan@starfivetech.com>, JeeHeng Sia <jeeheng.sia@starfivetech.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>
+Subject: RE: [PATCH v5 1/1] dt-bindings: net: starfive,jh7110-dwmac: Add
+ StarFive JH8100 support
+Thread-Topic: [PATCH v5 1/1] dt-bindings: net: starfive,jh7110-dwmac: Add
+ StarFive JH8100 support
+Thread-Index: AQHaf+o3L6L178d32UuN78fdZx4qAbFLOCoAgAJoxwCACLlvoA==
+Date: Wed, 3 Apr 2024 09:56:39 +0000
+Message-ID:
+ <BJSPR01MB059512332AE8549A340BDC5E9E3DA@BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn>
+References: <20240327015750.226349-1-chunhau.tan@starfivetech.com>
+ <20240327015750.226349-2-chunhau.tan@starfivetech.com>
+ <31ac366d-bfa6-4c99-a04d-ab9fb029da7e@linaro.org>
+ <20240328204202.GA308290-robh@kernel.org>
+In-Reply-To: <20240328204202.GA308290-robh@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BJSPR01MB0595:EE_|BJSPR01MB0739:EE_
+x-ms-office365-filtering-correlation-id: 43068e5c-8ad8-4113-5403-08dc53c45b7e
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 1PY91uaClo1IO0Wolz3C3AJxG2pcnQEdzI2F9RsIg3KzMVUQ4s8sx2XuOA7dNTe8MDKsZiglRneOzYUz8/QC9orGNaokYGTa6nOMe02/MBqTSO0JGZzCpv5UPkzGkBUr8Rc0N1vcZXCWpM37XxuyHssQcB37tZ0dYEaT4LoFP4w4qk686p9WJCJ6YA0oyMzUU9RQlfvXy26sEu8JTcaPPgC1uKrELsu3W/YKMp39P84c+/bOdz46b8lr/XlEN3MylIwRw8mzENnN6hGPmpC8b1gVygft+urwEnXaPqlnflD9xFDssZOr/U1VZa/SbHE2qBXDfwL/IdmdNuwE/eD32k6Pr87ECiG2vnWCiExYmcFXL+MkXJ5Q8G014Vk8BSahQ2TwfVJzRKcPHaWJTQ2eIv3wWZ+FhiW0/Eg5och2eWaLbe0lrss1roxU74c33sN3VeNNADuRpo4bDGNrnO5j23NTW2SNpPIMHrFJzSorv4DFyFjrzx68oXM3DShyH/jq+ity/Xil1qYTBiK7vIgNZFEq3/peOR0UFhuITd/3S+HIITjasDJd7QlDXHoDvbEKWkRHkDAAiFN0yaRAfwfaKP2dWoHq6QBWpIJd8dN7NMhptRixBPDRZdAUcVdUezVQ
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(366007)(41320700004)(1800799015)(7416005)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?o7HvMFLISCjX0cqwUy57qhVTQbY6hRo8MoTc+ki9hWdW/9gQMwUcD3m2bu?=
+ =?iso-8859-1?Q?rpdzmOoHwp7yLcbjzLFPs5OXAGG1lCEuOO3jTqwiw1N/HBO3QpIEkbCz7l?=
+ =?iso-8859-1?Q?SpMUDqCUV0ZCmmzXGeAOFob/CHxpXfO6MaQHFlLpirRpaQ1P6l50gRlNKc?=
+ =?iso-8859-1?Q?4Wuvq+cq7wnCh7Qlr5vncDo879dQxhKc78R7nTiCgW4BpeMMyBcJQGTZfH?=
+ =?iso-8859-1?Q?/jpbuGFJT/I+g9ROSvpa1loQN4KHAOvdI7p58xtPG94s8qxO2pQsfdhFuD?=
+ =?iso-8859-1?Q?o9i815+xzgWvfnR7XLDEJflCnosPjG7vrCt+OzpP1eJcxR4SVQX++5D7V3?=
+ =?iso-8859-1?Q?6WfdPhxyYw9pYCpvVYOGymDKjSqOepeogl2EqgWlPPVv9D15WkMoBRvjc/?=
+ =?iso-8859-1?Q?MajUDXob/IUKE+WJ0mrYtC1HNNQj4RFeMEOZYuU62VThUaZaX2ausamDy2?=
+ =?iso-8859-1?Q?D3iT6owKz670tWZ5bnQL8GVWZ45Od3QOaLITxwacS8c+9qD5vUjWUYGtI4?=
+ =?iso-8859-1?Q?eKk5x/7ZnQjQzAOLtCeWYAWgFnxAVtVulSp4BDrY+autH6SqNZqirG28xt?=
+ =?iso-8859-1?Q?M1i8w70xYLYlq+OxfKqNv/IxOV+XRhFeGCRo9WthOD5BqcOtExtmQqA9ev?=
+ =?iso-8859-1?Q?Ei1PVoyCk/d7FyO/2HfsopQzOqheQ8J3Gthx57hbLh9z5JzjpFeXOuPTbY?=
+ =?iso-8859-1?Q?gh+u/ed/X0yJDLxs+HbB4/io4t0crMtJprj3ZD4ZC8WgVIYMTqmUS7u4R2?=
+ =?iso-8859-1?Q?9C7pnnmmbOA2O1BqUEeGQChd85Q9So03znWB7fa7dHb6ZXE2kRiEt8/Tby?=
+ =?iso-8859-1?Q?zYJ9948MFTtzffmc3vrGA+JzhtosWfN/DGTYURG6b+xV0FFgBStd8HdRT9?=
+ =?iso-8859-1?Q?AQuf0dRTrHICpTIFkHS7IsuuiIGZmgrz4swyiTBm/W92ijLSEB+kcxDnIF?=
+ =?iso-8859-1?Q?frA0I2bhCb3VUt2eJqSnRvlT/SX9ro4eG1s0VNxlLi7+HoOGy16B1/mJDz?=
+ =?iso-8859-1?Q?MRA2DACxKo5dOk85HOX5/3kJCz6jPfXudmUa5HwoHOuXoJeUfpjvs52g4G?=
+ =?iso-8859-1?Q?nmY55WoLLsWXWu69iM55w2yW9WDCaNy0b1oBTeaRoj57rNFlNUF7QZ5vFZ?=
+ =?iso-8859-1?Q?u+822XrRic6hhI2rs8cAQ61fP/HukHEq3nuVCKcp5IVgoqlQ/Jj2VVq3JV?=
+ =?iso-8859-1?Q?g+fbd70k5/txRp+AuiR3GXuU88/L1i9RUaCCuYxTnGOAIYE0VJWnPFLhXg?=
+ =?iso-8859-1?Q?E/e5gYuKrSu4qwQ10hGaZ6VogyWwEFgElkIW5IfWC+6sM/NEzhdm46HJYN?=
+ =?iso-8859-1?Q?GUwzLJtptJ/m6q1s8fbW349LwNe1KpsR6tRZJQGrfGGWh1d1GXPSNaXAiJ?=
+ =?iso-8859-1?Q?PSxvYPwJYUP+drn5qtFyrY6T9gCgBaHc+6Tk0JI10RAnX5MldRbFhaZinQ?=
+ =?iso-8859-1?Q?VInae9mExQU1e1ha6XbWVo/r4iDfbmwg0QznYHzGXtwvIEnL5rzKZ098EJ?=
+ =?iso-8859-1?Q?VYf9P6t+64c1b+tNtSbbKjny+cKjL2wEaSkOTCPqfMK7ZoCcL0pBSXTJxk?=
+ =?iso-8859-1?Q?XAUrsO5xp8PgGAZwiXFA5XbaxbpaSWQ748FdXUT3LG5U2OAd0qFgvm5Avh?=
+ =?iso-8859-1?Q?4zQ0xGBZXFNtSjue2aBhxXEISv/vz5JRx+0nFSf39wQHwuMaZiZ0YStg?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000013D:EE_|DM4PR12MB7720:EE_
-X-MS-Office365-Filtering-Correlation-Id: a521082e-175e-42f6-a862-08dc53c82f83
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	e5wjNMFHqI2PprYndnUtw3hyKJKM3rAU7107EYRE9VpUX95mgM4bpSaGhn1ukrQH6jZ85tihwTr8JqcR4Apbz+s4eE6R+5+Lj7matauzf6pOK+w/aSp3286lNbzWr8NTH7wIGNmwVdka6WBqvgM5WJ1pfG5IDglfCbyNOjkTe69LJH13zrM+an7utDAr7JeVCMkyMxLD2X10rrlCiIAbmYKiY7Sdgb/Rq6qdg9ub5xOSsrwVmvK0MF6xgGMjaluBN9pSStY7lcoWOxsl4f2waVl5SnOC7Tssskb5dY6J07sIHcGu/b/7LUakUEU+teWPaDXMdLlWNNAou17bpA0u6aDUSpQpQKM1fmSb7jB0HI4qs2I8u13KycFFzvOGqiJJCnCD1PeCWiskP6ZVFYHTOGXf0OZvUCgjCrEiRYP9mThQroz4uDfiTXvHMm321y07gbCo5YVC13tpbSkxPYT+2wLyGw6gDq7P4MV7lYLRKv/fhXLUQZz/onAXEWOGxzb90+GZswV238KIFd05VyGRp6Y+IZou1nUAmUtk0yJYGLul2O/Tw3VdwafpRfSguQpkDS4j/wPm5fWontocmz2Us0IKwk80Kh1eqp1JSWSU7nzcZGhk96/xEo9F2bxXGC3DSCkYARaolWTdjdtdmuAV6aoORj1gk9aj+1MwCNEDMvv5TUdC5Xj5BSxlwnavm90s+WxgIl5MVqaiuTUWU3P0Sm0wROpXuR0cdG4l9fmzvexslu9AFtvSloFy+8+zFgqs
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 10:24:03.3927
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43068e5c-8ad8-4113-5403-08dc53c45b7e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2024 09:56:39.2977
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a521082e-175e-42f6-a862-08dc53c82f83
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000013D.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7720
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: grOUmTuN0O0TXQ5jyd81BcUd/YfuxqNR4uq8dQztyvzzYRHw21v65FwsRt3wwbkKqJBNXq4zRyozG1ayTUIxLhthqh+i7sgU2jCDDUoUQYM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJSPR01MB0739
 
 
-Jakub Kicinski <kuba@kernel.org> writes:
 
-> On Wed, 3 Apr 2024 00:04:14 +0200 Petr Machata wrote:
->> > Yes, I was wondering about that. It must be doable, IIRC 
->> > the multi-threading API "injects" args from a tuple.
->> > I was thinking something along the lines of:
->> >
->> >     with NetDrvEnv(__file__) as cfg:
->> >         ksft_run([check_pause, check_fec, pkt_byte_sum],
->> >                  args=(cfg, ))
->> >
->> > I got lazy, let me take a closer look. Another benefit
->> > will be that once we pass in "env" / cfg - we can "register" 
->> > objects in there for auto-cleanup (in the future, current
->> > tests don't need cleanup)  
->> 
->> Yeah, though some of those should probably just be their own context
->> managers IMHO, not necessarily hooked to cfg. I'm thinking something
->> fairly general, so that the support boilerplate doesn't end up costing
->> an arm and leg:
->> 
->>     with build("ip route add 192.0.2.1/28 nexthop via 192.0.2.17",
->>                "ip route del 192.0.2.1/28"),
->>          build("ip link set dev %s master %s" % (swp1, h1),
->>                "ip link set dev %s nomaster" % swp1):
->>         le_test()
->>
->> Dunno. I guess it makes sense to have some of the common stuff
->> predefined, e.g. "with vrf() as h1". And then the stuff that's typically
->> in lib.sh's setup() and cleanup(), can be losslessly hooked up to cfg.
->
-> I was thinking of something along the lines of:
->
-> def test_abc(cfg):
->     cfg.build("ip route add 192.0.2.1/28 nexthop via 192.0.2.17",
->               "ip route del 192.0.2.1/28")
->     cfg.build("ip link set dev %s master %s" % (swp1, h1),
->               "ip link set dev %s nomaster" % swp1)
->
-> optionally we could then also:
->
->      thing = cfg.build("ip link set dev %s master %s" % (swp1, h1),
->                        "ip link set dev %s nomaster" % swp1)
->
->      # ... some code which may raise ...
->
->      # unlink to do something else with the device
->      del thing
->      # ... more code ... 
->
-> cfg may not be best here, could be cleaner to create a "test" object,
-> always pass it in as the first param, and destroy it after each test.
+> -----Original Message-----
+> From: Rob Herring <robh@kernel.org>
+> Sent: Friday, 29 March, 2024 4:42 AM
+> To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Cc: ChunHau Tan <chunhau.tan@starfivetech.com>; David S . Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Emil Renner
+> Berthing <kernel@esmil.dk>; Krzysztof Kozlowski
+> <krzysztof.kozlowski+dt@linaro.org>; Conor Dooley <conor+dt@kernel.org>;
+> Maxime Coquelin <mcoquelin.stm32@gmail.com>; Alexandre Torgue
+> <alexandre.torgue@foss.st.com>; Simon Horman <horms@kernel.org>; Bartosz
+> Golaszewski <bartosz.golaszewski@linaro.org>; Andrew Halaney
+> <ahalaney@redhat.com>; Jisheng Zhang <jszhang@kernel.org>; Uwe
+> Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>; Russell King
+> <rmk+kernel@armlinux.org.uk>; Leyfoon Tan <leyfoon.tan@starfivetech.com>;
+> JeeHeng Sia <jeeheng.sia@starfivetech.com>; netdev@vger.kernel.org;
+> devicetree@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-stm32@st-md-mailman.stormreply.com;
+> linux-arm-kernel@lists.infradead.org; linux-riscv@lists.infradead.org
+> Subject: Re: [PATCH v5 1/1] dt-bindings: net: starfive,jh7110-dwmac: Add
+> StarFive JH8100 support
+>=20
+> On Wed, Mar 27, 2024 at 08:54:30AM +0100, Krzysztof Kozlowski wrote:
+> > On 27/03/2024 02:57, Tan Chun Hau wrote:
+> > > Add StarFive JH8100 dwmac support.
+> > > The JH8100 dwmac shares the same driver code as the JH7110 dwmac and
+> > > has only one reset signal.
+> > >
+> > > Please refer to below:
+> > >
+> > >   JH8100: reset-names =3D "stmmaceth";
+> > >   JH7110: reset-names =3D "stmmaceth", "ahb";
+> > >   JH7100: reset-names =3D "ahb";
+> > >
+> > > Example usage of JH8100 in the device tree:
+> > >
+> > > gmac0: ethernet@16030000 {
+> > >         compatible =3D "starfive,jh8100-dwmac",
+> > >                      "starfive,jh7110-dwmac",
+> > >                      "snps,dwmac-5.20";
+> > >         ...
+> > > };
+> > >
+> > > Signed-off-by: Tan Chun Hau <chunhau.tan@starfivetech.com>
+> > > ---
+> > >  .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
+> > >  .../bindings/net/starfive,jh7110-dwmac.yaml   | 29 +++++++++++++++--=
+--
+> > >  2 files changed, 25 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > index 6b0341a8e0ea..a6d596b7dcf4 100644
+> > > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > @@ -97,6 +97,7 @@ properties:
+> > >          - snps,dwxgmac-2.10
+> > >          - starfive,jh7100-dwmac
+> > >          - starfive,jh7110-dwmac
+> > > +        - starfive,jh8100-dwmac
+> >
+> > I think that's not needed. You have there already your fallback.
 
-I assume above you mean that cfg inherits the thing, but cfg lifetime
-currently looks like it spreads across several test cases. ksft_run()
-would need to know about it and call something to issue the postponed
-cleanups between cases.
+Okay, I will remove it.
 
-Also, it's not clear what "del thing" should do in that context, because
-if cfg also keeps a reference, __del__ won't get called. There could be
-a direct method, like thing.exit() or whatever, but then you need
-bookkeeping so as not to clean up the second time through cfg. It's the
-less straightforward way of going about it IMHO.
+> >
+> > >
+> > >    reg:
+> > >      minItems: 1
+> > > diff --git
+> > > a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> > > b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> > > index 0d1962980f57..5805a58c55d1 100644
+> > > ---
+> > > a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.ya
+> > > +++ ml
+> > > @@ -18,6 +18,7 @@ select:
+> > >          enum:
+> > >            - starfive,jh7100-dwmac
+> > >            - starfive,jh7110-dwmac
+> > > +          - starfive,jh8100-dwmac
+> >
+> > Same here, even more obvious.
+>=20
+> Agreed.
 
-I know that I must sound like a broken record at this point, but look:
-
-    with build("ip link set dev %s master %s" % (swp1, h1),
-               "ip link set dev %s nomaster" % swp1) as thing:
-        ... some code which may rise ...
-    ... more code, interface detached, `thing' gone ...
-
-It's just as concise, makes it very clear where the device is part of
-the bridge and where not anymore, and does away with the intricacies of
-lifetime management.
-
-If lifetimes don't nest, I think it's just going to be ugly either way.
-But I don't think this comes up often.
-
-I don't really see stuff that you could just throw at cfg to keep track
-of, apart from the suite configuration (i.e. topology set up). But I
-suppose if it comes up, we can do something like:
-
-    thing = cfg.retain(build(..., ...))
-
-Or maybe have a dedicated retainer object, or whatever, it doesn't
-necessarily need to be cfg itself.
-
->> This is what I ended up gravitating towards after writing a handful of
->> LNST tests anyway. The scoping makes it clear where the object exists,
->> lifetime is taken care of, it's all ponies rainbows basically. At least
->> as long as your object lifetimes can be cleanly nested, which admittedly
->> is not always.
->
-> Should be fairly easy to support all cases - "with", "recording on
-> cfg/test" and del.  Unfortunately in the two tests I came up with
-
-Yup.
-
-> quickly for this series cleanup is only needed for the env itself.
-> It's a bit awkward to add the lifetime helpers without any users.
-
-Yeah. I'm basically delving in this now to kinda try and steer future
-expectations.
+Okay, I will remove it.
+>=20
+> >
+> > >    required:
+> > >      - compatible
+> > >
+> > > @@ -30,6 +31,10 @@ properties:
+> > >        - items:
+> > >            - const: starfive,jh7110-dwmac
+> > >            - const: snps,dwmac-5.20
+> > > +      - items:
+> > > +          - const: starfive,jh8100-dwmac
+> > > +          - const: starfive,jh7110-dwmac
+> > > +          - const: snps,dwmac-5.20
+> > >
+> > >    reg:
+> > >      maxItems: 1
+> > > @@ -116,11 +121,25 @@ allOf:
+> > >            minItems: 3
+> > >            maxItems: 3
+> > >
+> > > -        resets:
+> > > -          minItems: 2
+> > > -
+> > > -        reset-names:
+> > > -          minItems: 2
+> > > +      if:
+> >
+> > I would personally avoid nesting if within if. It gets unreadable.
+> > Although Rob did not comment on this one, so I guess it is fine.
+>=20
+> I normally agree, but here I suggested it as it looked to be the simplest=
+ option.
+>=20
+> With the 2 other comments addressed,
+>=20
+> Reviewed-by: Rob Herring <robh@kernel.org>
 
