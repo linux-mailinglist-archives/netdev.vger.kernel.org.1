@@ -1,94 +1,74 @@
-Return-Path: <netdev+bounces-84230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFDCF8961EB
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:20:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4A3F8961F1
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:23:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A914928443B
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:20:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5598DB26C09
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0C111190;
-	Wed,  3 Apr 2024 01:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B9E125BA;
+	Wed,  3 Apr 2024 01:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fGw64nFY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SIWb1X+D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE95D6FC6
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 01:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E42CE56E;
+	Wed,  3 Apr 2024 01:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712107230; cv=none; b=Wt23JPRXYnduXOLsCSnyIyTKZDtOiOQZsqaw426V2yv8OpExt8Stq7pFlVt5wTD25Qg+/4ycAt+5nYCu8fZ9qw8Kq602ehvPN6rX8O/NLiibfQBgHFhqW5eoCPKfcDpGU9VtIKEGNi+WkIIg3/4jc6VHMN/foAclav7Qm7hK0tA=
+	t=1712107433; cv=none; b=ADR8MG1a01D7q9Tr7cVF2SWOuPBeb9R/x8OT3lbTdLXfYZMIwurkgEZVhJn8jCgzsu6r5t0egtyCwqhvPk/+LKwL4rouo2R6x3dPzZ13R60c/IPrQY+Pobv5Q75B8bwZQQ1ypXHPVFCO62ZzGcHfSJi+WQmwca2Bd5Mk6mgR6go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712107230; c=relaxed/simple;
-	bh=pmL07TVaZWxRXmRlLuD8rqgKCT8Qi0PrSrY07y5S8Kg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m7R4EyzEnUtWKW2bkusBF/b/o79m5nwy68yq42OXnljeUCcw+u6lajplYqPcF5ArlI/Gaa8PsT79YtapW3NZkNwRm/UTum9S2MflalOkfPPY8lcATjQ48xbmMxFsdMiZwhTrsVxC29jtKnXD03VF3MY6eK7ktSSaK6hyR7vL9/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGw64nFY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7EA3EC433C7;
-	Wed,  3 Apr 2024 01:20:29 +0000 (UTC)
+	s=arc-20240116; t=1712107433; c=relaxed/simple;
+	bh=Yy3W35jtTdyObIhJ/w2Brxj+AIW5aDDLh0ei+LhZZUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=drom+z7sAIejHcBeR1T009EmVa5NNBjuY9drx4sdbY+56FFTRLZVljTXP0eT+aHwAeIBVf+ASoeHFfRrQyl4rQabGAvzepQjcJWgLbuPS67kg1mPIhRVaP0IA35zPqPbxZP9IglikOCeEDZvGS0S2uxfI3d1u4RVXQCndwxtjNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SIWb1X+D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 769A7C433F1;
+	Wed,  3 Apr 2024 01:23:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712107229;
-	bh=pmL07TVaZWxRXmRlLuD8rqgKCT8Qi0PrSrY07y5S8Kg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fGw64nFY3wgi6qF5y7NEZpL3pw9zEFG4CKut8Or/fVC/Vhu6UHJu9jPOTnFn8kRvM
-	 RINoGyRdpDAPsI/3a8E9PQ3RFMHxJhVTXfkUjWayu87wWbpHjwgxs9c29kDfO+4sBl
-	 L0MGPbrqC6Y4qZAoEhbskQYoziqGt7iT1/MY6W+I0/5LYyy1HC3EHSG2wMGHS9BOd5
-	 SZFpxq9ygqtM/5KKjjstgcPcd4DqnWFdTcxIvGP5XNDaIIJtBdgB4JA4Ntlmenkozf
-	 JZ/0VGhvuXR9ZNJWR+tZ0jiAYqEVDmiWo2VD1vePfPlp+IILAt9Fkvll3wHmaVqJXG
-	 P81baBC++j/0Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D76FC4314C;
-	Wed,  3 Apr 2024 01:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1712107433;
+	bh=Yy3W35jtTdyObIhJ/w2Brxj+AIW5aDDLh0ei+LhZZUo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SIWb1X+DZwHj4mHi9J3FOltBIYLuYyWy5XHMgk6IGbuxD7JDxd6Vcze3wRIHkmlKB
+	 eVMUSkF1MF+ueaF6HjJq9TqXB7TcgnrlyhXUeUlbgFd/3UcxAGIcc59vEhd3gfA6jt
+	 S1IyofvTDw5rTYFznLP0lY8gYUSo8n/fU10QO0F3rPnxqfFJx0MoaoEgJT3VtFgocD
+	 sZ6QcH0rQNEjgoWY8RZTdedkLHdatfzIrPLETbDluALQGK4SMzLxMHW52E0LwET4yU
+	 kRrhTYOLHEv9S5kuwUUp4e76ZIExuJXfW0j3VPBA9cxD7+1gLGx3r6Ga1fdwxN8vOx
+	 qnzAvh/pG5eGQ==
+Date: Tue, 2 Apr 2024 18:23:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] net: stmmac: mmc_core: Add GMAC mmc tx/rx
+ missing statistics
+Message-ID: <20240402182351.031f5b59@kernel.org>
+In-Reply-To: <20240401024456.41433-2-minda.chen@starfivetech.com>
+References: <20240401024456.41433-1-minda.chen@starfivetech.com>
+	<20240401024456.41433-2-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] r8169: fix issue caused by buggy BIOS on certain boards
- with RTL8168d
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171210722944.2838.6358852291043028405.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Apr 2024 01:20:29 +0000
-References: <64f2055e-98b8-45ec-8568-665e3d54d4e6@gmail.com>
-In-Reply-To: <64f2055e-98b8-45ec-8568-665e3d54d4e6@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon,  1 Apr 2024 10:44:56 +0800 Minda Chen wrote:
+> +	unsigned int mmc_rx_control_g;
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 30 Mar 2024 12:49:02 +0100 you wrote:
-> On some boards with this chip version the BIOS is buggy and misses
-> to reset the PHY page selector. This results in the PHY ID read
-> accessing registers on a different page, returning a more or
-> less random value. Fix this by resetting the page selector first.
-> 
-> Fixes: f1e911d5d0df ("r8169: add basic phylib support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] r8169: fix issue caused by buggy BIOS on certain boards with RTL8168d
-    https://git.kernel.org/netdev/net/c/5d872c9f46bd
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+What's control_g?
+If it's number of received control frames it should be reported as
+MACControlFramesReceived from ethtool_ops::get_eth_ctrl_stats.
 
