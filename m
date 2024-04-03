@@ -1,67 +1,56 @@
-Return-Path: <netdev+bounces-84316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98C689684E
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:20:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B16089685C
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:22:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6249E28460A
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:20:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA2C128A3D7
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE3C12C81A;
-	Wed,  3 Apr 2024 08:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5FF12EBD0;
+	Wed,  3 Apr 2024 08:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tz7ILvZD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FidQLK6g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B326EB69;
-	Wed,  3 Apr 2024 08:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53FE6BFC2;
+	Wed,  3 Apr 2024 08:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712131826; cv=none; b=uAI5pkgGucJoTX5nNzfuQOcxWKILrj4k4kpAQsLTLfh3Qn6yy5RKrLOLNTQ4zASL+fYUSl/LZRsYhKOtQZsa6yNoXCQycWwHfVP2wS+k5lEkVhGWZj+FghdKBDa9oxZY71vwePq4UERrXJCeyCVexaWWhrHqY+y1v2mVyI0Hfe0=
+	t=1712131893; cv=none; b=TIRx1sJQazHniDOMl2lxRw5oTJFmMyk587p0yrTV66M3Y6+00HWY4XTiDMJHrzbn8IedR7ouXL7ESS4zNY7qad7jstP2+sQNr1qbStOeyNhUCeA8enpfsbdvvG5BUhwec6cIZyZ7CHqr94Y3HzdT3j8ZyDs+Cg6R2XxV4TC6i0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712131826; c=relaxed/simple;
-	bh=WiucSDfey+Rb6VSKODVbCb1E0/6xwr83CCZttDwFyxE=;
+	s=arc-20240116; t=1712131893; c=relaxed/simple;
+	bh=SH31gyLQOUjbQcsB8HrfJNW22dR7OQWuGrhgZCjvHU8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UcmutEs423l2Vin/I7nPIeQEab+Yzrxn+cAB6hAJPpDA3KxKrpI55t21tTZr+wGQEm0PmN1jAaLwdo/VjcO1X7BYwn9pYccUJ+u5p/gCcobtTvXQZHjijZqTT+QXhiQBH8CURQTuGMC7SXMH5mWOezvAHoyWn8UXFr/SRIol4uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tz7ILvZD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85028C433C7;
-	Wed,  3 Apr 2024 08:10:22 +0000 (UTC)
+	 MIME-Version; b=PXLgbXcXWJo5jR87y6N+M2qaHg5837eymDKdFOTlbfxnuU9ta3S8G/JYl26xecN2iYLoL56NdYFASS9hQfB0WiCwL+PQRnxA7CQkKvWK44lI9Zp3asY4F/7hdQv+k3c14Mh5fvzXuEGtXv+s8M15uzTB8h2d+5Pt9K3ImTsvBy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FidQLK6g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD697C433F1;
+	Wed,  3 Apr 2024 08:11:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712131826;
-	bh=WiucSDfey+Rb6VSKODVbCb1E0/6xwr83CCZttDwFyxE=;
+	s=k20201202; t=1712131893;
+	bh=SH31gyLQOUjbQcsB8HrfJNW22dR7OQWuGrhgZCjvHU8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Tz7ILvZDBSKlkXfydHLWZoo0LaYg/BPPpzBh4G9ExyldItTq+LggHRx356xDCgMgs
-	 iqDoFL52fC3ArfKjtL+Vn1yGtnlmb5hHMYUmXMo2xyMgRBqx6dMPka4uxyOyQMVMDs
-	 SzjXYwqzpShMZxzH6dbOaqLv7vU8odUsBvkPNXvalCCxRYeuH/uFF0A9kxdWhCgXlk
-	 g6wY/Pxa4Gh0HKTYvtJUC/hpHcO11BQUc9QnP1b6Ie+P6LGcX6IiRjpqdwS2UCWH+H
-	 F76jLFqc3FaCDhY55Pd6zfq88o0iXYgQuXpt2qgQYQXPznmM/FwvG52D4AmIm1sAWk
-	 LXB2BVTileS+A==
+	b=FidQLK6gJYLaHmLSbMmJq7Apfm2CmmsGY0w8vFJ9AUgB5Uvdf+QMvV5PQKVWqQAsm
+	 UDMd2GxCQgrKO2Y4/qnJXh1w61ipZJlUbr0wgYopmxLFUXvny2uvMjnn/JGYWwXtIj
+	 M07HB74PU7sW9slUtYd/dghQLUoDL0ycxWajmLD3jCfbjHh8rUfLLB6pQbseX/wRgC
+	 cfIg9+Xx3szTAegVMFufdxt8Cj6BvbFapg8ir/FoHKNqqZmtd2bIDnZoh2EGuj+K0q
+	 OLpDs6Gn5QRKlNWmZt/Zg9ZIlPjf4h0g0l0adlbszBXPhIovybmrJFgeeYLiy/60LI
+	 B1j3vM0Uy+ung==
 From: Arnd Bergmann <arnd@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	NeilBrown <neilb@suse.de>,
-	"J. Bruce Fields" <bfields@fieldses.org>
+To: linux-kernel@vger.kernel.org
 Cc: Arnd Bergmann <arnd@arndb.de>,
-	Olga Kornievskaia <kolga@netapp.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	linux-nfs@vger.kernel.org,
+	Karsten Keil <isdn@linux-pingi.de>,
+	Kees Cook <keescook@chromium.org>,
+	Justin Stitt <justinstitt@google.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH 19/34] sunrpc: suppress warnings for unused procfs functions
-Date: Wed,  3 Apr 2024 10:06:37 +0200
-Message-Id: <20240403080702.3509288-20-arnd@kernel.org>
+Subject: [PATCH 26/34] isdn: kcapi: don't build unused procfs code
+Date: Wed,  3 Apr 2024 10:06:44 +0200
+Message-Id: <20240403080702.3509288-27-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240403080702.3509288-1-arnd@kernel.org>
 References: <20240403080702.3509288-1-arnd@kernel.org>
@@ -75,61 +64,58 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-There is a warning about unused variables when building with W=1 and no procfs:
+The procfs file is completely unused without CONFIG_PROC_FS but causes
+a compile time warning:
 
-net/sunrpc/cache.c:1660:30: error: 'cache_flush_proc_ops' defined but not used [-Werror=unused-const-variable=]
- 1660 | static const struct proc_ops cache_flush_proc_ops = {
-      |                              ^~~~~~~~~~~~~~~~~~~~
-net/sunrpc/cache.c:1622:30: error: 'content_proc_ops' defined but not used [-Werror=unused-const-variable=]
- 1622 | static const struct proc_ops content_proc_ops = {
-      |                              ^~~~~~~~~~~~~~~~
-net/sunrpc/cache.c:1598:30: error: 'cache_channel_proc_ops' defined but not used [-Werror=unused-const-variable=]
- 1598 | static const struct proc_ops cache_channel_proc_ops = {
-      |                              ^~~~~~~~~~~~~~~~~~~~~~
+drivers/isdn/capi/kcapi_proc.c:97:36: error: unused variable 'seq_controller_ops' [-Werror,-Wunused-const-variable]
+static const struct seq_operations seq_controller_ops = {
+drivers/isdn/capi/kcapi_proc.c:104:36: error: unused variable 'seq_contrstats_ops' [-Werror,-Wunused-const-variable]
+drivers/isdn/capi/kcapi_proc.c:179:36: error: unused variable 'seq_applications_ops' [-Werror,-Wunused-const-variable]
+drivers/isdn/capi/kcapi_proc.c:186:36: error: unused variable 'seq_applstats_ops' [-Werror,-Wunused-const-variable]
 
-These are used inside of an #ifdef, so replacing that with an
-IS_ENABLED() check lets the compiler see how they are used while
-still dropping them during dead code elimination.
+Remove the file from the build in that config and make the calls into
+it conditional instead.
 
-Fixes: dbf847ecb631 ("knfsd: allow cache_register to return error on failure")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- net/sunrpc/cache.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ drivers/isdn/capi/Makefile | 3 ++-
+ drivers/isdn/capi/kcapi.c  | 7 +++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/net/sunrpc/cache.c b/net/sunrpc/cache.c
-index 95ff74706104..ab3a57965dc0 100644
---- a/net/sunrpc/cache.c
-+++ b/net/sunrpc/cache.c
-@@ -1673,12 +1673,14 @@ static void remove_cache_proc_entries(struct cache_detail *cd)
+diff --git a/drivers/isdn/capi/Makefile b/drivers/isdn/capi/Makefile
+index 352217ebabd8..4fd3a4d7133f 100644
+--- a/drivers/isdn/capi/Makefile
++++ b/drivers/isdn/capi/Makefile
+@@ -2,4 +2,5 @@
+ # Makefile for the CAPI subsystem used by BT_CMTP
+ 
+ obj-$(CONFIG_BT_CMTP)			+= kernelcapi.o
+-kernelcapi-y				:= kcapi.o capiutil.o capi.o kcapi_proc.o
++kernelcapi-y				:= kcapi.o capiutil.o capi.o
++kernelcapi-$(CONFIG_PROC_FS)		+= kcapi_proc.o
+diff --git a/drivers/isdn/capi/kcapi.c b/drivers/isdn/capi/kcapi.c
+index 136ba9fe55e0..c5d13bdc239b 100644
+--- a/drivers/isdn/capi/kcapi.c
++++ b/drivers/isdn/capi/kcapi.c
+@@ -917,13 +917,16 @@ int __init kcapi_init(void)
+ 		return err;
  	}
- }
  
--#ifdef CONFIG_PROC_FS
- static int create_cache_proc_entries(struct cache_detail *cd, struct net *net)
- {
- 	struct proc_dir_entry *p;
- 	struct sunrpc_net *sn;
- 
-+	if (!IS_ENABLED(CONFIG_PROC_FS))
-+		return 0;
+-	kcapi_proc_init();
++	if (IS_ENABLED(CONFIG_PROC_FS))
++		kcapi_proc_init();
 +
- 	sn = net_generic(net, sunrpc_net_id);
- 	cd->procfs = proc_mkdir(cd->name, sn->proc_net_rpc);
- 	if (cd->procfs == NULL)
-@@ -1706,12 +1708,6 @@ static int create_cache_proc_entries(struct cache_detail *cd, struct net *net)
- 	remove_cache_proc_entries(cd);
- 	return -ENOMEM;
+ 	return 0;
  }
--#else /* CONFIG_PROC_FS */
--static int create_cache_proc_entries(struct cache_detail *cd, struct net *net)
--{
--	return 0;
--}
--#endif
  
- void __init cache_initialize(void)
+ void kcapi_exit(void)
  {
+-	kcapi_proc_exit();
++	if (IS_ENABLED(CONFIG_PROC_FS))
++		kcapi_proc_exit();
+ 
+ 	cdebug_exit();
+ 	destroy_workqueue(kcapi_wq);
 -- 
 2.39.2
 
