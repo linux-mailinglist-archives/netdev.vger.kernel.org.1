@@ -1,221 +1,116 @@
-Return-Path: <netdev+bounces-84262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DD318962B0
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 04:51:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DEE58962B3
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 04:54:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6A6F287B57
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 02:51:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2230128808B
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 02:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58481B952;
-	Wed,  3 Apr 2024 02:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DCB1B952;
+	Wed,  3 Apr 2024 02:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="RPxbavw6"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Pj5hFXWc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-251-73.mail.qq.com (out203-205-251-73.mail.qq.com [203.205.251.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5EA1B815
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 02:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B6729CA;
+	Wed,  3 Apr 2024 02:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712112666; cv=none; b=jTXstvf+Qtzp9fpvBeU2uIpPhhQWYqoCtXxCV9DDPoqvIinSqqMxewwfctcCuWZK6DeswxVkVAd+R+xCX9PtOBqLbgFRmKEWjeGaW2ENyJ1WcWFAq0QRqDYHCkt5yZbo2olnXDWtAYGglRgNTVIAY0BVP93fp4enPA4imKnZc0I=
+	t=1712112852; cv=none; b=lR1N8K2P/XbcQ7fW4y6agbst2pCuTeMjTvtTzHv7yDbVF7QTcCbYr3mZwwyPnwxnhdoJyvs3wROrgiI7DHbEMHISQ8neqQeRDvml8QMG9G3NWCzVwy+wTk1Q2CEBRdA5xW1eMr/CYruo0hB9vYw0wmxPtm6iox8WnzNF2L2ThE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712112666; c=relaxed/simple;
-	bh=UD1id9vQsm3zxRZyXz3MGDJDaSN5smpRKuo3BMIhJS4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iBYJzwvuN5ML5IgTMxOXNFNQrRpcvFZbHUVaDynbxiqcY6NY9IDblCMGHrZCRKrsIkRP/k3Cb2OOb1vV8D2EXYohYevp0YB/6+YnXw7Ko798/psPAo6QJJwSi/PKY5tCQ+E4zmEaMWkGVCoD6ZMNV3Le4teTNZ25tPrOynp+B3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=RPxbavw6; arc=none smtp.client-ip=209.85.167.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3c3aeef1385so4283798b6e.3
-        for <netdev@vger.kernel.org>; Tue, 02 Apr 2024 19:51:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1712112663; x=1712717463; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KvNCN7b/5A+DFcsDCFKgdbvgot6yvnB3BUodDkQmmg0=;
-        b=RPxbavw6iMx4vl4LFfRqssmlpHg3qwUHBkwgwdhG4Ip4OQYzuLt6t253T9d3D7LO79
-         vxxVNYHLqGv7Kr7NrmCgqYO5mWb6Sh667cKVbmQ9YmG2f9KOnWWiVwstiWwh2OajIKvi
-         hBwNQmBx/fyEbaE3Wf9wA3YRR2lERQGa46FSKvymNXM9JD7s/xLnwMI5YQza+xw3/8aL
-         wTxxyqkSLfjIffRZBcMS/+/nWvCu4w6Fy9JkS4R4c1kH1BK5Qglj/I2VwcbDcb3gt3Dh
-         eiNYltTd1alTs06rDTlRGY5FCrnpaFmKV//5+dUCsRSBny7g6cMNDRCcY+58tNAldNxQ
-         TaQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712112663; x=1712717463;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KvNCN7b/5A+DFcsDCFKgdbvgot6yvnB3BUodDkQmmg0=;
-        b=NLdqCimG/1q7+pzXzFY1XGK1naYNH1J5eY31D+HEj5RRjPHsqJ5s0wQxGOOoS8MjSJ
-         6fi5Qt1APPcGLZrGhLpSZPxhol9FFfsTqpqavH0dcZhOeEUrLu3s8EoF0E2WmMBgbjXp
-         CcJiwNydA3MCOxzJ1YDNc14IaAKt/NEvjLmmjuvjm+1eOFCXaaEF3dmLPL2HtlPS5VWt
-         BDKX7edn9cAYmp6Te8IYhcenmPkFlkBhDu9uF64POIE4iFw4ydDithp8QA4odGKQzp/O
-         8aleBEWxIbjrF+eaWlqFx0W0c1NQ6MmvAhxLsh5JikWzB3FR2HA3ziyDGGA1e3kczPC1
-         c33g==
-X-Gm-Message-State: AOJu0YzJ+zNu43+Z/61KqvSfe9+xHj1MNfCKjBAtAnrshVYk3+ZdHGAa
-	9yc77HU8d+9RrtatpqH3eU5z4clDKi0OZHjgQn6iL/Jj432JQKnLNjR7d7BDWM0=
-X-Google-Smtp-Source: AGHT+IFLNbA5tGs9D8K1m995WGY502JvTsOPr8auGr+q5hn2J89zIUTgZGaaR1uVoTdH2Xg7j02ZUQ==
-X-Received: by 2002:a9d:6f12:0:b0:6e9:2e80:5a0d with SMTP id n18-20020a9d6f12000000b006e92e805a0dmr2534695otq.28.1712112663022;
-        Tue, 02 Apr 2024 19:51:03 -0700 (PDT)
-Received: from [192.168.1.26] (71-212-18-124.tukw.qwest.net. [71.212.18.124])
-        by smtp.gmail.com with ESMTPSA id n28-20020a63591c000000b005dcc8a3b26esm10325041pgb.16.2024.04.02.19.51.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Apr 2024 19:51:02 -0700 (PDT)
-Message-ID: <7fd250f7-30e9-4392-ae1e-c3664222f9de@davidwei.uk>
-Date: Tue, 2 Apr 2024 19:51:01 -0700
+	s=arc-20240116; t=1712112852; c=relaxed/simple;
+	bh=WO0yhmP7aDuL5Ijpdwik2fkUvfL8+DARWRnEAoOzdME=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=gBgGjOpd/mt4Vn8mevJ4eX8na6bDlUtGWYo3SCdzzDNSIby2xjwsTLSW0kUjyZeSAoAaSKPxD2YgUyAmYmVNiLZ7fRWQSRNmVdFj3bu/OMoNPSRYmq9Pden8/6Rjs0fnWFWAWY0ve4/bsjYTtgly3Kcbhb0mDyzd3I4UIo6kWZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Pj5hFXWc; arc=none smtp.client-ip=203.205.251.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1712112847; bh=EErZkKra0XeGY2iNAPwkwZ4Bk62p3Qrgv9IdIa4U0lw=;
+	h=From:To:Cc:Subject:Date;
+	b=Pj5hFXWcrhBr7pY0uqmtvTDFnrXEeunlv8SiD3gR/qKBHchPAi7V65AZgbFEKDaBG
+	 dqN4UgPfZW/2srTR1ycebQMbCFd8eR7HgXwiSC+/quMpFBhqvcgcnVs0IgnzuE+TlB
+	 skjstmDVda9G+TRxcF9dEtmhW3DnL588Huh771y8=
+Received: from localhost.localdomain ([153.3.164.50])
+	by newxmesmtplogicsvrszb6-0.qq.com (NewEsmtp) with SMTP
+	id D8284E80; Wed, 03 Apr 2024 10:54:02 +0800
+X-QQ-mid: xmsmtpt1712112842t6y8mxulq
+Message-ID: <tencent_C699E9540505523424F11A9BD3D21B86840A@qq.com>
+X-QQ-XMAILINFO: Nh9rHd4LJNLEhO7Ar0Vx/lAaGZ5gmlRV1igCRrU3qWmsPOw8HzyPxWvQm5b/dw
+	 P6hBrtj1rz5fmjJZM2CE62Dq18cKqTlBQB0Zk+y6fqD4eyOky5kxzIKZY/TdAKxA6QNe/EJB8yBI
+	 Do1qCPApRxc8PKCJYOjL8Av0aL/ewrmnSZQ8jXQ8GXxMpVBgsHQUVEUvg5CZwnlJy4HxROPHTZvg
+	 tjqnubt1d1BGKhkaY/qUVfDLFJrW91n2gQwLKaNc9CrHGpsfZOu7PnuHIQcmd5guB6JofiM8b8RH
+	 kAEyo9gwcdTK5eAk/H9YOQUfaCDCwD4COfloLyA2hwIesJ16Q7fYYtVO1zN4Izjx0Ir12bBm2G8U
+	 eRqxEwPGTMV7a12T6hgdeJ2yIW4B1Ae5FXr1UJ6VdbD97khPL3jcSvOIT7BTdtCCg3WrGPJBCSDG
+	 lVDl/SrYvdCg+BBWBL3oC4FsX6WdkhwMeZWlydxKCU3qD7+fsA3UvqqoVLesyDiIF1ny2FVXC90A
+	 lfI+447EDglZiIgG/som2YOAX3AhzEc+TBlT1HL6swSkXc5DPOosopbeWap+HdIffcLzmme06o/9
+	 XrmjVjX6OpLofK98KWm/xNjRcvbjcGbygYW0y5/xpV3VOVG+nXslpQ+T6jFR/cNv6ebcx4qclRNM
+	 Uhoz99luMbBAtfFWfIDYr9N4gdyGk9+Fcp4+Kj0tucXFkv1ZE9xD/qZY2laqPC72AF/APbMGrPin
+	 9MQEa2jtTiPORwIDOGbaFcV7nzwmAm/DZozx+Yg6+e7N7u+/V7aBf/nUM1lAovht10ttXwEBlnAh
+	 kPBf/tHPt4XB+aoUX2EoSiRfI831erzxlHMnJfw0iSCbToVGVqhFJn0/8MK1jGkOLAY1QsA7G5Gp
+	 lm3PeyF+3M/lfSOfWkHZ6NmlJWMmSE8M6UC4Vwt5mO27Q1DtCqlE/IdDz3O2r2Tpcl488apB4S89
+	 7G61EJYfuREPGs/E1gU66TdZrxEsEBWH4H8dS5pbnQHYbSZj836tahAs8bYCqLJTxT07hE64xS1N
+	 Ah/+ei0CZ4/Krsrs/p
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: linke li <lilinke99@qq.com>
+To: 
+Cc: xujianhao01@gmail.com,
+	linke li <lilinke99@qq.com>,
+	Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH] net: ethernet: mtk_eth_soc: Reuse value using READ_ONCE instead of re-rereading it
+Date: Wed,  3 Apr 2024 10:54:00 +0800
+X-OQ-MSGID: <20240403025400.48088-1-lilinke99@qq.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/7] netdevsim: report stats by default, like a
- real device
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- shuah@kernel.org, sdf@google.com, donald.hunter@gmail.com,
- linux-kselftest@vger.kernel.org, petrm@nvidia.com
-References: <20240402010520.1209517-1-kuba@kernel.org>
- <20240402010520.1209517-6-kuba@kernel.org>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240402010520.1209517-6-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2024-04-01 18:05, Jakub Kicinski wrote:
-> Real devices should implement qstats. Devices which support
-> pause or FEC configuration should also report the relevant stats.
-> 
-> nsim was missing FEC stats completely, some of the qstats
-> and pause stats required toggling a debugfs knob.
-> 
-> Note that the tests which used pause always initialize the setting
-> so they shouldn't be affected by the different starting value.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  drivers/net/netdevsim/ethtool.c | 11 ++++++++
->  drivers/net/netdevsim/netdev.c  | 45 +++++++++++++++++++++++++++++++++
->  2 files changed, 56 insertions(+)
-> 
-> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
-> index bd546d4d26c6..3f9c9327f149 100644
-> --- a/drivers/net/netdevsim/ethtool.c
-> +++ b/drivers/net/netdevsim/ethtool.c
-> @@ -140,6 +140,13 @@ nsim_set_fecparam(struct net_device *dev, struct ethtool_fecparam *fecparam)
->  	return 0;
->  }
->  
-> +static void
-> +nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats)
-> +{
-> +	fec_stats->corrected_blocks.total = 123;
-> +	fec_stats->uncorrectable_blocks.total = 4;
-> +}
-> +
->  static int nsim_get_ts_info(struct net_device *dev,
->  			    struct ethtool_ts_info *info)
->  {
-> @@ -163,6 +170,7 @@ static const struct ethtool_ops nsim_ethtool_ops = {
->  	.set_channels			= nsim_set_channels,
->  	.get_fecparam			= nsim_get_fecparam,
->  	.set_fecparam			= nsim_set_fecparam,
-> +	.get_fec_stats			= nsim_get_fec_stats,
->  	.get_ts_info			= nsim_get_ts_info,
->  };
->  
-> @@ -182,6 +190,9 @@ void nsim_ethtool_init(struct netdevsim *ns)
->  
->  	nsim_ethtool_ring_init(ns);
->  
-> +	ns->ethtool.pauseparam.report_stats_rx = true;
-> +	ns->ethtool.pauseparam.report_stats_tx = true;
-> +
->  	ns->ethtool.fec.fec = ETHTOOL_FEC_NONE;
->  	ns->ethtool.fec.active_fec = ETHTOOL_FEC_NONE;
->  
-> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-> index 8330bc0bcb7e..096ac0abbc02 100644
-> --- a/drivers/net/netdevsim/netdev.c
-> +++ b/drivers/net/netdevsim/netdev.c
-> @@ -19,6 +19,7 @@
->  #include <linux/module.h>
->  #include <linux/netdevice.h>
->  #include <linux/slab.h>
-> +#include <net/netdev_queues.h>
->  #include <net/netlink.h>
->  #include <net/pkt_cls.h>
->  #include <net/rtnetlink.h>
-> @@ -330,6 +331,49 @@ static const struct net_device_ops nsim_vf_netdev_ops = {
->  	.ndo_set_features	= nsim_set_features,
->  };
->  
-> +/* We don't have true par-queue stats, yet, so do some random fakery here. */
+In mtk_flow_entry_update_l2, the hwe->ib1 is read using READ_ONCE at the
+beginning of the function, checked, and then re-read from hwe->ib1,
+may void all guarantees of the checks. Reuse the value that was read by
+READ_ONCE to ensure the consistency of the ib1 throughout the function.
 
-nit: per-queue
+Signed-off-by: linke li <lilinke99@qq.com>
+---
+ drivers/net/ethernet/mediatek/mtk_ppe.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +static void nsim_get_queue_stats_rx(struct net_device *dev, int idx,
-> +				    struct netdev_queue_stats_rx *stats)
-> +{
-> +	struct rtnl_link_stats64 rtstats = {};
-> +
-> +	nsim_get_stats64(dev, &rtstats);
-> +
-> +	stats->packets = rtstats.rx_packets - !!rtstats.rx_packets;
+diff --git a/drivers/net/ethernet/mediatek/mtk_ppe.c b/drivers/net/ethernet/mediatek/mtk_ppe.c
+index b2a5d9c3733d..8b3cdfc4d407 100644
+--- a/drivers/net/ethernet/mediatek/mtk_ppe.c
++++ b/drivers/net/ethernet/mediatek/mtk_ppe.c
+@@ -580,7 +580,7 @@ mtk_flow_entry_update_l2(struct mtk_ppe *ppe, struct mtk_flow_entry *entry)
+ 
+ 		idle = cur_idle;
+ 		entry->data.ib1 &= ~ib1_ts_mask;
+-		entry->data.ib1 |= hwe->ib1 & ib1_ts_mask;
++		entry->data.ib1 |= ib1 & ib1_ts_mask;
+ 	}
+ }
+ 
+-- 
+2.39.3 (Apple Git-146)
 
-Why subtract !!rtstats.rx_packets? This evaluates to 0 if rx_packets is
-0 and 1 if rx_packets is non-zero.
-
-> +	stats->bytes = rtstats.rx_bytes;
-> +}
-> +
-> +static void nsim_get_queue_stats_tx(struct net_device *dev, int idx,
-> +				    struct netdev_queue_stats_tx *stats)
-> +{
-> +	struct rtnl_link_stats64 rtstats = {};
-> +
-> +	nsim_get_stats64(dev, &rtstats);
-> +
-> +	stats->packets = rtstats.tx_packets - !!rtstats.tx_packets;
-> +	stats->bytes = rtstats.tx_bytes;
-> +}
-> +
-> +static void nsim_get_base_stats(struct net_device *dev,
-> +				struct netdev_queue_stats_rx *rx,
-> +				struct netdev_queue_stats_tx *tx)
-> +{
-> +	struct rtnl_link_stats64 rtstats = {};
-> +
-> +	nsim_get_stats64(dev, &rtstats);
-> +
-> +	rx->packets = !!rtstats.rx_packets;
-> +	rx->bytes = 0;
-> +	tx->packets = !!rtstats.tx_packets;
-> +	tx->bytes = 0;
-> +}
-> +
-> +static const struct netdev_stat_ops nsim_stat_ops = {
-> +	.get_queue_stats_tx	= nsim_get_queue_stats_tx,
-> +	.get_queue_stats_rx	= nsim_get_queue_stats_rx,
-> +	.get_base_stats		= nsim_get_base_stats,
-> +};
-> +
->  static void nsim_setup(struct net_device *dev)
->  {
->  	ether_setup(dev);
-> @@ -360,6 +404,7 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
->  
->  	ns->phc = phc;
->  	ns->netdev->netdev_ops = &nsim_netdev_ops;
-> +	ns->netdev->stat_ops = &nsim_stat_ops;
->  
->  	err = nsim_udp_tunnels_info_create(ns->nsim_dev, ns->netdev);
->  	if (err)
 
