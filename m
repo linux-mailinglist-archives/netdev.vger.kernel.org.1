@@ -1,301 +1,445 @@
-Return-Path: <netdev+bounces-84359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E0B7896AD5
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:39:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B98896ACD
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22F19B29143
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:33:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32A1C1F2A93C
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D780A136647;
-	Wed,  3 Apr 2024 09:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38804135A6C;
+	Wed,  3 Apr 2024 09:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PCjOu78d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EqQeBzxd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788B6134759;
-	Wed,  3 Apr 2024 09:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBA2135A5D;
+	Wed,  3 Apr 2024 09:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712136663; cv=none; b=Ee7MS4a3z33xRjGuyL1xZfasgBLeY2o8aYLb0h+klFbcS2JxEDhF9kqSYOiv+KrubHO7FDWCsD8Wt+MWFxcExLpfjj37f5LAY/LgstNdIuufCJ4F+kfwTBG2zFArC2keMj6sNzc4xM1QdWTc3gK0YHOKAx4BdMGZOGegWFMW4OM=
+	t=1712136987; cv=none; b=Ij4GL14jzrA/ZqNPORo9x6enHP0t3A+uazPs0sZZWKkwobgaWSjags1anEbRCdvlE9M40aK9Dl6K2uTbTzgwjIXau0LhJX3Hiuf4/H3DBAeUeR4Zt1t8OitnTpvp8bge4MA6L46I9x2ct/7yHFYfB954QDUiuaE+ZMuyLC22CG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712136663; c=relaxed/simple;
-	bh=hdQyq38njeULYK9VdARbiJym46CETAEk7WigcOJGITQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KnH8sj3AWGU/P1ZkjJ3CS5RoLPyuVHFsemDLhXFpnR149l7sgKV4veWY92dhkQ7gd0ZXsIwH/xJf5MoJVBey3QzyGJ6i4GA34Yu/ihEiuf1MnBYpkMlPtaxjO+69Jqvkyq6uM6DCB+k4Xmq1gWM3efaDiOiBYTskzkf+4mZjrmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PCjOu78d; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712136662; x=1743672662;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hdQyq38njeULYK9VdARbiJym46CETAEk7WigcOJGITQ=;
-  b=PCjOu78dpbeK2v4+j7un//zzf72olDNQe4XY6y1MPAOLCXquqvvDkkdH
-   YIQ4TME0+UuSV/r42hAp+z7QXMM+JREXnm6DjsmLtV82Q87Ja/px0ErYH
-   AYYuPboeiTeU8fmUGgTbktl5Ya/lAKdNO6SekDck5qLLIQNURvDujJCLe
-   Sar2FBzvgl4TUi1maHC5kTfxCCWv5e3yEoaCmdnW1vLLdAseIsKjKbY96
-   rJg2BOTIsQb3DjJ5sIBx55WXiKLcGym9M8B26aGUwcPcaASj8F0XnU73o
-   v8m8yBh4zTf/qyn4h1eMFqWQqWT7HwYHKn959euQSlr7J9jE5kU4VrUd1
-   A==;
-X-CSE-ConnectionGUID: OJWbZ5bMT+6dX8xZHd9S8A==
-X-CSE-MsgGUID: f/nedbYdQMa/rZ6PnpO38A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="7218636"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="7218636"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 02:31:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="915175962"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="915175962"
-Received: from smile.fi.intel.com (HELO smile) ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 02:30:49 -0700
-Received: from andy by smile with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rrwxA-000000014hw-2roE;
-	Wed, 03 Apr 2024 12:30:44 +0300
-Date: Wed, 3 Apr 2024 12:30:44 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Corey Minyard <minyard@acm.org>,
-	Peter Huewe <peterhuewe@gmx.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-	Moritz Fischer <mdf@kernel.org>, Wu Hao <hao.wu@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>, Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-	Michael Hennerich <michael.hennerich@analog.com>,
-	Peter Rosin <peda@axentia.se>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Xiang Chen <chenxiang66@hisilicon.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>, Arnd Bergmann <arnd@arndb.de>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Tom Rix <trix@redhat.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Randy Dunlap <rdunlap@infradead.org>, Rob Herring <robh@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	openipmi-developer@lists.sourceforge.net,
-	linux-integrity@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-fpga@vger.kernel.org, linux-input@vger.kernel.org,
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
-	linux-omap@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-	linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 33/34] drivers: remove incorrect of_match_ptr/ACPI_PTR
- annotations
-Message-ID: <Zg0hxMZGlwfXV2RA@smile.fi.intel.com>
-References: <20240403080702.3509288-1-arnd@kernel.org>
- <20240403080702.3509288-34-arnd@kernel.org>
+	s=arc-20240116; t=1712136987; c=relaxed/simple;
+	bh=bwb4JvcedxX6rrIHMw10SZ50m7m0GwkH021kKHCM1ho=;
+	h=Content-Type:MIME-Version:From:Subject:To:Cc:Message-Id:Date; b=eLQMgKeGHPBHazG75Nc1yOPBQMYbixW1WRLaPRy1e3VJdY+6fA8hAzMd0nQ4xbDtXAZOwjdmy0quSEMlxj2TjrIZMTa7izezAN5umbK/ip9vvsMtvlXCLthnxENk06e5FxOeTNAoAHPRrhuY/zd/XmVRWKCv7iFh0aIRDXIAgnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EqQeBzxd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF515C433C7;
+	Wed,  3 Apr 2024 09:36:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712136986;
+	bh=bwb4JvcedxX6rrIHMw10SZ50m7m0GwkH021kKHCM1ho=;
+	h=From:Subject:To:Cc:Date:From;
+	b=EqQeBzxd1SC9WhyMkHhDI7GLuuPGd2CDA5JA7I/Jx7BMZetXi8Bbb51Lz1jN9A9J3
+	 i+Fv8DhTJqH9yaGL9nlB90KsK8AQaoUiL8EdDgikiMSPg3O1OuBUFGNWIAiJ6hty/k
+	 vX4kgriZKIm6bJf6u+BKmiGoiK1HZS9SPhUJ7YUL37RBJg4RAgmZXM/hmJ36OqXPS7
+	 6lAVMw6k8Xh75Q56WbJR/I62kLaXpoQVYa+UJLeBHCkqjCG/bsOI0XXEKH6/XV/hyB
+	 hjR+437/QypXoPMLLxbwbGbN/J0n+mlKRGKgceeywTsyq8JNTncrCQq6e/iRzN8q19
+	 B0Tnks4Jko5sQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240403080702.3509288-34-arnd@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+From: Kalle Valo <kvalo@kernel.org>
+Subject: pull-request: wireless-next-2024-04-03
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Message-Id: <20240403093625.CF515C433C7@smtp.kernel.org>
+Date: Wed,  3 Apr 2024 09:36:24 +0000 (UTC)
 
-On Wed, Apr 03, 2024 at 10:06:51AM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> When building with CONFIG_OF and/or CONFIG_ACPI disabled but W=1 extra
-> warnings enabled, a lot of driver cause a warning about an unused
-> ID table:
-> 
-> drivers/char/tpm/tpm_ftpm_tee.c:356:34: error: unused variable 'of_ftpm_tee_ids' [-Werror,-Wunused-const-variable]
-> drivers/dma/img-mdc-dma.c:863:34: error: unused variable 'mdc_dma_of_match' [-Werror,-Wunused-const-variable]
-> drivers/fpga/versal-fpga.c:62:34: error: unused variable 'versal_fpga_of_match' [-Werror,-Wunused-const-variable]
-> drivers/i2c/muxes/i2c-mux-ltc4306.c:200:34: error: unused variable 'ltc4306_of_match' [-Werror,-Wunused-const-variable]
-> drivers/i2c/muxes/i2c-mux-reg.c:242:34: error: unused variable 'i2c_mux_reg_of_match' [-Werror,-Wunused-const-variable]
-> drivers/memory/pl353-smc.c:62:34: error: unused variable 'pl353_smc_supported_children' [-Werror,-Wunused-const-variable]
-> drivers/regulator/pbias-regulator.c:136:34: error: unused variable 'pbias_of_match' [-Werror,-Wunused-const-variable]
-> drivers/regulator/twl-regulator.c:552:34: error: unused variable 'twl_of_match' [-Werror,-Wunused-const-variable]
-> drivers/regulator/twl6030-regulator.c:645:34: error: unused variable 'twl_of_match' [-Werror,-Wunused-const-variable]
-> drivers/scsi/hisi_sas/hisi_sas_v2_hw.c:3635:36: error: unused variable 'sas_v2_acpi_match' [-Werror,-Wunused-const-variable]
-> drivers/staging/pi433/pi433_if.c:1359:34: error: unused variable 'pi433_dt_ids' [-Werror,-Wunused-const-variable]
-> drivers/tty/serial/amba-pl011.c:2945:34: error: unused variable 'sbsa_uart_of_match' [-Werror,-Wunused-const-variable]
-> 
-> The fix is always to just remove the of_match_ptr() and ACPI_PTR() wrappers
-> that remove the reference, rather than adding another #ifdef just for build
-> testing for a configuration that doesn't matter in practice.
+Hi,
 
-> I considered splitting up the large patch into per subsystem patches, but since
-> it's really just the same thing everywhere it feels better to do it all at once.
+here's a pull request to net-next tree, more info below. Please let me know if
+there are any problems.
 
-Can we split to three groups:
-- Dropping ACPI_PTR()
-- Dropping of_match_ptr() (which I won't review in depth, for example)
-- Dropping both
-?
+Kalle
 
-...
+The following changes since commit c2b25092864a16c7865e406badedece5cc25fc2b:
 
-> --- a/drivers/char/ipmi/ipmb_dev_int.c
-> +++ b/drivers/char/ipmi/ipmb_dev_int.c
-> @@ -364,7 +364,7 @@ MODULE_DEVICE_TABLE(acpi, acpi_ipmb_id);
->  static struct i2c_driver ipmb_driver = {
->  	.driver = {
->  		.name = "ipmb-dev",
-> -		.acpi_match_table = ACPI_PTR(acpi_ipmb_id),
-> +		.acpi_match_table = acpi_ipmb_id,
->  	},
->  	.probe = ipmb_probe,
->  	.remove = ipmb_remove,
+  Merge branch 'qmc-hdlc' (2024-03-11 09:36:11 +0000)
 
-acpi.h --> mod_devicetable.h.
+are available in the Git repository at:
 
-...
+  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2024-04-03
 
-> --- a/drivers/hid/hid-google-hammer.c
-> +++ b/drivers/hid/hid-google-hammer.c
-> @@ -275,21 +275,19 @@ static const struct acpi_device_id cbas_ec_acpi_ids[] = {
->  };
->  MODULE_DEVICE_TABLE(acpi, cbas_ec_acpi_ids);
->  
-> -#ifdef CONFIG_OF
->  static const struct of_device_id cbas_ec_of_match[] = {
->  	{ .compatible = "google,cros-cbas" },
->  	{ },
->  };
->  MODULE_DEVICE_TABLE(of, cbas_ec_of_match);
-> -#endif
->  
->  static struct platform_driver cbas_ec_driver = {
->  	.probe = cbas_ec_probe,
->  	.remove = cbas_ec_remove,
->  	.driver = {
->  		.name = "cbas_ec",
-> -		.acpi_match_table = ACPI_PTR(cbas_ec_acpi_ids),
-> -		.of_match_table = of_match_ptr(cbas_ec_of_match),
-> +		.acpi_match_table = cbas_ec_acpi_ids,
-> +		.of_match_table = cbas_ec_of_match,
->  		.pm = &cbas_ec_pm_ops,
->  	},
->  };
+for you to fetch changes up to 0ccf50df61f98a9f98d46524be4baa00c88c499d:
 
-Ditto, and likely of.h can be also dropped.
+  Merge tag 'ath-next-20240402' of git://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath (2024-04-02 21:19:58 +0300)
 
-...
+----------------------------------------------------------------
+wireless-next patches for v6.10
 
-> --- a/drivers/input/touchscreen/wdt87xx_i2c.c
-> +++ b/drivers/input/touchscreen/wdt87xx_i2c.c
-> @@ -1166,7 +1166,7 @@ static struct i2c_driver wdt87xx_driver = {
->  		.name = WDT87XX_NAME,
->  		.dev_groups = wdt87xx_groups,
->  		.pm = pm_sleep_ptr(&wdt87xx_pm_ops),
-> -		.acpi_match_table = ACPI_PTR(wdt87xx_acpi_id),
-> +		.acpi_match_table = wdt87xx_acpi_id,
->  	},
->  };
->  module_i2c_driver(wdt87xx_driver);
+The first "new features" pull request for v6.10 with changes both in
+stack and in drivers. The big thing in this pull request is that
+wireless subsystem is now almost free of sparse warnings. There's only
+one warning left in ath11k which was introduced in v6.9-rc1 and will
+be fixed via the wireless tree.
 
-Ditto.
+Realtek drivers continue to improve, now we have support for RTL8922AE
+and RTL8723CS devices. ath11k also has long waited support for P2P.
 
-...
+This time we have a small conflict in iwlwifi as we didn't consider it
+as major enough to justify merging wireless tree to wireless-next. But
+Stephen has an example merge resolution which should help with fixing
+the conflict:
 
-> --- a/drivers/net/ethernet/apm/xgene-v2/main.c
-> +++ b/drivers/net/ethernet/apm/xgene-v2/main.c
-> @@ -731,7 +731,7 @@ MODULE_DEVICE_TABLE(acpi, xge_acpi_match);
->  static struct platform_driver xge_driver = {
->  	.driver = {
->  		   .name = "xgene-enet-v2",
-> -		   .acpi_match_table = ACPI_PTR(xge_acpi_match),
-> +		   .acpi_match_table = xge_acpi_match,
->  	},
->  	.probe = xge_probe,
->  	.remove_new = xge_remove,
+https://lore.kernel.org/all/20240326100945.765b8caf@canb.auug.org.au/
 
-Ditto. And remove forward declaration of the variable as well.
+Major changes:
 
-...
+rtw89
 
-> --- a/drivers/rtc/rtc-fsl-ftm-alarm.c
-> +++ b/drivers/rtc/rtc-fsl-ftm-alarm.c
-> @@ -320,7 +320,7 @@ static struct platform_driver ftm_rtc_driver = {
->  	.driver		= {
->  		.name	= "ftm-alarm",
->  		.of_match_table = ftm_rtc_match,
-> -		.acpi_match_table = ACPI_PTR(ftm_imx_acpi_ids),
-> +		.acpi_match_table = ftm_imx_acpi_ids,
->  	},
->  };
+* RTL8922AE Wi-Fi 7 PCI device support
 
-Ditto.
+rtw88
 
-...
+* RTL8723CS SDIO device support
 
->  	.driver = {
->  		.name =		"pi433",
->  		.owner =	THIS_MODULE,
+iwlwifi
 
-Oh-oh.
+* don't support puncturing in 5 GHz
 
-> -		.of_match_table = of_match_ptr(pi433_dt_ids),
-> +		.of_match_table = pi433_dt_ids,
->  	},
+* support monitor mode on passive channels
 
-...
+* BZ-W device support
 
-> --- a/drivers/tty/serial/amba-pl011.c
-> +++ b/drivers/tty/serial/amba-pl011.c
-> @@ -2948,7 +2948,7 @@ static const struct of_device_id sbsa_uart_of_match[] = {
->  };
->  MODULE_DEVICE_TABLE(of, sbsa_uart_of_match);
->  
-> -static const struct acpi_device_id __maybe_unused sbsa_uart_acpi_match[] = {
-> +static const struct acpi_device_id sbsa_uart_acpi_match[] = {
->  	{ "ARMH0011", 0 },
->  	{ "ARMHB000", 0 },
->  	{},
-> @@ -2961,8 +2961,8 @@ static struct platform_driver arm_sbsa_uart_platform_driver = {
->  	.driver	= {
->  		.name	= "sbsa-uart",
->  		.pm	= &pl011_dev_pm_ops,
-> -		.of_match_table = of_match_ptr(sbsa_uart_of_match),
-> -		.acpi_match_table = ACPI_PTR(sbsa_uart_acpi_match),
-> +		.of_match_table = sbsa_uart_of_match,
-> +		.acpi_match_table = sbsa_uart_acpi_match,
->  		.suppress_bind_attrs = IS_BUILTIN(CONFIG_SERIAL_AMBA_PL011),
->  	},
->  };
+* P2P with HE/EHT support
 
-Ditto.
+ath11k
 
-...
+* P2P support for QCA6390, WCN6855 and QCA2066
 
-As mentioned above, I haven't and won't look into of_match_ptr() cases, but you
-got the idea.
+----------------------------------------------------------------
+Aditya Kumar Singh (1):
+      wifi: mac80211_hwsim: set link ID information during Rx
 
-For the above, if addressed as suggested,
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Aloka Dixit (1):
+      wifi: ath12k: use correct flag field for 320 MHz channels
 
--- 
-With Best Regards,
-Andy Shevchenko
+Anjaneyulu (3):
+      wifi: mac80211: handle indoor AFC/LPI AP on assoc success
+      wifi: cfg80211: handle indoor AFC/LPI AP in probe response and beacon
+      wifi: iwlwifi: Add support for LARI_CONFIG_CHANGE_CMD cmd v9
 
+Avraham Stern (1):
+      wifi: iwlwifi: mvm: add debugfs for forcing unprotected ranging request
+
+Ayala Beker (3):
+      wifi: mac80211: fix BSS_CHANGED_MLD_TTLM description
+      wifi: mac80211: add support for tearing down negotiated TTLM
+      wifi: mac80211: don't select link ID if not provided in scan request
+
+Baochen Qiang (3):
+      wifi: ath10k: poll service ready message before failing
+      wifi: ath11k: don't force enable power save on non-running vdevs
+      wifi: ath11k: do not process consecutive RDDM event
+
+Benjamin Berg (7):
+      wifi: mac80211: improve association error reporting slightly
+      wifi: cfg80211: check BSSID Index against MaxBSSID
+      wifi: cfg80211: ignore non-TX BSSs in per-STA profile
+      wifi: iwlwifi: mvm: always apply 6 GHz probe limitations
+      wifi: iwlwifi: mvm: assign link STA ID lookups during restart
+      wifi: iwlwifi: mvm: fix active link counting during recovery
+      wifi: iwlwifi: mvm: mark EMLSR disabled in cleanup iterator
+
+Breno Leitao (1):
+      wifi: qtnfmac: allocate dummy net_device dynamically
+
+Ching-Te Ku (5):
+      wifi: rtw89: coex: Add WiFi role info format version 8
+      wifi: rtw89: coex: Add antenna setting function for RTL8922A
+      wifi: rtw89: coex: Add TDMA version 7
+      wifi: rtw89: coex: Add TDMA slot parameter setting version 7
+      wifi: rtw89: 8922a: update chip parameter for coex
+
+Daniel Amosi (1):
+      wifi: iwlwifi: Print a specific device name.
+
+Dian-Syuan Yang (1):
+      wifi: rtw89: Correct EHT TX rate on 20MHz connection
+
+Duoming Zhou (1):
+      wifi: brcmfmac: pcie: handle randbuf allocation failure
+
+Emmanuel Grumbach (4):
+      wifi: iwlwifi: mvm: support iwl_dev_tx_power_cmd_v8
+      wifi: iwlwifi: remove devices that never came out
+      wifi: iwlwifi: remove wrong CRF_IDs
+      wifi: iwlwifi: add support for BZ_W
+
+Fiona Klute (9):
+      wifi: rtw88: Shared module for rtw8723x devices
+      wifi: rtw88: Debug output for rtw8723x EFUSE
+      wifi: rtw88: Add definitions for 8703b chip
+      wifi: rtw88: Add rtw8703b.h
+      wifi: rtw88: Add rtw8703b.c
+      wifi: rtw88: Add rtw8703b_tables.h
+      wifi: rtw88: Add rtw8703b_tables.c
+      wifi: rtw88: Reset 8703b firmware before download
+      wifi: rtw88: SDIO device driver for RTL8723CS
+
+Gustavo A. R. Silva (2):
+      wifi: ti: Avoid a hundred -Wflex-array-member-not-at-end warnings
+      wifi: mwl8k: Avoid -Wflex-array-member-not-at-end warnings
+
+Ilan Peer (7):
+      wifi: iwlwifi: mvm: Move beacon filtering to be per link
+      wifi: iwlwifi: mvm: Refactor scan start
+      wifi: iwlwifi: mvm: Introduce internal MLO passive scan
+      wifi: iwlwifi: mvm: Add debugfs entry for triggering internal MLO scan
+      wifi: iwlwifi: mvm: Do not warn on invalid link on scan complete
+      wifi: mac80211_hwsim: Declare HE/EHT capabilities support for P2P interfaces
+      wifi: iwlwifi: mvm: Declare HE/EHT capabilities support for P2P interfaces
+
+Jeff Johnson (6):
+      wifi: ath12k: remove obsolete struct wmi_start_scan_arg
+      wifi: ath11k: remove obsolete struct wmi_start_scan_arg
+      wifi: ath11k: fix soc_dp_stats debugfs file permission
+      wifi: nl80211: rename enum plink_actions
+      wifi: nl80211: fix nl80211 uapi comment style issues
+      wifi: nl80211: cleanup nl80211.h kernel-doc
+
+Johannes Berg (26):
+      wifi: iwlwifi: mvm: fix flushing during quiet CSA
+      wifi: iwlwifi: mvm: advertise IEEE80211_HW_HANDLES_QUIET_CSA
+      wifi: iwlwifi: pcie: remove duplicate PCI IDs entry
+      wifi: mac80211: spectmgmt: simplify 6 GHz HE/EHT handling
+      wifi: ieee80211: check for NULL in ieee80211_mle_size_ok()
+      wifi: ieee80211: fix ieee80211_mle_basic_sta_prof_size_ok()
+      wifi: mac80211_hwsim: move skip_beacons to be per link
+      wifi: mac80211: clarify the dormant/suspended links docs
+      wifi: mac80211: add flag to disallow puncturing in 5 GHz
+      wifi: iwlwifi: add a kunit test for PCI table duplicates
+      wifi: iwlwifi: fw: add clarifying comments about iwl_fwrt_dump_data
+      wifi: iwlwifi: mvm: don't support puncturing in 5 GHz
+      wifi: iwlwifi: remove 6 GHz NVM override
+      wifi: iwlwifi: enable monitor on passive/inactive channels
+      wifi: iwlwifi: mvm: allocate STA links only for active links
+      wifi: mac80211: don't enter idle during link switch
+      wifi: mac80211: clarify IEEE80211_STATUS_SUBDATA_MASK
+      wifi: mac80211: don't ask driver about no-op link changes
+      wifi: mac80211: improve drop for action frame return
+      wifi: mac80211: reactivate multi-link later in restart
+      wifi: iwlwifi: mvm: set wider BW OFDMA ignore correctly
+      wifi: iwlwifi: mvm: select STA mask only for active links
+      wifi: iwlwifi: mvm: don't change BA sessions during restart
+      wifi: iwlwifi: reconfigure TLC during HW restart
+      wifi: mac80211: use kvcalloc() for codel vars
+      wifi: iwlwifi: mvm: fix check in iwl_mvm_sta_fw_id_mask
+
+Kalle Valo (9):
+      wifi: ath6kl: fix sparse warnings
+      wifi: wcn36xx: buff_to_be(): fix sparse warnings
+      wifi: wcn36xx: main: fix sparse warnings
+      wifi: wil6210: fix sparse warnings
+      wifi: ath9k: ath9k_set_moredata(): fix sparse warnings
+      wifi: ath9k: fix ath9k_use_msi declaration
+      wifi: ath9k: eeprom: fix sparse endian warnings
+      wifi: mt76: mt7915: workaround dubious x | !y warning
+      Merge tag 'ath-next-20240402' of git://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath
+
+Kang Yang (9):
+      wifi: ath11k: change interface combination for P2P mode
+      wifi: ath11k: add P2P IE in beacon template
+      wifi: ath11k: implement handling of P2P NoA event
+      wifi: ath11k: change WLAN_SCAN_PARAMS_MAX_IE_LEN from 256 to 512
+      wifi: ath11k: change scan flag scan_f_filter_prb_req for QCA6390/WCN6855/QCA2066
+      wifi: ath11k: advertise P2P dev support for QCA6390/WCN6855/QCA2066
+      wifi: ath12k: remove duplicate definitions in wmi.h
+      wifi: ath11k: remove duplicate definitions in wmi.h
+      wifi: mac80211: supplement parsing of puncturing bitmap
+
+Karthikeyan Periyasamy (3):
+      wifi: ath12k: Refactor Rxdma buffer replinish argument
+      wifi: ath12k: Optimize the lock contention of used list in Rx data path
+      wifi: ath12k: Refactor error handler of Rxdma replenish
+
+Kevin Lo (1):
+      wifi: ath11k: adjust a comment to reflect reality
+
+Li Zhijian (3):
+      wifi: b43: Convert sprintf/snprintf to sysfs_emit
+      wifi: ti: Convert sprintf/snprintf to sysfs_emit
+      wifi: ath: Convert sprintf/snprintf to sysfs_emit
+
+Lorenzo Bianconi (1):
+      wifi: mt76: mt7915: workaround too long expansion sparse warnings
+
+Marek Vasut (1):
+      dt-bindings: net: wireless: brcm,bcm4329-fmac: Add CYW43439 DT binding
+
+Miri Korenblit (1):
+      wifi: iwlwifi: mvm: Remove outdated comment
+
+Ping-Ke Shih (1):
+      wifi: rtw89: 8922a: add 8922ae to Makefile and Kconfig
+
+Rand Deeb (1):
+      ssb: Fix potential NULL pointer dereference in ssb_device_uevent()
+
+Randy Dunlap (2):
+      ssb: drop use of non-existing CONFIG_SSB_DEBUG symbol
+      ssb: use "break" on default case to prevent warning
+
+Shaul Triebitz (5):
+      wifi: iwlwifi: fix firmware API kernel doc
+      wifi: iwlwifi: mvm: fix the sta id in offload
+      wifi: iwlwifi: mvm: stop assuming sta id 0 in d3
+      wifi: iwlwifi: mvm: skip keys of other links
+      wifi: iwlwifi: mvm: support wowlan notif version 4
+
+Thiraviyam Mariyappan (1):
+      wifi: ath12k: fix desc address calculation in wbm tx completion
+
+Uwe Kleine-König (2):
+      bcma: convert to platform remove callback returning void
+      net: rfkill: gpio: Convert to platform remove callback returning void
+
+Víctor Gonzalo (1):
+      wifi: mwifiex: Add missing MODULE_FIRMWARE() for SD8801
+
+ .../bindings/net/wireless/brcm,bcm4329-fmac.yaml   |    1 +
+ drivers/bcma/host_soc.c                            |    6 +-
+ drivers/net/wireless/ath/ath10k/thermal.c          |    2 +-
+ drivers/net/wireless/ath/ath10k/wmi.c              |   26 +-
+ drivers/net/wireless/ath/ath11k/Makefile           |    3 +-
+ drivers/net/wireless/ath/ath11k/core.c             |   20 +-
+ drivers/net/wireless/ath/ath11k/debugfs.c          |    4 +-
+ drivers/net/wireless/ath/ath11k/mac.c              |  175 +-
+ drivers/net/wireless/ath/ath11k/mhi.c              |   17 +-
+ drivers/net/wireless/ath/ath11k/p2p.c              |  149 ++
+ drivers/net/wireless/ath/ath11k/p2p.h              |   22 +
+ drivers/net/wireless/ath/ath11k/pci.h              |    1 +
+ drivers/net/wireless/ath/ath11k/thermal.c          |    2 +-
+ drivers/net/wireless/ath/ath11k/wmi.c              |  107 +-
+ drivers/net/wireless/ath/ath11k/wmi.h              |   78 +-
+ drivers/net/wireless/ath/ath12k/dp.c               |   31 +-
+ drivers/net/wireless/ath/ath12k/dp.h               |    7 +-
+ drivers/net/wireless/ath/ath12k/dp_rx.c            |  140 +-
+ drivers/net/wireless/ath/ath12k/dp_rx.h            |    1 +
+ drivers/net/wireless/ath/ath12k/dp_tx.c            |    2 +-
+ drivers/net/wireless/ath/ath12k/wmi.c              |    2 +-
+ drivers/net/wireless/ath/ath12k/wmi.h              |   34 -
+ drivers/net/wireless/ath/ath6kl/htc_mbox.c         |    3 +-
+ drivers/net/wireless/ath/ath6kl/htc_pipe.c         |    3 +-
+ drivers/net/wireless/ath/ath9k/ath9k.h             |    1 +
+ drivers/net/wireless/ath/ath9k/eeprom_4k.c         |    2 +-
+ drivers/net/wireless/ath/ath9k/eeprom_9287.c       |    4 +-
+ drivers/net/wireless/ath/ath9k/eeprom_def.c        |    6 +-
+ drivers/net/wireless/ath/ath9k/pci.c               |    2 -
+ drivers/net/wireless/ath/ath9k/xmit.c              |   10 +-
+ drivers/net/wireless/ath/wcn36xx/main.c            |    4 +-
+ drivers/net/wireless/ath/wcn36xx/txrx.c            |    4 +-
+ drivers/net/wireless/ath/wcn36xx/wcn36xx.h         |    7 +-
+ drivers/net/wireless/ath/wil6210/cfg80211.c        |    4 +-
+ drivers/net/wireless/ath/wil6210/fw.h              |    1 -
+ drivers/net/wireless/ath/wil6210/fw_inc.c          |    4 +-
+ drivers/net/wireless/broadcom/b43/sysfs.c          |   13 +-
+ drivers/net/wireless/broadcom/b43legacy/sysfs.c    |   16 +-
+ .../wireless/broadcom/brcm80211/brcmfmac/pcie.c    |   15 +-
+ drivers/net/wireless/intel/iwlwifi/cfg/bz.c        |    2 +
+ drivers/net/wireless/intel/iwlwifi/fw/api/d3.h     |   57 +-
+ .../net/wireless/intel/iwlwifi/fw/api/nvm-reg.h    |    5 +-
+ .../net/wireless/intel/iwlwifi/fw/api/offload.h    |    4 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/power.h  |   30 +
+ drivers/net/wireless/intel/iwlwifi/fw/dbg.c        |    1 +
+ drivers/net/wireless/intel/iwlwifi/fw/file.h       |    3 +
+ drivers/net/wireless/intel/iwlwifi/fw/regulatory.h |   19 +-
+ drivers/net/wireless/intel/iwlwifi/fw/runtime.h    |    5 +
+ drivers/net/wireless/intel/iwlwifi/iwl-config.h    |    7 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-drv.c       |    6 -
+ drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.c |   28 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-prph.h      |    9 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/coex.c      |   21 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/d3.c        |  212 +-
+ .../net/wireless/intel/iwlwifi/mvm/debugfs-vif.c   |   60 +-
+ .../net/wireless/intel/iwlwifi/mvm/ftm-initiator.c |   17 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |   13 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |  117 +-
+ .../net/wireless/intel/iwlwifi/mvm/mld-mac80211.c  |   30 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/mld-sta.c   |   39 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/mvm.h       |   38 +-
+ .../net/wireless/intel/iwlwifi/mvm/offloading.c    |    8 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/power.c     |   16 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/rx.c        |   48 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/scan.c      |  292 ++-
+ drivers/net/wireless/intel/iwlwifi/pcie/drv.c      |   53 +-
+ drivers/net/wireless/intel/iwlwifi/tests/devinfo.c |   26 +-
+ drivers/net/wireless/marvell/mwifiex/sdio.c        |    1 +
+ drivers/net/wireless/marvell/mwl8k.c               |   92 +-
+ .../net/wireless/mediatek/mt76/mt7915/debugfs.c    |    9 +-
+ drivers/net/wireless/quantenna/qtnfmac/bus.h       |    2 +-
+ drivers/net/wireless/quantenna/qtnfmac/pcie/pcie.c |   13 +-
+ .../wireless/quantenna/qtnfmac/pcie/pearl_pcie.c   |    6 +-
+ .../wireless/quantenna/qtnfmac/pcie/topaz_pcie.c   |    6 +-
+ drivers/net/wireless/realtek/rtw88/Kconfig         |   22 +
+ drivers/net/wireless/realtek/rtw88/Makefile        |    9 +
+ drivers/net/wireless/realtek/rtw88/mac.c           |    6 +
+ drivers/net/wireless/realtek/rtw88/main.h          |    3 +
+ drivers/net/wireless/realtek/rtw88/rtw8703b.c      | 2109 ++++++++++++++++++++
+ drivers/net/wireless/realtek/rtw88/rtw8703b.h      |  102 +
+ .../net/wireless/realtek/rtw88/rtw8703b_tables.c   |  902 +++++++++
+ .../net/wireless/realtek/rtw88/rtw8703b_tables.h   |   14 +
+ drivers/net/wireless/realtek/rtw88/rtw8723cs.c     |   34 +
+ drivers/net/wireless/realtek/rtw88/rtw8723d.c      |  673 +------
+ drivers/net/wireless/realtek/rtw88/rtw8723d.h      |  269 +--
+ drivers/net/wireless/realtek/rtw88/rtw8723x.c      |  721 +++++++
+ drivers/net/wireless/realtek/rtw88/rtw8723x.h      |  518 +++++
+ drivers/net/wireless/realtek/rtw88/rx.h            |    2 +
+ drivers/net/wireless/realtek/rtw89/Kconfig         |   15 +
+ drivers/net/wireless/realtek/rtw89/Makefile        |   12 +-
+ drivers/net/wireless/realtek/rtw89/coex.c          |  964 ++++++++-
+ drivers/net/wireless/realtek/rtw89/coex.h          |   72 +
+ drivers/net/wireless/realtek/rtw89/core.h          |  108 +-
+ drivers/net/wireless/realtek/rtw89/fw.c            |   42 +
+ drivers/net/wireless/realtek/rtw89/fw.h            |   27 +
+ drivers/net/wireless/realtek/rtw89/phy.c           |   13 +-
+ drivers/net/wireless/realtek/rtw89/rtw8922a.c      |  154 ++
+ drivers/net/wireless/ti/wl1251/cmd.h               |    2 -
+ drivers/net/wireless/ti/wl1251/wl12xx_80211.h      |    1 -
+ drivers/net/wireless/ti/wlcore/cmd.h               |    2 -
+ drivers/net/wireless/ti/wlcore/sysfs.c             |   11 +-
+ drivers/net/wireless/ti/wlcore/wl12xx_80211.h      |    1 -
+ drivers/net/wireless/virtual/mac80211_hwsim.c      |   42 +-
+ drivers/ssb/main.c                                 |    6 +-
+ include/linux/ieee80211.h                          |   12 +-
+ include/linux/mmc/sdio_ids.h                       |    1 +
+ include/linux/ssb/ssb.h                            |    8 -
+ include/net/mac80211.h                             |   22 +-
+ include/uapi/linux/nl80211.h                       |  236 +--
+ net/mac80211/chan.c                                |   34 +-
+ net/mac80211/debugfs.c                             |    1 +
+ net/mac80211/drop.h                                |    3 +-
+ net/mac80211/ht.c                                  |    2 +-
+ net/mac80211/ieee80211_i.h                         |    8 +-
+ net/mac80211/link.c                                |    7 +-
+ net/mac80211/mlme.c                                |   82 +-
+ net/mac80211/rx.c                                  |    4 +-
+ net/mac80211/scan.c                                |   16 +-
+ net/mac80211/spectmgmt.c                           |   18 +-
+ net/mac80211/status.c                              |   22 +-
+ net/mac80211/tx.c                                  |    6 +-
+ net/mac80211/util.c                                |   14 +-
+ net/rfkill/rfkill-gpio.c                           |    6 +-
+ net/wireless/scan.c                                |   54 +-
+ 124 files changed, 7816 insertions(+), 1820 deletions(-)
+ create mode 100644 drivers/net/wireless/ath/ath11k/p2p.c
+ create mode 100644 drivers/net/wireless/ath/ath11k/p2p.h
+ create mode 100644 drivers/net/wireless/realtek/rtw88/rtw8703b.c
+ create mode 100644 drivers/net/wireless/realtek/rtw88/rtw8703b.h
+ create mode 100644 drivers/net/wireless/realtek/rtw88/rtw8703b_tables.c
+ create mode 100644 drivers/net/wireless/realtek/rtw88/rtw8703b_tables.h
+ create mode 100644 drivers/net/wireless/realtek/rtw88/rtw8723cs.c
+ create mode 100644 drivers/net/wireless/realtek/rtw88/rtw8723x.c
+ create mode 100644 drivers/net/wireless/realtek/rtw88/rtw8723x.h
 
 
