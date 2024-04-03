@@ -1,91 +1,166 @@
-Return-Path: <netdev+bounces-84628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63549897A49
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:58:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E8F4897A4B
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934341C21A5F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:58:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4023BB2153E
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 21:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA5515624A;
-	Wed,  3 Apr 2024 20:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A739A15625C;
+	Wed,  3 Apr 2024 21:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2I2lCHQ"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="bMjpQfbV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="CIQGSrnF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wfhigh6-smtp.messagingengine.com (wfhigh6-smtp.messagingengine.com [64.147.123.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DB8155308
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 20:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3400153BF3;
+	Wed,  3 Apr 2024 21:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712177920; cv=none; b=M1p1Ax0sornYy+ocx6mb5XFODSquPPGJBdDe/znpFXrGr7an8TWLm0kxLtzcw+AJ31B9njI/+tz43L+7ZqUOgtdF5/eBMghAmKFo5eHNVD87qlOnsoqxSjUsp/8442Y+VT0cp2zbw9C4klf4zQLVJ4762s8qU9FOCh3eWyfj01E=
+	t=1712178002; cv=none; b=XV8d7gCfz48laHKaS+kGhiSGC/2CjtfuhbaM6LSn46gEGtioFFImvQHaahOxsYq6ZpqEfla+gU383yw577qRXEksSax3B7LC9ougV01eFKe0QWPJ0D4ZMvPAu/UKR64G68ijMwPhqKi5jacAl04M87cr6GpuBvzF/CATkoA6kfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712177920; c=relaxed/simple;
-	bh=RxkrahTrphG/MPUXUeaXNtU1e5plCx8WQCYV1G077uM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q7atm3spRDMW5/WkXw7lAlj10l7x2V9UaY4xjDKUt+O3Re4gmM0KWzzkdxxAxaYTUTio7b5HjZYPAtw8jy+laZCUr2n5lNmRGtHNhMMnel30TRk4ntgAnlMpJMQS95L+hpjyW1DMvmX1Vg34SCMZn6EoIy7tLWodDJ8EA3t0X0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2I2lCHQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8358C433F1;
-	Wed,  3 Apr 2024 20:58:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712177920;
-	bh=RxkrahTrphG/MPUXUeaXNtU1e5plCx8WQCYV1G077uM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=F2I2lCHQ586KoBOKQmOFtOTiJUe0Bu8qtl0GokCZLEfapsyaPh92Nssy/+McksKaI
-	 QAHITP42tPYKlHTezR4f6Zq2h5bzX8aV3lm7Omg9QIjAM6yzDSufZjOdp7bpQmo/th
-	 8VQ/jDBs9oKOLIKKBfJjugVUlkovcS/wc1Lbh8sFj+QkIlJLrpAimWgPly3m8z/FvQ
-	 S9y2XulSKlHul7GUVV++KXmHD2OWHkgtvnl405wM399N7sxbdj11G6pozTMmWARUlf
-	 JRWBLW7y3J2dw5P966I1VnhiAxQPDdpPs4cVlZBlBAm0xidKraH3Ne96/gv73iQGGS
-	 69tBRcEEu3w3Q==
-Message-ID: <df1130b3-c695-42af-b939-05fc0a029e26@kernel.org>
-Date: Wed, 3 Apr 2024 14:58:38 -0600
+	s=arc-20240116; t=1712178002; c=relaxed/simple;
+	bh=z2aFj7Yero9UEAl+EmXBknvXwFagdYrg8gO/nPAA5PI=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=YxH7PfYQJdLJBaRKZo/lvdfNWmn78kCSvfAfkZnUNmolscKQdGA44BXMJhMSYgFIcVFbmIS9FOrnFcGJFk3cA0ejoSprfWe/t48sz8H8lPDb3qGaQrpsLBW3BZX7i9+kAwJ83T98IGYG9FQ8/5RMzTTzePG45HPlYB9Qv9Y+RtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=bMjpQfbV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=CIQGSrnF; arc=none smtp.client-ip=64.147.123.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.west.internal (Postfix) with ESMTP id 506BD180010E;
+	Wed,  3 Apr 2024 16:59:58 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 03 Apr 2024 16:59:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm1; t=1712177997; x=1712264397; bh=TkyKpF4n3C
+	q52s0X3ZL3E7R1KrZzCnoADc0YqLDsh/k=; b=bMjpQfbVCi8Fq8X/stkrxnmNLa
+	a9eEqq1QgwOAfhJa8IBNoTc9TmPgl8k37iGa3Plj+yL82KuU/DHLiW+B0EgYL82c
+	02tVQS6fGmyZwYLxqYe78UZVRUV2mMN5Esd/08WwqhNyFJnJG5un/99DDmFMwWJW
+	Az5K6oBjccQ59rLVezsvSSIgR8itvVTkbtC7jvrMY7NfxDzqNxrboKzUGqXNJQNi
+	YyEsWKJ6or2z1WSTEA2riV00U8oJRsjYk9nuZTZA0u6iQkwzng051T0bgvZmXXPP
+	VRHZnfJUFtIoxLojPbaHAglzRdn7e1lXGHeVQhMviK/+OorI/43OpHbHQFVA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1712177997; x=1712264397; bh=TkyKpF4n3Cq52s0X3ZL3E7R1KrZz
+	CnoADc0YqLDsh/k=; b=CIQGSrnFZRNZgMpARGSyCT5M46ioL1XGSw7MA0g7Rydv
+	zQYYjGI4sejaWCkb1bXdvVklGyJXheHuMfcxVjySSplR2bL7EkH3oyVUTIcl3Gai
+	GRPNR2tZJraIWZvwn5KzpR22QuKSAe+H/q/bRz04wgH0bXdpjj0tB9CO4CCBuABc
+	JG6u7OvcvJPWSiT9jPR78+639l1b3s8ex+E/W3xiVe/aTUxK9Sv6x4pVOmIGaBI3
+	2bEcxjq0cO+cB5msjHtB12nJhcKNH0JPZEy/brteYOce2+8Nno6d0bwX3DLJrcdy
+	m4VzX7YEp2FHkgYzSIWEumxrId/cRz6NUlyjxfgMOQ==
+X-ME-Sender: <xms:TcMNZvjGxtVaQ7lJjPrnjJiTRcLqVvdevj2JGj5ygxkyvaxZTq-XgQ>
+    <xme:TcMNZsCj-2Cg0iMiPgYRpqHhfvGdEB9yBlad668jZ-4CemOPfrP93fsBvHPVn709S
+    WLbvOnbNIIlgnQNirg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudefiedguddufecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
+    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:TcMNZvGQo8zIv4XpkRoy1AW70Hn1lLnDuoKeh7BaArgh2j3x8KRF4Q>
+    <xmx:TcMNZsSo7PaGRkdKyfCOrEEhQYGxMzdS9B_wky1316eTKOsQGv_gzg>
+    <xmx:TcMNZsy3V4u7Ht2CEsSf1pQF8CxUAU3s06Fo95V0PBgEmgUVe73JZQ>
+    <xmx:TcMNZi4mcfwK233dblrueIHu9lqApYhCEdnUP2bH5oTQyYtwjBFpWA>
+    <xmx:TcMNZoDtsp2EnYCMaV-GyvV6o6vcniCi6pZD5YwF8kZEoqBIUsKE_tNZ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 251F5B6008D; Wed,  3 Apr 2024 16:59:57 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-333-gbfea15422e-fm-20240327.001-gbfea1542
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: skbuff: generalize the skb->decrypted bit
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- borisp@nvidia.com, john.fastabend@gmail.com
-References: <20240403202139.1978143-1-kuba@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240403202139.1978143-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Message-Id: <701f8f93-f5fb-408b-822a-37a1d5c424ba@app.fastmail.com>
+In-Reply-To: <20240327152358.2368467-20-aleksander.lobakin@intel.com>
+References: <20240327152358.2368467-1-aleksander.lobakin@intel.com>
+ <20240327152358.2368467-20-aleksander.lobakin@intel.com>
+Date: Wed, 03 Apr 2024 22:59:36 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Alexander Lobakin" <aleksander.lobakin@intel.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>
+Cc: "Yury Norov" <yury.norov@gmail.com>,
+ "Alexander Potapenko" <glider@google.com>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ "Michal Swiatkowski" <michal.swiatkowski@linux.intel.com>,
+ "Marcin Szycik" <marcin.szycik@linux.intel.com>,
+ "Simon Horman" <horms@kernel.org>, "Kees Cook" <keescook@chromium.org>
+Subject: Re: [PATCH net-next v6 19/21] pfcp: always set pfcp metadata
+Content-Type: text/plain
 
-On 4/3/24 2:21 PM, Jakub Kicinski wrote:
-> The ->decrypted bit can be reused for other crypto protocols.
-> Remove the direct dependency on TLS, add helpers to clean up
-> the ifdefs leaking out everywhere.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> I'm going to post PSP support.. as soon as the test groundwork
-> is in place. I think this stands on its own as a cleanup.
-> 
-> CC: dsahern@kernel.org
-> CC: borisp@nvidia.com
-> CC: john.fastabend@gmail.com
-> ---
->  include/linux/skbuff.h | 15 ++++++++++++---
->  include/net/sock.h     |  4 +---
->  net/Kconfig            |  3 +++
->  net/core/sock.c        |  5 ++---
->  net/ipv4/tcp_input.c   | 12 +++---------
->  net/ipv4/tcp_ipv4.c    |  4 +---
->  net/ipv4/tcp_offload.c |  4 +---
->  net/tls/Kconfig        |  1 +
->  8 files changed, 24 insertions(+), 24 deletions(-)
-> 
+On Wed, Mar 27, 2024, at 16:23, Alexander Lobakin wrote:
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+> +static int pfcp_encap_recv(struct sock *sk, struct sk_buff *skb)
+> +{
+> +	IP_TUNNEL_DECLARE_FLAGS(flags) = { };
+> +	struct metadata_dst *tun_dst;
+> +	struct pfcp_metadata *md;
+> +	struct pfcphdr *unparsed;
+> +	struct pfcp_dev *pfcp;
+> +
+> +	if (unlikely(!pskb_may_pull(skb, PFCP_HLEN)))
+> +		goto drop;
+> +
+> +	pfcp = rcu_dereference_sk_user_data(sk);
+> +	if (unlikely(!pfcp))
+> +		goto drop;
+> +
+> +	unparsed = pfcp_hdr(skb);
+> +
+> +	ip_tunnel_flags_zero(flags);
+> +	tun_dst = udp_tun_rx_dst(skb, sk->sk_family, flags, 0,
+> +				 sizeof(*md));
+> +	if (unlikely(!tun_dst))
+> +		goto drop;
+> +
+> +	md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
+> +	if (unlikely(!md))
+> +		goto drop;
+> +
+> +	if (unparsed->flags & PFCP_SEID_FLAG)
+> +		pfcp_session_recv(pfcp, skb, md);
+> +	else
+> +		pfcp_node_recv(pfcp, skb, md);
+> +
+> +	__set_bit(IP_TUNNEL_PFCP_OPT_BIT, flags);
+> +	ip_tunnel_info_opts_set(&tun_dst->u.tun_info, md, sizeof(*md),
+> +				flags);
+> +
 
+The memcpy() in the ip_tunnel_info_opts_set() causes
+a string.h fortification warning, with at least gcc-13:
+
+    In function 'fortify_memcpy_chk',
+        inlined from 'ip_tunnel_info_opts_set' at include/net/ip_tunnels.h:619:3,
+        inlined from 'pfcp_encap_recv' at drivers/net/pfcp.c:84:2:
+    include/linux/fortify-string.h:553:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+      553 |                         __write_overflow_field(p_size_field, size);
+
+As far as I can tell, the warning is caused by the
+ambiguity of the union, but what I noticed is that
+it also seems to copy a buffer to itself, as 'md'
+is initialized to tun_dst->u.tun_info as well.
+
+Is this intentional?
+
+      Arnd
 
