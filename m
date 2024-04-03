@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-84235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90391896213
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:40:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D25F9896215
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:40:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B87B71C23577
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:40:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 885361F251EA
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466131429B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7305117995;
 	Wed,  3 Apr 2024 01:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXQc5DHq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lE+6ZRD0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8DE134BD;
-	Wed,  3 Apr 2024 01:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B3814F70;
+	Wed,  3 Apr 2024 01:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712108435; cv=none; b=U2XO7Re6St90XfkB3B6pxyEyp+rB+SXKnDwpw2kfvg9Tu0/+Xf6/FKrWz+gZaXUKrUVtYznspWvaUBaN1NNX37cM3g/fuXAa3CRA3bIM9G9Qo4duzHGHL/dC9L79OByqxEnJs0D4LfO2DaUeUibctQWL2ioIfUTmXRYdnsMG71E=
+	t=1712108435; cv=none; b=rNN7tVF/gdRFF88OYlDeVW9PhwSlFKZX5ooAgylkVKNW5CMj1ysKzYn+53ox6oCtvThRfi7Ed6DwUq8aZG5dKCCrFEc1GtA2YYs6JSqYadIHTPhlDH4OFCSbRBZZT1tvBGjgLdZzF+Dk0mSoE+kmmecYHoS8pHxvzUK7kmel6xY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712108435; c=relaxed/simple;
-	bh=0Guk15rTeTaTnMan0dmZnNapSaQTVXV+GiqMbsxmXPc=;
+	bh=TtYpX5o1SaCeDSwJWpxTFrJL0tn5JioRilj/w9tPs0k=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pAPx7oGIayKBgPnDr2MW1GJvOGMp6nK+Mb7WGLm6dXVwtvoTCKenqL3WEHEqLkgBkDUhIHA4K6Va5nOKiVE21KaVnIKNeNerTmJ/nutCIOYdlaEGl2PqZY935+sVVjlS27BeazmjfcIsChcWcovaN7zRZqtIe3+Es4OzFrXdKmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXQc5DHq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E0F05C43330;
+	 In-Reply-To:To:Cc; b=SLFDXSpQSva6frDH+GAOrlc29DkCTNKyiwNh20t1OCMq8DRr4cJ9OPhvbWHhYMI6viA5oJQApJkQ/+Nq3LyhSwp7mKAambiTWweg7M4P8+o7jb4GM+eLn/AUMDSfPUuDFPs1XbhGCUtuY8eK4HGNdksxhcu5rRvb+9RoAXSsFlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lE+6ZRD0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C8489C43394;
 	Wed,  3 Apr 2024 01:40:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712108434;
-	bh=0Guk15rTeTaTnMan0dmZnNapSaQTVXV+GiqMbsxmXPc=;
+	bh=TtYpX5o1SaCeDSwJWpxTFrJL0tn5JioRilj/w9tPs0k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fXQc5DHqHllgjJagFJQ9CHrsyuAjJ8i4CwpRCcDCdkI+Hvr6qfA6ohfw9dfsg66RW
-	 6BPfxWIhrJ7y7k/kANA4M99cUC3kiB4hM7hxr+yEj/wfNdgOxjkjXO4Spqq7urBmVJ
-	 kWVoSu013hG6YBVHAvtRP6BoN/SUZPAvoCl/olFVbqESRer6n31ki1QJ9AXwftvg5K
-	 A5bCd0txXajbd1AiXCN9bvWSn9uwaRRkDCtDRSDuvSbggbz+WuRygOSAyj8fhRmKBR
-	 9w+CKeUVYdD4WYU15pECicwdsBLURfZE4yE5eN9ilbW1pVHpPEd5nbLQhMn2HzNNK9
-	 zn4DimxTtB9kg==
+	b=lE+6ZRD0dWzfaeAvzxDV2/1WLyzDaNgfMguytYcWTSGpfSUrDCp8AaVhcWErYDnpc
+	 m6LYqaLXUfXtfF18ozyS8YBpqb77WnXNR7lFFdpoMAwiRJT0SZm7d6rkpxyxanByUN
+	 cel0mjsTVUNlpoiweQ5/xE+ufsZs9yl55/0xpyGt8JUlm1EBXHaY2yCXjjrwvdMg1M
+	 XuPk61G/+Hoxes9JdAo7jhUEJ9i/e2RDXHB1LgrhIG8xEPh/3mZuchGJImzRpUqeYc
+	 l633z0meLaVny82w2SRg9Ay2e4hetlvuhlNosQuseeV4g0S0Cj/S65GrYpemQpD0Gd
+	 8+r0d6eYi4PdA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D3438D8BD1C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8B8FD8BD1B;
 	Wed,  3 Apr 2024 01:40:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] caif: Use UTILITY_NAME_LENGTH instead of
- hard-coding 16
+Subject: Re: [net-next PATCH 1/2] net: dsa: microchip: drop driver owner
+ assignment
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171210843486.14193.9711095226828920854.git-patchwork-notify@kernel.org>
+ <171210843475.14193.13174868089209942320.git-patchwork-notify@kernel.org>
 Date: Wed, 03 Apr 2024 01:40:34 +0000
-References: <8c1160501f69b64bb2d45ce9f26f746eec80ac77.1711787352.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <8c1160501f69b64bb2d45ce9f26f746eec80ac77.1711787352.git.christophe.jaillet@wanadoo.fr>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: rkannoth@marvell.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org, netdev@vger.kernel.org
+References: <20240330211023.100924-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20240330211023.100924-1-krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 30 Mar 2024 09:32:12 +0100 you wrote:
-> UTILITY_NAME_LENGTH is 16. So better use the former when defining the
-> 'utility_name' array. This makes the intent clearer when it is used around
-> line 260.
+On Sat, 30 Mar 2024 22:10:22 +0100 you wrote:
+> Core in spi_register_driver() already sets the .owner, so driver
+> does not need to.
 > 
-> While at it, declare variable in reverse xmas tree style.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> 
-> [...]
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  drivers/net/dsa/microchip/ksz_spi.c | 1 -
+>  1 file changed, 1 deletion(-)
 
 Here is the summary with links:
-  - [net-next,v2] caif: Use UTILITY_NAME_LENGTH instead of hard-coding 16
-    https://git.kernel.org/netdev/net-next/c/f9a4506438a1
+  - [net-next,1/2] net: dsa: microchip: drop driver owner assignment
+    https://git.kernel.org/netdev/net-next/c/a343eb0343e5
+  - [net-next,2/2] net: dsa: sja1105: drop driver owner assignment
+    https://git.kernel.org/netdev/net-next/c/ad6afdfc638a
 
 You are awesome, thank you!
 -- 
