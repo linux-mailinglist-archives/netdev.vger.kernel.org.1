@@ -1,154 +1,165 @@
-Return-Path: <netdev+bounces-84561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9EA089751A
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:23:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C1989752B
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 751AB28D6D2
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:23:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3F6C28E950
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2388814F9F8;
-	Wed,  3 Apr 2024 16:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9D814A0A2;
+	Wed,  3 Apr 2024 16:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="T+d+H1gL"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sAjrqesj"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B092E14F13F;
-	Wed,  3 Apr 2024 16:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD32814F122;
+	Wed,  3 Apr 2024 16:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712161393; cv=none; b=pxmRuKul+qmZAy1YggcsEbNFWP0C8EwXuQvuYfgmH49mfmfqyf/2g434YXmNAQLl/tQb6AXt1X9pC2O94lUU7YWQ4ptrsN2Ax4Wrka9xF92xdqZ9oU4BAHekBNHpWqZpXXjfdvZU6HVkYJOS+duYVhXsWrudhL91yAp3QCuDJDE=
+	t=1712161523; cv=none; b=cKN9TTT8jhL+740h6rFhAvItUP+ioKeWA4gm2MQfTGq+ZUCwPZDovF99Rr6+Ki7se9ma9BIgC8r96/Tkj707v+PPUAcgGyG0v2xfm990y3DaftR0MD9QJxYVMIxo41qYmTKFNopPKV0U98YXA+W6Din73GWZOdS93K04IDgHTaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712161393; c=relaxed/simple;
-	bh=4JxhJtzFlUJ7J6jhZOstSwknN6UF4hCbKXWi39bQteg=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=SXNMIk4ZtNTXmG35Pqb54kG/yskI1xWtDwhoy7sVHImpQFWocswEpM97NQFCgd14Da6xj0KlieyfzY+4r3ICcTZrED8s6yM6GpYApwZRr/iSlIf1Lj3MxE9XjufSi0Y0qx+Wfj5/0jw4303FXr+lRu1R4PzhvOFw+98yYzBtZ1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=T+d+H1gL; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from apais-vm1.0synte4vioeebbvidf5q0vz2ua.xx.internal.cloudapp.net (unknown [52.183.86.224])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 4E7BC20E8CB1;
-	Wed,  3 Apr 2024 09:23:11 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4E7BC20E8CB1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1712161391;
-	bh=r+IUSp/rqY0+2Xhato4K1hvCDcdMpatgTirLLrUCDeE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=T+d+H1gLPOQsaOBde3rNHlo3DBg6hOuFl3vtMo5jphW5zJiO7NyITjISjsejTQMjA
-	 FYJGC1KV0yw3ADX5HL3wukaiVxOh8V3+4mcFx+yDZC4R/BMZnTjGTlEXKBe7hOLOc1
-	 3KJo6FPXtms2VevW/Ggn1nlMSo9cO5x7uhJG6+M0=
-From: Allen Pais <apais@linux.microsoft.com>
-To: linux-kernel@vger.kernel.org
-Cc: tj@kernel.org,
-	keescook@chromium.org,
-	m.grzeschik@pengutronix.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH] archnet: Convert from tasklet to BH workqueue
-Date: Wed,  3 Apr 2024 16:23:06 +0000
-Message-Id: <20240403162306.20258-1-apais@linux.microsoft.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1712161523; c=relaxed/simple;
+	bh=M2KSxX/qzBohwPJ02hVjKtTS/u8IGLEnJlpOLc775+c=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=A4uFRn7AaCaSPnXdZuoAlQt2XCyqIexTOLALzFuOX8qsxVeg0HABotusZAqEfXgfyDMEgMSdi81hvMZzPXyQKXsvOSswQx7weSnB7u9qJXj4aZSx3zVrsX4gC/9pEwEp+vbQ5sEIRT/fsFMmCBfquI1S4+O2L5X7IisxvHD9MvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sAjrqesj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 433G2mnG017749;
+	Wed, 3 Apr 2024 16:25:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=UqaB+wRnNOYEb2m53SzDiYd2Jvl8mk/TbCmsEno9obA=;
+ b=sAjrqesjJ6yYZeiFMFjQW7W9xciDm/RAp2G44FYgyrNmsN74i9KhwHiFKZGvi+XZq39V
+ eUn4H96aidg69kGQWvz9UdlDYiNz5tVLnueLVGzyASv+scU0wWR7qW9r/CghFpxrD5ai
+ AOL01EG/FVBYwfoNH2y7XmRNqADoqlIxu6wUgy+a6f40p1318e15Mus+LGOVbGqcG9xa
+ gGxFeTNqvRt8/v14QV2flcmpHQrKfixx3Sn4wdTMrOJawZlXFyhsL41dutaEVBY/U6Ay
+ E27WUkn4sPhYtWug43OYjTR5p34ojzrUiWUeBwW0x1x1RKKE4KuhX6yklpUSL4md1Wt5 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9a9b02jr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 16:25:16 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 433GPGRJ023481;
+	Wed, 3 Apr 2024 16:25:16 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9a9b02jh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 16:25:16 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 433EwYjc025753;
+	Wed, 3 Apr 2024 16:25:15 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x6x2peegv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 16:25:14 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 433GP9PY25231958
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 3 Apr 2024 16:25:11 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1C71F20065;
+	Wed,  3 Apr 2024 16:25:09 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 02BE52004B;
+	Wed,  3 Apr 2024 16:25:08 +0000 (GMT)
+Received: from [9.171.60.51] (unknown [9.171.60.51])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  3 Apr 2024 16:25:07 +0000 (GMT)
+Message-ID: <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some
+ unsupported operations of loopback-ism
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com,
+        twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com,
+        jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org
+Date: Wed, 03 Apr 2024 18:25:07 +0200
+In-Reply-To: <20240324135522.108564-5-guwen@linux.alibaba.com>
+References: <20240324135522.108564-1-guwen@linux.alibaba.com>
+	 <20240324135522.108564-5-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: e-maJrEYK3CrbN1gUYBUw5wqMTnGJHjI
+X-Proofpoint-ORIG-GUID: y1xl521ypI8S9m31iHqSuVR8sDJBb3t1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-03_16,2024-04-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
+ suspectscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403210000 definitions=main-2404030112
 
-The only generic interface to execute asynchronously in the BH context is
-tasklet; however, it's marked deprecated and has some design flaws. To
-replace tasklets, BH workqueue support was recently added. A BH workqueue
-behaves similarly to regular workqueues except that the queued work items
-are executed in the BH context.
+On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
+> This implements some operations that loopback-ism does not support
+> currently:
+>  - vlan operations, since there is no strong use-case for it.
+>  - signal_event operations, since there is no event to be processed=20
+> by the loopback-ism device.
 
-This patch converts drivers/net/archnet/* from tasklet to BH workqueue.
+Hi Wen,
 
-Based on the work done by Tejun Heo <tj@kernel.org>
-Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
+I wonder if the these operations that are not supported by loopback-ism
+should rather be marked "optional" in the struct smcd_ops, and the
+calling code should call these only when they are implemented.
 
-Signed-off-by: Allen Pais <allen.lkml@gmail.com>
----
- drivers/net/arcnet/arcdevice.h |  3 ++-
- drivers/net/arcnet/arcnet.c    | 11 ++++++-----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+Of course this would mean more changes to net/smc/smc_core.c - but
+loopback-ism could omit these "boiler-plate" functions.
 
-diff --git a/drivers/net/arcnet/arcdevice.h b/drivers/net/arcnet/arcdevice.h
-index b54275389f8a..bee60b377d7c 100644
---- a/drivers/net/arcnet/arcdevice.h
-+++ b/drivers/net/arcnet/arcdevice.h
-@@ -16,6 +16,7 @@
- 
- #ifdef __KERNEL__
- #include <linux/interrupt.h>
-+#include <linux/workqueue.h>
- 
- /*
-  * RECON_THRESHOLD is the maximum number of RECON messages to receive
-@@ -268,7 +269,7 @@ struct arcnet_local {
- 
- 	struct net_device *dev;
- 	int reply_status;
--	struct tasklet_struct reply_tasklet;
-+	struct work_struct reply_work;
- 
- 	/*
- 	 * Buffer management: an ARCnet card has 4 x 512-byte buffers, each of
-diff --git a/drivers/net/arcnet/arcnet.c b/drivers/net/arcnet/arcnet.c
-index 166bfc3c8e6c..530c15d6a5eb 100644
---- a/drivers/net/arcnet/arcnet.c
-+++ b/drivers/net/arcnet/arcnet.c
-@@ -54,6 +54,7 @@
- #include <linux/errqueue.h>
- 
- #include <linux/leds.h>
-+#include <linux/workqueue.h>
- 
- #include "arcdevice.h"
- #include "com9026.h"
-@@ -424,9 +425,9 @@ static void reset_device_work(struct work_struct *work)
- 	rtnl_unlock();
- }
- 
--static void arcnet_reply_tasklet(struct tasklet_struct *t)
-+static void arcnet_reply_work(struct work_struct *t)
- {
--	struct arcnet_local *lp = from_tasklet(lp, t, reply_tasklet);
-+	struct arcnet_local *lp = from_work(lp, t, reply_work);
- 
- 	struct sk_buff *ackskb, *skb;
- 	struct sock_exterr_skb *serr;
-@@ -527,7 +528,7 @@ int arcnet_open(struct net_device *dev)
- 		arc_cont(D_PROTO, "\n");
- 	}
- 
--	tasklet_setup(&lp->reply_tasklet, arcnet_reply_tasklet);
-+	INIT_WORK(&lp->reply_work, arcnet_reply_work);
- 
- 	arc_printk(D_INIT, dev, "arcnet_open: resetting card.\n");
- 
-@@ -620,7 +621,7 @@ int arcnet_close(struct net_device *dev)
- 	netif_stop_queue(dev);
- 	netif_carrier_off(dev);
- 
--	tasklet_kill(&lp->reply_tasklet);
-+	cancel_work_sync(&lp->reply_work);
- 
- 	/* flush TX and disable RX */
- 	lp->hw.intmask(dev, 0);
-@@ -984,7 +985,7 @@ irqreturn_t arcnet_interrupt(int irq, void *dev_id)
- 						->ack_tx(dev, ackstatus);
- 				}
- 				lp->reply_status = ackstatus;
--				tasklet_hi_schedule(&lp->reply_tasklet);
-+				queue_work(system_bh_highpri_wq, &lp->reply_work);
- 			}
- 			if (lp->cur_tx != -1)
- 				release_arcbuf(dev, lp->cur_tx);
--- 
-2.17.1
+> =C2=A0
+> +static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int smc_lo_del_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int smc_lo_set_vlan_required(struct smcd_dev *smcd)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int smc_lo_reset_vlan_required(struct smcd_dev *smcd)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int smc_lo_signal_event(struct smcd_dev *dev, struct smcd_gid
+> *rgid,
+> +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u32 trigger_irq, u32 event_code,=
+ u64
+> info)
+> +{
+> +	return 0;
+> +}
+> +
 
+Just a pattern that I saw elsewhere in the kernel...
+
+Thanks,
+Gerd
 
