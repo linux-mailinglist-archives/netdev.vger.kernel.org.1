@@ -1,96 +1,281 @@
-Return-Path: <netdev+bounces-84471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E00897009
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:17:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A06897013
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:19:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F40B51C2638B
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:17:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 915E01F235EC
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3330D1482F3;
-	Wed,  3 Apr 2024 13:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7EB147C9C;
+	Wed,  3 Apr 2024 13:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8p0tUqj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jFQjMyaY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25FB141991
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712150231; cv=none; b=SPJhKJTIGO7AcxlJaK9pAkapLomPrxdJHYu7GVF6UWN7HCT2B3a5TCc07s52EffkCBxuSOuub+/tMV4Rf3E4roW32lxlUpEY6TV9RxgmkHyY5GgAa8antJbaM/9/DiWj7NzvQzlx9sm3LHNetVRA/4+fBPYY9ExYm2+ssp82QJs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712150231; c=relaxed/simple;
-	bh=bot/LqakO244Ke5ijpewUEVhIF8TPVQB8mcNvJ2IOvE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dtqQLY6OqDAQebIqJhafHiBRqk++lsMH22EmVHU5SJDk7UPvvl0XVP/ngu5THN5/KU8upi+8vR43KHEBJBH3pf0TpJSgVjXTEh5H1kZtODsJQ3ODv8P/rVxM5V1PCeboAQxUOA2o8p98Y1li+KmXlqsUbYUc1pg0bOzFT58O1e4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U8p0tUqj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712150228;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bot/LqakO244Ke5ijpewUEVhIF8TPVQB8mcNvJ2IOvE=;
-	b=U8p0tUqjhs+voy334+GtHwfJ73dPNsAHVKF4zbq7n4EgYp52aDx3gr530ycFO33+5IdFgg
-	06x+3e1lj8I9QsHRM3NjI2TCJVBtfxnSfQITl7YmQ3ybuLXJlI0xHBBOEm308XJ498y0NN
-	7aEcgJC0B0oNazOjIxzlYMwSonWftZ0=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-588-YK5XOmpXMaOJLF38S5V0nw-1; Wed,
- 03 Apr 2024 09:17:04 -0400
-X-MC-Unique: YK5XOmpXMaOJLF38S5V0nw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7C9DF1C631C0;
-	Wed,  3 Apr 2024 13:17:03 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.193.197])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CA260C017A0;
-	Wed,  3 Apr 2024 13:16:59 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: kuba@kernel.org
-Cc: dave.stevenson@raspberrypi.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	jtornosm@redhat.com,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3] net: usb: ax88179_178a: avoid the interface always configured as random address
-Date: Wed,  3 Apr 2024 15:16:33 +0200
-Message-ID: <20240403131654.344732-1-jtornosm@redhat.com>
-In-Reply-To: <20240402183012.119f1511@kernel.org>
-References: <20240402183012.119f1511@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C71D147C98
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712150340; cv=fail; b=MKUorxTvp+WCnsd8b4b8czYvcsd+itOuvcRsxdxoO6N0qtiot5r4S7VDzMNcnv79Mjfw+3SdOifytAcRqNQp1CKXBAPUn+g6hjCoPPbiij79QxERumaTIw4VvKvyY1FkTPCqQXBtScymLRxJtSXnyYsv5m89jVz/lEveX5bF+Bs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712150340; c=relaxed/simple;
+	bh=bDhopsS3uhH+PdjliQxnLc+wPm0/ZAdJlbbgysemq54=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Yn9IiW+Wp+E/KrHfpYfsLW1Y52BgTgt4KqkR5tIWnlqFC+K0ZL2SNtfL8ZH4RktX9WU8DcV/+rLC1RLvt+VRV275hYdwtBIFn1iv4sVEALJ+p6jo5Kh9m+Zwt7yNx8Nv1ZwDH5dIrwTy/ArfVZuUSeOCJ+e+AxkZe3OjHJ1SSx8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jFQjMyaY; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712150339; x=1743686339;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bDhopsS3uhH+PdjliQxnLc+wPm0/ZAdJlbbgysemq54=;
+  b=jFQjMyaYIFcYHyXOJIWv/QzxUhG52kVEk01U+nXb8RtrIL+Fys3egxSc
+   tagTIbMGZrPcdr3OTDFB5UsrTdDLirHl5TzXxUp2zq2XHSXb/cf9tBmbp
+   m/H3W3wOVn2s37dP+ZGOhYLgfDdblvxuNu5cC+m2+iCGb3P+4pnL/8G7T
+   kR+UOvv1TFldaQVWiiTEFxxeywTH7j+TJeZ/K6zUpYhygBRZKoA1Vn6x8
+   LHOHA0SI8cu4wE+AOoEu37hh8vgRN4NtTR3hRDnP2l9gaxLAcy6G5byOl
+   pcaxbbyqA1QC0LopUFLM45DuRYHy3G2m4Nepupf+l+1c2bELYUIypKGH9
+   Q==;
+X-CSE-ConnectionGUID: VNKP5VNyTZq3IRWnNNFflw==
+X-CSE-MsgGUID: dPLK4ZFjSDSa8etfXF2DjA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="24833889"
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="24833889"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 06:18:54 -0700
+X-CSE-ConnectionGUID: G/hNiWuVTuqledtB8HlWkg==
+X-CSE-MsgGUID: H24USYPrT0y9e34UgScm9A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="18393947"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Apr 2024 06:18:54 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 3 Apr 2024 06:18:53 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 3 Apr 2024 06:18:53 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 3 Apr 2024 06:18:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oA0yb4QxuzBcpOo8ViPbZPRhGfNb0ngyKcQst4gjhy/3nczaQj3oOd2skMQAHywDlboY4tV17k9gV3G8F3tmoK98uXXMGHz6/34Qv7RSRiThQzGxjLbbH7hyCVmcutVgJGOM9EtVn7HQQe7dZCp4YNYguJUejdRpwh5DqwJs15LbnM6W0Jpvtq3xrwFtDBZC5GmSfpTeHkode4JyVxQClpkDfKlJOYDDOGGn10Kf8fiZ9dR9t+9Jw8NAJ7TgpgAQRVn7zT+OC2QD7K8AkjlPL9ScW366v2oerZQEDHJR2+dyxDb/x1XWuG2X0NsfpxCZx8NHqycYgVgkgfRnX3iPjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v2C/+UGrs5cviYpqReX31fzO0UqRLmok4uSGDpQTjZo=;
+ b=GSxZIOxKjvPeJMLe32SZwrnqO937QnWluus3s151TB+Tgy6y7E/FBJMfYfgR/Tehrgh39K3625BVUKwVZSBFvPcbbhu5vkRb/wlrbhkiUzkwdchgUMKzrlMDNVhISxWt0hilJIZLortP7niDzfhePrvSbEzhXm4ORtq7sgFG4bC+efciqDoH6JFIpVT6ewHmPKtFRnsgw7zTQzTnQJZHL9c7pLQmz+3xhI96hoj7naxxiUUQcos56cE7a/6I/BLQajzrELRhyNdjvu/IO9UmkHjBA+jcKHQrJXEF92RcvJAJ5m7oRoRvkQLkOG+UCIfwmeMLiV/9q2ZkdldsrHJc6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by MW6PR11MB8366.namprd11.prod.outlook.com (2603:10b6:303:24c::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.25; Wed, 3 Apr
+ 2024 13:18:50 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Wed, 3 Apr 2024
+ 13:18:50 +0000
+Message-ID: <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
+Date: Wed, 3 Apr 2024 15:18:44 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <idosch@nvidia.com>, <edumazet@google.com>,
+	<marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
+	<kuba@kernel.org>, <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
+ <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
+ <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+ <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0011.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1e::23) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|MW6PR11MB8366:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0zUPHtPtixLSySU6We475w7IBxxzJNKnbGRrv0TuOWNjEvWByFHVNMmnLf95S66p7Lcb1s/9dQu+JBX/WzFa1SoB4xeQ5VdhKGWyGXuInY80BqzHFMG5F2le0JFiTPaZMeFSOKkvLb5jNKuJu7gmJ8Zs+c0VUSO1QZ92ZCifH+6IR+onJTxkOOY8IhEBjY9MteUwfn/CCDA/6IZ04+YCwzAq/9NvTtegQ5GHamlgX1VTjphFeZjyddRXkv2zaq98BPlIID8URqMjTuwWwuMUoU3r4AZ2vQtfG+9omCvEu0MXgUbfeLMcdKEqVFTnIJc0EUUYzSvQyQ3zc7i9SmEUnJu8gddT0kVr//CsS2eUTxV4hLsn0VAAIVmnMyfHf5jjjjr7rjn/zllXUAeAdm6tTgTA0VJOotksDJRXwTwqMDCbhMmwPlaf1JzzNKTOYQN/i5ehTbEWcIFoOHj0KSjpJjLnNQevbgvyGglZTShf0y4TidYR6/yXre5fXPM407//lO08f5YNXFhdwGUiPdfoktSwsVviYzWtodiRduDr6mjEgHMLl6O918XsuM65ad/+ss3DdAEzcfdIptPT6ohlTzFJaioXtHF83X406nPkX+s=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TUJ6UmhMVmhIY2N6d0djejZyY216WmZadCtWRmpzQUpoRHVOMmRNLzhlTXJZ?=
+ =?utf-8?B?WTBSSWoxRXk3K0VKalNiTUxzTkhUKy81VGoyclMvWXIvYXZaVXF4SGRoOHhh?=
+ =?utf-8?B?QW9FbjRtMWhFWlExanlnUkdRYnhFNVY0T2ZTRTc2dVRqdU9HY1U1STlyTXFo?=
+ =?utf-8?B?azlZZlBUM2dGakpwVW03WGt0bEFRZzB3TDNzS0k1QmFOUTd1VkovWU1iZTJG?=
+ =?utf-8?B?U05GZk8xaDdPS2lBUGVtZWFJSnEyS2hVaTFQdDJ0REdqcVUxODVpQkZ1Ui9K?=
+ =?utf-8?B?SFAxNjZNWGNBK3lMQTU2WTNhVG5WT3dkZHExZWlUUFdVYWlpSXExVVQzMUZy?=
+ =?utf-8?B?bUtGNGV4WjNNT2gxNURhMzhpSk1obzFHUnhXRmwxNWFIN2NKQlFJM1M0MDFF?=
+ =?utf-8?B?a00wTUMwMDNLMEw1Znh4aDRGSUVkS0VCOWpkQVdHVmZCb0I4cmxUOE9qKytu?=
+ =?utf-8?B?MzlQeUYxS3l2VGZ0L2ZuUEZrSDJoVnk1ZEpaYmFKaThCQm9PVjQ1bCtwWnY3?=
+ =?utf-8?B?ZHJYdE1vdUpqS2Zac01kZENLZkNsOWMwQkFNRnNwMDNMZEJ5YUNSTTRRVkJy?=
+ =?utf-8?B?SHF0d0xsemg3aTlOaE41UzFRZ1YrQjdVdk94UFAyQ1RTWEdpZktUS2JCU1hB?=
+ =?utf-8?B?SGJoa2wvcGdUUEVSY1NTSVNkYXNBeUhMZGwvVEJhbVgrbTh4UkQ3STlNZVBF?=
+ =?utf-8?B?a1NIbmRmeE5INmxLT3ZpZ1NaRmhRNkMzdzBhdGFsallYdkY0ZVptUDkxVER5?=
+ =?utf-8?B?VGJwSDBEaW1MWWJFWUhYaFRyVzBkSFhrWmhjY1pKQVV2WlR6T1JZQ1RvNCtZ?=
+ =?utf-8?B?OUc0bmV0Mm1RV3FMTFJ0V2xWdDUyMVVqMzFQZWJTRWZTYUNjc1ZKV0dJaXdV?=
+ =?utf-8?B?ZkQwRkhTeVJnZ3BTdnBKcW9nTWV1elZFODJuRCtiWDAxRVFlM2k4K1A3L0xo?=
+ =?utf-8?B?RUZaS1p1bEpHb2FxRVZabm5NYksrOVM1RnN3YVJ4WEQ0ZWdIL0lVWHY0RTdM?=
+ =?utf-8?B?eUNpOEpYZTVvL3NJdzhLMkVyRlVlV002YzhnK1pJbWo4Wm5odHliZE4yTnZB?=
+ =?utf-8?B?cDQwUHFORFJLMFRUb1g4RE51encrY2h0Z3ZqeE12dDd1MXliQy91TGdVUy90?=
+ =?utf-8?B?SU5XMEkxNDZ2eWdiazZTOE9hT2JuOGxGcHdob2dZa3ppNnJlTVpaV2M0NGhQ?=
+ =?utf-8?B?QjdNWGhrZDlILzlEaEFyTmtRWEdJRi9DcmM5YmphYmlvMDJCaDdjZC91ZmNn?=
+ =?utf-8?B?M24xT1pFbHk0cWp4TVNVeHV2MWVCZFowdWxDNTdiT05xT1ZQQ1FPZGE5NXBQ?=
+ =?utf-8?B?OVdBZWN5c2ZPMFJqbENieEVwY3I1aG5kdVQ1OE50d3IrNEtJVEpwRWNFQWxV?=
+ =?utf-8?B?dFZwRVhnd1hmNWNGZTdpbGNmdVM1dlg1SWVFVG8rWlF5ZzhpS3dkcndhbU1N?=
+ =?utf-8?B?YmE1SHJpb1grbnF6K1I1OEI2R2xObDcrUVErZk05QVp6L0pPNHZkNTMxcG1x?=
+ =?utf-8?B?WEp6Y1J2TCtwTHB6V2E0N0swT201anhzNFR6UTZNQjZJNE13TytNTDlvZnAr?=
+ =?utf-8?B?N3N2KzMwZjFsZHNYT04wYUhMQ1BsZWRpL201cHNxR1RJZ3c3ZDlYaE55SG1V?=
+ =?utf-8?B?WmVYYUdMTlpFNjROZFVwTnk4Nm9KN0gyTkpzM1lUUVk4RG8vci9WY2ptQUZp?=
+ =?utf-8?B?dzRFMU9iNWZaUVllb0h4MDhvcUMyQnc4QnRMUnMwcllIcDFuNHg3eWphRG8w?=
+ =?utf-8?B?a0RjODB4NlJ2VkVZNTQ5aWM3WHBhQVJoQ2czWUZVbjVQZ3F2S0FiY01PRlpq?=
+ =?utf-8?B?TkFsNi9Ed0dzNUg1SXVCQUJUVTlZeXJuSlZWZ00vaGZwN2pHeFNlb2VMbXZD?=
+ =?utf-8?B?SUpMRUNVNDY1Vmt1Z2J2NTVHd1ZxM0U1RSsvK3NCTHZPN3ZrcTcyeUQ3YWEz?=
+ =?utf-8?B?Tlk0YjNPbnFEMFNUcUlZRFNqUW02Uis3dW43Zit3Y0M3SlBwNW1oRUlSMjYz?=
+ =?utf-8?B?ZXh2ZllpMlRTWStmc2FUQkVtMGF0dmp3SFlScFZiN3YvMU9ER0RJSDdaRm5M?=
+ =?utf-8?B?dzhqdmNYdGVmL09pM1dDY3FKd0RYYWJUU2RTa3Z4OW53eXVzYmF0aFRYR243?=
+ =?utf-8?B?WEo1Q0h0YlM5TXZIeEduVmNTSTRVVkIrS2tHMVdOQzhCc1gyZ2kyeVFCWFFW?=
+ =?utf-8?B?cUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc035e87-8ba3-4473-436a-08dc53e099c4
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 13:18:50.0732
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: y5Iwac/4wUd3BGRgXJUYVqPg0GbhQrgjaoQwxq1CxB0idlO0bI8o0fmo+H/h+tWwWXR0nwTsxzLgeWMNPcbv0EIjGXxsQUscwB1a+E9h6rw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8366
+X-OriginatorOrg: intel.com
 
-Hello Jakub,
 
-You are right, good catch.
-For all the cases, the mac address is going to be stored in the chip registers just in case (original behavior), and if the mac address was invalid the first time, a random one will be stored, so that when the mac address is read again from the chip registers will be a locally administered address (random).
-I will complete as you say.
 
-Thanks
+On 02.04.2024 16:46, Andrew Lunn wrote:
+> On Tue, Apr 02, 2024 at 01:38:59PM +0200, Wojciech Drewek wrote:
+>>
+>>
+>> On 30.03.2024 22:57, Andrew Lunn wrote:
+>>> On Fri, Mar 29, 2024 at 10:23:18AM +0100, Wojciech Drewek wrote:
+>>>> Some ethernet modules use nonstandard power levels [1]. Extend ethtool
+>>>> module implementation to support new attributes that will allow user
+>>>> to change maximum power. Rename structures and functions to be more
+>>>> generic. Introduce an example of the new API in ice driver.
+>>>>
+>>>> Ethtool examples:
+>>>> $ ethtool --show-module enp1s0f0np0
+>>>> Module parameters for enp1s0f0np0:
+>>>> power-min-allowed: 1000 mW
+>>>> power-max-allowed: 3000 mW
+>>>> power-max-set: 1500 mW
+>>>>
+>>>> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
+>>>
+>>> We have had a device tree property for a long time:
+>>>
+>>>   maximum-power-milliwatt:
+>>>     minimum: 1000
+>>>     default: 1000
+>>>     description:
+>>>       Maximum module power consumption Specifies the maximum power consumption
+>>>       allowable by a module in the slot, in milli-Watts. Presently, modules can
+>>>       be up to 1W, 1.5W or 2W.
+>>>
+>>> Could you flip the name around to be consistent with DT?
+>>
+>> Yea, I'm open to any name suggestion although I don't like the unit in the parameter name :) 
+> 
+> That is a DT thing. Helps make the units of an ABI obvious. However,
+> milliwatts is pretty standard with the kernel of user APIs, e.g. all
+> hwmon calls use milliwatts.
+> 
+>>>> minimum-power-allowed: 1000 mW
+>>>> maximum-power-allowed: 3000 mW
+>>>> maximum-power-set: 1500 mW
+>>>
+>>> Also, what does minimum-power-allowed actually tell us? Do you imagine
+>>> it will ever be below 1W because of bad board design? Do you have a
+>>> bad board design which does not allow 1W?
+>>
+>> Yes. in case of QSFP we don't support 1W, 1.5W is the minimum.
+> 
+> So if i plug in a 1W QSFP device, it will let the magic smoke out
+> because it is force fed 1.5W?
+> 
+> Looking at
+> https://www.optcore.net/wp-content/uploads/2017/04/QSFP-MSA.pdf table
+> 7 it indicates different power budget classifications. Power level 1
+> is a Maximum power of 1.5W. So does your parameter represent this?  It
+> is the minimum maximum power? And your other parameter is the maximum
+> maximum power?
 
-Best regards
-José Ignacio
+Exactly as you described, minimum-power-allowed is in fact minimum value
+which maximum-power-set can be set to (so minimum maximum). the other
+parameter is maximim maximum.
 
+> 
+> I agree with Jakub here, there needs to be documentation added
+> explaining in detail what these parameters mean, and ideally,
+> references to the specification.
+
+I completely agree, I'll include documentation in the next version.
+I see now that those parameters might look confusing, minimum-power-allowed
+is not true minimum in fact. We can try to came up with better names
+but it might get silly (minimum-maximum-power) XD.
+
+> 
+> Does
+> 
+> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
+> 
+> actually talk to the SFP module and tell it the maximum power it can
+> consume. So in this case, it is not the cage, but the module?
+
+It does not work that way in ice example.
+
+> 
+> Or is it talking to some entity which is managing the overall power
+> consumption of a number of cages, and asking it to allocate a maximum
+> of 4W to this cage. It might return an error message saying there is
+> no power budget left?
+
+That's right, we talk to firmware to set those restrictions.
+In the ice implementation, the driver is responsible for checking if the
+overall board budget is not exceeded.
+
+> 
+> Or is it doing both?
+> 
+> Sorry to be picky, but at some point, somebody is going to want to
+> implement this in the Linux SFP driver, and we want a consistent
+> implementation cross different implementations.
+
+No problem, I see that your points are totally valid.
+
+> 
+> 	Andrew
 
