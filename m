@@ -1,182 +1,117 @@
-Return-Path: <netdev+bounces-84276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D052E896439
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 07:47:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9A95896434
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 07:43:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E2B91F22CD9
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 05:47:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60E38282868
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 05:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C1F487B0;
-	Wed,  3 Apr 2024 05:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CF8487B6;
+	Wed,  3 Apr 2024 05:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NcesQ6EC"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pU/7X2fv"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2107.outbound.protection.outlook.com [40.107.102.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF54645;
-	Wed,  3 Apr 2024 05:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.107
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712123219; cv=fail; b=htRFVF9+SfU2Db/gVUL5IL1xE++9pj0TKVa6lz2Ew5ghlu54B8Q6NPL0W7Gk4RioZoSWa1veg+ugxcd9oqJqvNNp36kgVdv78YwHihmvkOCcMWpzjweuHSt5zxZD0DRIVVAsHOuF+rG/XyE5TDdNOkybz6XdsLFMoPvOuV3tSaI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712123219; c=relaxed/simple;
-	bh=OJudV+n1tKL2PiLEQo2+gi91BGv4SCkTWJstbzJUUVY=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=FLkmjJlifacFk3jisZCu7UH8gQgaZVCwmxNkZUHerkNHSA6qWOsZOOBScqmrd2Q4UBp6RBViK+Cn9rz18tzjMLZ5hAagQqGUq3vocXE6u6tmDhV7mchrj4nFRusivI+iqNIM6jCsbY4ifO6oYNvdkKERvghPQrGxb4o3z5KFjII=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NcesQ6EC; arc=fail smtp.client-ip=40.107.102.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KPScQHjuPfjPWoIxVRaV0q6ghXJLDXFI4zlHfgd41ZAvNS8u9FX/imcoUPLcnQ83W+szSU/Lg6QcXE5JjdmVxFcsFVZfxuCkcybyIOLQiIrBxcf9sLWsBhslWHwu8AU8ey8n0Y0Nb5HbtZKnbrsYkeM4kfAjwSriLEuTE3s2A/4YCgDYyH2BhQVJu2TGXBYEBRymLCkfn2fVP8TiiDJ1d6dSJn8C2WVtGCjTpLYmmpDgwyxiEcNVFfVYTGSip3KRhRXr6UgD7zBv4mi2TsqU2PXuBRrIv0pWTST8EB7eqGXgP22gyYv1AhUgWm4mijCadRHBOUFtjxc63+4LoanQFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZDLk5HZw+fSKx+VIXuFdhZN6iMwF9y+6ha0jWrUWf5o=;
- b=Y+1eFRaw5ngh4+CNwqTP5awAD0FsVzu73FLWPBzsOLfJRShFaJTxLmK7iIbFL5uLYPyVR2pUSt++oDaoffPOo7jdeTR1KiemzrlVoAs1yQUfUvrXsTvWB6Oy96sm3ODcbpOWK3L9XPXNZye+pQ/MOHdkFjo8LJ9ckKHuwcJh+Wgrpfyjw0Eybdqf/OaBl9SuZgRt3F/2njidm7IIK8NtbQCFEv6DGd7CUG8pfNKA1oJLNzFJ98v+FaErnGagJDaqtFE2u0l7V94d0JfssSsUNeGY5Ur5jKgajSkSFPCCrezHQpzU3mofyNNhP9Y/qji1nbYEgLk12p+qdo6n1JdHCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZDLk5HZw+fSKx+VIXuFdhZN6iMwF9y+6ha0jWrUWf5o=;
- b=NcesQ6ECrZiH20fyjxfrmIpitA+zPAlgjO57tFFDQr4GG4EW5IXqfQCInwpRR+hWjSLT6AZ1w97URVKWT3tW9iSSyzlaTKO4CgcegVpHlR+lCjoh1P7P7lRKVFL24lAS69jnRKNVKrJD7QDxLIn8t7XLkwy5JV9UPLr/MQzWRee0KoSm0reW4++HoqASY+G3rLrSooeB14hyN60zuUKpLs5CHxzZBbjzi5tJ8rLa0Fw88Daq9S/5WyaLJmb1Olg5++uAZB0wN9EjzQLS2QvnaHk9w5TUZjKQqK/hejfjc8XWoLrYCmGoeGOR8RM3sILWni+vAQcvUWrgkVlw0F8FeA==
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by DM6PR12MB4044.namprd12.prod.outlook.com (2603:10b6:5:21d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 3 Apr
- 2024 05:46:54 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7409.042; Wed, 3 Apr 2024
- 05:46:54 +0000
-References: <20240402205223.137565-1-rrameshbabu@nvidia.com>
- <20240402205223.137565-2-rrameshbabu@nvidia.com>
- <20240402191842.66decfd3@kernel.org>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, ahmed.zaki@intel.com,
- aleksander.lobakin@intel.com, alexandre.torgue@foss.st.com,
- andrew@lunn.ch, cjubran@nvidia.com, corbet@lwn.net, davem@davemloft.net,
- dtatulea@nvidia.com, edumazet@google.com, gal@nvidia.com,
- hkallweit1@gmail.com, jacob.e.keller@intel.com, jiri@resnulli.us,
- joabreu@synopsys.com, justinstitt@google.com, kory.maincent@bootlin.com,
- leon@kernel.org, liuhangbin@gmail.com, maxime.chevallier@bootlin.com,
- pabeni@redhat.com, paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com,
- rdunlap@infradead.org, richardcochran@gmail.com, saeed@kernel.org,
- tariqt@nvidia.com, vadim.fedorenko@linux.dev, vladimir.oltean@nxp.com,
- wojciech.drewek@intel.com
-Subject: Re: [PATCH net-next v1 1/6] ethtool: add interface to read Tx
- hardware timestamping statistics
-Date: Tue, 02 Apr 2024 22:14:38 -0700
-In-reply-to: <20240402191842.66decfd3@kernel.org>
-Message-ID: <87r0fn2e2b.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BY3PR05CA0018.namprd05.prod.outlook.com
- (2603:10b6:a03:254::23) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E7F2EB11;
+	Wed,  3 Apr 2024 05:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712123033; cv=none; b=KD1dk062c2LxL3Xl3aZf0fkMd8bBaVRVQfq4d1AMmr7Xeg7vKRLqkmqu4N8Y+xOHuqASPLFnwBzXGHzisCOnd43yAaCx1E0ZPAs1+zBL6HV758W7j4RknTa/rmWMiXDGJU5b5jtKESOW8iIoMTccDEeORsk8uwn8KP28JqzpWlI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712123033; c=relaxed/simple;
+	bh=Y2dZrNHPEhX+7//ljANF7dpLKPXIOdtiPvLZj5EPB4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZQdwlPbjMNHLyundHGQt6PLasyJ7RunXJwgfZv6V0wF7FAtmhwgpuOJJNN0ZCjvxeO/AN3Vivlf46b1mwhXi2o84GcF2RgpjtXZBVJ4hVImWoGd2qdSLlMc4zClXRVGgOoqeXNqB6ZpQYH1CS+lRds7f089KN5r80LyEw6Z5sIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pU/7X2fv; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 32B7E20E8C9A; Tue,  2 Apr 2024 22:43:51 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 32B7E20E8C9A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1712123031;
+	bh=eqr6ryp++wtR9G70yZFoMfybz5D1BNUxJE3/T3jBuO4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pU/7X2fvQfV6xZ5FUwDBlbCukAKuKLO6HMZZqOHyPAFCQMlq4d8vTYehFu3q+Uxtx
+	 Q2iineBG0ODQCg7cNt4Z670QJf3Q/TIbGt3pPs9N18lb7JM4hjb17XiiWPvmXc5UE4
+	 /YCzfGdSlqEnNXH9mHIWKnf26/hmfrNCYHZdIcWw=
+Date: Tue, 2 Apr 2024 22:43:51 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Alireza Dabagh <alid@microsoft.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+	Michael Kelley <mikelley@microsoft.com>,
+	Paul Rosswurm <paulros@microsoft.com>
+Subject: Re: [EXTERNAL] Re: [PATCH] net :mana : Add per-cpu stats for MANA
+ device
+Message-ID: <20240403054351.GA18633@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
+ <20240307090145.2fc7aa2e@kernel.org>
+ <CH2PR21MB1480D3ACADFFD2FC3B1BB7ECCA272@CH2PR21MB1480.namprd21.prod.outlook.com>
+ <20240308112244.391b3779@kernel.org>
+ <20240311041950.GA19647@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20240314025720.GA13853@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20240314112734.5f1c9f7e@kernel.org>
+ <DM6PR21MB14819A8CDB1431EBF88216ABCA292@DM6PR21MB1481.namprd21.prod.outlook.com>
+ <20240314120528.1ac154d1@kernel.org>
+ <SA3PR21MB39636B2DBFA00CFE3AD84845C1292@SA3PR21MB3963.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DM6PR12MB4044:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	pkpZMeGS9rxC1AkjYwpnuYgc9r6LxhN3+HZqdyGZHiu5HIDOkMDw/jaXkv1/cl01twrYJ+7+o4c5fTlV5GiP8f5khyQXpqM4WTK+tMc5kv82naI2pkZ3uLoNLaiWrv1HcK6ZcaDza2aYyEwwuwWuR17iLLNY4POyvfe/ME9v2h/sfczqm0UnY23JRDvAJp8MgLf9VoA9dYGsouOeeqFv6CSipkDB/jOz/+SnPgvWxGBSgAAQQf584UG9mDV8ol6J7v4/Y6JRq9O5upIOf8KfpxidLO52IlDoD1v/y4ATcREi8UBPxCGGgzrw3rvvBy9/TiNqLre0FNveKzjkw6iPVU5ZwCwh4JRSxAmdUnqpje9s45SXH3iPO98A9GKj/SeZJZnoRguFH9XDo5+gjQf3e4cejF+N/RdRwe8V2dzl2Oxn/DOdxAXuE+9O3WuHJsVoPA0muCQ7O75NWoqhyneGwxs8RuR6ZLBWD7FWoQwmxfTD53bAS6sKAOmXsqnkHD6pr9EjyOpnySNp01N3a3yd9xCHaKCEzArXLsixBcFqEQAPnqc7VtV+61OBkjEchHhAdXOzQkbhlZPCOU32fZ7cMfuQKZCuteVKlXkUQQ3lmzhFWQIeyn/pMxk4vxEoCDQ8tgFjy6o6zpbCC9aA8/R1mRYWxSl0mZoiJZxs07C4BRg=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(376005)(1800799015);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JJ7xOmvuUZQ2fv6IPHu7mllDxAPhOUEbVo5nxUud3LjspBKeozBwaFsVpg9E?=
- =?us-ascii?Q?ZC1aj5kZf39XiwH4gbJFcJ+LOWZpHdTkvIG4uhQoIbXUzlFmIRZfOzljcSeH?=
- =?us-ascii?Q?wmVy9J5DtFnjl4aFe6DZHPpMi4ihm6k+6Fcd4zsVErhYyLREzkHnqmFYTr1P?=
- =?us-ascii?Q?+NS4onu+JR2PpJ1pQnn+Gl3Vw5MBB1lj/c2O+mkHXOoT1Z0JZxgX5A3WSW0A?=
- =?us-ascii?Q?twNXSwJsqXAi3QgLWsT46QjENJfDMN6vly59eSLlHLEDnhrlScgaCp1aKzi9?=
- =?us-ascii?Q?b2TqTQ+Rx1zbTPG09HbEY+bItMrS9o1eOrjVPq+9qLEwD1MwA7MzDhLtLtVK?=
- =?us-ascii?Q?06msDmpsCxNJ4Pu/vRSEOQI1/cJcStHZap+/3TlWyMhmCtGrhp+w1BOUrxMa?=
- =?us-ascii?Q?ztOOhukEzEmlUEBM0Ua6ahLsXp8Lgoe2dFnbq08/Aj/O6FRh86cEvVVvti7d?=
- =?us-ascii?Q?LEftBW4Pj7cQj0PJ+czm2X/xKVykDkQViElWKTm8ex3oY7qFTFkjPzjdHW38?=
- =?us-ascii?Q?TpXMvDFaN4xMi//ZkvEyb51wAInFqhKh542ZnD7gb75rL5R7Vrq/ZZWhOv7u?=
- =?us-ascii?Q?l1NQLYyoIu0VmRpoJPeayZv/IhoK8J3WJ66PmMXBa3S4zHn6NyogoaioHADg?=
- =?us-ascii?Q?cFbAwfh7zCbsL3Vu45Pwoh8EawD8Scg+BbKuL6xT9zYNNDNSVnXommuSqw4k?=
- =?us-ascii?Q?hj4q/h5WAoV/P8dYx+ZV9dVxel8BxRxSbJYrbkQTR5tk9YdrmOXdvnVptAK1?=
- =?us-ascii?Q?0oMy07baNXNfCipZYsq/igO+NdeTu2DYxxtyXW43wibQFzEO0rrVOsjOlJUq?=
- =?us-ascii?Q?pEDKaKEofPJIZmnMekgk5x7buiFYjwoKDLAn/CnldoUTZWwDTqFkybhdsjtT?=
- =?us-ascii?Q?67lQZt0eHRhyvqKkxPLWrBBPrjav5ET7VeeYYgcroIedURhcWRJB150fER0g?=
- =?us-ascii?Q?0XhUOR8bKO316r8rZAKMjsEYM9ZcU8ookg4RywArjgbuYZSSqnxShnhslqIF?=
- =?us-ascii?Q?39smW4/eLOMa70LAMOdPL2M14PQqBtWPF8mmOoB6kJ0KQBhGA3ovdQRLjXQl?=
- =?us-ascii?Q?Kb+eNdYJWIMnYwJa+Yp2uKoPrLGttRBXWEiEEV3IR40VZM5H5zbwGWKX2btY?=
- =?us-ascii?Q?5L9+FVeEtcSwBdPdhhnm9RuUCIKy1mOMkTdwiJgOVXqZS2wl4woeuvwnALmq?=
- =?us-ascii?Q?2x1whM+sxBwE6YRe3kupaR3qqu8c/IL7pt33TzAqruhwiRVhazx8jgyMva72?=
- =?us-ascii?Q?PTD7v1RWs2oUaF1q8c0gVZU2qCnEIUNMhFwS/lWMa6PEMlUK8R3O8joxjeHv?=
- =?us-ascii?Q?5VVFpbhMVJNesUARrBdypzsRacGQvY9pMxCfKbOUCMfbwjlpobZknPy28gnv?=
- =?us-ascii?Q?cYUH5F1Rz8eo506uIMeURwP1dUspHuEEGEF6T0fo959PCF4mJpKDgLU29ML4?=
- =?us-ascii?Q?C3KPX7V80Roxe7QjI2Ms0IdsTA2WRdxnEhPwOwHY90uoBnLzy438AMbW/sQx?=
- =?us-ascii?Q?ZAbiG/UWqaS/6nEmqwe8hEDM/JAUWz8mdS5nNKuWmb2mhl4JQWcV1PZe9jM/?=
- =?us-ascii?Q?H5nJ4S3kXCt7bmGNo3N2u+pd5xC9L4X6ZV4iw5U1fZFXcs1tT1v7UXwtWcwr?=
- =?us-ascii?Q?Ig=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbbb3d8b-ed68-46ac-bc42-08dc53a17766
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 05:46:53.9310
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CXsOx7T8CAoETY5ek3bsB2y2m0cFKsrqXO2MKzhj7mfBXok47xwXF5KU9ofddh+5JWjuGbWh8iPfmCZrDCDlJw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4044
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SA3PR21MB39636B2DBFA00CFE3AD84845C1292@SA3PR21MB3963.namprd21.prod.outlook.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Tue, 02 Apr, 2024 19:18:42 -0700 Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue,  2 Apr 2024 13:52:01 -0700 Rahul Rameshbabu wrote:
->> +/**
->> + * struct ethtool_ts_stats - HW timestamping statistics
->> + * @tx_stats: struct group for TX HW timestamping
->> + *	@pkts: Number of packets successfully timestamped by the hardware.
->> + *	@lost: Number of hardware timestamping requests where the timestamping
->> + *		information from the hardware never arrived for submission with
->> + *		the skb.
->> + *	@err: Number of arbitrary timestamp generation error events that the
->> + *		hardware encountered, exclusive of @lost statistics. Cases such
->> + *		as resource exhaustion, unavailability, firmware errors, and
->> + *		detected illogical timestamp values not submitted with the skb
->> + *		are inclusive to this counter.
->> + */
->> +struct ethtool_ts_stats {
->> +	struct_group(tx_stats,
->
-> Doesn't seem like the group should be documented:
->
-> include/linux/ethtool.h:503: warning: Excess struct member 'tx_stats' description in 'ethtool_ts_stats'
+Hi all,
+I have a newer version of this patch with netlink implementation ready, to support the usecase of per-cpu stats for RSS handling and imbalance investigations. Please let me know if we can proceed with that.
 
-Was looking into why our internal verification did not catch this. We
-run W=1 with clang, but looks like the warning does not get triggered
-unless explicitly run with scripts/kernel-doc.
+Thanks and regards,
+Shradha.
 
-  https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html#how-to-format-kernel-doc-comments
-
-I have debugged using strace that the way the kernel doc checking works
-when W=1 is set is that the matching source file that is being compiled
-is passed to scripts/kernel-doc, so include files are missed from the
-doc check. I think this is worth adding to the kernel documentation.
-
-Anyway, I will send out a v2 with this fixed but wait for potentially
-more feedback on v1.
-
---
-Thanks,
-
-Rahul Rameshbabu
+On Thu, Mar 14, 2024 at 08:01:24PM +0000, Alireza Dabagh wrote:
+> Per processor network stats have been supported on netvsc and Mellanox NICs for years. They are also supported on Windows.
+> 
+> I routinely use these stats to rule in/out the issues with RSS imbalance due to either NIC not handling RSS correctly, incorrect MSI-X affinity, or not having enough entropy in flows. 
+> 
+> And yes, I perfectly understand that there are cases that packets received on processor x are processed (in tcp/ip stack) on processor y. But in many cases, there is a correlation between individual processor utilization and the processor where these packets are received on by the NIC.
+> 
+> -thanks, ali
+> (some suggested that I do mention on this thread that I am one of the original inventors of RSS. So there you have it. Personally I don't think that telling people "I invented the damn thing and I know what I am talking about" is the right way to handle this.) 
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org> 
+> Sent: Thursday, March 14, 2024 12:05 PM
+> To: Haiyang Zhang <haiyangz@microsoft.com>
+> Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>; Shradha Gupta <shradhagupta@microsoft.com>; linux-kernel@vger.kernel.org; linux-hyperv@vger.kernel.org; linux-rdma@vger.kernel.org; netdev@vger.kernel.org; Eric Dumazet <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>; Ajay Sharma <sharmaajay@microsoft.com>; Leon Romanovsky <leon@kernel.org>; Thomas Gleixner <tglx@linutronix.de>; Sebastian Andrzej Siewior <bigeasy@linutronix.de>; KY Srinivasan <kys@microsoft.com>; Wei Liu <wei.liu@kernel.org>; Dexuan Cui <decui@microsoft.com>; Long Li <longli@microsoft.com>; Michael Kelley <mikelley@microsoft.com>; Alireza Dabagh <alid@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>
+> Subject: [EXTERNAL] Re: [PATCH] net :mana : Add per-cpu stats for MANA device
+> 
+> On Thu, 14 Mar 2024 18:54:31 +0000 Haiyang Zhang wrote:
+> > We understand irqbalance may be a "bad idea", and recommended some 
+> > customers to disable it when having problems with it... But it's still 
+> > enabled by default, and we cannot let all distro vendors and custom 
+> > image makers to disable the irqbalance. So, our host- networking team 
+> > is eager to have per-CPU stats for analyzing CPU usage related to 
+> > irqbalance or other issues.
+> 
+> You need a use case to get the stats upstream.
+> "CPU usage related to irqbalance or other issues" is both too vague, and irqbalance is a user space problem.
 
