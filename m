@@ -1,55 +1,59 @@
-Return-Path: <netdev+bounces-84340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0C79896A7D
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:27:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 330CC896AAC
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D28B91C24E76
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:27:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E8631F298F7
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3621473164;
-	Wed,  3 Apr 2024 09:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 367AF13443A;
+	Wed,  3 Apr 2024 09:29:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B01130A64
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECA013248C
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712136464; cv=none; b=fZiEyUAz0bPcFIOiUNnJiCfn+YvKvPJx8yskT5JBPC5EVkYrXZmA28xYvJH3+5EbxDsCOLmSOhVvG+3gyRSGn0BzpbSFYDvTKU+7W/08pqhxDXMqk2k1aFLTrkztjCzfrKUzm4/G4dMWXy0qmBWh8Gl3FRRyCj8u9BvtvzSQpRU=
+	t=1712136576; cv=none; b=YbW8wl6/PTEgE3RLxpuL+ZINnWoiRWssYBb1qGYvuUVV38x3baJxvayVU0XvPxV9tmSzovqyY1Sw7BVKAVigXPxSO6AQE4w5ACHNPAR4sfQg3vryHsguS5V/eDqzNokiQ0c5JXVgLNT9736Vwv6nJrLLVxllp/t8DQYtBDnHlWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712136464; c=relaxed/simple;
-	bh=uec4ow18waH5M96ioU8VUfQCXlDums/zztG2E9HoQrA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X38ue89pJRbJwy3EfD+9f/2kkQ4HKhpa8om8FHTSNLO8Zb7g26Z9cfKp7VbLM9EEHJvhGA44Q2rwogmcphcz4fp5wgkoPM6tfiy2K/ERJN4Ylrm2ZLe3uYedXDpIAm9+kNqVs/u43wjBfbB1YURB2LCr13IECWUoXU8Wqrsuoi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.169.211.239
+	s=arc-20240116; t=1712136576; c=relaxed/simple;
+	bh=5yo6OVv1estZvfaTiJ898X7nfzsC8QtzQYrWaSBMMqQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=TQRY1c6QOGdDLfpbmMRDN/lGKkevyKMN/mYdh4dXOnd4E0enuLq2VagRc4NGpNpExvtI/BFiWvu+GNPZOLa4d73DD5Zqx5jUjRaN29387OHeYTFdR6GJJ3ZUq5VV0ts1whpT39vnJrKspRdMnJGJKXLZ8+Zx8iTlRwh0LtsoKXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.206.34.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtpsz9t1712136447to25xxo
-X-QQ-Originating-IP: v3mObkiEjAbS4yRONsAtMVFiN9t5G6rw1jBdvifScnw=
+X-QQ-mid: bizesmtpsz9t1712136455tgz4mjo
+X-QQ-Originating-IP: wEusj2kEd5bwOHg5SSc1aCkfap4zrBY96O8G7dYwckE=
 Received: from localhost.localdomain ( [36.24.97.137])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 03 Apr 2024 17:27:17 +0800 (CST)
+	id ; Wed, 03 Apr 2024 17:27:29 +0800 (CST)
 X-QQ-SSF: 01400000000000O0Z000000A0000000
-X-QQ-FEAT: qcKkmz/zJhyozaVVHuszywMoYIUOG8nvNjDAGVbTM0FVQALAIXLxFS/h5Ifyk
-	dHkn0I+VRDcyphPAIfPgI4soypZUq6JxWtjtLFxLVJDwSPxY/ieP/Jn8NuFB8NAFAejgR+6
-	KentiBmfxeMR8B5L0PwDLrluQtwquYjGZq6A6GEvA5589XA7SLZnmYoiMSK6WqrpXquhmwU
-	t8BcHWa+19lzT4NYm1nCexvMUrqdK0U9Orx/rlqKk/Y6tza5NG85a2sjQt5KepQiZPytyt1
-	v2PkmYFaCsCxj99OxqOo4FnasQXze4X4e2DfT6g92QUU8MzVhwfS3bJSeZThuzQE77yGOWV
-	t1KKtHdt9Eo56D2skjG1u9F/6h1ikrVhAovebVOyS4Zc6Cx10BTtvNf6jmHkw==
+X-QQ-FEAT: mRz6/7wsmIj8IuQ0USroiKVSvpgWTMXFhD1jsxYUKqWgVcRN6C6K1fYvZSzkd
+	0yFQxVo4rN4BrIm6AEy6E4F7U7Vj+Suu2hMDMQcbikiwWLg6Z/e0ZpaCMV9B7FcllFird8N
+	hUwo7B3HXzfgOXdRnQqFpIpOuBwViLAHT07dmNaMi4GP0W0c2Bgsqwj/TZCEPNN68ZV9+i0
+	ZtGPaC7K4rrRpkli6hnz1hCEDKj9p0y0ecKGHPQCitpoozPszL6GC2bZNoI7ITOCW9p5ybK
+	Uz37C3uxyzdg++D5+mCrjzSIbMMsuIDqQvss3sWDlhuvI3D92quPzHDhW04ICjpi1Lo3QxN
+	sJqUKoojoMeQmby/MASgE3my06TR0A1YMnaM6I60aXWb6pYkxkLHLQ3AH6Fipwr+OMt/VTe
+	7cwgr5/rfdVvPVbUDY8A2A==
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 10791282922348215057
+X-BIZMAIL-ID: 6479117282517601362
 From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
 Cc: jiawenwu@trustnetic.com,
 	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v2 0/7] add sriov support for wangxun NICs
-Date: Wed,  3 Apr 2024 17:09:57 +0800
-Message-ID: <EF19E603F7CCA7B9+20240403092714.3027-1-mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v2 1/7] net: libwx: Add malibox api for wangxun pf drivers
+Date: Wed,  3 Apr 2024 17:09:58 +0800
+Message-ID: <2BC993D1F55BDEA4+20240403092714.3027-2-mengyuanlou@net-swift.com>
 X-Mailer: git-send-email 2.43.2
+In-Reply-To: <20240403092714.3027-1-mengyuanlou@net-swift.com>
+References: <20240403092714.3027-1-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,51 +64,287 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 
-Add sriov_configure for ngbe and txgbe drivers.
-Reallocate queue and irq resources when sriov is enabled.
-Add wx_msg_task in interrupts handler, which is used to process the
-configuration sent by vfs.
-Add ping_vf for wx_pf to tell vfs about pf link change.
+Implements the mailbox interfaces for wangxun pf drivers
+ngbe and txgbe.
 
-changes v2:
-- Simon Horman:
-Fix some used uninitialised.
-- Sunil:
-Use poll + yield with delay instead of busy poll of 10 times
-in mbx_lock obtain.
-Split ndo_vf_xxx , msg_task and flow into separate patches.
-
-Mengyuan Lou (7):
-  net: libwx: Add malibox api for wangxun pf drivers
-  net: libwx: Add sriov api for wangxun nics
-  net: libwx: Implement basic funcs for vf setting
-  net: libwx: Redesign flow when sriov is enabled
-  net: libwx: Add msg task func
-  net: ngbe: add sriov function support
-  net: txgbe: add sriov function support
-
- drivers/net/ethernet/wangxun/libwx/Makefile   |    2 +-
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  289 +++-
- drivers/net/ethernet/wangxun/libwx/wx_hw.h    |    3 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  146 +-
- drivers/net/ethernet/wangxun/libwx/wx_mbx.c   |  191 +++
- drivers/net/ethernet/wangxun/libwx/wx_mbx.h   |   86 ++
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 1244 +++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_sriov.h |   19 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  100 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   63 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   10 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |    2 +
- .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |   25 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   29 +
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |    8 +
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |    4 +-
- 16 files changed, 2192 insertions(+), 29 deletions(-)
+Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+---
+ drivers/net/ethernet/wangxun/libwx/Makefile  |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.c  | 191 +++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.h  |  32 ++++
+ drivers/net/ethernet/wangxun/libwx/wx_type.h |   5 +
+ 4 files changed, 229 insertions(+), 1 deletion(-)
  create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.c
  create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.h
- create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.c
- create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.h
 
+diff --git a/drivers/net/ethernet/wangxun/libwx/Makefile b/drivers/net/ethernet/wangxun/libwx/Makefile
+index 42ccd6e4052e..913a978c9032 100644
+--- a/drivers/net/ethernet/wangxun/libwx/Makefile
++++ b/drivers/net/ethernet/wangxun/libwx/Makefile
+@@ -4,4 +4,4 @@
+ 
+ obj-$(CONFIG_LIBWX) += libwx.o
+ 
+-libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o
++libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_mbx.o
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_mbx.c b/drivers/net/ethernet/wangxun/libwx/wx_mbx.c
+new file mode 100644
+index 000000000000..26842043630b
+--- /dev/null
++++ b/drivers/net/ethernet/wangxun/libwx/wx_mbx.c
+@@ -0,0 +1,191 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2015 - 2024 Beijing WangXun Technology Co., Ltd. */
++#include <linux/pci.h>
++#include "wx_type.h"
++#include "wx_mbx.h"
++
++/**
++ *  wx_obtain_mbx_lock_pf - obtain mailbox lock
++ *  @wx: pointer to the HW structure
++ *  @vf: the VF index
++ *
++ *  return SUCCESS if we obtained the mailbox lock
++ **/
++static int wx_obtain_mbx_lock_pf(struct wx *wx, u16 vf)
++{
++	int ret = -EBUSY;
++	int count = 5;
++	u32 mailbox;
++
++	while (count--) {
++		/* Take ownership of the buffer */
++		wr32(wx, WX_PXMAILBOX(vf), WX_PXMAILBOX_PFU);
++
++		/* reserve mailbox for vf use */
++		mailbox = rd32(wx, WX_PXMAILBOX(vf));
++		if (mailbox & WX_PXMAILBOX_PFU) {
++			ret = 0;
++			break;
++		}
++		udelay(10);
++	}
++
++	if (ret)
++		wx_err(wx, "Failed to obtain mailbox lock for PF%d", vf);
++
++	return ret;
++}
++
++static int wx_check_for_bit_pf(struct wx *wx, u32 mask, int index)
++{
++	u32 mbvficr = rd32(wx, WX_MBVFICR(index));
++	int ret = -EBUSY;
++
++	if (mbvficr & mask) {
++		ret = 0;
++		wr32(wx, WX_MBVFICR(index), mask);
++	}
++
++	return ret;
++}
++
++/**
++ *  wx_check_for_ack_pf - checks to see if the VF has ACKed
++ *  @wx: pointer to the HW structure
++ *  @vf: the VF index
++ *
++ *  returns SUCCESS if the VF has set the Status bit or else ERR_MBX
++ **/
++int wx_check_for_ack_pf(struct wx *wx, u16 vf)
++{
++	u32 index = vf / 16, vf_bit = vf % 16;
++
++	return wx_check_for_bit_pf(wx,
++				   FIELD_PREP(WX_MBVFICR_VFACK_MASK, BIT(vf_bit)),
++				   index);
++}
++EXPORT_SYMBOL(wx_check_for_ack_pf);
++
++/**
++ *  wx_check_for_msg_pf - checks to see if the VF has sent mail
++ *  @wx: pointer to the HW structure
++ *  @vf: the VF index
++ *
++ *  returns SUCCESS if the VF has set the Status bit or else ERR_MBX
++ **/
++int wx_check_for_msg_pf(struct wx *wx, u16 vf)
++{
++	u32 index = vf / 16, vf_bit = vf % 16;
++
++	return wx_check_for_bit_pf(wx,
++				   FIELD_PREP(WX_MBVFICR_VFREQ_MASK, BIT(vf_bit)),
++				   index);
++}
++EXPORT_SYMBOL(wx_check_for_msg_pf);
++
++/**
++ *  wx_write_mbx_pf - Places a message in the mailbox
++ *  @wx: pointer to the HW structure
++ *  @msg: The message buffer
++ *  @size: Length of buffer
++ *  @vf: the VF index
++ *
++ *  returns SUCCESS if it successfully copied message into the buffer
++ **/
++int wx_write_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
++{
++	struct wx_mbx_info *mbx = &wx->mbx;
++	int ret, i;
++
++	if (size > mbx->size) {
++		wx_err(wx, "Invalid mailbox message size %d", size);
++		ret = -EINVAL;
++		goto out_no_write;
++	}
++
++	/* lock the mailbox to prevent pf/vf race condition */
++	ret = wx_obtain_mbx_lock_pf(wx, vf);
++	if (ret)
++		goto out_no_write;
++
++	/* flush msg and acks as we are overwriting the message buffer */
++	wx_check_for_msg_pf(wx, vf);
++	wx_check_for_ack_pf(wx, vf);
++
++	/* copy the caller specified message to the mailbox memory buffer */
++	for (i = 0; i < size; i++)
++		wr32a(wx, WX_PXMBMEM(vf), i, msg[i]);
++
++	/* Interrupt VF to tell it a message has been sent and release buffer*/
++	/* set mirrored mailbox flags */
++	wr32a(wx, WX_PXMBMEM(vf), WX_VXMAILBOX_SIZE, WX_PXMAILBOX_STS);
++	wr32(wx, WX_PXMAILBOX(vf), WX_PXMAILBOX_STS);
++
++out_no_write:
++	return ret;
++}
++EXPORT_SYMBOL(wx_write_mbx_pf);
++
++/**
++ *  wx_read_mbx_pf - Read a message from the mailbox
++ *  @wx: pointer to the HW structure
++ *  @msg: The message buffer
++ *  @size: Length of buffer
++ *  @vf: the VF index
++ *
++ *  This function copies a message from the mailbox buffer to the caller's
++ *  memory buffer.  The presumption is that the caller knows that there was
++ *  a message due to a VF request so no polling for message is needed.
++ **/
++int wx_read_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
++{
++	struct wx_mbx_info *mbx = &wx->mbx;
++	int ret;
++	u16 i;
++
++	/* limit read to size of mailbox */
++	if (size > mbx->size)
++		size = mbx->size;
++
++	/* lock the mailbox to prevent pf/vf race condition */
++	ret = wx_obtain_mbx_lock_pf(wx, vf);
++	if (ret)
++		goto out_no_read;
++
++	/* copy the message to the mailbox memory buffer */
++	for (i = 0; i < size; i++)
++		msg[i] = rd32a(wx, WX_PXMBMEM(vf), i);
++
++	/* Acknowledge the message and release buffer */
++	/* set mirrored mailbox flags */
++	wr32a(wx, WX_PXMBMEM(vf), WX_VXMAILBOX_SIZE, WX_PXMAILBOX_ACK);
++	wr32(wx, WX_PXMAILBOX(vf), WX_PXMAILBOX_ACK);
++out_no_read:
++	return ret;
++}
++EXPORT_SYMBOL(wx_read_mbx_pf);
++
++/**
++ *  wx_check_for_rst_pf - checks to see if the VF has reset
++ *  @wx: pointer to the HW structure
++ *  @vf: the VF index
++ *
++ *  returns SUCCESS if the VF has set the Status bit or else ERR_MBX
++ **/
++int wx_check_for_rst_pf(struct wx *wx, u16 vf)
++{
++	u32 reg_offset = vf / 32;
++	u32 vf_shift = vf % 32;
++	int ret = -EBUSY;
++	u32 vflre = 0;
++
++	vflre = rd32(wx, WX_VFLRE(reg_offset));
++
++	if (vflre & BIT(vf_shift)) {
++		ret = 0;
++		wr32(wx, WX_VFLREC(reg_offset), BIT(vf_shift));
++	}
++
++	return ret;
++}
++EXPORT_SYMBOL(wx_check_for_rst_pf);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_mbx.h b/drivers/net/ethernet/wangxun/libwx/wx_mbx.h
+new file mode 100644
+index 000000000000..1579096fb6ad
+--- /dev/null
++++ b/drivers/net/ethernet/wangxun/libwx/wx_mbx.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) 2015 - 2024 Beijing WangXun Technology Co., Ltd. */
++#ifndef _WX_MBX_H_
++#define _WX_MBX_H_
++
++#define WX_VXMAILBOX_SIZE    15
++
++/* PF Registers */
++#define WX_PXMAILBOX(i)      (0x600 + (4 * (i))) /* i=[0,63] */
++#define WX_PXMAILBOX_STS     BIT(0) /* Initiate message send to VF */
++#define WX_PXMAILBOX_ACK     BIT(1) /* Ack message recv'd from VF */
++#define WX_PXMAILBOX_PFU     BIT(3) /* PF owns the mailbox buffer */
++
++#define WX_PXMBMEM(i)        (0x5000 + (64 * (i))) /* i=[0,63] */
++
++#define WX_VFLRE(i)          (0x4A0 + (4 * (i))) /* i=[0,1] */
++#define WX_VFLREC(i)         (0x4A8 + (4 * (i))) /* i=[0,1] */
++
++/* SR-IOV specific macros */
++#define WX_MBVFICR(i)         (0x480 + (4 * (i))) /* i=[0,3] */
++#define WX_MBVFICR_VFREQ_MASK GENMASK(15, 0)
++#define WX_MBVFICR_VFACK_MASK GENMASK(31, 16)
++
++#define WX_VT_MSGINFO_MASK    GENMASK(23, 16)
++
++int wx_write_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf);
++int wx_read_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf);
++int wx_check_for_rst_pf(struct wx *wx, u16 mbx_id);
++int wx_check_for_msg_pf(struct wx *wx, u16 mbx_id);
++int wx_check_for_ack_pf(struct wx *wx, u16 mbx_id);
++
++#endif /* _WX_MBX_H_ */
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 1fdeb464d5f4..f29ac955dc83 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -674,6 +674,10 @@ struct wx_bus_info {
+ 	u16 device;
+ };
+ 
++struct wx_mbx_info {
++	u16 size;
++};
++
+ struct wx_thermal_sensor_data {
+ 	s16 temp;
+ 	s16 alarm_thresh;
+@@ -990,6 +994,7 @@ struct wx {
+ 	struct pci_dev *pdev;
+ 	struct net_device *netdev;
+ 	struct wx_bus_info bus;
++	struct wx_mbx_info mbx;
+ 	struct wx_mac_info mac;
+ 	enum em_mac_type mac_type;
+ 	enum sp_media_type media_type;
 -- 
 2.43.2
 
