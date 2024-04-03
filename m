@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-84226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE2398961C3
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:10:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84B908961C6
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 03:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 688E9286BDF
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A9AE1C2208F
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 01:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D020D101C4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7FAFC01;
 	Wed,  3 Apr 2024 01:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5lvH2Ou"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q70d+SGw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEDC33E1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF10DDC9;
 	Wed,  3 Apr 2024 01:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712106627; cv=none; b=U/d/+T9qYdWVYO+GhVMEfikIExdw3WN3uqKalaYUBai6490ZCGdAOBlCDXXwgkLJAM8DEuIqJWoTb1np6S684wmzS0f84aLk2YgLm+dHvL+hw1xRFyCW7ns3FlEXGQNszKGHZiOUWpr1vd4BBV/Az7dug0ynn5psNe5o4BwaDOU=
+	t=1712106627; cv=none; b=NyF9otRDjzWo56e5ws9YhP8bh7XHCc1iIyVeFuZHENcaH2vWKxevqXNcn6dK5ZMk2+nUc5oEWIXG/uryOn7tZtuRdkSl5q4DrmzgRQ9W6hgd2qVHyErr9/LYykB7f1C/Haw1p4GeIFWXahz0RrvWsKO8EiOLbQoPcV0D6vpT+FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712106627; c=relaxed/simple;
-	bh=dkk2ExlSTHUphfpzLrcP16omhm4msZO9WjRy+h4BTyw=;
+	bh=KCnOBi74BlzNl2+FFa0fS0VuyU/hlw2By7Q//n5ToVU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=g2JaO/JDoTuK2XEQMnssuTHI5242JEGJrKgALj+Ojm94MWagA7sgBYa2uYnRAmbyYaKDEY/jSHNcWBulRmjiwlFDjgvhbcBlcgc/+nlw9Hc+1eL0zdDg0qAfcGNdu+aKxOurOWiEw86+RBn4b+n3qLpEcvpCsi4p1YMco/w+pkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5lvH2Ou; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 39F99C433F1;
+	 In-Reply-To:To:Cc; b=E0xNa5xkbqjf3Std/3YrEdjsekvFi21kVuRKSb8xJqTndffCWjfkBOQlb9VT51xRJCR41XU17+1LK/B8jeT3Ehy1gkUlZTmH0VdP9Wrry94VDKcnFIthN7Ox5IRzymmp2W5t9Dke7ictOx6YaVnjaaUu6+jjLoQFx2RaDfNLWLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q70d+SGw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 404C6C43394;
 	Wed,  3 Apr 2024 01:10:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712106627;
-	bh=dkk2ExlSTHUphfpzLrcP16omhm4msZO9WjRy+h4BTyw=;
+	bh=KCnOBi74BlzNl2+FFa0fS0VuyU/hlw2By7Q//n5ToVU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=e5lvH2Ouf4B45kQyE7fOi3c5jI48EjzS3Glsj6Bi9XgphvZxOdHK/9hO+L7ScqKm2
-	 mxTJXvRUby9tXo753/bDHG1d3Ex1jmnhhzirPj4lWKZ/LnPpACIvxHcRr6wW+A1wdP
-	 MMSe+kNlOc115gnEOMcw5KkRIdnZAi/ORDzR5xlLKkUsOeFL9DgV2pirgvDOgoIc3S
-	 WRecQ040a5A9pvE1dJAgzFMKe4uIfqFtTf6V1D0/d2XD/Gx/8MF5ndZVlVVFYmMy0A
-	 HSD5ikH7OeBbh98SbxNlr9a8eBrO/MZLumYjkMCyrVzjBK/+K1dLr2ga7Ib9hjZs8J
-	 wg8ujMsrjKiPw==
+	b=q70d+SGwrgF7L4DIKYOBolGftr93n7uidNS8QWaYW/OF/ySgsqXAvSK0i7fukXw+u
+	 C/W6veJu3bxvkSBCocluJS+Y2u3CxWuAiW9va9Z6AFucsV2N6kcTYNxUyKaGdNmKP8
+	 8QUbgTbSsW6GjfeoxyfRu1+Jb32+RU7Pe+rv/LqCmMwUyD/FR7Rh1F7oCuNKlGwr3i
+	 Ctpp/n+AcBnowxw29Ul2GcDjD5kPQTf7yZxGpbtAQgsRX6cDbfBY9pCOlGcROUED8j
+	 bls7G4KYWqLYFpMrgAiZ4ATxxwNC65DQX8kr7cDWtgSQo//n160NmKRIZsyZKXxFmv
+	 mCbleRxyc/AYQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 22BAAC4314C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2DF37D8BD1B;
 	Wed,  3 Apr 2024 01:10:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,44 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] vsock/virtio: fix packet delivery to tap device
+Subject: Re: [PATCH net v2] ax25: fix use-after-free bugs caused by
+ ax25_ds_del_timer
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171210662713.30217.16461640125861494356.git-patchwork-notify@kernel.org>
+ <171210662718.30217.1033477175371401576.git-patchwork-notify@kernel.org>
 Date: Wed, 03 Apr 2024 01:10:27 +0000
-References: <20240329161259.411751-1-marco.pinn95@gmail.com>
-In-Reply-To: <20240329161259.411751-1-marco.pinn95@gmail.com>
-To: Marco Pinna <marco.pinn95@gmail.com>
-Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ggarcia@deic.uab.cat, jhansen@vmware.com, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vge.kernel.org
+References: <20240329015023.9223-1-duoming@zju.edu.cn>
+In-Reply-To: <20240329015023.9223-1-duoming@zju.edu.cn>
+To: Duoming Zhou <duoming@zju.edu.cn>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hams@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, jreuter@yaina.de, horms@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 29 Mar 2024 17:12:59 +0100 you wrote:
-> Commit 82dfb540aeb2 ("VSOCK: Add virtio vsock vsockmon hooks") added
-> virtio_transport_deliver_tap_pkt() for handing packets to the
-> vsockmon device. However, in virtio_transport_send_pkt_work(),
-> the function is called before actually sending the packet (i.e.
-> before placing it in the virtqueue with virtqueue_add_sgs() and checking
-> whether it returned successfully).
-> Queuing the packet in the virtqueue can fail even multiple times.
-> However, in virtio_transport_deliver_tap_pkt() we deliver the packet
-> to the monitoring tap interface only the first time we call it.
-> This certainly avoids seeing the same packet replicated multiple times
-> in the monitoring interface, but it can show the packet sent with the
-> wrong timestamp or even before we succeed to queue it in the virtqueue.
+On Fri, 29 Mar 2024 09:50:23 +0800 you wrote:
+> When the ax25 device is detaching, the ax25_dev_device_down()
+> calls ax25_ds_del_timer() to cleanup the slave_timer. When
+> the timer handler is running, the ax25_ds_del_timer() that
+> calls del_timer() in it will return directly. As a result,
+> the use-after-free bugs could happen, one of the scenarios
+> is shown below:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] vsock/virtio: fix packet delivery to tap device
-    https://git.kernel.org/netdev/net/c/b32a09ea7c38
+  - [net,v2] ax25: fix use-after-free bugs caused by ax25_ds_del_timer
+    https://git.kernel.org/netdev/net/c/fd819ad3ecf6
 
 You are awesome, thank you!
 -- 
