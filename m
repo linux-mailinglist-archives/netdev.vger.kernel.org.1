@@ -1,146 +1,183 @@
-Return-Path: <netdev+bounces-84568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B935E897579
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:44:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5555897600
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 19:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72C9228621F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:44:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D97411C2128F
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5320B1514D2;
-	Wed,  3 Apr 2024 16:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31672152513;
+	Wed,  3 Apr 2024 17:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0GskreP"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KQs7uIFM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2074.outbound.protection.outlook.com [40.107.220.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923CB1B7F4;
-	Wed,  3 Apr 2024 16:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712162654; cv=none; b=CDHlBXcmPRoxxJMZbyn5VkACDhQ9TUWXXR1fqJmAvuYqfAOrxh+6nWk9q0LkSvUDORa7/ntY57CeNM79DLrbFQTcOHCTE2ELiaQeWLf8yxujw+Gv4zKEcD503q8LZPHmFh9acDj/+Wtn9gPYKd8w9hVBMvubd0dUYwNAfYW6GzE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712162654; c=relaxed/simple;
-	bh=M1neYOlhzngATdBbVyJaKe7fkRAK//9DrStR8GOcQu4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HZT2XFqARwF4Z+85DrgQGT9BNu/Qrhxwgl8kP7Kvm8wgPlOlU/6YaxP4O4hledGA1mkNbcaArPbCmwBNh874p01oMZ7M+zmfhwIFzX9WxPwNE6IJi2Zzcv3q9EeX9nmUg35ytnMDbJMJvOYA0YtYAitbeCsfo+gmgvjcjnhaH6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i0GskreP; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4da6995e58bso3887e0c.1;
-        Wed, 03 Apr 2024 09:44:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712162651; x=1712767451; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aej6QFoETxeFvbQm8/sOYYAdEcWAnghw/7Ynm8n0ucQ=;
-        b=i0GskreP3bhVFE7L+jTrP55NTeLGEOiadN1sTEIYfQZF05ZqD7aFwgcHEWZzggB27p
-         Iu9pSvcSJvv9ctMRtptjRYbadJq2t5PSTI2cbljCYV4c1eP3C39UqNHbXsHjXVWPgRF4
-         cUNtQf66y29Ij0Ux473Ma14olhaOmCPIXPj2UkCmSyIiiLfd/Et1NmcTyn3tZ2/5CroR
-         JGJgD9ELhuJW4HPsYoaybFcG5Or8NO7kPPs+wVFcewF/98zylX3MkbB9YRRmtZLed4a1
-         /rF+ytNHfDippVqXcj/p/3MB6p+36Kb2Su2g3ayZiSDGs4JicOJMXB6apxu1GA4my1On
-         wA5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712162651; x=1712767451;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Aej6QFoETxeFvbQm8/sOYYAdEcWAnghw/7Ynm8n0ucQ=;
-        b=e8yBpGhE0mKo3L6OmYGnR55qeIfLG1anmLG/C9J7ZN+3APLmsWh6CvVnaVCYsjCiAq
-         hrNtZxk5KKZnV09ovVAOzQxwB01QW0NNKc7ScDXWNxQ0zT+i61WPf/HwALGzRKQ/BiSX
-         2r2pgmwbGI+J8jma1PQLhQpFVG8uK0yJELN2QNQ/ZEPXA5GxeVSzqk/IdcBm3yahGwRn
-         oed2hqf8dr7V23Fc6MYt4JHlKRTXO29I5BVGoVp8dN9jWEDGfcCwZ82JN9BHBfYpLw+e
-         /dx+zr5qFizvfFylmLkqTFSlx5t4y2pg5rZFtWvn0zdGhdzMxA2/t5cd0Hlv5PzNvCJT
-         s8PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpasyVqxm4S9hgcbs8dUy8q6r+F+STTWmT6MCdat3oYYGFf+6rfr/8BT6yKy29uM1AbAIolt6SJh3lZYGu+DdYx9rzuUZiacHksRrNK21d6PVKAmcA2bpy1ts6Yz9bGXjhHCps2uWJIbPr/dVtNNfyydVyE+K1ucGwYnGAjdY8ancrFK+L0hNax/c1XJjskEYv0wHpLr3QYcYae0jP0AbcIV7ty92/ff7x1UVKg/DHrQ4m6vd6MPfODU9MtPOA44TG4uH72P9SYMTl8iJ2Ymh/B+II5LqiE8dVCoxE0cInMo7xr933GhgCTU9KJIPBF0gQ+pJTOetPWCfC4PSf48Ob4/F3T0jmLDQrzHEiBXzlQ9uOWnlsVOsi4UII2DcFQsmqCVxhtgxyxlHQxh8eD2L7lMlo4zNFCgiUX02hHGzwheLA4FNBh6P5J9lVZbQvfyrD8swvpZGH79BZRxgEksXawYvBHZWkIm5bDVqAJDXTaUbQfuH7mx3HADTE5vaD85KO48aJ4TNlbvfSjEfa2sFySReyB4JFNhSFbk7HS6ecFe8=
-X-Gm-Message-State: AOJu0YwxuG7mpFcprqH+unaPXUWhDi4M8kWHnrmwwEENz8OeMEG3DaYw
-	/CXUPwT+I6xRjhFEM44yzLJqF6NH9qPNdRXdt6gxeHK+bYkky7/7uoKKDbs7asmf72EjxBTb0AM
-	t1tSGUHKch652xWodKB7wWjUMX4s=
-X-Google-Smtp-Source: AGHT+IFEFFEcpcdQfCxRWJYlDuuUETZ0sWBciDlGUMCvLnJmEBIY1oP87nAaJSL5QQDatxb4oTnFcly4MrzzQ8OrF5o=
-X-Received: by 2002:a05:6122:499a:b0:4d3:b326:5ae8 with SMTP id
- ex26-20020a056122499a00b004d3b3265ae8mr10815788vkb.14.1712162651582; Wed, 03
- Apr 2024 09:44:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7397A152506;
+	Wed,  3 Apr 2024 17:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712164265; cv=fail; b=B7WkpKyiVt+WX2n3eCZ7NbzwkDaC1F1XSYpf+ozUu/XtI7ksnWLDEu25rbQgfbNDHCYLe63JzMObxT6rBjhhi6syfcS32Dd3FyG1m4Fn2xchL/OjI3w4II61ycgaF7J0suz+3rWcZK+qLXKLXbs0H7oXleigTJT7ZLkpPcwi/aQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712164265; c=relaxed/simple;
+	bh=5IWlBvI6ZNVu7Y/K8W7ArbnOjS2NWSEvVOz90rv0obg=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=uD8PDxKJqvSBq9MbtZpXAPvX8Wc/ipYgdD8WDU9CreU4tdSiRTtbmU+DF7ZF5QBcXOLxitFQAhtoLaaqRvIaXLjivAkvoh4g+2hj7tGtbEVWx0ITS8v2N3VsRZmFea6jVe7WOv3jBbG+bbCss8tbvf42llRawo0kVwXNIV6tqaw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KQs7uIFM; arc=fail smtp.client-ip=40.107.220.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PSKNkj5lPB0fHrSOam0t06CLngeMnN54J/4xOGCMgxYn4BUL+DtEPF6WK+O1cZW6ZDTa9ximS6rI/dSQ+evXzSFS3tzobi+w+An8yLkhJz9lLqEnnuO1NGtbi27BwObrNtGvSgGCpoRiBHC+QiQGVUINWVL6RGp2+EiHrcMFqmsqQ9Gk0YE9R7LnbwTRULGBCahyX5VXDcqYKEN7v5Q12zw5cC1243Stf2Y9yk/OPWs+uQu4KISGvRBwhS1yje0/mx3HooySEow8o1yBZuu0TtvSFGy7dbG3IESocjLnmDx/9A6FwDvgbLDaOfZvt28UU0aTkPVKc24nYab9e1yONg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rS7pSqlP5c9ssV6gIAA1Z/R9ayWSMktu58NJpybRZJY=;
+ b=YO3gKkVTn/x+AizgNfyMgzuBE+WKhTCS673ngMoWeidfSKBXbfigiEvNCeUZfR2imBedmWho9Hm5pWxec2djtr6Pb/u9+ctRiVmhkDTktb8AjyuFdFyqzc0iIl5SDvV1H4LcQjWqii+LSBTiZB6RRNuKCNcqoHcQ1eYEF0J6+kJ9WkdnBJQeoW3qloGYREC8uJAOVt12tvLFwCyihPlp1MP9QM8Iz3ypk4v61+1gP7Z0tAIqR9Z100IOokUs7yZag7AKrJNAeE9NiLWMKVnjl+X+Qc9nB/hzw/dQAbQjkSlWc58xQ4ow7h6a6JVhoDMTBsNry6Zy51a7qofjS7ji8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rS7pSqlP5c9ssV6gIAA1Z/R9ayWSMktu58NJpybRZJY=;
+ b=KQs7uIFMXLcr0JE3Jjc2zz+5cRiZqBg245U9QLk5FHIUdYAAZGj2JVYShC7HO4BZVSTBuFGG2Pclgv7/WdpygKyStrFh9/nS6xBt+xVG/GiitqQkM7HGD65qeMoCUKAqZUFt59aUiodz61CDBCqpQjUhhdP19RdoC+9JFZxlxttI+eMbPkNijLGN6WUkKjzqHeJfzqN199G6V6e9+YhS4LObDMeiSF+bXuH+3FMLyKFEbCPtCL1GRKA3vsVBz7+K3ajTnsj+RaVjwcxFMXMB2cBkXjOONtMUGv03sPp7IUbQRwfDi+jpItFss5CgLzCWBXj3wYXTmAKLqVUehBiERw==
+Received: from SN6PR01CA0019.prod.exchangelabs.com (2603:10b6:805:b6::32) by
+ IA1PR12MB6436.namprd12.prod.outlook.com (2603:10b6:208:3ac::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 3 Apr
+ 2024 17:10:59 +0000
+Received: from SA2PEPF00001505.namprd04.prod.outlook.com
+ (2603:10b6:805:b6:cafe::fe) by SN6PR01CA0019.outlook.office365.com
+ (2603:10b6:805:b6::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
+ Transport; Wed, 3 Apr 2024 17:10:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SA2PEPF00001505.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Wed, 3 Apr 2024 17:10:58 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 3 Apr 2024
+ 10:10:32 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Wed, 3 Apr
+ 2024 10:10:28 -0700
+References: <20240402010520.1209517-1-kuba@kernel.org>
+ <20240402010520.1209517-8-kuba@kernel.org> <87bk6rit8f.fsf@nvidia.com>
+ <20240402103111.7d190fb1@kernel.org> <8734s3idys.fsf@nvidia.com>
+ <20240402163649.4fdc2d3b@kernel.org> <87y19uhhhx.fsf@nvidia.com>
+ <20240403065532.1f2a072d@kernel.org>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, <davem@davemloft.net>,
+	<netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<shuah@kernel.org>, <sdf@google.com>, <donald.hunter@gmail.com>,
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next 7/7] testing: net-drv: add a driver test for
+ stats reporting
+Date: Wed, 3 Apr 2024 18:52:50 +0200
+In-Reply-To: <20240403065532.1f2a072d@kernel.org>
+Message-ID: <87ttkigynz.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240327160314.9982-1-apais@linux.microsoft.com> <20240327160314.9982-2-apais@linux.microsoft.com>
-In-Reply-To: <20240327160314.9982-2-apais@linux.microsoft.com>
-From: Allen <allen.lkml@gmail.com>
-Date: Wed, 3 Apr 2024 09:43:57 -0700
-Message-ID: <CAOMdWSLavg27YZgnfE2QHjO=4RNmFx_7veAURaPG_=qWX=KMVA@mail.gmail.com>
-Subject: Re: [PATCH 1/9] hyperv: Convert from tasklet to BH workqueue
-To: Allen Pais <apais@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, tj@kernel.org, keescook@chromium.org, 
-	vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev, 
-	florian.fainelli@broadcom.com, rjui@broadcom.com, sbranden@broadcom.com, 
-	paul@crapouillou.net, Eugeniy.Paltsev@synopsys.com, 
-	manivannan.sadhasivam@linaro.org, vireshk@kernel.org, Frank.Li@nxp.com, 
-	leoyang.li@nxp.com, zw@zh-kernel.org, wangzhou1@hisilicon.com, 
-	haijie1@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de, 
-	sean.wang@mediatek.com, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, afaerber@suse.de, 
-	logang@deltatee.com, daniel@zonque.org, haojian.zhuang@gmail.com, 
-	robert.jarzmik@free.fr, andersson@kernel.org, konrad.dybcio@linaro.org, 
-	orsonzhai@gmail.com, baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com, 
-	patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org, 
-	jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com, kys@microsoft.com, 
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
-	jassisinghbrar@gmail.com, mchehab@kernel.org, maintainers@bluecherrydvr.com, 
-	aubin.constans@microchip.com, ulf.hansson@linaro.org, manuel.lauss@gmail.com, 
-	mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com, 
-	hayashi.kunihiko@socionext.com, mhiramat@kernel.org, brucechang@via.com.tw, 
-	HaraldWelte@viatech.com, pierre@ossman.eu, duncan.sands@free.fr, 
-	stern@rowland.harvard.edu, oneukum@suse.com, 
-	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org, 
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	linux-mediatek@lists.infradead.org, linux-actions@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-omap@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001505:EE_|IA1PR12MB6436:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8dad3595-aaa8-4962-9e4b-08dc54010832
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	90Vb/erYaV/T8w8ZVV4MYpaNapNP3DQp3ol6aznG83OARnN4LneupFnAuj+522nFtdUwxX53fhZNrSp39H0zJNoIixYZc/OXq2bWtZOB2dDWUwBH1Ofvnh9WxB04KKg122FYM4dH7Yx0mF6pqWQR5DyYp2LUy0IlW0+fYrH50Xb6F4ZbXppJKquXemGrBwZxumY39+VT7dJR8Zwcp+jdQ4LHz6s1KGp116f+mlFXEn60tdzt8+OOtr8WDGhRTLkeK8BO6kaGZ3WVVzwom2a+LwFRn4npcTloGG25a+E/68j4VWfPVyfINBmAFUy27/42FvqmCQLhFz9L2wSqOMezlonhhmo7v++fiw31a8KVaIPmikjcAHDEoUgEDP5zCgpQQnVfBbHzPeXKD2AWHKnB649V8BnxH7V8t7XmLbsiMG50/vffTm19vxkfkzTm5njOTwSEye5y6TWNif9PVy+CbTidvkCbEoIj8EkQjHP3o6+p3fyJiFMVNF+j4NcH6qjWCBaztEJ6frfu4t9Uu+csR4X8+rP27UtUkzjzXZpG+whwtIUxLQ+Hih9YHbD0piemnO2RB8MXO8yF6NQ9r0oWUWO47ap/QwoWAPLs3w3A/7m5DiJYrPVp95RA2iqDzhmlVpqFdJPam2VUwVgAIQDfarWi0qYOFXYp8OwzcQ2xYVqkVwTNiR/k8L2YpXCyP6PfNXEN+7vwzxfGsCwsVDjxeTX5u0/mcuInFoGQszEsajKNSl57/pqsv74fVC/LuRsU
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 17:10:58.6815
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8dad3595-aaa8-4962-9e4b-08dc54010832
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00001505.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6436
 
-> The only generic interface to execute asynchronously in the BH context is
-> tasklet; however, it's marked deprecated and has some design flaws. To
-> replace tasklets, BH workqueue support was recently added. A BH workqueue
-> behaves similarly to regular workqueues except that the queued work items
-> are executed in the BH context.
+
+Jakub Kicinski <kuba@kernel.org> writes:
+
+> On Wed, 3 Apr 2024 10:58:19 +0200 Petr Machata wrote:
+>> Also, it's not clear what "del thing" should do in that context, because
+>> if cfg also keeps a reference, __del__ won't get called. There could be
+>> a direct method, like thing.exit() or whatever, but then you need
+>> bookkeeping so as not to clean up the second time through cfg. It's the
+>> less straightforward way of going about it IMHO.
 >
-> This patch converts drivers/hv/* from tasklet to BH workqueue.
+> I see, having read up on what del actually does - "del thing" would
+> indeed not work here.
 >
-> Based on the work done by Tejun Heo <tj@kernel.org>
-> Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
+>> I know that I must sound like a broken record at this point, but look:
+>> 
+>>     with build("ip link set dev %s master %s" % (swp1, h1),
+>>                "ip link set dev %s nomaster" % swp1) as thing:
+>>         ... some code which may rise ...
+>>     ... more code, interface detached, `thing' gone ...
+>> 
+>> It's just as concise, makes it very clear where the device is part of
+>> the bridge and where not anymore, and does away with the intricacies of
+>> lifetime management.
 >
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-> ---
->  drivers/hv/channel.c      |  8 ++++----
->  drivers/hv/channel_mgmt.c |  5 ++---
->  drivers/hv/connection.c   |  9 +++++----
->  drivers/hv/hv.c           |  3 +--
->  drivers/hv/hv_balloon.c   |  4 ++--
->  drivers/hv/hv_fcopy.c     |  8 ++++----
->  drivers/hv/hv_kvp.c       |  8 ++++----
->  drivers/hv/hv_snapshot.c  |  8 ++++----
->  drivers/hv/hyperv_vmbus.h |  9 +++++----
->  drivers/hv/vmbus_drv.c    | 19 ++++++++++---------
->  include/linux/hyperv.h    |  2 +-
->  11 files changed, 42 insertions(+), 41 deletions(-)
+> My experience [1] is that with "with" we often end up writing tests
+> like this:
+>
+> 	def test():
+> 		with a() as bunch,
+> 		     of() as things:
+> 			... entire body of the test indented ...
+>
+> [1] https://github.com/kuba-moo/linux/blob/psp/tools/net/ynl/psp.py
 
-Wei,
+Yeah, that does end up happening. I think there are a couple places
+where you could have folded several withs in one, but it is going to be
+indented, yeah.
 
- I need to send out a v2 as I did not include the second patch that
-updates drivers/pci/controller/pci-hyperv.c
+But you end up indenting for try: finally: to make the del work reliably
+anyway, so it's kinda lose/lose in that regard.
 
-Thanks.
+> Nothing wrong with that. I guess the question in my mind is whether
+> we're aiming for making the tests "pythonic" (in which case "with"
+> definitely wins), or more of a "bash with classes" style trying to
+> avoid any constructs people may have to google. I'm on the fence on
+> that one, as the del example proves my python expertise is not high.
+> OTOH people who prefer bash will continue to write bash tests,
+> so maybe we don't have to worry about non-experts too much. Dunno.
+
+What I'm saying is, bash is currently a bit of a mess when it comes to
+cleanups. It's hard to get right, annoying to review, and sometimes
+individual cases add state that they don't unwind in cleanup() but only
+later in the function, so when you C-c half-way through such case, stuff
+stays behind.
+
+Python has tools to just magic all this away.
 
