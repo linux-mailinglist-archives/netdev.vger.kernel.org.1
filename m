@@ -1,144 +1,185 @@
-Return-Path: <netdev+bounces-84540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCD92897342
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:00:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E5168973F2
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA311F21474
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:00:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB99E1F23597
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35EA149C77;
-	Wed,  3 Apr 2024 15:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yi4Y6cDW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4891487F1;
+	Wed,  3 Apr 2024 15:28:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD9D59B67
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 15:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670C0148FE8
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 15:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712156406; cv=none; b=KcdCpNRMQghbeQnT5Wx+NmrIzqPv8f4/VCOg4+jRoESHL6Yd/AhlmAt8NrsN6PbnjIZmW+3HiMUOmD9s9KgskZpNsKrqRMnjeXFsA2rAYYCCMCzgHCdXsyqIJZT6CDZvuSJkcDs3V6DbNhkbXsW5iAPAkhCrJa/Kwl5UGtjkB/s=
+	t=1712158085; cv=none; b=c9OHMLS43hOHV8Kk375oSEPIU+6aQCHXXNBAkcHYR0trsrvhJ7o5AU427wDSeSzClUk8tg5Mrt73vUBaPJU4dE6jqD7bMRjX4LBWqZ7oN/TwIf6mUvf8dO5QKOX8wjK9XE+e9+ziPIJik+lNPcWSKOncujDf9ZbHoJwHGbge4IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712156406; c=relaxed/simple;
-	bh=ndCkxQo5uX3TQotVcTv4BC4YZaml5s4aoF3Ej4w+FUE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=erQ3FmeHKJlxl7G5I3Te1U6vh8on1jCrFh4YTVBXIat0rilL1KoevbtS7KsAlL3ZCspFhNxzczVA2pn+ubzyBDb/OuHEVFwQzREOBGPjU6lOn3Oybilg8VABBuUrPeEZFkvHIosHxGaqHpOi5T6KppSSWnl/1B3dlsKE+ESqotA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yi4Y6cDW; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56e0430f714so14816a12.1
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 08:00:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712156403; x=1712761203; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ndCkxQo5uX3TQotVcTv4BC4YZaml5s4aoF3Ej4w+FUE=;
-        b=yi4Y6cDWQG/yZnIc0+LVq5woEAJCnJMKM3X4EdPhqv0chAM6ccxrcL1zOnHIBKnnz3
-         Hv0NBPckexp3BKEab1dIJIygV9Zv1VKf/w8WJT/urJ0YjQTXE2ymhbS6eoQpqN+yUNwT
-         eQnfPSOCTREHLhzHGevwRo1wAC841QMsiNDIQ0vItHi+WLHSZVzUMcTmextkd65iDMD9
-         eiW1eTYwq+g6RgxeOFkpXvzV5g4Q2LZ/xW8LMV6q+Drg889FqxpFI7xCIzi4fdweijQC
-         93qGwm5G6hvPwj/qE44SaEQyd2f63bcz4iI4DjtpR2TWHMf1zuF7ElEd/g51MfNhH2Jr
-         VxiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712156403; x=1712761203;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ndCkxQo5uX3TQotVcTv4BC4YZaml5s4aoF3Ej4w+FUE=;
-        b=xSxrJk8Vl26+8W2/RO8WlIUPGmavTiD2KiSZGeX48wnqEBk1M27z7emtxmLK6GACB+
-         aN5AxlQ8di/ZP4TxZr8BSYrnvepRAsoogljCGD43di0sAa7NifFAqyazqBGA9sHzlJzk
-         gvLWUkyRXLiuM4cFZylOHxWJudkfdOT8ZGLE00qleGnHmfipgAsGLtmvxKkJL0ZM9iJH
-         kUExLGrPKq00NaoSU0sEPqIhZKJ1x4mN3Ju0S/qigET4fRD4/3FPiR+R/vSeuv9Rq0Nf
-         Rn5fnFaGT9+mrAlBQ+cva3T5LwQvaKYBejdNDG+dNbGWLY42HX/w/G+NukCgas2/40rW
-         TAgA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWoLqFO8Q/2PE0b23daidR7hYfJHaecWAL+5FbPpQqQU05K4rPK7De869TgneUN0+nXrwf12MykSZK2wQiA7gvWgj68dJY
-X-Gm-Message-State: AOJu0YwsKw7pvMFD4ULBKu24PWFn3fBjrzept3wQUFutcH+Vw3bP+Ik2
-	q5HrHVrJzJ/8iKhOxYt0k5aNa7rb/jg3tKWvjrW0nEW7x2Xk3HXu3Pxe9QjMLxIrkwxeE0d7Rwr
-	FWiEe0G8duQLnBoJbt9I73I8y+GPUmD5tyYcB
-X-Google-Smtp-Source: AGHT+IHPTZDcMATyH2zQNSMP/QAmL6iKMFrQgG+/h4o9L03bpFV2cWUzzq0dJnHRfc9AHioUPSz6YvGx8UjJKRQHyJo=
-X-Received: by 2002:a05:6402:5c7:b0:56e:ac4:e1f3 with SMTP id
- n7-20020a05640205c700b0056e0ac4e1f3mr110506edx.7.1712156403298; Wed, 03 Apr
- 2024 08:00:03 -0700 (PDT)
+	s=arc-20240116; t=1712158085; c=relaxed/simple;
+	bh=GmbD26WMynLhI5PkWa2+VgAcWtdokHdMIyR0DsUfccc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=saA7bZ+HZ0rm3BNk/t7pzcxGqYl/Z66az8hz8PbbUyzeeGda2B6rv3SzK6zZy2tWfhT1sNp6SpycK9pej3aL0Q7rr7QXIXO+tH25iXmNPh94aHJ8dR9qLOaYmFkVRYT6Kp199vVa5IuVJnWZN5tr8fpRuq1XNSKIJ9agDG91mLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rs2WX-0006iQ-Tz; Wed, 03 Apr 2024 17:27:37 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rs2WV-00ACng-OF; Wed, 03 Apr 2024 17:27:35 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rs2WV-00CU00-22;
+	Wed, 03 Apr 2024 17:27:35 +0200
+Date: Wed, 3 Apr 2024 17:27:35 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Rob Herring <robh@kernel.org>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <Zg11Z1kJ42eLhabK@pengutronix.de>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
+ <20240402132637.GA3744978-robh@kernel.org>
+ <ZgworgDAXXOpf3QV@pengutronix.de>
+ <20240403144448.GB3508225-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403113853.3877116-1-edumazet@google.com> <Zg1l9L2BNoZWZDZG@hog>
- <CANn89iL72ia+aCaRxPvBBaOcbKU_VTLZSPBjiUAQ14dhpSJrfw@mail.gmail.com> <Zg1t8LFGiShcEWeX@hog>
-In-Reply-To: <Zg1t8LFGiShcEWeX@hog>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 3 Apr 2024 16:59:52 +0200
-Message-ID: <CANn89i+EFGdrFUt+JpOPQUfOa7_aHv=G-ChRwHCt18zoJQFEVQ@mail.gmail.com>
-Subject: Re: [PATCH net] geneve: fix header validation in geneve[6]_xmit_skb
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com, 
-	Phillip Potter <phil@philpotter.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240403144448.GB3508225-robh@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Apr 3, 2024 at 4:55=E2=80=AFPM Sabrina Dubroca <sd@queasysnail.net>=
- wrote:
->
-> 2024-04-03, 16:25:47 +0200, Eric Dumazet wrote:
-> > On Wed, Apr 3, 2024 at 4:21=E2=80=AFPM Sabrina Dubroca <sd@queasysnail.=
-net> wrote:
-> > >
-> > > 2024-04-03, 11:38:53 +0000, Eric Dumazet wrote:
-> > > > syzbot is able to trigger an uninit-value in geneve_xmit() [1]
-> > > >
-> > > > Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield(=
-))
-> > > > uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
-> > > > skb->protocol.
-> > > >
-> > > > If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->proto=
-col,
-> > > > pskb_inet_may_pull() does nothing at all.
-> > > >
-> > > > If a vlan tag was provided by the caller (af_packet in the syzbot c=
-ase),
-> > > > the network header might not point to the correct location, and skb
-> > > > linear part could be smaller than expected.
-> > > >
-> > > > Add skb_vlan_inet_prepare() to perform a complete validation and pu=
-ll.
-> > > > If no IPv4/IPv6 header is found, it returns 0.
-> > >
-> > > And then geneve_xmit_skb/geneve6_xmit_skb drops the packet, which
-> > > breaks ARP over a geneve tunnel, and other valid things like macsec.
-> >
-> > geneve_xmit_skb() uses ip_hdr() blindly.
->
-> Do those actually end up getting used? They get passed to
-> {ip_tunnel_ecn_encap,ip_tunnel_get_ttl,ip_tunnel_get_dsfield}, and
-> those helpers only look at their iph argument when skb_protocol(skb,
-> true) is ETH_P_IP or ETH_P_IPV6. So, definitely not pretty, but I
-> don't see a bug there. Am I missing something?
+On Wed, Apr 03, 2024 at 09:44:48AM -0500, Rob Herring wrote:
+> On Tue, Apr 02, 2024 at 05:47:58PM +0200, Oleksij Rempel wrote:
+> > On Tue, Apr 02, 2024 at 08:26:37AM -0500, Rob Herring wrote:
+> > > > +          pairsets:
+> > > > +            $ref: /schemas/types.yaml#/definitions/phandle-array
+> > > > +            description:
+> > > > +              List of phandles, each pointing to the power supply for the
+> > > > +              corresponding pairset named in 'pairset-names'. This property
+> > > > +              aligns with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
+> > > > +              PSE Pinout Alternatives (as per IEEE 802.3-2022 Table 145\u20133)
+> > > > +              |-----------|---------------|---------------|---------------|---------------|
+> > > > +              | Conductor | Alternative A | Alternative A | Alternative B | Alternative B |
+> > > > +              |           |    (MDI-X)    |     (MDI)     |      (X)      |      (S)      |
+> > > > +              |-----------|---------------|---------------|---------------|---------------|
+> > > > +              | 1         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
+> > > > +              | 2         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
+> > > > +              | 3         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
+> > > > +              | 4         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
+> > > > +              | 5         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
+> > > > +              | 6         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
+> > > > +              | 7         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
+> > > > +              | 8         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
+> > > > +            minItems: 1
+> > > > +            maxItems: 2
+> > > 
+> > > "pairsets" does not follow the normal design pattern of foos, foo-names, 
+> > > and #foo-cells. You could add #foo-cells I suppose, but what would cells 
+> > > convey? I don't think it's a good fit for what you need.
+> > > 
+> > > The other oddity is the number of entries and the names are fixed. That 
+> > > is usually defined per consumer. 
+> > > 
+> > > As each entry is just a power rail, why can't the regulator binding be 
+> > > used here?
+> > 
+> > I'm not against describing it consequent with regulator till the wire
+> > end, but right now I have no idea how it should be described by using
+> > regulator bindings. There are maximum 2 rails going in to PSE PI on one
+> > side and 4 rails with at least 5 combinations supported by standard on
+> > other side. Instead of inventing anything new, I suggested to describe
+> > supported output combinations by using IEEE 802.3 standard.
+> 
+> There's 4 combinations above, what's the 5th combination? SPE?
 
-Please read my changelog, I explained that skb_protocol(skb, true) is
-parsing the Ethernet header up to the non vlan proto.
+The 5th combination is PoE4 where two rails are supplying power at same
+time.
 
-syzbot buillt a vlan packet with final proto being IPv4.
+First 4 variants for PoE: one or two positive rails are attached (but
+only one is used at same time) to pairs 1-2 or 3-4, or 5-6, or 7-8. Or
+support all of combinations if some advanced PSE PI is present. PSE PI
+is kind of MUX for regulators.
 
-So the helpers who are using skb_protocol() do not understand the IP
-header has not been pulled.
+One more variant in case of PoE4: two positive rail are attached at same
+time, one to 1-2, second to 5-6. May be one more variant with opposite
+polarity, this will be the 6th combination.
 
->
-> From a quick look, most users of those helpers seem to pass
-> ip_hdr(skb) (except for ip_tunnel_ecn_encap called from
-> ip_md_tunnel_xmit and ip_tunnel_xmit -- vxlan_xmit_one uses a cached
-> version but I don't think it's needed). Would it be less confusing if
-> we removed that argument and let the helper fetch ip_hdr?
+> Seems to me you just describe the 2 rails going to the connector and 
+> then describe all the variations the connector supports. The PSE 
+> (h/w) has little to do with which variations are supported, right?
 
-If you look at the syzbot report, the ip header is definitely dereferenced.
+No. In case of mutli-channel PSE, it needs to know if channels are
+attached to one port or to different ports. PSE is not only responsible
+to enable the power, it runs classification of devices attached to the
+port, so it will decide, which rail should be enabled.
+
+> For example, MDI-X vs. MDI support is determined by the PHY, right?
+
+Yes and No. Until PSE do not start supplying power, PHY will not be able to
+start communication with the remote PHY, so it will not be able to
+detect MDI/X configuration.
+
+Polarity configuration is important for user space or user to get
+information about supported pin configuration and if possible,
+change the configuration.
+
+> Or it has to be supported by both the PHY and PSE?
+
+In most cases PSE and PHY work independently from each other, they just
+share same port. Potential exception are:
+- in case data line should not be shared with power lines, we need to
+  know what pins are used for power, this information would help to
+  provide PHY configuration.
+- in case PHY autoneg signals disturb PoE classification, we need to
+  coordinate PHY and PSE states.
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
