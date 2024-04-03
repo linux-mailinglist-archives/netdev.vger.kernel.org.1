@@ -1,237 +1,163 @@
-Return-Path: <netdev+bounces-84420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCCF1896E38
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:32:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2C3896E49
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:36:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 173CEB225F6
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:29:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9932C1F27183
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4841411ED;
-	Wed,  3 Apr 2024 11:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KnLpst57"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA482142E82;
+	Wed,  3 Apr 2024 11:35:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BEB17583;
-	Wed,  3 Apr 2024 11:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458BB137C33
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 11:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712143773; cv=none; b=e8+Hvpmdp7ELPnh/PGpJPwScBaTpPtmEAB2vWfWC5lunkLPmRR+rVbsJqOkeZ965EDkcYcsc/etGTQ3WaztLXHeudYi2KFJ0qIDIH8t6z1odcX+9v1dhJRPzQdNcwqeGFRjo87fXidi2sorxJSwslqpHw+RjxovljtSL3uAGwO4=
+	t=1712144134; cv=none; b=A3JuFILMxvEuFDCP1a3o0C3FsX5pifonqERnTce7lBWA7Dp5LHS5W5fgQ2XpL0ghor99rQI1DHeYYJvuTKUFrLrfw6lPUSM/XLZUBiL3PbNP9OZ4QLLyP/43ChqASs2Tk6+PDx9r6LraacgxRs30h0CAzaZh0DgCCYJOw2rMjdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712143773; c=relaxed/simple;
-	bh=eBEKgmTKHane4Dqp52MxNEhoor9QSax5g3H7v6Urg3w=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=djNO5nu+c2xVnlyRZOuQajADcvo4qEKNtY4FwENK6zpKljmq45BcB0mmU2IAnXORZFAf5+6Gh7qeWiV5RmdtSwQE6FBkoIJlhmvVN4H6/XSeyC3kpTwURI2yB8P7hi9pEzP4L9enbqewMJuW+2XEbNo7b6+RKvaVFDAojRmehBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KnLpst57; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4339t8hW002791;
-	Wed, 3 Apr 2024 11:29:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=ec2Fije6X4O/M4nF/nInmoNZVq0q1ZIcyrBfwQBHW/o=;
- b=KnLpst575+PmP+WyYtS3Dwg7jRH26kQuhrO0payT3UV9XNEyOotX3Fl0Dk6Yserh2iiA
- IuxYOsTonb6Oucr5CRWrrQ5qTQLMSEhz18JsYkVeyEL1qdSszdDSLsuVVUJR/fvqaRY9
- 4Z7dHIQI/enq/vWMFXgqjBzwJrgc7h8CYsKr8Drj0R/mWAjm9V1FJ6jyZQmZS87aG86i
- 1mZnSGVQxJ3u4e4/0WmmcRo5wJcgENoleZLmPlzwCrSHjNMwatoRkap2Td1bJK10+xlp
- V0ZRduSdRqIcMPFv44zH1g13s63Uh5DdcHOwtuv68hS3xTzQOfA6Q5gIkSRkR17NsXpd Vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x94jx87r6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 11:29:25 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 433BTPQP017280;
-	Wed, 3 Apr 2024 11:29:25 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x94jx87nu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 11:29:24 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 433A4VJZ029600;
-	Wed, 3 Apr 2024 11:28:01 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x6ys34gbr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Apr 2024 11:28:00 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 433BRtIk45023562
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 3 Apr 2024 11:27:57 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7516020043;
-	Wed,  3 Apr 2024 11:27:55 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5465320040;
-	Wed,  3 Apr 2024 11:27:54 +0000 (GMT)
-Received: from [9.171.60.51] (unknown [9.171.60.51])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  3 Apr 2024 11:27:54 +0000 (GMT)
-Message-ID: <a9e1cdfba05279c36b7b85f327af66cf497d42b9.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH net-next v5 02/11] net/smc: introduce loopback-ism
- for SMC intra-OS shortcut
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com,
-        twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com,
-        jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Date: Wed, 03 Apr 2024 13:27:54 +0200
-In-Reply-To: <20240324135522.108564-3-guwen@linux.alibaba.com>
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
-	 <20240324135522.108564-3-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
+	s=arc-20240116; t=1712144134; c=relaxed/simple;
+	bh=He2U7fb8aU+EkEyUm/8NshncYf1dEyzTByD9lzAR4Hk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=j+7FJ1HpZ5532lX5aC6Uay0EFI6eO2+YrsfdskP/Oawv6AB2fzIiZyUdRzETcyU98VabQ9OL4ZXxv0zobyjkQhBm4ICvRIUUXoHZ9yh068Btxv0MXDtAjyroSJFek84gjr76yJeA7MDD+g4IzRMDCPKqYIrsyofgqLQ66fALrGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7cc78077032so770729939f.0
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 04:35:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712144132; x=1712748932;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W63RUJcvU8oDwlqRPyrIqv2ix8e3Wfp/1qAcWEZ3Qt4=;
+        b=fgNjs+ShjU7xJ/H3WpQfToWpc3vo0j/QiGI0WvjKb+vEkjptV/Xl6PCa7cCsm2pcEL
+         FPP/kRXa3m/Mn5XFacPGQy893olpRCOZDualgF/V8jO22gDdT8F2F+PF+IB4UHrvIBtI
+         eu2p6LtEhXamiGi0g7JUlyaj9DCXEbSJHhB/b1GwHIfL+Iq6tLdFZxC9GygbMqUqmvOQ
+         KPNsVqigVnX2BV6+tUkBabHo7gwVl469HKiotwtJn9QSuF0yJcEhq/b01eA6XpxQm6ss
+         ilV9FQZFUgRybKcG2dBVCA9LW9n5pcQlGulbxQkt5xWbJQbCTQIuMId0DSeDs0ULCOLE
+         pUJw==
+X-Forwarded-Encrypted: i=1; AJvYcCVGEQlkU+IfY7Ibc415pjL+hklIxex5zf22ehfMl3uzPw62UWXQJH5u4qpIBD7Js8mICfa55iR+UId02nLpFbWfsBICt4Lw
+X-Gm-Message-State: AOJu0YzLaNK7Boo+/Ik80895KxEQ6Elgv59FFpnQZ8LOxJLilfuZECrt
+	gQrMbyP4yVwHOCYQAng/Oy0foR7dTlTmm1tIpsh5T6SGZAJSD3hYFEwKVcOY8i6XiXD/VAtCQBy
+	qdZNLieJPGsxdEIjKV38AUjFR+FdDAmjd0TYv3gqnuZJXVQiHEgsapU4=
+X-Google-Smtp-Source: AGHT+IFHlnuZ227swltfMtmSK2kgOgDDYBW6LWbUccIHDI3QnefoBKXjAowCe6MZ/Vbj2QmQ+AM39ecZtIonUsiCGXcpqa5Db1E2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QroWNzYyRlpBiCu6AdsAw1Xv9Ni_4Tpb
-X-Proofpoint-ORIG-GUID: _Vh-x1q2-JP_K6XSyRo82l68TsDRoIYt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-03_10,2024-04-01_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- adultscore=0 malwarescore=0 suspectscore=0 priorityscore=1501 phishscore=0
- lowpriorityscore=0 bulkscore=0 impostorscore=0 mlxlogscore=999 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2403210000
- definitions=main-2404030079
+X-Received: by 2002:a05:6602:3fc4:b0:7c8:c7ec:2b71 with SMTP id
+ fc4-20020a0566023fc400b007c8c7ec2b71mr229344iob.3.1712144132441; Wed, 03 Apr
+ 2024 04:35:32 -0700 (PDT)
+Date: Wed, 03 Apr 2024 04:35:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d19c3a06152f9ee4@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in geneve_xmit (3)
+From: syzbot <syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
-> Configuration of this feature is managed through the config SMC_LO.
+Hello,
 
-Hi Wen,
+syzbot found the following issue on:
 
-you could omit building smc_loopback.o if CONFIG_SMC_LO was not set if
-you included the following fixup-patch. I think it's cleaner to put a
-few parts of net/smc/af_smc.c under conditional compile rather than
-have most of the contents of net/smc/smc_loopback.c under #ifdef.
+HEAD commit:    928a87efa423 Merge tag 'gfs2-v6.8-fix' of git://git.kernel..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=10c17b4e180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e2599baf258ef795
+dashboard link: https://syzkaller.appspot.com/bug?extid=9ee20ec1de7b3168db09
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16cd6479180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16cec009180000
 
-From 11a9cfce550f0c4df10eafdd30aa4226d4d522a8 Mon Sep 17 00:00:00 2001
-From: Gerd Bayer <gbayer@linux.ibm.com>
-Date: Wed, 3 Apr 2024 11:43:36 +0200
-Subject: [PATCH] fixup! net/smc: introduce loopback-ism for SMC intra-
-OS
- shortcut
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7d66fa7ed5c7/disk-928a87ef.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8b511d64cde0/vmlinux-928a87ef.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8810588440a2/bzImage-928a87ef.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in geneve_xmit_skb drivers/net/geneve.c:910 [inline]
+BUG: KMSAN: uninit-value in geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
+ geneve_xmit_skb drivers/net/geneve.c:910 [inline]
+ geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
+ __dev_queue_xmit+0x348d/0x52c0 net/core/dev.c:4335
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3081 [inline]
+ packet_sendmsg+0x8bb0/0x9ef0 net/packet/af_packet.c:3113
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:745
+ __sys_sendto+0x685/0x830 net/socket.c:2191
+ __do_sys_sendto net/socket.c:2203 [inline]
+ __se_sys_sendto net/socket.c:2199 [inline]
+ __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3804 [inline]
+ slab_alloc_node mm/slub.c:3845 [inline]
+ kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
+ alloc_skb include/linux/skbuff.h:1318 [inline]
+ alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6504
+ sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2795
+ packet_alloc_skb net/packet/af_packet.c:2930 [inline]
+ packet_snd net/packet/af_packet.c:3024 [inline]
+ packet_sendmsg+0x722d/0x9ef0 net/packet/af_packet.c:3113
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:745
+ __sys_sendto+0x685/0x830 net/socket.c:2191
+ __do_sys_sendto net/socket.c:2203 [inline]
+ __se_sys_sendto net/socket.c:2199 [inline]
+ __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+CPU: 0 PID: 5033 Comm: syz-executor346 Not tainted 6.9.0-rc1-syzkaller-00005-g928a87efa423 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+=====================================================
+
 
 ---
- net/smc/Makefile       | 5 +++--
- net/smc/af_smc.c       | 6 ++++++
- net/smc/smc_loopback.c | 8 --------
- 3 files changed, 9 insertions(+), 10 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/smc/Makefile b/net/smc/Makefile
-index a8c37111abe1..3b73c9d561bb 100644
---- a/net/smc/Makefile
-+++ b/net/smc/Makefile
-@@ -4,5 +4,6 @@ obj-$(CONFIG_SMC)	+=3D smc.o
- obj-$(CONFIG_SMC_DIAG)	+=3D smc_diag.o
- smc-y :=3D af_smc.o smc_pnet.o smc_ib.o smc_clc.o smc_core.o smc_wr.o
-smc_llc.o
- smc-y +=3D smc_cdc.o smc_tx.o smc_rx.o smc_close.o smc_ism.o
-smc_netlink.o smc_stats.o
--smc-y +=3D smc_tracepoint.o smc_loopback.o
--smc-$(CONFIG_SYSCTL) +=3D smc_sysctl.o
-+smc-y +=3D smc_tracepoint.o
-+smc-$(CONFIG_SMC_LO)	+=3D smc_loopback.o
-+smc-$(CONFIG_SYSCTL)	+=3D smc_sysctl.o
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index fce7a5b2ce5c..bcbf600cd271 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -3574,11 +3574,13 @@ static int __init smc_init(void)
- 		goto out_sock;
- 	}
-=20
-+#if IS_ENABLED(CONFIG_SMC_LO)
- 	rc =3D smc_loopback_init();
- 	if (rc) {
- 		pr_err("%s: smc_loopback_init fails with %d\n",
-__func__, rc);
- 		goto out_ib;
- 	}
-+#endif
-=20
- 	rc =3D tcp_register_ulp(&smc_ulp_ops);
- 	if (rc) {
-@@ -3590,8 +3592,10 @@ static int __init smc_init(void)
- 	return 0;
-=20
- out_lo:
-+#if IS_ENABLED(CONFIG_SMC_LO)
- 	smc_loopback_exit();
- out_ib:
-+#endif
- 	smc_ib_unregister_client();
- out_sock:
- 	sock_unregister(PF_SMC);
-@@ -3628,7 +3632,9 @@ static void __exit smc_exit(void)
- 	tcp_unregister_ulp(&smc_ulp_ops);
- 	sock_unregister(PF_SMC);
- 	smc_core_exit();
-+#if IS_ENABLED(CONFIG_SMC_LO)
- 	smc_loopback_exit();
-+#endif
- 	smc_ib_unregister_client();
- 	smc_ism_exit();
- 	destroy_workqueue(smc_close_wq);
-diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
-index 994fe39930ad..8d0181635ded 100644
---- a/net/smc/smc_loopback.c
-+++ b/net/smc/smc_loopback.c
-@@ -19,7 +19,6 @@
- #include "smc_ism.h"
- #include "smc_loopback.h"
-=20
--#if IS_ENABLED(CONFIG_SMC_LO)
- #define SMC_LO_V2_CAPABLE	0x1 /* loopback-ism acts as ISMv2 */
- #define SMC_LO_SUPPORT_NOCOPY	0x1
- #define SMC_DMA_ADDR_INVALID	(~(dma_addr_t)0)
-@@ -442,20 +441,13 @@ static void smc_lo_dev_remove(void)
- 	smc_lo_dev_exit(lo_dev);
- 	put_device(&lo_dev->dev); /* device_initialize in
-smc_lo_dev_probe */
- }
--#endif
-=20
- int smc_loopback_init(void)
- {
--#if IS_ENABLED(CONFIG_SMC_LO)
- 	return smc_lo_dev_probe();
--#else
--	return 0;
--#endif
- }
-=20
- void smc_loopback_exit(void)
- {
--#if IS_ENABLED(CONFIG_SMC_LO)
- 	smc_lo_dev_remove();
--#endif
- }
---=20
-2.40.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Even nicer would be, if smc_loopback_init() and smc_loopback_exit()
-would have an NO-OP implementation { } straight in
-net/smc/smc_loopback.h if CONFIG_SMC_LO was not enabled. That way, one
-could leave out the #if ENABLED's in net/smc/af_smc.c entirely.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-I think that's more kernel-style like...
-Gerd
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
