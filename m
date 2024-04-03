@@ -1,131 +1,140 @@
-Return-Path: <netdev+bounces-84569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED6998975CF
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 19:01:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D25489760F
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 19:14:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 343E81C215FD
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:01:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 560EB28DEEA
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304ED152170;
-	Wed,  3 Apr 2024 17:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CE0152DFE;
+	Wed,  3 Apr 2024 17:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=arista.com header.i=@arista.com header.b="VSsW3yJU"
+	dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="mifHZt1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9141514F6
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 17:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD16152DF0
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 17:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712163663; cv=none; b=YDdWnunwmkZ4ILPAxzRdm4Xvr8NM6E53a/OGpzcEnLxVkRWYtDfQIfNJJkTFFdvlU25rvnQNcLBCr6Mcd0/2cO44GMmooayiGhgc6I1lh0rrAaZbUO9dmtghvAQetBfkkFyq8IrVkLjnLFZQdLX7hnDAAXioGs6ZVFJCL5S7Bu8=
+	t=1712164468; cv=none; b=RR6gcpdOvypTKwrQTbJFl8qzFVMFkQXnPLhpVpjqBwzzsAw4r0g6e+O9cg9mzyBcmNH0rKF6FK4lJt4wsSLw6ZXCS/ysnp2RHxR/pucBKt5tVDqF1qhLzTT/Bfa19yWSAe4d1C3dtlhiKO8swc4pfp/quJ/2a9139kRLe/MhJOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712163663; c=relaxed/simple;
-	bh=pCLNzzLPBjclBQkvMoJ+H7z2bFenb2zAQY9AAvNZjGU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k2MB4UwZB6d78l2F0Acx14viLLnr26e2NdmbQJ4D0dKeA11arm0Z3C57RfAYPp4O5Y11HD01PMVjh/WTr0nON2+wfXwIGaUXzNoaHcqe9hrScjanzwJsiYzGuxVIiKmg1eMtvcs76UppAQv5efctxk/Y1R0NdFNIwO8tyJhSoVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=VSsW3yJU; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2a2c028b8a6so3728a91.1
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 10:01:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1712163661; x=1712768461; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eijqq1kellEja2nXJ0nGvTSxawC3HDrhpQA6YnGCSQ4=;
-        b=VSsW3yJUleNGPeqHgxDeDpkKvQ851yLnVQChKjh/WFepnQIKGBr3AcuouwsLt8g3yX
-         qHXUuHrXkCGs3XFGRly7x1uuyS0fjMU90tq1xQyjua5Uu0ZD3WdCRbsYhJLXN7moZp0U
-         sHvBriemOyRI9oHzeT5W13Js9BeZ6o1wHsgORJ0Y23J0HZPfP6uq6smTglkbatOdq9Fy
-         QpNGvvgR8AFbomu0OGmE1P7k52lmVTCM8eqpr0E97PTIAmS9zoePpJPx00F837RbZYRy
-         OsfbWaI/v6usx4fy1GehqG/lwjMs8GiJs5zSUCWYhiXjM+rfnFASwCf1srQiSqjDDIkg
-         7zZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712163661; x=1712768461;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eijqq1kellEja2nXJ0nGvTSxawC3HDrhpQA6YnGCSQ4=;
-        b=ARCeznHRhDGzZ5/bhZC82nO6DLhrHpkThMg//g06HnkT6u8A6AJjkFKFuZiqtJ+QGg
-         lVhfRavZQPwOP1HrxfO5c2tIHUScx+otcZK5Ee7qSSaitDyzqox9fZPFTHrhHVmYTV87
-         CjgF1hB3te1v87wuHNXbd43ywSjQOS5STnj2ciFnnBWnMv0H6vdHa3eGjnt6OhEVnx5x
-         3tSq9Jrut3bQ9VFSkwLq0DO/+T5dOyhouXele8Mmq4u5RoHSpYFa/vZwKiC2PHVV70HC
-         DfB4xZw+lO1L3SSXXpHrXSqg8Xy2WHu5iDQv6T96wiVwJbw/czJop0H4xNKOgr+v2uGa
-         GMWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWpeGRkjn0NGkuMioqGTM8+8GgA9Jb6cB+k/hmKVWzDpvVQhZ9iRhUu+CKVo8AKVp8exEpq5sdcNK1hZMDf7PDeHll3o8bA
-X-Gm-Message-State: AOJu0YxysQ6d5loOaFNiIHdgnaqM+ey9cC9Lw89BoxsP4irLYngOa25g
-	Ip+uxjJfHIXdT6L1mpkcqLGLJDXfVc0Yq07mzcAG+t6JZmIGx7fJMZb6EKPsAJuk+9GioJS7s2o
-	BzUIc7w3aMUK8TQbzGFnEkT1hSG/LoltXI3qK
-X-Google-Smtp-Source: AGHT+IH+b/yzFFmXkyLOQ8e/HJ2CJOFKEsj8o894ViUToeucMYnGc5Ulmwpl7GyflCzMs9YbMXKZZLY6LiWJ86MkzmM=
-X-Received: by 2002:a17:90a:ce82:b0:2a2:6a52:96f4 with SMTP id
- g2-20020a17090ace8200b002a26a5296f4mr118745pju.9.1712163660743; Wed, 03 Apr
- 2024 10:01:00 -0700 (PDT)
+	s=arc-20240116; t=1712164468; c=relaxed/simple;
+	bh=qmxqmlUJBz726UE7HUrKGD95zzODIeLBNvs0WCeptzw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M1q9E12NELjJNda0CUcLfMMeZ2oEwYiPK7tUF5/5e/RM9btYYYetnLi6tnR8+OhZnX8YZCpl07flYGgoWaVIieAoqaO6RE9RoKcEHb3ESphHOB8U8NWs1TmEWgJ3hkTdjQah0fCnyCbXVVB/86bKsvnVvSxcK2yOuURH5N5diFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=mifHZt1F; arc=none smtp.client-ip=95.143.172.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=david-bauer.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
+Received: (qmail 25993 invoked by uid 988); 3 Apr 2024 17:14:15 -0000
+Authentication-Results: perseus.uberspace.de;
+	auth=pass (plain)
+Received: from unknown (HELO unkown) (::1)
+	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Wed, 03 Apr 2024 19:14:15 +0200
+Message-ID: <c4f2c217-b2bd-4716-be17-3c6097873061@david-bauer.net>
+Date: Wed, 3 Apr 2024 19:14:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403132456.41709-1-aleksander.lobakin@intel.com>
-In-Reply-To: <20240403132456.41709-1-aleksander.lobakin@intel.com>
-From: Dmitry Safonov <dima@arista.com>
-Date: Wed, 3 Apr 2024 18:00:49 +0100
-Message-ID: <CAGrbwDQ40DWXZ1AYesdXMXrb3HWW6bs6dAYVaUrwDriCekwg3w@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/tcp: move TCP hash fail messages out of line
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Francesco Ruggeri <fruggeri@arista.com>, Salam Noureddine <noureddine@arista.com>, 
-	David Ahern <dsahern@kernel.org>, nex.sw.ncis.osdt.itp.upstreaming@intel.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] vxlan: drop packets from invalid src-address
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, amcohen@nvidia.com, netdev@vger.kernel.org
+References: <20240331211434.61100-1-mail@david-bauer.net>
+ <20240402180848.GT26556@kernel.org> <Zg1PYMUh6FCT5FQ2@shredder>
+From: David Bauer <mail@david-bauer.net>
+Autocrypt: addr=mail@david-bauer.net; keydata=
+ xjMEZgynMBYJKwYBBAHaRw8BAQdA+32xE63/l6uaRAU+fPDToCtlZtYJhzI/dt3I6VxixXnN
+ IkRhdmlkIEJhdWVyIDxtYWlsQGRhdmlkLWJhdWVyLm5ldD7CjwQTFggANxYhBLPGu7DmE/84
+ Uyu0uW0x5c9UngunBQJmDKcwBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQbTHlz1Se
+ C6eKAwEA8B6TGkUMw8X7Kv3JdBIoDqJG9+fZuuwlmFsRrdyDyHkBAPtLydDdancCVWNucImJ
+ GSk+M80qzgemqIBjFXW0CZYPzjgEZgynMBIKKwYBBAGXVQEFAQEHQPIm0qo7519c7VUOTAUD
+ 4OR6mZJXFJDJBprBfnXZUlY4AwEIB8J+BBgWCAAmFiEEs8a7sOYT/zhTK7S5bTHlz1SeC6cF
+ AmYMpzAFCQWjmoACGwwACgkQbTHlz1SeC6fP2AD8CduoErEo6JePUdZXwZ1e58+lAeXOLLvC
+ 2kj1OiLjqK4BANoZuHf/ku8ARYjUdIEgfgOzMX/OdYvn0HiaoEfMg7oB
+In-Reply-To: <Zg1PYMUh6FCT5FQ2@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Bar: ---
+X-Rspamd-Report: BAYES_HAM(-2.990611) XM_UA_NO_VERSION(0.01) MIME_GOOD(-0.1)
+X-Rspamd-Score: -3.080611
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=david-bauer.net; s=uberspace;
+	h=from:to:cc:subject:date;
+	bh=qmxqmlUJBz726UE7HUrKGD95zzODIeLBNvs0WCeptzw=;
+	b=mifHZt1F6aj+cCioSUniM9XR7OQ1pYe2NtbOOXAy9ucCc5I9uAlxYhXdwXZoDXCnPS8bPsHaZy
+	IbcKJUzLS7q7bDanX93LP/VpEwZYLl8hGhuTIpqfGitdMHRiZp92ixkqU12J9IdcFImoHzAxjE0i
+	G6vbgc2ZXtakWGgXD/KpKEwQ3Myl++jAaEjfpHPsRcoFh5ly1NYXdSGANYpUNfyuYvgt0VwbB7vM
+	xnvlgjeelK65NfOc1U3TTWogv1m5p4qU4kghWa9dqmyt1dT5mKP9e9fNo3imY8Lha1G+unc2hi+g
+	Gh9CVaF47bk/VugKqDYKOpWDXaTV/YneqfbsDnkdbrlsV50GziTqHBgdzAlXeuyJx6epg/1r4YD/
+	CrczZS94ZcALJ+9rXxvhSKxbcXXT750//150NhsDUNZsqWxHuOSR4OvpXBpQBgZvB0zQhqXxG++Q
+	yEWKjx80hhVW+7lnuLr7/Wrl9qD2AZb6EWo2cXenqNFwsNxz+oEzS4KMmtvE5GyUAza3vkU5SZpp
+	wNWGbll3wrvj7/FXWmntqkZtFBaclt+fa5xhwcOKKyQUxPw43dVoXXmy3FmBxZEpbxpkErEsl0cr
+	LOp/ZbG3X0B2hS8bLOlxtMpl+aKkEGlkARgQhD8UZ5S5Sbqh6NzpnUIYX8RtLTBa4RRO0wnqgiNa
+	I=
 
-Hi Alexander,
+Hi Ido,
 
-On Wed, Apr 3, 2024 at 2:26=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> tcp_hash_fail() is used multiple times on hotpath, including static
-> inlines. It contains a couple branches and a lot of code, which all
-> gets inlined into the call sites. For example, one call emits two
-> calls to net_ratelimit() etc.
-> Move as much as we can out of line to a new global function. Use enum
-> to determine the type of failure. Check for net_ratelimit() only once,
-> format common fields only once as well to pass only unique strings to
-> pr_info().
-> The result for vmlinux with Clang 19:
->
-> add/remove: 2/0 grow/shrink: 0/4 up/down: 773/-4908 (-4135)
-> Function                                     old     new   delta
-> __tcp_hash_fail                                -     757    +757
-> __pfx___tcp_hash_fail                          -      16     +16
-> tcp_inbound_ao_hash                         1819    1062    -757
-> tcp_ao_verify_hash                          1217     451    -766
-> tcp_inbound_md5_hash                        1591     374   -1217
-> tcp_inbound_hash                            3566    1398   -2168
+On 4/3/24 14:45, Ido Schimmel wrote:
+> On Tue, Apr 02, 2024 at 07:08:48PM +0100, Simon Horman wrote:
+>> On Sun, Mar 31, 2024 at 11:14:34PM +0200, David Bauer wrote:
+>>> The VXLAN driver currently does not check if the inner layer2
+>>> source-address is valid.
+>>>
+>>> In case source-address snooping/learning is enabled, a entry in the FDB
+>>> for the invalid address is created with the layer3 address of the tunnel
+>>> endpoint.
+>>>
+>>> If the frame happens to have a non-unicast address set, all this
+>>> non-unicast traffic is subsequently not flooded to the tunnel network
+>>> but sent to the learnt host in the FDB. To make matters worse, this FDB
+>>> entry does not expire.
+>>>
+>>> Apply the same filtering for packets as it is done for bridges. This not
+>>> only drops these invalid packets but avoids them from being learnt into
+>>> the FDB.
+>>>
+>>> Suggested-by: Ido Schimmel <idosch@nvidia.com>
+>>> Signed-off-by: David Bauer <mail@david-bauer.net>
+>>
+>> Hi David and Ido,
+>>
+>> I wonder if this is an appropriate candidate for 'net', with a Fixes tag.
+>> It does seem to address a user-visible problem.
+> 
+> I'm OK with targeting the patch at 'net'. Looking at git history, the
+> issue seems to be present since initial submission so Fixes tag should
+> be:
+> 
+> Fixes: d342894c5d2f ("vxlan: virtual extensible lan")
+> 
+> David, can you please re-submit with "[PATCH net]" prefix and the above
+> tag?
 
-I can see that as an improvement, albeit that enum and the resulting switch
-are quite gross, sorry.
-I had patches to convert those messages to tracepoints (by Jakub's suggesti=
-on).
-That seems to work quite nice and will remove this macro entirely:
-https://lore.kernel.org/all/20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@a=
-rista.com/
+I can take care of that. Thanks for analyzing the situation.
 
-I need to send version 2 for that. Unfortunately, that got delayed by
-me migrating
-from my previous work laptop. That was not my choice, resulting in
-little disruption.
-I'm planning to send the new version optimistically by the end of this week=
-,
-at worst the next week.
+One thing i still have in my head when looking at this:
 
-Thanks,
-            Dmitry
+ From my understanding, when i manage to send out such a packet from e.g. a
+VM connected to a vxlan overlay network and manage to send out such malformed
+packet, this would allow me to break the overlay network created with vxlan doesn't it?
+
+Can you comment on my assumption there? I assume you have a better understanding of
+the inner workings of the vxlan protocol.
+
+Best
+David
+
+> 
+> Thanks
 
