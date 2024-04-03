@@ -1,109 +1,104 @@
-Return-Path: <netdev+bounces-84622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 672938979D0
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:35:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B353897A2B
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E47C1B22998
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:35:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27282B2AAC4
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BCE155A25;
-	Wed,  3 Apr 2024 20:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JmGgUXU8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E5C156888;
+	Wed,  3 Apr 2024 20:37:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C969146018
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 20:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EF0156880;
+	Wed,  3 Apr 2024 20:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712176529; cv=none; b=FMXYmcw3nKymPltT3ugsQdwcrhusKgFMTS4JbQ+llHo53dagWjviGrAh6N5y/5to7Q5pir+IB+l1dgeSvwB1EtNfw5biG/hxQCB9yB0dIr/rECWhONUkeetMJZgRhA402J5AINBQKghnQRjuAhFZFnv2UFvzUPjxk9y7Lw7E1bI=
+	t=1712176654; cv=none; b=Zw9XrSk5iITGZo6kQHInI8m0tXc9bk3xPvmpnU0jYwF3QS/HdBk1wJ3wJG52lNWWeb1jgmz+j61eCnt6+/DOKiiDJhu4rq4NltJQR2n4uzpbIfzQ82ONILOeE2pOq+x0JF/+jinjk/G08S23DvW53rJMv5fBctAZ8Mkor1AzVbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712176529; c=relaxed/simple;
-	bh=+qORx5matsjqP5sTFy6Psrj5nLqFXic/oNqJWuGDQMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=l0tgXoXhWu1jIlBiGpYqE3CfNMk4JJQjKKNx11kwz8v3wccX/pBH0GOn9f+izSLuTyePZvH8YlDdUqIzJsH1eu0g3/gFEVg2w1uOOX0sEOpKYbFw081GS0C2OVIPJHET6johvq2+NunLqmokT88YUmtxuxXza64+6E/+Psy1xxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JmGgUXU8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2198C433F1;
-	Wed,  3 Apr 2024 20:35:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712176529;
-	bh=+qORx5matsjqP5sTFy6Psrj5nLqFXic/oNqJWuGDQMw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=JmGgUXU8DLPkIFK6G+k7yofrsD8WLwWxx8jLyigy7gt627QMzvfnpx7uF5ACfOmpw
-	 M2d2J10gCu64mwNqlQK97GYj/+/sTZ8NFAsjkmcpyKXf42GS2llinho2ADMC2CCYIH
-	 jfSvWlmacKiTBUB5mW8j+zT+zVPaUmssGW7vxtb6kyDvtpPNjCs6aiH8MzFeoO891O
-	 eG9ZmvKLRneQMq753TQJRK1C68cRMoJKvY1Qk5b+gtyK0aiHFmwrWCQS5hvaMkQRx/
-	 nupoEJnjCMJML1lq+dNjgd31ck+R9O+VcdbHjZZOMyftWBsb6/057V2ZHiME+MfWqZ
-	 94f/8Nt2SMm9A==
-Date: Wed, 3 Apr 2024 15:35:26 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 03/15] eth: fbnic: Allocate core device specific
- structures and devlink interface
-Message-ID: <20240403203526.GA1887417@bhelgaas>
+	s=arc-20240116; t=1712176654; c=relaxed/simple;
+	bh=X6bTWWIJgpGy4SkYcFLNiquERMtuJ6e3t7TzjT5IO4s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mDcGFo+DA96RtnKk+kqBR30Azz8St2rXgQZz8U+cmiQr130J5pWC5tyoGpXSzvc/Qple/gdS/eQgt5YgTczpXZSGDa3AWed2EQyLcv72n6rYmc7FY25EHDzsvBSIuJX0B/rqdY4xm5fxuWdXi+ni3BIQH+Nk8FNv/6L8oLSGIdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BB52160003;
+	Wed,  3 Apr 2024 20:37:22 +0000 (UTC)
+From: Ilya Maximets <i.maximets@ovn.org>
+To: netdev@vger.kernel.org
+Cc: Pravin B Shelar <pshelar@ovn.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yi-Hung Wei <yihung.wei@gmail.com>,
+	dev@openvswitch.org,
+	linux-kernel@vger.kernel.org,
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [PATCH net] net: openvswitch: fix unwanted error log on timeout policy probing
+Date: Wed,  3 Apr 2024 22:38:01 +0200
+Message-ID: <20240403203803.2137962-1-i.maximets@ovn.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <171217491765.1598374.8648487319055615080.stgit@ahduyck-xeon-server.home.arpa>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: i.maximets@ovn.org
 
-On Wed, Apr 03, 2024 at 01:08:37PM -0700, Alexander Duyck wrote:
-> From: Alexander Duyck <alexanderduyck@fb.com>
-> 
-> At the core of the fbnic device will be the devlink interface. This
-> interface will eventually provide basic functionality in the event that
-> there are any issues with the network interface.
-> 
-> Add support for allocating the MSI-X vectors and setting up the BAR
-> mapping. With this we can start enabling various subsytems and start
-> brining up additional interfaces such the AXI fabric and the firmware
-> mailbox.
+On startup, ovs-vswitchd probes different datapath features including
+support for timeout policies.  While probing, it tries to execute
+certain operations with OVS_PACKET_ATTR_PROBE or OVS_FLOW_ATTR_PROBE
+attributes set.  These attributes tell the openvswitch module to not
+log any errors when they occur as it is expected that some of the
+probes will fail.
 
-> +int fbnic_alloc_irqs(struct fbnic_dev *fbd)
-> +{
-> +	unsigned int wanted_irqs = FBNIC_NON_NAPI_VECTORS;
-> +	struct pci_dev *pdev = to_pci_dev(fbd->dev);
-> +	struct msix_entry *msix_entries;
-> +	int i, num_irqs;
-> +
-> +	msix_entries = kcalloc(wanted_irqs, sizeof(*msix_entries), GFP_KERNEL);
-> +	if (!msix_entries)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < wanted_irqs; i++)
-> +		msix_entries[i].entry = i;
-> +
-> +	num_irqs = pci_enable_msix_range(pdev, msix_entries,
-> +					 FBNIC_NON_NAPI_VECTORS + 1,
-> +					 wanted_irqs);
+For some reason, setting the timeout policy ignores the PROBE attribute
+and logs a failure anyway.  This is causing the following kernel log
+on each re-start of ovs-vswitchd:
 
-FWIW, deprecated in favor of pci_alloc_irq_vectors().
+  kernel: Failed to associated timeout policy `ovs_test_tp'
 
-> +	if (num_irqs < 0) {
-> +		dev_err(fbd->dev, "Failed to allocate MSI-X entries\n");
-> +		kfree(msix_entries);
-> +		return num_irqs;
-> +	}
-> +
-> +	if (num_irqs < wanted_irqs)
-> +		dev_warn(fbd->dev, "Allocated %d IRQs, expected %d\n",
-> +			 num_irqs, wanted_irqs);
-> +
-> +	fbd->msix_entries = msix_entries;
-> +	fbd->num_irqs = num_irqs;
-> +
-> +	return 0;
-> +}
+Fix that by using the same logging macro that all other messages are
+using.  The message will still be printed at info level when needed
+and will be rate limited, but with a net rate limiter instead of
+generic printk one.
+
+The nf_ct_set_timeout() itself will still print some info messages,
+but at least this change makes logging in openvswitch module more
+consistent.
+
+Fixes: 06bd2bdf19d2 ("openvswitch: Add timeout support to ct action")
+Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+---
+ net/openvswitch/conntrack.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+index 3019a4406ca4..74b63cdb5992 100644
+--- a/net/openvswitch/conntrack.c
++++ b/net/openvswitch/conntrack.c
+@@ -1380,8 +1380,9 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+ 	if (ct_info.timeout[0]) {
+ 		if (nf_ct_set_timeout(net, ct_info.ct, family, key->ip.proto,
+ 				      ct_info.timeout))
+-			pr_info_ratelimited("Failed to associated timeout "
+-					    "policy `%s'\n", ct_info.timeout);
++			OVS_NLERR(log,
++				  "Failed to associated timeout policy '%s'",
++				  ct_info.timeout);
+ 		else
+ 			ct_info.nf_ct_timeout = rcu_dereference(
+ 				nf_ct_timeout_find(ct_info.ct)->timeout);
+-- 
+2.44.0
+
 
