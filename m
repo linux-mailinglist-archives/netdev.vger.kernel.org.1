@@ -1,80 +1,108 @@
-Return-Path: <netdev+bounces-84501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9473E89710B
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:30:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8968A89701E
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:19:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFD53B25A1A
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD2E21C20DAA
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4930F14A09E;
-	Wed,  3 Apr 2024 13:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3052148303;
+	Wed,  3 Apr 2024 13:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YAAtNIir"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8+qq+KH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8A8148FF8
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F5F146A7E;
+	Wed,  3 Apr 2024 13:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712150906; cv=none; b=Astqy3PwQ8cYqLNEjnbmVtN9HmmCTZwrQMqPRQ93VJ3jZbi4XDDw2nvCYIqhrimueIvt2+iRakI7KrgwVEttG0yzQdvzYlXK41uLv26zp17YKDwQw5tBrb+J0FA0RerpjakFcGH0kOnW0L6kLHbUsQH4ZKj29swblbLlbKA7/7w=
+	t=1712150384; cv=none; b=QkgYaXcpKo9orSgros14iuQLoKodmHdXOmQ0ouhWtHbo6/BT0NTDlQR0SkkP1CcrA1XL35zpHjkqprOV1ZJSRk7qEvg0JRrMbt5+xc/GBswEKywueLcTO+5viE3300frtUOkEqApkDT6gwJKVuvvoH/mW5OP3SBwdUdiHJP0Psg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712150906; c=relaxed/simple;
-	bh=2OK9zniD3Kl1yamTmEiOM50EMBm688Olr2BNbC6g9KE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Tb3ZtzFliNW8KFhx6NyrIoG1pT/oF9OVFWpckWimsqMLwE9+l/cvJtYmhxGdsLTYfakLB4GB+wPvkbzRGZiKRgpefREL9EnGCIvz2pggGdSSwUcnwrTHT+2bxpWZUiQe4pfwcjmq3QfdrhIyT9wSMzpYvRPPPki+JDsu2cGdo8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YAAtNIir; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712150904; x=1743686904;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2OK9zniD3Kl1yamTmEiOM50EMBm688Olr2BNbC6g9KE=;
-  b=YAAtNIirZOJ7WcLRFdw59JJ4xyGJOurcMGtXT7Pp53L714eIOX5x0MuG
-   dXN4Z1pI1OqKgR7ukG1/NOdHO2YAw1N5EJDHGGeYwNPsRpdgyxlwo5oMO
-   BzID6ycfNwdqdsSa2wRaWE6FgLhzJpcKelWyoteZSVsMrt4XCTL1mjqcE
-   NKFcDVDkkA2o+AyTc7lqlsFa3hVsx3FQLKA0/hOO4ImaEyuGwuyUYxUiS
-   TCDsedGm47n0SbfjyEiVoeVAVQHs+WnySIfkm6Biw6baepgaAw6+MDLmq
-   NdHiypdm+LxkJOzYA65AI+TP2fhZTTDvIVdutRAbwtYXrRsNxbvhMgdaJ
-   A==;
-X-CSE-ConnectionGUID: u4Mb/TlWT0OgRt/JGkhcBg==
-X-CSE-MsgGUID: SSN55iD3SHO5RGidHEsOjg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7568755"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="7568755"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 06:28:23 -0700
-X-CSE-ConnectionGUID: fw0fybJDRciXf3I66YUl/g==
-X-CSE-MsgGUID: KqK84zCzSP63gfiYa3XCFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="41592078"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa002.fm.intel.com with ESMTP; 03 Apr 2024 06:28:20 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 8704F36C18;
-	Wed,  3 Apr 2024 14:28:16 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	horms@kernel.org,
-	anthony.l.nguyen@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v3 05/12] iavf: negotiate PTP capabilities
-Date: Wed,  3 Apr 2024 09:19:20 -0400
-Message-Id: <20240403131927.87021-6-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
-References: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
+	s=arc-20240116; t=1712150384; c=relaxed/simple;
+	bh=l/Ke/wiPt7/TaV9ybG3TveTzs1CGNNNgzCBPCA58cXg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T2XKSWFqepNHm0ZwXRLashhbvkytXagXL/k4dX0R9wdymoH3N+/jKn7516MDyDCcJY4EeoVOBLqLEgr4o+ZRAbpmFZDr7NXnZRjjITu32HbVGETRiUQ94CVc3Yoom5KQLDjbx9LBHHtrtSHooNQNDvoZcSvw90zmFaVgRVO2oPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g8+qq+KH; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e0f2798cd8so52875975ad.3;
+        Wed, 03 Apr 2024 06:19:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712150381; x=1712755181; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=5jeOyVY2AHqhv0KvV6kieVXey6Da3SBwUwdCTK976WY=;
+        b=g8+qq+KH/4ZOw4yKmBeAN1AEjHVv4iug/VmhgFNn9K3CpsBNyhSrCcyW9HDX4iUS3w
+         /zOuq23Y7ylAmJ4g4SKSm5GrP+9Hqr6mx5kq8xfut73OVqpZgFccbQufMji2kpyz3nfO
+         WSRP0qc8YcgQIWWCuGBmNtnMRy8uHFeX7UmbnrEVJ+WdKNlhVeJe2PxSE29c8fb/UuPF
+         cM+41js+04qz9ygVpN/pJELTfwE2hs7qLkiAIj6xdSS0+HXwRtraj8/WGlsPpvq7JPOT
+         23hJBjMtOmfbX7uNlA3nB/TKAiZlRrLRsMTzScAcHJfYJqpdvOMj4dNodseyrs5d4QoS
+         ye3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712150381; x=1712755181;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5jeOyVY2AHqhv0KvV6kieVXey6Da3SBwUwdCTK976WY=;
+        b=Te9qcRJDk+wo+ljEOihoLhkG/BO1zjSc8CsltTQQV3pbB0vrTGVdqzy9NJZeqazZPW
+         vyBNrS2F2O3EPCWckNAGeJSFhbMAFHg1jO0eVYt2+501YhSDUsssAhPCP91CNLtc+yg2
+         5hBeNrp8SU3rkC7Rha2I99Uv5nAeObtwC1XaNhabZF5GakQTnew36LLfgdz4iXWaFxkD
+         8BXE2lioeV1/WsrOLlv4Fw7zgr1hpIuMz8KL2FdPHQRsfmCDvuklMa7NWObtgW6G8IqB
+         610kBPh7nlCBHy7/lzBmzrLrqzsGMlrf4o2YtQp9Kz8MLDbWxhaA24Q5ZL6sp7KwGMum
+         vWaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVn0tQYIthAh+dAgS8It5Dh0e3tsOptMMWzEWD/SPt3Ish5IZRiZqXw0uINqRmcZxvGGcp+89IvG/mMP7dY8wvxoRQ6rOSFkG0yLOeimq9lTis3JTucGBfm/YpMyj4Z0BQmES0q80vOEM10OqYR+pKMFj0BjfCwDWk/m5GIkvfhHY4wnChUpiwWxhKtE8BAUMguqT0Whm5VCbZMEG7J5SLP5jnkT+LaX03yGTnRoREmVufV2u+DT4EF11djn8CafzBoycRVj8jg54Mz5ZsvmTpu2apKGcR1pgcQsMDBUVS8UZzqbD+1jn3U5agG/sCmbw==
+X-Gm-Message-State: AOJu0YwwkDi2irBujbKEOLv/JDyRJlsvoxKJjgfm2x6yf9eVUoHMGxJy
+	vdVkc3vj9oZ2iOJHypcpRflgPNmTlWltVpHF6nDNmdo/z/TR9wrdovK/eWbd
+X-Google-Smtp-Source: AGHT+IGUUHIUOOsCxCF/TsSf8IWxMRQa7fBTBtgLaZOyDBRCO0Z9+JW6g9cTcLQ9TLR427e8GbHcQA==
+X-Received: by 2002:a17:902:f68b:b0:1e2:8ec0:90c4 with SMTP id l11-20020a170902f68b00b001e28ec090c4mr2621403plg.2.1712150381396;
+        Wed, 03 Apr 2024 06:19:41 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id p2-20020a170902780200b001e00e17c6e2sm13430178pll.138.2024.04.03.06.19.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 06:19:40 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+To: linux-kselftest@vger.kernel.org
+Cc: David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	=?UTF-8?q?Ma=C3=ADra=20Canal?= <mcanal@igalia.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Kees Cook <keescook@chromium.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	=?UTF-8?q?Ville=20Syrj=C3=A4l=C3=A4?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org,
+	kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	x86@kernel.org,
+	Guenter Roeck <linux@roeck-us.net>
+Subject: [PATCH v3 00/15] Add support for suppressing warning backtraces
+Date: Wed,  3 Apr 2024 06:19:21 -0700
+Message-Id: <20240403131936.787234-1-linux@roeck-us.net>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,322 +111,129 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+Some unit tests intentionally trigger warning backtraces by passing bad
+parameters to kernel API functions. Such unit tests typically check the
+return value from such calls, not the existence of the warning backtrace.
 
-Add a new extended capabilities negotiation to exchange information from
-the PF about what PTP capabilities are supported by this VF. This
-requires sending a VIRTCHNL_OP_1588_PTP_GET_CAPS message, and waiting
-for the response from the PF. Handle this early on during the VF
-initialization.
+Such intentionally generated warning backtraces are neither desirable
+nor useful for a number of reasons.
+- They can result in overlooked real problems.
+- A warning that suddenly starts to show up in unit tests needs to be
+  investigated and has to be marked to be ignored, for example by
+  adjusting filter scripts. Such filters are ad-hoc because there is
+  no real standard format for warnings. On top of that, such filter
+  scripts would require constant maintenance.
 
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf.h        | 17 +++-
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 69 +++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.h    | 12 +++
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 77 +++++++++++++++++++
- 4 files changed, 173 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.h
+One option to address problem would be to add messages such as "expected
+warning backtraces start / end here" to the kernel log.  However, that
+would again require filter scripts, it might result in missing real
+problematic warning backtraces triggered while the test is running, and
+the irrelevant backtrace(s) would still clog the kernel log.
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index db00c1197c04..dbec7724a57d 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -39,6 +39,7 @@
- #include "iavf_txrx.h"
- #include "iavf_fdir.h"
- #include "iavf_adv_rss.h"
-+#include "iavf_ptp.h"
- #include <linux/bitmap.h>
- 
- #define DEFAULT_DEBUG_LEVEL_SHIFT 3
-@@ -337,13 +338,16 @@ struct iavf_adapter {
- #define IAVF_FLAG_AQ_ENABLE_STAG_VLAN_INSERTION		BIT_ULL(37)
- #define IAVF_FLAG_AQ_DISABLE_STAG_VLAN_INSERTION	BIT_ULL(38)
- #define IAVF_FLAG_AQ_GET_SUPPORTED_RXDIDS		BIT_ULL(39)
-+#define IAVF_FLAG_AQ_GET_PTP_CAPS			BIT_ULL(40)
-+#define IAVF_FLAG_AQ_SEND_PTP_CMD			BIT_ULL(41)
- 
- 	/* AQ messages that must be sent after IAVF_FLAG_AQ_GET_CONFIG, in
- 	 * order to negotiated extended capabilities.
- 	 */
- #define IAVF_FLAG_AQ_EXTENDED_CAPS			\
- 	(IAVF_FLAG_AQ_GET_OFFLOAD_VLAN_V2_CAPS |	\
--	 IAVF_FLAG_AQ_GET_SUPPORTED_RXDIDS)
-+	 IAVF_FLAG_AQ_GET_SUPPORTED_RXDIDS |		\
-+	 IAVF_FLAG_AQ_GET_PTP_CAPS)
- 
- 	/* flags for processing extended capability messages during
- 	 * __IAVF_INIT_EXTENDED_CAPS. Each capability exchange requires
-@@ -357,12 +361,16 @@ struct iavf_adapter {
- #define IAVF_EXTENDED_CAP_RECV_VLAN_V2			BIT_ULL(1)
- #define IAVF_EXTENDED_CAP_SEND_RXDID			BIT_ULL(2)
- #define IAVF_EXTENDED_CAP_RECV_RXDID			BIT_ULL(3)
-+#define IAVF_EXTENDED_CAP_SEND_PTP			BIT_ULL(4)
-+#define IAVF_EXTENDED_CAP_RECV_PTP			BIT_ULL(5)
- 
- #define IAVF_EXTENDED_CAPS				\
- 	(IAVF_EXTENDED_CAP_SEND_VLAN_V2 |		\
- 	 IAVF_EXTENDED_CAP_RECV_VLAN_V2 |		\
- 	 IAVF_EXTENDED_CAP_SEND_RXDID |			\
--	 IAVF_EXTENDED_CAP_RECV_RXDID)
-+	 IAVF_EXTENDED_CAP_RECV_RXDID |			\
-+	 IAVF_EXTENDED_CAP_SEND_PTP |			\
-+	 IAVF_EXTENDED_CAP_RECV_PTP)
- 
- 	/* Lock to prevent possible clobbering of
- 	 * current_netdev_promisc_flags
-@@ -420,6 +428,8 @@ struct iavf_adapter {
- 			     VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF)
- #define RXDID_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
- 			   VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC)
-+#define PTP_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
-+			 VIRTCHNL_VF_CAP_PTP)
- 	struct virtchnl_vf_resource *vf_res; /* incl. all VSIs */
- 	struct virtchnl_vsi_resource *vsi_res; /* our LAN VSI */
- 	struct virtchnl_version_info pf_version;
-@@ -427,6 +437,7 @@ struct iavf_adapter {
- 		       ((_a)->pf_version.minor == 1))
- 	struct virtchnl_vlan_caps vlan_v2_caps;
- 	struct virtchnl_supported_rxdids supported_rxdids;
-+	struct iavf_ptp ptp;
- 	u16 msg_enable;
- 	struct iavf_eth_stats current_stats;
- 	struct iavf_vsi vsi;
-@@ -539,6 +550,8 @@ int iavf_get_vf_vlan_v2_caps(struct iavf_adapter *adapter);
- int iavf_send_vf_offload_vlan_v2_msg(struct iavf_adapter *adapter);
- int iavf_send_vf_supported_rxdids_msg(struct iavf_adapter *adapter);
- int iavf_get_vf_supported_rxdids(struct iavf_adapter *adapter);
-+int iavf_send_vf_ptp_caps_msg(struct iavf_adapter *adapter);
-+int iavf_get_vf_ptp_caps(struct iavf_adapter *adapter);
- void iavf_set_queue_vlan_tag_loc(struct iavf_adapter *adapter);
- u16 iavf_get_num_vlans_added(struct iavf_adapter *adapter);
- void iavf_irq_enable(struct iavf_adapter *adapter, bool flush);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 0964939ab5f5..ea2034d7914a 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2110,6 +2110,8 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		return iavf_send_vf_offload_vlan_v2_msg(adapter);
- 	if (adapter->aq_required & IAVF_FLAG_AQ_GET_SUPPORTED_RXDIDS)
- 		return iavf_send_vf_supported_rxdids_msg(adapter);
-+	if (adapter->aq_required & IAVF_FLAG_AQ_GET_PTP_CAPS)
-+		return iavf_send_vf_ptp_caps_msg(adapter);
- 	if (adapter->aq_required & IAVF_FLAG_AQ_DISABLE_QUEUES) {
- 		iavf_disable_queues(adapter);
- 		return 0;
-@@ -2684,6 +2686,64 @@ static void iavf_init_recv_supported_rxdids(struct iavf_adapter *adapter)
- 	iavf_change_state(adapter, __IAVF_INIT_FAILED);
- }
- 
-+/**
-+ * iavf_init_send_ptp_caps - part of querying for extended PTP capabilities
-+ * @adapter: board private structure
-+ *
-+ * Function processes send of the request for 1588 PTP capabilities to the PF.
-+ * Must clear IAVF_EXTENDED_CAP_SEND_PTP if the message is not sent, e.g.
-+ * due to the PF not negotiating VIRTCHNL_VF_PTP_CAP
-+ */
-+static void iavf_init_send_ptp_caps(struct iavf_adapter *adapter)
-+{
-+	int ret;
-+
-+	WARN_ON(!(adapter->extended_caps & IAVF_EXTENDED_CAP_SEND_PTP));
-+
-+	ret = iavf_send_vf_ptp_caps_msg(adapter);
-+	if (ret && ret == -EOPNOTSUPP) {
-+		/* PF does not support VIRTCHNL_VF_PTP_CAP. In this case, we
-+		 * did not send the capability exchange message and do not
-+		 * expect a response.
-+		 */
-+		adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_PTP;
-+	}
-+
-+	/* We sent the message, so move on to the next step */
-+	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_SEND_PTP;
-+}
-+
-+/**
-+ * iavf_init_recv_ptp_caps - part of querying for supported PTP capabilities
-+ * @adapter: board private structure
-+ *
-+ * Function processes receipt of the PTP capabilities supported on this VF.
-+ **/
-+static void iavf_init_recv_ptp_caps(struct iavf_adapter *adapter)
-+{
-+	int ret;
-+
-+	WARN_ON(!(adapter->extended_caps & IAVF_EXTENDED_CAP_RECV_PTP));
-+
-+	memset(&adapter->ptp.hw_caps, 0, sizeof(adapter->ptp.hw_caps));
-+
-+	ret = iavf_get_vf_ptp_caps(adapter);
-+	if (ret)
-+		goto err;
-+
-+	/* We've processed the PF response to the VIRTCHNL_OP_1588_PTP_GET_CAPS
-+	 * message we sent previously.
-+	 */
-+	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_PTP;
-+	return;
-+err:
-+	/* We didn't receive a reply. Make sure we try sending again when
-+	 * __IAVF_INIT_FAILED attempts to recover.
-+	 */
-+	adapter->extended_caps |= IAVF_EXTENDED_CAP_SEND_PTP;
-+	iavf_change_state(adapter, __IAVF_INIT_FAILED);
-+}
-+
- /**
-  * iavf_init_process_extended_caps - Part of driver startup
-  * @adapter: board private structure
-@@ -2717,6 +2777,15 @@ static void iavf_init_process_extended_caps(struct iavf_adapter *adapter)
- 		return;
- 	}
- 
-+	/* Process capability exchange for PTP features */
-+	if (adapter->extended_caps & IAVF_EXTENDED_CAP_SEND_PTP) {
-+		iavf_init_send_ptp_caps(adapter);
-+		return;
-+	} else if (adapter->extended_caps & IAVF_EXTENDED_CAP_RECV_PTP) {
-+		iavf_init_recv_ptp_caps(adapter);
-+		return;
-+	}
-+
- 	/* When we reach here, no further extended capabilities exchanges are
- 	 * necessary, so we finally transition into __IAVF_INIT_CONFIG_ADAPTER
- 	 */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-new file mode 100644
-index 000000000000..aee4e2da0b9a
---- /dev/null
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright(c) 2024 Intel Corporation. */
-+
-+#ifndef _IAVF_PTP_H_
-+#define _IAVF_PTP_H_
-+
-+/* fields used for PTP support */
-+struct iavf_ptp {
-+	struct virtchnl_ptp_caps hw_caps;
-+};
-+
-+#endif /* _IAVF_PTP_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 52b8f1721147..f922e177146d 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -145,6 +145,7 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
- 	       VIRTCHNL_VF_OFFLOAD_CRC |
- 	       VIRTCHNL_VF_OFFLOAD_ENCAP_CSUM |
- 	       VIRTCHNL_VF_OFFLOAD_REQ_QUEUES |
-+	       VIRTCHNL_VF_CAP_PTP |
- 	       VIRTCHNL_VF_OFFLOAD_ADQ |
- 	       VIRTCHNL_VF_OFFLOAD_USO |
- 	       VIRTCHNL_VF_OFFLOAD_FDIR_PF |
-@@ -187,6 +188,39 @@ int iavf_send_vf_supported_rxdids_msg(struct iavf_adapter *adapter)
- 				NULL, 0);
- }
- 
-+/**
-+ * iavf_send_vf_ptp_caps_msg - Send request for PTP capabilities
-+ * @adapter: private adapter structure
-+ *
-+ * Send the VIRTCHNL_OP_1588_PTP_GET_CAPS command to the PF to request the PTP
-+ * capabilities available to this device. This includes the following
-+ * potential access:
-+ *
-+ * * READ_PHC - access to read the PTP hardware clock time
-+ * * RX_TSTAMP - access to request Rx timestamps on all received packets
-+ *
-+ * The PF will reply with the same opcode a filled out copy of the
-+ * virtchnl_ptp_caps structure which defines the specifics of which features
-+ * are accessible to this device.
-+ */
-+int iavf_send_vf_ptp_caps_msg(struct iavf_adapter *adapter)
-+{
-+	struct virtchnl_ptp_caps hw_caps = {};
-+
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_PTP_CAPS;
-+
-+	if (!PTP_ALLOWED(adapter))
-+		return -EOPNOTSUPP;
-+
-+	hw_caps.caps = (VIRTCHNL_1588_PTP_CAP_READ_PHC |
-+			VIRTCHNL_1588_PTP_CAP_RX_TSTAMP);
-+
-+	adapter->current_op = VIRTCHNL_OP_1588_PTP_GET_CAPS;
-+
-+	return iavf_send_pf_msg(adapter, VIRTCHNL_OP_1588_PTP_GET_CAPS,
-+				(u8 *)&hw_caps, sizeof(hw_caps));
-+}
-+
- /**
-  * iavf_validate_num_queues
-  * @adapter: adapter structure
-@@ -312,6 +346,45 @@ int iavf_get_vf_supported_rxdids(struct iavf_adapter *adapter)
- 	return err;
- }
- 
-+int iavf_get_vf_ptp_caps(struct iavf_adapter *adapter)
-+{
-+	struct iavf_hw *hw = &adapter->hw;
-+	struct iavf_arq_event_info event;
-+	enum virtchnl_ops op;
-+	enum iavf_status err;
-+	u16 len;
-+
-+	len =  sizeof(struct virtchnl_ptp_caps);
-+	event.buf_len = len;
-+	event.msg_buf = kzalloc(event.buf_len, GFP_KERNEL);
-+	if (!event.msg_buf) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	while (1) {
-+		/* When the AQ is empty, iavf_clean_arq_element will return
-+		 * nonzero and this loop will terminate.
-+		 */
-+		err = iavf_clean_arq_element(hw, &event, NULL);
-+		if (err != IAVF_SUCCESS)
-+			goto out_alloc;
-+		op = (enum virtchnl_ops)le32_to_cpu(event.desc.cookie_high);
-+		if (op == VIRTCHNL_OP_1588_PTP_GET_CAPS)
-+			break;
-+	}
-+
-+	err = (enum iavf_status)le32_to_cpu(event.desc.cookie_low);
-+	if (err)
-+		goto out_alloc;
-+
-+	memcpy(&adapter->ptp.hw_caps, event.msg_buf, min(event.msg_len, len));
-+out_alloc:
-+	kfree(event.msg_buf);
-+out:
-+	return err;
-+}
-+
- /**
-  * iavf_configure_queues
-  * @adapter: adapter structure
-@@ -2435,6 +2508,10 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		memcpy(&adapter->supported_rxdids, msg,
- 		       min_t(u16, msglen, sizeof(adapter->supported_rxdids)));
- 	break;
-+	case VIRTCHNL_OP_1588_PTP_GET_CAPS:
-+		memcpy(&adapter->ptp.hw_caps, msg,
-+		       min_t(u16, msglen, sizeof(adapter->ptp.hw_caps)));
-+	break;
- 	case VIRTCHNL_OP_ENABLE_QUEUES:
- 		/* enable transmits */
- 		iavf_irq_enable(adapter, true);
--- 
-2.38.1
+Solve the problem by providing a means to identify and suppress specific
+warning backtraces while executing test code. Support suppressing multiple
+backtraces while at the same time limiting changes to generic code to the
+absolute minimum. Architecture specific changes are kept at minimum by
+retaining function names only if both CONFIG_DEBUG_BUGVERBOSE and
+CONFIG_KUNIT are enabled.
 
+The first patch of the series introduces the necessary infrastructure.
+The second patch introduces support for counting suppressed backtraces.
+This capability is used in patch three to implement unit tests.
+Patch four documents the new API.
+The next two patches add support for suppressing backtraces in drm_rect
+and dev_addr_lists unit tests. These patches are intended to serve as
+examples for the use of the functionality introduced with this series.
+The remaining patches implement the necessary changes for all
+architectures with GENERIC_BUG support.
+
+With CONFIG_KUNIT enabled, image size increase with this series applied is
+approximately 1%. The image size increase (and with it the functionality
+introduced by this series) can be avoided by disabling
+CONFIG_KUNIT_SUPPRESS_BACKTRACE.
+
+This series is based on the RFC patch and subsequent discussion at
+https://patchwork.kernel.org/project/linux-kselftest/patch/02546e59-1afe-4b08-ba81-d94f3b691c9a@moroto.mountain/
+and offers a more comprehensive solution of the problem discussed there.
+
+Design note:
+  Function pointers are only added to the __bug_table section if both
+  CONFIG_KUNIT_SUPPRESS_BACKTRACE and CONFIG_DEBUG_BUGVERBOSE are enabled
+  to avoid image size increases if CONFIG_KUNIT is disabled. There would be
+  some benefits to adding those pointers all the time (reduced complexity,
+  ability to display function names in BUG/WARNING messages). That change,
+  if desired, can be made later.
+
+Checkpatch note:
+  Remaining checkpatch errors and warnings were deliberately ignored.
+  Some are triggered by matching coding style or by comments interpreted
+  as code, others by assembler macros which are disliked by checkpatch.
+  Suggestions for improvements are welcome.
+
+Changes since RFC:
+- Introduced CONFIG_KUNIT_SUPPRESS_BACKTRACE
+- Minor cleanups and bug fixes
+- Added support for all affected architectures
+- Added support for counting suppressed warnings
+- Added unit tests using those counters
+- Added patch to suppress warning backtraces in dev_addr_lists tests
+
+Changes since v1:
+- Rebased to v6.9-rc1
+- Added Tested-by:, Acked-by:, and Reviewed-by: tags
+  [I retained those tags since there have been no functional changes]
+- Introduced KUNIT_SUPPRESS_BACKTRACE configuration option, enabled by
+  default.
+
+Changes since v2:
+- Rebased to v6.9-rc2
+- Added comments to drm warning suppression explaining why it is needed.
+- Added patch to move conditional code in arch/sh/include/asm/bug.h
+  to avoid kerneldoc warning
+- Added architecture maintainers to Cc: for architecture specific patches
+- No functional changes
+
+----------------------------------------------------------------
+Guenter Roeck (15):
+      bug/kunit: Core support for suppressing warning backtraces
+      kunit: bug: Count suppressed warning backtraces
+      kunit: Add test cases for backtrace warning suppression
+      kunit: Add documentation for warning backtrace suppression API
+      drm: Suppress intentional warning backtraces in scaling unit tests
+      net: kunit: Suppress lock warning noise at end of dev_addr_lists tests
+      x86: Add support for suppressing warning backtraces
+      arm64: Add support for suppressing warning backtraces
+      loongarch: Add support for suppressing warning backtraces
+      parisc: Add support for suppressing warning backtraces
+      s390: Add support for suppressing warning backtraces
+      sh: Add support for suppressing warning backtraces
+      sh: Move defines needed for suppressing warning backtraces
+      riscv: Add support for suppressing warning backtraces
+      powerpc: Add support for suppressing warning backtraces
+
+ Documentation/dev-tools/kunit/usage.rst |  30 ++++++++-
+ arch/arm64/include/asm/asm-bug.h        |  29 ++++++---
+ arch/arm64/include/asm/bug.h            |   8 ++-
+ arch/loongarch/include/asm/bug.h        |  38 ++++++++----
+ arch/parisc/include/asm/bug.h           |  29 ++++++---
+ arch/powerpc/include/asm/bug.h          |  37 +++++++++---
+ arch/riscv/include/asm/bug.h            |  38 ++++++++----
+ arch/s390/include/asm/bug.h             |  17 +++++-
+ arch/sh/include/asm/bug.h               |  28 +++++++--
+ arch/x86/include/asm/bug.h              |  21 +++++--
+ drivers/gpu/drm/tests/drm_rect_test.c   |  16 +++++
+ include/asm-generic/bug.h               |  16 ++++-
+ include/kunit/bug.h                     |  56 +++++++++++++++++
+ include/kunit/test.h                    |   1 +
+ include/linux/bug.h                     |  13 ++++
+ lib/bug.c                               |  51 ++++++++++++++--
+ lib/kunit/Kconfig                       |   9 +++
+ lib/kunit/Makefile                      |   7 ++-
+ lib/kunit/backtrace-suppression-test.c  | 104 ++++++++++++++++++++++++++++++++
+ lib/kunit/bug.c                         |  42 +++++++++++++
+ net/core/dev_addr_lists_test.c          |   6 ++
+ 21 files changed, 524 insertions(+), 72 deletions(-)
+ create mode 100644 include/kunit/bug.h
+ create mode 100644 lib/kunit/backtrace-suppression-test.c
+ create mode 100644 lib/kunit/bug.c
 
