@@ -1,124 +1,132 @@
-Return-Path: <netdev+bounces-84529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C4018972E8
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:44:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B419F8972F0
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E513B29D02
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:40:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E69F28C45E
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE9859B6C;
-	Wed,  3 Apr 2024 14:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E465CDC9;
+	Wed,  3 Apr 2024 14:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="IPdAwJab"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KL/hqdY7"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863AD433C6;
-	Wed,  3 Apr 2024 14:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C4213A40B;
+	Wed,  3 Apr 2024 14:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712155245; cv=none; b=R7OEWLl+JIjnAfcVjP77MqhKTRc4d1tSZ+EcYGfhms6XLvtEyS8oDp9Xt2UqIKaASzGZMvFE0PxMngZ5kS3OgBJFhBSNHbDoKs7Y07l/zyEjZiu5zgqd0iMLW2qox0Kpiam5ccJxPVSk3dd0TV0Vbmqlg1cZ8Q5v4WkmvOP3zyo=
+	t=1712155491; cv=none; b=pyl4H+oKIkETLVhvfPHQXTHDvlTyeaK7hDJqNbeSuy6PbgtHx7ePwWhbN90zaOoKuHKKn58bXTtPviTDDDhyboPzKOIUiCDyDoQlUkXhX4u2flb7d3TvBs54nJz1w0p//whaCBSIvhdBwdSYvsn45mspvx6B9NLHxBiqIuFOyNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712155245; c=relaxed/simple;
-	bh=rT8sHi1P6vKvW4jge+5i6dqA062uBbrUeQnCV3IwOqg=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=gE6qzQE1e08Cj3okd+U/OegW7Fo5vgc131+DfAH2u9s4mNFGdp55J21XeWz7GoeYyctJE8qKCPyZw4fT/ZJB8fVsDUWRQ6py/To5/uDqLmwOWoXC4UTTOstON7N/QHErA/x90k6F2X2fDzFtQhuvbOqsKhX3NfxZipvX5tiqrG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=IPdAwJab; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=uicBnio8bSF9DNnpycUBJL1Q+Lal4LWdPwlItPeKwW8=; b=IPdAwJabygxRsrSF9Q+IWM4qvL
-	DkEc3QUZnw0Hfp0paVdxSRdz/YF3XvHnIx5vZDQ6VEbqjmKXWScvLYOh18FCMfIcwdV0UeKhOKTAO
-	rWgyf9XmSmOEx75/T5fAFJbfgNkuqPzeS2rwzc19BsbboL2qler/bq8/4GkWjfqWUuVgH+Mkshx/r
-	ouABhQnMmViDhug5/DN1P10PAUO0I7Lj0KoBEp8u8PDGdYDFTC4FFd1EAIXEtr4/z1ggbMfeIiXoo
-	vRpclL+AtnZsqgunSl3N5KMB3iQ3mBoUbR8jGN8Pdyre7mvKCR7QPY1GDUgkRtUbAeGrhXO9do2e3
-	mTnKXw2g==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rs1n6-000Oqk-CH; Wed, 03 Apr 2024 16:40:40 +0200
-Received: from [178.197.248.12] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rs1n5-001zbP-0p;
-	Wed, 03 Apr 2024 16:40:39 +0200
-Subject: Re: [PATCH bpf-next v3 2/2] selftests/bpf: Add testcase where 7th
- argment is struct
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20240403072818.1462811-1-pulehui@huaweicloud.com>
- <20240403072818.1462811-3-pulehui@huaweicloud.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <0f459fc1-1445-6e83-ace4-b2c42abfe884@iogearbox.net>
-Date: Wed, 3 Apr 2024 16:40:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1712155491; c=relaxed/simple;
+	bh=/bUWFCezkgyy5S4CuqWiKnU6VWsOo2TS23X0CcIeO3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=snzGs1MsU2T+2K3LeLjEUM5reRHwVsbK+h2Fj8OWU1bcmw/gqjys+OkVjkXeRed5oePx5fXrPUOBCgJ0Mq7FoIxAHllgylXXOxstAcP6AnFXvGfGdbgE1q6A/XNrW39UcLH97sV613FC4e8BoJ2fjcMWfn1GShck1XVP5MmEUzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KL/hqdY7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD74C43390;
+	Wed,  3 Apr 2024 14:44:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712155490;
+	bh=/bUWFCezkgyy5S4CuqWiKnU6VWsOo2TS23X0CcIeO3A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KL/hqdY7g7A3rt3L64YGc6y7NTX5V8jEgRH7IAkb8JOPoYIVE5QOrXyy0d/eqhXw9
+	 vY4wymhn3lErTVlrTnXatW6LuhTFrVc37KKda09EL13L58Ihpz0i36/j1CDth4MoRn
+	 rQNJJvgojQa3hyCq/7MTOiyksIwuFCX/KjEhX0aXwK4rswWATSChfDtanxwrBYF3gC
+	 Zp/K7R7J/Dc/83hOszq7jPMoIhVgdNoqzvBdYaDbknJP7SGf1VJEkxR3hjLQmZ35hZ
+	 AlRbfVhB7SyO/JkEnmBQbn7Wl+WzxvFtKRBNG1aRrQy2S6TndM+I0M3swW1nbA595R
+	 U/Oh06gBLL9ZQ==
+Date: Wed, 3 Apr 2024 09:44:48 -0500
+From: Rob Herring <robh@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <20240403144448.GB3508225-robh@kernel.org>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
+ <20240402132637.GA3744978-robh@kernel.org>
+ <ZgworgDAXXOpf3QV@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240403072818.1462811-3-pulehui@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27234/Wed Apr  3 10:25:27 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZgworgDAXXOpf3QV@pengutronix.de>
 
-On 4/3/24 9:28 AM, Pu Lehui wrote:
-> From: Pu Lehui <pulehui@huawei.com>
+On Tue, Apr 02, 2024 at 05:47:58PM +0200, Oleksij Rempel wrote:
+> On Tue, Apr 02, 2024 at 08:26:37AM -0500, Rob Herring wrote:
+> > > +          pairsets:
+> > > +            $ref: /schemas/types.yaml#/definitions/phandle-array
+> > > +            description:
+> > > +              List of phandles, each pointing to the power supply for the
+> > > +              corresponding pairset named in 'pairset-names'. This property
+> > > +              aligns with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
+> > > +              PSE Pinout Alternatives (as per IEEE 802.3-2022 Table 145\u20133)
+> > > +              |-----------|---------------|---------------|---------------|---------------|
+> > > +              | Conductor | Alternative A | Alternative A | Alternative B | Alternative B |
+> > > +              |           |    (MDI-X)    |     (MDI)     |      (X)      |      (S)      |
+> > > +              |-----------|---------------|---------------|---------------|---------------|
+> > > +              | 1         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
+> > > +              | 2         | Negative VPSE | Positive VPSE | \u2014             | \u2014             |
+> > > +              | 3         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
+> > > +              | 4         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
+> > > +              | 5         | \u2014             | \u2014             | Negative VPSE | Positive VPSE |
+> > > +              | 6         | Positive VPSE | Negative VPSE | \u2014             | \u2014             |
+> > > +              | 7         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
+> > > +              | 8         | \u2014             | \u2014             | Positive VPSE | Negative VPSE |
+> > > +            minItems: 1
+> > > +            maxItems: 2
+> > 
+> > "pairsets" does not follow the normal design pattern of foos, foo-names, 
+> > and #foo-cells. You could add #foo-cells I suppose, but what would cells 
+> > convey? I don't think it's a good fit for what you need.
+> > 
+> > The other oddity is the number of entries and the names are fixed. That 
+> > is usually defined per consumer. 
+> > 
+> > As each entry is just a power rail, why can't the regulator binding be 
+> > used here?
 > 
-> Add testcase where 7th argument is struct for architectures with 8
-> argument registers, and increase the complexity of the struct.
-> 
-> Signed-off-by: Pu Lehui <pulehui@huawei.com>
-> Acked-by: Björn Töpel <bjorn@kernel.org>
-> Reviewed-by: Björn Töpel <bjorn@rivosinc.com>
-> ---
->   tools/testing/selftests/bpf/DENYLIST.aarch64  |  1 +
->   .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 19 ++++++++++
->   .../selftests/bpf/prog_tests/tracing_struct.c | 13 +++++++
->   .../selftests/bpf/progs/tracing_struct.c      | 35 +++++++++++++++++++
->   4 files changed, 68 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/bpf/DENYLIST.aarch64 b/tools/testing/selftests/bpf/DENYLIST.aarch64
-> index d8ade15e2789..639ee3f5bc74 100644
-> --- a/tools/testing/selftests/bpf/DENYLIST.aarch64
-> +++ b/tools/testing/selftests/bpf/DENYLIST.aarch64
-> @@ -6,6 +6,7 @@ kprobe_multi_test                                # needs CONFIG_FPROBE
->   module_attach                                    # prog 'kprobe_multi': failed to auto-attach: -95
->   fentry_test/fentry_many_args                     # fentry_many_args:FAIL:fentry_many_args_attach unexpected error: -524
->   fexit_test/fexit_many_args                       # fexit_many_args:FAIL:fexit_many_args_attach unexpected error: -524
-> +tracing_struct                                   # test_fentry:FAIL:tracing_struct__attach unexpected error: -524
+> I'm not against describing it consequent with regulator till the wire
+> end, but right now I have no idea how it should be described by using
+> regulator bindings. There are maximum 2 rails going in to PSE PI on one
+> side and 4 rails with at least 5 combinations supported by standard on
+> other side. Instead of inventing anything new, I suggested to describe
+> supported output combinations by using IEEE 802.3 standard.
 
-Do we need to blacklist the whole test given it had coverage on arm64
-before.. perhaps this test here could be done as a new subtest and only
-that one is listed for arm64?
+There's 4 combinations above, what's the 5th combination? SPE?
 
->   fill_link_info/kprobe_multi_link_info            # bpf_program__attach_kprobe_multi_opts unexpected error: -95
->   fill_link_info/kretprobe_multi_link_info         # bpf_program__attach_kprobe_multi_opts unexpected error: -95
->   fill_link_info/kprobe_multi_invalid_ubuff        # bpf_program__attach_kprobe_multi_opts unexpected error: -95
+Seems to me you just describe the 2 rails going to the connector and 
+then describe all the variations the connector supports. The PSE 
+(h/w) has little to do with which variations are supported, right? 
+For example, MDI-X vs. MDI support is determined by the PHY, right? Or 
+it has to be supported by both the PHY and PSE?
 
-Thanks,
-Daniel
+Rob
 
