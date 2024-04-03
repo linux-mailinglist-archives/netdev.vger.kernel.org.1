@@ -1,108 +1,217 @@
-Return-Path: <netdev+bounces-84634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5C35897A82
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:17:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63B33897A8D
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F7ED1F236F4
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 21:17:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECA051F23C6D
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 21:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6B7156664;
-	Wed,  3 Apr 2024 21:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1683A156864;
+	Wed,  3 Apr 2024 21:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R1kTZzlb"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ptx5/DWJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7CA2BB02
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 21:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2495156667
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 21:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712179040; cv=none; b=fSXlzOd+0SjE5NYTSO8204H388EwX2VnFcLyiWkvRT8q0s7T0IJqbJFS8SX7sklEAHpbzmyA8vnewZzUjtRU7ESxZcDT26jBL4fyj9fI/o3Riq+7krWVzgiz4l0z/usDRKTx03zlaeX/f71Lnq81n4Caw9UYtmMPlNwkMhBxak8=
+	t=1712179239; cv=none; b=mOI6Rm2SE1T1pAsdMKUnaM2lEpcdJDlu2h0OxEpeXgfMUpJNBbB79gXXd5EuFhk+eTJnEJsFy/mhh0tPqB9iCLiQhR1uUj1JW6tftc1q2GNnaiFDB5jDOqs/FeBGeqqST78Oz0JcjDpjR4lYvu8re3V/2ouivrlFpxQNM7V/LYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712179040; c=relaxed/simple;
-	bh=13n8Vj2JpXmk8lvMEpfTAnHa7Ppq4qucolVUR1xLFnA=;
+	s=arc-20240116; t=1712179239; c=relaxed/simple;
+	bh=qNCBndGvASRj94i9gCbn2Ois8Kwv0gWWiWeAMOMLgEQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CAJSoV1CroI3QVZw8I+alWS3TBGau4UVElVALpp22f0k389j+vhEmPMXb6AaMI97iNxWz2M8ckdWV52eDNDNcgoY4572MllM9bjMAlpFP/i8IRuU1gaTp6lr+8xQhp2m9/HBYMHxNfqJft3oF4ThpsdKqF4Z8hClY8hDhR1rFuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R1kTZzlb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=JqbnLhQrjGQoV+XnhRTu7tv0RSgFD0H9E4Cq+hNRKrI=; b=R1
-	kTZzlb1WDxrWsqlaPYNo3Jfe9PXwdMdpuCpKOB7CfZWP7ryOI6oEEBsU+qRs8Q3lcQQRGKFqrLRSH
-	cES4SoBApWNm4ggHd9+L/fkJUHoqxvzvGbJjjuxu/mOm09Bs2/lxRHEaa7uuAAGc6iLvodTkrU959
-	3NGf+aWj0ed8Nsk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rs7yt-00C7Hj-O6; Wed, 03 Apr 2024 23:17:15 +0200
-Date: Wed, 3 Apr 2024 23:17:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 02/15] eth: fbnic: add scaffolding for Meta's
- NIC driver
-Message-ID: <19c2a4be-428f-4fc6-b344-704f314aee95@lunn.ch>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <171217491384.1598374.15535514527169847181.stgit@ahduyck-xeon-server.home.arpa>
- <7b4e73da-6dd7-4240-9e87-157832986dc0@lunn.ch>
- <CAKgT0UeBva+gCVHbqS2DL-0dUMSmq883cE6C1JqnehgCUUDBTQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qL7fxaEjmFDFsyRFyqCLfIXzKBRShWDPfdDLHPqh5o39vMQ+HqvOp97g4cCNMvDdmvUhLaDRb+G9bvOALfgL6Rl4TApk3NFb0wq6Gmjr04AR3PghbqwDtpeac6GtvH944QY7DINYRic/T3D2qnqdHyQTi9gvQAVMAnQ10anFuyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Ptx5/DWJ; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1dff837d674so2328075ad.3
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 14:20:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1712179236; x=1712784036; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gk/7t8bB/vPp5RYyhmHYp9/pKPIZpl1c0Hpc1VIArKM=;
+        b=Ptx5/DWJGOU9bqEoPLyU4ZVnUh9y3Xg9DvWbgEX4H/YrkQLkMUJSAnSiWexQ4Gzw1R
+         647vdzB8MXYOeAzQ/sAS2yYZmG3d071l5agv91Eq+IyAH5kdO42jY6PPSVrRvxB+lNOk
+         xCuL5r/sFUNSFKhut5mZeJ47HjuCvvl+8N89U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712179236; x=1712784036;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gk/7t8bB/vPp5RYyhmHYp9/pKPIZpl1c0Hpc1VIArKM=;
+        b=EZh++pbCDYcBfCiSUv4uOov9xIk02AChkjUue+QHfR8LqQb+WZIcNdPzdAkVPL3d90
+         KPobIIBWizWS2reiFxus+Lyz+riasrp/LK4ppB5E1+uzjRzdM2fLqkELVt6WhlYCSWIA
+         SIv2ZDVZD3qCt0pZP6BfSVvym5jPOwIn2DoDoiEvhTA5OwjykRw4cAse/sA1rlA/zT76
+         kne8RIzq9Nbvn9K/o7OQBDoqiwHDfVeTmmwWIQfGZr1Y1gDqzwD+qtVq7RjCzJ4jzzYK
+         JgB26SAY5ix5WKXyk84lk0v5PsrdjTcEfRCZsrEpT4tzQSMtLc1Tlu+gwPSJNaJZMCQW
+         tQ7g==
+X-Forwarded-Encrypted: i=1; AJvYcCX8QUktiOwDAZwCbdiuhKLrJfqwMmGSQaEu/rNpAY6/G+Ex85t7RwQ5wK6ycDtst8I2YeA2BteiTYWa/0pf0hYa76ZvV32N
+X-Gm-Message-State: AOJu0YyTW8lO0oZWXdrvVHzfQNONGN/wY8rfX98BQtwKfsOeqmMMBzLE
+	RfuCzAP3LkadpBGYOvBpNER8w8RNinnJ2ytPAitYGdBXBIb8w7SgIgI0UuWdoA==
+X-Google-Smtp-Source: AGHT+IFNWSt+grv0aoo3QXgpCvCZ7QxZ9IBnA1B4gdZs5eLtWkdhNXO9ogb9Q/XDMKHoC6MfZl34Wg==
+X-Received: by 2002:a17:903:110f:b0:1e0:f25b:e795 with SMTP id n15-20020a170903110f00b001e0f25be795mr509491plh.11.1712179236057;
+        Wed, 03 Apr 2024 14:20:36 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id m16-20020a170902bb9000b001e2a87d7d2dsm163988pls.253.2024.04.03.14.20.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 14:20:35 -0700 (PDT)
+Date: Wed, 3 Apr 2024 14:20:34 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: linux-kselftest@vger.kernel.org, David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	=?iso-8859-1?Q?Ma=EDra?= Canal <mcanal@igalia.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v3 00/15] Add support for suppressing warning backtraces
+Message-ID: <202404031414.645255D868@keescook>
+References: <20240403131936.787234-1-linux@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0UeBva+gCVHbqS2DL-0dUMSmq883cE6C1JqnehgCUUDBTQ@mail.gmail.com>
+In-Reply-To: <20240403131936.787234-1-linux@roeck-us.net>
 
-On Wed, Apr 03, 2024 at 01:47:18PM -0700, Alexander Duyck wrote:
-> On Wed, Apr 3, 2024 at 1:33 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > > + * fbnic_init_module - Driver Registration Routine
-> > > + *
-> > > + * The first routine called when the driver is loaded.  All it does is
-> > > + * register with the PCI subsystem.
-> > > + **/
-> > > +static int __init fbnic_init_module(void)
-> > > +{
-> > > +     int err;
-> > > +
-> > > +     pr_info(DRV_SUMMARY " (%s)", fbnic_driver.name);
-> >
-> > Please don't spam the kernel log like this. Drivers should only report
-> > when something goes wrong.
-> >
-> >      Andrew
+On Wed, Apr 03, 2024 at 06:19:21AM -0700, Guenter Roeck wrote:
+> Some unit tests intentionally trigger warning backtraces by passing bad
+> parameters to kernel API functions. Such unit tests typically check the
+> return value from such calls, not the existence of the warning backtrace.
 > 
-> Really?
+> Such intentionally generated warning backtraces are neither desirable
+> nor useful for a number of reasons.
+> - They can result in overlooked real problems.
+> - A warning that suddenly starts to show up in unit tests needs to be
+>   investigated and has to be marked to be ignored, for example by
+>   adjusting filter scripts. Such filters are ad-hoc because there is
+>   no real standard format for warnings. On top of that, such filter
+>   scripts would require constant maintenance.
+> 
+> One option to address problem would be to add messages such as "expected
+> warning backtraces start / end here" to the kernel log.  However, that
+> would again require filter scripts, it might result in missing real
+> problematic warning backtraces triggered while the test is running, and
+> the irrelevant backtrace(s) would still clog the kernel log.
+> 
+> Solve the problem by providing a means to identify and suppress specific
+> warning backtraces while executing test code. Support suppressing multiple
+> backtraces while at the same time limiting changes to generic code to the
+> absolute minimum. Architecture specific changes are kept at minimum by
+> retaining function names only if both CONFIG_DEBUG_BUGVERBOSE and
+> CONFIG_KUNIT are enabled.
+> 
+> The first patch of the series introduces the necessary infrastructure.
+> The second patch introduces support for counting suppressed backtraces.
+> This capability is used in patch three to implement unit tests.
+> Patch four documents the new API.
+> The next two patches add support for suppressing backtraces in drm_rect
+> and dev_addr_lists unit tests. These patches are intended to serve as
+> examples for the use of the functionality introduced with this series.
+> The remaining patches implement the necessary changes for all
+> architectures with GENERIC_BUG support.
+> 
+> With CONFIG_KUNIT enabled, image size increase with this series applied is
+> approximately 1%. The image size increase (and with it the functionality
+> introduced by this series) can be avoided by disabling
+> CONFIG_KUNIT_SUPPRESS_BACKTRACE.
+> 
+> This series is based on the RFC patch and subsequent discussion at
+> https://patchwork.kernel.org/project/linux-kselftest/patch/02546e59-1afe-4b08-ba81-d94f3b691c9a@moroto.mountain/
+> and offers a more comprehensive solution of the problem discussed there.
+> 
+> Design note:
+>   Function pointers are only added to the __bug_table section if both
+>   CONFIG_KUNIT_SUPPRESS_BACKTRACE and CONFIG_DEBUG_BUGVERBOSE are enabled
+>   to avoid image size increases if CONFIG_KUNIT is disabled. There would be
+>   some benefits to adding those pointers all the time (reduced complexity,
+>   ability to display function names in BUG/WARNING messages). That change,
+>   if desired, can be made later.
+> 
+> Checkpatch note:
+>   Remaining checkpatch errors and warnings were deliberately ignored.
+>   Some are triggered by matching coding style or by comments interpreted
+>   as code, others by assembler macros which are disliked by checkpatch.
+>   Suggestions for improvements are welcome.
+> 
+> Changes since RFC:
+> - Introduced CONFIG_KUNIT_SUPPRESS_BACKTRACE
+> - Minor cleanups and bug fixes
+> - Added support for all affected architectures
+> - Added support for counting suppressed warnings
+> - Added unit tests using those counters
+> - Added patch to suppress warning backtraces in dev_addr_lists tests
+> 
+> Changes since v1:
+> - Rebased to v6.9-rc1
+> - Added Tested-by:, Acked-by:, and Reviewed-by: tags
+>   [I retained those tags since there have been no functional changes]
+> - Introduced KUNIT_SUPPRESS_BACKTRACE configuration option, enabled by
+>   default.
+> 
+> Changes since v2:
+> - Rebased to v6.9-rc2
+> - Added comments to drm warning suppression explaining why it is needed.
+> - Added patch to move conditional code in arch/sh/include/asm/bug.h
+>   to avoid kerneldoc warning
+> - Added architecture maintainers to Cc: for architecture specific patches
+> - No functional changes
+> 
+> ----------------------------------------------------------------
+> Guenter Roeck (15):
+>       bug/kunit: Core support for suppressing warning backtraces
+>       kunit: bug: Count suppressed warning backtraces
+>       kunit: Add test cases for backtrace warning suppression
+>       kunit: Add documentation for warning backtrace suppression API
+>       drm: Suppress intentional warning backtraces in scaling unit tests
+>       net: kunit: Suppress lock warning noise at end of dev_addr_lists tests
+>       x86: Add support for suppressing warning backtraces
+>       arm64: Add support for suppressing warning backtraces
+>       loongarch: Add support for suppressing warning backtraces
+>       parisc: Add support for suppressing warning backtraces
+>       s390: Add support for suppressing warning backtraces
+>       sh: Add support for suppressing warning backtraces
+>       sh: Move defines needed for suppressing warning backtraces
+>       riscv: Add support for suppressing warning backtraces
+>       powerpc: Add support for suppressing warning backtraces
 
-I think if you look around, GregKH has said this.
+Tested-by: Kees Cook <keescook@chromium.org>
 
-lsmod | wc
-    167     585    6814
+(for x86 and um)
 
-Do i really want my kernel log spammed with 167 'Hello world'
-messages?
+I was planning to add warning suppression for the "overflow" KUnit
+tests, but it seems the vmalloc routines aren't calling warn_alloc() any
+more for impossible sizes. So, I think, no patches needed for
+lib/overflow_kunit.c, but at the end of the day, I've tested this series
+is working for me. :P
 
-> I have always used something like this to determine that the
-> driver isn't there when a user complains that the driver didn't load
-> on a given device. It isn't as though it would be super spammy as this
-> is something that is normally only run once when the module is loaded
-> during early boot, and there isn't a good way to say the module isn't
-> loaded if the driver itself isn't there.
-
-lsmod
-
-	Andrew
+-- 
+Kees Cook
 
