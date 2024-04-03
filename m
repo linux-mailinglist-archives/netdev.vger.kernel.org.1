@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-84535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE418897331
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:58:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441FD897332
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:58:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AB62911DB
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:58:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63A531C21447
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26FA0149C6D;
-	Wed,  3 Apr 2024 14:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF8D149DFB;
+	Wed,  3 Apr 2024 14:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="YByRV/P6"
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="KGY+1ZIp"
 X-Original-To: netdev@vger.kernel.org
 Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2132.outbound.protection.outlook.com [40.107.94.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909A3149C7B
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 14:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D04149DE2
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 14:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.132
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712156299; cv=fail; b=S46/+ggiDJOTBBeSSavjIuQz31WTK9HjjvCjm8pkUMj6tCuUOj2S8wO2/Z4L5JyAf5ISrHgZ1PQ1dxgxGPsPhF9ov/UGDT6aj2wJPw6Z3Km2S4pcWLjFlVYeGdD8SK+QlJcPI6S+XuH0AfD6CZcSy9sXMlmHitpUk+VwKWiy0Nk=
+	t=1712156300; cv=fail; b=eyIc8Abgc+AxooXXhxT/U0mufRj1lHIn7TBXC2fwW93haZlJUopmypVMRuNPTX8zn7NbG3ljexbIiJdeCAuCY8goy+ZspsyAjPaqhXp7ZxJwlie5T6WoTDGpkfeq25j/aj3d177rXe46BYERmuEJIp1tTCRMBD8LxUUASTYaKI0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712156299; c=relaxed/simple;
-	bh=0sisdVPwVlZ6pmGT58WwME/ANLhBoAXaXybagbQ2m7g=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=F4ZlKXCdzR1ksnQXMJHEWPu7Qp5RuOuvmgWUVryDFZJCXSu3by90jIWekENNWxnOm7ccFohABn7dtEAA+r58HQC0QMgk1esTlBZxtcCAVgjpU2dn/BgzQulIUkq6IEdVkauyGQ80FgPELkE3m9xNNBxIEPw07RkrmT6N1xHJ1oI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=YByRV/P6; arc=fail smtp.client-ip=40.107.94.132
+	s=arc-20240116; t=1712156300; c=relaxed/simple;
+	bh=yyULfJDoWcOVstoRB1WYRtfPrE9JNSTubJFVqHiUhO8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qeyftbVxWrhYY4vDraQaZTDqbGDvrhBiVFcbHEe+bhNvgi0nbWUtsX55Qqt0ujHQhTa7hatoc3Blpw2BB52kfXuCa8SduVV2xvfxiXXuO3N7EF83OTlI3Sb0PrvvI6cyU/AYiPK5ku6DjI1pmiOoNsXZkBh7CUS7RIYJ4E/gsec=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=KGY+1ZIp; arc=fail smtp.client-ip=40.107.94.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P/6SUb2WfrVrWq9R7uUZx+1gYeneKdtX+vqsReouvZt0MA6mHNOTaAqBXyuO2WrJh3JCdi8A2kdEpayWvNBIiMX7iX8fUAtXH42tdnKL/0wuonB5AxoYv4Ak++BpJRe1zbgb3YBLVNgZw3HEx8fnfhDAARonHhjZm62svI2ciqBvomuPsnfy9OuoXOI51uOWRTXAslFBhrjs/QJM2xcnGbNU1ss6emPJh6WLYSP+qGMBicWtaMGQP+jrcbVVFQ39+rAxNDIrYzoBm0kS3N4tAGx2LMOqU86TLBPXjB3WuwiVxVRRwu6dqT0M3vCL82AsY4qtyaSHkwT2cZadi7oX+Q==
+ b=jcX/+B+78GrMSNklfadMd8ig8WtsH9Rdq8+ijB2YYrRtzrBjtMYqtpNfflH0h223nxq3ahUITItUTj13y0EFxzfnf+bEkgsnsgNdRavUmHv5RYfeyQ82YbD3t5JttYCGuwXhIUh2R332q0/y/z8ZJWWQeP4AnUKhYUx0ux1JshHtlHOmt3htLamwK4qmM2eY8p3VWnKqVd0u4ncYx/yMR1JlMHIecSE8cvig6CJp7vllYzMrzSrC4MRpLEnWZ4smGO2HOtNvf0QeeHPW3IwOOcHsT+/hImOTOV9uJh+o8cYKmFl2n0juCpqJ0gDguhavkb6I0juYh5YixTbDGwz0Wg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tND220CQS1AqNR1vuOde0PoDlla+O3jX5Krf6yC/i78=;
- b=nXAJhyIFLMjggPOFMO9FMtu0+N9rt7avGPwgfDg5orl8w10lDU5Oj3umiMaWu6J0iyAtNCFhKg28SymddJCEQHGKGgk0170WzutrRVp50tpHoARmwrvV1JBk3MPTaEAHGEgDpdIjx61Hc3hx9IT4vcC/GiGDd7gt9uR2guvT2/qzfGETta6q5VvWkpHleheHVik6Y2FnkestEi6SUJ6WhdrC7qHZl6rE9sc0mkAO39Q0xReABMAEY8XGhzp+jLJi6CsWj0d0q/BhnhgAGOqsab3HYaNK8/FH8x5uYY0pagcTcpR/4JFtCr8k/qxyStb3+EncCXNLmkl/8hVlWFCyCA==
+ bh=G8+Pa4zRPIJO+kKYd0nB6E/azQ2VbO+CHvvc6kKe4x0=;
+ b=BTxBLi4cg37pgszpjB2f8TFwfPEcMik0uwfI3oM7f5/+OpucfQG4hZX51HnJaJg0gld1ItUFQVW2YydBS7KblmmSbNhzMBgXUM+AQE6U2buQBkKcnjWVO922M2uQlypOY+kVWkldgLEazv09jv+GDJqplw+qxbIe6n03coybcceIcPa+arTKhK+DVjP9NQbGhOv6ZhRlfhZ9dOsUviakyLH9IKtgXxWVcT2fXLrd6LvxLf+J2JLnOl8X8s8Z2GDoB3xMdT01mItxmKQNqFoSB7fnuyHoczaXz3bqyqWUBenkQ08avnGS2xQqMx/Xy6iT9uqFwChm0rRp+3p3gpXY7A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tND220CQS1AqNR1vuOde0PoDlla+O3jX5Krf6yC/i78=;
- b=YByRV/P6ejxBTES2N9ShivPoQAqip1zs8dizme2l4tBdUeTz6o6HVblvs65w9Xe2/fGVmgV5A+KpJuIGvdJyblZqQc35WMgkJJjHCSQsoXZFvIcTFVrNzUyPAh/P05WwDpGb2PO9+Az0dgkoUctKn5sKDkQ9eLGaN9ZPv0f7cE0=
+ bh=G8+Pa4zRPIJO+kKYd0nB6E/azQ2VbO+CHvvc6kKe4x0=;
+ b=KGY+1ZIpkhJixCkE/8xTJtPYKe/UPQEtDMJVwVtlubkaFLsY6A/z/W9GfK7BrrnsmvGDTAXj99VwBs+E5A8LO4Fp7AWJU9cpbx4c6bTeXmGJf7XSlcRdBVxcmPQcDMRbtB8uLHRWpvL0F+LSuvoC3EfOEwqCrAm63ULzwoAN8v8=
 Received: from CH2PR13MB4411.namprd13.prod.outlook.com (2603:10b6:610:6e::12)
  by DM6PR13MB4413.namprd13.prod.outlook.com (2603:10b6:5:1bf::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 3 Apr
- 2024 14:58:13 +0000
+ 2024 14:58:17 +0000
 Received: from CH2PR13MB4411.namprd13.prod.outlook.com
  ([fe80::cd14:b8e:969c:928f]) by CH2PR13MB4411.namprd13.prod.outlook.com
  ([fe80::cd14:b8e:969c:928f%4]) with mapi id 15.20.7409.042; Wed, 3 Apr 2024
- 14:58:13 +0000
+ 14:58:17 +0000
 From: Louis Peens <louis.peens@corigine.com>
 To: David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -62,10 +63,12 @@ Cc: Jiri Pirko <jiri@resnulli.us>,
 	Fei Qin <fei.qin@corigine.com>,
 	netdev@vger.kernel.org,
 	oss-drivers@corigine.com
-Subject: [PATCH net-next v3 0/4] nfp: series of minor driver improvements
-Date: Wed,  3 Apr 2024 16:56:56 +0200
-Message-Id: <20240403145700.26881-1-louis.peens@corigine.com>
+Subject: [PATCH net-next v3 1/4] devlink: add a new info version tag
+Date: Wed,  3 Apr 2024 16:56:57 +0200
+Message-Id: <20240403145700.26881-2-louis.peens@corigine.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240403145700.26881-1-louis.peens@corigine.com>
+References: <20240403145700.26881-1-louis.peens@corigine.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: JNAP275CA0005.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4c::10)
@@ -82,90 +85,102 @@ X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	YjJnyXfNFvqi/CfrXcnLFdUVkE4eGhhlDy9gf7/rwVeEMgcVz9GjchALtKAC91ypiJTIze5R6un/Qmn3kp7ZZQyoDBZOYPbkW67saa95Up5vooATEkY8TNIIHTa6n4Mw9Kn6a3Crs/YSVKSkwbX/mZqF3ywN4RxsdcP9XWPAS7m6N5YLM+q6/rENF9iKBFnCXk6nVocS8nFQdxVVIH/ATDLtaYL8oga7Ahbedv895JicVfc9GRC5rJYezVk7KjEtIiz1YpEin38lpOPvI//6FLmNevBoQaxOyUJ2XGafi2oSpcApemajrXX2mT/sEcFj1Mhkroe/1hwuCJZ2+eDKI7dAHPNuw6WZRly8N+AkaBne5NDU6OW+pWk9s3DBM2z1xEk+oS6nACFb2KrCWTaacYP0wIInuvWqsJ51gzSGM3j26jPjaj0gnMwnw3MEjEgIDxaM9fNKkbmjYHFCpImTsTDow6KHUIEywF7ppeHbP/hO3bWSm9yIOzKC8bSuoZjtpw4aFzvdvGgjJfps1iRPvet0y3AtstzYw+FuM7sEmRmVSu+DecEztPnrFWGe+Fo2yjtPA8PAJw+Hbo3Ei2IVCUsfYf4RhYMAjz4EEy0vWvo9a5d+fDFyam+tOK2O4MTpF87aY4iQZBakDWjOYdzu9/v1isYT8S467X0bJBHzZRiHychzXwKOR+7zYgZ1Ndd/HO8/o6ETiD4X2HktsEIw5g==
+	YpHy25oGQtu3EmPSr3MyddPWf2AgDr6HaRk+i16CAR2dJCCvGIm+yZdlJmnP9OzOLb7mTQjObOHtWyx0UOqfXEIj29+RKHka3YC4NeMYHEsZTQlx2azyDlUEzzg6cPSXlPo8es6pZCJPmIbhwKVk06sga9fPpzcXMqV5G99Iig9YF2uqkP9sUsXu6Yv2ZxVYJGrzYfqXD110xlKCl+VlC4J+ZHRUU8Hb250fyddCNFNw6kXt7wWP6mbekOCAFPBKvwoA6h4osyBWLcnoacDxtUyPBu5hjZZXgYFW6FYGcA0gVIlueIBkOkmqW0RagXF9BJpAlNLr3AEs69+SHBZ3Nw5lC6HFuuJlkig0y/4t0lTp/DmgZbV9xqRDGiieSF2obUPo5a8dKTl7gAQbgz+hPqDxm0IcW8BB1j8ioafnctqy556JipKyiUxTy1jQmk4sTS2RD2fWj1vJivtp+TNFFsqVMKjLs0LX/i0Me3X8Q4MTMnMDMy+BuGeRhoIMsuEyReX9FaPejH+uPW0DLyecnJVM9/lF5rzoFq4ihhazoNr5FMYpNjbBeFKjwgK4mYnqXfAF0N/6xqjlDlPvQVHvNc/YbvHkLAPBK/65DccpVXsml+2Uk9VWOsow7VAQdnt0kOxppmCMNJtGXmae4BHd5uvJ+FbpszAxgVTXKWbA+xDpM01gsnRQTp4IFtnMisz/39p3J95P7cZzRHKzUYekNh4a8TZSjd2m1Lo5hsTETlY=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR13MB4411.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(52116005)(1800799015)(376005)(366007)(38350700005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?XUxEi05x7MVZ18cr16OVoaoDDOsQbkg4B1+HNDY2w3tVqtfdINqinsC0zWd5?=
- =?us-ascii?Q?F2Cs6iBxGXGdSilt5gC0U/JNi0K4w8o+QBOndjkuGfub1HPDyoJN19dYLqMK?=
- =?us-ascii?Q?gJ1rs3Dk6SUa8q8js7tFtOcuOFXi6gnt8ixYW61dCuWV7VBs4bDVyHHP0Uq+?=
- =?us-ascii?Q?q5TOPdlroeDqHbu5ZWBJ+56IzgvlEU+6kSjB087zLMNEEoWn0FhtjGW2QDJB?=
- =?us-ascii?Q?bEGyWpsT8KS1QQ6xB1BfMK7tbpjTIp9NCM9BnOCJb9VKOpfkCUO65Zt/iYNC?=
- =?us-ascii?Q?+2gGofvNkdHmJGdl5w4a4da6BIaEvIGpeWH3l+vLn10uIsPuFGIHFUGO/H9l?=
- =?us-ascii?Q?WQKT8dSDnsjkwZAnWRaInvDOhL6wCjkpEjBult88hb2jmdQD/sWrGmCmxHlF?=
- =?us-ascii?Q?vxYh/hp9/VxcsUy9oDx9kT7wTR0MT7FNbUfcieNREcxIVwlL8iIxIKVcBqZb?=
- =?us-ascii?Q?Ut9rPcSfGyWaTaPNoM+NZzB/FU84nH04FSTpxWpU/wCrdLCO41XAzv/wzkgq?=
- =?us-ascii?Q?I2kXyIeOgaVDd2bHT04aY5r4D99SYNklPUozT11ytVi3ebxhtCxO/WNgFCq8?=
- =?us-ascii?Q?bgWJ/rtUvMYIglnc1rLql41HdIy4WuIRAnKmJenLsxdmSIOmB4G7S5kdYKj1?=
- =?us-ascii?Q?1AI0A8pGv/fJbmsRh8eEvJU+5ogsUCz11VDWgTcdfK6CydgztxtMCxSIIpEV?=
- =?us-ascii?Q?aHtkyBSkiQkObdwyajA8pmbQ56Cg7AyAYQa+5L/dmWHdhzBGVaPw+zoqJgTw?=
- =?us-ascii?Q?8m2Q5JXaRlBQKntoMb7sap5gELQeXo1f/VgNX2PrygNwzVkmXMCx77bWIz5s?=
- =?us-ascii?Q?mSf+u6qD5HYOcrC8icR4P71aFh67Z7LMeuHfaTKUhSR+BbtcgrXn6UtkkDRJ?=
- =?us-ascii?Q?nZ/ADhkLHLGj4tOq55+QgY/aAbZzDRq/UgmG0RW7VI4HnBCHMPqhDmt6eOBb?=
- =?us-ascii?Q?q4SpgkACj2/lHtw5+XInGjtxoXjpknPLROGodRoAM0Iuyz5PgxKicWaTPzdD?=
- =?us-ascii?Q?vHzdIpwSB+7dwsjiyD5AkxQq83ATwZC0564Qh/5IbpJBjL/KKX0Y9Vknyw05?=
- =?us-ascii?Q?5/YGLfI9JMlpaKJZ1JclceEMCpc2LzxAuiB8cenv/CKgvaWj5mBascy8EgMg?=
- =?us-ascii?Q?8h7UIGN34kMYKSuZahrzTkZQDRGogSAjzP+JEU8vZ1RP3k5rNzOgJb47R3WF?=
- =?us-ascii?Q?iPmEZ7oNDSDwxYr74Jge/OmcFS0aLfjNb/io2On40dHc3EYLCYWDPiPcZMaH?=
- =?us-ascii?Q?u5N5PjpbhSaAGbsDBod+5s0mHpLn3bfFhmlyRfB7QvpRN5D6HPxeeHjAyNc3?=
- =?us-ascii?Q?9pKmslqB4yQ4iBta5RRaRFqKhDVoeoCLZHvD5Ib/6gEh5iQX3yoydLx8j11j?=
- =?us-ascii?Q?CfEDgZNe7LDSnwGqDSc37aLq/v057Sr9uB29kpn9yyYSN2acQ6aFmpopNpaa?=
- =?us-ascii?Q?7Wl3omkyFhCtV44jPLXD5moT+n0k1D+9VxlJE7ZPSQIe3MT2GYmIIdWW2q2I?=
- =?us-ascii?Q?aSPpElAgD0ga6DLWVg58bjnTkb3qVncPd72Eb3nk5Krn7YH77hBkFC/7RPXA?=
- =?us-ascii?Q?+FH4n2MMBZ2sFsp56dai7SwEnRCAJQF0ueKvZOPFT3pqgvoylJjY7twl16Sp?=
- =?us-ascii?Q?2Q=3D=3D?=
+	=?us-ascii?Q?i9xUEwMpQzZWDhNWzCN0cd68DC198QAL1JRZQ1ZCsOBLXk/2X/eHfApy9eKU?=
+ =?us-ascii?Q?NKcOnb+zK55JB4Km20zotHfSh9RcMt9vpwKyHcgwEcIGsClQGrj/KwB5rL66?=
+ =?us-ascii?Q?zUB/HWCB4Xou2w7NIDwrnhDrbRTQqgb2xt3S3H+Rv0PUJDFr9UY1zSsPwonQ?=
+ =?us-ascii?Q?XENTAeLSRAS7vd7SQ1YrCo3HlovUaDPUtG/zBYxPApr28FLbw9cj1fCcPAnM?=
+ =?us-ascii?Q?HiWQMAFd9dQhqxRj8YvFCndvi1Y1nEJn2SmVHHtQRPh7QzGlir4RX6YaL35B?=
+ =?us-ascii?Q?VtoM26z0R4pPdm5KpgCWwTp9C2t+335lauXPdHtl0KZ9o6hB+oMb63dSehAL?=
+ =?us-ascii?Q?G1QXk8z/VgE9/IP16tFMFGyWDMUnjAWCc3FKLBUDsX4rs4a2zzr37kjgQw6E?=
+ =?us-ascii?Q?rr7tPuARAAETRrW12udIxwlUgtkgxsh9mzWRyHTjSakrwteNoMqmt3YvQzVs?=
+ =?us-ascii?Q?BwWR68E+1wyBMIldxLd4HUXA9O9CpzFr4G0xZuOS93THbiFYOJ5WDmOG8tJT?=
+ =?us-ascii?Q?W5o0K1e4y70S0319CZPzCZoTC1PQFKN4+UDSYvPGvDqvFXgYaEr6MblVj8uV?=
+ =?us-ascii?Q?Vvdd5ImBbRm/sHB5kCKU5iuNtVIM2ywIbIlv83RKa6cGXgielM81T3BUMj5C?=
+ =?us-ascii?Q?1dWRvQlDADsBq2INLFI8WckJUeR2w0fLM9KWWVWXhh2raxlwq+xC0A400aKq?=
+ =?us-ascii?Q?yYfZ5TiCnYEusGMyj00Q9FwVBSOkYSpxr6k/dzC4fjXid72cM0gC//3GlbGo?=
+ =?us-ascii?Q?3zp9LrGAVkLgBMglfESSZoCowzZyfHJJyrhw9PV/8D4o1zn915UFA+nPUayh?=
+ =?us-ascii?Q?ghIo4hPeg69ns/G7SyW6eNY8pWTGe418QdgHpUG9GmLyKMSo9cc0aXvHn1fj?=
+ =?us-ascii?Q?D2DKFZULIJaf5688FHEpdF8su1NfX9xzcyqkOrL5M4hwHQXuKDk8ns4B0qFN?=
+ =?us-ascii?Q?KEKkZHqeQzrMewUzwGW792uO6RmW/epugJ427KdJAg3CKAbmtw2C9yoxmadY?=
+ =?us-ascii?Q?anphuAnva793unjEQhqjElpjbbntvp4QhdQpNrZ/buHV0o7JQCFWbmJpFi76?=
+ =?us-ascii?Q?DNRgQvlceuSj6BG8MyNcN6fMQl9mAcgwcedt91envwTYi2a0SENda0hseyn/?=
+ =?us-ascii?Q?gOj8xOEatt8aCyyCCSBl2JzvWItneSbCkTr8jVDJgrH74NwHTIIHiMyUSlJw?=
+ =?us-ascii?Q?grLtZlfp7LWp+5B+BgK7cTL0gFGqr8BCTzfFPHIHXc/gXrXYT0EEEm+qRnAf?=
+ =?us-ascii?Q?dSeAR3ETc9Y5XBIppn/7zOQRI0r1TdWaDdjb2EgBRRDNiLBeaTnCdunU5idW?=
+ =?us-ascii?Q?rzbY2O5E47/IwbgbU0lmTxvD/6dCveLzlUYzUQ0W3qgumXJSAcIwSCV17Djy?=
+ =?us-ascii?Q?7p1P/xB/qQ96MqFI/um0aepDbC9PEfRHOCJzIezsZpPtXzgfsMKe+lYFlyq1?=
+ =?us-ascii?Q?5C2LURPI6JB0oNqlJv9+mjI/wEWBu7/htjZRIiL/NB7Y3uc5eut84bBwNwza?=
+ =?us-ascii?Q?kmUnaIhuK1JTItAw04L1vAfpXqSLHYNhuANNaNy0bejgvlLb8lUfdYSYW61I?=
+ =?us-ascii?Q?lTxk9aiypqxiR78fsS8KWiNcjFiyCc6wbOjeKh49YWgsp/1+wGEnjuTqg0vY?=
+ =?us-ascii?Q?jw=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5431c395-b55f-4821-c063-08dc53ee7c16
+X-MS-Exchange-CrossTenant-Network-Message-Id: 406fadce-91f3-4764-b335-08dc53ee7eb6
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR13MB4411.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 14:58:12.9872
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 14:58:17.4067
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NevWzdsfeUrBLluGPjX8/vgsmRVzBSBMTH9xmnUAr7zsZjgF2GYYT580VhKDnccSVKuW0t7DzZ8CBTP+fbGMsHOIvHd/NPVMprvKmEPL8DY=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1Jmn+mqqitMYziB9EBu+xgyVqeCyDVYtY1bF/04+l0TnmaQo7PMDaCKt76WZGQwvrc1vjT1Hmm15HB2nnqk5L7O8wxp9mezoiv/RWpDMd8c=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR13MB4413
 
-This short series bundles two unrelated but small updates to the nfp
-driver.
+From: Fei Qin <fei.qin@corigine.com>
 
-Patch1: Add new define for devlink string "board.part_number"
-Patch2: Make use of this field in the nfp driver
-Patch3: Add new 'dim' profiles
-Patch4: Make use of these new profiles in the nfp driver
+Add definition and documentation for the new generic
+info "board.part_number".
 
-Changes since V2:
-- After some discussion on the previous series it was agreed that only
-  the "board.part_number" field makes sense in the common code. The
-  "board.model" field which was moved to devlink common code in V1 is
-  now kept in the driver. The field is specific to the nfp driver,
-  exposing the codename of the board.
-- In summary, add "board.part_number" to devlink, and populate it
-  in the the nfp driver.
+The new one is for part number specific use, and board.id
+is modified to match the documentation in devlink-info.
 
-Changes since V1:
-- Move nfp local defines to devlink common code as it is quite generic.
-- Add new 'dim' profile instead of using driver local overrides, as this
-  allows use of the 'dim' helpers.
-- This expanded 2 patches to 4, as the common code changes are split
-  into seperate patches.
+Signed-off-by: Fei Qin <fei.qin@corigine.com>
+Signed-off-by: Louis Peens <louis.peens@corigine.com>
+---
+ Documentation/networking/devlink/devlink-info.rst | 5 +++++
+ include/net/devlink.h                             | 4 +++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-Fei Qin (4):
-  devlink: add a new info version tag
-  nfp: update devlink device info output
-  dim: introduce a specific dim profile for better latency
-  nfp: use new dim profiles for better latency
-
- .../networking/devlink/devlink-info.rst        |  5 +++++
- Documentation/networking/devlink/nfp.rst       |  5 ++++-
- .../net/ethernet/netronome/nfp/nfp_devlink.c   |  1 +
- .../ethernet/netronome/nfp/nfp_net_common.c    |  4 ++--
- include/linux/dim.h                            |  2 ++
- include/net/devlink.h                          |  4 +++-
- lib/dim/net_dim.c                              | 18 ++++++++++++++++++
- 7 files changed, 35 insertions(+), 4 deletions(-)
-
+diff --git a/Documentation/networking/devlink/devlink-info.rst b/Documentation/networking/devlink/devlink-info.rst
+index 1242b0e6826b..c7c5ef66a2fe 100644
+--- a/Documentation/networking/devlink/devlink-info.rst
++++ b/Documentation/networking/devlink/devlink-info.rst
+@@ -146,6 +146,11 @@ board.manufacture
+ 
+ An identifier of the company or the facility which produced the part.
+ 
++board.part_number
++-----------
++
++Part number of the board design.
++
+ fw
+ --
+ 
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index 9ac394bdfbe4..2100e62c2c2d 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -599,12 +599,14 @@ enum devlink_param_generic_id {
+ 	.validate = _validate,						\
+ }
+ 
+-/* Part number, identifier of board design */
++/* Identifier of board design */
+ #define DEVLINK_INFO_VERSION_GENERIC_BOARD_ID	"board.id"
+ /* Revision of board design */
+ #define DEVLINK_INFO_VERSION_GENERIC_BOARD_REV	"board.rev"
+ /* Maker of the board */
+ #define DEVLINK_INFO_VERSION_GENERIC_BOARD_MANUFACTURE	"board.manufacture"
++/* Part number of board design */
++#define DEVLINK_INFO_VERSION_GENERIC_BOARD_PART_NUMBER	"board.part_number"
+ 
+ /* Part number, identifier of asic design */
+ #define DEVLINK_INFO_VERSION_GENERIC_ASIC_ID	"asic.id"
 -- 
 2.34.1
 
