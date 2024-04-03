@@ -1,191 +1,193 @@
-Return-Path: <netdev+bounces-84333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E30F1896A52
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:17:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58DAB896A45
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:16:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B66FB28074
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:14:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6A5928F475
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9C07172C;
-	Wed,  3 Apr 2024 09:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA946FE23;
+	Wed,  3 Apr 2024 09:16:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1rSTq2g"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lkHzq6+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777E856471;
-	Wed,  3 Apr 2024 09:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451B456471;
+	Wed,  3 Apr 2024 09:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712135651; cv=none; b=mHv5v2BuiULx457c6/qLuQtnSCzvszDyavWJvx75MZmwOTSHe5TliriwKfs9iKHpziRVXNmyQ74UfWfd/EDjqwVKkH08POP+9jDrWDp1XIjNWNN5zi56bH7qLarJI+kRTriplcs9atvQu70taT3PDe15ATRjvPZr9SBVL4W1v44=
+	t=1712135762; cv=none; b=OwAXwDPsEqQc3jbOqL/19EZ2rp9gmkFrOb6xDXIPDBGb+Khq/LYrmjaPvmHdLSxeqQSsFkNCgvKUxGfTTe753Q3AZaTIFJBipDq5uPEpbNJS5+iGDJy9k+4kUJqfxgJZHJxGUIcPjf1djcG01iyU4GEvdaU9w0c3htM82SZemDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712135651; c=relaxed/simple;
-	bh=bZq0rD5KiJxbGyvQb/XEzn9LUcVm4yswpSv88dX9nmI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sX5dP8NHjpVy4kZHIBeVNrcq1GBE9O9W42DQ8DxeyqahvIh4LMhm7l4wHBcXcvGdDPsUXeAKHMckmBWlL0+ikIHZj8NN0NzwgkF++NjmAk9oL6rxj2XqmC4pzC7OJRJnPGFJlO7CWbKcdYWh+iJpZEepTBJYF8rHxz4952bsFOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1rSTq2g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BC9BC433C7;
-	Wed,  3 Apr 2024 09:13:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712135651;
-	bh=bZq0rD5KiJxbGyvQb/XEzn9LUcVm4yswpSv88dX9nmI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=G1rSTq2gywOxFwfLMdqh7qECus3WHP07qERZ0GtkigtronOFreYYbj2DY7o4GJAuf
-	 oZcWqYuX9S+yINjNot/Bp8IG/Vi80ILjCS2//Ok2dQJAT6HaTBOFMamLWGUliYxUPA
-	 8BVbBtudthBAzSBfr4+Y4azAlGCuU+iRCMYsvOKYoUSZTcQ7PfGs/HopPAE4pcoQU+
-	 BbJhflh1B4w4H2blhxzV6+JjWy5ghyw29+l1oTVl0f9DGG94s9opUckIyY0h5WleuU
-	 3Bq427YWzfKwCbID07SgygmaByiWT5aDeupc6m3NnvqJSnGpeOlcXf+zMqgHPhs136
-	 haNwFSyBb+J4A==
-Message-ID: <f68a9bef-cbd8-4d85-afd4-55516d9925ed@kernel.org>
-Date: Wed, 3 Apr 2024 11:13:50 +0200
+	s=arc-20240116; t=1712135762; c=relaxed/simple;
+	bh=+8Uaj5iMPA4wsnMkfm+EfD8CPE0onEGyhG1BVrPx97g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nPab0QaHvZQOKX9iV/AwvJazlBE+9I9ldphXoOL9v4DKpq3MN2Xgrb8yoZ46MCzgr7PAXbIAAhEp1VGEqLdeBBAfcNbl1AGONb//vTuDls/A9McSmcRIumR3C009TcseZvGdzHDQqQ5SR1U6B3/k98g+MRp2EaVK1dcvQxHs4YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lkHzq6+j; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E8B82000A;
+	Wed,  3 Apr 2024 09:15:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712135750;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=23YFb2E46Qkl4R91FdBc+xUfghupTFRI0Hd3AgYoG18=;
+	b=lkHzq6+j2/DDtgVj31zpfNMAJMxPg8yOn6qPzCqx2wTw1MBtHZhSyG6kqwrPVGg4ePO5Iz
+	NcZNNtS36kSkNIvvgqYCeDwaOGJGcf8B5mkrbSm9GgEvwCazDieF0gaM3p5XSbyHVw683q
+	/HfOjD2j9oKDg3k8h9EWluISvPIKeVbuZkPS8sE2ToGsJPjdXgL9FiAHMIbHmy61j2d5na
+	1OjxlQ49bUIxVhqBXh377Rtxyhf3yuZ/Wi15mTnbWSc1BwM9h7eka7YjPYU76uj2q3+qxS
+	P8eUZu8rRhE47xMgp/h8bGaVtaIJPCstKCD+tsXh6Bkooi/nD4WJBWh9AwgwPQ==
+Date: Wed, 3 Apr 2024 11:15:48 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <20240403111548.30e780b5@kmaincent-XPS-13-7390>
+In-Reply-To: <20240402132637.GA3744978-robh@kernel.org>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+	<20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
+	<20240402132637.GA3744978-robh@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 33/34] drivers: remove incorrect of_match_ptr/ACPI_PTR
- annotations
-To: Arnd Bergmann <arnd@kernel.org>, linux-kernel@vger.kernel.org,
- Corey Minyard <minyard@acm.org>, Peter Huewe <peterhuewe@gmx.de>,
- Jarkko Sakkinen <jarkko@kernel.org>, Vinod Koul <vkoul@kernel.org>,
- Moritz Fischer <mdf@kernel.org>, Wu Hao <hao.wu@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Jiri Kosina <jikos@kernel.org>,
- Benjamin Tissoires <benjamin.tissoires@redhat.com>,
- Michael Hennerich <michael.hennerich@analog.com>,
- Peter Rosin <peda@axentia.se>, Dmitry Torokhov <dmitry.torokhov@gmail.com>,
- Iyappan Subramanian <iyappan@os.amperecomputing.com>,
- Keyur Chudgar <keyur@os.amperecomputing.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, Tony Lindgren <tony@atomide.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Xiang Chen <chenxiang66@hisilicon.com>,
- "James E.J. Bottomley" <jejb@linux.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Russell King <linux@armlinux.org.uk>, Jiri Slaby <jirislaby@kernel.org>,
- Jacky Huang <ychuang3@nuvoton.com>, Shan-Chun Hung <schung@nuvoton.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Jason Gunthorpe <jgg@ziepe.ca>,
- Tom Rix <trix@redhat.com>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?=
- <u.kleine-koenig@pengutronix.de>, Randy Dunlap <rdunlap@infradead.org>,
- Rob Herring <robh@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- openipmi-developer@lists.sourceforge.net, linux-integrity@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-fpga@vger.kernel.org,
- linux-input@vger.kernel.org, linux-i2c@vger.kernel.org,
- netdev@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-rtc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-staging@lists.linux.dev, linux-serial@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20240403080702.3509288-1-arnd@kernel.org>
- <20240403080702.3509288-34-arnd@kernel.org>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240403080702.3509288-34-arnd@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 03/04/2024 10:06, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> When building with CONFIG_OF and/or CONFIG_ACPI disabled but W=1 extra
-> warnings enabled, a lot of driver cause a warning about an unused
-> ID table:
-> 
-> drivers/char/tpm/tpm_ftpm_tee.c:356:34: error: unused variable 'of_ftpm_tee_ids' [-Werror,-Wunused-const-variable]
-> drivers/dma/img-mdc-dma.c:863:34: error: unused variable 'mdc_dma_of_match' [-Werror,-Wunused-const-variable]
-> drivers/fpga/versal-fpga.c:62:34: error: unused variable 'versal_fpga_of_match' [-Werror,-Wunused-const-variable]
-> drivers/i2c/muxes/i2c-mux-ltc4306.c:200:34: error: unused variable 'ltc4306_of_match' [-Werror,-Wunused-const-variable]
-> drivers/i2c/muxes/i2c-mux-reg.c:242:34: error: unused variable 'i2c_mux_reg_of_match' [-Werror,-Wunused-const-variable]
-> drivers/memory/pl353-smc.c:62:34: error: unused variable 'pl353_smc_supported_children' [-Werror,-Wunused-const-variable]
-> drivers/regulator/pbias-regulator.c:136:34: error: unused variable 'pbias_of_match' [-Werror,-Wunused-const-variable]
-> drivers/regulator/twl-regulator.c:552:34: error: unused variable 'twl_of_match' [-Werror,-Wunused-const-variable]
-> drivers/regulator/twl6030-regulator.c:645:34: error: unused variable 'twl_of_match' [-Werror,-Wunused-const-variable]
-> drivers/scsi/hisi_sas/hisi_sas_v2_hw.c:3635:36: error: unused variable 'sas_v2_acpi_match' [-Werror,-Wunused-const-variable]
-> drivers/staging/pi433/pi433_if.c:1359:34: error: unused variable 'pi433_dt_ids' [-Werror,-Wunused-const-variable]
-> drivers/tty/serial/amba-pl011.c:2945:34: error: unused variable 'sbsa_uart_of_match' [-Werror,-Wunused-const-variable]
-> 
-> The fix is always to just remove the of_match_ptr() and ACPI_PTR() wrappers
-> that remove the reference, rather than adding another #ifdef just for build
-> testing for a configuration that doesn't matter in practice.
-> 
-> I considered splitting up the large patch into per subsystem patches, but since
-> it's really just the same thing everywhere it feels better to do it all at once.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/char/ipmi/ipmb_dev_int.c          | 2 +-
->  drivers/char/tpm/tpm_ftpm_tee.c           | 2 +-
->  drivers/dma/img-mdc-dma.c                 | 2 +-
->  drivers/fpga/versal-fpga.c                | 2 +-
->  drivers/hid/hid-google-hammer.c           | 6 ++----
->  drivers/i2c/muxes/i2c-mux-ltc4306.c       | 2 +-
->  drivers/i2c/muxes/i2c-mux-reg.c           | 2 +-
->  drivers/input/touchscreen/wdt87xx_i2c.c   | 2 +-
->  drivers/mux/adg792a.c                     | 2 +-
->  drivers/net/ethernet/apm/xgene-v2/main.c  | 2 +-
->  drivers/net/ethernet/hisilicon/hns_mdio.c | 2 +-
->  drivers/regulator/pbias-regulator.c       | 2 +-
->  drivers/regulator/twl-regulator.c         | 2 +-
->  drivers/regulator/twl6030-regulator.c     | 2 +-
+On Tue, 2 Apr 2024 08:26:37 -0500
+Rob Herring <robh@kernel.org> wrote:
 
-I covered regulators here the same way:
-https://lore.kernel.org/all/20230310214553.275450-5-krzysztof.kozlowski@linaro.org/
+> > +          pairset-names:
+> > +            $ref: /schemas/types.yaml#/definitions/string-array
+> > +            description:
+> > +              Names of the pairsets as per IEEE 802.3-2022, Section
+> > 145.2.4.
+> > +              Valid values are "alternative-a" and "alternative-b". Ea=
+ch
+> > name =20
+>=20
+> Don't state constraints in prose which are defined as schema=20
+> constraints.
 
-but just like SPI and ASoC, Mark did not agree to pick them up.
+Ok, I will remove the line.
 
-Best regards,
-Krzysztof
+> > +          pairsets:
+> > +            $ref: /schemas/types.yaml#/definitions/phandle-array
+> > +            description:
+> > +              List of phandles, each pointing to the power supply for =
+the
+> > +              corresponding pairset named in 'pairset-names'. This pro=
+perty
+> > +              aligns with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
+> > +              PSE Pinout Alternatives (as per IEEE 802.3-2022 Table
+> > 145\u20133)
+> > +
+> > |-----------|---------------|---------------|---------------|----------=
+-----|
+> > +              | Conductor | Alternative A | Alternative A | Alternativ=
+e B
+> > | Alternative B |
+> > +              |           |    (MDI-X)    |     (MDI)     |      (X)
+> > |      (S)      |
+> > +
+> > |-----------|---------------|---------------|---------------|----------=
+-----|
+> > +              | 1         | Negative VPSE | Positive VPSE | \u2014
+> >     | \u2014             |
+> > +              | 2         | Negative VPSE | Positive VPSE | \u2014
+> >     | \u2014             |
+> > +              | 3         | Positive VPSE | Negative VPSE | \u2014
+> >     | \u2014             |
+> > +              | 4         | \u2014             | \u2014             |
+> > Negative VPSE | Positive VPSE |
+> > +              | 5         | \u2014             | \u2014             |
+> > Negative VPSE | Positive VPSE |
+> > +              | 6         | Positive VPSE | Negative VPSE | \u2014
+> >     | \u2014             |
+> > +              | 7         | \u2014             | \u2014             |
+> > Positive VPSE | Negative VPSE |
+> > +              | 8         | \u2014             | \u2014             |
+> > Positive VPSE | Negative VPSE |
+> > +            minItems: 1
+> > +            maxItems: 2 =20
+>=20
+> "pairsets" does not follow the normal design pattern of foos, foo-names,=
+=20
+> and #foo-cells. You could add #foo-cells I suppose, but what would cells=
+=20
+> convey? I don't think it's a good fit for what you need.
+>=20
+> The other oddity is the number of entries and the names are fixed. That=20
+> is usually defined per consumer.=20
 
+Theoretically if the RJ45 port binding was supported it would make more sen=
+se,
+but in reality it's not feasible as the PSE controller need this information
+in its init process.
+The PSE controller reset all its port to apply a configuration so we can't =
+do
+it when the consumer (RJ45) probe. It would reset the other ports if one
+consumer is probed later in the process.
+
+> As each entry is just a power rail, why can't the regulator binding be=20
+> used here?
+
+Olekisj already answered about it.
+PSE PI is like a regulator but with few different features and more informa=
+tion
+like the pinout and the polarity, so we could not really fully rely on the
+regulator binding style.
+
+> > +
+> > +          polarity-supported:
+> > +            $ref: /schemas/types.yaml#/definitions/string-array
+> > +            description:
+> > +              Polarity configuration supported by the PSE PI pairsets.
+> > +            minItems: 1
+> > +            maxItems: 4
+> > +            items:
+> > +              enum:
+> > +                - MDI-X
+> > +                - MDI
+> > +                - X
+> > +                - S
+> > +
+> > +          vpwr-supply:
+> > +            description: Regulator power supply for the PSE PI. =20
+>=20
+> I don't see this being used anywhere.
+
+Right, I forgot to add it to the PD692x0 and TPS23881 binding example!
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
