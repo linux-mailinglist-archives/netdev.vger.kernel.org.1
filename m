@@ -1,182 +1,227 @@
-Return-Path: <netdev+bounces-84422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C46A3896E4F
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:36:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44389896E54
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79D8E28A878
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:36:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 674661C253DC
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9FC143874;
-	Wed,  3 Apr 2024 11:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7EC141991;
+	Wed,  3 Apr 2024 11:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzm+f6zW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ovY4ZbXD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC83F143870;
-	Wed,  3 Apr 2024 11:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118EB73506
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 11:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712144189; cv=none; b=vB6uOFgw23XUkOCF9Oqo1utUdKAEXHTk96BM4iIk/LmOSIlAdAUURottB3uCc7nn0nCUd/CGLs1u5s/LrN7M9ds6OkVM0IeUJTUq8MszeDJtRu9grRku6A2JrLxQu/P1riRq5CUtCMT5fvy8Gg/GCAcVaACufYc38B8NsUJ9q3k=
+	t=1712144337; cv=none; b=X/My/Hnv2pg4fJQ2mfjYTvGDCbGgHMiTADS0Ktfy07pV0qBT7mPyaKDksXeSfbrYivjBshZVvb9rn2HGo0EY+56clkoa6poM69MNZJK566otI328Fki3deKONn6DVhXYkzRjSqWFEE03I88olgOBeVodU4GB5lFMsUfBSu2Juok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712144189; c=relaxed/simple;
-	bh=5kWFz8zbQLSEVFdnby66rZBA85dW67ritiVu2PLeHcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yx8KJAsGstItubeeIiV0aKjydfDc3M16LknSkZzoDiBz0WhdORYs2MSfdmmaDfgWy3v8OhVUbmrKfhBcvS0/J4TehAFskHYif0sTJNZDWuR1FaldTJS8STzHCb/b6k9gYdJBthqFaXiUlSMTtdduPYLAJCBOsR2XsZ6eiDT+fQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzm+f6zW; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a466fc8fcccso802421466b.1;
-        Wed, 03 Apr 2024 04:36:27 -0700 (PDT)
+	s=arc-20240116; t=1712144337; c=relaxed/simple;
+	bh=RoTBXY8tt8di2P7Gsp3f2sX1N4FJAGDheM1L6+5mqms=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CoY4WWvk54CVtL6kIoNrf3rDgQmQJ1syxhFiTucXYYNTp/2wklYoGu7nqZtIZL/NPrxtscn2t7VNNKzzAq18WKdLuWeyE0TJ2C2QpvszIbVca8TwohluryDwTm52zhLgJ+Crl4VVGzMkw/WNnuECLTUdSrxs0LgQHthjVbYKaHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ovY4ZbXD; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-615372710c4so21519737b3.1
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 04:38:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712144186; x=1712748986; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wl9GbSbwwtw06Z6YDwV4UaKz7eSEFkKaGsjFATdLc6A=;
-        b=hzm+f6zWxFYPC9RnSO7Dm3tDfmGyqmNt9wfAw5trixh/iO2N3WDVsZsS9po7TMOgFv
-         oteieaMkuzjQ8EUtC7yQHFPft4wHsVxIZ4wmJsvi6M4gJkOT1/sXKJh6GIiV305t7vGn
-         13EwpLLYGZ847wdD0Kd8KQDAK8V1Dhs1UIQQAB1D26De76iJ93EzIaGd8QnyStFxnKmm
-         uvrgO9D/NEvn/U/BTBy1vMmIMlgKVyTmU39FKdrcIaSCeWE3RJF2nhZd2almO+SUtjtF
-         +z0SIiEkzgFaP0QKYD2c0+FlcOEcUYKiZhRRplb3b6xUhomGJjcZWrHFTQU/Vb//z9md
-         2Spw==
+        d=google.com; s=20230601; t=1712144335; x=1712749135; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ucl0Gv9qrqJz3HF/Wp/Tu9m2p61bezEAQ9mGwD3UQYY=;
+        b=ovY4ZbXDthIuTD2Q4Zt032EIzMFf7HVRmQezznnfCMLBAEEqAf3z9US6TNmz5cBO4K
+         Xc61gAm5GztvIM+5mPoydDVZXJh+tHcbylVZsj1Vx/AIHu5TdcttfcdwS4mzF4o9RNre
+         JxMtE04yC/lDSr7Kq5ebOu0dSV/Fcu39j3nGXD04Wz9jeDjsKMI0jq40da3u71bSO7le
+         yK8YcQbfULyz55H4EuMv8Z2GNC+PeqXK1KFu1eqeXrQ9o0mL8WjxBxJYLVe7T2Wyev78
+         VYOmMeo3zgqbQjf3TCfy8/N8hHY4Muiiw1YBEO/Fik7Si5FLqwM76dy4R+HJ861sEsaY
+         pkXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712144186; x=1712748986;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wl9GbSbwwtw06Z6YDwV4UaKz7eSEFkKaGsjFATdLc6A=;
-        b=i2kArWKlflkc2v3gMpNbnc6EzAJMkeNCq/AiGDd3WJBJ6zS9ESBNw8WR6dBQ1/7vKg
-         YovDK7Y0mpILWI/7t7ac7Mt8/u/UTFHju0FoLXtEh39xLFgpf7MCAYYxxA0erLtN2qbq
-         zVv/puN9bzTbkB2yeBpMr9bAMJtpUGjmFVLdGO+ZmA36CfI7Oth79bIju2sh4W0DxhPQ
-         eWzb0P2DzsYPV7gVN/FmlnA0LmXbAPCLiMNyQeIZB4u6DtLbuoauKvjqcDbGdZs4XrDD
-         fJk7KAx5qMG2oFRRq7PRQq0RVWRuzflczz3myVPThfBiUgbvjPXEfvmg6Dxh1dwPs7mn
-         JLjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX4va/KGs/nELxmBxTq+KCDL0qRfZsB7mQo613fQX3X/kV3u+0AGu1t/4aycnjw6Vk08qwAu+iIsV0s4KZCD+L8gaV7Pgra7xm7LbebctoOILV2ig99doOWELkx0TTgkCAysa9b
-X-Gm-Message-State: AOJu0YwhzVtXSyJmgLA7pAKuO40qFWGbUanACeln1VGBu89PUB/zj1+5
-	yPN6RJb+mmTBTwQtLYTcMyrYLLzmamwCDpJzW/1VxDr08iE53QON
-X-Google-Smtp-Source: AGHT+IFeojqKVT4WjW3ahppifgXq3dOGY9Pv1Sl+7bp/cHTUY0bwZAlPHfe0pZqlEI9V+C3l4C7Lhw==
-X-Received: by 2002:a17:906:13ca:b0:a51:18cf:b776 with SMTP id g10-20020a17090613ca00b00a5118cfb776mr581189ejc.2.1712144185730;
-        Wed, 03 Apr 2024 04:36:25 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d700:2000::b2c])
-        by smtp.gmail.com with ESMTPSA id u7-20020a170906124700b00a4e8a47107asm1888764eja.200.2024.04.03.04.36.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 04:36:24 -0700 (PDT)
-Date: Wed, 3 Apr 2024 14:36:22 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	=?utf-8?B?U8O4cmVu?= Andersen <san@skov.dk>
-Subject: Re: [PATCH net-next v2 2/9] net: dsa: microchip: add IPV information
- support
-Message-ID: <20240403113622.cg7gf3ejh4kb2uji@skbuf>
-References: <20240403092905.2107522-1-o.rempel@pengutronix.de>
- <20240403092905.2107522-3-o.rempel@pengutronix.de>
+        d=1e100.net; s=20230601; t=1712144335; x=1712749135;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ucl0Gv9qrqJz3HF/Wp/Tu9m2p61bezEAQ9mGwD3UQYY=;
+        b=UpWAkSwTnz8QluQIGFfNBmIaQux9tk0qqsNI5BCqezJtTLWhK9WIT2qprt7E32PdaY
+         Mvn1ZQar+N/vQIL3uec2iRoe5KjmDjR1pZrij6EowbymdpzNUFqFRMXW/LXOXC4h+YwX
+         NYgrYyiftp25pOn0HUWnEJNUSXbZH1FR/ZJWCrAtnEUABb6H0a981Ar449LL6srYuaK2
+         Ki9xS57GALsWNZPnj0RVDx4E1CAG0nvZUOT5282YuEeJCvwQFlu8KZKlzmddjv2DpU9X
+         NdrnIwr8wZH/7tek/6L3/6Zqbb/smfND/WMLdrhckOWPmaPR/dV2YLZJcUiiFloQKsqd
+         dqAA==
+X-Gm-Message-State: AOJu0YxpT2lOi3ohBghZIShyJlcmn05Ui7+8i5aUueHEGTpZXn3MGx+H
+	jhAp9xfQSDFADqWHuzZ5S3lcNNSKb6WzdH9YrAZkRlRd4oTTtJFnNmV+QfrzfrshwY6DQU/b8js
+	Yf8EtgzBXeQ==
+X-Google-Smtp-Source: AGHT+IEo+YkrSJGQ5GjHJxzQS81n37ul0YJ0ZTcdt0Ow/uJufBAtp8vC4JdKQIPkvPhiv+rXcX2M998A4UiEpg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:161a:b0:dc7:4af0:8c6c with SMTP
+ id bw26-20020a056902161a00b00dc74af08c6cmr1025754ybb.6.1712144334804; Wed, 03
+ Apr 2024 04:38:54 -0700 (PDT)
+Date: Wed,  3 Apr 2024 11:38:53 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240403092905.2107522-3-o.rempel@pengutronix.de>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240403113853.3877116-1-edumazet@google.com>
+Subject: [PATCH net] geneve: fix header validation in geneve[6]_xmit_skb
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com, 
+	Phillip Potter <phil@philpotter.co.uk>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Apr 03, 2024 at 11:28:58AM +0200, Oleksij Rempel wrote:
-> Most of Microchip KSZ switches use Internal Priority Value associated
-> with every frame. For example, it is possible to map any VLAN PCP or
-> DSCP value to IPV and at the end, map IPV to a queue.
-> 
-> Since amount of IPVs is not equal to amount of queues, add this
-> information and make use of it in some functions.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
-> ---
-> @@ -2296,6 +2313,13 @@ static int ksz_setup(struct dsa_switch *ds)
->  
->  	dev->dev_ops->enable_stp_addr(dev);
->  
-> +	/* Make sure driver provide plausible queue and IPV values */
+syzbot is able to trigger an uninit-value in geneve_xmit() [1]
 
-provides
+Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield())
+uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
+skb->protocol.
 
-> +	if (!dev->info->num_tx_queues ||
-> +	    dev->info->num_tx_queues > dev->info->max_ipvs) {
+If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->protocol,
+pskb_inet_may_pull() does nothing at all.
 
-This only works because "max_ipvs" actually holds the _number_ of IPVs.
-If it actually held _max_, it would have been off by one. Conclusion:
-please rename it num_ipvs.
+If a vlan tag was provided by the caller (af_packet in the syzbot case),
+the network header might not point to the correct location, and skb
+linear part could be smaller than expected.
 
-> +		dev_err(dev->dev, "Number of TX queues exceeds maximum supported IPVs\n");
-> +		return -EINVAL;
+Add skb_vlan_inet_prepare() to perform a complete validation and pull.
+If no IPv4/IPv6 header is found, it returns 0.
 
-Is the validation actually that helpful? FWIW, more TX queues than IPVs
-is nothing out of the ordinary (maybe not for this hardware IP). You can
-do multi-queue egress scheduling for a traffic class, even mqprio allows
-configuring this (e.g. "2@0 2@2" which means 4 queues using 2 TCs).
+Use this in geneve for the moment, I suspect we need to adopt this
+more broadly.
 
-> +	}
-> +
->  	ds->num_tx_queues = dev->info->num_tx_queues;
->  
->  	regmap_update_bits(ksz_regmap_8(dev), regs[S_MULTICAST_CTRL],
-> @@ -3522,7 +3546,7 @@ static int ksz_tc_ets_add(struct ksz_device *dev, int port,
->  	for (tc_prio = 0; tc_prio < ARRAY_SIZE(p->priomap); tc_prio++) {
->  		int queue;
->  
-> -		if (tc_prio > KSZ9477_MAX_TC_PRIO)
-> +		if (tc_prio >= dev->info->max_ipvs)
+[1]
 
-Same here (please rename max_ipvs to num_ipvs). Otherwise, the operator
-change makes no sense (we have "max" -> "max" but ">" -> ">=").
+BUG: KMSAN: uninit-value in geneve_xmit_skb drivers/net/geneve.c:910 [inline]
+ BUG: KMSAN: uninit-value in geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
+  geneve_xmit_skb drivers/net/geneve.c:910 [inline]
+  geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
+  __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+  netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+  xmit_one net/core/dev.c:3531 [inline]
+  dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
+  __dev_queue_xmit+0x348d/0x52c0 net/core/dev.c:4335
+  dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+  packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+  packet_snd net/packet/af_packet.c:3081 [inline]
+  packet_sendmsg+0x8bb0/0x9ef0 net/packet/af_packet.c:3113
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+  __sys_sendto+0x685/0x830 net/socket.c:2191
+  __do_sys_sendto net/socket.c:2203 [inline]
+  __se_sys_sendto net/socket.c:2199 [inline]
+  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
 
->  			break;
->  
->  		queue = ksz_ets_band_to_queue(p, p->priomap[tc_prio]);
-> @@ -3564,7 +3588,7 @@ static int ksz_tc_ets_del(struct ksz_device *dev, int port)
->  	/* Revert the queue mapping for TC-priority to its default setting on
->  	 * the chip.
->  	 */
-> -	for (tc_prio = 0; tc_prio <= KSZ9477_MAX_TC_PRIO; tc_prio++) {
-> +	for (tc_prio = 0; tc_prio < dev->info->max_ipvs; tc_prio++) {
->  		int queue;
->  
->  		queue = tc_prio >> s;
-> diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-> index 40c11b0d6b625..1bedd240cbbe4 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.h
-> +++ b/drivers/net/dsa/microchip/ksz_common.h
-> @@ -58,6 +58,7 @@ struct ksz_chip_data {
->  	int port_cnt;
->  	u8 port_nirqs;
->  	u8 num_tx_queues;
-> +	u8 max_ipvs; /* max number of Internal Priority Values */
->  	bool tc_cbs_supported;
->  	bool tc_ets_supported;
->  	const struct ksz_dev_ops *ops;
-> @@ -722,7 +723,6 @@ static inline int is_lan937x(struct ksz_device *dev)
->  #define KSZ9477_PORT_MRI_TC_MAP__4	0x0808
->  
->  #define KSZ9477_PORT_TC_MAP_S		4
-> -#define KSZ9477_MAX_TC_PRIO		7
->  
->  /* CBS related registers */
->  #define REG_PORT_MTI_QUEUE_INDEX__4	0x0900
-> -- 
-> 2.39.2
-> 
+Uninit was created at:
+  slab_post_alloc_hook mm/slub.c:3804 [inline]
+  slab_alloc_node mm/slub.c:3845 [inline]
+  kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
+  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+  __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
+  alloc_skb include/linux/skbuff.h:1318 [inline]
+  alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6504
+  sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2795
+  packet_alloc_skb net/packet/af_packet.c:2930 [inline]
+  packet_snd net/packet/af_packet.c:3024 [inline]
+  packet_sendmsg+0x722d/0x9ef0 net/packet/af_packet.c:3113
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+  __sys_sendto+0x685/0x830 net/socket.c:2191
+  __do_sys_sendto net/socket.c:2203 [inline]
+  __se_sys_sendto net/socket.c:2199 [inline]
+  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+CPU: 0 PID: 5033 Comm: syz-executor346 Not tainted 6.9.0-rc1-syzkaller-00005-g928a87efa423 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+
+Fixes: d13f048dd40e ("net: geneve: modify IP header check in geneve6_xmit_skb and geneve_xmit_skb")
+Reported-by: syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/000000000000d19c3a06152f9ee4@google.com/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Phillip Potter <phil@philpotter.co.uk>
+---
+ drivers/net/geneve.c     |  4 ++--
+ include/net/ip_tunnels.h | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index 2f6739fe78af2e8e90c0a3b474c2e99c83e02994..6c2835086b57eacbcddb44a3c507e26d5a944427 100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -822,7 +822,7 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	__be16 sport;
+ 	int err;
+ 
+-	if (!pskb_inet_may_pull(skb))
++	if (!skb_vlan_inet_prepare(skb))
+ 		return -EINVAL;
+ 
+ 	if (!gs4)
+@@ -929,7 +929,7 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	__be16 sport;
+ 	int err;
+ 
+-	if (!pskb_inet_may_pull(skb))
++	if (!skb_vlan_inet_prepare(skb))
+ 		return -EINVAL;
+ 
+ 	if (!gs6)
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 5cd64bb2104df389250fb3c518ba00a3826c53f7..41537d5dce52412e15d7871ec604546582b10098 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -361,6 +361,37 @@ static inline bool pskb_inet_may_pull(struct sk_buff *skb)
+ 	return pskb_network_may_pull(skb, nhlen);
+ }
+ 
++/* Strict version of pskb_inet_may_pull().
++ * Once vlan headers are skipped, only accept
++ * ETH_P_IPV6 and ETH_P_IP.
++ */
++static inline __be16 skb_vlan_inet_prepare(struct sk_buff *skb)
++{
++	int nhlen, maclen;
++	__be16 type;
++
++	type = __vlan_get_protocol(skb, type, &maclen);
++
++	switch (type) {
++#if IS_ENABLED(CONFIG_IPV6)
++	case htons(ETH_P_IPV6):
++		nhlen = sizeof(struct ipv6hdr);
++		break;
++#endif
++	case htons(ETH_P_IP):
++		nhlen = sizeof(struct iphdr);
++		break;
++
++	default:
++		return 0;
++	}
++	if (pskb_may_pull(skb, maclen + nhlen))
++		return 0;
++
++	skb_set_network_header(skb, maclen);
++	return type;
++}
++
+ static inline int ip_encap_hlen(struct ip_tunnel_encap *e)
+ {
+ 	const struct ip_tunnel_encap_ops *ops;
+-- 
+2.44.0.478.gd926399ef9-goog
+
 
