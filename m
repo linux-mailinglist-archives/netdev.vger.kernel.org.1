@@ -1,80 +1,113 @@
-Return-Path: <netdev+bounces-84504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5846D89710E
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:30:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B214889702D
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAC031F23141
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:30:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 273DE1F23415
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1BE14900C;
-	Wed,  3 Apr 2024 13:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06A01487F2;
+	Wed,  3 Apr 2024 13:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HIVWbWjd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a+vOuSqj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923F314A0A4
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1F3147C96;
+	Wed,  3 Apr 2024 13:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712150908; cv=none; b=lK1pdeD75TX/e/qvRId9PqPHlkaFVOuM+ZDmgDNf52igHbhOC6ydt3qx4HhWvCmb2irowOOzKdBlLFtDh3qUS/viIEBq1Wt8m4lMW4Dgsvy+K7VmniXikNLGoCD4TN3AMSlVBUyX6YYP+6LMKAUEya7UVFLXk0qhq2RAkPms1DI=
+	t=1712150386; cv=none; b=in2JAEtpNEXxhkntOpj9Cc7xiSa48yzENKMO4TA2x3NNx8nqTIZjBUOf8CF7EjkoBsDkWphbOA47+UDRlME5YhyicPav/64ycc9j603TllJB32SaA8Zk0elUJWWykeyXuUZIxK6MtT8p2sRAFg+f+8OoNRk/MhJyMyEaTP7TQrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712150908; c=relaxed/simple;
-	bh=Yb5KtvrmtVD6oEuuLqCgewBSPESdP1gDjAYYpbj38/E=;
+	s=arc-20240116; t=1712150386; c=relaxed/simple;
+	bh=hSW4BLkU0VtrY+14wpvjbk+6yBnorhMiRVVMWx2qUGA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dxClDU07W2/cZ7T5lAUetgDYt549a2hWXN7wC7tI6EO5h1Vb7LHj//iCbmWpvNQM64EJi1mfWyzFiLnA/TEGgqZf5ZF3xBEc44GD+oWqZtAb2StZwAsvTKekYqmExWv26KFafjXmRMkdRNN+C56hcPRT1dt9k0ojmQTHcTA93kU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HIVWbWjd; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712150906; x=1743686906;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Yb5KtvrmtVD6oEuuLqCgewBSPESdP1gDjAYYpbj38/E=;
-  b=HIVWbWjd0A5jzSuMSXzDtxi7v9KoZa1vTMAUbMF5jYUR9+iOIBr6mMXL
-   zLkKEN2G/UD9zaG8ETv/uTsNT2S7eFkCAynENA3+/B47X1/yNtfdx957b
-   I6+Ysf2kRoEKFzj6uJ2kJHwqRmFxp+TWnw7atRiYlNTcF+hXXt5FjrC4z
-   Ronzqegky64qfTioiGdfvpSPTrtLvslK8M+AlUoyEaFLc/1L1z7QS1afs
-   R5ibJ4faZ39s9VTrpGW5qUCt2lE8u2o5Ge8pY6AlmNaYXGBkN6upC6SNz
-   ltalfRM7mNU/EfXNxFEybdNQjwVNZtnsFiH3F+3bW8SqeLJz9YA7b+4ex
-   A==;
-X-CSE-ConnectionGUID: 0wjEr7GnRn6PBUrrqcusbw==
-X-CSE-MsgGUID: dMmUYmnkTxGjDPOrT5qsTQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7568774"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="7568774"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 06:28:26 -0700
-X-CSE-ConnectionGUID: IqFwmLcHRtSLW1jbkt8tBA==
-X-CSE-MsgGUID: XHczQhX9TkKyaAWLCVgvSA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="41592111"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa002.fm.intel.com with ESMTP; 03 Apr 2024 06:28:22 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id E77B136C13;
-	Wed,  3 Apr 2024 14:28:17 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	horms@kernel.org,
-	anthony.l.nguyen@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v3 07/12] iavf: add support for indirect access to PHC time
-Date: Wed,  3 Apr 2024 09:19:22 -0400
-Message-Id: <20240403131927.87021-8-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
-References: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
+	 MIME-Version; b=AAC6b1gp/ruWeUo0jwcR0AMXOVY7k0vzbMwA8gK/p8gPCQMU9OKFDWQggUFAyVZ6VaF8aAriHDOxJxQ68JnhMIk7IPL4fckpOADWMM/LUpkhr16fXAVUtFe4IKBdJb5NFYhO89JW+h4wYhxqL78QA6opJOF3fHM0LZEXYMu8yrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a+vOuSqj; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2a274955aacso1172703a91.2;
+        Wed, 03 Apr 2024 06:19:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712150384; x=1712755184; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QLppDGinW0QyvnpiYq8klDjFNvdzQ2Nr+inin7jIp4I=;
+        b=a+vOuSqjh3SIiEfb2itCich48Fl10ulBBjaxOKmNMSoKhq7wBiiagZTl6cSH0UcrGk
+         KUnZV2yUNvMwrbxiJ737lS1mbUQrZ2DYu5/abCH2NFSNUPpb70ktyVXtzbTaPs9tnonU
+         Nu95t9R6eaDRuHmKBikutWWLt0X0A29gnWdawYliLMPagrggOq4G8iTIRIPXXNeni+7Z
+         8jnfvM2RknKhHHaHBF6YFeTrkP2GR3PNixeY3dCK5yVPveNpF3sSkT8+kAnErI3CTfj/
+         3RHp+QuiWht5bb4LEgz+m4HD5Xukne6geQ+JIYtvApiyZdawdFmDe8NFiaP61k69xR1o
+         aYag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712150384; x=1712755184;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QLppDGinW0QyvnpiYq8klDjFNvdzQ2Nr+inin7jIp4I=;
+        b=C8JDmrIIHVwuWacyPb3jhlvCo6qi3P/LJv5jJ22+eDa2PApbgS1tOVVJFmzL/EXyIN
+         Vv4HFAdh4QUzEU2SnXDSmGjl0eHFtAmgtKO6GKhX7osfXys2zhHBCABrrxyjUY347x2a
+         sl9nffz3Dr3F3GWE4HFJnzMBiS6aI+Vkdlkh/j6s0053mCEF73mqUEO/z0fl2Ky1YQS9
+         T1tFSCdwQ/EO87mo3jQb7KiBzDgBgp6iOiklT4N/J9JwCqzHBD9Gho2Ma5r4ees2LlAJ
+         AdnQPoHFM3WSope203Z6UO4MjMc/x/+CmwFjvEasAtkZjwhTXD2iT0uSx6ilCvL1njmd
+         6CkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXsFSew7FSnz+WTKF/aPmODxzQhuaQFnUBWwDHbBu0KC2VxBwUrmiuhWJN1wKyJYgoXdRaYaTScn9hJhl4P/Kv6FsyiOyJ87WDIi3MXITMv4S4u3JKz9FP4ADz8p+KYVrYiZ161bxFP4Y34huOg2BxjlAbYtETLzv45oNnfbL80M1ayK7quCQVPbE165LXG32djdUNAGFjD/bt6o0spyxWICb+OvHPVhMIfK59k45JCQLurVx9Uk4OKps1bwkT/z8vLvbN/3BZYeB57Ra6SYl+B5KaVvLQ1O8pmdvENYsHGGcKAcTicKXwDXHy5Ng6Pww==
+X-Gm-Message-State: AOJu0Yw1z+lCFFqxDpKl4uHq+4QbEf1PqOSCHRC6tPIzZqkG4ddTGKHM
+	vp3I+LxtbhqRvy45vEo/X2Wr00arVRjtdOVc6Kilxpljaw0PS4lFyjWDIPJ+
+X-Google-Smtp-Source: AGHT+IHLZzwj8QjdIOumZZwMTdNJboOCUuRmYTlmuXcu4rWvyLRFqzzHLCDPQsEEK1PiSQ2OkIhUJQ==
+X-Received: by 2002:a17:90a:e691:b0:29c:7544:54df with SMTP id s17-20020a17090ae69100b0029c754454dfmr13682150pjy.23.1712150383662;
+        Wed, 03 Apr 2024 06:19:43 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id k6-20020a17090a658600b0029bc1c931d9sm13588667pjj.51.2024.04.03.06.19.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 06:19:42 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+To: linux-kselftest@vger.kernel.org
+Cc: David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	=?UTF-8?q?Ma=C3=ADra=20Canal?= <mcanal@igalia.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Kees Cook <keescook@chromium.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	=?UTF-8?q?Ville=20Syrj=C3=A4l=C3=A4?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org,
+	kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	x86@kernel.org,
+	Guenter Roeck <linux@roeck-us.net>,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: [PATCH v3 01/15] bug/kunit: Core support for suppressing warning backtraces
+Date: Wed,  3 Apr 2024 06:19:22 -0700
+Message-Id: <20240403131936.787234-2-linux@roeck-us.net>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240403131936.787234-1-linux@roeck-us.net>
+References: <20240403131936.787234-1-linux@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,422 +116,396 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+Some unit tests intentionally trigger warning backtraces by passing
+bad parameters to API functions. Such unit tests typically check the
+return value from those calls, not the existence of the warning backtrace.
 
-Implement support for reading the PHC time indirectly via the
-VIRTCHNL_OP_1588_PTP_GET_TIME operation.
+Such intentionally generated warning backtraces are neither desirable
+nor useful for a number of reasons.
+- They can result in overlooked real problems.
+- A warning that suddenly starts to show up in unit tests needs to be
+  investigated and has to be marked to be ignored, for example by
+  adjusting filter scripts. Such filters are ad-hoc because there is
+  no real standard format for warnings. On top of that, such filter
+  scripts would require constant maintenance.
 
-Based on some simple tests with ftrace, the latency of the indirect
-clock access appears to be about ~110 microseconds. This is due to the
-cost of preparing a message to send over the virtchnl queue.
+One option to address problem would be to add messages such as "expected
+warning backtraces start / end here" to the kernel log.  However, that
+would again require filter scripts, it might result in missing real
+problematic warning backtraces triggered while the test is running, and
+the irrelevant backtrace(s) would still clog the kernel log.
 
-This is expected, due to the increased jitter caused by sending messages
-over virtchnl. It is not easy to control the precise time that the
-message is sent by the VF, or the time that the message is responded to
-by the PF, or the time that the message sent from the PF is received by
-the VF.
+Solve the problem by providing a means to identify and suppress specific
+warning backtraces while executing test code. Since the new functionality
+results in an image size increase of about 1% if CONFIG_KUNIT is enabled,
+provide configuration option KUNIT_SUPPRESS_BACKTRACE to be able to disable
+the new functionality. This option is by default enabled since almost all
+systems with CONFIG_KUNIT enabled will want to benefit from it.
 
-For sending the request, note that many PTP related operations will
-require sending of VIRTCHNL messages. Instead of adding a separate AQ
-flag and storage for each operation, setup a simple queue mechanism for
-queuing up virtchnl messages.
-
-Each message will be converted to a iavf_ptp_aq_cmd structure which ends
-with a flexible array member. A single AQ flag is added for processing
-messages from this queue. In principle this could be extended to handle
-arbitrary virtchnl messages. For now it is kept to PTP-specific as the
-need is primarily for handling PTP-related commands.
-
-Use this to implement .gettimex64 using the indirect method via the
-virtchnl command. The response from the PF is processed and stored into
-the cached_phc_time. A wait queue is used to allow the PTP clock gettime
-request to sleep until the message is sent from the PF.
-
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Daniel Diaz <daniel.diaz@linaro.org>
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: Kees Cook <keescook@chromium.org>
+Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- drivers/net/ethernet/intel/iavf/iavf_main.c   |   9 +-
- drivers/net/ethernet/intel/iavf/iavf_ptp.c    | 153 ++++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.h    |  16 ++
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  93 +++++++++++
- 4 files changed, 270 insertions(+), 1 deletion(-)
+v2:
+- Rebased to v6.9-rc1
+- Added Tested-by:, Acked-by:, and Reviewed-by: tags
+- Added CONFIG_KUNIT_SUPPRESS_BACKTRACE configuration option,
+  enabled by default
+v3:
+- Rebased to v6.9-rc2
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 6feabb1c62d1..6b27065af357 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2261,7 +2261,10 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		iavf_enable_vlan_insertion_v2(adapter, ETH_P_8021AD);
- 		return 0;
- 	}
--
-+	if (adapter->aq_required & IAVF_FLAG_AQ_SEND_PTP_CMD) {
-+		iavf_virtchnl_send_ptp_cmd(adapter);
-+		return IAVF_SUCCESS;
-+	}
- 	if (adapter->aq_required & IAVF_FLAG_AQ_REQUEST_STATS) {
- 		iavf_request_stats(adapter);
- 		return 0;
-@@ -5182,6 +5185,10 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* Setup the wait queue for indicating virtchannel events */
- 	init_waitqueue_head(&adapter->vc_waitqueue);
+ include/asm-generic/bug.h | 16 +++++++++---
+ include/kunit/bug.h       | 51 +++++++++++++++++++++++++++++++++++++++
+ include/kunit/test.h      |  1 +
+ include/linux/bug.h       | 13 ++++++++++
+ lib/bug.c                 | 51 ++++++++++++++++++++++++++++++++++++---
+ lib/kunit/Kconfig         |  9 +++++++
+ lib/kunit/Makefile        |  6 +++--
+ lib/kunit/bug.c           | 40 ++++++++++++++++++++++++++++++
+ 8 files changed, 178 insertions(+), 9 deletions(-)
+ create mode 100644 include/kunit/bug.h
+ create mode 100644 lib/kunit/bug.c
+
+diff --git a/include/asm-generic/bug.h b/include/asm-generic/bug.h
+index 6e794420bd39..c170b6477689 100644
+--- a/include/asm-generic/bug.h
++++ b/include/asm-generic/bug.h
+@@ -18,6 +18,7 @@
+ #endif
  
-+	INIT_LIST_HEAD(&adapter->ptp.aq_cmds);
-+	init_waitqueue_head(&adapter->ptp.phc_time_waitqueue);
-+	spin_lock_init(&adapter->ptp.aq_cmd_lock);
-+
- 	queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 			   msecs_to_jiffies(5 * (pdev->devfn & 0x07)));
- 	/* Initialization goes on in the work. Do not add more of it below. */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-index 0f09d918d269..a562fe92a079 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-@@ -3,6 +3,21 @@
+ #ifndef __ASSEMBLY__
++#include <kunit/bug.h>
+ #include <linux/panic.h>
+ #include <linux/printk.h>
  
- #include "iavf.h"
- 
-+/**
-+ * clock_to_adapter - Convert clock info pointer to adapter pointer
-+ * @ptp_info: PTP info structure
+@@ -39,8 +40,14 @@ struct bug_entry {
+ #ifdef CONFIG_DEBUG_BUGVERBOSE
+ #ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
+ 	const char	*file;
++#ifdef HAVE_BUG_FUNCTION
++	const char      *function;
++#endif
+ #else
+ 	signed int	file_disp;
++#ifdef HAVE_BUG_FUNCTION
++	signed int	function_disp;
++#endif
+ #endif
+ 	unsigned short	line;
+ #endif
+@@ -96,15 +103,18 @@ extern __printf(1, 2) void __warn_printk(const char *fmt, ...);
+ #define __WARN()		__WARN_printf(TAINT_WARN, NULL)
+ #define __WARN_printf(taint, arg...) do {				\
+ 		instrumentation_begin();				\
+-		warn_slowpath_fmt(__FILE__, __LINE__, taint, arg);	\
++		if (!IS_SUPPRESSED_WARNING(__func__))			\
++			warn_slowpath_fmt(__FILE__, __LINE__, taint, arg);\
+ 		instrumentation_end();					\
+ 	} while (0)
+ #else
+ #define __WARN()		__WARN_FLAGS(BUGFLAG_TAINT(TAINT_WARN))
+ #define __WARN_printf(taint, arg...) do {				\
+ 		instrumentation_begin();				\
+-		__warn_printk(arg);					\
+-		__WARN_FLAGS(BUGFLAG_NO_CUT_HERE | BUGFLAG_TAINT(taint));\
++		if (!IS_SUPPRESSED_WARNING(__func__)) {			\
++			__warn_printk(arg);				\
++			__WARN_FLAGS(BUGFLAG_NO_CUT_HERE | BUGFLAG_TAINT(taint));\
++		}							\
+ 		instrumentation_end();					\
+ 	} while (0)
+ #define WARN_ON_ONCE(condition) ({				\
+diff --git a/include/kunit/bug.h b/include/kunit/bug.h
+new file mode 100644
+index 000000000000..bd0fe047572b
+--- /dev/null
++++ b/include/kunit/bug.h
+@@ -0,0 +1,51 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * KUnit helpers for backtrace suppression
 + *
-+ * Use container_of in order to extract a pointer to the iAVF adapter private
-+ * structure.
++ * Copyright (c) 2024 Guenter Roeck <linux@roeck-us.net>
 + */
-+static struct iavf_adapter *clock_to_adapter(struct ptp_clock_info *ptp_info)
-+{
-+	struct iavf_ptp *ptp_priv;
 +
-+	ptp_priv = container_of(ptp_info, struct iavf_ptp, info);
-+	return container_of(ptp_priv, struct iavf_adapter, ptp);
-+}
++#ifndef _KUNIT_BUG_H
++#define _KUNIT_BUG_H
 +
- /**
-  * iavf_ptp_cap_supported - Check if a PTP capability is supported
-  * @adapter: private adapter structure
-@@ -20,6 +35,132 @@ bool iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap)
- 	return (adapter->ptp.hw_caps.caps & cap) == cap;
- }
- 
-+/**
-+ * iavf_allocate_ptp_cmd - Allocate a PTP command message structure
-+ * @v_opcode: the virtchnl opcode
-+ * @msglen: length in bytes of the associated virtchnl structure
-+ *
-+ * Allocates a PTP command message and pre-fills it with the provided message
-+ * length and opcode.
-+ */
-+static struct iavf_ptp_aq_cmd *iavf_allocate_ptp_cmd(enum virtchnl_ops v_opcode,
-+						     u16 msglen)
-+{
-+	struct iavf_ptp_aq_cmd *cmd;
++#ifndef __ASSEMBLY__
 +
-+	cmd = kzalloc(struct_size(cmd, msg, msglen), GFP_KERNEL);
-+	if (!cmd)
-+		return NULL;
++#include <linux/kconfig.h>
 +
-+	cmd->v_opcode = v_opcode;
-+	cmd->msglen = msglen;
++#ifdef CONFIG_KUNIT_SUPPRESS_BACKTRACE
 +
-+	return cmd;
-+}
++#include <linux/stringify.h>
++#include <linux/types.h>
 +
-+/**
-+ * iavf_queue_ptp_cmd - Queue PTP command for sending over virtchnl
-+ * @adapter: private adapter structure
-+ * @cmd: the command structure to send
-+ *
-+ * Queue the given command structure into the PTP virtchnl command queue tos
-+ * end to the PF.
-+ */
-+static void iavf_queue_ptp_cmd(struct iavf_adapter *adapter,
-+			       struct iavf_ptp_aq_cmd *cmd)
-+{
-+	spin_lock(&adapter->ptp.aq_cmd_lock);
-+	list_add_tail(&cmd->list, &adapter->ptp.aq_cmds);
-+	spin_unlock(&adapter->ptp.aq_cmd_lock);
-+
-+	adapter->aq_required |= IAVF_FLAG_AQ_SEND_PTP_CMD;
-+	mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
-+}
-+
-+/**
-+ * iavf_send_phc_read - Send request to read PHC time
-+ * @adapter: private adapter structure
-+ *
-+ * Send a request to obtain the PTP hardware clock time. This allocates the
-+ * VIRTCHNL_OP_1588_PTP_GET_TIME message and queues it up to send to
-+ * indirectly read the PHC time.
-+ *
-+ * This function does not wait for the reply from the PF.
-+ */
-+static int iavf_send_phc_read(struct iavf_adapter *adapter)
-+{
-+	struct iavf_ptp_aq_cmd *cmd;
-+
-+	if (!adapter->ptp.initialized)
-+		return -EOPNOTSUPP;
-+
-+	cmd = iavf_allocate_ptp_cmd(VIRTCHNL_OP_1588_PTP_GET_TIME,
-+				    sizeof(struct virtchnl_phc_time));
-+	if (!cmd)
-+		return -ENOMEM;
-+
-+	iavf_queue_ptp_cmd(adapter, cmd);
-+
-+	return 0;
-+}
-+
-+/**
-+ * iavf_read_phc_indirect - Indirectly read the PHC time via virtchnl
-+ * @adapter: private adapter structure
-+ * @ts: storage for the timestamp value
-+ * @sts: system timestamp values before and after the read
-+ *
-+ * Used when the device does not have direct register access to the PHC time.
-+ * Indirectly reads the time via the VIRTCHNL_OP_1588_PTP_GET_TIME, and waits
-+ * for the reply from the PF.
-+ *
-+ * Based on some simple measurements using ftrace and phc2sys, this clock
-+ * access method has about a ~110 usec latency even when the system is not
-+ * under load. In order to achieve acceptable results when using phc2sys with
-+ * the indirect clock access method, it is recommended to use more
-+ * conservative proportional and integration constants with the P/I servo.
-+ */
-+static int iavf_read_phc_indirect(struct iavf_adapter *adapter,
-+				  struct timespec64 *ts,
-+				  struct ptp_system_timestamp *sts)
-+{
-+	long ret;
-+	int err;
-+
-+	adapter->ptp.phc_time_ready = false;
-+	ptp_read_system_prets(sts);
-+
-+	err = iavf_send_phc_read(adapter);
-+	if (err)
-+		return err;
-+
-+	ret = wait_event_interruptible_timeout(adapter->ptp.phc_time_waitqueue,
-+					       adapter->ptp.phc_time_ready,
-+					       HZ);
-+	if (ret < 0)
-+		return ret;
-+	else if (!ret)
-+		return -EBUSY;
-+
-+	*ts = ns_to_timespec64(adapter->ptp.cached_phc_time);
-+
-+	ptp_read_system_postts(sts);
-+
-+	return 0;
-+}
-+
-+static int iavf_ptp_gettimex64(struct ptp_clock_info *ptp,
-+			       struct timespec64 *ts,
-+			       struct ptp_system_timestamp *sts)
-+{
-+	struct iavf_adapter *adapter = clock_to_adapter(ptp);
-+
-+	if (!adapter->ptp.initialized)
-+		return -ENODEV;
-+
-+	return iavf_read_phc_indirect(adapter, ts, sts);
-+}
-+
- /**
-  * iavf_ptp_register_clock - Register a new PTP for userspace
-  * @adapter: private adapter structure
-@@ -37,6 +178,7 @@ static int iavf_ptp_register_clock(struct iavf_adapter *adapter)
- 		 dev_driver_string(dev),
- 		 dev_name(dev));
- 	ptp_info->owner = THIS_MODULE;
-+	ptp_info->gettimex64 = iavf_ptp_gettimex64;
- 
- 	adapter->ptp.clock = ptp_clock_register(ptp_info, dev);
- 	if (IS_ERR(adapter->ptp.clock))
-@@ -87,6 +229,8 @@ void iavf_ptp_init(struct iavf_adapter *adapter)
-  */
- void iavf_ptp_release(struct iavf_adapter *adapter)
- {
-+	struct iavf_ptp_aq_cmd *cmd, *tmp;
-+
- 	if (!IS_ERR_OR_NULL(adapter->ptp.clock)) {
- 		dev_info(&adapter->pdev->dev, "removing PTP clock %s\n",
- 			 adapter->ptp.info.name);
-@@ -94,6 +238,15 @@ void iavf_ptp_release(struct iavf_adapter *adapter)
- 		adapter->ptp.clock = NULL;
- 	}
- 
-+	/* Cancel any remaining uncompleted PTP clock commands */
-+	spin_lock(&adapter->ptp.aq_cmd_lock);
-+	list_for_each_entry_safe(cmd, tmp, &adapter->ptp.aq_cmds, list) {
-+		list_del(&cmd->list);
-+		kfree(cmd);
-+	}
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_SEND_PTP_CMD;
-+	spin_unlock(&adapter->ptp.aq_cmd_lock);
-+
- 	adapter->ptp.initialized = false;
- }
- 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-index 4939c219bd18..4f84416743e1 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-@@ -6,10 +6,25 @@
- 
- #include <linux/ptp_clock_kernel.h>
- 
-+/* structure used to queue PTP commands for processing */
-+struct iavf_ptp_aq_cmd {
-+	struct list_head list;
-+	enum virtchnl_ops v_opcode;
-+	u16 msglen;
-+	u8 msg[];
++struct __suppressed_warning {
++	struct list_head node;
++	const char *function;
 +};
 +
- /* fields used for PTP support */
- struct iavf_ptp {
-+	wait_queue_head_t phc_time_waitqueue;
- 	struct virtchnl_ptp_caps hw_caps;
-+	struct list_head aq_cmds;
-+	/* Lock protecting access to the AQ command list */
-+	spinlock_t aq_cmd_lock;
-+	u64 cached_phc_time;
-+	unsigned long cached_phc_updated;
- 	bool initialized;
-+	bool phc_time_ready;
- 	struct ptp_clock_info info;
- 	struct ptp_clock *clock;
- };
-@@ -18,5 +33,6 @@ void iavf_ptp_init(struct iavf_adapter *adapter);
- void iavf_ptp_release(struct iavf_adapter *adapter);
- void iavf_ptp_process_caps(struct iavf_adapter *adapter);
- bool iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap);
-+void iavf_virtchnl_send_ptp_cmd(struct iavf_adapter *adapter);
++void __start_suppress_warning(struct __suppressed_warning *warning);
++void __end_suppress_warning(struct __suppressed_warning *warning);
++bool __is_suppressed_warning(const char *function);
++
++#define DEFINE_SUPPRESSED_WARNING(func)	\
++	struct __suppressed_warning __kunit_suppress_##func = \
++		{ .function = __stringify(func) }
++
++#define START_SUPPRESSED_WARNING(func) \
++	__start_suppress_warning(&__kunit_suppress_##func)
++
++#define END_SUPPRESSED_WARNING(func) \
++	__end_suppress_warning(&__kunit_suppress_##func)
++
++#define IS_SUPPRESSED_WARNING(func) \
++	__is_suppressed_warning(func)
++
++#else /* CONFIG_KUNIT_SUPPRESS_BACKTRACE */
++
++#define DEFINE_SUPPRESSED_WARNING(func)
++#define START_SUPPRESSED_WARNING(func)
++#define END_SUPPRESSED_WARNING(func)
++#define IS_SUPPRESSED_WARNING(func) (false)
++
++#endif /* CONFIG_KUNIT_SUPPRESS_BACKTRACE */
++#endif /* __ASSEMBLY__ */
++#endif /* _KUNIT_BUG_H */
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index 61637ef32302..d0c44594d34c 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -10,6 +10,7 @@
+ #define _KUNIT_TEST_H
  
- #endif /* _IAVF_PTP_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 12ce169699cf..fde8b4bf56fb 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -1533,6 +1533,63 @@ void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid)
- 				  VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2);
+ #include <kunit/assert.h>
++#include <kunit/bug.h>
+ #include <kunit/try-catch.h>
+ 
+ #include <linux/args.h>
+diff --git a/include/linux/bug.h b/include/linux/bug.h
+index 348acf2558f3..c668762dc76a 100644
+--- a/include/linux/bug.h
++++ b/include/linux/bug.h
+@@ -36,6 +36,9 @@ static inline int is_warning_bug(const struct bug_entry *bug)
+ 	return bug->flags & BUGFLAG_WARNING;
  }
  
-+/**
-+ * iavf_virtchnl_send_ptp_cmd - Send one queued PTP command
-+ * @adapter: adapter private structure
-+ *
-+ * De-queue one PTP command request and send the command message to the PF.
-+ * Clear IAVF_FLAG_AQ_SEND_PTP_CMD if no more messages are left to send.
-+ */
-+void iavf_virtchnl_send_ptp_cmd(struct iavf_adapter *adapter)
-+{
-+	struct device *dev = &adapter->pdev->dev;
-+	struct iavf_ptp_aq_cmd *cmd;
-+	int err;
++void bug_get_file_function_line(struct bug_entry *bug, const char **file,
++				const char **function, unsigned int *line);
 +
-+	if (WARN_ON(!adapter->ptp.initialized)) {
-+		/* This shouldn't be possible to hit, since no messages should
-+		 * be queued if PTP is not initialized.
-+		 */
-+		adapter->aq_required &= ~IAVF_FLAG_AQ_SEND_PTP_CMD;
-+		return;
-+	}
-+
-+	spin_lock(&adapter->ptp.aq_cmd_lock);
-+	cmd = list_first_entry_or_null(&adapter->ptp.aq_cmds,
-+				       struct iavf_ptp_aq_cmd, list);
-+	if (!cmd) {
-+		/* no further PTP messages to send */
-+		adapter->aq_required &= ~IAVF_FLAG_AQ_SEND_PTP_CMD;
-+		goto out_unlock;
-+	}
-+
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(dev, "Cannot send PTP command %d, command %d pending\n",
-+			cmd->v_opcode, adapter->current_op);
-+		goto out_unlock;
-+	}
-+
-+	err = iavf_send_pf_msg(adapter, cmd->v_opcode, cmd->msg, cmd->msglen);
-+	if (!err) {
-+		/* Command was sent without errors, so we can remove it from
-+		 * the list and discard it.
-+		 */
-+		list_del(&cmd->list);
-+		kfree(cmd);
-+	} else {
-+		/* We failed to send the command, try again next cycle */
-+		dev_warn(dev, "Failed to send PTP command %d\n", cmd->v_opcode);
-+	}
-+
-+	if (list_empty(&adapter->ptp.aq_cmds))
-+		/* no further PTP messages to send */
-+		adapter->aq_required &= ~IAVF_FLAG_AQ_SEND_PTP_CMD;
-+
-+out_unlock:
-+	spin_unlock(&adapter->ptp.aq_cmd_lock);
-+}
-+
- /**
-  * iavf_print_link_message - print link up or down
-  * @adapter: adapter structure
-@@ -2104,6 +2161,39 @@ static void iavf_activate_fdir_filters(struct iavf_adapter *adapter)
- 		adapter->aq_required |= IAVF_FLAG_AQ_ADD_FDIR_FILTER;
+ void bug_get_file_line(struct bug_entry *bug, const char **file,
+ 		       unsigned int *line);
+ 
+@@ -62,6 +65,16 @@ static inline enum bug_trap_type report_bug(unsigned long bug_addr,
  }
  
-+/**
-+ * iavf_virtchnl_ptp_get_time - Respond to VIRTCHNL_OP_1588_PTP_GET_TIME
-+ * @adapter: private adapter structure
-+ * @data: the message from the PF
-+ * @len: length of the message from the PF
-+ *
-+ * Handle the VIRTCHNL_OP_1588_PTP_GET_TIME message from the PF. This message
-+ * is sent by the PF in response to the same op as a request from the VF.
-+ * Extract the 64bit nanoseconds time from the message and store it in
-+ * cached_phc_time. Then, notify any thread that is waiting for the update via
-+ * the wait queue.
-+ */
-+static void iavf_virtchnl_ptp_get_time(struct iavf_adapter *adapter,
-+				       void *data, u16 len)
+ struct bug_entry;
++static inline void bug_get_file_function_line(struct bug_entry *bug,
++					      const char **file,
++					      const char **function,
++					      unsigned int *line)
 +{
-+	struct virtchnl_phc_time *msg;
-+
-+	if (len == sizeof(*msg)) {
-+		msg = (struct virtchnl_phc_time *)data;
-+	} else {
-+		dev_err_once(&adapter->pdev->dev,
-+			     "Invalid VIRTCHNL_OP_1588_PTP_GET_TIME from PF. Got size %u, expected %zu\n",
-+			     len, sizeof(*msg));
-+		return;
-+	}
-+
-+	adapter->ptp.cached_phc_time = msg->time;
-+	adapter->ptp.cached_phc_updated = jiffies;
-+	adapter->ptp.phc_time_ready = true;
-+
-+	wake_up(&adapter->ptp.phc_time_waitqueue);
++	*file = NULL;
++	*function = NULL;
++	*line = 0;
 +}
 +
- /**
-  * iavf_virtchnl_completion
-  * @adapter: adapter structure
-@@ -2514,6 +2604,9 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		/* process any state change needed due to new capabilities */
- 		iavf_ptp_process_caps(adapter);
- 	break;
-+	case VIRTCHNL_OP_1588_PTP_GET_TIME:
-+		iavf_virtchnl_ptp_get_time(adapter, msg, msglen);
-+		break;
- 	case VIRTCHNL_OP_ENABLE_QUEUES:
- 		/* enable transmits */
- 		iavf_irq_enable(adapter, true);
+ static inline void bug_get_file_line(struct bug_entry *bug, const char **file,
+ 				     unsigned int *line)
+ {
+diff --git a/lib/bug.c b/lib/bug.c
+index e0ff21989990..aa8bb12b9809 100644
+--- a/lib/bug.c
++++ b/lib/bug.c
+@@ -26,6 +26,14 @@
+        when CONFIG_DEBUG_BUGVERBOSE is not enabled, so you must generate
+        the values accordingly.
+ 
++  2a.Optionally implement support for the "function" entry in struct
++     bug_entry. This entry must point to the name of the function triggering
++     the warning or bug trap (normally __func__). This is only needed if
++     both CONFIG_DEBUG_BUGVERBOSE and CONFIG_KUNIT_SUPPRESS_BACKTRACE are
++     enabled and if the architecture wants to implement support for suppressing
++     warning backtraces. The architecture must define HAVE_BUG_FUNCTION if it
++     adds pointers to function names to struct bug_entry.
++
+   3. Implement the trap
+      - In the illegal instruction trap handler (typically), verify
+        that the fault was in kernel mode, and call report_bug()
+@@ -127,14 +135,21 @@ static inline struct bug_entry *module_find_bug(unsigned long bugaddr)
+ }
+ #endif
+ 
+-void bug_get_file_line(struct bug_entry *bug, const char **file,
+-		       unsigned int *line)
++void bug_get_file_function_line(struct bug_entry *bug, const char **file,
++				const char **function, unsigned int *line)
+ {
++	*function = NULL;
+ #ifdef CONFIG_DEBUG_BUGVERBOSE
+ #ifdef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
+ 	*file = (const char *)&bug->file_disp + bug->file_disp;
++#ifdef HAVE_BUG_FUNCTION
++	*function = (const char *)&bug->function_disp + bug->function_disp;
++#endif
+ #else
+ 	*file = bug->file;
++#ifdef HAVE_BUG_FUNCTION
++	*function = bug->function;
++#endif
+ #endif
+ 	*line = bug->line;
+ #else
+@@ -143,6 +158,13 @@ void bug_get_file_line(struct bug_entry *bug, const char **file,
+ #endif
+ }
+ 
++void bug_get_file_line(struct bug_entry *bug, const char **file, unsigned int *line)
++{
++	const char *function;
++
++	bug_get_file_function_line(bug, file, &function, line);
++}
++
+ struct bug_entry *find_bug(unsigned long bugaddr)
+ {
+ 	struct bug_entry *bug;
+@@ -157,8 +179,9 @@ struct bug_entry *find_bug(unsigned long bugaddr)
+ static enum bug_trap_type __report_bug(unsigned long bugaddr, struct pt_regs *regs)
+ {
+ 	struct bug_entry *bug;
+-	const char *file;
++	const char *file, *function;
+ 	unsigned line, warning, once, done;
++	char __maybe_unused sym[KSYM_SYMBOL_LEN];
+ 
+ 	if (!is_valid_bugaddr(bugaddr))
+ 		return BUG_TRAP_TYPE_NONE;
+@@ -169,12 +192,32 @@ static enum bug_trap_type __report_bug(unsigned long bugaddr, struct pt_regs *re
+ 
+ 	disable_trace_on_warning();
+ 
+-	bug_get_file_line(bug, &file, &line);
++	bug_get_file_function_line(bug, &file, &function, &line);
++#if defined(CONFIG_KUNIT_SUPPRESS_BACKTRACE) && defined(CONFIG_KALLSYMS)
++	if (!function) {
++		/*
++		 * This will be seen if report_bug is called on an architecture
++		 * with no architecture-specific support for suppressing warning
++		 * backtraces, if CONFIG_DEBUG_BUGVERBOSE is not enabled, or if
++		 * the calling code is from assembler which does not record a
++		 * function name. Extracting the function name from the bug
++		 * address is less than perfect since compiler optimization may
++		 * result in 'bugaddr' pointing to a function which does not
++		 * actually trigger the warning, but it is better than no
++		 * suppression at all.
++		 */
++		sprint_symbol_no_offset(sym, bugaddr);
++		function = sym;
++	}
++#endif /* defined(CONFIG_KUNIT_SUPPRESS_BACKTRACE) && defined(CONFIG_KALLSYMS) */
+ 
+ 	warning = (bug->flags & BUGFLAG_WARNING) != 0;
+ 	once = (bug->flags & BUGFLAG_ONCE) != 0;
+ 	done = (bug->flags & BUGFLAG_DONE) != 0;
+ 
++	if (warning && IS_SUPPRESSED_WARNING(function))
++		return BUG_TRAP_TYPE_WARN;
++
+ 	if (warning && once) {
+ 		if (done)
+ 			return BUG_TRAP_TYPE_WARN;
+diff --git a/lib/kunit/Kconfig b/lib/kunit/Kconfig
+index 68a6daec0aef..b1b899265acc 100644
+--- a/lib/kunit/Kconfig
++++ b/lib/kunit/Kconfig
+@@ -15,6 +15,15 @@ menuconfig KUNIT
+ 
+ if KUNIT
+ 
++config KUNIT_SUPPRESS_BACKTRACE
++	bool "KUnit - Enable backtrace suppression"
++	default y
++	help
++	  Enable backtrace suppression for KUnit. If enabled, backtraces
++	  generated intentionally by KUnit tests are suppressed. Disable
++	  to reduce kernel image size if image size is more important than
++	  suppression of backtraces generated by KUnit tests.
++
+ config KUNIT_DEBUGFS
+ 	bool "KUnit - Enable /sys/kernel/debug/kunit debugfs representation" if !KUNIT_ALL_TESTS
+ 	default KUNIT_ALL_TESTS
+diff --git a/lib/kunit/Makefile b/lib/kunit/Makefile
+index 309659a32a78..545b57c3be48 100644
+--- a/lib/kunit/Makefile
++++ b/lib/kunit/Makefile
+@@ -14,8 +14,10 @@ ifeq ($(CONFIG_KUNIT_DEBUGFS),y)
+ kunit-objs +=				debugfs.o
+ endif
+ 
+-# KUnit 'hooks' are built-in even when KUnit is built as a module.
+-obj-y +=				hooks.o
++# KUnit 'hooks' and bug handling are built-in even when KUnit is built
++# as a module.
++obj-y +=				hooks.o \
++					bug.o
+ 
+ obj-$(CONFIG_KUNIT_TEST) +=		kunit-test.o
+ 
+diff --git a/lib/kunit/bug.c b/lib/kunit/bug.c
+new file mode 100644
+index 000000000000..f93544d7a9d1
+--- /dev/null
++++ b/lib/kunit/bug.c
+@@ -0,0 +1,40 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * KUnit helpers for backtrace suppression
++ *
++ * Copyright (c) 2024 Guenter Roeck <linux@roeck-us.net>
++ */
++
++#include <kunit/bug.h>
++#include <linux/export.h>
++#include <linux/list.h>
++#include <linux/string.h>
++
++static LIST_HEAD(suppressed_warnings);
++
++void __start_suppress_warning(struct __suppressed_warning *warning)
++{
++	list_add(&warning->node, &suppressed_warnings);
++}
++EXPORT_SYMBOL_GPL(__start_suppress_warning);
++
++void __end_suppress_warning(struct __suppressed_warning *warning)
++{
++	list_del(&warning->node);
++}
++EXPORT_SYMBOL_GPL(__end_suppress_warning);
++
++bool __is_suppressed_warning(const char *function)
++{
++	struct __suppressed_warning *warning;
++
++	if (!function)
++		return false;
++
++	list_for_each_entry(warning, &suppressed_warnings, node) {
++		if (!strcmp(function, warning->function))
++			return true;
++	}
++	return false;
++}
++EXPORT_SYMBOL_GPL(__is_suppressed_warning);
 -- 
-2.38.1
+2.39.2
 
 
