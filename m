@@ -1,128 +1,487 @@
-Return-Path: <netdev+bounces-84285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 721C289665A
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:26:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AFEE896665
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DE1E287EAA
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 07:26:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7797C1F23E49
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 07:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13EA58AAC;
-	Wed,  3 Apr 2024 07:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5559859B61;
+	Wed,  3 Apr 2024 07:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zxih+029"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kxkN0jp3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0095C54BF9;
-	Wed,  3 Apr 2024 07:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712129210; cv=none; b=kintW5nLGisJ3E4Se5SUmWE/KO29WO09E2FfAdR3IYMSKS4vyyqWDvZKDqIVlvzCGrxGSnhDhi6sKD/djzs2yag5zP/FVDiSmKStLvTYysdQZUVX6bUbu4va0r4+/YA1IE9piu3UyOolQRfpB/ijtG+9Q02qrcFOI3IID+ekbKU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712129210; c=relaxed/simple;
-	bh=h73eG0u0YShaUH2j9win7hL7ENNiYpL6Iy/Qlt7wZHA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=in7JMEd2Uvzk/9Za7oHwsnh8Emk3c0v1ZbTnVsJHJYG1bAmqjSI5xKlmBvSxjrKZx0wAtZeq1NgUZ6b+Y6ZiLAO+Gt4KmqjEd9JuW6UoUlPjCup777+vjx3ZVRy4Mlkx8SvtpvnM1/7btEbuWyseU+VB7Io37o0Kh7I3EkxFrBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zxih+029; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-56e030624d1so960471a12.2;
-        Wed, 03 Apr 2024 00:26:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712129207; x=1712734007; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y8gbtEBqWb/AkwR61G4KI9Q1rpsfxIg0StBFMmMIVEI=;
-        b=Zxih+029g7c7ZoJw78bRhRwSjA+wqklDZqYc+MwVNcq4lnEr8Wg6UjOeHwDugzB5TF
-         c9AH9sSbdJ7sg8EuBe0hJGjLZhj4FZOBmK/ReY4Q+YQZnSmDCpo5BmK3nN8R6a0jYFhT
-         MldKZYe3zK6IH7UK7bN7nRxljCWx3Y2q7fZ1YrSry2JpCy314XjvUNx+8Llmd2afmexE
-         z7+KUIn3iIFXeVL4f2aZ7qyQ0boEtx7N+wdvcZ6jWs+mN/TKbigOKrqv6BMyRR6M3Adn
-         TiW+Wy0hEW6vZ48fiu6yUpOiiutSMFW88a3FdDU49PQ+/3skWQWyex74XUsCKfPgsnt1
-         G6Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712129207; x=1712734007;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8gbtEBqWb/AkwR61G4KI9Q1rpsfxIg0StBFMmMIVEI=;
-        b=EzUmEgAwBlbw/7d8iOSIFSsWSGdpYin3AxRrOMeDMk9hZjVVmEHzM1y1Z6RlSfDq2D
-         rQbV1ime+GNfEQX7Dzs+NR8S6ZehvOggXbmvWGqCDsFeo3pNC5VIxk9woovj1gehQuOw
-         8qCyGC2YdJ544BvPnnRcowOqE6rTv0HH80Q3yFKNPuF/XUuhZ6N/uJOSe5UNPVcCdfPX
-         xKjyxJ2Ih2gn45L2RmbxchCFb+BUEr3/WR682U2bfBj7EKBXCamyu6OOkyioQqOVlI85
-         dMK2b+3nq1cDKf5Y6Ze+dzKYMkcA++y87796Efh7mkqJvC4c/KXbbYaLNousgi7ADcHX
-         dmfA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7KBYnysRfcPEatrtY81t/eCn6+IBgmk1P5S6h2N/61wyK7YHlSu+y7kpTPiQqqFavpULHuotZ58TztK58FQpKOmnUet9U92IgTjgprBQRJcqqDLH5DeNRPS617NqbzdisEkHryNJRJfjdKMKDc58vokvcQUTldDwC
-X-Gm-Message-State: AOJu0YyWk0UsgehmIlTMK7cJAHl5jeGoFNnUzFaCB19ANKCjFWsXDn6P
-	TI2cvbhusWhJO8d3B9srPMnSWKhU89Z0KbnN6OLLVmrGk629kpyeu+iCeXby88Q=
-X-Google-Smtp-Source: AGHT+IFks+nIAsP739PPBv3VJz+PZVgG1YU/0oeyvSk5uzthzR4qBmu3iWi8OIBxQZkac7yJC3wANw==
-X-Received: by 2002:a50:d48d:0:b0:567:824:e36c with SMTP id s13-20020a50d48d000000b005670824e36cmr9866650edi.14.1712129206838;
-        Wed, 03 Apr 2024 00:26:46 -0700 (PDT)
-Received: from gmail.com (84-236-113-97.pool.digikabel.hu. [84.236.113.97])
-        by smtp.gmail.com with ESMTPSA id a17-20020a05640233d100b0056ded9bc62esm1515843edc.43.2024.04.03.00.26.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 00:26:46 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date: Wed, 3 Apr 2024 09:26:44 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: patchwork-bot+netdevbpf@kernel.org, ast@kernel.org,
-	daniel@iogearbox.net
-Cc: Uros Bizjak <ubizjak@gmail.com>, x86@kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ast@kernel.org, daniel@iogearbox.net
-Subject: Re: [PATCH RESEND bpf v2 0/2] x86/bpf: Fixes for the BPF JIT with
- retbleed=stuff
-Message-ID: <Zg0EtEkIIA45cuPT@gmail.com>
-References: <20240401185821.224068-1-ubizjak@gmail.com>
- <171203102833.24910.7566029980709800852.git-patchwork-notify@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F42258AAC
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 07:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712129253; cv=fail; b=AajYQ+er6bFi4aWNAW72xsrPc7kacSa3dEifg3BBnMhLgTsKDk9usJYPBsHCRxrsdKi3BygCgsQ7kPpZFY4CD+BceKqHW7zzs17M4LG6hPUk5xU6lDibheREBFlMOWfTVPVNohOZ0iisj+ICKvttlRIE9cLS3oLqHNJk94uIlAA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712129253; c=relaxed/simple;
+	bh=wVdMRXo4qhcFhEILuEOi2aWVjdejNW3LMl7cLTEotug=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mTgwMuh/IUcZRxKCdKCQjLvK3c9qDEtiIDTMblf93NqddIJgC6DlPa2YMtS8w3nziut3tGjn9AQdLQOSf5ZWLJiJ5tsHRWUnt8X9vSXgHM2/bjq+PVrlDeqLdSW8m7+Td0wULayd1YLqybZvWlZIEeC5jt0SO6aCcZCd6l/n7ro=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kxkN0jp3; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712129251; x=1743665251;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=wVdMRXo4qhcFhEILuEOi2aWVjdejNW3LMl7cLTEotug=;
+  b=kxkN0jp3Q+5Q+wT0vC40Szo1DphHuFol4Nt/MP4MJn6imDCQkwr+Qh2e
+   p7vXd4i+F1H52akDxZ5lxuXumHngR+xU6VAIRqonSyPObgQ6j8LG87YSZ
+   zldFSjh3EOBxRBJ5UEdbPKUYaPMLUxQtW7PwEgK3EZqzWD3e8pdIOJwpu
+   Pii06y9MA0xzdGjWIPmPXww1J7oLADzujpjSPAVVFVAKj4NxylXnL/4lD
+   3wKjswbZ4Tj+g5rizTgil2so2nHJ+gQIRgZCBglsUaCNYivCRjYpBkG5w
+   V5eqEUVu2L/NH/xabbRKcyLb32jQdZ0gxTVRkOlZ99QcRAtwkWINCMzW2
+   A==;
+X-CSE-ConnectionGUID: ZfeudDB3ShKlwQwkMfw8dw==
+X-CSE-MsgGUID: mbRNznLfTxa/NVsT1v99oA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="7241040"
+X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
+   d="scan'208";a="7241040"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 00:27:30 -0700
+X-CSE-ConnectionGUID: FiSV0xarSrGDdjLVrPtJLA==
+X-CSE-MsgGUID: d2ycOFy2R6KY3mGgY1t2Wg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
+   d="scan'208";a="18443865"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Apr 2024 00:27:30 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 3 Apr 2024 00:27:29 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 3 Apr 2024 00:27:29 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 3 Apr 2024 00:27:29 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 3 Apr 2024 00:27:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M4WLn+w0bs5lU/iSG3IMFgTIVPb1dCNhjIIHhWvLzK/w7+8OAuUnd49UOHubZQvQxENy3BdkiB3gvWXQts+JhGuqFMZU5qsmNaSk/CCK7D/cCQZQTgNNe8/MVMZVUYM+9MYHxHYeR3G9EWxBgWmCbyJAuoZ9lh0ZE64BS8LXt2ew5e2bbiLiwAgiK/L31oXEh2pGJvHiSK6DxBoXC9gK7kPNLBpBUkHwVbRB+SWjUAy6W+KC2KPwkO0o63Oh32cEfXfhG1LEeU007fBp/YrkHwheMEmjucVy+iP86WSSEy3MTLQBZcZmdjgzSRgpI8yHXU9cT3Kea9PLLO/ogR0ihg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NW6ykIgyf3tYEHD0Omaf1AQpmUl/yk1Z81Y3JJHjDeo=;
+ b=BTes+2lRqbV3qkHsSrVLIMbFnjJqtsfptZB6r5Id76f1cOeEgUChTKUWVpa/eeJyDo+uWtuhw53LChLj2pbe3GrkkqrZEknMDxfnwq9RlkkkQRf5dBi/Op8l5qfLLsy3q5duYSu2mRVG+AuTHgaXll+9n6PsHxNDrOIWpNr0HZ7/Ne4roqAR3fdW2T9Q5f955Nzjg88ZLIwap+1+6u81EK/sr2DRDrnM37eu30XX4SUSdFz/vMYPMPPEWv5jcTwZqCUl9gZ/pgewLfRAnoNZb5oiDgyvUgCtCtWxKKeHpJr3qlTy9zopikk81XLIsFz3lC3G2bo4UXqAnP/wzZpJuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4610.namprd11.prod.outlook.com (2603:10b6:5:2ab::19)
+ by CYXPR11MB8730.namprd11.prod.outlook.com (2603:10b6:930:e3::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Wed, 3 Apr
+ 2024 07:27:21 +0000
+Received: from DM6PR11MB4610.namprd11.prod.outlook.com
+ ([fe80::e51:4d65:a54a:60fd]) by DM6PR11MB4610.namprd11.prod.outlook.com
+ ([fe80::e51:4d65:a54a:60fd%6]) with mapi id 15.20.7452.019; Wed, 3 Apr 2024
+ 07:27:21 +0000
+From: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
+To: Simon Horman <horms@kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Wegrzyn, Stefan" <stefan.wegrzyn@intel.com>, "Jagielski, Jedrzej"
+	<jedrzej.jagielski@intel.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>
+Subject: RE: [PATCH iwl-next v1 1/5] ixgbe: Add support for E610 FW Admin
+ Command Interface
+Thread-Topic: [PATCH iwl-next v1 1/5] ixgbe: Add support for E610 FW Admin
+ Command Interface
+Thread-Index: AQHagFzu8rp4PKVdekq//eh++MEBobFPDQEAgAceC0A=
+Date: Wed, 3 Apr 2024 07:27:21 +0000
+Message-ID: <DM6PR11MB4610B0DD83E935236A0674CBF33D2@DM6PR11MB4610.namprd11.prod.outlook.com>
+References: <20240327155422.25424-1-piotr.kwapulinski@intel.com>
+ <20240327155422.25424-2-piotr.kwapulinski@intel.com>
+ <20240329182816.GP651713@kernel.org>
+In-Reply-To: <20240329182816.GP651713@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4610:EE_|CYXPR11MB8730:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: b2FtqTxJ1bsHy0m4XVIagjRFMSArY9cEWPZqJxym3P/13i+sAyvLs93a31crElGE0jCTeVHo8mHsWiRhKdu6mdDB7zy6LwPbWTvqpTywweqbPh7vENTsYeEpno/8fUONaCpmUL49K/GZOS5/TwE68T/dQcDYTlbX6qAmki49f7QjuZ0bEmFsOQgNMoGP4vj/WaIej67ZkwmgsHcT7YwccAC0GWE4OX39KdFVFpRjySDuwPVH9K/5nJAkk/mgyfkNBBj0eyGidb/Sukl6p4gvxXfb+HACl2ABR56our6sPjkplfkQ9AO+jAg0rJAh9UWwIekXu8ksLKSpZhTTitlslaWYlQUwCNpOcmgRaMCLlZ3WM/R/dCCMMbpxOmEvqsPqWMHBne8P8l/YUNlOlyMxf8tEbk6XN3LToCEqgLto8zuncF4RQDjx0OyFRdhyQO7r57AVSPo7zUIl1+CXzkO5PCcFQYAv9gF4CUmle8+4CK2Ern/v0rS7cRwBPqXmps0oCECGSaTVwc+5jP/MtI3C0+D5iu5La7/k5h1QJEI/ErWfDV+HXhH+PNrirBL0VzoMgwA0AAuX9HIVYPMA2AQSBPieisGxaWMc16DmPjXSVXZ/MTM5L0RjOwOvDjqmndEX7bbdruNqpPVGfpTjSXSx/x6V0yHt38snpIAw3p6TbQ4=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4610.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?nQSVwcNjJKuYQG6MclFozkGbQ3laJS/xEcP23F6ESFM6Q21a1Hj4NA5SqjLe?=
+ =?us-ascii?Q?8Z8Faogsgc1wdX/cpRa47BkALixk2+V08gaYg5v/HqgXLYdz4OuJDJy2AG6j?=
+ =?us-ascii?Q?WPjOdmLUtjC7jHkrN5D6aRMN7xpYthvx+f1MNQbSGdRFfyIAdC5OtMg3KK7u?=
+ =?us-ascii?Q?4G55LYs1yfdjXAmb/V87nD4mV8xPMgokl1osFZtnjE+WH60dG7GC18vOfDvT?=
+ =?us-ascii?Q?BT7Jhwju69I/b03Yk4xYMrUI/7yEh6FboJ0KHBP5Xibr0p2teKiVzh0jXIeF?=
+ =?us-ascii?Q?mIR4ojTPItmUcm0tmxPfT2e4eJxXw13KPUGdsA7HXWoF2tI1QVjL65zKpa+e?=
+ =?us-ascii?Q?XUazJrd57Y6ga3GuhVjNd8p5rhcOoYmQgqfy0qW74FXZ27H7JrwvOsHiszQ8?=
+ =?us-ascii?Q?g9jxLKJF0Hm3FaT/01zOkKMnIdWTZEg1aM21n2MDzA90ct4o3qqDRJaq+aM8?=
+ =?us-ascii?Q?ddduKvMJHXlfIz5z/tkMDmhlib2J5+NJoXsvRjp9bQWLOWePUIIMSquv58OL?=
+ =?us-ascii?Q?ZJ/aI4DN44QIlEDR7FCqxk7YZum5pBCfw0r05Lj83UnCmrkJx9WOI6oXkBkw?=
+ =?us-ascii?Q?gbovaqsF6uFR/vqAheklym4HQERV7yJMtUunMnom53fEFWj8TWXr3E91DiWy?=
+ =?us-ascii?Q?gdVTymZkDWBA8iVftQO9dcuffDNXKNBKaZBPDV0B29RrVA5mPBzIC9iceA6e?=
+ =?us-ascii?Q?UZ2yHyt/nWOxA96+OYukoSNatIeR5GeAg/lbNCH3OtBQ8bkZHUpbATjXLe7P?=
+ =?us-ascii?Q?LPKc+WsL1Yr1vdISw9jz6T4vIL8b2IQJslTjKj8e7lhPatWk12rW4AYyNGku?=
+ =?us-ascii?Q?6nEMzy7G6K3KELwOjk1rZJfR4Q/BAxA+EQ56kWUTxd8ny4OykuVJJjptjo9h?=
+ =?us-ascii?Q?XWXD111zgZrciD3rJJ9Sp/Yz9s3SCdZGDXi/2/5HS+QmqZCAZ5P4oL6ORubS?=
+ =?us-ascii?Q?gq863blZZJs2WSvGTEYyTuNrMzhCp5TTnQdMPv1KtfBOBm5bFwfRRTFYRIXa?=
+ =?us-ascii?Q?KR8I+9NX6EV+WP4CDtG8CgpHGWz3mWwALAGy7wOoiyzDeBRD8nmfiGAH8N4X?=
+ =?us-ascii?Q?dLNWxeHr23J0jxvK080q8dN5UpTG72ltd2nDOZOdZstXAO/cyhPwD7Pi9tfa?=
+ =?us-ascii?Q?nZA7LnneLgKvDWRKUtta5/cL6hO23SYIAGMmcjDiwsXhpHAIjh2omSaK/Nfb?=
+ =?us-ascii?Q?QsnSQ19PVa4Z/FR9rIYx4u5Ry2Wb/2eWv0lzPh7pn5pAPaViu+Au4W59fFTp?=
+ =?us-ascii?Q?JEZMAYkNjh0bpM1e5svmu5tpcbNfpZTwx6+m1k7WNZXf8n7ii1DtzyFwN6Tn?=
+ =?us-ascii?Q?O93VZ9HzCxDpoIALAWEWd17D7YP4/5O8pTN9V7fGjvLl9Cwmm7Hr5pr4uDkv?=
+ =?us-ascii?Q?HhmOBb8mMgbuhFO07MzMg4J/AUn8RStw5dBQ7pMpcJsKqZjZU1kgK3NLcMX1?=
+ =?us-ascii?Q?lMpwGSs9Pekg8e+onnsECxibbNA/+rlR79YqsDXOaCASSVg4Rc6ycXCRop3f?=
+ =?us-ascii?Q?ULWjmwgcAAr2V0ppqxL2uyKcHoFMQbHGNjS003ezsa4UoAAW0eufPy0L9INn?=
+ =?us-ascii?Q?StPhP8RObC75egRLFeVm4/vr8JWnBdJRbVBveTak?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <171203102833.24910.7566029980709800852.git-patchwork-notify@kernel.org>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4610.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58f98133-5d99-48b7-ac41-08dc53af8024
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2024 07:27:21.3460
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5KyQKNDsgSVSuHdzcGTCb556u46YskCAyX3s7htKrZ2GtOE+eervxno2oH7dR2+Lh3Y8fteb7li13WyLGj1y5z33eF+p3ZnlqnFaH8CkSsk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8730
+X-OriginatorOrg: intel.com
 
+>-----Original Message-----
+>From: Simon Horman <horms@kernel.org>=20
+>Sent: Friday, March 29, 2024 7:28 PM
+>To: Kwapulinski, Piotr <piotr.kwapulinski@intel.com>
+>Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Wegrzyn, Ste=
+fan <stefan.wegrzyn@intel.com>; Jagielski, Jedrzej <jedrzej.jagielski@intel=
+.com>; Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>Subject: Re: [PATCH iwl-next v1 1/5] ixgbe: Add support for E610 FW Admin =
+Command Interface
+>
+>On Wed, Mar 27, 2024 at 04:54:18PM +0100, Piotr Kwapulinski wrote:
+>> Add low level support for Admin Command Interface (ACI). ACI is the=20
+>> Firmware interface used by a driver to communicate with E610 adapter.=20
+>> Add the following ACI features:
+>> - data structures, macros, register definitions
+>> - commands handling
+>> - events handling
+>>=20
+>> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+>> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+>> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+>> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+>> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+>> ---
+>>  drivers/net/ethernet/intel/ixgbe/Makefile     |    4 +-
+>>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c |  505 ++++++++
+>>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   19 +
+>>  drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   71 +-
+>>  .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 1063 +++++++++++++++++
+>>  drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |   15 +
+>>  6 files changed, 1671 insertions(+), 6 deletions(-)  create mode=20
+>> 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>>  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+>>  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+>>  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
+>>=20
+>> diff --git a/drivers/net/ethernet/intel/ixgbe/Makefile=20
+>> b/drivers/net/ethernet/intel/ixgbe/Makefile
+>> index 4fb0d9e..e0444ae 100644
+>> --- a/drivers/net/ethernet/intel/ixgbe/Makefile
+>> +++ b/drivers/net/ethernet/intel/ixgbe/Makefile
+>> @@ -1,5 +1,5 @@
+>>  # SPDX-License-Identifier: GPL-2.0
+>> -# Copyright(c) 1999 - 2018 Intel Corporation.
+>> +# Copyright(c) 1999 - 2024 Intel Corporation.
+>>  #
+>>  # Makefile for the Intel(R) 10GbE PCI Express ethernet driver  # @@=20
+>> -9,7 +9,7 @@ obj-$(CONFIG_IXGBE) +=3D ixgbe.o  ixgbe-objs :=3D=20
+>> ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
+>>                ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
+>>                ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_p=
+tp.o \
+>> -              ixgbe_xsk.o
+>> +              ixgbe_xsk.o ixgbe_e610.o
+>> =20
+>>  ixgbe-$(CONFIG_IXGBE_DCB) +=3D  ixgbe_dcb.o ixgbe_dcb_82598.o \
+>>                                ixgbe_dcb_82599.o ixgbe_dcb_nl.o diff=20
+>> --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c=20
+>> b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>
+>...
+>
+>> +/**
+>> + * ixgbe_aci_send_cmd_execute - execute sending FW Admin Command to=20
+>> +FW Admin
+>> + * Command Interface
+>> + * @hw: pointer to the HW struct
+>> + * @desc: descriptor describing the command
+>> + * @buf: buffer to use for indirect commands (NULL for direct=20
+>> +commands)
+>> + * @buf_size: size of buffer for indirect commands (0 for direct=20
+>> +commands)
+>> + *
+>> + * Admin Command is sent using CSR by setting descriptor and buffer=20
+>> +in specific
+>> + * registers.
+>> + *
+>> + * Return: the exit code of the operation.
+>> + * * - 0 - success.
+>> + * * - -EIO - CSR mechanism is not enabled.
+>> + * * - -EBUSY - CSR mechanism is busy.
+>> + * * - -EINVAL - buf_size is too big or
+>> + * invalid argument buf or buf_size.
+>> + * * - -ETIME - Admin Command X command timeout.
+>> + * * - -EIO - Admin Command X invalid state of HICR register or
+>> + * Admin Command failed because of bad opcode was returned or
+>> + * Admin Command failed with error Y.
+>> + */
+>> +static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>> +				      struct ixgbe_aci_desc *desc,
+>> +				      void *buf, u16 buf_size)
+>> +{
+>> +	u32 *tmp_buf __free(kfree) =3D NULL;
+>> +	u32 *raw_desc =3D (u32 *)desc;
+>> +	u32 hicr, i, tmp_buf_size;
+>> +	bool valid_buf =3D false;
+>> +	u16 opcode;
+>> +
+>> +	hw->aci.last_status =3D IXGBE_ACI_RC_OK;
+>> +
+>> +	/* It's necessary to check if mechanism is enabled */
+>> +	hicr =3D IXGBE_READ_REG(hw, IXGBE_PF_HICR);
+>> +
+>> +	if (!(hicr & IXGBE_PF_HICR_EN))
+>> +		return -EIO;
+>> +
+>> +	if (hicr & IXGBE_PF_HICR_C)
+>> +		return -EBUSY;
+>> +
+>> +	opcode =3D desc->opcode;
+>
+>The type of opcode is u16, host byte order.
+>But the type of desc->opcode is __le16, little endien.
+>This does not seem right.
+>
+>Flagged by Sparse.
+>
+>There are a number of problems flagged by Sparse in this patch-set.
+>Please make sure the patchset is Sparse-clean..
+Will do, working on it.
 
-* patchwork-bot+netdevbpf@kernel.org <patchwork-bot+netdevbpf@kernel.org> wrote:
+>> +
+>> +	if (buf_size > IXGBE_ACI_MAX_BUFFER_SIZE)
+>> +		return -EINVAL;
+>> +
+>> +	if (buf)
+>> +		desc->flags |=3D cpu_to_le16(IXGBE_ACI_FLAG_BUF);
+>> +
+>> +	if (desc->flags & cpu_to_le16(IXGBE_ACI_FLAG_BUF)) {
+>> +		if ((buf && !buf_size) ||
+>> +		    (!buf && buf_size))
+>> +			return -EINVAL;
+>> +		if (buf && buf_size)
+>> +			valid_buf =3D true;
+>> +	}
+>> +
+>> +	if (valid_buf) {
+>> +		if (buf_size % 4 =3D=3D 0)
+>> +			tmp_buf_size =3D buf_size;
+>> +		else
+>> +			/* Allow aligned PF_HIBA access */
+>> +			tmp_buf_size =3D (buf_size & (u16)(~0x03)) + 4;
+>> +
+>> +		tmp_buf =3D kmalloc(tmp_buf_size, GFP_KERNEL);
+>> +		if (!tmp_buf)
+>> +			return -ENOMEM;
+>> +
+>> +		/* tmp_buf will be firstly filled with 0xFF and after
+>> +		 * that the content of buf will be written into it.
+>> +		 * This approach lets us use valid buf_size and
+>> +		 * prevents us from reading past buf area
+>> +		 * when buf_size mod 4 not equal to 0.
+>> +		 */
+>> +		memset(tmp_buf, 0xFF, tmp_buf_size);
+>> +		memcpy(tmp_buf, buf, buf_size);
+>> +
+>> +		if (tmp_buf_size > IXGBE_ACI_LG_BUF)
+>> +			desc->flags |=3D cpu_to_le16(IXGBE_ACI_FLAG_LB);
+>> +
+>> +		desc->datalen =3D cpu_to_le16(buf_size);
+>> +
+>> +		if (desc->flags & cpu_to_le16(IXGBE_ACI_FLAG_RD))
+>> +			for (i =3D 0; i < tmp_buf_size / 4; i++)
+>> +				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i),
+>> +						le32_to_cpu(tmp_buf[i]));
+>> +	}
+>> +
+>> +	/* Descriptor is written to specific registers */
+>> +	for (i =3D 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
+>> +		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i),
+>> +				le32_to_cpu(raw_desc[i]));
+>> +
+>> +	/* SW has to set PF_HICR.C bit and clear PF_HICR.SV and
+>> +	 * PF_HICR_EV
+>> +	 */
+>> +	hicr =3D (IXGBE_READ_REG(hw, IXGBE_PF_HICR) | IXGBE_PF_HICR_C) &
+>> +	       ~(IXGBE_PF_HICR_SV | IXGBE_PF_HICR_EV);
+>> +	IXGBE_WRITE_REG(hw, IXGBE_PF_HICR, hicr);
+>> +
+>> +#define MAX_SLEEP_RESP_US 1000
+>> +#define MAX_TMOUT_RESP_SYNC_US 100000000
+>> +
+>> +	/* Wait for sync Admin Command response */
+>> +	read_poll_timeout(IXGBE_READ_REG, hicr,
+>> +			  (hicr & IXGBE_PF_HICR_SV) ||
+>> +			  !(hicr & IXGBE_PF_HICR_C),
+>> +			  MAX_SLEEP_RESP_US, MAX_TMOUT_RESP_SYNC_US, true, hw,
+>> +			  IXGBE_PF_HICR);
+>> +
+>> +#define MAX_TMOUT_RESP_ASYNC_US 150000000
+>> +
+>> +	/* Wait for async Admin Command response */
+>> +	read_poll_timeout(IXGBE_READ_REG, hicr,
+>> +			  (hicr & IXGBE_PF_HICR_EV) ||
+>> +			  !(hicr & IXGBE_PF_HICR_C),
+>> +			  MAX_SLEEP_RESP_US, MAX_TMOUT_RESP_ASYNC_US, true, hw,
+>> +			  IXGBE_PF_HICR);
+>> +
+>> +	/* Read sync Admin Command response */
+>> +	if ((hicr & IXGBE_PF_HICR_SV)) {
+>> +		for (i =3D 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+>> +			raw_desc[i] =3D IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
+>> +			raw_desc[i] =3D cpu_to_le32(raw_desc[i]);
+>> +		}
+>> +	}
+>> +
+>> +	/* Read async Admin Command response */
+>> +	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
+>> +		for (i =3D 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+>> +			raw_desc[i] =3D IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
+>> +			raw_desc[i] =3D cpu_to_le32(raw_desc[i]);
+>> +		}
+>> +	}
+>> +
+>> +	/* Handle timeout and invalid state of HICR register */
+>> +	if (hicr & IXGBE_PF_HICR_C)
+>> +		return -ETIME;
+>> +
+>> +	if (!(hicr & IXGBE_PF_HICR_SV) && !(hicr & IXGBE_PF_HICR_EV))
+>> +		return -EIO;
+>> +
+>> +	/* For every command other than 0x0014 treat opcode mismatch
+>> +	 * as an error. Response to 0x0014 command read from HIDA_2
+>> +	 * is a descriptor of an event which is expected to contain
+>> +	 * different opcode than the command.
+>> +	 */
+>> +	if (desc->opcode !=3D opcode &&
+>> +	    opcode !=3D cpu_to_le16(ixgbe_aci_opc_get_fw_event))
+>> +		return -EIO;
+>> +
+>> +	if (desc->retval) {
+>> +		hw->aci.last_status =3D (enum ixgbe_aci_err)desc->retval;
+>> +		return -EIO;
+>> +	}
+>> +
+>> +	/* Write a response values to a buf */
+>> +	if (valid_buf) {
+>> +		for (i =3D 0; i < tmp_buf_size / 4; i++) {
+>> +			tmp_buf[i] =3D IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
+>> +			tmp_buf[i] =3D cpu_to_le32(tmp_buf[i]);
+>> +		}
+>> +		memcpy(buf, tmp_buf, buf_size);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>
+>...
+>
+>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h=20
+>> b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+>
+>...
+>
+>> +/**
+>> + * struct ixgbe_aq_desc - Admin Command (AC) descriptor
+>
+>nit: ixgbe_aci_desc
+>
+>     ./scripts/kernel-doc -none is your friend here
+Will do
 
-> Hello:
-> 
-> This series was applied to bpf/bpf.git (master)
-> by Alexei Starovoitov <ast@kernel.org>:
-> 
-> On Mon,  1 Apr 2024 20:55:28 +0200 you wrote:
-> > From: Joan Bruguera Micó <joanbrugueram@gmail.com>
-> > 
-> > Fixes two issues that cause kernels panic when using the BPF JIT with
-> > the call depth tracking / stuffing mitigation for Skylake processors
-> > (`retbleed=stuff`). Both issues can be triggered by running simple
-> > BPF programs (e.g. running the test suite should trigger both).
-> > 
-> > [...]
-> 
-> Here is the summary with links:
->   - [RESEND,bpf,v2,1/2] x86/bpf: Fix IP after emitting call depth accounting
->     https://git.kernel.org/bpf/bpf/c/9d98aa088386
->   - [RESEND,bpf,v2,2/2] x86/bpf: Fix IP for relocating call depth accounting
->     https://git.kernel.org/bpf/bpf/c/6a537453000a
+>> + * @flags: IXGBE_ACI_FLAG_* flags
+>> + * @opcode: Admin command opcode
+>> + * @datalen: length in bytes of indirect/external data buffer
+>> + * @retval: return value from firmware
+>> + * @cookie_high: opaque data high-half
+>> + * @cookie_low: opaque data low-half
+>> + * @params: command-specific parameters
+>> + *
+>> + * Descriptor format for commands the driver posts via the
+>> + * Admin Command Interface (ACI).
+>> + * The firmware writes back onto the command descriptor and returns
+>> + * the result of the command. Asynchronous events that are not an=20
+>> +immediate
+>> + * result of the command are written to the Admin Command Interface=20
+>> +(ACI) using
+>> + * the same descriptor format. Descriptors are in little-endian=20
+>> +notation with
+>> + * 32-bit words.
+>> + */
+>> +struct ixgbe_aci_desc {
+>> +	__le16 flags;
+>> +	__le16 opcode;
+>> +	__le16 datalen;
+>> +	__le16 retval;
+>> +	__le32 cookie_high;
+>> +	__le32 cookie_low;
+>> +	union {
+>> +		u8 raw[16];
+>> +		struct ixgbe_aci_cmd_get_ver get_ver;
+>> +		struct ixgbe_aci_cmd_driver_ver driver_ver;
+>> +		struct ixgbe_aci_cmd_get_exp_err exp_err;
+>> +		struct ixgbe_aci_cmd_req_res res_owner;
+>> +		struct ixgbe_aci_cmd_list_caps get_cap;
+>> +		struct ixgbe_aci_cmd_disable_rxen disable_rxen;
+>> +		struct ixgbe_aci_cmd_get_phy_caps get_phy;
+>> +		struct ixgbe_aci_cmd_set_phy_cfg set_phy;
+>> +		struct ixgbe_aci_cmd_restart_an restart_an;
+>> +		struct ixgbe_aci_cmd_get_link_status get_link_status;
+>> +		struct ixgbe_aci_cmd_set_event_mask set_event_mask;
+>> +		struct ixgbe_aci_cmd_get_link_topo get_link_topo;
+>> +		struct ixgbe_aci_cmd_get_link_topo_pin get_link_topo_pin;
+>> +		struct ixgbe_aci_cmd_sff_eeprom read_write_sff_param;
+>> +		struct ixgbe_aci_cmd_nvm nvm;
+>> +		struct ixgbe_aci_cmd_nvm_checksum nvm_checksum;
+>> +	} params;
+>> +};
+>
+>...
 
-Just wondering, which kernel version is this targeted for?
-
-The bug is upstream as well, so a fix needs to be sent to Linus.
-
-I can pick all of this up into tip:x86/urgent, if that accelerates 
-things.
-
-Thanks,
-
-	Ingo
+Thank you for review
+Piotr
 
