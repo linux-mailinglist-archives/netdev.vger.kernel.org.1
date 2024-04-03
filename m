@@ -1,209 +1,132 @@
-Return-Path: <netdev+bounces-84550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84A49897463
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:49:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1291289747D
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 17:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A779C1C2154B
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:49:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C220D292D82
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9C714A4D8;
-	Wed,  3 Apr 2024 15:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A497D14A4E4;
+	Wed,  3 Apr 2024 15:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hrBcFKXl"
+	dkim=pass (2048-bit key) header.d=a16n.net header.i=@a16n.net header.b="dfog4gel"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A9C14A4C4;
-	Wed,  3 Apr 2024 15:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from smtp-out.a16n.net (smtp-out.a16n.net [87.98.181.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF005146A96
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 15:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.98.181.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712159366; cv=none; b=qFdGVQdI9kSmLF2Kjh++Jdz/Rb6Cuku0jUKvqmrA6/vn59JRCbINt3ls+FolCQ+1kcAt754r/ItSzhuxhyb0ETgPRuZqBAq7VO0kfkc4MROd+Zx+dzBSdCYBjACnc2kHtBMbQ848CoQddaizbCx8VQtB3TP6sKyNFptlvwDZXis=
+	t=1712159432; cv=none; b=WXSLgNXm2FAeHazC9P5chrGH7fAZezV/z6tRlgLRQ1Iu0Lt0boLtAxZcRSdEHouF8ijI6cIOtBvq87M5nB90+d4mRop18rVnuJyHTjsnQV9It/LqNiDvkPhu64cr9XK91gFpUDIWl6wrrYG2uxjVfCD+R06uFkx9Fzqipkswxxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712159366; c=relaxed/simple;
-	bh=k6dyOhfFQIf9vQIFCpUxUQulSUGcvn1uNJXKGOMIMvU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JHHKtQuljTjbhvI2HP7ur6xxR7/k4iYzq6uJZK8bhbD6OLLfDPVHtKaYyF1FppGZynkaj5rmIdqIbsZ6nK27UdBTa4VyE0sCH6FDE/MRpeFE0qtoseUaKbT1ARyxen4BuTLWOAKXfwHZoRiKiVlFVO6KDFoxUJdxwUJfUWcCn5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hrBcFKXl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77DC8C43390;
-	Wed,  3 Apr 2024 15:49:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712159366;
-	bh=k6dyOhfFQIf9vQIFCpUxUQulSUGcvn1uNJXKGOMIMvU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hrBcFKXlV84WvwdXTJ1EywXpIa7TCT7pO8gOx7ssARAppf6BJDhk9Z8sOK7hS9kZr
-	 0ZuW/ZJBRc2RSTi6YMprbytvzjZr2bfZj2k6RpMbi1RgY0CvqLuhiBUlvP3kXoAitd
-	 CHOu1mU9LXMxEvBJoeAzXpWK1zYYnUfDYeMFvgXnDHWFhHUT4hcjCDwThkmlG89/g5
-	 oxJBYofJBMdMkil2p3ADRNxhWBahluV1wuhQnqt0pQAIv3F3Jzp3evB3oyhWOMPVX7
-	 oRLgYSr0FJyH7V7o5mr4nvMyAFdotIUfUpQUXMEtrzMJ47A2EJWRnU+g9QQWyXkjXK
-	 HgjnL2E/3Fsmg==
-Date: Wed, 3 Apr 2024 16:49:21 +0100
-From: Simon Horman <horms@kernel.org>
-To: Joseph Huang <Joseph.Huang@garmin.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>,
-	linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-Subject: Re: [PATCH RFC net-next 09/10] net: dsa: mv88e6xxx: Enable mc flood
- for mrouter port
-Message-ID: <20240403154921.GN26556@kernel.org>
-References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
- <20240402001137.2980589-10-Joseph.Huang@garmin.com>
+	s=arc-20240116; t=1712159432; c=relaxed/simple;
+	bh=w2zZrsI5miqTAX2EAvtEo8kByLni0+KvGsn7OYh9OKU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=HuL7th9DmeMhVQGugDUDup+nf4Ew+/5Gxxf3puhiCYJxhSg8QVSmWKbXJQsHVpZ6S3buIrR47Srqn4j03qsM+GtKOP2R4CRBmWFxtuB0WHCzsHEQ4P1RrXjyWaoZPMlAWqmpfGk+x4SeLShXShyg2lwimyeqWpizedMlY/sSnaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=a16n.net; spf=pass smtp.mailfrom=a16n.net; dkim=pass (2048-bit key) header.d=a16n.net header.i=@a16n.net header.b=dfog4gel; arc=none smtp.client-ip=87.98.181.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=a16n.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a16n.net
+Received: from server.a16n.net (ml.a16n.net [82.65.98.121])
+	by smtp-out.a16n.net (Postfix) with ESMTP id 02E9846058A;
+	Wed,  3 Apr 2024 17:50:24 +0200 (CEST)
+Received: from ws.localdomain (unknown [192.168.13.254])
+	by server.a16n.net (Postfix) with ESMTPSA id D27AF801188;
+	Wed,  3 Apr 2024 17:50:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=a16n.net; s=a16n;
+	t=1712159424; bh=y8T6zG96w3X6IvRIYHBWoL9d7WXW8OTFpQhSpDQlwJw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=dfog4gel0J2JmVRmBvskErDt0UE90CRoV4R4yEOkqWXLmWERJkjmDpZLjNAYXPIVK
+	 ZjBA1qLJKB4qgHJk5jCjTuFVleYHOXgEpZAiqIFWAsfrxb+1m7EEHcOwyXB1icOdF1
+	 RRkerUMlIpev6ujkW2UgXj65lAzlqIV00kYBXJnAgQpHjwhGgg/PYsaRQ7P9fChfm5
+	 HVwKkWA4yLU0rRcfclxcXP/P7KpKiwP6kXMiC2aztafcaOtb7rpuJpZW5wlninN4bC
+	 GtLA5U/BKxqly7EOOGHOjiMy3qAFjUMzfiGhfhO1tB2s5EP49TGkSUx3r4TLwr+zl6
+	 duhEWdqb3ocnA==
+Received: by ws.localdomain (Postfix, from userid 1000)
+	id B204820A07; Wed,  3 Apr 2024 17:50:24 +0200 (CEST)
+From: =?utf-8?Q?Peter_M=C3=BCnster?= <pm@a16n.net>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: kernel panic with b44 and netifd
+In-Reply-To: <CACKFLikqEyAQf-2DxbAnKSFbvTP9Wj=X1Yr1ff6LzZ13T6OZ6w@mail.gmail.com>
+	(Michael Chan's message of "Wed, 3 Apr 2024 07:53:09 -0700")
+References: <878r1ufs9p.fsf@a16n.net>
+	<CACKFLikqEyAQf-2DxbAnKSFbvTP9Wj=X1Yr1ff6LzZ13T6OZ6w@mail.gmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
+Date: Wed, 03 Apr 2024 17:50:24 +0200
+Message-ID: <87il0ye98f.fsf@a16n.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240402001137.2980589-10-Joseph.Huang@garmin.com>
+Content-Type: multipart/signed; boundary="==-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
 
-On Mon, Apr 01, 2024 at 08:11:08PM -0400, Joseph Huang wrote:
-> When a port turns into an mrouter port, enable multicast flooding
-> on that port even if multicast flooding is disabled by user config. This
-> is necessary so that in a distributed system, the multicast packets
-> can be forwarded to the Querier when the multicast source is attached
-> to a Non-Querier bridge.
-> 
-> Consider the following scenario:
-> 
->                  +--------------------+
->                  |                    |
->                  |      Snooping      |    +------------+
->                  |      Bridge 1      |----| Listener 1 |
->                  |     (Querier)      |    +------------+
->                  |                    |
->                  +--------------------+
->                            |
->                            |
->                  +--------------------+
->                  |    | mrouter |     |
-> +-----------+    |    +---------+     |
-> | MC Source |----|      Snooping      |
-> +-----------|    |      Bridge 2      |
->                  |    (Non-Querier)   |
->                  +--------------------+
-> 
-> In this scenario, Listener 1 will never receive multicast traffic
-> from MC Source if multicast flooding is disabled on the mrouter port on
-> Snooping Bridge 2.
-> 
-> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
+--==-=-=
+Content-Type: multipart/mixed; boundary="=-=-="
 
-...
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> @@ -6849,11 +6864,28 @@ static int mv88e6xxx_port_bridge_flags(struct dsa_switch *ds, int port,
->  
->  	if (flags.mask & BR_MCAST_FLOOD) {
->  		bool multicast = !!(flags.val & BR_MCAST_FLOOD);
-> +		struct mv88e6xxx_bridge *mv_bridge;
-> +		struct mv88e6xxx_port *p;
-> +		bool mrouter;
->  
-> -		err = chip->info->ops->port_set_mcast_flood(chip, port,
-> -							    multicast);
-> -		if (err)
-> -			goto out;
-> +		mv_bridge = mv88e6xxx_bridge_by_port(chip, port);
-> +		if (!mv_bridge)
-> +			return -EINVAL;
+On Wed, Apr 03 2024, Michael Chan wrote:
 
-I think that mv88e6xxx_reg_unlock(chip) is needed here.
-So perhaps (completely untested!):
+> please post the patch to netdev for review.
 
-		if (!mv_bridge) {
-			err = -EINVAL;
-			goto out;
-		}
+Ok, please find it here attached.
 
-Flagged by Smatch
+And please consider also KanjiMonster=E2=80=99s comment here:
+https://github.com/openwrt/openwrt/issues/13789#issuecomment-2034601851
 
-> +
-> +		p = &chip->ports[port];
-> +		mrouter = !!(mv_bridge->mrouter_ports & BIT(port));
-> +
-> +		if (!mrouter) {
-> +			err = chip->info->ops->port_set_mcast_flood(chip, port,
-> +								    multicast);
-> +			if (err)
-> +				goto out;
-> +		}
-> +
-> +		if (multicast)
-> +			p->flags |= MV88E6XXX_PORT_FLAG_MC_FLOOD;
-> +		else
-> +			p->flags &= ~MV88E6XXX_PORT_FLAG_MC_FLOOD;
->  	}
->  
->  	if (flags.mask & BR_BCAST_FLOOD) {
-> @@ -6883,6 +6915,51 @@ static int mv88e6xxx_port_bridge_flags(struct dsa_switch *ds, int port,
->  	return err;
->  }
->  
-> +static int mv88e6xxx_port_mrouter(struct dsa_switch *ds, int port,
-> +				  bool mrouter,
-> +				  struct netlink_ext_ack *extack)
-> +{
-> +	struct mv88e6xxx_chip *chip = ds->priv;
-> +	struct mv88e6xxx_bridge *mv_bridge;
-> +	struct mv88e6xxx_port *p;
-> +	bool old_mrouter;
-> +	bool mc_flood;
-> +	int err;
-> +
-> +	if (!chip->info->ops->port_set_mcast_flood)
-> +		return -EOPNOTSUPP;
-> +
-> +	mv_bridge = mv88e6xxx_bridge_by_port(chip, port);
-> +	if (!mv_bridge)
-> +		return -EINVAL;
-> +
-> +	old_mrouter = !!(mv_bridge->mrouter_ports & BIT(port));
-> +	if (mrouter == old_mrouter)
-> +		return 0;
-> +
-> +	p = &chip->ports[port];
-> +	mc_flood = !!(p->flags & MV88E6XXX_PORT_FLAG_MC_FLOOD);
-> +
-> +	mv88e6xxx_reg_lock(chip);
-> +
-> +	if (!mc_flood) {
-> +		err = chip->info->ops->port_set_mcast_flood(chip, port,
-> +							    mrouter);
-> +		if (err)
-> +			goto out;
-> +	}
-> +
-> +	if (mrouter)
-> +		mv_bridge->mrouter_ports |= BIT(port);
-> +	else
-> +		mv_bridge->mrouter_ports &= ~BIT(port);
-> +
-> +out:
-> +	mv88e6xxx_reg_unlock(chip);
+=2D-=20
+           Peter
 
-If mc_flood is true then err is uninitialised here.
+--=-=-=
+Content-Type: text/x-patch
+Content-Disposition: inline; filename=b44.patch
+Content-Transfer-Encoding: quoted-printable
 
-Flagged by clang-17 W=1 build, and Smatch.
+=2D-- build_dir/target-mipsel_mips32_musl/linux-bcm47xx_legacy/linux-5.15.1=
+53/drivers/net/ethernet/broadcom/b44.c~	2024-04-03 10:04:09.177021530 +0200
++++ build_dir/target-mipsel_mips32_musl/linux-bcm47xx_legacy/linux-5.15.153=
+/drivers/net/ethernet/broadcom/b44.c	2024-04-03 10:46:42.267884445 +0200
+@@ -2056,12 +2056,14 @@
+ 		bp->flags |=3D B44_FLAG_TX_PAUSE;
+ 	else
+ 		bp->flags &=3D ~B44_FLAG_TX_PAUSE;
+=2D	if (bp->flags & B44_FLAG_PAUSE_AUTO) {
+=2D		b44_halt(bp);
+=2D		b44_init_rings(bp);
+=2D		b44_init_hw(bp, B44_FULL_RESET);
+=2D	} else {
+=2D		__b44_set_flow_ctrl(bp, bp->flags);
++	if (netif_running(dev)) {
++		if (bp->flags & B44_FLAG_PAUSE_AUTO) {
++			b44_halt(bp);
++			b44_init_rings(bp);
++			b44_init_hw(bp, B44_FULL_RESET);
++		} else {
++			__b44_set_flow_ctrl(bp, bp->flags);
++		}
+ 	}
+ 	spin_unlock_irq(&bp->lock);
+=20
 
-> +
-> +	return err;
-> +}
-> +
->  static bool mv88e6xxx_lag_can_offload(struct dsa_switch *ds,
->  				      struct dsa_lag lag,
->  				      struct netdev_lag_upper_info *info,
+--=-=-=--
 
-...
+--==-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iGoEARECACoWIQS/5hHRBUjla4uZVXU6jitvQ7HLaAUCZg16wAwccG1AYTE2bi5u
+ZXQACgkQOo4rb0Oxy2hSCQCglFdpIpdgtgXnoeH8DiXmReXIshIAn0Ro5N5Ut5OE
+lYqqtIjyJ9Hw6NBn
+=TbYR
+-----END PGP SIGNATURE-----
+--==-=-=--
 
