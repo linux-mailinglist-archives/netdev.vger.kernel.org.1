@@ -1,190 +1,124 @@
-Return-Path: <netdev+bounces-84528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2678972A1
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:31:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4018972E8
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 16:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7BCA1F21095
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:31:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E513B29D02
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 14:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27962F844;
-	Wed,  3 Apr 2024 14:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE9859B6C;
+	Wed,  3 Apr 2024 14:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPbur/z4"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="IPdAwJab"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B38D272;
-	Wed,  3 Apr 2024 14:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863AD433C6;
+	Wed,  3 Apr 2024 14:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712154705; cv=none; b=WcgeDu01JuQW87Zf06uZGwPxmaf23oyoAVaBLWuyqPeHpQ8NfsxEYXamr+K8wIewyKCaR7UAdXU7e8Zxv1abOmDZ53WlTdF78Ckkh21v91PrFwUvKKYATnLM5zGIImMZ0n9IA3HhuoGu6ycAwTOg5SNiul3y+rOkdgSrVI/DNjI=
+	t=1712155245; cv=none; b=R7OEWLl+JIjnAfcVjP77MqhKTRc4d1tSZ+EcYGfhms6XLvtEyS8oDp9Xt2UqIKaASzGZMvFE0PxMngZ5kS3OgBJFhBSNHbDoKs7Y07l/zyEjZiu5zgqd0iMLW2qox0Kpiam5ccJxPVSk3dd0TV0Vbmqlg1cZ8Q5v4WkmvOP3zyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712154705; c=relaxed/simple;
-	bh=awzNNZdI5HcMDUhEsGuSnb6/bioiSNUyQOEbMy3wFkM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b8ycIvMxLMziBy9rrifKZIGfa1+n4g7uSVa9ttNWbgsSpsrJo4QcFEFRR0pfdI2h5cO6oWYBbqC1/L9UxDxItmxgT1mlCrCULmzlWaNOXdFqlTfXEXRNYoWSVjHcxdRcJv5or5x/pRwzBsecGo1NWjOqf8nkKS2zcCJMEV43Yjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DPbur/z4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE051C433F1;
-	Wed,  3 Apr 2024 14:31:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712154705;
-	bh=awzNNZdI5HcMDUhEsGuSnb6/bioiSNUyQOEbMy3wFkM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DPbur/z4a1tQGEOZanah0R5lQ40TUPfDY6onBOSULbDggoXDaa6XJlzOl5449fH1H
-	 orrjhONQ+tBaJewJdR1NbiPAxAKoKqCihxzjaxJ/c/JSYol0i4gVmPL1G+CETej73T
-	 L4CevX5bm3JoMhgDu4BDtPLqBDZgPwgXebq1/f1BUtnv6DLd0qxi6klKbPjjrwcCwD
-	 QrqCYWqQOrHfSy+R/gku28usZNMd3AKh87sIhB6tHjjfyVBugCmkGK9/VPrKbpFl6w
-	 7YhMetzwM7LnqvGLx479DRvuqF5HrX/B/LQJpVyQTguBkc9YFzpBbWe2QH8OIk+Yyx
-	 NNS7WMYUjX6Iw==
-Date: Wed, 3 Apr 2024 09:31:42 -0500
-From: Rob Herring <robh@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
- way of describing several PSE PIs
-Message-ID: <20240403143142.GA3508225-robh@kernel.org>
-References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
- <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
- <20240402132637.GA3744978-robh@kernel.org>
- <20240403111548.30e780b5@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1712155245; c=relaxed/simple;
+	bh=rT8sHi1P6vKvW4jge+5i6dqA062uBbrUeQnCV3IwOqg=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gE6qzQE1e08Cj3okd+U/OegW7Fo5vgc131+DfAH2u9s4mNFGdp55J21XeWz7GoeYyctJE8qKCPyZw4fT/ZJB8fVsDUWRQ6py/To5/uDqLmwOWoXC4UTTOstON7N/QHErA/x90k6F2X2fDzFtQhuvbOqsKhX3NfxZipvX5tiqrG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=IPdAwJab; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=uicBnio8bSF9DNnpycUBJL1Q+Lal4LWdPwlItPeKwW8=; b=IPdAwJabygxRsrSF9Q+IWM4qvL
+	DkEc3QUZnw0Hfp0paVdxSRdz/YF3XvHnIx5vZDQ6VEbqjmKXWScvLYOh18FCMfIcwdV0UeKhOKTAO
+	rWgyf9XmSmOEx75/T5fAFJbfgNkuqPzeS2rwzc19BsbboL2qler/bq8/4GkWjfqWUuVgH+Mkshx/r
+	ouABhQnMmViDhug5/DN1P10PAUO0I7Lj0KoBEp8u8PDGdYDFTC4FFd1EAIXEtr4/z1ggbMfeIiXoo
+	vRpclL+AtnZsqgunSl3N5KMB3iQ3mBoUbR8jGN8Pdyre7mvKCR7QPY1GDUgkRtUbAeGrhXO9do2e3
+	mTnKXw2g==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rs1n6-000Oqk-CH; Wed, 03 Apr 2024 16:40:40 +0200
+Received: from [178.197.248.12] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rs1n5-001zbP-0p;
+	Wed, 03 Apr 2024 16:40:39 +0200
+Subject: Re: [PATCH bpf-next v3 2/2] selftests/bpf: Add testcase where 7th
+ argment is struct
+To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Pu Lehui <pulehui@huawei.com>
+References: <20240403072818.1462811-1-pulehui@huaweicloud.com>
+ <20240403072818.1462811-3-pulehui@huaweicloud.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <0f459fc1-1445-6e83-ace4-b2c42abfe884@iogearbox.net>
+Date: Wed, 3 Apr 2024 16:40:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240403111548.30e780b5@kmaincent-XPS-13-7390>
+In-Reply-To: <20240403072818.1462811-3-pulehui@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27234/Wed Apr  3 10:25:27 2024)
 
-On Wed, Apr 03, 2024 at 11:15:48AM +0200, Kory Maincent wrote:
-> On Tue, 2 Apr 2024 08:26:37 -0500
-> Rob Herring <robh@kernel.org> wrote:
+On 4/3/24 9:28 AM, Pu Lehui wrote:
+> From: Pu Lehui <pulehui@huawei.com>
 > 
-> > > +          pairset-names:
-> > > +            $ref: /schemas/types.yaml#/definitions/string-array
-> > > +            description:
-> > > +              Names of the pairsets as per IEEE 802.3-2022, Section
-> > > 145.2.4.
-> > > +              Valid values are "alternative-a" and "alternative-b". Each
-> > > name  
-> > 
-> > Don't state constraints in prose which are defined as schema 
-> > constraints.
+> Add testcase where 7th argument is struct for architectures with 8
+> argument registers, and increase the complexity of the struct.
 > 
-> Ok, I will remove the line.
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+> Acked-by: Björn Töpel <bjorn@kernel.org>
+> Reviewed-by: Björn Töpel <bjorn@rivosinc.com>
+> ---
+>   tools/testing/selftests/bpf/DENYLIST.aarch64  |  1 +
+>   .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 19 ++++++++++
+>   .../selftests/bpf/prog_tests/tracing_struct.c | 13 +++++++
+>   .../selftests/bpf/progs/tracing_struct.c      | 35 +++++++++++++++++++
+>   4 files changed, 68 insertions(+)
 > 
-> > > +          pairsets:
-> > > +            $ref: /schemas/types.yaml#/definitions/phandle-array
-> > > +            description:
-> > > +              List of phandles, each pointing to the power supply for the
-> > > +              corresponding pairset named in 'pairset-names'. This property
-> > > +              aligns with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
-> > > +              PSE Pinout Alternatives (as per IEEE 802.3-2022 Table
-> > > 145\u20133)
-> > > +
-> > > |-----------|---------------|---------------|---------------|---------------|
-> > > +              | Conductor | Alternative A | Alternative A | Alternative B
-> > > | Alternative B |
-> > > +              |           |    (MDI-X)    |     (MDI)     |      (X)
-> > > |      (S)      |
-> > > +
-> > > |-----------|---------------|---------------|---------------|---------------|
-> > > +              | 1         | Negative VPSE | Positive VPSE | \u2014
-> > >     | \u2014             |
-> > > +              | 2         | Negative VPSE | Positive VPSE | \u2014
-> > >     | \u2014             |
-> > > +              | 3         | Positive VPSE | Negative VPSE | \u2014
-> > >     | \u2014             |
-> > > +              | 4         | \u2014             | \u2014             |
-> > > Negative VPSE | Positive VPSE |
-> > > +              | 5         | \u2014             | \u2014             |
-> > > Negative VPSE | Positive VPSE |
-> > > +              | 6         | Positive VPSE | Negative VPSE | \u2014
-> > >     | \u2014             |
-> > > +              | 7         | \u2014             | \u2014             |
-> > > Positive VPSE | Negative VPSE |
-> > > +              | 8         | \u2014             | \u2014             |
-> > > Positive VPSE | Negative VPSE |
-> > > +            minItems: 1
-> > > +            maxItems: 2  
-> > 
-> > "pairsets" does not follow the normal design pattern of foos, foo-names, 
-> > and #foo-cells. You could add #foo-cells I suppose, but what would cells 
-> > convey? I don't think it's a good fit for what you need.
-> > 
-> > The other oddity is the number of entries and the names are fixed. That 
-> > is usually defined per consumer. 
-> 
-> Theoretically if the RJ45 port binding was supported it would make more sense,
-> but in reality it's not feasible as the PSE controller need this information
-> in its init process.
-> The PSE controller reset all its port to apply a configuration so we can't do
-> it when the consumer (RJ45) probe. It would reset the other ports if one
-> consumer is probed later in the process.
+> diff --git a/tools/testing/selftests/bpf/DENYLIST.aarch64 b/tools/testing/selftests/bpf/DENYLIST.aarch64
+> index d8ade15e2789..639ee3f5bc74 100644
+> --- a/tools/testing/selftests/bpf/DENYLIST.aarch64
+> +++ b/tools/testing/selftests/bpf/DENYLIST.aarch64
+> @@ -6,6 +6,7 @@ kprobe_multi_test                                # needs CONFIG_FPROBE
+>   module_attach                                    # prog 'kprobe_multi': failed to auto-attach: -95
+>   fentry_test/fentry_many_args                     # fentry_many_args:FAIL:fentry_many_args_attach unexpected error: -524
+>   fexit_test/fexit_many_args                       # fexit_many_args:FAIL:fexit_many_args_attach unexpected error: -524
+> +tracing_struct                                   # test_fentry:FAIL:tracing_struct__attach unexpected error: -524
 
-There is no reason other than convenience that all information some 
-driver needs has to be in one node or one hierarchy of nodes. You can 
-fetch anything from anywhere in the DT. It does feel like some of this 
-belongs in a connector node. We often haven't described connectors in DT 
-and stick connector properties in the controller node associated with 
-the connector. Then as things get more complicated, it becomes a mess. 
+Do we need to blacklist the whole test given it had coverage on arm64
+before.. perhaps this test here could be done as a new subtest and only
+that one is listed for arm64?
 
+>   fill_link_info/kprobe_multi_link_info            # bpf_program__attach_kprobe_multi_opts unexpected error: -95
+>   fill_link_info/kretprobe_multi_link_info         # bpf_program__attach_kprobe_multi_opts unexpected error: -95
+>   fill_link_info/kprobe_multi_invalid_ubuff        # bpf_program__attach_kprobe_multi_opts unexpected error: -95
 
-> > As each entry is just a power rail, why can't the regulator binding be 
-> > used here?
-> 
-> Olekisj already answered about it.
-> PSE PI is like a regulator but with few different features and more information
-> like the pinout and the polarity, so we could not really fully rely on the
-> regulator binding style.
-> 
-> > > +
-> > > +          polarity-supported:
-> > > +            $ref: /schemas/types.yaml#/definitions/string-array
-> > > +            description:
-> > > +              Polarity configuration supported by the PSE PI pairsets.
-> > > +            minItems: 1
-> > > +            maxItems: 4
-> > > +            items:
-> > > +              enum:
-> > > +                - MDI-X
-> > > +                - MDI
-> > > +                - X
-> > > +                - S
-> > > +
-> > > +          vpwr-supply:
-> > > +            description: Regulator power supply for the PSE PI.  
-> > 
-> > I don't see this being used anywhere.
-> 
-> Right, I forgot to add it to the PD692x0 and TPS23881 binding example!
-
-But is this really common/generic? I would think input power rails would 
-be chip specific.
-
-Rob
+Thanks,
+Daniel
 
