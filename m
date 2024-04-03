@@ -1,143 +1,132 @@
-Return-Path: <netdev+bounces-84312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7305E8967F1
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:12:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432A0896843
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 10:19:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0D0B1C26265
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:12:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCD611F217A6
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A301171737;
-	Wed,  3 Apr 2024 08:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nmYdqFEB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B206BB33;
+	Wed,  3 Apr 2024 08:09:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740EA5FB85;
-	Wed,  3 Apr 2024 08:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC1C1272DF
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 08:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712131616; cv=none; b=HMSgZ5FxpOyIjTt0uGsN/KARILAu9+CBCklveBiH3fNE3Eqib1cxWDZ8qHlZs5WRmX4uBE82weNklX10dP2SZ2quHGPMsrexLCustnewHMLnD8DN04ABMYoj4g/LKIS7q3xWjyBupVeBvEl4m0NwqVb2ZMZq5IseYsVztAV9yUQ=
+	t=1712131770; cv=none; b=KyRqYPuVKvitwbbEneGNDvaRtfhmMtWJOGnWVHHgFRz9USEQ/Z2td+H9J0XJLoBcM2oc+AgBzazwDMPN3PUvxZUJ1WOlQEnHEObk4ADLE2J5bU8wyc8vjhLn1SyPUDhxZfxhEMSR2kGUgXpHD8EMlSi9UNiM+a+JVcjm5tfDvLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712131616; c=relaxed/simple;
-	bh=D1fnKXGmnMmng2XJnWn0RD1OcALCWsnaPJw6jX/2oJk=;
-	h=Content-Type:Date:Message-Id:Cc:From:To:Subject:References:
-	 In-Reply-To; b=MXwQcbred8r/zC+5pYK2RkHrq05tUbrkoug8Nll+Cv52+vUBqQ1f4oRpOzSEfv5wF/YPV6jBmm4h3Y47ExqQhjJGRNfKzIepqeZ/3zA9u9ek4dAHP9/dEOVXafOxl+AolUsbdzbSwdnJZi0Z9bcn1+aboEuNr5YMvm3XZXub+Fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nmYdqFEB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A036C433F1;
-	Wed,  3 Apr 2024 08:06:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712131615;
-	bh=D1fnKXGmnMmng2XJnWn0RD1OcALCWsnaPJw6jX/2oJk=;
-	h=Date:Cc:From:To:Subject:References:In-Reply-To:From;
-	b=nmYdqFEB6hMbmmMq1HTnQD9AKOwTHn4LdeG9WSL5+bA6ISFiyoReQ48mynf1bfrtm
-	 2cxWDzfq6Kwpw8GDirG4YQfjKe9KXPN3fenEZdrTPLR0RX8tnu5I2qCpjZp0rqR9qA
-	 l1NmFCpNYaJo426dTMZF+vqvRLeLqUhe2717vOit18YdAHTHdpTU4O56dacq4W8Cz+
-	 w1AAimDEt1D/jUbc/YXGSz3OCtM8fU7dyfmtiff26M6BgOrILchaYd5HgbVe2vj1Zx
-	 2levQjXnuaDyq7+IL74gDHVRHz1fcFJ7E5HY3oHaaTTOkV/Qw9kb7b/ijgKPY4d9vz
-	 IX/6EqidI7a+w==
-Content-Type: multipart/signed;
- boundary=4bd2cb084b6d1bc3a4d2b6f2223a5fc8229f83965193b4e69adc10d305a3;
- micalg=pgp-sha384; protocol="application/pgp-signature"
-Date: Wed, 03 Apr 2024 10:06:51 +0200
-Message-Id: <D0AC0465UQUJ.26171T9KETMCW@kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
- <netdev@vger.kernel.org>
-From: "Michael Walle" <mwalle@kernel.org>
-To: "Christophe JAILLET" <christophe.jaillet@wanadoo.fr>, "Vladimir Oltean"
- <olteanv@gmail.com>, "Andrew Lunn" <andrew@lunn.ch>, "Florian Fainelli"
- <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: dsa: sja1105: Fix parameters order in
- sja1110_pcs_mdio_write_c45()
-X-Mailer: aerc 0.16.0
-References: <ff2a5af67361988b3581831f7bd1eddebfb4c48f.1712082763.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <ff2a5af67361988b3581831f7bd1eddebfb4c48f.1712082763.git.christophe.jaillet@wanadoo.fr>
+	s=arc-20240116; t=1712131770; c=relaxed/simple;
+	bh=Le7tfdz/BqzvTO5+hSEJ4P5GOTdGP2hENy7pMy9QQwI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jBRh0pCuE/w57xx3nI1o73J9SV9NC6Rwul4s/Z5nQVpYX5xaNWZpjD0fDg959HpFdgL4jMm9MJ+B0MvjYdSfo86U7a04Uz1mOPIX4wVYdA3obCF9hsQkSDa/O5Ih070CI87ys1BOVr997WlDNirgYBFM88KjsmzsKMsS7w40k8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.80])
+	by gateway (Coremail) with SMTP id _____8Bx3+uyDg1mn7MiAA--.14089S3;
+	Wed, 03 Apr 2024 16:09:22 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.80])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxbs2xDg1mI01yAA--.22105S3;
+	Wed, 03 Apr 2024 16:09:21 +0800 (CST)
+Message-ID: <e6122e3f-d221-4d95-a6b8-92e67aa51a5a@loongson.cn>
+Date: Wed, 3 Apr 2024 16:09:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 07/11] net: stmmac: dwmac-loongson: Add
+ multi-channel supports for loongson
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: hkallweit1@gmail.com, andrew@lunn.ch, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <bec0d6bf78c0dcf4797a148e3509058e46ccdb13.1706601050.git.siyanteng@loongson.cn>
+ <eqecwmi3guwda3wloxcttkx2xlteupvrsetb5ro5abupwhxqyu@ypliwpyswy23>
+ <e1c7b5fa-f3f8-4aa3-af4d-ca72b54d9c8c@loongson.cn>
+ <f9c5c697-6c3f-4cfb-aa60-2031b450a470@loongson.cn>
+ <roxfse6rf7ngnopn42f6la2ewzsaonjbrfokqjlumrpkobfvgh@7v7vblqi3mak>
+ <e57a6501-c9ae-4fed-8b8f-b05f0d50e118@loongson.cn>
+ <tr65rdtph43gtccnwymjfkaoumzuwc574cbzxfh2q3ipoip2eo@rzzrwtbp5m6v>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <tr65rdtph43gtccnwymjfkaoumzuwc574cbzxfh2q3ipoip2eo@rzzrwtbp5m6v>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cxbs2xDg1mI01yAA--.22105S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7tF1xWw1kGFWrWFy3CryrKrX_yoW8Gr17pr
+	ZxAFZrtryrXr13WFWDGw43uFn8JrWDGr1jgw43C34fZr4DArnruF1kK3y0krZ7GrWqka15
+	GF4rKFWDA3W5KFcCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUUUUU
 
---4bd2cb084b6d1bc3a4d2b6f2223a5fc8229f83965193b4e69adc10d305a3
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
 
-On Tue Apr 2, 2024 at 8:33 PM CEST, Christophe JAILLET wrote:
-> The definition and declaration of sja1110_pcs_mdio_write_c45() don't have
-> parameters in the same order.
+在 2024/3/23 02:47, Serge Semin 写道:
+> +static int loongson_dwmac_config_multi_msi(struct pci_dev *pdev,
+> +					   struct plat_stmmacenet_data *plat,
+> +					   struct stmmac_resources *res)
+> +{
+> +	int i, ret, vecs;
+> +
+> +	/* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
+> +	 * --------- ----- -------- --------  ...  -------- --------
+> +	 * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
+> +	 */
+> +	vecs = plat->rx_queues_to_use + plat->tx_queues_to_use + 1;
+> +	ret = pci_alloc_irq_vectors(pdev, 1, vecs, PCI_IRQ_MSI | PCI_IRQ_LEGACY);
+> +	if (ret < 0) {
+> +		dev_err(&pdev->dev, "Failed to allocate PCI IRQs\n");
+> +		return ret;
+> +	} else if (ret >= vecs) {
+> +		for (i = 0; i < plat->rx_queues_to_use; i++) {
+> +			res->rx_irq[CHANNELS_NUM - 1 - i] =
+> +				pci_irq_vector(pdev, 1 + i * 2);
+> +		}
+> +		for (i = 0; i < plat->tx_queues_to_use; i++) {
+> +			res->tx_irq[CHANNELS_NUM - 1 - i] =
+> +				pci_irq_vector(pdev, 2 + i * 2);
+> +		}
+> +
+> +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> +	}
+> +
+> +	res->irq = pci_irq_vector(pdev, 0);
+> +
+> +	return 0;
+> +}
 >
-> Knowing that sja1110_pcs_mdio_write_c45() is used as a function pointer
-> in 'sja1105_info' structure with .pcs_mdio_write_c45, and that we have:
->
->    int (*pcs_mdio_write_c45)(struct mii_bus *bus, int phy, int mmd,
-> 				  int reg, u16 val);
->
-> it is likely that the definition is the one to change.
+> Thus in case if for some reason you were able to allocate less MSI
+> IRQs than required you'll still be able to use them. The legacy IRQ
+> will be also available in case if MSI failed to be allocated.
 
-See also "struct mii_bus":
-
-	/** @write_c45: Perform a C45 write transfer on the bus */
-	int (*write_c45)(struct mii_bus *bus, int addr, int devnum,
-			 int regnum, u16 val);
-
->
-> Found with cppcheck, funcArgOrderDifferent.
->
-> Fixes: ae271547bba6 ("net: dsa: sja1105: C45 only transactions for PCS")
-
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> Compile tested only.
-> ---
->  drivers/net/dsa/sja1105/sja1105_mdio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/dsa/sja1105/sja1105_mdio.c b/drivers/net/dsa/sja=
-1105/sja1105_mdio.c
-> index 833e55e4b961..52ddb4ef259e 100644
-> --- a/drivers/net/dsa/sja1105/sja1105_mdio.c
-> +++ b/drivers/net/dsa/sja1105/sja1105_mdio.c
-> @@ -94,7 +94,7 @@ int sja1110_pcs_mdio_read_c45(struct mii_bus *bus, int =
-phy, int mmd, int reg)
->  	return tmp & 0xffff;
->  }
-> =20
-> -int sja1110_pcs_mdio_write_c45(struct mii_bus *bus, int phy, int reg, in=
-t mmd,
-> +int sja1110_pcs_mdio_write_c45(struct mii_bus *bus, int phy, int mmd, in=
-t reg,
->  			       u16 val)
-
-Reviewed-by: Michael Walle <mwalle@kernel.org>
-
-Vladimir, do you happen to know if some of your boards will use this
-function? Just wondering because it was never noticed.
-
--michael
-
->  {
->  	struct sja1105_mdio_private *mdio_priv =3D bus->priv;
+Great, we will consider doing this in the future, but at this stage, we 
+don't want to add too much complexity.
 
 
---4bd2cb084b6d1bc3a4d2b6f2223a5fc8229f83965193b4e69adc10d305a3
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks,
 
------BEGIN PGP SIGNATURE-----
+Yanteng
 
-iKgEABMJADAWIQTIVZIcOo5wfU/AngkSJzzuPgIf+AUCZg0OHBIcbXdhbGxlQGtl
-cm5lbC5vcmcACgkQEic87j4CH/hg0wF/RTzwJEa5sk8GegngsX3YXJNsapFGBssA
-1yi4ssEWgnZ6MhuJioHlBvvAGMyORvVSAYDbILAPiVw0FfyfNp47+kanvUqhvG78
-pxSroqUKdQMTmg56f1PDbdoUyTwYihmBgHw=
-=ICMO
------END PGP SIGNATURE-----
-
---4bd2cb084b6d1bc3a4d2b6f2223a5fc8229f83965193b4e69adc10d305a3--
 
