@@ -1,91 +1,100 @@
-Return-Path: <netdev+bounces-84493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF0898970FD
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:29:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80FAF8970FE
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 15:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF0BB1C24A54
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:29:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 170BCB28FA6
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 13:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EC0149C74;
-	Wed,  3 Apr 2024 13:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GnpodGso"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA54149C65;
+	Wed,  3 Apr 2024 13:27:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFAB1487F3
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from mail.rmail.be (mail.rmail.be [85.234.218.189])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4BC149C68
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 13:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.234.218.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712150815; cv=none; b=d0/aJq6zfztgmMeq1iJWt33PDThz9mGmXHKyPdyKVsKlwx7uFypVpP4277WLa3zR7LsEFR04d5vXwTfBWvbOBDSD/0NKBZXCQYblfzej+8lIZVw093JZU1w+V5L2h/JB9VZwC6wDUFcHy7TD+7hyY7XlZzr3mbEsKADA0/OnG+8=
+	t=1712150831; cv=none; b=Jy+hX/pqssc/xMsrFhk0al1OGl4jGDrQtiPHGkVidJiVIugEd0e8olD/lbpBPGEHj6dT0pUO5SoKLXOxV/X4Ig89FiWUPtI610nJgU0dNCBFxo1QZD7YjyjiBRJSGzarsQQW91pZHF7SmMqNEjDJLwj/sjP91Qc/iYs86Q3lfy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712150815; c=relaxed/simple;
-	bh=52UmcMJZtoCW9vlBYc/fadTAz/Lbo5LlOCiiSVdCjOQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E+B5bYR3OUfZbI+DcZSj4g+kWqUGClBPLHChc7OMyC6jKhUPXkFJ5ZD8jHEb/dmRqeOewwNgbFu5a69snxKSPVYqP6VZbwfKUI95DVg1ySqsXMEj9HSajcQb8Ug47ShDr9BJsPogbOy1AniImPSsw1kF/YG91aNp8KZpvn44AfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GnpodGso; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712150812;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=52UmcMJZtoCW9vlBYc/fadTAz/Lbo5LlOCiiSVdCjOQ=;
-	b=GnpodGso3ChUO++aH1WG+xQIsXjzadVdEcOqAjzw/3gXO449O5Frcq7njhwvJLXNIZHqXf
-	BNf1bP37wnfFP6qsq/LUWtr5t7w/W/4HgwGxg16F5RXb7N0peuQ5Buwbs+Zmwuwitp+Zp7
-	6ykAvUbuzJ9MFPv7CbcPRwcklqwiq9E=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-59vSHkt8OByb0-iMdjEcZA-1; Wed,
- 03 Apr 2024 09:26:47 -0400
-X-MC-Unique: 59vSHkt8OByb0-iMdjEcZA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A05083816B4C;
-	Wed,  3 Apr 2024 13:26:46 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.193.197])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5C1A1492BD1;
-	Wed,  3 Apr 2024 13:26:44 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	jtornosm@redhat.com,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v3] net: usb: ax88179_178a: non necessary second random mac address
-Date: Wed,  3 Apr 2024 15:26:35 +0200
-Message-ID: <20240403132639.344958-1-jtornosm@redhat.com>
-In-Reply-To: <20240402183237.2eb8398a@kernel.org>
-References: <20240402183237.2eb8398a@kernel.org>
+	s=arc-20240116; t=1712150831; c=relaxed/simple;
+	bh=OHungM9EBK3KdgCvTHFNx3SE52TLPhxcf7LeAEg0KZU=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=NNm4nKUBHEvh9Pp45PEVoy1hBuqf8lDgeq++XDD0B94nclkpsNw9lUqz674CMN37R3nKQRotLh5Gw5CCPy8o72yxP8UupnhEz84NDtYt/83+UxCs5BcaFEe01wz1pCFcggcjJS+yl2kW4qh85jeyiWWcWfD7MSJd/dUBzMMjrSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be; spf=pass smtp.mailfrom=rmail.be; arc=none smtp.client-ip=85.234.218.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rmail.be
+Received: from mail.rmail.be (domotica.rmail.be [10.238.9.4])
+	by mail.rmail.be (Postfix) with ESMTP id 568CE5052D;
+	Wed,  3 Apr 2024 15:27:00 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Date: Wed, 03 Apr 2024 15:27:00 +0200
+From: Maarten <maarten@rmail.be>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: patchwork-bot+netdevbpf@kernel.org, opendmb@gmail.com,
+ netdev@vger.kernel.org, phil@raspberrypi.com,
+ bcm-kernel-feedback-list@broadcom.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v2] net: bcmgenet: Reset RBUF on first open
+In-Reply-To: <bf3276f6-3e79-403c-9571-b146c1d9c86c@broadcom.com>
+References: <20240401111002.3111783-1-maarten@rmail.be>
+ <171213902816.4996.4627354410898383893.git-patchwork-notify@kernel.org>
+ <bf3276f6-3e79-403c-9571-b146c1d9c86c@broadcom.com>
+Message-ID: <562153bceaef87d0e4eedb7fe3a59df8@rmail.be>
+X-Sender: maarten@rmail.be
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-Understood, I will repost when the other one is merged and with the new
-context diff.
+Florian Fainelli schreef op 2024-04-03 14:58:
+> On 4/3/2024 3:10 AM, patchwork-bot+netdevbpf@kernel.org wrote:
+>> Hello:
+>> 
+>> This patch was applied to netdev/net.git (main)
+>> by David S. Miller <davem@davemloft.net>:
+>> 
+>> On Mon,  1 Apr 2024 13:09:33 +0200 you wrote:
+>>> From: Phil Elwell <phil@raspberrypi.com>
+>>> 
+>>> If the RBUF logic is not reset when the kernel starts then there
+>>> may be some data left over from any network boot loader. If the
+>>> 64-byte packet headers are enabled then this can be fatal.
+>>> 
+>>> Extend bcmgenet_dma_disable to do perform the reset, but not when
+>>> called from bcmgenet_resume in order to preserve a wake packet.
+>>> 
+>>> [...]
+>> 
+>> Here is the summary with links:
+>>    - [v2] net: bcmgenet: Reset RBUF on first open
+>>      https://git.kernel.org/netdev/net/c/0a6380cb4c6b
+>> 
+>> You are awesome, thank you!
+> 
+> Good thing I had mentioned in v1 that we were busy with other things
+> but that we would like to have tested that patch. I don't expect it to
+> cause regressions, but I would have appreciated that there would be a
+> mention or a github issue for the VPU firmware that indicated a fix
+> was underway.
 
-Thanks
+Eh, yeah, I had already sent an email to "David S. Miller 
+<davem@davemloft.net>" indicating my surprise that this was committed.
 
-Best regards
-José Ignacio
+I had added in the v2 commit msg a link to the firmware issue I created 
+at raspberrypi and also linked to the lore of the v1 patch.
 
+Should I have been clearer in some way or form when I posted the v2, 
+(which was to fix the minor formatting issues and also add the firmware 
+issues link to it)?
+
+Regards,
+
+Maarten Vanraes
 
