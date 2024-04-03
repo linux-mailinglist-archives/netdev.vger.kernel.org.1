@@ -1,166 +1,158 @@
-Return-Path: <netdev+bounces-84630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8F4897A4B
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:00:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 300D6897A65
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 23:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4023BB2153E
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 21:00:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537F31C217F2
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 21:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A739A15625C;
-	Wed,  3 Apr 2024 21:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE17C155A46;
+	Wed,  3 Apr 2024 21:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="bMjpQfbV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="CIQGSrnF"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Qt0U+NED"
 X-Original-To: netdev@vger.kernel.org
-Received: from wfhigh6-smtp.messagingengine.com (wfhigh6-smtp.messagingengine.com [64.147.123.157])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3400153BF3;
-	Wed,  3 Apr 2024 21:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67A314C5B3
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 21:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712178002; cv=none; b=XV8d7gCfz48laHKaS+kGhiSGC/2CjtfuhbaM6LSn46gEGtioFFImvQHaahOxsYq6ZpqEfla+gU383yw577qRXEksSax3B7LC9ougV01eFKe0QWPJ0D4ZMvPAu/UKR64G68ijMwPhqKi5jacAl04M87cr6GpuBvzF/CATkoA6kfM=
+	t=1712178475; cv=none; b=IA5WyCZ5hIjm3wyrXECSIwzgziMFrt4FnK5WLPPJX9EbBItsnUCF4My/rp58O2urYfT4zWID0p73NZJUDZRb5e/mSEFJOilc0G1Ju1oZEk05n/tPQSRGMVlodOlX9xRHqMrNVEZxf2loBMUzfDCm5rcDqpjnqhfVovGoJ6GUjE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712178002; c=relaxed/simple;
-	bh=z2aFj7Yero9UEAl+EmXBknvXwFagdYrg8gO/nPAA5PI=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=YxH7PfYQJdLJBaRKZo/lvdfNWmn78kCSvfAfkZnUNmolscKQdGA44BXMJhMSYgFIcVFbmIS9FOrnFcGJFk3cA0ejoSprfWe/t48sz8H8lPDb3qGaQrpsLBW3BZX7i9+kAwJ83T98IGYG9FQ8/5RMzTTzePG45HPlYB9Qv9Y+RtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=bMjpQfbV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=CIQGSrnF; arc=none smtp.client-ip=64.147.123.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfhigh.west.internal (Postfix) with ESMTP id 506BD180010E;
-	Wed,  3 Apr 2024 16:59:58 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 03 Apr 2024 16:59:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm1; t=1712177997; x=1712264397; bh=TkyKpF4n3C
-	q52s0X3ZL3E7R1KrZzCnoADc0YqLDsh/k=; b=bMjpQfbVCi8Fq8X/stkrxnmNLa
-	a9eEqq1QgwOAfhJa8IBNoTc9TmPgl8k37iGa3Plj+yL82KuU/DHLiW+B0EgYL82c
-	02tVQS6fGmyZwYLxqYe78UZVRUV2mMN5Esd/08WwqhNyFJnJG5un/99DDmFMwWJW
-	Az5K6oBjccQ59rLVezsvSSIgR8itvVTkbtC7jvrMY7NfxDzqNxrboKzUGqXNJQNi
-	YyEsWKJ6or2z1WSTEA2riV00U8oJRsjYk9nuZTZA0u6iQkwzng051T0bgvZmXXPP
-	VRHZnfJUFtIoxLojPbaHAglzRdn7e1lXGHeVQhMviK/+OorI/43OpHbHQFVA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1712177997; x=1712264397; bh=TkyKpF4n3Cq52s0X3ZL3E7R1KrZz
-	CnoADc0YqLDsh/k=; b=CIQGSrnFZRNZgMpARGSyCT5M46ioL1XGSw7MA0g7Rydv
-	zQYYjGI4sejaWCkb1bXdvVklGyJXheHuMfcxVjySSplR2bL7EkH3oyVUTIcl3Gai
-	GRPNR2tZJraIWZvwn5KzpR22QuKSAe+H/q/bRz04wgH0bXdpjj0tB9CO4CCBuABc
-	JG6u7OvcvJPWSiT9jPR78+639l1b3s8ex+E/W3xiVe/aTUxK9Sv6x4pVOmIGaBI3
-	2bEcxjq0cO+cB5msjHtB12nJhcKNH0JPZEy/brteYOce2+8Nno6d0bwX3DLJrcdy
-	m4VzX7YEp2FHkgYzSIWEumxrId/cRz6NUlyjxfgMOQ==
-X-ME-Sender: <xms:TcMNZvjGxtVaQ7lJjPrnjJiTRcLqVvdevj2JGj5ygxkyvaxZTq-XgQ>
-    <xme:TcMNZsCj-2Cg0iMiPgYRpqHhfvGdEB9yBlad668jZ-4CemOPfrP93fsBvHPVn709S
-    WLbvOnbNIIlgnQNirg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudefiedguddufecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
-    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:TcMNZvGQo8zIv4XpkRoy1AW70Hn1lLnDuoKeh7BaArgh2j3x8KRF4Q>
-    <xmx:TcMNZsSo7PaGRkdKyfCOrEEhQYGxMzdS9B_wky1316eTKOsQGv_gzg>
-    <xmx:TcMNZsy3V4u7Ht2CEsSf1pQF8CxUAU3s06Fo95V0PBgEmgUVe73JZQ>
-    <xmx:TcMNZi4mcfwK233dblrueIHu9lqApYhCEdnUP2bH5oTQyYtwjBFpWA>
-    <xmx:TcMNZoDtsp2EnYCMaV-GyvV6o6vcniCi6pZD5YwF8kZEoqBIUsKE_tNZ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 251F5B6008D; Wed,  3 Apr 2024 16:59:57 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-333-gbfea15422e-fm-20240327.001-gbfea1542
+	s=arc-20240116; t=1712178475; c=relaxed/simple;
+	bh=NAxXbTXljNe/Y4q6CRTIL8DlcLQmJZ+JPq3gNq41ALY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=d497gI5mdsqkQZ1MwpVUB8QrATvraSfLfYTc3Aui0iCQWadqByB5/uXwBZNs2pIA4QsyvyZ+sMRrmv6jfMU3lGyaisyFJClLaaDgTwcChNizpPF7zlZw9lAC0JZfcxaUJp5cT+P1YhSEsGhFGhNj2KHpdIVXIrWfsz3f2J+I3B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Qt0U+NED; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 433L29xh028503;
+	Wed, 3 Apr 2024 21:07:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=zu6US5qxrh9nqrNa72Oe1aQZi4GvXffEloGNo21Ijys=; b=Qt
+	0U+NED6WBW9JHrh5tCGPGFq93+qmp+/MW3nEvVgCZfJQKRDWQ1kO6p2ngB+KbI19
+	IxLMlmBaJSOkkDPdqgyNOSsobLkgcDJ0jdwHAry7nVC+boqTXN3vMUzPyfbbBUVw
+	8ZfYSVzs+vlhbB4NLgoODoA6bXi0NWd2AVhN8j9GziNicEzhzobnBaSL3gFyDKzI
+	6LQMI0SCDuOk5ldbCx2NIDq9uiEiHGEcA3rjGXH7PeYVCw113kk3lmtNh2srjf1b
+	lHicbTxAzofs5rXX0Zs9Pkc6EgEFp0CpgrVI89WYjqr/a2dJefCCThcBgbm3ELvV
+	aCPc3hgQTAarsW4xS+VA==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x9ep3r0b1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 21:07:42 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 433L7fuR004834
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 3 Apr 2024 21:07:41 GMT
+Received: from [10.227.110.203] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 3 Apr 2024
+ 14:07:41 -0700
+Message-ID: <9ec98f94-94e1-4a72-9dbd-31ac95e13f06@quicinc.com>
+Date: Wed, 3 Apr 2024 14:07:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <701f8f93-f5fb-408b-822a-37a1d5c424ba@app.fastmail.com>
-In-Reply-To: <20240327152358.2368467-20-aleksander.lobakin@intel.com>
-References: <20240327152358.2368467-1-aleksander.lobakin@intel.com>
- <20240327152358.2368467-20-aleksander.lobakin@intel.com>
-Date: Wed, 03 Apr 2024 22:59:36 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Alexander Lobakin" <aleksander.lobakin@intel.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>
-Cc: "Yury Norov" <yury.norov@gmail.com>,
- "Alexander Potapenko" <glider@google.com>,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
- "Michal Swiatkowski" <michal.swiatkowski@linux.intel.com>,
- "Marcin Szycik" <marcin.szycik@linux.intel.com>,
- "Simon Horman" <horms@kernel.org>, "Kees Cook" <keescook@chromium.org>
-Subject: Re: [PATCH net-next v6 19/21] pfcp: always set pfcp metadata
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 05/15] eth: fbnic: add message parsing for FW
+ messages
+Content-Language: en-US
+To: Alexander Duyck <alexander.duyck@gmail.com>, <netdev@vger.kernel.org>
+CC: Alexander Duyck <alexanderduyck@fb.com>, <kuba@kernel.org>,
+        <davem@davemloft.net>, <pabeni@redhat.com>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217492560.1598374.8486151971412546101.stgit@ahduyck-xeon-server.home.arpa>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <171217492560.1598374.8486151971412546101.stgit@ahduyck-xeon-server.home.arpa>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: pa7OjcD_xFQEiPwb2H4CI2A-CY1psrGh
+X-Proofpoint-GUID: pa7OjcD_xFQEiPwb2H4CI2A-CY1psrGh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-03_22,2024-04-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
+ mlxlogscore=999 spamscore=0 suspectscore=0 priorityscore=1501
+ lowpriorityscore=0 mlxscore=0 phishscore=0 impostorscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404030143
 
-On Wed, Mar 27, 2024, at 16:23, Alexander Lobakin wrote:
+On 4/3/2024 1:08 PM, Alexander Duyck wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
+> 
+> Add FW message formatting and parsing. The TLV format should
+> look very familiar to those familiar with netlink.
+> Since we don't have to deal with backward compatibility
+> we tweaked the format a little to make it easier to deal
+> with, and more appropriate for tightly coupled interfaces
+> like driver<>FW communication.
+> 
+> Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+> ---
+>  drivers/net/ethernet/meta/fbnic/Makefile    |    3 
+>  drivers/net/ethernet/meta/fbnic/fbnic_tlv.c |  529 +++++++++++++++++++++++++++
+>  drivers/net/ethernet/meta/fbnic/fbnic_tlv.h |  175 +++++++++
+>  3 files changed, 706 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
+>  create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
+[...]
+> +/**
+> + *  fbnic_tlv_msg_alloc - Allocate page and initialize FW message header
+> + *  @msg_id: Identifier for new message we are starting
+> + *
+> + *  Returns pointer to start of message, or NULL on failure.
 
-> +static int pfcp_encap_recv(struct sock *sk, struct sk_buff *skb)
-> +{
-> +	IP_TUNNEL_DECLARE_FLAGS(flags) = { };
-> +	struct metadata_dst *tun_dst;
-> +	struct pfcp_metadata *md;
-> +	struct pfcphdr *unparsed;
-> +	struct pfcp_dev *pfcp;
-> +
-> +	if (unlikely(!pskb_may_pull(skb, PFCP_HLEN)))
-> +		goto drop;
-> +
-> +	pfcp = rcu_dereference_sk_user_data(sk);
-> +	if (unlikely(!pfcp))
-> +		goto drop;
-> +
-> +	unparsed = pfcp_hdr(skb);
-> +
-> +	ip_tunnel_flags_zero(flags);
-> +	tun_dst = udp_tun_rx_dst(skb, sk->sk_family, flags, 0,
-> +				 sizeof(*md));
-> +	if (unlikely(!tun_dst))
-> +		goto drop;
-> +
-> +	md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
-> +	if (unlikely(!md))
-> +		goto drop;
-> +
-> +	if (unparsed->flags & PFCP_SEID_FLAG)
-> +		pfcp_session_recv(pfcp, skb, md);
-> +	else
-> +		pfcp_node_recv(pfcp, skb, md);
-> +
-> +	__set_bit(IP_TUNNEL_PFCP_OPT_BIT, flags);
-> +	ip_tunnel_info_opts_set(&tun_dst->u.tun_info, md, sizeof(*md),
-> +				flags);
-> +
+should use Return: tag as documented at https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html#function-documentation
 
-The memcpy() in the ip_tunnel_info_opts_set() causes
-a string.h fortification warning, with at least gcc-13:
+(although the kernel-doc script will accept a few variations such as Returns: or @Returns:)
 
-    In function 'fortify_memcpy_chk',
-        inlined from 'ip_tunnel_info_opts_set' at include/net/ip_tunnels.h:619:3,
-        inlined from 'pfcp_encap_recv' at drivers/net/pfcp.c:84:2:
-    include/linux/fortify-string.h:553:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
-      553 |                         __write_overflow_field(p_size_field, size);
+currently scripts/kernel-doc -Wall -Werror -none $files reports:
+drivers/net/ethernet/meta/fbnic/fbnic_fw.c:244: warning: No description found for return value of 'fbnic_fw_xmit_simple_msg'
+drivers/net/ethernet/meta/fbnic/fbnic_fw.c:273: warning: No description found for return value of 'fbnic_fw_xmit_cap_msg'
+drivers/net/ethernet/meta/fbnic/fbnic_fw.c:338: warning: No description found for return value of 'fbnic_fw_xmit_ownership_msg'
+drivers/net/ethernet/meta/fbnic/fbnic_fw.c:659: warning: No description found for return value of 'fbnic_fw_xmit_comphy_set_msg'
+drivers/net/ethernet/meta/fbnic/fbnic_irq.c:33: warning: No description found for return value of 'fbnic_fw_enable_mbx'
+drivers/net/ethernet/meta/fbnic/fbnic_irq.c:111: warning: No description found for return value of 'fbnic_mac_get_link'
+drivers/net/ethernet/meta/fbnic/fbnic_irq.c:146: warning: No description found for return value of 'fbnic_mac_enable'
+drivers/net/ethernet/meta/fbnic/fbnic_mac.c:1020: warning: No description found for return value of 'fbnic_mac_init'
+drivers/net/ethernet/meta/fbnic/fbnic_netdev.c:356: warning: No description found for return value of 'fbnic_netdev_alloc'
+drivers/net/ethernet/meta/fbnic/fbnic_netdev.c:449: warning: No description found for return value of 'fbnic_netdev_register'
+drivers/net/ethernet/meta/fbnic/fbnic_pci.c:300: warning: No description found for return value of 'fbnic_probe'
+drivers/net/ethernet/meta/fbnic/fbnic_pci.c:614: warning: No description found for return value of 'fbnic_init_module'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:24: warning: No description found for return value of 'fbnic_tlv_msg_alloc'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:55: warning: No description found for return value of 'fbnic_tlv_attr_put_flag'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:97: warning: No description found for return value of 'fbnic_tlv_attr_put_value'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:141: warning: No description found for return value of '__fbnic_tlv_attr_put_int'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:161: warning: No description found for return value of 'fbnic_tlv_attr_put_mac_addr'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:178: warning: No description found for return value of 'fbnic_tlv_attr_put_string'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:204: warning: No description found for return value of 'fbnic_tlv_attr_get_unsigned'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:220: warning: No description found for return value of 'fbnic_tlv_attr_get_signed'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:244: warning: No description found for return value of 'fbnic_tlv_attr_get_string'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:264: warning: No description found for return value of 'fbnic_tlv_attr_nest_start'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:387: warning: No description found for return value of 'fbnic_tlv_attr_parse_array'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:439: warning: No description found for return value of 'fbnic_tlv_attr_parse'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:487: warning: No description found for return value of 'fbnic_tlv_msg_parse'
+drivers/net/ethernet/meta/fbnic/fbnic_tlv.c:520: warning: No description found for return value of 'fbnic_tlv_parser_error'
+26 warnings as Errors
 
-As far as I can tell, the warning is caused by the
-ambiguity of the union, but what I noticed is that
-it also seems to copy a buffer to itself, as 'md'
-is initialized to tun_dst->u.tun_info as well.
+> + *
+> + *  Allocates a page and initializes message header at start of page.
+> + *  Initial message size is 1 DWORD which is just the header.
+> + **/
 
-Is this intentional?
-
-      Arnd
 
