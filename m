@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-84615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B768979B2
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:19:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE01A8979B3
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:19:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B125B24666
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:19:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BCA31C217E8
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C734B155A4F;
-	Wed,  3 Apr 2024 20:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8B2156226;
+	Wed,  3 Apr 2024 20:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JZyS4/Yw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R9W9CZjG"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371C115574B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6992155A25
 	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 20:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712175580; cv=none; b=bz2k5jwEh3DhmhkwcoyuUKnATu/Oe5VGo59qGheU9eqyTIXzyjFAhZYLBhwOD5QJVZEjojx9L1PcY2e1x1iMDG564pyn15/5ZlaClB8kUvzLvQZtgMoOb0g5oFGkTdYARLHc1iywmNwjt/8q0WpxA9/kgzNaZe67A/buhvyMbVk=
+	t=1712175581; cv=none; b=Aj8jjlNPYNFm2X5mav1Ep89SFEoT8hGzatWwisDOxmncXmJAaeZYv9Z/zugS77x3S6AbE/UoTW7bC0VIfteBQYD8EiNtms1P3mi86dJvikGVwaeZe3g5wesQ4jI6cmVJT+/hCF9ygU9RD5TmO5JrlRu7/zQFWrwxDteKjNKPEcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712175580; c=relaxed/simple;
-	bh=9H2lwI4Bsjuj+5xkt2aHUfOhrY/43BLjMOJ8ztq2o1c=;
+	s=arc-20240116; t=1712175581; c=relaxed/simple;
+	bh=hegHlUhBasKUMZObKcLkJqe/zOi+DJrgrHKeq2FG/SE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PQ+1UBv+s2deP1wGGb7/UZ7nFobEhMcss1ZEZg9mH8C9O0HVhKx79OBDytD+P5Hlu8M1x3Va34rd/i9tU3ozH4zwLyqvMUjxrrTRdZQs+67eB+/uFYtu/9HUmFirY11R708YY+INAX9nxKhcl0GgDPK4545PTm1AymsAi/5q8IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JZyS4/Yw; arc=none smtp.client-ip=192.198.163.9
+	 MIME-Version; b=mFZIALNTSqi5TwhdpucxCj+UJymtKjCRnWFH4Jb3UcDZmgMT3n2G6/YzbnCM3Wh3FbRYZorYZz1FxTVnuzdWev7fiaNZOgexe+6bkmL+UFdZZshsKOE8FKRDWBoY3tGEO4D2pbylf8UrtCu2Kd6H7ihKvstZmoho0ks+WxIk2xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R9W9CZjG; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712175579; x=1743711579;
+  t=1712175580; x=1743711580;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9H2lwI4Bsjuj+5xkt2aHUfOhrY/43BLjMOJ8ztq2o1c=;
-  b=JZyS4/YwCOHgQ9jLwDCkwI+LSWFTEd/3nc2m11DQsIN7fO4zH7tk04GP
-   YC7qM5ByCC7eba7xG/nxE6hBDrd9cRUtpRonZJ21i+0mki086UZrc62aL
-   cFsxiR2DDrnr8uYsUkp5CeVqiR/4jCAYpuIp9p4JbSgni+J3uvmae69H2
-   Fe40dv61YQ9T3f4KGxVkwMaZnNIFsAFdqMCLQK8gNXtGCvPvPTZR+dB9Q
-   M1cIDoBJBQAsXOHkg6bz3o/Za3UxGSIFk10m2NGiA6vQ2G3xJzKiAyIMC
-   FGdmqlwdv1/rCtxZ1tGNcCcpzQHi8hvnpjE/JWSs13omXFxlb3GDoghNy
-   w==;
-X-CSE-ConnectionGUID: qwPn1mbYR8iJW75Naack1w==
-X-CSE-MsgGUID: w1We7ttOQ1qut3YsRoHNUw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="18165808"
+  bh=hegHlUhBasKUMZObKcLkJqe/zOi+DJrgrHKeq2FG/SE=;
+  b=R9W9CZjGoCVTwKyuPUGnILzNT+M+5ZcXIGffX963oVZ+Vm3mKhNug/C1
+   R4jxFo4OGxZAvKV8KrO3YTufzBH/LxCixNbhrcote+aRUQ9WhUisWI2yZ
+   7jbzEpc5Virrl0rl2rzPlpskKKhc891p1edhNIGmNN68rBVrCsbvDAW0i
+   O485MuFiSy5Bs+DIT42wIyZlGvLP2mUsLgSzDLTU+d28+ZmfeAu2wxcH9
+   4UpKVXsye04GBYjfM9TKPQCIiib4egotyF9esP5z4+Vz/uegxuXBfJRkY
+   SQk8wZWw5hzCLuhlwcuGZt6CeOgIu8kZWCfHbowj8lSaeg7y446SvTZfa
+   A==;
+X-CSE-ConnectionGUID: pRQ3Zx2ISum1dq2IJByOaw==
+X-CSE-MsgGUID: bumTY+8pQjGX1aEKsnb6/Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="18165815"
 X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="18165808"
+   d="scan'208";a="18165815"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
   by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 13:19:38 -0700
-X-CSE-ConnectionGUID: nw3JSSvRTjWagZcvWP2BPQ==
-X-CSE-MsgGUID: bdGwvaixR3Khl7bAW4sitg==
+X-CSE-ConnectionGUID: S4QR8hmARO2slCFPSocE9w==
+X-CSE-MsgGUID: I80dzmceSG+G87y0fIuAjg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="18662695"
+   d="scan'208";a="18662698"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa008.fm.intel.com with ESMTP; 03 Apr 2024 13:19:37 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -64,14 +64,18 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
+Cc: Joshua Hay <joshua.a.hay@intel.com>,
 	anthony.l.nguyen@intel.com,
-	horms@kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net 2/3] ice: fix enabling RX VLAN filtering
-Date: Wed,  3 Apr 2024 13:19:27 -0700
-Message-ID: <20240403201929.1945116-3-anthony.l.nguyen@intel.com>
+	willemb@google.com,
+	Balazs Nemeth <bnemeth@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Salvatore Daniele <sdaniele@redhat.com>,
+	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+	Krishneil Singh <krishneil.k.singh@intel.com>
+Subject: [PATCH net 3/3] idpf: fix kernel panic on unknown packet types
+Date: Wed,  3 Apr 2024 13:19:28 -0700
+Message-ID: <20240403201929.1945116-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240403201929.1945116-1-anthony.l.nguyen@intel.com>
 References: <20240403201929.1945116-1-anthony.l.nguyen@intel.com>
@@ -83,65 +87,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Petr Oros <poros@redhat.com>
+From: Joshua Hay <joshua.a.hay@intel.com>
 
-ice_port_vlan_on/off() was introduced in commit 2946204b3fa8 ("ice:
-implement bridge port vlan"). But ice_port_vlan_on() incorrectly assigns
-ena_rx_filtering to inner_vlan_ops in DVM mode.
-This causes an error when rx_filtering cannot be enabled in legacy mode.
+In the very rare case where a packet type is unknown to the driver,
+idpf_rx_process_skb_fields would return early without calling
+eth_type_trans to set the skb protocol / the network layer handler.
+This is especially problematic if tcpdump is running when such a
+packet is received, i.e. it would cause a kernel panic.
 
-Reproducer:
- echo 1 > /sys/class/net/$PF/device/sriov_numvfs
- ip link set $PF vf 0 spoofchk off trust on vlan 3
-dmesg:
- ice 0000:41:00.0: failed to enable Rx VLAN filtering for VF 0 VSI 9 during VF rebuild, error -95
+Instead, call eth_type_trans for every single packet, even when
+the packet type is unknown.
 
-Fixes: 2946204b3fa8 ("ice: implement bridge port vlan")
-Signed-off-by: Petr Oros <poros@redhat.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
+Reported-by: Balazs Nemeth <bnemeth@redhat.com>
+Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Tested-by: Salvatore Daniele <sdaniele@redhat.com>
+Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- .../ethernet/intel/ice/ice_vf_vsi_vlan_ops.c   | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
-index 80dc4bcdd3a4..b3e1bdcb80f8 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
-@@ -26,24 +26,22 @@ static void ice_port_vlan_on(struct ice_vsi *vsi)
- 	struct ice_vsi_vlan_ops *vlan_ops;
- 	struct ice_pf *pf = vsi->back;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 6dd7a66bb897..f5bc4a278074 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -2941,6 +2941,8 @@ static int idpf_rx_process_skb_fields(struct idpf_queue *rxq,
+ 	rx_ptype = le16_get_bits(rx_desc->ptype_err_fflags0,
+ 				 VIRTCHNL2_RX_FLEX_DESC_ADV_PTYPE_M);
  
--	if (ice_is_dvm_ena(&pf->hw)) {
--		vlan_ops = &vsi->outer_vlan_ops;
++	skb->protocol = eth_type_trans(skb, rxq->vport->netdev);
++
+ 	decoded = rxq->vport->rx_ptype_lkup[rx_ptype];
+ 	/* If we don't know the ptype we can't do anything else with it. Just
+ 	 * pass it up the stack as-is.
+@@ -2951,8 +2953,6 @@ static int idpf_rx_process_skb_fields(struct idpf_queue *rxq,
+ 	/* process RSS/hash */
+ 	idpf_rx_hash(rxq, skb, rx_desc, &decoded);
+ 
+-	skb->protocol = eth_type_trans(skb, rxq->vport->netdev);
 -
--		/* setup outer VLAN ops */
--		vlan_ops->set_port_vlan = ice_vsi_set_outer_port_vlan;
--		vlan_ops->clear_port_vlan = ice_vsi_clear_outer_port_vlan;
-+	/* setup inner VLAN ops */
-+	vlan_ops = &vsi->inner_vlan_ops;
- 
--		/* setup inner VLAN ops */
--		vlan_ops = &vsi->inner_vlan_ops;
-+	if (ice_is_dvm_ena(&pf->hw)) {
- 		vlan_ops->add_vlan = noop_vlan_arg;
- 		vlan_ops->del_vlan = noop_vlan_arg;
- 		vlan_ops->ena_stripping = ice_vsi_ena_inner_stripping;
- 		vlan_ops->dis_stripping = ice_vsi_dis_inner_stripping;
- 		vlan_ops->ena_insertion = ice_vsi_ena_inner_insertion;
- 		vlan_ops->dis_insertion = ice_vsi_dis_inner_insertion;
--	} else {
--		vlan_ops = &vsi->inner_vlan_ops;
- 
-+		/* setup outer VLAN ops */
-+		vlan_ops = &vsi->outer_vlan_ops;
-+		vlan_ops->set_port_vlan = ice_vsi_set_outer_port_vlan;
-+		vlan_ops->clear_port_vlan = ice_vsi_clear_outer_port_vlan;
-+	} else {
- 		vlan_ops->set_port_vlan = ice_vsi_set_inner_port_vlan;
- 		vlan_ops->clear_port_vlan = ice_vsi_clear_inner_port_vlan;
- 	}
+ 	if (le16_get_bits(rx_desc->hdrlen_flags,
+ 			  VIRTCHNL2_RX_FLEX_DESC_ADV_RSC_M))
+ 		return idpf_rx_rsc(rxq, skb, rx_desc, &decoded);
 -- 
 2.41.0
 
