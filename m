@@ -1,278 +1,377 @@
-Return-Path: <netdev+bounces-84335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC07E896A5D
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:20:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F4E7896A61
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 11:21:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6250C28BC15
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:20:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8B001F24C5D
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 09:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E297172B;
-	Wed,  3 Apr 2024 09:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AC46F06D;
+	Wed,  3 Apr 2024 09:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F2L5gkRQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g3Wijdi3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2094D6F085
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EFD345008
+	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 09:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712136024; cv=none; b=IlqyByM1Kgu8Uh4K2NFcUP5mT8Cmo/zi9bTDbIp3O3i4W84sh6mk1T96DCD54W6euHiurpnjy4u4jiF6fEPOxbK3qH5mLhNNDjrA+1GRk6qQOub7FXe4hYRfjNm2aekOMKU/Jh6fgJyC/x2pBX5mV3dwyOFTPVk5xyeE2U7Vsqo=
+	t=1712136091; cv=none; b=fv/5p99S+hqD067v/HNb9OQWkXoWBdrE/Nr9svJtRKCuZCH0eN29L6D6FHDTdrR5d2J9oflRi2qrZ/ssH9lVj/8OUvDMXohVLdmOmUoZiWXE0Wqoysdz1g0C/nxSiKTIeCkYidXFVrAMmv7CX72vkKGwSr9UG0NVj6yDotj4myU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712136024; c=relaxed/simple;
-	bh=aVcBN45Xfck08qQ/abgvdWiQt9e3NFHvI+SBznc9rf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BAA/vwzEmuu8ivWlqleKEhbtt5Q4hQlLGEZAQcr+xNh4OL9yMi7DyHab7ENMAQ1vjX+MYSj2rQ55tukR2kvPhyOYMTBCF7tSboQU59ePMGE3XHMpsGzkkUB+P3JHO+ARa8eXXvXd0IWjx63mDLSJX99Lr3uHOQg3cwLxXCHKisI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F2L5gkRQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712136022;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7eVpcKNoPKOT5GjI4amQQ4jUKbgRtaP6DtVP6eeUayE=;
-	b=F2L5gkRQI1Sfx4PojyKXhEcQJe2VSDcKtVNVSTZrE89hmJCM/3Zxszfq9P/Re9hIkHaee+
-	g4cy/4aGsUUdaKfCfDiuHQmIIhrocWcfZYOVzSVJzIqS3Bt7b8sAQez6vg6fjHgepB5uUp
-	JeK+8sExopzibQpmwR2riIrNgpWVgBo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-100-c01W48kDOD2lEs7aZBwE9w-1; Wed, 03 Apr 2024 05:20:20 -0400
-X-MC-Unique: c01W48kDOD2lEs7aZBwE9w-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-41489c04f8cso31709735e9.3
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 02:20:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712136019; x=1712740819;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7eVpcKNoPKOT5GjI4amQQ4jUKbgRtaP6DtVP6eeUayE=;
-        b=DTptk+Hu9MmxeQAd/8li9xHUKz+Kpxs/+9BDUHbB8Ql3m9IGl34HpJZW2oRr7wNMw3
-         sLOquEBY7Mk3QeBXz+cAIAL4Ro1dG7E/rlpRYFHmV3kPXv21lIEkNeRI6ruguop8t1mt
-         OghxJblUmHRB37BMzqVas3HM3k4T47JeDpw6Gf+mV9Dbnm97okz6pS5g6ncaLg4jZ7CC
-         D31TYumqQj0XzKD0vB7+vgoiXVmbtHKw7vxc3Qmel6wjJ/Ap/UKd1Yo21yWI7PBuDGVs
-         NFZMat9wVrgFsdsyEMi+AW6g7CD/ibAzZXjBpFoh1GZdDvZUGO0sfBWrNYvz7vyXXkt6
-         X+Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCVZz1M+FGoqKK3t/I8FKDdC35K9pxFwETkZ/608YodGZPxfB87HhDJ2MFcQsgO8iXv7LJcqdcHMnfOveIzao9NHqZddph3c
-X-Gm-Message-State: AOJu0Yy9kk2slv20y5gcfnRrT8bNRRRY65GV9EO6a4TtAevWQDBmaOB6
-	TVuQedBns+q7UBGdfrZmeutHhROTuG/Nrj0cl6qF1fI9yVktUmXXDbfmuYRZX3f2qov2hAtq4zl
-	X5tgZaqRqUqV4gaveWqKk4F0Py9fY91Dcxm2DeXCzSxpdWLNcmRnlCw==
-X-Received: by 2002:a05:600c:190f:b0:414:93ae:396d with SMTP id j15-20020a05600c190f00b0041493ae396dmr13447745wmq.32.1712136019737;
-        Wed, 03 Apr 2024 02:20:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpPRLEixd0sNanUNIse0jfTMcCXcGZLbYnktjnv+/KAjawSRllq9bpUKMcQ9mEZUSuNo/uGA==
-X-Received: by 2002:a05:600c:190f:b0:414:93ae:396d with SMTP id j15-20020a05600c190f00b0041493ae396dmr13447724wmq.32.1712136019364;
-        Wed, 03 Apr 2024 02:20:19 -0700 (PDT)
-Received: from sgarzare-redhat ([185.95.145.60])
-        by smtp.gmail.com with ESMTPSA id fa14-20020a05600c518e00b004159df274d5sm5729524wmb.6.2024.04.03.02.20.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 02:20:18 -0700 (PDT)
-Date: Wed, 3 Apr 2024 11:20:13 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Luigi Leonardi <luigi.leonardi@outlook.com>
-Cc: kvm@vger.kernel.org, jasowang@redhat.com, 
-	virtualization@lists.linux.dev, mst@redhat.com, kuba@kernel.org, xuanzhuo@linux.alibaba.com, 
-	netdev@vger.kernel.org, stefanha@redhat.com, pabeni@redhat.com, davem@davemloft.net, 
-	edumazet@google.com
-Subject: Re: [PATCH net-next 3/3] test/vsock: add ioctl unsent bytes test
-Message-ID: <etx5zujgdrhnjz2dmavz6it5smkzhwvkzm3go6sesz2ya4aj5s@du3wfitew4il>
-References: <20240402150539.390269-1-luigi.leonardi@outlook.com>
- <AS2P194MB2170D78CDB7BDF00F0ACCB079A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1712136091; c=relaxed/simple;
+	bh=pJu6+ZAMB5/iuWJvZl1OLiuv2MCaA4XQrA4I3YAgSkE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IzQkeESYxGG5TW+yDzHBHFSkavnn18oooeTRHeYV9FNpXN7teJix8sFz+F6wG3catFLOshQqlP3l8P0snQwC+J9avf8ngfMSq76mYwi/O3jArwWR13YovpQLc91mdU3/E+cErGqhdGLF6gzwGJ2dS3Ab9P61s/ImjyfZrNzoUVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g3Wijdi3; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712136089; x=1743672089;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=pJu6+ZAMB5/iuWJvZl1OLiuv2MCaA4XQrA4I3YAgSkE=;
+  b=g3Wijdi31lXh3RIAXONtknD6ZchVyggTeEl49QFmj+MBFT7HUcDiZ/SQ
+   Y5ZIZ+poSKC2SDGRv6HpOttELQIMWWzr2ZScFBU8G7Oj2aPP3gtvSvBJ+
+   UZ8tzawHnGSaFB6pEKKdfXLrfk22abHd08TXojt/QbKvLoN3EMN42v8Mb
+   DlUSoapUqsCLHhJ1yNf3mfhw/7fOcj/RyZ2RRg7eBn6KhPe/hggxzwjva
+   MoRi3Rx0HFyoM23JPPM8mcy2+q2lvgPipCL9RiBeCfzr5wMVqo/CiEl0A
+   DNQFNt0csa92ULCEOF9C0BzpcLD9koHx6Irdo40FiFUsLXSk5LRYaZmKo
+   g==;
+X-CSE-ConnectionGUID: awREbb0sQ/2Pl7iKmVPRWg==
+X-CSE-MsgGUID: Do5x9h9PS42CXRUblJqdgg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="7223860"
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="7223860"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 02:21:28 -0700
+X-CSE-ConnectionGUID: vYouQ9mzTVOHBDAG77CKhw==
+X-CSE-MsgGUID: x4R7GP6hTeqOZ3HPRNbXaQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
+   d="scan'208";a="23138927"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.48.91]) ([10.246.48.91])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 02:21:26 -0700
+Message-ID: <1e22362d-63ff-4aba-8ef7-0b139517ba56@linux.intel.com>
+Date: Wed, 3 Apr 2024 11:21:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <AS2P194MB2170D78CDB7BDF00F0ACCB079A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4] ice: Reset VF on Tx MDD
+ event
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Cc: "Drewek, Wojciech" <wojciech.drewek@intel.com>,
+ "Wang, Liang-min" <liang-min.wang@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "Chmielewski, Pawel" <pawel.chmielewski@intel.com>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ "horms@kernel.org" <horms@kernel.org>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+References: <20240402165221.11669-1-marcin.szycik@linux.intel.com>
+ <SJ0PR11MB58667566B779717F962B9871E53D2@SJ0PR11MB5866.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <SJ0PR11MB58667566B779717F962B9871E53D2@SJ0PR11MB5866.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 02, 2024 at 05:05:39PM +0200, Luigi Leonardi wrote:
->This test that after a packet is delivered the number
->of unsent bytes is zero.
->
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->---
-> tools/testing/vsock/util.c       |  6 +--
-> tools/testing/vsock/util.h       |  3 ++
-> tools/testing/vsock/vsock_test.c | 83 ++++++++++++++++++++++++++++++++
-> 3 files changed, 89 insertions(+), 3 deletions(-)
->
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 554b290fefdc..a3d448a075e3 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -139,7 +139,7 @@ int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_po
-> }
->
-> /* Connect to <cid, port> and return the file descriptor. */
->-static int vsock_connect(unsigned int cid, unsigned int port, int type)
->+int vsock_connect(unsigned int cid, unsigned int port, int type)
-> {
-> 	union {
-> 		struct sockaddr sa;
->@@ -226,8 +226,8 @@ static int vsock_listen(unsigned int cid, unsigned int port, int type)
-> /* Listen on <cid, port> and return the first incoming connection.  The remote
->  * address is stored to clientaddrp.  clientaddrp may be NULL.
->  */
->-static int vsock_accept(unsigned int cid, unsigned int port,
->-			struct sockaddr_vm *clientaddrp, int type)
->+int vsock_accept(unsigned int cid, unsigned int port,
->+		 struct sockaddr_vm *clientaddrp, int type)
-> {
-> 	union {
-> 		struct sockaddr sa;
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index e95e62485959..fff22d4a14c0 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -39,6 +39,9 @@ struct test_case {
-> void init_signals(void);
-> unsigned int parse_cid(const char *str);
-> unsigned int parse_port(const char *str);
->+int vsock_connect(unsigned int cid, unsigned int port, int type);
->+int vsock_accept(unsigned int cid, unsigned int port,
->+		 struct sockaddr_vm *clientaddrp, int type);
-> int vsock_stream_connect(unsigned int cid, unsigned int port);
-> int vsock_bind_connect(unsigned int cid, unsigned int port,
-> 		       unsigned int bind_port, int type);
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index f851f8961247..58c94e04e3af 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -20,6 +20,8 @@
-> #include <sys/mman.h>
-> #include <poll.h>
-> #include <signal.h>
->+#include <sys/ioctl.h>
->+#include <linux/sockios.h>
->
-> #include "vsock_test_zerocopy.h"
-> #include "timeout.h"
->@@ -1238,6 +1240,77 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
-> 	}
-> }
->
->+#define MSG_BUF_IOCTL_LEN 64
->+static void test_unsent_bytes_server(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int client_fd;
->+
->+	client_fd = vsock_accept(VMADDR_CID_ANY, 1234, NULL, type);
->+	if (client_fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	recv_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
->+	control_writeln("RECEIVED");
->+
->+	close(client_fd);
->+}
->+
->+static void test_unsent_bytes_client(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int ret, fd, sock_bytes_unsent;
->+
->+	fd = vsock_connect(opts->peer_cid, 1234, type);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	for (int i = 0; i < sizeof(buf); i++)
->+		buf[i] = rand() & 0xFF;
->+
->+	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
->+	control_expectln("RECEIVED");
->+
->+	ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
->+	if (ret < 0 && errno != EOPNOTSUPP) {
 
-What about adding a warning when it is not supported?
 
-Something like this (untested):
+On 03.04.2024 08:37, Loktionov, Aleksandr wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On
+>> Behalf Of Marcin Szycik
+>> Sent: Tuesday, April 2, 2024 6:52 PM
+>> To: intel-wired-lan@lists.osuosl.org
+>> Cc: Drewek, Wojciech <wojciech.drewek@intel.com>; Wang, Liang-min
+>> <liang-min.wang@intel.com>; netdev@vger.kernel.org; Chmielewski,
+>> Pawel <pawel.chmielewski@intel.com>; Marcin Szycik
+>> <marcin.szycik@linux.intel.com>; Nguyen, Anthony L
+>> <anthony.l.nguyen@intel.com>; horms@kernel.org; Kitszel, Przemyslaw
+>> <przemyslaw.kitszel@intel.com>
+>> Subject: [Intel-wired-lan] [PATCH iwl-next v4] ice: Reset VF on Tx
+>> MDD event
+>>
+> Please state in the title explicitly the purpose of the patch:
+> Do you fix a bug? say fix
+> Do you add  functionality? say add
+> Do you refactor? say refactor
 
-	if (ret < 0) {
-		perror("ioctl");
+IMO it's neither of those.
 
-		if (errno != EOPNOTSUPP) {
-     			exit(EXIT_FAILURE);
-		}
+It's not a bugfix because the driver itself doesn't do anything wrong;
+the patch provides the user with a kind of optional workaround for an
+userspace app that's behaving incorrectly.
 
-		fprintf(stderr, "Test skipped\n");
-	}
+It's not really new functionality, since the mdd-auto-reset-vf flag
+was already implemented and auto reset was already happening for Rx
+events. I'm just extending this to Tx as well.
 
-The rest LGTM.
+And it's not strictly a refactor because I'm changing behaviour.
+
+Please also note that I've picked up a patch not originally made by
+me [2], and kept the original title and most of the description. I'm
+open to suggestions to title though.
+
+>> In cases when VF sends malformed packets that are classified as
+>> malicious, sometimes it causes Tx queue to freeze. This frozen
+>> queue can be stuck for several minutes being unusable. This
+>> behavior can be reproduced with a faulty userspace app running on
+>> VF.
+>>
+>> When any Malicious Driver Detection event occurs and the mdd-auto-
+>> reset-vf private flag is set, perform a graceful VF reset to
+>> quickly bring VF back to operational state. Add a log message to
+>> notify about the cause of the reset. Add a helper for this to be
+>> reused for both TX and RX events.
+> Please describe your changes explicitly:
+> Do you just add a helper function without adding a new functionality? 
+> Do you add functionality?
+> Do you fix?
+> Please explain what are the changes in driver behavior and the changes in the driver sources you make.
+> Thank you 
+
+I'll try to make the description more explicit.
 
 Thanks,
-Stefano
+Marcin
 
->+		perror("ioctl");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (ret == 0 && sock_bytes_unsent != 0) {
->+		fprintf(stderr,
->+			"Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
->+			sock_bytes_unsent);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	close(fd);
->+}
->+
->+static void test_stream_unsent_bytes_client(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_client(opts, SOCK_STREAM);
->+}
->+
->+static void test_stream_unsent_bytes_server(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_server(opts, SOCK_STREAM);
->+}
->+
->+static void test_seqpacket_unsent_bytes_client(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_client(opts, SOCK_SEQPACKET);
->+}
->+
->+static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
->+}
->+
-> #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-> /* This define is the same as in 'include/linux/virtio_vsock.h':
->  * it is used to decide when to send credit update message during
->@@ -1523,6 +1596,16 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-> 		.run_server = test_stream_cred_upd_on_low_rx_bytes,
-> 	},
->+	{
->+		.name = "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes",
->+		.run_client = test_stream_unsent_bytes_client,
->+		.run_server = test_stream_unsent_bytes_server,
->+	},
->+	{
->+		.name = "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes",
->+		.run_client = test_seqpacket_unsent_bytes_client,
->+		.run_server = test_seqpacket_unsent_bytes_server,
->+	},
-> 	{},
-> };
->
->-- 
->2.34.1
->
->
-
+>> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> Co-developed-by: Liang-Min Wang <liang-min.wang@intel.com>
+>> Signed-off-by: Liang-Min Wang <liang-min.wang@intel.com>
+>> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>> ---
+>> v4: Only perform auto-reset once per VF
+>> v3 [1]: Only auto reset VF if the mdd-auto-reset-vf flag is set
+>> v2 [2]: Revert an unneeded formatting change, fix commit message,
+>> fix a log
+>>     message with a correct event name
+>>
+>> [1] https://lore.kernel.org/intel-wired-lan/20240326164455.735739-
+>> 1-marcin.szycik@linux.intel.com
+>> [2] https://lore.kernel.org/netdev/20231102155149.2574209-1-
+>> pawel.chmielewski@intel.com
+>> ---
+>>  drivers/net/ethernet/intel/ice/ice_main.c  | 57 +++++++++++++++++-
+>> ----  drivers/net/ethernet/intel/ice/ice_sriov.c | 25 +++++++---
+>> drivers/net/ethernet/intel/ice/ice_sriov.h |  2 +
+>>  3 files changed, 67 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
+>> b/drivers/net/ethernet/intel/ice/ice_main.c
+>> index 185c9b13efcf..80bc83f6e1ab 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+>> @@ -1745,6 +1745,39 @@ static void ice_service_timer(struct
+>> timer_list *t)
+>>  	ice_service_task_schedule(pf);
+>>  }
+>>
+>> +/**
+>> + * ice_mdd_maybe_reset_vf - reset VF after MDD event
+>> + * @pf: pointer to the PF structure
+>> + * @vf: pointer to the VF structure
+>> + * @reset_vf_tx: whether Tx MDD has occurred
+>> + * @reset_vf_rx: whether Rx MDD has occurred
+>> + *
+>> + * Since the queue can get stuck on VF MDD events, the PF can be
+>> +configured to
+>> + * automatically reset the VF by enabling the private ethtool flag
+>> + * mdd-auto-reset-vf.
+>> + */
+>> +static void ice_mdd_maybe_reset_vf(struct ice_pf *pf, struct
+>> ice_vf *vf,
+>> +				   bool reset_vf_tx, bool reset_vf_rx) {
+>> +	struct device *dev = ice_pf_to_dev(pf);
+>> +
+>> +	if (!test_bit(ICE_FLAG_MDD_AUTO_RESET_VF, pf->flags))
+>> +		return;
+>> +
+>> +	/* VF MDD event counters will be cleared by reset, so print
+>> the event
+>> +	 * prior to reset.
+>> +	 */
+>> +	if (reset_vf_tx)
+>> +		ice_print_vf_tx_mdd_event(vf);
+>> +
+>> +	if (reset_vf_rx)
+>> +		ice_print_vf_rx_mdd_event(vf);
+>> +
+>> +	dev_info(dev, "PF-to-VF reset on PF %d VF %d due to MDD
+>> event\n",
+>> +		 pf->hw.pf_id, vf->vf_id);
+>> +	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY | ICE_VF_RESET_LOCK); }
+>> +
+>>  /**
+>>   * ice_handle_mdd_event - handle malicious driver detect event
+>>   * @pf: pointer to the PF structure
+>> @@ -1838,6 +1871,8 @@ static void ice_handle_mdd_event(struct
+>> ice_pf *pf)
+>>  	 */
+>>  	mutex_lock(&pf->vfs.table_lock);
+>>  	ice_for_each_vf(pf, bkt, vf) {
+>> +		bool reset_vf_tx = false, reset_vf_rx = false;
+>> +
+>>  		reg = rd32(hw, VP_MDET_TX_PQM(vf->vf_id));
+>>  		if (reg & VP_MDET_TX_PQM_VALID_M) {
+>>  			wr32(hw, VP_MDET_TX_PQM(vf->vf_id), 0xFFFF); @@ -
+>> 1846,6 +1881,8 @@ static void ice_handle_mdd_event(struct ice_pf
+>> *pf)
+>>  			if (netif_msg_tx_err(pf))
+>>  				dev_info(dev, "Malicious Driver Detection
+>> event TX_PQM detected on VF %d\n",
+>>  					 vf->vf_id);
+>> +
+>> +			reset_vf_tx = true;
+>>  		}
+>>
+>>  		reg = rd32(hw, VP_MDET_TX_TCLAN(vf->vf_id)); @@ -1856,6
+>> +1893,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+>>  			if (netif_msg_tx_err(pf))
+>>  				dev_info(dev, "Malicious Driver Detection
+>> event TX_TCLAN detected on VF %d\n",
+>>  					 vf->vf_id);
+>> +
+>> +			reset_vf_tx = true;
+>>  		}
+>>
+>>  		reg = rd32(hw, VP_MDET_TX_TDPU(vf->vf_id)); @@ -1866,6
+>> +1905,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+>>  			if (netif_msg_tx_err(pf))
+>>  				dev_info(dev, "Malicious Driver Detection
+>> event TX_TDPU detected on VF %d\n",
+>>  					 vf->vf_id);
+>> +
+>> +			reset_vf_tx = true;
+>>  		}
+>>
+>>  		reg = rd32(hw, VP_MDET_RX(vf->vf_id)); @@ -1877,18
+>> +1918,12 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+>>  				dev_info(dev, "Malicious Driver Detection
+>> event RX detected on VF %d\n",
+>>  					 vf->vf_id);
+>>
+>> -			/* Since the queue is disabled on VF Rx MDD
+>> events, the
+>> -			 * PF can be configured to reset the VF through
+>> ethtool
+>> -			 * private flag mdd-auto-reset-vf.
+>> -			 */
+>> -			if (test_bit(ICE_FLAG_MDD_AUTO_RESET_VF, pf-
+>>> flags)) {
+>> -				/* VF MDD event counters will be cleared by
+>> -				 * reset, so print the event prior to
+>> reset.
+>> -				 */
+>> -				ice_print_vf_rx_mdd_event(vf);
+>> -				ice_reset_vf(vf, ICE_VF_RESET_LOCK);
+>> -			}
+>> +			reset_vf_rx = true;
+>>  		}
+>> +
+>> +		if (reset_vf_tx || reset_vf_rx)
+>> +			ice_mdd_maybe_reset_vf(pf, vf, reset_vf_tx,
+>> +					       reset_vf_rx);
+>>  	}
+>>  	mutex_unlock(&pf->vfs.table_lock);
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c
+>> b/drivers/net/ethernet/intel/ice/ice_sriov.c
+>> index fb2e96db647e..a60dacf8942a 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+>> @@ -1861,6 +1861,24 @@ void ice_print_vf_rx_mdd_event(struct ice_vf
+>> *vf)
+>>  			  ? "on" : "off");
+>>  }
+>>
+>> +/**
+>> + * ice_print_vf_tx_mdd_event - print VF Tx malicious driver detect
+>> +event
+>> + * @vf: pointer to the VF structure
+>> + */
+>> +void ice_print_vf_tx_mdd_event(struct ice_vf *vf) {
+>> +	struct ice_pf *pf = vf->pf;
+>> +	struct device *dev;
+>> +
+>> +	dev = ice_pf_to_dev(pf);
+>> +
+>> +	dev_info(dev, "%d Tx Malicious Driver Detection events
+>> detected on PF %d VF %d MAC %pM. mdd-auto-reset-vfs=%s\n",
+>> +		 vf->mdd_tx_events.count, pf->hw.pf_id, vf->vf_id,
+>> +		 vf->dev_lan_addr,
+>> +		 test_bit(ICE_FLAG_MDD_AUTO_RESET_VF, pf->flags)
+>> +			  ? "on" : "off");
+>> +}
+>> +
+>>  /**
+>>   * ice_print_vfs_mdd_events - print VFs malicious driver detect
+>> event
+>>   * @pf: pointer to the PF structure
+>> @@ -1869,8 +1887,6 @@ void ice_print_vf_rx_mdd_event(struct ice_vf
+>> *vf)
+>>   */
+>>  void ice_print_vfs_mdd_events(struct ice_pf *pf)  {
+>> -	struct device *dev = ice_pf_to_dev(pf);
+>> -	struct ice_hw *hw = &pf->hw;
+>>  	struct ice_vf *vf;
+>>  	unsigned int bkt;
+>>
+>> @@ -1897,10 +1913,7 @@ void ice_print_vfs_mdd_events(struct ice_pf
+>> *pf)
+>>  		if (vf->mdd_tx_events.count != vf-
+>>> mdd_tx_events.last_printed) {
+>>  			vf->mdd_tx_events.last_printed =
+>>  							vf->mdd_tx_events.count;
+>> -
+>> -			dev_info(dev, "%d Tx Malicious Driver Detection
+>> events detected on PF %d VF %d MAC %pM.\n",
+>> -				 vf->mdd_tx_events.count, hw->pf_id, vf-
+>>> vf_id,
+>> -				 vf->dev_lan_addr);
+>> +			ice_print_vf_tx_mdd_event(vf);
+>>  		}
+>>  	}
+>>  	mutex_unlock(&pf->vfs.table_lock);
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.h
+>> b/drivers/net/ethernet/intel/ice/ice_sriov.h
+>> index 4ba8fb53aea1..8f22313474d6 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_sriov.h
+>> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.h
+>> @@ -58,6 +58,7 @@ void
+>>  ice_vf_lan_overflow_event(struct ice_pf *pf, struct
+>> ice_rq_event_info *event);  void ice_print_vfs_mdd_events(struct
+>> ice_pf *pf);  void ice_print_vf_rx_mdd_event(struct ice_vf *vf);
+>> +void ice_print_vf_tx_mdd_event(struct ice_vf *vf);
+>>  bool
+>>  ice_vc_validate_pattern(struct ice_vf *vf, struct
+>> virtchnl_proto_hdrs *proto);
+>>  u32 ice_sriov_get_vf_total_msix(struct pci_dev *pdev); @@ -69,6
+>> +70,7 @@ static inline  void ice_vf_lan_overflow_event(struct
+>> ice_pf *pf, struct ice_rq_event_info *event) { }  static inline
+>> void ice_print_vfs_mdd_events(struct ice_pf *pf) { }  static inline
+>> void ice_print_vf_rx_mdd_event(struct ice_vf *vf) { }
+>> +static inline void ice_print_vf_tx_mdd_event(struct ice_vf *vf) {
+>> }
+>>  static inline void ice_restore_all_vfs_msi_state(struct ice_pf
+>> *pf) { }
+>>
+>>  static inline int
+>> --
+>> 2.41.0
+> 
 
