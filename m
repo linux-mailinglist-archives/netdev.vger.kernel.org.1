@@ -1,152 +1,250 @@
-Return-Path: <netdev+bounces-84594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2134897930
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 21:49:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE79D897999
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 22:09:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C243AB2188A
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 19:49:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A0E8B2A015
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1852715538C;
-	Wed,  3 Apr 2024 19:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CF01553B5;
+	Wed,  3 Apr 2024 20:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="CaeWQ/MK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12olkn2071.outbound.protection.outlook.com [40.92.22.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C8756B70
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 19:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712173768; cv=none; b=MewkJJYIGZBTkr+oTsTYRN2chx67AXPYU5iUvWj+4lO7Ar3/lm0vCceO0QmwDiWGESayqfY3mOTvfdZDpBqD2lfYXiF9q1NihzqppI0QO6nzLNQBxdwSxOYExrQUPohYoi9ztGohe2+slam6l/GJ8CcIEQYuL4Xxxqs2YTghrcs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712173768; c=relaxed/simple;
-	bh=S8+yue+rB852p8fuZPutmAq6Cme265csBLMqTzDudjk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=hR/E8gLoyJ1tldpK2jkPQ4IJ8efP03Amf31My5HrU+QvwbOjq39TjYSR4igDEA9ePGGWMQ1kO50i5HTWS/M2UvJkAzRfpx+6tZVHjCP7xYkIkioFqrt0ha2IFHQZs8+9sRGvux7mP81VU5VFvdz0HWpr7LRmAz7WIih7dJAyKBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-368a360baabso1498115ab.3
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 12:49:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712173765; x=1712778565;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2mfNRdx+75D43YRA+L/zL3fO6iNsmFWVxkT1kh5NJ7A=;
-        b=TEoVSPTqEmgGKVE9WB1xODILMfGtmk6rDvg1b45ILAODWH85Sk1sSGUBQbTVyQBVxt
-         GRQ5iyMJjgo6c0nR7z0Ti1y79fPN8I3BIRPb8V/fWLog9YqGgyufdp6/EQ9daS3pHVCe
-         /tPJ5cA68CH4ETo4gQDLAXh4sdAHgpNYWj7sdGzj8E6bOLdNi4+dg6AmcxcqHv+mjrQj
-         9fOsUzN6e1r1Nc/k7wQb3mvXTh9lqq7hVX1zKB4bowHTt7jA/lLkuWvSmmD+D0nweGrJ
-         5C4alW35DoH85CUnVnxUELUzgCzBow29/332G/94gblHbHcN1NadBqvWOIuJxRk5/mQb
-         hE/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUmr2x6EH3E9FgBpuVsc3iVfHcDcmsGLujwLKdRNxpGvs0vOrBOZnBIeJIOx82SEZlhe0nKYLjcne5blHDc9ZhA2/ABYR+n
-X-Gm-Message-State: AOJu0Ywi22yJykxtFZ9FiRsqUEoiy4sbI9dqMm1a+FXpgrOINQI1kvtr
-	tnAwW2wu4PGtD54bGqroiO/begmEEKGRhUI9nMZMDCz68jBkza0nVAcj/Rht/9ALV2dUhUKm7GX
-	Dec44PipAVvkbgk4yUFf0qlDt0IZC6AuySQ2zFEn0wdN6gRsnnD21RVE=
-X-Google-Smtp-Source: AGHT+IG+m3YcJF5P64B5gx+rnOlS07BZ4G/7m78E4COx0Nqzhg3xgQxLBNZUIkdRsHOGshFE/bPTosEcgvPujLrO13NQdQuj/aGo
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9776154BE8;
+	Wed,  3 Apr 2024 20:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.22.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712174750; cv=fail; b=YfdaC+F9slyv7UPczkFKB6EXlKf98GtuBdWCVwwuVgCCiYdU3jKvoKNG52Dr0NA8+bjYTbsk0K2qPjVMHaOabLNjsxh+jhd4SSUJbZjzM9ZF5Y4KkFEWbILEFRuhb2XCYcJkF4V+7aY0mZvvhVMvzXf+DW8HCO7EdrPlH3X238Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712174750; c=relaxed/simple;
+	bh=6PRegIcfTnDyUmIFda++r8kJul5aUnLcVNrKnArbcuQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=iGRzwIZvdBBDKpZ339IhUxpIcIer/2zlX2ajxAjAHpOcd7MlIue6/3et41DsOgRL3swlOMuS39TCwNdZAcUhV36ExeNrIJn6gwVMfZ47D4uHBH/re3sceimcP6DGG9wFv5zFyFZ7BJq4ICux16IMm59xU6K5D8URecwJYHY8DR8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=CaeWQ/MK; arc=fail smtp.client-ip=40.92.22.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HrTFHCHtLTRLWHRfVYiaXKnOUjekv756nTBbQs+lcCXW4F2OpKh/xPRNR0nf3CBUZiLuNL8PRmCU/P92w2ztb57S3s8Bc8rKVIotSxoIZ641OFFLFfNipWm9dPi6HIZbzNz3SYrRdnHCb2+VWlcLXRyI36R9HVwIKwfidCWGh2IDnOGjmKEf0+RuMRB41HzhD9ViPVf5HBLPh3Km92br+5R3446gyt3cs/snVXw9LKTLphsp+lA9zrIsXKyxTVOP9VK1xqF5ZtMZpccyiO9XOrpRHhufdgTBkQOywtLiziWMv141MARBkWJnrXjbWBnMN4hWdiNH/c7ES2B8HW5H1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ggJQzvswQafjwqR4CsFKqtF+uFnYuxy8dPqpEwmXwic=;
+ b=H9gw7UTebIYjG5gmny8mzh8MRRXQmBP3Iuo+QKQCleAOizXrRHl71zeUvX10/nGtuG6P0SFiE4hdJOnU1+lVnWNXR7Y8ThjO60xSob7HOBcHY806TVB05YTj7ypH1YERNyErCGTXRtrPG90f4wK5OTA+CW14ZY9Rcozr2BxbXk8bMTWO9sxRTTEREyV+HQPzhMhFZIiT21Y9tMGoClYUxy1B2WhY+vkSfX8W8fU5hdxCz/tRNK/12WBNTKw5FW9YawE8z/Z1Rue2XKwkZzPiaSKz7Ef7YkjqB1gJmaCxbEfTpjljH1PpqZi7dtkUkNQ5/XwOflwBiNGraSCMNooMVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ggJQzvswQafjwqR4CsFKqtF+uFnYuxy8dPqpEwmXwic=;
+ b=CaeWQ/MKEQb+vYkHhv4Z4N+VW9jbBxcCQve3nJY36uDYAVP+67y94euYPE9xriE5P1hV8Wkl9XonrsqBXfcKbEql9CuGwz3ZEmwaatPqgApBh67yVf4EuykIdobzqeWbNYvyFjCznItcrTauEu4hxBRSQoJJNMYlZQWparZ6XFfq5fhUji16cOyU6V0+Qdgt5dmuxc/Gq67pg3lvomckwk7A2K5E8o3K0gfbSOTCZfly70kMA9vY0T4fzjs23uVMVlXngiJin4WNiST3e4sEC2KmySrDO/V/oBOLxnleTqChcYO2a5XN9ClLXZUjgAAS/7L+Lt2Hy7txeZZ1vF9x1A==
+Received: from LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:1ac::6)
+ by SJ2P220MB1216.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:589::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Wed, 3 Apr
+ 2024 20:05:46 +0000
+Received: from LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
+ ([fe80::57aa:102b:db4b:e05]) by LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
+ ([fe80::57aa:102b:db4b:e05%7]) with mapi id 15.20.7409.042; Wed, 3 Apr 2024
+ 20:05:40 +0000
+From: Min Li <lnimi@hotmail.com>
+To: richardcochran@gmail.com,
+	lee@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: [PATCH net 1/1] ptp: 82p33: move register definitions out of ptp folder
+Date: Wed,  3 Apr 2024 16:05:16 -0400
+Message-ID:
+ <LV3P220MB12022BEFC410BCBCD52DD891A03D2@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [eHg9lsO8pHOroNFQtd8UttRD5K7BkD1W]
+X-ClientProxiedBy: YQZPR01CA0025.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:86::22) To LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:408:1ac::6)
+X-Microsoft-Original-Message-ID: <20240403200516.7665-1-lnimi@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c562:0:b0:366:1f71:1f69 with SMTP id
- b2-20020a92c562000000b003661f711f69mr27753ilj.2.1712173765708; Wed, 03 Apr
- 2024 12:49:25 -0700 (PDT)
-Date: Wed, 03 Apr 2024 12:49:25 -0700
-In-Reply-To: <00000000000008cd6e0614deb1db@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000195eea0615368539@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] WARNING: locking bug in nci_close_device (2)
-From: syzbot <syzbot+e29c204bd2e3906fe69c@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3P220MB1202:EE_|SJ2P220MB1216:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9c7dfb67-80c8-4b0a-b73c-08dc54196fbc
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	xo2M2sfB9RRfvB56wKhA6zwS9jF11fZEqP/RABlOINKaL8qFhQ1QnLvU9D33dlRZhEv8k+8gwdirTKlC9RYeHAka9Rmo4ljOD8+bAYahek+R4AdwYf8sBz1VHQDfLbewC3WqFyQkCamntASe8zRrTPJwLQPv3B4Ga7DeqRqX0wAft8gtYcE/rj49GGeWsgFU7Rs+LGj992IGqUdNkPaRfZZN94lNWQsaYjj66/brsB+EMKIkAVRADEtpXZxt0IYBxS1pwrIEH4kpf55XYmyefviASiE7ei7pmJ8txJMqaAJvXMX9vre+nyd/YnogINPzBIU2GUb1p+nxKPa7DKM9lRQ2svygEa2SGvBwwEYjbMyYltxBzAZnQxBjh1hp7z4AITUbMSCggqHK7qR8v3YTff70JwcH5X/uQkzNObUVV47oC0mcMEWZ/yjvt3cs++5478emr7GEs1PDh2jsxvKOXjQJjpbYkZfMo7RSSgIcHO0omuU8vItSycZeuHijMj5o1YyGV4addWxljP4PjRMfrjSNjkqEVSvvAUfht38Dk1OzHHUeYnDhlk2QepNRYYuy
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?KYPfzkcEZ5bhc8dDpaK34KXm3PEZmCzkCtwrb6g7o/s8Hz32I7g/La0btXof?=
+ =?us-ascii?Q?AL/UE0axHeAkgE8iMRWG1dANp4RQuA+n3vQhpXkW+QlV3W50n+elnWLHUo01?=
+ =?us-ascii?Q?lFK/y0CP3S3utPE7xYCIqbvXuKbxk2eMjinkinyOYtSAxbAxrgSyk9gBn/VJ?=
+ =?us-ascii?Q?ZhJFxBXK3OITV+3nSoT+2kVFMVyqQKQqW+/hAPyF3d8uHFYJqI1JrDVPNiZQ?=
+ =?us-ascii?Q?Ugf++AN5/kLyAq9y8ROckUBLyXTZHOBlGorVfeiTVXzaaQeidprycLLDdx+o?=
+ =?us-ascii?Q?3BdEVqt1kDeJ+srRlSnWMLjnB4cHQMsF5uS02tYuC6YFStx226U8U1sahHFC?=
+ =?us-ascii?Q?r4pJnBG8qUbep5bsvGD7TqlFiu9N0f5p98RtrbZSjwDmIK1wdeJDT5SSfvA8?=
+ =?us-ascii?Q?bL31Ko+jW5AZJc4BEOFHVzH0/o7Z/8jMzEHWJZMYLh1I9zYn0+tNEaBYHSvN?=
+ =?us-ascii?Q?P4oPCW5mRrePu46NHzAzhBGXy3Ekz4Frir+AvSY6QcdeF5JQs76vF9PT2ChL?=
+ =?us-ascii?Q?MPxJ6heuM273nnCoit/spybS87EXDNF5TEpdNC4gGkk+6bEOdGpW6U9ZD1b8?=
+ =?us-ascii?Q?UVXtw4UHmToehrPY4+YWyVNcdMZRRpv1spky1QdMXp2tKu1C+nin1PmHVgmT?=
+ =?us-ascii?Q?80eeaisx8bIiJbC1jb+MZGvOL/2bkTe1u9mrYPejPLKfruw4scu/SSX24aLE?=
+ =?us-ascii?Q?MHCzX0oKUIvdgqcj9jJSBCAmDA6DNPzD1nvigHsWPSeuf/jyWTOX9e3T0GcQ?=
+ =?us-ascii?Q?6NQkgQ1KvbIothisNdXVh+l+mTtyd8geYnB1op9fntTBVjjI99nZBjxRZK3d?=
+ =?us-ascii?Q?3mos40u7tJ1kcETKlJuJYe1JWWwMFKBZ6S8A19mBdYnkRR/hpy5Egurb+7cT?=
+ =?us-ascii?Q?6sE+u5XCk/m4jP753xS4rdf7TevFaN2SPuDNDCf0l7FS2rCKyIulwSIFvGdK?=
+ =?us-ascii?Q?vtIzx/o6C/koDZGwBUDBDMNMrokkZEzxsT+zx5UUZO1+DatsC0Sm6/ik4Tq0?=
+ =?us-ascii?Q?GFgVEbDbZaGGgmR/h1r9wnOzxDh5XhX/tqbmxM0+1W7RMCMP86ccg4+JGnjy?=
+ =?us-ascii?Q?3OQMqxCATe7+Q3qteIWyfjjALHux0dlACpTi1Q745HenXYwQm+0AODlLBB7C?=
+ =?us-ascii?Q?zlxXmHUrsrd95mDIzKWaEvp5wJsKfM+8NKgghrhk2txGPHIssAeBpuhlzKJp?=
+ =?us-ascii?Q?nbMSCQ4twkVvo3RUEmQoPxzKVDMnBx3SY5xeL+KksxlQpyVkDPsM9Jnd3e0?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-3458f.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c7dfb67-80c8-4b0a-b73c-08dc54196fbc
+X-MS-Exchange-CrossTenant-AuthSource: LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 20:05:40.8461
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2P220MB1216
 
-syzbot has found a reproducer for the following issue on:
+From: Min Li <min.li.xe@renesas.com>
 
-HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14337af9180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4d90a36f0cab495a
-dashboard link: https://syzkaller.appspot.com/bug?extid=e29c204bd2e3906fe69c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1601053d180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1201b6d3180000
+Relocate register definitions so that other multi-functional
+devices can access.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f6c04726a2ae/disk-fe46a7dd.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/09c26ce901ea/vmlinux-fe46a7dd.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/134acf7f5322/bzImage-fe46a7dd.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e29c204bd2e3906fe69c@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(1)
-WARNING: CPU: 1 PID: 5095 at kernel/locking/lockdep.c:232 hlock_class kernel/locking/lockdep.c:232 [inline]
-WARNING: CPU: 1 PID: 5095 at kernel/locking/lockdep.c:232 check_wait_context kernel/locking/lockdep.c:4773 [inline]
-WARNING: CPU: 1 PID: 5095 at kernel/locking/lockdep.c:232 __lock_acquire+0x573/0x1fd0 kernel/locking/lockdep.c:5087
-Modules linked in:
-CPU: 1 PID: 5095 Comm: syz-executor108 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-RIP: 0010:hlock_class kernel/locking/lockdep.c:232 [inline]
-RIP: 0010:check_wait_context kernel/locking/lockdep.c:4773 [inline]
-RIP: 0010:__lock_acquire+0x573/0x1fd0 kernel/locking/lockdep.c:5087
-Code: 00 00 83 3d ce 9c 14 0e 00 75 23 90 48 c7 c7 80 c0 aa 8b 48 c7 c6 20 c3 aa 8b e8 38 24 e6 ff 48 ba 00 00 00 00 00 fc ff df 90 <0f> 0b 90 90 90 31 db 48 81 c3 c4 00 00 00 48 89 d8 48 c1 e8 03 0f
-RSP: 0018:ffffc9000442ef50 EFLAGS: 00010046
-RAX: de5230b6c68f0a00 RBX: 000000000000066c RCX: ffff888023db3c00
-RDX: dffffc0000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000014 R08: ffffffff8157cb22 R09: 1ffff110172a51a2
-R10: dffffc0000000000 R11: ffffed10172a51a3 R12: 0000000000000001
-R13: ffff888023db3c00 R14: 0000000000000014 R15: ffff888023db4798
-FS:  00007f4496c8a6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f4496d2ce90 CR3: 000000007824c000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- touch_wq_lockdep_map kernel/workqueue.c:3901 [inline]
- __flush_workqueue+0x1c9/0x1710 kernel/workqueue.c:3943
- nci_close_device+0x301/0x610 net/nfc/nci/core.c:567
- nci_dev_down+0x3b/0x50 net/nfc/nci/core.c:639
- nfc_dev_down+0x184/0x280 net/nfc/core.c:161
- nfc_genl_dev_down+0x84/0xd0 net/nfc/netlink.c:791
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f4496cf1a89
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 91 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f4496c8a208 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f4496d7b378 RCX: 00007f4496cf1a89
-RDX: 0000000000000000 RSI: 0000000020000780 RDI: 0000000000000005
-RBP: 00007f4496d7b370 R08: 0000000000000004 R09: 0000000000000000
-R10: 0000000000000008 R11: 0000000000000246 R12: 00007f4496d7b37c
-R13: 00007f4496d4819c R14: 00007ffc71898120 R15: 00007ffc71898208
- </TASK>
-
-
+Signed-off-by: Min Li <min.li.xe@renesas.com>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ drivers/ptp/ptp_idt82p33.h       | 27 -----------------------
+ include/linux/mfd/idt82p33_reg.h | 38 +++++++++++++++++++++++++++++---
+ 2 files changed, 35 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/ptp/ptp_idt82p33.h b/drivers/ptp/ptp_idt82p33.h
+index 6a63c14b6966..b4f3ee40389f 100644
+--- a/drivers/ptp/ptp_idt82p33.h
++++ b/drivers/ptp/ptp_idt82p33.h
+@@ -23,25 +23,6 @@
+ #define DDCO_THRESHOLD_NS	(5)
+ #define IDT82P33_MAX_WRITE_COUNT	(512)
+ 
+-#define PLLMASK_ADDR_HI	0xFF
+-#define PLLMASK_ADDR_LO	0xA5
+-
+-#define PLL0_OUTMASK_ADDR_HI	0xFF
+-#define PLL0_OUTMASK_ADDR_LO	0xB0
+-
+-#define PLL1_OUTMASK_ADDR_HI	0xFF
+-#define PLL1_OUTMASK_ADDR_LO	0xB2
+-
+-#define PLL2_OUTMASK_ADDR_HI	0xFF
+-#define PLL2_OUTMASK_ADDR_LO	0xB4
+-
+-#define PLL3_OUTMASK_ADDR_HI	0xFF
+-#define PLL3_OUTMASK_ADDR_LO	0xB6
+-
+-#define DEFAULT_PLL_MASK	(0x01)
+-#define DEFAULT_OUTPUT_MASK_PLL0	(0xc0)
+-#define DEFAULT_OUTPUT_MASK_PLL1	DEFAULT_OUTPUT_MASK_PLL0
+-
+ /**
+  * @brief Maximum absolute value for write phase offset in nanoseconds
+  */
+@@ -103,12 +84,4 @@ struct idt82p33 {
+ 	s64			tod_write_overhead_ns;
+ };
+ 
+-/* firmware interface */
+-struct idt82p33_fwrc {
+-	u8 hiaddr;
+-	u8 loaddr;
+-	u8 value;
+-	u8 reserved;
+-} __packed;
+-
+ #endif /* PTP_IDT82P33_H */
+diff --git a/include/linux/mfd/idt82p33_reg.h b/include/linux/mfd/idt82p33_reg.h
+index 1db532feeb91..15828e205fa8 100644
+--- a/include/linux/mfd/idt82p33_reg.h
++++ b/include/linux/mfd/idt82p33_reg.h
+@@ -22,6 +22,12 @@
+ #define DPLL1_OPERATING_MODE_CNFG 0x120
+ #define DPLL2_OPERATING_MODE_CNFG 0x1A0
+ 
++#define DPLL1_HOLDOVER_MODE_CNFG_LSB 0x12A
++#define DPLL1_HOLDOVER_MODE_CNFG_MSB 0x12B
++
++#define DPLL2_HOLDOVER_MODE_CNFG_LSB 0x1A9
++#define DPLL2_HOLDOVER_MODE_CNFG_MSB 0x1AA
++
+ #define DPLL1_HOLDOVER_FREQ_CNFG 0x12C
+ #define DPLL2_HOLDOVER_FREQ_CNFG 0x1AC
+ 
+@@ -43,7 +49,6 @@
+ #define REG_SOFT_RESET 0X381
+ 
+ #define OUT_MUX_CNFG(outn) REG_ADDR(0x6, (0xC * (outn)))
+-#define TOD_TRIGGER(wr_trig, rd_trig) ((wr_trig & 0xf) << 4 | (rd_trig & 0xf))
+ 
+ /* Register bit definitions */
+ #define SYNC_TOD BIT(1)
+@@ -101,7 +106,7 @@ enum hw_tod_trig_sel {
+ 	WR_TRIG_SEL_MAX = HW_TOD_WR_TRIG_SEL_MSB_TOD_CNFG,
+ };
+ 
+-/** @brief Enumerated type listing DPLL operational modes */
++/* Enumerated type listing DPLL operational modes */
+ enum dpll_state {
+ 	DPLL_STATE_FREERUN = 1,
+ 	DPLL_STATE_HOLDOVER = 2,
+@@ -109,7 +114,34 @@ enum dpll_state {
+ 	DPLL_STATE_PRELOCKED2 = 5,
+ 	DPLL_STATE_PRELOCKED = 6,
+ 	DPLL_STATE_LOSTPHASE = 7,
+-	DPLL_STATE_MAX
++	DPLL_STATE_MAX = DPLL_STATE_LOSTPHASE,
+ };
+ 
++/* firmware interface */
++struct idt82p33_fwrc {
++	u8 hiaddr;
++	u8 loaddr;
++	u8 value;
++	u8 reserved;
++} __packed;
++
++#define PLLMASK_ADDR_HI	0xFF
++#define PLLMASK_ADDR_LO	0xA5
++
++#define PLL0_OUTMASK_ADDR_HI	0xFF
++#define PLL0_OUTMASK_ADDR_LO	0xB0
++
++#define PLL1_OUTMASK_ADDR_HI	0xFF
++#define PLL1_OUTMASK_ADDR_LO	0xB2
++
++#define PLL2_OUTMASK_ADDR_HI	0xFF
++#define PLL2_OUTMASK_ADDR_LO	0xB4
++
++#define PLL3_OUTMASK_ADDR_HI	0xFF
++#define PLL3_OUTMASK_ADDR_LO	0xB6
++
++#define DEFAULT_PLL_MASK	(0x01)
++#define DEFAULT_OUTPUT_MASK_PLL0	(0xc0)
++#define DEFAULT_OUTPUT_MASK_PLL1	DEFAULT_OUTPUT_MASK_PLL0
++
+ #endif
+-- 
+2.39.2
+
 
