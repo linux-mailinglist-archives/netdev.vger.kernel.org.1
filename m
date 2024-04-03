@@ -1,65 +1,47 @@
-Return-Path: <netdev+bounces-84278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26367896476
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:20:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A29B89649E
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 08:35:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0C9F284B81
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 06:20:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01C2B2832CA
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 06:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E0F4E1CB;
-	Wed,  3 Apr 2024 06:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E25117BDD;
+	Wed,  3 Apr 2024 06:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MRUt4V79"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="U5njhQ60"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F37645;
-	Wed,  3 Apr 2024 06:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9448016426;
+	Wed,  3 Apr 2024 06:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712125245; cv=none; b=CZFmVEOQt5XbhYzm3OsldCgwyyHuvOUhedFBf+FRjSxNgQEiVh6ZuayV3CB2WdJrQz1PDRVDOY8Xxk7dw7XPnpUIvWrtkyrRwVG1wcYw68gVFJSs124iwP46l/Gl+GDRtITU85F3QdlwkyQlxfudUlrG6tnYq2WFHY5IoNbAX2o=
+	t=1712126149; cv=none; b=tsUzcS3GelzEh0o5tIeXyoKXkdZTuN4bMtK017/cXsR44G+OPjsB0TNXqJ8VCq3lSTIjrJ4XXDSKrjGS892bk8by4MLvtAl/tJxFIEj3h/lRXoFNB4gHoj9W1yJI2TPMaEE5g4mdw3RjNBnd4g3h9TfZ7omADW2aG1Aw1fP9KbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712125245; c=relaxed/simple;
-	bh=JpP/EDsMSxDuAaZti2qzwzDnAIQsAXrHMUrBgeEJ/Qk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mgj9PrJMh9yCa6iEXsf8u7RscUlMTqPbiszG9OAXaEJn5rwYKZth1fiFlaib9/iyGYekFBWSjU0PuSkC9b8JxCckpZVCQWt08j9PUFAbWVGd80n3LjHYl0OPAaoUdYInzLCtSF6j02QXqYXhGBM1h2OWJVVmd4e/0geLHfYGya8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MRUt4V79; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712125243; x=1743661243;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JpP/EDsMSxDuAaZti2qzwzDnAIQsAXrHMUrBgeEJ/Qk=;
-  b=MRUt4V79NBZ+BeHW+YxWuepAWZe9sZ1q9oc3AcphXNijuE44Al0B4LbO
-   27F85VsRS7J0fal203h+lQ3AqWRLxvnVTHciAfkAFqLpHVeJMzx4O3Lha
-   8zgDpqgnjB5ujSQhhkcmY+D/n70/byUBKsoW2G7KD+RB79X3InjMuQSl3
-   sN2SNH7olqajdgVbIQAszjMszpRHfUroebh87fJP5OO6pcs4ql3B2Mulo
-   3E5XBz80k41rK1I+r17mtSfOCozvLhKthRtqMFmWWzmMzqH3ZNP10Mfqt
-   bcZ7pHVMorLzijgMAJ8wTYedQXU3eecoWbZMor2aa2Xo40ei/IHNMlEti
-   w==;
-X-CSE-ConnectionGUID: RON7XNj6TDuF+Iei/Ti7vA==
-X-CSE-MsgGUID: McJnjiTdTs2c0XZvQvbxug==
-X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="7492471"
-X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
-   d="scan'208";a="7492471"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 23:20:43 -0700
-X-CSE-ConnectionGUID: TsR1QIiURJmbYigYH81a0Q==
-X-CSE-MsgGUID: jxr6We+rSRi5gdycU53sEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
-   d="scan'208";a="23023367"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.124.249.198]) ([10.124.249.198])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 23:20:40 -0700
-Message-ID: <81ba4f68-21b7-48bf-94ae-8cd72880fed6@intel.com>
-Date: Wed, 3 Apr 2024 14:20:36 +0800
+	s=arc-20240116; t=1712126149; c=relaxed/simple;
+	bh=K8UzjhHydr2Hb6RuF1ir1fFhF5U29UMEjP8cwaNN7cI=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Ac8iOs+ZSHNYSYVaTP8/IuiE/OZ1WpCAE8tBoAFo4dE+CVJHL5QC1k9TbY/zs+EMj30eeP43VTMEEJCIR++765jKkBgH8Gwt06dbq1zG6XjvLI0Xwxiko7Lw3dGi4YT6a3ZajPlkqbnxPTN9JT8etULtHre1wMehm8h/u+exlhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=U5njhQ60; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1712126138; h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type;
+	bh=Wso2cV7BV2xvQ8GUpk+yA1IZcHOWCxmjH1vPoD4/ztM=;
+	b=U5njhQ60vkw5rsirdIP3ybpog+59yIQkzMdioAZUU8vhoyoXwyDY56zFbyCY7r1IvSatKwuxQ9oHwiHH4uP+nSE6xFVf/yPkp0q9r0wg3L7GMwQcgTNXDfLhAofQ8jgwgViK7qHSRoMhD42Iz0BolZilAAzSqxdXly1r0o4jri0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W3qcjlv_1712126124;
+Received: from 30.221.129.220(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W3qcjlv_1712126124)
+          by smtp.aliyun-inc.com;
+          Wed, 03 Apr 2024 14:35:37 +0800
+Message-ID: <ae3ea4bc-4a9c-416e-a593-2885fea96ae5@linux.alibaba.com>
+Date: Wed, 3 Apr 2024 14:35:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,88 +49,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vhost-vdpa: change ioctl # for VDPA_GET_VRING_SIZE
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Jason Wang <jasowang@redhat.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- Adrian Hunter <adrian.hunter@intel.com>, Ian Rogers <irogers@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Kan Liang <kan.liang@linux.intel.com>
-References: <41c1c5489688abe5bfef9f7cf15584e3fb872ac5.1712092759.git.mst@redhat.com>
-Content-Language: en-US
-From: "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <41c1c5489688abe5bfef9f7cf15584e3fb872ac5.1712092759.git.mst@redhat.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+Subject: Re: [RFC PATCH net-next v5 00/11] net/smc: SMC intra-OS shortcut with
+ loopback-ism
+To: wenjia@linux.ibm.com, jaka@linux.ibm.com
+Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org
+References: <20240324135522.108564-1-guwen@linux.alibaba.com>
+In-Reply-To: <20240324135522.108564-1-guwen@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 4/3/2024 5:21 AM, Michael S. Tsirkin wrote:
-> VDPA_GET_VRING_SIZE by mistake uses the already occupied
-> ioctl # 0x80 and we never noticed - it happens to work
-> because the direction and size are different, but confuses
-> tools such as perf which like to look at just the number,
-> and breaks the extra robustness of the ioctl numbering macros.
->
-> To fix, sort the entries and renumber the ioctl - not too late
-> since it wasn't in any released kernels yet.
->
-> Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
-> Reported-by: Namhyung Kim <namhyung@kernel.org>
-> Fixes: 1496c47065f9 ("vhost-vdpa: uapi to support reporting per vq size")
-> Cc: "Zhu Lingshan" <lingshan.zhu@intel.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On 2024/3/24 21:55, Wen Gu wrote:
+> This patch set acts as the second part of the new version of [1] (The first
+> part can be referred from [2]), the updated things of this version are listed
+> at the end.
 
-Reviewed-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> Change log:
+> 
+> RFC v5->RFC v4:
+> - Patch #2: minor changes in description of config SMC_LO and comments.
+> - Patch #10: minor changes in comments and if(smc_ism_support_dmb_nocopy())
+>    check in smcd_cdc_msg_send().
+> - Patch #3: change smc_lo_generate_id() to smc_lo_generate_ids() and SMC_LO_CHID
+>    to SMC_LO_RESERVED_CHID.
+> - Patch #5: memcpy while holding the ldev->dmb_ht_lock.
+> - Some expression changes in commit logs.
+> 
 
-Thanks for the fix and sorry for the mess, I should read the whole header file to check whether
-the number is available.
-
-> ---
->
-> Build tested only - userspace patches using this will have to adjust.
-> I will merge this in a week or so unless I hear otherwise,
-> and afterwards perf can update there header.
->
->   include/uapi/linux/vhost.h | 15 ++++++++-------
->   1 file changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index bea697390613..b95dd84eef2d 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -179,12 +179,6 @@
->   /* Get the config size */
->   #define VHOST_VDPA_GET_CONFIG_SIZE	_IOR(VHOST_VIRTIO, 0x79, __u32)
->   
-> -/* Get the count of all virtqueues */
-> -#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
-> -
-> -/* Get the number of virtqueue groups. */
-> -#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
-> -
->   /* Get the number of address spaces. */
->   #define VHOST_VDPA_GET_AS_NUM		_IOR(VHOST_VIRTIO, 0x7A, unsigned int)
->   
-> @@ -228,10 +222,17 @@
->   #define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
->   					      struct vhost_vring_state)
->   
-> +
-> +/* Get the count of all virtqueues */
-> +#define VHOST_VDPA_GET_VQS_COUNT	_IOR(VHOST_VIRTIO, 0x80, __u32)
-> +
-> +/* Get the number of virtqueue groups. */
-> +#define VHOST_VDPA_GET_GROUP_NUM	_IOR(VHOST_VIRTIO, 0x81, __u32)
-> +
->   /* Get the queue size of a specific virtqueue.
->    * userspace set the vring index in vhost_vring_state.index
->    * kernel set the queue size in vhost_vring_state.num
->    */
-> -#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x80,	\
-> +#define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
->   					      struct vhost_vring_state)
->   #endif
-
+Hi, Jan. Do you have any comments on this version and should I post a new
+patch series without 'RFC'? Thank you.
 
