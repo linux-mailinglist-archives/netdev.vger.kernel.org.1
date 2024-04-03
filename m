@@ -1,208 +1,118 @@
-Return-Path: <netdev+bounces-84585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E3D5897817
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:22:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB084897868
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 20:43:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1D2F1F21903
-	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:22:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 284D41C26DAF
+	for <lists+netdev@lfdr.de>; Wed,  3 Apr 2024 18:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09877153826;
-	Wed,  3 Apr 2024 18:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA81B153BFB;
+	Wed,  3 Apr 2024 18:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="WS1lcdtt"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="D2vKj29w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0265015356B
-	for <netdev@vger.kernel.org>; Wed,  3 Apr 2024 18:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D599E153831;
+	Wed,  3 Apr 2024 18:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712168528; cv=none; b=jYAVI6jYqH41s1TWlI6/A9MbXV/VAR8GargijR6/QXPbam6iKam80WZeskubD2KHf8ODDcg2l5ULA/0uLg1XwZjVms+x2x3Wnm1Sl9UWI9nNULZZIpOhrvetLEFudQiF4HoMs/Gnb2XmtmVLQZYWZleEmFcfCfeQKv0pohfHIwU=
+	t=1712169750; cv=none; b=iuvLlmbDzgwtohMArepeJMdbFUZehLig4CQErbPjJDziEk3HdI/xHHEyNEUrp/z/jesqVner9HqxX59ySiKlb4FFuupIURyfYjIkoy4hNWD3R8/zpRL+miEh00biJdkjVeGCF5ufFGCVy69gukNm1AyH5XETOGOoEi1kwghs/kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712168528; c=relaxed/simple;
-	bh=mPQ6aDx/DzkRZiI7UzFAti6c8odqszdQXKvBp/uj47A=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=Cdmef2cr9k+i+Pz6PpRoCqfdM9kle4mZTD0YNGUowN7Lk4Tfms+3hmzlT89Obuin5EFpSnqnSdeTk8TgNPupXxj+Tp6fdSObaMNcPMigJ7RN0SprvL3/vZk5h4BCnzV7RCsnS9GTz8+tdFjZfrJaEAV1ziyAtDIc+lAn1k/Jldw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=WS1lcdtt; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1e0bec01232so863245ad.3
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 11:22:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1712168526; x=1712773326; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b+6ScChiC8zS3o9tbiOgcc1DiBxz6xvmMgS5MbEqCVk=;
-        b=WS1lcdttwByvBL81FDxCR9c9ohzcIBrEwgU8WykpdmMwgb72x4x1Vq5CwVOtTW6qEL
-         /U4s/ibFdFNF+gwkTlu+OXDesuZwLTPsVYF+24swBnSk5MMBbTtWAZ+q+cf3tdExrjbZ
-         Xh/oaV/2YgirVkzL/ngg1aBit6RKOFJ4KoOSZX4puydzTZtUKZ9CTiB/6PF+tgqsmgiF
-         pMvSysELXIGSPttBEbRvph76C3mGHB8D57OZ43vUyPiy21tE/Ae+30tvmSNjFtN4cJbY
-         siv6Cnf+vLkrBVeQOECUd0FJLZUqla/oU10n1LpCE1z814xlNsddY0i/c6Cdn909/jAi
-         fBZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712168526; x=1712773326;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b+6ScChiC8zS3o9tbiOgcc1DiBxz6xvmMgS5MbEqCVk=;
-        b=wdqhCd81AfFwBI0q6beD2Dgl+09+8FUzXiO8GOZBts+xSfU1GXKK5ItCnkKzLNtFWg
-         qO9MMTfTkmr1cUjgT1o6gjMn2kln89p/o/8AVtQCA7bXbCO/EjpWZITldMQMfHE0W6S8
-         Id/2j1RFSc6ZpgnQVy6DkOPjrM7/+N0dsiLdyx3lM4lqdB0GVkYW1rECB4aYBePuL5bD
-         URHxN0qsYsfRbdOGWdrPBpnbReUEnSb4Ic9R5k7DywTDmk+70u8GeVP8JwtFEg9mocZ3
-         08yhoFCBA1NGV+hS+fK+NP/IOz5Eedk/6RzJ6xu/hwR8O6NH5gnid45B+OE5g+dp7/ka
-         Ay5g==
-X-Forwarded-Encrypted: i=1; AJvYcCXqwfvZKtxT3mloYzdjuWbiyk30AnwZjOHX0VzG/RGA51EfHTmXBgxeZdSvLy/jtBnoTWioJukZKrqdCG+BVgq53FWIpc/c
-X-Gm-Message-State: AOJu0Yw9tHauUIhwuotE8HLjZnxvMAn8kbqLhaJUHdErd7zRXz8GIbwb
-	yOolGnDTqtKoxV/wlXCnvl+TUvDljzz0Fxro1qdz/Qf+V9jA58PA51uUun+qrF8=
-X-Google-Smtp-Source: AGHT+IFlUXGV4chig6oJvZqV4vGOgLfE+s5gAYd5D5SfvJ7gnZEYS1RqOGC2YxcHgRm7Hvepr5Q2zg==
-X-Received: by 2002:a17:902:c14b:b0:1e0:a7c5:b5a5 with SMTP id 11-20020a170902c14b00b001e0a7c5b5a5mr67760plj.37.1712168525743;
-        Wed, 03 Apr 2024 11:22:05 -0700 (PDT)
-Received: from localhost ([192.184.165.199])
-        by smtp.gmail.com with ESMTPSA id c2-20020a170902d48200b001dd652ef8d6sm13572476plg.152.2024.04.03.11.22.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 11:22:04 -0700 (PDT)
-Date: Wed, 03 Apr 2024 11:22:04 -0700 (PDT)
-X-Google-Original-Date: Wed, 03 Apr 2024 11:21:38 PDT (-0700)
-Subject:     Re: [PATCH v1 2/2] RISC-V: drop SOC_VIRT for ARCH_VIRT
-In-Reply-To: <20240305-stress-earflap-d7ddb8655a4d@spud>
-CC: linux-riscv@lists.infradead.org, Conor Dooley <conor@kernel.org>,
-  Conor Dooley <conor.dooley@microchip.com>, Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu,
-  linux-kernel@vger.kernel.org, brendan.higgins@linux.dev, davidgow@google.com, rmoar@google.com,
-  Jason@zx2c4.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
-  wireguard@lists.zx2c4.com, netdev@vger.kernel.org
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: Conor Dooley <conor@kernel.org>
-Message-ID: <mhng-170f61cd-c3b7-413b-8279-9d50d55dbebe@palmer-ri-x1c9>
+	s=arc-20240116; t=1712169750; c=relaxed/simple;
+	bh=+02UOlVxnZuD45S1Qu1BKfAhKN1vNMYWnQum/WOH5qs=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=UMd4Kmc5Hw+BpNrCCbyCvz/0EQYHUuwBFgYRPLbZ2ePnma83ym/rjWiFL+Cz2cjpI3h06OJaAIHr5A4qngzHeI9xUP/3vX7LorzGE753yACaDW+h3DqZQqZ472y00VQ7njDjb1s4V7NmmmnpacbcLCfJbOVOFOgWlJQEdD+SA2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=D2vKj29w; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1712169749; x=1743705749;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=+02UOlVxnZuD45S1Qu1BKfAhKN1vNMYWnQum/WOH5qs=;
+  b=D2vKj29w+GQ9TMdo87rkriEi8aO8VqBuyw/3yGUQmuyoIETHEyXzWQ18
+   Z0+pN/P/K8RBlkcxO1djchubxyjrcPO3XFy23Tu6da+OHYUGAnmaadY7/
+   +P/qAHF7UQEZdFlu9xwZKts1fkK/Irxa2HsJ8YRi6M3ov9fge8xKUttrD
+   9gc+AcgGIkjz0zkw7IF5iTzC+PGJRsCi2gxslS9+aC+ATCKu+0UQSQtEK
+   td7fiIvt4p57QYki0q2nzhTsH9TPEh09Jdwt8Cpfu3DXTWtXi4cxKz6UR
+   TJehXT5D0prCILlHmINMb8H3e2ca1IbNzEMWPL3Pm2rGSBI2bpmiQhfh0
+   A==;
+X-CSE-ConnectionGUID: dPETYnhxT5ynVvwtxb0tHQ==
+X-CSE-MsgGUID: B98+knGLQoOSJwIb/rapIw==
+X-IronPort-AV: E=Sophos;i="6.07,177,1708412400"; 
+   d="scan'208";a="19360444"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Apr 2024 11:42:28 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 3 Apr 2024 11:42:08 -0700
+Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 3 Apr 2024 11:42:05 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next 0/3] Add support for flower actions mirred and
+ redirect
+Date: Wed, 3 Apr 2024 20:41:41 +0200
+Message-ID: <20240403-mirror-redirect-actions-v1-0-c8e7c8132c89@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOWiDWYC/x3MQQqEMAxG4atI1gZqqaJeZXAh8VezsEpaBkG8+
+ 5RZvsX3HkowRaKxesjw1aRnLNHUFck+xw2sS2nyzgcXnOdDzU5jw6IGyTxLLiSxSOgGkbZv+46
+ Kvgyr3v/zhyIyR9yZpvf9AcbXIORzAAAA
+To: Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
+	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Daniel Machon <daniel.machon@microchip.com>
+X-Mailer: b4 0.14-dev
 
-On Tue, 05 Mar 2024 10:37:06 PST (-0800), Conor Dooley wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
->
-> The ARCH_ and SOC_ versions of this symbol have persisted for quite a
-> while now in parallel. Generated .config files from previous LTS kernels
-> should have both. Finally remove SOC_VIRT and update all config files
-> using it.
->
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
-> I had a 1.5 year old ack from Jason that I dropped due to the passage of
-> time.
->
-> CC: Paul Walmsley <paul.walmsley@sifive.com>
-> CC: Palmer Dabbelt <palmer@dabbelt.com>
-> CC: Albert Ou <aou@eecs.berkeley.edu>
-> CC: Brendan Higgins <brendan.higgins@linux.dev>
-> CC: David Gow <davidgow@google.com>
-> CC: Rae Moar <rmoar@google.com>
-> CC: "Jason A. Donenfeld" <Jason@zx2c4.com>
-> CC: Shuah Khan <shuah@kernel.org>
-> CC: linux-riscv@lists.infradead.org
-> CC: linux-kernel@vger.kernel.org
-> CC: linux-kselftest@vger.kernel.org
-> CC: kunit-dev@googlegroups.com
-> CC: wireguard@lists.zx2c4.com
-> CC: netdev@vger.kernel.org
-> ---
->  arch/riscv/Kconfig.socs                                    | 3 ---
->  arch/riscv/configs/defconfig                               | 2 +-
->  arch/riscv/configs/nommu_virt_defconfig                    | 2 +-
->  tools/testing/kunit/qemu_configs/riscv.py                  | 2 +-
->  tools/testing/selftests/wireguard/qemu/arch/riscv32.config | 2 +-
->  tools/testing/selftests/wireguard/qemu/arch/riscv64.config | 2 +-
->  6 files changed, 5 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/riscv/Kconfig.socs b/arch/riscv/Kconfig.socs
-> index e85ffb63c48d..dcbfb659839c 100644
-> --- a/arch/riscv/Kconfig.socs
-> +++ b/arch/riscv/Kconfig.socs
-> @@ -52,9 +52,6 @@ config ARCH_THEAD
->  	  This enables support for the RISC-V based T-HEAD SoCs.
->
->  config ARCH_VIRT
-> -	def_bool SOC_VIRT
-> -
-> -config SOC_VIRT
->  	bool "QEMU Virt Machine"
->  	select CLINT_TIMER if RISCV_M_MODE
->  	select POWER_RESET
-> diff --git a/arch/riscv/configs/defconfig b/arch/riscv/configs/defconfig
-> index ab3bab313d56..8d46a9137b1e 100644
-> --- a/arch/riscv/configs/defconfig
-> +++ b/arch/riscv/configs/defconfig
-> @@ -32,7 +32,7 @@ CONFIG_ARCH_SOPHGO=y
->  CONFIG_SOC_STARFIVE=y
->  CONFIG_ARCH_SUNXI=y
->  CONFIG_ARCH_THEAD=y
-> -CONFIG_SOC_VIRT=y
-> +CONFIG_ARCH_VIRT=y
->  CONFIG_SMP=y
->  CONFIG_HOTPLUG_CPU=y
->  CONFIG_PM=y
-> diff --git a/arch/riscv/configs/nommu_virt_defconfig b/arch/riscv/configs/nommu_virt_defconfig
-> index b794e2f8144e..de8143d1f738 100644
-> --- a/arch/riscv/configs/nommu_virt_defconfig
-> +++ b/arch/riscv/configs/nommu_virt_defconfig
-> @@ -24,7 +24,7 @@ CONFIG_EXPERT=y
->  CONFIG_SLUB=y
->  CONFIG_SLUB_TINY=y
->  # CONFIG_MMU is not set
-> -CONFIG_SOC_VIRT=y
-> +CONFIG_ARCH_VIRT=y
->  CONFIG_NONPORTABLE=y
->  CONFIG_SMP=y
->  CONFIG_CMDLINE="root=/dev/vda rw earlycon=uart8250,mmio,0x10000000,115200n8 console=ttyS0"
-> diff --git a/tools/testing/kunit/qemu_configs/riscv.py b/tools/testing/kunit/qemu_configs/riscv.py
-> index 12a1d525978a..c87758030ff7 100644
-> --- a/tools/testing/kunit/qemu_configs/riscv.py
-> +++ b/tools/testing/kunit/qemu_configs/riscv.py
-> @@ -13,7 +13,7 @@ if not os.path.isfile(OPENSBI_PATH):
->
->  QEMU_ARCH = QemuArchParams(linux_arch='riscv',
->  			   kconfig='''
-> -CONFIG_SOC_VIRT=y
-> +CONFIG_ARCH_VIRT=y
->  CONFIG_SERIAL_8250=y
->  CONFIG_SERIAL_8250_CONSOLE=y
->  CONFIG_SERIAL_OF_PLATFORM=y
-> diff --git a/tools/testing/selftests/wireguard/qemu/arch/riscv32.config b/tools/testing/selftests/wireguard/qemu/arch/riscv32.config
-> index 2fc36efb166d..2500eaa9b469 100644
-> --- a/tools/testing/selftests/wireguard/qemu/arch/riscv32.config
-> +++ b/tools/testing/selftests/wireguard/qemu/arch/riscv32.config
-> @@ -2,7 +2,7 @@ CONFIG_NONPORTABLE=y
->  CONFIG_ARCH_RV32I=y
->  CONFIG_MMU=y
->  CONFIG_FPU=y
-> -CONFIG_SOC_VIRT=y
-> +CONFIG_ARCH_VIRT=y
->  CONFIG_SERIAL_8250=y
->  CONFIG_SERIAL_8250_CONSOLE=y
->  CONFIG_SERIAL_OF_PLATFORM=y
-> diff --git a/tools/testing/selftests/wireguard/qemu/arch/riscv64.config b/tools/testing/selftests/wireguard/qemu/arch/riscv64.config
-> index dc266f3b1915..29a67ac67766 100644
-> --- a/tools/testing/selftests/wireguard/qemu/arch/riscv64.config
-> +++ b/tools/testing/selftests/wireguard/qemu/arch/riscv64.config
-> @@ -1,7 +1,7 @@
->  CONFIG_ARCH_RV64I=y
->  CONFIG_MMU=y
->  CONFIG_FPU=y
-> -CONFIG_SOC_VIRT=y
-> +CONFIG_ARCH_VIRT=y
->  CONFIG_SERIAL_8250=y
->  CONFIG_SERIAL_8250_CONSOLE=y
->  CONFIG_SERIAL_OF_PLATFORM=y
+================================================================================
+Add support for tc flower actions mirred and redirect.
+================================================================================
 
-Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+This series adds support for the two tc flower actions mirred and
+redirect. Both actions are implemented by means of a port mask and a
+mask mode. The mask mode controls how the mask is applied, and together
+they are used by the switch to make a forwarding decision. Both actions
+are configurable via the IS0 or IS2 VCAP's (ingress stage 0 and 2,
+respectively).
+
+Patch #1: adds support for 72-bit actions.
+Patch #2: adds support for tc flower mirred action.
+Patch #3: adds support for tc flower redirect action.
+
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+---
+Daniel Machon (3):
+      net: sparx5: support 72-bit VCAP actions
+      net: sparx5: add support for tc flower mirred action.
+      net: sparx5: add support for tc flower redirect action
+
+ .../ethernet/microchip/sparx5/sparx5_tc_flower.c   | 76 ++++++++++++++++++++++
+ drivers/net/ethernet/microchip/vcap/vcap_api.c     | 12 ++++
+ .../net/ethernet/microchip/vcap/vcap_api_client.h  |  2 +
+ 3 files changed, 90 insertions(+)
+---
+base-commit: 5fc68320c1fb3c7d456ddcae0b4757326a043e6f
+change-id: 20240402-mirror-redirect-actions-cc469cc58586
+
+Best regards,
+-- 
+Daniel Machon <daniel.machon@microchip.com>
+
 
