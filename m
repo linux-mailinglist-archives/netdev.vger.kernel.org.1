@@ -1,147 +1,125 @@
-Return-Path: <netdev+bounces-85015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480EA898FBB
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 22:37:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC03898FC2
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 22:43:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BFA71C226E2
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 20:37:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BED51F2366B
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 20:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E91913849C;
-	Thu,  4 Apr 2024 20:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835071384AE;
+	Thu,  4 Apr 2024 20:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1ImY5ow"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0A66FE26
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 20:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0158E1292CE;
+	Thu,  4 Apr 2024 20:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712263051; cv=none; b=Jfxp2pDPSruM+XCWHxNcKpyN4Fenm/XrBwILtUjJx37qM/BLfYeZrvPaZR7phphhf/1Wg5mHbc24ivrDqWv120QeS17p0KW27lXWQnjn495AfjxUcxDGHtfcShRi61A/YOoIs2yNqZtoth8JiEdUUHJO1OzF9bKNKMxmBakd5kg=
+	t=1712263423; cv=none; b=G6gQH0Xj6BSMEkJ5rMiDZE/j/DJwx2VA25ZzHCoekLnwpg+3iFL5MJFD3VA1H3Nt18muZRzii5XhL8cUWV7dpzAl3iAlzYD7zhABofnGy1HPUNmDyMLL4p+65fO4Pg9n4/00M5zU4aHoG8iBzPN0CihxA5TXmfzlmbJLy43cf9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712263051; c=relaxed/simple;
-	bh=A6HoS4GzLxsx7dqdRJSNn1EbWW7af9nHv+tk7XM/mQ8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Yya+JI4qJHGbCN6lAU50hp8Dn67afO+RNIbfp0BgBLBHuWoecWZ3h+8dmX1vYt/JkzJ8OZEyXDZTt6LeyodmISnvUasjcyHBrPquU4a2+bU+kjixvDBXPBH0Muw/jQlWf3Gt6XjpBEkhZnMzZkRVIlff0f9iRqYybPNU+iHPlt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3689a0abf52so12124065ab.1
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 13:37:29 -0700 (PDT)
+	s=arc-20240116; t=1712263423; c=relaxed/simple;
+	bh=oJzU1DchjJ7xBagvA/BSZcE6n68phH2iAnsMriy52xs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hx2Bfig2uWjUW022yHcoRHalzFCpyEXcv9Qb1gFaLFDZNQRiOouZWxHxCxEZCIFeOl5A2JqQDeDSw1kJMP/qEPyNztGa8qYApwwJN+iVosjFnYbLwSSWkmc4qXNtUf0vlvtVRdc7ieob1Giudp0vgAvWmmbw0NKHXZ9eazIuT1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1ImY5ow; arc=none smtp.client-ip=209.85.128.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-60a104601dcso16022327b3.2;
+        Thu, 04 Apr 2024 13:43:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712263421; x=1712868221; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OKmfpV6KrJ0i98Wh/0eskG0hyAllvgPjh1mOsK1t4hU=;
+        b=I1ImY5owmZqE6IhCJvRkMtcG9dxv8wOr4SVu739HRdzyDC4ZZn7Fv5i1oXlLaiyurv
+         unwgbO+aKznCtdpcFQ6VhEclpss9MRwC2WSuKjJYlm+XOtDkYsdCa0iRQGar1Bk6xAwu
+         kKZfHcXHHph0FO3SQx+5o2zDhELgdBq1aTXeMH48gaOVVNEaCqUZgjr14E4DJtLnWHRe
+         p/SzoQiqCnNd9W7clTWya74E+U6lnZb+DUuzVeIem01OnAKJWt7fqmnKfkCV4ywuNvt9
+         gWMeDFfuANj4ycGe/nuR9bbW1DBPcDd0MPQOOy6DpqT4BvwsAp7d1qr7uHp+gaaLqe+I
+         LZlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712263049; x=1712867849;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1712263421; x=1712868221;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hZzdwtDeS7G4wOc9so8v1UyHpIk8pMZqZRG7ETlZnlY=;
-        b=mD2+jc1N/F/eDS6JoG7CWDOT8kxiJ2rLOseVQQp8fG45GnFWBvzuC3MhFiqOsZGndw
-         pQZNeG389NPb05vrTRnb0z/YPO05nVDPM+P8wO1wMJMtFa3GYx3g9oJG/UQ1zTPT4AJ2
-         PTYubARvbJ0/FlaChel2fWqp1SUUUiqkSbSHoBfb4agFhINYrFBPVfSm9AbiA+ZcW4RK
-         nA5PSV1pwGpvpIx4N7Pyqc1RX8D4K5uuHujISQwm49Pio2A4cbNU59Pb8w7S+yu3mvRk
-         rt42QrctyeOW0XtPj1xnH3CfGU81kw+wDE2NgylbKWKHaWtvv7znjI67Ieolu4jiGrcb
-         3yGA==
-X-Forwarded-Encrypted: i=1; AJvYcCXl4WVPGQJFzqdMytCCewBKpWPbDAkbEGlCAjGGcQcJsr4o0sQ6dWYGDNabb3qnHAwgBbZ84HB2VynlECuHAg28KjO1WbDZ
-X-Gm-Message-State: AOJu0YyvKYd1f+3Kq9/QTnr7V6ZtX5ViY8k3yJFZgr5hxAD63zSpqS/p
-	k6+Dlg1xy2F4x5/yAAwAb5zWH/86/dHoRuBGxE3yYQCDVvVXGQnFNLjjAhEX3+e2dnF1aA/nPwE
-	3xLFATWXuNZdn61EdlWdeliNsPztrYQOxG9tmZL3b/3/ql3TpqOiqkZM=
-X-Google-Smtp-Source: AGHT+IHH0wpbFePpiE6nTTuUuVkf34Ui7sRdZXJxbGX8wsukrvd1m3qn/Cs15Ur/7yo7smMr53WGlvlbRkjCZysIoBKE1MXFjoqv
+        bh=OKmfpV6KrJ0i98Wh/0eskG0hyAllvgPjh1mOsK1t4hU=;
+        b=nnuvnQZ/+rPNYQe/IoQr6IEgZhTo8XIWhYJ74Qa8Ob4L/MKfbrw38/ttAkBW40wsR8
+         RTUBOCOhXrmgdCdV9dI6rS5rlpzxVpsB4e86+8nznTQM1DSKcrf+kCJebuiO9/R/4orA
+         mvfohnR9xysR0C1o1BFzNPtMhzn4asvNGcnp7VB8Dvg+QbA4RR5gOeo3j0DbPVrDx3LF
+         O8PrVkdiWllf+TDf37tZmbMPnhN/kuifw4TCgfSJ2IgGyCMhLHEV1fZaTZlyKXthQUO0
+         kazFBYSA+fnufl4EWXy7LkAQUG9lA4ziCrTzxMscZkapqfdNVisSiKwCmCjFlPDyEujC
+         JzqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNLDLvsNpt/+Dg8DvlUAj/80l899PP0y3X+/+MoZ+pU3JkkdCL30SOMRkx6/1xyNpQqenlIG9yG4azvWPeRPE64SlzzLKLF3b5EhEX
+X-Gm-Message-State: AOJu0Yww/lmYJGwRRhFC+TVY/e7tU6dbfjBiMnj4lkzbH98sfHetRa3r
+	NiRyNLAOJ8l+DvAwJuTJAGOLpbrX6PpWVLbFjMZmB2Lyd3ToBe/d
+X-Google-Smtp-Source: AGHT+IGDgKuMAKhqUpXoM3ovArMEGP+ceyMkb2rh8iiSQhZCVHS7jAbeIre6Po29dMVGSorIXuhCzQ==
+X-Received: by 2002:a0d:ca01:0:b0:615:1ba3:5732 with SMTP id m1-20020a0dca01000000b006151ba35732mr3527710ywd.11.1712263420902;
+        Thu, 04 Apr 2024 13:43:40 -0700 (PDT)
+Received: from [10.102.6.66] ([208.97.243.82])
+        by smtp.gmail.com with ESMTPSA id if3-20020a05690c690300b0061511220f16sm45006ywb.92.2024.04.04.13.43.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 13:43:39 -0700 (PDT)
+Message-ID: <b5f79571-b4a8-4f21-8dc8-e1aa11056a5d@gmail.com>
+Date: Thu, 4 Apr 2024 16:43:38 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:17cd:b0:368:9839:d21a with SMTP id
- z13-20020a056e0217cd00b003689839d21amr24501ilu.5.1712263049093; Thu, 04 Apr
- 2024 13:37:29 -0700 (PDT)
-Date: Thu, 04 Apr 2024 13:37:29 -0700
-In-Reply-To: <00000000000040a883061544c59f@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000cdb28b06154b4e94@google.com>
-Subject: Re: [syzbot] [netfilter?] KMSAN: uninit-value in nf_flow_offload_ip_hook
-From: syzbot <syzbot+b6f07e1c07ef40199081@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next 07/10] net: dsa: mv88e6xxx: Track bridge mdb
+ objects
+To: Vladimir Oltean <olteanv@gmail.com>,
+ Joseph Huang <Joseph.Huang@garmin.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ =?UTF-8?Q?Linus_L=C3=BCssing?= <linus.luessing@c0d3.blue>,
+ linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
+ <20240402001137.2980589-8-Joseph.Huang@garmin.com>
+ <20240402122343.a7o5narxsctrkaoo@skbuf>
+Content-Language: en-US
+From: Joseph Huang <joseph.huang.2024@gmail.com>
+In-Reply-To: <20240402122343.a7o5narxsctrkaoo@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
+Hi Vladimir,
 
-HEAD commit:    c85af715cac0 Merge tag 'vboxsf-v6.9-1' of git://git.kernel..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1123c615180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5112b3f484393436
-dashboard link: https://syzkaller.appspot.com/bug?extid=b6f07e1c07ef40199081
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16960955180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11cfc58d180000
+On 4/2/2024 8:23 AM, Vladimir Oltean wrote:
+> Can you comment on the feasibility/infeasibility of Tobias' proposal of:
+> "The bridge could just provide some MDB iterator to save us from having
+> to cache all the configured groups."?
+> https://lore.kernel.org/netdev/87sg31n04a.fsf@waldekranz.com/
+> 
+> What is done here will have to be scaled to many drivers - potentially
+> all existing DSA ones, as far as I'm aware.
+> 
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6741d41720b3/disk-c85af715.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1783406dda64/vmlinux-c85af715.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/53eeb4798ae1/bzImage-c85af715.xz
+I thought about implementing an MDB iterator as suggested by Tobias, but 
+I'm a bit concerned about the coherence of these MDB objects. In theory, 
+when the device driver is trying to act on an event, the source of the 
+trigger may have changed its state in the bridge already. If, upon 
+receiving an event in the device driver, we iterate over what the bridge 
+has at that instant, the differences between the worlds as seen by the 
+bridge and the device driver might lead to some unexpected results. 
+However, if we cache the MDB objects in the device driver, at least the 
+order in which the events took place will be coherent and at any give 
+time the state of the MDB objects in the device driver can be guaranteed 
+to be sane. This is also the approach the prestera device driver took.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b6f07e1c07ef40199081@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in nf_flow_skb_encap_protocol net/netfilter/nf_flow_table_ip.c:290 [inline]
-BUG: KMSAN: uninit-value in nf_flow_offload_lookup net/netfilter/nf_flow_table_ip.c:352 [inline]
-BUG: KMSAN: uninit-value in nf_flow_offload_ip_hook+0x79a/0x3e40 net/netfilter/nf_flow_table_ip.c:424
- nf_flow_skb_encap_protocol net/netfilter/nf_flow_table_ip.c:290 [inline]
- nf_flow_offload_lookup net/netfilter/nf_flow_table_ip.c:352 [inline]
- nf_flow_offload_ip_hook+0x79a/0x3e40 net/netfilter/nf_flow_table_ip.c:424
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xf2/0x3f0 net/netfilter/core.c:626
- nf_hook_ingress include/linux/netfilter_netdev.h:34 [inline]
- nf_ingress net/core/dev.c:5318 [inline]
- __netif_receive_skb_core+0x430b/0x6190 net/core/dev.c:5406
- __netif_receive_skb_one_core net/core/dev.c:5536 [inline]
- __netif_receive_skb+0xca/0xa00 net/core/dev.c:5652
- netif_receive_skb_internal net/core/dev.c:5738 [inline]
- netif_receive_skb+0x58/0x660 net/core/dev.c:5798
- tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1549
- tun_get_user+0x5566/0x69e0 drivers/net/tun.c:2002
- tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2048
- call_write_iter include/linux/fs.h:2108 [inline]
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xb63/0x1520 fs/read_write.c:590
- ksys_write+0x20f/0x4c0 fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:652
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x72/0x7a
-
-Uninit was created at:
- __alloc_pages+0x9d6/0xe70 mm/page_alloc.c:4598
- alloc_pages_mpol+0x299/0x990 mm/mempolicy.c:2264
- alloc_pages+0x1bf/0x1e0 mm/mempolicy.c:2335
- skb_page_frag_refill+0x2bf/0x7c0 net/core/sock.c:2921
- tun_build_skb drivers/net/tun.c:1679 [inline]
- tun_get_user+0x1258/0x69e0 drivers/net/tun.c:1819
- tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2048
- call_write_iter include/linux/fs.h:2108 [inline]
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xb63/0x1520 fs/read_write.c:590
- ksys_write+0x20f/0x4c0 fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:652
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x72/0x7a
-
-CPU: 0 PID: 5020 Comm: syz-executor108 Not tainted 6.9.0-rc2-syzkaller-00080-gc85af715cac0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-=====================================================
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Thanks,
+Joseph
 
