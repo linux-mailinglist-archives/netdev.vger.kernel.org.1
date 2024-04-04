@@ -1,111 +1,115 @@
-Return-Path: <netdev+bounces-84920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC6E898A91
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:01:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BC1F898A9B
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE95B1F277C3
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:01:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BF7D1F2AC4F
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:02:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FCD12C7F7;
-	Thu,  4 Apr 2024 15:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586FB12B159;
+	Thu,  4 Apr 2024 15:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qaVIpo7K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D0D1C698;
-	Thu,  4 Apr 2024 15:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5411D551;
+	Thu,  4 Apr 2024 15:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712242828; cv=none; b=QhnPNXCMOdcUAMyf3QWh+jqUGLgk3+Qalq6IfcMNf+OaVafKuCVMmBwKvzFOAYnOF6yVWGwZiXex8Yu15HiJk3VcW4kWm3B1pcL3NwDAbkEuhGDqsEFxVhx1PZM3SxJuoFQ3AF12/ewTL24VcqQx8GD5YGh70dlQizEeJTIjd58=
+	t=1712242919; cv=none; b=CNgwtdJYgSWk/6HCzfKI5PtHheMhPDt1V5N2Ec9sVxNtgK8sBXYw95dxhgxagGgjLmsGBt0fXScCxlW2AClr1uxgq2P7yjT62PrHPs86JzQx54qDTsU2uQfrEcmOO9AkITaXfcISHbZ+Wol4VdUHI06eJkV599ZjzsP1S2DhRWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712242828; c=relaxed/simple;
-	bh=36sh5N/jvpjq6jwl9uDLoGCYQeODe9Y4/Xxq15VmGxU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dy59jXNMz9JhiuMWrE135PJSW/TU6xCIjHdyUEqLAauhTBNnagdRuEOSOfhExGonh/0RD3yK5FFCm14Uo2jv9FBhT8KPvi6sgcVISjA1QAUrOBQ/iwvPWXflkY07Ph5VSbvKtvL4tCTEtELZOPtqLmv4ZbPayXbI3eSxXMvxC0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56b0af675deso1246728a12.1;
-        Thu, 04 Apr 2024 08:00:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712242825; x=1712847625;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xFdhNk5nsJDp0fP+o1jjxdXhOlujveYc4TGfWkAd6Tw=;
-        b=uEVuq165XJwzhECe733ybaBBv/yHZXeOxdezMghUt643+sfEjxa09Qv23obL4Sc5DV
-         PbmOVL4V/SgP/ddfASOrlYLgWe9zwAzaQ+0lztWgnIWFId/tylVIBimpN5hiIlZQPKvs
-         aHafTaAXBb3GjoKjy3HLfRubBsHbGASvlMQBFgrsTrNAYZrRcJ/Y7WaOFWKEaCSrAqIw
-         vykUypDxrw6T5LYNkZxr41L+sFuVHAC8caMBibKyBdKOmosisuxp5S+pAQJOd171wtGR
-         056iPoLRfh3BuerDRUbdjcqlxwP5dP5ksi8RfiWY/7A0hgXhBqJKOckcibAPgOZt8GXB
-         vqmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVlFhQuz3nKjTjko/rYnm+kLcgQdmVd1ViIXB7gX+KTbZ4KFCApbtlpI6Vj7UWSTkC/GW9Vf5bdAll3q6B/PDtmfUupXy8p
-X-Gm-Message-State: AOJu0Yz02GGbupYWJdZKpgdvf/nIfoaEYl3+Tly+ztNUOsWfrLh43n93
-	R5xVxvq2O85C4ETkLCgxJIvBEoMSc/iJaDvm3XAoCBTsn9lwxKF64LuexYdk
-X-Google-Smtp-Source: AGHT+IEDoWBCdzLzbTOd4u5qjKtS5pCSs5obUD272vBgv9E+Eua7zaoJAOzGHG7jCtPFrcFlOwfRVw==
-X-Received: by 2002:a50:d7c2:0:b0:56b:cfef:b2de with SMTP id m2-20020a50d7c2000000b0056bcfefb2demr6344edj.26.1712242824689;
-        Thu, 04 Apr 2024 08:00:24 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-120.fbsv.net. [2a03:2880:30ff:78::face:b00c])
-        by smtp.gmail.com with ESMTPSA id dh26-20020a0564021d3a00b0056e0b358e86sm1816264edb.97.2024.04.04.08.00.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 08:00:24 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next 3/3] net: dql: Optimize stall information population
-Date: Thu,  4 Apr 2024 07:59:32 -0700
-Message-ID: <20240404145939.3601097-4-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240404145939.3601097-1-leitao@debian.org>
-References: <20240404145939.3601097-1-leitao@debian.org>
+	s=arc-20240116; t=1712242919; c=relaxed/simple;
+	bh=m37CGWgGDzDmqqe0wk4eeU3R+P2kwq9EU6P+HBudePA=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=VOAfbJGO5BUgzB3qSD/o1HLUVN24QIMCpvD+jBGS9p/DlZyr8ruVzX1dz3LlPk218+wxqwTg/cXzKgQcHZiObEfDYgEoyIzs2/kCOYBY930KBwX6LtJRQoQHFG/MFrnrNBOrL1v4zvERcpfViEpFG53aHsi/9tqAMb56H/mFh90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qaVIpo7K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D121C433C7;
+	Thu,  4 Apr 2024 15:01:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712242918;
+	bh=m37CGWgGDzDmqqe0wk4eeU3R+P2kwq9EU6P+HBudePA=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=qaVIpo7KcwdH/2KGDFx1mUZTuMagPUnp8++R3YOCdX87zDybHhWnCcJC3PyNi2bW9
+	 BI7jfEPRj8JzPlIooc9+HkzESGwDGV6Y9ij240rM/UHWhO20Q+XTXJCTPeNzihyEbG
+	 TYRbqil/VAwNNwbUzFisJ6vOTzjsdxiX39pCHfqNImY5YpMsM3zV3vGydohSsx0veC
+	 Kik4rPAp1JZYjLXiu55enmnEQ6MnLLMfpUpbPN/UwffcReqM68sIBC+paK/A+EYTL6
+	 AeJMDxRdfWiHbkDTbZANN2Rsvjl38dw5kKQ5XVqVo4cDL+4hxI+lFqFr95RcUZOJCs
+	 dLhuGXRiUHz0g==
+From: Kalle Valo <kvalo@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: aleksander.lobakin@intel.com,  kuba@kernel.org,  davem@davemloft.net,
+  pabeni@redhat.com,  edumazet@google.com,  elder@kernel.org,
+  linux-arm-kernel@lists.infradead.org,
+  linux-mediatek@lists.infradead.org,  nbd@nbd.name,
+  sean.wang@mediatek.com,  Mark-MC.Lee@mediatek.com,  lorenzo@kernel.org,
+  taras.chornyi@plvision.eu,  Matthias Brugger <matthias.bgg@gmail.com>,
+  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+  quic_jjohnson@quicinc.com,  leon@kernel.org,
+  dennis.dalessandro@cornelisnetworks.com,  linux-kernel@vger.kernel.org,
+  netdev@vger.kernel.org,  bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v3 0/5] allocate dummy device dynamically
+References: <20240404114854.2498663-1-leitao@debian.org>
+	<87plv549ts.fsf@kernel.org> <Zg63iwvtTMlZSGcd@gmail.com>
+Date: Thu, 04 Apr 2024 18:01:52 +0300
+In-Reply-To: <Zg63iwvtTMlZSGcd@gmail.com> (Breno Leitao's message of "Thu, 4
+	Apr 2024 07:22:03 -0700")
+Message-ID: <87le5t41en.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-When Dynamic Queue Limit (DQL) is set, it always populate stall
-information through dql_queue_stall().  However, this information is
-only necessary if a stall threshold is set, stored in struct
-dql->stall_thrs.
+Breno Leitao <leitao@debian.org> writes:
 
-dql_queue_stall() is cheap, but not free, since it does have memory
-barriers and so forth.
+> Hello Kalle,
+>
+> On Thu, Apr 04, 2024 at 02:59:59PM +0300, Kalle Valo wrote:
+>> Breno Leitao <leitao@debian.org> writes:
+>> 
+>> > struct net_device shouldn't be embedded into any structure, instead,
+>> > the owner should use the private space to embed their state into
+>> > net_device.
+>> >
+>> > But, in some cases the net_device is embedded inside the private
+>> > structure, which blocks the usage of zero-length arrays inside
+>> > net_device.
+>> >
+>> > Create a helper to allocate a dummy device at dynamically runtime, and
+>> > move the Ethernet devices to use it, instead of embedding the dummy
+>> > device inside the private structure.
+>> >
+>> > This fixes all the network cases except for wireless drivers.
+>> >
+>> > PS: Due to lack of hardware, unfortunately all these patches are
+>> > compiled tested only.
+>> 
+>> BTW if it helps, and if you have an ath10k or ath11k patch already, I
+>> can run a quick test on real hardware.
+>
+> That would be very much appreciated! Thanks!
+>
+> I don't have them ready yet, but, I will work on them soon and I will
+> send it to you probably tomorrow.
+>
+> Should I send them as RFC, or as a regular patch, and we iterate over?
+> What would you prefer?
 
-Do not call dql_queue_stall() if there is no stall threshold set, and
-save some CPU cycles.
+A regular patch, like you did last time with ath11k, is fine for me. But
+please do add a lore or patchwork link to the depency patchset so that
+I'm testing with correct patches.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- include/linux/dynamic_queue_limits.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/dynamic_queue_limits.h b/include/linux/dynamic_queue_limits.h
-index 9980df0b7247..869afb800ea1 100644
---- a/include/linux/dynamic_queue_limits.h
-+++ b/include/linux/dynamic_queue_limits.h
-@@ -137,7 +137,9 @@ static inline void dql_queued(struct dql *dql, unsigned int count)
- 
- 	dql->num_queued += count;
- 
--	dql_queue_stall(dql);
-+	/* Only populate stall information if the threshold is set */
-+	if (READ_ONCE(dql->stall_thrs))
-+		dql_queue_stall(dql);
- }
- 
- /* Returns how many objects can be queued, < 0 indicates over limit. */
 -- 
-2.43.0
+https://patchwork.kernel.org/project/linux-wireless/list/
 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
