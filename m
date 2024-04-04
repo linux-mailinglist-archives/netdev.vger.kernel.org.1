@@ -1,245 +1,140 @@
-Return-Path: <netdev+bounces-84779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A003898506
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:32:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62273898530
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:39:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBE1528AB9C
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:32:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82DB51C22E86
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408716D1D8;
-	Thu,  4 Apr 2024 10:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC397F7D1;
+	Thu,  4 Apr 2024 10:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="npABHii0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ukVUDuhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DF3433AE
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 10:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712226728; cv=none; b=bFN1vyVBaSOZdi1oT0S5r15S1TIT32C0QlpYUkEsHxQsh6Gs7DC6kapGr7bfGuJ7bCWyAeU+d11MzmNYznr+RYlhybFhMhvpoClzzgzPdpjcl1pznDTB4qAKityrwQ3anzShR0ptAk8QvNnu9EJXAdK+vU9eHk95gm7ZKWVC3bo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712226728; c=relaxed/simple;
-	bh=TeJlJDqcGEZYxCd+qsv/45bcsJSawqiZZcu7w3xt4pU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S+vRU6cn9SsSBXqEEKXRc7WtFx11VS6DS/+4YkB/pOQ6MlA4XI7NsRmKW8zILSD1Xx6h/zC8i4C8IgIL91O7A7GEurDOoynOKT90nLaJHZY6E4aoWdiCq4bNl0B3aQHUco713e2eS3G1MO0jTuKan3Yw5QexwxWhnfxUfs912nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=npABHii0; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 38F142082B;
-	Thu,  4 Apr 2024 12:32:04 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 89lzlrYVdd7O; Thu,  4 Apr 2024 12:32:03 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 73EDB206BC;
-	Thu,  4 Apr 2024 12:32:03 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 73EDB206BC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1712226723;
-	bh=k3z5fMAu0mVZjR++M7Zw7yKEdt6OtBQLYGlJw9IuYiY=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=npABHii0P4I8cXXTL52ovSYax9oKM6r2dCEGGv/Urm7BIQCIOaRQ4acBKQfYeUkFu
-	 aWBfJVUGG54i/sjPX0Xv+0SoFpGagdYVoAxtDYcSGl8Z4lQM111FTW+sfoBAp93Aao
-	 1yt6npZbjTcXCXVLrppAjMmkx/Hm8g43tIBUaX8K0Qi8vfdZxajFcPLz5G121u9meO
-	 xncBUC1BS99YZSbN52ylZmUrpBnGagMP87V6rzjxg53+Hhxw8rAcCSxyOO1oNANo1h
-	 EoevLrfEvJuspdr4rytYHy/olfoaapDGKuQYSc186l9J2EWYexazIi9O2Crgzh6ht2
-	 +tXC/TM+8dySQ==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 65B5A80004A;
-	Thu,  4 Apr 2024 12:32:03 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 4 Apr 2024 12:32:03 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Thu, 4 Apr
- 2024 12:32:02 +0200
-Date: Thu, 4 Apr 2024 12:31:56 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Jakub Kicinski <kuba@kernel.org>, Steffen Klassert
-	<steffen.klassert@secunet.com>, "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Antony Antony
-	<antony.antony@secunet.com>, <devel@linux-ipsec.org>, Tobias Brunner
-	<tobias@strongswan.org>
-Subject: [PATCH net 1/1] xfrm: fix source address in icmp error generation
- from IPsec gateway
-Message-ID: <20ea2ab0472ecf2d1625dadb7ca0df39cf4fe0f5.1712226175.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
-References: <cover.1712226175.git.antony.antony@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5CC101E6;
+	Thu,  4 Apr 2024 10:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712227171; cv=fail; b=lci6fcNnTQnXyge0YHnHNZEZzIIu+NLlRoPLod8BUaA1UyeQguunjrz8QBB3mFLmT2EWkNxg2ImQ5+ZZJy/Ma936tyL9ABg7W4UOFHW7G1UCYWjGnk9H9BcRPivjMmEqEDuIoisxOVBQgO66JbYn1S6XIiaEM2YVha+s3i3FnBM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712227171; c=relaxed/simple;
+	bh=KEXa+FqIywG8GlqNCLNnTWg4rJLprk4KRDELpBlsV40=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=Kgr4UDmnGWdnBrOTdCBJyugzxF74kI3ZUhU0vH7Ba5Dve2bu4CCGgfbCRtPCjq7hMfwzjz5+FaY+yFNiI5TT6Ni8hwFV5AqWK42oJLys4PHW5Mr8zBIYB51vedrc+HItAZhshfLIjxp46oHHldBJKHmvJ46T25vmufIctQ7gWi8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ukVUDuhf; arc=fail smtp.client-ip=40.107.236.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JAoxAqBfshCm/AOShtqPH03RNsPsI2mQWn9Gq9aRIs/0SDILYgij+S04V6acXmwEOoo8ZPBoQ4Xv6HnGpHc9hSDpAF48gOQwg6AcO5b1WHI1VoWwECDhc8/eY3rJyTP+S4u8sNAgj/I1kmxN0nVIMvxt2+WqcYWEL6y8GpAFFuqT6/oDLISvCqO7SMxIJmJs2XvVxZgWOrgCCWKGO+SSUKrsc8Asnlf62oF9GvCDRfR+DVzfy87cnrGmCeGkrR887XRVXc3M+Qyny4VAmbXzAscVpjeyIXrXF19ggMq3FyZ3Oe9bZVZ8Loaz78y22CghFqMLatcDCSyVS5Rh0O6eaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RaF1k1r87oA87FmjpM2v5zolwzmM/4ZzqpOZ5rIYXQY=;
+ b=izDtenRu3B8WxCvOVmGfkhAjXEqiDGyqCKGs7eF5x9WfrN3MY7ZPwZODLzh//ZiPDZ6Ww3jUmyL4zaTz1/lRKXGFwVADQxDj0Q9eKcqTwbTiqSi0S3faAAicZQ2oTK3G12Pw9QftAYCSM4zxfLUO8vhJXjAfwD1wMQZIsVp2CcxxA9aPN4MYnjFWrS38PbOxxtnPn+0x1Sn0bgfDTkcZ4uwsUBQeJWf0/bijRZO5a9Puf+KUWYcyPFDeQuco23g67SGRbaFZggy9p6vgPPT2lOsSJkrHu7wD9ybhf1aeLeKYq3yRoU8v+4TrxVXqpZsAecvAIpVTxLp1rKTGdMoHpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RaF1k1r87oA87FmjpM2v5zolwzmM/4ZzqpOZ5rIYXQY=;
+ b=ukVUDuhfV+ZlFIT0QWG01uZW72TH4qr1F1lrg7r0k1VPw/2+d0PaLyW+XXNm7k8OzoCIQBlEMsp2ctLNWeCwngWUdG47ExgK8xWPqIQYQMb1+LM5wi6Y74Pku/lL4gNNmeqZ8FT5Bmty80NwxSOQcD3ozXOWftBekKyjGaIWNJ9U0iniqKeqse1fSJkgERZ/7pQN6cnERwl4XmNHs0GOj14Pm7lDnoWsjtZcTCNT/nPNAdtxKM1hv6kghrhyVuQ+sSTLAIG3qpIa80mKKo/P6mhcBqnAHfs1LpIoDRAs3InUzoztUWtFS4woVIlP8hsrbeNL/hiGlnnjD712eKNINg==
+Received: from MW2PR16CA0055.namprd16.prod.outlook.com (2603:10b6:907:1::32)
+ by SN7PR12MB6813.namprd12.prod.outlook.com (2603:10b6:806:267::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 4 Apr
+ 2024 10:39:26 +0000
+Received: from MWH0EPF000989E8.namprd02.prod.outlook.com
+ (2603:10b6:907:1:cafe::f6) by MW2PR16CA0055.outlook.office365.com
+ (2603:10b6:907:1::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26 via Frontend
+ Transport; Thu, 4 Apr 2024 10:39:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MWH0EPF000989E8.mail.protection.outlook.com (10.167.241.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Thu, 4 Apr 2024 10:39:26 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 4 Apr 2024
+ 03:39:02 -0700
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 4 Apr
+ 2024 03:38:58 -0700
+References: <20240403023426.1762996-1-kuba@kernel.org>
+ <20240403023426.1762996-2-kuba@kernel.org>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <shuah@kernel.org>, <sdf@google.com>,
+	<donald.hunter@gmail.com>, <linux-kselftest@vger.kernel.org>,
+	<petrm@nvidia.com>
+Subject: Re: [PATCH net-next v2 1/7] netlink: specs: define ethtool header
+ flags
+Date: Thu, 4 Apr 2024 12:38:33 +0200
+In-Reply-To: <20240403023426.1762996-2-kuba@kernel.org>
+Message-ID: <87le5th0ox.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cover.1712226175.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E8:EE_|SN7PR12MB6813:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66d00275-60a9-4303-02cc-08dc54938013
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	7BU4onPyTpVSekv/sdAnioviimtghxylfzz/cFMocexMTrZexl7taQ4q3ZaSqx6cx6DzJNVlMhBGznOAWdktbWpZYzoVS5UvAKOZxcg2jGIHLz5tM1c/Hfx4u2M0SF6jK1v+6HAY5/R9E2Nw+Y9rR5H1GOIGyBYx58Yd1WsAcrsx8HLN0yROxo3Ueprr9CAE6EoeUGV3pFQR1cTcprqLklJqxoChqC/RjQ56+aPZVY18MUl25WVkxw1M7eSdDClSdiez77/ZYSI1H4a1OfPvz8ko5l8VL039RO2C+l23ARhG7dPC702GwmtbarCNHZYHICJlkUceVRJkcmM81eAMAzKciejmgPrPXZ6/tH1XCpMUtNvcijBaRigNj9dbt287GgVq2GMmRMCUnXLmOufDF/2J/Q6cZ2Z3HZErUnvKL9Jk3qu3OECQ3mspulYb5Z/9/n5YrcB7AavEt/ZDTc4nYDe6zdMRK4dAjNO7fTGvb2ctECTeJUd/8bUZjuXw8zZOXUdnH2oFwoF/AsRElpZpnFmr4Hi//WhH/H8BHVv9xHwguiYHrU92atQct9k1j27E0blklVW+JAVa9/mZlNiDLeikebqO6pkK1hi/BKgTipzodfUUAxzSFs5eq4LJ8F8q5AHlDMp1UrjyuD/wCIoDlsgqIuX14IsnCZ2RiYkHtLLVTpEYDV6V9XA1KQzoV+AgXtPSsyr6ma8lGB9+Ii4w1oMvMZw9Vfxzfzn8O0OrMh3wbNsa1sJxdXJgzhwE2Q7w
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 10:39:26.4485
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66d00275-60a9-4303-02cc-08dc54938013
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000989E8.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6813
 
-When enabling support for XFRM lookup using reverse ICMP payload, we
-have identified an issue where the source address of the IPv4, e.g.,
-"Destination Host Unreachable" message, is incorrect. The error message
-received by the sender appears to originate from a 
-non-existing/unreachable host.  IPv6 seems to behave correctly; respond 
-with an existing source address from the gateway.
 
-Here is example of incorrect source address for ICMP error response.
-When sending a ping to an unreachable host, the sender would receive an
-ICMP unreachable response with a fake source address. Rather the address
-of the host that generated ICMP Unreachable message. This is confusing
-and incorrect.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Example:
-ping -W 9 -w 5 -c 1 10.1.4.3
-PING 10.1.4.3 (10.1.4.3) 56(84) bytes of data.
-From 10.1.4.3 icmp_seq=1 Destination Host Unreachable
+> When interfacing with the ethtool commands it's handy to
+> be able to use the names of the flags. Example:
+>
+>     ethnl.pause_get({"header": {"dev-index": cfg.ifindex,
+>                                 "flags": {'stats'}}})
+>
+> Note that not all commands accept all the flags,
+> but the meaning of the bits does not change command
+> to command.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Notice : packet has the source address of the ICMP "Unreachable host!"
-
-This issue can be traced back to commit
-415b3334a21a ("icmp: Fix regression in nexthop resolution during replies.")
-which introduced a change that copied the source address from the ICMP
-payload.
-
-This commit would force to use source address from the gatway/host.
-The ICMP error message source address correctly set from the host.
-
-After fixing:
-ping -W 5 -c 1 10.1.4.3
-PING 10.1.4.3 (10.1.4.3) 56(84) bytes of data.
-From 10.1.3.2 icmp_seq=1 Destination Host Unreachable
-
-Here is an snippt to reporduce the issue.
-
-export AB="10.1"
-for i in 1 2 3 4 5; do
-        h="host${i}"
-        ip netns add ${h}
-        ip -netns ${h} link set lo up
-        ip netns exec ${h} sysctl -wq net.ipv4.ip_forward=1
-        if [ $i -lt 5 ]; then
-                ip -netns ${h} link add eth0 type veth peer name eth10${i}
-                ip -netns ${h} addr add "${AB}.${i}.1/24" dev eth0
-                ip -netns ${h} link set up dev eth0
-        fi
-done
-
-for i in 1 2 3 4 5; do
-        h="host${i}"
-        p=$((i - 1))
-        ph="host${p}"
-        # connect to previous host
-        if [ $i -gt 1 ]; then
-                ip -netns ${ph} link set eth10${p} netns ${h}
-                ip -netns ${h} link set eth10${p} name eth1
-                ip -netns ${h} link set up dev eth1
-                ip -netns ${h} addr add "${AB}.${p}.2/24" dev eth1
-        fi
-        # add forward routes
-        for k in $(seq ${i} $((5 - 1))); do
-                ip -netns ${h} route 2>/dev/null | (grep "${AB}.${k}.0" 2>/dev/null) || \
-                ip -netns ${h} route add "${AB}.${k}.0/24" via "${AB}.${i}.2" 2>/dev/nul
-        done
-
-        # add reverse routes
-        for k in $(seq 1 $((i - 2))); do
-                ip -netns ${h} route 2>/dev/null | grep "${AB}.${k}.0" 2>/dev/null || \
-                ip -netns ${h} route add "${AB}.${k}.0/24" via "${AB}.${p}.1" 2>/dev/nul
-        done
-done
-
-ip netns exec host1 ping -q -W 2 -w 1 -c 1 10.1.4.2 2>&1>/dev/null && echo "success 10.1.4.2 reachable" || echo "ERROR"
-ip netns exec host1 ping -W 9 -w 5 -c 1 10.1.4.3 || echo  "note the source address of unreachble of gateway"
-ip -netns host1 route flush cache
-
-ip netns exec host3 nft add table inet filter
-ip netns exec host3 nft add chain inet filter FORWARD { type filter hook forward priority filter\; policy drop \; }
-ip netns exec host3 nft add rule inet filter FORWARD counter ip protocol icmp drop
-ip netns exec host3 nft add rule inet filter FORWARD counter ip protocol esp accept
-ip netns exec host3 nft add rule inet filter FORWARD counter drop
-
-ip -netns host2 xfrm policy add src 10.1.1.0/24 dst 10.1.4.0/24 dir out \
-        flag icmp tmpl src 10.1.2.1 dst 10.1.3.2 proto esp reqid 1 mode tunnel
-
-ip -netns host2 xfrm policy add src 10.1.4.0/24 dst 10.1.1.0/24 dir in \
-        tmpl src 10.1.3.2 dst 10.1.2.1 proto esp reqid 2 mode tunnel
-
-ip -netns host2 xfrm policy add src 10.1.4.0/24 dst 10.1.1.0/24 dir fwd \
-        flag icmp tmpl src 10.1.3.2 dst 10.1.2.1 proto esp reqid 2 mode tunnel
-
-ip -netns host2 xfrm state add src 10.1.2.1 dst 10.1.3.2 proto esp spi 1 \
-        reqid 1 replay-window 1  mode tunnel aead 'rfc4106(gcm(aes))' \
-        0x1111111111111111111111111111111111111111 96 \
-        sel src 10.1.1.0/24 dst 10.1.4.0/24
-
-ip -netns host2 xfrm state add src 10.1.3.2 dst 10.1.2.1 proto esp spi 2 \
-        flag icmp reqid 2 replay-window 10 mode tunnel aead 'rfc4106(gcm(aes))' \
-        0x2222222222222222222222222222222222222222 96
-
-ip -netns host4 xfrm policy add src 10.1.4.0/24 dst 10.1.1.0/24 dir out \
-        flag icmp tmpl src 10.1.3.2 dst 10.1.2.1 proto esp reqid 1 mode tunnel
-
-ip -netns host4 xfrm policy add src 10.1.1.0/24 dst 10.1.4.0/24 dir in \
-        tmpl src 10.1.2.1 dst 10.1.3.2 proto esp reqid 2  mode tunnel
-
-ip -netns host4 xfrm policy add src 10.1.1.0/24 dst 10.1.4.0/24 dir fwd \
-                flag icmp tmpl src 10.1.2.1 dst 10.1.3.2 proto esp reqid 2 mode tunnel
-
-ip -netns host4 xfrm state add src 10.1.3.2 dst 10.1.2.1 proto esp spi 2 \
-        reqid 1 replay-window 1 mode tunnel aead 'rfc4106(gcm(aes))' \
-        0x2222222222222222222222222222222222222222 96
-
-ip -netns host4 xfrm state add src 10.1.2.1 dst 10.1.3.2 proto esp spi 1 \
-        reqid 2 replay-window 20 flag icmp  mode tunnel aead 'rfc4106(gcm(aes))' \
-        0x1111111111111111111111111111111111111111 96 \
-        sel src 10.1.1.0/24 dst 10.1.4.0/24
-
-ip netns exec host1 ping -W 5 -c 1 10.1.4.2 2>&1 > /dev/null && echo ""
-ip netns exec host1 ping -W 5 -c 1 10.1.4.3 || echo "note source address of gateway 10.1.3.2"
-
-Again before the fix
-ping -W 5 -c 1 10.1.4.3
-From 10.1.4.3 icmp_seq=1 Destination Host Unreachable
-
-After the fix
-From 10.1.3.2 icmp_seq=1 Destination Host Unreachable
-
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
- net/ipv4/icmp.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index e63a3bf99617..bec234637122 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -555,7 +555,6 @@ static struct rtable *icmp_route_lookup(struct net *net,
- 					    XFRM_LOOKUP_ICMP);
- 	if (!IS_ERR(rt2)) {
- 		dst_release(&rt->dst);
--		memcpy(fl4, &fl4_dec, sizeof(*fl4));
- 		rt = rt2;
- 	} else if (PTR_ERR(rt2) == -EPERM) {
- 		if (rt)
---
-2.30.2
-
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
