@@ -1,239 +1,127 @@
-Return-Path: <netdev+bounces-84717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD9589821E
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:21:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E9AF89822F
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:28:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBC141C23F57
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 07:21:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4CB3281EE2
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 07:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7A558139;
-	Thu,  4 Apr 2024 07:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3639C59B7F;
+	Thu,  4 Apr 2024 07:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msP0Oqe2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e0nv9o2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE335675F;
-	Thu,  4 Apr 2024 07:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493F859B40
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 07:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712215303; cv=none; b=ezrS8Q0AlQeISq61wh9mqIuL/7PBqd53Di96DIzO6kMtLznFISKhrAwf62xpab2Hl7lhWIHxXQOcKskLsocC+5kb5O7KQHrFsnT+s4rJYSjttwwEhwEEtiUgHLcbU/kn8wxYqx8N0eC0gwPVGSLZ/q4Q3vTG3tigg7mxq4E+7J0=
+	t=1712215675; cv=none; b=neELXHnjhLZVgiOr0IvmW+mXWdumRlUbkVXWDBoDFGZ+qWv00x3CUzvqSBMVKNnoWtrcMmlfU8yDIITczd9m7LoB+MYx8+8S4L1qRionHJwoYD8voofwvnHAoIcIN36gB9r0nWWREB2YuaPdB99qS5mraHOh6XBKA9ZnUc4bHS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712215303; c=relaxed/simple;
-	bh=oZv1Wez/4+bqsLmNS3FVMB20C3FjVPxQSLIEYsk1Hlc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CMxMyptOu7x9QcsquV8O5DC2ADyVKW1VcocrHiLAw0X5M30ivpxS/2jg9003yHNOdmZ//qy61fwtO1HtLloNkshgVdVGWK6rv6oH48/BbI1Q1H1nBMRhurm5uGMLERyvZDXjnrAD0Fg8okS2l6ZWQpUzMApWRIMP862stxKpVFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=msP0Oqe2; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1e27c303573so4601105ad.3;
-        Thu, 04 Apr 2024 00:21:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712215301; x=1712820101; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oGOhlg//3F0S9mUwjG1Z9GiuJGTOaECWxukxpME741g=;
-        b=msP0Oqe2zagH8e616yVOVH3nfLZEqoidHLqDHaGEl23WuDyoUw6Jdvt6nys6HCExyq
-         MDgPpwmSu9zx3s36J7xqHQT8pXvag3hLlFKrYhNQZ0P5hreHT9zM+FXnf1xVjCvuI19P
-         cJk/ovbLA06KhUqsjP9fGpZbnpbEq5wz/h3KcOCqao09O164fy2VURG2nZthUGkOvMDz
-         mIgSnvMSXqlVmB7jBxzraYNV4kbItaHFAtEiDX9/hDVaztf6LLEQP8I5ZOMvMq9clBuY
-         n0Ec/I3Qx1OUZMFZo4EZDtiYCTyWIq54iik651OjONshBNDm+Aa4Z8BA23tMYu2MXInP
-         LF/g==
+	s=arc-20240116; t=1712215675; c=relaxed/simple;
+	bh=GSH6m/6gmzpdE4ilkVc5O/E3ikW4/Ya8/okCEmiU6Qg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IF2J/RqXi+aSVYXJuZHOLUjmQEmxFGHYEn25f00i47SSgpspwfmmTWYHRbKoLcPKVZWTrqv+CumKhoXOVj0Rp0puWV6oVlTnOMuST8EZx8tBrK7TxRneWpRzpbnZbxRMvgRUIKqqiO0ql8RkCxAqx/ty0miKkPPvEa07xRR2xUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e0nv9o2m; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712215672;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t2tlqAQDqg/5deVRzvMbMah/jpwOnEqnfEQox5MDopI=;
+	b=e0nv9o2mHepGFzN5l5DEOpFJJWYqovEYryi9tjlgEpQE0D4MKGiLpLy4GDpJMsn3H0drKV
+	NN0k6OwulvipJ7TCCf4a4G39/88Qcv/YZ2gxqUxaDq4laKcDJevSHVqqXH4eo6bPHUIYkW
+	7OVvssI7m0xQGVXFKw7Z+EefQco+7n4=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-470-z_8QGsNfMYSnEJzS01LRHg-1; Thu, 04 Apr 2024 03:27:51 -0400
+X-MC-Unique: z_8QGsNfMYSnEJzS01LRHg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a46ba1a19fdso44566366b.1
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 00:27:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712215301; x=1712820101;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oGOhlg//3F0S9mUwjG1Z9GiuJGTOaECWxukxpME741g=;
-        b=ebt3lpeE6j1ml7GpDWe3B9SXdISlz95794hBjJM8PY752gmoBX6m3jL+Mqo+CAIndi
-         BPBGXMIyIJg4+uDgMyRob1CBOMboyo1yD5uoI1XpXe4OWdsd2Bk3WHnEqoB3QxK900k8
-         ieOtTdCFNS7CKv6hnoZ5ifvg3MMSR40Hnu2082R96UaVsdAWVbkS3R3G8AyJL7T5e6bU
-         +cJd3RYS27yYDdYXgVGXQ8j1uhxMYlovth1HydBTO8phC1PvGKezy48aLkaPJU87+ioV
-         Ol/OAFPYEGurDejxOFyhSlI4ihpTGq/R+G/qTpoG239HwqxBtOzxEi/RHhBlrnkmd4WW
-         hX2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWYMCoI/VqDonmnn3OSBquRtlwX1190VMg3uUi2IH4/QeTBZc6fSS7uFuHugGIY7mVUmlOrqT7As0bcCNJ0h7I7mI+6wgO9Gdk/FYLWhtTyeeuXFjQ9wEV7wWlJYAGxJ3E/oDm/Or1vw2An
-X-Gm-Message-State: AOJu0YwkuLG6KzwyNqqXy0BRVYR1XHwmOMSBy6v5rVmipm0gZsbmoMGx
-	0s8P7cPyLCH66Kx6a6HHK1iKZM0JkoHYockLSLrhO32a9HWYqJUK
-X-Google-Smtp-Source: AGHT+IH66YdB2sVgkmH1xvgv4I+C6smt2MXPHmHm4S0q+JrLyLlx88yXDouok+cyXGNV6azCdk+JZw==
-X-Received: by 2002:a17:902:f38c:b0:1e2:7462:b97b with SMTP id f12-20020a170902f38c00b001e27462b97bmr1010177ple.67.1712215301155;
-        Thu, 04 Apr 2024 00:21:41 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([111.201.28.7])
-        by smtp.gmail.com with ESMTPSA id w2-20020a1709029a8200b001db5b39635dsm14606399plp.277.2024.04.04.00.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 00:21:40 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	rostedt@goodmis.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	matttbe@kernel.org,
-	martineau@kernel.org,
-	geliang@kernel.org
-Cc: mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v2 6/6] rstreason: make it work in trace world
-Date: Thu,  4 Apr 2024 15:20:47 +0800
-Message-Id: <20240404072047.11490-7-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240404072047.11490-1-kerneljasonxing@gmail.com>
-References: <20240404072047.11490-1-kerneljasonxing@gmail.com>
+        d=1e100.net; s=20230601; t=1712215669; x=1712820469;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t2tlqAQDqg/5deVRzvMbMah/jpwOnEqnfEQox5MDopI=;
+        b=jYJ9NVHtz2VOY4rwh5Y20OxQWHc7wayT85jOCO2PhFszB0PFCo6V2VG6D7DTIgv6Xk
+         fThJaEDrJRs10KpLdYghjmk05R+P8+hGln9CAQC+O/IGKcsdGBgTlkc4yc6IYocudYhz
+         uqQQSVW7KgWImGvMCpKNbjYdVDCFP4XH86fEvFOrh03D7fjFkOo7ugV34+ugljY6YKQj
+         A3Xhu2KAGqaCQQhk60diU/aGt+JQVNldOT13ZavYheFEeFLs5axHcGWlTZlyOYck0719
+         R+9jsoTqNXyAN9MktS8cw5OXDrEbI8DOBYeZias1QvZ+qHaccrhSSzPvGyNuc3m9fF2N
+         5Vxw==
+X-Gm-Message-State: AOJu0Yx4e8kgnPNHf0XkuCriu2gDHgVxJbQ712G/zAA91+rBYPf/iK2t
+	Vjb4CoPjWjKiTQFg9yTDs4K1ohMRco5Pv2K+XA/BMyQH49p1B1J8Ib2SYWLjcGTlPhSB0uhErG3
+	3dsgbsNdsYwzqW9zX4iJReJAD8IjBpBVeXFWP+7Lre8xR+88xx/kaLw==
+X-Received: by 2002:a17:906:4804:b0:a4e:2777:37c7 with SMTP id w4-20020a170906480400b00a4e277737c7mr896125ejq.49.1712215669542;
+        Thu, 04 Apr 2024 00:27:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHxbPP/ODmWMUcbgi/9We+ccJFuLsAvC+2+RNcoWVGTULDHqqt1uu9PwBj8X4lBnIyjLGdgFQ==
+X-Received: by 2002:a17:906:4804:b0:a4e:2777:37c7 with SMTP id w4-20020a170906480400b00a4e277737c7mr896104ejq.49.1712215669185;
+        Thu, 04 Apr 2024 00:27:49 -0700 (PDT)
+Received: from [172.16.2.75] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id g4-20020a17090669c400b00a4673706b4dsm8698717ejs.78.2024.04.04.00.27.48
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Apr 2024 00:27:48 -0700 (PDT)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org, linux-kernel@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Subject: Re: [ovs-dev] [PATCH net] net: openvswitch: fix unwanted error log on
+ timeout policy probing
+Date: Thu, 04 Apr 2024 09:27:47 +0200
+X-Mailer: MailMate (1.14r6028)
+Message-ID: <AA6642E8-F501-42EB-8AB1-A8D4C4356888@redhat.com>
+In-Reply-To: <20240403203803.2137962-1-i.maximets@ovn.org>
+References: <20240403203803.2137962-1-i.maximets@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Jason Xing <kernelxing@tencent.com>
 
-At last, we should let it work by introducing this reset reason in
-trace world.
 
-One of the possible expected outputs is:
-... tcp_send_reset: skbaddr=xxx skaddr=xxx src=xxx dest=xxx
-state=TCP_ESTABLISHED reason=NOT_SPECIFIED
+On 3 Apr 2024, at 22:38, Ilya Maximets wrote:
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/trace/events/tcp.h | 37 +++++++++++++++++++++++++++++++++----
- net/ipv4/tcp_ipv4.c        |  2 +-
- net/ipv4/tcp_output.c      |  2 +-
- net/ipv6/tcp_ipv6.c        |  2 +-
- 4 files changed, 36 insertions(+), 7 deletions(-)
+> On startup, ovs-vswitchd probes different datapath features including
+> support for timeout policies.  While probing, it tries to execute
+> certain operations with OVS_PACKET_ATTR_PROBE or OVS_FLOW_ATTR_PROBE
+> attributes set.  These attributes tell the openvswitch module to not
+> log any errors when they occur as it is expected that some of the
+> probes will fail.
+>
+> For some reason, setting the timeout policy ignores the PROBE attribute
+> and logs a failure anyway.  This is causing the following kernel log
+> on each re-start of ovs-vswitchd:
+>
+>   kernel: Failed to associated timeout policy `ovs_test_tp'
+>
+> Fix that by using the same logging macro that all other messages are
+> using.  The message will still be printed at info level when needed
+> and will be rate limited, but with a net rate limiter instead of
+> generic printk one.
+>
+> The nf_ct_set_timeout() itself will still print some info messages,
+> but at least this change makes logging in openvswitch module more
+> consistent.
+>
+> Fixes: 06bd2bdf19d2 ("openvswitch: Add timeout support to ct action")
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+> ---
 
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index 5c04a61a11c2..9bed9e63c9c5 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -11,6 +11,7 @@
- #include <net/ipv6.h>
- #include <net/tcp.h>
- #include <linux/sock_diag.h>
-+#include <net/rstreason.h>
- 
- /*
-  * tcp event with arguments sk and skb
-@@ -74,20 +75,38 @@ DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
- 	TP_ARGS(sk, skb)
- );
- 
-+#undef FN1
-+#define FN1(reason)	TRACE_DEFINE_ENUM(SK_RST_REASON_##reason);
-+#undef FN2
-+#define FN2(reason)	TRACE_DEFINE_ENUM(SKB_DROP_REASON_##reason);
-+DEFINE_RST_REASON(FN1, FN1)
-+
-+#undef FN1
-+#undef FNe1
-+#define FN1(reason)	{ SK_RST_REASON_##reason, #reason },
-+#define FNe1(reason)	{ SK_RST_REASON_##reason, #reason }
-+
-+#undef FN2
-+#undef FNe2
-+#define FN2(reason)	{ SKB_DROP_REASON_##reason, #reason },
-+#define FNe2(reason)	{ SKB_DROP_REASON_##reason, #reason }
- /*
-  * skb of trace_tcp_send_reset is the skb that caused RST. In case of
-  * active reset, skb should be NULL
-  */
- TRACE_EVENT(tcp_send_reset,
- 
--	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
-+	TP_PROTO(const struct sock *sk,
-+		 const struct sk_buff *skb,
-+		 const int reason),
- 
--	TP_ARGS(sk, skb),
-+	TP_ARGS(sk, skb, reason),
- 
- 	TP_STRUCT__entry(
- 		__field(const void *, skbaddr)
- 		__field(const void *, skaddr)
- 		__field(int, state)
-+		__field(int, reason)
- 		__array(__u8, saddr, sizeof(struct sockaddr_in6))
- 		__array(__u8, daddr, sizeof(struct sockaddr_in6))
- 	),
-@@ -113,14 +132,24 @@ TRACE_EVENT(tcp_send_reset,
- 			 */
- 			TP_STORE_ADDR_PORTS_SKB(skb, th, entry->daddr, entry->saddr);
- 		}
-+		__entry->reason = reason;
- 	),
- 
--	TP_printk("skbaddr=%p skaddr=%p src=%pISpc dest=%pISpc state=%s",
-+	TP_printk("skbaddr=%p skaddr=%p src=%pISpc dest=%pISpc state=%s reason=%s",
- 		  __entry->skbaddr, __entry->skaddr,
- 		  __entry->saddr, __entry->daddr,
--		  __entry->state ? show_tcp_state_name(__entry->state) : "UNKNOWN")
-+		  __entry->state ? show_tcp_state_name(__entry->state) : "UNKNOWN",
-+		  __entry->reason < RST_REASON_START ?
-+			__print_symbolic(__entry->reason, DEFINE_DROP_REASON(FN2, FNe2)) :
-+			__print_symbolic(__entry->reason, DEFINE_RST_REASON(FN1, FNe1)))
- );
- 
-+#undef FN1
-+#undef FNe1
-+
-+#undef FN2
-+#undef FNe2
-+
- /*
-  * tcp event with arguments sk
-  *
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 1ae2716f0c34..9c52a4a74842 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -871,7 +871,7 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb,
- 	if (sk)
- 		arg.bound_dev_if = sk->sk_bound_dev_if;
- 
--	trace_tcp_send_reset(sk, skb);
-+	trace_tcp_send_reset(sk, skb, reason);
- 
- 	BUILD_BUG_ON(offsetof(struct sock, sk_bound_dev_if) !=
- 		     offsetof(struct inet_timewait_sock, tw_bound_dev_if));
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 18fbbad2028a..d5a7ecfcc1b3 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3608,7 +3608,7 @@ void tcp_send_active_reset(struct sock *sk, gfp_t priority, int reason)
- 	/* skb of trace_tcp_send_reset() keeps the skb that caused RST,
- 	 * skb here is different to the troublesome skb, so use NULL
- 	 */
--	trace_tcp_send_reset(sk, NULL);
-+	trace_tcp_send_reset(sk, NULL, SK_RST_REASON_NOT_SPECIFIED);
- }
- 
- /* Send a crossed SYN-ACK during socket establishment.
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 6889ea70c760..3c995eff6e52 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1131,7 +1131,7 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb,
- 			label = ip6_flowlabel(ipv6h);
- 	}
- 
--	trace_tcp_send_reset(sk, skb);
-+	trace_tcp_send_reset(sk, skb, reason);
- 
- 	tcp_v6_send_response(sk, skb, seq, ack_seq, 0, 0, 0, oif, 1,
- 			     ipv6_get_dsfield(ipv6h), label, priority, txhash,
--- 
-2.37.3
+Thanks for fixing this annoying startup message! The change looks good to me.
+
+Acked-by: Eelco Chaudron <echaudro@redhat.com>
 
 
