@@ -1,195 +1,227 @@
-Return-Path: <netdev+bounces-84798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C9C58985C5
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:10:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37EB78985CD
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:12:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFD0C284E6D
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:10:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0DC61F22E6B
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD48080C16;
-	Thu,  4 Apr 2024 11:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCC6811E0;
+	Thu,  4 Apr 2024 11:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dIsFVDq9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RQ+uVyeM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E968061C;
-	Thu,  4 Apr 2024 11:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712229039; cv=none; b=Fnc94i+olI01j9U452kuwvw8Gp3lp7kjFMdOsT6OcCWFtB0hUQ9LWxkotnPeihqWKxPI7LO97VIhHhnlQCW7b3pKOaO4knMr82BLXIdgQogPNvucun1E0AXP+P3yDLXF5Pkl7gPR7Eg+8+VK8vfbvg1fnzFwm8QLh95TfedlERQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712229039; c=relaxed/simple;
-	bh=WMjkJTdFFtjI0VIdYjo+49cEcxDsHkkR20fgJigQFhA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ciJk62eRbEw+nwJ5Ia317eMZksVKTu6awgCXuM1ihskeSiMHA3Xrt9zoaxUVc3nWyciJr2HcfZjcXcsoxMvvugIjoWyfk0saBJRKsakWCsL73a60Xc7SurbMy9Nhn8EO2cuRf2gKDqDAbIfZw1hYDiyF50Zpynqv4pkWY5DQ1vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dIsFVDq9; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 434AghNM003847;
-	Thu, 4 Apr 2024 11:10:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=Y7rT3wbvNimPqRZV8+pCJV9SipoHmQS0tWVux4Dh6JU=;
- b=dIsFVDq90RNMlQV9p8VjF8wXddDqpYlJ0Uj9r6SXsembIoe2YyG69JfHf9lNr/AUjKdR
- PlCbf+eVsDgqryZKQnXJsQrwCg2Bmy0pL7WrqTwvL53srkwXduuktcmyhzG3tePwZpEm
- BTQknRou08R9eYk3yuDIShFBJRbqNyHqyBMUVPXi2bXgmKilpxX09MTkdCz2n3ZBU3Jj
- reRiaNCuEhFekyTd6HA96gmPTztzUggfUvb/b+YBgKhDEbzSrximViW/lpaZ8/j7qxHB
- VqjE7u+pLO5DRDPxxzmo+4uWGLqWHghL47yWL0QIAApN4dSkMTOCJVluXRM1QJMXH44O vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9tpar2ft-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Apr 2024 11:10:33 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 434BAWld014453;
-	Thu, 4 Apr 2024 11:10:32 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9tpar2fm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Apr 2024 11:10:32 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 434AG0XZ003612;
-	Thu, 4 Apr 2024 11:10:31 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x9epybqut-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Apr 2024 11:10:31 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 434BAQGO48759092
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 4 Apr 2024 11:10:28 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EA0F12005A;
-	Thu,  4 Apr 2024 11:10:25 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6379720043;
-	Thu,  4 Apr 2024 11:10:25 +0000 (GMT)
-Received: from [9.155.208.153] (unknown [9.155.208.153])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  4 Apr 2024 11:10:25 +0000 (GMT)
-Message-ID: <cb7b036b4d3db02ab70d17ee83e6bc4f2df03171.camel@linux.ibm.com>
-Subject: Re: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Paolo Abeni <pabeni@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        Wen Gu <guwen@linux.alibaba.com>, Heiko Carstens <hca@linux.ibm.com>,
-        pasic@linux.ibm.com, schnelle@linux.ibm.com
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Vasily
- Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
- <svens@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
-Date: Thu, 04 Apr 2024 13:10:20 +0200
-In-Reply-To: <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com>
-References: <20240328154144.272275-1-gbayer@linux.ibm.com>
-	 <20240328154144.272275-2-gbayer@linux.ibm.com>
-	 <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB1E745C3
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 11:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712229157; cv=fail; b=DVy4a3HizoZSOqtCPiPTUNb1TkwVV/XvoHaS16PvKVhkm6nawrwJCrhzm1L5qWIPsYXrKU5ELe7ankhMWDl2bt/05Gqtf/cmr51HCnqHKiiGN4zb1gB+jDTGdX1hNi77lm53bJ3JoLkOuclhGGYW2UuYFGuJtLM71db8yL4Znl4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712229157; c=relaxed/simple;
+	bh=KAGAplH3iWNgt5A7WC9H31Ln7Llykq96brf4ZzURb0o=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QnD1MTkDwEPok1ptp4g6wXQ3xdi5EAIsThF1AQPitN0rnyA6bNy/rlza98vJXWKOYqzaHE+gLS3yGwA8kYLAiN7jg+6CAeROIb6wLA0uohnmyHZ8EIeFeqDIB4+ezJKZ7jzk/eoK9St7frcIipj/9f1zclQthwbRbKpDdv83m5w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RQ+uVyeM; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712229155; x=1743765155;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KAGAplH3iWNgt5A7WC9H31Ln7Llykq96brf4ZzURb0o=;
+  b=RQ+uVyeMEOZU/5vgprW+ZT1pcwQItVP4bYdjCTwG0zUWRHk0lxr7ODTf
+   +CSytO1wBSks8OHy/rtgAMo0RSlVhWuHByApOIddrtfR9E5Wkk6kd4WSC
+   Y4hQCxocUZglayiSbb0+PZVUd75hlFOjqLTmu/8DQT7fRY94SBxnbRecH
+   gyii/kZXKejS3zWvdX/H3031sFs3p6gqopXgBxzouXbaOYwdEJdZEl9B5
+   NaQDTPBmgZ5Cd9HxMkSW6uIySS4lvdze0plK6YFI7DZxhUq3KMxMtwrsM
+   iHGGWKNhWKjwA5nqBo+Av0/di3ej9us29SIXTWyPEfEI1K8GRWoOuisXY
+   Q==;
+X-CSE-ConnectionGUID: uIznWIlgQf2LYXtngGH+Pw==
+X-CSE-MsgGUID: FaXJ5p/tSt25SQ/MUqCDDQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="18859749"
+X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
+   d="scan'208";a="18859749"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 04:12:34 -0700
+X-CSE-ConnectionGUID: 2Nm4/uHoRzq8VpCIzUV0bg==
+X-CSE-MsgGUID: ToCnF1q3SXeGlxz3sYwalA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
+   d="scan'208";a="19191451"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Apr 2024 04:12:34 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Apr 2024 04:12:33 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 4 Apr 2024 04:12:33 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 4 Apr 2024 04:12:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gn7hHXzf1S7W82JUPOeXeAG0acn2aWRI4EruRFfa7H432wDY9GkWvRqnuniqU7c1+R4fYUBDAK9vbBu2yL7EXa39/eZcjna+Sn4tqrXmDvY92Z1Bv+NyzuhmxldWQCBej2WAI9JSgYN6W/UkeRvB0ivKzbLGCJfuXmPN3hNXWljZQKulL80hQ8AuHWtWA6KQw4pBjpamW7ZzHUcoYtf0kSe5Bh5VyK2RrYdy26LBeM1B7jkdzFJywbB5yPWLk5BXEBMtmALqHz4afHLQNZ8ojalDSPue1ALJW34hX79zwzO7qAwteCmowvpMu2cLc0xaHOQN40LTMCS9c3biPmE8IQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=67pjTXmKGja3nvsX5VyMSUYj4cojpU0usl/qyl9Bntw=;
+ b=IE86erytpKPjbmfUacTGeEmlbglVTM42TgRwR0Qyq3Ieth5BCXVFohhyUyAawbnBbu5SyLTGiHVwyyMjnBSyRz9B0StevqtI9JUMifgM5U8dcF/ZJhVf8s2ix71y7PMluPb1Clvb2QSKGhp6x9vBM01YidZxwkf/PMM/HlfDWqZkzxPUfoomqjuXtWQnhcwGitW/p2/SfChrSY8i1yWHq+nE46q8HnXSplILqH8Na0KBhqusp9iRxlbOciunCd7TaSYGKhEM2laqcvuyjFwUEC70G54C6J5kpARd4TdQfZUuS74C+liy9ODsUkOLj81HRiEBa6SgQ+4NmsZdkKs0Vg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by DS0PR11MB7459.namprd11.prod.outlook.com (2603:10b6:8:144::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Thu, 4 Apr
+ 2024 11:12:32 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::654c:d66a:ec8e:45e9]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::654c:d66a:ec8e:45e9%6]) with mapi id 15.20.7452.019; Thu, 4 Apr 2024
+ 11:12:32 +0000
+Message-ID: <5238eaf3-cc47-470e-85ba-4930a2acbc15@intel.com>
+Date: Thu, 4 Apr 2024 13:11:13 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v5 iwl-next 09/12] ice: Add support for
+ E825-C TS PLL handling
+To: Karol Kolacinski <karol.kolacinski@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, Michal Michalik
+	<michal.michalik@intel.com>, <netdev@vger.kernel.org>, Arkadiusz Kubalewski
+	<arkadiusz.kubalewski@intel.com>, <anthony.l.nguyen@intel.com>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>
+References: <20240404092238.26975-14-karol.kolacinski@intel.com>
+ <20240404092238.26975-23-karol.kolacinski@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240404092238.26975-23-karol.kolacinski@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nLjX6XP8Y0FKlwWH22i-JIS_ZPcJZBV3
-X-Proofpoint-ORIG-GUID: rRAtMI-qMNO3waY_57VCcQTalw_2_kpr
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI2P293CA0007.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::7) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-04_07,2024-04-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 impostorscore=0 phishscore=0 adultscore=0 clxscore=1015
- bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=732 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404040076
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS0PR11MB7459:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: HXBluIW5kUBQbC7AQW+DR541fKMCFpxycVx3BlHC63u8iatd9NR/gGhnqB6T97NJJWUjaGuAAuXXS44utbca8vz3zt+w/9jizPbZsCdH+K2jkL2nPAiJGLPh6r4dZApixxuC+CcLW6XRJK3UrEsPa0xZkq1pBg7qArv9MYsTfHWrNDOoxQ/uyPOStUzNrM1bwVux7x4Al+CT7CS8fYzTXXC4Zk80R7HtlCGptpuXvB+MA1kTD/XrxfAMZ848A78J1u/U0X0nB2feBtIurdTHOUsnDANY5xs5GZ+fD8uNzr/hPy5aiTJRbkTvKQ61qrGzTwpVt9LQS9zck1ac8Psw4AjFwv6wQhxmMBEcNGwToDwnXK0j2JW9EzEcVDNRlSTFC4I1UA4iYcJ3SmQoB1GgThaD/m/f1iQ6eaBD7tYYwgQhk6IrSSRJWTwAZqASjNpKGJ998h/6oGuSFwLQKWvNrwGZeRiX53ijek14hwP69T8N/9CKKCrV+QM1q+NQQaB2k44MVoTEQffRTrR3cEwgs0hIxEhxjiOd6kOUjuNP0lNZdusoFwf6Z7X5qf7txU1tKGSU2vbH/RMhqLdf0FHh4Abyy2AgWZh58/4UBt9taV50o9WlXitADYavdshVUxn4h0AJ3raIzNqqC5pbnEHbT+AygCfekTd6HALUZ6MlOcI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SXNtSWlPbi80TGdtaysreTQzcHBRVWFtMlNlM1cyVTYvRWxpM3BDQktkY1I3?=
+ =?utf-8?B?NXNRZG95Z2c3YU1HN3Y1bThLdUFBWjhtMUhhYTdpRnhFZmVOYjRZSHYrbTJk?=
+ =?utf-8?B?N0lubUJuVWp2cXpNaDVqUGs2aXRJY0I0a29mMWpQb3hkOWZxbDhhODZkMHhK?=
+ =?utf-8?B?Wk4zYWQ0NUplZDVCWTl1OEM0WHpENElNMTlmZWp6ZUtxT1NIaVZhUmY1NFpL?=
+ =?utf-8?B?QkRxeGdBa0VkY1JjaVBiTkNvUkF6YU16YTJXVktrMXl1Tk9ETU5kb2VoS3JQ?=
+ =?utf-8?B?Z3UzMWR4bVJJdnBwY2RPV1NPak05NTI5T1RETDZEWnBsQTZwOTQrbXpYQXF4?=
+ =?utf-8?B?MHVUYVY1Y2h4VTlUeFJGY2FNdHMwbm9ZTFBDQVhMNHhWbGxwcXNQNWRiaE5o?=
+ =?utf-8?B?cUxkbldHcEZhRkpzRlZpa3RoV2VJZ1NGRzFQejRxV0lPaXRQMGFWdFZxVmY5?=
+ =?utf-8?B?MnB2Tm1lSHp6am94eGpPYzlNeC9VQVZ0aDArUkdzZGh4WXR4QXJoUFc1K3NO?=
+ =?utf-8?B?aXlEaERicGFOL25ZQmV1MlZtbEkxVU9YbEdaQUUvZEtaY3FwU3AwczhmVTRK?=
+ =?utf-8?B?eHJvaUx5VUs3R0Z4Y2ZTbFlRNXpoNkFZQUh2NCtyVXpGYjI0S0ZBRnZrWmc3?=
+ =?utf-8?B?ZHd6OEFvb2hwbWlCa21TWDBzTTBrbVR5RExjSWpxWGgrbjQzWkxKRkF3N3BV?=
+ =?utf-8?B?MHpJZllucXBzaVp5WW5PMjFndTVwczRVcWVkYStadjhWYnJ2NUJaNy91bHZr?=
+ =?utf-8?B?ME5TeFFMUm5hajVaQ0ZnRWxKNkZBbDQ4QUVwZXRJRk1vVWl6aHJjTGloQnhF?=
+ =?utf-8?B?KzRjSHpDcUpGeW9EUUtER2xWU1FiN3A5djdiQTJhQWM3cGl3amI5enU4SExK?=
+ =?utf-8?B?ZnYycTBDbFppQ2JKRFl2Snp0Rk1TWGU1QzMyMnkxbldyOWZVdnJjV1pNcDhR?=
+ =?utf-8?B?bnBRKzlLTlpDemhHNkpRV25DWEJpaVBzUFgvM2pMdWlPV1JSdzVUUHBPR0RR?=
+ =?utf-8?B?clB2cEo0WHVTS0RqRVNnZ2tWc2hGcEFGcDRlcWFSWHpkWit5a2lyZEcrMzJP?=
+ =?utf-8?B?bGdXQXFXSWJZcFMyTGEwVW9BZTNNbS94dHFOUW5HdE1IOXNTNEd5ejBFenNT?=
+ =?utf-8?B?R1Y3QVVqRGQxQ3d4d1lrRG9wejJWVXBWcGE3TXZkZkxVU2VLSDR1UEIyU2gz?=
+ =?utf-8?B?TzFRa1ptVmc3Zzc2eGdlcjdCL0V2SUtCV1JnNzExZ3pHeWdjQ2pLNG1wTDJM?=
+ =?utf-8?B?YitkSHpNcGFibFEvcTRidnpyTXozcXBmWUtkUFEyNGo1bU1tc0x6Z3RrcWNH?=
+ =?utf-8?B?dnZlcmVGOExrWjFkSTFrOHJIT2ZWU3BPY21mT2pDclVFL3VyU09XUGtIVTdw?=
+ =?utf-8?B?S2sycHFWODdMSnVQQklwa3NwQXlpakVvR2t2dXFTRFQ0Nlh5c0dYM1FzbDV2?=
+ =?utf-8?B?OGdmcHB0QW1VUFBiVmhoTFJqZnFPcGtGazBQNVpvc0g4UGM5TDlSU01BNklE?=
+ =?utf-8?B?Q25nRG8wRkZkT003SWJGeEJoSFFPVUZOZGlWL3hHU2dScU16czlEWTM2QUlr?=
+ =?utf-8?B?OHdnekdkTkhhaFVCWFJCU1FFcm50SWc4c2dUbGsyY2plUVYyRmJ1bXQwdEZ3?=
+ =?utf-8?B?U2M1bHhwTEFESHdudk41QXZ6OVc0N0FjZHJsRUFWb3dpaUs4NVVyTzhxR2lE?=
+ =?utf-8?B?ZlpMUGNIaWVDcDIyZlRELzZublFHWlFhU1JsK29qaDIxSTlYMTlUcGFZTjd0?=
+ =?utf-8?B?WmxBWFVGTiszUkg2eUF0Y2tJSkRMUFZaME90NnQyQmJIenRYT0tqcWFTQ3F5?=
+ =?utf-8?B?c3dKZ05ESXozSVEwRnhlSnVBWGtpK2FyQko1QUFEMDUrdmx0TFJVK09vU2Ev?=
+ =?utf-8?B?UHRLSmdiNmc2RWZtdVFFR1lQSFpqYmNBREdrNGdWTWd3R2Q5VTI0cGJ0TFY1?=
+ =?utf-8?B?T1MzejNGKy8zVTNDS1FpYmZ1VjZuMUlma1VFbk1kNWlBM0dkVkIwNG9ZelNI?=
+ =?utf-8?B?SUxtSGtVNnBtNXdiK0tJYjBUeG0yTHVmdUhZZ3M4QU10TE5aY2h5TmNSWVBP?=
+ =?utf-8?B?MkJaS1pseE1Yc2tiVU1xYWx0T1VrNmFKdnNxMW5HZGRnem1tcUdlVW93S2lU?=
+ =?utf-8?B?THkweUZOVE9TaXJWdjJJTFJ0WExnY1RyZVZVM0VtVXdyTmxZbjF4QjBDT2h2?=
+ =?utf-8?Q?ed4z5KOYkESKEpXPmbzV1dY=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: febdb839-dcdb-478b-0231-08dc54981f80
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 11:12:32.2191
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kh8aiq3J4kXwkIw4wbNPiqD18qAUTvcZLhkzHVGirLo5co6LEWBZliRAHkAHvwvlRkl8WHBkmedvrmIUQ5P42mnC4zkUIWlOSQsC0Q29VOo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7459
+X-OriginatorOrg: intel.com
 
-On Thu, 2024-04-04 at 10:13 +0200, Paolo Abeni wrote:
-> On Thu, 2024-03-28 at 16:41 +0100, Gerd Bayer wrote:
-> > Since [1], dma_alloc_coherent() does not accept requests for
-> > GFP_COMP anymore, even on archs that may be able to fulfill this.
-> > Functionality that relied on the receive buffer being a compound
-> > page broke at that point:
-> > The SMC-D protocol, that utilizes the ism device driver, passes
-> > receive buffers to the splice processor in a struct
-> > splice_pipe_desc with a single entry list of struct pages. As the
-> > buffer is no longer a compound page, the splice processor now
-> > rejects requests to handle more than a page worth of data.
-> >=20
-> > Replace dma_alloc_coherent() and allocate a buffer with kmalloc()
-> > then create a DMA map for it with dma_map_page(). Since only=20
-> > receive buffers on ISM devices use DMA, qualify the mapping as
-> > FROM_DEVICE.
-> > Since ISM devices are available on arch s390, only and on that arch
-> > all DMA is coherent, there is no need to introduce and export some
-> > kind of dma_sync_to_cpu() method to be called by the SMC-D protocol
-> > layer.
-> >=20
-> > Analogously, replace dma_free_coherent by a two step
-> > dma_unmap_page, then kfree to free the receive buffer.
-> >=20
-> > [1] https://lore.kernel.org/all/20221113163535.884299-1-hch@lst.de/
-> >=20
-> > Fixes: c08004eede4b ("s390/ism: don't pass bogus GFP_ flags to
-> > dma_alloc_coherent")
-> >=20
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+Date: Thu,  4 Apr 2024 11:09:57 +0200
+
+> From: Michal Michalik <michal.michalik@intel.com>
+> 
+> The CGU layout of E825-C is a little different than E822/E823. Add
+> support the new hardware adding relevant functions.
+> 
+> Signed-off-by: Michal Michalik <michal.michalik@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> ---
+> V4 -> V5: added UL to some of tspll_fbdiv_frac values in e825c_cgu_params
+> 
+>  drivers/net/ethernet/intel/ice/ice_cgu_regs.h |  65 +++++
+>  .../net/ethernet/intel/ice/ice_ptp_consts.h   |  87 ++++++
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 247 +++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  22 ++
+>  drivers/net/ethernet/intel/ice/ice_type.h     |   2 +-
+>  5 files changed, 410 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_cgu_regs.h b/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
+> index 36aeb10eefb7..10d9d74f3545 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
+> @@ -27,6 +27,17 @@ union nac_cgu_dword9 {
+>  	u32 val;
+>  };
+>  
+> +#define NAC_CGU_DWORD16_E825C 0x40
+> +union nac_cgu_dword16_e825c {
+> +	struct {
+> +		u32 synce_remndr : 6;
+> +		u32 synce_phlmt_en : 1;
+> +		u32 misc13 : 17;
+> +		u32 tspll_ck_refclkfreq : 8;
+> +	};
+> +	u32 val;
+> +};
+
+Will this work on Big Endian systems?
+
+> +
+>  #define NAC_CGU_DWORD19 0x4c
+>  union nac_cgu_dword19 {
+>  	struct {
 
 [...]
 
-> > @@ -315,14 +319,27 @@ static int ism_alloc_dmb(struct ism_dev *ism,
-> > struct ism_dmb *dmb)
-> > =C2=A0	=C2=A0=C2=A0=C2=A0 test_and_set_bit(dmb->sba_idx, ism->sba_bitma=
-p))
-> > =C2=A0		return -EINVAL;
-> > =C2=A0
-> > -	dmb->cpu_addr =3D dma_alloc_coherent(&ism->pdev->dev, dmb-
-> > >dmb_len,
-> > -					=C2=A0=C2=A0 &dmb->dma_addr,
-> > -					=C2=A0=C2=A0 GFP_KERNEL |
-> > __GFP_NOWARN |
-> > -					=C2=A0=C2=A0 __GFP_NOMEMALLOC |
-> > __GFP_NORETRY);
-> > -	if (!dmb->cpu_addr)
-> > -		clear_bit(dmb->sba_idx, ism->sba_bitmap);
-> > +	dmb->cpu_addr =3D kmalloc(dmb->dmb_len, GFP_KERNEL |
-> > __GFP_NOWARN |
-> > +				__GFP_COMP | __GFP_NOMEMALLOC |
-> > __GFP_NORETRY);
->=20
-> Out of sheer ignorance on my side, the __GFP_COMP flag looks
-> suspicious here. I *think* that is relevant only for the page
-> allocator.=20
->=20
-> Why can't you use get_free_pages() (or similar) here? (possibly
-> rounding up to the relevant page_aligned size).=20
-
-Thanks Paolo for your suggestion. However, I wanted to stay as close to
-the implementation pre [1] - that used to use __GFP_COMP, too. I'd
-rather avoid to change interfaces from "cpu_addr" to "struct page*" at
-this point. In the long run, I'd like to drop the requirement for
-compound pages entirely, since that *appears* to exist primarily for a
-simplified handling of the interface to splice_to_pipe() in
-net/smc/smc_rx.c. And of course there might be performance
-implications...
-
-At this point, I'm more concerned about my usage of the DMA API with
-this patch.
-
-Thanks again,
-Gerd
-
-
+Thanks,
+Olek
 
