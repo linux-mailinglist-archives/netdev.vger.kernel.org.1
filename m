@@ -1,128 +1,300 @@
-Return-Path: <netdev+bounces-84899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2134898964
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:59:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37089898977
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:03:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4453C283E87
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:59:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC745284008
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D1E128818;
-	Thu,  4 Apr 2024 13:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADC112880F;
+	Thu,  4 Apr 2024 14:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GYBoZ4Y0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gak1jCun"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482781272BB
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 13:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597CC1272BB
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 14:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712239176; cv=none; b=KBPPGtfDQl1fjB6KloxoIk0wuBqNxbsaDJrU1Vm0hCYTO89vOeTYsOM5KFCutv16EoVJZbczejYlWkgh1EPLIFwp5FI7wx0xsfbtsAaTQvW/D8imSmzLf7f5TUjbiWAYTZ2NFz6E00hcZKD/kdu7b3c27ROrfpz10YHqumRkzD8=
+	t=1712239402; cv=none; b=N0ypBdl1iA00BSbfzo2QFgZidb+02n+Q7uQQnYFk7hOlwbSIrcQHraYRdUxG9VHQuoJ5TblMHUGSPnA9PUyWrtiElwDFJmfs4Zo2WtuaVTHZlMf97X14hzaNEoY+zGY6xap/9UItyB6Y+tfVOaFGNqZ8mX67evLuTFtflj6kA1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712239176; c=relaxed/simple;
-	bh=pmmFduEtsh3CFaCz1t06RpvelcaDlp/p/S4Cuwhdxxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lKNHGRiCPM0lFj5tBu3d5sYYuzKgeweLXTKwcwmLLBoWQmd4POcpkEhsNKy2XeTyIwM3Aj96J56PjqIWFbapFwkHsnYEJ6brzdHHjL2FV08AbhSKNZK0HK+W2S1+cnBJH7XCRYzHzs+I/1ahscYYDcvMxSscC+6Ekm7M+cAzdkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GYBoZ4Y0; arc=none smtp.client-ip=198.175.65.11
+	s=arc-20240116; t=1712239402; c=relaxed/simple;
+	bh=SljF2kBzyoZaZWPEsfGk9rAcXzLcG3u0RlGpIJ7vzTs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=byrsWnoLV9P55GDynEiqci/wlciZoJm+U+86nibBvfehK+aWfQ7LmS2E6lZ2MYrMlrjszHZYcB3b2T3iXMEH7D1o1VcDx+OWK9e3MjguH7jRrS9Y8CUe1kNCGzhZZZwjTZRi2XkgbbuM6ZbNzsmGQn7vs1XNHVeTQcQx0LbbmQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gak1jCun; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712239175; x=1743775175;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pmmFduEtsh3CFaCz1t06RpvelcaDlp/p/S4Cuwhdxxw=;
-  b=GYBoZ4Y0XITe8l+ecnONgRHiVvmxiR4ez1nKtSF3Zdiq5gU90V4xOFDS
-   iHcB+cWjW6opNmvvgLNQOhD1MtYjGpZa+F+kAOH9bTm1xohsPqeZPbF5d
-   5JfGMYZi4vZlZzZQi4d/zK29N996XJA8lrq7cw9nk2YtORvrLMuR5MKZG
-   gvTkoiHmSJIEWIwIoDElnJI1pDfYIXGRQ4Aw12/FztTwEBOeM9VCMLK/c
-   uPLVjKGlR9MZOgLOGuKLGm0N3ZUziVM7ieLQ3HWUZQqYDyKEibjQbjIBg
-   dhRFk6bOBPH8FCvhVhqor4Ooi2Gv5zvdqrKGk5NMc+s4WrljbGomQxUib
-   w==;
-X-CSE-ConnectionGUID: BTwnYR01RxSlL79OzYFEMg==
-X-CSE-MsgGUID: qU2C8fODRkuW+J2oHkdSNg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="18088835"
+  t=1712239401; x=1743775401;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SljF2kBzyoZaZWPEsfGk9rAcXzLcG3u0RlGpIJ7vzTs=;
+  b=gak1jCunMjA9c5BEMAqJ6l/KPrV16HCtPp9yYGeXYzQ/QIPXmpGKsnKr
+   ChIIZ3avKLzjVP0Ew0JjlIYR36/xNmtSpwBsBTOhIMsJ2nrqUn+tz4FPB
+   ftpSucKvzPAaRgouWbIPuTsozT4/zX3JiLCmDNEa323W4KyAWvaTOFBHm
+   Ipl5ycy0lJ7z/blL0HUW3e0MrzkZRfsIAOv+Kuz8LNHhL/QJtXitvGJIj
+   Di8T2EJRCinhSheJV/OilhGV4cV3U6CS5wrNKfqO2eTrOnaXKy/z9Dffp
+   fXVqwfWhabiwrDdVf2Y4l4YT2Mr/DlE9m8oWXAUzhDpi2j3EOq4ppZe75
+   A==;
+X-CSE-ConnectionGUID: /f2tecE6Ro2r4NHklwln+w==
+X-CSE-MsgGUID: P2LQ2NllSmC//EeteGzBKQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="18089634"
 X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="18088835"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 06:59:30 -0700
-X-CSE-ConnectionGUID: Mytx7c3uR6WtmyHlaw0c7A==
-X-CSE-MsgGUID: 88pH3e0rR/u8K9LEpA6RsQ==
+   d="scan'208";a="18089634"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 07:03:21 -0700
+X-CSE-ConnectionGUID: RBJpi9RvQCu4LQTE3D2uaA==
+X-CSE-MsgGUID: QHC3lwVFQ8W5PzcwbJYtyg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="41944969"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 06:59:28 -0700
-Date: Thu, 4 Apr 2024 15:59:12 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org, aleksander.lobakin@intel.com,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [net-next v1] pfcp: avoid copy warning by simplifing code
-Message-ID: <Zg6yMB/3w4EBQVDm@mev-dev>
-References: <20240404135721.647474-1-michal.swiatkowski@linux.intel.com>
+   d="scan'208";a="49759097"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa002.jf.intel.com with ESMTP; 04 Apr 2024 07:03:18 -0700
+Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 144E637F7F;
+	Thu,  4 Apr 2024 15:03:16 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	mschmidt@redhat.com,
+	anthony.l.nguyen@intel.com,
+	pawel.chmielewski@intel.com,
+	horms@kernel.org,
+	aleksandr.loktionov@intel.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Liang-Min Wang <liang-min.wang@intel.com>
+Subject: [PATCH iwl-next v5] ice: Add automatic VF reset on Tx MDD events
+Date: Thu,  4 Apr 2024 16:04:51 +0200
+Message-ID: <20240404140451.504359-1-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240404135721.647474-1-michal.swiatkowski@linux.intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 04, 2024 at 03:57:21PM +0200, Michal Swiatkowski wrote:
-> From Arnd comment:
-> "The memcpy() in the ip_tunnel_info_opts_set() causes
-> a string.h fortification warning, with at least gcc-13:
-> 
->     In function 'fortify_memcpy_chk',
->         inlined from 'ip_tunnel_info_opts_set' at include/net/ip_tunnels.h:619:3,
->         inlined from 'pfcp_encap_recv' at drivers/net/pfcp.c:84:2:
->     include/linux/fortify-string.h:553:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
->       553 |                         __write_overflow_field(p_size_field, size);"
-> 
-> It is a false-positivie caused by ambiguity of the union.
-> 
-> However, as Arnd noticed, copying here is unescessary. The code can be
-> simplified to avoid calling ip_tunnel_info_opts_set(), which is doing
-> copying, setting flags and options_len.
-> 
-> Set correct flags and options_len directly on tun_info.
-> 
-> Reported-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->  drivers/net/pfcp.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/pfcp.c b/drivers/net/pfcp.c
-> index cc5b28c5f99f..69434fd13f96 100644
-> --- a/drivers/net/pfcp.c
-> +++ b/drivers/net/pfcp.c
-> @@ -80,9 +80,8 @@ static int pfcp_encap_recv(struct sock *sk, struct sk_buff *skb)
->  	else
->  		pfcp_node_recv(pfcp, skb, md);
->  
-> -	__set_bit(IP_TUNNEL_PFCP_OPT_BIT, flags);
-> -	ip_tunnel_info_opts_set(&tun_dst->u.tun_info, md, sizeof(*md),
-> -				flags);
-> +	__set_bit(IP_TUNNEL_PFCP_OPT_BIT, tun_dst->u.tun_info.key.tun_flags);
-> +	tun_dst->u.tun_info.options_len = sizeof(*md);
->  
->  	if (unlikely(iptunnel_pull_header(skb, PFCP_HLEN, skb->protocol,
->  					  !net_eq(sock_net(sk),
-> -- 
-> 2.42.0
-> 
+In cases when VF sends malformed packets that are classified as malicious,
+it can cause Tx queue to freeze as a result of Malicious Driver Detection
+event. Such malformed packets can appear as a result of a faulty userspace
+app running on VF. This frozen queue can be stuck for several minutes being
+unusable.
 
-Ehh, sorry, misstype in netdev ccing
-CC: netdev@vger.kernel.org
+User might prefer to immediately bring the VF back to operational state
+after such event, which can be done by automatically resetting the VF which
+caused MDD. This is already implemented for Rx events (mdd-auto-reset-vf
+flag private flag needs to be set).
+
+Extend the VF auto reset to also cover Tx MDD events. When any MDD event
+occurs on VF (Tx or Rx) and the mdd-auto-reset-vf private flag is set,
+perform a graceful VF reset to quickly bring it back to operational state.
+
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Co-developed-by: Liang-Min Wang <liang-min.wang@intel.com>
+Signed-off-by: Liang-Min Wang <liang-min.wang@intel.com>
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+---
+v5: Reword title and commit message to be more explicit and informative
+v4 [4]: Only perform auto-reset once per VF
+v3 [3]: Only auto reset VF if the mdd-auto-reset-vf flag is set
+v2 [2]: Revert an unneeded formatting change, fix commit message, fix a log
+        message with a correct event name
+
+[4] https://lore.kernel.org/intel-wired-lan/20240402165221.11669-1-marcin.szycik@linux.intel.com
+[3] https://lore.kernel.org/intel-wired-lan/20240326164455.735739-1-marcin.szycik@linux.intel.com
+[2] https://lore.kernel.org/netdev/20231102155149.2574209-1-pawel.chmielewski@intel.com
+---
+ drivers/net/ethernet/intel/ice/ice_main.c  | 57 +++++++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 25 +++++++---
+ drivers/net/ethernet/intel/ice/ice_sriov.h |  2 +
+ 3 files changed, 67 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 185c9b13efcf..80bc83f6e1ab 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -1745,6 +1745,39 @@ static void ice_service_timer(struct timer_list *t)
+ 	ice_service_task_schedule(pf);
+ }
+ 
++/**
++ * ice_mdd_maybe_reset_vf - reset VF after MDD event
++ * @pf: pointer to the PF structure
++ * @vf: pointer to the VF structure
++ * @reset_vf_tx: whether Tx MDD has occurred
++ * @reset_vf_rx: whether Rx MDD has occurred
++ *
++ * Since the queue can get stuck on VF MDD events, the PF can be configured to
++ * automatically reset the VF by enabling the private ethtool flag
++ * mdd-auto-reset-vf.
++ */
++static void ice_mdd_maybe_reset_vf(struct ice_pf *pf, struct ice_vf *vf,
++				   bool reset_vf_tx, bool reset_vf_rx)
++{
++	struct device *dev = ice_pf_to_dev(pf);
++
++	if (!test_bit(ICE_FLAG_MDD_AUTO_RESET_VF, pf->flags))
++		return;
++
++	/* VF MDD event counters will be cleared by reset, so print the event
++	 * prior to reset.
++	 */
++	if (reset_vf_tx)
++		ice_print_vf_tx_mdd_event(vf);
++
++	if (reset_vf_rx)
++		ice_print_vf_rx_mdd_event(vf);
++
++	dev_info(dev, "PF-to-VF reset on PF %d VF %d due to MDD event\n",
++		 pf->hw.pf_id, vf->vf_id);
++	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY | ICE_VF_RESET_LOCK);
++}
++
+ /**
+  * ice_handle_mdd_event - handle malicious driver detect event
+  * @pf: pointer to the PF structure
+@@ -1838,6 +1871,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 	 */
+ 	mutex_lock(&pf->vfs.table_lock);
+ 	ice_for_each_vf(pf, bkt, vf) {
++		bool reset_vf_tx = false, reset_vf_rx = false;
++
+ 		reg = rd32(hw, VP_MDET_TX_PQM(vf->vf_id));
+ 		if (reg & VP_MDET_TX_PQM_VALID_M) {
+ 			wr32(hw, VP_MDET_TX_PQM(vf->vf_id), 0xFFFF);
+@@ -1846,6 +1881,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 			if (netif_msg_tx_err(pf))
+ 				dev_info(dev, "Malicious Driver Detection event TX_PQM detected on VF %d\n",
+ 					 vf->vf_id);
++
++			reset_vf_tx = true;
+ 		}
+ 
+ 		reg = rd32(hw, VP_MDET_TX_TCLAN(vf->vf_id));
+@@ -1856,6 +1893,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 			if (netif_msg_tx_err(pf))
+ 				dev_info(dev, "Malicious Driver Detection event TX_TCLAN detected on VF %d\n",
+ 					 vf->vf_id);
++
++			reset_vf_tx = true;
+ 		}
+ 
+ 		reg = rd32(hw, VP_MDET_TX_TDPU(vf->vf_id));
+@@ -1866,6 +1905,8 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 			if (netif_msg_tx_err(pf))
+ 				dev_info(dev, "Malicious Driver Detection event TX_TDPU detected on VF %d\n",
+ 					 vf->vf_id);
++
++			reset_vf_tx = true;
+ 		}
+ 
+ 		reg = rd32(hw, VP_MDET_RX(vf->vf_id));
+@@ -1877,18 +1918,12 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 				dev_info(dev, "Malicious Driver Detection event RX detected on VF %d\n",
+ 					 vf->vf_id);
+ 
+-			/* Since the queue is disabled on VF Rx MDD events, the
+-			 * PF can be configured to reset the VF through ethtool
+-			 * private flag mdd-auto-reset-vf.
+-			 */
+-			if (test_bit(ICE_FLAG_MDD_AUTO_RESET_VF, pf->flags)) {
+-				/* VF MDD event counters will be cleared by
+-				 * reset, so print the event prior to reset.
+-				 */
+-				ice_print_vf_rx_mdd_event(vf);
+-				ice_reset_vf(vf, ICE_VF_RESET_LOCK);
+-			}
++			reset_vf_rx = true;
+ 		}
++
++		if (reset_vf_tx || reset_vf_rx)
++			ice_mdd_maybe_reset_vf(pf, vf, reset_vf_tx,
++					       reset_vf_rx);
+ 	}
+ 	mutex_unlock(&pf->vfs.table_lock);
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index fb2e96db647e..a60dacf8942a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -1861,6 +1861,24 @@ void ice_print_vf_rx_mdd_event(struct ice_vf *vf)
+ 			  ? "on" : "off");
+ }
+ 
++/**
++ * ice_print_vf_tx_mdd_event - print VF Tx malicious driver detect event
++ * @vf: pointer to the VF structure
++ */
++void ice_print_vf_tx_mdd_event(struct ice_vf *vf)
++{
++	struct ice_pf *pf = vf->pf;
++	struct device *dev;
++
++	dev = ice_pf_to_dev(pf);
++
++	dev_info(dev, "%d Tx Malicious Driver Detection events detected on PF %d VF %d MAC %pM. mdd-auto-reset-vfs=%s\n",
++		 vf->mdd_tx_events.count, pf->hw.pf_id, vf->vf_id,
++		 vf->dev_lan_addr,
++		 test_bit(ICE_FLAG_MDD_AUTO_RESET_VF, pf->flags)
++			  ? "on" : "off");
++}
++
+ /**
+  * ice_print_vfs_mdd_events - print VFs malicious driver detect event
+  * @pf: pointer to the PF structure
+@@ -1869,8 +1887,6 @@ void ice_print_vf_rx_mdd_event(struct ice_vf *vf)
+  */
+ void ice_print_vfs_mdd_events(struct ice_pf *pf)
+ {
+-	struct device *dev = ice_pf_to_dev(pf);
+-	struct ice_hw *hw = &pf->hw;
+ 	struct ice_vf *vf;
+ 	unsigned int bkt;
+ 
+@@ -1897,10 +1913,7 @@ void ice_print_vfs_mdd_events(struct ice_pf *pf)
+ 		if (vf->mdd_tx_events.count != vf->mdd_tx_events.last_printed) {
+ 			vf->mdd_tx_events.last_printed =
+ 							vf->mdd_tx_events.count;
+-
+-			dev_info(dev, "%d Tx Malicious Driver Detection events detected on PF %d VF %d MAC %pM.\n",
+-				 vf->mdd_tx_events.count, hw->pf_id, vf->vf_id,
+-				 vf->dev_lan_addr);
++			ice_print_vf_tx_mdd_event(vf);
+ 		}
+ 	}
+ 	mutex_unlock(&pf->vfs.table_lock);
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.h b/drivers/net/ethernet/intel/ice/ice_sriov.h
+index 4ba8fb53aea1..8f22313474d6 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.h
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.h
+@@ -58,6 +58,7 @@ void
+ ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event);
+ void ice_print_vfs_mdd_events(struct ice_pf *pf);
+ void ice_print_vf_rx_mdd_event(struct ice_vf *vf);
++void ice_print_vf_tx_mdd_event(struct ice_vf *vf);
+ bool
+ ice_vc_validate_pattern(struct ice_vf *vf, struct virtchnl_proto_hdrs *proto);
+ u32 ice_sriov_get_vf_total_msix(struct pci_dev *pdev);
+@@ -69,6 +70,7 @@ static inline
+ void ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event) { }
+ static inline void ice_print_vfs_mdd_events(struct ice_pf *pf) { }
+ static inline void ice_print_vf_rx_mdd_event(struct ice_vf *vf) { }
++static inline void ice_print_vf_tx_mdd_event(struct ice_vf *vf) { }
+ static inline void ice_restore_all_vfs_msi_state(struct ice_pf *pf) { }
+ 
+ static inline int
+-- 
+2.41.0
+
 
