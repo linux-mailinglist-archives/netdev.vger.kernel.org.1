@@ -1,139 +1,184 @@
-Return-Path: <netdev+bounces-84887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D624898898
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:12:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E18E8988B9
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:24:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55E1F28C13F
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:12:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 781AC1F23142
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1245E126F2F;
-	Thu,  4 Apr 2024 13:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 813461272D3;
+	Thu,  4 Apr 2024 13:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cBv5OokM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hptzp/Lx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FA9823C3;
-	Thu,  4 Apr 2024 13:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA11C53E30
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 13:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712236351; cv=none; b=qnRpyXaMGVvLzLHNh+0w+W86XMvvBtHJmCGuhThaFgx1XPTFs6FpebzjIPEm2+Ozp0kZIgLVQt1+jqESaH0chFAcynGeRReKju/PpauxLd+dsEioBq6MFr+YSbgPnEDU0eghskWg/b8bdvc3lBXJM8mQ0qTta6KzN/wRJIfj3cY=
+	t=1712237061; cv=none; b=KgBUM42GPKkXPTTTawFh8Z4Nt7TcItNWQB9CU+mxh7vpTUy+abfo2KbOGG7Ktgq74GJ6vTyxLquQPVbRfxvHOOr8uB21qYbo7esmrdzWPsRjcYNyj6D/k68jgamOiy8zmTPULWLwlOz67zmMVFZdHYbn5Eddl7tEcjGiSgkxAUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712236351; c=relaxed/simple;
-	bh=E2Ym1kUqVzjOH0XmO1ZZvC5uU8KCJxej7UD8A9ggl18=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q6h7mYVW/ww84Q43dKZhVAZYVA/lSI6HBG4/a0FQ205t1D3MD1f9ZTVTc8oUHgl/k3Wi1PthDDC0xHxY7g+E15LlgJyAgpcHFYNwZ3ruL8h8ElwnOavckZeuakENdG1ZR2lDH0kbXx3OjzWodZW/mGxrTKg7woQjNv1HI7IRVlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cBv5OokM; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1712236339; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=xOnC9TcmNIYHT66WMGU1uDCwRMaiasXF54VBLXYtEEM=;
-	b=cBv5OokM8O5FYXFYhnOIT4yywgochNztR/YZyh3spUC7GaxHZ6dS7n6rD8yjSxD0LfV6ENQriRk29vKw4tK3L4T+D6rqsxK+yovoTPtpPIYKyRPhgC2ieQMv+nlvwpMVt+Bg4ODvX9vdk4iKHyM6rulSPM6CtPIjzw+4GK631OA=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0W3uXYZ-_1712236337;
-Received: from 30.236.60.242(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W3uXYZ-_1712236337)
-          by smtp.aliyun-inc.com;
-          Thu, 04 Apr 2024 21:12:19 +0800
-Message-ID: <7a0fc481-658e-4c99-add7-ccbd5f9dce1e@linux.alibaba.com>
-Date: Thu, 4 Apr 2024 21:12:16 +0800
+	s=arc-20240116; t=1712237061; c=relaxed/simple;
+	bh=KjUxjkX9h/D1TanlEVt1nFRrEbVPPpBL+vnL+olkIgI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Yba1YgmQ+ZG1YIqyvgVb6BXup1cFTGRhLGAlGsKgXqWxVIN/Azc65sqXelBWo5sVVrpIBn6ZaOwA6+uXKZF9aeJVt2BpkHcgGD4CKBGSd1kbkpXvWh4afwPIo0bK45tHweGSqTp1IFAd5tLbTDjhs9JRJCNJhd3GQe+ye+FvgSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hptzp/Lx; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6150dcdf83fso18082257b3.2
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 06:24:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712237059; x=1712841859; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SU4eDsRCf7Z2gwIvqe7XP+V+zUElZuRXatTC3F4VV6w=;
+        b=Hptzp/LxVx9qhS0jOs5nlBDo+zzH24ejsJ7tuvEhfNxZ34c2635OoOfgVCvd9OV7r2
+         X/wCzuEKne8ngaLgsFxV9F6UTM2jc5grddQhw7188oleuIgNjkv2RLsZnwRS3Hf3clY4
+         MzN4DH5XcxSvXvq6i6jxKS+uVZxPA+l+GfKeRHTUzksZWGkLBFFfBqqFIUkQTKgTpsJ6
+         XDtcksmCfwnsb5SAvW450yLQGXKC+cTeViUnxLCg1BLbGfnDpK5rkXCvRh6L4/FEdYBb
+         I9Ogv1LMGrQPr5F8pjkwSg6fNeKXk3g15oGkoJsh9t+XKmh0SksxxcweP9tr3A8zm8LL
+         bZ9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712237059; x=1712841859;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SU4eDsRCf7Z2gwIvqe7XP+V+zUElZuRXatTC3F4VV6w=;
+        b=BFZzqrqkyolCUs4M5KDRlnj4RBmSCU9bmlNTqUY1y95sYI0IBrIq/hqBdwKkcpOLpS
+         /iVUpB/nyqURJ6MfdahboLK06ad94dTPDXLBcghHGnZL04xdY0LYS+7W3vpAfn55xgWs
+         qQICKdOIAIX28LaC8CS4so7RG3GUHz2MUGu3AhwTRWSTPVYDRAvm2uO4y2b6bqJ1JV4w
+         iPoPJK/fehcJwbsyDIN2IM4TrnNOIIMzE0v0kIQCgIghllvJJLUonN0pEKP9eY8Ze8kl
+         WLAlItb4jXH48ba8kTf85t3Gv1MTH/mLxbGlyaEF+1XPyxxAFzLL9YA01GC5s7fBVee/
+         fhwQ==
+X-Gm-Message-State: AOJu0YzI1yFN9Cu5315dklx+1BJXGE7GeASYdHkCzHy3akaexow2ZiH0
+	pATKbksuUsJ5/etwOL0EyOWhygQs/+wkd1DDUHswyvKa+womrreemgH4y7LoxPjblq/s+QF+JxT
+	6GhS3v0N+fw==
+X-Google-Smtp-Source: AGHT+IFfixs16qCO0AYCdybkI0Lqg80sPbTlWNzMoFa6jNc/UOc/iyEuO4NjD7rB+wKyhyn5vgK4s/WBSVrlcA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a0d:cb07:0:b0:615:378a:112c with SMTP id
+ n7-20020a0dcb07000000b00615378a112cmr594680ywd.5.1712237058991; Thu, 04 Apr
+ 2024 06:24:18 -0700 (PDT)
+Date: Thu,  4 Apr 2024 13:24:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some unsupported
- operations of loopback-ism
-To: Niklas Schnelle <schnelle@linux.ibm.com>,
- Gerd Bayer <gbayer@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
- <20240324135522.108564-5-guwen@linux.alibaba.com>
- <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
- <1db6ccab-b49f-45d2-a93c-05b0f79371a3@linux.alibaba.com>
- <3b3ff37643e9030ec1246e67720683a2cf5660e5.camel@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <3b3ff37643e9030ec1246e67720683a2cf5660e5.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240404132413.2633866-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] ipv6: remove RTNL protection from ip6addrlbl_dump()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+No longer hold RTNL while calling ip6addrlbl_dump()
+("ip addrlabel show")
 
+ip6addrlbl_dump() was already mostly relying on RCU anyway.
 
-On 2024/4/4 19:42, Niklas Schnelle wrote:
-> On Thu, 2024-04-04 at 17:32 +0800, Wen Gu wrote:
->>
->> On 2024/4/4 00:25, Gerd Bayer wrote:
->>> On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
->>>> This implements some operations that loopback-ism does not support
->>>> currently:
->>>>    - vlan operations, since there is no strong use-case for it.
->>>>    - signal_event operations, since there is no event to be processed
->>>> by the loopback-ism device.
->>>
->>> Hi Wen,
->>>
->>> I wonder if the these operations that are not supported by loopback-ism
->>> should rather be marked "optional" in the struct smcd_ops, and the
->>> calling code should call these only when they are implemented.
->>>
->>> Of course this would mean more changes to net/smc/smc_core.c - but
->>> loopback-ism could omit these "boiler-plate" functions.
->>>
->>
->> Hi Gerd.
->>
->> Thank you for the thoughts! I agree that checks like 'if(smcd->ops->xxx)'
->> can avoid the device driver from implementing unsupported operations. But I
->> am afraid that which operations need to be defined as 'optional' may differ
->> from different device perspectives (e.g. for loopback-ism they are vlan-related
->> opts and signal_event). So I perfer to simply let the smc protocol assume
->> that all operations have been implemented, and let drivers to decide which
->> ones are unsupported in implementation. What do you think?
->>
->> Thanks!
->>
-> 
-> I agree with Gerd, in my opinion it is better to document ops as
-> optional and then allow their function pointers to be NULL and check
-> for that. Acting like they are supported and then they turn out to be
-> nops to me seems to contradict the principle of least surprises. I also
-> think we can find a subset of mandatory ops without which SMC-D is
-> impossible and then everything else should be optional.
+Add READ_ONCE()/WRITE_ONCE() annotations around
+net->ipv6.ip6addrlbl_table.seq
 
-I see. If we all agree to classify smcd_ops into mandatory and optional ones,
-I'll add a patch to mark the optional ops and check if they are implemented.
+Note that ifal_seq value is currently ignored in iproute2,
+and a bit weak.
 
-> 
-> As a first guess I think the following options may be mandatory:
-> 
-> * query_remote_gid()
-> * register_dmb()/unregister_dmb()
-> * move_data()
->    For this one could argue that either move_data() or
->    attach_dmb()/detach_dmb() is required though personally I would
->    prefer to always have move_data() as a fallback and simple API
-> * supports_v2()
-> * get_local_gid()
-> * get_chid()
-> * get_dev()
-I agree with this classification. Just one point, maybe we can take
-supports_v2() as an optional ops, like support_dmb_nocopy()? e.g. if
-it is not implemented, we treat it as an ISMv1.
+We might user later cb->seq  / nl_dump_check_consistent()
+protocol if needed.
 
-Thanks!
+Also change return value for a completed dump,
+so that NLMSG_DONE can be appended to current skb,
+saving one recvmsg() system call.
 
->>>
+v2: read net->ipv6.ip6addrlbl_table.seq once, (David Ahern)
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Link:https://lore.kernel.org/netdev/67f5cb70-14a4-4455-8372-f039da2f15c2@kernel.org/
+---
+ net/ipv6/addrlabel.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/net/ipv6/addrlabel.c b/net/ipv6/addrlabel.c
+index 17ac45aa7194ce9c148ed95e14dd575d17feeb98..acd70b5992a7b9c1aadcfb9a279da7fe6aebfed9 100644
+--- a/net/ipv6/addrlabel.c
++++ b/net/ipv6/addrlabel.c
+@@ -234,7 +234,8 @@ static int __ip6addrlbl_add(struct net *net, struct ip6addrlbl_entry *newp,
+ 		hlist_add_head_rcu(&newp->list, &net->ipv6.ip6addrlbl_table.head);
+ out:
+ 	if (!ret)
+-		net->ipv6.ip6addrlbl_table.seq++;
++		WRITE_ONCE(net->ipv6.ip6addrlbl_table.seq,
++			   net->ipv6.ip6addrlbl_table.seq + 1);
+ 	return ret;
+ }
+ 
+@@ -445,7 +446,7 @@ static void ip6addrlbl_putmsg(struct nlmsghdr *nlh,
+ };
+ 
+ static int ip6addrlbl_fill(struct sk_buff *skb,
+-			   struct ip6addrlbl_entry *p,
++			   const struct ip6addrlbl_entry *p,
+ 			   u32 lseq,
+ 			   u32 portid, u32 seq, int event,
+ 			   unsigned int flags)
+@@ -498,7 +499,8 @@ static int ip6addrlbl_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 	struct net *net = sock_net(skb->sk);
+ 	struct ip6addrlbl_entry *p;
+ 	int idx = 0, s_idx = cb->args[0];
+-	int err;
++	int err = 0;
++	u32 lseq;
+ 
+ 	if (cb->strict_check) {
+ 		err = ip6addrlbl_valid_dump_req(nlh, cb->extack);
+@@ -507,10 +509,11 @@ static int ip6addrlbl_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 	}
+ 
+ 	rcu_read_lock();
++	lseq = READ_ONCE(net->ipv6.ip6addrlbl_table.seq);
+ 	hlist_for_each_entry_rcu(p, &net->ipv6.ip6addrlbl_table.head, list) {
+ 		if (idx >= s_idx) {
+ 			err = ip6addrlbl_fill(skb, p,
+-					      net->ipv6.ip6addrlbl_table.seq,
++					      lseq,
+ 					      NETLINK_CB(cb->skb).portid,
+ 					      nlh->nlmsg_seq,
+ 					      RTM_NEWADDRLABEL,
+@@ -522,7 +525,7 @@ static int ip6addrlbl_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 	}
+ 	rcu_read_unlock();
+ 	cb->args[0] = idx;
+-	return skb->len;
++	return err;
+ }
+ 
+ static inline int ip6addrlbl_msgsize(void)
+@@ -614,7 +617,7 @@ static int ip6addrlbl_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 
+ 	rcu_read_lock();
+ 	p = __ipv6_addr_label(net, addr, ipv6_addr_type(addr), ifal->ifal_index);
+-	lseq = net->ipv6.ip6addrlbl_table.seq;
++	lseq = READ_ONCE(net->ipv6.ip6addrlbl_table.seq);
+ 	if (p)
+ 		err = ip6addrlbl_fill(skb, p, lseq,
+ 				      NETLINK_CB(in_skb).portid,
+@@ -647,6 +650,7 @@ int __init ipv6_addr_label_rtnl_register(void)
+ 		return ret;
+ 	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETADDRLABEL,
+ 				   ip6addrlbl_get,
+-				   ip6addrlbl_dump, RTNL_FLAG_DOIT_UNLOCKED);
++				   ip6addrlbl_dump, RTNL_FLAG_DOIT_UNLOCKED |
++						    RTNL_FLAG_DUMP_UNLOCKED);
+ 	return ret;
+ }
+-- 
+2.44.0.478.gd926399ef9-goog
+
 
