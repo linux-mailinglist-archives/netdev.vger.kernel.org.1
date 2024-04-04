@@ -1,95 +1,73 @@
-Return-Path: <netdev+bounces-85021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A7C898FE9
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:11:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A61C5898FF4
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:14:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA0C1F22151
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:11:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CCAE2899DE
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85D013AA4C;
-	Thu,  4 Apr 2024 21:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FFA313B2AD;
+	Thu,  4 Apr 2024 21:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rdYDsViu";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Dclk8g+F";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cdvcwCJg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FFBGkHvK"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="L//OCpOz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAEF13473D
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 21:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F0813AD2F;
+	Thu,  4 Apr 2024 21:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712265090; cv=none; b=mlewhUFAE6iQfC0PFuz4VwsUyvXTnRAej5SgdK0o7LBQz3po0TU5TmVnVtTxA5nxtH/S9a+S4BRH7GVE8vupX5PVXJ5Au3s9w3M2qN4YZ5xNG/EOG6mEVuzPSSUVg3AeYV3E5zOUgZ2oWjp6gQafBSmOPLnV4olrIoufkc7wvM4=
+	t=1712265230; cv=none; b=GMV0F6/TgSMXnjamzr+dE6v7chJ6JKI971UvCJ8Ytvgta3U16g2hBF+vc5nhAgJFj1Y+KP2bgAmxpPF6v64R0JqoKvNAH7MBFYy4FYexukx/20XTlFqifLHHanms+o0Lw9OSwLG90QMGAwXTIYG5bQIQYA8dMsibEfsrXIUQkQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712265090; c=relaxed/simple;
-	bh=kDsTczcgKrQx4Mv1yNTeTiqNGF2XlywCGmGwOZLPq8M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RnlQCGJxs+akbcGHfID0tvZLl6RsZdu9PlznJLDtaPLS85laM2IO8AuWqY4GwVT5QOuKHXzgM67wQS3yJbz1ndl+LZfLxO4CQmhqtuFm2ZMVPwLCZNkkYYFHk6wuNyI2aKT+3Q5m0Xm+6M1AP0ZT3Oa+HtnQLlfa7njdZrIe/HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rdYDsViu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Dclk8g+F; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cdvcwCJg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FFBGkHvK; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A6D201F441;
-	Thu,  4 Apr 2024 21:11:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712265086; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=G4KkPw51wsPX4YLwRMC8+YIAnNVkPQo7t2OqZeZYoIA=;
-	b=rdYDsViu0mfvwbSjZuOLK62Od5l9D0KTtw0xOkCIJibV2yAO4T28TuiEb8dw7z293Jwe9Y
-	av41A1m+/NRGJdnI/473JbDK2rU7tBpzxctwn8ku3dNHY+ToTdexuYpp3TWC2kU4+5cf/N
-	tKQceYBUstmivnt0LzzVMMM5T0LapJ4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712265086;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=G4KkPw51wsPX4YLwRMC8+YIAnNVkPQo7t2OqZeZYoIA=;
-	b=Dclk8g+FEmhD1qsUum8WDeC058B6j+FT97/YJROUvptJ6CT52Jxhi5b0buPwSpPBqEkJ2f
-	giL3Yp5btypPjsAw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712265085; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=G4KkPw51wsPX4YLwRMC8+YIAnNVkPQo7t2OqZeZYoIA=;
-	b=cdvcwCJgdXSz74Tif7QBlY4ii0Xi9+cSLAJYNVc8Uym/j3vowQ0WZlVLwwsjQDlPDZTK2u
-	wf8VEbW++21jcFQYkURthjDCpniD2Mc0hWSp5ToWkkMBMQT2VEnfzKERZ8xJrfcGrbLnLJ
-	qUAvGt1ZoRfKiV520d2vO5tUcAFic54=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712265085;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=G4KkPw51wsPX4YLwRMC8+YIAnNVkPQo7t2OqZeZYoIA=;
-	b=FFBGkHvK4eK8XvCY/pm7fGsgs9Z9W3z7dXdueJsQV5UAyDMh9aTNGUTxE86r2ZKj3Zzzqp
-	1L9qKMaiv9JEYQAg==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 6BDA2139E8;
-	Thu,  4 Apr 2024 21:11:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id m9wOFH0XD2b6AgAAn2gu4w
-	(envelope-from <krisman@suse.de>); Thu, 04 Apr 2024 21:11:25 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	martin.lau@kernel.org,
-	Gabriel Krisman Bertazi <krisman@suse.de>,
-	Lorenz Bauer <lmb@isovalent.com>
-Subject: [PATCH] udp: Avoid call to compute_score on multiple sites
-Date: Thu,  4 Apr 2024 17:11:11 -0400
-Message-ID: <20240404211111.30493-1-krisman@suse.de>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1712265230; c=relaxed/simple;
+	bh=EEof2slDW7gYodnqaab/2948OaIHbPKbWF+mIByxp7k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r8VCsSWiuF6HN5Or/s3IcpwPBC8uBBSGuvLsgVrya8BVtQdlUTZH3fiSWnk1qnUAC2wgjBCFXYYc7U3uqum7D+TwMm9wxjpQrNiWCEPrut1M7Fy4zzMvU7VcSDEizIH8JTw8NKpleQThmT6WzY1i5MDeiS9jzpP9ciohgrlxmm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=L//OCpOz; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712265229; x=1743801229;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=QQNMJqyXpMyQcdc35q1n/uJzBeVy7tmfmWSmoONPVCA=;
+  b=L//OCpOzGIzlhS4l5SuqAeYDSzkBuZr3yYGf54TXh3fDthYbF/YKT73I
+   d4te/DYfpzS/47mcTO5iLogcrwnymmbJ+1yR4j80IOBDQ3GuaGFXOnqVT
+   S7uKWrKq7o4xFF6dJYS/SPVKE+gDyNwVpp3w8dej3Tc0FY+UQmhAiG1xh
+   o=;
+X-IronPort-AV: E=Sophos;i="6.07,180,1708387200"; 
+   d="scan'208";a="398265065"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 21:13:46 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:10975]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.213:2525] with esmtp (Farcaster)
+ id dcc88f20-f6d7-458e-b8e2-59575be13a00; Thu, 4 Apr 2024 21:13:44 +0000 (UTC)
+X-Farcaster-Flow-ID: dcc88f20-f6d7-458e-b8e2-59575be13a00
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 4 Apr 2024 21:13:41 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.6) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 4 Apr 2024 21:13:38 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+7f7f201cc2668a8fd169@syzkaller.appspotmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
+Subject: Re: [syzbot] [net?] possible deadlock in unix_del_edges
+Date: Thu, 4 Apr 2024 14:13:29 -0700
+Message-ID: <20240404211329.40644-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <00000000000083ca480615479e79@google.com>
+References: <00000000000083ca480615479e79@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,218 +75,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-1.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap2.dmz-prg2.suse.org:helo,imap2.dmz-prg2.suse.org:rdns];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Score: -1.30
-X-Spam-Flag: NO
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA004.ant.amazon.com (10.13.139.41) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
-ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
-commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
-sockets are present").  The failing tests were those that would spawn
-UDP sockets per-cpu on systems that have a high number of cpus.
+From: syzbot <syzbot+7f7f201cc2668a8fd169@syzkaller.appspotmail.com>
+Date: Thu, 04 Apr 2024 09:13:26 -0700
+> syzbot has found a reproducer for the following issue on:
+> 
+> HEAD commit:    2b3d5988ae2c Add linux-next specific files for 20240404
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13114d8d180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=9c48fd2523cdee5e
+> dashboard link: https://syzkaller.appspot.com/bug?extid=7f7f201cc2668a8fd169
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=113c7103180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1133aaa9180000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/136270ed2c7b/disk-2b3d5988.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/466d2f7c1952/vmlinux-2b3d5988.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/7dfaf3959891/bzImage-2b3d5988.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+7f7f201cc2668a8fd169@syzkaller.appspotmail.com
+> 
+> ============================================
+> WARNING: possible recursive locking detected
+> 6.9.0-rc2-next-20240404-syzkaller #0 Not tainted
+> --------------------------------------------
+> kworker/u8:3/51 is trying to acquire lock:
+> ffffffff8f6dc178 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+> ffffffff8f6dc178 (unix_gc_lock){+.+.}-{2:2}, at: unix_del_edges+0x30/0x590 net/unix/garbage.c:227
+> 
+> but task is already holding lock:
+> ffffffff8f6dc178 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+> ffffffff8f6dc178 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0xc5/0x1830 net/unix/garbage.c:547
+> 
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+> 
+>        CPU0
+>        ----
+>   lock(unix_gc_lock);
+>   lock(unix_gc_lock);
+> 
+>  *** DEADLOCK ***
+> 
+>  May be due to missing lock nesting notation
+> 
+> 4 locks held by kworker/u8:3/51:
+>  #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3193 [inline]
+>  #0: ffff888015089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3299
+>  #1: ffffc90000bb7d00 (unix_gc_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3194 [inline]
+>  #1: ffffc90000bb7d00 (unix_gc_work){+.+.}-{0:0}, at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3299
+>  #2: ffffffff8f6dc178 (unix_gc_lock){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+>  #2: ffffffff8f6dc178 (unix_gc_lock){+.+.}-{2:2}, at: __unix_gc+0xc5/0x1830 net/unix/garbage.c:547
+>  #3: ffff88802bd76118 (rlock-AF_UNIX){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+>  #3: ffff88802bd76118 (rlock-AF_UNIX){+.+.}-{2:2}, at: unix_collect_skb+0xb8/0x700 net/unix/garbage.c:343
+> 
+> stack backtrace:
+> CPU: 0 PID: 51 Comm: kworker/u8:3 Not tainted 6.9.0-rc2-next-20240404-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+> Workqueue: events_unbound __unix_gc
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+>  check_deadlock kernel/locking/lockdep.c:3062 [inline]
+>  validate_chain+0x15c1/0x58e0 kernel/locking/lockdep.c:3856
+>  __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+>  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+>  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+>  _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+>  spin_lock include/linux/spinlock.h:351 [inline]
+>  unix_del_edges+0x30/0x590 net/unix/garbage.c:227
+>  unix_destroy_fpl+0x59/0x210 net/unix/garbage.c:286
+>  unix_detach_fds net/unix/af_unix.c:1816 [inline]
+>  unix_destruct_scm+0x13e/0x210 net/unix/af_unix.c:1873
+>  skb_release_head_state+0x100/0x250 net/core/skbuff.c:1162
+>  skb_release_all net/core/skbuff.c:1173 [inline]
+>  __kfree_skb net/core/skbuff.c:1189 [inline]
+>  kfree_skb_reason+0x16d/0x3b0 net/core/skbuff.c:1225
+>  kfree_skb include/linux/skbuff.h:1262 [inline]
+>  unix_collect_skb+0x5e4/0x700 net/unix/garbage.c:361
+>  __unix_walk_scc net/unix/garbage.c:481 [inline]
+>  unix_walk_scc net/unix/garbage.c:506 [inline]
+>  __unix_gc+0x108c/0x1830 net/unix/garbage.c:559
+>  process_one_work kernel/workqueue.c:3218 [inline]
+>  process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
+>  worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
+>  kthread+0x2f0/0x390 kernel/kthread.c:388
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+>  </TASK>
+> 
+> 
+> ---
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
 
-Unsurprisingly, it is not caused by the extra re-scoring of the reused
-socket, but due to the compiler no longer inlining compute_score, once
-it has the extra call site in upd5_lib_lookup2.  This is augmented by
-the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
 
-We could just explicitly inline it, but compute_score() is quite a large
-function, around 300b.  Inlining in two sites would almost double
-udp4_lib_lookup2, which is a silly thing to do just to workaround a
-mitigation.  Instead, this patch shuffles the code a bit to avoid the
-multiple calls to compute_score.  Since it is a static function used in
-one spot, the compiler can safely fold it in, as it did before, without
-increasing the text size.
-
-With this patch applied I ran my original iperf3 testcases.  The failing
-cases all looked like this (ipv4):
-	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2 2>&1
-
-where $R is either 1G/10G/0 (max, unlimited).  I ran 5 times each.
-baseline is 6.9.0-rc1-g962490525cff, just a recent checkout of Linus
-tree. harmean == harmonic mean; CV == coefficient of variation.
-
-ipv4:
-                 1G                10G                  MAX
-	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-baseline 1726716.59(0.0401) 1751758.50(0.0068) 1425388.83(0.1276)
-patched  1842337.77(0.0711) 1861574.00(0.0774) 1888601.95(0.0580)
-
-ipv6:
-                 1G                10G                  MAX
-	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-baseline: 1693636.28(0.0132) 1704418.23(0.0094) 1519681.83(0.1299)
-patched   1909754.24(0.0307) 1782295.80(0.0539) 1632803.48(0.1185)
-
-This restores the performance we had before the change above with this
-benchmark.  We obviously don't expect any real impact when mitigations
-are disabled, but just to be sure it also doesn't regresses:
-
-mitigations=off ipv4:
-                 1G                10G                  MAX
-	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
-patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
-
-Finally, I can see this restores compute_score inlining in my gcc
-without extra function attributes. Out of caution, I still added
-__always_inline in compute_score, to prevent future changes from
-un-inlining it again.  Since it is only in one site, it should be fine.
-
-Cc: Lorenz Bauer <lmb@isovalent.com>
-Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
-Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
-
----
-Another idea would be shrinking compute_score and then inlining it.  I'm
-not a network developer, but it seems that we can avoid most of the
-"same network" checks of calculate_score when passing a socket from the
-reusegroup.  If that is the case, we can fork out a compute_score_fast
-that can be safely inlined at the second call site of the existing
-compute_score.  I didn't pursue this any further.
----
- net/ipv4/udp.c | 24 ++++++++++++++++++------
- net/ipv6/udp.c | 23 ++++++++++++++++++-----
- 2 files changed, 36 insertions(+), 11 deletions(-)
-
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 661d0e0d273f..8ce5c4e8663e 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -363,7 +363,11 @@ int udp_v4_get_port(struct sock *sk, unsigned short snum)
- 	return udp_lib_get_port(sk, snum, hash2_nulladdr);
- }
- 
--static int compute_score(struct sock *sk, struct net *net,
-+/* While large, compute_score is in the UDP hot path and only used once
-+ * in udp4_lib_lookup2. Avoiding the function call by inlining it has
-+ * yield measurable benefits in iperf3-based benchmarks.
-+ */
-+static __always_inline int compute_score(struct sock *sk, struct net *net,
- 			 __be32 saddr, __be16 sport,
- 			 __be32 daddr, unsigned short hnum,
- 			 int dif, int sdif)
-@@ -425,16 +429,20 @@ static struct sock *udp4_lib_lookup2(struct net *net,
- 				     struct udp_hslot *hslot2,
- 				     struct sk_buff *skb)
- {
--	struct sock *sk, *result;
-+	struct sock *sk, *result, *this;
- 	int score, badness;
- 
- 	result = NULL;
- 	badness = 0;
- 	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
--		score = compute_score(sk, net, saddr, sport,
-+		this = sk;
-+rescore:
-+		score = compute_score(this, net, saddr, sport,
- 				      daddr, hnum, dif, sdif);
- 		if (score > badness) {
- 			badness = score;
-+			if (this != sk)
-+				continue;
- 
- 			if (sk->sk_state == TCP_ESTABLISHED) {
- 				result = sk;
-@@ -456,9 +464,13 @@ static struct sock *udp4_lib_lookup2(struct net *net,
- 			if (IS_ERR(result))
- 				continue;
- 
--			badness = compute_score(result, net, saddr, sport,
--						daddr, hnum, dif, sdif);
--
-+			/* compute_score is too long of a function to be
-+			 * inlined, and calling it again yields
-+			 * measureable overhead. Work around it by
-+			 * jumping backwards to score 'this'.
-+			 */
-+			this = result;
-+			goto rescore;
- 		}
- 	}
- 	return result;
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 7c1e6469d091..883e62228432 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -114,7 +114,11 @@ void udp_v6_rehash(struct sock *sk)
- 	udp_lib_rehash(sk, new_hash);
- }
- 
--static int compute_score(struct sock *sk, struct net *net,
-+/* While large, compute_score is in the UDP hot path and only used once
-+ * in udp4_lib_lookup2. Avoiding the function call by inlining it has
-+ * yield measurable benefits in iperf3-based benchmarks.
-+ */
-+static __always_inline int compute_score(struct sock *sk, struct net *net,
- 			 const struct in6_addr *saddr, __be16 sport,
- 			 const struct in6_addr *daddr, unsigned short hnum,
- 			 int dif, int sdif)
-@@ -166,16 +170,20 @@ static struct sock *udp6_lib_lookup2(struct net *net,
- 		int dif, int sdif, struct udp_hslot *hslot2,
- 		struct sk_buff *skb)
- {
--	struct sock *sk, *result;
-+	struct sock *sk, *result, *this;
- 	int score, badness;
- 
- 	result = NULL;
- 	badness = -1;
- 	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
--		score = compute_score(sk, net, saddr, sport,
-+		this = sk;
-+rescore:
-+		score = compute_score(this, net, saddr, sport,
- 				      daddr, hnum, dif, sdif);
- 		if (score > badness) {
- 			badness = score;
-+			if (this != sk)
-+				continue;
- 
- 			if (sk->sk_state == TCP_ESTABLISHED) {
- 				result = sk;
-@@ -197,8 +205,13 @@ static struct sock *udp6_lib_lookup2(struct net *net,
- 			if (IS_ERR(result))
- 				continue;
- 
--			badness = compute_score(sk, net, saddr, sport,
--						daddr, hnum, dif, sdif);
-+			/* compute_score is too long of a function to be
-+			 * inlined, and calling it again yields
-+			 * measureable overhead. Work around it by
-+			 * jumping backwards to score 'result'.
-+			 */
-+			this = result;
-+			goto rescore;
- 		}
- 	}
- 	return result;
--- 
-2.44.0
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 61ecfa9c9c6b..12851dadcd4c 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2619,6 +2619,7 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+ 				}
+ 			} else if (!(flags & MSG_PEEK)) {
+ 				skb_unlink(skb, &sk->sk_receive_queue);
++				WRITE_ONCE(u->oob_skb, NULL);
+ 				consume_skb(skb);
+ 				skb = skb_peek(&sk->sk_receive_queue);
+ 			}
 
 
