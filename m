@@ -1,136 +1,161 @@
-Return-Path: <netdev+bounces-84757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72CEB89842D
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:35:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D17F898463
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:49:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2AE41C26726
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:35:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D29DB23B36
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D634074BEF;
-	Thu,  4 Apr 2024 09:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB3074BE2;
+	Thu,  4 Apr 2024 09:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OpQiInbP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VWsFBJlc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567DD71730;
-	Thu,  4 Apr 2024 09:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0570F74438;
+	Thu,  4 Apr 2024 09:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712223131; cv=none; b=hygvL4P14CwlKGTD8dDH7yydlY1jqJ35pDpYrx5LGiiHrPuyO6GhtDWEs2ZsfWzStRx0YJmNq9lwYkBTE1LhYavajBRtMaiGIQpcfFWvFnEgHf5vNItDrCGvAHxaqSnZsi/e/Tgf7lDnf2SLsPkOZ0HtVUnGstgDqd56Sj1co50=
+	t=1712224142; cv=none; b=U5BPLZQXU1XJb/4GZAaB/0nFtqe9SZt1p1BiWHjvkIZRUZHHZzOslvTBtDx+lwOL8+/wKvP97GQ59cW4A8D58X2I4RdrceTSKvnkZZIp6ExquFeAU1UP1+rpWBFbaXQ3s/RYg3rwlp6yVABDCudY7R8HcXu2DClRJBl1np1rioM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712223131; c=relaxed/simple;
-	bh=NTkIUFsN+o79sd3pZSLcsMIjH/xgf74EVtlGOhG5jsc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XG99hH/yiLkczDToWy6gldXKdoTufH+FLb6oif/8raPTAzNnjIu8GLL5CTJbbv2CzoCd/ZkcDNx6CWKfJogpiQKmN1z/f0GkiDCev+9iVzX4dJOpQ8zt7DNml4AEMenYESiWyzhqhc7Syeknp5Bwk9rkLe7ECn+xwTwKSqO8Xeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OpQiInbP; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1712223126; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=vcxcoTPPCvHJeWJFRiHn9mDGeolKMHFN0SNJlYjkGaw=;
-	b=OpQiInbPmiTtgXoqMNav2dCQ+hrEWjUHoWO//wF9a/2hqIBgmuCkP7zdRUPfhwmKNd1JgbwENlILZSQoamFBf/TtLrAspbiPA/67m3eMWx9oKTssDu0qPpVomQkAvebeYtswy3Smr6IDy1Zn5rV2Nmng91iRlPazZZBEvkJ2VFE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W3u1izQ_1712223124;
-Received: from 30.39.185.155(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W3u1izQ_1712223124)
-          by smtp.aliyun-inc.com;
-          Thu, 04 Apr 2024 17:32:05 +0800
-Message-ID: <1db6ccab-b49f-45d2-a93c-05b0f79371a3@linux.alibaba.com>
-Date: Thu, 4 Apr 2024 17:32:03 +0800
+	s=arc-20240116; t=1712224142; c=relaxed/simple;
+	bh=HtkXVwM+iFAGGvr+kUD0dRiyp1DbZhZOQzSip15beRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=onz9bQSe76F3rtV7yeWdiSE/6F5Au1AzMOlZ3vesf3aQJ1v0ekkT7mVvWWTi5qeFjLWojo0fSJs9v25P/EkvZSMkSUiNb3pJxYzXViBSlWzHba5/4FtELEAb8G9r7/EF6TEJM1cosP2FGsbs2zJkxO2hzP8p9jFeWuuvvqcrfWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VWsFBJlc; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712224138; x=1743760138;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HtkXVwM+iFAGGvr+kUD0dRiyp1DbZhZOQzSip15beRo=;
+  b=VWsFBJlcBTH1tLnwXNgjQezZM5kk21qupomVMp2eRC39bhK3DcE2DK/O
+   6M3/1rym143ubfDrH8Cnpv+/feSu5wTKgVGloI+1C+BXVT0vTKgiaS7Tj
+   rYIZTq8EQPNq8Hk0KepkXSzYQRRclZiT1syl0SNg3Y9LXfobd1ZsMjic3
+   O8h6NaG2t2JXesDXF9bf4+o5qgmUZhknMem1dHox/gCkLDoqMO0qOmeWp
+   0EOhWsiXK5J6wwhjvOI/j1RpsR86N1wsfCi+7FySHAzUogpe68QnyH7gQ
+   5aa9ivgli33JPvzZgmsHGTyWTL6vn9kMK/+MRMRCO0Cdky99TIixYZ9tP
+   Q==;
+X-CSE-ConnectionGUID: qbbmrJ7lQJawOnen1crRmw==
+X-CSE-MsgGUID: uCElAF3gSHy8LikxCd7HhA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7393419"
+X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
+   d="scan'208";a="7393419"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 02:46:13 -0700
+X-CSE-ConnectionGUID: ++d9YZT8TDytdMV2c2L46w==
+X-CSE-MsgGUID: WqeOzf9OQeK8oCmECxYFYw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
+   d="scan'208";a="41898069"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 02:46:09 -0700
+Date: Thu, 4 Apr 2024 11:45:54 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Simon Horman <horms@kernel.org>, Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH net-next v6 19/21] pfcp: always set pfcp metadata
+Message-ID: <Zg520gCPr+65sf5l@mev-dev>
+References: <20240327152358.2368467-1-aleksander.lobakin@intel.com>
+ <20240327152358.2368467-20-aleksander.lobakin@intel.com>
+ <701f8f93-f5fb-408b-822a-37a1d5c424ba@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some unsupported
- operations of loopback-ism
-To: Gerd Bayer <gbayer@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
- <20240324135522.108564-5-guwen@linux.alibaba.com>
- <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <701f8f93-f5fb-408b-822a-37a1d5c424ba@app.fastmail.com>
 
-
-
-On 2024/4/4 00:25, Gerd Bayer wrote:
-> On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
->> This implements some operations that loopback-ism does not support
->> currently:
->>   - vlan operations, since there is no strong use-case for it.
->>   - signal_event operations, since there is no event to be processed
->> by the loopback-ism device.
+On Wed, Apr 03, 2024 at 10:59:36PM +0200, Arnd Bergmann wrote:
+> On Wed, Mar 27, 2024, at 16:23, Alexander Lobakin wrote:
 > 
-> Hi Wen,
+> > +static int pfcp_encap_recv(struct sock *sk, struct sk_buff *skb)
+> > +{
+> > +	IP_TUNNEL_DECLARE_FLAGS(flags) = { };
+> > +	struct metadata_dst *tun_dst;
+> > +	struct pfcp_metadata *md;
+> > +	struct pfcphdr *unparsed;
+> > +	struct pfcp_dev *pfcp;
+> > +
+> > +	if (unlikely(!pskb_may_pull(skb, PFCP_HLEN)))
+> > +		goto drop;
+> > +
+> > +	pfcp = rcu_dereference_sk_user_data(sk);
+> > +	if (unlikely(!pfcp))
+> > +		goto drop;
+> > +
+> > +	unparsed = pfcp_hdr(skb);
+> > +
+> > +	ip_tunnel_flags_zero(flags);
+> > +	tun_dst = udp_tun_rx_dst(skb, sk->sk_family, flags, 0,
+> > +				 sizeof(*md));
+> > +	if (unlikely(!tun_dst))
+> > +		goto drop;
+> > +
+> > +	md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
+> > +	if (unlikely(!md))
+> > +		goto drop;
+> > +
+> > +	if (unparsed->flags & PFCP_SEID_FLAG)
+> > +		pfcp_session_recv(pfcp, skb, md);
+> > +	else
+> > +		pfcp_node_recv(pfcp, skb, md);
+> > +
+> > +	__set_bit(IP_TUNNEL_PFCP_OPT_BIT, flags);
+> > +	ip_tunnel_info_opts_set(&tun_dst->u.tun_info, md, sizeof(*md),
+> > +				flags);
+> > +
 > 
-> I wonder if the these operations that are not supported by loopback-ism
-> should rather be marked "optional" in the struct smcd_ops, and the
-> calling code should call these only when they are implemented.
+> The memcpy() in the ip_tunnel_info_opts_set() causes
+> a string.h fortification warning, with at least gcc-13:
 > 
-> Of course this would mean more changes to net/smc/smc_core.c - but
-> loopback-ism could omit these "boiler-plate" functions.
+>     In function 'fortify_memcpy_chk',
+>         inlined from 'ip_tunnel_info_opts_set' at include/net/ip_tunnels.h:619:3,
+>         inlined from 'pfcp_encap_recv' at drivers/net/pfcp.c:84:2:
+>     include/linux/fortify-string.h:553:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+>       553 |                         __write_overflow_field(p_size_field, size);
 > 
+> As far as I can tell, the warning is caused by the
+> ambiguity of the union, but what I noticed is that
+> it also seems to copy a buffer to itself, as 'md'
+> is initialized to tun_dst->u.tun_info as well.
+> 
+> Is this intentional?
 
-Hi Gerd.
+I used ip_tunnel_info_opts_set() to set options_len and flags.
+You are right that it can and probably should be changed to:
 
-Thank you for the thoughts! I agree that checks like 'if(smcd->ops->xxx)'
-can avoid the device driver from implementing unsupported operations. But I
-am afraid that which operations need to be defined as 'optional' may differ
-from different device perspectives (e.g. for loopback-ism they are vlan-related
-opts and signal_event). So I perfer to simply let the smc protocol assume
-that all operations have been implemented, and let drivers to decide which
-ones are unsupported in implementation. What do you think?
+__set_bit(IP_TUNNEL_PFCP_OPT_BIT, tun_dst->u.tun_info.key.tun_flags);
+tun_dst->u.tun_info.options_len = sizeof(*md);
 
-Thanks!
+instead of copying the buffer. Thanks for pointing it.
 
->>   
->> +static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
->> +{
->> +	return -EOPNOTSUPP;
->> +}
->> +
->> +static int smc_lo_del_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
->> +{
->> +	return -EOPNOTSUPP;
->> +}
->> +
->> +static int smc_lo_set_vlan_required(struct smcd_dev *smcd)
->> +{
->> +	return -EOPNOTSUPP;
->> +}
->> +
->> +static int smc_lo_reset_vlan_required(struct smcd_dev *smcd)
->> +{
->> +	return -EOPNOTSUPP;
->> +}
->> +
->> +static int smc_lo_signal_event(struct smcd_dev *dev, struct smcd_gid
->> *rgid,
->> +			       u32 trigger_irq, u32 event_code, u64
->> info)
->> +{
->> +	return 0;
->> +}
->> +
+Should I sent a fix to the net or patch to the maintainer? Sorry, don't
+know how this kind of situations are being solved.
+
+Michal
+
 > 
-> Just a pattern that I saw elsewhere in the kernel...
-> 
-> Thanks,
-> Gerd
+>       Arnd
 
