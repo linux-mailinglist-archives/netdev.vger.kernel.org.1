@@ -1,255 +1,184 @@
-Return-Path: <netdev+bounces-84971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC95898D49
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:35:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8075898D4A
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:35:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC8C2B25CFE
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:35:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8A281C23AB2
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119C212FB2C;
-	Thu,  4 Apr 2024 17:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315FA12DDBF;
+	Thu,  4 Apr 2024 17:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DKuQDDoQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmhzb0Au"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2067.outbound.protection.outlook.com [40.107.96.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F42112D765
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 17:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712252097; cv=fail; b=aPmPFpXh0oJvzDgzpC9ZX3HIcOeWMmQVvO4LUryiRFIR2QpzP78c40EFPXtywVs0VuE5siz3QGMG7tRTeZ/Yc3X9pNkDBDuBWS2kb925n/6JYGWXm3kUizlaB2JvPencMO825RwkEidVRjJsbnNd9rqZcy8JsE0niooCY8ULP5k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712252097; c=relaxed/simple;
-	bh=samQoVWGgQBhDOMpVyk7UJdqW27OF25V0YQYaA7/xhM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XKYICY0tr1WZwJ3H9qSndq3djpc9rG1BMBmnbLUmktf0+Jysg+MTt4YbJyJ4pMskuWNEedPCMiEL/UAjUvaaE8yDCqatUrkxmgmzoiRtRdCwY5MBnbBafQoUjF5j9Q6LwhDO7n21R5uomMjXN/jWk1KD/4aRTiQEyBtv5b46FVM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DKuQDDoQ; arc=fail smtp.client-ip=40.107.96.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cd5EZFgv6Nax5lp69NdiPhKtls068biyY/6lJTXMk+TrfKgrXK1Ew80daBVsm1GZTy83Yj73Jq2dWrOcr8J+y/+hZzAuqNZoUk9vP5/8IHkcvzPaFH3EdjzA9SNC3nRU72k5R+lUPAi2y/1n8y1tqfuYkC3E0lGIfYNKvvIEQB1qsF1UifbP3zDdDEvwnNRfgzVPNXBaF5WzPckRSs4qTItDQbShjG7Lr/WoyGAQU3cJl14a3mbTodnjSQGEmX76AAyFoGQakG7Nzu6fjDDXa+bSC9wxbFPoHcJGwG56WCf3SA+XWv1H0FijEto+731ozMjncQbQgGo58YMrxnoTRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ROVsO9SlIBSedRs87nXUr456pDeeDtUG3v2Falnm7eI=;
- b=YNCIuRS/uJGFNyxTb611nhIcB9brZowwqXzc1GJ5TQqPbKy6WYCCkchdvf3z6VSFvy0c9LLHLhZdbM0g3Rp8r+kibk5e4TIMgKrzb98CNDVoKEayqnvoCe0Pn13I46VMNdSdn1oOuKg3WmYXnpruxheXTVRngn6J/KkKmPTZRfjmPLBKs/oVmLxPaL/uBvCjmj/vNaL+s2JbQxFPe0gKxKlEEWMEsM1Uy3AVwnXqI7YzUJt1vAGICCAdrDt/y3+7NFWYHYWaPR+aiPCwr1BWiZf7JuvEnLLwruBdjx67wObqCoYwNOiVZl0RrOt4vakJra1MR/eiBrDG7ov3MiqQgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ROVsO9SlIBSedRs87nXUr456pDeeDtUG3v2Falnm7eI=;
- b=DKuQDDoQeWMvhgT16h2uUdMdKykyfRCopT5IUmqFLnOiMhTs42g1PSEnDjCiJeaGc6tbAl2KMft2hc/mPDp1fwotldxSNx29CcXTN3IOBeEkl2LJBXHSXNhNuRiWUnYWY6Q1n7AmM4aJS5gm1YJtJvz9ERnrkb32jvvDKNXuL4L3XjkwtzLWxIdgknW67d45l6Zn7qJgpSsM9mVEfVGJTKIk2vgWAOamI33wH1T4CgVZNfgWe1EzAEws3OEr72gqKj9+1Ro3dTN6TO1dD/RrfnAjkAlcaNkRK3Vs2HHQXU8eeXmb1lqc1YjbvSQU4cjtlWCBuumZu4DAbjkWlxcCCg==
-Received: from MW4PR04CA0056.namprd04.prod.outlook.com (2603:10b6:303:6a::31)
- by PH7PR12MB5709.namprd12.prod.outlook.com (2603:10b6:510:1e0::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 4 Apr
- 2024 17:34:51 +0000
-Received: from MWH0EPF000A6732.namprd04.prod.outlook.com
- (2603:10b6:303:6a:cafe::8c) by MW4PR04CA0056.outlook.office365.com
- (2603:10b6:303:6a::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26 via Frontend
- Transport; Thu, 4 Apr 2024 17:34:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MWH0EPF000A6732.mail.protection.outlook.com (10.167.249.24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Thu, 4 Apr 2024 17:34:50 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 4 Apr 2024
- 10:34:35 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 4 Apr
- 2024 10:34:34 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server id 15.2.1258.12 via Frontend Transport; Thu, 4 Apr
- 2024 10:34:32 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>
-Subject: [PATCH net-next 5/5] net/mlx5e: Un-expose functions in en.h
-Date: Thu, 4 Apr 2024 20:33:57 +0300
-Message-ID: <20240404173357.123307-6-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240404173357.123307-1-tariqt@nvidia.com>
-References: <20240404173357.123307-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AAD12C7FB;
+	Thu,  4 Apr 2024 17:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712252110; cv=none; b=Sl6Abl5tbvcLxTq354kPG1Q4q6sYyQ5MI0JNtIAJatNBjblDjn72UDX1+cLjy90Fy/GzonhrK2FXrJXgQ17V6u3+MR/pja68oGG5qotcjdmjvMWHzsFZ/9NRb4/a8wDekhHn4CWES6Pd7AjvByG6drjxkckUG6GfoQOaTM2B790=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712252110; c=relaxed/simple;
+	bh=rhsuIjyygBYjXcTcQ9p1bgKNsKZKY3pivftvx6uGje4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=FWg/hyKpa60ATOnC8ex6g+EudjF5IiuAF5dJ+MmAhtATWXsDFSiGO5awgcP3MNHePEZja3QRuMCTSVs3pHEb8ZnoghXMhAuQvvtYltEV0e2wH+xT30p/4+pwgLQdbXEFfgtRaTkqBD8CBo+4TWoAebRQLrqI2IIXWGgrwGVnAEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bmhzb0Au; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-343b92e54f5so670304f8f.0;
+        Thu, 04 Apr 2024 10:35:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712252106; x=1712856906; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vkEZmzUX1kGDhrBjq33VrBewg3EmM3UDb6YkmRJyPlo=;
+        b=bmhzb0AuxcPFOtKzEpBziys6BT//vNrHDl8FU/0XQ8nh5HVtKsrs7pkERN5mNt3Epy
+         5M5QDEDmuEsuPAQlfGT77btkMuxM0dIkNSsVjpJoeL0OTek7cHQV/bmdbliMUEhuxtJ9
+         pfH3zWQq9gJWif0x6CCfkyeQ9MkRrOp6oJDwq43wqNMXQ/P+c39hfyPBfeZcGcd8B9sO
+         P5jXStRLGxZRY/rAq1NsN+N3McDIk3BS7SETtZvHDo8NCJfe8hsxFCg2Lf0dQNnsgXCy
+         oldnHarSHDUR6wlbQiTLtdXGD6tDSNCC+HBflVf5wtQW31rjlbqSZ27B+DTtQojI3CaZ
+         GtPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712252106; x=1712856906;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vkEZmzUX1kGDhrBjq33VrBewg3EmM3UDb6YkmRJyPlo=;
+        b=SXqPnUnAAmHEwbypww4Ky/Z5X85dp8oBEo8EXL62ANDbLfHp+j74VtAb+Cos+hNP0u
+         kKbCiktV5cj0W0vJ6hvnLbCsZbhKT689JpOCO5EmUzliNgZXxqFcLkwfkT6DT4jjX3uF
+         Cu4Sl2w6fMi3IumMbFE+PWZGnAr4BRx7tH4Z7y2Ce0a557hbQAra3DAR5Mio2uHXQ0bB
+         +wu8WglTB3GGG4wUgAd2z7dJ9TUSVivoqF7uUi4okw52DSeQzGnWvAyoZ0s3RnJUC7NB
+         YK8eDtdzXeLZ78avDY6dnTyEESxjj6jXqAgWUaHiDWcLlctfVVJgZ1bpe4zkYGX4f+Wx
+         aBHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVF5CCySfusB3eiX4gi9p+J8YMs4xEkvf4mKaMQVVJjJqtOvf9z+GyoX1t5CyPaCaNgXPRcfteJuBmecnrYTVaZge6GArWLpGhIWZfvLEml/PQbkRZ1P/NR8Yx0kxIMvbOs3Yp
+X-Gm-Message-State: AOJu0YwK4DwO4/jkC+mDHi8PwVv3rczT+DT9pybSWK4Jjm8RhBU08NBN
+	jVWAfxRWasgbWTF/KdoysnrCcXhiWh1m9EHhz4k/kMbxiaEI4DIT
+X-Google-Smtp-Source: AGHT+IEuxzvBhx/5efmijXtpPh+SbCTmqjT8On9tK8tgF6MMoQLabA4/c5R6q1yvPFOjsdzrn2OMCg==
+X-Received: by 2002:adf:fc02:0:b0:33e:ca29:5a3 with SMTP id i2-20020adffc02000000b0033eca2905a3mr221895wrr.23.1712252106393;
+        Thu, 04 Apr 2024 10:35:06 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id t12-20020adfe10c000000b0033e9d9f891csm20599056wrz.58.2024.04.04.10.35.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 10:35:06 -0700 (PDT)
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Christoph Hellwig <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, Leon Romanovsky <leonro@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
+ Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <20240304160237.GA2909161@nvidia.com>
+ <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
+ <2024032248-ardently-ribcage-a495@gregkh>
+ <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+ <Zf2n02q0GevGdS-Z@C02YVCJELVCG> <20240322135826.1c4655e2@kernel.org>
+ <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+ <20240322154027.5555780a@kernel.org>
+ <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+ <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184055.GP946323@nvidia.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
+Date: Thu, 4 Apr 2024 18:35:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20240402184055.GP946323@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6732:EE_|PH7PR12MB5709:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c796049-3ac1-4830-103c-08dc54cd87fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	MpOhv0iDZiBXHwMpEQgL2BRT3QdSeGme+rQaE2sv7R3pdrOKqMlfsMXD3fu5Mz+jdX7LIogFBuiPh5lv4VUmJ5ikhoHYPwnF1djZ5O3CzHErMKa76CpcIkOYDKj/bxp2dwyzLaDdhmhJFsNDaydbmtlOIHnMOkVmPZ0fMlJEW4+BtNvj/Y2EXni4PjZmYoOI6cjZGh9Wk8ywmp+l7+3pisBOSfQKkZ8UOvuFIwCndSPMQ2bWsqZ+tKRb7iFg/PjLgroxGNdLmPdflDo3Ve/MSTA4Chcx7MUlyEF8ywp8h4nlpI2X4XVWpzfL4g2DTdA6uu3rmdtUq6e9IDmyG/iqz5Yp3/zawqcplRjSH3AQfIB7nCuTc9m9sVH1SDJa13RabbWtzihATqoaWxSYne+kJXC82QPhJG3AZC9Nqopuf2xNHp2oIpKhaApqXLEck0rotl5VBWhaurYhWlJWU2qxP9C2TGM/jAaaSKKBHtFPdL6Jcm9HHdPQvbRqXBLxAI3/cpFSvdGvGdeXlTGzoi9CE9nCm4guBGcJMpCiNBVT78M51//y06FM0GPiCiar12Z2AzHCUUInHMI7r3hMRErNcw3FL2jz+HjxYy6ODcgLQ2RN8CM5cONB5BYs3vwNSc9vwh9gA7PXamvWqEo+t6/ECChH+CVa7sUDTzJ3MzFYPt8vDmmdCE1PypS1/7rU9nrC0CH5lD27u0K/W8VOx/b/dGoZHwcWW/77Uet+8l+AJWNPeEr1P38grhYcMy6nE4Xz
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 17:34:50.4833
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c796049-3ac1-4830-103c-08dc54cd87fc
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A6732.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5709
 
-Un-expose functions that are not used outside of their c file.
-Make them static.
+[ Again, I had better disassociate my employer from the vitriol below,
+  for which I alone am responsible. ]
 
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en.h  | 12 ----------
- .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 22 +++++++++----------
- .../net/ethernet/mellanox/mlx5/core/en_main.c |  2 +-
- 3 files changed, 12 insertions(+), 24 deletions(-)
+On 02/04/2024 19:40, Jason Gunthorpe wrote:
+> Uh no. Alot of this configuration stuff is to serve niche customer
+> interests where the customers have no interest in publishing and
+> commonizing their method of operating because it would give away their
+> own operator secrets. The vendor's created it because their big
+> customers demanded it.
+> 
+> eg there are configurables in mlx5 that exist *soley* to accomodate
+> certain customer's pre-existing SW.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index f5a3ac40f6e3..2acd1ebb0888 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -1143,7 +1143,6 @@ void mlx5e_close_drop_rq(struct mlx5e_rq *drop_rq);
- int mlx5e_create_tis(struct mlx5_core_dev *mdev, void *in, u32 *tisn);
- void mlx5e_destroy_tis(struct mlx5_core_dev *mdev, u32 tisn);
- 
--int mlx5e_update_nic_rx(struct mlx5e_priv *priv);
- void mlx5e_update_carrier(struct mlx5e_priv *priv);
- int mlx5e_close(struct net_device *netdev);
- int mlx5e_open(struct net_device *netdev);
-@@ -1180,23 +1179,12 @@ int mlx5e_ethtool_set_coalesce(struct mlx5e_priv *priv,
- 			       struct ethtool_coalesce *coal,
- 			       struct kernel_ethtool_coalesce *kernel_coal,
- 			       struct netlink_ext_ack *extack);
--int mlx5e_ethtool_get_link_ksettings(struct mlx5e_priv *priv,
--				     struct ethtool_link_ksettings *link_ksettings);
--int mlx5e_ethtool_set_link_ksettings(struct mlx5e_priv *priv,
--				     const struct ethtool_link_ksettings *link_ksettings);
--int mlx5e_get_rxfh(struct net_device *dev, struct ethtool_rxfh_param *rxfh);
--int mlx5e_set_rxfh(struct net_device *dev, struct ethtool_rxfh_param *rxfh,
--		   struct netlink_ext_ack *extack);
- u32 mlx5e_ethtool_get_rxfh_key_size(struct mlx5e_priv *priv);
- u32 mlx5e_ethtool_get_rxfh_indir_size(struct mlx5e_priv *priv);
- int mlx5e_ethtool_get_ts_info(struct mlx5e_priv *priv,
- 			      struct ethtool_ts_info *info);
- int mlx5e_ethtool_flash_device(struct mlx5e_priv *priv,
- 			       struct ethtool_flash *flash);
--void mlx5e_ethtool_get_pauseparam(struct mlx5e_priv *priv,
--				  struct ethtool_pauseparam *pauseparam);
--int mlx5e_ethtool_set_pauseparam(struct mlx5e_priv *priv,
--				 struct ethtool_pauseparam *pauseparam);
- 
- /* mlx5e generic netdev management API */
- static inline bool
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-index 69f6a6aa7c55..93a13a478c11 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-@@ -996,8 +996,8 @@ static void get_lp_advertising(struct mlx5_core_dev *mdev, u32 eth_proto_lp,
- 	ptys2ethtool_adver_link(lp_advertising, eth_proto_lp, ext);
- }
- 
--int mlx5e_ethtool_get_link_ksettings(struct mlx5e_priv *priv,
--				     struct ethtool_link_ksettings *link_ksettings)
-+static int mlx5e_ethtool_get_link_ksettings(struct mlx5e_priv *priv,
-+					    struct ethtool_link_ksettings *link_ksettings)
- {
- 	struct mlx5_core_dev *mdev = priv->mdev;
- 	u32 out[MLX5_ST_SZ_DW(ptys_reg)] = {};
-@@ -1167,8 +1167,8 @@ static bool ext_requested(u8 autoneg, const unsigned long *adver, bool ext_suppo
- 	return  autoneg == AUTONEG_ENABLE ? ext_link_mode : ext_supported;
- }
- 
--int mlx5e_ethtool_set_link_ksettings(struct mlx5e_priv *priv,
--				     const struct ethtool_link_ksettings *link_ksettings)
-+static int mlx5e_ethtool_set_link_ksettings(struct mlx5e_priv *priv,
-+					    const struct ethtool_link_ksettings *link_ksettings)
- {
- 	struct mlx5_core_dev *mdev = priv->mdev;
- 	struct mlx5_port_eth_proto eproto;
-@@ -1268,7 +1268,7 @@ static u32 mlx5e_get_rxfh_indir_size(struct net_device *netdev)
- 	return mlx5e_ethtool_get_rxfh_indir_size(priv);
- }
- 
--int mlx5e_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh)
-+static int mlx5e_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh)
- {
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
- 	u32 rss_context = rxfh->rss_context;
-@@ -1281,8 +1281,8 @@ int mlx5e_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh)
- 	return err;
- }
- 
--int mlx5e_set_rxfh(struct net_device *dev, struct ethtool_rxfh_param *rxfh,
--		   struct netlink_ext_ack *extack)
-+static int mlx5e_set_rxfh(struct net_device *dev, struct ethtool_rxfh_param *rxfh,
-+			  struct netlink_ext_ack *extack)
- {
- 	struct mlx5e_priv *priv = netdev_priv(dev);
- 	u32 *rss_context = &rxfh->rss_context;
-@@ -1411,8 +1411,8 @@ static void mlx5e_get_pause_stats(struct net_device *netdev,
- 	mlx5e_stats_pause_get(priv, pause_stats);
- }
- 
--void mlx5e_ethtool_get_pauseparam(struct mlx5e_priv *priv,
--				  struct ethtool_pauseparam *pauseparam)
-+static void mlx5e_ethtool_get_pauseparam(struct mlx5e_priv *priv,
-+					 struct ethtool_pauseparam *pauseparam)
- {
- 	struct mlx5_core_dev *mdev = priv->mdev;
- 	int err;
-@@ -1433,8 +1433,8 @@ static void mlx5e_get_pauseparam(struct net_device *netdev,
- 	mlx5e_ethtool_get_pauseparam(priv, pauseparam);
- }
- 
--int mlx5e_ethtool_set_pauseparam(struct mlx5e_priv *priv,
--				 struct ethtool_pauseparam *pauseparam)
-+static int mlx5e_ethtool_set_pauseparam(struct mlx5e_priv *priv,
-+					struct ethtool_pauseparam *pauseparam)
- {
- 	struct mlx5_core_dev *mdev = priv->mdev;
- 	int err;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 81e1c1e401f9..a0d3af96dcb1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5562,7 +5562,7 @@ static void mlx5e_nic_disable(struct mlx5e_priv *priv)
- 	mlx5e_ipsec_cleanup(priv);
- }
- 
--int mlx5e_update_nic_rx(struct mlx5e_priv *priv)
-+static int mlx5e_update_nic_rx(struct mlx5e_priv *priv)
- {
- 	return mlx5e_refresh_tirs(priv, false, false);
- }
--- 
-2.44.0
+So it's a single-user hack, why do you want support for it in upstream?
+Oh right, because you want to be able to ship single-user hacks to all
+ your customers while still getting the _cachet_ of being An Intree
+ Driver with the implied engineering benefits of open source — despite
+ the actual feature implementations being obscured in firmware that's
+ not subject to the review process and thus doesn't actually carry
+ those benefits.
 
+> There are something like 600-800 configurables in mlx5
+
+So because your engineers can't design clean, orthogonal APIs for
+ toffee, you should be allowed to bypass review?  Sorry, but no.
+The right approach is to find generic mechanisms that cover multiple
+ customer configurations by allowing each customer to specify a policy
+ — which is better not just for the kernel but also for your customers
+ (they can experiment more easily with new policies) and even for you
+ (you don't have to spend engineer time on implementing hundreds of
+ single-purpose configuration switches, and can instead focus on
+ making better products).  And of course the customer's policy, with
+ their 'valuable' operator secrets, stays in-house.
+
+This is not some revolutionary new idea or blue-sky architecture
+ astronaut thinking; this is the way the Unix engineering tradition
+ has worked for half a century.
+
+And it's not like we don't give you the tools to do it!
+BPF demonstrates that the kernel is perfectly willing to expose highly
+ complex configuration primitives to userspace, *as long as* the
+ interface is well-defined and cross-vendor.
+Of course, without knowing what your several hundred knobs are for, I
+ can't tell you even in the broadest sense what shape a clean config
+ system to replace them would look like.  But 800 magic flags isn't it.
+
+> Where is the screaming?  Where has keeping blessed support out of
+> the kernel got us?
+
+Well, clearly *someone* wants you to supply them an in-tree driver,
+ else you wouldn't be trying to upstream this.  Now maybe they really
+ do just have a psychological aversion to TAINT_OOT_MODULE, but it's
+ more likely that the underlying reason is the improved reliability,
+ maintainability, and portability that come from the upstreaming
+ process.  And that in turn only happens because the kernel does not
+ "bless" crap.
+
+> The actual benefit of common names for the individual configuration
+> values is pretty tiny.
+
+In case I still need to make it clearer: the purpose of requiring
+ your configurables to go through review is not so you can have
+ "common names" for 800 magic flags.  It's so that you are forced to
+ come up with configurables that actually have a sensible design and
+ meaningful semantics that you can define in a way that gives you
+ something to *put* in the name and the commit message that's not
+ just "magic behaviour tweak #42 for $BigCustomer".
+
+> a second argument about who gets to have power in our community.
+
+As I understand it, power in Linux is entirely social and informal.
+If you think Kuba doesn't have standing to object, there's nothing
+ *technical* stopping you from applying the patches with his
+ Nacked-by tag included in the commit messages, then sending the
+ resulting PR to Linus.
+And if you think that Linus would reject the PR in that case, then
+ you're implicitly conceding that Kuba *does* have standing.
 
