@@ -1,388 +1,130 @@
-Return-Path: <netdev+bounces-84697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D73C7897E10
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 05:51:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4988B897E14
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 05:57:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55FB11F268DB
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 03:51:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF2E01F23969
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 03:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A42208C3;
-	Thu,  4 Apr 2024 03:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C292032B;
+	Thu,  4 Apr 2024 03:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OMVgedBq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTMoMozg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6E71CFB5
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 03:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180673FC2;
+	Thu,  4 Apr 2024 03:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712202712; cv=none; b=HZI+dmFUh0DcfPEExeZ2NbGPJhiq+MJeAKuz3unCePW2Y9fQgXwli3mbARys0ql4KPJaYfHokkidwPT0k+1g8mIFaByP+s5sUmQTkDHH4lOoTHvhJEURNZozCm/KN8EtvuNd9hiwK4bsQGAsxyls/85IhdJ5lHpKc0PJIX8AoUc=
+	t=1712203062; cv=none; b=YbQ/V74nP0fHIdV50Nkj+gmU9G5hHFoakoIMatyGyzZaeP03UX6ttXTfnUuxrevvLTkARTMcYaWeHQfl3Xnl/PD2MIci/ETxpcBUy9IfAYCHcYaCaUbz25aE+YgWC0OxEXHRgdyZmnQngVsuj67uXVJyJgJQ1nN4LyMOSIFjG68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712202712; c=relaxed/simple;
-	bh=4aQyRYsGMiSmXaiK4YwYJxXKPRfdzgnPhuw5zB+aNJI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Msq1EXTdjMEmjb493+S4qfYwPVbbuVafPVfBKSgyuCwX21uoQxjKdCMd3d1PkTjtt77UTA8n88FMJeplDWw0jqWyd4MS+0wj9ASrdWWt4NiXfbdAG7TroonpvrB8KkPGpd2hvUl4dWeHfxMdD6lS7yTdsroMO1etc/iJIYDGaq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OMVgedBq; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d858501412so2161841fa.0
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 20:51:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1712202708; x=1712807508; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=maQupXCv1wDKJfBatE3MRh4Sn+Ojo3u7e3ifshllnWE=;
-        b=OMVgedBqaPRcK3RzF4psYueTlbjp8o9bxMvjxWqkdHP5dm/gxqo9c5mvmvJOh18un4
-         gNuNNKXoNAt3NtvdDmA7hrAj1xdc3Qu1AhqGhf3J15KDO18+pGAI3N3Yj0DIMoPbUJR6
-         bj5SqB1NxOLmNoJjeJXzy15IngQZkKuPIk4Nk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712202708; x=1712807508;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=maQupXCv1wDKJfBatE3MRh4Sn+Ojo3u7e3ifshllnWE=;
-        b=Q9Ox9aIltlCpzWjjNb4QEBfjU3qet9t7Y9JopdX2z1ktbJYgUtv69+nkcnmaZ73GXO
-         GYbF+TsvJBLI85kiiqg8x5Arbq5y00iQtRnTLzksb7bQBPb/DvrbRuN65dc0WQ3AptS2
-         xiTjrfm+4zaX+XISmMN9p/2+j1wYoXSETv6U2SrNzmQdFu5h0hgOkr4qOLBrZeB5NOr7
-         Wfq+qUDwpA/1H5VYV4QYdGTP0WwP9q75GKNQEN8Y/mRYxnJ/7KzBT5A0YRI5hagNEcSP
-         0LEyiqhDyLDKZbbMWnKrNkl1EFPAQ81E4vdLfPGLPTAqL17iRNLTUlW5gVpxRWS3P3V5
-         xSfg==
-X-Gm-Message-State: AOJu0YxJ5q2qV/7ztU5GQbBBXPlBc8oid18tTtoVUbsd97nNPfkUrZSN
-	+MeP2YiycrPnA5+CsEm+69Eb8zLCiTOKNz98UirH/KSyiLxIkGlt1NAhb5v3xoUOG5ApL6BgNtq
-	gXKzo1yvO0vm/enXmMX6OeANH22YD/DeuTm4T
-X-Google-Smtp-Source: AGHT+IHnwtEhXua2WVkgLnF68DX2xKtbrnZm+/drmrsz8bMZ0IaAWzOJ8NXEXsuDvXd15hMDF4u9z1atkwe60W2R/04=
-X-Received: by 2002:a05:6512:48d6:b0:513:a479:3ad9 with SMTP id
- er22-20020a05651248d600b00513a4793ad9mr733672lfb.55.1712202707747; Wed, 03
- Apr 2024 20:51:47 -0700 (PDT)
+	s=arc-20240116; t=1712203062; c=relaxed/simple;
+	bh=QcQykjmrkgn42T+2ukwvujAgs4TaBfSCN2Y9G52ZM8I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VpBfh6EneZmmxUkK6MGZdCdvGwjcA1MpdfPruknprP+mXAeSsO0jQQa4g8UlqlxGpuyg3Q/Q5YOnHHvqIjM62SN+i9JTRbcDz8X0JADuMqakqvpgS6cHyy2jiH5PFU53OwveOuhGZ3A81L3/vCO5LWIxdUcm+PXveSylkblb3ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTMoMozg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 730A1C433F1;
+	Thu,  4 Apr 2024 03:57:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712203061;
+	bh=QcQykjmrkgn42T+2ukwvujAgs4TaBfSCN2Y9G52ZM8I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XTMoMozgq1tMZQUsA0fXJ0+E8z19RsfjQU9ydUY6JfMbApzXHzfC4bFUHSTMitG1c
+	 DCbyAIz6VSa+rFoFzTlWqvoaAw1Mqp3FVzMZxTnC7LRHtgI0Hy4qN6yBLaf5yHKs7E
+	 FSKPc72q4LxpzY2gNr29oNBW5jR+kMne9rPI335nuw9ooVuypmxtQ9A3jsZLOvzOGc
+	 LoQF+jVFM12E8pbsLhsTbICmIhvKY/TBFxoGymz8JzLWWKDKYqqMxbzxVpt/0hEUOI
+	 IHT9Jc2ggE1v6vaNjkFwPeqtsWRh2ItIm8q930Hfo4DC7JBQ7/bvbN42Ij0b6pIG8g
+	 HF8TiD7SnZT4w==
+Message-ID: <573697bb-a3e3-4016-82e7-dec3c2804c90@kernel.org>
+Date: Wed, 3 Apr 2024 21:57:39 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403174133.37587-1-parav@nvidia.com> <20240403174133.37587-3-parav@nvidia.com>
-In-Reply-To: <20240403174133.37587-3-parav@nvidia.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 4 Apr 2024 09:21:35 +0530
-Message-ID: <CAH-L+nOBTvHefxv0PeGj6TjrAk3D2fAWTyb_puBDRYQTkEmPeA@mail.gmail.com>
-Subject: Re: [net-next v3 2/2] mlx5/core: Support max_io_eqs for a function
-To: Parav Pandit <parav@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, saeedm@nvidia.com, 
-	leon@kernel.org, jiri@resnulli.us, shayd@nvidia.com, danielj@nvidia.com, 
-	dchumak@nvidia.com, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000341a5106153d420b"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, Edward Cree <ecree.xilinx@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@infradead.org>,
+ Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
+ Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <2024032248-ardently-ribcage-a495@gregkh>
+ <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+ <Zf2n02q0GevGdS-Z@C02YVCJELVCG> <20240322135826.1c4655e2@kernel.org>
+ <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+ <20240322154027.5555780a@kernel.org>
+ <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+ <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184832.GO11187@unreal>
+ <cefa2b9a-4227-969e-d31e-c19a552b9c1c@gmail.com>
+ <20240403190012.GV11187@unreal>
+ <d75ee9d5-36a9-4056-a0f3-0c05b2e744aa@kernel.org>
+ <20240403170149.7d2b8f2b@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240403170149.7d2b8f2b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---000000000000341a5106153d420b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 4/3/24 6:01 PM, Jakub Kicinski wrote:
+> On Wed, 3 Apr 2024 13:31:46 -0600 David Ahern wrote:
+>>> ... Patches aren't languishing for want of reviewer resources; it's just that it
+>>>  takes *submitter* time and effort to bring them up to the quality level
+>>>  that's required, and occasionally the vendor has to (shock! horror!)
+>>>  tell the world what one of their magic knobs actually *does*. ...
+>>>
+>>> ^^^^ Content
+>>> This paragraph alone shows that you completely didn't understand the
+>>> discussion here.
+>>
+>> +1
+> 
+> "didn't understand the discussion" is an ironic thing for you to +1,
 
-On Wed, Apr 3, 2024 at 11:12=E2=80=AFPM Parav Pandit <parav@nvidia.com> wro=
-te:
->
-> Implement get and set for the maximum IO event queues for SF and VF.
-> This enables administrator on the hypervisor to control the maximum
-> IO event queues which are typically used to derive the maximum and
-> default number of net device channels or rdma device completion vectors.
->
-> Reviewed-by: Shay Drory <shayd@nvidia.com>
-> Signed-off-by: Parav Pandit <parav@nvidia.com>
-
-Thanks Parav for addressing the comments. Changes look good to me.
-
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-> ---
-> changelog:
-> v2->v3:
-> - limited to 80 chars per line in devlink
-> - fixed comments from Jakub in mlx5 driver to fix missing mutex unlock
->   on error path
-> v1->v2:
-> - fixed comments from Kalesh
-> - fixed missing kfree in get call
-> - returning error code for get cmd failure
-> - fixed error msg copy paste error in set on cmd failure
-> - limited code to 80 chars limit
-> - fixed set function variables for reverse christmas tree
-> ---
->  .../mellanox/mlx5/core/esw/devlink_port.c     |  4 +
->  .../net/ethernet/mellanox/mlx5/core/eswitch.h |  7 ++
->  .../mellanox/mlx5/core/eswitch_offloads.c     | 97 +++++++++++++++++++
->  3 files changed, 108 insertions(+)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c b=
-/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-> index d8e739cbcbce..f8869c9b6802 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-> @@ -98,6 +98,8 @@ static const struct devlink_port_ops mlx5_esw_pf_vf_dl_=
-port_ops =3D {
->         .port_fn_ipsec_packet_get =3D mlx5_devlink_port_fn_ipsec_packet_g=
-et,
->         .port_fn_ipsec_packet_set =3D mlx5_devlink_port_fn_ipsec_packet_s=
-et,
->  #endif /* CONFIG_XFRM_OFFLOAD */
-> +       .port_fn_max_io_eqs_get =3D mlx5_devlink_port_fn_max_io_eqs_get,
-> +       .port_fn_max_io_eqs_set =3D mlx5_devlink_port_fn_max_io_eqs_set,
->  };
->
->  static void mlx5_esw_offloads_sf_devlink_port_attrs_set(struct mlx5_eswi=
-tch *esw,
-> @@ -143,6 +145,8 @@ static const struct devlink_port_ops mlx5_esw_dl_sf_p=
-ort_ops =3D {
->         .port_fn_state_get =3D mlx5_devlink_sf_port_fn_state_get,
->         .port_fn_state_set =3D mlx5_devlink_sf_port_fn_state_set,
->  #endif
-> +       .port_fn_max_io_eqs_get =3D mlx5_devlink_port_fn_max_io_eqs_get,
-> +       .port_fn_max_io_eqs_set =3D mlx5_devlink_port_fn_max_io_eqs_set,
->  };
->
->  int mlx5_esw_offloads_devlink_port_register(struct mlx5_eswitch *esw, st=
-ruct mlx5_vport *vport)
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/=
-net/ethernet/mellanox/mlx5/core/eswitch.h
-> index 349e28a6dd8d..50ce1ea20dd4 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> @@ -573,6 +573,13 @@ int mlx5_devlink_port_fn_ipsec_packet_get(struct dev=
-link_port *port, bool *is_en
->  int mlx5_devlink_port_fn_ipsec_packet_set(struct devlink_port *port, boo=
-l enable,
->                                           struct netlink_ext_ack *extack)=
-;
->  #endif /* CONFIG_XFRM_OFFLOAD */
-> +int mlx5_devlink_port_fn_max_io_eqs_get(struct devlink_port *port,
-> +                                       u32 *max_io_eqs,
-> +                                       struct netlink_ext_ack *extack);
-> +int mlx5_devlink_port_fn_max_io_eqs_set(struct devlink_port *port,
-> +                                       u32 max_io_eqs,
-> +                                       struct netlink_ext_ack *extack);
-> +
->  void *mlx5_eswitch_get_uplink_priv(struct mlx5_eswitch *esw, u8 rep_type=
-);
->
->  int __mlx5_eswitch_set_vport_vlan(struct mlx5_eswitch *esw,
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b=
-/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> index baaae628b0a0..2ad50634b401 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> @@ -66,6 +66,8 @@
->
->  #define MLX5_ESW_FT_OFFLOADS_DROP_RULE (1)
->
-> +#define MLX5_ESW_MAX_CTRL_EQS 4
-> +
->  static struct esw_vport_tbl_namespace mlx5_esw_vport_tbl_mirror_ns =3D {
->         .max_fte =3D MLX5_ESW_VPORT_TBL_SIZE,
->         .max_num_groups =3D MLX5_ESW_VPORT_TBL_NUM_GROUPS,
-> @@ -4557,3 +4559,98 @@ int mlx5_devlink_port_fn_ipsec_packet_set(struct d=
-evlink_port *port,
->         return err;
->  }
->  #endif /* CONFIG_XFRM_OFFLOAD */
-> +
-> +int
-> +mlx5_devlink_port_fn_max_io_eqs_get(struct devlink_port *port, u32 *max_=
-io_eqs,
-> +                                   struct netlink_ext_ack *extack)
-> +{
-> +       struct mlx5_vport *vport =3D mlx5_devlink_port_vport_get(port);
-> +       int query_out_sz =3D MLX5_ST_SZ_BYTES(query_hca_cap_out);
-> +       u16 vport_num =3D vport->vport;
-> +       struct mlx5_eswitch *esw;
-> +       void *query_ctx;
-> +       void *hca_caps;
-> +       u32 max_eqs;
-> +       int err;
-> +
-> +       esw =3D mlx5_devlink_eswitch_nocheck_get(port->devlink);
-> +       if (!MLX5_CAP_GEN(esw->dev, vhca_resource_manager)) {
-> +               NL_SET_ERR_MSG_MOD(extack,
-> +                                  "Device doesn't support VHCA managemen=
-t");
-> +               return -EOPNOTSUPP;
-> +       }
-> +
-> +       query_ctx =3D kzalloc(query_out_sz, GFP_KERNEL);
-> +       if (!query_ctx)
-> +               return -ENOMEM;
-> +
-> +       mutex_lock(&esw->state_lock);
-> +       err =3D mlx5_vport_get_other_func_cap(esw->dev, vport_num, query_=
-ctx,
-> +                                           MLX5_CAP_GENERAL);
-> +       if (err) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Failed getting HCA caps");
-> +               goto out;
-> +       }
-> +
-> +       hca_caps =3D MLX5_ADDR_OF(query_hca_cap_out, query_ctx, capabilit=
-y);
-> +       max_eqs =3D MLX5_GET(cmd_hca_cap, hca_caps, max_num_eqs);
-> +       if (max_eqs < MLX5_ESW_MAX_CTRL_EQS)
-> +               *max_io_eqs =3D 0;
-> +       else
-> +               *max_io_eqs =3D max_eqs - MLX5_ESW_MAX_CTRL_EQS;
-> +out:
-> +       mutex_unlock(&esw->state_lock);
-> +       kfree(query_ctx);
-> +       return err;
-> +}
-> +
-> +int
-> +mlx5_devlink_port_fn_max_io_eqs_set(struct devlink_port *port, u32 max_i=
-o_eqs,
-> +                                   struct netlink_ext_ack *extack)
-> +{
-> +       struct mlx5_vport *vport =3D mlx5_devlink_port_vport_get(port);
-> +       int query_out_sz =3D MLX5_ST_SZ_BYTES(query_hca_cap_out);
-> +       u16 max_eqs =3D max_io_eqs + MLX5_ESW_MAX_CTRL_EQS;
-> +       u16 vport_num =3D vport->vport;
-> +       struct mlx5_eswitch *esw;
-> +       void *query_ctx;
-> +       void *hca_caps;
-> +       int err;
-> +
-> +       esw =3D mlx5_devlink_eswitch_nocheck_get(port->devlink);
-> +       if (!MLX5_CAP_GEN(esw->dev, vhca_resource_manager)) {
-> +               NL_SET_ERR_MSG_MOD(extack,
-> +                                  "Device doesn't support VHCA managemen=
-t");
-> +               return -EOPNOTSUPP;
-> +       }
-> +
-> +       if (max_io_eqs + MLX5_ESW_MAX_CTRL_EQS > USHRT_MAX) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Supplied value out of range")=
-;
-> +               return -EINVAL;
-> +       }
-> +
-> +       query_ctx =3D kzalloc(query_out_sz, GFP_KERNEL);
-> +       if (!query_ctx)
-> +               return -ENOMEM;
-> +
-> +       mutex_lock(&esw->state_lock);
-> +       err =3D mlx5_vport_get_other_func_cap(esw->dev, vport_num, query_=
-ctx,
-> +                                           MLX5_CAP_GENERAL);
-> +       if (err) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Failed getting HCA caps");
-> +               goto out;
-> +       }
-> +
-> +       hca_caps =3D MLX5_ADDR_OF(query_hca_cap_out, query_ctx, capabilit=
-y);
-> +       MLX5_SET(cmd_hca_cap, hca_caps, max_num_eqs, max_eqs);
-> +
-> +       err =3D mlx5_vport_set_other_func_cap(esw->dev, hca_caps, vport_n=
-um,
-> +                                           MLX5_SET_HCA_CAP_OP_MOD_GENER=
-AL_DEVICE);
-> +       if (err)
-> +               NL_SET_ERR_MSG_MOD(extack, "Failed setting HCA caps");
-> +
-> +out:
-> +       mutex_unlock(&esw->state_lock);
-> +       kfree(query_ctx);
-> +       return err;
-> +}
-> --
-> 2.26.2
->
+Come on, Jakub. The +1 was regarding Leon's entire response to Ed, not
+just the last part you so conveniently quoted here. I agree 100% wiht
+Leon that Ed's "Language, tone, and content of your email were
+inappropriate". That is why I left the entire quote in the response and
+not just the paragraph above.
 
 
---=20
-Regards,
-Kalesh A P
+> David. After all my emails about HNS3 RDMA you somehow concluded today
+> that I want to make rules for the entire kernel:
+> https://lore.kernel.org/all/6faa47b0-27c3-47f9-94be-1ec671d9543c@kernel.org/
+> 
 
---000000000000341a5106153d420b
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+And as for that response (the URL you listed there), what else should
+one conclude? That has to be a fair summation of your stance because
+this entire thread is on a driver completely unrelated to netdev that
+you jumped in on with a NACK. I have asked multiple times in this thread
+and the one before where you believe your boundary ends as a maintainer.
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIEtVOkMEHxir1kgl7R4cCI5FBx6TJO6cROqlOEflF+2FMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQwNDAzNTE0OFowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAzWClfx6qa
-4Z04NVxzq2d+/0gzvKZkh1Gu5ZF9rs89D6m4GJEaAfT0JmpAisZrWq75Jbg+H/e+sy/ykiYR0N2n
-ItLLsg2hfd6wGsedTXGMkskXKPgcme/MHeyWQ2Nq6wLlZwYmnWB8wsraQTeo0LReIuGFlWk0Jv7r
-AjLX+PUyU4KgxEfUPifkCyLJ2O6mq2xw6kX/1qoi9GHRJSOwiU32oGifLqsH5TckokIqsL/mqgb0
-g0xemoU2osXLHNFsHsuJmQSV0MW9TCTDhPqrqLAFFU3zJBUa6TZcToqyjfqgE6xmu+h/BmN6crtC
-iwjVcr0lYfz+jSbIZ/dRbCGQU78r
---000000000000341a5106153d420b--
+
+> And I second what Ed said. I have asked multiple vendors preaching
+> impossibilism in this thread to start posting those knobs. I offered
+> to do a quick off-list review of the list of knobs they have to give 
+> a quick yay / nay, so they don't waste time implementing things that
+> would get nacked. None of the vendors bothered taking me up on that
+> offer.
+
+Again, entirely missing the point. This is not about configure knobs
+that have a potential to be consistent across devices.
+
+Sadly, this thread is not a spiral, ever so slowly converging on an
+agreement, but a merry-ground just going in circles.
+
+
 
