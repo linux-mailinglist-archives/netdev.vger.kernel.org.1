@@ -1,136 +1,164 @@
-Return-Path: <netdev+bounces-84795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AEEA89858B
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:58:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C7728985A1
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:03:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6792C1C20B28
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:58:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26111B20E6A
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B4380C09;
-	Thu,  4 Apr 2024 10:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B477D82887;
+	Thu,  4 Apr 2024 11:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SMHig4SZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDTYor3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE61757F8
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 10:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F87A59157;
+	Thu,  4 Apr 2024 11:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712228322; cv=none; b=nL34BEq5KtJdUaRscP5uK8oUNbdJ9oxNC95UAVOP2DvGlxx0FiA8NmwVikqLwm3xjyPOV8MuCDVirTR7favdPUVqDk6FGWW1w77TTz98rHWvQPnlazgzzQv36pkmsaMuAQT2AMDP7zch2ISFE5YnsCDJDl4NGfSiOZ+QHwGjpZw=
+	t=1712228603; cv=none; b=ToI6yNP5lZpEIh5xL6BwrhOKoD+2MxV/AjM/nvJuWiNqqbG0Fut8r9M9ZeglaXZSz2llVRJrVWtcZ/rBtcNF+V8EpNB+t7p3Scu+m/No177aVdQaqkKfUEbrXHJOHjGl5YC40kN3pN/yOQSGELcsgkeIPDRiWLE0bb8YblhuDMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712228322; c=relaxed/simple;
-	bh=EdtvoBukPT9bElPlweOCe5Q9pfjpP2PTBDviIr1amC4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L+sYTDvlO/NL8JC4iO5UdMTBgXDA6e1VDmGxpLJBT3dQeucrUbq++I7qOsgRUitKeeLrI4/p7ns+/DRZFpT27AgLKREWFTiZrFKfEFuRN1W5SjWDQ3sKS0Be7zhtUp9MZOcmVRKGJaRxYSfrcK2j9wWFGbAsAZ2DFank4S9Taj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SMHig4SZ; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56e0430f714so8667a12.1
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 03:58:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712228319; x=1712833119; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gGn5NVJs/3hfENazcAUnSsy/bAXTy8kRiGljS0ZwrmU=;
-        b=SMHig4SZT6kQARydbwZvdptz1IvytwBSKJR9GlWjMAg80bEulrQquiDlQmTuzHK1H9
-         2C3Gfb9kbJGxNqPfkGpuK6X9qv9cBPXY+Jhp21DxCMNKRsRPRPOmI1Bk50/keZfTlCev
-         yN7tlEH+rpNSdOvxTeYHxgcG6AuxpuvM7Qape1UGfagqJJ29upkkyWf7Mcpo3kgH5LcK
-         CcblxyhfGetZDHp460F6EPUj/zjihTbgQUojxTDXUsJ7O8ei3dfvdLal04v4nlQzQjN/
-         PIb646QF5C9wAOS6juyXiRSRNGFyt2OU9czixjcfnesKyiszAVQq+IMN45amBMyHQVdq
-         B50g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712228319; x=1712833119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gGn5NVJs/3hfENazcAUnSsy/bAXTy8kRiGljS0ZwrmU=;
-        b=BlXY/aZ1MbYxmOVc0Pt5fOhcLIdHuJYwJoOs2Ikyu4cmpuvCYaeCE9+4pYYUiqx/M1
-         JSYNqG1wfZfqZHYiHxa563P0FiLYLfC/3bewZsukVe65TWN5I14yJ5DGXLJz0ypSJMeh
-         KQGm6wPH+oel2cjFSnuxhLs1QVvgKQ2ONjTpHVYIbPDCBYFlcbxjBx0hEZtw0dVcJKsi
-         YJJX+p0QF4GWEv8lnRECdak82wHB6Vyfs6LH+3ByyH/A+NsSh5Bih5/iVy9iLhhBgYty
-         MolhymwjbqC4xOtOeO9A4mS46DaoSwICtN2YguIGGKv0sK1/weFT/Vu2de82v7jnGakT
-         jODg==
-X-Forwarded-Encrypted: i=1; AJvYcCWJ+zwqCC0hanyOdrIE/T5lcGwuuHKER6cfjLnPfEX7gXoxAE/u+1INLF0hKiWKoBmjk2qjfxIaAriaBHfxUKbvrXme+Pru
-X-Gm-Message-State: AOJu0YwA3lusFHpopFssafFwkfWyT4hOuFzo8//SqCWJxZHchd7lkBlk
-	tl1zTGxoW9wRsJnp+PgX6BsH4ZXGuDq1/LClMdLBn+wHWbvr6WoCWEEVpVZKfwHjeyVbuQ7Ne+g
-	FxOzllbSSAmot3goC5G9jkK5auwfOokYGYUu8
-X-Google-Smtp-Source: AGHT+IH3KWhUydszxYkWMlx9jigIPAm3rzvu4GWPbZl3HVbmRfcTD9TqSOCY1S+NR3NVqBh8K+sZARv3ppAwoEX1O/A=
-X-Received: by 2002:a05:6402:26c4:b0:56e:22b4:fa72 with SMTP id
- x4-20020a05640226c400b0056e22b4fa72mr37841edd.3.1712228319178; Thu, 04 Apr
- 2024 03:58:39 -0700 (PDT)
+	s=arc-20240116; t=1712228603; c=relaxed/simple;
+	bh=Q14ggXy+y0e4OfUSS6sgHf6RZqlI/EP8PYD1AXlxvVw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qOuCjVJ2ZwihhIrWa7OHKccsNQeGGMaXO3XM1jYpaWN5bfE4GtEOlYayaQOq5SdXKtYMajN2BQVYwEqvra2PcD2c66ZXo09VhvteZiTQfyVsuQuy604wiUDozzrroHLhzUJQg8bHAfohRfMzDO4w4knG3bzzs+TZQt4vOIbv+Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mDTYor3G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60563C43399;
+	Thu,  4 Apr 2024 11:03:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712228603;
+	bh=Q14ggXy+y0e4OfUSS6sgHf6RZqlI/EP8PYD1AXlxvVw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mDTYor3GUqTiqx1mWDSXkEV1Vnm/cCTGnTl1eKZLn9l72ZgLAzRW16KGZ893QZmTJ
+	 HjHO8kjaJGFOGhC3oEJJq2/b0EkcS3b5UYeX0VJNn2GrLx8HfcnUhtMnNLkZJrpUd2
+	 AVuWLxDc80BMc4FEf6eSiWhhugSKsktgkAx7DZ8fgGXez1BC8W7gbDQIHk2qDLPNhi
+	 0HJ1LJCtDWGJJJ+0LQNfepO0MP4gXqM+5r44jJGWFea4furiWM8VIcH0RiSHZeoOXl
+	 Xj2RUHZGAmPFb2FxejqTvEJWWHaWHt5S5AVI3AUlYmyFtv8XC6UJ8tk+lFDUo556nH
+	 feq2HzpO7cx1g==
+Message-ID: <15064d90-e89d-4522-90a8-52aad643d7c8@kernel.org>
+Date: Thu, 4 Apr 2024 13:03:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240402215405.432863-1-hli@netflix.com> <CANn89iJOSUa2EvgENS=zc+TKtD6gOgfVn-6me1SNhwFrA2+CXw@mail.gmail.com>
- <CANn89iLyb70E+0NcYUQ7qBJ1N3UH64D4Q8EoigXw287NNQv2sg@mail.gmail.com>
- <b3kspnkcbj2p3c5q6rbujih72n7vouafpreg5mjsrgvf4fpu52@545rpheaixni> <CANn89iJ3YrSg-Y+g65vowMtBzvNokT2N7ffk4=uw33k3SsePPA@mail.gmail.com>
-In-Reply-To: <CANn89iJ3YrSg-Y+g65vowMtBzvNokT2N7ffk4=uw33k3SsePPA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 4 Apr 2024 12:58:25 +0200
-Message-ID: <CANn89iJgr3f23-t2O+cMcyQixNhcTGVVwp3m69J3G28zW4MPkg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: update window_clamp together with scaling_ratio
-To: Hechao Li <hli@netflix.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
-	Tycho Andersen <tycho@tycho.pizza>, Neal Cardwell <ncardwell@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] bpf: fix null ptr deref in dev_map_enqueue
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
+ haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com,
+ song@kernel.org, syzbot+af9492708df9797198d6@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+References: <f45ad3e1-4433-422e-be28-17deaba4ade1@kernel.org>
+ <tencent_A4FA0DA89270DDAC5D8519424F9B0DB42507@qq.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <tencent_A4FA0DA89270DDAC5D8519424F9B0DB42507@qq.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 3, 2024 at 6:43=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
 
->
-> >
-> > Later with skb->len/skb->truesize, we get 0.66. However, the window
-> > can't grow to this ratio because window_clamp stays at the initial
-> > value, which is the initial tcp_full_space(sk), which is roughly 0.25 *
-> > rcvbuf.
->
-> Sure. Please address Jakub feedback about tests.
 
-I think a less risky patch would be the following one.
+On 02/04/2024 05.03, Edward Adam Davis wrote:
+> On Mon, 1 Apr 2024 13:00:12 +0200, Jesper Dangaard Brouer wrote:
+>>> [Fix]
+>>> On the execution path of bpf_prog_test_run(), due to ri->map being NULL,
+>>> ri->tgtvalue was not set correctly.
+>>>
+>>> Reported-and-tested-by:syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
+>>> Signed-off-by: Edward Adam Davis<eadavis@qq.com>
+>>> ---
+>>>    kernel/bpf/devmap.c | 6 +++++-
+>>>    1 file changed, 5 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+>>> index 4e2cdbb5629f..ef20de14154a 100644
+>>> --- a/kernel/bpf/devmap.c
+>>> +++ b/kernel/bpf/devmap.c
+>>> @@ -86,6 +86,7 @@ struct bpf_dtab {
+>>>    static DEFINE_PER_CPU(struct list_head, dev_flush_list);
+>>>    static DEFINE_SPINLOCK(dev_map_lock);
+>>>    static LIST_HEAD(dev_map_list);
+>>> +static bool is_valid_dst(struct bpf_dtab_netdev *obj, struct xdp_frame *xdpf);
+>>>
+>>>    static struct hlist_head *dev_map_create_hash(unsigned int entries,
+>>>    					      int numa_node)
+>>> @@ -536,7 +537,10 @@ int dev_xdp_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
+>>>    int dev_map_enqueue(struct bpf_dtab_netdev *dst, struct xdp_frame *xdpf,
+>>>    		    struct net_device *dev_rx)
+>>>    {
+>>> -	struct net_device *dev = dst->dev;
+>>> +	struct net_device *dev;
+>>> +	if (!is_valid_dst(dst, xdpf))
+>> This is overkill, because __xdp_enqueue() already contains most of the
+>> checks in is_valid_dst().
+>>
+>> Why not:
+>>
+>>    if (!dst)
+>> 	return -EINVAL;
+> This can work, but I think is_valid_dst() is better, as its internal inspection
+> of dst is more thorough.
 
-If you agree, send a V2 of the patch.
 
-Also remove from the changelog all the C code, this has no real value there=
-.
-changelog should be not too small, not too big.
-If you want to capture this test code, please cook a separate patch
-for net-next to add it in tools/testing/selftests/net
-(But I guess iperf3 could be used instead, iperf3 is already used in
-tools/testing/selftests)
+No, is_valid_dst() is not better, because it will repeat almost same
+checks (as I said) as __xdp_enqueue() already contains these checks.
+This is fast-path code, we don't want to repeat checks.
 
-Thanks !
+--Jesper
+(copy-pasted function below to easier compare)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 6ae35199d3b3c159ba029ff74b109c56a7c7d2fc..2bcf30381d75f84acf3b0276a4b=
-348edeb7f0781
-100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1539,11 +1539,10 @@ static inline int tcp_space_from_win(const
-struct sock *sk, int win)
-        return __tcp_space_from_win(tcp_sk(sk)->scaling_ratio, win);
- }
+static inline int __xdp_enqueue(struct net_device *dev, struct xdp_frame 
+*xdpf,
+				struct net_device *dev_rx,
+				struct bpf_prog *xdp_prog)
+{
+	int err;
 
--/* Assume a conservative default of 1200 bytes of payload per 4K page.
-+/* Assume a 50% default for skb->len/skb->truesize ratio.
-  * This may be adjusted later in tcp_measure_rcv_mss().
-  */
--#define TCP_DEFAULT_SCALING_RATIO ((1200 << TCP_RMEM_TO_WIN_SCALE) / \
--                                  SKB_TRUESIZE(4096))
-+#define TCP_DEFAULT_SCALING_RATIO (1 << (TCP_RMEM_TO_WIN_SCALE - 1))
+	if (!(dev->xdp_features & NETDEV_XDP_ACT_NDO_XMIT))
+		return -EOPNOTSUPP;
 
- static inline void tcp_scaling_ratio_init(struct sock *sk)
- {
+	if (unlikely(!(dev->xdp_features & NETDEV_XDP_ACT_NDO_XMIT_SG) &&
+		     xdp_frame_has_frags(xdpf)))
+		return -EOPNOTSUPP;
+
+	err = xdp_ok_fwd_dev(dev, xdp_get_frame_len(xdpf));
+	if (unlikely(err))
+		return err;
+
+	bq_enqueue(dev, xdpf, dev_rx, xdp_prog);
+	return 0;
+}
+
+
+static bool is_valid_dst(struct bpf_dtab_netdev *obj, struct xdp_frame 
+*xdpf)
+{
+	if (!obj)
+		return false;
+
+	if (!(obj->dev->xdp_features & NETDEV_XDP_ACT_NDO_XMIT))
+		return false;
+
+	if (unlikely(!(obj->dev->xdp_features & NETDEV_XDP_ACT_NDO_XMIT_SG) &&
+		     xdp_frame_has_frags(xdpf)))
+		return false;
+
+	if (xdp_ok_fwd_dev(obj->dev, xdp_get_frame_len(xdpf)))
+		return false;
+
+	return true;
+}
+
+
 
