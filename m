@@ -1,205 +1,118 @@
-Return-Path: <netdev+bounces-84677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043EA897D9C
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 04:11:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0F6897DA4
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 04:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70E181F236FE
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 02:11:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B8A9287BC4
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 02:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CA21B964;
-	Thu,  4 Apr 2024 02:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A001B815;
+	Thu,  4 Apr 2024 02:14:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mIV1nhM3"
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="VyMVQ3zt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D1018E1F;
-	Thu,  4 Apr 2024 02:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E123233;
+	Thu,  4 Apr 2024 02:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712196658; cv=none; b=UKAiG4Eg5umClvx5DIVnakF9aWgu6lPzYcMYrjLnPBsi8OQoIuoDOcH8HgEOuCzq+NMa1uyX5vf512+MqkmQvVnb7+23KbzK7g062el1VY6QseZat3lWpJZizqoGFMGmzKZgx1nYgdSZCuTNW4Ba0X+NRkk+beZhzObd9+3dFHs=
+	t=1712196868; cv=none; b=nUKkBUYxIFwNq3txgVe70WcL44+XfLNoqR5RzlRTYKnsLllyRrFl8q0/QikyNyjrxtVUAuySGAzpwpxuAl5BOk3I12WP46VlBfCwpabjqkPUo0aOrU9AqMYtx/WV+PuW4mJMOYDJtogHUJRsfOwZbTlyw/jE/KnW/bmfBwUz2CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712196658; c=relaxed/simple;
-	bh=AR/AtEDgmwi8snRJBALAksbcJyt6c2+pQS9F+TaXJUM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y+2A7dY8YFM1rClBcNQS+jOdqKQewNIyUWS/atMFqw40OL+Yr8LKLcXNz8kZe4STNygHnRKyzrjeZN7myS9ZBOYYV86V+on2GUnMMWneh5SsNeHV7/GomiLO97kTYadXl5e3muwIffqfB+Bwi2yfcqiDOOqdML/KNtF4w0RQMSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mIV1nhM3; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c4f23f3eeaso121139b6e.1;
-        Wed, 03 Apr 2024 19:10:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712196656; x=1712801456; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uJRz5ZKiWg3HYLn11KdTD00YJNISxlIkpr1p7lBKYzo=;
-        b=mIV1nhM3El0JZa8rT8NA42W7ifwh6i2/Jh3W1raBK8Ne84w1i7Eg7SsrORcXD5gWVo
-         yHl4XndziGeacm/x3FuAITEPCQX/oqiVWVrf0dMaYTvwrt7XpNAuCjm1Rfje5FA4wNKF
-         ii4hw+XJ9fYYm4Mm31POMeFPRg9svX1qx7A9djSFqjlBJyUNPXoUMYOjlWzH+9orvl3j
-         bD4GFcs24e4tAI0Yf3ADJfVq+HwRb4IsqgxCdJTknBmD3l114J8g07/Ah4+NYzdRzJEP
-         lZcz7KOZ4C6dEq0srXTm67SPkcrra3wLHI5hfwx1+m70zMvo0HtQPHPHPBhRM6ezF+A9
-         DVqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712196656; x=1712801456;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uJRz5ZKiWg3HYLn11KdTD00YJNISxlIkpr1p7lBKYzo=;
-        b=REPpuqNZe3CU0BKADrc51pOfboQRO3dLtDVaMop082zPSPvmgRDjUp0TbvZqZVIwVs
-         t/DAu+Gm0zPRlM+k5CuRMBaT19q5mgLdxVCxv41ALEMDZxTyC21GOTIeWOmnOLU8XTfb
-         CUQQclrfIau90ItFuk7dwvvnGcyHsf/bYojHQwoXu06KoifbvfXE1tDrGPVpsy8dCyPg
-         BtdA8yaOB2IPcjVot0SOkDw1uQfcYeJ46Euo28XADj7+pux8NIu/4TDk47Ot7ETxrJfe
-         Sk3qsuQuvi5zs1Z7OkTjIT7fnj0Gyvi45YIk30mFECXiw/mITqWPWaDMxb/EIYBKnOaO
-         cr2A==
-X-Forwarded-Encrypted: i=1; AJvYcCVbWeEKo9x2v8OJr4uHQOZc7i+ogWMl1JdJbeTHdlz58ULYpDn3sSFpNR303wjtsbY6jzEz91/b2z7YyGoVxxzHZxlo
-X-Gm-Message-State: AOJu0YwiFXXjD54TFpaf35JoQwRAs3G/eiffPcLwzQY+ofWXHARv7E5I
-	nyJ4aF+CQYpy7ebVqSTQPZB5yUbmqtaH3ggsEbfvckUm9IORy2BP
-X-Google-Smtp-Source: AGHT+IEPkMztezwxSOPNs6IgW9gHolYGByJoazIyo1bdsErohEpkpUEMEU/2x+ve2q1+dSzvp+ZO2w==
-X-Received: by 2002:a05:6808:394d:b0:3c4:e08e:c582 with SMTP id en13-20020a056808394d00b003c4e08ec582mr1140199oib.33.1712196656015;
-        Wed, 03 Apr 2024 19:10:56 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([111.201.28.7])
-        by smtp.gmail.com with ESMTPSA id lp16-20020a056a003d5000b006e6f0b4d950sm12489643pfb.4.2024.04.03.19.10.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 19:10:55 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: john.fastabend@gmail.com,
-	edumazet@google.com,
-	jakub@cloudflare.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	daniel@iogearbox.net,
-	ast@kernel.org
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	syzbot+aa8c8ec2538929f18f2d@syzkaller.appspotmail.com
-Subject: [PATCH net v2] bpf, skmsg: fix NULL pointer dereference in sk_psock_skb_ingress_enqueue
-Date: Thu,  4 Apr 2024 10:10:01 +0800
-Message-Id: <20240404021001.94815-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1712196868; c=relaxed/simple;
+	bh=R4aUilhN/aKLzJiF+HvkOFiYVxByUuTPeENIZPQUzeM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=RmIjYTi/IF4DjLMYkZQSBBYwcWRfhMoRhZXBKulQQl1GO4SrYk0fZmZR3wHZf9tNjT1hk8ehz1ZxnQvF7hUG95hUl+7GQ3KKVYafn/jS0L5Bwey9bC14FNU0c2/Lxv1gD3jOPZ15A6Z5ImWS5B130/TR4QT42IbBYID/EX5NbdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=VyMVQ3zt; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1712196863;
+	bh=0PcvpW5SQPrf4QnOqaQeX/XXu99U3a1qNIXPB0jb71k=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=VyMVQ3ztogSJTiIgLxBnLkNGFUgd68Qe2KDkfvwgzAo6UXogiTKbR69fLdEZZdu7n
+	 j3iNV2JgacCj30EfVfA0nufM6LLB0HhkUu4/gC0cH9GF15bjP6K55yY/SHfDcHG5LZ
+	 C6A3Ro/1onK6pyPh3jlVC2U8y95oPYSyx7VeOvKtcmV57g7fuqL83rvaMyFKYOVpxw
+	 oxm58pQDGWVdn2ucF5HZ6tep2QVSw9tARy9V9golouCtHYA3Tik7KGkuZEvWcLHYKF
+	 3HCUbzR0cNgClz2PklZaCGNb+9TQaIfvB8jeqaIi2XVH6tgkaEYydsWFGiIh6MP6A8
+	 HT6H386UWr5YA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4V94th0jq3z4wcQ;
+	Thu,  4 Apr 2024 13:14:19 +1100 (AEDT)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Guenter Roeck <linux@roeck-us.net>, linux-kselftest@vger.kernel.org
+Cc: David Airlie <airlied@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ =?utf-8?Q?Ma=C3=ADra?=
+ Canal <mcanal@igalia.com>, Dan Carpenter <dan.carpenter@linaro.org>, Kees
+ Cook <keescook@chromium.org>, Daniel Diaz <daniel.diaz@linaro.org>, David
+ Gow <davidgow@google.com>, Arthur Grillo <arthurgrillo@riseup.net>,
+ Brendan Higgins <brendan.higgins@linux.dev>, Naresh Kamboju
+ <naresh.kamboju@linaro.org>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Maxime Ripard <mripard@kernel.org>, Ville
+ =?utf-8?B?U3lyasOkbMOk?= <ville.syrjala@linux.intel.com>, Daniel Vetter
+ <daniel@ffwll.ch>,
+ Thomas Zimmermann <tzimmermann@suse.de>, dri-devel@lists.freedesktop.org,
+ kunit-dev@googlegroups.com, linux-arch@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+ loongarch@lists.linux.dev, netdev@vger.kernel.org, x86@kernel.org, Guenter
+ Roeck <linux@roeck-us.net>, Linux Kernel Functional Testing
+ <lkft@linaro.org>
+Subject: Re: [PATCH v3 15/15] powerpc: Add support for suppressing warning
+ backtraces
+In-Reply-To: <20240403131936.787234-16-linux@roeck-us.net>
+References: <20240403131936.787234-1-linux@roeck-us.net>
+ <20240403131936.787234-16-linux@roeck-us.net>
+Date: Thu, 04 Apr 2024 13:14:16 +1100
+Message-ID: <874jch98nb.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Jason Xing <kernelxing@tencent.com>
+Guenter Roeck <linux@roeck-us.net> writes:
+> Add name of functions triggering warning backtraces to the __bug_table
+> object section to enable support for suppressing WARNING backtraces.
+>
+> To limit image size impact, the pointer to the function name is only added
+> to the __bug_table section if both CONFIG_KUNIT_SUPPRESS_BACKTRACE and
+> CONFIG_DEBUG_BUGVERBOSE are enabled. Otherwise, the __func__ assembly
+> parameter is replaced with a (dummy) NULL parameter to avoid an image size
+> increase due to unused __func__ entries (this is necessary because __func__
+> is not a define but a virtual variable).
+>
+> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> ---
+> v2:
+> - Rebased to v6.9-rc1
+> - Added Tested-by:, Acked-by:, and Reviewed-by: tags
+> - Introduced KUNIT_SUPPRESS_BACKTRACE configuration option
+> v3:
+> - Rebased to v6.9-rc2
+>
+>  arch/powerpc/include/asm/bug.h | 37 +++++++++++++++++++++++++---------
+>  1 file changed, 28 insertions(+), 9 deletions(-)
 
-Fix NULL pointer data-races in sk_psock_skb_ingress_enqueue() which
-syzbot reported [1].
+I ran it through some build and boot tests, LGTM.
 
-[1]
-BUG: KCSAN: data-race in sk_psock_drop / sk_psock_skb_ingress_enqueue
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
-write to 0xffff88814b3278b8 of 8 bytes by task 10724 on cpu 1:
- sk_psock_stop_verdict net/core/skmsg.c:1257 [inline]
- sk_psock_drop+0x13e/0x1f0 net/core/skmsg.c:843
- sk_psock_put include/linux/skmsg.h:459 [inline]
- sock_map_close+0x1a7/0x260 net/core/sock_map.c:1648
- unix_release+0x4b/0x80 net/unix/af_unix.c:1048
- __sock_release net/socket.c:659 [inline]
- sock_close+0x68/0x150 net/socket.c:1421
- __fput+0x2c1/0x660 fs/file_table.c:422
- __fput_sync+0x44/0x60 fs/file_table.c:507
- __do_sys_close fs/open.c:1556 [inline]
- __se_sys_close+0x101/0x1b0 fs/open.c:1541
- __x64_sys_close+0x1f/0x30 fs/open.c:1541
- do_syscall_64+0xd3/0x1d0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-read to 0xffff88814b3278b8 of 8 bytes by task 10713 on cpu 0:
- sk_psock_data_ready include/linux/skmsg.h:464 [inline]
- sk_psock_skb_ingress_enqueue+0x32d/0x390 net/core/skmsg.c:555
- sk_psock_skb_ingress_self+0x185/0x1e0 net/core/skmsg.c:606
- sk_psock_verdict_apply net/core/skmsg.c:1008 [inline]
- sk_psock_verdict_recv+0x3e4/0x4a0 net/core/skmsg.c:1202
- unix_read_skb net/unix/af_unix.c:2546 [inline]
- unix_stream_read_skb+0x9e/0xf0 net/unix/af_unix.c:2682
- sk_psock_verdict_data_ready+0x77/0x220 net/core/skmsg.c:1223
- unix_stream_sendmsg+0x527/0x860 net/unix/af_unix.c:2339
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x140/0x180 net/socket.c:745
- ____sys_sendmsg+0x312/0x410 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x1e9/0x280 net/socket.c:2667
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x46/0x50 net/socket.c:2674
- do_syscall_64+0xd3/0x1d0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-value changed: 0xffffffff83d7feb0 -> 0x0000000000000000
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 PID: 10713 Comm: syz-executor.4 Tainted: G        W          6.8.0-syzkaller-08951-gfe46a7dd189e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-
-Prior to this, commit 4cd12c6065df ("bpf, sockmap: Fix NULL pointer
-dereference in sk_psock_verdict_data_ready()") fixed one NULL pointer
-similarly due to no protection of saved_data_ready. Here is another
-different caller causing the same issue because of the same reason. So
-we should protect it with sk_callback_lock read lock because the writer
-side in the sk_psock_drop() uses "write_lock_bh(&sk->sk_callback_lock);".
-
-To avoid errors that could happen in future, I move those two pairs of
-lock into the sk_psock_data_ready(), which is suggested by John Fastabend.
-
-Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
-Reported-by: syzbot+aa8c8ec2538929f18f2d@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=aa8c8ec2538929f18f2d
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-v2
-Link: https://lore.kernel.org/all/20240329134037.92124-1-kerneljasonxing@gmail.com/
-1. move the read_lock_bh()/unlock_bh() into the sk_psock_data_ready() call (John)
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/linux/skmsg.h | 2 ++
- net/core/skmsg.c      | 5 +----
- 2 files changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index e65ec3fd2799..a509caf823d6 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -461,10 +461,12 @@ static inline void sk_psock_put(struct sock *sk, struct sk_psock *psock)
- 
- static inline void sk_psock_data_ready(struct sock *sk, struct sk_psock *psock)
- {
-+	read_lock_bh(&sk->sk_callback_lock);
- 	if (psock->saved_data_ready)
- 		psock->saved_data_ready(sk);
- 	else
- 		sk->sk_data_ready(sk);
-+	read_unlock_bh(&sk->sk_callback_lock);
- }
- 
- static inline void psock_set_prog(struct bpf_prog **pprog,
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 4d75ef9d24bf..fd20aae30be2 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -1226,11 +1226,8 @@ static void sk_psock_verdict_data_ready(struct sock *sk)
- 
- 		rcu_read_lock();
- 		psock = sk_psock(sk);
--		if (psock) {
--			read_lock_bh(&sk->sk_callback_lock);
-+		if (psock)
- 			sk_psock_data_ready(sk, psock);
--			read_unlock_bh(&sk->sk_callback_lock);
--		}
- 		rcu_read_unlock();
- 	}
- }
--- 
-2.37.3
-
+cheers
 
