@@ -1,121 +1,88 @@
-Return-Path: <netdev+bounces-84892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A087898903
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:44:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20411898929
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:49:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED7EE1F22160
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:44:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BD681C275CF
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5EAD127B7E;
-	Thu,  4 Apr 2024 13:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8953C12838B;
+	Thu,  4 Apr 2024 13:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="S5qcrfZm"
+	dkim=pass (2048-bit key) header.d=sandelman.ca header.i=@sandelman.ca header.b="B23BDeQV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from tuna.sandelman.ca (tuna.sandelman.ca [209.87.249.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CF276023;
-	Thu,  4 Apr 2024 13:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DC9127B53
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 13:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.87.249.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712238293; cv=none; b=k+zcoo2n/mfPb9uh8Sz5uERAwJqAKyhzbTct5EI9LwMtIiIgfSycE02F1eBaxW+t3vXKm5tWBSzJRNSgBNqT5TcdQ0e9bYcFDuK5NFKyGecZrZFw8nh/sMw33o8Oj2fJdETE8p7XuL5plfBCpkD6R00FCqySzU/L7c9a+CMnctM=
+	t=1712238535; cv=none; b=bGAFjbFy7PEn9akpht8DeURxCjSqw+BtHwPMFxLQ094jyfc6w9RV35QdS6LUQ/E24n537KAfQi/oPVDG1BLUl0RDzKjJfURLahU/74hcaVOmMJIzUre6BVex4AMAXVnCYdLUgYA7MBiHgNJEondz2OM9nyrJkREakKDvc/zyq4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712238293; c=relaxed/simple;
-	bh=tAAtr7pnR4MH/4TMN77ugW13pgkeIiTR+g76NLCU3ds=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ayOWBDwlMlJCLtJzr47kkX41z9+LBT3lWXdzu/Pp1O1AKzCao+ZE750npVvjDFuGQnlSaqe2PZkEfgdpnajB6CX0f8SRIU3xa1ebnZLqe1RarD+uRd4X4t3mwC1nM96tUoTSvbmEaXEuZXOI5rrF9adJMP8u3MU3hGhlswhlF6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=S5qcrfZm; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1712238280; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=O+o5H6Rp/YKTpylXkB7+dR8XqLzGRaNwaFZPCluqRS8=;
-	b=S5qcrfZm1dko10hBCbO8YldAe+QslRnlpEVQBpZ76+NqGZUfVErND4p+JrABcyINl3+O3JmpGiQ2lC0P0YRDcgx3cqQ4V3A5Ypdo6CQE31FlAlb64oquLJPI0Jwu0v4Swah4Xq0HlN2JkGWFWLWsDauCmHa8h8nGs1c3ONIEhuU=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R431e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0W3uXJtx_1712238278;
-Received: from 30.236.60.242(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W3uXJtx_1712238278)
-          by smtp.aliyun-inc.com;
-          Thu, 04 Apr 2024 21:44:39 +0800
-Message-ID: <7c3733b7-a3f2-45ba-9b8d-880957ed5cdf@linux.alibaba.com>
-Date: Thu, 4 Apr 2024 21:44:37 +0800
+	s=arc-20240116; t=1712238535; c=relaxed/simple;
+	bh=mIFldIxsyswVURtM9BrGTcEwvxTPcZlj2ZOPgHs4MzE=;
+	h=From:To:cc:Subject:In-Reply-To:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=fw21U/QTSPWZ6f8yQqhTsI3ixsV1TDcrQmajwrdeDYcW+g2uQYc5VcKFYpDmCdmmCsLrFbWhitr/8vegE3AvBtUSeMan/Q5a7yo9TbKbwBXckQkStkV9PbQKLsUUSChs1U/Bj2/RjqhR8IXEXAsrr3X6N/rFRsTrkKRcoWKwLp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sandelman.ca; spf=pass smtp.mailfrom=sandelman.ca; dkim=pass (2048-bit key) header.d=sandelman.ca header.i=@sandelman.ca header.b=B23BDeQV; arc=none smtp.client-ip=209.87.249.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sandelman.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandelman.ca
+Received: from localhost (localhost [127.0.0.1])
+	by tuna.sandelman.ca (Postfix) with ESMTP id 18D773898D;
+	Thu,  4 Apr 2024 09:48:51 -0400 (EDT)
+Received: from tuna.sandelman.ca ([127.0.0.1])
+	by localhost (localhost [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id 2P3nYOsZ9C0L; Thu,  4 Apr 2024 09:48:50 -0400 (EDT)
+Received: from sandelman.ca (obiwan.sandelman.ca [209.87.249.21])
+	by tuna.sandelman.ca (Postfix) with ESMTP id 1643F3898C;
+	Thu,  4 Apr 2024 09:48:50 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sandelman.ca;
+	s=mail; t=1712238530;
+	bh=ilhp6ksPfdCG2aDvEEDmbbmayi3/AggJU3SReavMMeU=;
+	h=From:To:cc:Subject:In-Reply-To:References:Date:From;
+	b=B23BDeQVAkb7Rfp1RlI9NIC2IT9SlG22gb3xZobxCuiPwQdTKDTEh6bmbBPISiEFd
+	 yoZ7d7hb91m7+6jGuyAc2BW6b/stg7Z7eXDZRufQAIQiepnOvujLy6kGAuS8mBujf+
+	 HX28KIIhvUwe04/YFFauQFCV0jcam0PbwKwrYHo1g2wSjrCxQcziP7j3iFg7bVF+TC
+	 egzZd0iFhKtk7rdgMf6wceG3I2cC4P3mDEX68efyhnkhFBWGs6rzrpOdlJjwPuf7mA
+	 ilqfWbLlOyfSawAOgCH6KLyMoWjK3OHCTf67Bv9a+4UfK/7Xe1CArlpfklCFHCNqWy
+	 WOZMRi5cZb0NQ==
+Received: from obiwan.sandelman.ca (localhost [IPv6:::1])
+	by sandelman.ca (Postfix) with ESMTP id 0BD90111;
+	Thu,  4 Apr 2024 09:48:50 -0400 (EDT)
+From: Michael Richardson <mcr@sandelman.ca>
+To: antony.antony@secunet.com
+cc: Steffen Klassert <steffen.klassert@secunet.com>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+    Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+    David Ahern <dsahern@kernel.org>, devel@linux-ipsec.org,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Andreas Gruenbacher <agruenba@redhat.com>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v2] udpencap: Remove Obsolete UDP_ENCAP_ESPINUDP_NON_IKE Support
+In-Reply-To: <c873dc4dcaa0ab84b562f29751996db6bd37d440.1712220541.git.antony.antony@secunet.com>
+References: <c873dc4dcaa0ab84b562f29751996db6bd37d440.1712220541.git.antony.antony@secunet.com>
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; GNU Emacs 28.2
+X-Face: $\n1pF)h^`}$H>Hk{L"x@)JS7<%Az}5RyS@k9X%29-lHB$Ti.V>2bi.~ehC0;<'$9xN5Ub#
+ z!G,p`nR&p7Fz@^UXIn156S8.~^@MJ*mMsD7=QFeq%AL4m<nPbLgmtKK-5dC@#:k
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v5 05/11] net/smc: implement DMB-related
- operations of loopback-ism
-To: Niklas Schnelle <schnelle@linux.ibm.com>,
- Gerd Bayer <gbayer@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
- <20240324135522.108564-6-guwen@linux.alibaba.com>
- <9a17268d4046f99b30f3620079b5749a9ddc5cd9.camel@linux.ibm.com>
- <92b0c4b1-4844-4adf-a15a-a9323fb859e1@linux.alibaba.com>
- <6d3cfa04c9826a24f0ad8d401940af3ad02a67bc.camel@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <6d3cfa04c9826a24f0ad8d401940af3ad02a67bc.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <27921.1712238530.1@obiwan.sandelman.ca>
+Date: Thu, 04 Apr 2024 09:48:50 -0400
+Message-ID: <27922.1712238530@obiwan.sandelman.ca>
 
+Antony Antony via Devel <devel@linux-ipsec.org> wrote:
+    > With this commit, we remove support for UDP_ENCAP_ESPINUDP_NON_IKE,
+    > simplifying the codebase and eliminating unnecessary complexity.
 
-
-On 2024/4/4 19:27, Niklas Schnelle wrote:
-> On Thu, 2024-04-04 at 18:20 +0800, Wen Gu wrote:
->>
->> On 2024/4/4 01:20, Gerd Bayer wrote:
->>> On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
->>>
->>> When I instrumented this to see, why I still see tons of my other
->>> temporary instrumentation messages from the "ism" driver, I found that
->>> in my setup loopback-ism is used rather infrequently.
->>>
->>> I suspect this is due to how the SMC proposals are constructed in
->>> net/smc/af_smc.c and net/smc/smc_pnet.c - and later evaluated in
->>> smc_check_ism_v2_match() - where there is a first-come-first-serve
->>> selection.
->>>
->>> I wonder if one should change that to favour loopback-ism over "real"
->>> ISM devices - and how this could be achieved elegantly.
->>>
->>> Just some food for thought... Probably little you can do on x86.
->>>
->>
->> Yes, it is about the priority of available ISM devices, and now it
->> is decided by their order in the smcd_dev_list. The later registered
->> ISMv2 devices(without pnetid) will be added to the beginning of the
->> list (see smcd_register_dev()). So there is a probability that
->> loopback-ism will not be ranked first, since it is added into list
->> earlier during smc_init().
->>
->> If we have the runtime switch of loopback-ism, we can re-active the
->> loopback-ism, that make it be re-added into the beginning of the dev
->> list and be chosen first. Or a new netlink command to adjust the slot
->> order of available ISM devices in the list. As we discussed before,
->> that could be tasks in stage 1 or stage 2.
->>
->> Thanks!
-> 
-> Maybe when adding the ISM devices we could instead make sure that all
-> ISM devices are added after loopback and loopback is added in the
-> beginning. I think loopback should always be preferred and would
-> consider it a bug if it isn't faster too. Between virtio-ism and ISM it
-> may be less clear so maybe for stage 2 we would want a priority setting
-> and then insert ordered by priority. Thoughts?
-I have no objection. If we all agree, I will keep it at the beginning of the list.
-
-Thanks!
+Good.
 
 
