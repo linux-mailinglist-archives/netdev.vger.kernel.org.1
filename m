@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-84685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B134A897DBE
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33299897DBD
 	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 04:31:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B07151C24013
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 02:31:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAE8728842D
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 02:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E702D7A8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4C829CF1;
 	Thu,  4 Apr 2024 02:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SY+M4pcP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPESMufZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAE622EE4;
-	Thu,  4 Apr 2024 02:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AABB225AF
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 02:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712197831; cv=none; b=lMidfqdPp7Jg5F1VCdn0zeebx5FK0YjcdoEMTJkJMKgFzWxPsxN4jx+AHr6T0el3jgxY1BHKg+jGPzJWbevXoHW5m7k/Xg8sqmXAgkPJmTxPCP3NwrAlvfiV1/u0y1PsWeJDDYr/WehZ9RY32nzgAugWlNMegrF1eNWmL1ek2KU=
+	t=1712197831; cv=none; b=glu09j/cPRQmwjJ534zO1NkK+2Ekp2G6Jny+TJu+Jer9pJoe/+MvCzTJpQo3VDvS/nadeMF+jGjyju3wEmEV9z5Tjp0KQOzCq4WVzaRvZpSRyAsxj8BEYjeZQrc2Z+MGWawopeb1eR4nF/CpS2bBwFLW+HjzkimptKUlzn6AaKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712197831; c=relaxed/simple;
-	bh=NOGCFUfoduMhXBNepIeFQKEbkMK3T2AAGEPJIWtjKCg=;
+	bh=8XU1P2kBhaYjJVrGyPeBz3T79JiJ428bXbeGCwtW1RA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qCCgqi+g+OkhXFi9uow3eJtF9gJLuMNsCq3seoSpRoNGm/E12fFwEY+WAUFQXa3h+MLgSeLt0PwP+p9iDSPhKFwiLFDm2EWbN/Gdclgl4yCbs4R4QL+zrhvdjZmZdfHCAcf4QNPs01v4DyqHJOX5lJ3+8SXxcngvd8M1VETB75w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SY+M4pcP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EF758C43141;
+	 In-Reply-To:To:Cc; b=KkBBeki+j0R6w0hYHzYtxENsO3n0EBvd/IlzNAwREuOlkttJTKvsQTL21F4+snTA5Nv+8vtvxUBbTaZL+Kq5tSQ1bsYPG2CQ77M1aQKAo/BzJ/l51bGvQuX5gRIAni6K76nr9yLnwSaXLCZb5m/I/wmzTKEMA13qMinIaKmQYkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPESMufZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E9249C433C7;
 	Thu,  4 Apr 2024 02:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712197831;
-	bh=NOGCFUfoduMhXBNepIeFQKEbkMK3T2AAGEPJIWtjKCg=;
+	bh=8XU1P2kBhaYjJVrGyPeBz3T79JiJ428bXbeGCwtW1RA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SY+M4pcPFW2CXEv0wuYaR8t+K4sqdo9z7HSP8ixAwl1bC2yLK5gugEg1H2t1YAYtJ
-	 OYg2w6kH52DvqpGrxoiUKys42PmauGBrg+eAU9hd2ioJFMT4hyTZMTTeZXxLcPa46Y
-	 EUQ5Fbe3LfRBznCZWI94gG3YuV62MFMeNrkj2D9CvbIlyhHs08AKJ2DCNUJwTDzeRx
-	 1rye1lcgC5dWDRTl7r2hLqBUR494aG3dHY+jtYXZEvCFe5QRYG2zStevOfC4LcT+aJ
-	 4f5BzTVekHtupgGBs/C3HS6Nv8CbKkhKkam30ctfufjcPpXG9tvXuwP5PzKT6BeMIF
-	 vomu2K8J6mEQw==
+	b=hPESMufZ9Y8q8O5IHpauLuRFWQXunQ+IXlf0aH1xDCgZ2j754Rc9Nvv7V/Q/b+1SX
+	 ug1KIz2xWPdJlOBtK8Rf5x7ejvivHor9C9vCVGAk/WJTEQkUaMuhEPlCv2DKTLinar
+	 QAFvQQCTzl6w4d5k6BfpmZabh/cD/aQVixfKWcd8eT/9jbjuu72OfFWJTbvi2BdSjH
+	 grQRGPUp/LVJrj2GmGcSWplAG9Z/K82BdlDjZ+PkA89ovXKYU3DCQ0F/daFb1nf4Ra
+	 +YsHxzFriD+N01M3M6SAfeCiyhm/hxQLp3g+25D0oohJD1zEeIIz3VOKzq1V8dbayV
+	 y8ojYbEFU8uxw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E66AAD9A151;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF788D2D0E1;
 	Thu,  4 Apr 2024 02:30:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,47 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/2] tcp: make trace of reset logic complete
+Subject: Re: [PATCH v1 net-next 0/2] af_unix: Remove old GC leftovers.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171219783094.25056.16795921330072816795.git-patchwork-notify@kernel.org>
+ <171219783091.25056.4589044183528305137.git-patchwork-notify@kernel.org>
 Date: Thu, 04 Apr 2024 02:30:30 +0000
-References: <20240401073605.37335-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240401073605.37335-1-kerneljasonxing@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- rostedt@goodmis.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
- netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kernelxing@tencent.com
+References: <20240401173125.92184-1-kuniyu@amazon.com>
+In-Reply-To: <20240401173125.92184-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  1 Apr 2024 15:36:03 +0800 you wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Mon, 1 Apr 2024 10:31:23 -0700 you wrote:
+> This is a follow-up series for commit 4090fa373f0e ("af_unix: Replace
+> garbage collection algorithm.") which introduced the new GC for AF_UNIX.
 > 
-> Before this, we miss some cases where the TCP layer could send RST but
-> we cannot trace it. So I decided to complete it :)
+> Now we no longer need two ugly tricks for the old GC, let's remove them.
 > 
-> v4
-> Link: https://lore.kernel.org/all/20240329034243.7929-1-kerneljasonxing@gmail.com/
-> 1. rebased against latest net-next
-> 2. remove {} and add skb test statement (Eric)
-> 3. drop v3 patch [3/3] temporarily because 1) location is not that useful
-> since we can use perf or something else to trace, 2) Eric said we could
-> use drop_reason to show why we have to RST, which is good, but this seems
-> not work well for those ->send_reset() logic. I need more time to
-> investigate this part.
+> 
+> Kuniyuki Iwashima (2):
+>   af_unix: Remove scm_fp_dup() in unix_attach_fds().
+>   af_unix: Remove lock dance in unix_peek_fds().
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v4,1/2] trace: adjust TP_STORE_ADDR_PORTS_SKB() parameters
-    https://git.kernel.org/netdev/net-next/c/9807080e2170
-  - [net-next,v4,2/2] trace: tcp: fully support trace_tcp_send_reset
-    https://git.kernel.org/netdev/net-next/c/19822a980e19
+  - [v1,net-next,1/2] af_unix: Remove scm_fp_dup() in unix_attach_fds().
+    https://git.kernel.org/netdev/net-next/c/7c349ed09031
+  - [v1,net-next,2/2] af_unix: Remove lock dance in unix_peek_fds().
+    https://git.kernel.org/netdev/net-next/c/118f457da9ed
 
 You are awesome, thank you!
 -- 
