@@ -1,69 +1,102 @@
-Return-Path: <netdev+bounces-84916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EE64898A86
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:59:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CAFD898A89
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EC6D1C278DF
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:59:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 968D7B249A1
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881AE1C696;
-	Thu,  4 Apr 2024 14:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ns0Yfjz1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F8D1C698;
+	Thu,  4 Apr 2024 15:00:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643C91BC57
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 14:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED7B1CF8B;
+	Thu,  4 Apr 2024 15:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712242766; cv=none; b=g5fVYlrk4BDpf4VxD+CNKVse3Cv2AXJP8wPqdeuZLFtB7souMLuzwv8TcQ3bt+SgikPJVklqKJ61usMR6UkfkhVFxLdP6ZFbECbRnzj8wtqp5ABpa0345Lqe/bnetV0WxIttfVmuEAaoF8q1YnvtWztj2DeRyORiGwy+Pjlx+KM=
+	t=1712242818; cv=none; b=CRNfybPIRhvpTZA0hJFBp12i1YiG6kJd7xG5RsVWqlhoO+XSeY0uf9ifc9vGnEgaOTRn2cNMfwpIwi6vzVe1a4ZilY14GntSAblGBKJdCbkLhLkc3EnAZr9Bl5m0EY16baucx+qk7lHLDjUg09ba5/GMIyukH4sGjUVJgrLtQJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712242766; c=relaxed/simple;
-	bh=6m5m+X7dTXXV7+ob+UnQPkHFs7tsmLskpxdcCUfdL1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SVr9+D33IYgP1Vuk27oalHazJwGsJVrBfYPyABFUSa+oFW7TzLFYIaGwM42W2/Pz7KuhALx44/LXmixojmq1a9bTIkaHnPYh/lDayGKkTm5LqpDfgnkJTxzEZsYbYZQkH4Hksd7p2PASdDoSi6JqDNzQIUH+bXkHOpJwgqbrVGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ns0Yfjz1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D45EC433F1;
-	Thu,  4 Apr 2024 14:59:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712242765;
-	bh=6m5m+X7dTXXV7+ob+UnQPkHFs7tsmLskpxdcCUfdL1w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ns0Yfjz1zD4+lwcMsdGt36EgOSbvCecc6bXHhQ1k8JgMRnjXL+9VWgxsDcuasMhuz
-	 QJ7wrOGxXqo7569tniQiYJ2PibiSQcpxsq3MgUaU7RhqIIbTj3qVDsb286j10MQ/9K
-	 OaB/diHRq7wdggAbCiy4Sr+XRtUiIFMH3v1RKJXSlvlsYLg8aIRF3cMfo13yFuNhON
-	 IeGvfNL3P6MxfC3XEOPYRS0mXXJnCIgq4Ult3Z5+83l+MzS0CBwn5rJHjbR4wUwqqZ
-	 H/UutIV/QckfJNqCReY9fy6qLtTzhSmexQooZepsXAanOuG3umXaXTBhLoEmIK/csR
-	 sWzaaMUCbSFZg==
-Date: Thu, 4 Apr 2024 07:59:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, aleksander.lobakin@intel.com,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [net-next v1] pfcp: avoid copy warning by simplifing code
-Message-ID: <20240404075924.24c4fdec@kernel.org>
-In-Reply-To: <Zg6yMB/3w4EBQVDm@mev-dev>
-References: <20240404135721.647474-1-michal.swiatkowski@linux.intel.com>
-	<Zg6yMB/3w4EBQVDm@mev-dev>
+	s=arc-20240116; t=1712242818; c=relaxed/simple;
+	bh=eMuaYgx01EBMtw3uBUV9HF4Gnz06WvJHbf59WwPGPO8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fvt5lviw6L7D2HMmnoVZ6GqwDI65oQLtDwSZlcN+UqDSGYC0DMyZBRu7sg8+Ai2Ro0lgkE8+s5xEh4RoVNBCXWeZPD2lQWL9z0UzRlxiXg0v56I5dhnRSsu1ShprsnqTKeC0luT1PpWfUYJ+dXhX1CCeyxTR27whRKu5tbKhpoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-516d04fc04bso953675e87.2;
+        Thu, 04 Apr 2024 08:00:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712242815; x=1712847615;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b5ToI3bzdZhzvl18q+80iRB/qtFJZwodL1fIQlb9Cc0=;
+        b=hve+gMiY0/wvZgonux7F8XM8IMZFI/EydnVPsdV7z9gXNrdT3GD/6oxFkxj2/sW006
+         VSBWBkCtHnuxdHCVExhQjElWmN/7GyNtBxxW9gQqPJVcDfN60BnsM1fgubtNn4lZ/t99
+         kErb9i3zWS6SUpcZQgiF1zSWDBvPcZSidq4bpXLgaYCOK8BrdsDf5Gk6gOhv/WgjspaC
+         1o766RaB199zPCIdTb7jt90vlhPaunUjokbFtX73BDZC8JcswVBvb9GQ93uCRBOab1G+
+         yyHxWVTvOE6knmKMKaqswr0b5Rs7xO/80Ix1OaX30dH56iiReNVJ3ya9BJm4ui0YajpI
+         lgoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqwxuIyh9NnxZDsWY4MfJDDru0PPE6cMhbzkT5SRkSAAUy0UyOOL2hp68MCx1b9sro9EBGitd/SRZDHKAquX2TUObE+zNV
+X-Gm-Message-State: AOJu0YwOnFDHOPwsz6NIKRiay+ASBJNhVQa1zWQ+HQx0DzXHWH2XLOh4
+	R/Txs7g5bMfHNGbLtwBKxI7PNqM7ENqEb517lO6l2AWH172xIssj
+X-Google-Smtp-Source: AGHT+IEAeiQoYh1EXhCv9LPSM8dKxIblZUfzpr0UJ3k4fzxeqtdoxZg6Uu+jFimyiCCRe0s87UWktw==
+X-Received: by 2002:ac2:4563:0:b0:513:7e83:b3f2 with SMTP id k3-20020ac24563000000b005137e83b3f2mr2262791lfm.45.1712242814063;
+        Thu, 04 Apr 2024 08:00:14 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-117.fbsv.net. [2a03:2880:30ff:75::face:b00c])
+        by smtp.gmail.com with ESMTPSA id kg26-20020a17090776fa00b00a449026672esm9154370ejc.81.2024.04.04.08.00.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 08:00:13 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 0/3] net: dqs: optimize if stall threshold is not set
+Date: Thu,  4 Apr 2024 07:59:29 -0700
+Message-ID: <20240404145939.3601097-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 4 Apr 2024 15:59:12 +0200 Michal Swiatkowski wrote:
-> Ehh, sorry, misstype in netdev ccing
-> CC: netdev@vger.kernel.org
+Here are three patches aimed at enhancing the Dynamic Queue Limit (DQL)
+subsystem within the networking stack.
 
-You gotta resend, feel free to do so right away, just keep Arnd's ack.
+The first two commits involve code refactoring, while the final patch
+introduces the actual change.
+
+Typically, when DQL is enabled, stall information is always populated
+through dql_queue_stall(). However, this information is only necessary
+if a stall threshold is set, which is stored in struct dql->stall_thrs.
+
+Although dql_queue_stall() is relatively inexpensive, it is not entirely
+free due to memory barriers and similar overheads.
+
+To optimize performance, refrain from calling dql_queue_stall() when no
+stall threshold is set, thus avoiding the processing of unnecessary
+information.
+
+Breno Leitao (3):
+  net: dql: Avoid calling BUG() when WARN() is enough
+  net: dql: Separate queue function responsibilities
+  net: dql: Optimize stall information population
+
+ include/linux/dynamic_queue_limits.h | 45 +++++++++++++++++-----------
+ 1 file changed, 27 insertions(+), 18 deletions(-)
+
+-- 
+2.43.0
+
 
