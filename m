@@ -1,121 +1,145 @@
-Return-Path: <netdev+bounces-84814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9103889865F
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:48:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 526C889866D
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:50:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22FB5288CDD
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:48:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E70FB1F24020
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9F784A3E;
-	Thu,  4 Apr 2024 11:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZ3ysiRJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A5B684FAA;
+	Thu,  4 Apr 2024 11:49:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2898D82876;
-	Thu,  4 Apr 2024 11:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9843B8286B;
+	Thu,  4 Apr 2024 11:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712231305; cv=none; b=D+8yb0+SgR1hRCQUP3i6eQTzSITk2hVlVfBVjiClxrTQgjFeZY59ILBoeRz64TkIlzM1G0OWNad4BiqH4+nhTAj8CO9L9vWya9K4ExG9oErrVPmDSNInRahkKNy1rfCY77gati9UxH8aCrCAZLFlxRBC9LB4mCYLuC1aqWu8WQw=
+	t=1712231392; cv=none; b=gAP5/rvzDj5AA9srmplkrKpS2niN/TZLbmUzckufIYrA7w+NDo+zLQQiB2E8gVjNd0lY1h2F7nBx3F6pzu7RZ9ry/otLco6swSWX12MpE5nwltbYpQLbTgUeaqWk9b4C6aRSP8YA/42RiaXrvf6Lu/8yh9gm8CoMOKL9E1f/umk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712231305; c=relaxed/simple;
-	bh=dAhTmkzD/Nmh0C2TGZh+xAa7rrEqwqkaz/GvQ75Pxgk=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=jB+TlZB0/JZIMdXxSgW3P7uD7QTXiUavDgHMaKOnsC3+eNL0o9+1z9UPDypv/IH0nUEZab2ej69OBSMSnF15tcwDNRXnvqXM9lORmcCy9fXDb/NwWsdKdHEwpL0QKxF4nZN7qfodZCGx/hOk023F863bpH96a3OCUAbe1KkSU1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oZ3ysiRJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A850C433C7;
-	Thu,  4 Apr 2024 11:48:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712231304;
-	bh=dAhTmkzD/Nmh0C2TGZh+xAa7rrEqwqkaz/GvQ75Pxgk=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=oZ3ysiRJDSYt/kN9hfKEvbX+lYFhMkuZPFEjeLM1IaNtVCP2RO4mgUpMVciE8KRga
-	 065MjFV57yg9nErRgKXpwZ9OvAYKvJEDWryQwve7yNEupWPEU3KY50zCX1Ec0Eib4u
-	 B4+w8CyWSMmI6ZEJ2hyQtb83sa2yjAsy7lNyHSTvydru95AwCfhz3xZ8eyjL6oV2Qj
-	 E9ts3COC0a+/R4KGw87uNxJzApcCR7tn6iifhs6gGz/olk6KiBoaYezIU4KvGd1W5D
-	 btUrI0dUPOKAmKuHIE3mRpMemLR/aI6wgJoUjUF6c1qhLMj9HqzAZpALXW9SFSN9vu
-	 5x/IM/wXbFCSQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
- <robh+dt@kernel.org>,  Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
-  Bjorn Andersson <andersson@kernel.org>,  Konrad Dybcio
- <konrad.dybcio@linaro.org>,  <ath10k@lists.infradead.org>,
-  <linux-wireless@vger.kernel.org>,  <netdev@vger.kernel.org>,
-  <devicetree@vger.kernel.org>,  <linux-arm-msm@vger.kernel.org>,
-  Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific
- firmware overrides
-References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
-	<CAA8EJprpmC6+ePxw_G6y9YEszndq1VonS1HP=aP9OVHNm42LLw@mail.gmail.com>
-	<c2bd01d1-8ddf-44b8-b5bc-860cc9754b76@quicinc.com>
-Date: Thu, 04 Apr 2024 14:48:19 +0300
-In-Reply-To: <c2bd01d1-8ddf-44b8-b5bc-860cc9754b76@quicinc.com> (Jeff
-	Johnson's message of "Tue, 2 Apr 2024 16:40:57 -0700")
-Message-ID: <87y19t4ad8.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1712231392; c=relaxed/simple;
+	bh=rWbrqNP2jyNIuW4GC9x5L1VtJAk70ZYdmbHoBKNEOUo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qJjR1tn3kLTiCXpJ2lXmBhbszfDGvMGajE3Q47GrC+aaUMEWZvWer4UiBtXXiFrJlQwOLcVx8D5kpJ69D0Aqy7z/oycGZpJKQ54sueTmZmxS/aOw7pISBWm6h6jWKzyZNvtUgJap286yOTf4F5hK6rGpbh32bocxRckDWQ+47ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a450bedffdfso119451166b.3;
+        Thu, 04 Apr 2024 04:49:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712231389; x=1712836189;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mM0VRkY4R/s+2RZMIGBjXivRb+LhyFR0UNjBp7WG/2w=;
+        b=KOQTvE+ndRr4+2qUIpAQeB4QGHK5iS3nsuQQVnWQOnVLYgw+/1EottMxa/aAWv9lW9
+         Dwk91soPBJ/tBwN342jpxAoOWFPtXgzhTW5QaSTFbdlhC2/uE0dIQ7dgDjZ7LaJAPjih
+         NxjA7WYSNko6LjBuEm2TfJ8QgK7znhcps+2u6+ouDphH3GpWPS6504KJXDaNVYVB+BoS
+         vDW4p69EMY4+6q6a12JHNxK68wark7PM2WNbB6MBoJXZenIen/tjHSuVO3Fit3EMOPK/
+         fNIrBCkTvE9+n8n6pTrv7gb3ZfI+bb+pE+69YZfo4XX1US2vq3KPkM3BpSRvc5Y46jug
+         GOUg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwaKVOJno07lPaA/VMC6e0VZ/0wejsPLGrp42R8Vk1niDCJjCkBBpzar3h5L1HdtBBjWRdwiijjrsDbHIc0MmB6zBXmODiskMzmi2h/5aXCvzGVguB6Z9Wm/GgvvurlsL/zP+XN2cg9EOkoFf2fUn9Mk+2+AvP+P9G
+X-Gm-Message-State: AOJu0YzWJ8v5lj8sXhM0aWbxyb2An/omlQjRp5VyzdAvrJxp240nE/M/
+	xPxS+R8SS08nA6AaH5BLczLY82j8LZ1/nhTANAuXJECDkhgG8B8j
+X-Google-Smtp-Source: AGHT+IFDNnBaWKjKBUScMyD1XxsRGzjVdkpYifMEFEBvLKEwHf4ElIsvpdnvFDl4eaA7HXmhAU+ciQ==
+X-Received: by 2002:a17:907:9807:b0:a4e:539d:2183 with SMTP id ji7-20020a170907980700b00a4e539d2183mr1768927ejc.73.1712231388672;
+        Thu, 04 Apr 2024 04:49:48 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-118.fbsv.net. [2a03:2880:30ff:76::face:b00c])
+        by smtp.gmail.com with ESMTPSA id xj7-20020a170906db0700b00a4e379ac57fsm7640946ejb.30.2024.04.04.04.49.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 04:49:48 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: aleksander.lobakin@intel.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	elder@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	nbd@nbd.name,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	lorenzo@kernel.org,
+	taras.chornyi@plvision.eu,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: quic_jjohnson@quicinc.com,
+	kvalo@kernel.org,
+	leon@kernel.org,
+	dennis.dalessandro@cornelisnetworks.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v3 0/5] allocate dummy device dynamically
+Date: Thu,  4 Apr 2024 04:48:40 -0700
+Message-ID: <20240404114854.2498663-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Jeff Johnson <quic_jjohnson@quicinc.com> writes:
+struct net_device shouldn't be embedded into any structure, instead,
+the owner should use the private space to embed their state into
+net_device.
 
-> On 3/29/2024 9:47 PM, Dmitry Baryshkov wrote:
->
->> On Wed, 6 Mar 2024 at 10:16, Dmitry Baryshkov
->> <dmitry.baryshkov@linaro.org> wrote:
->>>
->>> On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
->>> modem DSP via the TQFTPserv. These MBN files are signed by the device
->>> vendor, can only be used with the particular SoC or device.
->>>
->>> Unfortunately different firmware versions come with different features.
->>> For example firmware for SDM845 doesn't use single-chan-info-per-channel
->>> feature, while firmware for QRB2210 / QRB4210 requires that feature.
->>>
->>> Allow board DT files to override the subdir of the fw dir used to lookup
->>> the firmware-N.bin file decribing corresponding WiFi firmware.
->>> For example, adding firmware-name = "qrb4210" property will make the
->>> driver look for the firmware-N.bin first in ath10k/WCN3990/hw1.0/qrb4210
->>> directory and then fallback to the default ath10k/WCN3990/hw1.0 dir.
->>>
->>> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
->>> ---
->>> Changes in v2:
->>> - Fixed the comment about the default board name being NULL (Kalle)
->>> - Expanded commit message to provide examples for firmware paths (Kalle)
->>> - Added a note regarding board-2.bin to the commit message (Kalle)
->>> - Link to v1:
->>> https://lore.kernel.org/r/20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org
->>>
->>> ---
->>> Dmitry Baryshkov (4):
->>>       dt-bindings: net: wireless: ath10k: describe firmware-name property
->>>       wifi: ath10k: support board-specific firmware overrides
->>>       arm64: dts: qcom: qrb2210-rb1: add firmware-name qualifier to WiFi node
->>>       arm64: dts: qcom: qrb4210-rb1: add firmware-name qualifier to WiFi node
->> 
->> Kalle, Jeff, is there anything pending on me on this series?
->> 
-> Nothing from me -- this is outside my area of expertise so I'm deferring to Kalle.
+But, in some cases the net_device is embedded inside the private
+structure, which blocks the usage of zero-length arrays inside
+net_device.
 
-I was on Easter vacation and now catching up, that's why the delay.
+Create a helper to allocate a dummy device at dynamically runtime, and
+move the Ethernet devices to use it, instead of embedding the dummy
+device inside the private structure.
+
+This fixes all the network cases except for wireless drivers.
+
+PS: Due to lack of hardware, unfortunately all these patches are
+compiled tested only.
+
+---
+Changelog:
+
+v1:
+	* https://lore.kernel.org/all/20240327200809.512867-1-leitao@debian.org/
+
+v2:
+	* Patch 1: Use a pre-defined name ("dummy#") for the dummy
+	  net_devices.
+	* Patch 2-5: Added users for the new helper.
+v3:
+	* Use free_netdev() instead of kfree() as suggested by Jakub.
+	* Change the free_netdev() place in ipa driver, as suggested by
+	  Alex Elder.
+	* Set err in the error path in the Marvell driver, as suggested
+	  by Simon Horman.
+
+Breno Leitao (5):
+  net: create a dummy net_device allocator
+  net: marvell: prestera: allocate dummy net_device dynamically
+  net: mediatek: mtk_eth_sock: allocate dummy net_device dynamically
+  net: ipa: allocate dummy net_device dynamically
+  net: ibm/emac: allocate dummy net_device dynamically
+
+ drivers/net/ethernet/ibm/emac/mal.c           | 13 +++--
+ drivers/net/ethernet/ibm/emac/mal.h           |  2 +-
+ .../ethernet/marvell/prestera/prestera_rxtx.c | 15 ++++--
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   | 17 ++++--
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h   |  2 +-
+ drivers/net/ipa/gsi.c                         | 12 +++--
+ drivers/net/ipa/gsi.h                         |  2 +-
+ include/linux/netdevice.h                     |  3 ++
+ net/core/dev.c                                | 54 ++++++++++++-------
+ 9 files changed, 85 insertions(+), 35 deletions(-)
 
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.43.0
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
