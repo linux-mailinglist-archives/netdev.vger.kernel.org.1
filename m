@@ -1,228 +1,104 @@
-Return-Path: <netdev+bounces-84876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA6A89883D
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:49:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C371689882D
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7E20B2936D
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:46:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276882943B8
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C9B71720;
-	Thu,  4 Apr 2024 12:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1790745C4;
+	Thu,  4 Apr 2024 12:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hg2YBLms"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UL7h4T/O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922E03D962
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712234759; cv=fail; b=RpTxjaK3u/G9TeYHhIPiR8DDJIpGxbjhSWSlo4dEg9eHt+8rvNvAjSYnNEOUT8rccgjwixgXqvyFwfx+mAZxMWcX9urgTAY72Se51QggQJLlTut3VCWqTAhNih6WoTVjsW31mpDTJxA5O3hR3MFOIsTZFQo9ci2mLis5U53OFFY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712234759; c=relaxed/simple;
-	bh=wLv9/pr2EIGiz2xhMwy1FInzGK52is7/MX2DXmk4ZuU=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=DHG1/CELvvIRaZ7n3EZSimP1bQS+ut2bBZkPvbIs/HRO1dcO+Hr3FHyhyqh9gXvLjw+ec9OrIuWTnVU8wBihHPQW03c/tpztGJOdrnGV+zIQjJ9ctXvv7VQ9+LkoPZCI/jjl+HhcouP7sYKSC3kJMjzpJICogMVyqiOlWd+Y+B8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hg2YBLms; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712234754; x=1743770754;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=wLv9/pr2EIGiz2xhMwy1FInzGK52is7/MX2DXmk4ZuU=;
-  b=Hg2YBLmsYC1LZi1xGas8GF7VWa3NAnXWYVQnyUUt98NrCb7jBXr+jhOi
-   H2e4AsIR/vc81XNWzoK5xe4AT8ZNBkVLC9yO9udpPc1WudBhOs3dsx1E7
-   PJOM+2XmfmvtvWgUSWhzrUT6ayGFv1kRbL6iz+NdU1xGlqAQVLYKP9Clo
-   Bp6dcqZBRPLyDI3czZnda5OZwnsvutbYPTu6uCUyUc3XnglVBpIXrVuyS
-   ByvkRzZtXyD+c7gRbIt9ycGreQyPeDuUDriYzS8HOnM3GzGi0Me7my36S
-   I1YVJV1bwO0xiw2IBoI37eOxQEOJJGP1I96Crp4ot5b+azCzvWA4GOwVZ
-   Q==;
-X-CSE-ConnectionGUID: ZjDVnR1mT9G72V+jRUqAtA==
-X-CSE-MsgGUID: lkWCqg/qTRG5IlEI9LS3Lw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7374492"
-X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="7374492"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 05:45:53 -0700
-X-CSE-ConnectionGUID: Lf9gPxgPS1ix4pSTwMHH2A==
-X-CSE-MsgGUID: s1cLWOcvT8ukMh7ecb3reA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="19368164"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Apr 2024 05:45:52 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 4 Apr 2024 05:45:52 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 4 Apr 2024 05:45:51 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 4 Apr 2024 05:45:51 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 4 Apr 2024 05:45:51 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XBz+hLnNbOtkIlyKrtNuQtJkokCQFnljFNgtCLv8JejLQU3qwwSXS1nBUaV86eUptBu8h4fO9a9hBiFOU25bUCt7dM4yVjQ+P6Qj/TCogXRnQQAtZZFrr5xBLN0KIyPR+A43NkoYAyAJJZXCUxedDYvQH5e/ty5h2yaYATfnC9N3j7qCTY/SMeeg/PjwJckAN1cT9qjgRXGwpwW3LkG/YLeJa0BbIlS0kjhU+ww7IdhM2G69B0M01OFUsKqKUyve9+njf1/yEBFmZgrx+cjOfC3HH88dW8bNmYy8NbIJSskyiwLhWSpb2tAmaWFWzbTHyBThGqnmJ2CYj/Gqsj+nzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bZsm+wbvk54NBM4m8QDxceaWnjF4JXlvUW+Ncy7bGjo=;
- b=XFp3NsYB5zTxOaIxIzz6gv4XmvxkpHLmAAiUcZ8wYCL1AVjxpoWnVbEtKAWq8WS/K0TG0q+BmNrzErO0nwMQ1NCb+JoiywWPwPDit1NQTewBT69Iat31tsONo8UGTYPLHj9GLxoR/gXXfdwrVFaGr6eW302ipJXa2mN+djkhx0n1sC4TlhL503LdMTkFD9d0htqloT2gu/7vgP9LxIVv/DAMgLxxI8g7lxv5OjkSKQIu1gTtr87I5UyBiIOS96+aLZbc2Czalbwp1GLl+D2k5tQCWU5BxhoQ5eQuPj5FeaEPrdkhf4LCpjrSnbRy9F4ID4bXjI57ozpgJ6Kb3FuaZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by CY8PR11MB7876.namprd11.prod.outlook.com (2603:10b6:930:7d::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Thu, 4 Apr
- 2024 12:45:48 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Thu, 4 Apr 2024
- 12:45:48 +0000
-Message-ID: <206686dc-c39b-4b52-a35c-914b93fe3f36@intel.com>
-Date: Thu, 4 Apr 2024 14:45:43 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <idosch@nvidia.com>, <edumazet@google.com>,
-	<marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
-	<kuba@kernel.org>, <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>
-References: <20240329092321.16843-1-wojciech.drewek@intel.com>
- <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
- <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
- <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
- <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
- <61a89488-e79a-4175-8868-3de36af7f62d@lunn.ch>
-Content-Language: en-US
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <61a89488-e79a-4175-8868-3de36af7f62d@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA2P291CA0014.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::25) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CDF535AC
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712234830; cv=none; b=o2hg/r/YVgfxYVBdZwowhCJN7+9dmyYqibM61Gsho1NTrPw577Vngfh8AlRR1QNWnD20V4zOWSOUQdXa9QCc+Dpq0UY37wPdTjWblzPgn5chqHWwNx6asMk5EKeyDwKotZcJTVWKAYi98iHr9wAEYAX7CVz+exWz86a7+ZijT5k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712234830; c=relaxed/simple;
+	bh=LKX7vVNyqnnyjHXxmLAOtau0jOrACCVSiJJ7CZT6tc8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EMFT+zruMgaqbdgoWS2iQWRrdZbWHFukTp4fjQcr/FRefTd3ModowmdNq9ymT/S3xCr3QbJgxvzCbUlcbo9wgoENA2nnZjhcWBKHtGt0hBCN5ULkSqAnUhpM8vr9Kufp+/f31cY5c5OTuw6uI2roc224nosLOETD0x7KOs+eRX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UL7h4T/O; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4daa8466d6fso111844e0c.2
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 05:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712234828; x=1712839628; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LKX7vVNyqnnyjHXxmLAOtau0jOrACCVSiJJ7CZT6tc8=;
+        b=UL7h4T/O0Lx41kWnx+2mfQhaonmBn+SgqIf7nMnevAvzKClKcdef4gze0prGteprf3
+         OTlDWUk/Zwk3fyCHViWQYSCFShtvxFZQaCBvKvmCY8hftc8mg/TPvEj9wgyC+B7lzDNv
+         rYx0BNBZR4CeOsVQ8lr3xhYoJLbgyBJhTYSkl7MfUBkD4qZlr5TesKsGky/TLQSYr3m1
+         zOaxNcOBuEONg3sGreCHftyWQCQeQ1KotHgff1P+wLd4rFaqvVlHUDVoYMctY7Pqz86G
+         tyzVhPHMlWLSA2fDKrb/w0ZDJPxyRB10NdCWMj9qb9g1t5bJySV9JRWvOVkNW8gKZbSJ
+         pD0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712234828; x=1712839628;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LKX7vVNyqnnyjHXxmLAOtau0jOrACCVSiJJ7CZT6tc8=;
+        b=NnwuhZjiskyovEBMxcTYqbttCzdJjDQ6upbQKQAeNc/r0wZIHfsfvWmjDPTUr61fDW
+         wimipRMQiW+DHjghhg6au5lN+rQA25HqdMKBQILzk980Py5OR9MIiNCMmO+NZ9BD2JVt
+         13Pz2662BK0zA4Kqtl5+haBakxxstP1vdn+HIrFTtGxKHf5E9aiTrxSlcq1dg5O6oBYK
+         OgXBpah8xqvV6p9oFxxi0WwhSGWemdq8GOGYs+dCMBwTLIrVGShblA/KBUVAQfJmtq60
+         7Tie3fwHJZQ5MMK1hNmMOR3AN5nw/STLakXf1enhO3id770SMr5yBVWMrhzptM9WjQuO
+         zbGg==
+X-Forwarded-Encrypted: i=1; AJvYcCXS1ZLjEZ7KpK5eYTDcO7Ru7fitnE+O/x4dvEG3FX3Flng8/nSQR+lwjL7xCdpGs5dYnDckEDM9Wb8zTNPUKperd0VmTZvv
+X-Gm-Message-State: AOJu0Yyntx0WRexqZ8LjXyT1sDzMOoXTRmSQdT44C0/9IcU19b0x6NwV
+	aDpJexJWYjOlH44Iwkoqz4r12si4Ik/nRfa6pjusLOhkkjzejXWHmTTWPLNRWbnJnp2Sw+b6t6E
+	7wK2D9C10LIsaKu0suv9WUxTLN5A35TpVKM0U
+X-Google-Smtp-Source: AGHT+IFKwJu/g7BbPnYrYJB2WSSLAQgmbJ4c/CB4oOIccB6vlZA5jW33C9kcqZQFCvLNmqUBHzsgj92sT6oOOlwD0UM=
+X-Received: by 2002:a1f:7c8f:0:b0:4da:9900:a547 with SMTP id
+ x137-20020a1f7c8f000000b004da9900a547mr2081279vkc.1.1712234828230; Thu, 04
+ Apr 2024 05:47:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|CY8PR11MB7876:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6DcjmfeumLP3VW2byDO9/V66VJQSEngS2KuJb5PQZx2Tbls58RUuDpIKQByJpp0dQFknkImtmyJy85ybv+zbYkFmDwqSwip8sY6fco86M4wPRgdmwxhcwhnF5quGqdcK4Z2ZyDu24tOkTFnVAo1G20CjWHp5PKOhlU4ObG5spwNpKaJZ/qe+j5N0CkS6Krlzk96CeuNJUDHghJQMoHBQEtMarqWcQoYqy5zReRied4omOAbfGOTDMydPoUAye+mtOtRRLmzVdRb6GYJNMDi2tzkg8CO0cUjmS8PIZULi1V3apmp3y9Tm2k6Q9t30W09HBBqGNZfD4kFAFObQqcGdnMRjLgak/pcUm93VrUT0O/kLffr5QGtC4Ar5vy4eIhDk9gNRP0uTgI8MQBXUJgunG/aMG4wpX0/MOa9Co8YAU8bhU0Bn28/KGpErY0jkp1h72PE69+Qpz2XUMgk0PuAeYtWKdfO8iexzM5tk/XVaDWBtXNTsNf+VqkHRhhL8vKg6YGCmFXAtscv9vrw0pn4yGv+j9MbZqh8RbaF1XQzstbuLafVulNoCYANd/qVy82D4/VVZtZgOOMQHxZDi2vMwoFyOgKZo0VzobHfO+mb436K5im0kgF4OfqGpsySoAMZYjDEsLc65hiuHl5NbuidDKYT3j5aGnRMf1+MSvHELyRA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SDd5YURTbm9TckR1N2d0NEh6M2s2eTh0UzdCbms5RWJycFVwTElNUUY4QVY3?=
- =?utf-8?B?UnZjWDVscEEySTZoWUZzeGx5cjM0NjIyS0ZSYlUrR08xQUJWN1JGSUh4Tmlk?=
- =?utf-8?B?YnRCV2FOYURpTzAybFh4NUtpTEpLTnI4NWlhZXM5SW5lTFVKNVNEYWMzU2VY?=
- =?utf-8?B?L2hXd0NPNHJKVklubXFFVTJqdFE4cFI4N0g1ZUdWcEZIVTVzNXo3SU9rZ29z?=
- =?utf-8?B?c2pMYytkZlo0M2R0Ymc3dnE2dXRhTlNKOTB4M1hudW9tUGlKWlhnVFN6dzhi?=
- =?utf-8?B?MGRTVW1wMlhmNTJRS21rUmF6bFE0Y3lZWjBSWkxWdzVWOWQ5SVVuanppSUt4?=
- =?utf-8?B?M3NvWnpsNXBnVzFjWGlydnM3a3BNU05CZzdOU3BJQjIvRm82eVMwYVVTOGFL?=
- =?utf-8?B?VUN0SVpvelB5WE1oR29TcFVkWEkzOEpwN1BVR3N0RE5pRTR5T0t1V0IrZXFw?=
- =?utf-8?B?SWtmZlkrZmdrTCtka3JqczUxZFQ5NWZCdXN5K3FYaDhTbzcvK0pRTnJZOTl3?=
- =?utf-8?B?TVdMSC8yWlJCYTVNdmlEYXZtNnhFcUFmNVJiMTBSMk0yVURJcElDcjRqMitn?=
- =?utf-8?B?cVZ0ZGFNdHBBM2tBa2orZUNrcEN0L2txRjlROE82Z0ZOV0VVYkZiVFJRTFQ2?=
- =?utf-8?B?bnM1MHRUc0hTeG9BbFNOcTg0Uk4vQk1yMnA1bGM0U0lRUTY1UzYzVmRkblhi?=
- =?utf-8?B?L2kvMlVWV0xCS0Z2VldYaXlZSVFzQWVaalZ4SjNwVmdnUVhKeDdSK0ZveXFo?=
- =?utf-8?B?NGFrRklNSEJLaTRoRGt1b0dreE92RVlTSWgrQWJGaDYxa0Rock9qcHRlUWJX?=
- =?utf-8?B?RE5lV3BJeENRd2h2ODNBdkJDNjduaEdTVno1dlFUREZiS1ViVGpGM3pWYVla?=
- =?utf-8?B?KytMZVo4dXRvcGcxZ0dKOURPQ21sa251N2YwSlZHcHlSY1VwcTZIdFBpMWx4?=
- =?utf-8?B?TFB0UG55bXN3dXh6NjdndlQxS2tBRXBaNW1YSHBnd2c4bCt3TWRxZXpnT1Jl?=
- =?utf-8?B?ZllMZUJuKzJPYks3anVleTJWbFVUYkJNUFFHVGF0cXdwRS9LZWsyTForbjVw?=
- =?utf-8?B?Wno4OG0xMURMWThaT3M4emRzRi9UUlg3clA2QjIwZUFLZVQ4YndEeTVyN2hz?=
- =?utf-8?B?Tmx5WUtjc055K3JVS0R6S3dZWDhpbnlYbHJVRktTVEVUVEh4SnZWRE5uMFNn?=
- =?utf-8?B?VTVuNUtieGZmZ1pUVjEyY003dnNwcC94V1hnRkNBcGlBN0pmN29UNVFONENV?=
- =?utf-8?B?T0RxUlZoL1V6UGtYT2NtTXMxb0d2cEU4TEgyL2cwYlp3WjN4S2NKVmdrM1Ur?=
- =?utf-8?B?WXQvWW93c3dqblFDdTNGMGpiQXZCa0RJSExkd2VSeUVHSy8yVndzV0wrc3dD?=
- =?utf-8?B?aE9IdHlpaTBDUVN0bDhrTGljUVBCMitnNEZ0Yy9HQTRZc1pYSWkrdEI0YWxx?=
- =?utf-8?B?VUlIS2ZzU2dKM0VrN1BmemxHdFhJcmwraFdSSVd2TWJia0lxSThZRng0ZXNT?=
- =?utf-8?B?aUxHUk8zdWFkNTI2ZGQ3d2FPZFpOMzZjSlBUMTJkRXJncnVXbGVCYmJqUGo5?=
- =?utf-8?B?L2swWEpCc010cDBNSVpacVQ4QXNqakJkWThmdGZLdGZrZm85ZHJSUXoyTzRn?=
- =?utf-8?B?Sis4S0hCenNFVGxwSXR3dHNBZ0M0M0pobGNuZHZqTEg5TjhpcXBWR3FPZjNC?=
- =?utf-8?B?SytuVDBITXRwT0Nka2ovd3VmMTRDMUEycDRNZ3RYeDJyT2dzQlhJNlFpYkNT?=
- =?utf-8?B?SE43bURVQWRKanVrY3phN1FmdjhEbkllSEFUaW85WHEzdnlqTEtMY2FQNzla?=
- =?utf-8?B?Tm5MQUV2ck1iMEh2d1hObDNnNUNoMVBoZFpGYjRWb0VwdzgxU0V6ZVhoTytO?=
- =?utf-8?B?NlR5SktFWkZXVkY0N1NKU3plVXZhcWI0ejBnZmliTlZ6enBLVTlpSWVJWnM1?=
- =?utf-8?B?N0JCY24xSFo5eXI3THFBblJaOUpmNWxwbWJGY2pwNE9MbU1kRGMvN3RhMUlH?=
- =?utf-8?B?QUFhcDQ3cG5oVGl3RFBwQTFmc0V2VDBRVjJJQVRRVmhPR0VuaDQ0UUc4UXFB?=
- =?utf-8?B?bVB5bHhXS3c1OG5OUE5xSHpIdHZhYnJ5NCthMFgwTk1mWVZ5TWlRUXF4bnVY?=
- =?utf-8?B?aXNtUUwwdEZaK2pyZlA4eExReXcwWVlhUk5wd3NqSzhmUzlZU0g2enlOTXEx?=
- =?utf-8?B?V2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a124873-349c-4314-1cf0-08dc54a52751
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 12:45:48.8528
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hCPKSSjTUbd/D1hHnC9xTPMx9ikI7yqtgUVYcEm2y/5HJTJ8AY/pGn76H74PvlL3lCd71E5kKuhVIQeUT09PNQY7aSNO4nyK1qKdbTelJzk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7876
-X-OriginatorOrg: intel.com
+References: <20240328195457.225001-1-wedsonaf@gmail.com> <20240328195457.225001-2-wedsonaf@gmail.com>
+In-Reply-To: <20240328195457.225001-2-wedsonaf@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Thu, 4 Apr 2024 14:46:57 +0200
+Message-ID: <CAH5fLgi7R0JX8sc-cCQ8eUgzXFx+6hBGZm_gMZ_RvHPKZeB2ZQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] rust: phy: implement `Send` for `Registration`
+To: Wedson Almeida Filho <wedsonaf@gmail.com>
+Cc: rust-for-linux@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	linux-kernel@vger.kernel.org, Wedson Almeida Filho <walmeida@microsoft.com>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Mar 28, 2024 at 8:55=E2=80=AFPM Wedson Almeida Filho <wedsonaf@gmai=
+l.com> wrote:
+>
+> From: Wedson Almeida Filho <walmeida@microsoft.com>
+>
+> In preparation for requiring `Send` for `Module` implementations in the
+> next patch.
+>
+> Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> Cc: Trevor Gross <tmgross@umich.edu>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Wedson Almeida Filho <walmeida@microsoft.com>
 
-
-On 03.04.2024 15:49, Andrew Lunn wrote:
->>> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
->>>
->>> actually talk to the SFP module and tell it the maximum power it can
->>> consume. So in this case, it is not the cage, but the module?
->>
->> It does not work that way in ice example.
->>>
->>> Or is it talking to some entity which is managing the overall power
->>> consumption of a number of cages, and asking it to allocate a maximum
->>> of 4W to this cage. It might return an error message saying there is
->>> no power budget left?
->>
->> That's right, we talk to firmware to set those restrictions.
->> In the ice implementation, the driver is responsible for checking if the
->> overall board budget is not exceeded.
-> 
-> So i can get the board to agree that the cage can supply 3W to the
-> module, but how do i then tell the module this?
-
-I'd assume it is not possible, if the module consumes more power
-than maximum than the link will not come up and error will be printed.
-
-> 
-> I would also suggest you don't focus too much on ICE. I find it better
-> to think about an abstract system. A board with a power supply to a
-> number of SFP cages, and some cages have modules in them. What does
-> the kAPI look like, the use cases for this abstract system.
-
-My design for this API is to have an option to get and set maximum
-power that the module in the cage can consume. It's not about modifying
-module's power consumption, it's about setting restrictions for it.
-
-The use case is to let the user change maximum power in the given cage
-(so he can plug in the module with higher power consumption). Before that
-he will lower maximum power in different cage. Thanks to that the overall
-budget for the board won't be exceeded. Does it make sense for the abstract
-system you described?
-
-> 
->     Andrew
-> 
-> 
-> 
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
