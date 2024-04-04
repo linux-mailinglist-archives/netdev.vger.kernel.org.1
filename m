@@ -1,117 +1,104 @@
-Return-Path: <netdev+bounces-85026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F0C899007
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:23:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A04899071
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E17EDB2211B
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:23:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E7222891CC
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B598D13BAC6;
-	Thu,  4 Apr 2024 21:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975B313AD22;
+	Thu,  4 Apr 2024 21:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="C16XOPFc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hGEe3nIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5517912DD9B;
-	Thu,  4 Apr 2024 21:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFB5745C2;
+	Thu,  4 Apr 2024 21:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712265777; cv=none; b=PazpdNd187PBBYNMsb+6L+UcoTS+n3nEHrzPntWMuZn3GeCDTCZE7JbclvVdqQRnXt/MQ+G9iQjTKn7GLuMMbVKjD63MhO6tnr5SakJC580Vvg+pvOl90t+hvM9SqgaquLlS6JX2XJcMjk13HVZSprlh9v4+XnxqeFI0yT5szuo=
+	t=1712266450; cv=none; b=gFARZm4Vf8f5DrwcUDyJucbrKxpprG9Dqx5nRn19D7bqvSUGViVzmCbwm5+j57H3sQpeT+WmcmSfQvdQjis/bIzIlmHwGkVLkBVGSYKRTpY1msafzsm6mqwG54pPAJmf8Ze95vDkjCf/5liP7qhDmQVauQt2jXlIE72xFM9sK8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712265777; c=relaxed/simple;
-	bh=rIO7RiRPDq+k3n0/SLUar4PSqPI1e24ngMzDAoiYJpk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=aYust3r8/VcTzygvBF6dfgUL9ak1YXpWq74gK8AHD3bBTD6eT9RTIv5DhnjDEmoyDjeznM2QMre0IpW47JJr6/vhb75uoy4edorjIbma2zSP3BGem5OLYqlc4ZRccfDn5O6nIkZmKTYwQvtfdNVKuLwydQM3BDwEfwMKosxMRwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=C16XOPFc; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1712265772;
-	bh=38P+zYGFMcPTcXJryge5OAB4c4qWAdYh4T/ILFqnM0A=;
-	h=Date:From:To:Cc:Subject:From;
-	b=C16XOPFcQ61kGQeInt1DSpq76WsCl5gu112yo+Wkx1aMuZeh/VJOPU+lTLHs2Pu4S
-	 Vl73Aqf/pWot8sLwtUs8TfePMRqEDFXJVkQNvyIT5lM2MEUKwxadB/8BbWKE8md5oU
-	 spxKE1U7UUtb3T//h8i4SJ/nmvcwj4Epwc1sWIQeCurJshBAsiCvwbDVr1o31uAG92
-	 /n/xZIJqeS2jL3PbY94P0AZxf1Z7eIt5tHfUpiX//JDTn55Ra8StTXFWtL5Csev3VY
-	 aiIAssmLrPbX6Cban3044mJLzc9PIF1aC/FAvkvN7eHSSYrF0B84fT5KPUhzBgPPt1
-	 qATXUpgG73nTA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4V9ZMv3Ycwz4wc5;
-	Fri,  5 Apr 2024 08:22:50 +1100 (AEDT)
-Date: Fri, 5 Apr 2024 08:22:47 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
-Cc: Networking <netdev@vger.kernel.org>, Alexey Makhalov
- <alexey.makhalov@broadcom.com>, Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net tree with the mm-hotfixes tree
-Message-ID: <20240405082247.177638cf@canb.auug.org.au>
+	s=arc-20240116; t=1712266450; c=relaxed/simple;
+	bh=MvO4hn6NceYnIx1psf+rZClmgr9/kqbNuQw4jwCybUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tGtd2eMm/DH9jhwVh7CoJwIruFnxLQHcLBAIQlLrnWfEXWo03W9UVrG1B/orEFre2poDsRAM8MsXRj7FgYVgP1sBH8J4ijZ1xmX/FF3GVCW8gk56Lw/7mX8fBim+YqVrh5vT25EUy1YRGEz+zQH9Znpyv9+s5pi2HOAUVZHBuyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hGEe3nIl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 111D7C433F1;
+	Thu,  4 Apr 2024 21:34:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712266449;
+	bh=MvO4hn6NceYnIx1psf+rZClmgr9/kqbNuQw4jwCybUo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hGEe3nIlsl2LY3b6fNhY82fq0TjwggHOYHq+XKfEVZWZNEP1RGwR4GKxprMif+jkh
+	 3fvBcREXd3TxdL5GamnEG+A6/mZ+rKP8aaSNAItzn/4HN3HB8My+kUfaYNSh3oarSd
+	 OK1m3i4qS0lZxLXVYtGJtH+dg6Q42PyU7wwSwVCz+ZAWRX9DAiJK27B6myCvBqwLPu
+	 XeeHup5JEeJLwuFxWKWFKFPpF4AD/aOr/8v6uSjGtJn3mZuB1mWT30zMRBLus2eWOV
+	 PTEKSkoiWTKb7923YStB7hkm3cQVy6DBLyLdcpKEYTUZ7b3qL8VRNDkxDKsd1S6yOg
+	 yCUBV3S4Mx4hQ==
+Date: Thu, 4 Apr 2024 14:34:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, David Ahern <dsahern@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoph Hellwig
+ <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko
+ <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Itay Avraham
+ <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Aron Silverton
+ <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Andy Gospodarek
+ <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240404143407.64b44a88@kernel.org>
+In-Reply-To: <20240404204454.GO1723999@nvidia.com>
+References: <Zf2n02q0GevGdS-Z@C02YVCJELVCG>
+	<20240322135826.1c4655e2@kernel.org>
+	<e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+	<20240322154027.5555780a@kernel.org>
+	<1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+	<0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+	<20240402184055.GP946323@nvidia.com>
+	<83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
+	<20240404183305.GM1723999@nvidia.com>
+	<20240404125339.14695f27@kernel.org>
+	<20240404204454.GO1723999@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Wu_=e+S0FwX5G._gSarN6D=";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/Wu_=e+S0FwX5G._gSarN6D=
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi all,
+On Thu, 4 Apr 2024 17:44:54 -0300 Jason Gunthorpe wrote:
+> > To my knowledge the "customizations" are mostly around fitting into OCP
+> > servers.  
+> 
+> Nope. I understand it is significant. If Meta had to work with a COTS
+> environment like a HP/Dell customer then Meta would have a list of
+> flash configurables to set. I think you greatly underestimate the
+> privilege of being at a hyperscaler and having vendors create custom
+> products just for you..
+> 
+> > Those unfamiliar with how hyperscalers operate can mentally
+> > replace $hyperscaler with HP or Dell in your message. Minus all the
+> > proprietary OOB management stuff those guys also provide.  
+> 
+> A significant Dell customer will get a server pre-populated with a NIC
+> with some generic Dell configuration. In most cases the customer will
+> have to then program the flash to match their needs. Set a specific FW
+> version, set site specific configurables, etc.
+> 
+> Similar to how a Dell customer will have to change the BIOS settings
+> in the Dell to match their needs.
 
-Today's linux-next merge of the net tree got a conflict in:
-
-  MAINTAINERS
-
-between commit:
-
-  ba74dd4f0460 ("MAINTAINERS: change vmware.com addresses to broadcom.com")
-
-from the mm-hotfixes tree and commit:
-
-  fa84513997e9 ("ptp: MAINTAINERS: drop Jeff Sipek")
-
-from the net tree.
-
-I fixed it up (I just used the former version) and can carry the fix as
-necessary. This is now fixed as far as linux-next is concerned, but any
-non trivial conflicts should be mentioned to your upstream maintainer
-when your tree is submitted for merging.  You may also want to consider
-cooperating with the maintainer of the conflicting tree to minimise any
-particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/Wu_=e+S0FwX5G._gSarN6D=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYPGicACgkQAVBC80lX
-0GydGAf/dOx1xO2dm4EYRytGjFb52JemaTVgMeKqvTIoczDzUnbOgnph/KChF7jg
-ofXam6zRFb1CbtXfwkKWb+msnAbdVdjGLamf8Ikxo4HG9aLXdWcoxris1GfH+vja
-YlbpWvHNilmArzQ/Frs0D8tEinl/ohR4SUL7k2JnBgKSMErxlWF0zFQH496JYEvv
-3Ck+1hrHFi37YSb7DrEwaOAsqq0cGfoUpyHpo5zn6DxYm+Rhy46uHlJ1SBCaHUYg
-MujhxHFOPr+4DaPeyLVfqBXJYfEYqVPxjG4mFc51ghS68W8zeyeiB65uFBzDBuUQ
-EseShsUVldDGaKOXkiuYRA1DpRyMHA==
-=s6ZW
------END PGP SIGNATURE-----
-
---Sig_/Wu_=e+S0FwX5G._gSarN6D=--
+I can only guess that you are again thinking about RDMA/HPC.
+Flashing tunables is not a workable solution for extremely varied 
+and ephemeral TCP/IP workloads :|
 
