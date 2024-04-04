@@ -1,92 +1,117 @@
-Return-Path: <netdev+bounces-85024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 032EB898FFE
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:20:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66F0C899007
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B290B288B77
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:20:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E17EDB2211B
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AF713B798;
-	Thu,  4 Apr 2024 21:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B598D13BAC6;
+	Thu,  4 Apr 2024 21:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XWaGOdAO"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="C16XOPFc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9F513B587;
-	Thu,  4 Apr 2024 21:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5517912DD9B;
+	Thu,  4 Apr 2024 21:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712265633; cv=none; b=PDsvkr7mch2FjpfZkYmNUKwN1Kc3J5U1ozlrwxuIuNJPYMljmMwaLyA9S/b/R5NroQZlzSOoVTJutxJc5ITFoPbYxdM5a97eCT5iRo+G+jVQzSyEbzc4mnuy4ACwndn/bfg6iSpCqs21g8yi3iZtPrMPD+MlsfOd3bGzMRCn1uE=
+	t=1712265777; cv=none; b=PazpdNd187PBBYNMsb+6L+UcoTS+n3nEHrzPntWMuZn3GeCDTCZE7JbclvVdqQRnXt/MQ+G9iQjTKn7GLuMMbVKjD63MhO6tnr5SakJC580Vvg+pvOl90t+hvM9SqgaquLlS6JX2XJcMjk13HVZSprlh9v4+XnxqeFI0yT5szuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712265633; c=relaxed/simple;
-	bh=bzP9wdG4Lo9CGuFeKbadFxBdG0phjSnacMiPX1MPcQM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ovJirehS2nDBgR2tzzGOTT+Hl3hPJEE/vnnjJCJ7NBa4Lx+utdQPKW+mCKkRNRFhNl3DTdtmn8Y7OZBHy0GUEXuXZIczsRY+PLO212J8WfWHEOvsCL/QJ7v+1HGIAojKATEo6WY75IWJEQYhdCOZbnpH1Bu7Zg0Q+/mWRQSzPU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XWaGOdAO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1CA60C433C7;
-	Thu,  4 Apr 2024 21:20:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712265633;
-	bh=bzP9wdG4Lo9CGuFeKbadFxBdG0phjSnacMiPX1MPcQM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XWaGOdAOCMUGll1igVOE3CzX1DL0Ys9lPqfUQGqFQhtU0vG1aW53oslemKjv++3iz
-	 uAhCiDavTk4m+rbfCft6Gz8gOHYOrkyTRmWk+OX8imHZw/47YSY/kNoQ4dYaf4C/+Q
-	 A1fsxLBmARBnjWrs+m1orPALXTmMjouMhPzy9v+FyzpU8y6PhOkhz/yQ7BObyIrmPa
-	 1qFDVP5VFDKfBndKp/DBliZggX6Q5wjmeoiT8AU1coQVs9ZReX5l/A7tXJCRx8PwA7
-	 P+wBh3SQIIOoKw8q+yL/KjqYTPbOnEq8t/VtFu+dUsKmxCe1zxT4fOX6KLNyqpPfd6
-	 xNEt8empUirSQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 09BC2D9A150;
-	Thu,  4 Apr 2024 21:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712265777; c=relaxed/simple;
+	bh=rIO7RiRPDq+k3n0/SLUar4PSqPI1e24ngMzDAoiYJpk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=aYust3r8/VcTzygvBF6dfgUL9ak1YXpWq74gK8AHD3bBTD6eT9RTIv5DhnjDEmoyDjeznM2QMre0IpW47JJr6/vhb75uoy4edorjIbma2zSP3BGem5OLYqlc4ZRccfDn5O6nIkZmKTYwQvtfdNVKuLwydQM3BDwEfwMKosxMRwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=C16XOPFc; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1712265772;
+	bh=38P+zYGFMcPTcXJryge5OAB4c4qWAdYh4T/ILFqnM0A=;
+	h=Date:From:To:Cc:Subject:From;
+	b=C16XOPFcQ61kGQeInt1DSpq76WsCl5gu112yo+Wkx1aMuZeh/VJOPU+lTLHs2Pu4S
+	 Vl73Aqf/pWot8sLwtUs8TfePMRqEDFXJVkQNvyIT5lM2MEUKwxadB/8BbWKE8md5oU
+	 spxKE1U7UUtb3T//h8i4SJ/nmvcwj4Epwc1sWIQeCurJshBAsiCvwbDVr1o31uAG92
+	 /n/xZIJqeS2jL3PbY94P0AZxf1Z7eIt5tHfUpiX//JDTn55Ra8StTXFWtL5Csev3VY
+	 aiIAssmLrPbX6Cban3044mJLzc9PIF1aC/FAvkvN7eHSSYrF0B84fT5KPUhzBgPPt1
+	 qATXUpgG73nTA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4V9ZMv3Ycwz4wc5;
+	Fri,  5 Apr 2024 08:22:50 +1100 (AEDT)
+Date: Fri, 5 Apr 2024 08:22:47 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Networking <netdev@vger.kernel.org>, Alexey Makhalov
+ <alexey.makhalov@broadcom.com>, Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net tree with the mm-hotfixes tree
+Message-ID: <20240405082247.177638cf@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2024-04-04
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171226563303.5542.7090157406302786864.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Apr 2024 21:20:33 +0000
-References: <20240404183258.4401-1-daniel@iogearbox.net>
-In-Reply-To: <20240404183258.4401-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: multipart/signed; boundary="Sig_/Wu_=e+S0FwX5G._gSarN6D=";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hello:
+--Sig_/Wu_=e+S0FwX5G._gSarN6D=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Hi all,
 
-On Thu,  4 Apr 2024 20:32:58 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net* tree.
-> 
-> We've added 7 non-merge commits during the last 5 day(s) which contain
-> a total of 9 files changed, 75 insertions(+), 24 deletions(-).
-> 
-> [...]
+Today's linux-next merge of the net tree got a conflict in:
 
-Here is the summary with links:
-  - pull-request: bpf 2024-04-04
-    https://git.kernel.org/netdev/net/c/1cfa2f10f4e9
+  MAINTAINERS
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+between commit:
 
+  ba74dd4f0460 ("MAINTAINERS: change vmware.com addresses to broadcom.com")
 
+from the mm-hotfixes tree and commit:
+
+  fa84513997e9 ("ptp: MAINTAINERS: drop Jeff Sipek")
+
+from the net tree.
+
+I fixed it up (I just used the former version) and can carry the fix as
+necessary. This is now fixed as far as linux-next is concerned, but any
+non trivial conflicts should be mentioned to your upstream maintainer
+when your tree is submitted for merging.  You may also want to consider
+cooperating with the maintainer of the conflicting tree to minimise any
+particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/Wu_=e+S0FwX5G._gSarN6D=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYPGicACgkQAVBC80lX
+0GydGAf/dOx1xO2dm4EYRytGjFb52JemaTVgMeKqvTIoczDzUnbOgnph/KChF7jg
+ofXam6zRFb1CbtXfwkKWb+msnAbdVdjGLamf8Ikxo4HG9aLXdWcoxris1GfH+vja
+YlbpWvHNilmArzQ/Frs0D8tEinl/ohR4SUL7k2JnBgKSMErxlWF0zFQH496JYEvv
+3Ck+1hrHFi37YSb7DrEwaOAsqq0cGfoUpyHpo5zn6DxYm+Rhy46uHlJ1SBCaHUYg
+MujhxHFOPr+4DaPeyLVfqBXJYfEYqVPxjG4mFc51ghS68W8zeyeiB65uFBzDBuUQ
+EseShsUVldDGaKOXkiuYRA1DpRyMHA==
+=s6ZW
+-----END PGP SIGNATURE-----
+
+--Sig_/Wu_=e+S0FwX5G._gSarN6D=--
 
