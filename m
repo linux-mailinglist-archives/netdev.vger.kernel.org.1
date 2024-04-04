@@ -1,97 +1,120 @@
-Return-Path: <netdev+bounces-84981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAE9D898DB2
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 20:06:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7152898DB4
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 20:07:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133DE1C2198A
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 18:06:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 041331C25B4B
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 18:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73FC12FB10;
-	Thu,  4 Apr 2024 18:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACBEB130A6C;
+	Thu,  4 Apr 2024 18:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPjoyJgV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAUlmAAA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941A712F590
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 18:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1192E1C6A7;
+	Thu,  4 Apr 2024 18:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712253970; cv=none; b=fzvkHtf0vqeuXJO+R/tbhxujvCagdr4Yxk0ywpne36JGKymUqf19ejKL75EExnJDYGPHhT8qNh/L4hHMvi8Vf9zfXYeU0XzVogx7Le3U70/VwghFL+bMh2S/XY5GV4bdgjZI39Fvc3QnVVZpHWzHOYbVTq4T5M3dzwm/dZV6ZVw=
+	t=1712254018; cv=none; b=i6bLlBYjCawO37XvqIA6molv2GF7IB9vYX386iEMQwTSs1z7yv/JhF/j+6+6lwaIRpbn343IgFgjaCxmKRHjmHN123QGp86k+U5fBrJrLHKPZ61MGOK3ZFwhTFVkEllLMsoDqZnVsEFxvEumYFOafOVvk/eHZvYe/6u6l/SM4bA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712253970; c=relaxed/simple;
-	bh=ciGSsgbtL57oOZaOtVMCBQeNpC3tDp8C+/42uIsQBwY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IlpFxZSdeuJ3j7cVVRouHSULYL0aMm4+u7ry5Pwj0TQoWFvb1yvpSuJ2gGtpQffqbM50teXXnEfXfjAvXqvo4Gcmcy45jg+gBKumbusf4vQEyPskir5usQPxidvhDRhrMiM9di3zIpE/RCeZhuQQ/Sa6aW5g66OGK4KvfwK3Tqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPjoyJgV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8633C433C7;
-	Thu,  4 Apr 2024 18:06:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712253969;
-	bh=ciGSsgbtL57oOZaOtVMCBQeNpC3tDp8C+/42uIsQBwY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PPjoyJgVVMrSoPKsT9k4ldcaVTaCJhCHYFyjmSDrzyE5RpovGzLD2BKYGW0i1Z6/7
-	 8N+zYZ5YRetvIMgbsJSHzVc42HOyvdoAIe0O3U1OnSi2f2isph0gmczu3qVMB+VrA/
-	 roqBs9JnSb66SJRMRlMyCKaqB3KQSkH6KlHaVvCfQp5HZrUtUOwoSiP/94h7ab929x
-	 36SIEe9wk9gyhvaRkwT2t7PXTQhPDbFr+1fhV5+miFVBLz2qT/+TyuIiwFtCwJDHH8
-	 3WzbSwqEalCvsQ6nR2eqEwyRybIQiQUjvAw76Rv5NwCOKzkRkNGzd/F8NvJCX0i8al
-	 0dM+Omsidte3w==
-Message-ID: <8ab59d1c-80fb-439c-962f-a1c3b486ca37@kernel.org>
-Date: Thu, 4 Apr 2024 12:06:07 -0600
+	s=arc-20240116; t=1712254018; c=relaxed/simple;
+	bh=zusms/ybvY0EBsrA7FDocXGlfT3sH3wDhrIWLT6+ny4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=BOytSfa1gCIt8v/LN5OlGqsv9qjTbbkazkh3EB31WiIgh16gMpL/BMxwCILGt/QCRtYY9O5IDrnw7ceZMp4lSlo6Y7bdSoUIRtFYgp3vyPXncAPwwJjHMfzdcYyMVk9nzzAfNuz5u3ngSzvOKGUNiA8rvy1+SJQq+RWVVbC6ejE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAUlmAAA; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4162bac95d4so5215375e9.2;
+        Thu, 04 Apr 2024 11:06:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712254015; x=1712858815; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wy7kg47oLg/+gMxBxUBvkrC3zJR95ziHDFd4yzE48Pk=;
+        b=CAUlmAAAxV+OFTV//11EZwwmumer5t80MSRsvz2wt4D/nqR/xcDHIr5YmYSSEKJJeU
+         RkfbFnQ6MsfT7ulNlK1RXmi2IXZUBQQRdlSj9xx7HBbyu0d7hHJ5FhkXymkw1/TjZEFr
+         5duzALoqQq+/Z7HVR6Yq2UWvTVU54uQ8vyn9eRvH5aVtFze5XISUgGcUELAozno2LPHc
+         CIU+NM04zglsqF0VJGFY0ry68/A9mwX5AAnhHu0uQm8DEsexVOeTP2qyNmW2Mc/SWuzY
+         6UP4o/iSyY8Y2P4/Zp6uM1YCO1UjdctTcibSIOURTx001ZVh8GKPoHfkpajI36Nh0CNM
+         ad2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712254015; x=1712858815;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wy7kg47oLg/+gMxBxUBvkrC3zJR95ziHDFd4yzE48Pk=;
+        b=oY9WQjHSp0mDcIxESxmQ5gTDFXOD27nhGN0/haUd0CwrQGlLyNbhGkEAabpaI0tdl6
+         0p+kih30EGnsMNr/dCTYOUABYzGNQf8uTqF2dCKHKmHNXJ8nvHx47xcsq5uKQXsgqNwE
+         IZAhxhP1tSS1H/ayZqG2B87LwnseDS0oywn21pQ/oYQiAuHbP7J2y4uVGX97b161Huqx
+         Qii9PxNRQwGvzlV8l700c6dN2m7mYyhce5wcEwEzVxvfg9Jx0czB5boJJpBR/qS3doGr
+         T3IaBqVBeI+qWFcxb2p9yLBAErdQEvzs7lsTSCX5WQ/tLOKtFMSuyqHxNuDmRvSNybHJ
+         QFCw==
+X-Forwarded-Encrypted: i=1; AJvYcCX1sbo4MN5JzUafvnjEdBbDTnrxvErbeZb3cOBcoz35M44bwimGYRvQzg9AAfuVkIkhsQ/bJRY+OqRyRHdnsE1RVxaH3ivhnmEGprmItCDNKadiH1sWoSnZ82qrVjUFFozz1P0B
+X-Gm-Message-State: AOJu0YzHUEZXz8MYbCMerEovyOQXvaWwiyPShSRZtKXcQ98wZjrrQAYC
+	9/cfv/k14CLsxXWVt7DrthY++7fL52Kl+zO28gviKMaza7vPuz/A
+X-Google-Smtp-Source: AGHT+IFuj2PFJNPDI0+yYN3g/kkN7zAmtKbcZzLJJ9MVWLdK0xcF6De3NCFwWSgcSN+nApFENyekRw==
+X-Received: by 2002:a05:600c:5755:b0:414:c42:e114 with SMTP id jw21-20020a05600c575500b004140c42e114mr2269751wmb.39.1712254015080;
+        Thu, 04 Apr 2024 11:06:55 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id h7-20020a05600c350700b004154399fbd9sm3540550wmq.45.2024.04.04.11.06.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 11:06:54 -0700 (PDT)
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+To: Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Christoph Hellwig <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, Jiri Pirko <jiri@nvidia.com>,
+ Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <20240322154027.5555780a@kernel.org>
+ <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+ <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184832.GO11187@unreal>
+ <cefa2b9a-4227-969e-d31e-c19a552b9c1c@gmail.com>
+ <20240403190012.GV11187@unreal>
+ <d75ee9d5-36a9-4056-a0f3-0c05b2e744aa@kernel.org>
+ <20240403170149.7d2b8f2b@kernel.org> <20240404122338.GI1723999@nvidia.com>
+ <20240404074850.19ecd52e@kernel.org> <20240404174728.GL1723999@nvidia.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <d0b11055-1804-515b-7916-cb83a6274955@gmail.com>
+Date: Thu, 4 Apr 2024 19:06:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] ipv6: remove RTNL protection from
- ip6addrlbl_dump()
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20240404132413.2633866-1-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240404132413.2633866-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20240404174728.GL1723999@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 
-On 4/4/24 7:24 AM, Eric Dumazet wrote:
-> No longer hold RTNL while calling ip6addrlbl_dump()
-> ("ip addrlabel show")
-> 
-> ip6addrlbl_dump() was already mostly relying on RCU anyway.
-> 
-> Add READ_ONCE()/WRITE_ONCE() annotations around
-> net->ipv6.ip6addrlbl_table.seq
-> 
-> Note that ifal_seq value is currently ignored in iproute2,
-> and a bit weak.
-> 
-> We might user later cb->seq  / nl_dump_check_consistent()
-> protocol if needed.
-> 
-> Also change return value for a completed dump,
-> so that NLMSG_DONE can be appended to current skb,
-> saving one recvmsg() system call.
-> 
-> v2: read net->ipv6.ip6addrlbl_table.seq once, (David Ahern)
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Link:https://lore.kernel.org/netdev/67f5cb70-14a4-4455-8372-f039da2f15c2@kernel.org/
-> ---
->  net/ipv6/addrlabel.c | 18 +++++++++++-------
->  1 file changed, 11 insertions(+), 7 deletions(-)
-> 
+#include <disclaimer.h>
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+On 04/04/2024 18:47, Jason Gunthorpe wrote:
+> The configurables exist as they are
+> and need to be supported, in one way or another, by the kernel.
 
+Why?  What does the kernel get out of it?
 
+Maybe *you* need them to be supported, but maybe you should have
+ thought of that earlier in the design process.  ("A failure on
+ your part to foresee the eminently foreseeable does not
+ constitute an emergency on mine.")
+If we let folks bypass our standards with a _fait accompli_, we
+ don't really have standards in the first place.
 
