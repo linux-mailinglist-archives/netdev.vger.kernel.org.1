@@ -1,102 +1,392 @@
-Return-Path: <netdev+bounces-84994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4B3898E0C
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 20:36:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBE04898E16
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 20:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 955CF28A973
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 18:36:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BEFE1F226E5
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 18:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D391513281A;
-	Thu,  4 Apr 2024 18:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F0F130ACA;
+	Thu,  4 Apr 2024 18:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pha4B60D"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="nqQ35LSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82451327FD;
-	Thu,  4 Apr 2024 18:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAA112D775
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 18:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712255745; cv=none; b=ba0t0QesFw4oIaeVLWXjAs2+RG4GuXPIxDFrIZ/xVAwBklQ6DrrpO4SGGASbPc0o+cC/JtRHHkRgsqpMuaLO56gWl4mBKAgNRFiAE8nnGG9sar1l6QYXKlWXMBOcxVX/iFPGnFeohyajwmmtDMpxvi22P1lcQiwE2g1ciPldK8I=
+	t=1712256011; cv=none; b=tOErNEmR96c69ON/snuJ86gANzDmgP3zd624X63hmdtSthBGTHdnAne/2Lvkz0NebjYom0kAmdm+nue+3AA3Fb9agGqH9SvnxbnsEARKa8esJEd1dLjFa5oM44Lb5RZoRCMeN/7vj3jlAuVdJGuTb9CdugP5+CC0cQfiASX3bGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712255745; c=relaxed/simple;
-	bh=D5doStes5LbDvIj5OW/qOmZxpIoPwQ/5pyTQVs/kqTk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IJiEEbbJsLGyr5YFblxTy9LNFCAs0Jacf5rKIeZggTOPOvoi19gPgc8l/Q38fGoJlIIOGqHe6mVxD4HevSvSOCQYUcVhjIWdKlUWgJw+lEhn/tp8w8qzVNmXEzTC7frIckCtHEfUJ0mFqAPbXsEnDCY2MD1db79pEgNnDpTZxvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pha4B60D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67903C433F1;
-	Thu,  4 Apr 2024 18:35:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712255745;
-	bh=D5doStes5LbDvIj5OW/qOmZxpIoPwQ/5pyTQVs/kqTk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pha4B60D0m27PsZaGvvJLi2KhZWTl0mLjUrg4k2TtT/UyLw2H53c9501PX5z6j5wk
-	 oy5zZGtvA/zBA4X2vNT4IgJ2Tbm6CHxx5WzI6JMswDGbzrz2YweJL3sQ+KXBcpQF1p
-	 nxH+jEemSF7NLsK+WWKVpgVWgRmBD1xDQX3Oembysvf7B4BraO1jPGQAS/phWXS+Yh
-	 JuJapJYAIWp7hFI0qjiPMiXh/6j9iCqFg/4licHVkXc9193Ul1dHNV/7Z5Q7VPQeuH
-	 H2ByAxUDkjBeJZb7jHlElBs1WFB1NIb+Pqh0SR6bLxXJ1p5+I5jLZW4tEY6kBNkvte
-	 XpA6lkalRzmeQ==
-Date: Thu, 4 Apr 2024 21:35:40 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
-	Itay Avraham <itayavr@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	linux-kernel@vger.kernel.org,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240404183540.GX11187@unreal>
-References: <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
- <20240402184832.GO11187@unreal>
- <cefa2b9a-4227-969e-d31e-c19a552b9c1c@gmail.com>
- <20240403190012.GV11187@unreal>
- <d75ee9d5-36a9-4056-a0f3-0c05b2e744aa@kernel.org>
- <20240403170149.7d2b8f2b@kernel.org>
- <20240404122338.GI1723999@nvidia.com>
- <20240404074850.19ecd52e@kernel.org>
- <20240404174728.GL1723999@nvidia.com>
- <d0b11055-1804-515b-7916-cb83a6274955@gmail.com>
+	s=arc-20240116; t=1712256011; c=relaxed/simple;
+	bh=H3pqw5Cn21mEjrw4QLbhRCTF5t3UE9p+uXoiKRje7Kc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mjZrP+MizTXutNXPiGnpNFAITwNWBdgyApabWUClMiisOOfvECyE3juTyAq2iICqSE+ecZzRbCJraxx1O5DNym+cI18qBfk+ftCAlHClISCNoZTZnFBz8s6XF+xCuZ3IfzYYEyeU1trrNdmG3/w1VB98OxKuaS76o4hEnQZN8RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=nqQ35LSF; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1e2b1cd446fso7190695ad.3
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 11:40:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1712256009; x=1712860809; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AyIyFdiyJQRDXRJOVVzrljOkrzosqdH0O43qmBP8nHA=;
+        b=nqQ35LSFvjdUkUPZ49OJd/vniNq+bOF6RVJO0VWfkER7oDEmoLHh+n4ArLRt1C1kXx
+         OrNiOAKdocsjJnNuqkda7niT61sJ508TCuXn/8uPd204y3vOu1wLR23wfAZpx2/gOC4o
+         2ZV49mSUeV1av/j2pSwtaQSUoxwGWEmpfSXrIhGqlHhnyvkI1jzIKWuO31EBCqZ5ntXD
+         IT2qx517vgbLsncbIfbiUf0zAweBfM+QAjQE7pIq/OPidF1VTX2KVVGIhz0bcBxbzPWb
+         O1kVP2lnrvBm1u5GSIQSLJmWNZ2xBE/KFSUzX0be5Lhi19UJgAaENoRb++w/2cAH3eoU
+         hW1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712256009; x=1712860809;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AyIyFdiyJQRDXRJOVVzrljOkrzosqdH0O43qmBP8nHA=;
+        b=XVnDYhC2oSDTh0OcAKLYzDLGxvOSq7B+fAGfSabQZwGGwQzx8gRx494sS/hLt2FW26
+         owDEe2Umky4rsfElp02Grwzp1xhkKnYUFD/5bia9CQpApShEh14nLVTpgbbbixga8GFG
+         pIlFm1HdxgNPcf3E0l3zVDNJmo+fjS2Hrme4lB5ZI7NO2jqYcscERSCo47MsOGYxucvB
+         v//C6vwwqK3NwCEHfmx/e7lXSJ3vPF1nmaioMzeDeUrLiD46CAqVxksnBK5PSGCFNdAg
+         XRmberIoRv3zPXjUdOWXw5mJJeIWcAPgMD92KC5l2FEzseEowffSYuq77jJgnBDK2dJP
+         EhNw==
+X-Forwarded-Encrypted: i=1; AJvYcCV5L+Yl7+vO4QTOJMg46D+qVzgqLCan0MWo/3Qm6ub5ByTMt8szdMdig6yp0X8nLNeyeCD6oEe0D5NeCfcoyq/Ymqbdp7RM
+X-Gm-Message-State: AOJu0YyXzqcxh93RhAgLfejgRLk8KhNoDyCr3bMzpiBfXTFbTwTsF6DQ
+	fJHEwJ+1NYJv146juS5M/GDoWRtp7hX4Caccfbwd/sr1h30S4yDlxMOTRdwJY9c=
+X-Google-Smtp-Source: AGHT+IFOxqjhaxjG4yiKwWKB8DflifC3x7roG3kHFQHSdDjCz6+cBiGmT1J0tfx1L997ab9p0RJkCg==
+X-Received: by 2002:a17:902:b288:b0:1e0:ca47:4d96 with SMTP id u8-20020a170902b28800b001e0ca474d96mr3090938plr.3.1712256009204;
+        Thu, 04 Apr 2024 11:40:09 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::6:7e1f])
+        by smtp.gmail.com with ESMTPSA id f17-20020a170902ce9100b001e0e977f655sm15769263plg.159.2024.04.04.11.40.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 11:40:08 -0700 (PDT)
+Message-ID: <e909bd86-a6bc-4234-b895-280cbd9d66e0@davidwei.uk>
+Date: Thu, 4 Apr 2024 11:40:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d0b11055-1804-515b-7916-cb83a6274955@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v3 1/2] devlink: Support setting max_io_eqs
+Content-Language: en-GB
+To: Parav Pandit <parav@nvidia.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "kalesh-anakkur.purayil@broadcom.com" <kalesh-anakkur.purayil@broadcom.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+ "jiri@resnulli.us" <jiri@resnulli.us>, Shay Drori <shayd@nvidia.com>,
+ Dan Jurgens <danielj@nvidia.com>, Dima Chumak <dchumak@nvidia.com>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ Jiri Pirko <jiri@nvidia.com>
+References: <20240403174133.37587-1-parav@nvidia.com>
+ <20240403174133.37587-2-parav@nvidia.com>
+ <b6f1dc7a-4548-42df-99ae-596dff525226@davidwei.uk>
+ <PH0PR12MB548196662E45D680214A6069DC3C2@PH0PR12MB5481.namprd12.prod.outlook.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <PH0PR12MB548196662E45D680214A6069DC3C2@PH0PR12MB5481.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 04, 2024 at 07:06:53PM +0100, Edward Cree wrote:
-> #include <disclaimer.h>
+On 2024-04-04 10:58, Parav Pandit wrote:
+> Hi David,
 > 
-> On 04/04/2024 18:47, Jason Gunthorpe wrote:
-> > The configurables exist as they are
-> > and need to be supported, in one way or another, by the kernel.
+>> From: David Wei <dw@davidwei.uk>
+>> Sent: Thursday, April 4, 2024 10:29 PM
+>>
+>> On 2024-04-03 10:41, Parav Pandit wrote:
+>>> Many devices send event notifications for the IO queues, such as tx
+>>> and rx queues, through event queues.
+>>>
+>>> Enable a privileged owner, such as a hypervisor PF, to set the number
+>>> of IO event queues for the VF and SF during the provisioning stage.
+>>>
+>>> example:
+>>> Get maximum IO event queues of the VF device::
+>>>
+>>>   $ devlink port show pci/0000:06:00.0/2
+>>>   pci/0000:06:00.0/2: type eth netdev enp6s0pf0vf1 flavour pcivf pfnum 0
+>> vfnum 1
+>>>       function:
+>>>           hw_addr 00:00:00:00:00:00 ipsec_packet disabled max_io_eqs
+>>> 10
+>>>
+>>> Set maximum IO event queues of the VF device::
+>>>
+>>>   $ devlink port function set pci/0000:06:00.0/2 max_io_eqs 32
+>>>
+>>>   $ devlink port show pci/0000:06:00.0/2
+>>>   pci/0000:06:00.0/2: type eth netdev enp6s0pf0vf1 flavour pcivf pfnum 0
+>> vfnum 1
+>>>       function:
+>>>           hw_addr 00:00:00:00:00:00 ipsec_packet disabled max_io_eqs
+>>> 32
+>>>
+>>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>>> Reviewed-by: Shay Drory <shayd@nvidia.com>
+>>> Signed-off-by: Parav Pandit <parav@nvidia.com>
+>>> ---
+>>> changelog:
+>>> v2->v3:
+>>> - limited 80 chars per line
+>>> v1->v2:
+>>> - limited comment to 80 chars per line in header file
+>>> ---
+>>>  .../networking/devlink/devlink-port.rst       | 25 +++++++++
+>>>  include/net/devlink.h                         | 14 +++++
+>>>  include/uapi/linux/devlink.h                  |  1 +
+>>>  net/devlink/port.c                            | 53 +++++++++++++++++++
+>>>  4 files changed, 93 insertions(+)
+>>>
+>>> diff --git a/Documentation/networking/devlink/devlink-port.rst
+>>> b/Documentation/networking/devlink/devlink-port.rst
+>>> index 562f46b41274..451f57393f11 100644
+>>> --- a/Documentation/networking/devlink/devlink-port.rst
+>>> +++ b/Documentation/networking/devlink/devlink-port.rst
+>>> @@ -134,6 +134,9 @@ Users may also set the IPsec crypto capability of
+>>> the function using  Users may also set the IPsec packet capability of
+>>> the function using  `devlink port function set ipsec_packet` command.
+>>>
+>>> +Users may also set the maximum IO event queues of the function using
+>>> +`devlink port function set max_io_eqs` command.
+>>> +
+>>>  Function attributes
+>>>  ===================
+>>>
+>>> @@ -295,6 +298,28 @@ policy is processed in software by the kernel.
+>>>          function:
+>>>              hw_addr 00:00:00:00:00:00 ipsec_packet enabled
+>>>
+>>> +Maximum IO events queues setup
+>>> +------------------------------
+>>> +When user sets maximum number of IO event queues for a SF or a VF,
+>>> +such function driver is limited to consume only enforced number of IO
+>>> +event queues.
+>>> +
+>>> +- Get maximum IO event queues of the VF device::
+>>> +
+>>> +    $ devlink port show pci/0000:06:00.0/2
+>>> +    pci/0000:06:00.0/2: type eth netdev enp6s0pf0vf1 flavour pcivf pfnum
+>> 0 vfnum 1
+>>> +        function:
+>>> +            hw_addr 00:00:00:00:00:00 ipsec_packet disabled
+>>> + max_io_eqs 10
+>>> +
+>>> +- Set maximum IO event queues of the VF device::
+>>> +
+>>> +    $ devlink port function set pci/0000:06:00.0/2 max_io_eqs 32
+>>> +
+>>> +    $ devlink port show pci/0000:06:00.0/2
+>>> +    pci/0000:06:00.0/2: type eth netdev enp6s0pf0vf1 flavour pcivf pfnum
+>> 0 vfnum 1
+>>> +        function:
+>>> +            hw_addr 00:00:00:00:00:00 ipsec_packet disabled
+>>> + max_io_eqs 32
+>>> +
+>>>  Subfunction
+>>>  ============
+>>>
+>>> diff --git a/include/net/devlink.h b/include/net/devlink.h index
+>>> 9ac394bdfbe4..bb1af599d101 100644
+>>> --- a/include/net/devlink.h
+>>> +++ b/include/net/devlink.h
+>>> @@ -1602,6 +1602,14 @@ void devlink_free(struct devlink *devlink);
+>>>   *			      capability. Should be used by device drivers to
+>>>   *			      enable/disable ipsec_packet capability of a
+>>>   *			      function managed by the devlink port.
+>>> + * @port_fn_max_io_eqs_get: Callback used to get port function's
+>> maximum number
+>>> + *			    of event queues. Should be used by device drivers
+>> to
+>>> + *			    report the maximum event queues of a function
+>>> + *			    managed by the devlink port.
+>>> + * @port_fn_max_io_eqs_set: Callback used to set port function's
+>> maximum number
+>>> + *			    of event queues. Should be used by device drivers
+>> to
+>>> + *			    configure maximum number of event queues
+>>> + *			    of a function managed by the devlink port.
+>>>   *
+>>>   * Note: Driver should return -EOPNOTSUPP if it doesn't support
+>>>   * port function (@port_fn_*) handling for a particular port.
+>>> @@ -1651,6 +1659,12 @@ struct devlink_port_ops {
+>>>  	int (*port_fn_ipsec_packet_set)(struct devlink_port *devlink_port,
+>>>  					bool enable,
+>>>  					struct netlink_ext_ack *extack);
+>>> +	int (*port_fn_max_io_eqs_get)(struct devlink_port *devlink_port,
+>>> +				      u32 *max_eqs,
+>>> +				      struct netlink_ext_ack *extack);
+>>> +	int (*port_fn_max_io_eqs_set)(struct devlink_port *devlink_port,
+>>> +				      u32 max_eqs,
+>>> +				      struct netlink_ext_ack *extack);
+>>>  };
+>>>
+>>>  void devlink_port_init(struct devlink *devlink, diff --git
+>>> a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h index
+>>> 2da0c7eb6710..9401aa343673 100644
+>>> --- a/include/uapi/linux/devlink.h
+>>> +++ b/include/uapi/linux/devlink.h
+>>> @@ -686,6 +686,7 @@ enum devlink_port_function_attr {
+>>>  	DEVLINK_PORT_FN_ATTR_OPSTATE,	/* u8 */
+>>>  	DEVLINK_PORT_FN_ATTR_CAPS,	/* bitfield32 */
+>>>  	DEVLINK_PORT_FN_ATTR_DEVLINK,	/* nested */
+>>> +	DEVLINK_PORT_FN_ATTR_MAX_IO_EQS,	/* u32 */
+>>>
+>>>  	__DEVLINK_PORT_FUNCTION_ATTR_MAX,
+>>>  	DEVLINK_PORT_FUNCTION_ATTR_MAX =
+>> __DEVLINK_PORT_FUNCTION_ATTR_MAX -
+>>> 1 diff --git a/net/devlink/port.c b/net/devlink/port.c index
+>>> 118d130d2afd..be9158b4453c 100644
+>>> --- a/net/devlink/port.c
+>>> +++ b/net/devlink/port.c
+>>> @@ -16,6 +16,7 @@ static const struct nla_policy
+>> devlink_function_nl_policy[DEVLINK_PORT_FUNCTION_
+>>>  				 DEVLINK_PORT_FN_STATE_ACTIVE),
+>>>  	[DEVLINK_PORT_FN_ATTR_CAPS] =
+>>>
+>> 	NLA_POLICY_BITFIELD32(DEVLINK_PORT_FN_CAPS_VALID_MASK),
+>>> +	[DEVLINK_PORT_FN_ATTR_MAX_IO_EQS] = { .type = NLA_U32 },
+>>>  };
+>>>
+>>>  #define ASSERT_DEVLINK_PORT_REGISTERED(devlink_port)
+>> 		\
+>>> @@ -182,6 +183,30 @@ static int devlink_port_fn_caps_fill(struct
+>> devlink_port *devlink_port,
+>>>  	return 0;
+>>>  }
+>>>
+>>> +static int devlink_port_fn_max_io_eqs_fill(struct devlink_port *port,
+>>> +					   struct sk_buff *msg,
+>>> +					   struct netlink_ext_ack *extack,
+>>> +					   bool *msg_updated)
+>>> +{
+>>> +	u32 max_io_eqs;
+>>> +	int err;
+>>> +
+>>> +	if (!port->ops->port_fn_max_io_eqs_get)
+>>> +		return 0;
+>>> +
+>>> +	err = port->ops->port_fn_max_io_eqs_get(port, &max_io_eqs,
+>> extack);
+>>> +	if (err) {
+>>> +		if (err == -EOPNOTSUPP)
+>>> +			return 0;
+>>
+>> Docs above says:
+>>    * Note: Driver should return -EOPNOTSUPP if it doesn't support
+>>    * port function (@port_fn_*) handling for a particular port.
+>>
+>> But here you're returning 0 in both cases of no port_fn_max_io_eqs_get or
+>> port_fn_max_io_eqs_get() returns EOPNOTSUPP.
+>>
+> When the port does not support this op, the function pointer is null and, 0 is returned as expected.
 > 
-> Why?  What does the kernel get out of it?
+> When the port for some reason has the ops function pointer set for a port, but if the port does not support the ops, it will return ENOPNOTSUPP.
+> This may be possible when the driver has chosen to use same ops callback structure for multiple port flavors.
 > 
-> Maybe *you* need them to be supported, but maybe you should have
->  thought of that earlier in the design process.  ("A failure on
->  your part to foresee the eminently foreseeable does not
->  constitute an emergency on mine.")
-> If we let folks bypass our standards with a _fait accompli_, we
->  don't really have standards in the first place.
+> This code pattern is likely left over code of relatively recent work that moved ops from devlink instance to per port ops.
+> I propose to keep the current check as done in this patch,
+> and run a full audit of all the drivers, if all drivers have moved to per port ops, then simplify the code to drop the check for EOPNOTSUPP in a new series that may touch more drivers.
+> Otherwise, we may end up failing the port show operation when it returns - ENOPNOTSUPP.
 
-Sorry, who are "we" and what are "our standards"?
+Thanks for the explanation. So ideally each port flavour has its own
+unique set of struct ops, and if something is not supported then don't
+set the func ptr in the struct ops.
 
-And, please, please reread the thread, it is not about devlink at all.
+Yes, I see that 0 has to be returned for devlink_port_fn_caps_fill() to
+succeed.
 
-Thanks
+Had a brief look and there's only a handful of drivers (mlx, nfp, ice)
+that use devlink_port_ops.
+
+>  
+>>> +		return err;
+>>> +	}
+>>> +	err = nla_put_u32(msg, DEVLINK_PORT_FN_ATTR_MAX_IO_EQS,
+>> max_io_eqs);
+>>> +	if (err)
+>>> +		return err;
+>>> +	*msg_updated = true;
+>>> +	return 0;
+>>> +}
+>>> +
+>>>  int devlink_nl_port_handle_fill(struct sk_buff *msg, struct
+>>> devlink_port *devlink_port)  {
+>>>  	if (devlink_nl_put_handle(msg, devlink_port->devlink)) @@ -409,6
+>>> +434,18 @@ static int devlink_port_fn_caps_set(struct devlink_port
+>> *devlink_port,
+>>>  	return 0;
+>>>  }
+>>>
+>>> +static int
+>>> +devlink_port_fn_max_io_eqs_set(struct devlink_port *devlink_port,
+>>> +			       const struct nlattr *attr,
+>>> +			       struct netlink_ext_ack *extack) {
+>>> +	u32 max_io_eqs;
+>>> +
+>>> +	max_io_eqs = nla_get_u32(attr);
+>>> +	return devlink_port->ops->port_fn_max_io_eqs_set(devlink_port,
+>>> +							 max_io_eqs, extack);
+>>> +}
+>>> +
+>>>  static int
+>>>  devlink_nl_port_function_attrs_put(struct sk_buff *msg, struct
+>> devlink_port *port,
+>>>  				   struct netlink_ext_ack *extack) @@ -428,6
+>> +465,9 @@
+>>> devlink_nl_port_function_attrs_put(struct sk_buff *msg, struct
+>> devlink_port *por
+>>>  	if (err)
+>>>  		goto out;
+>>>  	err = devlink_port_fn_state_fill(port, msg, extack, &msg_updated);
+>>> +	if (err)
+>>> +		goto out;
+>>> +	err = devlink_port_fn_max_io_eqs_fill(port, msg, extack,
+>>> +&msg_updated);
+>>>  	if (err)
+>>>  		goto out;
+>>>  	err = devlink_rel_devlink_handle_put(msg, port->devlink, @@ -726,6
+>>> +766,12 @@ static int devlink_port_function_validate(struct devlink_port
+>> *devlink_port,
+>>>  			}
+>>>  		}
+>>>  	}
+>>> +	if (tb[DEVLINK_PORT_FN_ATTR_MAX_IO_EQS] &&
+>>> +	    !ops->port_fn_max_io_eqs_set) {
+>>> +		NL_SET_ERR_MSG_ATTR(extack,
+>> tb[DEVLINK_PORT_FN_ATTR_MAX_IO_EQS],
+>>> +				    "Function does not support max_io_eqs
+>> setting");
+>>> +		return -EOPNOTSUPP;
+>>> +	}
+>>>  	return 0;
+>>>  }
+>>>
+>>> @@ -761,6 +807,13 @@ static int devlink_port_function_set(struct
+>> devlink_port *port,
+>>>  			return err;
+>>>  	}
+>>>
+>>> +	attr = tb[DEVLINK_PORT_FN_ATTR_MAX_IO_EQS];
+>>> +	if (attr) {
+>>> +		err = devlink_port_fn_max_io_eqs_set(port, attr, extack);
+>>> +		if (err)
+>>> +			return err;
+>>> +	}
+>>> +
+>>>  	/* Keep this as the last function attribute set, so that when
+>>>  	 * multiple port function attributes are set along with state,
+>>>  	 * Those can be applied first before activating the state.
 
