@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-84670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64DC3897D77
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 03:42:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60369897D7D
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 03:47:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8EC128C21C
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 01:42:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8E21B21988
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 01:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9C2CA40;
-	Thu,  4 Apr 2024 01:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F897492;
+	Thu,  4 Apr 2024 01:47:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFu/whxi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j6xtExnG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A73CC4C6F
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 01:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F6FD52F
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 01:47:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712194973; cv=none; b=MCecds/c70WJ5kAOKEJL2kE76h6r7zPShWjuy+CXKPG/yoFWdEKQaw/HC50WczBgZ8Lqeyc/lTdjd9G446pQeidc5VHZW//sYg9BfkT3w8BPvb58zCy+ymrFpYzJzuDVkpYW+odaBMdXcWeANIfx1ylnxT66cADzbmfsvAd/9rs=
+	t=1712195268; cv=none; b=DJ1a18BW9VaiK3Mtvpdno/7mY5GmdjqIzhdXCEjQ5NJBJZI+r/jgbqOLuBY/Aor3xDORJ36X3QddXwzZSHGqy0G74bItsoiWA/YJ0QEYjNq61qDyI31gOA7TLktm9J+u4fZ3nRIjFtC1PjsJnST1Sgz2SmXRiLgkWcsW5VLDhtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712194973; c=relaxed/simple;
-	bh=zCaB2dYtjuerklQKFCRzEAyjLZSL0R3Etl5JFJVxM2U=;
+	s=arc-20240116; t=1712195268; c=relaxed/simple;
+	bh=9N46xWif9hh0MBJJT6rUfQjHmQF7goXuFQxvhTk8gRI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wbk0dp0y2NUuwUQeLt9wwhq+kS90DA/FhgZVZk6M1H6qZLSOZ7VvBbik2JkvS5kHCb20Fn5JZTqg+XTD/dSmyyfwivIegz6IvSAHOiK4RQ+l/HP0rB/IMBVhuFjH3vHtWrmF0ozpQMdgfHo5PPFqk2H8hL2aKC74TIlM3kD5/hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFu/whxi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAB1BC433C7;
-	Thu,  4 Apr 2024 01:42:52 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fxmb0kiWg/IaxIBd8X/pYjwkuCAGBZtbwDlL/w5sTInb7w3zEuRo/uSCjz5RREmp3ZvWIRIAhC0c5KLYDtWuh7m9CsrujV4tE8WeZmSI4ssGe+vclmuNCMgs909sPVP0uDER6mq/lJLwAdkinOC7GwLdwss5egUJp34xPUz+y2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j6xtExnG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F86DC433C7;
+	Thu,  4 Apr 2024 01:47:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712194973;
-	bh=zCaB2dYtjuerklQKFCRzEAyjLZSL0R3Etl5JFJVxM2U=;
+	s=k20201202; t=1712195268;
+	bh=9N46xWif9hh0MBJJT6rUfQjHmQF7goXuFQxvhTk8gRI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XFu/whxiBptTmuXk9r0701N+Tk+d7rYPaoqixHhB08wUlyF0G52FEw7EHbQOQqR8c
-	 azmn8vSKMk3cPpG7GufVXiotvHrYXw6TN+AoODgrxr99jlNfJHpT2U5CYW5X++mPK9
-	 B+LNKORoezxFhAetk4k/jopNcMpLPcwQCGQeFH87ebWOWGfTgMI3N0xtSYuFszxMXM
-	 p1vPCCZYgrj8dwOTwDwt+/aBd1SDwESIdJfC3hABqLz0H18h83Y9uLmpQH7/TIHFtM
-	 f+PgTGEn5HPYmUqb5A5AWbkdVkVLX4FlCmKqfi7bggclhv11R3NCn+kd37Hsxp4sn1
-	 vXN/KE9PBgVCQ==
-Date: Wed, 3 Apr 2024 18:42:52 -0700
+	b=j6xtExnGsFFlKTzChZfmUzPX7QnANskds4SRvsh24CQ9+pQU2MYeQ+WXvSnjXYJEV
+	 FeZiYs5jxF/56bqH51PuFW/WK4me59YtxMCDtyEfZFZ18oMmb25i8A+6ZDj6zEADLI
+	 Nxaxw4TVErHr+imWRb8apLbBUSdoz2ppvjtxJ1l2Dz7qA6+OJDXvRERSKaFAgiBPM8
+	 jvmakBkQ4oxwuYmeEfj1h4traCcV42FMDSX5/n6nJ/11dzv4a6iRIshjqHx356XfDO
+	 aYsNb0VrAGFssx24jVmb8bVNFuCSENcUKHQmIdtytaR6jx2u48kqjASnurH0yQKobz
+	 LPDuQ0qVii7EA==
+Date: Wed, 3 Apr 2024 18:47:46 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Louis Peens <louis.peens@corigine.com>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>, Fei Qin <fei.qin@corigine.com>,
- netdev@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH net-next v3 1/4] devlink: add a new info version tag
-Message-ID: <20240403184252.7df774d0@kernel.org>
-In-Reply-To: <20240403145700.26881-2-louis.peens@corigine.com>
-References: <20240403145700.26881-1-louis.peens@corigine.com>
-	<20240403145700.26881-2-louis.peens@corigine.com>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ horms@kernel.org, anthony.l.nguyen@intel.com, Jacob Keller
+ <jacob.e.keller@intel.com>, Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 05/12] iavf: negotiate PTP
+ capabilities
+Message-ID: <20240403184746.178b2268@kernel.org>
+In-Reply-To: <20240403131927.87021-6-mateusz.polchlopek@intel.com>
+References: <20240403131927.87021-1-mateusz.polchlopek@intel.com>
+	<20240403131927.87021-6-mateusz.polchlopek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,16 +62,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed,  3 Apr 2024 16:56:57 +0200 Louis Peens wrote:
-> +board.part_number
-> +-----------
+On Wed,  3 Apr 2024 09:19:20 -0400 Mateusz Polchlopek wrote:
+> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> @@ -145,6 +145,7 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
+>  	       VIRTCHNL_VF_OFFLOAD_CRC |
+>  	       VIRTCHNL_VF_OFFLOAD_ENCAP_CSUM |
+>  	       VIRTCHNL_VF_OFFLOAD_REQ_QUEUES |
+> +	       VIRTCHNL_VF_CAP_PTP |
+>  	       VIRTCHNL_VF_OFFLOAD_ADQ |
 
-make htmldocs says:
-
-board.part_number
------------
-
-Documentation/networking/devlink/devlink-info.rst:150: WARNING: Title underline too short.
--- 
-pw-bot: cr
+coccicheck says VIRTCHNL_VF_CAP_PTP ends up on this list twice.
 
