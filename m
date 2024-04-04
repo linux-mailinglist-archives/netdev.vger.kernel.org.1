@@ -1,97 +1,127 @@
-Return-Path: <netdev+bounces-84822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9267D8986A8
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:00:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C2C3898714
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:20:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E3B8B21986
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:00:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F10D81F27F62
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F6A85C6A;
-	Thu,  4 Apr 2024 12:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB8A129A73;
+	Thu,  4 Apr 2024 12:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Owq9783G"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="STFQ6Tff"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC8E85934;
-	Thu,  4 Apr 2024 12:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B212129A77
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712232006; cv=none; b=AmCrKxk2yMprxghIt8e1xTGoXrWj2L+2sM/ZNy7IgLhCAlaa9/EEZ2WsxCPEXlU3WNp4jsTN6eK34HlOpKUYIvJw1PU36U7PwjqaiZtb/D6GjWtcbkvakkG1oVBvw/aHujN/F9h4I3WhPkWp8SUWsc8DaeuWuNEVFBJISDwQJGY=
+	t=1712233001; cv=none; b=Xu7IsWHeZEUBTU/s9WE7bw5KdlCvupIJZgy8tc5qX/AZsoSKseqoHKSJWbdl+rqUQb3jmW1nAWPc6fcrMlPHO2EU3EwbGSEZ0W5PTCB2AdExA+4uPeNFHiI2swdDzrmGITzegWc135E3fJrSIKk5pM+Sp1KYlIY7k4YSxcE+Kf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712232006; c=relaxed/simple;
-	bh=Px5gxMf6tE7367j2YyGFk4bSXXCZIlJ5JXSZauI8+Js=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=XAEOg9GbWQyqAHDbinLKpiiQdFOtIj6jwO3EPkisYjIRu8M5Zx2ZRweMSU/8p5EFlLOw8r1VDxwRULNSjY2iL+YoZ7Mck+FeGrQiRfPI3746moJ9ND+geqLJ0FrgRSHCS3rUWU65rPeJNYQmpi9e1+J8bGEf2FgOXU3qEvml/cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Owq9783G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B951C433C7;
-	Thu,  4 Apr 2024 12:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712232005;
-	bh=Px5gxMf6tE7367j2YyGFk4bSXXCZIlJ5JXSZauI8+Js=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=Owq9783GbLDLeZP9d19ztQwHpwDD7NCh7fP637lINhBASzGKfF966xh6zQM5+l723
-	 TbuddxuuXBidy+OfRIqhWNTOQH/f+jD7zvcLlro83KbfyNQAoONncguuKf/mGCLAg3
-	 X2UKVhUKwhrS4z8U97khL6U7WuqfldW2mHQM6PRLlWkj16oQATi8u+qXZzQi3E1Ayn
-	 vRo2hwDw9bdkRfjcu43J2gU5TVOMR4OO6YnjGp4FrNd9DacpOs+An6mPQUULa69sYw
-	 IBS0yHkcAxm99xUR7FrRLzud6bDEtBAredMLIB8dkUwOD01CmZc9aH5aTgos/4nkzL
-	 Sj6j2m4yqvIRw==
-From: Kalle Valo <kvalo@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: aleksander.lobakin@intel.com,  kuba@kernel.org,  davem@davemloft.net,
-  pabeni@redhat.com,  edumazet@google.com,  elder@kernel.org,
-  linux-arm-kernel@lists.infradead.org,
-  linux-mediatek@lists.infradead.org,  nbd@nbd.name,
-  sean.wang@mediatek.com,  Mark-MC.Lee@mediatek.com,  lorenzo@kernel.org,
-  taras.chornyi@plvision.eu,  Matthias Brugger <matthias.bgg@gmail.com>,
-  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-  quic_jjohnson@quicinc.com,  leon@kernel.org,
-  dennis.dalessandro@cornelisnetworks.com,  linux-kernel@vger.kernel.org,
-  netdev@vger.kernel.org,  bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v3 0/5] allocate dummy device dynamically
-References: <20240404114854.2498663-1-leitao@debian.org>
-Date: Thu, 04 Apr 2024 14:59:59 +0300
-In-Reply-To: <20240404114854.2498663-1-leitao@debian.org> (Breno Leitao's
-	message of "Thu, 4 Apr 2024 04:48:40 -0700")
-Message-ID: <87plv549ts.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1712233001; c=relaxed/simple;
+	bh=RbM9izympFt15JsGMUNx2Nj1SYs4LoRDVTLl9T97n2I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jtLLPydaK3ZyIfRaEXQax9h3shLIchR158caH71P1XbP8QrJAHOs9pVSUIKoMpSXp5xaUHOpg0G0k4kFt/2T6oZ/eniXYeuaobFLqNrgnDg4ZHvvrlktaN5t01qExPBt3Xif+oXgOgu9VoZ4aaGBegr2WmZImi8xfwRprJsHlWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=STFQ6Tff; arc=none smtp.client-ip=195.121.94.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: 1c22d34d-f27d-11ee-bfb8-005056ab378f
+Received: from smtp.kpnmail.nl (unknown [10.31.155.40])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 1c22d34d-f27d-11ee-bfb8-005056ab378f;
+	Thu, 04 Apr 2024 14:16:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=0SWIcjqRtknLyn50llFxgflM7JwUXIS3wxjXCr3/KbY=;
+	b=STFQ6TffP51rihDJQddbT4TT0SgU5G/vaMNZ6QDcyOwmZLZ7uln/yCBPwHJD1YS+QoybR8ibYCtwn
+	 Pncs2CXi7VyRZHr14yaxQa6ey/BnGHywqMLS/E9IDeN2X+qThQTU5Ygt8iz+UzL2gBw2pFapbiAfl5
+	 Y6CV8crTrOPtenRY=
+X-KPN-MID: 33|6SrT1pAAy8YLmRA7/TsghRJkscloFNh1ohlqEyicE61yPCcd3YuFiU5j0q4yhm+
+ ZEkKWkPTKZeeYK+wPZOBPtiLtjW7RoHWxmE8YZG3i3Vw=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|UACsZenehqJok+ORlZKru/1XX+jqo7wcSII8GQMJIwM1m6OQnQA4jl7MMjx2yWQ
+ KR8ikzFKItO5XA2vvvhh0/w==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 2ccb0ca8-f27d-11ee-9f09-005056ab7584;
+	Thu, 04 Apr 2024 14:16:34 +0200 (CEST)
+Date: Thu, 4 Apr 2024 14:16:33 +0200
+From: Antony Antony <antony@phenome.org>
+To: Michael Richardson <mcr@sandelman.ca>
+Cc: antony.antony@secunet.com, Herbert Xu <herbert@gondor.apana.org.au>,
+	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+	devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: [PATCH net 1/1] xfrm: fix source address in icmp error generation
+ from IPsec gateway
+Message-ID: <Zg6aIbUV-oj4wPMq@Antony2201.local>
+References: <cover.1712226175.git.antony.antony@secunet.com>
+ <20ea2ab0472ecf2d1625dadb7ca0df39cf4fe0f5.1712226175.git.antony.antony@secunet.com>
+ <28050.1712230684@obiwan.sandelman.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28050.1712230684@obiwan.sandelman.ca>
 
-Breno Leitao <leitao@debian.org> writes:
+Hi Michael,
 
-> struct net_device shouldn't be embedded into any structure, instead,
-> the owner should use the private space to embed their state into
-> net_device.
->
-> But, in some cases the net_device is embedded inside the private
-> structure, which blocks the usage of zero-length arrays inside
-> net_device.
->
-> Create a helper to allocate a dummy device at dynamically runtime, and
-> move the Ethernet devices to use it, instead of embedding the dummy
-> device inside the private structure.
->
-> This fixes all the network cases except for wireless drivers.
->
-> PS: Due to lack of hardware, unfortunately all these patches are
-> compiled tested only.
+On Thu, Apr 04, 2024 at 07:38:04AM -0400, Michael Richardson via Devel 
+wrote:
+> 
+> Antony Antony via Devel <devel@linux-ipsec.org> wrote:
+>     > This commit would force to use source address from the gatway/host.
+>     > The ICMP error message source address correctly set from the host.
+> 
+> While that seems more correct, since that host is generating, it might not
+> fit into the IPsec tunnel, and therefore might go the right place or
+> anywhere.   Perhaps you could pick the internal IP of the gateway, but in
+> more complex policies, the gateway itself might not be part of the VPN.
+> 
+>     > Again before the fix ping -W 5 -c 1 10.1.4.3 From 10.1.4.3 icmp_seq=1
+>     > Destination Host Unreachable
+> 
+>     > After the fix From 10.1.3.2 icmp_seq=1 Destination Host Unreachable
+> 
+> ip -netns host2 xfrm policy add src 10.1.1.0/24 dst 10.1.4.0/24 dir out \
+>         flag icmp tmpl src 10.1.2.1 dst 10.1.3.2 proto esp reqid 1 mode tunnel
 
-BTW if it helps, and if you have an ath10k or ath11k patch already, I
-can run a quick test on real hardware.
+> 
+> As far as I can see, 10.1.3.2 does not fit into this policy.
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Indeed, 10.1.3.2 does not match the policy. However, notice the 
+"flag icmp" in the above line. That means the policy lookup will use the inner
+payload for policy lookup as specified in RFC 4301, Section 6, which
+will match. The inner payload 10.1.4.1 <=> 10.1.4.3  will match the policy.
+
+> You appear to be selecting the outside ("WAN") interface of the gateway.
+> It would be less confusing if you had used 172.16.0.0/24 for the outside of
+> the gateways in your example.
+
+With this fix, I am leaving the source address selection of the error
+response to the stack instead of unconditionally copying from the packet
+that was dropped. So, in a simple case, the outgoing interface will be
+the end of the tunnel, i.e., 10.1.3.2. Also that is the end point of the 
+tunnel. 
+
+> How will the WAN interface manage to talk to the internal sender of the
+> packet except via the tunnel?
+
+WAN is geneerating an ESP packet? In this case ESP tunnel mode with  
+10.1.3.2. Note: the reciver has also the icmp enabled.
+
+-antony
 
