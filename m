@@ -1,184 +1,141 @@
-Return-Path: <netdev+bounces-85040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EAB58991AF
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 00:59:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD3EB8991B6
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 01:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C965FB25125
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 22:59:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BC741C2173C
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F2FB130495;
-	Thu,  4 Apr 2024 22:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75FD113C3EB;
+	Thu,  4 Apr 2024 23:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="bjOQuwrG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RjT1djYl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C7C6F099
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 22:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CB7138489
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 23:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712271588; cv=none; b=onKR388O83QhKjgBPUuezl98az4ZGhMBesGdovhRS3biBqgv/8fKseP8Yrbx5NiVULrWMzwrdN21k7eq6axBpTrgyzSsTxjjxV+h372T3UP2d0agj3xFEWO5m9mD6cswCfsjoGdKQhyJMUR5raeMhiuq8Aeup9wHvSUECJiJOmY=
+	t=1712271663; cv=none; b=K1SBcIx+aRSeLtkEQRKtj88YWu8wtDb9rELSVRuKP3c8iRM+BzhALtR6yIg4Qd2Y8Tttg/G0kTVyy4ctyaQ0FPbs5/HkgihK2K84lnGOXdsWmgpo91O5cuEWg8hKT4SxIK38+RiNR+YZwvZNfjhRQfCkWN2/07j/VTb4wXqhnDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712271588; c=relaxed/simple;
-	bh=3KfHzzVqCenEpli7+i2AT5/sHR3mXvJ+MXge6MSdt5s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qgSR8eeuTbNJOB1PZFoMFNEyDVu9cZLSWB6UAVZWINNA7z/One9w0aR3ZOPD+abK8heHq5VDOwGA1Ua8sqaT2v1fgg3JbqdR0PjPgOnJI7TSceZ9McB85A0LuVEoTHFRI4hjVSDrQ4OXoMDiBTSvdXDeP3sJUQPdCMWuIYInRG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=bjOQuwrG; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dcbd1d4904dso1661209276.3
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 15:59:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1712271585; x=1712876385; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3KfHzzVqCenEpli7+i2AT5/sHR3mXvJ+MXge6MSdt5s=;
-        b=bjOQuwrGoarfwpwE5TAZWUSWmboHd6g+mMokeaRLELNCMUrRQPjv0Dwu05bZNqDVcO
-         Xh/LKJgIBUhrABQBAKdZfcCg+UdP7NusN9KTE8YqwuDswQlwLX489XHmhkudAlfsFw4a
-         6uSYOoKa7AMjmZo6UZIEkY+4nFjz/Am7aTgmQGhHWO1wzfEzulAdstAlyK/UGTj19bWQ
-         uJmEKx5LdhHwelOiheyanMfUlmHxSWyH0CzCr5vdMa0Ceuz2QdJ2jVR6ZA4bl74rsxtf
-         nfFhY3r0vqi0n2wrzx5xKiXCXKsFFXddBZz7mvs1+64nUUgVUWaCujzj3QpIAqnqMRzI
-         DMuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712271585; x=1712876385;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3KfHzzVqCenEpli7+i2AT5/sHR3mXvJ+MXge6MSdt5s=;
-        b=sK/lgVcfpAkZvrFtQ51jYtbD2D0evNJOqIHNS0KJ+BKd34ZlzH9fmd1m6v0BMFF/Lg
-         qdksomK8P8aAoypH2CZRkWuON3JKk0CC1fTAs9xUvT3F4xYFw06zx5YbfLvm6Wex7zkt
-         fHJpr/4z9d8nrsvQyjvMy013dHAd8blVuhXWUGfK6tt9KNWuJcu1+sVBoGNWQ6UqmiT1
-         bQkHABy+60XSOB43e5gdtfvwkIW02Nr/vS36TatNg2TKc2vnneCKe01jHTlr0CPfAIwV
-         gSRzz9tTGbw2/8rio8hI35pfm47SfPTcVV0UyZCkRTEz04XIRZuxOU/rSsqwwN/X9IvY
-         +bTg==
-X-Gm-Message-State: AOJu0YzUaMvgvSnoFVN+YswzEI6mWmLLXvCDD9f+U9Cn8ZEWbbVgKtoZ
-	DRDZVf2HqiwBSucAGXNxWGE4MMaiTkUFF+sIpYofk9gCmF2MVoaAo0TR3fsO4DLvwznUYo6hgmz
-	ng5iB/lpwQyf3fXRxkFmb6LkBMZ28u4yxvUi8
-X-Google-Smtp-Source: AGHT+IHLYSIJJn5ZiLgss5d1MGDVMo1TD0IPyPLYXbC8xwTw5TvM3TyTgIuW4IFiESXjSKc+lhbxKbeE7yxzTfVhEGE=
-X-Received: by 2002:a5b:64d:0:b0:dc6:3610:c344 with SMTP id
- o13-20020a5b064d000000b00dc63610c344mr903126ybq.13.1712271585426; Thu, 04 Apr
- 2024 15:59:45 -0700 (PDT)
+	s=arc-20240116; t=1712271663; c=relaxed/simple;
+	bh=7HXE5M3oO4PodeStVnSZa8DXP/cTOPjYZEumGvFvNpA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fiNhUZCHB7mEe7PSVvkGgaUVJ5PVg/u75rOz6gag/kV6gyQ8T+0nrxg1/vy3e00d1W/OwFFMgX7tLzGu9Y16YvUNaymtuk10T9DcitCWf5j4hq++fGJQTIq4VogpVosNlLuaP4Ynhp9DczXDoMZfntK2alrHZTYLZco60Wbyoew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RjT1djYl; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 4 Apr 2024 19:00:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712271659;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KHLNB8rkpoKwDhM7NRf7iWUfLDgvBLjzklimu7mkdKs=;
+	b=RjT1djYlTZqBwHogqp4zy40F3SqAdaK+3oWOfGDaM6L3NSOO4dCastLQfuNaOlT1Dgo7Wv
+	i9k29lxad1FbeHT3aK6BLtfd8jnI/QWfQOgpcP7kCCmnpZ6YfJaUcPMAV7nzKK1Ptjb3Iu
+	+YlbAoFGlEHtL49GVJGZLcl1jqHQD6A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Matthew Wilcox <willy@infradead.org>, 
+	Suren Baghdasaryan <surenb@google.com>, joro@8bytes.org, will@kernel.org, 
+	trond.myklebust@hammerspace.com, anna@kernel.org, arnd@arndb.de, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, jikos@kernel.org, benjamin.tissoires@redhat.com, tytso@mit.edu, 
+	jack@suse.com, dennis@kernel.org, tj@kernel.org, cl@linux.com, 
+	jakub@cloudflare.com, penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, 
+	vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-acpi@vger.kernel.org, acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org
+Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
+ the call site
+Message-ID: <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3>
+References: <20240404165404.3805498-1-surenb@google.com>
+ <Zg7dmp5VJkm1nLRM@casper.infradead.org>
+ <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
+ <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
+ <Zg8qstJNfK07siNn@casper.infradead.org>
+ <jb25mtkveqf63bv74jhynf6ncxmums5s37esveqsv52yurh4z7@5q55ttv34bia>
+ <20240404154150.c25ba3a0b98023c8c1eff3a4@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404122338.372945-1-jhs@mojatatu.com> <20240404122338.372945-15-jhs@mojatatu.com>
- <CAADnVQLw1FRkvYJX0=6WMDoR7rQaWSVPnparErh4soDtKjc73w@mail.gmail.com>
-In-Reply-To: <CAADnVQLw1FRkvYJX0=6WMDoR7rQaWSVPnparErh4soDtKjc73w@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 4 Apr 2024 18:59:33 -0400
-Message-ID: <CAM0EoM=SyHR-f7z8YVRknXrUsKALgx96eH-hBudo40NyeaxuoA@mail.gmail.com>
-Subject: Re: [PATCH net-next v14 14/15] p4tc: add set of P4TC table kfuncs
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>, deb.chatterjee@intel.com, 
-	Anjali Singhai Jain <anjali.singhai@intel.com>, namrata.limaye@intel.com, tom@sipanda.io, 
-	Marcelo Ricardo Leitner <mleitner@redhat.com>, Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, 
-	tomasz.osinski@intel.com, Jiri Pirko <jiri@resnulli.us>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, khalidm@nvidia.com, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, victor@mojatatu.com, 
-	Pedro Tammela <pctammela@mojatatu.com>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240404154150.c25ba3a0b98023c8c1eff3a4@linux-foundation.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Apr 4, 2024 at 6:07=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Thu, Apr 4, 2024 at 5:48=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
-> >
-> > We add an initial set of kfuncs to allow interactions from eBPF program=
-s
-> > to the P4TC domain.
->
-> ...
->
-> > Note:
-> > All P4 objects are owned and reside on the P4TC side. IOW, they are
-> > controlled via TC netlink interfaces and their resources are managed
-> > (created, updated, freed, etc) by the TC side. As an example, the struc=
-ture
-> > p4tc_table_entry_act is returned to the ebpf side on table lookup. On t=
-he
-> > TC side that struct is wrapped around p4tc_table_entry_act_bpf_kern.
-> > A multitude of these structure p4tc_table_entry_act_bpf_kern are
-> > preallocated (to match the P4 architecture, patch #9 describes some of
-> > the subtleties involved) by the P4TC control plane and put in a kernel
-> > pool. Their purpose is to hold the action parameters for either a table
-> > entry, a global per-table "miss" and "hit" action, etc - which are
-> > instantiated and updated via netlink per runtime requests. An instance =
-of
-> > the p4tc_table_entry_act_bpf_kern.p4tc_table_entry_act is returned
-> > to ebpf when there is a un/successful table lookup depending on how the
-> > P4 program is written. When the table entry is deleted the instance of
-> > the struct p4tc_table_entry_act_bpf_kern is recycled to the pool to be
-> > reused for a future table entry. The only time the pool memory is relea=
-sed
-> > is when the pipeline is deleted.
->
-> TLDR:
-> Nacked-by: Alexei Starovoitov <ast@kernel.org>
->
-> Please drop this patch (all p4tc kfuncs) then I can lift
-> the nack and the rest will be up to Kuba/Dave to decide.
-> I agree with earlier comments from John and Daniel that
-> p4tc is duplicating existing logic and doesn't provide
-> any additional value to the kernel, but TC has a bunch
-> of code already that no one is using, so
-> another 13k lines of such stuff doesn't make it much worse.
->
-> What I cannot tolerate is this p4tc <-> bpf integration.
-> It breaks all the normal layering and programming from bpf pov.
-> Martin explained this earlier. You cannot introduce new
-> objects that are instantiated by TC, yet read/write-able
-> from xdp and act_bpf that act like a bpf map, but not being a map.
-> Performance overhead of these kfuncs is too high.
-> It's not what the XDP community is used to.
-> We cannot give users such a footgun.
->
-> Furthermore, act_bpf is something that we added during early
-> days and it turned out to be useless. It's still
-> there, it's working and supported, but it's out of place
-> and in the wrong spot in the pipeline to be useful
-> beyond simple examples.
-> Yet, p4tc tries to integrate with act_bpf. It's a red flag
-> and a sign that that none of this code saw any practical
-> application beyond demo code.
-> We made our fair share of design mistakes. We learned our lessons
-> and not going to repeat the same ones. This one is obvious.
->
+On Thu, Apr 04, 2024 at 03:41:50PM -0700, Andrew Morton wrote:
+> On Thu, 4 Apr 2024 18:38:39 -0400 Kent Overstreet <kent.overstreet@linux.dev> wrote:
+> 
+> > On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
+> > > On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrote:
+> > > > Ironically, checkpatch generates warnings for these type casts:
+> > > > 
+> > > > WARNING: unnecessary cast may hide bugs, see
+> > > > http://c-faq.com/malloc/mallocnocast.html
+> > > > #425: FILE: include/linux/dma-fence-chain.h:90:
+> > > > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),
+> > > > GFP_KERNEL))
+> > > > 
+> > > > I guess I can safely ignore them in this case (since we cast to the
+> > > > expected type)?
+> > > 
+> > > I find ignoring checkpatch to be a solid move 99% of the time.
+> > > 
+> > > I really don't like the codetags.  This is so much churn, and it could
+> > > all be avoided by just passing in _RET_IP_ or _THIS_IP_ depending on
+> > > whether we wanted to profile this function or its caller.  vmalloc
+> > > has done it this way since 2008 (OK, using __builtin_return_address())
+> > > and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
+> > 
+> > Except you can't. We've been over this; using that approach for tracing
+> > is one thing, using it for actual accounting isn't workable.
+> 
+> I missed that.  There have been many emails.  Please remind us of the
+> reasoning here.
 
-It's the same old aggression from you "if you dont do it the way i
-would have done it then it is wrong". Maybe it's how Meta or Cilium do
-things, but that imposition on other people is just plain rude.
-I have heard you shit on tc many times and it's not just tc everything
-else sucks if it is not from you. It's your prerogative. Sorry, we are
-not going to use tcx because it doesnt suit our goals. We are going to
-use tc actions and filters. You do you, we'll do us.
+I think it's on the other people claiming 'oh this would be so easy if
+you just do it this other way' to put up some code - or at least more
+than hot takes.
 
-You've been going around telling people they dont have to post any
-kfunc to the ebpf mailing but it is still preferred to upstream.
-That's what we are doing.
-You do realize we can make this kfunc an out of tree kernel module but
-we opted to share with the community.
- We initially posted a solution that didnt use ebpf and the push back
-was to use ebpf. I know you act like ebpf is your property but it is
-not. We will use ebpf/xdp/kfuncs whenever they make sense to us. Sigh.
-This community is getting more political by the day. Open source is
-about scratching your itch - this is our itch.
+But, since you asked - one of the main goals of this patchset was to be
+fast enough to run in production, and if you do it by return address
+then you've added at minimum a hash table lookup to every allocate and
+free; if you do that, running it in production is completely out of the
+question.
 
-cheers,
-jamal
+Besides that - the issues with annotating and tracking the correct
+callsite really don't go away, they just shift around a bit. It's true
+that the return address approach would be easier initially, but that's
+not all we're concerned with; we're concerned with making sure
+allocations get accounted to the _correct_ callsite so that we're giving
+numbers that you can trust, and by making things less explicit you make
+that harder.
 
-> So please drop all bpf integration and focus on pure p4tc.
+Additionally: the alloc_hooks() macro is for more than this. It's also
+for more usable fault injection - remember every thread we have where
+people are begging for every allocation to be __GFP_NOFAIL - "oh, error
+paths are hard to test, let's just get rid of them" - never mind that
+actually do have to have error paths - but _per callsite_ selectable
+fault injection will actually make it practical to test memory error
+paths.
+
+And Kees working on stuff that'll make use of the alloc_hooks() macro
+for segregating kmem_caches.
+
+This is all stuff that I've explained before; let's please dial back on
+the whining - or I'll just bookmark this for next time...
 
