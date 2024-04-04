@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-84689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61243897DDA
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 04:50:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D074B897DDE
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 04:50:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 153D01F240FF
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 02:50:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 876791F24AE4
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 02:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACAD91CD02;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71D31CD2D;
 	Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZh6jmp5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="babYapBx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889201CA9F
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92EB1CABD;
+	Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712199043; cv=none; b=lQyDeDBRGZ5q3D5P7YwpUoyFQP8INZv6u74psVSLjCaCo4UGLCkMKMNll8a2Mt/CPRHnFTdKdqXpYsnby+kpCq6DHhaugBafBM9JVtu3e+S9D+pk5LsLM1o/SS1mUY4ToG3m2naS2DET+9H7H22/emMN+KUvEl9DF+M3Of3n3lo=
+	t=1712199043; cv=none; b=pdoFUBb1pnrgxBgALe+ge9Kiwk64xpXXAhBaCv+4VKjk12gwDLoVM7HPC3mX3qYy4uztPieBsxhIXoOLCGij/ekLjdoj2cqjqVnGJ5sZsuRngrPfugUQVWCHG1dyFLpsPyNOGB0EPPuH8szManPCNPbAX+sdlMnasFk+Q49/uI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712199043; c=relaxed/simple;
-	bh=bUD7GRQ3mDYCb8V4JE/SjZ8SVSWwPU7Ql35y4E9pKYw=;
+	bh=Z0NqPyA1Ag7ywDCAREb3aLXtL9z+FPZPJKBvHQO0qu4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EKrPNU1W8fZepqw1fn2NCc9ttLq11LM2d+WmYYnrLh6jZu9PqfT4HIJ02sSSlVCgZdU4Ps7Fi2mIAmMGVQcUcPNnMGeybIKUqmVl7ay+arH9vfiSIfLSF0eTNIeofePvPjbawuiN1mSCnWBxYWv+vlPZ0fBgEYePrul51YR7oj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZh6jmp5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 31B6FC433C7;
+	 In-Reply-To:To:Cc; b=dwPWzU7ZssKI7S63B28N167hpvm0xQmdKKZ+9oN1xzUqwyygnmEMEM+jm2UPXYaZdaEX5d5aMXdOi+qh/elKdVSBVZss0KfFuOpAWdHfUuLqK0YgFNNPKXuo2/zBXsdS43IDNp5zGoOUh6Bbo3mvJcLTvSxIMwkuDdfsjXn2qBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=babYapBx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A4CFC43399;
 	Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712199043;
-	bh=bUD7GRQ3mDYCb8V4JE/SjZ8SVSWwPU7Ql35y4E9pKYw=;
+	bh=Z0NqPyA1Ag7ywDCAREb3aLXtL9z+FPZPJKBvHQO0qu4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cZh6jmp5FMU6PPNVwqKUAb6/6FmYPyaBVg81oU4ISpghd/ikvupnusjVoTyUmqeHC
-	 vSIi+qcqM057lVthFPdHKFbAFIofOz4PrLSxPaCjoQ/5mCma7cBPWH8ZCboI0S3nDF
-	 wERbd/OF5f3Dv0bYmGh0DpZ79IL1XNjlxalqzRYLBkDD2M06Jch3TnWf6xmU4vtJeP
-	 kGNpU1O7t0tXmKYrYbLIftZNkMW8lkFualXumhyrNQJIjBZfjH55NSMuKCVEM3dAkC
-	 wr8EdNNYeAqF5nyOvplvpJpnaVtc1bUj2itFzaBc9nbeLrc2mjExJqaFk4s6eD0jmz
-	 Nuidzugo4ONCw==
+	b=babYapBxC3JxNFI8z01+x6T2wNnl/TdGYD+Sjp7dxvjVzz5WJTPhZScrrb35OMtaf
+	 Bc49gAlrOdrms5bjXdHn6puun1kncoLIWUHIyzouZ1mm8arI780jlur1uoZAz3uuQG
+	 dD6IUiTYJrldynPR/IaH1xD+YC9vku7XqoOTmPjJVnSGxXbvS6aHqBDhkbeScg9SNL
+	 v1nx9FS10qWDq/wFwOMzyyl+ynkUUM8QI25cUCFTmIHAxk3dmsutJTI8sWaEKTUEoy
+	 iaV6BFEtf5lFaTA0M+FhCeyhRtGbEqz0CP3MXqjMCJwG6ZbskzEYt6ezPMPOQELKQz
+	 I4vPi06ntdHzQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 23965D9A151;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34EA8D84BB4;
 	Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] tools: ynl: ethtool.py: Make tool invokable from
- any CWD
+Subject: Re: [PATCH net-next] net: fman: Remove some unused fields in some
+ structure
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171219904314.5496.13812029659945386741.git-patchwork-notify@kernel.org>
+ <171219904321.5496.4241068677460405258.git-patchwork-notify@kernel.org>
 Date: Thu, 04 Apr 2024 02:50:43 +0000
-References: <20240402204000.115081-1-rrameshbabu@nvidia.com>
-In-Reply-To: <20240402204000.115081-1-rrameshbabu@nvidia.com>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: netdev@vger.kernel.org, gal@nvidia.com, tariqt@nvidia.com,
- saeedm@nvidia.com, edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
- davem@davemloft.net, dtatulea@nvidia.com
+References: <425222d4f6c584e8316ccb7b2ef415a85c96e455.1712084103.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <425222d4f6c584e8316ccb7b2ef415a85c96e455.1712084103.git.christophe.jaillet@wanadoo.fr>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: madalin.bucur@nxp.com, sean.anderson@seco.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  2 Apr 2024 13:39:52 -0700 you wrote:
-> ethtool.py depends on yml files in a specific location of the linux kernel
-> tree. Using relative lookup for those files means that ethtool.py would
-> need to be run under tools/net/ynl/. Lookup needed yml files without
-> depending on the current working directory that ethtool.py is invoked from.
+On Tue,  2 Apr 2024 20:55:50 +0200 you wrote:
+> In "struct muram_info", the 'size' field is unused.
+> In "struct memac_cfg", the 'fixed_link' field is unused.
 > 
-> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Remove them.
+> 
+> Found with cppcheck, unusedStructMember.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v1] tools: ynl: ethtool.py: Make tool invokable from any CWD
-    https://git.kernel.org/netdev/net-next/c/ca3e10c4d83a
+  - [net-next] net: fman: Remove some unused fields in some structure
+    https://git.kernel.org/netdev/net-next/c/04af1d643701
 
 You are awesome, thank you!
 -- 
