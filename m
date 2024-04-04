@@ -1,101 +1,111 @@
-Return-Path: <netdev+bounces-84804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE0F8985FF
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:24:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 583A7898602
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:24:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29A5A1C2456E
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:24:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12BF028E2D8
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96EF082871;
-	Thu,  4 Apr 2024 11:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC0582862;
+	Thu,  4 Apr 2024 11:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGh4W6k2"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fg5I+J8/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D840757F8;
-	Thu,  4 Apr 2024 11:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EAF8061C;
+	Thu,  4 Apr 2024 11:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712229838; cv=none; b=l17lVEi52r9x9rGNviRMBJDGHqDcUyco5vmw2lzG6Lr8eotSv7zaYLQMfNkuqvm6+8YVsKIXZ/gZtWO0ddQpDcLJb+S8xe7aIrvFpI523TtSOCH4Q1is6pTEFrUs7cUi2NOuuokRiFVE/ew6SqGk7CvrJFzd1Fd32zySw9kJTBs=
+	t=1712229894; cv=none; b=nhUctO8Jnemkhqu+l4istF2bdp/XYkw3ZKzFfeus4qj62UIP1yvCCfh7mPG8bH8Kqwb542Rc4pnOS9bGz2ly3aXm+9oxqUgJLaOya/zowxe+n5zpoN5BbDxoxNr3irIuMIhOu32Y+lwrnARFF4GxSOTpwe+6iiONsMkfSioNTUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712229838; c=relaxed/simple;
-	bh=Y+5uB6ya45iH0N47tEEHl6dTEm9h/ITDLtDCoUztF34=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QujO6Tr2Ynau5C6P5kC+7rDGTcF/PbxqTKhL4abO86qVLiHKz9ifoHDHgoQCTEfnZ1JfFvW9C+MTkHzYOWjKrDb2smuWbVhhfG39kyfOC40/n0CBwBw8+Vn226ZQlrueg7KGvw36Tj8OyF9euBIvvb4/WJJbidB11IXVMYqlGb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGh4W6k2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7281AC433F1;
-	Thu,  4 Apr 2024 11:23:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712229838;
-	bh=Y+5uB6ya45iH0N47tEEHl6dTEm9h/ITDLtDCoUztF34=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EGh4W6k2KNsABUiQ4uNVSsXhb2UJ5hnxsXxsacdF7yic71/h6oFHDQdD1UOtm0WdC
-	 b0JtokyP38X9BTaHFel2bAiuk3pBMKg2Ifxe3FWs+F23KibGsS0KXYnKwsielqtn3Y
-	 zoXg5Mxnm5l9Oz+4lo7rIjpOq18vXcxBBR0jaL53fLoVB3CLB2hfUoSPO2hLc1JlT6
-	 z5IVk5f+zfpVEdSxm8zXKqjCgSkb1awo55gtVz3Pv9uP3auXB6ApPgoMomC0F+nXJi
-	 mkaY1qEy17PFj4jJPeJezgkKC4dH5dWl4wGc7FIUOSGeNoVx5uJ+oRzw0Zmm9zrMiF
-	 XEz06ILZhw2zg==
-Message-ID: <5a0db8a6-6d73-48a6-8824-3191657ff11a@kernel.org>
-Date: Thu, 4 Apr 2024 13:23:53 +0200
+	s=arc-20240116; t=1712229894; c=relaxed/simple;
+	bh=q2nfKh6ApwW052OGkdGyVop2L2by0nfP7ronTq9Kwao=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D23jAA7j9F2XvZ7JLQTkljtTLbM2SOwR3fShNoTURkii7CKQEBcjvV5qRwKWxQOzLcgBCyNP5h5dfnnjRWQuN8hEcpqUoRuw3BPKcErvEQj+zjStnp9KI/ihlGqMen23xmYNA//EAzSyvg2OMncCIovmP7pEQP9NV1Han+5WTOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=fg5I+J8/; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 434A6eUa001682;
+	Thu, 4 Apr 2024 04:24:33 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=xJvKlkUF7eE8As79gdR5lqoyi4bsuHX51wblXwpON6s=; b=fg5
+	I+J8/B0+zc3A8kaOV+jbURgsKtqzmVW+8WKiHhOhtMJZPyb8wfZk/rPf4jkuSXl8
+	blRMpvN9MJFLNiNsylLB1vHnGJAesBQwIvFd2zGr7P0lNcKNuFltZKALRfto43GY
+	JL+34Rcnn07l5A7biJ4LmyMBJZ7QyNc0XlNFL1iafqPMDuZk46nUHtJ1sFN1Uo/q
+	ztV3YmaChZVlMFeu/xGZzkx3RTqNZTUu74uLDRT6cpQypjaG4OUeVfaSEyAgDCnG
+	NNiTfVbcr+hDtm9rfscXGNnWi/pdQ4mJ2gtZIKP17JdOX5iicZvDpzOJQ5o9YAO8
+	TxIbp6aKMxCkiWGdzxQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3x9em6j46g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 04:24:33 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 4 Apr 2024 04:24:32 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 4 Apr 2024 04:24:32 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 10D773F7070;
+	Thu,  4 Apr 2024 04:24:28 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <sbhatta@marvell.com>, <gakula@marvell.com>,
+        <sgoutham@marvell.com>, <naveenm@marvell.com>
+Subject: [net Patch] octeontx2-pf: Fix transmit scheduler resource leak
+Date: Thu, 4 Apr 2024 16:54:27 +0530
+Message-ID: <20240404112427.16805-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/4] bpf: test_run: Use system page pool for
- XDP live frame mode
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20240220210342.40267-1-toke@redhat.com>
- <20240220210342.40267-3-toke@redhat.com> <87sf1lzxdb.fsf@toke.dk>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <87sf1lzxdb.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: DSYpJLdrJPsGpP9aWzgDXLPX68pskJO1
+X-Proofpoint-GUID: DSYpJLdrJPsGpP9aWzgDXLPX68pskJO1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-04_07,2024-04-04_01,2023-05-22_02
 
+Inorder to support shaping and scheduling, Upon class creation
+Netdev driver allocates trasmit schedulers.
 
+The previous patch which added support for Round robin scheduling has
+a bug due to which driver is not freeing transmit schedulers post
+class deletion.
 
-On 21/02/2024 15.48, Toke Høiland-Jørgensen wrote:
-> Toke Høiland-Jørgensen <toke@redhat.com> writes:
-> 
->> The cookie is a random 128-bit value, which means the probability that
->> we will get accidental collisions (which would lead to recycling the
->> wrong page values and reading garbage) is on the order of 2^-128. This
->> is in the "won't happen before the heat death of the universe" range, so
->> this marking is safe for the intended usage.
-> 
-> Alright, got a second opinion on this from someone better at security
-> than me; I'll go try out some different ideas :)
+This patch fixes the same.
 
-It is a general security concern for me that BPF test_run gets access to
-memory used by 'system page pool', with the concern of leaking data
-(from real traffic) to an attacker than can inject a BPF test_run
-program via e.g. a CI pipeline.
+Fixes: 47a9656f168a ("octeontx2-pf: htb offload support for Round Robin scheduling")
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/qos.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I'm not saying we leaking data today in BPF/XDP progs, but there is a
-potential, because to gain performance in XDP and page_pool we don't
-clear memory to avoid cache line performance issues.
-I guess today, I could BPF tail extend and read packet data from older
-frames, in this way, if I get access to 'system page pool'.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+index 1e77bbf5d22a..1723e9912ae0 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+@@ -382,6 +382,7 @@ static void otx2_qos_read_txschq_cfg_tl(struct otx2_qos_node *parent,
+ 		otx2_qos_read_txschq_cfg_tl(node, cfg);
+ 		cnt = cfg->static_node_pos[node->level];
+ 		cfg->schq_contig_list[node->level][cnt] = node->schq;
++		cfg->schq_index_used[node->level][cnt] = true;
+ 		cfg->schq_contig[node->level]++;
+ 		cfg->static_node_pos[node->level]++;
+ 		otx2_qos_read_txschq_cfg_schq(node, cfg);
+-- 
+2.17.1
 
---Jesper
 
