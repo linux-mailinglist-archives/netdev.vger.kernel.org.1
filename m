@@ -1,291 +1,314 @@
-Return-Path: <netdev+bounces-85020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50700898FE3
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:07:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22A7C898FE9
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EA2D288872
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:07:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA0C1F22151
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992B512D1EF;
-	Thu,  4 Apr 2024 21:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85D013AA4C;
+	Thu,  4 Apr 2024 21:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P9fWsTtf"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rdYDsViu";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Dclk8g+F";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cdvcwCJg";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FFBGkHvK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D11313AA56;
-	Thu,  4 Apr 2024 21:07:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAEF13473D
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 21:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712264869; cv=none; b=Y/cJx7uHRvRaJauDRvNOZFaWaglUZMlNPhE76rMzkyCuL9t86mHmtibf/BCgWHB2Sai5afleOeKBMwsA/pr/KQRBb4qZ/ZKSIKyDRlTUKdEc3BV9/6V+7IKoSjQp7Jv+9BwjnW1AktNtJNhFIaid+ZiyVszqeh7OHYpW2cUcZ0Y=
+	t=1712265090; cv=none; b=mlewhUFAE6iQfC0PFuz4VwsUyvXTnRAej5SgdK0o7LBQz3po0TU5TmVnVtTxA5nxtH/S9a+S4BRH7GVE8vupX5PVXJ5Au3s9w3M2qN4YZ5xNG/EOG6mEVuzPSSUVg3AeYV3E5zOUgZ2oWjp6gQafBSmOPLnV4olrIoufkc7wvM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712264869; c=relaxed/simple;
-	bh=SPrsCt+96Ef4t6Uvmt292hPv1QOe1YN3cl5humKxypk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZNzzzevpjXKzFK0DpgEYjDvGyRtOhNGyBGPTgZf2BqyhiDeH1hDbPUIxHICtR3UgcdtRlFEyWGIemaVebXTpohF+qpvk9CWCvr2swt+CdYXfq9nMPNfuenZn87FjMDbJAual7f0VncMEsZ5tUMsuj25zQOW/TIlGiJ9+c5F3rMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P9fWsTtf; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d4a8bddc21so19136221fa.0;
-        Thu, 04 Apr 2024 14:07:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712264866; x=1712869666; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xwWIR+Fvzm57PQ+qlxVYuBVk+hYeDkdNxYheKsxzHjs=;
-        b=P9fWsTtfRF5EnZPCETPtAIecOobEx9egRjA5T5dokg/cX7FCaPRS4iVM4efeaEe5RC
-         K2HQdqfB/CcscM1TsxUkH5GwnAJdVBSu0wo6B2VVSrM36ouAdek71I29f7Qrq5Ub18fJ
-         cIqItzGFhL+n97Sfxa4K4p1OLxLQwvt7UXb69elWkQMm+ZN6y1CL3/NuWjE/hF9YnTxb
-         kCd1rHoKb90UtaurjsCdrFjM9GEXAOe3OpPGHdXmaAttjfrRqpL/fXBf52WwpavbPcFA
-         /sE527cb0fuHr4Dtmpx+6v1BxxIYqvhVQbics/kOV/L2q+H1D56mwa/E5ZcXSrpZU0p0
-         dNog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712264866; x=1712869666;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xwWIR+Fvzm57PQ+qlxVYuBVk+hYeDkdNxYheKsxzHjs=;
-        b=CRmNm30+YWXAZ+6PiafYx26+3gfVliHh9SA9kpjemCq2CcSx8JXZhQA4Bf8x0JTcTv
-         mY4Sbo0jT+dEfOnhVLu/TjbmfvR4g8ZEhz0MwSwHpEefnGvoydDLKDGnTTOxoKJkCWB+
-         cZcSBKc4zTjTWCrrUmxoWBqG3mObDt5nbc/1Azhch1BRrt8zkJQiRRc2OnTib16Khts4
-         VlohvvBLjSYlS2DYUP2w6YRz4mmehIRTIzAgWtURu+EXAmN8zrcxWQObefsEQuBcOFcU
-         FDUqeTNfxxbJl2k32thyKoj+EX06+umsRwBr6+sxzwgH9ZiZV33QA+9xRAmcG2kFLMLk
-         ccpg==
-X-Forwarded-Encrypted: i=1; AJvYcCVcdcVIS1st+s6yhTuGQgZLy0jyMj/n97++8+paSWI1VHftVLRqcmxF2O0vd+mm3QwY+zxNvcIUp1evu0dH0VYQiTITicr3HB7Qo/YdQW7uFiy25nEJxJ31dM/T60RxPGuIdLdZDVTe
-X-Gm-Message-State: AOJu0YxcZ5+a5ps4UF6DZFr1KrYPAbIjlY0vEmVffM7jEcCvL5LxpeWy
-	T59/llx1A6Wnnf3M46SqX8ORDvjuQ3lCQiT7ZYA7BoxYQDwtlBTZ8qaLfS+wbNjAOjbJtuD8Edv
-	Gcr3zRCJ3yDYND1hipTREU0yLgtk=
-X-Google-Smtp-Source: AGHT+IEWWvr1Up6DqHKXOF4AW/P4VLByTsrGLERC6kRaWewRX15iFarpeVpJOgGVsKZU0HjbJwYSaruZBdv89tIhFlQ=
-X-Received: by 2002:a05:651c:221d:b0:2d8:4637:4062 with SMTP id
- y29-20020a05651c221d00b002d846374062mr3300610ljq.28.1712264865293; Thu, 04
- Apr 2024 14:07:45 -0700 (PDT)
+	s=arc-20240116; t=1712265090; c=relaxed/simple;
+	bh=kDsTczcgKrQx4Mv1yNTeTiqNGF2XlywCGmGwOZLPq8M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RnlQCGJxs+akbcGHfID0tvZLl6RsZdu9PlznJLDtaPLS85laM2IO8AuWqY4GwVT5QOuKHXzgM67wQS3yJbz1ndl+LZfLxO4CQmhqtuFm2ZMVPwLCZNkkYYFHk6wuNyI2aKT+3Q5m0Xm+6M1AP0ZT3Oa+HtnQLlfa7njdZrIe/HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rdYDsViu; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Dclk8g+F; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cdvcwCJg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FFBGkHvK; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A6D201F441;
+	Thu,  4 Apr 2024 21:11:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1712265086; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=G4KkPw51wsPX4YLwRMC8+YIAnNVkPQo7t2OqZeZYoIA=;
+	b=rdYDsViu0mfvwbSjZuOLK62Od5l9D0KTtw0xOkCIJibV2yAO4T28TuiEb8dw7z293Jwe9Y
+	av41A1m+/NRGJdnI/473JbDK2rU7tBpzxctwn8ku3dNHY+ToTdexuYpp3TWC2kU4+5cf/N
+	tKQceYBUstmivnt0LzzVMMM5T0LapJ4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1712265086;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=G4KkPw51wsPX4YLwRMC8+YIAnNVkPQo7t2OqZeZYoIA=;
+	b=Dclk8g+FEmhD1qsUum8WDeC058B6j+FT97/YJROUvptJ6CT52Jxhi5b0buPwSpPBqEkJ2f
+	giL3Yp5btypPjsAw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1712265085; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=G4KkPw51wsPX4YLwRMC8+YIAnNVkPQo7t2OqZeZYoIA=;
+	b=cdvcwCJgdXSz74Tif7QBlY4ii0Xi9+cSLAJYNVc8Uym/j3vowQ0WZlVLwwsjQDlPDZTK2u
+	wf8VEbW++21jcFQYkURthjDCpniD2Mc0hWSp5ToWkkMBMQT2VEnfzKERZ8xJrfcGrbLnLJ
+	qUAvGt1ZoRfKiV520d2vO5tUcAFic54=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1712265085;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=G4KkPw51wsPX4YLwRMC8+YIAnNVkPQo7t2OqZeZYoIA=;
+	b=FFBGkHvK4eK8XvCY/pm7fGsgs9Z9W3z7dXdueJsQV5UAyDMh9aTNGUTxE86r2ZKj3Zzzqp
+	1L9qKMaiv9JEYQAg==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 6BDA2139E8;
+	Thu,  4 Apr 2024 21:11:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id m9wOFH0XD2b6AgAAn2gu4w
+	(envelope-from <krisman@suse.de>); Thu, 04 Apr 2024 21:11:25 +0000
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+To: willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	martin.lau@kernel.org,
+	Gabriel Krisman Bertazi <krisman@suse.de>,
+	Lorenz Bauer <lmb@isovalent.com>
+Subject: [PATCH] udp: Avoid call to compute_score on multiple sites
+Date: Thu,  4 Apr 2024 17:11:11 -0400
+Message-ID: <20240404211111.30493-1-krisman@suse.de>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404123602.2369488-1-edumazet@google.com> <CABBYNZJB+n7NN2QkBt5heDeWq0wbyE1Y4CUyK9Ne7vBRnmuWaw@mail.gmail.com>
- <CANn89iLweXJRLdn=v6WbqtvW6q0yLz_Dox87+GAnZUmx0WevKA@mail.gmail.com>
-In-Reply-To: <CANn89iLweXJRLdn=v6WbqtvW6q0yLz_Dox87+GAnZUmx0WevKA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 4 Apr 2024 17:07:32 -0400
-Message-ID: <CABBYNZK08zDX07N9BTcFku=RSzc=W_74K2n2ky5f+qSexSLM+g@mail.gmail.com>
-Subject: Re: [PATCH net] Bluetooth: validate setsockopt( BT_PKT_STATUS /
- BT_DEFER_SETUP) user input
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-1.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap2.dmz-prg2.suse.org:helo,imap2.dmz-prg2.suse.org:rdns];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Score: -1.30
+X-Spam-Flag: NO
 
-Hi Eric,
+We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
+ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
+commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
+sockets are present").  The failing tests were those that would spawn
+UDP sockets per-cpu on systems that have a high number of cpus.
 
-On Thu, Apr 4, 2024 at 3:04=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Thu, Apr 4, 2024 at 8:31=E2=80=AFPM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Eric,
-> >
-> > On Thu, Apr 4, 2024 at 8:36=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > syzbot reported sco_sock_setsockopt() is copying data without
-> > > checking user input length.
-> > >
-> > >  BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/l=
-inux/sockptr.h:49 [inline]
-> > >  BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/so=
-ckptr.h:55 [inline]
-> > >  BUG: KASAN: slab-out-of-bounds in sco_sock_setsockopt+0xc0b/0xf90 ne=
-t/bluetooth/sco.c:893
-> > > Read of size 4 at addr ffff88805f7b15a3 by task syz-executor.5/12578
-> > >
-> > > CPU: 1 PID: 12578 Comm: syz-executor.5 Not tainted 6.8.0-syzkaller-08=
-951-gfe46a7dd189e #0
-> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BI=
-OS Google 03/27/2024
-> > > Call Trace:
-> > >  <TASK>
-> > >   __dump_stack lib/dump_stack.c:88 [inline]
-> > >   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
-> > >   print_address_description mm/kasan/report.c:377 [inline]
-> > >   print_report+0x169/0x550 mm/kasan/report.c:488
-> > >   kasan_report+0x143/0x180 mm/kasan/report.c:601
-> > >   copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
-> > >   copy_from_sockptr include/linux/sockptr.h:55 [inline]
-> > >   sco_sock_setsockopt+0xc0b/0xf90 net/bluetooth/sco.c:893
-> > >   do_sock_setsockopt+0x3b1/0x720 net/socket.c:2311
-> > >   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
-> > >   __do_sys_setsockopt net/socket.c:2343 [inline]
-> > >   __se_sys_setsockopt net/socket.c:2340 [inline]
-> > >   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
-> > >  do_syscall_64+0xfd/0x240
-> > >  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> > > RIP: 0033:0x7f3c2487dde9
-> > > Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 =
-89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f=
-0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> > > RSP: 002b:00007f3c256b40c8 EFLAGS: 00000246 ORIG_RAX: 000000000000003=
-6
-> > > RAX: ffffffffffffffda RBX: 00007f3c249abf80 RCX: 00007f3c2487dde9
-> > > RDX: 0000000000000010 RSI: 0000000000000112 RDI: 0000000000000008
-> > > RBP: 00007f3c248ca47a R08: 0000000000000002 R09: 0000000000000000
-> > > R10: 0000000020000080 R11: 0000000000000246 R12: 0000000000000000
-> > > R13: 000000000000004d R14: 00007f3c249abf80 R15: 00007fff5dcf4978
-> > >  </TASK>
-> > >
-> > > Allocated by task 12578:
-> > >   kasan_save_stack mm/kasan/common.c:47 [inline]
-> > >   kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
-> > >   poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
-> > >   __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
-> > >   kasan_kmalloc include/linux/kasan.h:211 [inline]
-> > >   __do_kmalloc_node mm/slub.c:3966 [inline]
-> > >   __kmalloc+0x233/0x4a0 mm/slub.c:3979
-> > >   kmalloc include/linux/slab.h:632 [inline]
-> > >   __cgroup_bpf_run_filter_setsockopt+0xd2f/0x1040 kernel/bpf/cgroup.c=
-:1869
-> > >   do_sock_setsockopt+0x6b4/0x720 net/socket.c:2293
-> > >   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
-> > >   __do_sys_setsockopt net/socket.c:2343 [inline]
-> > >   __se_sys_setsockopt net/socket.c:2340 [inline]
-> > >   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
-> > >  do_syscall_64+0xfd/0x240
-> > >  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> > >
-> > > The buggy address belongs to the object at ffff88805f7b15a0
-> > >  which belongs to the cache kmalloc-8 of size 8
-> > > The buggy address is located 1 bytes to the right of
-> > >  allocated 2-byte region [ffff88805f7b15a0, ffff88805f7b15a2)
-> > >
-> > > The buggy address belongs to the physical page:
-> > > page:ffffea00017dec40 refcount:1 mapcount:0 mapping:0000000000000000 =
-index:0x0 pfn:0x5f7b1
-> > > flags: 0xfff00000000800(slab|node=3D0|zone=3D1|lastcpupid=3D0x7ff)
-> > > page_type: 0xffffffff()
-> > > raw: 00fff00000000800 ffff888014c41280 ffffea0000a26d80 dead000000000=
-002
-> > > raw: 0000000000000000 0000000080800080 00000001ffffffff 0000000000000=
-000
-> > > page dumped because: kasan: bad access detected
-> > > page_owner tracks the page as allocated
-> > > page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12=
-cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5091, tgid 5091 (syz-execut=
-or.3), ts 75758857522, free_ts 75730585588
-> > >   set_page_owner include/linux/page_owner.h:31 [inline]
-> > >   post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
-> > >   prep_new_page mm/page_alloc.c:1540 [inline]
-> > >   get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
-> > >   __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
-> > >   __alloc_pages_node include/linux/gfp.h:238 [inline]
-> > >   alloc_pages_node include/linux/gfp.h:261 [inline]
-> > >   alloc_slab_page+0x5f/0x160 mm/slub.c:2175
-> > >   allocate_slab mm/slub.c:2338 [inline]
-> > >   new_slab+0x84/0x2f0 mm/slub.c:2391
-> > >   ___slab_alloc+0xc73/0x1260 mm/slub.c:3525
-> > >   __slab_alloc mm/slub.c:3610 [inline]
-> > >   __slab_alloc_node mm/slub.c:3663 [inline]
-> > >   slab_alloc_node mm/slub.c:3835 [inline]
-> > >   __do_kmalloc_node mm/slub.c:3965 [inline]
-> > >   __kmalloc_node_track_caller+0x2d6/0x4e0 mm/slub.c:3986
-> > >   kstrdup+0x3a/0x80 mm/util.c:62
-> > >   __kernfs_new_node+0x9d/0x880 fs/kernfs/dir.c:611
-> > >   kernfs_new_node+0x13a/0x240 fs/kernfs/dir.c:691
-> > >   kernfs_create_dir_ns+0x43/0x120 fs/kernfs/dir.c:1052
-> > >   sysfs_create_dir_ns+0x189/0x3a0 fs/sysfs/dir.c:59
-> > >   create_dir lib/kobject.c:73 [inline]
-> > >   kobject_add_internal+0x435/0x8d0 lib/kobject.c:240
-> > >   kobject_add_varg lib/kobject.c:374 [inline]
-> > >   kobject_init_and_add+0x124/0x190 lib/kobject.c:457
-> > >   netdev_queue_add_kobject net/core/net-sysfs.c:1786 [inline]
-> > >   netdev_queue_update_kobjects+0x1ee/0x5f0 net/core/net-sysfs.c:1838
-> > >   register_queue_kobjects net/core/net-sysfs.c:1900 [inline]
-> > >   netdev_register_kobject+0x265/0x320 net/core/net-sysfs.c:2140
-> > > page last free pid 5103 tgid 5103 stack trace:
-> > >   reset_page_owner include/linux/page_owner.h:24 [inline]
-> > >   free_pages_prepare mm/page_alloc.c:1140 [inline]
-> > >   free_unref_page_prepare+0x968/0xa90 mm/page_alloc.c:2346
-> > >   free_unref_page_list+0x5a3/0x850 mm/page_alloc.c:2532
-> > >   release_pages+0x2744/0x2a80 mm/swap.c:1042
-> > >   tlb_batch_pages_flush mm/mmu_gather.c:98 [inline]
-> > >   tlb_flush_mmu_free mm/mmu_gather.c:293 [inline]
-> > >   tlb_flush_mmu+0x34d/0x4e0 mm/mmu_gather.c:300
-> > >   tlb_finish_mmu+0xd4/0x200 mm/mmu_gather.c:392
-> > >   exit_mmap+0x4b6/0xd40 mm/mmap.c:3300
-> > >   __mmput+0x115/0x3c0 kernel/fork.c:1345
-> > >   exit_mm+0x220/0x310 kernel/exit.c:569
-> > >   do_exit+0x99e/0x27e0 kernel/exit.c:865
-> > >   do_group_exit+0x207/0x2c0 kernel/exit.c:1027
-> > >   __do_sys_exit_group kernel/exit.c:1038 [inline]
-> > >   __se_sys_exit_group kernel/exit.c:1036 [inline]
-> > >   __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1036
-> > >  do_syscall_64+0xfd/0x240
-> > >  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> > >
-> > > Memory state around the buggy address:
-> > >  ffff88805f7b1480: 05 fc fc fc 05 fc fc fc fa fc fc fc 05 fc fc fc
-> > >  ffff88805f7b1500: 05 fc fc fc 05 fc fc fc 05 fc fc fc 05 fc fc fc
-> > > >ffff88805f7b1580: 04 fc fc fc 02 fc fc fc fa fc fc fc 05 fc fc fc
-> > >                                ^
-> > >  ffff88805f7b1600: fa fc fc fc 05 fc fc fc fa fc fc fc 05 fc fc fc
-> > >  ffff88805f7b1680: 05 fc fc fc 05 fc fc fc 00 fc fc fc fa fc fc fc
-> > >
-> > > Fixes: 00398e1d5183 ("Bluetooth: Add support for BT_PKT_STATUS CMSG d=
-ata for SCO connections")
-> > > Fixes: b96e9c671b05 ("Bluetooth: Add BT_DEFER_SETUP option to sco soc=
-ket")
-> > > Reported-by: syzbot <syzkaller@googlegroups.com>
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > Cc: Marcel Holtmann <marcel@holtmann.org>
-> > > Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> > > Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com> (supporter:BLUETOOT=
-H SUBSYSTEM)
-> > > Cc: linux-bluetooth@vger.kernel.org
-> > > ---
-> > >  net/bluetooth/sco.c | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > >
-> > > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> > > index 43daf965a01e4ac5c9329150080b00dcd63c7e1c..9d013f01865fd2509f28e=
-ac3bceadf682f0a5edb 100644
-> > > --- a/net/bluetooth/sco.c
-> > > +++ b/net/bluetooth/sco.c
-> > > @@ -843,6 +843,10 @@ static int sco_sock_setsockopt(struct socket *so=
-ck, int level, int optname,
-> > >                         break;
-> > >                 }
-> > >
-> > > +               if (optlen < sizeof(u32)) {
-> > > +                       err =3D -EINVAL;
-> > > +                       break;
-> > > +               }
-> >
-> > Usually we deal with this sort of problem by doing len =3D
-> > min_t(unsigned int, sizeof(u32), optlen) so we truncate the value if
-> > smaller, perhaps it would be better to have a helper function that
-> > does len check internally.
->
-> Well, what happens if user provided optlen =3D=3D 1 ?
->
-> opt would then contain 24 bits of garbage.
+Unsurprisingly, it is not caused by the extra re-scoring of the reused
+socket, but due to the compiler no longer inlining compute_score, once
+it has the extra call site in upd5_lib_lookup2.  This is augmented by
+the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
 
-We might need to do a memset so if userspace just send one byte that
-would still work, not that are actually doing memset right now so you
-are right that in that respect it is still broken since it accessing
-uninitialized value which perhaps is not triggering any build errors
-but I wonder if we should attempt to fix that as well.
+We could just explicitly inline it, but compute_score() is quite a large
+function, around 300b.  Inlining in two sites would almost double
+udp4_lib_lookup2, which is a silly thing to do just to workaround a
+mitigation.  Instead, this patch shuffles the code a bit to avoid the
+multiple calls to compute_score.  Since it is a static function used in
+one spot, the compiler can safely fold it in, as it did before, without
+increasing the text size.
 
---=20
-Luiz Augusto von Dentz
+With this patch applied I ran my original iperf3 testcases.  The failing
+cases all looked like this (ipv4):
+	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2 2>&1
+
+where $R is either 1G/10G/0 (max, unlimited).  I ran 5 times each.
+baseline is 6.9.0-rc1-g962490525cff, just a recent checkout of Linus
+tree. harmean == harmonic mean; CV == coefficient of variation.
+
+ipv4:
+                 1G                10G                  MAX
+	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+baseline 1726716.59(0.0401) 1751758.50(0.0068) 1425388.83(0.1276)
+patched  1842337.77(0.0711) 1861574.00(0.0774) 1888601.95(0.0580)
+
+ipv6:
+                 1G                10G                  MAX
+	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+baseline: 1693636.28(0.0132) 1704418.23(0.0094) 1519681.83(0.1299)
+patched   1909754.24(0.0307) 1782295.80(0.0539) 1632803.48(0.1185)
+
+This restores the performance we had before the change above with this
+benchmark.  We obviously don't expect any real impact when mitigations
+are disabled, but just to be sure it also doesn't regresses:
+
+mitigations=off ipv4:
+                 1G                10G                  MAX
+	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
+patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
+
+Finally, I can see this restores compute_score inlining in my gcc
+without extra function attributes. Out of caution, I still added
+__always_inline in compute_score, to prevent future changes from
+un-inlining it again.  Since it is only in one site, it should be fine.
+
+Cc: Lorenz Bauer <lmb@isovalent.com>
+Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
+Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
+
+---
+Another idea would be shrinking compute_score and then inlining it.  I'm
+not a network developer, but it seems that we can avoid most of the
+"same network" checks of calculate_score when passing a socket from the
+reusegroup.  If that is the case, we can fork out a compute_score_fast
+that can be safely inlined at the second call site of the existing
+compute_score.  I didn't pursue this any further.
+---
+ net/ipv4/udp.c | 24 ++++++++++++++++++------
+ net/ipv6/udp.c | 23 ++++++++++++++++++-----
+ 2 files changed, 36 insertions(+), 11 deletions(-)
+
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 661d0e0d273f..8ce5c4e8663e 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -363,7 +363,11 @@ int udp_v4_get_port(struct sock *sk, unsigned short snum)
+ 	return udp_lib_get_port(sk, snum, hash2_nulladdr);
+ }
+ 
+-static int compute_score(struct sock *sk, struct net *net,
++/* While large, compute_score is in the UDP hot path and only used once
++ * in udp4_lib_lookup2. Avoiding the function call by inlining it has
++ * yield measurable benefits in iperf3-based benchmarks.
++ */
++static __always_inline int compute_score(struct sock *sk, struct net *net,
+ 			 __be32 saddr, __be16 sport,
+ 			 __be32 daddr, unsigned short hnum,
+ 			 int dif, int sdif)
+@@ -425,16 +429,20 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+ 				     struct udp_hslot *hslot2,
+ 				     struct sk_buff *skb)
+ {
+-	struct sock *sk, *result;
++	struct sock *sk, *result, *this;
+ 	int score, badness;
+ 
+ 	result = NULL;
+ 	badness = 0;
+ 	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+-		score = compute_score(sk, net, saddr, sport,
++		this = sk;
++rescore:
++		score = compute_score(this, net, saddr, sport,
+ 				      daddr, hnum, dif, sdif);
+ 		if (score > badness) {
+ 			badness = score;
++			if (this != sk)
++				continue;
+ 
+ 			if (sk->sk_state == TCP_ESTABLISHED) {
+ 				result = sk;
+@@ -456,9 +464,13 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+ 			if (IS_ERR(result))
+ 				continue;
+ 
+-			badness = compute_score(result, net, saddr, sport,
+-						daddr, hnum, dif, sdif);
+-
++			/* compute_score is too long of a function to be
++			 * inlined, and calling it again yields
++			 * measureable overhead. Work around it by
++			 * jumping backwards to score 'this'.
++			 */
++			this = result;
++			goto rescore;
+ 		}
+ 	}
+ 	return result;
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 7c1e6469d091..883e62228432 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -114,7 +114,11 @@ void udp_v6_rehash(struct sock *sk)
+ 	udp_lib_rehash(sk, new_hash);
+ }
+ 
+-static int compute_score(struct sock *sk, struct net *net,
++/* While large, compute_score is in the UDP hot path and only used once
++ * in udp4_lib_lookup2. Avoiding the function call by inlining it has
++ * yield measurable benefits in iperf3-based benchmarks.
++ */
++static __always_inline int compute_score(struct sock *sk, struct net *net,
+ 			 const struct in6_addr *saddr, __be16 sport,
+ 			 const struct in6_addr *daddr, unsigned short hnum,
+ 			 int dif, int sdif)
+@@ -166,16 +170,20 @@ static struct sock *udp6_lib_lookup2(struct net *net,
+ 		int dif, int sdif, struct udp_hslot *hslot2,
+ 		struct sk_buff *skb)
+ {
+-	struct sock *sk, *result;
++	struct sock *sk, *result, *this;
+ 	int score, badness;
+ 
+ 	result = NULL;
+ 	badness = -1;
+ 	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+-		score = compute_score(sk, net, saddr, sport,
++		this = sk;
++rescore:
++		score = compute_score(this, net, saddr, sport,
+ 				      daddr, hnum, dif, sdif);
+ 		if (score > badness) {
+ 			badness = score;
++			if (this != sk)
++				continue;
+ 
+ 			if (sk->sk_state == TCP_ESTABLISHED) {
+ 				result = sk;
+@@ -197,8 +205,13 @@ static struct sock *udp6_lib_lookup2(struct net *net,
+ 			if (IS_ERR(result))
+ 				continue;
+ 
+-			badness = compute_score(sk, net, saddr, sport,
+-						daddr, hnum, dif, sdif);
++			/* compute_score is too long of a function to be
++			 * inlined, and calling it again yields
++			 * measureable overhead. Work around it by
++			 * jumping backwards to score 'result'.
++			 */
++			this = result;
++			goto rescore;
+ 		}
+ 	}
+ 	return result;
+-- 
+2.44.0
+
 
