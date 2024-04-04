@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-85047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0EA89922D
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 01:37:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E52899236
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 01:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F1E01C21DE8
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:37:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3152D1F231DE
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BE713C680;
-	Thu,  4 Apr 2024 23:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCB613C680;
+	Thu,  4 Apr 2024 23:38:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMDHRDrt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mbt2p35a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B314013C672
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 23:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9415D13BC38
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 23:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712273852; cv=none; b=BOLR69bdIodFLIGw5S4BZPZ6hYkj0MnR+UfDTq3eBejIe9jMQkzbVe1Fq/GYOddaSVmzuHxEgEwFiWEHWnOo3rMvWwvNcaXdA4iNjLjoTghxuarYWMjXsrjeqHUgn8825sRW8Bf5Zhasjnw5WhNG1TkxY88bFyJDVUSqbZXsHtE=
+	t=1712273915; cv=none; b=YbdT3cgI87R7kQ9funracLdTqvf6tQ4O4RwSThYBvCcOFznbLemyQmS55ZMVs5bA/B+9Yv6EPCxS6yEovoKnT40fbfdWBWDCUXiSBh+mITiCf4dH5MLozK/GqiAGHfGRZJqpCOhlYpDE4CQH+yApJPQFP9eP7fW7qJDXvyI9+M8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712273852; c=relaxed/simple;
-	bh=8xmpO2PO8497s3ULBFRLxqphXzhM1UY1y8vkK+fYWsk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kx/v3lOonHXocmaiOg5JoKebXWXE/U2upE9PPnBqB4gm42GqObikqp/ncrs5mgFVMShrinazxY00ZHliP1qgC+3LL7KhWq+UDVCvoh++JxtxoFJK/na7f+3Cq6QYYon3Ghiz1xNKrkYK8nvcXFlbOHQNMWf4v3H7qfRJv+4ZUA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gMDHRDrt; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1712273915; c=relaxed/simple;
+	bh=JKUtZjUvHM6bUjgHrnrEhHm6LtkSdRubkyUbNAt7ejk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=miWC6RrEi+F+PfHHXxEr/x09kGKWQJ+EAGOU33dViBJcAaYAWQI7I0qmgqQdphYW/kLlc3KPL0wd91itxaQIi72gJmo0aSr0YwD3v9tyacJDtMFoZJgtw/NbEe9fvE9zVUP7b7ykghaN3pTIFV8Fn3PHWeIncTPchbZJqF8gdrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mbt2p35a; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4162ae2a0e4so7889085e9.3
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 16:37:30 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-343d88460cdso362292f8f.2
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 16:38:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712273848; x=1712878648; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712273911; x=1712878711; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bopkRUSgMPXZeQzrpuGp2v8LQiisYBbDtRQN02asSEw=;
-        b=gMDHRDrtVdjFlhQEYNavhHS8rZ/dkKJcONCGdvy+gllPmg39iybkWO5NcImElL/aU7
-         KGLS/rARulXcrwhx2dNLRy/1IzDWr+jkv53YdKSki2SA9lxnFh51q/dZpVDvlWWHTUqu
-         nsN8O4opYq2vD2sdD/rfztamNCMncEzdyrwXJWPow9ekspnWQqaroukHKsk4OqfCBYQe
-         89jshRs/UlJe+slDmoEQBeS/kV/rlvEr8fh4GATMkNKDlmfR/gJRuzkUefksjAus110o
-         cZyoMGMOwFAUj5iYrB5cnQprgRbJ/WLPTxSaXjqUwBN2wN1UWaon5SfZjHMsqguo9K8u
-         A6TQ==
+        bh=ig9XvshF/3U4rqJUTUlLBuVOsDHakaUwZL+kE4GfOLQ=;
+        b=Mbt2p35afmLblRHqMfIzVFP4npENEcogRLK7RmRN263nQwT3hHJhtRegzsLmNm9v1I
+         ZD7i4yV1HDFv/dwkjn/xrs5uzkwAND7Au/MwA0icMOPA3KbEsdtrv7MtOnQY5jdeNZqe
+         tE9JbjCNdHzHwEMTog7Qtyo9/TQFKC0jQtA4I5+iW3KNWn49SknuoW7QGgVqVGddp/JI
+         3+TBF4D/6XB6mCWxPAILJ0Kl86NOQwjVQ8NR4S1goLX+6k+h0g7/1BtfQNZLTdl5Idso
+         Nh0EgPhpkEhL1khqSn2uDpDRKEfqN/mglNjV+LAaIjcdRSUrvTCxsJqenOl/bRykejLV
+         /Ddw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712273848; x=1712878648;
+        d=1e100.net; s=20230601; t=1712273911; x=1712878711;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bopkRUSgMPXZeQzrpuGp2v8LQiisYBbDtRQN02asSEw=;
-        b=qsSzUemgUr8GoTzDelMwiLpB2kUp6eYTrbpyxFWYbvN2iN+Bo/hARguL6l8rT61L2U
-         pCg8KqQVPR2vPdtqCM9GNhvfjuYcQYd23YmYCT/VaOuRtq1Zwb3bDvQHWhiux/3Hfab+
-         QMAIT8z/4gH5szthok1XMtl5YPpovCakypO3gG92/GF62AJnTFgw2moaQYpwocm9sz2S
-         uvEoeRxALju35ng8y5keDThGmy325Zwo5Dx3DCXZHFdhWoH1MYkvjk1++TzHRXL14FiB
-         X89ozy8XVAC5D12FetytHAzSN0WIQf8KZFb7gvkxS0cTEpIBYxhoub1JRYa6wdmVpHPT
-         j8oQ==
-X-Gm-Message-State: AOJu0YzZzOMIrl5lHnpAKQb4v44nlirfh2Tb/sblriGx11/sdEqy0XJl
-	Xm39qquXo5Uk6HTg6xsfJyjrJez9jwRsiHSMyRY+B97xBw2KRwEAUwbigwgx
-X-Google-Smtp-Source: AGHT+IHb0lhuDbU0xhfRciXzpicNvCGP2FhqOFy+by03KenU3CeDjqzGPs+/aYCnq1sz7ve+iCUwcg==
-X-Received: by 2002:a05:600c:6b06:b0:415:611f:a0a4 with SMTP id jn6-20020a05600c6b0600b00415611fa0a4mr3100107wmb.37.1712273848288;
-        Thu, 04 Apr 2024 16:37:28 -0700 (PDT)
+        bh=ig9XvshF/3U4rqJUTUlLBuVOsDHakaUwZL+kE4GfOLQ=;
+        b=hmSmLO8U1E5wanv4DQTyGJrn2Tt4B3wPMlhj6Cz4zNeg5ZSkRyTSC9aWy2VXwc8lWE
+         Bz29W5LdoQNmrrsf7Ty/uY4tLViEjts4qPxJ54q5BreOrM7w3NAShCFAYWoKWoa8RNIN
+         mb9sU1N5WSjSczi1BPBlNeKHugd8U9J46cn0IYi6IS4OUNtpE4ATH8G6iXt4bZs1fRrP
+         qMukNvSnQQt6H1BrP9CW8MAgOv3CVGi8MhV16kCsq1ySW3xlQH+H1RjIOsY3eL5OTJB1
+         B39G2ZlRuNeSzuan4K7QnsaYl1vtrk5DFTB2pMYOXQB8x4Y3kHD1y+xCQvIJvUwOmXQ+
+         CflA==
+X-Gm-Message-State: AOJu0YxncAnWE0GHt/nOfwLleFMqVix4a5Vl7ly4eFu5W3Zg0BRU8VHb
+	pxZu/cb9EHC/OlfkJf2uk6NDXyDqQHbZfNsiIoQwWFxBD3yp1uG012dnLUEw
+X-Google-Smtp-Source: AGHT+IGFan5SUbs2DcewEskTfKNrgSI3rD0ftaXoNbXR2WUKxHXL9IjHcGXpcASKe/zr2wcyTCOQyg==
+X-Received: by 2002:a05:6000:a83:b0:33e:2a76:bb90 with SMTP id dh3-20020a0560000a8300b0033e2a76bb90mr2559151wrb.65.1712273911255;
+        Thu, 04 Apr 2024 16:38:31 -0700 (PDT)
 Received: from 127.0.0.1localhost ([185.69.144.46])
-        by smtp.gmail.com with ESMTPSA id ay14-20020a05600c1e0e00b004146a304863sm4359856wmb.34.2024.04.04.16.37.27
+        by smtp.gmail.com with ESMTPSA id o14-20020adfe80e000000b003436a3cae6dsm510333wrm.98.2024.04.04.16.38.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 16:37:27 -0700 (PDT)
+        Thu, 04 Apr 2024 16:38:30 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: edumazet@google.com,
@@ -72,9 +72,9 @@ Cc: edumazet@google.com,
 	pabeni@redhat.com,
 	kuba@kernel.org,
 	Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH net-next v2] net: enable SOCK_NOSPACE for UDP
-Date: Fri,  5 Apr 2024 00:37:25 +0100
-Message-ID: <1da265997eb754925e30260eb4c5b15f3bff3b43.1712273351.git.asml.silence@gmail.com>
+Subject: [PATCH RESEND net-next v3] net: cache for same cpu skb_attempt_defer_free
+Date: Fri,  5 Apr 2024 00:38:27 +0100
+Message-ID: <00c5b7641c0c854b630a80038d0131d148c2c81a.1712270285.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -84,95 +84,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-wake_up_poll() and variants can be expensive even if they don't actually
-wake anything up as it involves disabling irqs, taking a spinlock and
-walking through the poll list, which is fraught with cache bounces.
-That might happen when someone waits for POLLOUT or even POLLIN as the
-waitqueue is shared, even though we should be able to skip these
-false positive calls when the tx queue is not full.
+Optimise skb_attempt_defer_free() when run by the same CPU the skb was
+allocated on. Instead of __kfree_skb() -> kmem_cache_free() we can
+disable softirqs and put the buffer into cpu local caches.
 
-Add support for SOCK_NOSPACE for UDP sockets. The udp_poll() change is
-straightforward and repeats after tcp_poll() and others. However, for
-sock_wfree() it's done as an optional feature flagged by
-SOCK_SUPPORT_NOSPACE, because the feature requires support from the
-corresponding poll handler but there are many users of sock_wfree()
-that might be not prepared.
-
-Note, it optimises the sock_wfree() path but not sock_def_write_space().
-That's fine because it leads to more false positive wake ups, which is
-tolerable and not performance critical.
-
-It wins +5% to throughput testing with a CPU bound tx only io_uring
-based benchmark and showed 0.5-3% in more realistic workloads.
+CPU bound TCP ping pong style benchmarking (i.e. netbench) showed a 1%
+throughput increase (392.2 -> 396.4 Krps). Cross checking with profiles,
+the total CPU share of skb_attempt_defer_free() dropped by 0.6%. Note,
+I'd expect the win doubled with rx only benchmarks, as the optimisation
+is for the receive path, but the test spends >55% of CPU doing writes.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- include/net/sock.h |  1 +
- net/core/sock.c    |  5 +++++
- net/ipv4/udp.c     | 15 ++++++++++++++-
- 3 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 2253eefe2848..027a398471c4 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -944,6 +944,7 @@ enum sock_flags {
- 	SOCK_XDP, /* XDP is attached */
- 	SOCK_TSTAMP_NEW, /* Indicates 64 bit timestamps always */
- 	SOCK_RCVMARK, /* Receive SO_MARK  ancillary data with packet */
-+	SOCK_NOSPACE_SUPPORTED, /* socket supports the SOCK_NOSPACE flag */
- };
+v3: rebased, no changes otherwise
+
+v2: pass @napi_safe=true by using __napi_kfree_skb()
+
+ net/core/skbuff.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 2a5ce6667bbb..c4d36e462a9a 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6968,6 +6968,19 @@ void __skb_ext_put(struct skb_ext *ext)
+ EXPORT_SYMBOL(__skb_ext_put);
+ #endif /* CONFIG_SKB_EXTENSIONS */
  
- #define SK_FLAGS_TIMESTAMP ((1UL << SOCK_TIMESTAMP) | (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE))
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 5ed411231fc7..e4f486e9296a 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3393,6 +3393,11 @@ static void sock_def_write_space_wfree(struct sock *sk)
- 
- 		/* rely on refcount_sub from sock_wfree() */
- 		smp_mb__after_atomic();
-+
-+		if (sock_flag(sk, SOCK_NOSPACE_SUPPORTED) &&
-+		    !test_bit(SOCK_NOSPACE, &sk->sk_socket->flags))
-+			return;
-+
- 		if (wq && waitqueue_active(&wq->wait))
- 			wake_up_interruptible_sync_poll(&wq->wait, EPOLLOUT |
- 						EPOLLWRNORM | EPOLLWRBAND);
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 11460d751e73..309fa96e9020 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -342,6 +342,7 @@ int udp_lib_get_port(struct sock *sk, unsigned short snum,
- 		hslot2->count++;
- 		spin_unlock(&hslot2->lock);
- 	}
-+	sock_set_flag(sk, SOCK_NOSPACE_SUPPORTED);
- 	sock_set_flag(sk, SOCK_RCU_FREE);
- 	error = 0;
- fail_unlock:
-@@ -2885,8 +2886,20 @@ __poll_t udp_poll(struct file *file, struct socket *sock, poll_table *wait)
- 	/* psock ingress_msg queue should not contain any bad checksum frames */
- 	if (sk_is_readable(sk))
- 		mask |= EPOLLIN | EPOLLRDNORM;
--	return mask;
- 
-+	if (!sock_writeable(sk)) {
-+		set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
-+
-+		/* Order with the wspace read so either we observe it
-+		 * writeable or udp_sock_wfree() would find SOCK_NOSPACE and
-+		 * wake us up.
-+		 */
-+		smp_mb__after_atomic();
-+
-+		if (sock_writeable(sk))
-+			mask |= EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND;
++static void kfree_skb_napi_cache(struct sk_buff *skb)
++{
++	/* if SKB is a clone, don't handle this case */
++	if (skb->fclone != SKB_FCLONE_UNAVAILABLE) {
++		__kfree_skb(skb);
++		return;
 +	}
-+	return mask;
- }
- EXPORT_SYMBOL(udp_poll);
++
++	local_bh_disable();
++	__napi_kfree_skb(skb, SKB_DROP_REASON_NOT_SPECIFIED);
++	local_bh_enable();
++}
++
+ /**
+  * skb_attempt_defer_free - queue skb for remote freeing
+  * @skb: buffer
+@@ -6986,7 +6999,7 @@ void skb_attempt_defer_free(struct sk_buff *skb)
+ 	if (WARN_ON_ONCE(cpu >= nr_cpu_ids) ||
+ 	    !cpu_online(cpu) ||
+ 	    cpu == raw_smp_processor_id()) {
+-nodefer:	__kfree_skb(skb);
++nodefer:	kfree_skb_napi_cache(skb);
+ 		return;
+ 	}
  
 -- 
 2.44.0
