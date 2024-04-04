@@ -1,137 +1,108 @@
-Return-Path: <netdev+bounces-85008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01D85898F2E
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:46:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9D3A898F3E
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9067282582
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:46:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CC6D1F2B923
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:53:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305B313440F;
-	Thu,  4 Apr 2024 19:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC4813441C;
+	Thu,  4 Apr 2024 19:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQXg7Ed/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eWYsq6cd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA9012B82;
-	Thu,  4 Apr 2024 19:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F3412EBD0;
+	Thu,  4 Apr 2024 19:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712260007; cv=none; b=am2Z2tM7WQYa0GD8oFrkWfIRFeQCo2YHdJpENxHBzWwDGjLYLrLwKJiDDTpJ5xIMpN/30uqOP9j4Dt4TzTRDPpnH9ptmcWfEeU6EGjRKnfInxHbqD8dh7T+5bhT1wURZr8F6jnLq5KI4qQzicwD3Zty2VCiVgTP+TRVi+htWoVo=
+	t=1712260421; cv=none; b=fft4hJC/Y5YkBjjaS0EW5uXH0+77rPB8X5AJEJmgy1/h3n11LzBJDtWx3W48Wmv7zXI1TfvfLB1iSc9sz3NUKU01Z2sWT5yqzdRpIFaKBP1yDVDgyglkOw60X0VNeHNqudXa4B07pzzQWfDOEJCrZleU/yrxIkd6OzJvAlatL1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712260007; c=relaxed/simple;
-	bh=WK3fqVgXyhO4SaUPgOZtatPngfwA0rXyE9bTEsovzVE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=IQIwNJyY6QX4mfYLkvAXX+14KNazNDML5RzemA3wIJF/edVU+gzGCToZnW/VOecNb7B+G8u/uudUu6idwiq4vdS+K0EfLSG8ncLfwBNFmgerz5ZmeZ0TquePxE70Ti7wuIB9c8/9BctJIsi7PYdlOLhIrq27KpBwpWJTl3azhMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQXg7Ed/; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4162b016230so7105125e9.3;
-        Thu, 04 Apr 2024 12:46:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712260004; x=1712864804; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gyZX00utsqFHyIyMrK0p94XEseScZhVbdBOCzUKgoBI=;
-        b=NQXg7Ed/n35bhMoMh4PUqViJtU0pn474gi6KlGQ21yMTeiKBm5i6KMIE2kvIj1XvG0
-         pf+XCmw+6Jk60CggmyBs20LdbZss7c00japtRdJ0+hc673WhqeCVSnX7p0gO0JSewQmG
-         P5gfJWIXf6EDwzajys4b7NteLOEfxpdvi4/Xvnf/9SnDUymdint8sXpUfSZVkHTFRnIT
-         V3gRckMTkZ/+JMG3Kqdn+3F9QQhvWygZt2FiE06Fc8SXvorMJl+EnXVfmjnrAVEKfYlR
-         j0+0kfHDrGBCtnxWZfmADr02lZtpodR2FCqrrxmz188Fw0RMMxBpJhN/6096nflwK4UY
-         C1kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712260004; x=1712864804;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gyZX00utsqFHyIyMrK0p94XEseScZhVbdBOCzUKgoBI=;
-        b=uRSOqOKfOQf/HwyQaBMGduT9gVhlzX2xfDV1OrJ/y3r1eXAmJvm+BUAdzBluelkqGr
-         0UB0l70jO90nc9t/Q62NhrZpFKRaySDzMI1GO6L/C/C745uARCavPGvnPOyE5zj5vLnW
-         YNL/Hyj9kpaQAVEo3kOmclGgm/k2lx52yt+5XHHtXI1RlS2j4wZdo8LpY+7s4OB2wO8H
-         kbKL0FogYKO/+OzSbsJ10VWjBmNzwbdelGaE9i7GjXKda8XbW3icRsKwLVZGiVZ82jWH
-         BcCHZP8vUseVEYJ35pT6zh9BCzy3cYHbHv7aw/cPCqpgDyzlIgtJ+TT4K53i9+L0TZrr
-         WfVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFlPfNz2G+Ddsk8qbKYdKBPrzhaa2Ys3McUNFOH9gKVKpZmdgxkcr35mwwgIzzMKbyQ0czQ/U99GxPwIylEfzQx6aGPY7sUoihF/u48ibAb/kxR9X7R1h+qDDmEwrSI1iNB7D8
-X-Gm-Message-State: AOJu0YxBq9q5vm/IEZMwfxoCps3gVx++ie5r5KEWBXqYddaz/DsLyb7B
-	WTImD9HBfJK/xayipRzz9uJ5+eixFWdMQ4PS6Avr+1Or3c8L55nR
-X-Google-Smtp-Source: AGHT+IHekUzO777iLHR4liMlPFnVwBNBoqtPNNPXdvvu+XWFviFnIRx8MjBP7y94ROtz/nqECd2FNg==
-X-Received: by 2002:a05:600c:4a9f:b0:415:b921:6121 with SMTP id b31-20020a05600c4a9f00b00415b9216121mr2570868wmp.10.1712260003625;
-        Thu, 04 Apr 2024 12:46:43 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id n7-20020a5d5887000000b00343d38ee4a2sm164430wrf.11.2024.04.04.12.46.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Apr 2024 12:46:42 -0700 (PDT)
+	s=arc-20240116; t=1712260421; c=relaxed/simple;
+	bh=0dykGMEIzzbTlo2r7m+D7cx0I5fgw0FXn+BBmF6bBqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D5Q4O0QJzXz09noioYCw6Y2O6xt647rjydkI2jxKxpatHMat7z149NjSwBeuCxQz6eSptu2bktD3humaXZKv1aTxF2kh+ri1vsv5ENT6/zGOQbWzdv7fCg2vlsUp/jsp2xg5pWreF5nKPQ2xX9zMN7U6XHMsEtaG+61ozUsOtA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eWYsq6cd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C218C433C7;
+	Thu,  4 Apr 2024 19:53:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712260421;
+	bh=0dykGMEIzzbTlo2r7m+D7cx0I5fgw0FXn+BBmF6bBqw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eWYsq6cdE8XB4cOK3AWiv8n3QZ7i+7Ni1D2SBgpPsoYmtOFo/K4li1lmayQOYqU6q
+	 yjJTyvuJ5jQ+QyIfywyVFnIBRMS+2hpTwxhuyw2AAJ/3mpZNLqL2kUWAup5M/JCwmW
+	 GfkQukIkoYzg/l4zheIQqzIDwvb4q8PN7bQqJN88/bfgTmNecNNjN7SXZhCyMnFJ33
+	 yjOhjoRGqEACQJOfyDf19bxVqjG5HrBw/1ueT4Q3dgELG190YplzvA5VKJsQtEAcA4
+	 10wMY21RPYKmLtjkHEZFB0RYx8AS3+FbXAtKQ+bhfIt/25Rh6alrkzNUvICWuTt81A
+	 Yr2fUEFzJTWug==
+Date: Thu, 4 Apr 2024 12:53:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, David Ahern <dsahern@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoph Hellwig
+ <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko
+ <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Itay Avraham
+ <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Aron Silverton
+ <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Andy Gospodarek
+ <andrew.gospodarek@broadcom.com>
 Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
- David Ahern <dsahern@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Christoph Hellwig <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, Jiri Pirko <jiri@nvidia.com>,
- Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
- Saeed Mahameed <saeedm@nvidia.com>,
- Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
- <20240402184832.GO11187@unreal>
- <cefa2b9a-4227-969e-d31e-c19a552b9c1c@gmail.com>
- <20240403190012.GV11187@unreal>
- <d75ee9d5-36a9-4056-a0f3-0c05b2e744aa@kernel.org>
- <20240403170149.7d2b8f2b@kernel.org> <20240404122338.GI1723999@nvidia.com>
- <20240404074850.19ecd52e@kernel.org> <20240404174728.GL1723999@nvidia.com>
- <d0b11055-1804-515b-7916-cb83a6274955@gmail.com>
- <20240404183540.GX11187@unreal>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <d09cc7f0-3e2c-f22d-51ce-43a36412425b@gmail.com>
-Date: Thu, 4 Apr 2024 20:46:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+Message-ID: <20240404125339.14695f27@kernel.org>
+In-Reply-To: <20240404183305.GM1723999@nvidia.com>
+References: <2024032248-ardently-ribcage-a495@gregkh>
+	<510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+	<Zf2n02q0GevGdS-Z@C02YVCJELVCG>
+	<20240322135826.1c4655e2@kernel.org>
+	<e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+	<20240322154027.5555780a@kernel.org>
+	<1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+	<0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+	<20240402184055.GP946323@nvidia.com>
+	<83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
+	<20240404183305.GM1723999@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240404183540.GX11187@unreal>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 04/04/2024 19:35, Leon Romanovsky wrote:
-> On Thu, Apr 04, 2024 at 07:06:53PM +0100, Edward Cree wrote:
->> Why?  What does the kernel get out of it?
->>
->> Maybe *you* need them to be supported, but maybe you should have
->>  thought of that earlier in the design process.  ("A failure on
->>  your part to foresee the eminently foreseeable does not
->>  constitute an emergency on mine.")
->> If we let folks bypass our standards with a _fait accompli_, we
->>  don't really have standards in the first place.
+On Thu, 4 Apr 2024 15:33:05 -0300 Jason Gunthorpe wrote:
+> Uh no, mlx5 already has an excellent in-tree driver, thank you very
+> much. The configuration is not changing the driver, it is changing the
+> device.
 > 
-> Sorry, who are "we" and what are "our standards"?
+> Consider, I can ship unique devices pre-configured for each site's
+> special needs. They still work with the same inbox driver.
+> 
+> In fact that happens already for certain large customers. It is why
+> Jakub recently pointed out that Meta doesn't need any
+> provisioning/mlx5ctl/misc driver. They just buy different devices than
+> everyone else.
 
-As should be obvious from context, "we" in that sentence referred to
- the mainline kernel.  And while participants in this thread currently
- disagree on what "our standards" are, I hope it is not contentious
- that the kernel community *does* have standards as to what code and
- design is acceptable for inclusion.
-Necessarily, for those standards to be meaningful, there cannot be an
- exception for "oh, but we already built our product, it's too late
- now", otherwise everyone would just ignore the standards and then
- demand to be merged anyway.
-That is true regardless of the specific standards in question.
+> Further it is really rude and inappropriate to say that some customers
+> should not be able to enjoy intree drivers because of your aesthetic
+> opinion of hacks in a device's design.
 
-> And, please, please reread the thread, it is not about devlink at all.
+To my knowledge the "customizations" are mostly around fitting into OCP
+servers. Those unfamiliar with how hyperscalers operate can mentally
+replace $hyperscaler with HP or Dell in your message. Minus all the
+proprietary OOB management stuff those guys also provide.
 
-Please, please, reread the email to which you are replying; it is
- not about devlink at all.
+> Overreach. The job of the kernel maintainer is to review the driver
+> software, not the device design.
 
--ed
+Agreed. I rarely if ever comment on what I think about device design.
+
+Discussion is about mlx5ctrl not "the device" as much as you'd like
+to equate the two.
 
