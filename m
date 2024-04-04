@@ -1,193 +1,155 @@
-Return-Path: <netdev+bounces-85029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982038990A4
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:59:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5C788990FD
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 00:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B3FE288D78
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:59:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 388ED1F22E7E
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 22:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8A113BC38;
-	Thu,  4 Apr 2024 21:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D00F13C3DE;
+	Thu,  4 Apr 2024 22:07:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNWNQPHj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QgLDaApk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912BE12D1EF;
-	Thu,  4 Apr 2024 21:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FED713C3D9;
+	Thu,  4 Apr 2024 22:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712267977; cv=none; b=rK/FJktN4NWUG9f+VO1NjwXhAHXUBoC+tjonoo0D9oT3lV+01QOO/bdk6pxSt1uRrKYPsUFFNw6YpsF2jKaJCnvvRu6DfmVQsR0ASF4cVQbHlHwoIiklVCE2CwKog6VJsWSrVu0jYVTJ45tnwtCi1AXwp71icL2gHr90WSF/kn0=
+	t=1712268452; cv=none; b=k2Lru5pNDMO7eG6tdEb8irQKQwPvP6ytdq/DY7pvtSYeh40PpINNteiW1XnWlF3aOhj/htMKAFqaTgtK5XGtx36U8OpKCYfTNPIFoMQZIE9kFU0U1bi85Fs9EVQSiCSnn00PUPXerzQ6QuQe++mZrjlD3H21YfA8gMEkTPlF1Jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712267977; c=relaxed/simple;
-	bh=sX9uoGi43CCPt+PhgNoq1Pq6O7XF0XaBCfZQ7zRFB7Q=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ZaHwU2jfqR1/rZZRJ68jSp3zKECnexO99tCiZOZVNWyGUofMXhRfuTcP0l5HbYI5szPr8bDpVMQO69ShIcRr9ncWIwYeKZ4f25UZuFh4fsAU7z4AxPiLh87Mo6LYvlMSMiMguczvd6XteNVwdgbWrCWHy2YUPzfHLX0qlPFPD3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNWNQPHj; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1712268452; c=relaxed/simple;
+	bh=AjvuPzaZCOzpiQVfLOn/AmFNJ7anIJ2tJ90YdBIhnKs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pq/1UoQSWGgpkSamhvODRyaWjKhVIF4oDfGLSALaDJwMCi2YrP1c3TOfvicfTXZFPCCB2u86FhK925qGDhMqiG3pck/OqHsl1vckhAlY9JisoUxs0dVMnvwkWsEsxGy3ZubRQPX+kWXx7037hjGdu4Rhfwm1WSKpDqDg/uljJkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QgLDaApk; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ecf3f001c5so884972b3a.1;
-        Thu, 04 Apr 2024 14:59:35 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-343c891bca5so608824f8f.2;
+        Thu, 04 Apr 2024 15:07:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712267975; x=1712872775; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1712268448; x=1712873248; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CrkGHjiHmUY/gKDbNB9chzEuUYm95/thM+vcpjSq034=;
-        b=kNWNQPHjzyiqL6K9Ga5lqU1DdLzNgYgJgH06yqDCxRH5nfsBgXu9HPHhBV0Z+vlkGU
-         3mtTAzmVy7bK6lmg0LjwZfQLwnZ8phYF1d2fd9FiOoDEeS3iSCswavdmMklTGDUoOVLc
-         stsbUN+OQvU3d8y4oqtC5j7x8rlapXVeFNtVH/QNMFzTeVMR7B41bLUD0aeCsfZC7/Be
-         mHdBeGmTPPTlpBVi8iEJ6E6u3wiBT+qU9Bi+Amtvws3S9jb2p2CEUdJ/CA9gzvjfgWGM
-         wEDDaXY3zMHjLF+6VLaVzUO3lnLWvHa5pxlQmAi7yPfP65MDLRpNyo8FuAs6+t/WheuZ
-         LKIg==
+        bh=AjvuPzaZCOzpiQVfLOn/AmFNJ7anIJ2tJ90YdBIhnKs=;
+        b=QgLDaApkpEkXiMeZ6MtJmWyhxAQnBUVtvfUqAqDRUbO9aw77utl/+M494o8eUqm/el
+         yKc99+g0Luif38DVeny5OoGbAToKp1v8a32HCYvmFJU5yIQCWblPa+KYupv8dbP0XeSn
+         DkE/oVHXGFIRxdzzKmAt3S7Z77fv/qycihI+MKrTYqpChociVtu3kO7+lZ1K4imZmzj3
+         2uoxva7+/tC97VFotDY+430fH0mvDJHksgxqpJ7c/fU41P2BQ3WkYCRHTUrcMRhG7FDx
+         eoump2DFU3l8ZnR7BHysGBNK+vwbaSH6WXPvcVxMQY9kLAr4FNBbdNIgPREQTlYXrU/J
+         TgbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712267975; x=1712872775;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CrkGHjiHmUY/gKDbNB9chzEuUYm95/thM+vcpjSq034=;
-        b=A30+M6niIR8A8C/2xdwesf8CYiNfvuqMkYHSnS+r+3wPZlEY2NCK+RFMHY+6MKdSOf
-         +XPSO9OJBphhAM4rqY/S+xgKjOJ2S8bpjZIUM6bgFBZntRhtvU9488155C18L0W8Tl2A
-         iah6uU2FYKT5H3Aupj8thqVl/OTmzVous07sc7ZtcwDCe3I50USvQMU3hfxku+au9LwU
-         8HP0zJJbInFxaJooYt+Kqk1385+9AZ+5X6qCJyrwW2D4zkHvUTiUV3YrM0ca61YYrevb
-         pax4bLszjBTKcJrdmH8SiGBbbVkYlnnrSpCw6DkG5Fr3E8lSxu56Ur5f2uAQVerr/Ieq
-         VjnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXOjblL9Myjl6nksJEB3b+Tu/9g6L1p3v7ExOPW2w0IABJAUh2ilO84WwxjBw+CRSMjLw+6QlVLaUjI36IDa8Wq1g7QFEz/eOm0mjnOZcdVVPvv/QwrdrLOYC0y5zkC1ro7
-X-Gm-Message-State: AOJu0YxU/Kk6YqoBSsfJn1baZhgm0KMUfzEiyTs7/xeDjqYSoo65eKMQ
-	FBAQQLK9avJB45bTDnWF+//SJVW89RotlKlrMHb55t6Xk+t3A24n
-X-Google-Smtp-Source: AGHT+IF54ZsQXQgdenyf/wtK819T3em8CVKGK5ZCgoJpT6TnudRX0bdsIEHuqU2V4rf1WJUlrtt3sQ==
-X-Received: by 2002:a05:6a21:2783:b0:1a7:2d38:85b with SMTP id rn3-20020a056a21278300b001a72d38085bmr3585426pzb.53.1712267974764;
-        Thu, 04 Apr 2024 14:59:34 -0700 (PDT)
-Received: from localhost ([98.97.36.54])
-        by smtp.gmail.com with ESMTPSA id i14-20020aa78b4e000000b006ecfd012e03sm134364pfd.90.2024.04.04.14.59.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 14:59:34 -0700 (PDT)
-Date: Thu, 04 Apr 2024 14:59:33 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, 
- netdev@vger.kernel.org, 
- bhelgaas@google.com, 
- linux-pci@vger.kernel.org, 
- Alexander Duyck <alexanderduyck@fb.com>, 
- davem@davemloft.net, 
- pabeni@redhat.com
-Message-ID: <660f22c56a0a2_442282088b@john.notmuch>
-In-Reply-To: <20240404132548.3229f6c8@kernel.org>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <Zg6Q8Re0TlkDkrkr@nanopsycho>
- <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
- <Zg7JDL2WOaIf3dxI@nanopsycho>
- <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
- <20240404132548.3229f6c8@kernel.org>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
+        d=1e100.net; s=20230601; t=1712268448; x=1712873248;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AjvuPzaZCOzpiQVfLOn/AmFNJ7anIJ2tJ90YdBIhnKs=;
+        b=jK0DrW9aFdAPYN+w9PokCFyC70JtiZif3YTi83a9Ivr4d3t1V5d+9zlAHUEYaC+6xK
+         qRfISb+TEqq/EnN7PVHHhQqNkmZR1ulSbyi5GLhoVP51OGmkFDPhsDYB8DIGI1p09Mb6
+         9K6zhMzyFcO64NAfiRLOYoX7NESPK6faQHK4BZAmZjMKm9h3sW3o3YbhPl5Q4/ujEmiY
+         JTzV6JhAFtTeKZxpCfkgagEb4F195zeEHSr4lmXqI3HeiCUxNdwmzlGZFOKBg3AslXH1
+         3lO4FqdiRihJGDQ42qtCH1dJ/tIb+d7uxQYR1cxaFNngJDhTOyrJYJk0nGmn8gZNaW6O
+         UbYg==
+X-Forwarded-Encrypted: i=1; AJvYcCXpl0q+k+JBv8Rbvpo9F2C5u2LjRDvVF5UdqViI7NQ218WY6mmibnw4T2bDo7I/s1Api1uBycKDyLzIYW+PFRukL+If
+X-Gm-Message-State: AOJu0Yz9QcDOX+ukU+IzsMpox4JwqFAFQ5LezXCDy1RK7Kwibeb339NY
+	DDYrD8WzRsTrJrC3idYgPZyExUcHYjrQIJkBlD3GDkkiJWDAP2ngCA6LwYM0G9bk2AcCkAgpF8x
+	19OO/afU2i0OJYqhTbaDxD6P4pno=
+X-Google-Smtp-Source: AGHT+IGYEE2XWLfYLVC5q1f8MQwSkAGP99QhnhOCs1Cvyyj1GjLUUmSVwvc+eOXYzH6rsY4aPkKDcWxhTuK28Srinys=
+X-Received: by 2002:adf:e48c:0:b0:343:ae03:2a02 with SMTP id
+ i12-20020adfe48c000000b00343ae032a02mr676485wrm.40.1712268448261; Thu, 04 Apr
+ 2024 15:07:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240404122338.372945-1-jhs@mojatatu.com> <20240404122338.372945-15-jhs@mojatatu.com>
+In-Reply-To: <20240404122338.372945-15-jhs@mojatatu.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 4 Apr 2024 15:07:16 -0700
+Message-ID: <CAADnVQLw1FRkvYJX0=6WMDoR7rQaWSVPnparErh4soDtKjc73w@mail.gmail.com>
+Subject: Re: [PATCH net-next v14 14/15] p4tc: add set of P4TC table kfuncs
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Network Development <netdev@vger.kernel.org>, deb.chatterjee@intel.com, 
+	Anjali Singhai Jain <anjali.singhai@intel.com>, namrata.limaye@intel.com, tom@sipanda.io, 
+	Marcelo Ricardo Leitner <mleitner@redhat.com>, Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, 
+	tomasz.osinski@intel.com, Jiri Pirko <jiri@resnulli.us>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, khalidm@nvidia.com, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, victor@mojatatu.com, 
+	Pedro Tammela <pctammela@mojatatu.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski wrote:
-> On Thu, 4 Apr 2024 12:22:02 -0700 Alexander Duyck wrote:
-> > The argument itself doesn't really hold water. The fact is the Meta
-> > data centers are not an insignificant consumer of Linux, 
-> 
-> customer or beneficiary ?
-> 
-> > so it isn't as if the driver isn't going to be used. This implies
-> > some lack of good faith from Meta.
-> 
-> "Good faith" is not a sufficient foundation for a community consisting
-> of volunteers, and commercial entities (with the xz debacle maybe even
-> less today than it was a month ago). As a maintainer I really don't want
-> to be in position of judging the "good faith" of corporate actors.
-> 
-> > I don't understand that as we are
-> > contributing across multiple areas in the kernel including networking
-> > and ebpf. Is Meta expected to start pulling time from our upstream
-> > maintainers to have them update out-of-tree kernel modules since the
-> > community isn't willing to let us maintain it in the kernel? Is the
-> > message that the kernel is expected to get value from Meta, but that
-> > value is not meant to be reciprocated? Would you really rather have
-> > us start maintaining our own internal kernel with our own
-> > "proprietary goodness", and ask other NIC vendors to have to maintain
-> > their drivers against yet another kernel if they want to be used in
-> > our data centers?
-> 
-> Please allow the community to make rational choices in the interest of
-> the project and more importantly the interest of its broader user base.
-> 
-> Google would also claim "good faith" -- undoubtedly is supports 
-> the kernel, and lets some of its best engineers contribute.
-> Did that make them stop trying to build Fuchsia? The "good faith" of
-> companies operates with the limits of margin of error of they consider
-> rational and beneficial.
-> 
-> I don't want to put my thumb on the scale (yet?), but (with my
-> maintainer hat on) please don't use the "Meta is good" argument, because
-> someone will send a similar driver from a less involved company later on
-> and we'll be accused of playing favorites :( Plus companies can change
-> their approach to open source from "inclusive" to "extractive" 
-> (to borrow the economic terminology) rather quickly.
-> 
+On Thu, Apr 4, 2024 at 5:48=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com> =
+wrote:
+>
+> We add an initial set of kfuncs to allow interactions from eBPF programs
+> to the P4TC domain.
 
-I'll throw my $.02 in. In this case you have a driver that I only scanned
-so far, but looks well done. Alex has written lots of drivers I trust he
-will not just abondon it. And if it does end up abondoned and no one
-supports it at some future point we can deprecate it same as any other
-driver in the networking tree. All the feedback is being answered and
-debate is happening so I expect will get a v2, v3 or so. All good signs
-in my point.
+...
 
-Back to your point about faith in a company. I don't think we even need
-to care about whatever companies business plans. The author could have
-submitted with their personal address for what its worth and called it
-drivers/alexware/duyck.o Bit extreme and I would have called him on it,
-but hopefully the point is clear.
+> Note:
+> All P4 objects are owned and reside on the P4TC side. IOW, they are
+> controlled via TC netlink interfaces and their resources are managed
+> (created, updated, freed, etc) by the TC side. As an example, the structu=
+re
+> p4tc_table_entry_act is returned to the ebpf side on table lookup. On the
+> TC side that struct is wrapped around p4tc_table_entry_act_bpf_kern.
+> A multitude of these structure p4tc_table_entry_act_bpf_kern are
+> preallocated (to match the P4 architecture, patch #9 describes some of
+> the subtleties involved) by the P4TC control plane and put in a kernel
+> pool. Their purpose is to hold the action parameters for either a table
+> entry, a global per-table "miss" and "hit" action, etc - which are
+> instantiated and updated via netlink per runtime requests. An instance of
+> the p4tc_table_entry_act_bpf_kern.p4tc_table_entry_act is returned
+> to ebpf when there is a un/successful table lookup depending on how the
+> P4 program is written. When the table entry is deleted the instance of
+> the struct p4tc_table_entry_act_bpf_kern is recycled to the pool to be
+> reused for a future table entry. The only time the pool memory is release=
+d
+> is when the pipeline is deleted.
 
-We have lots of drivers in the tree that are hard to physically get ahold
-of. Or otherwise gated by paying some vendor for compute time, etc. to
-use. We even have some drivers where the hardware itself never made
-it out into the wild or only a single customer used it before sellers 
-burned it for commercial reasons or hw wasn't workable, team was cut, etc.
+TLDR:
+Nacked-by: Alexei Starovoitov <ast@kernel.org>
 
-I can't see how if I have a physical NIC for it on my desk here makes
-much difference one way or the other.
+Please drop this patch (all p4tc kfuncs) then I can lift
+the nack and the rest will be up to Kuba/Dave to decide.
+I agree with earlier comments from John and Daniel that
+p4tc is duplicating existing logic and doesn't provide
+any additional value to the kernel, but TC has a bunch
+of code already that no one is using, so
+another 13k lines of such stuff doesn't make it much worse.
 
-The alternative is much worse someone builds a team of engineers locks
-them up they build some interesting pieces and we never get to see it
-because we tried to block someone from opensourcing their driver?
-Eventually they need some kernel changes and than we block those too
-because we didn't allow the driver that was the use case? This seems
-wrong to me.
+What I cannot tolerate is this p4tc <-> bpf integration.
+It breaks all the normal layering and programming from bpf pov.
+Martin explained this earlier. You cannot introduce new
+objects that are instantiated by TC, yet read/write-able
+from xdp and act_bpf that act like a bpf map, but not being a map.
+Performance overhead of these kfuncs is too high.
+It's not what the XDP community is used to.
+We cannot give users such a footgun.
 
-Anyways we have zero ways to enforce such a policy. Have vendors
-ship a NIC to somebody with the v0 of the patch set? Attach a picture? 
-Even if vendor X claims they will have a product in N months and
-than only sells it to qualified customers what to do we do then.
-Driver author could even believe the hardware will be available
-when they post the driver, but business may change out of hands
-of the developer.
+Furthermore, act_bpf is something that we added during early
+days and it turned out to be useless. It's still
+there, it's working and supported, but it's out of place
+and in the wrong spot in the pipeline to be useful
+beyond simple examples.
+Yet, p4tc tries to integrate with act_bpf. It's a red flag
+and a sign that that none of this code saw any practical
+application beyond demo code.
+We made our fair share of design mistakes. We learned our lessons
+and not going to repeat the same ones. This one is obvious.
 
-I'm 100% on letting this through assuming Alex is on top of feedback
-and the code is good. I think any other policy would be very ugly
-to enforce, prove, and even understand. Obviously code and architecture
-debates I'm all for. Ensuring we have a trusted, experienced person
-signed up to review code, address feedback, fix whatever syzbot finds
-and so on is also a must I think. I'm sure Alex will take care of
-it.
-
-Thanks,
-John
+So please drop all bpf integration and focus on pure p4tc.
 
