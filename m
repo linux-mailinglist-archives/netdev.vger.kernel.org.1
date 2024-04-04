@@ -1,335 +1,260 @@
-Return-Path: <netdev+bounces-84826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C86D1898735
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:22:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1475898737
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:22:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FC101F28C01
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5658B298871
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5B212880A;
-	Thu,  4 Apr 2024 12:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8EA85269;
+	Thu,  4 Apr 2024 12:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ru31sPeu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q7KvogI2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2429128396
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712233255; cv=none; b=C5w7PBncWixfqHzq6avas0PRuY9tghzkJs0TNXKrYUbIYKvt2v+GcLQi2lsDmU8mQ68JQ+7fT4Vqv4dpsVcAdRyPVQ2iyDTU3lONgWFXs20W4/BzRrQ9Aq8r9v0ZtOxvANIkcSrZ2wulcb8SnZoi2DcWUi9zsqjx0/Ww65t6h9Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712233255; c=relaxed/simple;
-	bh=REMktHm+FgsBlVxWcUnKMoKuAz8bxajqkfWFiry5Gao=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tznSq7UVk+H0fCeSJCY7PRD3AI18U6apettPnTeM5HibatRUclcVkbRDX/QvEcYvOlitICLqZ7WJzjm2yQ7diKt/NL6m+bZGAjisq3eL6DZcsGvEp7OG/FC+3j2Pu51sidkGw2ndSboYDdQgRuFqE+tOB/xKXw88BkYk7uWGEX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ru31sPeu; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61504a34400so15138557b3.0
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 05:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712233253; x=1712838053; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=z1/n+j8eXXMQvld3HNZDBdZPz3kRpN0A4qvNXNbcDlQ=;
-        b=ru31sPeuc5JQD+msylTDogEQGe0bMwVOgQHURw8dK3TEaxXtK2T5op9xg8I+XAriZC
-         txmKucrtNzwYN8mtYYRZFAsaCs8cZjHajAUV9+Kz7yLjiOiI/3k/TP5eJji8uN0A3+4M
-         wfuHD+psUcvqiiex2wgd9E6ArI7okwfdroLcv4sBToCG6fD5e/u1K+zfCUbTEq+sFr0Y
-         Zc9DzlK9EBvBByd5mgVSoRJZ3utkxsNh7/bFGUfnnoqX7fOHo0saMLzwiHvoef/RWgBY
-         6uNsthmTWY2mnFhaoG2XHdC47hKzW0WT0akJuvXZVcdz1hnewBrZUhgbAc8JZqzLxYef
-         h36Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712233253; x=1712838053;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z1/n+j8eXXMQvld3HNZDBdZPz3kRpN0A4qvNXNbcDlQ=;
-        b=RJ5Il4jkpZMSSx4rhk14N53tFp48GpR90O6hrBOyO3eZIhUp87Yb0z4pfFPGTSdvyY
-         z20JpShMzXNh1Bv2Az8JxDcyQMpJdc299BTv3qAqS0W9r6Tirk7L1MEHvy2XTHOsxzeS
-         d20th5TXk3pAVlkM9pvJdw87aNCiAwh/pqWjdQP3gvResXoSgOcIDtimjxF5C7TuleUP
-         zsdxT0LalyOaE/FLpz297AuoT6JQBlidl3GqyZAViMRwUH7Y/LJguY2WoitTqVXNYQaE
-         SQywfCKJgj2vIIP6VDr+6250ks7Zq/Whe5O4/Is66AQiwvbp3TsmdLx+OEWSphvWiEqg
-         n3bA==
-X-Gm-Message-State: AOJu0YxpJLZ93Nu7L0ZpaC5RqO+3LujC72x2K3JbXdgmjOGhy/HstQt1
-	nZOp8IXJ6Yk3dDffsUpBFoJ4H+MWi5AErjNJOVCACfXHYh4m+hFvW7zJ1XLGmLIrVEbZH6TPEuW
-	11lP80I64OQ==
-X-Google-Smtp-Source: AGHT+IG3atDXWHSI6gSFYPwti52AhtGvlDYdzQKq0dexwBQhd8pnPjnTO0eGQTnY44srL142e5wIgkRWA6Fr/w==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:4e89:0:b0:615:737c:2864 with SMTP id
- c131-20020a814e89000000b00615737c2864mr534480ywb.2.1712233252873; Thu, 04 Apr
- 2024 05:20:52 -0700 (PDT)
-Date: Thu,  4 Apr 2024 12:20:51 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F90F85280
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712233310; cv=fail; b=C0QeGcUAWMDb7soKNstJEUFdHFnNTnOple6EQmSa0cHNEXckks9U0xYs2mj4Dg+LlUeFor35XoPZFdWJLB/I7N7klSUGsx7Ny1KsMGh+7ES1oPuDvNQglQkU3Ny7pGj7e7Nrkhq4yYLeGXjVFuTauW+a1dyjWQvExSgWYjtqbrQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712233310; c=relaxed/simple;
+	bh=vbdY3vNHg+7lqtwWgKZ8nocv0OCNqa4cqx2e4efziSE=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Lvm8xsffMvt1zTDjTkBpQMhIjCni7me0CL35C1hmkVshJqURXgqapBM5+QYz4g1iai6rBGwDxAQ7gduh1rNRXc24XYx7+zPUJYCBV3phM3f4yvJW0O00xII/I3WwNWb24QoxkGp/i3WjoVD/1SJ43TZASb1TzCh5Cy7f8d+NNFY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q7KvogI2; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712233303; x=1743769303;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vbdY3vNHg+7lqtwWgKZ8nocv0OCNqa4cqx2e4efziSE=;
+  b=Q7KvogI2cs03Rjte1L4hU4Rug1W2dSQ+B02fBP0lVNj9R/aySeqx0xyb
+   mqWqPJTkxjCk9H/Fo+7yWFIVGT2ZEW2RkmWnPwiRD/bfLCxV63Vf6rgaz
+   4emCA0ls7jYalgLTELheorGW0bPL0ZPG+EuvzhQLbtnB4IRtobqT5kjBP
+   eivkVERxHztL5ra3f8Wor35l0lusm5FgDDPAtRdq5KZW6kLkB7EDENzaY
+   BOqt3wA3/u073Apz58Q5qrZ3rJMG16y/iePD3G0CvYos4D/psdiE/u+rR
+   R9yvEyWiDbYNEqf8Z8CzQaGSTc08HqQObj9vRblsGDsx1vzpBYImzipZP
+   Q==;
+X-CSE-ConnectionGUID: h1pUIW/aRW+No3ILoCgd4A==
+X-CSE-MsgGUID: F6IQvv5OSZK7iqmz+qFrwg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="24964399"
+X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
+   d="scan'208";a="24964399"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 05:21:42 -0700
+X-CSE-ConnectionGUID: EezprMb9Sd6+djwo0+bl1Q==
+X-CSE-MsgGUID: goWGnrBFQhuD3BPXVn5cZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
+   d="scan'208";a="18885789"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Apr 2024 05:21:41 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Apr 2024 05:21:40 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Apr 2024 05:21:40 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 4 Apr 2024 05:21:40 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 4 Apr 2024 05:21:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nT26IhvpEmOdH5U5PAIEPwNZzmrzcj+TJ2wy0IxCVn0RYbcwaqG9FvugiJ0lGR9iF6rZbTYOKMdJbsRxf13QqUe/NMR1VORy93VccUyc3yn0ayJ4SbxWmVeNtun4DhrctS0+4LYK5q2vns+LANmwc/SvB35RIx2Us31KyagFtIVTih9/aN20TPQaAAmYQFFLpDUCNIZazokTH/gXqoLdFtaX5QvcO+C9aGO+V4vMO/B6NR9fHvZNgRrqHeCBWtZ15lc0/f2tJT33G+2+nB+RwMEUIE7QWpf+a9WugyEeCZU+S1cpiiDFGhdeSYa4WfnZD69XvMLdXUtk8OPNZKkVUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7VZXuNDxXYy4j8sWNLAz68btZiDvRy6kyqwD0g3MeiI=;
+ b=R08yWcMn7NeMsuY0lVG6qCpM5l4FJY072VhfYV0/DXwQNQpAL29+iH2JzK5RlajU3/8UBLHR2F8UQng+9bm45yQidoe/XvHvFGA+LiaB+TxJTNw5ErURVkrexof2ht+FrtLSHCmyxPplmF6wdJ6Ri1XyJwjjinCaDTbArIF+/fKxscmzuALmuNbbrvZhtf9f95dPPQ3Uvrygph2OF2qQqb6DJUu1wCocbhg/p4uQyLb0xFYkfmkQDl8g22BK7LLzAAF73xp6xrZNzMNprDz+c3oCruse+MbO4lM2egu8w/mHzApfPbWOwmf4m2R36EXFEE3xuRnM38IZF5uMF0k3Ew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by DM4PR11MB6094.namprd11.prod.outlook.com (2603:10b6:8:ab::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.25; Thu, 4 Apr
+ 2024 12:21:38 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Thu, 4 Apr 2024
+ 12:21:37 +0000
+Message-ID: <10ec952c-fde1-49b3-b606-38e3536e4070@intel.com>
+Date: Thu, 4 Apr 2024 14:21:31 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <idosch@nvidia.com>, <edumazet@google.com>,
+	<marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
+	<kuba@kernel.org>, <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
+ <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
+ <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+ <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
+ <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
+ <7b0b3d27-c21d-4765-875b-2dd4681a2ba4@lunn.ch>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <7b0b3d27-c21d-4765-875b-2dd4681a2ba4@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI1P293CA0019.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:3::16) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240404122051.2303764-1-edumazet@google.com>
-Subject: [PATCH net] netfilter: validate user input for expected length
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|DM4PR11MB6094:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: CLlNLZZcTQX1jPLyEFay2FwCrpEEyHspm2RYxak1YTiua8THqoeAexJQ58CI9GXIFwAm0itdOTugjhBgN5sA8BePBtUmV2cBsxsrzBDVdz90g/twuIg2OU0+aAlCWGtTaQXKDQSRmBxUfdjrsLxwMM6BOl2QADV2NUBXeYR/FSeFb3ZMi2skDCdIZuzHf1pJqSg7bmVq2Ks5q7gdz7czDbK2u2gF3QIbBdf5EFdhlYE4zmj4rAFxe7sFU9y3aSLLc7iMABB9ZaLTh5qQldtuMmGOPTQBWD8ZWB4YSc6vwfuZhk0OFvg1LMAe0jdyZo2FAjqhWLwbdJlLDkKbZ2ojBH/CYnmHwqD+y8AF7pnRFYf0Gx/8M1TzVz1ONOW4LBbg1joFJqwNI7SytXIMr2zrQ6NfCW7ftrsZdQDtRFu/1ohjH/M8jzlSOUmwvBYZKhB4KwefarZIPSgBB1gG5uxrprkYe/UOMBRH4ntDVlXyxlzu5A5rljOHkRLMRhaB3yvtV1xD0rx4gWKx5qnQI9KAXNDzFpAYkcB7OA4XOKUOZP34oh11eC3GiWoXMpuF+GSUnQP4NbmXvUth+bLlaHa/kRToGzLIFFIxq0JHQpzXMHU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZGMyTXJRVDZ3cWd1b3VoSnNMRm9wZ3N4dGdNekE3WncvUFIxZzhMVlNNU05E?=
+ =?utf-8?B?MDZvRE1KemJ6aytRR2VBWkpNdHJjbU00VnhENUZNQ1IyUmVDSG5HYXNTQlAw?=
+ =?utf-8?B?Q0FlZW1HTEVFN0hrUHE5dkRFN2o5OE9pME8xQ0dKS0xRQ0xDdFUvdldsU3lN?=
+ =?utf-8?B?Mm1BOURSNkUwTmVTb0F6TTNhVXVXcGpUSVJyZTV0dXdQVE5RbEdXV20yc0hB?=
+ =?utf-8?B?c1BzSDBTM0FGK0hQWmxqc20raXR1SFpGYXhaaTFvZ254T29uLzZDOUFOZW9D?=
+ =?utf-8?B?NnBUa0ZzY0pnekpEQ3liSW5jdWJVN01GeG1qTm5vUmhUckI3cmlBSUxBVmx1?=
+ =?utf-8?B?QjdWelNMY2x0VnNJUjVZdk02VnFOUitUOU1IQzd4NkQyUEpqSjI2ZFdoeWsx?=
+ =?utf-8?B?TnZjMHR6cTJ5Unp1cER3V0dnZWEyRGdGVGw4WE5xQlorTy9rbXp2R2dxVFBV?=
+ =?utf-8?B?YzVJY2ROSVJVMlNBSkc5SGNDZ0pLRS9HdGV3SEJSRWMrY0xtQ045R0o5bTZr?=
+ =?utf-8?B?cWo5VXJ1b2FRdFpzbVB3ZXpGK3IvV3VkUEJPQVphMHZ1N1g1SWhyRWE4VHVr?=
+ =?utf-8?B?RmlYdWo1eXZCMGpXL0h5Q2Rxa1UyMG9wZUd5eXovb3NEVWRuQys0ZkR1SWR4?=
+ =?utf-8?B?ZWN1TmRPbjdqUThSUFVUVDdvUnNJS2J4RU51d0RqMHlmejVYUkdtdHZESHVM?=
+ =?utf-8?B?cXpGb0FyV24vWXU0TkFnRkJ4cENnNUNoMkNJUEF5UmlHRktMRXRTTzNRVG1a?=
+ =?utf-8?B?VU84K3ZOb1FlZzRJMld4VnZqdDRRNDlReGcrb29qY0tWbFVxcHpmOE9qVSti?=
+ =?utf-8?B?ZGtheXladzNjZ0ZjRXNPakVGTS9FNXJlQ2NBSCtqZFZOY3BpblBBdDI1d1V6?=
+ =?utf-8?B?MWZKR2NkeUh1K3c2QWJmSm5ybUJCdEtGZzNoM3pxRUV4VDVsbG1zU2NFeUE3?=
+ =?utf-8?B?WUhhS2Qvb2ptaTA0bTdGTTBraHJCZFVldHNPaFYydDZZaHVGS042UmZkbHpJ?=
+ =?utf-8?B?TzR5ZGovZTVCK29kemxSNElFMVo0QlJvZmQ4VWpEOXh3Q205Ykxud0VLWjlr?=
+ =?utf-8?B?a215VkNkU0tmbnNZV3RZZVJ1Ky94SWpmQ3FJcXlNeTIzTldXNi96K1lIR2ky?=
+ =?utf-8?B?UklOcmFQMVozV1I3NlJCaFl6eXBBTTZyZHh3ODlIN3QzTGx4VDhUSjgvREw3?=
+ =?utf-8?B?Q2tCU2k3Vk1obEM0TVZQQW5IMzNmOVAweWsxN1VTMDMzZ3ozZzFSaWNwb1Qw?=
+ =?utf-8?B?VmdBY0dPeUt3eVh6bERRbjVsUDdvMnhKOThvaW4zVEp2ZmJtTjRWVFFQMlJj?=
+ =?utf-8?B?ajlQbTd0bWNGRmtaQ0ZjS3JTRS81V1VOcEVSd0daYWRXR3pWL0Ywa0NCUzJl?=
+ =?utf-8?B?dDlsTGxseTVVQ3FET0dPWUZlSytBa0pKZS9CQzk4S1BFSDN0dkFLNngrQmdp?=
+ =?utf-8?B?NmhEd1ZmRnpLcmtGUHNvSFgzVURuV2t4blQxSXM1ajJzY3Y0aWFEaFZrS2hB?=
+ =?utf-8?B?MjRFaitmT0tYYmdtZ2p4WW5KaDJWNTNER3l0bFZrT2hOemNPaSt1MktIQXpx?=
+ =?utf-8?B?dnJwNDQ4NFNVSndyeEVkb2NzZTFNZDRoMmZMbTFmZmdFZllTMzc2eCs4R2Nv?=
+ =?utf-8?B?MHdrOTNxVUdPUUxYYzRFa2p0VGtRUVY5c0poUHBHdEVvWnJ2ZHZ5MUpqTDVl?=
+ =?utf-8?B?dXhINDJMWVh2WDlicFpIb1JqcW9YZEtLSHJhR1RLN2xCWWVZbi9RQU9FcFY5?=
+ =?utf-8?B?ZU9DMXhBZkdqRVI5czBoSVU2UFJ5NGp5UWZwVGRiNWM4TngrZXpZZnJaU0xp?=
+ =?utf-8?B?dGpjODJKRzRNaFZNYU0ydmxveERPSHJiRU90a2llbFBTWjJjSkltNGFESW1a?=
+ =?utf-8?B?aXA1S1k1NWpyV05mMWVsTWNPYkZFc0x5MUlrSTBsTVF5dHlOQ0REK0F3dVNL?=
+ =?utf-8?B?WC9RaHdxNFZEa1dyUW8vMVlZYUFuUDJMdFYxWFk3V2VqNDhkVytqcDdEK2lO?=
+ =?utf-8?B?NHdDcU5sQURMRWJqemgwTVBBcTFuR3ZLSHZhb1lHRXZ5bzBSRWFpU2o0K3hX?=
+ =?utf-8?B?L3pYY1M3djVJcGg2SmVmTHYwRCt0Q1J1eGhQQUllZHU4bXdJMUhHRlVyRHla?=
+ =?utf-8?B?S0FzalYxS1NIQ21KZEc3Q3E3dmtUNG9EdG1hWXIwRlBsUFRFME1BdEQyWWd3?=
+ =?utf-8?B?VkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddab90fe-69e4-4932-8724-08dc54a1c640
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 12:21:37.5131
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qH9Vsr+kOLrGkfXnK/k/soQSD98ba/x9bi7lvH5SSvZ91PrliTFI5xsnP4bxlImNYCOT2Swhd+E5Iydj2sCtOVMWVBHtvG5WybUBUrBDc5c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6094
+X-OriginatorOrg: intel.com
 
-I got multiple syzbot reports showing old bugs exposed
-by BPF after commit 20f2505fb436 ("bpf: Try to avoid kzalloc
-in cgroup/{s,g}etsockopt")
 
-setsockopt() @optlen argument should be taken into account
-before copying data.
 
- BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
- BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/sockptr.h:55 [inline]
- BUG: KASAN: slab-out-of-bounds in do_replace net/ipv4/netfilter/ip_tables.c:1111 [inline]
- BUG: KASAN: slab-out-of-bounds in do_ipt_set_ctl+0x902/0x3dd0 net/ipv4/netfilter/ip_tables.c:1627
-Read of size 96 at addr ffff88802cd73da0 by task syz-executor.4/7238
+On 03.04.2024 15:40, Andrew Lunn wrote:
+> On Wed, Apr 03, 2024 at 03:18:44PM +0200, Wojciech Drewek wrote:
+>>
+>>
+>> On 02.04.2024 16:46, Andrew Lunn wrote:
+>>> On Tue, Apr 02, 2024 at 01:38:59PM +0200, Wojciech Drewek wrote:
+>>>>
+>>>>
+>>>> On 30.03.2024 22:57, Andrew Lunn wrote:
+>>>>> On Fri, Mar 29, 2024 at 10:23:18AM +0100, Wojciech Drewek wrote:
+>>>>>> Some ethernet modules use nonstandard power levels [1]. Extend ethtool
+>>>>>> module implementation to support new attributes that will allow user
+>>>>>> to change maximum power. Rename structures and functions to be more
+>>>>>> generic. Introduce an example of the new API in ice driver.
+>>>>>>
+>>>>>> Ethtool examples:
+>>>>>> $ ethtool --show-module enp1s0f0np0
+>>>>>> Module parameters for enp1s0f0np0:
+>>>>>> power-min-allowed: 1000 mW
+>>>>>> power-max-allowed: 3000 mW
+>>>>>> power-max-set: 1500 mW
+>>>>>>
+>>>>>> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
+>>>>>
+>>>>> We have had a device tree property for a long time:
+>>>>>
+>>>>>   maximum-power-milliwatt:
+>>>>>     minimum: 1000
+>>>>>     default: 1000
+>>>>>     description:
+>>>>>       Maximum module power consumption Specifies the maximum power consumption
+>>>>>       allowable by a module in the slot, in milli-Watts. Presently, modules can
+>>>>>       be up to 1W, 1.5W or 2W.
+>>>>>
+>>>>> Could you flip the name around to be consistent with DT?
+>>>>
+>>>> Yea, I'm open to any name suggestion although I don't like the unit in the parameter name :) 
+>>>
+>>> That is a DT thing. Helps make the units of an ABI obvious. However,
+>>> milliwatts is pretty standard with the kernel of user APIs, e.g. all
+>>> hwmon calls use milliwatts.
+>>>
+>>>>>> minimum-power-allowed: 1000 mW
+>>>>>> maximum-power-allowed: 3000 mW
+>>>>>> maximum-power-set: 1500 mW
+>>>>>
+>>>>> Also, what does minimum-power-allowed actually tell us? Do you imagine
+>>>>> it will ever be below 1W because of bad board design? Do you have a
+>>>>> bad board design which does not allow 1W?
+>>>>
+>>>> Yes. in case of QSFP we don't support 1W, 1.5W is the minimum.
+>>>
+>>> So if i plug in a 1W QSFP device, it will let the magic smoke out
+>>> because it is force fed 1.5W?
+>>>
+>>> Looking at
+>>> https://www.optcore.net/wp-content/uploads/2017/04/QSFP-MSA.pdf table
+>>> 7 it indicates different power budget classifications. Power level 1
+>>> is a Maximum power of 1.5W. So does your parameter represent this?  It
+>>> is the minimum maximum power? And your other parameter is the maximum
+>>> maximum power?
+>>
+>> Exactly as you described, minimum-power-allowed is in fact minimum value
+>> which maximum-power-set can be set to (so minimum maximum). the other
+>> parameter is maximim maximum.
+> 
+> Table 7 in that document is titled "Power Budget Classification". So
+> how about
+> 
+> minimum-power-class-allowed: 1000 mW
+> maximum-power-class-allowed: 3000 mW
 
-CPU: 1 PID: 7238 Comm: syz-executor.4 Not tainted 6.9.0-rc2-next-20240403-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Call Trace:
- <TASK>
-  __dump_stack lib/dump_stack.c:88 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
-  print_address_description mm/kasan/report.c:377 [inline]
-  print_report+0x169/0x550 mm/kasan/report.c:488
-  kasan_report+0x143/0x180 mm/kasan/report.c:601
-  kasan_check_range+0x282/0x290 mm/kasan/generic.c:189
-  __asan_memcpy+0x29/0x70 mm/kasan/shadow.c:105
-  copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
-  copy_from_sockptr include/linux/sockptr.h:55 [inline]
-  do_replace net/ipv4/netfilter/ip_tables.c:1111 [inline]
-  do_ipt_set_ctl+0x902/0x3dd0 net/ipv4/netfilter/ip_tables.c:1627
-  nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
-  do_sock_setsockopt+0x3af/0x720 net/socket.c:2311
-  __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
-  __do_sys_setsockopt net/socket.c:2343 [inline]
-  __se_sys_setsockopt net/socket.c:2340 [inline]
-  __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x72/0x7a
-RIP: 0033:0x7fd22067dde9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fd21f9ff0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007fd2207abf80 RCX: 00007fd22067dde9
-RDX: 0000000000000040 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007fd2206ca47a R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000020000880 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fd2207abf80 R15: 00007ffd2d0170d8
- </TASK>
+Sounds good
 
-Allocated by task 7238:
-  kasan_save_stack mm/kasan/common.c:47 [inline]
-  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
-  poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
-  __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
-  kasan_kmalloc include/linux/kasan.h:211 [inline]
-  __do_kmalloc_node mm/slub.c:4069 [inline]
-  __kmalloc_noprof+0x200/0x410 mm/slub.c:4082
-  kmalloc_noprof include/linux/slab.h:664 [inline]
-  __cgroup_bpf_run_filter_setsockopt+0xd47/0x1050 kernel/bpf/cgroup.c:1869
-  do_sock_setsockopt+0x6b4/0x720 net/socket.c:2293
-  __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
-  __do_sys_setsockopt net/socket.c:2343 [inline]
-  __se_sys_setsockopt net/socket.c:2340 [inline]
-  __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x72/0x7a
-
-The buggy address belongs to the object at ffff88802cd73da0
- which belongs to the cache kmalloc-8 of size 8
-The buggy address is located 0 bytes inside of
- allocated 1-byte region [ffff88802cd73da0, ffff88802cd73da1)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802cd73020 pfn:0x2cd73
-flags: 0xfff80000000000(node=0|zone=1|lastcpupid=0xfff)
-page_type: 0xffffefff(slab)
-raw: 00fff80000000000 ffff888015041280 dead000000000100 dead000000000122
-raw: ffff88802cd73020 000000008080007f 00000001ffffefff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5103, tgid 2119833701 (syz-executor.4), ts 5103, free_ts 70804600828
-  set_page_owner include/linux/page_owner.h:32 [inline]
-  post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1490
-  prep_new_page mm/page_alloc.c:1498 [inline]
-  get_page_from_freelist+0x2e7e/0x2f40 mm/page_alloc.c:3454
-  __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4712
-  __alloc_pages_node_noprof include/linux/gfp.h:244 [inline]
-  alloc_pages_node_noprof include/linux/gfp.h:271 [inline]
-  alloc_slab_page+0x5f/0x120 mm/slub.c:2249
-  allocate_slab+0x5a/0x2e0 mm/slub.c:2412
-  new_slab mm/slub.c:2465 [inline]
-  ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3615
-  __slab_alloc+0x58/0xa0 mm/slub.c:3705
-  __slab_alloc_node mm/slub.c:3758 [inline]
-  slab_alloc_node mm/slub.c:3936 [inline]
-  __do_kmalloc_node mm/slub.c:4068 [inline]
-  kmalloc_node_track_caller_noprof+0x286/0x450 mm/slub.c:4089
-  kstrdup+0x3a/0x80 mm/util.c:62
-  device_rename+0xb5/0x1b0 drivers/base/core.c:4558
-  dev_change_name+0x275/0x860 net/core/dev.c:1232
-  do_setlink+0xa4b/0x41f0 net/core/rtnetlink.c:2864
-  __rtnl_newlink net/core/rtnetlink.c:3680 [inline]
-  rtnl_newlink+0x180b/0x20a0 net/core/rtnetlink.c:3727
-  rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6594
-  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
-  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
-  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
-page last free pid 5146 tgid 5146 stack trace:
-  reset_page_owner include/linux/page_owner.h:25 [inline]
-  free_pages_prepare mm/page_alloc.c:1110 [inline]
-  free_unref_page+0xd3c/0xec0 mm/page_alloc.c:2617
-  discard_slab mm/slub.c:2511 [inline]
-  __put_partials+0xeb/0x130 mm/slub.c:2980
-  put_cpu_partial+0x17c/0x250 mm/slub.c:3055
-  __slab_free+0x2ea/0x3d0 mm/slub.c:4254
-  qlink_free mm/kasan/quarantine.c:163 [inline]
-  qlist_free_all+0x9e/0x140 mm/kasan/quarantine.c:179
-  kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
-  __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
-  kasan_slab_alloc include/linux/kasan.h:201 [inline]
-  slab_post_alloc_hook mm/slub.c:3888 [inline]
-  slab_alloc_node mm/slub.c:3948 [inline]
-  __do_kmalloc_node mm/slub.c:4068 [inline]
-  __kmalloc_node_noprof+0x1d7/0x450 mm/slub.c:4076
-  kmalloc_node_noprof include/linux/slab.h:681 [inline]
-  kvmalloc_node_noprof+0x72/0x190 mm/util.c:634
-  bucket_table_alloc lib/rhashtable.c:186 [inline]
-  rhashtable_rehash_alloc+0x9e/0x290 lib/rhashtable.c:367
-  rht_deferred_worker+0x4e1/0x2440 lib/rhashtable.c:427
-  process_one_work kernel/workqueue.c:3218 [inline]
-  process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
-  worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
-  kthread+0x2f0/0x390 kernel/kthread.c:388
-  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-Memory state around the buggy address:
- ffff88802cd73c80: 07 fc fc fc 05 fc fc fc 05 fc fc fc fa fc fc fc
- ffff88802cd73d00: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
->ffff88802cd73d80: fa fc fc fc 01 fc fc fc fa fc fc fc fa fc fc fc
-                               ^
- ffff88802cd73e00: fa fc fc fc fa fc fc fc 05 fc fc fc 07 fc fc fc
- ffff88802cd73e80: 07 fc fc fc 07 fc fc fc 07 fc fc fc 07 fc fc fc
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/bridge/netfilter/ebtables.c | 6 ++++++
- net/ipv4/netfilter/arp_tables.c | 4 ++++
- net/ipv4/netfilter/ip_tables.c  | 4 ++++
- net/ipv6/netfilter/ip6_tables.c | 4 ++++
- 4 files changed, 18 insertions(+)
-
-diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
-index 99d82676f780ac49d01151fa9c585f44f9ea8ccc..cbd0e3586c3f61904efb4db7d9101d7770c852e7 100644
---- a/net/bridge/netfilter/ebtables.c
-+++ b/net/bridge/netfilter/ebtables.c
-@@ -1111,6 +1111,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
- 	struct ebt_table_info *newinfo;
- 	struct ebt_replace tmp;
- 
-+	if (len < sizeof(tmp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
- 		return -EFAULT;
- 
-@@ -1423,6 +1425,8 @@ static int update_counters(struct net *net, sockptr_t arg, unsigned int len)
- {
- 	struct ebt_replace hlp;
- 
-+	if (len < sizeof(hlp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
- 		return -EFAULT;
- 
-@@ -2352,6 +2356,8 @@ static int compat_update_counters(struct net *net, sockptr_t arg,
- {
- 	struct compat_ebt_replace hlp;
- 
-+	if (len < sizeof(hlp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
- 		return -EFAULT;
- 
-diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
-index 2407066b0fec1121d71561ecbad6f4f87ecdebbc..b150c9929b12e86219a55c77da480e0c538b3449 100644
---- a/net/ipv4/netfilter/arp_tables.c
-+++ b/net/ipv4/netfilter/arp_tables.c
-@@ -956,6 +956,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
- 	void *loc_cpu_entry;
- 	struct arpt_entry *iter;
- 
-+	if (len < sizeof(tmp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
- 		return -EFAULT;
- 
-@@ -1254,6 +1256,8 @@ static int compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
- 	void *loc_cpu_entry;
- 	struct arpt_entry *iter;
- 
-+	if (len < sizeof(tmp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
- 		return -EFAULT;
- 
-diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
-index 7da1df4997d057a4292927c2041687c2b39d4a01..487670759578168c5ff53bce6642898fc41936b3 100644
---- a/net/ipv4/netfilter/ip_tables.c
-+++ b/net/ipv4/netfilter/ip_tables.c
-@@ -1108,6 +1108,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
- 	void *loc_cpu_entry;
- 	struct ipt_entry *iter;
- 
-+	if (len < sizeof(tmp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
- 		return -EFAULT;
- 
-@@ -1492,6 +1494,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
- 	void *loc_cpu_entry;
- 	struct ipt_entry *iter;
- 
-+	if (len < sizeof(tmp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
- 		return -EFAULT;
- 
-diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
-index fd9f049d6d41e77eacc10ce074a8a0d96b0d2e11..636b360311c5365fba2330f6ca2f7f1b6dd1363e 100644
---- a/net/ipv6/netfilter/ip6_tables.c
-+++ b/net/ipv6/netfilter/ip6_tables.c
-@@ -1125,6 +1125,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
- 	void *loc_cpu_entry;
- 	struct ip6t_entry *iter;
- 
-+	if (len < sizeof(tmp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
- 		return -EFAULT;
- 
-@@ -1501,6 +1503,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
- 	void *loc_cpu_entry;
- 	struct ip6t_entry *iter;
- 
-+	if (len < sizeof(tmp))
-+		return -EINVAL;
- 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
- 		return -EFAULT;
- 
--- 
-2.44.0.478.gd926399ef9-goog
-
+> 
+> 	Andrew
 
