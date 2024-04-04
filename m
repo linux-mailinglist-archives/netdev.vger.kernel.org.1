@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-84768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FAF289844F
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:38:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A222898450
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:38:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 907E51C21826
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:38:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 698AB1C2628A
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4287E7F7E2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C121E7FBA7;
 	Thu,  4 Apr 2024 09:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dnnBx+MD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V9wAQJYM"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85456768FC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40E674C0D
 	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 09:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712223338; cv=none; b=Duoi/r3Ro/8thRbUP/5pALw+aLmSpp6a4dBQvbkKY/EjDKJyiWWHER0Y8pu4hhk6kPAaetFYhwsfw6wKEZ8Hhz8Ju22SL6hn8NisHzRLHri6a5eox3hjG1M/e6WOitXzu9QLDSWoeQw3Eo/qwP7IqyFp+yOBZFssoqgZE4NimQQ=
+	t=1712223338; cv=none; b=K95/wrgGVQXLg/381Mgmjswp0gDKWtZQAE3JKLwwQnOu0sI9QzPwAbVRehck5yJj5G/DYZvGLOzz3IVjwsYQzOG1aZcZDzEdS7On8r/W6IMBUslZr9OPwmqevcN7Fs0oejSWHSIv594f0vwe/LMotnWLIfoXiiKTUVXF6/W1cgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712223338; c=relaxed/simple;
-	bh=IVBDs4L7Qd+JaeX6DTI07/w8MFx+zEAa5k58OsyrFq4=;
+	bh=X2j1cT9PSC5LMkFVwl3+YDvprKKLD/LkSYwlN8doez4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JfMN/wSE98T5etPVbjYPRs6wmKZ4Mlo7AjoqRHBPdTbHRi28uCWJbn6N/KOYe0Nz97dHgWxEsp1fDlT8QjUeUVQqOFp0eEe6vMAgwj9kRYdqSSv9V8xmzEMUZZt/qVI6361zKmqu21Omjt+vMR+9/MXSaTsJNU+LEwfFdzfst8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dnnBx+MD; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=LheBoy8+umsw5HZNe0vo1hqjU647C4885t+wbjZkqDTtX0nRXTTyPn0H0qmLLf81iaPHKJBEVW/Yvh3BdHDTlr00XeM3RdOOtYicUCRw35u94Ek6v3I9PAqSy565HCoO6aNEglAbsfbc9LlXZdoxU91ssbAondCCgk44ST7QwvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V9wAQJYM; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,43 +36,40 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1712223336; x=1743759336;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=IVBDs4L7Qd+JaeX6DTI07/w8MFx+zEAa5k58OsyrFq4=;
-  b=dnnBx+MDrbsZekhGqZe7HwoIqgaDu6uxkQjiMwg47HY83Bz9X+Wd2k8L
-   8fW8YFUq8PI6OLhukAKTJpZACCxG6ZTA9+lNdBJF1pCx5paDs40pA8zhf
-   /qb0UwU7zA9z07dimB/XaE/AeIoZrxYrqJnTa2/UcJpLX38HyBeohsI6g
-   qShpiJWL6LMyJ/iwpJhKfHF0cDe8en0WQ74RdE4d/MwS1uhdmjhLshsXD
-   psj+RDfv9nzN9HaP3pIh3RUU6ERbAJ1lt5TRgtPV/3GK9XP2fLvVL88db
-   HTEvjYn/LdwANue4m/CK2/1hr+/DOrdduwmXozFV+lcJSlPVIHMW/j8An
-   g==;
-X-CSE-ConnectionGUID: KHoH1BJ4QoiOVS7UA/ss7A==
-X-CSE-MsgGUID: fgoQNJ9cQFi5KjyhJ5sZ7g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="29966610"
+  bh=X2j1cT9PSC5LMkFVwl3+YDvprKKLD/LkSYwlN8doez4=;
+  b=V9wAQJYM4zCWsRDliL89BhshSavb93DICrXmeFs9PtrZM+0y8LVi6ikk
+   o5SAnLFqXymHjIOTQ/3K+cr7NalVTn3DJyrZf0uIFt+qVWaThxEWYE7BN
+   uPKGDdcQ4EpxeHjOEhKEexWw5qZBUMJDvdwu6VHwOYGAom921eSM5hk22
+   ot+EFQX5tXKXbrW1fAWMm5w1cZiSG5m9w471naDt+dPFoQRvgjJDt5gkw
+   5UMteEnjbyGcowe/u5rGbNh0Tj+aC2E6AMRxy0tamymLY6u5yykVIYzKt
+   2fP0P4BbGhvHedG78POwLwPwp4uDKO5wznOfRHpckETM5Fxos3DqC/lSl
+   w==;
+X-CSE-ConnectionGUID: 2Ac+HjxATZyjSmr5OdYEQQ==
+X-CSE-MsgGUID: wzKobr7QSeOO1wCquFLgtg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="29966612"
 X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="29966610"
+   d="scan'208";a="29966612"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 02:23:09 -0700
-X-CSE-ConnectionGUID: D4bW7w3LS4+snqaj1WB2xw==
-X-CSE-MsgGUID: YbgHc2W2SCmkuz+XwNiI6A==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 02:23:12 -0700
+X-CSE-ConnectionGUID: /P4ikxv5SNWsVRQ5P5gOTQ==
+X-CSE-MsgGUID: 7h2CwOymQjCGKfvtDoPvKQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="56180791"
+   d="scan'208";a="56180803"
 Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by orviesa001.jf.intel.com with ESMTP; 04 Apr 2024 02:23:06 -0700
+  by orviesa001.jf.intel.com with ESMTP; 04 Apr 2024 02:23:09 -0700
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
 	jesse.brandeburg@intel.com,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Prathisna Padmasanan <prathisna.padmasanan@intel.com>,
-	Pawel Kaminski <pawel.kaminski@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Igor Bagnucki <igor.bagnucki@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v5 iwl-next 10/12] ice: Add NAC Topology device capability parser
-Date: Thu,  4 Apr 2024 11:09:58 +0200
-Message-ID: <20240404092238.26975-24-karol.kolacinski@intel.com>
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH v5 iwl-next 11/12] ice: Support 2XNAC configuration using auxbus
+Date: Thu,  4 Apr 2024 11:09:59 +0200
+Message-ID: <20240404092238.26975-25-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240404092238.26975-14-karol.kolacinski@intel.com>
 References: <20240404092238.26975-14-karol.kolacinski@intel.com>
@@ -84,116 +81,286 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+There are E825C products featuring 2 NACs. Those have only one source
+clock on the primary NAC.
+For those devices, there
+should be only one clock controller on the primary NAC. All PFs from
+both NACs should connect as auxiliary devices to the auxiliary driver on
+the primary NAC.
 
-Add new device capability ICE_AQC_CAPS_NAC_TOPOLOGY which allows to
-determine the mode of operation (1 or 2 NAC).
-Define a new structure to store data from new capability and
-corresponding parser code.
-
-Co-developed-by: Prathisna Padmasanan <prathisna.padmasanan@intel.com>
-Signed-off-by: Prathisna Padmasanan <prathisna.padmasanan@intel.com>
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Reviewed-by: Pawel Kaminski <pawel.kaminski@intel.com>
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  1 +
- drivers/net/ethernet/intel/ice/ice_common.c   | 31 +++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_type.h     | 10 ++++++
- 3 files changed, 42 insertions(+)
+ drivers/net/ethernet/intel/ice/ice.h        | 23 +++++++-
+ drivers/net/ethernet/intel/ice/ice_ptp.c    | 62 +++++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 28 ++++++++--
+ drivers/net/ethernet/intel/ice/ice_type.h   |  2 +
+ 4 files changed, 101 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 540c0bdca936..8eaf030a29c9 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -121,6 +121,7 @@ struct ice_aqc_list_caps_elem {
- #define ICE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
- #define ICE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT		0x0077
- #define ICE_AQC_CAPS_NVM_MGMT				0x0080
-+#define ICE_AQC_CAPS_NAC_TOPOLOGY			0x0087
- #define ICE_AQC_CAPS_FW_LAG_SUPPORT			0x0092
- #define ICE_AQC_BIT_ROCEV2_LAG				0x01
- #define ICE_AQC_BIT_SRIOV_LAG				0x02
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 8ae257f8a191..d53e6794eace 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2583,6 +2583,34 @@ ice_parse_sensor_reading_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
- 		  dev_p->supported_sensors);
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 67a3236ab1fc..b8319851bef1 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -197,8 +197,6 @@
+ 
+ #define ice_pf_to_dev(pf) (&((pf)->pdev->dev))
+ 
+-#define ice_pf_src_tmr_owned(pf) ((pf)->hw.func_caps.ts_func_info.src_tmr_owned)
+-
+ enum ice_feature {
+ 	ICE_F_DSCP,
+ 	ICE_F_PHY_RCLK,
+@@ -1010,4 +1008,25 @@ static inline void ice_clear_rdma_cap(struct ice_pf *pf)
+ }
+ 
+ extern const struct xdp_metadata_ops ice_xdp_md_ops;
++
++/**
++ * ice_pf_src_tmr_owned - check if PF is owner of source timer
++ * @pf: Board private structure
++ */
++static inline bool ice_pf_src_tmr_owned(struct ice_pf *pf)
++{
++	if (pf->hw.ptp.phy_model == ICE_PHY_ETH56G && !pf->hw.ptp.primary_nac)
++		return false;
++	else
++		return pf->hw.func_caps.ts_func_info.src_tmr_owned;
++}
++
++/**
++ * ice_is_primary - check if PF is on a primary NAC
++ * @pf: Board private structure
++ */
++static inline bool ice_is_primary(struct ice_pf *pf)
++{
++	return pf->hw.dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M;
++}
+ #endif /* _ICE_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 105caf51261a..29a86fcfd312 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -371,6 +371,9 @@ ice_ptp_read_src_clk_reg(struct ice_pf *pf, struct ptp_system_timestamp *sts)
+ 	u32 hi, lo, lo2;
+ 	u8 tmr_idx;
+ 
++	if (!hw->ptp.primary_nac)
++		hw = hw->ptp.primary_hw;
++
+ 	tmr_idx = ice_get_ptp_src_clock_index(hw);
+ 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
+ 	/* Read the system timestamp pre PHC read */
+@@ -2673,6 +2676,31 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
+ 				   msecs_to_jiffies(err ? 10 : 500));
  }
  
 +/**
-+ * ice_parse_nac_topo_dev_caps - Parse ICE_AQC_CAPS_NAC_TOPOLOGY cap
-+ * @hw: pointer to the HW struct
-+ * @dev_p: pointer to device capabilities structure
-+ * @cap: capability element to parse
-+ *
-+ * Parse ICE_AQC_CAPS_NAC_TOPOLOGY for device capabilities.
++ * ice_ptp_prepare_rebuild_sec - Prepare second NAC for PTP reset or rebuild
++ * @pf: Board private structure
++ * @rebuild: rebuild if true, prepare if false
++ * @reset_type: the reset type being performed
 + */
-+static void ice_parse_nac_topo_dev_caps(struct ice_hw *hw,
-+					struct ice_hw_dev_caps *dev_p,
-+					struct ice_aqc_list_caps_elem *cap)
++static void ice_ptp_prepare_rebuild_sec(struct ice_pf *pf, bool rebuild,
++					enum ice_reset_req reset_type)
 +{
-+	dev_p->nac_topo.mode = le32_to_cpu(cap->number);
-+	dev_p->nac_topo.id = le32_to_cpu(cap->phys_id) & ICE_NAC_TOPO_ID_M;
++	struct ice_ptp_port *port;
 +
-+	dev_info(ice_hw_to_dev(hw),
-+		 "PF is configured in %s mode with IP instance ID %d\n",
-+		 (dev_p->nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M) ?
-+		 "primary" : "secondary", dev_p->nac_topo.id);
++	mutex_lock(&pf->ptp.ports_owner.lock);
++	list_for_each_entry(port, &pf->ptp.ports_owner.ports, list_member) {
++		struct ice_pf *peer_pf = ptp_port_to_pf(port);
 +
-+	ice_debug(hw, ICE_DBG_INIT, "dev caps: nac topology is_primary = %d\n",
-+		  !!(dev_p->nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M));
-+	ice_debug(hw, ICE_DBG_INIT, "dev caps: nac topology is_dual = %d\n",
-+		  !!(dev_p->nac_topo.mode & ICE_NAC_TOPO_DUAL_M));
-+	ice_debug(hw, ICE_DBG_INIT, "dev caps: nac topology id = %d\n",
-+		  dev_p->nac_topo.id);
++		if (!peer_pf->hw.ptp.primary_nac) {
++			if (rebuild)
++				ice_ptp_rebuild(peer_pf, reset_type);
++			else
++				ice_ptp_prepare_for_reset(peer_pf, reset_type);
++		}
++	}
++	mutex_unlock(&pf->ptp.ports_owner.lock);
 +}
 +
  /**
-  * ice_parse_dev_caps - Parse device capabilities
-  * @hw: pointer to the HW struct
-@@ -2634,6 +2662,9 @@ ice_parse_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
- 		case ICE_AQC_CAPS_SENSOR_READING:
- 			ice_parse_sensor_reading_cap(hw, dev_p, &cap_resp[i]);
- 			break;
-+		case ICE_AQC_CAPS_NAC_TOPOLOGY:
-+			ice_parse_nac_topo_dev_caps(hw, dev_p, &cap_resp[i]);
-+			break;
- 		default:
- 			/* Don't list common capabilities as unknown */
- 			if (!found)
+  * ice_ptp_prepare_for_reset - Prepare PTP for reset
+  * @pf: Board private structure
+@@ -2681,6 +2709,7 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
+ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ {
+ 	struct ice_ptp *ptp = &pf->ptp;
++	struct ice_hw *hw = &pf->hw;
+ 	u8 src_tmr;
+ 
+ 	if (ptp->state != ICE_PTP_READY)
+@@ -2696,15 +2725,18 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 	if (reset_type == ICE_RESET_PFR)
+ 		return;
+ 
++	if (ice_pf_src_tmr_owned(pf) && ice_is_e825c(hw))
++		ice_ptp_prepare_rebuild_sec(pf, false, reset_type);
++
+ 	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
+ 
+ 	/* Disable periodic outputs */
+ 	ice_ptp_disable_all_clkout(pf);
+ 
+-	src_tmr = ice_get_ptp_src_clock_index(&pf->hw);
++	src_tmr = ice_get_ptp_src_clock_index(hw);
+ 
+ 	/* Disable source clock */
+-	wr32(&pf->hw, GLTSYN_ENA(src_tmr), (u32)~GLTSYN_ENA_TSYN_ENA_M);
++	wr32(hw, GLTSYN_ENA(src_tmr), (u32)~GLTSYN_ENA_TSYN_ENA_M);
+ 
+ 	/* Acquire PHC and system timer to restore after reset */
+ 	ptp->reset_time = ktime_get_real_ns();
+@@ -2800,6 +2832,9 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 		err = ice_ptp_rebuild_owner(pf);
+ 		if (err)
+ 			goto err;
++
++		if (ice_is_e825c(&pf->hw))
++			ice_ptp_prepare_rebuild_sec(pf, true, reset_type);
+ 	}
+ 
+ 	ptp->state = ICE_PTP_READY;
+@@ -2872,6 +2907,9 @@ static int ice_ptp_auxbus_probe(struct auxiliary_device *aux_dev,
+ 		 &owner_pf->ptp.ports_owner.ports);
+ 	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
+ 
++	if (!aux_pf->hw.ptp.primary_nac)
++		aux_pf->hw.ptp.primary_hw = &owner_pf->hw;
++
+ 	return 0;
+ }
+ 
+@@ -2949,6 +2987,7 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+ {
+ 	struct auxiliary_driver *aux_driver;
+ 	struct ice_ptp *ptp;
++	char busdev[8] = {};
+ 	struct device *dev;
+ 	char *name;
+ 	int err;
+@@ -2958,8 +2997,10 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+ 	aux_driver = &ptp->ports_owner.aux_driver;
+ 	INIT_LIST_HEAD(&ptp->ports_owner.ports);
+ 	mutex_init(&ptp->ports_owner.lock);
+-	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+-			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
++	if (ice_is_e810(&pf->hw))
++		sprintf(busdev, "%u_%u_", pf->pdev->bus->number,
++			PCI_SLOT(pf->pdev->devfn));
++	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_%sclk%u", busdev,
+ 			      ice_get_ptp_src_clock_index(&pf->hw));
+ 	if (!name)
+ 		return -ENOMEM;
+@@ -3163,6 +3204,7 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+ {
+ 	struct auxiliary_device *aux_dev;
+ 	struct ice_ptp *ptp;
++	char busdev[8] = {};
+ 	struct device *dev;
+ 	char *name;
+ 	int err;
+@@ -3174,8 +3216,11 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+ 
+ 	aux_dev = &ptp->port.aux_dev;
+ 
+-	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+-			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
++	if (ice_is_e810(&pf->hw))
++		sprintf(busdev, "%u_%u_", pf->pdev->bus->number,
++			PCI_SLOT(pf->pdev->devfn));
++
++	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_%sclk%u", busdev,
+ 			      ice_get_ptp_src_clock_index(&pf->hw));
+ 	if (!name)
+ 		return -ENOMEM;
+@@ -3263,6 +3308,11 @@ void ice_ptp_init(struct ice_pf *pf)
+ 
+ 	ptp->state = ICE_PTP_INITIALIZING;
+ 
++	if (ice_is_e825c(hw) && !ice_is_primary(pf))
++		hw->ptp.primary_nac = false;
++	else
++		hw->ptp.primary_nac = true;
++
+ 	ice_ptp_init_hw(hw);
+ 
+ 	ice_ptp_init_tx_interrupt_mode(pf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index 5dbab905be22..1fdb7f173127 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -836,7 +836,10 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
+ {
+ 	u32 cmd_val = ice_ptp_tmr_cmd_to_src_reg(hw, cmd);
+ 
+-	wr32(hw, GLTSYN_CMD, cmd_val);
++	if (hw->ptp.primary_nac)
++		wr32(hw, GLTSYN_CMD, cmd_val);
++	else
++		wr32(hw->ptp.primary_hw, GLTSYN_CMD, cmd_val);
+ }
+ 
+ /**
+@@ -852,7 +855,10 @@ static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
+ 	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
+ 
+ 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
+-	wr32(hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
++	if (hw->ptp.primary_nac)
++		wr32(hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
++	else
++		wr32(hw->ptp.primary_hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
+ 	ice_flush(hw);
+ }
+ 
+@@ -2170,8 +2176,13 @@ static int ice_read_phy_and_phc_time_eth56g(struct ice_hw *hw, u8 port,
+ 	ice_ptp_exec_tmr_cmd(hw);
+ 
+ 	/* Read the captured PHC time from the shadow time registers */
+-	zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
+-	lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
++	if (hw->ptp.primary_nac) {
++		zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
++		lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
++	} else {
++		zo = rd32(hw->ptp.primary_hw, GLTSYN_SHTIME_0(tmr_idx));
++		lo = rd32(hw->ptp.primary_hw, GLTSYN_SHTIME_L(tmr_idx));
++	}
+ 	*phc_time = (u64)lo << 32 | zo;
+ 
+ 	/* Read the captured PHY time from the PHY shadow registers */
+@@ -2321,8 +2332,13 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
+ 	if (err)
+ 		return err;
+ 
+-	lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
+-	hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
++	if (hw->ptp.primary_nac) {
++		lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
++		hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
++	} else {
++		lo = rd32(hw->ptp.primary_hw, GLTSYN_INCVAL_L(tmr_idx));
++		hi = rd32(hw->ptp.primary_hw, GLTSYN_INCVAL_H(tmr_idx));
++	}
+ 	incval = (u64)hi << 32 | lo;
+ 
+ 	err = ice_write_40b_ptp_reg_eth56g(hw, port, PHY_REG_TIMETUS_L, incval);
 diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 2baf305a0c95..948c4bdbb206 100644
+index 948c4bdbb206..e019dad56819 100644
 --- a/drivers/net/ethernet/intel/ice/ice_type.h
 +++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -372,6 +372,15 @@ struct ice_ts_dev_info {
- 	u8 ts_ll_int_read;
+@@ -856,6 +856,8 @@ struct ice_ptp_hw {
+ 	union ice_phy_params phy;
+ 	u8 num_lports;
+ 	u8 ports_per_phy;
++	bool primary_nac;
++	struct ice_hw *primary_hw;
  };
  
-+#define ICE_NAC_TOPO_PRIMARY_M	BIT(0)
-+#define ICE_NAC_TOPO_DUAL_M	BIT(1)
-+#define ICE_NAC_TOPO_ID_M	GENMASK(0xF, 0)
-+
-+struct ice_nac_topology {
-+	u32 mode;
-+	u8 id;
-+};
-+
- /* Function specific capabilities */
- struct ice_hw_func_caps {
- 	struct ice_hw_common_caps common_cap;
-@@ -393,6 +402,7 @@ struct ice_hw_dev_caps {
- 	u32 num_flow_director_fltr;	/* Number of FD filters available */
- 	struct ice_ts_dev_info ts_dev_info;
- 	u32 num_funcs;
-+	struct ice_nac_topology nac_topo;
- 	/* bitmap of supported sensors
- 	 * bit 0 - internal temperature sensor
- 	 * bit 31:1 - Reserved
+ /* Port hardware description */
 -- 
 2.43.0
 
