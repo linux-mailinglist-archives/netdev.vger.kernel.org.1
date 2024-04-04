@@ -1,96 +1,73 @@
-Return-Path: <netdev+bounces-84894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4523189892B
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:50:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBA0898936
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:52:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 733B51C21279
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9BF12831EE
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF8F1272AF;
-	Thu,  4 Apr 2024 13:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450B112880E;
+	Thu,  4 Apr 2024 13:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pBa4gmCH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MWikJUAq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D5D76023;
-	Thu,  4 Apr 2024 13:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1127912839D;
+	Thu,  4 Apr 2024 13:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712238627; cv=none; b=oIzvq9JfiE5G2lF1BkGHSgF7mbB2HJVjHIO47GnmLM5n0Bj72QCn4BDlA8aTQeUOL/2jp8YPQX5jNVSC2mVTHw0DKEWk1z6qbrO6nyu4KQ6Gor6/SBhi8qmLbrW4cKHEftrxQG771BHgpQPu2tFec6wov4k7O70PogbWOOf6trU=
+	t=1712238723; cv=none; b=ufNznpUzQD+9SEea08CTjSuL//T+/PUhNAISQi91tUiuuyJH9ikrOLlDEQ2nYy8QQpJf4SI/m+Vve87mK1ixFopFvL173LMmiQ/eZsWjPbYcuMqyMUSRXpPNG2jZAr0DCFMGv3lkGk7ALRvRlASMOnXihusNHyU+Gp+CLiMumQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712238627; c=relaxed/simple;
-	bh=/e/3RELV3V5iO9Ru8peq8yOQty9/FY4WyCtQxbYjXRU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sklwnodVUNEDHJStgkYB2CfxOWWz4OPkxa1nrETwABgq8IjMayUt1s4Ca/JcbhwwPXrqS1JKKLlUPFYSp7JEX7glUWjPlWpu2maoUx9dHe1n+089la/mLBH+tRdv8PJfilMZDpFSY4frgBx8HPccjwwZktdLsi5kDeq+ASaptsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pBa4gmCH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D5DFC43390;
-	Thu,  4 Apr 2024 13:50:27 +0000 (UTC)
+	s=arc-20240116; t=1712238723; c=relaxed/simple;
+	bh=5td1WnMP4T8gOUudfpg8lft9EMzSNlFEKNurVZ/kTaE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TEcm59QqBZLDnDMvzjO89exy/EqqVg/ju0WTRKm1xVda7aBWO0OpWNR4VjS8JLyI68mMesJCuv0HrIL/mA8MyrM9xeOqS2StbH31IY+UftqUjya6d/bwYQdnOqa85e7WpNKc2ee8nvOWraKU/kgLZ5tl+Fv7xIqx19QoC1rWhb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWikJUAq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CFEFC433F1;
+	Thu,  4 Apr 2024 13:52:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712238627;
-	bh=/e/3RELV3V5iO9Ru8peq8yOQty9/FY4WyCtQxbYjXRU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pBa4gmCHOsXrCH9G4RFkX9/3TAAYu8nMsfNewPXJWKR+5k2Jl26o0OH1ukghUSbBL
-	 By/NVCfEfLKMHbZN/xisPjHMBSt4/bP+F5sQb9jRUojy2RhQ/V99GXRhBU2n/ijKwK
-	 9VlyjVCSAdQO1xOVXzOjo4qIDEliz22c7FcqONVH+Ar6RwL6VRh1wDHHY2rVZBqYeY
-	 fIIw6S1sK8dlaIoEZLBgfoxw/vbAoOM+be6PRKEZt2KQ2ddBRdfDlnt+q+viXIUvTH
-	 BidPs0WqeYuZRtr3D9cN/hMphBrJLYWQIyV6iDpki4JRmpKSj26OCDdH6PgBZwx9Pa
-	 GfJCdTnVwauyw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3DB2FD84BA4;
-	Thu,  4 Apr 2024 13:50:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1712238722;
+	bh=5td1WnMP4T8gOUudfpg8lft9EMzSNlFEKNurVZ/kTaE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MWikJUAqiylqljmtmnZWdoozUbYxNRVmKSI55zrS58TQtSWqjRJooX/cAxx+tn8h7
+	 HQ0WmwE+DcD8tjFG7hKO0ixMJI8EthnYYtsJFkM3oIRMzxd4IzYHg7qYstqaz2mUJV
+	 x2xgxTSjTMYpvkktfsVLwc4w1YLwJsOEOHLBfEiLBrmPG71v5PZTlkJoLM/GSnYn5/
+	 /tx35PfAJrQtneAaEFMsECrFGYgtjc7Hk5H2VYS5PyMJXtjE7MBh6k3nrGQ6nP81wT
+	 92qyHyurNVeXjM2b8NvaS18tXSj/5jnRBWthi9vWktGw5x742voxMoaGuebgfSrJJR
+	 v1HJlPkMQth7A==
+Date: Thu, 4 Apr 2024 06:52:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <shuah@kernel.org>, <sdf@google.com>,
+ <donald.hunter@gmail.com>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 5/7] netdevsim: report stats by default,
+ like a real device
+Message-ID: <20240404065201.0109606d@kernel.org>
+In-Reply-To: <874jchgyok.fsf@nvidia.com>
+References: <20240403023426.1762996-1-kuba@kernel.org>
+	<20240403023426.1762996-6-kuba@kernel.org>
+	<874jchgyok.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: ethernet: mtk_eth_soc: Reuse value using READ_ONCE
- instead of re-rereading it
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171223862724.955.4736478868030987627.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Apr 2024 13:50:27 +0000
-References: <tencent_C699E9540505523424F11A9BD3D21B86840A@qq.com>
-In-Reply-To: <tencent_C699E9540505523424F11A9BD3D21B86840A@qq.com>
-To: linke li <lilinke99@qq.com>
-Cc: xujianhao01@gmail.com, nbd@nbd.name, sean.wang@mediatek.com,
- Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed,  3 Apr 2024 10:54:00 +0800 you wrote:
-> In mtk_flow_entry_update_l2, the hwe->ib1 is read using READ_ONCE at the
-> beginning of the function, checked, and then re-read from hwe->ib1,
-> may void all guarantees of the checks. Reuse the value that was read by
-> READ_ONCE to ensure the consistency of the ib1 throughout the function.
+On Thu, 4 Apr 2024 12:40:04 +0200 Petr Machata wrote:
+> > +	stats->packets = rtstats.rx_packets - !!rtstats.rx_packets;  
 > 
-> Signed-off-by: linke li <lilinke99@qq.com>
-> 
-> [...]
+> This is just to make sure that per-queue stats are lower than the
+> overall rtstats I presume?
 
-Here is the summary with links:
-  - net: ethernet: mtk_eth_soc: Reuse value using READ_ONCE instead of re-rereading it
-    https://git.kernel.org/netdev/net-next/c/04172043bd21
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yes, to fake some "non-queue" stats.
 
