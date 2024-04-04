@@ -1,234 +1,139 @@
-Return-Path: <netdev+bounces-84886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B68898896
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:11:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D624898898
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 15:12:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C888C1F21DCE
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:11:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55E1F28C13F
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7346C1272A0;
-	Thu,  4 Apr 2024 13:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1245E126F2F;
+	Thu,  4 Apr 2024 13:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RgOMkDyL"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cBv5OokM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FA384FDC
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 13:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FA9823C3;
+	Thu,  4 Apr 2024 13:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712236290; cv=none; b=K1GOeOfchFNMxi10kncc0r12kTHxPl2BqoFsPUtr6teKGksc9CufG0o6CZ8rQlVJ5ZDLcMalUw3hsN3duZiygshGcxX6VAXoqsxETyggImK+9NMdPcEQBmcgnujUfxu7sV0uj6xeC/eEF066Jj7qvssEsM7JM/0PPMiwKxrdQZA=
+	t=1712236351; cv=none; b=qnRpyXaMGVvLzLHNh+0w+W86XMvvBtHJmCGuhThaFgx1XPTFs6FpebzjIPEm2+Ozp0kZIgLVQt1+jqESaH0chFAcynGeRReKju/PpauxLd+dsEioBq6MFr+YSbgPnEDU0eghskWg/b8bdvc3lBXJM8mQ0qTta6KzN/wRJIfj3cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712236290; c=relaxed/simple;
-	bh=2XGETqMTHK2M+McL6wwFeA/m6DDbNuMZCHmcvpzYH0E=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Repg+wDhdkstTBrfdYGo8D5KpF/J13XzeSiIT18eYmckJt+ut8p2hmTTfSEt4wscPLJYyHvYZdpTm9rqcFfKKvjQB85kXS1djHbJ8mgC6goiRgiZrkCPyiI76zCpCShU4IRDmZ3+tcWSiQ6YcTKAxfla+BXCpGQyLpHEa/yzbvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RgOMkDyL; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6156b93c768so18637947b3.1
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 06:11:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712236287; x=1712841087; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BAn9+1D0RFQ6YM7aZHUb6hUml8LWK/l7TsZudQjysFo=;
-        b=RgOMkDyLAbW3t8k+xEH5JGfq/lfHaA6bln1R6lq6MaoE6hU1u6OsWO4MhvCAjanHbA
-         EMFftVJl3AdqkHSx4JcukVnOTtNgVDY2xRJzJJTP/Pr9H+Fx/XjpvJL2UDIG4MUbVTsQ
-         5tc5DmT/p4wCEINoC8YtLZdptcC1OGn8RN4iGVvqsLlj+3+Fy9o678zehiIw5aJBTjAm
-         3Hx61l7fN5DjEHv7eADSzf4Q3L6T/1I6r40xk2XMcISD90ychJBsOrgEkN0zvSZAFI+x
-         PA12y+TYZFmVvUjYpOH5wgxf49ZIODhbf6h93OKVjBENBnnTflQBgyogISeUXKRVgo56
-         X2xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712236287; x=1712841087;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BAn9+1D0RFQ6YM7aZHUb6hUml8LWK/l7TsZudQjysFo=;
-        b=LxkPW5Az2OilwN35jFzrRORnt2IgdbMKbJjDexxchJv3yWTHPWY1K522DyZi7TcAgh
-         xlcrIk1t71EKmrct5ypStMCyiTUmN3T6kmnuD0n8aAaTJsBX9Y46jh1E0sM46lpLuMhy
-         8r5P/9psH5AmEf5Y1fr122PEvb9aK7tub1Bt+bYrR8o3YVWPaKXTGZMxjX6kZJ+IikFF
-         y3havUTIzJAWtXz0m2udP6QgO9F+8amgxnSmTf24MoAW87SGKs5ZMJO1Fa9+tUMcMXy0
-         UFt1CTf+ugaiKAkwvHqCGKLjA5wrTJJvfpY0cnfNOyrcj3T8badgapdE8eq7akerBALm
-         Hd2g==
-X-Gm-Message-State: AOJu0YxJvQsjk5uZPE4PDG9aH0QvASn4VmPBywExZiOsyPQljkQVjgi3
-	0y2ED2TDF1lTpkmYasXIQeWwLjoRZ9Lzw5Xdf7I6Rfe9y39TBJMUlT4draxbw5ph7/AFb9C+wcO
-	H+hfzt30lFg==
-X-Google-Smtp-Source: AGHT+IFOiT8EmsLEJTxkzq4pGB4GkA4oFCAIrHNmeqvG8Ly0vn8e/TtzMkjcWn95hVi/i7CKS+NC1efmc6jX3Q==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a0d:cc51:0:b0:614:e20c:d3ef with SMTP id
- o78-20020a0dcc51000000b00614e20cd3efmr661720ywd.10.1712236287662; Thu, 04 Apr
- 2024 06:11:27 -0700 (PDT)
-Date: Thu,  4 Apr 2024 13:11:26 +0000
+	s=arc-20240116; t=1712236351; c=relaxed/simple;
+	bh=E2Ym1kUqVzjOH0XmO1ZZvC5uU8KCJxej7UD8A9ggl18=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q6h7mYVW/ww84Q43dKZhVAZYVA/lSI6HBG4/a0FQ205t1D3MD1f9ZTVTc8oUHgl/k3Wi1PthDDC0xHxY7g+E15LlgJyAgpcHFYNwZ3ruL8h8ElwnOavckZeuakENdG1ZR2lDH0kbXx3OjzWodZW/mGxrTKg7woQjNv1HI7IRVlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cBv5OokM; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1712236339; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=xOnC9TcmNIYHT66WMGU1uDCwRMaiasXF54VBLXYtEEM=;
+	b=cBv5OokM8O5FYXFYhnOIT4yywgochNztR/YZyh3spUC7GaxHZ6dS7n6rD8yjSxD0LfV6ENQriRk29vKw4tK3L4T+D6rqsxK+yovoTPtpPIYKyRPhgC2ieQMv+nlvwpMVt+Bg4ODvX9vdk4iKHyM6rulSPM6CtPIjzw+4GK631OA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0W3uXYZ-_1712236337;
+Received: from 30.236.60.242(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W3uXYZ-_1712236337)
+          by smtp.aliyun-inc.com;
+          Thu, 04 Apr 2024 21:12:19 +0800
+Message-ID: <7a0fc481-658e-4c99-add7-ccbd5f9dce1e@linux.alibaba.com>
+Date: Thu, 4 Apr 2024 21:12:16 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240404131126.2534400-1-edumazet@google.com>
-Subject: [PATCH net] geneve: fix header validation in geneve[6]_xmit_skb
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com, 
-	Phillip Potter <phil@philpotter.co.uk>, Sabrina Dubroca <sd@queasysnail.net>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some unsupported
+ operations of loopback-ism
+To: Niklas Schnelle <schnelle@linux.ibm.com>,
+ Gerd Bayer <gbayer@linux.ibm.com>, wintera@linux.ibm.com,
+ twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240324135522.108564-1-guwen@linux.alibaba.com>
+ <20240324135522.108564-5-guwen@linux.alibaba.com>
+ <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
+ <1db6ccab-b49f-45d2-a93c-05b0f79371a3@linux.alibaba.com>
+ <3b3ff37643e9030ec1246e67720683a2cf5660e5.camel@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <3b3ff37643e9030ec1246e67720683a2cf5660e5.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot is able to trigger an uninit-value in geneve_xmit() [1]
 
-Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield())
-uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
-skb->protocol.
 
-If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->protocol,
-pskb_inet_may_pull() does nothing at all.
+On 2024/4/4 19:42, Niklas Schnelle wrote:
+> On Thu, 2024-04-04 at 17:32 +0800, Wen Gu wrote:
+>>
+>> On 2024/4/4 00:25, Gerd Bayer wrote:
+>>> On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
+>>>> This implements some operations that loopback-ism does not support
+>>>> currently:
+>>>>    - vlan operations, since there is no strong use-case for it.
+>>>>    - signal_event operations, since there is no event to be processed
+>>>> by the loopback-ism device.
+>>>
+>>> Hi Wen,
+>>>
+>>> I wonder if the these operations that are not supported by loopback-ism
+>>> should rather be marked "optional" in the struct smcd_ops, and the
+>>> calling code should call these only when they are implemented.
+>>>
+>>> Of course this would mean more changes to net/smc/smc_core.c - but
+>>> loopback-ism could omit these "boiler-plate" functions.
+>>>
+>>
+>> Hi Gerd.
+>>
+>> Thank you for the thoughts! I agree that checks like 'if(smcd->ops->xxx)'
+>> can avoid the device driver from implementing unsupported operations. But I
+>> am afraid that which operations need to be defined as 'optional' may differ
+>> from different device perspectives (e.g. for loopback-ism they are vlan-related
+>> opts and signal_event). So I perfer to simply let the smc protocol assume
+>> that all operations have been implemented, and let drivers to decide which
+>> ones are unsupported in implementation. What do you think?
+>>
+>> Thanks!
+>>
+> 
+> I agree with Gerd, in my opinion it is better to document ops as
+> optional and then allow their function pointers to be NULL and check
+> for that. Acting like they are supported and then they turn out to be
+> nops to me seems to contradict the principle of least surprises. I also
+> think we can find a subset of mandatory ops without which SMC-D is
+> impossible and then everything else should be optional.
 
-If a vlan tag was provided by the caller (af_packet in the syzbot case),
-the network header might not point to the correct location, and skb
-linear part could be smaller than expected.
+I see. If we all agree to classify smcd_ops into mandatory and optional ones,
+I'll add a patch to mark the optional ops and check if they are implemented.
 
-Add skb_vlan_inet_prepare() to perform a complete mac validation.
+> 
+> As a first guess I think the following options may be mandatory:
+> 
+> * query_remote_gid()
+> * register_dmb()/unregister_dmb()
+> * move_data()
+>    For this one could argue that either move_data() or
+>    attach_dmb()/detach_dmb() is required though personally I would
+>    prefer to always have move_data() as a fallback and simple API
+> * supports_v2()
+> * get_local_gid()
+> * get_chid()
+> * get_dev()
+I agree with this classification. Just one point, maybe we can take
+supports_v2() as an optional ops, like support_dmb_nocopy()? e.g. if
+it is not implemented, we treat it as an ISMv1.
 
-Use this in geneve for the moment, I suspect we need to adopt this
-more broadly.
+Thanks!
 
-v2,v3 - Addressed Sabrina comments on v1 and v2
-Link: https://lore.kernel.org/netdev/Zg1l9L2BNoZWZDZG@hog/
-
-[1]
-
-BUG: KMSAN: uninit-value in geneve_xmit_skb drivers/net/geneve.c:910 [inline]
- BUG: KMSAN: uninit-value in geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
-  geneve_xmit_skb drivers/net/geneve.c:910 [inline]
-  geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
-  __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
-  netdev_start_xmit include/linux/netdevice.h:4917 [inline]
-  xmit_one net/core/dev.c:3531 [inline]
-  dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
-  __dev_queue_xmit+0x348d/0x52c0 net/core/dev.c:4335
-  dev_queue_xmit include/linux/netdevice.h:3091 [inline]
-  packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
-  packet_snd net/packet/af_packet.c:3081 [inline]
-  packet_sendmsg+0x8bb0/0x9ef0 net/packet/af_packet.c:3113
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg+0x30f/0x380 net/socket.c:745
-  __sys_sendto+0x685/0x830 net/socket.c:2191
-  __do_sys_sendto net/socket.c:2203 [inline]
-  __se_sys_sendto net/socket.c:2199 [inline]
-  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-Uninit was created at:
-  slab_post_alloc_hook mm/slub.c:3804 [inline]
-  slab_alloc_node mm/slub.c:3845 [inline]
-  kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
-  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
-  __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
-  alloc_skb include/linux/skbuff.h:1318 [inline]
-  alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6504
-  sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2795
-  packet_alloc_skb net/packet/af_packet.c:2930 [inline]
-  packet_snd net/packet/af_packet.c:3024 [inline]
-  packet_sendmsg+0x722d/0x9ef0 net/packet/af_packet.c:3113
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg+0x30f/0x380 net/socket.c:745
-  __sys_sendto+0x685/0x830 net/socket.c:2191
-  __do_sys_sendto net/socket.c:2203 [inline]
-  __se_sys_sendto net/socket.c:2199 [inline]
-  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-CPU: 0 PID: 5033 Comm: syz-executor346 Not tainted 6.9.0-rc1-syzkaller-00005-g928a87efa423 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-
-Fixes: d13f048dd40e ("net: geneve: modify IP header check in geneve6_xmit_skb and geneve_xmit_skb")
-Reported-by: syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/000000000000d19c3a06152f9ee4@google.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Phillip Potter <phil@philpotter.co.uk>
-Cc: Sabrina Dubroca <sd@queasysnail.net>
----
- drivers/net/geneve.c     |  4 ++--
- include/net/ip_tunnels.h | 35 +++++++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 2f6739fe78af2e8e90c0a3b474c2e99c83e02994..6c2835086b57eacbcddb44a3c507e26d5a944427 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -822,7 +822,7 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	__be16 sport;
- 	int err;
- 
--	if (!pskb_inet_may_pull(skb))
-+	if (!skb_vlan_inet_prepare(skb))
- 		return -EINVAL;
- 
- 	if (!gs4)
-@@ -929,7 +929,7 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	__be16 sport;
- 	int err;
- 
--	if (!pskb_inet_may_pull(skb))
-+	if (!skb_vlan_inet_prepare(skb))
- 		return -EINVAL;
- 
- 	if (!gs6)
-diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-index 5cd64bb2104df389250fb3c518ba00a3826c53f7..6898d0b8306f803c57065f6e134f96dcc8517cad 100644
---- a/include/net/ip_tunnels.h
-+++ b/include/net/ip_tunnels.h
-@@ -361,6 +361,41 @@ static inline bool pskb_inet_may_pull(struct sk_buff *skb)
- 	return pskb_network_may_pull(skb, nhlen);
- }
- 
-+/* Variant of pskb_inet_may_pull().
-+ */
-+static inline bool skb_vlan_inet_prepare(struct sk_buff *skb)
-+{
-+	int nhlen, maclen;
-+	__be16 type;
-+
-+	/* Essentially this is skb_protocol(skb, true)
-+	 * And we get MAC len.
-+	 */
-+	type = __vlan_get_protocol(skb, skb->protocol, &maclen);
-+
-+	switch (type) {
-+#if IS_ENABLED(CONFIG_IPV6)
-+	case htons(ETH_P_IPV6):
-+		nhlen = sizeof(struct ipv6hdr);
-+		break;
-+#endif
-+	case htons(ETH_P_IP):
-+		nhlen = sizeof(struct iphdr);
-+		break;
-+
-+	default:
-+		nhlen = 0;
-+	}
-+	/* For ETH_P_IPV6/ETH_P_IP we make sure to pull
-+	 * a base network header in skb->head.
-+	 */
-+	if (!pskb_may_pull(skb, maclen + nhlen))
-+		return false;
-+
-+	skb_set_network_header(skb, maclen);
-+	return true;
-+}
-+
- static inline int ip_encap_hlen(struct ip_tunnel_encap *e)
- {
- 	const struct ip_tunnel_encap_ops *ops;
--- 
-2.44.0.478.gd926399ef9-goog
-
+>>>
 
