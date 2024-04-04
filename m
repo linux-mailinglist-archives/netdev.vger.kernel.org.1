@@ -1,59 +1,55 @@
-Return-Path: <netdev+bounces-84672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23979897D80
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 03:50:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D93897D85
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 03:53:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6B481F263AD
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 01:50:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80A981C218C6
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 01:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB3217BBA;
-	Thu,  4 Apr 2024 01:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96901758F;
+	Thu,  4 Apr 2024 01:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGS7RhhX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2jAn6zg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E80214F62;
-	Thu,  4 Apr 2024 01:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AA72F37
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 01:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712195435; cv=none; b=LEKIPvdylR9n3jl4tTjqR25Mc9ywaPEcNiMWOieRNGSN3o7Rp1BIcXFa5A0NiK/rcEMq4X016HP4JWhr7PjWrVCRVKFcL/rOLXhzEDBCtF2l91LTG+ZbuCEsIgSPexkctB/R5jABB4DlYGmhd4Lfu0loJYHCRrAJLmZd03o4HMY=
+	t=1712195581; cv=none; b=bREmG2v+gb98pLvJYe+h5o+LPVgmt4mTVPnQjnoDZht0FF/83S59qqq9GcWLm6YVO+7yBogS20JAv/gX/ZuMZAz7ILE6xoL1vJkTmjyq2BF9ymT1rculHz/WVjn1Ja/O8+NPuvz35kQnsFBs5epgSlZTg1X+qYbzAQTnhSv6l5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712195435; c=relaxed/simple;
-	bh=ZOLpFyWMUibdLrrIJRH3L/KcxtL06Sr4BA7j+sJrjxo=;
+	s=arc-20240116; t=1712195581; c=relaxed/simple;
+	bh=rRQkB/2uqKZF0P31rAziA8rhsj1SCGdb8A62U/nbDzU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N2Fe8pqy1353ec+bMFnMJP8HE74bh9FQLmJkxNg/S6XXAfZZjV+gacV3hvPtvXoAMOkvyD81n5uHwUUWH9ADkaESK9qiCaQHEZnfKWOElIMq/PFVY9AlAtzEC40MuPeQ8E+zvTcOUZFIdyAmQ/XxWmvFh3Qu2ziyWvN9vXOd0WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGS7RhhX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38FE1C433C7;
-	Thu,  4 Apr 2024 01:50:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UEaahmNRwoak58970P3kzodlSdAhAdXS+gLPfI2L0sJP9d6ZVpytb3onwaAaWPvFAMhvgtSDSdGMadOKsFTjabizyd4jiGucXcCAauwUjCWXCBNQG2Wq5RJ6VigfSrrBvNOHuMueAvj31svhLZXqatZGFyHbU43qSiYx8Y4mgJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2jAn6zg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8438C433F1;
+	Thu,  4 Apr 2024 01:53:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712195434;
-	bh=ZOLpFyWMUibdLrrIJRH3L/KcxtL06Sr4BA7j+sJrjxo=;
+	s=k20201202; t=1712195581;
+	bh=rRQkB/2uqKZF0P31rAziA8rhsj1SCGdb8A62U/nbDzU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EGS7RhhXZrSA7nDxaqZDAq3VcXI/GTcHr8IXYNNSbzhTETkqDFEk0DbHXfZFefes5
-	 F8TG//XiNj7B2KfGWiHQvy+b1+Wmi53Gi9NUt9xvWo7ygoGVumsRuj4MxXRoHgeI3b
-	 kIPUUEmYchsG6hrmuvIp62wJ9zr/MPORFpFc8FxHW1Amj8u200BfhJdOAY7dtIdQ/S
-	 E2jAKi8+eGQERhTNe17B0lnVLWw2J+Z+j6VKr0xXzfbkxnteDw1mxbC7Oi7rxFFvYl
-	 HwFVDoy9bUx0Sty1cQiJA+fHFks/mdF6N3zPc7wOCAVU0vM9VoUzFDShB9MId6s6Nx
-	 aMjWi5AetUJeQ==
-Date: Wed, 3 Apr 2024 18:50:33 -0700
+	b=m2jAn6zgw6GmlQpyrropOEQUykaM6zJN2fltddWJLz6LSrbPdOvLnpYZH9nbV177W
+	 WmIWpUAGQ47Ri7t5O8is1jb9Z1FSWqpXjhWkKwAtdEmGs1ULYXawN/8oGQs8KA+qJB
+	 FaBhBvWX19s4chYQHsuBT/J3Q8/KMPq+RaVxZdOhqJtiuZUC+i2SRUFHb2Ku2LeGq+
+	 jTNYrHg286irHGI9wgDgs2odyE3BrkwhcDXSI8KRysfaqznDAR2SLuEz07hyQ8twdj
+	 1KS9uLjLffyCzCfE7F8McJ2c8JHmLjexVHpUVRhglLTDZw6yqUYXSXZu4Y4JxMYdE8
+	 JARFYDQymsIqw==
+Date: Wed, 3 Apr 2024 18:53:00 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, rostedt@goodmis.org, pabeni@redhat.com,
- davem@davemloft.net, matttbe@kernel.org, martineau@kernel.org,
- geliang@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next 0/6]  Implement reset reason mechanism to
- detect
-Message-ID: <20240403185033.47ebc6a9@kernel.org>
-In-Reply-To: <20240403073144.35036-1-kerneljasonxing@gmail.com>
-References: <20240403073144.35036-1-kerneljasonxing@gmail.com>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com
+Subject: Re: [PATCH net-next v2 7/7] net: txgbe: add sriov function support
+Message-ID: <20240403185300.702a8271@kernel.org>
+In-Reply-To: <BDE9D80ABE699DA7+20240403092714.3027-8-mengyuanlou@net-swift.com>
+References: <20240403092714.3027-1-mengyuanlou@net-swift.com>
+	<BDE9D80ABE699DA7+20240403092714.3027-8-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,11 +59,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed,  3 Apr 2024 15:31:38 +0800 Jason Xing wrote:
-> It's based on top of https://patchwork.kernel.org/project/netdevbpf/list/?series=840182
+On Wed,  3 Apr 2024 17:10:04 +0800 Mengyuan Lou wrote:
+> +	.ndo_set_vf_spoofchk    = wx_ndo_set_vf_spoofchk,
+> +	.ndo_set_vf_link_state	= wx_ndo_set_vf_link_state,
+> +	.ndo_get_vf_config      = wx_ndo_get_vf_config,
+> +	.ndo_set_vf_vlan        = wx_ndo_set_vf_vlan,
+> +	.ndo_set_vf_mac         = wx_ndo_set_vf_mac,
 
-Please post as RFC if there's a dependency.
-We don't maintain patch queues for people.
+We don't accept any new implementations of the old SR-IOV API.
+Please offload standard networking constructs like flow rules,
+bridge etc.
 -- 
-pw-bot: cr
+pw-bot: reject
 
