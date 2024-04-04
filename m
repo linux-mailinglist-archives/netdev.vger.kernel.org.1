@@ -1,110 +1,120 @@
-Return-Path: <netdev+bounces-84912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4081D898A45
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:39:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC392898A54
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:43:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AFBA1C20D65
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:39:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F4661F28D31
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00387182D8;
-	Thu,  4 Apr 2024 14:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8DA1BC57;
+	Thu,  4 Apr 2024 14:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sandelman.ca header.i=@sandelman.ca header.b="Ygq3LE6k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HW01zKz/"
 X-Original-To: netdev@vger.kernel.org
-Received: from tuna.sandelman.ca (tuna.sandelman.ca [209.87.249.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096E3168DA
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 14:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.87.249.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509711BDC3
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 14:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712241561; cv=none; b=FOJ8V4MURjpoEoKRNkIqzEsjyua0RtYpndYKutMR2xpwT6Sp34Th47/qInkvLQ+drzKxvuGN0VEO+vji7S3JF/e8JS6z9Q5yQDH4UU44Qi74AGCu7JGNwBNUjuSNk7EdBnR2cpcxadCisG4Rf7gCTCZnvJdLGkSeMk+WKbHuDlg=
+	t=1712241784; cv=none; b=XVKiX9JVKs4J12UN5qqVhPTWgyZQDnCtC/B26WWDSY2IN3C7Hs3CvW5Ugf1TyQrm9f0ASpnTx7Icp42+fPWtqf93UIAtUh6SLMCYDi6hVX4BlOdQgmJuJ14jWdhLJ1itikl1bDnRl1owf+0lIFQevFWKGr9SRwQdH4y2u5tdmlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712241561; c=relaxed/simple;
-	bh=CwAvl28fyBamPEJgziBJqUkD/hLUMxWcxwlvYOxjd50=;
-	h=From:To:cc:Subject:In-Reply-To:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=QKKyRMur+uWVyMDhTjcyEOcS90gDV+CAP807sCzReevhFn4VBqw2hrVyOsxZWGoFDsqCj+F7hZ+VKKjdBLFs9oH2sWjjSHtK32kWzGs6y3k1yIWl7flqzao6ILmuNB3EZZ5HIN4HNCRJKok6SQw6f8Je0EG0uvtmNX5zfMBFOIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sandelman.ca; spf=pass smtp.mailfrom=sandelman.ca; dkim=pass (2048-bit key) header.d=sandelman.ca header.i=@sandelman.ca header.b=Ygq3LE6k; arc=none smtp.client-ip=209.87.249.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sandelman.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandelman.ca
-Received: from localhost (localhost [127.0.0.1])
-	by tuna.sandelman.ca (Postfix) with ESMTP id 9A3933898B;
-	Thu,  4 Apr 2024 10:39:18 -0400 (EDT)
-Received: from tuna.sandelman.ca ([127.0.0.1])
-	by localhost (localhost [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id FZnH-1xvOAx5; Thu,  4 Apr 2024 10:39:17 -0400 (EDT)
-Received: from sandelman.ca (obiwan.sandelman.ca [IPv6:2607:f0b0:f:2::247])
-	by tuna.sandelman.ca (Postfix) with ESMTP id 6A52038988;
-	Thu,  4 Apr 2024 10:39:17 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sandelman.ca;
-	s=mail; t=1712241557;
-	bh=ATvB/suQA4L1/h4S0HWm4c5gVxT0nCOx/IAypVGYzTg=;
-	h=From:To:cc:Subject:In-Reply-To:References:Date:From;
-	b=Ygq3LE6khmMbUOWJe3NCTqI6rSUSxvuifJZ1mEedTl0rmPVRondAX8ed9qRsyb0sW
-	 5L6/5BjZQR5J/x649/BD0ApIeDzsq11oCW9oZ7fTzKxgqcaph+Z9PXx+MEzNkDdmVt
-	 rFPNySgZOqoxgN0+M+TLfjulspprGbRtMZeB7MiXU0HIBKPlOL2hSPPajUviWrAe8X
-	 X9PWmpjgSn6PxGtfXi3CzEgUJnWmO5KxmWl/S0rHDzRilY/+NvKei7JOG1YzfqBzdc
-	 C/OtRhXAIYdpJHyf3iPyn+e3PKRuqn+CowjbZfbFRiP1rnYSqjcesixw9rI+E/senx
-	 nGVVHr1pCbebg==
-Received: from obiwan.sandelman.ca (localhost [IPv6:::1])
-	by sandelman.ca (Postfix) with ESMTP id 65B0F111;
-	Thu,  4 Apr 2024 10:39:17 -0400 (EDT)
-From: Michael Richardson <mcr@sandelman.ca>
-To: Antony Antony <antony@phenome.org>
-cc: antony.antony@secunet.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-    devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net 1/1] xfrm: fix source address in icmp error generation from IPsec gateway
-In-Reply-To: <Zg6aIbUV-oj4wPMq@Antony2201.local>
-References: <cover.1712226175.git.antony.antony@secunet.com> <20ea2ab0472ecf2d1625dadb7ca0df39cf4fe0f5.1712226175.git.antony.antony@secunet.com> <28050.1712230684@obiwan.sandelman.ca> <Zg6aIbUV-oj4wPMq@Antony2201.local>
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; GNU Emacs 28.2
-X-Face: $\n1pF)h^`}$H>Hk{L"x@)JS7<%Az}5RyS@k9X%29-lHB$Ti.V>2bi.~ehC0;<'$9xN5Ub#
- z!G,p`nR&p7Fz@^UXIn156S8.~^@MJ*mMsD7=QFeq%AL4m<nPbLgmtKK-5dC@#:k
+	s=arc-20240116; t=1712241784; c=relaxed/simple;
+	bh=Xz7G02KtWB3BD63yCJjk7YWVtswsmbtvCsGufzzopQY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Nol5owIw0GnXl77DfzphlpEY4ArHsmmZuc0jnzciISkADX3WKVQrHxqp7btGWFPUs0Gnws28UrkQrHxBCkpnedcdrHkFkyEH87HVKfWGBWcq+LfCuAMNk4ZzZ7iduulDJN7l+NkE9Y0AqW3Wf++1ck2L9bmvbg2IogoML3HfHw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HW01zKz/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712241781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Opa6cQ8aMa/r4VieccqKIjtVHxJ6RSw6QDAMVLUMeq0=;
+	b=HW01zKz/dXwLz75HdfvA9+MK6h37i+jMYE+aFi8L1u1L+g/fUy7RhLw2Q+OdmE9aQDt2j4
+	ZBkhgt3hbrXUk7PIlGGbJRjafwHckYco6ILpUwbiDgc35ieS5IYEFmt1QvnTGzPRUWBTP6
+	kEnUdEv2jqq+u3G8DVzAcE/mARJT5XA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-7BHgvAOZPemx7ieFSZ-baQ-1; Thu, 04 Apr 2024 10:42:59 -0400
+X-MC-Unique: 7BHgvAOZPemx7ieFSZ-baQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-343b9425ed1so186533f8f.1
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 07:42:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712241778; x=1712846578;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Opa6cQ8aMa/r4VieccqKIjtVHxJ6RSw6QDAMVLUMeq0=;
+        b=TFxFGtZzUhoQLzkjOy5UxNzhUOF1Ch9oVfHtVb5uTGX918pxfrZF/C0nQ/nGB5AqHd
+         Zt/k0oWdJUFxARsJdCVQUqpoOCi4fI7vsd3pO9fv6cG/zbEvw4eUq2idho3mnqIJu/Kz
+         9VL8CSyvtqBl84Bo5ZVZnPAM5qZj9bq2iOGMyL3WMLS/FL4tirV4MVGU3dK+smagtybF
+         dUgvWfj7r5vluYjrHbZFKIhF9bFmQLzCiBC+86a/0yjVUgWhr7RKAl06TbiElSTFr+j2
+         HEdfl/BeYp7gpEQ3+1HMGQ/uwKgKH522RvVYhFwWCEUzzs/0gX5QzPmBXdAlV5lUyVw9
+         27Uw==
+X-Forwarded-Encrypted: i=1; AJvYcCWNwag4FDknnJJtjxn4igt1kyPUkttLxjqfyY61jiDLnLDRUdZDNX6dgc+57QAyegtjLsqJVZQjzIFntgTE7uVdZjHaTdzb
+X-Gm-Message-State: AOJu0YyFD+mEJnrchu2PUzwWgCAAFemxdvCQgd/PW6BQifHWQHYRhRLP
+	9BYhYC+WhltX7nnnLO0jqFgXdNh94VYhV7XG4+AoI5Q2WVQFEeVuEDgtXsDW4Ae4Ci8p5J3p6jD
+	7x18aD+vFva/vwLvEj3Zesj+fb1GW8UsaWOlZsmHf1VY3uGwX8btrBQ==
+X-Received: by 2002:a05:600c:1c2a:b0:415:54d2:15ad with SMTP id j42-20020a05600c1c2a00b0041554d215admr2224903wms.1.1712241778070;
+        Thu, 04 Apr 2024 07:42:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHvO/HEppjycsbP3XuCeRC5XLv3meJDSEhRHnfDxuOwMuI6Dpy8IDOtDTKZ4L6gotmeucozEg==
+X-Received: by 2002:a05:600c:1c2a:b0:415:54d2:15ad with SMTP id j42-20020a05600c1c2a00b0041554d215admr2224881wms.1.1712241777427;
+        Thu, 04 Apr 2024 07:42:57 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-247-213.dyn.eolo.it. [146.241.247.213])
+        by smtp.gmail.com with ESMTPSA id m32-20020a05600c3b2000b004154e48bcdesm2929512wms.14.2024.04.04.07.42.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 07:42:57 -0700 (PDT)
+Message-ID: <8576a80ac958812ac75b01299c2de3a6485f84a1.camel@redhat.com>
+Subject: Re: [PATCH v1 net-next] ref_tracker: Print allocator task name.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Date: Thu, 04 Apr 2024 16:42:55 +0200
+In-Reply-To: <20240403201715.33883-1-kuniyu@amazon.com>
+References: <20240403201715.33883-1-kuniyu@amazon.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Thu, 04 Apr 2024 10:39:17 -0400
-Message-ID: <7748.1712241557@obiwan.sandelman.ca>
 
---=-=-=
-Content-Type: text/plain
+On Wed, 2024-04-03 at 13:17 -0700, Kuniyuki Iwashima wrote:
+> @@ -208,6 +213,8 @@ int ref_tracker_alloc(struct ref_tracker_dir *dir,
+>  	}
+>  	nr_entries =3D stack_trace_save(entries, ARRAY_SIZE(entries), 1);
+>  	tracker->alloc_stack_handle =3D stack_depot_save(entries, nr_entries, g=
+fp);
+> +	if (in_task())
+> +		get_task_comm(tracker->comm, current);
 
+This apparently causes a lockdep splat, hit by the CI:
 
-Antony Antony <antony@phenome.org> wrote:
-    > Indeed, 10.1.3.2 does not match the policy. However, notice the "flag
-    > icmp" in the above line. That means the policy lookup will use the
-    > inner payload for policy lookup as specified in RFC 4301, Section 6,
-    > which will match. The inner payload 10.1.4.1 <=> 10.1.4.3 will match
-    > the policy.
+https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/537021/16-vrf-route-=
+leaking-sh/stderr
 
-How is "flag icmp" communicated via IKEv2?
-Won't the other gateway just drop this packet?
+it looks like get_task_comm() is for BH-only scope.
 
+Cheers,
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+Paolo
 
------BEGIN PGP SIGNATURE-----
-
-iQFFBAEBCgAvFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAmYOu5URHG1jckBzYW5k
-ZWxtYW4uY2EACgkQgItw+93Q3WWPqAf+JQ6+3Vh9wWz4XKY3BwEVQa6KT5NDvbq8
-awmgZieRmXtSweYCj6A9rNlGeWIhZfJcE8kpeMHpv5426QMR2cxL1A0au9OiLGSt
-LMH72U5F49dn7SyaB1Lc+GpBkM7WX6RbUBu8Kvc4Q8GtZ1fwviXx2tiwBd1AkgS9
-29mVJXkI0P7fheTNM9ReogNwd84Ct+vKgSo9J7qLqy3bNKpKrg0shy4+X9GMJs93
-zMGOIJXyypFxi5ug4+Orr3/rkpAfYuqonRhsJgN3HT1zOHa5QSr/9JWE27V+zKGd
-X4p1btNNdTItYL+loG2Kiz/8jLGLpx00QUYFhxlTQ9laZUrdMtx3hw==
-=djSy
------END PGP SIGNATURE-----
---=-=-=--
 
