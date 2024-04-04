@@ -1,103 +1,110 @@
-Return-Path: <netdev+bounces-84719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B5589827F
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:52:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E3D18982A2
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40791289B9F
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 07:52:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F41B1F25F98
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 07:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF04B5D724;
-	Thu,  4 Apr 2024 07:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625106BFCA;
+	Thu,  4 Apr 2024 07:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMGRYab0"
+	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="BTPeoF04"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bee.tesarici.cz (bee.tesarici.cz [37.205.15.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9895A110
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 07:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF37D5EE76;
+	Thu,  4 Apr 2024 07:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.205.15.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712217127; cv=none; b=tkJ9X3IxRH8cKEsb/PhYwheceBtPPBNaSN4O0dME8nCNDdlxW4YPrMQEPg8Ydc0jlYvGyxQwiiKxUrhNXlBBV9Gq0ATf0Pe13iUcY+657N5IBbiZ/DA/2nX+2kA/oHFLI5Y07bW6WWH/HXAo6fFUE0xxF2WEsgACz1ufbSsZJdo=
+	t=1712217485; cv=none; b=EK/RNrizCWs41WI4wEMFo0J8g1dmeyV4V1mUJtHNNu/ta+W+1/TGLHPNBjWUYjR6Ngn3yN23WXIy0dEjzWWrbfgrdgq3bOs5MQ/P6KdzX7AHXYSf5Q7L+MSOf41UDaKCQMUuy6TiKewRTStM4dPbgP7OfFdIzYrvbYcuXFjw9a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712217127; c=relaxed/simple;
-	bh=xuyJ4Vq6zUtNBwqm/4jt8kNEn56EDs4LkP7OBIGqEmE=;
-	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
-	 Date:Message-ID; b=P4JYslgXMSTJ/DYH5/1/Ju+oJSJv0pXlAA5UXEAVPimvVlvLhRGDyqU60t+4a5OAknAS22YBaWMKSQPWCb7FJK81kSSt+IKzPODPZ9AaA0+cSDBjGhwQlBwk6a5ufwS5fs8RgycxprCY3ilXRxC0IFpoS1hVW+Z2d/fWP3Olq7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gMGRYab0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712217125;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C9vFcjZDN/Fxaa0QMjaZwgnMDGjE5U9a9cC8FQf1Wik=;
-	b=gMGRYab0eErUsdd3zXrJKwLgQgisIvqXXVKn+AZod/TwJq2/LOgQXS7SCydyvMzoocRkR9
-	c2Azw37K98VSOpua7fTunmYuiIBzrARHksM2GgxcKQZ0DI1o+3MiIpvljQyOZ2OieIzv5i
-	QWpfQmTh37uQsB4FJRfJscdtBx7M6MU=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-668-4vRV2FK2MnqAak7lNxvr5w-1; Thu,
- 04 Apr 2024 03:52:01 -0400
-X-MC-Unique: 4vRV2FK2MnqAak7lNxvr5w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	s=arc-20240116; t=1712217485; c=relaxed/simple;
+	bh=jtzhrMLdZ8BM8eIGM+1HCvFVB4kJmRbapmmThq4pMyk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eRoAsRyiv8Sv9c6uN/T/JWa8V8vDPecPICp4HZvCVWIrfKXwX2afX/uk51ASA3QNDNViSlWlwAfJcALQp30311o4ZwiPmVTYWPiMLKQcytgRIxogfdtYZMe++xCRS43zWLPnoXde8gjgRkAFQy66oKqoTrLx0ctOnuix9OHfPMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tesarici.cz; spf=pass smtp.mailfrom=tesarici.cz; dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b=BTPeoF04; arc=none smtp.client-ip=37.205.15.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tesarici.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tesarici.cz
+Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A8E333806736;
-	Thu,  4 Apr 2024 07:52:00 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 739012166B33;
-	Thu,  4 Apr 2024 07:51:56 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240328163424.2781320-22-dhowells@redhat.com>
-References: <20240328163424.2781320-22-dhowells@redhat.com> <20240328163424.2781320-1-dhowells@redhat.com>
-Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
-    Jeff Layton <jlayton@kernel.org>,
-    Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
-    Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: Re: [PATCH 21/26] netfs, 9p: Implement helpers for new write code
+	by bee.tesarici.cz (Postfix) with ESMTPSA id 8F4C41BF132;
+	Thu,  4 Apr 2024 09:58:00 +0200 (CEST)
+Authentication-Results: mail.tesarici.cz; dmarc=fail (p=quarantine dis=none) header.from=tesarici.cz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tesarici.cz; s=mail;
+	t=1712217480; bh=ZeTrjHj8R8/GGeNF/M+NaL7fhHhYqCIgj0CVkk8KzLg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BTPeoF04gCPLsFsx12CG+rAV9sdx737J25fCkK4oVXJMrnTAYLFOVoe9YGkgvUJ5a
+	 ZaecnVh3gxT7Jv+5bhR21nxMu9PW665iI1as0B7z7AdpzqIpn3BGIWCXT/WXYzn14m
+	 wk1rHGeajIUNtm4tSVYi6rkuskfibzSZ/uLWF9bxqkfYS/vAvpxwQ5Lvxxj/0K/IR0
+	 JHqfOlGD2ANKdmjHhku5afPml/bH3lFSXtr9rP9cMZMHtAsQwz3+3mEI0y8byw+aBK
+	 23epvw7DbQe6b/SvEei8yLjTFA+OmFQukCEfKwZxIJtxNSwYN6bgQ4ZnrLd2mFF+3F
+	 Yg5dhg7dHhJdw==
+From: Petr Tesarik <petr@tesarici.cz>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org (open list)
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+	linux-kernel@vger.kernel.org (open list),
+	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>,
+	Petr Tesarik <petr@tesarici.cz>
+Subject: [PATCH net] u64_stats: fix u64_stats_init() for lockdep when used repeatedly in one file
+Date: Thu,  4 Apr 2024 09:57:40 +0200
+Message-ID: <20240404075740.30682-1-petr@tesarici.cz>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3655510.1712217111.1@warthog.procyon.org.uk>
-Date: Thu, 04 Apr 2024 08:51:51 +0100
-Message-ID: <3655511.1712217111@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Transfer-Encoding: 8bit
 
-David Howells <dhowells@redhat.com> wrote:
+Fix bogus lockdep warnings if multiple u64_stats_sync variables are
+initialized in the same file.
 
-> +	size_t len = subreq->len - subreq->transferred;
+With CONFIG_LOCKDEP, seqcount_init() is a macro which declares:
 
-This actually needs to be 'int len' because of the varargs packet formatter.
+	static struct lock_class_key __key;
 
-David
+Since u64_stats_init() is a function (albeit an inline one), all calls
+within the same file end up using the same instance, effectively treating
+them all as a single lock-class.
+
+Fixes: 9464ca650008 ("net: make u64_stats_init() a function")
+Closes: https://lore.kernel.org/netdev/ea1567d9-ce66-45e6-8168-ac40a47d1821@roeck-us.net/
+Signed-off-by: Petr Tesarik <petr@tesarici.cz>
+---
+ include/linux/u64_stats_sync.h | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/u64_stats_sync.h b/include/linux/u64_stats_sync.h
+index ffe48e69b3f3..457879938fc1 100644
+--- a/include/linux/u64_stats_sync.h
++++ b/include/linux/u64_stats_sync.h
+@@ -135,10 +135,11 @@ static inline void u64_stats_inc(u64_stats_t *p)
+ 	p->v++;
+ }
+ 
+-static inline void u64_stats_init(struct u64_stats_sync *syncp)
+-{
+-	seqcount_init(&syncp->seq);
+-}
++#define u64_stats_init(syncp)				\
++	do {						\
++		struct u64_stats_sync *__s = (syncp);	\
++		seqcount_init(&__s->seq);		\
++	} while (0)
+ 
+ static inline void __u64_stats_update_begin(struct u64_stats_sync *syncp)
+ {
+-- 
+2.44.0
 
 
