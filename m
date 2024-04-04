@@ -1,324 +1,114 @@
-Return-Path: <netdev+bounces-84736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE5589837A
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:51:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53B668983A0
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:57:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74DDC28F61F
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 08:51:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537AC1C20D8D
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 08:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D3771B4C;
-	Thu,  4 Apr 2024 08:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77C073186;
+	Thu,  4 Apr 2024 08:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="qj1zT2zs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6AYak8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389AE71B42
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 08:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F33971B4E
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 08:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712220707; cv=none; b=BEaL9x9C3W1nb4UTlQmaqzlGG6+HtNGhYYf4dZbjVY+iJOUoYQKQiisvSZuKqHwVxGi9M4G1LjVvVxdUul9QA8E9fexV+/TK0D2IrBLuQVbv/a40Dsst0EJIpQuQ+sjPXEZ5ppX4B/8hzyh48gBmSk/k1ErzWa/4SPMl/EPG/3M=
+	t=1712221026; cv=none; b=DrJMROOggTeFYuLL7MH6KCo+Rzi9lPczgRdEueyWbktTakYNLjG+CS5+1C+PGYBXDkMRXAeXk0q6KhWihi+vy6PWWHHFQxy83l3Bl4lURCxuGPeaZE+pyAaeHvGg4iy7uMoWr3s9YBgBVplsKq3TyRMG+cgxSNTtaBmzmH4tNF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712220707; c=relaxed/simple;
-	bh=QV2oeWZERwN/CzhgKiCVdOUwTY7orAveVJ7ZAnLpr5I=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=TnuaBIrJCpj/FuKgk4qlWTCZ+owDszz5W0XnJuhlV+u2tMTBKsvPIQsRYNUuxsWaDmfUQ67AmXfcnMdeiAuhb0kiE/z+/wpn441PBZSiDh4/FsdHwCSbMVDWM6GQll7BTUrWWRrQ7CmUKC1EfFpHUI6PuggJ1l64/sOVF/lGAZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=qj1zT2zs; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 0BBEC20893;
-	Thu,  4 Apr 2024 10:51:42 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w6cQCm5Z3l7F; Thu,  4 Apr 2024 10:51:41 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id E3CC4201E5;
-	Thu,  4 Apr 2024 10:51:40 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com E3CC4201E5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1712220700;
-	bh=B1Ac4RcRnZ/bQLQE0gnsjmezgu2IrXFbH1TIZKPJ3ko=;
-	h=Date:From:To:CC:Subject:Reply-To:From;
-	b=qj1zT2zs+wDZLI6iI1yYmzBR6voqpu32Opq7LkTfZpL7azG7sMkfLoY+owAyP+KL0
-	 H0F2Ufm97ul6gekj5qyxLh+S4Ry0RVbSINTtfQngN5fe3cKbTwZRLengrFkNfQf6/I
-	 hvsDXdBzic4FUO/gEE2qunYaCFHpSgcS1zlvwJboQc/MCKR9+NxRkB9R0Pm/CcXRax
-	 x6JXPpz5BP37isaZCwC3qla30jnjSuVx/IlOacQeJ+bMFYkLq3gIYhRbJqT1cRdqN0
-	 jfjJtTUPj5ZduMgHZgi8nQZb1OugPFUD5FKfpNTUIuhE5C4xjday21tl8cwpf0uJNu
-	 QdV7h0ZLHABnA==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id D6E3680004A;
-	Thu,  4 Apr 2024 10:51:40 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 4 Apr 2024 10:51:40 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Thu, 4 Apr
- 2024 10:51:40 +0200
-Date: Thu, 4 Apr 2024 10:51:31 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-CC: Florian Westphal <fw@strlen.de>, Herbert Xu <herbert@gondor.apana.org.au>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andreas Gruenbacher
-	<agruenba@redhat.com>, <devel@linux-ipsec.org>, <netdev@vger.kernel.org>
-Subject: [PATCH ipsec-next v2] udpencap: Remove Obsolete
- UDP_ENCAP_ESPINUDP_NON_IKE Support
-Message-ID: <c873dc4dcaa0ab84b562f29751996db6bd37d440.1712220541.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
+	s=arc-20240116; t=1712221026; c=relaxed/simple;
+	bh=payVFyGnjrWONQxZPASD2sELUcqQAHBtglUmm0Lf5IM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=NHhM3I07+0wPFhvfeK8SLMAi5FWkpQThIXyWaa7GwBDlgFPulrSi/rkT3Gqab3kT0Pl1lTnEXSxPc9AZRSTJ5bt+0143vXroAokDSVSDqzX7WlIRfgsv1Fuv1Bz/z6zrNg7vvqpvmguEosiG4XLOR2nQZYv9NTK4LeJ20j1ZR0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e6AYak8e; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712221024;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=KaZjg34ixG35MC2J/uQFBc+0lATRGuM6qjOLyn811BA=;
+	b=e6AYak8etWB0hs/BN7/o1nZ2ZDsxCmfi+C+p7zFmKNXWofLZBsmicE221e1gShioeHW1Dn
+	ezGJ5P3+MAHA7ue2ToCnyYSNGE1XlkE/z6GxumQ93Bb7Fn7bKccaUu5XoBgIjQhA1AobWK
+	+te2/OGLYeHEzD0MYjWrNYN8aHq6Iaw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-qRDocV29NTmz66Ix3nKmcA-1; Thu, 04 Apr 2024 04:57:02 -0400
+X-MC-Unique: qRDocV29NTmz66Ix3nKmcA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41543b57f2dso1767145e9.0
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 01:57:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712221021; x=1712825821;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KaZjg34ixG35MC2J/uQFBc+0lATRGuM6qjOLyn811BA=;
+        b=eVnEEJBgIE1sWaN9Cvg8gYcSzTBGDBc9yuI0kJKZZEP+PpodMWeky8ZAyfAcKBxBXk
+         kbaJ+nkS0VjQ+eNDNT2zvxuUBNOBgQpcqwarPD0Lb78wG/SZ2+P1utat7V484ka5hjEA
+         xtMFfQNKHl7trj1+mzzo+uukYE8Z+IMig/EIZBJddMJ2dkFbiB9c/u9girOk1bnf9+da
+         yhBOffng6Q33fS3SmJ8jqTjpJl6xRK/43HnLkGqa8Cgp1jh1ayi2KbbmxqUk3CsubO4f
+         i6osD0n2G4PxE8lz/B8kEniwImVFYiSv1tiuG2IZngpNBBcdqr5/f9r1X0bFjdipkzB1
+         IWdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTSXy+RRUvFnXkmWuY7wWYEn4N4/2Ei1N6eWfPCV2gECJyUcaDIlTA4voVE+g/SunxeGs78Ejiyuu1L44MXkNRtE+p0c2w
+X-Gm-Message-State: AOJu0YyQf1BHkKSHwvoW/XlFsBWoJqUNZEC6GbdcGVKIuz7COuuNWxCh
+	DAK7pmsITcMvsJVJaAgpmOlLTiaDxsH4HMv3mvzXYgmWQlvSUKsET1PdHIUdv+PneY+IPG22orE
+	u0rNXRM/cbdwODuceBAS2or5Zjg0GqVKDTwkcBSY8dOpg/A/qpgGZ+Q==
+X-Received: by 2002:a05:6000:1887:b0:343:bccb:af41 with SMTP id a7-20020a056000188700b00343bccbaf41mr1114711wri.4.1712221021390;
+        Thu, 04 Apr 2024 01:57:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHYoTW/0xnQmkFpE+2Z699+rByuCUrILQa6di79cHcS1c9qPyT5/db+Oox9c/qVG9EP1+H8rQ==
+X-Received: by 2002:a05:6000:1887:b0:343:bccb:af41 with SMTP id a7-20020a056000188700b00343bccbaf41mr1114697wri.4.1712221021075;
+        Thu, 04 Apr 2024 01:57:01 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-247-213.dyn.eolo.it. [146.241.247.213])
+        by smtp.gmail.com with ESMTPSA id b12-20020a5d4b8c000000b00343723c126asm6306182wrt.48.2024.04.04.01.56.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 01:57:00 -0700 (PDT)
+Message-ID: <4726fefd2a710cbee0d1a7fb15e361564915e955.camel@redhat.com>
+Subject: Re: [PATCH net-next v3] tg3: Remove residual error handling in
+ tg3_suspend
+From: Paolo Abeni <pabeni@redhat.com>
+To: Nikita Kiryushin <kiryushin@ancud.ru>
+Cc: mchan@broadcom.com, pavan.chebbi@broadcom.com, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, rjw@rjwysocki.net,
+ netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org,  michael.chan@broadcom.com
+Date: Thu, 04 Apr 2024 10:56:59 +0200
+In-Reply-To: <171222062943.6705.9843920756752610864.git-patchwork-notify@kernel.org>
+References: <20240401191418.361747-1-kiryushin@ancud.ru>
+	 <171222062943.6705.9843920756752610864.git-patchwork-notify@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
 
-The UDP_ENCAP_ESPINUDP_NON_IKE mode, introduced into the Linux kernel
-in 2004 [2], has remained inactive and obsolete for an extended period.
+On Thu, 2024-04-04 at 08:50 +0000, patchwork-bot+netdevbpf@kernel.org
+wrote:
+> Hello:
+>=20
+> This patch was applied to netdev/net.git (main)
+                                   ^^^^^^^
+Wrong tree, blame on me. I'm reverting it from net, I will re-apply to
+net-next. Sorry for the noise.
 
-This mode was originally defined in an early version of an IETF draft
-[1] from 2001. By the time it was integrated into the kernel in 2004 [2],
-it had already been replaced by UDP_ENCAP_ESPINUDP [3] in later
-versions of draft-ietf-ipsec-udp-encaps, particularly in version 06.
-
-Over time, UDP_ENCAP_ESPINUDP_NON_IKE has lost its relevance, with no
-known use cases.
-
-With this commit, we remove support for UDP_ENCAP_ESPINUDP_NON_IKE,
-simplifying the codebase and eliminating unnecessary complexity.
-Actually, we remove the functionality and wrap  UDP_ENCAP_ESPINUDP_NON_IKE
-defination in "#ifndef __KERNEL__". If it is used again in kernel code
-your build will fail.
-
-References:
-[1] https://datatracker.ietf.org/doc/html/draft-ietf-ipsec-udp-encaps-00.txt
-
-[2] Commit that added UDP_ENCAP_ESPINUDP_NON_IKE to the Linux historic
-    repository.
-
-    Author: Andreas Gruenbacher <agruen@suse.de>
-    Date: Fri Apr 9 01:47:47 2004 -0700
-
-   [IPSEC]: Support draft-ietf-ipsec-udp-encaps-00/01, some ipec impls need it.
-
-[3] Commit that added UDP_ENCAP_ESPINUDP to the Linux historic
-    repository.
-
-    Author: Derek Atkins <derek@ihtfp.com>
-    Date: Wed Apr 2 13:21:02 2003 -0800
-
-    [IPSEC]: Implement UDP Encapsulation framework.
-
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
-v1 -> v2
-- removed defination wrapped in #ifndef __KERNEL__ It would falsly
-  let userspace appliction build and break when running.
-RFC -> v1
-- keep removed defination wrapped in #ifndef __KERNEL__
----
- include/uapi/linux/udp.h |  1 -
- net/ipv4/esp4.c          | 12 ------------
- net/ipv4/udp.c           |  2 --
- net/ipv4/xfrm4_input.c   | 13 -------------
- net/ipv6/esp6.c          | 12 ------------
- net/ipv6/xfrm6_input.c   | 13 -------------
- 6 files changed, 53 deletions(-)
-
-diff --git a/include/uapi/linux/udp.h b/include/uapi/linux/udp.h
-index 4828794efcf8..1516f53698e0 100644
---- a/include/uapi/linux/udp.h
-+++ b/include/uapi/linux/udp.h
-@@ -36,7 +36,6 @@ struct udphdr {
- #define UDP_GRO		104	/* This socket can receive UDP GRO packets */
-
- /* UDP encapsulation types */
--#define UDP_ENCAP_ESPINUDP_NON_IKE	1 /* draft-ietf-ipsec-nat-t-ike-00/01 */
- #define UDP_ENCAP_ESPINUDP	2 /* draft-ietf-ipsec-udp-encaps-06 */
- #define UDP_ENCAP_L2TPINUDP	3 /* rfc2661 */
- #define UDP_ENCAP_GTP0		4 /* GSM TS 09.60 */
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index d33d12421814..695f775640ac 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -347,7 +347,6 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
- 					       __be16 dport)
- {
- 	struct udphdr *uh;
--	__be32 *udpdata32;
- 	unsigned int len;
-
- 	len = skb->len + esp->tailen - skb_transport_offset(skb);
-@@ -362,12 +361,6 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
-
- 	*skb_mac_header(skb) = IPPROTO_UDP;
-
--	if (encap_type == UDP_ENCAP_ESPINUDP_NON_IKE) {
--		udpdata32 = (__be32 *)(uh + 1);
--		udpdata32[0] = udpdata32[1] = 0;
--		return (struct ip_esp_hdr *)(udpdata32 + 2);
--	}
--
- 	return (struct ip_esp_hdr *)(uh + 1);
- }
-
-@@ -423,7 +416,6 @@ static int esp_output_encap(struct xfrm_state *x, struct sk_buff *skb,
- 	switch (encap_type) {
- 	default:
- 	case UDP_ENCAP_ESPINUDP:
--	case UDP_ENCAP_ESPINUDP_NON_IKE:
- 		esph = esp_output_udp_encap(skb, encap_type, esp, sport, dport);
- 		break;
- 	case TCP_ENCAP_ESPINTCP:
-@@ -775,7 +767,6 @@ int esp_input_done2(struct sk_buff *skb, int err)
- 			source = th->source;
- 			break;
- 		case UDP_ENCAP_ESPINUDP:
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
- 			source = uh->source;
- 			break;
- 		default:
-@@ -1179,9 +1170,6 @@ static int esp_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
- 		case UDP_ENCAP_ESPINUDP:
- 			x->props.header_len += sizeof(struct udphdr);
- 			break;
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
--			x->props.header_len += sizeof(struct udphdr) + 2 * sizeof(u32);
--			break;
- #ifdef CONFIG_INET_ESPINTCP
- 		case TCP_ENCAP_ESPINTCP:
- 			/* only the length field, TCP encap is done by
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 661d0e0d273f..16b6a9d59b02 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2688,8 +2688,6 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
- #ifdef CONFIG_XFRM
- 		case UDP_ENCAP_ESPINUDP:
- 			set_xfrm_gro_udp_encap_rcv(val, sk->sk_family, sk);
--			fallthrough;
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
- #if IS_ENABLED(CONFIG_IPV6)
- 			if (sk->sk_family == AF_INET6)
- 				WRITE_ONCE(up->encap_rcv,
-diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
-index dae35101d189..0918b0682174 100644
---- a/net/ipv4/xfrm4_input.c
-+++ b/net/ipv4/xfrm4_input.c
-@@ -113,19 +113,6 @@ static int __xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
- 			/* Must be an IKE packet.. pass it through */
- 			return 1;
- 		break;
--	case UDP_ENCAP_ESPINUDP_NON_IKE:
--		/* Check if this is a keepalive packet.  If so, eat it. */
--		if (len == 1 && udpdata[0] == 0xff) {
--			return -EINVAL;
--		} else if (len > 2 * sizeof(u32) + sizeof(struct ip_esp_hdr) &&
--			   udpdata32[0] == 0 && udpdata32[1] == 0) {
--
--			/* ESP Packet with Non-IKE marker */
--			len = sizeof(struct udphdr) + 2 * sizeof(u32);
--		} else
--			/* Must be an IKE packet.. pass it through */
--			return 1;
--		break;
- 	}
-
- 	/* At this point we are sure that this is an ESPinUDP packet,
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 7371886d4f9f..cafb5746f4c7 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -383,7 +383,6 @@ static struct ip_esp_hdr *esp6_output_udp_encap(struct sk_buff *skb,
- 					       __be16 dport)
- {
- 	struct udphdr *uh;
--	__be32 *udpdata32;
- 	unsigned int len;
-
- 	len = skb->len + esp->tailen - skb_transport_offset(skb);
-@@ -398,12 +397,6 @@ static struct ip_esp_hdr *esp6_output_udp_encap(struct sk_buff *skb,
-
- 	*skb_mac_header(skb) = IPPROTO_UDP;
-
--	if (encap_type == UDP_ENCAP_ESPINUDP_NON_IKE) {
--		udpdata32 = (__be32 *)(uh + 1);
--		udpdata32[0] = udpdata32[1] = 0;
--		return (struct ip_esp_hdr *)(udpdata32 + 2);
--	}
--
- 	return (struct ip_esp_hdr *)(uh + 1);
- }
-
-@@ -459,7 +452,6 @@ static int esp6_output_encap(struct xfrm_state *x, struct sk_buff *skb,
- 	switch (encap_type) {
- 	default:
- 	case UDP_ENCAP_ESPINUDP:
--	case UDP_ENCAP_ESPINUDP_NON_IKE:
- 		esph = esp6_output_udp_encap(skb, encap_type, esp, sport, dport);
- 		break;
- 	case TCP_ENCAP_ESPINTCP:
-@@ -822,7 +814,6 @@ int esp6_input_done2(struct sk_buff *skb, int err)
- 			source = th->source;
- 			break;
- 		case UDP_ENCAP_ESPINUDP:
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
- 			source = uh->source;
- 			break;
- 		default:
-@@ -1232,9 +1223,6 @@ static int esp6_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
- 		case UDP_ENCAP_ESPINUDP:
- 			x->props.header_len += sizeof(struct udphdr);
- 			break;
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
--			x->props.header_len += sizeof(struct udphdr) + 2 * sizeof(u32);
--			break;
- #ifdef CONFIG_INET6_ESPINTCP
- 		case TCP_ENCAP_ESPINTCP:
- 			/* only the length field, TCP encap is done by
-diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
-index a17d783dc7c0..2c6aeb090b7a 100644
---- a/net/ipv6/xfrm6_input.c
-+++ b/net/ipv6/xfrm6_input.c
-@@ -109,19 +109,6 @@ static int __xfrm6_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
- 			/* Must be an IKE packet.. pass it through */
- 			return 1;
- 		break;
--	case UDP_ENCAP_ESPINUDP_NON_IKE:
--		/* Check if this is a keepalive packet.  If so, eat it. */
--		if (len == 1 && udpdata[0] == 0xff) {
--			return -EINVAL;
--		} else if (len > 2 * sizeof(u32) + sizeof(struct ip_esp_hdr) &&
--			   udpdata32[0] == 0 && udpdata32[1] == 0) {
--
--			/* ESP Packet with Non-IKE marker */
--			len = sizeof(struct udphdr) + 2 * sizeof(u32);
--		} else
--			/* Must be an IKE packet.. pass it through */
--			return 1;
--		break;
- 	}
-
- 	/* At this point we are sure that this is an ESPinUDP packet,
---
-2.30.2
+Paolo
 
 
