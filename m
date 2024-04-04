@@ -1,183 +1,123 @@
-Return-Path: <netdev+bounces-84964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91EC4898D04
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:09:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33E82898D06
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:09:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0591D1F2295E
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:09:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C848B1F22C32
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E189412EBE8;
-	Thu,  4 Apr 2024 17:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A9F12BF06;
+	Thu,  4 Apr 2024 17:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jC5EaRQM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QThm8eB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEDE12CDB5
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 17:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A3712BEBC
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 17:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712250540; cv=none; b=MtWWqUeg1LW++YfyCKFUFzBIpRC75lX7pxs4IAHuue1nJVV9kQdX5d2z8cpy+/fpB1+O3w/S8TLBoWBiIjxOgBxppK3NA9K9Q3ESu30UJR/3WKNFIuvKtT6gdYpOLFn3K7OiCU2k7ozSKr1tjouTy9JyduqjPgo6TrEfuv0s6yg=
+	t=1712250576; cv=none; b=DtnDa9MWVh5TFXp0EHUReuVh/DmEIXxJahVT8wRwfDiFVYCkF6Uk0ydGLGRc/06l059CW3AEACkAi2T6mYo50+i42xwJ2I/GmgEJRm/eChTBTHYXYyjF4o3UkXUzd9qdSsM1n452JOgwBIk+4WmfOwR2vxYMFqzekSrNrLmyno8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712250540; c=relaxed/simple;
-	bh=qIeHxQSzEKN+T+ZMX5PFicsmdKmy6EfcZQYdz44LOBA=;
+	s=arc-20240116; t=1712250576; c=relaxed/simple;
+	bh=75veXdvHVGBGKdsT/X9RInAKKKDeeyDLnHogazNvqHM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NHsfchi5b6VDua5UATgKU2mvU6j5hTtwAx6+TDgf5/5DqM8SQkTCHMyAltm7ML0QpPUdac8jjLNY0QkveScHKkd5PwJGZAKh9lWw8J3V9cTRPmUhF7rsxjaxSyzOQUisIRpkjK33djwUfpBAHKC4QwJATLD8Mct5W+7VMtZN8I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jC5EaRQM; arc=none smtp.client-ip=209.85.219.177
+	 To:Cc:Content-Type; b=g9zr+K2QdbztiSQiGa1KMOyt9tTw3RyLcmzeNPEqqLxwatPHt+uE/IQdwhnDFwb/Z7AQmLh9fsf2sq0yi45kGISXljCBDsaIi8L05BZqeH0jWC0zDWqpwWaHLoAHc9Agc5fA4POpMZkzYSNP0mLvQfeskSi4dlz7xixC6Zanws4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QThm8eB2; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dcc73148611so1373066276.3
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 10:08:57 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso343a12.1
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 10:09:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712250536; x=1712855336; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712250573; x=1712855373; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KuDs1drwJi9Z+z9OuWkhK3ckPKS9r4/p1uVUkFqevFk=;
-        b=jC5EaRQMXoWxXcT/PNqSjrcsftwnvseB5AtKBg2vqgAyyLVQgp20SRegZq7YLIrdO/
-         HTQWScQM/DW37R2IYh+dwMOL2ayL0pQIQzYyP1lXQTLRA97VQiYJ9PHXRyMfJ/Z9ZvVJ
-         oFpUWCWEB1bSpDEyqEQ7RCqnI1td28ZhCzX2yYyMeaCp+6hQUqHZ6EtZjij0pKovvOgy
-         stCx6Jb+d1gT/UvnialtOoZLUIi5qkRs+J/dXYzAxsZr67uO7BH+bPTh4Ub09lLJuNIn
-         17mjFsnILx+0qC4dxBW5VMWwIa7xznM4mAxRt/Jwv9KrNYGo+0DSWcP592JJrWie/m+S
-         e2vQ==
+        bh=qd/KUutY8k98OH4WU4pXgX2oA0me8NydQT/NVKkKzK4=;
+        b=QThm8eB2GkIYFIQZdCGqbHmGOJKti29fms8vpvUh3EgP4zVwzq0Oos2C+gZQJeCEW1
+         j/9YxeFIylb2cpnUTJ6Hb3CWN3fx7ul/ajlRk9fJlWg6swWbQ2JVzkcxljCJx9dwSF0W
+         Yc5TIvApxFMj9b8vUxrqaEESgXNs/1qc7JmSjK6uX4zgdKnK21CThjEAN2QsMBYuA1RD
+         346d9RfQiBrsJ4Ua9gQMiEQQ5McXLhhTcpZErZRA7W+16IP7akgfFSsdW+nZ4c0uaVMc
+         S1M0vu9WFJOF5iw+ToHaZvVBt4g+10O3L3fwUHK+h9BmlfWLTMOIcs01L8xXROaiTriJ
+         bmEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712250536; x=1712855336;
+        d=1e100.net; s=20230601; t=1712250573; x=1712855373;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KuDs1drwJi9Z+z9OuWkhK3ckPKS9r4/p1uVUkFqevFk=;
-        b=ghr8ZzZuboqeV/qRa3Bk53PMHogggRnJ9KYZDhfiPWPOS10gYWBbleqK0hTQBshBeK
-         /K0Vv+FK1+vpdSZ6QAnbrTeew91eZkmm9jfVjaNh7U+Id1hQ02DbvnUa1Um5wBpLqm5u
-         FIGitiW+W+HCnOlEBst2Taut8oJlPUIZwH/YaCy3zgviYdYXRjbmxXLCnEChz7zRzgeu
-         iRuNQPLLjiSNUIiUXBwZ93844P0ucHKXCCvDI1ikZC4cBrY8v8Cy/2wLVeJHw/NiwXN1
-         VOHLjnLSg/bKT6YAUGlTqbxuOJrGN2RVFP75zrTiVgdbgdU8LdJ4a5u2cMw+qU9KHFSy
-         bldg==
-X-Forwarded-Encrypted: i=1; AJvYcCXgkQK5LEeiw3/QJxKyzmsj/VPApO6WgVvkW1nL/GOl5YMWAHIDWRIGEmyzTLF3CT0OpSkIILC5bYlVYFtofpH3FkvTHBvo
-X-Gm-Message-State: AOJu0YyYPCvbYga/fSIzZ6jxQ5YkvH5jbgSUtZhzN2E4QM3dmONw523t
-	YVXUlbfBVUZNR3cn8x8sjxPjqNgCnptXhkYwIdfC/LEvIcwJdZUsIsGm73GF/LvCyjCaPaAeLhb
-	uguSwAnDAKBaZR9nBUWFtfe0lliVBOzGd9Hs9
-X-Google-Smtp-Source: AGHT+IFt2ASldzAexjX0sPM2NMrH0Lqtd66mUXGVX9ZgF2XSVZKC+BEFwLxb4crFlAjVgX0qYdICDkkyaJeo+de/1Hw=
-X-Received: by 2002:a25:ac19:0:b0:dcb:b072:82d5 with SMTP id
- w25-20020a25ac19000000b00dcbb07282d5mr3065164ybi.64.1712250536330; Thu, 04
- Apr 2024 10:08:56 -0700 (PDT)
+        bh=qd/KUutY8k98OH4WU4pXgX2oA0me8NydQT/NVKkKzK4=;
+        b=YI94XWr2Ynfc6JBqI4AnG0hQ3cLbPH5Uc54Ut9E4zfAvLJ5RiUaom3754IN7aQ2b1d
+         6u4vlNxmOH8zwIZ8+VWP0ONasv1IojFQOJUzQZyptZhaoG4bVQxOGjc5irN9E6stJQW+
+         oLds9v0ud/PlosO2/yYTXMnrgXlSxEcWqe8XNsQoXf+RqDHdR7NakPqqOfjVHVO3xpbp
+         Z8uuTy6snT3Iniawt0SXW2aaaZLaPQFIaNm67WNRZtPYehdP+A7mch/Rr4l3Gd9GngZl
+         rBmXBuftzqXe5Q8XF7mVLb0cVKGU0RjGWIoKDAC74wusQKWI3uYfsd60bP6MvCw76Ssy
+         8Zug==
+X-Forwarded-Encrypted: i=1; AJvYcCU5ieL+GxDotqtowiVyvFLLXqi7sf17Nu+ehvn3XS0ykpBDCH7w1QDbbvnSj5i0sk3rN4eUZk4EeE0hOcaOd5NOXv4EUDTD
+X-Gm-Message-State: AOJu0YzlDPsGaANaYa5X2J0AVZAvawuLzzl9WIhngBAc2cZVtmg+/gJk
+	PCmrSrxr3tog5ZQrb3a/Z8BQXue5lKk3Kp9u+bdI0DFTDTZd3MMru535DjfPEBnpHd+3ZN5phi3
+	3LY+L+Ii8uYeUV/uHtVrtxJqUB80RLZsUiDSP
+X-Google-Smtp-Source: AGHT+IFs5FJlTAX7nsxWbYHR9ouajL9lmeqa7W4zxKxY/vQBRgiYYzHoA+deevjGKTY1BU89KBnI2KUBZFtexJKnLxM=
+X-Received: by 2002:aa7:cd05:0:b0:56e:2239:bcbe with SMTP id
+ b5-20020aa7cd05000000b0056e2239bcbemr129710edw.2.1712250573448; Thu, 04 Apr
+ 2024 10:09:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404165404.3805498-1-surenb@google.com> <Zg7dmp5VJkm1nLRM@casper.infradead.org>
-In-Reply-To: <Zg7dmp5VJkm1nLRM@casper.infradead.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Thu, 4 Apr 2024 10:08:45 -0700
-Message-ID: <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
- the call site
-To: Matthew Wilcox <willy@infradead.org>
-Cc: akpm@linux-foundation.org, joro@8bytes.org, will@kernel.org, 
-	trond.myklebust@hammerspace.com, anna@kernel.org, arnd@arndb.de, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, jikos@kernel.org, 
-	benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
-	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
-	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, 
-	vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	kent.overstreet@linux.dev
+References: <20240404131126.2534400-1-edumazet@google.com> <20240404100035.3270a7d5@kernel.org>
+In-Reply-To: <20240404100035.3270a7d5@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 4 Apr 2024 19:09:22 +0200
+Message-ID: <CANn89iJxsJBj6tG7BQ2rDibcXnb-PSHREY_zKSAFcNXQacQO3A@mail.gmail.com>
+Subject: Re: [PATCH net] geneve: fix header validation in geneve[6]_xmit_skb
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com, 
+	Phillip Potter <phil@philpotter.co.uk>, Sabrina Dubroca <sd@queasysnail.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 4, 2024 at 10:04=E2=80=AFAM Matthew Wilcox <willy@infradead.org=
-> wrote:
+On Thu, Apr 4, 2024 at 7:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
-> On Thu, Apr 04, 2024 at 09:54:04AM -0700, Suren Baghdasaryan wrote:
-> > +++ b/include/linux/dma-fence-chain.h
-> > @@ -86,10 +86,7 @@ dma_fence_chain_contained(struct dma_fence *fence)
-> >   *
-> >   * Returns a new struct dma_fence_chain object or NULL on failure.
-> >   */
-> > -static inline struct dma_fence_chain *dma_fence_chain_alloc(void)
-> > -{
-> > -     return kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL);
-> > -};
-> > +#define dma_fence_chain_alloc()      kmalloc(sizeof(struct dma_fence_c=
-hain), GFP_KERNEL)
->
-> You've removed some typesafety here.  Before, if I wrote:
->
->         struct page *page =3D dma_fence_chain_alloc();
->
-> the compiler would warn me that I've done something stupid.  Now it
-> can't tell.  Suggest perhaps:
->
-> #define dma_fence_chain_alloc()                                          =
- \
->         (struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),=
- \
->                                                 GFP_KERNEL)
->
-> but maybe there's a better way of doing that.  There are a few other
-> occurrences of the same problem in this monster patch.
-
-Got your point.
-
->
-> > +++ b/include/linux/hid_bpf.h
-> > @@ -149,10 +149,7 @@ static inline int hid_bpf_connect_device(struct hi=
-d_device *hdev) { return 0; }
-> >  static inline void hid_bpf_disconnect_device(struct hid_device *hdev) =
-{}
-> >  static inline void hid_bpf_destroy_device(struct hid_device *hid) {}
-> >  static inline void hid_bpf_device_init(struct hid_device *hid) {}
-> > -static inline u8 *call_hid_bpf_rdesc_fixup(struct hid_device *hdev, u8=
- *rdesc, unsigned int *size)
-> > -{
-> > -     return kmemdup(rdesc, *size, GFP_KERNEL);
-> > -}
-> > +#define call_hid_bpf_rdesc_fixup(_hdev, _rdesc, _size) kmemdup(_rdesc,=
- *(_size), GFP_KERNEL)
->
-> here
->
-> > -static inline handle_t *jbd2_alloc_handle(gfp_t gfp_flags)
-> > -{
-> > -     return kmem_cache_zalloc(jbd2_handle_cache, gfp_flags);
-> > -}
-> > +#define jbd2_alloc_handle(_gfp_flags)        kmem_cache_zalloc(jbd2_ha=
-ndle_cache, _gfp_flags)
->
-> here
->
-> > +++ b/include/linux/skmsg.h
-> > @@ -410,11 +410,8 @@ void sk_psock_stop_verdict(struct sock *sk, struct=
- sk_psock *psock);
-> >  int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
-> >                        struct sk_msg *msg);
+> On Thu,  4 Apr 2024 13:11:26 +0000 Eric Dumazet wrote:
+> > syzbot is able to trigger an uninit-value in geneve_xmit() [1]
 > >
-> > -static inline struct sk_psock_link *sk_psock_init_link(void)
-> > -{
-> > -     return kzalloc(sizeof(struct sk_psock_link),
-> > -                    GFP_ATOMIC | __GFP_NOWARN);
-> > -}
-> > +#define sk_psock_init_link() \
-> > +             kzalloc(sizeof(struct sk_psock_link), GFP_ATOMIC | __GFP_=
-NOWARN)
+> > Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield())
+> > uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
+> > skb->protocol.
+> >
+> > If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->protocol,
+> > pskb_inet_may_pull() does nothing at all.
+> >
+> > If a vlan tag was provided by the caller (af_packet in the syzbot case)=
+,
+> > the network header might not point to the correct location, and skb
+> > linear part could be smaller than expected.
+> >
+> > Add skb_vlan_inet_prepare() to perform a complete mac validation.
+> >
+> > Use this in geneve for the moment, I suspect we need to adopt this
+> > more broadly.
 >
-> here
+> Something is cause the ttl test do break:
 >
-> ... I kind of gave up at this point.  You'll want to audit for yourself
-> anyway ;-)
+> # =E2=94=82 geneve =E2=94=82     4 =E2=94=82     4 =E2=94=82 inherit 0x3c=
+ =E2=94=82    inherit 8 =E2=94=82 false =E2=94=82./l2_tos_ttl_inherit.sh: l=
+ine 350: printf: 0xeaECT0: invalid hex number
+> ok 1 selftests: net: l2_tos_ttl_inherit.sh # SKIP
+>
+> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/537382/6-l2-tos-tt=
+l-inherit-sh/stdout
+>
+> Is is possibly this change?
 
-Yes, I'll go over it and will make the required changes. Thanks for
-looking into it!
-Suren.
+Let me check this, thanks !
 
