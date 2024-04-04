@@ -1,100 +1,105 @@
-Return-Path: <netdev+bounces-85003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D080898E9D
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:05:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58176898ECF
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:17:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E09F7B26E63
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:05:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E84D1F21FCC
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F197F1332A0;
-	Thu,  4 Apr 2024 19:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ABD2133413;
+	Thu,  4 Apr 2024 19:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWm9a7UG"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ouUr4Yzr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C742C13281A;
-	Thu,  4 Apr 2024 19:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E215513119B;
+	Thu,  4 Apr 2024 19:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712257519; cv=none; b=atPLfvWh6eADGuBSsBWSem3BrtdiwoltFcz7DXBtQPWHLa8hwmyAr0X7DtqvX+Tjmx+AhbCaWnz0CSbbRzQI1gpFcwR8wkl4j5CMKsvvIT8J1q0CRH+h+YwM92b5ajq32ujEMJoUFIr1xByODw1g6muncOLGT/4GSaSEi0uPX0Y=
+	t=1712258250; cv=none; b=cuyS+kDZCNFLG7Z10tBJP2KSds6QISDlcao2l0S+4Op2sZP9XVwzkr2DUBcd0PO4vymElQ8WSYh/pJJw4wuYI7VfGpPk4p1a2KUBiVtZWUhIeB6BVIMdx242SuXn0uPpsxaqwLp0e3TJ7SwcLitbEw4My9p7HxOed1oOIqmi0wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712257519; c=relaxed/simple;
-	bh=KGp40LrbcNKw0qSOzQOETPv7v9G01+pHwMF09MGhAfA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BDb2vDESgPJWNZJblBWqs73faWRVKzwOmmsuSF9t0tUAHQUsAOfFRHPVTihJ2/9oyiSXZ1pgmorCbOkS2/Q+e07jAh5sujUCV2oDkmc0982Wx0vAEPFYotR2oOsqbZMPmbKKCiaCuB9sh7vjy+w+HsrnpsFos5Ehu/jxL7uJfKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWm9a7UG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B986C433F1;
-	Thu,  4 Apr 2024 19:05:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712257519;
-	bh=KGp40LrbcNKw0qSOzQOETPv7v9G01+pHwMF09MGhAfA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WWm9a7UGjgyFQtMbsy+MWiHjpfm8YK8lAQbWLdSYJ82EN3gmz+z6zSE1m/0FM5nz6
-	 nLpvcuyNuGB6fehe1B3YJtqYWhE9BVltGSFJ3XqffTQUN/B0kJ03fwuAeh8Z4sUBeS
-	 Wp1FwG8u7hxYlmET+n48c5SnjL4dgyZtltsSjrpUZURcVwdQma3YJOgnCYN9cum15w
-	 S44EGvuwWrs4KBo3hDW4q1XqxAc528qDWgH7LBCvBEKrElZOq84VsI0mrOHjYGfXrj
-	 Tcw8ywaya+y01c5eQKClbW+xRgRG8ZHyrMaQGirbVtNizIFEjl03d4r+eTnEHL+GLj
-	 GaIyCN4gModyQ==
-Date: Thu, 4 Apr 2024 22:05:15 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jiri Pirko <jiri@resnulli.us>,
-	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <20240404190515.GY11187@unreal>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <Zg6Q8Re0TlkDkrkr@nanopsycho>
- <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
- <Zg7JDL2WOaIf3dxI@nanopsycho>
- <20204f34-eae6-47cd-bac3-540a577595e1@lunn.ch>
+	s=arc-20240116; t=1712258250; c=relaxed/simple;
+	bh=DIPK6f6CAa3cqdVDKBGfl3pnOMadHOz2VC8QjAmhrbw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lIjpIWseVi7pRpbJRad4QIzXTV8Sg0LhEkG5UR8xm/c2JU7YFoVYmHtFzA3pq2T7x2baCPgM07wC3y/K6xlaP3QrAdfs19uUveP0jwPU1K7717D4H9wV84OspIa7FN9en7M6az/fa/+f9NsiWzHQEeHt7bEqgkC4+PEIawjCR+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ouUr4Yzr; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.64.1.95] (unknown [20.29.225.195])
+	by linux.microsoft.com (Postfix) with ESMTPSA id DEEC720E94A7;
+	Thu,  4 Apr 2024 12:17:27 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DEEC720E94A7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1712258248;
+	bh=ZrJyqrC7sT3JNnbsQN7FmNZAzW2Ic4NFV4xHepZ1iyE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ouUr4YzrTeT1xQ1G84VlDGr/wpUk6MGHRGIQMB7WoEeMZ+IPgpdMcvtmzPFc3Klyf
+	 aGnO13FEkkfhZT6ZBcqpgxS84Ob9Fza2JbfZXbMQXPvtNWxBeefu162cM7VQ0yCR/H
+	 fdTWdfJov5qRIM4zOKJufV8tFIV67xSnLc0hYGik=
+Message-ID: <cd983b4d-70dc-47b8-96cd-55bba39eb892@linux.microsoft.com>
+Date: Thu, 4 Apr 2024 12:17:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20204f34-eae6-47cd-bac3-540a577595e1@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v0 10/14] sfc: falcon: Make I2C terminology more inclusive
+To: Simon Horman <horms@kernel.org>
+Cc: Edward Cree <ecree.xilinx@gmail.com>,
+ Martin Habets <habetsm.xilinx@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "open list:SFC NETWORK DRIVER" <netdev@vger.kernel.org>,
+ "open list:SFC NETWORK DRIVER" <linux-net-drivers@amd.com>,
+ open list <linux-kernel@vger.kernel.org>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>,
+ "open list:RADEON and AMDGPU DRM DRIVERS" <amd-gfx@lists.freedesktop.org>,
+ "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
+ "open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS"
+ <intel-gfx@lists.freedesktop.org>,
+ "open list:INTEL DRM DISPLAY FOR XE AND I915 DRIVERS"
+ <intel-xe@lists.freedesktop.org>,
+ "open list:DRM DRIVER FOR NVIDIA GEFORCE/QUADRO GPUS"
+ <nouveau@lists.freedesktop.org>,
+ "open list:I2C SUBSYSTEM HOST DRIVERS" <linux-i2c@vger.kernel.org>,
+ "open list:BTTV VIDEO4LINUX DRIVER" <linux-media@vger.kernel.org>,
+ "open list:FRAMEBUFFER LAYER" <linux-fbdev@vger.kernel.org>
+References: <20240329170038.3863998-1-eahariha@linux.microsoft.com>
+ <20240329170038.3863998-11-eahariha@linux.microsoft.com>
+ <20240402082951.GG26556@kernel.org>
+Content-Language: en-CA
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <20240402082951.GG26556@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 04, 2024 at 08:35:18PM +0200, Andrew Lunn wrote:
-> > OCP, ehm, lets say I have my reservations...
-> > Okay, what motivation would anyne have to touch the fw of a hardware
-> > running inside Meta datacenter only? Does not make any sense.
-> > 
-> > I'd say come again when your HW is not limited to Meta datacenter.
-> > For the record and FWIW, I NACK this.
+On 4/2/2024 1:29 AM, Simon Horman wrote:
+> On Fri, Mar 29, 2024 at 05:00:34PM +0000, Easwar Hariharan wrote:
+>> I2C v7, SMBus 3.2, and I3C specifications have replaced "master/slave"
+>> with more appropriate terms. Inspired by and following on to Wolfram's
+>> series to fix drivers/i2c/[1], fix the terminology for users of
+>> I2C_ALGOBIT bitbanging interface, now that the approved verbiage exists
+>> in the specification.
+>>
+>> Compile tested, no functionality changes intended
+>>
+>> [1]: https://lore.kernel.org/all/20240322132619.6389-1-wsa+renesas@sang-engineering.com/
+>>
+>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 > 
-> Is ENA used outside of Amazon data centres?
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-At least this driver is needed when you use cloud instance in Amazon
-and want install your own kernel/OS.
 
-> 
-> Is FUNGIBLE used outside of Microsoft data centres?
+Thank you, Simon, for reviewing. I believe that we are settling on controller/target
+terminology from feedback on the other drivers in this series. Would you want to re-review
+v1 with that change, or should I add you R-B in v1 despite the change?
 
-Have no idea
-
-> 
-> Is gVNIC used outside of Google data centres?
-
-You need this driver too.
-https://cloud.google.com/compute/docs/networking/using-gvnic
-
-> 
-> I don't actually know, i'm more of an Embedded developer.
-> 
->   Andrew
-> 
-> 
+Thanks,
+Easwar
 
