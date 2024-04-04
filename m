@@ -1,171 +1,171 @@
-Return-Path: <netdev+bounces-85006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A39C898EEE
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:22:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E68898F0E
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:31:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84A921F26776
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:22:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9C681F21E5D
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D9A134407;
-	Thu,  4 Apr 2024 19:22:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8E0133439;
+	Thu,  4 Apr 2024 19:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EiI6kx6I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IJq9hjHK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75251339A2;
-	Thu,  4 Apr 2024 19:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983C6133419;
+	Thu,  4 Apr 2024 19:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712258563; cv=none; b=Dl1HZ6vDfArY+9CbiaM5UbZjLc7YP7etuhm4mHIs1107v5fRQaLu1HydRxgNe0vhqR0W/vD5XIDf7X8aHF9OJvJbHZbciTbWu9uhgDdYS7QRq9FrzRst7snAeEZkIcjVHphbRXC/IJ1WvohnnHTiPbRoaYHdr8VxB6aqcGqPNas=
+	t=1712259089; cv=none; b=R/kgGwxLEMrNIco8e5KJyua5LQ8rh+E08Jz144PzZvnV4laZ4xXiXCGF5x3Bm0opwlqvwXTiFAad9p+ch/h7UZWx7IcEqjDyyTOAJ5yR+HHqpkCODOTy6WbmAL2TZUzq2N3FsvM042UQaRAxUAXSQAhIHuvxnFYWMTwUYhj904E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712258563; c=relaxed/simple;
-	bh=L3u8qdzYK3tIcgSok6qUXAH/WJMn6GRjOGj6lME/65w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JD8uwzvodVILqRJDF1fh+R8uYKzzGEbiMih834jrkwq28npi6rXt/WpZRQLPlEX9YeIZ5DSNIoLPIiNvth3jKXNbAIrc+rCdxdytNOjSYvbztRJeZTShrIig94Hc+cjtGq5MrP59l22Y7LSATAVPTeWd9Af3Da640f2Kx4C9BV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EiI6kx6I; arc=none smtp.client-ip=209.85.221.43
+	s=arc-20240116; t=1712259089; c=relaxed/simple;
+	bh=iM3i25pNxk7MFpTNFrE9HeruXtREtfbbpD0ry393lEs=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=TkX9mZl/XVFqk+BVWlgqZB371HDUNJ26GnUmk09qxcIyi8ZmjR8edMhdYWpuziz+EzF3BPdN9mAYtRAkB2TdWZH1Pi2LJ2GIkBn7+s35vJ7EZ0j3uQL2CoAxxiwW3EBl7vvZ28wJKxngc/Wvrl+W5wYPx75jYNDR43LLmjzgnV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IJq9hjHK; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-343c7fae6e4so574167f8f.1;
-        Thu, 04 Apr 2024 12:22:41 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4162dd23df5so322915e9.2;
+        Thu, 04 Apr 2024 12:31:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712258560; x=1712863360; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L3u8qdzYK3tIcgSok6qUXAH/WJMn6GRjOGj6lME/65w=;
-        b=EiI6kx6IsJ8E+L6sSNQfWoqIXDY83JKJh8cGt2WS3kUkN+TkMKlyl23lLS2h6KJsnB
-         mQde0YDTn6EZ6UseJ3VaaWJicfklY49azEeumwcKpKArlY6YZauoZLDZJ1LISagJutw3
-         AvjfBM69UEPzaB+SQmE9wmD8VYOL47YKccjR9oxhlDH61XGmS9mBEeW3ys8WqfBYdwa6
-         Gr94oFUb6GL8DqxREExYY6mD8ZwJDEtoTYpCKJDlFiY7Ts2tzqtaT+RcyLu27H9/uSOC
-         NbyaV2FYx9aOzaEK7l9fL1Gsr21g5CbgFWhiT53xJEirW3EnTYwW0F/CEidlNdOE0cu8
-         Fqrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712258560; x=1712863360;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1712259086; x=1712863886; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=L3u8qdzYK3tIcgSok6qUXAH/WJMn6GRjOGj6lME/65w=;
-        b=JgglhC62a6N4rU2L6Xjp7/JSPQmMAVr/3ck+zxlAw7sI9fp9PaZ9P+KqplXNgnKVXi
-         xBFLsrXmNHgsNKUKGas9NbdWUiq/YR1kQ8hnckpijLTnFYTP0I5zxqr81lvjcW+2/LjT
-         8hTmvwXU5XIY7J05R0T/UansQ3KXQ/qQU8tACLauxapm7vT031I/S6jD9dGTbytjw1fa
-         wGsmiteJBtyfyGO7i4Z/LPUWmX44AHYaY2tF+Bm4S7FODW/YwQ+5w3pHr2Vi4ssonWL5
-         2/V5+qtvAxOVVCRZwdlOa0eSsjjMnNRTOtlCYioVQsq6q2hipmzd+XYebLRA+OOi0pin
-         NKpA==
-X-Forwarded-Encrypted: i=1; AJvYcCXk34UD591MkqNlOL0xw9KF7jaa+6SNC0MiY49OYnh/ED80ag0Q7zmdErJ665+1LyYWZFwBs9zZIeXRmAP+4/zbxZM22sw+V9D8
-X-Gm-Message-State: AOJu0YyVKGaUJmcpbMweSVhbhm+yQh7vTGCzgbWK0m7XX+b31TIuF/xU
-	furzmbuGDZOcNcCPUDMjfXMnX0oCTRbQAUyjR8gRX6giy34ROltFyeaASX3JfZfbOG/Q6HA9rMz
-	uF81lY3+YBlbc5WeuvM0IkleMx7M=
-X-Google-Smtp-Source: AGHT+IEW05YFY+qf0bLGERKY4/mx/eBoZkSo9D9PDYEuATnlM5TZB3b6m/CIaZeGQKcR/Ryro0r2FgB5lcc2VfQg4kY=
-X-Received: by 2002:adf:edcb:0:b0:342:a8db:603f with SMTP id
- v11-20020adfedcb000000b00342a8db603fmr2536153wro.26.1712258559994; Thu, 04
- Apr 2024 12:22:39 -0700 (PDT)
+        bh=1eO1/J0Yje7Em+OMu/DeZk4R9Llsjy7pakAEzgykzDc=;
+        b=IJq9hjHKKE58m+2UrYWNrZRxg/BlwXPpRw9gT/lKDXYPBFWVopvpw0FjPhzc/G9/TL
+         aw8i4rq0Ir8h3ERzlEpHVBa4gtGj4KQe/ijqL4w/RYCa8NIpwvekdv6MTswHv0+7TGMZ
+         c+IastDRFpaaubrq8Rp61UKPNKcnDwAeloavmhBa8fN3YWoQ9TRANqgkwdIHsYYOIZ07
+         eLwSxRfIC9h1xHRSBksK38x4einVFEnbzIjqlmYRmWjdYNurVb0xcpNJGQMOil+g+peq
+         6C0Tw4HgzrwXfXjaOPbIFXyBcgPEy/dFZS3H+LmEZyMKdvS//AEV8y8rnbn5rdB7DPH8
+         wiDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712259086; x=1712863886;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1eO1/J0Yje7Em+OMu/DeZk4R9Llsjy7pakAEzgykzDc=;
+        b=vmIW4ZAImkmNAPCRzJGG3OR+nwKUwztWxnaRCRtOHOV5OKYi/DmSwXGGa2Bw4xymI6
+         es3ZLRP70VeMblyscXuTVLHageQm6kBZaY67ijRycrRhFTyt20V75uz1cTfARlj/rJU2
+         KjwJSrun9fdFNGqGi6fkrxxosAVjSzaCtrMqfCWh/HqL/QGwd2o1+BDYPhEIlvztGKtY
+         PBGSCUqIyfmQJkjHOhJelQ/KVTgUkGECg4OMZA+uX1bWWqNfhpgTVnMfsS/XL5vlDkEU
+         YxJdjyIpnoOT8CT+vqURWQnomFXdt14RL1D7WBv4XyzQ/PR6UH205HniD9o2htpg5Pzg
+         fESA==
+X-Forwarded-Encrypted: i=1; AJvYcCVuXSZD7FsxPWqPD/heI3/CXnoQQpa1CBqYnSK/xtOMCURB+mZfMx+Tr5+ewOLfo28Zrm+V7mMvvOU8v41P5j+8mbQgC4AhTTdDKYHMgBFVAjPF0HrEDCC+qeON8W6boCBp3Yyk
+X-Gm-Message-State: AOJu0YxNj8lgidje8vSdAf/BYeGzqYvmscVyXVc6ca2DOBIOLVw6ltyF
+	e5TdI+ct7O/DMN0GUcQ3lLw8WBD+hCBNOPyRl+/z/okx5mnMZM4j
+X-Google-Smtp-Source: AGHT+IG7ZVywsfTWEb2ciSoldrzNl+Vhiacwyn9iloTkli9hJk84kG0jPHbFyc5iaswHimiMzAyNZg==
+X-Received: by 2002:a05:600c:252:b0:414:8c06:5c32 with SMTP id 18-20020a05600c025200b004148c065c32mr3219978wmj.14.1712259085798;
+        Thu, 04 Apr 2024 12:31:25 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id fc9-20020a05600c524900b004162d0676cdsm186098wmb.29.2024.04.04.12.31.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 12:31:25 -0700 (PDT)
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Christoph Hellwig <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, Leon Romanovsky <leonro@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
+ Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <2024032248-ardently-ribcage-a495@gregkh>
+ <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+ <Zf2n02q0GevGdS-Z@C02YVCJELVCG> <20240322135826.1c4655e2@kernel.org>
+ <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+ <20240322154027.5555780a@kernel.org>
+ <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+ <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184055.GP946323@nvidia.com>
+ <83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
+ <20240404183305.GM1723999@nvidia.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <1bb526d4-31ac-b25d-e494-ef5adbaef7ac@gmail.com>
+Date: Thu, 4 Apr 2024 20:31:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <Zg6Q8Re0TlkDkrkr@nanopsycho> <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
- <Zg7JDL2WOaIf3dxI@nanopsycho>
-In-Reply-To: <Zg7JDL2WOaIf3dxI@nanopsycho>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Thu, 4 Apr 2024 12:22:02 -0700
-Message-ID: <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, davem@davemloft.net, 
-	pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240404183305.GM1723999@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 4, 2024 at 8:36=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote:
->
-> Thu, Apr 04, 2024 at 04:45:14PM CEST, alexander.duyck@gmail.com wrote:
-> >On Thu, Apr 4, 2024 at 4:37=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wro=
-te:
-> >>
-> >> Wed, Apr 03, 2024 at 10:08:24PM CEST, alexander.duyck@gmail.com wrote:
+. disclaimer.sh
 
-<...>
+On 04/04/2024 19:33, Jason Gunthorpe wrote:
+> Uh no, mlx5 already has an excellent in-tree driver, thank you very
+> much.
 
-> >> Could you please shed some light for the motivation to introduce this
-> >> driver in the community kernel? Is this device something people can
-> >> obtain in a shop, or is it rather something to be seen in Meta
-> >> datacenter only? If the second is the case, why exactly would we need
-> >> this driver?
-> >
-> >For now this is Meta only. However there are several reasons for
-> >wanting to include this in the upstream kernel.
-> >
-> >First is the fact that from a maintenance standpoint it is easier to
-> >avoid drifting from the upstream APIs and such if we are in the kernel
-> >it makes things much easier to maintain as we can just pull in patches
-> >without having to add onto that work by having to craft backports
-> >around code that isn't already in upstream.
->
-> That is making life easier for you, making it harder for the community.
-> O relevance.
->
->
-> >
-> >Second is the fact that as we introduce new features with our driver
-> >it is much easier to show a proof of concept with the driver being in
-> >the kernel than not. It makes it much harder to work with the
-> >community on offloads and such if we don't have a good vehicle to use
-> >for that. What this driver will provide is an opportunity to push
-> >changes that would be beneficial to us, and likely the rest of the
-> >community without being constrained by what vendors decide they want
-> >to enable or not. The general idea is that if we can show benefit with
-> >our NIC then other vendors would be more likely to follow in our path.
->
-> Yeah, so not even we would have to maintain driver nobody (outside Meta)
-> uses or cares about, you say that we will likely maintain more of a dead
-> code related to that. I think that in Linux kernel, there any many
-> examples of similarly dead code that causes a lot of headaches to
-> maintain.
->
-> You just want to make your life easier here again. Don't drag community
-> into this please.
+I was referring to *mlx5ctl*, which is not currently in-tree, which
+ is why this thread trying to add it exists in the first place.
 
-The argument itself doesn't really hold water. The fact is the Meta
-data centers are not an insignificant consumer of Linux, so it isn't
-as if the driver isn't going to be used. This implies some lack of
-good faith from Meta. I don't understand that as we are contributing
-across multiple areas in the kernel including networking and ebpf. Is
-Meta expected to start pulling time from our upstream maintainers to
-have them update out-of-tree kernel modules since the community isn't
-willing to let us maintain it in the kernel? Is the message that the
-kernel is expected to get value from Meta, but that value is not meant
-to be reciprocated? Would you really rather have us start maintaining
-our own internal kernel with our own "proprietary goodness", and ask
-other NIC vendors to have to maintain their drivers against yet
-another kernel if they want to be used in our data centers?
+> So, it is really some kind of extremism to say that allowing users to
+> configure the device in their own system in a booted Linux OS instead
 
-As pointed out by Andew we aren't the first data center to push a
-driver for our own proprietary device. The fact is there have been
-drivers added for devices that were for purely emulated devices with
-no actual customers such as rocker. Should the switch vendors at the
-time have pushed back on it stating it wasn't a real "for sale"
-device? The whole argument seems counter to what is expected. When a
-vendor creates a new device and will likely be enabling new kernel
-features my understanding is that it is better to be in the kernel
-than not.
+Um, nothing upstream does is stopping them installing an OOT mlx5ctl
+ driver, *if* that's what they want to do.  Clearly some of them don't
+ like that solution, otherwise we wouldn't be here.
 
-Putting a criteria on it that it must be "for sale" seems rather
-arbitrary and capricious, especially given that most drivers have to
-be pushed out long before they are available in the market in order to
-meet deadlines to get the driver into OSV releases such as Redhat when
-it hits the market. By that logic should we block all future drivers
-until we can find them for sale somewhere? That way we don't run the
-risk of adding a vendor driver for a product that might be scrapped
-due to a last minute bug that will cause it to never be released.
+> of in the factory looses the "implied engineering benefits of open
+> source".
+
+You're looking at the wrong point on the causal graph.
+Whether you apply the hacks in the factory or at runtime, their hacky
+ design is what prevents them from having the benefits of open source
+ (because those benefits consist of a development process that weeds
+ out hacks and bad design).
+It is just that the latter case, if done through an intree driver,
+ would appear to be (and might be marketed as) an open-source developed
+ product, which users would naturally expect to have those benefits,
+ when in fact it doesn't.
+
+>> So because your engineers can't design clean, orthogonal APIs for
+>>  toffee, you should be allowed to bypass review?  Sorry, but no.
+> 
+> Overreach. The job of the kernel maintainer is to review the driver
+> software, not the device design.
+
+Really? [1]
+The kernel always has the choice to not support a given device, or a
+ given feature of a device; and kernel maintainers are precisely the
+ people with both the right and the duty to make that determination.
+
+> If you had read the thread to understand the issue, you'd know this is
+> because the distros have turned on module signing, secure boot and
+> kernel lock down.
+
+Funnily enough, I am aware of that.
+And if your customers didn't want those things, they'd be quite capable
+ of forking the distro to undo it.  Several hyperscalers already have
+ their own in-house distros anyway.
+They could add their own signing key to the kernel, and sign your ctl
+ driver with it.
+They could disable lockdown, or patch the kernel to allow your
+ (hopefully signed and IMA-ed) userspace tool to do its PCI-over-sysfs
+ crap even when lockdown blocks it for everything else.
+But strangely, there are people out there who trust the upstream process
+ to ensure quality/security/etc. more than they trust vendors and their
+ "oh don't worry, the device will enforce security scopes on these raw
+ commands from userspace" magic firmware blobs.
+
+What you are asking for here is a special exemption to all those
+ requirements and security measures because "just trust me bro".
+
+-ed
+
+[1]: https://wiki.linuxfoundation.org/networking/toe
 
