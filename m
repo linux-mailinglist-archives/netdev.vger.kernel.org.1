@@ -1,155 +1,174 @@
-Return-Path: <netdev+bounces-85030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C788990FD
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 00:07:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABFD2899108
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 00:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 388ED1F22E7E
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 22:07:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 081AA1F23234
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 22:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D00F13C3DE;
-	Thu,  4 Apr 2024 22:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB5113C3E6;
+	Thu,  4 Apr 2024 22:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QgLDaApk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bkoPPZ18"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FED713C3D9;
-	Thu,  4 Apr 2024 22:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6A113C3DF;
+	Thu,  4 Apr 2024 22:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712268452; cv=none; b=k2Lru5pNDMO7eG6tdEb8irQKQwPvP6ytdq/DY7pvtSYeh40PpINNteiW1XnWlF3aOhj/htMKAFqaTgtK5XGtx36U8OpKCYfTNPIFoMQZIE9kFU0U1bi85Fs9EVQSiCSnn00PUPXerzQ6QuQe++mZrjlD3H21YfA8gMEkTPlF1Jw=
+	t=1712268724; cv=none; b=pFTeAewWbJLvQFFbRfW1zZjZU2kfvDsLvDby5n7tkswcQ3c1ouCzLg8oLJpB3yOPHKC9E6b2KLdZ/bAfZn7WoyRPRPCmCXZwMNaV4Oigy/BviPqeudZpBgKf1085RwnWOe1qnGjlEnGQTZ2LoVw+vXxfYI8EJ14m0upoGa9WgxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712268452; c=relaxed/simple;
-	bh=AjvuPzaZCOzpiQVfLOn/AmFNJ7anIJ2tJ90YdBIhnKs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pq/1UoQSWGgpkSamhvODRyaWjKhVIF4oDfGLSALaDJwMCi2YrP1c3TOfvicfTXZFPCCB2u86FhK925qGDhMqiG3pck/OqHsl1vckhAlY9JisoUxs0dVMnvwkWsEsxGy3ZubRQPX+kWXx7037hjGdu4Rhfwm1WSKpDqDg/uljJkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QgLDaApk; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-343c891bca5so608824f8f.2;
-        Thu, 04 Apr 2024 15:07:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712268448; x=1712873248; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AjvuPzaZCOzpiQVfLOn/AmFNJ7anIJ2tJ90YdBIhnKs=;
-        b=QgLDaApkpEkXiMeZ6MtJmWyhxAQnBUVtvfUqAqDRUbO9aw77utl/+M494o8eUqm/el
-         yKc99+g0Luif38DVeny5OoGbAToKp1v8a32HCYvmFJU5yIQCWblPa+KYupv8dbP0XeSn
-         DkE/oVHXGFIRxdzzKmAt3S7Z77fv/qycihI+MKrTYqpChociVtu3kO7+lZ1K4imZmzj3
-         2uoxva7+/tC97VFotDY+430fH0mvDJHksgxqpJ7c/fU41P2BQ3WkYCRHTUrcMRhG7FDx
-         eoump2DFU3l8ZnR7BHysGBNK+vwbaSH6WXPvcVxMQY9kLAr4FNBbdNIgPREQTlYXrU/J
-         TgbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712268448; x=1712873248;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AjvuPzaZCOzpiQVfLOn/AmFNJ7anIJ2tJ90YdBIhnKs=;
-        b=jK0DrW9aFdAPYN+w9PokCFyC70JtiZif3YTi83a9Ivr4d3t1V5d+9zlAHUEYaC+6xK
-         qRfISb+TEqq/EnN7PVHHhQqNkmZR1ulSbyi5GLhoVP51OGmkFDPhsDYB8DIGI1p09Mb6
-         9K6zhMzyFcO64NAfiRLOYoX7NESPK6faQHK4BZAmZjMKm9h3sW3o3YbhPl5Q4/ujEmiY
-         JTzV6JhAFtTeKZxpCfkgagEb4F195zeEHSr4lmXqI3HeiCUxNdwmzlGZFOKBg3AslXH1
-         3lO4FqdiRihJGDQ42qtCH1dJ/tIb+d7uxQYR1cxaFNngJDhTOyrJYJk0nGmn8gZNaW6O
-         UbYg==
-X-Forwarded-Encrypted: i=1; AJvYcCXpl0q+k+JBv8Rbvpo9F2C5u2LjRDvVF5UdqViI7NQ218WY6mmibnw4T2bDo7I/s1Api1uBycKDyLzIYW+PFRukL+If
-X-Gm-Message-State: AOJu0Yz9QcDOX+ukU+IzsMpox4JwqFAFQ5LezXCDy1RK7Kwibeb339NY
-	DDYrD8WzRsTrJrC3idYgPZyExUcHYjrQIJkBlD3GDkkiJWDAP2ngCA6LwYM0G9bk2AcCkAgpF8x
-	19OO/afU2i0OJYqhTbaDxD6P4pno=
-X-Google-Smtp-Source: AGHT+IGYEE2XWLfYLVC5q1f8MQwSkAGP99QhnhOCs1Cvyyj1GjLUUmSVwvc+eOXYzH6rsY4aPkKDcWxhTuK28Srinys=
-X-Received: by 2002:adf:e48c:0:b0:343:ae03:2a02 with SMTP id
- i12-20020adfe48c000000b00343ae032a02mr676485wrm.40.1712268448261; Thu, 04 Apr
- 2024 15:07:28 -0700 (PDT)
+	s=arc-20240116; t=1712268724; c=relaxed/simple;
+	bh=ZnX7DwugUfNwNH8YtGd8Qbbpcv7XYT2KMkbjx+Yt7A8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tx+O+C3TEZNEzw6NLLf7YFu37iyDGDW6rlzQCgPWEZP7lBCCm5kveM9rvqLZ9u+/KZb3yzCzuGXXzlUHMHs7i6jfwOlFUOmhOhplOhwiw8+Lcsgg0UEw9z62xwuO+PsQa61WUb5io47trEs1RazoNaxQBFYuplPaXhjZ3umgnJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bkoPPZ18; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wF0piU5Bum94a3TqN990DQ0BqoHBjzdesA2kdLohbls=; b=bkoPPZ18rFow9S+p4VD+hwtV2c
+	YVv56WUHqp6UcY66ae4Dn6BK5G9irkN6ghn1J6HIqLwS3LnBQqgPffUdTBq/WKN1+7jCYATloR0sN
+	nVN6msTrATYeYkkIIwA0RksBq4AGmKC6LjfhH2lDj3VBNzech5rpNWHrbYAZL44x+yqw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rsVJ0-00CDmV-A9; Fri, 05 Apr 2024 00:11:34 +0200
+Date: Fri, 5 Apr 2024 00:11:34 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Joseph Huang <joseph.huang.2024@gmail.com>
+Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Linus =?iso-8859-1?Q?L=FCssing?= <linus.luessing@c0d3.blue>,
+	linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
+Message-ID: <630c37d6-b1c6-466b-8d00-fdc84585d5e7@lunn.ch>
+References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
+ <f5512e7b-b572-4444-9d56-1eed9bbcda6b@lunn.ch>
+ <4c28d59e-0c4f-462c-8a1c-d4bd72e25115@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404122338.372945-1-jhs@mojatatu.com> <20240404122338.372945-15-jhs@mojatatu.com>
-In-Reply-To: <20240404122338.372945-15-jhs@mojatatu.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 4 Apr 2024 15:07:16 -0700
-Message-ID: <CAADnVQLw1FRkvYJX0=6WMDoR7rQaWSVPnparErh4soDtKjc73w@mail.gmail.com>
-Subject: Re: [PATCH net-next v14 14/15] p4tc: add set of P4TC table kfuncs
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Network Development <netdev@vger.kernel.org>, deb.chatterjee@intel.com, 
-	Anjali Singhai Jain <anjali.singhai@intel.com>, namrata.limaye@intel.com, tom@sipanda.io, 
-	Marcelo Ricardo Leitner <mleitner@redhat.com>, Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, 
-	tomasz.osinski@intel.com, Jiri Pirko <jiri@resnulli.us>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, khalidm@nvidia.com, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, victor@mojatatu.com, 
-	Pedro Tammela <pctammela@mojatatu.com>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4c28d59e-0c4f-462c-8a1c-d4bd72e25115@gmail.com>
 
-On Thu, Apr 4, 2024 at 5:48=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com> =
-wrote:
->
-> We add an initial set of kfuncs to allow interactions from eBPF programs
-> to the P4TC domain.
+On Thu, Apr 04, 2024 at 05:35:41PM -0400, Joseph Huang wrote:
+> Hi Andrew,
+> 
+> On 4/2/2024 8:43 AM, Andrew Lunn wrote:
+> > On Mon, Apr 01, 2024 at 08:10:59PM -0400, Joseph Huang wrote:
+> > > There is a use case where one would like to enable multicast snooping
+> > > on a bridge but disable multicast flooding on all bridge ports so that
+> > > registered multicast traffic will only reach the intended recipients and
+> > > unregistered multicast traffic will be dropped. However, with existing
+> > > bridge ports' mcast_flood flag implementation, it doesn't work as desired.
+> > > 
+> > > This patchset aims to make multicast snooping work even when multicast
+> > > flooding is disabled on the bridge ports, without changing the semantic of
+> > > the mcast_flood flag too much. Patches 1 to 4 attempt to address this issue.
+> > > 
+> > > Also, in a network where more than one multicast snooping capable bridges
+> > > are interconnected without multicast routers being present, multicast
+> > > snooping fails if:
+> > > 
+> > >   1. The source is not directly attached to the Querier
+> > >   2. The listener is beyond the mrouter port of the bridge where the
+> > >      source is directly attached
+> > >   3. A hardware offloading switch is involved
+> > 
+> > I've not studied the details here, but that last point makes me think
+> > the offload driver is broken. There should not be any difference
+> > between software bridging and hardware bridging. The whole idea is
+> > that you take what Linux can do in software and accelerate it by
+> > offloading to hardware. Doing acceleration should not change the
+> > behaviour.
+> > 
+> 
+> In patch 10 I gave a little more detail about the fix, but basically this is
+> what happened.
+> 
+> Assuming we have a soft bridge like the following:
+> 
+>             bp1 +------------+
+>   Querier <---- |   bridge   |
+>                 +------------+
+>                bp2 |      | bp3
+>                    |      |
+>                    v      v
+>             MC Source    MC Listener
+> 
+> Here bp1 is the mrouter port, bp2 is connected to the multicast source, and
+> bp3 is connected to the multicast listener who wishes to receive multicast
+> traffic for that group.
+> 
+> After some Query/Report exchange, the snooping code in the bridge is going
+> to learn about the Listener from bp3, and is going to create an MDB group
+> which includes bp3 as the sole member. When the bridge receives a multicast
+> packet for that group from bp2, the bridge will do a look up to find the
+> members of that group (in this case, bp3) and forward the packet to every
+> single member in that group. At the same time, the bridge will also forward
+> the packet to every mrouter port so that listeners beyond mrouter ports can
+> receive that multicast packet as well.
+> 
+> Now consider the same scenario, but with a hardware-offloaded switch:
+> 
+>                 +------------+
+>                 |   bridge   |
+>                 +------------+
+>                       ^
+>                       |
+>                       | p6 (Host CPU port)
+>          p1/bp1 +------------+
+>   Querier <---- |     sw     |
+>                 +------------+
+>             p2/bp2 |      | p3/bp3
+>                    |      |
+>                    v      v
+>             MC Source    MC Listener
+> 
+> Same Query/Report exchange, same MDB group, except that this time around the
+> MDB group will be offloaded to the switch as well. So in the switch's ATU we
+> will now have an entry for the multicast group and with p3 being the only
+> member of that ATU. When the multicast packet arrives at the switch from p2,
+> the switch will do an ATU lookup, and forward the packet to p3 only. This
+> means that the Host CPU (p6) will not get a copy of the packet, and so the
+> soft bridge will not have the opportunity to forward that packet to the
+> mrouter port. This is what patch 10 attempts to address.
+> 
+> One possible solution of course is to add p6 to every MDB group, however
+> that's probably not very desirable. Besides, it will be more efficient if
+> the packet is forwarded to the mrouter port by the switch in hardware (i.e.,
+> offload mrouter forwarding), vs. being forwarded in the bridge by software.
 
-...
+Thanks for the explanation. So i think the key part which you said
+above is:
 
-> Note:
-> All P4 objects are owned and reside on the P4TC side. IOW, they are
-> controlled via TC netlink interfaces and their resources are managed
-> (created, updated, freed, etc) by the TC side. As an example, the structu=
-re
-> p4tc_table_entry_act is returned to the ebpf side on table lookup. On the
-> TC side that struct is wrapped around p4tc_table_entry_act_bpf_kern.
-> A multitude of these structure p4tc_table_entry_act_bpf_kern are
-> preallocated (to match the P4 architecture, patch #9 describes some of
-> the subtleties involved) by the P4TC control plane and put in a kernel
-> pool. Their purpose is to hold the action parameters for either a table
-> entry, a global per-table "miss" and "hit" action, etc - which are
-> instantiated and updated via netlink per runtime requests. An instance of
-> the p4tc_table_entry_act_bpf_kern.p4tc_table_entry_act is returned
-> to ebpf when there is a un/successful table lookup depending on how the
-> P4 program is written. When the table entry is deleted the instance of
-> the struct p4tc_table_entry_act_bpf_kern is recycled to the pool to be
-> reused for a future table entry. The only time the pool memory is release=
-d
-> is when the pipeline is deleted.
+  At the same time, the bridge will also forward the packet to every
+  mrouter port so that listeners beyond mrouter ports can receive that
+  multicast packet as well.
 
-TLDR:
-Nacked-by: Alexei Starovoitov <ast@kernel.org>
+How does the bridge know about the mrouter port? It seems like the
+bridge needs to pass that information down to the switch. Is the
+mrouter itself performing a join on the group when it has members of
+the group on the other side of it?
 
-Please drop this patch (all p4tc kfuncs) then I can lift
-the nack and the rest will be up to Kuba/Dave to decide.
-I agree with earlier comments from John and Daniel that
-p4tc is duplicating existing logic and doesn't provide
-any additional value to the kernel, but TC has a bunch
-of code already that no one is using, so
-another 13k lines of such stuff doesn't make it much worse.
-
-What I cannot tolerate is this p4tc <-> bpf integration.
-It breaks all the normal layering and programming from bpf pov.
-Martin explained this earlier. You cannot introduce new
-objects that are instantiated by TC, yet read/write-able
-from xdp and act_bpf that act like a bpf map, but not being a map.
-Performance overhead of these kfuncs is too high.
-It's not what the XDP community is used to.
-We cannot give users such a footgun.
-
-Furthermore, act_bpf is something that we added during early
-days and it turned out to be useless. It's still
-there, it's working and supported, but it's out of place
-and in the wrong spot in the pipeline to be useful
-beyond simple examples.
-Yet, p4tc tries to integrate with act_bpf. It's a red flag
-and a sign that that none of this code saw any practical
-application beyond demo code.
-We made our fair share of design mistakes. We learned our lessons
-and not going to repeat the same ones. This one is obvious.
-
-So please drop all bpf integration and focus on pure p4tc.
+	Andrew
 
