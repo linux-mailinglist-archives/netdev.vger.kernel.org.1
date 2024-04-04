@@ -1,198 +1,193 @@
-Return-Path: <netdev+bounces-85028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31EB7899085
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:35:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 982038990A4
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 23:59:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95C63B21D13
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:35:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B3FE288D78
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 21:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4903113BAE4;
-	Thu,  4 Apr 2024 21:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8A113BC38;
+	Thu,  4 Apr 2024 21:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ghDKZn7M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNWNQPHj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f194.google.com (mail-yw1-f194.google.com [209.85.128.194])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A034D15EA6;
-	Thu,  4 Apr 2024 21:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912BE12D1EF;
+	Thu,  4 Apr 2024 21:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712266545; cv=none; b=JagvLsXWR252nlotuUGbqzrfBdQEFH6C0L3uIA0RnQxVTJxidb+J8JKdRqggyBZOQcKuc0Wd3mHeVbLMujXJpaOdAb6YbD1AbiSYLE5/7NArM86NVtPgfoPoHRJBSVIOBIpX7U7CN48EerzYgy1yLozdhZB1+8oTkuLt/pDSpvc=
+	t=1712267977; cv=none; b=rK/FJktN4NWUG9f+VO1NjwXhAHXUBoC+tjonoo0D9oT3lV+01QOO/bdk6pxSt1uRrKYPsUFFNw6YpsF2jKaJCnvvRu6DfmVQsR0ASF4cVQbHlHwoIiklVCE2CwKog6VJsWSrVu0jYVTJ45tnwtCi1AXwp71icL2gHr90WSF/kn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712266545; c=relaxed/simple;
-	bh=JTQTqrzushgnpZsjVSlzwLwe3o/1zhQzYzHB9k1LTZI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YpfdhRgaCONPW94KtMBc7DC6BsIFhKN6D9yL1KeoacQ9qA2YRERzQ71uZUamYBU9iLqEXwkpE1e1uylw9W3AnIbj5OriTpZthRfgirANejzo9VM5oiKxSRPDCqkfpayJ5aU9vHXnOZwZC0be/wo6Zpl7IdNqI/3JHrqdNiH1wAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ghDKZn7M; arc=none smtp.client-ip=209.85.128.194
+	s=arc-20240116; t=1712267977; c=relaxed/simple;
+	bh=sX9uoGi43CCPt+PhgNoq1Pq6O7XF0XaBCfZQ7zRFB7Q=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ZaHwU2jfqR1/rZZRJ68jSp3zKECnexO99tCiZOZVNWyGUofMXhRfuTcP0l5HbYI5szPr8bDpVMQO69ShIcRr9ncWIwYeKZ4f25UZuFh4fsAU7z4AxPiLh87Mo6LYvlMSMiMguczvd6XteNVwdgbWrCWHy2YUPzfHLX0qlPFPD3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNWNQPHj; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f194.google.com with SMTP id 00721157ae682-61587aa956eso13244617b3.1;
-        Thu, 04 Apr 2024 14:35:43 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ecf3f001c5so884972b3a.1;
+        Thu, 04 Apr 2024 14:59:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712266543; x=1712871343; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bYViHhuN6un7AAvGKIwNdy+ywGtCXn58gtiJR3tWorM=;
-        b=ghDKZn7M1jPhUuPx7ZDQkDGvfFPXDGpF7XT9CnV0MBDv7ecV6EcR/JHF4LuNtOKqCV
-         EezLgL2/DIbk7qVBeEZ5Igs+F0kvps9aCoCGto9ge+e6DVkhaD/xIbjgXw9ubedXTCoz
-         cg+5L1l8LtmR6IsMJzwe7pzoDAeBrDtefuXW3AqX5Bibm2Wz7krpkKb5O965vglA8Zim
-         eGCDY4Jbkm9yrt9Vpxh9SQtsuVgUoLtmk87EFoWDwVWOgM8gnoeVu0mb4j9nRJVGq5jl
-         3F9IHiHvniUYnTjIfsr3BQdiB2odrj5w657T6QKRb/YSfA2zCn1K++Wk7uRrHZGRUAr+
-         SMPg==
+        d=gmail.com; s=20230601; t=1712267975; x=1712872775; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CrkGHjiHmUY/gKDbNB9chzEuUYm95/thM+vcpjSq034=;
+        b=kNWNQPHjzyiqL6K9Ga5lqU1DdLzNgYgJgH06yqDCxRH5nfsBgXu9HPHhBV0Z+vlkGU
+         3mtTAzmVy7bK6lmg0LjwZfQLwnZ8phYF1d2fd9FiOoDEeS3iSCswavdmMklTGDUoOVLc
+         stsbUN+OQvU3d8y4oqtC5j7x8rlapXVeFNtVH/QNMFzTeVMR7B41bLUD0aeCsfZC7/Be
+         mHdBeGmTPPTlpBVi8iEJ6E6u3wiBT+qU9Bi+Amtvws3S9jb2p2CEUdJ/CA9gzvjfgWGM
+         wEDDaXY3zMHjLF+6VLaVzUO3lnLWvHa5pxlQmAi7yPfP65MDLRpNyo8FuAs6+t/WheuZ
+         LKIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712266543; x=1712871343;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bYViHhuN6un7AAvGKIwNdy+ywGtCXn58gtiJR3tWorM=;
-        b=mdqzPCUqvFfVC8IzxoJ/7BXO9KsVie5isrYP7LRmLxI81DK7BXZWGFpn5jBIFPE0vy
-         OdCse2hoHDTmCJmJnhNUCjFpG13buiuSnmYRnJgUEpAVoO0skQwEl8Fd6IJZLnWRiiRh
-         iTzfjHETjqr8leIOr67gPjwnHNVYbgkT3t+rBG/Lyw9CLz1HWE4H88fKU7dHMy9TXdGj
-         huHVV6u4VjSEzaOPzTW3X2S/JodQFvABkZpgU5cLD3+E67kWjbBOh56A/HR4fe9unRaJ
-         DRVZsGaVR01hl0UW8cAqXWrIIK9NBwc/VXQHKOhZ8aNZtT6ONjAlgVQxkfq2V3S+FeVS
-         yQfg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6h57YQi2b9XkmvZQBIPAEr/mNn0P2wQBd11mJX3yLq0giM5vsSwIT0SOqt4sXXaNLvEbjVMpstzS5NHn3b49U9LgdpTYv4E4yjq68
-X-Gm-Message-State: AOJu0YxE4tIQtXBgoyOiPPCTnYqX3x84Nf6z7v/KYTOAHRbY9tsKpo33
-	mwsETeNf6443h3C2jz0W5s+37H/pQEBXeBU5IBL0Kd/K1/gQDAKh
-X-Google-Smtp-Source: AGHT+IEIMCXoTN7AbHHE0JMxoF9IgYcgGOsMLr0GZBAs3lfQviBkmx0Ru6prTlPBrThYniwtpK67ng==
-X-Received: by 2002:a81:df12:0:b0:615:18f8:d32a with SMTP id c18-20020a81df12000000b0061518f8d32amr701219ywn.36.1712266542641;
-        Thu, 04 Apr 2024 14:35:42 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id w198-20020a0dd4cf000000b00610e03c9fe8sm64368ywd.103.2024.04.04.14.35.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Apr 2024 14:35:42 -0700 (PDT)
-Message-ID: <4c28d59e-0c4f-462c-8a1c-d4bd72e25115@gmail.com>
-Date: Thu, 4 Apr 2024 17:35:41 -0400
+        d=1e100.net; s=20230601; t=1712267975; x=1712872775;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CrkGHjiHmUY/gKDbNB9chzEuUYm95/thM+vcpjSq034=;
+        b=A30+M6niIR8A8C/2xdwesf8CYiNfvuqMkYHSnS+r+3wPZlEY2NCK+RFMHY+6MKdSOf
+         +XPSO9OJBphhAM4rqY/S+xgKjOJ2S8bpjZIUM6bgFBZntRhtvU9488155C18L0W8Tl2A
+         iah6uU2FYKT5H3Aupj8thqVl/OTmzVous07sc7ZtcwDCe3I50USvQMU3hfxku+au9LwU
+         8HP0zJJbInFxaJooYt+Kqk1385+9AZ+5X6qCJyrwW2D4zkHvUTiUV3YrM0ca61YYrevb
+         pax4bLszjBTKcJrdmH8SiGBbbVkYlnnrSpCw6DkG5Fr3E8lSxu56Ur5f2uAQVerr/Ieq
+         VjnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXOjblL9Myjl6nksJEB3b+Tu/9g6L1p3v7ExOPW2w0IABJAUh2ilO84WwxjBw+CRSMjLw+6QlVLaUjI36IDa8Wq1g7QFEz/eOm0mjnOZcdVVPvv/QwrdrLOYC0y5zkC1ro7
+X-Gm-Message-State: AOJu0YxU/Kk6YqoBSsfJn1baZhgm0KMUfzEiyTs7/xeDjqYSoo65eKMQ
+	FBAQQLK9avJB45bTDnWF+//SJVW89RotlKlrMHb55t6Xk+t3A24n
+X-Google-Smtp-Source: AGHT+IF54ZsQXQgdenyf/wtK819T3em8CVKGK5ZCgoJpT6TnudRX0bdsIEHuqU2V4rf1WJUlrtt3sQ==
+X-Received: by 2002:a05:6a21:2783:b0:1a7:2d38:85b with SMTP id rn3-20020a056a21278300b001a72d38085bmr3585426pzb.53.1712267974764;
+        Thu, 04 Apr 2024 14:59:34 -0700 (PDT)
+Received: from localhost ([98.97.36.54])
+        by smtp.gmail.com with ESMTPSA id i14-20020aa78b4e000000b006ecfd012e03sm134364pfd.90.2024.04.04.14.59.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 14:59:34 -0700 (PDT)
+Date: Thu, 04 Apr 2024 14:59:33 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, 
+ netdev@vger.kernel.org, 
+ bhelgaas@google.com, 
+ linux-pci@vger.kernel.org, 
+ Alexander Duyck <alexanderduyck@fb.com>, 
+ davem@davemloft.net, 
+ pabeni@redhat.com
+Message-ID: <660f22c56a0a2_442282088b@john.notmuch>
+In-Reply-To: <20240404132548.3229f6c8@kernel.org>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <Zg6Q8Re0TlkDkrkr@nanopsycho>
+ <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
+ <Zg7JDL2WOaIf3dxI@nanopsycho>
+ <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
+ <20240404132548.3229f6c8@kernel.org>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
-To: Andrew Lunn <andrew@lunn.ch>, Joseph Huang <Joseph.Huang@garmin.com>
-Cc: netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,
- =?UTF-8?Q?Linus_L=C3=BCssing?= <linus.luessing@c0d3.blue>,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
- <f5512e7b-b572-4444-9d56-1eed9bbcda6b@lunn.ch>
-Content-Language: en-US
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-In-Reply-To: <f5512e7b-b572-4444-9d56-1eed9bbcda6b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
-
-On 4/2/2024 8:43 AM, Andrew Lunn wrote:
-> On Mon, Apr 01, 2024 at 08:10:59PM -0400, Joseph Huang wrote:
->> There is a use case where one would like to enable multicast snooping
->> on a bridge but disable multicast flooding on all bridge ports so that
->> registered multicast traffic will only reach the intended recipients and
->> unregistered multicast traffic will be dropped. However, with existing
->> bridge ports' mcast_flood flag implementation, it doesn't work as desired.
->> 
->> This patchset aims to make multicast snooping work even when multicast
->> flooding is disabled on the bridge ports, without changing the semantic of
->> the mcast_flood flag too much. Patches 1 to 4 attempt to address this issue.
->> 
->> Also, in a network where more than one multicast snooping capable bridges
->> are interconnected without multicast routers being present, multicast
->> snooping fails if:
->> 
->>   1. The source is not directly attached to the Querier
->>   2. The listener is beyond the mrouter port of the bridge where the
->>      source is directly attached
->>   3. A hardware offloading switch is involved
+Jakub Kicinski wrote:
+> On Thu, 4 Apr 2024 12:22:02 -0700 Alexander Duyck wrote:
+> > The argument itself doesn't really hold water. The fact is the Meta
+> > data centers are not an insignificant consumer of Linux, 
 > 
-> I've not studied the details here, but that last point makes me think
-> the offload driver is broken. There should not be any difference
-> between software bridging and hardware bridging. The whole idea is
-> that you take what Linux can do in software and accelerate it by
-> offloading to hardware. Doing acceleration should not change the
-> behaviour.
+> customer or beneficiary ?
 > 
-
-In patch 10 I gave a little more detail about the fix, but basically 
-this is what happened.
-
-Assuming we have a soft bridge like the following:
-
-             bp1 +------------+
-   Querier <---- |   bridge   |
-                 +------------+
-                bp2 |      | bp3
-                    |      |
-                    v      v
-             MC Source    MC Listener
-
-Here bp1 is the mrouter port, bp2 is connected to the multicast source, 
-and bp3 is connected to the multicast listener who wishes to receive 
-multicast traffic for that group.
-
-After some Query/Report exchange, the snooping code in the bridge is 
-going to learn about the Listener from bp3, and is going to create an 
-MDB group which includes bp3 as the sole member. When the bridge 
-receives a multicast packet for that group from bp2, the bridge will do 
-a look up to find the members of that group (in this case, bp3) and 
-forward the packet to every single member in that group. At the same 
-time, the bridge will also forward the packet to every mrouter port so 
-that listeners beyond mrouter ports can receive that multicast packet as 
-well.
-
-Now consider the same scenario, but with a hardware-offloaded switch:
-
-                 +------------+
-                 |   bridge   |
-                 +------------+
-                       ^
-                       |
-                       | p6 (Host CPU port)
-          p1/bp1 +------------+
-   Querier <---- |     sw     |
-                 +------------+
-             p2/bp2 |      | p3/bp3
-                    |      |
-                    v      v
-             MC Source    MC Listener
-
-Same Query/Report exchange, same MDB group, except that this time around 
-the MDB group will be offloaded to the switch as well. So in the 
-switch's ATU we will now have an entry for the multicast group and with 
-p3 being the only member of that ATU. When the multicast packet arrives 
-at the switch from p2, the switch will do an ATU lookup, and forward the 
-packet to p3 only. This means that the Host CPU (p6) will not get a copy 
-of the packet, and so the soft bridge will not have the opportunity to 
-forward that packet to the mrouter port. This is what patch 10 attempts 
-to address.
-
-One possible solution of course is to add p6 to every MDB group, however 
-that's probably not very desirable. Besides, it will be more efficient 
-if the packet is forwarded to the mrouter port by the switch in hardware 
-(i.e., offload mrouter forwarding), vs. being forwarded in the bridge by 
-software.
-
->> The patches were developed against 5.15, and forward-ported to 6.8.
->> Tests were done on a Pi 4B + Marvell 6393X Eval board with a single
->> switch chip with no VLAN.
+> > so it isn't as if the driver isn't going to be used. This implies
+> > some lack of good faith from Meta.
 > 
-> So what is the mv88e6xxx driver doing wrong?
+> "Good faith" is not a sufficient foundation for a community consisting
+> of volunteers, and commercial entities (with the xz debacle maybe even
+> less today than it was a month ago). As a maintainer I really don't want
+> to be in position of judging the "good faith" of corporate actors.
 > 
-> 	Andrew
+> > I don't understand that as we are
+> > contributing across multiple areas in the kernel including networking
+> > and ebpf. Is Meta expected to start pulling time from our upstream
+> > maintainers to have them update out-of-tree kernel modules since the
+> > community isn't willing to let us maintain it in the kernel? Is the
+> > message that the kernel is expected to get value from Meta, but that
+> > value is not meant to be reciprocated? Would you really rather have
+> > us start maintaining our own internal kernel with our own
+> > "proprietary goodness", and ask other NIC vendors to have to maintain
+> > their drivers against yet another kernel if they want to be used in
+> > our data centers?
+> 
+> Please allow the community to make rational choices in the interest of
+> the project and more importantly the interest of its broader user base.
+> 
+> Google would also claim "good faith" -- undoubtedly is supports 
+> the kernel, and lets some of its best engineers contribute.
+> Did that make them stop trying to build Fuchsia? The "good faith" of
+> companies operates with the limits of margin of error of they consider
+> rational and beneficial.
+> 
+> I don't want to put my thumb on the scale (yet?), but (with my
+> maintainer hat on) please don't use the "Meta is good" argument, because
+> someone will send a similar driver from a less involved company later on
+> and we'll be accused of playing favorites :( Plus companies can change
+> their approach to open source from "inclusive" to "extractive" 
+> (to borrow the economic terminology) rather quickly.
 > 
 
-The mv88e6xxx driver did nothing differently than the other DSA drivers. 
-I chose the mv88e6xxx driver to implement the fix simply because that's 
-the only platform I have at hand to verify the solution.
+I'll throw my $.02 in. In this case you have a driver that I only scanned
+so far, but looks well done. Alex has written lots of drivers I trust he
+will not just abondon it. And if it does end up abondoned and no one
+supports it at some future point we can deprecate it same as any other
+driver in the networking tree. All the feedback is being answered and
+debate is happening so I expect will get a v2, v3 or so. All good signs
+in my point.
+
+Back to your point about faith in a company. I don't think we even need
+to care about whatever companies business plans. The author could have
+submitted with their personal address for what its worth and called it
+drivers/alexware/duyck.o Bit extreme and I would have called him on it,
+but hopefully the point is clear.
+
+We have lots of drivers in the tree that are hard to physically get ahold
+of. Or otherwise gated by paying some vendor for compute time, etc. to
+use. We even have some drivers where the hardware itself never made
+it out into the wild or only a single customer used it before sellers 
+burned it for commercial reasons or hw wasn't workable, team was cut, etc.
+
+I can't see how if I have a physical NIC for it on my desk here makes
+much difference one way or the other.
+
+The alternative is much worse someone builds a team of engineers locks
+them up they build some interesting pieces and we never get to see it
+because we tried to block someone from opensourcing their driver?
+Eventually they need some kernel changes and than we block those too
+because we didn't allow the driver that was the use case? This seems
+wrong to me.
+
+Anyways we have zero ways to enforce such a policy. Have vendors
+ship a NIC to somebody with the v0 of the patch set? Attach a picture? 
+Even if vendor X claims they will have a product in N months and
+than only sells it to qualified customers what to do we do then.
+Driver author could even believe the hardware will be available
+when they post the driver, but business may change out of hands
+of the developer.
+
+I'm 100% on letting this through assuming Alex is on top of feedback
+and the code is good. I think any other policy would be very ugly
+to enforce, prove, and even understand. Obviously code and architecture
+debates I'm all for. Ensuring we have a trusted, experienced person
+signed up to review code, address feedback, fix whatever syzbot finds
+and so on is also a must I think. I'm sure Alex will take care of
+it.
+
+Thanks,
+John
 
