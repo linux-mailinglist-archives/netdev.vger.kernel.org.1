@@ -1,108 +1,143 @@
-Return-Path: <netdev+bounces-84976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9285898D87
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:56:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DB15898D90
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 19:57:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D55991C21899
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:56:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07E3A28A428
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 17:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7EB12EBC5;
-	Thu,  4 Apr 2024 17:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04AC112F387;
+	Thu,  4 Apr 2024 17:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mIV3m8++"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="UrUQk3hp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F5F127B7D;
-	Thu,  4 Apr 2024 17:56:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751A0CA62
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 17:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712253365; cv=none; b=aG/rKaXl9sOUYizUcEQsRgeAQ+TP8bkP5LnELHMVt/enu4H6EoOpoUhOv7DOXlMnWH2AvPPabhq4xL1NWnxEiXwAMayJ8cgVRonlI5rqSB/WWTVBw1uFvzFFbs94js4KhQUqkY2ZJ3Z+UvQZA5W5/RHf0rHQq2C/vrdPSy+I+v0=
+	t=1712253439; cv=none; b=Nc3IGyDYWqsatn+vts+gViHlWl6tmBvdbI+/nBOxQGOHEHIb2nwhfhIsDb86U+7AqjpOpWLtAsIjAIbl794vkEQbuMuDkR5U7B8i35cZxtOIpYPljc0y+2N2Wv6mwPVD5RtzrfpqeUjjeX6mpsL5djf25G8/ZgyI+wgGZAZ9jOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712253365; c=relaxed/simple;
-	bh=jrrBn8WsgmiRVg7JSf1dTg4FPbZgIaRf3d5/pes6beA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vDQ3zKP8Wsr3poImOoGXwZdWRzY5ySoBdOzbSsYn4xTPwVSub8a2w6E6H3n5eg4xuroWQ1NLnkcxAUr47n50Vh2/l5DN2TKcFiqE0NSUKgwzL6EHwaoVH+AdreWxSmwc+L+4LawHlF0PO4RYkCgT2siVEqOkXzUjPW1qQjY7H7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mIV3m8++; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712253364; x=1743789364;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jrrBn8WsgmiRVg7JSf1dTg4FPbZgIaRf3d5/pes6beA=;
-  b=mIV3m8++kspIwqLS4r2sviAru4/bMN2L+QRnQN31oOJSXSiqHaPVgUKX
-   JsSrV3QT+iyoyBnIOHScJoZhe+pGFb6abel0lWisCe0pm+L9B5wEyVkQD
-   eDKSggX0spksl5xP72wruxar0tGnKX66cR0t7ZwLTknti6Rj0y7XMyhCD
-   m2vLRetVkMj/PgWJ6GLOVIKMYVyIIx52Gw+zSqzPfOek6kSB3l1EDT2x5
-   b0A6AgfjKf3z4pTsN09OXtl2n4xjClBqdjzepjVyUNEcvuURfkjjuCXIo
-   J0nDtEI9TxD5BQNBiAyQmqhp/KuvndcxpAm8Ts5wZQnjz1xzUDpKqwBJP
-   A==;
-X-CSE-ConnectionGUID: BsLDQvQAQ6aqcwS+9GqBlQ==
-X-CSE-MsgGUID: wTI/hcFGTWex90dKNbv8ZQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="30025601"
-X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="30025601"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 10:56:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="937086937"
-X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="937086937"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga001.fm.intel.com with ESMTP; 04 Apr 2024 10:56:00 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 4EB0B812; Thu,  4 Apr 2024 20:55:59 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v1 1/1] net: mdio-gpio: Use device_is_compatible()
-Date: Thu,  4 Apr 2024 20:55:57 +0300
-Message-ID: <20240404175557.2470008-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
+	s=arc-20240116; t=1712253439; c=relaxed/simple;
+	bh=lUzwLyPQyWgkAhs2myAXy9TyzSHpUQLHUBGYXlPsuxA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BOgnr2Szv0/EMVN+3KRt/FaJxgtD1zfGhZf7YduqUshTqU+nNFgJdrviow4DdQ0EncP15fIoFRrgimkAMVa6Uiy6JGXsx6w/hqDbpefHHvdRcQe5THDhmjqw0AAobI0KmtiQ5vbXEOqmPniRp6Pg8G3bWxoFQmajSsukHZifQgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=UrUQk3hp; arc=none smtp.client-ip=209.85.161.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5a550ce1a41so742450eaf.0
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 10:57:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1712253437; x=1712858237; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ju7ZAzR28wQEBBWMoZM6YMGwGTqBkO770itO6OSbu44=;
+        b=UrUQk3hpF678xuolvkksjC9OoS18vBcU1gq9Iq9LIq/BPx08jlAs2kAJfApNpvxCYX
+         GduIG6r/Ivy+qmrTWECKJypdyiRNUhmC8EcfsNK6Afcl47pF6NafthQKcUZw6NGR6Dz5
+         8TALgyJIObiwgbWTPi4HCcFy7mafDK11mOtFpl02csmnguEHy3t3eOkeKsxIbxb97Kd8
+         ELpNAgnSZ+wV8G5knZrsPclODTV+I2o3RKcDY5068/YtJ/YLyBUUFM1YczewQfTGB+1t
+         TqJbEPzC1XFmVo7zSF8RqfOXOGiIlSWJa/yUCL5xztP+rfbyWz2q/uqL4m6tsvlPhFbZ
+         aXkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712253437; x=1712858237;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ju7ZAzR28wQEBBWMoZM6YMGwGTqBkO770itO6OSbu44=;
+        b=lWipvBqlrRgbr3P4RnXUj5ffv2NfY6PGYrAb2L2lu+TvrJPUDcOkdu/CWXgHZ+LarA
+         peh/m9juYmisCrSpgvt5a8pGEtRAQCHvOoiUq3olBCEuUPCyZemAlymgKbl81SXHeInq
+         GHhs8eLBkH4rhHzhPIioEjwsbzf0k9Cykm818lwd6XaH4MRYboKB8s64wDqE46T1n5Z1
+         oHMDU+CceUEIY5IrrYTLmbcRoWNk7Y9KTHJCqy2oaljgnCzpqqN0A9j8oPEzYzhbIw5C
+         z2JVAy1BcMIXw8KSBee+cTcwNnrg5uQmuGj4kRg0liQlTZN8lC+DFSyJ/31iWc8Xrccz
+         b95g==
+X-Gm-Message-State: AOJu0YxeHCBM/fE1LmM6qfOAf27xOm0rXr+/vDjx/MJxPTiJxzuydVVi
+	0HIPPejmACugmzXq7+IKH0ZyPqHQJlId6VvynbqTmdo4HmPwtjAfigUi2VMGz8c=
+X-Google-Smtp-Source: AGHT+IGwzbGXErs+yRHKfSVECh1dtFSB/rzRRV2LvmVtQNdXoBiV3dRw1TLfnQFHfe3d1BkVjoErIw==
+X-Received: by 2002:a05:6358:1206:b0:183:e72e:ce04 with SMTP id h6-20020a056358120600b00183e72ece04mr3074902rwi.16.1712253437474;
+        Thu, 04 Apr 2024 10:57:17 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::6:7e1f])
+        by smtp.gmail.com with ESMTPSA id s22-20020a656916000000b005bd980cca56sm12199250pgq.29.2024.04.04.10.57.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 10:57:17 -0700 (PDT)
+Message-ID: <8ce74a4c-f20d-410d-ab15-818ea9205ef8@davidwei.uk>
+Date: Thu, 4 Apr 2024 10:57:15 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dqs: use sysfs_emit() in favor of sprintf()
+Content-Language: en-GB
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Breno Leitao <leitao@debian.org>
+References: <20240404164604.3055832-1-edumazet@google.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20240404164604.3055832-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Replace open coded variant of device_is_compatible().
+On 2024-04-04 09:46, Eric Dumazet wrote:
+> Commit 6025b9135f7a ("net: dqs: add NIC stall detector based on BQL")
+> added three sysfs files.
+> 
+> Use the recommended sysfs_emit() helper.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Breno Leitao <leitao@debian.org>
+> ---
+>  net/core/net-sysfs.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+> index e3d7a8cfa20b7d1052f2b6c54b7a9810c55f91fc..ff3ee45be64a6a91d1abdcac5cd04b4bdd03e39c 100644
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -1419,7 +1419,7 @@ static ssize_t bql_show_stall_thrs(struct netdev_queue *queue, char *buf)
+>  {
+>  	struct dql *dql = &queue->dql;
+>  
+> -	return sprintf(buf, "%u\n", jiffies_to_msecs(dql->stall_thrs));
+> +	return sysfs_emit(buf, "%u\n", jiffies_to_msecs(dql->stall_thrs));
+>  }
+>  
+>  static ssize_t bql_set_stall_thrs(struct netdev_queue *queue,
+> @@ -1451,7 +1451,7 @@ static struct netdev_queue_attribute bql_stall_thrs_attribute __ro_after_init =
+>  
+>  static ssize_t bql_show_stall_max(struct netdev_queue *queue, char *buf)
+>  {
+> -	return sprintf(buf, "%u\n", READ_ONCE(queue->dql.stall_max));
+> +	return sysfs_emit(buf, "%u\n", READ_ONCE(queue->dql.stall_max));
+>  }
+>  
+>  static ssize_t bql_set_stall_max(struct netdev_queue *queue,
+> @@ -1468,7 +1468,7 @@ static ssize_t bql_show_stall_cnt(struct netdev_queue *queue, char *buf)
+>  {
+>  	struct dql *dql = &queue->dql;
+>  
+> -	return sprintf(buf, "%lu\n", dql->stall_cnt);
+> +	return sysfs_emit(buf, "%lu\n", dql->stall_cnt);
+>  }
+>  
+>  static struct netdev_queue_attribute bql_stall_cnt_attribute __ro_after_init =
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/mdio/mdio-gpio.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Checked that the above are the only 3 instances of sprintf() in
+net-sysfs.c. Rest of the file uses sysfs_emit() which has the same args
+as sprintf().
 
-diff --git a/drivers/net/mdio/mdio-gpio.c b/drivers/net/mdio/mdio-gpio.c
-index 778db310a28d..82088741debd 100644
---- a/drivers/net/mdio/mdio-gpio.c
-+++ b/drivers/net/mdio/mdio-gpio.c
-@@ -132,8 +132,7 @@ static struct mii_bus *mdio_gpio_bus_init(struct device *dev,
- 		new_bus->phy_ignore_ta_mask = pdata->phy_ignore_ta_mask;
- 	}
- 
--	if (dev->of_node &&
--	    of_device_is_compatible(dev->of_node, "microchip,mdio-smi0")) {
-+	if (device_is_compatible(dev, "microchip,mdio-smi0")) {
- 		bitbang->ctrl.op_c22_read = 0;
- 		bitbang->ctrl.op_c22_write = 0;
- 		bitbang->ctrl.override_op_c22 = 1;
--- 
-2.43.0.rc1.1.gbec44491f096
-
+Interestingly the docs for sysfs_emit() claims it is an scnprintf()
+equivalent, but has no size_t size param. So it's more like a sprintf()
+equivalent.
 
