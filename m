@@ -1,375 +1,195 @@
-Return-Path: <netdev+bounces-84799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F17E8985CC
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:11:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C9C58985C5
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:10:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C580CB2119D
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:11:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFD0C284E6D
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 824E6811E2;
-	Thu,  4 Apr 2024 11:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD48080C16;
+	Thu,  4 Apr 2024 11:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hqul+Dyb"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dIsFVDq9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBC5745C3
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 11:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712229080; cv=fail; b=pB0hrZsXAeO3CGuha+Kc6A1MGe2CKppMTV4/VUf4oP3olMADjWr+yO/sxzpCph9Nz4JTa435O4SsjwCOuo5eurssFYxIIMQTQ2k43c4r/FAPMCeMASaZjGeCKrZ/+RfkWMgKpYaemf479IaXwi10XqQsVrCXUcNlhKrbWQ13s/c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712229080; c=relaxed/simple;
-	bh=jicOXk5jQO5RcRcsPwLwsCx8vIYHHj7YASZDYPi35Ec=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=i5Dt7pFvhR7C7S7OXaTV/e1dmBiMdvXCeCS2hw9R3oRRZRoAuP3X+fSbEBIUBv2gpVuV0P7zfFwGWEWtaz4J3f+texdNOnccltP2cWoNxWsLy44HWi9l3MB3lTbPan8XHUYTXrdZ0qkZa+f1k2pVbVPxEiltdGqhnDp3VZy720A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hqul+Dyb; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712229074; x=1743765074;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jicOXk5jQO5RcRcsPwLwsCx8vIYHHj7YASZDYPi35Ec=;
-  b=hqul+DybAoleeiAI9/CBB+YFgLIMNrJAgIcgk0gn3lYJt8KZanLEmzXy
-   7m6LyD3FfesIzoCNKpp0ZKerzk8xGO78SnyGZIQhbRdrA5akS1B2xP6Wh
-   Gf5wNtF1yn16C5FbaFQk1lSGUAn0y8RAqsFgmocvy5UPR6c87XCZ5qtcn
-   aOxzXEefOy5/x9q9PZYt8wjJX+VirZ5j/JsflizMUqX9QRY5B9//aW/jJ
-   TVmOA43CJKgz1S8QMaQfVRQ1W7svzU5rlKbKENxkd4zr0A46o9tyWCzS2
-   WVV1QbKNRJsDGIhQlTZIfWkZrZAqZDoebbvm7M7kktIeBTufs5Ln5OBnj
-   w==;
-X-CSE-ConnectionGUID: /qV0UHeOSx+ibwjHkaqzEQ==
-X-CSE-MsgGUID: eQrfQ+aPTR6vMV8px2vRXQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="18949732"
-X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="18949732"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 04:10:11 -0700
-X-CSE-ConnectionGUID: WGtpgTojSN2qsBM7ALp2tQ==
-X-CSE-MsgGUID: ptYAUvzRSOWottjKPLEF0g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="49715169"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Apr 2024 04:10:11 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 4 Apr 2024 04:10:10 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 4 Apr 2024 04:10:10 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 4 Apr 2024 04:10:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oMGRGPJlmkk8q0G1i/YGT/+USSNyL48dcJQlhXE0ESVHch7eaUuqNPZTZhmmXAa2x1sBB5fjHXwo4tDweK8eS3T2fN4CbkVEcyXuUZiQ+Xx6Iq9aY66n8izjr+RLkGH0LHYUqXjHWRAnqSVq0HJLxty3xrTkyqoeqZ2wT6qiHrH31flYLBhtB6UEBzPEijRuoLEXw5YmknMmzLGrPwZzjyQvE2IhfYXYGbA9Yb89ivg5EbvVbb4ICEnoHE04fX/v+1t9hsIGM0L9TyBSdM8MP8FKuOTiBZapczsyhKBWzNRxrBKUSYg/oyLyMwj6s4aNvcxrpFcHQdFosL167I5j1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VATkyd6fDilZYxmPmtfCOmUx57IbPh1soV4SuWK4abA=;
- b=cGJRmxMo5oOEmkeqNNOx1hJ7S/mpJ0b8dQGXI6ypTsjkgFpdjGZvJf/7m3OsDSsY/W6iyber62u7lOYq852X5R/mjgU+b2uNWLNANjple0FSFOJy+HJwToyR6D4OjgDugTHw0TiUh+qLMl/nUyr3/2rsRbERionv3/QQPaIuosIgfKBvNXoaD0aAhdgWqwa1R1R0fFEg1HQgjaijpVwHuKb+X3yCJ+lAX8oFwP9mHV1n1vi31buJXuuXzCbZTDQuvy3vn7TlPildqnUhgHxugRI9SMG+y1ujcvvAcvizsD3z3xKPuar+iYXAQ7aNTBbqAyvaYEjT/XQNEPJ9JYwq8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by DS0PR11MB7459.namprd11.prod.outlook.com (2603:10b6:8:144::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Thu, 4 Apr
- 2024 11:09:54 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9%6]) with mapi id 15.20.7452.019; Thu, 4 Apr 2024
- 11:09:54 +0000
-Message-ID: <200925f5-b29e-4601-9e2d-32bfb390be4e@intel.com>
-Date: Thu, 4 Apr 2024 13:08:36 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v5 iwl-next 05/12] ice: Move CGU block
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, Sergey Temerkhanov
-	<sergey.temerkhanov@intel.com>, <netdev@vger.kernel.org>, "Arkadiusz
- Kubalewski" <arkadiusz.kubalewski@intel.com>, <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20240404092238.26975-14-karol.kolacinski@intel.com>
- <20240404092238.26975-19-karol.kolacinski@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240404092238.26975-19-karol.kolacinski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E968061C;
+	Thu,  4 Apr 2024 11:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712229039; cv=none; b=Fnc94i+olI01j9U452kuwvw8Gp3lp7kjFMdOsT6OcCWFtB0hUQ9LWxkotnPeihqWKxPI7LO97VIhHhnlQCW7b3pKOaO4knMr82BLXIdgQogPNvucun1E0AXP+P3yDLXF5Pkl7gPR7Eg+8+VK8vfbvg1fnzFwm8QLh95TfedlERQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712229039; c=relaxed/simple;
+	bh=WMjkJTdFFtjI0VIdYjo+49cEcxDsHkkR20fgJigQFhA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ciJk62eRbEw+nwJ5Ia317eMZksVKTu6awgCXuM1ihskeSiMHA3Xrt9zoaxUVc3nWyciJr2HcfZjcXcsoxMvvugIjoWyfk0saBJRKsakWCsL73a60Xc7SurbMy9Nhn8EO2cuRf2gKDqDAbIfZw1hYDiyF50Zpynqv4pkWY5DQ1vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dIsFVDq9; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 434AghNM003847;
+	Thu, 4 Apr 2024 11:10:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=Y7rT3wbvNimPqRZV8+pCJV9SipoHmQS0tWVux4Dh6JU=;
+ b=dIsFVDq90RNMlQV9p8VjF8wXddDqpYlJ0Uj9r6SXsembIoe2YyG69JfHf9lNr/AUjKdR
+ PlCbf+eVsDgqryZKQnXJsQrwCg2Bmy0pL7WrqTwvL53srkwXduuktcmyhzG3tePwZpEm
+ BTQknRou08R9eYk3yuDIShFBJRbqNyHqyBMUVPXi2bXgmKilpxX09MTkdCz2n3ZBU3Jj
+ reRiaNCuEhFekyTd6HA96gmPTztzUggfUvb/b+YBgKhDEbzSrximViW/lpaZ8/j7qxHB
+ VqjE7u+pLO5DRDPxxzmo+4uWGLqWHghL47yWL0QIAApN4dSkMTOCJVluXRM1QJMXH44O vg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9tpar2ft-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 11:10:33 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 434BAWld014453;
+	Thu, 4 Apr 2024 11:10:32 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9tpar2fm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 11:10:32 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 434AG0XZ003612;
+	Thu, 4 Apr 2024 11:10:31 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x9epybqut-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 11:10:31 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 434BAQGO48759092
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 4 Apr 2024 11:10:28 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EA0F12005A;
+	Thu,  4 Apr 2024 11:10:25 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6379720043;
+	Thu,  4 Apr 2024 11:10:25 +0000 (GMT)
+Received: from [9.155.208.153] (unknown [9.155.208.153])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  4 Apr 2024 11:10:25 +0000 (GMT)
+Message-ID: <cb7b036b4d3db02ab70d17ee83e6bc4f2df03171.camel@linux.ibm.com>
+Subject: Re: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Paolo Abeni <pabeni@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+        Wen Gu <guwen@linux.alibaba.com>, Heiko Carstens <hca@linux.ibm.com>,
+        pasic@linux.ibm.com, schnelle@linux.ibm.com
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        Alexandra Winter
+ <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Vasily
+ Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
+Date: Thu, 04 Apr 2024 13:10:20 +0200
+In-Reply-To: <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com>
+References: <20240328154144.272275-1-gbayer@linux.ibm.com>
+	 <20240328154144.272275-2-gbayer@linux.ibm.com>
+	 <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA0P291CA0007.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1::11) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nLjX6XP8Y0FKlwWH22i-JIS_ZPcJZBV3
+X-Proofpoint-ORIG-GUID: rRAtMI-qMNO3waY_57VCcQTalw_2_kpr
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS0PR11MB7459:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uKEb6G8FDOKhhpFk8XkTWHw7YNzzEiQ5q3E2llecUGldUs9/mtTRd5IuGUscjfXZYJAh3jM3vZm0z30i93ADL2yI2ubyJwMiaU9++DtmAYwh3yq7Zow6BLfnY/kMQV9E89wlay/MgOloPf7S0Mi9IEii+ZT3sXO9eoQGheN8ZnxliHjtLkQs5eELqE2kcUL3AGEKTdmPmuNzm9FuPLqnJfaOcITjidJEE4HajxbWT02QZo6oEh9Yk9RF62f0FmUWUiUtwtGGQM8ySCOuHfXK7E0Rm1zt3ScHdwttPJ28UpA3QY8gpRBCVRdSSYHU22hxK1vZsFy+OiUiixtpIOkFC8VnIICx+cWWUSQocuPFP7GZILqkjyJbKS71X+K0UVw2kTU6U2lRZo8JUn80u8984s8O9suCFrbilZKy1XgD68AFdmD3A4t8mFA7ERjP0hoan00C5Yn8g2MGYG1YVicHOem9FcjtaFK1tdVuyDclCuDvPdkXJLjczpCFuiX1MT11q/wp4YdjtkIy6l+ydS6T0UC4o9HddRzrlUv03nuMOjNq+xFb56vQhelS8MJop3fNnlvfc5jr5vCZuIo6NcHbqoLHnIS/+X5W8ifaEuEw0S+VeiVO/nv5Rr4CpbHcN+CjEo3DiPdMkLGQiCtx6KF8Wuejldj987A8F4MYFM8pM5o=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WS9vZ1YyWG9HbHdSa1ZHQmI3M1FKNFNVV2JmRkpCUWhVQmdiZ1NOZ3VYeFIv?=
- =?utf-8?B?cHZyM01nRWdRTHY1M09USDYwY25ITk5IL29uYWdUVU94bTBLSlh3Vlo1VStB?=
- =?utf-8?B?ZkwwM24rUU85L1NPMnl2Z1h1ZEhZZ0duNTRDZ2Q3REpHaTVEUytBTEkrYkhs?=
- =?utf-8?B?OVlyWXVjandGYVJGbExHMkFOay9kRWd2Nm5IK0dyelZsV1lPZUhjUlBHd0NX?=
- =?utf-8?B?RjBaQ094WUMxZVF5Z3p5MUZSZUtDSVVsellaOFJSYjBXZnhxWFBlbUNEM3lK?=
- =?utf-8?B?bkx3VVBPNFJBQWVJdzRpSlNkV3ZDeitodkFpcXdKd0tKYVZHT3ErTHgwdFdR?=
- =?utf-8?B?aDZDMGZDbEJydENvc3lpakhIMzZjc2dSK2FhcStJdWdTN2NLSCtOSDkzY1Jm?=
- =?utf-8?B?UHprcGJybDZpMFpUN2tFd1BaZmxVMDJFOHMzbGMzYVhQVWFMVzRzcWdRVmpC?=
- =?utf-8?B?aTREeEFBSHBXVWs5VmpDSkVaWkZXYXU1Y1JyYUwwWGtoSEIwYVVuSCtHWWxn?=
- =?utf-8?B?MlFyMnNtZkhhRTc0cmZqZU9OOHJTb2VpL3VaRThEa3M1MStmZjhQMWZrYkpB?=
- =?utf-8?B?MGloSElWZjRlYm1ueXJiRDEwdi93dkEyd3ZpQys4MVZINHowZFVJVmUzZDla?=
- =?utf-8?B?Y1Y4NC9xTXoxR0ZScUlGYktrbS8rV2Z0ajJ6ODhBenJKU3hCRW5UWWN3ZU91?=
- =?utf-8?B?azBhenJZcEx4eGc5UEhISXZOZ3BGMFl1OWhtbVpyR05RYTFkaXNBYTBuWHZi?=
- =?utf-8?B?Z3lNVGl1cU9RTHFORzZJVDg1T1VQNUYvc1NNT3BNTEtqL0dZK1EwMkF4QXhD?=
- =?utf-8?B?d05jVnF0SXlmL3Z2TWFkOFNDS2VmRHBCRE5hQSsyMkJsNjlHcEVMZDltUUNx?=
- =?utf-8?B?S05qZ3liQkhGZVB1d2xMY3E0R2ZIbStMdkZYTDVyWlVCL2hlSnVNZ2c5Zitr?=
- =?utf-8?B?MTZqQ3dvbmhrTEp5cmJIcDdTNmtPS2J3cUhSaEltRHEzMjJrZHM4RmxMV2Er?=
- =?utf-8?B?TmdybVZ4WnhOQk4rUWtldUJKS1dSYlorWjhOWnpMMDBZTGF0TlBsckszSHVR?=
- =?utf-8?B?Q2JOSFpneUpFYkttdFdFbU0yckQyYTFRS3JIV3ZobUdzRkVFNm9VTTA5YzJS?=
- =?utf-8?B?UlljMzd4MWpYYnd2MmxvTy9PbHl3d2JQOHMrWCtWYzdGVzhuMHZ3d0tKWTZB?=
- =?utf-8?B?M1dMOXo2NEZBQXdjU2QvWnVSKy9qYnFXalltTVU3czFBdHRQaEpmQy9BaDEw?=
- =?utf-8?B?a0VBVGl4elBCMUQyK2lsbDRtb1BrS1gvK29zUGJZUHVvRnU0MHRqeTBOVnQ2?=
- =?utf-8?B?Z2Mza1lBclNyZVdPZTFhV3I0Q3dsaGRPaDhmZE1VY3puT0ZLeFVBTjBoY2k5?=
- =?utf-8?B?N1BReDh3RXI3ODM4UVRtTzBhQVI3K24yY1BKNzhEaGxtK3VDVDFLZ0xyOGxo?=
- =?utf-8?B?bTNhN1JubWdaVmRIZy90MzlMb3pTZ0R0ZXEvWDhoc0taU21ibEV4QkRCaGQ4?=
- =?utf-8?B?VFRHVDA5bTZuT3BXWTAvVUMybjI2OFZMbWk0UXRWejV6bGx3REdZaXZxbmhP?=
- =?utf-8?B?a1Nzdk1OcGVNOHRHcWd5WmhYNzZySkgzWE9MdVQxNWN4dHhCOFB5QTF0YlBS?=
- =?utf-8?B?dWhOUkxwd0RnaEJrN0lsYVk0eFU4bVdBc2oxZytmN3RaL0x4OWNoOUNPczMw?=
- =?utf-8?B?NGUrSHNtU1ZsWUJZY2NGTE1TbzBQaDZtWGVoZHloc3ZFdmg1QkRPWGZYSWtL?=
- =?utf-8?B?eXhaNEZvQm1LYjB6S3k3alJkTXNYMVhCbkZHQzBsaGZOZXFKWkZxSVU4Ukl6?=
- =?utf-8?B?dVoyeml3WWFqZ1YwWXZOVm9SU2FqZkJndlpKYTI2Qk9mZzRFVG9DVDdibml3?=
- =?utf-8?B?Q0VvWVBMMi9hdHVvenNZaWtVeFVSd1FGa3ZCUVVseTFSNXNrZExNQnZINHVL?=
- =?utf-8?B?Ty9nenRCdnhWeHVTUTQ4eVV0ZFB6Nk95RCtxdXdtNDNBQW9vejgrcHlzM1Ru?=
- =?utf-8?B?dDJsK2k1ZnVzRHorZVI0QnVsdjF0S3E1Y0NreWRROHZoUUgzd2ZWaVJUTHBp?=
- =?utf-8?B?alU0a0dkL3BVbVlMUnljZitGRktMb0RCbHNGYitxZjZmMG9kREFqVVcyZE4y?=
- =?utf-8?B?aDBBN2lDdEc5Q20vMFdmd0hRbVBqSWpETFBJRk9PSE5wZDRKQzd0YjJVakxl?=
- =?utf-8?B?V0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 10f2b1ac-11f1-4274-f09b-08dc5497c173
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 11:09:54.4244
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dm7EKzYYOrLixcNRc0lpaDCL1BX/ov2cqCoz+t7c1d/BkjZwOZqcLZtIKPhJLrPjdVN6i/voVt0oA+cYjUD+WFAZiRK7uTAU4a3pE563ZD8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7459
-X-OriginatorOrg: intel.com
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-04_07,2024-04-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 impostorscore=0 phishscore=0 adultscore=0 clxscore=1015
+ bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=732 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404040076
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-Date: Thu,  4 Apr 2024 11:09:53 +0200
-
-> From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-> 
-> Move CGU block to the beginning of ice_ptp_hw.c
-> 
-> Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+On Thu, 2024-04-04 at 10:13 +0200, Paolo Abeni wrote:
+> On Thu, 2024-03-28 at 16:41 +0100, Gerd Bayer wrote:
+> > Since [1], dma_alloc_coherent() does not accept requests for
+> > GFP_COMP anymore, even on archs that may be able to fulfill this.
+> > Functionality that relied on the receive buffer being a compound
+> > page broke at that point:
+> > The SMC-D protocol, that utilizes the ism device driver, passes
+> > receive buffers to the splice processor in a struct
+> > splice_pipe_desc with a single entry list of struct pages. As the
+> > buffer is no longer a compound page, the splice processor now
+> > rejects requests to handle more than a page worth of data.
+> >=20
+> > Replace dma_alloc_coherent() and allocate a buffer with kmalloc()
+> > then create a DMA map for it with dma_map_page(). Since only=20
+> > receive buffers on ISM devices use DMA, qualify the mapping as
+> > FROM_DEVICE.
+> > Since ISM devices are available on arch s390, only and on that arch
+> > all DMA is coherent, there is no need to introduce and export some
+> > kind of dma_sync_to_cpu() method to be called by the SMC-D protocol
+> > layer.
+> >=20
+> > Analogously, replace dma_free_coherent by a two step
+> > dma_unmap_page, then kfree to free the receive buffer.
+> >=20
+> > [1] https://lore.kernel.org/all/20221113163535.884299-1-hch@lst.de/
+> >=20
+> > Fixes: c08004eede4b ("s390/ism: don't pass bogus GFP_ flags to
+> > dma_alloc_coherent")
+> >=20
 
 [...]
 
-> +static int ice_read_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 *val)
-> +{
-> +	struct ice_sbq_msg_input cgu_msg;
-> +	int err;
-> +
-> +	cgu_msg.opcode = ice_sbq_msg_rd;
-> +	cgu_msg.dest_dev = cgu;
-> +	cgu_msg.msg_addr_low = addr;
-> +	cgu_msg.msg_addr_high = 0x0;
-> +
-> +	err = ice_sbq_rw_reg(hw, &cgu_msg);
-> +	if (err) {
-> +		ice_debug(hw, ICE_DBG_PTP, "Failed to read CGU register 0x%04x, err %d\n",
-> +			  addr, err);
-> +		return err;
-> +	}
-> +
-> +	*val = cgu_msg.data;
-> +
-> +	return err;
+> > @@ -315,14 +319,27 @@ static int ism_alloc_dmb(struct ism_dev *ism,
+> > struct ism_dmb *dmb)
+> > =C2=A0	=C2=A0=C2=A0=C2=A0 test_and_set_bit(dmb->sba_idx, ism->sba_bitma=
+p))
+> > =C2=A0		return -EINVAL;
+> > =C2=A0
+> > -	dmb->cpu_addr =3D dma_alloc_coherent(&ism->pdev->dev, dmb-
+> > >dmb_len,
+> > -					=C2=A0=C2=A0 &dmb->dma_addr,
+> > -					=C2=A0=C2=A0 GFP_KERNEL |
+> > __GFP_NOWARN |
+> > -					=C2=A0=C2=A0 __GFP_NOMEMALLOC |
+> > __GFP_NORETRY);
+> > -	if (!dmb->cpu_addr)
+> > -		clear_bit(dmb->sba_idx, ism->sba_bitmap);
+> > +	dmb->cpu_addr =3D kmalloc(dmb->dmb_len, GFP_KERNEL |
+> > __GFP_NOWARN |
+> > +				__GFP_COMP | __GFP_NOMEMALLOC |
+> > __GFP_NORETRY);
+>=20
+> Out of sheer ignorance on my side, the __GFP_COMP flag looks
+> suspicious here. I *think* that is relevant only for the page
+> allocator.=20
+>=20
+> Why can't you use get_free_pages() (or similar) here? (possibly
+> rounding up to the relevant page_aligned size).=20
 
-	return 0;
+Thanks Paolo for your suggestion. However, I wanted to stay as close to
+the implementation pre [1] - that used to use __GFP_COMP, too. I'd
+rather avoid to change interfaces from "cpu_addr" to "struct page*" at
+this point. In the long run, I'd like to drop the requirement for
+compound pages entirely, since that *appears* to exist primarily for a
+simplified handling of the interface to splice_to_pipe() in
+net/smc/smc_rx.c. And of course there might be performance
+implications...
 
-since @err is already checked above.
+At this point, I'm more concerned about my usage of the DMA API with
+this patch.
 
-> +}
-> +
-> +/**
-> + * ice_write_cgu_reg_e82x - Write a CGU register
-> + * @hw: pointer to the HW struct
-> + * @addr: Register address to write
-> + * @val: value to write into the register
-> + *
-> + * Write the specified value to a register of the Clock Generation Unit. Only
-> + * applicable to E822 devices.
-> + */
-> +static int ice_write_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 val)
-> +{
-> +	struct ice_sbq_msg_input cgu_msg;
-> +	int err;
-> +
-> +	cgu_msg.opcode = ice_sbq_msg_wr;
-> +	cgu_msg.dest_dev = cgu;
-> +	cgu_msg.msg_addr_low = addr;
-> +	cgu_msg.msg_addr_high = 0x0;
-> +	cgu_msg.data = val;
+Thanks again,
+Gerd
 
-Maybe initialize it when declaring?
 
-	struct ice_sbq_msg_input cgu_msg = {
-		.opcode		= ice_sbq_msg_wr,
-		.dest_dev	= cgu,
-		...
-	};
-
-> +
-> +	err = ice_sbq_rw_reg(hw, &cgu_msg);
-> +	if (err) {
-> +		ice_debug(hw, ICE_DBG_PTP, "Failed to write CGU register 0x%04x, err %d\n",
-> +			  addr, err);
-> +		return err;
-> +	}
-> +
-> +	return err;
-
-	return 0;
-
-> +}
-> +
-> +/**
-> + * ice_clk_freq_str - Convert time_ref_freq to string
-> + * @clk_freq: Clock frequency
-> + *
-> + * Convert the specified TIME_REF clock frequency to a string.
-> + */
-> +static const char *ice_clk_freq_str(u8 clk_freq)
-> +{
-> +	switch ((enum ice_time_ref_freq)clk_freq) {
-
-You can declare @clk_freq as enum and avoid this cast.
-
-> +	case ICE_TIME_REF_FREQ_25_000:
-> +		return "25 MHz";
-> +	case ICE_TIME_REF_FREQ_122_880:
-> +		return "122.88 MHz";
-> +	case ICE_TIME_REF_FREQ_125_000:
-> +		return "125 MHz";
-> +	case ICE_TIME_REF_FREQ_153_600:
-> +		return "153.6 MHz";
-> +	case ICE_TIME_REF_FREQ_156_250:
-> +		return "156.25 MHz";
-> +	case ICE_TIME_REF_FREQ_245_760:
-> +		return "245.76 MHz";
-> +	default:
-> +		return "Unknown";
-> +	}
-
-Array lookup produces more optimized code than switch-case.
-
-static const char * const ice_clk_freqs[] = {
-	[ICE_TIME_REF_FREQ_25_000]	= "25 MHz",
-	...
-	[NUM_ICE_TIME_REF_FREQ]		= "Unknown",
-};
-
-static const char *ice_clk_freq_str(enum ice_time_ref_freq clk_freq)
-{
-	return ice_clk_freqs[min(clk_freq, NUM_ICE_TIME_REF_FREQ)];
-}
-
-> +}
-> +
-> +/**
-> + * ice_clk_src_str - Convert time_ref_src to string
-> + * @clk_src: Clock source
-> + *
-> + * Convert the specified clock source to its string name.
-> + */
-> +static const char *ice_clk_src_str(u8 clk_src)
-> +{
-> +	switch ((enum ice_clk_src)clk_src) {
-> +	case ICE_CLK_SRC_TCX0:
-> +		return "TCX0";
-> +	case ICE_CLK_SRC_TIME_REF:
-> +		return "TIME_REF";
-> +	default:
-> +		return "Unknown";
-> +	}
-
-Same as above.
-
-[...]
-
-> -int
-> -ice_write_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 val)
-> +static int
-> +ice_write_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 val)
->  {
->  	struct ice_sbq_msg_input msg = {0};
-
-It's not a changed line, just a reminder that `= { }` is preferred over
-`= {0}`.
-
-[...]
-
-> -	err = ice_read_quad_reg_e82x(hw, quad, lo_addr, &lo);
-> +	low = (u32)(val & P_REG_40B_LOW_M);
-> +	high = (u32)(val >> P_REG_40B_HIGH_S);
-
-	low = FIELD_GET(P_REG_40B_LOW_M, val);
-	high = FIELD_GET(P_REG_40B_HIGH_M, val);
-
-[...]
-
-> -	/* Log the current clock configuration */
-> -	ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-> -		  dw24.field.ts_pll_enable ? "enabled" : "disabled",
-> -		  ice_clk_src_str(dw24.field.time_ref_sel),
-> -		  ice_clk_freq_str(dw9.field.time_ref_freq_sel),
-> -		  bwm_lf.field.plllock_true_lock_cri ? "locked" : "unlocked");
-> +	/* For E822 based internal PHYs, the timestamp is reported with the
-> +	 * lower 8 bits in the low register, and the upper 32 bits in the high
-> +	 * register.
-> +	 */
-> +	*tstamp = ((u64)hi) << TS_PHY_HIGH_S | ((u64)lo & TS_PHY_LOW_M);
-
-	*tstamp = FIELD_PREP(TS_PHY_HIGH_M, hi) |
-		  FIELD_PREP(TS_PHY_LOW_M, lo);
-
-[...]
-
-> + * Clear all timestamps from the PHY quad block that is shared between the
-> + * internal PHYs on the E822 devices.
-> + */
-> +void ice_ptp_reset_ts_memory_quad_e82x(struct ice_hw *hw, u8 quad)
-> +{
-> +	ice_write_quad_reg_e82x(hw, quad, Q_REG_TS_CTRL, Q_REG_TS_CTRL_M);
-> +	ice_write_quad_reg_e82x(hw, quad, Q_REG_TS_CTRL, ~(u32)Q_REG_TS_CTRL_M);
-
-Is it intended to write the same register twice? Some reset sequence?
-
-This (u32) cast before `~` is not needed BTW.
-
-[...]
-
-Thanks,
-Olek
 
