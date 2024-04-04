@@ -1,225 +1,145 @@
-Return-Path: <netdev+bounces-84770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5161A898452
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:38:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8D2B8983EA
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07AFA28C997
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:38:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98CCB1F24629
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 09:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3CB126F11;
-	Thu,  4 Apr 2024 09:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AC974433;
+	Thu,  4 Apr 2024 09:25:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RyOacRUg"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="K87hT6eF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DD17F7E4
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 09:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA871E86F;
+	Thu,  4 Apr 2024 09:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712223339; cv=none; b=apseXm86QpI4+etUkwUZZarTzlq+RmAHXS0wEppB/5yT6yVji5JZw4I8ZxCSGm3aZ8vjaHdBDBJpBa4nBg0tJNxemUbo24+gF6A9erNHCGIQi4jEbZWsmO+iGuOM/cRj792XMi1+pdkk5qXSP3w/i342Nx+P+myhO6bN9Sum8d4=
+	t=1712222716; cv=none; b=atVuPIoQO8i7RVuzGGb9359hg7bjawuHH6WENUEoKPUePBNQOekWnID+6mh0kLCjL0PcS43apXFKOj+EPWxngVpwaGN4ZimA/h/8CzRnA9HZvqPpqw609e2IeEBph9N5hnpMEfNbbqW7CBfVGq4g+Y0xU109z4uXB58zteho9jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712223339; c=relaxed/simple;
-	bh=pfoNFYOr3EovMbGTtnSk+2UVggl44Rnff6vBk+RWHFs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U92v2t8o1lQT33Th2lYGYremcSP4k2DN3Jtj28AtohErQNwtgOgRGHGynDsc+1qzmIxXH1u3u679UmyHiFm1uB8IoD7j9e6GKSj0YcwqZ2kqnp2RyguX5VsapQK/dsiOOgNuBthOHCgIJbAceB7PMIpM3tc/BfOEAqPMbKBRNmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RyOacRUg; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712223338; x=1743759338;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pfoNFYOr3EovMbGTtnSk+2UVggl44Rnff6vBk+RWHFs=;
-  b=RyOacRUg83smwB+rVJkTYwpAmZXFDtMHnOQ8hNyeyYFXLQE7anDLlbaj
-   UsX0/ZjcIW1ZBrNeUP6ynpQVnTwCw8w5gNwue9P8OvBWamX76+ReTGX8m
-   CExUg+CS7zt3vLk0TZE9s6lGDtyHuPqkcnUNW24zdS9bBPnFRXe6bvbEn
-   Bq/9Khh6BSgHFuSMXdrYV6V2yXOY72+1/hC6beXM2ejT7uDh6Klhn2nnT
-   Frovss9xqM5Lo5R/8LDeLF7LIkPwPoPw+wnLWQ2FU0+aaz8bcg0UmFYPJ
-   WxtN9nAG0+wA8Bzk1EbTNHH6u1vVM0Q5AgHYw/9dUVZxgC4d+IYGoKWcz
-   g==;
-X-CSE-ConnectionGUID: GmWmLev4SfuZNIr8+iP72A==
-X-CSE-MsgGUID: fzNv2f4KRjuaa9WjudlaXg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="29966616"
-X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="29966616"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 02:23:14 -0700
-X-CSE-ConnectionGUID: A3hcHsOVSWGHLB9ID892/g==
-X-CSE-MsgGUID: Gsm8+NrDTW++Ecrlfeg5Lw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="56180813"
-Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by orviesa001.jf.intel.com with ESMTP; 04 Apr 2024 02:23:11 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	jesse.brandeburg@intel.com,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v5 iwl-next 12/12] ice: Adjust PTP init for 2x50G E825C devices
-Date: Thu,  4 Apr 2024 11:10:00 +0200
-Message-ID: <20240404092238.26975-26-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240404092238.26975-14-karol.kolacinski@intel.com>
-References: <20240404092238.26975-14-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1712222716; c=relaxed/simple;
+	bh=goGoyXyy2aFQvi0+QqmO6oV3VAEgFQ1Y15GcxBwoZ28=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=udTVr4Gx5gj9Tbc0aY5enpUIDFCC9Lc7hQa8jzZhBBvuMjNYLcX5e8D0nK7ZhN94ViOTxY2yKI8Iob377bY0Htl7dCY/t4aLCcnEC5v2DsN3N07FvCg0wQBg4PiXX4o/JV4DWEZOeSYIMHi080YK5KLQsqa92XT+C473gzaBmuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=K87hT6eF; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 074A260008;
+	Thu,  4 Apr 2024 09:25:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712222712;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JmD8Cz8LQvllwErFtC5QF38oacw9e604VmlkOt2aTy8=;
+	b=K87hT6eFy1B8OGtdw6c4NM4XNlL1sD85a1Uge3xud4ocA7A/Sh0ogIKA0De/miAF0B6wEq
+	fUWkit4VX2y1tVN0KhnXSMZy8aoAqRnwyf5j5Kkp/Fa8DiRti8LsC629SlqeSItha2dwrB
+	JljeqzL3D6OnnzHF0NMyZvtP0n633+FVoqSP+ABlnBurdoRSIIlq1XtbBUzPUPDjwnVoVu
+	+iUCEusnp+NAkyiT+85r7kqM7vZRoXz4GXHE0UF7yv+7pqYbODPTDxf11FJXL/C9ujBK+C
+	OalDYtvgOYDwpJhwlD2WJu53LgPGEvfLZyIN8A1FbgS+0/xZrSEsA8Xqm3rLNQ==
+Date: Thu, 4 Apr 2024 11:25:06 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <20240404112506.2e155bad@kmaincent-XPS-13-7390>
+In-Reply-To: <20240403143142.GA3508225-robh@kernel.org>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+	<20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
+	<20240402132637.GA3744978-robh@kernel.org>
+	<20240403111548.30e780b5@kmaincent-XPS-13-7390>
+	<20240403143142.GA3508225-robh@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+On Wed, 3 Apr 2024 09:31:42 -0500
+Rob Herring <robh@kernel.org> wrote:
 
-From FW/HW perspective, 2 port topology in E825C devices requires
-merging of 2 port mapping internally and breakout mapping externally.
-As a consequence, it requires different port numbering from PTP code
-perspective.
-For that topology, pf_id can not be used to index PTP ports. Even if
-the 2nd port is identified as port with pf_id = 1, all PHY operations
-need to be performed as it was port 2. Thus, special mapping is needed
-for the 2nd port.
-This change adds detection of 2x50G topology and applies 'custom'
-mapping on the 2nd port.
+> >  =20
+> > > > +
+> > > > +          polarity-supported:
+> > > > +            $ref: /schemas/types.yaml#/definitions/string-array
+> > > > +            description:
+> > > > +              Polarity configuration supported by the PSE PI pairs=
+ets.
+> > > > +            minItems: 1
+> > > > +            maxItems: 4
+> > > > +            items:
+> > > > +              enum:
+> > > > +                - MDI-X
+> > > > +                - MDI
+> > > > +                - X
+> > > > +                - S
+> > > > +
+> > > > +          vpwr-supply:
+> > > > +            description: Regulator power supply for the PSE PI.   =
+=20
+> > >=20
+> > > I don't see this being used anywhere. =20
+> >=20
+> > Right, I forgot to add it to the PD692x0 and TPS23881 binding example! =
+=20
+>=20
+> But is this really common/generic? I would think input power rails would=
+=20
+> be chip specific.
 
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
----
-V4 -> V5: - reworded commit mesage
-	  - renamed GLGEN_SWITCH_MODE_CONFIG_SELECT_25X4_ON_SINGLE_QUAD_M to
-	    GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M
+I think as each PSE PI are seen as a regulator we may want it generic to tr=
+ack
+each PI parent. Having the parent regulator described like that would force=
+ the
+devicetree to describe where the power come from.
+In contrary, for example, on the pd692x0 controller the regulators are conn=
+ected
+to the managers (PD69208) and not directly to the PIs. So the devicetree wo=
+uld
+not really fit the hardware. It is indeed chip specific but having described
+like that would be more simple.
 
- .../net/ethernet/intel/ice/ice_hw_autogen.h   |  4 ++++
- drivers/net/ethernet/intel/ice/ice_ptp.c      |  5 +++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 22 +++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_type.h     |  9 ++++++++
- 4 files changed, 40 insertions(+)
+If we decided to make it chip specific the core would have a callback to ask
+the driver to fill the regulator_init_data structure for each PI before
+registering the regulators. It is feasible.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index cfac1d432c15..91cbae1eec89 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -157,6 +157,8 @@
- #define GLGEN_RTRIG_CORER_M			BIT(0)
- #define GLGEN_RTRIG_GLOBR_M			BIT(1)
- #define GLGEN_STAT				0x000B612C
-+#define GLGEN_SWITCH_MODE_CONFIG		0x000B81E0
-+#define GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M	BIT(2)
- #define GLGEN_VFLRSTAT(_i)			(0x00093A04 + ((_i) * 4))
- #define PFGEN_CTRL				0x00091000
- #define PFGEN_CTRL_PFSWR_M			BIT(0)
-@@ -177,6 +179,8 @@
- #define GLINT_CTL_ITR_GRAN_50_M			ICE_M(0xF, 24)
- #define GLINT_CTL_ITR_GRAN_25_S			28
- #define GLINT_CTL_ITR_GRAN_25_M			ICE_M(0xF, 28)
-+#define GLGEN_MAC_LINK_TOPO			0x000B81DC
-+#define GLGEN_MAC_LINK_TOPO_LINK_TOPO_M		GENMASK(1, 0)
- #define GLINT_DYN_CTL(_INT)			(0x00160000 + ((_INT) * 4))
- #define GLINT_DYN_CTL_INTENA_M			BIT(0)
- #define GLINT_DYN_CTL_CLEARPBA_M		BIT(1)
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 29a86fcfd312..71b19fcb7d14 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1470,6 +1470,8 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
- 		return;
- 
- 	ptp_port = &pf->ptp.port;
-+	if (ice_is_e825c(hw) && hw->ptp.is_2x50g_muxed_topo)
-+		port *= 2;
- 	if (WARN_ON_ONCE(ptp_port->port_num != port))
- 		return;
- 
-@@ -3327,6 +3329,9 @@ void ice_ptp_init(struct ice_pf *pf)
- 	}
- 
- 	ptp->port.port_num = hw->pf_id;
-+	if (ice_is_e825c(hw) && hw->ptp.is_2x50g_muxed_topo)
-+		ptp->port.port_num = hw->pf_id * 2;
-+
- 	err = ice_ptp_init_port(pf, &ptp->port);
- 	if (err)
- 		goto err;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 1fdb7f173127..21c7758b98f7 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -2458,6 +2458,26 @@ static int ice_get_phy_tx_tstamp_ready_eth56g(struct ice_hw *hw, u8 port,
- 	return 0;
- }
- 
-+/**
-+ * ice_is_muxed_topo - detect breakout 2x50G topology for E825C
-+ * @hw: pointer to the HW struct
-+ *
-+ * Returns: true if it's 2x50 breakout topology, false otherwise
-+ */
-+static bool ice_is_muxed_topo(struct ice_hw *hw)
-+{
-+	u8 link_topo;
-+	bool mux;
-+	u32 val;
-+
-+	val = rd32(hw, GLGEN_SWITCH_MODE_CONFIG);
-+	mux = FIELD_GET(GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M, val);
-+	val = rd32(hw, GLGEN_MAC_LINK_TOPO);
-+	link_topo = FIELD_GET(GLGEN_MAC_LINK_TOPO_LINK_TOPO_M, val);
-+
-+	return (mux && link_topo == ICE_LINK_TOPO_UP_TO_2_LINKS);
-+}
-+
- /**
-  * ice_ptp_init_phy_e825c - initialize PHY parameters
-  * @hw: pointer to the HW struct
-@@ -2490,6 +2510,8 @@ static void ice_ptp_init_phy_e825c(struct ice_hw *hw)
- 			return;
- 		}
- 	}
-+
-+	ptp->is_2x50g_muxed_topo = ice_is_muxed_topo(hw);
- }
- 
- /* E822 family functions
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index e019dad56819..c5b2ad113d1a 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -851,6 +851,14 @@ enum ice_phy_model {
- 	ICE_PHY_ETH56G,
- };
- 
-+/* Global Link Topology */
-+enum ice_global_link_topo {
-+	ICE_LINK_TOPO_UP_TO_2_LINKS,
-+	ICE_LINK_TOPO_UP_TO_4_LINKS,
-+	ICE_LINK_TOPO_UP_TO_8_LINKS,
-+	ICE_LINK_TOPO_RESERVED,
-+};
-+
- struct ice_ptp_hw {
- 	enum ice_phy_model phy_model;
- 	union ice_phy_params phy;
-@@ -858,6 +866,7 @@ struct ice_ptp_hw {
- 	u8 ports_per_phy;
- 	bool primary_nac;
- 	struct ice_hw *primary_hw;
-+	bool is_2x50g_muxed_topo;
- };
- 
- /* Port hardware description */
--- 
-2.43.0
+Mmh in fact I am still unsure about the solution.
 
+Oleksij as you were the first to push the idea. Have you more argument in m=
+ind
+to make it generic?
+https://lore.kernel.org/netdev/ZeObuKHkPN3tiWz_@pengutronix.de/
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
