@@ -1,121 +1,133 @@
-Return-Path: <netdev+bounces-84908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0D4E898A06
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:25:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B49898A21
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:29:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C2B7B247F5
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:25:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0557E1F2DF0A
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE15012A145;
-	Thu,  4 Apr 2024 14:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22728129A6F;
+	Thu,  4 Apr 2024 14:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OdS0xPAr"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="rWyvnw6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2587350E
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 14:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5DA1CD03;
+	Thu,  4 Apr 2024 14:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712240671; cv=none; b=ajqbOgtCHNFAfIN7QVIWkn2XHq01txwcP3RlLsC4IRjAkhPlHkQ5DYLnXinIR0/PC62uKdR+rz3MkPXjOxv8WuQlg+5EVk5ZLB3tEv4/9pBZyFRgV/qD9ySMXJRGDyJZw7UO7zCClAA3Cu/byfpPYmUjNQBnDmV8SbM36jmQn1E=
+	t=1712240976; cv=none; b=cz6tAw+8CIz1dEDlUxNxr4e80DAQtAPvgc2zR3vi3Xt3UGOBWBy6idG/UIOgxXpkSi7gzWZ/4qgBAzxdwvpDoI6BY+MSCmvhkmv+7CwTj2Fdk0dyM6b3oBtp58lIYgpr6MBYGpFqCCcWh49eBJ+vyRzQWDAwASnAoxxRLpnV1ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712240671; c=relaxed/simple;
-	bh=Vjs9fiDyEPCiUH5V97YlzYYK9hVDZiame31wpvVYE20=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sv6rT5nkAWaqqoWMrsJ2KAg9Pezx1h9ctOgz3mbn8fKQJi+k9dePwzBNLN09gtTHF3VVMS6gg1t2PsGuXdE+A2vC6FlQfnp/G0biqYy1Z0bofrCjbe1SYUJ/oPeyvc9zNlsTjNQK6XlAQ/Tq+wOt4YPsLtUuwNvpBHEqBc4f79o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OdS0xPAr; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a5193f56986so54788066b.0
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 07:24:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712240668; x=1712845468; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=73VFeujZ5zRSnfDeve047kxeX/QzAwRRioVRteiOY0c=;
-        b=OdS0xPAr3SPdUwnKKcNya6NXo3tYIx31vHdM4Wp+gKzcowRsPRO1pC6AXGMsho9lMd
-         7fpiRYOfp/Rs5RwGzePNVIpJvjm7tC+Y3UuuwEsCRAnu5s0kqLYWMxKyOceUTzv1LPbp
-         z3ZtGwHAXYIUqcCJMLxx94Q8k0MNmafxjLAAu2CjUxZxnswImWioca2803X9AgsdGo35
-         PpISXs4OLFBmnh11BBdlJ+KzpWN4Zbx6xXzR4ZgrSaBtqbu5gAsmIoyy5XLHrjVGALoF
-         6m5O6OI43uT40JfypoPi/X8ctrlHDIFoZwEm/hkFdy0FrNc+kXUbZ0xqLHvM2Nhuqhuj
-         OEiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712240668; x=1712845468;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=73VFeujZ5zRSnfDeve047kxeX/QzAwRRioVRteiOY0c=;
-        b=ojbv3qaTBdPrjFBkOJnT4JFtDme8FEIzv23AKJmyLm2MtRFKr9Vv2yV+7Cr8kJTRub
-         lbjeBRDFdZXINOOcNajeXbS76ZOcvWfBOJrS4qjr+/ZTJTSq77BXJFP24eQQ6Sc5uXFw
-         nB1mqtBmFPBVEe5YYvbpW16FyDCLoO4cWkZcoOimjs8U9lftttcQK/PQF1oBfBiZ2jyR
-         NfdULLqfFVRZmEeVDIKRgV0YWuMhcM9SveiKYOMsXshKCYarjMkLj9HJDWG2UQAxyrg/
-         Nha+nZG1so2vqObiDpu1yOsjZ5zJghe2gZ2cTxrRO62L070vi3vu7E6pnlbJZLKxhcQs
-         G5WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVMgDgATsrI7LQqjiCVbKdF+s7zc9WXHZHndXfvpA6jSUmkTqJI9LkiqAc3e6PnpzG6BkBf2jBDtotIgvMzOFQfC0ptiGEw
-X-Gm-Message-State: AOJu0Yyng6wxi18uezdvehWTWGJdzBHHSl03OMKecesrKOSIrWo1TzoR
-	DExnUzQdri/USQLL8nlkcbs4nyfWkhehu02rnJddZQ3KCu3IVzndsZCOo42IB58=
-X-Google-Smtp-Source: AGHT+IE95d2GyKE88haqUxd82qWyW9YDQkqTlbBv2liHK6vJPSxaCXRx7+j2iffF7lQ5Hkbtdl0/2Q==
-X-Received: by 2002:a17:906:dfe3:b0:a51:982e:b3f7 with SMTP id lc3-20020a170906dfe300b00a51982eb3f7mr348369ejc.37.1712240668315;
-        Thu, 04 Apr 2024 07:24:28 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id pw14-20020a17090720ae00b00a4e35cc42c7sm7998858ejb.170.2024.04.04.07.24.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 07:24:27 -0700 (PDT)
-Date: Thu, 4 Apr 2024 17:24:23 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v6 15/21] ip_tunnel: use a separate struct to
- store tunnel params in the kernel
-Message-ID: <5f63dd25-de94-4ca3-84e6-14095953db13@moroto.mountain>
-References: <20240327152358.2368467-1-aleksander.lobakin@intel.com>
- <20240327152358.2368467-16-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1712240976; c=relaxed/simple;
+	bh=gSn2QxVUMSt6DtUuen8wT0y+Bz6MyT//GDU+6tlw5Jw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=J9I1LRVzxgEPeAOSdwfVlAv0bSHoya5bgtWRHn0LlOwiilj5pQqXiYjFgYxDru2wg7R4X6gSEA8XOWXbmzkBsyPgPq1mA4aUtFSghMz1AHweGC2PJjod8CU+tGGF0WQkL8ewxWjO0EFSrEiUPu36eDgsVLv1UXC7Lx0cT/JwjrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=rWyvnw6o; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=7D3JU+W2ZThhxENkFnOKanLxJxN9HSyjIsx2EIsO4IA=; b=rWyvnw6ozyjMfjRrqxeJvcmS+9
+	SJtdQQO9qriT2svBzvuzSz+U9GhbieFs2BBn1coYpVmyDwOLy5z89qy/RYqoAKUtQVKQLnZy4AaS5
+	fUWolnL61rL3FbILCxSBglw5Vi560+EArKbSNMYTj9bzx7wrXFtm5pzEr9PAVuF5UkBewq3BwGGDJ
+	6UnGvZ04OsfROjXYcB3q/X8rbC+oGNtMajbwWQo04iZmwyWi4j9Ai+JZiHbxh/rNDVvn36V5XIvmy
+	wgyeldplqNbIUcxDE0Z6z97MR1Otq+fp340zNbv/qyeEDjNPDeycCZ2FWsyd/RE6GCjdHO8/HXT5H
+	tQeq4enw==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rsO4y-00023V-E3; Thu, 04 Apr 2024 16:28:36 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rsO4w-0006EC-SC; Thu, 04 Apr 2024 16:28:34 +0200
+Subject: Re: [PATCH] bpf: x86: avoid link error with CONFIG_SMP=n
+To: Arnd Bergmann <arnd@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Kumar Kartikeya Dwivedi
+ <memxor@gmail.com>, Menglong Dong <imagedong@tencent.com>,
+ Leon Hwang <hffilwlqm@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240404123346.2661488-1-arnd@kernel.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <22b3dcfd-458d-dde3-7025-10611b3c6ef3@iogearbox.net>
+Date: Thu, 4 Apr 2024 16:28:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327152358.2368467-16-aleksander.lobakin@intel.com>
+In-Reply-To: <20240404123346.2661488-1-arnd@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27235/Thu Apr  4 10:24:59 2024)
 
-On Wed, Mar 27, 2024 at 04:23:52PM +0100, Alexander Lobakin wrote:
-> +bool ip_tunnel_parm_to_user(void __user *data, struct ip_tunnel_parm_kern *kp)
-> +{
-> +	struct ip_tunnel_parm p;
+On 4/4/24 2:33 PM, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> On UP systems, this_cpu_off is not defined, so the new percpu code in bpf
+> fails to link:
+> 
+> x86_64-linux-ld: vmlinux.o: in function `do_jit':
+> bpf_jit_comp.c:(.text+0xbab14): undefined reference to `this_cpu_off'
+> 
+> Use offset zero on UP builds instead.
+> 
+> Fixes: 7bdbf7446305 ("bpf: add special internal-only MOV instruction to resolve per-CPU addrs")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> I assume this is not the correct fix, or at least not the best one, so
+> please treat this as a bug report. It does address the link failure for
+> me, so I applied this to my randconfig build tree.
+> ---
+>   arch/x86/net/bpf_jit_comp.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index d6ebb9136f3c..8b8eebb89a9b 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -1383,7 +1383,10 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image, u8 *rw_image
+>   				EMIT3(0x0F, 0x44, add_2reg(0xC0, AUX_REG, dst_reg));
+>   				break;
+>   			} else if (insn_is_mov_percpu_addr(insn)) {
+> -				u32 off = (u32)(unsigned long)&this_cpu_off;
+> +				u32 off = 0;
 > +
-> +	strscpy(p.name, kp->name);
+> +				if (IS_ENABLED(CONFIG_SMP))
+> +					off = (u32)(unsigned long)&this_cpu_off;
+>   
 
-We need to clear out p before copying to user space to avoid an
-information leak.  So this strscpy() needs to be strcpy_pad()
+Thanks, there was already a fix in bpf-next tree in here:
+https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git/commit/?id=1e9e0b85255e6eca6036b59d8a5fbca6501905ac
 
-> +	p.link = kp->link;
-> +	p.i_flags = kp->i_flags;
-> +	p.o_flags = kp->o_flags;
-> +	p.i_key = kp->i_key;
-> +	p.o_key = kp->o_key;
-> +	memcpy(&p.iph, &kp->iph, min(sizeof(p.iph), sizeof(kp->iph)));
-
-And this memcpy() doesn't necessarily clear the whole of p.iph.
-
-> +
-> +	return !copy_to_user(data, &p, sizeof(p));
-> +}
-
-regards,
-dan carpenter
+>   				/* mov <dst>, <src> (if necessary) */
+>   				EMIT_mov(dst_reg, src_reg);
+> 
 
 
