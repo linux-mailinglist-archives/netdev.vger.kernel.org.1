@@ -1,680 +1,236 @@
-Return-Path: <netdev+bounces-84843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C794A898770
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:27:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A03A898778
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:27:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 521151F22E9C
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:27:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72F781F29C16
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF3C12BF38;
-	Thu,  4 Apr 2024 12:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B46126F3B;
+	Thu,  4 Apr 2024 12:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="J8iWGRW2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JVhm8GDq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C188662B
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712233456; cv=none; b=kOCrBzWHGGFvZsvBdcTxfWSf8xuAPTf9pag5DZWWd0Zs/ZScMwTD13L+UiysKQ/FM3k7P1a0kkfmJtpH2GtjKT2zlR9qdJZ9s8LaV+E8/XIkfG72xUSjOLihn6ke+lxwCR4u6sqnW64EV9Gm2GhBXbhcRvagOVyEHgFqIQzhXaQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712233456; c=relaxed/simple;
-	bh=qkpz6cm4gN8iTmUhK/vGU+FZGz1m3kV1qj6r2nQQTyw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f9bqiYY1CL6niI28dCn7mvciZi/UjxHADRCXyQkFtgp7vyG2WjjJaPJ0fIVVibhMl8oA5V0ikKkOW3mP0bB38yJxcLKSjZ51bIoE4Cb5KbiLAy6G/druvI86j4lYLrWIrIjVO3QQJk1XDGgrDUafwB2kEZ0Xsmrk6PbxuwRplrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=J8iWGRW2; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4317aed91baso5164651cf.0
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 05:24:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1712233453; x=1712838253; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LmJfCctbSYKu2pXz2fu2G4Rh9IAyteRVp6GMTXFxWUU=;
-        b=J8iWGRW2e/XVTGgkvvyorYVJytsAQACKnDbYfp+Nb+bdGODqB8nl6RpOzAmNp3OrXK
-         tu3HVIvJrMT8ibPxoxMUN8p/m1qusMXYZSE4XTvq15QR2aq2XcqIP0+se+WigMxLw/2o
-         ogse3JnS+h9JdRBIanbYCOXwymv0T4VF4W9MK0CqmBA/5IwfFavRFrvAZlgMlnmjiUxB
-         0k2GVEXjFXjovspS77d20KlDaUK7WDFIHz0Los21vAQuLl6tL8LP/SWnw1s0/u/g40tS
-         EIO6WEOgnoYizS/wKWrt6dxx6nPKTUGepli644SYrxc8G0PNkpQhpmhUUOcFwhKoX6L5
-         DFzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712233453; x=1712838253;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LmJfCctbSYKu2pXz2fu2G4Rh9IAyteRVp6GMTXFxWUU=;
-        b=jm7Kpo6cj394BcONpktkPNcRA64hzlaxO6oZbB//Cd4geyG0XptcuNUKkpFLH6N/MX
-         pGoQf3MYI1X5GbbZMOWCjANNbDbhenB8jtjCv6hSRgahmb5FnBafAFu7dX/WaACBLM5R
-         FmPQzUK2qibHW9xViXc1P5L59vlZ8Uy4MxFUHx0A2uU528x201Kw2pGMAZt2fHCYzbOQ
-         ilMnlaUhMhjwxCLXQ647BJtIW2fFwDZPJeh/OQyXbNICi7zpBNenCjzh59BIqoyN69ld
-         uNnpd4IzLhbTr9SGpP9+txLE4G0pcY5Fx70/SnixvccdgnD0r1Yuy2Wha51XmapJpjn0
-         GxNg==
-X-Gm-Message-State: AOJu0YwON9HkPw42uF84lxpGi2nRgnPcBcneoodEWxxtgCPtAYBnTTZR
-	GoATBe62AMxpNl0Bm4YrF1PFj6i0fD5FHdhu8CGuVDvquaO04P+ervc9HWfGlyBP4szMngE5mw0
-	=
-X-Google-Smtp-Source: AGHT+IECmloSxVz7Dmo/jmAuKKikzPmeE97YxdXRxsR2awgL77rR7PpdrBX1mHCIA784gVmYtnafrQ==
-X-Received: by 2002:ac8:5a91:0:b0:431:62a8:491e with SMTP id c17-20020ac85a91000000b0043162a8491emr2635367qtc.55.1712233452613;
-        Thu, 04 Apr 2024 05:24:12 -0700 (PDT)
-Received: from majuu.waya (bras-base-kntaon1621w-grc-19-174-94-28-98.dsl.bell.ca. [174.94.28.98])
-        by smtp.gmail.com with ESMTPSA id bb19-20020a05622a1b1300b00434508cfb62sm584945qtb.79.2024.04.04.05.24.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 05:24:11 -0700 (PDT)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: deb.chatterjee@intel.com,
-	anjali.singhai@intel.com,
-	namrata.limaye@intel.com,
-	tom@sipanda.io,
-	mleitner@redhat.com,
-	Mahesh.Shirshyad@amd.com,
-	Vipin.Jain@amd.com,
-	tomasz.osinski@intel.com,
-	jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vladbu@nvidia.com,
-	horms@kernel.org,
-	khalidm@nvidia.com,
-	toke@redhat.com,
-	daniel@iogearbox.net,
-	victor@mojatatu.com,
-	pctammela@mojatatu.com,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next v14  15/15] p4tc: add P4 classifier
-Date: Thu,  4 Apr 2024 08:23:38 -0400
-Message-Id: <20240404122338.372945-16-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240404122338.372945-1-jhs@mojatatu.com>
-References: <20240404122338.372945-1-jhs@mojatatu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5A3376E2
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712233575; cv=fail; b=dg9Z+lOS0w9LugLFyjf3EBHEJZD1MNv82tRM/jECiZPx+F1wBymPgM94alT4BQjnAjeSA3pBAO2nl+8W2Pm68cx40/+t0xeriJeoLURIcC/WX8LyCitilv3LvAFveCwGIaNq2ny/0u++rf3Q6z9ZDxzWzECXOkOQBkR54q7sjFU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712233575; c=relaxed/simple;
+	bh=RcNx9FuFFKurdz5LxhtnKQmpTveq3rKop/TNQrhis0U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ADW1WK0hF7z4zhGByMV/bWE7MEq80gqtjkQsJNfNQleJZLyGuGoen9jDhxrPy4M7xnV+ayhEibvmf3K7XxCrW31Pk2p0XPguo2LgHtAXPZUA/2klHerAQmG+mo4ubbQABtnxyTt+k5Bk1RwvRyKQPOVcpdnuIdC5uGev9PQgSMg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JVhm8GDq; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712233573; x=1743769573;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=RcNx9FuFFKurdz5LxhtnKQmpTveq3rKop/TNQrhis0U=;
+  b=JVhm8GDqzEp7w9NLRJaiyZEN8KBYUNWh5W+l52F9nrxxE/f5YZEIuRRg
+   URBuNbKHRSP5a977H+6GjrCQqgFfB9PsoOO+rgC2T+H978k3qbrH4uJ9f
+   rIrRvjeP/yVwoItkiN1NeJ4XaxngRen6ahdwYml+Ww62h3/lqIMeL7IRO
+   pSKImLWpPFHhr0wYjbPG2AdBvyAkirW+RqC7fK5s3uAX/Em91MHy9xz2N
+   enEivkFUFhSpMAf3SOnZTYqo8mT3IakEX4Aw+kIcxL5UX1NFj/HUR0AAb
+   hkDHFPIgi8OYQRnXPyleRUAjWkxh4t580eeb1nhUeuvCNQ4htZTlm+y5q
+   g==;
+X-CSE-ConnectionGUID: V5kBVwydT9+C9xqGpompvA==
+X-CSE-MsgGUID: YFXf9Cy0RP+fAOyWLbFJpg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="11334721"
+X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
+   d="scan'208";a="11334721"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 05:26:11 -0700
+X-CSE-ConnectionGUID: Sk4PWTXERXOsv809E9SAww==
+X-CSE-MsgGUID: rvR6xE3aQKuRQE0CXNPj5A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
+   d="scan'208";a="49990313"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Apr 2024 05:26:09 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Apr 2024 05:26:08 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Apr 2024 05:26:08 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 4 Apr 2024 05:26:08 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 4 Apr 2024 05:26:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cC2a5UTMsVJfqFBB9qqfxCagQHqu4XQneDR86SJEppwDt0i70jpgWaXcDGEH7+vMmcfARBNFfyt17ig5se8B7QkfGozVTZjZ2+3aeWdGSOB5FutwjmmpkCouI58c81DcoqkD2vyibEPgzHTLVonBHh5tujez9ZM/lx4jGOSoedvOrfUrKfX08DpCLnZS+W8j4a4H2MTjA9dIumYJIb98QFNemGCnnLRQKIrmpNg5RL++HuXhG2+xzAQMIjptLXZChqM9e7VSijlLte0WiNxaRpkckHGcdfLzLtb6rso1RVAw1+RmQn3+LAo7eft128iTbk0uz19nrry7XjY/pXgcmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RcNx9FuFFKurdz5LxhtnKQmpTveq3rKop/TNQrhis0U=;
+ b=bTMBaGcguXFloMoP9OFmwQgBEpSqIuAhhOr3E2OWhf/RePBV6qf5514glQAaTSxVSJcX2kTLH+QV+6kv5kbIycsv7aM7crtEPSvPrNr3QA3JHfVOKhZJyPqp1ahDwrLNAGzsHlniy3r/GzpleClvDzrWG5RoxFac8nq2fq4W1ht08woKeQULytkYyoyXoq1Wf9kTP6/p3DSDwIeFb3wNT6L+TZLRzxbNSMLber/1xD3q34IPXBA7M4hV1by2x/0G0DVvRrUvEJI/5UjXvp2rBHLC4UgNbmYNNE1hq23gdp+2vtk1TTBemJjUfkYgnLdOPRznh+R4H/VkBnMXVYJ8sQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5800.namprd11.prod.outlook.com (2603:10b6:303:186::21)
+ by DM4PR11MB8201.namprd11.prod.outlook.com (2603:10b6:8:18a::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.38; Thu, 4 Apr
+ 2024 12:26:03 +0000
+Received: from MW4PR11MB5800.namprd11.prod.outlook.com
+ ([fe80::b022:a668:b398:77a4]) by MW4PR11MB5800.namprd11.prod.outlook.com
+ ([fe80::b022:a668:b398:77a4%7]) with mapi id 15.20.7452.019; Thu, 4 Apr 2024
+ 12:26:03 +0000
+From: "Kolacinski, Karol" <karol.kolacinski@intel.com>
+To: "Lobakin, Aleksander" <aleksander.lobakin@intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Temerkhanov, Sergey" <sergey.temerkhanov@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH v5 iwl-next 05/12] ice: Move CGU block
+Thread-Topic: [Intel-wired-lan] [PATCH v5 iwl-next 05/12] ice: Move CGU block
+Thread-Index: AQHahnG123lHfUDv8Uunuxswe1QcmLFX8/0AgAATYnc=
+Date: Thu, 4 Apr 2024 12:26:03 +0000
+Message-ID: <MW4PR11MB580072F154D9A5D189224D2C863C2@MW4PR11MB5800.namprd11.prod.outlook.com>
+References: <20240404092238.26975-14-karol.kolacinski@intel.com>
+ <20240404092238.26975-19-karol.kolacinski@intel.com>
+ <200925f5-b29e-4601-9e2d-32bfb390be4e@intel.com>
+In-Reply-To: <200925f5-b29e-4601-9e2d-32bfb390be4e@intel.com>
+Accept-Language: pl-PL, en-US
+Content-Language: pl-PL
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB5800:EE_|DM4PR11MB8201:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: u4G/F65qKt+8ScBKTDFPD4/Pg26GQ+tZEz3KLPoGc4W2ctJM2A3egbUcYT4mZi9gGGjsrnFtGqTj+Z3t+vZhdoK1rF69qZxqvEr5iJmz/dsNFcSclQC8mv3qqZNfXyNQw8jnHiwM0MeccHYGb+ppimkOXyesEsc2SctPXQ8994BxneP+rIvxn2KqpnmVirhF/nsAFWsxzGiGoMBaei6oKQBw4DctcTTztLZTa364L5kKdnrc5A8lbWaTBY6a/fxuCFEqAVoaNHWMnGuFfzCar7Ik2P5mO8OYP5mpj7Cp3Q1NdLPAvaPeqrrCkjC0dtN3rE69W9HHpY6n0ByCDBXLftjbtT7j08ivJJzllvGIBMTLu/Rcnwezt/+XtG5eyUDIpK8Ntp5JJHh4ZI/O/PoR3+IVJC6HF8SZvnEAg0waBe8sv9wCFlN9cPbqVly5uujse2SAj7XaXunLdxTyB8IlL6eBJksL2hnD1sKWaIcrwWJgbteo1lC0wqZNS3bahNdtwpZC64Z2OwIFBLs09V59/LvhWOT0oZih8pGSkm9K878opoJiAUp+KOqKRaEvBwPet6YowImJntYyMiHsNt18iwbXRrAgdyZfeN27qZtDPXG3MqsvKmnXHD3VmAFjefiQcr+Ow7nN1WCZT8vizYW03A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5800.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-2?Q?DVxmxigV1rvhS53fcXjlg/xJ4iOWtQzkSpISqn7mA8ofrRvZx2sw4u8sl9?=
+ =?iso-8859-2?Q?a0tthBgG8i0pHpoSYF9LJzxq3UQjcmhvvIKZTQUh6DdQ5S9bfJ8xGDoJ6m?=
+ =?iso-8859-2?Q?kSxnjkx34KtwW8Z2Eq1qkimGKUFszmSseqwvQMyHnKDEf1HMBA1y0y9Ec9?=
+ =?iso-8859-2?Q?K1SVwBazHG1r15X4zmPSWeVbkwlLh5Nr1LzK8IUX29GnTVA5SPdJxfPE7R?=
+ =?iso-8859-2?Q?kN0nW50/KZ8UMlAPc9cKhxEno8hrXjzZCsp7vv5finSh3F3ZY+vXvV3TrS?=
+ =?iso-8859-2?Q?NZPnOpTUm10o5U2yRK3J6ZkWIq86rFT1EDX5+dxfbzQW+hbL+uDU2deIhP?=
+ =?iso-8859-2?Q?6aFvW3f4ISHAAqtrNlnsijGYEwB7pc5AaJO1tzgmQJtqC2pEgk2ARaCFMP?=
+ =?iso-8859-2?Q?SZinTFYp0gkgUXpz2i0JIbrE11lzxzQUMS8AKY+R/D4rlYJ/Y/h2TiIXhZ?=
+ =?iso-8859-2?Q?OOeIJl1L2KwII2uuS28yeHDlmWzTh2wgNAVlFs4Mm5fXO4LDFCMraEloSg?=
+ =?iso-8859-2?Q?/qyir1N6IzE7qO0WSJro89SjKd2QfnkkbmvgXMXCbNQXOT3n+G9ET50EH4?=
+ =?iso-8859-2?Q?FZ9/BJayZMtzm0klAWxC2mULKbnhz9L9UzLu6FriKYRyZWSGFrlKdFJCyj?=
+ =?iso-8859-2?Q?1Zhq00DF3vPxK3kaPwEMgApM4Kh/qypU4yYuJanNq+my/ML44GuCt7Vpjo?=
+ =?iso-8859-2?Q?IYiB0Ec2WCH9ka/+qvv6Yu/PIlJBC1sKqELsK5O5Cvf7XtHihw32VOUoT2?=
+ =?iso-8859-2?Q?wJxybUugrfIynUMrHd3CqsmdapFzZm8V0y33P0c/ctuWzc6RgiiL3zohb6?=
+ =?iso-8859-2?Q?Q83u/Pwg28XQdqzMuUvHqS31SUX8AFpkmoLCc/a4zBopKWQGS1SpuwyF/o?=
+ =?iso-8859-2?Q?eVkGmH+zujj3BOy8s15gh7MNcAR3TpWIHRffUSHYJNN0T+8WHuuNAQd51B?=
+ =?iso-8859-2?Q?QNpJ1Ox9nxfhvRZYhokD9bWtwAk/NS5RG9rIKEnknVVJXy3MSDeLvvB+96?=
+ =?iso-8859-2?Q?jZyXZbiyIZFykLX+NyOH9DtqmEqLyWkt6Rw4PdeKPvzhfk/W3/wOuheyHO?=
+ =?iso-8859-2?Q?XRqVAFoch0VZ5IJUQp5N7szmdj10ecovlry8s13dLvNxU1HbQW3iWhIP1O?=
+ =?iso-8859-2?Q?Tzz0LnCS+iQyDYOGfTH2xNJFloj4dCHWZLdeQy9snaDOdNsD1xIRiI2LKy?=
+ =?iso-8859-2?Q?F1oR8QjwrmwN7TXSzUpq2wxUseHVTqBG5UQ4UhqLHnWKIb65xPY9x/sRb3?=
+ =?iso-8859-2?Q?p9Ir99bfkoTp4mr2/QNJX4Sy9ZHMUUtduzNAHhjGiUFlBe7g7wA2x7dlPC?=
+ =?iso-8859-2?Q?LpVYqviobiQTYu8kcqku3VUeoYVapB5dZC75d5CbipP5FBa7/MOEtRN7aD?=
+ =?iso-8859-2?Q?DyQ/OkgAPUpGJHvWXjok52MQftRoT/JONEe8MEUs14qkljWgHIAGYgD7lN?=
+ =?iso-8859-2?Q?Ewgh8dPJVSVEh7EGdxzr04ZsluGfz2IgZy9yWPZnAcLwc6WKGil+Nky/Lo?=
+ =?iso-8859-2?Q?52v+BQjbUrWMr67DQCgb2kQPubjCm6E9VmRerkSbgf/L0T0JjWpKndJDpa?=
+ =?iso-8859-2?Q?7+DLaUuvLF4q3dVYPqbCxYkzSKkY92htJqoFJUrUoQSC1sWFmhhnuBbCmL?=
+ =?iso-8859-2?Q?5Zif/Q8/SRxjPGp2wEGSlCBUMgPuxWL1yl5Gqx9YZkmaVXyMV0ZJsVIQ?=
+ =?iso-8859-2?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5800.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 858e34f5-3840-47a2-b4be-08dc54a264dc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Apr 2024 12:26:03.3266
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sFRM+Qx4pLsNbj7NjdQGfVRh/gfbq7O9vK/LYSh4EZLy5BQYvHb1P8sc/L8xOX1EP3ZCVle0IQTPuYbR73pcHcnXg0yJTiXDNdIgrtxPUWA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB8201
+X-OriginatorOrg: intel.com
 
-Introduce P4 tc classifier. The main task of this classifier is to manage
-the lifetime of pipeline instances across one or more netdev ports.
-Note: a defined pipeline may be instantiated multiple times across one or
-more tc chains and different priorities.
-
-Note that part or whole of the P4 pipeline could reside in tc, XDP or even
-hardware depending on how the P4 program was compiled. This classifier only
-deals with tc layer.
-To use the P4 classifier you must specify a pipeline name that will be
-associated to the filter instance, a s/w parser (eBPF) and datapath P4
-control block program (eBPF) program. Although this patchset does not deal
-with offloads, it is also possible to load the h/w part using this filter.
-We will illustrate a few examples further below to clarify. Please treat
-the illustrated split as an example - there are probably more pragmatic
-approaches to splitting the pipeline; however, regardless of where the
-different pieces of the pipeline are placed (tc, XDP, HW) and what each
-layer will implement (what part of the pipeline) - these examples are
-merely showing what is possible.
-
-The pipeline is assumed to have already been created via a template.
-
-For example, if we were to add a filter to ingress of a group of netdevs
-(tc block 22) and associate it to P4 pipeline simple_l3 we could issue the
-following command:
-
-tc filter add block 22 parent ffff: protocol all prio 6 p4 pname simple_l3 \
-    action bpf obj $PARSER.o ... \
-    action bpf obj $PROGNAME.o section p4tc/main
-
-The above uses the classical tc action mechanism in which the first action
-runs the P4 parser and if that goes well then the P4 control block is
-executed. Note, although not shown above, one could also append the command
-line with other traditional tc actions.
-
-Given one of the objectives of this classifier is to manage the lifetime
-of the p4 program and said program may be split across tc:xdp:hardware we
-allow specification of where the xdp (and in the future hardware) programs
-can be found. For this reason when instantiating one could specify where
-the associated XDP program using they syntax "prog type xdp progname",
-where progname refers to the XDP ebpf program name. The control plane side
-(below we show iproute2) will be responsible for loading the XDP program.
-The kernel is unaware of the XDP side.
-There is an ongoing discussion in the P4TC community biweekly meetings
-which is likely going to have us add another location definition "prog type
-hw" which will specify the hardware object file name and other related
-attributes. The current discussion is that this h/w piece will go via the
-p4 classifier.
-
-An example using xdp and tc:
-
-tc filter add dev $P0 ingress protocol all prio 1 p4 pname simple_l3 \
-    prog type xdp obj $PARSER.o section p4tc/parse-xdp \
-    action bpf obj $PROGNAME.o section p4tc/main
-
-In this case, the parser will be executed in the XDP layer and the rest of
-P4 control block as a tc action.
-
-For illustration sake, the hw one looks as follows (please note there's
-still a lot of discussions going on in the meetings - the example is here
-merely to illustrate the tc filter functionality):
-
-tc filter add block 22 ingress protocol all prio 1 p4 pname simple_l3 \
-   prog type hw filename "mypnameprog.o" ... \
-   prog type xdp obj $PARSER.o section p4tc/parse-xdp \
-   action bpf obj $PROGNAME.o section p4tc/main
-
-The theory of operations is as follows:
-
-================================1. PARSING================================
-
-The packet first encounters the parser.
-The parser is implemented in ebpf residing either at the TC or XDP
-level. The parsed header values are stored in a shared per-cpu eBPF map.
-When the parser runs at XDP level, we load it into XDP using the control
-plane (tc filter command) and pin it to a file.
-
-=============================2. ACTIONS=============================
-
-In the above example, the P4 program (minus the parser) is encoded in an
-action($PROGNAME.o). It should be noted that classical tc actions
-continue to work:
-IOW, someone could decide to add a mirred action to mirror all packets
-after or before the ebpf action.
-
-tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_l3 \
-    action bpf obj $PARSER.o section p4tc/parse \
-    action bpf obj $PROGNAME.o section p4tc/main \
-    action mirred egress mirror index 1 dev $P1 \
-    action bpf obj $ANOTHERPROG.o section mysect/section-1
-
-It should also be noted that it is feasible to split some of the ingress
-datapath into XDP first and more into TC later (as was shown above for
-example where the parser runs at XDP level). YMMV.
-Regardless of choice of which scheme to use, none of these will affect
-UAPI. It will all depend on whether you generate code to load on XDP vs
-tc, etc. We expect the compiler to evolve over time (but that has
-nothing to do with the kernel part).
-
-Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Acked-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
- include/uapi/linux/pkt_cls.h |  14 ++
- net/sched/Kconfig            |  12 ++
- net/sched/Makefile           |   1 +
- net/sched/cls_p4.c           | 305 +++++++++++++++++++++++++++++++++++
- net/sched/p4tc/Makefile      |   4 +-
- net/sched/p4tc/trace.c       |  10 ++
- net/sched/p4tc/trace.h       |  44 +++++
- 7 files changed, 389 insertions(+), 1 deletion(-)
- create mode 100644 net/sched/cls_p4.c
- create mode 100644 net/sched/p4tc/trace.c
- create mode 100644 net/sched/p4tc/trace.h
-
-diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index 898f6a05ec..efc98765ad 100644
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -706,6 +706,20 @@ enum {
- 
- #define TCA_MATCHALL_MAX (__TCA_MATCHALL_MAX - 1)
- 
-+/* P4 classifier */
-+
-+enum {
-+	TCA_P4_UNSPEC,
-+	TCA_P4_CLASSID,
-+	TCA_P4_ACT,
-+	TCA_P4_PNAME,
-+	TCA_P4_PIPEID,
-+	TCA_P4_PAD,
-+	__TCA_P4_MAX,
-+};
-+
-+#define TCA_P4_MAX (__TCA_P4_MAX - 1)
-+
- /* Extended Matches */
- 
- struct tcf_ematch_tree_hdr {
-diff --git a/net/sched/Kconfig b/net/sched/Kconfig
-index 5dbae579bd..66d7fed274 100644
---- a/net/sched/Kconfig
-+++ b/net/sched/Kconfig
-@@ -565,6 +565,18 @@ config NET_CLS_MATCHALL
- 	  To compile this code as a module, choose M here: the module will
- 	  be called cls_matchall.
- 
-+config NET_CLS_P4
-+	tristate "P4 classifier"
-+	select NET_CLS
-+	select NET_P4TC
-+	help
-+	  If you say Y here, you will be able to bind a P4 pipeline
-+	  program. You will need to install a P4 template representing the
-+	  program successfully to use this feature.
-+
-+	  To compile this code as a module, choose M here: the module will
-+	  be called cls_p4.
-+
- config NET_EMATCH
- 	bool "Extended Matches"
- 	select NET_CLS
-diff --git a/net/sched/Makefile b/net/sched/Makefile
-index 581f9dd690..b4f9ef48dd 100644
---- a/net/sched/Makefile
-+++ b/net/sched/Makefile
-@@ -72,6 +72,7 @@ obj-$(CONFIG_NET_CLS_CGROUP)	+= cls_cgroup.o
- obj-$(CONFIG_NET_CLS_BPF)	+= cls_bpf.o
- obj-$(CONFIG_NET_CLS_FLOWER)	+= cls_flower.o
- obj-$(CONFIG_NET_CLS_MATCHALL)	+= cls_matchall.o
-+obj-$(CONFIG_NET_CLS_P4)	+= cls_p4.o
- obj-$(CONFIG_NET_EMATCH)	+= ematch.o
- obj-$(CONFIG_NET_EMATCH_CMP)	+= em_cmp.o
- obj-$(CONFIG_NET_EMATCH_NBYTE)	+= em_nbyte.o
-diff --git a/net/sched/cls_p4.c b/net/sched/cls_p4.c
-new file mode 100644
-index 0000000000..a266e777b8
---- /dev/null
-+++ b/net/sched/cls_p4.c
-@@ -0,0 +1,305 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * net/sched/cls_p4.c - P4 Classifier
-+ * Copyright (c) 2022-2024, Mojatatu Networks
-+ * Copyright (c) 2022-2024, Intel Corporation.
-+ * Authors:     Jamal Hadi Salim <jhs@mojatatu.com>
-+ *              Victor Nogueira <victor@mojatatu.com>
-+ *              Pedro Tammela <pctammela@mojatatu.com>
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/percpu.h>
-+#include <linux/bpf.h>
-+#include <linux/filter.h>
-+
-+#include <net/sch_generic.h>
-+#include <net/pkt_cls.h>
-+
-+#include <net/p4tc.h>
-+
-+#include "p4tc/trace.h"
-+
-+struct cls_p4_head {
-+	struct tcf_exts exts;
-+	struct tcf_result res;
-+	struct rcu_work rwork;
-+	struct p4tc_pipeline *pipeline;
-+	u32 handle;
-+};
-+
-+static int p4_classify(struct sk_buff *skb, const struct tcf_proto *tp,
-+		       struct tcf_result *res)
-+{
-+	struct cls_p4_head *head = rcu_dereference_bh(tp->root);
-+
-+	if (unlikely(!head)) {
-+		pr_err("P4 classifier not found\n");
-+		return -1;
-+	}
-+
-+	trace_p4_classify(skb, head->pipeline);
-+
-+	*res = head->res;
-+
-+	return tcf_exts_exec(skb, &head->exts, res);
-+}
-+
-+static int p4_init(struct tcf_proto *tp)
-+{
-+	return 0;
-+}
-+
-+static void __p4_destroy(struct cls_p4_head *head)
-+{
-+	tcf_exts_destroy(&head->exts);
-+	tcf_exts_put_net(&head->exts);
-+	p4tc_pipeline_put(head->pipeline);
-+	kfree(head);
-+}
-+
-+static void p4_destroy_work(struct work_struct *work)
-+{
-+	struct cls_p4_head *head =
-+		container_of(to_rcu_work(work), struct cls_p4_head, rwork);
-+
-+	rtnl_lock();
-+	__p4_destroy(head);
-+	rtnl_unlock();
-+}
-+
-+static void p4_destroy(struct tcf_proto *tp, bool rtnl_held,
-+		       struct netlink_ext_ack *extack)
-+{
-+	struct cls_p4_head *head = rtnl_dereference(tp->root);
-+
-+	if (!head)
-+		return;
-+
-+	tcf_unbind_filter(tp, &head->res);
-+
-+	if (tcf_exts_get_net(&head->exts))
-+		tcf_queue_work(&head->rwork, p4_destroy_work);
-+	else
-+		__p4_destroy(head);
-+}
-+
-+static void *p4_get(struct tcf_proto *tp, u32 handle)
-+{
-+	struct cls_p4_head *head = rtnl_dereference(tp->root);
-+
-+	if (head && head->handle == handle)
-+		return head;
-+
-+	return NULL;
-+}
-+
-+static const struct nla_policy p4_policy[TCA_P4_MAX + 1] = {
-+	[TCA_P4_UNSPEC] = { .type = NLA_UNSPEC },
-+	[TCA_P4_CLASSID] = { .type = NLA_U32 },
-+	[TCA_P4_ACT] = { .type = NLA_NESTED },
-+	[TCA_P4_PNAME] = { .type = NLA_STRING, .len = P4TC_PIPELINE_NAMSIZ },
-+	[TCA_P4_PIPEID] = { .type = NLA_U32 },
-+};
-+
-+static int p4_set_parms(struct net *net, struct tcf_proto *tp,
-+			struct cls_p4_head *head, unsigned long base,
-+			struct nlattr **tb, struct nlattr *est, u32 flags,
-+			struct netlink_ext_ack *extack)
-+{
-+	int err;
-+
-+	err = tcf_exts_validate_ex(net, tp, tb, est, &head->exts, flags, 0,
-+				   extack);
-+	if (err < 0)
-+		return err;
-+
-+	if (tb[TCA_P4_CLASSID]) {
-+		head->res.classid = nla_get_u32(tb[TCA_P4_CLASSID]);
-+		tcf_bind_filter(tp, &head->res, base);
-+	}
-+
-+	return 0;
-+}
-+
-+static int p4_change(struct net *net, struct sk_buff *in_skb,
-+		     struct tcf_proto *tp, unsigned long base, u32 handle,
-+		     struct nlattr **tca, void **arg, u32 flags,
-+		     struct netlink_ext_ack *extack)
-+{
-+	struct cls_p4_head *head = rtnl_dereference(tp->root);
-+	struct p4tc_pipeline *pipeline = NULL;
-+	struct nlattr *tb[TCA_P4_MAX + 1];
-+	struct cls_p4_head *new_cls;
-+	char *pname = NULL;
-+	u32 pipeid = 0;
-+	int err;
-+
-+	if (!tca[TCA_OPTIONS]) {
-+		NL_SET_ERR_MSG(extack, "Must provide pipeline options");
-+		return -EINVAL;
-+	}
-+
-+	if (head)
-+		return -EEXIST;
-+
-+	err = nla_parse_nested(tb, TCA_P4_MAX, tca[TCA_OPTIONS], p4_policy,
-+			       extack);
-+	if (err < 0)
-+		return err;
-+
-+	if (tb[TCA_P4_PNAME])
-+		pname = nla_data(tb[TCA_P4_PNAME]);
-+
-+	if (tb[TCA_P4_PIPEID])
-+		pipeid = nla_get_u32(tb[TCA_P4_PIPEID]);
-+
-+	pipeline = p4tc_pipeline_find_get(net, pname, pipeid, extack);
-+	if (IS_ERR(pipeline))
-+		return PTR_ERR(pipeline);
-+
-+	if (!p4tc_pipeline_sealed(pipeline)) {
-+		err = -EINVAL;
-+		NL_SET_ERR_MSG(extack, "Pipeline must be sealed before use");
-+		goto pipeline_put;
-+	}
-+
-+	new_cls = kzalloc(sizeof(*new_cls), GFP_KERNEL);
-+	if (!new_cls) {
-+		err = -ENOMEM;
-+		goto pipeline_put;
-+	}
-+
-+	err = tcf_exts_init(&new_cls->exts, net, TCA_P4_ACT, 0);
-+	if (err)
-+		goto err_exts_init;
-+
-+	if (!handle)
-+		handle = 1;
-+
-+	new_cls->handle = handle;
-+
-+	err = p4_set_parms(net, tp, new_cls, base, tb, tca[TCA_RATE], flags,
-+			   extack);
-+	if (err)
-+		goto err_set_parms;
-+
-+	new_cls->pipeline = pipeline;
-+	*arg = head;
-+	rcu_assign_pointer(tp->root, new_cls);
-+	return 0;
-+
-+err_set_parms:
-+	tcf_exts_destroy(&new_cls->exts);
-+err_exts_init:
-+	kfree(new_cls);
-+pipeline_put:
-+	p4tc_pipeline_put(pipeline);
-+	return err;
-+}
-+
-+static int p4_delete(struct tcf_proto *tp, void *arg, bool *last,
-+		     bool rtnl_held, struct netlink_ext_ack *extack)
-+{
-+	*last = true;
-+	return 0;
-+}
-+
-+static void p4_walk(struct tcf_proto *tp, struct tcf_walker *arg,
-+		    bool rtnl_held)
-+{
-+	struct cls_p4_head *head = rtnl_dereference(tp->root);
-+
-+	if (arg->count < arg->skip)
-+		goto skip;
-+
-+	if (!head)
-+		return;
-+	if (arg->fn(tp, head, arg) < 0)
-+		arg->stop = 1;
-+skip:
-+	arg->count++;
-+}
-+
-+static int p4_dump(struct net *net, struct tcf_proto *tp, void *fh,
-+		   struct sk_buff *skb, struct tcmsg *t, bool rtnl_held)
-+{
-+	struct cls_p4_head *head = fh;
-+	struct nlattr *nest;
-+
-+	if (!head)
-+		return skb->len;
-+
-+	t->tcm_handle = head->handle;
-+
-+	nest = nla_nest_start(skb, TCA_OPTIONS);
-+	if (!nest)
-+		goto nla_put_failure;
-+
-+	if (nla_put_string(skb, TCA_P4_PNAME, head->pipeline->common.name))
-+		goto nla_put_failure;
-+
-+	if (head->res.classid &&
-+	    nla_put_u32(skb, TCA_P4_CLASSID, head->res.classid))
-+		goto nla_put_failure;
-+
-+	if (tcf_exts_dump(skb, &head->exts))
-+		goto nla_put_failure;
-+
-+	nla_nest_end(skb, nest);
-+
-+	if (tcf_exts_dump_stats(skb, &head->exts) < 0)
-+		goto nla_put_failure;
-+
-+	return skb->len;
-+
-+nla_put_failure:
-+	nla_nest_cancel(skb, nest);
-+	return -1;
-+}
-+
-+static void p4_bind_class(void *fh, u32 classid, unsigned long cl, void *q,
-+			  unsigned long base)
-+{
-+	struct cls_p4_head *head = fh;
-+
-+	if (head && head->res.classid == classid) {
-+		if (cl)
-+			__tcf_bind_filter(q, &head->res, base);
-+		else
-+			__tcf_unbind_filter(q, &head->res);
-+	}
-+}
-+
-+static struct tcf_proto_ops cls_p4_ops __read_mostly = {
-+	.kind		= "p4",
-+	.classify	= p4_classify,
-+	.init		= p4_init,
-+	.destroy	= p4_destroy,
-+	.get		= p4_get,
-+	.change		= p4_change,
-+	.delete		= p4_delete,
-+	.walk		= p4_walk,
-+	.dump		= p4_dump,
-+	.bind_class	= p4_bind_class,
-+	.owner		= THIS_MODULE,
-+};
-+
-+static int __init cls_p4_init(void)
-+{
-+	return register_tcf_proto_ops(&cls_p4_ops);
-+}
-+
-+static void __exit cls_p4_exit(void)
-+{
-+	unregister_tcf_proto_ops(&cls_p4_ops);
-+}
-+
-+module_init(cls_p4_init);
-+module_exit(cls_p4_exit);
-+
-+MODULE_AUTHOR("Mojatatu Networks");
-+MODULE_DESCRIPTION("P4 Classifier");
-+MODULE_LICENSE("GPL");
-diff --git a/net/sched/p4tc/Makefile b/net/sched/p4tc/Makefile
-index 73ccb53c46..04302a3ac0 100644
---- a/net/sched/p4tc/Makefile
-+++ b/net/sched/p4tc/Makefile
-@@ -1,6 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
- 
-+CFLAGS_trace.o := -I$(src)
-+
- obj-y := p4tc_types.o p4tc_tmpl_api.o p4tc_pipeline.o \
- 	p4tc_action.o p4tc_table.o p4tc_tbl_entry.o \
--	p4tc_filter.o p4tc_runtime_api.o
-+	p4tc_filter.o p4tc_runtime_api.o trace.o
- obj-$(CONFIG_DEBUG_INFO_BTF) += p4tc_bpf.o
-diff --git a/net/sched/p4tc/trace.c b/net/sched/p4tc/trace.c
-new file mode 100644
-index 0000000000..6833134077
---- /dev/null
-+++ b/net/sched/p4tc/trace.c
-@@ -0,0 +1,10 @@
-+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+
-+#include <net/p4tc.h>
-+
-+#ifndef __CHECKER__
-+
-+#define CREATE_TRACE_POINTS
-+#include "trace.h"
-+EXPORT_TRACEPOINT_SYMBOL_GPL(p4_classify);
-+#endif
-diff --git a/net/sched/p4tc/trace.h b/net/sched/p4tc/trace.h
-new file mode 100644
-index 0000000000..80abec13b1
---- /dev/null
-+++ b/net/sched/p4tc/trace.h
-@@ -0,0 +1,44 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM p4tc
-+
-+#if !defined(__P4TC_TRACE_H_) || defined(TRACE_HEADER_MULTI_READ)
-+#define __P4TC_TRACE_H
-+
-+#include <linux/tracepoint.h>
-+
-+struct p4tc_pipeline;
-+
-+TRACE_EVENT(p4_classify,
-+	    TP_PROTO(struct sk_buff *skb, struct p4tc_pipeline *pipeline),
-+
-+	    TP_ARGS(skb, pipeline),
-+
-+	    TP_STRUCT__entry(__string(pname, pipeline->common.name)
-+			     __field(u32,  p_id)
-+			     __field(u32,  ifindex)
-+			     __field(u32,  ingress)
-+			    ),
-+
-+	    TP_fast_assign(__assign_str(pname, pipeline->common.name);
-+			   __entry->p_id = pipeline->common.p_id;
-+			   __entry->ifindex = skb->dev->ifindex;
-+			   __entry->ingress = skb_at_tc_ingress(skb);
-+			  ),
-+
-+	    TP_printk("dev=%u dir=%s pipeline=%s p_id=%u",
-+		      __entry->ifindex,
-+		      __entry->ingress ? "ingress" : "egress",
-+		      __get_str(pname),
-+		      __entry->p_id
-+		     )
-+);
-+
-+#endif
-+
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH .
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE trace
-+
-+#include <trace/define_trace.h>
--- 
-2.34.1
-
+From: Aleksander=A0Lobakin=A0=A0<aleksander.lobakin@intel.com>=0A=
+Date: Thu,=A0 4 Apr 2024 13:08 +0200=0A=
+=0A=
+[...]=0A=
+> > +=A0=A0=A0=A0 case ICE_TIME_REF_FREQ_25_000:=0A=
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return "25 MHz";=0A=
+> > +=A0=A0=A0=A0 case ICE_TIME_REF_FREQ_122_880:=0A=
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return "122.88 MHz";=0A=
+> > +=A0=A0=A0=A0 case ICE_TIME_REF_FREQ_125_000:=0A=
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return "125 MHz";=0A=
+> > +=A0=A0=A0=A0 case ICE_TIME_REF_FREQ_153_600:=0A=
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return "153.6 MHz";=0A=
+> > +=A0=A0=A0=A0 case ICE_TIME_REF_FREQ_156_250:=0A=
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return "156.25 MHz";=0A=
+> > +=A0=A0=A0=A0 case ICE_TIME_REF_FREQ_245_760:=0A=
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return "245.76 MHz";=0A=
+> > +=A0=A0=A0=A0 default:=0A=
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return "Unknown";=0A=
+> > +=A0=A0=A0=A0 }=0A=
+> =0A=
+> Array lookup produces more optimized code than switch-case.=0A=
+> =0A=
+> static const char * const ice_clk_freqs[] =3D {=0A=
+> =A0=A0=A0=A0=A0=A0=A0 [ICE_TIME_REF_FREQ_25_000]=A0=A0=A0=A0=A0 =3D "25 M=
+Hz",=0A=
+> =A0=A0=A0=A0=A0=A0=A0 ...=0A=
+> =A0=A0=A0=A0=A0=A0=A0 [NUM_ICE_TIME_REF_FREQ]=A0=A0=A0=A0=A0=A0=A0=A0 =3D=
+ "Unknown",=0A=
+> };=0A=
+> =0A=
+> static const char *ice_clk_freq_str(enum ice_time_ref_freq clk_freq)=0A=
+> {=0A=
+> =A0=A0=A0=A0=A0=A0=A0 return ice_clk_freqs[min(clk_freq, NUM_ICE_TIME_REF=
+_FREQ)];=0A=
+> }=0A=
+=0A=
+I agree, but I'd like to avoid changing this now (in code move patch and=0A=
+this patchset) if possible. I prepared another patchset, which is=0A=
+refactoring and moving CGU related stuff into a separate file.=0A=
+=0A=
+[...]=0A=
+> > + * Clear all timestamps from the PHY quad block that is shared between=
+ the=0A=
+> > + * internal PHYs on the E822 devices.=0A=
+> > + */=0A=
+> > +void ice_ptp_reset_ts_memory_quad_e82x(struct ice_hw *hw, u8 quad)=0A=
+> > +{=0A=
+> > +=A0=A0=A0=A0 ice_write_quad_reg_e82x(hw, quad, Q_REG_TS_CTRL, Q_REG_TS=
+_CTRL_M);=0A=
+> > +=A0=A0=A0=A0 ice_write_quad_reg_e82x(hw, quad, Q_REG_TS_CTRL, ~(u32)Q_=
+REG_TS_CTRL_M);=0A=
+> =0A=
+> Is it intended to write the same register twice? Some reset sequence?=0A=
+=0A=
+Yes, it's intended, E82X PHYs have multiple weird behaviours, especially=0A=
+in PHY start sequence=0A=
+=0A=
+[...]=0A=
+=0A=
+Thanks,=0A=
+Karol=
 
