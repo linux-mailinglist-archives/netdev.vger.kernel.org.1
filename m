@@ -1,199 +1,322 @@
-Return-Path: <netdev+bounces-84700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B72898106
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 07:35:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A00E789810E
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 07:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72339288CA6
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 05:35:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF0951C20CE9
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 05:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5991145941;
-	Thu,  4 Apr 2024 05:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678AD3DBBC;
+	Thu,  4 Apr 2024 05:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MKngJEij"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="kZk42A1w"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8CE286A6
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 05:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1D717991
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 05:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712208949; cv=none; b=hFem91xNdlNsQ2cqH1LUjfnao9/EFR3ed1trFG6SAQk2LAYUjGLHrsznD1VpF7rdhVqCIu32o6n69GqRUO2iWpZRE6E2jVObRh6fBHzLJC5hvdYG7pGzOm18mug3D6dj6jXfeGgVsbjQhEG50L3HgPlKbGdnfMhsaumpg9dWM1M=
+	t=1712209395; cv=none; b=JwxQNZbD3pu47bBsPMaDqkvoovZ4MQO1/Z/R6I1FChrwlLgYCdT5lo8Hi+jnvv6dMGzAvvQfjiCoYax+SPGOuDYqiH7wzWc1eTQUHAkAKs51+4wc7zI80BnYLvgUBb53pf/3jpQTJtmon8z+P4f2MIkG428JDwE8CTvsG90idy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712208949; c=relaxed/simple;
-	bh=Ym38qLEOUNfy/4hL6ENnTMzg8xPqYlCnX/Fr3RLE/U8=;
+	s=arc-20240116; t=1712209395; c=relaxed/simple;
+	bh=S0PuWJxaX2ucVMnxVzoXt0U7xs1OpRQuy4BrJf8p5qw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W/vQioblm1sBwh28baNdJ2s0lmuRQxN9RAIXzVq+CB+xTiUGl2DyH4FeYjyXKkRIdlhCWaoKKaurZjfLJz7AA+vJaUhX2ZIWj3EP4GGPPgoKcn9jEW3ko1sgBy78+EEe98L+IePNtypSC0ezVqFw5wxxss0JqWO/zPyoP3v0K4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MKngJEij; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712208946;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gaCNfh5JQ71P8XHmMhbBbFyQnfQUNQ6Qvksh5dYu/Jg=;
-	b=MKngJEijNtLYHHEutmTMeEj1emj71sE2Z0m90NjOvt78gL6BOgyupJTP8HQhCGFoeW560b
-	Ii4ZbsXOPmVdNFsog0a417nfDriSpVp8NjIyoSV6qtioJh2/Q7BPKIRgGbeO6MDoB3PpE+
-	5xrVyjS5J8lpqmv8Hvh+zh98gzh5vR0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-196-1buSRewMOECNZyJgKVYt3g-1; Thu, 04 Apr 2024 01:35:44 -0400
-X-MC-Unique: 1buSRewMOECNZyJgKVYt3g-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a467a6d4e3eso22400866b.3
-        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 22:35:44 -0700 (PDT)
+	 To:Cc:Content-Type; b=g+kA3GVpm18qTICNFHyhxfQ7I5FNEWfuhBvdczKe2LgBbx0w3G1eKXhA2kvRpzwSO8mXoQjbjAhfhmjLSO5FM2xddjfHumEplZxDqZeWvYg2xq1Rg46p85SVfl6igrPQ0SGhBLSYQLeW25i/DlqrfcS5j6Z+HwXXfsQ+zG8t4Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=kZk42A1w; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a450bedffdfso69006166b.3
+        for <netdev@vger.kernel.org>; Wed, 03 Apr 2024 22:43:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1712209391; x=1712814191; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a7FHyBbkFqkiMaU45C+JD/nYcu/68KLWR2HD03GIzHQ=;
+        b=kZk42A1wATD5DAo2KkqrOIsKRenNyNGUWicJ0FERy9HuCTkroaLFO5VUrnl3+Wrs7C
+         Rtqv12WMLrAveMvsN4Ads60mR04oUkbpKKH/eG4h9nBfr80w/nOecTQvkipArUZEqaMg
+         q2ldIqBXV9DfU4xtR0HfJ2JTKtI3azMuFAUUU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712208943; x=1712813743;
+        d=1e100.net; s=20230601; t=1712209391; x=1712814191;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gaCNfh5JQ71P8XHmMhbBbFyQnfQUNQ6Qvksh5dYu/Jg=;
-        b=NZGF+5P1ZlZ1o373k6zEq0Htv57YOGYIk1ZNwYW0mIwaZYCoGccYARYqazx3hqBn/I
-         CqjjqZosrzOAgAj9AtFGQtGPXjZNiInq6aNKrjxZ3+J26s3vvd9LFPSimxqU2+IVp2oR
-         rQvpJxsxlKTO+D18CbtSVNQFNDnGgmoJ1lNPACGIFSX3U9Fk7qozlNn8KdOnzsitaEfy
-         MzIuHIqqZGODDo5jz6pxE7yqDMDkc5MZrRWed0FZqt6XJJQ0Jjw7Aje+80Bev/WFj1lv
-         Ds+CLq6MKAL8pPKyjVZVniu94Ewmf5I4yotw4vij7dnwCYPrYpKz8IXiCOZqV1C32dgh
-         L7Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEF9FxN2acWI11lZVmQ6JLdFiNxtviPSyF03DlwO+c5dNg1kSS6+h8e8V9Y0F+klbEQkCEqq5oNtmPWDIZdgfsVZcqj5TW
-X-Gm-Message-State: AOJu0YylW15yNofjn788XR4zrn6ys10LFcEk4ZJYinL4/CDSEdRViaxy
-	Lbj95VqfhgLkuQz1py2dOYpgM6d44iXCrkwGOk/MUdwEAjTTcQdMJ1QmjRG4sH2JCmD4lceW+Md
-	pfVvZXeK6kqk2NLfGk7tLLydmC1gpnnVXq586gM5vIwjdVeadsvLtZnoV4hn0p/M56nH7eGZG6T
-	WKun1FKTZzdHbHqgWX/HF+u2SW4vu+5rdB3x+rE6I=
-X-Received: by 2002:a17:906:3e50:b0:a4e:9591:c2dd with SMTP id t16-20020a1709063e5000b00a4e9591c2ddmr725276eji.39.1712208942842;
-        Wed, 03 Apr 2024 22:35:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH6977Prz4EA27qaIn9ShWtc7ls7nUld0dGYjMeBaoZgL/dkR13B3ZOUXg8GK3+bvqSwQUifVVp85zJvDVRczk=
-X-Received: by 2002:a17:906:3e50:b0:a4e:9591:c2dd with SMTP id
- t16-20020a1709063e5000b00a4e9591c2ddmr725266eji.39.1712208942439; Wed, 03 Apr
- 2024 22:35:42 -0700 (PDT)
+        bh=a7FHyBbkFqkiMaU45C+JD/nYcu/68KLWR2HD03GIzHQ=;
+        b=YNBV9qNL64VoEtg+OvI+Ck6a1lykR7YpCFQTHTf0HdvUevs0cjtk/mXPsE1YByGrYM
+         p2pTb93zVpSNreA5rXhqJbVNIC/x3sHA51Tg12OUyxWbTXcXw5/Aw5ZFxLu8TxypLADR
+         gbJTFnI/jh/jxzE74x/hNwXCsb0HaaUdi66gFczmVw+gLI0cSTODGBkhAKDU63MNmi7G
+         46XRBUm8ySxsoecxsm3dPfw3lbfSSl18KVLVFlrqWRYzhMsXPdss9Ru2dGEFq8R13jiX
+         g3i685Ul5ypow7obWiwi5W7T5OKKWoD38AucuQVAgg4564tbU5L5Pn0EqVRJf7Xp4sTG
+         dchg==
+X-Forwarded-Encrypted: i=1; AJvYcCX1SYXgps/yes37EqGKk5lksJLxx9uUXg057cHGpLVeKoeX3+66uiAfuTtHkKQM9clX6BXbGG1sEvC7/bjjv9EMCzu7Dk4w
+X-Gm-Message-State: AOJu0YwWVvU6KK1nboj0Tomb9MuaA1r+rt2w23E87ZOnZVp1jHP9WR7t
+	l1Jg5IQcH93OQhUIaqi2Xy5MvSDE7g2aAlf0wtXQZBy+s7zCEGKwl9bIxrvDZdHUBvvjcygmtsD
+	UywFfutL4sy1q2tmH8/zlmqTWIPfA+82k5pPL
+X-Google-Smtp-Source: AGHT+IHjq7FXeivyM9YWZJUdQmoCkVtYBb4kAZduf6LFCae424Btt0hf0wZHiow6M+tVESnVQMIDwVZ2qGylVqIGiSE=
+X-Received: by 2002:a17:906:4c56:b0:a4e:1b02:81d6 with SMTP id
+ d22-20020a1709064c5600b00a4e1b0281d6mr748578ejw.10.1712209391417; Wed, 03 Apr
+ 2024 22:43:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329093832.140690-1-lulu@redhat.com> <20240329054845-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240329054845-mutt-send-email-mst@kernel.org>
-From: Cindy Lu <lulu@redhat.com>
-Date: Thu, 4 Apr 2024 13:35:02 +0800
-Message-ID: <CACLfguW5GxYLtgL-8itH6b9re25bGsorKBWwDW9z5kBucSPLVg@mail.gmail.com>
-Subject: Re: [PATCH v2] Documentation: Add reconnect process for VDUSE
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, virtualization@lists.linux-foundation.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
+ <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+ <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
+ <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com>
+ <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
+ <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
+ <CA+9S74hs_1Ft9iyXOPU_vF_EFKuoG8LjDpSna0QSPMFnMywd_g@mail.gmail.com> <CACGkMEvHiAN7X_QBgihWX6zzEUOxhrV2Nqg1arw1sfYy2A5K0g@mail.gmail.com>
+In-Reply-To: <CACGkMEvHiAN7X_QBgihWX6zzEUOxhrV2Nqg1arw1sfYy2A5K0g@mail.gmail.com>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Thu, 4 Apr 2024 07:42:45 +0200
+Message-ID: <CAK8fFZ6P6e+6V6NUkc-H5SdkXqgHdZ-GEMEPp4hKZSJVaGbBYQ@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Jason Wang <jasowang@redhat.com>
+Cc: Igor Raits <igor@gooddata.com>, Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 29, 2024 at 5:52=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+=C3=BAt 26. 3. 2024 v 5:46 odes=C3=ADlatel Jason Wang <jasowang@redhat.com>=
+ napsal:
+>
+> On Mon, Mar 25, 2024 at 4:44=E2=80=AFPM Igor Raits <igor@gooddata.com> wr=
+ote:
+> >
+> > Hello,
+> >
+> > On Fri, Mar 22, 2024 at 12:19=E2=80=AFPM Igor Raits <igor@gooddata.com>=
  wrote:
->
-> On Fri, Mar 29, 2024 at 05:38:25PM +0800, Cindy Lu wrote:
-> > Add a document explaining the reconnect process, including what the
-> > Userspace App needs to do and how it works with the kernel.
+> > >
+> > > Hi Jason,
+> > >
+> > > On Fri, Mar 22, 2024 at 9:39=E2=80=AFAM Igor Raits <igor@gooddata.com=
+> wrote:
+> > > >
+> > > > Hi Jason,
+> > > >
+> > > > On Fri, Mar 22, 2024 at 6:31=E2=80=AFAM Jason Wang <jasowang@redhat=
+.com> wrote:
+> > > > >
+> > > > > On Thu, Mar 21, 2024 at 5:44=E2=80=AFPM Igor Raits <igor@gooddata=
+.com> wrote:
+> > > > > >
+> > > > > > Hello Jason & others,
+> > > > > >
+> > > > > > On Wed, Mar 20, 2024 at 10:33=E2=80=AFAM Jason Wang <jasowang@r=
+edhat.com> wrote:
+> > > > > > >
+> > > > > > > On Tue, Mar 19, 2024 at 9:15=E2=80=AFPM Igor Raits <igor@good=
+data.com> wrote:
+> > > > > > > >
+> > > > > > > > Hello Stefan,
+> > > > > > > >
+> > > > > > > > On Tue, Mar 19, 2024 at 2:12=E2=80=AFPM Stefan Hajnoczi <st=
+efanha@redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Tue, Mar 19, 2024 at 10:00:08AM +0100, Igor Raits wrot=
+e:
+> > > > > > > > > > Hello,
+> > > > > > > > > >
+> > > > > > > > > > We have started to observe kernel crashes on 6.7.y kern=
+els (atm we
+> > > > > > > > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6=
+.9 where we
+> > > > > > > > > > have nodes of cluster it looks stable. Please see stack=
+trace below. If
+> > > > > > > > > > you need more information please let me know.
+> > > > > > > > > >
+> > > > > > > > > > We do not have a consistent reproducer but when we put =
+some bigger
+> > > > > > > > > > network load on a VM, the hypervisor's kernel crashes.
+> > > > > > > > > >
+> > > > > > > > > > Help is much appreciated! We are happy to test any patc=
+hes.
+> > > > > > > > >
+> > > > > > > > > CCing Michael Tsirkin and Jason Wang for vhost_net.
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOP=
+TI
+> > > > > > > > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tai=
+nted: G
+> > > > > > > > > >    E      6.7.10-1.gdc.el9.x86_64 #1
+> > > > > > > > >
+> > > > > > > > > Are there any patches in this kernel?
+> > > > > > > >
+> > > > > > > > Only one, unrelated to this part. Removal of pr_err("EEVDF =
+scheduling
+> > > > > > > > fail, picking leftmost\n"); line (reported somewhere few mo=
+nths ago
+> > > > > > > > and it was suggested workaround until proper solution comes=
+).
+> > > > > > >
+> > > > > > > Btw, a bisection would help as well.
+> > > > > >
+> > > > > > In the end it seems like we don't really have "stable" setup, s=
+o
+> > > > > > bisection looks to be useless but we did find few things meanti=
+me:
+> > > > > >
+> > > > > > 1. On 6.6.9 it crashes either with unexpected GSO type or userc=
+opy:
+> > > > > > Kernel memory exposure attempt detected from SLUB object
+> > > > > > 'skbuff_head_cache'
+> > > > >
+> > > > > Do you have a full calltrace for this?
+> > > >
+> > > > I have shared it in one of the messages in this thread.
+> > > > https://marc.info/?l=3Dlinux-virtualization&m=3D171085443512001&w=
+=3D2
+> > > >
+> > > > > > 2. On 6.7.5, 6.7.10 and 6.8.1 it crashes with RIP:
+> > > > > > 0010:skb_release_data+0xb8/0x1e0
+> > > > >
+> > > > > And for this?
+> > > >
+> > > > https://marc.info/?l=3Dlinux-netdev&m=3D171083870801761&w=3D2
+> > > >
+> > > > > > 3. It does NOT crash on 6.8.1 when VM does not have multi-queue=
+ setup
+> > > > > >
+> > > > > > Looks like the multi-queue setup (we have 2 interfaces =C3=97 3=
+ virtio
+> > > > > > queues for each) is causing problems as if we set only one queu=
+e for
+> > > > > > each interface the issue is gone.
+> > > > > > Maybe there is some race condition in __pfx_vhost_task_fn+0x10/=
+0x10 or
+> > > > > > somewhere around?
+> > > > >
+> > > > > I can't tell now, but it seems not because if we have 3 queue pai=
+rs we
+> > > > > will have 3 vhost threads.
+> > > > >
+> > > > > > We have noticed that there are 3 of such functions
+> > > > > > in the stacktrace that gave us hints about what we could try=E2=
+=80=A6
+> > > > >
+> > > > > Let's try to enable SLUB_DEBUG and KASAN to see if we can get
+> > > > > something interesting.
+> > > >
+> > > > We were able to reproduce it even with 1 vhost queue... And now we
+> > > > have slub_debug + kasan so I hopefully have more useful data for yo=
+u
+> > > > now.
+> > > > I have attached it for better readability.
+> > >
+> > > Looks like we have found a "stable" kernel and that is 6.1.32. The
+> > > 6.3.y is broken and we are testing 6.2.y now.
+> > > My guess it would be related to virtio/vsock: replace virtio_vsock_pk=
+t
+> > > with sk_buff that was done around that time but we are going to test,
+> > > bisect and let you know more.
 > >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  Documentation/userspace-api/vduse.rst | 41 +++++++++++++++++++++++++++
-> >  1 file changed, 41 insertions(+)
+> > So we have been trying to bisect it but it is basically impossible for
+> > us to do so as the ICE driver was quite broken for most of the release
+> > cycle so we have no networking on 99% of the builds and we can't test
+> > such a setup.
+> > More specifically, the bug was introduced between 6.2 and 6.3 but we
+> > could not get much further. The last good commit we were able to test
+> > was f18f9845f2f10d3d1fc63e4ad16ee52d2d9292fa and then after 20 commits
+> > where we had no networking we gave up.
 > >
-> > diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/user=
-space-api/vduse.rst
-> > index bdb880e01132..f903aed714d1 100644
-> > --- a/Documentation/userspace-api/vduse.rst
-> > +++ b/Documentation/userspace-api/vduse.rst
-> > @@ -231,3 +231,44 @@ able to start the dataplane processing as follows:
-> >     after the used ring is filled.
+> > If you have some suspicious commit(s) we could revert - happy to test.
+>
+> Here is the is for the change since f18f9845f2f10d3d1fc63e4ad16ee52d2d929=
+2fa:
+>
+> cbfbfe3aee71 tun: prevent negative ifindex
+> b2f8323364ab tun: add __exit annotations to module exit func tun_cleanup(=
+)
+> 6231e47b6fad tun: avoid high-order page allocation for packet header
+> 4d016ae42efb Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/n=
+et
+> 59eeb2329405 drivers: net: prevent tun_build_skb() to exceed the
+> packet size limit
+> 35b1b1fd9638 Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/n=
+et
+> ce7c7fef1473 net: tun: change tun_alloc_skb() to allow bigger paged alloc=
+ations
+> 9bc3047374d5 net: tun_chr_open(): set sk_uid from current_fsuid()
+> 82b2bc279467 tun: Fix memory leak for detached NAPI queue.
+> 6e98b09da931 Merge tag 'net-next-6.4' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
+> de4f5fed3f23 iov_iter: add iter_iovec() helper
+> 438b406055cd tun: flag the device as supporting FMODE_NOWAIT
+> de4287336794 Daniel Borkmann says:
+> a096ccca6e50 tun: tun_chr_open(): correctly initialize socket uid
+> 66c0e13ad236 drivers: net: turn on XDP features
+>
+> The commit that touches the datapath are:
+>
+> 6231e47b6fad tun: avoid high-order page allocation for packet header
+> 59eeb2329405 drivers: net: prevent tun_build_skb() to exceed the
+> packet size limit
+> ce7c7fef1473 net: tun: change tun_alloc_skb() to allow bigger paged alloc=
+ations
+> 82b2bc279467 tun: Fix memory leak for detached NAPI queue.
+> de4f5fed3f23 iov_iter: add iter_iovec() helper
+>
+
+We do not have much progress, I reverted few commits from the list and
+they are not causing the issue, look for (no):
+--------------------------
+(no) cbfbfe3aee71 tun: prevent negative ifindex
+b2f8323364ab tun: add __exit annotations to module exit func tun_cleanup()
+(no) 6231e47b6fad tun: avoid high-order page allocation for packet header
+4d016ae42efb Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+(no) 59eeb2329405 drivers: net: prevent tun_build_skb() to exceed the
+packet size limit
+35b1b1fd9638 Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+(no) ce7c7fef1473 net: tun: change tun_alloc_skb() to allow bigger
+paged allocations
+9bc3047374d5 net: tun_chr_open(): set sk_uid from current_fsuid()
+(no) 82b2bc279467 tun: Fix memory leak for detached NAPI queue.
+6e98b09da931 Merge tag 'net-next-6.4' of
+git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
+de4f5fed3f23 iov_iter: add iter_iovec() helper
+438b406055cd tun: flag the device as supporting FMODE_NOWAIT
+de4287336794 Daniel Borkmann says:
+a096ccca6e50 tun: tun_chr_open(): correctly initialize socket uid
+66c0e13ad236 drivers: net: turn on XDP features
+
+The commit that touches the datapath are:
+
+(no) 6231e47b6fad tun: avoid high-order page allocation for packet header
+(no) 59eeb2329405 drivers: net: prevent tun_build_skb() to exceed the
+packet size limit
+(no) ce7c7fef1473 net: tun: change tun_alloc_skb() to allow bigger
+paged allocations
+(no) 82b2bc279467 tun: Fix memory leak for detached NAPI queue.
+de4f5fed3f23 iov_iter: add iter_iovec() helper
+--------------------------
+
+
+> I assume you didn't use NAPI mode, so 82b2bc279467 tun: Fix memory
+> leak for detached NAPI queue doesn't make sense for us.
+>
+> The rest might be the bad commit if it is caused by a change of tun itsel=
+f.
+>
+> btw I vaguely remember KASAN will report who did the allocation and
+> who did the free. But it seems not in your KASAN log.
+>
+> Thanks
+>
 > >
-> >  For more details on the uAPI, please see include/uapi/linux/vduse.h.
-> > +
-> > +HOW VDUSE devices reconnectoin works
+> > Thanks again.
+> >
 >
-> typo
->
-Really sorry for this, I will send a new version
-
-Thanks
-Cindy
-> > +------------------------------------
-> > +1. What is reconnection?
-> > +
-> > +   When the userspace application loads, it should establish a connect=
-ion
-> > +   to the vduse kernel device. Sometimes,the userspace application exi=
-sts,
-> > +   and we want to support its restart and connect to the kernel device=
- again
-> > +
-> > +2. How can I support reconnection in a userspace application?
-> > +
-> > +2.1 During initialization, the userspace application should first veri=
-fy the
-> > +    existence of the device "/dev/vduse/vduse_name".
-> > +    If it doesn't exist, it means this is the first-time for connectio=
-n. goto step 2.2
-> > +    If it exists, it means this is a reconnection, and we should goto =
-step 2.3
-> > +
-> > +2.2 Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
-> > +    /dev/vduse/control.
-> > +    When ioctl(VDUSE_CREATE_DEV) is called, kernel allocates memory fo=
-r
-> > +    the reconnect information. The total memory size is PAGE_SIZE*vq_m=
-umber.
-> > +
-> > +2.3 Check if the information is suitable for reconnect
-> > +    If this is reconnection :
-> > +    Before attempting to reconnect, The userspace application needs to=
- use the
-> > +    ioctl(VDUSE_DEV_GET_CONFIG, VDUSE_DEV_GET_STATUS, VDUSE_DEV_GET_FE=
-ATURES...)
-> > +    to get the information from kernel.
-> > +    Please review the information and confirm if it is suitable to rec=
-onnect.
-> > +
-> > +2.4 Userspace application needs to mmap the memory to userspace
-> > +    The userspace application requires mapping one page for every vq. =
-These pages
-> > +    should be used to save vq-related information during system runnin=
-g. Additionally,
-> > +    the application must define its own structure to store information=
- for reconnection.
-> > +
-> > +2.5 Completed the initialization and running the application.
-> > +    While the application is running, it is important to store relevan=
-t information
-> > +    about reconnections in mapped pages. When calling the ioctl VDUSE_=
-VQ_GET_INFO to
-> > +    get vq information, it's necessary to check whether it's a reconne=
-ction. If it is
-> > +    a reconnection, the vq-related information must be get from the ma=
-pped pages.
-> > +
->
->
-> I don't get it. So this is just a way for the application to allocate
-> memory? Why do we need this new way to do it?
-> Why not just mmap a file anywhere at all?
->
-We used to use tmpfs to save this reconnect information,
-but this will make the API not self contained, so we changed to using
-the kernel memory
-Thanks
-cindy
-
-
-
->
-> > +2.6 When the Userspace application exits, it is necessary to unmap all=
- the
-> > +    pages for reconnection
-> > --
-> > 2.43.0
->
-
 
