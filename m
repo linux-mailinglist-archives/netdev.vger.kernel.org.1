@@ -1,61 +1,73 @@
-Return-Path: <netdev+bounces-84993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192AF898E0A
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 20:36:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB4B3898E0C
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 20:36:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A32D1C28891
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 18:36:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 955CF28A973
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 18:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315CE131BC5;
-	Thu,  4 Apr 2024 18:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D391513281A;
+	Thu,  4 Apr 2024 18:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UNUnb+8t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pha4B60D"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35C6131BDB;
-	Thu,  4 Apr 2024 18:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82451327FD;
+	Thu,  4 Apr 2024 18:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712255727; cv=none; b=hGaY3SP+wLt8pp0AGPlbSkaTvJ1FRQZ9/AJ31eNiZycbCfVvcAlKNvNEdtvbQffqw4eFUWtnGdRazeAl9gQRV+xS9uW3drva5G9PjhdmxjXjdQgHplifCgj/pgBloqKXL6pa+pz/RF2I4TZ79cshSBCU47z43BmyoFG/tNAg7yw=
+	t=1712255745; cv=none; b=ba0t0QesFw4oIaeVLWXjAs2+RG4GuXPIxDFrIZ/xVAwBklQ6DrrpO4SGGASbPc0o+cC/JtRHHkRgsqpMuaLO56gWl4mBKAgNRFiAE8nnGG9sar1l6QYXKlWXMBOcxVX/iFPGnFeohyajwmmtDMpxvi22P1lcQiwE2g1ciPldK8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712255727; c=relaxed/simple;
-	bh=LRg4128xan5SzH8WDKrOkbb9y0sYcu1ihtUsBO+VVhA=;
+	s=arc-20240116; t=1712255745; c=relaxed/simple;
+	bh=D5doStes5LbDvIj5OW/qOmZxpIoPwQ/5pyTQVs/kqTk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QuOpg6HQHuPtcIZtVUPE0cpIAO8nRn/1BThmjZTtID3S3ao/j9h4vwv/Ef4Tv+0vOqTvfkLJfGRbtOUtB/G9IV2X1buiYcqaYfddWMDNj+kBzgROlGnO1qCepZIdw2oaUppOXapg9PsBxPOjYVNhkUXh40rMnAR7+VvaLE5TDyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UNUnb+8t; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SR2j00hel98hxTZ89qkzLQdu+DAenXYSnL1mOmaOPtU=; b=UNUnb+8tSWwZBIdS/ZpAupOn9P
-	BDXvR9CJ3UBI3C+hWo60HKY8ZqQnsG/B9fOoSOeLUBY6JMdmv+2Y5BtYA1CHZtnNTv4OHwEwhl6mv
-	y+ebsSi0Nn2L6dLFe59dauKpDlRzi+sp+OP6FMeVwyu5neKd5uUQWS9bbpZXs4OEaTRs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rsRvi-00CCzF-S0; Thu, 04 Apr 2024 20:35:18 +0200
-Date: Thu, 4 Apr 2024 20:35:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <20204f34-eae6-47cd-bac3-540a577595e1@lunn.ch>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <Zg6Q8Re0TlkDkrkr@nanopsycho>
- <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
- <Zg7JDL2WOaIf3dxI@nanopsycho>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJiEEbbJsLGyr5YFblxTy9LNFCAs0Jacf5rKIeZggTOPOvoi19gPgc8l/Q38fGoJlIIOGqHe6mVxD4HevSvSOCQYUcVhjIWdKlUWgJw+lEhn/tp8w8qzVNmXEzTC7frIckCtHEfUJ0mFqAPbXsEnDCY2MD1db79pEgNnDpTZxvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pha4B60D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67903C433F1;
+	Thu,  4 Apr 2024 18:35:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712255745;
+	bh=D5doStes5LbDvIj5OW/qOmZxpIoPwQ/5pyTQVs/kqTk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pha4B60D0m27PsZaGvvJLi2KhZWTl0mLjUrg4k2TtT/UyLw2H53c9501PX5z6j5wk
+	 oy5zZGtvA/zBA4X2vNT4IgJ2Tbm6CHxx5WzI6JMswDGbzrz2YweJL3sQ+KXBcpQF1p
+	 nxH+jEemSF7NLsK+WWKVpgVWgRmBD1xDQX3Oembysvf7B4BraO1jPGQAS/phWXS+Yh
+	 JuJapJYAIWp7hFI0qjiPMiXh/6j9iCqFg/4licHVkXc9193Ul1dHNV/7Z5Q7VPQeuH
+	 H2ByAxUDkjBeJZb7jHlElBs1WFB1NIb+Pqh0SR6bLxXJ1p5+I5jLZW4tEY6kBNkvte
+	 XpA6lkalRzmeQ==
+Date: Thu, 4 Apr 2024 21:35:40 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
+	Itay Avraham <itayavr@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	linux-kernel@vger.kernel.org,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240404183540.GX11187@unreal>
+References: <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184832.GO11187@unreal>
+ <cefa2b9a-4227-969e-d31e-c19a552b9c1c@gmail.com>
+ <20240403190012.GV11187@unreal>
+ <d75ee9d5-36a9-4056-a0f3-0c05b2e744aa@kernel.org>
+ <20240403170149.7d2b8f2b@kernel.org>
+ <20240404122338.GI1723999@nvidia.com>
+ <20240404074850.19ecd52e@kernel.org>
+ <20240404174728.GL1723999@nvidia.com>
+ <d0b11055-1804-515b-7916-cb83a6274955@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,23 +76,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zg7JDL2WOaIf3dxI@nanopsycho>
+In-Reply-To: <d0b11055-1804-515b-7916-cb83a6274955@gmail.com>
 
-> OCP, ehm, lets say I have my reservations...
-> Okay, what motivation would anyne have to touch the fw of a hardware
-> running inside Meta datacenter only? Does not make any sense.
+On Thu, Apr 04, 2024 at 07:06:53PM +0100, Edward Cree wrote:
+> #include <disclaimer.h>
 > 
-> I'd say come again when your HW is not limited to Meta datacenter.
-> For the record and FWIW, I NACK this.
+> On 04/04/2024 18:47, Jason Gunthorpe wrote:
+> > The configurables exist as they are
+> > and need to be supported, in one way or another, by the kernel.
+> 
+> Why?  What does the kernel get out of it?
+> 
+> Maybe *you* need them to be supported, but maybe you should have
+>  thought of that earlier in the design process.  ("A failure on
+>  your part to foresee the eminently foreseeable does not
+>  constitute an emergency on mine.")
+> If we let folks bypass our standards with a _fait accompli_, we
+>  don't really have standards in the first place.
 
-Is ENA used outside of Amazon data centres?
+Sorry, who are "we" and what are "our standards"?
 
-Is FUNGIBLE used outside of Microsoft data centres?
+And, please, please reread the thread, it is not about devlink at all.
 
-Is gVNIC used outside of Google data centres?
-
-I don't actually know, i'm more of an Embedded developer.
-
-  Andrew
-
+Thanks
 
