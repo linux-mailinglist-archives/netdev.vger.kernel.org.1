@@ -1,45 +1,50 @@
-Return-Path: <netdev+bounces-84791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF3DF89854A
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:44:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4843289856A
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38024B231BB
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D176F284ADF
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6402882C6B;
-	Thu,  4 Apr 2024 10:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381B184D10;
+	Thu,  4 Apr 2024 10:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LF7TKBnD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BC180C14;
-	Thu,  4 Apr 2024 10:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BBC84D08;
+	Thu,  4 Apr 2024 10:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712227428; cv=none; b=LmVVVH88Lv9DtaGwfnaA5lE1hRprHYcVVdkV5Hr8WpD3dzIE3bpOd6riawhT7woJ5saD4PjJoEBEAe78nCFrEx5PUSrpPJEkhgPIOwohIftlf5QBJLtZIvKVnN0+5bHP7osJ/4iI5lXvlDpPY22dbsc6cbbkrKCEXfwAnmxkgtM=
+	t=1712227829; cv=none; b=S1Tf0JkSTjhRw+HUvbul0+GTaX1tfkKO5fbM865YEyySlJPP0KfBoSwEW7YJuDxglreB4OfBm/8oxi1cLg0EL+cgr7WM6lsB76tYdFmiJMIEoAG+nc9EKBqywKgt8FKSK4owypaX/0yW0RLqZiWHoGEyoMtbN/sf0o2MqM2CG+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712227428; c=relaxed/simple;
-	bh=IcAm6IPqIzjvFLWEexvayPECTgRbWQe2zvaa9XsxLDs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KSZ/39+SouIIYKQHHvZ7UkNuildJ1Q3vAdix1Q0H3QPSP42US//dPEb0K3cKjInmzhIixb1eaEW5DP87Ethpwu1gK+phGPmu2AW7mki22rIHm2EWqh0qbilOH/ONiy+xwIu/FPTEgSPouNPw+H1nXzR3rYU+9x/M4Mt2y2Fv6Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net 6/6] netfilter: nf_tables: discard table flag update with pending basechain deletion
-Date: Thu,  4 Apr 2024 12:43:34 +0200
-Message-Id: <20240404104334.1627-7-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240404104334.1627-1-pablo@netfilter.org>
-References: <20240404104334.1627-1-pablo@netfilter.org>
+	s=arc-20240116; t=1712227829; c=relaxed/simple;
+	bh=+IMhv+hHLcEPWxDhhfXnyLyfIsrX37Q+lDnPXU2T1oc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WhzEfeTBPlFzh22I109gGtN2qsUk6iDhKFeomQC4efURbrxj1bMBLhg7stb2LiHvB0QKevO+jZVdTXGFeplqj5STsPO4HWnzTxW/h//0LJJdBFPY70bbfF/b/6tgfeFtD3uCvZYG5fhbFuji421vLFxG5ikyNhsWLWCSTQpYYlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LF7TKBnD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7F87DC43142;
+	Thu,  4 Apr 2024 10:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712227828;
+	bh=+IMhv+hHLcEPWxDhhfXnyLyfIsrX37Q+lDnPXU2T1oc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LF7TKBnD/WUDxIrNBAXi+VFhnDwf+bw7kipZZmlvMkAw/EcavIjvBg3YlIRBoFFsu
+	 5++W+Ee2GlQctXAmifzxYuZfH3JPe0YHYVZ2yoP5wFJ128fEswqNTyx7F9o6XqJoQb
+	 Wekn1zn0EN6IEVR2ql2APR6pZuffdtk/TcnI9j/qWvWE2SpCUedufEf4kRI50UU5pG
+	 72t9JYB9qzqkq+sO7cHlBu2cZ9EKb352KjeirAaC2AedrLuaFuS6i9+5O9h/mVBFGM
+	 98aOKI7eGbOJww6jnOBrz97MFpLd4FbLcR2GjeIRZ2A3d1k1nDv1VPbeyjBNy47jIU
+	 EX/Ou6ZbvUTCw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65928D84BAD;
+	Thu,  4 Apr 2024 10:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,39 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 1/2] net: ravb: Always process TX descriptor ring
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171222782841.23550.12563797338225580141.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Apr 2024 10:50:28 +0000
+References: <20240402145305.82148-1-paul.barker.ct@bp.renesas.com>
+In-Reply-To: <20240402145305.82148-1-paul.barker.ct@bp.renesas.com>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, niklas.soderlund+renesas@ragnatech.se,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-Hook unregistration is deferred to the commit phase, same occurs with
-hook updates triggered by the table dormant flag. When both commands are
-combined, this results in deleting a basechain while leaving its hook
-still registered in the core.
+Hello:
 
-Fixes: 179d9ba5559a ("netfilter: nf_tables: fix table flag updates")
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_tables_api.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index e02d0ae4f436..d89d77946719 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -1209,10 +1209,11 @@ static bool nft_table_pending_update(const struct nft_ctx *ctx)
- 		return true;
- 
- 	list_for_each_entry(trans, &nft_net->commit_list, list) {
--		if ((trans->msg_type == NFT_MSG_NEWCHAIN ||
--		     trans->msg_type == NFT_MSG_DELCHAIN) &&
--		    trans->ctx.table == ctx->table &&
--		    nft_trans_chain_update(trans))
-+		if (trans->ctx.table == ctx->table &&
-+		    ((trans->msg_type == NFT_MSG_NEWCHAIN &&
-+		      nft_trans_chain_update(trans)) ||
-+		     (trans->msg_type == NFT_MSG_DELCHAIN &&
-+		      nft_is_base_chain(trans->ctx.chain))))
- 			return true;
- 	}
- 
+On Tue,  2 Apr 2024 15:53:04 +0100 you wrote:
+> The TX queue should be serviced each time the poll function is called,
+> even if the full RX work budget has been consumed. This prevents
+> starvation of the TX queue when RX bandwidth usage is high.
+> 
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,1/2] net: ravb: Always process TX descriptor ring
+    https://git.kernel.org/netdev/net/c/596a4254915f
+  - [v2,2/2] net: ravb: Always update error counters
+    https://git.kernel.org/netdev/net/c/101b76418d71
+
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
