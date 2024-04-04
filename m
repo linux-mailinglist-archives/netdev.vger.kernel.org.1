@@ -1,204 +1,335 @@
-Return-Path: <netdev+bounces-84825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7678898730
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:22:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86D1898735
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 621081F28787
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:22:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FC101F28C01
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 12:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C971272CB;
-	Thu,  4 Apr 2024 12:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5B212880A;
+	Thu,  4 Apr 2024 12:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="efjYofd0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ru31sPeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B70D127B40
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712233216; cv=fail; b=KLtyRzaNm43A78AadWelrAgMr+E9/ER7CBg9/jrn29Ie5WkqfWxKpBjG7OwLacUzFKf4CEsnByd79T8irOsGHKnEMJhF+aqBSpErAtDDsFWugFjC0e3LO2ufLK/zZ67uAnNU1oRICSOLQCfvillpmCI6cQDVtsZ+8FDiTTbPTtg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712233216; c=relaxed/simple;
-	bh=ACwKl6s97rC5kT2RO44BRfpAc+sEWvgqBmlCY/XFLpU=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=tAA0roLktKmSZUqyUkmv5qIMZxcuc01Gjd/p2RVeEVCmE9BH24ssXeADhKIulgBRrJ0m40x0UvkTZLvgPuyHzcC6hKBgSJIWijAESpE6p0WqtaSd4Cm23nprvx7TmV76BLL1EcwRq7lNX+vUkuJZCvzaFCqEQ+Mhjp1N0XgyPPI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=efjYofd0; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712233211; x=1743769211;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ACwKl6s97rC5kT2RO44BRfpAc+sEWvgqBmlCY/XFLpU=;
-  b=efjYofd0IIpAxPNUpVr0BmqnLZvQGH4XtwviEAWKlNnwhEsM5usPanFX
-   TailGJaNYNv2WkYOIJSVpUNCJHKXY+ky452eCxjUK27/CrTXl9Soyn31t
-   bbg0XrrBzYAr1SrqTj53B2MkurVCVdrQt7rZb7RNRKeDiQPAcbHbQsuiK
-   fPIZrdZnMkghrFtekcxei+uipo60esFi5k4e661kytKsoC5oiKClUQTUi
-   YFWesTpj7jRghrk2rckD38zS8eGE94wk7uvL36YVQN3PgZKdzqlz61AYo
-   yUmNkPxNDH0TxZqXLLEitRh/Wdwcxk101dOfr+/5h8JZ6257HmfbQNDrU
-   Q==;
-X-CSE-ConnectionGUID: u7zki12DQGq84Y7wxggbNw==
-X-CSE-MsgGUID: w6XYmpl6RVyK/+v3GqZp3w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7675373"
-X-IronPort-AV: E=Sophos;i="6.07,178,1708416000"; 
-   d="scan'208";a="7675373"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 05:19:35 -0700
-X-CSE-ConnectionGUID: Bzsjov99S2mMsvmjmAGqCg==
-X-CSE-MsgGUID: lj8iSlnbSA2czdy8fyiB1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,179,1708416000"; 
-   d="scan'208";a="23458102"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Apr 2024 05:19:35 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 4 Apr 2024 05:19:33 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 4 Apr 2024 05:19:33 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 4 Apr 2024 05:19:33 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 4 Apr 2024 05:19:32 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WCJCGGpubTMw18he8GwiJVHk6yZfNHFSmNkTbJAbBcSkGV1xv9/VD+N+2pDt1JueadHFjofI8pXd7EJbgtJeni6Zi50JqXe6Frp3nHewuFN2lkM76QD9YrhUBACYuv/6xAiTaMRUh7/Rhd7CrT3xMiFN64aXwvUyyBrKfLfA885N5bakCSoULD2vzB3fOIU50Cv7my2dbpU61e0ZTmwP71M0FxOHfB9JXVohY+QjEFVbEuL/AtNagh7YlM3E72miCuJha8wP4sPD4ZDhhNLoqe7oGsBnG9m2mSijKeqxc69dvq4wGQ9G1S17XdVHayXBDoPZNUjl5po8bB7cM4wZhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U9Ii34nKmfAt1LQxSWvk8xbamgGzXhwmcOovr2KIaWQ=;
- b=Pl403Z3E3TsTArMgCkav64hckpJLVxv0MEhKanFDwfDe+hYdKg3Xf5QjRc6KHdOnpZZLwjQI9KCReorduGgfUqHT1y0ig/TtOSdY3Lwz4LNmC1wcBuRPR1wxJjzUatDJaaAkYFz660h38IDCIGob8KUp3eg6DAgU1neYds5AByfujhKY8kgTMGXClCGekEp9ImHgvpxg0wQTPK8Vvf9rkKCz4y7cQa3TuAmxbw84dZO9vfZhZ2l70a5v+S4+4vpG25lHwgIuFyjFlfELrHvBIesWUiyVWjlxCuqb0zueE5xgv5j864xWEj7PCbO9/ccyrm3qkqXwVNbs0etukoZ+yA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by SJ2PR11MB8497.namprd11.prod.outlook.com (2603:10b6:a03:57b::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.25; Thu, 4 Apr
- 2024 12:19:30 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Thu, 4 Apr 2024
- 12:19:30 +0000
-Message-ID: <35c5df1f-114e-48f8-8ad2-ceb0b2e6efa1@intel.com>
-Date: Thu, 4 Apr 2024 14:19:24 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] ethtool: Introduce max power support
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<anthony.l.nguyen@intel.com>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<idosch@nvidia.com>, <przemyslaw.kitszel@intel.com>,
-	<marcin.szycik@linux.intel.com>
-References: <20240329092321.16843-1-wojciech.drewek@intel.com>
- <20240329092321.16843-3-wojciech.drewek@intel.com>
- <20240329152954.26a7ce75@kernel.org>
- <f7c6264e-9a16-4232-aba2-fde91eb51fb7@intel.com>
- <20240402073421.2528ce4f@kernel.org>
- <348ead57-cdb8-4db7-a3d7-e8053a5f00c1@intel.com>
- <20240403171825.31d6867a@kernel.org>
-Content-Language: en-US
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <20240403171825.31d6867a@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI1P293CA0027.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:3::7)
- To MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2429128396
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 12:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712233255; cv=none; b=C5w7PBncWixfqHzq6avas0PRuY9tghzkJs0TNXKrYUbIYKvt2v+GcLQi2lsDmU8mQ68JQ+7fT4Vqv4dpsVcAdRyPVQ2iyDTU3lONgWFXs20W4/BzRrQ9Aq8r9v0ZtOxvANIkcSrZ2wulcb8SnZoi2DcWUi9zsqjx0/Ww65t6h9Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712233255; c=relaxed/simple;
+	bh=REMktHm+FgsBlVxWcUnKMoKuAz8bxajqkfWFiry5Gao=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tznSq7UVk+H0fCeSJCY7PRD3AI18U6apettPnTeM5HibatRUclcVkbRDX/QvEcYvOlitICLqZ7WJzjm2yQ7diKt/NL6m+bZGAjisq3eL6DZcsGvEp7OG/FC+3j2Pu51sidkGw2ndSboYDdQgRuFqE+tOB/xKXw88BkYk7uWGEX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ru31sPeu; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61504a34400so15138557b3.0
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 05:20:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712233253; x=1712838053; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=z1/n+j8eXXMQvld3HNZDBdZPz3kRpN0A4qvNXNbcDlQ=;
+        b=ru31sPeuc5JQD+msylTDogEQGe0bMwVOgQHURw8dK3TEaxXtK2T5op9xg8I+XAriZC
+         txmKucrtNzwYN8mtYYRZFAsaCs8cZjHajAUV9+Kz7yLjiOiI/3k/TP5eJji8uN0A3+4M
+         wfuHD+psUcvqiiex2wgd9E6ArI7okwfdroLcv4sBToCG6fD5e/u1K+zfCUbTEq+sFr0Y
+         Zc9DzlK9EBvBByd5mgVSoRJZ3utkxsNh7/bFGUfnnoqX7fOHo0saMLzwiHvoef/RWgBY
+         6uNsthmTWY2mnFhaoG2XHdC47hKzW0WT0akJuvXZVcdz1hnewBrZUhgbAc8JZqzLxYef
+         h36Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712233253; x=1712838053;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z1/n+j8eXXMQvld3HNZDBdZPz3kRpN0A4qvNXNbcDlQ=;
+        b=RJ5Il4jkpZMSSx4rhk14N53tFp48GpR90O6hrBOyO3eZIhUp87Yb0z4pfFPGTSdvyY
+         z20JpShMzXNh1Bv2Az8JxDcyQMpJdc299BTv3qAqS0W9r6Tirk7L1MEHvy2XTHOsxzeS
+         d20th5TXk3pAVlkM9pvJdw87aNCiAwh/pqWjdQP3gvResXoSgOcIDtimjxF5C7TuleUP
+         zsdxT0LalyOaE/FLpz297AuoT6JQBlidl3GqyZAViMRwUH7Y/LJguY2WoitTqVXNYQaE
+         SQywfCKJgj2vIIP6VDr+6250ks7Zq/Whe5O4/Is66AQiwvbp3TsmdLx+OEWSphvWiEqg
+         n3bA==
+X-Gm-Message-State: AOJu0YxpJLZ93Nu7L0ZpaC5RqO+3LujC72x2K3JbXdgmjOGhy/HstQt1
+	nZOp8IXJ6Yk3dDffsUpBFoJ4H+MWi5AErjNJOVCACfXHYh4m+hFvW7zJ1XLGmLIrVEbZH6TPEuW
+	11lP80I64OQ==
+X-Google-Smtp-Source: AGHT+IG3atDXWHSI6gSFYPwti52AhtGvlDYdzQKq0dexwBQhd8pnPjnTO0eGQTnY44srL142e5wIgkRWA6Fr/w==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:4e89:0:b0:615:737c:2864 with SMTP id
+ c131-20020a814e89000000b00615737c2864mr534480ywb.2.1712233252873; Thu, 04 Apr
+ 2024 05:20:52 -0700 (PDT)
+Date: Thu,  4 Apr 2024 12:20:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|SJ2PR11MB8497:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PGk8hL39DUW7NVP1gksoCCExlZ2npWszevaPAEFr5V2gnUwr8PRYiVZIyfumBUKmTofGmSGDIHEU7k85EIccts3Q1m74yB3G2fGgjKwrknLijcgtOlna8ESNChXiFXjCkIP3bL5nPkVw4HEDpNJxN6qNE8WKFrGRjT+WmQNhzpcCyNz1lKEGHgL9+dm8zVoJqxoYMLNxqDJKjGC/QvxVROvuNgPPz0mcnc+zvp8EsNKXSEi4hnSl/6nzRGrvVaa+e+mFOQ49+AuELqUc2xfBQcC0RgEq1WR5z0Z8tfJnGsTzsUrZT61iA5C2N/K9Y9I6Vzjq/uojtuY/5S8dxMfReMnD5OX8NFIKZDk7A0cCnPwIZrB5R1dpXkwyujK6hc4R7G7Rl6jqDvlSKaSqSdWz67vvrLG0fdAq6pwK15lKKH6vr6I7WZ7KpXEWRXaaEQsjBjVvjhDDCWVMLxFj5cwWFU8lLsmrMKGHzIF2g1Uhdg2uElKgpw2mrhN8uDcsYM/rSD/QlH0pJInrkU9BqQtRJ9Nbv7suyvF8JUpmuFBXmc8IgU+9uLqFmoQRtbxUc3eKmT71lqOgop5ova0pCGcPDDvrDiRjivBFIpXW/d8W8Y+PoYx/EFzLX6AGWFvxL4RZ1igft2SuVGXri+32uPCBtVIU3jel6jQL/sALfhbA7YA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OVRHUW9aOGRFekhtUjRqeHo5WVR6UCtKUnVEMURPWFIxWktwREtmR3pCT1p6?=
- =?utf-8?B?VnYxTzFFQ3dlUzZqUkJnMDAzZWJDV0RnZ1NiaEdCSmxkeVJaU2c4djAvSWp1?=
- =?utf-8?B?K2VGWVJKYjFvZDZyRDdRMEFQMXVzWXVDU0FXNnJ0RGtnNkE5alAwVUlsRmh1?=
- =?utf-8?B?Z3NBYUpVWmx4Rnp4Rzc1dmJIVVhCcUdDOHBnQisvWW5jbXErS2xNdTF3TTcx?=
- =?utf-8?B?b05vTjlBMmpXWDROV3VhUmpQZDJMZkVQVld1UkhPaytNdThRd0ZHTlAzdzNi?=
- =?utf-8?B?QTFNUEVxZ09GbCtOMUgxWWZHTWJmSkhSSjVvZmM0WjlTZk9Ddi9UZDJQSnYr?=
- =?utf-8?B?dFhtUWNMcXRHc3V3dkFQQ2Z6bTcrSXhDKzFaQnlnVGx1VFQwZk5VQ1NJSEx6?=
- =?utf-8?B?OGpSdkwzLzIxS1Z1T1habTBxcnBuMThHNU9LRjFnWndIUEpxNW45ei85Zng3?=
- =?utf-8?B?Tk01azNPNG5BWWRhK1NjVGlzTGlVaklqb1RnOGl5c2tYV3pacXJud1RteERj?=
- =?utf-8?B?dExJTTRiaUd5WWNUbWRydG5DS3Y3TlBRa0wxUWx0dVFJVnRrNk9wUlRCTkVW?=
- =?utf-8?B?RUZKSkVFMzVmV2tGT1lDQk8zV29hRWdMZHIzVDFIazdyNExveGtVR2hkQXVm?=
- =?utf-8?B?ZmN3UktvUGtVaThpZk11NDdCemtYOEdiRFdCVTFoNloxWjYwQVpoaVB0YTRh?=
- =?utf-8?B?MTNZQkhGa1ZYVjNBcDI2SDFacWdwdklQQnlEZXB1Ti96d2RSSnFhRkN1czVm?=
- =?utf-8?B?RjdFVVNpOWN6L1dsOEFNNURCMC9KSFpjZmVMdEtzbFhWYUhWVlcyRTI5R2NC?=
- =?utf-8?B?elJZTUJhTzJpdGR6SUpJTkg4OUpXSWVML0VKZy9aY04rTW1zZUVOQTRzRDA1?=
- =?utf-8?B?VGdZWHpLUEdGTzUwamlTbWk5WlN3TDdkSEZQQWloMmJSTU9FaG15dHJaNUJG?=
- =?utf-8?B?MVhvVTRVVTdUL3dpblpuNnpzWjhEeXNSRHpUdnpSczRZREVoYklNQ3U1SFJG?=
- =?utf-8?B?RTREd3QvWENMbjMrT3VKRFFKNXI3N2tuMGV4ek9CbTdoYkZ3aCswUXAxd241?=
- =?utf-8?B?ZVNMTlU2YWcxaFoxd1UxbFpKSWVSWnhjTGNBSzN2SkFEc214NG9wN2ExV2Nn?=
- =?utf-8?B?bWc0TGhjV2RiYmhORmZLcE9PWDZSQWpjbkRCdU9DbkxBN2VOU3pQYVZRQkxI?=
- =?utf-8?B?bklZU1IvZUliN0doYkJIdXJ1WVlOVlp4aVo0RkljbW9GenJOUDFqenFESVFs?=
- =?utf-8?B?MjZPeHIxRnZ6bGUzWGtTWFZ1a3JrZnIrU3B4K05odHZvYkNjY0xkWjJhaG41?=
- =?utf-8?B?Q1l2RXdYRXppS3JzVUNqeUJWZ0hyZXIrSlNmUlNOYjJNWENPWHpDaEE4TVpj?=
- =?utf-8?B?dlNIVk1rdW9uV1lkMGdvV014VmFKR2FmSVhGMGI2ZXhLY21jTVJVM09oOUdN?=
- =?utf-8?B?bU1XeFZ0SW4xOEJiUFNMWkpXbmhJY1dsclQrSDg5WHBIenYyaWNhZzBFM2hm?=
- =?utf-8?B?T0pmaStlWWc4Z3B2VjVWYXVFYVJLVFhhbDVLSHNGRyttK2hqKzF5UjJiOXhL?=
- =?utf-8?B?YTE5OEtMbjd6K09qQkd4M1dXNlNrYUlEQWVXejg4ZDZIdEs4L1dhVW9yL3JB?=
- =?utf-8?B?THVCemlHWHl0OHF3RUlJQ2pzTExTaWpsZTR3alBCdWtRTEUrcDJvekxuWHgv?=
- =?utf-8?B?aE5vYVNWWHRJNUtTZEZBMGhaNmxOUUQ0NUkvb09zWG1FRnJyRzZ6cDJqOHJ3?=
- =?utf-8?B?Wkl3VGE5cFY3NDMvOGlCZDkzUktFbkprNWFDT1Jna21ISitVYlhTRmJSQW1I?=
- =?utf-8?B?MnIvRWcxRzBBVUYxRSt0YWxsQXFCTmE1cmYwRWFUakl4SXRyckwrM2dzbW11?=
- =?utf-8?B?U1NDWEIwL1NPOXNxSGw0N1l5cFFyN3REUEJyN0RUZ3M0Y3NkNXlRSUFKa2RD?=
- =?utf-8?B?WWppaDlDa0FYOUV4WFJtam44UWlpL0NnVnBEOXR2aFFTNk44MnQxM1p5UTgw?=
- =?utf-8?B?czdxMWVGcUFYWU5JUFNqNkFFa3JGTndCeE9zVlVPNVFKYldMU3Zwd3hmNWhj?=
- =?utf-8?B?S2hJbHk4VFdqd05tZ0JBcFBiSnNTcWRrcXpnb25HeUVURTlDaW1WdGpjaFpP?=
- =?utf-8?B?MVIwQWFGTXZKWHpuVkpZM0ZWYzZjREt2ZXp6cm1vWm5zbDJWdnZJaHZLWmxV?=
- =?utf-8?B?Y1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d1def60-b62c-432c-81be-08dc54a17ab5
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 12:19:30.7841
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: N0NA8NP77TTbGPGmI5moAfDQCWLwdIBgD5MSZh8y9DsnKwQAZ+znCaXF1QKlrZJ4ED5ZqgJAtmaP68x2E79hXvxjBXZlJOzT5fmoHXnqc7A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8497
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240404122051.2303764-1-edumazet@google.com>
+Subject: [PATCH net] netfilter: validate user input for expected length
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
+I got multiple syzbot reports showing old bugs exposed
+by BPF after commit 20f2505fb436 ("bpf: Try to avoid kzalloc
+in cgroup/{s,g}etsockopt")
 
+setsockopt() @optlen argument should be taken into account
+before copying data.
 
-On 04.04.2024 02:18, Jakub Kicinski wrote:
-> On Wed, 3 Apr 2024 12:19:57 +0200 Wojciech Drewek wrote:
->> You're saying that if min_pwr_allowed or max_pwr_allowed taken from get op
->> are 0 than we should not allow to set max_pwr_reset and max_pwr_set?
-> 
-> Yes, return -EOPNOTSUPP and point extack at whatever max_pwr attr user
-> sent. If driver doesn't return any bounds from get() it must not support
-> the configuration.
+ BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
+ BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/sockptr.h:55 [inline]
+ BUG: KASAN: slab-out-of-bounds in do_replace net/ipv4/netfilter/ip_tables.c:1111 [inline]
+ BUG: KASAN: slab-out-of-bounds in do_ipt_set_ctl+0x902/0x3dd0 net/ipv4/netfilter/ip_tables.c:1627
+Read of size 96 at addr ffff88802cd73da0 by task syz-executor.4/7238
 
-Ok
+CPU: 1 PID: 7238 Comm: syz-executor.4 Not tainted 6.9.0-rc2-next-20240403-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Call Trace:
+ <TASK>
+  __dump_stack lib/dump_stack.c:88 [inline]
+  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+  print_address_description mm/kasan/report.c:377 [inline]
+  print_report+0x169/0x550 mm/kasan/report.c:488
+  kasan_report+0x143/0x180 mm/kasan/report.c:601
+  kasan_check_range+0x282/0x290 mm/kasan/generic.c:189
+  __asan_memcpy+0x29/0x70 mm/kasan/shadow.c:105
+  copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
+  copy_from_sockptr include/linux/sockptr.h:55 [inline]
+  do_replace net/ipv4/netfilter/ip_tables.c:1111 [inline]
+  do_ipt_set_ctl+0x902/0x3dd0 net/ipv4/netfilter/ip_tables.c:1627
+  nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
+  do_sock_setsockopt+0x3af/0x720 net/socket.c:2311
+  __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
+  __do_sys_setsockopt net/socket.c:2343 [inline]
+  __se_sys_setsockopt net/socket.c:2340 [inline]
+  __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x72/0x7a
+RIP: 0033:0x7fd22067dde9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fd21f9ff0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 00007fd2207abf80 RCX: 00007fd22067dde9
+RDX: 0000000000000040 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 00007fd2206ca47a R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000020000880 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fd2207abf80 R15: 00007ffd2d0170d8
+ </TASK>
 
-> 
->> And similarly if policy was 0 than we should not allow to set it?
-> 
-> You mean the limit? I'm not as sure about this one. We can either
-> treat 0 as "unset" or as unsupported. Not sure what makes more sense
-> for this case.
+Allocated by task 7238:
+  kasan_save_stack mm/kasan/common.c:47 [inline]
+  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+  poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+  __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+  kasan_kmalloc include/linux/kasan.h:211 [inline]
+  __do_kmalloc_node mm/slub.c:4069 [inline]
+  __kmalloc_noprof+0x200/0x410 mm/slub.c:4082
+  kmalloc_noprof include/linux/slab.h:664 [inline]
+  __cgroup_bpf_run_filter_setsockopt+0xd47/0x1050 kernel/bpf/cgroup.c:1869
+  do_sock_setsockopt+0x6b4/0x720 net/socket.c:2293
+  __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
+  __do_sys_setsockopt net/socket.c:2343 [inline]
+  __se_sys_setsockopt net/socket.c:2340 [inline]
+  __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x72/0x7a
 
-I was talking about ETHTOOL_A_MODULE_POWER_MODE_POLICY, attribute that
-is already present in ethtool.
+The buggy address belongs to the object at ffff88802cd73da0
+ which belongs to the cache kmalloc-8 of size 8
+The buggy address is located 0 bytes inside of
+ allocated 1-byte region [ffff88802cd73da0, ffff88802cd73da1)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802cd73020 pfn:0x2cd73
+flags: 0xfff80000000000(node=0|zone=1|lastcpupid=0xfff)
+page_type: 0xffffefff(slab)
+raw: 00fff80000000000 ffff888015041280 dead000000000100 dead000000000122
+raw: ffff88802cd73020 000000008080007f 00000001ffffefff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5103, tgid 2119833701 (syz-executor.4), ts 5103, free_ts 70804600828
+  set_page_owner include/linux/page_owner.h:32 [inline]
+  post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1490
+  prep_new_page mm/page_alloc.c:1498 [inline]
+  get_page_from_freelist+0x2e7e/0x2f40 mm/page_alloc.c:3454
+  __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4712
+  __alloc_pages_node_noprof include/linux/gfp.h:244 [inline]
+  alloc_pages_node_noprof include/linux/gfp.h:271 [inline]
+  alloc_slab_page+0x5f/0x120 mm/slub.c:2249
+  allocate_slab+0x5a/0x2e0 mm/slub.c:2412
+  new_slab mm/slub.c:2465 [inline]
+  ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3615
+  __slab_alloc+0x58/0xa0 mm/slub.c:3705
+  __slab_alloc_node mm/slub.c:3758 [inline]
+  slab_alloc_node mm/slub.c:3936 [inline]
+  __do_kmalloc_node mm/slub.c:4068 [inline]
+  kmalloc_node_track_caller_noprof+0x286/0x450 mm/slub.c:4089
+  kstrdup+0x3a/0x80 mm/util.c:62
+  device_rename+0xb5/0x1b0 drivers/base/core.c:4558
+  dev_change_name+0x275/0x860 net/core/dev.c:1232
+  do_setlink+0xa4b/0x41f0 net/core/rtnetlink.c:2864
+  __rtnl_newlink net/core/rtnetlink.c:3680 [inline]
+  rtnl_newlink+0x180b/0x20a0 net/core/rtnetlink.c:3727
+  rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6594
+  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+page last free pid 5146 tgid 5146 stack trace:
+  reset_page_owner include/linux/page_owner.h:25 [inline]
+  free_pages_prepare mm/page_alloc.c:1110 [inline]
+  free_unref_page+0xd3c/0xec0 mm/page_alloc.c:2617
+  discard_slab mm/slub.c:2511 [inline]
+  __put_partials+0xeb/0x130 mm/slub.c:2980
+  put_cpu_partial+0x17c/0x250 mm/slub.c:3055
+  __slab_free+0x2ea/0x3d0 mm/slub.c:4254
+  qlink_free mm/kasan/quarantine.c:163 [inline]
+  qlist_free_all+0x9e/0x140 mm/kasan/quarantine.c:179
+  kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
+  __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
+  kasan_slab_alloc include/linux/kasan.h:201 [inline]
+  slab_post_alloc_hook mm/slub.c:3888 [inline]
+  slab_alloc_node mm/slub.c:3948 [inline]
+  __do_kmalloc_node mm/slub.c:4068 [inline]
+  __kmalloc_node_noprof+0x1d7/0x450 mm/slub.c:4076
+  kmalloc_node_noprof include/linux/slab.h:681 [inline]
+  kvmalloc_node_noprof+0x72/0x190 mm/util.c:634
+  bucket_table_alloc lib/rhashtable.c:186 [inline]
+  rhashtable_rehash_alloc+0x9e/0x290 lib/rhashtable.c:367
+  rht_deferred_worker+0x4e1/0x2440 lib/rhashtable.c:427
+  process_one_work kernel/workqueue.c:3218 [inline]
+  process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
+  worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
+  kthread+0x2f0/0x390 kernel/kthread.c:388
+  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+Memory state around the buggy address:
+ ffff88802cd73c80: 07 fc fc fc 05 fc fc fc 05 fc fc fc fa fc fc fc
+ ffff88802cd73d00: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
+>ffff88802cd73d80: fa fc fc fc 01 fc fc fc fa fc fc fc fa fc fc fc
+                               ^
+ ffff88802cd73e00: fa fc fc fc fa fc fc fc 05 fc fc fc 07 fc fc fc
+ ffff88802cd73e80: 07 fc fc fc 07 fc fc fc 07 fc fc fc 07 fc fc fc
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/bridge/netfilter/ebtables.c | 6 ++++++
+ net/ipv4/netfilter/arp_tables.c | 4 ++++
+ net/ipv4/netfilter/ip_tables.c  | 4 ++++
+ net/ipv6/netfilter/ip6_tables.c | 4 ++++
+ 4 files changed, 18 insertions(+)
+
+diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+index 99d82676f780ac49d01151fa9c585f44f9ea8ccc..cbd0e3586c3f61904efb4db7d9101d7770c852e7 100644
+--- a/net/bridge/netfilter/ebtables.c
++++ b/net/bridge/netfilter/ebtables.c
+@@ -1111,6 +1111,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 	struct ebt_table_info *newinfo;
+ 	struct ebt_replace tmp;
+ 
++	if (len < sizeof(tmp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+ 		return -EFAULT;
+ 
+@@ -1423,6 +1425,8 @@ static int update_counters(struct net *net, sockptr_t arg, unsigned int len)
+ {
+ 	struct ebt_replace hlp;
+ 
++	if (len < sizeof(hlp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
+ 		return -EFAULT;
+ 
+@@ -2352,6 +2356,8 @@ static int compat_update_counters(struct net *net, sockptr_t arg,
+ {
+ 	struct compat_ebt_replace hlp;
+ 
++	if (len < sizeof(hlp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
+ 		return -EFAULT;
+ 
+diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
+index 2407066b0fec1121d71561ecbad6f4f87ecdebbc..b150c9929b12e86219a55c77da480e0c538b3449 100644
+--- a/net/ipv4/netfilter/arp_tables.c
++++ b/net/ipv4/netfilter/arp_tables.c
+@@ -956,6 +956,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 	void *loc_cpu_entry;
+ 	struct arpt_entry *iter;
+ 
++	if (len < sizeof(tmp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+ 		return -EFAULT;
+ 
+@@ -1254,6 +1256,8 @@ static int compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 	void *loc_cpu_entry;
+ 	struct arpt_entry *iter;
+ 
++	if (len < sizeof(tmp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+ 		return -EFAULT;
+ 
+diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
+index 7da1df4997d057a4292927c2041687c2b39d4a01..487670759578168c5ff53bce6642898fc41936b3 100644
+--- a/net/ipv4/netfilter/ip_tables.c
++++ b/net/ipv4/netfilter/ip_tables.c
+@@ -1108,6 +1108,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 	void *loc_cpu_entry;
+ 	struct ipt_entry *iter;
+ 
++	if (len < sizeof(tmp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+ 		return -EFAULT;
+ 
+@@ -1492,6 +1494,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 	void *loc_cpu_entry;
+ 	struct ipt_entry *iter;
+ 
++	if (len < sizeof(tmp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+ 		return -EFAULT;
+ 
+diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
+index fd9f049d6d41e77eacc10ce074a8a0d96b0d2e11..636b360311c5365fba2330f6ca2f7f1b6dd1363e 100644
+--- a/net/ipv6/netfilter/ip6_tables.c
++++ b/net/ipv6/netfilter/ip6_tables.c
+@@ -1125,6 +1125,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 	void *loc_cpu_entry;
+ 	struct ip6t_entry *iter;
+ 
++	if (len < sizeof(tmp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+ 		return -EFAULT;
+ 
+@@ -1501,6 +1503,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 	void *loc_cpu_entry;
+ 	struct ip6t_entry *iter;
+ 
++	if (len < sizeof(tmp))
++		return -EINVAL;
+ 	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+ 		return -EFAULT;
+ 
+-- 
+2.44.0.478.gd926399ef9-goog
+
 
