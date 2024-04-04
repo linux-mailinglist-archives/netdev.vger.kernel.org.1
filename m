@@ -1,306 +1,147 @@
-Return-Path: <netdev+bounces-84904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8690A8989A0
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:11:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F096C8989AD
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:15:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 214C0290AC8
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:11:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46263B24DBC
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7584C1292EB;
-	Thu,  4 Apr 2024 14:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6FF129A75;
+	Thu,  4 Apr 2024 14:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="pgmFneWN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C61128833;
-	Thu,  4 Apr 2024 14:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712239870; cv=none; b=un507Kqckdk2Rntj1nOTaZOPBr8mcRltn7QJYLFLgVJBFKoEMoiK0ZTQSeSp5tgxUxVi3nxBKMdtqWYZp5c9ZdzHxR43MtsYG7/a9IHr2sEp/AzBlupfgD6/s7IZ1/sZHfO2X5ojpCwelNF2PtYM1hNsgoyxWcM6SoNd8YycBhc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712239870; c=relaxed/simple;
-	bh=KERPuvYjSltLlZLXV08lzV/QSTu/a5/riypv63psSVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PJL5QwkSt69NTnOQ1g1I3pQlo1g5X/sGhZX9Sie2zrk4rDY31NkOgdn5tWOldzDdTvKmJbN6vkgNEIzcocHDByGyWg881bOj6ToyRoQ3oB/CP7bCxj5I6AqCVIqg6rltrbdntt8gGsYIYq97asIKfwvZxFXGE6AyJj3tuLS0xYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Date: Thu, 4 Apr 2024 16:11:02 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net] netfilter: validate user input for expected length
-Message-ID: <Zg609rcSqzUW64wm@calendula>
-References: <20240404122051.2303764-1-edumazet@google.com>
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2104.outbound.protection.outlook.com [40.107.237.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7591CD03
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 14:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.104
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712240092; cv=fail; b=bDxjmbY3V0i5V4nvrFy1DklHh02imUvxEyPDdGeMvi/qm7hA5+Li8HC+DGAwOQxHbPDfPivFC1s07JxBhZXN4DB9GqCC6KhuldEB0OaZpDD+/1fvw9UkhmCH+C7D3O56CAftVn67KIxt3hAOHXdeQk3+BivvUXg14WNPKxMt7KQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712240092; c=relaxed/simple;
+	bh=2jlPDLOEQpXzVWAKzwBoq3cOq9MAWWd8w6YEM84YSrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=UHT2UzV/JGCxCJPRKP/diIBp53RerJwH1iX9uQcwKFRlcU2dX6fLlq0WRR1cHJDSbTQlRsICJbyrYpT/2gbZooGlj5UMm5GPtf5bjRafOStlVteh2286Vpx9sFuzeDiCI7esb0sD8xAdz0hFkDFcOHkUUz/CEr/+P/MydsXFtC0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=pgmFneWN; arc=fail smtp.client-ip=40.107.237.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KFGxBccc5TN2SYpAYLaChBM7DOF6ON5+VNaC2IVCBPPM04vUfPEgeROhkUdZ+XL4zUtEoUVsLzxOPE7p46Zd413ZZqJ3b3ksd9s6NfHSPVMInuyw+SuIIOyrHhTD4dWhglOCXk5d5nMcUgi1J/KYZ4X3Ps1UQLGmE3MhLfH/mcb9TO1uGAeGj7fospnK7wv5O8opiJ/cAScVW2j6+ulkxMf5e74i/Um47ihrwnILnjwPdMV6+s1HizJuGLrYbKSXwjjq9hmVy4d0CAViOnRnuocyADT+u8EzoV+GndRyPh/4BEBAp4OlHcNuVGoKN3pv1bXKVA8KUi3CohdqVsgBDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mmOEGu0+XY1E1Des+rkJh8laucDrbJ5PujY7O/Y7r6w=;
+ b=S4mWLWIVVQDuIpYdA4Zc5QPqn1cu51lI7D3rTqyCaVpcRwSsTLMcDrlCWb2mK5qiGNOQxfS/qDcGuyZDxNQEFbD2qaRXOTAn81+0ljOaqk2cOn+VxnHBIrkEi8U0c6AXmLdiaMkKjXG8kQXC3Z1tqeqikQ2I34ZFB4wv0TaU3kL3zTPXlxgyQJdeD65zaliuOROv5i9jiLS0EmEK8g0P1kCjZshp9x/4677lTU1+jHBW5Xj15FKldssaVXtPg/UMfxlTcHc8p2LYNRFD2R0FAYWqxrKkoTIP0u7ISkoSvs46BruUXTx6GtiKZ7azn6/cqzhHRszCGMUJg8bbYCxqTA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mmOEGu0+XY1E1Des+rkJh8laucDrbJ5PujY7O/Y7r6w=;
+ b=pgmFneWN4x+d2Q168EgM4zelkxPvdcBt5GjBOjyV+WmXs8gI+s/+ahdO3EK9YJgGTVfarBdP7BObCMgIyLHhAb/BSwFdacBDL5Q7wowZ/X5KVwbqFpfjmHPTqjAWUdKuFyp5jA3X0QWGf2tjmzh5LuKwc5ZQNOIO4BDXR16YWmM=
+Received: from CH2PR13MB4411.namprd13.prod.outlook.com (2603:10b6:610:6e::12)
+ by LV3PR13MB6357.namprd13.prod.outlook.com (2603:10b6:408:1a7::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 4 Apr
+ 2024 14:14:45 +0000
+Received: from CH2PR13MB4411.namprd13.prod.outlook.com
+ ([fe80::cd14:b8e:969c:928f]) by CH2PR13MB4411.namprd13.prod.outlook.com
+ ([fe80::cd14:b8e:969c:928f%4]) with mapi id 15.20.7409.042; Thu, 4 Apr 2024
+ 14:14:44 +0000
+Date: Thu, 4 Apr 2024 16:13:42 +0200
+From: Louis Peens <louis.peens@corigine.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Fei Qin <fei.qin@corigine.com>,
+	netdev@vger.kernel.org, oss-drivers@corigine.com
+Subject: Re: [PATCH net-next v3 1/4] devlink: add a new info version tag
+Message-ID: <Zg61lgMUzVWvXEVM@LouisNoVo>
+References: <20240403145700.26881-1-louis.peens@corigine.com>
+ <20240403145700.26881-2-louis.peens@corigine.com>
+ <20240403184252.7df774d0@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240403184252.7df774d0@kernel.org>
+X-ClientProxiedBy: JNXP275CA0004.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:19::16)
+ To CH2PR13MB4411.namprd13.prod.outlook.com (2603:10b6:610:6e::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240404122051.2303764-1-edumazet@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PR13MB4411:EE_|LV3PR13MB6357:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	nEXxpeYFXAO2mJgeSBgsdz+I2adYcOAgD0lTHcLgxZGWz6Gg8ru/aY8VjLTvH3yJ6lbQKrSCQZEFFtJ8igrtUWcmQcXmDYJ6J8JoNLgQq5hk6f0Lv849oiTeHzlDsc8FQOeXkvrTEanKBtJ1keH9ryOPl5O5IiovPWX5bELGySrzHP6WkNRii3pxBPOFpXO3HeYcX4lB5NywYr9S0xjALZa/2exThJb5/7qQpoar5qWtRX+yiDrEuEvKXpX5ioD+0dvBZ6Jf5q75UkQuqnWtwCZMqlyfvrFSTi85vD8rvTGb+Z0Ev8CR6gPINx5PLLsOdKxg0Udm3qM1jBR0ECte77KeVn+m9hF8+oALlc+6lyCYO7Mj+hO48Dm9irKD0+xIOho2YFEpFy9vwIgc8dmnBkLWSGDz01cQKUw52j7Jspidy1EFPKK/ipSpOfh07m5Kw0LtXPnoU/83HY5P3RWY1w/I5IYcKy2/aeWZiYGtIhkezdoCoFtZeiw/PYqO5oIgxZr9lxF8fg5dhNoJUm9Mp3lkpZpwHQ13UgJRt9GnixOvgtleI8HYAiGKvwuFgbEXPc4jFnklDTxLmJYodBWrENzPIBQFrGnfJ7t26qVxltNWO3GzvwgZC8z+Yy1A/xPqkwJG5T94wrR/b5uhmLVxBzEP6FFt5Npm1qkBCB9wVjw=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR13MB4411.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qTR9LWZQ/WOUmejMcs7z8zkWzUClKvecRnaQfdwDlVpDlq0KZnO25xMFidEk?=
+ =?us-ascii?Q?jWMLmlvbobxOM3GBPJBkTG2Hak9nC1bg4/PLpOyzL1k+G8EuK8Wb9b0+Nljp?=
+ =?us-ascii?Q?EI8FIN10KGb3wChqRe1QtG63glmWPg79rQ9ZUkAWSxD9Ssm9PFLqRIF9etG5?=
+ =?us-ascii?Q?H5BtEUmQWkQs+u+BINiXXheie7dsXB2bJoopDaPhJv8HjyD1VtPAB6yFg8D0?=
+ =?us-ascii?Q?OGfmtsyOk1FNpywteRjfTfafdICnq6anJ9cv3wRxaM6thxHxp3kha4RbR8jp?=
+ =?us-ascii?Q?hfYvJyKlOJ+w7ugCmhnjFgOpxJ/rZo7MgCkAZoCHGP7jmRV29vZCzqx5MuJR?=
+ =?us-ascii?Q?/qv8U1h2frSSFvje2wYo76GiuvOhAVUehexSlNS/GUtpBecw4r+grerXxnWn?=
+ =?us-ascii?Q?Qae5W6Ss3yVQlwtD4UyCqZloN60r5wOMiPmZpskUv7xCMIHr2hH1wn+WqslP?=
+ =?us-ascii?Q?oc0T/ybXz82uwUcoODiWkYV23bAml+PiYNNkYni32HOjJ5ZaAZgJqkMC1WA+?=
+ =?us-ascii?Q?yqhMvJVNun+TP0o9+yoAZx2yrITgQR5dkIYdmGmuvjyzbB+E/VMB9HC6kA4T?=
+ =?us-ascii?Q?hoR6kpjMqAPJpY9iBabxpwK927gt5INVGIF8CBQ+XSeZv8l2P0u5H7shDgPM?=
+ =?us-ascii?Q?U9hCWydEjDLUqHUXxSRaZecfX8paE8Cf/MHqeOm0dHUSuCnHto8GElq1MLTk?=
+ =?us-ascii?Q?nS+impUt1+BQn/Y0jXIPlxoluN8bqPX1FD3MZs3gl/DnDvvYguCBmXd+GbMR?=
+ =?us-ascii?Q?3fxSaq5vqI8ymxVZZHgksbYXrbpogrYzkaBa4pWBWQTvecSHEYWLjn86s+Bt?=
+ =?us-ascii?Q?Ssrvrc2QftbClWpq8oGnoBN+htVyXFp+uleIvQS1FYAjXKyPp1YKysEspLAe?=
+ =?us-ascii?Q?m3DOaS8URgpZoF/jqaqkrkm66kkNAwD4tD8MqRT+ysmo+Rghl6L9OYut6E8L?=
+ =?us-ascii?Q?+uhdDQY99+0IYw8VxS4U+RMrfuQ8RLP1nvJgUwoWycEVEA8I1um6x4x3GUl3?=
+ =?us-ascii?Q?+IAnWOr8IVF7gyNjrm2MkZYGVR1BhuNDbLPReZx17EBjqaHLHpgiNfiMt+HH?=
+ =?us-ascii?Q?nlQP/ZpmgYEm/dj1VcA+Ewl4VuVfOjed1JF2Co8Oug8jjhfgRHDGEB7sOkLB?=
+ =?us-ascii?Q?vzwICUa5uiU2boQiahw/bQgpJ8WhYJhsseYAWgyZsvmiJItfoaMdFgpR0vVK?=
+ =?us-ascii?Q?3u8Jdrgzj/DQ8MtrUIlzVyl05r74Tra3bhOX2e6hFEKapI7a07PG7LLOBLEz?=
+ =?us-ascii?Q?R/PLaQnbvAZ8BchXFSQgEg2LFb8ehmTtP6DE5XhnUYRpzvxTakbgyPACPjuG?=
+ =?us-ascii?Q?IwXVsLbTTgLcF5ZhD24vn6+5ohRUNivcdcYRAIndu+SGXB1SDkbXon3gLIY/?=
+ =?us-ascii?Q?mcm4T0sLJ9I/7T3VW6yqC8hUU67SVTpYwH06ysH7wAWbbOs7YrZJzD1qjvU9?=
+ =?us-ascii?Q?2OCMBWUlL1io+9qIDmtPYZrsyxbOgwwPnmnQMm87bj1yN2JhojMBb8hnawhu?=
+ =?us-ascii?Q?tleLDaqc7PkBSlmiSKnZrdBB5DnRjtq6nOe1RJP/UN1z2tJcIvatTsEmhbZf?=
+ =?us-ascii?Q?NC8gKHELaSPwy5cpckzFxbH2F7hapcb6oP9NQTnLa7dwqHawnAATChl2ONLT?=
+ =?us-ascii?Q?lg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ac6932b-3b5b-4f0d-54da-08dc54b193c4
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR13MB4411.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 14:14:44.6425
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4dTxsKh1dVTxj+L0XRStLGN0bilciHZYzPSKKuMhSTLYYQ05mc9O5jZFCdJZ5Fwey3fNKGqXhCw8NWtRk8dRS2BLw1Vse3QiYo2cjT+RYDE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR13MB6357
 
-On Thu, Apr 04, 2024 at 12:20:51PM +0000, Eric Dumazet wrote:
-> I got multiple syzbot reports showing old bugs exposed
-> by BPF after commit 20f2505fb436 ("bpf: Try to avoid kzalloc
-> in cgroup/{s,g}etsockopt")
+On Wed, Apr 03, 2024 at 06:42:52PM -0700, Jakub Kicinski wrote:
+> On Wed,  3 Apr 2024 16:56:57 +0200 Louis Peens wrote:
+> > +board.part_number
+> > +-----------
 > 
-> setsockopt() @optlen argument should be taken into account
-> before copying data.
+> make htmldocs says:
 > 
->  BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
->  BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/sockptr.h:55 [inline]
->  BUG: KASAN: slab-out-of-bounds in do_replace net/ipv4/netfilter/ip_tables.c:1111 [inline]
->  BUG: KASAN: slab-out-of-bounds in do_ipt_set_ctl+0x902/0x3dd0 net/ipv4/netfilter/ip_tables.c:1627
-> Read of size 96 at addr ffff88802cd73da0 by task syz-executor.4/7238
+> board.part_number
+> -----------
 > 
-> CPU: 1 PID: 7238 Comm: syz-executor.4 Not tainted 6.9.0-rc2-next-20240403-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-> Call Trace:
->  <TASK>
->   __dump_stack lib/dump_stack.c:88 [inline]
->   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
->   print_address_description mm/kasan/report.c:377 [inline]
->   print_report+0x169/0x550 mm/kasan/report.c:488
->   kasan_report+0x143/0x180 mm/kasan/report.c:601
->   kasan_check_range+0x282/0x290 mm/kasan/generic.c:189
->   __asan_memcpy+0x29/0x70 mm/kasan/shadow.c:105
->   copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
->   copy_from_sockptr include/linux/sockptr.h:55 [inline]
->   do_replace net/ipv4/netfilter/ip_tables.c:1111 [inline]
->   do_ipt_set_ctl+0x902/0x3dd0 net/ipv4/netfilter/ip_tables.c:1627
->   nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
->   do_sock_setsockopt+0x3af/0x720 net/socket.c:2311
->   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
->   __do_sys_setsockopt net/socket.c:2343 [inline]
->   __se_sys_setsockopt net/socket.c:2340 [inline]
->   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
->  do_syscall_64+0xfb/0x240
->  entry_SYSCALL_64_after_hwframe+0x72/0x7a
-> RIP: 0033:0x7fd22067dde9
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fd21f9ff0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-> RAX: ffffffffffffffda RBX: 00007fd2207abf80 RCX: 00007fd22067dde9
-> RDX: 0000000000000040 RSI: 0000000000000000 RDI: 0000000000000003
-> RBP: 00007fd2206ca47a R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000020000880 R11: 0000000000000246 R12: 0000000000000000
-> R13: 000000000000000b R14: 00007fd2207abf80 R15: 00007ffd2d0170d8
->  </TASK>
-> 
-> Allocated by task 7238:
->   kasan_save_stack mm/kasan/common.c:47 [inline]
->   kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
->   poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
->   __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
->   kasan_kmalloc include/linux/kasan.h:211 [inline]
->   __do_kmalloc_node mm/slub.c:4069 [inline]
->   __kmalloc_noprof+0x200/0x410 mm/slub.c:4082
->   kmalloc_noprof include/linux/slab.h:664 [inline]
->   __cgroup_bpf_run_filter_setsockopt+0xd47/0x1050 kernel/bpf/cgroup.c:1869
->   do_sock_setsockopt+0x6b4/0x720 net/socket.c:2293
->   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
->   __do_sys_setsockopt net/socket.c:2343 [inline]
->   __se_sys_setsockopt net/socket.c:2340 [inline]
->   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
->  do_syscall_64+0xfb/0x240
->  entry_SYSCALL_64_after_hwframe+0x72/0x7a
-> 
-> The buggy address belongs to the object at ffff88802cd73da0
->  which belongs to the cache kmalloc-8 of size 8
-> The buggy address is located 0 bytes inside of
->  allocated 1-byte region [ffff88802cd73da0, ffff88802cd73da1)
-> 
-> The buggy address belongs to the physical page:
-> page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802cd73020 pfn:0x2cd73
-> flags: 0xfff80000000000(node=0|zone=1|lastcpupid=0xfff)
-> page_type: 0xffffefff(slab)
-> raw: 00fff80000000000 ffff888015041280 dead000000000100 dead000000000122
-> raw: ffff88802cd73020 000000008080007f 00000001ffffefff 0000000000000000
-> page dumped because: kasan: bad access detected
-> page_owner tracks the page as allocated
-> page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5103, tgid 2119833701 (syz-executor.4), ts 5103, free_ts 70804600828
->   set_page_owner include/linux/page_owner.h:32 [inline]
->   post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1490
->   prep_new_page mm/page_alloc.c:1498 [inline]
->   get_page_from_freelist+0x2e7e/0x2f40 mm/page_alloc.c:3454
->   __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4712
->   __alloc_pages_node_noprof include/linux/gfp.h:244 [inline]
->   alloc_pages_node_noprof include/linux/gfp.h:271 [inline]
->   alloc_slab_page+0x5f/0x120 mm/slub.c:2249
->   allocate_slab+0x5a/0x2e0 mm/slub.c:2412
->   new_slab mm/slub.c:2465 [inline]
->   ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3615
->   __slab_alloc+0x58/0xa0 mm/slub.c:3705
->   __slab_alloc_node mm/slub.c:3758 [inline]
->   slab_alloc_node mm/slub.c:3936 [inline]
->   __do_kmalloc_node mm/slub.c:4068 [inline]
->   kmalloc_node_track_caller_noprof+0x286/0x450 mm/slub.c:4089
->   kstrdup+0x3a/0x80 mm/util.c:62
->   device_rename+0xb5/0x1b0 drivers/base/core.c:4558
->   dev_change_name+0x275/0x860 net/core/dev.c:1232
->   do_setlink+0xa4b/0x41f0 net/core/rtnetlink.c:2864
->   __rtnl_newlink net/core/rtnetlink.c:3680 [inline]
->   rtnl_newlink+0x180b/0x20a0 net/core/rtnetlink.c:3727
->   rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6594
->   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
->   netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->   netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
-> page last free pid 5146 tgid 5146 stack trace:
->   reset_page_owner include/linux/page_owner.h:25 [inline]
->   free_pages_prepare mm/page_alloc.c:1110 [inline]
->   free_unref_page+0xd3c/0xec0 mm/page_alloc.c:2617
->   discard_slab mm/slub.c:2511 [inline]
->   __put_partials+0xeb/0x130 mm/slub.c:2980
->   put_cpu_partial+0x17c/0x250 mm/slub.c:3055
->   __slab_free+0x2ea/0x3d0 mm/slub.c:4254
->   qlink_free mm/kasan/quarantine.c:163 [inline]
->   qlist_free_all+0x9e/0x140 mm/kasan/quarantine.c:179
->   kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
->   __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
->   kasan_slab_alloc include/linux/kasan.h:201 [inline]
->   slab_post_alloc_hook mm/slub.c:3888 [inline]
->   slab_alloc_node mm/slub.c:3948 [inline]
->   __do_kmalloc_node mm/slub.c:4068 [inline]
->   __kmalloc_node_noprof+0x1d7/0x450 mm/slub.c:4076
->   kmalloc_node_noprof include/linux/slab.h:681 [inline]
->   kvmalloc_node_noprof+0x72/0x190 mm/util.c:634
->   bucket_table_alloc lib/rhashtable.c:186 [inline]
->   rhashtable_rehash_alloc+0x9e/0x290 lib/rhashtable.c:367
->   rht_deferred_worker+0x4e1/0x2440 lib/rhashtable.c:427
->   process_one_work kernel/workqueue.c:3218 [inline]
->   process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
->   worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
->   kthread+0x2f0/0x390 kernel/kthread.c:388
->   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> 
-> Memory state around the buggy address:
->  ffff88802cd73c80: 07 fc fc fc 05 fc fc fc 05 fc fc fc fa fc fc fc
->  ffff88802cd73d00: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
-> >ffff88802cd73d80: fa fc fc fc 01 fc fc fc fa fc fc fc fa fc fc fc
->                                ^
->  ffff88802cd73e00: fa fc fc fc fa fc fc fc 05 fc fc fc 07 fc fc fc
->  ffff88802cd73e80: 07 fc fc fc 07 fc fc fc 07 fc fc fc 07 fc fc fc
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-
-Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
-
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/bridge/netfilter/ebtables.c | 6 ++++++
->  net/ipv4/netfilter/arp_tables.c | 4 ++++
->  net/ipv4/netfilter/ip_tables.c  | 4 ++++
->  net/ipv6/netfilter/ip6_tables.c | 4 ++++
->  4 files changed, 18 insertions(+)
-> 
-> diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
-> index 99d82676f780ac49d01151fa9c585f44f9ea8ccc..cbd0e3586c3f61904efb4db7d9101d7770c852e7 100644
-> --- a/net/bridge/netfilter/ebtables.c
-> +++ b/net/bridge/netfilter/ebtables.c
-> @@ -1111,6 +1111,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
->  	struct ebt_table_info *newinfo;
->  	struct ebt_replace tmp;
->  
-> +	if (len < sizeof(tmp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
->  		return -EFAULT;
->  
-> @@ -1423,6 +1425,8 @@ static int update_counters(struct net *net, sockptr_t arg, unsigned int len)
->  {
->  	struct ebt_replace hlp;
->  
-> +	if (len < sizeof(hlp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
->  		return -EFAULT;
->  
-> @@ -2352,6 +2356,8 @@ static int compat_update_counters(struct net *net, sockptr_t arg,
->  {
->  	struct compat_ebt_replace hlp;
->  
-> +	if (len < sizeof(hlp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
->  		return -EFAULT;
->  
-> diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
-> index 2407066b0fec1121d71561ecbad6f4f87ecdebbc..b150c9929b12e86219a55c77da480e0c538b3449 100644
-> --- a/net/ipv4/netfilter/arp_tables.c
-> +++ b/net/ipv4/netfilter/arp_tables.c
-> @@ -956,6 +956,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
->  	void *loc_cpu_entry;
->  	struct arpt_entry *iter;
->  
-> +	if (len < sizeof(tmp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
->  		return -EFAULT;
->  
-> @@ -1254,6 +1256,8 @@ static int compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
->  	void *loc_cpu_entry;
->  	struct arpt_entry *iter;
->  
-> +	if (len < sizeof(tmp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
->  		return -EFAULT;
->  
-> diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
-> index 7da1df4997d057a4292927c2041687c2b39d4a01..487670759578168c5ff53bce6642898fc41936b3 100644
-> --- a/net/ipv4/netfilter/ip_tables.c
-> +++ b/net/ipv4/netfilter/ip_tables.c
-> @@ -1108,6 +1108,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
->  	void *loc_cpu_entry;
->  	struct ipt_entry *iter;
->  
-> +	if (len < sizeof(tmp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
->  		return -EFAULT;
->  
-> @@ -1492,6 +1494,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
->  	void *loc_cpu_entry;
->  	struct ipt_entry *iter;
->  
-> +	if (len < sizeof(tmp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
->  		return -EFAULT;
->  
-> diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
-> index fd9f049d6d41e77eacc10ce074a8a0d96b0d2e11..636b360311c5365fba2330f6ca2f7f1b6dd1363e 100644
-> --- a/net/ipv6/netfilter/ip6_tables.c
-> +++ b/net/ipv6/netfilter/ip6_tables.c
-> @@ -1125,6 +1125,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
->  	void *loc_cpu_entry;
->  	struct ip6t_entry *iter;
->  
-> +	if (len < sizeof(tmp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
->  		return -EFAULT;
->  
-> @@ -1501,6 +1503,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
->  	void *loc_cpu_entry;
->  	struct ip6t_entry *iter;
->  
-> +	if (len < sizeof(tmp))
-> +		return -EINVAL;
->  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
->  		return -EFAULT;
->  
+> Documentation/networking/devlink/devlink-info.rst:150: WARNING: Title underline too short.
 > -- 
-> 2.44.0.478.gd926399ef9-goog
+Whoops, thanks - will check what we're missing for this to have escaped
+internal detection.
+> pw-bot: cr
 > 
 
