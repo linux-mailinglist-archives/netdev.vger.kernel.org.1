@@ -1,118 +1,306 @@
-Return-Path: <netdev+bounces-84903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D28989899A
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:10:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8690A8989A0
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 16:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C8A61C2930D
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 214C0290AC8
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 14:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66DA12AACD;
-	Thu,  4 Apr 2024 14:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Anr8tcxN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7584C1292EB;
+	Thu,  4 Apr 2024 14:11:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148E51292DD
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 14:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C61128833;
+	Thu,  4 Apr 2024 14:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712239727; cv=none; b=C9rbMpXnKZRyQA3MTcZEbnHLDE5cOV4z8839lwaBgxeg8Vu4zIj9sFibWpqWgkIPikbqHr2uFa9YIuoY4U9vP0EA/XL1nc4noQFj1MUBEIVu8jPghUHPkodoUGo4FjVnWMcFf2UyhUN9SlAVnQPfn4RD/p8z1AHMUR0NllHQCXs=
+	t=1712239870; cv=none; b=un507Kqckdk2Rntj1nOTaZOPBr8mcRltn7QJYLFLgVJBFKoEMoiK0ZTQSeSp5tgxUxVi3nxBKMdtqWYZp5c9ZdzHxR43MtsYG7/a9IHr2sEp/AzBlupfgD6/s7IZ1/sZHfO2X5ojpCwelNF2PtYM1hNsgoyxWcM6SoNd8YycBhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712239727; c=relaxed/simple;
-	bh=hrxAJFwASDfNl3rAya+EMsLNEAoHRcFWT7T7tFj+mwA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q7Ss61K8S3/cXeq5TXTJsgmXN2GjOCZqcjQ6IO8B15KygV6xlaRpdoeIy4jzPEBK5LBHM9tgUak7QzrCO8sp08tbeoejThl80qn2vQdVtzJfXZYfyKn8LdOASilCCI5f0GjtcQ17M1YWrFWK3XLO+VMCDugdmVQdcrxXe7I11+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Anr8tcxN; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-415446af364so13192615e9.0
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 07:08:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1712239724; x=1712844524; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aExDhstFgMLX3GM9LPOJfkL+GlZDL+jzdbp79tNKPx0=;
-        b=Anr8tcxNGp3RlHVs8JlbjsUChNZAzsCPH8c++y1H0gUvkWzKuBdV39NQ2RuMbMzu6j
-         /TDZIy/6YV45Ho3moDxz8m0PyZvCt9JAeh8IctGzmRLY77F7NGCC7fm+4yZRMZiEWs/f
-         w/sLQIOqVjX7moFcdSHBU+3O7QB44vHyAuFiCNUP/WpABLxN6XsYpTX2G9eNeI9NzSed
-         mX5CnkLbHC9HdZb6buwymGOVd3HWY18rgH8MFAkJO+zLhzRnhY66lo3lXs2/mq5QxeQr
-         nkeVJD82PtoE1D3/Rl1RtouYZLAxlsDjcLZQ2BTqENwoXEjwvgPGOBH6Emk/LUmjWvLG
-         VDeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712239724; x=1712844524;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aExDhstFgMLX3GM9LPOJfkL+GlZDL+jzdbp79tNKPx0=;
-        b=ZZmJNYqVqbaUa8zXw8R3KS2giyn8Suxi4Dd/zSHH123p3IrRvGrNNjEaOyEV5Tixe8
-         iYzrIfVICBhrlx5hP6Wx2I+5nHZlyfyqpBNYr8M2KMNsvwBLXobA+6zSsxQVpC5U34vJ
-         +zIY5DxKyOFqhMLljbLUQQxbcYPiJEEdThFs9nyFU2Nef93iZN2+PM2oBLpD1dQktJLL
-         0fEaWMHd7ArtktNU3W/vSFP51/zcUL9HXwG6qDoUVC1o3YFEZu5XwxUQ2gIQbpbVX7xN
-         cXQdGgrhqeD3s6OplhAj6PVgCtnBDYmOQGlJvtQXCloblpGxL5IJiHRcO1+zL6UykKgf
-         ueIA==
-X-Gm-Message-State: AOJu0YzXJobgu5PfTR83xxkUl3BvhZGy6/F3x+CduV1ju46Ljf6JTIgz
-	Pqp3ivmWJfWOrsZg3aLKXFwQydHbwVEr64VlcrnVIJsXu+5RutYVX767dK79ROnsIhbdpbuOdMv
-	0
-X-Google-Smtp-Source: AGHT+IE03XJROIMG5S/BAbknvt/QHBDdHgq2kw4KZuNkV0OkAdP8V4iUaWvxeS1BezvfeA4WrccPlA==
-X-Received: by 2002:adf:ee90:0:b0:343:83a8:96e with SMTP id b16-20020adfee90000000b0034383a8096emr2622736wro.8.1712239724365;
-        Thu, 04 Apr 2024 07:08:44 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:258f:a4c6:9d5e:37c1? ([2a01:e0a:b41:c160:258f:a4c6:9d5e:37c1])
-        by smtp.gmail.com with ESMTPSA id bp8-20020a5d5a88000000b00343300a4eb8sm20026270wrb.49.2024.04.04.07.08.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Apr 2024 07:08:43 -0700 (PDT)
-Message-ID: <13307e0d-11c8-4530-8182-37ecb2f8b8a3@6wind.com>
-Date: Thu, 4 Apr 2024 16:08:42 +0200
+	s=arc-20240116; t=1712239870; c=relaxed/simple;
+	bh=KERPuvYjSltLlZLXV08lzV/QSTu/a5/riypv63psSVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PJL5QwkSt69NTnOQ1g1I3pQlo1g5X/sGhZX9Sie2zrk4rDY31NkOgdn5tWOldzDdTvKmJbN6vkgNEIzcocHDByGyWg881bOj6ToyRoQ3oB/CP7bCxj5I6AqCVIqg6rltrbdntt8gGsYIYq97asIKfwvZxFXGE6AyJj3tuLS0xYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Date: Thu, 4 Apr 2024 16:11:02 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net] netfilter: validate user input for expected length
+Message-ID: <Zg609rcSqzUW64wm@calendula>
+References: <20240404122051.2303764-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH ipsec-next v5] xfrm: Add Direction to the SA in or out
-To: antony.antony@secunet.com, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>
-Cc: netdev@vger.kernel.org, devel@linux-ipsec.org,
- Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>
-References: <0baa206a7e9c6257826504e1f57103a84ce17b41.1712219452.git.antony.antony@secunet.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <0baa206a7e9c6257826504e1f57103a84ce17b41.1712219452.git.antony.antony@secunet.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240404122051.2303764-1-edumazet@google.com>
 
-Le 04/04/2024 à 10:32, Antony Antony a écrit :
-> This patch introduces the 'dir' attribute, 'in' or 'out', to the
-> xfrm_state, SA, enhancing usability by delineating the scope of values
-> based on direction. An input SA will now exclusively encompass values
-> pertinent to input, effectively segregating them from output-related
-> values. This change aims to streamline the configuration process and
-> improve the overall clarity of SA attributes.
+On Thu, Apr 04, 2024 at 12:20:51PM +0000, Eric Dumazet wrote:
+> I got multiple syzbot reports showing old bugs exposed
+> by BPF after commit 20f2505fb436 ("bpf: Try to avoid kzalloc
+> in cgroup/{s,g}etsockopt")
 > 
-> This feature sets the groundwork for future patches, including
-> the upcoming IP-TFS patch. Additionally, the 'dir' attribute can
-> serve purely informational purposes.
-> It currently validates the XFRM_OFFLOAD_INBOUND flag for hardware
-> offload capabilities.
-Frankly, it's a poor API. It will be more confusing than useful.
-This informational attribute could be wrong, there is no check.
-Please consider use cases of people that don't do offload.
+> setsockopt() @optlen argument should be taken into account
+> before copying data.
+> 
+>  BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
+>  BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/sockptr.h:55 [inline]
+>  BUG: KASAN: slab-out-of-bounds in do_replace net/ipv4/netfilter/ip_tables.c:1111 [inline]
+>  BUG: KASAN: slab-out-of-bounds in do_ipt_set_ctl+0x902/0x3dd0 net/ipv4/netfilter/ip_tables.c:1627
+> Read of size 96 at addr ffff88802cd73da0 by task syz-executor.4/7238
+> 
+> CPU: 1 PID: 7238 Comm: syz-executor.4 Not tainted 6.9.0-rc2-next-20240403-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+> Call Trace:
+>  <TASK>
+>   __dump_stack lib/dump_stack.c:88 [inline]
+>   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+>   print_address_description mm/kasan/report.c:377 [inline]
+>   print_report+0x169/0x550 mm/kasan/report.c:488
+>   kasan_report+0x143/0x180 mm/kasan/report.c:601
+>   kasan_check_range+0x282/0x290 mm/kasan/generic.c:189
+>   __asan_memcpy+0x29/0x70 mm/kasan/shadow.c:105
+>   copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
+>   copy_from_sockptr include/linux/sockptr.h:55 [inline]
+>   do_replace net/ipv4/netfilter/ip_tables.c:1111 [inline]
+>   do_ipt_set_ctl+0x902/0x3dd0 net/ipv4/netfilter/ip_tables.c:1627
+>   nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
+>   do_sock_setsockopt+0x3af/0x720 net/socket.c:2311
+>   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
+>   __do_sys_setsockopt net/socket.c:2343 [inline]
+>   __se_sys_setsockopt net/socket.c:2340 [inline]
+>   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
+>  do_syscall_64+0xfb/0x240
+>  entry_SYSCALL_64_after_hwframe+0x72/0x7a
+> RIP: 0033:0x7fd22067dde9
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fd21f9ff0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+> RAX: ffffffffffffffda RBX: 00007fd2207abf80 RCX: 00007fd22067dde9
+> RDX: 0000000000000040 RSI: 0000000000000000 RDI: 0000000000000003
+> RBP: 00007fd2206ca47a R08: 0000000000000001 R09: 0000000000000000
+> R10: 0000000020000880 R11: 0000000000000246 R12: 0000000000000000
+> R13: 000000000000000b R14: 00007fd2207abf80 R15: 00007ffd2d0170d8
+>  </TASK>
+> 
+> Allocated by task 7238:
+>   kasan_save_stack mm/kasan/common.c:47 [inline]
+>   kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+>   poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+>   __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+>   kasan_kmalloc include/linux/kasan.h:211 [inline]
+>   __do_kmalloc_node mm/slub.c:4069 [inline]
+>   __kmalloc_noprof+0x200/0x410 mm/slub.c:4082
+>   kmalloc_noprof include/linux/slab.h:664 [inline]
+>   __cgroup_bpf_run_filter_setsockopt+0xd47/0x1050 kernel/bpf/cgroup.c:1869
+>   do_sock_setsockopt+0x6b4/0x720 net/socket.c:2293
+>   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
+>   __do_sys_setsockopt net/socket.c:2343 [inline]
+>   __se_sys_setsockopt net/socket.c:2340 [inline]
+>   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
+>  do_syscall_64+0xfb/0x240
+>  entry_SYSCALL_64_after_hwframe+0x72/0x7a
+> 
+> The buggy address belongs to the object at ffff88802cd73da0
+>  which belongs to the cache kmalloc-8 of size 8
+> The buggy address is located 0 bytes inside of
+>  allocated 1-byte region [ffff88802cd73da0, ffff88802cd73da1)
+> 
+> The buggy address belongs to the physical page:
+> page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802cd73020 pfn:0x2cd73
+> flags: 0xfff80000000000(node=0|zone=1|lastcpupid=0xfff)
+> page_type: 0xffffefff(slab)
+> raw: 00fff80000000000 ffff888015041280 dead000000000100 dead000000000122
+> raw: ffff88802cd73020 000000008080007f 00000001ffffefff 0000000000000000
+> page dumped because: kasan: bad access detected
+> page_owner tracks the page as allocated
+> page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5103, tgid 2119833701 (syz-executor.4), ts 5103, free_ts 70804600828
+>   set_page_owner include/linux/page_owner.h:32 [inline]
+>   post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1490
+>   prep_new_page mm/page_alloc.c:1498 [inline]
+>   get_page_from_freelist+0x2e7e/0x2f40 mm/page_alloc.c:3454
+>   __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4712
+>   __alloc_pages_node_noprof include/linux/gfp.h:244 [inline]
+>   alloc_pages_node_noprof include/linux/gfp.h:271 [inline]
+>   alloc_slab_page+0x5f/0x120 mm/slub.c:2249
+>   allocate_slab+0x5a/0x2e0 mm/slub.c:2412
+>   new_slab mm/slub.c:2465 [inline]
+>   ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3615
+>   __slab_alloc+0x58/0xa0 mm/slub.c:3705
+>   __slab_alloc_node mm/slub.c:3758 [inline]
+>   slab_alloc_node mm/slub.c:3936 [inline]
+>   __do_kmalloc_node mm/slub.c:4068 [inline]
+>   kmalloc_node_track_caller_noprof+0x286/0x450 mm/slub.c:4089
+>   kstrdup+0x3a/0x80 mm/util.c:62
+>   device_rename+0xb5/0x1b0 drivers/base/core.c:4558
+>   dev_change_name+0x275/0x860 net/core/dev.c:1232
+>   do_setlink+0xa4b/0x41f0 net/core/rtnetlink.c:2864
+>   __rtnl_newlink net/core/rtnetlink.c:3680 [inline]
+>   rtnl_newlink+0x180b/0x20a0 net/core/rtnetlink.c:3727
+>   rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6594
+>   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+>   netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+>   netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+> page last free pid 5146 tgid 5146 stack trace:
+>   reset_page_owner include/linux/page_owner.h:25 [inline]
+>   free_pages_prepare mm/page_alloc.c:1110 [inline]
+>   free_unref_page+0xd3c/0xec0 mm/page_alloc.c:2617
+>   discard_slab mm/slub.c:2511 [inline]
+>   __put_partials+0xeb/0x130 mm/slub.c:2980
+>   put_cpu_partial+0x17c/0x250 mm/slub.c:3055
+>   __slab_free+0x2ea/0x3d0 mm/slub.c:4254
+>   qlink_free mm/kasan/quarantine.c:163 [inline]
+>   qlist_free_all+0x9e/0x140 mm/kasan/quarantine.c:179
+>   kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
+>   __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
+>   kasan_slab_alloc include/linux/kasan.h:201 [inline]
+>   slab_post_alloc_hook mm/slub.c:3888 [inline]
+>   slab_alloc_node mm/slub.c:3948 [inline]
+>   __do_kmalloc_node mm/slub.c:4068 [inline]
+>   __kmalloc_node_noprof+0x1d7/0x450 mm/slub.c:4076
+>   kmalloc_node_noprof include/linux/slab.h:681 [inline]
+>   kvmalloc_node_noprof+0x72/0x190 mm/util.c:634
+>   bucket_table_alloc lib/rhashtable.c:186 [inline]
+>   rhashtable_rehash_alloc+0x9e/0x290 lib/rhashtable.c:367
+>   rht_deferred_worker+0x4e1/0x2440 lib/rhashtable.c:427
+>   process_one_work kernel/workqueue.c:3218 [inline]
+>   process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
+>   worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
+>   kthread+0x2f0/0x390 kernel/kthread.c:388
+>   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+> 
+> Memory state around the buggy address:
+>  ffff88802cd73c80: 07 fc fc fc 05 fc fc fc 05 fc fc fc fa fc fc fc
+>  ffff88802cd73d00: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
+> >ffff88802cd73d80: fa fc fc fc 01 fc fc fc fa fc fc fc fa fc fc fc
+>                                ^
+>  ffff88802cd73e00: fa fc fc fc fa fc fc fc 05 fc fc fc 07 fc fc fc
+>  ffff88802cd73e80: 07 fc fc fc 07 fc fc fc 07 fc fc fc 07 fc fc fc
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
 
-The kernel could accept this attribute only in case of offload. This could be
-relaxed later if needed. With no check at all, nothing could be done later, once
-it's in the uapi.
+Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
 
-
-Regards,
-Nicolas
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/bridge/netfilter/ebtables.c | 6 ++++++
+>  net/ipv4/netfilter/arp_tables.c | 4 ++++
+>  net/ipv4/netfilter/ip_tables.c  | 4 ++++
+>  net/ipv6/netfilter/ip6_tables.c | 4 ++++
+>  4 files changed, 18 insertions(+)
+> 
+> diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+> index 99d82676f780ac49d01151fa9c585f44f9ea8ccc..cbd0e3586c3f61904efb4db7d9101d7770c852e7 100644
+> --- a/net/bridge/netfilter/ebtables.c
+> +++ b/net/bridge/netfilter/ebtables.c
+> @@ -1111,6 +1111,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
+>  	struct ebt_table_info *newinfo;
+>  	struct ebt_replace tmp;
+>  
+> +	if (len < sizeof(tmp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+>  		return -EFAULT;
+>  
+> @@ -1423,6 +1425,8 @@ static int update_counters(struct net *net, sockptr_t arg, unsigned int len)
+>  {
+>  	struct ebt_replace hlp;
+>  
+> +	if (len < sizeof(hlp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
+>  		return -EFAULT;
+>  
+> @@ -2352,6 +2356,8 @@ static int compat_update_counters(struct net *net, sockptr_t arg,
+>  {
+>  	struct compat_ebt_replace hlp;
+>  
+> +	if (len < sizeof(hlp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&hlp, arg, sizeof(hlp)))
+>  		return -EFAULT;
+>  
+> diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
+> index 2407066b0fec1121d71561ecbad6f4f87ecdebbc..b150c9929b12e86219a55c77da480e0c538b3449 100644
+> --- a/net/ipv4/netfilter/arp_tables.c
+> +++ b/net/ipv4/netfilter/arp_tables.c
+> @@ -956,6 +956,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
+>  	void *loc_cpu_entry;
+>  	struct arpt_entry *iter;
+>  
+> +	if (len < sizeof(tmp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+>  		return -EFAULT;
+>  
+> @@ -1254,6 +1256,8 @@ static int compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+>  	void *loc_cpu_entry;
+>  	struct arpt_entry *iter;
+>  
+> +	if (len < sizeof(tmp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+>  		return -EFAULT;
+>  
+> diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
+> index 7da1df4997d057a4292927c2041687c2b39d4a01..487670759578168c5ff53bce6642898fc41936b3 100644
+> --- a/net/ipv4/netfilter/ip_tables.c
+> +++ b/net/ipv4/netfilter/ip_tables.c
+> @@ -1108,6 +1108,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
+>  	void *loc_cpu_entry;
+>  	struct ipt_entry *iter;
+>  
+> +	if (len < sizeof(tmp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+>  		return -EFAULT;
+>  
+> @@ -1492,6 +1494,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+>  	void *loc_cpu_entry;
+>  	struct ipt_entry *iter;
+>  
+> +	if (len < sizeof(tmp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+>  		return -EFAULT;
+>  
+> diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
+> index fd9f049d6d41e77eacc10ce074a8a0d96b0d2e11..636b360311c5365fba2330f6ca2f7f1b6dd1363e 100644
+> --- a/net/ipv6/netfilter/ip6_tables.c
+> +++ b/net/ipv6/netfilter/ip6_tables.c
+> @@ -1125,6 +1125,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
+>  	void *loc_cpu_entry;
+>  	struct ip6t_entry *iter;
+>  
+> +	if (len < sizeof(tmp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+>  		return -EFAULT;
+>  
+> @@ -1501,6 +1503,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+>  	void *loc_cpu_entry;
+>  	struct ip6t_entry *iter;
+>  
+> +	if (len < sizeof(tmp))
+> +		return -EINVAL;
+>  	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
+>  		return -EFAULT;
+>  
+> -- 
+> 2.44.0.478.gd926399ef9-goog
+> 
 
