@@ -1,165 +1,182 @@
-Return-Path: <netdev+bounces-84806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8D5C898608
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:27:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5EB489861D
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 13:37:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D08928E6A0
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:27:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 441F9282E3F
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 11:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A689482862;
-	Thu,  4 Apr 2024 11:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EA6839F8;
+	Thu,  4 Apr 2024 11:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ICOuCdeB"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="eCOdlWUo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B0C811F8;
-	Thu,  4 Apr 2024 11:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B86F7F7C8
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 11:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712230074; cv=none; b=jI3d/ZBqMHIgPtwQIRf5LOXXvbuyaEfiLPdxf73HTWQZezwezIxhWytEuKmNyV1O0FmB+GU4g3qPeF8RH3fNY7lrQwWTcO30dLSZjM7JJS+xnjXvSq1/LPi23YR3PuZ5Opw+d6LBywJZR7w1JJM7x7ZtVBChYjS5nq6JLtkzXmo=
+	t=1712230651; cv=none; b=aQvgxpd9QvXaZEwV2s7LdCiVgiGUCQJOlOwirR3Jbxlaz5p48+kht2cypCMbnIQupkhxTTOCg/JelPUzA6Xz9E6lMDENtrdCeatQW23tKr7ANKDTBNP0Ae1UMev0M1DfUk895F0/ZfPpRU2qpsmemx9NSoKJVbTiwIH9B9q25sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712230074; c=relaxed/simple;
-	bh=+jHFERI1GgeMfz30niMt948PlLrx2icxJxsL8auktG8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BV3IsGfYWzqHGzD34mGc+kvJ2ci6DMKtV9B4mxxB40CNSVDQ+188mTYaJ9EFryk+ZgvcLuMvQMNIluXvRAKYLQeMLsH1any4X9/Mgfu9zL+T0bbFCxHq0gNCfUqBCuyxonAr1XWgqaH+DjU4K6M7Sd1qSnO+OaGcYQtQFtZ/GWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ICOuCdeB; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 434BRHRN020162;
-	Thu, 4 Apr 2024 11:27:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=+jHFERI1GgeMfz30niMt948PlLrx2icxJxsL8auktG8=;
- b=ICOuCdeBA3+pOJ63TTR9Y28V3XKbg28jrwY+Y5hKmZoouV9RbndFlxowdvhb6LfA2p69
- HKvLNJYGICAKCHbRn/3hPXzgrvb53ysZ7LdmoVw65qxayJ82ymHOS5DeLuD976pjpqY+
- CHeHl6uNUl0eD5bbgCw98erf1NryIsB0aDzbSJz+M5Fxw5yY0xF5rfGLTWH5gZE5aj8E
- qW/WbWpkQdl+x0e2gQ8/GBzTsDs3tTB2Aa4ne/Dn3Z01ptp8TV1m2yxtlcf3spO30DBC
- ZhvESYaqedCAwtQgtQRxYZuE5PeOhQrfosjgRYoXnHdyGBHHpGLJABIzI0yq3M8/INHx iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9ubc001q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Apr 2024 11:27:48 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 434BRlFY020378;
-	Thu, 4 Apr 2024 11:27:48 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9ubc001k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Apr 2024 11:27:47 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 434AFihO031075;
-	Thu, 4 Apr 2024 11:27:47 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x9epxkte2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Apr 2024 11:27:47 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 434BRfZj33358438
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 4 Apr 2024 11:27:43 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64BC320040;
-	Thu,  4 Apr 2024 11:27:41 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 43D6820043;
-	Thu,  4 Apr 2024 11:27:40 +0000 (GMT)
-Received: from [9.171.68.41] (unknown [9.171.68.41])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  4 Apr 2024 11:27:40 +0000 (GMT)
-Message-ID: <6d3cfa04c9826a24f0ad8d401940af3ad02a67bc.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH net-next v5 05/11] net/smc: implement DMB-related
- operations of loopback-ism
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Wen Gu <guwen@linux.alibaba.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-        wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Date: Thu, 04 Apr 2024 13:27:39 +0200
-In-Reply-To: <92b0c4b1-4844-4adf-a15a-a9323fb859e1@linux.alibaba.com>
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
-	 <20240324135522.108564-6-guwen@linux.alibaba.com>
-	 <9a17268d4046f99b30f3620079b5749a9ddc5cd9.camel@linux.ibm.com>
-	 <92b0c4b1-4844-4adf-a15a-a9323fb859e1@linux.alibaba.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=mQINBGHm3M8BEAC+MIQkfoPIAKdjjk84OSQ8erd2OICj98+GdhMQpIjHXn/RJdCZLa58k/ay5x0xIHkWzx1JJOm4Lki7WEzRbYDexQEJP0xUia0U+4Yg7PJL4Dg/W4Ho28dRBROoJjgJSLSHwc3/1pjpNlSaX/qg3ZM8+/EiSGc7uEPklLYu3gRGxcWV/944HdUyLcnjrZwCn2+gg9ncVJjsimS0ro/2wU2RPE4ju6NMBn5Go26sAj1owdYQQv9t0d71CmZS9Bh+2+cLjC7HvyTHKFxVGOznUL+j1a45VrVSXQ+nhTVjvgvXR84z10bOvLiwxJZ/00pwNi7uCdSYnZFLQ4S/JGMs4lhOiCGJhJ/9FR7JVw/1t1G9aUlqVp23AXwzbcoV2fxyE/CsVpHcyOWGDahGLcH7QeitN6cjltf9ymw2spBzpRnfFn80nVxgSYVG1dw75ksBAuQ/3e+oTQk4GAa2ShoNVsvR9GYn7rnsDN5pVILDhdPO3J2PGIXa5ipQnvwb3EHvPXyzakYtK50fBUPKk3XnkRwRYEbbPEB7YT+ccF/HioCryqDPWUivXF8qf6Jw5T1mhwukUV1i+QyJzJxGPh19/N2/GK7/yS5wrt0Lwxzevc5g+jX8RyjzywOZGHTVu9KIQiG8Pqx33UxZvykjaqTMjo7kaAdGEkrHZdVHqoPZwhCsgQARAQABtChOaWtsYXMgU2NobmVsbGUgPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+iQJXBBMBCABBAhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAhkBFiEEnbAAstJ1IDCl9y3cr+Q/FejCYJAFAmWVooIFCQWP+TMACgkQr+Q/FejCYJCmLg/+OgZD6wTjooE77/ZHmW6Egb5nUH6DU+2nMHMHUupkE3dKuLcuzI4aEf/6wGG2xF/LigMRrbb1iKRVk/VG/swyLh/OBOTh8cJnhdmURnj3jhaef
-	zslA1wTHcxeH4wMGJWVRAhOfDUpMMYV2J5XoroiA1+acSuppelmKAK5voVn9/fNtrVr6mgBXT5RUnmW60UUq5z6a1zTMOe8lofwHLVvyG9zMgv6Z9IQJc/oVnjR9PWYDUX4jqFL3yO6DDt5iIQCN8WKaodlNP61lFKAYujV8JY4Ln+IbMIV2h34cGpIJ7f76OYt2XR4RANbOd41+qvlYgpYSvIBDml/fT2vWEjmncm7zzpVyPtCZlijV3npsTVerGbh0Ts/xC6ERQrB+rkUqN/fx+dGnTT9I7FLUQFBhK2pIuD+U1K+A+EgwUiTyiGtyRMqz12RdWzerRmWFo5Mmi8N1jhZRTs0yAUn3MSCdRHP1Nu3SMk/0oE+pVeni3ysdJ69SlkCAZoaf1TMRdSlF71oT/fNgSnd90wkCHUK9pUJGRTUxgV9NjafZy7sx1Gz11s4QzJE6JBelClBUiF6QD4a+MzFh9TkUcpG0cPNsFfEGyxtGzuoeE86sL1tk3yO6ThJSLZyqFFLrZBIJvYK2UiD+6E7VWRW9y1OmPyyFBPBosOvmrkLlDtAtyfYInO0KU5pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQGlibS5jb20+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJB7oxAAksHYU+myhSZD0YSuYZl3oLDUEFP3fm9m6N9zgtiOg/GGI0jHc+Tt8qiQaLEtVeP/waWKgQnje/emHJOEDZTb0AdeXZk+T5/ydrKRLmYC6rPge3ue1yQUCiA+T72O3WfjZILI2yOstNwd1f0epQ32YaAvM+QbKDloJSmKhGWZlvdVUDXWkS6/maUtUwZpddFY8InXBxsYCbJsqiKF3kPVD515/6keIZmZh1cTIFQ+Kc+UZaz0MxkhiCyWC4
-	cH6HZGKRfiXLhPlmmAyW9FiZK9pwDocTLemfgMR6QXOiB0uisdoFnjhXNfp6OHSy7w7LTIHzCsJoHk+vsyvSp+fxkjCXgFzGRQaJkoX33QZwQj1mxeWl594QUfR4DIZ2KERRNI0OMYjJVEtB5jQjnD/04qcTrSCpJ5ZPtiQ6Umsb1c9tBRIJnL7gIslo/OXBe/4q5yBCtCZOoD6d683XaMPGhi/F6+fnGvzsi6a9qDBgVvtarI8ybayhXDuS6/StR8qZKCyzZ/1CUofxGVIdgkseDhts0dZ4AYwRVCUFQULeRtyoT4dKfEot7hPE/4wjm9qZf2mDPRvJOqss6jObTNuw1YzGlpe9OvDYtGeEfHgcZqEmHbiMirwfGLaTG2xKDx4g2jd2zOcf83TCERFKJEhvZxB3tRiUQTd3dZ1TIaisv/o+y0K05pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQGdtYWlsLmNvbT6JAlQEEwEIAD4CGwEFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQSdsACy0nUgMKX3Ldyv5D8V6MJgkAUCZZWiiwUJBY/5MwAKCRCv5D8V6MJgkNVuEACo12niyoKhnXLQFtNaqxNZ+8p/MGA7g2XcVJ1bYMPoZ2Wh8zwX0sKX/dLlXVHIAeqelL5hIv6GoTykNqQGUN2Kqf0h/z7b85o3tHiqMAQV0dAB0y6qdIwdiB69SjpPNK5KKS1+AodLzosdIVKb+LiOyqUFKhLnablni1hiKlqYyDeD4k5hePeQdpFixf1YZclGZLFbKlF/A/0Q13USOHuAMYoA/iSgJQDMSUWkuC0mNxdhfVt/gVJnuKq+uKUghcHflhK+yodqezlxmmRxg6HrPVqRG4pZ6YNYO7YXuEWy9JiEH7MmFYcjNdgjn+kxx4IoYUO0MJ+DjLpVCV1QP1ZvMy8qQxScyEn7pMpQ0aW6zfJBsvoV3EHCR1emwKYO6rJOfvt
-	u1rElGCTe3snsScV9Z1oXlvo8pVNH5a2SlnsuEBQe0RXNXNJ4RAls8VraGdNSHi4MxcsYEgAVHVaAdTLfJcXZNCIUcZejkOE+U2talW2n5sMvx+yURAEVsT/50whYcvomt0y81ImvCgUz4xN1axZ3PCjkgyhNiqLe+vzgexq7B2Kx2++hxIBDCKLUTn8JUAtQ1iGBZL9RuDrBy2rR7xbHcU2424iSbP0zmnpav5KUg4F1JVYG12vDCi5tq5lORCL28rjOQqE0aLHU1M1D2v51kjkmNuc2pgLDFzpvgLQhTmlrbGFzIFNjaG5lbGxlIDxuaWtzQGtlcm5lbC5vcmc+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJAglRAAihbDxiGLOWhJed5cFkOwdTZz6MyYgazbr+2sFrfAhX3hxPFoG4ogY/BzsjkN0cevWpSigb2I8Y1sQD7BFWJ2OjpEpVQd0Dsk5VbJBXEWIVDBQ4VMoACLUKgfrb0xiwMRg9C2h6KlwrPBlfgctfvrWWLBq7+oqx73CgxqTcGpfFytD87R4ovR9W1doZbh7pjsH5Ae9xX5PnQFHruib3y35zC8+tvSgvYWv3Eg/8H4QWlrjLHHy2AfZDVl9F5t5RfGL8NRsiTdVg9VFYg/GDdck9WPEgdO3L/qoq3Iuk0SZccGl+Nj8vtWYPKNlu2UvgYEbB8clUoWhg+SjjYQka7/p6tc+CCPZ8JUpkgkAdt7yXt6370wP1gct2VztS6SEGcmAE1qxtGhi5Kuln4ZJ/UO2yxhPHgoW99OuZw3IRHe0+mNR67JbIpSuFWDFNjZ0nckQcU1taSEUi0euWs7i4MEkm0NsOsVhbs4D2vMiC6kO/FqWOPmWZeAjyJw/KRUG4PaJAr5zJUx57nhKWgeTniW712n4DwC
-	Uh77D/PHY0nqBTG/B+QQCR/FYGpTFkO4DRVfapT8njDrsWyVpP9o64VNZP42S+DuRGWfUKCMAXsM/wPzRiDEVfnZMcUR9vwLSHeoV7MiIFC0xIrp5ES9R00t4UFgqtGc36DV71qjR+66Im24OARh5t9QEgorBgEEAZdVAQUBAQdAwhTH11wigg1BVNqmlPAcneh8CthXnZZf70RNLR9fWloDAQgHiQI2BBgBCAAgFiEEnbAAstJ1IDCl9y3cr+Q/FejCYJAFAmHm31ACGwwACgkQr+Q/FejCYJAztg//fshsI9L9eCmLKUdZIc0XuFJcek0B9ydLp9jPIGUjBDLmkqxZ6NT1GWx9Ab3xTVg2Zs6IuP70UhvRqRV8g2XQdkHia5NMnTqfJEZWncjBr9pjfbZJRjvm7T2IVYiVnAqPf/LEoVgztgG8RvtQ/lPRwnE+zPJ3bEBcnl+W5fguRxHo/Mom3XGlQCif3oF3uydWAKRef4b3h8nZmn2EBzj6J7juwek9x7SkxKe8+Vavr5HTwEHOBTMrsUH7DCp27zJ8MU1XRpBAjkn2YEujRx2z2cPeNloFX6z5F7T4f+Ao2xxcXUEXeEBz8XL94DstXGI1IULTC2ui99B4NL0JfiCAWOf3mrosppdjzgM0X6g4pO8gVR1C09+rr/fbp6L8FflQu01kV1TZkAgSAUe58HlbP10I9Ush6nE7Z9Q5DR/T56DXh1o8sW4dBMu6AWan7mFRPwVQqL9zN5m8n87uNb/jiedvhBeb22TihHvbheEWB3WtfaQjdykETR80bm5T+ACcrwBpPvXkOFKovWJVEvvsUXynfFQYoFj5chNtH60zhvg/eHI9ZCweQgwvCqAJxESTZSEMbtxkklSl9OfnoBzPFFia1JwqazmUl0N5WzaLPW1P9KjDSt5YxMu0jdh2MAPaHdxFO/G8d0VS13FjIy/2QAni8Zf2CRlj1q4q5MJ0vXq4MwRh5t9wFgkrBgEEA
-	dpHDwEBB0CdY+CSLBT98n1BaxlG+VeVzL3fQUYZDqybI14E6IH+JokCrQQYAQgAIBYhBJ2wALLSdSAwpfct3K/kPxXowmCQBQJh5t9wAhsCAIEJEK/kPxXowmCQdiAEGRYIAB0WIQSiikNOrnCUNbxSj4j7H22hwInkVgUCYebfcAAKCRD7H22hwInkVtg4AP0cl7yQX1JjOa92zkytZc7rwsjmSzvYExyRV0ilozmUNwEAifrmLVNjn+fST7LqkjWpSdFN3waHM9rw1d88SE0z1QqgCQ//YJOcAVYrR5KruzYjfh/FHiimFfvoOcanPS22uRhteBEALvV7LeCPjU5zi8/TKd8KZ9FmvYCaUf4IWzKIe51szZgnWPXdxF7Eyz5gVdM7ZaS35Dk9CCH3gtVU7iUorN95+pJ5elwUn6DAMdgFWswCBWuOm9zwq6Dj4KHTE4b4iWDenTNECqT+qwiS1bAHNbljXtoM68Uo1s3WDZPYcjqPlsoSjkpa7kz1z0NygE0zT3vHq8r7aFs+kq2sPVveTGhKhqZ82l7rSZpxssutpEdhChKbshD/44VaRLyXGhtQaOpWpFPdELAsJIB9BG39GrgP9K8TXG/5dXDzmC2Ku0ftyLa4ronM1LXG515bxQUPKFxaBYQonpdDWQVBu9bzQDmT8itP44hJWGDurDaPrYh5GYuetzIj8zgDxnh/wfwCpIepUxdZCV2NGYQiMjxuXEf/u7a2164U45rSsOCeKAG97f1GeQME3RsHV+d8lDOdjU+AfiWXqIhP32DVa5xElE3xQAd7+mUoAjYhP9OdM9e8j/UO6e4TmBMLYIMJh+joXan5eePJDYdY/NuRTqPjlZnOlA6JzbWOstXk/3GwFVOAO6YxNJl0m+EzGSOAYmIA3HuohrwPcVGi4CSbZF829CAMQQl0cXGjfI65pZFM8xcaB+lMgykEHrZ2uf6Y+Kkgdo24MwRh5t+CFgkrBgEEAdpHDwEBB0
-	AF23/zeAYKTtphGMg29j9mNBKDoRQS9I3Zih5SNpJ3YokCNgQYAQgAIBYhBJ2wALLSdSAwpfct3K/kPxXowmCQBQJh5t+CAhsgAAoJEK/kPxXowmCQV4UP/3KpWKD6EUIO8DGnohGUpZkD0qHSWVXMu6RuCukZeAMDaWdVkMW6SSFswUT1xGoGc10hxPFiR1Sv448S1DgIz1sRgZKDcvFFlPhJH8PAJArv2gaaBBhUj3IN8XH58BJ/q9we8n/lJLDCs++0QeQJEoOG0O5IiP8wGHLPSWa9jXiej5SBMbTx+wQmQZc6NQdv7O9gB3j86IRv3Ly2tHuOQ3WEAUQZvy1dzQj+5WHVOU9F99P6OfkzU8QW0izPyB3uVfxJkNB+K78+Klj1L1HONCfBVGz8vly3U4bXtWm0JuIBty7x9a0TPrSGpghs+rPRw8miHgkEB6pWiJzDek6jQLPMyEtUDs7/vgQEPBlDwVHxPvLtqzyjn0v+9T9DEFQo3i2zWfpE9AI7CTf3qJeqHFATtVzNQnA8j2X94R8R3r9oxzSW/z17zuDV2XjmZTUJlOuw8e99FOop2CFUn49OcfA7qm8o2vaatPy4aYahsaptmTuMZ6InwZp/LI1GX7egQyExtte7y/X0HAbME5Wa6UpYgxt689xWFlh+VAOadZ6c7UDDu8KZis+3z6PAXYOJK5naEHpYbLdyBZEvtXWVoYVCA69h1X6289XUAjbm1h7OS6qz9m7+8kjpoakIFUt75M2KKCJ9a6yaOGjiLj5r1vQzNgV16lOPsb1Ywf8p2/ac
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1712230651; c=relaxed/simple;
+	bh=DAlReTr7FMZy3ybYtHJ3qg5jeZHN2W6oGUcghBVEMgQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g1cCA3bthrGUJ9DFQ4AlWvUKAVGunkcfyHcBRbHRolsiX2rlFbjHo+iVL4GMy8Uc5PrKR+/NwoH1dLjvglf/rHIXgbpCKvE0MecVE719ZjIIhwh0ZMHtaNx+V5iAE4qdEK0pCRCeh5D3SXM8KXg9g8Enjo6ckXXZBYWEv775fvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=eCOdlWUo; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a45f257b81fso120185366b.0
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 04:37:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712230648; x=1712835448; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VO78M6WJ/EUoT8fizWFXUB5hyrVQ/HkiQuOMAjpL0QA=;
+        b=eCOdlWUoy10DOFnS1LZrYeumky0sgH3LNAi9HV3vSH1ztOHp2ijDR984xtqc8X/USY
+         2rJIZOvZnfFAaG3RTLv2oGVCjgzHBsuI5w1+vVZL4SWtdibW0ODAU3Wq1E7izryEUnaN
+         K82khJwR0Xy5XmG0fhWZZuVAKQHR71qD5z+BH/DuG8hZI2sx/OEM3vo2+YrcBpc3aMoy
+         UjgsnhO/CTuoARIsBY8JMZQoW0bCz8D8LugK1TqD+l50Oi8WPcusfedPAioWn4SG9yGM
+         oluEFimXoQ1e2ivy6++MasQxZfB3uJdn3DZiGDS+TQgoy1dDFsj38M6xun2/Stmv+b7v
+         BsNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712230648; x=1712835448;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VO78M6WJ/EUoT8fizWFXUB5hyrVQ/HkiQuOMAjpL0QA=;
+        b=Nc53V2oVDMZZvR4JVtDwmQVs9vGWmF6pNsdGPA51XPkF7UnXL9FiVhpF6vuLPheD++
+         9Q2bZizTSFfYz+Gu0WbNgSmeZR3a4opJLlcN+CCWgnIRsYCyDH/ubFbxmGFxHzimvovU
+         OtOsRUkbDnQ/pPQg4KO00R+ekP7i7QaaCZXijYuOIv6J6HfafKaqk5foO486jrJU9+Oc
+         7ke6TUC3qfv/4vKmGQuI/aFyLRCiYIVovpammMWWXOAC3qSgus8CyaeAA2b8Uwmtqluf
+         0w5y/1g1IzbxkUVarduRETmpvy7kO/SckOL3ppEs+Pf1/3pdvywbtG2Q5cQ3pRNxB4U0
+         srMw==
+X-Gm-Message-State: AOJu0YwKj/m5SwTf1xEY529zYnTWz6PQ8zQ7uOMFIyeDXDzgDn+nnu6o
+	MpKq284AEm6ifVE0sme0Ha6NfsNiMg0mY4rHiZbaJLPRJLEN0ipOWYrwL2EfNxY=
+X-Google-Smtp-Source: AGHT+IHFHCHr2Q489DOL+d0gABB3LAj+ru+7apqX40Da8X9E+f+oK93EZhhaa5LxrlyPNiBsG0a/GQ==
+X-Received: by 2002:a17:906:c313:b0:a4e:37ac:79c8 with SMTP id s19-20020a170906c31300b00a4e37ac79c8mr1489073ejz.5.1712230647502;
+        Thu, 04 Apr 2024 04:37:27 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ak1-20020a170906888100b00a465a012cf1sm9079533ejc.18.2024.04.04.04.37.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 04:37:26 -0700 (PDT)
+Date: Thu, 4 Apr 2024 13:37:21 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <Zg6Q8Re0TlkDkrkr@nanopsycho>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HBK0XHW2Ctxv8spf25CfC94aOb_koXIS
-X-Proofpoint-ORIG-GUID: xm5chBUglIVTce67M6M5GZ9NDfDZy0pl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-04_07,2024-04-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- priorityscore=1501 impostorscore=0 phishscore=0 clxscore=1015 mlxscore=0
- suspectscore=0 adultscore=0 bulkscore=0 lowpriorityscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404040078
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
 
-On Thu, 2024-04-04 at 18:20 +0800, Wen Gu wrote:
->=20
-> On 2024/4/4 01:20, Gerd Bayer wrote:
-> > On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
-> >=20
-> > When I instrumented this to see, why I still see tons of my other
-> > temporary instrumentation messages from the "ism" driver, I found that
-> > in my setup loopback-ism is used rather infrequently.
-> >=20
-> > I suspect this is due to how the SMC proposals are constructed in
-> > net/smc/af_smc.c and net/smc/smc_pnet.c - and later evaluated in
-> > smc_check_ism_v2_match() - where there is a first-come-first-serve
-> > selection.
-> >=20
-> > I wonder if one should change that to favour loopback-ism over "real"
-> > ISM devices - and how this could be achieved elegantly.
-> >=20
-> > Just some food for thought... Probably little you can do on x86.
-> >=20
->=20
-> Yes, it is about the priority of available ISM devices, and now it
-> is decided by their order in the smcd_dev_list. The later registered
-> ISMv2 devices(without pnetid) will be added to the beginning of the
-> list (see smcd_register_dev()). So there is a probability that
-> loopback-ism will not be ranked first, since it is added into list
-> earlier during smc_init().
->=20
-> If we have the runtime switch of loopback-ism, we can re-active the
-> loopback-ism, that make it be re-added into the beginning of the dev
-> list and be chosen first. Or a new netlink command to adjust the slot
-> order of available ISM devices in the list. As we discussed before,
-> that could be tasks in stage 1 or stage 2.
->=20
-> Thanks!
+Wed, Apr 03, 2024 at 10:08:24PM CEST, alexander.duyck@gmail.com wrote:
+>This patch set includes the necessary patches to enable basic Tx and Rx
+>over the Meta Platforms Host Network Interface. To do this we introduce a
+>new driver and driver and directories in the form of
+>"drivers/net/ethernet/meta/fbnic".
+>
+>Due to submission limits the general plan to submit a minimal driver for
+>now almost equivalent to a UEFI driver in functionality, and then follow up
+>over the coming weeks enabling additional offloads and more features for
+>the device.
+>
+>The general plan is to look at adding support for ethtool, statistics, and
+>start work on offloads in the next set of patches.
 
-Maybe when adding the ISM devices we could instead make sure that all
-ISM devices are added after loopback and loopback is added in the
-beginning. I think loopback should always be preferred and would
-consider it a bug if it isn't faster too. Between virtio-ism and ISM it
-may be less clear so maybe for stage 2 we would want a priority setting
-and then insert ordered by priority. Thoughts?
+Could you please shed some light for the motivation to introduce this
+driver in the community kernel? Is this device something people can
+obtain in a shop, or is it rather something to be seen in Meta
+datacenter only? If the second is the case, why exactly would we need
+this driver?
+
+
+
+>
+>---
+>
+>Alexander Duyck (15):
+>      PCI: Add Meta Platforms vendor ID
+>      eth: fbnic: add scaffolding for Meta's NIC driver
+>      eth: fbnic: Allocate core device specific structures and devlink interface
+>      eth: fbnic: Add register init to set PCIe/Ethernet device config
+>      eth: fbnic: add message parsing for FW messages
+>      eth: fbnic: add FW communication mechanism
+>      eth: fbnic: allocate a netdevice and napi vectors with queues
+>      eth: fbnic: implement Tx queue alloc/start/stop/free
+>      eth: fbnic: implement Rx queue alloc/start/stop/free
+>      eth: fbnic: Add initial messaging to notify FW of our presence
+>      eth: fbnic: Enable Ethernet link setup
+>      eth: fbnic: add basic Tx handling
+>      eth: fbnic: add basic Rx handling
+>      eth: fbnic: add L2 address programming
+>      eth: fbnic: write the TCAM tables used for RSS control and Rx to host
+>
+>
+> MAINTAINERS                                   |    7 +
+> drivers/net/ethernet/Kconfig                  |    1 +
+> drivers/net/ethernet/Makefile                 |    1 +
+> drivers/net/ethernet/meta/Kconfig             |   29 +
+> drivers/net/ethernet/meta/Makefile            |    6 +
+> drivers/net/ethernet/meta/fbnic/Makefile      |   18 +
+> drivers/net/ethernet/meta/fbnic/fbnic.h       |  148 ++
+> drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  912 ++++++++
+> .../net/ethernet/meta/fbnic/fbnic_devlink.c   |   86 +
+> .../net/ethernet/meta/fbnic/fbnic_drvinfo.h   |    5 +
+> drivers/net/ethernet/meta/fbnic/fbnic_fw.c    |  823 ++++++++
+> drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  133 ++
+> drivers/net/ethernet/meta/fbnic/fbnic_irq.c   |  251 +++
+> drivers/net/ethernet/meta/fbnic/fbnic_mac.c   | 1025 +++++++++
+> drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |   83 +
+> .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  470 +++++
+> .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   59 +
+> drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |  633 ++++++
+> drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |  709 +++++++
+> drivers/net/ethernet/meta/fbnic/fbnic_rpc.h   |  189 ++
+> drivers/net/ethernet/meta/fbnic/fbnic_tlv.c   |  529 +++++
+> drivers/net/ethernet/meta/fbnic/fbnic_tlv.h   |  175 ++
+> drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 1873 +++++++++++++++++
+> drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  125 ++
+> include/linux/pci_ids.h                       |    2 +
+> 25 files changed, 8292 insertions(+)
+> create mode 100644 drivers/net/ethernet/meta/Kconfig
+> create mode 100644 drivers/net/ethernet/meta/Makefile
+> create mode 100644 drivers/net/ethernet/meta/fbnic/Makefile
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic.h
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_drvinfo.h
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_mac.h
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_tlv.h
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+> create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+>
+>--
+>
+>
 
