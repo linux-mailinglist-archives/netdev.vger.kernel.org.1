@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-84692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D074B897DDE
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA2A897DDD
 	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 04:50:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 876791F24AE4
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 02:50:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C746A1F24EB6
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 02:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71D31CD2D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D20B31CD29;
 	Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="babYapBx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="limjUGjT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92EB1CABD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92BA1CAA8;
 	Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712199043; cv=none; b=pdoFUBb1pnrgxBgALe+ge9Kiwk64xpXXAhBaCv+4VKjk12gwDLoVM7HPC3mX3qYy4uztPieBsxhIXoOLCGij/ekLjdoj2cqjqVnGJ5sZsuRngrPfugUQVWCHG1dyFLpsPyNOGB0EPPuH8szManPCNPbAX+sdlMnasFk+Q49/uI0=
+	t=1712199043; cv=none; b=iLcw4ZwrVgfklCinPDmhtiqo4FdSE/3N0y8czww6LWyx7EjYqSLK5iK4XfSyqy6+TAt6UxwF72RkvXSFFftu7V11w7pdaW4YefDNZSl7YMJcPNGRrNwP7NDAVRsVmLbSymMu0lJfY9hXRbWUwUPw7adClFsyIA3CfT3QzHGe+t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712199043; c=relaxed/simple;
-	bh=Z0NqPyA1Ag7ywDCAREb3aLXtL9z+FPZPJKBvHQO0qu4=;
+	bh=fLLhdICbSbYMyMYPr4eJBTupZKW9tjY+NKcxxmVVcis=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dwPWzU7ZssKI7S63B28N167hpvm0xQmdKKZ+9oN1xzUqwyygnmEMEM+jm2UPXYaZdaEX5d5aMXdOi+qh/elKdVSBVZss0KfFuOpAWdHfUuLqK0YgFNNPKXuo2/zBXsdS43IDNp5zGoOUh6Bbo3mvJcLTvSxIMwkuDdfsjXn2qBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=babYapBx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A4CFC43399;
+	 In-Reply-To:To:Cc; b=ldljzk2iyLdipGxGBfa33/erAdzF1l5oYzQvIdJcaaxivF7bTHTS/HV5jAmXYo1JOiovioRt8JXt3bvNESvJWwMWOmFgpCULfKkdFqKe7X5JQ8aq8JvAm7rH2tc2oErqDXNAtrkOXR+fmIHnvktT/AjBlZeZIpafL0kiDZR6mbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=limjUGjT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 43B42C43394;
 	Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712199043;
-	bh=Z0NqPyA1Ag7ywDCAREb3aLXtL9z+FPZPJKBvHQO0qu4=;
+	bh=fLLhdICbSbYMyMYPr4eJBTupZKW9tjY+NKcxxmVVcis=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=babYapBxC3JxNFI8z01+x6T2wNnl/TdGYD+Sjp7dxvjVzz5WJTPhZScrrb35OMtaf
-	 Bc49gAlrOdrms5bjXdHn6puun1kncoLIWUHIyzouZ1mm8arI780jlur1uoZAz3uuQG
-	 dD6IUiTYJrldynPR/IaH1xD+YC9vku7XqoOTmPjJVnSGxXbvS6aHqBDhkbeScg9SNL
-	 v1nx9FS10qWDq/wFwOMzyyl+ynkUUM8QI25cUCFTmIHAxk3dmsutJTI8sWaEKTUEoy
-	 iaV6BFEtf5lFaTA0M+FhCeyhRtGbEqz0CP3MXqjMCJwG6ZbskzEYt6ezPMPOQELKQz
-	 I4vPi06ntdHzQ==
+	b=limjUGjTRjNokn4OBBNQscQdSbKHr9GhFLPRk9rU8WDKLslldthVK0OnggBe/pI50
+	 VZZup/2jyf6ekuN4xVnuWkZNB+vDKNSHs25KqTDghR5C/VSTM81Aam6FsODGVZ8DdD
+	 aOWfUE/dBaNF7JP9D98sKPG1VUyTpx43i9K4oeHrGAMLp5eTo+ngNmbLszF3QQudh2
+	 7LzJ99Y2n9wp9ORPEuHQ1WDSjFq7a3aOcJJ42kZz5GQTCHXyksBqBnW00DcP6XuD5w
+	 PA3b60vxO8rZGNrQ57d8dhRIGNdQS8trGE6HVo8GBqWWx0X+Hr1GEUjNr+XKq6NPuH
+	 jD4FAWa+xZ4ug==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34EA8D84BB4;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2C894D8BD16;
 	Thu,  4 Apr 2024 02:50:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: fman: Remove some unused fields in some
- structure
+Subject: Re: pull-request: wireless-next-2024-04-03
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171219904321.5496.4241068677460405258.git-patchwork-notify@kernel.org>
+ <171219904317.5496.10294522118952771698.git-patchwork-notify@kernel.org>
 Date: Thu, 04 Apr 2024 02:50:43 +0000
-References: <425222d4f6c584e8316ccb7b2ef415a85c96e455.1712084103.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <425222d4f6c584e8316ccb7b2ef415a85c96e455.1712084103.git.christophe.jaillet@wanadoo.fr>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: madalin.bucur@nxp.com, sean.anderson@seco.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- netdev@vger.kernel.org
+References: <20240403093625.CF515C433C7@smtp.kernel.org>
+In-Reply-To: <20240403093625.CF515C433C7@smtp.kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  2 Apr 2024 20:55:50 +0200 you wrote:
-> In "struct muram_info", the 'size' field is unused.
-> In "struct memac_cfg", the 'fixed_link' field is unused.
+On Wed,  3 Apr 2024 09:36:24 +0000 (UTC) you wrote:
+> Hi,
 > 
-> Remove them.
+> here's a pull request to net-next tree, more info below. Please let me know if
+> there are any problems.
 > 
-> Found with cppcheck, unusedStructMember.
+> Kalle
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: fman: Remove some unused fields in some structure
-    https://git.kernel.org/netdev/net-next/c/04af1d643701
+  - pull-request: wireless-next-2024-04-03
+    https://git.kernel.org/netdev/net-next/c/8c73e8b59593
 
 You are awesome, thank you!
 -- 
