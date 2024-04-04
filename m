@@ -1,213 +1,122 @@
-Return-Path: <netdev+bounces-84730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-84733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F478898344
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:38:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 654D389834B
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 10:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64474B24A1E
-	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 08:38:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E42828CA5C
+	for <lists+netdev@lfdr.de>; Thu,  4 Apr 2024 08:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A8871B45;
-	Thu,  4 Apr 2024 08:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5B67173C;
+	Thu,  4 Apr 2024 08:39:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XO8Cun9r"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="XKJf7Zne"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE3D71B24
-	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 08:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CDA2134A
+	for <netdev@vger.kernel.org>; Thu,  4 Apr 2024 08:39:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712219904; cv=none; b=AY/N249E0arpdsfQ7SukMl+s41Pt/xgH9J893JmdqNhMKCJX1M4+Zd5l5IueSPX8mZWNwVP/uR6Fhb0iiTTHUF1nFlqbXCzH56CihdCqC0V7iiDNp8LPilg1f26pUzDkIZtLfjLL0S5IIpotE1mhuO/kKcyACjg++lJ98HXmmbc=
+	t=1712219966; cv=none; b=EZwBrt4V8PUbA8OCkwTLMaPl0ReX0i1c3lk1PRxL/moMArGXYyj+d9qcI/YA+QT2etJ23u/5egnN6yO3kB+qM1FnHsGedjrSXEf1v8h85qsC0q//1QTB2p8dToRvqkLzITW5v0PKdeBLgr6xXFH76Yq2xMx/BXJykB8BAD5fC68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712219904; c=relaxed/simple;
-	bh=qkPoIifBuSH5VuY0M6o1wfPpbRTpbHQCbQZ8R/5rDMM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SsuW5nCZ7MqOFCii7zSnv0qrODkGq/58PUCFxfDxZRPtK3fqjMaVESHA13QqrN+M770arpzZVf1R4BW/cLbjU0RQwAGF5km/LI03BKvQmXUQM0dgID1vKrwaGciMMOgmwtcC/n3dzlM9wP9+Iv9K46wbBk0d13Ba8c8qsVSD774=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XO8Cun9r; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712219901;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=RUWAt6tTr1BoO0DACrinTOy1v3V69UJ6vNkPfIqNt3c=;
-	b=XO8Cun9rXd7mJ8nIZdBTd3jccq/9QQpTYLViNulfIyHlq9R5c3pJQQLvGc6EeiqSKHScNM
-	INPOqVyy2n9rUJJ+/HRtgS30Oap5kQBQN2MOyMASHrfpANjb7gv51H3w/JuZkPvK0kB1iw
-	nT71NOH5F6SDjUt4eyifmUVuKMTtpWw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-568-LZ70iHZPOJOvtns32caFSQ-1; Thu, 04 Apr 2024 04:38:15 -0400
-X-MC-Unique: LZ70iHZPOJOvtns32caFSQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3436fab808aso181894f8f.0
-        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 01:38:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712219894; x=1712824694;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RUWAt6tTr1BoO0DACrinTOy1v3V69UJ6vNkPfIqNt3c=;
-        b=WOoX5wcncfrV+rJ8CmMQ/fXForPy5n1Zj4o4Hg5lExozukdabeW1WmTRYYRgZDDxwI
-         z6UBkV4JKFVuE5jOaW81+yu7rZVMWTOfO19HYLaA5eMLTrn0eTlXIsa2o1ZRGapIa4hR
-         f7BH81+VvMZggp6K2j1+1mNT2OdfyJSWXB7KCVIurkjYffG/01ppNPCBB2wbqzPJ/csX
-         ZR3/gleCECqYP5DJsqmNUFD/J0SQlJPGBKrGG9ufpAqYFdnqODtlcgpGHB7QFr9KdCcg
-         HXIIr22RFAb0vimezaRIMVvyY1KN5HM/WfG1W2QyMfCCnT7y5eXnG1+kdZ1uKq21++Nw
-         9cyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVIozAUHRQOM1ilsm8OWSc2WW2nNz2LF03hjKDJ6FoF5h5gFsUt2GkvdmSRKOibDROwATMzn2Lq8iLqfta5CIlsoNpL8gYP
-X-Gm-Message-State: AOJu0YwQqn0ngOr0CxWJ33eKMGV5+kk5eDw5I5BxjSlLqehfzvdUJNdr
-	NP5RPFYg3AqsBaHGOc+XKueSC37FmXx2U7ypgYkePVtLzBaf6HtgvWLvEP4vtaKmCEE9iHWNvx0
-	oma5XGZtvoypTW0TpZ4vhsQhYfayIob1NC06w1kjSeIkcNsUOJfq1dg==
-X-Received: by 2002:a05:600c:1d98:b0:416:2abe:b709 with SMTP id p24-20020a05600c1d9800b004162abeb709mr801890wms.0.1712219894559;
-        Thu, 04 Apr 2024 01:38:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEzyWr3P15XNPlIJ6iMRbAdROByyF217WrcowuLk97p8X/JElmL3JtVQh8mCb3OHNYQhyBtVw==
-X-Received: by 2002:a05:600c:1d98:b0:416:2abe:b709 with SMTP id p24-20020a05600c1d9800b004162abeb709mr801859wms.0.1712219894178;
-        Thu, 04 Apr 2024 01:38:14 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-247-213.dyn.eolo.it. [146.241.247.213])
-        by smtp.gmail.com with ESMTPSA id ck17-20020a5d5e91000000b003438e98e727sm4416451wrb.84.2024.04.04.01.38.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 01:38:13 -0700 (PDT)
-Message-ID: <168c9226d2cac6a5a53ce33ef1f76b99a02bedcb.camel@redhat.com>
-Subject: Re: [PATCH v4] net: hsr: Provide RedBox support (HSR-SAN)
-From: Paolo Abeni <pabeni@redhat.com>
-To: Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,  Oleksij Rempel
- <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>,
- Simon Horman <horms@kernel.org>, Nikita Zhandarovich
- <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Jiri
- Pirko <jiri@resnulli.us>, Dan Carpenter <dan.carpenter@linaro.org>,  Ziyang
- Xuan <william.xuanziyang@huawei.com>, Shigeru Yoshida
- <syoshida@redhat.com>,  linux-kernel@vger.kernel.org
-Date: Thu, 04 Apr 2024 10:38:11 +0200
-In-Reply-To: <20240402085850.229058-1-lukma@denx.de>
-References: <20240402085850.229058-1-lukma@denx.de>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1712219966; c=relaxed/simple;
+	bh=eBAGlAEVzpzY7amkDpDIgHmnCq3jCeCyf1r4pBB8jVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lpqH/XzGmGCVpsahXPELTGUEtoyybjYthq3RSreSa9g1aTcZeuAotEfyJbcXk3e3uZdRAwFCivP/q9jNuO8c41SFgvOEZSDXJIc26Iwg5nkQTvuYZwwioFGXiOgSSCokZS4RW5jCjEcY7yEKd5b71L5cqXy5eYVvu5YbUW9Tnjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=XKJf7Zne; arc=none smtp.client-ip=195.121.94.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: 9af774a5-f25e-11ee-bfb8-005056ab378f
+Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 9af774a5-f25e-11ee-bfb8-005056ab378f;
+	Thu, 04 Apr 2024 10:37:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=QyhD3Ey3fKxNGb4VIQMdLEjwBMVcXNVjSMgIrdov7E0=;
+	b=XKJf7ZneDCP+tebRbu7BgCynCtdwgTHHkLQc8n7j9XRIjvyB0gJkuEFVkdKt+jHbkIQht0eTC4Ie8
+	 FUP9mshvfDKl2SYABft1V/eBJsAhBjwiVcXHh5TxKerMUMGTS4F5MHhIsJ1zvmQs7/9O2PQxYCzYgz
+	 49ybSvNqNZfcahIY=
+X-KPN-MID: 33|po0lT09CshO4sNngrtvMQrgob9mnqIygAMHJ00rx7njLc/E2tGgCU19T7kWelth
+ Q8ou4JLW76OgsBzkXnD6GA/6DkB7SoM1NEL51FW2F2oc=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|qr9i59af5+jb78J9oYVq75vrjzWvFkMPXpX+qq5lRNHalX88J7WskjJ7gcoW3Yt
+ QUt8IlEz8X1vnZRC7wf+HDA==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id ab5d41d2-f25e-11ee-a210-005056ab1411;
+	Thu, 04 Apr 2024 10:38:12 +0200 (CEST)
+Date: Thu, 4 Apr 2024 10:38:11 +0200
+From: Antony Antony <antony@phenome.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Antony Antony <antony@phenome.org>, antony.antony@secunet.com,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, devel@linux-ipsec.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH ipsec-next v4] xfrm: Add Direction to the SA in or out
+Message-ID: <Zg5m8yQQgpORcRJJ@Antony2201.local>
+References: <515e7c749459afdd61af95bd40ce0d5f2173fc30.1710363570.git.antony.antony@secunet.com>
+ <c2b3203b-fcc7-452f-88d8-1ef826509915@6wind.com>
+ <Zfdv8dLMhpwItqGL@Antony2201.local>
+ <b3e0c716-fc74-4cb4-9778-c92749cd4b4b@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b3e0c716-fc74-4cb4-9778-c92749cd4b4b@6wind.com>
 
-On Tue, 2024-04-02 at 10:58 +0200, Lukasz Majewski wrote:
-> Introduce RedBox support (HSR-SAN to be more precise) for HSR networks.
-> Following traffic reduction optimizations have been implemented:
-> - Do not send HSR supervisory frames to Port C (interlink)
-> - Do not forward to HSR ring frames addressed to Port C
-> - Do not forward to Port C frames from HSR ring
-> - Do not send duplicate HSR frame to HSR ring when destination is Port C
->=20
-> The corresponding patch to modify iptable2 sources has already been sent:
-> https://lore.kernel.org/netdev/20240308145729.490863-1-lukma@denx.de/T/
->=20
-> Testing procedure:
-> ------------------
-> The EVB-KSZ9477 has been used for testing on net-next branch
-> (SHA1: 5fc68320c1fb3c7d456ddcae0b4757326a043e6f).
->=20
-> Ports 4/5 were used for SW managed HSR (hsr1) as first hsr0 for ports 1/2
-> (with HW offloading for ksz9477) was created. Port 3 has been used as
-> interlink port (single USB-ETH dongle).
->=20
-> Configuration - RedBox (EVB-KSZ9477):
-> if link set lan1 down;ip link set lan2 down
-> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 ver=
-sion 1
-> ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 interlink lan3 sup=
-ervision 45 version 1
-> ip link set lan4 up;ip link set lan5 up
-> ip link set lan3 up
-> ip addr add 192.168.0.11/24 dev hsr1
-> ip link set hsr1 up
->=20
-> Configuration - DAN-H (EVB-KSZ9477):
->=20
-> ip link set lan1 down;ip link set lan2 down
-> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 ver=
-sion 1
-> ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 supervision 45 ver=
-sion 1
-> ip link set lan4 up;ip link set lan5 up
-> ip addr add 192.168.0.12/24 dev hsr1
-> ip link set hsr1 up
->=20
-> This approach uses only SW based HSR devices (hsr1).
->=20
-> --------------          -----------------       ------------
-> DAN-H  Port5 | <------> | Port5         |       |
->        Port4 | <------> | Port4   Port3 | <---> | PC
->              |          | (RedBox)      |       | (USB-ETH)
-> EVB-KSZ9477  |          | EVB-KSZ9477   |       |
-> --------------          -----------------       ------------
->=20
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+On Fri, Mar 22, 2024 at 09:20:05AM +0100, Nicolas Dichtel wrote:
+> Le 17/03/2024 à 23:34, Antony Antony a écrit :
+> > Hi Nicolas,
+> > 
+> > On Thu, Mar 14, 2024 at 03:28:57PM +0100, Nicolas Dichtel via Devel wrote:
+> >> Le 13/03/2024 à 22:04, Antony Antony via Devel a écrit :
+> >>> This patch introduces the 'dir' attribute, 'in' or 'out', to the
+> >>> xfrm_state, SA, enhancing usability by delineating the scope of values
+> >>> based on direction. An input SA will now exclusively encompass values
+> >>> pertinent to input, effectively segregating them from output-related
+> >>> values. This change aims to streamline the configuration process and
+> >>> improve the overall clarity of SA attributes.
+> >>
+> >> If I correctly understand the commit, the direction is ignored if there is no
+> >> offload configured, ie an output SA could be used in input. Am I right?
+> >>
+> >> If yes:
+> >>  1/ it would be nice to state it explicitly in the commit log.
+> >>  2/ it is confusing for users not using offload.
+> > 
+> > 
+> > I see why you're asking for clarification. This patch is designed for 
+> > broader use in the future beyond its current application, specifically for 
+> > the HW offload use case. Notably, the upcoming IP-TFS patch, among others, 
+> > will utilize the 'direction' (dir) attribute. The absence of a 'direction' 
+> > for an SA can lead to a confusing user experience. While symmetry is nice,
+> Thanks for the explanation.
+> 
+> > configuring values that are not utilized and are direction-specific can be 
+> > very confusing. For instance, many users configure a replay window 
+> > (specifically without ESN) on an outbound SA, even though the replay window 
+> > is only applicable to an inbound SA. With ESN, you can just leave it at 1.  
+> > SAs have historically lacked a direction attribute. It has been brought up 
+> > many times but never implemented.
+> Maybe it would be worse to reject this new XFRMA_SA_DIR attribute when it is not
+> used (for example if there is no offload configured). It will make the API 
+> clearer.
 
-This is 'net-next' patch, you must insert the target tree in the subj
-prefix.
+there was also interst to use "dir"  for informational only.  It could be 
+useful to check incoming traffic on large systems with 100s of xfrm states.
+So I keep the "dir"  open for any  xfrm state. 
 
-Does not apply cleanly to 'net-next', please rebase.
-
-Introducing a new functionality, this deserve some paired self-tests.=20
-Does this have specific H/W requirement or can it run e.g. on top of
-veths? If the latter applies, please bundle some basic test with the
-next revision (separate patch, same series).
-
-> @@ -561,6 +582,37 @@ void hsr_prune_nodes(struct timer_list *t)
->  		  jiffies + msecs_to_jiffies(PRUNE_PERIOD));
->  }
-> =20
-> +void hsr_prune_proxy_nodes(struct timer_list *t)
-> +{
-> +	struct hsr_priv *hsr =3D from_timer(hsr, t, prune_proxy_timer);
-> +	unsigned long timestamp;
-> +	struct hsr_node *node;
-> +	struct hsr_node *tmp;
-> +
-> +	spin_lock_bh(&hsr->list_lock);
-> +	list_for_each_entry_safe(node, tmp, &hsr->proxy_node_db, mac_list) {
-> +		timestamp =3D node->time_in[HSR_PT_INTERLINK];
-> +
-> +		/* Prune old entries */
-> +		if (time_is_before_jiffies(timestamp +
-> +				msecs_to_jiffies(HSR_PROXY_NODE_FORGET_TIME))) {
-> +			hsr_nl_nodedown(hsr, node->macaddress_A);
-> +			if (!node->removed) {
-> +				list_del_rcu(&node->mac_list);
-> +				node->removed =3D true;
-> +				/* Note that we need to free this entry later: */
-> +				kfree_rcu(node, rcu_head);
-> +			}
-> +		}
-> +	}
-> +
-> +	spin_unlock_bh(&hsr->list_lock);
-> +
-> +	/* Restart timer */
-> +	mod_timer(&hsr->prune_proxy_timer,
-> +		  jiffies + msecs_to_jiffies(PRUNE_PROXY_PERIOD));
-
-AFAICS this timer not explicitly cancelled at hsr port tear-down time.
-
-What prevent it from expiring after a port has been deleted and causing
-UaF?
-
-Cheers,
-
-Paolo
-
+-antony
 
