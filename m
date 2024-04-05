@@ -1,104 +1,207 @@
-Return-Path: <netdev+bounces-85174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70DB1899B09
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:41:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD5DA899B0C
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:42:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E9ED1F22603
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:41:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BFBC1C20E88
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4931553AD;
-	Fri,  5 Apr 2024 10:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1215715F3F5;
+	Fri,  5 Apr 2024 10:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LRqjR1oO"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HxgdXFLu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5525F18E02;
-	Fri,  5 Apr 2024 10:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3676E13B2B9;
+	Fri,  5 Apr 2024 10:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712313704; cv=none; b=sOMnvFYo/JU/62jzGfdpeZzAVuURg5skDb0X3FsOSM299iGLO3PrXZsplUWH19QwDZeKLGSXB0zYb+kae0rAbZ6hT31zzClAE8PJmMo8oRV1dxGV1i4UcPjziQfCa2i074nhcJRBbEX3qzddNcwyRiL/LqDfZYQAPDHIv0dHfnY=
+	t=1712313742; cv=none; b=ns0dtg7tXiSOFzFkWpdco7dOy2uJmpa7k4qy0HRxximhXg73bpL97HufO1mX8FQ1ybX9zzaQ/6F1aqrgigoYvD9dGut9Ge1ML0qxzLHwNPeDii45xjeVT1tBXeMOcvUGMcm32IYjo8atgNNN5pZny59vgnL5bMKW2XeLF/3qmjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712313704; c=relaxed/simple;
-	bh=xCpACVpsGefQ3cwv4WVd0LUAr0cjofRtcGcTdFBplJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jsq20I072eQLtObhMuI/w1yq3+wviSoc9s2MLsBj4ZCBA9/XBhAMnynazPcN2mn7aGCdYIHV0rvIA7jY75hRkZickPOGkPCm0qxXe+0CD7E9NHfUq/1JB0pK3e/Pf1UODWExBsyzO6RbNMkH9+dac+2LtOXPGEoOWQIt59fB+v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LRqjR1oO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CA7FC433F1;
-	Fri,  5 Apr 2024 10:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712313704;
-	bh=xCpACVpsGefQ3cwv4WVd0LUAr0cjofRtcGcTdFBplJU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LRqjR1oONHUB4q7mfpbgRTfbMmEvVf4fg1nV0IqVgzhYMDxI5qko2nQrRdZZeTv12
-	 aAenfA8kOH6JBJcwZBfszwVjlLNgrC3SILomY+P8TwXkQp1a/oBJ0/JYt7yPpiwztL
-	 VRhcE0UZdYY3w+08QyCcOpwtapyFkfvAfGX+iYeG441uvMNFFy+coplKUJj7G7hh7Q
-	 +FAYOQtJ4iSSIkyfFc6VTQbu8UhrJOMSSUEmKqoWMJUWs4OwuSSo8uAkfskj9qrS9L
-	 xaf31PPBfhOiGosrZdvr8gqIKGKwirMSXVz+zHUGfe8rIEz2PcvNJaD5iv9zeqCnfv
-	 yeMwewkshuCvQ==
-Date: Fri, 5 Apr 2024 13:41:40 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
-	Itay Avraham <itayavr@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	linux-kernel@vger.kernel.org,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240405104140.GZ11187@unreal>
-References: <cefa2b9a-4227-969e-d31e-c19a552b9c1c@gmail.com>
- <20240403190012.GV11187@unreal>
- <d75ee9d5-36a9-4056-a0f3-0c05b2e744aa@kernel.org>
- <20240403170149.7d2b8f2b@kernel.org>
- <20240404122338.GI1723999@nvidia.com>
- <20240404074850.19ecd52e@kernel.org>
- <20240404174728.GL1723999@nvidia.com>
- <d0b11055-1804-515b-7916-cb83a6274955@gmail.com>
- <20240404183540.GX11187@unreal>
- <d09cc7f0-3e2c-f22d-51ce-43a36412425b@gmail.com>
+	s=arc-20240116; t=1712313742; c=relaxed/simple;
+	bh=1SAWkE4/sbynQ4HIQauR9XKJA67ntIPOOnBWyofSjVA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=a5KAwpmNkYhX3sqf+vtBTVEAe4l2gmznooB/mLdKwEXOKS7Kz4vcHPL11suxhIWaVYcueWisv29aWVbRK/fAh58D9LqD3etAnBfOAV2az9rbRXrWHfCWE9DQ6VAVaFix4MDH28cKP5hyfEwwUI2DYT92CYGzLUqytzinrNgNTbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HxgdXFLu; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435AUQiq014733;
+	Fri, 5 Apr 2024 10:42:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=H/v/GntoFeDJyqcRE6ME34EKf1XIQmWIMVCRSWiOK6s=;
+ b=HxgdXFLuizNdd6Ejsc+iQCh6jRYH2gzPFS3oWOAfQndTd2q4j6/0JcbB2xEZRkNACdc+
+ bHyVI4+wNbThEmeqsArZaH71hFZfftxHdcdpiww6+RXNv0fi1z/B5Ui+MuV7JiB5xSjT
+ 2JCMQpWlJO9e/Jnq7bM2wQR0mt0KM52hQmUPim50tdrBmMkLjsqzDqcOyh5uAqRrXtca
+ 6/kydTK/H94VNegOt31SamJqYOm/uGXWDJCQrbVHFzoHy31iYvOKxUWvOxQHFlyYNub/
+ fAYwL1c1pNA9xQAIXpaIz4FUuPsmrUNGNBWSCWWzPZ0G9J3viXA3vxmB0ohFhl7egxvN TQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xadvf8910-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 10:42:14 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 435AgE6i000647;
+	Fri, 5 Apr 2024 10:42:14 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xadvf890w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 10:42:14 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4359jDeF009103;
+	Fri, 5 Apr 2024 10:42:12 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x9epy1wwp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 10:42:12 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 435Ag6km47317432
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 5 Apr 2024 10:42:09 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DCDBE2004B;
+	Fri,  5 Apr 2024 10:42:06 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8F53320043;
+	Fri,  5 Apr 2024 10:42:06 +0000 (GMT)
+Received: from [9.155.208.153] (unknown [9.155.208.153])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  5 Apr 2024 10:42:06 +0000 (GMT)
+Message-ID: <50b6811dbb53b19385260f6b0dffa1534f8e341e.camel@linux.ibm.com>
+Subject: Re: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Christoph Hellwig <hch@lst.de>, Paolo Abeni <pabeni@redhat.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Heiko Carstens <hca@linux.ibm.com>, pasic@linux.ibm.com,
+        schnelle@linux.ibm.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
+        Thorsten
+ Winkler <twinkler@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Date: Fri, 05 Apr 2024 12:42:02 +0200
+In-Reply-To: <20240405064919.GA3788@lst.de>
+References: <20240328154144.272275-1-gbayer@linux.ibm.com>
+	 <20240328154144.272275-2-gbayer@linux.ibm.com>
+	 <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com>
+	 <cb7b036b4d3db02ab70d17ee83e6bc4f2df03171.camel@linux.ibm.com>
+	 <20240405064919.GA3788@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d09cc7f0-3e2c-f22d-51ce-43a36412425b@gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 8sX8TKM29sS0XRnJVF5nxfmynfPXVWiK
+X-Proofpoint-GUID: VBhMWf1ztUKxTcJ3cgNZr2GmTcDDezpP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-05_09,2024-04-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ mlxscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
+ lowpriorityscore=0 adultscore=0 phishscore=0 spamscore=0 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404050078
 
-On Thu, Apr 04, 2024 at 08:46:41PM +0100, Edward Cree wrote:
-> On 04/04/2024 19:35, Leon Romanovsky wrote:
-> > On Thu, Apr 04, 2024 at 07:06:53PM +0100, Edward Cree wrote:
-> >> Why?  What does the kernel get out of it?
-> >>
-> >> Maybe *you* need them to be supported, but maybe you should have
-> >>  thought of that earlier in the design process.  ("A failure on
-> >>  your part to foresee the eminently foreseeable does not
-> >>  constitute an emergency on mine.")
-> >> If we let folks bypass our standards with a _fait accompli_, we
-> >>  don't really have standards in the first place.
-> > 
-> > Sorry, who are "we" and what are "our standards"?
-> 
-> As should be obvious from context, "we" in that sentence referred to
->  the mainline kernel.  And while participants in this thread currently
->  disagree on what "our standards" are, I hope it is not contentious
->  that the kernel community *does* have standards as to what code and
->  design is acceptable for inclusion.
+On Fri, 2024-04-05 at 08:49 +0200, Christoph Hellwig wrote:
+> On Thu, Apr 04, 2024 at 01:10:20PM +0200, Gerd Bayer wrote:
+> > > Why can't you use get_free_pages() (or similar) here? (possibly
+> > > rounding up to the relevant page_aligned size).=20
+> >=20
+> > Thanks Paolo for your suggestion. However, I wanted to stay as
+> > close to the implementation pre [1] - that used to use __GFP_COMP,
+> > too. I'd rather avoid to change interfaces from "cpu_addr" to
+> > "struct page*" at this point. In the long run, I'd like to drop the
+> > requirement for
+>=20
+> The right interface actually is to simply use folio_alloc, which adds
+> __GFP_COMP and is a fully supported and understood interface. You can
+> just convert the folio to a kernel virtual address using
+> folio_address() right after allocating it.
 
-You didn't answer my question. What are "our standards"?
+Thanks for pointing me to folios.
+After a good night's sleep, I figured that I was thinking too
+complicated when I dismissed Paolo's suggestion.
 
-Thanks
+> (get_free_pages also retunrs a kernel virtual address, just awkwardly
+> as an unsigned long. In doubt don't use this interface for new
+> code..)
+>=20
+> > compound pages entirely, since that *appears* to exist primarily
+> > for a
+> > simplified handling of the interface to splice_to_pipe() in
+> > net/smc/smc_rx.c. And of course there might be performance
+> > implications...
+>=20
+> While compounds pages might sound awkward, they are the new normal in
+> form of folios.=C2=A0 So just use folios.
+
+With the following fixup, my tests were just as successful.
+I'll send that out as a v2.
+
+Thank you, Christoph and Paolo!
+
+
+
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 25911b887e5e..affb05521e14 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -14,8 +14,8 @@
+ #include <linux/err.h>
+ #include <linux/ctype.h>
+ #include <linux/processor.h>
+-#include <linux/dma-direction.h>
+-#include <linux/gfp_types.h>
++#include <linux/dma-mapping.h>
++#include <linux/mm.h>
+=20
+ #include "ism.h"
+=20
+@@ -296,7 +296,7 @@ static void ism_free_dmb(struct ism_dev *ism,
+struct ism_dmb *dmb)
+ 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+ 	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
+ 		       DMA_FROM_DEVICE);
+-	kfree(dmb->cpu_addr);
++	folio_put(virt_to_folio(dmb->cpu_addr));
+ }
+=20
+ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+@@ -319,8 +319,11 @@ static int ism_alloc_dmb(struct ism_dev *ism,
+struct ism_dmb *dmb)
+ 	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
+ 		return -EINVAL;
+=20
+-	dmb->cpu_addr =3D kmalloc(dmb->dmb_len, GFP_KERNEL |
+__GFP_NOWARN |
+-				__GFP_COMP | __GFP_NOMEMALLOC |
+__GFP_NORETRY);
++	dmb->cpu_addr =3D
++		folio_address(folio_alloc(GFP_KERNEL | __GFP_NOWARN |
++					  __GFP_NOMEMALLOC |
+__GFP_NORETRY,
++					  get_order(dmb->dmb_len)));
++
+ 	if (!dmb->cpu_addr) {
+ 		rc =3D -ENOMEM;
+ 		goto out_bit;
+--=20
+2.44.0
+
+
 
