@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-85203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E11EC899BE2
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:32:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1211899C0A
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:45:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 108C81C20A55
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:32:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DF4A1F238B2
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4411D16C457;
-	Fri,  5 Apr 2024 11:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85CA416C68D;
+	Fri,  5 Apr 2024 11:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9UjcH8Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6QpzC9L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602FE2032D
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 11:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BDE2032D
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 11:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712316718; cv=none; b=EJQUJx8R3ouaXABKH+zUlaQGKJCmWJhLjoqWMbtnyDsgVmEcQ+4oQJ0QY2J/LFUwrVObcplU1Lv8ZUy4MALEUyMlPYGWZrwgAhRCjzfG2A8N41/6WdL5mB5QEQa2Oxt+W0UMbEgoi9lCZ4rbjCLRQ7pugPgbZ6Vd3jFP89VvEXs=
+	t=1712317550; cv=none; b=gIqN3Hw5sJB7ZKZrFNc7c+ik7WxHNEiL1t0P7QEWJxB3BtXShmo3fW+NqzMMICtw9mL1FWyQrpWVkKE1d7L/HHwdu3LPLj9qHX3EjiJPDLe+fUrIiVXRL3+5LpU06KvjhJAmhYG0KTbtrvCW+DZMuRlAxL9pIcwOiTjv6ADThNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712316718; c=relaxed/simple;
-	bh=auQbLtVSNRBJEra15dpInE1MVd6NBYbQP6JOLISq33c=;
+	s=arc-20240116; t=1712317550; c=relaxed/simple;
+	bh=gGHCMUiakKSNc8B8cOXjwSL4GqSlNA49uJy2oj4yEGY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M+TOmuJ4ddY/ikrAAbai3XRkefd0ri3/QIo5/iv4/aT5TiqmnTxmZc6Vj9H67cf5kVoD+uiZCvUkG9jwfo4D12WBCXRnf0NclFRoEf5+1MYmw2ixLisv0UXzcg1bUfvjF+32PFBCyMk4vYAsW0n820M2fU0UIr2tqbVDt/RoRwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9UjcH8Z; arc=none smtp.client-ip=209.85.208.170
+	 In-Reply-To:Content-Type; b=hLKythXrHd62bfiuvbgAMGZLxFwFvhYudEEI4nTqge0yWLzZRX+NkAkSZcI5YtUWPvkdwGXSVHsdXNHhzdGSJAXLavSnN1JrrwHjM7zIFAKaYjfxiIM0yaUrElDSFioiRnpEqL/LSLttwxFvLvMuLyuz/DWMPFOtlRHwLLsjOx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T6QpzC9L; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d84a5f4a20so4549921fa.1
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 04:31:56 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56bf6591865so3087370a12.0
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 04:45:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712316714; x=1712921514; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=gmail.com; s=20230601; t=1712317547; x=1712922347; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=yw5RKrZdUi4tuw82iBlrxT24MUPm/UOqHz9cTZxXgtw=;
-        b=k9UjcH8ZlVjXkYd7M3tnJSk/fD+aRS0JZJG88SwLtPqt8HeaCS77tBZFQAJLpnkMPd
-         zRY90IZfuFjLhAE9a1tN066qSZEuAuN4JgKIDL3n53KjpzW/AfeJVof2ZoCGeF3fHlyI
-         2bb/5dFVkGBjbAdGlu/aaBCavEJ+0tFvNOffEqdhKyBlydFYJKHDUE+dhHt+CW9MhJQx
-         7bd7smpo7zuZN58+/HmxkzwL5JQOcYLbYvaUmKjhD9uhjH/MM/wKddg6p8JfqDqZT2be
-         H2Nx0hkggOQAOZMDdMiTdXn8TjPAdXIFR1t1zCPe67UkFVSLMKV1nPEDqk9IHIf9oEJW
-         263Q==
+        bh=dHXEJWkwhcknMX4NaaWAKodU53vBMWqal7mTz5l/30M=;
+        b=T6QpzC9LrYQrxNoJrlttGrogLzTJTJdAazobi8VZDhT4Ue5ssUraBIbIwG3sVAn+A+
+         aGNA6q4pT8UslD0jsmgzVn0tmUF/Fs8tdQv8MfjXWQ44tskqv0MQwLcFUCcDDyEBMmSd
+         PHUFMSeEZpxSLAZtcPYXIR7o+RHApxDrJmJSiANpXAK45BgryXM34JIV0MW6vm6jJkFn
+         0pkK6n1uAb9iEay6xpc9rpCmi0kwB8cNsorvN/704OfUyg4OidQMqEiQXOLVgKLNCi4c
+         K1uXUrA1WnGakQThbQfbtACH3kCMBUBiIqm1k9007HHEdQTsQ4WfVQGpeUjY9LJoYplw
+         ao/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712316714; x=1712921514;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1712317547; x=1712922347;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yw5RKrZdUi4tuw82iBlrxT24MUPm/UOqHz9cTZxXgtw=;
-        b=sbt7/B/5b9KlgKJ5ayHvsjYzP2zYgxwCODmMiOCIEI8cPszJOtOrTKiKwkQ9FDde6H
-         MSp5T74N1pbre/nwqY4C/v5FSLekgQ8wy7Y0l6x2ZiO5f6NZ68UxV4jZKTic3hYbmR/W
-         ggVv0TQVla1vhepFDv9dWY3BccIqKttpnMJi9z+yOcuLP+9jBcb+xkRPg++Y7s6nfI8d
-         LcIBO/zwOq4kIKvJKech8Sie1/Ia0xUk1/mS202E+vZ4q89OaXdAzSZXo0EM3SykLMFu
-         8fQgG01A+DkKHsua4m5O3mIq5hOk/QsfKvh26T8V+2jyAXq4t2DJsVnXhDjKXFsmK1h9
-         5NRg==
-X-Forwarded-Encrypted: i=1; AJvYcCVFX4wjdm/QyV1Vi9NxPmjFNjOf8e50uVxcI/6OpWxXa3QiU0hSNp/Ona5FyBBFikrQH9trvVHOGEBVwuKwL65RidfbwuPS
-X-Gm-Message-State: AOJu0YwbWkyzL8n1vDMXxgsyKrremti1RlAz94Qc7twrl9f7LxtyqxzF
-	Yak69fCYFlijlrFqzp6gYe1nh+bml0nmKu7TtkJQVIqT0az/mWrs
-X-Google-Smtp-Source: AGHT+IGzjUcr9qgHN/EVSlAUf2F4F4wqNnbUJu7LshCbWcWNdRSVbXD98iNecVhGHoIEuYTHJU/QsA==
-X-Received: by 2002:a2e:b00a:0:b0:2d8:5af8:84c0 with SMTP id y10-20020a2eb00a000000b002d85af884c0mr875875ljk.5.1712316714217;
-        Fri, 05 Apr 2024 04:31:54 -0700 (PDT)
-Received: from [10.0.0.4] ([37.174.58.205])
-        by smtp.gmail.com with ESMTPSA id q18-20020adfcd92000000b00343e5f3a3e2sm1405673wrj.19.2024.04.05.04.31.52
+        bh=dHXEJWkwhcknMX4NaaWAKodU53vBMWqal7mTz5l/30M=;
+        b=uSb1dWJ0OmAaqyzsd55OcSNOKB1SCfHGatLhmSg4a7PtNMWBi2iSP442pikWa7NI1d
+         Znr1A9RyHaf99aIC6UEY5P9xAmXotfJRGcapNwmt+Z0rEHF+yyowD1lN7a5Qol3ptKip
+         VAhm1HHVM9a+vozwiVLKCYUZXLGDmQNNXtGvik4k+udAsVXSQUXN7MfquTU9Ta3FdEKi
+         6+1DRXssXJzsLp+2CRpUoaQC2LzJUOhNajou4G+6/4/jiI+3XYlUHQ7HyqE2u3eKqEVC
+         YDUqEgZWLQ0+4h1Cyu6ten5ZAW6KZreag7Qgq0dAEQqcp59e5S8FmPqrYenRuBtYbK1D
+         bQRw==
+X-Gm-Message-State: AOJu0YyCVCTyhagVg8MgO8YaT+uD5Y2EtU7VCWlbRYzGenW2JIjzk4SC
+	SvwVxqGXj1VuriE+PfwmnWe1iL5SIaYLsh+HX9iM3TazJlGWzogQDW9x0/5m
+X-Google-Smtp-Source: AGHT+IEhgQfiq4CRr4G47rBtvkf4jln5UyOqX1O6lVytpkNeS081N7q5RTflDYR36qVQ88sYKLpWfA==
+X-Received: by 2002:a17:906:ac7:b0:a51:982e:b3f7 with SMTP id z7-20020a1709060ac700b00a51982eb3f7mr927945ejf.37.1712317546913;
+        Fri, 05 Apr 2024 04:45:46 -0700 (PDT)
+Received: from [192.168.42.78] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id hg21-20020a1709072cd500b00a4e0df9e793sm747367ejc.136.2024.04.05.04.45.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 04:31:53 -0700 (PDT)
-Message-ID: <3e90336c-6859-474c-aa1e-01ccc665ad49@gmail.com>
-Date: Fri, 5 Apr 2024 13:31:52 +0200
+        Fri, 05 Apr 2024 04:45:46 -0700 (PDT)
+Message-ID: <455a75bb-f3ea-4cbf-830f-a443a7e0d71a@gmail.com>
+Date: Fri, 5 Apr 2024 12:45:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,110 +75,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: fix race condition between ipv6_get_ifaddr and
- ipv6_del_addr
+Subject: Re: [PATCH net-next v2] net: enable SOCK_NOSPACE for UDP
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org
+References: <1da265997eb754925e30260eb4c5b15f3bff3b43.1712273351.git.asml.silence@gmail.com>
+ <CANn89iKzwxgzX7-TAqjN5np8fksVM=qq1A0rFRdNKWjYJYWLaA@mail.gmail.com>
 Content-Language: en-US
-To: Jiri Benc <jbenc@redhat.com>, netdev@vger.kernel.org, edumazet@google.com
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
- David Ahern <dsahern@kernel.org>
-References: <8bbe1218656e66552ff28cbee8c7d1f0ffd8e9fd.1712314149.git.jbenc@redhat.com>
-From: Eric Dumazet <eric.dumazet@gmail.com>
-In-Reply-To: <8bbe1218656e66552ff28cbee8c7d1f0ffd8e9fd.1712314149.git.jbenc@redhat.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CANn89iKzwxgzX7-TAqjN5np8fksVM=qq1A0rFRdNKWjYJYWLaA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+On 4/5/24 10:11, Eric Dumazet wrote:
+> On Fri, Apr 5, 2024 at 1:37 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> wake_up_poll() and variants can be expensive even if they don't actually
+>> wake anything up as it involves disabling irqs, taking a spinlock and
+>> walking through the poll list, which is fraught with cache bounces.
+>> That might happen when someone waits for POLLOUT or even POLLIN as the
+>> waitqueue is shared, even though we should be able to skip these
+>> false positive calls when the tx queue is not full.
+>>
+>> Add support for SOCK_NOSPACE for UDP sockets. The udp_poll() change is
+>> straightforward and repeats after tcp_poll() and others. However, for
+>> sock_wfree() it's done as an optional feature flagged by
+>> SOCK_SUPPORT_NOSPACE, because the feature requires support from the
+>> corresponding poll handler but there are many users of sock_wfree()
+>> that might be not prepared.
+>>
+>> Note, it optimises the sock_wfree() path but not sock_def_write_space().
+>> That's fine because it leads to more false positive wake ups, which is
+>> tolerable and not performance critical.
+>>
+>> It wins +5% to throughput testing with a CPU bound tx only io_uring
+>> based benchmark and showed 0.5-3% in more realistic workloads.
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>>   include/net/sock.h |  1 +
+>>   net/core/sock.c    |  5 +++++
+>>   net/ipv4/udp.c     | 15 ++++++++++++++-
+>>   3 files changed, 20 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/net/sock.h b/include/net/sock.h
+>> index 2253eefe2848..027a398471c4 100644
+>> --- a/include/net/sock.h
+>> +++ b/include/net/sock.h
+>> @@ -944,6 +944,7 @@ enum sock_flags {
+>>          SOCK_XDP, /* XDP is attached */
+>>          SOCK_TSTAMP_NEW, /* Indicates 64 bit timestamps always */
+>>          SOCK_RCVMARK, /* Receive SO_MARK  ancillary data with packet */
+>> +       SOCK_NOSPACE_SUPPORTED, /* socket supports the SOCK_NOSPACE flag */
+>>   };
+>>
+>>   #define SK_FLAGS_TIMESTAMP ((1UL << SOCK_TIMESTAMP) | (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE))
+>> diff --git a/net/core/sock.c b/net/core/sock.c
+>> index 5ed411231fc7..e4f486e9296a 100644
+>> --- a/net/core/sock.c
+>> +++ b/net/core/sock.c
+>> @@ -3393,6 +3393,11 @@ static void sock_def_write_space_wfree(struct sock *sk)
+>>
+>>                  /* rely on refcount_sub from sock_wfree() */
+>>                  smp_mb__after_atomic();
+>> +
+>> +               if (sock_flag(sk, SOCK_NOSPACE_SUPPORTED) &&
+>> +                   !test_bit(SOCK_NOSPACE, &sk->sk_socket->flags))
+>> +                       return;
+>> +
+>>                  if (wq && waitqueue_active(&wq->wait))
+>>                          wake_up_interruptible_sync_poll(&wq->wait, EPOLLOUT |
+>>                                                  EPOLLWRNORM | EPOLLWRBAND);
+>> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+>> index 11460d751e73..309fa96e9020 100644
+>> --- a/net/ipv4/udp.c
+>> +++ b/net/ipv4/udp.c
+>> @@ -342,6 +342,7 @@ int udp_lib_get_port(struct sock *sk, unsigned short snum,
+>>                  hslot2->count++;
+>>                  spin_unlock(&hslot2->lock);
+>>          }
+>> +       sock_set_flag(sk, SOCK_NOSPACE_SUPPORTED);
+>>          sock_set_flag(sk, SOCK_RCU_FREE);
+>>          error = 0;
+>>   fail_unlock:
+>> @@ -2885,8 +2886,20 @@ __poll_t udp_poll(struct file *file, struct socket *sock, poll_table *wait)
+>>          /* psock ingress_msg queue should not contain any bad checksum frames */
+>>          if (sk_is_readable(sk))
+>>                  mask |= EPOLLIN | EPOLLRDNORM;
+>> -       return mask;
+>>
+>> +       if (!sock_writeable(sk)) {
+> 
+> I think there is a race that you could avoid here by using
+> 
+> if  (!(mask & (EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND))) {
 
-On 4/5/24 12:54, Jiri Benc wrote:
-> Although ipv6_get_ifaddr walks inet6_addr_lst under the RCU lock, it
-> still means hlist_for_each_entry_rcu can return an item that got removed
-> from the list. The memory itself of such item is not freed thanks to RCU
-> but nothing guarantees the actual content of the memory is sane.
->
-> In particular, the reference count can be zero. This can happen if
-> ipv6_del_addr is called in parallel. ipv6_del_addr removes the entry
-> from inet6_addr_lst (hlist_del_init_rcu(&ifp->addr_lst)) and drops all
-> references (__in6_ifa_put(ifp) + in6_ifa_put(ifp)). With bad enough
-> timing, this can happen:
->
-> 1. In ipv6_get_ifaddr, hlist_for_each_entry_rcu returns an entry.
->
-> 2. Then, the whole ipv6_del_addr is executed for the given entry. The
->     reference count drops to zero and kfree_rcu is scheduled.
->
-> 3. ipv6_get_ifaddr continues and increments the reference count
->     (in6_ifa_hold).
->
-> 4. The rcu is unlocked and the entry is freed.
->
-> 5. Later, the reference count is dropped to zero (again) and kfree_rcu
->     is scheduled (again).
+Seems like it, I'll add the change, thanks
 
-refcount_t semantic should prevent this double transition to 0  ?
+> (We called datagram_poll() at the beginning of udp_poll())
 
-Can you include a stack trace in the changelog ?
-
-Otherwise patch looks good to me, thanks !
-
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-
-
->
-> Prevent increasing of the reference count in such case. The name
-> in6_ifa_hold_safe is chosen to mimic the existing fib6_info_hold_safe.
->
-> Fixes: 5c578aedcb21d ("IPv6: convert addrconf hash list to RCU")
-> Signed-off-by: Jiri Benc <jbenc@redhat.com>
-> ---
->
-> Side note: While this fixes one bug, there may be more locking bugs
-> lurking aroung inet6_ifaddr. The semantics of locking of inet6_ifaddr is
-> wild and fragile. Some of the fields are freed in ipv6_del_addr and
-> guarded by ifa->state == INET6_IFADDR_STATE_DEAD and RTNL. Some of the
-> fields are freed in inet6_ifa_finish_destroy and guarded by ifa->refcnt
-> and RCU. Needless to say, this semantics is undocumented. Worse,
-> ifa->state guard may not be enough. For example, ipv6_get_ifaddr can
-> still return an entry that proceeded through ipv6_del_addr, which means
-> ifa->state is INET6_IFADDR_STATE_DEAD. However, at least some callers
-> (e.g. ndisc_recv_ns) seem to change ifa->state to something else. As
-> another example, ipv6_del_addr relies on ifa->flags, which are changed
-> throughout the code without RTNL. All of this may be okay but it's far
-> from clear.
-> ---
->   include/net/addrconf.h | 4 ++++
->   net/ipv6/addrconf.c    | 7 ++++---
->   2 files changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/include/net/addrconf.h b/include/net/addrconf.h
-> index 9d06eb945509..62a407db1bf5 100644
-> --- a/include/net/addrconf.h
-> +++ b/include/net/addrconf.h
-> @@ -438,6 +438,10 @@ static inline void in6_ifa_hold(struct inet6_ifaddr *ifp)
->   	refcount_inc(&ifp->refcnt);
->   }
->   
-> +static inline bool in6_ifa_hold_safe(struct inet6_ifaddr *ifp)
-> +{
-> +	return refcount_inc_not_zero(&ifp->refcnt);
-> +}
->   
->   /*
->    *	compute link-local solicited-node multicast address
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 92db9b474f2b..779aa6ecdd49 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -2091,9 +2091,10 @@ struct inet6_ifaddr *ipv6_get_ifaddr(struct net *net, const struct in6_addr *add
->   		if (ipv6_addr_equal(&ifp->addr, addr)) {
->   			if (!dev || ifp->idev->dev == dev ||
->   			    !(ifp->scope&(IFA_LINK|IFA_HOST) || strict)) {
-> -				result = ifp;
-> -				in6_ifa_hold(ifp);
-> -				break;
-> +				if (in6_ifa_hold_safe(ifp)) {
-> +					result = ifp;
-> +					break;
-> +				}
->   			}
->   		}
->   	}
+-- 
+Pavel Begunkov
 
