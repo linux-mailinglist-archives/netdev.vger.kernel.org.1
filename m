@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-85138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 428A28999E7
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:53:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9C38999E6
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7D891F22B45
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:53:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D8CC1C215C5
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9806161939;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32E7161932;
 	Fri,  5 Apr 2024 09:52:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EE116130B
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 09:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F6C161308
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 09:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712310749; cv=none; b=FEGVoLgaw/i+V6W7kYZWelx+zbPDjn+WU0pZThTI9jaX+xhjJMqXBssK7NYZV4Wbk9Sf3toiNkm+y/zWH4Y+mo865CA8RcZY5PzdhYGfw4m2MLNyhMKt18evf43lgZ7tgXkAkT4kOngheDpE3mZpzBulQc5Q8lfnkOjFb6Ol7TU=
+	t=1712310749; cv=none; b=EzEd23FSqyM0qHMejW6CFNyKz2LzbzDcbriZAxvmNrce1f91EcfU5em8Td4NpmUMz6nk4gGxmw+jPX+yqUjwmtdepMIK7XLWkk05eXtWR1c4GoPTNyrxPl5qjx1PI2q1Rf1tbbAn3KEIoAjJNCOApVJxpuzlPG1SXg1bcfp/Byg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712310749; c=relaxed/simple;
-	bh=OGySa7PRBGVhcZ1wkHb/G4yHgQeuwcgy+IoxJtFPJIk=;
+	bh=jRF/wbhWxadLpImtFIjnLIQkxJrsOFnPq3PkVy2pvBw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YGHvpcvdpea31zqNJVW6kL3mHjaX7dzlIoEA7yw4xY05Z6wSnEiASYn3Bja5fyFj18V7XELH+iUZ12JKVUq+9q4UsyQJdLM7uApZmcKUm9Y7z1CpE7fRfrn/G0Ebxs5uhUpxjoCh/rkqYUAFMTfg7IT618KKCffE9OkuDPMU5V0=
+	 MIME-Version; b=jT/Xc2F6AYioGnlGdoWAdEqRCrBnIOLsu2hT72LordUDuMwRCTl9S4UDFCslm1Yjg3HUZQjrzOy2SIKtTvHoDOm4v4qcVBRzCUws8UNovL8k8+UtAQAF4l/Vo2+JcViLGPoG+3nFBt+3KwwFQmg9K1qmUmcSPacNhZ9tYuHkkFE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,15 +33,15 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rsgFA-0005EG-SA; Fri, 05 Apr 2024 11:52:20 +0200
+	id 1rsgFA-0005EF-S9; Fri, 05 Apr 2024 11:52:20 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rsgF8-00AXqj-Ey; Fri, 05 Apr 2024 11:52:18 +0200
+	id 1rsgF8-00AXql-Ek; Fri, 05 Apr 2024 11:52:18 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rsgF8-001U5X-13;
+	id 1rsgF8-001U5i-17;
 	Fri, 05 Apr 2024 11:52:18 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -62,9 +62,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Willem de Bruijn <willemb@google.com>,
 	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
-Subject: [PATCH net-next v3 7/9] net: dsa: microchip: enable ETS support for KSZ989X variants
-Date: Fri,  5 Apr 2024 11:52:14 +0200
-Message-Id: <20240405095216.353829-8-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v3 8/9] net: dsa: microchip: init predictable IPV to queue mapping for all non KSZ8xxx variants
+Date: Fri,  5 Apr 2024 11:52:15 +0200
+Message-Id: <20240405095216.353829-9-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240405095216.353829-1-o.rempel@pengutronix.de>
 References: <20240405095216.353829-1-o.rempel@pengutronix.de>
@@ -80,42 +80,120 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-I tested ETS support on KSZ9893, so it should work other KSZ989X
-variants too.
+Init priority to queue mapping in the way as it shown in IEEE 802.1Q
+mapping example.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/dsa/microchip/ksz_common.c | 3 +++
- 1 file changed, 3 insertions(+)
+changes v2:
+- s/ksz_set_default_prio_queue_mapping/ksz9477_set_default_prio_queue_mapping
+- remove error on queue < 0.
+---
+ drivers/net/dsa/microchip/ksz_common.c | 57 +++++++++++++++-----------
+ 1 file changed, 33 insertions(+), 24 deletions(-)
 
 diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 840b17b8507e1..dc96931e62da8 100644
+index dc96931e62da8..3f7977a423407 100644
 --- a/drivers/net/dsa/microchip/ksz_common.c
 +++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1378,6 +1378,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.port_nirqs = 2,
- 		.num_tx_queues = 4,
- 		.num_ipvs = 8,
-+		.tc_ets_supported = true,
- 		.ops = &ksz9477_dev_ops,
- 		.mib_names = ksz9477_mib_names,
- 		.mib_cnt = ARRAY_SIZE(ksz9477_mib_names),
-@@ -1411,6 +1412,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.port_nirqs = 2,
- 		.num_tx_queues = 4,
- 		.num_ipvs = 8,
-+		.tc_ets_supported = true,
- 		.ops = &ksz9477_dev_ops,
- 		.mib_names = ksz9477_mib_names,
- 		.mib_cnt = ARRAY_SIZE(ksz9477_mib_names),
-@@ -1442,6 +1444,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.port_nirqs = 2,
- 		.num_tx_queues = 4,
- 		.num_ipvs = 8,
-+		.tc_ets_supported = true,
- 		.ops = &ksz9477_dev_ops,
- 		.mib_names = ksz9477_mib_names,
- 		.mib_cnt = ARRAY_SIZE(ksz9477_mib_names),
+@@ -24,6 +24,7 @@
+ #include <linux/of_net.h>
+ #include <linux/micrel_phy.h>
+ #include <net/dsa.h>
++#include <net/ieee8021q.h>
+ #include <net/pkt_cls.h>
+ #include <net/switchdev.h>
+ 
+@@ -2685,9 +2686,33 @@ static int ksz_port_mdb_del(struct dsa_switch *ds, int port,
+ 	return dev->dev_ops->mdb_del(dev, port, mdb, db);
+ }
+ 
++static int ksz9477_set_default_prio_queue_mapping(struct ksz_device *dev,
++						  int port)
++{
++	u32 queue_map = 0;
++	int ipv;
++
++	for (ipv = 0; ipv < dev->info->num_ipvs; ipv++) {
++		int queue;
++
++		/* Traffic Type (TT) is corresponding to the Internal Priority
++		 * Value (IPV) in the switch. Traffic Class (TC) is
++		 * corresponding to the queue in the switch.
++		 */
++		queue = ieee8021q_tt_to_tc(ipv, dev->info->num_tx_queues);
++		if (queue < 0)
++			return queue;
++
++		queue_map |= queue << (ipv * KSZ9477_PORT_TC_MAP_S);
++	}
++
++	return ksz_pwrite32(dev, port, KSZ9477_PORT_MRI_TC_MAP__4, queue_map);
++}
++
+ static int ksz_port_setup(struct dsa_switch *ds, int port)
+ {
+ 	struct ksz_device *dev = ds->priv;
++	int ret;
+ 
+ 	if (!dsa_is_user_port(ds, port))
+ 		return 0;
+@@ -2695,6 +2720,12 @@ static int ksz_port_setup(struct dsa_switch *ds, int port)
+ 	/* setup user port */
+ 	dev->dev_ops->port_setup(dev, port, false);
+ 
++	if (!is_ksz8(dev)) {
++		ret = ksz9477_set_default_prio_queue_mapping(dev, port);
++		if (ret)
++			return ret;
++	}
++
+ 	/* port_stp_state_set() will be called after to enable the port so
+ 	 * there is no need to do anything.
+ 	 */
+@@ -3559,8 +3590,7 @@ static int ksz_tc_ets_add(struct ksz_device *dev, int port,
+ 
+ static int ksz_tc_ets_del(struct ksz_device *dev, int port)
+ {
+-	int ret, queue, tc_prio, s;
+-	u32 queue_map = 0;
++	int ret, queue;
+ 
+ 	/* To restore the default chip configuration, set all queues to use the
+ 	 * WRR scheduler with a weight of 1.
+@@ -3572,31 +3602,10 @@ static int ksz_tc_ets_del(struct ksz_device *dev, int port)
+ 			return ret;
+ 	}
+ 
+-	switch (dev->info->num_tx_queues) {
+-	case 2:
+-		s = 2;
+-		break;
+-	case 4:
+-		s = 1;
+-		break;
+-	case 8:
+-		s = 0;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-
+ 	/* Revert the queue mapping for TC-priority to its default setting on
+ 	 * the chip.
+ 	 */
+-	for (tc_prio = 0; tc_prio < dev->info->num_ipvs; tc_prio++) {
+-		int queue;
+-
+-		queue = tc_prio >> s;
+-		queue_map |= queue << (tc_prio * KSZ9477_PORT_TC_MAP_S);
+-	}
+-
+-	return ksz_pwrite32(dev, port, KSZ9477_PORT_MRI_TC_MAP__4, queue_map);
++	return ksz9477_set_default_prio_queue_mapping(dev, port);
+ }
+ 
+ static int ksz_tc_ets_validate(struct ksz_device *dev, int port,
 -- 
 2.39.2
 
