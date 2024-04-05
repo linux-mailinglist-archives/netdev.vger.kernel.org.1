@@ -1,146 +1,120 @@
-Return-Path: <netdev+bounces-85228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95575899D3A
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:41:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05574899D3E
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FDBE1F232C2
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:41:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99B601F22A27
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC7A1649DB;
-	Fri,  5 Apr 2024 12:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D7F13C673;
+	Fri,  5 Apr 2024 12:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFHM2C2G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZXnwZiKC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C270328DB;
-	Fri,  5 Apr 2024 12:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B301649DF
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 12:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712320904; cv=none; b=HgsQ0EeA9g2rCOpJlnq6yM+NzOyBgjXmnMJPWHqPPwpUHkq/gbjmeUj/895SgKLvQzsTjNdG9qb0L1A/7eI3StwzpF5E3a/Cah3DlfnebSF7M5JhJUOPa2xAHRd1CPKBu4fJEI8yNFoRi0w1NJvh+hyMxUcfyyOyJlPmb6Jkc2E=
+	t=1712320932; cv=none; b=DKgFbzbHGyvzhkbDgdA7pnpA5pn+Ml8XtP3rjHKCGOiG5XIPkoP+akLObRIWmYShcI+wgJyL8LBpIhc+GCkhwcLv3IIZH6zMNum+6lpyLUNoxJ8JUec8oNlW4QP0CS3okWTCgr31ahQs7QQx/C220MOzGqJdOIkcXWh7fe2JlWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712320904; c=relaxed/simple;
-	bh=XstQV4I3hA64wkJdbVIzI8G3hTpnTOdEI888VqMr7I4=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=RKmpB9TDOOPvnKRwSFD/b4n2ohnB+5AUgP64dtJ3e5/OCRQIw2fBukUOyNY661e1G+NHnFXjBOZ/kCU7A5q9kTierD8PYeTgKCecPIPhuVb2VHlLTcO4kP4Kwjl2gJc8i5hfg+gEsarvli2pKg+nCq9jhCirTvhI1WfkYEqpG+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pFHM2C2G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 366B1C433F1;
-	Fri,  5 Apr 2024 12:41:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712320903;
-	bh=XstQV4I3hA64wkJdbVIzI8G3hTpnTOdEI888VqMr7I4=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=pFHM2C2GbsBvF2xfSpXbDbaeeEthKyyQgnk3Sh1pD+g7kaPMyMOdDsUUKD8nhM5ei
-	 b2Wrjp9NU01rX5iBliGumbHoX/2Uas8in0Of+sBK9wmOIK9ItUsc+0xeoYjiAFLC+M
-	 3RTH2EaieomEgwH69yqkFwNxh3zfPfohpjhKZbSQMLF6eseattZCeR8jxqDjXwmJk0
-	 DjsaoTkLKvG6tEvkbIOhvjBZzMqATIKYE0HqU1SIThb3v8zBpyiox4mz8CQ4rsGvnQ
-	 34zZP9u3HcKyKiw6J3e3nHKstbXuWjqfbR/b5w4viCAk65sw5lYGu+5wfYmy9We2Fu
-	 /hFNursI5SIog==
-From: Kalle Valo <kvalo@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
- <robh+dt@kernel.org>,  Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
-  Bjorn Andersson <andersson@kernel.org>,  Konrad Dybcio
- <konrad.dybcio@linaro.org>,  ath10k@lists.infradead.org,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-arm-msm@vger.kernel.org,  Krzysztof
- Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific
- firmware overrides
-References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
-	<87plw7hgt4.fsf@kernel.org>
-	<CAA8EJpr6fRfY5pNz6cXVTaNashqffy5_qLv9c35nkgjaDuSgyQ@mail.gmail.com>
-	<87cys7hard.fsf@kernel.org>
-	<CAA8EJpowyEEbXQ4YK-GQ63wZSkJDy04qJsC2uuYCXt+aJ1HSOQ@mail.gmail.com>
-	<87v85wg39y.fsf@kernel.org>
-	<CAA8EJpq_XLUEMC67ck2tZRjqS0PazCkQWWMGmwydeWxTETHwcg@mail.gmail.com>
-	<871q7k3tnq.fsf@kernel.org>
-	<CAA8EJppASEmj6-Jt7OCABAeqr8umSgXaDDha9nn2nRafuZ-Gvw@mail.gmail.com>
-Date: Fri, 05 Apr 2024 15:41:38 +0300
-In-Reply-To: <CAA8EJppASEmj6-Jt7OCABAeqr8umSgXaDDha9nn2nRafuZ-Gvw@mail.gmail.com>
-	(Dmitry Baryshkov's message of "Fri, 5 Apr 2024 15:34:29 +0300")
-Message-ID: <87sf002d8d.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1712320932; c=relaxed/simple;
+	bh=SXUNLeIIkC+dmaNcU+Yxqy2ljJq5wklXQ51/I8Tbrek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gY1DRh0VQVQ7EE3RDsOt22OlKcugeousKwetHgWzLZvwUt9gv1fphpMTBjbStHccx0GehtECl+NWs041qoJcrRCO0VUB3YVPkfkMJC4RzVuYBcWsXdIY3bJgHgkYGkSe5YDUBJ8gyAfa5Z33F+leIy2P8nVkKvadsN63sYPLGQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZXnwZiKC; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56e2e851794so8107a12.0
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 05:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712320928; x=1712925728; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SVBvJilZY3Ooedngi0kJwoAC9G+3Khq4/wHI4eXqFHQ=;
+        b=ZXnwZiKCbHOFl3IiNOCPogtD7rIAPOF1pZoBuUS8eP2dQkjJop1J+hgaGUm4oONcC9
+         C0oSK2aeshaak7KI2gtYqbxlbodbaHkG9Xn1HSC214Yj1jTXPep+t2Qy7LYCKEkfa8Ru
+         f3baN5z7FllZpdQ6c/xaIr6AtaRg9VIxgFXImCd3CSbgcEp5rs/bHT+jlhFrdbJh/K6/
+         UhYbOue/Jjd7bamF8ixB38KRBN+Go6ZWburw0ZtsgGx9kmS1tKKhytNYl8DRPYLgtZjD
+         Y/9fUdxa0teEu0V+PtAtSLwU6NQb9MdpBJ8MC8SMFwPltAesZlpUhL+/qoOIxXCo3au6
+         eLCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712320928; x=1712925728;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SVBvJilZY3Ooedngi0kJwoAC9G+3Khq4/wHI4eXqFHQ=;
+        b=sT3jvt1f3a34ewswOmsQyUsJIi0PklPbOwyfvxyEIhiNJkipy1RLD726Rsk/cuK4Uw
+         ICnSKyzRxiqADykQQcLboz4oqPmN/sPQAdwruvWpeiWsJtGYk7TSZ5dggu6NaEW8+uVC
+         lepoKzl4EXDamtoudectC6wtA6VuGqMhOJVSHbkuYisG9jmyS6xsC9Lh2bbC6aKiEBnt
+         jabznJybrh3QwgN6k2tCw3jjXLYoy3NqE4/kCtBWbUYsJoz8pWo6PtTIJDuCH8qWJUTy
+         uXbVdttXDm5ti2dSSSllpzjozfTRQ+XksXkssdVe2JHfn6/8thAiVu4mH9MYPZfdPGrs
+         pDZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrr0jmuBgIsrBrzBEIZkgFdt6Ib35H07Qupazc7FVqyRNmuE1qwrBw00cNJTFg/KNx8FU5RQ97sh8DhaPbL+wED/sV11cU
+X-Gm-Message-State: AOJu0Yzs1shAWh/NtQCb0/magsU6wcvJ73O3eOyahBLW+o33Nc2qA+yo
+	EDQYXVkCmJW2K49dvVtKYx0CFb+0JZwYfCPecVsG9LqfMhVzvj/uGksXBaXU0jnM/u7BhIHzloe
+	1AOxk2qGVaufE7c/mEVcj5/Bw7oSm9tM1IuJw
+X-Google-Smtp-Source: AGHT+IFPAHKIJ/1yJhnZmS0vik0zLdsQtl/+FxlV6/w+aHTBFigb86WPpQMcVfiyeUwzuAMtfjsONbs4D+6LkJmw7Ug=
+X-Received: by 2002:aa7:c40c:0:b0:56d:e27:369c with SMTP id
+ j12-20020aa7c40c000000b0056d0e27369cmr303313edq.3.1712320927774; Fri, 05 Apr
+ 2024 05:42:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <00c5b7641c0c854b630a80038d0131d148c2c81a.1712270285.git.asml.silence@gmail.com>
+ <CANn89i+XZtjD1RVBiFxfmsqZPMtN0156XgjUOkoOf8ohc7n+RQ@mail.gmail.com>
+ <d475498f-f6db-476c-8c33-66c9f6685acf@gmail.com> <CANn89iKZ4_ENsdOsMECd_7Np5imhqkJGatNXfrwMrgcgrLaUjg@mail.gmail.com>
+ <CAL+tcoC4m7wO386UiCoax1rsuAYANgjfHyaqBz7=Usme_2jxuw@mail.gmail.com> <CANn89iJ+WXUcXna+s6eVh=-HJf2ExsdLTkXV=CTww9syR2KGVg@mail.gmail.com>
+In-Reply-To: <CANn89iJ+WXUcXna+s6eVh=-HJf2ExsdLTkXV=CTww9syR2KGVg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Apr 2024 14:41:53 +0200
+Message-ID: <CANn89iLUQ1DsBd_nemdhcgfvc_ybQmM_sGwWLwzeyOW+5C2KnA@mail.gmail.com>
+Subject: Re: [PATCH RESEND net-next v3] net: cache for same cpu skb_attempt_defer_free
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, pabeni@redhat.com, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
+On Fri, Apr 5, 2024 at 2:38=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
 
-> On Fri, 5 Apr 2024 at 15:01, Kalle Valo <kvalo@kernel.org> wrote:
+> There are false positives at this moment whenever frag_list are used in r=
+x skbs.
 >
->>
->> Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
->>
->> > On Fri, 8 Mar 2024 at 17:19, Kalle Valo <kvalo@kernel.org> wrote:
->> >>
->> >> Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
->> >>
->> >> >> To be on the safe side using 'qcom-rb1' makes sense but on the other
->> >> >> hand that means we need to update linux-firmware (basically add a new
->> >> >> symlink) everytime a new product is added. But are there going to be
->> >> >> that many new ath10k based products?
->> >> >>
->> >> >> Using 'qcm2290' is easier because for a new product then there only
->> >> >> needs to be a change in DTS and no need to change anything
->> >> >> linux-firmware. But here the risk is that if there's actually two
->> >> >> different ath10k firmware branches for 'qcm2290'. If that ever happens
->> >> >> (I hope not) I guess we could solve that by adding new 'qcm2290-foo'
->> >> >> directory?
->> >> >>
->> >> >> But I don't really know, thoughts?
->> >> >
->> >> > After some thought, I'd suggest to follow approach taken by the rest
->> >> > of qcom firmware:
->> >>
->> >> Can you provide pointers to those cases?
->> >
->> > https://gitlab.com/kernel-firmware/linux-firmware/-/tree/main/qcom/sc8280xp/LENOVO/21BX
->> >
->> >>
->> >> > put a default (accepted by non-secured hardware) firmware to SoC dir
->> >> > and then put a vendor-specific firmware into subdir. If any of such
->> >> > vendors appear, we might even implement structural fallback: first
->> >> > look into sdm845/Google/blueline, then in sdm845/Google, sdm845/ and
->> >> > finally just under hw1.0.
->> >>
->> >> Honestly that looks quite compilicated compared to having just one
->> >> sub-directory. How will ath10k find the directory names (or I vendor and
->> >> model names) like 'Google' or 'blueline' in this example?
->> >
->> > I was thinking about the firmware-name = "sdm845/Google/blueline". But
->> > this can be really simpler, firmware-name = "blueline" or
->> > "sdm845/blueline" with no need for fallbacks.
->>
->> I have been also thinking about this and I would prefer not to have the
->> fallbacks. But good if you agree with that.
->>
->> IMHO just "sdm845-blueline" would be the most simple. I don't see the
->> point of having a directory structure when there are not that many
->> directories really. But this is just cosmetics.
->
-> It is "not many directories" if we are thinking about the
-> linux-firmware or open devices. But once embedded distros start
-> picking this up for the supported devices, this can quickly become a
-> nuisance.
+> (Small MAX_SKB_FRAGS, small MTU, big GRO size)
 
-Ok. Just out of curiosity, any ideas how many devices/products are there
-with wcn3990 who want to use ath10k?
+ perf record -a -g -e skb:kfree_skb sleep 1
+[ perf record: Woken up 84 times to write data ]
+[ perf record: Captured and wrote 21.594 MB perf.data (95653 samples) ]
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+perf script
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+netserver 43113 [051] 2053323.508683: skb:kfree_skb:
+skbaddr=3D0xffff8d699e0b8f00 protocol=3D34525 location=3Dskb_release_data
+reason: NOT_SPECIFIED
+            7fffa5bcadb8 kfree_skb_list_reason ([kernel.kallsyms])
+            7fffa5bcadb8 kfree_skb_list_reason ([kernel.kallsyms])
+            7fffa5bcb7b8 skb_release_data ([kernel.kallsyms])
+            7fffa5bcaa5f __kfree_skb ([kernel.kallsyms])
+            7fffa5bd7099 skb_attempt_defer_free ([kernel.kallsyms])
+            7fffa5ce81fa tcp_recvmsg_locked ([kernel.kallsyms])
+            7fffa5ce7cf9 tcp_recvmsg ([kernel.kallsyms])
+            7fffa5dac407 inet6_recvmsg ([kernel.kallsyms])
+            7fffa5bb9bc2 sock_recvmsg ([kernel.kallsyms])
+            7fffa5bbbc8b __sys_recvfrom ([kernel.kallsyms])
+            7fffa5bbbd3a __x64_sys_recvfrom ([kernel.kallsyms])
+            7fffa5eeb367 do_syscall_64 ([kernel.kallsyms])
+            7fffa600312a entry_SYSCALL_64_after_hwframe ([kernel.kallsyms])
+                  1220d2 __libc_recv (/usr/grte/v3/lib64/libc-2.15.so)
 
