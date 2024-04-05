@@ -1,175 +1,167 @@
-Return-Path: <netdev+bounces-85366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C2189A716
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 00:11:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFA5F89A744
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 00:31:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3231DB20C0D
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:11:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BEA81F24F53
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22F6174EE9;
-	Fri,  5 Apr 2024 22:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96874176FBF;
+	Fri,  5 Apr 2024 22:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KgCtWAYS"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LMoCvuAv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B9A1E87C
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 22:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DCE175557;
+	Fri,  5 Apr 2024 22:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712355076; cv=none; b=CY/RDJcNJEVO7+hW2hoIYEHzDCR0J4U07Z/ekxMhYfcxtUjpMgkkb0nOe456ZgOV/14kxFqF5IccBXfhmL/CaTrg1t/3ryiMans2EuUhyJkB0wyyrn0MwUn273noWn+xlhui0c/JnQ+fCd4EFah/FhdEsmcrKg3xiJn+4D7MnH4=
+	t=1712356047; cv=none; b=u+xTbhwsmRezwWfNUAyD1JnRzYl/RJ/gI33aR37BWnetkFsDlfuOE49y0jw4NlmNvPl+IRzp3v9tKVfEynZUheaDyRaLRI7r5G6eGY6/33jNYzyHjj++ENwlF76h46xJp4yZrTbnCZTWPFcbF4NglQgipCGifrHbHr8YbrgMt50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712355076; c=relaxed/simple;
-	bh=FK0G/FCjSXEososHM46ugi1L4cjmlaSB1pTi1GOWgpM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nIQNICavoyQX3RWJV4QyQGMAtS9VOcrnTCT64WuOiGGPEG08l9U5DhQGC+Qdgs8q76n6iR5xbNA5cDuQJHNQmvq0HS8gjcIg5HNQM0JdM7+Q1R+Zgwrf+8/DIuxQ+zrLDEwffMu3973QSeZJ8vCKSmdnI9cQ8ufoAZyQIENCWt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=KgCtWAYS; arc=none smtp.client-ip=52.95.49.90
+	s=arc-20240116; t=1712356047; c=relaxed/simple;
+	bh=qrrZBeX1vtGWgwK5O99qDlCfzTKu2CnGs6Zioe/+/30=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z0aoUwsMtCAaySyGhoMv85FBhIAl7qXo9RqNcGHUA6nx0srvUfdJ0sUczzXtFonspXftrqI+tIQu3FI9Q5mPxzBi7tsHpXZLaZeA7USE3YTTRH9sj5p2/pxHsoCBKQygnR/hJPHMos+OzJ6ckIQP/hqFBl3Qp1ulx67fVGhsHKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LMoCvuAv; arc=none smtp.client-ip=207.171.188.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712355075; x=1743891075;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=F9S5i89Ur2NiLYRkrWpvWTzaR3VdlsNWetaXGaaNT+g=;
-  b=KgCtWAYSeSukp1sPYnDRABmF0l30cv3NNxTXjgc7qZkJC/7jUN/GIJ87
-   /XU5bJqd8SAupmVJz57FzypzvF3hQ0+WBLJ1WncJrtH500vCYz/VQLFg6
-   jmsrWwUhivkI800nJleEk8hKP34iWT2ebbvr1SrkyxCJXE0yhwkYjn/jZ
-   M=;
+  t=1712356045; x=1743892045;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=MZmfmRuTm98xxNT3u4GoRIvJJsGslBrgcovMMdqPwTw=;
+  b=LMoCvuAvAiKpauBjBvG9rZqvq6Adv0g22tVGZIEI0d5TB8C2HlDl1LHj
+   ASgigsE0s2Il2hca+iDoCM6AQH10YBXw8e5uCk/kWQjy44Sa3yPPKf9V2
+   ge0Y/ag/602Bo2vu9PmOTCQz5V4tyWdDcU0BFbPvDDGjaYJf/FMeOaHPI
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.07,182,1708387200"; 
-   d="scan'208";a="398518618"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 22:11:12 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:8111]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.181:2525] with esmtp (Farcaster)
- id 0a098e4b-ae03-44b7-8490-00b918663e98; Fri, 5 Apr 2024 22:11:11 +0000 (UTC)
-X-Farcaster-Flow-ID: 0a098e4b-ae03-44b7-8490-00b918663e98
+   d="scan'208";a="716520780"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 22:27:19 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:33431]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.222:2525] with esmtp (Farcaster)
+ id d323b31d-9f42-407f-b466-8125712ac6f4; Fri, 5 Apr 2024 22:27:18 +0000 (UTC)
+X-Farcaster-Flow-ID: d323b31d-9f42-407f-b466-8125712ac6f4
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 5 Apr 2024 22:11:10 +0000
+ 15.2.1258.28; Fri, 5 Apr 2024 22:27:17 +0000
 Received: from 88665a182662.ant.amazon.com (10.106.101.45) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Fri, 5 Apr 2024 22:11:08 +0000
+ Fri, 5 Apr 2024 22:27:06 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Rao shoaib <rao.shoaib@oracle.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
-	<syzbot+7f7f201cc2668a8fd169@syzkaller.appspotmail.com>
-Subject: [PATCH v2 net] af_unix: Clear stale u->oob_skb.
-Date: Fri, 5 Apr 2024 15:10:57 -0700
-Message-ID: <20240405221057.2406-1-kuniyu@amazon.com>
+To: <j.granados@samsung.com>
+CC: <Dai.Ngo@oracle.com>, <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
+	<allison.henderson@oracle.com>, <anna@kernel.org>, <bridge@lists.linux.dev>,
+	<chuck.lever@oracle.com>, <coreteam@netfilter.org>, <courmisch@gmail.com>,
+	<davem@davemloft.net>, <dccp@vger.kernel.org>,
+	<devnull+j.granados.samsung.com@kernel.org>, <dhowells@redhat.com>,
+	<dsahern@kernel.org>, <edumazet@google.com>, <fw@strlen.de>,
+	<geliang@kernel.org>, <guwen@linux.alibaba.com>,
+	<herbert@gondor.apana.org.au>, <horms@verge.net.au>, <ja@ssi.bg>,
+	<jaka@linux.ibm.com>, <jlayton@kernel.org>, <jmaloy@redhat.com>,
+	<jreuter@yaina.de>, <kadlec@netfilter.org>, <keescook@chromium.org>,
+	<kolga@netapp.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-afs@lists.infradead.org>, <linux-hams@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<linux-sctp@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
+	<linux-x25@vger.kernel.org>, <lucien.xin@gmail.com>,
+	<lvs-devel@vger.kernel.org>, <marc.dionne@auristor.com>,
+	<marcelo.leitner@gmail.com>, <martineau@kernel.org>, <matttbe@kernel.org>,
+	<mcgrof@kernel.org>, <miquel.raynal@bootlin.com>, <mptcp@lists.linux.dev>,
+	<ms@dev.tdt.de>, <neilb@suse.de>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <pabeni@redhat.com>,
+	<pablo@netfilter.org>, <ralf@linux-mips.org>, <razor@blackwall.org>,
+	<rds-devel@oss.oracle.com>, <roopa@nvidia.com>, <stefan@datenfreihafen.org>,
+	<steffen.klassert@secunet.com>, <tipc-discussion@lists.sourceforge.net>,
+	<tom@talpey.com>, <tonylu@linux.alibaba.com>,
+	<trond.myklebust@hammerspace.com>, <wenjia@linux.ibm.com>,
+	<ying.xue@windriver.com>
+Subject: Re: [PATCH v2 4/4] ax.25: Remove the now superfluous sentinel elements from ctl_table array
+Date: Fri, 5 Apr 2024 15:26:58 -0700
+Message-ID: <20240405222658.3615-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240405071531.fv6smp55znlfnul2@joelS2.panther.com>
+References: <20240405071531.fv6smp55znlfnul2@joelS2.panther.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC003.ant.amazon.com (10.13.139.231) To
+X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-syzkaller started to report deadlock of unix_gc_lock after commit
-4090fa373f0e ("af_unix: Replace garbage collection algorithm."), but
-it just uncovers the bug that has been there since commit 314001f0bf92
-("af_unix: Add OOB support").
+From: Joel Granados <j.granados@samsung.com>
+Date: Fri, 5 Apr 2024 09:15:31 +0200
+> On Thu, Mar 28, 2024 at 12:49:34PM -0700, Kuniyuki Iwashima wrote:
+> > From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>
+> > Date: Thu, 28 Mar 2024 16:40:05 +0100
+> > > This commit comes at the tail end of a greater effort to remove the
+> > > empty elements at the end of the ctl_table arrays (sentinels) which will
+> > > reduce the overall build time size of the kernel and run time memory
+> > > bloat by ~64 bytes per sentinel (further information Link :
+> > > https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
+> > > 
+> > > When we remove the sentinel from ax25_param_table a buffer overflow
+> > > shows its ugly head. The sentinel's data element used to be changed when
+> > > CONFIG_AX25_DAMA_SLAVE was not defined.
+> > 
+> > I think it's better to define the relation explicitly between the
+> > enum and sysctl table by BUILD_BUG_ON() in ax25_register_dev_sysctl()
+> > 
+> >   BUILD_BUG_ON(AX25_MAX_VALUES != ARRAY_SIZE(ax25_param_table));
+> > 
+> > and guard AX25_VALUES_DS_TIMEOUT with #ifdef CONFIG_AX25_DAMA_SLAVE
+> > as done for other enum.
+> 
+> When I remove AX25_VALUES_DS_TIMEOUT from the un-guarded build it
+> complains in net/ax25/ax25_ds_timer.c (ax25_ds_set_timer). Here is the
+> report https://lore.kernel.org/oe-kbuild-all/202404040301.qzKmVQGB-lkp@intel.com/.
+> 
+> How best to address this? Should we just guard the whole function and do
+> nothing when not set? like this:
 
-The repro basically does the following.
+It seems fine to me.
 
-  from socket import *
-  from array import array
+ax25_ds_timeout() checks !ax25_dev->dama.slave_timeout, but it's
+initialised by kzalloc() during dev setup, so it will be a noop.
 
-  c1, c2 = socketpair(AF_UNIX, SOCK_STREAM)
-  c1.sendmsg([b'a'], [(SOL_SOCKET, SCM_RIGHTS, array("i", [c2.fileno()]))], MSG_OOB)
-  c2.recv(1)  # blocked as no normal data in recv queue
 
-  c2.close()  # done async and unblock recv()
-  c1.close()  # done async and trigger GC
+> 
+> ```
+> void ax25_ds_set_timer(ax25_dev *ax25_dev)
+> {
+> #ifdef COFNIG_AX25_DAMA_SLAVE
+>         if (ax25_dev == NULL)        ···/* paranoia */
+>                 return;
+> 
+>         ax25_dev->dama.slave_timeout =
+>                 msecs_to_jiffies(ax25_dev->values[AX25_VALUES_DS_TIMEOUT]) / 10;
+>         mod_timer(&ax25_dev->dama.slave_timer, jiffies + HZ);
+> #else
+>         return;
+> #endif
+> }
+> 
+> ```
+> 
+> I'm not too familiar with this, so pointing me to the "correct" way to
+> handle this would be helpfull.
 
-A socket sends its file descriptor to itself as OOB data and tries to
-receive normal data, but finally recv() fails due to async close().
+Also, you will need to guard another use of AX25_VALUES_DS_TIMEOUT in
+ax25_dev_device_up().
 
-The problem here is wrong handling of OOB skb in manage_oob().  When
-recvmsg() is called without MSG_OOB, manage_oob() is called to check
-if the peeked skb is OOB skb.  In such a case, manage_oob() pops it
-out of the receive queue but does not clear unix_sock(sk)->oob_skb.
-This is wrong in terms of uAPI.
-
-Let's say we send "hello" with MSG_OOB, and "world" without MSG_OOB.
-The 'o' is handled as OOB data.  When recv() is called twice without
-MSG_OOB, the OOB data should be lost.
-
-  >>> from socket import *
-  >>> c1, c2 = socketpair(AF_UNIX, SOCK_STREAM, 0)
-  >>> c1.send(b'hello', MSG_OOB)  # 'o' is OOB data
-  5
-  >>> c1.send(b'world')
-  5
-  >>> c2.recv(5)  # OOB data is not received
-  b'hell'
-  >>> c2.recv(5)  # OOB date is skipped
-  b'world'
-  >>> c2.recv(5, MSG_OOB)  # This should return an error
-  b'o'
-
-In the same situation, TCP actually returns -EINVAL for the last
-recv().
-
-Also, if we do not clear unix_sk(sk)->oob_skb, unix_poll() always set
-EPOLLPRI even though the data has passed through by previous recv().
-
-To avoid these issues, we must clear unix_sk(sk)->oob_skb when dequeuing
-it from recv queue.
-
-The reason why the old GC did not trigger the deadlock is because the
-old GC relied on the receive queue to detect the loop.
-
-When it is triggered, the socket with OOB data is marked as GC candidate
-because file refcount == inflight count (1).  However, after traversing
-all inflight sockets, the socket still has a positive inflight count (1),
-thus the socket is excluded from candidates.  Then, the old GC lose the
-chance to garbage-collect the socket.
-
-With the old GC, the repro continues to create true garbage that will
-never be freed nor detected by kmemleak as it's linked to the global
-inflight list.  That's why we couldn't even notice the issue.
-
-Fixes: 314001f0bf92 ("af_unix: Add OOB support")
-Reported-by: syzbot+7f7f201cc2668a8fd169@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=7f7f201cc2668a8fd169
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
-v2: Use skb_unref() instead of kfree_skb()
-v1: https://lore.kernel.org/netdev/20240405204145.93169-1-kuniyu@amazon.com/
----
- net/unix/af_unix.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 5b41e2321209..d032eb5fa6df 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2665,7 +2665,9 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
- 				}
- 			} else if (!(flags & MSG_PEEK)) {
- 				skb_unlink(skb, &sk->sk_receive_queue);
--				consume_skb(skb);
-+				WRITE_ONCE(u->oob_skb, NULL);
-+				if (!WARN_ON_ONCE(skb_unref(skb)))
-+					kfree_skb(skb);
- 				skb = skb_peek(&sk->sk_receive_queue);
- 			}
- 		}
--- 
-2.30.2
-
+Thanks!
 
