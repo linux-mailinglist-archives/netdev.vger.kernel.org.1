@@ -1,155 +1,126 @@
-Return-Path: <netdev+bounces-85094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5A858996C7
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:44:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5582E8996DA
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84422B23D1F
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 07:44:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7FEDB2201C
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 07:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4990F13D2BB;
-	Fri,  5 Apr 2024 07:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D6213E03F;
+	Fri,  5 Apr 2024 07:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="C8iLZcm8"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CD213D29D
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 07:44:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA15013D601;
+	Fri,  5 Apr 2024 07:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712303066; cv=none; b=UTFbfp4zihdi27cG25/LK5igjdH4Eb6fVZ2G5lQ39P5wm/Iua0swdI5MDwn3IWecAlHzCRUOCzpNMNMLfIr8VRketPfWYdOb7KBQHhIBAZBod6mZKMSEFFIRJAvPI1IRhMFzO8VLUeisbb2d6XBUFbob1xiZu1X/OCnLBGM5idA=
+	t=1712303158; cv=none; b=OW60alDTRbCkxl6lHEGpDMr0WAObwrf1pHix2TFkTLAiWGp/yqtfKwOje6yibRo8IjEma2pygg2SYtNIRIVZ9Rui+VW0Iq6oQNTvmiHNsY11LTKUpePxM84BLjiKfGt02F1+S4+QmNTYV3wmvLTKS5OmlXJjv2OBochpXGYX/Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712303066; c=relaxed/simple;
-	bh=R03D674QYB5Ga54S94jEHsV8UofXlPVpjBUr5x+5e/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NL69Vz5WNKaqi4k4ZBVGU0nSDZAA9yGG7jSTqsT/qKXeE4xfcxLKEtjVYowXJRhuHJGwl2YsABjiYNZ/w66KKVYEX+TzZDLihJiBjxzj3YiMDRALHQ0i0Zfu4FHWseaII4n9ZgiLkke+183I2d/3cZjR1CjTvyU2r6UAx0/je6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rseEx-0000sw-KA; Fri, 05 Apr 2024 09:43:59 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rseEr-00AWqn-SL; Fri, 05 Apr 2024 09:43:53 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rseEr-00FbmS-2U;
-	Fri, 05 Apr 2024 09:43:53 +0200
-Date: Fri, 5 Apr 2024 09:43:53 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
- way of describing several PSE PIs
-Message-ID: <Zg-ruY_ufPJOyHad@pengutronix.de>
-References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
- <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
- <20240402132637.GA3744978-robh@kernel.org>
- <20240403111548.30e780b5@kmaincent-XPS-13-7390>
- <20240403143142.GA3508225-robh@kernel.org>
- <20240404112506.2e155bad@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1712303158; c=relaxed/simple;
+	bh=1ZDpfD3a7RKRHSzvUXknQC7JfUb0EeRAFmr7HaGNp/o=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=PBmc00OJo9R5TwLPjKl4w+ArT3joSOopwMAc7ipWRJOSKV3AcWUdZV5aXpGXVt9OfSTsJyX5433WEY4kBCiiP7IrKrOfBf61CWBwn1osej/eHhdqT3i2ThxnW2AnCRbk0H0qy00sVOmGiDxsYRMxE0xB6B4GuYaKMy4sltDCB/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=C8iLZcm8; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1712303157; x=1743839157;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=1ZDpfD3a7RKRHSzvUXknQC7JfUb0EeRAFmr7HaGNp/o=;
+  b=C8iLZcm86fGH+YItlDduL3fgCedtW+DakpMZKJ+fJIJE+bEA7RRdk09s
+   SqGTDod12h1DM74XxArsVmB8TfnTxuaV0Uf36JLX8uTnygCJfh/y0+PsN
+   Zil+I4Px5OEX1nWrT8UjTeV6MJV5743hghkGtq2Dc5BNX7VVfvqYN45TW
+   9bgHHAckGCWckD0RJLKrMKDxOf3dnoox8noavqR6Sc0+abuTsmWdkf2na
+   rP9tZpX3wHSFI1olN2fmUNsKIVnPX0C6ZfJ7BiEQkP+LWBbZZxsYQUiMl
+   77RzYz8JsmP1M/hhmxZq8J/XbcV7aJ8jS/QM0HEsXfJ7PWkcZGR2xv3pn
+   Q==;
+X-CSE-ConnectionGUID: 4qZUTU13T9uNgS2+V4FJcw==
+X-CSE-MsgGUID: iW+rMIoVTuCswnVlz6AsWg==
+X-IronPort-AV: E=Sophos;i="6.07,180,1708412400"; 
+   d="scan'208";a="250415236"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Apr 2024 00:45:55 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 5 Apr 2024 00:45:03 -0700
+Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 5 Apr 2024 00:45:00 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next v2 0/2] Add support for flower actions mirred and
+ redirect
+Date: Fri, 5 Apr 2024 09:44:48 +0200
+Message-ID: <20240405-mirror-redirect-actions-v2-0-875d4c1927c8@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240404112506.2e155bad@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPCrD2YC/3WNywqDMBBFf0Vm3SkxPhq76n8UFzJO6yxMZBLEI
+ v57g3Tb5eFyzt0hsgpHuBc7KK8SJfgM9lIATYN/M8qYGayxtamNxVlUg6LyKMqUcKCUlYhEdds
+ RNa5xLWR7UX7Jdpaf4Dmh5y1Bn5dJYgr6OS/X8tx/9epvfS3RIDm+kSsrS657zEIaaJLlSmGG/
+ jiOL7BiBU3MAAAA
+To: Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
+	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Ratheesh Kannoth <rkannoth@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Daniel Machon <daniel.machon@microchip.com>
+X-Mailer: b4 0.14-dev
 
-On Thu, Apr 04, 2024 at 11:25:06AM +0200, Kory Maincent wrote:
-> On Wed, 3 Apr 2024 09:31:42 -0500
-> Rob Herring <robh@kernel.org> wrote:
-> 
-> > >   
-> > > > > +
-> > > > > +          polarity-supported:
-> > > > > +            $ref: /schemas/types.yaml#/definitions/string-array
-> > > > > +            description:
-> > > > > +              Polarity configuration supported by the PSE PI pairsets.
-> > > > > +            minItems: 1
-> > > > > +            maxItems: 4
-> > > > > +            items:
-> > > > > +              enum:
-> > > > > +                - MDI-X
-> > > > > +                - MDI
-> > > > > +                - X
-> > > > > +                - S
-> > > > > +
-> > > > > +          vpwr-supply:
-> > > > > +            description: Regulator power supply for the PSE PI.    
-> > > > 
-> > > > I don't see this being used anywhere.  
-> > > 
-> > > Right, I forgot to add it to the PD692x0 and TPS23881 binding example!  
-> > 
-> > But is this really common/generic? I would think input power rails would 
-> > be chip specific.
-> 
-> I think as each PSE PI are seen as a regulator we may want it generic to track
-> each PI parent. Having the parent regulator described like that would force the
-> devicetree to describe where the power come from.
-> In contrary, for example, on the pd692x0 controller the regulators are connected
-> to the managers (PD69208) and not directly to the PIs. So the devicetree would
-> not really fit the hardware. It is indeed chip specific but having described
-> like that would be more simple.
-> 
-> If we decided to make it chip specific the core would have a callback to ask
-> the driver to fill the regulator_init_data structure for each PI before
-> registering the regulators. It is feasible.
-> 
-> Mmh in fact I am still unsure about the solution.
-> 
-> Oleksij as you were the first to push the idea. Have you more argument in mind
-> to make it generic?
-> https://lore.kernel.org/netdev/ZeObuKHkPN3tiWz_@pengutronix.de/
+================================================================================
+Add support for tc flower actions mirred and redirect.
+================================================================================
 
-There can be different, chip specific power consumer, for example the
-one which is feeding the PSE controller it self, but also there are common
-providers/consumers  those which are used to feed PSE PIs. In case of
-pd692x0 based setup, the managers are actual regulator responsible to
-control power rails connected to PSE PIs, so managers should use this
-common provider. Not sure how TI is designed, but it will have same type
-of consumer to feed PSE PIs as well.
+This series adds support for the two tc flower actions mirred and
+redirect. Both actions are implemented by means of a port mask and a
+mask mode. The mask mode controls how the mask is applied, and together
+they are used by the switch to make a forwarding decision. Both actions
+are configurable via the IS0 or IS2 VCAP's (ingress stage 0 and 2,
+respectively).
 
-Regards,
-Oleksij
+Patch #1: adds support for tc flower mirred action.
+Patch #2: adds support for tc flower redirect action.
+
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+---
+Changes in v2:
+- Squash patch #1 and #2 from previous version, to silence the false
+  positive NIPA warnings.
+- Return directly from vcap_rule_add_action_u72() in *_mirred() and
+  *_redirect()
+- Link to v1: https://lore.kernel.org/r/20240403-mirror-redirect-actions-v1-0-c8e7c8132c89@microchip.com
+
+---
+Daniel Machon (2):
+      net: sparx5: add support for tc flower mirred action.
+      net: sparx5: add support for tc flower redirect action
+
+ .../ethernet/microchip/sparx5/sparx5_tc_flower.c   | 68 ++++++++++++++++++++++
+ drivers/net/ethernet/microchip/vcap/vcap_api.c     | 12 ++++
+ .../net/ethernet/microchip/vcap/vcap_api_client.h  |  2 +
+ 3 files changed, 82 insertions(+)
+---
+base-commit: 5fc68320c1fb3c7d456ddcae0b4757326a043e6f
+change-id: 20240402-mirror-redirect-actions-cc469cc58586
+
+Best regards,
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Daniel Machon <daniel.machon@microchip.com>
+
 
