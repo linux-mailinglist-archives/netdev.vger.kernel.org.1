@@ -1,160 +1,138 @@
-Return-Path: <netdev+bounces-85362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E7989A606
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 23:23:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1920589A6BD
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 23:59:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D3DCB225A3
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:22:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C561C2142D
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92D8174EFD;
-	Fri,  5 Apr 2024 21:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CE6C178CFD;
+	Fri,  5 Apr 2024 21:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pxtPJ3qT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="E3KKnycv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE108174ED2
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 21:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFF01791F1
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 21:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712352174; cv=none; b=bVoeN9jZX3/FGxa6lRCbYDeZLRjxbSQXaTDeCMo0ZvuafstdcFJ5ycJhqAIq+Xmd46PR4Lk6hcrxGNFzCu//3tJnLGbs8XJ9kKNotJmKxzt/hoFghvD5HsrHxwtaw8NF3jxvCsXwHxrELf3/DgDEqs9eE/uWKwV4VqPSLkSB+Z8=
+	t=1712353910; cv=none; b=afvVujhLpDoUQOoCL645LItzITxOIRPw0edB9/zWPxucYHSecvrozQxGD+GBycgog+94nOOQqErAfvhx9r5yrF/IH51psUNNSmeP3ebmjaBeiHo54AeEfveHXUAQHWt1ypOqsUnOXuXTeJ4saF01b4bnug38HS4vQXG5PX8EKqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712352174; c=relaxed/simple;
-	bh=+XGvr/9UwiEYoJxySupRBV0fX9P8bN9Wu4aGZNBWzG0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tKvW5uAwhBCpXZv8Ni47BbGsyHubq/QlRSYNuOWa6Yg61wOEtFlohIXzPjTCkc+8kEuPHtfHN7cN7wHw/537lrsxN7arcKAXR3CejobIr0r4OK49zcFhFC2t7OLNIPUpdBLOA6bKf/Ykuw79gyqzUWFviOZscqbyJi5aYZSbaH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pxtPJ3qT; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso1357a12.1
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 14:22:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712352171; x=1712956971; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2bOittMnFEaGoOVCuwnFtfdUUNfSo5v/D1jXHfwcvf4=;
-        b=pxtPJ3qT4wTIVSuqwhApOuUxV+A8e4pJWttpwvpjSUMq8u8Rm54z96eT6oJwxrKOOL
-         XeXmeVPHBFbBFSdkkKcizZUmtu6GL8GS/rh5SGcnU7VdLvrLEiNeYJTSO0Zu3lKa8CSe
-         +XB+tkJHk3XTzKxSvsllpUlv6O5j8zOHcHBdHrIMMfQm7ZAAKYITSAjhzIjuIONI6Fqu
-         wfQDBy4uIJjmu5P3HAqKBTRmKuWwohVVoaoE43XmL/cqCGV2kjW2mGfOUDTx6D2pZMcP
-         N1S4TZaHIL1bD8nyI3KgyXQf7UpvzptFwuvRRuG8CbjloXzgnvvsfYKlrme1TMTzM9tw
-         v2UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712352171; x=1712956971;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2bOittMnFEaGoOVCuwnFtfdUUNfSo5v/D1jXHfwcvf4=;
-        b=oMPKzlJp9PuQc2pvAdhvKkDyPEYlXXqjvzInCeNW5VmZe0nsyC3Dl9P37gsLEyOKCt
-         PJJxKZyKNCgV9dus/vzGzuZBNvjV4Tk7Cbayn/qkJGXxBwbhpsJJeEHFePy+WZBT8nZW
-         anQN0KMnrscPwYkpV1nU6H7BsdVrpzQnLS3QnNSanTXrbGwWo0c8lJkOC3N2Sw4lA4Fu
-         PkTIQaFAz+QRWzz+wgQrHZiUAjrKuEYeQuR+BwZhG7iOM5fynl1n1CkDkEMxS/W+Ocio
-         iVa6Fi66qqSZLRl3+MeRAWo87WzaTLlJtJNWlgrKqgwIZKRg/bvy4SVLW8oULKu82mQY
-         4fkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUpK2QW6ZwUWWOFaAzXuuw0+3zftnVQ6MR/iKA5r3R3wzI/yipIlELenNdxdZZkPf6ml2Z9lPdWLRvsrIGYg3vhg73qQNmr
-X-Gm-Message-State: AOJu0YxbTSufBW1cFg8NdIzR6PKwtf6s8iI8ev0qFNhncyQPOd6Uhx3K
-	dP/7MAlY42bX1h8QVyHi3tZfltTg9/iiHjmMOPtU6VYjfkg0htZJD4YXfmEHD1nz2M3ZXqfDqFm
-	I+aHdpcj6uamAqZONcLNPrG6I8rez0Wm7RF4I
-X-Google-Smtp-Source: AGHT+IHW+7mf82GixhuIT44gfxUqRfQhYZqSPvI+8Wc67f6b41aoVw8JPchWHJiiUx52XXEGD+SfiIIS/CP4s+sHzXI=
-X-Received: by 2002:a05:6402:c9b:b0:56e:3486:25a3 with SMTP id
- cm27-20020a0564020c9b00b0056e348625a3mr6488edb.1.1712352170998; Fri, 05 Apr
- 2024 14:22:50 -0700 (PDT)
+	s=arc-20240116; t=1712353910; c=relaxed/simple;
+	bh=Yg2sDjRUvrWz06cX4cnmQbTralx8eSPasqEwfIND8A4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nz4tSTuHAbD7N2rHBxBIscRCTOHcf7jtBDpc6EWeDT82Q47hm1M6j/6LQcf4VfSbbR3/iGh1u/mWRqxrhEQmR3fQEUSUc0e5AmBbMPdg+250baG7L9BjgWA0gNd6OnMVZAJ3xUJZEFRy5I4WVIJVb6QJeSgMHdSZen6l3XjhUJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=E3KKnycv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7WKZJqZJYBvNKWiAHVAdj3lxIKfu98oxQMlSdToNKuw=; b=E3KKnycvD2J8Osn99KZINzsT/F
+	ivudIDThfZgWfwRpf25M9lWxwMQeD7wmHPGJSd47P0Ps4uF+SXkkhdR9zQY0QD1MYGi8ZG9XmBFEg
+	gvusUctnM8O4BOzD0UC9HCaBWhUzaPVtaQs+x7I2HpahPdxpckZKMt5qHscvcC3sGD84=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rsrTK-00CLA9-OE; Fri, 05 Apr 2024 23:51:42 +0200
+Date: Fri, 5 Apr 2024 23:51:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 11/15] eth: fbnic: Enable Ethernet link setup
+Message-ID: <cb2519c4-0514-4237-94f8-6707263806a1@lunn.ch>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217495098.1598374.12824051034972793514.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000002ca935060b5a7682@google.com> <0000000000009c0f98061550a827@google.com>
-In-Reply-To: <0000000000009c0f98061550a827@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 5 Apr 2024 23:22:40 +0200
-Message-ID: <CANn89iLxVgrd2QoFkv0xS6ppyZTyO5Hnv5+M5gGg99BQ09n5Ng@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING in cleanup_net (3)
-To: syzbot <syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, hdanton@sina.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, xrivendell7@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <171217495098.1598374.12824051034972793514.stgit@ahduyck-xeon-server.home.arpa>
 
-On Fri, Apr 5, 2024 at 5:00=E2=80=AFAM syzbot
-<syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com> wrote:
->
-> syzbot has found a reproducer for the following issue on:
->
-> HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kerne=
-l..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D11fdccc518000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dfe78468a74fdc=
-3b7
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D9ada62e1dc03fdc=
-41982
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
-ian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D16696223180=
-000
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/0f7abe4afac7/dis=
-k-fe46a7dd.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/82598d09246c/vmlinu=
-x-fe46a7dd.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/efa23788c875/b=
-zImage-fe46a7dd.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com
->
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 5236 at lib/ref_tracker.c:179 ref_tracker_dir_exit+0=
-x411/0x550 lib/ref_tracker.c:179
-> Modules linked in:
-> CPU: 1 PID: 5236 Comm: kworker/u8:6 Not tainted 6.8.0-syzkaller-08951-gfe=
-46a7dd189e #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 03/27/2024
-> Workqueue: netns cleanup_net
-> RIP: 0010:ref_tracker_dir_exit+0x411/0x550 lib/ref_tracker.c:179
-> Code: 48 8b 1c 24 48 89 df 48 8b 74 24 20 e8 88 e7 9f 06 eb 1a e8 71 d2 b=
-5 fc 48 8b 1c 24 48 89 df 48 8b 74 24 20 e8 70 e7 9f 06 90 <0f> 0b 90 48 83=
- c3 44 48 89 df be 04 00 00 00 e8 db 23 19 fd 48 89
-> RSP: 0018:ffffc9000905f9e0 EFLAGS: 00010246
-> RAX: 717a74f119e84f00 RBX: ffff888021ec9e98 RCX: 0000000000000001
-> RDX: dffffc0000000000 RSI: ffffffff8baac1e0 RDI: 0000000000000001
-> RBP: ffffc9000905fab0 R08: ffffffff92ce55ff R09: 1ffffffff259cabf
-> R10: dffffc0000000000 R11: fffffbfff259cac0 R12: 1ffff1100df19ef8
-> R13: dead000000000100 R14: ffff888021ec9ee8 R15: dffffc0000000000
-> FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f5c604d35c0 CR3: 0000000029078000 CR4: 0000000000350ef0
-> Call Trace:
->  <TASK>
->  net_free net/core/net_namespace.c:462 [inline]
->  cleanup_net+0xbf3/0xcc0 net/core/net_namespace.c:658
->  process_one_work kernel/workqueue.c:3254 [inline]
->  process_scheduled_works+0xa02/0x1770 kernel/workqueue.c:3335
->  worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
->  kthread+0x2f2/0x390 kernel/kthread.c:388
->  ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
->  </TASK>
->
->
-> ---
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
+> +#define FBNIC_CSR_START_PCS		0x10000 /* CSR section delimiter */
+> +#define FBNIC_PCS_CONTROL1_0		0x10000		/* 0x40000 */
+> +#define FBNIC_PCS_CONTROL1_RESET		CSR_BIT(15)
+> +#define FBNIC_PCS_CONTROL1_LOOPBACK		CSR_BIT(14)
+> +#define FBNIC_PCS_CONTROL1_SPEED_SELECT_ALWAYS	CSR_BIT(13)
+> +#define FBNIC_PCS_CONTROL1_SPEED_ALWAYS		CSR_BIT(6)
 
-#syz fix: rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
+This appears to be PCS control register 1, define in 45.2.3.1. Since
+this is a standard register, please add it to mdio.h.
+
+> +#define FBNIC_PCS_VENDOR_VL_INTVL_0	0x10202		/* 0x40808 */
+
+Could you explain how these registers map to 802.3 clause 45? Would
+that be 3.1002? That would however put it in the reserved range 3.812
+through 3.1799. The vendor range is 3.32768 through 3.65535. 
+
+> +#define FBNIC_PCS_VL0_0_CHAN_0		0x10208		/* 0x40820 */
+> +#define FBNIC_PCS_VL0_1_CHAN_0		0x10209		/* 0x40824 */
+> +#define FBNIC_PCS_VL1_0_CHAN_0		0x1020a		/* 0x40828 */
+> +#define FBNIC_PCS_VL1_1_CHAN_0		0x1020b		/* 0x4082c */
+> +#define FBNIC_PCS_VL2_0_CHAN_0		0x1020c		/* 0x40830 */
+> +#define FBNIC_PCS_VL2_1_CHAN_0		0x1020d		/* 0x40834 */
+> +#define FBNIC_PCS_VL3_0_CHAN_0		0x1020e		/* 0x40838 */
+> +#define FBNIC_PCS_VL3_1_CHAN_0		0x1020f		/* 0x4083c */
+> +#define FBNIC_PCS_MODE_VL_CHAN_0	0x10210		/* 0x40840 */
+> +#define FBNIC_PCS_MODE_HI_BER25			CSR_BIT(2)
+> +#define FBNIC_PCS_MODE_DISABLE_MLD		CSR_BIT(1)
+> +#define FBNIC_PCS_MODE_ENA_CLAUSE49		CSR_BIT(0)
+> +#define FBNIC_PCS_CONTROL1_1		0x10400		/* 0x41000 */
+> +#define FBNIC_PCS_VENDOR_VL_INTVL_1	0x10602		/* 0x41808 */
+> +#define FBNIC_PCS_VL0_0_CHAN_1		0x10608		/* 0x41820 */
+> +#define FBNIC_PCS_VL0_1_CHAN_1		0x10609		/* 0x41824 */
+> +#define FBNIC_PCS_VL1_0_CHAN_1		0x1060a		/* 0x41828 */
+> +#define FBNIC_PCS_VL1_1_CHAN_1		0x1060b		/* 0x4182c */
+> +#define FBNIC_PCS_VL2_0_CHAN_1		0x1060c		/* 0x41830 */
+> +#define FBNIC_PCS_VL2_1_CHAN_1		0x1060d		/* 0x41834 */
+> +#define FBNIC_PCS_VL3_0_CHAN_1		0x1060e		/* 0x41838 */
+> +#define FBNIC_PCS_VL3_1_CHAN_1		0x1060f		/* 0x4183c */
+> +#define FBNIC_PCS_MODE_VL_CHAN_1	0x10610		/* 0x41840 */
+> +#define FBNIC_CSR_END_PCS		0x10668 /* CSR section delimiter */
+> +
+> +#define FBNIC_CSR_START_RSFEC		0x10800 /* CSR section delimiter */
+> +#define FBNIC_RSFEC_CONTROL(n)\
+> +				(0x10800 + 8 * (n))	/* 0x42000 + 32*n */
+> +#define FBNIC_RSFEC_CONTROL_AM16_COPY_DIS	CSR_BIT(3)
+> +#define FBNIC_RSFEC_CONTROL_KP_ENABLE		CSR_BIT(8)
+> +#define FBNIC_RSFEC_CONTROL_TC_PAD_ALTER	CSR_BIT(10)
+> +#define FBNIC_RSFEC_MAX_LANES			4
+> +#define FBNIC_RSFEC_CCW_LO(n) \
+> +				(0x10802 + 8 * (n))	/* 0x42008 + 32*n */
+> +#define FBNIC_RSFEC_CCW_HI(n) \
+> +				(0x10803 + 8 * (n))	/* 0x4200c + 32*n */
+
+Is this Corrected Code Words Lower/Upper? 1.202 and 1.203?
+
+> +#define FBNIC_RSFEC_NCCW_LO(n) \
+> +				(0x10804 + 8 * (n))	/* 0x42010 + 32*n */
+> +#define FBNIC_RSFEC_NCCW_HI(n) \
+> +				(0x10805 + 8 * (n))	/* 0x42014 + 32*n */
+
+Which suggests this is Uncorrected code Words? 1.204, 1.205? I guess
+the N is for Not?
+
+> +#define FBNIC_RSFEC_SYMBLERR_LO(n) \
+> +				(0x10880 + 8 * (n))	/* 0x42200 + 32*n */
+> +#define FBNIC_RSFEC_SYMBLERR_HI(n) \
+> +				(0x10881 + 8 * (n))	/* 0x42204 + 32*n */
+
+And these are symbol count errors, 1.210 and 1.211?
+
+If there are other registers which follow 802.3 it would be good to
+add them to mdio.h, so others can share them.
+
+    Andrew
 
