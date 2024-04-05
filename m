@@ -1,107 +1,65 @@
-Return-Path: <netdev+bounces-85091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C136899647
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:11:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C45689964C
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E564DB223E0
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 07:11:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EA94B231C2
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 07:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7200A2D042;
-	Fri,  5 Apr 2024 07:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dI5LGV9N"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4872C19C;
+	Fri,  5 Apr 2024 07:12:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CACEC2D03C
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 07:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318752D04C
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 07:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712301087; cv=none; b=pfZxqvpHcC4+rAgHKnXyRoHwCAF+TJOREQT0B8upDOnAxdjM1RFy+Wl/uVaIWGUHk8TW2PBsnoguzl03/La/canYjrmvAQL2AsY2fC6tiKUVTgKXp2gMiwPUQFnTt9DlyJUHBfmGTxU5Cz5I2k3uvSu8AGhcL2QObcAoN9d1qBs=
+	t=1712301133; cv=none; b=VILI0S+534T/2oli63QrobVjYAK8+cRSGnur9G+LXOgGFY/hodEqzIiD25IMageOrXdSrGrCyOhWE1S/p+TXHrAEhJ1cEd08uhYSUitrO35CRn3JmxZwkk+DGTtCGkwzioTs1gEc0c6ykjmh222x1hzyrQq55Yqgn8/Bu5WetaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712301087; c=relaxed/simple;
-	bh=FaJY1Vh/+XbGnJl7l/4I6+2o3O1Tg6lPSEvl1XBTqtQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SeRrtNa1ikaj54GDTCCZ9iK2UvuMen3JbcqECGhsd/8rNH/Y4npV4Z8SOYAQoEbgFp47Pa8pVdsBm/prBBnE4LW/8ofpaYHLh/w3HqmRnZt15okbPEaCmz5alKmNGCk0KdU4Zv1UegELFey5VhJ2xdpMQZNoMCfJhgZLeLb1NzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dI5LGV9N; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712301084;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=FaJY1Vh/+XbGnJl7l/4I6+2o3O1Tg6lPSEvl1XBTqtQ=;
-	b=dI5LGV9NxKEzlKAEveAZOpjm4lIRdRrwKgCtFFW79hrHfiBJfy3srmjLCVRWSOJURiVtCd
-	5qjmlSrRcBnfjpefyNx4GVvXXvky15LEu7fjZF7W4LWLNQ934Gcx6tqAgJxYb/1jGtUx7Z
-	H0spl9CQWdYhTBURgxMgdwWOVjXSSDs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-339-jukXY-q_MpO3I_CuRJc2xA-1; Fri, 05 Apr 2024 03:11:23 -0400
-X-MC-Unique: jukXY-q_MpO3I_CuRJc2xA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-343edd4ac01so45108f8f.0
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 00:11:22 -0700 (PDT)
+	s=arc-20240116; t=1712301133; c=relaxed/simple;
+	bh=uzh/Mszl2+B3KFQvKUH37svKj+pJExNIQuJAXKf2FPs=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=LuSSoDCmm9n7qn5yo8cpryEB08vzNLB8yfSjtIlaMAiqasPWIun0xrGyVP0OlaNJyv6kgSmv32/NTecdqKgWWP4n8zz4D+5MaJkuJ5yIS6+g9Sy4F6inQOkdvvdzG5qaUlobP9Sco4gWQPAyQ+w0ZFAy2BO+OSJAQ4LSh0MpEIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inf.elte.hu; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inf.elte.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-415446af364so17329315e9.0
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 00:12:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712301082; x=1712905882;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FaJY1Vh/+XbGnJl7l/4I6+2o3O1Tg6lPSEvl1XBTqtQ=;
-        b=qcNjlU2NRlkF4bN/BsiQqwcTw+4FRb6XQRsC2CgqD3zu0uLf/0hxFxi1fZYqinUrx/
-         86Uh5hE/rNPjXsRKdqrkWAMcNrqyTtsjTpu4pMQQK21NIlyArYI/0dxNEBDPwfZnAmtO
-         I+vYCGJc7ZqWfvx+rqZPzNXPIjCtrmS2Jlz4irSXLe6OCQ74MQQgdQT/7wwvcVmyHIiZ
-         FCvseLJJY8R+d99GKQnSmrUGK5hTeAAf89YYk7Y6JeIIxHeMH5mcvOHjqqqKcPiUtdyr
-         5TCZJ7NHxDOktO6s8jO/GbienVNiGO/bCCyAEl41kTWgNnZfddUkIcHfhTZAQAcv4kaK
-         1bmA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFqyXiAD9v6ovoJRB3cAYFQo6P2NkCgowgAB/dkdWzqXy4O+R6Qns9ZxZFNtkyGAudjyatus1xXMrG3j0JAjuSjKLk2tge
-X-Gm-Message-State: AOJu0Yy4x60PBu3UQaDJb9xktTQUPsUG3z4H5PKtyIsI7hRTk6IOGbch
-	Dp2OXxnATinjf2hjOFUP5fzBLqKlCIRW9S3k2W2yfEyGzxHYuqqxmXEo/MinoEeIRrkfNv2lAhj
-	gtBORvQwm06QxETWiEdPAerw3uJfCy5Nr7tNnz9sN33nE1fonSFOFig==
-X-Received: by 2002:a05:600c:35ce:b0:415:54d2:15ad with SMTP id r14-20020a05600c35ce00b0041554d215admr494035wmq.1.1712301082047;
-        Fri, 05 Apr 2024 00:11:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHG3drsURmYKY81I73IScfWCYeZGfBqNoxh4npfx6Pwq/q426FKn0qzViRqt34db113evlnNQ==
-X-Received: by 2002:a05:600c:35ce:b0:415:54d2:15ad with SMTP id r14-20020a05600c35ce00b0041554d215admr494014wmq.1.1712301081677;
-        Fri, 05 Apr 2024 00:11:21 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-247-213.dyn.eolo.it. [146.241.247.213])
-        by smtp.gmail.com with ESMTPSA id p13-20020a05600c468d00b004163059bb53sm684688wmo.16.2024.04.05.00.11.20
+        d=1e100.net; s=20230601; t=1712301129; x=1712905929;
+        h=mime-version:user-agent:content-transfer-encoding:date:cc:to:from
+         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uzh/Mszl2+B3KFQvKUH37svKj+pJExNIQuJAXKf2FPs=;
+        b=NfEZxo0vT4LB6EQyAm/mPGfD7sFs0/1X3UWM9HSwMhRqPQvrtWdmlowI/kez86ISEY
+         dETlmf+f2RriDVyQvL75iCmSKA55VzQow8wCTi4LUXdNJ9gbO1YIab4IamK1kfCfVTQ2
+         LbVcrCd+3XujO9Tuu1rxQd4saAxvyWI4scfP3/OXn4SsSlv6UaEeYQY+YHQ+cApR3SjT
+         sB8LAaggzmuBFrwEQj5XTNYbZJw0Ix9s/FeMwjUoDG0KmFAQPwCqFNvhqa51uk27FquQ
+         Qkr0mmLXOfhpLJqEY7bCgW+eiht2tYz+Pbhzra7jB9NadkFw9ETGHQOIm2yLtLIHrqpt
+         Dyfg==
+X-Gm-Message-State: AOJu0Yyr1Fk7M+RgssjvPqvNwNBy5dQ1kYADq77oEflIGOCDTShw2KqF
+	XDCOnD/cY1+sPvkozh95ULDUlmRCWbgLnqldaGVpE+eZlPSOFQpJVoT+QhcHfizFkA==
+X-Google-Smtp-Source: AGHT+IHhVpNE78D8yPNvyaDzdNhVgbX26ypZaQOkkukk10mBoTAJhk0t3BbwCvVMJA1KnHCCSL3b4A==
+X-Received: by 2002:a05:6000:ac2:b0:33e:710a:b699 with SMTP id di2-20020a0560000ac200b0033e710ab699mr661720wrb.9.1712301128920;
+        Fri, 05 Apr 2024 00:12:08 -0700 (PDT)
+Received: from [10.148.80.106] (business-89-135-192-225.business.broadband.hu. [89.135.192.225])
+        by smtp.gmail.com with ESMTPSA id dx18-20020a0560000e1200b00343d840b3f8sm1266977wrb.33.2024.04.05.00.12.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 00:11:21 -0700 (PDT)
-Message-ID: <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-From: Paolo Abeni <pabeni@redhat.com>
-To: Alexander Duyck <alexander.duyck@gmail.com>, Jakub Kicinski
-	 <kuba@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>,  netdev@vger.kernel.org, bhelgaas@google.com,
- linux-pci@vger.kernel.org,  Alexander Duyck <alexanderduyck@fb.com>,
- davem@davemloft.net
-Date: Fri, 05 Apr 2024 09:11:19 +0200
-In-Reply-To: <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
-References: 
-	<171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
-	 <Zg6Q8Re0TlkDkrkr@nanopsycho>
-	 <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
-	 <Zg7JDL2WOaIf3dxI@nanopsycho>
-	 <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
-	 <20240404132548.3229f6c8@kernel.org>
-	 <660f22c56a0a2_442282088b@john.notmuch>
-	 <20240404165000.47ce17e6@kernel.org>
-	 <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
+        Fri, 05 Apr 2024 00:12:08 -0700 (PDT)
+Message-ID: <6aef04e4ea98227c18328126d0a2fcedfaf362b6.camel@inf.elte.hu>
+Subject: [question] SRv6 socket API
+From: Ferenc Fejes <fejes@inf.elte.hu>
+To: netdev <netdev@vger.kernel.org>
+Cc: andrea.mayer@uniroma2.it, sr6-dev@listes.uclouvain.be
+Date: Fri, 05 Apr 2024 09:12:07 +0200
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+User-Agent: Evolution 3.50.3-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,35 +67,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Thu, 2024-04-04 at 17:11 -0700, Alexander Duyck wrote:
-> Again, I would say we look at the blast radius. That is how we should
-> be measuring any change. At this point the driver is self contained
-> into /drivers/net/ethernet/meta/fbnic/. It isn't exporting anything
-> outside that directory, and it can be switched off via Kconfig.
+Hi,
 
-I personally think this is the most relevant point. This is just a new
-NIC driver, completely self-encapsulated.=C2=A0I quickly glanced over the
-code and it looks like it's not doing anything obviously bad. It really
-looks like an usual, legit, NIC driver.
+While experimenting with SRv6 and IPv6 sockets, I skimmed the relevant
+parts of the kernel and failed to figure out how it was supposed to
+work.
 
-I don't think the fact that the NIC itself is hard to grasp for anyone
-outside <organization> makes a difference. Long time ago Greg noted
-that drivers has been merged for H/W known to have a _single_ existing
-instance (IIRC, I can't find the reference on top of my head, but back
-then was quite popular, I hope some other old guy could remember).
+Two questions about the SRv6 socket API.
 
-To me, the maintainership burden is on Meta: Alex/Meta will have to
-handle bug report, breakages, user-complains (I guess this last would
-be the easier part ;). If he/they will not cope with the process we can
-simply revert the driver. I would be quite surprised if such situation
-should happen, but the impact from my PoV looks minimal.
+1. No matter what I do, the nexthdr field of ipv6_sr_hdr is completely
+ignored and the field is set as if its a sticky option. For example, if
+I open my socket as (AF_INET6, SOCK_RAW, IPPROTO_IPV6), nexthdr on the
+wire is set to 41 (IPv6). If I open the socket as (..., ...,
+IPPROTO_UDP) nexthdr will be UDP. Do I miss something?
 
-TL;DR: I don't see any good reason to not accept this - unless my quick
-glance was too quick and very wrong, but it looks like other has
-similar view.
+2. Is it possible to request the SRv6 header? I see the relevant parts
+in the kernel code for legacy routing headers (type2) but not for SRv6
+(type4).
 
-Cheers,
+My test code is as follows:
+socket(AF_INET6, SOCK_RAW, IPPROTO_ROUTING)
+setsockopt(fd, IPPROTO_IPV6, IPV6_RECVRTHDR, &on, sizeof(on))
+... allocate enough space for cmsg, prepare msghdr, etc...
+recvmsg(fd, &msg, 0)
 
-Paolo
+When I send an SRv6 packet with a few segments, recvmsg returns, but
+there are no cmsgs.
 
+
+
+Are these expected operations or do I need to dig deeper?
+
+Thanks,
+Ferenc
 
