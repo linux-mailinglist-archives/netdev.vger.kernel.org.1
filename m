@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-85350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E1889A59B
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:22:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99B7089A5A6
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0087283A49
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:22:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2636E1F233CE
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E67174EC5;
-	Fri,  5 Apr 2024 20:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C45174EC5;
+	Fri,  5 Apr 2024 20:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJkFbOmN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUJvKpsK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9626917278B;
-	Fri,  5 Apr 2024 20:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90BC174ED5
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 20:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712348568; cv=none; b=qfi+0nzCrBT6L8yWAodq7RjOyEBYV4h4Hes8DTuvirzgXfWzA9puXws/j3Mm+knOSPKY8mo8sRny7xZdBomeqx9QNovvnV8pkDjOLoHJHVf2UiO9nyBsCTIIlvP7E+efLTdgllFdI3tjY25swoiukaxFNBl9bjKov7Px+MeHZzI=
+	t=1712348960; cv=none; b=pXu9E4DfVsPaslspXdha2amq2mvWwWnV7oncabatqKhdB3DEMQDX4p1QuokvqYvEmw5KHZUznOGW7yVaTb2RcOPduPGNubCuiCMWwPUyywf34XXqZeG4RXfYCoqhdtw4YSxv26WJcdSefck1kKaGb706Wu6rLDVDgoycFbq457M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712348568; c=relaxed/simple;
-	bh=/c7g36rtE40BDeZV1S/AlcHS7dY6Xj4ExtPGgjvBAJw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bQLLnS6PQY5nswlNehf4XDnrCWpo3/IjA3xFDKR4oSR7JIhN7t3GDhYOyijCBRU8nXuDJkb4LWeE4KpKkH9hw3K/69qU+W2Yx4F86RCB5qV5VTgNjs33MP4yblGucHQJRWSwDyEBNBmMK9AW2J7DPIh8xgbY1hIKcMZwbbeDLhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QJkFbOmN; arc=none smtp.client-ip=209.85.128.195
+	s=arc-20240116; t=1712348960; c=relaxed/simple;
+	bh=SIKxjQ5uGFsLjoRcZZ6RhVfRtu4RHZDzTmqkSL9r6UM=;
+	h=Message-ID:Date:MIME-Version:Cc:From:Subject:To:Content-Type; b=b0AA69WTwP4c/ZkJF1MY6Txz3hOnR/D7GT7i1xgOPTo2OSIR/08X6pf6mf1KOK+M/9qHglqJqETJmRcANMrzq5vMKTnKd5RvAafhOsHU3zNqDwDCRU+eiVYDnu96h8wubaNZB6rfB88Sj4WSKx9MgEalNr/2v2Ca2S4V4R5+mtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FUJvKpsK; arc=none smtp.client-ip=209.85.208.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-615038fc5baso27621997b3.3;
-        Fri, 05 Apr 2024 13:22:46 -0700 (PDT)
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d8129797fcso33847891fa.1
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 13:29:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712348565; x=1712953365; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9uO9sL7m4DMsIKcxtkPkEJUbu4NEoxIAppzIfnBTObw=;
-        b=QJkFbOmNZCyJpTeJ3OHD1+CWxPuXIZmk72B7MpAHrkxuhjbWY5YwNg31+CYGxQ8gg+
-         6Jl/RaOn0/IFRp2JmHlfqQOvw6KEiLygln/MiCMDt8HNSXA9BeH6nL2GiH+SMDOGUI7n
-         9W/sff4BWrrjmd2E40gILEiAI0VS3gJEoJ3wJBqbsWQh8Ho3tTnOV4raveO0r6icdjNM
-         /fYjHMiYmNq6xUMsSZ3XVMxQHyBPn/EtkBx91VTq697SuEnxToJuscWn21J5t6h3k41P
-         6WcRCIc8pccvnjyD/qhdHavqu6keyVkr4lVEfA86uQCv5+dYIWtkviQnTnnHHSRCPAZR
-         VFCQ==
+        d=gmail.com; s=20230601; t=1712348956; x=1712953756; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:autocrypt:subject:from:cc
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I8K/7MorK30NpCqnMG3JqcQN0gZJgIyPD9B3dUB8TvI=;
+        b=FUJvKpsKdSVt+vLC239GhTJmGmGIcPIfabLoSkyw3hMpSc9DgAUilcGASeMuoytNEC
+         a/HTUI5jblPyaAcO4vjO6T9CTRFxhKKPcgfhiwvcBP38vgmxU5NQv31GR26MoOg1Z6QJ
+         QI07cQBJIjzyh+tMmvAIsxUn1ElcUj1ZH6O8wotxZoVEzMtVCMf0t8MTF4aFyk+5t2BE
+         wZAUgL7CPxpzbmPnchj1r6G7t1jyJng4ldPhsmZ5dDyw5BbmykELrS83/XCZitbfb53/
+         n4hDS3NEpZhXcfeKOgvVNAuL2jDU2q1Xc+DffsX/Nk4UItYKP8p3k2V4AL+NP/prsvdR
+         D7iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712348565; x=1712953365;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1712348956; x=1712953756;
+        h=content-transfer-encoding:to:autocrypt:subject:from:cc
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9uO9sL7m4DMsIKcxtkPkEJUbu4NEoxIAppzIfnBTObw=;
-        b=auFIa6uCHGnnKCYstwSvTCU2dI6dFVjRVtAU46w0Xcd0Md6evH2gqf4I71uUDE99ab
-         jKur8E/7rhlxeSUbxryJ9Zj7jUTWIf0bB60QiC0sxBhztNVviCA5wUEBfPzDPN7OpJWr
-         OVDFXWC34Z0oQBs0HMvtuZpekLw7ZBo538iFXlTPpCqRwbO9mv2w0/FYIYy9k18wpNCK
-         9Sr+maUwrhvjsR23dapZJF7MkEqr7j/phUGkxuwyXuyYx6igD2zrgpM0YpqhiBbMvw4+
-         nIioRlkyDQk5uZq4EnSbXvFYM0am+/xRskoSYfSDtLPFvuzUbsIjByL1XcjHtVCRZuBQ
-         lWCg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2yESLT1QhkZWCeJMAXBie3UB7hST2ZO5N6ZDW0wGYjnJ8tF32sm7WXuZeSn+R3KfMCcn2wD10AWA82hVhIAjhFdp5aaWRRkzViqCkAxi1dveRalZw43iaUYT5mHEF5StC7ugB
-X-Gm-Message-State: AOJu0Yzui/4VVQd/sHX+6gjd8/cU22lPCqIfgyAhBrsVWoCxezWCN5QC
-	DE2ksXCBjT0ELXHBu5BeH2wRb+W7Y61678xnnKW7jXg86tUdd5Z2
-X-Google-Smtp-Source: AGHT+IH/fk1YAwa90MOBxgFnsa+3wbT2P6MSx+PBNEyLZqpyED42kh5pJENTlsy6ODPjOmgWmKoDIA==
-X-Received: by 2002:a0d:d9d1:0:b0:615:1413:95c1 with SMTP id b200-20020a0dd9d1000000b00615141395c1mr2510706ywe.19.1712348564458;
-        Fri, 05 Apr 2024 13:22:44 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id x11-20020a81b04b000000b006155d6134dasm501309ywk.141.2024.04.05.13.22.43
+        bh=I8K/7MorK30NpCqnMG3JqcQN0gZJgIyPD9B3dUB8TvI=;
+        b=hKdYXVeYIDszwqCcdcUabCdgOv1vbaPqHt7LqaK7p9xnxV5cpDZw9tqsl1nwVos+BK
+         K9oQao93BDPxb+oeUGyyXwb8fZLfapwJbGJKNcG12pjXEf/jqPYoFRrf8ABJ430ubQ/L
+         7DM2hwj4CxjJ5kWeNI2tnfmV782w7GPCRH6TcAaj5Nybtuo4ptfHhU5Iq+6dklfoEQ5s
+         cre1eZ7/AM4U32MpMpNFczD19z6tISfEvUel5OBVxbCewESK7gD2fcxXjL5rLaA2OOFL
+         tkXt10eoUzH/963h8WUd/KjVDG5yHHStf4TxldhfdGqoiNnEBsWWJ1YjSw6xoMzAHv9R
+         Tb4g==
+X-Forwarded-Encrypted: i=1; AJvYcCXQxbCS2SOFaIcMa7IBLZnJTzjZSjzGrOiFbbFMivTEXpurXgIWmyGbAOcC0knKzv8b/Ue+l2gxyNH+4RhkdczfRA78Z1Cw
+X-Gm-Message-State: AOJu0YxL3BQbGzcxn8pvBPACpf6AzkQGB5xMD0eExPezk06q3TmxlTc5
+	aDbQjlRtvGL4w3e7c70dumwasGxxZrzvIjBHrCsC6wAtDRoCYdIX
+X-Google-Smtp-Source: AGHT+IGfgpzqH/wl5V4hyG93qVAMN1QswdKt6virMzYxULwOrBvh4YLtv1YozVlhIFDU1+9OI7B5SA==
+X-Received: by 2002:a19:ca07:0:b0:516:ced5:3afa with SMTP id a7-20020a19ca07000000b00516ced53afamr1899827lfg.5.1712348956304;
+        Fri, 05 Apr 2024 13:29:16 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:72bb:b200:e0e0:cd27:7a04:5c79? (dynamic-2a01-0c22-72bb-b200-e0e0-cd27-7a04-5c79.c22.pool.telefonica.de. [2a01:c22:72bb:b200:e0e0:cd27:7a04:5c79])
+        by smtp.googlemail.com with ESMTPSA id e9-20020a17090618e900b00a4655513f0bsm1210303ejf.88.2024.04.05.13.29.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 13:22:44 -0700 (PDT)
-Message-ID: <651c87fc-1f21-4153-bade-2dad048eecbd@gmail.com>
-Date: Fri, 5 Apr 2024 16:22:43 -0400
+        Fri, 05 Apr 2024 13:29:15 -0700 (PDT)
+Message-ID: <bbcdbc1b-44bc-4cf8-86ef-6e6af2b009c3@gmail.com>
+Date: Fri, 5 Apr 2024 22:29:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,129 +75,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
-To: Nikolay Aleksandrov <razor@blackwall.org>,
- Vladimir Oltean <olteanv@gmail.com>
-Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, =?UTF-8?Q?Linus_L=C3=BCssing?=
- <linus.luessing@c0d3.blue>, linux-kernel@vger.kernel.org,
- bridge@lists.linux.dev
-References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
- <7fc8264a-a383-4682-a144-8d91fe3971d9@blackwall.org>
- <20240402174348.wosc37adyub5o7xu@skbuf>
- <a8968719-a63b-4969-a971-173c010d708f@blackwall.org>
- <20240402204600.5ep4xlzrhleqzw7k@skbuf>
- <065b803f-14a9-4013-8f11-712bb8d54848@blackwall.org>
- <804b7bf3-1b29-42c4-be42-4c23f1355aaf@gmail.com>
- <20240405102033.vjkkoc3wy2i3vdvg@skbuf>
- <935c18c1-7736-416c-b5c5-13ca42035b1f@blackwall.org>
 Content-Language: en-US
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-In-Reply-To: <935c18c1-7736-416c-b5c5-13ca42035b1f@blackwall.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Cc: Lukas Wunner <lukas@wunner.de>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net] r8169: fix LED-related deadlock on module removal
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+To: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Realtek linux nic maintainers <nic_swsd@realtek.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/5/2024 7:00 AM, Nikolay Aleksandrov wrote:
-> On 4/5/24 13:20, Vladimir Oltean wrote:
->> On Thu, Apr 04, 2024 at 06:16:12PM -0400, Joseph Huang wrote:
->>>>> mcast_flood == off:
->>>>> - mcast_ipv4_ctrl_flood: don't care (maybe can force to "off")
->>>>> - mcast_ipv4_data_flood: don't care
->>>>> - mcast_ipv6_ctrl_flood: don't care
->>>>> - mcast_ipv6_data_flood: don't care
->>>>> - mcast_l2_flood: don't care
->>>>> mcast_flood == on:
->>>>> - Flood 224.0.0.x according to mcast_ipv4_ctrl_flood
->>>>> - Flood all other IPv4 multicast according to mcast_ipv4_data_flood
->>>>> - Flood ff02::/16 according to mcast_ipv6_ctrl_flood
->>>>> - Flood all other IPv6 multicast according to mcast_ipv6_data_flood
->>>>> - Flood L2 according to mcast_l2_flood
->>>
->>> Did you mean
->>>
->>> if mcast_flood == on (meaning mcast_flood is ENABLED)
->>> - mcast_ipv4_ctrl_flood: don't care (since 224.0.0.x will be flooded 
->>> anyway)
->>> ...
->>>
->>> if mcast_flood == off (meaning mcast_flood is DISABLED)
->>> - Flood 224.0.0.x according to mcast_ipv4_ctrl_flood
->>> ...
->>>
->>> ? Otherwise the problem is still not solved when mcast_flood is 
->>> disabled.
->>
->> No, I mean exactly as I said. My goal was not to "solve the problem"
->> when mcast_flood is disabled, but to give you an option to configure the
->> bridge to achieve what you want, in a way which I think is more 
->> acceptable.
->>
->> AFAIU, there is not really any "problem" - the bridge behaves exactly as
->> instructed given the limited language available to instruct it 
->> ("mcast_flood"
->> covers all multicast). So the other knobs have the role of fine-tuning
->> what gets flooded when mcast_flood is on. Like "yes, but..."
->>
->> You can't "solve the problem" when it involves changing an established
->> behavior that somebody probably depended on to be just like that.
->>
->>>> Yep, sounds good to me. I was thinking about something in these lines
->>>> as well if doing a kernel solution in order to make it simpler and more
->>>> generic. The ctrl flood bits need to be handled more carefully to make
->>>> sure they match only control traffic and not link-local data.
->>>
->>> Do we consider 224.0.0.251 (mDNS) to be control or data? What 
->>> qualifies as
->>> control I guess that's my question.
->>
->> Well, as I said, I'm proposing that 224.0.0.x qualifies as control and
->> the rest of IPv4 multicast as data. Which means that, applied to your
->> case, "mcast_flood on mcast_ipv4_ctrl_flood on mcast_ipv4_data_flood off"
->> will "force flood" mDNS just like the IGMP traffic from your patches.
->> I'm not aware if this could be considered problematic (I don't think so).
->>
->> The reason behind this proposal is that, AFAIU, endpoints may choose to
->> join IGMP groups in the 224.0.0.x range or not, but RFC4541 says that
->> switches shouldn't prune the destinations towards endpoints that don't
->> join this range anyway: https://www.rfc-editor.org/rfc/rfc4541#page-6
->>
->> Whereas for IP multicast traffic towards an address outside 224.0.0.x,
->> pruning will happen as per the IGMP join tracking mechanism.
-> 
-> +1, non-IGMP traffic to 224.0.0.x must be flooded to all anyway
-> so this should allow for a better control over it, but perhaps
-> the naming should be link_local instead because control usually
-> means IGMP, maybe something like mcast_ip_link_local_flood
-> 
+Binding devm_led_classdev_register() to the netdev is problematic
+because on module removal we get a RTNL-related deadlock. Fix this
+by using the parent device instead for device-managed resources.
+This is cleaner anyway because then all device-managed resources in
+the driver use the same device (the one belonging to the PCI device).
 
-Like this?
+Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
+Cc: stable@vger.kernel.org
+Reported-by: Lukas Wunner <lukas@wunner.de>
+Suggested-by: Lukas Wunner <lukas@wunner.de>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/ethernet/realtek/r8169_leds.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-bridge link set dev swp0 mcast_flood off
-   - all flooding disabled
+diff --git a/drivers/net/ethernet/realtek/r8169_leds.c b/drivers/net/ethernet/realtek/r8169_leds.c
+index 7c5dc9d0d..7f2b8a361 100644
+--- a/drivers/net/ethernet/realtek/r8169_leds.c
++++ b/drivers/net/ethernet/realtek/r8169_leds.c
+@@ -146,13 +146,12 @@ static void rtl8168_setup_ldev(struct r8169_led_classdev *ldev,
+ 	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
+ 
+ 	/* ignore errors */
+-	devm_led_classdev_register(&ndev->dev, led_cdev);
++	devm_led_classdev_register(ndev->dev.parent, led_cdev);
+ }
+ 
+ void rtl8168_init_leds(struct net_device *ndev)
+ {
+-	/* bind resource mgmt to netdev */
+-	struct device *dev = &ndev->dev;
++	struct device *dev = ndev->dev.parent;
+ 	struct r8169_led_classdev *leds;
+ 	int i;
+ 
+@@ -245,13 +244,12 @@ static void rtl8125_setup_led_ldev(struct r8169_led_classdev *ldev,
+ 	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
+ 
+ 	/* ignore errors */
+-	devm_led_classdev_register(&ndev->dev, led_cdev);
++	devm_led_classdev_register(ndev->dev.parent, led_cdev);
+ }
+ 
+ void rtl8125_init_leds(struct net_device *ndev)
+ {
+-	/* bind resource mgmt to netdev */
+-	struct device *dev = &ndev->dev;
++	struct device *dev = ndev->dev.parent;
+ 	struct r8169_led_classdev *leds;
+ 	int i;
+ 
+-- 
+2.44.0
 
-bridge link set dev swp0 mcast_flood on
-   - all flooding enabled
-
-bridge link set dev swp0 mcast_flood on mcast_ipv4_data_flood off 
-mcast_ipv6_data_flood off
-   - IPv4 data packets flooding disabled, IPv6 data packets flooding 
-disabled, everything else floods (that is to say, only allow IPv4 local 
-subnet and IPv6 link-local to flood)
-
-?
-
-The syntax seems to be counterintuitive.
-
-Or like this?
-
-bridge link set dev swp0 mcast_flood on mcast_ipv4_ctrl_flood on
-   - only allow IPv4 local subnet to flood, everything else off
-
-?
-
-So basically the question is, what should the behavior be when something 
-is omitted from the command line?
 
