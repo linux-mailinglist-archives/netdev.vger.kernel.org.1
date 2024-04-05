@@ -1,76 +1,79 @@
-Return-Path: <netdev+bounces-85309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DD9989A212
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 18:07:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E6489A226
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 18:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABF3E1F23EEF
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 16:07:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96E73B23C41
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 16:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2354F17106A;
-	Fri,  5 Apr 2024 16:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30F516FF4D;
+	Fri,  5 Apr 2024 16:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cMiRTSns"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sg//saIJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE57171066;
-	Fri,  5 Apr 2024 16:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC1F16ABC3;
+	Fri,  5 Apr 2024 16:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712333240; cv=none; b=VJWEHMj6WEeJ+nsD1HaLJhPpb2NRqqH5uXttrd0bD6TXxeVx8hmh348G63xJIvEN5PGiubyDeU5P2D3+Cw54EOQ5AN1L5bZkkZjG5Y/XIheMAqUDNgdle3XYGhoucL/b1Hn0D79AGP3/CGW2D+ALvEy2EsJ0OymR2Q8NnjDK0l4=
+	t=1712333429; cv=none; b=sm230r/fDp1FOiPGkKSmR4LTrtOzWPmF+q94qIvADGQItJcVG/jxAQmy3cT04ZV22ctAds+WmfGOUk8dHgDAEKWoIR6Y1IDpZQ0GF+ZnVzcTG9hneAYoOLGItOX6mlSNKvStrhgDUYGMsL6TYhkDpSoTMZUiNLcCiOfN18MJ+QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712333240; c=relaxed/simple;
-	bh=5AXlut9OGYv3DSXu2yDWsFFCKzEKKIb9A8Q/EEtoh/I=;
+	s=arc-20240116; t=1712333429; c=relaxed/simple;
+	bh=XoXoslvHGhFAGNnZ/jtkQPOaFZnm6QeH3/hk2RonHU8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YETzB/zANq56STkiaZlz4FCt9uCQYnVubUuekziCDxw6jpTPg/CLDdqu9PohzyitRydRrGILs9on/yca3/TknHmsZb9lagPeTKYOK3RypevHXrSvCNZaEsIGswxfguNXKh9uZ1j9MQmRqdoDIQROhB03oc9k1j+Sdik0zBOhyWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cMiRTSns; arc=none smtp.client-ip=209.85.208.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=EWsLNrsw7SM1kp61YNrN5OL86aSX4TqmVMLI3dZwjS9QNSc7e81SX3lUE6Yn6oHR/9NtIjg0HZaQNXHHIEaf28hEfg0PFLbbI6y88bBR3shNWxyVt4XvlqYYAPHj4K0hNVZ4gROeczUrQOqT7AJuEwaUGqA0mebxbNDH55UdTWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sg//saIJ; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56dfb52d10cso2625050a12.2;
-        Fri, 05 Apr 2024 09:07:18 -0700 (PDT)
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a4715991c32so350484566b.1;
+        Fri, 05 Apr 2024 09:10:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712333237; x=1712938037; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712333427; x=1712938227; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SWxWCR4jW+IXngpqL70YJDP0T6vuTGV5ymV1PXN5QL0=;
-        b=cMiRTSnsHBrCufZ7PqWqY0r5YATSlyeoGvjUWLgT+qmCF9R//smFJG3I22+1blGplF
-         DgnOEpEtMF1kyrl3QKMSWPQbS6cfIu9Kr31OY10wCRLdf1CD7+zQCsnqasf7W//XjsHL
-         h1jTVaFn0qdhvt+c+v1a7ir18sCmok7kznxPEePmvnpKLm3vUv0IUYCGHBzWrDa9h8lR
-         zxPcMWkWga5vBoB3oT8/jTrkMBef1FsdFI5I1F7wnfimTYo0WUwRUup0cI6wstZIAcLm
-         oz0WXIyNVyBKUfx9gwzN6Fs0veNb+WNk098tYDFwvnZ6apQKV9tmhjxv+ELTQ8CaWjXq
-         BMTw==
+        bh=QRnuU2T0zeBP54NjTK724wHa45BiVHY1dZbI/4zG+So=;
+        b=Sg//saIJpNTqinmB2+tRADa5wtqoQWxwHXuOdbWL3EWDePEIJ7ZFvGR6vsGgZaClur
+         fKyD7NDPBMBtOTzrYeuF5NFBqqQBPAgZn4bP2vbrTOCFQqE3W+kDpeJ/ozakujp+tUMY
+         /QiOBTP8jwnl0IXFBu+S7MCw5s5jrhaTSFF1TYd/8UGGG0buZLO9wFMGe1if7wWrBZZF
+         RSPf3L8dJKbwbB95JQs4yhCORhbc02ZufaxRRLnchOq5YToG0ljoIa9aSW4JaooG/g1j
+         2U5C/h/9WTpy0j1GTtM3fKiWG/4Hqg56P0xbXAl7M1VrKS9QB8EgT1Ud+45xYYPOsd/E
+         BMkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712333237; x=1712938037;
+        d=1e100.net; s=20230601; t=1712333427; x=1712938227;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SWxWCR4jW+IXngpqL70YJDP0T6vuTGV5ymV1PXN5QL0=;
-        b=w6xT/ppm3TqufyKfyc4xMXjpwSSoZfOd+R5WVhBxvXgqQX0FjkjVci57fYzkaNn0U5
-         SXYhktqZ5E/awW4GI7mgJB29RBN2R3iA9MNIf2Icyul0GplNP7hNwDEv35MAeLiYTozV
-         KBc/N52Z+bAB7ZkJzgUC4rwZskNn+TvBGSLEVBCyhaoDzm1OolQzTQDgj+K7HQzgpTli
-         K2idIrcBzBJ0WUVKqVCBttQK0MW5R1iP/80N3Wz9gdC8oGdh+zeERUF8Y/40nZsdVYNi
-         q8GBDkmzxO0/fZNJfIJ/hDfp9pRw8oCHZ3l/xPzBezro/RKSDtuUZFw+B3lFaAuykRSb
-         l+PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDsJSbIFAzivI9WHheLUgwNZ7A9Hd6LB8wVuE0plF/S7YNBU00SirhcKJtYcBzNJxu29VlSkL4Nkzy5b41FXxGLARy1Qi9QMBcQjd/
-X-Gm-Message-State: AOJu0YyLWzsN3EPphM04oFdyxZv5+qX9kEv1E/lE3XlN2ok62erXbbP7
-	21hxeuWtndJh+f8apAZxXdZpAAoghqaoOt0C6trOO3nG4yUKNKCB
-X-Google-Smtp-Source: AGHT+IF7dy/kq+AATCpv8CUEDkIB1LId8J+Lr4m6BkQtDRqyyk/K+83e4aN/TATArwjdHUCfM1GzUg==
-X-Received: by 2002:a17:906:a86:b0:a51:a4fc:4baf with SMTP id y6-20020a1709060a8600b00a51a4fc4bafmr1217253ejf.25.1712333236356;
-        Fri, 05 Apr 2024 09:07:16 -0700 (PDT)
+        bh=QRnuU2T0zeBP54NjTK724wHa45BiVHY1dZbI/4zG+So=;
+        b=JCxtT4sHBAEEjJOdX3BZXdsenIA55CadPBCI6nqNBzCGctTlfjweCkasjptQjiXtGb
+         P9csVQ1afQFuD5EuVyTr4kB1XY7RVXbryURU7/BIkhU60/4qx7pU2gGVO6bmH9qmnnzJ
+         /Tj36A78ir43ngsEBTCFQvtDqjGI7JB3alJSXghkxi83yECCrwCWDpe8nWfe7AYXMV/w
+         PeWlwPaYAF1xEofwKeMfTfzPhUxPTXLdrBLXZdli29LqjY7rekDnqTL+/4GSrCENPhxB
+         qV5FgcvbsqPbwe40tnaIQivLd6j1xV1IWXvKbZW7bsmM2RDF3NpN7A/6YnMDh6rl+WOD
+         YUIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUCx7ZYlvT9+52kuHO45e53ROHVS7mO3GhH6fstSDJOr291ihd/Dg10zhxcTswhjh5wCh+3bGTtBAGDkL6A4h39zfKvb00k/b6G+sK4
+X-Gm-Message-State: AOJu0YzBSjSz5y7O26HskrbKl30xuxiAyzxj950LQtDv2tRC+BCGULPy
+	z4YajXg/cVqM8yy28fuqgiNLzi076Yfm8tzpZDnWSt2vp2K6KleE
+X-Google-Smtp-Source: AGHT+IH7Qbt1NBMrdEBXQHquNIASOfmjNvLH5V9PKL2THeFZ+c+Z2bsaJEPTx1jQZbu29vT3ktgvlA==
+X-Received: by 2002:a17:907:ea8:b0:a4e:d43:dc4b with SMTP id ho40-20020a1709070ea800b00a4e0d43dc4bmr1835447ejc.58.1712333426307;
+        Fri, 05 Apr 2024 09:10:26 -0700 (PDT)
 Received: from skbuf ([2a02:2f04:d700:2000::b2c])
-        by smtp.gmail.com with ESMTPSA id f8-20020a170906048800b00a4e4de1892fsm979376eja.58.2024.04.05.09.07.14
+        by smtp.gmail.com with ESMTPSA id n2-20020a1709062bc200b00a517e505e3bsm979891ejg.204.2024.04.05.09.10.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 09:07:15 -0700 (PDT)
-Date: Fri, 5 Apr 2024 19:07:12 +0300
+        Fri, 05 Apr 2024 09:10:25 -0700 (PDT)
+Date: Fri, 5 Apr 2024 19:10:23 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Pawel Dembicki <paweldembicki@gmail.com>
 Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
-	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -79,10 +82,10 @@ Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
 	Alexandre Belloni <alexandre.belloni@bootlin.com>,
 	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v8 07/16] net: dsa: vsc73xx: Add vlan filtering
-Message-ID: <20240405160712.pfgt7lnutsqvxfob@skbuf>
+Subject: Re: [PATCH net-next v8 02/16] net: dsa: vsc73xx: convert to PHYLINK
+Message-ID: <20240405161023.qp2jl2a63z4vg3a2@skbuf>
 References: <20240403103734.3033398-1-paweldembicki@gmail.com>
- <20240403103734.3033398-8-paweldembicki@gmail.com>
+ <20240403103734.3033398-3-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,109 +94,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240403103734.3033398-8-paweldembicki@gmail.com>
+In-Reply-To: <20240403103734.3033398-3-paweldembicki@gmail.com>
 
-On Wed, Apr 03, 2024 at 12:37:23PM +0200, Pawel Dembicki wrote:
-> +static int
-> +vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
-> +			    bool vlan_filtering, struct netlink_ext_ack *extack)
-> +{
-> +	enum vsc73xx_port_vlan_conf port_vlan_conf = VSC73XX_VLAN_IGNORE;
-> +	u16 vid_pvid = 0, vid_untagged = 0;
-> +	struct vsc73xx_portinfo *portinfo;
-> +	struct vsc73xx *vsc = ds->priv;
-> +	bool set_untagged = false;
-> +	bool set_pvid = false;
-> +
-> +	portinfo = &vsc->portinfo[port];
-> +
-> +	/* The swap processed below is required because vsc73xx is using
-> +	 * tag_8021q. When vlan_filtering is disabled, tag_8021q uses
-> +	 * pvid/untagged vlans for port recognition. The values configured for
-> +	 * vlans and pvid/untagged states are stored in portinfo structure.
-> +	 * When vlan_filtering is enabled, we need to restore pvid/untagged from
-> +	 * portinfo structure. Analogic routine is processed when vlan_filtering
+On Wed, Apr 03, 2024 at 12:37:18PM +0200, Pawel Dembicki wrote:
+> This patch replaces the adjust_link api with the phylink apis that provide
+> equivalent functionality.
+> 
+> The remaining functionality from the adjust_link is now covered in the
+> phylink_mac_link_* and phylink_mac_config.
+> 
+> Removes:
+> .adjust_link
+> Adds:
+> .phylink_mac_config
+> .phylink_mac_link_up
+> .phylink_mac_link_down
+> 
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
-Analogous
-
-> +	 * is disabled, but values used for tag_8021q are restored.
-> +	 */
-> +	if (vlan_filtering) {
-> +		struct vsc73xx_vlan_summary summary;
-> +
-> +		/* Use VLAN_N_VID to count all vlans */
-> +		vsc73xx_bridge_vlan_summary(vsc, port, &summary, VLAN_N_VID);
-> +
-> +		port_vlan_conf = (summary.num_untagged > 1) ?
-> +				 VSC73XX_VLAN_FILTER_UNTAG_ALL :
-> +				 VSC73XX_VLAN_FILTER;
-> +
-> +		if (summary.num_untagged == 1) {
-> +			vid_untagged = vsc73xx_find_first_vlan_untagged(vsc,
-> +									port);
-> +			set_untagged = true;
-> +		}
-
-Is there really any functional difference between the above, vs this in
-port_vlan_add():
-
-	port_vlan_conf = VSC73XX_VLAN_FILTER;
-
-	if (summary.num_tagged == 0 && untagged)
-		port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
-	vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
-
-	if (port_vlan_conf == VSC73XX_VLAN_FILTER_UNTAG_ALL)
-		goto update_vlan_table;
-
-vs this in port_vlan_del():
-
-		enum vsc73xx_port_vlan_conf port_vlan_conf =
-							VSC73XX_VLAN_FILTER;
-
-		if (summary.num_tagged == 0)
-			port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
-		vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
-
-		if (summary.num_untagged <= 1) {
-			vid = vsc73xx_find_first_vlan_untagged(vsc, port);
-			vsc73xx_vlan_change_untagged_hw(vsc, port, vid,
-							summary.num_untagged);
-		}
-
-?
-
-If not, I have to agree with Florian that it's dizzying to follow the
-vsc73xx_set_vlan_conf() calls, all with slightly different input.
-Even worse now than before, I think.
-
-I see you've changed the storage variable names, so maybe you are open
-to some more refactoring, to make the code more maintainable.
-
-I would suggest calling a single vsc73xx_update_vlan_conf() from all
-places, which figures out what to do by itself, based on the current
-(updated) state. All ifs and buts are on the inside, not on the outside.
-
-Also, the operate_on_storage variable is not a great name now. Because
-you always operate on storage. It means "operate _just_ on storage", aka
-"don't commit to hardware".
-
-I wanted to avoid requesting you to make more changes to the
-implementation, but you started it, and now it's a confusing mix of
-concepts from old and new patch sets.
-
-I would like to also see the "operate_on_storage" logic rewritten and
-embedded into those functions which must update shared resources (port
-PVID, port untagged VID, etc).
-
-Basically, in the end I would like the driver to be written in the style
-of every other similar function: ocelot_port_manage_port_tag(),
-sja1105_commit_pvid(), mv88e6xxx_commit_pvid() etc. No arguments, except
-the port on which to run. Figure out what to do from the current state,
-and make sure it is called from all places that change that state.
-It also serves very well as self-documenting code, because "how register
-X should be set" is centralized into a single function.
-
-Sorry for making this request so late in the development process. I hope
-it's not discouraging.
+I think you should split out the phylink patches from VLAN work, since
+these seem good to go.
 
