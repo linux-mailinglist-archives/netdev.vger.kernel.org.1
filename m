@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-85307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6EE689A1E0
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:52:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB46889A1EC
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:53:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4914BB240C3
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:52:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F01CB23F80
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C85A171063;
-	Fri,  5 Apr 2024 15:52:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1692C17165E;
+	Fri,  5 Apr 2024 15:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOvM1giy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1RscKEI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D9016FF32;
-	Fri,  5 Apr 2024 15:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8088171658;
+	Fri,  5 Apr 2024 15:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712332329; cv=none; b=vCD7fPgeg190Wse8b6JtN7YP+kp246upcLdVcZzc9AUocq+q7z6XzFZ3+Mhf89gnpH5ZtpLFHIESIfhi98i2WLhhoQLILq/fALYN8f+Wu46QSGW5VsRAAyJzKpzQrYiNLOdvJ9w9TlkfA7beLP3fj9e+3J360bL2dpa191uuS1c=
+	t=1712332356; cv=none; b=A1RsOGBuhM//FsAGDefhi2vGaHaqpzVR10bt+uNIH7bH7uJkfm7TiwdwCTmj+Vi2cpqa608gpzB3EJAXlfCT9Rd9jjQ7T5/L4C9rYVVKA5FWiBwPzm2Bd/9yOApvli4BedywLxxHWMGYdy/Y1WU+b3rDRQa6DNMSFf/eZwkWnbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712332329; c=relaxed/simple;
-	bh=ORRmS7eL8P78h/AQLnRcZuzcALNpQJjjr7RmBmTZR8U=;
+	s=arc-20240116; t=1712332356; c=relaxed/simple;
+	bh=zpr4dQm3nm9LfkfCTtXpoXqHkpx3qH1bE57/AAn3+S8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IEBEbwGAvFWFpQoQyzb0pkf/Rke3YxiwpTnDBPF8ThyW9DlQNt7iyrEx0hq3+Jpff782xDn1iusbxCdXZTZ2w+24rAGc5bzObSJy4CKh8iF9S7XB1wDkBhOZzxFRGyIfoY00IKSlog5V8//2znFUmMZdkyI/kHLUHRbJJW8Bn+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOvM1giy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BD10C433F1;
-	Fri,  5 Apr 2024 15:52:01 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=fYqvCh/L1AMBH4c1LAM33u8gjPTXd9TnhmeaBf+YTibnacyWR0M9tPS/PQ9g1ZQbsFbDA+PiohCAqTQXTU6/0QT6Snz5RBK3s0G/HwP4Eo2fUG3PYo6bEBuOyJZtmi8qq3KMRdatSkRBnj0eHs+RiUAici1pV1q/7qcI3CYNRTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1RscKEI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF029C433C7;
+	Fri,  5 Apr 2024 15:52:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712332328;
-	bh=ORRmS7eL8P78h/AQLnRcZuzcALNpQJjjr7RmBmTZR8U=;
+	s=k20201202; t=1712332355;
+	bh=zpr4dQm3nm9LfkfCTtXpoXqHkpx3qH1bE57/AAn3+S8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aOvM1giyUrtoZvh0zzryNF/mBIQCuURDdYQHcluwXA/H9BBR6zUt+ouPvhZ7EGEk2
-	 O+aJsQmylAi1FG+6eUgCfGaLUTMaRyEYbUE7snnPqzVYv4gewy8W6DogV0MYZxDIxC
-	 uAEkEQmAOpXtYxZb1x8SUmeBktb1E/V0y6KVbI60t5hi+mbhjrKD06azFKD7Gl2ngA
-	 +Wcd5YdrC5CvWrMlg7OPQLKlva6NOQgLnl1bwVxs2/BusSI4njRoJz0zAxCok6aaOH
-	 oDiebgdM62gPVua6HJqflIAZMfkFAaJB2/BumpB71oj8/Dr3SHBGaD4VHp+E+UFwLC
-	 DTc/Tp/hPFbsw==
-Message-ID: <010d67c7-ca71-43fc-a3e3-ec3e5cd8b149@kernel.org>
-Date: Fri, 5 Apr 2024 17:51:59 +0200
+	b=G1RscKEITOjXIsvfj1orjtQTTRAGG7pieQAli0pGaGr7uDlzXS5uXiHCyli8xYmlN
+	 mw/z0K3hCRBdQK2eQBZv3eytMQIaDXQDgJbApEL+dLuGfMqFi9bR4UqV6Lu0ETgmcD
+	 b8h7zhmTOuEuBYUGuhznNIRgGcBu1MR9bfQIZg2edV1tvAygX1b5wRwsrTqwELUdei
+	 uc5NzTXMRNecUKG1WnOuTqGidE7LYvup1wkXFvou0XimbtCYPblONTfo1L6mQ0mAM9
+	 FPI0YQTOiV9+rT4goySzZoYY5Q3OCy/vvt0pJLWKShkYXHI1kCLxt7v19nJ3/ZvgXj
+	 1iuywcnWrUFfg==
+Message-ID: <6f59551a-24df-4b7f-8ddf-beaa62a850f9@kernel.org>
+Date: Fri, 5 Apr 2024 17:52:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/6] arm64: dts: qcom: sa8540p-ride: remove tx-sched-sp
- property
+Subject: Re: [PATCH 6/6] dts: qcom: sa8775p-ride: remove tx-sched-sp property
 To: Flavio Suligoi <f.suligoi@asem.it>,
  Alexandre Torgue <alexandre.torgue@foss.st.com>,
  Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>,
@@ -70,7 +69,7 @@ Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
  imx@lists.linux.dev, linux-arm-msm@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20240405152800.638461-1-f.suligoi@asem.it>
- <20240405152800.638461-6-f.suligoi@asem.it>
+ <20240405152800.638461-7-f.suligoi@asem.it>
 Content-Language: en-US
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -116,11 +115,11 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240405152800.638461-6-f.suligoi@asem.it>
+In-Reply-To: <20240405152800.638461-7-f.suligoi@asem.it>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 05/04/2024 17:27, Flavio Suligoi wrote:
+On 05/04/2024 17:28, Flavio Suligoi wrote:
 > The property "tx-sched-sp" no longer exists, as it was removed from the
 > file:
 > 
@@ -130,16 +129,10 @@ On 05/04/2024 17:27, Flavio Suligoi wrote:
 > 
 > commit aed6864035b1 ("net: stmmac: platform: Delete a redundant condition
 > branch")
+> 
+> Signed-off-by: Flavio Suligoi <f.suligoi@asem.it>
 
-Same problem with commit. BTW, your commit msg does not say what happens
-if this property is removed. Instead it could be "Strict priority is by
-default in Linux driver and tx-sched-sp was removed in commit sha ("foo
-bar")".
-
-
-With fixed in commit msg.
-
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+Fixes in commit msg needed and patch prefix got mangled: missing arm64.
 
 Best regards,
 Krzysztof
