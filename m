@@ -1,199 +1,108 @@
-Return-Path: <netdev+bounces-85063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D9F899335
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 04:38:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56861899336
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 04:39:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74D8DB23D31
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 02:38:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E1F61F2245A
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 02:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A78134A9;
-	Fri,  5 Apr 2024 02:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD8714A85;
+	Fri,  5 Apr 2024 02:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ixxun8zA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khmU1G2g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3A712E68;
-	Fri,  5 Apr 2024 02:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C44E12B82
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 02:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712284699; cv=none; b=FAaNpvfeg33iOpp1ONQRXaSA9HDYwZRkQUfpDg/xXVyWWj9T/fT9ehf4eH4ZL0Xgj1v2J62jG4A6BCpXcParnJGXWzRTx5ml6FPS7lyB3bgw/itGHrbxnWiKp8jxX6UntaJSKBXsw7LXtkugZY8+BvcFzcdKzqNWDuCl27qm6js=
+	t=1712284773; cv=none; b=NwlOukkpSlqSwQOeVXVMP640WrHrB5kDhjuP+n1f8tKBLk+YS4Cwk5ioJNsN4dFuAqw/OAfcRJRkNs8MRl5EOkb9Cg4GRKTk/ickpFAvy+baFaIUpqgkL7Px8+hJSsaDV4O1dZycRHiTaMc3j9SBzGkz0UqH39dB6FWB+uxYPac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712284699; c=relaxed/simple;
-	bh=q8KT3VdkpWtyrZPZsIOOaau0ZTOm3ekdX9hDpVw20T4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jq1PYAVi/zbM/bpI5KDsuFKMIiHeMEnwItoG7oT7VR9uV3eNc9TQsev1RiOP1AVLddYx5oCtl7KljOwASqRHCNM3Ewmnw/zC+zdNR2hHU/0kKx5zTjqXV3VE5jobHEVefDzPp5jxEn2jrU+xdVTZ2eo4TZGT7PSfq6N8Z5mzleE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ixxun8zA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BECBC433C7;
-	Fri,  5 Apr 2024 02:38:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712284698;
-	bh=q8KT3VdkpWtyrZPZsIOOaau0ZTOm3ekdX9hDpVw20T4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ixxun8zAXGLvGzjL8wg3l+dl5V68I1B8lZOJWX6XemIImybjz2rybNuq7ztDegxeY
-	 Hwx2X3ZgC6Vlkt5sNkz8j97XPZH0YdnHGNel78mmIf9K4vKlJMn9Twqw5rkE2x5WzM
-	 VAV98/j4v1oFSy1LR71z8xE9M2w4bCcTuUQeAsMDeTWY941m1ua+mkQBoNgVf/P/F0
-	 fslXE9U27eXRRbfw7oinGzt9RTDwyrUEmMbJuVUV4267QacFo/fYHeF/D2OwZuweZn
-	 /bFzui8hw5dCehjRh4RtWVhZKM//y8Oitle7rEEm3Z8IFlIdIbXtzLWIyeuUmmz/Db
-	 NPW4J43xRqXPg==
-Date: Thu, 4 Apr 2024 19:38:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: John Fastabend <john.fastabend@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, netdev@vger.kernel.org, bhelgaas@google.com,
- linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
- davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <20240404193817.500523aa@kernel.org>
-In-Reply-To: <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
-	<Zg6Q8Re0TlkDkrkr@nanopsycho>
-	<CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
-	<Zg7JDL2WOaIf3dxI@nanopsycho>
-	<CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
-	<20240404132548.3229f6c8@kernel.org>
-	<660f22c56a0a2_442282088b@john.notmuch>
-	<20240404165000.47ce17e6@kernel.org>
-	<CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+	s=arc-20240116; t=1712284773; c=relaxed/simple;
+	bh=yCrgtIEyJaXtaIIO80fltYjSfsjjoKuT7F4mKQ+FKKc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mzLXZquoqKCeb9IIG7XWAQAxhUeJlzHZ5GaJ7MLyGVajBYMYWTYqaLCBq0VYbqapyjfidXpCZeJGvd0tWGokxUe64XZU4L4nL5Q+MHeUP2lcWTCDiAWtaihJypdbBJhxNdly1PkcjLml45C1kLXLTopPQtrPz2MXnlAi54DS9MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=khmU1G2g; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6e9e46f1e03so1080244a34.1
+        for <netdev@vger.kernel.org>; Thu, 04 Apr 2024 19:39:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712284770; x=1712889570; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ru6gzWZMnxJpSoX+oWtJXQs1aqt/q+okaky3Vgyasnk=;
+        b=khmU1G2gn2KyWAvTsQdSoG6wnxpRAS7BPHEHqPIMqNCkqkjJGD87LkeEzfWsGBO15Y
+         /L8GxDGFzDJXoGFWm/hrTk8bYrxDmOyXs36TxxJIrnCHCdvu8YIrAb4DSnMHGoggFUvh
+         wrEBA2pFTKfafkSgIahIzIWsZ+10B45HanGKAm15+G6hqo/a5qLykDhlM1pTg7MPrmz0
+         QPgfPJ/0XHmjLPtc/hKOgeWusnDLjYyr0zuKhkgPpdvR3A41MifXYUhe9X2oVJg5WBUl
+         EHswIiswvZI+i0wuS1XCYN1G/oHtMFn6p1V+JQ/axLLv+/n8NhouKIj5BVmwFx0vCANG
+         fGGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712284770; x=1712889570;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ru6gzWZMnxJpSoX+oWtJXQs1aqt/q+okaky3Vgyasnk=;
+        b=akxh0WiJzAUzoIZkJyR1l0v+QFXn9nsYmi5104IBGOdmanjTJJTruogTfpGDEhrrHI
+         N/dCwJ2Imf1ksBAj6wPBBNeBrH6qg6MoSNYQbI1RsRDoA69fu2RS3PYLQH9RBarx5/I7
+         rhG06UYy1w3Yh6+DJpl6T1tRGZBIo6wxgsjmN7KTlnemjeJPzhNG+J8djRKL9hEXJlVc
+         4TUYW9XzABT4rkdug+geR7uFnshlx6l75zjuKqXaSHWUuU+4m3U7Tf3kiwM2bBDVHCps
+         99U19GcT+CI3IrtrJkRV7j33C/GvIwifK2FO1Lua3uBS0nl2fo+GMTuOP+QWedk1mEdn
+         5rWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPs9FO+g2vt/pYdqJKQ1U8GhDvRDjpVKayyqksf+i1KxXRu892sRexz1ylXVSatxmr6ua4oo0bYetvuuWnJqBnjjbkbZZC
+X-Gm-Message-State: AOJu0YydU8LuF663YZzemUkcYhvIaM2IF+h3yATQuIZWTp5eSkvFJk8p
+	sCKhL03Qqkk3d3u141EO/6+hLF7vK0WuGOztIi0/ptgJRE3qb0bw
+X-Google-Smtp-Source: AGHT+IEi5eNI/vjTMu+2orLSL75cx2jVOhRKt1mlpryze+uU3jxlB9BUvsiYH4ZfXhti36YHx5oiGg==
+X-Received: by 2002:a05:6871:80b:b0:22e:15d2:6773 with SMTP id q11-20020a056871080b00b0022e15d26773mr280798oap.32.1712284770467;
+        Thu, 04 Apr 2024 19:39:30 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([111.201.28.7])
+        by smtp.gmail.com with ESMTPSA id g27-20020a63565b000000b005d8b89bbf20sm366494pgm.63.2024.04.04.19.39.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 19:39:29 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	matttbe@kernel.org,
+	martineau@kernel.org,
+	geliang@kernel.org
+Cc: mptcp@lists.linux.dev,
+	netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next 0/2] mptcp: add reset reasons in skb in more cases
+Date: Fri,  5 Apr 2024 10:39:12 +0800
+Message-Id: <20240405023914.54872-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 4 Apr 2024 17:11:47 -0700 Alexander Duyck wrote:
-> > Opensourcing is just one push to github.
-> > There are guarantees we give to upstream drivers.  
-> 
-> Are there? Do we have them documented somewhere?
+From: Jason Xing <kernelxing@tencent.com>
 
-I think they are somewhere in Documentation/
-To some extent this question in itself supports my point that written
-down rules, as out of date as they may be, seem to carry more respect
-than what a maintainer says :S
+The first patch only removes the check while the second adds reasons into
+some places.
 
-> > > Eventually they need some kernel changes and than we block those too
-> > > because we didn't allow the driver that was the use case? This seems
-> > > wrong to me.  
-> >
-> > The flip side of the argument is, what if we allow some device we don't
-> > have access to to make changes to the core for its benefit. Owner
-> > reports that some changes broke the kernel for them. Kernel rules,
-> > regression, we have to revert. This is not a hypothetical, "less than
-> > cooperative users" demanding reverts, and "reporting us to Linus"
-> > is a reality :(
-> >
-> > Technical solution? Maybe if it's not a public device regression rules
-> > don't apply? Seems fairly reasonable.  
-> 
-> This is a hypothetical. This driver currently isn't changing anything
-> outside of itself. At this point the driver would only be build tested
-> by everyone else. They could just not include it in their Kconfig and
-> then out-of-sight, out-of-mind.
+Jason Xing (2):
+  mptcp: don't need to check SKB_EXT_MPTCP in mptcp_reset_option()
+  mptcp: add reset reason options in some places
 
-Not changing does not mean not depending on existing behavior.
-Investigating and fixing properly even the hardest regressions in 
-the stack is a bar that Meta can so easily clear. I don't understand
-why you are arguing.
+ include/net/mptcp.h |  5 +----
+ net/mptcp/subflow.c | 21 ++++++++++++++++++---
+ 2 files changed, 19 insertions(+), 7 deletions(-)
 
-> > > Anyways we have zero ways to enforce such a policy. Have vendors
-> > > ship a NIC to somebody with the v0 of the patch set? Attach a picture?  
-> >
-> > GenAI world, pictures mean nothing :) We do have a CI in netdev, which
-> > is all ready to ingest external results, and a (currently tiny amount?)
-> > of test for NICs. Prove that you care about the device by running the
-> > upstream tests and reporting results? Seems fairly reasonable.  
-> 
-> That seems like an opportunity to be exploited through. Are the
-> results going to be verified in any way? Maybe cryptographically
-> signed? Seems like it would be easy enough to fake the results.
+-- 
+2.37.3
 
-I think it's much easier to just run the tests than write a system
-which will competently lie. But even if we completely suspend trust,
-someone lying is of no cost to the community in this case.
-
-> > > Even if vendor X claims they will have a product in N months and
-> > > than only sells it to qualified customers what to do we do then.
-> > > Driver author could even believe the hardware will be available
-> > > when they post the driver, but business may change out of hands
-> > > of the developer.
-> > >
-> > > I'm 100% on letting this through assuming Alex is on top of feedback
-> > > and the code is good.  
-> >
-> > I'd strongly prefer if we detach our trust and respect for Alex
-> > from whatever precedent we make here. I can't stress this enough.
-> > IDK if I'm exaggerating or it's hard to appreciate the challenges
-> > of maintainership without living it, but I really don't like being
-> > accused of playing favorites or big companies buying their way in :(  
-> 
-> Again, I would say we look at the blast radius. That is how we should
-> be measuring any change. At this point the driver is self contained
-> into /drivers/net/ethernet/meta/fbnic/. It isn't exporting anything
-> outside that directory, and it can be switched off via Kconfig.
-
-It is not practical to ponder every change case by case. Maintainers
-are overworked. How long until we send the uAPI patch for RSS on the
-flow label? I'd rather not re-litigate this every time someone posts
-a slightly different feature. Let's cover the obvious points from 
-the beginning while everyone is paying attention. We can amend later
-as need be.
-
-> When the time comes to start adding new features we can probably start
-> by looking at how to add either generic offloads like was done for
-> GSO, CSO, ect or how it can also be implemented on another vendor's
-> NIC.
-> 
-> At this point the only risk the driver presents is that it is yet
-> another driver, done in the same style I did the other Intel drivers,
-> and so any kernel API changes will end up needing to be applied to it
-> just like the other drivers.
-
-The risk is we'll have a fight every time there is a disagreement about
-the expectations.
-
-> > > I think any other policy would be very ugly to enforce, prove, and
-> > > even understand. Obviously code and architecture debates I'm all for.
-> > > Ensuring we have a trusted, experienced person signed up to review
-> > > code, address feedback, fix whatever syzbot finds and so on is also a
-> > > must I think. I'm sure Alex will take care of it.  
-> >
-> > "Whatever syzbot finds" may be slightly moot for a private device ;)
-> > but otherwise 100%! These are exactly the kind of points I think we
-> > should enumerate. I started writing a list of expectations a while back:
-> >
-> > Documentation/maintainer/feature-and-driver-maintainers.rst
-> >
-> > I think we just need something like this, maybe just a step up, for
-> > non-public devices..  
-> 
-> I honestly think we are getting the cart ahead of the horse. When we
-> start talking about kernel API changes then we can probably get into
-> the whole "private" versus "publicly available" argument. A good
-> example of the kind of thing I am thinking of is GSO partial where I
-> ended up with Mellanox and Intel sending me 40G and 100G NICs and
-> cables to implement it on their devices as all I had was essentially
-> igb and ixgbe based NICs.
-
-That'd be great. Maybe even more than I'd expect. So why not write
-it down? In case the person doing the coding is not Alex Duyck, and
-just wants to get it done for their narrow use case, get a promo,
-go work on something else?
-
-> Odds are when we start getting to those kind of things maybe we need
-> to look at having a few systems available for developer use, but until
-> then I am not sure it makes sense to focus on if the device is
-> publicly available or not.
-
-Developer access would be huge.
-A mirage of developer access? immaterial :)
 
