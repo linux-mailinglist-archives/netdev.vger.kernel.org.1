@@ -1,211 +1,226 @@
-Return-Path: <netdev+bounces-85053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4FF899282
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 02:13:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA4A899284
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 02:15:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD6E1C21664
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 00:13:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1A441C21620
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 00:15:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457D4393;
-	Fri,  5 Apr 2024 00:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDECC393;
+	Fri,  5 Apr 2024 00:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7EJLlwX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RwHgrJWh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDF1185E;
-	Fri,  5 Apr 2024 00:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8116A36F
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 00:14:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712276016; cv=none; b=RY/uOZsAzGlwLlIEKhB+y4HD5EbN82pegGDEPEcumkg3mJnsTlTnBOcke2Cixq6c3G9UZuWi0xJq5BAX6nS61+cU9/gikxZ5NxrtOmIxLzhPjf1mIHZJvZHRn2pLy1HgViak4x8eBQyIRaGNozzJfAtYpRW1FqECp+sTWULPHOQ=
+	t=1712276100; cv=none; b=TDQg1NZMJQLJWOyZlH4mwhWBfOY90M6nFMG/dBtuK+b8oXTjDHQR+U144c5prFNBKXzgX66lD03XQ1sfb09gTL+Nw1hm57/634P4NLgjWYUaB8b4a/uQFofbsJRKEzgGn6/2rssxiDz87bn61ExP+uhdbwnZiR8zuohUmPIg+Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712276016; c=relaxed/simple;
-	bh=aYcNk1K/ICwidZexakaP0dA9+tVqluQB/biKSaxzonQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ItzwG/5uKaJM3zSNW+KMtDZXVtPuaKHBQO171iUz5Bp0RY3BqoqF2zHAadX569RbZR+44OeNf6PJWQGnG5ziac62pnWqt60PExscFTegvwoXZcx8T6XvlLremJ5RQ+cDJl1IIliLK3vw0+56sWtmlBXBM+EY+cvPyPKY2ISuGpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7EJLlwX; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56b0af675deso1821628a12.1;
-        Thu, 04 Apr 2024 17:13:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712276013; x=1712880813; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RDQ0AI+9sTgw7Asa/hXBXLhuxdgG1OjxAuphEolhA+Q=;
-        b=C7EJLlwXyNDFH1IHQ1gJq79T5LKXowQIZehc/P5v4nlfDDGE36w/F6UMv3FoTAB59C
-         3FlTEzoEgo9n2VQi51TQiYPty8zwiZe95krrZqn87Ggrwbr4JUxwxnmE/fieqzLMUWBO
-         ZoQWgVE2JQ/L0T/dPWf8lSdRWNx9vhXFubkAqv8jXAX80HVa6l4zY+slHtADWGm0/s5k
-         jjcoruvdq4VZ3LHWtG6DwBUcrEmlHzDfrKqNkHk00Qb8S6X8zuBElEhfkBgFVgu/SCsl
-         YqSrgFRFpImv0MCc1j7fPFB3Xx5KS8OgT2LMWTBDuMq4S40tLtcIVBuqXt1/w/YKlt3u
-         2HeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712276013; x=1712880813;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RDQ0AI+9sTgw7Asa/hXBXLhuxdgG1OjxAuphEolhA+Q=;
-        b=Y0l2tJfXJChKWsnUkR4vZJckj5zKE6lP84Zz32NzYxIMQJQSuua9gP34wB/O+GRUHf
-         I2P3EjtQ7E24FH00TmUgX8NkmNbJL953bG0B6N41Ghm7iAo19gCvppyJVb5FBULpgSzo
-         Y3pJfYorZv+n0OA7VKUZqIuAJoY5dO8GKwlbA4WLCj+XD+xOG17+9tHu8Dwu521ycDHp
-         smqEljGF8AjwCOYP6peDIPy2+Nztov6tkByyz6LbHbUoQozQNNnGRf8g/i46U1KvuPjE
-         yLnMCQcjm2NEv/Jp/kozibqJCUU5A6S5nBCJt/8lDaipCX5f3mI6qhFb4FAuZaynlX1+
-         W1hA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5IsZnNTl67+n2vNSNKaFvOvI3Gy9ewWCxDXDgqYQ5OhPaO6rHkHOtPl69L0f3rL7VECkZB6ETZ+TyyOg53SmuQU/H6zIV7H0DfZvCf0a1NyRmN2FKAwDh++v9DDLrMUx/pSdti75i2Z61
-X-Gm-Message-State: AOJu0YwalcOeu1kcbTqcwj/qqPEN0dfcdbqAPM3NfHlLXwtYveSInCsg
-	xt0lDNaqh2AcYwsnpeRx6+xgh3EU9aiedK20mwqHAekAw3HGyrNA1xx4FRZriWRSWbagZlA7C11
-	X7zztRoOfktGvcyRCteno1cCBzGk=
-X-Google-Smtp-Source: AGHT+IH6Q81Un2FH3uF8VE7T4Unxxqeh2qFkaxrnOGFKzV+Z878Eu+hE3fshL8FUJXx6nwSAhwbmRHlSvUGQ+Z7jBEc=
-X-Received: by 2002:a17:907:6d0a:b0:a4e:676f:c34b with SMTP id
- sa10-20020a1709076d0a00b00a4e676fc34bmr929711ejc.61.1712276012643; Thu, 04
- Apr 2024 17:13:32 -0700 (PDT)
+	s=arc-20240116; t=1712276100; c=relaxed/simple;
+	bh=lhXrrKk3jui/IPf1Wm9PfMRztmR64UbYlM8a8dUK8O8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=H2Qq8UyADAUXvLWxLs5uwJA0VMjXgeq1+/i0IglpidA9ghJxj8OReN/EqfjyK5pgQlLuk9na7+Vyn2hvP20TF8DMfpOaAyF9N4AHy44HFCrqhBsbD3o3aTejvEc6H+Am0YaoXmoAWptWh+V5323E5MbZsWX1xEuXEAQ0vo8+I04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RwHgrJWh; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712276098; x=1743812098;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=lhXrrKk3jui/IPf1Wm9PfMRztmR64UbYlM8a8dUK8O8=;
+  b=RwHgrJWhZNBMfj9pFm6kpn3mAfNl8NP0Y57dXQ87/yOAqNCYXic7rYiL
+   b+XkU6MNVOyreH//8KEgFAaajWSBRXx9GYke+amYUio61wG8dUQ5WfgdG
+   inaCBypDYUq1+XMUTw3T8tpUPVH/SXXSDKGOaC1LawI2MDsJ9I1YuxTgW
+   Z4eYDngMLwWSifY7+kA0m94dr4gGPn7lpxYb/+n4HFfCyFfwPajABEcYy
+   6OrfeJqBQHBs6RSsEnt/aQn9LXHZr/Fdc1gPkJ2VWZzQ9H4IbSkgsc4jo
+   rJYgqvYZ6o77XCInNKGyXyKPx0M/7OkOfDpUmIp8/rl8UyX7Csg3M8Ur0
+   Q==;
+X-CSE-ConnectionGUID: sAZlF/cfQ0W89fHbgaluuA==
+X-CSE-MsgGUID: 92c7iiMaTiq0Xo9ybscbSg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="7437167"
+X-IronPort-AV: E=Sophos;i="6.07,180,1708416000"; 
+   d="scan'208";a="7437167"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 17:14:58 -0700
+X-CSE-ConnectionGUID: bX4iwGqcTh2NWHL0xPOMMQ==
+X-CSE-MsgGUID: s90ctnXpSm+GRPJlvGhiCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,180,1708416000"; 
+   d="scan'208";a="23449022"
+Received: from vcostago-mobl3.jf.intel.com (HELO vcostago-mobl3) ([10.241.228.254])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 17:14:58 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: Piotr Kwapulinski <piotr.kwapulinski@intel.com>, netdev@vger.kernel.org,
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>, Jan Glaza
+ <jan.glaza@intel.com>, Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 3/5] ixgbe: Add link
+ management support for E610 device
+In-Reply-To: <20240327155422.25424-4-piotr.kwapulinski@intel.com>
+References: <20240327155422.25424-1-piotr.kwapulinski@intel.com>
+ <20240327155422.25424-4-piotr.kwapulinski@intel.com>
+Date: Thu, 04 Apr 2024 17:14:57 -0700
+Message-ID: <87r0fkbr7i.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404072047.11490-1-kerneljasonxing@gmail.com>
- <20240404072047.11490-6-kerneljasonxing@gmail.com> <d8fe5d37-e317-59a5-9a01-d7c6ae43be7b@kernel.org>
-In-Reply-To: <d8fe5d37-e317-59a5-9a01-d7c6ae43be7b@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 5 Apr 2024 08:12:55 +0800
-Message-ID: <CAL+tcoCDTEov0YkeZD7B0v=TQEsfs9LtGiOge71UxUaPzWA9kQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/6] mptcp: support rstreason for passive reset
-To: Mat Martineau <martineau@kernel.org>
-Cc: edumazet@google.com, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	rostedt@goodmis.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	matttbe@kernel.org, geliang@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-Hello Mat,
+Piotr Kwapulinski <piotr.kwapulinski@intel.com> writes:
 
-On Fri, Apr 5, 2024 at 4:33=E2=80=AFAM Mat Martineau <martineau@kernel.org>=
- wrote:
+> Add low level link management support for E610 device. Link management
+> operations are handled via the Admin Command Interface. Add the following
+> link management operations:
+> - get link capabilities
+> - set up link
+> - get media type
+> - get link status, link status events
+> - link power management
 >
-> On Thu, 4 Apr 2024, Jason Xing wrote:
->
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > It relys on what reset options in MPTCP does as rfc8684 says. Reusing
-> > this logic can save us much energy. This patch replaces all the prior
-> > NOT_SPECIFIED reasons.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> > net/mptcp/subflow.c | 26 ++++++++++++++++++++------
-> > 1 file changed, 20 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-> > index a68d5d0f3e2a..24668d3020aa 100644
-> > --- a/net/mptcp/subflow.c
-> > +++ b/net/mptcp/subflow.c
-> > @@ -304,7 +304,10 @@ static struct dst_entry *subflow_v4_route_req(cons=
-t struct sock *sk,
-> >
-> >       dst_release(dst);
-> >       if (!req->syncookie)
-> > -             tcp_request_sock_ops.send_reset(sk, skb, SK_RST_REASON_NO=
-T_SPECIFIED);
-> > +             /* According to RFC 8684, 3.2. Starting a New Subflow,
-> > +              * we should use an "MPTCP specific error" reason code.
-> > +              */
-> > +             tcp_request_sock_ops.send_reset(sk, skb, SK_RST_REASON_MP=
-TCP_RST_EMPTCP);
->
-> Hi Jason -
->
-> In this case, the MPTCP reset reason is set in subflow_check_req(). Looks
-> like it uses EMPTCP but that isn't guaranteed to stay the same. I think i=
-t
-> would be better to extract the reset reason from the skb extension or the
-> subflow context "reset_reason" field.
+> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Reviewed-by: Jan Glaza <jan.glaza@intel.com>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> ---
 
-Good suggestions :)
+[...]
 
->
->
-> >       return NULL;
-> > }
-> >
-> > @@ -371,7 +374,10 @@ static struct dst_entry *subflow_v6_route_req(cons=
-t struct sock *sk,
-> >
-> >       dst_release(dst);
-> >       if (!req->syncookie)
-> > -             tcp6_request_sock_ops.send_reset(sk, skb, SK_RST_REASON_N=
-OT_SPECIFIED);
-> > +             /* According to RFC 8684, 3.2. Starting a New Subflow,
-> > +              * we should use an "MPTCP specific error" reason code.
-> > +              */
-> > +             tcp6_request_sock_ops.send_reset(sk, skb, SK_RST_REASON_M=
-PTCP_RST_EMPTCP);
->
-> Same issue here.
+> +/**
+> + * ixgbe_update_link_info - update status of the HW network link
+> + * @hw: pointer to the HW struct
+> + *
+> + * Update the status of the HW network link.
+> + *
+> + * Return: the exit code of the operation.
+> + */
+> +int ixgbe_update_link_info(struct ixgbe_hw *hw)
+> +{
+> +	struct ixgbe_link_status *li;
+> +	int err;
+> +
+> +	if (!hw)
+> +		return -EINVAL;
+> +
+> +	li = &hw->link.link_info;
+> +
+> +	err = ixgbe_aci_get_link_info(hw, true, NULL);
+> +	if (err)
+> +		return err;
+> +
+> +	if (li->link_info & IXGBE_ACI_MEDIA_AVAILABLE) {
+> +		struct ixgbe_aci_cmd_get_phy_caps_data __free(kfree) *pcaps;
+> +
+> +		pcaps =	kzalloc(sizeof(*pcaps), GFP_KERNEL);
+> +		if (!pcaps)
+> +			return -ENOMEM;
+> +
 
-Got it.
+Seems that 'pcaps' is leaking here.
 
->
-> >       return NULL;
-> > }
-> > #endif
-> > @@ -778,6 +784,7 @@ static struct sock *subflow_syn_recv_sock(const str=
-uct sock *sk,
-> >       bool fallback, fallback_is_fatal;
-> >       struct mptcp_sock *owner;
-> >       struct sock *child;
-> > +     int reason;
-> >
-> >       pr_debug("listener=3D%p, req=3D%p, conn=3D%p", listener, req, lis=
-tener->conn);
-> >
-> > @@ -833,7 +840,8 @@ static struct sock *subflow_syn_recv_sock(const str=
-uct sock *sk,
-> >                */
-> >               if (!ctx || fallback) {
-> >                       if (fallback_is_fatal) {
-> > -                             subflow_add_reset_reason(skb, MPTCP_RST_E=
-MPTCP);
-> > +                             reason =3D MPTCP_RST_EMPTCP;
-> > +                             subflow_add_reset_reason(skb, reason);
-> >                               goto dispose_child;
-> >                       }
-> >                       goto fallback;
-> > @@ -861,7 +869,8 @@ static struct sock *subflow_syn_recv_sock(const str=
-uct sock *sk,
-> >               } else if (ctx->mp_join) {
-> >                       owner =3D subflow_req->msk;
-> >                       if (!owner) {
-> > -                             subflow_add_reset_reason(skb, MPTCP_RST_E=
-PROHIBIT);
-> > +                             reason =3D MPTCP_RST_EPROHIBIT;
-> > +                             subflow_add_reset_reason(skb, reason);
-> >                               goto dispose_child;
-> >                       }
-> >
-> > @@ -875,13 +884,18 @@ static struct sock *subflow_syn_recv_sock(const s=
-truct sock *sk,
-> >                                        ntohs(inet_sk((struct sock *)own=
-er)->inet_sport));
-> >                               if (!mptcp_pm_sport_in_anno_list(owner, s=
-k)) {
-> >                                       SUBFLOW_REQ_INC_STATS(req, MPTCP_=
-MIB_MISMATCHPORTACKRX);
-> > +                                     reason =3D MPTCP_RST_EUNSPEC;
->
-> I think the MPTCP code here should have been using MPTCP_RST_EPROHIBIT.
+> +		err = ixgbe_aci_get_phy_caps(hw, false,
+> +					     IXGBE_ACI_REPORT_TOPO_CAP_MEDIA,
+> +					     pcaps);
+> +
+> +		if (!err)
+> +			memcpy(li->module_type, &pcaps->module_type,
+> +			       sizeof(li->module_type));
+> +	}
+> +
+> +	return err;
+> +}
+> +
+[...]
 
-I'll update in the V2 of the patch.
+> +/**
+> + * ixgbe_get_media_type_e610 - Gets media type
+> + * @hw: pointer to the HW struct
+> + *
+> + * In order to get the media type, the function gets PHY
+> + * capabilities and later on use them to identify the PHY type
+> + * checking phy_type_high and phy_type_low.
+> + *
+> + * Return: the type of media in form of ixgbe_media_type enum
+> + * or ixgbe_media_type_unknown in case of an error.
+> + */
+> +enum ixgbe_media_type ixgbe_get_media_type_e610(struct ixgbe_hw *hw)
+> +{
+> +	struct ixgbe_aci_cmd_get_phy_caps_data pcaps;
+> +	int rc;
+> +
+> +	rc = ixgbe_update_link_info(hw);
+> +	if (rc)
+> +		return ixgbe_media_type_unknown;
+> +
+> +	/* If there is no link but PHY (dongle) is available SW should use
+> +	 * Get PHY Caps admin command instead of Get Link Status, find most
+> +	 * significant bit that is set in PHY types reported by the command
+> +	 * and use it to discover media type.
+> +	 */
+> +	if (!(hw->link.link_info.link_info & IXGBE_ACI_LINK_UP) &&
+> +	    (hw->link.link_info.link_info & IXGBE_ACI_MEDIA_AVAILABLE)) {
+> +		u64 phy_mask;
+> +		u8 i;
+> +
+> +		/* Get PHY Capabilities */
+> +		rc = ixgbe_aci_get_phy_caps(hw, false,
+> +					    IXGBE_ACI_REPORT_TOPO_CAP_MEDIA,
+> +					    &pcaps);
+> +		if (rc)
+> +			return ixgbe_media_type_unknown;
+> +
+> +		/* Check if there is some bit set in phy_type_high */
+> +		for (i = 64; i > 0; i--) {
+> +			phy_mask = (u64)((u64)1 << (i - 1));
+> +			if ((pcaps.phy_type_high & phy_mask) != 0) {
+> +				/* If any bit is set treat it as PHY type */
+> +				hw->link.link_info.phy_type_high = phy_mask;
+> +				hw->link.link_info.phy_type_low = 0;
+> +				break;
+> +			}
+> +			phy_mask = 0;
+> +		}
+> +
+> +		/* If nothing found in phy_type_high search in phy_type_low */
+> +		if (phy_mask == 0) {
+> +			for (i = 64; i > 0; i--) {
+> +				phy_mask = (u64)((u64)1 << (i - 1));
+> +				if ((pcaps.phy_type_low & phy_mask) != 0) {
+> +					/* Treat as PHY type is any bit set */
+> +					hw->link.link_info.phy_type_high = 0;
+> +					hw->link.link_info.phy_type_low = phy_mask;
+> +					break;
+> +				}
+> +			}
+> +		}
 
-Thanks,
-Jason
+These two look like they are doing something very similar to fls64().
+Could that work?
+
+> +
+> +		/* Based on search above try to discover media type */
+> +		hw->phy.media_type = ixgbe_get_media_type_from_phy_type(hw);
+> +	}
+> +
+> +	return hw->phy.media_type;
+> +}
+> +
+
+
+-- 
+Vinicius
 
