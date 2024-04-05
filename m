@@ -1,162 +1,128 @@
-Return-Path: <netdev+bounces-85119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 724BD89985B
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:46:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D77889985E
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:46:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28ADA284B4B
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:46:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D651B21361
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6325715FCE8;
-	Fri,  5 Apr 2024 08:46:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B09156F41;
+	Fri,  5 Apr 2024 08:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gqlnanNG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA4315F30B
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 08:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C21F1E898
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 08:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712306760; cv=none; b=EDshF0Y6KepE8ibpYNKWucRaa1eY7os3JxjCK1nOG7ED87az58tVK5ZDwmiwjgWR7nIXt6QKSWCb51+Vy7Ab2S3cQsLzYpC/dWO8iajPavLTaW8lxwZIFeUJe8sKTim1dlEaYv8tLFRDFsudawdqnPYNU/96yS+vREo90Pp6n1c=
+	t=1712306805; cv=none; b=cTQFbXCD/NzEOUkASYXEqvrIweija5gcFlhGJc8+h3VXsuFt++TR5mCC0GdpHDfgCO+1Z/oDKcgb0AQ18vCjJ3Cg2Begps0KtZctRYBUajTCuGNjK8kNT+ncBr69qU5nsggn1dnQfcmih4KDqT//Sn9cvfccDRNIWoqw0du3y+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712306760; c=relaxed/simple;
-	bh=vSSoYqZQKwgOXi0XTcJwWuHCpMMOIThoOk9Z8HvMjc4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cTA86JeCzu8YdCVHwZGr06m+/4T2Yzp48xZ980EwOR1NXUVhP86jhABamdBx7m+SVqRLBECN2oCB2dK67cVrw+/HNIfPavz0J8NekHAmmu+JGRQ1+CrfA0Gur3vjmXS6wNawv1vha94Rl//ScUNscyoquEd16n55Gb2gSF2sIxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-Received: from kero.packetmixer.de (p5de1fdf8.dip0.t-ipconnect.de [93.225.253.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.simonwunderlich.de (Postfix) with ESMTPSA id 6F0B4FA103;
-	Fri,  5 Apr 2024 10:45:56 +0200 (CEST)
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: kuba@kernel.org,
-	davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Eric Dumazet <edumazet@google.com>,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH 3/3] batman-adv: bypass empty buckets in batadv_purge_orig_ref()
-Date: Fri,  5 Apr 2024 10:45:49 +0200
-Message-Id: <20240405084549.20003-4-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240405084549.20003-1-sw@simonwunderlich.de>
-References: <20240405084549.20003-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1712306805; c=relaxed/simple;
+	bh=idk0MM3W2P2J2l37DE4I486TwtzE8HyFdg/Q+f0/0Jk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uOKBIz8VqViYO1kb1Mjq2AmNMq49a1Q/WGIZOGrOdcrb41k65a1Mlkg2PwpY/I+nYtdmFQu8GkVYYU5P26NYVOI9MI8wW7UjEk8LVLFCaJckhv9qSNgmAIohGDS465Wf/Y1m1XhBiE9HVBavCATjke+hXgHJDeba2v+XWs5+zAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gqlnanNG; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56e0430f714so7293a12.1
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 01:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712306802; x=1712911602; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xLjMSi+14Hj3xEqyxme36Gwoz1Gt1Sz3UQ5n2a0WBGM=;
+        b=gqlnanNGfouu/IdEcVfZTgN8MmllTemhGHnQnzg/sW0AD7iHUUAVrZxqHhAzK7D/PT
+         D1F8YOHTxt1ATZBJIICAcm9DHWlVFZb8TQh+6cQF7GmpVSiloCztu1yDjdDB6weHOa/H
+         B7U2rS+b+xf00tmEJjnjd5sOmHRynn5PwqxFlUGGfCF4Z6I+tvheCl1EcVYwQaAz3qRe
+         mgMs2HP9qo/94i+m2dBU+ZmUR03+KHStL1RQTDcTI1/CJVYL0AghjGC6tJlLUkQZTfbZ
+         XhgUxYd2z4ykAUs4A5IGRbReKe8oF+gbKDVBVvgnv/KciDKe4cLwgC0yx0zTk2AbIDuC
+         pswg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712306802; x=1712911602;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xLjMSi+14Hj3xEqyxme36Gwoz1Gt1Sz3UQ5n2a0WBGM=;
+        b=ns2K0snD2HtD20aJ5TVLYZV3dIHDfx7XPjHzJ2ndF955xcNd9ddaWOPxxVqaSy6srR
+         A1kDg2wRxCX5GPx9TGgmTKqW554ZV9Aitwo14sJNOU/oChGKsPZ2DMhWh5VMRt0d0MwY
+         +J1od7jr52PAi5nkjhnTdeBr5aRKQLX2fpP0+59cERU7FgrTWRAeympLnvxSZfEtnQan
+         WF5Rg3ufRc+0nruzFlC5z2T7ZxifVfqZB/Sr+CGxNfwBgWC08nM6DimHG9KbORlFpvqK
+         8Ex2Xjda99U6K4Nh7gopJaMUZlst/AkjHqaOOGHDIhmzqeRnYPvAgQL97wQXUHFth5rj
+         86Hw==
+X-Gm-Message-State: AOJu0YzxeYviSPTtkIG8NKZMLe7gRROX8Gc+HZxlkKvTzanYAntu/Pyz
+	4sp7zjMr6pHdpgME86zvy7DzOTI20hg6TcqrvaPKQLFl9GEWb39dLuKx3Px+MUIVdCXMFt1AjDF
+	GRP2W4NVEucQvn8jH6lhiKJi3R/UqbnL5oTu67iPDqA5dpos4/S5D
+X-Google-Smtp-Source: AGHT+IEBlV7UfM/9iAiMTJjcTRPHesarzXb7VqFVFovM3bNRvsXU58sw2YINrqhAxIJhBcATxTlZluEl5DT6y23lNCY=
+X-Received: by 2002:aa7:d987:0:b0:56e:2b00:fcc7 with SMTP id
+ u7-20020aa7d987000000b0056e2b00fcc7mr181317eds.0.1712306801567; Fri, 05 Apr
+ 2024 01:46:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
+References: <00c5b7641c0c854b630a80038d0131d148c2c81a.1712270285.git.asml.silence@gmail.com>
+In-Reply-To: <00c5b7641c0c854b630a80038d0131d148c2c81a.1712270285.git.asml.silence@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Apr 2024 10:46:28 +0200
+Message-ID: <CANn89i+XZtjD1RVBiFxfmsqZPMtN0156XgjUOkoOf8ohc7n+RQ@mail.gmail.com>
+Subject: Re: [PATCH RESEND net-next v3] net: cache for same cpu skb_attempt_defer_free
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	pabeni@redhat.com, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Many syzbot reports are pointing to soft lockups in
-batadv_purge_orig_ref() [1]
+On Fri, Apr 5, 2024 at 1:38=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> Optimise skb_attempt_defer_free() when run by the same CPU the skb was
+> allocated on. Instead of __kfree_skb() -> kmem_cache_free() we can
+> disable softirqs and put the buffer into cpu local caches.
+>
+> CPU bound TCP ping pong style benchmarking (i.e. netbench) showed a 1%
+> throughput increase (392.2 -> 396.4 Krps). Cross checking with profiles,
+> the total CPU share of skb_attempt_defer_free() dropped by 0.6%. Note,
+> I'd expect the win doubled with rx only benchmarks, as the optimisation
+> is for the receive path, but the test spends >55% of CPU doing writes.
+>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>
+> v3: rebased, no changes otherwise
+>
+> v2: pass @napi_safe=3Dtrue by using __napi_kfree_skb()
+>
+>  net/core/skbuff.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 2a5ce6667bbb..c4d36e462a9a 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -6968,6 +6968,19 @@ void __skb_ext_put(struct skb_ext *ext)
+>  EXPORT_SYMBOL(__skb_ext_put);
+>  #endif /* CONFIG_SKB_EXTENSIONS */
+>
+> +static void kfree_skb_napi_cache(struct sk_buff *skb)
+> +{
+> +       /* if SKB is a clone, don't handle this case */
+> +       if (skb->fclone !=3D SKB_FCLONE_UNAVAILABLE) {
+> +               __kfree_skb(skb);
+> +               return;
+> +       }
+> +
+> +       local_bh_disable();
+> +       __napi_kfree_skb(skb, SKB_DROP_REASON_NOT_SPECIFIED);
 
-Root cause is unknown, but we can avoid spending too much
-time there and perhaps get more interesting reports.
-
-[1]
-
-watchdog: BUG: soft lockup - CPU#0 stuck for 27s! [kworker/u4:6:621]
-Modules linked in:
-irq event stamp: 6182794
- hardirqs last  enabled at (6182793): [<ffff8000801dae10>] __local_bh_enable_ip+0x224/0x44c kernel/softirq.c:386
- hardirqs last disabled at (6182794): [<ffff80008ad66a78>] __el1_irq arch/arm64/kernel/entry-common.c:533 [inline]
- hardirqs last disabled at (6182794): [<ffff80008ad66a78>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:551
- softirqs last  enabled at (6182792): [<ffff80008aab71c4>] spin_unlock_bh include/linux/spinlock.h:396 [inline]
- softirqs last  enabled at (6182792): [<ffff80008aab71c4>] batadv_purge_orig_ref+0x114c/0x1228 net/batman-adv/originator.c:1287
- softirqs last disabled at (6182790): [<ffff80008aab61dc>] spin_lock_bh include/linux/spinlock.h:356 [inline]
- softirqs last disabled at (6182790): [<ffff80008aab61dc>] batadv_purge_orig_ref+0x164/0x1228 net/batman-adv/originator.c:1271
-CPU: 0 PID: 621 Comm: kworker/u4:6 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Workqueue: bat_events batadv_purge_orig
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
- pc : should_resched arch/arm64/include/asm/preempt.h:79 [inline]
- pc : __local_bh_enable_ip+0x228/0x44c kernel/softirq.c:388
- lr : __local_bh_enable_ip+0x224/0x44c kernel/softirq.c:386
-sp : ffff800099007970
-x29: ffff800099007980 x28: 1fffe00018fce1bd x27: dfff800000000000
-x26: ffff0000d2620008 x25: ffff0000c7e70de8 x24: 0000000000000001
-x23: 1fffe00018e57781 x22: dfff800000000000 x21: ffff80008aab71c4
-x20: ffff0001b40136c0 x19: ffff0000c72bbc08 x18: 1fffe0001a817bb0
-x17: ffff800125414000 x16: ffff80008032116c x15: 0000000000000001
-x14: 1fffe0001ee9d610 x13: 0000000000000000 x12: 0000000000000003
-x11: 0000000000000000 x10: 0000000000ff0100 x9 : 0000000000000000
-x8 : 00000000005e5789 x7 : ffff80008aab61dc x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : 0000000000000000
-x2 : 0000000000000006 x1 : 0000000000000080 x0 : ffff800125414000
-Call trace:
-  __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
-  arch_local_irq_enable arch/arm64/include/asm/irqflags.h:49 [inline]
-  __local_bh_enable_ip+0x228/0x44c kernel/softirq.c:386
-  __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
-  _raw_spin_unlock_bh+0x3c/0x4c kernel/locking/spinlock.c:210
-  spin_unlock_bh include/linux/spinlock.h:396 [inline]
-  batadv_purge_orig_ref+0x114c/0x1228 net/batman-adv/originator.c:1287
-  batadv_purge_orig+0x20/0x70 net/batman-adv/originator.c:1300
-  process_one_work+0x694/0x1204 kernel/workqueue.c:2633
-  process_scheduled_works kernel/workqueue.c:2706 [inline]
-  worker_thread+0x938/0xef4 kernel/workqueue.c:2787
-  kthread+0x288/0x310 kernel/kthread.c:388
-  ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 0 Comm: swapper/1 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
- pc : arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:51
- lr : default_idle_call+0xf8/0x128 kernel/sched/idle.c:103
-sp : ffff800093a17d30
-x29: ffff800093a17d30 x28: dfff800000000000 x27: 1ffff00012742fb4
-x26: ffff80008ec9d000 x25: 0000000000000000 x24: 0000000000000002
-x23: 1ffff00011d93a74 x22: ffff80008ec9d3a0 x21: 0000000000000000
-x20: ffff0000c19dbc00 x19: ffff8000802d0fd8 x18: 1fffe00036804396
-x17: ffff80008ec9d000 x16: ffff8000802d089c x15: 0000000000000001
-x14: 1fffe00036805f10 x13: 0000000000000000 x12: 0000000000000003
-x11: 0000000000000001 x10: 0000000000000003 x9 : 0000000000000000
-x8 : 00000000000ce8d1 x7 : ffff8000804609e4 x6 : 0000000000000000
-x5 : 0000000000000001 x4 : 0000000000000001 x3 : ffff80008ad6aac0
-x2 : 0000000000000000 x1 : ffff80008aedea60 x0 : ffff800125436000
-Call trace:
-  __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
-  arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:49
-  cpuidle_idle_call kernel/sched/idle.c:170 [inline]
-  do_idle+0x1f0/0x4e8 kernel/sched/idle.c:312
-  cpu_startup_entry+0x5c/0x74 kernel/sched/idle.c:410
-  secondary_start_kernel+0x198/0x1c0 arch/arm64/kernel/smp.c:272
-  __secondary_switched+0xb8/0xbc arch/arm64/kernel/head.S:404
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
----
- net/batman-adv/originator.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
-index 71c143d4b6d0..ac74f6ead62d 100644
---- a/net/batman-adv/originator.c
-+++ b/net/batman-adv/originator.c
-@@ -1266,6 +1266,8 @@ void batadv_purge_orig_ref(struct batadv_priv *bat_priv)
- 	/* for all origins... */
- 	for (i = 0; i < hash->size; i++) {
- 		head = &hash->table[i];
-+		if (hlist_empty(head))
-+			continue;
- 		list_lock = &hash->list_locks[i];
- 
- 		spin_lock_bh(list_lock);
--- 
-2.39.2
-
+This needs to be SKB_CONSUMED
 
