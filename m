@@ -1,278 +1,218 @@
-Return-Path: <netdev+bounces-85196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 254BA899BB0
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:14:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42DCB899BB3
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:16:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90B8FB24BEF
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:14:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C23421F21D0A
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B9816C44D;
-	Fri,  5 Apr 2024 11:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD60E16ABC2;
+	Fri,  5 Apr 2024 11:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Lp4n6654"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714A114F9D3
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 11:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BBE16C455;
+	Fri,  5 Apr 2024 11:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712315643; cv=none; b=C9SSLcoflZQeuWp2M2azF0YJ4Nl4ib6VOvGudOZg8450Jhs0qZng/+mnsELmWQSATy05quaEN2Ub9DKe/hBKi9IFqMYrPe6iqNx/FLhrUGwrDCtW6Tobv7ayNapbziVcg1RYkIzG+oo3Okaww1NUfs0uX2g+N7x0Ypx1RK3Zu5c=
+	t=1712315781; cv=none; b=Pl+SyH5Ixf1SIwAb8O+bQSg1ULKbF+Qg9N5x/KuVaaR0CHBqKR2E8MoSjr7gUK+z5j5qgN7qykQIjNLk6Yr0baEcJCi9lM1UbaK70axRdG8vTGK16aXA3h4Qp5Xovh8oFkh6uQIsQHYPQclhJBGGczXK4BH2aeix/7mbLAyEuuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712315643; c=relaxed/simple;
-	bh=49yOLvI7lOSv5U/xdRmIUsLYtFVEBYukZysO+ceNj5w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nqndnSj0zoUkotX5BaHO7bZ/fS7v97wJ8e5yi2LlGcN72vszq+M4M7YvxPmqom4ISZIPiL8TLzinqWS9gSfgC4ygRGwv0RboeyTK7/b71XQaHTlaWVh4MM7aqBs+OGaX/hQbuYHXRRjT4V/oSOTvcC/owaV7rokiXTg02oUNn8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.80])
-	by gateway (Coremail) with SMTP id _____8CxF+j03A9mboUjAA--.61726S3;
-	Fri, 05 Apr 2024 19:13:56 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.109.80])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxbs3w3A9me8dzAA--.24654S3;
-	Fri, 05 Apr 2024 19:13:52 +0800 (CST)
-Message-ID: <f3a1ae88-2817-4c60-b281-336aedf18384@loongson.cn>
-Date: Fri, 5 Apr 2024 19:13:51 +0800
+	s=arc-20240116; t=1712315781; c=relaxed/simple;
+	bh=WZMtENGXdvFJ9qv+lMQx6/O9ZWqZ5ZTWI0gGOlj9A+Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ns3iZ+dCAXZe0wRIpRExr0PiiI/l8F1+NmJ69qMMCqr10Ckks8A0v43DcuFw8m/s6POLC6EfttN0qwZkrJxcaw7+5993o8vIvdlCjjLhIrQH9RqxsCGCgpgVAIgiJ4bYFI4WGN3I307K40cNEMciz5HwGlZ3s6bucHP8bUyPgFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Lp4n6654; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435AW1Ym000702;
+	Fri, 5 Apr 2024 11:16:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=0vIjhhw5+ITnPLAZX2x8gYmmNbs14HCZKP5g9TH1uP0=;
+ b=Lp4n66546xHcavjcK2npsE0Z8HvYTiRa0X7zzkKJ+RyDPYC7O3azhlq/cHTazfqyHBAr
+ 9DSfI1kPurR6wgrPTc+BWxy+FIKNUUjktzrkYUM1sahvHNaTUo8IgJ+wgz6uYNAe77DT
+ ZoF9gT01uobet3pAvj7E/pGDRBrL3MtvfJ6jRLuzJ2W+Hd6wOc/aWWiNWq58qw4TDa/y
+ c1yMCaZrAPJoHSJEMiYiGSN2RuL51F0iDBkzMDM0MvR/jxue8llrl6raZAGktm2AHdq3
+ fB/MsFbvzMxIYy8KA6nd4lYcYhbNHO+MAYjXNMfHGkhUfyaEGAnI5amP9BMJjKPkxFb5 dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeakr896-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 11:16:15 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 435BGF32030479;
+	Fri, 5 Apr 2024 11:16:15 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeakr890-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 11:16:15 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4359Q5sU031066;
+	Fri, 5 Apr 2024 11:16:14 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x9epxt5x2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 11:16:14 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 435BG8On49086806
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 5 Apr 2024 11:16:11 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DA3F02004D;
+	Fri,  5 Apr 2024 11:16:08 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4412B2004F;
+	Fri,  5 Apr 2024 11:16:08 +0000 (GMT)
+Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.155.208.153])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  5 Apr 2024 11:16:08 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, pasic@linux.ibm.com,
+        schnelle@linux.ibm.com
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>
+Subject: [PATCH net v2] s390/ism: fix receive message buffer allocation
+Date: Fri,  5 Apr 2024 13:16:06 +0200
+Message-ID: <20240405111606.1785928-1-gbayer@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 8ez_jlHiYe4hYy3NkvgwnyYyREFT38k5
+X-Proofpoint-GUID: BMN_pKOfbWqj3CquCureDYFxRHTuuxNI
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 02/11] net: stmmac: dwmac-loongson: Refactor
- code for loongson_dwmac_probe()
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <6a66fdf816665c9d91c4611f47ffe3108b9bd39a.1706601050.git.siyanteng@loongson.cn>
- <uvar72vvibm44tgn3trr52mpvrjgnn4ttbmyt2mouwws7pkywq@qcyrmj25c4su>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <uvar72vvibm44tgn3trr52mpvrjgnn4ttbmyt2mouwws7pkywq@qcyrmj25c4su>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Cxbs3w3A9me8dzAA--.24654S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxKF1xuF43CFWrAr4UZr4kKrX_yoWxZF45pa
-	93C3ZxKrWxtr1Ika1kZr4UZFyYyrWYk343urWxK3s2ga4qkryvqFyIgrWjkF97ArWku3WI
-	vF1jkr48uF1DtFgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
-	Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
-	CY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8
-	JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14
-	v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY
-	67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2
-	IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jFApnUUUUU=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-05_10,2024-04-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=860
+ mlxscore=0 impostorscore=0 phishscore=0 clxscore=1015 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404050081
 
-Hi Serge,
+Since [1], dma_alloc_coherent() does not accept requests for GFP_COMP
+anymore, even on archs that may be able to fulfill this. Functionality that
+relied on the receive buffer being a compound page broke at that point:
+The SMC-D protocol, that utilizes the ism device driver, passes receive
+buffers to the splice processor in a struct splice_pipe_desc with a
+single entry list of struct pages. As the buffer is no longer a compound
+page, the splice processor now rejects requests to handle more than a
+page worth of data.
 
+Replace dma_alloc_coherent() and allocate a buffer with folio_alloc and
+create a DMA map for it with dma_map_page(). Since only receive buffers
+on ISM devices use DMA, qualify the mapping as FROM_DEVICE.
+Since ISM devices are available on arch s390, only and on that arch all
+DMA is coherent, there is no need to introduce and export some kind of
+dma_sync_to_cpu() method to be called by the SMC-D protocol layer.
 
-Sorry, I seem to have forgotten to reply to the comments on this patch.
+Analogously, replace dma_free_coherent by a two step dma_unmap_page,
+then folio_put to free the receive buffer.
 
-在 2024/2/5 22:43, Serge Semin 写道:
-> On Tue, Jan 30, 2024 at 04:43:22PM +0800, Yanteng Si wrote:
->> The driver function is not changed, but the code location is
->> adjusted to prepare for adding more loongson drivers.
-> Having the word "refactoring" in the subject is always suspicious
-> because submitters very often try to hind behind it many small
-> changes they didn't want to/didn't know how to unpin from a more bulky
-> change. Moreover if there is no detailed explanation what is done and
-> why, it raises too many review questions and makes the reviewers life
-> much harder. So it would have been much better for us if you split up
-> this change into the smaller patches (see my last comment for a
-> presumable subset of the patches) to simplify the review process and
-> improve the driver bisectability especially seeing there actually are
-> functional changes introduced here despite of what is said in the
-> commit log.
-OK. I will resplit it.
->> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
->> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
->> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->> ---
->>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 61 +++++++++++++------
->>   1 file changed, 42 insertions(+), 19 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->> index 9e40c28d453a..e2dcb339b8b0 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->> @@ -9,7 +9,12 @@
->>   #include <linux/of_irq.h>
->>   #include "stmmac.h"
->>   
->> -static int loongson_default_data(struct plat_stmmacenet_data *plat)
->> +struct stmmac_pci_info {
->> +	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
->> +};
->> +
->> +static void loongson_default_data(struct pci_dev *pdev,
->> +				  struct plat_stmmacenet_data *plat)
->>   {
->>   	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
->>   	plat->has_gmac = 1;
->> @@ -34,23 +39,37 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
->>   
->>   	/* Disable RX queues routing by default */
->>   	plat->rx_queues_cfg[0].pkt_route = 0x0;
->> +}
->> +
->> +static int loongson_gmac_data(struct pci_dev *pdev,
->> +			      struct plat_stmmacenet_data *plat)
->> +{
->> +	loongson_default_data(pdev, plat);
->> +
->> +	plat->multicast_filter_bins = 256;
-> Why do you need to move this here from the function tail?
-OK, restore it.
->
->> +
->> +	plat->mdio_bus_data->phy_mask = 0;
-> This is already zero. Why do you need this?
-OK, drop it.
->
->>   
->> -	/* Default to phy auto-detection */
-> What is wrong with this comment?
-Sorry, restore it.
->
->>   	plat->phy_addr = -1;
->>   
->>   	plat->dma_cfg->pbl = 32;
->>   	plat->dma_cfg->pblx8 = true;
->>   
->> -	plat->multicast_filter_bins = 256;
->>   	return 0;
->>   }
->>   
->> -static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->> +static struct stmmac_pci_info loongson_gmac_pci_info = {
->> +	.setup = loongson_gmac_data,
->> +};
->> +
->> +static int loongson_dwmac_probe(struct pci_dev *pdev,
->> +				const struct pci_device_id *id)
->>   {
->> +	int ret, i, bus_id, phy_mode;
->>   	struct plat_stmmacenet_data *plat;
->> +	struct stmmac_pci_info *info;
->>   	struct stmmac_resources res;
->>   	struct device_node *np;
->> -	int ret, i, phy_mode;
-> Reverse xmas tree order please.
-OK.
->
->>   
->>   	np = dev_of_node(&pdev->dev);
->>   
->> @@ -69,18 +88,17 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->>   	if (!plat->mdio_bus_data)
->>   		return -ENOMEM;
->>   
->> +	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
->> +				     GFP_KERNEL);
->> +	if (!plat->dma_cfg)
->> +		return -ENOMEM;
->> +
-> Why do you need this moved above the mdio_node getting procedure? They
-> seem independent.
-Sorry, restore it.
->
->>   	plat->mdio_node = of_get_child_by_name(np, "mdio");
->>   	if (plat->mdio_node) {
->>   		dev_info(&pdev->dev, "Found MDIO subnode\n");
->>   		plat->mdio_bus_data->needs_reset = true;
->>   	}
->>   
->> -	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
->> -	if (!plat->dma_cfg) {
->> -		ret = -ENOMEM;
->> -		goto err_put_node;
->> -	}
->> -
->>   	/* Enable pci device */
->>   	ret = pci_enable_device(pdev);
->>   	if (ret) {
->> @@ -98,9 +116,16 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->>   		break;
->>   	}
->>   
->> -	plat->bus_id = of_alias_get_id(np, "ethernet");
->> -	if (plat->bus_id < 0)
->> -		plat->bus_id = pci_dev_id(pdev);
-> This is a functional change because further bus_id is no longer
-> initialized by the pci_dev_id() method as a fallback case. If you are
-> sure this is required please unpin to a separate patch and explain.
-Hmm, I will merge it into  [PATCH net-next 03/11] .
->
->> +	pci_set_master(pdev);
->> +
->> +	info = (struct stmmac_pci_info *)id->driver_data;
->> +	ret = info->setup(pdev, plat);
->> +	if (ret)
->> +		goto err_disable_device;
->> +
->> +	bus_id = of_alias_get_id(np, "ethernet");
->> +	if (bus_id >= 0)
->> +		plat->bus_id = bus_id;
->>   
->>   	phy_mode = device_get_phy_mode(&pdev->dev);
->>   	if (phy_mode < 0) {
->> @@ -110,11 +135,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->>   	}
->>   
->>   	plat->phy_interface = phy_mode;
->> -	plat->mac_interface = PHY_INTERFACE_MODE_GMII;
-> This is just dropped. Are you sure that the driver will work correctly
-Yes, We only need to set phy_interface.
-> after this change is applied? Russell already asked you about this change
-> here:
-> https://lore.kernel.org/netdev/ZZPnaziDZEcv5GGw@shell.armlinux.org.uk/
->
-> Anyway please unpin it to a separate patch and explain.
-OK.
->
->>   
->> -	pci_set_master(pdev);
->> -
->> -	loongson_default_data(plat);
->>   	pci_enable_msi(pdev);
->>   	memset(&res, 0, sizeof(res));
->>   	res.addr = pcim_iomap_table(pdev)[0];
->> @@ -212,8 +233,10 @@ static int __maybe_unused loongson_dwmac_resume(struct device *dev)
->>   static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
->>   			 loongson_dwmac_resume);
->>   
->> +#define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
->> +
->>   static const struct pci_device_id loongson_dwmac_id_table[] = {
->> -	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
->> +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
-> If I were you and needed to preserve all the changes I would have
-> split the patch up into the next patches:
-> 1. Use PCI_DEVICE_DATA() macro for device identification
-> 2. Drop mac-interface initialization
-> 3. Don't initialize MDIO bus ID with PCIe device ID
-> 4. Introduce device-specific setup callback
+[1] https://lore.kernel.org/all/20221113163535.884299-1-hch@lst.de/
 
-OK, I will.
+Fixes: c08004eede4b ("s390/ism: don't pass bogus GFP_ flags to dma_alloc_coherent")
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+---
+Sorry for the immediate resend - forgot to mark this for "net"
 
+changelog:
+v1->v2:
+- replaced kmalloc/kfree with folio_alloc/folio_put
+  as suggested.
 
-Thanks,
+---
+ drivers/s390/net/ism_drv.c | 38 +++++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
-Yanteng
-
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 2c8e964425dc..affb05521e14 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -14,6 +14,8 @@
+ #include <linux/err.h>
+ #include <linux/ctype.h>
+ #include <linux/processor.h>
++#include <linux/dma-mapping.h>
++#include <linux/mm.h>
+ 
+ #include "ism.h"
+ 
+@@ -292,13 +294,15 @@ static int ism_read_local_gid(struct ism_dev *ism)
+ static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
+ 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+-	dma_free_coherent(&ism->pdev->dev, dmb->dmb_len,
+-			  dmb->cpu_addr, dmb->dma_addr);
++	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
++		       DMA_FROM_DEVICE);
++	folio_put(virt_to_folio(dmb->cpu_addr));
+ }
+ 
+ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
+ 	unsigned long bit;
++	int rc;
+ 
+ 	if (PAGE_ALIGN(dmb->dmb_len) > dma_get_max_seg_size(&ism->pdev->dev))
+ 		return -EINVAL;
+@@ -315,14 +319,30 @@ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ 	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
+ 		return -EINVAL;
+ 
+-	dmb->cpu_addr = dma_alloc_coherent(&ism->pdev->dev, dmb->dmb_len,
+-					   &dmb->dma_addr,
+-					   GFP_KERNEL | __GFP_NOWARN |
+-					   __GFP_NOMEMALLOC | __GFP_NORETRY);
+-	if (!dmb->cpu_addr)
+-		clear_bit(dmb->sba_idx, ism->sba_bitmap);
++	dmb->cpu_addr =
++		folio_address(folio_alloc(GFP_KERNEL | __GFP_NOWARN |
++					  __GFP_NOMEMALLOC | __GFP_NORETRY,
++					  get_order(dmb->dmb_len)));
+ 
+-	return dmb->cpu_addr ? 0 : -ENOMEM;
++	if (!dmb->cpu_addr) {
++		rc = -ENOMEM;
++		goto out_bit;
++	}
++	dmb->dma_addr = dma_map_page(&ism->pdev->dev,
++				     virt_to_page(dmb->cpu_addr), 0,
++				     dmb->dmb_len, DMA_FROM_DEVICE);
++	if (dma_mapping_error(&ism->pdev->dev, dmb->dma_addr)) {
++		rc = -ENOMEM;
++		goto out_free;
++	}
++
++	return 0;
++
++out_free:
++	kfree(dmb->cpu_addr);
++out_bit:
++	clear_bit(dmb->sba_idx, ism->sba_bitmap);
++	return rc;
+ }
+ 
+ int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
+-- 
+2.44.0
 
 
