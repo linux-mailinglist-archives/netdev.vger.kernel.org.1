@@ -1,90 +1,167 @@
-Return-Path: <netdev+bounces-85338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FD6489A53A
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:51:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A351789A555
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A52181F22DB9
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 19:51:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB52284459
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A03717334C;
-	Fri,  5 Apr 2024 19:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C90173351;
+	Fri,  5 Apr 2024 20:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFZ6BxS6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q0ir2StH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF6417167F;
-	Fri,  5 Apr 2024 19:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8327116EBFD
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 20:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712346681; cv=none; b=MFFuCyY16ykeUKT7xnHm7cGig4lJLn9VlYDlySiLteV/Oppi50Ows6tkFcrl+F/c+XAkFMOMITzkIYy/bFXtN1m8Bzs5/h4LaK9i4TbakaZ9lIwgvU/zzN/y423NwvHj0V6NIjhbFF2BuYlKhiI6rB1F75IPpTlPBBX/CKS9bJM=
+	t=1712347314; cv=none; b=C1Gz9EC+5DL2jBgqnyALJx4AgbhhWJJgQWngHuIyQVl3jIPuznjfMhY65a1A8Hf6/M+ZyOTQU93X5PcwOwBMNjxiKVLVQarnxFRpkyCCJK5NFoIMPtmdW7/LC9dJI7azqMVBi0dVyctJNUfzWFufMffr8bkbJkv2ghE2d+8oEaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712346681; c=relaxed/simple;
-	bh=f/CMxni7jFnpuDFclRQ1sPJPHz81GAHsls7RUeZIdCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DP9avejGEJDGOKtgugqG2TTHzemCeXlKa74efNSNmdhCDpSf8Pjcfr4AXqxLQUqjJyWgLMkmjWXheVUwkz95cdpWebTyLvYYzJ9AnBM7Xciwhmm0STvzj2J1YX5iRNzwbHaeH8YH8IWWmAFfqEQCbhZb6bB//wbAOAzAM+MZdYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pFZ6BxS6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 753DCC433C7;
-	Fri,  5 Apr 2024 19:51:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712346681;
-	bh=f/CMxni7jFnpuDFclRQ1sPJPHz81GAHsls7RUeZIdCk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pFZ6BxS6BGeI5OmF9rs1tRD2Hp2W9N7XTVe5pVrAF7rvPFaOibY/fpmVZ77dK4bZU
-	 noTNHTNfxSHvFI/0c+n17Iae2j+0W9yaOVfBx78hiU2/XenxVQuMWhOUcKkWXh/TNM
-	 camqvKOLDRLcXNuarSCk2hmBGYczjWSaeMr6YhupVqTTqEw5efmoDy6HFY6BpBfJqg
-	 ml06ZbuI7lS1204c90vdfBpuLAHgCaObxPLt2TOen9bauIKLgNgCValaYzlat1Kcuw
-	 O3NzhV+3p3z6GSlCC1yz2JO0DTfuROqOWmYRV5lXO9vGx7T9ye7uLYThf96k2WCJXR
-	 RsZJ01ZdoIUyg==
-Date: Fri, 5 Apr 2024 20:51:17 +0100
-From: Simon Horman <horms@kernel.org>
-To: Petr Tesarik <petr@tesarici.cz>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	open list <netdev@vger.kernel.org>,
-	Linux regressions mailing list <regressions@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>,
-	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>
-Subject: Re: [PATCH net] u64_stats: fix u64_stats_init() for lockdep when
- used repeatedly in one file
-Message-ID: <20240405195117.GV26556@kernel.org>
-References: <20240404075740.30682-1-petr@tesarici.cz>
+	s=arc-20240116; t=1712347314; c=relaxed/simple;
+	bh=t8Zy94V47DEeguDpVsCAlSHh8loEquEVZj3DhaG/mCE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WwfTnTFgS9BOupLpVfCaZz4xqeSnawyefgnLIPS50dMdmNCFnRYdRc6jLvWbxKbmsO4xqWr+gRWSdctCjBlLWmT6w3lOClp6bXEtoAIZEQYhlb0cuoeuJxDMpOG5ZT6OXMt5QfkUKcJRyIQZUGo+MWzSDSBiyDhn8RsFy4jnQvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q0ir2StH; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <29325462-d001-4cb3-909d-27f7243a5c05@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712347309;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6gWflinqU1d4wkQYf0aiD/ruz8RWl/tYTTOYnC5SJvI=;
+	b=q0ir2StHc3kPa0wMeyOID45TWAeATcIeQbaZClgmEfmzmdtgPJrlcv6qHBr1bYfYt07BB5
+	9Dxh3WzWLM2mpLIqv+IsnXo8LoYFDyLoSmMPxGxLExJblxBQCVvOcgXKPiOe65vUzwZZLh
+	T7czWGzGRog4EKJiUvzb+qgFFNh4HvY=
+Date: Fri, 5 Apr 2024 13:01:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240404075740.30682-1-petr@tesarici.cz>
+Subject: Re: [PATCH bpf-next] net: netfilter: Make ct zone id configurable for
+ bpf ct helper functions
+To: Brad Cowie <brad@faucet.nz>
+Cc: lorenzo@kernel.org, memxor@gmail.com, pablo@netfilter.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, song@kernel.org,
+ john.fastabend@gmail.com, sdf@google.com, jolsa@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20240329041430.2176860-1-brad@faucet.nz>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240329041430.2176860-1-brad@faucet.nz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Apr 04, 2024 at 09:57:40AM +0200, Petr Tesarik wrote:
-> Fix bogus lockdep warnings if multiple u64_stats_sync variables are
-> initialized in the same file.
+On 3/28/24 9:14 PM, Brad Cowie wrote:
+> Add ct zone id to bpf_ct_opts so that arbitrary ct zone can be
+> set for xdp/tc bpf ct helper functions bpf_{xdp,skb}_ct_alloc
+> and bpf_{xdp,skb}_ct_lookup.
 > 
-> With CONFIG_LOCKDEP, seqcount_init() is a macro which declares:
+> Signed-off-by: Brad Cowie <brad@faucet.nz>
+> ---
+>   net/netfilter/nf_conntrack_bpf.c              | 23 ++++++++++---------
+>   .../testing/selftests/bpf/prog_tests/bpf_nf.c |  1 -
+>   .../testing/selftests/bpf/progs/test_bpf_nf.c | 13 ++---------
+>   3 files changed, 14 insertions(+), 23 deletions(-)
 > 
-> 	static struct lock_class_key __key;
-> 
-> Since u64_stats_init() is a function (albeit an inline one), all calls
-> within the same file end up using the same instance, effectively treating
-> them all as a single lock-class.
-> 
-> Fixes: 9464ca650008 ("net: make u64_stats_init() a function")
-> Closes: https://lore.kernel.org/netdev/ea1567d9-ce66-45e6-8168-ac40a47d1821@roeck-us.net/
-> Signed-off-by: Petr Tesarik <petr@tesarici.cz>
+> diff --git a/net/netfilter/nf_conntrack_bpf.c b/net/netfilter/nf_conntrack_bpf.c
+> index d2492d050fe6..a0f8a64751ec 100644
+> --- a/net/netfilter/nf_conntrack_bpf.c
+> +++ b/net/netfilter/nf_conntrack_bpf.c
+> @@ -30,7 +30,6 @@
+>    * @error      - Out parameter, set for any errors encountered
+>    *		 Values:
+>    *		   -EINVAL - Passed NULL for bpf_tuple pointer
+> - *		   -EINVAL - opts->reserved is not 0
+>    *		   -EINVAL - netns_id is less than -1
+>    *		   -EINVAL - opts__sz isn't NF_BPF_CT_OPTS_SZ (12)
+>    *		   -EPROTO - l4proto isn't one of IPPROTO_TCP or IPPROTO_UDP
+> @@ -42,16 +41,14 @@
+>    *		 Values:
+>    *		   IPPROTO_TCP, IPPROTO_UDP
+>    * @dir:       - connection tracking tuple direction.
+> - * @reserved   - Reserved member, will be reused for more options in future
+> - *		 Values:
+> - *		   0
+> + * @ct_zone    - connection tracking zone id.
+>    */
+>   struct bpf_ct_opts {
+>   	s32 netns_id;
+>   	s32 error;
+>   	u8 l4proto;
+>   	u8 dir;
+> -	u8 reserved[2];
+> +	u16 ct_zone;
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+How about the other fields (flags and dir) in the "struct nf_conntrack_zone" and 
+would it be useful to have values other than the default?
 
-Interesting bug. I'm wondering if you also looked over other users of
-u64_stats_init() to see if any of them can result in unexpected aliasing of
-lock keys too.
+[ ... ]
 
-...
+> diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_nf.c b/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
+> index b30ff6b3b81a..25c3c4e87ed5 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
+> @@ -103,7 +103,6 @@ static void test_bpf_nf_ct(int mode)
+>   		goto end;
+>   
+>   	ASSERT_EQ(skel->bss->test_einval_bpf_tuple, -EINVAL, "Test EINVAL for NULL bpf_tuple");
+> -	ASSERT_EQ(skel->bss->test_einval_reserved, -EINVAL, "Test EINVAL for reserved not set to 0");
+>   	ASSERT_EQ(skel->bss->test_einval_netns_id, -EINVAL, "Test EINVAL for netns_id < -1");
+>   	ASSERT_EQ(skel->bss->test_einval_len_opts, -EINVAL, "Test EINVAL for len__opts != NF_BPF_CT_OPTS_SZ");
+>   	ASSERT_EQ(skel->bss->test_eproto_l4proto, -EPROTO, "Test EPROTO for l4proto != TCP or UDP");
+> diff --git a/tools/testing/selftests/bpf/progs/test_bpf_nf.c b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
+> index 77ad8adf68da..4adb73bc1b33 100644
+> --- a/tools/testing/selftests/bpf/progs/test_bpf_nf.c
+> +++ b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
+> @@ -45,7 +45,8 @@ struct bpf_ct_opts___local {
+>   	s32 netns_id;
+>   	s32 error;
+>   	u8 l4proto;
+> -	u8 reserved[3];
+> +	u8 dir;
+> +	u16 ct_zone;
+>   } __attribute__((preserve_access_index));
+>   
+>   struct nf_conn *bpf_xdp_ct_alloc(struct xdp_md *, struct bpf_sock_tuple *, u32,
+> @@ -84,16 +85,6 @@ nf_ct_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
+>   	else
+>   		test_einval_bpf_tuple = opts_def.error;
+>   
+> -	opts_def.reserved[0] = 1;
+> -	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
+> -		       sizeof(opts_def));
+> -	opts_def.reserved[0] = 0;
+> -	opts_def.l4proto = IPPROTO_TCP;
+> -	if (ct)
+> -		bpf_ct_release(ct);
+> -	else
+> -		test_einval_reserved = opts_def.error;
+> -
+
+Can it actually test an alloc and lookup of a non default zone id?
+
+Please also separate the selftest into another patch.
+
+pw-bot: cr
+
+>   	opts_def.netns_id = -2;
+>   	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
+>   		       sizeof(opts_def));
+
 
