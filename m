@@ -1,185 +1,151 @@
-Return-Path: <netdev+bounces-85336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8175389A4C0
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:16:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1903E89A530
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21EE91F21AC2
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 19:16:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B4D81C20DC5
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 19:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8441D172BAE;
-	Fri,  5 Apr 2024 19:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377A0173343;
+	Fri,  5 Apr 2024 19:46:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="biWxvr8U"
 X-Original-To: netdev@vger.kernel.org
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D75E172BAB;
-	Fri,  5 Apr 2024 19:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3203172BA3;
+	Fri,  5 Apr 2024 19:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712344571; cv=none; b=sRpkGjcKiAUBqI6aAWxK/2inUWaWypO3FNN3tsC7xTwwpSIZuSPD0bD4mpdnR/ROIA9zelCtDhfdxNBZ8qahk3bkzqCAcaOQGj7W7IlQ3+hD31dCpbs85wVIErrjx79n4QohGNAQRyIBrq6a2D/KUkm0vmyX1WFM4HLOzM5N81M=
+	t=1712346393; cv=none; b=JKa7GL93HooZrmfS/O5ShCp8VzbPKmrW1HF0lcqWBeUVjHifElEPfBsnqmHNvltV7bJY+yfRh+9Z3rAc5dl0sXMFNaoafmjO6DIZKUzFKReUM9Q2PllnjVOZyqh2Aejqf3FcRIYJbTtBJbc7QAMqJ3sLbLPX6tJmPAE9b+Jr8Ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712344571; c=relaxed/simple;
-	bh=9nV6IwZvh+7VJGSjmzla8vNvvjjgdzbj8OPcldmJZk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HySAcar1QvLi9g3TJFVX9ktbM2QgOstgPchb2RfaQ8zY1p6sKu2mR0rwm9D1ixjj+MQ0xVBn5DOnrIFHE6JGZfWV+yMXdUdbbMWYrhbd3R0fsuthC+W6bb+FxtIpQw3kAgjBoHa6dQ+Zs4KOYHaTMOugS5zVsUkMi/4TqYCCIOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 50AA22800BB90;
-	Fri,  5 Apr 2024 21:16:06 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 278851192D2; Fri,  5 Apr 2024 21:16:06 +0200 (CEST)
-Date: Fri, 5 Apr 2024 21:16:06 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Roman Lozko <lozko.roma@gmail.com>, linux-pci@vger.kernel.org,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: Deadlock in pciehp on dock disconnect
-Message-ID: <ZhBN9p1yOyciXkzw@wunner.de>
-References: <CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com>
- <Zg_MOG1OufptoRph@wunner.de>
- <cd9edf12-5241-4366-b376-d5ee8f919903@gmail.com>
- <ZhA5WAYyMQJsAey8@wunner.de>
+	s=arc-20240116; t=1712346393; c=relaxed/simple;
+	bh=/PmtoA+LEViAKJ0fcog5saUVPgiPgx5ZMgX0tIQr6Ew=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SJFcoUrZadAgcG2HbAR2LKpkxmdF8Hj3Mgh+dYilf6Wox/DVBZhaWNQ0vRye8+Oz5anY+PM77dn0DC4CBW1AU4+5Lft5WAguntptMUAUin1rnvXcHnS8UHhfkOzm2GnSSx1ovWNc0GKmtni2EOYYeIaAYFdW8qmtdZQujcmx3qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=biWxvr8U; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1712346390; x=1743882390;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/PmtoA+LEViAKJ0fcog5saUVPgiPgx5ZMgX0tIQr6Ew=;
+  b=biWxvr8U3qblss0NyZzyCvTWiZL+Uluj+7VmRQSYGN0IZROc4FZK9SsI
+   p3VZlwe4IeK80uPENYe2gWmY4qHPhhq/+hT5DwzZaa1gQQETy69tXfXWh
+   OpkGyi0Uk7L41Ft4MKMksPNFmht8yv7YYviuVEDMbG3EpVxRLP4WFvyZH
+   oBPgy9lS4t1BXCzFRKlSytqBcZfSG2isYRqjDVmCh2XRA8jAgC42qbWld
+   fZ+BxIPqWmIB9KrX9oXUhfozXS6CEjtiSr6otBWmd9JHu+rIfufIuQ6Nl
+   AMRBL/5BB/P+GrEi4Y/ModxFFzkN9j2DOv70WEwChYD6U5aBBfipnm3il
+   g==;
+X-CSE-ConnectionGUID: xpLuj8wMSr2hyqqrVe0wTA==
+X-CSE-MsgGUID: D4qVjqWhT9Wf7GT1Q4fnUQ==
+X-IronPort-AV: E=Sophos;i="6.07,182,1708412400"; 
+   d="scan'208";a="250502725"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Apr 2024 12:46:13 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 5 Apr 2024 12:45:59 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 5 Apr 2024 12:45:57 -0700
+Date: Fri, 5 Apr 2024 19:45:56 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Lars Povlsen <lars.povlsen@microchip.com>, "Steen
+ Hegelund" <Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	Bjarni Jonasson <bjarni.jonasson@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: sparx5: fix reconfiguration of PCS on link mode
+ change
+Message-ID: <20240405194556.ngto6ddgf5r2br33@DEN-DL-M70577>
+References: <20240405-link-mode-reconfiguration-fix-v1-1-c1480bc2346a@microchip.com>
+ <Zg/Qf4P5gAzRUYuK@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ZhA5WAYyMQJsAey8@wunner.de>
+In-Reply-To: <Zg/Qf4P5gAzRUYuK@shell.armlinux.org.uk>
 
-On Fri, Apr 05, 2024 at 07:48:08PM +0200, Lukas Wunner wrote:
-> Roman, does the below patch fix the issue?
+Hi Russel,
 
-Actually the patch in my previous e-mail was crap as the unregistering
-of the LEDs happened after unbind of the pdev, i.e. after
-igc_release_hw_control() and pci_disable_device().
+> > It was observed that the PCS would be misconfigured on link mode change,
+> > if the negotiated link mode went from no-inband capabilities to in-band
+> > capabilities. This bug appeared after the neg_mode change of phylink [1],
+> > but is really due to the wrong config being used when reconfiguring the PCS.
+> 
+> I don't see how the change you point to could have changed the
+> behaviour. Old code:
+> 
+>         conf.inband = phylink_autoneg_inband(mode);
+>         conf.autoneg = phylink_test(advertising, Autoneg);
+> 
+> New code:
+> 
+>         conf.inband = neg_mode == PHYLINK_PCS_NEG_INBAND_DISABLED ||
+>                       neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED;
+>         conf.autoneg = neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED;
+> 
+> where, for SGMII or 802.3z modes, neg_mode will be one of
+> PHYLINK_PCS_NEG_INBAND_DISABLED or PHYLINK_PCS_NEG_INBAND_ENABLED if
+> phylink_autoneg_inband(mode) is true, or PHYLINK_PCS_NEG_OUTBAND if
+> not.
 
-The driver otherwise doesn't seem to be using devm_*() and with
-devm_*() it's always all or nothing.  A mix of devm_*() and manual
-teardown is prone to ordering issues.
+For inband/10GBase-R, conf.inband would be true, prior to the
+phylink change. This is fine since conf.inband is only used when
+configuring low speed devices.
 
-Here's another attempt:
+After the change, conf.inband will be false when opting in through
+phylink_pcs.net_mode = true. This causes the SGMII to be misconfigured,
+since the inband parameter from the old config is used, and that
+parameter is actually used for configuring SGMII..
 
--- >8 --
+TBH the commit description is inadequate at best. I will revise it in a
+v2.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index 90316dc58630..f9ffe9df9a96 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -298,6 +298,7 @@ struct igc_adapter {
- 
- 	/* LEDs */
- 	struct mutex led_mutex;
-+	struct igc_led_classdev *leds;
- };
- 
- void igc_up(struct igc_adapter *adapter);
-@@ -723,6 +724,7 @@ void igc_ptp_read(struct igc_adapter *adapter, struct timespec64 *ts);
- void igc_ptp_tx_tstamp_event(struct igc_adapter *adapter);
- 
- int igc_led_setup(struct igc_adapter *adapter);
-+void igc_led_teardown(struct igc_adapter *adapter);
- 
- #define igc_rx_pg_size(_ring) (PAGE_SIZE << igc_rx_pg_order(_ring))
- 
-diff --git a/drivers/net/ethernet/intel/igc/igc_leds.c b/drivers/net/ethernet/intel/igc/igc_leds.c
-index bf240c5daf86..4c2806c0878a 100644
---- a/drivers/net/ethernet/intel/igc/igc_leds.c
-+++ b/drivers/net/ethernet/intel/igc/igc_leds.c
-@@ -236,8 +236,8 @@ static void igc_led_get_name(struct igc_adapter *adapter, int index, char *buf,
- 		 pci_dev_id(adapter->pdev), index);
- }
- 
--static void igc_setup_ldev(struct igc_led_classdev *ldev,
--			   struct net_device *netdev, int index)
-+static int igc_setup_ldev(struct igc_led_classdev *ldev,
-+			  struct net_device *netdev, int index)
- {
- 	struct igc_adapter *adapter = netdev_priv(netdev);
- 	struct led_classdev *led_cdev = &ldev->led;
-@@ -257,15 +257,15 @@ static void igc_setup_ldev(struct igc_led_classdev *ldev,
- 	led_cdev->hw_control_get = igc_led_hw_control_get;
- 	led_cdev->hw_control_get_device = igc_led_hw_control_get_device;
- 
--	devm_led_classdev_register(&netdev->dev, led_cdev);
-+	return led_classdev_register(&netdev->dev, led_cdev);
- }
- 
- int igc_led_setup(struct igc_adapter *adapter)
- {
- 	struct net_device *netdev = adapter->netdev;
--	struct device *dev = &netdev->dev;
-+	struct device *dev = &adapter->pdev->dev;
- 	struct igc_led_classdev *leds;
--	int i;
-+	int i, ret;
- 
- 	mutex_init(&adapter->led_mutex);
- 
-@@ -273,8 +273,27 @@ int igc_led_setup(struct igc_adapter *adapter)
- 	if (!leds)
- 		return -ENOMEM;
- 
--	for (i = 0; i < IGC_NUM_LEDS; i++)
--		igc_setup_ldev(leds + i, netdev, i);
-+	for (i = 0; i < IGC_NUM_LEDS; i++) {
-+		ret = igc_setup_ldev(leds + i, netdev, i);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	adapter->leds = leds;
- 
- 	return 0;
-+
-+err:
-+	for (i--; i >= 0; i--)
-+		led_classdev_unregister(&((leds + i)->led));
-+	return ret;
-+}
-+
-+void igc_led_teardown(struct igc_adapter *adapter)
-+{
-+	struct igc_led_classdev *leds = adapter->leds;
-+	int i;
-+
-+	for (i = 0; i < IGC_NUM_LEDS; i++)
-+		led_classdev_unregister(&((leds + i)->led));
- }
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 2e1cfbd82f4f..cd164442ab35 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7025,6 +7025,9 @@ static void igc_remove(struct pci_dev *pdev)
- 	cancel_work_sync(&adapter->watchdog_task);
- 	hrtimer_cancel(&adapter->hrtimer);
- 
-+	if (IS_ENABLED(CONFIG_IGC_LEDS))
-+		igc_led_teardown(adapter);
-+
- 	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
- 	 * would have already happened in close and is redundant.
- 	 */
+> 
+> It does change conf.autoneg slightly in that this will always be true
+> for SGMII, but will only be true for Autoneg + 802.3z modes.
+> 
+> As far as your code change goes, it looks correct to me, but I think
+> it's fixing a bug that goes back long before the commit you have
+> identified.
+
+Just to be clear - by commit do you mean the phylink change or the commit
+referenced in the fixes tag?
+
+> 
+> However, I think there's another issue here which is more relevant to
+> the problem you describe in your commit message. If you look at
+> port_conf_has_changed(), you will notice that it fails to compare
+> conf.inband, and thus fails to notice any change in the setting of
+> that configuration item. This will result in sparx5_port_pcs_set()
+> not even being called if only conf.inband changes state.
+> 
+> Thus, changing from in-band to out-of-band or vice versa won't have
+> any effect if this is the only change that occurs, and this also
+> exists prior to my change.
+
+Yes. I agree this is an issue that deserves a fix - separate from this
+one I would think.
+
+> 
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
