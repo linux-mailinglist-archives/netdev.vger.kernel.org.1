@@ -1,193 +1,278 @@
-Return-Path: <netdev+bounces-85195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD731899BAE
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:13:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 254BA899BB0
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:14:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA3151C2252D
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:13:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90B8FB24BEF
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C6016C44D;
-	Fri,  5 Apr 2024 11:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CA3un0XU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B9816C44D;
+	Fri,  5 Apr 2024 11:14:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2099.outbound.protection.outlook.com [40.107.223.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D121CD2B;
-	Fri,  5 Apr 2024 11:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.99
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712315592; cv=fail; b=rsjsRhrWwkFPjKu1KhOYPHbYq7I07nn7+XfA0E0ySUoX4VNdg20TKXj2Ie83jI2pEmNxh5Zm/Rw6jrGG/GA3Dr9tai8aSR+6hQ0gBqLuWxNeMbWCAQbFc5FSf1vjsVehSHlF/ajxeF7P+RSURRew8v8gL0kFhj0KIvTm1q+tOeM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712315592; c=relaxed/simple;
-	bh=xN8iTysxSIsY8l0FOVg1UF6VK1mXaDq+QofUED0ZV5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=iMo4oJeNBXyfOPDn5W/pXtV4W13RP2UUnNJf6RdWITYWlKbSMflXgmJFZRzHuEgOwEVzGmfqHz5DGyG5lpjOBqjGQ1ow8HZA5xOv+pJkBeL7FKCu3xSsQomBvmz6BdZIftsZBPTCp6xEuG03ZrE8RkqEfX3+uyg4Fn2hoRhwQvE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CA3un0XU; arc=fail smtp.client-ip=40.107.223.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E1FQn9AB3NT2w5H0UHRRJ0inV/oHCFp4RkZcRPXkQtd6F+FxOo+tQsIhSlV4LAe63u/uQBQBjaDS5WadlPJrnCGWTKpaIVVlIMDpFEVFDmOBGIAlhG0zYmiIKYdRCjvxOmdAWbtws6/yksZ7Nbtm/x26GrfKNipSORyqHpUYoSFs7RNYvWvrCvXCkALghPJY/TGzkYnQ8ojOo7EEssUrPVpQ5A61EkH86DF/68/jYFWHgU00igkyduy5CcQtggMEgl3InQV2mVEIyh9eblqo6Vlc3oQqWlXGHfyyhUuyv84uXnBHswboohIJHThwatVwoBhOVCQbkRECdpFhKudCug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lcLOhhqcF0QaObmX3dP6pNg2dpCc66605bO61xGNF6E=;
- b=fP0FolBjjo4IkbC3HMCVaBj/o9Rj5mIsQWEtoAgThUalyxmmiRCHFj9yn9hJElMu5s/hvZsDrbHcB4z6C+UfUU+Vn8R0zLTi/KYYhza3NDRCFWpbQai1wE6+RLdVq2bMacpUtYMxhLzE2DKAQxpq428/dTpHQbhw7bgnGzJJ+nZNu1bArgvKB3fJxDADj+pm0cDw4K+CROFoT+h3X2r0CckIit9O+34ho2Y6BiZlO1pUXHTSyzfw3llDvkpFupfcahKM/Ipyt25FAD47saSEORCgpjlA95PFzAVkaYLqD8wBeOm2YE2YqvDjBelwoV9nYFnvPMOKEdtQCIItR6zAOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lcLOhhqcF0QaObmX3dP6pNg2dpCc66605bO61xGNF6E=;
- b=CA3un0XUE2vdt3N2HrU5zj8noXrmbC+B4N0u+mEqqFFmE3vC16zDr393j6pFEUvphIvyMAIPuXhj+XLsZ8nvkAXl/lrWWnpmzRChoTxhb6JM8wvA8wUvqjLeh9Smtll76YeCgRwJACzVf7zVOyL2XDxG39GjZlR0Js3ZHjcEvMW56lM1rbEsP2G4iLUf4MtRlboS3kmpQuVr6aobWlFtpKx7Enfs1l0bgGUoIETHKLLja5GRUdl+kd4YR4opOIhF0R3OfDn/oNTWpPeHiV2NW1JmjcNlYAJtOAZoEqT0LQM9SjFOKlAgrKoNea+FtIWUAM8oW15zkKMlFObc6RyM/Q==
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by DM4PR12MB6326.namprd12.prod.outlook.com (2603:10b6:8:a3::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Fri, 5 Apr
- 2024 11:13:08 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7409.042; Fri, 5 Apr 2024
- 11:13:07 +0000
-Date: Fri, 5 Apr 2024 08:13:06 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Edward Cree <ecree.xilinx@gmail.com>, David Ahern <dsahern@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	linux-kernel@vger.kernel.org,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240405111306.GB5383@nvidia.com>
-References: <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
- <20240322154027.5555780a@kernel.org>
- <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
- <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
- <20240402184055.GP946323@nvidia.com>
- <83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
- <20240404183305.GM1723999@nvidia.com>
- <20240404125339.14695f27@kernel.org>
- <20240404204454.GO1723999@nvidia.com>
- <20240404143407.64b44a88@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240404143407.64b44a88@kernel.org>
-X-ClientProxiedBy: MN2PR19CA0069.namprd19.prod.outlook.com
- (2603:10b6:208:19b::46) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714A114F9D3
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 11:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712315643; cv=none; b=C9SSLcoflZQeuWp2M2azF0YJ4Nl4ib6VOvGudOZg8450Jhs0qZng/+mnsELmWQSATy05quaEN2Ub9DKe/hBKi9IFqMYrPe6iqNx/FLhrUGwrDCtW6Tobv7ayNapbziVcg1RYkIzG+oo3Okaww1NUfs0uX2g+N7x0Ypx1RK3Zu5c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712315643; c=relaxed/simple;
+	bh=49yOLvI7lOSv5U/xdRmIUsLYtFVEBYukZysO+ceNj5w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nqndnSj0zoUkotX5BaHO7bZ/fS7v97wJ8e5yi2LlGcN72vszq+M4M7YvxPmqom4ISZIPiL8TLzinqWS9gSfgC4ygRGwv0RboeyTK7/b71XQaHTlaWVh4MM7aqBs+OGaX/hQbuYHXRRjT4V/oSOTvcC/owaV7rokiXTg02oUNn8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.80])
+	by gateway (Coremail) with SMTP id _____8CxF+j03A9mboUjAA--.61726S3;
+	Fri, 05 Apr 2024 19:13:56 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.80])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxbs3w3A9me8dzAA--.24654S3;
+	Fri, 05 Apr 2024 19:13:52 +0800 (CST)
+Message-ID: <f3a1ae88-2817-4c60-b281-336aedf18384@loongson.cn>
+Date: Fri, 5 Apr 2024 19:13:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|DM4PR12MB6326:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	lxw9Pxd0C3OJ4TLxUcMK7iPpM3AqGkkQDbi63RE0gzzdwtRwhYjc5MItkbTySQs7Rl3XF/Va1ljd9i85W/aZrED+WCTg6ZuvOmPUy8Nks/DvE+SdpWz0SdXXL4vmWDEhIieSwJj3TlUsPjE3HMtzf91p5RDWl54kmMzqN0tzp6a2w4d67VFXW3LN8wPfjoRK6MAFzn92VuodTZoCvCrLUYzaAqc8IRFhry/28RvzISdl+Bbvwu/4qm+LUu+qFMQvyIJgvup646Iydc3FqVQjzorHmyTrtoqyfSFV5WHWLupcEWH6EnxASeDkSjgT/ze5CksDzawDULNBdrWipvfVE21bgjthQv/DWValnS4KwGB8cHnGUQHX5dsSFo9S/g2/06TJlDgRgMFpAa4PEHJaiApny91LH+p++7P7EpY6joiq+SnQ5NQM2GlE7Tu6qR1sXqiXvrG9FUmVhIq4hL4geF3+xA8a+4iaiJ1ElMh1Wdum9rm0ge0UVry+ILgu5q7aE6Pad/kORtYGpcsSnHtyNWEU04LxqDr7ZVAEjQnU+k5kVzt+NIG7V+i7htXY3R6CcUg8aHVEZzzRWd8U7Y7rcEZn03FYadJ1vfuhg0pS2AMJmIo5Vo/Orjre6ZhJw90mB9qb0Yiy8xzgYq971Q+ANLXIFwAa/WfIOT/pMMtED3Q=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(7416005)(376005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?5KX73K4WMZBHH1Z+YgETReDDoiAOKDZkyLBudf1Cwcq+G1FwfzQP8r9gzUQv?=
- =?us-ascii?Q?K00yjbQhwSH6bp2WfbHcGYEnEkdy0nwk+9EmhHTTtIBNs+/LBiRJezsRyEpf?=
- =?us-ascii?Q?puwRyyv9FFZn7m6CfzMmQzAKlfKOiNDwOQDJcsthbCZISZm65R2VmbFbkOCe?=
- =?us-ascii?Q?iSpK8zlZZa/el+HB9hYoP4uQpAXNwb/E9mvxbREE+N1FOPbQ+c2QgdB42JIM?=
- =?us-ascii?Q?vryEULZHvrEzY2LAgn5FRuYl0Om06MhUazkg5+/b1D/O27tB6VPS0Uj81a9t?=
- =?us-ascii?Q?qz7qXM7Hq/kFLNt4fTzBLxjj89xo/tXa6cNgIi3PiFrrH0ZMP68Q7jy+bZoH?=
- =?us-ascii?Q?u0HiGQVYOBRduX92GB11+wDiwuwa4pXRCB90NS37jPdrnoiDTVJtkqaAiVjp?=
- =?us-ascii?Q?6JoyaLdV7pCaZMDFArsyrGTDy+EJbM1SgijCANqgtm05OqEcXV2GU/lIyvX+?=
- =?us-ascii?Q?u2/AGGrt1sw0vX2DChVJSMDXH04pabHsv5JrPl+mkbmOquXOX9mUjwvIODoW?=
- =?us-ascii?Q?aFLV0Fm/7I7oePMVpk4NhVKtURiibf8xtbur8LibYDloMUnSd7kr2yRglzkU?=
- =?us-ascii?Q?SZ391MFs+XpXnJerU8byY/IvgBIgtTRM57VwnMw9Rm1wIAu6Qr9Hybp/6hOW?=
- =?us-ascii?Q?uRx/s7H/5rB95y38OhMrySr2Dq5MhAsIpvjB79HOBOtt0ESs3ZoOpe4OiuFh?=
- =?us-ascii?Q?89ifbhR1oT6ke+osItTs74EbDezqWHcM6ZtRzSUgogKn5Tayc0w5akdpORbZ?=
- =?us-ascii?Q?O4KUz1Lj7C8RmNPd8XfdnX0ypIuz5fDCOZb+aMG12yMrvLGuep7gXiGAAeWH?=
- =?us-ascii?Q?s03XXYn9xVfATI7D5wwn/sxjYO38+FPkLrLfPsJzova30MGuUo4o0NrRgjcn?=
- =?us-ascii?Q?u111e+bK91Y9W+75s2isTCMca3GCCEFjeB2uony/G5k3HQZ3CFDaykdY1qml?=
- =?us-ascii?Q?k4i0TaEK8yGi+wXUPYgUgDvZzHICJd7VvQy319dyNxCBYhyfh5RQStLI4v47?=
- =?us-ascii?Q?QdNsO6B/4L/LY5b+KjOFUxXmvqUGrCeDaVUm3o+bBi4aarI54k8xhsrdj5rK?=
- =?us-ascii?Q?7kdP8wVeA8GNqS8FEPGEfHqVyyu+rUvol+zzol1mC5pg1crOfSfQKUcX3DA7?=
- =?us-ascii?Q?TSliwl1re18npG5kSV4tpqpurXrc4rjBeZclS5QlQfT1Dj1gAFltS7JqMkU+?=
- =?us-ascii?Q?yxK+3Bj7f+1uNix49eTGNM/2ktUcMgbmjGGfUyPkLO3sLZBpHcrDjGJAMy3n?=
- =?us-ascii?Q?MkF2cwCekotU2Cs2xhRTR1FRvJmairHnIPqfd9TAHPzzk42h0uzTStfNP41q?=
- =?us-ascii?Q?/NiurHDo4SdLR3klAF4aO8QT25DEs/XC1Hq1g/Oavc4yp5efBrGAIMGNuDvQ?=
- =?us-ascii?Q?aHdBlVfTKIAeo8FItS1JTNopxbFQWOH7BAaQQuEdyVjOgUavSSKXamyxGyms?=
- =?us-ascii?Q?0r0ZZlc8/4Vu1UClIIEFtfe5x7noK/dSKRDCSK9wp0jLUuJhKAsPmB76PjXo?=
- =?us-ascii?Q?tZvS4QD8iRXXRxQ7i0CxnlgHOkmoMawg54yJ7ejCQMEg9EP+43lnFITIHtmj?=
- =?us-ascii?Q?pkpnmiS1EW0kK9MqQ7OuqnwWvevYB7QkrhxeEdi2?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd4e4bc3-7ebf-487b-44c0-08dc55615f20
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2024 11:13:07.7588
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JWhEDUjRnn5LN7wNCQWih73o9esqEeqj6ZclJmlP+OgQbuFb58MylQ3qYmk4InQV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6326
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 02/11] net: stmmac: dwmac-loongson: Refactor
+ code for loongson_dwmac_probe()
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <6a66fdf816665c9d91c4611f47ffe3108b9bd39a.1706601050.git.siyanteng@loongson.cn>
+ <uvar72vvibm44tgn3trr52mpvrjgnn4ttbmyt2mouwws7pkywq@qcyrmj25c4su>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <uvar72vvibm44tgn3trr52mpvrjgnn4ttbmyt2mouwws7pkywq@qcyrmj25c4su>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cxbs3w3A9me8dzAA--.24654S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxKF1xuF43CFWrAr4UZr4kKrX_yoWxZF45pa
+	93C3ZxKrWxtr1Ika1kZr4UZFyYyrWYk343urWxK3s2ga4qkryvqFyIgrWjkF97ArWku3WI
+	vF1jkr48uF1DtFgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4j6r4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8
+	JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14
+	v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY
+	67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2
+	IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jFApnUUUUU=
 
-On Thu, Apr 04, 2024 at 02:34:07PM -0700, Jakub Kicinski wrote:
-> On Thu, 4 Apr 2024 17:44:54 -0300 Jason Gunthorpe wrote:
-> > > To my knowledge the "customizations" are mostly around fitting into OCP
-> > > servers.  
-> > 
-> > Nope. I understand it is significant. If Meta had to work with a COTS
-> > environment like a HP/Dell customer then Meta would have a list of
-> > flash configurables to set. I think you greatly underestimate the
-> > privilege of being at a hyperscaler and having vendors create custom
-> > products just for you..
-> > 
-> > > Those unfamiliar with how hyperscalers operate can mentally
-> > > replace $hyperscaler with HP or Dell in your message. Minus all the
-> > > proprietary OOB management stuff those guys also provide.  
-> > 
-> > A significant Dell customer will get a server pre-populated with a NIC
-> > with some generic Dell configuration. In most cases the customer will
-> > have to then program the flash to match their needs. Set a specific FW
-> > version, set site specific configurables, etc.
-> > 
-> > Similar to how a Dell customer will have to change the BIOS settings
-> > in the Dell to match their needs.
-> 
-> I can only guess that you are again thinking about RDMA/HPC.
-> Flashing tunables is not a workable solution for extremely varied 
-> and ephemeral TCP/IP workloads :|
+Hi Serge,
 
-As I answered to Anderew, a lot is functional behavior not so much
-"tunables". The same way many BIOS settings are not all tunables but
-have functional impacts to the machine. Like enable SRIOV, for
-instance.
 
-Even for dataplane tunables - you know there are micro-architectural
-performance tunables set in the special Meta NICs that are wired just
-for Meta's special use case? Apparently that is actually perfectly
-workable.
+Sorry, I seem to have forgotten to reply to the comments on this patch.
 
-It is really strange to hear you act like "Meta doesn't need
-provisioning or tuning" when the NIC Meta uses is *highly* customized
-specifically for Meta to the point it is an entirely different
-product. Of course you don't need provisioning, alot of other people
-did alot of hard work to make it that way.
+在 2024/2/5 22:43, Serge Semin 写道:
+> On Tue, Jan 30, 2024 at 04:43:22PM +0800, Yanteng Si wrote:
+>> The driver function is not changed, but the code location is
+>> adjusted to prepare for adding more loongson drivers.
+> Having the word "refactoring" in the subject is always suspicious
+> because submitters very often try to hind behind it many small
+> changes they didn't want to/didn't know how to unpin from a more bulky
+> change. Moreover if there is no detailed explanation what is done and
+> why, it raises too many review questions and makes the reviewers life
+> much harder. So it would have been much better for us if you split up
+> this change into the smaller patches (see my last comment for a
+> presumable subset of the patches) to simplify the review process and
+> improve the driver bisectability especially seeing there actually are
+> functional changes introduced here despite of what is said in the
+> commit log.
+OK. I will resplit it.
+>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> ---
+>>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 61 +++++++++++++------
+>>   1 file changed, 42 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> index 9e40c28d453a..e2dcb339b8b0 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> @@ -9,7 +9,12 @@
+>>   #include <linux/of_irq.h>
+>>   #include "stmmac.h"
+>>   
+>> -static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>> +struct stmmac_pci_info {
+>> +	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+>> +};
+>> +
+>> +static void loongson_default_data(struct pci_dev *pdev,
+>> +				  struct plat_stmmacenet_data *plat)
+>>   {
+>>   	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+>>   	plat->has_gmac = 1;
+>> @@ -34,23 +39,37 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>>   
+>>   	/* Disable RX queues routing by default */
+>>   	plat->rx_queues_cfg[0].pkt_route = 0x0;
+>> +}
+>> +
+>> +static int loongson_gmac_data(struct pci_dev *pdev,
+>> +			      struct plat_stmmacenet_data *plat)
+>> +{
+>> +	loongson_default_data(pdev, plat);
+>> +
+>> +	plat->multicast_filter_bins = 256;
+> Why do you need to move this here from the function tail?
+OK, restore it.
+>
+>> +
+>> +	plat->mdio_bus_data->phy_mask = 0;
+> This is already zero. Why do you need this?
+OK, drop it.
+>
+>>   
+>> -	/* Default to phy auto-detection */
+> What is wrong with this comment?
+Sorry, restore it.
+>
+>>   	plat->phy_addr = -1;
+>>   
+>>   	plat->dma_cfg->pbl = 32;
+>>   	plat->dma_cfg->pblx8 = true;
+>>   
+>> -	plat->multicast_filter_bins = 256;
+>>   	return 0;
+>>   }
+>>   
+>> -static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>> +static struct stmmac_pci_info loongson_gmac_pci_info = {
+>> +	.setup = loongson_gmac_data,
+>> +};
+>> +
+>> +static int loongson_dwmac_probe(struct pci_dev *pdev,
+>> +				const struct pci_device_id *id)
+>>   {
+>> +	int ret, i, bus_id, phy_mode;
+>>   	struct plat_stmmacenet_data *plat;
+>> +	struct stmmac_pci_info *info;
+>>   	struct stmmac_resources res;
+>>   	struct device_node *np;
+>> -	int ret, i, phy_mode;
+> Reverse xmas tree order please.
+OK.
+>
+>>   
+>>   	np = dev_of_node(&pdev->dev);
+>>   
+>> @@ -69,18 +88,17 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   	if (!plat->mdio_bus_data)
+>>   		return -ENOMEM;
+>>   
+>> +	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
+>> +				     GFP_KERNEL);
+>> +	if (!plat->dma_cfg)
+>> +		return -ENOMEM;
+>> +
+> Why do you need this moved above the mdio_node getting procedure? They
+> seem independent.
+Sorry, restore it.
+>
+>>   	plat->mdio_node = of_get_child_by_name(np, "mdio");
+>>   	if (plat->mdio_node) {
+>>   		dev_info(&pdev->dev, "Found MDIO subnode\n");
+>>   		plat->mdio_bus_data->needs_reset = true;
+>>   	}
+>>   
+>> -	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+>> -	if (!plat->dma_cfg) {
+>> -		ret = -ENOMEM;
+>> -		goto err_put_node;
+>> -	}
+>> -
+>>   	/* Enable pci device */
+>>   	ret = pci_enable_device(pdev);
+>>   	if (ret) {
+>> @@ -98,9 +116,16 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   		break;
+>>   	}
+>>   
+>> -	plat->bus_id = of_alias_get_id(np, "ethernet");
+>> -	if (plat->bus_id < 0)
+>> -		plat->bus_id = pci_dev_id(pdev);
+> This is a functional change because further bus_id is no longer
+> initialized by the pci_dev_id() method as a fallback case. If you are
+> sure this is required please unpin to a separate patch and explain.
+Hmm, I will merge it into  [PATCH net-next 03/11] .
+>
+>> +	pci_set_master(pdev);
+>> +
+>> +	info = (struct stmmac_pci_info *)id->driver_data;
+>> +	ret = info->setup(pdev, plat);
+>> +	if (ret)
+>> +		goto err_disable_device;
+>> +
+>> +	bus_id = of_alias_get_id(np, "ethernet");
+>> +	if (bus_id >= 0)
+>> +		plat->bus_id = bus_id;
+>>   
+>>   	phy_mode = device_get_phy_mode(&pdev->dev);
+>>   	if (phy_mode < 0) {
+>> @@ -110,11 +135,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   	}
+>>   
+>>   	plat->phy_interface = phy_mode;
+>> -	plat->mac_interface = PHY_INTERFACE_MODE_GMII;
+> This is just dropped. Are you sure that the driver will work correctly
+Yes, We only need to set phy_interface.
+> after this change is applied? Russell already asked you about this change
+> here:
+> https://lore.kernel.org/netdev/ZZPnaziDZEcv5GGw@shell.armlinux.org.uk/
+>
+> Anyway please unpin it to a separate patch and explain.
+OK.
+>
+>>   
+>> -	pci_set_master(pdev);
+>> -
+>> -	loongson_default_data(plat);
+>>   	pci_enable_msi(pdev);
+>>   	memset(&res, 0, sizeof(res));
+>>   	res.addr = pcim_iomap_table(pdev)[0];
+>> @@ -212,8 +233,10 @@ static int __maybe_unused loongson_dwmac_resume(struct device *dev)
+>>   static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+>>   			 loongson_dwmac_resume);
+>>   
+>> +#define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+>> +
+>>   static const struct pci_device_id loongson_dwmac_id_table[] = {
+>> -	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
+>> +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> If I were you and needed to preserve all the changes I would have
+> split the patch up into the next patches:
+> 1. Use PCI_DEVICE_DATA() macro for device identification
+> 2. Drop mac-interface initialization
+> 3. Don't initialize MDIO bus ID with PCIe device ID
+> 4. Introduce device-specific setup callback
 
-So please don't use that as a justification to pull up the ladder so
-nobody else can enjoy even a semi-customized device.
+OK, I will.
 
-Jason
+
+Thanks,
+
+Yanteng
+
+
 
