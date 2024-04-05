@@ -1,186 +1,218 @@
-Return-Path: <netdev+bounces-85351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B7089A5A6
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:29:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 158A589A5AB
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2636E1F233CE
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:29:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E113280E7C
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C45174EC5;
-	Fri,  5 Apr 2024 20:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B6317BAA;
+	Fri,  5 Apr 2024 20:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUJvKpsK"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="nLqcZ24q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90BC174ED5
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 20:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0474C8D
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 20:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712348960; cv=none; b=pXu9E4DfVsPaslspXdha2amq2mvWwWnV7oncabatqKhdB3DEMQDX4p1QuokvqYvEmw5KHZUznOGW7yVaTb2RcOPduPGNubCuiCMWwPUyywf34XXqZeG4RXfYCoqhdtw4YSxv26WJcdSefck1kKaGb706Wu6rLDVDgoycFbq457M=
+	t=1712349156; cv=none; b=E1dqDFE42L2+/lIGbgL6gq+1aCCGK0LyD6XOMXtEvMLQ9fVutKeuvMS+U9xd19VDzzGS3HZiDYdMKp6Y5Il1VKKQ00oGqo5MsMKFiSuwkfFKkWBgvqbHOP1w5oy65Te6lq8IQts6hZb9wlKTN/dvl4WTP3fZ3Ov75L2XhZsElQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712348960; c=relaxed/simple;
-	bh=SIKxjQ5uGFsLjoRcZZ6RhVfRtu4RHZDzTmqkSL9r6UM=;
-	h=Message-ID:Date:MIME-Version:Cc:From:Subject:To:Content-Type; b=b0AA69WTwP4c/ZkJF1MY6Txz3hOnR/D7GT7i1xgOPTo2OSIR/08X6pf6mf1KOK+M/9qHglqJqETJmRcANMrzq5vMKTnKd5RvAafhOsHU3zNqDwDCRU+eiVYDnu96h8wubaNZB6rfB88Sj4WSKx9MgEalNr/2v2Ca2S4V4R5+mtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FUJvKpsK; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d8129797fcso33847891fa.1
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 13:29:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712348956; x=1712953756; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:autocrypt:subject:from:cc
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I8K/7MorK30NpCqnMG3JqcQN0gZJgIyPD9B3dUB8TvI=;
-        b=FUJvKpsKdSVt+vLC239GhTJmGmGIcPIfabLoSkyw3hMpSc9DgAUilcGASeMuoytNEC
-         a/HTUI5jblPyaAcO4vjO6T9CTRFxhKKPcgfhiwvcBP38vgmxU5NQv31GR26MoOg1Z6QJ
-         QI07cQBJIjzyh+tMmvAIsxUn1ElcUj1ZH6O8wotxZoVEzMtVCMf0t8MTF4aFyk+5t2BE
-         wZAUgL7CPxpzbmPnchj1r6G7t1jyJng4ldPhsmZ5dDyw5BbmykELrS83/XCZitbfb53/
-         n4hDS3NEpZhXcfeKOgvVNAuL2jDU2q1Xc+DffsX/Nk4UItYKP8p3k2V4AL+NP/prsvdR
-         D7iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712348956; x=1712953756;
-        h=content-transfer-encoding:to:autocrypt:subject:from:cc
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I8K/7MorK30NpCqnMG3JqcQN0gZJgIyPD9B3dUB8TvI=;
-        b=hKdYXVeYIDszwqCcdcUabCdgOv1vbaPqHt7LqaK7p9xnxV5cpDZw9tqsl1nwVos+BK
-         K9oQao93BDPxb+oeUGyyXwb8fZLfapwJbGJKNcG12pjXEf/jqPYoFRrf8ABJ430ubQ/L
-         7DM2hwj4CxjJ5kWeNI2tnfmV782w7GPCRH6TcAaj5Nybtuo4ptfHhU5Iq+6dklfoEQ5s
-         cre1eZ7/AM4U32MpMpNFczD19z6tISfEvUel5OBVxbCewESK7gD2fcxXjL5rLaA2OOFL
-         tkXt10eoUzH/963h8WUd/KjVDG5yHHStf4TxldhfdGqoiNnEBsWWJ1YjSw6xoMzAHv9R
-         Tb4g==
-X-Forwarded-Encrypted: i=1; AJvYcCXQxbCS2SOFaIcMa7IBLZnJTzjZSjzGrOiFbbFMivTEXpurXgIWmyGbAOcC0knKzv8b/Ue+l2gxyNH+4RhkdczfRA78Z1Cw
-X-Gm-Message-State: AOJu0YxL3BQbGzcxn8pvBPACpf6AzkQGB5xMD0eExPezk06q3TmxlTc5
-	aDbQjlRtvGL4w3e7c70dumwasGxxZrzvIjBHrCsC6wAtDRoCYdIX
-X-Google-Smtp-Source: AGHT+IGfgpzqH/wl5V4hyG93qVAMN1QswdKt6virMzYxULwOrBvh4YLtv1YozVlhIFDU1+9OI7B5SA==
-X-Received: by 2002:a19:ca07:0:b0:516:ced5:3afa with SMTP id a7-20020a19ca07000000b00516ced53afamr1899827lfg.5.1712348956304;
-        Fri, 05 Apr 2024 13:29:16 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:72bb:b200:e0e0:cd27:7a04:5c79? (dynamic-2a01-0c22-72bb-b200-e0e0-cd27-7a04-5c79.c22.pool.telefonica.de. [2a01:c22:72bb:b200:e0e0:cd27:7a04:5c79])
-        by smtp.googlemail.com with ESMTPSA id e9-20020a17090618e900b00a4655513f0bsm1210303ejf.88.2024.04.05.13.29.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 13:29:15 -0700 (PDT)
-Message-ID: <bbcdbc1b-44bc-4cf8-86ef-6e6af2b009c3@gmail.com>
-Date: Fri, 5 Apr 2024 22:29:15 +0200
+	s=arc-20240116; t=1712349156; c=relaxed/simple;
+	bh=25JT5Bz4Kh2uSK5K/DAgSdVwx4jRohVm0IBFXqBA7fE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Jq0Sixzs8suY9oUXbTwiPoOXe/zVeN84UJ1R3qUQF8YMHEfkTUDbn+Zgzt394VCQd+b0f9uT/4Sh5tz9RIUgr/ZaNnwqktaNuDaY5wCW/EjjZxcBwk6P3hRZE4xbHYIUyGoQsUG5JSzO50NBcb677XwvBKDzBK08oueLc6oWeuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=nLqcZ24q; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 573A087EB2;
+	Fri,  5 Apr 2024 22:32:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1712349153;
+	bh=GjrzxdXp3rOIcxwOnOoHdjK2eAW3MQkR30uN7bgccrk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=nLqcZ24qWAOxF2hYelINGWFCHwgqaMs80cXskiKofx0l88TpE6M5MBHOwcbkECWaV
+	 AjX0BLV21u16tDhfOvjov3lZo44ZbIMRGvBfW4PtxWxOxxxZOzj8skoo6gLl7sN9Jo
+	 WKGeD6OliT/EIOF3rERoGFqZcS2SZu5Jc1TLYH4n4KR9RGoO8cqTRsLdczj2ME+zt8
+	 Jl8DwdYdjtD1d2yY8fb91I8myV8lhwS6v5XAN2dHHmGALmX9UaaCszD6cfDbKXFaoe
+	 LNZ77s0b9xxubTcVsl/7uKW2KolxCWus7BkFyk/4E+js7L9I18zojpJ8bHzYQE4aaS
+	 D8xag2qR/vJTA==
+From: Marek Vasut <marex@denx.de>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net v2 1/2] net: ks8851: Inline ks8851_rx_skb()
+Date: Fri,  5 Apr 2024 22:30:39 +0200
+Message-ID: <20240405203204.82062-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-Cc: Lukas Wunner <lukas@wunner.de>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net] r8169: fix LED-related deadlock on module removal
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-To: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Binding devm_led_classdev_register() to the netdev is problematic
-because on module removal we get a RTNL-related deadlock. Fix this
-by using the parent device instead for device-managed resources.
-This is cleaner anyway because then all device-managed resources in
-the driver use the same device (the one belonging to the PCI device).
+Both ks8851_rx_skb_par() and ks8851_rx_skb_spi() call netif_rx(skb),
+inline the netif_rx(skb) call directly into ks8851_common.c and drop
+the .rx_skb callback and ks8851_rx_skb() wrapper. This removes one
+indirect call from the driver, no functional change otherwise.
 
-Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
-Cc: stable@vger.kernel.org
-Reported-by: Lukas Wunner <lukas@wunner.de>
-Suggested-by: Lukas Wunner <lukas@wunner.de>
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Signed-off-by: Marek Vasut <marex@denx.de>
 ---
- drivers/net/ethernet/realtek/r8169_leds.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+---
+V2: - Fill in 'net' subject prefix
+---
+ drivers/net/ethernet/micrel/ks8851.h        |  3 ---
+ drivers/net/ethernet/micrel/ks8851_common.c | 12 +-----------
+ drivers/net/ethernet/micrel/ks8851_par.c    | 11 -----------
+ drivers/net/ethernet/micrel/ks8851_spi.c    | 11 -----------
+ 4 files changed, 1 insertion(+), 36 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_leds.c b/drivers/net/ethernet/realtek/r8169_leds.c
-index 7c5dc9d0d..7f2b8a361 100644
---- a/drivers/net/ethernet/realtek/r8169_leds.c
-+++ b/drivers/net/ethernet/realtek/r8169_leds.c
-@@ -146,13 +146,12 @@ static void rtl8168_setup_ldev(struct r8169_led_classdev *ldev,
- 	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
+diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/micrel/ks8851.h
+index e5ec0a363aff8..31f75b4a67fd7 100644
+--- a/drivers/net/ethernet/micrel/ks8851.h
++++ b/drivers/net/ethernet/micrel/ks8851.h
+@@ -368,7 +368,6 @@ union ks8851_tx_hdr {
+  * @rdfifo: FIFO read callback
+  * @wrfifo: FIFO write callback
+  * @start_xmit: start_xmit() implementation callback
+- * @rx_skb: rx_skb() implementation callback
+  * @flush_tx_work: flush_tx_work() implementation callback
+  *
+  * The @statelock is used to protect information in the structure which may
+@@ -423,8 +422,6 @@ struct ks8851_net {
+ 					  struct sk_buff *txp, bool irq);
+ 	netdev_tx_t		(*start_xmit)(struct sk_buff *skb,
+ 					      struct net_device *dev);
+-	void			(*rx_skb)(struct ks8851_net *ks,
+-					  struct sk_buff *skb);
+ 	void			(*flush_tx_work)(struct ks8851_net *ks);
+ };
  
- 	/* ignore errors */
--	devm_led_classdev_register(&ndev->dev, led_cdev);
-+	devm_led_classdev_register(ndev->dev.parent, led_cdev);
+diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
+index 0bf13b38b8f5b..896d43bb8883d 100644
+--- a/drivers/net/ethernet/micrel/ks8851_common.c
++++ b/drivers/net/ethernet/micrel/ks8851_common.c
+@@ -231,16 +231,6 @@ static void ks8851_dbg_dumpkkt(struct ks8851_net *ks, u8 *rxpkt)
+ 		   rxpkt[12], rxpkt[13], rxpkt[14], rxpkt[15]);
  }
  
- void rtl8168_init_leds(struct net_device *ndev)
- {
--	/* bind resource mgmt to netdev */
--	struct device *dev = &ndev->dev;
-+	struct device *dev = ndev->dev.parent;
- 	struct r8169_led_classdev *leds;
- 	int i;
+-/**
+- * ks8851_rx_skb - receive skbuff
+- * @ks: The device state.
+- * @skb: The skbuff
+- */
+-static void ks8851_rx_skb(struct ks8851_net *ks, struct sk_buff *skb)
+-{
+-	ks->rx_skb(ks, skb);
+-}
+-
+ /**
+  * ks8851_rx_pkts - receive packets from the host
+  * @ks: The device information.
+@@ -309,7 +299,7 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
+ 					ks8851_dbg_dumpkkt(ks, rxpkt);
  
-@@ -245,13 +244,12 @@ static void rtl8125_setup_led_ldev(struct r8169_led_classdev *ldev,
- 	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
+ 				skb->protocol = eth_type_trans(skb, ks->netdev);
+-				ks8851_rx_skb(ks, skb);
++				netif_rx(skb);
  
- 	/* ignore errors */
--	devm_led_classdev_register(&ndev->dev, led_cdev);
-+	devm_led_classdev_register(ndev->dev.parent, led_cdev);
+ 				ks->netdev->stats.rx_packets++;
+ 				ks->netdev->stats.rx_bytes += rxlen;
+diff --git a/drivers/net/ethernet/micrel/ks8851_par.c b/drivers/net/ethernet/micrel/ks8851_par.c
+index 2a7f298542670..381b9cd285ebd 100644
+--- a/drivers/net/ethernet/micrel/ks8851_par.c
++++ b/drivers/net/ethernet/micrel/ks8851_par.c
+@@ -210,16 +210,6 @@ static void ks8851_wrfifo_par(struct ks8851_net *ks, struct sk_buff *txp,
+ 	iowrite16_rep(ksp->hw_addr, txp->data, len / 2);
  }
  
- void rtl8125_init_leds(struct net_device *ndev)
+-/**
+- * ks8851_rx_skb_par - receive skbuff
+- * @ks: The device state.
+- * @skb: The skbuff
+- */
+-static void ks8851_rx_skb_par(struct ks8851_net *ks, struct sk_buff *skb)
+-{
+-	netif_rx(skb);
+-}
+-
+ static unsigned int ks8851_rdreg16_par_txqcr(struct ks8851_net *ks)
  {
--	/* bind resource mgmt to netdev */
--	struct device *dev = &ndev->dev;
-+	struct device *dev = ndev->dev.parent;
- 	struct r8169_led_classdev *leds;
- 	int i;
+ 	return ks8851_rdreg16_par(ks, KS_TXQCR);
+@@ -298,7 +288,6 @@ static int ks8851_probe_par(struct platform_device *pdev)
+ 	ks->rdfifo = ks8851_rdfifo_par;
+ 	ks->wrfifo = ks8851_wrfifo_par;
+ 	ks->start_xmit = ks8851_start_xmit_par;
+-	ks->rx_skb = ks8851_rx_skb_par;
  
+ #define STD_IRQ (IRQ_LCI |	/* Link Change */	\
+ 		 IRQ_RXI |	/* RX done */		\
+diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
+index 2f803377c9f9d..670c1de966db8 100644
+--- a/drivers/net/ethernet/micrel/ks8851_spi.c
++++ b/drivers/net/ethernet/micrel/ks8851_spi.c
+@@ -298,16 +298,6 @@ static unsigned int calc_txlen(unsigned int len)
+ 	return ALIGN(len + 4, 4);
+ }
+ 
+-/**
+- * ks8851_rx_skb_spi - receive skbuff
+- * @ks: The device state
+- * @skb: The skbuff
+- */
+-static void ks8851_rx_skb_spi(struct ks8851_net *ks, struct sk_buff *skb)
+-{
+-	netif_rx(skb);
+-}
+-
+ /**
+  * ks8851_tx_work - process tx packet(s)
+  * @work: The work strucutre what was scheduled.
+@@ -435,7 +425,6 @@ static int ks8851_probe_spi(struct spi_device *spi)
+ 	ks->rdfifo = ks8851_rdfifo_spi;
+ 	ks->wrfifo = ks8851_wrfifo_spi;
+ 	ks->start_xmit = ks8851_start_xmit_spi;
+-	ks->rx_skb = ks8851_rx_skb_spi;
+ 	ks->flush_tx_work = ks8851_flush_tx_work_spi;
+ 
+ #define STD_IRQ (IRQ_LCI |	/* Link Change */	\
 -- 
-2.44.0
+2.43.0
 
 
