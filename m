@@ -1,143 +1,392 @@
-Return-Path: <netdev+bounces-85111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 861678997E9
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:35:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 525048997ED
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:36:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2352B21D0C
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:34:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D44DE28689A
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B5315FA66;
-	Fri,  5 Apr 2024 08:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233ED15FA75;
+	Fri,  5 Apr 2024 08:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqlMh6fA"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="q20t30hH";
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="cxRrGfA0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEFB415FA95
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 08:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712306079; cv=none; b=clduofWWJYmiMqsIVmExda6bAB5IWPu++9hB8DUL6hYUqYrmDZutuRMraN6ytaMsPh1uriHiV7etX7TaE7+6x4UuE5nm/LQfBMJTlgRXvP3TB+z5SxIU4ykbzfwdX7VFHc/HKbjYO6hv1SilegGuN2foF0Bj0wNyA2UDOpa9bl0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712306079; c=relaxed/simple;
-	bh=qm6TnS1OEfgYoeCHQolapAEQCWvFv3wqYvT2tGPeW38=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rmhSHQ2zfrr4fATDG4gKMezdvpIeZyHKq56L8ZV1xyt0LTn6cBtj/0x543D5q3GSUkhguANhagJsxyTua0YyWXUYDkrbGX3+k4Jz6nR7MCvLdCPjdc4GuKxwBa93J6SGLWpnxjmQbDPQMBRZwXUD9oLZhjgAqIa/6g04OX81bUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dqlMh6fA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712306076;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=qm6TnS1OEfgYoeCHQolapAEQCWvFv3wqYvT2tGPeW38=;
-	b=dqlMh6fAWHqwQjBDpZmbcY6AujJLTCJ3zdHs1NgX8cEo7k1/umqp5shc3nD3WxDjGVWUE3
-	GUrFK0ITxEamFxGKbFrQM/RmHKQsgyF95Z39mu1u1X8XJJnHhK2qJlgM+m12kBgFQIAns/
-	ijmR3INHIx/5yz8wkiwTWKdUtc+ScYQ=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-490-5iLb9Po5O4mUt1iQS8UY3w-1; Fri, 05 Apr 2024 04:34:34 -0400
-X-MC-Unique: 5iLb9Po5O4mUt1iQS8UY3w-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-516ce9afcabso187859e87.0
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 01:34:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712306073; x=1712910873;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qm6TnS1OEfgYoeCHQolapAEQCWvFv3wqYvT2tGPeW38=;
-        b=EF3SYFfSVp+QqSm0g30JS3RJyJCYn0N0dZx6uZRqUIaLZH5SrLMZWyFOJ3lQ3Ml+7I
-         FSAdb6zKxd0prPvti7xCJNAGk+CdeXduZnu/03gQpMp/3Hq5Syp9ewPq6lerFTBou2wH
-         tbb9Nf6K0u0Q/k4OzzneeBjW9Dgv7WnSFJxXp4ab+P+cxh25ntkKBxi2BNUFwbqKsVKL
-         QF9KFSYs5cIO18o2083U5p4i5fdw0YYNhVn98Zh3bJ3lBVnz+VTPasTqtDCNOTYoAlmu
-         gWHCW79xtTSkNXLhm9lyOlT8OSFKQ/ko1bmGwA1Q2JjJ6Uq+l+/tFl3m6AJMIoF1e21Y
-         zK4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV485pUa4lsaks255ytjbrX1vanKirEHIbQLiRIHlhaziGJgz/0sO3jvtJsx1jBkCy6s3trpckS/tt9t/TQD/393X9lCZ/S
-X-Gm-Message-State: AOJu0YyykRJgtmeTnU2Az7SUvGuQyiLNEHdhC+jk81VpJDSg0CzDW9Zp
-	GcJlyTx3k5zxwSVxidWort7HQSP3gDhaTnzUN17kinqZxF5p3FTj77thP2N/8s/rGGrbR6nup3R
-	XJdOOpk+jG9bGeZunM6mPx2ZhQK6egMQKkbCPu2ySPgAmZ2y0JKI//A==
-X-Received: by 2002:a05:6512:34c4:b0:516:d538:d559 with SMTP id w4-20020a05651234c400b00516d538d559mr462237lfr.1.1712306073027;
-        Fri, 05 Apr 2024 01:34:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwzObbsy85KEmqb+6x/QXyc3wKmM6tmRM3Sby2LIhrZ2yAgf82e4tcAjeWZXNnpyCpSfSdHg==
-X-Received: by 2002:a05:6512:34c4:b0:516:d538:d559 with SMTP id w4-20020a05651234c400b00516d538d559mr462219lfr.1.1712306072560;
-        Fri, 05 Apr 2024 01:34:32 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-247-213.dyn.eolo.it. [146.241.247.213])
-        by smtp.gmail.com with ESMTPSA id l13-20020a5d668d000000b0034354a99d43sm1457613wru.43.2024.04.05.01.34.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 01:34:32 -0700 (PDT)
-Message-ID: <6b77ce4f71dae82a0be793cf17fac4fda0884501.camel@redhat.com>
-Subject: Re: [PATCH net-next 1/2] mptcp: don't need to check SKB_EXT_MPTCP
- in mptcp_reset_option()
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- matttbe@kernel.org,  martineau@kernel.org, geliang@kernel.org,
- mptcp@lists.linux.dev,  netdev@vger.kernel.org, Jason Xing
- <kernelxing@tencent.com>
-Date: Fri, 05 Apr 2024 10:34:30 +0200
-In-Reply-To: <CAL+tcoBEkK-ncB6zdJrq7kkd3MEdyT7_ONOyB=0cVVR_oj-4yA@mail.gmail.com>
-References: <20240405023914.54872-1-kerneljasonxing@gmail.com>
-	 <20240405023914.54872-2-kerneljasonxing@gmail.com>
-	 <a0e75cbda948d9911425d8464ea47c92ab2eee3b.camel@redhat.com>
-	 <CAL+tcoBEkK-ncB6zdJrq7kkd3MEdyT7_ONOyB=0cVVR_oj-4yA@mail.gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD7915F321;
+	Fri,  5 Apr 2024 08:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712306165; cv=fail; b=VJ8bJX9idwr+sPaCZKFSVWMdZq7h9P/tM+8pMWh1ElI+TE7eA2X171VJ7FLXtN+1cmh+B1b/PMpD6HxKTLQyy0Cl+Ggj65WAZ9IWpHE14RANXZ31sXi0S5ISGFYP+FHMInJb3GpHaWiCtNSFf1FN/qqZZ2rd9rfxTRs3oAfdoiE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712306165; c=relaxed/simple;
+	bh=j3ygQtg9d3ahWGMr5Gz3S3ppaeVlsE+V4Q2t9Hiip/c=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nzYZpE1YPNcOfqo8BOkYU8BrDBmniJaB1TelXo3ddndNcuCY4evwPuzQyvajwOFRjasVwaXaJheh4vy6nAs2dbaBqor+S2oNZQrkYO+537OkZ0cQ4viJQI+JAhJQXWL74srN8CSg9Po8E7vVS5id6/dqg+B+xy+j5TY9qPhdKYU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=q20t30hH; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=cxRrGfA0; arc=fail smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1712306162; x=1743842162;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=j3ygQtg9d3ahWGMr5Gz3S3ppaeVlsE+V4Q2t9Hiip/c=;
+  b=q20t30hHnkoip8CCptpHx4g8FgKZOGGOGswova27dJMfhAhQoQDSJCIF
+   yPhMmIzhbFlXSTrLIVSslYoK1sGlJu6GjcIBsQUO7HvdcTjOd435+NGsq
+   quTLqLm3QbsMsjzJnKmSkZTGSPTCVurgxBIKrfqRLLLbbLpsC+OwZLzg6
+   /NnHdk0/EhUlWTa42/Nil4jRWkE6QODt2xFGQvbdVuTXOdOCuw69w+5+5
+   5UTAsIVP53P7ppruCgVxOiD825p7sQMN9FOe63swpWG81HceBgwmE4q/9
+   rP7VYaKjbetnwE2Rk/1gfkOcSCUgXySugd4n4bq+qZAzfVc9oAp5V++CR
+   g==;
+X-CSE-ConnectionGUID: VB+k7OebR7i2J84qft7WJg==
+X-CSE-MsgGUID: tJUAntLKQMOfAu/lSbwT2g==
+X-IronPort-AV: E=Sophos;i="6.07,181,1708412400"; 
+   d="scan'208";a="186895384"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Apr 2024 01:36:01 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 5 Apr 2024 01:35:29 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (10.10.215.250)
+ by email.microchip.com (10.10.87.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 5 Apr 2024 01:35:29 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BPWn52SJ77PUftlFkqFbdiy3W9LWptF/xlCknpgANdbUz0vlSE971uZNgGVSpMhSh4DZKVnZ0dNIShlQkQppfE8UEhkTRLg2bMzHw89dJCyAr1wP672Ix4UyTDWJo/+jwYpKVdEGzJDV9ESapvoFBOner2gSIcT8MDDD/zq7Y6it856zKdslBAi+riulrdK/AZj/vf9jDauDdkmzVDC+W7lWoNRH+07A0EPnP2Lh87cVMOVb728vANQetibOtCKNNhXvGiHNYau1O+BteA12hY3vvr5RYe1+fbI1CP5ctdWfHaunfuZourtEEewLnWwzxa/yCcat6jsw5lgJ+hM76g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JnL0t9DUGxb/GcvT8qZ+vAD0RH2LSv1OgvEJNjy5JIE=;
+ b=QlxssXiA6xRsh71RYtk5gVldHoz7z7QGM3Nc/be3eiY5bJ4iBRTMLGZjSzEdX6pNUNqz9FoKMMeSnBHAJWMXJD+FkJG0D3ZShq6bc8XE2nde5iDaQTFD3/FW9/OUaQjKxsDhAZUQslZr8MhITMRqLKEW5nfgIYnIdyTBMMaTSn4XGzsUb7KD3uyx65hvHWKrxXfDIxZHpnuTc4tc0eruBpF102arDfn0vm5Pqp8UMPAsCfWMIdAwPYQ4hNIEYO31hSOMmDnpuEJ4vqCyYHrNS/jb3bP8oaOZgimkqZ/lGKnhvmoZ3GTxuSgvSqh9sPjwyFCJNnBpofWsWE7vHr8pSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JnL0t9DUGxb/GcvT8qZ+vAD0RH2LSv1OgvEJNjy5JIE=;
+ b=cxRrGfA0RMxVEdFadEyz/djqBmuZZfNna/eLix9KyCT/ypz9IUkmC0jNe3Tv96syvVz9pTWwtI8kq6c12HAYQ6kUmKIjqc//caaityFbraYHVUldrrCphjCkn56u0vpH0g6via0bKQ1Ifh6jjvw+pb/zq8iXzgCZ/KV6VRqEeCHGUtjbu3KyR16mFU8RKeFHmg7EUGCYlTmr34Igux3ktRcAIPbWKsOQJTxXqV1rZW5uQt44z3UBr2dSKR2Ly+Iw1krQ01G1ZrqEbSy0CQc3NLC/b6AIYPo2mecIXW+kTRwDDOublLJWwQhX8juDPrOiVTm8eAlAWzO39iSsfVz3yw==
+Received: from CO1PR11MB4771.namprd11.prod.outlook.com (2603:10b6:303:9f::9)
+ by DS0PR11MB7879.namprd11.prod.outlook.com (2603:10b6:8:f7::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Fri, 5 Apr
+ 2024 08:35:25 +0000
+Received: from CO1PR11MB4771.namprd11.prod.outlook.com
+ ([fe80::b78f:e89c:89a:842f]) by CO1PR11MB4771.namprd11.prod.outlook.com
+ ([fe80::b78f:e89c:89a:842f%6]) with mapi id 15.20.7452.019; Fri, 5 Apr 2024
+ 08:35:25 +0000
+From: <Divya.Koppera@microchip.com>
+To: <Horatiu.Vultur@microchip.com>, <andrew@lunn.ch>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <richardcochran@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<UNGLinuxDriver@microchip.com>, <Horatiu.Vultur@microchip.com>
+Subject: RE: [PATCH net-next 2/2] net: phy: micrel: lan8814: Add support for
+ PTP_PF_PEROUT
+Thread-Topic: [PATCH net-next 2/2] net: phy: micrel: lan8814: Add support for
+ PTP_PF_PEROUT
+Thread-Index: AQHahmbVG65LRxNRpEalQnzb7NUpU7FZWpFA
+Date: Fri, 5 Apr 2024 08:35:25 +0000
+Message-ID: <CO1PR11MB4771B9B8238242DA6406CBE6E2032@CO1PR11MB4771.namprd11.prod.outlook.com>
+References: <20240404080115.450929-1-horatiu.vultur@microchip.com>
+ <20240404080115.450929-3-horatiu.vultur@microchip.com>
+In-Reply-To: <20240404080115.450929-3-horatiu.vultur@microchip.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB4771:EE_|DS0PR11MB7879:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: fFEa5rZ6e/c6isRkvbmoLuabM277TMTjjyLgd0Ii+DeAJjmqfVxr66Astt/nvEGYlOBpGymiQ+4A6hMSWsWwbTcw57l5uaq30f1K9mTEmi/ygWqFbBgBpZlxDtAoMphu7SysrkxVoSF4aZaJQMhOgYwx296T+Tuia3wzt+1HrVpCG06MSxUyUkDHtF2E2NM5c9UJ/TvOAVbjWeArdnSgzd6zEpFYJS6GiCIuJGkyXL7UMDs7EBC80YiqZYkeQNEIBdWqnbeYLWxvTEjsoAv6f+zD9J65SJGTpietxupBJD8FmDhib4PTlRHMPR1UFxms8V2OBCohUrhqYWz6jBlzfRBQ9PvjQETSA61pUJE08Hzg7A3nxFxLLU8jIor6jNidM/bc3A7jrZY9cE+5Q8JK2ME9FvWyncXHfOubPyMWcqFAv1HLqtw0M9lqYX2qU7IZulWDDO+SOU+HWVhC2sq8UzpAxW1nyxnFOSRyV0dYQktyQn+OUvbvLbJ0rjWT40BDFgcKSocU0YbDkjHfLg1AYPuKnADOKRnBVkT4ZjcllnWvOyectU6IXHF9aWpIcEy2x1RPjzI9pDMzrF/8ZRlw7WVmq9sRRWatiV6QnxXOvi8rMvj84dfXriH1yA3ruxn/REEMKc39xtSotZp0LmVFJJ648c6N6nMraEqWQ1ikQQ0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4771.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?MhgCZ8ZCxK0UA3Xov5m37GQsfSXW3GmdDpMuOocbQQAfhVH9zsxfrBFy5mn2?=
+ =?us-ascii?Q?+o2Rugis69zS6o5gcOqF9pBoq+vT8Fg60jPy2+TgNx4V3FRrtygmoFxdV57X?=
+ =?us-ascii?Q?A+k8FNk83slvPmoPlBoRCmsHOmYG8UsRzVRUfH1rK112N+UV0lAI53FjzcVU?=
+ =?us-ascii?Q?YgI3brOYbznKvwI/89ct1Ht5tLfrhlZpk+lWMqoaf9i7SV7b1x1PaMFzX4hI?=
+ =?us-ascii?Q?J6uLmkieqGyaozjVwgJAhAeacxpzzInwBAtNs/A/gkjOBiNykvEY0ITpFTsF?=
+ =?us-ascii?Q?vqkhApnjs5ddN3zj+/YeUlN2oTcI33zInWjHge1Pd456cba9AvpK4TQpEuCW?=
+ =?us-ascii?Q?RE/JX4JSbHxIFddVxqroYv+WAWmq98kbDgEgj9xPrqJyx+o4GQYrW4zjuVfe?=
+ =?us-ascii?Q?+cOXsGZq9mRyW34T0cmnGs1UfoEcRcRR7niHCFfTsIGnR307JgkFyyr6T+iQ?=
+ =?us-ascii?Q?Fn/3tzP8BM6hMRQW2I9YT0drAXpg+EEth4TybAdhwBYryp8YGxWVGnyIrpY2?=
+ =?us-ascii?Q?NpNODkSivr26qiXFnNy8w6N8hXaIJDBtUdcoQminPF+0aPXcfCCTgQiLjhVf?=
+ =?us-ascii?Q?/wKJjIqn0BJfXnRqNuII6EvV2z1FuTtSM8nVdoAOSflh3NA4n6cMtQki4/Yi?=
+ =?us-ascii?Q?3Nd1AeXqb+Q9h0cZkgouvjYKJDo0ei5+tsm0xhT0DWeZ3GDFAx3coa+DINTP?=
+ =?us-ascii?Q?NgmDEBFWuTM/QzIwPH90bZgjftzqcfYNvjykS0qTykAA0jX8gglAZFaRsTNF?=
+ =?us-ascii?Q?+g4ow4xKimgtSAkXeitawGi0SbZD/AnTZEYPy6FYkie6TG4qbLKzAAaGxzYL?=
+ =?us-ascii?Q?hzabMGmhzR9LBD36KP0U7DnPp4p+/brHNLLDG4Jdzjxa6vV44B3n726YzgjW?=
+ =?us-ascii?Q?aBl4kiuI21P76okbpVjUiIJiP1ggrDMCzp9lahWkc2OkQKQz40/Fb4c+Dz2H?=
+ =?us-ascii?Q?/+nv847+uHMM1nUQpfXpwp/E34/WCCH/eV6lBAP79HqBL+seJOvWY80RuKPf?=
+ =?us-ascii?Q?VTCgAJfM6KbO83QRDYwilY0kksTyP7NvyrgjAw+FH/aUCmxbVU352BaJGSNJ?=
+ =?us-ascii?Q?krfP/RSodKoqyYKEl0iQH6OJfhgjzruEV128Qd1c0Gszz/2FGLUOH2MuMYp8?=
+ =?us-ascii?Q?LBQln6OA72HhVQ5w7uUtY5aFrCPHK/rhwFTtbI/nAdUnvy5TfwVBCdG+lqRp?=
+ =?us-ascii?Q?qC4HdUtm3t65iOToknP62RppqSu1dq0rmvsLWE5RNoDuJqmd4NgrD71fIVl7?=
+ =?us-ascii?Q?yCS0Ad6qTIUyk73avNrB1a9QFraES8+hldfojz11513ZGvuR3mV4jmtFpbpu?=
+ =?us-ascii?Q?ETk4pfSkJo7SPskRdYQ54q/PFksBLAwpsaw357PkGt3m7dxnIU+5Oa7IF95U?=
+ =?us-ascii?Q?gsEup4ZnGFxhR//p6lQXj/4lJPKNvALeQ5Ji9hdz911XfY3DwjPlLrn9emO0?=
+ =?us-ascii?Q?OXgTmqe5lJoTUQXA7NUg74b821lHPfwDKIPAWPLqTRwBoO2u+cLSIOnvDIss?=
+ =?us-ascii?Q?vop2O7TExPQ/pVA3aiVGGOL9ja5+TnE/UxA0Q4y/2HETWqKHGP1Kdy3WuSZN?=
+ =?us-ascii?Q?NnVDjWM5pxwJVFTXuugz4E1Eqq4oldkSNc/9LAA7FJ6eOWIHdnT098u4bsML?=
+ =?us-ascii?Q?Bg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4771.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50c6ba50-99cc-4787-ba7f-08dc554b575d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Apr 2024 08:35:25.5937
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: uhuQEciigud/PbHlrMc0kXQx7MF9eQgpSKifzXDFs0cVzbAIV6mHoaLAGSPpja/PqPyYVnan3WbiP9QV7PtUvGPsPj4PWOc9Lv1XtgEXguw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7879
 
-On Fri, 2024-04-05 at 15:58 +0800, Jason Xing wrote:
-> Hello Paolo,
+Hi Horatiu,
+
+
+> Subject: [PATCH net-next 2/2] net: phy: micrel: lan8814: Add support for
+> PTP_PF_PEROUT
 >=20
-> On Fri, Apr 5, 2024 at 3:47=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
-> >=20
-> > On Fri, 2024-04-05 at 10:39 +0800, Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >=20
-> > > Before this, what mptcp_reset_option() checks is totally the same as
-> > > mptcp_get_ext() does, so we could skip it.
-> >=20
-> > Note that the somewhat duplicate test is (a possibly not great)
-> > optimization to avoid jumping in the mptcp code (possible icache
-> > misses) for plain TCP sockets.
-> >=20
-> > I guess we want to maintain it.
+> Lan8814 has 24 GPIOs but only 2 GPIOs (GPIO 0 and GPIO 1) can be
+> configured to generate period signals. And there are 2 events (EVENT_A an=
+d
+> EVENT_B) but these events are hardcoded to the GPIO 0 and GPIO 1.
+> These events are used to generate period signals. It is possible to confi=
+gure the
+> length, the start time and the period of the signal by configuring the ev=
+ent.
 >=20
-> Okay, I just read code and found the duplication but may I ask why it
-> has something to do with icache misses?
+> These events are generated by comparing the target time with the PHC time=
+.
+> In case the PHC time is changed to a value bigger than the target time + =
+reload
+> time, then it would generate only 1 event and then it would stop because
+> target time + reload time is smaller than PHC time.
+> Therefore it is required to change also the target time every time when t=
+he PHC
+> is changed. The same will apply also when the PHC time is changed to a sm=
+aller
+> value.
+>=20
+> This was tested using:
+> testptp -i 1 -L 1,2
+> testptp -i 1 -p 1000000000 -w 200000000
+>=20
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> ---
+>  drivers/net/phy/micrel.c | 353
+> ++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 351 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c index
+> 51ca1b2b5d99a..521c6f7ab420c 100644
+> --- a/drivers/net/phy/micrel.c
+> +++ b/drivers/net/phy/micrel.c
+> @@ -272,6 +272,66 @@
+> +static void lan8814_ptp_perout_off(struct phy_device *phydev, int pin)
+> +{
+> +	u16 val;
+> +
+> +	/* Disable gpio alternate function,
+> +	 * 1: select as gpio,
+> +	 * 0: select alt func
+> +	 */
+> +	val =3D lanphy_read_page_reg(phydev, 4,
+> LAN8814_GPIO_EN_ADDR(pin));
+> +	val |=3D LAN8814_GPIO_EN_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin),
+> val);
+> +
+> +	val =3D lanphy_read_page_reg(phydev, 4,
+> LAN8814_GPIO_DIR_ADDR(pin));
+> +	val &=3D ~LAN8814_GPIO_DIR_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin),
+> val);
+> +
+> +	val =3D lanphy_read_page_reg(phydev, 4,
+> LAN8814_GPIO_BUF_ADDR(pin));
+> +	val &=3D ~LAN8814_GPIO_BUF_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin),
+> val); }
+> +
+> +static void lan8814_ptp_perout_on(struct phy_device *phydev, int pin) {
+> +	int val;
+> +
+> +	/* Set as gpio output */
+> +	val =3D lanphy_read_page_reg(phydev, 4,
+> LAN8814_GPIO_DIR_ADDR(pin));
+> +	val |=3D LAN8814_GPIO_DIR_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin),
+> val);
+> +
+> +	/* Enable gpio 0:for alternate function, 1:gpio */
+> +	val =3D lanphy_read_page_reg(phydev, 4,
+> LAN8814_GPIO_EN_ADDR(pin));
+> +	val &=3D ~LAN8814_GPIO_EN_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin),
+> val);
+> +
+> +	/* Set buffer type to push pull */
+> +	val =3D lanphy_read_page_reg(phydev, 4,
+> LAN8814_GPIO_BUF_ADDR(pin));
+> +	val |=3D LAN8814_GPIO_BUF_BIT(pin);
+> +	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin),
+> val); }
+> +
+> +static int lan8814_ptp_perout(struct ptp_clock_info *ptpci,
+> +			      struct ptp_clock_request *rq, int on) {
+> +	struct lan8814_shared_priv *shared =3D container_of(ptpci, struct
+> lan8814_shared_priv,
+> +							  ptp_clock_info);
+> +	struct phy_device *phydev =3D shared->phydev;
+> +	struct timespec64 ts_on, ts_period;
+> +	s64 on_nsec, period_nsec;
+> +	int pulse_width;
+> +	int pin, event;
+> +
+> +	/* Reject requests with unsupported flags */
+> +	if (rq->perout.flags & ~PTP_PEROUT_DUTY_CYCLE)
+> +		return -EOPNOTSUPP;
+> +
+> +	mutex_lock(&shared->shared_lock);
+> +	event =3D rq->perout.index;
+> +	pin =3D ptp_find_pin(shared->ptp_clock, PTP_PF_PEROUT, event);
+> +	if (pin < 0 || pin >=3D LAN8814_PTP_PEROUT_NUM) {
+> +		mutex_unlock(&shared->shared_lock);
+> +		return -EBUSY;
+> +	}
+> +
+> +	if (!on) {
+> +		lan8814_ptp_perout_off(phydev, pin);
+> +		lan8814_ptp_disable_event(phydev, event);
+> +		mutex_unlock(&shared->shared_lock);
+> +		return 0;
+> +	}
+> +
+> +	ts_on.tv_sec =3D rq->perout.on.sec;
+> +	ts_on.tv_nsec =3D rq->perout.on.nsec;
+> +	on_nsec =3D timespec64_to_ns(&ts_on);
+> +
+> +	ts_period.tv_sec =3D rq->perout.period.sec;
+> +	ts_period.tv_nsec =3D rq->perout.period.nsec;
+> +	period_nsec =3D timespec64_to_ns(&ts_period);
+> +
+> +	if (period_nsec < 200) {
+> +		pr_warn_ratelimited("%s: perout period too small, minimum
+> is 200 nsec\n",
+> +				    phydev_name(phydev));
+> +		return -EOPNOTSUPP;
+> +	}
 
-The first check/mptcp_get_ext() is in mptcp_reset_option() /
-tcp_v4_send_reset(). For plain TCP socket it will fail and the
-execution will continue inside the same compilation unit. The code
-locality should avoid icaches misses around there.
+Unlock is Missing in above and below conditions.
 
-Removing such check, even when processing plain TCP packets, the code
-execution will have to call into mptcp_get_reset_option() in the mptcp
-code, decreasing the code locality and increasing the chance of icache
-misses.
+> +
+> +	if (on_nsec >=3D period_nsec) {
+> +		pr_warn_ratelimited("%s: pulse width must be smaller than
+> period\n",
+> +				    phydev_name(phydev));
+> +		return -EINVAL;
+> +	}
+> +
+> +	switch (on_nsec) {
+> +	case 200000000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_200MS;
+> +		break;
+> +	case 100000000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100MS;
+> +		break;
+> +	case 50000000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_50MS;
+> +		break;
+> +	case 10000000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_10MS;
+> +		break;
+> +	case 5000000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_5MS;
+> +		break;
+> +	case 1000000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_1MS;
+> +		break;
+> +	case 500000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_500US;
+> +		break;
+> +	case 100000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100US;
+> +		break;
+> +	case 50000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_50US;
+> +		break;
+> +	case 10000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_10US;
+> +		break;
+> +	case 5000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_5US;
+> +		break;
+> +	case 1000:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_1US;
+> +		break;
+> +	case 500:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_500NS;
+> +		break;
+> +	case 100:
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100NS;
+> +		break;
+> +	default:
+> +		pr_warn_ratelimited("%s: Use default duty cycle of 100ns\n",
+> +				    phydev_name(phydev));
+> +		pulse_width =3D
+> LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100NS;
+> +		break;
+> +	}
+> +
+> +	/* Configure to pulse every period */
+> +	lan8814_ptp_enable_event(phydev, event, pulse_width);
+> +	lan8814_ptp_set_target(phydev, event, rq->perout.start.sec,
+> +			       rq->perout.start.nsec);
+> +	lan8814_ptp_set_reload(phydev, event, rq->perout.period.sec,
+> +			       rq->perout.period.nsec);
+> +	lan8814_ptp_perout_on(phydev, pin);
+> +	mutex_unlock(&shared->shared_lock);
+> +
+> +	return 0;
+> +}
+> +
+> 2.34.1
 
-I don't have actual profile data, so this is an early optimization (and
-thus root of all evil), but sounds reasonable to me (yep, I'm biased!)
+Except above comment, everything is good.
 
-Cheers,
-
-Paolo
+Reviewed-by: Divya Koppera <divya.koppera@microchip.com>
 
 
