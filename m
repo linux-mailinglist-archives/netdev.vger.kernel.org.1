@@ -1,216 +1,193 @@
-Return-Path: <netdev+bounces-85194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08325899BA9
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:12:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD731899BAE
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7464B1F22D92
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:12:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA3151C2252D
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3F416C439;
-	Fri,  5 Apr 2024 11:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C6016C44D;
+	Fri,  5 Apr 2024 11:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PDjgdsrY"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CA3un0XU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2099.outbound.protection.outlook.com [40.107.223.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3326116C445;
-	Fri,  5 Apr 2024 11:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712315558; cv=none; b=ekpsrYyP3pCnh8TEcu/gUawRTmyo/dc2a5h5JOT7WDyzaHxXqbx80+dncezpaThAkuzOjGCyxBIijmpamw/cLOQskJ1ad6V8sZKW07M6IfMoe9QWJW2ZmOPaAzbvohBv8Mj3JaLrWyWjY/Kt+IRdwKxjXjM3PJxSaEcZWy8hUp4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712315558; c=relaxed/simple;
-	bh=NcfjqL3uT5ez6zqz+Ud9aNoZeboBCbGYLwfyWj8ndaU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eZcgE4TQK0RittLAxM4/RC1+uHBBK/tayGUhZSYwynjoW/S9j9UVs8OwzN4H/NQbsjT4ZY4wf19m58jzFzl8Q+sfKw4zm74K+xC3kdw39TBP7pJ+JinKUnPc8MOSm9hypDSkSYheXkaobC/6euXSss2HpjgXoW6FxAmYcNBPDOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PDjgdsrY; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435B1TaS008527;
-	Fri, 5 Apr 2024 11:12:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=dFBShyNS93DhkSHWTQt6kg+6vcoJjojN32KTr8iUQzM=;
- b=PDjgdsrYqVnGzw0y7Jljkuwl3YL/eyWo7umDMuB15wlfmvH2NGyhETkKFPFKlewU3IkP
- JRav5TqvuLlsEHw79FsAw1RGWG5YMGx4a/4CozZh9eP8qbdw3iZMUxPy1W7WNY4sDiPi
- uFecUeql5zuFXjig3i3N1LU5SUiXQPRJUeoWzI4QfsyyKHL9V3ptfJF+GdfdG5M3Qeso
- OD+/j2d1gW7WNXT6vRcZ0JcyRQsHjQ9YsvDgJHe770GhBNougfe2EIaPXr93w8rjWwGs
- xGOqXbbyoB9FRm28domPHxX3n3Kr2QvB1/3kbmgztkwijcVX3KHSqjI2WbYC5+ejpx1P bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeas886e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:12:32 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 435BCWWW026603;
-	Fri, 5 Apr 2024 11:12:32 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeas886b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:12:31 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4359iSFS008671;
-	Fri, 5 Apr 2024 11:12:31 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x9epwa2t0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:12:31 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 435BCPdG55509398
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Apr 2024 11:12:27 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A5B0F2004E;
-	Fri,  5 Apr 2024 11:12:25 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5D7E820043;
-	Fri,  5 Apr 2024 11:12:25 +0000 (GMT)
-Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.155.208.153])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Apr 2024 11:12:25 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, pasic@linux.ibm.com,
-        schnelle@linux.ibm.com
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>
-Subject: [PATCH v2] s390/ism: fix receive message buffer allocation
-Date: Fri,  5 Apr 2024 13:12:22 +0200
-Message-ID: <20240405111222.1785248-1-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 15muSFZidZJPAkconFCBO2_TDBmNjDrS
-X-Proofpoint-ORIG-GUID: rxxOC3P_aUitHV94ysa5YL49ARfeZNp5
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D121CD2B;
+	Fri,  5 Apr 2024 11:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.99
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712315592; cv=fail; b=rsjsRhrWwkFPjKu1KhOYPHbYq7I07nn7+XfA0E0ySUoX4VNdg20TKXj2Ie83jI2pEmNxh5Zm/Rw6jrGG/GA3Dr9tai8aSR+6hQ0gBqLuWxNeMbWCAQbFc5FSf1vjsVehSHlF/ajxeF7P+RSURRew8v8gL0kFhj0KIvTm1q+tOeM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712315592; c=relaxed/simple;
+	bh=xN8iTysxSIsY8l0FOVg1UF6VK1mXaDq+QofUED0ZV5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=iMo4oJeNBXyfOPDn5W/pXtV4W13RP2UUnNJf6RdWITYWlKbSMflXgmJFZRzHuEgOwEVzGmfqHz5DGyG5lpjOBqjGQ1ow8HZA5xOv+pJkBeL7FKCu3xSsQomBvmz6BdZIftsZBPTCp6xEuG03ZrE8RkqEfX3+uyg4Fn2hoRhwQvE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CA3un0XU; arc=fail smtp.client-ip=40.107.223.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E1FQn9AB3NT2w5H0UHRRJ0inV/oHCFp4RkZcRPXkQtd6F+FxOo+tQsIhSlV4LAe63u/uQBQBjaDS5WadlPJrnCGWTKpaIVVlIMDpFEVFDmOBGIAlhG0zYmiIKYdRCjvxOmdAWbtws6/yksZ7Nbtm/x26GrfKNipSORyqHpUYoSFs7RNYvWvrCvXCkALghPJY/TGzkYnQ8ojOo7EEssUrPVpQ5A61EkH86DF/68/jYFWHgU00igkyduy5CcQtggMEgl3InQV2mVEIyh9eblqo6Vlc3oQqWlXGHfyyhUuyv84uXnBHswboohIJHThwatVwoBhOVCQbkRECdpFhKudCug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lcLOhhqcF0QaObmX3dP6pNg2dpCc66605bO61xGNF6E=;
+ b=fP0FolBjjo4IkbC3HMCVaBj/o9Rj5mIsQWEtoAgThUalyxmmiRCHFj9yn9hJElMu5s/hvZsDrbHcB4z6C+UfUU+Vn8R0zLTi/KYYhza3NDRCFWpbQai1wE6+RLdVq2bMacpUtYMxhLzE2DKAQxpq428/dTpHQbhw7bgnGzJJ+nZNu1bArgvKB3fJxDADj+pm0cDw4K+CROFoT+h3X2r0CckIit9O+34ho2Y6BiZlO1pUXHTSyzfw3llDvkpFupfcahKM/Ipyt25FAD47saSEORCgpjlA95PFzAVkaYLqD8wBeOm2YE2YqvDjBelwoV9nYFnvPMOKEdtQCIItR6zAOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lcLOhhqcF0QaObmX3dP6pNg2dpCc66605bO61xGNF6E=;
+ b=CA3un0XUE2vdt3N2HrU5zj8noXrmbC+B4N0u+mEqqFFmE3vC16zDr393j6pFEUvphIvyMAIPuXhj+XLsZ8nvkAXl/lrWWnpmzRChoTxhb6JM8wvA8wUvqjLeh9Smtll76YeCgRwJACzVf7zVOyL2XDxG39GjZlR0Js3ZHjcEvMW56lM1rbEsP2G4iLUf4MtRlboS3kmpQuVr6aobWlFtpKx7Enfs1l0bgGUoIETHKLLja5GRUdl+kd4YR4opOIhF0R3OfDn/oNTWpPeHiV2NW1JmjcNlYAJtOAZoEqT0LQM9SjFOKlAgrKoNea+FtIWUAM8oW15zkKMlFObc6RyM/Q==
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by DM4PR12MB6326.namprd12.prod.outlook.com (2603:10b6:8:a3::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Fri, 5 Apr
+ 2024 11:13:08 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7409.042; Fri, 5 Apr 2024
+ 11:13:07 +0000
+Date: Fri, 5 Apr 2024 08:13:06 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, David Ahern <dsahern@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	linux-kernel@vger.kernel.org,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240405111306.GB5383@nvidia.com>
+References: <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+ <20240322154027.5555780a@kernel.org>
+ <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+ <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184055.GP946323@nvidia.com>
+ <83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
+ <20240404183305.GM1723999@nvidia.com>
+ <20240404125339.14695f27@kernel.org>
+ <20240404204454.GO1723999@nvidia.com>
+ <20240404143407.64b44a88@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240404143407.64b44a88@kernel.org>
+X-ClientProxiedBy: MN2PR19CA0069.namprd19.prod.outlook.com
+ (2603:10b6:208:19b::46) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-05_10,2024-04-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=807
- clxscore=1015 mlxscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
- adultscore=0 malwarescore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404050081
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|DM4PR12MB6326:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	lxw9Pxd0C3OJ4TLxUcMK7iPpM3AqGkkQDbi63RE0gzzdwtRwhYjc5MItkbTySQs7Rl3XF/Va1ljd9i85W/aZrED+WCTg6ZuvOmPUy8Nks/DvE+SdpWz0SdXXL4vmWDEhIieSwJj3TlUsPjE3HMtzf91p5RDWl54kmMzqN0tzp6a2w4d67VFXW3LN8wPfjoRK6MAFzn92VuodTZoCvCrLUYzaAqc8IRFhry/28RvzISdl+Bbvwu/4qm+LUu+qFMQvyIJgvup646Iydc3FqVQjzorHmyTrtoqyfSFV5WHWLupcEWH6EnxASeDkSjgT/ze5CksDzawDULNBdrWipvfVE21bgjthQv/DWValnS4KwGB8cHnGUQHX5dsSFo9S/g2/06TJlDgRgMFpAa4PEHJaiApny91LH+p++7P7EpY6joiq+SnQ5NQM2GlE7Tu6qR1sXqiXvrG9FUmVhIq4hL4geF3+xA8a+4iaiJ1ElMh1Wdum9rm0ge0UVry+ILgu5q7aE6Pad/kORtYGpcsSnHtyNWEU04LxqDr7ZVAEjQnU+k5kVzt+NIG7V+i7htXY3R6CcUg8aHVEZzzRWd8U7Y7rcEZn03FYadJ1vfuhg0pS2AMJmIo5Vo/Orjre6ZhJw90mB9qb0Yiy8xzgYq971Q+ANLXIFwAa/WfIOT/pMMtED3Q=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(7416005)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5KX73K4WMZBHH1Z+YgETReDDoiAOKDZkyLBudf1Cwcq+G1FwfzQP8r9gzUQv?=
+ =?us-ascii?Q?K00yjbQhwSH6bp2WfbHcGYEnEkdy0nwk+9EmhHTTtIBNs+/LBiRJezsRyEpf?=
+ =?us-ascii?Q?puwRyyv9FFZn7m6CfzMmQzAKlfKOiNDwOQDJcsthbCZISZm65R2VmbFbkOCe?=
+ =?us-ascii?Q?iSpK8zlZZa/el+HB9hYoP4uQpAXNwb/E9mvxbREE+N1FOPbQ+c2QgdB42JIM?=
+ =?us-ascii?Q?vryEULZHvrEzY2LAgn5FRuYl0Om06MhUazkg5+/b1D/O27tB6VPS0Uj81a9t?=
+ =?us-ascii?Q?qz7qXM7Hq/kFLNt4fTzBLxjj89xo/tXa6cNgIi3PiFrrH0ZMP68Q7jy+bZoH?=
+ =?us-ascii?Q?u0HiGQVYOBRduX92GB11+wDiwuwa4pXRCB90NS37jPdrnoiDTVJtkqaAiVjp?=
+ =?us-ascii?Q?6JoyaLdV7pCaZMDFArsyrGTDy+EJbM1SgijCANqgtm05OqEcXV2GU/lIyvX+?=
+ =?us-ascii?Q?u2/AGGrt1sw0vX2DChVJSMDXH04pabHsv5JrPl+mkbmOquXOX9mUjwvIODoW?=
+ =?us-ascii?Q?aFLV0Fm/7I7oePMVpk4NhVKtURiibf8xtbur8LibYDloMUnSd7kr2yRglzkU?=
+ =?us-ascii?Q?SZ391MFs+XpXnJerU8byY/IvgBIgtTRM57VwnMw9Rm1wIAu6Qr9Hybp/6hOW?=
+ =?us-ascii?Q?uRx/s7H/5rB95y38OhMrySr2Dq5MhAsIpvjB79HOBOtt0ESs3ZoOpe4OiuFh?=
+ =?us-ascii?Q?89ifbhR1oT6ke+osItTs74EbDezqWHcM6ZtRzSUgogKn5Tayc0w5akdpORbZ?=
+ =?us-ascii?Q?O4KUz1Lj7C8RmNPd8XfdnX0ypIuz5fDCOZb+aMG12yMrvLGuep7gXiGAAeWH?=
+ =?us-ascii?Q?s03XXYn9xVfATI7D5wwn/sxjYO38+FPkLrLfPsJzova30MGuUo4o0NrRgjcn?=
+ =?us-ascii?Q?u111e+bK91Y9W+75s2isTCMca3GCCEFjeB2uony/G5k3HQZ3CFDaykdY1qml?=
+ =?us-ascii?Q?k4i0TaEK8yGi+wXUPYgUgDvZzHICJd7VvQy319dyNxCBYhyfh5RQStLI4v47?=
+ =?us-ascii?Q?QdNsO6B/4L/LY5b+KjOFUxXmvqUGrCeDaVUm3o+bBi4aarI54k8xhsrdj5rK?=
+ =?us-ascii?Q?7kdP8wVeA8GNqS8FEPGEfHqVyyu+rUvol+zzol1mC5pg1crOfSfQKUcX3DA7?=
+ =?us-ascii?Q?TSliwl1re18npG5kSV4tpqpurXrc4rjBeZclS5QlQfT1Dj1gAFltS7JqMkU+?=
+ =?us-ascii?Q?yxK+3Bj7f+1uNix49eTGNM/2ktUcMgbmjGGfUyPkLO3sLZBpHcrDjGJAMy3n?=
+ =?us-ascii?Q?MkF2cwCekotU2Cs2xhRTR1FRvJmairHnIPqfd9TAHPzzk42h0uzTStfNP41q?=
+ =?us-ascii?Q?/NiurHDo4SdLR3klAF4aO8QT25DEs/XC1Hq1g/Oavc4yp5efBrGAIMGNuDvQ?=
+ =?us-ascii?Q?aHdBlVfTKIAeo8FItS1JTNopxbFQWOH7BAaQQuEdyVjOgUavSSKXamyxGyms?=
+ =?us-ascii?Q?0r0ZZlc8/4Vu1UClIIEFtfe5x7noK/dSKRDCSK9wp0jLUuJhKAsPmB76PjXo?=
+ =?us-ascii?Q?tZvS4QD8iRXXRxQ7i0CxnlgHOkmoMawg54yJ7ejCQMEg9EP+43lnFITIHtmj?=
+ =?us-ascii?Q?pkpnmiS1EW0kK9MqQ7OuqnwWvevYB7QkrhxeEdi2?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd4e4bc3-7ebf-487b-44c0-08dc55615f20
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2024 11:13:07.7588
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JWhEDUjRnn5LN7wNCQWih73o9esqEeqj6ZclJmlP+OgQbuFb58MylQ3qYmk4InQV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6326
 
-Since [1], dma_alloc_coherent() does not accept requests for GFP_COMP
-anymore, even on archs that may be able to fulfill this. Functionality that
-relied on the receive buffer being a compound page broke at that point:
-The SMC-D protocol, that utilizes the ism device driver, passes receive
-buffers to the splice processor in a struct splice_pipe_desc with a
-single entry list of struct pages. As the buffer is no longer a compound
-page, the splice processor now rejects requests to handle more than a
-page worth of data.
+On Thu, Apr 04, 2024 at 02:34:07PM -0700, Jakub Kicinski wrote:
+> On Thu, 4 Apr 2024 17:44:54 -0300 Jason Gunthorpe wrote:
+> > > To my knowledge the "customizations" are mostly around fitting into OCP
+> > > servers.  
+> > 
+> > Nope. I understand it is significant. If Meta had to work with a COTS
+> > environment like a HP/Dell customer then Meta would have a list of
+> > flash configurables to set. I think you greatly underestimate the
+> > privilege of being at a hyperscaler and having vendors create custom
+> > products just for you..
+> > 
+> > > Those unfamiliar with how hyperscalers operate can mentally
+> > > replace $hyperscaler with HP or Dell in your message. Minus all the
+> > > proprietary OOB management stuff those guys also provide.  
+> > 
+> > A significant Dell customer will get a server pre-populated with a NIC
+> > with some generic Dell configuration. In most cases the customer will
+> > have to then program the flash to match their needs. Set a specific FW
+> > version, set site specific configurables, etc.
+> > 
+> > Similar to how a Dell customer will have to change the BIOS settings
+> > in the Dell to match their needs.
+> 
+> I can only guess that you are again thinking about RDMA/HPC.
+> Flashing tunables is not a workable solution for extremely varied 
+> and ephemeral TCP/IP workloads :|
 
-Replace dma_alloc_coherent() and allocate a buffer with folio_alloc and
-create a DMA map for it with dma_map_page(). Since only receive buffers
-on ISM devices use DMA, qualify the mapping as FROM_DEVICE.
-Since ISM devices are available on arch s390, only and on that arch all
-DMA is coherent, there is no need to introduce and export some kind of
-dma_sync_to_cpu() method to be called by the SMC-D protocol layer.
+As I answered to Anderew, a lot is functional behavior not so much
+"tunables". The same way many BIOS settings are not all tunables but
+have functional impacts to the machine. Like enable SRIOV, for
+instance.
 
-Analogously, replace dma_free_coherent by a two step dma_unmap_page,
-then folio_put to free the receive buffer.
+Even for dataplane tunables - you know there are micro-architectural
+performance tunables set in the special Meta NICs that are wired just
+for Meta's special use case? Apparently that is actually perfectly
+workable.
 
-[1] https://lore.kernel.org/all/20221113163535.884299-1-hch@lst.de/
+It is really strange to hear you act like "Meta doesn't need
+provisioning or tuning" when the NIC Meta uses is *highly* customized
+specifically for Meta to the point it is an entirely different
+product. Of course you don't need provisioning, alot of other people
+did alot of hard work to make it that way.
 
-Fixes: c08004eede4b ("s390/ism: don't pass bogus GFP_ flags to dma_alloc_coherent")
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
-changelog:
-v1->v2:
-- replaced kmalloc/kfree with folio_alloc/folio_put
-  as suggested.
+So please don't use that as a justification to pull up the ladder so
+nobody else can enjoy even a semi-customized device.
 
----
- drivers/s390/net/ism_drv.c | 38 +++++++++++++++++++++++++++++---------
- 1 file changed, 29 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 2c8e964425dc..affb05521e14 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -14,6 +14,8 @@
- #include <linux/err.h>
- #include <linux/ctype.h>
- #include <linux/processor.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/mm.h>
- 
- #include "ism.h"
- 
-@@ -292,13 +294,15 @@ static int ism_read_local_gid(struct ism_dev *ism)
- static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- {
- 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
--	dma_free_coherent(&ism->pdev->dev, dmb->dmb_len,
--			  dmb->cpu_addr, dmb->dma_addr);
-+	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
-+		       DMA_FROM_DEVICE);
-+	folio_put(virt_to_folio(dmb->cpu_addr));
- }
- 
- static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- {
- 	unsigned long bit;
-+	int rc;
- 
- 	if (PAGE_ALIGN(dmb->dmb_len) > dma_get_max_seg_size(&ism->pdev->dev))
- 		return -EINVAL;
-@@ -315,14 +319,30 @@ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- 	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
- 		return -EINVAL;
- 
--	dmb->cpu_addr = dma_alloc_coherent(&ism->pdev->dev, dmb->dmb_len,
--					   &dmb->dma_addr,
--					   GFP_KERNEL | __GFP_NOWARN |
--					   __GFP_NOMEMALLOC | __GFP_NORETRY);
--	if (!dmb->cpu_addr)
--		clear_bit(dmb->sba_idx, ism->sba_bitmap);
-+	dmb->cpu_addr =
-+		folio_address(folio_alloc(GFP_KERNEL | __GFP_NOWARN |
-+					  __GFP_NOMEMALLOC | __GFP_NORETRY,
-+					  get_order(dmb->dmb_len)));
- 
--	return dmb->cpu_addr ? 0 : -ENOMEM;
-+	if (!dmb->cpu_addr) {
-+		rc = -ENOMEM;
-+		goto out_bit;
-+	}
-+	dmb->dma_addr = dma_map_page(&ism->pdev->dev,
-+				     virt_to_page(dmb->cpu_addr), 0,
-+				     dmb->dmb_len, DMA_FROM_DEVICE);
-+	if (dma_mapping_error(&ism->pdev->dev, dmb->dma_addr)) {
-+		rc = -ENOMEM;
-+		goto out_free;
-+	}
-+
-+	return 0;
-+
-+out_free:
-+	kfree(dmb->cpu_addr);
-+out_bit:
-+	clear_bit(dmb->sba_idx, ism->sba_bitmap);
-+	return rc;
- }
- 
- int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
--- 
-2.44.0
-
+Jason
 
