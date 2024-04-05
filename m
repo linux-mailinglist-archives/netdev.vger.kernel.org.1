@@ -1,126 +1,371 @@
-Return-Path: <netdev+bounces-85168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36A4A899A9F
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:21:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B9EF899AA9
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:24:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67A041C2180C
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:21:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4030E283800
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C601649CD;
-	Fri,  5 Apr 2024 10:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD58B1649DF;
+	Fri,  5 Apr 2024 10:24:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XxhDIG9x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dh/Vr4rn"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18F0160798;
-	Fri,  5 Apr 2024 10:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2EA1649DC
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 10:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712312473; cv=none; b=Yv3hYd9Expuo95jSPfV5yGpg+5ffTzUfNBPdKojHpiBSNuQ4o6eLeuyD61IcpdE7u1lCYC/ouVbWSdXSaVaXef5PMnGxMlvKVPx5f5/sM7e0VCC7ojcDjEaSq7dkORC2RRRukhVAVPBiMq1W3uGvMJKigtI/yaQhkl3wtTSyNuo=
+	t=1712312687; cv=none; b=DOiDuyTdKaBaX9+lUYSOkbQ3oCH5efjjGzUsrul/+dS9bo4Ef/sxkOOjarmrqGZl8HDAMdewzuIYJKm61rzZ030ZdnnnHHlSKLTDmFklQdA2wVVp4fg21WrMwNfsuXsJ1ghE/20CArggFl3OE7732j0nc0wVamfU7KyJY0DOy80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712312473; c=relaxed/simple;
-	bh=8OTcYbM5BXtHpjptecVPfKlc9zekT5TkSATwQT2nhFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=foCApdi0hU3JecENYDeQ4+vC0RIeK0KLhPyhqzQ35SxLBRykJXQ2xIhlBtH2O3sHG85aN6MP3kJmZ2NcW7c1bk2GbiwVQyrfaB37tj6W1ANxDjS8II9T4WaHsD5ta5RFX17ixbY4C3QI+h9639MRQJizv0KkGOAVcTI+iq+0vcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XxhDIG9x; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=h6ooeeo3yUb6+TuxcE/grwqLZtdIxPaR752SVlSVmKQ=; b=XxhDIG9xuOitAMHCbDFb0BlB6B
-	DiryAlmDMJmtwZ815XVyY3qDkdkswFq9dqYmkmXWhgDCmegsEGEdYMyBVsHM7khh2WLVp9LoJ8jjP
-	NE9D52HkUhK2rYVojzqgnHMNzNg0Gj/hegRy7OrJ2+04Tg0M6eah+L9bZBNXqjNTKYlh+XUxTC5tl
-	nGyxozXpq0JW9Y7Un7dWNZy/1jryTfstjW4/EJAW9T6k5HHWt4IJIfsAmWmDDcfdF/Pz52Zldcryh
-	kcaOb7C+cjctXDi4/isMSf+shwF5twQzHYBItIZcIOh7bFSfxIc5pgsi0TLwgNQLlw5EyUPDaFjJR
-	fjLiabFw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47700)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rsggk-0002HW-22;
-	Fri, 05 Apr 2024 11:20:50 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rsggh-0001Jq-Nk; Fri, 05 Apr 2024 11:20:47 +0100
-Date: Fri, 5 Apr 2024 11:20:47 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Bjarni Jonasson <bjarni.jonasson@microchip.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: sparx5: fix reconfiguration of PCS on link mode
- change
-Message-ID: <Zg/Qf4P5gAzRUYuK@shell.armlinux.org.uk>
-References: <20240405-link-mode-reconfiguration-fix-v1-1-c1480bc2346a@microchip.com>
+	s=arc-20240116; t=1712312687; c=relaxed/simple;
+	bh=43wk8HZ0mt55F6j0HCuDCI36YwFH6sfak+q8/iD6ssE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LTLofwjs3B7nWoPHUNWtJCc3wiwirQsbeQaL3O4JHmpQLPpWaREEi8F8n6QhIIBHlWNt9MeQSY4sYTNbc3PZQf/Oto2CxbcihuaZQOvfFe/diyWq4Mtu0eDI6AN7me5o7pgCIfZrKGLc3bhG9DMZbRML75o62J+Am+XvUsdabWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dh/Vr4rn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04993C43394;
+	Fri,  5 Apr 2024 10:24:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712312687;
+	bh=43wk8HZ0mt55F6j0HCuDCI36YwFH6sfak+q8/iD6ssE=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Dh/Vr4rn8zyo/4jE4F0ElPsbXfCMe57DmnVBc/oAFb/NcKX/mZq7xrkYvIfKVZ00x
+	 bItrNi/NvgldqE/EkGmNBI/tCsLyxuCy4qe41E2lKLkXVjsTL6UaXfITm/GnIPavD7
+	 n/CClzoLCGnidWZc4t9o/kcx/pTm/Vb2Zwhh6ApNuJ8SlXXflwIyXP/kmSYjKvbVmX
+	 ZDkM19Yc15UhJZn3bQa2Ch3iCYA8T7mt2wgB2AuEUyUg43YHqb7DmTthVwkexhqK12
+	 YGXvczowbbppzKqJeMK5S0AuuT0xPXVA8vnWwwfBmVo7UTnJew3KgmeNDZ8xO4DjrU
+	 7KH/dznU7t7Jg==
+Date: Fri, 5 Apr 2024 11:23:13 +0100
+From: Simon Horman <horms@kernel.org>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [RFC] HW TX Rate Limiting Driver API
+Message-ID: <20240405102313.GA310894@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240405-link-mode-reconfiguration-fix-v1-1-c1480bc2346a@microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 05, 2024 at 11:53:15AM +0200, Daniel Machon wrote:
-> It was observed that the PCS would be misconfigured on link mode change,
-> if the negotiated link mode went from no-inband capabilities to in-band
-> capabilities. This bug appeared after the neg_mode change of phylink [1],
-> but is really due to the wrong config being used when reconfiguring the PCS.
+Hi,
 
-I don't see how the change you point to could have changed the
-behaviour. Old code:
+This is follow-up to the ongoing discussion started by Intel to extend the
+support for TX shaping H/W offload [1].
 
-	conf.inband = phylink_autoneg_inband(mode);
-	conf.autoneg = phylink_test(advertising, Autoneg);
+The goal is allowing the user-space to configure TX shaping offload on a
+per-queue basis with min guaranteed B/W, max B/W limit and burst size on a
+VF device.
 
-New code:
 
-	conf.inband = neg_mode == PHYLINK_PCS_NEG_INBAND_DISABLED ||
-		      neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED;
-	conf.autoneg = neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED;
+In the past few months several different solutions were attempted and
+discussed, without finding a perfect fit:
 
-where, for SGMII or 802.3z modes, neg_mode will be one of
-PHYLINK_PCS_NEG_INBAND_DISABLED or PHYLINK_PCS_NEG_INBAND_ENABLED if
-phylink_autoneg_inband(mode) is true, or PHYLINK_PCS_NEG_OUTBAND if
-not.
+- devlink_rate APIs are not appropriate for to control TX shaping on netdevs
+- No existing TC qdisc offload covers the required feature set
+- HTB does not allow direct queue configuration
+- MQPRIO imposes constraint on the maximum number of TX queues
+- TBF does not support max B/W limit
+- ndo_set_tx_maxrate() only controls the max B/W limit
 
-It does change conf.autoneg slightly in that this will always be true
-for SGMII, but will only be true for Autoneg + 802.3z modes.
+A new H/W offload API is needed, but offload API proliferation should be
+avoided.
 
-As far as your code change goes, it looks correct to me, but I think
-it's fixing a bug that goes back long before the commit you have
-identified.
+The following proposal intends to cover the above specified requirement and
+provide a possible base to unify all the shaping offload APIs mentioned above.
 
-However, I think there's another issue here which is more relevant to
-the problem you describe in your commit message. If you look at
-port_conf_has_changed(), you will notice that it fails to compare
-conf.inband, and thus fails to notice any change in the setting of
-that configuration item. This will result in sparx5_port_pcs_set()
-not even being called if only conf.inband changes state.
+The following only defines the in-kernel interface between the core and
+drivers. The intention is to expose the feature to user-space via Netlink.
+Hopefully the latter part should be straight-forward after agreement
+on the in-kernel interface.
 
-Thus, changing from in-band to out-of-band or vice versa won't have
-any effect if this is the only change that occurs, and this also
-exists prior to my change.
+All feedback and comment is more then welcome!
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+[1] https://lore.kernel.org/netdev/20230808015734.1060525-1-wenjun1.wu@intel.com/
+
+Regards,
+Simon with much assistance from Paolo
+
+--- 
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
+#ifndef _NET_SHAPER_H_
+#define _NET_SHAPER_H_
+
+/**
+ * enum shaper_metric - the metric of the shaper
+ * @SHAPER_METRIC_PPS: Shaper operates on a packets per second basis
+ * @SHAPER_METRIC_BPS: Shaper operates on a bits per second basis
+ */
+enum shaper_metric {
+	SHAPER_METRIC_PPS;
+	SHAPER_METRIC_BPS;
+};
+
+#define SHAPER_ROOT_ID 0
+#define SHAPER_NONE_ID UINT_MAX
+
+/**
+ * struct shaper_info - represent a node of the shaper hierarchy
+ * @id: Unique identifier inside the shaper tree.
+ * @parent_id: ID of parent shaper, or SHAPER_NONE_ID if the shaper has
+ *             no parent. Only the root shaper has no parent.
+ * @metric: Specify if the bw limits refers to PPS or BPS
+ * @bw_min: Minimum guaranteed rate for this shaper
+ * @bw_max: Maximum peak bw allowed for this shaper
+ * @burst: Maximum burst for the peek rate of this shaper
+ * @priority: Scheduling priority for this shaper
+ * @weight: Scheduling weight for this shaper
+ *
+ * The full shaper hierarchy is maintained only by the
+ * NIC driver (or firmware), possibly in a NIC-specific format
+ * and/or in H/W tables.
+ * The kernel uses this representation and the shaper_ops to
+ * access, traverse, and update it.
+ */
+struct shaper_info {
+	/* The following fields allow the full traversal of the whole
+	 * hierarchy.
+	 */
+	u32 id;
+	u32 parent_id;
+
+	/* The following fields define the behavior of the shaper. */
+	enum shaper_metric metric;
+	u64 bw_min;
+	u64 bw_max;
+	u32 burst;
+	u32 priority;
+	u32 weight;
+};
+
+/**
+ * enum shaper_lookup_mode - Lookup method used to access a shaper
+ * @SHAPER_LOOKUP_BY_PORT: The root shaper for the whole H/W, @id is unused
+ * @SHAPER_LOOKUP_BY_NETDEV: The main shaper for the given network device,
+ *                           @id is unused
+ * @SHAPER_LOOKUP_BY_VF: @id is a virtual function number.
+ * @SHAPER_LOOKUP_BY_QUEUE: @id is a queue identifier.
+ * @SHAPER_LOOKUP_BY_TREE_ID: @id is the unique shaper identifier inside the
+ *                            shaper hierarchy as in shaper_info.id
+ *
+ * SHAPER_LOOKUP_BY_PORT and SHAPER_LOOKUP_BY_VF, SHAPER_LOOKUP_BY_TREE_ID are
+ * only available on PF devices, usually inside the host/hypervisor.
+ * SHAPER_LOOKUP_BY_NETDEV is available on both PFs and VFs devices, but
+ * only if the latter are privileged ones.
+ * The same shaper can be reached with different lookup mode/id pairs,
+ * mapping network visible objects (devices, VFs, queues) to the scheduler
+ * hierarchy and vice-versa.
+ */
+enum shaper_lookup_mode {
+    SHAPER_LOOKUP_BY_PORT,
+    SHAPER_LOOKUP_BY_NETDEV,
+    SHAPER_LOOKUP_BY_VF,
+    SHAPER_LOOKUP_BY_QUEUE,
+    SHAPER_LOOKUP_BY_TREE_ID,
+};
+
+
+/**
+ * struct shaper_ops - Operations on shaper hierarchy
+ * @get: Access the specified shaper.
+ * @set: Modify the specifier shaper.
+ * @move: Move the specifier shaper inside the hierarchy.
+ * @add: Add a shaper inside the shaper hierarchy.
+ * @delete: Delete the specified shaper .
+ *
+ * The netdevice exposes a pointer to these ops.
+ *
+ * It’s up to the driver or firmware to create the default shapers hierarchy,
+ * according to the H/W capabilities.
+ */
+struct shaper_ops {
+	/* get - Fetch the specified shaper, if it exists
+	 * @dev: Netdevice to operate on.
+	 * @lookup_mode: How to perform the shaper lookup
+	 * @id: ID of the specified shaper,
+	 *      relative to the specified @lookup_mode.
+	 * @shaper: Object to return shaper.
+	 * @extack: Netlink extended ACK for reporting errors.
+	 *
+	 * Multiple placement domain/id pairs can refer to the same shaper.
+	 * And multiple entities (e.g. VF and PF) can try to access the same
+	 * shaper concurrently.
+	 *
+	 * Values of @id depend on the @access_type:
+	 * * If @access_type is SHAPER_LOOKUP_BY_PORT or
+	 *   SHAPER_LOOKUP_BY_NETDEV, then @placement_id is unused.
+	 * * If @access_type is SHAPER_LOOKUP_BY_VF,
+	 *   then @id is a virtual function number, relative to @dev
+	 *   which should be phisical function
+	 * * If @access_type is SHAPER_LOOKUP_BY_QUEUE,
+	 *   Then @id represents the queue number, relative to @dev
+	 * * If @access_type is SHAPER_LOOKUP_BY_TREE_ID,
+	 *   then @id is a @shaper_info.id and any shaper inside the
+	 *   hierarcy can be accessed directly.
+	 *
+	 * Return:
+	 * * %0 - Success
+	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
+	 *		    or core for any reason. @extack should be set
+	 *		    to text describing the reason.
+	 * * Other negative error value on failure.
+	 */
+	int (*get)(struct net_device *dev,
+		   enum shaper_lookup_mode lookup_mode, u32 id,
+                   struct shaper_info *shaper, struct netlink_ext_ack *extack);
+
+	/* set - Update the specified shaper, if it exists
+	 * @dev: Netdevice to operate on.
+	 * @lookup_mode: How to perform the shaper lookup
+	 * @id: ID of the specified shaper,
+	 *      relative to the specified @access_type.
+	 * @shaper: Configuration of shaper.
+	 * @extack: Netlink extended ACK for reporting errors.
+	 *
+	 * Configure the parameters of @shaper according to values supplied
+	 * in the following fields:
+	 * * @shaper.metric
+	 * * @shaper.bw_min
+	 * * @shaper.bw_max
+	 * * @shaper.burst
+	 * * @shaper.priority
+	 * * @shaper.weight
+	 * Values supplied in other fields of @shaper must be zero and,
+	 * other than verifying that, are ignored.
+	 *
+	 * Return:
+	 * * %0 - Success
+	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
+	 *		    or core for any reason. @extack should be set
+	 *		    to text describing the reason.
+	 * * Other negative error values on failure.
+	 */
+	int (*set)(struct net_device *dev,
+		   enum shaper_lookup_mode lookup_mode, u32 id,
+		   const struct shaper_info *shaper,
+		   struct netlink_ext_ack *extack);
+
+	/* Move - change the parent id of the specified shaper
+	 * @dev: netdevice to operate on.
+	 * @lookup_mode: how to perform the shaper lookup
+	 * @id: ID of the specified shaper,
+	 *                      relative to the specified @access_mode.
+	 * @new_parent_id: new ID of the parent shapers,
+	 *                      always relative to the SHAPER_LOOKUP_BY_TREE_ID
+	 *                      lookup mode
+	 * @extack: Netlink extended ACK for reporting errors.
+	 *
+	 * Move the specified shaper in the hierarchy replacing its
+	 * current parent shaper with @new_parent_id
+	 *
+	 * Return:
+	 * * %0 - Success
+	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
+	 *		    or core for any reason. @extack should be set
+	 *		    to text describing the reason.
+	 * * Other negative error values on failure.
+	 */
+	int (*move)(struct net_device *dev,
+		    enum shaper_lookup_mode lookup_mode, u32 id,
+		    u32 new_parent_id, struct netlink_ext_ack *extack);
+
+	/* add - Add a shaper inside the shaper hierarchy
+	 * @dev: netdevice to operate on.
+	 * @shaper: configuration of shaper.
+	 * @extack: Netlink extended ACK for reporting errors.
+	 *
+	 * @shaper.id must be set to SHAPER_NONE_ID as
+	 * the id for the shaper will be automatically allocated.
+	 * @shaper.parent_id determines where inside the shaper's tree
+	 * this node is inserted.
+	 *
+	 * Return:
+	 * * non-negative shaper id on success
+	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
+	 *		    or core for any reason. @extack should be set
+	 *		    to text describing the reason.
+	 * * Other negative error values on failure.
+	 *
+	 * Examples or reasons this operation may fail include:
+	 * * H/W resources limits.
+	 * * The parent is a ‘leaf’ node - attached to a queue.
+	 * * Can’t respect the requested bw limits.
+	 */
+	int (*add)(struct net_device *dev, const struct shaper_info *shaper,
+		   struct netlink_ext_ack *extack);
+
+	/* delete - Add a shaper inside the shaper hierarchy
+	 * @dev: netdevice to operate on.
+	 * @lookup_mode: how to perform the shaper lookup
+	 * @id: ID of the specified shaper,
+	 *                      relative to the specified @access_type.
+	 * @shaper: Object to return the deleted shaper configuration.
+	 *              Ignored if NULL.
+	 * @extack: Netlink extended ACK for reporting errors.
+	 *
+	 * Return:
+	 * * %0 - Success
+	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
+	 *		    or core for any reason. @extack should be set
+	 *		    to text describing the reason.
+	 * * Other negative error values on failure.
+	 */
+	int (*delete)(struct net_device *dev,
+		      enum shaper_lookup_mode lookup_mode,
+		      u32 id, struct shaper_info *shaper,
+		      struct netlink_ext_ack *extack);
+};
+
+/*
+ * Examples:
+ * - set shaping on a given queue
+ *   struct shaper_info info = { // fill this };
+ *   dev->shaper_ops->set(dev, SHAPER_LOOKUP_BY_QUEUE, queue_id, &info, NULL);
+ *
+ * - create a queue group with a queue group shaping limits.
+ *   Assuming the following topology already exists:
+ *                    < netdev shaper >
+ *                      /           \
+ *         <queue 0 shaper> . . .  <queue N shaper>
+ *
+ *   struct shaper_info pinfo, ginfo;
+ *   dev->shaper_ops->get(dev, SHAPER_LOOKUP_BY_NETDEV, 0, &pinfo);
+ *
+ *   ginfo.parent_id = pinfo.id;
+ *   // fill-in other shaper params...
+ *   new_node_id = dev->shaper_ops->add(dev, &ginfo);
+ *
+ *   // now topology is:
+ *   //                  <    netdev shaper    >
+ *   //                  /            |        \
+ *   //                 /             |        <newly created shaper>
+ *   //                /              |
+ *   // <queue 0 shaper> . . . <queue N shaper>
+ *
+ *   // move a shapers for queues 3..n out of such queue group
+ *   for (i = 0; i <= 2; ++i)
+ *           dev->shaper_ops->move(dev, SHAPER_LOOKUP_BY_QUEUE, i, new_node_id);
+ *
+ *   // now topology is:
+ *   //                   < netdev shaper >
+ *   //                   /              \
+ *   //        <newly created shaper>   <queue 3 shaper> ... <queue n shaper>
+ *   //         /                   \
+ *   // <queue 0 shaper> ... <queue 2 shaper>
+ */
+#endif
+
 
