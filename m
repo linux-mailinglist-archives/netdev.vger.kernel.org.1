@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-85109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A1A8997B6
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:24:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA9358997B8
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:25:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00DC91F22D3A
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:24:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80DE01F23151
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D8C1474DB;
-	Fri,  5 Apr 2024 08:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49815146A7C;
+	Fri,  5 Apr 2024 08:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="JXgNWH1o"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RmGv+mTD"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1026145FE8;
-	Fri,  5 Apr 2024 08:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD461465AD
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 08:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712305469; cv=none; b=bdm+edRcmyQTom0YUkXbxQJ1RJ643MNpivooMILhvX93VpK4dI4PN3cMfRWOCw/JdR14dJbrqS7n8YLkR5XKjQOx8d2tnYs1yOSVA/FZlDVDPxfFjeZ97HyKb+ubg+9DuDVQBtL2sNPWgZA+MY/xLEf1eEmk2k/eO3sXbo5lAQo=
+	t=1712305489; cv=none; b=G8hdjgETtleurTmiCuNK2YWAkZzLh+4docfbaOgOKK8C3qj0+ka3BM5s7Dv1D4QwllfPRlDGKx7f6rdLJTDxaPRpiPJsmiCqPXuLmCCmjWV599faL3JPDZWFrZLgkiPiie3QqLJ5MgjGO632TnBwHSjhFKuGDmh9+LjMe7Zaz1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712305469; c=relaxed/simple;
-	bh=SMpjN1UOg3mknj3ZLML06svUPGkdKABsiJrnr0G7XYA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CQScmiTFgw8GPrpUmx3aKvdSL8RiL/yvIO2qf6BiEDnxxHu2SdsDRae+8yT0OkozEMxmv/NB0B6pnRXqxgnjJcwbhZG02DY540TVG78bthhRRz1L+VHznQZX7Bhq+bvLaTQGhOdicPgilaO2/2X5JVvUYp4xC3/ss8LeWyhnGIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=JXgNWH1o; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1712305466; x=1743841466;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SMpjN1UOg3mknj3ZLML06svUPGkdKABsiJrnr0G7XYA=;
-  b=JXgNWH1o/fqDimznCbbldbwtfVXh4wQczVwNuPTZDyfyTSoxZYWkd+q0
-   xr1bLoBYtafacvhUAOtZlYIwA7cNkG/W2mFwGePwbCo21/1GEnF6+s065
-   F8+P6s6YtVz4GXnC3zd01/+/5u6PC29Hf6SF4GE4xaGI5Fwqgib0/SiBw
-   qkeGhTqpBRVG9x+Z2JDH0FlUUWRmWWYAM0/hLnEuE/zb7nL+C0f7m1ALH
-   3fLwOVwIzmkUJ2jqMz8TCI+HcvxuF3o/egES6fmyIPXTBZtwND2IHw4/f
-   PcZvtnNQCIIqCp5hRUsKeliEQpWu1jGT3mD1jop/7EPy17zgKiNNeVQGU
-   g==;
-X-CSE-ConnectionGUID: YjdtRCXQQq6Hp7xbmZIMzw==
-X-CSE-MsgGUID: +Ry1PeueS7+6UNJguaXFPA==
-X-IronPort-AV: E=Sophos;i="6.07,180,1708412400"; 
-   d="scan'208";a="20152822"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Apr 2024 01:24:24 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 5 Apr 2024 01:24:11 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 5 Apr 2024 01:24:08 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, Horatiu Vultur <horatiu.vultur@microchip.com>
-Subject: [PATCH net-next v2 2/2] net: phy: micrel: lan8814: Add support for PTP_PF_PEROUT
-Date: Fri, 5 Apr 2024 10:22:57 +0200
-Message-ID: <20240405082257.1552821-3-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240405082257.1552821-1-horatiu.vultur@microchip.com>
-References: <20240405082257.1552821-1-horatiu.vultur@microchip.com>
+	s=arc-20240116; t=1712305489; c=relaxed/simple;
+	bh=2L3CGX7OqkPmTsK6TECnNjWBwH73l9NqbMPNMtYIP0o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=aYPRYnFYCYLugJyVKcMZZrezvDpujQg3kBDRwBnTHuC2PktDqZnhgc58fMdmqpmLbzhxOaOR0CACjTBk6yjXniltGZtR63eZ7OlDO97NJebXaK2ktHvHBkvk3EHxePZtJs/AxBcl3ZUszJhRzMvUrjO7STSQQyvUghclHnJ8so8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RmGv+mTD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712305486;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C5I/NTVTKh0Md5yW/gn8T1xGvsFGQXYIProl8xxAsRQ=;
+	b=RmGv+mTD7UoxUrlYKeVOFTqNI2dMG+dreR4iOlkoJoofkh7VpYnP9Fkh+N9YYG5cAYCpM8
+	pyRQBntjfXchHgqXvJvHcI9zUI+7N3fnlw8Vft0F4A/EimigWscyHMFEYBgcv5yXGRW2OX
+	tcI0GQkqVCtRVfFAMgfcDzC/CJuQpbc=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-Gyk7UQUqN5SvoK_fJKmb7A-1; Fri,
+ 05 Apr 2024 04:24:42 -0400
+X-MC-Unique: Gyk7UQUqN5SvoK_fJKmb7A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DAB481C0432F;
+	Fri,  5 Apr 2024 08:24:41 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.193.88])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8E448111F3C6;
+	Fri,  5 Apr 2024 08:24:39 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	jtornosm@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next v4] net: usb: ax88179_178a: non necessary second random mac address
+Date: Fri,  5 Apr 2024 10:24:31 +0200
+Message-ID: <20240405082431.8329-1-jtornosm@redhat.com>
+In-Reply-To: <20240402183237.2eb8398a@kernel.org>
+References: <20240402183237.2eb8398a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,474 +77,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Lan8814 has 24 GPIOs but only 2 GPIOs (GPIO 0 and GPIO 1) can be
-configured to generate period signals. And there are 2 events (EVENT_A
-and EVENT_B) but these events are hardcoded to the GPIO 0 and GPIO 1.
-These events are used to generate period signals. It is possible to
-configure the length, the start time and the period of the signal by
-configuring the event.
+If the mac address can not be read from the device registers or the
+devicetree, a random address is generated, but this was already done from
+usbnet_probe, so it is not necessary to call eth_hw_addr_random from here
+again to generate another random address.
 
-These events are generated by comparing the target time with the PHC
-time. In case the PHC time is changed to a value bigger than the target
-time + reload time, then it would generate only 1 event and then it
-would stop because target time + reload time is smaller than PHC time.
-Therefore it is required to change also the target time every time when
-the PHC is changed. The same will apply also when the PHC time is
-changed to a smaller value.
+Indeed, when reset was also executed from bind, generate another random mac
+address invalidated the check from usbnet_probe to configure if the assigned
+mac address for the interface was random or not, because it is comparing
+with the initial generated random address. Now, with only a reset from open
+operation, it is just a harmless simplification.
 
-This was tested using:
-testptp -i 1 -L 1,2
-testptp -i 1 -p 1000000000 -w 200000000
-
-Acked-by: Richard Cochran <richardcochran@gmail.com>
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
 ---
- drivers/net/phy/micrel.c | 355 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 353 insertions(+), 2 deletions(-)
+v4:
+  - Context diff due to first patch modification.
+v3:
+  - Send the patch separately to net-next and remove fixes and stable tags.
+v2:
+  - Split the fix and the improvement in two patches and keep curly-brackets
+as Simon Horman suggests.
+v1: https://lore.kernel.org/netdev/20240325173155.671807-1-jtornosm@redhat.com/
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 75dcd8bae78d8..cd7e78843b445 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -272,6 +272,66 @@
- #define PS_TO_REG				200
- #define FIFO_SIZE				8
- 
-+#define LAN8814_PTP_GPIO_NUM			24
-+#define LAN8814_PTP_PEROUT_NUM			2
-+
-+#define LAN8814_BUFFER_TIME			2
-+
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_200MS	13
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100MS	12
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_50MS	11
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_10MS	10
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_5MS	9
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_1MS	8
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_500US	7
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100US	6
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_50US	5
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_10US	4
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_5US	3
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_1US	2
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_500NS	1
-+#define LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100NS	0
-+
-+#define LAN8814_GPIO_EN1			0x20
-+#define LAN8814_GPIO_EN2			0x21
-+#define LAN8814_GPIO_DIR1			0x22
-+#define LAN8814_GPIO_DIR2			0x23
-+#define LAN8814_GPIO_BUF1			0x24
-+#define LAN8814_GPIO_BUF2			0x25
-+
-+#define LAN8814_GPIO_EN_ADDR(pin) \
-+	((pin) > 15 ? LAN8814_GPIO_EN1 : LAN8814_GPIO_EN2)
-+#define LAN8814_GPIO_EN_BIT(pin)		BIT(pin)
-+#define LAN8814_GPIO_DIR_ADDR(pin) \
-+	((pin) > 15 ? LAN8814_GPIO_DIR1 : LAN8814_GPIO_DIR2)
-+#define LAN8814_GPIO_DIR_BIT(pin)		BIT(pin)
-+#define LAN8814_GPIO_BUF_ADDR(pin) \
-+	((pin) > 15 ? LAN8814_GPIO_BUF1 : LAN8814_GPIO_BUF2)
-+#define LAN8814_GPIO_BUF_BIT(pin)		BIT(pin)
-+
-+#define LAN8814_EVENT_A				0
-+#define LAN8814_EVENT_B				1
-+
-+#define LAN8814_PTP_GENERAL_CONFIG		0x0201
-+#define LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_MASK(event) \
-+	((event) ? GENMASK(11, 8) : GENMASK(7, 4))
-+#define LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_SET(event, value) \
-+	(((value) & GENMASK(3, 0)) << (4 + ((event) << 2)))
-+#define LAN8814_PTP_GENERAL_CONFIG_RELOAD_ADD_X(event) \
-+	((event) ? BIT(2) : BIT(0))
-+#define LAN8814_PTP_GENERAL_CONFIG_POLARITY_X(event) \
-+	((event) ? BIT(3) : BIT(1))
-+
-+#define LAN8814_PTP_CLOCK_TARGET_SEC_HI(event)	((event) ? 0x21F : 0x215)
-+#define LAN8814_PTP_CLOCK_TARGET_SEC_LO(event)	((event) ? 0x220 : 0x216)
-+#define LAN8814_PTP_CLOCK_TARGET_NS_HI(event)	((event) ? 0x221 : 0x217)
-+#define LAN8814_PTP_CLOCK_TARGET_NS_LO(event)	((event) ? 0x222 : 0x218)
-+
-+#define LAN8814_PTP_CLOCK_TARGET_RELOAD_SEC_HI(event)	((event) ? 0x223 : 0x219)
-+#define LAN8814_PTP_CLOCK_TARGET_RELOAD_SEC_LO(event)	((event) ? 0x224 : 0x21A)
-+#define LAN8814_PTP_CLOCK_TARGET_RELOAD_NS_HI(event)	((event) ? 0x225 : 0x21B)
-+#define LAN8814_PTP_CLOCK_TARGET_RELOAD_NS_LO(event)	((event) ? 0x226 : 0x21C)
-+
- /* Delay used to get the second part from the LTC */
- #define LAN8841_GET_SEC_LTC_DELAY		(500 * NSEC_PER_MSEC)
- 
-@@ -304,6 +364,7 @@ struct lan8814_shared_priv {
- 	struct phy_device *phydev;
- 	struct ptp_clock *ptp_clock;
- 	struct ptp_clock_info ptp_clock_info;
-+	struct ptp_pin_desc *pin_config;
- 
- 	/* Lock for ptp_clock */
- 	struct mutex shared_lock;
-@@ -2645,6 +2706,29 @@ static int lan8814_ptpci_settime64(struct ptp_clock_info *ptpci,
- 	return 0;
- }
- 
-+static void lan8814_ptp_set_target(struct phy_device *phydev, int event,
-+				   s64 start_sec, u32 start_nsec)
-+{
-+	/* Set the start time */
-+	lanphy_write_page_reg(phydev, 4, LAN8814_PTP_CLOCK_TARGET_SEC_LO(event),
-+			      lower_16_bits(start_sec));
-+	lanphy_write_page_reg(phydev, 4, LAN8814_PTP_CLOCK_TARGET_SEC_HI(event),
-+			      upper_16_bits(start_sec));
-+
-+	lanphy_write_page_reg(phydev, 4, LAN8814_PTP_CLOCK_TARGET_NS_LO(event),
-+			      lower_16_bits(start_nsec));
-+	lanphy_write_page_reg(phydev, 4, LAN8814_PTP_CLOCK_TARGET_NS_HI(event),
-+			      upper_16_bits(start_nsec) & 0x3fff);
-+}
-+
-+static void lan8814_ptp_update_target(struct phy_device *phydev, time64_t sec)
-+{
-+	lan8814_ptp_set_target(phydev, LAN8814_EVENT_A,
-+			       sec + LAN8814_BUFFER_TIME, 0);
-+	lan8814_ptp_set_target(phydev, LAN8814_EVENT_B,
-+			       sec + LAN8814_BUFFER_TIME, 0);
-+}
-+
- static void lan8814_ptp_clock_step(struct phy_device *phydev,
- 				   s64 time_step_ns)
- {
-@@ -2666,6 +2750,7 @@ static void lan8814_ptp_clock_step(struct phy_device *phydev,
- 			nano_seconds -= 1000000000;
- 		}
- 		lan8814_ptp_clock_set(phydev, set_seconds, nano_seconds);
-+		lan8814_ptp_update_target(phydev, set_seconds);
- 		return;
- 	} else if (time_step_ns < -15000000000LL) {
- 		/* convert to clock set */
-@@ -2681,6 +2766,7 @@ static void lan8814_ptp_clock_step(struct phy_device *phydev,
- 		}
- 		nano_seconds -= nano_seconds_step;
- 		lan8814_ptp_clock_set(phydev, set_seconds, nano_seconds);
-+		lan8814_ptp_update_target(phydev, set_seconds);
- 		return;
+ drivers/net/usb/ax88179_178a.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+index a9c418890a1c..69169842fa2f 100644
+--- a/drivers/net/usb/ax88179_178a.c
++++ b/drivers/net/usb/ax88179_178a.c
+@@ -1277,7 +1277,6 @@ static void ax88179_get_mac_addr(struct usbnet *dev)
+ 			dev->net->addr_assign_type = NET_ADDR_PERM;
+ 	} else {
+ 		netdev_info(dev->net, "invalid MAC address, using random\n");
+-		eth_hw_addr_random(dev->net);
  	}
  
-@@ -2717,6 +2803,8 @@ static void lan8814_ptp_clock_step(struct phy_device *phydev,
- 	}
- 
- 	while (seconds) {
-+		u32 nsec;
-+
- 		if (seconds > 0) {
- 			u32 adjustment_value = (u32)seconds;
- 			u16 adjustment_value_lo, adjustment_value_hi;
-@@ -2733,6 +2821,10 @@ static void lan8814_ptp_clock_step(struct phy_device *phydev,
- 					      PTP_LTC_STEP_ADJ_DIR_ |
- 					      adjustment_value_hi);
- 			seconds -= ((s32)adjustment_value);
-+
-+			lan8814_ptp_clock_get(phydev, &set_seconds, &nsec);
-+			set_seconds -= adjustment_value;
-+			lan8814_ptp_update_target(phydev, set_seconds);
- 		} else {
- 			u32 adjustment_value = (u32)(-seconds);
- 			u16 adjustment_value_lo, adjustment_value_hi;
-@@ -2748,6 +2840,10 @@ static void lan8814_ptp_clock_step(struct phy_device *phydev,
- 			lanphy_write_page_reg(phydev, 4, PTP_LTC_STEP_ADJ_HI,
- 					      adjustment_value_hi);
- 			seconds += ((s32)adjustment_value);
-+
-+			lan8814_ptp_clock_get(phydev, &set_seconds, &nsec);
-+			set_seconds += adjustment_value;
-+			lan8814_ptp_update_target(phydev, set_seconds);
- 		}
- 		lanphy_write_page_reg(phydev, 4, PTP_CMD_CTL,
- 				      PTP_CMD_CTL_PTP_LTC_STEP_SEC_);
-@@ -2813,6 +2909,241 @@ static int lan8814_ptpci_adjfine(struct ptp_clock_info *ptpci, long scaled_ppm)
- 	return 0;
- }
- 
-+static void lan8814_ptp_set_reload(struct phy_device *phydev, int event,
-+				   s64 period_sec, u32 period_nsec)
-+{
-+	lanphy_write_page_reg(phydev, 4,
-+			      LAN8814_PTP_CLOCK_TARGET_RELOAD_SEC_LO(event),
-+			      lower_16_bits(period_sec));
-+	lanphy_write_page_reg(phydev, 4,
-+			      LAN8814_PTP_CLOCK_TARGET_RELOAD_SEC_HI(event),
-+			      upper_16_bits(period_sec));
-+
-+	lanphy_write_page_reg(phydev, 4,
-+			      LAN8814_PTP_CLOCK_TARGET_RELOAD_NS_LO(event),
-+			      lower_16_bits(period_nsec));
-+	lanphy_write_page_reg(phydev, 4,
-+			      LAN8814_PTP_CLOCK_TARGET_RELOAD_NS_HI(event),
-+			      upper_16_bits(period_nsec) & 0x3fff);
-+}
-+
-+static void lan8814_ptp_enable_event(struct phy_device *phydev, int event,
-+				     int pulse_width)
-+{
-+	u16 val;
-+
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG);
-+	/* Set the pulse width of the event */
-+	val &= ~(LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_MASK(event));
-+	/* Make sure that the target clock will be incremented each time when
-+	 * local time reaches or pass it
-+	 */
-+	val |= LAN8814_PTP_GENERAL_CONFIG_LTC_EVENT_SET(event, pulse_width);
-+	val &= ~(LAN8814_PTP_GENERAL_CONFIG_RELOAD_ADD_X(event));
-+	/* Set the polarity high */
-+	val |= LAN8814_PTP_GENERAL_CONFIG_POLARITY_X(event);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG, val);
-+}
-+
-+static void lan8814_ptp_disable_event(struct phy_device *phydev, int event)
-+{
-+	u16 val;
-+
-+	/* Set target to too far in the future, effectively disabling it */
-+	lan8814_ptp_set_target(phydev, event, 0xFFFFFFFF, 0);
-+
-+	/* And then reload once it recheas the target */
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG);
-+	val |= LAN8814_PTP_GENERAL_CONFIG_RELOAD_ADD_X(event);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_PTP_GENERAL_CONFIG, val);
-+}
-+
-+static void lan8814_ptp_perout_off(struct phy_device *phydev, int pin)
-+{
-+	u16 val;
-+
-+	/* Disable gpio alternate function,
-+	 * 1: select as gpio,
-+	 * 0: select alt func
-+	 */
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
-+	val |= LAN8814_GPIO_EN_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), val);
-+
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
-+	val &= ~LAN8814_GPIO_DIR_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), val);
-+
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin));
-+	val &= ~LAN8814_GPIO_BUF_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin), val);
-+}
-+
-+static void lan8814_ptp_perout_on(struct phy_device *phydev, int pin)
-+{
-+	int val;
-+
-+	/* Set as gpio output */
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin));
-+	val |= LAN8814_GPIO_DIR_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_DIR_ADDR(pin), val);
-+
-+	/* Enable gpio 0:for alternate function, 1:gpio */
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin));
-+	val &= ~LAN8814_GPIO_EN_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_EN_ADDR(pin), val);
-+
-+	/* Set buffer type to push pull */
-+	val = lanphy_read_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin));
-+	val |= LAN8814_GPIO_BUF_BIT(pin);
-+	lanphy_write_page_reg(phydev, 4, LAN8814_GPIO_BUF_ADDR(pin), val);
-+}
-+
-+static int lan8814_ptp_perout(struct ptp_clock_info *ptpci,
-+			      struct ptp_clock_request *rq, int on)
-+{
-+	struct lan8814_shared_priv *shared = container_of(ptpci, struct lan8814_shared_priv,
-+							  ptp_clock_info);
-+	struct phy_device *phydev = shared->phydev;
-+	struct timespec64 ts_on, ts_period;
-+	s64 on_nsec, period_nsec;
-+	int pulse_width;
-+	int pin, event;
-+
-+	/* Reject requests with unsupported flags */
-+	if (rq->perout.flags & ~PTP_PEROUT_DUTY_CYCLE)
-+		return -EOPNOTSUPP;
-+
-+	mutex_lock(&shared->shared_lock);
-+	event = rq->perout.index;
-+	pin = ptp_find_pin(shared->ptp_clock, PTP_PF_PEROUT, event);
-+	if (pin < 0 || pin >= LAN8814_PTP_PEROUT_NUM) {
-+		mutex_unlock(&shared->shared_lock);
-+		return -EBUSY;
-+	}
-+
-+	if (!on) {
-+		lan8814_ptp_perout_off(phydev, pin);
-+		lan8814_ptp_disable_event(phydev, event);
-+		mutex_unlock(&shared->shared_lock);
-+		return 0;
-+	}
-+
-+	ts_on.tv_sec = rq->perout.on.sec;
-+	ts_on.tv_nsec = rq->perout.on.nsec;
-+	on_nsec = timespec64_to_ns(&ts_on);
-+
-+	ts_period.tv_sec = rq->perout.period.sec;
-+	ts_period.tv_nsec = rq->perout.period.nsec;
-+	period_nsec = timespec64_to_ns(&ts_period);
-+
-+	if (period_nsec < 200) {
-+		pr_warn_ratelimited("%s: perout period too small, minimum is 200 nsec\n",
-+				    phydev_name(phydev));
-+		mutex_unlock(&shared->shared_lock);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (on_nsec >= period_nsec) {
-+		pr_warn_ratelimited("%s: pulse width must be smaller than period\n",
-+				    phydev_name(phydev));
-+		mutex_unlock(&shared->shared_lock);
-+		return -EINVAL;
-+	}
-+
-+	switch (on_nsec) {
-+	case 200000000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_200MS;
-+		break;
-+	case 100000000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100MS;
-+		break;
-+	case 50000000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_50MS;
-+		break;
-+	case 10000000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_10MS;
-+		break;
-+	case 5000000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_5MS;
-+		break;
-+	case 1000000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_1MS;
-+		break;
-+	case 500000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_500US;
-+		break;
-+	case 100000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100US;
-+		break;
-+	case 50000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_50US;
-+		break;
-+	case 10000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_10US;
-+		break;
-+	case 5000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_5US;
-+		break;
-+	case 1000:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_1US;
-+		break;
-+	case 500:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_500NS;
-+		break;
-+	case 100:
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100NS;
-+		break;
-+	default:
-+		pr_warn_ratelimited("%s: Use default duty cycle of 100ns\n",
-+				    phydev_name(phydev));
-+		pulse_width = LAN8841_PTP_GENERAL_CONFIG_LTC_EVENT_100NS;
-+		break;
-+	}
-+
-+	/* Configure to pulse every period */
-+	lan8814_ptp_enable_event(phydev, event, pulse_width);
-+	lan8814_ptp_set_target(phydev, event, rq->perout.start.sec,
-+			       rq->perout.start.nsec);
-+	lan8814_ptp_set_reload(phydev, event, rq->perout.period.sec,
-+			       rq->perout.period.nsec);
-+	lan8814_ptp_perout_on(phydev, pin);
-+	mutex_unlock(&shared->shared_lock);
-+
-+	return 0;
-+}
-+
-+static int lan8814_ptpci_enable(struct ptp_clock_info *ptpci,
-+				struct ptp_clock_request *rq, int on)
-+{
-+	switch (rq->type) {
-+	case PTP_CLK_REQ_PEROUT:
-+		return lan8814_ptp_perout(ptpci, rq, on);
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
-+static int lan8814_ptpci_verify(struct ptp_clock_info *ptp, unsigned int pin,
-+				enum ptp_pin_function func, unsigned int chan)
-+{
-+	switch (func) {
-+	case PTP_PF_NONE:
-+	case PTP_PF_PEROUT:
-+		/* Only pins 0 and 1 can generate perout signals. And for pin 0
-+		 * there is only chan 0 (event A) and for pin 1 there is only
-+		 * chan 1 (event B)
-+		 */
-+		if (pin >= LAN8814_PTP_PEROUT_NUM || pin != chan)
-+			return -1;
-+		break;
-+	default:
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
- static void lan8814_get_sig_tx(struct sk_buff *skb, u16 *sig)
- {
- 	struct ptp_header *ptp_header;
-@@ -3172,19 +3503,39 @@ static int lan8814_ptp_probe_once(struct phy_device *phydev)
- 	/* Initialise shared lock for clock*/
- 	mutex_init(&shared->shared_lock);
- 
-+	shared->pin_config = devm_kmalloc_array(&phydev->mdio.dev,
-+						LAN8814_PTP_GPIO_NUM,
-+						sizeof(*shared->pin_config),
-+						GFP_KERNEL);
-+	if (!shared->pin_config)
-+		return -ENOMEM;
-+
-+	for (int i = 0; i < LAN8814_PTP_GPIO_NUM; i++) {
-+		struct ptp_pin_desc *ptp_pin = &shared->pin_config[i];
-+
-+		memset(ptp_pin, 0, sizeof(*ptp_pin));
-+		snprintf(ptp_pin->name,
-+			 sizeof(ptp_pin->name), "lan8814_ptp_pin_%02d", i);
-+		ptp_pin->index = i;
-+		ptp_pin->func =  PTP_PF_NONE;
-+	}
-+
- 	shared->ptp_clock_info.owner = THIS_MODULE;
- 	snprintf(shared->ptp_clock_info.name, 30, "%s", phydev->drv->name);
- 	shared->ptp_clock_info.max_adj = 31249999;
- 	shared->ptp_clock_info.n_alarm = 0;
- 	shared->ptp_clock_info.n_ext_ts = 0;
--	shared->ptp_clock_info.n_pins = 0;
-+	shared->ptp_clock_info.n_pins = LAN8814_PTP_GPIO_NUM;
- 	shared->ptp_clock_info.pps = 0;
--	shared->ptp_clock_info.pin_config = NULL;
-+	shared->ptp_clock_info.pin_config = shared->pin_config;
-+	shared->ptp_clock_info.n_per_out = LAN8814_PTP_PEROUT_NUM;
- 	shared->ptp_clock_info.adjfine = lan8814_ptpci_adjfine;
- 	shared->ptp_clock_info.adjtime = lan8814_ptpci_adjtime;
- 	shared->ptp_clock_info.gettime64 = lan8814_ptpci_gettime64;
- 	shared->ptp_clock_info.settime64 = lan8814_ptpci_settime64;
- 	shared->ptp_clock_info.getcrosststamp = NULL;
-+	shared->ptp_clock_info.enable = lan8814_ptpci_enable;
-+	shared->ptp_clock_info.verify = lan8814_ptpci_verify;
- 
- 	shared->ptp_clock = ptp_clock_register(&shared->ptp_clock_info,
- 					       &phydev->mdio.dev);
+ 	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_NODE_ID, ETH_ALEN, ETH_ALEN,
 -- 
-2.34.1
+2.44.0
 
 
