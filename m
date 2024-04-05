@@ -1,80 +1,91 @@
-Return-Path: <netdev+bounces-85283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B6789A0BD
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:13:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E148389A0BF
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:14:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96F0C1F24499
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:13:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EE491C22B39
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4B616F8F8;
-	Fri,  5 Apr 2024 15:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0304016F82E;
+	Fri,  5 Apr 2024 15:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eYpRAC47"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dK9l+6jq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD9F16F856
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 15:12:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A41343170;
+	Fri,  5 Apr 2024 15:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712329974; cv=none; b=pV695f29X2x0aC5ZFY0MCI88mq9ecBnT8vuigZtlzjfwVrT/sUimQe3dseRlxCyHxBVhRY6x5Bn4oZ4B4aKsdfA4vq9DB88bYoYW8F1ygaT4TXv4qs+5mebfV2NLEmN5kl98dPdqYv7ec/kWEuQqIvOVk72Mpe267IlEQzeeCjc=
+	t=1712330046; cv=none; b=XA6tsE1EtO4h+7Fm4jKvR8uEobSuX2GjOgX8A6FEDW+OOMBR3RyBLJLHspEY4vt/W8NpXBvyTEFUIEonsepkzpIaUFE0qGPkTBEh6JBPEVEJ5iMkDXplGtLavXGFI4bQEaB4WVVHD/lN2EMkO1v7mekhZx4IVaIWlh/aWbtbyNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712329974; c=relaxed/simple;
-	bh=L+EstHcfYpzRZ/TLP9//CpcXFrDN3YqLhlpvPktxKnQ=;
+	s=arc-20240116; t=1712330046; c=relaxed/simple;
+	bh=iwj0KP+eanKsQzXfz4LZn/8GeEnuSPo+VMKDJLnxQ2c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSWKdee2t+UKJFGaPgzyoDCe62ZAJbVGGUzCf2yG+5PS8Wqmy1TduUbTauOMqZPARUhjSzaLrMQt834bNP3KtOWvY02qOD7rdijF7UJg0BvwFCLq7rSMrZDfGR3EL2IoV1AyOoW6uxfWqSw/LMsiL4m49mKXHzvrQ/we8IIhvHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eYpRAC47; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712329973; x=1743865973;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=L+EstHcfYpzRZ/TLP9//CpcXFrDN3YqLhlpvPktxKnQ=;
-  b=eYpRAC47e1VX55ZnlwE5XCK7K59RxVt7mYoRBsCbV3XtGLUbnFuVZ5i/
-   vrWhvoL5K/bDJHAle0mmZbuXBr9rUStO85i0y43tZvFp3YI0+r2TI01KW
-   fs6FI3RuGp3zyKC8JMI9xlhM7neZF6OnDkGVcGP2y5lvLvzh2EsOQV34P
-   pBkLVqxgNEJ2ydPIde0nnXwOO+5NMjvV4G7uJeeVsrlDk8sxt2OIXN8Jd
-   WYvQoJWj4nRgBxqMg9UkTOS//vtiHxwHHQuUnL48CoZ8nQCdVswzr+hCJ
-   E9dU2ieH00q9n+8+J6SfUAo47fpRrMur8q6n15oJ8EhL5yXZNj5NSV3/D
-   w==;
-X-CSE-ConnectionGUID: flTJZp9BSDSc7bMX2dCGkg==
-X-CSE-MsgGUID: Ou0sTndiQoSi9fX+SlakNA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="7502537"
-X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
-   d="scan'208";a="7502537"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 08:12:52 -0700
-X-CSE-ConnectionGUID: ShImGe+yR0S9fck85jRqSA==
-X-CSE-MsgGUID: bC4a0k0GTU2ce6xjuGLv2Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
-   d="scan'208";a="23928411"
-Received: from lkp-server01.sh.intel.com (HELO e61807b1d151) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 05 Apr 2024 08:12:50 -0700
-Received: from kbuild by e61807b1d151 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rslFH-0002OC-2K;
-	Fri, 05 Apr 2024 15:12:47 +0000
-Date: Fri, 5 Apr 2024 23:11:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Karol Kolacinski <karol.kolacinski@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: Re: [PATCH v6 iwl-next 05/12] ice: Move CGU block
-Message-ID: <202404052226.aq0o8qIE-lkp@intel.com>
-References: <20240405100648.144756-19-karol.kolacinski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pt8ApqLKFPNUGYlLeP1A+DKiOtQ9erG3NuDlCGEtrSj58Z+YMruVnDLMws8+oKyCWn6vAm4gQXELpmtam/nX/hQRNpcYEDho5X6ULhuun9DCGe3FhOpbHzVzWGdRmxd9gPxUsOUVV3fSYdLe437Y4/2B0vYA9yDjqTQCRIuUGEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dK9l+6jq; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e0c00e7fcso2629068a12.2;
+        Fri, 05 Apr 2024 08:14:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712330044; x=1712934844; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cW66Xi9N1jJiiCbW5+5cftF5AQ4e7QDnxMyMEgeBBJg=;
+        b=dK9l+6jqI6WCpO1EXPkADspupHr2IK5YfXtNThm72Hjh6qrJut80XmaBR/y/0Mv4GD
+         bfcBb8KQ/EXzw/uqhoi8r/RiwTmSVncMVRIzUt2l+vmWxPl4A/XfDEyeu+mM80HOteL1
+         ZWx8hnVDdWGPb1/N3IuPaY/g62wSEAIVw2FGUDp1zwqzoVFHtuI47CaNtm9cXKLZ3rv+
+         qo6AgGAvtDlJEFUCTicJi6a1huQJQgfu29juImatsUmpFvD9+lzig7Yt3mf51nab1iYj
+         hd1LWkNrYAl5dDtmLeiz1LeB11qx90ceHrbunadzgMSk89OyPuurr5BjZvM/3qWYEMAh
+         5enA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712330044; x=1712934844;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cW66Xi9N1jJiiCbW5+5cftF5AQ4e7QDnxMyMEgeBBJg=;
+        b=pBNhF5AQDl+6dXhHrZuR5cfCdiNadZPdB224hM+XC9iKNd1qnYg3qPsrdlFFA5Li9M
+         0UiIvwXTnBI8PS06w1vSxOrVb0qbK/D4w27f8UAiI7ttf9Uvfj+tjUKz5kB/nOba7KBI
+         X/uIWbkx+A7aI0ACF6yTAceAA4h6cwrg8jctTY/2ZJ40sUHA3TZK1IcfumTGJBiZ25pN
+         K2ABiIHvT73RPrnw1pZ7QBhQjBfk4FwAi4AbEC5n3rJvuAiQEaDTlzMsI5cOWNkAM5LS
+         uPGW2+S2W+tSz6eRQzMIg0RenKYgsxQvHsaLhXcN8dXL9Yt9Em8nsJCo7gwcYcNggzUS
+         rzkw==
+X-Forwarded-Encrypted: i=1; AJvYcCUYZHNlqgRsF31vlWZZYNCvT/UUzq7ULplxKhtIhE7AhZU65JFbDVhj4lYgy0IIA2ttsgW5PJhQLtVknY0MX5V+3bTdWeOb0JvuJdZh
+X-Gm-Message-State: AOJu0YylXxYGz51YjhgNbTN8b39YGqB0LdpLl/8dgnz8ZXQcZIqfK9wm
+	s1hDkunWhKZaq7eERjkNv7Jqtlzhpu8casXByronDQn+4qRPWD1N
+X-Google-Smtp-Source: AGHT+IGf6gsO6qok4Nna0hC54XT64mpjfs9iUxB4KTpAuEkyHm9kRwvOf3KZdMSyoJMxH72kh56D0A==
+X-Received: by 2002:a50:8acd:0:b0:56b:9029:dd48 with SMTP id k13-20020a508acd000000b0056b9029dd48mr1207020edk.5.1712330043498;
+        Fri, 05 Apr 2024 08:14:03 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d700:2000::b2c])
+        by smtp.gmail.com with ESMTPSA id o9-20020aa7c509000000b0056bf6287f32sm883472edq.26.2024.04.05.08.14.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Apr 2024 08:14:02 -0700 (PDT)
+Date: Fri, 5 Apr 2024 18:13:59 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v8 13/16] net: dsa: vsc73xx: Implement the
+ tag_8021q VLAN operations
+Message-ID: <20240405151359.3kuawi4ylug6ryfc@skbuf>
+References: <20240403103734.3033398-1-paweldembicki@gmail.com>
+ <20240403103734.3033398-1-paweldembicki@gmail.com>
+ <20240403103734.3033398-14-paweldembicki@gmail.com>
+ <20240403103734.3033398-14-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,58 +94,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240405100648.144756-19-karol.kolacinski@intel.com>
+In-Reply-To: <20240403103734.3033398-14-paweldembicki@gmail.com>
+ <20240403103734.3033398-14-paweldembicki@gmail.com>
 
-Hi Karol,
+On Wed, Apr 03, 2024 at 12:37:29PM +0200, Pawel Dembicki wrote:
+> @@ -756,6 +756,12 @@ static int vsc73xx_setup(struct dsa_switch *ds)
+>  
+>  	mdelay(50);
+>  
+> +	rtnl_lock();
+> +	ret = dsa_tag_8021q_register(ds, htons(ETH_P_8021Q));
+> +	rtnl_unlock();
+> +	if (ret)
+> +		return ret;
+> +
 
-kernel test robot noticed the following build warnings:
+No dsa_tag_8021q_unregister() in vsc73xx_teardown()?
 
-[auto build test WARNING on 0a3074e5b4b523fb60f4ae9fb32bb180ea1fb6ef]
+Also, a bit odd placement, while the resets haven't all finished (this
+falls in between the IP multicast flood mask and the PHY resets. It
+makes future refactoring of the other code harder.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Karol-Kolacinski/ice-Introduce-ice_ptp_hw-struct/20240405-180941
-base:   0a3074e5b4b523fb60f4ae9fb32bb180ea1fb6ef
-patch link:    https://lore.kernel.org/r/20240405100648.144756-19-karol.kolacinski%40intel.com
-patch subject: [PATCH v6 iwl-next 05/12] ice: Move CGU block
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20240405/202404052226.aq0o8qIE-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240405/202404052226.aq0o8qIE-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404052226.aq0o8qIE-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/intel/ice/ice_ptp_hw.c: In function 'ice_read_cgu_reg_e82x':
-   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:244:25: warning: initialization of 'unsigned int' from 'u32 *' {aka 'unsigned int *'} makes integer from pointer without a cast [-Wint-conversion]
-     244 |                 .data = val
-         |                         ^~~
-   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:244:25: note: (near initialization for 'cgu_msg.data')
-   drivers/net/ethernet/intel/ice/ice_ptp_hw.c: In function 'ice_ptp_reset_ts_memory_quad_e82x':
->> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:1167:58: warning: conversion from 'long unsigned int' to 'u32' {aka 'unsigned int'} changes value from '18446744073709551614' to '4294967294' [-Woverflow]
-    1167 |         ice_write_quad_reg_e82x(hw, quad, Q_REG_TS_CTRL, ~Q_REG_TS_CTRL_M);
-
-
-vim +1167 drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-
-  1155	
-  1156	/**
-  1157	 * ice_ptp_reset_ts_memory_quad_e82x - Clear all timestamps from the quad block
-  1158	 * @hw: pointer to the HW struct
-  1159	 * @quad: the quad to read from
-  1160	 *
-  1161	 * Clear all timestamps from the PHY quad block that is shared between the
-  1162	 * internal PHYs on the E822 devices.
-  1163	 */
-  1164	void ice_ptp_reset_ts_memory_quad_e82x(struct ice_hw *hw, u8 quad)
-  1165	{
-  1166		ice_write_quad_reg_e82x(hw, quad, Q_REG_TS_CTRL, Q_REG_TS_CTRL_M);
-> 1167		ice_write_quad_reg_e82x(hw, quad, Q_REG_TS_CTRL, ~Q_REG_TS_CTRL_M);
-  1168	}
-  1169	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Additionally (and much worse), even later in vsc73xx_setup(), you clear
+the VLAN table with portmaps of 0. Doesn't this wipe out the
+configuration made by
+dsa_tag_8021q_register()
+-> dsa_tag_8021q_setup()
+   -> dsa_tag_8021q_port_setup()
+      -> dsa_port_tag_8021q_vlan_add()
+         -> dsa_switch_tag_8021q_vlan_add()
+            -> dsa_port_do_tag_8021q_vlan_add()
+               -> vsc73xx_tag_8021q_vlan_add()
+                  -> vsc73xx_tag_8021q_vlan_add()
+?
 
