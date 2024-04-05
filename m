@@ -1,206 +1,211 @@
-Return-Path: <netdev+bounces-85216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8ED1899CD7
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:24:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A52899CDF
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:27:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F9821F22B09
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:24:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02A50B217E6
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A0516D9AA;
-	Fri,  5 Apr 2024 12:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFE916C698;
+	Fri,  5 Apr 2024 12:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sOPDBchf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2111.outbound.protection.outlook.com [40.107.244.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FB716D4DC;
-	Fri,  5 Apr 2024 12:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712319787; cv=none; b=Ved9b2v4WDbDNbZXiFrl1w2FBpcRCMluNN1JKxgfNvL32dVEP7h4TYLwevQw8ojHWtCbxfV+UFlm3QVW8WBUI8rURbs5FV12Nrz6Dk6mlDdN716sT6OHtFg6MbdQ5RjET94m1sl/8VORz0yZ7cb56ExAiRnYFaLo44GZyR5IEUM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712319787; c=relaxed/simple;
-	bh=H4qwwcs9QCBhu2Nhj/At6l3PyJNuCbZmSkaPnBPTv2g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JMQVBuXU6cEiHqxEtM/C9RiNlgTh4amuD/hp5F9xSYIx7tUwz4sxMxpVF55bAsgqzH8mnJVxoSVWHOOOjMQXwI2LNwtlqUFbD7yNAg6EPPoyDecHj2yJRPH3o6gy2azr7aQrUQdYxzPuneRtM/Tbd49RKYc/wG+C30DMP1SjwwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56bdf81706aso2882300a12.2;
-        Fri, 05 Apr 2024 05:23:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712319784; x=1712924584;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0b6ZTZP28B582Ew9wb8M6SnVQx+DzS3AWFgjM5huBrw=;
-        b=EfQmn2Lzgfv12+rK2dFvdU1/dss8K7UZVj5PukvJvVYQyPQJNgSF1/TyjfKpkJebRc
-         sj0CszgbfREZVBLcr4/jO+UdlfD2qh5NRAUnso34DyfJC9GS09HTr22vTcb+Hb9LLgCt
-         Hq2jm+kJuCdr/wREup+7emPjJvENI4Dps6ITNo0SddQqnffrJ+u/4QiNUSu7B0KOR/rd
-         AY59/hM35+2alONuWKd0EYXavzrBwh91pTl2TJyP3alTyhuCx89n9IFNkSq8dKMjn7Fe
-         DkAXt1XLhgKewtnik2XUOVAVrk4gUwT4IgmyRCOrwQJrR0U3MoE2E0rT58pbtVv4JXku
-         OliQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0Y546E+BxVQ9B9CCAA38QkNBGCYXF/6/WWZ0X9hOX/GqwExmUTDisf9kOYuS7aaZKv6KG7nMCeqwgwoqeYrVJCk7qZzAcXh2UyzX4AXkWN23vwpzeS1BQOgX/5KThguVFKJLyUBM=
-X-Gm-Message-State: AOJu0YxpQ+/8FRXHeRA6qfXo1teRPnfEptjei4oQfMdRiU5yZwIjv735
-	D62TGYUX3PqlSQB9VGeuc/x0//jTIIysGxXv9bQJwpGiyd8x90vp
-X-Google-Smtp-Source: AGHT+IEUq9r/2bByh0SZDeLS9YE8AIX/kJ1yrrwbEiNuiEdzLaWWM9/L5wr+eIzvXbdrrpRvHGpXSg==
-X-Received: by 2002:a50:c04c:0:b0:56d:c40d:b921 with SMTP id u12-20020a50c04c000000b0056dc40db921mr974312edd.20.1712319783449;
-        Fri, 05 Apr 2024 05:23:03 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
-        by smtp.gmail.com with ESMTPSA id o9-20020aa7c509000000b0056bf6287f32sm736426edq.26.2024.04.05.05.23.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 05:23:03 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	ath11k@lists.infradead.org,
-	ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	imitsyanko@quantenna.com,
-	geomatsi@gmail.com,
-	kvalo@kernel.org,
-	Jeff Johnson <jjohnson@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 3/3] wifi: ath11k: allocate dummy net_device dynamically
-Date: Fri,  5 Apr 2024 05:21:18 -0700
-Message-ID: <20240405122123.4156104-4-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240405122123.4156104-1-leitao@debian.org>
-References: <20240405122123.4156104-1-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4960013A265;
+	Fri,  5 Apr 2024 12:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.111
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712320013; cv=fail; b=gKKDy3epApRCI2irEkYxp+H0rTU/kDb06A/nXYHl5EqrUONWX+v+oCV2QTG63lDwI8ja4tX+a6WNi4cAqZGV1kQX6knm2/IHGkKcqC+Rkaw/SuQUMjOgToDsCA+m6MN+7NYBamTxdTvjEtRNZPjjJlujBLRZZUU9cuWey6LuplE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712320013; c=relaxed/simple;
+	bh=jFNo1EimX1/H8fQ77ZwGSxyTySkbcMg4tJqnSziyhgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=HMYzSF3q5wusA8MOXa/1Y222Ah8Am71I+Owdq7a2SbEUImVJt+vnNTnGM3Uf5idTZg0tTw9yRoUMjPMA6OayP/5ycB69KRBaDykKDYuu+Zoze04pDiOgBZ25ggqkaIwg/Q4K3YSfrwheNZ5UIXKxyOYx+wyozrDE1gYIKeDT+rU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sOPDBchf; arc=fail smtp.client-ip=40.107.244.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=leRL43DRIoUbz7/HhcigfutT4//ZxQOKgeNxT+VvYQNhCs54OE3b6SmWiXGd5cFLn77tojjFstKQVHImzFcAj6yP4zRCVs4i4og3YwpDFnmeePmlHfk5T7rKBd0gYlACuUaZPRZHafc4CS56tugSzqWdFzjg9jptXYlcveZMjYqplds/yr5tRD3dIedGGVzmGpnA21g2OFpwOWmKQ4J81k1+Z88aj7rTpQ7PVjb3deDDBgYAJJBu6ynqZS45SVjAT8SIAWgzfNLXOUiiSDxWdZF0m+AM8omPcESw357sSTJrsG09lQOSdk0H0u++tYav3TPv57ZPxBUW1hm9jbKSXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tA+NsjcRahzf1BXehG4Lp4fBIwRKd8Af3/diB9e5oqE=;
+ b=k2UTc8M9gBsUnExHzHnBsTdtwCgSLT1HMFR5byBUDxrk2WH1NZzqqAc42juakIpYw6juA+DuTaEKEojTWFyNbqJZKWI0PSThd3Yn5PRCdfzUEM92a0oYgmaJBhId/jqZ0lTkAZJrH7Fmj8BD+RJQtDDl3DA+ZDizrmMWpsZRCDFa1KvUJGpHobA1ISIbeiOlg93wujOskfF2NQFa9z9WQ2KhqZoLkLxAXVjJYDbkT2M4xO1gV2AR0/oMiL3DY5T2Y/sJlZ9ZGwKmC0u7gyfL3z4LNHT+Nxl4Mz5qi4EcDew/M3OKFCl4nP7SYxS+uPgtRM6J8kmChBrCiy4JyEbLvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tA+NsjcRahzf1BXehG4Lp4fBIwRKd8Af3/diB9e5oqE=;
+ b=sOPDBchfJ89E2Wx2Dk2RiQ5vu5NaSUlOjFGdn01KU7JYXhIGMTDEd+O9LBkdVnOQMYSgUcm+Qwizdml4A0cXfpa4M+Kd+3Q+/C3A4dAp/ZH0Jo2gNpHFWCvYzpPa7uY/eTTDCqr4xmAm5+fIC6mu8BmqiaqrBwinZKlcV2B4Qi5Tpz4F/roVcxcMpK9E9xLeqD/GpSOB/Wky1ETBKQH75d1wa/WBH4dhE89chmMkGjD4GuO2pdHaLFkbAlZhlBYgOTtVfXMxsb3D+dzwLzioG1ebm33+yn8gp3VhF/Wbdy1y2bi5mQDtkuzP7I98BhYfDUU5VnF9SBF+ZHpuoVZV9w==
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by LV2PR12MB5822.namprd12.prod.outlook.com (2603:10b6:408:179::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.54; Fri, 5 Apr
+ 2024 12:26:48 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7409.042; Fri, 5 Apr 2024
+ 12:26:48 +0000
+Date: Fri, 5 Apr 2024 09:26:46 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <20240405122646.GA166551@nvidia.com>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <Zg6Q8Re0TlkDkrkr@nanopsycho>
+ <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
+ <Zg7JDL2WOaIf3dxI@nanopsycho>
+ <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
+ <20240404132548.3229f6c8@kernel.org>
+ <660f22c56a0a2_442282088b@john.notmuch>
+ <20240404165000.47ce17e6@kernel.org>
+ <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+ <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
+X-ClientProxiedBy: BLAPR03CA0044.namprd03.prod.outlook.com
+ (2603:10b6:208:32d::19) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|LV2PR12MB5822:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	c03anaC0HXoFwsOFBWVxY/zNjIYxDhNiM0BC/9PYwQasmT3IF9zYlBh/Crh8RTnl1vd8spceXQ7exnkZrbjpgcQkCgixaeV8SAEPCBaMLYcvBEzuNMMkuwctl9d20Jcjiv8Jz2oBuTWooPh3MbZ8LRc1G5TVFdNRNPj7pRAMf+GrOvkX0eL/BRh+p94BdnmWftJ5VL1CZ8hR5SMp/S0LitNGPkwP47phz1lIaxMJUzxsrPGwzrrd156HoGnd2owVNSjOjO3EJfp9wdv5IVVcoL0+RgOFE1qAwHqnDyF0cLQaB3U2Yxw0GoFjlsAWIsO4BSt753wi6LitW80B9nZX71D1GHKcX0SlDfB8ekek5fSR5wJbkwTrD+1Kiy9/EwFRzsPfb7t+DtO1WqJJolBXawTbDoIp32Jn40aJO21vpcmiOP1pP2ExC6pag+WEsvDZhU8XOGnGCM57NzlLzJLhxfP3WKBEAI6N6PTZWLhsjBAiMrYh6HnUiaOLFZ057yzf7DGxX5+dz+ungoIVoSmZzgAMcwC/DbaB0b30UXuZ/2gC+3oz+0xlm2yYIZ1vrnc64J2miEVmCS8xI/+bbrbqnkA+DMCzRt3+znOOkmJmZgevSehg/kHutU1LoAYY3k/XzO22F9YbSIcRpfKC6D+mlRhw3IGcshzCRz+0oF6CajY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YU5zUytVU1VpREw4dnF2UThuREphM3U0THg2VTV2VWR5UUhmSkQ4alR3bHg2?=
+ =?utf-8?B?N25qcm5HRVRKREllVkF0VXFucEFZWTJyclNUVUhYTFZFRmNMQWVtREswMmVk?=
+ =?utf-8?B?eGJKV2lON1IvTzl4ODJLZjJGTFYyOFNTeFJQUlZBMjNKczY4d1VTR0EvVU52?=
+ =?utf-8?B?VDArYi9lS0xlZVBzWlNjKzJNd1BZNzZJUjJINXFJcFY1THFveU5oS1hkOThz?=
+ =?utf-8?B?RzZqZmw0RW5iemJmNGFMbHcvWU9DemVNV0NZSXpxSm9rVDVNVHl2UHV2SDF1?=
+ =?utf-8?B?ZFNmRHJKY2pGR2NFVzFsanhRWis2Zk1jdzZaS1BOMXJCcW8vVkJ4SE9aVDUv?=
+ =?utf-8?B?eExLb2gxZjVtT1RhUHhrRzlyYW9lUitLY1NjMHhvVnV2dmlzeGZrckRiSTBG?=
+ =?utf-8?B?dVk2Y3paSGEyR1k5c2tPd3NCbDV4MHpwaTQ1OEx3VW1wRXZyN3dlcGpjZ1gw?=
+ =?utf-8?B?ZTQwdWx5ajhDRXh0M3ZMbTE2MWp3KzZkaHdwZWJwZWRuWEFBbGRQV0xXaXQw?=
+ =?utf-8?B?R2pHT2taQ1RnR2RsUU13K0hxZjVCbzZRYWpPbC8zK09SMG5jMEpPWFllMmR0?=
+ =?utf-8?B?dUhKOEMrcEltbDl0eWFNNngzOHlhMkVGRnRwWmdGQTdoQk1KcEtlL2tIN244?=
+ =?utf-8?B?N3ExTTBEcE1YL2h5L0ppaFN1ZDEzMnZDaitLbWdkZTJVR0hUemQzUjRlcHZW?=
+ =?utf-8?B?bGRqYWZKUjN2Y1VBS1ZZSEM5aWR1M3ZQOTRKY3RyV3BjWGFoTXhYclRzck5i?=
+ =?utf-8?B?bXNnZWtSd01QdzB6UzNSRmxYMUcrU0xXbDNFSFRpdlVSd3FCTmdKaTlBbzgy?=
+ =?utf-8?B?cFRZWGZhSDB4TDJDYXU5S3RwRVY1ZlNjZ0FLTGRmcWRIWVRyd2EwSTdvcU5v?=
+ =?utf-8?B?RmpwTkNxMmZkUFlVYWtHdFh3NGsyTFFCUmtCS0dzRmF3M29FOW9VNTFXWGxm?=
+ =?utf-8?B?bHlrdHJFd29PZVRWQzZTWWYwVVVNc01zWVMyWEMvWkdycHBzVTNxNXpkOGxJ?=
+ =?utf-8?B?c1F1VHEyUlVvU00rZ2c1TGNPTUtrc2FIdFBtZVVXOHB3UXVmRmwrSFBFbGZm?=
+ =?utf-8?B?V3NJVG82dWFjSm9DU2kxdUd3VHdzNHZHbnhrSERMMS8xUFRpU0xlWEp5ejdK?=
+ =?utf-8?B?L0ZQcDY1Wk9EdW53ZGpCaGE0Z0ExS21tSy9YY3lrTzBMMmZQcmNQeUdaVnBa?=
+ =?utf-8?B?dTZlOWM3Ynpld1VMM0hYMFhIS0JNZ1o0R002ZXZ0eGdVdFBzdXA5ZEJ5b0FR?=
+ =?utf-8?B?M211OUdLMHc1UEMwVzBxZk4xbkpvMjJnT1FTZ3hzQlA0MmpTcEhqZkx0VHN0?=
+ =?utf-8?B?SFErWmRRbnJOM2J4NFVnWEFHWjV0dGRKTnFMOFVvQlZYaFRuZ0JWTWJxRXhh?=
+ =?utf-8?B?cnN1UkU2SE5QTmo2SzdmT0NLTzRWRzVhTC8zTVNuS1VkemxoUEtlT09yRjdD?=
+ =?utf-8?B?cENtMEkvaG10OHlSZGtRWnFYTTMyOFZqNm9MRFhMbjhyR0JqUmcwemNoY0Vv?=
+ =?utf-8?B?VlhRSkZSWitmK1Jnc0p1S2ZNZnFtQkRPS3lEdWFWM0V2M0VYUGVpczA4Zllp?=
+ =?utf-8?B?VVhDV0wrRFhxNmFhYndVQkhNV3NRNWQxdk5vWE9mRERVOGlFU0xrclJnL2x6?=
+ =?utf-8?B?bTNlbGFkSjB0elhiVFA4STJQVTdmejlIYzF4R0U2Z2NnR1lteXgwanIyVVlR?=
+ =?utf-8?B?S3l1MVpCMmk5NTR0bHVFSDFaS1d4TTFSREE5cHZDMFA1cUNnaXdkbzcveDk1?=
+ =?utf-8?B?T1gxY1JTUmpTKzZENHVvNzZQMTVWLzZpNUtMTFlWbW1PRmJIVlVtYTdIdWtq?=
+ =?utf-8?B?a1V4ak9RM3pGVVRRK1Vyd2RKck5peFNRVlUrTXpIWVBRUWNzaldsM0NDcEht?=
+ =?utf-8?B?aG82aEZ2VVNPUWxZVENidVVqbkNPUzdKSnZqc0I3OXZobkV4MXhxZjhHZ0hR?=
+ =?utf-8?B?Q3VEUG1CT2VkM3h3UlNrdUk0MUpOUzRIUmkrUTRLWHUrWHRMY0c4ZzByamM4?=
+ =?utf-8?B?K1AzOEQ2S1hhN1JZNk1GYW5URVJQL1hyUXFqOWtSNDI5bk5kd3BkSldWTWtm?=
+ =?utf-8?B?ayt6TTlaVXI1SVVQZExVTFVEYXBMWkh4SFM0Y0lIZFQvVU5RK3BTYlRkNHJm?=
+ =?utf-8?Q?fetLzWZn+XrHyx8Jo7aWUCRYE?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24c5385f-1dab-4251-c291-08dc556ba99e
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2024 12:26:47.9672
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DCa5Xujd+Mo8j/n+vqeSN/Be1omalOcJRZ9baLVaJj2mffh3NADyglhHajn1DwIT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5822
 
-Embedding net_device into structures prohibits the usage of flexible
-arrays in the net_device structure. For more details, see the discussion
-at [1].
+On Fri, Apr 05, 2024 at 09:11:19AM +0200, Paolo Abeni wrote:
+> On Thu, 2024-04-04 at 17:11 -0700, Alexander Duyck wrote:
+> > Again, I would say we look at the blast radius. That is how we should
+> > be measuring any change. At this point the driver is self contained
+> > into /drivers/net/ethernet/meta/fbnic/. It isn't exporting anything
+> > outside that directory, and it can be switched off via Kconfig.
+> 
+> I personally think this is the most relevant point. This is just a new
+> NIC driver, completely self-encapsulated. I quickly glanced over the
+> code and it looks like it's not doing anything obviously bad. It really
+> looks like an usual, legit, NIC driver.
 
-Un-embed the net_device from struct ath11k_ext_irq_grp by converting it
-into a pointer. Then use the leverage alloc_netdev() to allocate the
-net_device object at ath11k_ahb_config_ext_irq() for ahb, and
-ath11k_pcic_ext_irq_config() for pcic.
+This is completely true, and as I've said many times the kernel as a
+project is substantially about supporting the HW that people actually
+build. There is no reason not to merge yet another basic netdev
+driver.
 
-The free of the device occurs at ath11k_ahb_free_ext_irq() for the ahb
-case, and ath11k_pcic_free_ext_irq() for the pcic case.
+However, there is also a pretty strong red line in Linux where people
+belive, with strong conviction, that kernel code should not be merged
+only to support a propriety userspace. This submission is clearly
+bluring that line. This driver will only run in Meta's proprietary
+kernel fork on servers running Meta's propriety userspace.
 
-[1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
+At this point perhaps it is OK, a basic NIC driver is not really an
+issue, but Jiri is also very correct to point out that this is heading
+in a very concerning direction.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/wireless/ath/ath11k/ahb.c  |  9 +++++++--
- drivers/net/wireless/ath/ath11k/core.h |  2 +-
- drivers/net/wireless/ath/ath11k/pcic.c | 21 +++++++++++++++++----
- 3 files changed, 25 insertions(+), 7 deletions(-)
+Alex already indicated new features are coming, changes to the core
+code will be proposed. How should those be evaluated? Hypothetically
+should fbnic be allowed to be the first implementation of something
+invasive like Mina's DMABUF work? Google published an open userspace
+for NCCL that people can (in theory at least) actually run. Meta would
+not be able to do that. I would say that clearly crosses the line and
+should not be accepted.
 
-diff --git a/drivers/net/wireless/ath/ath11k/ahb.c b/drivers/net/wireless/ath/ath11k/ahb.c
-index 7c0a23517949..7f3f6479d553 100644
---- a/drivers/net/wireless/ath/ath11k/ahb.c
-+++ b/drivers/net/wireless/ath/ath11k/ahb.c
-@@ -442,6 +442,7 @@ static void ath11k_ahb_free_ext_irq(struct ath11k_base *ab)
- 			free_irq(ab->irq_num[irq_grp->irqs[j]], irq_grp);
- 
- 		netif_napi_del(&irq_grp->napi);
-+		free_netdev(irq_grp->napi_ndev);
- 	}
- }
- 
-@@ -533,8 +534,12 @@ static int ath11k_ahb_config_ext_irq(struct ath11k_base *ab)
- 
- 		irq_grp->ab = ab;
- 		irq_grp->grp_id = i;
--		init_dummy_netdev(&irq_grp->napi_ndev);
--		netif_napi_add(&irq_grp->napi_ndev, &irq_grp->napi,
-+
-+		irq_grp->napi_ndev = alloc_netdev_dummy(0);
-+		if (!irq_grp->napi_ndev)
-+			return -ENOMEM;
-+
-+		netif_napi_add(irq_grp->napi_ndev, &irq_grp->napi,
- 			       ath11k_ahb_ext_grp_napi_poll);
- 
- 		for (j = 0; j < ATH11K_EXT_IRQ_NUM_MAX; j++) {
-diff --git a/drivers/net/wireless/ath/ath11k/core.h b/drivers/net/wireless/ath/ath11k/core.h
-index b3fb74a226fb..590307ca7a11 100644
---- a/drivers/net/wireless/ath/ath11k/core.h
-+++ b/drivers/net/wireless/ath/ath11k/core.h
-@@ -174,7 +174,7 @@ struct ath11k_ext_irq_grp {
- 	u64 timestamp;
- 	bool napi_enabled;
- 	struct napi_struct napi;
--	struct net_device napi_ndev;
-+	struct net_device *napi_ndev;
- };
- 
- enum ath11k_smbios_cc_type {
-diff --git a/drivers/net/wireless/ath/ath11k/pcic.c b/drivers/net/wireless/ath/ath11k/pcic.c
-index add4db4c50bc..79eb3f9c902f 100644
---- a/drivers/net/wireless/ath/ath11k/pcic.c
-+++ b/drivers/net/wireless/ath/ath11k/pcic.c
-@@ -316,6 +316,7 @@ static void ath11k_pcic_free_ext_irq(struct ath11k_base *ab)
- 			free_irq(ab->irq_num[irq_grp->irqs[j]], irq_grp);
- 
- 		netif_napi_del(&irq_grp->napi);
-+		free_netdev(irq_grp->napi_ndev);
- 	}
- }
- 
-@@ -558,7 +559,7 @@ ath11k_pcic_get_msi_irq(struct ath11k_base *ab, unsigned int vector)
- 
- static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- {
--	int i, j, ret, num_vectors = 0;
-+	int i, j, n, ret, num_vectors = 0;
- 	u32 user_base_data = 0, base_vector = 0;
- 	unsigned long irq_flags;
- 
-@@ -578,8 +579,11 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 
- 		irq_grp->ab = ab;
- 		irq_grp->grp_id = i;
--		init_dummy_netdev(&irq_grp->napi_ndev);
--		netif_napi_add(&irq_grp->napi_ndev, &irq_grp->napi,
-+		irq_grp->napi_ndev = alloc_netdev_dummy(0);
-+		if (!irq_grp->napi_ndev)
-+			return -ENOMEM;
-+
-+		netif_napi_add(irq_grp->napi_ndev, &irq_grp->napi,
- 			       ath11k_pcic_ext_grp_napi_poll);
- 
- 		if (ab->hw_params.ring_mask->tx[i] ||
-@@ -601,8 +605,13 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 			int vector = (i % num_vectors) + base_vector;
- 			int irq = ath11k_pcic_get_msi_irq(ab, vector);
- 
--			if (irq < 0)
-+			if (irq < 0) {
-+				for (n = 0; n <= i; n++) {
-+					irq_grp = &ab->ext_irq_grp[n];
-+					free_netdev(irq_grp->napi_ndev);
-+				}
- 				return irq;
-+			}
- 
- 			ab->irq_num[irq_idx] = irq;
- 
-@@ -615,6 +624,10 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 			if (ret) {
- 				ath11k_err(ab, "failed request irq %d: %d\n",
- 					   vector, ret);
-+				for (n = 0; n <= i; n++) {
-+					irq_grp = &ab->ext_irq_grp[n];
-+					free_netdev(irq_grp->napi_ndev);
-+				}
- 				return ret;
- 			}
- 		}
--- 
-2.43.0
+So I think there should be an expectation that technicaly sound things
+Meta may propose must not be accepted because they cross the
+ideological red line into enabling only proprietary software.
 
+To me it sets up a fairly common anti-pattern where a vendor starts
+out with good intentions, reaches community pushback and falls back to
+their downstream fork. Once forking occurs it becomes self-reinforcing
+as built up infrastructure like tests and CI will only run correctly
+on the fork and the fork grows. Then eventually the upstream code is
+abandoned. This has happened many times before in Linux..
+
+IMHO from a community perspective I feel like we should expect Meta to
+fail and end up with a fork. The community should warn them. However
+if they really want to try anyhow then I'm not sure it would be
+appropriate to stop them at this point. Meta will just end up being a
+"bad vendor".
+
+I think the best thing the netdev community could do is come up with
+some more clear guidelines what Meta could use fbnic to justify and
+what would be rejected (ideologically) and Meta can decide on their
+own if they want to continue.
+
+Jason
 
