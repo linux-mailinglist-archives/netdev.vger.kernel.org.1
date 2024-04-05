@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-85333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A87FF89A478
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:58:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEACD89A47F
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:02:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F0891F24856
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 18:58:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D26031F24A6D
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 19:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88A317279F;
-	Fri,  5 Apr 2024 18:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568D8171E77;
+	Fri,  5 Apr 2024 19:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcIAPPBe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fzr3RwYC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f195.google.com (mail-yb1-f195.google.com [209.85.219.195])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034C716D328;
-	Fri,  5 Apr 2024 18:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE626BFAB;
+	Fri,  5 Apr 2024 19:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712343495; cv=none; b=op8nolpxGWR3E36+GijUVY1Z0SPMydC8ryfCGuvc6CX1tAC7PU0yHASE0AxhRcXZ7KRL5fuiLw8AbJdD6EuTR2WlwOgLNW21XERPHGntYWMaGd1m6wb5cAtFN8Lcxkm38mw3/twNbtsor3C5FoAZhEriAWqrQ+NLiPdc3devd1I=
+	t=1712343724; cv=none; b=hENaDgsGcl2pQF2Ahe/9pH3+xb4OkCMOD9MgoVxElG/zLKYuObOs8FRPLr19sbMav5n+19qsXHir4jqqK4LtBHzl0IUKl/hRq3lN81BHB+N9xsJS7gMpwPzrgKsTdMicFoZznIF+9bjS+N8w18lhUTZDGZZPOc4bHlJwc1vh2uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712343495; c=relaxed/simple;
-	bh=TqNsEWEXLQNb5wTUaOuCY4vPYv0zMydgUQmOxvROaZc=;
+	s=arc-20240116; t=1712343724; c=relaxed/simple;
+	bh=nw7V9sglSsCdlmjFtFn+xziFCoG1Ras9nyHd5YLKus4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NowF5xAsZOotyJTlcwhNP5q9ht16nM9m3RkKxE0RoMRD6Hf5/JLXz6seb6saEcHpXZ/AgKv3niE25xj8yM67tyPiGSGzG1+d2rh1m5quJBuWCoO1a6NBML/ODPGWjILLFnWw6tK3kzbUK/zKR4zaXqX2yCxg7/+fThd+0yW9Odo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcIAPPBe; arc=none smtp.client-ip=209.85.219.195
+	 In-Reply-To:Content-Type; b=GzKTZjiBv52oWB2TXYQIRV6WY7IO9IOwAU/VrAxTL3b7epnRlHLkTMCThv5pUPHUyePbIUpi4raKC1+uYiMySXEA9vpjm+E0afp2NalIi536tSM+8PUcGrnke0RemtBI7o+3/KBZcwUEWeqONNlngFxW8bMAi+Y+uJOsHnWirM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fzr3RwYC; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f195.google.com with SMTP id 3f1490d57ef6-dc6d9a8815fso2732104276.3;
-        Fri, 05 Apr 2024 11:58:13 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a51b4032ac7so15574166b.0;
+        Fri, 05 Apr 2024 12:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712343493; x=1712948293; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=A7kbTABmSB3WHGlFkXmQdklyP9Fynhg8P2k5hFgf9iM=;
-        b=bcIAPPBeoTOQXCrcyYc2Oywb9yUylAT2KCEIyx16bxuihES/geZ8omcZwdZjoFETeD
-         XIJhJsdEMH69sx+e5oSepio6Duv/jjNGQqFA2lZEO6xbL0q/pmVUjDWdIf86ZV3peCfk
-         KGTznP68WiV6eCSasiru4SlU3oOocCgguoNkTz+miCOtzxEEKm1icN0W4y5O2jb2WszP
-         /6W71JdoNysuh5uXsAlJwRdUxInOMKqzEGe9q2fuWersDcBJQpXDBqoXz4h1mmEwKfGN
-         n8m5EOUPnigKOx3br6ZOsDDHTA4hYdn29XIA0PXE4f/2Bqp27apJxHcr3ffEnkyzsP+0
-         Fjow==
+        d=gmail.com; s=20230601; t=1712343721; x=1712948521; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YCydaye7fGEguRI4B7g0/kq2YLpbPdSprOIVnhlJHDQ=;
+        b=fzr3RwYCaeTjsz+VAontHo3PxDVqCQ/oeUNbtBXplhFpspSbld8DDRm2sGzKyxItPI
+         jFoVfAKn2gvwDaxlnQltaB3kRNV7kf1qlhSzf5UX5VQFtheAuDexKDD27xuPQ2Q6nB3b
+         L2CWU7ZL7DNexarkCXXSkNGqK5UtA+usVDLrNQovU6EfA/gMlreAuj8P5Aa+wE8XG8ue
+         Bvla2Xeh0B42WSZmglKu3XFFrLJAVQY9aBJEULFTSbL/jsKaWyGoAviV/QPlRMytVK4z
+         5/8/HIGiYWW2QLbzmCJkKTWZfejxD/PAWANDR6WlBXGVL+zT4x7i6YUUjnGic5hFl/j3
+         zWHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712343493; x=1712948293;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A7kbTABmSB3WHGlFkXmQdklyP9Fynhg8P2k5hFgf9iM=;
-        b=ladUc//E75JnT065iMCe7wVlKvzi2yBy4+8RMLFh8xM+J+T3Efh5SAFiCYx638riqG
-         ugf64o0Xrw+PT+GszfNYiJ7hlcBQlznqLiuPV8hrDdtd+uH0ykHRbhjZNA6av9BzSTyd
-         Sum3rYZhU2YP26pcf2vjUlCpNiXwm8pOV8TrzIz+wkr7qhW6bSF03scHeMJRTn9TAUwk
-         lqQmSqa+0W7SbB5JsUMN8wpBXyZ4cw9iA3z34c4vbWwwY9PisNHgUk9JNm11FVKNYlZN
-         nStglaY6nOHTyVOFx9/qZDNN5mKXFxOXeCqrlKjFdeOI9TfDAWG8eOhM8GPZVwdlptzj
-         ij3w==
-X-Forwarded-Encrypted: i=1; AJvYcCVncNYlcS/h8iJOlefGP7efvIfGhntnOMiKrmAoBTQDqICbU1JdRQtTcLjs6YlPh5MitxGjYjpR1vgouk7X78FNhJfkkvX03AbNKZEw1+kvqUABZl26piST+6NT3uMEL5HecCIh
-X-Gm-Message-State: AOJu0YzZJcBzG8UjlBvIJqU7Yz78+KeZ9Kts8+CMvasU7p3I9zmgjqfP
-	nXZjv4JUfwM3oOJATMq0dLSw9cubzrAKsOdw41c4jG8svdScBnvF
-X-Google-Smtp-Source: AGHT+IGAUd3Bg+ii71QK/C2dpvD0uH7oCwfe2q/A6gBLAJWnZ32PJMDhQPIIPbh3ZkqKASOQNvR80A==
-X-Received: by 2002:a25:a3c6:0:b0:dcc:aa1f:b418 with SMTP id e64-20020a25a3c6000000b00dccaa1fb418mr2088089ybi.1.1712343492813;
-        Fri, 05 Apr 2024 11:58:12 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id i128-20020a256d86000000b00dcdbe11c243sm433140ybc.1.2024.04.05.11.58.11
+        d=1e100.net; s=20230601; t=1712343721; x=1712948521;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YCydaye7fGEguRI4B7g0/kq2YLpbPdSprOIVnhlJHDQ=;
+        b=A1Zdeu3vo2lSp0Iyttlo2ijLDOn8pES62VKM3A+M2MiYVO5DIWMimbWnfRSo7Hufmp
+         2lgbFoY5ZG6WteSxzMJOUi5fQ9UFb5lLalyBHT/oBJG2oD515P3a7ChLqz+icZvSMgmT
+         YzQcwEiVX7rVLAgNDF+Znk6PwSHi6f+Q8ycThBenonIVAoezkL2ZLiSr4Hh1Jm8jCr05
+         keifck7mG0D1rCU2/exXSVCMj3MrNFiICqymAC3JbKvbgVBqEBwaNciXtFEI7hn1D1ir
+         QLpJcsSCf7re4+YrJ+682Z0H8gDVS9YHciF1pVCmA03+I8LbbJayaX3cowrpyDccqyZL
+         U7OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqL5E8/nhGPddhLyYi27gsiLEB/NH2N72J+1mWtyqPyrsNAuOg/xICoeF9YOmiYWvbX+0B86GwHJzScqSM7sDSS1qURFn4jEbRpKbDetbVElS6NZfLBxFUzLJoa2L7ac6m
+X-Gm-Message-State: AOJu0YyUKtLtdVfLcoiPHbH0g6mQAnDsMAtADinT+XcwRMhgfMammfJa
+	fXY3TxNF30LHnY5uG8efbkgscrmOavcrbrHCBuYBOY2j7ZDPNtFE
+X-Google-Smtp-Source: AGHT+IFeoL4xhfRkglFIcYSiTqZVuyMvRkS/SuSfT8UziayVKARcEsXrAfmsxmzumHkJOo1nyFdlCQ==
+X-Received: by 2002:a17:906:eca5:b0:a46:4bd4:df86 with SMTP id qh5-20020a170906eca500b00a464bd4df86mr2771600ejb.3.1712343720424;
+        Fri, 05 Apr 2024 12:02:00 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:72bb:b200:e0e0:cd27:7a04:5c79? (dynamic-2a01-0c22-72bb-b200-e0e0-cd27-7a04-5c79.c22.pool.telefonica.de. [2a01:c22:72bb:b200:e0e0:cd27:7a04:5c79])
+        by smtp.googlemail.com with ESMTPSA id re9-20020a170906d8c900b00a4e6750a358sm1121493ejb.187.2024.04.05.12.01.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 11:58:12 -0700 (PDT)
-Message-ID: <c4f5c444-832c-4376-845f-7c28e88e4436@gmail.com>
-Date: Fri, 5 Apr 2024 14:58:11 -0400
+        Fri, 05 Apr 2024 12:02:00 -0700 (PDT)
+Message-ID: <b2845d6b-ee0b-4f21-9cac-bdc41393a739@gmail.com>
+Date: Fri, 5 Apr 2024 21:01:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,108 +77,128 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 07/10] net: dsa: mv88e6xxx: Track bridge mdb
- objects
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+Subject: Re: Deadlock in pciehp on dock disconnect
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Roman Lozko <lozko.roma@gmail.com>, linux-pci@vger.kernel.org,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,
- =?UTF-8?Q?Linus_L=C3=BCssing?= <linus.luessing@c0d3.blue>,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
- <20240402001137.2980589-8-Joseph.Huang@garmin.com>
- <20240402122343.a7o5narxsctrkaoo@skbuf>
- <b5f79571-b4a8-4f21-8dc8-e1aa11056a5d@gmail.com>
- <20240405110745.si4gc567jt5gwpbr@skbuf>
+ netdev@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
+ Kurt Kanzenbach <kurt@linutronix.de>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org
+References: <CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com>
+ <Zg_MOG1OufptoRph@wunner.de> <cd9edf12-5241-4366-b376-d5ee8f919903@gmail.com>
+ <ZhA5WAYyMQJsAey8@wunner.de>
 Content-Language: en-US
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-In-Reply-To: <20240405110745.si4gc567jt5gwpbr@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <ZhA5WAYyMQJsAey8@wunner.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Vladimir,
-
-On 4/5/2024 7:07 AM, Vladimir Oltean wrote:
-> On Thu, Apr 04, 2024 at 04:43:38PM -0400, Joseph Huang wrote:
->> Hi Vladimir,
->>
->> On 4/2/2024 8:23 AM, Vladimir Oltean wrote:
->>> Can you comment on the feasibility/infeasibility of Tobias' proposal of:
->>> "The bridge could just provide some MDB iterator to save us from having
->>> to cache all the configured groups."?
->>> https://lore.kernel.org/netdev/87sg31n04a.fsf@waldekranz.com/
+On 05.04.2024 19:48, Lukas Wunner wrote:
+> On Fri, Apr 05, 2024 at 03:31:34PM +0200, Heiner Kallweit wrote:
+>> On 05.04.2024 12:02, Lukas Wunner wrote:
+>>> On Fri, Apr 05, 2024 at 11:14:01AM +0200, Roman Lozko wrote:
+>>>> Hi, I'm using HP G4 Thunderbolt docking station, and recently (?)
+>>>> kernel started to "partially" deadlock after disconnecting the dock
+>>>> station. This results in inability to turn network interfaces on or
+>>>> off, system can't reboot, `sudo` does not work (guess because it uses
+>>>> DNS).
 >>>
->>> What is done here will have to be scaled to many drivers - potentially
->>> all existing DSA ones, as far as I'm aware.
+>>> unregister_netdev() acquires rtnl_lock(), indirectly invokes
+>>> netdev_trig_deactivate() upon unregistering some LED, thereby
+>>> calling unregister_netdevice_notifier(), which tries to
+>>> acquire rtnl_lock() again.
 >>>
+>>> From a quick look at the source files involved, this doesn't look
+>>> like something new, though I note LED support for igc was added
+>>> only recently with ea578703b03d ("igc: Add support for LEDs on
+>>> i225/i226"), which went into v6.9-rc1.
 >>
->> I thought about implementing an MDB iterator as suggested by Tobias, but I'm
->> a bit concerned about the coherence of these MDB objects. In theory, when
->> the device driver is trying to act on an event, the source of the trigger
->> may have changed its state in the bridge already.
+>> It's unfortunate that the device-managed LED is bound to the netdev device.
+>> Wouldn't binding it to the parent (&pdev->dev) solve the issue?
 > 
-> Yes, this is the result of SWITCHDEV_F_DEFER, used by both
-> SWITCHDEV_ATTR_ID_PORT_MROUTER and SWITCHDEV_OBJ_ID_PORT_MDB.
+> I'm guessing igc commit ea578703b03d copy-pasted from r8169 commit
+> be51ed104ba9 ("r8169: add LED support for RTL8125/RTL8126") because
+> that driver has exactly the same problem. :)
 > 
->> If, upon receiving an event in the device driver, we iterate over what
->> the bridge has at that instant, the differences between the worlds as
->> seen by the bridge and the device driver might lead to some unexpected
->> results.
-> 
-> Translated: iterating over bridge MDB objects needs to be serialized
-> with new switchdev events by acquiring rtnl_lock(). Then, once switchdev
-> events are temporarily blocked, the pending ones need to be flushed
-> using switchdev_deferred_process(), so resync the bridge state with the
-> driver state. Once the resync is done, the iteration is safe until
-> rtnl_unlock().
-> 
-> Applied to our case, the MDB iterator is needed in mv88e6xxx_port_mrouter().
-> This is already called with rtnl_lock() acquired. The resync procedure
-> will indirectly call mv88e6xxx_port_mdb_add()/mv88e6xxx_port_mdb_del()
-> through switchdev_deferred_process(), and then the walk is consistent
-> for the remainder of the mv88e6xxx_port_mrouter() function.
-> 
-> A helper which does this is what would be required - an iterator
-> function which calls an int (*cb)(struct net_device *brport, const struct switchdev_obj_port_mdb *mdb)
-> for each MDB entry. The DSA core could then offer some post-processing
-> services over this API, to recover the struct dsa_port associated with
-> the bridge port (in the LAG case they aren't the same) and the address
-> database associated with the bridge.
-> 
-> Do you think there would be unexpected results even if we did this?
-> br_switchdev_mdb_replay() needs to handle a similarly complicated
-> situation of synchronizing with deferred MDB events.
->  >> However, if we cache the MDB objects in the device driver, at least
->> the order in which the events took place will be coherent and at any
->> give time the state of the MDB objects in the device driver can be
->> guaranteed to be sane. This is also the approach the prestera device
->> driver took.
-> 
-> Not contesting this, but I wouldn't like to see MDBs cached in each
-> device driver just for this. Switchdev is not very high on the list of
-> APIs which are easy to use, and making MDB caching a requirement
-> (for the common case that MDB entry destinations need software fixups
-> with the mrouter ports) isn't exactly going to make that any better.
-> Others' opinion may differ, but mine is that core offload APIs need to
-> consider what hardware is available in the real world, make the common
-> case easy, and the advanced cases possible. Rather than make every case
-> "advanced" :)
+Right, just tested it for r8169 and got a similar lockdep error.
 
-Just throwing some random ideas out there. Do you think it would make 
-more sense if this whole solution (rtnl_lock, iterator cb,...etc.) is 
-moved up to DSA so that other DSA drivers could benefit from it? I 
-thought about implement it (not the iterator, the current form) in DSA 
-at first, but I'm not sure how other drivers would behave, so I did it 
-with mv instead.
+> Roman, does the below patch fix the issue?
+> 
+> Note that just changing the devm_led_classdev_register() call isn't
+> sufficient:  I'm changing the devm_kcalloc() in igc_led_setup() as well
+> to avoid a use-after-free (memory would already get freed on netdev
+> unregister but led a little later on pdev unbind).
+> 
+> -- >8 --
+> 
+> diff --git a/drivers/net/ethernet/intel/igc/igc_leds.c b/drivers/net/ethernet/intel/igc/igc_leds.c
+> index bf240c5..0b78c30 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_leds.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_leds.c
+> @@ -257,13 +257,13 @@ static void igc_setup_ldev(struct igc_led_classdev *ldev,
+>  	led_cdev->hw_control_get = igc_led_hw_control_get;
+>  	led_cdev->hw_control_get_device = igc_led_hw_control_get_device;
+>  
+> -	devm_led_classdev_register(&netdev->dev, led_cdev);
+> +	devm_led_classdev_register(&adapter->pdev->dev, led_cdev);
+>  }
+>  
+>  int igc_led_setup(struct igc_adapter *adapter)
+>  {
+>  	struct net_device *netdev = adapter->netdev;
+> -	struct device *dev = &netdev->dev;
+> +	struct device *dev = &adapter->pdev->dev;
+>  	struct igc_led_classdev *leds;
+>  	int i;
+>  
+> 
 
-I guess the question is, is the current limitation (mrouter not properly 
-offloaded) an issue specific to mv or is it a limitation of hardware 
-offloading in general? I tend to think it's the latter.
-
-But then again, if we move it to DSA, we would lose the benefit of the 
-optimization of consolidating multiple register writes into just one (as 
-done in patch 10 currently), unless we add a new switch op which takes a 
-portvec instead of a port when modifying mdb's.
 
