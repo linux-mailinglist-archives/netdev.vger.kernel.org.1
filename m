@@ -1,135 +1,189 @@
-Return-Path: <netdev+bounces-85275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B4A899FE8
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 16:37:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 043F489A02B
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 16:49:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F35A1F2393A
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:37:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FAA81F21641
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:49:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CAF16F27C;
-	Fri,  5 Apr 2024 14:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC1416DEAB;
+	Fri,  5 Apr 2024 14:49:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y3gsiQ8s"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sela0LmX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C50341C68;
-	Fri,  5 Apr 2024 14:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6754516E897
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 14:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712327827; cv=none; b=CjBfQCGWn/9yiJ2ZCPxLKieWvs19KiQj/FO3deY6veVaUmHBm2JFmtPNTd07CT/D65HhBl+tOJMjVC9MxdZPMpxEtcIW3G0IsfIzhFFVKRvGanjA92o2v854wz23Jz2NtLGNh5WuNhCNpJ0nTtCZR2Sa7RVmgiZG8PxurLhKOPw=
+	t=1712328565; cv=none; b=H2nOA/AY0ska3AMP8Pa9FbRGYQra85CdJP6Z59SMgqNleqT6b/3xZLLhQYSwADMfP8jrtJ7Vq7TzB/maEGpLtIYruMLrjFW9BIInB7+BcW+W0K9+VgvwdVkwO0GGRP6cNliyt0hqSBQqO7E+D95uV24gaRVEgTXzTY/Fvb+xVGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712327827; c=relaxed/simple;
-	bh=eIorOYYZiLdm+pbueizWefpBql/HDSgTVKhM4Iafk9s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cPB3PcqWrQSkXUiWDOUNpitnlf9VQ8IHIFd5vrsL33oCyuMU1vqBKl/K/HQ0842iYiNdztiTwqQSZyWflvF4pAVH+oMb2NrlnL+NGDPMgxsm1Uijy9gcLczq1UQ/ITtTbn+tkOJkZJjD8bZ+eHNZJvOz9q+56hF8qKXuoAM3+6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y3gsiQ8s; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56e0acaf69aso2863359a12.1;
-        Fri, 05 Apr 2024 07:37:05 -0700 (PDT)
+	s=arc-20240116; t=1712328565; c=relaxed/simple;
+	bh=tWEy3uDpUkGv8CXM0b7bl86HHSVyjxRNU/8Ley4Ukyk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ogIN7Ws2Jd7/9x9y/vh33WEKtsTrfPtvjTfVtaMQn8o6jEeG5q8AbQXagIuSviskOiFROdwAsfWfZ5HAkx+/qg4Url9LXPpIoFu0zL1tobnHafRc90yHqfc2idfwutW9YRT3i7seXdZ2OcsgkQVuBNbfzTHMNO44sUwlDbaolAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sela0LmX; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e2e94095cso10283a12.0
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 07:49:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712327824; x=1712932624; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CSJRYNqAmVBKiGPVSvhxhy0tW7FVAqspgSB3v6fe5Ds=;
-        b=Y3gsiQ8svPUtQZrrCXc27NzBXOLlsTreXBahRXZUiBffEsgfbld9wgmy3/u6zdJFNO
-         47aGdkjkbOcXTY2NXnpajYoUgj1CNNg0CmRkZfXN1azPc0Bff8o9awEWoVvqfwcC7Qb2
-         YWw3W86F/ktfCPvSo3fE+LACIAPOVp4OY1hqKcNEwJQfKhxqT3RkuEjgt+Uyl5DTfbn+
-         6uQ3SI0MsFRQmbs+JzmV9xfXZEwViUOpkQ/7GiWqf7QSikJa1nNB/8okqYMbHFdoRxtH
-         2EvFUpmLZiWnYLhj3jbmQgWzc7/Hcql5CK+q1F4SnrEh/PKUC/yjekO7AxRavP78bCK7
-         ZtQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712327824; x=1712932624;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1712328561; x=1712933361; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CSJRYNqAmVBKiGPVSvhxhy0tW7FVAqspgSB3v6fe5Ds=;
-        b=lmHYuzvhj8Wyg+i7gXbGzVfi37lbn2rPx3M8UjdLsC32WzWRlOlyZkCclpd4RN1NLc
-         VDtLApv3VtNaFPvrAW9o9xW0tvsOEkD3Wqii7DtqmhhB0/6x6+atjdfdw1tE9bQl6w8l
-         8yGflySh4BJ2MynloiNsEq5LOZ03EvAr1LAHvb7Kb48RAuSvg0Cx+Qq5KXuPm/WJrLK3
-         KDgsSGZL5kwGZS9wahFSoHKAibSdHAtThFJi1fwXnL4drZwYEge+KzZcp1EjtCDe/0Cx
-         7ZcsSKWqFu6g0ULG7j/AlZ/7sHuNWo+wPoeInIEeDTRTixizHDViUDo8AuFQt7TteOnj
-         /ViQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUT2R1anYi6iEMJkqfSrFCZ/m3ADe++9wVnLhxnDm5tMYSOY94+7VwgENm7v8XJDc3b8psa2x25iR1EsxmSRMYBXYsnpv7INYcVL+nm
-X-Gm-Message-State: AOJu0YwIkGfjjjgBTfm3tl0oFOF0iFVlWojTTYRnKpTs1UddP4zr3pni
-	JGvo300V8/d8wQn661bbprs18o6bjP8gONqMhOHCCy/iNZhJRBaC
-X-Google-Smtp-Source: AGHT+IHZlbgRHFlooAtDFVBN7jM5NrSJFl77rEcVoUJUAp4b0sSOmB3NQgvCCqIeb055tv+wzACddg==
-X-Received: by 2002:a50:d6d6:0:b0:56d:ee61:6874 with SMTP id l22-20020a50d6d6000000b0056dee616874mr973236edj.20.1712327824238;
-        Fri, 05 Apr 2024 07:37:04 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d700:2000::b2c])
-        by smtp.gmail.com with ESMTPSA id es18-20020a056402381200b0056a033fa007sm845735edb.64.2024.04.05.07.37.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 07:37:03 -0700 (PDT)
-Date: Fri, 5 Apr 2024 17:37:00 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
-	Simon Horman <horms@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v8 05/16] net: dsa: vsc73xx: add structure
- descriptions
-Message-ID: <20240405143700.vaohtglfzcbrcd3f@skbuf>
-References: <20240403103734.3033398-1-paweldembicki@gmail.com>
- <20240403103734.3033398-6-paweldembicki@gmail.com>
+        bh=M3ujW/DDq8SFp5GEHP6PG0wD2WWvfF2hgMN6lRbymJ0=;
+        b=sela0LmXec+//oB07XIxWCIQJ5cw7HEXXWq8mS5ofWl6s4EFJhEoOaLvSA+wmeGPtA
+         RMXcgI30AIsvIESBst+S9mJSoP5h8djkglj6yuz5Zltxlvqw6bWOIeE0BLB2GjxIVl5P
+         t6eROtm4EGYPdydt6Pmr/RJ+DtknCDuHPCgtTEBYwiJCnYsTZiajUj9plwkgpWA6OoIi
+         wf4H6AUWiV40IqKDeihWOKAJK5gwXjGRJzYYbezMKsUBRgBBnm8ppJ4/Wu97XAjQxrCg
+         Nw0brw5dQyCzcMiNelzfNroixsef6jGDrnWSDN95+z2r6nOc48SBq0T7pfdknJr2cFqi
+         ZcbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712328561; x=1712933361;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M3ujW/DDq8SFp5GEHP6PG0wD2WWvfF2hgMN6lRbymJ0=;
+        b=W9ggHgcQYBRs9CBUHF7/emrf/Ps6K6x51hXrkBZWQtgdFL3BW9tttI4zACLVU/8UAR
+         g4UDe5sPzjJv216ue9tv0ghVwIJ/mO24uUw2uv6v9YXSyK8lJGEpVqk9ieO4FEapdXXL
+         rsWoaKIv+FZZosY6kDtjkbbfzDqTzrbyg62znGmpFqMyHvxmqzKodEP12jcQPx7hARSI
+         u45SJdO6Ed0f22dZb9pm+eW4YO7icvExz5XxBZA5yNezE+UZ7d2PfGWJvtX0vDnyb5W1
+         iK5cdeM2MRHqLjIS44fqrAVe8c9oAE/+MRDvBJqOXUFi1maBqRPTw5nJZVI4keLqs4zc
+         abWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWPmNax1aim3tFVLBb4KrOqxoAD5bQBFHGbp/8VXFew9sr0z1HNbzDgmEgb9fS9QJ/Eh0ZrzAcWc35SPbdnwdVTzGhVNy3U
+X-Gm-Message-State: AOJu0YwZChfi16zEAWlA6tUXo/W7AucrM55CJ3xmM+j3ix13/4+JPFhQ
+	uSTXZJ6PyTn5kcj0/xZ1MJTCqIWpiXE5JIhyqfRBuGpV2OhB1/ctxpuXTxMYS+GOitqgGBNSloy
+	X5UB2SaaT/5Vm3liFWQYNYNLimZI2zFwmBx8P
+X-Google-Smtp-Source: AGHT+IHJhMtE2Viqwn/Uw+uK5Pp39pZf0azA8EmdOuAMjeczkqZaMa7FEPA/QCQz9MJ+rNcWHs685tI4kOSAKtOrHXg=
+X-Received: by 2002:aa7:d049:0:b0:56e:ac4:e1f3 with SMTP id
+ n9-20020aa7d049000000b0056e0ac4e1f3mr348063edo.7.1712328561357; Fri, 05 Apr
+ 2024 07:49:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240403103734.3033398-6-paweldembicki@gmail.com>
+References: <20240404114231.2195171-1-edumazet@google.com> <CAL+tcoBhdqVs0ZMzifriVf+3gpLeA72HByB5TW4vJyUn+KntMA@mail.gmail.com>
+In-Reply-To: <CAL+tcoBhdqVs0ZMzifriVf+3gpLeA72HByB5TW4vJyUn+KntMA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Apr 2024 16:49:07 +0200
+Message-ID: <CANn89iK9pDX=dA78Bk-sm8p4xxSno6XgHT=s0epSes=WLwxOZA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: annotate data-races around tp->window_clamp
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 03, 2024 at 12:37:21PM +0200, Pawel Dembicki wrote:
-> This commit adds updates to the documentation describing the structures
-> used in vsc73xx. This will help prevent kdoc-related issues in the future.
-> 
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-> ---
+On Fri, Apr 5, 2024 at 4:29=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Thu, Apr 4, 2024 at 7:53=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+> >
+> > tp->window_clamp can be read locklessly, add READ_ONCE()
+> > and WRITE_ONCE() annotations.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> >  net/ipv4/syncookies.c |  3 ++-
+> >  net/ipv4/tcp.c        |  8 ++++----
+> >  net/ipv4/tcp_input.c  | 17 ++++++++++-------
+> >  net/ipv4/tcp_output.c | 18 ++++++++++--------
+> >  net/ipv6/syncookies.c |  2 +-
+> >  net/mptcp/protocol.c  |  2 +-
+> >  net/mptcp/sockopt.c   |  2 +-
+> >  7 files changed, 29 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> > index 500f665f98cbce4a3d681f8e39ecd368fe4013b1..b61d36810fe3fd62b1e5c58=
+85bbaf20185f1abf0 100644
+> > --- a/net/ipv4/syncookies.c
+> > +++ b/net/ipv4/syncookies.c
+> > @@ -462,7 +462,8 @@ struct sock *cookie_v4_check(struct sock *sk, struc=
+t sk_buff *skb)
+> >         }
+> >
+> >         /* Try to redo what tcp_v4_send_synack did. */
+> > -       req->rsk_window_clamp =3D tp->window_clamp ? :dst_metric(&rt->d=
+st, RTAX_WINDOW);
+> > +       req->rsk_window_clamp =3D READ_ONCE(tp->window_clamp) ? :
+> > +                               dst_metric(&rt->dst, RTAX_WINDOW);
+> >         /* limit the window selection if the user enforce a smaller rx =
+buffer */
+> >         full_space =3D tcp_full_space(sk);
+> >         if (sk->sk_userlocks & SOCK_RCVBUF_LOCK &&
+> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > index e767721b3a588b5d56567ae7badf5dffcd35a76a..92ee60492314a1483cfbfa2=
+f73d32fcad5632773 100644
+> > --- a/net/ipv4/tcp.c
+> > +++ b/net/ipv4/tcp.c
+> > @@ -1721,7 +1721,7 @@ int tcp_set_rcvlowat(struct sock *sk, int val)
+> >         space =3D tcp_space_from_win(sk, val);
+> >         if (space > sk->sk_rcvbuf) {
+> >                 WRITE_ONCE(sk->sk_rcvbuf, space);
+> > -               tcp_sk(sk)->window_clamp =3D val;
+> > +               WRITE_ONCE(tcp_sk(sk)->window_clamp, val);
+> >         }
+> >         return 0;
+> >  }
+> > @@ -3379,7 +3379,7 @@ int tcp_set_window_clamp(struct sock *sk, int val=
+)
+> >         if (!val) {
+> >                 if (sk->sk_state !=3D TCP_CLOSE)
+> >                         return -EINVAL;
+> > -               tp->window_clamp =3D 0;
+> > +               WRITE_ONCE(tp->window_clamp, 0);
+> >         } else {
+> >                 u32 new_rcv_ssthresh, old_window_clamp =3D tp->window_c=
+lamp;
+> >                 u32 new_window_clamp =3D val < SOCK_MIN_RCVBUF / 2 ?
+> > @@ -3388,7 +3388,7 @@ int tcp_set_window_clamp(struct sock *sk, int val=
+)
+> >                 if (new_window_clamp =3D=3D old_window_clamp)
+> >                         return 0;
+> >
+> > -               tp->window_clamp =3D new_window_clamp;
+> > +               WRITE_ONCE(tp->window_clamp, new_window_clamp);
+> >                 if (new_window_clamp < old_window_clamp) {
+> >                         /* need to apply the reserved mem provisioning =
+only
+> >                          * when shrinking the window clamp
+> > @@ -4057,7 +4057,7 @@ int do_tcp_getsockopt(struct sock *sk, int level,
+> >                                       TCP_RTO_MAX / HZ);
+> >                 break;
+> >         case TCP_WINDOW_CLAMP:
+> > -               val =3D tp->window_clamp;
+> > +               val =3D READ_ONCE(tp->window_clamp);
+> >                 break;
+> >         case TCP_INFO: {
+> >                 struct tcp_info info;
+> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> > index 1b6cd384001202df5f8e8e8c73adff0db89ece63..8d44ab5671eacd4bc06647c=
+7cca387a79e346618 100644
+> > --- a/net/ipv4/tcp_input.c
+> > +++ b/net/ipv4/tcp_input.c
+> > @@ -563,19 +563,20 @@ static void tcp_init_buffer_space(struct sock *sk=
+)
+> >         maxwin =3D tcp_full_space(sk);
+> >
+> >         if (tp->window_clamp >=3D maxwin) {
+>
+> I wonder if it is necessary to locklessly protect the above line with
+> READ_ONCE() because I saw the full reader protection in the
+> tcp_select_initial_window()? There are some other places like this.
+> Any special reason?
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+We hold the socket lock at this point.
 
-> diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitesse-vsc73xx.h
-> index fee1378508b5..e7b08599a625 100644
-> --- a/drivers/net/dsa/vitesse-vsc73xx.h
-> +++ b/drivers/net/dsa/vitesse-vsc73xx.h
-> @@ -15,7 +15,16 @@
->  #define VSC73XX_MAX_NUM_PORTS	8
->  
->  /**
-> - * struct vsc73xx - VSC73xx state container
-> + * struct vsc73xx - VSC73xx state container: main data structure
-> + * @dev: The device pointer
-> + * @reset: The descriptor for the GPIO line tied to the reset pin
-> + * @ds: Pointer to the DSA core structure
-> + * @gc: Main structure of the GPIO controller
-> + * @chipid: Storage for the Chip ID value read from the CHIPID register of the
-> + *	sswitch
-
-Nitpick (not a request to resend): "switch"
-
-> + * @addr: MAC address used in flow control frames
-> + * @ops: Structure with hardware-dependent operations
-> + * @priv: Pointer to the configuration interface structure
->   */
->  struct vsc73xx {
->  	struct device			*dev;
+READ_ONCE() is only needed if another thread can potentially change
+the value under us.
 
