@@ -1,144 +1,116 @@
-Return-Path: <netdev+bounces-85360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D661489A5FB
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 23:15:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 102ED89A604
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 23:20:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D3CE1F21E9C
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:15:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD792B21671
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2963174EFA;
-	Fri,  5 Apr 2024 21:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PGFEWxMz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C9D174EDB;
+	Fri,  5 Apr 2024 21:20:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4EC171072;
-	Fri,  5 Apr 2024 21:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D4F1C687
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 21:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712351709; cv=none; b=Qgr7yKnEIM3CLNuByuuNlNSoAJEf/CPsicNCKvi+OeSws0c5govcw/JkqF1vPRpCnwTaNOHJraSyY9KrgGYk1kelbPamHh5vxPJKOf2/Kc8tf87bJkYPfhMyNDBvUT3oxtIVeR/C/5297kSuW9bPd5rSV08PPl9Qp+Z//FnD3YM=
+	t=1712352001; cv=none; b=UEOM5bZEn7XUyXIHoC+GxI3WRJ7JcWs5WfCQdyDTicOxr92P5AKVyjlHUunHsPBM2AKuq4ARLkORuKL7KrvU46EWLRziBOdi7B60GwF8iHNAlET5B9laut+KNtsYd8aAnbzd108ovZX59EjBJGhPS3wPyvv3UtKHroW9wYV/H9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712351709; c=relaxed/simple;
-	bh=HeNEhIGrzcGEZrocdkVTvsddhLnVgsVIbEn+zKxLMn8=;
+	s=arc-20240116; t=1712352001; c=relaxed/simple;
+	bh=DmWLO9dxq30HbLw9pWZItRdax35PdcRdrilzTT/8IFU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p/migCLxZDl/p0UBlJlVCKaawu5U87Dp101ANqzh1oGDeiho0TkIAGRdmNmbLazEIsGOcv6iMn/lLP55h0tqKwYBBQyIZhTGVHccFnBBwgbWrce9MpgRsmZQrZc+pPJqTw9FJjwvB43n8366em54Kq2I6O5j3r22sx/4OM3gFfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PGFEWxMz; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d82713f473so45028801fa.3;
-        Fri, 05 Apr 2024 14:15:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712351706; x=1712956506; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o2vV+ljPu+LnmovF94XbYF/3sqJWOm/WOolsuT6CmUg=;
-        b=PGFEWxMz4tQcFt2BYityYj/xUahJMbYAefJcDE2F9KDpTvIaLc0I40iksU14ciSkOR
-         iRmR0+EAzxQzRamygaE++qg0RB3LjRia0QaaR+0DItadnws7oO3gQFoXbuBoDBgKLi9l
-         JkRWFb0jlJ0zNiwjKOMciRx2ro1iuA4y377pb6Ls3/clh4FLxVz1/tIuGIQACwdj55wV
-         Pgli/GHyDYgOjNrkhNTKZfDVkLhBt9+v186m/5+svVvJxMbcKppiqauAJaKY2BqbuPrP
-         6qcnpX6fdwA1VYNkK46EIidKc0sr2nzblzHU/mbeK/uRnt2PzqNlUH18euVmtcrm0MqN
-         m+Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712351706; x=1712956506;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o2vV+ljPu+LnmovF94XbYF/3sqJWOm/WOolsuT6CmUg=;
-        b=JNkCAX2TU9vo6Gp1E3gw/4XZkz9Ulnel0AvvvqPxRe6ocX5ISKypbqvcrn3ZlrwNPJ
-         Pw99jc3dXRdI/hbZYWezlpQcKX6M3mmVozzlWZIwQkE7Q2zQEnXaaodmT4Slx+5iOUZf
-         Hu5ZbaYmh8b+nRFY+SLWY9RSPwdPyIIKdSpk+21ASSte06T4D2H00n0GtHZ1xhnaOQNW
-         E3WiKPf2V+v+vyzc5cwBr72uC5/noXhTBCIa8rpHDc2nFWc7QmYy4Q8sKjn/MIw8CTsN
-         lWOeLuu+gvx3d1L5/4b8MyeGFXszySUnOca8bIzKvkr4ZmDp0h5RBDE1P2CPUHSyWHk4
-         Qfbg==
-X-Forwarded-Encrypted: i=1; AJvYcCXS/72+27TeE7RuwdOd+NdROj6BiE5cvjLUnHiBauO5C4axLVYAKAOlNCF9ddK6J6HVL/DVM9SAQ0JOYiXUR0QalilhYe9LBi2H5DREqnIBtVGzfpR3TUXiNGfuLI5qmPVWCi1i
-X-Gm-Message-State: AOJu0YxGb5qweokLB7PTae3j4inL3g08cg9EbUW6LEK8OQx3H88yi1q3
-	sx26TJOcsnFyZ/dnyhYczZ2clV9NCJ5TJvhh7MjoeHuMaBlyTnXY
-X-Google-Smtp-Source: AGHT+IGvqldN6HhRWWnSY5+EnUP2pam16riYtoUm7Q1wDs8Ky3sSiGU3pUJdfw1lLyEvKoUGXAwYHA==
-X-Received: by 2002:a2e:8ed5:0:b0:2d8:6b3c:1eb8 with SMTP id e21-20020a2e8ed5000000b002d86b3c1eb8mr2430875ljl.4.1712351705883;
-        Fri, 05 Apr 2024 14:15:05 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d700:2000::b2c])
-        by smtp.gmail.com with ESMTPSA id de26-20020a056402309a00b0056c1cca33bfsm1169683edb.6.2024.04.05.14.15.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 14:15:05 -0700 (PDT)
-Date: Sat, 6 Apr 2024 00:15:02 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Joseph Huang <joseph.huang.2024@gmail.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
-	Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 In-Reply-To:Content-Type:Content-Disposition; b=E+r+0zNdoHbFelgn+QmcoON9QzetGNtr6feJBJUB6qGP5WhfEfLssUltO60+SRyArUlXjfX+CSqEjU/wlbZJeu/lKHJOgQARIxXioCJzEkFKmzo8Rb50FEj5dbBckOrmYj7Iu1M93wPXNBF5rPP5HBxkZyGHJyxQ3j4o91i750Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-376-B0yS12P1NjOc5eOOiUbggg-1; Fri, 05 Apr 2024 17:19:48 -0400
+X-MC-Unique: B0yS12P1NjOc5eOOiUbggg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 331A5811E81;
+	Fri,  5 Apr 2024 21:19:48 +0000 (UTC)
+Received: from hog (unknown [10.39.192.7])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B52AE1121D;
+	Fri,  5 Apr 2024 21:19:46 +0000 (UTC)
+Date: Fri, 5 Apr 2024 23:19:41 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>,
-	linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
-Message-ID: <20240405211502.q5gfwcwyhkm6w7xy@skbuf>
-References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
- <7fc8264a-a383-4682-a144-8d91fe3971d9@blackwall.org>
- <20240402174348.wosc37adyub5o7xu@skbuf>
- <a8968719-a63b-4969-a971-173c010d708f@blackwall.org>
- <20240402204600.5ep4xlzrhleqzw7k@skbuf>
- <065b803f-14a9-4013-8f11-712bb8d54848@blackwall.org>
- <804b7bf3-1b29-42c4-be42-4c23f1355aaf@gmail.com>
- <20240405102033.vjkkoc3wy2i3vdvg@skbuf>
- <935c18c1-7736-416c-b5c5-13ca42035b1f@blackwall.org>
- <651c87fc-1f21-4153-bade-2dad048eecbd@gmail.com>
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com,
+	Phillip Potter <phil@philpotter.co.uk>
+Subject: Re: [PATCH v4 net] geneve: fix header validation in
+ geneve[6]_xmit_skb
+Message-ID: <ZhBq7fe_pN90gJkX@hog>
+References: <20240405103035.171380-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20240405103035.171380-1-edumazet@google.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <651c87fc-1f21-4153-bade-2dad048eecbd@gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 05, 2024 at 04:22:43PM -0400, Joseph Huang wrote:
-> Like this?
-> 
-> bridge link set dev swp0 mcast_flood off
->   - all flooding disabled
-> 
-> bridge link set dev swp0 mcast_flood on
->   - all flooding enabled
-> 
-> bridge link set dev swp0 mcast_flood on mcast_ipv4_data_flood off
-> mcast_ipv6_data_flood off
->   - IPv4 data packets flooding disabled, IPv6 data packets flooding
-> disabled, everything else floods (that is to say, only allow IPv4 local
-> subnet and IPv6 link-local to flood)
-> 
-> ?
+2024-04-05, 10:30:34 +0000, Eric Dumazet wrote:
+> syzbot is able to trigger an uninit-value in geneve_xmit() [1]
+>=20
+> Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield())
+> uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
+> skb->protocol.
+>=20
+> If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->protocol,
+> pskb_inet_may_pull() does nothing at all.
+>=20
+> If a vlan tag was provided by the caller (af_packet in the syzbot case),
+> the network header might not point to the correct location, and skb
+> linear part could be smaller than expected.
+>=20
+> Add skb_vlan_inet_prepare() to perform a complete mac validation.
+>=20
+> Use this in geneve for the moment, I suspect we need to adopt this
+> more broadly.
+>=20
+> v4 - Jakub reported v3 broke l2_tos_ttl_inherit.sh selftest
+>    - Only call __vlan_get_protocol() for vlan types.
+> Link: https://lore.kernel.org/netdev/20240404100035.3270a7d5@kernel.org/
+>=20
+> v2,v3 - Addressed Sabrina comments on v1 and v2
+> Link: https://lore.kernel.org/netdev/Zg1l9L2BNoZWZDZG@hog/
+>=20
+...
+>=20
+> Fixes: d13f048dd40e ("net: geneve: modify IP header check in geneve6_xmit=
+_skb and geneve_xmit_skb")
+> Reported-by: syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/000000000000d19c3a06152f9ee4@googl=
+e.com/
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Phillip Potter <phil@philpotter.co.uk>
+> Cc: Sabrina Dubroca <sd@queasysnail.net>
 
-Yeah.
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-> The syntax seems to be counterintuitive.
-> 
-> Or like this?
-> 
-> bridge link set dev swp0 mcast_flood on mcast_ipv4_ctrl_flood on
->   - only allow IPv4 local subnet to flood, everything else off
-> 
-> ?
+Thanks Eric.
 
-Nope.
+--=20
+Sabrina
 
-> So basically the question is, what should the behavior be when something is
-> omitted from the command line?
-
-The answer is always: "new options should default to behaving exactly
-like before". It's not just about the command line arguments, but also
-about the actual netlink attributes that iproute2 (and other tooling)
-creates when communicating with the kernel. Old user space has no idea
-about the existence of mcast_ipv4_ctrl_flood et. al. So, if netlink
-attributes specifying their value are not sent by user space, their
-value in the kernel must mimic the value of mcast_flood.
 
