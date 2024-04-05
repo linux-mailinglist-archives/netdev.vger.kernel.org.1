@@ -1,447 +1,190 @@
-Return-Path: <netdev+bounces-85198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51DB1899BB8
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:19:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3B35899BC2
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74E431C22216
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:18:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 028121C21FC1
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED7716C454;
-	Fri,  5 Apr 2024 11:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D0716ABDE;
+	Fri,  5 Apr 2024 11:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MeKmT5pU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kRxJqKiK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2110.outbound.protection.outlook.com [40.107.223.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0937D2032D;
-	Fri,  5 Apr 2024 11:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712315933; cv=none; b=h4RBwyV1031u0nogLQl3Tb0ZLMXf5jcCGq5D0UFZHhHpoGa5Zv9EqSdX3+Mot68tHzDUJyZzTzVXOlRoQrHX2mmbokLrXrzLuPd8Nf+DXoARR0IEvtbE/ocrW29qHjMv7OVH7uYEG9h28mS7+gTjhd8E42rmF7fUzAzi+5WUsu8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712315933; c=relaxed/simple;
-	bh=fHSjG8AZo0FX4nSlP+Ivgqsk4xVhRJKYEhULtlxYVso=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V0TEO0JZ83UCDfvnGAX6nG2yOEq0hnxdancJlfBFGpcbRg6LanBfEvHIle9yumiXysGL1y0fdSDfG9olbpkyNO3hcRVHgiOdP48dn8T2BJg7nVun/ynDR8h2bS2v1lvVnxxdd0mAWxclUiKhPfT4LjEwaIQwGX1/q7bSI274sNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MeKmT5pU; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435AVuWR000631;
-	Fri, 5 Apr 2024 11:18:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=y0LU6CIkPpNU6xA+PTZzNEpure5X6gej72qFqBV1D20=;
- b=MeKmT5pU6TT475aBEMiFdSZRMZDB2bfpJl6gv1Kgp1uu2pZevuhdhuONOn5o3eVIcw0U
- wQXza84urhA4aCoLNTnf1/L9YYD0jGDn5PGkVx0X/x9snQDu50iuv8jx4Uy/rD6O26OF
- 0TbD9GgmwBV+uEn2bZC50055yokSSntABPEknWRnDEvOz5u1Tj3fBdvNYalbTb01/6Lb
- yKmHG35Kwc6bW/gxlSUl+EI8Ik8dG6O/ki2yWOwN3C/gK2B1Vo6uBmXItcFW/eDriNXK
- P2kSiQLc2mCpKe2nkOxewJsgEeoVbML9KvKsDG4zz/nM7YlZ+Io++RnICTzP078/2ybk bA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeakr8dg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:18:39 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 435BFZP2029550;
-	Fri, 5 Apr 2024 11:18:39 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeakr8db-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:18:39 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4359r2Bi009100;
-	Fri, 5 Apr 2024 11:18:38 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x9epy22kd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:18:38 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 435BIWoG50266600
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Apr 2024 11:18:34 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B0B692004F;
-	Fri,  5 Apr 2024 11:18:32 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 56D212005A;
-	Fri,  5 Apr 2024 11:18:32 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Apr 2024 11:18:32 +0000 (GMT)
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Vincent Mailhol <mailhol.vincent@wanadoo.fr>, netdev@vger.kernel.org,
-        linux-can@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-hams@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        Niklas Schnelle <schnelle@linux.ibm.com>
-Subject: [PATCH net-next 1/1] net: handle HAS_IOPORT dependencies
-Date: Fri,  5 Apr 2024 13:18:31 +0200
-Message-Id: <20240405111831.3881080-2-schnelle@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240405111831.3881080-1-schnelle@linux.ibm.com>
-References: <20240405111831.3881080-1-schnelle@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C94D16132B;
+	Fri,  5 Apr 2024 11:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.110
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712316067; cv=fail; b=Y2ztEpEN0m7tfhTJG8K8KCdlMYptkoXv7DiYwWMlHJcUHNbVdJH7tL7xb55v2Y8JKXlkosQOvdMlxi0FLpNWqP7CK+9PAHuKjQoegAWMHAbPE2zn+G7Qa8HuDpJ3GukISmzuNAE5Mh1r2PjpLdou/wuBuqrkyl4FK91H+1a7enk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712316067; c=relaxed/simple;
+	bh=yW8YE/CZ4q2Zr/Qw+w08Y5ateG0LommnC5Zgd6uZpYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=K87DUKX0Egjbpr9QpaeTxVPw9J1wA5P6aOI18kA4VVLC1dmhLn0dyN0n29ioi2jsNii0yOPS3TE2d+u4EK/oLjHK+0NXo7ayTH4LqyCy8XPoTkYQDlhJb1d4NqwAqkK8vyL6mEb3tjF6Lqleihc2pLLdq4HeCnyZ2d6V9CzzKcg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kRxJqKiK; arc=fail smtp.client-ip=40.107.223.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UZ93xoCnPJTyGzNxhjVKdGxGU04UEpu5rUs6OWnWwS92vuuKjWD4nha7jBvtCE3dIlfX/uVkKl4yAEskfV0I865G+hw6Y2VaK0kPY/DRecfqXIuO8/qk5qE4tGN08rzqEImCgUwbmQl5+L4Nf91btBNzMZ0pg6fCtx4v3bURY72umWRT03//oCMbgpWnZ/NJmzjUp1XkM0KymsWNT+VKj3Vbl+Tg/QilcbqaNQa02cW5QiZ0FNXR1UoKt3P4b1OkIaltV59jV66Hc4iRdURpWBGiTyXUEABxJ1N3H5ZKqT91q4eho/cLPHkz4ujmrlC6RdV7bA4bJ/N4Nr35uIC+cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e1S3VXHwVlfW+auHgPF8kqI8g3gk7l+GKUuqhBJ8G9E=;
+ b=SAzYeGMC9cSCzJAcTO3AMzKfgGq0Uld0JSN2ro7pFfuWZdloNwCooi6QwOz02qdMxBT6enKFsQH5dIOaZFJT2/i2SBO0Lx2yvJlguQyN94xFSNcJxzG0eq8fyy5kvXwu0mq35KtRdenwzs3+gPlCDGVWBstlUwsf4n7O6RtMLNuL3R4lWxKxuZiPexBG9aA5GZ11RpTNYZcT9Bv1RqEID3xeD0hH4Hg+/95JjChNzF/VduiVgS8AH6McfCl1Ded7kg7FtdvaMj0cEpaBlzJDtb4z2hxqen+bdqV55mWmj+5A1RfnCxql3jLB6ypzQswWqO0z6kAL0tH5jN8ISnn8dQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e1S3VXHwVlfW+auHgPF8kqI8g3gk7l+GKUuqhBJ8G9E=;
+ b=kRxJqKiKJdp8Z+bBGA1mKJa0Gys4nj+MmcElcEr/XExq3GqawchYpTPOu4qfzJ5nrJIf2TWtZfw+Dsl7DWpAF8i/zCMboZoz3M4o6E1LRi1ixdYNZkwwbsu5wuIyKacuV8JDOgQHcvseyHdW9+7sgyemlm1FEMmvNRnZBr0F6DO8A/mTiDilCUFp21QbBmcKb+y4ydjNTki9mrt6r0t0QaJUMauhqLxyqgsYIvJqlkicUzgQMRSve931x0+kcPPi5Ti3LRbUiOykO1R2SxRRxIIwyXXuB8RVAzvEoL13Ipgeb2WzCP/GDlLP0u9J3XHfVQrtXrLnyt7Lrark8FpJjg==
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by DM4PR12MB6326.namprd12.prod.outlook.com (2603:10b6:8:a3::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Fri, 5 Apr
+ 2024 11:21:02 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7409.042; Fri, 5 Apr 2024
+ 11:21:01 +0000
+Date: Fri, 5 Apr 2024 08:21:00 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	linux-kernel@vger.kernel.org,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240405112100.GC5383@nvidia.com>
+References: <Zf2n02q0GevGdS-Z@C02YVCJELVCG>
+ <20240322135826.1c4655e2@kernel.org>
+ <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+ <20240322154027.5555780a@kernel.org>
+ <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+ <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184055.GP946323@nvidia.com>
+ <83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
+ <20240404183305.GM1723999@nvidia.com>
+ <1bb526d4-31ac-b25d-e494-ef5adbaef7ac@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1bb526d4-31ac-b25d-e494-ef5adbaef7ac@gmail.com>
+X-ClientProxiedBy: MN2PR22CA0011.namprd22.prod.outlook.com
+ (2603:10b6:208:238::16) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: RjhKE1gq53wuWnpSjOfs6S1Tu_sQCDJp
-X-Proofpoint-GUID: CptBld5yXKFHbap5VtUybL33TKqLcOoH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-05_10,2024-04-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
- mlxscore=0 impostorscore=0 phishscore=0 clxscore=1015 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404050081
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|DM4PR12MB6326:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	xXmOmmzmbV5Cg067xAOvLJSzuvnSRgeT2lf93gJFqeAOt8MzrrEa3SJgYuFJ/SHjRmvq1nCIiiwYvxUldcAJU0D5QZcKndZw0V+t27lx/VbbynQkJBXbMX7Tsvx5aoR5R/zLrIu8b+pz8vn0EQJuyalpALG0ddDiUVCI2TvndWbNh/PizU4UVyie2sz39EHPT7gJqBVYVc08km8+kzktimnCMPSJ1xYt/4SFfirsPD8i1bMH1/Rl3ES5VHwJzl9mcmdQcqXMnEuojJXIj86e1EqhC84Z/pdNpZhNCpB7afffq8Zcr9EBmWZRDALkXVfNBfJK4TQ2ob8JoY0u/nHYb6K16JRzltK6Z3oZCAtTCbTj7LR+hTzchetNH1UrvGiGBTA3YZ+VoqcCIkxO0nUVwgjp2w2UET0UtOedxwo1IQwzCMdN8c5/RVW7rLz69a/HVszScRXJLyulasB6Vtb3YbNE4ROWUj2pzl23MIGEcKhwUU97f/P4GNBVJq462ykfFON3X8cktnZOfceiTAIDh7p3dkdJfEyUbWBqvTFeHd+3i9iAOtfUcvO30kJvJ8kZUoMuHtJv5OohDschyJuGen2dcgt6G74OlVdZi0TCjCcBaKMblIzRiJmIPLZsJaRfQZo0Ll83SVQKTCJuuYuAM5lAqRHc6n6a68W8d2hNTJ0=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(7416005)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?TjW37yaJ0LMtZYR6GfRlYlNhuU4KjGGZzigd0TOfJ43/m43J6HdzGcUu0C8d?=
+ =?us-ascii?Q?scaFdn74TdX+tbUDSzvo1YkoOaHF6dHpK/TNO1yPBxphfoLink5xgDO6Ry78?=
+ =?us-ascii?Q?bXIBrX5UIbs2YW7js2t7nu300uwubhIF4Fiw9rBXMBOrBMoOBGMUViam5S5r?=
+ =?us-ascii?Q?5R9/EDghuYBiVK7Nifx/SORoTdibrCGfB5Uhr26018t/wC8i7GKi5VL2PiM/?=
+ =?us-ascii?Q?os77wKuxnx5fDDCAsngMlYGs4UJNZYx2qhJh7mKRNF0bbTh3SZRmWSmjfJUg?=
+ =?us-ascii?Q?8pZz6TdiHHjbf6EIROYkRRoOWejMzU0ybJY37KGYTsO/FB6ftE6jKN8PGkkh?=
+ =?us-ascii?Q?4Kr3UFZD4zl3+RM6IPWNgwg9ArY+rDPUKPfgYkxVz37ype47iD53RpcDyXDO?=
+ =?us-ascii?Q?X1VKhhO251o8IxsyUEAGOAiBlG6m5VCNZvLjeUAcpQWosMsqkHKKmIPLfw5J?=
+ =?us-ascii?Q?dXexRhyn1fYNO7igLc8jvlTX3IsSSEJGMvhgp6M1sbGth0+u32J6rb95C/lB?=
+ =?us-ascii?Q?x/rnC9Wbm80OJiDtA3s2z0UiVKiSSdPI6l2DXQUevcRY41rQRFGeUu3fC6hy?=
+ =?us-ascii?Q?ehTc/16FfqJ80gPhSPm4RBy6iv2AQwUYdSBIFTLQgR8jxKQpJW000VsDwW3K?=
+ =?us-ascii?Q?VKcooIIKcYQrjPrX3EpdEretVJUb74148yNkMn/MWho12kVAfA362IFMZLTa?=
+ =?us-ascii?Q?SKAU2kVk/vrLKY89qAneJew5fdaZ4xyRI4zblIiOKOVXPiepMDxhqBhXlngY?=
+ =?us-ascii?Q?FmzD5u/WvtbsbWvkuIgSpxo/03QKT6nzZ+4+WoRTTCjBNgYjJk4G+Kh4JmmY?=
+ =?us-ascii?Q?2RqiQZJkiCvaPNSqRTMw/xS1+OEFjslJjrPthG1XIWGrmhc20jLug7nsFkMY?=
+ =?us-ascii?Q?1U2jRmZXezwsSIyYevTVSPKo4RRqOLKGeCQ3H972uR3uJc9hUPEqmqSYxAzv?=
+ =?us-ascii?Q?um8EqLTNdSOP8+zCpn9gBtQnOmXDaO0DbQLgl7GuYoEglVpOK8QmDKxtTlnW?=
+ =?us-ascii?Q?ohF9Oiy0YyV77qfFgkiD3KgVkopzl41kFIAXO9YByuAlkPP9SzwB/Mq4VI1V?=
+ =?us-ascii?Q?Uo9fCjpdMsp+TfIfc2h9uoSxFbd02/yNwz78mcKjv2U08xunqZek7wofwGOR?=
+ =?us-ascii?Q?22UfllV4zNsx/+Uip+uy4i1a8OT87+/sfqSzbkiVy2H03llvKMFFoJlP5S+e?=
+ =?us-ascii?Q?DX36sdOKcc0aKTjwvwQqFaP75R88rI/13Vm2ebKoPBOO7eSPWfqkmQzJUKha?=
+ =?us-ascii?Q?I2YFo5wViCnBTLbcpolJqdshi1ZJ5slSQi4+x39T9UXVXjlYZNVbSjiXYwrn?=
+ =?us-ascii?Q?CcOHqYYiE50nk2WyFKAUzDZM9VQ/TDbkT9osLNXWVn1z1a3iGaAMYN7cMypO?=
+ =?us-ascii?Q?ze8MkaMrNZshKSlvjebdDKoHpbDjZN8yQvyuME0FAz0INGJTMl0xLI1FJTJ4?=
+ =?us-ascii?Q?sKefKGNF73as7Neo2cyKYJxo4Q5zPbuiEo7MqPXmwP56mm2RThhzoqJYLlhw?=
+ =?us-ascii?Q?GdBTxyM0kJeDPFqsvJ3V4mKSctUc+LUlkQPA6ojCJT1+eqoKyORowbe69+OJ?=
+ =?us-ascii?Q?L3C4oZ0bMVpZpr/Wosw/CpFlKteDN6LyI9gU4ZMu?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3755c69f-14bf-4ea2-98f0-08dc556279a4
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2024 11:21:01.7042
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9HnlcdCu3IfSbRfgilZq8SKWvf6abH8W9QjehwXdAGkqH3RaQ5xthU6hYjI5gUz/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6326
 
-In a future patch HAS_IOPORT=n will disable inb()/outb() and friends at
-compile time. We thus need to add HAS_IOPORT as dependency for
-those drivers requiring them. For the DEFXX driver the use of I/O
-ports is optional and we only need to fence specific code paths. It also
-turns out that with HAS_IOPORT handled explicitly HAMRADIO does not need
-the !S390 dependency and successfully builds the bpqether driver.
+On Thu, Apr 04, 2024 at 08:31:24PM +0100, Edward Cree wrote:
+> > of in the factory looses the "implied engineering benefits of open
+> > source".
+> 
+> You're looking at the wrong point on the causal graph.
+> Whether you apply the hacks in the factory or at runtime, their hacky
+>  design is what prevents them from having the benefits of open source
+>  (because those benefits consist of a development process that weeds
+>  out hacks and bad design).
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Maciej W. Rozycki <macro@orcam.me.uk>
-Co-developed-by: Arnd Bergmann <arnd@kernel.org>
-Signed-off-by: Arnd Bergmann <arnd@kernel.org>
-Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
----
-Note: This patch does not depend any not-yet-mainline HAS_IOPORT changes
-and may be merged via subsystem specific trees at your earliest
-convenience.
+Oh please. They are not hacks, you are inventing this idea entirely
+out of thin air based on your own lack of detailed knowledge or
+personal aesthetic preferences.
 
- drivers/net/Kconfig                  | 2 +-
- drivers/net/arcnet/Kconfig           | 2 +-
- drivers/net/can/cc770/Kconfig        | 1 +
- drivers/net/can/sja1000/Kconfig      | 1 +
- drivers/net/ethernet/3com/Kconfig    | 4 ++--
- drivers/net/ethernet/8390/Kconfig    | 6 +++---
- drivers/net/ethernet/amd/Kconfig     | 4 ++--
- drivers/net/ethernet/fujitsu/Kconfig | 2 +-
- drivers/net/ethernet/intel/Kconfig   | 2 +-
- drivers/net/ethernet/sis/Kconfig     | 4 ++--
- drivers/net/ethernet/smsc/Kconfig    | 2 +-
- drivers/net/ethernet/ti/Kconfig      | 2 +-
- drivers/net/ethernet/via/Kconfig     | 1 +
- drivers/net/ethernet/xircom/Kconfig  | 2 +-
- drivers/net/fddi/defxx.c             | 2 +-
- drivers/net/hamradio/Kconfig         | 6 +++---
- drivers/net/wan/Kconfig              | 2 +-
- net/ax25/Kconfig                     | 2 +-
- 18 files changed, 25 insertions(+), 22 deletions(-)
+> > Overreach. The job of the kernel maintainer is to review the driver
+> > software, not the device design.
+> 
+> Really? [1]
 
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index 8ca0bc223b30..82a1e77ce57a 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -507,7 +507,7 @@ source "drivers/net/ipa/Kconfig"
- 
- config NET_SB1000
- 	tristate "General Instruments Surfboard 1000"
--	depends on PNP
-+	depends on ISA && PNP
- 	help
- 	  This is a driver for the General Instrument (also known as
- 	  NextLevel) SURFboard 1000 internal
-diff --git a/drivers/net/arcnet/Kconfig b/drivers/net/arcnet/Kconfig
-index a51b9dab6d3a..d1d07a1d4fbc 100644
---- a/drivers/net/arcnet/Kconfig
-+++ b/drivers/net/arcnet/Kconfig
-@@ -4,7 +4,7 @@
- #
- 
- menuconfig ARCNET
--	depends on NETDEVICES && (ISA || PCI || PCMCIA)
-+	depends on NETDEVICES && (ISA || PCI || PCMCIA) && HAS_IOPORT
- 	tristate "ARCnet support"
- 	help
- 	  If you have a network card of this type, say Y and check out the
-diff --git a/drivers/net/can/cc770/Kconfig b/drivers/net/can/cc770/Kconfig
-index 9ef1359319f0..467ef19de1c1 100644
---- a/drivers/net/can/cc770/Kconfig
-+++ b/drivers/net/can/cc770/Kconfig
-@@ -7,6 +7,7 @@ if CAN_CC770
- 
- config CAN_CC770_ISA
- 	tristate "ISA Bus based legacy CC770 driver"
-+	depends on ISA
- 	help
- 	  This driver adds legacy support for CC770 and AN82527 chips
- 	  connected to the ISA bus using I/O port, memory mapped or
-diff --git a/drivers/net/can/sja1000/Kconfig b/drivers/net/can/sja1000/Kconfig
-index 4b2f9cb17fc3..01168db4c106 100644
---- a/drivers/net/can/sja1000/Kconfig
-+++ b/drivers/net/can/sja1000/Kconfig
-@@ -87,6 +87,7 @@ config CAN_PLX_PCI
- 
- config CAN_SJA1000_ISA
- 	tristate "ISA Bus based legacy SJA1000 driver"
-+	depends on ISA
- 	help
- 	  This driver adds legacy support for SJA1000 chips connected to
- 	  the ISA bus using I/O port, memory mapped or indirect access.
-diff --git a/drivers/net/ethernet/3com/Kconfig b/drivers/net/ethernet/3com/Kconfig
-index 706bd59bf645..1fbab79e2be4 100644
---- a/drivers/net/ethernet/3com/Kconfig
-+++ b/drivers/net/ethernet/3com/Kconfig
-@@ -44,7 +44,7 @@ config 3C515
- 
- config PCMCIA_3C574
- 	tristate "3Com 3c574 PCMCIA support"
--	depends on PCMCIA
-+	depends on PCMCIA && HAS_IOPORT
- 	help
- 	  Say Y here if you intend to attach a 3Com 3c574 or compatible PCMCIA
- 	  (PC-card) Fast Ethernet card to your computer.
-@@ -54,7 +54,7 @@ config PCMCIA_3C574
- 
- config PCMCIA_3C589
- 	tristate "3Com 3c589 PCMCIA support"
--	depends on PCMCIA
-+	depends on PCMCIA && HAS_IOPORT
- 	help
- 	  Say Y here if you intend to attach a 3Com 3c589 or compatible PCMCIA
- 	  (PC-card) Ethernet card to your computer.
-diff --git a/drivers/net/ethernet/8390/Kconfig b/drivers/net/ethernet/8390/Kconfig
-index a4130e643342..345f250781c6 100644
---- a/drivers/net/ethernet/8390/Kconfig
-+++ b/drivers/net/ethernet/8390/Kconfig
-@@ -19,7 +19,7 @@ if NET_VENDOR_8390
- 
- config PCMCIA_AXNET
- 	tristate "Asix AX88190 PCMCIA support"
--	depends on PCMCIA
-+	depends on PCMCIA && HAS_IOPORT
- 	help
- 	  Say Y here if you intend to attach an Asix AX88190-based PCMCIA
- 	  (PC-card) Fast Ethernet card to your computer.  These cards are
-@@ -117,7 +117,7 @@ config NE2000
- 
- config NE2K_PCI
- 	tristate "PCI NE2000 and clones support (see help)"
--	depends on PCI
-+	depends on PCI && HAS_IOPORT
- 	select CRC32
- 	help
- 	  This driver is for NE2000 compatible PCI cards. It will not work
-@@ -146,7 +146,7 @@ config APNE
- 
- config PCMCIA_PCNET
- 	tristate "NE2000 compatible PCMCIA support"
--	depends on PCMCIA
-+	depends on PCMCIA && HAS_IOPORT
- 	select CRC32
- 	help
- 	  Say Y here if you intend to attach an NE2000 compatible PCMCIA
-diff --git a/drivers/net/ethernet/amd/Kconfig b/drivers/net/ethernet/amd/Kconfig
-index f8cc8925161c..b39c6f3e1eda 100644
---- a/drivers/net/ethernet/amd/Kconfig
-+++ b/drivers/net/ethernet/amd/Kconfig
-@@ -56,7 +56,7 @@ config LANCE
- 
- config PCNET32
- 	tristate "AMD PCnet32 PCI support"
--	depends on PCI
-+	depends on PCI && HAS_IOPORT
- 	select CRC32
- 	select MII
- 	help
-@@ -122,7 +122,7 @@ config MVME147_NET
- 
- config PCMCIA_NMCLAN
- 	tristate "New Media PCMCIA support"
--	depends on PCMCIA
-+	depends on PCMCIA && HAS_IOPORT
- 	help
- 	  Say Y here if you intend to attach a New Media Ethernet or LiveWire
- 	  PCMCIA (PC-card) Ethernet card to your computer.
-diff --git a/drivers/net/ethernet/fujitsu/Kconfig b/drivers/net/ethernet/fujitsu/Kconfig
-index 0a1400cb410a..06a28bce5d27 100644
---- a/drivers/net/ethernet/fujitsu/Kconfig
-+++ b/drivers/net/ethernet/fujitsu/Kconfig
-@@ -18,7 +18,7 @@ if NET_VENDOR_FUJITSU
- 
- config PCMCIA_FMVJ18X
- 	tristate "Fujitsu FMV-J18x PCMCIA support"
--	depends on PCMCIA
-+	depends on PCMCIA && HAS_IOPORT
- 	select CRC32
- 	help
- 	  Say Y here if you intend to attach a Fujitsu FMV-J18x or compatible
-diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-index 639fbb12bd35..6e7901e12699 100644
---- a/drivers/net/ethernet/intel/Kconfig
-+++ b/drivers/net/ethernet/intel/Kconfig
-@@ -41,7 +41,7 @@ config E100
- 
- config E1000
- 	tristate "Intel(R) PRO/1000 Gigabit Ethernet support"
--	depends on PCI
-+	depends on PCI && HAS_IOPORT
- 	help
- 	  This driver supports Intel(R) PRO/1000 gigabit ethernet family of
- 	  adapters.  For more information on how to identify your adapter, go
-diff --git a/drivers/net/ethernet/sis/Kconfig b/drivers/net/ethernet/sis/Kconfig
-index 775d76d9890e..7e498bdbca73 100644
---- a/drivers/net/ethernet/sis/Kconfig
-+++ b/drivers/net/ethernet/sis/Kconfig
-@@ -19,7 +19,7 @@ if NET_VENDOR_SIS
- 
- config SIS900
- 	tristate "SiS 900/7016 PCI Fast Ethernet Adapter support"
--	depends on PCI
-+	depends on PCI && HAS_IOPORT
- 	select CRC32
- 	select MII
- 	help
-@@ -35,7 +35,7 @@ config SIS900
- 
- config SIS190
- 	tristate "SiS190/SiS191 gigabit ethernet support"
--	depends on PCI
-+	depends on PCI && HAS_IOPORT
- 	select CRC32
- 	select MII
- 	help
-diff --git a/drivers/net/ethernet/smsc/Kconfig b/drivers/net/ethernet/smsc/Kconfig
-index 5f22a8a4d27b..13ce9086a9ca 100644
---- a/drivers/net/ethernet/smsc/Kconfig
-+++ b/drivers/net/ethernet/smsc/Kconfig
-@@ -54,7 +54,7 @@ config SMC91X
- 
- config PCMCIA_SMC91C92
- 	tristate "SMC 91Cxx PCMCIA support"
--	depends on PCMCIA
-+	depends on PCMCIA && HAS_IOPORT
- 	select CRC32
- 	select MII
- 	help
-diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-index 1530d13984d4..cfe9bd6b1d62 100644
---- a/drivers/net/ethernet/ti/Kconfig
-+++ b/drivers/net/ethernet/ti/Kconfig
-@@ -167,7 +167,7 @@ config TI_KEYSTONE_NETCP_ETHSS
- 
- config TLAN
- 	tristate "TI ThunderLAN support"
--	depends on (PCI || EISA)
-+	depends on (PCI || EISA) && HAS_IOPORT
- 	help
- 	  If you have a PCI Ethernet network card based on the ThunderLAN chip
- 	  which is supported by this driver, say Y here.
-diff --git a/drivers/net/ethernet/via/Kconfig b/drivers/net/ethernet/via/Kconfig
-index da287ef65be7..00773f5e4d7e 100644
---- a/drivers/net/ethernet/via/Kconfig
-+++ b/drivers/net/ethernet/via/Kconfig
-@@ -20,6 +20,7 @@ config VIA_RHINE
- 	tristate "VIA Rhine support"
- 	depends on PCI || (OF_IRQ && GENERIC_PCI_IOMAP)
- 	depends on PCI || ARCH_VT8500 || COMPILE_TEST
-+	depends on HAS_IOPORT
- 	depends on HAS_DMA
- 	select CRC32
- 	select MII
-diff --git a/drivers/net/ethernet/xircom/Kconfig b/drivers/net/ethernet/xircom/Kconfig
-index 7497b9bea511..bfbdcf758afb 100644
---- a/drivers/net/ethernet/xircom/Kconfig
-+++ b/drivers/net/ethernet/xircom/Kconfig
-@@ -19,7 +19,7 @@ if NET_VENDOR_XIRCOM
- 
- config PCMCIA_XIRC2PS
- 	tristate "Xircom 16-bit PCMCIA support"
--	depends on PCMCIA
-+	depends on PCMCIA && HAS_IOPORT
- 	help
- 	  Say Y here if you intend to attach a Xircom 16-bit PCMCIA (PC-card)
- 	  Ethernet or Fast Ethernet card to your computer.
-diff --git a/drivers/net/fddi/defxx.c b/drivers/net/fddi/defxx.c
-index 1fef8a9b1a0f..0fbbb7286008 100644
---- a/drivers/net/fddi/defxx.c
-+++ b/drivers/net/fddi/defxx.c
-@@ -254,7 +254,7 @@ static const char version[] =
- #define DFX_BUS_TC(dev) 0
- #endif
- 
--#if defined(CONFIG_EISA) || defined(CONFIG_PCI)
-+#ifdef CONFIG_HAS_IOPORT
- #define dfx_use_mmio bp->mmio
- #else
- #define dfx_use_mmio true
-diff --git a/drivers/net/hamradio/Kconfig b/drivers/net/hamradio/Kconfig
-index 25b1f929c422..36a9aade9f33 100644
---- a/drivers/net/hamradio/Kconfig
-+++ b/drivers/net/hamradio/Kconfig
-@@ -83,7 +83,7 @@ config SCC_TRXECHO
- 
- config BAYCOM_SER_FDX
- 	tristate "BAYCOM ser12 fullduplex driver for AX.25"
--	depends on AX25 && !S390
-+	depends on AX25 && HAS_IOPORT
- 	select CRC_CCITT
- 	help
- 	  This is one of two drivers for Baycom style simple amateur radio
-@@ -103,7 +103,7 @@ config BAYCOM_SER_FDX
- 
- config BAYCOM_SER_HDX
- 	tristate "BAYCOM ser12 halfduplex driver for AX.25"
--	depends on AX25 && !S390
-+	depends on AX25 && HAS_IOPORT
- 	select CRC_CCITT
- 	help
- 	  This is one of two drivers for Baycom style simple amateur radio
-@@ -150,7 +150,7 @@ config BAYCOM_EPP
- 
- config YAM
- 	tristate "YAM driver for AX.25"
--	depends on AX25 && !S390
-+	depends on AX25 && HAS_IOPORT
- 	help
- 	  The YAM is a modem for packet radio which connects to the serial
- 	  port and includes some of the functions of a Terminal Node
-diff --git a/drivers/net/wan/Kconfig b/drivers/net/wan/Kconfig
-index 31ab2136cdf1..67be9857c86c 100644
---- a/drivers/net/wan/Kconfig
-+++ b/drivers/net/wan/Kconfig
-@@ -180,7 +180,7 @@ config C101
- 
- config FARSYNC
- 	tristate "FarSync T-Series support"
--	depends on HDLC && PCI
-+	depends on HDLC && PCI && HAS_IOPORT
- 	help
- 	  Support for the FarSync T-Series X.21 (and V.35/V.24) cards by
- 	  FarSite Communications Ltd.
-diff --git a/net/ax25/Kconfig b/net/ax25/Kconfig
-index fdb666607f10..e23a3dc14b93 100644
---- a/net/ax25/Kconfig
-+++ b/net/ax25/Kconfig
-@@ -4,7 +4,7 @@
- #
- 
- menuconfig HAMRADIO
--	depends on NET && !S390
-+	depends on NET
- 	bool "Amateur Radio support"
- 	help
- 	  If you want to connect your Linux box to an amateur radio, answer Y
--- 
-2.40.1
+Yep. TOEs are supported in the RDMA stack.
 
+The only thing the kernel community decided was that a TOE cannot be
+accessed using the socket API, the HW is still supported.
+
+> But strangely, there are people out there who trust the upstream process
+>  to ensure quality/security/etc. more than they trust vendors and their
+>  "oh don't worry, the device will enforce security scopes on these raw
+>  commands from userspace" magic firmware blobs.
+
+Upstream Linux community has already decided trusting firwmare is
+acceptable. I gave many examples in the fwctl document if you'd care
+to understand it.
+
+And of course we get the usual garbage solution "oh just fork linux"
+which *completely misses the point* of what Linux really is or what
+the community is fundamentally seeking to achieve.
+
+> What you are asking for here is a special exemption to all those
+>  requirements and security measures because "just trust me bro".
+
+Actually no, fwctl is following accepted kernel design principles with
+many prior examples.
+
+Jason
 
