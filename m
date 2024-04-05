@@ -1,143 +1,197 @@
-Return-Path: <netdev+bounces-85126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30E23899914
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:12:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4A40899911
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4242B229F2
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:12:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FF211F22567
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB5815FD06;
-	Fri,  5 Apr 2024 09:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4AD15FD14;
+	Fri,  5 Apr 2024 09:11:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxR3eikh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hHYz4AKk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C79715FCE4
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 09:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16741EEE6
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 09:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712308306; cv=none; b=cRha9GE7HH9/TPTHElFu9w+VXf11gNELbFs15D4FCvHAoYU6sPDZf2s7Lxi2NsjoS80xN2U8Z+EeEN1+s23W4r1b3ZxqB2u2YusXf0G75LGqehB6ZktOiS+3nhaYHq+wDL8smyhKscNQEzAg9IGs+Cp6rVnOciZDKJZ+NDeTJ1E=
+	t=1712308297; cv=none; b=ABMCKbO5iKN9IC0XOt+UYqJ1hP5u5vhFc8UdHZljGmmTLlH2C9uP03hBPBuQ0ofYCf6bYrL3py2hS/jn9eEYgDfV2QqLxcCURkH/kHuZGwusntUO8gmp442RVLdP4IPyQNuoVYSRwEebupmDixrVVUhnZndPkMZY6Ww/uH0NYcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712308306; c=relaxed/simple;
-	bh=LmBXoWInajfE9xBuj2UZYG0+rLoVhICctMDwspO9QyM=;
+	s=arc-20240116; t=1712308297; c=relaxed/simple;
+	bh=AhIrEuT+bYJftdqneSKZzKj0fFAymum6I6t5pF+Vz0E=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fk+HfBFA88KjSXjtjnQ0mdH5aQsOrhIBPUNh2zDPz6aLM7nJdI83tDQAhtkGZOGoJLVY8X+PdqaC4C2vKaA0g/GwkFZg6ifubLDhjnWdY3RK75QLNuwyv+eneevz4vyo47bSEItY2arJxLxyhOjrz8H78jGJo21XyI7b1B+uHbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxR3eikh; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a45f257b81fso262331566b.0
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 02:11:44 -0700 (PDT)
+	 To:Cc:Content-Type; b=dvQnVByxtqDuGSRQ4nFcAuoJ5GnYehkmqQAbjV+GnJTwfeSa2WmK2l8JT/uL/nTgzMGthBXpTtTLXmPLf202gZ8NdcGiqD2a9wGzNfm6uzURzUNmC8HLcp07771FFUumUCvSrtUkNwx4QGRa7CaQDlqTzgOw2JfgzWCE+gr81fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hHYz4AKk; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e2e94095cso5856a12.0
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 02:11:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712308303; x=1712913103; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712308294; x=1712913094; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LmBXoWInajfE9xBuj2UZYG0+rLoVhICctMDwspO9QyM=;
-        b=TxR3eikh1THgH4H0odSQS5LKAE884HJThIgXhsMZAhCz3SZlt1bxWg0B8K7e70lJLK
-         cX6XZMdnEOIxLe1ftbCKCIlZtD4T4QtXSoCr+X25cEPMw+EhplL+TRUjsYgECDtOYFdu
-         5Raa0Xzn4kLO6RcHlNDJvLPaD5Q3woI14PkRdyubxttlgkDAX5KvwIzdnoCjERIh5Zae
-         37VKJxNO4q7QJmHnrtFrVusK1I7V/ItsLuDFQ9bmvRC3w/Zqh65ai9J96uI9TBdUVqi1
-         dhq2ArF9rvuEGminwWq1hLVXZD2aosmelBqxDfWjp99WHhtaIZM3LxqtkKd8JNUoQrFd
-         kXYQ==
+        bh=66v6ZZfpUUiPYvvzQnNTvA9YwejZdE7KV4QKTRMJ8qI=;
+        b=hHYz4AKknRmuXJVOWZ/oQEtjhX/6ADMP1P/e4BeKN0dGI9+AeZiBJjybt/Y3NvI6gG
+         9P5kO2KhAywd3DgBxuh5B/uHx+reMd4dWJazjJfxX5ZcpWJewhDQA7qWx7nQc+772Q9V
+         vwJ7+/wKqdLJ1v7oVo1CsGcvfv2VDg9CH9GfRlBFe6VewXOUY8L3ltVxUb1KmVKloBj4
+         t9cncIhRev6UFlNt4EevrttL7J16t5DBYX8zN8D/Azp8h+wIb3xfHVP/bU46wKl1YhCQ
+         Kro9ihTy3RNhA49EurhKjMZLd18udjzZUMMtPwSdyLcYY5NdJm6k/9NbXyIIyFVFQQ3J
+         0ivQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712308303; x=1712913103;
+        d=1e100.net; s=20230601; t=1712308294; x=1712913094;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LmBXoWInajfE9xBuj2UZYG0+rLoVhICctMDwspO9QyM=;
-        b=ByDSbLg0eQr2CzwSFDmHNSXFneT7GUqv80xsbRART/rh2fwfJBtCvLTFYjgQRM1ztS
-         GBOqv/cfB4mspFxb5MfsXiYxPYkSFB90+H/xTqsAuav7R667BlH1JkawzV3iUkjDIz+V
-         A16h//a8ufZ0VfW3HMfacxkikG44qLa1JrCvdn7Vj7RwZvSGKSjQor/Q+1e+IOj9pCGd
-         oT3gcEhizVG8BsAlk/9B9Z7KjYbmPhAGG3Uxph7L3026tuwVWi8d6qwGtzTort/lFdNA
-         CK1uOyeZ649bbw1zWj9bknzsI6VvqoK1PAW4e9RqgMmaUgiQzLEitCOeAnn4QPluyALP
-         eaGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUZWBcgT+AcfuAW4C5RXNSyY9ev7cDUtyTkfFNM14+v6/v1hz+jLoMsLfyUQ9K55QdBx3ktDZPi/P64yyvazaUTgIsbDRxA
-X-Gm-Message-State: AOJu0YyspRk9iWK5kiS9OQVPc8+OnseEUDNrBCZJJ2vPWxWYysfsDJbN
-	VJ/KzHFdoG1hqDrOhIEZHkE+pdmltPq1gbcnSwN4UNoCxWjFvUhfAhS+TKGzivrEGwkbZp+sk+3
-	ulI0KnPJ0SPOiKilcjsyJNP9C9E8=
-X-Google-Smtp-Source: AGHT+IEEPo8HEBxHiQd6Gt7/FDnKq9efCmeTXDQp0f/A+PCZoOWH/Nuodq5vo9IuIrQXcrOSGB7QK6gmH6ao3HKBn8Y=
-X-Received: by 2002:a17:906:ac7:b0:a51:98df:f669 with SMTP id
- z7-20020a1709060ac700b00a5198dff669mr480152ejf.43.1712308303134; Fri, 05 Apr
- 2024 02:11:43 -0700 (PDT)
+        bh=66v6ZZfpUUiPYvvzQnNTvA9YwejZdE7KV4QKTRMJ8qI=;
+        b=pdVF3lPu50O90kz5LZ72SOCgz0JzUEEoQKRHD3TStUn3vpIrZMnzK81tO+ku5Ia1X8
+         /7VObqNyqiaPR/OxGylqx67m62c6exQwHBiZp+khq3ehQc3lde8gYTkgoH4ffWw1KD+w
+         lA+0VpehucXLaHpkgkzpYwAAzF8h0pgaKXb7hjNMjS5Oa2LN3hveUfpwjmi2hnhHFBHR
+         +DLcUU6adxu7uBtN7EvkooJ1PwvsLFLanRDUJmDVEDs6s3w6xb+65I2wU/K+G7EozCu7
+         hnnmkck/O0tPf40XwsStZfTGufuJrvtB6D6pzK1pxB0Y71aYAK+f8BwtUd3YAHo3L/hc
+         Ut6w==
+X-Gm-Message-State: AOJu0YwZ0/9AAg7YpWMHYeyq7kANT8MoV7aPVNis52CBQwluf0yZyUft
+	WV2623Uby8kneKuPpqE/V8C62ZlUhgzaHd33K4jaIqFFjYusnanwUscIYEgeQy/nJsIw6ko7+xu
+	iO+5L0WubM1b0Gvs/0P8AhbJRLLWPPKKVdcW0
+X-Google-Smtp-Source: AGHT+IGTi8z9iXuoO3ep0VNoKrt+ZPsALQCvqeXEYHny3Pb6KTkJrC1YqiXLuJZsqKR7jOh4OZ+E4Ck0udUuisYxXP0=
+X-Received: by 2002:aa7:d987:0:b0:56e:2b00:fcc7 with SMTP id
+ u7-20020aa7d987000000b0056e2b00fcc7mr187317eds.0.1712308293853; Fri, 05 Apr
+ 2024 02:11:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240405023914.54872-1-kerneljasonxing@gmail.com>
- <20240405023914.54872-2-kerneljasonxing@gmail.com> <a0e75cbda948d9911425d8464ea47c92ab2eee3b.camel@redhat.com>
- <CAL+tcoBEkK-ncB6zdJrq7kkd3MEdyT7_ONOyB=0cVVR_oj-4yA@mail.gmail.com> <6b77ce4f71dae82a0be793cf17fac4fda0884501.camel@redhat.com>
-In-Reply-To: <6b77ce4f71dae82a0be793cf17fac4fda0884501.camel@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 5 Apr 2024 17:11:05 +0800
-Message-ID: <CAL+tcoBFS9Z-=H5g8hoyDVuvcmT+wEuAdT6GxyS-vh0hKdE8cw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] mptcp: don't need to check SKB_EXT_MPTCP in mptcp_reset_option()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org, 
-	mptcp@lists.linux.dev, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+References: <1da265997eb754925e30260eb4c5b15f3bff3b43.1712273351.git.asml.silence@gmail.com>
+In-Reply-To: <1da265997eb754925e30260eb4c5b15f3bff3b43.1712273351.git.asml.silence@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Apr 2024 11:11:20 +0200
+Message-ID: <CANn89iKzwxgzX7-TAqjN5np8fksVM=qq1A0rFRdNKWjYJYWLaA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: enable SOCK_NOSPACE for UDP
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	pabeni@redhat.com, kuba@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hello Paolo,
-
-On Fri, Apr 5, 2024 at 4:34=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
+On Fri, Apr 5, 2024 at 1:37=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
 >
-> On Fri, 2024-04-05 at 15:58 +0800, Jason Xing wrote:
-> > Hello Paolo,
-> >
-> > On Fri, Apr 5, 2024 at 3:47=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> > >
-> > > On Fri, 2024-04-05 at 10:39 +0800, Jason Xing wrote:
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > Before this, what mptcp_reset_option() checks is totally the same a=
-s
-> > > > mptcp_get_ext() does, so we could skip it.
-> > >
-> > > Note that the somewhat duplicate test is (a possibly not great)
-> > > optimization to avoid jumping in the mptcp code (possible icache
-> > > misses) for plain TCP sockets.
-> > >
-> > > I guess we want to maintain it.
-> >
-> > Okay, I just read code and found the duplication but may I ask why it
-> > has something to do with icache misses?
+> wake_up_poll() and variants can be expensive even if they don't actually
+> wake anything up as it involves disabling irqs, taking a spinlock and
+> walking through the poll list, which is fraught with cache bounces.
+> That might happen when someone waits for POLLOUT or even POLLIN as the
+> waitqueue is shared, even though we should be able to skip these
+> false positive calls when the tx queue is not full.
 >
-> The first check/mptcp_get_ext() is in mptcp_reset_option() /
-> tcp_v4_send_reset(). For plain TCP socket it will fail and the
-> execution will continue inside the same compilation unit. The code
-> locality should avoid icaches misses around there.
+> Add support for SOCK_NOSPACE for UDP sockets. The udp_poll() change is
+> straightforward and repeats after tcp_poll() and others. However, for
+> sock_wfree() it's done as an optional feature flagged by
+> SOCK_SUPPORT_NOSPACE, because the feature requires support from the
+> corresponding poll handler but there are many users of sock_wfree()
+> that might be not prepared.
 >
-> Removing such check, even when processing plain TCP packets, the code
-> execution will have to call into mptcp_get_reset_option() in the mptcp
-> code, decreasing the code locality and increasing the chance of icache
-> misses.
-
-Interesting. Thanks for the explanation:)
-
+> Note, it optimises the sock_wfree() path but not sock_def_write_space().
+> That's fine because it leads to more false positive wake ups, which is
+> tolerable and not performance critical.
 >
-> I don't have actual profile data, so this is an early optimization (and
-> thus root of all evil), but sounds reasonable to me (yep, I'm biased!)
-
-I'll drop this patch.
-
-Thanks,
-Jason
-
+> It wins +5% to throughput testing with a CPU bound tx only io_uring
+> based benchmark and showed 0.5-3% in more realistic workloads.
 >
-> Cheers,
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  include/net/sock.h |  1 +
+>  net/core/sock.c    |  5 +++++
+>  net/ipv4/udp.c     | 15 ++++++++++++++-
+>  3 files changed, 20 insertions(+), 1 deletion(-)
 >
-> Paolo
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 2253eefe2848..027a398471c4 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -944,6 +944,7 @@ enum sock_flags {
+>         SOCK_XDP, /* XDP is attached */
+>         SOCK_TSTAMP_NEW, /* Indicates 64 bit timestamps always */
+>         SOCK_RCVMARK, /* Receive SO_MARK  ancillary data with packet */
+> +       SOCK_NOSPACE_SUPPORTED, /* socket supports the SOCK_NOSPACE flag =
+*/
+>  };
+>
+>  #define SK_FLAGS_TIMESTAMP ((1UL << SOCK_TIMESTAMP) | (1UL << SOCK_TIMES=
+TAMPING_RX_SOFTWARE))
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 5ed411231fc7..e4f486e9296a 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3393,6 +3393,11 @@ static void sock_def_write_space_wfree(struct sock=
+ *sk)
+>
+>                 /* rely on refcount_sub from sock_wfree() */
+>                 smp_mb__after_atomic();
+> +
+> +               if (sock_flag(sk, SOCK_NOSPACE_SUPPORTED) &&
+> +                   !test_bit(SOCK_NOSPACE, &sk->sk_socket->flags))
+> +                       return;
+> +
+>                 if (wq && waitqueue_active(&wq->wait))
+>                         wake_up_interruptible_sync_poll(&wq->wait, EPOLLO=
+UT |
+>                                                 EPOLLWRNORM | EPOLLWRBAND=
+);
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 11460d751e73..309fa96e9020 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -342,6 +342,7 @@ int udp_lib_get_port(struct sock *sk, unsigned short =
+snum,
+>                 hslot2->count++;
+>                 spin_unlock(&hslot2->lock);
+>         }
+> +       sock_set_flag(sk, SOCK_NOSPACE_SUPPORTED);
+>         sock_set_flag(sk, SOCK_RCU_FREE);
+>         error =3D 0;
+>  fail_unlock:
+> @@ -2885,8 +2886,20 @@ __poll_t udp_poll(struct file *file, struct socket=
+ *sock, poll_table *wait)
+>         /* psock ingress_msg queue should not contain any bad checksum fr=
+ames */
+>         if (sk_is_readable(sk))
+>                 mask |=3D EPOLLIN | EPOLLRDNORM;
+> -       return mask;
+>
+> +       if (!sock_writeable(sk)) {
+
+I think there is a race that you could avoid here by using
+
+if  (!(mask & (EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND))) {
+
+(We called datagram_poll() at the beginning of udp_poll())
+
+> +               set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+> +
+> +               /* Order with the wspace read so either we observe it
+> +                * writeable or udp_sock_wfree() would find SOCK_NOSPACE =
+and
+> +                * wake us up.
+> +                */
+> +               smp_mb__after_atomic();
+> +
+> +               if (sock_writeable(sk))
+> +                       mask |=3D EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND;
+> +       }
+> +       return mask;
+>  }
+>  EXPORT_SYMBOL(udp_poll);
+>
+> --
+> 2.44.0
 >
 
