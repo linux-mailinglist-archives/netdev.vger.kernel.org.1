@@ -1,118 +1,147 @@
-Return-Path: <netdev+bounces-85306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ED3D89A1DB
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:52:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6EE689A1E0
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F5E21C21352
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:52:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4914BB240C3
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243F316FF5A;
-	Fri,  5 Apr 2024 15:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C85A171063;
+	Fri,  5 Apr 2024 15:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="RKOaxOX9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOvM1giy"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD8916EBFB;
-	Fri,  5 Apr 2024 15:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D9016FF32;
+	Fri,  5 Apr 2024 15:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712332325; cv=none; b=jOudDzcKUomUP7kfTs2saJk1kI7n8DWn1DfyhfvjFw5vOuzMPsLU6MWMdq7dUgtGDChAKMZUoxTLvRo4gUXf3nfNLPOF74mvNkU3fwtwAOLsghrSI+cZpJo5zuzWoPOvu1Jm6Hdn9I73tsHxTqOXDL8qxW+dFr47yamuKlCvBdQ=
+	t=1712332329; cv=none; b=vCD7fPgeg190Wse8b6JtN7YP+kp246upcLdVcZzc9AUocq+q7z6XzFZ3+Mhf89gnpH5ZtpLFHIESIfhi98i2WLhhoQLILq/fALYN8f+Wu46QSGW5VsRAAyJzKpzQrYiNLOdvJ9w9TlkfA7beLP3fj9e+3J360bL2dpa191uuS1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712332325; c=relaxed/simple;
-	bh=fxv8PWbJbosspUvll7wJxzHOu0SzCsKZfnP95vWBhBc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=hH0u+FfPc5YHH798+1vx+ENWSbToU5LuTpORzVUWYQJExbBTp7SsRHxGFTfpbTpxwDABvZDipKb3VWyt3e7sx70PPtE1a5Su+b5eRDEAUg8l+yTm1auJLFngKJauR1Yv/KDRvmlhEuyVQ7NugtWVa04sEzC/4RAr61bkNAzmmmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=RKOaxOX9; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=y8HiA5vRMbQK27T06qo0opVcq074kst6mzqx2ZlhPcE=; b=RKOaxOX9p9DcbDkS/bQPzUk89g
-	/wE51Cq04Wk/tNX6RTFR3byLwXMGLxCmZPVHYY0dEojtTzXrx8zvsvImy67nxzfOwDsMDU0SD8HnZ
-	TTTQmVxD2+kNQ2XaBp8A39yn3XJH6yfUaYYGeJAjPnxfkKa+dCGz23VpYoy60cth5QG0ZJZ0MHVet
-	F7YVNSTki3xdcwlpnG682SCcuZVNH7Jx2p2dkRtx99eDzhp14QstvvljFNmDRwDZooz+4z4qWIYcO
-	56BUbSPG9S1v5OGnMRky5EkrNpHo2Cqq17grAZqLB+tUUt4qs/npPxeomh+5suHc22fA1d2NOqaBf
-	masJvRVw==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rslr4-000J2P-VY; Fri, 05 Apr 2024 17:51:51 +0200
-Received: from [178.197.249.22] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rslr3-00AxvR-1E;
-	Fri, 05 Apr 2024 17:51:49 +0200
-Subject: Re: [PATCH net-next v14 14/15] p4tc: add set of P4TC table kfuncs
-To: Jamal Hadi Salim <jhs@mojatatu.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>, deb.chatterjee@intel.com,
- Anjali Singhai Jain <anjali.singhai@intel.com>, namrata.limaye@intel.com,
- tom@sipanda.io, Marcelo Ricardo Leitner <mleitner@redhat.com>,
- Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com,
- Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>,
- khalidm@nvidia.com, =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?=
- <toke@redhat.com>, Martin KaFai Lau <martin.lau@linux.dev>,
- victor@mojatatu.com, Pedro Tammela <pctammela@mojatatu.com>,
- bpf <bpf@vger.kernel.org>
-References: <20240404122338.372945-1-jhs@mojatatu.com>
- <20240404122338.372945-15-jhs@mojatatu.com>
- <CAADnVQLw1FRkvYJX0=6WMDoR7rQaWSVPnparErh4soDtKjc73w@mail.gmail.com>
- <CAM0EoM=SyHR-f7z8YVRknXrUsKALgx96eH-hBudo40NyeaxuoA@mail.gmail.com>
- <CAADnVQLJ3iO73c7g0PG1Em9iM4W-n=7aanu_pc9O0t4XrG5Gwg@mail.gmail.com>
- <CAM0EoMn6Nyu5AKgSERZEtSojvzKN6r7enc7t313G9xBvq-bcog@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <db5fa77e-c179-d90c-f4f5-1f39a5a0f56d@iogearbox.net>
-Date: Fri, 5 Apr 2024 17:51:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1712332329; c=relaxed/simple;
+	bh=ORRmS7eL8P78h/AQLnRcZuzcALNpQJjjr7RmBmTZR8U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IEBEbwGAvFWFpQoQyzb0pkf/Rke3YxiwpTnDBPF8ThyW9DlQNt7iyrEx0hq3+Jpff782xDn1iusbxCdXZTZ2w+24rAGc5bzObSJy4CKh8iF9S7XB1wDkBhOZzxFRGyIfoY00IKSlog5V8//2znFUmMZdkyI/kHLUHRbJJW8Bn+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOvM1giy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BD10C433F1;
+	Fri,  5 Apr 2024 15:52:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712332328;
+	bh=ORRmS7eL8P78h/AQLnRcZuzcALNpQJjjr7RmBmTZR8U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aOvM1giyUrtoZvh0zzryNF/mBIQCuURDdYQHcluwXA/H9BBR6zUt+ouPvhZ7EGEk2
+	 O+aJsQmylAi1FG+6eUgCfGaLUTMaRyEYbUE7snnPqzVYv4gewy8W6DogV0MYZxDIxC
+	 uAEkEQmAOpXtYxZb1x8SUmeBktb1E/V0y6KVbI60t5hi+mbhjrKD06azFKD7Gl2ngA
+	 +Wcd5YdrC5CvWrMlg7OPQLKlva6NOQgLnl1bwVxs2/BusSI4njRoJz0zAxCok6aaOH
+	 oDiebgdM62gPVua6HJqflIAZMfkFAaJB2/BumpB71oj8/Dr3SHBGaD4VHp+E+UFwLC
+	 DTc/Tp/hPFbsw==
+Message-ID: <010d67c7-ca71-43fc-a3e3-ec3e5cd8b149@kernel.org>
+Date: Fri, 5 Apr 2024 17:51:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAM0EoMn6Nyu5AKgSERZEtSojvzKN6r7enc7t313G9xBvq-bcog@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/6] arm64: dts: qcom: sa8540p-ride: remove tx-sched-sp
+ property
+To: Flavio Suligoi <f.suligoi@asem.it>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240405152800.638461-1-f.suligoi@asem.it>
+ <20240405152800.638461-6-f.suligoi@asem.it>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27236/Fri Apr  5 10:26:04 2024)
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240405152800.638461-6-f.suligoi@asem.it>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 4/5/24 1:16 AM, Jamal Hadi Salim wrote:
-> On Thu, Apr 4, 2024 at 7:05 PM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
->> On Thu, Apr 4, 2024 at 3:59 PM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
->>>
->>> We will use ebpf/xdp/kfuncs whenever they make sense to us.
->>
->> In such case my Nack stands even if you drop this patch.
+On 05/04/2024 17:27, Flavio Suligoi wrote:
+> The property "tx-sched-sp" no longer exists, as it was removed from the
+> file:
 > 
-> We are not changing any ebpf code. I must have missed the memo that
-> stated you can control how people write or use ebpf.
-> The situation is this: Anybody can write kfuncs today. They can put
-> them in kernel modules - i am sure you designed it with that intent.
-> So what exactly are you objecting to that is ebpf related here?
+> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> 
+> by the commit:
+> 
+> commit aed6864035b1 ("net: stmmac: platform: Delete a redundant condition
+> branch")
 
-To be honest, this entire patchset is questionable from a design pov for
-the many reasons stated by various folks (including tc co-maintainers) in
-all the earlier discussions, but related to the BPF bits if someone else
-were trying to propose an interface on kfuncs which replicate to a larger
-extend BPF map APIs, the feedback would be similarly in that this should
-be attempted to generalize instead so that this is useful as a building
-block, esp given the goal is on SW datapath and not offloads, and the
-context specific pieces would reside in the p4tc code.
+Same problem with commit. BTW, your commit msg does not say what happens
+if this property is removed. Instead it could be "Strict priority is by
+default in Linux driver and tx-sched-sp was removed in commit sha ("foo
+bar")".
+
+
+With fixed in commit msg.
+
+Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+
+Best regards,
+Krzysztof
+
 
