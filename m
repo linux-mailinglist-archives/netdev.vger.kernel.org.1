@@ -1,121 +1,148 @@
-Return-Path: <netdev+bounces-85210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90837899C58
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:06:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A867E899CBE
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0ACE1C21166
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:06:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E3C6283C6F
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A364916C6B7;
-	Fri,  5 Apr 2024 12:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F7A16D32F;
+	Fri,  5 Apr 2024 12:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bhVdlC95"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GZwMpFhU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05E116ABCE;
-	Fri,  5 Apr 2024 12:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEAC16C878
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 12:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712318803; cv=none; b=bIMaLVcdaE2Y2LjjdIerbSvotQFJGHncmb6x9bKxmjEDhq2Z3a4R9+aDzGg1jd6nMcvOD/dT1muAku0OCPzre5SRuChtR8yCYWnv7WpWf3MRWyNVqHxqUG56IJF/eedLApuWWDMAqVIzM2ZTaZiQIEc1yIP3Ey+edRf+FbTxKnw=
+	t=1712319512; cv=none; b=d+NRjG+J7ng1vaapP3I2HZL4t5WwUiRiemO3AHLR0TOB3wgLop749q6aJgP1CAJXwyzm5zwwhKeC1FaRWV1v/W23eKZzILyfcOqvmmH8h3oPx2P9DufZN6SMvASNkRM78C9unFtbVe3GYqtDwplhLl3TRHG0VBur2mlE4KP/2Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712318803; c=relaxed/simple;
-	bh=QRvOuAu53+EArfY0qfpIBAa+WtOG64cUCx3bEohfA+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fKMPrf4euZqCqaW24k115a8OiCdg7KPidv8c5t7xeJNrUdOst0PFUZPgL4Er1CNh1QdOUCYBVpIkgDVXCYSnIik7zV+Naj46aZhj2yvrRIj1hs1UNLLrQhwJJeUfLvK3Xw4OaGEPmDQbev0TvYHVYenHnUB+nzworKfauRNpvjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bhVdlC95; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a519e04b142so119057366b.3;
-        Fri, 05 Apr 2024 05:06:41 -0700 (PDT)
+	s=arc-20240116; t=1712319512; c=relaxed/simple;
+	bh=udUxXEZqr7ZvZXYZK4DkmP6qmn431zipOt1V3yiuVAk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WpzGmG+C6v+pHegVK26iWln4nswYy9RU8jVfdscHobJvdFXPjSPuPp0T3l/5m2UKXjMtIHPXVxWABuMkNpxIFUKs5PBoWyXYtQ27IIO7+wxUpM18qY+QY3GMgX6xIXPcCH+lKspeI5Z7TrOkk0Ym+SN3Cw/14euGTqzBrmFSR3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GZwMpFhU; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso9101a12.1
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 05:18:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712318800; x=1712923600; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=951nXGkKjtOMWvE593+3+1defoukyWk76h9tCSdYH3U=;
-        b=bhVdlC95N0N8ZKDVL/D4DHZbzh+2X2/L6m58E3yntxQ/mtWR7z8hY+LePEYtyrvHk1
-         kFnJbamnmlTM8s0sg7hWBCaqnJPlGlgmqO/TLWS8bmVU0+IBc0iE1dS/XwIAFcVo1obx
-         rP4kPBN71q4hw1d7gMZZqQTSxD4ujJN4WLzgrgKvJ3wgCBb1IzjjwicvobBOXdNyiqrB
-         HwAj318mZz5qCULex9qugeP3svbvyHiJ6SNiIHn+qm/jhSrUFesJx7ChGYfZ50zNvMUk
-         L2QnVC/RmNweBfPL625r/YBwGLvDk4nVNiKPwhkJhZzRGOPKAzdX7sg66DqtUtomKgGh
-         TGxQ==
+        d=google.com; s=20230601; t=1712319502; x=1712924302; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tfsi1juHChnxscvc1BunWqnmn0THRUV5sR+hJYTSHQs=;
+        b=GZwMpFhUT4kZX7DPv12ktsxX/c8hz0CfM5YljIJgao40YrRnpVKxkJ3LZphM94JpP4
+         gTe797yjWUR/8yFG1FCeRenrVvviV50X1WLDXkCRY+6g1XzVn9QhZAmpSmQVBDl8IkaQ
+         rPZXJIhHPnw87Q7jWPU+Yw9HhYGYqVfrmcak5Gg467A5MtsARRZLuk83B1M5mniKfyVX
+         VPCnkRkn1eWcwQ48YgoW+wr/tD+rlzZJPk1gT6OzsVaRiWv/Nq2N2gUsuszLshvgh+Ll
+         p16j00ATlb7vRRfp1mhubFs2LNFRMo/N95kaD9f9cWMxBHIOy6QYEQ3KBvnEUwBHUJl7
+         r9IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712318800; x=1712923600;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=951nXGkKjtOMWvE593+3+1defoukyWk76h9tCSdYH3U=;
-        b=iTLxph84CcuRk5t6vw1WTjzq516Jv6ax2FW6HCE7AyLZH8ujZgcYRMoXh/6+PpIg/N
-         AIzLpeVjMikIQQ3CAA11oW5fP2+n6t1uwMzFxAnHMI3RcVh7ufXehSuSWVPtGZVh3ryZ
-         iRl+YlLT1TqKXbIv0P+2nHyOyR/syjKMjh2aMgQv2/1JmUVTFYiU5j55P0Q6aCN4z81U
-         IGKgcJaPTpjxd1kDMn3CtwzaYsANDw4UHPZxhooG9SFHTQ+ZjPrekvj5s7bO1HBTvU/j
-         AiQq1w9KopjkOfYGrWuqP4yEw5k12lQfwkD8Qdv9UkhlEgF1nMma+tnQJ1Klz8d2ihYW
-         5gDg==
-X-Forwarded-Encrypted: i=1; AJvYcCUAmMQF/SXrHLcos/jwlxfchZo9lX6tc5F8knNpdfKOHljDHEYhlPAajUTF6CbH0hmrC8+paURsAl4cVZAKo+IHSCD7r/NMxPU8ux4gI+VkQFwZMxMcpmlDb7uU8u1IyXADL5f2WULKLdsMfA/H3BEi9NnhDNd2gejKI5w2hSlqrDd1zvzj
-X-Gm-Message-State: AOJu0YzpPcx5EfTaUS5JhT5ZprUQDohOVlStAWQzbUDk0HW8xaSbP6dd
-	h+QkvSSpoz+nP6ZtLx2Gp/veX4mVepa4+pAID7L276Pc2fP+ILlv
-X-Google-Smtp-Source: AGHT+IFM21RPOG0tBkcKSWY7GAr7G2myaGTXDGJk7JBt2SQYunxK5QAwm2BlpDVWn1tZtx9+NzyVsw==
-X-Received: by 2002:a17:906:29d5:b0:a4e:57c5:e736 with SMTP id y21-20020a17090629d500b00a4e57c5e736mr999133eje.25.1712318800025;
-        Fri, 05 Apr 2024 05:06:40 -0700 (PDT)
-Received: from [192.168.42.78] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id lc24-20020a170906f91800b00a4e2d7dd2d8sm753430ejb.182.2024.04.05.05.06.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 05:06:39 -0700 (PDT)
-Message-ID: <e3c0da47-8748-42ba-bd0e-872a5e66090f@gmail.com>
-Date: Fri, 5 Apr 2024 13:06:40 +0100
+        d=1e100.net; s=20230601; t=1712319502; x=1712924302;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tfsi1juHChnxscvc1BunWqnmn0THRUV5sR+hJYTSHQs=;
+        b=XHZpSCK4ttxNJsi4FzUOtx7nuRQc0n5qNUe9/zjEqZlT7Q1r/G0mKbeEb1pkDCH0Ho
+         QnuUSKnJulduBubW0JkYYB6+y2SqeTQw3RQKNAb9bF7cOwfxPgIbftWliJNFDXrLpQ/z
+         e9KnMpJfiMA4KqDITyTHxKFLZGMQArJrCDqoZgFGDBgZGLafSvN4cfudKFx1wGpIsYWU
+         ygPB7s1HEQSHHVNqUv7JQ3AdWNptQXIM/8lHkJM9nw977QmMmQJ7qkp7+xCb1PoC/0EF
+         Hbw/nIagkzY4tA9bsvWSZI8g1HC8/M8hXmXSHa17xdu1TSiXqbsOLsiKZ20AuoKQ9ihV
+         C+jw==
+X-Gm-Message-State: AOJu0YyIJ+FpCh+rWytGCUQ9UBQxf2yCD2D9dz7c0jEBxarya2g7m23V
+	zqkVQgjD0iAFqrgsrBq6XUZOg86TD+UG7+eDOzM1zNsJ+6ImDEqhFIM41g5H1gBtLNxCOrPH9fe
+	xOW/PCZoW9aG9UvS5ASQMPFo26q0Wtk2Zy6zu
+X-Google-Smtp-Source: AGHT+IG8HsUuvrxJXgZX5iVHspSlUXfelkhRpJvkmhGXo3+gZCOK2okXIts9fuV2g/nImuABj0RX0DwaQ1btQmAp99I=
+X-Received: by 2002:aa7:c40c:0:b0:56d:e27:369c with SMTP id
+ j12-20020aa7c40c000000b0056d0e27369cmr300320edq.3.1712319501857; Fri, 05 Apr
+ 2024 05:18:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Add REQ_F_CQE_SKIP support to io_uring zerocopy
-To: Oliver Crumrine <ozlinuxc@gmail.com>, axboe@kernel.dk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, leitao@debian.org
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1712268605.git.ozlinuxc@gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <cover.1712268605.git.ozlinuxc@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <00c5b7641c0c854b630a80038d0131d148c2c81a.1712270285.git.asml.silence@gmail.com>
+ <CANn89i+XZtjD1RVBiFxfmsqZPMtN0156XgjUOkoOf8ohc7n+RQ@mail.gmail.com> <d475498f-f6db-476c-8c33-66c9f6685acf@gmail.com>
+In-Reply-To: <d475498f-f6db-476c-8c33-66c9f6685acf@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Apr 2024 14:18:09 +0200
+Message-ID: <CANn89iKZ4_ENsdOsMECd_7Np5imhqkJGatNXfrwMrgcgrLaUjg@mail.gmail.com>
+Subject: Re: [PATCH RESEND net-next v3] net: cache for same cpu skb_attempt_defer_free
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	pabeni@redhat.com, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/4/24 23:16, Oliver Crumrine wrote:
-> This patchset allows for io_uring zerocopy to support REQ_F_CQE_SKIP,
-> skipping the normal completion notification, but not the zerocopy buffer
-> release notification.
+On Fri, Apr 5, 2024 at 1:55=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 4/5/24 09:46, Eric Dumazet wrote:
+> > On Fri, Apr 5, 2024 at 1:38=E2=80=AFAM Pavel Begunkov <asml.silence@gma=
+il.com> wrote:
+> >>
+> >> Optimise skb_attempt_defer_free() when run by the same CPU the skb was
+> >> allocated on. Instead of __kfree_skb() -> kmem_cache_free() we can
+> >> disable softirqs and put the buffer into cpu local caches.
+> >>
+> >> CPU bound TCP ping pong style benchmarking (i.e. netbench) showed a 1%
+> >> throughput increase (392.2 -> 396.4 Krps). Cross checking with profile=
+s,
+> >> the total CPU share of skb_attempt_defer_free() dropped by 0.6%. Note,
+> >> I'd expect the win doubled with rx only benchmarks, as the optimisatio=
+n
+> >> is for the receive path, but the test spends >55% of CPU doing writes.
+> >>
+> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> >> ---
+> >>
+> >> v3: rebased, no changes otherwise
+> >>
+> >> v2: pass @napi_safe=3Dtrue by using __napi_kfree_skb()
+> >>
+> >>   net/core/skbuff.c | 15 ++++++++++++++-
+> >>   1 file changed, 14 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> >> index 2a5ce6667bbb..c4d36e462a9a 100644
+> >> --- a/net/core/skbuff.c
+> >> +++ b/net/core/skbuff.c
+> >> @@ -6968,6 +6968,19 @@ void __skb_ext_put(struct skb_ext *ext)
+> >>   EXPORT_SYMBOL(__skb_ext_put);
+> >>   #endif /* CONFIG_SKB_EXTENSIONS */
+> >>
+> >> +static void kfree_skb_napi_cache(struct sk_buff *skb)
+> >> +{
+> >> +       /* if SKB is a clone, don't handle this case */
+> >> +       if (skb->fclone !=3D SKB_FCLONE_UNAVAILABLE) {
+> >> +               __kfree_skb(skb);
+> >> +               return;
+> >> +       }
+> >> +
+> >> +       local_bh_disable();
+> >> +       __napi_kfree_skb(skb, SKB_DROP_REASON_NOT_SPECIFIED);
+> >
+> > This needs to be SKB_CONSUMED
+>
+> Net folks and yourself were previously strictly insisting that
+> every patch should do only one thing at a time without introducing
+> unrelated changes. Considering it replaces __kfree_skb, which
+> passes SKB_DROP_REASON_NOT_SPECIFIED, that should rather be a
+> separate patch.
 
-It's an io_uring internal change not altering how it operates
-with the net layer, you don't need to CC the net list.
+OK, I will send a patch myself.
 
-> This patchset also includes a test to test these changes, and a patch to
-> mini_liburing to enable io_uring_peek_cqe, which is needed for the test.
+__kfree_skb(skb) had no drop reason yet.
 
-For the same reason tests should be in liburing, where all io_uring tests
-are, and the selftest can be dropped. See liburing/test/send-zerocopy.c
-
-
-> Oliver Crumrine (3):
->    io_uring: Add REQ_F_CQE_SKIP support for io_uring zerocopy
->    io_uring: Add io_uring_peek_cqe to mini_liburing
->    io_uring: Support IOSQE_CQE_SKIP_SUCCESS in io_uring zerocopy test
-> 
->   io_uring/net.c                                |  6 +--
->   tools/include/io_uring/mini_liburing.h        | 18 +++++++++
->   .../selftests/net/io_uring_zerocopy_tx.c      | 37 +++++++++++++++++--
->   .../selftests/net/io_uring_zerocopy_tx.sh     |  7 +++-
->   4 files changed, 59 insertions(+), 10 deletions(-)
-> 
-
--- 
-Pavel Begunkov
+Here you are explicitly adding one wrong reason, this is why I gave feedbac=
+k.
 
