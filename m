@@ -1,96 +1,105 @@
-Return-Path: <netdev+bounces-85201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52CD899BC6
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:21:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64149899BDD
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4769FB21F00
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:21:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E70991F22E26
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EE316C457;
-	Fri,  5 Apr 2024 11:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3306E16C45E;
+	Fri,  5 Apr 2024 11:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gWENtA0a"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="beELki4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B99316C44C;
-	Fri,  5 Apr 2024 11:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A8F1649D9;
+	Fri,  5 Apr 2024 11:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712316088; cv=none; b=q6hkNju1fBelQkjE04Wt0PnVD1BzK5h7RSAPiG8fSEa/no+hkzJ9/3e1Dbgip2L2SUrEY7CHuyuDf2aHWAXleQldqTyzUEI1d1YopzxH59mAznnu6ugeCei83lPDLyvmeTT5MhGn6/eQgk/YCTQPct1Zn/u5kdlf25yvTfzwR9M=
+	t=1712316611; cv=none; b=gWe8WMafa91N2DI2118S9kbfAxLgdvXWLGmkFPjbOKojIG6cqQNqbevzL2aZI/NUtKvQuqFYpz0B7L6jNf0vEuUO7cz4MiOCosQjiZC9/VwMB2BHo8zn3GnmZNGy8rtgpoqEE60CY8kh0pnTq34UawzEjICeoghJezrKZleHhb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712316088; c=relaxed/simple;
-	bh=uxdtZOYXhengGWwZXZonOk5LihR8NR7q33quXNXAvg8=;
+	s=arc-20240116; t=1712316611; c=relaxed/simple;
+	bh=2V4L8qe3+CTuFahMV+YklCVpxQKV3ulIRMRR/8O6RtA=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=k4CLwg2dlFHkVK2bp17gPygLqpbYnebqyaVb7Q8LTMQoTR6+tkUOEcwUBDvyRdHaP7gCl6a+d+Z04GDTobJ9Mt/4KbhPP0ve8Um5/DeO/iBEAud7zcO83F+1ml6KbNxB6APSVnJzTtgvjIL6LAh/8jsZYFS7ldQxIjX8OF0vwbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gWENtA0a; arc=none smtp.client-ip=148.163.158.5
+	 Content-Type:MIME-Version; b=iEU46Y7Uhx2h3kMU7gosxRkN5sOFkKVwt5F8On+xMoRBTvt33uciKkc8iCVqV8seyXzh7/BU4QgyEEweeBO4qSolcXwl42OGL/cUmHqBV5jQt0W8ZZbDlxV5OojlbcbdpvAi8OXeGiggiEOvpeWsgD78B91RTNJu8bOjmgRTCdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=beELki4S; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435AWREs001013;
-	Fri, 5 Apr 2024 11:21:19 GMT
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435BRPxE004541;
+	Fri, 5 Apr 2024 11:30:05 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  content-transfer-encoding : mime-version; s=pp1;
- bh=+/DZazVdDgz9vkr7XNWWsXj9bzeEYUkuwtMjHCy5u7c=;
- b=gWENtA0axJNmBfu81NvsPNk0e3dPcFjIau8cBETrEGmPBf8jSq9OrvSNjA7rsOjoBM3e
- 1HnsYznIWWun87rcCkIrLgnJRcHj6Zvtplw7chQkUyu1OuhZfTfdaidXbbugn1zG/Q1l
- A3rTT+JKavD0e2Et5UtI8zqUH+7XsjDBuNtwgJZSAGc+gRmE5qpHzRh/K7blZNPIWnEN
- TNn5b/oY1QtV8AoihW9g5p1c1q/b1YXVKBGeV24toHOluuq9cbXhoucd6/oHbtRhsh1a
- cPH/YG23jMQSJDlcHA1dzTMSUi9uLhh0KSXcSw78hjOTlHvVCaMmqsenFXAdMgsEomsx kA== 
+ bh=un+pIbB0k+n2I0pQqrXMsfw75ppUr36BA4TZrzejS2w=;
+ b=beELki4S6+K2orITEwRmpo6gtKK7J4r7YqXvepa1zzRGy1EP1Xb9wbhml1poFInJ0mmH
+ 8Z7j4b/mgUfPTi4rl4PjfdqgYvmmZmZRa3QST1dV2EIJe/1/XXiXiWOWLqxp1384OWu8
+ ylTx230flkqVcABSHXbzEB2yDcaZR8T94Qw5OmSCM6Lrb7Nm8B/QiNIo1jZfN3r+euP6
+ aGDTJF7EX8XXh43hXJ7gCXYKw3HuAR4r5Ocqfw1I0dJFdvvDLfXJm+GqPD+JS9ZmdpF0
+ KDak4TerY2mtthWmmQjA5E+EJcryfXFmChQy8wKBuBkdb+TcJSzKmQP9aTZkCGywiDR4 fQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeakr8k5-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xagee809k-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:21:19 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 435BLI8i005845;
-	Fri, 5 Apr 2024 11:21:18 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeakr8k0-1
+	Fri, 05 Apr 2024 11:30:04 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 435BU4Vd009101;
+	Fri, 5 Apr 2024 11:30:04 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xagee809b-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:21:18 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4359nPSP003711;
-	Fri, 5 Apr 2024 11:21:17 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x9epyj6ab-1
+	Fri, 05 Apr 2024 11:30:04 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4359wUnR022293;
+	Fri, 5 Apr 2024 11:30:02 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x9eq0j4d6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 11:21:17 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 435BLDcE45416818
+	Fri, 05 Apr 2024 11:30:02 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 435BTuqj46268672
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Apr 2024 11:21:15 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B0A1020043;
-	Fri,  5 Apr 2024 11:21:13 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A19982004D;
-	Fri,  5 Apr 2024 11:21:12 +0000 (GMT)
+	Fri, 5 Apr 2024 11:29:59 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D9F362004B;
+	Fri,  5 Apr 2024 11:29:56 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D47C32004F;
+	Fri,  5 Apr 2024 11:29:55 +0000 (GMT)
 Received: from [9.171.37.225] (unknown [9.171.37.225])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Apr 2024 11:21:12 +0000 (GMT)
-Message-ID: <2f6ca1375ac2ffdd2ac368e1d5c5221f6fbd427c.camel@linux.ibm.com>
-Subject: Re: [PATCH net-next 0/1] XYZ: Handle HAS_IOPORT dependencies
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  5 Apr 2024 11:29:55 +0000 (GMT)
+Message-ID: <1e31497c3d655c237c106c97e8eaf6a72bcb562f.camel@linux.ibm.com>
+Subject: Re: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
 From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Michael Grzeschik <m.grzeschik@pengutronix.de>,
-        Marc Kleine-Budde
-	 <mkl@pengutronix.de>,
-        Vincent Mailhol <mailhol.vincent@wanadoo.fr>, netdev@vger.kernel.org,
-        linux-can@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-hams@vger.kernel.org, Arnd Bergmann
-	 <arnd@kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>, linux-kernel@vger.kernel.org
-Date: Fri, 05 Apr 2024 13:21:12 +0200
-In-Reply-To: <20240405111831.3881080-1-schnelle@linux.ibm.com>
-References: <20240405111831.3881080-1-schnelle@linux.ibm.com>
+To: Gerd Bayer <gbayer@linux.ibm.com>, Christoph Hellwig <hch@lst.de>,
+        Paolo
+	Abeni <pabeni@redhat.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Heiko Carstens <hca@linux.ibm.com>, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        Alexandra Winter
+ <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Vasily
+ Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>
+Date: Fri, 05 Apr 2024 13:29:55 +0200
+In-Reply-To: <50b6811dbb53b19385260f6b0dffa1534f8e341e.camel@linux.ibm.com>
+References: <20240328154144.272275-1-gbayer@linux.ibm.com>
+	 <20240328154144.272275-2-gbayer@linux.ibm.com>
+	 <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com>
+	 <cb7b036b4d3db02ab70d17ee83e6bc4f2df03171.camel@linux.ibm.com>
+	 <20240405064919.GA3788@lst.de>
+	 <50b6811dbb53b19385260f6b0dffa1534f8e341e.camel@linux.ibm.com>
 Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
  keydata=mQINBGHm3M8BEAC+MIQkfoPIAKdjjk84OSQ8erd2OICj98+GdhMQpIjHXn/RJdCZLa58k/ay5x0xIHkWzx1JJOm4Lki7WEzRbYDexQEJP0xUia0U+4Yg7PJL4Dg/W4Ho28dRBROoJjgJSLSHwc3/1pjpNlSaX/qg3ZM8+/EiSGc7uEPklLYu3gRGxcWV/944HdUyLcnjrZwCn2+gg9ncVJjsimS0ro/2wU2RPE4ju6NMBn5Go26sAj1owdYQQv9t0d71CmZS9Bh+2+cLjC7HvyTHKFxVGOznUL+j1a45VrVSXQ+nhTVjvgvXR84z10bOvLiwxJZ/00pwNi7uCdSYnZFLQ4S/JGMs4lhOiCGJhJ/9FR7JVw/1t1G9aUlqVp23AXwzbcoV2fxyE/CsVpHcyOWGDahGLcH7QeitN6cjltf9ymw2spBzpRnfFn80nVxgSYVG1dw75ksBAuQ/3e+oTQk4GAa2ShoNVsvR9GYn7rnsDN5pVILDhdPO3J2PGIXa5ipQnvwb3EHvPXyzakYtK50fBUPKk3XnkRwRYEbbPEB7YT+ccF/HioCryqDPWUivXF8qf6Jw5T1mhwukUV1i+QyJzJxGPh19/N2/GK7/yS5wrt0Lwxzevc5g+jX8RyjzywOZGHTVu9KIQiG8Pqx33UxZvykjaqTMjo7kaAdGEkrHZdVHqoPZwhCsgQARAQABtChOaWtsYXMgU2NobmVsbGUgPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+iQJXBBMBCABBAhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAhkBFiEEnbAAstJ1IDCl9y3cr+Q/FejCYJAFAmWVooIFCQWP+TMACgkQr+Q/FejCYJCmLg/+OgZD6wTjooE77/ZHmW6Egb5nUH6DU+2nMHMHUupkE3dKuLcuzI4aEf/6wGG2xF/LigMRrbb1iKRVk/VG/swyLh/OBOTh8cJnhdmURnj3jhaef
 	zslA1wTHcxeH4wMGJWVRAhOfDUpMMYV2J5XoroiA1+acSuppelmKAK5voVn9/fNtrVr6mgBXT5RUnmW60UUq5z6a1zTMOe8lofwHLVvyG9zMgv6Z9IQJc/oVnjR9PWYDUX4jqFL3yO6DDt5iIQCN8WKaodlNP61lFKAYujV8JY4Ln+IbMIV2h34cGpIJ7f76OYt2XR4RANbOd41+qvlYgpYSvIBDml/fT2vWEjmncm7zzpVyPtCZlijV3npsTVerGbh0Ts/xC6ERQrB+rkUqN/fx+dGnTT9I7FLUQFBhK2pIuD+U1K+A+EgwUiTyiGtyRMqz12RdWzerRmWFo5Mmi8N1jhZRTs0yAUn3MSCdRHP1Nu3SMk/0oE+pVeni3ysdJ69SlkCAZoaf1TMRdSlF71oT/fNgSnd90wkCHUK9pUJGRTUxgV9NjafZy7sx1Gz11s4QzJE6JBelClBUiF6QD4a+MzFh9TkUcpG0cPNsFfEGyxtGzuoeE86sL1tk3yO6ThJSLZyqFFLrZBIJvYK2UiD+6E7VWRW9y1OmPyyFBPBosOvmrkLlDtAtyfYInO0KU5pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQGlibS5jb20+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJB7oxAAksHYU+myhSZD0YSuYZl3oLDUEFP3fm9m6N9zgtiOg/GGI0jHc+Tt8qiQaLEtVeP/waWKgQnje/emHJOEDZTb0AdeXZk+T5/ydrKRLmYC6rPge3ue1yQUCiA+T72O3WfjZILI2yOstNwd1f0epQ32YaAvM+QbKDloJSmKhGWZlvdVUDXWkS6/maUtUwZpddFY8InXBxsYCbJsqiKF3kPVD515/6keIZmZh1cTIFQ+Kc+UZaz0MxkhiCyWC4
@@ -100,60 +109,116 @@ Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
 	dpHDwEBB0CdY+CSLBT98n1BaxlG+VeVzL3fQUYZDqybI14E6IH+JokCrQQYAQgAIBYhBJ2wALLSdSAwpfct3K/kPxXowmCQBQJh5t9wAhsCAIEJEK/kPxXowmCQdiAEGRYIAB0WIQSiikNOrnCUNbxSj4j7H22hwInkVgUCYebfcAAKCRD7H22hwInkVtg4AP0cl7yQX1JjOa92zkytZc7rwsjmSzvYExyRV0ilozmUNwEAifrmLVNjn+fST7LqkjWpSdFN3waHM9rw1d88SE0z1QqgCQ//YJOcAVYrR5KruzYjfh/FHiimFfvoOcanPS22uRhteBEALvV7LeCPjU5zi8/TKd8KZ9FmvYCaUf4IWzKIe51szZgnWPXdxF7Eyz5gVdM7ZaS35Dk9CCH3gtVU7iUorN95+pJ5elwUn6DAMdgFWswCBWuOm9zwq6Dj4KHTE4b4iWDenTNECqT+qwiS1bAHNbljXtoM68Uo1s3WDZPYcjqPlsoSjkpa7kz1z0NygE0zT3vHq8r7aFs+kq2sPVveTGhKhqZ82l7rSZpxssutpEdhChKbshD/44VaRLyXGhtQaOpWpFPdELAsJIB9BG39GrgP9K8TXG/5dXDzmC2Ku0ftyLa4ronM1LXG515bxQUPKFxaBYQonpdDWQVBu9bzQDmT8itP44hJWGDurDaPrYh5GYuetzIj8zgDxnh/wfwCpIepUxdZCV2NGYQiMjxuXEf/u7a2164U45rSsOCeKAG97f1GeQME3RsHV+d8lDOdjU+AfiWXqIhP32DVa5xElE3xQAd7+mUoAjYhP9OdM9e8j/UO6e4TmBMLYIMJh+joXan5eePJDYdY/NuRTqPjlZnOlA6JzbWOstXk/3GwFVOAO6YxNJl0m+EzGSOAYmIA3HuohrwPcVGi4CSbZF829CAMQQl0cXGjfI65pZFM8xcaB+lMgykEHrZ2uf6Y+Kkgdo24MwRh5t+CFgkrBgEEAdpHDwEBB0
 	AF23/zeAYKTtphGMg29j9mNBKDoRQS9I3Zih5SNpJ3YokCNgQYAQgAIBYhBJ2wALLSdSAwpfct3K/kPxXowmCQBQJh5t+CAhsgAAoJEK/kPxXowmCQV4UP/3KpWKD6EUIO8DGnohGUpZkD0qHSWVXMu6RuCukZeAMDaWdVkMW6SSFswUT1xGoGc10hxPFiR1Sv448S1DgIz1sRgZKDcvFFlPhJH8PAJArv2gaaBBhUj3IN8XH58BJ/q9we8n/lJLDCs++0QeQJEoOG0O5IiP8wGHLPSWa9jXiej5SBMbTx+wQmQZc6NQdv7O9gB3j86IRv3Ly2tHuOQ3WEAUQZvy1dzQj+5WHVOU9F99P6OfkzU8QW0izPyB3uVfxJkNB+K78+Klj1L1HONCfBVGz8vly3U4bXtWm0JuIBty7x9a0TPrSGpghs+rPRw8miHgkEB6pWiJzDek6jQLPMyEtUDs7/vgQEPBlDwVHxPvLtqzyjn0v+9T9DEFQo3i2zWfpE9AI7CTf3qJeqHFATtVzNQnA8j2X94R8R3r9oxzSW/z17zuDV2XjmZTUJlOuw8e99FOop2CFUn49OcfA7qm8o2vaatPy4aYahsaptmTuMZ6InwZp/LI1GX7egQyExtte7y/X0HAbME5Wa6UpYgxt689xWFlh+VAOadZ6c7UDDu8KZis+3z6PAXYOJK5naEHpYbLdyBZEvtXWVoYVCA69h1X6289XUAjbm1h7OS6qz9m7+8kjpoakIFUt75M2KKCJ9a6yaOGjiLj5r1vQzNgV16lOPsb1Ywf8p2/ac
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MMRmpj8D8NKdYCsPaE6yic9FIbuFISZ1
-X-Proofpoint-GUID: P4v1SDgRl41l2tizrSWHrwjYBtTfzqfe
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Gub5CefKnyHIxJh1_icYXSvFa_MCnoOP
+X-Proofpoint-GUID: Ahtqg-ur4oqVg2Sw_uQrdbZEK9ALEMvB
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-04-05_10,2024-04-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
- mlxscore=0 impostorscore=0 phishscore=0 clxscore=1015 adultscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxlogscore=999
+ impostorscore=0 spamscore=0 bulkscore=0 malwarescore=0 phishscore=0
+ adultscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
  lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404050081
+ engine=8.12.0-2404010000 definitions=main-2404050082
 
-On Fri, 2024-04-05 at 13:18 +0200, Niklas Schnelle wrote:
-> Hi networking maintainers,
+On Fri, 2024-04-05 at 12:42 +0200, Gerd Bayer wrote:
+> On Fri, 2024-04-05 at 08:49 +0200, Christoph Hellwig wrote:
+> > On Thu, Apr 04, 2024 at 01:10:20PM +0200, Gerd Bayer wrote:
+> > > > Why can't you use get_free_pages() (or similar) here? (possibly
+> > > > rounding up to the relevant page_aligned size).=20
+> > >=20
+> > > Thanks Paolo for your suggestion. However, I wanted to stay as
+> > > close to the implementation pre [1] - that used to use __GFP_COMP,
+> > > too. I'd rather avoid to change interfaces from "cpu_addr" to
+> > > "struct page*" at this point. In the long run, I'd like to drop the
+> > > requirement for
+> >=20
+> > The right interface actually is to simply use folio_alloc, which adds
+> > __GFP_COMP and is a fully supported and understood interface. You can
+> > just convert the folio to a kernel virtual address using
+> > folio_address() right after allocating it.
 >=20
-> This is a follow up in my ongoing effort of making inb()/outb() and
-> similar I/O port accessors compile-time optional. Previously I sent this
-> as a treewide series titled "treewide: Remove I/O port accessors for
-> HAS_IOPORT=3Dn" with the latest being its 5th version[0]. With a signific=
-ant
-> subset of patches merged I've changed over to per-subsystem series. These
-> series are stand alone and should be merged via the relevant tree such
-> that with all subsystems complete we can follow this up with the final
-> patch that will make the I/O port accessors compile-time optional.
+> Thanks for pointing me to folios.
+> After a good night's sleep, I figured that I was thinking too
+> complicated when I dismissed Paolo's suggestion.
 >=20
-> The current state of the full series with changes to the remaining subsys=
-tems
-> and the aforementioned final patch can be found for your convenience on my
-> git.kernel.org tree in the has_ioport branch[1]. As for compile-time vs r=
-untime
-> see Linus' reply to my first attempt[2].
+> > (get_free_pages also retunrs a kernel virtual address, just awkwardly
+> > as an unsigned long. In doubt don't use this interface for new
+> > code..)
+> >=20
+> > > compound pages entirely, since that *appears* to exist primarily
+> > > for a
+> > > simplified handling of the interface to splice_to_pipe() in
+> > > net/smc/smc_rx.c. And of course there might be performance
+> > > implications...
+> >=20
+> > While compounds pages might sound awkward, they are the new normal in
+> > form of folios.=C2=A0 So just use folios.
 >=20
-> Thanks,
-> Niklas
+> With the following fixup, my tests were just as successful.
+> I'll send that out as a v2.
 >=20
-> [0] https://lore.kernel.org/all/20230522105049.1467313-1-schnelle@linux.i=
-bm.com/
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git/log/?h=
-=3Dhas_ioport
-> [2] https://lore.kernel.org/lkml/CAHk-=3Dwg80je=3DK7madF4e7WrRNp37e3qh6y1=
-0Svhdc7O8SZ_-8g@mail.gmail.com/
+> Thank you, Christoph and Paolo!
 >=20
-> Niklas Schnelle (1):
->   net: handle HAS_IOPORT dependencies
 >=20
+>=20
+> diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+> index 25911b887e5e..affb05521e14 100644
+> --- a/drivers/s390/net/ism_drv.c
+> +++ b/drivers/s390/net/ism_drv.c
+> @@ -14,8 +14,8 @@
+>  #include <linux/err.h>
+>  #include <linux/ctype.h>
+>  #include <linux/processor.h>
+> -#include <linux/dma-direction.h>
+> -#include <linux/gfp_types.h>
+> +#include <linux/dma-mapping.h>
+> +#include <linux/mm.h>
+> =20
+>  #include "ism.h"
+> =20
+> @@ -296,7 +296,7 @@ static void ism_free_dmb(struct ism_dev *ism,
+> struct ism_dmb *dmb)
+>  	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+>  	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
+>  		       DMA_FROM_DEVICE);
+> -	kfree(dmb->cpu_addr);
+> +	folio_put(virt_to_folio(dmb->cpu_addr));
+>  }
+> =20
+>  static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+> @@ -319,8 +319,11 @@ static int ism_alloc_dmb(struct ism_dev *ism,
+> struct ism_dmb *dmb)
+>  	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
+>  		return -EINVAL;
+> =20
+> -	dmb->cpu_addr =3D kmalloc(dmb->dmb_len, GFP_KERNEL |
+> __GFP_NOWARN |
+> -				__GFP_COMP | __GFP_NOMEMALLOC |
+> __GFP_NORETRY);
+> +	dmb->cpu_addr =3D
+> +		folio_address(folio_alloc(GFP_KERNEL | __GFP_NOWARN |
+> +					  __GFP_NOMEMALLOC |
 
-Obviously the subject of the cover letter should start with "net:" ;-(
+Personally I'd go with a temporary variable here if only to make the
+lines a bit shorter and easier to read. I also think above is not
+correct for allocation failure since folio_address() accesses folio-
+>page without first checking for NULL. So I'm guessing the NULL check
+needs to move and be done on the temporary struct folio*.
+
+> __GFP_NORETRY,
+> +					  get_order(dmb->dmb_len)));
+> +
+>  	if (!dmb->cpu_addr) {
+>  		rc =3D -ENOMEM;
+>  		goto out_bit;
+
 
