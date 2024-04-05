@@ -1,186 +1,256 @@
-Return-Path: <netdev+bounces-85262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE07899EC3
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:53:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB422899EDF
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8BF1B21121
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:53:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42201282BB6
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8923E16D9C7;
-	Fri,  5 Apr 2024 13:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CE916D9BB;
+	Fri,  5 Apr 2024 13:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aYTVf2I+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FpvTrxqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52FD72E401
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 13:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8227016D4D2
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 13:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712325203; cv=none; b=upAo3en1nyNDZTkvKcOAJ3M97BHyL01ga8Y6r9Rp1Z+hG9OdfEO6cMenyUeGdmaadBDfFCrWt+veOIjAVRgQonvq8PPb4rmUnR5Vl4Nb50aqnMSoFjnjL+iv4VgWSeR55kef2fT0as8XFq8pF1pMyfhtcbbQ0uZsAK0m0wHWS6g=
+	t=1712325594; cv=none; b=tipfGuZyxJhamGutM1kJQTpaTq4ogyjO5eZlKTa8HZlksXY3IhYoK+wMQhYno9/KibX/M9qZYfby7QyXg0HRqrKIDUBvoBLQ3e49M2/80UULvKkjNKxK95IIibep6xLoxa5MRUkmkLR717qw0He+YFQjJhkkpnVVaYfMlD0i9W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712325203; c=relaxed/simple;
-	bh=0BksyQPOyLKGmYa0FEtepwJD1JDHx0EJaEKX0tpkO58=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ILNjJ+VlLB8IBKPqXxdy3PQKMuWqRYxyrztFyZcGjwLgApzUWdHFVCGTcRcr7E3T/jqTLSK3hHNe+nG/R0c6Z/o1l8DNEniFlda13Yu/vwfRYoxhCkL0f97aIrPyS4eHJFJ70sQqYGpIgqK8z6RjL+lIo4x4UZAX1KC4wLQqvuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aYTVf2I+; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dcc71031680so2202611276.2
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 06:53:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712325200; x=1712930000; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lAHdE5NFk++ufix28SzhuwWBAI0pKipkj98VJiYe3GU=;
-        b=aYTVf2I+TyRnSSdH8+I/CVMYO1BJa7hB9/v01eKTU4OrNL9qd16Jg0wQfeflZu4I00
-         bJzKgnoYGjlF2wFjjjOIkrUvFIjP/gbka8Ca/nK2NNuY96Fo8i0pVlzBoXDg1TkGWJgh
-         e74bm5LQIwxwotdUhDKtFybHE4VYNE/OXkfP4r8mdYC/WVnYYO2zvp0is9rK/LvGlb1u
-         rNp+xyY2kEDgPEpFHmoCvWu4DRKLOea8E3f1pcxL98WGt6zjQX+gyOrqvrhhCb7mBZhQ
-         NliJCHdvq8o1zOgd+ypWl8ttBwBOiemAKjdJsQE5P4duBu286hd2IUmiV+Z3y72bJNxi
-         hYIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712325200; x=1712930000;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lAHdE5NFk++ufix28SzhuwWBAI0pKipkj98VJiYe3GU=;
-        b=vFBaq5X7zCM5u74PwyQjjaPxBVzMsXJXS/nOCM+PYpyp9wwPM00qqYZkpDK2Uc54BJ
-         ht2ejemNNwN//izbQE68Cyb0Ktz5NclPlPqy+wWh30ZS+RQppp2ObVpHo9NjsYGzvmfJ
-         k1KB1gYcKvBkyOtuCnduFpZnWAFZ0fbQ+5qGJ+r9GoTmh7d0cXeoaKlnK/5kWZ/UO7Cj
-         lkvnVSd98wSWS10PNn7jPnBEgOk2QQS8ovrbm42Ud/W8pJ9xMLC+nOPGK0CrNp+n2Pyu
-         Cp25bEunLikcYQ7lDPfYmdkplht6bWvpIyxWdfioGi3LdTg63+CDiWTQJ5dXKDgu9g9C
-         TAxA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8t7IsC1yW8+0fbpyzqsDybIDnaf5yaJFSLESvwXluN57hm1eyVDJ6T9Zb8thh0OgoPU84KRn1DCVulWZ+I78u9z1PjJvf
-X-Gm-Message-State: AOJu0YwjyUZehQGuxKzCoNfutVWzkRCuow2x1yVsyITckhZjXRUm8ikJ
-	RWhq3FQSlLF93ONPrWaT8JXQI6890/QAFhKclMiLvLDN/N5pvCxUik27LgaaDvYLC98lTccF/gU
-	hkAMZTQCpPWjAxBaDsstwvzHl5UB4zQ0IrAX5
-X-Google-Smtp-Source: AGHT+IH/KRHN+9M5N1gYIB2bCPgMB25x0KPnvuKiHgvgSCGh43Ngn+0mkz51p67LhizDAcBL1UgazcYTNlxqGDPZP2o=
-X-Received: by 2002:a25:f454:0:b0:dcd:b624:3e55 with SMTP id
- p20-20020a25f454000000b00dcdb6243e55mr1115241ybe.54.1712325200128; Fri, 05
- Apr 2024 06:53:20 -0700 (PDT)
+	s=arc-20240116; t=1712325594; c=relaxed/simple;
+	bh=F85+f1rlvH5QrZHeUd9aBhK9Uht+YIMvPImsvnkMVnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Byh1y7KVCcHAxPJs79t5i3H4ZMRym5m0QEv0GHaVeO+iJp/SZE2mw+Tq8d1xhxagGPBlBvQiiI68+4yah9UdOFcwmZrPh2wwZrDPmQvT2yyh0RP5jkWuv9xRS+0B16+b2awYHm1zX/UffX+7raI36Q+cUo+MebaKm/6FaMNGbx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FpvTrxqY; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712325592; x=1743861592;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=F85+f1rlvH5QrZHeUd9aBhK9Uht+YIMvPImsvnkMVnE=;
+  b=FpvTrxqYDU7KcGvgzf5Z6LzptjauurHUODu/oTRsZjExx3KsdNxrhLMZ
+   4nj73TOnjLvvf2UCCjLZdATQeLSuVXRAksCLNP9/tGjCvSmx5wRAmQbsQ
+   j55oYC/XMbUS2JT3y0zuiHfwFaarFZqZrnrj/S/dpyEpDJoyv8q4oNtJO
+   r5YX3wD6udrR5lOD+px2epUVaVYz9mLJmPjgaLhF1q+dQL/t01LuFRb7Z
+   xD+zrVbZZ/FseplVgNQjy0kECsP8++/Muu8sma3r/O144giCU/QLfpuLZ
+   z8eGtL7BQy7a7A2lkr1BcxcEg/7A/2tphPeOnXfdqtIU6dIlImRaZXc7E
+   w==;
+X-CSE-ConnectionGUID: 84dcbuujQzyQDFJhylUoTQ==
+X-CSE-MsgGUID: upwlCxInRXyK967WoGpPAg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="10625019"
+X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
+   d="scan'208";a="10625019"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 06:59:51 -0700
+X-CSE-ConnectionGUID: BwDrBxxWQ82yQRx8HnmAug==
+X-CSE-MsgGUID: VtAYIJv0QNmKeaVe/X/lwA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
+   d="scan'208";a="19194085"
+Received: from lkp-server01.sh.intel.com (HELO e61807b1d151) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 05 Apr 2024 06:59:48 -0700
+Received: from kbuild by e61807b1d151 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rsk6c-0002LC-0U;
+	Fri, 05 Apr 2024 13:59:46 +0000
+Date: Fri, 5 Apr 2024 21:58:56 +0800
+From: kernel test robot <lkp@intel.com>
+To: Karol Kolacinski <karol.kolacinski@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: Re: [PATCH v6 iwl-next 05/12] ice: Move CGU block
+Message-ID: <202404052136.o9Cbreqn-lkp@intel.com>
+References: <20240405100648.144756-19-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404165404.3805498-1-surenb@google.com> <Zg7dmp5VJkm1nLRM@casper.infradead.org>
- <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
- <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
- <Zg8qstJNfK07siNn@casper.infradead.org> <jb25mtkveqf63bv74jhynf6ncxmums5s37esveqsv52yurh4z7@5q55ttv34bia>
- <20240404154150.c25ba3a0b98023c8c1eff3a4@linux-foundation.org>
- <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3> <Zg_yHGKpw4HJHdpb@casper.infradead.org>
-In-Reply-To: <Zg_yHGKpw4HJHdpb@casper.infradead.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Fri, 5 Apr 2024 06:53:09 -0700
-Message-ID: <CAJuCfpGMSHv7drSu7Veo5CVz3d_Upt8S6Rdx3isi7orct9-uNQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
- the call site
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	joro@8bytes.org, will@kernel.org, trond.myklebust@hammerspace.com, 
-	anna@kernel.org, arnd@arndb.de, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, jikos@kernel.org, benjamin.tissoires@redhat.com, 
-	tytso@mit.edu, jack@suse.com, dennis@kernel.org, tj@kernel.org, cl@linux.com, 
-	jakub@cloudflare.com, penberg@kernel.org, rientjes@google.com, 
-	iamjoonsoo.kim@lge.com, vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240405100648.144756-19-karol.kolacinski@intel.com>
 
-On Fri, Apr 5, 2024 at 5:44=E2=80=AFAM Matthew Wilcox <willy@infradead.org>=
- wrote:
->
-> On Thu, Apr 04, 2024 at 07:00:51PM -0400, Kent Overstreet wrote:
-> > On Thu, Apr 04, 2024 at 03:41:50PM -0700, Andrew Morton wrote:
-> > > On Thu, 4 Apr 2024 18:38:39 -0400 Kent Overstreet <kent.overstreet@li=
-nux.dev> wrote:
-> > >
-> > > > On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
-> > > > > On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrot=
-e:
-> > > > > > Ironically, checkpatch generates warnings for these type casts:
-> > > > > >
-> > > > > > WARNING: unnecessary cast may hide bugs, see
-> > > > > > http://c-faq.com/malloc/mallocnocast.html
-> > > > > > #425: FILE: include/linux/dma-fence-chain.h:90:
-> > > > > > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_ch=
-ain),
-> > > > > > GFP_KERNEL))
-> > > > > >
-> > > > > > I guess I can safely ignore them in this case (since we cast to=
- the
-> > > > > > expected type)?
-> > > > >
-> > > > > I find ignoring checkpatch to be a solid move 99% of the time.
-> > > > >
-> > > > > I really don't like the codetags.  This is so much churn, and it =
-could
-> > > > > all be avoided by just passing in _RET_IP_ or _THIS_IP_ depending=
- on
-> > > > > whether we wanted to profile this function or its caller.  vmallo=
-c
-> > > > > has done it this way since 2008 (OK, using __builtin_return_addre=
-ss())
-> > > > > and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
-> > > >
-> > > > Except you can't. We've been over this; using that approach for tra=
-cing
-> > > > is one thing, using it for actual accounting isn't workable.
-> > >
-> > > I missed that.  There have been many emails.  Please remind us of the
-> > > reasoning here.
-> >
-> > I think it's on the other people claiming 'oh this would be so easy if
-> > you just do it this other way' to put up some code - or at least more
-> > than hot takes.
->
-> Well, /proc/vmallocinfo exists, and has existed since 2008, so this is
-> slightly more than a "hot take".
->
-> > But, since you asked - one of the main goals of this patchset was to be
-> > fast enough to run in production, and if you do it by return address
-> > then you've added at minimum a hash table lookup to every allocate and
-> > free; if you do that, running it in production is completely out of the
-> > question.
->
-> And yet vmalloc doesn't do that.
->
-> > Besides that - the issues with annotating and tracking the correct
-> > callsite really don't go away, they just shift around a bit. It's true
-> > that the return address approach would be easier initially, but that's
-> > not all we're concerned with; we're concerned with making sure
-> > allocations get accounted to the _correct_ callsite so that we're givin=
-g
-> > numbers that you can trust, and by making things less explicit you make
-> > that harder.
->
-> I'm not convinced that _THIS_IP_ is less precise than a codetag.  They
-> do essentially the same thing, except that codetags embed the source
-> location in the file while _THIS_IP_ requires a tool like faddr2line
-> to decode kernel_clone+0xc0/0x430 into a file + line number.
->
-> > This is all stuff that I've explained before; let's please dial back on
-> > the whining - or I'll just bookmark this for next time...
->
-> Please stop mischaracterising serious thoughtful criticism as whining.
-> I don't understand what value codetags bring over using _THIS_IP_ and
-> _RET_IP_ and you need to explain that.
+Hi Karol,
 
-The conceptual difference between codetag and _THIS_IP_/_RET_IP_ is
-that codetag injects counters at the call site, so you don't need to
-spend time finding the appropriate counter to operate on during
-allocation.
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on 0a3074e5b4b523fb60f4ae9fb32bb180ea1fb6ef]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Karol-Kolacinski/ice-Introduce-ice_ptp_hw-struct/20240405-180941
+base:   0a3074e5b4b523fb60f4ae9fb32bb180ea1fb6ef
+patch link:    https://lore.kernel.org/r/20240405100648.144756-19-karol.kolacinski%40intel.com
+patch subject: [PATCH v6 iwl-next 05/12] ice: Move CGU block
+config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20240405/202404052136.o9Cbreqn-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240405/202404052136.o9Cbreqn-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404052136.o9Cbreqn-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c: In function 'ice_read_cgu_reg_e82x':
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:244:25: warning: initialization of 'unsigned int' from 'u32 *' {aka 'unsigned int *'} makes integer from pointer without a cast [-Wint-conversion]
+     244 |                 .data = val
+         |                         ^~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:244:25: note: (near initialization for 'cgu_msg.data')
+   In file included from <command-line>:
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c: In function 'ice_write_40b_phy_reg_e82x':
+   include/uapi/linux/bits.h:9:19: warning: right shift count is negative [-Wshift-count-negative]
+       9 |          (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+         |                   ^~
+   include/linux/compiler_types.h:440:23: note: in definition of macro '__compiletime_assert'
+     440 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:460:9: note: in expansion of macro '_compiletime_assert'
+     460 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/bitfield.h:65:17: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      65 |                 BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask),          \
+         |                 ^~~~~~~~~~~~~~~~
+   include/linux/bitfield.h:155:17: note: in expansion of macro '__BF_FIELD_CHECK'
+     155 |                 __BF_FIELD_CHECK(_mask, _reg, 0U, "FIELD_GET: ");       \
+         |                 ^~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:908:16: note: in expansion of macro 'FIELD_GET'
+     908 |         high = FIELD_GET(P_REG_40B_HIGH_M, val);
+         |                ^~~~~~~~~
+   include/linux/bits.h:35:38: note: in expansion of macro '__GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |                                      ^~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:41: note: in expansion of macro 'GENMASK'
+     381 | #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+         |                                         ^~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:908:26: note: in expansion of macro 'P_REG_40B_HIGH_M'
+     908 |         high = FIELD_GET(P_REG_40B_HIGH_M, val);
+         |                          ^~~~~~~~~~~~~~~~
+   include/uapi/linux/bits.h:9:19: warning: right shift count is negative [-Wshift-count-negative]
+       9 |          (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+         |                   ^~
+   include/linux/compiler_types.h:440:23: note: in definition of macro '__compiletime_assert'
+     440 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:460:9: note: in expansion of macro '_compiletime_assert'
+     460 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/bitfield.h:67:17: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      67 |                 BUILD_BUG_ON_MSG((_mask) == 0, _pfx "mask is zero");    \
+         |                 ^~~~~~~~~~~~~~~~
+   include/linux/bitfield.h:155:17: note: in expansion of macro '__BF_FIELD_CHECK'
+     155 |                 __BF_FIELD_CHECK(_mask, _reg, 0U, "FIELD_GET: ");       \
+         |                 ^~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:908:16: note: in expansion of macro 'FIELD_GET'
+     908 |         high = FIELD_GET(P_REG_40B_HIGH_M, val);
+         |                ^~~~~~~~~
+   include/linux/bits.h:35:38: note: in expansion of macro '__GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |                                      ^~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:41: note: in expansion of macro 'GENMASK'
+     381 | #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+         |                                         ^~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:908:26: note: in expansion of macro 'P_REG_40B_HIGH_M'
+     908 |         high = FIELD_GET(P_REG_40B_HIGH_M, val);
+         |                          ^~~~~~~~~~~~~~~~
+   include/uapi/linux/bits.h:9:19: warning: right shift count is negative [-Wshift-count-negative]
+       9 |          (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+         |                   ^~
+   include/linux/compiler_types.h:440:23: note: in definition of macro '__compiletime_assert'
+     440 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:460:9: note: in expansion of macro '_compiletime_assert'
+     460 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/bitfield.h:68:17: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      68 |                 BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?           \
+         |                 ^~~~~~~~~~~~~~~~
+   include/linux/bitfield.h:155:17: note: in expansion of macro '__BF_FIELD_CHECK'
+     155 |                 __BF_FIELD_CHECK(_mask, _reg, 0U, "FIELD_GET: ");       \
+         |                 ^~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:908:16: note: in expansion of macro 'FIELD_GET'
+     908 |         high = FIELD_GET(P_REG_40B_HIGH_M, val);
+         |                ^~~~~~~~~
+   include/linux/bits.h:35:38: note: in expansion of macro '__GENMASK'
+      35 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+         |                                      ^~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:41: note: in expansion of macro 'GENMASK'
+     381 | #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+         |                                         ^~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.c:908:26: note: in expansion of macro 'P_REG_40B_HIGH_M'
+     908 |         high = FIELD_GET(P_REG_40B_HIGH_M, val);
+         |                          ^~~~~~~~~~~~~~~~
+   include/uapi/linux/bits.h:9:19: warning: right shift count is negative [-Wshift-count-negative]
+       9 |          (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+         |                   ^~
+   include/linux/compiler_types.h:440:23: note: in definition of macro '__compiletime_assert'
+     440 |                 if (!(condition))                                       \
+
+
+vim +244 drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+
+   228	
+   229	/**
+   230	 * ice_read_cgu_reg_e82x - Read a CGU register
+   231	 * @hw: pointer to the HW struct
+   232	 * @addr: Register address to read
+   233	 * @val: storage for register value read
+   234	 *
+   235	 * Read the contents of a register of the Clock Generation Unit. Only
+   236	 * applicable to E822 devices.
+   237	 */
+   238	static int ice_read_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 *val)
+   239	{
+   240		struct ice_sbq_msg_input cgu_msg = {
+   241			.opcode = ice_sbq_msg_rd,
+   242			.dest_dev = cgu,
+   243			.msg_addr_low = addr,
+ > 244			.data = val
+   245		};
+   246		int err;
+   247	
+   248		cgu_msg.opcode = ice_sbq_msg_rd;
+   249		cgu_msg.dest_dev = cgu;
+   250		cgu_msg.msg_addr_low = addr;
+   251		cgu_msg.msg_addr_high = 0x0;
+   252	
+   253		err = ice_sbq_rw_reg(hw, &cgu_msg);
+   254		if (err) {
+   255			ice_debug(hw, ICE_DBG_PTP, "Failed to read CGU register 0x%04x, err %d\n",
+   256				  addr, err);
+   257			return err;
+   258		}
+   259	
+   260		*val = cgu_msg.data;
+   261	
+   262		return 0;
+   263	}
+   264	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
