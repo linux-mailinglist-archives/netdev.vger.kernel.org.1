@@ -1,140 +1,199 @@
-Return-Path: <netdev+bounces-85308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB46889A1EC
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:53:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DD9989A212
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 18:07:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F01CB23F80
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:53:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABF3E1F23EEF
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 16:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1692C17165E;
-	Fri,  5 Apr 2024 15:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2354F17106A;
+	Fri,  5 Apr 2024 16:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1RscKEI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cMiRTSns"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8088171658;
-	Fri,  5 Apr 2024 15:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE57171066;
+	Fri,  5 Apr 2024 16:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712332356; cv=none; b=A1RsOGBuhM//FsAGDefhi2vGaHaqpzVR10bt+uNIH7bH7uJkfm7TiwdwCTmj+Vi2cpqa608gpzB3EJAXlfCT9Rd9jjQ7T5/L4C9rYVVKA5FWiBwPzm2Bd/9yOApvli4BedywLxxHWMGYdy/Y1WU+b3rDRQa6DNMSFf/eZwkWnbo=
+	t=1712333240; cv=none; b=VJWEHMj6WEeJ+nsD1HaLJhPpb2NRqqH5uXttrd0bD6TXxeVx8hmh348G63xJIvEN5PGiubyDeU5P2D3+Cw54EOQ5AN1L5bZkkZjG5Y/XIheMAqUDNgdle3XYGhoucL/b1Hn0D79AGP3/CGW2D+ALvEy2EsJ0OymR2Q8NnjDK0l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712332356; c=relaxed/simple;
-	bh=zpr4dQm3nm9LfkfCTtXpoXqHkpx3qH1bE57/AAn3+S8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fYqvCh/L1AMBH4c1LAM33u8gjPTXd9TnhmeaBf+YTibnacyWR0M9tPS/PQ9g1ZQbsFbDA+PiohCAqTQXTU6/0QT6Snz5RBK3s0G/HwP4Eo2fUG3PYo6bEBuOyJZtmi8qq3KMRdatSkRBnj0eHs+RiUAici1pV1q/7qcI3CYNRTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1RscKEI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF029C433C7;
-	Fri,  5 Apr 2024 15:52:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712332355;
-	bh=zpr4dQm3nm9LfkfCTtXpoXqHkpx3qH1bE57/AAn3+S8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=G1RscKEITOjXIsvfj1orjtQTTRAGG7pieQAli0pGaGr7uDlzXS5uXiHCyli8xYmlN
-	 mw/z0K3hCRBdQK2eQBZv3eytMQIaDXQDgJbApEL+dLuGfMqFi9bR4UqV6Lu0ETgmcD
-	 b8h7zhmTOuEuBYUGuhznNIRgGcBu1MR9bfQIZg2edV1tvAygX1b5wRwsrTqwELUdei
-	 uc5NzTXMRNecUKG1WnOuTqGidE7LYvup1wkXFvou0XimbtCYPblONTfo1L6mQ0mAM9
-	 FPI0YQTOiV9+rT4goySzZoYY5Q3OCy/vvt0pJLWKShkYXHI1kCLxt7v19nJ3/ZvgXj
-	 1iuywcnWrUFfg==
-Message-ID: <6f59551a-24df-4b7f-8ddf-beaa62a850f9@kernel.org>
-Date: Fri, 5 Apr 2024 17:52:25 +0200
+	s=arc-20240116; t=1712333240; c=relaxed/simple;
+	bh=5AXlut9OGYv3DSXu2yDWsFFCKzEKKIb9A8Q/EEtoh/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YETzB/zANq56STkiaZlz4FCt9uCQYnVubUuekziCDxw6jpTPg/CLDdqu9PohzyitRydRrGILs9on/yca3/TknHmsZb9lagPeTKYOK3RypevHXrSvCNZaEsIGswxfguNXKh9uZ1j9MQmRqdoDIQROhB03oc9k1j+Sdik0zBOhyWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cMiRTSns; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56dfb52d10cso2625050a12.2;
+        Fri, 05 Apr 2024 09:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712333237; x=1712938037; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SWxWCR4jW+IXngpqL70YJDP0T6vuTGV5ymV1PXN5QL0=;
+        b=cMiRTSnsHBrCufZ7PqWqY0r5YATSlyeoGvjUWLgT+qmCF9R//smFJG3I22+1blGplF
+         DgnOEpEtMF1kyrl3QKMSWPQbS6cfIu9Kr31OY10wCRLdf1CD7+zQCsnqasf7W//XjsHL
+         h1jTVaFn0qdhvt+c+v1a7ir18sCmok7kznxPEePmvnpKLm3vUv0IUYCGHBzWrDa9h8lR
+         zxPcMWkWga5vBoB3oT8/jTrkMBef1FsdFI5I1F7wnfimTYo0WUwRUup0cI6wstZIAcLm
+         oz0WXIyNVyBKUfx9gwzN6Fs0veNb+WNk098tYDFwvnZ6apQKV9tmhjxv+ELTQ8CaWjXq
+         BMTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712333237; x=1712938037;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SWxWCR4jW+IXngpqL70YJDP0T6vuTGV5ymV1PXN5QL0=;
+        b=w6xT/ppm3TqufyKfyc4xMXjpwSSoZfOd+R5WVhBxvXgqQX0FjkjVci57fYzkaNn0U5
+         SXYhktqZ5E/awW4GI7mgJB29RBN2R3iA9MNIf2Icyul0GplNP7hNwDEv35MAeLiYTozV
+         KBc/N52Z+bAB7ZkJzgUC4rwZskNn+TvBGSLEVBCyhaoDzm1OolQzTQDgj+K7HQzgpTli
+         K2idIrcBzBJ0WUVKqVCBttQK0MW5R1iP/80N3Wz9gdC8oGdh+zeERUF8Y/40nZsdVYNi
+         q8GBDkmzxO0/fZNJfIJ/hDfp9pRw8oCHZ3l/xPzBezro/RKSDtuUZFw+B3lFaAuykRSb
+         l+PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDsJSbIFAzivI9WHheLUgwNZ7A9Hd6LB8wVuE0plF/S7YNBU00SirhcKJtYcBzNJxu29VlSkL4Nkzy5b41FXxGLARy1Qi9QMBcQjd/
+X-Gm-Message-State: AOJu0YyLWzsN3EPphM04oFdyxZv5+qX9kEv1E/lE3XlN2ok62erXbbP7
+	21hxeuWtndJh+f8apAZxXdZpAAoghqaoOt0C6trOO3nG4yUKNKCB
+X-Google-Smtp-Source: AGHT+IF7dy/kq+AATCpv8CUEDkIB1LId8J+Lr4m6BkQtDRqyyk/K+83e4aN/TATArwjdHUCfM1GzUg==
+X-Received: by 2002:a17:906:a86:b0:a51:a4fc:4baf with SMTP id y6-20020a1709060a8600b00a51a4fc4bafmr1217253ejf.25.1712333236356;
+        Fri, 05 Apr 2024 09:07:16 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d700:2000::b2c])
+        by smtp.gmail.com with ESMTPSA id f8-20020a170906048800b00a4e4de1892fsm979376eja.58.2024.04.05.09.07.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Apr 2024 09:07:15 -0700 (PDT)
+Date: Fri, 5 Apr 2024 19:07:12 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v8 07/16] net: dsa: vsc73xx: Add vlan filtering
+Message-ID: <20240405160712.pfgt7lnutsqvxfob@skbuf>
+References: <20240403103734.3033398-1-paweldembicki@gmail.com>
+ <20240403103734.3033398-8-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/6] dts: qcom: sa8775p-ride: remove tx-sched-sp property
-To: Flavio Suligoi <f.suligoi@asem.it>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240405152800.638461-1-f.suligoi@asem.it>
- <20240405152800.638461-7-f.suligoi@asem.it>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
- QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
- gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
- /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
- iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
- VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
- 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
- xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
- eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
- AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
- MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
- Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
- ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
- vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
- oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
- lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
- t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
- uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
- 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
- 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240405152800.638461-7-f.suligoi@asem.it>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240403103734.3033398-8-paweldembicki@gmail.com>
 
-On 05/04/2024 17:28, Flavio Suligoi wrote:
-> The property "tx-sched-sp" no longer exists, as it was removed from the
-> file:
-> 
-> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> 
-> by the commit:
-> 
-> commit aed6864035b1 ("net: stmmac: platform: Delete a redundant condition
-> branch")
-> 
-> Signed-off-by: Flavio Suligoi <f.suligoi@asem.it>
+On Wed, Apr 03, 2024 at 12:37:23PM +0200, Pawel Dembicki wrote:
+> +static int
+> +vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
+> +			    bool vlan_filtering, struct netlink_ext_ack *extack)
+> +{
+> +	enum vsc73xx_port_vlan_conf port_vlan_conf = VSC73XX_VLAN_IGNORE;
+> +	u16 vid_pvid = 0, vid_untagged = 0;
+> +	struct vsc73xx_portinfo *portinfo;
+> +	struct vsc73xx *vsc = ds->priv;
+> +	bool set_untagged = false;
+> +	bool set_pvid = false;
+> +
+> +	portinfo = &vsc->portinfo[port];
+> +
+> +	/* The swap processed below is required because vsc73xx is using
+> +	 * tag_8021q. When vlan_filtering is disabled, tag_8021q uses
+> +	 * pvid/untagged vlans for port recognition. The values configured for
+> +	 * vlans and pvid/untagged states are stored in portinfo structure.
+> +	 * When vlan_filtering is enabled, we need to restore pvid/untagged from
+> +	 * portinfo structure. Analogic routine is processed when vlan_filtering
 
-Fixes in commit msg needed and patch prefix got mangled: missing arm64.
+Analogous
 
-Best regards,
-Krzysztof
+> +	 * is disabled, but values used for tag_8021q are restored.
+> +	 */
+> +	if (vlan_filtering) {
+> +		struct vsc73xx_vlan_summary summary;
+> +
+> +		/* Use VLAN_N_VID to count all vlans */
+> +		vsc73xx_bridge_vlan_summary(vsc, port, &summary, VLAN_N_VID);
+> +
+> +		port_vlan_conf = (summary.num_untagged > 1) ?
+> +				 VSC73XX_VLAN_FILTER_UNTAG_ALL :
+> +				 VSC73XX_VLAN_FILTER;
+> +
+> +		if (summary.num_untagged == 1) {
+> +			vid_untagged = vsc73xx_find_first_vlan_untagged(vsc,
+> +									port);
+> +			set_untagged = true;
+> +		}
 
+Is there really any functional difference between the above, vs this in
+port_vlan_add():
+
+	port_vlan_conf = VSC73XX_VLAN_FILTER;
+
+	if (summary.num_tagged == 0 && untagged)
+		port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
+	vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
+
+	if (port_vlan_conf == VSC73XX_VLAN_FILTER_UNTAG_ALL)
+		goto update_vlan_table;
+
+vs this in port_vlan_del():
+
+		enum vsc73xx_port_vlan_conf port_vlan_conf =
+							VSC73XX_VLAN_FILTER;
+
+		if (summary.num_tagged == 0)
+			port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
+		vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
+
+		if (summary.num_untagged <= 1) {
+			vid = vsc73xx_find_first_vlan_untagged(vsc, port);
+			vsc73xx_vlan_change_untagged_hw(vsc, port, vid,
+							summary.num_untagged);
+		}
+
+?
+
+If not, I have to agree with Florian that it's dizzying to follow the
+vsc73xx_set_vlan_conf() calls, all with slightly different input.
+Even worse now than before, I think.
+
+I see you've changed the storage variable names, so maybe you are open
+to some more refactoring, to make the code more maintainable.
+
+I would suggest calling a single vsc73xx_update_vlan_conf() from all
+places, which figures out what to do by itself, based on the current
+(updated) state. All ifs and buts are on the inside, not on the outside.
+
+Also, the operate_on_storage variable is not a great name now. Because
+you always operate on storage. It means "operate _just_ on storage", aka
+"don't commit to hardware".
+
+I wanted to avoid requesting you to make more changes to the
+implementation, but you started it, and now it's a confusing mix of
+concepts from old and new patch sets.
+
+I would like to also see the "operate_on_storage" logic rewritten and
+embedded into those functions which must update shared resources (port
+PVID, port untagged VID, etc).
+
+Basically, in the end I would like the driver to be written in the style
+of every other similar function: ocelot_port_manage_port_tag(),
+sja1105_commit_pvid(), mv88e6xxx_commit_pvid() etc. No arguments, except
+the port on which to run. Figure out what to do from the current state,
+and make sure it is called from all places that change that state.
+It also serves very well as self-documenting code, because "how register
+X should be set" is centralized into a single function.
+
+Sorry for making this request so late in the development process. I hope
+it's not discouraging.
 
