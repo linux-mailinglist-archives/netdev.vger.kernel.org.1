@@ -1,94 +1,146 @@
-Return-Path: <netdev+bounces-85226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11F0D899D34
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:40:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95575899D3A
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:41:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB9BA1F2272A
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:40:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FDBE1F232C2
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95AFF13C681;
-	Fri,  5 Apr 2024 12:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC7A1649DB;
+	Fri,  5 Apr 2024 12:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NYttEdZ3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFHM2C2G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA22937143
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 12:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C270328DB;
+	Fri,  5 Apr 2024 12:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712320829; cv=none; b=cMEabBsQQ4r2WWaJDByo//uhu8+9tHYwbt7FdCTMo61j4zPS07UqFa7+XVKPI7THLvbv8HIRzw71hbJVIQk+gIjIwOlNYANzk7PeQ7tf/Pyo5rQKMenTMZ2vOFduqcb55vEE8awCtoAa/WrjmK4Sp+wRsNZ4D7v3KywW1SlXTtQ=
+	t=1712320904; cv=none; b=HgsQ0EeA9g2rCOpJlnq6yM+NzOyBgjXmnMJPWHqPPwpUHkq/gbjmeUj/895SgKLvQzsTjNdG9qb0L1A/7eI3StwzpF5E3a/Cah3DlfnebSF7M5JhJUOPa2xAHRd1CPKBu4fJEI8yNFoRi0w1NJvh+hyMxUcfyyOyJlPmb6Jkc2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712320829; c=relaxed/simple;
-	bh=R6+BhSwTJjln4WnQCjacr5poEUTqt3nEa/5dq+LBvU0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XwKvh6biMS1vDn0hpjzpcFh9QGslgOgFg9KNqmB2JTJHzner+pcEDLs2CuaTz5r8cHZJwwRJEPFCxmJGmVh/kSQHj/4PrhE+Iu8gLi38Ni2q3q5dTFAGMbwU2Ojng4BR/9moez4Jx6jDbgpvR6ZK+XcAJrii+JMQ+Uki38RZ1N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NYttEdZ3; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e0430f714so9874a12.1
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 05:40:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712320826; x=1712925626; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R6+BhSwTJjln4WnQCjacr5poEUTqt3nEa/5dq+LBvU0=;
-        b=NYttEdZ32zsAp/rSBEOJdtYm/9nmoGEbDZyelEhIo0bIiEXt6wbsiF2YEXYy1AjB1p
-         IHqc6XWaeA7bw1CioYNBndJkBC0YBMMrd8mlTv9bw4zu+cmnr6LNJgolmbwY3Wad0gvn
-         oe/4aILI2OCloDixKMIZLXx1Ekq7+1s4/xQJVqbLPPgobuLVc0qBm+Kf7sdliLyGa/70
-         aJWJcV92Fz6V/QVAYvsFvuHTmGFKRHHXJnkrNVKAYtwqfvqyhYKirqcoA0zxgtTgKvMn
-         xf5YuwsSrc5wiUjmNHEWGwcAfEupRfmal9oS5gW5iiFJdTznKQI1930GTaQS0zQzg48H
-         +Www==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712320826; x=1712925626;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R6+BhSwTJjln4WnQCjacr5poEUTqt3nEa/5dq+LBvU0=;
-        b=CN2+ahlPiQNfdDiRMgJ8iGwkFRFtS/1RpYc6/V1igL5atjw7nsV86PgrvpqlyVPpaO
-         cBlRfyPqp8jWQWfXu8tmgtcvM4YuoAwg9A2XNNsu9B7v+qesJ3SeR4o5vZB0Af6PiAbT
-         vvJ3+LcMobCdCU5OqDCG6T4DWMfZI2CFBDRTrxPGnhb3NHF/2f7bjA7yR0RGwRjITk04
-         c0Ubtdq8MWvZeGyk5ZEgelzYN+1uivqWlb0ICYE4a+WcGegvLYEmqG6yKYs3WGVEcq88
-         wBA09HrHTPjU0XJd3IHbIcTlg2JnYgmyXl2zu78YWUwfO7o1+tdIKZtxuE1yuYDlzNNG
-         ejdw==
-X-Gm-Message-State: AOJu0YzuoGxK7EYMKsCOPksPleULyM4vInQcI9moprviJlO39ZjkG8u1
-	nUVh4j1/dkAFkf9sMKo2J7Jlqt2JIwnEoQVlmocf8KaeLhdByg1TAEGBLbqkho8AcpeUKQj6eWm
-	fkZcG47btf3D2YE/Kg1XOK+wRQ1FR05d7g4dF
-X-Google-Smtp-Source: AGHT+IHpoCLf6EhV39AEvNkBg+FRlIkoIrR2GcUaSVaO49C3YirVj2QtgxixbuPqCIbSkVPp9JYuS+bPAcx60/eDgds=
-X-Received: by 2002:a05:6402:274c:b0:56e:34de:69c1 with SMTP id
- z12-20020a056402274c00b0056e34de69c1mr70366edd.4.1712320825955; Fri, 05 Apr
- 2024 05:40:25 -0700 (PDT)
+	s=arc-20240116; t=1712320904; c=relaxed/simple;
+	bh=XstQV4I3hA64wkJdbVIzI8G3hTpnTOdEI888VqMr7I4=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=RKmpB9TDOOPvnKRwSFD/b4n2ohnB+5AUgP64dtJ3e5/OCRQIw2fBukUOyNY661e1G+NHnFXjBOZ/kCU7A5q9kTierD8PYeTgKCecPIPhuVb2VHlLTcO4kP4Kwjl2gJc8i5hfg+gEsarvli2pKg+nCq9jhCirTvhI1WfkYEqpG+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pFHM2C2G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 366B1C433F1;
+	Fri,  5 Apr 2024 12:41:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712320903;
+	bh=XstQV4I3hA64wkJdbVIzI8G3hTpnTOdEI888VqMr7I4=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=pFHM2C2GbsBvF2xfSpXbDbaeeEthKyyQgnk3Sh1pD+g7kaPMyMOdDsUUKD8nhM5ei
+	 b2Wrjp9NU01rX5iBliGumbHoX/2Uas8in0Of+sBK9wmOIK9ItUsc+0xeoYjiAFLC+M
+	 3RTH2EaieomEgwH69yqkFwNxh3zfPfohpjhKZbSQMLF6eseattZCeR8jxqDjXwmJk0
+	 DjsaoTkLKvG6tEvkbIOhvjBZzMqATIKYE0HqU1SIThb3v8zBpyiox4mz8CQ4rsGvnQ
+	 34zZP9u3HcKyKiw6J3e3nHKstbXuWjqfbR/b5w4viCAk65sw5lYGu+5wfYmy9We2Fu
+	 /hFNursI5SIog==
+From: Kalle Valo <kvalo@kernel.org>
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
+ <robh+dt@kernel.org>,  Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
+  Bjorn Andersson <andersson@kernel.org>,  Konrad Dybcio
+ <konrad.dybcio@linaro.org>,  ath10k@lists.infradead.org,
+  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
+  devicetree@vger.kernel.org,  linux-arm-msm@vger.kernel.org,  Krzysztof
+ Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific
+ firmware overrides
+References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
+	<87plw7hgt4.fsf@kernel.org>
+	<CAA8EJpr6fRfY5pNz6cXVTaNashqffy5_qLv9c35nkgjaDuSgyQ@mail.gmail.com>
+	<87cys7hard.fsf@kernel.org>
+	<CAA8EJpowyEEbXQ4YK-GQ63wZSkJDy04qJsC2uuYCXt+aJ1HSOQ@mail.gmail.com>
+	<87v85wg39y.fsf@kernel.org>
+	<CAA8EJpq_XLUEMC67ck2tZRjqS0PazCkQWWMGmwydeWxTETHwcg@mail.gmail.com>
+	<871q7k3tnq.fsf@kernel.org>
+	<CAA8EJppASEmj6-Jt7OCABAeqr8umSgXaDDha9nn2nRafuZ-Gvw@mail.gmail.com>
+Date: Fri, 05 Apr 2024 15:41:38 +0300
+In-Reply-To: <CAA8EJppASEmj6-Jt7OCABAeqr8umSgXaDDha9nn2nRafuZ-Gvw@mail.gmail.com>
+	(Dmitry Baryshkov's message of "Fri, 5 Apr 2024 15:34:29 +0300")
+Message-ID: <87sf002d8d.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <00c5b7641c0c854b630a80038d0131d148c2c81a.1712270285.git.asml.silence@gmail.com>
- <CANn89i+XZtjD1RVBiFxfmsqZPMtN0156XgjUOkoOf8ohc7n+RQ@mail.gmail.com>
- <d475498f-f6db-476c-8c33-66c9f6685acf@gmail.com> <CANn89iKZ4_ENsdOsMECd_7Np5imhqkJGatNXfrwMrgcgrLaUjg@mail.gmail.com>
- <30882f03-0094-42c7-b459-3f240ae94f20@gmail.com>
-In-Reply-To: <30882f03-0094-42c7-b459-3f240ae94f20@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 5 Apr 2024 14:40:14 +0200
-Message-ID: <CANn89iJRXFsrNBUz=0EWngyw6AunpTyB3ssFLGDvA7jktR3JsQ@mail.gmail.com>
-Subject: Re: [PATCH RESEND net-next v3] net: cache for same cpu skb_attempt_defer_free
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	pabeni@redhat.com, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Fri, Apr 5, 2024 at 2:35=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
+Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
 
-> Ok, alternatively, I can make it a series adding it on top.
+> On Fri, 5 Apr 2024 at 15:01, Kalle Valo <kvalo@kernel.org> wrote:
+>
+>>
+>> Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
+>>
+>> > On Fri, 8 Mar 2024 at 17:19, Kalle Valo <kvalo@kernel.org> wrote:
+>> >>
+>> >> Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
+>> >>
+>> >> >> To be on the safe side using 'qcom-rb1' makes sense but on the other
+>> >> >> hand that means we need to update linux-firmware (basically add a new
+>> >> >> symlink) everytime a new product is added. But are there going to be
+>> >> >> that many new ath10k based products?
+>> >> >>
+>> >> >> Using 'qcm2290' is easier because for a new product then there only
+>> >> >> needs to be a change in DTS and no need to change anything
+>> >> >> linux-firmware. But here the risk is that if there's actually two
+>> >> >> different ath10k firmware branches for 'qcm2290'. If that ever happens
+>> >> >> (I hope not) I guess we could solve that by adding new 'qcm2290-foo'
+>> >> >> directory?
+>> >> >>
+>> >> >> But I don't really know, thoughts?
+>> >> >
+>> >> > After some thought, I'd suggest to follow approach taken by the rest
+>> >> > of qcom firmware:
+>> >>
+>> >> Can you provide pointers to those cases?
+>> >
+>> > https://gitlab.com/kernel-firmware/linux-firmware/-/tree/main/qcom/sc8280xp/LENOVO/21BX
+>> >
+>> >>
+>> >> > put a default (accepted by non-secured hardware) firmware to SoC dir
+>> >> > and then put a vendor-specific firmware into subdir. If any of such
+>> >> > vendors appear, we might even implement structural fallback: first
+>> >> > look into sdm845/Google/blueline, then in sdm845/Google, sdm845/ and
+>> >> > finally just under hw1.0.
+>> >>
+>> >> Honestly that looks quite compilicated compared to having just one
+>> >> sub-directory. How will ath10k find the directory names (or I vendor and
+>> >> model names) like 'Google' or 'blueline' in this example?
+>> >
+>> > I was thinking about the firmware-name = "sdm845/Google/blueline". But
+>> > this can be really simpler, firmware-name = "blueline" or
+>> > "sdm845/blueline" with no need for fallbacks.
+>>
+>> I have been also thinking about this and I would prefer not to have the
+>> fallbacks. But good if you agree with that.
+>>
+>> IMHO just "sdm845-blueline" would be the most simple. I don't see the
+>> point of having a directory structure when there are not that many
+>> directories really. But this is just cosmetics.
+>
+> It is "not many directories" if we are thinking about the
+> linux-firmware or open devices. But once embedded distros start
+> picking this up for the supported devices, this can quickly become a
+> nuisance.
 
-Sure thing, thanks.
+Ok. Just out of curiosity, any ideas how many devices/products are there
+with wcn3990 who want to use ath10k?
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
