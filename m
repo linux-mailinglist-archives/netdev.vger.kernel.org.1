@@ -1,126 +1,102 @@
-Return-Path: <netdev+bounces-85324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E419989A3B2
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 19:48:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95EDA89A3B4
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 19:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 848F11F24909
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:48:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D06151C20A61
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 17:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB9C1EB36;
-	Fri,  5 Apr 2024 17:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE79C171E41;
+	Fri,  5 Apr 2024 17:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ucnfn771"
 X-Original-To: netdev@vger.kernel.org
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422F1134AC;
-	Fri,  5 Apr 2024 17:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B5F17166A;
+	Fri,  5 Apr 2024 17:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712339299; cv=none; b=uyMhdBa6/iPvI4orH4W40vxrlf3L9ip1ekPwS7aKRI0huhHQIykBjRiPNGSYnp2C/0ffFg5e1UDifY2kVuzzEiAIhG05NHBo9RHhb+3un4bjQkNJjAjEXmD/j/SvZ/glvP4Tq6hXrGoPqbA4L7PAphCxFVhm0yfNKg3dLDC2iww=
+	t=1712339311; cv=none; b=XYQw9iPZyeshD5Ilqpf0c1G2n6jp6APpHKOwA35hxK+CeBA1E5cr3/4V0Hd/QklglTDZ0agBi0A5fS/b1e2VQ5xTrDFD3Y+S5Ej3wrGvamIuWwECkIvMRdtykfF33cpZ50QXnlzy8bf1NCMV8pcii0kveLGWGGXGB0ZSYi9Sfrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712339299; c=relaxed/simple;
-	bh=WvRsBVBjYEza67dv61GNHhs7Cd+qc3xljT52Ok2UXD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MZLPoOvoeunHujmHfXIKJYjbHYDdFHO86ymTeueChbIX/eg6gjqjbwKR04H6nyLe5XMptBWrT3km2SM+UHmK2Nex8v1OgecD01rx/pvlMhdFjVKQdDCQtgQ4jcgKq/csRckLoRYDndfiDNmEtQlrWPHwZ4P3BW82gI02HZnitG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 1D43B2800BB90;
-	Fri,  5 Apr 2024 19:48:08 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 082829926D8; Fri,  5 Apr 2024 19:48:08 +0200 (CEST)
-Date: Fri, 5 Apr 2024 19:48:08 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Roman Lozko <lozko.roma@gmail.com>, linux-pci@vger.kernel.org,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: Deadlock in pciehp on dock disconnect
-Message-ID: <ZhA5WAYyMQJsAey8@wunner.de>
-References: <CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com>
- <Zg_MOG1OufptoRph@wunner.de>
- <cd9edf12-5241-4366-b376-d5ee8f919903@gmail.com>
+	s=arc-20240116; t=1712339311; c=relaxed/simple;
+	bh=A1NgwHDC10bWTRgwQyvwKCoHXIXCNqeJgjkafa3KT18=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SqkSZtZTKelLE1gS9V6Oyf4Wg/aOD/Mnw7Zbpc5nrICX7qEKxbbCRLFR08LwjY/U8IZRsa72WhvdfnGakIcRIU4cbICxUezK4Q73YmnhRS6mtQ3ND5albM57TIwiV++xxx8XGrCi/avbY64WqGp5ax2ZUWp3jWBwHvhH85LFmlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ucnfn771; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C68F6C433C7;
+	Fri,  5 Apr 2024 17:48:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712339311;
+	bh=A1NgwHDC10bWTRgwQyvwKCoHXIXCNqeJgjkafa3KT18=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ucnfn771Ryd5ttTlvciywI7ENwjrqduaU3SeGiEkUwStAa5ctf3XgOxobH1baTLY4
+	 aa96ZguC5LHPeBBGIQama4tYctpn3rhX32rPuX0llaiLmlSJggidop0RxcypM5P1yX
+	 hTer+LQ4mzt3JlH7NPos/+zxmkNIvVRrjkPyYlb5vRIIjs7CIt8nDa6UIshLXjg7Z1
+	 AB1yjzVPamX96NFCMY/9HoAiMTUotr4JRG7Plrx+7o3GpDWcRxUv0wW25dImB7R4Hk
+	 1g0dsmQ5Eqw0pv9eHb4GcrhLxwx82uTi+140Y4C/vrlveUrEWaEQS+laNLwzhf4a3V
+	 9z6cX2bN16Psg==
+Date: Fri, 5 Apr 2024 10:48:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, David Ahern <dsahern@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christoph Hellwig
+ <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko
+ <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Itay Avraham
+ <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Aron Silverton
+ <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Andy Gospodarek
+ <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240405104829.2ba1a3b1@kernel.org>
+In-Reply-To: <20240405083827.78cc1b20@kernel.org>
+References: <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+	<20240322154027.5555780a@kernel.org>
+	<1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
+	<0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+	<20240402184055.GP946323@nvidia.com>
+	<83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
+	<20240404183305.GM1723999@nvidia.com>
+	<20240404125339.14695f27@kernel.org>
+	<20240404204454.GO1723999@nvidia.com>
+	<20240404143407.64b44a88@kernel.org>
+	<20240405111306.GB5383@nvidia.com>
+	<20240405083827.78cc1b20@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cd9edf12-5241-4366-b376-d5ee8f919903@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 05, 2024 at 03:31:34PM +0200, Heiner Kallweit wrote:
-> On 05.04.2024 12:02, Lukas Wunner wrote:
-> > On Fri, Apr 05, 2024 at 11:14:01AM +0200, Roman Lozko wrote:
-> > > Hi, I'm using HP G4 Thunderbolt docking station, and recently (?)
-> > > kernel started to "partially" deadlock after disconnecting the dock
-> > > station. This results in inability to turn network interfaces on or
-> > > off, system can't reboot, `sudo` does not work (guess because it uses
-> > > DNS).
-> > 
-> > unregister_netdev() acquires rtnl_lock(), indirectly invokes
-> > netdev_trig_deactivate() upon unregistering some LED, thereby
-> > calling unregister_netdevice_notifier(), which tries to
-> > acquire rtnl_lock() again.
-> > 
-> > From a quick look at the source files involved, this doesn't look
-> > like something new, though I note LED support for igc was added
-> > only recently with ea578703b03d ("igc: Add support for LEDs on
-> > i225/i226"), which went into v6.9-rc1.
+On Fri, 5 Apr 2024 08:38:27 -0700 Jakub Kicinski wrote:
+> > It is really strange to hear you act like "Meta doesn't need
+> > provisioning or tuning" when the NIC Meta uses is *highly* customized
+> > specifically for Meta to the point it is an entirely different
+> > product. Of course you don't need provisioning, alot of other people
+> > did alot of hard work to make it that way.  
 > 
-> It's unfortunate that the device-managed LED is bound to the netdev device.
-> Wouldn't binding it to the parent (&pdev->dev) solve the issue?
+> :) When you say *highly* I think I know what you mean :)
+> It'd be unprofessional for us to discuss here, and I really doubt 
+> you actually want to air that laundry publicly :) :)
 
-I'm guessing igc commit ea578703b03d copy-pasted from r8169 commit
-be51ed104ba9 ("r8169: add LED support for RTL8125/RTL8126") because
-that driver has exactly the same problem. :)
+Maybe that's unnecessary air of mystery. Long time ago there was 
+a concern about impact of the rapidly developing eswitch offload
+market(?) on FW stability so a requirement was put forward to 
+*compile out* major unused FW features. Such requirement is no 
+longer in place (or fulfilled) largely due to my support.
 
-Roman, does the below patch fix the issue?
-
-Note that just changing the devm_led_classdev_register() call isn't
-sufficient:  I'm changing the devm_kcalloc() in igc_led_setup() as well
-to avoid a use-after-free (memory would already get freed on netdev
-unregister but led a little later on pdev unbind).
-
--- >8 --
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_leds.c b/drivers/net/ethernet/intel/igc/igc_leds.c
-index bf240c5..0b78c30 100644
---- a/drivers/net/ethernet/intel/igc/igc_leds.c
-+++ b/drivers/net/ethernet/intel/igc/igc_leds.c
-@@ -257,13 +257,13 @@ static void igc_setup_ldev(struct igc_led_classdev *ldev,
- 	led_cdev->hw_control_get = igc_led_hw_control_get;
- 	led_cdev->hw_control_get_device = igc_led_hw_control_get_device;
- 
--	devm_led_classdev_register(&netdev->dev, led_cdev);
-+	devm_led_classdev_register(&adapter->pdev->dev, led_cdev);
- }
- 
- int igc_led_setup(struct igc_adapter *adapter)
- {
- 	struct net_device *netdev = adapter->netdev;
--	struct device *dev = &netdev->dev;
-+	struct device *dev = &adapter->pdev->dev;
- 	struct igc_led_classdev *leds;
- 	int i;
- 
+I wish I could support that out by referring to the OCP NIC SW spec,
+by it's stuck in "legal review" of one of the vendors for months.
+I'd like to ask that vendor not to pull up the ladder and let everyone
+else enjoy access to NIC requirements and recommendations from Meta
+and Google.
 
