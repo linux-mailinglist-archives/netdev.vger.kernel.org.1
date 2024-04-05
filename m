@@ -1,192 +1,211 @@
-Return-Path: <netdev+bounces-85052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB2FE89927F
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 02:12:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF4FF899282
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 02:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 813C728276A
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 00:12:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD6E1C21664
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 00:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E796632;
-	Fri,  5 Apr 2024 00:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457D4393;
+	Fri,  5 Apr 2024 00:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7BMKCsk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7EJLlwX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA1236F;
-	Fri,  5 Apr 2024 00:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDF1185E;
+	Fri,  5 Apr 2024 00:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712275948; cv=none; b=uViorCVDG+mBzutysrJec6BP07VO4fiNDnedUZQKK0fLdQhOo2/ZdHMBucDAFevYmnizlKI25FSGQyR4J5XRn7ClVLl27VFmR8cTkcTt3EJmokXE0BZTNNh7ugh2f2qz4Ne7ZKgAsRHjaX0KJFL+wjwO5IMwp2SOFTlZJk43J3k=
+	t=1712276016; cv=none; b=RY/uOZsAzGlwLlIEKhB+y4HD5EbN82pegGDEPEcumkg3mJnsTlTnBOcke2Cixq6c3G9UZuWi0xJq5BAX6nS61+cU9/gikxZ5NxrtOmIxLzhPjf1mIHZJvZHRn2pLy1HgViak4x8eBQyIRaGNozzJfAtYpRW1FqECp+sTWULPHOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712275948; c=relaxed/simple;
-	bh=omc4lpuY9giELKfLxMsx/Ib2N0mC7vAkFp7YcFSNEA8=;
+	s=arc-20240116; t=1712276016; c=relaxed/simple;
+	bh=aYcNk1K/ICwidZexakaP0dA9+tVqluQB/biKSaxzonQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y4E++KEO09mzf0HUwDtjmUbaaWl9GXjBRqDMMFgtuY+TXIMSq7rIZyAzFxFxtQSF2lZACzxLAdn1h9J8yx2S8ucudHUsF8CrtslXMdWroP4aOBdOmbcAks6umtHbcwkw+FrEh/BSqTvyRdZzQ5wSj2Zk6dbeDUQllvW0QQCUtDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c7BMKCsk; arc=none smtp.client-ip=209.85.221.44
+	 To:Cc:Content-Type; b=ItzwG/5uKaJM3zSNW+KMtDZXVtPuaKHBQO171iUz5Bp0RY3BqoqF2zHAadX569RbZR+44OeNf6PJWQGnG5ziac62pnWqt60PExscFTegvwoXZcx8T6XvlLremJ5RQ+cDJl1IIliLK3vw0+56sWtmlBXBM+EY+cvPyPKY2ISuGpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7EJLlwX; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3436b096690so2069005f8f.1;
-        Thu, 04 Apr 2024 17:12:26 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56b0af675deso1821628a12.1;
+        Thu, 04 Apr 2024 17:13:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712275945; x=1712880745; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712276013; x=1712880813; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=omc4lpuY9giELKfLxMsx/Ib2N0mC7vAkFp7YcFSNEA8=;
-        b=c7BMKCskirYoKAX0keLUrkLkzgs5060XjfcPJs0R2ueG62eewntIe1km2Xvq+P+b9E
-         LjGpWsV8vzXZuy+u0Fp8dQ2pAcwYTxifC9zlaO5NDcUfnAiwSiL+QgDsTaEHZlZ4PSm1
-         oFcemBqm1QQkeuEdQWPFx2B28VnrhcD6HJxd3pbFW1Wx4ViXqk16Au9Z4Wyg7H/mdap3
-         VszTt90gp09lb/XK1vWpIoZjXnF54s67GfdsWXUhoSH4x+piLUvOVOoPItydf41BkIRg
-         w764cQsoBqdL8CzORNXIlz/XClMGhEbx4WdrT6+G3N7803Fzn5b7FUOJDzWXR7CFekUo
-         elFA==
+        bh=RDQ0AI+9sTgw7Asa/hXBXLhuxdgG1OjxAuphEolhA+Q=;
+        b=C7EJLlwXyNDFH1IHQ1gJq79T5LKXowQIZehc/P5v4nlfDDGE36w/F6UMv3FoTAB59C
+         3FlTEzoEgo9n2VQi51TQiYPty8zwiZe95krrZqn87Ggrwbr4JUxwxnmE/fieqzLMUWBO
+         ZoQWgVE2JQ/L0T/dPWf8lSdRWNx9vhXFubkAqv8jXAX80HVa6l4zY+slHtADWGm0/s5k
+         jjcoruvdq4VZ3LHWtG6DwBUcrEmlHzDfrKqNkHk00Qb8S6X8zuBElEhfkBgFVgu/SCsl
+         YqSrgFRFpImv0MCc1j7fPFB3Xx5KS8OgT2LMWTBDuMq4S40tLtcIVBuqXt1/w/YKlt3u
+         2HeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712275945; x=1712880745;
+        d=1e100.net; s=20230601; t=1712276013; x=1712880813;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=omc4lpuY9giELKfLxMsx/Ib2N0mC7vAkFp7YcFSNEA8=;
-        b=wArLB/pdkZwwHEcyHafIgv/3pwFHlGf495DEwfkO6QzVPjFQWoEgh17vXiPitdq4Nz
-         ymIcdJ9fGjh2srJg7p1FKzrjpE60YnPTeWplOsSrfh8sgpETLok0t1H6/sxRgiuS1PWB
-         esCAhGI64THw2Ipq9x7dXrrWU7oqNM8mOdOpWAZC7aLl+nuUEOJKHWYkjM22A60O3zTb
-         rJAaGsqqcamakLXWQZzo6ud74nNGfeq6rfjZOPTUBdRRxB4CEla+q+tfariSLK3wewvY
-         6TTlY3IXEpXGT7V9gxZx2V+gjogqnXwRkVDS3YVe4Pu76mZ3v6yLtH2T+M9+50Lx1Kc4
-         ULgw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1uQ6OSwZHq5mvTPcBdG4ile9nCE0oX9JRJzRKQFalqcM2TA5bX+Kkysbxcels3PaGLWuAh+JeTpM+i5l6Ud+MXAnHxxwJ0mC9B5Tgf+8OyTqKGC63Roav8+AbbXBg80Yw
-X-Gm-Message-State: AOJu0YzuFT5WMKMtVzl3W2mfB3sYL8IB8lsz9lYYenpX7WjmU0Uff6qy
-	3LxWI9kA7RBF4Fh5q9QEL925fUFmisuhu9UP/3Hmg2HA6a/UcFDzayoFBs2APNih1zgTx72NAlC
-	7ufMxBk/C/JSgpUfiiUIexHgz7n7m7WMq
-X-Google-Smtp-Source: AGHT+IEj8sc/+KAf7eHTTyr96yYzknt0ODX9E3p8wLXyIvypdzWcRah8uQL6CjQ2KVr6hiltGcXoNBH8MCIKc3/5C5c=
-X-Received: by 2002:adf:f14b:0:b0:343:ce15:fd3f with SMTP id
- y11-20020adff14b000000b00343ce15fd3fmr664071wro.29.1712275944522; Thu, 04 Apr
- 2024 17:12:24 -0700 (PDT)
+        bh=RDQ0AI+9sTgw7Asa/hXBXLhuxdgG1OjxAuphEolhA+Q=;
+        b=Y0l2tJfXJChKWsnUkR4vZJckj5zKE6lP84Zz32NzYxIMQJQSuua9gP34wB/O+GRUHf
+         I2P3EjtQ7E24FH00TmUgX8NkmNbJL953bG0B6N41Ghm7iAo19gCvppyJVb5FBULpgSzo
+         Y3pJfYorZv+n0OA7VKUZqIuAJoY5dO8GKwlbA4WLCj+XD+xOG17+9tHu8Dwu521ycDHp
+         smqEljGF8AjwCOYP6peDIPy2+Nztov6tkByyz6LbHbUoQozQNNnGRf8g/i46U1KvuPjE
+         yLnMCQcjm2NEv/Jp/kozibqJCUU5A6S5nBCJt/8lDaipCX5f3mI6qhFb4FAuZaynlX1+
+         W1hA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5IsZnNTl67+n2vNSNKaFvOvI3Gy9ewWCxDXDgqYQ5OhPaO6rHkHOtPl69L0f3rL7VECkZB6ETZ+TyyOg53SmuQU/H6zIV7H0DfZvCf0a1NyRmN2FKAwDh++v9DDLrMUx/pSdti75i2Z61
+X-Gm-Message-State: AOJu0YwalcOeu1kcbTqcwj/qqPEN0dfcdbqAPM3NfHlLXwtYveSInCsg
+	xt0lDNaqh2AcYwsnpeRx6+xgh3EU9aiedK20mwqHAekAw3HGyrNA1xx4FRZriWRSWbagZlA7C11
+	X7zztRoOfktGvcyRCteno1cCBzGk=
+X-Google-Smtp-Source: AGHT+IH6Q81Un2FH3uF8VE7T4Unxxqeh2qFkaxrnOGFKzV+Z878Eu+hE3fshL8FUJXx6nwSAhwbmRHlSvUGQ+Z7jBEc=
+X-Received: by 2002:a17:907:6d0a:b0:a4e:676f:c34b with SMTP id
+ sa10-20020a1709076d0a00b00a4e676fc34bmr929711ejc.61.1712276012643; Thu, 04
+ Apr 2024 17:13:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <Zg6Q8Re0TlkDkrkr@nanopsycho> <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
- <Zg7JDL2WOaIf3dxI@nanopsycho> <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
- <20240404132548.3229f6c8@kernel.org> <660f22c56a0a2_442282088b@john.notmuch> <20240404165000.47ce17e6@kernel.org>
-In-Reply-To: <20240404165000.47ce17e6@kernel.org>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Thu, 4 Apr 2024 17:11:47 -0700
-Message-ID: <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	bhelgaas@google.com, linux-pci@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
+References: <20240404072047.11490-1-kerneljasonxing@gmail.com>
+ <20240404072047.11490-6-kerneljasonxing@gmail.com> <d8fe5d37-e317-59a5-9a01-d7c6ae43be7b@kernel.org>
+In-Reply-To: <d8fe5d37-e317-59a5-9a01-d7c6ae43be7b@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 5 Apr 2024 08:12:55 +0800
+Message-ID: <CAL+tcoCDTEov0YkeZD7B0v=TQEsfs9LtGiOge71UxUaPzWA9kQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/6] mptcp: support rstreason for passive reset
+To: Mat Martineau <martineau@kernel.org>
+Cc: edumazet@google.com, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	rostedt@goodmis.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	matttbe@kernel.org, geliang@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 4, 2024 at 4:50=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+Hello Mat,
+
+On Fri, Apr 5, 2024 at 4:33=E2=80=AFAM Mat Martineau <martineau@kernel.org>=
+ wrote:
 >
-> On Thu, 04 Apr 2024 14:59:33 -0700 John Fastabend wrote:
-> > The alternative is much worse someone builds a team of engineers locks
-> > them up they build some interesting pieces and we never get to see it
-> > because we tried to block someone from opensourcing their driver?
+> On Thu, 4 Apr 2024, Jason Xing wrote:
 >
-> Opensourcing is just one push to github.
-> There are guarantees we give to upstream drivers.
-
-Are there? Do we have them documented somewhere?
-
-> > Eventually they need some kernel changes and than we block those too
-> > because we didn't allow the driver that was the use case? This seems
-> > wrong to me.
->
-> The flip side of the argument is, what if we allow some device we don't
-> have access to to make changes to the core for its benefit. Owner
-> reports that some changes broke the kernel for them. Kernel rules,
-> regression, we have to revert. This is not a hypothetical, "less than
-> cooperative users" demanding reverts, and "reporting us to Linus"
-> is a reality :(
->
-> Technical solution? Maybe if it's not a public device regression rules
-> don't apply? Seems fairly reasonable.
-
-This is a hypothetical. This driver currently isn't changing anything
-outside of itself. At this point the driver would only be build tested
-by everyone else. They could just not include it in their Kconfig and
-then out-of-sight, out-of-mind.
-
-> > Anyways we have zero ways to enforce such a policy. Have vendors
-> > ship a NIC to somebody with the v0 of the patch set? Attach a picture?
->
-> GenAI world, pictures mean nothing :) We do have a CI in netdev, which
-> is all ready to ingest external results, and a (currently tiny amount?)
-> of test for NICs. Prove that you care about the device by running the
-> upstream tests and reporting results? Seems fairly reasonable.
-
-That seems like an opportunity to be exploited through. Are the
-results going to be verified in any way? Maybe cryptographically
-signed? Seems like it would be easy enough to fake the results.
-
-> > Even if vendor X claims they will have a product in N months and
-> > than only sells it to qualified customers what to do we do then.
-> > Driver author could even believe the hardware will be available
-> > when they post the driver, but business may change out of hands
-> > of the developer.
+> > From: Jason Xing <kernelxing@tencent.com>
 > >
-> > I'm 100% on letting this through assuming Alex is on top of feedback
-> > and the code is good.
+> > It relys on what reset options in MPTCP does as rfc8684 says. Reusing
+> > this logic can save us much energy. This patch replaces all the prior
+> > NOT_SPECIFIED reasons.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> > net/mptcp/subflow.c | 26 ++++++++++++++++++++------
+> > 1 file changed, 20 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> > index a68d5d0f3e2a..24668d3020aa 100644
+> > --- a/net/mptcp/subflow.c
+> > +++ b/net/mptcp/subflow.c
+> > @@ -304,7 +304,10 @@ static struct dst_entry *subflow_v4_route_req(cons=
+t struct sock *sk,
+> >
+> >       dst_release(dst);
+> >       if (!req->syncookie)
+> > -             tcp_request_sock_ops.send_reset(sk, skb, SK_RST_REASON_NO=
+T_SPECIFIED);
+> > +             /* According to RFC 8684, 3.2. Starting a New Subflow,
+> > +              * we should use an "MPTCP specific error" reason code.
+> > +              */
+> > +             tcp_request_sock_ops.send_reset(sk, skb, SK_RST_REASON_MP=
+TCP_RST_EMPTCP);
 >
-> I'd strongly prefer if we detach our trust and respect for Alex
-> from whatever precedent we make here. I can't stress this enough.
-> IDK if I'm exaggerating or it's hard to appreciate the challenges
-> of maintainership without living it, but I really don't like being
-> accused of playing favorites or big companies buying their way in :(
-
-Again, I would say we look at the blast radius. That is how we should
-be measuring any change. At this point the driver is self contained
-into /drivers/net/ethernet/meta/fbnic/. It isn't exporting anything
-outside that directory, and it can be switched off via Kconfig.
-
-When the time comes to start adding new features we can probably start
-by looking at how to add either generic offloads like was done for
-GSO, CSO, ect or how it can also be implemented on another vendor's
-NIC.
-
-At this point the only risk the driver presents is that it is yet
-another driver, done in the same style I did the other Intel drivers,
-and so any kernel API changes will end up needing to be applied to it
-just like the other drivers.
-
-> > I think any other policy would be very ugly to enforce, prove, and
-> > even understand. Obviously code and architecture debates I'm all for.
-> > Ensuring we have a trusted, experienced person signed up to review
-> > code, address feedback, fix whatever syzbot finds and so on is also a
-> > must I think. I'm sure Alex will take care of it.
+> Hi Jason -
 >
-> "Whatever syzbot finds" may be slightly moot for a private device ;)
-> but otherwise 100%! These are exactly the kind of points I think we
-> should enumerate. I started writing a list of expectations a while back:
->
-> Documentation/maintainer/feature-and-driver-maintainers.rst
->
-> I think we just need something like this, maybe just a step up, for
-> non-public devices..
+> In this case, the MPTCP reset reason is set in subflow_check_req(). Looks
+> like it uses EMPTCP but that isn't guaranteed to stay the same. I think i=
+t
+> would be better to extract the reset reason from the skb extension or the
+> subflow context "reset_reason" field.
 
-I honestly think we are getting the cart ahead of the horse. When we
-start talking about kernel API changes then we can probably get into
-the whole "private" versus "publicly available" argument. A good
-example of the kind of thing I am thinking of is GSO partial where I
-ended up with Mellanox and Intel sending me 40G and 100G NICs and
-cables to implement it on their devices as all I had was essentially
-igb and ixgbe based NICs.
+Good suggestions :)
 
-Odds are when we start getting to those kind of things maybe we need
-to look at having a few systems available for developer use, but until
-then I am not sure it makes sense to focus on if the device is
-publicly available or not.
+>
+>
+> >       return NULL;
+> > }
+> >
+> > @@ -371,7 +374,10 @@ static struct dst_entry *subflow_v6_route_req(cons=
+t struct sock *sk,
+> >
+> >       dst_release(dst);
+> >       if (!req->syncookie)
+> > -             tcp6_request_sock_ops.send_reset(sk, skb, SK_RST_REASON_N=
+OT_SPECIFIED);
+> > +             /* According to RFC 8684, 3.2. Starting a New Subflow,
+> > +              * we should use an "MPTCP specific error" reason code.
+> > +              */
+> > +             tcp6_request_sock_ops.send_reset(sk, skb, SK_RST_REASON_M=
+PTCP_RST_EMPTCP);
+>
+> Same issue here.
+
+Got it.
+
+>
+> >       return NULL;
+> > }
+> > #endif
+> > @@ -778,6 +784,7 @@ static struct sock *subflow_syn_recv_sock(const str=
+uct sock *sk,
+> >       bool fallback, fallback_is_fatal;
+> >       struct mptcp_sock *owner;
+> >       struct sock *child;
+> > +     int reason;
+> >
+> >       pr_debug("listener=3D%p, req=3D%p, conn=3D%p", listener, req, lis=
+tener->conn);
+> >
+> > @@ -833,7 +840,8 @@ static struct sock *subflow_syn_recv_sock(const str=
+uct sock *sk,
+> >                */
+> >               if (!ctx || fallback) {
+> >                       if (fallback_is_fatal) {
+> > -                             subflow_add_reset_reason(skb, MPTCP_RST_E=
+MPTCP);
+> > +                             reason =3D MPTCP_RST_EMPTCP;
+> > +                             subflow_add_reset_reason(skb, reason);
+> >                               goto dispose_child;
+> >                       }
+> >                       goto fallback;
+> > @@ -861,7 +869,8 @@ static struct sock *subflow_syn_recv_sock(const str=
+uct sock *sk,
+> >               } else if (ctx->mp_join) {
+> >                       owner =3D subflow_req->msk;
+> >                       if (!owner) {
+> > -                             subflow_add_reset_reason(skb, MPTCP_RST_E=
+PROHIBIT);
+> > +                             reason =3D MPTCP_RST_EPROHIBIT;
+> > +                             subflow_add_reset_reason(skb, reason);
+> >                               goto dispose_child;
+> >                       }
+> >
+> > @@ -875,13 +884,18 @@ static struct sock *subflow_syn_recv_sock(const s=
+truct sock *sk,
+> >                                        ntohs(inet_sk((struct sock *)own=
+er)->inet_sport));
+> >                               if (!mptcp_pm_sport_in_anno_list(owner, s=
+k)) {
+> >                                       SUBFLOW_REQ_INC_STATS(req, MPTCP_=
+MIB_MISMATCHPORTACKRX);
+> > +                                     reason =3D MPTCP_RST_EUNSPEC;
+>
+> I think the MPTCP code here should have been using MPTCP_RST_EPROHIBIT.
+
+I'll update in the V2 of the patch.
+
+Thanks,
+Jason
 
