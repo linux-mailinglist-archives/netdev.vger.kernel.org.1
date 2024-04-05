@@ -1,103 +1,158 @@
-Return-Path: <netdev+bounces-85092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C45689964C
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:12:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FDBB89966B
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:21:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EA94B231C2
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 07:12:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80D991C21298
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 07:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4872C19C;
-	Fri,  5 Apr 2024 07:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15B72E84E;
+	Fri,  5 Apr 2024 07:21:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318752D04C
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 07:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3052C1B8
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 07:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712301133; cv=none; b=VILI0S+534T/2oli63QrobVjYAK8+cRSGnur9G+LXOgGFY/hodEqzIiD25IMageOrXdSrGrCyOhWE1S/p+TXHrAEhJ1cEd08uhYSUitrO35CRn3JmxZwkk+DGTtCGkwzioTs1gEc0c6ykjmh222x1hzyrQq55Yqgn8/Bu5WetaY=
+	t=1712301670; cv=none; b=Oo9XFRXI+UuV5ikrpbTkgC0otLLbUZ41mRya2uYh4t+ApRsr9KMcwH/YRKqoRw6pOrNHauj/rmTIUGQAI8wsvamUg2T43PCjjGTAaxbhpdGXSfNH+8c8Wfuh2t9LOq96pj71Smw6zF33LlVv5YbrQM8w486kGAKFqNxJ43xkhGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712301133; c=relaxed/simple;
-	bh=uzh/Mszl2+B3KFQvKUH37svKj+pJExNIQuJAXKf2FPs=;
-	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=LuSSoDCmm9n7qn5yo8cpryEB08vzNLB8yfSjtIlaMAiqasPWIun0xrGyVP0OlaNJyv6kgSmv32/NTecdqKgWWP4n8zz4D+5MaJkuJ5yIS6+g9Sy4F6inQOkdvvdzG5qaUlobP9Sco4gWQPAyQ+w0ZFAy2BO+OSJAQ4LSh0MpEIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inf.elte.hu; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inf.elte.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-415446af364so17329315e9.0
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 00:12:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712301129; x=1712905929;
-        h=mime-version:user-agent:content-transfer-encoding:date:cc:to:from
-         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uzh/Mszl2+B3KFQvKUH37svKj+pJExNIQuJAXKf2FPs=;
-        b=NfEZxo0vT4LB6EQyAm/mPGfD7sFs0/1X3UWM9HSwMhRqPQvrtWdmlowI/kez86ISEY
-         dETlmf+f2RriDVyQvL75iCmSKA55VzQow8wCTi4LUXdNJ9gbO1YIab4IamK1kfCfVTQ2
-         LbVcrCd+3XujO9Tuu1rxQd4saAxvyWI4scfP3/OXn4SsSlv6UaEeYQY+YHQ+cApR3SjT
-         sB8LAaggzmuBFrwEQj5XTNYbZJw0Ix9s/FeMwjUoDG0KmFAQPwCqFNvhqa51uk27FquQ
-         Qkr0mmLXOfhpLJqEY7bCgW+eiht2tYz+Pbhzra7jB9NadkFw9ETGHQOIm2yLtLIHrqpt
-         Dyfg==
-X-Gm-Message-State: AOJu0Yyr1Fk7M+RgssjvPqvNwNBy5dQ1kYADq77oEflIGOCDTShw2KqF
-	XDCOnD/cY1+sPvkozh95ULDUlmRCWbgLnqldaGVpE+eZlPSOFQpJVoT+QhcHfizFkA==
-X-Google-Smtp-Source: AGHT+IHhVpNE78D8yPNvyaDzdNhVgbX26ypZaQOkkukk10mBoTAJhk0t3BbwCvVMJA1KnHCCSL3b4A==
-X-Received: by 2002:a05:6000:ac2:b0:33e:710a:b699 with SMTP id di2-20020a0560000ac200b0033e710ab699mr661720wrb.9.1712301128920;
-        Fri, 05 Apr 2024 00:12:08 -0700 (PDT)
-Received: from [10.148.80.106] (business-89-135-192-225.business.broadband.hu. [89.135.192.225])
-        by smtp.gmail.com with ESMTPSA id dx18-20020a0560000e1200b00343d840b3f8sm1266977wrb.33.2024.04.05.00.12.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 00:12:08 -0700 (PDT)
-Message-ID: <6aef04e4ea98227c18328126d0a2fcedfaf362b6.camel@inf.elte.hu>
-Subject: [question] SRv6 socket API
-From: Ferenc Fejes <fejes@inf.elte.hu>
-To: netdev <netdev@vger.kernel.org>
-Cc: andrea.mayer@uniroma2.it, sr6-dev@listes.uclouvain.be
-Date: Fri, 05 Apr 2024 09:12:07 +0200
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3-1 
+	s=arc-20240116; t=1712301670; c=relaxed/simple;
+	bh=rq0ub4HQWbS8WRYOtmnvbSqcOyc5iY6cPnnlDfYTMfY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u73C8nwBIJPRedqF6Izc9fBhKeYs2WAO5iVwQUVnaxNMVJ4+SjPBmBELRIWYxNoBc6lagCA3Bc2O8attCa+fulSBiHcC9KpRNDOlZkaiaRkAtYJ1Yr24+IjunWb8NI8EwOtFTFEQI8xG+FNiJW6ld70rsHucc38/lnLy2B2SLA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rsdsU-0002so-2H; Fri, 05 Apr 2024 09:20:46 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rsdsS-00AWlk-VL; Fri, 05 Apr 2024 09:20:44 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rsdsS-00FNeT-2q;
+	Fri, 05 Apr 2024 09:20:44 +0200
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Li Yang <leoyang.li@nxp.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Zhang Wei <zw@zh-kernel.org>,
+	linuxppc-dev@lists.ozlabs.org,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH] MAINTAINERS: Drop Li Yang as their email address stopped working
+Date: Fri,  5 Apr 2024 09:20:41 +0200
+Message-ID: <20240405072042.697182-2-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2657; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=rq0ub4HQWbS8WRYOtmnvbSqcOyc5iY6cPnnlDfYTMfY=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBmD6ZKkY6yppGrhNNyOtWlNH+4elKIHpdGAEr5v tStHRrc2RuJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZg+mSgAKCRCPgPtYfRL+ TsouB/47cqGkwC5L5mRT5uk5aAdbTfA7NN4ZTXF31ggFYif4zOhNk8lB2NZ3sV+ZCEMsrhJGQ1W 0qiy1Ak+QnRSVm96815mssAhzxCJwRqoBjEutLPScymOxs+/UwHn+tCnFP1MtdXOXD06Ku2VBFW OsQZOiaIdqiCahqDK4m0l/AR1MkEmVRFO1o3rgBlYWZlUlKQiJpxXsVPEwHQuUyvnFnfBMARMpu lG6OI1Dz/hBSHifIc2YNmkmFPSpDoe3G0PQjzIfLBjCr1fuvsnNS1NIhwCSHG70iCJlU7rVqPap AznBlkkLLwJFbPSLW+liIiMfw+DCkSPQStmpHQkvMRB3no4r
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi,
+When sending a patch to (among others) Li Yang the nxp MTA replied that
+the address doesn't exist and so the mail couldn't be delivered. The
+error code was 550, so at least technically that's not a temporal issue.
 
-While experimenting with SRv6 and IPv6 sockets, I skimmed the relevant
-parts of the kernel and failed to figure out how it was supposed to
-work.
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+Hello,
 
-Two questions about the SRv6 socket API.
+I added the affected maintainers and lists to Cc:, maybe someone there
+knows if this issue is only temporal?
 
-1. No matter what I do, the nexthdr field of ipv6_sr_hdr is completely
-ignored and the field is set as if its a sticky option. For example, if
-I open my socket as (AF_INET6, SOCK_RAW, IPPROTO_IPV6), nexthdr on the
-wire is set to 41 (IPv6). If I open the socket as (..., ...,
-IPPROTO_UDP) nexthdr will be UDP. Do I miss something?
+@Greg: Given that I noticed the non-existing address when sending an usb
+patch, I suggest you care for application of this patch (iff it should
+be applied now). If Li Yang disappeared indeed, I'd prefer to drop the
+contact from MAINTAINERS early to not give wrong expectations to
+contributors.
 
-2. Is it possible to request the SRv6 header? I see the relevant parts
-in the kernel code for legacy routing headers (type2) but not for SRv6
-(type4).
+Best regards
+Uwe
 
-My test code is as follows:
-socket(AF_INET6, SOCK_RAW, IPPROTO_ROUTING)
-setsockopt(fd, IPPROTO_IPV6, IPV6_RECVRTHDR, &on, sizeof(on))
-... allocate enough space for cmsg, prepare msghdr, etc...
-recvmsg(fd, &msg, 0)
+ MAINTAINERS | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-When I send an SRv6 packet with a few segments, recvmsg returns, but
-there are no cmsgs.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7c121493f43d..be19aad15045 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2191,7 +2191,6 @@ N:	mxs
+ 
+ ARM/FREESCALE LAYERSCAPE ARM ARCHITECTURE
+ M:	Shawn Guo <shawnguo@kernel.org>
+-M:	Li Yang <leoyang.li@nxp.com>
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/shawnguo/linux.git
+@@ -8523,7 +8522,6 @@ S:	Maintained
+ F:	drivers/video/fbdev/fsl-diu-fb.*
+ 
+ FREESCALE DMA DRIVER
+-M:	Li Yang <leoyang.li@nxp.com>
+ M:	Zhang Wei <zw@zh-kernel.org>
+ L:	linuxppc-dev@lists.ozlabs.org
+ S:	Maintained
+@@ -8688,10 +8686,9 @@ F:	drivers/soc/fsl/qe/tsa.h
+ F:	include/dt-bindings/soc/cpm1-fsl,tsa.h
+ 
+ FREESCALE QUICC ENGINE UCC ETHERNET DRIVER
+-M:	Li Yang <leoyang.li@nxp.com>
+ L:	netdev@vger.kernel.org
+ L:	linuxppc-dev@lists.ozlabs.org
+-S:	Maintained
++S:	Orphan
+ F:	drivers/net/ethernet/freescale/ucc_geth*
+ 
+ FREESCALE QUICC ENGINE UCC HDLC DRIVER
+@@ -8708,10 +8705,9 @@ S:	Maintained
+ F:	drivers/tty/serial/ucc_uart.c
+ 
+ FREESCALE SOC DRIVERS
+-M:	Li Yang <leoyang.li@nxp.com>
+ L:	linuxppc-dev@lists.ozlabs.org
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+-S:	Maintained
++S:	Orphan
+ F:	Documentation/devicetree/bindings/misc/fsl,dpaa2-console.yaml
+ F:	Documentation/devicetree/bindings/soc/fsl/
+ F:	drivers/soc/fsl/
+@@ -8745,10 +8741,9 @@ F:	Documentation/devicetree/bindings/sound/fsl,qmc-audio.yaml
+ F:	sound/soc/fsl/fsl_qmc_audio.c
+ 
+ FREESCALE USB PERIPHERAL DRIVERS
+-M:	Li Yang <leoyang.li@nxp.com>
+ L:	linux-usb@vger.kernel.org
+ L:	linuxppc-dev@lists.ozlabs.org
+-S:	Maintained
++S:	Orphan
+ F:	drivers/usb/gadget/udc/fsl*
+ 
+ FREESCALE USB PHY DRIVER
 
+base-commit: c85af715cac0a951eea97393378e84bb49384734
+-- 
+2.43.0
 
-
-Are these expected operations or do I need to dig deeper?
-
-Thanks,
-Ferenc
 
