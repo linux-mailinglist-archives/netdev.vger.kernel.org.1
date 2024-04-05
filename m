@@ -1,119 +1,104 @@
-Return-Path: <netdev+bounces-85242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC3ED899E35
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:24:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5B7B899E49
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F4292836E3
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:24:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 805381F22DC0
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605C716D4E0;
-	Fri,  5 Apr 2024 13:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9671516D4D0;
+	Fri,  5 Apr 2024 13:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aieFgJ4A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lttrIDkP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390F116078C;
-	Fri,  5 Apr 2024 13:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625D116C877;
+	Fri,  5 Apr 2024 13:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712323423; cv=none; b=fSkdEAikCVo5jlBwfAhnbpL2x5Gs9dV20RqJRC4IXmkWgFgoe9G+p2CCNoTTNCxTzXLq0x+nc1djpKM3WhQibq2EI83K78AIaGUzTpixnJrnLSW7BvUVZdEDWX9y8ba4EYGNSuKG1oNZr3OSSsVnhYUQZ5O01WmQr7J5vM1yxoQ=
+	t=1712323660; cv=none; b=tZSI/4CPIjyKWhYfJcGFXdGrbYF6acM07JtMYc6ZEhH3nDLIrlSH6HFJATi40CiMklKj5BfpYV9Ce0vcT9kAx6fuUDa9N3bcDHr649NHmQGKVlvMhXx3tmYuXg343EQjzYpupuPB4PzrgTNyg9NJpJMVxdaY2oMUyhrSI7R2vf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712323423; c=relaxed/simple;
-	bh=TsyTbKLsCoanqUlDnD9/XzJ/RF7X9X8PhkChbcH//pU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WNOonMLqeP/Rk5s5nd7IrOwdSViFS9byXFplqOXxQqrT+TSR75gss6tS4iGvY1u/1l1S7i3Vw6ZPNm012XAb/A2JnRjOKLiZmxA1+gwfevbc7rzKIz4dRxkMCmhpwIndf9mQq+3aYPdfWVGh0Lu0dUmy/ypF+UAC7hw9iWh62FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aieFgJ4A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE41C433C7;
-	Fri,  5 Apr 2024 13:23:42 +0000 (UTC)
+	s=arc-20240116; t=1712323660; c=relaxed/simple;
+	bh=iitSfI2Y8LrBa++ncwel3h3WEbl4CDisdRxqGPA4c5k=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=BNFdwAH1jhN8JGivG3ltKJ8qdfaREFosQH237bJhm0Yprpaw7klsj5GWMVW0bjCI5ugR2BnYUdbxkIJkPsHjy7iRBZE+0JMIuA4PUWzlOB/Ba/hPAvZY5DHHO6VgaJGBpCJhG6Afc6gMV6P1PMp91Yx6BlIzZyOWtgTHAlsil6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lttrIDkP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B728C433C7;
+	Fri,  5 Apr 2024 13:27:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712323422;
-	bh=TsyTbKLsCoanqUlDnD9/XzJ/RF7X9X8PhkChbcH//pU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=aieFgJ4ADP8kJvJ/64bJ+gAd3zXlZyAh/vEo+wiF/DyN91mKlnh+vzW6A76IujFsX
-	 a5plKs1pLRB0YgGTWdRhcmbMUjuoJ6fcBTOK2ACOA4nPm8lE4a7CncVus3picOvJbP
-	 CcIV4I82lsIPu+ucNLBwKheM/YoZgXaJAiGtliiaJSpx/jJlhZoG/ARcmZWrBA81S7
-	 LcJ+wl4snnoHXEjKcIYoZpM4ThKNBx/1e6ifdAM59J6Xyf8iy31sz5UyRtAAEMeWip
-	 YOg+2voLyd1aAqxgnFVmZwhPb/LIU6UGhiRAuzJOwu3WHPJlVHn78h3bSZFlMvt/T4
-	 PtDRVBfF+Y5+w==
-From: Puranjay Mohan <puranjay@kernel.org>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@rivosinc.com>
-Cc: puranjay12@gmail.com,
-	puranjay@kernel.org
-Subject: [PATCH bpf] MAINTAINERS: Update email address for Puranjay Mohan
-Date: Fri,  5 Apr 2024 13:23:37 +0000
-Message-Id: <20240405132337.71950-1-puranjay@kernel.org>
-X-Mailer: git-send-email 2.40.1
+	s=k20201202; t=1712323660;
+	bh=iitSfI2Y8LrBa++ncwel3h3WEbl4CDisdRxqGPA4c5k=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=lttrIDkP/Dhv4IN6Lxk++khK7XWYBENBQs6ggUCGtf4DyBhxkdh6xc5im0USff+Gm
+	 CGtvdPhqBQXrMkVdiAK9fOCDiwUt4DBYoGSQMrfBcLx0RZuJBS61BL6I5sC+vn4znX
+	 YIcIUcw19KqTIYxqWzBstbqn046g4X7EHfEJZpXflYZLLGDYFsnJWu4jewvExLRNCJ
+	 ONIAaJAuozMJ0yVdPHQIKJmPUQHyHzlkuSggeVvYchurL5QnIVKtJn0ZNCpp/Fr0C5
+	 CAWNm+FbmdZoeV9fPnY1PH5ZjXyWz/tmhUfd/lezExNCXmYevrmZebYkyySrghUINF
+	 08r5k2y+i6y3w==
+From: Kalle Valo <kvalo@kernel.org>
+To: <davem@davemloft.net>,  <edumazet@google.com>,  <kuba@kernel.org>,
+  <pabeni@redhat.com>
+Cc: Baochen Qiang <quic_bqiang@quicinc.com>, <ath11k@lists.infradead.org>,
+  <manivannan.sadhasivam@linaro.org>,  <linux-wireless@vger.kernel.org>,
+  <linux-arm-msm@vger.kernel.org>,  <mhi@lists.linux.dev>,
+  <netdev@vger.kernel.org>
+Subject: Re: [PATCH v7 2/3] net: qrtr: support suspend/hibernation
+References: <20240305021320.3367-1-quic_bqiang@quicinc.com>
+	<20240305021320.3367-3-quic_bqiang@quicinc.com>
+Date: Fri, 05 Apr 2024 16:27:35 +0300
+In-Reply-To: <20240305021320.3367-3-quic_bqiang@quicinc.com> (Baochen Qiang's
+	message of "Tue, 5 Mar 2024 10:13:19 +0800")
+Message-ID: <8734s02b3s.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-I would like to use the kernel.org address for kernel development from
-now on.
+Hi netdev maintainers,
 
-Signed-off-by: Puranjay Mohan <puranjay@kernel.org>
----
- .mailmap    | 1 +
- MAINTAINERS | 6 +++---
- 2 files changed, 4 insertions(+), 3 deletions(-)
+Baochen Qiang <quic_bqiang@quicinc.com> writes:
 
-diff --git a/.mailmap b/.mailmap
-index 59c9a841bf71..b6930c2f68f4 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -496,6 +496,7 @@ Praveen BP <praveenbp@ti.com>
- Pradeep Kumar Chitrapu <quic_pradeepc@quicinc.com> <pradeepc@codeaurora.org>
- Prasad Sodagudi <quic_psodagud@quicinc.com> <psodagud@codeaurora.org>
- Punit Agrawal <punitagrawal@gmail.com> <punit.agrawal@arm.com>
-+Puranjay Mohan <puranjay@kernel.org> <puranjay12@gmail.com>
- Qais Yousef <qyousef@layalina.io> <qais.yousef@imgtec.com>
- Qais Yousef <qyousef@layalina.io> <qais.yousef@arm.com>
- Quentin Monnet <qmo@kernel.org> <quentin.monnet@netronome.com>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6a233e1a3cf2..e2350c031578 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -553,7 +553,7 @@ F:	Documentation/devicetree/bindings/iio/accel/adi,adxl345.yaml
- F:	drivers/input/misc/adxl34x.c
- 
- ADXL355 THREE-AXIS DIGITAL ACCELEROMETER DRIVER
--M:	Puranjay Mohan <puranjay12@gmail.com>
-+M:	Puranjay Mohan <puranjay@kernel.org>
- L:	linux-iio@vger.kernel.org
- S:	Supported
- F:	Documentation/devicetree/bindings/iio/accel/adi,adxl355.yaml
-@@ -3714,7 +3714,7 @@ F:	drivers/iio/imu/bmi323/
- 
- BPF JIT for ARM
- M:	Russell King <linux@armlinux.org.uk>
--M:	Puranjay Mohan <puranjay12@gmail.com>
-+M:	Puranjay Mohan <puranjay@kernel.org>
- L:	bpf@vger.kernel.org
- S:	Maintained
- F:	arch/arm/net/
-@@ -21921,7 +21921,7 @@ F:	include/linux/soc/ti/ti_sci_inta_msi.h
- F:	include/linux/soc/ti/ti_sci_protocol.h
- 
- TEXAS INSTRUMENTS' TMP117 TEMPERATURE SENSOR DRIVER
--M:	Puranjay Mohan <puranjay12@gmail.com>
-+M:	Puranjay Mohan <puranjay@kernel.org>
- L:	linux-iio@vger.kernel.org
- S:	Supported
- F:	Documentation/devicetree/bindings/iio/temperature/ti,tmp117.yaml
--- 
-2.40.1
+> MHI devices may not be destroyed during suspend/hibernation, so need
+> to unprepare/prepare MHI channels throughout the transition, this is
+> done by adding suspend/resume callbacks.
+>
+> The suspend callback is called in the late suspend stage, this means
+> MHI channels are still alive at suspend stage, and that makes it
+> possible for an MHI controller driver to communicate with others over
+> those channels at suspend stage. While the resume callback is called
+> in the early resume stage, for a similar reason.
+>
+> Also note that we won't do unprepare/prepare when MHI device is in
+> suspend state because it's pointless if MHI is only meant to go through
+> a suspend/resume transition, instead of a complete power cycle.
+>
+> Tested-on: WCN6855 hw2.0 PCI
+> WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
+>
+> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
+> Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+> Reviewed-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 
+Could I take this patch via ath.git tree? Full patch here (same patch
+but links to both patchwork projects):
+
+https://patchwork.kernel.org/project/linux-wireless/patch/20240305021320.3367-3-quic_bqiang@quicinc.com/
+
+https://patchwork.kernel.org/project/netdevbpf/patch/20240305021320.3367-3-quic_bqiang@quicinc.com/
+
+I ask because we need it to get hibernation working on ath11k (and ath12k):
+
+https://patchwork.kernel.org/project/linux-wireless/patch/20240305021320.3367-4-quic_bqiang@quicinc.com/
+
+Kalle
 
