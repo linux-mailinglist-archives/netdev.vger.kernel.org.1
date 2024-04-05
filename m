@@ -1,116 +1,160 @@
-Return-Path: <netdev+bounces-85361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 102ED89A604
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 23:20:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E7989A606
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 23:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD792B21671
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:20:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D3DCB225A3
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 21:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C9D174EDB;
-	Fri,  5 Apr 2024 21:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92D8174EFD;
+	Fri,  5 Apr 2024 21:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pxtPJ3qT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D4F1C687
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 21:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE108174ED2
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 21:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712352001; cv=none; b=UEOM5bZEn7XUyXIHoC+GxI3WRJ7JcWs5WfCQdyDTicOxr92P5AKVyjlHUunHsPBM2AKuq4ARLkORuKL7KrvU46EWLRziBOdi7B60GwF8iHNAlET5B9laut+KNtsYd8aAnbzd108ovZX59EjBJGhPS3wPyvv3UtKHroW9wYV/H9M=
+	t=1712352174; cv=none; b=bVoeN9jZX3/FGxa6lRCbYDeZLRjxbSQXaTDeCMo0ZvuafstdcFJ5ycJhqAIq+Xmd46PR4Lk6hcrxGNFzCu//3tJnLGbs8XJ9kKNotJmKxzt/hoFghvD5HsrHxwtaw8NF3jxvCsXwHxrELf3/DgDEqs9eE/uWKwV4VqPSLkSB+Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712352001; c=relaxed/simple;
-	bh=DmWLO9dxq30HbLw9pWZItRdax35PdcRdrilzTT/8IFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=E+r+0zNdoHbFelgn+QmcoON9QzetGNtr6feJBJUB6qGP5WhfEfLssUltO60+SRyArUlXjfX+CSqEjU/wlbZJeu/lKHJOgQARIxXioCJzEkFKmzo8Rb50FEj5dbBckOrmYj7Iu1M93wPXNBF5rPP5HBxkZyGHJyxQ3j4o91i750Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-376-B0yS12P1NjOc5eOOiUbggg-1; Fri, 05 Apr 2024 17:19:48 -0400
-X-MC-Unique: B0yS12P1NjOc5eOOiUbggg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 331A5811E81;
-	Fri,  5 Apr 2024 21:19:48 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B52AE1121D;
-	Fri,  5 Apr 2024 21:19:46 +0000 (UTC)
-Date: Fri, 5 Apr 2024 23:19:41 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com,
-	Phillip Potter <phil@philpotter.co.uk>
-Subject: Re: [PATCH v4 net] geneve: fix header validation in
- geneve[6]_xmit_skb
-Message-ID: <ZhBq7fe_pN90gJkX@hog>
-References: <20240405103035.171380-1-edumazet@google.com>
+	s=arc-20240116; t=1712352174; c=relaxed/simple;
+	bh=+XGvr/9UwiEYoJxySupRBV0fX9P8bN9Wu4aGZNBWzG0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tKvW5uAwhBCpXZv8Ni47BbGsyHubq/QlRSYNuOWa6Yg61wOEtFlohIXzPjTCkc+8kEuPHtfHN7cN7wHw/537lrsxN7arcKAXR3CejobIr0r4OK49zcFhFC2t7OLNIPUpdBLOA6bKf/Ykuw79gyqzUWFviOZscqbyJi5aYZSbaH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pxtPJ3qT; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso1357a12.1
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 14:22:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712352171; x=1712956971; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2bOittMnFEaGoOVCuwnFtfdUUNfSo5v/D1jXHfwcvf4=;
+        b=pxtPJ3qT4wTIVSuqwhApOuUxV+A8e4pJWttpwvpjSUMq8u8Rm54z96eT6oJwxrKOOL
+         XeXmeVPHBFbBFSdkkKcizZUmtu6GL8GS/rh5SGcnU7VdLvrLEiNeYJTSO0Zu3lKa8CSe
+         +XB+tkJHk3XTzKxSvsllpUlv6O5j8zOHcHBdHrIMMfQm7ZAAKYITSAjhzIjuIONI6Fqu
+         wfQDBy4uIJjmu5P3HAqKBTRmKuWwohVVoaoE43XmL/cqCGV2kjW2mGfOUDTx6D2pZMcP
+         N1S4TZaHIL1bD8nyI3KgyXQf7UpvzptFwuvRRuG8CbjloXzgnvvsfYKlrme1TMTzM9tw
+         v2UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712352171; x=1712956971;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2bOittMnFEaGoOVCuwnFtfdUUNfSo5v/D1jXHfwcvf4=;
+        b=oMPKzlJp9PuQc2pvAdhvKkDyPEYlXXqjvzInCeNW5VmZe0nsyC3Dl9P37gsLEyOKCt
+         PJJxKZyKNCgV9dus/vzGzuZBNvjV4Tk7Cbayn/qkJGXxBwbhpsJJeEHFePy+WZBT8nZW
+         anQN0KMnrscPwYkpV1nU6H7BsdVrpzQnLS3QnNSanTXrbGwWo0c8lJkOC3N2Sw4lA4Fu
+         PkTIQaFAz+QRWzz+wgQrHZiUAjrKuEYeQuR+BwZhG7iOM5fynl1n1CkDkEMxS/W+Ocio
+         iVa6Fi66qqSZLRl3+MeRAWo87WzaTLlJtJNWlgrKqgwIZKRg/bvy4SVLW8oULKu82mQY
+         4fkg==
+X-Forwarded-Encrypted: i=1; AJvYcCUpK2QW6ZwUWWOFaAzXuuw0+3zftnVQ6MR/iKA5r3R3wzI/yipIlELenNdxdZZkPf6ml2Z9lPdWLRvsrIGYg3vhg73qQNmr
+X-Gm-Message-State: AOJu0YxbTSufBW1cFg8NdIzR6PKwtf6s8iI8ev0qFNhncyQPOd6Uhx3K
+	dP/7MAlY42bX1h8QVyHi3tZfltTg9/iiHjmMOPtU6VYjfkg0htZJD4YXfmEHD1nz2M3ZXqfDqFm
+	I+aHdpcj6uamAqZONcLNPrG6I8rez0Wm7RF4I
+X-Google-Smtp-Source: AGHT+IHW+7mf82GixhuIT44gfxUqRfQhYZqSPvI+8Wc67f6b41aoVw8JPchWHJiiUx52XXEGD+SfiIIS/CP4s+sHzXI=
+X-Received: by 2002:a05:6402:c9b:b0:56e:3486:25a3 with SMTP id
+ cm27-20020a0564020c9b00b0056e348625a3mr6488edb.1.1712352170998; Fri, 05 Apr
+ 2024 14:22:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240405103035.171380-1-edumazet@google.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+References: <0000000000002ca935060b5a7682@google.com> <0000000000009c0f98061550a827@google.com>
+In-Reply-To: <0000000000009c0f98061550a827@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Apr 2024 23:22:40 +0200
+Message-ID: <CANn89iLxVgrd2QoFkv0xS6ppyZTyO5Hnv5+M5gGg99BQ09n5Ng@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING in cleanup_net (3)
+To: syzbot <syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, hdanton@sina.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, xrivendell7@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-2024-04-05, 10:30:34 +0000, Eric Dumazet wrote:
-> syzbot is able to trigger an uninit-value in geneve_xmit() [1]
->=20
-> Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield())
-> uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
-> skb->protocol.
->=20
-> If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->protocol,
-> pskb_inet_may_pull() does nothing at all.
->=20
-> If a vlan tag was provided by the caller (af_packet in the syzbot case),
-> the network header might not point to the correct location, and skb
-> linear part could be smaller than expected.
->=20
-> Add skb_vlan_inet_prepare() to perform a complete mac validation.
->=20
-> Use this in geneve for the moment, I suspect we need to adopt this
-> more broadly.
->=20
-> v4 - Jakub reported v3 broke l2_tos_ttl_inherit.sh selftest
->    - Only call __vlan_get_protocol() for vlan types.
-> Link: https://lore.kernel.org/netdev/20240404100035.3270a7d5@kernel.org/
->=20
-> v2,v3 - Addressed Sabrina comments on v1 and v2
-> Link: https://lore.kernel.org/netdev/Zg1l9L2BNoZWZDZG@hog/
->=20
-...
->=20
-> Fixes: d13f048dd40e ("net: geneve: modify IP header check in geneve6_xmit=
-_skb and geneve_xmit_skb")
-> Reported-by: syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/000000000000d19c3a06152f9ee4@googl=
-e.com/
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Phillip Potter <phil@philpotter.co.uk>
-> Cc: Sabrina Dubroca <sd@queasysnail.net>
+On Fri, Apr 5, 2024 at 5:00=E2=80=AFAM syzbot
+<syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has found a reproducer for the following issue on:
+>
+> HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kerne=
+l..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D11fdccc518000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dfe78468a74fdc=
+3b7
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D9ada62e1dc03fdc=
+41982
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D16696223180=
+000
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/0f7abe4afac7/dis=
+k-fe46a7dd.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/82598d09246c/vmlinu=
+x-fe46a7dd.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/efa23788c875/b=
+zImage-fe46a7dd.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com
+>
+> ------------[ cut here ]------------
+> WARNING: CPU: 1 PID: 5236 at lib/ref_tracker.c:179 ref_tracker_dir_exit+0=
+x411/0x550 lib/ref_tracker.c:179
+> Modules linked in:
+> CPU: 1 PID: 5236 Comm: kworker/u8:6 Not tainted 6.8.0-syzkaller-08951-gfe=
+46a7dd189e #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 03/27/2024
+> Workqueue: netns cleanup_net
+> RIP: 0010:ref_tracker_dir_exit+0x411/0x550 lib/ref_tracker.c:179
+> Code: 48 8b 1c 24 48 89 df 48 8b 74 24 20 e8 88 e7 9f 06 eb 1a e8 71 d2 b=
+5 fc 48 8b 1c 24 48 89 df 48 8b 74 24 20 e8 70 e7 9f 06 90 <0f> 0b 90 48 83=
+ c3 44 48 89 df be 04 00 00 00 e8 db 23 19 fd 48 89
+> RSP: 0018:ffffc9000905f9e0 EFLAGS: 00010246
+> RAX: 717a74f119e84f00 RBX: ffff888021ec9e98 RCX: 0000000000000001
+> RDX: dffffc0000000000 RSI: ffffffff8baac1e0 RDI: 0000000000000001
+> RBP: ffffc9000905fab0 R08: ffffffff92ce55ff R09: 1ffffffff259cabf
+> R10: dffffc0000000000 R11: fffffbfff259cac0 R12: 1ffff1100df19ef8
+> R13: dead000000000100 R14: ffff888021ec9ee8 R15: dffffc0000000000
+> FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f5c604d35c0 CR3: 0000000029078000 CR4: 0000000000350ef0
+> Call Trace:
+>  <TASK>
+>  net_free net/core/net_namespace.c:462 [inline]
+>  cleanup_net+0xbf3/0xcc0 net/core/net_namespace.c:658
+>  process_one_work kernel/workqueue.c:3254 [inline]
+>  process_scheduled_works+0xa02/0x1770 kernel/workqueue.c:3335
+>  worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+>  kthread+0x2f2/0x390 kernel/kthread.c:388
+>  ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+>  </TASK>
+>
+>
+> ---
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-
-Thanks Eric.
-
---=20
-Sabrina
-
+#syz fix: rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
 
