@@ -1,158 +1,155 @@
-Return-Path: <netdev+bounces-85093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FDBB89966B
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:21:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A858996C7
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80D991C21298
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 07:21:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84422B23D1F
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 07:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15B72E84E;
-	Fri,  5 Apr 2024 07:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4990F13D2BB;
+	Fri,  5 Apr 2024 07:44:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3052C1B8
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 07:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CD213D29D
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 07:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712301670; cv=none; b=Oo9XFRXI+UuV5ikrpbTkgC0otLLbUZ41mRya2uYh4t+ApRsr9KMcwH/YRKqoRw6pOrNHauj/rmTIUGQAI8wsvamUg2T43PCjjGTAaxbhpdGXSfNH+8c8Wfuh2t9LOq96pj71Smw6zF33LlVv5YbrQM8w486kGAKFqNxJ43xkhGA=
+	t=1712303066; cv=none; b=UTFbfp4zihdi27cG25/LK5igjdH4Eb6fVZ2G5lQ39P5wm/Iua0swdI5MDwn3IWecAlHzCRUOCzpNMNMLfIr8VRketPfWYdOb7KBQHhIBAZBod6mZKMSEFFIRJAvPI1IRhMFzO8VLUeisbb2d6XBUFbob1xiZu1X/OCnLBGM5idA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712301670; c=relaxed/simple;
-	bh=rq0ub4HQWbS8WRYOtmnvbSqcOyc5iY6cPnnlDfYTMfY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u73C8nwBIJPRedqF6Izc9fBhKeYs2WAO5iVwQUVnaxNMVJ4+SjPBmBELRIWYxNoBc6lagCA3Bc2O8attCa+fulSBiHcC9KpRNDOlZkaiaRkAtYJ1Yr24+IjunWb8NI8EwOtFTFEQI8xG+FNiJW6ld70rsHucc38/lnLy2B2SLA0=
+	s=arc-20240116; t=1712303066; c=relaxed/simple;
+	bh=R03D674QYB5Ga54S94jEHsV8UofXlPVpjBUr5x+5e/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NL69Vz5WNKaqi4k4ZBVGU0nSDZAA9yGG7jSTqsT/qKXeE4xfcxLKEtjVYowXJRhuHJGwl2YsABjiYNZ/w66KKVYEX+TzZDLihJiBjxzj3YiMDRALHQ0i0Zfu4FHWseaII4n9ZgiLkke+183I2d/3cZjR1CjTvyU2r6UAx0/je6o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rsdsU-0002so-2H; Fri, 05 Apr 2024 09:20:46 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rseEx-0000sw-KA; Fri, 05 Apr 2024 09:43:59 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rsdsS-00AWlk-VL; Fri, 05 Apr 2024 09:20:44 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rsdsS-00FNeT-2q;
-	Fri, 05 Apr 2024 09:20:44 +0200
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Li Yang <leoyang.li@nxp.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Zhang Wei <zw@zh-kernel.org>,
-	linuxppc-dev@lists.ozlabs.org,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH] MAINTAINERS: Drop Li Yang as their email address stopped working
-Date: Fri,  5 Apr 2024 09:20:41 +0200
-Message-ID: <20240405072042.697182-2-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
+	(envelope-from <ore@pengutronix.de>)
+	id 1rseEr-00AWqn-SL; Fri, 05 Apr 2024 09:43:53 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rseEr-00FbmS-2U;
+	Fri, 05 Apr 2024 09:43:53 +0200
+Date: Fri, 5 Apr 2024 09:43:53 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <Zg-ruY_ufPJOyHad@pengutronix.de>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+ <20240326-feature_poe-v6-11-c1011b6ea1cb@bootlin.com>
+ <20240402132637.GA3744978-robh@kernel.org>
+ <20240403111548.30e780b5@kmaincent-XPS-13-7390>
+ <20240403143142.GA3508225-robh@kernel.org>
+ <20240404112506.2e155bad@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2657; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=rq0ub4HQWbS8WRYOtmnvbSqcOyc5iY6cPnnlDfYTMfY=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBmD6ZKkY6yppGrhNNyOtWlNH+4elKIHpdGAEr5v tStHRrc2RuJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZg+mSgAKCRCPgPtYfRL+ TsouB/47cqGkwC5L5mRT5uk5aAdbTfA7NN4ZTXF31ggFYif4zOhNk8lB2NZ3sV+ZCEMsrhJGQ1W 0qiy1Ak+QnRSVm96815mssAhzxCJwRqoBjEutLPScymOxs+/UwHn+tCnFP1MtdXOXD06Ku2VBFW OsQZOiaIdqiCahqDK4m0l/AR1MkEmVRFO1o3rgBlYWZlUlKQiJpxXsVPEwHQuUyvnFnfBMARMpu lG6OI1Dz/hBSHifIc2YNmkmFPSpDoe3G0PQjzIfLBjCr1fuvsnNS1NIhwCSHG70iCJlU7rVqPap AznBlkkLLwJFbPSLW+liIiMfw+DCkSPQStmpHQkvMRB3no4r
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240404112506.2e155bad@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-When sending a patch to (among others) Li Yang the nxp MTA replied that
-the address doesn't exist and so the mail couldn't be delivered. The
-error code was 550, so at least technically that's not a temporal issue.
+On Thu, Apr 04, 2024 at 11:25:06AM +0200, Kory Maincent wrote:
+> On Wed, 3 Apr 2024 09:31:42 -0500
+> Rob Herring <robh@kernel.org> wrote:
+> 
+> > >   
+> > > > > +
+> > > > > +          polarity-supported:
+> > > > > +            $ref: /schemas/types.yaml#/definitions/string-array
+> > > > > +            description:
+> > > > > +              Polarity configuration supported by the PSE PI pairsets.
+> > > > > +            minItems: 1
+> > > > > +            maxItems: 4
+> > > > > +            items:
+> > > > > +              enum:
+> > > > > +                - MDI-X
+> > > > > +                - MDI
+> > > > > +                - X
+> > > > > +                - S
+> > > > > +
+> > > > > +          vpwr-supply:
+> > > > > +            description: Regulator power supply for the PSE PI.    
+> > > > 
+> > > > I don't see this being used anywhere.  
+> > > 
+> > > Right, I forgot to add it to the PD692x0 and TPS23881 binding example!  
+> > 
+> > But is this really common/generic? I would think input power rails would 
+> > be chip specific.
+> 
+> I think as each PSE PI are seen as a regulator we may want it generic to track
+> each PI parent. Having the parent regulator described like that would force the
+> devicetree to describe where the power come from.
+> In contrary, for example, on the pd692x0 controller the regulators are connected
+> to the managers (PD69208) and not directly to the PIs. So the devicetree would
+> not really fit the hardware. It is indeed chip specific but having described
+> like that would be more simple.
+> 
+> If we decided to make it chip specific the core would have a callback to ask
+> the driver to fill the regulator_init_data structure for each PI before
+> registering the regulators. It is feasible.
+> 
+> Mmh in fact I am still unsure about the solution.
+> 
+> Oleksij as you were the first to push the idea. Have you more argument in mind
+> to make it generic?
+> https://lore.kernel.org/netdev/ZeObuKHkPN3tiWz_@pengutronix.de/
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
-Hello,
+There can be different, chip specific power consumer, for example the
+one which is feeding the PSE controller it self, but also there are common
+providers/consumers  those which are used to feed PSE PIs. In case of
+pd692x0 based setup, the managers are actual regulator responsible to
+control power rails connected to PSE PIs, so managers should use this
+common provider. Not sure how TI is designed, but it will have same type
+of consumer to feed PSE PIs as well.
 
-I added the affected maintainers and lists to Cc:, maybe someone there
-knows if this issue is only temporal?
-
-@Greg: Given that I noticed the non-existing address when sending an usb
-patch, I suggest you care for application of this patch (iff it should
-be applied now). If Li Yang disappeared indeed, I'd prefer to drop the
-contact from MAINTAINERS early to not give wrong expectations to
-contributors.
-
-Best regards
-Uwe
-
- MAINTAINERS | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7c121493f43d..be19aad15045 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2191,7 +2191,6 @@ N:	mxs
- 
- ARM/FREESCALE LAYERSCAPE ARM ARCHITECTURE
- M:	Shawn Guo <shawnguo@kernel.org>
--M:	Li Yang <leoyang.li@nxp.com>
- L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
- S:	Maintained
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/shawnguo/linux.git
-@@ -8523,7 +8522,6 @@ S:	Maintained
- F:	drivers/video/fbdev/fsl-diu-fb.*
- 
- FREESCALE DMA DRIVER
--M:	Li Yang <leoyang.li@nxp.com>
- M:	Zhang Wei <zw@zh-kernel.org>
- L:	linuxppc-dev@lists.ozlabs.org
- S:	Maintained
-@@ -8688,10 +8686,9 @@ F:	drivers/soc/fsl/qe/tsa.h
- F:	include/dt-bindings/soc/cpm1-fsl,tsa.h
- 
- FREESCALE QUICC ENGINE UCC ETHERNET DRIVER
--M:	Li Yang <leoyang.li@nxp.com>
- L:	netdev@vger.kernel.org
- L:	linuxppc-dev@lists.ozlabs.org
--S:	Maintained
-+S:	Orphan
- F:	drivers/net/ethernet/freescale/ucc_geth*
- 
- FREESCALE QUICC ENGINE UCC HDLC DRIVER
-@@ -8708,10 +8705,9 @@ S:	Maintained
- F:	drivers/tty/serial/ucc_uart.c
- 
- FREESCALE SOC DRIVERS
--M:	Li Yang <leoyang.li@nxp.com>
- L:	linuxppc-dev@lists.ozlabs.org
- L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
--S:	Maintained
-+S:	Orphan
- F:	Documentation/devicetree/bindings/misc/fsl,dpaa2-console.yaml
- F:	Documentation/devicetree/bindings/soc/fsl/
- F:	drivers/soc/fsl/
-@@ -8745,10 +8741,9 @@ F:	Documentation/devicetree/bindings/sound/fsl,qmc-audio.yaml
- F:	sound/soc/fsl/fsl_qmc_audio.c
- 
- FREESCALE USB PERIPHERAL DRIVERS
--M:	Li Yang <leoyang.li@nxp.com>
- L:	linux-usb@vger.kernel.org
- L:	linuxppc-dev@lists.ozlabs.org
--S:	Maintained
-+S:	Orphan
- F:	drivers/usb/gadget/udc/fsl*
- 
- FREESCALE USB PHY DRIVER
-
-base-commit: c85af715cac0a951eea97393378e84bb49384734
+Regards,
+Oleksij
 -- 
-2.43.0
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
