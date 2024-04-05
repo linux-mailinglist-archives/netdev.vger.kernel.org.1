@@ -1,121 +1,123 @@
-Return-Path: <netdev+bounces-85130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18B838999A9
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:38:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DAAC89998A
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:34:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C855B22EC1
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:38:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC4A32837BA
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A9716130D;
-	Fri,  5 Apr 2024 09:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999AA160782;
+	Fri,  5 Apr 2024 09:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rere.qmqm.pl header.i=@rere.qmqm.pl header.b="ZcrcoLqs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EpExBfVI"
 X-Original-To: netdev@vger.kernel.org
-Received: from rere.qmqm.pl (rere.qmqm.pl [91.227.64.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CAC15FA9C;
-	Fri,  5 Apr 2024 09:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.227.64.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502E8142E73;
+	Fri,  5 Apr 2024 09:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712309901; cv=none; b=AkwXRnRMetJ0L9IbHlnUlbm/I0PKkqbVheFMD6/h7gGzzCCEy3N0M6MCj5zef/kgVgDLuYdVbDKvVZa2ntxLYmVOH9+UNCMoJUCM5lDHULesMw/QG1A4N4mKQkWQ1JBmToVuVKemW8967bjjTRSDQiUl8coDx2ZJP5dEQov/leg=
+	t=1712309642; cv=none; b=riTeSbNHGuCIba3znf2JKL8iNXgELmlDKJ2faklOXGjEFtIW++X5BCwcWZIm1f7CFIRmP/VM7DelQ/tQAs/K3+a3HZvyORrBua5gGw2JA8/I688SATxtMUsc9Zyz7mMEaBVGBefqO2LgFAQ7HYzErthpbhwEpT5GN/sYkQJx8VU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712309901; c=relaxed/simple;
-	bh=gui0f6MViE5zSAEEOcDKHdPoDszSctiaYWprNP7GSNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TYx9XDMOKHsxsxgpErRPS/ygvPDzCeAlZTHPD8jU6Un/vl7oitKkIppyqtOYrexLuq9vY46aMb/YVGm7xn8ldd+hst08TGbqT5Eu4ZsNBxcPdZveBtSAApHlqy+wE0mswPrfmKn1k9Vlu1n6YEW+MMhGa8Dopk6yoUAbjF5ae08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rere.qmqm.pl; spf=pass smtp.mailfrom=rere.qmqm.pl; dkim=pass (2048-bit key) header.d=rere.qmqm.pl header.i=@rere.qmqm.pl header.b=ZcrcoLqs; arc=none smtp.client-ip=91.227.64.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rere.qmqm.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rere.qmqm.pl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
-	t=1712309337; bh=gui0f6MViE5zSAEEOcDKHdPoDszSctiaYWprNP7GSNc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZcrcoLqsz/zzlMruWf44PYk75DueBejOUyr1Eh31EyaZcoY7ODel3t0vFK51sQutC
-	 YY7dBqw6x5FiEghmAZFtz/zTJMGq5GtkEocuVfbQcN9BDPuRIei5HZ4DdjLpHxZ7+6
-	 E7lgHaOaQ5/+P2XOh5i4UPTyYivuDu5pF+wIovDfOhmC0jyS7Po0jdQpgN6Tw+kWcU
-	 BR21bYeWeQT2EX7dHW/mtmIf4RbdkqX5exTxh2367mA4o2zBmZSc7BFV4XrNkiEptZ
-	 Q5SBD2Ru9xBFkYUfXpcQGRwkKRKwaEBGta6Gar0WuqKpV+3lBKaNoDOSXQIouXFRPP
-	 Bq/roRR1X1cQQ==
-Received: from remote.user (localhost [127.0.0.1])
-	by rere.qmqm.pl (Postfix) with ESMTPSA id 4V9tTX48kvz8B;
-	Fri,  5 Apr 2024 11:28:48 +0200 (CEST)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 1.0.3 at mail
-Date: Fri, 5 Apr 2024 11:28:47 +0200
-From: =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
-To: Allen Pais <apais@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, tj@kernel.org, keescook@chromium.org,
-	vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev,
-	florian.fainelli@broadcom.com, rjui@broadcom.com,
-	sbranden@broadcom.com, paul@crapouillou.net,
-	Eugeniy.Paltsev@synopsys.com, manivannan.sadhasivam@linaro.org,
-	vireshk@kernel.org, Frank.Li@nxp.com, leoyang.li@nxp.com,
-	zw@zh-kernel.org, wangzhou1@hisilicon.com, haijie1@huawei.com,
-	shawnguo@kernel.org, s.hauer@pengutronix.de, sean.wang@mediatek.com,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	afaerber@suse.de, logang@deltatee.com, daniel@zonque.org,
-	haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-	andersson@kernel.org, konrad.dybcio@linaro.org, orsonzhai@gmail.com,
-	baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
-	patrice.chotard@foss.st.com, linus.walleij@linaro.org,
-	wens@csie.org, jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com,
-	kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, jassisinghbrar@gmail.com, mchehab@kernel.org,
-	maintainers@bluecherrydvr.com, aubin.constans@microchip.com,
-	ulf.hansson@linaro.org, manuel.lauss@gmail.com,
-	jh80.chung@samsung.com, oakad@yahoo.com,
-	hayashi.kunihiko@socionext.com, mhiramat@kernel.org,
-	brucechang@via.com.tw, HaraldWelte@viatech.com, pierre@ossman.eu,
-	duncan.sands@free.fr, stern@rowland.harvard.edu, oneukum@suse.com,
-	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
-	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-mediatek@lists.infradead.org,
-	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH 9/9] mmc: Convert from tasklet to BH workqueue
-Message-ID: <Zg_ET2XmZM_Id_Ad@qmqm.qmqm.pl>
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-10-apais@linux.microsoft.com>
+	s=arc-20240116; t=1712309642; c=relaxed/simple;
+	bh=NiNnjLTs7bJ/pA/1fT9tG+FdpzDELxqauiH0/oieIZc=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=Vt5fGx60fglzdPqXiAfqL2w+TNDSCUaJwpHpGPzwj1Lo97WkrRp0XQQV1WfZ5gJn3i4s+WFQplQfElajZTFie2pj1LUrjUzhqh6/hSDE7ks4XQd33ZobA6+wcpusvd5hKnGmCoOCWk4ej+xCyl8e94JcEwHhHpxDGGmJjarxHT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EpExBfVI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E043C433C7;
+	Fri,  5 Apr 2024 09:33:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712309641;
+	bh=NiNnjLTs7bJ/pA/1fT9tG+FdpzDELxqauiH0/oieIZc=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=EpExBfVIoVWyJiDMnIrAUVUAroAPVwax2wJwSWi6O2UUg6EDBUQDYB5m2yGpAPv3C
+	 FaDnBN9oFJjSztOLcKSpEwKPA5nX1dPExe5eYVpPv+krSk9k+DGDXSd5MuAnEwmBlN
+	 e5+bn1N4v0drvsj3q86qImhIVe2C1Lm6NmYpGH/fsWp5dZ/dBWRvvy/NxtXRY+GCCf
+	 lwP6bIotm0t+WUbwoyXNJXQz5HN/9SdmvQmxPqlhIVaWBkB4GLDo8rqHoIWefbUK3L
+	 z/ektvzmKv6hw3uZ857vNfcCajwMbEbcKc1SOscXtNJOLfMc7q6J33NtisFLxSSamh
+	 fpEK3k1TCqfYw==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,  Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>,  "David S . Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley
+ <conor+dt@kernel.org>,  Bjorn Andersson <andersson@kernel.org>,  Konrad
+ Dybcio <konrad.dybcio@linaro.org>,  Liam Girdwood <lgirdwood@gmail.com>,
+  Mark Brown <broonie@kernel.org>,  Catalin Marinas
+ <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>,  Bjorn Helgaas
+ <bhelgaas@google.com>,  Saravana Kannan <saravanak@google.com>,  Geert
+ Uytterhoeven <geert+renesas@glider.be>,  Arnd Bergmann <arnd@arndb.de>,
+  Neil Armstrong <neil.armstrong@linaro.org>,  Marek Szyprowski
+ <m.szyprowski@samsung.com>,  Alex Elder <elder@linaro.org>,  Srini
+ Kandagatla <srinivas.kandagatla@linaro.org>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,  Abel Vesa <abel.vesa@linaro.org>,
+  Manivannan Sadhasivam <mani@kernel.org>,  Lukas Wunner <lukas@wunner.de>,
+  Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+  linux-bluetooth@vger.kernel.org,  netdev@vger.kernel.org,
+  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-wireless@vger.kernel.org,  linux-arm-msm@vger.kernel.org,
+  linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
+  linux-pm@vger.kernel.org,  Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v6 05/16] dt-bindings: net: wireless: describe the
+ ath12k PCI module
+References: <20240325131624.26023-1-brgl@bgdev.pl>
+	<20240325131624.26023-6-brgl@bgdev.pl> <87msqm8l6q.fsf@kernel.org>
+	<CAMRc=MeCjNn7QdDrcQMuj32JFYoemQ6A8WOYcwKJo1YhDTfY+Q@mail.gmail.com>
+Date: Fri, 05 Apr 2024 12:33:52 +0300
+In-Reply-To: <CAMRc=MeCjNn7QdDrcQMuj32JFYoemQ6A8WOYcwKJo1YhDTfY+Q@mail.gmail.com>
+	(Bartosz Golaszewski's message of "Wed, 3 Apr 2024 16:56:01 +0200")
+Message-ID: <87cyr440hr.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240327160314.9982-10-apais@linux.microsoft.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 27, 2024 at 04:03:14PM +0000, Allen Pais wrote:
-> The only generic interface to execute asynchronously in the BH context is
-> tasklet; however, it's marked deprecated and has some design flaws. To
-> replace tasklets, BH workqueue support was recently added. A BH workqueue
-> behaves similarly to regular workqueues except that the queued work items
-> are executed in the BH context.
-> 
-> This patch converts drivers/infiniband/* from tasklet to BH workqueue.
-> 
-> Based on the work done by Tejun Heo <tj@kernel.org>
-> Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
-> 
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-> ---
-[...]
->  drivers/mmc/host/cb710-mmc.c                  | 15 ++--
->  drivers/mmc/host/cb710-mmc.h                  |  3 +-
-[...]
+Bartosz Golaszewski <brgl@bgdev.pl> writes:
 
-Acked-by: Micha³ Miros³aw <mirq-linux@rere.qmqm.pl>
+> On Mon, Mar 25, 2024 at 3:01=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wro=
+te:
+>>
+>> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>>
+>> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>> >
+>> > +
+>> > +maintainers:
+>> > +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>
+>> IMHO it would be better to have just driver maintainers listed here.
+>>
+>
+> Why? What's wrong with having the author of the bindings in the Cc list?
+
+If you want follow the ath12k development and review patches then you
+can join the ath12k list. I'm not fond of having too many maintainers,
+it's not really helping anything and just extra work to periodically
+cleanup the silent maintainers.
+
+I would ask the opposite question: why add you as the maintainer?
+There's not even a single ath12k patch from you, nor I haven't seen you
+doing any patch review or otherwise helping others related to ath12k.
+Don't get me wrong, I value the work you do with this important powerseq
+feature and hopefully we get it into the tree soon. But I don't see
+adding you as a maintainer at this point.
+
+--=20
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatc=
+hes
 
