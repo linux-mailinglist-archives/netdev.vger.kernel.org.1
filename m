@@ -1,142 +1,157 @@
-Return-Path: <netdev+bounces-85189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 364E2899B5D
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:56:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7BD8899B66
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:56:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 679EE1C21160
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:56:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 938182824FC
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FFA816D9DB;
-	Fri,  5 Apr 2024 10:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B0816ABDD;
+	Fri,  5 Apr 2024 10:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbqyZprg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHwMPTy0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6207016D9D5;
-	Fri,  5 Apr 2024 10:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8B416ABDE
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 10:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712314379; cv=none; b=k5hRbaNmVOR3yIQoiXWoe30vBcyl42KCS8qiScnWHvD0ZhB6YDchJzFKc+CivYpUZXl5NyXoO4jNmbqMlgGc/wXT7KJwO0wigzkPzEfcXKwqmhV/fmgai9F3EIDq6BguQjdFl3cbJiRbo4uleAZvPFODHQFhnl9FAcDKo5wU7DI=
+	t=1712314488; cv=none; b=Ph9dKNSspfNx9c9IyUFeVmUuqMNtAy7yxf4lwzmufpgt2pfjplhfVfP2snLDUsrlllXiowsWExLdtx+jnjFfMejuZ/5xaAphofE3HnGpf0sAjfL+JThrxCoP7lp82d1SbUKdl9K9XHIdmBHNosn8P/Fu9XUxBmM8uwu6BJU1f1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712314379; c=relaxed/simple;
-	bh=fgoj8mb7L9iIjajmasQSVS1V+GYnanZZ2dC6S1meCAs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ckJMu/1jNayXCsSHEBvIPR2KUASU5toMxPPFGNfCGiuz29ghjMSoSWqatmEJ8cciCgEw66Oknk9jq8KI0mosRCznK6aJG6KcnWY1IHUYEo6uFzPtkv1CBmGXnQPFErqooyv2on8lSLSIm7//fQz+7yC2NMC9Rh750SRzsi+dGtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbqyZprg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 444E0C433C7;
-	Fri,  5 Apr 2024 10:52:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712314378;
-	bh=fgoj8mb7L9iIjajmasQSVS1V+GYnanZZ2dC6S1meCAs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=hbqyZprgjdHYpN9ZXwzmxzj3feL/kC5fOzHQc1AfCkwK2OdoGpqe+aHKzwvvPDj3J
-	 uLdnXvIglqQoP9UYbKIHgUd+BAg6HfIvaOOPv8QP3ghKIlsbEYTBLgRDP3huiv03ce
-	 HgyBEgSkLvJB5QUlMLH66iTSeRFrrLUKjECTxdi+1LmFCn78byLzepphDWeB+Ocqhw
-	 9DRuzTbpX/KthsEMHSkZvQdM+3LF7T0yNqVUlNPPYiujhfeqIGPBImtq2rzcUg1as0
-	 /Z9+8DN5521lxqrzOsSlTjxTc0dJerUXA4k3g2QqoMmEyhnG4W12El0O/Lwr2LOOBC
-	 Ws7A8Kso6KW0w==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 05 Apr 2024 12:52:15 +0200
-Subject: [PATCH net-next 11/11] selftests: mptcp: netlink: drop
- disable=SC2086
+	s=arc-20240116; t=1712314488; c=relaxed/simple;
+	bh=To5A4M4WOKRZoEHIzugmE9TFkdwevHaM2rNN+ZTcRr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RTBo5HjjMPV+bIerMt+TcFWex8FWtrxOJyZ+5jhUP1S311Tq1FxFf/g/TyrWIWesIBpgzAsgSvZf3FcDzK8J5oCaVZ5HQRCVMOyOA7VJyK/rQWkjk8ecIgKYz12TRoODiTD5YVId13k7UUi4Z3SSRWKYeB/9Lwo9joGj+sd0YJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IHwMPTy0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712314485;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9nZAWSaBPuynx66B5XqJ60TNqoFuIzxwkDzDU3J2744=;
+	b=IHwMPTy06oO88xRxmkpg7+F3p2mBJe/pwa55QIR2fr5qLOY7igZUTas8dN4zz8i+0mY1LD
+	bMKahhM9E78eLC7ki9TC7ozQX1CGXtEykshkBQwXDxbdEUpwDaIT+dFPZ8GFao9iEib2Dt
+	HCiJCP3Y8nVuTdUVvER5DN/bmvNBc9M=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-537-DblAvW_iNb-yn94ctt2OFw-1; Fri,
+ 05 Apr 2024 06:54:41 -0400
+X-MC-Unique: DblAvW_iNb-yn94ctt2OFw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6D9D23C0F458;
+	Fri,  5 Apr 2024 10:54:41 +0000 (UTC)
+Received: from griffin.upir.cz (unknown [10.45.225.31])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B61CC40735E1;
+	Fri,  5 Apr 2024 10:54:40 +0000 (UTC)
+From: Jiri Benc <jbenc@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@kernel.org>
+Subject: [PATCH net] ipv6: fix race condition between ipv6_get_ifaddr and ipv6_del_addr
+Date: Fri,  5 Apr 2024 12:54:05 +0200
+Message-ID: <8bbe1218656e66552ff28cbee8c7d1f0ffd8e9fd.1712314149.git.jbenc@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240405-upstream-net-next-20240405-mptcp-selftests-refactoring-v1-11-eabc9b960966@kernel.org>
-References: <20240405-upstream-net-next-20240405-mptcp-selftests-refactoring-v1-0-eabc9b960966@kernel.org>
-In-Reply-To: <20240405-upstream-net-next-20240405-mptcp-selftests-refactoring-v1-0-eabc9b960966@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <tanggeliang@kylinos.cn>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1495; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=xlQkfbCL4ErvHSP5FwwmBIYPnN6FGH51Kb3aZGA8ojk=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmD9fmcHa6BiI0wi6rGAw8wxUcdYt3P3gbi4rnv
- pZoILgfM5eJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZg/X5gAKCRD2t4JPQmmg
- cwneD/95yyx0OfnYUP9IrQ29KInbqFdl7JhdnjHOfWsBwn9kgblNW3kDztkzOGqNQCqBbMtMg4Q
- Yxh7Slbcq/nA5KvwNcvwtD/sntLL1vczQNK7tpheGwwbju/iAjxDLnUv+fhQtnPOG+oCWtNG4Q5
- noWvfNx9RAQzVgfp9TAOaZkqZSK6fkn5uppPDdet5eM45IAJGZZTWuyQuPcF0XxI9cMObnBlQlj
- 4PcsMOGtx46OQz5gm3dmJlMfVxnIdzdotlIZhUx4ojidKwm35ftWaBuxw8n+53tkH13oor5rujG
- peNnt5mLAlulFQLoLTETeagGwkV6Ski5AMzDvhOcaB8mB7ATTJME9pSGDcJ9jrUvkIdV6jZCPbu
- b/Qd9JyvuuqAz0C/2SPqfLBAfOVlCRr/LEcTtDbIXkjcNQoFNE8sWYlnMxNTl4Cb8M1BghCekup
- 8/KX0hpQW7vcFxHC4ic+hSMLnw/diUrhr4j6RV7jiTtCSwNYuB9QoPzJGQBAE2vS2ddbNicz6xC
- QlP8jXKkpyCa6VPRegrkdLhPiOpTkOcrMLiJXji1BOB3wctQ4Zq9bZucVXB249NtSyJ9WJLH/c0
- qhsplxn+AXFu4mTR/NuHd2ItS//H420JrDZbgtmiI/krE+ldfDleZPz55sRutUz3cbhF+4YdUdf
- zbNuAHCZSkOxFGQ==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+Although ipv6_get_ifaddr walks inet6_addr_lst under the RCU lock, it
+still means hlist_for_each_entry_rcu can return an item that got removed
+from the list. The memory itself of such item is not freed thanks to RCU
+but nothing guarantees the actual content of the memory is sane.
 
-Now there are only a few of variables are not using double quotes.
-Modifying them, then "shellcheck disable=SC2086" can be dropped.
+In particular, the reference count can be zero. This can happen if
+ipv6_del_addr is called in parallel. ipv6_del_addr removes the entry
+from inet6_addr_lst (hlist_del_init_rcu(&ifp->addr_lst)) and drops all
+references (__in6_ifa_put(ifp) + in6_ifa_put(ifp)). With bad enough
+timing, this can happen:
 
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+1. In ipv6_get_ifaddr, hlist_for_each_entry_rcu returns an entry.
+
+2. Then, the whole ipv6_del_addr is executed for the given entry. The
+   reference count drops to zero and kfree_rcu is scheduled.
+
+3. ipv6_get_ifaddr continues and increments the reference count
+   (in6_ifa_hold).
+
+4. The rcu is unlocked and the entry is freed.
+
+5. Later, the reference count is dropped to zero (again) and kfree_rcu
+   is scheduled (again).
+
+Prevent increasing of the reference count in such case. The name
+in6_ifa_hold_safe is chosen to mimic the existing fib6_info_hold_safe.
+
+Fixes: 5c578aedcb21d ("IPv6: convert addrconf hash list to RCU")
+Signed-off-by: Jiri Benc <jbenc@redhat.com>
 ---
- tools/testing/selftests/net/mptcp/pm_netlink.sh | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/pm_netlink.sh b/tools/testing/selftests/net/mptcp/pm_netlink.sh
-index 4859fa85d9a0..2757378b1b13 100755
---- a/tools/testing/selftests/net/mptcp/pm_netlink.sh
-+++ b/tools/testing/selftests/net/mptcp/pm_netlink.sh
-@@ -1,11 +1,6 @@
- #!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- 
--# Double quotes to prevent globbing and word splitting is recommended in new
--# code but we accept it, especially because there were too many before having
--# address all other issues detected by shellcheck.
--#shellcheck disable=SC2086
--
- . "$(dirname "${0}")/mptcp_lib.sh"
- 
- ret=0
-@@ -20,14 +15,14 @@ optstring=hi
- while getopts "$optstring" option;do
- 	case "$option" in
- 	"h")
--		usage $0
-+		usage "$0"
- 		exit ${KSFT_PASS}
- 		;;
- 	"i")
- 		mptcp_lib_set_ip_mptcp
- 		;;
- 	"?")
--		usage $0
-+		usage "$0"
- 		exit ${KSFT_FAIL}
- 		;;
- 	esac
-@@ -40,7 +35,7 @@ err=$(mktemp)
- #shellcheck disable=SC2317
- cleanup()
- {
--	rm -f $err
-+	rm -f "${err}"
- 	mptcp_lib_ns_exit "${ns1}"
+Side note: While this fixes one bug, there may be more locking bugs
+lurking aroung inet6_ifaddr. The semantics of locking of inet6_ifaddr is
+wild and fragile. Some of the fields are freed in ipv6_del_addr and
+guarded by ifa->state == INET6_IFADDR_STATE_DEAD and RTNL. Some of the
+fields are freed in inet6_ifa_finish_destroy and guarded by ifa->refcnt
+and RCU. Needless to say, this semantics is undocumented. Worse,
+ifa->state guard may not be enough. For example, ipv6_get_ifaddr can
+still return an entry that proceeded through ipv6_del_addr, which means
+ifa->state is INET6_IFADDR_STATE_DEAD. However, at least some callers
+(e.g. ndisc_recv_ns) seem to change ifa->state to something else. As
+another example, ipv6_del_addr relies on ifa->flags, which are changed
+throughout the code without RTNL. All of this may be okay but it's far
+from clear.
+---
+ include/net/addrconf.h | 4 ++++
+ net/ipv6/addrconf.c    | 7 ++++---
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/addrconf.h b/include/net/addrconf.h
+index 9d06eb945509..62a407db1bf5 100644
+--- a/include/net/addrconf.h
++++ b/include/net/addrconf.h
+@@ -438,6 +438,10 @@ static inline void in6_ifa_hold(struct inet6_ifaddr *ifp)
+ 	refcount_inc(&ifp->refcnt);
  }
  
-
++static inline bool in6_ifa_hold_safe(struct inet6_ifaddr *ifp)
++{
++	return refcount_inc_not_zero(&ifp->refcnt);
++}
+ 
+ /*
+  *	compute link-local solicited-node multicast address
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 92db9b474f2b..779aa6ecdd49 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -2091,9 +2091,10 @@ struct inet6_ifaddr *ipv6_get_ifaddr(struct net *net, const struct in6_addr *add
+ 		if (ipv6_addr_equal(&ifp->addr, addr)) {
+ 			if (!dev || ifp->idev->dev == dev ||
+ 			    !(ifp->scope&(IFA_LINK|IFA_HOST) || strict)) {
+-				result = ifp;
+-				in6_ifa_hold(ifp);
+-				break;
++				if (in6_ifa_hold_safe(ifp)) {
++					result = ifp;
++					break;
++				}
+ 			}
+ 		}
+ 	}
 -- 
-2.43.0
+2.42.0
 
 
