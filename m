@@ -1,128 +1,121 @@
-Return-Path: <netdev+bounces-85127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA196899944
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:17:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B838999A9
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:38:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24ED9B21763
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:17:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C855B22EC1
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABE216079B;
-	Fri,  5 Apr 2024 09:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A9716130D;
+	Fri,  5 Apr 2024 09:38:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="JXw2oYVZ"
+	dkim=pass (2048-bit key) header.d=rere.qmqm.pl header.i=@rere.qmqm.pl header.b="ZcrcoLqs"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from rere.qmqm.pl (rere.qmqm.pl [91.227.64.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBAF15FCEC;
-	Fri,  5 Apr 2024 09:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CAC15FA9C;
+	Fri,  5 Apr 2024 09:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.227.64.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712308600; cv=none; b=N/W7d0cCyV0UkNK14se2B7uDZuow3WwMLdxsMbDcktpILYAIlkGwhziu8+l/hLsEcdBQRrFb7FKjfn7cyv3x9iSJs1u05KYTHv0SvBAz3YJCQIr4rOi3WF3E8xenTVOdIwnJAznkhgEWw8IA0HFlDgoSpd1VzEb7UCD6AJa8Bf8=
+	t=1712309901; cv=none; b=AkwXRnRMetJ0L9IbHlnUlbm/I0PKkqbVheFMD6/h7gGzzCCEy3N0M6MCj5zef/kgVgDLuYdVbDKvVZa2ntxLYmVOH9+UNCMoJUCM5lDHULesMw/QG1A4N4mKQkWQ1JBmToVuVKemW8967bjjTRSDQiUl8coDx2ZJP5dEQov/leg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712308600; c=relaxed/simple;
-	bh=fdMbK7k3/PNgmO7Xgshuru0+/9501l65oDk3nuXnMCg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h6YzKl7fCfVkWfBGOifCpImbC2QWz4t8FzSRjbVJqcm1HjwidIS0UhSQHHutSHnu2M0BAI3rQOI3QHMQgIoPLWbq0JLVb91LLjEAnFFPOnVlHqvwAXO/IPZuCMXCr19NR81IFV8TLUiznnZpZaMx3VrBw1/uKhOLys/hRzybElA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=JXw2oYVZ; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1712308597; x=1743844597;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fdMbK7k3/PNgmO7Xgshuru0+/9501l65oDk3nuXnMCg=;
-  b=JXw2oYVZJH49enVBJRrJWTptbkVfnwn4LpASayoC5l7wQYtvsrYvDKJG
-   dCypznIVmg4DF0LLO7OvtOGXLIAy30df+JLFq4+j8vp9t+7DdcgdKpJnq
-   cdJnTaeRjn75/AAFsHDIb7zVjZPsvpM/kN9kdEaLWQiMZ1USp+6BFWOqN
-   iOvSe4y/a+qoFtozB+h/RfQhMY/UcL52vtoY4BVudvaDZo4voutDWKhuf
-   lqkyY5HF/08Io9T/8HN9pQGIMQskEbLr4argQ8bSp1wYBVfytiYW8IrkA
-   DnvkpW8Cl9mkO8YPKEwHj994l7DzwrA6MqwITIFk5An436YOY+vHgk1Gj
-   w==;
-X-CSE-ConnectionGUID: sMUIZTwPTmiGVQCGWDNR+g==
-X-CSE-MsgGUID: 1BdMq5GhSjicJYu6ieBt5g==
-X-IronPort-AV: E=Sophos;i="6.07,181,1708412400"; 
-   d="scan'208";a="19574513"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Apr 2024 02:16:36 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 5 Apr 2024 02:16:24 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Fri, 5 Apr 2024 02:16:24 -0700
-Date: Fri, 5 Apr 2024 11:16:23 +0200
-From: Horatiu Vultur - M31836 <Horatiu.Vultur@microchip.com>
-To: Divya Koppera - I30481 <Divya.Koppera@microchip.com>
-CC: "andrew@lunn.ch" <andrew@lunn.ch>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, UNGLinuxDriver <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next 2/2] net: phy: micrel: lan8814: Add support for
- PTP_PF_PEROUT
-Message-ID: <20240405091623.yxbx5pkoxqqokyr2@DEN-DL-M31836.microchip.com>
-References: <20240404080115.450929-1-horatiu.vultur@microchip.com>
- <20240404080115.450929-3-horatiu.vultur@microchip.com>
- <CO1PR11MB4771B9B8238242DA6406CBE6E2032@CO1PR11MB4771.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1712309901; c=relaxed/simple;
+	bh=gui0f6MViE5zSAEEOcDKHdPoDszSctiaYWprNP7GSNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TYx9XDMOKHsxsxgpErRPS/ygvPDzCeAlZTHPD8jU6Un/vl7oitKkIppyqtOYrexLuq9vY46aMb/YVGm7xn8ldd+hst08TGbqT5Eu4ZsNBxcPdZveBtSAApHlqy+wE0mswPrfmKn1k9Vlu1n6YEW+MMhGa8Dopk6yoUAbjF5ae08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rere.qmqm.pl; spf=pass smtp.mailfrom=rere.qmqm.pl; dkim=pass (2048-bit key) header.d=rere.qmqm.pl header.i=@rere.qmqm.pl header.b=ZcrcoLqs; arc=none smtp.client-ip=91.227.64.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rere.qmqm.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rere.qmqm.pl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
+	t=1712309337; bh=gui0f6MViE5zSAEEOcDKHdPoDszSctiaYWprNP7GSNc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZcrcoLqsz/zzlMruWf44PYk75DueBejOUyr1Eh31EyaZcoY7ODel3t0vFK51sQutC
+	 YY7dBqw6x5FiEghmAZFtz/zTJMGq5GtkEocuVfbQcN9BDPuRIei5HZ4DdjLpHxZ7+6
+	 E7lgHaOaQ5/+P2XOh5i4UPTyYivuDu5pF+wIovDfOhmC0jyS7Po0jdQpgN6Tw+kWcU
+	 BR21bYeWeQT2EX7dHW/mtmIf4RbdkqX5exTxh2367mA4o2zBmZSc7BFV4XrNkiEptZ
+	 Q5SBD2Ru9xBFkYUfXpcQGRwkKRKwaEBGta6Gar0WuqKpV+3lBKaNoDOSXQIouXFRPP
+	 Bq/roRR1X1cQQ==
+Received: from remote.user (localhost [127.0.0.1])
+	by rere.qmqm.pl (Postfix) with ESMTPSA id 4V9tTX48kvz8B;
+	Fri,  5 Apr 2024 11:28:48 +0200 (CEST)
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 1.0.3 at mail
+Date: Fri, 5 Apr 2024 11:28:47 +0200
+From: =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
+To: Allen Pais <apais@linux.microsoft.com>
+Cc: linux-kernel@vger.kernel.org, tj@kernel.org, keescook@chromium.org,
+	vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev,
+	florian.fainelli@broadcom.com, rjui@broadcom.com,
+	sbranden@broadcom.com, paul@crapouillou.net,
+	Eugeniy.Paltsev@synopsys.com, manivannan.sadhasivam@linaro.org,
+	vireshk@kernel.org, Frank.Li@nxp.com, leoyang.li@nxp.com,
+	zw@zh-kernel.org, wangzhou1@hisilicon.com, haijie1@huawei.com,
+	shawnguo@kernel.org, s.hauer@pengutronix.de, sean.wang@mediatek.com,
+	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+	afaerber@suse.de, logang@deltatee.com, daniel@zonque.org,
+	haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+	andersson@kernel.org, konrad.dybcio@linaro.org, orsonzhai@gmail.com,
+	baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
+	patrice.chotard@foss.st.com, linus.walleij@linaro.org,
+	wens@csie.org, jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com,
+	kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, jassisinghbrar@gmail.com, mchehab@kernel.org,
+	maintainers@bluecherrydvr.com, aubin.constans@microchip.com,
+	ulf.hansson@linaro.org, manuel.lauss@gmail.com,
+	jh80.chung@samsung.com, oakad@yahoo.com,
+	hayashi.kunihiko@socionext.com, mhiramat@kernel.org,
+	brucechang@via.com.tw, HaraldWelte@viatech.com, pierre@ossman.eu,
+	duncan.sands@free.fr, stern@rowland.harvard.edu, oneukum@suse.com,
+	openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
+	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-mediatek@lists.infradead.org,
+	linux-actions@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH 9/9] mmc: Convert from tasklet to BH workqueue
+Message-ID: <Zg_ET2XmZM_Id_Ad@qmqm.qmqm.pl>
+References: <20240327160314.9982-1-apais@linux.microsoft.com>
+ <20240327160314.9982-10-apais@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-2
 Content-Disposition: inline
-In-Reply-To: <CO1PR11MB4771B9B8238242DA6406CBE6E2032@CO1PR11MB4771.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240327160314.9982-10-apais@linux.microsoft.com>
 
-The 04/05/2024 08:35, Divya Koppera - I30481 wrote:
-> Hi Horatiu,
-
-Hi Divya,
-
-> > +	ts_on.tv_sec = rq->perout.on.sec;
-> > +	ts_on.tv_nsec = rq->perout.on.nsec;
-> > +	on_nsec = timespec64_to_ns(&ts_on);
-> > +
-> > +	ts_period.tv_sec = rq->perout.period.sec;
-> > +	ts_period.tv_nsec = rq->perout.period.nsec;
-> > +	period_nsec = timespec64_to_ns(&ts_period);
-> > +
-> > +	if (period_nsec < 200) {
-> > +		pr_warn_ratelimited("%s: perout period too small, minimum
-> > is 200 nsec\n",
-> > +				    phydev_name(phydev));
-> > +		return -EOPNOTSUPP;
-> > +	}
+On Wed, Mar 27, 2024 at 04:03:14PM +0000, Allen Pais wrote:
+> The only generic interface to execute asynchronously in the BH context is
+> tasklet; however, it's marked deprecated and has some design flaws. To
+> replace tasklets, BH workqueue support was recently added. A BH workqueue
+> behaves similarly to regular workqueues except that the queued work items
+> are executed in the BH context.
 > 
-> Unlock is Missing in above and below conditions.
-
-Thanks for the review.
-
-Jakob already mention this in a previous comment[1]. And I already sent a
-new version where this is fixed.
-
-[1] https://lore.kernel.org/netdev/20240404094137.51b1397e@kernel.org/T/#m3053305f9a354ebf89e4dd0e6140f6cfbd2591e6
-
+> This patch converts drivers/infiniband/* from tasklet to BH workqueue.
 > 
-> > +
-> > +	if (on_nsec >= period_nsec) {
-> > +		pr_warn_ratelimited("%s: pulse width must be smaller than
-> > period\n",
-> > +				    phydev_name(phydev));
-> > +		return -EINVAL;
-> > +	}
-> > +
--- 
-/Horatiu
+> Based on the work done by Tejun Heo <tj@kernel.org>
+> Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.10
+> 
+> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+> ---
+[...]
+>  drivers/mmc/host/cb710-mmc.c                  | 15 ++--
+>  drivers/mmc/host/cb710-mmc.h                  |  3 +-
+[...]
+
+Acked-by: Micha³ Miros³aw <mirq-linux@rere.qmqm.pl>
 
