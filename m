@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-85171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8484B899ADA
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C2A899AE0
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A80D81C203BE
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:29:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C822F1C20A68
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B49161902;
-	Fri,  5 Apr 2024 10:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A5312E5B;
+	Fri,  5 Apr 2024 10:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j+zR5SoS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B1WHMiC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDDD16087B
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 10:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54AE1537E9
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 10:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712312970; cv=none; b=srgnS1wGVav1tbvZ4MAHkDkNCICrZp3u5XHZnVcPt0UB9Ol+Yfhd1JKKrI8hRGpQB7pJE1EamCofKZQTQl7dectlcID5rKAb5ZRzmu8k21jK6NwEh8+n+uspgypdVXwj6ijxmwXiGtfEXM9y5CuoVfqL8aPUJRVKD4t95sHxTEA=
+	t=1712313039; cv=none; b=ObX0MQmHXWPBGf6+psmUQ+8Ratjj9Ydie9PtEMZcIBZoZGoOkmpGb28IJP/1olqOW9zw2NvBEfKolQ8HKMzNjjsBv+5hhtvpJrxH6lo/2hNwiQdWuSsUEpE83j0lqsh8AjgH+8ynpT0idG1CDJ5tRzS2pCSXR5FlMT8JwXg1jzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712312970; c=relaxed/simple;
-	bh=j0Y2hhbgzwZ8sEW751sk49un7VN4F+j1OeYQiGQcsPc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uutaeD0UgvKijeCFQWmaNJCxXbhy+8rskdiwln57Wkh/Hy0q6tKMn0AZLYSQRQV/jc1WlnEd5RaTeOCX1f2dKUqE0VeyfdMdvlstAZtmjgfCIwomtfTblA7yAdrI8Vey2h4F5AberBD6N1S25g+lIhrHgS/vORD2j6TTDh8SPu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j+zR5SoS; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1712313039; c=relaxed/simple;
+	bh=vBhDVRzH+eTk2Dru2QR29F9ssxThCWHQG2bC6gft7VQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tU1xGBrQpHrLaXM6OQcsiIsLc04uBEet2zgNrdb0AR/+MA58NaLXuvkBdGgXbsCvkQglV4tdjVRTNDehNQa8FSDNanl2bqD5h3xcrgWMmeFxaiFfnrFZ+0fOUimpc/fR51RUiKcG5LkVowvSPhnxNzXTte9HpNI+3FkNjvYeGuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B1WHMiC+; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc4563611cso3096705276.3
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 03:29:28 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61504a34400so32819727b3.0
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 03:30:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712312967; x=1712917767; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712313036; x=1712917836; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=ZDx2yrQRouLc2u2CnAaRe+8FoaNC7eA5oT1BotlubCY=;
-        b=j+zR5SoSewflR4L/4ZrvL2qwW4xkLRB4d/wBm8KwUcKVyG3MprLypIZWH6Iix9sj/7
-         /BZrQDsk47n18nlOV9+Jh3xipAdvKw7EQ622h0QOpe6rpd/7OouN6/sCcLcO/FrV3BTc
-         3VIYqWOVDNL/0zasQ9dGTnEc9QnVpEL1ciaR9DVBs63eu4RiwNGkjgS9orDCxRU5FoPC
-         nVZEHXFPnFjauZkS+IZJX1JIz2VTc5mJb91T9o2wdMln+RaB56m7yGwql/mLNLF/DrzR
-         wvbaifn7iPGMNnTh6yJNKko2Qwg/fXWf7Z/C/wPpYxHATmmHSUHiNMcXQqBJYE8lMwrn
-         nq6Q==
+        bh=RXPsm+ZrEV6vu5g9tLRD5QdiNPu14Tgug+xAyXUgzdg=;
+        b=B1WHMiC+s2BMfx6eMcBd83SOIsN9yjPDCEsxZR0CjsLjxh3E5/6EYYuPGIksVtZtn6
+         w7QkN/YfBmMQ7JLx8chAlSS8iFen+Bk+CyKswb9D956xxpPQzrPbsALl8shbsuDdXmtx
+         bDXH4HJ5p5VFrdbP2dkoPQlVf+FAjbpF/fQml+lpcW0TRMlAN6+7ZCW2R6HRkag7QGpq
+         PzIHTZOR6sx8BFBa/EFSQ9gvcrgtNqXiRmxLg2ELw1w1RK7fabuVmeSv8jGFanuqjf4m
+         gV/560vEvXS8nqTYQ5HxdGCLhAbamt8XfAXsZiDkjc3DxrGoZXAU/AbxTajIWJ7DHSh9
+         aCuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712312967; x=1712917767;
+        d=1e100.net; s=20230601; t=1712313036; x=1712917836;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZDx2yrQRouLc2u2CnAaRe+8FoaNC7eA5oT1BotlubCY=;
-        b=nISOECB02JlkIg4VPPxxbnFPogjlzrouJS45J2WO/jJJ+LvuV1caGqPZq2rIvR8k//
-         PFC2NMOy1b5pRxSlTTxxyaAxuWhzU0q346TPlsucPtNljdYtUasrZ9/6wwfYV2ujp6xV
-         nr4MJ5yIZVXUmzeuSlJ/7kLlrYFuTciSp8V8t1DlRpmpvS7AAwVw8zk+yTqk1WqOXpW4
-         3UhzaKHxGsUcEUbrBxPC9EH1NnHE7KyBGGaf+k8B24DuWpm6VqCBuA9B5zgVgCVYEWyP
-         385I5QTSSZn5+a1bBjTw/neSDftBMqLOqCZerXrWL5/44cpHRwau/yzjgrarWlJPkMpB
-         fDaw==
-X-Gm-Message-State: AOJu0YwvrUSfRTi2iyvLhWl4Zl2BPWZuKQMMFmtQXEYkVbjf+grc5T0b
-	DdvKNPTBNnNJStT9vMbNiIYuRvW9YzuGLOlS7LxJVu99qpygvNyKSmoRErJ9YUhGQhH3ukeEoeV
-	YnrQiHNqdZQ==
-X-Google-Smtp-Source: AGHT+IE3QOmXNnH5UbAC4KmBczFix70v8yrhYgPN5Osb18uL0L8EGvUxTSmZj4RV4wpPdHd8w94OSvRBvEkSww==
+        bh=RXPsm+ZrEV6vu5g9tLRD5QdiNPu14Tgug+xAyXUgzdg=;
+        b=Lz4sLkW3j+NFybROm3NmbEZ7zGLpkoOYi5HKb4WYoHTHwqM+XsYJjRj9FAEJLAQbF8
+         FLs6AH1kdcBtgVAeV/VGwObDuXeVsmUdgvTGD4WRSIS9PdKyJwGxPKVCwO59c01vIE8g
+         rU6rnSZ8oAA/wxSctvCyAcK8DtqekIhBY7nwJ1ec2IUCkf3XMmztEq+Atin+555qFreV
+         4yqb2G2KuhlL1k3k0P5MGc2oSYA0n9d0vbswwiwCkVm4FEOlbx0bO6gKUrKmFC4y00H0
+         6lqJW+WMFJI76QAKRdDhML5ouXdM+vg6qFyBBRTB7kKHS4yA88RDKd3c1q6t4Y5Crnz+
+         7j0A==
+X-Gm-Message-State: AOJu0YxW8OLX4UC9tipJIR2SXgC8tFpUx/ZdU8E3jdweT9UIPjZcxrqN
+	wKR+yUNpvFQ+Tvr0+4N4xENzCqzpcg7/+ATQpTd1WbAsVxwPxAvXXOZJOahmF3+UPaOsTO6KL+5
+	hoJP3Po1/sA==
+X-Google-Smtp-Source: AGHT+IF9Xndj8RqFg16xZAcxfpbTlYvsz7SYJ/DLXfHxMoy/zz2rY+49lcqJapT6Ho2Y+2Ea2onpXAe314q5DQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1108:b0:dc7:68b5:4f21 with SMTP
- id o8-20020a056902110800b00dc768b54f21mr248595ybu.9.1712312967540; Fri, 05
- Apr 2024 03:29:27 -0700 (PDT)
-Date: Fri,  5 Apr 2024 10:29:26 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:48ca:0:b0:615:ca8:6058 with SMTP id
+ v193-20020a8148ca000000b006150ca86058mr190125ywa.5.1712313036397; Fri, 05 Apr
+ 2024 03:30:36 -0700 (PDT)
+Date: Fri,  5 Apr 2024 10:30:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,99 +70,166 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240405102926.170698-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: more struct tcp_sock adjustments
+Message-ID: <20240405103035.171380-1-edumazet@google.com>
+Subject: [PATCH v4 net] geneve: fix header validation in geneve[6]_xmit_skb
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+	Eric Dumazet <edumazet@google.com>, syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com, 
+	Phillip Potter <phil@philpotter.co.uk>, Sabrina Dubroca <sd@queasysnail.net>
 Content-Type: text/plain; charset="UTF-8"
 
-tp->recvmsg_inq is used from tcp recvmsg() thus should
-be in tcp_sock_read_rx group.
+syzbot is able to trigger an uninit-value in geneve_xmit() [1]
 
-tp->tcp_clock_cache and tp->tcp_mstamp are written
-both in rx and tx paths, thus are better placed
-in tcp_sock_write_txrx group.
+Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield())
+uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
+skb->protocol.
 
+If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->protocol,
+pskb_inet_may_pull() does nothing at all.
+
+If a vlan tag was provided by the caller (af_packet in the syzbot case),
+the network header might not point to the correct location, and skb
+linear part could be smaller than expected.
+
+Add skb_vlan_inet_prepare() to perform a complete mac validation.
+
+Use this in geneve for the moment, I suspect we need to adopt this
+more broadly.
+
+v4 - Jakub reported v3 broke l2_tos_ttl_inherit.sh selftest
+   - Only call __vlan_get_protocol() for vlan types.
+Link: https://lore.kernel.org/netdev/20240404100035.3270a7d5@kernel.org/
+
+v2,v3 - Addressed Sabrina comments on v1 and v2
+Link: https://lore.kernel.org/netdev/Zg1l9L2BNoZWZDZG@hog/
+
+[1]
+
+BUG: KMSAN: uninit-value in geneve_xmit_skb drivers/net/geneve.c:910 [inline]
+ BUG: KMSAN: uninit-value in geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
+  geneve_xmit_skb drivers/net/geneve.c:910 [inline]
+  geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
+  __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+  netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+  xmit_one net/core/dev.c:3531 [inline]
+  dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
+  __dev_queue_xmit+0x348d/0x52c0 net/core/dev.c:4335
+  dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+  packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+  packet_snd net/packet/af_packet.c:3081 [inline]
+  packet_sendmsg+0x8bb0/0x9ef0 net/packet/af_packet.c:3113
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+  __sys_sendto+0x685/0x830 net/socket.c:2191
+  __do_sys_sendto net/socket.c:2203 [inline]
+  __se_sys_sendto net/socket.c:2199 [inline]
+  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+Uninit was created at:
+  slab_post_alloc_hook mm/slub.c:3804 [inline]
+  slab_alloc_node mm/slub.c:3845 [inline]
+  kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
+  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+  __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
+  alloc_skb include/linux/skbuff.h:1318 [inline]
+  alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6504
+  sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2795
+  packet_alloc_skb net/packet/af_packet.c:2930 [inline]
+  packet_snd net/packet/af_packet.c:3024 [inline]
+  packet_sendmsg+0x722d/0x9ef0 net/packet/af_packet.c:3113
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+  __sys_sendto+0x685/0x830 net/socket.c:2191
+  __do_sys_sendto net/socket.c:2203 [inline]
+  __se_sys_sendto net/socket.c:2199 [inline]
+  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+CPU: 0 PID: 5033 Comm: syz-executor346 Not tainted 6.9.0-rc1-syzkaller-00005-g928a87efa423 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+
+Fixes: d13f048dd40e ("net: geneve: modify IP header check in geneve6_xmit_skb and geneve_xmit_skb")
+Reported-by: syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/000000000000d19c3a06152f9ee4@google.com/
 Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Phillip Potter <phil@philpotter.co.uk>
+Cc: Sabrina Dubroca <sd@queasysnail.net>
 ---
- include/linux/tcp.h | 6 +++---
- net/ipv4/tcp.c      | 8 ++++----
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/net/geneve.c     |  4 ++--
+ include/net/ip_tunnels.h | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 55399ee2a57e736b55ed067fc06ea620bbe62fd3..6a5e08b937b3156ff876eec85d153b975bf217ef 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -244,6 +244,7 @@ struct tcp_sock {
- 	/* OOO segments go in this rbtree. Socket lock must be held. */
- 	struct rb_root	out_of_order_queue;
- 	u32	snd_ssthresh;	/* Slow start size threshold		*/
-+	u8	recvmsg_inq : 1;/* Indicate # of bytes in queue upon recvmsg */
- 	__cacheline_group_end(tcp_sock_read_rx);
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index 2f6739fe78af2e8e90c0a3b474c2e99c83e02994..6c2835086b57eacbcddb44a3c507e26d5a944427 100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -822,7 +822,7 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	__be16 sport;
+ 	int err;
  
- 	/* TX read-write hotpath cache lines */
-@@ -266,8 +267,6 @@ struct tcp_sock {
- 	u32	mdev_us;	/* medium deviation			*/
- 	u32	rtt_seq;	/* sequence number to update rttvar	*/
- 	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
--	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
--	u64	tcp_mstamp;	/* most recent packet received/sent */
- 	struct list_head tsorted_sent_queue; /* time-sorted sent but un-SACKed skbs */
- 	struct sk_buff *highest_sack;   /* skb just after the highest
- 					 * skb with SACKed bit set
-@@ -284,6 +283,8 @@ struct tcp_sock {
-  *	0x5?10 << 16 + snd_wnd in net byte order
-  */
- 	__be32	pred_flags;
-+	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
-+	u64	tcp_mstamp;	/* most recent packet received/sent */
- 	u32	rcv_nxt;	/* What we want to receive next		*/
- 	u32	snd_nxt;	/* Next sequence we send		*/
- 	u32	snd_una;	/* First byte we want an ack for	*/
-@@ -370,7 +371,6 @@ struct tcp_sock {
- 		tlp_retrans:1,	/* TLP is a retransmission */
- 		unused:5;
- 	u8	thin_lto    : 1,/* Use linear timeouts for thin streams */
--		recvmsg_inq : 1,/* Indicate # of bytes in queue upon recvmsg */
- 		fastopen_connect:1, /* FASTOPEN_CONNECT sockopt */
- 		fastopen_no_cookie:1, /* Allow send/recv SYN+data without a cookie */
- 		fastopen_client_fail:2, /* reason why fastopen failed */
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index e767721b3a588b5d56567ae7badf5dffcd35a76a..7c7bd7aa20637a2efa0a4dcd521ead14d9c2cbda 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4648,16 +4648,16 @@ static void __init tcp_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, lsndtime);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, mdev_us);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_wstamp_ns);
--	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_clock_cache);
--	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_mstamp);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, rtt_seq);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tsorted_sent_queue);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, highest_sack);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, ecn_flags);
--	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_tx, 105);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_tx, 89);
+-	if (!pskb_inet_may_pull(skb))
++	if (!skb_vlan_inet_prepare(skb))
+ 		return -EINVAL;
  
- 	/* TXRX read-write hotpath cache lines */
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, pred_flags);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, tcp_clock_cache);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, tcp_mstamp);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_nxt);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_nxt);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_una);
-@@ -4670,7 +4670,7 @@ static void __init tcp_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, app_limited);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_wnd);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rx_opt);
--	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 76);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 92);
+ 	if (!gs4)
+@@ -929,7 +929,7 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	__be16 sport;
+ 	int err;
  
- 	/* RX read-write hotpath cache lines */
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_received);
+-	if (!pskb_inet_may_pull(skb))
++	if (!skb_vlan_inet_prepare(skb))
+ 		return -EINVAL;
+ 
+ 	if (!gs6)
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 5cd64bb2104df389250fb3c518ba00a3826c53f7..c286cc2e766ee04a77206b7c326b4283de43933e 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -361,6 +361,39 @@ static inline bool pskb_inet_may_pull(struct sk_buff *skb)
+ 	return pskb_network_may_pull(skb, nhlen);
+ }
+ 
++/* Variant of pskb_inet_may_pull().
++ */
++static inline bool skb_vlan_inet_prepare(struct sk_buff *skb)
++{
++	int nhlen = 0, maclen = ETH_HLEN;
++	__be16 type = skb->protocol;
++
++	/* Essentially this is skb_protocol(skb, true)
++	 * And we get MAC len.
++	 */
++	if (eth_type_vlan(type))
++		type = __vlan_get_protocol(skb, type, &maclen);
++
++	switch (type) {
++#if IS_ENABLED(CONFIG_IPV6)
++	case htons(ETH_P_IPV6):
++		nhlen = sizeof(struct ipv6hdr);
++		break;
++#endif
++	case htons(ETH_P_IP):
++		nhlen = sizeof(struct iphdr);
++		break;
++	}
++	/* For ETH_P_IPV6/ETH_P_IP we make sure to pull
++	 * a base network header in skb->head.
++	 */
++	if (!pskb_may_pull(skb, maclen + nhlen))
++		return false;
++
++	skb_set_network_header(skb, maclen);
++	return true;
++}
++
+ static inline int ip_encap_hlen(struct ip_tunnel_encap *e)
+ {
+ 	const struct ip_tunnel_encap_ops *ops;
 -- 
 2.44.0.478.gd926399ef9-goog
 
