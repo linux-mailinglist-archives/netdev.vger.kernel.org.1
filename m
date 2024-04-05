@@ -1,167 +1,173 @@
-Return-Path: <netdev+bounces-85345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A351789A555
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:02:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B28B89A559
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:04:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB52284459
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:02:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19A671F23113
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C90173351;
-	Fri,  5 Apr 2024 20:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF97173338;
+	Fri,  5 Apr 2024 20:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q0ir2StH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6sendFp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8327116EBFD
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 20:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9052C172BD2;
+	Fri,  5 Apr 2024 20:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712347314; cv=none; b=C1Gz9EC+5DL2jBgqnyALJx4AgbhhWJJgQWngHuIyQVl3jIPuznjfMhY65a1A8Hf6/M+ZyOTQU93X5PcwOwBMNjxiKVLVQarnxFRpkyCCJK5NFoIMPtmdW7/LC9dJI7azqMVBi0dVyctJNUfzWFufMffr8bkbJkv2ghE2d+8oEaE=
+	t=1712347476; cv=none; b=H6bcfzKy1K3/yNv0nQhdet7lMXDeCMlXUVtu1UTK0PtT6KzA5QWkXIB3Dg4eXWAgbtKB3vEmdXVe7d+oKwlqrjhCh3QIdU3p988+cxKxwJe/rCquoM8PJDvAnXnBSSJfhXMlW/YHxYKL/M7IbTlmVCFNJn5XptOqiZgyYNeUwDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712347314; c=relaxed/simple;
-	bh=t8Zy94V47DEeguDpVsCAlSHh8loEquEVZj3DhaG/mCE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WwfTnTFgS9BOupLpVfCaZz4xqeSnawyefgnLIPS50dMdmNCFnRYdRc6jLvWbxKbmsO4xqWr+gRWSdctCjBlLWmT6w3lOClp6bXEtoAIZEQYhlb0cuoeuJxDMpOG5ZT6OXMt5QfkUKcJRyIQZUGo+MWzSDSBiyDhn8RsFy4jnQvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q0ir2StH; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <29325462-d001-4cb3-909d-27f7243a5c05@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712347309;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6gWflinqU1d4wkQYf0aiD/ruz8RWl/tYTTOYnC5SJvI=;
-	b=q0ir2StHc3kPa0wMeyOID45TWAeATcIeQbaZClgmEfmzmdtgPJrlcv6qHBr1bYfYt07BB5
-	9Dxh3WzWLM2mpLIqv+IsnXo8LoYFDyLoSmMPxGxLExJblxBQCVvOcgXKPiOe65vUzwZZLh
-	T7czWGzGRog4EKJiUvzb+qgFFNh4HvY=
-Date: Fri, 5 Apr 2024 13:01:40 -0700
+	s=arc-20240116; t=1712347476; c=relaxed/simple;
+	bh=tbbi4WoC47A+bt3krfOjf71ActzV3spu8nYayJm63oA=;
+	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nxvw+N4SEVAUmSvd7M4RPnzRSeiysRLqi6MJ1Z6I2v5ii8sQ96f81BJAIBlVpk848Ab9aV9tZCUb4oqEN4CnjBPgtTI3L9D3/Tq1XX+atXSW26CeYZAUDRTbImVJ9O+Tbm+F+oMzc33Fxk53hQzVaH9Ejx2UbDgYZ/q8pgrRrFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f6sendFp; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4156c4fe401so16936345e9.1;
+        Fri, 05 Apr 2024 13:04:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712347473; x=1712952273; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oNObfeJuKkZ5zVbv0of2yxi9979Q5AyU5TKw6nz/51s=;
+        b=f6sendFpi41pjEK0IF25gFpWPmgekLSEkAEQhKc+mCpYd6oiGfyD1JOuqCm+qFcIZ/
+         24H5o4N4WEPja4wA6hjg4Uzq+GHedK3PQGeOOIF2xoqokEAXO0pQd50VoKc2qGxyguQs
+         JSuk1LTCq7RPrAGyCliyyDk39kJ6dFDwcNGUC7Taj0wqZIHOpUljvHzXUZKe5+Yv7QXJ
+         ht1fmdXn4gSy3AeTlwO2d8cY0nGKJzJx34/HbyQOJQ7qWP8fFWBQfLIAUSun9iQ+CuaQ
+         tugGHUDnPU+3FKEBDFMXUhcByxRP+4PgRJTAQDPuhwvasK6bb2DOMUrFm7IMa3MabgVr
+         Dc9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712347473; x=1712952273;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oNObfeJuKkZ5zVbv0of2yxi9979Q5AyU5TKw6nz/51s=;
+        b=Y3VvMLiL27uj3m4bH0iayBgLNUaIiEcNX3x/DtwWjW8H0xNuvirEKye4oDbW55VnrR
+         moOhxDSHlu7Q8RohpMikj81cBxB+j2uUT8itKu7qufZFaEoVDToFf/Lj7vSo4bj/1NUj
+         obkcvdo89is2HIp3wVZr4DoLMJpqt42L6izrDnjRELPVkjlmTPkM4var8JJkvysbUN1M
+         ypvuY6bHLoRyyc9KxB/RtLXh8hqS5RfaGg4gixQ2IZ72sLYGe8iG8F3pBab5AYh4/zM9
+         zIDQ6h+37vZYAp5C9sPUTI865jDtLkVL7p8tGuraidNQkK7qMNzoB5Yj6iHqGkJmDLd1
+         NNNg==
+X-Forwarded-Encrypted: i=1; AJvYcCWgBIYuFznEh2AqrghvbFgF/hSD2qskxDWfcv2tIhYgTrudlVVhIZrAQrcCsrtzAVCVxK3XXO3OWSjhvOaFUF/kISmPDv91x7RJ6ozUkxw+1XQl9wECcIOUfTAXdjVnYpm5QmsWJT8ohjrlQewvJdbpVPkst27BxUF5a3DGERobb8ClUPH5
+X-Gm-Message-State: AOJu0YxSkIv3nMDrhNiTnKscjiZuMDMS+G73xloy5AqBRzaN0tAq7dlN
+	xvL0ItTeL4J5ecUTJUSK4M0S2ojE/OcG5aSnJatZILJJ5eKN6lfSdYKuNyolekYH9zm55EriUc7
+	P0R7vWY44HFB0FGxQxE6BBeJETcQ=
+X-Google-Smtp-Source: AGHT+IFB8aEDQ/BbWb+hOhkcYe3VOfWJS6EMMeWrTqCpIDi+W6S2XSEZW4aH+5cffK/Mhx7nORN93E11StYoe/7EisE=
+X-Received: by 2002:a05:600c:a04:b0:414:1325:e8a8 with SMTP id
+ z4-20020a05600c0a0400b004141325e8a8mr2043843wmp.39.1712347472797; Fri, 05 Apr
+ 2024 13:04:32 -0700 (PDT)
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 5 Apr 2024 13:04:32 -0700
+From: Oliver Crumrine <ozlinuxc@gmail.com>
+In-Reply-To: <6850f08d-0e89-4eb3-bbfb-bdcc5d4e1b78@gmail.com>
+References: <cover.1712268605.git.ozlinuxc@gmail.com> <b1a047a1b2d55c1c245a78ca9772c31a9b3ceb12.1712268605.git.ozlinuxc@gmail.com>
+ <6850f08d-0e89-4eb3-bbfb-bdcc5d4e1b78@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] net: netfilter: Make ct zone id configurable for
- bpf ct helper functions
-To: Brad Cowie <brad@faucet.nz>
-Cc: lorenzo@kernel.org, memxor@gmail.com, pablo@netfilter.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, song@kernel.org,
- john.fastabend@gmail.com, sdf@google.com, jolsa@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <20240329041430.2176860-1-brad@faucet.nz>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240329041430.2176860-1-brad@faucet.nz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Date: Fri, 5 Apr 2024 13:04:32 -0700
+Message-ID: <CAK1VsR17Ea6cmks7BcdvS4ZHQMRz_kWd1NhPh8J1fUpsgC7WFg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] io_uring: Add REQ_F_CQE_SKIP support for io_uring zerocopy
+To: Pavel Begunkov <asml.silence@gmail.com>, Oliver Crumrine <ozlinuxc@gmail.com>, axboe@kernel.dk, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	shuah@kernel.org, leitao@debian.org
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 3/28/24 9:14 PM, Brad Cowie wrote:
-> Add ct zone id to bpf_ct_opts so that arbitrary ct zone can be
-> set for xdp/tc bpf ct helper functions bpf_{xdp,skb}_ct_alloc
-> and bpf_{xdp,skb}_ct_lookup.
-> 
-> Signed-off-by: Brad Cowie <brad@faucet.nz>
-> ---
->   net/netfilter/nf_conntrack_bpf.c              | 23 ++++++++++---------
->   .../testing/selftests/bpf/prog_tests/bpf_nf.c |  1 -
->   .../testing/selftests/bpf/progs/test_bpf_nf.c | 13 ++---------
->   3 files changed, 14 insertions(+), 23 deletions(-)
-> 
-> diff --git a/net/netfilter/nf_conntrack_bpf.c b/net/netfilter/nf_conntrack_bpf.c
-> index d2492d050fe6..a0f8a64751ec 100644
-> --- a/net/netfilter/nf_conntrack_bpf.c
-> +++ b/net/netfilter/nf_conntrack_bpf.c
-> @@ -30,7 +30,6 @@
->    * @error      - Out parameter, set for any errors encountered
->    *		 Values:
->    *		   -EINVAL - Passed NULL for bpf_tuple pointer
-> - *		   -EINVAL - opts->reserved is not 0
->    *		   -EINVAL - netns_id is less than -1
->    *		   -EINVAL - opts__sz isn't NF_BPF_CT_OPTS_SZ (12)
->    *		   -EPROTO - l4proto isn't one of IPPROTO_TCP or IPPROTO_UDP
-> @@ -42,16 +41,14 @@
->    *		 Values:
->    *		   IPPROTO_TCP, IPPROTO_UDP
->    * @dir:       - connection tracking tuple direction.
-> - * @reserved   - Reserved member, will be reused for more options in future
-> - *		 Values:
-> - *		   0
-> + * @ct_zone    - connection tracking zone id.
->    */
->   struct bpf_ct_opts {
->   	s32 netns_id;
->   	s32 error;
->   	u8 l4proto;
->   	u8 dir;
-> -	u8 reserved[2];
-> +	u16 ct_zone;
-
-How about the other fields (flags and dir) in the "struct nf_conntrack_zone" and 
-would it be useful to have values other than the default?
-
-[ ... ]
-
-> diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_nf.c b/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
-> index b30ff6b3b81a..25c3c4e87ed5 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/bpf_nf.c
-> @@ -103,7 +103,6 @@ static void test_bpf_nf_ct(int mode)
->   		goto end;
->   
->   	ASSERT_EQ(skel->bss->test_einval_bpf_tuple, -EINVAL, "Test EINVAL for NULL bpf_tuple");
-> -	ASSERT_EQ(skel->bss->test_einval_reserved, -EINVAL, "Test EINVAL for reserved not set to 0");
->   	ASSERT_EQ(skel->bss->test_einval_netns_id, -EINVAL, "Test EINVAL for netns_id < -1");
->   	ASSERT_EQ(skel->bss->test_einval_len_opts, -EINVAL, "Test EINVAL for len__opts != NF_BPF_CT_OPTS_SZ");
->   	ASSERT_EQ(skel->bss->test_eproto_l4proto, -EPROTO, "Test EPROTO for l4proto != TCP or UDP");
-> diff --git a/tools/testing/selftests/bpf/progs/test_bpf_nf.c b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-> index 77ad8adf68da..4adb73bc1b33 100644
-> --- a/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-> +++ b/tools/testing/selftests/bpf/progs/test_bpf_nf.c
-> @@ -45,7 +45,8 @@ struct bpf_ct_opts___local {
->   	s32 netns_id;
->   	s32 error;
->   	u8 l4proto;
-> -	u8 reserved[3];
-> +	u8 dir;
-> +	u16 ct_zone;
->   } __attribute__((preserve_access_index));
->   
->   struct nf_conn *bpf_xdp_ct_alloc(struct xdp_md *, struct bpf_sock_tuple *, u32,
-> @@ -84,16 +85,6 @@ nf_ct_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
->   	else
->   		test_einval_bpf_tuple = opts_def.error;
->   
-> -	opts_def.reserved[0] = 1;
-> -	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
-> -		       sizeof(opts_def));
-> -	opts_def.reserved[0] = 0;
-> -	opts_def.l4proto = IPPROTO_TCP;
-> -	if (ct)
-> -		bpf_ct_release(ct);
-> -	else
-> -		test_einval_reserved = opts_def.error;
-> -
-
-Can it actually test an alloc and lookup of a non default zone id?
-
-Please also separate the selftest into another patch.
-
-pw-bot: cr
-
->   	opts_def.netns_id = -2;
->   	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
->   		       sizeof(opts_def));
-
+Pavel Begunkov wrote:
+> On 4/4/24 23:17, Oliver Crumrine wrote:
+> > In his patch to enable zerocopy networking for io_uring, Pavel Begunkov
+> > specifically disabled REQ_F_CQE_SKIP, as (at least from my
+> > understanding) the userspace program wouldn't receive the
+> > IORING_CQE_F_MORE flag in the result value.
+>
+> No. IORING_CQE_F_MORE means there will be another CQE from this
+> request, so a single CQE without IORING_CQE_F_MORE is trivially
+> fine.
+>
+> The problem is the semantics, because by suppressing the first
+> CQE you're loosing the result value. You might rely on WAITALL
+That's already happening with io_send.
+> as other sends and "fail" (in terms of io_uring) the request
+> in case of a partial send posting 2 CQEs, but that's not a great
+> way and it's getting userspace complicated pretty easily.
+>
+> In short, it was left out for later because there is a
+> better way to implement it, but it should be done carefully
+Maybe we could put the return values in the notifs? That would be a
+discrepancy between io_send and io_send_zc, though.
+>
+>
+> > To fix this, instead of keeping track of how many CQEs have been
+> > received, and subtracting notifs from that, programs can keep track of
+>
+> That's a benchmark way of doing it, more realistically
+> it'd be more like
+>
+> event_loop() {
+> 	cqe = wait_cqe();
+> 	struct req *r = (struct req *)cqe->user_data;
+> 	r->callback(r, cqe);
+>
+>
+> send_zc_callback(req, cqe) {
+> 	if (cqe->flags & F_MORE) {
+> 		// don't free the req
+> 		// we should wait for another CQE
+> 		...
+> 	}
+> }
+>
+> > how many SQEs they have issued, and if a CQE is returned with an error,
+> > they can simply subtract from how many notifs they expect to receive.
+>
+> The design specifically untangles those two notions, i.e. there can
+> be a notification even when the main CQE fails (ret<0). It's safer
+> this way, even though AFAIK relying on errors would be fine with
+> current users (TCP/UDP).
+>
+>
+> > Signed-off-by: Oliver Crumrine <ozlinuxc@gmail.com>
+> > ---
+> >   io_uring/net.c | 6 ++----
+> >   1 file changed, 2 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/io_uring/net.c b/io_uring/net.c
+> > index 1e7665ff6ef7..822f49809b68 100644
+> > --- a/io_uring/net.c
+> > +++ b/io_uring/net.c
+> > @@ -1044,9 +1044,6 @@ int io_send_zc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+> >
+> >   	if (unlikely(READ_ONCE(sqe->__pad2[0]) || READ_ONCE(sqe->addr3)))
+> >   		return -EINVAL;
+> > -	/* we don't support IOSQE_CQE_SKIP_SUCCESS just yet */
+> > -	if (req->flags & REQ_F_CQE_SKIP)
+> > -		return -EINVAL;
+> >
+> >   	notif = zc->notif = io_alloc_notif(ctx);
+> >   	if (!notif)
+> > @@ -1342,7 +1339,8 @@ void io_sendrecv_fail(struct io_kiocb *req)
+> >   		req->cqe.res = sr->done_io;
+> >
+> >   	if ((req->flags & REQ_F_NEED_CLEANUP) &&
+> > -	    (req->opcode == IORING_OP_SEND_ZC || req->opcode == IORING_OP_SENDMSG_ZC))
+> > +	    (req->opcode == IORING_OP_SEND_ZC || req->opcode == IORING_OP_SENDMSG_ZC) &&
+> > +	    !(req->flags & REQ_F_CQE_SKIP))
+> >   		req->cqe.flags |= IORING_CQE_F_MORE;
+> >   }
+> >
+>
+> --
+> Pavel Begunkov
 
