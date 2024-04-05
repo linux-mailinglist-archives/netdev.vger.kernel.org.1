@@ -1,236 +1,255 @@
-Return-Path: <netdev+bounces-85172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C2A899AE0
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:30:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54604899AEE
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C822F1C20A68
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:30:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 095CC28623F
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A5312E5B;
-	Fri,  5 Apr 2024 10:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA4712CD8F;
+	Fri,  5 Apr 2024 10:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B1WHMiC+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ATlOi2NK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54AE1537E9
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 10:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712313039; cv=none; b=ObX0MQmHXWPBGf6+psmUQ+8Ratjj9Ydie9PtEMZcIBZoZGoOkmpGb28IJP/1olqOW9zw2NvBEfKolQ8HKMzNjjsBv+5hhtvpJrxH6lo/2hNwiQdWuSsUEpE83j0lqsh8AjgH+8ynpT0idG1CDJ5tRzS2pCSXR5FlMT8JwXg1jzU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712313039; c=relaxed/simple;
-	bh=vBhDVRzH+eTk2Dru2QR29F9ssxThCWHQG2bC6gft7VQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tU1xGBrQpHrLaXM6OQcsiIsLc04uBEet2zgNrdb0AR/+MA58NaLXuvkBdGgXbsCvkQglV4tdjVRTNDehNQa8FSDNanl2bqD5h3xcrgWMmeFxaiFfnrFZ+0fOUimpc/fR51RUiKcG5LkVowvSPhnxNzXTte9HpNI+3FkNjvYeGuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B1WHMiC+; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61504a34400so32819727b3.0
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 03:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712313036; x=1712917836; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RXPsm+ZrEV6vu5g9tLRD5QdiNPu14Tgug+xAyXUgzdg=;
-        b=B1WHMiC+s2BMfx6eMcBd83SOIsN9yjPDCEsxZR0CjsLjxh3E5/6EYYuPGIksVtZtn6
-         w7QkN/YfBmMQ7JLx8chAlSS8iFen+Bk+CyKswb9D956xxpPQzrPbsALl8shbsuDdXmtx
-         bDXH4HJ5p5VFrdbP2dkoPQlVf+FAjbpF/fQml+lpcW0TRMlAN6+7ZCW2R6HRkag7QGpq
-         PzIHTZOR6sx8BFBa/EFSQ9gvcrgtNqXiRmxLg2ELw1w1RK7fabuVmeSv8jGFanuqjf4m
-         gV/560vEvXS8nqTYQ5HxdGCLhAbamt8XfAXsZiDkjc3DxrGoZXAU/AbxTajIWJ7DHSh9
-         aCuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712313036; x=1712917836;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RXPsm+ZrEV6vu5g9tLRD5QdiNPu14Tgug+xAyXUgzdg=;
-        b=Lz4sLkW3j+NFybROm3NmbEZ7zGLpkoOYi5HKb4WYoHTHwqM+XsYJjRj9FAEJLAQbF8
-         FLs6AH1kdcBtgVAeV/VGwObDuXeVsmUdgvTGD4WRSIS9PdKyJwGxPKVCwO59c01vIE8g
-         rU6rnSZ8oAA/wxSctvCyAcK8DtqekIhBY7nwJ1ec2IUCkf3XMmztEq+Atin+555qFreV
-         4yqb2G2KuhlL1k3k0P5MGc2oSYA0n9d0vbswwiwCkVm4FEOlbx0bO6gKUrKmFC4y00H0
-         6lqJW+WMFJI76QAKRdDhML5ouXdM+vg6qFyBBRTB7kKHS4yA88RDKd3c1q6t4Y5Crnz+
-         7j0A==
-X-Gm-Message-State: AOJu0YxW8OLX4UC9tipJIR2SXgC8tFpUx/ZdU8E3jdweT9UIPjZcxrqN
-	wKR+yUNpvFQ+Tvr0+4N4xENzCqzpcg7/+ATQpTd1WbAsVxwPxAvXXOZJOahmF3+UPaOsTO6KL+5
-	hoJP3Po1/sA==
-X-Google-Smtp-Source: AGHT+IF9Xndj8RqFg16xZAcxfpbTlYvsz7SYJ/DLXfHxMoy/zz2rY+49lcqJapT6Ho2Y+2Ea2onpXAe314q5DQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:48ca:0:b0:615:ca8:6058 with SMTP id
- v193-20020a8148ca000000b006150ca86058mr190125ywa.5.1712313036397; Fri, 05 Apr
- 2024 03:30:36 -0700 (PDT)
-Date: Fri,  5 Apr 2024 10:30:34 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9A81D69B;
+	Fri,  5 Apr 2024 10:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712313192; cv=fail; b=Da9Xdze2HnMC2HY+gyvhNh8YtpHrisAnlbLyC9KrrKrR0QGwbLECbfGk9XFK+7IS6AhNOJ2UMZfY79GCkUJW7uAL15Cs2sKYeyXuMzBY4PdE1WJgi/5vs+jhh3jhHcj7Yvl5VbXSMt4XoYE0o0Dxlwr9riBEInaG0+NskXErm4E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712313192; c=relaxed/simple;
+	bh=O/XRHVWA1qtz5Clwi8vv1le4Z6w0GyN3nFkNTtp55U4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=tEaAvUPA5DZWrL24MbdC6AKc8XxSTGCsYciDLGjEEBJUci4XE0WGU0mQ6/LC+j9zBLjvAQjHwMBZ9mNejDi66glVmw67TaFNPLsHh1Zya/j7lv7FmO73nq+W4wQEiwIrnie5wwaBkyBS6duKoTTgxNkojhmFZ/imf1oSVzB1arc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ATlOi2NK; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712313189; x=1743849189;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=O/XRHVWA1qtz5Clwi8vv1le4Z6w0GyN3nFkNTtp55U4=;
+  b=ATlOi2NKjGneXsFkH8EA04mrDYKV7xwQr7ohae1v/JDwPbwbejvQonH/
+   pp2zmbvg4w3o0WeANh8fWBK4yMgqcsXqSZtA77IKalCsnW/u12Cj7+5lb
+   UyBuexZVKbX+PHpgtJL/qwsoRhl5h2LIUvX/9t0Qe4qudFkY5pVJGr1KL
+   OCYagM8XNFCKaXc1sHxP1XmRevBOFYKJvOITANyrFOqsMNssBSEzoQS2m
+   xbx0bg8c/VkDQd+018Gps6hO1LFg0XkFcyBqi/S+w14NxN2OHcbUB5IUA
+   DFa28jT2VNKX1Z3g1wLnsNWGOmt046+4Me+JeFgPckOJKPpg/CQJxRBV7
+   Q==;
+X-CSE-ConnectionGUID: feNIE2B9S+eAJO2KQoJzfA==
+X-CSE-MsgGUID: 2GHTTbwoRMGsvbrFTdcoiQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="7482314"
+X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
+   d="scan'208";a="7482314"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 03:33:09 -0700
+X-CSE-ConnectionGUID: bG3PPeqSSA67GPqmdxnekA==
+X-CSE-MsgGUID: vGtquPqWRt2qYLRPiIiByw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
+   d="scan'208";a="23593634"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Apr 2024 03:33:09 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 5 Apr 2024 03:33:08 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 5 Apr 2024 03:33:07 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 5 Apr 2024 03:33:07 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 5 Apr 2024 03:33:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bzRuSX03pQhqkS3pcGJh/rANX6pUeFv0tWwMfRlEeSkh05mRe6hBsWOaGr9ejkegaG7mJOWD9yS3A1+NUXjkHw5euoTRn1yFeWGomSF913YmiJ5f4tnNdcS8HmqXc7y1UOkc1tW3ctwNdyYAqp3BsD58vn9bUSFyApsyTuea/IIyuDd3wB82dge8el0OsxR2AvzxlbFNfCMUz5MtDF3n8iiRXp46lp6m0vsjZVwLmJc9nvj+7n6CiQ9OMclhRkbXVCJBfObcx7PGgCdJgFYMegaH+NKPVsXrTYUBg01O8/FaqOl7wPc6QCw4OYno09ARaHuJUwx0k5i9CyeHz7x/xQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gHJq7cgFjMXn5d9VlWjFL5c3EDjnZN/xA3r+uAqrJNw=;
+ b=NoTEq7KEG8VaBI8SDEhtIbrT8MeQ6UWyEL1BKSHX7fyplUdRWGsIWa4mz0RxPjtUYSW2rwe0zokDAGEUzquj2+3QErK5V/cIVjO7xegL8nrZHN1jer7bAuzUNWC3o0jxR2zLF0RdBsiwzncYK647A1gauyYbq3AG+czS7kPr6EIIR9uEftuQNonTeqcOUMCGV+QheCPLrNvZp9QNrZ2XHq9iE3z8kxUDC3xnqUFF3Wyd3XUcQEX/0dSV7JCRaCfOHmv0oYhIzFNBQzQelHZ6atFsPaAWmf2zRj6Tgzrs50n2ZCMf6xTVEjD1n+BJYVLno6Ua1SHbkSCAIp/CAj7bYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by CYXPR11MB8662.namprd11.prod.outlook.com (2603:10b6:930:de::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Fri, 5 Apr
+ 2024 10:33:00 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::5c8:d560:c544:d9cf]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::5c8:d560:c544:d9cf%5]) with mapi id 15.20.7409.042; Fri, 5 Apr 2024
+ 10:33:00 +0000
+Message-ID: <45eb2bf1-e7b0-4045-82b3-93b9f81b7988@intel.com>
+Date: Fri, 5 Apr 2024 12:32:55 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 7/9] libeth: add Rx buffer management
+Content-Language: en-US
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Alexander Duyck <alexanderduyck@fb.com>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, Christoph Lameter <cl@linux.com>,
+	Vlastimil Babka <vbabka@suse.cz>, Andrew Morton <akpm@linux-foundation.org>,
+	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240404154402.3581254-1-aleksander.lobakin@intel.com>
+ <20240404154402.3581254-8-aleksander.lobakin@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20240404154402.3581254-8-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0313.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4ba::11) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240405103035.171380-1-edumazet@google.com>
-Subject: [PATCH v4 net] geneve: fix header validation in geneve[6]_xmit_skb
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com, 
-	Phillip Potter <phil@philpotter.co.uk>, Sabrina Dubroca <sd@queasysnail.net>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CYXPR11MB8662:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GAcOweLQl8CNAodVrTIAHOaqxfo4CN11YcvsZIdTR0eorFewHtmnvo/+Boh1dmDovJE1J4EAwRD7RxHVEw5Q6RWVTX0hL0zk2iXYlUCSKMFhaLs8hUp8gHoxSo7iNYyXj9kfz8vzj9UBHdLZhr2VUVd3eSIGrXtSHKYWBzOQ1xXZnQMfHGrjGQaQ5LDpSv+DJG/ZIfcqGQ23Bztw8Uc9KTxPvHoCqlic+SmtXLSzkcatScP6lJCed3Q64qG71UErvRWi1ZDJjkbTxxswn0kD+Bax4AD2BAfz9tPH9RggB3qQx8gr7DGikqi4XodHZr8RwDyjnrqzpU9Tv4WTyhtbJ0XhTrmOPfmS0TjV3Vs8s4L+AgNd6Lik4/TL7+JROkFM4RgLcfjIyikO/4z9d6Op60UTQXtrYstAUz7wp8XzWMvfqB8ZXE3EEVioXA6RdIFoItGoTebjn5zAlPIOCmyO68x8Vo4PwvxG048Y8tQUwyRXUOh23JSN6UbFCi4LqnZ/MvfTUFrLyL89sbXVti9Gm4MFSdtYtHYEc6j0F2ybEQ0PliEdxDWjSbMI5cBkpher49mKcQykIbntnQpj+gnRSN2heBzLvXDwpSJidu460oku2ahE91RGFYSC3f1PdktxXOQUy835K/Z/IGSdYDW7IWZ+0E5oCALpKCLXt9YWzUw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VXFSZ3ZhNHFwb3piaDBhdWtLWkxOdTd4d3BLaWdocjl6Z3VQRlBUUlEzemtR?=
+ =?utf-8?B?VWJXVElFd2g2Sndpa1NCU0VrQ1NzbThERmtFZnVPWFFlMG9naHFldzNJOUdC?=
+ =?utf-8?B?VHlvb2xQVTBJYms5Skd0RUxLUlVqcjdxNExuYTNnNzBrNzFNKzlRckJ1eThW?=
+ =?utf-8?B?Mk9ERzg1QWpuYzhuYnlhcitSZ1pvemkwSjhCUm1uM2tVMzFtWmRPdU5XNVgv?=
+ =?utf-8?B?bHJra1VkUVJ1WDk2eGxLVHNySjZ5bVlhS3p2MWVzcllsM0pwdm9Ec2lPNDVU?=
+ =?utf-8?B?YjFKcGQxMkwwVlFiVnZQZUxudHBPTzRGSUptejRJOHYvTjl5QllzVXJzdVFl?=
+ =?utf-8?B?bU5NbUc4MDBoV1VZTTMrWW9oeW8xR0dnY2J6SU1MTVJUR3lwb2tUT05LUjR6?=
+ =?utf-8?B?SXpnOGRZdDgyU28rWENLOTFGTzZreWV1eE9nR0lvK2dVWTVaUE94TkJra3Rl?=
+ =?utf-8?B?MFlsQzlUd09vRjRBZUlob3hmZEVlVEIyZVFBOXFRQjAyN1Q5SEpkOUgxa3Js?=
+ =?utf-8?B?KzZ4ZmoreGh0V3RvZHhxSGtHU3R2S3Q3dnlBcGhML0NIRFBBNE9jekRlOU1Y?=
+ =?utf-8?B?Q1QvUnUrQ3E5alNoVm9RTm9rR2Y0MVJXMTRvbkowTEtRcTV0SUVzTTd1VUM4?=
+ =?utf-8?B?KzFzcnI4SEx0VEpJVDRZNXd5RkV3cnphajlqZ2Y1cTh6a3JSeUdmaUVyakxC?=
+ =?utf-8?B?RWh6cTNaVkhOeEtLK2R2MEpTQWxGWW01dFJnOWxMYjJyeTZiUFFxYkU1dkJR?=
+ =?utf-8?B?WDJXUEtXdWlLOFJGNGExaVJ6Q0xjTXNPU3BZc2R4VjdrUnFHSlp5VGFiNXcw?=
+ =?utf-8?B?WkdOTjhGTzZudDIrYjVRUm1mM2NmTnNtLzZlb2pXaTBQME84UmpISGN4N0pq?=
+ =?utf-8?B?NnVrU0tBK05yS1ZkQmE3YnRzdUZCQyt5NTFkWTdld0txOCtydTRSWlppWEFL?=
+ =?utf-8?B?M1BjKy9aOXVySXlOQlZoT1hhYXNNc09Cb3N4R1VXRjg0bWo2Y0MvZnMzcmFD?=
+ =?utf-8?B?SG9TQ3JVT1pET3NEbk00SGQxTnAvWCtmWWxNTndaSzNOcldmdW5BWXl4T3dB?=
+ =?utf-8?B?Q1BCVjBvQ3d6aGZKZWQ5OGVTeHVnQi8zWktWK1dwNzlDNHFzaUJTdkltclNa?=
+ =?utf-8?B?ZFE5dlZmeWJ1TXJVNktYZFpPK0xEcXh1NEdpL3prK2cwdS9UdDBFUGJvTk04?=
+ =?utf-8?B?WWtMVm82NVRxNWhEM3pKYThNUGdtdG44WW1ESTF0cGlUTVd0ODliUHhvNHNu?=
+ =?utf-8?B?OFNLcG44V0pUSGJybkN2ZzdUVERvMTBLQ2tjdHdkVmZQSW5CMUFENC9SMjlx?=
+ =?utf-8?B?Ynlub2dYMnA3dzVQbGNxYy95RlZqSnFFc051dmRLSTBtWENMN1Q5MjdLZ0tx?=
+ =?utf-8?B?UndBR0RWejUxNWl6VTg4ZENCQnRrMXN4SVYvd3UyWURoRFQwdElRQ3dEMDBs?=
+ =?utf-8?B?dUVHR3Q5U3RBRlo4K2N4UmlvcGNDQk1udzhGOFFpY0xMQXA5Q01ZNlF2WURJ?=
+ =?utf-8?B?V3JvUGRpYUJJWWFZZ25raTkvK1djWEx3UVVoMnBZQXVqN1BXR09FWkRGUXFH?=
+ =?utf-8?B?VTc0bkZZYVY5eXJmQ0YzZnVuRTI2QmFtUXhGcnI1Y1V4aFd5a2swYUsvYXVC?=
+ =?utf-8?B?b2k1RkVRZzdFMjlFS2F1NnN0RXdPNFR6dVFFNDBpbldPbTVYTE4xVk9BeG5j?=
+ =?utf-8?B?V3VzTHBqbUgyajdYMkxkOEo3aXFKU1RqWmJxTG1Cc1lJNktTL2FOVnc5S3pM?=
+ =?utf-8?B?RldUdDdpWGpkNkJ4SE53eFhnVTVtYTltdzVXK3d2azNMOWpEajNqMTBOKytC?=
+ =?utf-8?B?ME1DL0txRWV0Q0JMV3pOMUZUazRCdHMvb2owaWRDdU5ubHJ4ZlZDVWlaRmJ1?=
+ =?utf-8?B?QkZzcWc2SWhyMjNjWExuUWVmeFZPU2ZZR21nYkRhaVk3TkRZNUswZEZSekw0?=
+ =?utf-8?B?VjdvZ2czbVVleDRqNVVRYk50M1JIQnh1RGo4SHM1cWYrVjRHdis3WUVSczlq?=
+ =?utf-8?B?dnlFWm96WlRZME5sNCtSdHlObHBEcjE2TUpXNlpVT0tPUEhkcGVOdHhlUFEz?=
+ =?utf-8?B?VGE2SHA0OS9yVnlEMllXcjkrMjVVVllYY0lXTzYralU5R1RENDZKOStZWk5B?=
+ =?utf-8?B?QmFQaFdBbzRtTFlNRFJTR1cvVGxZWERhUEdmQThvTEhMbklGdzdLSDZra0Vk?=
+ =?utf-8?B?Wmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6af062ad-526f-49e4-c7fb-08dc555bc463
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2024 10:33:00.6613
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QGKESn/lpiroR7xcpBtALyEOnhzU8HHw+gy7Ab5Oi9FPESE+Cu6U7q/uvwlhzMSA/zouKQEJi0BYJQtiBLSnAaNkjnMXRkixTJxkaMWuV40=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8662
+X-OriginatorOrg: intel.com
 
-syzbot is able to trigger an uninit-value in geneve_xmit() [1]
+On 4/4/24 17:44, Alexander Lobakin wrote:
+> Add a couple intuitive helpers to hide Rx buffer implementation details
+> in the library and not multiplicate it between drivers. The settings are
+> sorta optimized for 100G+ NICs, but nothing really HW-specific here.
+> Use the new page_pool_dev_alloc() to dynamically switch between
+> split-page and full-page modes depending on MTU, page size, required
+> headroom etc. For example, on x86_64 with the default driver settings
+> each page is shared between 2 buffers. Turning on XDP (not in this
+> series) -> increasing headroom requirement pushes truesize out of 2048
+> boundary, leading to that each buffer starts getting a full page.
+> The "ceiling" limit is %PAGE_SIZE, as only order-0 pages are used to
+> avoid compound overhead. For the above architecture, this means maximum
+> linear frame size of 3712 w/o XDP.
+> Not that &libeth_buf_queue is not a complete queue/ring structure for
+> now, rather a shim, but eventually the libeth-enabled drivers will move
+> to it, with iavf being the first one.
+> 
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>   drivers/net/ethernet/intel/libeth/Kconfig |   1 +
+>   include/net/libeth/rx.h                   | 117 ++++++++++++++++++++++
+>   drivers/net/ethernet/intel/libeth/rx.c    |  98 ++++++++++++++++++
+>   3 files changed, 216 insertions(+)
+>
+[...]
 
-Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield())
-uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
-skb->protocol.
+> +/**
+> + * struct libeth_fqe - structure representing an Rx buffer
+> + * @page: page holding the buffer
+> + * @offset: offset from the page start (to the headroom)
+> + * @truesize: total space occupied by the buffer (w/ headroom and tailroom)
+> + *
+> + * Depending on the MTU, API switches between one-page-per-frame and shared
+> + * page model (to conserve memory on bigger-page platforms). In case of the
+> + * former, @offset is always 0 and @truesize is always ```PAGE_SIZE```.
+> + */
+> +struct libeth_fqe {
+> +	struct page		*page;
+> +	u32			offset;
+> +	u32			truesize;
+> +} __aligned_largest;
+> +
+> +/**
+> + * struct libeth_fq - structure representing a buffer queue
+> + * @fp: hotpath part of the structure
+> + * @pp: &page_pool for buffer management
+> + * @fqes: array of Rx buffers
+> + * @truesize: size to allocate per buffer, w/overhead
+> + * @count: number of descriptors/buffers the queue has
+> + * @buf_len: HW-writeable length per each buffer
+> + * @nid: ID of the closest NUMA node with memory
+> + */
+> +struct libeth_fq {
+> +	struct_group_tagged(libeth_fq_fp, fp,
+> +		struct page_pool	*pp;
+> +		struct libeth_fqe	*fqes;
+> +
+> +		u32			truesize;
+> +		u32			count;
+> +	);
+> +
+> +	/* Cold fields */
+> +	u32			buf_len;
+> +	int			nid;
+> +};
 
-If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->protocol,
-pskb_inet_may_pull() does nothing at all.
+[...]
 
-If a vlan tag was provided by the caller (af_packet in the syzbot case),
-the network header might not point to the correct location, and skb
-linear part could be smaller than expected.
+Could you please unpack the meaning of `fq` and `fqe` acronyms here?
 
-Add skb_vlan_inet_prepare() to perform a complete mac validation.
-
-Use this in geneve for the moment, I suspect we need to adopt this
-more broadly.
-
-v4 - Jakub reported v3 broke l2_tos_ttl_inherit.sh selftest
-   - Only call __vlan_get_protocol() for vlan types.
-Link: https://lore.kernel.org/netdev/20240404100035.3270a7d5@kernel.org/
-
-v2,v3 - Addressed Sabrina comments on v1 and v2
-Link: https://lore.kernel.org/netdev/Zg1l9L2BNoZWZDZG@hog/
-
-[1]
-
-BUG: KMSAN: uninit-value in geneve_xmit_skb drivers/net/geneve.c:910 [inline]
- BUG: KMSAN: uninit-value in geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
-  geneve_xmit_skb drivers/net/geneve.c:910 [inline]
-  geneve_xmit+0x302d/0x5420 drivers/net/geneve.c:1030
-  __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
-  netdev_start_xmit include/linux/netdevice.h:4917 [inline]
-  xmit_one net/core/dev.c:3531 [inline]
-  dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
-  __dev_queue_xmit+0x348d/0x52c0 net/core/dev.c:4335
-  dev_queue_xmit include/linux/netdevice.h:3091 [inline]
-  packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
-  packet_snd net/packet/af_packet.c:3081 [inline]
-  packet_sendmsg+0x8bb0/0x9ef0 net/packet/af_packet.c:3113
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg+0x30f/0x380 net/socket.c:745
-  __sys_sendto+0x685/0x830 net/socket.c:2191
-  __do_sys_sendto net/socket.c:2203 [inline]
-  __se_sys_sendto net/socket.c:2199 [inline]
-  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-Uninit was created at:
-  slab_post_alloc_hook mm/slub.c:3804 [inline]
-  slab_alloc_node mm/slub.c:3845 [inline]
-  kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
-  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
-  __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
-  alloc_skb include/linux/skbuff.h:1318 [inline]
-  alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6504
-  sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2795
-  packet_alloc_skb net/packet/af_packet.c:2930 [inline]
-  packet_snd net/packet/af_packet.c:3024 [inline]
-  packet_sendmsg+0x722d/0x9ef0 net/packet/af_packet.c:3113
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg+0x30f/0x380 net/socket.c:745
-  __sys_sendto+0x685/0x830 net/socket.c:2191
-  __do_sys_sendto net/socket.c:2203 [inline]
-  __se_sys_sendto net/socket.c:2199 [inline]
-  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2199
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-CPU: 0 PID: 5033 Comm: syz-executor346 Not tainted 6.9.0-rc1-syzkaller-00005-g928a87efa423 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-
-Fixes: d13f048dd40e ("net: geneve: modify IP header check in geneve6_xmit_skb and geneve_xmit_skb")
-Reported-by: syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/000000000000d19c3a06152f9ee4@google.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Phillip Potter <phil@philpotter.co.uk>
-Cc: Sabrina Dubroca <sd@queasysnail.net>
----
- drivers/net/geneve.c     |  4 ++--
- include/net/ip_tunnels.h | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 2f6739fe78af2e8e90c0a3b474c2e99c83e02994..6c2835086b57eacbcddb44a3c507e26d5a944427 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -822,7 +822,7 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	__be16 sport;
- 	int err;
- 
--	if (!pskb_inet_may_pull(skb))
-+	if (!skb_vlan_inet_prepare(skb))
- 		return -EINVAL;
- 
- 	if (!gs4)
-@@ -929,7 +929,7 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	__be16 sport;
- 	int err;
- 
--	if (!pskb_inet_may_pull(skb))
-+	if (!skb_vlan_inet_prepare(skb))
- 		return -EINVAL;
- 
- 	if (!gs6)
-diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-index 5cd64bb2104df389250fb3c518ba00a3826c53f7..c286cc2e766ee04a77206b7c326b4283de43933e 100644
---- a/include/net/ip_tunnels.h
-+++ b/include/net/ip_tunnels.h
-@@ -361,6 +361,39 @@ static inline bool pskb_inet_may_pull(struct sk_buff *skb)
- 	return pskb_network_may_pull(skb, nhlen);
- }
- 
-+/* Variant of pskb_inet_may_pull().
-+ */
-+static inline bool skb_vlan_inet_prepare(struct sk_buff *skb)
-+{
-+	int nhlen = 0, maclen = ETH_HLEN;
-+	__be16 type = skb->protocol;
-+
-+	/* Essentially this is skb_protocol(skb, true)
-+	 * And we get MAC len.
-+	 */
-+	if (eth_type_vlan(type))
-+		type = __vlan_get_protocol(skb, type, &maclen);
-+
-+	switch (type) {
-+#if IS_ENABLED(CONFIG_IPV6)
-+	case htons(ETH_P_IPV6):
-+		nhlen = sizeof(struct ipv6hdr);
-+		break;
-+#endif
-+	case htons(ETH_P_IP):
-+		nhlen = sizeof(struct iphdr);
-+		break;
-+	}
-+	/* For ETH_P_IPV6/ETH_P_IP we make sure to pull
-+	 * a base network header in skb->head.
-+	 */
-+	if (!pskb_may_pull(skb, maclen + nhlen))
-+		return false;
-+
-+	skb_set_network_header(skb, maclen);
-+	return true;
-+}
-+
- static inline int ip_encap_hlen(struct ip_tunnel_encap *e)
- {
- 	const struct ip_tunnel_encap_ops *ops;
--- 
-2.44.0.478.gd926399ef9-goog
+otherwise the whole series is very good for me, thank you very much!
 
 
