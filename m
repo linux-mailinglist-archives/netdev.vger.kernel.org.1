@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-85349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B0489A58D
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:17:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32E1889A59B
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 22:22:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0D671F2353F
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:17:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0087283A49
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 20:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F33F172BBF;
-	Fri,  5 Apr 2024 20:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E67174EC5;
+	Fri,  5 Apr 2024 20:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M45zuFdZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJkFbOmN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6086174EDF;
-	Fri,  5 Apr 2024 20:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9626917278B;
+	Fri,  5 Apr 2024 20:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712348222; cv=none; b=jtDs2KuqXJGdvvX4VGpBzoWNoCP0JzvO7PPbtKd+aqElBdjhx17B8nwy3oTYbmG81Y1U9hV0B1KYKiY2o2Q75CPK+gQBKcFrqCUBGgZyoM3AQssxyopKTMaGAPOZ1aikCXdq5VXV/TWV5Vb/kawYtt6vK63RPIma28uiuq/wAyo=
+	t=1712348568; cv=none; b=qfi+0nzCrBT6L8yWAodq7RjOyEBYV4h4Hes8DTuvirzgXfWzA9puXws/j3Mm+knOSPKY8mo8sRny7xZdBomeqx9QNovvnV8pkDjOLoHJHVf2UiO9nyBsCTIIlvP7E+efLTdgllFdI3tjY25swoiukaxFNBl9bjKov7Px+MeHZzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712348222; c=relaxed/simple;
-	bh=4mASSoyIbcpjgjYZputIEbEDNIq66JcLHRl7S+bYQrM=;
+	s=arc-20240116; t=1712348568; c=relaxed/simple;
+	bh=/c7g36rtE40BDeZV1S/AlcHS7dY6Xj4ExtPGgjvBAJw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H5hharDYhbnsJR4zwfiGi10JEKTIwSjqhHSsh7ovonhmJGH2KMxKE8tdZIVuxTU/DAgiy/r5wecvxR30j5VBGet++6lfI/ZVh85nogeguDX0K5O0VqDxpC/Zzh+YZ2rJNFQgydiuLe5TXY23jN9mV09qM/Z1Ttao9r7vY213HPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M45zuFdZ; arc=none smtp.client-ip=209.85.208.52
+	 In-Reply-To:Content-Type; b=bQLLnS6PQY5nswlNehf4XDnrCWpo3/IjA3xFDKR4oSR7JIhN7t3GDhYOyijCBRU8nXuDJkb4LWeE4KpKkH9hw3K/69qU+W2Yx4F86RCB5qV5VTgNjs33MP4yblGucHQJRWSwDyEBNBmMK9AW2J7DPIh8xgbY1hIKcMZwbbeDLhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QJkFbOmN; arc=none smtp.client-ip=209.85.128.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e3e03b989so635456a12.0;
-        Fri, 05 Apr 2024 13:16:59 -0700 (PDT)
+Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-615038fc5baso27621997b3.3;
+        Fri, 05 Apr 2024 13:22:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712348218; x=1712953018; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ThPCWIT4pkg3fU7cysoFhmBMESsLUy5SSpFnLwP72yU=;
-        b=M45zuFdZ+7mOWGYut6NlUqSlN0Y6DP8u5APAauIMz0VP7rSk2H1B9ntfHk45gegm/X
-         wY6FRRJUvXAKnxLOSjtvddxLYW6q3CcTZQCdX6TivYNy45XID6UX84z2ogod8lC01C+y
-         fDXj77UZyfJJ8YAuzLfH4yfV297UZa7E1TQ2Iim+6DnpHTgUgtQsFtoUgd7BQfiGwGEc
-         PSoBeERmgEaKQ/H8q/GlnmT5GfPv1zQU8ElbqgPmkKBhmc8FAxVky8Mu2qadq7KO9kXe
-         qnUmDOhyWhmETxliXFN9UOv0VpovZWUJ/EcvXzALLyfp1xccWeaOd67g7x+Yh3SGdd8L
-         MuyQ==
+        d=gmail.com; s=20230601; t=1712348565; x=1712953365; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9uO9sL7m4DMsIKcxtkPkEJUbu4NEoxIAppzIfnBTObw=;
+        b=QJkFbOmNZCyJpTeJ3OHD1+CWxPuXIZmk72B7MpAHrkxuhjbWY5YwNg31+CYGxQ8gg+
+         6Jl/RaOn0/IFRp2JmHlfqQOvw6KEiLygln/MiCMDt8HNSXA9BeH6nL2GiH+SMDOGUI7n
+         9W/sff4BWrrjmd2E40gILEiAI0VS3gJEoJ3wJBqbsWQh8Ho3tTnOV4raveO0r6icdjNM
+         /fYjHMiYmNq6xUMsSZ3XVMxQHyBPn/EtkBx91VTq697SuEnxToJuscWn21J5t6h3k41P
+         6WcRCIc8pccvnjyD/qhdHavqu6keyVkr4lVEfA86uQCv5+dYIWtkviQnTnnHHSRCPAZR
+         VFCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712348218; x=1712953018;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ThPCWIT4pkg3fU7cysoFhmBMESsLUy5SSpFnLwP72yU=;
-        b=NY/QeEim8jj61mfwU3Bi5VWHvqnAOj+JL0tGo86jL1j4VCMm3M360/qRb7KYwnzcrz
-         Z7J6HvYuTb5pc2BKDcTgjy670UoEwYDiXbil6IRkvWYM82Jk+4ZXZ+iRUCreJpIa2iAj
-         euBh/tOAozW8VH/mL8YSXfW+qNbi082B59nP2tesXCqH/LVTTre9wg9hvbu/mpZTEkHW
-         zToFfwNqj2c5QjEYerehvO7DZj0d4J9aMTAcyiXd7u9mDD4lSMtR60REvlX+vqvFkL8P
-         Nz547uHmu5bTO4rsOY6ILS8N5njrLs5VdOQByX5XOcFico/S51tNUCh1Rcxovx3A6Cus
-         vlFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrB3EvAbCKD9gcjdtMaFGyjHZ2142ilCoGcXhlHnkkYveXdC/d8iYI8weunhxEH/sjrKJ/zQAxr6XVbYOheLr/4CNx3RiHjr8SN7TnGloS63iIKaVv9H08mpUTEPSbVeMy
-X-Gm-Message-State: AOJu0YxMfNoFO72099GfWNjR79ALCTP3yk+yR9AEmWNJBNk6AJ6Nxk0h
-	7pIx71PgnQsEeMad39Z6PY2JQ5v9n3MPWQRsxqJDTrscWlZahOa1
-X-Google-Smtp-Source: AGHT+IGPUPXW71437OXIi/Vq6l1EajSrkn1zMUWwKDqFKiCJ6Mr4JtLkd4tYcj2olXaH5nJQ2HqeTw==
-X-Received: by 2002:a50:f68b:0:b0:56d:f29d:c80d with SMTP id d11-20020a50f68b000000b0056df29dc80dmr2354134edn.5.1712348217709;
-        Fri, 05 Apr 2024 13:16:57 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:72bb:b200:e0e0:cd27:7a04:5c79? (dynamic-2a01-0c22-72bb-b200-e0e0-cd27-7a04-5c79.c22.pool.telefonica.de. [2a01:c22:72bb:b200:e0e0:cd27:7a04:5c79])
-        by smtp.googlemail.com with ESMTPSA id y9-20020a056402440900b0056e3707323bsm492079eda.97.2024.04.05.13.16.56
+        d=1e100.net; s=20230601; t=1712348565; x=1712953365;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9uO9sL7m4DMsIKcxtkPkEJUbu4NEoxIAppzIfnBTObw=;
+        b=auFIa6uCHGnnKCYstwSvTCU2dI6dFVjRVtAU46w0Xcd0Md6evH2gqf4I71uUDE99ab
+         jKur8E/7rhlxeSUbxryJ9Zj7jUTWIf0bB60QiC0sxBhztNVviCA5wUEBfPzDPN7OpJWr
+         OVDFXWC34Z0oQBs0HMvtuZpekLw7ZBo538iFXlTPpCqRwbO9mv2w0/FYIYy9k18wpNCK
+         9Sr+maUwrhvjsR23dapZJF7MkEqr7j/phUGkxuwyXuyYx6igD2zrgpM0YpqhiBbMvw4+
+         nIioRlkyDQk5uZq4EnSbXvFYM0am+/xRskoSYfSDtLPFvuzUbsIjByL1XcjHtVCRZuBQ
+         lWCg==
+X-Forwarded-Encrypted: i=1; AJvYcCW2yESLT1QhkZWCeJMAXBie3UB7hST2ZO5N6ZDW0wGYjnJ8tF32sm7WXuZeSn+R3KfMCcn2wD10AWA82hVhIAjhFdp5aaWRRkzViqCkAxi1dveRalZw43iaUYT5mHEF5StC7ugB
+X-Gm-Message-State: AOJu0Yzui/4VVQd/sHX+6gjd8/cU22lPCqIfgyAhBrsVWoCxezWCN5QC
+	DE2ksXCBjT0ELXHBu5BeH2wRb+W7Y61678xnnKW7jXg86tUdd5Z2
+X-Google-Smtp-Source: AGHT+IH/fk1YAwa90MOBxgFnsa+3wbT2P6MSx+PBNEyLZqpyED42kh5pJENTlsy6ODPjOmgWmKoDIA==
+X-Received: by 2002:a0d:d9d1:0:b0:615:1413:95c1 with SMTP id b200-20020a0dd9d1000000b00615141395c1mr2510706ywe.19.1712348564458;
+        Fri, 05 Apr 2024 13:22:44 -0700 (PDT)
+Received: from [10.102.6.66] ([208.97.243.82])
+        by smtp.gmail.com with ESMTPSA id x11-20020a81b04b000000b006155d6134dasm501309ywk.141.2024.04.05.13.22.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 13:16:57 -0700 (PDT)
-Message-ID: <4c11ca11-8585-4cb5-bd0e-cd67eb1c208f@gmail.com>
-Date: Fri, 5 Apr 2024 22:16:56 +0200
+        Fri, 05 Apr 2024 13:22:44 -0700 (PDT)
+Message-ID: <651c87fc-1f21-4153-bade-2dad048eecbd@gmail.com>
+Date: Fri, 5 Apr 2024 16:22:43 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,187 +76,129 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Deadlock in pciehp on dock disconnect
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Roman Lozko <lozko.roma@gmail.com>, linux-pci@vger.kernel.org,
- Bjorn Helgaas <bhelgaas@google.com>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>,
+Subject: Re: [PATCH RFC net-next 00/10] MC Flood disable and snooping
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+ Vladimir Oltean <olteanv@gmail.com>
+Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
- Kurt Kanzenbach <kurt@linutronix.de>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org
-References: <CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com>
- <Zg_MOG1OufptoRph@wunner.de> <cd9edf12-5241-4366-b376-d5ee8f919903@gmail.com>
- <ZhA5WAYyMQJsAey8@wunner.de> <ZhBN9p1yOyciXkzw@wunner.de>
+ Roopa Prabhu <roopa@nvidia.com>, =?UTF-8?Q?Linus_L=C3=BCssing?=
+ <linus.luessing@c0d3.blue>, linux-kernel@vger.kernel.org,
+ bridge@lists.linux.dev
+References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
+ <7fc8264a-a383-4682-a144-8d91fe3971d9@blackwall.org>
+ <20240402174348.wosc37adyub5o7xu@skbuf>
+ <a8968719-a63b-4969-a971-173c010d708f@blackwall.org>
+ <20240402204600.5ep4xlzrhleqzw7k@skbuf>
+ <065b803f-14a9-4013-8f11-712bb8d54848@blackwall.org>
+ <804b7bf3-1b29-42c4-be42-4c23f1355aaf@gmail.com>
+ <20240405102033.vjkkoc3wy2i3vdvg@skbuf>
+ <935c18c1-7736-416c-b5c5-13ca42035b1f@blackwall.org>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
- sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
- MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
- dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
- /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
- 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
- J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
- kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
- cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
- mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
- bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
- ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
- AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
- axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
- wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
- ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
- TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
- 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
- dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
- +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
- 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
- aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
- kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
- fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
- 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
- KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
- ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
- 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
- ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
- /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
- gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
- AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
- GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
- y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
- nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
- Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
- rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
- Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
- q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
- H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
- lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
- OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <ZhBN9p1yOyciXkzw@wunner.de>
-Content-Type: text/plain; charset=UTF-8
+From: Joseph Huang <joseph.huang.2024@gmail.com>
+In-Reply-To: <935c18c1-7736-416c-b5c5-13ca42035b1f@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 05.04.2024 21:16, Lukas Wunner wrote:
-> On Fri, Apr 05, 2024 at 07:48:08PM +0200, Lukas Wunner wrote:
->> Roman, does the below patch fix the issue?
+On 4/5/2024 7:00 AM, Nikolay Aleksandrov wrote:
+> On 4/5/24 13:20, Vladimir Oltean wrote:
+>> On Thu, Apr 04, 2024 at 06:16:12PM -0400, Joseph Huang wrote:
+>>>>> mcast_flood == off:
+>>>>> - mcast_ipv4_ctrl_flood: don't care (maybe can force to "off")
+>>>>> - mcast_ipv4_data_flood: don't care
+>>>>> - mcast_ipv6_ctrl_flood: don't care
+>>>>> - mcast_ipv6_data_flood: don't care
+>>>>> - mcast_l2_flood: don't care
+>>>>> mcast_flood == on:
+>>>>> - Flood 224.0.0.x according to mcast_ipv4_ctrl_flood
+>>>>> - Flood all other IPv4 multicast according to mcast_ipv4_data_flood
+>>>>> - Flood ff02::/16 according to mcast_ipv6_ctrl_flood
+>>>>> - Flood all other IPv6 multicast according to mcast_ipv6_data_flood
+>>>>> - Flood L2 according to mcast_l2_flood
+>>>
+>>> Did you mean
+>>>
+>>> if mcast_flood == on (meaning mcast_flood is ENABLED)
+>>> - mcast_ipv4_ctrl_flood: don't care (since 224.0.0.x will be flooded 
+>>> anyway)
+>>> ...
+>>>
+>>> if mcast_flood == off (meaning mcast_flood is DISABLED)
+>>> - Flood 224.0.0.x according to mcast_ipv4_ctrl_flood
+>>> ...
+>>>
+>>> ? Otherwise the problem is still not solved when mcast_flood is 
+>>> disabled.
+>>
+>> No, I mean exactly as I said. My goal was not to "solve the problem"
+>> when mcast_flood is disabled, but to give you an option to configure the
+>> bridge to achieve what you want, in a way which I think is more 
+>> acceptable.
+>>
+>> AFAIU, there is not really any "problem" - the bridge behaves exactly as
+>> instructed given the limited language available to instruct it 
+>> ("mcast_flood"
+>> covers all multicast). So the other knobs have the role of fine-tuning
+>> what gets flooded when mcast_flood is on. Like "yes, but..."
+>>
+>> You can't "solve the problem" when it involves changing an established
+>> behavior that somebody probably depended on to be just like that.
+>>
+>>>> Yep, sounds good to me. I was thinking about something in these lines
+>>>> as well if doing a kernel solution in order to make it simpler and more
+>>>> generic. The ctrl flood bits need to be handled more carefully to make
+>>>> sure they match only control traffic and not link-local data.
+>>>
+>>> Do we consider 224.0.0.251 (mDNS) to be control or data? What 
+>>> qualifies as
+>>> control I guess that's my question.
+>>
+>> Well, as I said, I'm proposing that 224.0.0.x qualifies as control and
+>> the rest of IPv4 multicast as data. Which means that, applied to your
+>> case, "mcast_flood on mcast_ipv4_ctrl_flood on mcast_ipv4_data_flood off"
+>> will "force flood" mDNS just like the IGMP traffic from your patches.
+>> I'm not aware if this could be considered problematic (I don't think so).
+>>
+>> The reason behind this proposal is that, AFAIU, endpoints may choose to
+>> join IGMP groups in the 224.0.0.x range or not, but RFC4541 says that
+>> switches shouldn't prune the destinations towards endpoints that don't
+>> join this range anyway: https://www.rfc-editor.org/rfc/rfc4541#page-6
+>>
+>> Whereas for IP multicast traffic towards an address outside 224.0.0.x,
+>> pruning will happen as per the IGMP join tracking mechanism.
 > 
-> Actually the patch in my previous e-mail was crap as the unregistering
-> of the LEDs happened after unbind of the pdev, i.e. after
-> igc_release_hw_control() and pci_disable_device().
-> 
-For r8169 the first version is sufficient because everything is
-device-managed.
-
-> The driver otherwise doesn't seem to be using devm_*() and with
-> devm_*() it's always all or nothing.  A mix of devm_*() and manual
-> teardown is prone to ordering issues.
-> 
-> Here's another attempt:
-> 
-> -- >8 --
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-> index 90316dc58630..f9ffe9df9a96 100644
-> --- a/drivers/net/ethernet/intel/igc/igc.h
-> +++ b/drivers/net/ethernet/intel/igc/igc.h
-> @@ -298,6 +298,7 @@ struct igc_adapter {
->  
->  	/* LEDs */
->  	struct mutex led_mutex;
-> +	struct igc_led_classdev *leds;
->  };
->  
->  void igc_up(struct igc_adapter *adapter);
-> @@ -723,6 +724,7 @@ void igc_ptp_read(struct igc_adapter *adapter, struct timespec64 *ts);
->  void igc_ptp_tx_tstamp_event(struct igc_adapter *adapter);
->  
->  int igc_led_setup(struct igc_adapter *adapter);
-> +void igc_led_teardown(struct igc_adapter *adapter);
->  
->  #define igc_rx_pg_size(_ring) (PAGE_SIZE << igc_rx_pg_order(_ring))
->  
-> diff --git a/drivers/net/ethernet/intel/igc/igc_leds.c b/drivers/net/ethernet/intel/igc/igc_leds.c
-> index bf240c5daf86..4c2806c0878a 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_leds.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_leds.c
-> @@ -236,8 +236,8 @@ static void igc_led_get_name(struct igc_adapter *adapter, int index, char *buf,
->  		 pci_dev_id(adapter->pdev), index);
->  }
->  
-> -static void igc_setup_ldev(struct igc_led_classdev *ldev,
-> -			   struct net_device *netdev, int index)
-> +static int igc_setup_ldev(struct igc_led_classdev *ldev,
-> +			  struct net_device *netdev, int index)
->  {
->  	struct igc_adapter *adapter = netdev_priv(netdev);
->  	struct led_classdev *led_cdev = &ldev->led;
-> @@ -257,15 +257,15 @@ static void igc_setup_ldev(struct igc_led_classdev *ldev,
->  	led_cdev->hw_control_get = igc_led_hw_control_get;
->  	led_cdev->hw_control_get_device = igc_led_hw_control_get_device;
->  
-> -	devm_led_classdev_register(&netdev->dev, led_cdev);
-> +	return led_classdev_register(&netdev->dev, led_cdev);
->  }
->  
->  int igc_led_setup(struct igc_adapter *adapter)
->  {
->  	struct net_device *netdev = adapter->netdev;
-> -	struct device *dev = &netdev->dev;
-> +	struct device *dev = &adapter->pdev->dev;
->  	struct igc_led_classdev *leds;
-> -	int i;
-> +	int i, ret;
->  
->  	mutex_init(&adapter->led_mutex);
->  
-> @@ -273,8 +273,27 @@ int igc_led_setup(struct igc_adapter *adapter)
->  	if (!leds)
->  		return -ENOMEM;
->  
-> -	for (i = 0; i < IGC_NUM_LEDS; i++)
-> -		igc_setup_ldev(leds + i, netdev, i);
-> +	for (i = 0; i < IGC_NUM_LEDS; i++) {
-> +		ret = igc_setup_ldev(leds + i, netdev, i);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +	adapter->leds = leds;
->  
->  	return 0;
-> +
-> +err:
-> +	for (i--; i >= 0; i--)
-> +		led_classdev_unregister(&((leds + i)->led));
-> +	return ret;
-> +}
-> +
-> +void igc_led_teardown(struct igc_adapter *adapter)
-> +{
-> +	struct igc_led_classdev *leds = adapter->leds;
-> +	int i;
-> +
-> +	for (i = 0; i < IGC_NUM_LEDS; i++)
-> +		led_classdev_unregister(&((leds + i)->led));
->  }
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 2e1cfbd82f4f..cd164442ab35 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -7025,6 +7025,9 @@ static void igc_remove(struct pci_dev *pdev)
->  	cancel_work_sync(&adapter->watchdog_task);
->  	hrtimer_cancel(&adapter->hrtimer);
->  
-> +	if (IS_ENABLED(CONFIG_IGC_LEDS))
-> +		igc_led_teardown(adapter);
-> +
->  	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
->  	 * would have already happened in close and is redundant.
->  	 */
+> +1, non-IGMP traffic to 224.0.0.x must be flooded to all anyway
+> so this should allow for a better control over it, but perhaps
+> the naming should be link_local instead because control usually
+> means IGMP, maybe something like mcast_ip_link_local_flood
 > 
 
+Like this?
+
+bridge link set dev swp0 mcast_flood off
+   - all flooding disabled
+
+bridge link set dev swp0 mcast_flood on
+   - all flooding enabled
+
+bridge link set dev swp0 mcast_flood on mcast_ipv4_data_flood off 
+mcast_ipv6_data_flood off
+   - IPv4 data packets flooding disabled, IPv6 data packets flooding 
+disabled, everything else floods (that is to say, only allow IPv4 local 
+subnet and IPv6 link-local to flood)
+
+?
+
+The syntax seems to be counterintuitive.
+
+Or like this?
+
+bridge link set dev swp0 mcast_flood on mcast_ipv4_ctrl_flood on
+   - only allow IPv4 local subnet to flood, everything else off
+
+?
+
+So basically the question is, what should the behavior be when something 
+is omitted from the command line?
 
