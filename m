@@ -1,207 +1,243 @@
-Return-Path: <netdev+bounces-85175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD5DA899B0C
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:42:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE6B5899B1C
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:44:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BFBC1C20E88
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:42:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 951EE281B29
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1215715F3F5;
-	Fri,  5 Apr 2024 10:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBFB161920;
+	Fri,  5 Apr 2024 10:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HxgdXFLu"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="j4++e9W9";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FtpHEAcp";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="j4++e9W9";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FtpHEAcp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3676E13B2B9;
-	Fri,  5 Apr 2024 10:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF7718E02;
+	Fri,  5 Apr 2024 10:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712313742; cv=none; b=ns0dtg7tXiSOFzFkWpdco7dOy2uJmpa7k4qy0HRxximhXg73bpL97HufO1mX8FQ1ybX9zzaQ/6F1aqrgigoYvD9dGut9Ge1ML0qxzLHwNPeDii45xjeVT1tBXeMOcvUGMcm32IYjo8atgNNN5pZny59vgnL5bMKW2XeLF/3qmjY=
+	t=1712313866; cv=none; b=hPsMiopuArapy0YJ7KWW2uWyRzJyIC69yRwc8KogJLzPArkp2S9+NIG5OPUZvpTlhpHYLgU4CWqWpEJELfpxGXRa+Ja6YdSJI82PYHazmm+L/33D44TdKGYVzRYvyq3oWgbUbEbYDwRicnXVTHxSnOMsl5+v/FaddphJlNIyuco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712313742; c=relaxed/simple;
-	bh=1SAWkE4/sbynQ4HIQauR9XKJA67ntIPOOnBWyofSjVA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=a5KAwpmNkYhX3sqf+vtBTVEAe4l2gmznooB/mLdKwEXOKS7Kz4vcHPL11suxhIWaVYcueWisv29aWVbRK/fAh58D9LqD3etAnBfOAV2az9rbRXrWHfCWE9DQ6VAVaFix4MDH28cKP5hyfEwwUI2DYT92CYGzLUqytzinrNgNTbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HxgdXFLu; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435AUQiq014733;
-	Fri, 5 Apr 2024 10:42:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=H/v/GntoFeDJyqcRE6ME34EKf1XIQmWIMVCRSWiOK6s=;
- b=HxgdXFLuizNdd6Ejsc+iQCh6jRYH2gzPFS3oWOAfQndTd2q4j6/0JcbB2xEZRkNACdc+
- bHyVI4+wNbThEmeqsArZaH71hFZfftxHdcdpiww6+RXNv0fi1z/B5Ui+MuV7JiB5xSjT
- 2JCMQpWlJO9e/Jnq7bM2wQR0mt0KM52hQmUPim50tdrBmMkLjsqzDqcOyh5uAqRrXtca
- 6/kydTK/H94VNegOt31SamJqYOm/uGXWDJCQrbVHFzoHy31iYvOKxUWvOxQHFlyYNub/
- fAYwL1c1pNA9xQAIXpaIz4FUuPsmrUNGNBWSCWWzPZ0G9J3viXA3vxmB0ohFhl7egxvN TQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xadvf8910-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 10:42:14 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 435AgE6i000647;
-	Fri, 5 Apr 2024 10:42:14 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xadvf890w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 10:42:14 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4359jDeF009103;
-	Fri, 5 Apr 2024 10:42:12 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x9epy1wwp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Apr 2024 10:42:12 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 435Ag6km47317432
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Apr 2024 10:42:09 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DCDBE2004B;
-	Fri,  5 Apr 2024 10:42:06 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8F53320043;
-	Fri,  5 Apr 2024 10:42:06 +0000 (GMT)
-Received: from [9.155.208.153] (unknown [9.155.208.153])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Apr 2024 10:42:06 +0000 (GMT)
-Message-ID: <50b6811dbb53b19385260f6b0dffa1534f8e341e.camel@linux.ibm.com>
-Subject: Re: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Christoph Hellwig <hch@lst.de>, Paolo Abeni <pabeni@redhat.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Heiko Carstens <hca@linux.ibm.com>, pasic@linux.ibm.com,
-        schnelle@linux.ibm.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
-        Thorsten
- Winkler <twinkler@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Date: Fri, 05 Apr 2024 12:42:02 +0200
-In-Reply-To: <20240405064919.GA3788@lst.de>
-References: <20240328154144.272275-1-gbayer@linux.ibm.com>
-	 <20240328154144.272275-2-gbayer@linux.ibm.com>
-	 <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com>
-	 <cb7b036b4d3db02ab70d17ee83e6bc4f2df03171.camel@linux.ibm.com>
-	 <20240405064919.GA3788@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
+	s=arc-20240116; t=1712313866; c=relaxed/simple;
+	bh=7RNwrav9gsUT+HkGUSeZ6P3OuvkmVs0i2tQMpqCCR9g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HV30i/V20KzFsKBfl1ZXvVQShgSZXe9sgmjZBrrZcvT0c1IUXUVnuRey/pR8qEg5MEjWhkEI9q5LLzbrbIdNlNxK90xL8219w3Q+nX2BZ75mGI8mF+6vP9R8AkCuWUWZSBWKmHewzGG8ie6AAj31rR0bf7yBHe7Wq0cRXGlKgHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=j4++e9W9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FtpHEAcp; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=j4++e9W9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FtpHEAcp; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9BEFB21A34;
+	Fri,  5 Apr 2024 10:44:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1712313862; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ujKJNakC2lY1afOYTNxjDOu1u3voQsxq+lDvp53sD9I=;
+	b=j4++e9W9r8Pl33/JlVK9iLxWXn00q9gdZDwnI9mK7jlrFQkK7wQTbQeOZwe55COg8MDoqP
+	/jvWm/klVqw6x4eCZf6MUvq/3r6tdMjAHeMpm9Jp4QCVjjX/621qDnn/t9YRG7+fT5urSc
+	AgFmEkUg+shBQRvFzn/JJBcqefjVVE4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1712313862;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ujKJNakC2lY1afOYTNxjDOu1u3voQsxq+lDvp53sD9I=;
+	b=FtpHEAcpdpP5lMTQI3E5MKG4VlaV95PKQiTPtGKvu6NetWZjVJ9AkZLpnMXvSthH838MDA
+	LfDNDkWeg4rlUgDg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=j4++e9W9;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=FtpHEAcp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1712313862; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ujKJNakC2lY1afOYTNxjDOu1u3voQsxq+lDvp53sD9I=;
+	b=j4++e9W9r8Pl33/JlVK9iLxWXn00q9gdZDwnI9mK7jlrFQkK7wQTbQeOZwe55COg8MDoqP
+	/jvWm/klVqw6x4eCZf6MUvq/3r6tdMjAHeMpm9Jp4QCVjjX/621qDnn/t9YRG7+fT5urSc
+	AgFmEkUg+shBQRvFzn/JJBcqefjVVE4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1712313862;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=ujKJNakC2lY1afOYTNxjDOu1u3voQsxq+lDvp53sD9I=;
+	b=FtpHEAcpdpP5lMTQI3E5MKG4VlaV95PKQiTPtGKvu6NetWZjVJ9AkZLpnMXvSthH838MDA
+	LfDNDkWeg4rlUgDg==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 6BEA0139E8;
+	Fri,  5 Apr 2024 10:44:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id Ndv/GQbWD2bpcgAAn2gu4w
+	(envelope-from <vbabka@suse.cz>); Fri, 05 Apr 2024 10:44:22 +0000
+Message-ID: <e62d9465-7056-4714-9a4e-4645a457774e@suse.cz>
+Date: Fri, 5 Apr 2024 12:44:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8sX8TKM29sS0XRnJVF5nxfmynfPXVWiK
-X-Proofpoint-GUID: VBhMWf1ztUKxTcJ3cgNZr2GmTcDDezpP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-05_09,2024-04-04_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
- mlxscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 adultscore=0 phishscore=0 spamscore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404050078
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 4/9] slab: introduce kvmalloc_array_node() and
+ kvcalloc_node()
+Content-Language: en-US
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Duyck <alexanderduyck@fb.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Christoph Lameter <cl@linux.com>, Andrew Morton <akpm@linux-foundation.org>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Suren Baghdasaryan <surenb@google.com>,
+ Kent Overstreet <kent.overstreet@linux.dev>
+References: <20240404154402.3581254-1-aleksander.lobakin@intel.com>
+ <20240404154402.3581254-5-aleksander.lobakin@intel.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <20240404154402.3581254-5-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MX_GOOD(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 9BEFB21A34
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -4.50
 
-On Fri, 2024-04-05 at 08:49 +0200, Christoph Hellwig wrote:
-> On Thu, Apr 04, 2024 at 01:10:20PM +0200, Gerd Bayer wrote:
-> > > Why can't you use get_free_pages() (or similar) here? (possibly
-> > > rounding up to the relevant page_aligned size).=20
-> >=20
-> > Thanks Paolo for your suggestion. However, I wanted to stay as
-> > close to the implementation pre [1] - that used to use __GFP_COMP,
-> > too. I'd rather avoid to change interfaces from "cpu_addr" to
-> > "struct page*" at this point. In the long run, I'd like to drop the
-> > requirement for
->=20
-> The right interface actually is to simply use folio_alloc, which adds
-> __GFP_COMP and is a fully supported and understood interface. You can
-> just convert the folio to a kernel virtual address using
-> folio_address() right after allocating it.
+On 4/4/24 5:43 PM, Alexander Lobakin wrote:
+> Add NUMA-aware counterparts for kvmalloc_array() and kvcalloc() to be
+> able to flexibly allocate arrays for a particular node.
+> Rewrite kvmalloc_array() to kvmalloc_array_node(NUMA_NO_NODE) call.
+> 
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-Thanks for pointing me to folios.
-After a good night's sleep, I figured that I was thinking too
-complicated when I dismissed Paolo's suggestion.
+Acked-by: Vlastimil Babka <vbabka@suse>
 
-> (get_free_pages also retunrs a kernel virtual address, just awkwardly
-> as an unsigned long. In doubt don't use this interface for new
-> code..)
->=20
-> > compound pages entirely, since that *appears* to exist primarily
-> > for a
-> > simplified handling of the interface to splice_to_pipe() in
-> > net/smc/smc_rx.c. And of course there might be performance
-> > implications...
->=20
-> While compounds pages might sound awkward, they are the new normal in
-> form of folios.=C2=A0 So just use folios.
+This will however cause some conflicts with alloc tagging series with mm
+tree in next and the new wrappers will have to be adjusted.
 
-With the following fixup, my tests were just as successful.
-I'll send that out as a v2.
-
-Thank you, Christoph and Paolo!
-
-
-
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 25911b887e5e..affb05521e14 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -14,8 +14,8 @@
- #include <linux/err.h>
- #include <linux/ctype.h>
- #include <linux/processor.h>
--#include <linux/dma-direction.h>
--#include <linux/gfp_types.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/mm.h>
-=20
- #include "ism.h"
-=20
-@@ -296,7 +296,7 @@ static void ism_free_dmb(struct ism_dev *ism,
-struct ism_dmb *dmb)
- 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
- 	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
- 		       DMA_FROM_DEVICE);
--	kfree(dmb->cpu_addr);
-+	folio_put(virt_to_folio(dmb->cpu_addr));
- }
-=20
- static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
-@@ -319,8 +319,11 @@ static int ism_alloc_dmb(struct ism_dev *ism,
-struct ism_dmb *dmb)
- 	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
- 		return -EINVAL;
-=20
--	dmb->cpu_addr =3D kmalloc(dmb->dmb_len, GFP_KERNEL |
-__GFP_NOWARN |
--				__GFP_COMP | __GFP_NOMEMALLOC |
-__GFP_NORETRY);
-+	dmb->cpu_addr =3D
-+		folio_address(folio_alloc(GFP_KERNEL | __GFP_NOWARN |
-+					  __GFP_NOMEMALLOC |
-__GFP_NORETRY,
-+					  get_order(dmb->dmb_len)));
-+
- 	if (!dmb->cpu_addr) {
- 		rc =3D -ENOMEM;
- 		goto out_bit;
---=20
-2.44.0
-
+> ---
+>  include/linux/slab.h | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/slab.h b/include/linux/slab.h
+> index e53cbfa18325..d1d1fa5e7983 100644
+> --- a/include/linux/slab.h
+> +++ b/include/linux/slab.h
+> @@ -774,14 +774,27 @@ static inline __alloc_size(1) void *kvzalloc(size_t size, gfp_t flags)
+>  	return kvmalloc(size, flags | __GFP_ZERO);
+>  }
+>  
+> -static inline __alloc_size(1, 2) void *kvmalloc_array(size_t n, size_t size, gfp_t flags)
+> +static inline __alloc_size(1, 2) void *
+> +kvmalloc_array_node(size_t n, size_t size, gfp_t flags, int node)
+>  {
+>  	size_t bytes;
+>  
+>  	if (unlikely(check_mul_overflow(n, size, &bytes)))
+>  		return NULL;
+>  
+> -	return kvmalloc(bytes, flags);
+> +	return kvmalloc_node(bytes, flags, node);
+> +}
+> +
+> +static inline __alloc_size(1, 2) void *
+> +kvmalloc_array(size_t n, size_t size, gfp_t flags)
+> +{
+> +	return kvmalloc_array_node(n, size, flags, NUMA_NO_NODE);
+> +}
+> +
+> +static inline __alloc_size(1, 2) void *
+> +kvcalloc_node(size_t n, size_t size, gfp_t flags, int node)
+> +{
+> +	return kvmalloc_array_node(n, size, flags | __GFP_ZERO, node);
+>  }
+>  
+>  static inline __alloc_size(1, 2) void *kvcalloc(size_t n, size_t size, gfp_t flags)
 
 
