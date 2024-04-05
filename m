@@ -1,164 +1,216 @@
-Return-Path: <netdev+bounces-85193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00348899B98
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:07:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08325899BA9
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA99528642F
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:07:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7464B1F22D92
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D8316ABFD;
-	Fri,  5 Apr 2024 11:07:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3F416C439;
+	Fri,  5 Apr 2024 11:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VK2/kpTw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PDjgdsrY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B85418659;
-	Fri,  5 Apr 2024 11:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3326116C445;
+	Fri,  5 Apr 2024 11:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712315272; cv=none; b=JCc8eiP2fiKK1py8LyqXKrUa5ZB5CeqO4zov+beRInZzjXJQBgQlkj+HbH2bxMD+hzcwXsLo9ZkH8zg4HmwTVPRMLmez6/SwtY/4vXFeHEcvEwr62CJgXEzoOthY2oDX0Sr7EbxG37WuZMZqRxrVhV05HNWBwa9DtDhLRzhC7SY=
+	t=1712315558; cv=none; b=ekpsrYyP3pCnh8TEcu/gUawRTmyo/dc2a5h5JOT7WDyzaHxXqbx80+dncezpaThAkuzOjGCyxBIijmpamw/cLOQskJ1ad6V8sZKW07M6IfMoe9QWJW2ZmOPaAzbvohBv8Mj3JaLrWyWjY/Kt+IRdwKxjXjM3PJxSaEcZWy8hUp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712315272; c=relaxed/simple;
-	bh=87fmuLbik3W4Ac3ZqTmrh4k5PYq0/NphQip5MWUxITw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PgazBHl7MqLli3As6Tj9NyW0bK+/npeYfxenoD52ZK2VEnqdWNMFo3KvMQ81B/ujjc2nnJYjDmllNbEZYPFhIdAMrAXMNVb5EYgbO0I+LtKxiAj78QpcalPtU3+aZrvLUTP5l126fO/eAHJfDzv2K1OVh6ckDLmO1HL64niPNZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VK2/kpTw; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-566e869f631so2106298a12.0;
-        Fri, 05 Apr 2024 04:07:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712315269; x=1712920069; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C9xHgLw53zJpmruDx7tv4qUMo9+hzZpsIUuIr1l11KM=;
-        b=VK2/kpTwGbuAoa8/qYPTFDhfXX7D9eXhiWT/c0JymtNfLAGckdFxOTAd8qf99Fy5/X
-         pTXLmoohWMT0T8e43NaRxi4TA+KVJNzehCynFTS1vrnhyKWy8/W9dVxStbW44Q+B+Hz9
-         +hFUmYPZ4jkI6uauOFSHvQNJ8SmfmT2u+/CJug1tGl2FOeCY/TSthcqcra8PNIp/3UhK
-         ThdNpBvIkBgNd/QM51NeCO9sShey9y587RudBkhnkKDFXa11NVcqcuzFHRGDvUaTvGgo
-         yc9RunG4CHf2KgW0K/MHvg1L6aNlXzJ/bFHa3Dxw86lBeNqvLZ2Aese3JbblZtTCoEEn
-         E3pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712315269; x=1712920069;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C9xHgLw53zJpmruDx7tv4qUMo9+hzZpsIUuIr1l11KM=;
-        b=w58SOOoFAOV3Raflmc0zkHTtWCG1uA88oP9y6WVB76ZJm6cFJsJdMjFxF84zlq741D
-         YvDxPrxtFsYTv6tUezgZeNJG4SuOwwAZIfrvwSl3wBuRiTNUJBZ9B4/7VsweOKpwyOxt
-         YtdJmfsS1VfNpjxpIm9ahMO0WcG7VesCouB6fW7q+87h3zlbkzsPs7Mi8+9IZuNBCSd6
-         3jV6HsflhTX1qgpPyYeVUwAhOVk9eWR3edZ4bHdikucz1OKSb8G28lHg4flK/Y3Q7qg9
-         cr83dSgj0VxHjj5CrL7gt0DuUFg355g5pEQGipoauj5Ab+jNKrI+1fTgjFJZOLRDyNpO
-         FtyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqFsUAJu5RbK+ATAAEZgoPNeHZ7RrCdQiO6NPXPmGQqDiAg77YpOtpi4P2cY2L099FkiuNs7FsJ6bftuGxxGI2PDbuVkARp84cOlK7fy60o6rJY0FBhva51pL0FGSoyAq6OBrO
-X-Gm-Message-State: AOJu0YycssYy9ZnUUp+FbOEXz9xtGzO6Ig3A+dCoAZnrRjBIGJFFAtrc
-	132VdbTehnlrwe+pWjAxPhHNv8M0CAgUvtvEAeB3FaJ+0gkHY8rz
-X-Google-Smtp-Source: AGHT+IGG1+9Mqc13eWk/3SacISlrxycbkz+FTzpktzUPXrv/hdfTUb1d5xcoorCxuKaN2KMIYlqb4Q==
-X-Received: by 2002:a50:9316:0:b0:56c:4db:33f7 with SMTP id m22-20020a509316000000b0056c04db33f7mr829730eda.10.1712315269128;
-        Fri, 05 Apr 2024 04:07:49 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d700:2000::b2c])
-        by smtp.gmail.com with ESMTPSA id p15-20020a05640243cf00b0056c2d0052c0sm666532edc.60.2024.04.05.04.07.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 04:07:48 -0700 (PDT)
-Date: Fri, 5 Apr 2024 14:07:45 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Joseph Huang <joseph.huang.2024@gmail.com>
-Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>,
-	linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-Subject: Re: [PATCH RFC net-next 07/10] net: dsa: mv88e6xxx: Track bridge mdb
- objects
-Message-ID: <20240405110745.si4gc567jt5gwpbr@skbuf>
-References: <20240402001137.2980589-1-Joseph.Huang@garmin.com>
- <20240402001137.2980589-8-Joseph.Huang@garmin.com>
- <20240402122343.a7o5narxsctrkaoo@skbuf>
- <b5f79571-b4a8-4f21-8dc8-e1aa11056a5d@gmail.com>
+	s=arc-20240116; t=1712315558; c=relaxed/simple;
+	bh=NcfjqL3uT5ez6zqz+Ud9aNoZeboBCbGYLwfyWj8ndaU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eZcgE4TQK0RittLAxM4/RC1+uHBBK/tayGUhZSYwynjoW/S9j9UVs8OwzN4H/NQbsjT4ZY4wf19m58jzFzl8Q+sfKw4zm74K+xC3kdw39TBP7pJ+JinKUnPc8MOSm9hypDSkSYheXkaobC/6euXSss2HpjgXoW6FxAmYcNBPDOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PDjgdsrY; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 435B1TaS008527;
+	Fri, 5 Apr 2024 11:12:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=dFBShyNS93DhkSHWTQt6kg+6vcoJjojN32KTr8iUQzM=;
+ b=PDjgdsrYqVnGzw0y7Jljkuwl3YL/eyWo7umDMuB15wlfmvH2NGyhETkKFPFKlewU3IkP
+ JRav5TqvuLlsEHw79FsAw1RGWG5YMGx4a/4CozZh9eP8qbdw3iZMUxPy1W7WNY4sDiPi
+ uFecUeql5zuFXjig3i3N1LU5SUiXQPRJUeoWzI4QfsyyKHL9V3ptfJF+GdfdG5M3Qeso
+ OD+/j2d1gW7WNXT6vRcZ0JcyRQsHjQ9YsvDgJHe770GhBNougfe2EIaPXr93w8rjWwGs
+ xGOqXbbyoB9FRm28domPHxX3n3Kr2QvB1/3kbmgztkwijcVX3KHSqjI2WbYC5+ejpx1P bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeas886e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 11:12:32 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 435BCWWW026603;
+	Fri, 5 Apr 2024 11:12:32 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xaeas886b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 11:12:31 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4359iSFS008671;
+	Fri, 5 Apr 2024 11:12:31 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x9epwa2t0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 11:12:31 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 435BCPdG55509398
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 5 Apr 2024 11:12:27 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A5B0F2004E;
+	Fri,  5 Apr 2024 11:12:25 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5D7E820043;
+	Fri,  5 Apr 2024 11:12:25 +0000 (GMT)
+Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.155.208.153])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  5 Apr 2024 11:12:25 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, pasic@linux.ibm.com,
+        schnelle@linux.ibm.com
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>
+Subject: [PATCH v2] s390/ism: fix receive message buffer allocation
+Date: Fri,  5 Apr 2024 13:12:22 +0200
+Message-ID: <20240405111222.1785248-1-gbayer@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 15muSFZidZJPAkconFCBO2_TDBmNjDrS
+X-Proofpoint-ORIG-GUID: rxxOC3P_aUitHV94ysa5YL49ARfeZNp5
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b5f79571-b4a8-4f21-8dc8-e1aa11056a5d@gmail.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-05_10,2024-04-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=807
+ clxscore=1015 mlxscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
+ adultscore=0 malwarescore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404050081
 
-On Thu, Apr 04, 2024 at 04:43:38PM -0400, Joseph Huang wrote:
-> Hi Vladimir,
-> 
-> On 4/2/2024 8:23 AM, Vladimir Oltean wrote:
-> > Can you comment on the feasibility/infeasibility of Tobias' proposal of:
-> > "The bridge could just provide some MDB iterator to save us from having
-> > to cache all the configured groups."?
-> > https://lore.kernel.org/netdev/87sg31n04a.fsf@waldekranz.com/
-> > 
-> > What is done here will have to be scaled to many drivers - potentially
-> > all existing DSA ones, as far as I'm aware.
-> > 
-> 
-> I thought about implementing an MDB iterator as suggested by Tobias, but I'm
-> a bit concerned about the coherence of these MDB objects. In theory, when
-> the device driver is trying to act on an event, the source of the trigger
-> may have changed its state in the bridge already.
+Since [1], dma_alloc_coherent() does not accept requests for GFP_COMP
+anymore, even on archs that may be able to fulfill this. Functionality that
+relied on the receive buffer being a compound page broke at that point:
+The SMC-D protocol, that utilizes the ism device driver, passes receive
+buffers to the splice processor in a struct splice_pipe_desc with a
+single entry list of struct pages. As the buffer is no longer a compound
+page, the splice processor now rejects requests to handle more than a
+page worth of data.
 
-Yes, this is the result of SWITCHDEV_F_DEFER, used by both
-SWITCHDEV_ATTR_ID_PORT_MROUTER and SWITCHDEV_OBJ_ID_PORT_MDB.
+Replace dma_alloc_coherent() and allocate a buffer with folio_alloc and
+create a DMA map for it with dma_map_page(). Since only receive buffers
+on ISM devices use DMA, qualify the mapping as FROM_DEVICE.
+Since ISM devices are available on arch s390, only and on that arch all
+DMA is coherent, there is no need to introduce and export some kind of
+dma_sync_to_cpu() method to be called by the SMC-D protocol layer.
 
-> If, upon receiving an event in the device driver, we iterate over what
-> the bridge has at that instant, the differences between the worlds as
-> seen by the bridge and the device driver might lead to some unexpected
-> results.
+Analogously, replace dma_free_coherent by a two step dma_unmap_page,
+then folio_put to free the receive buffer.
 
-Translated: iterating over bridge MDB objects needs to be serialized
-with new switchdev events by acquiring rtnl_lock(). Then, once switchdev
-events are temporarily blocked, the pending ones need to be flushed
-using switchdev_deferred_process(), so resync the bridge state with the
-driver state. Once the resync is done, the iteration is safe until
-rtnl_unlock().
+[1] https://lore.kernel.org/all/20221113163535.884299-1-hch@lst.de/
 
-Applied to our case, the MDB iterator is needed in mv88e6xxx_port_mrouter().
-This is already called with rtnl_lock() acquired. The resync procedure
-will indirectly call mv88e6xxx_port_mdb_add()/mv88e6xxx_port_mdb_del()
-through switchdev_deferred_process(), and then the walk is consistent
-for the remainder of the mv88e6xxx_port_mrouter() function.
+Fixes: c08004eede4b ("s390/ism: don't pass bogus GFP_ flags to dma_alloc_coherent")
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+---
+changelog:
+v1->v2:
+- replaced kmalloc/kfree with folio_alloc/folio_put
+  as suggested.
 
-A helper which does this is what would be required - an iterator
-function which calls an int (*cb)(struct net_device *brport, const struct switchdev_obj_port_mdb *mdb)
-for each MDB entry. The DSA core could then offer some post-processing
-services over this API, to recover the struct dsa_port associated with
-the bridge port (in the LAG case they aren't the same) and the address
-database associated with the bridge.
+---
+ drivers/s390/net/ism_drv.c | 38 +++++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
-Do you think there would be unexpected results even if we did this?
-br_switchdev_mdb_replay() needs to handle a similarly complicated
-situation of synchronizing with deferred MDB events.
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 2c8e964425dc..affb05521e14 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -14,6 +14,8 @@
+ #include <linux/err.h>
+ #include <linux/ctype.h>
+ #include <linux/processor.h>
++#include <linux/dma-mapping.h>
++#include <linux/mm.h>
+ 
+ #include "ism.h"
+ 
+@@ -292,13 +294,15 @@ static int ism_read_local_gid(struct ism_dev *ism)
+ static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
+ 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+-	dma_free_coherent(&ism->pdev->dev, dmb->dmb_len,
+-			  dmb->cpu_addr, dmb->dma_addr);
++	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
++		       DMA_FROM_DEVICE);
++	folio_put(virt_to_folio(dmb->cpu_addr));
+ }
+ 
+ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
+ 	unsigned long bit;
++	int rc;
+ 
+ 	if (PAGE_ALIGN(dmb->dmb_len) > dma_get_max_seg_size(&ism->pdev->dev))
+ 		return -EINVAL;
+@@ -315,14 +319,30 @@ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ 	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
+ 		return -EINVAL;
+ 
+-	dmb->cpu_addr = dma_alloc_coherent(&ism->pdev->dev, dmb->dmb_len,
+-					   &dmb->dma_addr,
+-					   GFP_KERNEL | __GFP_NOWARN |
+-					   __GFP_NOMEMALLOC | __GFP_NORETRY);
+-	if (!dmb->cpu_addr)
+-		clear_bit(dmb->sba_idx, ism->sba_bitmap);
++	dmb->cpu_addr =
++		folio_address(folio_alloc(GFP_KERNEL | __GFP_NOWARN |
++					  __GFP_NOMEMALLOC | __GFP_NORETRY,
++					  get_order(dmb->dmb_len)));
+ 
+-	return dmb->cpu_addr ? 0 : -ENOMEM;
++	if (!dmb->cpu_addr) {
++		rc = -ENOMEM;
++		goto out_bit;
++	}
++	dmb->dma_addr = dma_map_page(&ism->pdev->dev,
++				     virt_to_page(dmb->cpu_addr), 0,
++				     dmb->dmb_len, DMA_FROM_DEVICE);
++	if (dma_mapping_error(&ism->pdev->dev, dmb->dma_addr)) {
++		rc = -ENOMEM;
++		goto out_free;
++	}
++
++	return 0;
++
++out_free:
++	kfree(dmb->cpu_addr);
++out_bit:
++	clear_bit(dmb->sba_idx, ism->sba_bitmap);
++	return rc;
+ }
+ 
+ int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
+-- 
+2.44.0
 
-> However, if we cache the MDB objects in the device driver, at least
-> the order in which the events took place will be coherent and at any
-> give time the state of the MDB objects in the device driver can be
-> guaranteed to be sane. This is also the approach the prestera device
-> driver took.
-
-Not contesting this, but I wouldn't like to see MDBs cached in each
-device driver just for this. Switchdev is not very high on the list of
-APIs which are easy to use, and making MDB caching a requirement
-(for the common case that MDB entry destinations need software fixups
-with the mrouter ports) isn't exactly going to make that any better.
-Others' opinion may differ, but mine is that core offload APIs need to
-consider what hardware is available in the real world, make the common
-case easy, and the advanced cases possible. Rather than make every case
-"advanced" :)
 
