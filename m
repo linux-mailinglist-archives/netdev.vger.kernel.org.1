@@ -1,121 +1,104 @@
-Return-Path: <netdev+bounces-85220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9D46899CE5
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:30:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 104A8899D10
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2CC31C2177A
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:30:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 421A01C21D61
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D646D16C866;
-	Fri,  5 Apr 2024 12:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A7813C679;
+	Fri,  5 Apr 2024 12:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neksvo/R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f7OO++ld"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08E316C862;
-	Fri,  5 Apr 2024 12:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A5F1E87F;
+	Fri,  5 Apr 2024 12:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712320208; cv=none; b=cbAjvKtE3HR/+KXNpmrIXlhLW7bEXxuKpQgbN1kDJAH7IQEg+0flQuI+8VgXD3QvQoDQ+ktQ5C/YsrftXOYr9V+AZtl47IRjjeIOv4iPh+LI6ITztU1KVLh/p2yP/y1jq3mlakWizmz17Bam6BXqCeSAhZxdKgRLKQouRpRTXKI=
+	t=1712320445; cv=none; b=SOlA8kPv0RL3fVijCTkM9ZlBXTWSUEJTn1JtyBqb5Vp6hf8p89Q5D5fM7efT0F6CYELp+SWzZwezNDiQuG1oB+DhRrwGWOEIzD4t/j0CT6LgXI0OK9Kb/RwW0x2dCkykrNEmygeGWwiWgQ5XGNdc2ZXuF+ypqKxF7igQ0loH0kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712320208; c=relaxed/simple;
-	bh=JR8+Vwz3pz5roRhU/fTETXN5L9wi9qDehmzIoJCYsWY=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=hha2Oae1NiDH+why3jmc6RXXKnGW17P6VW51uALTT9+tbMedQm//aZJ/RVM1qt/q4NSk4nKpDsGd1xX9s4hPCbzEcRkJecNSxQLwd3nlkzymN+ShlFgQeQg01tNNpigyKbCNESLDogWWb/sBkTsQ/rZk5JH5pKAJWnEVQkKq7vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neksvo/R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE0D6C433C7;
-	Fri,  5 Apr 2024 12:30:05 +0000 (UTC)
+	s=arc-20240116; t=1712320445; c=relaxed/simple;
+	bh=PECncfpIj9KF2NL1qIow7qaBE8q+dGkyd5JVLY75BOg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=rr4vzquK5N5qiEPuGyTkXVjDjW8bS2Hi5T3l8qbROokgytelZIBWxXwQPivccmcXKB+ypH217tpStOgeogFPLNOfvwDtuHM6pj1s963CHFzs77d0FFLuPdsKJ3NkJY2igu+UGy6WYOoxl1Y/6se4rUPVpLeVWtgTNFG8AT5osos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f7OO++ld; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF20DC433C7;
+	Fri,  5 Apr 2024 12:34:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712320208;
-	bh=JR8+Vwz3pz5roRhU/fTETXN5L9wi9qDehmzIoJCYsWY=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=neksvo/RefNVGv94kOSJeWzddtr2dwvzlWDzqeZrWWz8+WB8jbKpwpCH9a/67DZBo
-	 8ULRAuSKEi+8uStofOQEGjttycmW6+ChNAIbrJJDNQkl6Xc/9AtG5IZnb9GhV5Xedp
-	 rQ1j4moHJ//fvAAUq4K6FuQFqXHt/l8R/F4fIX3YwT3xlG7rR1eJbfztfPaY/lwBun
-	 vxZYGlLG2jfo9NwFtlo5oqXz9pz6GIxtJDvQv8R495F00cxg039mTKbLX6YIky3Mei
-	 3Z6WOhwbDanDuSfdFp3ts+80lH30SLHf4Pzw661+EyiE+953kAMaypkhvalYw+VVs9
-	 IJOg5/94oXSlQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Cc: Baochen Qiang <quic_bqiang@quicinc.com>,  ath11k@lists.infradead.org,
-  linux-wireless@vger.kernel.org,  linux-arm-msm@vger.kernel.org,
-  mhi@lists.linux.dev,  davem@davemloft.net,  edumazet@google.com,
-  kuba@kernel.org,  pabeni@redhat.com,  netdev@vger.kernel.org
-Subject: Re: [PATCH v7 1/3] bus: mhi: host: add mhi_power_down_keep_dev()
-References: <20240305021320.3367-1-quic_bqiang@quicinc.com>
-	<20240305021320.3367-2-quic_bqiang@quicinc.com>
-	<20240401104908.GA234427@thinkpad>
-Date: Fri, 05 Apr 2024 15:30:03 +0300
-In-Reply-To: <20240401104908.GA234427@thinkpad> (Manivannan Sadhasivam's
-	message of "Mon, 1 Apr 2024 16:19:08 +0530")
-Message-ID: <87wmpc2dro.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=k20201202; t=1712320444;
+	bh=PECncfpIj9KF2NL1qIow7qaBE8q+dGkyd5JVLY75BOg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=f7OO++ldDAG5EvmYC/zNV61hMnNPLbuFpCPIFVPgvRCZ3MYgmFm8WHRO+XWL4WQ67
+	 ePFkz+UQVYDfnUjZY8s6OsNrJOH63T2asc5L7yRbMSdNL53LOd3GWDcWDD5vyIz4pT
+	 qHh+ZgTY43kwgrSlbxKaD4VCb4YJ1mUMQQlK57VJ7VLWLebLRjR6ecq28RvkVvglLH
+	 GiC4bQx2PPqnuKVgr8BAH729yQS56FpSXMdB0S65D0Timy7W3InfO6SRenpmaHxcbu
+	 0m2q2rs+x4g4XgRUC/xIq+SfeFpMsPjjZFqSKdtB1K+4ZvzAUHrMLpG8O0h2RseZEm
+	 RBeYAPQuBl0TQ==
+From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Pu Lehui <pulehui@huawei.com>,
+	Puranjay Mohan <puranjay@kernel.org>
+Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@rivosinc.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
+Subject: [PATCH bpf] MAINTAINERS: bpf: Add Lehui and Puranjay as riscv64 reviewers
+Date: Fri,  5 Apr 2024 14:33:51 +0200
+Message-Id: <20240405123352.2852393-1-bjorn@kernel.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org> writes:
+From: Björn Töpel <bjorn@rivosinc.com>
 
-> On Tue, Mar 05, 2024 at 10:13:18AM +0800, Baochen Qiang wrote:
->
->> ath11k fails to resume:
->> 
->> ath11k_pci 0000:06:00.0: timeout while waiting for restart complete
->> 
->> This happens because when calling mhi_sync_power_up() the MHI subsystem
->> eventually calls device_add() from mhi_create_devices() but the device
->> creation is deferred:
->> 
->> mhi mhi0_IPCR: Driver qcom_mhi_qrtr force probe deferral
->> 
->> The reason for deferring device creation is explained in dpm_prepare():
->> 
->>         /*
->>          * It is unsafe if probing of devices will happen during suspend or
->>          * hibernation and system behavior will be unpredictable in this case.
->>          * So, let's prohibit device's probing here and defer their probes
->>          * instead. The normal behavior will be restored in dpm_complete().
->>          */
->> 
->> Because the device probe is deferred, the qcom_mhi_qrtr_probe() is not
->> called and thus MHI channels are not prepared:
->> 
->> So what this means that QRTR is not delivering messages and the QMI connection
->> is not working between ath11k and the firmware, resulting a failure in firmware
->> initialization.
->> 
->> To fix this add new function mhi_power_down_keep_dev() which doesn't destroy
->> the devices for channels during power down. This way we avoid probe defer issue
->> and finally can get ath11k hibernation working with the following patches.
->> 
->> Tested-on: WCN6855 hw2.0 PCI WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
->> 
->> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
->
-> Applied to mhi-next! Note that this patch is also available in mhi-immutable
-> branch for ath11k maintainers to pull into their tree.
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/mani/mhi.git/log/?h=mhi-immutable
+Lehui and Puranjay have been active RISC-V 64-bit BPF JIT
+contributors/reviewers for a long time!
 
-Thanks, I pulled this branch to ath-next:
+Let's make it more official by adding them as reviewers in
+MAINTAINERS.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=ath-next&id=231a4c893c9bb2984a8c6b7450199f59eb816ed9
+Thank you for your hard work!
 
-This is just preparation for patches 2 and 3, those patches are not
-commited yet.
+Signed-off-by: Björn Töpel <bjorn@kernel.org>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 75381386fe4c..58ab032ad33d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3764,6 +3764,8 @@ X:	arch/riscv/net/bpf_jit_comp64.c
+ 
+ BPF JIT for RISC-V (64-bit)
+ M:	Björn Töpel <bjorn@kernel.org>
++R:	Pu Lehui <pulehui@huawei.com>
++R:	Puranjay Mohan <puranjay@kernel.org>
+ L:	bpf@vger.kernel.org
+ S:	Maintained
+ F:	arch/riscv/net/
+
+base-commit: c88b9b4cde17aec34fb9bfaf69f9f72a1c44f511
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.40.1
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
