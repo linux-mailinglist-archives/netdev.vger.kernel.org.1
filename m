@@ -1,459 +1,302 @@
-Return-Path: <netdev+bounces-85248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C3C899E5C
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:34:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14C6B899E82
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:39:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64BC81C21F35
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:34:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB75E283074
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9337616D4C5;
-	Fri,  5 Apr 2024 13:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7AA316D4DE;
+	Fri,  5 Apr 2024 13:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OXEeRuNX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NmKeQDbV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47EC16D4F9
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 13:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE9516C68C;
+	Fri,  5 Apr 2024 13:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712324046; cv=none; b=tRghR+mwk+02NUDEfmyx++Wh5A7Ptqf2DSh20yvhQOfeOSmCZBVuXDv//SY0LryBb1BLnKw8MZRdYhDH5cf6q5VjJNPeFSe6OVAcow3E9Cq799lGC6ykUJFt7qZ/2eroFDhBu7WhXtsb8sQvN8pD38fJVhxeUUM+ekT1/tRg744=
+	t=1712324354; cv=none; b=TBpehYoT2HaSHRZ+VbMX8GaELc1nbAYiUxQWwdsgcYmzir2qZsALOuVdxkCH+JowFIj0hyDsTNHSPmR6/EWeuxk6zwtuiapdlg2BKBVgTPnP8Ncj9VbW0k9jBIW3U8be2dY+d377B8JsK25atmHgl1+SPt1YKXcBTeQCSbQFejE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712324046; c=relaxed/simple;
-	bh=2xiZS+lzeptBHXal4Pm6xzjZ3cF+eVVZTG7JYi5B80s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P9mOBZo37Q05qJbii7IGklIM+xFsvYzg1lTLBaf5SKobTtV+PLueSwUKtj5BrX1NdURyAxfNUBsVTHG99CeDDKHwoPNB9FfB3BdUwIULUTPnds0ZAI49GmaI5d1JTY7tK39a4OQlbc23L69gZ8Pp8ms95iQeOBIYX5VXq6sIWE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=OXEeRuNX; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6154a1812ffso22693277b3.1
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 06:34:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1712324042; x=1712928842; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3HGMasy7CW4eu+5mzobBtNWNp/FJJI+kNtNpgApZ92U=;
-        b=OXEeRuNXTEVoPEMFPt6DM5koBzAsm1Sltkoj5ophPmkGDNfUcE+NtugL685EEts/I3
-         kojAsPMK+MIIAOkKjGtlfqeNbtDf7XkPOpAgMziWL+/4o7iMTmCa1GMZdgyvkP0/UPT+
-         dw29wfPDXhn3p5OjKSVmDTJTagcRVUQF1V7cllpDjwJKPJwaV8hiwo3Fsli4XhQO4mDj
-         LBWOmEMa6F2Nt7gNpYMkT6Y4kXojzI48cz4+ABV9aMeHE1gTXxTXEFpe1SQhJt3WdesL
-         knYu52RhBe+rcYlg3qgcS4a6xCUqkdkceBapG9FYsWZGUQOGs/UcjJ8LLiWH6q6lYtmn
-         pFug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712324042; x=1712928842;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3HGMasy7CW4eu+5mzobBtNWNp/FJJI+kNtNpgApZ92U=;
-        b=A4vPfq4Wl0BvrEIVzAph1g5W2wMwJ1Ou9KsO9XOxulSY0hWRQyhMRdjc1aaF7N8irv
-         LKdAQYoItqjSCwFlTWBp03UdIRTUOOkC0wmggejcdUDIlGpyS4pLZoe1L+/YFhjLj0kb
-         pwslUi8y01fK829fwTI2T+uFfRGlVEb6U9TQmJEQGJL16EWBxmxPNRAz2wCiq/KECyDk
-         yBzVdwi0LzHPHLdrvHvbo+5uMqI6PwXrrfBAskiqqfD7FX+rQqPoUq98fJUnmd4E37Hi
-         O58h3inBm5+SjCT6KV14tQzQsLGEsrN24oOybpUKpLvEJKRdl5CTsIkktVCvYmbfKHAU
-         jOxg==
-X-Gm-Message-State: AOJu0YyuhpcxaZ0AR7ZP3LTQWkBM8HlQnmTWXRdZ7vYGQXV4O+Wg4xT7
-	aRiHYX1fMZEh79tcUGcsbFUG6R3QcZGNqKt55IJroxmRpS1K+JSdS6Ii/vs/00Ia86xRgCMifjt
-	EE8NGBKsWi/ejBdPtUOj4vkUL8RqqenmroRK8
-X-Google-Smtp-Source: AGHT+IG1StBUzeCyb8Fy28cnXLPHFxkDwwVobdAIRNoAN4H//7y5n0CxVQoHoUgLQoIRXoGGdBY/t3RfeeH3Zo286lQ=
-X-Received: by 2002:a25:ac16:0:b0:dcd:5187:a032 with SMTP id
- w22-20020a25ac16000000b00dcd5187a032mr1347218ybi.43.1712324041683; Fri, 05
- Apr 2024 06:34:01 -0700 (PDT)
+	s=arc-20240116; t=1712324354; c=relaxed/simple;
+	bh=yWQCwLrQZoT1UXlDqF5ZcZ98bGIprS17RgS9M+Wu8Ao=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cgpsY2BcDJbqJWQfURHGq5/5a0pYTnnhYN59MTHMF/WPEmuFUE+bpQyHPaL1I27UP3uUgYev+alNLmj3PgLmfSwbMJn1NEI3iOFdICpZn3ubjmsw7P964Xz06RuXV7V9VYxV1BZ7P5LU8+K8xKaEGz+a+qpEmkJ0PY0P403M1rQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NmKeQDbV; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712324352; x=1743860352;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yWQCwLrQZoT1UXlDqF5ZcZ98bGIprS17RgS9M+Wu8Ao=;
+  b=NmKeQDbVdhhX7ztDcwyMi8iOor/qMU5J+fj/6jDhoLeVv4hlVpW55Hwy
+   dMwz0K7v/AqSvFyrbLmfRxLVdTQ83slchihUmjXOiEGkfpOpah8b0FWH4
+   /z1ju1RWbtbQYi9EFUTDG6GL/BLvBDQcfdUVIFFgBKXoTMAb7lcqcfwuP
+   dJlvK+qj+QJU6BhryaC0LFxB1Ss0FsOrgtGHoarjCJGnpEnj+LhESM4zM
+   vAQ7kV9OBXRgv7SLi03LwEcj2etFWeCZzztnPbaO4X0kK8Fx7UgZEPY0f
+   Kob8DdDx3hJvBKtpkXDRiAi8xzkhpqIJpYf3TDyMbhpU2TUGbPWowRNaQ
+   w==;
+X-CSE-ConnectionGUID: 0WKEKhFLSbCqZMHMvASjMQ==
+X-CSE-MsgGUID: mII/TiZlS92vA5iEKzs6jw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="18219537"
+X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
+   d="scan'208";a="18219537"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 06:39:11 -0700
+X-CSE-ConnectionGUID: qZoM6zepS5SkcnsKi+wIRg==
+X-CSE-MsgGUID: QipjC6sjQiOBbzbx7MROuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
+   d="scan'208";a="19600077"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa007.jf.intel.com with ESMTP; 05 Apr 2024 06:39:09 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RFC net-next 0/7] netdev_features: start cleaning netdev_features_t up
+Date: Fri,  5 Apr 2024 15:37:24 +0200
+Message-ID: <20240405133731.1010128-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240405102313.GA310894@kernel.org>
-In-Reply-To: <20240405102313.GA310894@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 5 Apr 2024 09:33:50 -0400
-Message-ID: <CAM0EoMnEWbLJXNChpDrnKSsu6gXjaPwCX9jRqKv0UagPUuo1tA@mail.gmail.com>
-Subject: Re: [RFC] HW TX Rate Limiting Driver API
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	Madhu Chittim <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>, 
-	Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 5, 2024 at 6:25=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> Hi,
->
-> This is follow-up to the ongoing discussion started by Intel to extend th=
-e
-> support for TX shaping H/W offload [1].
->
-> The goal is allowing the user-space to configure TX shaping offload on a
-> per-queue basis with min guaranteed B/W, max B/W limit and burst size on =
-a
-> VF device.
->
->
-> In the past few months several different solutions were attempted and
-> discussed, without finding a perfect fit:
->
-> - devlink_rate APIs are not appropriate for to control TX shaping on netd=
-evs
-> - No existing TC qdisc offload covers the required feature set
-> - HTB does not allow direct queue configuration
-> - MQPRIO imposes constraint on the maximum number of TX queues
-> - TBF does not support max B/W limit
-> - ndo_set_tx_maxrate() only controls the max B/W limit
->
-> A new H/W offload API is needed, but offload API proliferation should be
-> avoided.
->
-> The following proposal intends to cover the above specified requirement a=
-nd
-> provide a possible base to unify all the shaping offload APIs mentioned a=
-bove.
->
-> The following only defines the in-kernel interface between the core and
-> drivers. The intention is to expose the feature to user-space via Netlink=
-.
-> Hopefully the latter part should be straight-forward after agreement
-> on the in-kernel interface.
->
-> All feedback and comment is more then welcome!
->
-> [1] https://lore.kernel.org/netdev/20230808015734.1060525-1-wenjun1.wu@in=
-tel.com/
->
+NETDEV_FEATURE_COUNT is currently 64, which means we can't add any new
+features as netdev_features_t is u64.
+As per several discussions, instead of converting netdev_features_t to
+a bitmap, which would mean A LOT of changes, we can try cleaning up
+netdev feature bits.
+There's a bunch of bits which don't really mean features, rather device
+attributes/properties that can't be changed via Ethtool in any of the
+drivers. Such attributes can be moved to netdev private flags without
+losing any functionality.
+Start converting some read-only netdev features to private flags from
+the ones that are most obvious, like lockless Tx, inability to change
+network namespace etc. I was able to reduce NETDEV_FEATURE_COUNT from
+64 to 58, which mean 6 free slots for new features. NETIF_F_NEVER_CHANGE
+is gone, so ETHTOOL_A_FEATURES_NOCHANGE Netlink reply will always be 0.
+I may've made some mistakes with feature inheriting and also some of
+these are compile-tested only, so this is marked as RFC to discuss
+the changes. There are obviously more read-only features to convert,
+such as HSR (4 bits), this will be done in subsequent series.
 
-My 2 cents:
-I did peruse the lore quoted thread but i am likely to have missed somethin=
-g.
-It sounds like the requirement is for egress-from-host (which to a
-device internal looks like ingress-from-host on the device). Doesn't
-existing HTB offload already support this? I didnt see this being
-discussed in the thread. Also, IIUC, there is no hierarchy
-requirement. That is something you can teach HTB but there's probably
-something i missed because i didnt understand the context of "HTB does
-not allow direct queue configuration". If HTB is confusing from a
-config pov then it seems what Paolo was describing in the thread on
-TBF is a reasonable approach too. I couldnt grok why that TBF
-extension for max bw was considered a bad idea.
-On config:
-Could we not introduce skip_sw/hw semantics for qdiscs? IOW, skip_sw
-means the config is only subjected to hw and you have DIRECT
-semantics, etc.
-I understand the mlnx implementation of HTB does a lot of things in
-the driver but the one nice thing they had was ability to use classid
-X:Y to select a egress h/w queue. The driver resolution of all the
-hierarchy is not needed at all here if i understood the requirement
-above.
-You still need to have a classifier in s/w (which could be attached to
-clsact egress) to select the queue. That is something the mlnx
-implementation allowed. So there is no "double queueing"
+Alexander Lobakin (7):
+  netdev_features: remove unused __UNUSED_NETIF_F_1
+  netdev_features: convert NETIF_F_LLTX to priv_flag IFF_LLTX
+  netdevice: introduce IFF_LOGICAL as (IFF_NO_QUEUE | IFF_LLTX)
+  netdev_features: convert NETIF_F_NETNS_LOCAL to IFF_NETNS_LOCAL
+  netdev_features: convert NETIF_F_HIGHDMA to priv_flag IFF_HIGHDMA
+  netdev_features: convert NETIF_F_VLAN_CHALLENGED to
+    IFF_VLAN_CHALLENGED
+  netdev_features: convert NETIF_F_FCOE_MTU to IFF_FCOE_MTU
 
-If this is about totally bypassing s/w config then its a different ballgame=
-..
+ Documentation/driver-api/usb/dma.rst          |  2 +-
+ Documentation/networking/ethtool-netlink.rst  |  2 +-
+ Documentation/networking/netdev-features.rst  | 31 +-------------
+ Documentation/networking/netdevices.rst       |  4 +-
+ Documentation/networking/switchdev.rst        |  4 +-
+ drivers/net/ethernet/tehuti/tehuti.h          |  2 +-
+ include/linux/if_vlan.h                       |  5 +--
+ include/linux/netdev_features.h               | 26 ++----------
+ include/linux/netdevice.h                     | 31 ++++++++++++--
+ include/net/mac80211.h                        |  1 +
+ include/net/net_failover.h                    |  6 ++-
+ net/mac80211/ieee80211_i.h                    |  4 +-
+ drivers/firewire/net.c                        |  2 +-
+ drivers/infiniband/hw/hfi1/vnic_main.c        |  3 +-
+ drivers/infiniband/ulp/ipoib/ipoib_main.c     |  3 +-
+ drivers/net/amt.c                             |  4 +-
+ drivers/net/bareudp.c                         |  3 +-
+ drivers/net/bonding/bond_main.c               | 42 +++++++++----------
+ drivers/net/dummy.c                           |  4 +-
+ drivers/net/ethernet/adaptec/starfire.c       |  2 +-
+ drivers/net/ethernet/adi/adin1110.c           |  3 +-
+ drivers/net/ethernet/aeroflex/greth.c         |  3 +-
+ drivers/net/ethernet/alteon/acenic.c          |  2 +-
+ drivers/net/ethernet/altera/altera_tse_main.c |  3 +-
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  |  5 ++-
+ drivers/net/ethernet/broadcom/bcmsysport.c    |  4 +-
+ drivers/net/ethernet/broadcom/bnx2.c          |  2 +-
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  |  5 +--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  6 +--
+ .../net/ethernet/broadcom/genet/bcmgenet.c    |  4 +-
+ drivers/net/ethernet/broadcom/tg3.c           |  2 +-
+ drivers/net/ethernet/brocade/bna/bnad.c       |  9 ++--
+ drivers/net/ethernet/calxeda/xgmac.c          |  4 +-
+ .../net/ethernet/cavium/liquidio/lio_main.c   |  4 +-
+ .../ethernet/cavium/liquidio/lio_vf_main.c    |  4 +-
+ drivers/net/ethernet/chelsio/cxgb/cxgb2.c     |  3 +-
+ .../net/ethernet/chelsio/cxgb3/cxgb3_main.c   |  4 +-
+ .../net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c   |  6 +--
+ .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   |  6 +--
+ .../ethernet/chelsio/cxgb4vf/cxgb4vf_main.c   |  6 +--
+ drivers/net/ethernet/cisco/enic/enic_main.c   |  2 +-
+ drivers/net/ethernet/emulex/benet/be_main.c   |  5 +--
+ .../net/ethernet/freescale/dpaa/dpaa_eth.c    |  6 +--
+ .../net/ethernet/freescale/dpaa2/dpaa2-eth.c  |  5 +--
+ .../net/ethernet/freescale/enetc/enetc_pf.c   |  4 +-
+ .../net/ethernet/freescale/enetc/enetc_vf.c   |  3 +-
+ drivers/net/ethernet/freescale/gianfar.c      |  3 +-
+ .../ethernet/fungible/funeth/funeth_main.c    |  5 ++-
+ drivers/net/ethernet/google/gve/gve_main.c    |  2 +-
+ drivers/net/ethernet/hisilicon/hix5hd2_gmac.c |  4 +-
+ .../net/ethernet/huawei/hinic/hinic_main.c    |  4 +-
+ drivers/net/ethernet/ibm/ehea/ehea_main.c     |  6 +--
+ drivers/net/ethernet/intel/e100.c             |  2 +-
+ drivers/net/ethernet/intel/e1000/e1000_main.c |  6 +--
+ drivers/net/ethernet/intel/e1000e/netdev.c    |  5 +--
+ drivers/net/ethernet/intel/fm10k/fm10k_pci.c  |  6 +--
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  2 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  3 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  5 ++-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  5 ++-
+ drivers/net/ethernet/intel/igb/igb_main.c     |  4 +-
+ drivers/net/ethernet/intel/igbvf/netdev.c     |  3 +-
+ drivers/net/ethernet/intel/igc/igc_main.c     |  4 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c |  4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |  3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 12 +++---
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |  4 +-
+ .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  4 +-
+ drivers/net/ethernet/jme.c                    |  6 +--
+ .../ethernet/marvell/prestera/prestera_main.c |  3 +-
+ drivers/net/ethernet/marvell/skge.c           |  2 +-
+ drivers/net/ethernet/marvell/sky2.c           |  2 +-
+ .../net/ethernet/mellanox/mlx4/en_netdev.c    |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  7 ++--
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  |  2 +-
+ .../net/ethernet/mellanox/mlxsw/spectrum.c    |  5 ++-
+ .../net/ethernet/myricom/myri10ge/myri10ge.c  |  4 +-
+ drivers/net/ethernet/natsemi/ns83820.c        |  4 +-
+ drivers/net/ethernet/neterion/s2io.c          |  4 +-
+ .../ethernet/netronome/nfp/nfp_net_common.c   |  2 +-
+ .../net/ethernet/netronome/nfp/nfp_net_repr.c |  5 +--
+ drivers/net/ethernet/nvidia/forcedeth.c       |  4 +-
+ drivers/net/ethernet/pasemi/pasemi_mac.c      |  4 +-
+ .../net/ethernet/pensando/ionic/ionic_lif.c   |  4 +-
+ .../ethernet/qlogic/netxen/netxen_nic_main.c  |  6 +--
+ drivers/net/ethernet/qlogic/qede/qede_main.c  |  6 +--
+ drivers/net/ethernet/qlogic/qla3xxx.c         |  2 +-
+ .../net/ethernet/qlogic/qlcnic/qlcnic_main.c  |  6 +--
+ .../net/ethernet/qualcomm/rmnet/rmnet_vnd.c   |  2 +-
+ drivers/net/ethernet/realtek/8139cp.c         |  5 +--
+ drivers/net/ethernet/realtek/8139too.c        |  3 +-
+ drivers/net/ethernet/realtek/r8169_main.c     |  2 +-
+ drivers/net/ethernet/rocker/rocker_main.c     |  3 +-
+ .../net/ethernet/samsung/sxgbe/sxgbe_main.c   |  4 +-
+ drivers/net/ethernet/sfc/ef100_netdev.c       |  3 +-
+ drivers/net/ethernet/sfc/ef100_nic.c          |  2 +-
+ drivers/net/ethernet/sfc/ef100_rep.c          |  3 +-
+ drivers/net/ethernet/sfc/efx.c                |  4 +-
+ drivers/net/ethernet/sfc/falcon/efx.c         |  3 +-
+ drivers/net/ethernet/sfc/siena/efx.c          |  4 +-
+ drivers/net/ethernet/sgi/ioc3-eth.c           |  3 +-
+ drivers/net/ethernet/silan/sc92031.c          |  4 +-
+ drivers/net/ethernet/socionext/netsec.c       |  3 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  4 +-
+ drivers/net/ethernet/sun/cassini.c            |  2 +-
+ drivers/net/ethernet/sun/niu.c                |  2 +-
+ drivers/net/ethernet/sun/sungem.c             |  2 +-
+ drivers/net/ethernet/tehuti/tehuti.c          |  9 ++--
+ drivers/net/ethernet/ti/cpsw_new.c            |  3 +-
+ drivers/net/ethernet/toshiba/ps3_gelic_net.c  |  3 +-
+ drivers/net/ethernet/toshiba/spider_net.c     |  3 +-
+ drivers/net/ethernet/tundra/tsi108_eth.c      |  2 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  2 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  2 +-
+ drivers/net/ethernet/wiznet/w5100.c           |  2 +-
+ drivers/net/ethernet/wiznet/w5300.c           |  2 +-
+ drivers/net/ethernet/xilinx/ll_temac_main.c   |  2 -
+ drivers/net/geneve.c                          |  3 +-
+ drivers/net/gtp.c                             |  3 +-
+ drivers/net/hamradio/bpqether.c               |  2 +-
+ drivers/net/hyperv/netvsc_drv.c               |  4 +-
+ drivers/net/ifb.c                             |  4 +-
+ drivers/net/ipvlan/ipvlan_main.c              | 13 +++---
+ drivers/net/loopback.c                        |  8 ++--
+ drivers/net/macsec.c                          |  6 +--
+ drivers/net/macvlan.c                         | 12 +++---
+ drivers/net/net_failover.c                    | 36 ++++++++--------
+ drivers/net/netdevsim/netdev.c                |  6 +--
+ drivers/net/netkit.c                          |  6 +--
+ drivers/net/nlmon.c                           |  5 +--
+ drivers/net/ntb_netdev.c                      |  3 +-
+ drivers/net/ppp/ppp_generic.c                 |  2 +-
+ drivers/net/rionet.c                          |  2 +-
+ drivers/net/tap.c                             |  3 +-
+ drivers/net/team/team_core.c                  | 27 ++++++------
+ drivers/net/thunderbolt/main.c                |  3 +-
+ drivers/net/tun.c                             |  5 ++-
+ drivers/net/usb/r8152.c                       |  5 ++-
+ drivers/net/veth.c                            |  6 +--
+ drivers/net/virtio_net.c                      |  3 +-
+ drivers/net/vmxnet3/vmxnet3_drv.c             |  3 +-
+ drivers/net/vrf.c                             | 17 +++-----
+ drivers/net/vsockmon.c                        |  5 +--
+ drivers/net/vxlan/vxlan_core.c                |  3 +-
+ drivers/net/wireguard/device.c                |  5 +--
+ .../net/wireless/intel/iwlwifi/dvm/mac80211.c |  6 ++-
+ .../net/wireless/intel/iwlwifi/mvm/mac80211.c |  6 ++-
+ drivers/net/wwan/t7xx/t7xx_netdev.c           |  3 +-
+ drivers/s390/net/qeth_l2_main.c               |  2 +-
+ drivers/scsi/fcoe/fcoe.c                      |  4 +-
+ drivers/staging/octeon/ethernet.c             |  2 +-
+ drivers/usb/fotg210/fotg210-hcd.c             |  2 +-
+ drivers/usb/host/ehci-hcd.c                   |  2 +-
+ drivers/usb/host/oxu210hp-hcd.c               |  2 +-
+ lib/test_bpf.c                                |  3 +-
+ net/8021q/vlan.c                              |  2 +-
+ net/8021q/vlan_dev.c                          |  8 ++--
+ net/batman-adv/soft-interface.c               |  5 +--
+ net/bridge/br_device.c                        |  9 ++--
+ net/core/dev.c                                | 34 +++++++++++----
+ net/core/net-sysfs.c                          |  3 +-
+ net/dsa/user.c                                |  3 +-
+ net/ethtool/common.c                          |  5 ---
+ net/ethtool/features.c                        |  2 +-
+ net/ethtool/ioctl.c                           |  3 +-
+ net/hsr/hsr_device.c                          | 19 +++------
+ net/ieee802154/6lowpan/core.c                 |  3 +-
+ net/ieee802154/core.c                         | 10 ++---
+ net/ipv4/ip_gre.c                             |  5 ++-
+ net/ipv4/ip_tunnel.c                          |  2 +-
+ net/ipv4/ip_vti.c                             |  2 +-
+ net/ipv4/ipip.c                               |  3 +-
+ net/ipv4/ipmr.c                               |  2 +-
+ net/ipv6/ip6_gre.c                            |  8 ++--
+ net/ipv6/ip6_tunnel.c                         |  5 +--
+ net/ipv6/ip6mr.c                              |  2 +-
+ net/ipv6/sit.c                                |  5 +--
+ net/l2tp/l2tp_eth.c                           |  2 +-
+ net/mac80211/iface.c                          |  2 +
+ net/openvswitch/vport-internal_dev.c          | 12 +++---
+ net/wireless/core.c                           | 10 ++---
+ net/xfrm/xfrm_interface_core.c                |  2 +-
+ tools/testing/selftests/net/forwarding/README |  2 +-
+ 184 files changed, 462 insertions(+), 498 deletions(-)
 
-cheers,
-jamal
+-- 
+2.44.0
 
-> Regards,
-> Simon with much assistance from Paolo
->
-> ---
-> /* SPDX-License-Identifier: GPL-2.0-or-later */
->
-> #ifndef _NET_SHAPER_H_
-> #define _NET_SHAPER_H_
->
-> /**
->  * enum shaper_metric - the metric of the shaper
->  * @SHAPER_METRIC_PPS: Shaper operates on a packets per second basis
->  * @SHAPER_METRIC_BPS: Shaper operates on a bits per second basis
->  */
-> enum shaper_metric {
->         SHAPER_METRIC_PPS;
->         SHAPER_METRIC_BPS;
-> };
->
-> #define SHAPER_ROOT_ID 0
-> #define SHAPER_NONE_ID UINT_MAX
->
-> /**
->  * struct shaper_info - represent a node of the shaper hierarchy
->  * @id: Unique identifier inside the shaper tree.
->  * @parent_id: ID of parent shaper, or SHAPER_NONE_ID if the shaper has
->  *             no parent. Only the root shaper has no parent.
->  * @metric: Specify if the bw limits refers to PPS or BPS
->  * @bw_min: Minimum guaranteed rate for this shaper
->  * @bw_max: Maximum peak bw allowed for this shaper
->  * @burst: Maximum burst for the peek rate of this shaper
->  * @priority: Scheduling priority for this shaper
->  * @weight: Scheduling weight for this shaper
->  *
->  * The full shaper hierarchy is maintained only by the
->  * NIC driver (or firmware), possibly in a NIC-specific format
->  * and/or in H/W tables.
->  * The kernel uses this representation and the shaper_ops to
->  * access, traverse, and update it.
->  */
-> struct shaper_info {
->         /* The following fields allow the full traversal of the whole
->          * hierarchy.
->          */
->         u32 id;
->         u32 parent_id;
->
->         /* The following fields define the behavior of the shaper. */
->         enum shaper_metric metric;
->         u64 bw_min;
->         u64 bw_max;
->         u32 burst;
->         u32 priority;
->         u32 weight;
-> };
->
-> /**
->  * enum shaper_lookup_mode - Lookup method used to access a shaper
->  * @SHAPER_LOOKUP_BY_PORT: The root shaper for the whole H/W, @id is unus=
-ed
->  * @SHAPER_LOOKUP_BY_NETDEV: The main shaper for the given network device=
-,
->  *                           @id is unused
->  * @SHAPER_LOOKUP_BY_VF: @id is a virtual function number.
->  * @SHAPER_LOOKUP_BY_QUEUE: @id is a queue identifier.
->  * @SHAPER_LOOKUP_BY_TREE_ID: @id is the unique shaper identifier inside =
-the
->  *                            shaper hierarchy as in shaper_info.id
->  *
->  * SHAPER_LOOKUP_BY_PORT and SHAPER_LOOKUP_BY_VF, SHAPER_LOOKUP_BY_TREE_I=
-D are
->  * only available on PF devices, usually inside the host/hypervisor.
->  * SHAPER_LOOKUP_BY_NETDEV is available on both PFs and VFs devices, but
->  * only if the latter are privileged ones.
->  * The same shaper can be reached with different lookup mode/id pairs,
->  * mapping network visible objects (devices, VFs, queues) to the schedule=
-r
->  * hierarchy and vice-versa.
->  */
-> enum shaper_lookup_mode {
->     SHAPER_LOOKUP_BY_PORT,
->     SHAPER_LOOKUP_BY_NETDEV,
->     SHAPER_LOOKUP_BY_VF,
->     SHAPER_LOOKUP_BY_QUEUE,
->     SHAPER_LOOKUP_BY_TREE_ID,
-> };
->
->
-> /**
->  * struct shaper_ops - Operations on shaper hierarchy
->  * @get: Access the specified shaper.
->  * @set: Modify the specifier shaper.
->  * @move: Move the specifier shaper inside the hierarchy.
->  * @add: Add a shaper inside the shaper hierarchy.
->  * @delete: Delete the specified shaper .
->  *
->  * The netdevice exposes a pointer to these ops.
->  *
->  * It=E2=80=99s up to the driver or firmware to create the default shaper=
-s hierarchy,
->  * according to the H/W capabilities.
->  */
-> struct shaper_ops {
->         /* get - Fetch the specified shaper, if it exists
->          * @dev: Netdevice to operate on.
->          * @lookup_mode: How to perform the shaper lookup
->          * @id: ID of the specified shaper,
->          *      relative to the specified @lookup_mode.
->          * @shaper: Object to return shaper.
->          * @extack: Netlink extended ACK for reporting errors.
->          *
->          * Multiple placement domain/id pairs can refer to the same shape=
-r.
->          * And multiple entities (e.g. VF and PF) can try to access the s=
-ame
->          * shaper concurrently.
->          *
->          * Values of @id depend on the @access_type:
->          * * If @access_type is SHAPER_LOOKUP_BY_PORT or
->          *   SHAPER_LOOKUP_BY_NETDEV, then @placement_id is unused.
->          * * If @access_type is SHAPER_LOOKUP_BY_VF,
->          *   then @id is a virtual function number, relative to @dev
->          *   which should be phisical function
->          * * If @access_type is SHAPER_LOOKUP_BY_QUEUE,
->          *   Then @id represents the queue number, relative to @dev
->          * * If @access_type is SHAPER_LOOKUP_BY_TREE_ID,
->          *   then @id is a @shaper_info.id and any shaper inside the
->          *   hierarcy can be accessed directly.
->          *
->          * Return:
->          * * %0 - Success
->          * * %-EOPNOTSUPP - Operation is not supported by hardware, drive=
-r,
->          *                  or core for any reason. @extack should be set
->          *                  to text describing the reason.
->          * * Other negative error value on failure.
->          */
->         int (*get)(struct net_device *dev,
->                    enum shaper_lookup_mode lookup_mode, u32 id,
->                    struct shaper_info *shaper, struct netlink_ext_ack *ex=
-tack);
->
->         /* set - Update the specified shaper, if it exists
->          * @dev: Netdevice to operate on.
->          * @lookup_mode: How to perform the shaper lookup
->          * @id: ID of the specified shaper,
->          *      relative to the specified @access_type.
->          * @shaper: Configuration of shaper.
->          * @extack: Netlink extended ACK for reporting errors.
->          *
->          * Configure the parameters of @shaper according to values suppli=
-ed
->          * in the following fields:
->          * * @shaper.metric
->          * * @shaper.bw_min
->          * * @shaper.bw_max
->          * * @shaper.burst
->          * * @shaper.priority
->          * * @shaper.weight
->          * Values supplied in other fields of @shaper must be zero and,
->          * other than verifying that, are ignored.
->          *
->          * Return:
->          * * %0 - Success
->          * * %-EOPNOTSUPP - Operation is not supported by hardware, drive=
-r,
->          *                  or core for any reason. @extack should be set
->          *                  to text describing the reason.
->          * * Other negative error values on failure.
->          */
->         int (*set)(struct net_device *dev,
->                    enum shaper_lookup_mode lookup_mode, u32 id,
->                    const struct shaper_info *shaper,
->                    struct netlink_ext_ack *extack);
->
->         /* Move - change the parent id of the specified shaper
->          * @dev: netdevice to operate on.
->          * @lookup_mode: how to perform the shaper lookup
->          * @id: ID of the specified shaper,
->          *                      relative to the specified @access_mode.
->          * @new_parent_id: new ID of the parent shapers,
->          *                      always relative to the SHAPER_LOOKUP_BY_T=
-REE_ID
->          *                      lookup mode
->          * @extack: Netlink extended ACK for reporting errors.
->          *
->          * Move the specified shaper in the hierarchy replacing its
->          * current parent shaper with @new_parent_id
->          *
->          * Return:
->          * * %0 - Success
->          * * %-EOPNOTSUPP - Operation is not supported by hardware, drive=
-r,
->          *                  or core for any reason. @extack should be set
->          *                  to text describing the reason.
->          * * Other negative error values on failure.
->          */
->         int (*move)(struct net_device *dev,
->                     enum shaper_lookup_mode lookup_mode, u32 id,
->                     u32 new_parent_id, struct netlink_ext_ack *extack);
->
->         /* add - Add a shaper inside the shaper hierarchy
->          * @dev: netdevice to operate on.
->          * @shaper: configuration of shaper.
->          * @extack: Netlink extended ACK for reporting errors.
->          *
->          * @shaper.id must be set to SHAPER_NONE_ID as
->          * the id for the shaper will be automatically allocated.
->          * @shaper.parent_id determines where inside the shaper's tree
->          * this node is inserted.
->          *
->          * Return:
->          * * non-negative shaper id on success
->          * * %-EOPNOTSUPP - Operation is not supported by hardware, drive=
-r,
->          *                  or core for any reason. @extack should be set
->          *                  to text describing the reason.
->          * * Other negative error values on failure.
->          *
->          * Examples or reasons this operation may fail include:
->          * * H/W resources limits.
->          * * The parent is a =E2=80=98leaf=E2=80=99 node - attached to a =
-queue.
->          * * Can=E2=80=99t respect the requested bw limits.
->          */
->         int (*add)(struct net_device *dev, const struct shaper_info *shap=
-er,
->                    struct netlink_ext_ack *extack);
->
->         /* delete - Add a shaper inside the shaper hierarchy
->          * @dev: netdevice to operate on.
->          * @lookup_mode: how to perform the shaper lookup
->          * @id: ID of the specified shaper,
->          *                      relative to the specified @access_type.
->          * @shaper: Object to return the deleted shaper configuration.
->          *              Ignored if NULL.
->          * @extack: Netlink extended ACK for reporting errors.
->          *
->          * Return:
->          * * %0 - Success
->          * * %-EOPNOTSUPP - Operation is not supported by hardware, drive=
-r,
->          *                  or core for any reason. @extack should be set
->          *                  to text describing the reason.
->          * * Other negative error values on failure.
->          */
->         int (*delete)(struct net_device *dev,
->                       enum shaper_lookup_mode lookup_mode,
->                       u32 id, struct shaper_info *shaper,
->                       struct netlink_ext_ack *extack);
-> };
->
-> /*
->  * Examples:
->  * - set shaping on a given queue
->  *   struct shaper_info info =3D { // fill this };
->  *   dev->shaper_ops->set(dev, SHAPER_LOOKUP_BY_QUEUE, queue_id, &info, N=
-ULL);
->  *
->  * - create a queue group with a queue group shaping limits.
->  *   Assuming the following topology already exists:
->  *                    < netdev shaper >
->  *                      /           \
->  *         <queue 0 shaper> . . .  <queue N shaper>
->  *
->  *   struct shaper_info pinfo, ginfo;
->  *   dev->shaper_ops->get(dev, SHAPER_LOOKUP_BY_NETDEV, 0, &pinfo);
->  *
->  *   ginfo.parent_id =3D pinfo.id;
->  *   // fill-in other shaper params...
->  *   new_node_id =3D dev->shaper_ops->add(dev, &ginfo);
->  *
->  *   // now topology is:
->  *   //                  <    netdev shaper    >
->  *   //                  /            |        \
->  *   //                 /             |        <newly created shaper>
->  *   //                /              |
->  *   // <queue 0 shaper> . . . <queue N shaper>
->  *
->  *   // move a shapers for queues 3..n out of such queue group
->  *   for (i =3D 0; i <=3D 2; ++i)
->  *           dev->shaper_ops->move(dev, SHAPER_LOOKUP_BY_QUEUE, i, new_no=
-de_id);
->  *
->  *   // now topology is:
->  *   //                   < netdev shaper >
->  *   //                   /              \
->  *   //        <newly created shaper>   <queue 3 shaper> ... <queue n sha=
-per>
->  *   //         /                   \
->  *   // <queue 0 shaper> ... <queue 2 shaper>
->  */
-> #endif
->
->
 
