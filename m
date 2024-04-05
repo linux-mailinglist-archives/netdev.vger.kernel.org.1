@@ -1,104 +1,169 @@
-Return-Path: <netdev+bounces-85243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5B7B899E49
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:27:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5504899E4D
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 805381F22DC0
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:27:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0A75B2224F
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9671516D4D0;
-	Fri,  5 Apr 2024 13:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1CF16D4F2;
+	Fri,  5 Apr 2024 13:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lttrIDkP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h0dpdXlM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625D116C877;
-	Fri,  5 Apr 2024 13:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F198D16D4E5
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 13:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712323660; cv=none; b=tZSI/4CPIjyKWhYfJcGFXdGrbYF6acM07JtMYc6ZEhH3nDLIrlSH6HFJATi40CiMklKj5BfpYV9Ce0vcT9kAx6fuUDa9N3bcDHr649NHmQGKVlvMhXx3tmYuXg343EQjzYpupuPB4PzrgTNyg9NJpJMVxdaY2oMUyhrSI7R2vf4=
+	t=1712323808; cv=none; b=ZlFF7XmYazOJFMZZkZcDtKkG/TT33wmECy05wRT7aI+2CURJ1C0sT91TCkKyJXlt+1IT/diLc1sDs1ML8QVQMcYWKcjYATLX8EIKE9gyTyg1E+XCIQhf6JzCF+2aP2rvG5ZHSzytup4Pq/P0wrBGn+9DCh1xMdU1U2GLPAxijp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712323660; c=relaxed/simple;
-	bh=iitSfI2Y8LrBa++ncwel3h3WEbl4CDisdRxqGPA4c5k=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=BNFdwAH1jhN8JGivG3ltKJ8qdfaREFosQH237bJhm0Yprpaw7klsj5GWMVW0bjCI5ugR2BnYUdbxkIJkPsHjy7iRBZE+0JMIuA4PUWzlOB/Ba/hPAvZY5DHHO6VgaJGBpCJhG6Afc6gMV6P1PMp91Yx6BlIzZyOWtgTHAlsil6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lttrIDkP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B728C433C7;
-	Fri,  5 Apr 2024 13:27:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712323660;
-	bh=iitSfI2Y8LrBa++ncwel3h3WEbl4CDisdRxqGPA4c5k=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=lttrIDkP/Dhv4IN6Lxk++khK7XWYBENBQs6ggUCGtf4DyBhxkdh6xc5im0USff+Gm
-	 CGtvdPhqBQXrMkVdiAK9fOCDiwUt4DBYoGSQMrfBcLx0RZuJBS61BL6I5sC+vn4znX
-	 YIcIUcw19KqTIYxqWzBstbqn046g4X7EHfEJZpXflYZLLGDYFsnJWu4jewvExLRNCJ
-	 ONIAaJAuozMJ0yVdPHQIKJmPUQHyHzlkuSggeVvYchurL5QnIVKtJn0ZNCpp/Fr0C5
-	 CAWNm+FbmdZoeV9fPnY1PH5ZjXyWz/tmhUfd/lezExNCXmYevrmZebYkyySrghUINF
-	 08r5k2y+i6y3w==
-From: Kalle Valo <kvalo@kernel.org>
-To: <davem@davemloft.net>,  <edumazet@google.com>,  <kuba@kernel.org>,
-  <pabeni@redhat.com>
-Cc: Baochen Qiang <quic_bqiang@quicinc.com>, <ath11k@lists.infradead.org>,
-  <manivannan.sadhasivam@linaro.org>,  <linux-wireless@vger.kernel.org>,
-  <linux-arm-msm@vger.kernel.org>,  <mhi@lists.linux.dev>,
-  <netdev@vger.kernel.org>
-Subject: Re: [PATCH v7 2/3] net: qrtr: support suspend/hibernation
-References: <20240305021320.3367-1-quic_bqiang@quicinc.com>
-	<20240305021320.3367-3-quic_bqiang@quicinc.com>
-Date: Fri, 05 Apr 2024 16:27:35 +0300
-In-Reply-To: <20240305021320.3367-3-quic_bqiang@quicinc.com> (Baochen Qiang's
-	message of "Tue, 5 Mar 2024 10:13:19 +0800")
-Message-ID: <8734s02b3s.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1712323808; c=relaxed/simple;
+	bh=wSswXutQJ+wCZIDOdh13zZfPNpNOZaTJPxJxnSQYIrs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ntnYOs50vyB6uQ6VsRDocC9dcD20tzRCubiBYakuV0JwGcmuVbbmevpRiZPUvrkhKJxxZBmpt5EhgDkMc6GCd80+UKJC0dNPrwsIAxbYyW/foRx/VILCGUpu/g57VHr0oSKoUVB1sgU1+s5/Y0h8I8M53tBAve4PtBIWgQEDz74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h0dpdXlM; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-56e2e94095cso8874a12.0
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 06:30:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712323805; x=1712928605; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=udhYzo9d/0PPqGVdd4D3LGjxi+bDzO7RIJlIIFERmQE=;
+        b=h0dpdXlMP0f9BdNCgI3z2niKFXY9IYX0Nco1p7nyhoLd2RFtzrVsqFiIjztlGdKcx7
+         wcyCekVug7fXUGKUXGx5ORzxP1flB2jj7auYgifZZ5v5fInbkVYHYRKdln0OP6jYD3pi
+         Xrv6ggpi8FVSsputPRghJWQWJ4s4eEaDTdjH+Rlq4RVRJIs/Rx5AlZgSVKEi3h9MbmGa
+         gQtPAikTtw1tQDjJxSxH/JL0aOakrB+KFbmYjCdKmLPE1EyobbmSLJnyMPbrkoTqX5k1
+         CUjKDAqTaF/mn3kknxmnVsUo4HaIa30jD9yu2vX5fUmOMLvVRCtdIOHp7FG2/lBbYGJN
+         ORxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712323805; x=1712928605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=udhYzo9d/0PPqGVdd4D3LGjxi+bDzO7RIJlIIFERmQE=;
+        b=mFSjsjCCly5sq3PGkaccaoihyI4O74MvN9QnkFn6K9os9Qe5ViFEcWMqhdKkTjJ8GY
+         t9YWg0Q7o3WJG6SO4Y0zqz83ILiq0AV86+MiLQP9Mn+z5R/4Q16VlnmtT2Jy6KUXx9zE
+         dyCCNto1tn1BxThLgLHcJ2Nd3K2+FTOcpbM+AxiBMT7cjHO/IIUW5A9Un1aP+i6RnOKe
+         JqZL3XSx2yWykon1vMXuqtZh+2MgpC7IuehGdkcu6d59MKVc694EI/TcNxE8d5hCYJFF
+         Z3o0joVFQL+1L6K3Nf4xl7E5rJh8qJZSNpqXYBXDe28zGogezs3smUYOKD/kZ6sF1CZ4
+         prBA==
+X-Forwarded-Encrypted: i=1; AJvYcCW8ZoF+Rhw5B+LjKqsqUgFCm2CFdT2OqZi5nezh5ljaPBTUYTibjDIxS7ulpL6iJ1wV2mZb04TSzlBIg7bE6ZoXIsUs5izc
+X-Gm-Message-State: AOJu0Yy67cP5wqRUgi6P7CrpvIQukTnleIU3VHC0GZC5D47Oewzpi1lf
+	f12AzhfKSclMZpIHBWzwZf33MjwShFNOuWSMSibYFUYKClJNTZ++Tlrg/CAjYSgXOAY/3r/oHAa
+	2jVLmXg5FYR2rnMmMcB7om+/q0lBzPzzww1ke
+X-Google-Smtp-Source: AGHT+IHKnNwfoWVM8o54afDpZXoYzLLS0/kJjLYpGez23Xun7fuG7ohs51CmC+MLEwtVWDcCBP1C25v11O1H+kvmdgE=
+X-Received: by 2002:a05:6402:26c4:b0:56e:22b4:fa72 with SMTP id
+ x4-20020a05640226c400b0056e22b4fa72mr347542edd.3.1712323804808; Fri, 05 Apr
+ 2024 06:30:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240405-upstream-net-next-20240405-mptcp-last-time-info-v1-0-52dc49453649@kernel.org>
+ <20240405-upstream-net-next-20240405-mptcp-last-time-info-v1-1-52dc49453649@kernel.org>
+In-Reply-To: <20240405-upstream-net-next-20240405-mptcp-last-time-info-v1-1-52dc49453649@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Apr 2024 15:29:53 +0200
+Message-ID: <CANn89i+2TMNF7chYaDFEBNRng3iLPaXBqXKNtZYevDd95-PqmQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] mptcp: add last time fields in mptcp_info
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Geliang Tang <tanggeliang@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi netdev maintainers,
-
-Baochen Qiang <quic_bqiang@quicinc.com> writes:
-
-> MHI devices may not be destroyed during suspend/hibernation, so need
-> to unprepare/prepare MHI channels throughout the transition, this is
-> done by adding suspend/resume callbacks.
+On Fri, Apr 5, 2024 at 3:06=E2=80=AFPM Matthieu Baerts (NGI0)
+<matttbe@kernel.org> wrote:
 >
-> The suspend callback is called in the late suspend stage, this means
-> MHI channels are still alive at suspend stage, and that makes it
-> possible for an MHI controller driver to communicate with others over
-> those channels at suspend stage. While the resume callback is called
-> in the early resume stage, for a similar reason.
+> From: Geliang Tang <tanggeliang@kylinos.cn>
 >
-> Also note that we won't do unprepare/prepare when MHI device is in
-> suspend state because it's pointless if MHI is only meant to go through
-> a suspend/resume transition, instead of a complete power cycle.
+> This patch adds "last time" fields last_data_sent, last_data_recv and
+> last_ack_recv in struct mptcp_sock to record the last time data_sent,
+> data_recv and ack_recv happened. They all are initialized as
+> tcp_jiffies32 in __mptcp_init_sock(), and updated as tcp_jiffies32 too
+> when data is sent in __subflow_push_pending(), data is received in
+> __mptcp_move_skbs_from_subflow(), and ack is received in ack_update_msk()=
+.
 >
-> Tested-on: WCN6855 hw2.0 PCI
-> WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
+> Similar to tcpi_last_data_sent, tcpi_last_data_recv and tcpi_last_ack_rec=
+v
+> exposed with TCP, this patch exposes the last time "an action happened" f=
+or
+> MPTCP in mptcp_info, named mptcpi_last_data_sent, mptcpi_last_data_recv a=
+nd
+> mptcpi_last_ack_recv, calculated in mptcp_diag_fill_info() as the time
+> deltas between now and the newly added last time fields in mptcp_sock.
 >
-> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
-> Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-> Reviewed-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+> Also add three reserved bytes in struct mptcp_info not to have holes in
+> this structure exposed to userspace.
+>
+> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/446
+> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> Reviewed-by: Mat Martineau <martineau@kernel.org>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+>  include/uapi/linux/mptcp.h | 4 ++++
 
-Could I take this patch via ath.git tree? Full patch here (same patch
-but links to both patchwork projects):
 
-https://patchwork.kernel.org/project/linux-wireless/patch/20240305021320.3367-3-quic_bqiang@quicinc.com/
+> diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+> index 73fdf423de44..2ec2fdf9f4af 100644
+> --- a/net/mptcp/sockopt.c
+> +++ b/net/mptcp/sockopt.c
+> @@ -896,6 +896,7 @@ static int mptcp_getsockopt_first_sf_only(struct mptc=
+p_sock *msk, int level, int
+>  void mptcp_diag_fill_info(struct mptcp_sock *msk, struct mptcp_info *inf=
+o)
+>  {
+>         struct sock *sk =3D (struct sock *)msk;
+> +       u32 now =3D tcp_jiffies32;
+>         u32 flags =3D 0;
+>         bool slow;
+>
+> @@ -930,6 +931,7 @@ void mptcp_diag_fill_info(struct mptcp_sock *msk, str=
+uct mptcp_info *info)
+>         info->mptcpi_snd_una =3D msk->snd_una;
+>         info->mptcpi_rcv_nxt =3D msk->ack_seq;
+>         info->mptcpi_bytes_acked =3D msk->bytes_acked;
+> +       info->mptcpi_last_ack_recv =3D jiffies_to_msecs(now - msk->last_a=
+ck_recv);
+>         mptcp_data_unlock(sk);
+>
+>         slow =3D lock_sock_fast(sk);
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20240305021320.3367-3-quic_bqiang@quicinc.com/
+ lock_sock_fast(sk) can sleep and be quite slow...
 
-I ask because we need it to get hibernation working on ath11k (and ath12k):
+I suggest you reload now =3D jiffies32;
 
-https://patchwork.kernel.org/project/linux-wireless/patch/20240305021320.3367-4-quic_bqiang@quicinc.com/
 
-Kalle
+> @@ -942,6 +944,8 @@ void mptcp_diag_fill_info(struct mptcp_sock *msk, str=
+uct mptcp_info *info)
+>         info->mptcpi_bytes_retrans =3D msk->bytes_retrans;
+>         info->mptcpi_subflows_total =3D info->mptcpi_subflows +
+>                 __mptcp_has_initial_subflow(msk);
+> +       info->mptcpi_last_data_sent =3D jiffies_to_msecs(now - msk->last_=
+data_sent);
+> +       info->mptcpi_last_data_recv =3D jiffies_to_msecs(now - msk->last_=
+data_recv);
+>         unlock_sock_fast(sk, slow);
+>  }
+>  EXPORT_SYMBOL_GPL(mptcp_diag_fill_info);
+>
+> --
+> 2.43.0
+>
 
