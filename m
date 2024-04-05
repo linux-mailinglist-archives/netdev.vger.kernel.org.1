@@ -1,52 +1,60 @@
-Return-Path: <netdev+bounces-85089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C6C8995D6
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:49:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35FD48995EF
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:54:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A91EB21908
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 06:49:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8B701F226DD
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 06:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7935224CC;
-	Fri,  5 Apr 2024 06:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A662C1AA;
+	Fri,  5 Apr 2024 06:54:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC9E1370;
-	Fri,  5 Apr 2024 06:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8DD286BF;
+	Fri,  5 Apr 2024 06:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712299765; cv=none; b=NmBNs3z5Qk0NjHX+Djtd2ycMDWDtocOph2SgbYdoR0NhU/hRlcp2NRhf2J8pgoJ3HUrqoiY9Hemjf3esCMVOpZYH2WZUwlHg9HXms9lS2oKOCJgR5nagAo/ZD/HYPMIDjNzVAewXNH84WLzQIBkjr0D8A12yfVyX8nDuyNeA6xk=
+	t=1712300041; cv=none; b=QmBwk1xrsAR7y6cK7Z9pVqEpRdTdmqeVoG21f3vy52asuYQ7t9p4oGjYAKJMy8Yy0Bm5FBQ0D8ASeMfVd3iyWOWDJFwDDoA03zJ3XSNjuhmmXLAnilt96GZACcZOQpcnWfNk60hadd0hjS1AFEvoVhGVTX32IQGaXRwJC1pEwNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712299765; c=relaxed/simple;
-	bh=2qIDQhf8Ezg35/KZesFxdWVwgujKl2P4Z5XtWDsQdmk=;
+	s=arc-20240116; t=1712300041; c=relaxed/simple;
+	bh=VL+lHBiS+Sf/7qTZy7DcU3HGXsGvFoDFNTJcTa1vnKk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f3ZGLmlR5uCwMKsWa3J2aA4AsoliKAeTinvOMbFmBKqquuQumZ77fBBn33ZcLSU2DHZSTwroUTDfSmbtAucgyJxMfy4G9b/9xcvSYP4oGArqRDKPoAs4LCwMm5M5TVtC2J3MsLvYfknEf/gZ52LMcybL3Xpmec+VMhpLy2EEcZw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=k4Guz/olj7wcXZqYlUBte46pcd8IZMv0v+Vn4KMfA2L9fQS0+xVT3+J0NfUW5zCfGeBTEkFBhrgQc6oNF/QH3iv2qaGqSbcbTMGy6ExRSgzpvt7nUl7cHH5zRhKYPFRtKQbZ0bXinRWgndEROWxyHnGxMmfMuMQXfluAtB75PTc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 9358268D07; Fri,  5 Apr 2024 08:49:19 +0200 (CEST)
-Date: Fri, 5 Apr 2024 08:49:19 +0200
+	id 5D43C68D07; Fri,  5 Apr 2024 08:53:55 +0200 (CEST)
+Date: Fri, 5 Apr 2024 08:53:55 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Heiko Carstens <hca@linux.ibm.com>, pasic@linux.ibm.com,
-	schnelle@linux.ibm.com, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
-Message-ID: <20240405064919.GA3788@lst.de>
-References: <20240328154144.272275-1-gbayer@linux.ibm.com> <20240328154144.272275-2-gbayer@linux.ibm.com> <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com> <cb7b036b4d3db02ab70d17ee83e6bc4f2df03171.camel@linux.ibm.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Christian Brauner <christian@brauner.io>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+	linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 15/26] mm: Export writeback_iter()
+Message-ID: <20240405065355.GA4112@lst.de>
+References: <20240403124124.GA19085@lst.de> <20240403101422.GA7285@lst.de> <20240403085918.GA1178@lst.de> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-16-dhowells@redhat.com> <3235934.1712139047@warthog.procyon.org.uk> <3300438.1712141700@warthog.procyon.org.uk> <3326107.1712149095@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,31 +63,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cb7b036b4d3db02ab70d17ee83e6bc4f2df03171.camel@linux.ibm.com>
+In-Reply-To: <3326107.1712149095@warthog.procyon.org.uk>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Apr 04, 2024 at 01:10:20PM +0200, Gerd Bayer wrote:
-> > Why can't you use get_free_pages() (or similar) here? (possibly
-> > rounding up to the relevant page_aligned size). 
-> 
-> Thanks Paolo for your suggestion. However, I wanted to stay as close to
-> the implementation pre [1] - that used to use __GFP_COMP, too. I'd
-> rather avoid to change interfaces from "cpu_addr" to "struct page*" at
-> this point. In the long run, I'd like to drop the requirement for
+On Wed, Apr 03, 2024 at 01:58:15PM +0100, David Howells wrote:
+> Very well, I'll switch that export to GPL.  Christian, if you can amend that
+> patch in your tree?
 
-The right interface actually is to simply use folio_alloc, which adds
-__GFP_COMP and is a fully supported and understood interface. You can
-just convert the folio to a kernel virtual address using folio_address()
-right after allocating it.
+Thanks!
 
-(get_free_pages also retunrs a kernel virtual address, just awkwardly as
-an unsigned long. In doubt don't use this interface for new code..)
-
-> compound pages entirely, since that *appears* to exist primarily for a
-> simplified handling of the interface to splice_to_pipe() in
-> net/smc/smc_rx.c. And of course there might be performance
-> implications...
-
-While compounds pages might sound awkward, they are the new normal in
-form of folios.  So just use folios.
 
