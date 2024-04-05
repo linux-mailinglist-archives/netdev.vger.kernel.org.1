@@ -1,253 +1,121 @@
-Return-Path: <netdev+bounces-85249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 253C2899E65
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:35:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90837899C58
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 14:06:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92039B22F53
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:35:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0ACE1C21166
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE5D16D9C0;
-	Fri,  5 Apr 2024 13:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A364916C6B7;
+	Fri,  5 Apr 2024 12:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="YKhX3vsr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bhVdlC95"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1FE16D4FF;
-	Fri,  5 Apr 2024 13:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05E116ABCE;
+	Fri,  5 Apr 2024 12:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712324052; cv=none; b=W+QcWlksg8NbOP19gT1zfwpZYBe1loxKUUY3eov7T1nLF/IF+GCjsQrj7x2BaQtIIB+rru5ncuItdHQZh2fH6uxRhMf5f8kxUcVzhhPiLoDTqMjwEZh2f365UEMfvpa88+c9Q1FQD3I1NMR5eEzv7g6ADtQHtHTAZGHUaboe3Sw=
+	t=1712318803; cv=none; b=bIMaLVcdaE2Y2LjjdIerbSvotQFJGHncmb6x9bKxmjEDhq2Z3a4R9+aDzGg1jd6nMcvOD/dT1muAku0OCPzre5SRuChtR8yCYWnv7WpWf3MRWyNVqHxqUG56IJF/eedLApuWWDMAqVIzM2ZTaZiQIEc1yIP3Ey+edRf+FbTxKnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712324052; c=relaxed/simple;
-	bh=LJj/6K9S0mccLf8EzL0tHISHfup0kONjt4pdLG952wc=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=L+jkd/K7nSJIY7eKRSmcYMNDScK7m6nj3NiTEf5A5RqjpENk2u9NRpUgG91O2FZMkkMUeYH/5F450J6clGNFQJmF8aGNbifalj8uwU55Qs1V4eDCj6Lp9WG5J8kCA/lK3XNwlCq8DnIAnm4j9y2IHh9f4I6IzKrgmkKxZvSweoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=YKhX3vsr; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240405133401euoutp0130e9bdebb3e41d400edfa9e541a3840a~DZaS-L9et0180601806euoutp01z;
-	Fri,  5 Apr 2024 13:34:01 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240405133401euoutp0130e9bdebb3e41d400edfa9e541a3840a~DZaS-L9et0180601806euoutp01z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1712324041;
-	bh=i+a4M7yICQ2HnP92i8Uv6JJWR1edpPHj8jQXZpZYBH4=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=YKhX3vsrA71sZeueE+2+MgNpe71G3PLv4t4SN6kD8caKNpwMl0UBDtLeuO2mObwiD
-	 dwf35oPYrx7CMhrIrJ2KyMWZTpLXasIrnmh5Gj1fWMcyMHtpPj68JGhl01Ql4gy5i6
-	 gk/EctOtGYb6SPs3o1drGd49WVWPSiDlcygGXDoE=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240405133401eucas1p180bf7886e5501a175873e1fa6d28381b~DZaSwD5pi2523125231eucas1p1e;
-	Fri,  5 Apr 2024 13:34:01 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id D6.83.09539.9CDFF066; Fri,  5
-	Apr 2024 14:34:01 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240405133400eucas1p17a657be41afd1be881bbb599e769968a~DZaSKzIvA2124621246eucas1p1f;
-	Fri,  5 Apr 2024 13:34:00 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240405133400eusmtrp15f4b2e2b477b0577c76ad47d2a727a34~DZaSJSYyi1386013860eusmtrp1Y;
-	Fri,  5 Apr 2024 13:34:00 +0000 (GMT)
-X-AuditID: cbfec7f2-515ff70000002543-54-660ffdc93c52
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 94.A3.09146.8CDFF066; Fri,  5
-	Apr 2024 14:34:00 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240405133400eusmtip2bf1c1d03faee0a07935c7405979e5cff~DZaR2giF20852408524eusmtip2m;
-	Fri,  5 Apr 2024 13:34:00 +0000 (GMT)
-Received: from localhost (106.210.248.212) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Fri, 5 Apr 2024 14:33:59 +0100
-Date: Fri, 5 Apr 2024 09:15:31 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: <devnull+j.granados.samsung.com@kernel.org>, <Dai.Ngo@oracle.com>,
-	<alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
-	<allison.henderson@oracle.com>, <anna@kernel.org>, <bridge@lists.linux.dev>,
-	<chuck.lever@oracle.com>, <coreteam@netfilter.org>, <courmisch@gmail.com>,
-	<davem@davemloft.net>, <dccp@vger.kernel.org>, <dhowells@redhat.com>,
-	<dsahern@kernel.org>, <edumazet@google.com>, <fw@strlen.de>,
-	<geliang@kernel.org>, <guwen@linux.alibaba.com>,
-	<herbert@gondor.apana.org.au>, <horms@verge.net.au>, <ja@ssi.bg>,
-	<jaka@linux.ibm.com>, <jlayton@kernel.org>, <jmaloy@redhat.com>,
-	<jreuter@yaina.de>, <kadlec@netfilter.org>, <keescook@chromium.org>,
-	<kolga@netapp.com>, <kuba@kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-hams@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-s390@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <linux-x25@vger.kernel.org>,
-	<lucien.xin@gmail.com>, <lvs-devel@vger.kernel.org>,
-	<marc.dionne@auristor.com>, <marcelo.leitner@gmail.com>,
-	<martineau@kernel.org>, <matttbe@kernel.org>, <mcgrof@kernel.org>,
-	<miquel.raynal@bootlin.com>, <mptcp@lists.linux.dev>, <ms@dev.tdt.de>,
-	<neilb@suse.de>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <pabeni@redhat.com>,
-	<pablo@netfilter.org>, <ralf@linux-mips.org>, <razor@blackwall.org>,
-	<rds-devel@oss.oracle.com>, <roopa@nvidia.com>, <stefan@datenfreihafen.org>,
-	<steffen.klassert@secunet.com>, <tipc-discussion@lists.sourceforge.net>,
-	<tom@talpey.com>, <tonylu@linux.alibaba.com>,
-	<trond.myklebust@hammerspace.com>, <wenjia@linux.ibm.com>,
-	<ying.xue@windriver.com>
-Subject: Re: [PATCH v2 4/4] ax.25: Remove the now superfluous sentinel
- elements from ctl_table array
-Message-ID: <20240405071531.fv6smp55znlfnul2@joelS2.panther.com>
+	s=arc-20240116; t=1712318803; c=relaxed/simple;
+	bh=QRvOuAu53+EArfY0qfpIBAa+WtOG64cUCx3bEohfA+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fKMPrf4euZqCqaW24k115a8OiCdg7KPidv8c5t7xeJNrUdOst0PFUZPgL4Er1CNh1QdOUCYBVpIkgDVXCYSnIik7zV+Naj46aZhj2yvrRIj1hs1UNLLrQhwJJeUfLvK3Xw4OaGEPmDQbev0TvYHVYenHnUB+nzworKfauRNpvjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bhVdlC95; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a519e04b142so119057366b.3;
+        Fri, 05 Apr 2024 05:06:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712318800; x=1712923600; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=951nXGkKjtOMWvE593+3+1defoukyWk76h9tCSdYH3U=;
+        b=bhVdlC95N0N8ZKDVL/D4DHZbzh+2X2/L6m58E3yntxQ/mtWR7z8hY+LePEYtyrvHk1
+         kFnJbamnmlTM8s0sg7hWBCaqnJPlGlgmqO/TLWS8bmVU0+IBc0iE1dS/XwIAFcVo1obx
+         rP4kPBN71q4hw1d7gMZZqQTSxD4ujJN4WLzgrgKvJ3wgCBb1IzjjwicvobBOXdNyiqrB
+         HwAj318mZz5qCULex9qugeP3svbvyHiJ6SNiIHn+qm/jhSrUFesJx7ChGYfZ50zNvMUk
+         L2QnVC/RmNweBfPL625r/YBwGLvDk4nVNiKPwhkJhZzRGOPKAzdX7sg66DqtUtomKgGh
+         TGxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712318800; x=1712923600;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=951nXGkKjtOMWvE593+3+1defoukyWk76h9tCSdYH3U=;
+        b=iTLxph84CcuRk5t6vw1WTjzq516Jv6ax2FW6HCE7AyLZH8ujZgcYRMoXh/6+PpIg/N
+         AIzLpeVjMikIQQ3CAA11oW5fP2+n6t1uwMzFxAnHMI3RcVh7ufXehSuSWVPtGZVh3ryZ
+         iRl+YlLT1TqKXbIv0P+2nHyOyR/syjKMjh2aMgQv2/1JmUVTFYiU5j55P0Q6aCN4z81U
+         IGKgcJaPTpjxd1kDMn3CtwzaYsANDw4UHPZxhooG9SFHTQ+ZjPrekvj5s7bO1HBTvU/j
+         AiQq1w9KopjkOfYGrWuqP4yEw5k12lQfwkD8Qdv9UkhlEgF1nMma+tnQJ1Klz8d2ihYW
+         5gDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAmMQF/SXrHLcos/jwlxfchZo9lX6tc5F8knNpdfKOHljDHEYhlPAajUTF6CbH0hmrC8+paURsAl4cVZAKo+IHSCD7r/NMxPU8ux4gI+VkQFwZMxMcpmlDb7uU8u1IyXADL5f2WULKLdsMfA/H3BEi9NnhDNd2gejKI5w2hSlqrDd1zvzj
+X-Gm-Message-State: AOJu0YzpPcx5EfTaUS5JhT5ZprUQDohOVlStAWQzbUDk0HW8xaSbP6dd
+	h+QkvSSpoz+nP6ZtLx2Gp/veX4mVepa4+pAID7L276Pc2fP+ILlv
+X-Google-Smtp-Source: AGHT+IFM21RPOG0tBkcKSWY7GAr7G2myaGTXDGJk7JBt2SQYunxK5QAwm2BlpDVWn1tZtx9+NzyVsw==
+X-Received: by 2002:a17:906:29d5:b0:a4e:57c5:e736 with SMTP id y21-20020a17090629d500b00a4e57c5e736mr999133eje.25.1712318800025;
+        Fri, 05 Apr 2024 05:06:40 -0700 (PDT)
+Received: from [192.168.42.78] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id lc24-20020a170906f91800b00a4e2d7dd2d8sm753430ejb.182.2024.04.05.05.06.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Apr 2024 05:06:39 -0700 (PDT)
+Message-ID: <e3c0da47-8748-42ba-bd0e-872a5e66090f@gmail.com>
+Date: Fri, 5 Apr 2024 13:06:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="h65h3fnxnuqgv2vq"
-Content-Disposition: inline
-In-Reply-To: <20240328194934.42278-1-kuniyu@amazon.com>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA2VTaVBTVxj1vi0BG/sExVt0uiA4rdpQHGf8aNVSu/BmOhbH6Q+rUys2T0Qg
-	KJG6UDuRRSQBZMQWiRAQbViiQCEN4FIRWUxAwKKFUlCJLIogaliESKjh2daZ/jvn3HPuPefH
-	FZMuqWJ3cbB8Nx8hDwz1YJwpY+1407umyVe3vfeXxRmqlCug64KKBmXsIQLiKqYoMJ5SEzDV
-	2UfAZEU8CdauPhqyckoZyGiKpWCyVc1AS2Y3AQ+jbRQUnosjoKfWIgJjkh6BPrqDgrK+MQbU
-	/Qsg5tcRBN1HLDTc0D1iYFxXIILbIxYKxpNnQroqhoAGdRiUd3ZT0GxMpkGXeJaBFLMP/FHW
-	SUDLuQwGmivraeitSqIg5WQMCT3ZD2joSNVRUHkxC4GlaIiAmKwnJMRY75IwkVdHQ2PSFAma
-	wgIS2lJ6EFyJ/42GhqJoEYxqr5JwMUtJQW22G6QUmikYrR9AkDZwk4TfL3iCeXiKgMZSKw3W
-	jLchNc9AwPmEpyIwNO0A84SZgLtjfQxMtX3ot4bLa1bRXLtlhOQeNpoQpz0TxZ1QXqe4ifHF
-	nCH/T4JTV/eTXIWmU8QZK7247JJI7lnVLyKupCCB4WryzxJcRZcvl5JTidZ5bHReKeNDg7/j
-	I7xXb3HenpRlInY+dNtrGotllCjHVYWcxJhdjq9eu4BUyFnswuYhPDqqfUGGET5qbmAEYkV4
-	vMFMq5B4OmK8EyLouQg3Dt5H/5rKDkYTAjEg3NtejByPUKwn1qa3TGOGXYqbBjpIB57DvoMP
-	FybSjgDJlkqwKaGVdhy4stvw01s90wEJ64ev3LxMCng2NqV3Uw5MsnvxTycNjKMSyc7HuXax
-	Q3ZiV+DLE1dfNF2IHxStFHYewGZD+3Q3zF57Bd8Z7iAEzyf4+OBGweOK++sMIgEvwPWpiZTg
-	T0X4kv2RSCB6hHUHRwjB9QGOvdH9IvERHrQeZIRLZ+G2wdlCzVn4qDGNFGQJPnzIRXAvwvpb
-	A1QKWqh5aZjmpWGa/4YJshS3/Xjs//ISrDv5gBTwKlxYOERlI1EBmsdHKsKCeIWPnN8jVQSG
-	KSLlQdJvw8NK0PO/Wm+ve1KOMvsfS6sQIUZVyPN52FKsb0bulDxcznvMkaj9JNtcJLLAffv5
-	iPBvIiJDeUUVmi+mPOZJvGRv8C5sUOBuPoTnd/IR/5wSYid3JTH3XrK0J/jr6vW2kXMxa8JP
-	H/c/Eaa3Sb12GDYHtLttjdd1bvBM2Fw5Kf7YL65r0zq9tzRf0hrVO7DB356hza1vOpaoeOux
-	XRTifcBW8ZpMvW7J+gDb6j2bZvhmBTyZ6T/zVLuxvDjc//aX93O+6nWupkprX5+x98YP9fsj
-	7YO7bJKoVa5vLpc1RLXKrGn93td3pJ5Z5f4Zu+XTn6X2zEdOh3WyZWO+z2ruVcbNqQs+v3C9
-	ZthkWfv92mpl36VivHGXZCihw3KnJ371ikixJWPLvRq6qKhh2HvJF76LLO9/HpBdoq2+NBdl
-	bGrW5S4VNZ/WrJka9twnXTw5FL5blb51WbW2RW31oBTbA30WkxGKwL8B0oUGfSYFAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WTe0yTZxTGfb9Lv4Jp/KSKn+AWUzHZQAtVLqeLMDTRfRqzuItb4txKI+Uy
-	LjUtJehmRkBEC2iNMYaKgM51QGdraQFRYAgOoVwH4i2UjVokQgNqQe4wsFlmsv9+73PO8+Sc
-	Nzlc3Osm5cONT06RKZKliQKOJ9G6cL9/a/P8qpigdudGaEgPg4EaNQnpJ09hkFW9SEDlzzkY
-	LNqGMJivzsbBNTBEQtE1MwcKOk8SMP8ohwM9VxwYjGbMEmC4nYXBYJOdgso8PQJ9Rh8BVUOT
-	HMgZ3gCZFRMIHOfsJDzQveTAtK6Mgr8m7ARMn10J+epMDNpykuCWzUFAV+VZEnS5NzigsYrg
-	YZUNg57bBRzoqm8l4XlDHgGaq5k4DBaPkNB3QUdAfW0RArtxDIPMotc4ZLqe4TBTcp+EjrxF
-	HLSGMhweawYRNGbXkdBmzKDgTWEzDrVF6QQ0FXuDxmAl4E2rE8ElZy8O3TV+YB1fxKDD7CLB
-	VfABXCixYHDnzBQFls7vwTpjxeDZ5BAHFh9/HLmLLelSk+xT+wTOjna0ILbwtx/Yy+l/EuzM
-	tD9rKX2CsTn3hnG2Wmuj2Mr6zWxxuYqdazBRbHnZGQ77R+kNjK0eELOaa/XogOCQcIdCrkqR
-	bYyTK1PCBd+IYJtQJAbhtmCxULQ97NuPtoUIAiN2RMsS41NlisCIKGFcj9ZMHHV6p+UZm6l0
-	VMxXIy6XoYOZyr8T1MiT60X/gpj+GjOlRh5L+gbGNN5LupnPzD1Uc9xNrxBTce4U5n5YEKPT
-	G992EbQfU5jfg5aZQ29hOp19+DKvoT9kThtyyWUDTpt4jFPf+bbAp2OYqf7BtwYeHck09t7F
-	3amtiGluHaHchdVMS76DWGacTmVsHU/I5blx2pf5dYG7LHvQYczdmWbSvc4mZsS4wz31CcY1
-	/xxpEF/7TpD2nSDtf0FueQtTXdHH+Z8cwOiujuBuDmcMhjGiGFFlaI1MpUyKTVKKhEppklKV
-	HCs8Ik8qR0vnUtk0bb6FCodfCRsQxkUNyG/Jab+p70I+RLI8WSZYw8uJ5MV48aKlx47LFHKJ
-	QpUoUzagkKVfPI/7rD0iX7q95BSJKDQoRBQcKg4KEYduF6zj7T16WupFx0pTZAky2VGZ4l8f
-	xvXwScdW54q7V3xCx2wNlkb47tvc2ysKj9e6Ht7BH3EDo8LKcwPfN+6J5Zu+POjTaZH46jcF
-	DHnu3//13cMV2kONA/YXPWPrAvhJT9OyS85JnZdgxXftLe/xHk2I7RfruxKuMD/yuUdqHgum
-	j2EoYmGmfXb0QZuJYAu/qnLNOrzF+etflBJ54VZV5tzE+i2afThluyepbynqCKBt/o7JE6mp
-	Duz1yGRjo393amSo12e75yjs89hVRtVxicgsnzuQldHktWvtzsUoiemnoZ3XLd1ZebVfNB2+
-	Hri9LcSSPfVSsqfG2lanTzO0rwzUjad+ahLX/W5OiK7oDw/wz927W375YNZ5AaGMk4r8cYVS
-	+g8887p5wwQAAA==
-X-CMS-MailID: 20240405133400eucas1p17a657be41afd1be881bbb599e769968a
-X-Msg-Generator: CA
-X-RootMTR: 20240328195008eucas1p2fc32577c64a80424c10f30e4f69fc11a
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240328195008eucas1p2fc32577c64a80424c10f30e4f69fc11a
-References: <20240328-jag-sysctl_remset_net-v2-4-52c9fad9a1af@samsung.com>
-	<CGME20240328195008eucas1p2fc32577c64a80424c10f30e4f69fc11a@eucas1p2.samsung.com>
-	<20240328194934.42278-1-kuniyu@amazon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Add REQ_F_CQE_SKIP support to io_uring zerocopy
+To: Oliver Crumrine <ozlinuxc@gmail.com>, axboe@kernel.dk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, leitao@debian.org
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1712268605.git.ozlinuxc@gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <cover.1712268605.git.ozlinuxc@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---h65h3fnxnuqgv2vq
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 4/4/24 23:16, Oliver Crumrine wrote:
+> This patchset allows for io_uring zerocopy to support REQ_F_CQE_SKIP,
+> skipping the normal completion notification, but not the zerocopy buffer
+> release notification.
 
-On Thu, Mar 28, 2024 at 12:49:34PM -0700, Kuniyuki Iwashima wrote:
-> From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.o=
-rg>
-> Date: Thu, 28 Mar 2024 16:40:05 +0100
-> > This commit comes at the tail end of a greater effort to remove the
-> > empty elements at the end of the ctl_table arrays (sentinels) which will
-> > reduce the overall build time size of the kernel and run time memory
-> > bloat by ~64 bytes per sentinel (further information Link :
-> > https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
-> >=20
-> > When we remove the sentinel from ax25_param_table a buffer overflow
-> > shows its ugly head. The sentinel's data element used to be changed when
-> > CONFIG_AX25_DAMA_SLAVE was not defined.
->=20
-> I think it's better to define the relation explicitly between the
-> enum and sysctl table by BUILD_BUG_ON() in ax25_register_dev_sysctl()
->=20
->   BUILD_BUG_ON(AX25_MAX_VALUES !=3D ARRAY_SIZE(ax25_param_table));
->=20
-> and guard AX25_VALUES_DS_TIMEOUT with #ifdef CONFIG_AX25_DAMA_SLAVE
-> as done for other enum.
+It's an io_uring internal change not altering how it operates
+with the net layer, you don't need to CC the net list.
 
-When I remove AX25_VALUES_DS_TIMEOUT from the un-guarded build it
-complains in net/ax25/ax25_ds_timer.c (ax25_ds_set_timer). Here is the
-report https://lore.kernel.org/oe-kbuild-all/202404040301.qzKmVQGB-lkp@inte=
-l.com/.
+> This patchset also includes a test to test these changes, and a patch to
+> mini_liburing to enable io_uring_peek_cqe, which is needed for the test.
 
-How best to address this? Should we just guard the whole function and do
-nothing when not set? like this:
+For the same reason tests should be in liburing, where all io_uring tests
+are, and the selftest can be dropped. See liburing/test/send-zerocopy.c
 
-```
-void ax25_ds_set_timer(ax25_dev *ax25_dev)
-{
-#ifdef COFNIG_AX25_DAMA_SLAVE
-        if (ax25_dev =3D=3D NULL)        =B7=B7=B7/* paranoia */
-                return;
 
-        ax25_dev->dama.slave_timeout =3D
-                msecs_to_jiffies(ax25_dev->values[AX25_VALUES_DS_TIMEOUT]) =
-/ 10;
-        mod_timer(&ax25_dev->dama.slave_timer, jiffies + HZ);
-#else
-        return;
-#endif
-}
+> Oliver Crumrine (3):
+>    io_uring: Add REQ_F_CQE_SKIP support for io_uring zerocopy
+>    io_uring: Add io_uring_peek_cqe to mini_liburing
+>    io_uring: Support IOSQE_CQE_SKIP_SUCCESS in io_uring zerocopy test
+> 
+>   io_uring/net.c                                |  6 +--
+>   tools/include/io_uring/mini_liburing.h        | 18 +++++++++
+>   .../selftests/net/io_uring_zerocopy_tx.c      | 37 +++++++++++++++++--
+>   .../selftests/net/io_uring_zerocopy_tx.sh     |  7 +++-
+>   4 files changed, 59 insertions(+), 10 deletions(-)
+> 
 
-```
-
-I'm not too familiar with this, so pointing me to the "correct" way to
-handle this would be helpfull.
-
-Thx in advance.
-
-Best
-
---=20
-
-Joel Granados
-
---h65h3fnxnuqgv2vq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmYPpRMACgkQupfNUreW
-QU+GdwwAk+SQw0o7uu63t5QC8II75UQQXXzD86NcnboVLtTTKuPbn2y+rcWUY7tu
-RfnrQvG2ui15fSX0cYv66um6AIlYtvOAjlKfh5wBAA3YZQdmnSTGuHW8vcu5B6Iu
-WdjX4C12SNI/7Y8S7yLZurWvE5QrS/RHQ5sHtDfNm/HUmIoylsHmbuNvwxrOdzFH
-xxfDDdCrT5jxjVmr0Ctx3tJEmAHnkUD5voVBT1p6bJNNUOdYK986gsCYlgJpYuqE
-J3hSfJnhAnMGJcmtfnTXwoaje7XN5opqF9qaSinY7HaEoidu6pRGCA/M8a6N+PT7
-wBYhl0umuMOOBkqS7o0HtadAx6yv2fO7sOiZl4ZXvA9fRWam40n2CvKGZmF2koPs
-KRllZIQ+Uh+pbfhN9g6w0Mbjb10W9sFaZdN7CsEKKk6nxmkmgH/2PmmNhwYkdgXG
-7SLMAqeOLP/ZtTEypd2LzGdpLvjZq54jgAcB2c3cQI8jb4eogkqaMeazsf247+zt
-i5D8SOSY
-=Yv9S
------END PGP SIGNATURE-----
-
---h65h3fnxnuqgv2vq--
+-- 
+Pavel Begunkov
 
