@@ -1,130 +1,116 @@
-Return-Path: <netdev+bounces-85237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AB4E899DE9
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:06:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADE4B899DEB
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 15:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BC801F21EE6
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:06:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69D37284113
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 13:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA60516C85E;
-	Fri,  5 Apr 2024 13:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96CE16D32A;
+	Fri,  5 Apr 2024 13:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Kra4dFt5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j4I8sVlg"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188E116ABFA;
-	Fri,  5 Apr 2024 13:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7832F1DFE4;
+	Fri,  5 Apr 2024 13:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712322391; cv=none; b=iIMcXakP7ddPxaLHwN2vsugCZAWusrT84CCnsMcQJeumQu4JkODG1bp47OkGUQk/omkUwkinwsiC4J7IVxAUGGZCljtK8nYv1f9B8ER/g2pwp3/BgDcW0pLp57jSGCfq9J3o1duOnpz7MLCN9jYw+/RAZBq4TdKWgsHbH+FncMA=
+	t=1712322396; cv=none; b=LeLOAC9EaPUi7Fu2vv2InEJVdu0S2ial6aThB0m94YTeyG29XDucWlMhQh4VtmDqdxICwgYsgBqqkxvXOUmft/+qZwbQqvf8iHJX80ezLJLRrhOCL4kIlXC3x8KqQyhEmpn+aB2BrnFNd78vmYvWjcsRo9Ziqn/UlMXcE3j4MeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712322391; c=relaxed/simple;
-	bh=YljZRN04HiQc8Wt3luG12vSGapEED3ffuFFBqFi0cl8=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=lelpJZp0W3XJRzFrjGAuAjVYv2Ece8I5kwrBZW9ojfOS0XeaGB0T20kX1uiDnQwljkWL7GPHbjz9qhyk6nJKWbSFczg3wTGdkYA3kMxGE0swW0rsnQYngbucxFHtvm3XVKxYCEClMCIJVAEPlzPTx41kDh44CRhPNItQmvrkTzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Kra4dFt5; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=UBqDaTZzUF/U4d8S2p0/DyPa6gFbPu12hq+e26cZbaA=; b=Kra4dFt51r+1M3Ng+yvTwc4kPy
-	wU9Mex2+lsP3H0WX4jKl35z8+Cy7WybyBOR7szfGSBqoaOttIByz2JV6BwWOaLiHyH5SNjaBltPsg
-	3OkEaZP7TDAsmCqBjbnW4YYsxMpkEY78WsssbvuWkj4+m8T7zRelZ+uzSa9OH9eXQ00ZKjymvrWIl
-	R2Gg9hlVlOA2oE2Wg2r64OPA/uzaLWObuyP1xmVrC3pTuw7RWdQVjnfcVLp3IOjih6i3ag8DxX1kt
-	Mf1DYRDk0ur+WyFJndxkBZ9f9m8p0TdBwqYTUyCLf2ryl9Kl/2azb3cL17SeIFhOwHXkprz+Fkhku
-	J8H8TSxA==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rsjGu-0000R9-Qj; Fri, 05 Apr 2024 15:06:20 +0200
-Received: from [178.197.249.22] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rsjGu-00Fqav-0L;
-	Fri, 05 Apr 2024 15:06:20 +0200
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, bhelgaas@google.com,
- linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
- davem@davemloft.net, Christoph Hellwig <hch@lst.de>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <Zg6Q8Re0TlkDkrkr@nanopsycho>
- <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
- <Zg7JDL2WOaIf3dxI@nanopsycho>
- <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
- <20240404132548.3229f6c8@kernel.org> <660f22c56a0a2_442282088b@john.notmuch>
- <20240404165000.47ce17e6@kernel.org>
- <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
- <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
- <20240405122646.GA166551@nvidia.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <7f728d06-3a8b-945b-de0f-d0691d3c1eab@iogearbox.net>
-Date: Fri, 5 Apr 2024 15:06:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1712322396; c=relaxed/simple;
+	bh=aiTtOgawA1gl+sKd/BL+KKsnX7hyyYugKZCpLonIlAk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=necKBGHKqE4XQGjV5CAIZBTGx1cQYvI+uxgrBJJxZsLrTrCbbVna+pOrIHuvxN9ftCuUtWKYGHwdN4A6j+sel81PX0nQ2118EHQ5zgalyz19EXPXQr03bb5hyUvPheiIMlfTx8S53v3DsHisjT6xjEYQBuVJSkc7CN5Nlw9panw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j4I8sVlg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D319C433F1;
+	Fri,  5 Apr 2024 13:06:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712322396;
+	bh=aiTtOgawA1gl+sKd/BL+KKsnX7hyyYugKZCpLonIlAk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=j4I8sVlgrQ3jetssQjEvZ926rndqiioLxqiNtHYXfK1GV1hjwD4EBfbQAvpERTKsH
+	 XDoA+HdX1ovylqxGPDOeS1uSEVfhQZaiX8DP/14b/Uf2ZkVmT2W5BwChg2MF2tIaMr
+	 pmoluv2TrZb48BnvEpz8U1duOplkukiFmOoFwN+jiRtbfHFYcLTkoAy+ybnGjDK0rk
+	 axF+BeY6gALyi7pYSIC01mZKPG2X/1A1ZWNlcnloTKKANGNRCiK8XpGX3pkfLmvTTR
+	 axm06j/PTigcgp4klJwNzdnyjT26B+WKPbf/QINQ0mKDKSd81f8sXW5ZMzQ30Egm73
+	 uvL9qh8jgxj4A==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/2] mptcp: add last time fields in mptcp_info
+Date: Fri, 05 Apr 2024 15:06:20 +0200
+Message-Id: <20240405-upstream-net-next-20240405-mptcp-last-time-info-v1-0-52dc49453649@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240405122646.GA166551@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27236/Fri Apr  5 10:26:04 2024)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEz3D2YC/z2NwQrCMBBEf6Xs2YVNW6X6K9JDWje6YNKQrFIo/
+ XcXQQ9zeAzzZoPKRbjCpdmg8FuqLMnAHRqYHz7dGeVmDC21PfV0xFeuWthHTKyWVfFfxaxzxqe
+ viirRlikseJ6oO7mBaQgOzJoLB1m/j1f4OWDc9w9b+edaiwAAAA==
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <tanggeliang@kylinos.cn>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1238; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=aiTtOgawA1gl+sKd/BL+KKsnX7hyyYugKZCpLonIlAk=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmD/dYTs4Nh1M3Y3r9Yx3wcV7xGdpd2pup/0HIL
+ HFlecIH0z+JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZg/3WAAKCRD2t4JPQmmg
+ c2UoD/9m56ReagBAujFA3sYu5/Z8OuB4jsQqPGMSSoHZpLzAlx8QacdEAsbVgLioaf3b1btSBoY
+ 09W4qNP8uwrLYx25BecWFoe+PzFsecCNjUtYgfCdMlQnt+sbbzpwgfgyELl0fFHsgNewI8VVqD2
+ Yxtv/A4VBB6MitPaS+QQ/MQD2j0pqOB/+lNZtd6c9PKkYzpyjxp6iWMlUfTbKIl8bLWZlp+/7lx
+ bheh5G9+wUtipZn6VpINqfxuVXOACFTILk5as97XeEE/xq9yMwchWqwa6w7kY6lzc7zRGx16W2g
+ i7x0BhMLfhpmQcFUNmwZL5MTgOs3O7C5TCYUiULeEA8JElFlYDvmppLI2knW2h2MeA1GfoiphSI
+ iADfUf0CW+surlAvS4F2MMVMFVaktJGCYfM/Mk//kFBrUU7+UrkX+booNvx6fkCXTjMSAEL6WeG
+ YWN0opPw4K5nJGC6/rMHnrwfOYtyilBffMHY28qW/vI2aaXmLakCEkexSiPolLjqB77ZhPIVsvg
+ w+VD+ApD5yKG9bgB9MSjDfJaYm3w9d9k/kBpcJJac9w6+wePpL0TlRE/4HWyCkxZLoA3yMgn+Pc
+ baTUNW2bTz7I44mT0VcO36MEvVA/6VQ6iJt05T/fmxZDO56T0k8AGKbwH/cSMAveeGRbu36LGN1
+ rynsFVEpFmsERFA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On 4/5/24 2:26 PM, Jason Gunthorpe wrote:
-> On Fri, Apr 05, 2024 at 09:11:19AM +0200, Paolo Abeni wrote:
->> On Thu, 2024-04-04 at 17:11 -0700, Alexander Duyck wrote:
->>> Again, I would say we look at the blast radius. That is how we should
->>> be measuring any change. At this point the driver is self contained
->>> into /drivers/net/ethernet/meta/fbnic/. It isn't exporting anything
->>> outside that directory, and it can be switched off via Kconfig.
->>
->> I personally think this is the most relevant point. This is just a new
->> NIC driver, completely self-encapsulated. I quickly glanced over the
->> code and it looks like it's not doing anything obviously bad. It really
->> looks like an usual, legit, NIC driver.
-> 
-> This is completely true, and as I've said many times the kernel as a
-> project is substantially about supporting the HW that people actually
-> build. There is no reason not to merge yet another basic netdev
-> driver.
-> 
-> However, there is also a pretty strong red line in Linux where people
-> belive, with strong conviction, that kernel code should not be merged
-> only to support a propriety userspace. This submission is clearly
-> bluring that line. This driver will only run in Meta's proprietary
-> kernel fork on servers running Meta's propriety userspace.
-> 
-> At this point perhaps it is OK, a basic NIC driver is not really an
-> issue, but Jiri is also very correct to point out that this is heading
-> in a very concerning direction.
-> 
-> Alex already indicated new features are coming, changes to the core
-> code will be proposed. How should those be evaluated? Hypothetically
-> should fbnic be allowed to be the first implementation of something
-> invasive like Mina's DMABUF work?
-My $0.02 from only reading this thread on the side.. when it comes to
-extending and integrating with core networking code (e.g. larger features
-like offloads, xdp/af_xdp, etc) the networking community always requested
-at least two driver implementations to show-case that the code extensions
-touching core code are not unique to just a single driver/NIC/vendor. I'd
-expect this holds true also here..
+These patches from Geliang add support for the "last time" field in
+MPTCP Info, and verify that the counters look valid.
+
+Patch 1 adds these counters: last_data_sent, last_data_recv and
+last_ack_recv. They are available in the MPTCP Info, so exposed via
+getsockopt(MPTCP_INFO) and the Netlink Diag interface.
+
+Patch 2 adds a test in diag.sh MPTCP selftest, to check that the
+counters have moved by at least 250ms, after having waited twice that
+time.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (2):
+      mptcp: add last time fields in mptcp_info
+      selftests: mptcp: test last time mptcp_info
+
+ include/uapi/linux/mptcp.h                |  4 +++
+ net/mptcp/options.c                       |  1 +
+ net/mptcp/protocol.c                      |  7 ++++
+ net/mptcp/protocol.h                      |  3 ++
+ net/mptcp/sockopt.c                       |  4 +++
+ tools/testing/selftests/net/mptcp/diag.sh | 53 +++++++++++++++++++++++++++++++
+ 6 files changed, 72 insertions(+)
+---
+base-commit: d76c740b2eaaddc5fc3a8b21eaec5b6b11e8c3f5
+change-id: 20240405-upstream-net-next-20240405-mptcp-last-time-info-9b03618e08f1
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
