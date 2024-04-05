@@ -1,170 +1,212 @@
-Return-Path: <netdev+bounces-85105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 284F38997A5
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:17:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7EF189979A
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:16:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78D91F215DE
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:17:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E8401F22B25
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 08:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5487146A73;
-	Fri,  5 Apr 2024 08:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB61414535C;
+	Fri,  5 Apr 2024 08:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="p34noSm3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3I/OirS"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2101.outbound.protection.outlook.com [40.107.93.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385E7145B15
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 08:17:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.101
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712305034; cv=fail; b=GLQjz4Y+uVdCwbLmIk8R2n4fPUBOwz4Woj+XfhdYaLTaZzttpXUM4EgA2sZcBVrQkEbXCj/UKErH4Bw5m/wjf91uEGSMunWyh7HkMPV1QR/1wBa9yvSUQEEkk9rtcHF7t8Kd+xWJ7Cvf9pNxbLMqknnNYft0ELIWtlAF2R8YCOM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712305034; c=relaxed/simple;
-	bh=b+5yacpfrP6rKeFbIaZjklDkRK4FfU/QXr78SHgXO0o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VvEL3hFiEnDR6Dehnro3cTL02BnFuaEQe34672iwLY9jEECao2X8a8qWi8jXzu18lJIAnbX5gQ81N7NtSeBPuURrn6Re95fgxC/tZdFnK04K+68/nxFlu2q+/ru7bmM0ICYV84FdUyl/zZZtXr3E1qZy/ObcfMfbRn24Y86lhoU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=p34noSm3; arc=fail smtp.client-ip=40.107.93.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XkxZOo+n7E84m6S9bgVC3mG67NDzrsdZmfVwRhvD06kJsifdgcYAjdbaodRnYnTJLCjv7gyoPFbfDJHNQYetkpu8MrtL2+IPOlRiSyihiaVTlyDvmimbUkiOAC4Q8SprGmXnO8dzWtFk5J+vRcUAEUnh3LuQh1nv8HPi5XYXFj9sDVvbrXQ+Ua1cd/2rtk0TkqUzoKwh0fBHLq4F9CsJqs219nKUsIUX5wnmBqOuzP/hRcrKLIRx0ZVp6vmDpVtHU+5xhN/I4mDouR7uxe2VtOa77k5AEsLVI9/f6SQhIj+TYR6zmfnf9MA7lDSp/lP/9+zbvMaQlyJmTPytH0ZGuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AHUvb+RyJzN91AarShGLkXOSDuC04m8MpbCJ+S/Bgw4=;
- b=lCL0n7iNGC+Oy5iBCnPw+VSeMCdboODFbPiFmlUAVBpqHDV8+R94v6mY18qiq//cNJj+YPE0202IAttkWRvsrpRzO8hHnupRdRYwGW//trukAKAY2a8d6nw06Nz54u7qV9nAYRxZ5EGajkkSMNC7pZK3gv4K8lktddD1JD6Xy/lXT5I3w5Snndrt/Tv493gU6ghdUCEhQ17jsAnN2COrsQIofPuCRMPtw9wwcmb7Q3/q5eduYvrC/BgUIIqbOjPs8HAEy3G0vJSDDBBgswT2AehIcZERZ2EFLwQxAGWCL5TI435Vpud3moS96ASOJLKE8cxZMFBCkEiQ9jWIKfM8lA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AHUvb+RyJzN91AarShGLkXOSDuC04m8MpbCJ+S/Bgw4=;
- b=p34noSm3x7jSb7xoQJPnx4iiKcP2oKXNJMqdDxcrvnDWFc9YXwwwT6SWdYQQ7kjCu6eTZyVESESCYa6tKNfMt94dp2+m+PekmxlcGfxbJtwKxwTJj/+mdPEKG/sISDfOz/20JfrfqDRCJYZx9lji4kQ5QQii3/Ta4dBwV+JuNkE=
-Received: from CH2PR13MB4411.namprd13.prod.outlook.com (2603:10b6:610:6e::12)
- by SN4PR13MB5678.namprd13.prod.outlook.com (2603:10b6:806:21e::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Fri, 5 Apr
- 2024 08:17:11 +0000
-Received: from CH2PR13MB4411.namprd13.prod.outlook.com
- ([fe80::cd14:b8e:969c:928f]) by CH2PR13MB4411.namprd13.prod.outlook.com
- ([fe80::cd14:b8e:969c:928f%4]) with mapi id 15.20.7409.042; Fri, 5 Apr 2024
- 08:17:11 +0000
-From: Louis Peens <louis.peens@corigine.com>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>,
-	Fei Qin <fei.qin@corigine.com>,
-	netdev@vger.kernel.org,
-	oss-drivers@corigine.com
-Subject: [PATCH net-next v4 4/4] nfp: use new dim profiles for better latency
-Date: Fri,  5 Apr 2024 10:15:47 +0200
-Message-Id: <20240405081547.20676-5-louis.peens@corigine.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240405081547.20676-1-louis.peens@corigine.com>
-References: <20240405081547.20676-1-louis.peens@corigine.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: JN2P275CA0019.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:3::31)
- To CH2PR13MB4411.namprd13.prod.outlook.com (2603:10b6:610:6e::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA601CD18
+	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 08:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712304976; cv=none; b=kqzoPK1S41eXHul+6UxdVGqxJISspfj66Kz+AHluZw0z/Zyz7u2AEbMclLEAg53370aMbV8/LW2j6R2mYaqJIGr4AYQV/j2MdOPlbF2flUcdA/HyqkSHHsyFa4R3GpCHdwK1egfGI8e4y8pKigbNzR5DpzHAadkk9wUXbn3BxOk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712304976; c=relaxed/simple;
+	bh=N8tiSAiO4xyWIcoObC5tM1NhQk11cyGKT2M1FftBbxY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UrgCjQvmh6MlTuPdxMRd5+NxJD2DIWEMSCHtQCeUFJGTlJHVshcow3HSBFOgaBDQca9C9W1QTVY2Xedfh5BZ8oJLuEhf8ql/Rd+vSA3YlXaLxRddwmw615H20twBV4D6nnNQtA7cSUOwo7s/AT9mS5LZGeqmEdIDHlNidEaqQfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3I/OirS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712304974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=DMqPcsWYdMz+QuAcl4GQnhcerxyIbnKaTUXcWIfKPf0=;
+	b=O3I/OirS/u1uvNSgu18xwAyUFhXpe9MS5vTEZBZipWV9pUiCzyM0GBnqf8z3vsOgHcB3mu
+	db57QrraH8mNc1Xqtv6zRQ50lVngKmgVoSgLsTxeekeRNJ2MQNW3fOZD04PGZUCPOQQX52
+	bSFLZYfMCkrHggoI1lmZOQIopiDenDw=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-48-g1lWko3lNZ-i-P11TbI0UQ-1; Fri, 05 Apr 2024 04:16:12 -0400
+X-MC-Unique: g1lWko3lNZ-i-P11TbI0UQ-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2d6884f6de1so3992471fa.0
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 01:16:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712304970; x=1712909770;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DMqPcsWYdMz+QuAcl4GQnhcerxyIbnKaTUXcWIfKPf0=;
+        b=tFoCydZAKtlwMKJLwinUz8MLJ7Qa3ELl6hJIZxKJDkaKEqS/gO8/7eUw5mr/pIvqaO
+         nVa0ZglrD3PG1FpQmCPXlI3upWPo/GheHvuqNFshwRxkv6jYMY7WHDQFsaS694uLboMb
+         oxFTeX4AE3hu6ljhsg8+P3TkAWxo3mD0HmcgyaGrVD1pXHWurZYJ+3vWNyzcT0YkhEMy
+         iUEatI/6BKLfBI2eMeLspy+c/AKtZg8N1582O0lOSiHsyNLMUdvSsAP7qFSUOKlz8Ct0
+         GAyZoOtdLD7OZZyQ7alcxOsNHmA+nieim5ea34lQK49SHXBrzriXt82yAPiPE9cW+2BD
+         xfig==
+X-Forwarded-Encrypted: i=1; AJvYcCUlLV5GOpGYeENB7KUqDw4X1bqz28aysRtCw6l233nsc2qMXz5kRHfkoZnaMHpVKXeOhGzRIKhiETvgfAj46M5J3vwpPOto
+X-Gm-Message-State: AOJu0YwmajM+IoSYeKOIOxvx6CBi0gE43trirtEI6R4c85qIm4hgJYqn
+	w9Lfq/vnxY3wbqtzCuIe0mAeYi0RBo3rHBt6OfEPWVFeUzYuK/fCdXUuIzNU0GjtPqq9nVtfYKR
+	NnL+++oAKQHDTj0sBx5g00za0SonXMMaH30YiLHSn3upjDWlJSnPcUvyL26XKmQ==
+X-Received: by 2002:a2e:9592:0:b0:2d3:1b88:9237 with SMTP id w18-20020a2e9592000000b002d31b889237mr550711ljh.0.1712304969852;
+        Fri, 05 Apr 2024 01:16:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFogvpnQZjO6LZncWCHcyh7EtNDl1PYr1OSiuBpIBMshgE3ZsqlXOsblX1v7LOm2ldM7m17JQ==
+X-Received: by 2002:a2e:9592:0:b0:2d3:1b88:9237 with SMTP id w18-20020a2e9592000000b002d31b889237mr550696ljh.0.1712304969457;
+        Fri, 05 Apr 2024 01:16:09 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-247-213.dyn.eolo.it. [146.241.247.213])
+        by smtp.gmail.com with ESMTPSA id u3-20020a5d6ac3000000b00341d9e8cc62sm1388284wrw.100.2024.04.05.01.16.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Apr 2024 01:16:08 -0700 (PDT)
+Message-ID: <5046e1867c65f39e07822beb0a19a22743b1064b.camel@redhat.com>
+Subject: Re: [PATCH net-next 2/2] mptcp: add reset reason options in some
+ places
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, matttbe@kernel.org,
+ martineau@kernel.org,  geliang@kernel.org
+Cc: mptcp@lists.linux.dev, netdev@vger.kernel.org, Jason Xing
+	 <kernelxing@tencent.com>
+Date: Fri, 05 Apr 2024 10:16:07 +0200
+In-Reply-To: <20240405023914.54872-3-kerneljasonxing@gmail.com>
+References: <20240405023914.54872-1-kerneljasonxing@gmail.com>
+	 <20240405023914.54872-3-kerneljasonxing@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR13MB4411:EE_|SN4PR13MB5678:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	5jKfYCz37WlHsHGI+xbKxwFytV8J7+KhQ5hFGV0fqIwGSBZ9p+zGFMyiPLfC0VmlXBimne+eW6A0RRjDUkZo81+368yGi8opShL0lZ/BzxJ2aEioYXrR6QmFlFK2N70g8SRJE6AN1xHlzmHAJ1dS59zzgJt8cgMEU6qsIyeRgH83hDVQ607DaWiH+EVGk8DBrpA79fjz1hFJVo5U64kWUCQj9V3fefCO5enbBR5PgEiiRph7kLJFXQTW/3cw+nOLTs+LuJygy+jFWcKIkoTWnkb/Q/sts90gtj3wBiMcEGvA6rhT7oX5e5wyjXfXjp8bIA70tziOdbr+1ZX/Y9IbnG18pOiGkx6UU8EqrgDumfLEs0eCoPYrYRNIZh9dWdZoU8bSGb5NBVnos6yMhnlb97j6ZpgvB/SibYlidPcW7+8ecXbu7OPXW3G0M3RQLG8wUy5bXmpsFLyM/hC4VE06HCf8oR1rh+pfMMyAUVbAgKAGE+xqTzQ/YQZ4ebzVQZnCgNfcw24p0nsMD/IKY66CYVFAZyNdun4Lw52XOBvjMUuVtcHrAfyuVw8gWn+Q7ZsxCvQ5azy9dOwLefQuUeyhVl7z0kVd95z0dt9+dXStdoEoBzELIsohgpVaaAJStDJnoFoDlRc9nxtx6j40Moat8vc6knWXzgk0zcsQdrQQWfbs3zzeX9BoQF1D8ntLJChi4OZOu4AVZJ2pTZZyPwszib64oBiuOGPe+71+Oc8+HGQ=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR13MB4411.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(52116005)(1800799015)(38350700005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?z4s8PAxJVaQFy2MGw4Dh8wG2DDaXxwp4OAMG5rG1KFUiUuoRjeZBlPe8DyZI?=
- =?us-ascii?Q?LV03Pm8EeRP8mRm5VhxkMPzehXnZOCMNGilOrwEciwukj79ie4xThgBi6+gp?=
- =?us-ascii?Q?0VUnEk0l5imuiOJqjJSVHBzQPpxM43vhnRO4n0GpM4w9BIVWkhVVaOmvqqwd?=
- =?us-ascii?Q?rpdrIhm+N6GrmGoyLSGJ7mqIHjYylT5rfIH7z90qlCwdYMLuQzeQgJVVHpVs?=
- =?us-ascii?Q?jX2yFaTGKBKjJ/znyp8P+eYO5IGqKCg8NWU+ztUK+YgdsCIvWMkP3QY9rbL+?=
- =?us-ascii?Q?Bu48xFco+4VoDkx1Kwl8Dv56QPIxUCRQAcNWJWDIpeXglQ1S11/rb7mS4wqH?=
- =?us-ascii?Q?RSlxsH3RbKDGK4e0wUIJVFALNnrLOYnFRfBYoCl8F5j7CfnksJoX4eKvDtMi?=
- =?us-ascii?Q?vcip00WZ2Vgv+zfyRm07GS+aLssrzQ7oTgCKWAQkHGH+t95QbqlFErDCXAH+?=
- =?us-ascii?Q?MScyQcO9/dsH4wOIgYySeuXkviU3Zz8Ko9gv6wskp1eVo59xYXb7ZJjg2xbE?=
- =?us-ascii?Q?kfIfQdSNYSOW7hFrKrl9V72GebbaTp3QfILVxCsH7ih3PTfaA9c12lN844rN?=
- =?us-ascii?Q?18EV+9mxxp1ORg/UTUQxe5brAykANiwz30XBqKTCvmMN1/N3HKQm5BpaLY6/?=
- =?us-ascii?Q?vWxXga8yv9m+2hvSeSZVzoZuk6g4rlMSPhUpIKyqdZUD7KHHtHteC5rlaHZP?=
- =?us-ascii?Q?l6LgG/o206SD5ckl8k9JaeA0YAHAIIl0ITIlYLEVWjcUWDBVlWGCYPKuHnXd?=
- =?us-ascii?Q?MR49kRDOnFVS06S4TmirE57fchRXYYZhdIoVxBTONvsgTuHAEoPKoGC6gkNQ?=
- =?us-ascii?Q?Mxg8ti/MM+Is9zpzpD/WCQmq5TbL7evMNw97n8I+oRA9Q8gsiZQb6wPnTfmI?=
- =?us-ascii?Q?gMstl6pf5j9q8dXl4jEHqvJpGDy6xea5Wb2jyZTDE9GMjGKQ0Lkx9k5QeJlO?=
- =?us-ascii?Q?zbzdxlZyJTwZAfA/PSzNlbXDrzaJ20kAMG1Wa/w/5UXFmGMGIJuDroFSHYVN?=
- =?us-ascii?Q?vWZaiFgYSBSySdLvCzO4zoiGmo4gSUQvU6dBnEgDRWxkYo7vTeuCQNCXfTcP?=
- =?us-ascii?Q?j14PqFTxTcRE41MxLZH9mda9Pk332dE0i0nGyeqiuqnM27pmJt5xFaDLsSBa?=
- =?us-ascii?Q?GUt7cVfs527gLSjAp4ln2kT+ErqIg1W+vIC5GSSJ0eq9rqwIbANng1gd+tAQ?=
- =?us-ascii?Q?Kou/a/eleCH/Rnw4vuWntZAXr5BfZq6CjbuG0cAmEC6U5RSRvN+4rwfKghYP?=
- =?us-ascii?Q?W7cEgM9/PZtq+dXZkXIHqMQTlelZEQKQJe0zd9h9Y9vPAdXdpUxox10rGesR?=
- =?us-ascii?Q?8+DD+eie0GCWRdnOFGAqUeOPUP+XcPldYIpq+beXSz0uoprVZQ7UwkVBeHpi?=
- =?us-ascii?Q?bpa+4fceRRs0RxKcSGnm3v5O4R0JqjmH01tj47dlwOhChxVTgasL9zioIrRQ?=
- =?us-ascii?Q?1XIa9FQ+f836rGyeVlLJ7EEgU7Lh3XOkuVIes9szQzqGBSBwBn9+jMiOocUZ?=
- =?us-ascii?Q?MlpjHfn+D0ledoJX54B1XsHgC7Qll4Q1VPazhDBqCvHjMx1B8Qfzpi4p9trp?=
- =?us-ascii?Q?mM+bW5ZrV8LlEpsIZl0AoxkACAuX+u+fh23LErc3+CWIssVflQeF7KSsquDo?=
- =?us-ascii?Q?cQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce0856b4-29f5-4397-1655-08dc5548cabb
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR13MB4411.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2024 08:17:11.1083
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m3b3tifQRQDKYhqP7Uxbyf7nFesa8qH9mvBlNzTq5s5TKcsZLMVJoSglRGs3QlEyDSP1jxYful3oJgWV6PEFuMjzGca3I+9MunnYIIdN1gk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR13MB5678
 
-From: Fei Qin <fei.qin@corigine.com>
+On Fri, 2024-04-05 at 10:39 +0800, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+>=20
+> The reason codes are handled in two ways nowadays (quoting Mat Martineau)=
+:
+> 1. Sending in the MPTCP option on RST packets when there is no subflow
+> context available (these use subflow_add_reset_reason() and directly call
+> a TCP-level send_reset function)
+> 2. The "normal" way via subflow->reset_reason. This will propagate to bot=
+h
+> the outgoing reset packet and to a local path manager process via netlink
+> in mptcp_event_sub_closed()
+>=20
+> RFC 8684 defines the skb reset reason behaviour which is not required
+> even though in some places:
+>=20
+>     A host sends a TCP RST in order to close a subflow or reject
+>     an attempt to open a subflow (MP_JOIN). In order to let the
+>     receiving host know why a subflow is being closed or rejected,
+>     the TCP RST packet MAY include the MP_TCPRST option (Figure 15).
+>     The host MAY use this information to decide, for example, whether
+>     it tries to re-establish the subflow immediately, later, or never.
+>=20
+> Since the commit dc87efdb1a5cd ("mptcp: add mptcp reset option support")
+> introduced this feature about three years ago, we can fully use it.
+> There remains some places where we could insert reason into skb as
+> we can see in this patch.
+>=20
+> Many thanks to Mat for help:)
+>=20
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/mptcp/subflow.c | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> index 1626dd20c68f..49f746d91884 100644
+> --- a/net/mptcp/subflow.c
+> +++ b/net/mptcp/subflow.c
+> @@ -301,8 +301,13 @@ static struct dst_entry *subflow_v4_route_req(const =
+struct sock *sk,
+>  		return dst;
+> =20
+>  	dst_release(dst);
+> -	if (!req->syncookie)
+> +	if (!req->syncookie) {
+> +		struct mptcp_ext *mpext =3D mptcp_get_ext(skb);
+> +
+> +		if (mpext)
+> +			subflow_add_reset_reason(skb, mpext->reset_reason);
 
-Latency comparison between EQE profiles and SPECIFIC_0 profiles
-for 5 different runs:
+uhm? subflow_add_reset_reason() will do:
 
-                                     Latency (us)
-EQE profiles 	    |	132.85  136.32  131.31  131.37  133.51
-SPECIFIC_0 profiles |	92.09   92.16   95.58   98.26   89.79
+	mptcp_ext_add(skb)->reset_reason =3D mpext->reset_reason
 
-Signed-off-by: Fei Qin <fei.qin@corigine.com>
-Signed-off-by: Louis Peens <louis.peens@corigine.com>
+The above looks like a no-op.=20
+
+Possibly we should instead ensure that subflow_check_req() calls
+subflow_add_reset_reason() with reasonable arguments on all the error
+paths?!?
+
+Something alike the (completely untested) following
+
+Cheers,
+
+Paolo
 ---
- drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-index 997cc4fcffdb..4c2dac1e1be4 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-@@ -1232,12 +1232,12 @@ static void nfp_net_open_stack(struct nfp_net *nn)
- 
- 		if (r_vec->rx_ring) {
- 			INIT_WORK(&r_vec->rx_dim.work, nfp_net_rx_dim_work);
--			r_vec->rx_dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+			r_vec->rx_dim.mode = DIM_CQ_PERIOD_MODE_SPECIFIC_0;
+diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+index 6042a47da61b..298c6342a78c 100644
+--- a/net/mptcp/subflow.c
++++ b/net/mptcp/subflow.c
+@@ -150,8 +150,10 @@ static int subflow_check_req(struct request_sock *req,
+ 	/* no MPTCP if MD5SIG is enabled on this socket or we may run out of
+ 	 * TCP option space.
+ 	 */
+-	if (rcu_access_pointer(tcp_sk(sk_listener)->md5sig_info))
++	if (rcu_access_pointer(tcp_sk(sk_listener)->md5sig_info)) {
++		subflow_add_reset_reason(skb, MPTCP_RST_EMPTCP);
+ 		return -EINVAL;
++	}
+ #endif
+=20
+ 	mptcp_get_options(skb, &mp_opt);
+@@ -219,6 +221,7 @@ static int subflow_check_req(struct request_sock *req,
+ 				 ntohs(inet_sk((struct sock *)subflow_req->msk)->inet_sport));
+ 			if (!mptcp_pm_sport_in_anno_list(subflow_req->msk, sk_listener)) {
+ 				SUBFLOW_REQ_INC_STATS(req, MPTCP_MIB_MISMATCHPORTSYNRX);
++				subflow_add_reset_reason(skb, MPTCP_RST_EPROHIBIT);
+ 				return -EPERM;
+ 			}
+ 			SUBFLOW_REQ_INC_STATS(req, MPTCP_MIB_JOINPORTSYNRX);
+@@ -227,10 +230,12 @@ static int subflow_check_req(struct request_sock *req=
+,
+ 		subflow_req_create_thmac(subflow_req);
+=20
+ 		if (unlikely(req->syncookie)) {
+-			if (mptcp_can_accept_new_subflow(subflow_req->msk))
+-				subflow_init_req_cookie_join_save(subflow_req, skb);
+-			else
++			if (!mptcp_can_accept_new_subflow(subflow_req->msk)) {
++				subflow_add_reset_reason(skb, MPTCP_RST_EPROHIBIT);
+ 				return -EPERM;
++			}
++
++			subflow_init_req_cookie_join_save(subflow_req, skb);
  		}
- 
- 		if (r_vec->tx_ring) {
- 			INIT_WORK(&r_vec->tx_dim.work, nfp_net_tx_dim_work);
--			r_vec->tx_dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+			r_vec->tx_dim.mode = DIM_CQ_PERIOD_MODE_SPECIFIC_0;
- 		}
- 
- 		napi_enable(&r_vec->napi);
--- 
-2.34.1
+=20
+ 		pr_debug("token=3D%u, remote_nonce=3D%u msk=3D%p", subflow_req->token,
 
 
