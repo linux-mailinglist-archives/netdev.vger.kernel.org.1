@@ -1,240 +1,391 @@
-Return-Path: <netdev+bounces-85145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4FAD899A02
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 11:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70247899A22
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 12:02:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2648284FA0
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 09:56:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC0F928433D
+	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 10:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3A4161B4E;
-	Fri,  5 Apr 2024 09:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0AXR3Sr9";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mv3acM2x";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Z0+7rq6f";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="lVccGfCI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B1816079E;
+	Fri,  5 Apr 2024 10:02:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4C7161318;
-	Fri,  5 Apr 2024 09:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752FA160783;
+	Fri,  5 Apr 2024 10:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712310815; cv=none; b=mIY19KJ4UI01mSUrK/lBBv8QwjcJFR/GcJ6feTqejR8OgeII6d1QwMKbqIJTyzfDe2X7g00bTfU0bh5S7h+NSCXlfxA62h9QQpRYFxXo7OHTIxC2zyX5YlvA7BynzOoUeIx5UKv0uZ6mblIOhEjhQ3rfAySQg7m8fsf0PYzEYx8=
+	t=1712311358; cv=none; b=pM5zAxmeTOegRYtIwpvJ/P1eKQ15OsoFXTt4kwduubLSl13wxbvsV7U+G/Iie8Sv+zmcWBmGOrI+GVUlB5p7GYW+OwBVf+Vtl7AwVzKNdTVuIfyx98rO3SWKjUynWU3Q322jDJUBhANoq1oyOLgO+LzxrwNMoGAr1MEnfdIecEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712310815; c=relaxed/simple;
-	bh=iG4O7MMO9gnBVtJZSYs1Hq2UvQRfp2O+8N10zEhPJQc=;
+	s=arc-20240116; t=1712311358; c=relaxed/simple;
+	bh=NxvxzWFEm1vUUexok4ekiOZ5+EfNkBZCkduLoUStE9k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DTPANW0a0wV97PEgXPLudGyv3gNtEeQLhpJBkNuIi948I7CrYZ9fV9IXUO9CHKdzxmRFDqRx0rKF1oJDd3VteF75R6+ZlJBtipMSwfwrUNbT5Fxu40VGFfJ1EKKvwLJtoCIlZQ86OWSzO0Xlf9VMAHYCMnI1p2jWMX1LE6MYm2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0AXR3Sr9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mv3acM2x; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Z0+7rq6f; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=lVccGfCI; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
+	 Content-Type:Content-Disposition:In-Reply-To; b=OxkVK7tIRqYWdN0cS4Sn1ik2z2wuOdxK7ndkvCM4NQBAQ0DElOHTtP+qHgJjTFLY83KMrCh1B4CkMIuMhO5/+V/Il8M6ydDGSQ1LI1HhKVSEJ29aDfTCQ6rgnND0Erja2As9PdoDOJCpHKbF2TRjmrCb8Q5C6pfAOCUR1/gz7h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 65BF721A2E;
-	Fri,  5 Apr 2024 09:53:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1712310809; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kxLJbVvPYqfzG83pwvoYNu5wMFXj9ZScFtz4XZeGAUk=;
-	b=0AXR3Sr9XfI+c7rTPImw5uCIqUd0/09qhqdILdsZtrOOOTHNThWW8IWO2LavomosrDlGR4
-	r5zcQ7aU/RB1e9VhO2PeMNtjvZCEdKzHqupTEPNLaoS68JZ7HFWh4OFd1ckPqsmFOlBB7H
-	mcwM4kvxTwfCAYfvPvAMLZZtKWx5vB8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1712310809;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kxLJbVvPYqfzG83pwvoYNu5wMFXj9ZScFtz4XZeGAUk=;
-	b=mv3acM2xzaAtD0goPoMaKRbxprQYlRRQRdWeBSj+XgsIgB6XYwFswsOsyAWM2lrdH+uuj0
-	DSsBpoDlTl2n1rDQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1712310808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kxLJbVvPYqfzG83pwvoYNu5wMFXj9ZScFtz4XZeGAUk=;
-	b=Z0+7rq6fcjYyrOGJFwhu7EPjxeB2YzEP6/GI4QJE77wXmTpoCFc1mE9dE1Bj/PEGY1tu49
-	ESTilKNYDaC1JrKhdHCnLw44UtjznYqGrEfN+CtNGBPA2Dt9MhQgjmAw2Ok0XXX+qUvUQJ
-	M0o1kG24lT0V2nbGjew3Qb50utPv0T0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1712310808;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kxLJbVvPYqfzG83pwvoYNu5wMFXj9ZScFtz4XZeGAUk=;
-	b=lVccGfCILCM4svVbHjo2v2GSsNkbxp/3kUm/GIkdwdP1GGRDcHYdF3Ew32qMBI0ItKMWtc
-	2n16V0vgVrwCANAQ==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 5716C139F1;
-	Fri,  5 Apr 2024 09:53:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id 2Ig+FRjKD2a3YAAAn2gu4w
-	(envelope-from <jack@suse.cz>); Fri, 05 Apr 2024 09:53:28 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 0505DA0814; Fri,  5 Apr 2024 11:53:27 +0200 (CEST)
-Date: Fri, 5 Apr 2024 11:53:27 +0200
-From: Jan Kara <jack@suse.cz>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Matthew Wilcox <willy@infradead.org>, joro@8bytes.org,
-	will@kernel.org, trond.myklebust@hammerspace.com, anna@kernel.org,
-	arnd@arndb.de, herbert@gondor.apana.org.au, davem@davemloft.net,
-	jikos@kernel.org, benjamin.tissoires@redhat.com, tytso@mit.edu,
-	jack@suse.com, dennis@kernel.org, tj@kernel.org, cl@linux.com,
-	jakub@cloudflare.com, penberg@kernel.org, rientjes@google.com,
-	iamjoonsoo.kim@lge.com, vbabka@suse.cz, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-acpi@vger.kernel.org, acpica-devel@lists.linux.dev,
-	linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
-	bpf@vger.kernel.org, linux-input@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
- the call site
-Message-ID: <20240405095327.ufsimeplwahh6mem@quack3>
-References: <20240404165404.3805498-1-surenb@google.com>
- <Zg7dmp5VJkm1nLRM@casper.infradead.org>
- <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
- <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
- <Zg8qstJNfK07siNn@casper.infradead.org>
- <jb25mtkveqf63bv74jhynf6ncxmums5s37esveqsv52yurh4z7@5q55ttv34bia>
- <20240404154150.c25ba3a0b98023c8c1eff3a4@linux-foundation.org>
- <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3>
- <CAJuCfpF10COO2nh1nt3CcaZOFe4iSXszsup+a0qAEQ1ngyy5tQ@mail.gmail.com>
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 015C9100DA1A6;
+	Fri,  5 Apr 2024 12:02:33 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id C87935FC4DA; Fri,  5 Apr 2024 12:02:32 +0200 (CEST)
+Date: Fri, 5 Apr 2024 12:02:32 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Roman Lozko <lozko.roma@gmail.com>
+Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: Deadlock in pciehp on dock disconnect
+Message-ID: <Zg_MOG1OufptoRph@wunner.de>
+References: <CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJuCfpF10COO2nh1nt3CcaZOFe4iSXszsup+a0qAEQ1ngyy5tQ@mail.gmail.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[39];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLinodumkc3pofpwycnya9d5a9)];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[c-faq.com:url,suse.com:email,imap2.dmz-prg2.suse.org:helo,imap2.dmz-prg2.suse.org:rdns,linux.dev:email]
-X-Spam-Score: -3.80
-X-Spam-Flag: NO
+In-Reply-To: <CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com>
 
-On Thu 04-04-24 16:16:15, Suren Baghdasaryan wrote:
-> On Thu, Apr 4, 2024 at 4:01 PM Kent Overstreet
-> <kent.overstreet@linux.dev> wrote:
-> >
-> > On Thu, Apr 04, 2024 at 03:41:50PM -0700, Andrew Morton wrote:
-> > > On Thu, 4 Apr 2024 18:38:39 -0400 Kent Overstreet <kent.overstreet@linux.dev> wrote:
-> > >
-> > > > On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
-> > > > > On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrote:
-> > > > > > Ironically, checkpatch generates warnings for these type casts:
-> > > > > >
-> > > > > > WARNING: unnecessary cast may hide bugs, see
-> > > > > > http://c-faq.com/malloc/mallocnocast.html
-> > > > > > #425: FILE: include/linux/dma-fence-chain.h:90:
-> > > > > > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),
-> > > > > > GFP_KERNEL))
-> > > > > >
-> > > > > > I guess I can safely ignore them in this case (since we cast to the
-> > > > > > expected type)?
-> > > > >
-> > > > > I find ignoring checkpatch to be a solid move 99% of the time.
-> > > > >
-> > > > > I really don't like the codetags.  This is so much churn, and it could
-> > > > > all be avoided by just passing in _RET_IP_ or _THIS_IP_ depending on
-> > > > > whether we wanted to profile this function or its caller.  vmalloc
-> > > > > has done it this way since 2008 (OK, using __builtin_return_address())
-> > > > > and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
-> > > >
-> > > > Except you can't. We've been over this; using that approach for tracing
-> > > > is one thing, using it for actual accounting isn't workable.
-> > >
-> > > I missed that.  There have been many emails.  Please remind us of the
-> > > reasoning here.
-> >
-> > I think it's on the other people claiming 'oh this would be so easy if
-> > you just do it this other way' to put up some code - or at least more
-> > than hot takes.
-> >
-> > But, since you asked - one of the main goals of this patchset was to be
-> > fast enough to run in production, and if you do it by return address
-> > then you've added at minimum a hash table lookup to every allocate and
-> > free; if you do that, running it in production is completely out of the
-> > question.
-> >
-> > Besides that - the issues with annotating and tracking the correct
-> > callsite really don't go away, they just shift around a bit. It's true
-> > that the return address approach would be easier initially, but that's
-> > not all we're concerned with; we're concerned with making sure
-> > allocations get accounted to the _correct_ callsite so that we're giving
-> > numbers that you can trust, and by making things less explicit you make
-> > that harder.
-> >
-> > Additionally: the alloc_hooks() macro is for more than this. It's also
-> > for more usable fault injection - remember every thread we have where
-> > people are begging for every allocation to be __GFP_NOFAIL - "oh, error
-> > paths are hard to test, let's just get rid of them" - never mind that
-> > actually do have to have error paths - but _per callsite_ selectable
-> > fault injection will actually make it practical to test memory error
-> > paths.
-> >
-> > And Kees working on stuff that'll make use of the alloc_hooks() macro
-> > for segregating kmem_caches.
+[cc += netdev maintainers]
+
+On Fri, Apr 05, 2024 at 11:14:01AM +0200, Roman Lozko wrote:
+> Hi, I'm using HP G4 Thunderbolt docking station, and recently (?)
+> kernel started to "partially" deadlock after disconnecting the dock
+> station. This results in inability to turn network interfaces on or
+> off, system can't reboot, `sudo` does not work (guess because it uses
+> DNS).
 > 
-> Yeah, that pretty much summarizes it. Note that we don't have to make
-> the conversions in this patch and accounting will still work but then
-> all allocations from different callers will be accounted to the helper
-> function and that's less useful than accounting at the call site.
-> It's a sizable churn but the conversions are straight-forward and we
-> do get accurate, performant and easy to use memory accounting.
+> It started to occur ~two weeks ago, don't know why, I did not change
+> anything at that time. First seen on 6.8.2, nothing changed with
+> 6.9.0-rc2.
 
-OK, fair enough. I guess I can live with the allocation macros in jbd2 if
-type safety is preserved. But please provide a short summary of why we need
-these macros (e.g. instead of RET_IP approach) in the changelog (or at
-least a link to some email explaining this if the explanation would get too
-long). Because I was wondering about the same as Andrew (and yes, this is
-because I wasn't really following the huge discussion last time).
+This is not a pciehp issue, it's a networking issue:
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+In the stacktrace you've provided below, the rtnl_lock() is acquired
+recursively, which leads to the deadlock:
+
+unregister_netdev() acquires rtnl_lock(), indirectly invokes
+netdev_trig_deactivate() upon unregistering some LED, thereby
+calling unregister_netdevice_notifier(), which tries to
+acquire rtnl_lock() again.
+
+From a quick look at the source files involved, this doesn't look
+like something new, though I note LED support for igc was added
+only recently with ea578703b03d ("igc: Add support for LEDs on
+i225/i226"), which went into v6.9-rc1.
+
+The other hanging tasks are simply waiting for rtnl_lock() as well.
+
+
+> pciehp stack trace:
+> INFO: task irq/122-pciehp:209 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:irq/122-pciehp  state:D stack:0     pid:209   tgid:209   ppid:2
+>    flags:0x00004000
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  unregister_netdevice_notifier+0x40/0x150
+>  netdev_trig_deactivate+0x1f/0x60 [ledtrig_netdev c68f5c964fe428d1a2169816a653c62dba2f2e01]
+>  led_trigger_set+0x102/0x330
+>  led_classdev_unregister+0x4b/0x110
+>  release_nodes+0x3d/0xb0
+>  devres_release_all+0x8b/0xc0
+>  device_del+0x34f/0x3c0
+>  unregister_netdevice_many_notify+0x80b/0xaf0
+>  unregister_netdev+0x7c/0xd0
+>  igc_remove+0xd8/0x1e0 [igc d1bcf7b726f7370e167c72960cdb27ae7f970357]
+>  pci_device_remove+0x3f/0xb0
+>  device_release_driver_internal+0x1be/0x2d0
+>  pci_stop_bus_device+0x68/0xa0
+>  pci_stop_bus_device+0x39/0xa0
+>  pci_stop_bus_device+0x39/0xa0
+>  pciehp_unconfigure_device+0x12b/0x1d0
+>  pciehp_disable_slot+0x65/0x120
+>  pciehp_handle_presence_or_link_change+0x7a/0x450
+>  pciehp_ist+0xf5/0x320
+>  irq_thread_fn+0x1d/0x40
+>  irq_thread+0x19b/0x260
+>  kthread+0x147/0x160
+>  ret_from_fork+0x34/0x40
+>  ret_from_fork_asm+0x11/0x20
+>  </TASK>
+> 
+> Other affected kernel threads
+> INFO: task NetworkManager:1294 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:NetworkManager  state:D stack:0     pid:1294  tgid:1294  ppid:1
+>    flags:0x00000002
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  netlink_dump+0x1c4/0x3f0
+>  __netlink_dump_start+0x2b3/0x340
+>  rtnetlink_rcv_msg+0x469/0x4a0
+>  netlink_rcv_skb+0xed/0x120
+>  netlink_unicast+0x2ce/0x3f0
+>  netlink_sendmsg+0x39c/0x450
+>  ____sys_sendmsg+0x1a5/0x2a0
+>  ___sys_sendmsg+0x293/0x2d0
+>  __x64_sys_sendmsg+0x10d/0x140
+>  do_syscall_64+0x92/0x170
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> RIP: 0033:0x7971ac52c02b
+> RSP: 002b:00007ffc684c09a0 EFLAGS: 00000293 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00005661e9bc5be0 RCX: 00007971ac52c02b
+> RDX: 0000000000000000 RSI: 00007ffc684c09e0 RDI: 000000000000000d
+> RBP: 00007ffc684c09c0 R08: 0000000000000000 R09: 0000000000000001
+> R10: 0000000000000001 R11: 0000000000000293 R12: 0000000000000001
+> R13: 0000000000000000 R14: 00005661e9c45030 R15: 00005661e9bc5cac
+>  </TASK>
+> INFO: task geoclue:2325 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:geoclue         state:D stack:0     pid:2325  tgid:2325  ppid:1
+>    flags:0x00000002
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  netlink_dump+0x1c4/0x3f0
+>  __netlink_dump_start+0x2b3/0x340
+>  rtnetlink_rcv_msg+0x469/0x4a0
+>  netlink_rcv_skb+0xed/0x120
+>  netlink_unicast+0x2ce/0x3f0
+>  netlink_sendmsg+0x39c/0x450
+>  __sys_sendto+0x2c8/0x350
+>  __x64_sys_sendto+0x26/0x30
+>  do_syscall_64+0x92/0x170
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> RIP: 0033:0x7ad712b2beea
+> RSP: 002b:00007fff94c1fd80 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ad712b2beea
+> RDX: 0000000000000014 RSI: 00007fff94c1fe10 RDI: 0000000000000007
+> RBP: 00007fff94c1fdb0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000004000 R11: 0000000000000246 R12: 00007fff94c1fe10
+> R13: 0000000000000014 R14: 0000000000000000 R15: 0000000000000000
+>  </TASK>
+> INFO: task pool-geoclue:84396 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:pool-geoclue    state:D stack:0     pid:84396 tgid:2325  ppid:1
+>    flags:0x00000002
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  netlink_dump+0x1c4/0x3f0
+>  __netlink_dump_start+0x2b3/0x340
+>  rtnetlink_rcv_msg+0x469/0x4a0
+>  netlink_rcv_skb+0xed/0x120
+>  netlink_unicast+0x2ce/0x3f0
+>  netlink_sendmsg+0x39c/0x450
+>  __sys_sendto+0x2c8/0x350
+>  __x64_sys_sendto+0x26/0x30
+>  do_syscall_64+0x92/0x170
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> RIP: 0033:0x7ad712b2c0e4
+> RSP: 002b:00007ad6e7dfdf40 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ad712b2c0e4
+> RDX: 0000000000000014 RSI: 00007ad6e7dff070 RDI: 000000000000000b
+> RBP: 00007ad6e7dfdf80 R08: 00007ad6e7dff014 R09: 000000000000000c
+> R10: 0000000000000000 R11: 0000000000000293 R12: 000000000000000b
+> R13: 0000000000000010 R14: 00007ad6e7dff030 R15: 00000000d3fb1bea
+>  </TASK>
+> INFO: task Qt bearer threa:4002 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:Qt bearer threa state:D stack:0     pid:4002  tgid:3506
+> ppid:3034   flags:0x00000002
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  netlink_dump+0x1c4/0x3f0
+>  __netlink_dump_start+0x2b3/0x340
+>  rtnetlink_rcv_msg+0x469/0x4a0
+>  netlink_rcv_skb+0xed/0x120
+>  netlink_unicast+0x2ce/0x3f0
+>  netlink_sendmsg+0x39c/0x450
+>  __sys_sendto+0x2c8/0x350
+>  __x64_sys_sendto+0x26/0x30
+>  do_syscall_64+0x92/0x170
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> RIP: 0033:0x76f3c692beea
+> RSP: 002b:000076f3a51fecb0 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 000076f3c692beea
+> RDX: 0000000000000020 RSI: 000076f3a51fed60 RDI: 0000000000000023
+> RBP: 000076f3a51fece0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 000076f3a51fee38
+> R13: 000076f378026b30 R14: 000076f3a51fed30 R15: 000076f378026b48
+>  </TASK>
+> INFO: task gnome-software:3529 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:gnome-software  state:D stack:0     pid:3529  tgid:3529
+> ppid:3034   flags:0x00000002
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  netlink_dump+0x1c4/0x3f0
+>  __netlink_dump_start+0x2b3/0x340
+>  rtnetlink_rcv_msg+0x469/0x4a0
+>  netlink_rcv_skb+0xed/0x120
+>  netlink_unicast+0x2ce/0x3f0
+>  netlink_sendmsg+0x39c/0x450
+>  __sys_sendto+0x2c8/0x350
+>  __x64_sys_sendto+0x26/0x30
+>  do_syscall_64+0x92/0x170
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> RIP: 0033:0x7d6be892beea
+> RSP: 002b:00007ffd94e01560 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007d6be892beea
+> RDX: 0000000000000014 RSI: 00007ffd94e015f0 RDI: 000000000000000d
+> RBP: 00007ffd94e01590 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000004000 R11: 0000000000000246 R12: 00007ffd94e015f0
+> R13: 0000000000000014 R14: 0000000000000000 R15: 0000000000000000
+>  </TASK>
+> INFO: task Qt bearer threa:3960 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:Qt bearer threa state:D stack:0     pid:3960  tgid:3550
+> ppid:3034   flags:0x00000002
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  netlink_dump+0x1c4/0x3f0
+>  __netlink_dump_start+0x2b3/0x340
+>  rtnetlink_rcv_msg+0x469/0x4a0
+>  netlink_rcv_skb+0xed/0x120
+>  netlink_unicast+0x2ce/0x3f0
+>  netlink_sendmsg+0x39c/0x450
+>  __sys_sendto+0x2c8/0x350
+>  __x64_sys_sendto+0x26/0x30
+>  do_syscall_64+0x92/0x170
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> RIP: 0033:0x777a42b2beea
+> RSP: 002b:0000777a2abfecf0 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 0000777a42b2beea
+> RDX: 0000000000000020 RSI: 0000777a2abfeda0 RDI: 000000000000001d
+> RBP: 0000777a2abfed20 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000777a2abfee78
+> R13: 0000777a080285b0 R14: 0000777a2abfed70 R15: 0000777a080285c8
+>  </TASK>
+> INFO: task xdg-desktop-por:3821 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:xdg-desktop-por state:D stack:0     pid:3821  tgid:3821
+> ppid:2776   flags:0x00000002
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  netlink_dump+0x1c4/0x3f0
+>  __netlink_dump_start+0x2b3/0x340
+>  rtnetlink_rcv_msg+0x469/0x4a0
+>  netlink_rcv_skb+0xed/0x120
+>  netlink_unicast+0x2ce/0x3f0
+>  netlink_sendmsg+0x39c/0x450
+>  __sys_sendto+0x2c8/0x350
+>  __x64_sys_sendto+0x26/0x30
+>  do_syscall_64+0x92/0x170
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> RIP: 0033:0x79d76612beea
+> RSP: 002b:00007ffd480942a0 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 000079d76612beea
+> RDX: 0000000000000014 RSI: 00007ffd48094330 RDI: 0000000000000008
+> RBP: 00007ffd480942d0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000004000 R11: 0000000000000246 R12: 00007ffd48094330
+> R13: 0000000000000014 R14: 0000000000000000 R15: 0000000000000000
+>  </TASK>
+> INFO: task DNS Res~ver #11:25588 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:DNS Res~ver #11 state:D stack:0     pid:25588 tgid:4934
+> ppid:3070   flags:0x00000002
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  netlink_dump+0x1c4/0x3f0
+>  __netlink_dump_start+0x2b3/0x340
+>  rtnetlink_rcv_msg+0x469/0x4a0
+>  netlink_rcv_skb+0xed/0x120
+>  netlink_unicast+0x2ce/0x3f0
+>  netlink_sendmsg+0x39c/0x450
+>  __sys_sendto+0x2c8/0x350
+>  __x64_sys_sendto+0x26/0x30
+>  do_syscall_64+0x92/0x170
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> RIP: 0033:0x72d65892c0e4
+> RSP: 002b:000072d649cbb880 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 000072d65892c0e4
+> RDX: 0000000000000014 RSI: 000072d649cbc9b0 RDI: 0000000000000053
+> RBP: 000072d649cbb8c0 R08: 000072d649cbc954 R09: 000000000000000c
+> R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000053
+> R13: 0000000000000010 R14: 000072d649cbc970 R15: 00000000b48fd654
+>  </TASK>
+> INFO: task kworker/u88:2:31385 blocked for more than 120 seconds.
+>       Not tainted 6.9.0-rc2 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:kworker/u88:2   state:D stack:0     pid:31385 tgid:31385 ppid:2
+>    flags:0x00004000
+> Workqueue: ipv6_addrconf addrconf_verify_work
+> Call Trace:
+>  <TASK>
+>  __schedule+0x5dd/0x1380
+>  schedule+0x6e/0xf0
+>  schedule_preempt_disabled+0x15/0x20
+>  __mutex_lock+0x2a0/0x750
+>  addrconf_verify_work+0x20/0x30
+>  process_scheduled_works+0x1f4/0x450
+>  worker_thread+0x349/0x5e0
+>  kthread+0x147/0x160
+>  ret_from_fork+0x34/0x40
+>  ret_from_fork_asm+0x11/0x20
+>  </TASK>
 
