@@ -1,216 +1,113 @@
-Return-Path: <netdev+bounces-85415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74B6989AB1F
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 15:48:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B2389AB46
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 16:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0EDE281E4B
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 13:48:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C23CF281582
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 14:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953E137141;
-	Sat,  6 Apr 2024 13:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C71376E0;
+	Sat,  6 Apr 2024 14:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="qIxuUX0v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QdjkBhQ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836F236AF2
-	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 13:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1F636120
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 14:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712411314; cv=none; b=Xf8/GcCohuTWow0y3hFTfoMGhSWTFS5nX36bpDFGlWYRN9NuAHy48EEVsuKtqB5JdsRKKDUPGtuQt0mUf6aTG4urI0hBHpOlafWNX3jrw9/6Hw9XLTVKK9FsRrhNAjtNWGdqlwwyq6ul+sh6mMga5MsjHH5xqANGoKNEik+Gc3A=
+	t=1712412471; cv=none; b=k4SwmM+lZAnqPBwJI3NFUnqfoEosR4MMYpG9gC6ehwcPdVIF5sP26HVflV/WgbI8N5Is4PANKL5uJaB/3Krylp4jUCOebwgED0lc3gqVDfYAfPM7pYCi9qFa13x1AEBN6Ne1rzXJ2uZeD4sHxWe9Hj2tzrnf91WlWUQnfMO3cpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712411314; c=relaxed/simple;
-	bh=zgCM8NsnNaZ0DBEpzMiWhN+mogYlvXld9lo/9ByiQ9g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EQWDh7m2ytD4RdSGQ7ZzqzlpmyBoEEhXwe/zmUV68MurVUO3ciEslNlwByev7X8dyxlTNUVXlNWC4w7mwWO6nQnBlnen3/Z3+6G6wbRYIvJTtJ2lnOq369weqGucllaJWu3XNWPNTibzy6WPOwBsRc7T4Miz7hRveGbAD6nHpdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=qIxuUX0v; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-ddaad2aeab1so2879252276.3
-        for <netdev@vger.kernel.org>; Sat, 06 Apr 2024 06:48:32 -0700 (PDT)
+	s=arc-20240116; t=1712412471; c=relaxed/simple;
+	bh=vTu8ynjvbqT7hKf43CpGpUyJAVQMCSSWuQOXjNd26Z8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=QFgQlwZFg0y4U1wC90RF1QaTujL+ldP46Wr58SHzF2H2gnetqMBv+/U7Kj4LPzO7wZG174MVd1VYA6fhbxNSSX47d6uwyyW7aDZFx62POiu4evxP8/wGERoXlPzvvknpRMUHmHHHu9Rep1yjWgGnYcQBjST1MQ2zERg0vvBr6GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QdjkBhQ7; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6992f97ec8eso18758646d6.3
+        for <netdev@vger.kernel.org>; Sat, 06 Apr 2024 07:07:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1712411311; x=1713016111; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1712412469; x=1713017269; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zgCM8NsnNaZ0DBEpzMiWhN+mogYlvXld9lo/9ByiQ9g=;
-        b=qIxuUX0vxIirojXBrFBA5ML7Ab3cw1UvH2auq9Bmw3UASW699pIeKd7Z2wtaSyCAzp
-         yMqxK4gnmKjxLq2Gor6ktB52b2BOFsLSbbWf8Ag8SfAughqKRpq2yBiR5G3DENig6lVI
-         blioGRu+8u8WkJhrewZFvdAUQxWy6I6s2KfiPokEZWIA4mhi+L1hqESLqDIoD4v6ZHeE
-         1mDq5bCzBL4W5DM4WRHD/et+ARGgcUS9fWnyBYLKzJ9FjdNNLLw+xwSMi1zfU7VAAzKx
-         l6+qZR7fZTzwxMvwMls+68E3dXcP4jgEjoknH1dodeBCO0WyTuncj1Xo2J6ObMBwM99m
-         fmdQ==
+        bh=p7qZdfgYqcfCxCVyJ4WnesTq+IsTCkbmkka9C3rPW0Q=;
+        b=QdjkBhQ7OFtE6TXf4R1Lv4IslMqG6tipch67jShso/8/vtjNIsBXeeeFyw9qyl/qtc
+         o/XmHAjr5b2dUS2Th3M6R5gZVerESujt5St3ywH/ZfpDThLPWWJLM7m5tVGKslIFiyTk
+         zXDY4pQu1m9oYm1px9pkfkypLFAkoeGGPBlRtbCHMuiHLCTY7d07XszFeJp09kELlVyS
+         bo0ymOzWAYZRwic2fC/sG3nyaRa8Jd1T95ckW9qjzh/2sEPEb7dFxoNpMWCXeef6nvj7
+         Lb4AsUjzrL+JFB+a9JDv1CviWvSYyB38WfYFe0jU/leeJ5cZ6ApPIKJCqtjy01HSiujR
+         qwMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712411311; x=1713016111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zgCM8NsnNaZ0DBEpzMiWhN+mogYlvXld9lo/9ByiQ9g=;
-        b=gBngdvG2BPVc5gNf7uV0e186ekgmNyH5jfOuyrwRQsOryOXZF4egg9o8Pq9xqSkkrp
-         tWfD+QKcG99mUQIYFYWk4VsN/brCH5JRT7HfeBgc19lYhnPua5BMIgRI8i+/d3A6Tim1
-         kC16JzN6YxzajE4UhWWz59AAAqs9x/1lFZxb/NrXU8cPZf3h5sl7yZQIl5dhU3mA6U8d
-         iQWsgypQAUso5tHyCYZceGAfxgPzyH6NIiltjHDYVjuHzN2/l3V+Qd4DFLZB5YcyuY3h
-         eJ7gyTbGSw60Vfh2O6jIQ2qZNbIobqN8+24ZTI+qs6kVPIEPCcHwH1HaoAIQVwLtYXPW
-         hXTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXH2lOEkedidrLADyy+r7TCsPpo5lnXL5Y1WmFly7ixDlgrJuKUqb1fbqwQDorxKy5IgQS952oNpoKIFD5+Eh0g045ncBg+
-X-Gm-Message-State: AOJu0YxjpZ7rveQjXDfjU15tKBK1lUEGlsjgOUdGJZ/q1BJM3ro/WkSX
-	v9ocPYtULiUmCI8/vVBk1DyqyGAs5PIvyF6k06mMVickCmYaztxaORHa/uS83xZL5sCGFbSpQZD
-	Tatgtq6m2nzTkug0kl7Hu4Rw/QDDqwJIL6IcnuhoOrqsyeO9JEg==
-X-Google-Smtp-Source: AGHT+IFMhb4Yp93mgzeuaou/4r1uy4LKjS7mUA920hU1pleLRumKEu7n3e/8ii8Dy8P7FjD/KDxjElSNN/7nt2xx/MM=
-X-Received: by 2002:a5b:4ca:0:b0:dcd:19ba:10df with SMTP id
- u10-20020a5b04ca000000b00dcd19ba10dfmr3396208ybp.56.1712411311307; Sat, 06
- Apr 2024 06:48:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712412469; x=1713017269;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=p7qZdfgYqcfCxCVyJ4WnesTq+IsTCkbmkka9C3rPW0Q=;
+        b=JAGMjOynblZrBvDgMIEI9fyDARJL8sUsCQkhQA3TBLgpLsEbFWFfa/nFm5FPLZs/YW
+         FCfRWhBOYToLhFOc7braNTQoKfKSlSAVxiXO8UL47H4Wr7gpkoLTK/kGIlAFh9mrWnrx
+         dF6tFQ0Id7grPxlPV/ShC1gOTjovkn4Fmw2Cv34w/BeYm4MBkt63c1LgidUH2OOUW+en
+         PUqZaE9oii4dAn50MQBKZbBGGPO93lQ8RN6++aLIWxWOgcm0EcykgSdTHYoIurO+pPiw
+         2dSAAdN9u6QL0QfdMNudTpGcQ0Y0QUdulOIMb00Hf6pE5Txx0fTTItQlhJZtoMr3fwAz
+         CuOw==
+X-Gm-Message-State: AOJu0YycWokexfOSacE3Vc16NwyciDR10wI0WeYQ5IRdbzuOsupkm+Go
+	yGeFke709+raGlt72nDl8Ifx/X+w2mVyErozCz94wfmwM2Rxdkx6
+X-Google-Smtp-Source: AGHT+IFuwX2F0g2/eyVIQLEf8RmccqVh1c67Eix2KovhNtopilO8aoDBoD2cRFlhAucCGFdlupr0AQ==
+X-Received: by 2002:ad4:5e8b:0:b0:699:28ad:8c3f with SMTP id jl11-20020ad45e8b000000b0069928ad8c3fmr4661074qvb.58.1712412469326;
+        Sat, 06 Apr 2024 07:07:49 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id pr6-20020a056214140600b006986d9c6b6asm1459018qvb.112.2024.04.06.07.07.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Apr 2024 07:07:47 -0700 (PDT)
+Date: Sat, 06 Apr 2024 10:07:47 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>, 
+ syzbot <syzkaller@googlegroups.com>, 
+ Kees Cook <keescook@chromium.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Message-ID: <66115733b397a_16bd4c29423@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240405114939.188821-1-edumazet@google.com>
+References: <20240405114939.188821-1-edumazet@google.com>
+Subject: Re: [PATCH net-next] af_packet: avoid a false positive warning in
+ packet_setsockopt()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240405102313.GA310894@kernel.org> <CAM0EoMnEWbLJXNChpDrnKSsu6gXjaPwCX9jRqKv0UagPUuo1tA@mail.gmail.com>
- <b32bab8ee1468647b4b9d93407cf8287bcffc67f.camel@redhat.com>
-In-Reply-To: <b32bab8ee1468647b4b9d93407cf8287bcffc67f.camel@redhat.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 6 Apr 2024 09:48:19 -0400
-Message-ID: <CAM0EoMkeErAmjksQKqOjL6uz00XXahvbgoHJWpCRjR-S6CkSGA@mail.gmail.com>
-Subject: Re: [RFC] HW TX Rate Limiting Driver API
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	Madhu Chittim <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>, 
-	John Fastabend <john.fastabend@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 5, 2024 at 1:06=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On Fri, 2024-04-05 at 09:33 -0400, Jamal Hadi Salim wrote:
-> > On Fri, Apr 5, 2024 at 6:25=E2=80=AFAM Simon Horman <horms@kernel.org> =
-wrote:
-> > > This is follow-up to the ongoing discussion started by Intel to exten=
-d the
-> > > support for TX shaping H/W offload [1].
-> > >
-> > > The goal is allowing the user-space to configure TX shaping offload o=
-n a
-> > > per-queue basis with min guaranteed B/W, max B/W limit and burst size=
- on a
-> > > VF device.
-> > >
-> > >
-> > > In the past few months several different solutions were attempted and
-> > > discussed, without finding a perfect fit:
-> > >
-> > > - devlink_rate APIs are not appropriate for to control TX shaping on =
-netdevs
-> > > - No existing TC qdisc offload covers the required feature set
-> > > - HTB does not allow direct queue configuration
-> > > - MQPRIO imposes constraint on the maximum number of TX queues
-> > > - TBF does not support max B/W limit
-> > > - ndo_set_tx_maxrate() only controls the max B/W limit
-> > >
-> > > A new H/W offload API is needed, but offload API proliferation should=
- be
-> > > avoided.
-> > >
-> > > The following proposal intends to cover the above specified requireme=
-nt and
-> > > provide a possible base to unify all the shaping offload APIs mention=
-ed above.
-> > >
-> > > The following only defines the in-kernel interface between the core a=
-nd
-> > > drivers. The intention is to expose the feature to user-space via Net=
-link.
-> > > Hopefully the latter part should be straight-forward after agreement
-> > > on the in-kernel interface.
-> > >
-> > > All feedback and comment is more then welcome!
-> > >
-> > > [1] https://lore.kernel.org/netdev/20230808015734.1060525-1-wenjun1.w=
-u@intel.com/
-> > >
-> >
-> > My 2 cents:
-> > I did peruse the lore quoted thread but i am likely to have missed some=
-thing.
-> > It sounds like the requirement is for egress-from-host (which to a
-> > device internal looks like ingress-from-host on the device). Doesn't
-> > existing HTB offload already support this? I didnt see this being
-> > discussed in the thread.
->
-> Yes, HTB has been one of the possible option discussed, but not in that
-> thread, let me find the reference:
->
-> https://lore.kernel.org/netdev/131da9645be5ef6ea584da27ecde795c52dfbb00.c=
-amel@redhat.com/
->
-> it turns out that HTB does not allow configuring TX shaping on a per
-> (existing, direct) queue basis. It could, with some small functional
-> changes, but then we will be in the suboptimal scenario I mentioned in
-> my previous email: quite similar to creating a new offload type,
-> and will not be 'future proof'.
->
-> > Also, IIUC, there is no hierarchy
-> > requirement. That is something you can teach HTB but there's probably
-> > something i missed because i didnt understand the context of "HTB does
-> > not allow direct queue configuration". If HTB is confusing from a
-> > config pov then it seems what Paolo was describing in the thread on
-> > TBF is a reasonable approach too. I couldnt grok why that TBF
-> > extension for max bw was considered a bad idea.
->
-> TBF too was also in the category 'near enough but not 100% fit'
->
-> > On config:
-> > Could we not introduce skip_sw/hw semantics for qdiscs? IOW, skip_sw
-> > means the config is only subjected to hw and you have DIRECT
-> > semantics, etc.
-> > I understand the mlnx implementation of HTB does a lot of things in
-> > the driver but the one nice thing they had was ability to use classid
-> > X:Y to select a egress h/w queue. The driver resolution of all the
-> > hierarchy is not needed at all here if i understood the requirement
-> > above.
-> > You still need to have a classifier in s/w (which could be attached to
-> > clsact egress) to select the queue. That is something the mlnx
-> > implementation allowed. So there is no "double queueing"
->
-> AFAICS the current status of qdisc H/W offload implementation is a bit
-> mixed-up. e.g. HTB requires explicit syntax on the command line to
-> enable H/W offload, TBF doesn't.
->
-> H/W offload enabled on MQPRIO implies skipping the software path, while
-> for HTB and TBF doesn't.
->
-> > If this is about totally bypassing s/w config then its a different ball=
-game..
->
-> Yes, this does not have s/w counter-part. It limits itself to
-> configure/expose H/W features.
->
+Eric Dumazet wrote:
+> Although the code is correct, the following line
+> 
+> 	copy_from_sockptr(&req_u.req, optval, len));
+> 
+> triggers this warning :
+> 
+> memcpy: detected field-spanning write (size 28) of single field "dst" at include/linux/sockptr.h:49 (size 16)
+> 
+> Refactor the code to be more explicit.
+> 
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 
-I think this changes the dynamics altogether. Would IDPF[1] be a fit for th=
-is?
-
-> My take is that configuring the shapers on a queue/device/queue
-> group/vfs group basis, the admin is enforcing shared resources
-> reservation: we don't strictly need a software counter-part.
->
-
-I am assuming then, if the hw allows it one could run offloaded TC/htb
-on the queue/device/queue
-
-cheers,
-jamal
-
-[1] https://netdevconf.info/0x16/sessions/workshop/infrastructure-datapath-=
-functionidpf-workshop.html
-> Thanks for the feedback!
->
-> Paolo
->
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
