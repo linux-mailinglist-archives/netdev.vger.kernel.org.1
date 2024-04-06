@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-85459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 277E789ACCF
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 22:14:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B96F89ACD0
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 22:14:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8B041F21B11
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 20:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B722C2825C5
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 20:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9644EB44;
-	Sat,  6 Apr 2024 20:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B017D4F1E2;
+	Sat,  6 Apr 2024 20:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P+cQMZJF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JmiLBtFz"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAAB4EB43
-	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 20:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CBC4EB55
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 20:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712434449; cv=none; b=Zo8V7FuIy7Fz7sNyfZHcURZe5KeBoI1MMzMz/wLcSoCRJQsGaERVAWnzbffc2cI7f/T7Ia3nm37OLa5vQYxdJLtWMnyZ6NEpN4yWnw3GPdjQg2B+56F8PtmXDTNmRK8tgIS7vpFWMRAjU7uGhH9VKla5AZg6YdTwOisJQ+z+1WA=
+	t=1712434451; cv=none; b=sQdqD6KefBjoMG1tRW7FFhCvgfIduZCXMotcOsKwfqiijef7OHT8o6j9g19mRViXNpThSrXIANDJ/EGhWVcAhL+o8AblcvJhxo6C9NIifgwSYM3xQRk9mYkLiq9S4VcwIdXSwPSx+dhiRp9DFz0mnCFIjW/9lC/iPPVDyw9Lq0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712434449; c=relaxed/simple;
-	bh=p7dt1sYAFleXe7WJbo7I++W2evAAUObqgPZGrVymRS0=;
+	s=arc-20240116; t=1712434451; c=relaxed/simple;
+	bh=5c/LeEUlIOtE+8gy1/iUzzqk5iYILTlD+nwjHKT76NQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GAJbgCQND+B3Ed5sv8U8EKR24Vmo4e2ObLqZfKt2vCwZxpasW1sidEbGFcVCiBDZWLH78jRNJ0J5KQ8l8LQiDe6x2FJcgTP3EL2eqx0e1B5mq1haHea/41aManx0y9HUY4QhNiNJFgJA7kZB//5n2fS4hW70ziSUw8yo/AyXb18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P+cQMZJF; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=qOgwr8VRip90Qmj4Dv7iN6UhmvpLm1D5GhIAKQ3aEIblj67ZaulEfS9U3IKBeU8Ru2fUVcZWJuU7vKWD3CqnQlHwezDg9t2EsoJbJVdxJRsGwCjNWLiRJPoHGcwYJfrLttbByAqvnWn9xXFmKIBRAomOa4tqsD7OjHSzU5tfIZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JmiLBtFz; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,19 +36,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=HzFEEq0e1hj2eRrvH4HUFfwK1pjYzpPU5ffG+djjhUA=; b=P+
-	cQMZJFnHw4+Gvw0/fMXkKT2JUpFP1vfSjVcrb0PHTLPJE7cH5L8EGsoyjLrFpycztViDxSZsPdC7C
-	NAZUBLi2QASZFs9wDIVQYRjSXkWugcLfyj20FESp0K2Y/HW7aAFBkKvZqnhHYJ09UcjnlVpwCY0hY
-	QRp8tjbTDhiGj74=;
+	In-Reply-To:References; bh=uWtW/XSwpo6clFLMk/FD9MvkIl41Cc/iKiNTFPUgXss=; b=Jm
+	iLBtFzK06Jdwv6/oP1I7X8pS6QXkPABOV8FUB7DqT/d+pXtD5CQs1kWDiSNWwP8VYk4rkYv8rE5WC
+	s5CpOyqlWv82tCi7jzOS0fjEonNikDrRW5ih9nDYVdj8SkGNe3A2R2oRcOCC90HAyzWJPI3hZJEaC
+	ex1DhdscyHtp86U=;
 Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rtCQP-00COA7-1c; Sat, 06 Apr 2024 22:14:05 +0200
+	id 1rtCQR-00COA7-Mz; Sat, 06 Apr 2024 22:14:07 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Sat, 06 Apr 2024 15:13:30 -0500
-Subject: [PATCH net-next v4 3/8] net: dsa: move call to driver port_setup
- after creation of netdev
+Date: Sat, 06 Apr 2024 15:13:31 -0500
+Subject: [PATCH net-next v4 4/8] net: Add helpers for netdev LEDs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-3-eb97665e7f96@lunn.ch>
+Message-Id: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-4-eb97665e7f96@lunn.ch>
 References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
 In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
 To: Florian Fainelli <f.fainelli@gmail.com>, 
@@ -66,196 +65,332 @@ To: Florian Fainelli <f.fainelli@gmail.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
  Russell King <linux@armlinux.org.uk>, 
  Gregory Clement <gregory.clement@bootlin.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4470; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=BGV2AxUQLBPNtICKS0EgkQ3O7rWT8QxXcz7h1ZGAEIs=;
- b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBmEaz/BS5RJTeqRhCZ0GsQ+8sYy9CZ8NUnudeLV
- QRgR9nrLgeJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZhGs/wAKCRDmvw3LpmlM
- hKANEACkl73pNnvroDWqYtroWDTw/nFp7I3HWhEHhu295RAOs8OkPvhXgNFAkH5uI5h2QgLhWiv
- waADTLNMqgLU6ejQ8kyZT+XGDsRCRecv/HGhZLLjZFk2SmPOoShkhlconxh7vNDP+YM7T7fSnJR
- +LE7g6Jyuqx/1lGiXLmT2jNuoJfhXmzb8tDN7b+vXig4lq6+noRgdwyBlYY11l/ApGNaL2TwhHD
- VkIkqpjaahyVNFyGw2z8YV1/WtitVplt4qpR9VEWdMQKxGG59UaOhI+WCFH1JdkWDcFsilyCch2
- 4Uotn5Lt9ywwf34wEx4XmxG+xkXDDU9I25fbf5NhbdTHRQ1ctZnpPYO6PmtXa/SHiIAE+RMHJq1
- 8srrS0p8Sb95RXELQPwx5VxmGZrwapiiAhR9YzZOHlamekSl/iNmfOAfRgqtL+h9YFj/cGhTE2c
- NVp6lMe0SVKJG+rSjVVTmskwzo5tUB5nX10pszQ6WyBDsUxbG2D3MhH91Jn3mOQwuYxdszrgEce
- fSchPNpte+yUV5iyWzEZbZK4iSfrIKzfROfKNGlD6J30BJR3XEtZ61twKIGJpqpEhNqyFXjZnXS
- PZ6L6Dzj0s5X4MlzDhC7rqL4ioTTyb8IZzZ3CZCiMmcAKosvmojGDmZF8GWUOZALi2Yulz0tIlB
- ti/OOXIgFzpdyFg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9120; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=5c/LeEUlIOtE+8gy1/iUzzqk5iYILTlD+nwjHKT76NQ=;
+ b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBmEaz/uKh+V3LO7v4F+8eqm92GE9i0a8jJVrCia
+ 1aDL3QhpHKJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZhGs/wAKCRDmvw3LpmlM
+ hKw8EACno28OT1ZiOqNB04JGNShM48rtF/p2e/vH0uKBYCs3GD0ZFOqDrWt9nvjIugR946b7g2/
+ /sphgunymLsGD1dbxbZfILAU4ntA9yVvNc67Z1JrWrkJzYrYfSQ9nryEVJ81ZAHAILIxYaj8D2x
+ 4qO4nAyJXwfYJtepRhCZaS/S0GxpN/NjXfWA0X1iB+fJsoyKXByGR1ljQOsIq1VMazFTy77NKxl
+ YzGwTuyK5vyj0YuyVQxJbrmGdCoJ7pagtyR0Mi2gi7CIylk0L1ynbq5hRkpA2r2EHPIJeGXasGM
+ t/nf0g7oNm9q72Ih9vXwnjmCuTHnCUazsgLKjJAt4MknsRU05BxdysERAoEQ8dQ9Qj6usG23kwY
+ wOM2/pU/CirFXm211ctI/GNz7Iq/H8E7cfI1M+Ky2CG0qiyXPB0Z+Y5blMVgKOrYA2qLFEn2OUB
+ gLwJExmd5339e6CK42zYIxDGmouszBdVqSqObKAwExforZ94DxrG2gZ/K80FMyQ9cZR6QmhKxml
+ Sbgtz0X+uc7T8PUGuCqDuaPFHpchMM/u4c6SS7U417Vb/1oP70pIx+I5BPHeyYBYTWdESC3itgZ
+ wrcVL63tjMKnhzLsL3zzHNLs/LAYCoz2vgaZL0jivrHsCCC3DrI4sK4M7ZT2HDDyW0paaxmGG2H
+ WWtZc6aY1jeLipg==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Add a set of helpers for parsing the standard device tree properties
+for LEDs as part of an ethernet device, and registering them with the
+LED subsystem. This code can be used by any sort of netdev driver,
+including plain MAC, DSA switches or pure switchdev switch driver.
 
-The driver-facing method port_setup() is a good place to add the LEDs of
-a port to the netdev representing the port. However, when port_setup()
-is called in dsa_port_devlink_setup(), the netdev does not exist
-yet. That only happens in dsa_user_create(), which is later in
-dsa_port_setup().
+The MAC driver should call netdev_leds_teardown() before destroying
+the netdev to ensure the ops cannot be called after unbinding the
+device.
 
-Move the call to port_setup() out of dsa_port_devlink_setup() and to
-the end of dsa_port_setup() where the netdev will exist. For the other
-port types, the call to port_setup() and port_teardown() remains where
-it was before (functionally speaking), but now it needs to be open-coded
-in their respective setup/teardown logic.
-
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- net/dsa/devlink.c | 17 +---------------
- net/dsa/dsa.c     | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 58 insertions(+), 18 deletions(-)
+ include/net/netdev_leds.h |  50 ++++++++++++
+ net/Kconfig               |  11 +++
+ net/core/Makefile         |   1 +
+ net/core/netdev-leds.c    | 199 ++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 261 insertions(+)
 
-diff --git a/net/dsa/devlink.c b/net/dsa/devlink.c
-index 431bf52290a1..9c3dc6319269 100644
---- a/net/dsa/devlink.c
-+++ b/net/dsa/devlink.c
-@@ -294,20 +294,12 @@ int dsa_port_devlink_setup(struct dsa_port *dp)
- 	struct dsa_switch_tree *dst = dp->ds->dst;
- 	struct devlink_port_attrs attrs = {};
- 	struct devlink *dl = dp->ds->devlink;
--	struct dsa_switch *ds = dp->ds;
- 	const unsigned char *id;
- 	unsigned char len;
--	int err;
- 
- 	memset(dlp, 0, sizeof(*dlp));
- 	devlink_port_init(dl, dlp);
- 
--	if (ds->ops->port_setup) {
--		err = ds->ops->port_setup(ds, dp->index);
--		if (err)
--			return err;
--	}
--
- 	id = (const unsigned char *)&dst->index;
- 	len = sizeof(dst->index);
- 
-@@ -331,14 +323,7 @@ int dsa_port_devlink_setup(struct dsa_port *dp)
- 	}
- 
- 	devlink_port_attrs_set(dlp, &attrs);
--	err = devlink_port_register(dl, dlp, dp->index);
--	if (err) {
--		if (ds->ops->port_teardown)
--			ds->ops->port_teardown(ds, dp->index);
--		return err;
--	}
--
--	return 0;
-+	return devlink_port_register(dl, dlp, dp->index);
- }
- 
- void dsa_port_devlink_teardown(struct dsa_port *dp)
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 5d65da9a1971..d8aa869e17ba 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -462,6 +462,15 @@ static void dsa_tree_teardown_cpu_ports(struct dsa_switch_tree *dst)
- 
- static int dsa_unused_port_setup(struct dsa_port *dp)
- {
-+	struct dsa_switch *ds = dp->ds;
-+	int err;
+diff --git a/include/net/netdev_leds.h b/include/net/netdev_leds.h
+new file mode 100644
+index 000000000000..30053891561c
+--- /dev/null
++++ b/include/net/netdev_leds.h
+@@ -0,0 +1,50 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Helpers used for creating and managing LEDs on a netdev MAC
++ * driver.
++ */
 +
-+	if (ds->ops->port_setup) {
-+		err = ds->ops->port_setup(ds, dp->index);
-+		if (err)
-+			return err;
-+	}
++#ifndef _NET_NETDEV_LEDS_H
++#define _NET_NETDEV_LEDS_H
 +
- 	dsa_port_disable(dp);
- 
- 	return 0;
-@@ -469,6 +478,10 @@ static int dsa_unused_port_setup(struct dsa_port *dp)
- 
- static void dsa_unused_port_teardown(struct dsa_port *dp)
- {
-+	struct dsa_switch *ds = dp->ds;
++#include <linux/leds.h>
++#include <linux/types.h>
 +
-+	if (ds->ops->port_teardown)
-+		ds->ops->port_teardown(ds, dp->index);
- }
- 
- static int dsa_shared_port_setup(struct dsa_port *dp)
-@@ -490,8 +503,23 @@ static int dsa_shared_port_setup(struct dsa_port *dp)
- 			 dp->index);
- 	}
- 
-+	if (ds->ops->port_setup) {
-+		err = ds->ops->port_setup(ds, dp->index);
-+		if (err)
-+			goto unregister_link;
-+	}
++struct net_device;
++struct list_head;
 +
- 	err = dsa_port_enable(dp, NULL);
--	if (err && link_registered)
-+	if (err)
-+		goto port_teardown;
++struct netdev_leds_ops {
++	int (*brightness_set)(struct net_device *ndev, u8 led,
++			      enum led_brightness brightness);
++	int (*blink_set)(struct net_device *ndev, u8 led,
++			 unsigned long *delay_on, unsigned long *delay_off);
++	int (*hw_control_is_supported)(struct net_device *ndev, u8 led,
++				       unsigned long flags);
++	int (*hw_control_set)(struct net_device *ndev, u8 led,
++			      unsigned long flags);
++	int (*hw_control_get)(struct net_device *ndev, u8 led,
++			      unsigned long *flags);
++};
 +
++#ifdef CONFIG_NETDEV_LEDS
++int netdev_leds_setup(struct net_device *ndev, struct device_node *np,
++		      struct list_head *list, struct netdev_leds_ops *ops,
++		      int max_leds);
++
++void netdev_leds_teardown(struct list_head *list);
++
++#else
++static inline int netdev_leds_setup(struct net_device *ndev,
++				    struct device_node *np,
++				    struct list_head *list,
++				    struct netdev_leds_ops *ops)
++{
 +	return 0;
++}
 +
-+port_teardown:
-+	if (ds->ops->port_teardown)
-+		ds->ops->port_teardown(ds, dp->index);
-+unregister_link:
-+	if (link_registered)
- 		dsa_shared_port_link_unregister_of(dp);
- 
- 	return err;
-@@ -499,23 +527,50 @@ static int dsa_shared_port_setup(struct dsa_port *dp)
- 
- static void dsa_shared_port_teardown(struct dsa_port *dp)
- {
-+	struct dsa_switch *ds = dp->ds;
++static inline void netdev_leds_teardown(struct list_head *list)
++{
++}
++#endif /* CONFIG_NETDEV_LEDS */
 +
- 	dsa_port_disable(dp);
-+	if (ds->ops->port_teardown)
-+		ds->ops->port_teardown(ds, dp->index);
- 	if (dp->dn)
- 		dsa_shared_port_link_unregister_of(dp);
- }
++#endif /* _NET_PORT_LEDS_H */
+diff --git a/net/Kconfig b/net/Kconfig
+index 3e57ccf0da27..5301b95744cd 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -516,4 +516,15 @@ config NET_TEST
  
- static int dsa_user_port_setup(struct dsa_port *dp)
- {
-+	struct dsa_switch *ds = dp->ds;
+ 	  If unsure, say N.
+ 
++config NETDEV_LEDS
++	bool "NETDEV helper code for MAC LEDs"
++	select LEDS_CLASS
++	select LEDS_TRIGGERS
++	select LEDS_TRIGGER_NETDEV
++	help
++	  NICs and switches often contain LED controllers. When the LEDs
++	  are part of the MAC, the MAC driver, aka netdev driver, should
++	  make the LEDs available. NETDEV_LEDS offers a small library
++	  of code to help MAC drivers do this.
++
+ endif   # if NET
+diff --git a/net/core/Makefile b/net/core/Makefile
+index 21d6fbc7e884..d04ce07541b5 100644
+--- a/net/core/Makefile
++++ b/net/core/Makefile
+@@ -42,3 +42,4 @@ obj-$(CONFIG_BPF_SYSCALL) += sock_map.o
+ obj-$(CONFIG_BPF_SYSCALL) += bpf_sk_storage.o
+ obj-$(CONFIG_OF)	+= of_net.o
+ obj-$(CONFIG_NET_TEST) += net_test.o
++obj-$(CONFIG_NETDEV_LEDS) += netdev-leds.o
+diff --git a/net/core/netdev-leds.c b/net/core/netdev-leds.c
+new file mode 100644
+index 000000000000..bea981ff42ea
+--- /dev/null
++++ b/net/core/netdev-leds.c
+@@ -0,0 +1,199 @@
++// SPDX-License-Identifier: GPL-2.0+
++
++#include <linux/device.h>
++#include <linux/err.h>
++#include <linux/leds.h>
++#include <linux/netdevice.h>
++#include <linux/of.h>
++#include <linux/slab.h>
++#include <net/netdev_leds.h>
++
++struct netdev_led {
++	struct list_head led_list;
++	struct led_classdev led_cdev;
++	struct netdev_leds_ops *ops;
++	struct net_device *ndev;
++	u8 index;
++};
++
++#define to_netdev_led(d) container_of(d, struct netdev_led, led_cdev)
++
++static int netdev_brightness_set(struct led_classdev *led_cdev,
++				 enum led_brightness value)
++{
++	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
++
++	return netdev_led->ops->brightness_set(netdev_led->ndev,
++					       netdev_led->index,
++					       value);
++}
++
++static int netdev_blink_set(struct led_classdev *led_cdev,
++			    unsigned long *delay_on, unsigned long *delay_off)
++{
++	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
++
++	return netdev_led->ops->blink_set(netdev_led->ndev,
++					  netdev_led->index,
++					  delay_on, delay_off);
++}
++
++static __maybe_unused int
++netdev_hw_control_is_supported(struct led_classdev *led_cdev,
++			       unsigned long flags)
++{
++	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
++
++	return netdev_led->ops->hw_control_is_supported(netdev_led->ndev,
++							netdev_led->index,
++							flags);
++}
++
++static __maybe_unused int netdev_hw_control_set(struct led_classdev *led_cdev,
++						unsigned long flags)
++{
++	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
++
++	return netdev_led->ops->hw_control_set(netdev_led->ndev,
++					       netdev_led->index,
++					       flags);
++}
++
++static __maybe_unused int netdev_hw_control_get(struct led_classdev *led_cdev,
++						unsigned long *flags)
++{
++	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
++
++	return netdev_led->ops->hw_control_get(netdev_led->ndev,
++					       netdev_led->index,
++					       flags);
++}
++
++static struct device *
++netdev_hw_control_get_device(struct led_classdev *led_cdev)
++{
++	struct netdev_led *netdev_led = to_netdev_led(led_cdev);
++
++	return &netdev_led->ndev->dev;
++}
++
++static int netdev_led_setup(struct net_device *ndev, struct device_node *led,
++			    struct list_head *list, struct netdev_leds_ops *ops,
++			    int max_leds)
++{
++	struct led_init_data init_data = {};
++	struct device *dev = &ndev->dev;
++	struct netdev_led *netdev_led;
++	struct led_classdev *cdev;
++	u32 index;
 +	int err;
 +
- 	of_get_mac_address(dp->dn, dp->mac);
- 
--	return dsa_user_create(dp);
-+	err = dsa_user_create(dp);
++	netdev_led = kzalloc(sizeof(*netdev_led), GFP_KERNEL);
++	if (!netdev_led)
++		return -ENOMEM;
++
++	netdev_led->ndev = ndev;
++	netdev_led->ops = ops;
++	cdev = &netdev_led->led_cdev;
++
++	err = of_property_read_u32(led, "reg", &index);
 +	if (err)
 +		return err;
 +
-+	if (ds->ops->port_setup) {
-+		err = ds->ops->port_setup(ds, dp->index);
-+		if (err)
-+			goto user_destroy;
-+	}
++	if (index >= max_leds)
++		return -EINVAL;
++
++	netdev_led->index = index;
++
++	if (ops->brightness_set)
++		cdev->brightness_set_blocking = netdev_brightness_set;
++	if (ops->blink_set)
++		cdev->blink_set = netdev_blink_set;
++#ifdef CONFIG_LEDS_TRIGGERS
++	if (ops->hw_control_is_supported)
++		cdev->hw_control_is_supported = netdev_hw_control_is_supported;
++	if (ops->hw_control_set)
++		cdev->hw_control_set = netdev_hw_control_set;
++	if (ops->hw_control_get)
++		cdev->hw_control_get = netdev_hw_control_get;
++	cdev->hw_control_trigger = "netdev";
++#endif
++	cdev->hw_control_get_device = netdev_hw_control_get_device;
++	cdev->max_brightness = 1;
++	init_data.fwnode = of_fwnode_handle(led);
++	init_data.devname_mandatory = true;
++
++	init_data.devicename = dev_name(dev);
++	err = led_classdev_register_ext(dev, cdev, &init_data);
++	if (err)
++		return err;
++
++	INIT_LIST_HEAD(&netdev_led->led_list);
++	list_add(&netdev_led->led_list, list);
 +
 +	return 0;
++}
 +
-+user_destroy:
-+	dsa_user_destroy(dp->user);
-+	dp->user = NULL;
-+	return err;
- }
- 
- static void dsa_user_port_teardown(struct dsa_port *dp)
- {
-+	struct dsa_switch *ds = dp->ds;
++/**
++ * netdev_leds_setup - Parse DT node and create LEDs for netdev
++ *
++ * @ndev: struct netdev for the MAC
++ * @np: ethernet-node in device tree
++ * @list: list to add LEDs to
++ * @ops: structure of ops to manipulate the LED.
++ * @max_leds: maximum number of LEDs support by netdev.
++ *
++ * Parse the device tree node, as described in
++ * ethernet-controller.yaml, and find any LEDs. For each LED found,
++ * ensure the reg value is less than max_leds, create an LED and
++ * register it with the LED subsystem. The LED will be added to the
++ * list, which should be unique to the netdev. The ops structure
++ * contains the callbacks needed to control the LEDs.
++ *
++ * Return 0 in success, otherwise an negative error code.
++ */
++int netdev_leds_setup(struct net_device *ndev, struct device_node *np,
++		      struct list_head *list, struct netdev_leds_ops *ops,
++		      int max_leds)
++{
++	struct device_node *leds, *led;
++	int err;
 +
- 	if (!dp->user)
- 		return;
- 
-+	if (ds->ops->port_teardown)
-+		ds->ops->port_teardown(ds, dp->index);
++	leds = of_get_child_by_name(np, "leds");
++	if (!leds)
++		return 0;
 +
- 	dsa_user_destroy(dp->user);
- 	dp->user = NULL;
- }
++	for_each_available_child_of_node(leds, led) {
++		err = netdev_led_setup(ndev, led, list, ops, max_leds);
++		if (err) {
++			of_node_put(leds);
++			of_node_put(led);
++			return err;
++		}
++	}
++	of_node_put(leds);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(netdev_leds_setup);
++
++/**
++ * netdev_leds_teardown - Remove LEDs for a netdev
++ *
++ * @list: list to add LEDs to teardown
++ *
++ * Unregister all LEDs from the given list of LEDS, freeing up any
++ * allocated memory.
++ */
++void netdev_leds_teardown(struct list_head *list)
++{
++	struct netdev_led *netdev_led;
++	struct led_classdev *cdev;
++
++	list_for_each_entry(netdev_led, list, led_list) {
++		cdev = &netdev_led->led_cdev;
++		led_classdev_unregister(cdev);
++		kfree(netdev_led);
++	}
++}
++EXPORT_SYMBOL_GPL(netdev_leds_teardown);
 
 -- 
 2.43.0
