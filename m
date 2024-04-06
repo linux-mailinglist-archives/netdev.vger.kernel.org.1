@@ -1,207 +1,327 @@
-Return-Path: <netdev+bounces-85374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57DEC89A7A1
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 01:55:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B4C89A7E6
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 02:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 848581C215BB
-	for <lists+netdev@lfdr.de>; Fri,  5 Apr 2024 23:55:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29E2A1F23104
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 00:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE4E383B0;
-	Fri,  5 Apr 2024 23:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E2B620;
+	Sat,  6 Apr 2024 00:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LbLdVrAh"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="wGg4+uzd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6247376F5
-	for <netdev@vger.kernel.org>; Fri,  5 Apr 2024 23:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B37336B
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 00:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712361335; cv=none; b=MXj9MRGQZB4jJrvfMBJ73sVIE9KvPFOQVSqecX6IhMGcI04Q2Hf4V4Oi0XNS5EdkbOb6ppjTDNullIkXl40hu4NOP8WO8QEq4envW2fgEyhR89YRmw3cTO3wIK1gm4OFcArqv13kHeRVBQOrV2FNIvvHi/XStM92rUydcxHmd8c=
+	t=1712362809; cv=none; b=O9/mEpMszZBjH96v0Ba5XPeucl7lhLn4tNXOFaSAXlMNiTGhDdZR90f3kv24StxTZH/H/TYiBkrbuBNwhzB9qt/De8PM2FkWS33EAsPBcqSgGYDVJHGOcp4lA5bw4AR3NjAlxbqrA+OwsOtbNRwOD5mayccVw5GzM1VFwgfLjVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712361335; c=relaxed/simple;
-	bh=tMLDuYtychh33OOhY9BHQHX16boKULM8p0yu6v8K5O8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WbD5ZpRfXFw2OJXLe80Fo1cyA6PiUKhbthPoMH2+rew6amLOCkxWRFElfBB0uGNaO7RwtaFzEje7fveSbq9CsjLI1iZAUWDgS6cVg5hqA3X4CSAebezUeOXVx3ulkHG0vWq9jZgRXzQmM/AQZfxOM2bFp4T5VOTMUE1rINE1r1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LbLdVrAh; arc=none smtp.client-ip=209.85.160.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-22ea24c9215so1487541fac.0
-        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 16:55:33 -0700 (PDT)
+	s=arc-20240116; t=1712362809; c=relaxed/simple;
+	bh=m6ae/N3ftPzt0pSGMbATcQYKcV1V8KnPwebXCKeNz/4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J1p/T+b7m7dAvQnPO7MeOL8b4Sz8obMPGaWQ0OD4M3joQ6AL6hvmna8P+CYdI1ANj2RAN4dXbAjbyGd+6rma91luZdXB0d/s0IMpDYHG0p0ALRs/nWTQGRoAzTHf/6oCxpgXMzErlhzwv/lyRr0LHNp3RrP3YoxAsTVZd8Qtsr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=wGg4+uzd; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6eaf7c97738so2231935b3a.2
+        for <netdev@vger.kernel.org>; Fri, 05 Apr 2024 17:20:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1712361333; x=1712966133; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+PN+auHSkOKZUcIL1blqDd2MqE91KF9mTXcFFEvChwQ=;
-        b=LbLdVrAh2wLrk4vbD7XXHS8HbXGEg7LJ58dOpskudj6Z/jzKEbAQPgfxQDRmQLRdRo
-         2hek1nUGHXXAAsHHWYEMzn79UsdZ0sY9S+FxbbSfw+PVe22nEMJnqFpGyln+dtko2+u8
-         BzntSJJOa1Oy1rHRsM2Or1J21h629FjNto14s=
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1712362807; x=1712967607; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O6hW7oPfHP2bYU3e5u3yAoQm2gACd7nMPuyXMRxuVwA=;
+        b=wGg4+uzdc9ls5gtrKTC0JufkFfmIz5z7B3cS+5xE9gem6i+1Br1qFTF5rXIYLVag6c
+         ivIqh1MHCHxoAah/BsttsWM1EN9rTgIymW72mgoWcJ36C848qp8UrhXNnlgv90KrkJ3Y
+         iwxcMJkOcX4zo38Ftyyzoee7nrtqbOI7gh2lmQZKkZAA9gi76RaUQ0si0cjb7rxAjmAp
+         3k3Ea3stxpkqgnRTE3F9aKqZJ1HeCrRDvTaGYtD2pBxxK7JU2MFTo7hKf36jrSrYsPWe
+         15UslN4ktjV2IhsME9sMkWL/uUIB7w4R6bVpd082sWe437khwdw5VKN7Evpgo6mvRST7
+         jZ7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712361333; x=1712966133;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+PN+auHSkOKZUcIL1blqDd2MqE91KF9mTXcFFEvChwQ=;
-        b=vRxpFFnwV0aTGNtHGgUFFjSDsOleJfhU89VaZfag6yk0W0+w3i2t7kUeQ+wJj0lR0p
-         b6DxarswLCLaGQ5djuPkmlfYS4OLzaM6E2yxrisU1VqPOKrPs0TfwhpJ/KsvHz7okk2o
-         4tPmkVbaeL3a9R3z3rOBhzunwr7lJdiUQlwyRzHMrmv9qW+bErxSOX6AS78DVa8MlPoa
-         qbobL3qWMoTrfmK4xSD+iyQe8qj3l8z+3rqcx16+6FR4rgQgEissg6PhgFYoXx3awUGD
-         VdhQiXtbWdQY5BkkWU40bn4ByXg2o/3+cL2cVikd5iBoZIYWmHhNu9YQ6hLMjayoxdZq
-         XVjg==
-X-Gm-Message-State: AOJu0YxkWR8u/r5bGLQLau/v8cxO8cr46SvIeCVS/d7Od8q3pcGmSma6
-	bAyKQ8smcZPzXxPfsxOIhg5IIWGwxAybILidrUG0HF0+TMaGig4C/ky5/tuYix0OwwK6Gs5tsTA
-	=
-X-Google-Smtp-Source: AGHT+IHdUxKMn7mPnUdiH3boaEybH8WKkE9+sccxXuoISHV3/0qB41+/DNHuQVihiLYuytYKU+x89w==
-X-Received: by 2002:a05:6870:1609:b0:22e:9aec:e8fe with SMTP id b9-20020a056870160900b0022e9aece8femr2951964oae.47.1712361332617;
-        Fri, 05 Apr 2024 16:55:32 -0700 (PDT)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id it24-20020a056a00459800b006ea81423c65sm2162078pfb.148.2024.04.05.16.55.31
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Apr 2024 16:55:32 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net 3/3] bnxt_en: Reset PTP tx_avail after possible firmware reset
-Date: Fri,  5 Apr 2024 16:55:13 -0700
-Message-Id: <20240405235513.64668-4-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20240405235513.64668-1-michael.chan@broadcom.com>
-References: <20240405235513.64668-1-michael.chan@broadcom.com>
+        d=1e100.net; s=20230601; t=1712362807; x=1712967607;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O6hW7oPfHP2bYU3e5u3yAoQm2gACd7nMPuyXMRxuVwA=;
+        b=Xb78Ur//8Dtk76R3NdhY39TvrumKYFhnCyDXC9PV1UfqAUddUS691u/BmTsqLqh+0d
+         PXg9KJxg/S1n+RL8PtzqSmlNNsOkleB8t/vvszn0tgiHu2PXFKDFUYU0lk/9dt2+pTyu
+         QLCfhIZGsdLKjWZFymEvX9+pTb6myozIO7arqiYAyvqdjpeycreCxPe/GykX4Dq9A6v7
+         ciENNDf+8QY0AAJTiU7WnyNgmAxO2D59s5TVYrXj6f7nBm5LxafHQ8hIqtLe82Fu3GNn
+         jxgSGRElBY1cbisAJ5OjmacPAO4VA0xUC22odQF43e2jc3+H/4024Ji2fcu/258+wDYE
+         M1cw==
+X-Forwarded-Encrypted: i=1; AJvYcCUhYO18zMkBlDDhaIEmfnqB7AJds/T6kJQa0BkySOKi58uNUiqdOn8QVBQd5bBg0EAyM6wph/uGAUbdVZlbVxb5BNQQfXVi
+X-Gm-Message-State: AOJu0YzH9SAtiqUmSfjnFMqhtrAvWmgNuEQ8KZZz8fOLsbKaDFVuyLso
+	HUxsMGMQgo3OIU/ZY5os0MOcn/CeVmNcCEJGKjf6hjRcBmtfa/9KrMD4bGO3t90=
+X-Google-Smtp-Source: AGHT+IG8K37KT8wwQSwpHQ8eqTaHOh6igT6mWFvHtYe6kQL4jYJSc3nghXSGOMcXVbsyKjCG0uQJzA==
+X-Received: by 2002:a05:6a00:139c:b0:6e8:f708:4b09 with SMTP id t28-20020a056a00139c00b006e8f7084b09mr3468725pfg.15.1712362807463;
+        Fri, 05 Apr 2024 17:20:07 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::4:bbe8])
+        by smtp.gmail.com with ESMTPSA id i4-20020aa787c4000000b006e64c9bc2b3sm2185545pfo.11.2024.04.05.17.20.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Apr 2024 17:20:07 -0700 (PDT)
+Message-ID: <c6597621-dbb5-4891-8aba-f0596b08e667@davidwei.uk>
+Date: Fri, 5 Apr 2024 17:20:05 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000fcce8d06156230e4"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next, RFC PATCH 2/5] netdev-genl: Add netlink framework
+ functions for queue-set NAPI
+Content-Language: en-GB
+To: Amritha Nambiar <amritha.nambiar@intel.com>, netdev@vger.kernel.org,
+ kuba@kernel.org, davem@davemloft.net
+Cc: edumazet@google.com, pabeni@redhat.com, ast@kernel.org, sdf@google.com,
+ lorenzo@kernel.org, tariqt@nvidia.com, daniel@iogearbox.net,
+ anthony.l.nguyen@intel.com, lucien.xin@gmail.com, hawk@kernel.org,
+ sridhar.samudrala@intel.com
+References: <171234737780.5075.5717254021446469741.stgit@anambiarhost.jf.intel.com>
+ <171234777883.5075.17163018772262453896.stgit@anambiarhost.jf.intel.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <171234777883.5075.17163018772262453896.stgit@anambiarhost.jf.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---000000000000fcce8d06156230e4
-Content-Transfer-Encoding: 8bit
+On 2024-04-05 13:09, Amritha Nambiar wrote:
+> Implement the netdev netlink framework functions for associating
+> a queue with NAPI ID.
+> 
+> Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
+> ---
+>  include/linux/netdevice.h |    7 +++
+>  net/core/netdev-genl.c    |  117 +++++++++++++++++++++++++++++++++++++++------
+>  2 files changed, 108 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 0c198620ac93..70df1cec4a60 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1351,6 +1351,10 @@ struct netdev_net_notifier {
+>   *			   struct kernel_hwtstamp_config *kernel_config,
+>   *			   struct netlink_ext_ack *extack);
+>   *	Change the hardware timestamping parameters for NIC device.
+> + *
+> + * int (*ndo_queue_set_napi)(struct net_device *dev, u32 q_idx, u32 q_type,
+> + *			     struct napi_struct *napi);
+> + *	Change the NAPI instance associated with the queue.
+>   */
+>  struct net_device_ops {
+>  	int			(*ndo_init)(struct net_device *dev);
+> @@ -1596,6 +1600,9 @@ struct net_device_ops {
+>  	int			(*ndo_hwtstamp_set)(struct net_device *dev,
+>  						    struct kernel_hwtstamp_config *kernel_config,
+>  						    struct netlink_ext_ack *extack);
+> +	int			(*ndo_queue_set_napi)(struct net_device *dev,
+> +						      u32 q_idx, u32 q_type,
+> +						      struct napi_struct *napi);
+>  };
+>  
+>  /**
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index d5b2e90e5709..6b3d3165d76e 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -288,12 +288,29 @@ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+>  	return err;
+>  }
+>  
+> +/* must be called under rtnl_lock() */
+> +static struct napi_struct *
+> +napi_get_by_queue(struct net_device *netdev, u32 q_idx, u32 q_type)
+> +{
+> +	struct netdev_rx_queue *rxq;
+> +	struct netdev_queue *txq;
+> +
+> +	switch (q_type) {
+> +	case NETDEV_QUEUE_TYPE_RX:
+> +		rxq = __netif_get_rx_queue(netdev, q_idx);
+> +		return rxq->napi;
+> +	case NETDEV_QUEUE_TYPE_TX:
+> +		txq = netdev_get_tx_queue(netdev, q_idx);
+> +		return txq->napi;
+> +	}
+> +	return NULL;
+> +}
+> +
+>  static int
+>  netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
+>  			 u32 q_idx, u32 q_type, const struct genl_info *info)
+>  {
+> -	struct netdev_rx_queue *rxq;
+> -	struct netdev_queue *txq;
+> +	struct napi_struct *napi;
+>  	void *hdr;
+>  
+>  	hdr = genlmsg_iput(rsp, info);
+> @@ -305,19 +322,9 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
+>  	    nla_put_u32(rsp, NETDEV_A_QUEUE_IFINDEX, netdev->ifindex))
+>  		goto nla_put_failure;
+>  
+> -	switch (q_type) {
+> -	case NETDEV_QUEUE_TYPE_RX:
+> -		rxq = __netif_get_rx_queue(netdev, q_idx);
+> -		if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
+> -					     rxq->napi->napi_id))
+> -			goto nla_put_failure;
+> -		break;
+> -	case NETDEV_QUEUE_TYPE_TX:
+> -		txq = netdev_get_tx_queue(netdev, q_idx);
+> -		if (txq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
+> -					     txq->napi->napi_id))
+> -			goto nla_put_failure;
+> -	}
+> +	napi = napi_get_by_queue(netdev, q_idx, q_type);
+> +	if (napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID, napi->napi_id))
+> +		goto nla_put_failure;
+>  
+>  	genlmsg_end(rsp, hdr);
+>  
+> @@ -674,9 +681,87 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
+>  	return err;
+>  }
+>  
+> +static int
+> +netdev_nl_queue_set_napi(struct sk_buff *rsp, struct net_device *netdev,
+> +			 u32 q_idx, u32 q_type, u32 napi_id,
+> +			 const struct genl_info *info)
+> +{
+> +	struct napi_struct *napi, *old_napi;
+> +	int err;
+> +
+> +	if (!(netdev->flags & IFF_UP))
+> +		return 0;
 
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Should this be an error code?
 
-It is possible that during error recovery and firmware reset,
-there is a pending TX PTP packet waiting for the timestamp.
-We need to reset this condition so that after recovery, the
-tx_avail count for PTP is reset back to the initial value.
-Otherwise, we may not accept any PTP TX timestamps after
-recovery.
+> +
+> +	err = netdev_nl_queue_validate(netdev, q_idx, q_type);
+> +	if (err)
+> +		return err;
+> +
+> +	old_napi = napi_get_by_queue(netdev, q_idx, q_type);
+> +	if (old_napi && old_napi->napi_id == napi_id)
+> +		return 0;
 
-Fixes: 118612d519d8 ("bnxt_en: Add PTP clock APIs, ioctls, and ethtool methods")
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 ++
- 1 file changed, 2 insertions(+)
+Same as above, I think this should be an error.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 493b724848c8..57e61f963167 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -11758,6 +11758,8 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	/* VF-reps may need to be re-opened after the PF is re-opened */
- 	if (BNXT_PF(bp))
- 		bnxt_vf_reps_open(bp);
-+	if (bp->ptp_cfg)
-+		atomic_set(&bp->ptp_cfg->tx_avail, BNXT_MAX_TX_TS);
- 	bnxt_ptp_init_rtc(bp, true);
- 	bnxt_ptp_cfg_tstamp_filters(bp);
- 	bnxt_cfg_usr_fltrs(bp);
--- 
-2.30.1
+> +
+> +	napi = napi_by_id(napi_id);
+> +	if (!napi)
+> +		return -EINVAL;
+> +
+> +	err = netdev->netdev_ops->ndo_queue_set_napi(netdev, q_idx, q_type, napi);
+> +
+> +	return err;
 
+nit: return ndo_queue_set_napi() would save two lines.
 
---000000000000fcce8d06156230e4
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> +}
+> +
+>  int netdev_nl_queue_set_doit(struct sk_buff *skb, struct genl_info *info)
+>  {
+> -	return -EOPNOTSUPP;
+> +	u32 q_id, q_type, ifindex;
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFNiIlGC9qrMqEmZ+kZomWN3y8q9CZ4I
-uyGiAE7i4r7WMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQw
-NTIzNTUzM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQChNCZPC0OCqUO/92vlCF74n5Atk4Hgx2R+YQwiHhgF7BfTLTeu
-K3kZw/xI5pqSTvm0dMBaAm6OrZhqWnmWZCWZiz0HG5IHEred3SjByeiSN+m/XHqyVTW3C3pjFHqi
-c5+aNbZSREcz/zehrMLenmjKCTmgY0AikMRDoq9Jx+3VFbuIL7oxH7Udp9FUA0f3G+4NiRxvrIwf
-rqeYIO4WeaiWKHg6piz+BgX2KNRcR0JHOP02HseEzmERMfxWylCG75sxUlBorGhCfGpumJI+fUV0
-vw/jJuOVrkXf9CmcZm/LXKNpHrRwosE9nQUeZ/8ECYNZgvCGBuJOTS1jLFs9gYBv
---000000000000fcce8d06156230e4--
+nit: q_idx for consistency?
+
+> +	struct net_device *netdev;
+> +	struct sk_buff *rsp;
+> +	u32 napi_id = 0;
+> +	int err = 0;
+> +
+> +	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_ID) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_TYPE) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFINDEX))
+> +		return -EINVAL;
+> +
+> +	q_id = nla_get_u32(info->attrs[NETDEV_A_QUEUE_ID]);
+> +	q_type = nla_get_u32(info->attrs[NETDEV_A_QUEUE_TYPE]);
+> +	ifindex = nla_get_u32(info->attrs[NETDEV_A_QUEUE_IFINDEX]);
+> +
+> +	if (info->attrs[NETDEV_A_QUEUE_NAPI_ID]) {
+> +		napi_id = nla_get_u32(info->attrs[NETDEV_A_QUEUE_NAPI_ID]);
+> +		if (napi_id < MIN_NAPI_ID)
+> +			return -EINVAL;
+> +	}
+> +
+> +	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+> +	if (!rsp)
+> +		return -ENOMEM;
+> +
+> +	rtnl_lock();
+> +
+> +	netdev = __dev_get_by_index(genl_info_net(info), ifindex);
+> +	if (netdev) {
+> +		if (!napi_id)
+> +			GENL_SET_ERR_MSG(info, "No queue parameters changed\n");
+
+Could this be checked earlier outside of rtnl_lock? I feel like not
+setting a napi_id here is EINVAL.
+
+> +		else
+> +			err = netdev_nl_queue_set_napi(rsp, netdev, q_id,
+> +						       q_type, napi_id, info);
+> +		if (!err)
+> +			err = netdev_nl_queue_fill_one(rsp, netdev, q_id,
+> +						       q_type, info);
+> +	} else {
+> +		err = -ENODEV;
+
+Could be less nesty (completely untested):
+
+	if (!netdev) {
+		err = -ENODEV;
+		goto err_rtnl_unlock;
+	}
+
+	if (!napi_id) {
+		GENL_SET_ERR_MSG(info, "No queue parameters changed\n");
+		goto err_nonapi;
+	}
+
+	err = netdev_nl_queue_set_napi(rsp, netdev, q_id,
+				       q_type, napi_id, info);
+	if (err)
+		goto err_rtnl_unlock;
+
+err_nonapi:
+	err = netdev_nl_queue_fill_one(rsp, netdev, q_id,
+				       q_type, info);
+
+err_rtnl_unlock:
+	rtnl_unlock();
+
+	if (!err)
+		return genlmsg_reply(rsp, info);
+
+err_free_msg:
+	nlmsg_free(rsp);
+	return err;
+
+> +	}
+> +
+> +	rtnl_unlock();
+> +
+> +	if (err)
+> +		goto err_free_msg;
+> +
+> +	return genlmsg_reply(rsp, info);
+> +
+> +err_free_msg:
+> +	nlmsg_free(rsp);
+> +	return err;
+>  }
+>  
+>  static int netdev_genl_netdevice_event(struct notifier_block *nb,
+> 
 
