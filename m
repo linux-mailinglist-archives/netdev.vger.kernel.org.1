@@ -1,98 +1,94 @@
-Return-Path: <netdev+bounces-85437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D768289ABF2
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 18:14:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02FD289AC12
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 18:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 847E81F217BF
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 16:14:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C8761C209B4
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 16:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A143BBF4;
-	Sat,  6 Apr 2024 16:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312973C470;
+	Sat,  6 Apr 2024 16:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KuLAShsa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQReiQui"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D0E38396;
-	Sat,  6 Apr 2024 16:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B76C1A716
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 16:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712420055; cv=none; b=W1jfc+/0YLiWkHTsv1t5Y/cFWYmO5SAueWPqLnIVub5X+O5Qkonk4g2ldtZlrgbILoBsXyukoQWzFCpmv1FoB986DiuwYJZ/FECP/PX1QHmPtMSNnUYUK99q1eaOmjSfsQxHoSKrkGsse3Zx1OVDZXDKRIzF3tTj84/EZ28xvVI=
+	t=1712421627; cv=none; b=XRw+Dt4CcWFkaMp2VY2JH7DtX/U7CAERCU+AMLYB3qhRYIWkRotmpvdu5IpZhd3O/wVreYJuSgsAwOU+Byc5jDA1DJaGKfki/eKW9GbQgaLG2Nn3Hs/lum7LLR+RfZmnOIcbMUMdGrYX3nYhqjcA6hnHWXEMw67O6DPOfmgN0Wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712420055; c=relaxed/simple;
-	bh=ZlEmRPoAfWYYr0CJ+9eeyIeoPG7qNC9qINFRuFN4SpY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MRmqQs+QZ4YXEmamoVhQoRXf1kH2waXH1Rh71MC1sL3dg/GV4MeZ42J44HW23WRFweo9MrxGLo7tfL/XxM+j1sEOKG8ZLi5oumkY5UPGz/NiHYHVTvV32ZqtuZMG5tq5QRAe96pGt3kR53WvISusfxLLE1TJPsLR6Wi2AjvdE6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KuLAShsa; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2OVtX+5WKn0At0QBYPFlNgJmZou+DvFnhRzz5T7jCKQ=; b=KuLAShsaKELYuK+CaYP52iOB9W
-	QtsI2qfO9y6RWpFMyx3qownZbB1xcb+kk0tNHkwPuauACxtuQMzu4G4cPXD96SzQYBr6c9rg+vRVb
-	bi7uGe6NrdvqIddV84CVcGNFloeqHOWUwmQpu2HINzDVFCGIE6UFV/KRjeUxie2Uw1bc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rt8gF-00CNfP-2X; Sat, 06 Apr 2024 18:14:11 +0200
-Date: Sat, 6 Apr 2024 18:14:11 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org
-Subject: Re: [PATCH net-next v11 08/13] netlink: specs: add ethnl PHY_GET
- command set
-Message-ID: <d3df9d5e-4d97-44b1-b03c-98369294ccec@lunn.ch>
-References: <20240404093004.2552221-1-maxime.chevallier@bootlin.com>
- <20240404093004.2552221-9-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1712421627; c=relaxed/simple;
+	bh=ZsisEtLSo5Cn64iP/+Ruz4EKL9M5Iqm4Jw1zCwgRdJ4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nmS1rxvay9jCiqyZwqHNbUf3Eh1AlAhZf/z5GlyTnCLCe/98882ru///vY9Rj1FYw3nDVDHAx8TXSbQrL5IinKsQy9wWkvnN5xrNo9RCj3x4caQFg6oz8a7Hlq+MIMz2WFu+OjmgvCVRoSilMkkKrqtMsNNqKr7p96WdSX3YYpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQReiQui; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 77079C43390;
+	Sat,  6 Apr 2024 16:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712421626;
+	bh=ZsisEtLSo5Cn64iP/+Ruz4EKL9M5Iqm4Jw1zCwgRdJ4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KQReiQui9lJ/NxEeTsE2xdxgVg+f1xvqiwvirQMd+wFqgPZYf0k9Lo7Ym20B16sOx
+	 NbC+EZAaHh5CiHSj//pDjpK8+e4Aa83CVHXj3L5gKOFMJ5Zn6K8Xsv7iX1hbQnUV4o
+	 oklhr9oVgAhSEABOMvj6BbPTBJ5Rx2BDyK8/JmV4efo8dWUlU7pRfjIhUoY743p+Jw
+	 K+H6BS30dpSRFQo4YfLjazL7hY1V0Vs4WU6lBNFzy9DDlorBx2sVv1OjGiMl79D32Y
+	 jzrW6hNLEs6lu0PmcrItSeUPb5h8bPnHyqfuKd2retiirRICpyCMVsaaCqFQJ2Jss9
+	 yAmLCRfAM7cUQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 67052D8A104;
+	Sat,  6 Apr 2024 16:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240404093004.2552221-9-maxime.chevallier@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: skbuff: generalize the skb->decrypted bit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171242162641.12553.9789629674269759591.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Apr 2024 16:40:26 +0000
+References: <20240403202139.1978143-1-kuba@kernel.org>
+In-Reply-To: <20240403202139.1978143-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, dsahern@kernel.org, borisp@nvidia.com,
+ john.fastabend@gmail.com
 
-On Thu, Apr 04, 2024 at 11:29:58AM +0200, Maxime Chevallier wrote:
-> The PHY_GET command, supporting both DUMP and GET operations, is used to
-> retrieve the list of PHYs connected to a netdevice, and get topology
-> information to know where exactly it sits on the physical link.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed,  3 Apr 2024 13:21:39 -0700 you wrote:
+> The ->decrypted bit can be reused for other crypto protocols.
+> Remove the direct dependency on TLS, add helpers to clean up
+> the ifdefs leaking out everywhere.
 > 
-> Add the netlink specs corresponding to that command.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> I'm going to post PSP support.. as soon as the test groundwork
+> is in place. I think this stands on its own as a cleanup.
 > 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> [...]
 
-This i don't feel qualified to review this, other than i don't see any
-obvious spelling mistakes etc.
+Here is the summary with links:
+  - [net-next] net: skbuff: generalize the skb->decrypted bit
+    https://git.kernel.org/netdev/net-next/c/9f06f87fef68
 
-Is there a tool to sanity check/validate these spec files? If so,
-could it be added to NIPA? Added to Simon's list of checks?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-	Andrew
+
 
