@@ -1,37 +1,38 @@
-Return-Path: <netdev+bounces-85409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66FFC89AB0D
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 15:21:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42F1789AB0B
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 15:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C90BE1F21F43
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 13:21:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62EE21C2135E
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 13:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8AB0374DD;
-	Sat,  6 Apr 2024 13:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342FC36AE3;
+	Sat,  6 Apr 2024 13:21:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA58364A5
-	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 13:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75540364AC
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 13:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712409702; cv=none; b=sRc6WVY2tKVL4ee4Hmlrj9DQOY7acGB9GSniW6Bu4UjwsuKW0JTEIGz3zkWjKITdblKU/GE+6Ud3qZ12NzdSOHFIU4gS73GW0sntJH5CdoBGlar65eXRLifvWHKf0dtFshOkbeI8kUm5Qkh0tqI92j2+Wxc9qLD9tO7ytyI8R5w=
+	t=1712409701; cv=none; b=OZgG/4k5oOvKY5BSUxP/sNT8EKcGIokCNiNX/WiJ/RAJSq6Up/msWhSt2Mu9UlDhlFtp/zlp2vBt/kI9kQzIzi4Aej9TNzU/eKzwplyAHZ2GKEYcgvmE6IeiingGBnGkbYYVwtWz4JU0eMxrseKvPrWqLXaVkxZORw8bigJygC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712409702; c=relaxed/simple;
-	bh=1UBGX7bUjtvuk3M0IyafQlboT3hw0GN3FAqgGGhU+aI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VyUqretrPFdKGdUImxvZx8hGr5hfPx2iHxCsZFDw9Ql0r0n1qzNQfbptsa6jg81XJJKqLPkRg0nbp9qG0CyJcs5W9xinO+JkQYMHAWisRdbkPeaK+WUCA7xHaoHYHYc5sduAcSSbTJMd7+kexDXvb9XYymVWiLGjUVpzZhLeGoc=
+	s=arc-20240116; t=1712409701; c=relaxed/simple;
+	bh=AbDJvH6MWHKn8bgD3Dx1YcCapbld4ddn1WZfyZcZdxc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=W9qj2AQnWGXvzI3C522Q+kyYjY+XLwLgeh4kN4xY262S/G1HO7t5y/Qxrt5t0iuMc1Vd7odkbH3pSppjwByPVnClE09cArjVsDF++7dhl0LhfJ0ALzEKR1QhhgWkS1FT8DRyiLmtaAnlpx/GKBAUPKbLT7CHEX2imrBSJnInz0o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [112.20.109.80])
-	by gateway (Coremail) with SMTP id _____8CxF+haTBFmWdgjAA--.62472S3;
-	Sat, 06 Apr 2024 21:21:30 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Dx6uhZTBFmU9gjAA--.62455S3;
+	Sat, 06 Apr 2024 21:21:29 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.109.80])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxTRNUTBFm8zl0AA--.28003S2;
-	Sat, 06 Apr 2024 21:21:25 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxTRNUTBFm8zl0AA--.28003S3;
+	Sat, 06 Apr 2024 21:21:27 +0800 (CST)
 From: Yanteng Si <siyanteng@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -47,10 +48,12 @@ Cc: Yanteng Si <siyanteng@loongson.cn>,
 	netdev@vger.kernel.org,
 	chris.chenfeiyang@gmail.com,
 	siyanteng01@gmail.com
-Subject: [PATCH net-next v9 0/6] stmmac: Add Loongson platform support
-Date: Sat,  6 Apr 2024 21:21:18 +0800
-Message-Id: <cover.1712407009.git.siyanteng@loongson.cn>
+Subject: [PATCH net-next v9 1/6] net: stmmac: Add multi-channel support
+Date: Sat,  6 Apr 2024 21:21:19 +0800
+Message-Id: <e293a30532ef3e567e6236f6b643430036ea7e09.1712407009.git.siyanteng@loongson.cn>
 X-Mailer: git-send-email 2.31.4
+In-Reply-To: <cover.1712407009.git.siyanteng@loongson.cn>
+References: <cover.1712407009.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,210 +61,478 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxTRNUTBFm8zl0AA--.28003S2
+X-CM-TRANSID:AQAAf8AxTRNUTBFm8zl0AA--.28003S3
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3GrWxJrWUuw4kKr4UWF45Arc_yoWxKr1fpF
-	W3Ca4a9rWktr1xA3WkXw17Xry5JrWYy3y8Wa1Ik34Ska98CryjqrySgayFvFy7uFWDZF12
-	qr4j9r1FgF1qkagCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1q6r4UM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_
-	WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
-	x2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26c
-	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAF
-	wI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UAKsUUUUUU=
+X-Coremail-Antispam: 1Uk129KBj9fXoW3Zr17Cr17uw17AFyUXr15Jrc_yoW8CrWxto
+	Z3AFn0gFyagw18ur97Kr1kJry3XrnxXw1rCrZ7ur4kua97Zay5Z340q393G3W7AF4xurZx
+	Z340qa1qvF4UKF1Ul-sFpf9Il3svdjkaLaAFLSUrUUUU0b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYW7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUAVWUZwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8JVW8Jr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
+	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4eMKDUUUU
 
-v9:
-We have not provided a detailed list of equipment for a long time,
-and I apologize for this. During this period, I have collected some
-information and now present it to you, hoping to alleviate the pressure
-of review.
+DW GMAC v3.x multi-channels feature is implemented as multiple
+sets of the same CSRs. Here is only preliminary support, it will
+be useful for the driver further evolution and for the users
+having multi-channel DWGMAC v3.x devices.
 
-1. IP core
-We now have two types of IP cores, one is 0x37, similar to dwmac1000;
-The other is 0x10.  Compared to 0x37, we split several DMA registers
-from one to two, and it is not worth adding a new entry for this.
-According to Serge's comment, we made these devices work by overwriting
-priv->synopsys_id = 0x37 and mac->dma = <LS_dma_ops>.
+Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+---
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  4 +--
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 34 ++++++++++---------
+ .../ethernet/stmicro/stmmac/dwmac100_dma.c    |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 20 +++++++++--
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 32 ++++++++---------
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  5 ++-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  6 ++++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++---
+ include/linux/stmmac.h                        |  1 +
+ 11 files changed, 71 insertions(+), 48 deletions(-)
 
-1.1.  Some more detailed information
-The number of DMA channels for 0x37 is 1; The number of DMA channels
-for 0x10 is 8.  Except for channel 0, otherchannels do not support
-sending hardware checksums. Supported AV features are Qav, Qat, and Qas,
-and the rest are consistent with 3.73.
-
-2. DEVICE
-We have two types of devices,
-one is GMAC, which only has a MAC chip inside and needs an external PHY
-chip;
-the other is GNET, which integrates both MAC and PHY chips inside.
-
-2.1.  Some more detailed information
-GMAC device: LS7A1000, LS2K1000, these devices do not support any pause
-mode.
-gnet device: LS7A2000, LS2K2000, the chip connection between the mac and
-             phy of these devices is not normal and requires two rounds of
-             negotiation; LS7A2000 does not support half-duplex and
-multi-channel;
-             to enable multi-channel on LS2K2000, you need to turn off
-hardware checksum.
-**Note**: Only the LS2K2000's IP core is 0x10, while the IP cores of other
-devices are 0x37.
-
-3. TABLE
-
-device    type    pci_id    ip_core
-ls7a1000  gmac    7a03      0x37
-ls2k1000  gmac    7a03      0x37
-ls7a2000  gnet    7a13      0x37
-ls2k2000  gnet    7a13      0x10
------------------------------------------------
-Changes:
-
-* passed the CI
-  <https://github.com/linux-netdev/nipa/blob/main/tests/patch/checkpatch
-  /checkpatch.sh>
-* reverse xmas tree order.
-* Silence build warning.
-* Re-split the patch.
-* Add more detailed commit message.
-* Add more code comment.
-* Reduce modification of generic code.
-* using the GNET-specific prefix.
-* define a new macro for the GNET MAC.
-* Use an easier way to overwrite mac.
-* Removed some useless printk.
-
-
-v8:
-* The biggest change is according to Serge's comment in the previous
-  edition:
-   Seeing the patch in the current state would overcomplicate the generic
-   code and the only functions you need to update are
-   dwmac_dma_interrupt()
-   dwmac1000_dma_init_channel()
-   you can have these methods re-defined with all the Loongson GNET
-   specifics in the low-level platform driver (dwmac-loongson.c). After
-   that you can just override the mac_device_info.dma pointer with a
-   fixed stmmac_dma_ops descriptor. Here is what should be done for that:
-
-   1. Keep the Patch 4/9 with my comments fixed. First it will be partly
-   useful for your GNET device. Second in general it's a correct
-   implementation of the normal DW GMAC v3.x multi-channels feature and
-   will be useful for the DW GMACs with that feature enabled.
-
-   2. Create the Loongson GNET-specific
-   stmmac_dma_ops.dma_interrupt()
-   stmmac_dma_ops.init_chan()
-   methods in the dwmac-loongson.c driver. Don't forget to move all the
-   Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
-
-   3. Create a Loongson GNET-specific platform setup method with the next
-   semantics:
-      + allocate stmmac_dma_ops instance and initialize it with
-        dwmac1000_dma_ops.
-      + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
-        the pointers to the methods defined in 2.
-      + allocate mac_device_info instance and initialize the
-        mac_device_info.dma field with a pointer to the new
-        stmmac_dma_ops instance.
-      + call dwmac1000_setup() or initialize mac_device_info in a way
-        it's done in dwmac1000_setup() (the later might be better so you
-        wouldn't need to export the dwmac1000_setup() function).
-      + override stmmac_priv.synopsys_id with a correct value.
-
-   4. Initialize plat_stmmacenet_data.setup() with the pointer to the
-   method created in 3.
-
-* Others:
-  Re-split the patch.
-  Passed checkpatch.pl test.
-
-v7:
-* Refer to andrew's suggestion:
-  - Add DMA_INTR_ENA_NIE_RX and DMA_INTR_ENA_NIE_TX #define's, etc.
-
-* Others:
-  - Using --subject-prefix="PATCH net-next vN" to indicate that the
-    patches are for the networking tree.
-  - Rebase to the latest networking tree:
-    <git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git>
-
-
-v6:
-
-* Refer to Serge's suggestion:
-  - Add new platform feature flag:
-    include/linux/stmmac.h:
-    +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
-
-  - Add the IRQs macros specific to the Loongson Multi-channels GMAC:
-     drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h:
-     +#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000      /* ...*/
-     #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
-     ...
-
-  - Drop all of redundant changes that don't require the
-    prototypes being converted to accepting the stmmac_priv
-    pointer.
-
-* Refer to andrew's suggestion:
-  - Drop white space changes.
-  - break patch up into lots of smaller parts.
-     Some small patches have been put into another series as a preparation
-     see <https://lore.kernel.org/loongarch/cover.1702289232.git.siyanteng@loongson.cn/T/#t>
-     
-     *note* : This series of patches relies on the three small patches above.
-* others
-  - Drop irq_flags changes.
-  - Changed patch order.
-
-
-v4 -> v5:
-
-* Remove an ugly and useless patch (fix channel number).
-* Remove the non-standard dma64 driver code, and also remove
-  the HWIF entries, since the associated custom callbacks no
-  longer exist.
-* Refer to Serge's suggestion: Update the dwmac1000_dma.c to
-  support the multi-DMA-channels controller setup.
-
-See:
-v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
-v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
-v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
-v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
-
-Yanteng Si (6):
-  net: stmmac: Add multi-channel support
-  net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device
-    identification
-  net: stmmac: dwmac-loongson: Drop mac-interface initialization
-  net: stmmac: dwmac-loongson: Introduce gmac setup
-  net: stmmac: dwmac-loongson: Add full PCI support
-  net: stmmac: dwmac-loongson: Add GNET support
-
- .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 569 ++++++++++++++++--
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |   4 +-
- .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  35 +-
- .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   2 +-
- .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   2 +-
- .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  20 +-
- .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  32 +-
- .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |   2 +-
- drivers/net/ethernet/stmicro/stmmac/hwif.h    |   5 +-
- .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   6 +
- .../net/ethernet/stmicro/stmmac/stmmac_main.c |  11 +-
- include/linux/stmmac.h                        |   2 +
- 12 files changed, 583 insertions(+), 107 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+index b21d99faa2d0..ae9240736e64 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+@@ -299,7 +299,7 @@ static int sun8i_dwmac_dma_reset(void __iomem *ioaddr)
+  * Called from stmmac via stmmac_dma_ops->init
+  */
+ static void sun8i_dwmac_dma_init(void __iomem *ioaddr,
+-				 struct stmmac_dma_cfg *dma_cfg, int atds)
++				 struct stmmac_dma_cfg *dma_cfg)
+ {
+ 	writel(EMAC_RX_INT | EMAC_TX_INT, ioaddr + EMAC_INT_EN);
+ 	writel(0x1FFFFFF, ioaddr + EMAC_INT_STA);
+@@ -395,7 +395,7 @@ static void sun8i_dwmac_dma_start_tx(struct stmmac_priv *priv,
+ 	writel(v, ioaddr + EMAC_TX_CTL1);
+ }
+ 
+-static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr)
++static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
+ {
+ 	u32 v;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+index daf79cdbd3ec..f161ec9ac490 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+@@ -70,15 +70,17 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
+ 	writel(value, ioaddr + DMA_AXI_BUS_MODE);
+ }
+ 
+-static void dwmac1000_dma_init(void __iomem *ioaddr,
+-			       struct stmmac_dma_cfg *dma_cfg, int atds)
++static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
++				       void __iomem *ioaddr,
++				       struct stmmac_dma_cfg *dma_cfg, u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_BUS_MODE);
+ 	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
+ 	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
++	u32 value;
+ 
+-	/*
+-	 * Set the DMA PBL (Programmable Burst Length) mode.
++	value = readl(ioaddr + DMA_CHAN_BUS_MODE(chan));
++
++	/* Set the DMA PBL (Programmable Burst Length) mode.
+ 	 *
+ 	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
+ 	 * post 3.5 mode bit acts as 8*PBL.
+@@ -98,16 +100,16 @@ static void dwmac1000_dma_init(void __iomem *ioaddr,
+ 	if (dma_cfg->mixed_burst)
+ 		value |= DMA_BUS_MODE_MB;
+ 
+-	if (atds)
++	if (dma_cfg->atds)
+ 		value |= DMA_BUS_MODE_ATDS;
+ 
+ 	if (dma_cfg->aal)
+ 		value |= DMA_BUS_MODE_AAL;
+ 
+-	writel(value, ioaddr + DMA_BUS_MODE);
++	writel(value, ioaddr + DMA_CHAN_BUS_MODE(chan));
+ 
+ 	/* Mask interrupts by writing to CSR7 */
+-	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_INTR_ENA);
++	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_CHAN_INTR_ENA(chan));
+ }
+ 
+ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+@@ -116,7 +118,7 @@ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+ 				  dma_addr_t dma_rx_phy, u32 chan)
+ {
+ 	/* RX descriptor base address list must be written into DMA CSR3 */
+-	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR);
++	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_CHAN_RCV_BASE_ADDR(chan));
+ }
+ 
+ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+@@ -125,7 +127,7 @@ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+ 				  dma_addr_t dma_tx_phy, u32 chan)
+ {
+ 	/* TX descriptor base address list must be written into DMA CSR4 */
+-	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR);
++	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_CHAN_TX_BASE_ADDR(chan));
+ }
+ 
+ static u32 dwmac1000_configure_fc(u32 csr6, int rxfifosz)
+@@ -153,7 +155,7 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+ 					    void __iomem *ioaddr, int mode,
+ 					    u32 channel, int fifosz, u8 qmode)
+ {
+-	u32 csr6 = readl(ioaddr + DMA_CONTROL);
++	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
+ 
+ 	if (mode == SF_DMA_MODE) {
+ 		pr_debug("GMAC: enable RX store and forward mode\n");
+@@ -175,14 +177,14 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+ 	/* Configure flow control based on rx fifo size */
+ 	csr6 = dwmac1000_configure_fc(csr6, fifosz);
+ 
+-	writel(csr6, ioaddr + DMA_CONTROL);
++	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
+ }
+ 
+ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
+ 					    void __iomem *ioaddr, int mode,
+ 					    u32 channel, int fifosz, u8 qmode)
+ {
+-	u32 csr6 = readl(ioaddr + DMA_CONTROL);
++	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
+ 
+ 	if (mode == SF_DMA_MODE) {
+ 		pr_debug("GMAC: enable TX store and forward mode\n");
+@@ -209,7 +211,7 @@ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
+ 			csr6 |= DMA_CONTROL_TTC_256;
+ 	}
+ 
+-	writel(csr6, ioaddr + DMA_CONTROL);
++	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
+ }
+ 
+ static void dwmac1000_dump_dma_regs(struct stmmac_priv *priv,
+@@ -271,12 +273,12 @@ static int dwmac1000_get_hw_feature(void __iomem *ioaddr,
+ static void dwmac1000_rx_watchdog(struct stmmac_priv *priv,
+ 				  void __iomem *ioaddr, u32 riwt, u32 queue)
+ {
+-	writel(riwt, ioaddr + DMA_RX_WATCHDOG);
++	writel(riwt, ioaddr + DMA_CHAN_RX_WATCHDOG(queue));
+ }
+ 
+ const struct stmmac_dma_ops dwmac1000_dma_ops = {
+ 	.reset = dwmac_dma_reset,
+-	.init = dwmac1000_dma_init,
++	.init_chan = dwmac1000_dma_init_channel,
+ 	.init_rx_chan = dwmac1000_dma_init_rx,
+ 	.init_tx_chan = dwmac1000_dma_init_tx,
+ 	.axi = dwmac1000_dma_axi,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
+index dea270f60cc3..f861babc06f9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
+@@ -19,7 +19,7 @@
+ #include "dwmac_dma.h"
+ 
+ static void dwmac100_dma_init(void __iomem *ioaddr,
+-			      struct stmmac_dma_cfg *dma_cfg, int atds)
++			      struct stmmac_dma_cfg *dma_cfg)
+ {
+ 	/* Enable Application Access by writing to DMA CSR0 */
+ 	writel(DMA_BUS_MODE_DEFAULT | (dma_cfg->pbl << DMA_BUS_MODE_PBL_SHIFT),
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+index 84d3a8551b03..e0165358c4ac 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+@@ -153,7 +153,7 @@ static void dwmac410_dma_init_channel(struct stmmac_priv *priv,
+ }
+ 
+ static void dwmac4_dma_init(void __iomem *ioaddr,
+-			    struct stmmac_dma_cfg *dma_cfg, int atds)
++			    struct stmmac_dma_cfg *dma_cfg)
+ {
+ 	u32 value = readl(ioaddr + DMA_SYS_BUS_MODE);
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+index 72672391675f..7c8b3ad739f7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+@@ -22,6 +22,23 @@
+ #define DMA_INTR_ENA		0x0000101c	/* Interrupt Enable */
+ #define DMA_MISSED_FRAME_CTR	0x00001020	/* Missed Frame Counter */
+ 
++/* Following DMA defines are channels oriented */
++#define DMA_CHAN_BASE_OFFSET			0x100
++
++static inline u32 dma_chan_base_addr(u32 base, u32 chan)
++{
++	return base + chan * DMA_CHAN_BASE_OFFSET;
++}
++
++#define DMA_CHAN_XMT_POLL_DEMAND(chan)	dma_chan_base_addr(DMA_XMT_POLL_DEMAND, chan)
++#define DMA_CHAN_INTR_ENA(chan)		dma_chan_base_addr(DMA_INTR_ENA, chan)
++#define DMA_CHAN_CONTROL(chan)		dma_chan_base_addr(DMA_CONTROL, chan)
++#define DMA_CHAN_STATUS(chan)		dma_chan_base_addr(DMA_STATUS, chan)
++#define DMA_CHAN_BUS_MODE(chan)		dma_chan_base_addr(DMA_BUS_MODE, chan)
++#define DMA_CHAN_RCV_BASE_ADDR(chan)	dma_chan_base_addr(DMA_RCV_BASE_ADDR, chan)
++#define DMA_CHAN_TX_BASE_ADDR(chan)	dma_chan_base_addr(DMA_TX_BASE_ADDR, chan)
++#define DMA_CHAN_RX_WATCHDOG(chan)	dma_chan_base_addr(DMA_RX_WATCHDOG, chan)
++
+ /* SW Reset */
+ #define DMA_BUS_MODE_SFT_RESET	0x00000001	/* Software Reset */
+ 
+@@ -152,7 +169,7 @@
+ #define NUM_DWMAC1000_DMA_REGS	23
+ #define NUM_DWMAC4_DMA_REGS	27
+ 
+-void dwmac_enable_dma_transmission(void __iomem *ioaddr);
++void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan);
+ void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			  u32 chan, bool rx, bool tx);
+ void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+@@ -168,5 +185,4 @@ void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			struct stmmac_extra_stats *x, u32 chan, u32 dir);
+ int dwmac_dma_reset(void __iomem *ioaddr);
+-
+ #endif /* __DWMAC_DMA_H__ */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+index 85e18f9a22f9..7570f01838a8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+@@ -28,65 +28,65 @@ int dwmac_dma_reset(void __iomem *ioaddr)
+ }
+ 
+ /* CSR1 enables the transmit DMA to check for new descriptor */
+-void dwmac_enable_dma_transmission(void __iomem *ioaddr)
++void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
+ {
+-	writel(1, ioaddr + DMA_XMT_POLL_DEMAND);
++	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
+ }
+ 
+ void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			  u32 chan, bool rx, bool tx)
+ {
+-	u32 value = readl(ioaddr + DMA_INTR_ENA);
++	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
+ 
+ 	if (rx)
+ 		value |= DMA_INTR_DEFAULT_RX;
+ 	if (tx)
+ 		value |= DMA_INTR_DEFAULT_TX;
+ 
+-	writel(value, ioaddr + DMA_INTR_ENA);
++	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
+ }
+ 
+ void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			   u32 chan, bool rx, bool tx)
+ {
+-	u32 value = readl(ioaddr + DMA_INTR_ENA);
++	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
+ 
+ 	if (rx)
+ 		value &= ~DMA_INTR_DEFAULT_RX;
+ 	if (tx)
+ 		value &= ~DMA_INTR_DEFAULT_TX;
+ 
+-	writel(value, ioaddr + DMA_INTR_ENA);
++	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
+ }
+ 
+ void dwmac_dma_start_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_CONTROL);
++	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+ 	value |= DMA_CONTROL_ST;
+-	writel(value, ioaddr + DMA_CONTROL);
++	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+ }
+ 
+ void dwmac_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_CONTROL);
++	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+ 	value &= ~DMA_CONTROL_ST;
+-	writel(value, ioaddr + DMA_CONTROL);
++	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+ }
+ 
+ void dwmac_dma_start_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_CONTROL);
++	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+ 	value |= DMA_CONTROL_SR;
+-	writel(value, ioaddr + DMA_CONTROL);
++	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+ }
+ 
+ void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_CONTROL);
++	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+ 	value &= ~DMA_CONTROL_SR;
+-	writel(value, ioaddr + DMA_CONTROL);
++	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+ }
+ 
+ #ifdef DWMAC_DMA_DEBUG
+@@ -165,7 +165,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
+ 	int ret = 0;
+ 	/* read the status register (CSR5) */
+-	u32 intr_status = readl(ioaddr + DMA_STATUS);
++	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
+ 
+ #ifdef DWMAC_DMA_DEBUG
+ 	/* Enable it to monitor DMA rx/tx status in case of critical problems */
+@@ -235,7 +235,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
+ 
+ 	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
+-	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
++	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
+ 
+ 	return ret;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+index dd2ab6185c40..7840bc403788 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+@@ -20,7 +20,7 @@ static int dwxgmac2_dma_reset(void __iomem *ioaddr)
+ }
+ 
+ static void dwxgmac2_dma_init(void __iomem *ioaddr,
+-			      struct stmmac_dma_cfg *dma_cfg, int atds)
++			      struct stmmac_dma_cfg *dma_cfg)
+ {
+ 	u32 value = readl(ioaddr + XGMAC_DMA_SYSBUS_MODE);
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+index 7be04b54738b..3b20fb7f3a61 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+@@ -175,8 +175,7 @@ struct dma_features;
+ struct stmmac_dma_ops {
+ 	/* DMA core initialization */
+ 	int (*reset)(void __iomem *ioaddr);
+-	void (*init)(void __iomem *ioaddr, struct stmmac_dma_cfg *dma_cfg,
+-		     int atds);
++	void (*init)(void __iomem *ioaddr, struct stmmac_dma_cfg *dma_cfg);
+ 	void (*init_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			  struct stmmac_dma_cfg *dma_cfg, u32 chan);
+ 	void (*init_rx_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
+@@ -198,7 +197,7 @@ struct stmmac_dma_ops {
+ 	/* To track extra statistic (if supported) */
+ 	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
+ 				  void __iomem *ioaddr);
+-	void (*enable_dma_transmission) (void __iomem *ioaddr);
++	void (*enable_dma_transmission)(void __iomem *ioaddr, u32 chan);
+ 	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			       u32 chan, bool rx, bool tx);
+ 	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index e1537a57815f..e94faa72f30e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
+ 		return 0;
+ 	}
+ 
++	if (priv->plat->flags & STMMAC_FLAG_DISABLE_FORCE_1000) {
++		if (cmd->base.speed == SPEED_1000 &&
++		    cmd->base.autoneg != AUTONEG_ENABLE)
++			return -EOPNOTSUPP;
++	}
++
+ 	return phylink_ethtool_ksettings_set(priv->phylink, cmd);
+ }
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index fe3498e86de9..835c8570a767 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -2564,7 +2564,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+ 				       true, priv->mode, true, true,
+ 				       xdp_desc.len);
+ 
+-		stmmac_enable_dma_transmission(priv, priv->ioaddr);
++		stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+ 
+ 		xsk_tx_metadata_to_compl(meta,
+ 					 &tx_q->tx_skbuff_dma[entry].xsk_meta);
+@@ -3014,7 +3014,6 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+ 	struct stmmac_rx_queue *rx_q;
+ 	struct stmmac_tx_queue *tx_q;
+ 	u32 chan = 0;
+-	int atds = 0;
+ 	int ret = 0;
+ 
+ 	if (!priv->plat->dma_cfg || !priv->plat->dma_cfg->pbl) {
+@@ -3023,7 +3022,7 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+ 	}
+ 
+ 	if (priv->extend_desc && (priv->mode == STMMAC_RING_MODE))
+-		atds = 1;
++		priv->plat->dma_cfg->atds = 1;
+ 
+ 	ret = stmmac_reset(priv, priv->ioaddr);
+ 	if (ret) {
+@@ -3032,7 +3031,7 @@ static int stmmac_init_dma_engine(struct stmmac_priv *priv)
+ 	}
+ 
+ 	/* DMA Configuration */
+-	stmmac_dma_init(priv, priv->ioaddr, priv->plat->dma_cfg, atds);
++	stmmac_dma_init(priv, priv->ioaddr, priv->plat->dma_cfg);
+ 
+ 	if (priv->plat->axi)
+ 		stmmac_axi(priv, priv->ioaddr, priv->plat->axi);
+@@ -4761,7 +4760,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	netdev_tx_sent_queue(netdev_get_tx_queue(dev, queue), skb->len);
+ 
+-	stmmac_enable_dma_transmission(priv, priv->ioaddr);
++	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+ 
+ 	stmmac_flush_tx_descriptors(priv, queue);
+ 	stmmac_tx_timer_arm(priv, queue);
+@@ -4988,7 +4987,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
+ 		u64_stats_update_end(&txq_stats->q_syncp);
+ 	}
+ 
+-	stmmac_enable_dma_transmission(priv, priv->ioaddr);
++	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+ 
+ 	entry = STMMAC_GET_ENTRY(entry, priv->dma_conf.dma_tx_size);
+ 	tx_q->cur_tx = entry;
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index dfa1828cd756..1b54b84a6785 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -100,6 +100,7 @@ struct stmmac_dma_cfg {
+ 	bool eame;
+ 	bool multi_msi_en;
+ 	bool dche;
++	bool atds;
+ };
+ 
+ #define AXI_BLEN	7
 -- 
 2.31.4
 
