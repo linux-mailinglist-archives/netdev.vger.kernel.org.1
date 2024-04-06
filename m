@@ -1,140 +1,149 @@
-Return-Path: <netdev+bounces-85403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C01A489A9C3
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 10:25:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA6B89A9CF
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 11:05:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1B041C214B9
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 08:25:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18434B21CD8
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 09:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB2024219;
-	Sat,  6 Apr 2024 08:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02A5225CF;
+	Sat,  6 Apr 2024 09:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="RQXFG31G"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LL8LDxyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB4E1BF40
-	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 08:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FB64C84
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 09:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712391924; cv=none; b=myVe9Txo/u0d9BrpFbkrR5P7qHgMcNxeL1tCL5BxjBZ7A0sGYyxAaESY7ul98i3XuiCM011CwmXiB4HqJ102BK5SPnzK1Sr22otiI/a5ONx/dzLYeJBmKWMoNywxxWI+P76P/oDjpq4c5JWP3v3224sZZtJ2Ass9f+WfXd9kMDU=
+	t=1712394350; cv=none; b=io1Zl+9Uk9CRJ8KUWMHQ5S8qk4baF8xr6bJhDDBqMymMwXfMoPYTaHT2F03gZaRYVloFGnGXFMaE1cUZTLkkzs48YuPhSyTk+NzP1nX8jj6Z/HkkWT6+w/yaT5rJPBqVyvz2Iy3dARNoBt6ITjFLYcClNF3Z760VRMRbeoEEakE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712391924; c=relaxed/simple;
-	bh=Yp70LyV42TC86owiqwUo+ei2yFC/VLhbCv0icbZUJFE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HDFRxTx/cgOYXfwhl88gl4LOok90+skrHXkLlpZxaI0Om8qeoSlkEycD2+cFISKsDGWUeABxVG8UT9cIcKcBEYrN6336j8PZaoKObz31IwJRHvIhNJZ3bSnvLyDVrt3DWHUfrdQOL1XJyRy28MfAcqGsaIPAb6Ym8PP6bUDdpTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=RQXFG31G; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-41551500a7eso23392955e9.2
-        for <netdev@vger.kernel.org>; Sat, 06 Apr 2024 01:25:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1712391920; x=1712996720; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QBJNfaYHzuiXuMZUpgDPs9xtiQNCWuPWeZpuB9UBK3o=;
-        b=RQXFG31GJAWymDTWNhTKADUAB9uLWMTl6XLDZsCjsq48E0qlICb8X5ZIYM+ZFvPxY+
-         2iTmDH2B1OdN9K8TMnnATglFXoHTbTWRzBWWDkwJ3o+vYAyxonhSKaU2L6EFlUFJMeVk
-         5eKsxULDCoQlQLghZy2H4tfZ62ywrUO4qnvkpTZCbil65UKBTo1Nk6cLNBkuuNAfi7ba
-         dnIVBhElxMmNSPRnwBE1OAan/2MXAgTo7UfQp1MkFaMFcRlS+vyE/6rw/Mn/VpWuJp3N
-         JETK06m6C8UTxZxjVMsd1Cg6mpJZwgChIcsqmUAK8gs32cNQoI7Ugv32HgdBYOXF7rHr
-         ++ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712391920; x=1712996720;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QBJNfaYHzuiXuMZUpgDPs9xtiQNCWuPWeZpuB9UBK3o=;
-        b=qUGW88zHuflIBo+LR+yF61F8Wp545CDaKDUSOpcDU7T33wFkb0PlHr7x4G9kP53Iqc
-         Oy1WZaeKKxftj3lotp6QrxHHhbWZW7teiF2AM7IjvAPTuSHJgKEJ/W5g68IdlDir9xJg
-         ChKaKgDJFXmpDuwnNLspkVQxi3ZelaPAEJ/pqdV1wvMMDH9JLXowOLks7iqRUkTxg68V
-         5Ne9cl2rFPieKTytxvkvsst296IxWtAKGtPaSuJYNxepla4kIRCHsXLnCiKHFQ0jm8Tg
-         D5rPu7rDdLJxbg5Z1Oh1Ep/j+L7Qib7X5/d4kFpE08nMWYCh2BAHzO8bYWd9A6x0shVp
-         NDrg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhMcIQBtjzjsOhVTAuV39UnCCFdxF/vJHZDY6y7HTsN6xgnsGpXiFxcfLES/Z3hoEVVMDEgRXTmv6WiQxxekCw2W0VsrRG
-X-Gm-Message-State: AOJu0YxI2gMwhypv+9jtIx8nJiQTbrMT6mOZ/spLYeSmH8UC6Ns3ktyI
-	/2+DWQjqza53gWFF1upnaGRHh304iVwIZ7p7M4vvFmosnY/RRGJKY3U8YC7nCio=
-X-Google-Smtp-Source: AGHT+IErFMsFHaLT/wvJseM7VLt7L5c4EEUPJNvPHKcBFR7A7uLC4IE0vs6uWbJXA8BJb/8NdN1U/g==
-X-Received: by 2002:a05:600c:1c13:b0:416:3de5:1364 with SMTP id j19-20020a05600c1c1300b004163de51364mr437857wms.18.1712391919991;
-        Sat, 06 Apr 2024 01:25:19 -0700 (PDT)
-Received: from f1.redhat.com ([2a06:c701:46c7:8900:15f8:24e1:258e:dbd5])
-        by smtp.gmail.com with ESMTPSA id g11-20020a05600c310b00b00416244a53b8sm5794220wmo.4.2024.04.06.01.25.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Apr 2024 01:25:19 -0700 (PDT)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: yan@daynix.com,
-	andrew@daynix.com
-Subject: [PATCH] net: change maximum number of UDP segments to 128
-Date: Sat,  6 Apr 2024 11:25:13 +0300
-Message-Id: <20240406082513.78692-1-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.34.3
+	s=arc-20240116; t=1712394350; c=relaxed/simple;
+	bh=QKT6ZgMmLZgvHpHSPv5dWWpjzG6gbWOWYvrh3WXbrcU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KyPz81AYeGTRA/Alndc0azIs7vKg7Z1qbiKi7CHblhcRMxIHeJ00loK2lOueDkyMvVxnAgi4TWO+1iYdAmJ1ApwsH+a8zNTd8TfXoBD0F+qy9GHi/29zyt99Z7wvIFmxVReUjai4FvG1IU4JkF0L/TyhMQeNz+1E8eofIY11vf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LL8LDxyC; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5c47f5de-c3cf-4921-9e8c-efc8b55f1d7f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712394345;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P8QB0c6fetFanEVdDBif61y8ep5Rhwz7oQ9ZgyX91gs=;
+	b=LL8LDxyCHIsG46BUlaYrm6eGjyTeDsk7fwLU4pMX5eZnbXJf6M8TTWkzuQwW1BcJE1vIgZ
+	CFngzH65ObigEf/TceBCQTtrJ0gEJcD79/AXBMC+B0duT5sgxHCfowUAg8KTs3EEWKOe86
+	x1y1knsfC+eBZjf7u2iVcepo0QvoVDg=
+Date: Sat, 6 Apr 2024 11:05:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [net-next v4 0/2] devlink: Add port function attribute for IO EQs
+To: Parav Pandit <parav@nvidia.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, corbet@lwn.net, dw@davidwei.uk,
+ kalesh-anakkur.purayil@broadcom.com
+Cc: saeedm@nvidia.com, leon@kernel.org, jiri@resnulli.us, shayd@nvidia.com,
+ danielj@nvidia.com, dchumak@nvidia.com, linux-doc@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+References: <20240406010538.220167-1-parav@nvidia.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20240406010538.220167-1-parav@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Earlier commit fc8b2a619469378 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
-added check of potential number of UDP segment vs UDP_MAX_SEGMENTS
-in linux/virtio_net.h.
-After this change certification test of USO guest-to-guest
-transmit on Windows driver for virtio-net device fails,
-for example with packet size of ~64K and mss of 536 bytes.
-In general the USO should not be more restrictive than TSO.
-Indeed, in case of unreasonably small mss a lot of segments
-can cause queue overflow and packet loss on the destination.
-Limit of 128 segments is good for any practical purpose,
-with minimal meaningful mss of 536 the maximal UDP packet will
-be divided to ~120 segments.
+在 2024/4/6 3:05, Parav Pandit 写道:
+> Currently, PCI SFs and VFs use IO event queues to deliver netdev per
+> channel events. The number of netdev channels is a function of IO
+> event queues. In the second scenario of an RDMA device, the
+> completion vectors are also a function of IO event queues. Currently, an
+> administrator on the hypervisor has no means to provision the number
+> of IO event queues for the SF device or the VF device. Device/firmware
+> determines some arbitrary value for these IO event queues. Due to this,
+> the SF netdev channels are unpredictable, and consequently, the
+> performance is too.
+> 
+> This short series introduces a new port function attribute: max_io_eqs.
+> The goal is to provide administrators at the hypervisor level with the
+> ability to provision the maximum number of IO event queues for a
+> function. This gives the control to the administrator to provision
+> right number of IO event queues and have predictable performance.
+> 
+> Examples of when an administrator provisions (set) maximum number of
+> IO event queues when using switchdev mode:
+> 
+>    $ devlink port show pci/0000:06:00.0/1
+>        pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
+>            function:
+>            hw_addr 00:00:00:00:00:00 roce enable max_io_eqs 10
+> 
+>    $ devlink port function set pci/0000:06:00.0/1 max_io_eqs 20
+> 
+>    $ devlink port show pci/0000:06:00.0/1
+>        pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
+>            function:
+>            hw_addr 00:00:00:00:00:00 roce enable max_io_eqs 20
+> 
+> This sets the corresponding maximum IO event queues of the function
+> before it is enumerated. Thus, when the VF/SF driver reads the
+> capability from the device, it sees the value provisioned by the
+> hypervisor. The driver is then able to configure the number of channels
+> for the net device, as well as the number of completion vectors
+> for the RDMA device. The device/firmware also honors the provisioned
+> value, hence any VF/SF driver attempting to create IO EQs
+> beyond provisioned value results in an error.
+> 
+> With above setting now, the administrator is able to achieve the 2x
+> performance on SFs with 20 channels. In second example when SF was
+> provisioned for a container with 2 cpus, the administrator provisioned only
+> 2 IO event queues, thereby saving device resources.
+> 
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- include/linux/udp.h                  | 2 +-
- tools/testing/selftests/net/udpgso.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+The following paragraph is the same with the above paragraph?
 
-diff --git a/include/linux/udp.h b/include/linux/udp.h
-index 3748e82b627b..7e75ccdf25fe 100644
---- a/include/linux/udp.h
-+++ b/include/linux/udp.h
-@@ -108,7 +108,7 @@ struct udp_sock {
- #define udp_assign_bit(nr, sk, val)		\
- 	assign_bit(UDP_FLAGS_##nr, &udp_sk(sk)->udp_flags, val)
- 
--#define UDP_MAX_SEGMENTS	(1 << 6UL)
-+#define UDP_MAX_SEGMENTS	(1 << 7UL)
- 
- #define udp_sk(ptr) container_of_const(ptr, struct udp_sock, inet.sk)
- 
-diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
-index 1d975bf52af3..85b3baa3f7f3 100644
---- a/tools/testing/selftests/net/udpgso.c
-+++ b/tools/testing/selftests/net/udpgso.c
-@@ -34,7 +34,7 @@
- #endif
- 
- #ifndef UDP_MAX_SEGMENTS
--#define UDP_MAX_SEGMENTS	(1 << 6UL)
-+#define UDP_MAX_SEGMENTS	(1 << 7UL)
- #endif
- 
- #define CONST_MTU_TEST	1500
--- 
-2.34.3
+> With the above settings now in place, the administrator achieved 2x
+> performance with the SF device with 20 channels. In the second example,
+> when the SF was provisioned for a container with 2 CPUs, the administrator
+> provisioned only 2 IO event queues, thereby saving device resources.
+> 
+> changelog:
+> v2->v3:
+> - limited to 80 chars per line in devlink
+> - fixed comments from Jakub in mlx5 driver to fix missing mutex unlock
+>    on error path
+> v1->v2:
+> - limited comment to 80 chars per line in header file
+> - fixed set function variables for reverse christmas tree
+> - fixed comments from Kalesh
+> - fixed missing kfree in get call
+> - returning error code for get cmd failure
+> - fixed error msg copy paste error in set on cmd failure
+> 
+> Parav Pandit (2):
+>    devlink: Support setting max_io_eqs
+>    mlx5/core: Support max_io_eqs for a function
+> 
+>   .../networking/devlink/devlink-port.rst       | 33 +++++++
+>   .../mellanox/mlx5/core/esw/devlink_port.c     |  4 +
+>   .../net/ethernet/mellanox/mlx5/core/eswitch.h |  7 ++
+>   .../mellanox/mlx5/core/eswitch_offloads.c     | 97 +++++++++++++++++++
+>   include/net/devlink.h                         | 14 +++
+>   include/uapi/linux/devlink.h                  |  1 +
+>   net/devlink/port.c                            | 53 ++++++++++
+>   7 files changed, 209 insertions(+)
+> 
 
 
