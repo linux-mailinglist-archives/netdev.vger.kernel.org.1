@@ -1,149 +1,152 @@
-Return-Path: <netdev+bounces-85404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA6B89A9CF
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 11:05:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7190989AAEE
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 14:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18434B21CD8
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 09:05:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28643282258
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 12:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02A5225CF;
-	Sat,  6 Apr 2024 09:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LL8LDxyC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5092C1A3;
+	Sat,  6 Apr 2024 12:45:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FB64C84
-	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 09:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9ECEE546
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 12:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712394350; cv=none; b=io1Zl+9Uk9CRJ8KUWMHQ5S8qk4baF8xr6bJhDDBqMymMwXfMoPYTaHT2F03gZaRYVloFGnGXFMaE1cUZTLkkzs48YuPhSyTk+NzP1nX8jj6Z/HkkWT6+w/yaT5rJPBqVyvz2Iy3dARNoBt6ITjFLYcClNF3Z760VRMRbeoEEakE=
+	t=1712407529; cv=none; b=gRC0ZrT2AhDlCHb4VaaQJnFmPtmVVsxdtmUBPHFAIm/4h6MrYO4AOAdv0ZvOelFWbwUiCVZJfv59CtaBgXGJfjviIgzrumyOB7ecYA5pcY3ipwKc9J22aNJt6iC0sROwdTCLhqbaywKkOxbI9xNO95m6m+blUo8VeVgPaz8bs5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712394350; c=relaxed/simple;
-	bh=QKT6ZgMmLZgvHpHSPv5dWWpjzG6gbWOWYvrh3WXbrcU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KyPz81AYeGTRA/Alndc0azIs7vKg7Z1qbiKi7CHblhcRMxIHeJ00loK2lOueDkyMvVxnAgi4TWO+1iYdAmJ1ApwsH+a8zNTd8TfXoBD0F+qy9GHi/29zyt99Z7wvIFmxVReUjai4FvG1IU4JkF0L/TyhMQeNz+1E8eofIY11vf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LL8LDxyC; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5c47f5de-c3cf-4921-9e8c-efc8b55f1d7f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712394345;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P8QB0c6fetFanEVdDBif61y8ep5Rhwz7oQ9ZgyX91gs=;
-	b=LL8LDxyCHIsG46BUlaYrm6eGjyTeDsk7fwLU4pMX5eZnbXJf6M8TTWkzuQwW1BcJE1vIgZ
-	CFngzH65ObigEf/TceBCQTtrJ0gEJcD79/AXBMC+B0duT5sgxHCfowUAg8KTs3EEWKOe86
-	x1y1knsfC+eBZjf7u2iVcepo0QvoVDg=
-Date: Sat, 6 Apr 2024 11:05:41 +0200
+	s=arc-20240116; t=1712407529; c=relaxed/simple;
+	bh=jXG8WT8tTm5rxdE5PY8Uo30AJqEfXI4UjfQ7ZR6Q7Ys=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=SVYPKBxA7gP7f7W3SMbFaf47Vj8snhXxIRx37DU8QeEFK2X6YxJjVovqEb8LgUSNiIcc+jmwKG1f0KPKv6ySpMTTg+Yo/BEnFwWnRfKosuIyb6ag1pl8EcKLoiJKn8lcHkhsEG1yUgyoPHt7b0L3ZoqsaxR8iZ+RdDSLiH3YT58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from smtpclient.apple (172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 0912C7D111;
+	Sat,  6 Apr 2024 12:36:19 +0000 (UTC)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [net-next v4 0/2] devlink: Add port function attribute for IO EQs
-To: Parav Pandit <parav@nvidia.com>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, corbet@lwn.net, dw@davidwei.uk,
- kalesh-anakkur.purayil@broadcom.com
-Cc: saeedm@nvidia.com, leon@kernel.org, jiri@resnulli.us, shayd@nvidia.com,
- danielj@nvidia.com, dchumak@nvidia.com, linux-doc@vger.kernel.org,
- linux-rdma@vger.kernel.org
-References: <20240406010538.220167-1-parav@nvidia.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20240406010538.220167-1-parav@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.500.171.1.1\))
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the SA
+ in or out
+From: Christian Hopps <chopps@chopps.org>
+In-Reply-To: <ZhBzcMrpBCNXXVBV@hog>
+Date: Sat, 6 Apr 2024 08:36:09 -0400
+Cc: Christian Hopps <chopps@chopps.org>,
+ Antony Antony <antony.antony@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ netdev@vger.kernel.org,
+ devel@linux-ipsec.org,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <9F71A296-D9DF-4C4F-844E-CB3DE01B3F34@chopps.org>
+References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
+ <ZhBzcMrpBCNXXVBV@hog>
+To: Sabrina Dubroca <sd@queasysnail.net>
+X-Mailer: Apple Mail (2.3774.500.171.1.1)
 
-在 2024/4/6 3:05, Parav Pandit 写道:
-> Currently, PCI SFs and VFs use IO event queues to deliver netdev per
-> channel events. The number of netdev channels is a function of IO
-> event queues. In the second scenario of an RDMA device, the
-> completion vectors are also a function of IO event queues. Currently, an
-> administrator on the hypervisor has no means to provision the number
-> of IO event queues for the SF device or the VF device. Device/firmware
-> determines some arbitrary value for these IO event queues. Due to this,
-> the SF netdev channels are unpredictable, and consequently, the
-> performance is too.
-> 
-> This short series introduces a new port function attribute: max_io_eqs.
-> The goal is to provide administrators at the hypervisor level with the
-> ability to provision the maximum number of IO event queues for a
-> function. This gives the control to the administrator to provision
-> right number of IO event queues and have predictable performance.
-> 
-> Examples of when an administrator provisions (set) maximum number of
-> IO event queues when using switchdev mode:
-> 
->    $ devlink port show pci/0000:06:00.0/1
->        pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
->            function:
->            hw_addr 00:00:00:00:00:00 roce enable max_io_eqs 10
-> 
->    $ devlink port function set pci/0000:06:00.0/1 max_io_eqs 20
-> 
->    $ devlink port show pci/0000:06:00.0/1
->        pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
->            function:
->            hw_addr 00:00:00:00:00:00 roce enable max_io_eqs 20
-> 
-> This sets the corresponding maximum IO event queues of the function
-> before it is enumerated. Thus, when the VF/SF driver reads the
-> capability from the device, it sees the value provisioned by the
-> hypervisor. The driver is then able to configure the number of channels
-> for the net device, as well as the number of completion vectors
-> for the RDMA device. The device/firmware also honors the provisioned
-> value, hence any VF/SF driver attempting to create IO EQs
-> beyond provisioned value results in an error.
-> 
-> With above setting now, the administrator is able to achieve the 2x
-> performance on SFs with 20 channels. In second example when SF was
-> provisioned for a container with 2 cpus, the administrator provisioned only
-> 2 IO event queues, thereby saving device resources.
-> 
 
-The following paragraph is the same with the above paragraph?
 
-> With the above settings now in place, the administrator achieved 2x
-> performance with the SF device with 20 channels. In the second example,
-> when the SF was provisioned for a container with 2 CPUs, the administrator
-> provisioned only 2 IO event queues, thereby saving device resources.
-> 
-> changelog:
-> v2->v3:
-> - limited to 80 chars per line in devlink
-> - fixed comments from Jakub in mlx5 driver to fix missing mutex unlock
->    on error path
-> v1->v2:
-> - limited comment to 80 chars per line in header file
-> - fixed set function variables for reverse christmas tree
-> - fixed comments from Kalesh
-> - fixed missing kfree in get call
-> - returning error code for get cmd failure
-> - fixed error msg copy paste error in set on cmd failure
-> 
-> Parav Pandit (2):
->    devlink: Support setting max_io_eqs
->    mlx5/core: Support max_io_eqs for a function
-> 
->   .../networking/devlink/devlink-port.rst       | 33 +++++++
->   .../mellanox/mlx5/core/esw/devlink_port.c     |  4 +
->   .../net/ethernet/mellanox/mlx5/core/eswitch.h |  7 ++
->   .../mellanox/mlx5/core/eswitch_offloads.c     | 97 +++++++++++++++++++
->   include/net/devlink.h                         | 14 +++
->   include/uapi/linux/devlink.h                  |  1 +
->   net/devlink/port.c                            | 53 ++++++++++
->   7 files changed, 209 insertions(+)
-> 
+> On Apr 5, 2024, at 17:56, Sabrina Dubroca via Devel =
+<devel@linux-ipsec.org> wrote:
+>=20
+> Hi Antony,
+>=20
+> 2024-04-05, 14:40:07 +0200, Antony Antony wrote:
+>> This patch introduces the 'dir' attribute, 'in' or 'out', to the
+>> xfrm_state, SA, enhancing usability by delineating the scope of =
+values
+>> based on direction. An input SA will now exclusively encompass values
+>> pertinent to input, effectively segregating them from output-related
+>> values.
+>=20
+> But this patch isn't doing that for existing properties (I'm thinking
+> of replay window, not sure if any others are relevant [1]). Why not?
+>=20
+> [1] that should include values passed via xfrm_usersa_info too,
+>    not just XFRMA_* attributes
+>=20
+> Adding these checks should be safe (wrt breakage of API): Old software
+> would not be passing XFRMA_SA_DIR, so adding checks when it is =
+provided
+> would not break anything there. Only new software using the attribute
+> would benefit from having directed SAs and restriction on which =
+attributes
+> can be used (and that's fine).
+>=20
+> Right now the new attribute is 100% duplicate of the existing offload
+> direction, so I don't see much point.
+
+A subset of the ipsec has requested that IPTFS utilize this new =
+directional attribute as most of IPTFS config is send-only. So IPTFS is =
+the planned first user and is also now blocked on this patch.
+
+Chris.
+
+
+>=20
+>> This change aims to streamline the configuration process and
+>> improve the overall clarity of SA attributes.
+>>=20
+>> This feature sets the groundwork for future patches, including
+>> the upcoming IP-TFS patch.
+>>=20
+>> Currently, dir is only allowed when HW OFFLOAD is set.
+>>=20
+>> ---
+>=20
+> BTW, everything after this '---' will get cut, including your =
+sign-off.
+>=20
+>> v5->v6:
+>> - XFRMA_SA_DIR only allowed with HW OFFLOAD
+>>=20
+>> v4->v5:
+>> - add details to commit message
+>>=20
+>> v3->v4:
+>> - improve HW OFFLOAD DIR check check other direction
+>>=20
+>> v2->v3:
+>> - delete redundant XFRM_SA_DIR_USE
+>> - use u8 for "dir"
+>> - fix HW OFFLOAD DIR check
+>>=20
+>> v1->v2:
+>> - use .strict_start_type in struct nla_policy xfrma_policy
+>> - delete redundant XFRM_SA_DIR_MAX enum
+>> ---
+>>=20
+>> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+>> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+>=20
+> nit: If I'm making non-trivial changes to the contents of the patch, I
+> typically drop the review (and test) tags I got on previous versions,
+> since they may no longer apply.
+>=20
+> --=20
+> Sabrina
+>=20
+> --=20
+> Devel mailing list
+> Devel@linux-ipsec.org
+> https://linux-ipsec.org/mailman/listinfo/devel
+>=20
 
 
