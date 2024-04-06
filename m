@@ -1,236 +1,127 @@
-Return-Path: <netdev+bounces-85452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 154AE89ACA4
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 20:38:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3619789ACBD
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 21:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FB5AB21528
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 18:37:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 680521C20340
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 19:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270C338DF2;
-	Sat,  6 Apr 2024 18:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4ED4CB45;
+	Sat,  6 Apr 2024 19:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hrg5w6M+"
+	dkim=pass (2048-bit key) header.d=philpotter-co-uk.20230601.gappssmtp.com header.i=@philpotter-co-uk.20230601.gappssmtp.com header.b="bPB2vn+6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A7D1F16B
-	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 18:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59532481DE
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 19:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712428674; cv=none; b=AqfDiVtsHq1nPoLcwNrowLlRiReGjmv5JEGg80HNIgLzo9iaxUtG+ztPJ8u5wfQIQrYtCSiFU9E5QnVXGstObdzEHSuVA3XkUNmsZ0Bd2pujFVGapBNSnw8d4MQ3XG4zoZYIzuO+i1H/bzD14aYGOwT0oXRkGNyEpOgt2f8s23M=
+	t=1712431332; cv=none; b=byekLmm1LQPLqACEtyso89x+Z1c348/lUSI3ijm4Smca1koKMEGXRnPC5kOnNr4yIACbb+IKiy+GvpJrZ3psl7+oKexwCjIZpYv7ysboMt33IAUsN+VnLaBsobSjOz7xLxL1mzq+HtZ1bdDpX5XnbE53oub49Gnob+1vQzMgD+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712428674; c=relaxed/simple;
-	bh=pVyno5FUU06QcOnKBkCBLZuitqukqwVq2ShJhgAAxc8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SV5SVwpEVcqMAdlXUCA4jDVyg8GX9wLe4v8/q7ZaP9meFUSt0h0BLQhc5hFHu0zx3YfAXqkqMBp0JENHDQ6K80nN2HP8TFlDWmjwKrR350pFKHn1sJ6Lc2CALsLVvgR24xD0HCHj0ZDso2fJpf9xW1fHXXIGzDaxEX27HEcpSTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hrg5w6M+; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56e2e851794so7489a12.0
-        for <netdev@vger.kernel.org>; Sat, 06 Apr 2024 11:37:51 -0700 (PDT)
+	s=arc-20240116; t=1712431332; c=relaxed/simple;
+	bh=5A+6f7IkS+EMvp55GPed2MsJPEeMMXdOrMYYL9nD6ak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HpUFWuJwTgNXb/eSTxNrfFSyLY+ioa7iyX/ttQwo2fdPDh7YVR5SMZPuhAvyNiycu5upOyKc1WiBqGKfM9ig7t42LzfCiIRmsXKU7jRAWz1AVhqnBFxjPCGM+LaFnd59+r3ePRSjrPi3TRAjZWJfzK4AWAe1pO39XlRXwnFb7+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk; spf=pass smtp.mailfrom=philpotter.co.uk; dkim=pass (2048-bit key) header.d=philpotter-co-uk.20230601.gappssmtp.com header.i=@philpotter-co-uk.20230601.gappssmtp.com header.b=bPB2vn+6; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=philpotter.co.uk
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-344047ac7e4so432961f8f.0
+        for <netdev@vger.kernel.org>; Sat, 06 Apr 2024 12:22:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712428670; x=1713033470; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lXiaeiDriebfXzGJiJC2yW3jLrxaZ2tj8awoa8ujxwA=;
-        b=hrg5w6M+EFb2qJExhUtNKgOtFgJWxzXwA14Bd/Bd55K+/wEV8cbyoA3z5CuyynUDe4
-         xIHd8UJ7gWcDJdDrgzon4eppnCQj3J7HOLY1u3TUyJMqc7mCSYiB0aOYauPxzZnLvBvM
-         xaWMCozr89DFF7Aj/ipM5XTgYEfrCM/zzCSja6tPNV1GTHQ+auMGXS1nqkJmVo8HQmjf
-         WinZ7T7Yj8WPzF96zzsxOuW/QiHChYylV8E8ARp4iNmiHUepM4zsliqIMMGDj159Xoa7
-         iN8CsbtJSpNHi1LozeFE3Td1zLUeCt8jbbNUAE+HVGoAL+yrKcQqN2DR+5Y2vNkuRG87
-         rWyA==
+        d=philpotter-co-uk.20230601.gappssmtp.com; s=20230601; t=1712431328; x=1713036128; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=756hDfjo3U5mrTvSlV/zzY9CFAqjhj0SOon+Yv0jZK0=;
+        b=bPB2vn+6u8RAhKXV4/d52Yqa5/YwJ8bBz5NyHQNMtaadsVGTrYP75pnoOmd++z5UB8
+         E/+q2u4MkO8Tf4DQ3XZKk0aBcB+DGxOUkW8VydBjt5j7YCKb3dM0QzWbtOGwlcwuoDYP
+         nNP863suwm96sDV96IPvmQgS0b322mPby+IWUvpgsxpvl01rcbPVQKp6M74Mpfuj1wUc
+         Dg6gQUUn8R54XrRPGEJw4CzxC3I8txXr0j+A/kkrcSVdb6Q9qJcJFnoIzSf8MjfqpvDq
+         kc6CfECcSYSs4uA2f7OrYaoy8xyiqPn6vXHwZa3+ozy+js77CW8iKdA9AvMtDPpTvdcz
+         2SzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712428670; x=1713033470;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lXiaeiDriebfXzGJiJC2yW3jLrxaZ2tj8awoa8ujxwA=;
-        b=ro2AvQzppaDq+hpkIg3gkONqcu4wy5lrD2e9fzmECawjYIbkBadUleFrE4xc/wrrWQ
-         lM8jO/29O3Ox4Eq1uZwOydn+J4ixaqfexSgQGc24sPCpv+dtZti0YJmLDNFrbAyJVy24
-         FTIhl4kgebfaFS1ZtW6fzH5PB6bhbZ9mbTNCbsW284UEvkyuvxs/MiUe3iEYTrr91gnJ
-         uk+UyiAnJFaiDtfTpoZNjrio1nQd7Z8D03/TY0JRu0qCRbOAj9PsxWpfLftgS3S2PWXh
-         AwMj4/qwWiELvCyl1Nfy9FKza5dN7fLg7HcWrWXrtE3XZz+XhVWazucv/p4eEXgAmBue
-         RWyQ==
-X-Gm-Message-State: AOJu0YzhZO3QmpKGTZyKcZ+Qo3+3LnhZBywvp9To877W4Cj9YHjMd0Vd
-	WbN6cm+D8f29Ts5cnI9uuXe3oOSoGh/AbeMPNzo4MTNi0MiaLeE07wUEQw+ByTD7p9sOM8lGpV7
-	u9tyd3L+wXCNDFRFhVjS4CnvCLftjtJYuLBEy
-X-Google-Smtp-Source: AGHT+IEty72s9OzFyTi5pHlJFZrQLvzxGjU1K9N6gYeWeNs+IZWQ5D6h6eMxU+sQ6LHwIgx1sJ6irMo6KsPxDKC/Klc=
-X-Received: by 2002:a05:6402:c9b:b0:56e:3486:25a3 with SMTP id
- cm27-20020a0564020c9b00b0056e348625a3mr75240edb.1.1712428670233; Sat, 06 Apr
- 2024 11:37:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712431328; x=1713036128;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=756hDfjo3U5mrTvSlV/zzY9CFAqjhj0SOon+Yv0jZK0=;
+        b=KD+/es2KOurKGfVn7RXItlYGOgfA+S1K1ZAsSoBkditt/fIrHGHRTe3X7SyaJVFoW4
+         GQr8M+jstmBczDm4olIGeOZ3RnATjHrDHXON+LV+S1sbBIm2CcE0Jm5rH1a4OtikapI/
+         1rGhvlb1fI5d9uxPbvM+hR/Ho4r30wFa7hJkwZKNLz9yvK4yZbASvqVipU33lHh9kLie
+         Ag8ju7sFiPUSNTSWOm0FCaLl5xf4qiR9m9E9EeiJ94jgiiH//w96Kvcakwer+sZSpeea
+         oCO/w/IKqgrtTv1H1+N6/u+pyULROAg562rQpODC6H111CH2bawIGyYvasXvBl6a3Su4
+         VvWg==
+X-Forwarded-Encrypted: i=1; AJvYcCUCvBUCVUQAbOuayhuMOmou71LqxqR2HHu7EeZNPY76oT004AtDkuQU1PneUk1nWNbXHaTGmDWTAHte4IhpwcjZQ3Rt5xuT
+X-Gm-Message-State: AOJu0Yw7mcYC/AY+83wUQV9fSGilGUHPLqdYhbZqCosAgZX5Qfh289Tx
+	axa47tgm4edW/H5wuf0eNdN/SnRmHBU6d1UIHGw2gebFGghedFp418zWxBzQDLo=
+X-Google-Smtp-Source: AGHT+IF12v1vBalJveHvkoU64m+w7vrJbJW8RGGa8glJnsx8VZ6952vGw2fa1a0O3oXBcHLTR2asNQ==
+X-Received: by 2002:adf:a496:0:b0:343:dd78:cede with SMTP id g22-20020adfa496000000b00343dd78cedemr5963369wrb.4.1712431328560;
+        Sat, 06 Apr 2024 12:22:08 -0700 (PDT)
+Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
+        by smtp.gmail.com with ESMTPSA id y13-20020a5d4acd000000b00343eac2acc4sm4429440wrs.111.2024.04.06.12.22.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Apr 2024 12:22:08 -0700 (PDT)
+Date: Sat, 6 Apr 2024 20:22:06 +0100
+From: Phillip Potter <phil@philpotter.co.uk>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	syzbot+9ee20ec1de7b3168db09@syzkaller.appspotmail.com,
+	sd@queasysnail.net
+Subject: Re: [PATCH v4 net] geneve: fix header validation in
+ geneve[6]_xmit_skb
+Message-ID: <ZhGg3kRHpARQAv9b@equinox>
+References: <20240405103035.171380-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240406182107.261472-1-jmaloy@redhat.com> <20240406182107.261472-3-jmaloy@redhat.com>
-In-Reply-To: <20240406182107.261472-3-jmaloy@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 6 Apr 2024 20:37:35 +0200
-Message-ID: <CANn89iJgXBXaZyX5gBwr4WiAz5DRn8sH_v0LLtNOSB84yDP3yg@mail.gmail.com>
-Subject: Re: [net-next 2/2] tcp: correct handling of extreme menory squeeze
-To: jmaloy@redhat.com, Menglong Dong <imagedong@tencent.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
-	dgibson@redhat.com, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240405103035.171380-1-edumazet@google.com>
 
-On Sat, Apr 6, 2024 at 8:21=E2=80=AFPM <jmaloy@redhat.com> wrote:
->
-> From: Jon Maloy <jmaloy@redhat.com>
->
-> Testing of the previous commit ("tcp: add support for SO_PEEK_OFF")
-> in this series along with the pasta protocol splicer revealed a bug in
-> the way tcp handles window advertising during extreme memory squeeze
-> situations.
->
-> The excerpt of the below logging session shows what is happeing:
->
-> [5201<->54494]:     =3D=3D=3D=3D Activating log @ tcp_select_window()/268=
- =3D=3D=3D=3D
-> [5201<->54494]:     (inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM) -->=
- TRUE
-> [5201<->54494]:   tcp_select_window(<-) tp->rcv_wup: 2812454294, tp->rcv_=
-wnd: 5812224, tp->rcv_nxt 2818016354, returning 0
-> [5201<->54494]:   ADVERTISING WINDOW SIZE 0
-> [5201<->54494]: __tcp_transmit_skb(<-) tp->rcv_wup: 2812454294, tp->rcv_w=
-nd: 5812224, tp->rcv_nxt 2818016354
->
-> [5201<->54494]: tcp_recvmsg_locked(->)
-> [5201<->54494]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 2812454294, tp->rcv=
-_wnd: 5812224, tp->rcv_nxt 2818016354
-> [5201<->54494]:     (win_now: 250164, new_win: 262144 >=3D (2 * win_now):=
- 500328))? --> time_to_ack: 0
-> [5201<->54494]:     NOT calling tcp_send_ack()
-> [5201<->54494]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 2812454294, tp->rcv=
-_wnd: 5812224, tp->rcv_nxt 2818016354
-> [5201<->54494]: tcp_recvmsg_locked(<-) returning 131072 bytes, window now=
-: 250164, qlen: 83
->
-> [...]
+On Fri, Apr 05, 2024 at 10:30:34AM +0000, Eric Dumazet wrote:
+> syzbot is able to trigger an uninit-value in geneve_xmit() [1]
+> 
+> Problem : While most ip tunnel helpers (like ip_tunnel_get_dsfield())
+> uses skb_protocol(skb, true), pskb_inet_may_pull() is only using
+> skb->protocol.
+> 
+> If anything else than ETH_P_IPV6 or ETH_P_IP is found in skb->protocol,
+> pskb_inet_may_pull() does nothing at all.
+> 
+> If a vlan tag was provided by the caller (af_packet in the syzbot case),
+> the network header might not point to the correct location, and skb
+> linear part could be smaller than expected.
+> 
+> Add skb_vlan_inet_prepare() to perform a complete mac validation.
+> 
+> Use this in geneve for the moment, I suspect we need to adopt this
+> more broadly.
+> 
+> v4 - Jakub reported v3 broke l2_tos_ttl_inherit.sh selftest
+>    - Only call __vlan_get_protocol() for vlan types.
+> Link: https://lore.kernel.org/netdev/20240404100035.3270a7d5@kernel.org/
+> 
+> v2,v3 - Addressed Sabrina comments on v1 and v2
+> Link: https://lore.kernel.org/netdev/Zg1l9L2BNoZWZDZG@hog/
+> 
+> [1]
+> 
 
-I would prefer a packetdrill test, it is not clear what is happening...
+Hi Eric,
 
-In particular, have you used SO_RCVBUF ?
+Looks good.
 
->
-> [5201<->54494]: tcp_recvmsg_locked(->)
-> [5201<->54494]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 2812454294, tp->rcv=
-_wnd: 5812224, tp->rcv_nxt 2818016354
-> [5201<->54494]:     (win_now: 250164, new_win: 262144 >=3D (2 * win_now):=
- 500328))? --> time_to_ack: 0
-> [5201<->54494]:     NOT calling tcp_send_ack()
-> [5201<->54494]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 2812454294, tp->rcv=
-_wnd: 5812224, tp->rcv_nxt 2818016354
-> [5201<->54494]: tcp_recvmsg_locked(<-) returning 131072 bytes, window now=
-: 250164, qlen: 1
->
-> [5201<->54494]: tcp_recvmsg_locked(->)
-> [5201<->54494]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 2812454294, tp->rcv=
-_wnd: 5812224, tp->rcv_nxt 2818016354
-> [5201<->54494]:     (win_now: 250164, new_win: 262144 >=3D (2 * win_now):=
- 500328))? --> time_to_ack: 0
-> [5201<->54494]:     NOT calling tcp_send_ack()
-> [5201<->54494]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 2812454294, tp->rcv=
-_wnd: 5812224, tp->rcv_nxt 2818016354
-> [5201<->54494]: tcp_recvmsg_locked(<-) returning 57036 bytes, window now:=
- 250164, qlen: 0
->
-> [5201<->54494]: tcp_recvmsg_locked(->)
-> [5201<->54494]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 2812454294, tp->rcv=
-_wnd: 5812224, tp->rcv_nxt 2818016354
-> [5201<->54494]:     NOT calling tcp_send_ack()
-> [5201<->54494]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 2812454294, tp->rcv=
-_wnd: 5812224, tp->rcv_nxt 2818016354
-> [5201<->54494]: tcp_recvmsg_locked(<-) returning -11 bytes, window now: 2=
-50164, qlen: 0
->
-> We can see that although we are adverising a window size of zero,
-> tp->rcv_wnd is not updated accordingly. This leads to a discrepancy
-> between this side's and the peer's view of the current window size.
-> - The peer thinks the window is zero, and stops sending.
-> - This side ends up in a cycle where it repeatedly caclulates a new
->   window size it finds too small to advertise.
->
-> Hence no messages are received, and no acknowledges are sent, and
-> the situation remains locked even after the last queued receive buffer
-> has been consumed.
->
-> We fix this by setting tp->rcv_wnd to 0 before we return from the
-> function tcp_select_window() in this particular case.
-> Further testing shows that the connection recovers neatly from the
-> squeeze situation, and traffic can continue indefinitely.
->
-> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
-> ---
->  net/ipv4/tcp_output.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 9282fafc0e61..57ead8f3c334 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -263,11 +263,15 @@ static u16 tcp_select_window(struct sock *sk)
->         u32 cur_win, new_win;
->
->         /* Make the window 0 if we failed to queue the data because we
-> -        * are out of memory. The window is temporary, so we don't store
-> -        * it on the socket.
-> +        * are out of memory. The window needs to be stored in the socket
-> +        * for the connection to recover.
->          */
-> -       if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM))
-> -               return 0;
-> +       if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM)) {
-> +               new_win =3D 0;
-> +               tp->rcv_wnd =3D 0;
-> +               tp->rcv_wup =3D tp->rcv_nxt;
-> +               goto out;
-> +       }
->
->         cur_win =3D tcp_receive_window(tp);
->         new_win =3D __tcp_select_window(sk);
-> @@ -301,7 +305,7 @@ static u16 tcp_select_window(struct sock *sk)
->
->         /* RFC1323 scaling applied */
->         new_win >>=3D tp->rx_opt.rcv_wscale;
-> -
-> +out:
->         /* If we advertise zero window, disable fast path. */
->         if (new_win =3D=3D 0) {
->                 tp->pred_flags =3D 0;
-> --
-> 2.42.0
->
+Reviewed-by: Phillip Potter <phil@philpotter.co.uk>
 
-Any particular reason to not cc Menglong Dong ?
-(I just did)
-
-This code was added in
-
-commit e2142825c120d4317abf7160a0fc34b3de532586
-Author: Menglong Dong <imagedong@tencent.com>
-Date:   Fri Aug 11 10:55:27 2023 +0800
-
-    net: tcp: send zero-window ACK when no memory
-
-    For now, skb will be dropped when no memory, which makes client keep
-    retrans util timeout and it's not friendly to the users.
-
-    In this patch, we reply an ACK with zero-window in this case to update
-    the snd_wnd of the sender to 0. Therefore, the sender won't timeout the
-    connection and will probe the zero-window with the retransmits.
-
-    Signed-off-by: Menglong Dong <imagedong@tencent.com>
-    Reviewed-by: Eric Dumazet <edumazet@google.com>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
+Regards,
+Phil
 
