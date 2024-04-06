@@ -1,240 +1,116 @@
-Return-Path: <netdev+bounces-85440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFB789AC1B
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 18:46:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8DB989AC58
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 18:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 706571C20492
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 16:46:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05B041C2140B
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 16:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5803F9F6;
-	Sat,  6 Apr 2024 16:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91FC4438F;
+	Sat,  6 Apr 2024 16:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="gizgIDXY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="i41hjGON"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03olkn2086.outbound.protection.outlook.com [40.92.59.86])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781D23A26E;
-	Sat,  6 Apr 2024 16:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.59.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712421990; cv=fail; b=bdF0UJ0q0i+GKbTISI7ozXuQEbsnlyCTUV1RjXrevvqZtIAgzj4lOVFnsuIzrNS7qiSe4hjpn04i8IOOVGi6qeUVAIFYUfSmwl1/cIuprKIzRL7jbHxa4rQ/Yo5q8+r38UiHcIJ5jExkBJLGBlevBTomJhJCqnV91VENEc4mQ+Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712421990; c=relaxed/simple;
-	bh=+o8xF+c3J0kte/V4G/UjqyN0qZUVccEGPELPS6+xSHc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=OtOUgUuqYUlQKLw/CumO0+PozrZA8I5YVFQv86+NZIHRnThzXf5Ei1Er0B8ZGUrjqinNDpp8d7ZLARCh/lvPYgs79Z9dKQjJi1Y5nLg778aY8q+j4mYf9JaZZNFaFV0WnH0SNcYzx2zWGbJeXra/RlsAlIe6JG+xaw0fQ3F8+ac=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=gizgIDXY; arc=fail smtp.client-ip=40.92.59.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VeF766Ckn84p3HE0IKvtwOALsdN+f0za6CDhPFbruUQe0AM6SJcT2yvrbte4o2CjocjIY+ca4XdnlppiyX87/htQ8ua3NK41kMOK5eyhvpaiA86Mv26s54vxhxfqT1Gj2zxBesWi645sqdrs5uaw4GJ+vhgwQ7mxEvV4L0oZjSCrRyWWsONpRoBcwgMbiz7hPRfwqeaoSMskZfyRlqhiO1EaH4UQSkBfmGPaSg8rbcFgggp71LJvUhLSk/bWkcZYO7Te45BzIEL1+Td5qRNDjUKzchIRauMjx05YIvGaG/EQ9wDCKw3v3G/mDMNe2mrKRv90Z8Lsh5PhbkKPXWWCQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UF2zGeEp20pZ+g+ruR/Y/fUPN2XB39IWhALwuoEmqXc=;
- b=MCP38VGA7Ftk5fOF2Tkt0/GMxJdVqXwCuSHx5hTcF1yoLNn3td1OZ8cgEyGEOQ48F9uXvdEvYHKAqLu/+pW26mogGjhO962Wv4XnC6jp+J1eej/FOV4JxgtpgBBDt1KItWqFGVWn2KIW0pOtzwWnGqerrWh7XfQ91y/UCf2gU9+rMNngRUJbfOBDyMdMAqZx4JnlAbsD+0NbPBjTK2y8FN9P8CaXCUisldz/a2o0/GTZaZnP6ggO613QMhAd23drY/nx1BodBrOL39D4fTGhaMIcEEy5xX/OW5utma+GnwhTSOJf7IEWZG2pWQLZbkfmBLMCRisD8R1bj6Speoi1TQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UF2zGeEp20pZ+g+ruR/Y/fUPN2XB39IWhALwuoEmqXc=;
- b=gizgIDXYuFzWm85H/poPtD9rY0lfwRwH9YC968EwYDNw3qeDluwaD/KUjl9a64iOOXXOedJMn9JQzDRh1CqBHfWo6vu4gnf6PJA24neoOaxBflkTxDyzwVwB9rNc7wcXVqdFb/h3IPX2U/R9em9WcvtLGb27zX5CV693OC6Nvk3HYT9eqWQulQpmW9DcMv21VGId0qhT73XtWXip9esmac4UJKhP52469WNLeLjpSatiyQlF80dg2B451FbtI4pKgilRfGvyKBYh7+5I759aZhBVutF0AtndV3VMqArW6lo1ZYcTyqe0EDAY86wTN8K5BQeNjTGcd+jsLzldPNrkgA==
-Received: from AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
- by DB8PR02MB5771.eurprd02.prod.outlook.com (2603:10a6:10:f8::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.54; Sat, 6 Apr
- 2024 16:46:23 +0000
-Received: from AS8PR02MB7237.eurprd02.prod.outlook.com
- ([fe80::9817:eaf5:e2a7:e486]) by AS8PR02MB7237.eurprd02.prod.outlook.com
- ([fe80::9817:eaf5:e2a7:e486%4]) with mapi id 15.20.7409.049; Sat, 6 Apr 2024
- 16:46:23 +0000
-Date: Sat, 6 Apr 2024 18:46:11 +0200
-From: Erick Archer <erick.archer@outlook.com>
-To: Sven Eckelmann <sven@narfation.org>
-Cc: Marek Lindner <mareklindner@neomailbox.ch>,
-	Simon Wunderlich <sw@simonwunderlich.de>,
-	Antonio Quartulli <a@unstable.cc>,
-	"David S.  Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Erick Archer <erick.archer@outlook.com>,
-	b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] batman-adv: Add flex array to struct batadv_tvlv_tt_data
-Message-ID:
- <AS8PR02MB7237161B8D17F83F0A31467F8B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
-References: <AS8PR02MB7237987BF9DFCA030B330F658B3E2@AS8PR02MB7237.eurprd02.prod.outlook.com>
- <5466543.Sb9uPGUboI@sven-l14>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5466543.Sb9uPGUboI@sven-l14>
-X-TMN: [B/2mQTnMSx/9dfbusV7bQx2ESxCQQOMB]
-X-ClientProxiedBy: MA4P292CA0014.ESPP292.PROD.OUTLOOK.COM
- (2603:10a6:250:2d::7) To AS8PR02MB7237.eurprd02.prod.outlook.com
- (2603:10a6:20b:3f1::10)
-X-Microsoft-Original-Message-ID: <20240406164611.GA21322@titan>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CD2446A0;
+	Sat,  6 Apr 2024 16:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712422162; cv=none; b=J//4l1yjy5MUJSIMrBK4vwQmFnXE6sVQuC0w168t7UPjEvVDAvrMLOz0kef2+QqHKOCPV0eqT2boD6x4P3OW94CANTCHlIOEhy0jjCvRCSbbEkE2wi648AlXG4DrruUzqDBW2PbBl6p4sncp17fyqA6odl9xdTcBy4Tqst/k6Vg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712422162; c=relaxed/simple;
+	bh=o6rCWrkCCMKhbDFNWKnJwxzIkPZg6rzq6G5ccjUP0lA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fxX5KBO8w+Y5rzHi6jKVXnelBfIK0I2Eu2ur5arefyOmpV1wMfntY6VT7yqOM5bEyG1zETEp6RLf+qwm1uY4UY7SQzRvWQh0vT3px5BYkR4H3KvxdQhccb6DaFUHvg829X2/tX7x7RWBmpRg+t420+Lb1h4AUVgwnmQPjvPQwpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=i41hjGON; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NsVJhybXoNm2BAjNEOwJVpEfmnbtHnO9dO+eB6wnYTA=; b=i41hjGON5R2dL4M0o2quPirnCB
+	/o5ptgm/sDZQkc164TtFTFyfr3S68WaDKJdH4N7MFcw/YgOvhiStzNB27gDYzGaE+KejDnbw9QjLZ
+	Qn5q2dEZSbsOK4+OR6p5hlpdxPYdjdf5P+ptr8EzlKO8v5RBHGt+r5b2wNZbwwHFVKLo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rt9E5-00CNkT-3i; Sat, 06 Apr 2024 18:49:09 +0200
+Date: Sat, 6 Apr 2024 18:49:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <b3183aab-4071-460d-acf0-1b5caa8c67a5@lunn.ch>
+References: <660f22c56a0a2_442282088b@john.notmuch>
+ <20240404165000.47ce17e6@kernel.org>
+ <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+ <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
+ <20240405122646.GA166551@nvidia.com>
+ <CAKgT0UeBCBfeq5TxTjND6G_S=CWYZsArxQxVb-2paK_smfcn2w@mail.gmail.com>
+ <20240405151703.GF5383@nvidia.com>
+ <CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
+ <20240405190209.GJ5383@nvidia.com>
+ <CAKgT0UdZz3fKpkTRnq5ZO2nW3NQcQ_DWahHMyddODjmNDLSaZQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR02MB7237:EE_|DB8PR02MB5771:EE_
-X-MS-Office365-Filtering-Correlation-Id: db0b8e0a-a757-4698-89bf-08dc565917bb
-X-MS-Exchange-SLBlob-MailProps:
-	vuaKsetfIZkROEo2gJaqbzokFpX8aXM6DNmNUR/0rxwggsJctEeOogq2OeF011FdJL+4eq562zTEHD78Hq1QKoXS46511zfbZfpB0GD/c2AivYT/fY54oa4JzWdSyq83cLKFgcKXjDGMYuYRe1cY3fuRbDIE1gZWJ3xDuyVbe53UwlLU5I33DCnPi+sqQomMLswhaqSa1Cwac39DcZbxmVzQAILkVmmRwasbZff45vGzxOKIgfB1ryyVRxIV6PBySe7TYckH1IZ7MpqSX2wIqJg/wKINUm6m/Wi48++imS0rKds/s9BuHID1V332u6nTR1V8q9fdGfS3RTH9b7xMUuv1M3+9ladkz2L+TOXPzpaZv8Cgomq7ND0gMISGyEYOuH8DKJCXupo7rPLUn1VveRlf16rKNpNLOe5/qaxbzgVIWn0Ywmq68axwj8MFnUcLrAOnwM2Qa4b9VDWHXV0zYtey5uLK4eZdVuIdxGp2/ahqVrzDlDyKiSyNqE6qCegYGHStLejVdPqaj61AkoglP7kaXCGrPzV+Jx1Bw0LMq1U329/TBeC7IOSH9mJQWINlcXyT7MEA8yqZMQf/2PJzH0MdJkAGg0W2gQ2zVqOOxF2rIIOAmzzt2rKpytxwy9PJw1ex5vcFMj6VCmVSJpqqXrM32Qjqa79QhhMUtjbnNULs+sCY5JG2VTVYvEQa2RYODBlM1qp3aZS1rUpBWuEqFuq2yANMMojWd9QRKss0JY8Cn7NjssA7txb48kuPKK2/AeVv2Cs4O0pL3/gPl/kS2OxBXY0dqg5OJJNj/oRH2ALfZcYzbg0c5uNcwYwvJIj0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	VebbSgdsyIe4DVKeU8GpE6fShD4MGDioLQxg8TdFO3astpbzQfPfFtc4wdVh2C2wOjwx9VsQlyvj+NQ2VqO2pge81CdsqoziDVTIpiKtgfHgfGHXN92meA6sNK3+AlXFEMH/v1f6aQtmSB4xEzDsXJVwbAuZZEN3o7WFFXuVuEcTA8Fq40YfXJmIaY14jD89/U/JgKEIjv7fXCIXF01EbDQUgFFUKmsMxAgdd0sCDpFWuQ3C7tkIORLitPiM9SCbkhEyf+sGJrBAYJDCzzy/mHgDos15grU4Jq2Ucr6vp4weJU9aOo6A2hf4qWYdrh7aUk4PQBnch2o9jJEqzndsD+p+bprGlfwPfEqphTh3NVw8nQpWvkEQKZfxpkER8bLnw/2gjfay/XO3pjFPcQN3lKY3VDsLL6QwO0njy9+cEjLe0SgURbl+7sH2GWJyw+I//PtGl8dGWM9Ea4pQudcJM3bZlXdP9qy9EHPfNvl1HjTaEkWGaOtqdLxlVF4IUZk1i7V/IoTxYU7N1DtkqhbN5jqIWJLBgWznHFyDYAMTaBtJ+Zif3t8Ne3N87yInhA4YDzxzuk1Eq1lE4b28S6dcSGXaYSEbFCed5QlQA1Dqns1jSQX7V4EtgbwwLEI9EcX/pnJPsAdGI9AwCvV02XLHlgC6VInxII4lUdoSIqRe486OksDfCXY3inpwifyS1UkgTKOdt4KZwkamA4y4Z9qWag==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LUFvAlSbFT+eyc7bEa60mJIC0bu8ikvBIUkw0dfp42t9YQufdBHJWGYEsE76?=
- =?us-ascii?Q?+01BPdzhpyLIzn4bQFi6w5WcwauIs35/B3+Kef3JJsbyIkBqfVGpSLwiQR4r?=
- =?us-ascii?Q?VcqiYz61frg2DH2H7lxbOolIoYWqzV+Kl3VVh1oK2zNFUbNp4UeuAcfI8+HV?=
- =?us-ascii?Q?VRNl99I0NThICtz+ptu+HYgGEQYDhLBGYmhbsugmvYhYyc4vykmMoM2fwd04?=
- =?us-ascii?Q?iZfm1TViVHpMejOEMijw3BdqU59rasrrVDEC67XQjYiAHzLsExxCp2QsetB0?=
- =?us-ascii?Q?qGvyd+nlMUQ44bATNEiiEZHBmzrGgxdQNrwrnjH50OxOt+iQK/mbjNjDJliZ?=
- =?us-ascii?Q?SGFf5E5OZuKvhnFDzql0Onv/mYi1fjzvfQ3YDZgvirvdTQpluJZRcy+IHxtJ?=
- =?us-ascii?Q?Uof7Dtyghjr3i+BIO21Kx1qiWKmdk0AVp9AOV46qnTgixp+BXO0RM6h3rsaV?=
- =?us-ascii?Q?6rESR8W8tz8J+lIWCHqESc6/K5xfYMOuvqFT/mAY5QdgJBGbDq+O1vz39KwN?=
- =?us-ascii?Q?DtRE9gKIhdAmxEQiuWYIeqaj+hcccYadAqJHSWvYIABUXszogSou3bokJ+H2?=
- =?us-ascii?Q?zo5Tw779r/PkbuIYoocgkiX/0dHlgFIGc7V8ICyU/8VvBI9efPXdkia4rrvY?=
- =?us-ascii?Q?cfigUwposXW2ZPKtTwr7P9FWh4SK2iqx4UN1Nf7YBaqNa53nbtaWrdFJVXRC?=
- =?us-ascii?Q?uw3PeXJZtavq0D+0INYqFrqF2bs4kh+zwKWrOa+xL1ZqBWVmIFgfvhabj/tE?=
- =?us-ascii?Q?Y9rsQYEaR/wW31oeQ1yaF8w6NvpOqfmyM3rJt743J1C5iUaEuwZB8WtbK7wj?=
- =?us-ascii?Q?WEnVWiWa23NhFVbYt/qlURHkMoghvoqsXGJEH4rZBMheuVMwce2UszvFuFKn?=
- =?us-ascii?Q?gA+YAmsvKkHmuTVpkzuI5ojNF4J5PqEFs7rWp3lx0+kE66yUFqazcRDWmFAC?=
- =?us-ascii?Q?QlC+NZjbLWexLUd9hxXG+cwqMTFjBdL2a1zWUaCbVl85PDRqd52QnFcp1Ful?=
- =?us-ascii?Q?kwiT2dDyRd0HlBYomCy+UwscC2Zm1b15u3Lu72J0q0lt85MLdvo6y/wL+OSN?=
- =?us-ascii?Q?JK6muFnewpXeXkcAboVizLIFZ5feYWATHsJnrYhIxJBzOXb4V3ksjWjdlUlw?=
- =?us-ascii?Q?xPCKxhCXG9VShldPnJAwBMATlvy8nWz3pFxud31BBCKLZPXkKhj3h98P8zgw?=
- =?us-ascii?Q?svwY9rYJ1CjQdBV9H+2ASuLGR9Haidg0kWEjrENnwUFBK0QVX2Lb5ShrGQ3f?=
- =?us-ascii?Q?LSYIumHio8BhUWpGzcF3?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: db0b8e0a-a757-4698-89bf-08dc565917bb
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB7237.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2024 16:46:23.2362
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR02MB5771
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKgT0UdZz3fKpkTRnq5ZO2nW3NQcQ_DWahHMyddODjmNDLSaZQ@mail.gmail.com>
 
-Hi Sven,
+> I'm assuming it is some sort of firmware functionality that is needed
+> to enable it? One thing with our design is that the firmware actually
+> has minimal functionality. Basically it is the liaison between the
+> BMC, Host, and the MAC. Otherwise it has no role to play in the
+> control path so when the driver is loaded it is running the show.
 
-On Tue, Apr 02, 2024 at 09:06:35PM +0200, Sven Eckelmann wrote:
-> On Tuesday, 2 April 2024 19:23:01 CEST Erick Archer wrote:
-> > The "struct batadv_tvlv_tt_data" uses a dynamically sized set of
-> > trailing elements. Specifically, it uses an array of structures of type
-> > "batadv_tvlv_tt_vlan_data". So, use the preferred way in the kernel
-> > declaring a flexible array [1].
-> > 
-> > The order in which the structure batadv_tvlv_tt_data and the structure
-> > batadv_tvlv_tt_vlan_data are defined must be swap to avoid an incomplete
-> > type error.
-> > 
-> > Also, avoid the open-coded arithmetic in memory allocator functions [2]
-> > using the "struct_size" macro and use the "flex_array_size" helper to
-> > clarify some calculations, when possible.
-> > 
-> > Moreover, the new structure member also allow us to avoid the open-coded
-> > arithmetic on pointers in some situations. Take advantage of this.
-> > 
-> > This code was detected with the help of Coccinelle, and audited and
-> > modified manually.
-> > 
-> > Link: https://www.kernel.org/doc/html/next/process/deprecated.html#zero-length-and-one-element-arrays [1]
-> > Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [2]
-> > Signed-off-by: Erick Archer <erick.archer@outlook.com>
-> 
-> > ---
-> > Hi,
-> > 
-> > I would like to add the "__counted_by(num_vlan)" tag to the new flex member
-> > but I don't know if this line can affect it.
-> > 
-> > ntohs(tt_data->num_vlan)
-> 
-> 
-> Yes, num_vlan is a __be16. I could only identify the kernel-doc related 
-> scripts as consumer. But maybe they are more - so I would defer this question 
-> to kernel-hardening.
+Which i personally feel is great. In an odd way, this to me indicates
+this is a commodity product, or at least, leading the way towards
+commodity 100G products. Looking at the embedded SoC NIC market, which
+pretty is much about commodity, few 1G Ethernet NICs have firmware.
+Most 10G NICs also have no firmware. Linux is driving the hardware.
 
-Thanks for the info.
-> 
-> And with this change, I get a lot of additional warnings (-Wsparse-all)
-> 
-> 
-> cfg: BLA=n DAT=y DEBUG=y TRACING=n NC=y MCAST=n BATMAN_V=n
->     net/batman-adv/translation-table.c:574:21: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:859:25: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:859:25: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:938:25: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:938:25: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:2932:16: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:2932:16: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:3378:21: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:3378:21: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:3982:30: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:3986:27: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:4026:30: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:4030:27: warning: using sizeof on a flexible structure
->     net/batman-adv/translation-table.c:4032:23: warning: cast from restricted __be16
->     net/batman-adv/translation-table.c:4032:23: warning: restricted __be16 degrades to integer
->     net/batman-adv/translation-table.c:4032:23: warning: incorrect type in argument 1 (different base types)
->     net/batman-adv/translation-table.c:4032:23:    expected unsigned long [usertype] factor1
->     net/batman-adv/translation-table.c:4032:23:    got restricted __be16 [usertype] num_vlan
-> 
-> [...]
+Much of the current Linux infrastructure is limited to 10G, because
+currently everything faster than that hides away in firmware, Linux
+does not get to driver it. This driver could help push Linux
+controlling the hardware forward, to be benefit of us all. It would be
+great if this driver used phylink to manage the PCS and the SFP cage,
+that the PCS code is moved into drivers/net/pcs, etc. Assuming this
+PCS follows the standards, it would be great to add helpers like we
+have for clause 37, clause 73, to help support other future PCS
+drivers which will appear. 100G in SoCs is probably not going to
+appear too soon, but single channel 25G is probably the next step
+after 10G. And what is added for this device will probably also work
+for 25G. 40G via 4 channels is probably not too far away either.
 
-I will work on this for the next version. Thanks for share these warnings.
+Our Linux SFP driver is also currently limited to 10G. It would be
+great if this driver could push that forwards to support faster SFP
+cages and devices, support splitting and merging, etc.
 
-> >  	num_vlan = ntohs(tt_data->num_vlan);
-> >  
-> > -	if (tvlv_value_len < sizeof(*tt_vlan) * num_vlan)
-> > +	flex_size = flex_array_size(tt_data, vlan_data, num_vlan);
-> > +	if (tvlv_value_len < flex_size)
-> >  		return;
-> 
-> This helper would need an #include of <linux/overflow.h> in 
-> net/batman-adv/translation-table.c
+None of this requires new kAPIs, they all already exist. There is
+nothing controversial here. Everything follows standards. So if Meta
+were to abandon the MAC driver, it would not matter, its not dead
+infrastructure code, future drivers would make use of it, as this
+technology becomes more and more commodity.
 
-Understood.
+	Andrew
 
-> 
-> [....]
-> >  /**
-> > @@ -4039,8 +4029,7 @@ static int batadv_tt_tvlv_unicast_handler_v1(struct batadv_priv *bat_priv,
-> >  	tt_data = tvlv_value;
-> >  	tvlv_value_len -= sizeof(*tt_data);
-> >  
-> > -	tt_vlan_len = sizeof(struct batadv_tvlv_tt_vlan_data);
-> > -	tt_vlan_len *= ntohs(tt_data->num_vlan);
-> > +	tt_vlan_len = flex_array_size(tt_data, vlan_data, tt_data->num_vlan);
-> 
-> This is definitely wrong on little endian systems. You first need to convert 
-> num_vlan from network (big endian) to host order.
-
-I'm sorry. My bad. I forgot to add the "ntohs".
-I will fix it for the next version.
-
-> 
-> Kind regards,
-> 	Sven
-
-Regards,
-Erick
-
+	   
 
