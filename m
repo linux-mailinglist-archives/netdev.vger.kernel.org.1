@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-85462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 041B189ACD2
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 22:14:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D00D89ACD3
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 22:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B191282826
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 20:14:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 653781C215F7
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 20:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D5F4E1C8;
-	Sat,  6 Apr 2024 20:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0F54E1DA;
+	Sat,  6 Apr 2024 20:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CA6hejSZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M4d/j/XQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDE44EB55
-	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 20:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B164F5F9
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 20:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712434456; cv=none; b=TucN+3NeATUFZjdqXDN/M2BmRo/UeLcQWDkJTItPCmavbZ20c2usuuhuh9QpyLqfCFbhnampxrMFEoxBal/UhLaC5F7QoQqZUcYAdy91lck/K3phHdv1pYdov24o460jyFHRGo7Agy60U5Bcjhsl/AC+ag4XcT6QvE42l3v3NNg=
+	t=1712434459; cv=none; b=Td84mTR9fo35YgAlyKDXQ/sHfJQj7zaJAQ5Lq0DG4PB0a8RfQ/Sl3Ht8wS8ldpfR7CLwvgflJKl1y3bP8LhqOPqrZAM5zRa2YYidoNLQ3to3vMAd7yXU9hdaXFCDolJ0cz2qd1iqgrN/JlbFb4HvO7gUIPxDkv86F8T5CpmRHYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712434456; c=relaxed/simple;
-	bh=7REgVx3Hk+G70l5YOIE6zqEavzl38e/93gZxmXsSzgA=;
+	s=arc-20240116; t=1712434459; c=relaxed/simple;
+	bh=zdSFNxjfLA1vj0wL9Qk7dYbfsefbjxh136VgsdiSg3s=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TnSJDuKy+PYs/jLlnpTrfDeY3ZqSycPd+3aOwamqGMdkv4I6wuB4Pmkng+0/8WJMY1lj1sueRoNikJYg1L3hdpMNiB93qB8jmGaXazxpfMzKJoDssuxIaQKCvPFjNabXFcq48GOuQ2nzGO9KWLBxW9VGgtWET+Y5y5nzXubgjsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CA6hejSZ; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=eK3qYuJeXMYR5eaVS98xVX7vrYQfye4T8yVuVAp3xseg/t5qfgCSMFgd13ua0cJgoneCEG8pMhImOsxJ8wuQiZu2Jc/MbKR+2sd8LoVKGzJ7EmqoWw+Q5W+nBsF0WHEt5TMotMh/vsCjelpYzdrG87vrBvyToliLFpD56N8q2Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M4d/j/XQ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,19 +36,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=iHiJcTca4uqI5eVNh//6Wjc2B/iJjDsQUALvb+o+t0E=; b=CA
-	6hejSZpXcCohrnhilAAXy7vuCSd6Hv+/67dtsgEaVjHfNYBpT5/fCF7e/7oa782R7+Y2fXdAspoTe
-	DeuccLdUloA/wPn79toguTBEV+2ofAAaxdO+1BGsDSMoIcS48PV3E+6d3d+mlC1TFSM8DZky7P4e7
-	OkUdwH0f8JPZjHA=;
+	In-Reply-To:References; bh=Oqh2XRP/MH/MweeMUWi+g8QbT8VLHwXzrU+lz6qGOH4=; b=M4
+	d/j/XQRFuOrPW2mUrqmkcG0AqiOZNrgBDnBJG/TJyYPGrint4iRehKt7OKwYfoinuqPYCyVsMIyqi
+	mUN70aBO70MYWaVXzh//gkYL38A9ln9PVshkqZElHKbmM+M/aajEqDtgrVQpw837UVN/nyJZAK96O
+	gZbbFYz1jG2V6vI=;
 Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rtCQX-00COA7-1A; Sat, 06 Apr 2024 22:14:13 +0200
+	id 1rtCQZ-00COA7-Ma; Sat, 06 Apr 2024 22:14:15 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Sat, 06 Apr 2024 15:13:33 -0500
-Subject: [PATCH net-next v4 6/8] net: dsa: mv88e6xxx: Tie the low level LED
- functions to device ops
+Date: Sat, 06 Apr 2024 15:13:34 -0500
+Subject: [PATCH net-next v4 7/8] dsa: mv88e6xxx: Create port/netdev LEDs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-6-eb97665e7f96@lunn.ch>
+Message-Id: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-7-eb97665e7f96@lunn.ch>
 References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
 In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
 To: Florian Fainelli <f.fainelli@gmail.com>, 
@@ -68,87 +67,240 @@ To: Florian Fainelli <f.fainelli@gmail.com>,
  Gregory Clement <gregory.clement@bootlin.com>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2653; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=7REgVx3Hk+G70l5YOIE6zqEavzl38e/93gZxmXsSzgA=;
- b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBmEa0AIoXnHYGwc/vXgqKM6A7W8nJwed2gaKLQm
- ArTsPfZMliJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZhGtAAAKCRDmvw3LpmlM
- hFd/D/92AWTD4vJ4zr4KpGZA2CoZ43Ur/qp4D4Lm+sANe3O1/kntagidATmeh+5lRh8nO+2zmMc
- +ZX2a3Mf7Nhf6Hh1RcKyXNObvGgAFy6UMPTAEIf+2aH6GSLXV3mnAKWEvNNJGADSCy78WkmEzfv
- 3UyvB9zBGzZrMHvgR90QGTbqoOE66ha9P7fG6yS9tuonKMzcmGdNW0T24b2RaB7i3BNs5cppv9C
- uw26cbfcyvJcnNa9PwfcrtjCQIiHuqyb6tRL2RDPYROanypMONMy0PN+MqtH+fiIwmw3/L0Chbx
- FDiUPBM0HhqiA3UrqDMH0UFYeNaoVz5v7LzyII3j3oanEjceBSWPR2j78E1klGPM+PK2ZFhHzSW
- UwioxbL0Le45JDba3DHR1rGO36Vc5M9ZDhKRoC4Z23kVFbW4Maxv+JwRxD4aB+VKRzzeumRqYll
- 7ViIKVo/K6UfVtJoQCrgTOWjop0xKV0Gi+c/juZ04dctyTmfdXgmW/VvVatY9watAICKawrtww1
- vuWXiJAArXgA3F4Tm14+5e5xmPqgLQMJWBSroWL3FuBKSqR+he4rphXH+AG7UuLkdKnOdwFX6tH
- dBX3RTqLrvEWQTjpvtknTdcyuhOl3PEl9sTfOpNUXbfIYQvQgJ8U2YB+YtxwI1H3o+MT0lSgO3q
- ckEGztNlqbIanfQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6865; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=zdSFNxjfLA1vj0wL9Qk7dYbfsefbjxh136VgsdiSg3s=;
+ b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBmEa0A1GTEDn8nTNCdd6O2tOppxe4UwhAGEE1bJ
+ 2M8x0Mn4siJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZhGtAAAKCRDmvw3LpmlM
+ hBDgEACjznnHWJx48FGisZW4GAVzSSl19fLaObfL/uG3e9J9/ggBuz30/J8ZOXFqx9NC/xK4eJu
+ iQyhM+auHk7yJvpXIeds4YHNseFHLiveUGc6dx5qMuJbHKVieU/50//rrP7yM7A9YLBUEl4zHWT
+ 5oSBRXSiiQfSDN0ZJNFPn+Lsyyuli9YY7RMUgoum4ZIDSUBgyin75wkhC+coGnT0vKfxc8mURE9
+ sRPAiL1VoixJt/eOdhY7eRy0YbI4pXu2BM3+myBH9GEjQstvITFfMTUzI9sNNe+7lo/JU/5DWKz
+ kTQ3CDb8Otb2V+VxOFnC3w2Dh8wPiK4LubQywJ1tTYv0tZriipQuWUikqdOZAmnWgDxuzq3ejKi
+ V42A9m7kFQBwvOplW2zcsIjQNZdaty2PrDTpB8l9MmQM3eGNTaZX4xzt6pRmElPxQgRVdwlyDtx
+ T43Z0qgyHSKFnetGFYX0rlV/UZXuYU15VsP6O2g9c87cquxVV4utNm6JCPZ+6xxhSwHHRLIaxKx
+ nLCXy9uH+xBwT1m9ZxQ5S02cTaxM+X4+0Q7dwo/zDVeOJZv3EjOhI0L9IQuk9L1ePqK9rmtlPZx
+ mpw7n41GEChCW7D6qLB0m7qsnvA/f9qvLsgB8wHpj5zgXFIqRp2RbRJXxkPg4OK8u3b30BZ7nRg
+ hiacV2svsSnlYtg==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-Make the LED brightness and blink helpers available for the 6352
-family via their ops structure.
+Make use of the helpers to add LEDs to the user ports when the port is
+setup. Also remove the LEDs when the port is destroyed to avoid any
+race conditions with users of /sys/class/leds and LED triggers after
+the driver has been removed.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 8 ++++++++
- drivers/net/dsa/mv88e6xxx/chip.h | 7 +++++++
- 2 files changed, 15 insertions(+)
+ drivers/net/dsa/mv88e6xxx/Kconfig |   1 +
+ drivers/net/dsa/mv88e6xxx/chip.c  | 119 +++++++++++++++++++++++++++++++++++++-
+ drivers/net/dsa/mv88e6xxx/chip.h  |  13 +++++
+ 3 files changed, 132 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/dsa/mv88e6xxx/Kconfig b/drivers/net/dsa/mv88e6xxx/Kconfig
+index e3181d5471df..ded5c6b9132b 100644
+--- a/drivers/net/dsa/mv88e6xxx/Kconfig
++++ b/drivers/net/dsa/mv88e6xxx/Kconfig
+@@ -5,6 +5,7 @@ config NET_DSA_MV88E6XXX
+ 	select IRQ_DOMAIN
+ 	select NET_DSA_TAG_EDSA
+ 	select NET_DSA_TAG_DSA
++	select NETDEV_LEDS
+ 	help
+ 	  This driver adds support for most of the Marvell 88E6xxx models of
+ 	  Ethernet switch chips, except 88E6060.
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 9ed1821184ec..3d7e4aa9293a 100644
+index 3d7e4aa9293a..4e4031f11088 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -4526,6 +4526,8 @@ static const struct mv88e6xxx_ops mv88e6172_ops = {
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.phylink_get_caps = mv88e6352_phylink_get_caps,
- 	.pcs_ops = &mv88e6352_pcs_ops,
-+	.led_brightness_set = mv88e6352_port_led_brightness_set,
-+	.led_blink_set = mv88e6352_port_led_blink_set,
- };
+@@ -31,6 +31,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/phylink.h>
+ #include <net/dsa.h>
++#include <net/netdev_leds.h>
  
- static const struct mv88e6xxx_ops mv88e6175_ops = {
-@@ -4628,6 +4630,8 @@ static const struct mv88e6xxx_ops mv88e6176_ops = {
- 	.gpio_ops = &mv88e6352_gpio_ops,
- 	.phylink_get_caps = mv88e6352_phylink_get_caps,
- 	.pcs_ops = &mv88e6352_pcs_ops,
-+	.led_brightness_set = mv88e6352_port_led_brightness_set,
-+	.led_blink_set = mv88e6352_port_led_blink_set,
- };
+ #include "chip.h"
+ #include "devlink.h"
+@@ -3129,6 +3130,105 @@ static int mv88e6xxx_switch_reset(struct mv88e6xxx_chip *chip)
+ 	return mv88e6xxx_software_reset(chip);
+ }
  
- static const struct mv88e6xxx_ops mv88e6185_ops = {
-@@ -4897,6 +4901,8 @@ static const struct mv88e6xxx_ops mv88e6240_ops = {
- 	.ptp_ops = &mv88e6352_ptp_ops,
- 	.phylink_get_caps = mv88e6352_phylink_get_caps,
- 	.pcs_ops = &mv88e6352_pcs_ops,
-+	.led_brightness_set = mv88e6352_port_led_brightness_set,
-+	.led_blink_set = mv88e6352_port_led_blink_set,
- };
++static int mv88e6xxx_led_brightness_set(struct net_device *ndev,
++					u8 led, enum led_brightness value)
++{
++	struct dsa_port *dp = dsa_port_from_netdev(ndev);
++	struct mv88e6xxx_chip *chip = dp->ds->priv;
++	int port = dp->index;
++	int err;
++
++	if (chip->info->ops->led_brightness_set) {
++		mv88e6xxx_reg_lock(chip);
++		err = chip->info->ops->led_brightness_set(chip, port, led,
++							  value);
++		mv88e6xxx_reg_unlock(chip);
++		return err;
++	}
++	return -EOPNOTSUPP;
++}
++
++static int mv88e6xxx_led_blink_set(struct net_device *ndev, u8 led,
++				   unsigned long *delay_on,
++				   unsigned long *delay_off)
++{
++	struct dsa_port *dp = dsa_port_from_netdev(ndev);
++	struct mv88e6xxx_chip *chip = dp->ds->priv;
++	int port = dp->index;
++	int err;
++
++	if (chip->info->ops->led_blink_set) {
++		mv88e6xxx_reg_lock(chip);
++		err = chip->info->ops->led_blink_set(chip, port, led,
++						     delay_on, delay_off);
++		mv88e6xxx_reg_unlock(chip);
++		return err;
++	}
++	return -EOPNOTSUPP;
++}
++
++static int mv88e6xxx_led_hw_control_is_supported(struct net_device *ndev,
++						 u8 led, unsigned long flags)
++{
++	struct dsa_port *dp = dsa_port_from_netdev(ndev);
++	struct mv88e6xxx_chip *chip = dp->ds->priv;
++	int port = dp->index;
++	int err;
++
++	if (chip->info->ops->led_hw_control_is_supported) {
++		mv88e6xxx_reg_lock(chip);
++		err = chip->info->ops->led_hw_control_is_supported(chip, port,
++								   led, flags);
++		mv88e6xxx_reg_unlock(chip);
++		return err;
++	}
++	return -EOPNOTSUPP;
++}
++
++static int mv88e6xxx_led_hw_control_set(struct net_device *ndev, u8 led,
++					unsigned long flags)
++{
++	struct dsa_port *dp = dsa_port_from_netdev(ndev);
++	struct mv88e6xxx_chip *chip = dp->ds->priv;
++	int port = dp->index;
++	int err;
++
++	if (chip->info->ops->led_hw_control_set) {
++		mv88e6xxx_reg_lock(chip);
++		err = chip->info->ops->led_hw_control_set(chip, port,
++							  led, flags);
++		mv88e6xxx_reg_unlock(chip);
++		return err;
++	}
++	return -EOPNOTSUPP;
++}
++
++static int mv88e6xxx_led_hw_control_get(struct net_device *ndev,
++					u8 led, unsigned long *flags)
++{
++	struct dsa_port *dp = dsa_port_from_netdev(ndev);
++	struct mv88e6xxx_chip *chip = dp->ds->priv;
++	int port = dp->index;
++	int err;
++
++	if (chip->info->ops->led_hw_control_get) {
++		mv88e6xxx_reg_lock(chip);
++		err = chip->info->ops->led_hw_control_get(chip, port,
++							  led, flags);
++		mv88e6xxx_reg_unlock(chip);
++		return err;
++	}
++	return -EOPNOTSUPP;
++}
++
++static struct netdev_leds_ops mv88e6xxx_netdev_leds_ops = {
++	.brightness_set = mv88e6xxx_led_brightness_set,
++	.blink_set = mv88e6xxx_led_blink_set,
++	.hw_control_is_supported = mv88e6xxx_led_hw_control_is_supported,
++	.hw_control_set = mv88e6xxx_led_hw_control_set,
++	.hw_control_get = mv88e6xxx_led_hw_control_get,
++};
++
+ static int mv88e6xxx_set_port_mode(struct mv88e6xxx_chip *chip, int port,
+ 				   enum mv88e6xxx_frame_mode frame,
+ 				   enum mv88e6xxx_egress_mode egress, u16 etype)
+@@ -4006,7 +4106,9 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
  
- static const struct mv88e6xxx_ops mv88e6250_ops = {
-@@ -5310,6 +5316,8 @@ static const struct mv88e6xxx_ops mv88e6352_ops = {
- 	.serdes_set_tx_amplitude = mv88e6352_serdes_set_tx_amplitude,
- 	.phylink_get_caps = mv88e6352_phylink_get_caps,
- 	.pcs_ops = &mv88e6352_pcs_ops,
-+	.led_brightness_set = mv88e6352_port_led_brightness_set,
-+	.led_blink_set = mv88e6352_port_led_blink_set,
- };
+ static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
+ {
++	struct dsa_port *dp = dsa_to_port(ds, port);
+ 	struct mv88e6xxx_chip *chip = ds->priv;
++	struct mv88e6xxx_port *p;
+ 	int err;
  
- static const struct mv88e6xxx_ops mv88e6390_ops = {
+ 	if (chip->info->ops->pcs_ops &&
+@@ -4016,13 +4118,28 @@ static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
+ 			return err;
+ 	}
+ 
+-	return mv88e6xxx_setup_devlink_regions_port(ds, port);
++	err  = mv88e6xxx_setup_devlink_regions_port(ds, port);
++	if (err)
++		return err;
++
++	if (dp->dn && dsa_is_user_port(ds, port)) {
++		p = &chip->ports[port];
++		INIT_LIST_HEAD(&p->leds);
++		err = netdev_leds_setup(dp->user, dp->dn, &p->leds,
++					&mv88e6xxx_netdev_leds_ops, 2);
++		if (err)
++			mv88e6xxx_teardown_devlink_regions_port(ds, port);
++	}
++	return err;
+ }
+ 
+ static void mv88e6xxx_port_teardown(struct dsa_switch *ds, int port)
+ {
+ 	struct mv88e6xxx_chip *chip = ds->priv;
+ 
++	if (dsa_is_user_port(ds, port))
++		netdev_leds_teardown(&chip->ports[port].leds);
++
+ 	mv88e6xxx_teardown_devlink_regions_port(ds, port);
+ 
+ 	if (chip->info->ops->pcs_ops &&
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index 85eb293381a7..64f8bde68ccf 100644
+index 64f8bde68ccf..d15bb5810831 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.h
 +++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -661,6 +661,13 @@ struct mv88e6xxx_ops {
+@@ -291,6 +291,9 @@ struct mv88e6xxx_port {
  
- 	/* Max Frame Size */
- 	int (*set_max_frame_size)(struct mv88e6xxx_chip *chip, int mtu);
+ 	/* MacAuth Bypass control flag */
+ 	bool mab;
 +
-+	/* LEDs */
-+	int (*led_brightness_set)(struct mv88e6xxx_chip *chip, int port,
-+				  u8 led, enum led_brightness value);
-+	int (*led_blink_set)(struct mv88e6xxx_chip *chip, int port, u8 led,
-+			     unsigned long *delay_on,
-+			     unsigned long *delay_off);
++	/* LEDs associated to the port */
++	struct list_head leds;
+ };
+ 
+ enum mv88e6xxx_region_id {
+@@ -432,6 +435,7 @@ struct mv88e6xxx_chip {
+ 
+ 	/* Bridge MST to SID mappings */
+ 	struct list_head msts;
++
+ };
+ 
+ struct mv88e6xxx_bus_ops {
+@@ -668,6 +672,15 @@ struct mv88e6xxx_ops {
+ 	int (*led_blink_set)(struct mv88e6xxx_chip *chip, int port, u8 led,
+ 			     unsigned long *delay_on,
+ 			     unsigned long *delay_off);
++	int (*led_hw_control_is_supported)(struct mv88e6xxx_chip *chip,
++					   int port, u8 led,
++					   unsigned long flags);
++	int (*led_hw_control_set)(struct mv88e6xxx_chip *chip,
++				  int port, u8 led,
++				  unsigned long flags);
++	int (*led_hw_control_get)(struct mv88e6xxx_chip *chip,
++				  int port, u8 led,
++				  unsigned long *flags);
  };
  
  struct mv88e6xxx_irq_ops {
