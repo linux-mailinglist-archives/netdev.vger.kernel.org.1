@@ -1,134 +1,126 @@
-Return-Path: <netdev+bounces-85419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 563B489AB69
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 16:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5BA689AB6B
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 16:47:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CB231F220B9
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 14:46:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5340F1F21B29
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 14:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C00376E0;
-	Sat,  6 Apr 2024 14:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889E62D051;
+	Sat,  6 Apr 2024 14:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IZ1eyWnk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2EdFao6X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497941CFB9;
-	Sat,  6 Apr 2024 14:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E872836D
+	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 14:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712414791; cv=none; b=rYn4TAzDHsCESqrac+31K+TdORUGkvbH2OSY0Eu+uQlyhWtaxz+Ypr5ib7SlbeN0htu3L9Vaby6SX4q99WmQPL2Ff6tdxXB6vq6K3KbUmfnZ0veyivu50sWuEGFcw70fGZcQeyAMHZCPi4uQ6W9UsnUZwiUSfS6NH3dB+44DZeE=
+	t=1712414830; cv=none; b=ctpQcHNANYIBfRyaeHaV3x7iKW4cW1tWkGbDwwbUnvlJdG6vABEg3JX+oCNwVzvuYSClxTgFq46gsGvD3Ii4G8/Sg6s/eeLzWVQkqcs06okmwHHY243ViqRNr7O//4LWTuuPWkd7zbK+ZKsNV9aBf3PpQCpsEK4LiaXobBO/Bl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712414791; c=relaxed/simple;
-	bh=ptiA1PCzQan4LIlitfTk82UdxdeYk8S3aeHGjbzn7KU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=nf0p2+MFTkBzobkNSOTnxWJ9wQG0DebsMoxQ8E0PY2vX1oqZ5zwdsK0bcphp0ZcYm7VG4/DlFKASJbD3pCHkjLvvdCipi2z1OT1DUo0BhpyUfalbccI+4v/9tYLK/9rPcXbIC05fDCyENX9cZ2DAmZLODafzSthNN7zwpXkkThI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IZ1eyWnk; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1e2232e30f4so27980435ad.2;
-        Sat, 06 Apr 2024 07:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712414789; x=1713019589; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lSXRqJM5tC4sSesaPkUfqrE6J3PdYWbaxpDTJoUDDps=;
-        b=IZ1eyWnkRzuuBo7JaL7axvaUpY8RnsjQHFzcyhA33T8m51WwNF/FqvB/cWe49ZIKjL
-         BKDgGUwO/e+MT2tB0iAk/irVtuSSiaTkZKXgq2QPE6jZknYJUNIU1oUBqhrAVmurTr+/
-         eZ1JgzDuELE6a/HWIVUnjaPAXQ7m4RfunJhEYNIrQuvWWcY0u/nGNza9rldjcoKbbPVy
-         NBmYw4gseiMv+a8dZEdEjwfWkQ7Q03tCm8w78q5pPtChPlsS7TsL/5IXmH2NIjaK7Csz
-         LxZKQjNexH2Tw3WpJwiivvUsH0kZx/CFeyW6jO/lq6OcZiAbAGbOr78d3F0PCfDNSlQz
-         d+eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712414789; x=1713019589;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lSXRqJM5tC4sSesaPkUfqrE6J3PdYWbaxpDTJoUDDps=;
-        b=MOvfOQYNaGfBym4r4O9BXFgGEEAexCmdKngewsFrDLUiWjEisp958NvgyyYRvFvT8Q
-         5XkrNyV2tMonqOyk7BlK3qH0+YOEKC2g6sSz7DbE9K16PEyH38TaYGHMJvfQDk+pN4XH
-         UE0tA85CVy+fYOGpEme62qOdhILM5CF5JPFAc9YRfC4PfjKvzoQ2WFgYyu1jK5JBgPak
-         sHoGdufeSok/6ik3jA6c6UPn1vs7SoKaxjmSIjRFXy2T24PcPMK2Xc+1uOmYmrcdr6SW
-         YyNasfvbeQG66Nsx27R6zXWDurNqWPPNX/hhBjddDxOAHoyrsdyiKZF7hMKzblIoVhhP
-         hXcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWgXUC/yUCn885Pr2HjQDij6mpLatkW7M22fOtlT/LcI1/etKCWw7t3suPP8GUhQKPDBqUB5i7FNSjzYxF1LOt++Ko0C/nSPrvCKFYiRuPBT8pP2IT3hqcke6fQg+rBoOY8N1Her6x
-X-Gm-Message-State: AOJu0YyfaJlBtVUQgIHxHhxrKqyfeTi5zGLuPMcOsVe5pZGcP26MPnIz
-	3Ch185PwV5wx8GLd6g9b6uMOUGIewyfLvnBC1vcju9ERvXc6owuP
-X-Google-Smtp-Source: AGHT+IGC2PYGcZn8I5MO7PTPhm7t8IjxnbWHW+FBFkrNXHx3c7p01R40iOHFoLUA8tP3R6O1XIiYEA==
-X-Received: by 2002:a17:903:984:b0:1e3:f226:1377 with SMTP id mb4-20020a170903098400b001e3f2261377mr225480plb.61.1712414789606;
-        Sat, 06 Apr 2024 07:46:29 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([111.201.28.7])
-        by smtp.gmail.com with ESMTPSA id l10-20020a170903244a00b001e29833ada6sm3481965pls.140.2024.04.06.07.46.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Apr 2024 07:46:29 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	mykolal@fb.com,
-	shuah@kernel.org
-Cc: bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next] selftests/bpf: eliminate warning of get_cgroup_id_from_path()
-Date: Sat,  6 Apr 2024 22:46:13 +0800
-Message-Id: <20240406144613.4434-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1712414830; c=relaxed/simple;
+	bh=6gF3lw525dNquOf1Wlt+lbSqjZjUSKbE+kQ/NWr7Zuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aG9Cav2zuY4TVmtIM63D3EMkkg6JeSt7Yd0L98xDfhV9BJB5+AE4oD7M9wL4a651ObtS/xc0ZL+Qkjjr7Dl1aS923FEFLkfBOxUEQ+vYr+nOZov0LniEniVaCrw0CYxhGHVMsrpZ4xYO7mUsIfNZetLrG+UIdinQWpZU8b0jtv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2EdFao6X; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KkM/eBigkziJwOag+4/N3FMZW3f3bDOG1WUzp0rvHv0=; b=2EdFao6Xcz4vY+jGv5WGf9Owjh
+	T/Q1E15EgYASILmmzCDaKUwBuIH0ZHKodhNi/pCxBtGjETCXJ9mJTeEvQ+Me1hlIjoT2Mgt0sg4lo
+	NxWBoh+DoKF5Z3ZtlPJOXpvnfYlMkln8/7OKDzO5rJbAnmu2jLf3o68G5wyXKEiMUM5E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rt7Jg-00CNBS-8v; Sat, 06 Apr 2024 16:46:48 +0200
+Date: Sat, 6 Apr 2024 16:46:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn, linux@armlinux.org.uk,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v9 6/6] net: stmmac: dwmac-loongson: Add GNET
+ support
+Message-ID: <a3975cd6-ae9a-4dc1-b186-5dacf1df5150@lunn.ch>
+References: <cover.1712407009.git.siyanteng@loongson.cn>
+ <3e9560ea34d507344d38a978a379f13bf6124d1b.1712407009.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e9560ea34d507344d38a978a379f13bf6124d1b.1712407009.git.siyanteng@loongson.cn>
 
-From: Jason Xing <kernelxing@tencent.com>
+> +static void loongson_gnet_fix_speed(void *priv, unsigned int speed,
+> +				    unsigned int mode)
+> +{
+> +	struct loongson_data *ld = (struct loongson_data *)priv;
+> +	struct net_device *ndev = dev_get_drvdata(ld->dev);
+> +	struct stmmac_priv *ptr = netdev_priv(ndev);
+> +
+> +	/* The controller and PHY don't work well together.
+> +	 * We need to use the PS bit to check if the controller's status
+> +	 * is correct and reset PHY if necessary.
+> +	 * MAC_CTRL_REG.15 is defined by the GMAC_CONTROL_PS macro.
+> +	 */
+> +	if (speed == SPEED_1000) {
+> +		if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15))
 
-The output goes like this if I make samples/bpf:
-...warning: no previous prototype for ‘get_cgroup_id_from_path’...
+It would be good to add a #define using BIT(15) for this PS bit. Also,
+what does PS actually mean?
 
-Make this function static could solve the warning problem since
-no one outside of the file calls it.
+> +	priv->synopsys_id = 0x37;
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- tools/testing/selftests/bpf/cgroup_helpers.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+hwif.c:		if (priv->synopsys_id >= DWMAC_CORE_3_50) {
+hwif.c:	priv->synopsys_id = id;
+hwif.c:		/* Use synopsys_id var because some setups can override this */
+hwif.c:		if (priv->synopsys_id < entry->min_id)
+stmmac_ethtool.c:		if (priv->synopsys_id >= DWMAC_CORE_3_50)
+stmmac.h:	int synopsys_id;
+stmmac_main.c:			if (priv->synopsys_id < DWMAC_CORE_4_10)
+stmmac_main.c:	if (priv->synopsys_id >= DWMAC_CORE_4_00 ||
+stmmac_main.c:		if (priv->synopsys_id < DWMAC_CORE_4_00)
+stmmac_main.c:	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
+stmmac_main.c:	if (priv->synopsys_id < DWMAC_CORE_5_20)
+stmmac_main.c:	else if ((priv->plat->enh_desc) || (priv->synopsys_id >= DWMAC_CORE_4_00))
+stmmac_mdio.c:	if (priv->synopsys_id < DWXGMAC_CORE_2_20) {
+stmmac_mdio.c:	if (priv->synopsys_id < DWXGMAC_CORE_2_20 &&
+stmmac_mdio.c:	if (priv->synopsys_id < DWXGMAC_CORE_2_20 &&
+stmmac_mdio.c:		if (priv->synopsys_id < DWXGMAC_CORE_2_20) {
 
-diff --git a/tools/testing/selftests/bpf/cgroup_helpers.c b/tools/testing/selftests/bpf/cgroup_helpers.c
-index 19be9c63d5e8..f2952a65dcc2 100644
---- a/tools/testing/selftests/bpf/cgroup_helpers.c
-+++ b/tools/testing/selftests/bpf/cgroup_helpers.c
-@@ -429,7 +429,7 @@ int create_and_get_cgroup(const char *relative_path)
-  * which is an invalid cgroup id.
-  * If there is a failure, it prints the error to stderr.
-  */
--unsigned long long get_cgroup_id_from_path(const char *cgroup_workdir)
-+static unsigned long long get_cgroup_id_from_path(const char *cgroup_workdir)
- {
- 	int dirfd, err, flags, mount_id, fhsize;
- 	union {
--- 
-2.37.3
+Please add a #define for this 0x37.
 
+Who allocated this value? Synopsys?
+
+/* Synopsys Core versions */
+#define DWMAC_CORE_3_40         0x34
+#define DWMAC_CORE_3_50         0x35
+#define DWMAC_CORE_4_00         0x40
+#define DWMAC_CORE_4_10         0x41
+
+0x37 makes it somewhere between a 3.5 and 4.0.
+
+stmmac_ethtool.c:		if (priv->synopsys_id >= DWMAC_CORE_3_50)
+stmmac_main.c:	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
+
+Does the hardware actually provide what these two bits of code
+require? Have you reviewed all similar bits of code to confirm they
+are correct for your hardware?
+
+	Andrew
 
