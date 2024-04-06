@@ -1,126 +1,161 @@
-Return-Path: <netdev+bounces-85420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5BA689AB6B
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 16:47:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2178989AB7C
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 17:03:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5340F1F21B29
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 14:47:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4243281FDC
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 15:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889E62D051;
-	Sat,  6 Apr 2024 14:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00ACB383A3;
+	Sat,  6 Apr 2024 15:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2EdFao6X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFiaeLE/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E872836D
-	for <netdev@vger.kernel.org>; Sat,  6 Apr 2024 14:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654F5376E0;
+	Sat,  6 Apr 2024 15:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712414830; cv=none; b=ctpQcHNANYIBfRyaeHaV3x7iKW4cW1tWkGbDwwbUnvlJdG6vABEg3JX+oCNwVzvuYSClxTgFq46gsGvD3Ii4G8/Sg6s/eeLzWVQkqcs06okmwHHY243ViqRNr7O//4LWTuuPWkd7zbK+ZKsNV9aBf3PpQCpsEK4LiaXobBO/Bl8=
+	t=1712415797; cv=none; b=Pbmf4vV0o6wOuEBLhac3OATAJIXkyW7h9i2BQbBDPW2M+Xt6tgEs42eIUP/IY6MFUSLiQ2ZOG5PAYiMCIzvkA7DzgZbyODYaO30rANuMTBjOYlCagne69oUqV51QxquU6oS77NSG+bPCb5tI4cYzwpoglJl6yIX9m4GU17QA8Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712414830; c=relaxed/simple;
-	bh=6gF3lw525dNquOf1Wlt+lbSqjZjUSKbE+kQ/NWr7Zuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aG9Cav2zuY4TVmtIM63D3EMkkg6JeSt7Yd0L98xDfhV9BJB5+AE4oD7M9wL4a651ObtS/xc0ZL+Qkjjr7Dl1aS923FEFLkfBOxUEQ+vYr+nOZov0LniEniVaCrw0CYxhGHVMsrpZ4xYO7mUsIfNZetLrG+UIdinQWpZU8b0jtv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2EdFao6X; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KkM/eBigkziJwOag+4/N3FMZW3f3bDOG1WUzp0rvHv0=; b=2EdFao6Xcz4vY+jGv5WGf9Owjh
-	T/Q1E15EgYASILmmzCDaKUwBuIH0ZHKodhNi/pCxBtGjETCXJ9mJTeEvQ+Me1hlIjoT2Mgt0sg4lo
-	NxWBoh+DoKF5Z3ZtlPJOXpvnfYlMkln8/7OKDzO5rJbAnmu2jLf3o68G5wyXKEiMUM5E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rt7Jg-00CNBS-8v; Sat, 06 Apr 2024 16:46:48 +0200
-Date: Sat, 6 Apr 2024 16:46:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
-	chenhuacai@loongson.cn, linux@armlinux.org.uk,
-	guyinggang@loongson.cn, netdev@vger.kernel.org,
-	chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v9 6/6] net: stmmac: dwmac-loongson: Add GNET
- support
-Message-ID: <a3975cd6-ae9a-4dc1-b186-5dacf1df5150@lunn.ch>
-References: <cover.1712407009.git.siyanteng@loongson.cn>
- <3e9560ea34d507344d38a978a379f13bf6124d1b.1712407009.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1712415797; c=relaxed/simple;
+	bh=CAq2D4Inwn3Za5vQna+/XQvSndgmRav7iHL7fAy3yyM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=pZIJsshov0YnYWmT+pQ19+fwUUqPG3Yd7jEvd1UuHhwbEacuJC0OlEpL38k5j0pY2wpdKE1vBqRowIj5TAldQ+h8Sh/4jKnmyx7szmDacuCYOadxZzTqlgA4VNyMc1B+VCXMpCe/uDIqIIsN65D/cy0Sc5ecalD9bRu66tKxTrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PFiaeLE/; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-430b7b22b17so18051541cf.2;
+        Sat, 06 Apr 2024 08:03:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712415795; x=1713020595; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a7oZc1r1+1pQl56GfIW2CdrbD4i8j9cKjnw4MtdeYuc=;
+        b=PFiaeLE/RTYRHPtqIkrHGucHcYABPoBZycwxjeaBa+S1DWnGCPvahY9b8Noa75Cvpk
+         j5L+dn39bNY3kGEUzHMEQOp1si2vicTnm6F5bXxQB2UIRDz9OaqopeQZh5WIPx8ucccR
+         t1FIycd6YILBdPOyT6Ay8DjE1mgDXz8W2eHV3CVSk9NlJ6HVvTPLd6Ao5euxoVaQ3W8Y
+         H/Scw1/GOIRnb3vXLKw96Qd7Z1EWeXm2m2l+S/nDeEXOKWV2KKuN+ejLZdT2vO2wA6Jp
+         /PsmidNqciw95XoANF6jJmgCizwRGliErU0FoZ4dzD7UbQA8wxTzURUDh7lRj3BnrMN+
+         5kWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712415795; x=1713020595;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=a7oZc1r1+1pQl56GfIW2CdrbD4i8j9cKjnw4MtdeYuc=;
+        b=eeQ9/qYvK6ywKZJy5wlPoV9Ltxhfqh+Av23LJLXkD2w/Y+e5VraAWxTytSb5xpHfpy
+         3nkic/ewrbBc2iMjer0cVCt1P2lkrxVaE7C6h53ina/OQ+U1awi2g3ge+EteuidyiIIo
+         pVGKSKIkQVGf17g4CJI+JLMfyJnpBkg5uI9YH1bQ5l8DfsNHh9TinzDBndtph25oX92f
+         4Zw2P/4Dn8RdEERGP2/08sce2GWiLRUJ3A9/flot+M6/0z9sd/zV1m7VGbcb32vQZZ6G
+         GIuaHVvbLL15e68IEYiLnEDeMTD4rE1qcffdAf6Rwh7x+LqaeaT5f+hj+RqT47XoxjYJ
+         JX2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVSWsMVm5Mfc76t8FOsdvzVfSo8gx/JKcf3ez/QH9trO4ly/bsgwQYfhy3GjGFZO6L0XYOY7awICKcrfAWoB7ulhcv9DISZQ31n5NpNUvGm8AgdyrTeAWM4wGd8aVyg/l941Eq2wwet7qLEJr6m6CxG44Wdo4FUHKSPa1gDtfTRkr6/0sCM
+X-Gm-Message-State: AOJu0YwmXv+w513LGACEsUE6lm8WJiCAPE/Is3JB4ewZo8JyraDTFGGA
+	fpeF5kHFDiHQg8C01O49ME2U6+Fw1vtwD7yJXkTMJ32SZnc18SaI
+X-Google-Smtp-Source: AGHT+IHxoO6b2MerF1U3CAmgXcBlPetNiGPIdanb85cHChz2yvph3qr1eOxLcgarxaWdzQTe3bNd6Q==
+X-Received: by 2002:ac8:7c44:0:b0:434:7944:bafc with SMTP id o4-20020ac87c44000000b004347944bafcmr1289053qtv.16.1712415795225;
+        Sat, 06 Apr 2024 08:03:15 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id w22-20020ac843d6000000b0043146d55f0csm416039qtn.60.2024.04.06.08.03.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Apr 2024 08:03:14 -0700 (PDT)
+Date: Sat, 06 Apr 2024 11:03:14 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: yan@daynix.com, 
+ andrew@daynix.com
+Message-ID: <66116432b55ce_16bd4c2943e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240406082513.78692-1-yuri.benditovich@daynix.com>
+References: <20240406082513.78692-1-yuri.benditovich@daynix.com>
+Subject: Re: [PATCH] net: change maximum number of UDP segments to 128
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3e9560ea34d507344d38a978a379f13bf6124d1b.1712407009.git.siyanteng@loongson.cn>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-> +static void loongson_gnet_fix_speed(void *priv, unsigned int speed,
-> +				    unsigned int mode)
-> +{
-> +	struct loongson_data *ld = (struct loongson_data *)priv;
-> +	struct net_device *ndev = dev_get_drvdata(ld->dev);
-> +	struct stmmac_priv *ptr = netdev_priv(ndev);
-> +
-> +	/* The controller and PHY don't work well together.
-> +	 * We need to use the PS bit to check if the controller's status
-> +	 * is correct and reset PHY if necessary.
-> +	 * MAC_CTRL_REG.15 is defined by the GMAC_CONTROL_PS macro.
-> +	 */
-> +	if (speed == SPEED_1000) {
-> +		if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15))
+Yuri Benditovich wrote:
+> Earlier commit fc8b2a619469378 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
+> added check of potential number of UDP segment vs UDP_MAX_SEGMENTS
+> in linux/virtio_net.h.
+> After this change certification test of USO guest-to-guest
+> transmit on Windows driver for virtio-net device fails,
+> for example with packet size of ~64K and mss of 536 bytes.
+> In general the USO should not be more restrictive than TSO.
 
-It would be good to add a #define using BIT(15) for this PS bit. Also,
-what does PS actually mean?
+Ack
 
-> +	priv->synopsys_id = 0x37;
+> Indeed, in case of unreasonably small mss a lot of segments
+> can cause queue overflow and packet loss on the destination.
+> Limit of 128 segments is good for any practical purpose,
+> with minimal meaningful mss of 536 the maximal UDP packet will
+> be divided to ~120 segments.
+> 
+> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 
-hwif.c:		if (priv->synopsys_id >= DWMAC_CORE_3_50) {
-hwif.c:	priv->synopsys_id = id;
-hwif.c:		/* Use synopsys_id var because some setups can override this */
-hwif.c:		if (priv->synopsys_id < entry->min_id)
-stmmac_ethtool.c:		if (priv->synopsys_id >= DWMAC_CORE_3_50)
-stmmac.h:	int synopsys_id;
-stmmac_main.c:			if (priv->synopsys_id < DWMAC_CORE_4_10)
-stmmac_main.c:	if (priv->synopsys_id >= DWMAC_CORE_4_00 ||
-stmmac_main.c:		if (priv->synopsys_id < DWMAC_CORE_4_00)
-stmmac_main.c:	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
-stmmac_main.c:	if (priv->synopsys_id < DWMAC_CORE_5_20)
-stmmac_main.c:	else if ((priv->plat->enh_desc) || (priv->synopsys_id >= DWMAC_CORE_4_00))
-stmmac_mdio.c:	if (priv->synopsys_id < DWXGMAC_CORE_2_20) {
-stmmac_mdio.c:	if (priv->synopsys_id < DWXGMAC_CORE_2_20 &&
-stmmac_mdio.c:	if (priv->synopsys_id < DWXGMAC_CORE_2_20 &&
-stmmac_mdio.c:		if (priv->synopsys_id < DWXGMAC_CORE_2_20) {
+Please mark fixes as [PATCH net] and include a fixes tag:
 
-Please add a #define for this 0x37.
+Fixes: fc8b2a619469 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
 
-Who allocated this value? Synopsys?
+Otherwise this looks fine to me. UDP_MAX_SEGMENTS exists to block
+egregious examples, such as 64K 1B segments. Doubling to 128 to handle
+536B MSS is well within the reasonable range.
 
-/* Synopsys Core versions */
-#define DWMAC_CORE_3_40         0x34
-#define DWMAC_CORE_3_50         0x35
-#define DWMAC_CORE_4_00         0x40
-#define DWMAC_CORE_4_10         0x41
+> ---
+>  include/linux/udp.h                  | 2 +-
+>  tools/testing/selftests/net/udpgso.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/udp.h b/include/linux/udp.h
+> index 3748e82b627b..7e75ccdf25fe 100644
+> --- a/include/linux/udp.h
+> +++ b/include/linux/udp.h
+> @@ -108,7 +108,7 @@ struct udp_sock {
+>  #define udp_assign_bit(nr, sk, val)		\
+>  	assign_bit(UDP_FLAGS_##nr, &udp_sk(sk)->udp_flags, val)
+>  
+> -#define UDP_MAX_SEGMENTS	(1 << 6UL)
+> +#define UDP_MAX_SEGMENTS	(1 << 7UL)
+>  
+>  #define udp_sk(ptr) container_of_const(ptr, struct udp_sock, inet.sk)
+>  
+> diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
+> index 1d975bf52af3..85b3baa3f7f3 100644
+> --- a/tools/testing/selftests/net/udpgso.c
+> +++ b/tools/testing/selftests/net/udpgso.c
+> @@ -34,7 +34,7 @@
+>  #endif
+>  
+>  #ifndef UDP_MAX_SEGMENTS
+> -#define UDP_MAX_SEGMENTS	(1 << 6UL)
+> +#define UDP_MAX_SEGMENTS	(1 << 7UL)
+>  #endif
+>  
+>  #define CONST_MTU_TEST	1500
+> -- 
+> 2.34.3
+> 
 
-0x37 makes it somewhere between a 3.5 and 4.0.
 
-stmmac_ethtool.c:		if (priv->synopsys_id >= DWMAC_CORE_3_50)
-stmmac_main.c:	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
-
-Does the hardware actually provide what these two bits of code
-require? Have you reviewed all similar bits of code to confirm they
-are correct for your hardware?
-
-	Andrew
 
