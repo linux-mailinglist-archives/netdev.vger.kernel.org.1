@@ -1,148 +1,124 @@
-Return-Path: <netdev+bounces-85443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65FB689AC65
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 19:16:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBDDD89AC71
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 19:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A949E282081
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 17:16:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5864F1F214D5
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 17:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC62C3FBA2;
-	Sat,  6 Apr 2024 17:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1F040857;
+	Sat,  6 Apr 2024 17:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AwTGRd+H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eq/4KaNO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148E03BBCB;
-	Sat,  6 Apr 2024 17:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A439D3A8F9;
+	Sat,  6 Apr 2024 17:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712423809; cv=none; b=TYcDEWeyk4LD9POBMt+aWPCIllstTFHL4uZRH6QpAFEH3yYcz13l7PYOYSo1pqtnUZv9dEOoCE7xQQPg/P9/zzniDn7qCRkyVpOOX6WTPooDADlUTl+HWsDq/4mRnlqa/NOfV8mJ3Jda1W+on6PPhCUom8ahbWaDpRh1hh6Xpj8=
+	t=1712424629; cv=none; b=L3gEyJnUx0C43ebec0OVg/FEmA4085JipyICgVH4mvkQwt+kusnqKkxwS4UM6hL1YSdZoaAVbcW3bBMwOKtprTkTF6xzKfAxBP4TdTMs1Vetd9DrDFGDbd6lsLT2vHqHfZPBymyucmP0uahEdQE910tNpih7lmvbAnVhSaAM2RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712423809; c=relaxed/simple;
-	bh=gILLRIaVJ2bum2B26nurRKPjscbQyS4QY1lUR4suiu0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oig7veuN0xsFNOhD22ljzUXVcXYIo5VC/1Eq+naVP1LjIHp+OF6ZlI6/ZEhdosGnjiN5p+756b7ds/mVEj2edl/L9gv09K3cRdgewrvNSm0i9my0sEtVoNn2seg0aR5Kvg2afxTVXaWipi24kKpOR/My5tWaq+8/ZtXANfMobA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AwTGRd+H; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-343b7c015a8so1930124f8f.1;
-        Sat, 06 Apr 2024 10:16:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712423806; x=1713028606; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=39fZePlFT6ahGlwRwztLsqQQOhwi+xDfyqxIazasOhs=;
-        b=AwTGRd+HR3Zbq2UDI11IhlewRpJumc2M/6Cdr21/cQ2qsMWcTBXOpebe5i0poQ42RO
-         63S8GHdAFbRQGx5Pk/GUrOMW0bGhA2/fWkBh+49HOrjTdXQia/E4+kfBRi9H+cpB8cbk
-         tROUgDB2k1biUviysZRqU6qaIwaOABwbpqSEEkmeXyrDf47rsV8HAexjDKFNhrkOyIBZ
-         uC3EB7xitV4ke/UyidVc2lJgEN22eCOAOmvGL4etCW1u8ZyxYHHo1nRjjlwiDZjlB8b0
-         ScAFncuFh0N9eU0L2h+KcWCZuZSFb1uv7JCOgfQ5qM8vQqt6W9rRoRjRy1hsdneuxVPp
-         hOBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712423806; x=1713028606;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=39fZePlFT6ahGlwRwztLsqQQOhwi+xDfyqxIazasOhs=;
-        b=TVftaoRu5UOdxO7w0ccqM8E/4HRPs9Ge21RkO/WokMct9+6toivESX3bA6ssYJUBWe
-         kxZupXmgiGJ6JRAdwD5ay6OGoAd8DedarQ8dh4jA1BF0+WEdyPTMSzwACJMQhnBvHt98
-         8+bcz8zbQfi1Qgw0JYHVi+KE/SCbTMiiwj7CRX7Sj8BgmlMvwUOkZTgM9RqayqUgAehQ
-         tfznasrakRLfw3HNB+AR3baBmf7swaEQbU9dWc+pUkpogE/waRRocuWlqjHNAXI+8Ihu
-         bei0Q51wDLCyvx76AjuASP6I4mU3KyHvigDGBcvhaQTzF+OpUIcZBmwWs2r8s6yOVFru
-         62Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCVxsOm1Sftg2cBrjtM4dXRdeGea+c0mhA1IaKSeQK29HnUCdhDsH4udbB3guTOB7fhEzivoy8gmyRG5UynIGlfxjl8D1MwgLgHHLLgOoQLGMpLrPt49MFwNFhpan4guMKvL
-X-Gm-Message-State: AOJu0YxJ5KQtWnJbkzGWyu7rkGh/4/KqGdqdS0VXjUXLDDTZjXtIhEz5
-	HqzQ3U3ECZLad5gSXJ5K/fk0bCa0DO+Cl+vcC2auTP1BAWtBDYnORM0dyPfPHnc/YLxTMwWTJSo
-	PfZVva0trtP7ImuehTIn/OG96Ol8=
-X-Google-Smtp-Source: AGHT+IEaKC3u9TiPBaPvwW2S9KZJmF0eLrzaUJP1ztG7c00OyVwF7t31avqJIODgx5xZoB33xf+wdmin12B6ZVr0tE8=
-X-Received: by 2002:a05:6000:e4c:b0:343:aeab:2cd9 with SMTP id
- dy12-20020a0560000e4c00b00343aeab2cd9mr3197668wrb.11.1712423806235; Sat, 06
- Apr 2024 10:16:46 -0700 (PDT)
+	s=arc-20240116; t=1712424629; c=relaxed/simple;
+	bh=OH9KHxGszVemhHYPpLuSdvMAeb+Xyw3DNtED6GDXdSo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rwt0e6x4ziQFuA+lA/YXqudfIw8W6s85B7yqeKgvWDba+HnhFEVmS4JKBcuxpIAQmtL1Po/eGvOyOvOI1gcXcWajmCk6sDKjCTwMp0W5wiKPb0Nq7S5doijS5h8zwh40K4qcJMJlmOeqDzW7WR9t7kteD+/qT8oJke0yJiAxTXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eq/4KaNO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DE0BC43390;
+	Sat,  6 Apr 2024 17:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712424629;
+	bh=OH9KHxGszVemhHYPpLuSdvMAeb+Xyw3DNtED6GDXdSo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Eq/4KaNOFAQV7+ZLJu65m4yKdvLmeeFLj89g6orUKh6dkE1571a7cDJypoQTwm8di
+	 9QaWKPGTNk89IheUZknQ5OfzW8oxksVtREgG/ZJGCFqrqeYZlKwiYlXzVG7/B2Mm3w
+	 ztPjYG95l4iVmcP9NntxLsKHt0YneOo3VkFtbqvlOuRTeiYzWbFdjo+TrQkv3XhRjt
+	 p9CYOZ9jVInYt5BFpoAbql2eRuJmd2nSI1VpuR4KNqlI7hXAXlumV8WhoUoU39FjYJ
+	 RhytPLEJVwExQ6Bnre/lz5Ibsxx5YOecm7MuzqUz+t7UC2B+6dQsHmEblBTdJRHFDX
+	 Hl9A/WLWuJkmw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2A770D8A101;
+	Sat,  6 Apr 2024 17:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <660f22c56a0a2_442282088b@john.notmuch> <20240404165000.47ce17e6@kernel.org>
- <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
- <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
- <20240405122646.GA166551@nvidia.com> <CAKgT0UeBCBfeq5TxTjND6G_S=CWYZsArxQxVb-2paK_smfcn2w@mail.gmail.com>
- <20240405151703.GF5383@nvidia.com> <CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
- <20240405190209.GJ5383@nvidia.com> <CAKgT0UdZz3fKpkTRnq5ZO2nW3NQcQ_DWahHMyddODjmNDLSaZQ@mail.gmail.com>
- <b3183aab-4071-460d-acf0-1b5caa8c67a5@lunn.ch>
-In-Reply-To: <b3183aab-4071-460d-acf0-1b5caa8c67a5@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Sat, 6 Apr 2024 10:16:09 -0700
-Message-ID: <CAKgT0UefOftypF89vb9+COtHXARzvSVBpDZdJ_hmpE-GJNs=4Q@mail.gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	bhelgaas@google.com, linux-pci@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v11 00/13] Introduce PHY listing and link_topology
+ tracking
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171242462917.4000.9759453824684907063.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Apr 2024 17:30:29 +0000
+References: <20240404093004.2552221-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20240404093004.2552221-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, andrew@lunn.ch, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk,
+ linux-arm-kernel@lists.infradead.org, christophe.leroy@csgroup.eu,
+ herve.codina@bootlin.com, f.fainelli@gmail.com, hkallweit1@gmail.com,
+ vladimir.oltean@nxp.com, kory.maincent@bootlin.com,
+ jesse.brandeburg@intel.com, corbet@lwn.net, kabel@kernel.org,
+ piergiorgio.beruto@gmail.com, o.rempel@pengutronix.de, nicveronese@gmail.com,
+ horms@kernel.org, mwojtas@chromium.org
 
-On Sat, Apr 6, 2024 at 9:49=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > I'm assuming it is some sort of firmware functionality that is needed
-> > to enable it? One thing with our design is that the firmware actually
-> > has minimal functionality. Basically it is the liaison between the
-> > BMC, Host, and the MAC. Otherwise it has no role to play in the
-> > control path so when the driver is loaded it is running the show.
->
-> Which i personally feel is great. In an odd way, this to me indicates
-> this is a commodity product, or at least, leading the way towards
-> commodity 100G products. Looking at the embedded SoC NIC market, which
-> pretty is much about commodity, few 1G Ethernet NICs have firmware.
-> Most 10G NICs also have no firmware. Linux is driving the hardware.
->
-> Much of the current Linux infrastructure is limited to 10G, because
-> currently everything faster than that hides away in firmware, Linux
-> does not get to driver it. This driver could help push Linux
-> controlling the hardware forward, to be benefit of us all. It would be
-> great if this driver used phylink to manage the PCS and the SFP cage,
-> that the PCS code is moved into drivers/net/pcs, etc. Assuming this
-> PCS follows the standards, it would be great to add helpers like we
-> have for clause 37, clause 73, to help support other future PCS
-> drivers which will appear. 100G in SoCs is probably not going to
-> appear too soon, but single channel 25G is probably the next step
-> after 10G. And what is added for this device will probably also work
-> for 25G. 40G via 4 channels is probably not too far away either.
->
-> Our Linux SFP driver is also currently limited to 10G. It would be
-> great if this driver could push that forwards to support faster SFP
-> cages and devices, support splitting and merging, etc.
->
-> None of this requires new kAPIs, they all already exist. There is
-> nothing controversial here. Everything follows standards. So if Meta
-> were to abandon the MAC driver, it would not matter, its not dead
-> infrastructure code, future drivers would make use of it, as this
-> technology becomes more and more commodity.
->
->         Andrew
+Hello:
 
-As far as the MAC/PCS code goes I will have to see what I can do. I
-think I have to check with our sourcing team to figure out what
-contracts are in place for whatever IP we are currently using before I
-can share any additional info beyond the code here.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-One other complication I can think of in terms of switching things
-over as you have requested is that we will probably need to look at
-splitting up the fbnic_mac.c file as it is currently used for both the
-UEFI driver and the Linux driver so I will need to have a solution for
-the UEFI driver which wouldn't have the advantage of phylink.
+On Thu,  4 Apr 2024 11:29:50 +0200 you wrote:
+> Hello everyone,
+> 
+> This is V11 for the link topology addition, allowing to track all PHYs
+> that are linked to netdevices.
+> 
+> This V11 addresses the various netlink-related issues that were raised
+> by Jakub, and fixes some typos in the documentation.
+> 
+> [...]
 
-Thanks,
+Here is the summary with links:
+  - [net-next,v11,01/13] net: phy: Introduce ethernet link topology representation
+    https://git.kernel.org/netdev/net-next/c/6916e461e793
+  - [net-next,v11,02/13] net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+    https://git.kernel.org/netdev/net-next/c/0ec5ed6c130e
+  - [net-next,v11,03/13] net: phy: add helpers to handle sfp phy connect/disconnect
+    https://git.kernel.org/netdev/net-next/c/e75e4e074c44
+  - [net-next,v11,04/13] net: sfp: Add helper to return the SFP bus name
+    https://git.kernel.org/netdev/net-next/c/fdd353965b52
+  - [net-next,v11,05/13] net: ethtool: Allow passing a phy index for some commands
+    https://git.kernel.org/netdev/net-next/c/841942bc6212
+  - [net-next,v11,06/13] netlink: specs: add phy-index as a header parameter
+    (no matching commit)
+  - [net-next,v11,07/13] net: ethtool: Introduce a command to list PHYs on an interface
+    (no matching commit)
+  - [net-next,v11,08/13] netlink: specs: add ethnl PHY_GET command set
+    (no matching commit)
+  - [net-next,v11,09/13] net: ethtool: plca: Target the command to the requested PHY
+    (no matching commit)
+  - [net-next,v11,10/13] net: ethtool: pse-pd: Target the command to the requested PHY
+    (no matching commit)
+  - [net-next,v11,11/13] net: ethtool: cable-test: Target the command to the requested PHY
+    (no matching commit)
+  - [net-next,v11,12/13] net: ethtool: strset: Allow querying phy stats by index
+    (no matching commit)
+  - [net-next,v11,13/13] Documentation: networking: document phy_link_topology
+    (no matching commit)
 
-- Alex
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
