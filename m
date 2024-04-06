@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-85427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0092989ABCC
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 17:52:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EA6D89ABD0
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 17:58:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 946BB1F21970
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 15:52:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25912B215CD
+	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 15:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 405043B2A2;
-	Sat,  6 Apr 2024 15:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF663BB38;
+	Sat,  6 Apr 2024 15:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lJ8iiQfV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fuKZqE5r"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB011CFB9;
-	Sat,  6 Apr 2024 15:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D77D38396;
+	Sat,  6 Apr 2024 15:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712418747; cv=none; b=m4LLx5TDMZhAl4xNCjyrzBRQm1TSbJEu7IErkmzCzC54oVrUjKb1jvOO5iy8BhrkCSd6oG3L5FEZOdNuLlS5IOtxXlD0GGPEoBZl+DyJdZW/XIZzTQ5WkcoCTbgpmWT1Z6yECGx79skXww6DtvuQRynNXbyM7L3FbNf/o8oiLgc=
+	t=1712419126; cv=none; b=T6CUFoHLgIjs1DvJ2uyc8LG5H0xI10PhOvh+lcuHeI2ZFSvXV1RmD9/SDi1nU/I8EiBKxjBdD9aCgifoJwO0etZ+DiJgFdh0fH0pgWS4wygxot7H1Y2flTLemSyUgvTwi9GEY38lRpK3xPzil8k1G1AtHwzRBc3lIKJ50TfJ/vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712418747; c=relaxed/simple;
-	bh=DijJAWy9i/up+jDarXl3HGvDuc5nZ1pLtm25cesA4iA=;
+	s=arc-20240116; t=1712419126; c=relaxed/simple;
+	bh=nNdKTO1hqqrwsAK7J5UWvHyMQWy/DPFAecbNqFDFKx4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qGCUUwDOW8iLJG9l4P6Ahd+7gdguzOSFQm5TmqhWYFoiX3W8KraRwaqp7GklwFm0v0cNgF+O2LueT9V0xLiL8i4HVHS3N8rjdz/De3/Pbka82MX798aESdcl4bhPV+Zbb8lvo12VxdGjBBKzRDN0y8atd1p8wjN2q2kyq/TkKqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lJ8iiQfV; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=O8KZTHLlNgLAhNUwWNj++j03ek7noizh3AwFSbRWNaMhDN7XFVzYmXnq2RV0lkTJUGUpTkl3VTkxpNebIG8FgPVKJ2mNGPMryfJLUcPea8gDC3vvSvNuuEHm1pxhYd6grXeNNEkJ8BsrTJ9dz3wr7QrN0N+sGY8Jryf4FJldL9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fuKZqE5r; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MEl8Sy+tCfS2l7mF/OXdN4vincdv+IXBh938c/3Vnqc=; b=lJ8iiQfVAnvqJaBytHQRN4D1YQ
-	yeMHKI5j9PnYO39PT75Axy1RNkaEMWC1PopS9hZ9yVKdwaOGVc266R272RDGtDKALer65EXNH5F/q
-	kn4hauzI68jYrofo2YEm/YwtEakC+bMdV9+Qa4XsCawrCKPdMDTlWXlzVTFQSs19pWv4=;
+	bh=j4wsuCXSqn6uoRNQn7YbhCaXFnmRpqFl6kS8zFaXYgg=; b=fuKZqE5r+3JLdPKZBwuyf5obJq
+	623AkBjqhSEu5NSgQRxygFKrQ7bklm/amGQR5jL+rr+DcaNnZxMMurdjPtZ7hBfG4TtpTCOnAfPqN
+	+TuulBU7RRg0GBDvKN6Au9tHNM5SSjSLGn3v2QLJtQQT2kq4gBwezDEbxKHFh/EDni8E=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rt8L8-00CNTV-IQ; Sat, 06 Apr 2024 17:52:22 +0200
-Date: Sat, 6 Apr 2024 17:52:22 +0200
+	id 1rt8RF-00CNV6-SB; Sat, 06 Apr 2024 17:58:41 +0200
+Date: Sat, 6 Apr 2024 17:58:41 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Cc: davem@davemloft.net, netdev@vger.kernel.org,
@@ -64,11 +64,11 @@ Cc: davem@davemloft.net, netdev@vger.kernel.org,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
 	Simon Horman <horms@kernel.org>, mwojtas@chromium.org
-Subject: Re: [PATCH net-next v11 03/13] net: phy: add helpers to handle sfp
- phy connect/disconnect
-Message-ID: <5561aaf7-b01a-495a-958f-2a07e1ff8cf3@lunn.ch>
+Subject: Re: [PATCH net-next v11 07/13] net: ethtool: Introduce a command to
+ list PHYs on an interface
+Message-ID: <a5e5c188-bae8-4827-914a-e089cd0bf5c9@lunn.ch>
 References: <20240404093004.2552221-1-maxime.chevallier@bootlin.com>
- <20240404093004.2552221-4-maxime.chevallier@bootlin.com>
+ <20240404093004.2552221-8-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,18 +77,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240404093004.2552221-4-maxime.chevallier@bootlin.com>
+In-Reply-To: <20240404093004.2552221-8-maxime.chevallier@bootlin.com>
 
-On Thu, Apr 04, 2024 at 11:29:53AM +0200, Maxime Chevallier wrote:
-> There are a few PHY drivers that can handle SFP modules through their
-> sfp_upstream_ops. Introduce Phylib helpers to keep track of connected
-> SFP PHYs in a netdevice's namespace, by adding the SFP PHY to the
-> upstream PHY's netdev's namespace.
+On Thu, Apr 04, 2024 at 11:29:57AM +0200, Maxime Chevallier wrote:
+> As we have the ability to track the PHYs connected to a net_device
+> through the link_topology, we can expose this list to userspace. This
+> allows userspace to use these identifiers for phy-specific commands and
+> take the decision of which PHY to target by knowing the link topology.
 > 
-> By doing so, these SFP PHYs can be enumerated and exposed to users,
-> which will be able to use their capabilities.
+> Add PHY_GET and PHY_DUMP, which can be a filtered DUMP operation to list
+> devices on only one interface.
 > 
 > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+It would be good if Jakub reviewed this as well, since i don't know
+netlink too well. But:
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
