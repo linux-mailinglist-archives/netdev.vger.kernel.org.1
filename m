@@ -1,124 +1,145 @@
-Return-Path: <netdev+bounces-85484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7744289AF4D
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 09:59:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51F0289AF54
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 10:04:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EE8CB219DC
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 07:59:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C880AB213AA
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 08:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8967125AC;
-	Sun,  7 Apr 2024 07:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A68D748F;
+	Sun,  7 Apr 2024 08:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IXFygKIw"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7522F4E7;
-	Sun,  7 Apr 2024 07:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6023D7A
+	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 08:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712476750; cv=none; b=uiAfq5Z5ka8lHxz/rAPL3mYy3UJ9mTMfBviU+TgduSNcXvusyL5JXafI3CzbuE17wN9NEUK9xdE5YUUWA6S2eTQm0mhD0au2de4k+VfVW1mJ2KL5h5bsP5TfHYh+sKygvosSTmirkFE8BfZCclxjIkxP8wEGevOSXaugVtrvv98=
+	t=1712477054; cv=none; b=k0gW0JJzROgOH86xvaCKo6hzz43D+QxIybTHi8WVbQFVVzsdDBky2pA08f9jzxF8Y5m0Suor/9GT/O8G1Fs1v5eym/SbBxsx3cW6E0cxTCKPQdZqX9BW0Qdx1u6RsA1C3Lza3kiuo3w13EttqieGIhbpDGvPJ3/zmD0eBsFToPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712476750; c=relaxed/simple;
-	bh=umpEPG5e4IRUn6CQljWlAIot08VG+XtIQj73ktnnmY0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=omd83Mm5L690Gfj92UtGN4hSaplk3S3VfM3Em5iipTyqhtYJ+FIT4MjwzmxVdtnnqhv0ZUlwUyJAgqcjvxrMnznXKGLvpJ/LMIF9iAqvzLjTZwnP/bV7R/zH5D9pfeEjDSQNViXPpU2KHqjb3yvWlebwPN4Sg97ZLxomdwrcRVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VC4N20xm9zbfMx;
-	Sun,  7 Apr 2024 15:58:10 +0800 (CST)
-Received: from kwepemm600014.china.huawei.com (unknown [7.193.23.54])
-	by mail.maildlp.com (Postfix) with ESMTPS id D9C3D14010C;
-	Sun,  7 Apr 2024 15:59:06 +0800 (CST)
-Received: from huawei.com (10.67.174.78) by kwepemm600014.china.huawei.com
- (7.193.23.54) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Sun, 7 Apr
- 2024 15:59:06 +0800
-From: Yi Yang <yiyang13@huawei.com>
-To: <horms@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <nichen@iscas.ac.cn>
-CC: <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<stable@vger.kernel.org>, <wangweiyang2@huawei.com>
-Subject: [PATCH net 2/2] net: usb: asix: Replace the direct return with goto statement
-Date: Sun, 7 Apr 2024 07:55:13 +0000
-Message-ID: <20240407075513.923435-3-yiyang13@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240407075513.923435-1-yiyang13@huawei.com>
-References: <20240407075513.923435-1-yiyang13@huawei.com>
+	s=arc-20240116; t=1712477054; c=relaxed/simple;
+	bh=OA11V4gZaC0bm4WHVue3hpnj7GvS2TWb/dX++M+X87o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rN3FJzWB0D0azERbUBVVxQVywNgnFCMz/UrCpirVdANECULdll2kOGtoxxUtPrFCbMwwCuuQYrt/peqaS3ypK0tyzc8AOHcvpOVrZN9uxk7P8WLpDLRVwjCDx5ddEzf0vn/4C0L4E+y99560hLs6JxRFy5rAZweDiUfQth6giFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IXFygKIw; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-516d0dc0cf7so2632e87.0
+        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 01:04:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712477051; x=1713081851; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7opS8tt3/PQ20Z3xJ7Gfy1IP3QyzeZYFCYGhZNGExoQ=;
+        b=IXFygKIwITC96Hx8yWZZO+q0Xqasbsu2Yby87wflgfKQu04ukZH+Q73u2bCzE5PKqb
+         1YUCRrUL5XPIxs8JjcwivtP4+damHhAmjA3F4NtHYoK7jqNy/rDo3M3kuv0tsNZEyMm8
+         RUMjfoTZoWxh8wCyUtl5C/8hkPybkvjY9oH7bSeAzrmvuxqOI7vFJgDyq9B8LSI8kYsR
+         4DkHPLz/UKj2Hl8PCJszCRHndhmzWqHe69HfiGTc08WyfuJ2bWdL3QofkeUnSrpe61pR
+         +3tjRZxHvZ1eWOt54aA4buAlW+Mjl42UJcGuLWQ5/epLx8k+WrsTmJrh/W+9EAYnUkcq
+         0GbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712477051; x=1713081851;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7opS8tt3/PQ20Z3xJ7Gfy1IP3QyzeZYFCYGhZNGExoQ=;
+        b=VcI/x+3Uq2Mt4xjWbPnn/4Igb3eexSok4sZIDD1qLWUXpk4cbfMN+5VH0n5ViMdgVW
+         kC5G9cWhq/bG3cfj9tlQfABJQDeyq9dqkFzviedmDQKxS8WLdFmGXA9wqEnfQdAkeyUp
+         oCgyasez7DE2PKUHpo6Imk7DChCI/aJtPI9qEtblybHDCje3GFP6gurw2dINXhiepEW2
+         oY/YnQjAYUiaFWd2dWgIOopburcPeJJZxnAZQjIu9xZQK0nPkl16RVk5vZfyqEBkfss8
+         MWds1vqJRXEYU0B0ckBVVKRaiVwnCMUIL2iQ7BYdw2Z0A/nQicDYQjLNyfNX/MFvVpUY
+         EEQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVs/6ix4TO63opqaS0exYHLthC4m09y9ZnWB+YyooaweKTPqo6lTM2jS77LGqReHJKVVgvMzAro5RUG8Jg+yqunzMIz64l4
+X-Gm-Message-State: AOJu0YyXnSF57vnLm2momyEK0hs0S74WuuzhiTnjL0J6nQUwVLDqQowH
+	jpZyLwj9FB/JNWjXlOBImXnwthuvw3KNQpaWJcuoiSb9l4a+GIdlQ2F6IboiyEpS+WtJGsuOcsg
+	0zFrLSZmPD7rneU8pvOvB9fXFrjQeyti2zoN5
+X-Google-Smtp-Source: AGHT+IGRRJo7P3sVeNCQ/XYlsKR8vcOG2qL/HZ0hBv0CRlcLtL+naRfNOqrXmSjMli2jElawYhLN+iSonLgwCRehTsc=
+X-Received: by 2002:a05:6512:3b09:b0:516:d099:400a with SMTP id
+ f9-20020a0565123b0900b00516d099400amr130904lfv.0.1712477050794; Sun, 07 Apr
+ 2024 01:04:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600014.china.huawei.com (7.193.23.54)
+References: <20240406160825.1587913-1-edumazet@google.com> <66118ade17cd9_172b6329459@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66118ade17cd9_172b6329459@willemb.c.googlers.com.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 7 Apr 2024 10:03:56 +0200
+Message-ID: <CANn89iLeUSOhVRM=Fm3Fnq1qi68sqAqzAMqMZnbLHqJdcpUbWQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: display more skb fields in skb_dump()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Replace the direct return statement in ax88772_bind() with goto, to adhere
-to the kernel coding style.
+On Sat, Apr 6, 2024 at 7:48=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Eric Dumazet wrote:
+> > Print these additional fields in skb_dump()
+> >
+> > - mac_len
+> > - priority
+> > - mark
+> > - alloc_cpu
+> > - vlan_all
+> > - encapsulation
+> > - inner_protocol
+> > - inner_mac_header
+> > - inner_network_header
+> > - inner_transport_header
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+>
+> > ---
+> >  net/core/skbuff.c | 12 +++++++++---
+> >  1 file changed, 9 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 2a5ce6667bbb9bb70e89d47abda5daca5d16aae2..fa0d1364657e001c6668aaf=
+af2c2a3d434980798 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -1304,13 +1304,16 @@ void skb_dump(const char *level, const struct s=
+k_buff *skb, bool full_pkt)
+> >       has_trans =3D skb_transport_header_was_set(skb);
+> >
+> >       printk("%sskb len=3D%u headroom=3D%u headlen=3D%u tailroom=3D%u\n=
+"
+> > -            "mac=3D(%d,%d) net=3D(%d,%d) trans=3D%d\n"
+> > +            "mac=3D(%d,%d) mac_len=3D%u net=3D(%d,%d) trans=3D%d\n"
+> >              "shinfo(txflags=3D%u nr_frags=3D%u gso(size=3D%hu type=3D%=
+u segs=3D%hu))\n"
+> >              "csum(0x%x ip_summed=3D%u complete_sw=3D%u valid=3D%u leve=
+l=3D%u)\n"
+>
+> If touching this function, also add csum_start and csum_offset?
+> These are technically already present in csum, as it's a union:
+>
+>         union {
+>                 __wsum          csum;
+>                 struct {
+>                         __u16   csum_start;
+>                         __u16   csum_offset;
+>                 };
+>         };
+>
+> But it is a bit annoying to have to do the conversion manually.
+> And this is a regular playground for syzbot.
 
-Signed-off-by: Yi Yang <yiyang13@huawei.com>
----
- drivers/net/usb/asix_devices.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index d8f86bafad6a..11417ed86d9e 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -838,7 +838,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	ret = usbnet_get_endpoints(dev, intf);
- 	if (ret)
--		return ret;
-+		goto mdio_err;
- 
- 	/* Maybe the boot loader passed the MAC address via device tree */
- 	if (!eth_platform_get_mac_address(&dev->udev->dev, buf)) {
-@@ -862,7 +862,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 		if (ret < 0) {
- 			netdev_dbg(dev->net, "Failed to read MAC address: %d\n",
- 				   ret);
--			return ret;
-+			goto mdio_err;
- 		}
- 	}
- 
-@@ -875,7 +875,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	ret = asix_read_phy_addr(dev, true);
- 	if (ret < 0)
--		return ret;
-+		goto mdio_err;
- 
- 	priv->phy_addr = ret;
- 	priv->embd_phy = ((priv->phy_addr & 0x1f) == AX_EMBD_PHY_ADDR);
-@@ -884,7 +884,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 			    &priv->chipcode, 0);
- 	if (ret < 0) {
- 		netdev_dbg(dev->net, "Failed to read STATMNGSTS_REG: %d\n", ret);
--		return ret;
-+		goto mdio_err;
- 	}
- 
- 	priv->chipcode &= AX_CHIPCODE_MASK;
-@@ -899,7 +899,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
- 	ret = priv->reset(dev, 0);
- 	if (ret < 0) {
- 		netdev_dbg(dev->net, "Failed to reset AX88772: %d\n", ret);
--		return ret;
-+		goto mdio_err;
- 	}
- 
- 	/* Asix framing packs multiple eth frames into a 2K usb bulk transfer */
--- 
-2.25.1
-
+I agree, I am adding them in V2, thanks !
 
