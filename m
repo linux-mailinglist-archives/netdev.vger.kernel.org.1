@@ -1,145 +1,120 @@
-Return-Path: <netdev+bounces-85485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51F0289AF54
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 10:04:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2863B89AF69
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 10:07:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C880AB213AA
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 08:04:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1F631F22124
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 08:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A68D748F;
-	Sun,  7 Apr 2024 08:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA711173F;
+	Sun,  7 Apr 2024 08:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IXFygKIw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqbpjPLv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6023D7A
-	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 08:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A2611717
+	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 08:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712477054; cv=none; b=k0gW0JJzROgOH86xvaCKo6hzz43D+QxIybTHi8WVbQFVVzsdDBky2pA08f9jzxF8Y5m0Suor/9GT/O8G1Fs1v5eym/SbBxsx3cW6E0cxTCKPQdZqX9BW0Qdx1u6RsA1C3Lza3kiuo3w13EttqieGIhbpDGvPJ3/zmD0eBsFToPU=
+	t=1712477125; cv=none; b=M5QDC+S3cXkkFou2XBP02bbplLJ6yOlqi3CAtiG9yDPWC+Pqb8jC0T4+dpbwYYtSB39pxbe5eLA8fUpxtXu46yGw/33DKc6JUx1OxOS0R+4eifdTEusSM6assYiPCmQz8aO2R0XGA8R+9Qz218wtHJhMAsF+1T64/NbPGB1cUKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712477054; c=relaxed/simple;
-	bh=OA11V4gZaC0bm4WHVue3hpnj7GvS2TWb/dX++M+X87o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rN3FJzWB0D0azERbUBVVxQVywNgnFCMz/UrCpirVdANECULdll2kOGtoxxUtPrFCbMwwCuuQYrt/peqaS3ypK0tyzc8AOHcvpOVrZN9uxk7P8WLpDLRVwjCDx5ddEzf0vn/4C0L4E+y99560hLs6JxRFy5rAZweDiUfQth6giFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IXFygKIw; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-516d0dc0cf7so2632e87.0
-        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 01:04:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712477051; x=1713081851; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7opS8tt3/PQ20Z3xJ7Gfy1IP3QyzeZYFCYGhZNGExoQ=;
-        b=IXFygKIwITC96Hx8yWZZO+q0Xqasbsu2Yby87wflgfKQu04ukZH+Q73u2bCzE5PKqb
-         1YUCRrUL5XPIxs8JjcwivtP4+damHhAmjA3F4NtHYoK7jqNy/rDo3M3kuv0tsNZEyMm8
-         RUMjfoTZoWxh8wCyUtl5C/8hkPybkvjY9oH7bSeAzrmvuxqOI7vFJgDyq9B8LSI8kYsR
-         4DkHPLz/UKj2Hl8PCJszCRHndhmzWqHe69HfiGTc08WyfuJ2bWdL3QofkeUnSrpe61pR
-         +3tjRZxHvZ1eWOt54aA4buAlW+Mjl42UJcGuLWQ5/epLx8k+WrsTmJrh/W+9EAYnUkcq
-         0GbA==
+	s=arc-20240116; t=1712477125; c=relaxed/simple;
+	bh=sipUYppo/fuNUneIxzUGvGCxT1E3jMZtBO3piEFY9Bo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mElSH0EmCkUb82RwNs4ZdmqEZiVWxRImabIW7Rdr9lTn15SQkYm6/6aYJvwHECgfVYyaYnQG0sEVPaKY5jQpNsF7U/IF5EpBsMwAHxWLvx6ci5z3pQhh2Oyv1R0COhhCN67FIZyQjHNRDv7jmKMVvhqrKotFROrK1uSFWIV/WOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JqbpjPLv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712477123;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=fZMY4FIR5bqHlVqLpHDKFnD9HwhABXpqUz5I1Slfl5Q=;
+	b=JqbpjPLvsgF94WhbSgJ/kUxp846SAWVyqQo2wieC7exSfAzJl4IMMzf7A43Z2klf1JLLfW
+	2oyI+a8F4PQgNjiK8KmyG4+IfmWIVhdEnanaq2IFQ0sZ/KioVR3GgStqCdmSnRSlEi9K5u
+	bFQT/fR3gDJxNpDzOsdzKViF4LbUkmU=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-486-KTICYUkLOAShzWQ8BlIB9A-1; Sun, 07 Apr 2024 04:05:21 -0400
+X-MC-Unique: KTICYUkLOAShzWQ8BlIB9A-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1e278ebfea1so32536085ad.0
+        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 01:05:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712477051; x=1713081851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7opS8tt3/PQ20Z3xJ7Gfy1IP3QyzeZYFCYGhZNGExoQ=;
-        b=VcI/x+3Uq2Mt4xjWbPnn/4Igb3eexSok4sZIDD1qLWUXpk4cbfMN+5VH0n5ViMdgVW
-         kC5G9cWhq/bG3cfj9tlQfABJQDeyq9dqkFzviedmDQKxS8WLdFmGXA9wqEnfQdAkeyUp
-         oCgyasez7DE2PKUHpo6Imk7DChCI/aJtPI9qEtblybHDCje3GFP6gurw2dINXhiepEW2
-         oY/YnQjAYUiaFWd2dWgIOopburcPeJJZxnAZQjIu9xZQK0nPkl16RVk5vZfyqEBkfss8
-         MWds1vqJRXEYU0B0ckBVVKRaiVwnCMUIL2iQ7BYdw2Z0A/nQicDYQjLNyfNX/MFvVpUY
-         EEQw==
-X-Forwarded-Encrypted: i=1; AJvYcCVs/6ix4TO63opqaS0exYHLthC4m09y9ZnWB+YyooaweKTPqo6lTM2jS77LGqReHJKVVgvMzAro5RUG8Jg+yqunzMIz64l4
-X-Gm-Message-State: AOJu0YyXnSF57vnLm2momyEK0hs0S74WuuzhiTnjL0J6nQUwVLDqQowH
-	jpZyLwj9FB/JNWjXlOBImXnwthuvw3KNQpaWJcuoiSb9l4a+GIdlQ2F6IboiyEpS+WtJGsuOcsg
-	0zFrLSZmPD7rneU8pvOvB9fXFrjQeyti2zoN5
-X-Google-Smtp-Source: AGHT+IGRRJo7P3sVeNCQ/XYlsKR8vcOG2qL/HZ0hBv0CRlcLtL+naRfNOqrXmSjMli2jElawYhLN+iSonLgwCRehTsc=
-X-Received: by 2002:a05:6512:3b09:b0:516:d099:400a with SMTP id
- f9-20020a0565123b0900b00516d099400amr130904lfv.0.1712477050794; Sun, 07 Apr
- 2024 01:04:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712477120; x=1713081920;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fZMY4FIR5bqHlVqLpHDKFnD9HwhABXpqUz5I1Slfl5Q=;
+        b=pmV/iyd+5L1j12X8kE43LCZR4EzilvBpaTDW2DK2ZhmtypNhS6iOKwAFtaun2k2VdO
+         ISjGZgd7w0RSSHzi73qOpFR/bP35pPlb91JCmUJ7HJWhTYRBJOLeSurlT7wAamEIoMOk
+         u9doJyAyvWGZOCwc7Rb43r/lBHYxvtwIG2nW86CBAVvJhHpj77AE1axiUolkkdZSw2DY
+         YtkE3SL64+XflqBPYlA34trHSMSaTgZmr5gvsrYv37WHd1rnzHZhwKY/LVRfJagyjde2
+         ZaKu6Gr4pKbcORNRYY89IlJaL1DQ8afaKw2MQY4vI4GAZ5tm2kQBPv7UllJtmBtnCKoZ
+         /EtA==
+X-Gm-Message-State: AOJu0YzfX8dROsNrBoASJJV37lYUKiyBIT0cyPNwCM0OgEmFNo+18+9O
+	UNvMt1DtcU70wE3wgd3hHBoXSeASlYeEkck5mKOGA0Dh1+rEyMmR3dy2Lee++afL+FcwijIEqaL
+	F1ySKHOOBaa0uCFlwZY0QoTyLHF/BU4TAIBK8w7wlKV6VGDPoA4YrSA==
+X-Received: by 2002:a17:902:6806:b0:1e3:dad5:331a with SMTP id h6-20020a170902680600b001e3dad5331amr3186998plk.59.1712477120363;
+        Sun, 07 Apr 2024 01:05:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFdLw+ctudtG5r+xOHndXsrdEa+rCjmOgdC2XpVPQttOj9CueVJYiAKFgBsFYW1hcW2+KHY2A==
+X-Received: by 2002:a17:902:6806:b0:1e3:dad5:331a with SMTP id h6-20020a170902680600b001e3dad5331amr3186986plk.59.1712477120035;
+        Sun, 07 Apr 2024 01:05:20 -0700 (PDT)
+Received: from zeus ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
+        by smtp.gmail.com with ESMTPSA id p12-20020a170902780c00b001e3c9a98429sm3735115pll.119.2024.04.07.01.05.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Apr 2024 01:05:19 -0700 (PDT)
+Date: Sun, 7 Apr 2024 17:05:15 +0900
+From: Ryosuke Yasuoka <ryasuoka@redhat.com>
+To: krzysztof.kozlowski@linaro.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syoshida@redhat.com
+Subject: [PATCH net] nfc: nci: Fix uninit-value in nci_rx_work
+Message-ID: <ZhJTu7qmOtTs9u2c@zeus>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240406160825.1587913-1-edumazet@google.com> <66118ade17cd9_172b6329459@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66118ade17cd9_172b6329459@willemb.c.googlers.com.notmuch>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 7 Apr 2024 10:03:56 +0200
-Message-ID: <CANn89iLeUSOhVRM=Fm3Fnq1qi68sqAqzAMqMZnbLHqJdcpUbWQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: display more skb fields in skb_dump()
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sat, Apr 6, 2024 at 7:48=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Eric Dumazet wrote:
-> > Print these additional fields in skb_dump()
-> >
-> > - mac_len
-> > - priority
-> > - mark
-> > - alloc_cpu
-> > - vlan_all
-> > - encapsulation
-> > - inner_protocol
-> > - inner_mac_header
-> > - inner_network_header
-> > - inner_transport_header
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
->
-> > ---
-> >  net/core/skbuff.c | 12 +++++++++---
-> >  1 file changed, 9 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 2a5ce6667bbb9bb70e89d47abda5daca5d16aae2..fa0d1364657e001c6668aaf=
-af2c2a3d434980798 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -1304,13 +1304,16 @@ void skb_dump(const char *level, const struct s=
-k_buff *skb, bool full_pkt)
-> >       has_trans =3D skb_transport_header_was_set(skb);
-> >
-> >       printk("%sskb len=3D%u headroom=3D%u headlen=3D%u tailroom=3D%u\n=
-"
-> > -            "mac=3D(%d,%d) net=3D(%d,%d) trans=3D%d\n"
-> > +            "mac=3D(%d,%d) mac_len=3D%u net=3D(%d,%d) trans=3D%d\n"
-> >              "shinfo(txflags=3D%u nr_frags=3D%u gso(size=3D%hu type=3D%=
-u segs=3D%hu))\n"
-> >              "csum(0x%x ip_summed=3D%u complete_sw=3D%u valid=3D%u leve=
-l=3D%u)\n"
->
-> If touching this function, also add csum_start and csum_offset?
-> These are technically already present in csum, as it's a union:
->
->         union {
->                 __wsum          csum;
->                 struct {
->                         __u16   csum_start;
->                         __u16   csum_offset;
->                 };
->         };
->
-> But it is a bit annoying to have to do the conversion manually.
-> And this is a regular playground for syzbot.
+syzbot reported the following uninit-value access issue [1]
 
-I agree, I am adding them in V2, thanks !
+nci_rx_work() parses received packet from ndev->rx_q. It should be
+checked skb->len is non-zero to verify if it is valid before processing
+the packet. If skb->len is zero but skb->data is not, such packet is
+invalid and should be silently discarded.
+
+Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
+Reported-and-tested-by: syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534 [1]
+Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
+---
+ net/nfc/nci/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
+index 0d26c8ec9993..b7a020484131 100644
+--- a/net/nfc/nci/core.c
++++ b/net/nfc/nci/core.c
+@@ -1516,7 +1516,7 @@ static void nci_rx_work(struct work_struct *work)
+ 		nfc_send_to_raw_sock(ndev->nfc_dev, skb,
+ 				     RAW_PAYLOAD_NCI, NFC_DIRECTION_RX);
+ 
+-		if (!nci_plen(skb->data)) {
++		if (!skb->len || !nci_plen(skb->data)) {
+ 			kfree_skb(skb);
+ 			break;
+ 		}
+-- 
+2.44.0
+
 
