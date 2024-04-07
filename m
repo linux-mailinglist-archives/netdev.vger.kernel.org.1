@@ -1,96 +1,131 @@
-Return-Path: <netdev+bounces-85531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8832E89B267
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 15:59:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C45D89B274
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 16:24:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3CBB1C20E3D
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 13:59:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B784B21000
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 14:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E042C376FE;
-	Sun,  7 Apr 2024 13:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8686381DA;
+	Sun,  7 Apr 2024 14:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNx4sn9d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575E639AC7
-	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 13:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2627737703;
+	Sun,  7 Apr 2024 14:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712498344; cv=none; b=M7YjsKmhMsu7wVPbLLEMQECxs41HqibbTIS0VohBnYiTJ1Jik3xl50QHyHwOtjqxu2ew9psiQWX8kAxPCMSTpAKmcTbmhl3k70xEaB/dsdy9nLnDXF5SwLrJUVrwNTc7pY4V+fqGOrfwkUlinD2E9yQCnVQRus3pj7YVoxCf66I=
+	t=1712499880; cv=none; b=sKCzdpfTg9Fm7AZ1gsjb9/MzCSPapNPjYz/Qb1UQWyko742wyuy2VhiaTE915CEGf/JJNL5HlvBl+a3vpOUX6nNoD/pApLxgBWSpytoZby5oXb97xNlUj2M/BMpF5QC+iaKvPn3Fr2TqH8p5CWEKqtPVPgrI7KxfVMY76pP2jDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712498344; c=relaxed/simple;
-	bh=G3SuHFbHFzh8ypZatqs8OpXqZOj87aatW9KjH+JX3+A=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=oZqUkyEIrn8BdSfyMhNC4zAKsTdk2ZgEjD3fJpMeKA2DX0ZCnBpyNddMB6hrdAwnAotGFt5SsHCJDLs5mGMAkEdoNsEpdOeLIF0VQJrLjFJHgOP1uA/G+4s1znP6duk6cdZsSJu2O8WdNOnHOltttAeIIjv8YHEg1Bgvg0u3pC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-36a17a4b594so11322045ab.3
-        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 06:59:03 -0700 (PDT)
+	s=arc-20240116; t=1712499880; c=relaxed/simple;
+	bh=057EjmkWBMVcK9xKGnWCFqyiyABAvqqe5E02u7dyYAg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sUx72VSBWx/O3yqeQyqLjIpyBVx+cNwNfgnoeVhsICVZSjNzIwW8JUyZB8gu5Zml5wuDmt4faiXHbXBAneMVPCfkFnV41iewUp+0vBhG8iExggr1Hxmsjgmb1aBm70tZJ5b4zHRojnwbekxe2k/TF3PZTs2Z9tB5vHQ1lA0qDy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BNx4sn9d; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4156c4fe401so23403795e9.1;
+        Sun, 07 Apr 2024 07:24:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712499877; x=1713104677; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZJYGJMn0SoZv7X1gCRhWkduuUEvK/yiFWdRu8bhp/fI=;
+        b=BNx4sn9dBzxsu9zaOZGT88a9vflbpVGiWMSHAkCZAMMWf9JjsgqYxqDrd9c/TP0rdC
+         9Wf2o+wWcNk5Qz9MCuQjYYxQWNK2FAgengeJDRfJwuwffM9W6K8VYY0mHHpFwHQj+jdT
+         tMFjYnmt+tvSvvMj/Ks9M539ST48zTExvyidlu7Ukrgoaj2x3SOzZYzzRFppSU2zKFIn
+         OTflMTzD9unSukT2MLH+9rsrKmLbynS4HrTzKLnW6XdSY3AYvretlDgdGeulMcjI66mr
+         gkZS1kKyWYf2JwbLdeirxpOTtcRgK1kn2NrfeGGFd3rrobPpbp7q/LnvZ7R00ecgLGmK
+         c2Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712498342; x=1713103142;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h8th6mi8YZ4SsK+AiWToLd2PxMqZqV+eb1WyXiyTunM=;
-        b=FUxOnJpacejPt2J8agfZU7kVb0f01yOHrjkbuZ2iQ6W/DwRUoL3CQLqwn4+juzT1NJ
-         C1V9tNTvh62lJnqxYLDpO+Gw1ylLWUnn9aHg5zmjFw06W4W5rSLTwD2N4McmmRqMR09b
-         65X2CdzrU9iF2+/eIkUFYHLXWQxwV1PqMm+cmDCitkUAFJzMxOb48jvTnwfQzA6qK+tx
-         1zydgA63Csn3pxA/XXpf3C9ADJZme4JvTbebpY/a0sM0ZcvWiQgvOv7A/eDypqCTf5am
-         bX4/7T1VEz26vlfe9ZQAfWZiciu+mKoLpOdz8kPfKyNF7FJ3iSK1JQW8JnwVHTeV9HI/
-         UsLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWnLoCZer89CYzUe/qFLQwemzd/kRdBdroE8g+qqhVTISJpKwtRHnvmlzHpUa7MnIXK1Pi6+rZzGdaDrzFxYQqun9QVh0mG
-X-Gm-Message-State: AOJu0YwFq9LoBGBXjaF/QRRUtCgNcDrGPuvk6o8jcLRtreHyuMI7ljqq
-	X6UO0mLPyQxu5lHqjCHanlXCyun8plh/0jRI64qYl1MRXIQoVe+dRvA+B0m1AskLwtNtsKPUPoT
-	h6Yvo7uUq76Q5wnIoFu4lSflQHH1csaYMUHFQX8grBuzHhqmLvcl9WW8=
-X-Google-Smtp-Source: AGHT+IFRKc+gPnyLAxAH5+XQEeRuYzDRDNS0sDrq8v2ttGi7NqWFtGQeCgDhZmSWhznz4tsckWDm4Cdcag1QA6QB0dcB1gsjCuuz
+        d=1e100.net; s=20230601; t=1712499877; x=1713104677;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZJYGJMn0SoZv7X1gCRhWkduuUEvK/yiFWdRu8bhp/fI=;
+        b=xAAWtVaWtW1B2Osp4Z0TtUbQbEnJvOIdfeLGRBJF1jpBBeNZS5DSLnxxM5wM0RbRLO
+         Y5CSCgRj34ExUzwpVsWYNWjT6Mr5WYqCMTAMMfLrV5y/Ldi5SEaxyiey1Pg9dIv8I3RJ
+         cc867balHjR7YaRqffFm6ZT6TFq82O/aisk7jOxnZQUF59J3vQADxrTTTwhs1uLSgxqc
+         f/q4KesOTZ5+m7wigkh/5Xq14CW9f9s8TIUM/ZG1yWggxSeuHewotXa6gyrWBIsLCZCX
+         sf3q3MWUSoYfJ6fErVqoaw9OnNH7oz8R6mnd1LJ0osuonPCA5ToJS3BawGrKGDb/ykix
+         os6A==
+X-Forwarded-Encrypted: i=1; AJvYcCVS4Q093Y1HRhs7QXuxxihklz467xkSffKd8TaHmIqxUiM1hBmbkom15UtG3hXbhDZCereFf3EcpPXyDzaUKD/11PorNUFKEmseK7KD9wl8iIRsSgVWpiAoNDTtbIYM+S27q8W4IhCeK9Ouh2VzMFvGRz3q/r+A2T2d
+X-Gm-Message-State: AOJu0Yyj937tc/45ct0UKzVikI/0yC1Hd4D3zjxHceKFkaBaTw2nM0rA
+	vp1obCcIhh0t59dkTnC4yEUiSZy7/xYAF1p+Vgd1cOrV69nW3N8jElTU5FlxMhIziSzbA7zT0BO
+	V7cxW2eKlUXu73Zp7XLRIpR3dA3U=
+X-Google-Smtp-Source: AGHT+IGc8WCDaSVuw98k/nsa9KO1MD8OoUYVDAuzf2YYUvHO5mTm6E79lqePVBMzaAMumy0KDIe2R4KMCw3ArQe9s08=
+X-Received: by 2002:a05:600c:34cb:b0:416:5192:a30 with SMTP id
+ d11-20020a05600c34cb00b0041651920a30mr1649236wmq.3.1712499877213; Sun, 07 Apr
+ 2024 07:24:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1646:b0:368:efa4:be00 with SMTP id
- v6-20020a056e02164600b00368efa4be00mr555322ilu.3.1712498342650; Sun, 07 Apr
- 2024 06:59:02 -0700 (PDT)
-Date: Sun, 07 Apr 2024 06:59:02 -0700
-In-Reply-To: <000000000000dd84650615800e67@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000647e5f06158217d9@google.com>
-Subject: Re: [syzbot] [bluetooth?] BUG: sleeping function called from invalid
- context in hci_le_create_big_complete_evt
-From: syzbot <syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, hdanton@sina.com, 
-	iulia.tanasescu@nxp.com, johan.hedberg@gmail.com, kuba@kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <000000000000b97fba06156dc57b@google.com> <b764fde2-cbf3-6446-d437-45af0964b062@huaweicloud.com>
+In-Reply-To: <b764fde2-cbf3-6446-d437-45af0964b062@huaweicloud.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 7 Apr 2024 07:24:25 -0700
+Message-ID: <CAADnVQJ4BRO_85By7T7bJkxgN8tmzJkS3TvP2JMiFU3WwRT7yA@mail.gmail.com>
+Subject: Re: [syzbot] [bpf?] KASAN: stack-out-of-bounds Read in hash
+To: Hou Tao <houtao@huaweicloud.com>
+Cc: syzbot <syzbot+9459b5d7fab774cf182f@syzkaller.appspotmail.com>, 
+	bpf <bpf@vger.kernel.org>, syzkaller-bugs <syzkaller-bugs@googlegroups.com>, 
+	Network Development <netdev@vger.kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Eddy Z <eddyz87@gmail.com>, 
+	Hao Luo <haoluo@google.com>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Stanislav Fomichev <sdf@google.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has bisected this issue to:
+On Sun, Apr 7, 2024 at 2:09=E2=80=AFAM Hou Tao <houtao@huaweicloud.com> wro=
+te:
+>
+> Hi,
+>
+> On 4/6/2024 9:44 PM, syzbot wrote:
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    443574b03387 riscv, bpf: Fix kfunc parameters incompati=
+bil..
+> > git tree:       bpf
+> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D148ad855180=
+000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D6fb1be60a19=
+3d440
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D9459b5d7fab77=
+4cf182f
+> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for D=
+ebian) 2.40
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D13d867951=
+80000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D143eff76180=
+000
+>
+> According to the reproducer, it passes a big value_size (0xfffffe00)
+> when creating bloom filter map. The big value_size bypasses the check in
+> check_stack_access_within_bounds(). I think a proper fix needs to add
+> these following two checks:
+> (1) in check_stack_access_within_bounds()  add check for negative
+> access_size
+> (2) in bloom_map_alloc() limit the max value of bloom_map_alloc().
+>
+> Will post a patch to fix the syzbot report. Will also check whether or
+> not there are similar problems for other bpf maps.
 
-commit a0bfde167b506423111ddb8cd71930497a40fc54
-Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Date:   Tue May 30 14:21:59 2023 +0000
-
-    Bluetooth: ISO: Add support for connecting multiple BISes
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=146c679d180000
-start commit:   8568bb2ccc27 Add linux-next specific files for 20240405
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=166c679d180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=126c679d180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=48ca5acf8d2eb3bc
-dashboard link: https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1338efc5180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15428f4b180000
-
-Reported-by: syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com
-Fixes: a0bfde167b50 ("Bluetooth: ISO: Add support for connecting multiple BISes")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Isn't it fixed by
+https://lore.kernel.org/all/20240327024245.318299-2-andreimatei1@gmail.com/
 
