@@ -1,135 +1,94 @@
-Return-Path: <netdev+bounces-85541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D560B89B332
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 19:03:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6804B89B346
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 19:26:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F61D1F21B73
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 17:03:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14DEA2825E1
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 17:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674613B2A1;
-	Sun,  7 Apr 2024 17:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A3B3B7AC;
+	Sun,  7 Apr 2024 17:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TLHAbAiB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MIvcAYR6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8F43A1A2;
-	Sun,  7 Apr 2024 17:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF072231C
+	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 17:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712509405; cv=none; b=t6h1Z70tIm3W30ogGIMeksUeWYpTdiECIXIML5XRbpE0Cwy2TGUYhjZYDKjNTsVWKEXxZkh+96DOTxlBdZkwmmamHJafMUOIXusQt0+e/1JSPS/jQhxeDUDPpBmhF/iBH4TBEjwrB+VAnrk9cLjcbcX8KoDZtWebUkt6cGrRHM8=
+	t=1712510814; cv=none; b=QUEqPK+eSgIARdhS6JUP5Hn/sRBtnFmlDussHnNXQEEXPWfdaPVHjNn4HpP/0GlPGs4fmq2RUhNcwg7jBH55PkDxm1jOrCOwQUw61znf8UJ6z6GXbQKM8Q1p5y7iGkqsp7Y5qDRQHm6OkH8VHULKwa6Iov755NOi6eJyUVDoeHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712509405; c=relaxed/simple;
-	bh=fRM90mJoop7mHkTq4lHxrtHPapUGNNrALtNHT2ImE9s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HGs9i2i3Dd+0xUiE7FP37ezZA7eLYdnewd9QqTtX8YQhid9SLIcVUOAnXyvjxPEcs44rlZVUqwByrOnxbbHOWE6zOZDKQVtR790tdgo0WxbSojIyB/9+wWOv4tf6Rl6CjkIidU8mvVUvUjSquhd0bns1cjk1rroJ+5T4aApWsk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TLHAbAiB; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-343bccc0b2cso2642851f8f.1;
-        Sun, 07 Apr 2024 10:03:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712509402; x=1713114202; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cRL6F0Y7GWiKLw5ZjSnTgJyOyz7w6uvipEUuFAhRYQ8=;
-        b=TLHAbAiBjkxCQqqIv72Pvae8oWQd0rj/Lf8HocKJs7CeanGr+d+nlH4l3Ly5XCjxo+
-         bkrQkzdn+k+Um1D7bGCExHx0LOJqgex6f1PSW8t7tpVRYpRff13ZUZ6QmkLFOZ2I4CHR
-         ZGpzxHLfxFWvlYwIqQlQVhXVC6SHCwre7b0RIyAHUsZOnb2b3dpDjU1iLm32WiDk89JV
-         8CQAiOwLr3ikzg4yxQL6eG85W+gufoQYxOVkvCazGQCZyKPwrOZYwI6LyADWolj26/pA
-         0g4DNyXQiW5VIhVqxswLj01OVllsKMENi/Fx0EG5iQI1EvxsmGbH3TT28Ywcc1L9vP6g
-         4DuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712509402; x=1713114202;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cRL6F0Y7GWiKLw5ZjSnTgJyOyz7w6uvipEUuFAhRYQ8=;
-        b=gPh/GmsP5sMaTYgI8bGww2o1RvpaRz4CjBkbwYLMJm8v9yt1ZeA8bJFuEXLN98Wd5u
-         nAh5aDWQVAyyxCcG94YMTUrteaj4dvHMO6uJoMZYypTijei3v+ihxiltFRA/GZwJAnYM
-         qdjol6Okc9PbSfnoXvHWaOHkjd+klnaGtYG+2m3v2u8l+0P9g1FVO/Ldi1/3e7cQclpA
-         dnJ7kQmbknaEQ5951GMyWWNFv2XtlYo6IbGgyOIpKV627bwdnYA0E5CA00aJZ7ftzy4e
-         ldVeN5S76gEoMri2uBxtgpmxPVKiX7I+n1NZfkF06y3FkEPZv+w1O/ZD0L67W8ZTQMYm
-         XnUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqIoWJZ02dzRvoAVr8hvc+vSpoX+94S6c3KUZPWUsCdiWg7NLJE6DbIwwmFcH5BUD2LVdlL5o0VBRALF0wGBS+HIUnTdOffJAjCS4jt30uaGAl2wfYf16cly/oCJ1Eo1o3YZqE4iH0AIvEggZzVtrrtH/G5ReZg2ji
-X-Gm-Message-State: AOJu0YwzMOJdEyrm5PNdphMqPCH87563bpvIhVl6z4XGGHdOemmXKArN
-	FfsVtusjD+CEvt/rdS92c68h5p78bjGXeAAhJqn31/dNTFFdAwesm0DrcETbSALMT3aKGjz45Dp
-	EkLVz8GpR13sSeEOpkrYcT9qUMmA=
-X-Google-Smtp-Source: AGHT+IHJQxJHl+wPj51rspPjpYHaysfsWlIxLTCgpIveJzPwDf+CTy65VL1Y+YNaoJwGVL0dTTu913oNCo9Ck2pbQtI=
-X-Received: by 2002:a5d:6c64:0:b0:345:8c1b:32f with SMTP id
- r4-20020a5d6c64000000b003458c1b032fmr1847452wrz.26.1712509401720; Sun, 07 Apr
- 2024 10:03:21 -0700 (PDT)
+	s=arc-20240116; t=1712510814; c=relaxed/simple;
+	bh=/VqsvBFwghrPLkX3zuCvhWp/gKD/Bee2/h48i5AOCOg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UaqOzrcGmR8Jf0EKje967XTV07U6gXarTkWNtTjvhqCburwkxo3+b0H+Q6Mf3PFvus1wQqcbcbSbvh/H6AM33GThEuR6D0t5K2F8ZwuMTz2OsdObfpYMv/8o7ijs9IhnP5Un6n55v1QsASN26TeixU9tmMCR3S16AIdN3lAkAB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MIvcAYR6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YWay0V2bZ277152w7TiWjmD5EYN7YDnFFqruQZHdvNI=; b=MIvcAYR6UjIBbhakVGRKfQvpar
+	gL/cf6Ty+EC66C2/ezJ5VyY+Lu8sQ130gJ7L8ROPPO4aVN4WHS4AUMWt2JKG3yT2XDmS0OYLghyWT
+	EjzUBRXP+HeIfNa2UXHzbGWbCACqWSGETKHbKRkKiQodohuZIOKu+BwNLASHu4g9eF+k=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rtWHs-00CQzk-Nx; Sun, 07 Apr 2024 19:26:36 +0200
+Date: Sun, 7 Apr 2024 19:26:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Gregory Clement <gregory.clement@bootlin.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 4/8] net: Add helpers for netdev LEDs
+Message-ID: <de7fa561-84b4-420e-b5dd-6105c0560662@lunn.ch>
+References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
+ <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-4-eb97665e7f96@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240407130850.19625-1-linyunsheng@huawei.com>
-In-Reply-To: <20240407130850.19625-1-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Sun, 7 Apr 2024 10:02:45 -0700
-Message-ID: <CAKgT0Uex+e_g9nyqk6DiB03U4zs_A1z2LoztHnpYbJ9LPm=NFA@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 00/12] First try to replace page_frag with page_frag_cache
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-4-eb97665e7f96@lunn.ch>
 
-On Sun, Apr 7, 2024 at 6:10=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> After [1], Only there are two implementations for page frag:
->
-> 1. mm/page_alloc.c: net stack seems to be using it in the
->    rx part with 'struct page_frag_cache' and the main API
->    being page_frag_alloc_align().
-> 2. net/core/sock.c: net stack seems to be using it in the
->    tx part with 'struct page_frag' and the main API being
->    skb_page_frag_refill().
->
-> This patchset tries to unfiy the page frag implementation
-> by replacing page_frag with page_frag_cache for sk_page_frag()
-> first. net_high_order_alloc_disable_key for the implementation
-> in net/core/sock.c doesn't seems matter that much now have
-> have pcp support for high-order pages in commit 44042b449872
-> ("mm/page_alloc: allow high-order pages to be stored on the
-> per-cpu lists").
->
-> As the related change is mostly related to networking, so
-> targeting the net-next. And will try to replace the rest
-> of page_frag in the follow patchset.
->
-> After this patchset, we are not only able to unify the page
-> frag implementation a little, but seems able to have about
-> 0.5+% performance boost testing by using the vhost_net_test
-> introduced in [1] and page_frag_test.ko introduced in this
-> patch.
+> +/**
+> + * netdev_leds_setup - Parse DT node and create LEDs for netdev
+> + *
+> + * @ndev: struct netdev for the MAC
+> + * @np: ethernet-node in device tree
+> + * @list: list to add LEDs to
+> + * @ops: structure of ops to manipulate the LED.
+> + * @max_leds: maximum number of LEDs support by netdev.
+> + *
+> + * Parse the device tree node, as described in
+> + * ethernet-controller.yaml, and find any LEDs. For each LED found,
+> + * ensure the reg value is less than max_leds, create an LED and
+> + * register it with the LED subsystem. The LED will be added to the
+> + * list, which should be unique to the netdev. The ops structure
+> + * contains the callbacks needed to control the LEDs.
+> + *
+> + * Return 0 in success, otherwise an negative error code.
 
-One question that jumps out at me for this is "why?". No offense but
-this is a pretty massive set of changes with over 1400 additions and
-500+ deletions and I can't help but ask why, and this cover page
-doesn't give me any good reason to think about accepting this set.
-What is meant to be the benefit to the community for adding this? All
-I am seeing is a ton of extra code to have to review as this
-unification is adding an additional 1000+ lines without a good
-explanation as to why they are needed.
+There is a missing : here, which causes kdoc warnings. I will wait a
+couple of days for other comments and then repost with this fixed.
 
-Also I wouldn't bother mentioning the 0.5+% performance gain as a
-"bonus". Changes of that amount usually mean it is within the margin
-of error. At best it likely means you haven't introduced a noticeable
-regression.
+    Andrew
+
+---
+pw-bot: cr
 
