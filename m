@@ -1,217 +1,194 @@
-Return-Path: <netdev+bounces-85478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09E4D89AEBC
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 07:59:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FF4489AEBF
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 08:03:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF61A28339E
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 05:59:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ED6BB22D3C
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 06:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA97B101EC;
-	Sun,  7 Apr 2024 05:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF09184D;
+	Sun,  7 Apr 2024 06:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qW7sHlqE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95E4101C6
-	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 05:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A3E17F0
+	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 06:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712469558; cv=none; b=oM0MzOmu0UXCIuAJkIHhPMs242e/eAjO5jtt3/kRwFFGXW3g8Wl60pvl1DIUahX9dsWGQ2ZnoXhP5F+OATe3VMwViFwqe/ymS+pr1Se+8dl7MlO/MANjNuD2gi9bngyncWbxfG3oNlA+HLSdAOslR+6DiKq4gzylSm5RqMD/Wq8=
+	t=1712469804; cv=none; b=N3xbwMcPMqg6H4NipgqfrzuK5GzilGVn0OsuTjeD+CWJhdzIfVQMtSYjC0tRvkMsrk9x/DQkiIUATNnvnpLO570nXgqd8BOH8T732mS2sBRhaJE706oFxpU60zPetzlWUvFCeCK5luRJtveSPalOq/1VeMnzlX68VvymjEKvx7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712469558; c=relaxed/simple;
-	bh=SQvC3t1tYE6Nsw7OKT8wvePTK46iGC72XDpd3nUyP8I=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=b+w4hu7AJ2iAwnyJCO2CfujjOjqCbQDJlQgObb+nMznokSOtX/K0vAjxQ15llkyfcHov1lmApQ/cdrzCIq1hZO6H+9tVcALlWUQdnXKfdnSQqlXDv3JC2OU+szSqp7IwLYGgxaWXOIv8KAq3OexkPxQuEOGKWtSdMBrhmUIUmuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-369f714fedcso34016595ab.1
-        for <netdev@vger.kernel.org>; Sat, 06 Apr 2024 22:59:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712469556; x=1713074356;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8QrHHeznjplGnWd4t+TxFLv/UdbP8518qccfKdaod4s=;
-        b=NSReYubykJZseA+FajTTmzq1KX6MCL6aL+MwWmDavzrzjdhaTjGT5Q3KpOJft+Paos
-         jms6v162AdGtBmyBgORrCb3X/x3rWGVj/fTXx7mVnlBgHwRz2jpSJgjJratFsjeSW2K2
-         BqsKLLEpOJBYQwQgLhUMkEwsYfkLU14T2X85Q1zF7PylfF4vNjquoKFJvihxcCg1L+lJ
-         Wc9DEar0aViOaE0p/yyd0K8E/W45nPjPnkL7T7M0V03CYRyyNmXdoAsMMjinljSKm48K
-         /YVNDWnK57YRfHLriVszwo0Z3USK031kd68SFRpm+chUnAb43XNfzepa+SNlS+2rwVzT
-         F+mw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCSPAn9aq+ZTSI6kXlHet/b6gb5WxqAbSnVKeUrNNA4o+VLJSbd2ZyO8vxDRkQ21U6kt72NiQQtbNir83i9T9XFFEG/CBD
-X-Gm-Message-State: AOJu0YyWQ2GWBPw6TOmO4bY0fNBOZlLLmOx7kCzuGiSmdANMkpwA8q1v
-	qNcveb53oSvU+2oeigZyX1QSSskR5QuGMUXrtWvmEydH7LKn7hgYsyXrN+3Cc2Lq0wnme8f0vSm
-	VK4YHiPfUMhUeP8Qoya5PHXXv5ZWqVj/R2AQWHZcPk8qyWRXA+HfuTuc=
-X-Google-Smtp-Source: AGHT+IFfc/aeNEo0/n7C0M6rmG8q0oWvaw13RQjxNAntHMpL2PMGkraLujUupCGq64DmsUlthQVY3G5XBKMLnDjFRZ3fIK5XMauM
+	s=arc-20240116; t=1712469804; c=relaxed/simple;
+	bh=dV7TKtHxf+IaIUw1dxawpCy/kf4dYptOrfI1cMpEC8g=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=IK5rOYC29yMu0UJlfOsEIsmD+PPgzfYccYcQpnBx7ccHNIORfadJOInDYiICAH/PRtvrNVXl9nzXaqHfZytgfi9brXB7WOh6ZzkEkXdd2hXE4puCOu6moIW0n0tOnPxKfDd9O9p7Ut7il7DnIu3ENPSZu202jaCWJTLIs3bkNP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qW7sHlqE; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1712469794; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=dV7TKtHxf+IaIUw1dxawpCy/kf4dYptOrfI1cMpEC8g=;
+	b=qW7sHlqENZQtY+ZyaV6OfUzplLg3NyUBRvHkE8/Lvbg4Bg5QbNs9RcUxfno2ZtuLSrKeXm+Tk0NeJf9dznmzFc61wxLEt5NvKrA5Ne6IiNZ908pQ2HyO74wge2Zu7YSZwUIjZU8QGAvr/Js7DeKJq3iGYeety3SMqV0lZW7fT0Y=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W4.LB8O_1712469793;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W4.LB8O_1712469793)
+          by smtp.aliyun-inc.com;
+          Sun, 07 Apr 2024 14:03:13 +0800
+Message-ID: <1712469641.4145665-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v6 09/10] virtio_net: set premapped mode by find_vqs()
+Date: Sun, 7 Apr 2024 14:00:41 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240327111430.108787-1-xuanzhuo@linux.alibaba.com>
+ <20240327111430.108787-10-xuanzhuo@linux.alibaba.com>
+ <CACGkMEs=NZGkkA7ye0wY7YcPBPfbKkYq84KCRX1gS0e=bZDX-w@mail.gmail.com>
+ <1711614157.5913072-7-xuanzhuo@linux.alibaba.com>
+ <CACGkMEuBhfMwrfaiburLG7gFw36GuVHSbRTtK+FycrGFVTgOcA@mail.gmail.com>
+ <1711935607.4691076-1-xuanzhuo@linux.alibaba.com>
+ <1711940418.2573907-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvPZKa-au=2XaXrjT4t1vpPF4mPRNYNZ6uTPNyUpT8dfA@mail.gmail.com>
+In-Reply-To: <CACGkMEvPZKa-au=2XaXrjT4t1vpPF4mPRNYNZ6uTPNyUpT8dfA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:220e:b0:368:d130:a718 with SMTP id
- j14-20020a056e02220e00b00368d130a718mr436494ilf.0.1712469555911; Sat, 06 Apr
- 2024 22:59:15 -0700 (PDT)
-Date: Sat, 06 Apr 2024 22:59:15 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000091ad3106157b63e6@google.com>
-Subject: [syzbot] [bpf?] BUG: unable to handle kernel paging request in jhash
-From: syzbot <syzbot+6592955f6080eeb2160f@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=105e88a9180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=6592955f6080eeb2160f
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=134c0cad180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11faf09d180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/65d3f3eb786e/disk-f99c5f56.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/799cf7f28ff8/vmlinux-f99c5f56.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ab26c60c3845/bzImage-f99c5f56.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6592955f6080eeb2160f@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: stack-out-of-bounds in __get_unaligned_cpu32 include/linux/unaligned/packed_struct.h:19 [inline]
-BUG: KASAN: stack-out-of-bounds in jhash+0x200/0x740 include/linux/jhash.h:82
-Read of size 4 at addr ffffc9000a42eb20 by task kworker/u8:8/2470
-
-CPU: 0 PID: 2470 Comm: kworker/u8:8 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: writeback wb_workfn (flush-8:0)
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- __get_unaligned_cpu32 include/linux/unaligned/packed_struct.h:19 [inline]
- jhash+0x200/0x740 include/linux/jhash.h:82
- hash+0x339/0x410 kernel/bpf/bloom_filter.c:31
- bloom_map_peek_elem+0xb2/0x1b0 kernel/bpf/bloom_filter.c:43
- bpf_prog_00798911c748094f+0x42/0x46
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run8+0x2ec/0x500 kernel/trace/bpf_trace.c:2426
- __bpf_trace_jbd2_handle_stats+0x47/0x60 include/trace/events/jbd2.h:210
- trace_jbd2_handle_stats include/trace/events/jbd2.h:210 [inline]
- jbd2_journal_stop+0xd3d/0xdc0 fs/jbd2/transaction.c:1869
- __ext4_journal_stop+0xfd/0x1a0 fs/ext4/ext4_jbd2.c:134
- ext4_do_writepages+0x2d24/0x3ca0 fs/ext4/inode.c:2692
- ext4_writepages+0x204/0x3e0 fs/ext4/inode.c:2768
- do_writepages+0x3a4/0x670 mm/page-writeback.c:2553
- __writeback_single_inode+0x155/0xfd0 fs/fs-writeback.c:1650
- writeback_sb_inodes+0x8e4/0x1220 fs/fs-writeback.c:1941
- __writeback_inodes_wb+0x11b/0x260 fs/fs-writeback.c:2012
- wb_writeback+0x45b/0xc70 fs/fs-writeback.c:2119
- wb_check_old_data_flush fs/fs-writeback.c:2223 [inline]
- wb_do_writeback fs/fs-writeback.c:2276 [inline]
- wb_workfn+0xb7c/0x1070 fs/fs-writeback.c:2304
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
-
-The buggy address belongs to stack of task kworker/u8:8/2470
- and is located at offset 0 in frame:
- bpf_trace_run8+0x0/0x500
-
-This frame has 1 object:
- [32, 96) 'args'
-
-The buggy address belongs to the virtual mapping at
- [ffffc9000a428000, ffffc9000a431000) created by:
- copy_process+0x5d1/0x3df0 kernel/fork.c:2219
-
-The buggy address belongs to the physical page:
-page:ffffea0000a37d80 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x28df6
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000000000 0000000000000000 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x2dc2(GFP_KERNEL|__GFP_HIGHMEM|__GFP_NOWARN|__GFP_ZERO), pid 60, tgid 60 (kworker/u8:4), ts 12699826929, free_ts 0
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
- prep_new_page mm/page_alloc.c:1540 [inline]
- get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
- __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
- alloc_pages_mpol+0x3de/0x650 mm/mempolicy.c:2133
- vm_area_alloc_pages mm/vmalloc.c:3135 [inline]
- __vmalloc_area_node mm/vmalloc.c:3211 [inline]
- __vmalloc_node_range+0x9a4/0x14a0 mm/vmalloc.c:3392
- alloc_thread_stack_node kernel/fork.c:309 [inline]
- dup_task_struct+0x3e9/0x7d0 kernel/fork.c:1114
- copy_process+0x5d1/0x3df0 kernel/fork.c:2219
- kernel_clone+0x21e/0x8d0 kernel/fork.c:2796
- user_mode_thread+0x132/0x1a0 kernel/fork.c:2874
- call_usermodehelper_exec_work+0x5c/0x230 kernel/umh.c:172
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffffc9000a42ea00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffffc9000a42ea80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffffc9000a42eb00: 00 00 00 00 f1 f1 f1 f1 00 00 00 00 00 00 00 00
-                               ^
- ffffc9000a42eb80: f3 f3 f3 f3 00 00 00 00 00 00 00 00 00 00 00 00
- ffffc9000a42ec00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
+On Sun, 7 Apr 2024 12:24:00 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Apr 1, 2024 at 11:10=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > On Mon, 1 Apr 2024 09:40:07 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.co=
+m> wrote:
+> > > On Fri, 29 Mar 2024 11:20:08 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Thu, Mar 28, 2024 at 4:27=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.a=
+libaba.com> wrote:
+> > > > >
+> > > > > On Thu, 28 Mar 2024 16:05:02 +0800, Jason Wang <jasowang@redhat.c=
+om> wrote:
+> > > > > > On Wed, Mar 27, 2024 at 7:14=E2=80=AFPM Xuan Zhuo <xuanzhuo@lin=
+ux.alibaba.com> wrote:
+> > > > > > >
+> > > > > > > Now, the virtio core can set the premapped mode by find_vqs().
+> > > > > > > If the premapped can be enabled, the dma array will not be
+> > > > > > > allocated. So virtio-net use the api of find_vqs to enable the
+> > > > > > > premapped.
+> > > > > > >
+> > > > > > > Judge the premapped mode by the vq->premapped instead of savi=
+ng
+> > > > > > > local variable.
+> > > > > > >
+> > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > ---
+> > > > > >
+> > > > > > I wonder what's the reason to keep a fallback when premapped is=
+ not enabled?
+> > > > >
+> > > > > Rethink this.
+> > > > >
+> > > > > I think you are right. We can remove the fallback.
+> > > > >
+> > > > > Because we have the virtio dma apis that wrap all the cases.
+> > > > > So I will remove the fallback from the virtio-net in next version.
+> > > >
+> > > > Ok.
+> > > >
+> > > > >
+> > > > > But we still need to export the premapped to the drivers.
+> > > > > Because we can enable the AF_XDP only when premapped is true.
+> > > >
+> > > > I may miss something but it should work like
+> > > >
+> > > > enable AF_XDP -> enable remapping
+> > > >
+> > > > So can we fail during remapping enablement?
+> > >
+> > >
+> > > YES.
+> > >
+> > > Enabling the premapped mode may fail, then we must stop to enable AF_=
+XDP.
+> > >
+> > > AF-XDP requires that we export the dma dev to the af-xdp.
+> > > We can do that only when the virtio core works with use_dma_api.
+> > > Other other side, if we support the page-pool in future, we may have =
+the
+> > > same requirement.
+> >
+> > Rethink this.
+> >
+> > Enable premapped MUST NOT fail. No care the use_dma_api is true or not,=
+ because
+> > we have the DMA APIs for virtio. Then the virtio-net rx will work with
+> > premapped (I will make the big mode work with premapped mode)
+>
+> Just to make sure we're at the same page. Rx will always work in the
+> mode or pre mapping. So we can easily fail the probe if we fail to
+> enable RX premapping?
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+NO, enabling premapped mode can not fail. So the rx will always work
+in the premapping mode.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+>
+> >
+> > AF_XDP checks the virtqueue_dma_dev() when enabling.
+> >
+> > But disabling premapped mode may fail, because that virtio ring need to
+> > allocate memory for dma.
+>
+> That's kind of too tricky, what if we just allocate the memory for dma
+> unconditionally?
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+It's ok, but we waste the memory.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Thanks.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
 
-If you want to undo deduplication, reply with:
-#syz undup
+
+>
+> Thanks
+>
+> >
+> > Thanks.
+> >
+> >
+> >
+> > >
+> > >
+> > > Thanks.
+> > >
+> > >
+> > > >
+> > > > THanks
+> > > >
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > >
+> > > > > >
+> > > > > > Thanks
+> > > > > >
+> > > > >
+> > > >
+> > >
+> >
+>
 
