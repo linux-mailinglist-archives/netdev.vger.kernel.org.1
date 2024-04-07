@@ -1,109 +1,175 @@
-Return-Path: <netdev+bounces-85473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F4789ADE9
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 03:47:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1287A89AE03
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 04:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F8DC28288B
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 01:47:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 390B5B22B89
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 02:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AE7EBE;
-	Sun,  7 Apr 2024 01:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A601EDC;
+	Sun,  7 Apr 2024 02:12:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09B95223;
-	Sun,  7 Apr 2024 01:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046CE1849;
+	Sun,  7 Apr 2024 02:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712454467; cv=none; b=owIs1wSz9uS9p1Mzi068oau78VS9Lo6OfX3ap+kFfOdOKCcURZU0Blk1DV+F5CiNYS+AT6YuS7XVCf+L/EX6DFqM+iIhSWKW5MM5981LPrVrHquntabVKs34kMlgi0QrHo6uK5qWfHUdEeSW9ieE6Yutpid/M3WqO2SXCCT/azk=
+	t=1712455935; cv=none; b=F2wxLAjYW6J0Zoeu0Qe9IlKQq6wdIcZ+JxroOIH13aexe/TjgY5kcePf/kd0Lc8ZOLPUHFj9kARb2Btv1nxfVFdgkVO/Yv1nGc1avMibCjLJNyMV/989Yu+QF0wnzFxeRRcOo23ilcrKIbw8/cV+SqLFxTi0R/BKozfRxq9qoZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712454467; c=relaxed/simple;
-	bh=3ZcpxR9wsm3F98xCGc2DPxsXXCX+A8HMy5dSk8T23gg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OCpmuuGYc5GgT65bGIidEFVtBxLDZYGMssq2eVnRlbtLVBKXIv+XlW9EG3OptAFaH7lhq0DpFSVYvjRY3HLo1s9kFy2k7Qahq0YwBCEere56ETC+F6NoMxu5Ldi07GxZMbvyc25hNnWJmRMncqIyToWinDLcPuBRn8U7rZGSP/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+	s=arc-20240116; t=1712455935; c=relaxed/simple;
+	bh=71RVXQgx/EzQHXWmMSI0tWquMHamfIoAHlsjnAZvuFI=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=UMrQ24XDyGr1kS67s2YTMW+pGHBDWwCl8CeWFom5ziSu6G+oZ61APwGdYo9Mlm0bdfBvRfQJi58gfV/rDQvyT8F2cjCV4DRbAU+HDs8/AjOG7m3gpVpU/CWU2Ywc9sohGm2iXhWht0ncm521x+FK2kuolrbPBuSI1KFZFEIwJgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4VBw5C23hLz1RBSv;
-	Sun,  7 Apr 2024 09:44:47 +0800 (CST)
-Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8630E14011F;
-	Sun,  7 Apr 2024 09:47:36 +0800 (CST)
-Received: from [10.67.109.184] (10.67.109.184) by
- kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sun, 7 Apr 2024 09:47:35 +0800
-Message-ID: <959db176-a79e-4074-a4bb-d9ee5ce19f79@huawei.com>
-Date: Sun, 7 Apr 2024 09:47:35 +0800
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VBwdc5Xwsz1QCRX;
+	Sun,  7 Apr 2024 10:09:24 +0800 (CST)
+Received: from kwepemm600014.china.huawei.com (unknown [7.193.23.54])
+	by mail.maildlp.com (Postfix) with ESMTPS id A749B140154;
+	Sun,  7 Apr 2024 10:12:03 +0800 (CST)
+Received: from [10.67.111.5] (10.67.111.5) by kwepemm600014.china.huawei.com
+ (7.193.23.54) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Sun, 7 Apr
+ 2024 10:12:03 +0800
+Subject: Re: [PATCH -next] net: usb: asix: Add check for usbnet_get_endpoints
+To: Simon Horman <horms@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<wangweiyang2@huawei.com>
+References: <20240402113048.873130-1-yiyang13@huawei.com>
+ <20240403105329.GV26556@kernel.org>
+From: "yiyang (D)" <yiyang13@huawei.com>
+Message-ID: <16281533-d768-1523-467a-4408916e6067@huawei.com>
+Date: Sun, 7 Apr 2024 10:11:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf] MAINTAINERS: bpf: Add Lehui and Puranjay as riscv64
- reviewers
-Content-Language: en-US
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Puranjay Mohan
-	<puranjay@kernel.org>
-CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
-	<aou@eecs.berkeley.edu>, <linux-kernel@vger.kernel.org>,
-	<bpf@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<netdev@vger.kernel.org>
-References: <20240405123352.2852393-1-bjorn@kernel.org>
-From: Pu Lehui <pulehui@huawei.com>
-In-Reply-To: <20240405123352.2852393-1-bjorn@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240403105329.GV26556@kernel.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemd100009.china.huawei.com (7.221.188.135)
+ kwepemm600014.china.huawei.com (7.193.23.54)
 
+On 2024/4/3 18:53, Simon Horman wrote:
+> On Tue, Apr 02, 2024 at 11:30:48AM +0000, Yi Yang wrote:
+>> Add check for usbnet_get_endpoints() and return the error if it fails
+>> in order to transfer the error.
+>>
+>> Signed-off-by: Yi Yang <yiyang13@huawei.com>
+> 
+> Hi,
+> 
+> I am wondering if this is a fix for a user-visible problem and as such
+> should:
+> 1. Be targeted at net
+> 2. Have a Fixes tag
+> 3. CC stable
+> 
+I will split this patch to two patch. one for bugfix, anorther one for 
+cleanup.
+> See: https://docs.kernel.org/process/maintainer-netdev.html
+> 
+>> ---
+>>   drivers/net/usb/asix_devices.c | 20 +++++++++++++-------
+>>   1 file changed, 13 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
+>> index f7cff58fe044..11417ed86d9e 100644
+>> --- a/drivers/net/usb/asix_devices.c
+>> +++ b/drivers/net/usb/asix_devices.c
+>> @@ -230,7 +230,9 @@ static int ax88172_bind(struct usbnet *dev, struct usb_interface *intf)
+>>   	int i;
+>>   	unsigned long gpio_bits = dev->driver_info->data;
+>>   
+>> -	usbnet_get_endpoints(dev,intf);
+>> +	ret = usbnet_get_endpoints(dev, intf);
+>> +	if (ret)
+>> +		goto out;
+>>   
+>>   	/* Toggle the GPIOs in a manufacturer/model specific way */
+>>   	for (i = 2; i >= 0; i--) {
+>> @@ -834,7 +836,9 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+>>   
+>>   	dev->driver_priv = priv;
+>>   
+>> -	usbnet_get_endpoints(dev, intf);
+>> +	ret = usbnet_get_endpoints(dev, intf);
+>> +	if (ret)
+>> +		goto mdio_err;
+>>   
+>>   	/* Maybe the boot loader passed the MAC address via device tree */
+>>   	if (!eth_platform_get_mac_address(&dev->udev->dev, buf)) {
+>> @@ -858,7 +862,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+>>   		if (ret < 0) {
+>>   			netdev_dbg(dev->net, "Failed to read MAC address: %d\n",
+>>   				   ret);
+>> -			return ret;
+>> +			goto mdio_err;
+>>   		}
+>>   	}
+>>   
+> 
+> The two hunks above do not seem related to the subject of the patch, but
+> rather separate cleanups. So I think they should not be part of this patch.
+> Instead they could be a separate patch, targeted at net-next.  (FWIIW, I
+> would go the other way and drop the mdio_err label from this function.)
+> 
+>> @@ -871,7 +875,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+>>   
+>>   	ret = asix_read_phy_addr(dev, true);
+>>   	if (ret < 0)
+>> -		return ret;
+>> +		goto mdio_err;
+>>   
+>>   	priv->phy_addr = ret;
+>>   	priv->embd_phy = ((priv->phy_addr & 0x1f) == AX_EMBD_PHY_ADDR);
+>> @@ -880,7 +884,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+>>   			    &priv->chipcode, 0);
+>>   	if (ret < 0) {
+>>   		netdev_dbg(dev->net, "Failed to read STATMNGSTS_REG: %d\n", ret);
+>> -		return ret;
+>> +		goto mdio_err;
+>>   	}
+>>   
+>>   	priv->chipcode &= AX_CHIPCODE_MASK;
+>> @@ -895,7 +899,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+>>   	ret = priv->reset(dev, 0);
+>>   	if (ret < 0) {
+>>   		netdev_dbg(dev->net, "Failed to reset AX88772: %d\n", ret);
+>> -		return ret;
+>> +		goto mdio_err;
+>>   	}
+>>   
+>>   	/* Asix framing packs multiple eth frames into a 2K usb bulk transfer */
+>> @@ -1258,7 +1262,9 @@ static int ax88178_bind(struct usbnet *dev, struct usb_interface *intf)
+>>   	int ret;
+>>   	u8 buf[ETH_ALEN] = {0};
+>>   
+>> -	usbnet_get_endpoints(dev,intf);
+>> +	ret = usbnet_get_endpoints(dev, intf);
+>> +	if (ret)
+>> +		return ret;
+>>   
+>>   	/* Get the MAC address */
+>>   	ret = asix_read_cmd(dev, AX_CMD_READ_NODE_ID, 0, 0, ETH_ALEN, buf, 0);
+>> -- 
+>> 2.25.1
+>>
+>>
+> .
+> 
 
-On 2024/4/5 20:33, Björn Töpel wrote:
-> From: Björn Töpel <bjorn@rivosinc.com>
-> 
-> Lehui and Puranjay have been active RISC-V 64-bit BPF JIT
-> contributors/reviewers for a long time!
-> 
-> Let's make it more official by adding them as reviewers in
-> MAINTAINERS.
-
-It's my honor to take on this responsibility, and delighted to be 
-partnered with you Björn and Puranjay.😀
-
-Lehui
-
-> 
-> Thank you for your hard work!
-> 
-> Signed-off-by: Björn Töpel <bjorn@kernel.org>
-> ---
->   MAINTAINERS | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 75381386fe4c..58ab032ad33d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -3764,6 +3764,8 @@ X:	arch/riscv/net/bpf_jit_comp64.c
->   
->   BPF JIT for RISC-V (64-bit)
->   M:	Björn Töpel <bjorn@kernel.org>
-> +R:	Pu Lehui <pulehui@huawei.com>
-> +R:	Puranjay Mohan <puranjay@kernel.org>
->   L:	bpf@vger.kernel.org
->   S:	Maintained
->   F:	arch/riscv/net/
-> 
-> base-commit: c88b9b4cde17aec34fb9bfaf69f9f72a1c44f511
 
