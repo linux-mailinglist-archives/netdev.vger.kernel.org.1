@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-85494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DCF589B015
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 11:33:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7639389B016
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 11:33:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 696231C20A70
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 09:33:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242C5282334
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 09:33:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C30171D8;
-	Sun,  7 Apr 2024 09:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA0B179AD;
+	Sun,  7 Apr 2024 09:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0yqLmFSR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sOBL/wFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63DF14295
-	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 09:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE6317554
+	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 09:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712482412; cv=none; b=rcD/b5Lbus3oyBA6A5e0zYTHNS84TOh8fG4N+KY0etCY2sBFye94iQJkC/DuUVd3O2JR8VrmwV3/bUj2kgtFLB4+6sdm10UkPfntG0wZAaFwZU4BDIcgIfa9HBqjY3qcYa3OSNSQNmhuGV9xvHnsLbMhC0PD5HQ2faxB1jNf8KQ=
+	t=1712482414; cv=none; b=XpJjnDtZlVk23eZRgTQorJ3OV5TEl2iZ6e+4vyepA9pd7byleSfr0Fc3I1ZfvNjncuG9aBhz8dOFAAx1yvS9ATFe+6nXfVgNZmrLktn1QGuuQjuM9CQfiXUp3eTUnGdkY9pXr038R6lVyHnFucG3D7dY7GwCvuuyh2be4B3vrKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712482412; c=relaxed/simple;
-	bh=Hrp+md+8YLT4mRwz7YWy1yrXTL6gTeCUynDeJu6EF40=;
+	s=arc-20240116; t=1712482414; c=relaxed/simple;
+	bh=QbB2TLdW7jeBpsnipwV75g5X4RD7ZcBWAjNmwFqbThs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hg9f/89s5iMVoDp/wPpCGrxZsW9pRVlglQwVYu5YAJqpfvinJTNO6InPSyBQEBJzK6WafFCEp4I2iA1PvfnZAvku0IVhwuqjswl0My3dxOk1hhSA1PMXgqiCMmwMPW/1SvmVY7zSLVwVlBqi+0VpFOnnOazQAWDXDJa1vqaikgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0yqLmFSR; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=VLl+miRsD1xWrE513P1ztYhnTZlcHHMM3AOpi2FYd3Kz/YVFGrwgZ8OYqyKQSpl3aDb+gH2XeKO+oAT26z/2PEDxpfOQDgwOHODxDFLwMEOd9K0IS/dFRwPEhzwJrIULNZ/I1U6RITJYFEEcz9xU+yt4Bw45kPlQTK2f+4fLBWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sOBL/wFL; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b269686aso5124444276.1
-        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 02:33:30 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60cd62fa1f9so54267257b3.0
+        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 02:33:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712482410; x=1713087210; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712482412; x=1713087212; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zt3JVf9pxS5FsJysIzUO1FjSPv03D2t2MKk+pZbb8PY=;
-        b=0yqLmFSRc/3288js9w9VgyZLNauN7Bb34I+gPKmeXnF7QCSwiuwUyn7z3z2csJtRyG
-         Y8RjfzF6vG0Rwy6/XvpbTcV7mUggJUo7uoEfR3Kb0vBxJcDVivDjabkeuXZy0cu4E6jV
-         ahqcI3AZuhQgjA8wQxOJLeOFcQDUlN3mRiML5TCAXFs0b/OvpdoZLkZO9z07G1VAx/jz
-         qSq/w0q2DAB470fkRyK1Zf2Uoif0N+xTqCsUgbLbm18SXBqpxfYypGE0w2V4y9QREMyX
-         RBlst8lKouSPMfZpgX0oAGQ6GtKodIs1W7pVtNeIKOTFTzHJiOcko7SU76gQxqjqnrR2
-         PpfA==
+        bh=d4AkDKKXa6u5c7ipjuKU/32hkAU0asGsloRy15k55MM=;
+        b=sOBL/wFLAxcHWYRl1/6AJ1AS78EDJL7fqIhxMR4bjuyKJ3vAQzscmLvUKQJJP2EsN1
+         U6X/81etsHGa7XSnx3wjsneCnoP+iBjTTAql5yd8DlWlLzualy6WJG/id2M9DR1brn0u
+         PPeH/WmwFl7nIuPArrg1arCLG1rPvse5jPFq3uDYyzgBycrLWCLS6z+60Y8WxOId7xUh
+         d2ZrTKleWYf3IqWaMrZPkLO1j63aim6WbApT3/SrmdEUbBPUcJ4QUJ87NbzganxXlPKR
+         BTXu9YrbHLOQifhg5QC2ySgBXpbXksz0tBpPglTvuICakDNDvMFwc4kVPpMQzRkCl752
+         NNLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712482410; x=1713087210;
+        d=1e100.net; s=20230601; t=1712482412; x=1713087212;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zt3JVf9pxS5FsJysIzUO1FjSPv03D2t2MKk+pZbb8PY=;
-        b=Oo8TCYCtFK8XxC1EPBOV6n5tHihdmVcDKPwJl28CRa/XRbGtkVo6N8YRdhQSpagSI4
-         Kfrpdfgq+A4sIp5972uvcNY2al7q2vRhFl4z8CoQZhVHj/mWdZ2aq0yRs/cYXByH6KwT
-         eHV2pLJneYhFvsJrCd0CRT+z2k6pRyDpanGeMkCQVsv8E8avxdzlj8VNz/vk7q8HQEjn
-         sykbNPoMecIX56DNT/AZN2baBgRXeKXhh/vuYhos4CdgF64VVo76j7KCsZFN2YSO5Kga
-         A4cTlpGFbFIZzdo/pEMDZLZg10ogto294wJYMKiVcqdcDyihCDrW0rT7gmJnkh5l36qm
-         RLxg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6skyMR9M0dpoQEmpLvmOWgkXcRSN61BbpXuHZudhgw61FAFkbpFZiKyJJf4KyfT1YNarqcj/6+MBoRHA6LL13BMEPXVY9
-X-Gm-Message-State: AOJu0Ywx8h64F9l0zsXLZZm4dV9gZ87Zcm9/zplSdEaHS3jXJHtxTIss
-	/ZONQQoNJ2zNwWU40F9AJe+3VyM9QSSpUa3CRVq0XfNIQ4esi8XrU/6wu3zIybFVU7haoIGztt2
-	T/YSl1HJ60g==
-X-Google-Smtp-Source: AGHT+IHDA3R8j9o4TjkQP9E6q+MGcMQd1jekA1PpJqaO3CS2qtVQGLVAzY2KopbtzkAOQYhmuDOm2G+Vqztrvw==
+        bh=d4AkDKKXa6u5c7ipjuKU/32hkAU0asGsloRy15k55MM=;
+        b=PH63W67vHF/AnvsYksDur9UNErWRdfZCaxPCJPCGAjhbE53gRPFgTOdTT5j0yrgnqj
+         t72FVjQ+DXjHtIhKr0CWz7K6N10WvjyR88vMAYAIAzcFtI+fAaeWAxZXdpSSGRoRF3mX
+         sSRZ/3xOKpLt0x72JD2WgDrRGIwQAXrNMW1RhJv+8ODYUq8oVlOqNSFrgqcnIpijFI27
+         wRRmI7DR0C3Ft3mn1YtJAWH6ys/eG1QaJkxdIKJW5Jq39fMtxAUHfDBpFRl5tELDmwqm
+         YaQy/lsTvB0ZkMfy7M4Ab6cgw2NjA6HP3ulewC+iQNFASoWGtHBk0pU/zsG7zUoN+R+C
+         u5nw==
+X-Forwarded-Encrypted: i=1; AJvYcCUs+DX3kxacJKNef3k0YrIS56YTSVA34Wn7rL0aQizXUSyVdQnunyTJpgh+L5KpP3vO2dky0vnZSFC/eSCuuWLJGE3Z26Se
+X-Gm-Message-State: AOJu0YxKHLIdZvRadpj/wz2Ag32GAhvdDGcYP1Ey+clyaeW3a4o3ylcl
+	IH9Taf4Cktu0/mY0addp2hwb8tMhA7ZTfCjLF2AhgmrYbz/me22d0cMqTCoB1LBHzUUZ1sjrCUq
+	mC7Yadr5s5w==
+X-Google-Smtp-Source: AGHT+IHNe3QXMj2+7Kd3NsaJ3dzY+j8jMLeTPp+lCEApL7773PKof45L7i7eAc6Gto85BhnAtwyj7hG7E8PhRg==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:6911:0:b0:dcc:79ab:e522 with SMTP id
- e17-20020a256911000000b00dcc79abe522mr471743ybc.11.1712482409961; Sun, 07 Apr
- 2024 02:33:29 -0700 (PDT)
-Date: Sun,  7 Apr 2024 09:33:21 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:102e:b0:de0:ecc6:87b with SMTP
+ id x14-20020a056902102e00b00de0ecc6087bmr124086ybt.1.1712482411803; Sun, 07
+ Apr 2024 02:33:31 -0700 (PDT)
+Date: Sun,  7 Apr 2024 09:33:22 +0000
 In-Reply-To: <20240407093322.3172088-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240407093322.3172088-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240407093322.3172088-2-edumazet@google.com>
-Subject: [PATCH net-next 1/2] tcp: propagate tcp_tw_isn via an extra parameter
- to ->route_req()
+Message-ID: <20240407093322.3172088-3-edumazet@google.com>
+Subject: [PATCH net-next 2/2] tcp: replace TCP_SKB_CB(skb)->tcp_tw_isn with a
+ per-cpu field
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,142 +84,260 @@ Cc: Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@g
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-tcp_v6_init_req() reads TCP_SKB_CB(skb)->tcp_tw_isn to find
-out if the request socket is created by a SYN hitting a TIMEWAIT socket.
+TCP can transform a TIMEWAIT socket into a SYN_RECV one from
+a SYN packet, and the ISN of the SYNACK packet is normally
+generated using TIMEWAIT tw_snd_nxt :
 
-This has been buggy for a decade, lets directly pass the information
-from tcp_conn_request().
+tcp_timewait_state_process()
+...
+    u32 isn = tcptw->tw_snd_nxt + 65535 + 2;
+    if (isn == 0)
+        isn++;
+    TCP_SKB_CB(skb)->tcp_tw_isn = isn;
+    return TCP_TW_SYN;
 
-This is a preparatory patch to make the following one easier to review.
+This SYN packet also bypasses normal checks against listen queue
+being full or not.
 
+tcp_conn_request()
+...
+       __u32 isn = TCP_SKB_CB(skb)->tcp_tw_isn;
+...
+        /* TW buckets are converted to open requests without
+         * limitations, they conserve resources and peer is
+         * evidently real one.
+         */
+        if ((syncookies == 2 || inet_csk_reqsk_queue_is_full(sk)) && !isn) {
+                want_cookie = tcp_syn_flood_action(sk, rsk_ops->slab_name);
+                if (!want_cookie)
+                        goto drop;
+        }
+
+This was using TCP_SKB_CB(skb)->tcp_tw_isn field in skb.
+
+Unfortunately this field has been accidentally cleared
+after the call to tcp_timewait_state_process() returning
+TCP_TW_SYN.
+
+Using a field in TCP_SKB_CB(skb) for a temporary state
+is overkill.
+
+Switch instead to a per-cpu variable.
+
+As a bonus, we do not have to clear tcp_tw_isn in TCP receive
+fast path.
+It is temporarily set then cleared only in the TCP_TW_SYN dance.
+
+Fixes: 4ad19de8774e ("net: tcp6: fix double call of tcp_v6_fill_cb()")
+Fixes: eeea10b83a13 ("tcp: add tcp_v4_fill_cb()/tcp_v4_restore_cb()")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/tcp.h    |  3 ++-
- net/ipv4/tcp_input.c |  2 +-
- net/ipv4/tcp_ipv4.c  |  3 ++-
- net/ipv6/tcp_ipv6.c  | 10 ++++++----
- net/mptcp/subflow.c  | 10 ++++++----
- 5 files changed, 17 insertions(+), 11 deletions(-)
+ include/net/tcp.h        | 10 +++++-----
+ net/ipv4/tcp.c           |  3 +++
+ net/ipv4/tcp_input.c     | 26 ++++++++++++++++----------
+ net/ipv4/tcp_ipv4.c      |  5 +++--
+ net/ipv4/tcp_minisocks.c |  4 ++--
+ net/ipv6/tcp_ipv6.c      |  5 +++--
+ 6 files changed, 32 insertions(+), 21 deletions(-)
 
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 9ab5b37e9d532cdf26dd423810b07912ef4abd75..fa0ab77acee23654b22e97615de983fc04eee319 100644
+index fa0ab77acee23654b22e97615de983fc04eee319..ba6c5ae86e228a1633feaf39b0f1e053c3832b08 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -2284,7 +2284,8 @@ struct tcp_request_sock_ops {
- 	struct dst_entry *(*route_req)(const struct sock *sk,
- 				       struct sk_buff *skb,
- 				       struct flowi *fl,
--				       struct request_sock *req);
-+				       struct request_sock *req,
-+				       u32 tw_isn);
- 	u32 (*init_seq)(const struct sk_buff *skb);
- 	u32 (*init_ts_off)(const struct net *net, const struct sk_buff *skb);
- 	int (*send_synack)(const struct sock *sk, struct dst_entry *dst,
+@@ -52,6 +52,8 @@ extern struct inet_hashinfo tcp_hashinfo;
+ DECLARE_PER_CPU(unsigned int, tcp_orphan_count);
+ int tcp_orphan_count_sum(void);
+ 
++DECLARE_PER_CPU(u32, tcp_tw_isn);
++
+ void tcp_time_wait(struct sock *sk, int state, int timeo);
+ 
+ #define MAX_TCP_HEADER	L1_CACHE_ALIGN(128 + MAX_HEADER)
+@@ -392,7 +394,8 @@ enum tcp_tw_status {
+ 
+ enum tcp_tw_status tcp_timewait_state_process(struct inet_timewait_sock *tw,
+ 					      struct sk_buff *skb,
+-					      const struct tcphdr *th);
++					      const struct tcphdr *th,
++					      u32 *tw_isn);
+ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 			   struct request_sock *req, bool fastopen,
+ 			   bool *lost_race);
+@@ -935,13 +938,10 @@ struct tcp_skb_cb {
+ 	__u32		seq;		/* Starting sequence number	*/
+ 	__u32		end_seq;	/* SEQ + FIN + SYN + datalen	*/
+ 	union {
+-		/* Note : tcp_tw_isn is used in input path only
+-		 *	  (isn chosen by tcp_timewait_state_process())
+-		 *
++		/* Note :
+ 		 * 	  tcp_gso_segs/size are used in write queue only,
+ 		 *	  cf tcp_skb_pcount()/tcp_skb_mss()
+ 		 */
+-		__u32		tcp_tw_isn;
+ 		struct {
+ 			u16	tcp_gso_segs;
+ 			u16	tcp_gso_size;
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 92ee60492314a1483cfbfa2f73d32fcad5632773..6cb5b9f74c94b72fec1d6a3cc8e6dc75bd61ba2f 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -290,6 +290,9 @@ enum {
+ DEFINE_PER_CPU(unsigned int, tcp_orphan_count);
+ EXPORT_PER_CPU_SYMBOL_GPL(tcp_orphan_count);
+ 
++DEFINE_PER_CPU(u32, tcp_tw_isn);
++EXPORT_PER_CPU_SYMBOL_GPL(tcp_tw_isn);
++
+ long sysctl_tcp_mem[3] __read_mostly;
+ EXPORT_SYMBOL(sysctl_tcp_mem);
+ 
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 1f28a2561795cf48ee7dbf638c15c773c8b8c84c..48c275e6ef02bfc5dd98f0878c752841f949c714 100644
+index 48c275e6ef02bfc5dd98f0878c752841f949c714..5a45a0923a1f058cdc80255be0f76a71fd102d4d 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -7160,7 +7160,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
- 	/* Note: tcp_v6_init_req() might override ir_iif for link locals */
- 	inet_rsk(req)->ir_iif = inet_request_bound_dev_if(sk, skb);
+@@ -7097,7 +7097,6 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 		     struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct tcp_fastopen_cookie foc = { .len = -1 };
+-	__u32 isn = TCP_SKB_CB(skb)->tcp_tw_isn;
+ 	struct tcp_options_received tmp_opt;
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	struct net *net = sock_net(sk);
+@@ -7107,21 +7106,28 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 	struct dst_entry *dst;
+ 	struct flowi fl;
+ 	u8 syncookies;
++	u32 isn;
  
--	dst = af_ops->route_req(sk, skb, &fl, req);
-+	dst = af_ops->route_req(sk, skb, &fl, req, isn);
- 	if (!dst)
- 		goto drop_and_free;
+ #ifdef CONFIG_TCP_AO
+ 	const struct tcp_ao_hdr *aoh;
+ #endif
  
+-	syncookies = READ_ONCE(net->ipv4.sysctl_tcp_syncookies);
++	isn = __this_cpu_read(tcp_tw_isn);
++	if (isn) {
++		/* TW buckets are converted to open requests without
++		 * limitations, they conserve resources and peer is
++		 * evidently real one.
++		 */
++		__this_cpu_write(tcp_tw_isn, 0);
++	} else {
++		syncookies = READ_ONCE(net->ipv4.sysctl_tcp_syncookies);
+ 
+-	/* TW buckets are converted to open requests without
+-	 * limitations, they conserve resources and peer is
+-	 * evidently real one.
+-	 */
+-	if ((syncookies == 2 || inet_csk_reqsk_queue_is_full(sk)) && !isn) {
+-		want_cookie = tcp_syn_flood_action(sk, rsk_ops->slab_name);
+-		if (!want_cookie)
+-			goto drop;
++		if (syncookies == 2 || inet_csk_reqsk_queue_is_full(sk)) {
++			want_cookie = tcp_syn_flood_action(sk,
++							   rsk_ops->slab_name);
++			if (!want_cookie)
++				goto drop;
++		}
+ 	}
+ 
+ 	if (sk_acceptq_is_full(sk)) {
 diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 52963c3bb8ca7380692f7be6e15d687c45e8673a..81e2f05c244d1671980a34bb756f528f3e6debcc 100644
+index 81e2f05c244d1671980a34bb756f528f3e6debcc..1e650ec71d2fe5198b9dad9e6ea9c5eaf868277f 100644
 --- a/net/ipv4/tcp_ipv4.c
 +++ b/net/ipv4/tcp_ipv4.c
-@@ -1666,7 +1666,8 @@ static void tcp_v4_init_req(struct request_sock *req,
- static struct dst_entry *tcp_v4_route_req(const struct sock *sk,
- 					  struct sk_buff *skb,
- 					  struct flowi *fl,
--					  struct request_sock *req)
-+					  struct request_sock *req,
-+					  u32 tw_isn)
+@@ -2146,7 +2146,6 @@ static void tcp_v4_fill_cb(struct sk_buff *skb, const struct iphdr *iph,
+ 				    skb->len - th->doff * 4);
+ 	TCP_SKB_CB(skb)->ack_seq = ntohl(th->ack_seq);
+ 	TCP_SKB_CB(skb)->tcp_flags = tcp_flag_byte(th);
+-	TCP_SKB_CB(skb)->tcp_tw_isn = 0;
+ 	TCP_SKB_CB(skb)->ip_dsfield = ipv4_get_dsfield(iph);
+ 	TCP_SKB_CB(skb)->sacked	 = 0;
+ 	TCP_SKB_CB(skb)->has_rxtstamp =
+@@ -2168,6 +2167,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
+ 	bool refcounted;
+ 	struct sock *sk;
+ 	int ret;
++	u32 isn;
+ 
+ 	drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 	if (skb->pkt_type != PACKET_HOST)
+@@ -2383,7 +2383,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
+ 		inet_twsk_put(inet_twsk(sk));
+ 		goto csum_error;
+ 	}
+-	switch (tcp_timewait_state_process(inet_twsk(sk), skb, th)) {
++	switch (tcp_timewait_state_process(inet_twsk(sk), skb, th, &isn)) {
+ 	case TCP_TW_SYN: {
+ 		struct sock *sk2 = inet_lookup_listener(net,
+ 							net->ipv4.tcp_death_row.hashinfo,
+@@ -2397,6 +2397,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
+ 			sk = sk2;
+ 			tcp_v4_restore_cb(skb);
+ 			refcounted = false;
++			__this_cpu_write(tcp_tw_isn, isn);
+ 			goto process;
+ 		}
+ 	}
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index 5b21a07ddf9aa5593d21cb856f0e0ea2f45b1eef..f53c7ada2ace4219917e75f806f39a00d5ab0123 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -95,7 +95,7 @@ static void twsk_rcv_nxt_update(struct tcp_timewait_sock *tcptw, u32 seq)
+  */
+ enum tcp_tw_status
+ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+-			   const struct tcphdr *th)
++			   const struct tcphdr *th, u32 *tw_isn)
  {
- 	tcp_v4_init_req(req, sk, skb);
+ 	struct tcp_options_received tmp_opt;
+ 	struct tcp_timewait_sock *tcptw = tcp_twsk((struct sock *)tw);
+@@ -228,7 +228,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 		u32 isn = tcptw->tw_snd_nxt + 65535 + 2;
+ 		if (isn == 0)
+ 			isn++;
+-		TCP_SKB_CB(skb)->tcp_tw_isn = isn;
++		*tw_isn = isn;
+ 		return TCP_TW_SYN;
+ 	}
  
 diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index cffebaec66f1ab60f1dde00b8bd8cc7a595bdc91..5141f7033abd8bb03bc4e162066ca4befe343bdc 100644
+index 5141f7033abd8bb03bc4e162066ca4befe343bdc..3aa9da5c9a669d2754b421cfb704ad28def5a748 100644
 --- a/net/ipv6/tcp_ipv6.c
 +++ b/net/ipv6/tcp_ipv6.c
-@@ -793,7 +793,8 @@ static int tcp_v6_md5_hash_skb(char *md5_hash,
+@@ -1741,7 +1741,6 @@ static void tcp_v6_fill_cb(struct sk_buff *skb, const struct ipv6hdr *hdr,
+ 				    skb->len - th->doff*4);
+ 	TCP_SKB_CB(skb)->ack_seq = ntohl(th->ack_seq);
+ 	TCP_SKB_CB(skb)->tcp_flags = tcp_flag_byte(th);
+-	TCP_SKB_CB(skb)->tcp_tw_isn = 0;
+ 	TCP_SKB_CB(skb)->ip_dsfield = ipv6_get_dsfield(hdr);
+ 	TCP_SKB_CB(skb)->sacked = 0;
+ 	TCP_SKB_CB(skb)->has_rxtstamp =
+@@ -1758,6 +1757,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 	bool refcounted;
+ 	struct sock *sk;
+ 	int ret;
++	u32 isn;
+ 	struct net *net = dev_net(skb->dev);
  
- static void tcp_v6_init_req(struct request_sock *req,
- 			    const struct sock *sk_listener,
--			    struct sk_buff *skb)
-+			    struct sk_buff *skb,
-+			    u32 tw_isn)
- {
- 	bool l3_slave = ipv6_l3mdev_skb(TCP_SKB_CB(skb)->header.h6.flags);
- 	struct inet_request_sock *ireq = inet_rsk(req);
-@@ -807,7 +808,7 @@ static void tcp_v6_init_req(struct request_sock *req,
- 	    ipv6_addr_type(&ireq->ir_v6_rmt_addr) & IPV6_ADDR_LINKLOCAL)
- 		ireq->ir_iif = tcp_v6_iif(skb);
+ 	drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+@@ -1967,7 +1967,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 		goto csum_error;
+ 	}
  
--	if (!TCP_SKB_CB(skb)->tcp_tw_isn &&
-+	if (!tw_isn &&
- 	    (ipv6_opt_accepted(sk_listener, skb, &TCP_SKB_CB(skb)->header.h6) ||
- 	     np->rxopt.bits.rxinfo ||
- 	     np->rxopt.bits.rxoinfo || np->rxopt.bits.rxhlim ||
-@@ -820,9 +821,10 @@ static void tcp_v6_init_req(struct request_sock *req,
- static struct dst_entry *tcp_v6_route_req(const struct sock *sk,
- 					  struct sk_buff *skb,
- 					  struct flowi *fl,
--					  struct request_sock *req)
-+					  struct request_sock *req,
-+					  u32 tw_isn)
- {
--	tcp_v6_init_req(req, sk, skb);
-+	tcp_v6_init_req(req, sk, skb, tw_isn);
- 
- 	if (security_inet_conn_request(sk, skb, req))
- 		return NULL;
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index 6042a47da61be8bc3000ab485fe6fbb7bff387b6..294390a9cd431024b84a56feae9b9c895111393e 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -284,7 +284,8 @@ EXPORT_SYMBOL_GPL(mptcp_subflow_init_cookie_req);
- static struct dst_entry *subflow_v4_route_req(const struct sock *sk,
- 					      struct sk_buff *skb,
- 					      struct flowi *fl,
--					      struct request_sock *req)
-+					      struct request_sock *req,
-+					      u32 tw_isn)
- {
- 	struct dst_entry *dst;
- 	int err;
-@@ -292,7 +293,7 @@ static struct dst_entry *subflow_v4_route_req(const struct sock *sk,
- 	tcp_rsk(req)->is_mptcp = 1;
- 	subflow_init_req(req, sk);
- 
--	dst = tcp_request_sock_ipv4_ops.route_req(sk, skb, fl, req);
-+	dst = tcp_request_sock_ipv4_ops.route_req(sk, skb, fl, req, tw_isn);
- 	if (!dst)
- 		return NULL;
- 
-@@ -351,7 +352,8 @@ static int subflow_v6_send_synack(const struct sock *sk, struct dst_entry *dst,
- static struct dst_entry *subflow_v6_route_req(const struct sock *sk,
- 					      struct sk_buff *skb,
- 					      struct flowi *fl,
--					      struct request_sock *req)
-+					      struct request_sock *req,
-+					      u32 tw_isn)
- {
- 	struct dst_entry *dst;
- 	int err;
-@@ -359,7 +361,7 @@ static struct dst_entry *subflow_v6_route_req(const struct sock *sk,
- 	tcp_rsk(req)->is_mptcp = 1;
- 	subflow_init_req(req, sk);
- 
--	dst = tcp_request_sock_ipv6_ops.route_req(sk, skb, fl, req);
-+	dst = tcp_request_sock_ipv6_ops.route_req(sk, skb, fl, req, tw_isn);
- 	if (!dst)
- 		return NULL;
- 
+-	switch (tcp_timewait_state_process(inet_twsk(sk), skb, th)) {
++	switch (tcp_timewait_state_process(inet_twsk(sk), skb, th, &isn)) {
+ 	case TCP_TW_SYN:
+ 	{
+ 		struct sock *sk2;
+@@ -1985,6 +1985,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 			sk = sk2;
+ 			tcp_v6_restore_cb(skb);
+ 			refcounted = false;
++			__this_cpu_write(tcp_tw_isn, isn);
+ 			goto process;
+ 		}
+ 	}
 -- 
 2.44.0.478.gd926399ef9-goog
 
