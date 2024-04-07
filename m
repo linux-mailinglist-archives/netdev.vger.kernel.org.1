@@ -1,120 +1,96 @@
-Return-Path: <netdev+bounces-85530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DFCF89B237
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 15:41:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8832E89B267
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 15:59:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DCFFB221AC
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 13:41:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3CBB1C20E3D
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 13:59:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9BA13AD34;
-	Sun,  7 Apr 2024 13:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9o4XVmA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E042C376FE;
+	Sun,  7 Apr 2024 13:59:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070E113AD30;
-	Sun,  7 Apr 2024 13:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575E639AC7
+	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 13:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712495674; cv=none; b=fg2e+rrBLNN7NHNkkAJjCNRR8HBUx1K/4acWbU5kv2B/a1gxlwXxfKpK94mw+e/JVZNkCE/Rtb/9pe2U12K4HRYre2SzLKwX6m/zV4yyGP7YivxcejfxWPErgYvHeUFjPffy85Mqnx4W2NJ9GQH36GFqPlKla1XNoPQdlheKp9M=
+	t=1712498344; cv=none; b=M7YjsKmhMsu7wVPbLLEMQECxs41HqibbTIS0VohBnYiTJ1Jik3xl50QHyHwOtjqxu2ew9psiQWX8kAxPCMSTpAKmcTbmhl3k70xEaB/dsdy9nLnDXF5SwLrJUVrwNTc7pY4V+fqGOrfwkUlinD2E9yQCnVQRus3pj7YVoxCf66I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712495674; c=relaxed/simple;
-	bh=Y1SZ2ijBW5TH0lgerbHNx/oxlDKk8wXv5m5mQBVO9pY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AafTaMTAgqLxpOfQezHD4RxLPVgJ/Ntbkl9EtVRbOuipyJFgzb+YvO/GciG3G+cqvPp+193BuR9AOHwIM11tvWkik7qxk584zcWSsllUH6K//+EvHW/Wjz95aF9JVFiTwsQsaTnKUTLYjfArB+CenE0/QFp55YIyoDun7WDO4G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9o4XVmA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16A94C433F1;
-	Sun,  7 Apr 2024 13:14:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712495673;
-	bh=Y1SZ2ijBW5TH0lgerbHNx/oxlDKk8wXv5m5mQBVO9pY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s9o4XVmAKEmDh4rD3cJLWCZWiMDHYmQMRAQxl45GTiEGIkIHoxL9tfR5jOOvApkdo
-	 Ig0GbLwHCdBOqxJyOszCwa4/5Wo+aAP21i8gRv3JdjuMurV/IT6KGVYZRcUgq+En3C
-	 rK9dEHxSTcG+0v90EBO6ckK2i+oqOnLip/8uQoweUIQkquh1Q9VAlpHe46gN8P6/uR
-	 rVle6id2gyVXJUWB9utvTqKYNcAp7zwLm/npfy27SsFHPo+X0qrTbmMixXmGk0aEBK
-	 nsCaEfTJmxsWFooNPBP4Gh2uCN0XQjch8BTD6OKcya5usfqQjjpqYiIvtaU0uMfd2u
-	 G5365wSqx/4ug==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: linke li <lilinke99@qq.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kuniyu@amazon.com,
-	willemb@google.com,
-	wuyun.abel@bytedance.com,
-	leitao@debian.org,
-	alexander@mihalicyn.com,
-	dhowells@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 4/5] net: mark racy access on sk->sk_rcvbuf
-Date: Sun,  7 Apr 2024 09:14:24 -0400
-Message-ID: <20240407131426.1053736-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240407131426.1053736-1-sashal@kernel.org>
-References: <20240407131426.1053736-1-sashal@kernel.org>
+	s=arc-20240116; t=1712498344; c=relaxed/simple;
+	bh=G3SuHFbHFzh8ypZatqs8OpXqZOj87aatW9KjH+JX3+A=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=oZqUkyEIrn8BdSfyMhNC4zAKsTdk2ZgEjD3fJpMeKA2DX0ZCnBpyNddMB6hrdAwnAotGFt5SsHCJDLs5mGMAkEdoNsEpdOeLIF0VQJrLjFJHgOP1uA/G+4s1znP6duk6cdZsSJu2O8WdNOnHOltttAeIIjv8YHEg1Bgvg0u3pC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-36a17a4b594so11322045ab.3
+        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 06:59:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712498342; x=1713103142;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h8th6mi8YZ4SsK+AiWToLd2PxMqZqV+eb1WyXiyTunM=;
+        b=FUxOnJpacejPt2J8agfZU7kVb0f01yOHrjkbuZ2iQ6W/DwRUoL3CQLqwn4+juzT1NJ
+         C1V9tNTvh62lJnqxYLDpO+Gw1ylLWUnn9aHg5zmjFw06W4W5rSLTwD2N4McmmRqMR09b
+         65X2CdzrU9iF2+/eIkUFYHLXWQxwV1PqMm+cmDCitkUAFJzMxOb48jvTnwfQzA6qK+tx
+         1zydgA63Csn3pxA/XXpf3C9ADJZme4JvTbebpY/a0sM0ZcvWiQgvOv7A/eDypqCTf5am
+         bX4/7T1VEz26vlfe9ZQAfWZiciu+mKoLpOdz8kPfKyNF7FJ3iSK1JQW8JnwVHTeV9HI/
+         UsLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWnLoCZer89CYzUe/qFLQwemzd/kRdBdroE8g+qqhVTISJpKwtRHnvmlzHpUa7MnIXK1Pi6+rZzGdaDrzFxYQqun9QVh0mG
+X-Gm-Message-State: AOJu0YwFq9LoBGBXjaF/QRRUtCgNcDrGPuvk6o8jcLRtreHyuMI7ljqq
+	X6UO0mLPyQxu5lHqjCHanlXCyun8plh/0jRI64qYl1MRXIQoVe+dRvA+B0m1AskLwtNtsKPUPoT
+	h6Yvo7uUq76Q5wnIoFu4lSflQHH1csaYMUHFQX8grBuzHhqmLvcl9WW8=
+X-Google-Smtp-Source: AGHT+IFRKc+gPnyLAxAH5+XQEeRuYzDRDNS0sDrq8v2ttGi7NqWFtGQeCgDhZmSWhznz4tsckWDm4Cdcag1QA6QB0dcB1gsjCuuz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.311
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1646:b0:368:efa4:be00 with SMTP id
+ v6-20020a056e02164600b00368efa4be00mr555322ilu.3.1712498342650; Sun, 07 Apr
+ 2024 06:59:02 -0700 (PDT)
+Date: Sun, 07 Apr 2024 06:59:02 -0700
+In-Reply-To: <000000000000dd84650615800e67@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000647e5f06158217d9@google.com>
+Subject: Re: [syzbot] [bluetooth?] BUG: sleeping function called from invalid
+ context in hci_le_create_big_complete_evt
+From: syzbot <syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, hdanton@sina.com, 
+	iulia.tanasescu@nxp.com, johan.hedberg@gmail.com, kuba@kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: linke li <lilinke99@qq.com>
+syzbot has bisected this issue to:
 
-[ Upstream commit c2deb2e971f5d9aca941ef13ee05566979e337a4 ]
+commit a0bfde167b506423111ddb8cd71930497a40fc54
+Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Date:   Tue May 30 14:21:59 2023 +0000
 
-sk->sk_rcvbuf in __sock_queue_rcv_skb() and __sk_receive_skb() can be
-changed by other threads. Mark this as benign using READ_ONCE().
+    Bluetooth: ISO: Add support for connecting multiple BISes
 
-This patch is aimed at reducing the number of benign races reported by
-KCSAN in order to focus future debugging effort on harmful races.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=146c679d180000
+start commit:   8568bb2ccc27 Add linux-next specific files for 20240405
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=166c679d180000
+console output: https://syzkaller.appspot.com/x/log.txt?x=126c679d180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=48ca5acf8d2eb3bc
+dashboard link: https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1338efc5180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15428f4b180000
 
-Signed-off-by: linke li <lilinke99@qq.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/core/sock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reported-by: syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com
+Fixes: a0bfde167b50 ("Bluetooth: ISO: Add support for connecting multiple BISes")
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 62d169bcfcfa1..dd7cee54b66cc 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -404,7 +404,7 @@ int __sock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
- 	unsigned long flags;
- 	struct sk_buff_head *list = &sk->sk_receive_queue;
- 
--	if (atomic_read(&sk->sk_rmem_alloc) >= sk->sk_rcvbuf) {
-+	if (atomic_read(&sk->sk_rmem_alloc) >= READ_ONCE(sk->sk_rcvbuf)) {
- 		atomic_inc(&sk->sk_drops);
- 		trace_sock_rcvqueue_full(sk, skb);
- 		return -ENOMEM;
-@@ -456,7 +456,7 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
- 
- 	skb->dev = NULL;
- 
--	if (sk_rcvqueues_full(sk, sk->sk_rcvbuf)) {
-+	if (sk_rcvqueues_full(sk, READ_ONCE(sk->sk_rcvbuf))) {
- 		atomic_inc(&sk->sk_drops);
- 		goto discard_and_relse;
- 	}
--- 
-2.43.0
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
