@@ -1,146 +1,210 @@
-Return-Path: <netdev+bounces-85487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 081C089AF6C
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 10:07:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B5A889AF7B
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 10:13:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AAF5282882
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 08:07:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B579F1F2218D
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 08:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9156211720;
-	Sun,  7 Apr 2024 08:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062E510A26;
+	Sun,  7 Apr 2024 08:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2RCRkpxZ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FQfjlvnL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E04915AF6
-	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 08:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC5612B83;
+	Sun,  7 Apr 2024 08:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712477171; cv=none; b=k1k3A8ovsLP9lA61ucXD8soE4yJB79sMXZ1BlrCx/LZ3N88h1+/cmGrtg6tS7fJ80DvurZh8Ol5N1RSK6iF/aNjWW2CNVLjSAw7tXCkTWoU5XHCCpYM87FxxC6XN7NNNhZCMSNvT2vSjLXlKDKMjECTI4myymrrzZzbkynsy0fI=
+	t=1712477583; cv=none; b=qK7/3/k864epQzLWcnoAb+tsS5upNcjbbGJy9Smkn04M1jNKIr6LK8Vm5AeyEuSfcWRyK+njtO4Un2xnbibHmuDyajTbUUDebg+l4GUaeGEjGeKV6U6HiFQTYW+/O0XElpI2psYkdsuctrZ+4huhWq3pRMM8Pr7FWLKwOxx+sug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712477171; c=relaxed/simple;
-	bh=Mey5rJ2GRiTMoCRHwXY/DlCztDmd8UnAbGEoXw2v4P0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jTQM1xMqPfQhR0ctlssa+B+iPGacGnJIY9MXy3ZNSiUYdrrwy8G3C9m6q/I0aqOUcAWlRrp0hFWHS+bgXjxF053vR0X9eD1tt2Uw0eCmZnvqCvg0QWmLkXiPi/NL5iZfnqJ2UH2ErxR4/UTPrpQf6/T3Qz9bymWS33aIT9TYKJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2RCRkpxZ; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dced704f17cso6193282276.1
-        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 01:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712477168; x=1713081968; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=sygACIauSmYUglo7+/NhK1xXhkGeqqP6XusXRXxtUQg=;
-        b=2RCRkpxZ9lNDEI55gksVr+Of3nFrOuBTTj81JHqqMxqSQwuRWSG/SVqWJlIoF/7U3X
-         qJSBfvWHwCO64uGFDe51oaSkVQzCl9RxM7LBpkJeII0uuvEAgERtFs/SFM1nCJ4PiHAs
-         mMzhQIx3e7skotJjwad7Y2hCpDbXbslWiZrtPrp3/1vPkCdPb+s9NnCPX5uBegBDeyHq
-         z6QVtJ20+d/fcu8au85Mf7baqOfyS2TESRTaACDmCfoF2ijLS9iPgiOgYd9vRhKaePi2
-         g++ufITt1nc5uezESqYZIGYBfKWSYAF+6Fx1OhpyL5HqtNS51Rg/vRfe+aqT2EWMHJaw
-         4+WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712477168; x=1713081968;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sygACIauSmYUglo7+/NhK1xXhkGeqqP6XusXRXxtUQg=;
-        b=YuhFRAX4SK0ugKn0RPUupdeWAbzaThJrCAGBSQwRn96Ltn3mgXp8k0RFFgIGeSuasm
-         bhcWh6W0YdT3hrfKV2c2x5UE0Pvq0AZ9Zp3uzjUiLHxikN/Nc8qddldIa0Q+hBkq+eNv
-         g8NexhRDVfunk8MVp/mCoQoynRbtdkabC5HgsgLExTci2juwvkKnFsYBI2Q19m2UPHL0
-         6M+SzoBSKofWgssAkVEwzlWgPN8izfw5qeZj9lzW2FB+p7Rvn5NBTk2IDqzbMKusNNY5
-         EOnl4sJY6CtOGjA59O9Q02sbg5hZx5EBijoNqP/WxSzGSYEQ2+CHY9oBXSlggBgNJw3Z
-         bkTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUMliArYXuakASJ2KTsW/kVlUuJzn1zZY9qdYj5XJRX/jQJcwxMTuVJXzFY/2v3Bz+Aa+/GIZSw8Gxw/DlaBJ7tcpwDkCJ0
-X-Gm-Message-State: AOJu0YzsesD1TzY+JxZI92/kgv8x4FUBkAPO3W60cMHgicYpcfODogLK
-	oXbcgAH0aIb4huGJbekyuuIuuULQJLmj5Lbek4vb24dK2mBXtNgAEE5UrL5jMZFYrAkUr5hTv/v
-	+IPEQtfY8TA==
-X-Google-Smtp-Source: AGHT+IE80Moy+di+bIxWKOq9h6t61vlZd0PVMzrQd+0tIUCxJ+ypVW2rp46B7BtGJMfJzB/QAmBWckAE8+cvcA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:18f:b0:dd9:3922:fc0e with SMTP
- id t15-20020a056902018f00b00dd93922fc0emr464913ybh.13.1712477168208; Sun, 07
- Apr 2024 01:06:08 -0700 (PDT)
-Date: Sun,  7 Apr 2024 08:06:06 +0000
+	s=arc-20240116; t=1712477583; c=relaxed/simple;
+	bh=fgvBYr5qb0CRValf4l8NVrLApElBgdEGuMbFLvYJTZM=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=i+M5vGC7KcqNLvPI7R4n+AZtJ+mjlQf7Xwm1sofemCeE8twtLlxX+Hom1H2D8VMjhR7VIQipB6FdEoAnKtFbKyeDw3exTgBfZCACSTx7uZSw01nx14LXDMXbkWZgU2DPH9itvjhMqNc0pmBh0X89o0g70P5DQzcA9bQjfzNQ+q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FQfjlvnL; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1712477578; h=Message-ID:Subject:Date:From:To;
+	bh=Jyrgw+fdsx70sA5rZNTdVtftvjSvV7dvUm0DDwjdLJw=;
+	b=FQfjlvnLyb9rS6Jf0JpTxFfCIl9PAdi0OpCW8/hNhAl/XzkjpfV6eHFjrsmntHnqkorBfrBj6N7Z9hfvFFId451b9EAJr0yGenfuy9yMUkrBC4MqAAq1j9aFe5jR/KFOsnZBR/mC3bFx6FwOusWePbCkflxkqcHaJZXEAPZF0vM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R731e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0W4.rUrS_1712477576;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W4.rUrS_1712477576)
+          by smtp.aliyun-inc.com;
+          Sun, 07 Apr 2024 16:12:57 +0800
+Message-ID: <1712477565.823871-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net v4] virtio_net: Do not send RSS key if it is not supported
+Date: Sun, 7 Apr 2024 16:12:45 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: rbc@meta.com,
+ riel@surriel.com,
+ stable@vger.kernel.org,
+ qemu-devel@nongnu.org,
+ virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
+ netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+ linux-kernel@vger.kernel.org (open list),
+ hengqi@linux.alibaba.com,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Andrew Melnychenko <andrew@daynix.com>
+References: <20240403154313.1331319-1-leitao@debian.org>
+In-Reply-To: <20240403154313.1331319-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240407080606.3153359-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] net: display more skb fields in skb_dump()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Print these additional fields in skb_dump() to ease debugging.
+On Wed,  3 Apr 2024 08:43:12 -0700, Breno Leitao <leitao@debian.org> wrote:
+> There is a bug when setting the RSS options in virtio_net that can break
+> the whole machine, getting the kernel into an infinite loop.
+>
+> Running the following command in any QEMU virtual machine with virtionet
+> will reproduce this problem:
+>
+>     # ethtool -X eth0  hfunc toeplitz
+>
+> This is how the problem happens:
+>
+> 1) ethtool_set_rxfh() calls virtnet_set_rxfh()
+>
+> 2) virtnet_set_rxfh() calls virtnet_commit_rss_command()
+>
+> 3) virtnet_commit_rss_command() populates 4 entries for the rss
+> scatter-gather
+>
+> 4) Since the command above does not have a key, then the last
+> scatter-gatter entry will be zeroed, since rss_key_size == 0.
+> sg_buf_size = vi->rss_key_size;
+>
+> 5) This buffer is passed to qemu, but qemu is not happy with a buffer
+> with zero length, and do the following in virtqueue_map_desc() (QEMU
+> function):
+>
+>   if (!sz) {
+>       virtio_error(vdev, "virtio: zero sized buffers are not allowed");
+>
+> 6) virtio_error() (also QEMU function) set the device as broken
+>
+>     vdev->broken = true;
+>
+> 7) Qemu bails out, and do not repond this crazy kernel.
+>
+> 8) The kernel is waiting for the response to come back (function
+> virtnet_send_command())
+>
+> 9) The kernel is waiting doing the following :
+>
+>       while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+> 	     !virtqueue_is_broken(vi->cvq))
+> 	      cpu_relax();
+>
+> 10) None of the following functions above is true, thus, the kernel
+> loops here forever. Keeping in mind that virtqueue_is_broken() does
+> not look at the qemu `vdev->broken`, so, it never realizes that the
+> vitio is broken at QEMU side.
+>
+> Fix it by not sending RSS commands if the feature is not available in
+> the device.
+>
+> Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
+> Cc: stable@vger.kernel.org
+> Cc: qemu-devel@nongnu.org
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
 
-- mac_len
-- csum_start (in v2, at Willem suggestion)
-- csum_offset (in v2, at Willem suggestion)
-- priority
-- mark
-- alloc_cpu
-- vlan_all
-- encapsulation
-- inner_protocol
-- inner_mac_header
-- inner_network_header
-- inner_transport_header
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
----
- net/core/skbuff.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 2a5ce6667bbb9bb70e89d47abda5daca5d16aae2..21cd01641f4c047c9a7ff2924b686b5a42535f81 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -1304,22 +1304,28 @@ void skb_dump(const char *level, const struct sk_buff *skb, bool full_pkt)
- 	has_trans = skb_transport_header_was_set(skb);
- 
- 	printk("%sskb len=%u headroom=%u headlen=%u tailroom=%u\n"
--	       "mac=(%d,%d) net=(%d,%d) trans=%d\n"
-+	       "mac=(%d,%d) mac_len=%u net=(%d,%d) trans=%d\n"
- 	       "shinfo(txflags=%u nr_frags=%u gso(size=%hu type=%u segs=%hu))\n"
--	       "csum(0x%x ip_summed=%u complete_sw=%u valid=%u level=%u)\n"
--	       "hash(0x%x sw=%u l4=%u) proto=0x%04x pkttype=%u iif=%d\n",
-+	       "csum(0x%x start=%u offset=%u ip_summed=%u complete_sw=%u valid=%u level=%u)\n"
-+	       "hash(0x%x sw=%u l4=%u) proto=0x%04x pkttype=%u iif=%d\n"
-+	       "priority=0x%x mark=0x%x alloc_cpu=%u vlan_all=0x%x\n"
-+	       "encapsulation=%d inner(proto=0x%04x, mac=%u, net=%u, trans=%u)\n",
- 	       level, skb->len, headroom, skb_headlen(skb), tailroom,
- 	       has_mac ? skb->mac_header : -1,
- 	       has_mac ? skb_mac_header_len(skb) : -1,
-+	       skb->mac_len,
- 	       skb->network_header,
- 	       has_trans ? skb_network_header_len(skb) : -1,
- 	       has_trans ? skb->transport_header : -1,
- 	       sh->tx_flags, sh->nr_frags,
- 	       sh->gso_size, sh->gso_type, sh->gso_segs,
--	       skb->csum, skb->ip_summed, skb->csum_complete_sw,
--	       skb->csum_valid, skb->csum_level,
-+	       skb->csum, skb->csum_start, skb->csum_offset, skb->ip_summed,
-+	       skb->csum_complete_sw, skb->csum_valid, skb->csum_level,
- 	       skb->hash, skb->sw_hash, skb->l4_hash,
--	       ntohs(skb->protocol), skb->pkt_type, skb->skb_iif);
-+	       ntohs(skb->protocol), skb->pkt_type, skb->skb_iif,
-+	       skb->priority, skb->mark, skb->alloc_cpu, skb->vlan_all,
-+	       skb->encapsulation, skb->inner_protocol, skb->inner_mac_header,
-+	       skb->inner_network_header, skb->inner_transport_header);
- 
- 	if (dev)
- 		printk("%sdev name=%s feat=%pNF\n",
--- 
-2.44.0.478.gd926399ef9-goog
-
+> ---
+> Changelog:
+>
+> V2:
+>   * Moved from creating a valid packet, by rejecting the request
+>     completely.
+> V3:
+>   * Got some good feedback from and Xuan Zhuo and Heng Qi, and reworked
+>     the rejection path.
+> V4:
+>   * Added a comment in an "if" clause, as suggested by Michael S. Tsirkin.
+>
+> ---
+>  drivers/net/virtio_net.c | 26 ++++++++++++++++++++++----
+>  1 file changed, 22 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index c22d1118a133..115c3c5414f2 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3807,6 +3807,7 @@ static int virtnet_set_rxfh(struct net_device *dev,
+>  			    struct netlink_ext_ack *extack)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
+> +	bool update = false;
+>  	int i;
+>
+>  	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
+> @@ -3814,13 +3815,28 @@ static int virtnet_set_rxfh(struct net_device *dev,
+>  		return -EOPNOTSUPP;
+>
+>  	if (rxfh->indir) {
+> +		if (!vi->has_rss)
+> +			return -EOPNOTSUPP;
+> +
+>  		for (i = 0; i < vi->rss_indir_table_size; ++i)
+>  			vi->ctrl->rss.indirection_table[i] = rxfh->indir[i];
+> +		update = true;
+>  	}
+> -	if (rxfh->key)
+> +
+> +	if (rxfh->key) {
+> +		/* If either _F_HASH_REPORT or _F_RSS are negotiated, the
+> +		 * device provides hash calculation capabilities, that is,
+> +		 * hash_key is configured.
+> +		 */
+> +		if (!vi->has_rss && !vi->has_rss_hash_report)
+> +			return -EOPNOTSUPP;
+> +
+>  		memcpy(vi->ctrl->rss.key, rxfh->key, vi->rss_key_size);
+> +		update = true;
+> +	}
+>
+> -	virtnet_commit_rss_command(vi);
+> +	if (update)
+> +		virtnet_commit_rss_command(vi);
+>
+>  	return 0;
+>  }
+> @@ -4729,13 +4745,15 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
+>  		vi->has_rss_hash_report = true;
+>
+> -	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS))
+> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
+>  		vi->has_rss = true;
+>
+> -	if (vi->has_rss || vi->has_rss_hash_report) {
+>  		vi->rss_indir_table_size =
+>  			virtio_cread16(vdev, offsetof(struct virtio_net_config,
+>  				rss_max_indirection_table_length));
+> +	}
+> +
+> +	if (vi->has_rss || vi->has_rss_hash_report) {
+>  		vi->rss_key_size =
+>  			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
+>
+> --
+> 2.43.0
+>
 
