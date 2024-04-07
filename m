@@ -1,140 +1,128 @@
-Return-Path: <netdev+bounces-85543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C9C89B359
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 19:42:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F1E389B365
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 19:51:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A56F3282184
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 17:42:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD169B21E3C
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 17:51:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC9039FDA;
-	Sun,  7 Apr 2024 17:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LcFI3LPO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC6F3BBD6;
+	Sun,  7 Apr 2024 17:50:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07D426AE3;
-	Sun,  7 Apr 2024 17:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6F2AF1E
+	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 17:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712511746; cv=none; b=OXa7CInY3bjLZO2VJZtlKlz8xt6Sjv6ynG7KMihs3FZaZWm+g92v8NmgzFn+LCGgYJfSolf80SXe+VA1p5Z87XHkzArGqZGUw3kWO+smPo6i+TEe0NGtfJzZPuS0xOfGPxbnOm3EbSViF+zZa7dIxwo0qhOwGn/PVXORnY4nhFs=
+	t=1712512256; cv=none; b=H2ytVQtAw0oS530elfCBVwbYqoXcc/19JDVVtMby+LFdyzaaAndq1wQIwUPAY08VQZ/8cfAsWRW91BP7qrnZ9LgiXEFWFxtYbegwARfJU6QvpPcrgeFjBNlvQxLdtjwWv4733FZjy4kAjd1VuJBXXN0OSLY87Vk441nZMPGcNMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712511746; c=relaxed/simple;
-	bh=etAp7UXfJ/WJy4+nHdOhLIJ6jju/rYBGIvpVABAbLBI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CDRXzyRteDUfWdQOHZUi6dIJcjy46XwyKp2XzjT3gJTOjRC4mUXADXv3q5RBMuJ0Ed5HJb7i9smGIrtgxPExIJz1hjNTuUvKunCjp3vuhHgO+zbWywx4cdEQPA/2XJpUC4dqNlT5ijksTV9uBNh/jMVHumIM2hLf1WaTon/+OL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LcFI3LPO; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6ed32341906so70598b3a.1;
-        Sun, 07 Apr 2024 10:42:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712511744; x=1713116544; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zmJXrKQQ8NYLGkWMPvSbi6f9GIaPx/v82cnS8xblnmU=;
-        b=LcFI3LPOas/lUuhq9sMvIAk71Kav6viCqL9DnHvpM9w1qpMgQAN52BoOk/gqd6Ypan
-         inUA+Rfgfid/6Rf5Qy1VlSKzrS6n2njyXU1b92p1DBYB5196P43wxJkbGVbSijiWDVhX
-         AiEuqtMNzumP1jfm67/V1mi+vWb0IZaUBnAtMgrZ+RQRVgXKSLCI/eHoHLWhBAk70HNC
-         GPoPZXBY6eHs2Ru8v98mjFYU9v/uG+4RIerkVKbsxvg0nCia2rUdNkA5SturvbmeaMTf
-         Pt2eQOenVNqLfLxSW5zzG7Yb6HazwPx7nFu3/W3y9o14Hu091tLNp+4JHf7e7WdSmKUJ
-         Wm1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712511744; x=1713116544;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zmJXrKQQ8NYLGkWMPvSbi6f9GIaPx/v82cnS8xblnmU=;
-        b=CV39Kf/ck86rmbAMVO5jz9OEXON7aTw8m42nzJ/2Ugr6XMvhpWxXeDKtMAgktf9Pbr
-         dttBx4ZDV62sRTmTBce+Evml+kDdxejFi9TpAdhxiL7Kpjv2UFpMeL6lFPdOz9wM+ERv
-         0lxtQObsekreYTpaoJUGZbpM881FOkv+2Iagbl4X25xMi/uWrNLPmCmaZAQuECv5EkHO
-         g7A0aPswk8e9kEGF5maF+ShlzTb2dRhhiB5uAc5F8I8ozhuH30bPZDnSn4gJRZxw8j8m
-         KUJ8/4OCIxOg9yKwaNsFC2ohFCAKOBqMgcizPLA/uO4lt5w9SOsHUgfL2cj9msTr2OPh
-         PHUw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVHl9ao48exBSHutfWcR3LZY8u6BQHHswSYnuL068hAMNndxsqEmHDkE59Y6Fv2HBugugAo96mQDw3hGET21ybcQZbd3nFQg0Ma+k8
-X-Gm-Message-State: AOJu0Yy2iXnTjjZVIrqKviNML6yF06QmmdTBY3BCW6fmVpJ998QsUgG4
-	QDJ4Fywf7PC453+BuKl50rxhz0lp7NhvXJcB7g8H6ZUXaSSmQQCx
-X-Google-Smtp-Source: AGHT+IGmD7uuv7daOdFGh7EVoXMeD8DUhS3yBr0tHuJyG+U1xgkotgOsXcTORKS876xd2wFGkcWeGA==
-X-Received: by 2002:a05:6a00:6908:b0:6eb:1ea:52ed with SMTP id hs8-20020a056a00690800b006eb01ea52edmr4889908pfb.1.1712511743899;
-        Sun, 07 Apr 2024 10:42:23 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:43f:400:82ee:73ff:fe41:9a02? ([2605:59c8:43f:400:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id g24-20020a63dd58000000b005d66caee3d0sm4902477pgj.22.2024.04.07.10.42.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Apr 2024 10:42:23 -0700 (PDT)
-Message-ID: <30a6635dedf305e23e623c501e614e55bca1ab41.camel@gmail.com>
-Subject: Re: [PATCH net-next v1 01/12] mm: Move the page fragment allocator
- from page_alloc into its own file
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, David Howells
-	 <dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-mm@kvack.org
-Date: Sun, 07 Apr 2024 10:42:22 -0700
-In-Reply-To: <20240407130850.19625-2-linyunsheng@huawei.com>
-References: <20240407130850.19625-1-linyunsheng@huawei.com>
-	 <20240407130850.19625-2-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1712512256; c=relaxed/simple;
+	bh=bhDnlacz4nSSm581AJuntvWCopjzPjgTLZRRM7V4Jkg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VrDjTkgZoY83QzF1yWeHadDpL98M3s7Zr4cln8dpl3hXY66J5AGK9jyDGQ887fyWWxKebKgcR6OV7Kv6JMQkHkNIHj7DW5x7Ibi5cJjUde833ab5jgTgTwKFvIMwEWBH9HRradXS9ERpz8fCWF0gu2r9VoM8m7pXmwSVYvdqJ1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rtWf6-0004bZ-Ke; Sun, 07 Apr 2024 19:50:36 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rtWf3-00Axl5-EU; Sun, 07 Apr 2024 19:50:33 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rtWf3-001GrB-18;
+	Sun, 07 Apr 2024 19:50:33 +0200
+Date: Sun, 7 Apr 2024 19:50:33 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: usb: lan78xx: Fixup EEE
+Message-ID: <ZhLc6W2TS9_vWOeq@pengutronix.de>
+References: <20240406-lan78xx-eee-v1-0-2993b14b849c@lunn.ch>
+ <20240406-lan78xx-eee-v1-1-2993b14b849c@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240406-lan78xx-eee-v1-1-2993b14b849c@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Sun, 2024-04-07 at 21:08 +0800, Yunsheng Lin wrote:
-> Inspired by [1], but use free_unref_page() to replace free_the_page()
-> instead of __free_pages(), use VM_BUG_ON() to catch that we can use
-> free_unref_page() directly, also add its own header file.
+Hi Andrew,
 
-Instead of doing this all as one patch it would be better to split this
-into 2. Make the refactor first, and then move the code. Don't do it
-all in one patch.
-
-Adding a refactor that changes out functions called in addition to
-moving the functions makes it very difficult to provide useful feedback
-and review.
-
-One of the big things with free_unref_page vx free_the_page is a check
-to see how costly it is to free the page. Right now the page frags are
-on the verge of crossing that threshold with defaulting to order 3
-pages.
-
-> As the API is only used by the networking, it may make sense to
-> move it to the networking directory like the page_pool does in the
-> future if we can make the free_unref_page() callable outside of the
-> mm subsystem. And we can utilize that to decouple the 'struct page'
-> in the networking subsystem in the future.
->=20
-> 1. https://lore.kernel.org/all/20230411160902.4134381-3-dhowells@redhat.c=
-om/
-
-The problem with moving this out to networking is the fact that this is
-memory allocation. In my opinion it would better for it to live there.
-
-> CC: David Howells <dhowells@redhat.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+On Sat, Apr 06, 2024 at 03:15:59PM -0500, Andrew Lunn wrote:
+.....
 > ---
->  include/linux/gfp.h             |  22 -----
->  include/linux/mm_types.h        |  18 ----
->  include/linux/page_frag_cache.h |  47 ++++++++++
->  include/linux/skbuff.h          |   1 +
->  mm/Makefile                     |   1 +
->  mm/page_alloc.c                 | 136 -----------------------------
->  mm/page_frag_cache.c            | 149 ++++++++++++++++++++++++++++++++
->  7 files changed, 198 insertions(+), 176 deletions(-)
->  create mode 100644 include/linux/page_frag_cache.h
->  create mode 100644 mm/page_frag_cache.c
+> -	if (edata->eee_enabled) {
+> -		ret = lan78xx_read_reg(dev, MAC_CR, &buf);
+> -		buf |= MAC_CR_EEE_EN_;
+> -		ret = lan78xx_write_reg(dev, MAC_CR, buf);
+> -
+> -		phy_ethtool_set_eee(net->phydev, edata);
+> -
+> -		buf = (u32)edata->tx_lpi_timer;
+> -		ret = lan78xx_write_reg(dev, EEE_TX_LPI_REQ_DLY, buf);
+> -	} else {
+> -		ret = lan78xx_read_reg(dev, MAC_CR, &buf);
+> -		buf &= ~MAC_CR_EEE_EN_;
+> -		ret = lan78xx_write_reg(dev, MAC_CR, buf);
+> -	}
+> +	ret = phy_ethtool_set_eee(net->phydev, edata);
+> +	if (ret < 0)
+> +		goto out;
+>  
+> +	buf = (u32)edata->tx_lpi_timer;
+> +	ret = lan78xx_write_reg(dev, EEE_TX_LPI_REQ_DLY, buf);
 
-I would add comments inline below about the changes you made but it is
-hard to keep them in any sort of context since what is contained in the
-"-" block is well spaced out from the "+" block.
+According to the documentation:
+"Host software should only change this field when Energy Efficient
+Ethernet Enable (EEEEN) is cleared."
+
+Even more: "A value of zero may adversely affect the ability of the TX
+data path to support Gigabit operation. A reasonable value when the part
+is operating at Gigabit speeds is 50 us."
+
+Previous code seems to not care about it too. So, it would be not a
+regression if something is broken.
+
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+
+I'll get some time to work on this driver in some months, in this case
+I'll take a closer look on EEE too.
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
