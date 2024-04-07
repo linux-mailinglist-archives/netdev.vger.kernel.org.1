@@ -1,128 +1,208 @@
-Return-Path: <netdev+bounces-85544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1E389B365
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 19:51:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF9189B36D
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 19:52:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD169B21E3C
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 17:51:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8A7D1F23BBB
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 17:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC6F3BBD6;
-	Sun,  7 Apr 2024 17:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B081F3BBD6;
+	Sun,  7 Apr 2024 17:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQJB47ac"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6F2AF1E
-	for <netdev@vger.kernel.org>; Sun,  7 Apr 2024 17:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A213BB24;
+	Sun,  7 Apr 2024 17:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712512256; cv=none; b=H2ytVQtAw0oS530elfCBVwbYqoXcc/19JDVVtMby+LFdyzaaAndq1wQIwUPAY08VQZ/8cfAsWRW91BP7qrnZ9LgiXEFWFxtYbegwARfJU6QvpPcrgeFjBNlvQxLdtjwWv4733FZjy4kAjd1VuJBXXN0OSLY87Vk441nZMPGcNMg=
+	t=1712512358; cv=none; b=fn84AimKEfj5P3fGmc2Tk4omOz2G2MGHjEoQUyxJYWPn8xA79RlnQbkOUZJxIKXzQ3ni0upNR58Hkul7mRyk/MrP1Ixn7HNAmHjYOqfNC71YI7SwheYXaPbcatEuoGZOEg6MKcGmIvavs+s3U5NNX1MyQDGu1GEfkau1E8R2EAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712512256; c=relaxed/simple;
-	bh=bhDnlacz4nSSm581AJuntvWCopjzPjgTLZRRM7V4Jkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VrDjTkgZoY83QzF1yWeHadDpL98M3s7Zr4cln8dpl3hXY66J5AGK9jyDGQ887fyWWxKebKgcR6OV7Kv6JMQkHkNIHj7DW5x7Ibi5cJjUde833ab5jgTgTwKFvIMwEWBH9HRradXS9ERpz8fCWF0gu2r9VoM8m7pXmwSVYvdqJ1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rtWf6-0004bZ-Ke; Sun, 07 Apr 2024 19:50:36 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rtWf3-00Axl5-EU; Sun, 07 Apr 2024 19:50:33 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rtWf3-001GrB-18;
-	Sun, 07 Apr 2024 19:50:33 +0200
-Date: Sun, 7 Apr 2024 19:50:33 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: usb: lan78xx: Fixup EEE
-Message-ID: <ZhLc6W2TS9_vWOeq@pengutronix.de>
-References: <20240406-lan78xx-eee-v1-0-2993b14b849c@lunn.ch>
- <20240406-lan78xx-eee-v1-1-2993b14b849c@lunn.ch>
+	s=arc-20240116; t=1712512358; c=relaxed/simple;
+	bh=ex3C1kb6Q72XlQWJSKlw1FNyNzm00wWyYbhTFrIwIUo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gUZKbvsBOiGgaCQr16XOLkCrJi9OzqaywR7EzooApAV5ktVAQDTbhYIvDIzDzKbo15TVIPuxhf1b/LTSBp0ePTtk0uEA4KlmmHlGtT6E8g5eZ/n5xPeA0XI5LdZKgvRpsa145gZNnXWvVEV0NB3Sl1ubqtKnOwEGNBWy+YOZ/qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JQJB47ac; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ecf1bb7f38so2479355b3a.0;
+        Sun, 07 Apr 2024 10:52:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712512356; x=1713117156; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HCYO+bV74bGlAeszClwqmPg2dxoZO9mkEN1fPZP1BZ8=;
+        b=JQJB47actGVcD3BYFRua/rtO1F/heIn1l21llZaGlzoVNAD+EI9sNFWTyIIHKZrxCk
+         U5V60IyUjXW9pEfWbSqfbllNazWVMixNu8KSO3FkdtdNaeMgWBrskP7WghMO2MgNIf8e
+         951WTYo7VjQtsJLHfsaV0QB4iVVxYR8sn0/24EruaGXlOouirCC6uv+RBNm8qLliq/hM
+         2up3YhWHFhVNp71vtH1Pu5NPB5vBszhOgLI6OzLFKra4xaJEa3xJ9CKat8/4av9RSaeg
+         Z2hYpCdky0qBXg+9yaGUC1+OzzTTBvRKVfcawR8ufcMNxHdnE2rhfri0uiN7CIXx89BW
+         gaqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712512356; x=1713117156;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HCYO+bV74bGlAeszClwqmPg2dxoZO9mkEN1fPZP1BZ8=;
+        b=BdgFnk/q0F9UbicPj9vjrzpVTeyOMBKxgWvwxD1IQ5kMP7gNodo7qveivU2uVAB0/D
+         /TZgUHlVbs7IMmxHkNKGHndQuTzUXdkFfkDpVrNKrscNv5EB4gsllklN0jyRxuYAmaWL
+         uxc2n/ufi03mibq56bJjBusVtPy04v6A+vlTukGQHr8zw/kiX4HXfOvZjL03AW6Vo+lm
+         IV7PFA/CGwtOnwSMVXKMx/+j25WaNUMg/b8lscrWbOjr2WfCigLUQTu6imqW2d9UrMI+
+         SnaugtGzjiPdbOWxjeBZNSnKEPL41P7TffshksN9kJh+so8/MY3l/q7IRv3VXDplLoTA
+         Ckfw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEd90+x+RWGjgn/yQg6PgtLjMj4kshwcG1L2wgRHb1drRUTkpNGtQUXhVltl+kJiGvAI124IVDTp2fFKujZy3Xu+EQ+YLJ80O6VAhJ
+X-Gm-Message-State: AOJu0Yyb51r+GVWsL9SQ0sl7coj1LaBDRiY4qtaBNA2hlzuY9ZOjr7wB
+	Lzu7UhpfaShnBFCudQW36iYgsOpWRYDRSEfh75JTSCSftZ+P6IMk
+X-Google-Smtp-Source: AGHT+IETsDpxJPJzLUhyUBf4ug/fHSnjoo/erTt516cxp81fiTWalJfzilhfmCsQa6257Bos1Ex/2w==
+X-Received: by 2002:a05:6a20:d48f:b0:1a7:507a:c9f4 with SMTP id im15-20020a056a20d48f00b001a7507ac9f4mr4285765pzb.30.1712512356242;
+        Sun, 07 Apr 2024 10:52:36 -0700 (PDT)
+Received: from [192.168.0.128] ([98.97.103.43])
+        by smtp.googlemail.com with ESMTPSA id 1-20020a17090a0f0100b002a261d1da0dsm7316132pjy.24.2024.04.07.10.52.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Apr 2024 10:52:35 -0700 (PDT)
+Message-ID: <43d99616cd4a2a6fce6a6b97f73d08ebc5361a61.camel@gmail.com>
+Subject: Re: [PATCH net-next v1 02/12] mm: page_frag: use initial zero
+ offset for page_frag_alloc_align()
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
+	 <akpm@linux-foundation.org>, linux-mm@kvack.org
+Date: Sun, 07 Apr 2024 10:52:34 -0700
+In-Reply-To: <20240407130850.19625-3-linyunsheng@huawei.com>
+References: <20240407130850.19625-1-linyunsheng@huawei.com>
+	 <20240407130850.19625-3-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240406-lan78xx-eee-v1-1-2993b14b849c@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Andrew,
-
-On Sat, Apr 06, 2024 at 03:15:59PM -0500, Andrew Lunn wrote:
-.....
+On Sun, 2024-04-07 at 21:08 +0800, Yunsheng Lin wrote:
+> We are above to use page_frag_alloc_*() API to not just
+> allocate memory for skb->data, but also use them to do
+> the memory allocation for skb frag too. Currently the
+> implementation of page_frag in mm subsystem is running
+> the offset as a countdown rather than count-up value,
+> there may have several advantages to that as mentioned
+> in [1], but it may have some disadvantages, for example,
+> it may disable skb frag coaleasing and more correct cache
+> prefetching
+>=20
+> We have a trade-off to make in order to have a unified
+> implementation and API for page_frag, so use a initial zero
+> offset in this patch, and the following patch will try to
+> make some optimization to aovid the disadvantages as much
+> as possible.
+>=20
+> 1. https://lore.kernel.org/all/f4abe71b3439b39d17a6fb2d410180f367cadf5c.c=
+amel@gmail.com/
+>=20
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 > ---
-> -	if (edata->eee_enabled) {
-> -		ret = lan78xx_read_reg(dev, MAC_CR, &buf);
-> -		buf |= MAC_CR_EEE_EN_;
-> -		ret = lan78xx_write_reg(dev, MAC_CR, buf);
-> -
-> -		phy_ethtool_set_eee(net->phydev, edata);
-> -
-> -		buf = (u32)edata->tx_lpi_timer;
-> -		ret = lan78xx_write_reg(dev, EEE_TX_LPI_REQ_DLY, buf);
-> -	} else {
-> -		ret = lan78xx_read_reg(dev, MAC_CR, &buf);
-> -		buf &= ~MAC_CR_EEE_EN_;
-> -		ret = lan78xx_write_reg(dev, MAC_CR, buf);
-> -	}
-> +	ret = phy_ethtool_set_eee(net->phydev, edata);
-> +	if (ret < 0)
-> +		goto out;
->  
-> +	buf = (u32)edata->tx_lpi_timer;
-> +	ret = lan78xx_write_reg(dev, EEE_TX_LPI_REQ_DLY, buf);
+>  mm/page_frag_cache.c | 31 ++++++++++++++-----------------
+>  1 file changed, 14 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> index a0f90ba25200..3e3e88d9af90 100644
+> --- a/mm/page_frag_cache.c
+> +++ b/mm/page_frag_cache.c
+> @@ -67,9 +67,8 @@ void *__page_frag_alloc_align(struct page_frag_cache *n=
+c,
+>  			      unsigned int fragsz, gfp_t gfp_mask,
+>  			      unsigned int align_mask)
+>  {
+> -	unsigned int size =3D PAGE_SIZE;
+> +	unsigned int size, offset;
+>  	struct page *page;
+> -	int offset;
+> =20
+>  	if (unlikely(!nc->va)) {
+>  refill:
+> @@ -77,10 +76,6 @@ void *__page_frag_alloc_align(struct page_frag_cache *=
+nc,
+>  		if (!page)
+>  			return NULL;
+> =20
+> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> -		/* if size can vary use size else just use PAGE_SIZE */
+> -		size =3D nc->size;
+> -#endif
+>  		/* Even if we own the page, we do not use atomic_set().
+>  		 * This would break get_page_unless_zero() users.
+>  		 */
+> @@ -89,11 +84,18 @@ void *__page_frag_alloc_align(struct page_frag_cache =
+*nc,
+>  		/* reset page count bias and offset to start of new frag */
+>  		nc->pfmemalloc =3D page_is_pfmemalloc(page);
+>  		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+> -		nc->offset =3D size;
+> +		nc->offset =3D 0;
+>  	}
+> =20
+> -	offset =3D nc->offset - fragsz;
+> -	if (unlikely(offset < 0)) {
+> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> +	/* if size can vary use size else just use PAGE_SIZE */
+> +	size =3D nc->size;
+> +#else
+> +	size =3D PAGE_SIZE;
+> +#endif
+> +
+> +	offset =3D ALIGN(nc->offset, -align_mask);
+> +	if (unlikely(offset + fragsz > size)) {
 
-According to the documentation:
-"Host software should only change this field when Energy Efficient
-Ethernet Enable (EEEEN) is cleared."
+Rather than using "ALIGN" with a negative value it would probably make
+more sense to use __ALIGN_KERNEL_MASK with ~align_mask. I am not sure
+how well the compiler sorts out the use of negatives to flip values
+that are then converted to masks with the "(a) - 1".
 
-Even more: "A value of zero may adversely affect the ability of the TX
-data path to support Gigabit operation. A reasonable value when the part
-is operating at Gigabit speeds is 50 us."
+>  		page =3D virt_to_page(nc->va);
+> =20
+>  		if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
+> @@ -104,17 +106,13 @@ void *__page_frag_alloc_align(struct page_frag_cach=
+e *nc,
+>  			goto refill;
+>  		}
+> =20
+> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> -		/* if size can vary use size else just use PAGE_SIZE */
+> -		size =3D nc->size;
+> -#endif
+>  		/* OK, page count is 0, we can safely set it */
+>  		set_page_count(page, PAGE_FRAG_CACHE_MAX_SIZE + 1);
+> =20
+>  		/* reset page count bias and offset to start of new frag */
+>  		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+> -		offset =3D size - fragsz;
+> -		if (unlikely(offset < 0)) {
+> +		offset =3D 0;
+> +		if (unlikely(fragsz > size)) {
+>  			/*
+>  			 * The caller is trying to allocate a fragment
+>  			 * with fragsz > PAGE_SIZE but the cache isn't big
+> @@ -129,8 +127,7 @@ void *__page_frag_alloc_align(struct page_frag_cache =
+*nc,
+>  	}
+> =20
+>  	nc->pagecnt_bias--;
+> -	offset &=3D align_mask;
+> -	nc->offset =3D offset;
+> +	nc->offset =3D offset + fragsz;
+> =20
+>  	return nc->va + offset;
+>  }
 
-Previous code seems to not care about it too. So, it would be not a
-regression if something is broken.
-
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
-I'll get some time to work on this driver in some months, in this case
-I'll take a closer look on EEE too.
-
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
