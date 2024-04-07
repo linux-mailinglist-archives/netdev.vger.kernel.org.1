@@ -1,120 +1,109 @@
-Return-Path: <netdev+bounces-85472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E917189ADAC
-	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 01:55:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00F4789ADE9
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 03:47:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 633EBB2144F
-	for <lists+netdev@lfdr.de>; Sat,  6 Apr 2024 23:55:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F8DC28288B
+	for <lists+netdev@lfdr.de>; Sun,  7 Apr 2024 01:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C94535C8;
-	Sat,  6 Apr 2024 23:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fD1DY5P0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AE7EBE;
+	Sun,  7 Apr 2024 01:47:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024A4482C7;
-	Sat,  6 Apr 2024 23:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09B95223;
+	Sun,  7 Apr 2024 01:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712447741; cv=none; b=k124R2QHJIJIxKaxtv6Q6pyQA2QFjc4ATVdN+ZH7KZwwpnpsm2wXsV0xItLZ2Y+c+yEEhhc9j9M6AUswVaPJybmuA/3ZupEpbeCCcdSi3IcPDuz+ZMCFW78VBsRqQQ06GfT+UBadKt//EGdjEm3UD4Ws8C/Yv0LuEAhwv5p7Wkc=
+	t=1712454467; cv=none; b=owIs1wSz9uS9p1Mzi068oau78VS9Lo6OfX3ap+kFfOdOKCcURZU0Blk1DV+F5CiNYS+AT6YuS7XVCf+L/EX6DFqM+iIhSWKW5MM5981LPrVrHquntabVKs34kMlgi0QrHo6uK5qWfHUdEeSW9ieE6Yutpid/M3WqO2SXCCT/azk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712447741; c=relaxed/simple;
-	bh=Z0fSrQayCZEZ7BN+ls9wJNksXQi4tTCQ51JwCFxbtVI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oRtKHB5uY1UH/i9L8sApwWT7gcr8fuhJoh905JW+F8rmtPbJcycCEvmdGkY7ibexp7KbjQxXPv+XDj+DI6IUIw3UEcRelM9FZoVD36XOBmd1RsDXBpmrqeeXlgNWNqVOJby5azoLkq0txd9n563WwRUWKNMCOtxq1c1afc6n9Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fD1DY5P0; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2a2d37b8c4fso816995a91.1;
-        Sat, 06 Apr 2024 16:55:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712447739; x=1713052539; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AXM7kfM1Z58yWKWsC/e8tiwljIuUChOEbm514WnQ12k=;
-        b=fD1DY5P096pY7+SuZlyA351kB6jXujeOuSaJ8MtVKcZPTbvKx5uQgLWRwtY+hKd1xP
-         Ggi6AarBCrJRh7/VBXuDr3GTvvcgoKWK9048a3JZarPxMNhNHxqjH6ijzKh0MZYzOFHX
-         3aQcWwSLlGqsUd9NXjS4FOWEMnfAD2+uPE8+ZNKQJOnb9VA7tyn06VyIOtxZWfXpj/rN
-         19LO0ncZkKIJ2WjHk+le3VoHvpz0HioHT7qj5TROZKe5RXWQbsureD5fYqsfZKmYzlko
-         O3upYT65SeRYHjz2/A2OirKBRe1ZxNachOGwCU8olJZ/bqcEreEwYpm7vgzXxoCvfhMl
-         BaTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712447739; x=1713052539;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AXM7kfM1Z58yWKWsC/e8tiwljIuUChOEbm514WnQ12k=;
-        b=IzZUgzrX0v77VH9t620vWPbyKi6bAiS/rjvkTuzFAlEbnSiASzk9rGQiS5bEmKJf1K
-         hnEx0HrEFWsfME/7YEIR7wMdL6wtrpWapsqY44OziEAqupsgA+Oan31tNS1CdP2ltiNY
-         vjeNgbHX6CgDt60FlqyuFElpKlYF4efJRYHR80+hP9oa4YEby8FpxmzuiZchSyx2riku
-         uugeMrQPci8zAokn5ApEu4JOYX/uUQNzPrXh+z/05asIr2BlEjqC95R/FjbbLfrXZgFW
-         OkBff98xDc9Bc2jg7ZyAHvhcH/L1mCQAbwRPJZDU3FoetVaS0fkH9HWTc+L+1pNcJPXv
-         bcNg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVPJpycba2P7Ofx5L/r5Tr1EdYEt+xam15mIwm7LGZKMzJyQmHPgY2Ct2IucUk2kHET1jrfNr71dmh9xZsPC6JQEb8WD4UoSx4bcws1iA018RD5adEbaal1lUwTVbxOnZ1YmqV
-X-Gm-Message-State: AOJu0YwPfVmaPhgw37zuN684MgyXeMSO35aBmW2nTv0L4DFv2mv+JMX1
-	CGWwAXeQUGptzUD0U0t5Hid+4Z/EL04ppJ+sjcniy9z3Na4sz37B
-X-Google-Smtp-Source: AGHT+IE3B5Pz+/ZkseS/mNk/yx/nQmMtrI/bGxa3Q0nv17K2q4uzMUrg6CzyBHy6NMcob3bTLeEQEQ==
-X-Received: by 2002:a17:90a:8996:b0:2a2:83b0:5fad with SMTP id v22-20020a17090a899600b002a283b05fadmr4669920pjn.2.1712447739216;
-        Sat, 06 Apr 2024 16:55:39 -0700 (PDT)
-Received: from visitorckw-System-Product-Name.. ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id bt8-20020a17090af00800b002a2b06ce909sm5460178pjb.17.2024.04.06.16.55.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Apr 2024 16:55:38 -0700 (PDT)
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: toke@toke.dk
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jserv@ccns.ncku.edu.tw,
-	cake@lists.bufferbloat.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kuan-Wei Chiu <visitorckw@gmail.com>
-Subject: [PATCH net-next] net: sched: cake: Optimize number of calls to cake_heapify()
-Date: Sun,  7 Apr 2024 07:55:32 +0800
-Message-Id: <20240406235532.613696-1-visitorckw@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1712454467; c=relaxed/simple;
+	bh=3ZcpxR9wsm3F98xCGc2DPxsXXCX+A8HMy5dSk8T23gg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=OCpmuuGYc5GgT65bGIidEFVtBxLDZYGMssq2eVnRlbtLVBKXIv+XlW9EG3OptAFaH7lhq0DpFSVYvjRY3HLo1s9kFy2k7Qahq0YwBCEere56ETC+F6NoMxu5Ldi07GxZMbvyc25hNnWJmRMncqIyToWinDLcPuBRn8U7rZGSP/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4VBw5C23hLz1RBSv;
+	Sun,  7 Apr 2024 09:44:47 +0800 (CST)
+Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8630E14011F;
+	Sun,  7 Apr 2024 09:47:36 +0800 (CST)
+Received: from [10.67.109.184] (10.67.109.184) by
+ kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sun, 7 Apr 2024 09:47:35 +0800
+Message-ID: <959db176-a79e-4074-a4bb-d9ee5ce19f79@huawei.com>
+Date: Sun, 7 Apr 2024 09:47:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf] MAINTAINERS: bpf: Add Lehui and Puranjay as riscv64
+ reviewers
+Content-Language: en-US
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Puranjay Mohan
+	<puranjay@kernel.org>
+CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>, Paul Walmsley
+	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+	<aou@eecs.berkeley.edu>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+	<netdev@vger.kernel.org>
+References: <20240405123352.2852393-1-bjorn@kernel.org>
+From: Pu Lehui <pulehui@huawei.com>
+In-Reply-To: <20240405123352.2852393-1-bjorn@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemd100009.china.huawei.com (7.221.188.135)
 
-Improve the max-heap construction process by reducing unnecessary
-heapify operations. Specifically, adjust the starting condition from
-n / 2 to n / 2 - 1 in the loop that iterates over all non-leaf
-elements.
 
-Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
----
- net/sched/sch_cake.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 2024/4/5 20:33, Björn Töpel wrote:
+> From: Björn Töpel <bjorn@rivosinc.com>
+> 
+> Lehui and Puranjay have been active RISC-V 64-bit BPF JIT
+> contributors/reviewers for a long time!
+> 
+> Let's make it more official by adding them as reviewers in
+> MAINTAINERS.
 
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index edee926ccde8..2eabc4dc5b79 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -1512,7 +1512,7 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 	if (!q->overflow_timeout) {
- 		int i;
- 		/* Build fresh max-heap */
--		for (i = CAKE_MAX_TINS * CAKE_QUEUES / 2; i >= 0; i--)
-+		for (i = CAKE_MAX_TINS * CAKE_QUEUES / 2 - 1; i >= 0; i--)
- 			cake_heapify(q, i);
- 	}
- 	q->overflow_timeout = 65535;
--- 
-2.34.1
+It's my honor to take on this responsibility, and delighted to be 
+partnered with you Björn and Puranjay.😀
 
+Lehui
+
+> 
+> Thank you for your hard work!
+> 
+> Signed-off-by: Björn Töpel <bjorn@kernel.org>
+> ---
+>   MAINTAINERS | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 75381386fe4c..58ab032ad33d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3764,6 +3764,8 @@ X:	arch/riscv/net/bpf_jit_comp64.c
+>   
+>   BPF JIT for RISC-V (64-bit)
+>   M:	Björn Töpel <bjorn@kernel.org>
+> +R:	Pu Lehui <pulehui@huawei.com>
+> +R:	Puranjay Mohan <puranjay@kernel.org>
+>   L:	bpf@vger.kernel.org
+>   S:	Maintained
+>   F:	arch/riscv/net/
+> 
+> base-commit: c88b9b4cde17aec34fb9bfaf69f9f72a1c44f511
 
