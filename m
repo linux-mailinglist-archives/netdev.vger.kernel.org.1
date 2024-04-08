@@ -1,195 +1,348 @@
-Return-Path: <netdev+bounces-85763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9402289C085
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:09:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5099989C08A
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:09:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 644EFB2A912
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:04:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E841B246DB
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0DA7D3F4;
-	Mon,  8 Apr 2024 13:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB896F53D;
+	Mon,  8 Apr 2024 13:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IxKar8Xl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CC56F08B
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587212DF73
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712581373; cv=none; b=OsLtyPlG407bUgP3WO1UTo0/a0FyAKeXhZlRqsJ2+pqelnWSa85T53ogkFFBt0l4xc/6nS0vz5i5qc+MxeXIEIReLgvbMlnvf2JTmaZgmaa0RuEl5RHGt+61p7g3CP9ybBF1uq/dzdkm6cyDOiZJq5QRmmGRD9DNpSYlqW/jGgI=
+	t=1712581726; cv=none; b=UOYSdu5WMkwDQe7VM7q1zxA1lQvGCe2O5g/njBdxXCety0dYHFgkBlgcmJBt9DMVwwJPA7N2qz2q7QvbH6eYKfBpiWgxiCuPIIUdQAb7E49vjkN2mSfZv4C/Kdz2bnEZqb9F2dr3NK/26X3+7Cfrwr7qPY4v1PkjCFA2W3V89Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712581373; c=relaxed/simple;
-	bh=pteGFMYsPq/MM603iUlNnEZK49ejpJn5CSpKsoQy57I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=myqlWj7uTB0sb8sE+ocDhE9iiULvUj8vxhIwl033CBNtnqaeBxEQCTRkuoBYB1d9Tqx9L7SdFsG4K7kLZEcumgQjUXbAhX7v+aEz6T+2uahOnZuu3lBL3d/E2h3+ygP9ook1/qdWpBQ90saT+vx6WfDjys2+Rm3si5UkhcKxfBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-7wGp3ECaNfyaohg7KMraYA-1; Mon, 08 Apr 2024 09:02:39 -0400
-X-MC-Unique: 7wGp3ECaNfyaohg7KMraYA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BE14D8026B9;
-	Mon,  8 Apr 2024 13:02:38 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F9D0492BC7;
-	Mon,  8 Apr 2024 13:02:36 +0000 (UTC)
-Date: Mon, 8 Apr 2024 15:02:31 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antony Antony <antony@phenome.org>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: Antony Antony <antony.antony@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the
- SA in or out
-Message-ID: <ZhPq542VY18zl6z3@hog>
-References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
- <ZhBzcMrpBCNXXVBV@hog>
- <ZhJX-Rn50RxteJam@Antony2201.local>
+	s=arc-20240116; t=1712581726; c=relaxed/simple;
+	bh=m+jw77nLcnkLeRDbaHPflyBgSYWw0KkJf+HonyKXlD4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NMUIuZ+2RrZIBnqpcAIBBkNA2NNePyUo6XIihSOpIALX10XQ7xY25V3q6FG5p3XtG3tN5WA1P0fbqT1unZvKxSBypmWSq/NUhR/wpSAaRlNFYszR5GCklypEN9qJB0MWxKhUfB0LjEp6KfGm8LYUPzC63s8lZkMh5ixxedfN5Aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IxKar8Xl; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dced704f17cso7738075276.1
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 06:08:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712581722; x=1713186522; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d06Ago2/G5anqicwOggM0K0/XYbwCAxGONLNO2HI/JQ=;
+        b=IxKar8XlnVWQG5vb0UYCKgcjuZDfc8BxwaxxTnjRPDu/xHUeAck28UHHJzDNArqyny
+         h+WnOl62r9k2z18YxZlbG5YXJe+nCjJ2+JEeMLojjYteTt9i1cKn4R1xmPT/8brasNFV
+         68PfmUa5hY6kWVUA73yoEFfqQbjGAhPM497fzrp5lLWL7BK0mGh9MtdAZpmvcpaW6g2L
+         QK4D1WLi0LPHYCcauZDaeSCPHjZm8gbgNMzSk7PqvXa1DiLWaQfVRWepof0yLaydvjKN
+         gAoRJzatOTbqTNqXlswK2EHbcyautL+OLQNe5IQ3PdOi8n028FGT5UCi05JChQmCi+jY
+         vj/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712581722; x=1713186522;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=d06Ago2/G5anqicwOggM0K0/XYbwCAxGONLNO2HI/JQ=;
+        b=mOZjuD5tiYnCrAzCCqS7J+nShttDNDnZ6bkXX6qP4hqyulglkikuJnBkf2xa2OqIT0
+         6YQThZVkmfq1To6k8X9NQX3yq88C6Kc0DnSL9PVohVBXZNvAhhmyK/tN3CfvTfB/OkV4
+         53JS1mHFG4m+ifsbyohw3Y85CIRRyhU8jE5rzj56d823X7uh85PD0bsIjn+gpwDORF0P
+         prIc57si1lF8xjQBk8uk25wgMpTwkrBJ4NdXrXIzx/zpsjP3+agcLv/XghnnENpBrs4w
+         XLzHRAoXE4cunbSuLghZzGsgt3ydOXhg+AL0extqY5shDyv884Gon7jvjM6ptdcskacH
+         +7aw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjR0dkHt3ZnrbtbHbRj2DbGQfwEqgaADzmvtD9Gtk+4AJ2YRQP4EUctDK5VZdLehPZFfdWkiPBtWtc9B2gZxYg080GoIIq
+X-Gm-Message-State: AOJu0Yx3M88ccy9xI3wHolCqDNHxU+apzDH7fTL6AQjbufuN1noIpXNk
+	S6IY+IcwuYPXuYT4+hPJ4QNjBhAjPZKJZViFYTfwN0bV9BF+ygzXE/SHDsT7kLX7RPM+19mxIdo
+	RXA==
+X-Google-Smtp-Source: AGHT+IGcg1Ntpbtl+ojQVjIfyP2CUrOqPziIvPtcqCRCiSSD5vtFjGMNukw3ga8LybH10Tc112piZU0ftFc=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a05:6902:2d06:b0:dcd:3a37:65 with SMTP id
+ fo6-20020a0569022d0600b00dcd3a370065mr701394ybb.7.1712581722377; Mon, 08 Apr
+ 2024 06:08:42 -0700 (PDT)
+Date: Mon, 8 Apr 2024 15:08:40 +0200
+In-Reply-To: <20240408093927.1759381-4-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <ZhJX-Rn50RxteJam@Antony2201.local>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+Mime-Version: 1.0
+References: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com> <20240408093927.1759381-4-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZhPsWKSRrqDiulrg@google.com>
+Subject: Re: [RFC PATCH v1 03/10] selftests/landlock: Create 'create' test
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-2024-04-07, 10:23:21 +0200, Antony Antony wrote:
-> Hi Sabrina,
+Hello!
+
+I am very happy to see this patch set, this is a very valuable feature, IMH=
+O! :)
+
+Regarding the subject of this patch:
+
+  [RFC PATCH v1 03/10] selftests/landlock: Create 'create' test
+                                                   ^^^^^^
+
+This was probably meant to say "socket"?
+
+(In my mind, it is a good call to put the test in a separate file -
+the existing test files have grown too large already.)
+
+
+On Mon, Apr 08, 2024 at 05:39:20PM +0800, Ivanov Mikhail wrote:
+> Initiate socket_test.c selftests. Add protocol fixture for tests
+> with changeable domain/type values. Only most common variants of
+> protocols (like ipv4-tcp,ipv6-udp, unix) were added.
+> Add simple socket access right checking test.
 >=20
-> On Fri, Apr 05, 2024 at 11:56:00PM +0200, Sabrina Dubroca via Devel wrote=
-:
-> > Hi Antony,
-> >=20
-> > 2024-04-05, 14:40:07 +0200, Antony Antony wrote:
-> > > This patch introduces the 'dir' attribute, 'in' or 'out', to the
-> > > xfrm_state, SA, enhancing usability by delineating the scope of value=
-s
-> > > based on direction. An input SA will now exclusively encompass values
-> > > pertinent to input, effectively segregating them from output-related
-> > > values.=20
-> >=20
-> > But this patch isn't doing that for existing properties (I'm thinking
-> > of replay window, not sure if any others are relevant [1]). Why not?
+> Signed-off-by: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+> Reviewed-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> ---
+>  .../testing/selftests/landlock/socket_test.c  | 197 ++++++++++++++++++
+>  1 file changed, 197 insertions(+)
+>  create mode 100644 tools/testing/selftests/landlock/socket_test.c
 >=20
-> Thank you for raising this point.  I thought that introducing a patch for=
-=20
-> the replay window check could stir more controversy, which might delay th=
-e=20
-> acceptance of the essential 'dir' feature.
+> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testi=
+ng/selftests/landlock/socket_test.c
+> new file mode 100644
+> index 000000000..525f4f7df
+> --- /dev/null
+> +++ b/tools/testing/selftests/landlock/socket_test.c
+> @@ -0,0 +1,197 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Landlock tests - Socket
+> + *
+> + * Copyright =C2=A9 2024 Huawei Tech. Co., Ltd.
+> + */
+> +
+> +#define _GNU_SOURCE
+> +
+> +#include <errno.h>
+> +#include <linux/landlock.h>
+> +#include <sched.h>
+> +#include <string.h>
+> +#include <sys/prctl.h>
+> +#include <sys/socket.h>
+> +
+> +#include "common.h"
+> +
+> +/* clang-format off */
+> +
+> +#define ACCESS_LAST LANDLOCK_ACCESS_SOCKET_CREATE
+> +
+> +#define ACCESS_ALL ( \
+> +	LANDLOCK_ACCESS_SOCKET_CREATE)
+> +
+> +/* clang-format on */
+> +
+> +struct protocol_variant {
+> +	int domain;
+> +	int type;
+> +};
+> +
+> +struct service_fixture {
+> +	struct protocol_variant protocol;
+> +};
+> +
+> +static void setup_namespace(struct __test_metadata *const _metadata)
+> +{
+> +	set_cap(_metadata, CAP_SYS_ADMIN);
+> +	ASSERT_EQ(0, unshare(CLONE_NEWNET));
+> +	clear_cap(_metadata, CAP_SYS_ADMIN);
+> +}
+> +
+> +static int socket_variant(const struct service_fixture *const srv)
+> +{
+> +	int ret;
+> +
+> +	ret =3D socket(srv->protocol.domain, srv->protocol.type | SOCK_CLOEXEC,
+> +			 0);
+> +	if (ret < 0)
+> +		return -errno;
+> +	return ret;
+> +}
 
-I'm not convinced it's *that* critical. People have someone managed to
-use IPsec without it for all those years. Is the intention to only
-allow setting up IPTFS SAs when this new 'dir' attribute is provided?
-If not, then this patch is not really blocking for IPTFS.
+This helper is mostly concerned with mapping the error code.
 
-And yes, people will sometimes make comments on patches that cause
-delays in getting the patches accepted. Some patches even end up
-getting rejected. The kernel is better thanks to that process, even if
-it can be annoying to the submitter (including me! it would be a lot
-more relaxing if my patches always just went in at v1 :)).
+In the fs_test.c, we have dealt with such use cases with helpers like
+test_open_rel() and test_open().  These helpers attempt to open the file, t=
+ake
+the same arguments as open(2), but instead of returning the opened fd, they=
+ only
+return 0 or errno.  Do you think this would be an option here?
 
-Nicolas, since you were objecting to the informational nature of the
-attribute in v5: would you still object to the new attribute (and not
-just limited to offload cases) if it properly restricted attributes
-that don't match the direction?
+Then you could write your tests as
 
->  My primary goal at this stage is=20
-> to get this basic feature  in and to convince Chris to integrate the "dir=
-"=20
-> attribute into IP-TFS. This patch has partly contributed to the delays in=
-=20
-> IP-TFS's development.
->=20
-> Given your input, I'm curious about the specific conditions you have in=
-=20
-> mind. See the attached patch.
+  ASSERT_EQ(EACCES, test_socket(p->domain, p->type, 0));
 
-I didn't look into details when I wrote that email. The rough idea was
-"Whatever makes the kernel do replay protection on incoming packets"
-(and if any attribute is output-only, skip those on input SAs).
+and the test would (a) more obviously map to socket(2), and (b) keep releva=
+nt
+information like the expected error code at the top level of the test.
 
-> For non-ESN scenarios, the outbound SA should have a replay window set to=
- 0?
+> +
+> +FIXTURE(protocol)
+> +{
+> +	struct service_fixture srv0;
+> +};
+> +
+> +FIXTURE_VARIANT(protocol)
+> +{
+> +	const struct protocol_variant protocol;
+> +};
+> +
+> +FIXTURE_SETUP(protocol)
+> +{
+> +	disable_caps(_metadata);
+> +	self->srv0.protocol =3D variant->protocol;
+> +	setup_namespace(_metadata);
+> +};
+> +
+> +FIXTURE_TEARDOWN(protocol)
+> +{
+> +}
+> +
+> +/* clang-format off */
+> +FIXTURE_VARIANT_ADD(protocol, unspec) {
+> +	/* clang-format on */
+> +	.protocol =3D {
+> +		.domain =3D AF_UNSPEC,
+> +		.type =3D SOCK_STREAM,
+> +	},
+> +};
+> +
+> +/* clang-format off */
+> +FIXTURE_VARIANT_ADD(protocol, unix_stream) {
+> +	/* clang-format on */
+> +	.protocol =3D {
+> +		.domain =3D AF_UNIX,
+> +		.type =3D SOCK_STREAM,
+> +	},
+> +};
+> +
+> +/* clang-format off */
+> +FIXTURE_VARIANT_ADD(protocol, unix_dgram) {
+> +	/* clang-format on */
+> +	.protocol =3D {
+> +		.domain =3D AF_UNIX,
+> +		.type =3D SOCK_DGRAM,
+> +	},
+> +};
+> +
+> +/* clang-format off */
+> +FIXTURE_VARIANT_ADD(protocol, ipv4_tcp) {
+> +	/* clang-format on */
+> +	.protocol =3D {
+> +		.domain =3D AF_INET,
+> +		.type =3D SOCK_STREAM,
+> +	},
+> +};
+> +
+> +/* clang-format off */
+> +FIXTURE_VARIANT_ADD(protocol, ipv4_udp) {
+> +	/* clang-format on */
+> +	.protocol =3D {
+> +		.domain =3D AF_INET,
+> +		.type =3D SOCK_DGRAM,
+> +	},
+> +};
+> +
+> +/* clang-format off */
+> +FIXTURE_VARIANT_ADD(protocol, ipv6_tcp) {
+> +	/* clang-format on */
+> +	.protocol =3D {
+> +		.domain =3D AF_INET6,
+> +		.type =3D SOCK_STREAM,
+> +	},
+> +};
+> +
+> +/* clang-format off */
+> +FIXTURE_VARIANT_ADD(protocol, ipv6_udp) {
+> +	/* clang-format on */
+> +	.protocol =3D {
+> +		.domain =3D AF_INET6,
+> +		.type =3D SOCK_DGRAM,
+> +	},
+> +};
+> +
+> +static void test_socket_create(struct __test_metadata *const _metadata,
+> +				  const struct service_fixture *const srv,
+> +				  const bool deny_create)
+> +{
+> +	int fd;
+> +
+> +	fd =3D socket_variant(srv);
+> +	if (srv->protocol.domain =3D=3D AF_UNSPEC) {
+> +		EXPECT_EQ(fd, -EAFNOSUPPORT);
+> +	} else if (deny_create) {
+> +		EXPECT_EQ(fd, -EACCES);
+> +	} else {
+> +		EXPECT_LE(0, fd)
+> +		{
+> +			TH_LOG("Failed to create socket: %s", strerror(errno));
+> +		}
+> +		EXPECT_EQ(0, close(fd));
+> +	}
+> +}
 
-Looks ok.
+This is slightly too much logic in a test helper, for my taste,
+and the meaning of the true/false argument in the main test below
+is not very obvious.
 
-> And for ESN 1?
+Extending the idea from above, if test_socket() was simpler, would it
+be possible to turn these fixtures into something shorter like this:
 
-Why 1 and not 0?
+  ASSERT_EQ(EAFNOSUPPORT, test_socket(AF_UNSPEC, SOCK_STREAM, 0));
+  ASSERT_EQ(EACCES, test_socket(AF_UNIX, SOCK_STREAM, 0));
+  ASSERT_EQ(EACCES, test_socket(AF_UNIX, SOCK_DGRAM, 0));
+  ASSERT_EQ(EACCES, test_socket(AF_INET, SOCK_STREAM, 0));
+  // etc.
 
-Does setting xfrm_replay_state_esn->{oseq,oseq_hi} on an input SA (and
-{seq,seq_hi} on output) make sense?
-
-
-And xfrm_state_update probably needs to check that the dir value
-matches?  If we get this far we know the new state had matching
-direction and properties, but maybe the old one didn't?
-
-In XFRMA_SA_EXTRA_FLAGS, both XFRM_SA_XFLAG_DONT_ENCAP_DSCP and
-XFRM_SA_XFLAG_OSEQ_MAY_WRAP look like they're only used on output. A
-few of the flags defined with xfrm_usersa_info also seem to work only
-in one direction (XFRM_STATE_DECAP_DSCP, XFRM_STATE_NOPMTUDISC,
-XFRM_STATE_ICMP).
+Would that make the tests easier to write, to list out the table of
+expected values aspect like that, rather than in a fixture?
 
 
-> non-ESN
-> ip xfrm state add src 10.1.3.4 dst 10.1.2.3 proto esp spi 3 reqid 2  \
-> mode tunnel dir out aead 'rfc4106(gcm(aes))' \
-> 0x2222222222222222222222222222222222222222 96 if_id 11 replay-window 10
-> Error: Replay-window too big > 0 for OUT SA.
+> +
+> +TEST_F(protocol, create)
+> +{
+> +	const struct landlock_ruleset_attr ruleset_attr =3D {
+> +		.handled_access_socket =3D LANDLOCK_ACCESS_SOCKET_CREATE,
+> +	};
+> +	const struct landlock_socket_attr create_socket_attr =3D {
+> +		.allowed_access =3D LANDLOCK_ACCESS_SOCKET_CREATE,
+> +		.domain =3D self->srv0.protocol.domain,
+> +		.type =3D self->srv0.protocol.type,
+> +	};
+> +
+> +	int ruleset_fd;
+> +
+> +	/* Allowed create */
+> +	ruleset_fd =3D landlock_create_ruleset(&ruleset_attr,
+> +							sizeof(ruleset_attr), 0);
+> +	ASSERT_LE(0, ruleset_fd);
+> +
+> +	ASSERT_EQ(0,
+> +			landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+> +					&create_socket_attr, 0));
 
-I'd probably change the string to "Replay window should not be set for
-OUT SA", that makes a bit more sense to me. "too big" implies that
-some values are valid, which isn't really the case.
+The indentation looks wrong?  We run clang-format on Landlock files.
 
-> The current impelementation does not replay window 0 with ESN.  Even thou=
-gh=20
-> disabling replay window with ESN is a desired feature.
->=20
-> ip xfrm state add src 10.1.3.4 dst 10.1.2.3 proto esp spi 3 reqid 2 mode=
-=20
-> tunnel dir out flag esn  aead  'rfc4106(gcm(aes))'  \
-> 0x2222222222222222222222222222222222222222 96 if_id 11 replay-window 10
-> Error: ESN replay-window too big > 1 for OUT SA.ww
->=20
-> I wonder would the attached patch get accepted quickly.
+  clang-format -i security/landlock/*.[ch] \
+  	include/uapi/linux/landlock.h \
+  	tools/testing/selftests/landlock/*.[ch]
 
-I'm more interested in getting things right if we're going to
-introduce a new bit of API. IMO a new "dir" attribute that doesn't
-fully lock down the options on an SA is worse than no attribute (as
-Nicolas said previously, it's really confusing).
-And I'm not that familiar with all the API for xfrm SAs, so the
-properties I listed above may not be everything we should lock down
-(and maybe some are wrong).
-
-I think it would also make sense to only accept this attribute in
-xfrm_add_sa, and not for any of the other message types. Sharing
-xfrma_policy is convenient but not all attributes are valid for all
-requests. Old attributes can't be changed, but we should try to be
-more strict when we introduce new attributes.
-
-Sorry that I didn't notice this when you posted the previous versions.
-
---=20
-Sabrina
-
+=E2=80=94G=C3=BCnther
 
