@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-85760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69B5789BFC4
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:02:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A166489BFC5
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:02:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDD921F22CC2
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:02:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 429381F2326E
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4641C7D3F6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A27A7D3F8;
 	Mon,  8 Apr 2024 13:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aZcReh+N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJm6G0i9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165AB7BAFD
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E9F7CF29;
+	Mon,  8 Apr 2024 13:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712581228; cv=none; b=eNoKJby+ccCzBIB/UUc5YwfgCRgHOMRvhcQGF1n3peAtp+BVxkLVEDrp+U1ZmNS2uDsyshWiH7A50N7ps129paLEgjzSLTv6wS4LX5EcP4g4QBID3J+Cqeax0iUplDgRETdYpDSnFf4uZK67036TDV0PGGGi7dbw7HRoVehUwPE=
+	t=1712581228; cv=none; b=F89Lc2NpreSxZ4wtN3yUud3as+O4l3Q1XqzNhohzQ6nGiOj776q7uGsM44i4mvzNLlFAdxFYa6gziHqtIl8E+AFDIMZL0kZMzGGRZ4da2/ud0CX01Jx94Jn7N4MI7/f9vvvdAh1z1q995t7bArpMTvm8BdN7N/miRlp3UGwhAvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712581228; c=relaxed/simple;
-	bh=y6vZPoZt1ulbLLsdseWh5p+rOS0K30RZlRcO9RRLmxs=;
+	bh=SKmIkCuasOmtGJF2nICPyAm5mULG4Q7bUsyMXCdFlb0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BuM19DLKPTW8690mTdYgP5i7asZWhI9Sk/wbUElbzMQHsTCVZA5oeSm8ssDwGJQ4/124Wbi+rlJJYqatC++lMFQQTbf4ivjtuNpjwEzVFYGb3ewWcYEraOq2rFXEFYNUkchLaeUfJlcgOdGCN0Buy4LzA3uLCpE0Vec1/hcySrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aZcReh+N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C7EFEC43390;
-	Mon,  8 Apr 2024 13:00:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MugC8HKfPzEGJO7LtBHFJrgKS6rUM+rOKtAZ17Xhkh/9ulFNfpnl+VsXr7C9GhXwdcE85fbrvzQ/mFcjxAwZfdNH459L4G8ZsVGlFeqG5k5tCWMtT26NZ3MuPEKC/4vCBCCtKK9+BTsLX0NaFF3+kJiELYUauDL1kQQpW4INDbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJm6G0i9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D530C433A6;
+	Mon,  8 Apr 2024 13:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712581227;
-	bh=y6vZPoZt1ulbLLsdseWh5p+rOS0K30RZlRcO9RRLmxs=;
+	s=k20201202; t=1712581228;
+	bh=SKmIkCuasOmtGJF2nICPyAm5mULG4Q7bUsyMXCdFlb0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aZcReh+NnK+NSPRp1bcwSgfHTgehqg2VJsEunF/8IoRKWvVGoetSA2oau8tOP6qC8
-	 tA8zvEE5epUbfw3jsumT70Ci/C/v6VRe8eUFr4yM2SwhbxAG+ReSWi46rlBmFavFM8
-	 9vfw2cSEzOGnwL2AdtzB8qaHHWw1kQ8l3vtbNupMwAPBAlt0tpjHw/tHjQlQjohfY2
-	 4GmO0nl5LqdjaId5PhNGY8I/mdps1oNLTbPg6YhjSEXredGkhM4Tec5PzkMY1xDNsH
-	 77AGlYo5+RnHPlVkmKVGH6+g9+rrYl6BZQdgpX8Km/WABFsgGqVK9QoRLY3K6kKccs
-	 j07x5IyvyVZdg==
+	b=NJm6G0i9sZk5lxrRxqDJK4K1dka3lgf31PO44tIglEge4ShH1f2Pw6bJgonptaPp6
+	 HHs55XoTlmYZq9i2qfz/FmPFbVX2NZIDXYxESG5BgFl5bAfi6X3Oo+6AMCNtVsRoEH
+	 ZIDCIBz9koOqsG8iukVdZNEniRhbp0s74ro/bMpJS48w/7E2zDgdGccJ0c4c6cN9Wk
+	 o4FRgQ5kIS9T+KFqtKdDo1fHJf926pDbW/T/ds14ZSiqjqrGeu2lRJGXWEbWXhHrIv
+	 JoqHVZoJzEyFpsDH71LFz6ICt7j8Rk0EY11xac0108N9TtYHVRP7u9TleduP6vjHaS
+	 SpRjnoDo2Yjxw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C093FC54BD4;
-	Mon,  8 Apr 2024 13:00:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 024DBC54BD6;
+	Mon,  8 Apr 2024 13:00:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] bnxt_en: Bug fixes
+Subject: Re: [PATCH net-next v2] mptcp: add reset reason options in some places
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171258122778.2224.18057783618226624946.git-patchwork-notify@kernel.org>
-Date: Mon, 08 Apr 2024 13:00:27 +0000
-References: <20240405235513.64668-1-michael.chan@broadcom.com>
-In-Reply-To: <20240405235513.64668-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com
+ <171258122800.2224.8882516894860681833.git-patchwork-notify@kernel.org>
+Date: Mon, 08 Apr 2024 13:00:28 +0000
+References: <20240406014848.71739-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20240406014848.71739-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, matttbe@kernel.org, martineau@kernel.org,
+ geliang@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ kernelxing@tencent.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri,  5 Apr 2024 16:55:10 -0700 you wrote:
-> The first 2 patches fix 2 potential issues in the aux bus initialization
-> and error recovery paths.  The 3rd patch fixes a potential PTP TX
-> timestamp issue during error recovery.
+On Sat,  6 Apr 2024 09:48:48 +0800 you wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> Pavan Chebbi (1):
->   bnxt_en: Reset PTP tx_avail after possible firmware reset
+> The reason codes are handled in two ways nowadays (quoting Mat Martineau):
+> 1. Sending in the MPTCP option on RST packets when there is no subflow
+> context available (these use subflow_add_reset_reason() and directly call
+> a TCP-level send_reset function)
+> 2. The "normal" way via subflow->reset_reason. This will propagate to both
+> the outgoing reset packet and to a local path manager process via netlink
+> in mptcp_event_sub_closed()
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] bnxt_en: Fix possible memory leak in bnxt_rdma_aux_device_init()
-    https://git.kernel.org/netdev/net/c/7ac10c7d728d
-  - [net,2/3] bnxt_en: Fix error recovery for RoCE ulp client
-    https://git.kernel.org/netdev/net/c/b5ea7d33ba2a
-  - [net,3/3] bnxt_en: Reset PTP tx_avail after possible firmware reset
-    https://git.kernel.org/netdev/net/c/faa12ca24558
+  - [net-next,v2] mptcp: add reset reason options in some places
+    https://git.kernel.org/netdev/net-next/c/382c60019ee7
 
 You are awesome, thank you!
 -- 
