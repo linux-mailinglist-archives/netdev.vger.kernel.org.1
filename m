@@ -1,151 +1,173 @@
-Return-Path: <netdev+bounces-85919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADAB389CDA3
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:35:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B25089CDAD
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:36:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29DD1C21814
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:35:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03C791F255AF
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C4814882B;
-	Mon,  8 Apr 2024 21:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C751487C5;
+	Mon,  8 Apr 2024 21:36:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yw1T7jLk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XhhNxxi0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA651487E0
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 21:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF3E1442F3;
+	Mon,  8 Apr 2024 21:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712612105; cv=none; b=d+VpTfoACvGu7YtO1UV30gjlIMT0VsU0bkvwSW46d8LPNPc1md/2abWnkHGNMPEexh9CWebm+5CCSbwZxRrzxfoJSXL4JotIc/h7upOwoYgo4VSivXayQxW5zY16bcvxk/hoEeA/2JyC2qIN50UQwYKd+rZuL+e70GwW6fomkHY=
+	t=1712612212; cv=none; b=XwZ9EeLAXpRdrnG1KpktziJDYd+Y39d/6oLcZn85/1Ns28TicfHgd+mnfAUdkyFMzc1faeH/jmaPDSzukfzsU5aLih0sJ2HCBN5w/jph4QiKW3qapVe9TRhCx378e2gNu4GZsiyPBWKFtBOeLdTb21fc1pCB1tEfNkUAKz7SOO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712612105; c=relaxed/simple;
-	bh=/nOvjmJ91jQb+qzpXpfMlSnSf1RVGQ++/tlSfZTbIVA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AdNpc4gnxCs0RXuSdx4XY3yRwVJtelu7KDTGVsTahm6fzV/GMj2XPIp7kGTdSnJ2siGPxCxItfjPNEOKJ68Sl/XCNs1IciBLp32bafo0EIk2i/V8vZwktmn51RV0/N6sbhqs4sWhAkmh/JYZXAgUp3sos41TlGttFH9ELBcf6vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yw1T7jLk; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7c8d2e0e9cfso131685139f.1
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 14:35:03 -0700 (PDT)
+	s=arc-20240116; t=1712612212; c=relaxed/simple;
+	bh=+fk1YFrgP1RijMlaqGbsWmb4JPRxZeRgA50F2z9IF9g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iJLr1cq00H75LvsBYJLbx2ydmZQhfNR+X2eOCEGu3aanpwzmOtYvZqLSq6Dk0d4cHFCVilI8UHumXFu2Br3ci+4sp4ggh2P2P1VBUByTkLP8ML2lsFXjOgjEpPPheTqe3doe5FFcLXJbBvgcUUInBeQYxd4DZrStmEEN+EPItro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XhhNxxi0; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-78d575054c8so139280585a.3;
+        Mon, 08 Apr 2024 14:36:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712612103; x=1713216903; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vt9E9ocYakJzoJGxxxpSMK28+2pLBkDtvg+Rt4wpS/Q=;
-        b=Yw1T7jLkSiefvwt/qMGREgvc9VQGG5sr3wNYRcFJoaYLVQM6wj3PebMjPYw9dQavXp
-         h8mgm3J31ip2SNeyMH6lp9TcjLSBIBdXrTDR9jHDE4wVda0A0Hl08blxp8y0Xm4u9WhE
-         QjQaI5EMoSEBnHanooBk5xgsbb1Imi4c8WbvbYPhK1t0GNDC6aXWjW+aHFwM7+j0r7bX
-         ypGy/EvnAUNMrBiVvtLUKS1CR0Yhl9WuKlsgC7ClDF1nEyVra3XnRgdQ8NztxpQr2RPK
-         te6vPfZQ7hrkWIFdAV+RTH/+FzgxLkmJwPbWNLRSQEOpspIQTqJAvLmMpjV7gDiHyP+/
-         aJjw==
+        d=gmail.com; s=20230601; t=1712612209; x=1713217009; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0a7cIgoqwCVBrfTgB2VfnvqDS5iR7DqyhxTtY9g5hWY=;
+        b=XhhNxxi0iD4wxzojA3Qvs1QKD79kvEoJns10bdOmQIkID5FXmWPhlF4Ojeq382hw/G
+         6dji7MGIbQaRJ5/CtURXyc/B1vRndfJ/fz8a/Kwi/ehuQ5OQzxtBm9kdlgELNvLcvcPP
+         ky3/FFZV4btjl2idlM2hEdDTgyHgd5+swWtnaXmQM/Sg7vPSBiyJ3iK/fcymgaQywpyI
+         tA255PJq+F9QG/4KfUYantuU8WmznEaFk5J5NyCx49WjNmvBaTpDaML9cyQm8yMWGJ2u
+         lJhdHesqIgcOXQTjiCpQbiAaOg2vQmzl0SGGhhF4YWXEjn3H94RLWuwHXkpgsxrSo8BX
+         yWlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712612103; x=1713216903;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vt9E9ocYakJzoJGxxxpSMK28+2pLBkDtvg+Rt4wpS/Q=;
-        b=LSqQ42vmjcCaFYaBfPSBy7OvsuSj81HqZgGcQ/cDHcJfAyp0DjdnmgX0eWFyDadj0f
-         GSgTO3QlGYrPiBfPSrelTM/CteyMGLUkJB7dmlfsqzLcBMQlK/TY+vhxlXdpwMxpj+kY
-         lJm250j0jYalcukFzE2xVjHgcai2U5YVCJOTuMOP0ZmfdWJqpgS04m0ajTJi3GMWHt+C
-         b+0v41jvbBZwlHUNdGP2tZ4cjc4DsWlBSX1frCc5EPKWiDcmyn02Dg7a8rRh5cGGkZpv
-         dJcEzMpVEOhocwKInbGzSuYla5ofgUed+gQPBOlJTV72VHe3T6vKshBtOyt/rsXQA/iO
-         iLig==
-X-Forwarded-Encrypted: i=1; AJvYcCUAX26/hQEXV9oH2vw2bmaKiTr42JNwRS7QjjsyFpA7XvXIuv78VHwpA6f9y6WABn1/12Ot4uyEbDvGL6zVnrgwYhtKmdFb
-X-Gm-Message-State: AOJu0YzgkS/0vx5vzaHkP/9mzrE57Ucc8q2z/SjwkKqGbh13qS8pzrjK
-	5aIurwtyqFU6MyWjyarlTY9OYbwwJbTV3lfihw5LPfa8kN/kJFG/0fh/4iKxng==
-X-Google-Smtp-Source: AGHT+IEdFSK5QqqKt9qncsKp7ryKn9H+Sg05GW6WePIo293/2ywIdxNeDfZ0TNP8GETEknDCzR6JAA==
-X-Received: by 2002:a05:6602:3946:b0:7d5:f931:c48e with SMTP id bt6-20020a056602394600b007d5f931c48emr3089366iob.17.1712612102715;
-        Mon, 08 Apr 2024 14:35:02 -0700 (PDT)
-Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
-        by smtp.gmail.com with ESMTPSA id ep7-20020a0566024b8700b007d06f222614sm2590462iob.32.2024.04.08.14.35.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 14:35:01 -0700 (PDT)
-Date: Mon, 8 Apr 2024 21:34:59 +0000
-From: Justin Stitt <justinstitt@google.com>
-To: Erick Archer <erick.archer@outlook.com>
-Cc: Long Li <longli@microsoft.com>, Ajay Sharma <sharmaajay@microsoft.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kees Cook <keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Shradha Gupta <shradhagupta@linux.microsoft.com>, 
-	Konstantin Taranov <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	llvm@lists.linux.dev
-Subject: Re: [PATCH v3 1/3] net: mana: Add flex array to struct
- mana_cfg_rx_steer_req_v2
-Message-ID: <zrqicnpeu52n42yulmrupxmrejd7mhbsu35ycd2bgfjz6gmm2a@dtpv5qdxhmnu>
-References: <20240406142337.16241-1-erick.archer@outlook.com>
- <AS8PR02MB7237E2900247571C9CB84C678B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1712612209; x=1713217009;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0a7cIgoqwCVBrfTgB2VfnvqDS5iR7DqyhxTtY9g5hWY=;
+        b=mjo9sl70b+HETi9rlVkT0xUXTIELD7dmU6gkgPB85FUo2dILQm8+v3GS4iGREdlNzC
+         p8Gq+5hnT80XzztKLXyhXB+biiKKoIcc0CIuacle/iRHTPqKdlbF1Ebag/rIonyElKB8
+         oOeFlZGLwkhOogNqutSiy74Y5/aDrZtCMVOHoQip4Z/gBFvm/uzhDxis828CxJNleTPV
+         gOS+L6LyD9090p3UoxlIOo0tZSMM8t538nDQh9SAPGfi9t2kNwFgNq1i+JIudacuvOS0
+         Vqwc3YdSDMfhNsZq9EKgzYJranWDit9o/i1A1BQvRB2t9dBI+2jxMQW7HpRpByPLSQ5F
+         zBRA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+kEEj1hGO5YQ/jzsOF33t4Z6SKmqa+kVsPNExIk/8na16RfZXNcdVEX04ib+fYfep+TwhUzTc6cz9gEAK3IhBjN4HC+jjDNWm485MGaAlK594V804Jp2rUoPNpcnH6npY
+X-Gm-Message-State: AOJu0YwL9XcJ3nJ3vinH6yARNctHKllp/RrkXpBZ5J9EP3zXcW2uIidP
+	KsLJX+tVQYNjxsAXkXyA9wYJFz71AJgxIzXAis4htTKyvZCj39Gr
+X-Google-Smtp-Source: AGHT+IEBMCCFVf+5E9G2JwsWX6Wih3gNqk9OyU2aGFjVg2hyj+32gzvxHI7zZq8fb7ORDJBjkULS5A==
+X-Received: by 2002:a05:620a:3b89:b0:78d:5079:7c3f with SMTP id ye9-20020a05620a3b8900b0078d50797c3fmr8058507qkn.75.1712612209140;
+        Mon, 08 Apr 2024 14:36:49 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id d7-20020a05620a158700b0078d5f7b9a2dsm2160980qkk.15.2024.04.08.14.36.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Apr 2024 14:36:48 -0700 (PDT)
+Message-ID: <ae67d1a6-8ca6-432e-8f1d-2e3e45cad848@gmail.com>
+Date: Mon, 8 Apr 2024 14:36:42 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS8PR02MB7237E2900247571C9CB84C678B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org,
+ Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+ Christoph Hellwig <hch@lst.de>
+References: <660f22c56a0a2_442282088b@john.notmuch>
+ <20240404165000.47ce17e6@kernel.org>
+ <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+ <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
+ <20240405122646.GA166551@nvidia.com>
+ <CAKgT0UeBCBfeq5TxTjND6G_S=CWYZsArxQxVb-2paK_smfcn2w@mail.gmail.com>
+ <20240405151703.GF5383@nvidia.com>
+ <CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
+ <ZhPaIjlGKe4qcfh_@nanopsycho>
+ <CAKgT0UfcK8cr8UPUBmqSCxyLDpEZ60tf1YwTAxoMVFyR1wwdsQ@mail.gmail.com>
+ <ZhQgmrH-QGu6HP-k@nanopsycho>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <ZhQgmrH-QGu6HP-k@nanopsycho>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On 4/8/24 09:51, Jiri Pirko wrote:
+> Mon, Apr 08, 2024 at 05:46:35PM CEST, alexander.duyck@gmail.com wrote:
+>> On Mon, Apr 8, 2024 at 4:51 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>>
+>>> Fri, Apr 05, 2024 at 08:38:25PM CEST, alexander.duyck@gmail.com wrote:
+>>>> On Fri, Apr 5, 2024 at 8:17 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>>>
+>>>>> On Fri, Apr 05, 2024 at 07:24:32AM -0700, Alexander Duyck wrote:
+>>>>>>> Alex already indicated new features are coming, changes to the core
+>>>>>>> code will be proposed. How should those be evaluated? Hypothetically
+>>>>>>> should fbnic be allowed to be the first implementation of something
+>>>>>>> invasive like Mina's DMABUF work? Google published an open userspace
+>>>>>>> for NCCL that people can (in theory at least) actually run. Meta would
+>>>>>>> not be able to do that. I would say that clearly crosses the line and
+>>>>>>> should not be accepted.
+>>>>>>
+>>>>>> Why not? Just because we are not commercially selling it doesn't mean
+>>>>>> we couldn't look at other solutions such as QEMU. If we were to
+>>>>>> provide a github repo with an emulation of the NIC would that be
+>>>>>> enough to satisfy the "commercial" requirement?
+>>>>>
+>>>>> My test is not "commercial", it is enabling open source ecosystem vs
+>>>>> benefiting only proprietary software.
+>>>>
+>>>> Sorry, that was where this started where Jiri was stating that we had
+>>>> to be selling this.
+>>>
+>>> For the record, I never wrote that. Not sure why you repeat this over
+>>> this thread.
+>>
+>> Because you seem to be implying that the Meta NIC driver shouldn't be
+>> included simply since it isn't going to be available outside of Meta.
+>> The fact is Meta employs a number of kernel developers and as a result
+>> of that there will be a number of kernel developers that will have
+>> access to this NIC and likely do development on systems containing it.
+>> In addition simply due to the size of the datacenters that we will be
+>> populating there is actually a strong likelihood that there will be
+>> more instances of this NIC running on Linux than there are of some
+>> other vendor devices that have been allowed to have drivers in the
+>> kernel.
+> 
+> So? The gain for community is still 0. No matter how many instances is
+> private hw you privately have. Just have a private driver.
 
-On Sat, Apr 06, 2024 at 04:23:35PM +0200, Erick Archer wrote:
-> The "struct mana_cfg_rx_steer_req_v2" uses a dynamically sized set of
-> trailing elements. Specifically, it uses a "mana_handle_t" array. So,
-> use the preferred way in the kernel declaring a flexible array [1].
-> 
-> At the same time, prepare for the coming implementation by GCC and Clang
-> of the __counted_by attribute. Flexible array members annotated with
-> __counted_by can have their accesses bounds-checked at run-time via
-> CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE (for
-> strcpy/memcpy-family functions).
-> 
-> This is a previous step to refactor the two consumers of this structure.
-> 
->  drivers/infiniband/hw/mana/qp.c
->  drivers/net/ethernet/microsoft/mana/mana_en.c
-> 
-> The ultimate goal is to avoid the open-coded arithmetic in the memory
-> allocator functions [2] using the "struct_size" macro.
-> 
-> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#zero-length-and-one-element-arrays [1]
-> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [2]
-> Signed-off-by: Erick Archer <erick.archer@outlook.com>
+I am amazed and not in a good way at how far this has gone, truly.
 
-I think this could have all been one patch, I found myself jumping
-around the three patches here piecing together context.
+This really is akin to saying that any non-zero driver count to maintain 
+is a burden on the community. Which is true, by definition, but if the 
+goal was to build something for no users, then clearly this is the wrong 
+place to be in, or too late. The systems with no users are the best to 
+maintain, that is for sure.
 
-Reviewed-by: Justin Stitt <justinstitt@google.com>
+If the practical concern is wen you make tree wide API change that fbnic 
+happens to use, and you have yet another driver (fbnic) to convert, so 
+what? Work with Alex ahead of time, get his driver to be modified, post 
+the patch series. Even if Alex happens to move on and stop being 
+responsible and there is no maintainer, so what? Give the driver a 
+depreciation window for someone to step in, rip it, end of story. 
+Nothing new, so what has specifically changed as of April 4th 2024 to 
+oppose such strong rejection?
 
-> ---
->  include/net/mana/mana.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> index 4eeedf14711b..561f6719fb4e 100644
-> --- a/include/net/mana/mana.h
-> +++ b/include/net/mana/mana.h
-> @@ -670,6 +670,7 @@ struct mana_cfg_rx_steer_req_v2 {
->  	u8 hashkey[MANA_HASH_KEY_SIZE];
->  	u8 cqe_coalescing_enable;
->  	u8 reserved2[7];
-> +	mana_handle_t indir_tab[] __counted_by(num_indir_entries);
->  }; /* HW DATA */
->  
->  struct mana_cfg_rx_steer_resp {
-> -- 
-> 2.25.1
-> 
+Like it was said, there are tons of drivers in the Linux kernel that 
+have a single user, this one might have a few more than a single one, 
+that should be good enough.
 
-Thanks
-Justin
+What the heck is going on?
+-- 
+Florian
+
 
