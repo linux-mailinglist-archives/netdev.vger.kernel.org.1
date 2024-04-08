@@ -1,129 +1,170 @@
-Return-Path: <netdev+bounces-85925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E141B89CDD5
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:52:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D977289CE31
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 00:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E71CB224DA
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:52:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CD12B21476
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 22:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C60E7E8;
-	Mon,  8 Apr 2024 21:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgt4hJF5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B03148FEE;
+	Mon,  8 Apr 2024 22:03:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05B6146D74;
-	Mon,  8 Apr 2024 21:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9875E147C71
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 22:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712613138; cv=none; b=VKG0H6vEPafixxG2anErUR88ZYTt5W1C/Q3oZP5f2+jeLdpGWdbkwAxRf1sFj+e+C5ZQ4kqg2jt9P7nqywIoM1Hsv8kYRlDCKfQKhG6SupYTFAHWT8RdVtCLmiGXd+7OTosvi4tpbm3mvq86YaFxumG84Nob4hAEgLqPCr3VLzw=
+	t=1712613786; cv=none; b=GW4GPDaaiWeHKuOsR5f60srgVce9wNr/6QC6qGF/EuPSNfT6d2RKAAxhudhDdRlESwjPfPNo7XZgthJUS2Qc29VANVhGfr9GN5LKPoCYidX3sgZBQJ73zWrBZBMR4GZ3NWXuF69njX77gcqP9iSHI2jnXKO2aKMFNvbWwvKuGl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712613138; c=relaxed/simple;
-	bh=hb9SYQFj2t1P28x3CX/m54HgTRWoaz+drxkpDylTfDw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=JXYkLbs2sXAcfQPYvbDgre96sHcwxezrsC/pM0ZUPc/laZ4DGA4g4e8PGONjAcw6CLv/aHcK3N5HSXyiweoDkAG/zdUyJRFf0KAEXddwJRBJOh72rPhqwb1n4dEATUJtsPKwgh07MM50PfRs62TqafkTOeEqbIYmXCYzt3lhf3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cgt4hJF5; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-7e057fb0b69so1160353241.0;
-        Mon, 08 Apr 2024 14:52:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712613135; x=1713217935; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BzpOdXd2P0az+B4oPxEYqAXzG6a93+7qUz8cfvKLvLU=;
-        b=cgt4hJF5lUZoGE2BMK9KKgRBSsjq3Ovre2W5U2518DbOD7MIgQhobPjKICP0nljO6/
-         3DzifBrLJxEaa9NCTIA5rftls6XDu11fiDcPShaiifgr2/pMCfqsL0hgK6Vq4LXn9xh1
-         P1lxS++3OI/nlpXmt0zh5rcl7WHd20pYzTNGDGUaoypcs+uQX3ouqlF8kqxIh4GH0fkG
-         g2xSLM28qUoBNqqHUs9IVc3hGVoDNF3dHCoFqYely7MyjKErGPCRYP69g7ZRQL92MKOb
-         kafAuMSr4SD70q8aERxKXg0mjjaB6CHCo+Jesjo/cqjmK8GoVldx660P2z/9WrVkr02d
-         PoKw==
+	s=arc-20240116; t=1712613786; c=relaxed/simple;
+	bh=JP6s7i2VAFiUd/EYR6e9JUfTFhs5g17RVYGi9G44oxI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=fSQIMyaPdBkIWKVg4zUY9B01AtUka6DiVhyBvPtjgpJy2b2gzqG5ee0i9A7lu237wPAFg5T9Wm3Plji8zlvJYDmhnre3cgvKDRN+DbYtagMhjdZazJ4bgrHzbTIo+vyL7PDu+D+TGk6RV2PnLgYZghXSsxLXEzLApLaZ6/REdkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7d5efba3f8fso130149239f.2
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 15:03:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712613135; x=1713217935;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1712613784; x=1713218584;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BzpOdXd2P0az+B4oPxEYqAXzG6a93+7qUz8cfvKLvLU=;
-        b=VFp9jbuKzi9h2xYU5LvjnckDdxkPbHjPo0CmEb/JAKI+hQA4Jn3IP6W4OCacvr86Pg
-         L5vfeMxS+k3JPmKXZkax9BrdKVq8YuPD81gBw3bYHjpm7m/75e8k0re9x8Ml//uBf3QV
-         ihj0JE1tLv6c1yC/9Pa0bXcpYCmzC/F4ycYxXRdcuCyum1u5KSHwWJPbdwHZTBb1DHAB
-         SE5PkyFUHZVMtP4rA9ty8Z2kJ02FvyL1eolaUqOiQMox4oPqibQxV90W88oamjbhy6V8
-         ABSloUWi1bnA34tGsUUNBzGb9enLNwXKMPP0c7tkFJb7SNcaetkhGEjcm4XPuI/eReCY
-         MkkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAKTB9iBYEcviYa+GEbh4YtxkOvJoXeiZlwc/4z3A5kFAA1jhyJfN7LmMumKmF2AOpjCn+hb+45w/GoGtLLhjNuWeu03ion3o0KtKkj1IHtS3GzAmiYhjTeE7h2WxVG1/T
-X-Gm-Message-State: AOJu0YxotNDn+FRDdtX11Vx6zF4dngBtD9V81zxh/PQFg9tsk9uCuL2w
-	FVZqxKqxD9BiWxGlHe5hsw74l7dOPyIsTA19oBnBwxOD7vXqA89W
-X-Google-Smtp-Source: AGHT+IHO9B9Y+hNiUlJchmPGO1bfla/oVAYbPDtR59a/yutgGUGcgccRztyGfHpnEXp0JW+cccfCVQ==
-X-Received: by 2002:a05:6102:292b:b0:479:e377:2c2d with SMTP id cz43-20020a056102292b00b00479e3772c2dmr8776468vsb.32.1712613135444;
-        Mon, 08 Apr 2024 14:52:15 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id p5-20020a0cfac5000000b006987272f5cbsm3456831qvo.71.2024.04.08.14.52.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Apr 2024 14:52:14 -0700 (PDT)
-Message-ID: <ab38046a-a56d-43c9-85de-157e88ad2053@gmail.com>
-Date: Mon, 8 Apr 2024 14:52:04 -0700
+        bh=IsU/sMnc5XA5zrqfRklHsN/3Qe43gMvrpG8RMn/HvFU=;
+        b=Dt8qzRrd6uwtDfBrLCZs0Ye53FOIyI0aqfplaCopxMKJpgX6RcWZl6TJmp9UVjQuG1
+         fxVeQIhXtmOJMCJhJlvAB7CFzq6VJZptr3gJXyxjZWbTAIMwiKuJMMQc+xUdYtU8mJbi
+         Dtoat5f2Drwom1NKkMv85rrJPMrKeKEzjHEL91xiY9R6T6edMfuU6Ad2X3xYix3KgC1z
+         LWzRdWUsba/2r8hsV/boDtgTevAW+ob8zEsHP41ztiNUUOvMt/bEgvrkl7yWOO+lfa6Y
+         JBDhjmeV90SQ0jR5ryr/YhUE0zebf7oIF2/7wzuqL7OEy2sdFESodI9f/jbWlw0Mw0IH
+         dwOg==
+X-Forwarded-Encrypted: i=1; AJvYcCVc7R0982EMLquYrVhxMNfnszSQoz5fgqCj08FnEYHS0haLoHoUeQ2+8C4hMQ4dk1g+eYTATCRIlIK7oobKhdZm0dNCMFVm
+X-Gm-Message-State: AOJu0Ywe/SmzFp4CKz1nOfPqFUh6rCAeICWl6QTHxLEt2DRRCGGwhNgY
+	94STo8q7s6A2D9FeJt5hWodD+qG2gITaKOviKUXo5a7sE8xMmneW6UN7KESa0fKE0wJ4zd5I1l+
+	NASUhxpwSqgsRxn616571Yz/AtUWtwhbwrC14Yp89R33ubeLfP7vooR8=
+X-Google-Smtp-Source: AGHT+IEPOHz0i+nN8HqthsqApsGr1SefiMjoA0B/9H3y5BTbULzhEg6xxFL96D9wa7V1QqI3ydnVCjNIsG3KZ2gRXU83iFGadQQI
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-To: Alexander Duyck <alexander.duyck@gmail.com>,
- Leon Romanovsky <leon@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org,
- Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
- pabeni@redhat.com
-References: <Zg7JDL2WOaIf3dxI@nanopsycho>
- <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
- <20240404132548.3229f6c8@kernel.org> <660f22c56a0a2_442282088b@john.notmuch>
- <20240404165000.47ce17e6@kernel.org>
- <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
- <20240404193817.500523aa@kernel.org>
- <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
- <20240408061846.GA8764@unreal>
- <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
- <20240408184102.GA4195@unreal>
- <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
- <73ef7e23-d09d-42ec-8a11-0a42b8b6e459@gmail.com>
-In-Reply-To: <73ef7e23-d09d-42ec-8a11-0a42b8b6e459@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6638:4115:b0:47e:c165:74dc with SMTP id
+ ay21-20020a056638411500b0047ec16574dcmr585913jab.5.1712613783927; Mon, 08 Apr
+ 2024 15:03:03 -0700 (PDT)
+Date: Mon, 08 Apr 2024 15:03:03 -0700
+In-Reply-To: <877ch7hnxf.fsf@toke.dk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003a924406159cf8ee@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue
+From: syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eadavis@qq.com, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	toke@kernel.org, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/8/24 14:49, Florian Fainelli wrote:
-> On 4/8/24 13:43, Alexander Duyck wrote:
->>>>
->>>> Also as far as item 3 isn't hard for it to be a "user-visible"
->>>> regression if there are no users outside of the vendor that is
->>>> maintaining the driver to report it?
->>>
->>> This wasn't the case. It was change in core code, which broke specific
->>> version of vagrant. Vendor caught it simply by luck.
->>
->> Any more info on this? Without context it is hard to say one way or 
->> the other.
-> 
-> Believe this is the thread in question:
-> 
-> https://lore.kernel.org/netdev/MN2PR12MB44863139E562A59329E89DBEB982A@MN2PR12MB4486.namprd12.prod.outlook.com/
+Hello,
 
-And the follow up:
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+general protection fault in dev_map_enqueue
 
-https://lore.kernel.org/netdev/14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com/
--- 
-Florian
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 8787 Comm: syz-executor.0 Not tainted 6.8.0-syzkaller-05236-g443574b03387-dirty #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 a6 42 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 10 8a 3b 00 4c 8b 7d 00 48 83 c5
+RSP: 0018:ffffc9000bc1f688 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888011815a00
+RDX: 0000000000000000 RSI: ffff88802bed7070 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff90e
+R10: 0000000000000004 R11: ffff888011815a00 R12: ffff888022f4a000
+R13: ffff88802bed7070 R14: dffffc0000000000 R15: ffff8880b943c088
+FS:  00007f0b6b2916c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0b6a5a80c0 CR3: 000000002dad2000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __xdp_do_redirect_frame net/core/filter.c:4384 [inline]
+ xdp_do_redirect_frame+0x20d/0x4d0 net/core/filter.c:4438
+ xdp_test_run_batch net/bpf/test_run.c:337 [inline]
+ bpf_test_run_xdp_live+0xf0b/0x1f10 net/bpf/test_run.c:385
+ bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1268
+ bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
+ __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7f0b6a47dda9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f0b6b2910c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f0b6a5abf80 RCX: 00007f0b6a47dda9
+RDX: 0000000000000050 RSI: 0000000020000240 RDI: 000000000000000a
+RBP: 00007f0b6a4ca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f0b6a5abf80 R15: 00007ffe8c70ed58
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 a6 42 d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 10 8a 3b 00 4c 8b 7d 00 48 83 c5
+RSP: 0018:ffffc9000bc1f688 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888011815a00
+RDX: 0000000000000000 RSI: ffff88802bed7070 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff894ff90e
+R10: 0000000000000004 R11: ffff888011815a00 R12: ffff888022f4a000
+R13: ffff88802bed7070 R14: dffffc0000000000 R15: ffff8880b943c088
+FS:  00007f0b6b2916c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0b6a5a80c0 CR3: 000000002dad2000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	41 56                	push   %r14
+   2:	41 55                	push   %r13
+   4:	41 54                	push   %r12
+   6:	53                   	push   %rbx
+   7:	48 83 ec 18          	sub    $0x18,%rsp
+   b:	49 89 d4             	mov    %rdx,%r12
+   e:	49 89 f5             	mov    %rsi,%r13
+  11:	48 89 fd             	mov    %rdi,%rbp
+  14:	49 be 00 00 00 00 00 	movabs $0xdffffc0000000000,%r14
+  1b:	fc ff df
+  1e:	e8 a6 42 d8 ff       	call   0xffd842c9
+  23:	48 89 e8             	mov    %rbp,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	48 89 ef             	mov    %rbp,%rdi
+  34:	e8 10 8a 3b 00       	call   0x3b8a49
+  39:	4c 8b 7d 00          	mov    0x0(%rbp),%r15
+  3d:	48                   	rex.W
+  3e:	83                   	.byte 0x83
+  3f:	c5                   	.byte 0xc5
+
+
+Tested on:
+
+commit:         443574b0 riscv, bpf: Fix kfunc parameters incompatibil..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=11ac5323180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=af9492708df9797198d6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=154653d3180000
 
 
