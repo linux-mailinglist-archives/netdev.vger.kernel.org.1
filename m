@@ -1,125 +1,115 @@
-Return-Path: <netdev+bounces-85829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CE6389C794
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 16:55:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD61789C7BD
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:04:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF3011C20DE3
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 14:55:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68744283283
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97EFF13F422;
-	Mon,  8 Apr 2024 14:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0645A13F422;
+	Mon,  8 Apr 2024 15:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nok+zJAZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dWH7wp7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EE1126F07;
-	Mon,  8 Apr 2024 14:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06B613F425;
+	Mon,  8 Apr 2024 15:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712588141; cv=none; b=BL1xTUx5OvG2s7puZaiPm5RK+unA5T+HrzpizYwQlC3aPHmmABYSyyRlh6zTQc0U1wJNSvnvZlHhD6m8ujrIsSvjm/5m2nw7DZZmu8swVefyXjXeI2FTHruMxG/8y7s5MHQ3RdbiDYFPylFcbszzmG8eNU0zd7n+b+5wY0EUUU0=
+	t=1712588662; cv=none; b=hBMbWTheo0Sk7m3t31RXIZ7vYkcbpe9VHqDRFM+zAHlgiZmol2dUbVvqTa6u24PDefSYHUCueycKopiLq8D+o7ZCCI0XWNvjR5IcHaCsXvGg8+0SV0HJl7K/lpoQ4DJWSUNilCDUkuuehfP4BcpN3Xq+o1hjNkGEt9sOg321zm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712588141; c=relaxed/simple;
-	bh=Ov2BcR6+Z6HnKIgx85TjUBUXWlTdUZPqGxh8lge3WGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MfS2BYkyxcdHh7C6nNHP1+/JB7EUnj/MW1lqLSSMCfHQWuArs7IMFQUkQ4fuqCYvt02QYXg2FNYG5EXMHkg/WL53dEoJ0Joa8hHXcZCt1yHdbyhBjgwbGn6pQ7pQDQVK5HBGRPglykA0/w9YLRH8jlRIdIuMkSYFmqesAO+I5TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nok+zJAZ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1PBTRz03aq88OrjremWvkNYUDAiOv89NpdJyRW1vn4c=; b=nok+zJAZaWJpfupGZrseZ3Tvqk
-	44R0VF4WDwybUX+9OHmLLkPeWjf9bSv/+o7QqaXHJ1qMYpeyKBSZY9LTrQlV1lr86ftHWcT29r65m
-	YQwwPiuybeZ0X7NCN4RrzfoNeQ0/A4330dbcx3gGV3EIynt+43Vz7AphalzRBTEtlHW0v97cEq8Gp
-	gT70fcGaXcg0/R3VENuMDAOMOIu5zFiVMsv2Ut2aCUgFJj3UelenHeQLFRiZ6asMtFJgssbQX/8Zd
-	XAM7neTYwWs4gLnfy38iu7Nnxg5UAI5dT8VC6gnIZqmbVeIDYiPpA7v0pC5LS1698kQ73wX2gWuQu
-	nJqas7XQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35728)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rtqP9-0005JN-1h;
-	Mon, 08 Apr 2024 15:55:27 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rtqP1-0004EI-I3; Mon, 08 Apr 2024 15:55:19 +0100
-Date: Mon, 8 Apr 2024 15:55:19 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, sdf@google.com,
-	kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
-	vladimir.oltean@nxp.com, przemyslaw.kitszel@intel.com,
-	ahmed.zaki@intel.com, richardcochran@gmail.com, shayagr@amazon.com,
-	paul.greenwalt@intel.com, jiri@resnulli.us,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
-Subject: Re: [PATCH net-next 07/10] ethtool: cmis_cdb: Add a layer for
- supporting CDB commands
-Message-ID: <ZhQFV7I3EwW7FV+H@shell.armlinux.org.uk>
-References: <20240408125340.2084269-1-danieller@nvidia.com>
- <20240408125340.2084269-8-danieller@nvidia.com>
+	s=arc-20240116; t=1712588662; c=relaxed/simple;
+	bh=BVnd/s+ToAz0ywi5pWEfazLOqaEnySYG1PsThMrrUIs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WvoTa4dgOPJo4TPvJ7FIA6fMvJ+whXzZ9wF0aYYXwkeg0ybmlxPinsJ6dKeQLs0G//Rhdo+cNRNQfOjhGFwtl2nSyq66VxhRR/PiTN8uRxvorlJfii77zqtf8blmRgGv8ulyJ7SP54x5jOxjGZwbi7tWOz2r3x4o5UINJIURIDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dWH7wp7H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD631C433C7;
+	Mon,  8 Apr 2024 15:04:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712588662;
+	bh=BVnd/s+ToAz0ywi5pWEfazLOqaEnySYG1PsThMrrUIs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dWH7wp7Hu9BOVHI9bQPNePdPm/G+opP5dkZaZAnqiFmn297ty4pd0Ktx+pOMKUf+P
+	 n3RTFilcntsGQnFXhJa/zR713Ze3b4BhmtWfTHECxnCA0AVamkQnDCZ+nuTuxJq3lk
+	 rK1vubo9F5t74pZv/MGh1DCwHPaqpSXYrClVrPZDn2N3Y8PdgTv1EZ/5CKz5etOLMk
+	 TVHgZRUTdC4ODZjgfwNX6W1DLhdCEz4H8BSXJ/OOK4tkY2mu7GrRtIpNs+hc4PLhUM
+	 FkSbmoKZIX39LyGGdjU1LLJnmznstaN2g4e3qx3nLtuv5kz0oFZDe0CuLcPtdbWjZX
+	 ZPVMNPl2xV/aw==
+Date: Mon, 8 Apr 2024 08:04:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, Jason Gunthorpe
+ <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>, John Fastabend
+ <john.fastabend@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ bhelgaas@google.com, linux-pci@vger.kernel.org, Alexander Duyck
+ <alexanderduyck@fb.com>, davem@davemloft.net, Christoph Hellwig
+ <hch@lst.de>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <20240408080420.7a6dad61@kernel.org>
+In-Reply-To: <CAKgT0UdZz3fKpkTRnq5ZO2nW3NQcQ_DWahHMyddODjmNDLSaZQ@mail.gmail.com>
+References: <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
+	<20240404132548.3229f6c8@kernel.org>
+	<660f22c56a0a2_442282088b@john.notmuch>
+	<20240404165000.47ce17e6@kernel.org>
+	<CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+	<678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
+	<20240405122646.GA166551@nvidia.com>
+	<CAKgT0UeBCBfeq5TxTjND6G_S=CWYZsArxQxVb-2paK_smfcn2w@mail.gmail.com>
+	<20240405151703.GF5383@nvidia.com>
+	<CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
+	<20240405190209.GJ5383@nvidia.com>
+	<CAKgT0UdZz3fKpkTRnq5ZO2nW3NQcQ_DWahHMyddODjmNDLSaZQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240408125340.2084269-8-danieller@nvidia.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 08, 2024 at 03:53:37PM +0300, Danielle Ratson wrote:
-> +/**
-> + * struct ethtool_cmis_cdb_request - CDB commands request fields as decribed in
-> + *				the CMIS standard
-> + * @id: Command ID.
-> + * @epl_len: EPL memory length.
-> + * @lpl_len: LPL memory length.
-> + * @chk_code: Check code for the previous field and the payload.
-> + * @resv1: Added to match the CMIS standard request continuity.
-> + * @resv2: Added to match the CMIS standard request continuity.
-> + * @payload: Payload for the CDB commands.
-> + */
-> +struct ethtool_cmis_cdb_request {
-> +	__be16 id;
-> +	struct_group(body,
-> +		u16 epl_len;
+On Sat, 6 Apr 2024 09:05:01 -0700 Alexander Duyck wrote:
+> > I'm being very clear to say that there are some core changes should
+> > not be accepted due to the kernel's open source ideology.  
+> 
+> Okay, on core changes I 100% agree. That is one of the reasons why we
+> have the whole thing about any feature really needing to be enabled on
+> at least 2 different vendor devices.
 
-u16 with a struct that also uses __be16 looks suspicious.
+The "2 different vendor"/implementation thing came up before so
+I wanted to provide more context for the less initiated readers.
+We try  to judge features in terms of how reasonable the APIs are,
+overall system design and how easy they will be to modify later
+(e.g. uAPI, depth of core changes).
 
-> +		u8 lpl_len;
-> +		u8 chk_code;
-> +		u8 resv1;
-> +		u8 resv2;
-> +		u8 payload[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH];
-> +	);
+Risks are usually more pronounced for stack features like GSO partial,
+XDP or AF_XDP. Although my (faulty) memory is that we started with
+just mlx4 for XDP and other drivers quickly followed. But we did not
+wait for more than an ACK from other vendors.
 
-Does it matter if the compiler inserts some padding before this struct
-group?
+We almost never have a second implementation for HW-heavy features.
+TLS immediately comes to mind, and merging it was probably the right
+call given how many implementations were added since. For "full" IPsec
+offload we still only have one vendor. Existing TCP ZC Rx (page
+flipping) was presented as possible with two NICs but mlx5 was hacked
+up and still doesn't support real HDS.
 
-> +/**
-> + * struct ethtool_cmis_cdb_rpl_hdr - CDB commands reply header arguments
-> + * @rpl_len: Reply length.
-> + * @rpl_chk_code: Reply check code.
-> + */
-> +struct ethtool_cmis_cdb_rpl_hdr {
-> +	u8 rpl_len;
-> +	u8 rpl_chk_code;
+Most (if not all) of recent uAPI we added in netdev netlink were
+accepted with a single implementation (be it Intel's work + drivers
+or my work, and I often provide just a bnxt implementation).
 
-Does it matter if the compiler adds some padding here?
+Summary -> the number of implementations we require is decided on case
+by case basis, depending on our level of confidence..
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I don't know if this "2 implementations" rule is just a "mental
+ellipsis" everyone understands to be a more nuanced rule in practice. 
+But to an outsider it would seem very selectively enforced. In worst
+case a fake rule to give us an excuse to nack stuff.
 
