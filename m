@@ -1,126 +1,84 @@
-Return-Path: <netdev+bounces-85770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68B6989C122
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:18:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A45C989C1E0
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CD391C219A6
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:18:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2BADB283C4
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB8B12A146;
-	Mon,  8 Apr 2024 13:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B020080058;
+	Mon,  8 Apr 2024 13:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1vMMWc6P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aVKtwK3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7CA129E8C
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC0A80045
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:13:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712581979; cv=none; b=m+rz/ekCIIIbhJNrozVRpS//LiplvCQldfcDRY5X8bdEY1M02vgEs5lYyijr2YFM5EboFYJaS5BqmqpdW0Vc7DkGQrj+zQELOQvl1+X3G/TM+AjF0GzeoYu+8baCGpmnzCw66KNc4S/zkTpKlLdhXtkSiejepFl1vrjvfjWte8Y=
+	t=1712582023; cv=none; b=nwrwj2BAdhd1art/J16pz2955TSnO1ku2lh5+REaev1HZITsC6j5Rkc+V1v6FMe0gdtyl/J933GvblG6cs0mDaryTthvFgdPoBMuIqo1HqZPvSPP3KSmPKXzoKzwePpuBATeBCg3UE+4isMeHqZvuszgx6w6F1MdZyLWwxa2b8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712581979; c=relaxed/simple;
-	bh=0iqngNH3jEvlaOWgNf2tjTcQ9ZCKb8iGNqEUBkUj1gY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Cc7w5J7h3tSZ3RcSx1SxvB05g01lNNrAVP328AyxgIrLIj0f1bnD1dwJuGFvKjupXgGTb7yc9+ruLWelFcuc4nC6WKMKUbgf+j6TznrrG/SyYY21+KnX8jb0szY05rOdGXNUJfrOC5oikWAJIMH9WUTSXMHq0bitsrS2a1tmmFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1vMMWc6P; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-a51a3459f16so58834766b.0
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 06:12:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712581976; x=1713186776; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/CH4hwVso/WDr7y4pSKS9yzbDjeKeN7zzQ6h4YnWEb4=;
-        b=1vMMWc6Pm+UL69POcfUInC5wjvQswyw+UcsU0PiBcFA/UOLSHn5ly97h3SDv1iXW5U
-         yQ+VfLDgnaW3BH1mqx21rC9MdKIpPQ+HPXk1zKqIEvdjmITBBZKxdyKgmfwL3n52osKP
-         GbyF/7GFbvHEUdX5INhLbMAlS3y4Ht0A0ZYTgEiSVqSbvQwQsiT8MQYnSUi2omc6jKlS
-         90OSRuq3btGFE/dI9uPNBvy5BBZNpD7y9HWubl8rmVqP7w6aGjovprE6RhgKdwKN3VZd
-         nOqHVa24IXCmNs+sItRCIqmDIF7Hin0Hyvlf0CqIZHgY4ntRfRWSA8hEpAfIuoJtZPQQ
-         VRyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712581976; x=1713186776;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/CH4hwVso/WDr7y4pSKS9yzbDjeKeN7zzQ6h4YnWEb4=;
-        b=E1PcRWcyf/BZDeWly/QYoVvVMKzVZ6fE/XP6jpTv6Qzo5yHomXko/tVIU2nwq4i5At
-         iGPmuD6++m5Um48nChQAI/KMbQldbR+XKewzwXCAFTkJPnJk2loK96oZeQS8g8SdQLLi
-         kdeI0HslKRPb1eKtG10M3RokskxfiS3Wj2fC+Ghd7w1bqsjnbyeHF6ZNVOPZ1EsOnSdv
-         4/zIWaZ9OYBm7+/FYf0apfMDGSf3gcySsMtq2ikJL7ElThJPYQY+E00uDItM17CVfT/y
-         mjA8k3bW8o3bwXbOkQN5SrCtMmxIz+VqMR12AdUKNmArPUXStXVqcySbMiCK/nbV3Tm2
-         Pzbg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsSHliAteiE1lYQ/r8g6R30c3I+x+R67Gcb7sHC6p9zePEc2R6nVWVBKxZW59QCrJh/YOqfwFChSLanA6SnnJ82JyfKhWR
-X-Gm-Message-State: AOJu0YxWybIhIYDBLKLz3cljd5/yDjW3ZoCTNR0lkeFvUea6sX/N9F8F
-	5YQ96aA71SAV9u2VeosqGbKGwje+ZNzaY6Lc1XEOfar74URnrlpMHdvjIEtUuXJxBZDBUTTW3ZP
-	A0A==
-X-Google-Smtp-Source: AGHT+IGs+m7MfAnJA9ItGk7TPmWFffmQH2vM458kWN6Zr0u30DFEEpFcIPz4OlejhsQN9AEuPXPEmINaC5w=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a17:907:77d2:b0:a51:9148:1938 with SMTP id
- kz18-20020a17090777d200b00a5191481938mr10276ejc.15.1712581975754; Mon, 08 Apr
- 2024 06:12:55 -0700 (PDT)
-Date: Mon, 8 Apr 2024 15:12:53 +0200
-In-Reply-To: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1712582023; c=relaxed/simple;
+	bh=w7mbhzgIDEsUoaLxTQI0tTenLivVC167JlArscZ8FWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I1flB+oho/eLmh/q3NjBbeH61XhIA+XWrWTAt/32DU8qbbxRbttvKVvdh04/kV801QAuwxiyhdY8K1VloTWID89q8NjWnWOuB5ELnmp6t+HFO7TL0KaOOo+Q5kohlRwezyRyhfC3xbGPe1aiTNW328IUg3/paD/OJa4rB2r1AxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aVKtwK3w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44D1FC433F1;
+	Mon,  8 Apr 2024 13:13:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712582023;
+	bh=w7mbhzgIDEsUoaLxTQI0tTenLivVC167JlArscZ8FWA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aVKtwK3w5uZC3vz0JnOCO7Ue8vrgaRiSqqQcgs2yFYL+T+w8WCsMul84T3N3LgniX
+	 gFN/E6Pkj/M7arwOUuvSC/ah021w1jwpzZvONA55ASAFQtcq3TwYLuJs6lGy7HfRuO
+	 AP0/TWjVfyGJi64ZVg5f8t1OZ0fEHS4SnJh7RfjwDf/ZYTTXpcfv41+jmjSr6bHocZ
+	 +VI+1M6qrjEgmjv192pRjVGz14m8mnmIO8ztRjJwDShu8xJF7lGuBtlwN1HAt8XGJK
+	 znMc0lefGxrXsBqflQppG32InWerR4Mw3h4pO/HW1LVabdwGAlPJjKQdwaF8JOezR5
+	 EJPmAvy8B6+6Q==
+Date: Mon, 8 Apr 2024 14:13:38 +0100
+From: Simon Horman <horms@kernel.org>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Fei Qin <fei.qin@corigine.com>, netdev@vger.kernel.org,
+	oss-drivers@corigine.com
+Subject: Re: [PATCH net-next v4 4/4] nfp: use new dim profiles for better
+ latency
+Message-ID: <20240408131338.GE26556@kernel.org>
+References: <20240405081547.20676-1-louis.peens@corigine.com>
+ <20240405081547.20676-5-louis.peens@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com>
-Message-ID: <ZhPtVYkVcKsUJrty@google.com>
-Subject: Re: [RFC PATCH v1 00/10] Socket type control for Landlock
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240405081547.20676-5-louis.peens@corigine.com>
 
-On Mon, Apr 08, 2024 at 05:39:17PM +0800, Ivanov Mikhail wrote:
-> Patchset implements new type of Landlock rule, that restricts actions for
-> sockets of any protocol. Such restriction would be useful to ensure
-> that a sandboxed process uses only necessary protocols.
-> See [2] for more cases.
->=20
-> The rules store information about the socket family(aka domain) and type.
->=20
-> struct landlock_socket_attr {
-> 	__u64 allowed_access;
-> 	int domain; // see socket(2)
-> 	int type; // see socket(2)
-> }
->=20
-> Patchset currently implements rule only for socket_create() method, but
-> other necessary rules will also be impemented. [1]
->=20
-> Code coverage(gcov) report with the launch of all the landlock selftests:
-> * security/landlock:
-> lines......: 94.7% (784 of 828 lines)
-> functions..: 97.2% (105 of 108 functions)
->=20
-> * security/landlock/socket.c:
-> lines......: 100.0% (33 of 33 lines)
-> functions..: 100.0% (5 of 5 functions)
->=20
-> [1] https://lore.kernel.org/all/b8a2045a-e7e8-d141-7c01-bf47874c7930@digi=
-kod.net/
-> [2] https://lore.kernel.org/all/ZJvy2SViorgc+cZI@google.com/
+On Fri, Apr 05, 2024 at 10:15:47AM +0200, Louis Peens wrote:
+> From: Fei Qin <fei.qin@corigine.com>
+> 
+> Latency comparison between EQE profiles and SPECIFIC_0 profiles
+> for 5 different runs:
+> 
+>                                      Latency (us)
+> EQE profiles 	    |	132.85  136.32  131.31  131.37  133.51
+> SPECIFIC_0 profiles |	92.09   92.16   95.58   98.26   89.79
 
-Thank you, I am very excited to see this patch set! :)
+Nice improvement :)
 
-You might want to also link to https://github.com/landlock-lsm/linux/issues=
-/6
-where the feature idea is tracked.
+> Signed-off-by: Fei Qin <fei.qin@corigine.com>
+> Signed-off-by: Louis Peens <louis.peens@corigine.com>
 
-=E2=80=94G=C3=BCnther
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
