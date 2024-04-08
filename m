@@ -1,146 +1,147 @@
-Return-Path: <netdev+bounces-85931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5294989CEED
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:25:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC7B089CEF9
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DFFD287924
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:25:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD081F24F48
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4363E53807;
-	Mon,  8 Apr 2024 23:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE88149DF1;
+	Mon,  8 Apr 2024 23:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="jlcl9s2Z"
+	dkim=pass (1024-bit key) header.d=netflix.com header.i=@netflix.com header.b="VFX1lHDO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CB6171B0
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 23:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D911146D59
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 23:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712618750; cv=none; b=eSuBe93wms/l8JrDse/UOWGAdLZ9Hjwp8kYJ4uCyiYgbdwfh3hJtttsh6DjmTosNTC5DI+mZIWvocMBI7+lzuWhIAsqLpe6MD801f9tuFTMjmfIaM/VBgg/n0baTVStgtWyLEBovPN6hIGSRMV9wiJLOcpwImOXzHcavrBoW0rk=
+	t=1712619132; cv=none; b=aeCzAitVWcrunS0AaoTbEB5Uyer1XqEjyawstAaAaTcEx0cvTnxORTLCiNbofmolUx2xdZCz0L3365Y6+Bz/Qr6dnq449W1Z01oZEyXLdorhR5cSNIUJ2JoM7pldzDt1+9e/ZzfGob8UIL7vxDwHXTLWsdvq6IOk7jkpiJ+jn+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712618750; c=relaxed/simple;
-	bh=nY+yierZIh2aQyUM/eztxjd7nDccsTrYf0rXHbe9KKk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gYoOtFWgcHdaYy+b9aQUTu7sod7qWLaugHE8afMK42o9AkEThdhf1WrUw1y5QGpCgzfjA8ANZErHO8FhNP2GjG2wOozp/xmkElOqL0WNsD1pH4TcRNZLQgZiNCytlwpUql6Yxu3pkMHNKs/1kEtXB9buvfgIEMNOiCykhxFQjBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=jlcl9s2Z; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1rtyMw-00CJYk-MC; Tue, 09 Apr 2024 01:25:42 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=t371Iy+FhYxhl7DOAG5fYy9u8vKqKRm49whvClVFQhQ=; b=jlcl9s2ZKl6uXldGBZ6SdGcclR
-	jihCQ7saS62qPqnXe8zkorN35ZT4gLHFfYI9gA32oeUM8eh70/+xkju0QsEa0tRc04IW9ITNQJZ/M
-	sVaWFWonuUOPb5s3ZWUszR9gjgAMzhFlg52royP2/RZrT753dN1NfJxGHVZwR3ATYezdABDGEsPA7
-	IVsn2K2jlLYGJrlk7mRKTtchuxEyCsgg1glnIrPqL/fSBOkGhvHWrJ22hf0Kalw7n3797tTQEKAXR
-	KoZfYUk+tDelJIKitftVTa7sxYmaARD91eDHyqtu9HGHLOf2u4lLs92vq7A7aeOTcEQ7kLdIoLJGI
-	GzCfXQ0A==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1rtyMv-0000Kd-QT; Tue, 09 Apr 2024 01:25:41 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1rtyMe-000ExV-7z; Tue, 09 Apr 2024 01:25:24 +0200
-Message-ID: <c3f212f8-01a5-4037-af76-39170aa6a6ce@rbox.co>
-Date: Tue, 9 Apr 2024 01:25:23 +0200
+	s=arc-20240116; t=1712619132; c=relaxed/simple;
+	bh=bVEIb6e+/B24H+2KosaPTYKZHDeBj1vnRwJgY39tm84=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=MDtlwBzUlX3yDKmDpuaINbEGoaMAUK+HduejYZdUjA8XhlYP0meZuRGDv1NMgTotHLmqH4EdU628Bac4tR6tSp7VLS0jhWaAj01NwlaEy2AQOVIE8U7EXaib1pc/PlPEVdKxMglW7rhlXunC8PA8w5RInKnT/ApXhXXlitsdnr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=netflix.com; spf=pass smtp.mailfrom=netflix.com; dkim=pass (1024-bit key) header.d=netflix.com header.i=@netflix.com header.b=VFX1lHDO; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=netflix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netflix.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ed691fb83eso665711b3a.1
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 16:32:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netflix.com; s=google; t=1712619130; x=1713223930; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=exMdnTAAmb+Wduf4Gnad0Iboa2uGRYogmdNpnKal3eA=;
+        b=VFX1lHDOiQQVzSgAopHWN6pPIPlzmS3V6s5tiWVEOtMJV6VQpjvp75okidtLhR6KN8
+         ujAX9rKFtF9j03zNHeQucZpKzpex22/l9V7/LWVs9NWVZJYxJ6NSMgHNMOyKsECEROw6
+         mUR7r2ppHb6pEmZpXUYy32+w9P2BWFApX+Npo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712619130; x=1713223930;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=exMdnTAAmb+Wduf4Gnad0Iboa2uGRYogmdNpnKal3eA=;
+        b=p/dsO2XDYYzLGlttE+3fT1RjafG8uBJJtBaSykOajQdyd7he8comDuWXoUHtTdRm+I
+         3YbHLfV/Rk1ORd62DlAlU75uj9QBJ09WIOd6EqHEZ2IhVCDe4Gip2VcQPg8Q3sJisrJW
+         8+c/HQr1V24TTREkxFPPS6ktzNm+8ST8BZvZfOU7uFG028q776T5eWpAD9Q4JXk8hgP/
+         iNkaH5fvNnQc1GdVuob76RkbWdxtF20XoYMfgIi8NgFLiic9xLFAyGA/B4blV5JA9u9z
+         iUqb5JxP9qqpq7zpjg/fn553IgB2f1lxVMCK4lkzASRP3j9/TaCRuQYelh9CqU42YvIy
+         5fOA==
+X-Gm-Message-State: AOJu0YwUhARI8yMgAJoVLc3YioqiS/xoDIfL/JKirfC36AmzmDY1TWsp
+	e8NmEdhrrrw1KRUZxWrAtOAt75RQYLeY+6qwawgtL9CaleQ0K1lcBNLR6oq1QUktkRJKGlMMiIf
+	i7caWLVJd
+X-Google-Smtp-Source: AGHT+IFLeOubTVV/zL+idW19Wk7N/QZ+M7RTkYyLsZ9usATqIisIu03pzt8kKjaqu0XGkjIT1gH8aQ==
+X-Received: by 2002:a05:6a00:b4a:b0:6ea:8a2c:96fa with SMTP id p10-20020a056a000b4a00b006ea8a2c96famr10202252pfo.23.1712619129666;
+        Mon, 08 Apr 2024 16:32:09 -0700 (PDT)
+Received: from localhost ([2607:fb10:7302::3])
+        by smtp.gmail.com with UTF8SMTPSA id a14-20020aa78e8e000000b006eadf879a30sm7336815pfr.179.2024.04.08.16.32.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Apr 2024 16:32:09 -0700 (PDT)
+From: Hechao Li <hli@netflix.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Soheil Hassas Yeganeh <soheil@google.com>
+Cc: netdev@vger.kernel.org,
+	Hechao Li <hli@netflix.com>,
+	Tycho Andersen <tycho@tycho.pizza>
+Subject: [PATCH net-next v2] tcp: increase the default TCP scaling ratio
+Date: Mon,  8 Apr 2024 16:32:00 -0700
+Message-Id: <20240408233200.1701282-1-hli@netflix.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CANn89iJgr3f23-t2O+cMcyQixNhcTGVVwp3m69J3G28zW4MPkg@mail.gmail.com>
+References: <CANn89iJgr3f23-t2O+cMcyQixNhcTGVVwp3m69J3G28zW4MPkg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] af_unix: Fix garbage collector racing against
- connect()
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com
-References: <20240408161336.612064-2-mhal@rbox.co>
- <20240408211830.99829-1-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20240408211830.99829-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/8/24 23:18, Kuniyuki Iwashima wrote:
-> From: Michal Luczaj <mhal@rbox.co>
-> Date: Mon,  8 Apr 2024 17:58:45 +0200
-...
->>  	list_for_each_entry_safe(u, next, &gc_inflight_list, link) {
->> -		long total_refs;
->> -
->> -		total_refs = file_count(u->sk.sk_socket->file);
->> +		struct sock *sk = &u->sk;
->> +		long total_refs = file_count(sk->sk_socket->file);
->>  
->>  		WARN_ON_ONCE(!u->inflight);
->>  		WARN_ON_ONCE(total_refs < u->inflight);
->> @@ -286,6 +295,11 @@ static void __unix_gc(struct work_struct *work)
->>  			list_move_tail(&u->link, &gc_candidates);
->>  			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
->>  			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
->> +
->> +			if (sk->sk_state == TCP_LISTEN) {
->> +				unix_state_lock(sk);
->> +				unix_state_unlock(sk);
-> 
-> Less likely though, what if the same connect() happens after this ?
-> 
-> connect(S, addr)	sendmsg(S, [V]); close(V)	__unix_gc()
-> ----------------	-------------------------	-----------
-> NS = unix_create1()
-> skb1 = sock_wmalloc(NS)
-> L = unix_find_other(addr)
-> 						for u in gc_inflight_list:
-> 						  if (total_refs == inflight_refs)
-> 						    add u to gc_candidates
-> 						    // L was already traversed
-> 						    // in a previous iteration.
-> unix_state_lock(L)
-> unix_peer(S) = NS
-> 
-> 						// gc_candidates={L, V}
-> 
-> 						for u in gc_candidates:
-> 						  scan_children(u, dec_inflight)
-> 
-> 						// embryo (skb1) was not
-> 						// reachable from L yet, so V's
-> 						// inflight remains unchanged
-> __skb_queue_tail(L, skb1)
-> unix_state_unlock(L)
-> 						for u in gc_candidates:
-> 						  if (u.inflight)
-> 						    scan_children(u, inc_inflight_move_tail)
-> 
-> 						// V count=1 inflight=2 (!)
+After commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale"),
+we noticed an application-level timeout due to reduced throughput.
 
-If I understand your question, in this case L's queue technically does change
-between scan_children()s: embryo appears, but that's meaningless. __unix_gc()
-already holds unix_gc_lock, so the enqueued embryo can not carry any SCM_RIGHTS
-(i.e. it doesn't affect the inflight graph). Note that unix_inflight() takes the
-same unix_gc_lock.
+Before the commit, for a client that sets SO_RCVBUF to 65k, it takes
+around 22 seconds to transfer 10M data. After the commit, it takes 40
+seconds. Because our application has a 30-second timeout, this
+regression broke the application.
 
-Is there something I'm missing?
+The reason that it takes longer to transfer data is that
+tp->scaling_ratio is initialized to a value that results in ~0.25 of
+rcvbuf. In our case, SO_RCVBUF is set to 65536 by the application, which
+translates to 2 * 65536 = 131,072 bytes in rcvbuf and hence a ~28k
+initial receive window.
 
-> As you pointed out, this GC's assumption is basically wrong; the GC
-> works correctly only when the set of traversed sockets does not change
-> over 3 scan_children() calls.
-> 
-> That's why I reworked the GC not to rely on receive queue.
-> https://lore.kernel.org/netdev/20240325202425.60930-1-kuniyu@amazon.com/
+Later, even though the scaling_ratio is updated to a more accurate
+skb->len/skb->truesize, which is ~0.66 in our environment, the window
+stays at ~0.25 * rcvbuf. This is because tp->window_clamp does not
+change together with the tp->scaling_ratio update. As a result, the
+window size is capped at the initial window_clamp, which is also ~0.25 *
+rcvbuf, and never grows bigger.
 
-Right, I'll try to get my head around your series :)
+This patch increases the initial scaling_ratio from ~25% to 50% in order
+to be backward compatible with the original default
+sysctl_tcp_adv_win_scale.
+
+Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
+Signed-off-by: Hechao Li <hli@netflix.com>
+Reviewed-by: Tycho Andersen <tycho@tycho.pizza>, Eric Dumazet <edumazet@google.com>
+
+---
+v1->v2: increase the default tcp scaling ratio instead of updating
+window_clamp and update the commit message
+---
+ include/net/tcp.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 6ae35199d3b3..2bcf30381d75 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1539,11 +1539,10 @@ static inline int tcp_space_from_win(const struct sock *sk, int win)
+ 	return __tcp_space_from_win(tcp_sk(sk)->scaling_ratio, win);
+ }
+ 
+-/* Assume a conservative default of 1200 bytes of payload per 4K page.
++/* Assume a 50% default for skb->len/skb->truesize ratio.
+  * This may be adjusted later in tcp_measure_rcv_mss().
+  */
+-#define TCP_DEFAULT_SCALING_RATIO ((1200 << TCP_RMEM_TO_WIN_SCALE) / \
+-				   SKB_TRUESIZE(4096))
++#define TCP_DEFAULT_SCALING_RATIO (1 << (TCP_RMEM_TO_WIN_SCALE - 1))
+ 
+ static inline void tcp_scaling_ratio_init(struct sock *sk)
+ {
+-- 
+2.34.1
+
 
