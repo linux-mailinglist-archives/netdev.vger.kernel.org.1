@@ -1,635 +1,161 @@
-Return-Path: <netdev+bounces-85704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F5589BDFA
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:19:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDAC089BDC1
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25399B21EE7
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:19:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99F992857EA
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C60B6A010;
-	Mon,  8 Apr 2024 11:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF6365198;
+	Mon,  8 Apr 2024 11:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iqeAdTbT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nByh4qB0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2E0657BD
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 11:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6355FB8F;
+	Mon,  8 Apr 2024 11:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712575121; cv=none; b=iNLwpA2rYM0FjP+cCOKRM7buiamwcOmM+tuYy7IaG52OszGQmKO+m/qnmQTvaFcVmU+jhXnqn19gLpJ1vPXVWaHb4RciAp/sHrqDhKQXGqz8WtbuE6oyQ09RGXIh9zCj04Tx04OXRW2/9UAzOmriPfhiMUiUZ+kImSCZr93svJE=
+	t=1712574454; cv=none; b=Vlt6gDLKffoyJKU9P1bzesROtLbsECTZ7m2Btur6VOM7HWWXQrGi+Hnh8kwpwSm7wflsyGe4Cfbkzw8vzMa7+qdo6VoblREGCTfV+rPpAr8bqhRvtKKp7u3OcAy2KFnV3eXtzK8cnzq2EA5nEvNWIFaanjFnl5Oae7abcqZSnhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712575121; c=relaxed/simple;
-	bh=SNzVWDw9RW74m+kfuyhYi3I94xsc7d4x+UtikOon0cs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=INXgMldXT/VogdQO273bX5HJBpNmw9FL1jwIAV9lzKvzq86mdxi4GGWKy/jzmp3OD6ZrfLOihGYLaN/jwnN0yMKWR2ktRQk424brNVy2Cq9qQ8KZab6bK0lfYLEkmLdc/1iG+sfzhuH8lObzoublwYB3coG3/9LkxKtJI96Zt+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iqeAdTbT; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712575119; x=1744111119;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SNzVWDw9RW74m+kfuyhYi3I94xsc7d4x+UtikOon0cs=;
-  b=iqeAdTbTzzucYozXrxLTG2zsXZ/ppl+eOObmkHTsBPaXZL8kLlitS1Fo
-   VVxAIqHmQjkmikomqY0TRL+fhBihPmYIxl/dlAmdUOec+D9Gw2FRkYLIT
-   g2jF08iEz0GN99+9pDmKUnI366wmYVm300HOUnL6zKIhZPorfuQIYw+q6
-   pYyHqJBN59/+MSgwp8j/1Pvawg+X/t6m82PrJjasubzqVbTu+ql8lChjT
-   blXrygSSSEneEwPQDpJ8kHejI9E8yZdvOyKlJG94EW4I5IaevPAC94exY
-   QQqvBBsb3Jrv0h36DQ51V8TiTzTNX8JnlP9RLcAUgbgJq702GPnEApWpd
-   w==;
-X-CSE-ConnectionGUID: UYsYuZPiRIWpN6TEJCp2qQ==
-X-CSE-MsgGUID: b+UOUJkXRyKV0GiLh4OCxw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11037"; a="18988598"
-X-IronPort-AV: E=Sophos;i="6.07,186,1708416000"; 
-   d="scan'208";a="18988598"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 04:18:39 -0700
-X-CSE-ConnectionGUID: pBcvdAVUTw+NgPVFbwUoyw==
-X-CSE-MsgGUID: 3saK0NpDQUeRaPlTOdo2vA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,186,1708416000"; 
-   d="scan'208";a="19904934"
-Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by fmviesa009.fm.intel.com with ESMTP; 08 Apr 2024 04:18:37 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	jesse.brandeburg@intel.com,
-	Michal Michalik <michal.michalik@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v7 iwl-next 09/12] ice: Add support for E825-C TS PLL handling
-Date: Mon,  8 Apr 2024 13:07:30 +0200
-Message-ID: <20240408111814.404583-23-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240408111814.404583-14-karol.kolacinski@intel.com>
-References: <20240408111814.404583-14-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1712574454; c=relaxed/simple;
+	bh=R2LuuhSb8d6q3LtxSsHfHd/kQABTJ1jxxQJ/ujhQYfg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WyLIMGHVj42/HKhQyZURVyaCFPiWnI/yiySUmVN0W0hya83f8MyMae2HEoVHce9EocmMwyX1+Wj1bq4jPQX4PaEtqhItBOP6vYngHc2xZXGAdqTUSsiNOP3pmNRpFsQeT+11Q5Us0exeTyTSd4ISV2oB7nMY769GexIUg961cbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nByh4qB0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F33AC433F1;
+	Mon,  8 Apr 2024 11:07:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712574454;
+	bh=R2LuuhSb8d6q3LtxSsHfHd/kQABTJ1jxxQJ/ujhQYfg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nByh4qB0rdSeeOibjSvCimXfcV/qAR7lbkNljjj77K8nA+Oj7E/oM3toKo88czV+8
+	 9rxlZFwLtCElIPO4Z8Sqd8Txi3ZQABfDJxi+ROUR3NXvwN1+qpl9xfRhhZX3VRpMGV
+	 7olUd5uOgTdIXHrdPLNuHkF79Hfcc8Ox/K2OTfe7g4gwCI9t68JcexnDji9plBCvdD
+	 RnOazez5g2lcqCZGMDMXNkx9+sOMsHIsdQC3bVFCG362slU0ZVxBo4DkktEK5fbCHq
+	 sEGEC+JlIMcl+zuAep24ICZzrrb/+j+HGFFI1wM4dCHDfQ1GHcYjhxnK1c+8QK2A0v
+	 zAS2hdWoWm87g==
+Date: Mon, 8 Apr 2024 14:07:30 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Erick Archer <erick.archer@outlook.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Long Li <longli@microsoft.com>, Ajay Sharma <sharmaajay@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v3 0/3] RDMA/mana_ib: Add flex array to struct
+ mana_cfg_rx_steer_req_v2
+Message-ID: <20240408110730.GE8764@unreal>
+References: <AS8PR02MB72374BD1B23728F2E3C3B1A18B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AS8PR02MB72374BD1B23728F2E3C3B1A18B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
 
-From: Michal Michalik <michal.michalik@intel.com>
+On Sat, Apr 06, 2024 at 04:23:34PM +0200, Erick Archer wrote:
+> The "struct mana_cfg_rx_steer_req_v2" uses a dynamically sized set of
+> trailing elements. Specifically, it uses a "mana_handle_t" array. So,
+> use the preferred way in the kernel declaring a flexible array [1].
+> 
+> At the same time, prepare for the coming implementation by GCC and Clang
+> of the __counted_by attribute. Flexible array members annotated with
+> __counted_by can have their accesses bounds-checked at run-time via
+> CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE (for
+> strcpy/memcpy-family functions).
+> 
+> Also, avoid the open-coded arithmetic in the memory allocator functions
+> [2] using the "struct_size" macro.
+> 
+> Moreover, use the "offsetof" helper to get the indirect table offset
+> instead of the "sizeof" operator and avoid the open-coded arithmetic in
+> pointers using the new flex member. This new structure member also allow
+> us to remove the "req_indir_tab" variable since it is no longer needed.
+> 
+> Now, it is also possible to use the "flex_array_size" helper to compute
+> the size of these trailing elements in the "memcpy" function.
+> 
+> Specifically, the first commit adds the flex member and the patches 2 and
+> 3 refactor the consumers of the "struct mana_cfg_rx_steer_req_v2".
+> 
+> This code was detected with the help of Coccinelle, and audited and
+> modified manually. The Coccinelle script used to detect this code pattern
+> is the following:
+> 
+> virtual report
+> 
+> @rule1@
+> type t1;
+> type t2;
+> identifier i0;
+> identifier i1;
+> identifier i2;
+> identifier ALLOC =~ "kmalloc|kzalloc|kmalloc_node|kzalloc_node|vmalloc|vzalloc|kvmalloc|kvzalloc";
+> position p1;
+> @@
+> 
+> i0 = sizeof(t1) + sizeof(t2) * i1;
+> ...
+> i2 = ALLOC@p1(..., i0, ...);
+> 
+> @script:python depends on report@
+> p1 << rule1.p1;
+> @@
+> 
+> msg = "WARNING: verify allocation on line %s" % (p1[0].line)
+> coccilib.report.print_report(p1[0],msg)
+> 
+> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#zero-length-and-one-element-arrays [1]
+> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [2]
+> Signed-off-by: Erick Archer <erick.archer@outlook.com>
+> ---
+> Changes in v3:
+> - Split the changes in various commits to simplify the acceptance process
+>   (Leon Romanovsky).
+> 
+> Changes in v2:
+> - Remove the "req_indir_tab" variable (Gustavo A. R. Silva).
+> - Update the commit message.
+> - Add the "__counted_by" attribute.
+> 
+> Previous versions:
+> v1 -> https://lore.kernel.org/linux-hardening/AS8PR02MB7237974EF1B9BAFA618166C38B382@AS8PR02MB7237.eurprd02.prod.outlook.com/
+> v2 -> https://lore.kernel.org/linux-hardening/AS8PR02MB723729C5A63F24C312FC9CD18B3F2@AS8PR02MB7237.eurprd02.prod.outlook.com/
+> ---
+> Erick Archer (3):
+>   net: mana: Add flex array to struct mana_cfg_rx_steer_req_v2
+>   RDMA/mana_ib: Prefer struct_size over open coded arithmetic
+>   net: mana: Avoid open coded arithmetic
 
-The CGU layout of E825-C is a little different than E822/E823. Add
-support the new hardware adding relevant functions.
+Unfortunately, I still can't take RDMA patch alone without the netdev
+patches.
 
-Signed-off-by: Michal Michalik <michal.michalik@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
----
-V4 -> V5: added UL to some of tspll_fbdiv_frac values in e825c_cgu_params
+Jakub, do you want shared branch for this series or should I take
+everything through RDMA tree as netdev part is small enough?
 
- drivers/net/ethernet/intel/ice/ice_cgu_regs.h |  65 +++++
- .../net/ethernet/intel/ice/ice_ptp_consts.h   |  87 ++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 247 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  22 ++
- drivers/net/ethernet/intel/ice/ice_type.h     |   2 +-
- 5 files changed, 410 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_cgu_regs.h b/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
-index 36aeb10eefb7..10d9d74f3545 100644
---- a/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
-+++ b/drivers/net/ethernet/intel/ice/ice_cgu_regs.h
-@@ -27,6 +27,17 @@ union nac_cgu_dword9 {
- 	u32 val;
- };
- 
-+#define NAC_CGU_DWORD16_E825C 0x40
-+union nac_cgu_dword16_e825c {
-+	struct {
-+		u32 synce_remndr : 6;
-+		u32 synce_phlmt_en : 1;
-+		u32 misc13 : 17;
-+		u32 tspll_ck_refclkfreq : 8;
-+	};
-+	u32 val;
-+};
-+
- #define NAC_CGU_DWORD19 0x4c
- union nac_cgu_dword19 {
- 	struct {
-@@ -67,6 +78,22 @@ union nac_cgu_dword22 {
- 	u32 val;
- };
- 
-+#define NAC_CGU_DWORD23_E825C 0x5C
-+union nac_cgu_dword23_e825c {
-+	struct {
-+		u32 cgupll_fbdiv_intgr : 10;
-+		u32 ux56pll_fbdiv_intgr : 10;
-+		u32 misc20 : 4;
-+		u32 ts_pll_enable : 1;
-+		u32 time_sync_tspll_align_sel : 1;
-+		u32 ext_synce_sel : 1;
-+		u32 ref1588_ck_div : 4;
-+		u32 time_ref_sel : 1;
-+
-+	};
-+	u32 val;
-+};
-+
- #define NAC_CGU_DWORD24 0x60
- union nac_cgu_dword24 {
- 	struct {
-@@ -113,4 +140,42 @@ union tspll_ro_bwm_lf {
- 	u32 val;
- };
- 
-+#define TSPLL_RO_LOCK_E825C 0x3f0
-+union tspll_ro_lock_e825c {
-+	struct {
-+		u32 bw_freqov_high_cri_7_0 : 8;
-+		u32 bw_freqov_high_cri_9_8 : 2;
-+		u32 reserved455 : 1;
-+		u32 plllock_gain_tran_cri : 1;
-+		u32 plllock_true_lock_cri : 1;
-+		u32 pllunlock_flag_cri : 1;
-+		u32 afcerr_cri : 1;
-+		u32 afcdone_cri : 1;
-+		u32 feedfwrdgain_cal_cri_7_0 : 8;
-+		u32 reserved462 : 8;
-+	};
-+	u32 val;
-+};
-+
-+#define TSPLL_BW_TDC_E825C 0x31c
-+union tspll_bw_tdc_e825c {
-+	struct {
-+		u32 i_tdc_offset_lock_1_0 : 2;
-+		u32 i_bbthresh1_2_0 : 3;
-+		u32 i_bbthresh2_2_0 : 3;
-+		u32 i_tdcsel_1_0 : 2;
-+		u32 i_tdcovccorr_en_h : 1;
-+		u32 i_divretimeren : 1;
-+		u32 i_bw_ampmeas_window : 1;
-+		u32 i_bw_lowerbound_2_0 : 3;
-+		u32 i_bw_upperbound_2_0 : 3;
-+		u32 i_bw_mode_1_0 : 2;
-+		u32 i_ft_mode_sel_2_0 : 3;
-+		u32 i_bwphase_4_0 : 5;
-+		u32 i_plllock_sel_1_0 : 2;
-+		u32 i_afc_divratio : 1;
-+	};
-+	u32 val;
-+};
-+
- #endif /* _ICE_CGU_REGS_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-index ef180936f60c..e6980b94a6c1 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
-@@ -470,6 +470,93 @@ const struct ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
- 	},
- };
- 
-+const
-+struct ice_cgu_pll_params_e825c e825c_cgu_params[NUM_ICE_TIME_REF_FREQ] = {
-+	/* ICE_TIME_REF_FREQ_25_000 -> 25 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x19,
-+		/* tspll_ndivratio */
-+		1,
-+		/* tspll_fbdiv_intgr */
-+		320,
-+		/* tspll_fbdiv_frac */
-+		0,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_122_880 -> 122.88 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x29,
-+		/* tspll_ndivratio */
-+		3,
-+		/* tspll_fbdiv_intgr */
-+		195,
-+		/* tspll_fbdiv_frac */
-+		1342177280UL,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_125_000 -> 125 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x3E,
-+		/* tspll_ndivratio */
-+		2,
-+		/* tspll_fbdiv_intgr */
-+		128,
-+		/* tspll_fbdiv_frac */
-+		0,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_153_600 -> 153.6 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x33,
-+		/* tspll_ndivratio */
-+		3,
-+		/* tspll_fbdiv_intgr */
-+		156,
-+		/* tspll_fbdiv_frac */
-+		1073741824UL,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_156_250 -> 156.25 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x1F,
-+		/* tspll_ndivratio */
-+		5,
-+		/* tspll_fbdiv_intgr */
-+		256,
-+		/* tspll_fbdiv_frac */
-+		0,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+
-+	/* ICE_TIME_REF_FREQ_245_760 -> 245.76 MHz */
-+	{
-+		/* tspll_ck_refclkfreq */
-+		0x52,
-+		/* tspll_ndivratio */
-+		3,
-+		/* tspll_fbdiv_intgr */
-+		97,
-+		/* tspll_fbdiv_frac */
-+		2818572288UL,
-+		/* ref1588_ck_div */
-+		0,
-+	},
-+};
-+
- /* struct ice_vernier_info_e82x
-  *
-  * E822 hardware calibrates the delay of the timestamp indication from the
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index c73f8cde0769..53d97eca194b 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -321,8 +321,8 @@ static const char *ice_clk_freq_str(enum ice_time_ref_freq clk_freq)
- static const char *ice_clk_src_str(enum ice_clk_src clk_src)
- {
- 	switch (clk_src) {
--	case ICE_CLK_SRC_TCX0:
--		return "TCX0";
-+	case ICE_CLK_SRC_TCXO:
-+		return "TCXO";
- 	case ICE_CLK_SRC_TIME_REF:
- 		return "TIME_REF";
- 	default:
-@@ -334,7 +334,7 @@ static const char *ice_clk_src_str(enum ice_clk_src clk_src)
-  * ice_cfg_cgu_pll_e82x - Configure the Clock Generation Unit
-  * @hw: pointer to the HW struct
-  * @clk_freq: Clock frequency to program
-- * @clk_src: Clock source to select (TIME_REF, or TCX0)
-+ * @clk_src: Clock source to select (TIME_REF, or TCXO)
-  *
-  * Configure the Clock Generation Unit with the desired clock frequency and
-  * time reference, enabling the PLL which drives the PTP hardware clock.
-@@ -362,10 +362,10 @@ static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
- 		return -EINVAL;
- 	}
- 
--	if (clk_src == ICE_CLK_SRC_TCX0 &&
-+	if (clk_src == ICE_CLK_SRC_TCXO &&
- 	    clk_freq != ICE_TIME_REF_FREQ_25_000) {
- 		dev_warn(ice_hw_to_dev(hw),
--			 "TCX0 only supports 25 MHz frequency\n");
-+			 "TCXO only supports 25 MHz frequency\n");
- 		return -EINVAL;
- 	}
- 
-@@ -470,14 +470,190 @@ static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
- }
- 
- /**
-- * ice_init_cgu_e82x - Initialize CGU with settings from firmware
-- * @hw: pointer to the HW structure
-+ * ice_cfg_cgu_pll_e825c - Configure the Clock Generation Unit for E825-C
-+ * @hw: pointer to the HW struct
-+ * @clk_freq: Clock frequency to program
-+ * @clk_src: Clock source to select (TIME_REF, or TCXO)
-  *
-- * Initialize the Clock Generation Unit of the E822 device.
-+ * Configure the Clock Generation Unit with the desired clock frequency and
-+ * time reference, enabling the PLL which drives the PTP hardware clock.
-  */
--static int ice_init_cgu_e82x(struct ice_hw *hw)
-+static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
-+				 enum ice_time_ref_freq clk_freq,
-+				 enum ice_clk_src clk_src)
-+{
-+	union tspll_ro_lock_e825c ro_lock;
-+	union nac_cgu_dword16_e825c dw16;
-+	union nac_cgu_dword23_e825c dw23;
-+	union nac_cgu_dword19 dw19;
-+	union nac_cgu_dword22 dw22;
-+	union nac_cgu_dword24 dw24;
-+	union nac_cgu_dword9 dw9;
-+	int err;
-+
-+	if (clk_freq >= NUM_ICE_TIME_REF_FREQ) {
-+		dev_warn(ice_hw_to_dev(hw), "Invalid TIME_REF frequency %u\n",
-+			 clk_freq);
-+		return -EINVAL;
-+	}
-+
-+	if (clk_src >= NUM_ICE_CLK_SRC) {
-+		dev_warn(ice_hw_to_dev(hw), "Invalid clock source %u\n",
-+			 clk_src);
-+		return -EINVAL;
-+	}
-+
-+	if (clk_src == ICE_CLK_SRC_TCXO &&
-+	    clk_freq != ICE_TIME_REF_FREQ_156_250) {
-+		dev_warn(ice_hw_to_dev(hw),
-+			 "TCXO only supports 156.25 MHz frequency\n");
-+		return -EINVAL;
-+	}
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD9, &dw9.val);
-+	if (err)
-+		return err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD24, &dw24.val);
-+	if (err)
-+		return err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD16_E825C, &dw16.val);
-+	if (err)
-+		return err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, &dw23.val);
-+	if (err)
-+		return err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, TSPLL_RO_LOCK_E825C, &ro_lock.val);
-+	if (err)
-+		return err;
-+
-+	/* Log the current clock configuration */
-+	ice_debug(hw, ICE_DBG_PTP, "Current CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-+		  dw24.ts_pll_enable ? "enabled" : "disabled",
-+		  ice_clk_src_str(dw23.time_ref_sel),
-+		  ice_clk_freq_str(dw9.time_ref_freq_sel),
-+		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
-+
-+	/* Disable the PLL before changing the clock source or frequency */
-+	if (dw23.ts_pll_enable) {
-+		dw23.ts_pll_enable = 0;
-+
-+		err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C,
-+					     dw23.val);
-+		if (err)
-+			return err;
-+	}
-+
-+	/* Set the frequency */
-+	dw9.time_ref_freq_sel = clk_freq;
-+
-+	/* Enable the correct receiver */
-+	if (clk_src == ICE_CLK_SRC_TCXO) {
-+		dw9.time_ref_en = 0;
-+		dw9.clk_eref0_en = 1;
-+	} else {
-+		dw9.time_ref_en = 1;
-+		dw9.clk_eref0_en = 0;
-+	}
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD9, dw9.val);
-+	if (err)
-+		return err;
-+
-+	/* Choose the referenced frequency */
-+	dw16.tspll_ck_refclkfreq =
-+	e825c_cgu_params[clk_freq].tspll_ck_refclkfreq;
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD16_E825C, dw16.val);
-+	if (err)
-+		return err;
-+
-+	/* Configure the TS PLL feedback divisor */
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD19, &dw19.val);
-+	if (err)
-+		return err;
-+
-+	dw19.tspll_fbdiv_intgr =
-+		e825c_cgu_params[clk_freq].tspll_fbdiv_intgr;
-+	dw19.tspll_ndivratio =
-+		e825c_cgu_params[clk_freq].tspll_ndivratio;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD19, dw19.val);
-+	if (err)
-+		return err;
-+
-+	/* Configure the TS PLL post divisor */
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD22, &dw22.val);
-+	if (err)
-+		return err;
-+
-+	/* These two are constant for E825C */
-+	dw22.time1588clk_div = 5;
-+	dw22.time1588clk_sel_div2 = 0;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD22, dw22.val);
-+	if (err)
-+		return err;
-+
-+	/* Configure the TS PLL pre divisor and clock source */
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, &dw23.val);
-+	if (err)
-+		return err;
-+
-+	dw23.ref1588_ck_div =
-+		e825c_cgu_params[clk_freq].ref1588_ck_div;
-+	dw23.time_ref_sel = clk_src;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, dw23.val);
-+	if (err)
-+		return err;
-+
-+	dw24.tspll_fbdiv_frac =
-+		e825c_cgu_params[clk_freq].tspll_fbdiv_frac;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD24, dw24.val);
-+	if (err)
-+		return err;
-+
-+	/* Finally, enable the PLL */
-+	dw23.ts_pll_enable = 1;
-+
-+	err = ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD23_E825C, dw23.val);
-+	if (err)
-+		return err;
-+
-+	/* Wait to verify if the PLL locks */
-+	usleep_range(1000, 5000);
-+
-+	err = ice_read_cgu_reg_e82x(hw, TSPLL_RO_LOCK_E825C, &ro_lock.val);
-+	if (err)
-+		return err;
-+
-+	if (!ro_lock.plllock_true_lock_cri) {
-+		dev_warn(ice_hw_to_dev(hw), "CGU PLL failed to lock\n");
-+		return -EBUSY;
-+	}
-+
-+	/* Log the current clock configuration */
-+	ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
-+		  dw24.ts_pll_enable ? "enabled" : "disabled",
-+		  ice_clk_src_str(dw23.time_ref_sel),
-+		  ice_clk_freq_str(dw9.time_ref_freq_sel),
-+		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_cfg_cgu_pll_dis_sticky_bits_e82x - disable TS PLL sticky bits
-+ * @hw: pointer to the HW struct
-+ *
-+ * Configure the Clock Generation Unit TS PLL sticky bits so they don't latch on
-+ * losing TS PLL lock, but always show current state.
-+ */
-+static int ice_cfg_cgu_pll_dis_sticky_bits_e82x(struct ice_hw *hw)
- {
--	struct ice_ts_func_info *ts_info = &hw->func_caps.ts_func_info;
- 	union tspll_cntr_bist_settings cntr_bist;
- 	int err;
- 
-@@ -492,14 +668,61 @@ static int ice_init_cgu_e82x(struct ice_hw *hw)
- 
- 	err = ice_write_cgu_reg_e82x(hw, TSPLL_CNTR_BIST_SETTINGS,
- 				     cntr_bist.val);
-+	return err;
-+}
-+
-+/**
-+ * ice_cfg_cgu_pll_dis_sticky_bits_e825c - disable TS PLL sticky bits for E825-C
-+ * @hw: pointer to the HW struct
-+ *
-+ * Configure the Clock Generation Unit TS PLL sticky bits so they don't latch on
-+ * losing TS PLL lock, but always show current state.
-+ */
-+static int ice_cfg_cgu_pll_dis_sticky_bits_e825c(struct ice_hw *hw)
-+{
-+	union tspll_bw_tdc_e825c bw_tdc;
-+	int err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, TSPLL_BW_TDC_E825C, &bw_tdc.val);
-+	if (err)
-+		return err;
-+
-+	bw_tdc.i_plllock_sel_1_0 = 0;
-+
-+	err = ice_write_cgu_reg_e82x(hw, TSPLL_BW_TDC_E825C, bw_tdc.val);
-+	return err;
-+}
-+
-+/**
-+ * ice_init_cgu_e82x - Initialize CGU with settings from firmware
-+ * @hw: pointer to the HW structure
-+ *
-+ * Initialize the Clock Generation Unit of the E822 device.
-+ */
-+static int ice_init_cgu_e82x(struct ice_hw *hw)
-+{
-+	struct ice_ts_func_info *ts_info = &hw->func_caps.ts_func_info;
-+	int err;
-+
-+	/* Disable sticky lock detection so lock err reported is accurate */
-+	if (ice_is_e825c(hw))
-+		err = ice_cfg_cgu_pll_dis_sticky_bits_e825c(hw);
-+	else
-+		err = ice_cfg_cgu_pll_dis_sticky_bits_e82x(hw);
- 	if (err)
- 		return err;
- 
- 	/* Configure the CGU PLL using the parameters from the function
- 	 * capabilities.
- 	 */
--	return ice_cfg_cgu_pll_e82x(hw, ts_info->time_ref,
--				   (enum ice_clk_src)ts_info->clk_src);
-+	if (ice_is_e825c(hw))
-+		err = ice_cfg_cgu_pll_e825c(hw, ts_info->time_ref,
-+					    (enum ice_clk_src)ts_info->clk_src);
-+	else
-+		err = ice_cfg_cgu_pll_e82x(hw, ts_info->time_ref,
-+					   (enum ice_clk_src)ts_info->clk_src);
-+
-+	return err;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 96d6977d6b57..696a29a814bf 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -288,6 +288,28 @@ struct ice_cgu_pin_desc {
- extern const struct
- ice_cgu_pll_params_e82x e822_cgu_params[NUM_ICE_TIME_REF_FREQ];
- 
-+/**
-+ * struct ice_cgu_pll_params_e825c
-+ * @tspll_ck_refclkfreq: tspll_ck_refclkfreq selection
-+ * @tspll_ndivratio: ndiv ratio that goes directly to the pll
-+ * @tspll_fbdiv_intgr: TS PLL integer feedback divide
-+ * @tspll_fbdiv_frac:  TS PLL fractional feedback divide
-+ * @ref1588_ck_div: clock divider for tspll ref
-+ *
-+ * Clock Generation Unit parameters used to program the PLL based on the
-+ * selected TIME_REF/TCXO frequency.
-+ */
-+struct ice_cgu_pll_params_e825c {
-+	u32 tspll_ck_refclkfreq;
-+	u32 tspll_ndivratio;
-+	u32 tspll_fbdiv_intgr;
-+	u32 tspll_fbdiv_frac;
-+	u32 ref1588_ck_div;
-+};
-+
-+extern const struct
-+ice_cgu_pll_params_e825c e825c_cgu_params[NUM_ICE_TIME_REF_FREQ];
-+
- #define E810C_QSFP_C827_0_HANDLE 2
- #define E810C_QSFP_C827_1_HANDLE 3
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index f039fc665455..39d8fc08d651 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -329,7 +329,7 @@ enum ice_time_ref_freq {
- 
- /* Clock source specification */
- enum ice_clk_src {
--	ICE_CLK_SRC_TCX0	= 0, /* Temperature compensated oscillator  */
-+	ICE_CLK_SRC_TCXO	= 0, /* Temperature compensated oscillator */
- 	ICE_CLK_SRC_TIME_REF	= 1, /* Use TIME_REF reference clock */
- 
- 	NUM_ICE_CLK_SRC
--- 
-2.43.0
-
+Thanks
 
