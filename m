@@ -1,298 +1,154 @@
-Return-Path: <netdev+bounces-85799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0F589C3B6
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:43:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E701589C3AE
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:43:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B743A283FFB
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:43:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2598C1C22963
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83807130AE8;
-	Mon,  8 Apr 2024 13:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="KXtFA0Ss"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D77612DD93;
+	Mon,  8 Apr 2024 13:38:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04olkn2084.outbound.protection.outlook.com [40.92.74.84])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAD512E1DB;
-	Mon,  8 Apr 2024 13:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.74.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712583487; cv=fail; b=KcuVJL3uj1tO1MRd0rZx6lRbdIRtJtYOjWK+ONHMYuZla1TQfkwaQm/vZbGCXPXM57+l80qaHKwaa+6SNlI7Rgi+AwxwKNfSRCM3gSzvkKV650g9yR8yTZPBFAnx+KeFvR7tVh1KAGw1Ix6lEZ8QQ54hFfroBlNCNH4nIzDEeu4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712583487; c=relaxed/simple;
-	bh=kMkbuSouMVyfx9e17I2jia19HrSAMQA6Vxiyr4jC7TY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=n4HlFrwUlB7rbJpJQ0kdP3foavb8kPJKDWzqSnbbiGxHB+uZTcuH7dlvPxH1/ygbJmatcxaLKsGib1V93er55tLnFNtvfsnpvD+bsnR2KSZh+MhBICGJEzdVq/Snp4S+aujJj59kIblalA93OiutMxifRiCALmK1odUnavRiOFY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=KXtFA0Ss; arc=fail smtp.client-ip=40.92.74.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jt6uIzF/4h1kqkxkaJLVIb03TeuBpRLK0zlkGd1elnkDUyWhP1CnmXNgQP3KBjyCPuUfrKuoZBYXqpJh5tfinXuPcKLhFRmhXDOTIJmkriN1krxI2m0H3HSCujYf7KWskGN4lErJRVjcNaa/B2ybuRZyIMgSW+cKPtb5lkWocOBQeUaCaawj0OKSjF+IEwLhKD8VeibaQ7XoyaxywFj1BzNQvpn2QV8+ZpbrVBdE1YpzHVHphEr6M0UJUQsuk47kAqgwEx+hFl8pLkbP3MJPZfi+GgPOI/Zfmi7UBXxP1PexA5UYejMDZ2rPehcg5xbbUq6NscxvfDQ05ZWQZNCj9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7WJsOAcjdVDt7Vxd6SdrBgUI2q3HCWMcb42jSXmBoAI=;
- b=WdLB1+cppQ/dDZVjGhmxb0yLziLBQoDRsZVpOOkieq650v2dBfI5bbTKs80H6F7CiGV0JdTHHuPeVYsM+S5oOwXwLVo62gyYl+1k72/xCJSs/REZSpkAUpVIA7iDaWWA7iCjgZygFhZUXP4G5nxJ79OgDBMrmmyd22WIKHOpVzlhc6PKRQAs4XBV3xpKHr+K7+SWOdrfF5nOoDMU+awBPp5NmZH9o/ipThWiqL6UZQ1aqAacDeOW6NxH9jOIzr3Ns4Zzeu/uzSFOt+yf+VYkv/DFAhlwEQJrUPbCHihiFjkEHN0YkYsx35OyxTgQ7aLKHDdWo33x6n13tLymWbXbNw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7WJsOAcjdVDt7Vxd6SdrBgUI2q3HCWMcb42jSXmBoAI=;
- b=KXtFA0SsGemNrSCqoNB4Ghd/tVY31F9erv1IYXfI7JV9L4E7UTSHYi5R2l//fgJmMo6VvDMkWbxQ3Uk2a9n4UCfQbXO8QRnxS/4/nfCpVsL44dPKxXefUAinu58M9zQBtDSOFRycYyo+JrqSjI8pmt4x/9xSq5HwRpQP/oJHXB8Mv3rRElJPVBHf4rNcXp8OuwzVQ/SgmqG9bj6uksTfdwHm70T9MntA0jB48efRD19OJ6Rf2ZeGuRYJfhHZCZoPZ4jIexUCunzJaoraJKO+eM9kfFf21b8FUmRdMFF3I8EuFtNfwcZ/4VrfB/KTgGIsj4O3tx0DVMpMxTlRiHkx5Q==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by AM8P194MB1662.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:321::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.47; Mon, 8 Apr
- 2024 13:37:58 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::56f0:1717:f1a8:ea4e]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::56f0:1717:f1a8:ea4e%2]) with mapi id 15.20.7409.042; Mon, 8 Apr 2024
- 13:37:58 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: mst@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	virtualization@lists.linux.dev,
-	sgarzare@redhat.com,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	stefanha@redhat.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	kvm@vger.kernel.org,
-	jasowang@redhat.com
-Cc: Luigi Leonardi <luigi.leonardi@outlook.com>
-Subject: [PATCH net-next v2 3/3] test/vsock: add ioctl unsent bytes test
-Date: Mon,  8 Apr 2024 15:37:49 +0200
-Message-ID:
- <AS2P194MB217007992597CC2E1BF71D679A002@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240408133749.510520-1-luigi.leonardi@outlook.com>
-References: <20240408133749.510520-1-luigi.leonardi@outlook.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [dILONH51rufQGRaOkOyWZiPNRtnd5OWN]
-X-ClientProxiedBy: MI0P293CA0013.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:44::18) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:20b:642::8)
-X-Microsoft-Original-Message-ID:
- <20240408133749.510520-4-luigi.leonardi@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE6112CDBF;
+	Mon,  8 Apr 2024 13:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712583484; cv=none; b=H6KrxNgnTlxIEoFey5uqBKMHifoQ/V2B+Bmj/DVxTHMZF2Tq9SkXqROoPiQp10iy0ovmwlRrt0E9OnK45nBcI1IQycBPjsXtNjNaAgJEd/V2CC1YIWsaHUJGQ8AIg0cHi3EbbH8+6YcmN/2tM0QJFGmTH6N07qtIWXUimXVXnHI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712583484; c=relaxed/simple;
+	bh=E0/UTpUSMOnQ9j5vlnYiF5Npys6nHFf4oi0gwpMqJj4=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=tmsY09AGZ9i6cKkDnh8PWwwDt6JMF9rMU1yY6HLfzwGAp6cNsu5NyrZb3/x0DXBpeE4tL+wYI+50oCAfEJaUddQH1mnZsGVFakV8d65DTmlZJzYhk7VtacNFrXwmjArkuE5jRMhzheUm+ASfG+XpoYWrWPyS1OWAkF0CRKllClo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VCqq459Xjz1ymVC;
+	Mon,  8 Apr 2024 21:35:44 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5D06118002D;
+	Mon,  8 Apr 2024 21:37:58 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 8 Apr
+ 2024 21:37:58 +0800
+Subject: Re: [PATCH net-next v1 00/12] First try to replace page_frag with
+ page_frag_cache
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<bpf@vger.kernel.org>
+References: <20240407130850.19625-1-linyunsheng@huawei.com>
+ <CAKgT0Uex+e_g9nyqk6DiB03U4zs_A1z2LoztHnpYbJ9LPm=NFA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <05c21500-033b-dfee-6aa7-1ee967616213@huawei.com>
+Date: Mon, 8 Apr 2024 21:37:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|AM8P194MB1662:EE_
-X-MS-Office365-Filtering-Correlation-Id: cf91efde-5ae0-495c-9032-08dc57d11a9d
-X-MS-Exchange-SLBlob-MailProps:
-	znQPCv1HvwW17eFZrekaPBZuDTSQRy8lIpg5mhFRKw0dzIef8ex5pMt4k4PMUxPPmFkwPMy3AtVzRP7WjFRwAkckTI3gHEUIXuIjgJqWtPyLF2zlL2K6qCydptc1rmAOf/gqw5QaHcwwXvE0kL/kybgxJLw0x1AIlOOfhHOmDwA/cV9lmbHQf50rfglG/Xk6oish/+4Mx7O4T0BLluXhM4ufip09AuDGsX7DUTWn9niRBDwckLNw5V7I6dJUYiPf6FO30zNe60wtYKa8SN6iPOar3azooJC7i8uZYZXO/LbvJyjvAX/wlOW6jcfHK8QbQxm0BXEIWgouYqAI+ksrepXEqpcslmb+EV4rGrBDRMZ6VsxQFHcLzZKoRFoh8Gxnl0sw/8iHcqfkh9vj0dTPuXkU6G7Mv13LP+fChuc3haj2PTjvkL/EyRd27/G/m0/d8qpzB0TyuQBAbkzJ5Dctt0sy7x/uztwMdA0MpGlJG8eDObpETSRclHsqZDaa5Z463pj0vrvZ18/T28O5wJNQljTakeMMqsn2PrWUhU4xyr9ymACDpmLTcdKgU6wtg7o1tjXr+t+gZFgm6oDCNVWsQPye2A61u5yNy3cCyTamvq4GeHELP/q+AQyDvqPvOPt4y8BOAjC/ZwlfSvG4C/hWR/A/mjcvXrpkEuzdoyRLJRoN/qiGzMnTEEWClAtoZW5fnkGI4e/40xIQ0g9MOaDOXrlceKin2JmrJ1F03PlH2IEWr7oU+7aH3Bc3cUmXQCiFYyoCg7cKF1o=
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	DTkg/jpp6AQDWuR1wTaWJN/QIgJnaPHc4PCI9k9501z5hGr1+l152pLieJmQ7L+hrI+pmaYj16q4/MPb1a2G+9yV/SWvWqdNnpoZpboL8d/Bmcdof3s6qGUBGSW4QsaCs1KULjgZ+NNAsjdIUCWqDw/qwJj/PwlnT7cfZyDnnJfYwQFSDqrR7OLucko7Dkk7+uFMGxrnaBmniiN16nr8Kp3cvK7y2QR5I577m1yFz4IWk7pOi5h0/V9MvP6KbKetcbUl51xN/J46mH6kjxpcOncMOCrjr1fQLb2F5+fy0w94upNXaatoh5TiVbo1FXRcNLsvbXob7pRU51DncJbZLSrGIC3uWCvYJfSRoQldqxgKmV8Foq50Qo1/0m8ohWUp/vMK7fMzoQEvX5FRUCpQkQgtOLwfT51sd57CcRx7qk+JMEhDPF64ZiiB1YmXpYqrHWoCiOYwvs0N9YvtJCIVIEFV4q0RmXHxx7MQbemkhqSSPkwjLxHchCqGUaoPN4wzC0XSZ/Dn6j6yL1pUGIqqx1FknRRjLvUh1J8MA4RI3+mk89ffXd4KZtoqMAmFzuuAsjkT+eUKYMorw2cjNrgOBD+MItr0j1jvHiJ7W/8WQTovgqTp9E4N+x/tczyibpy4
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?x4g4wC0NHtL006aM8irss2E4QcP3OsY4oFZrhLwt9xH4AFejyBX7mRaQ01rC?=
- =?us-ascii?Q?MEzR877rFLQCUeOfGeoduUPA+gV4PcLzjW+CGHOncIe82k212yWaDFBp/g2O?=
- =?us-ascii?Q?K+3cN68wNRMfCu8dumShB89ZdZ5JnZ/sn/tiOvT7PRCwO8cepimoAk092VKI?=
- =?us-ascii?Q?G7lowW4SLsfX0ub0H0H+igV4L/TC2hYQ3Qcd2x2vD+yBfb869UwOSymAcucr?=
- =?us-ascii?Q?S6dppYvROIYEDr3d8JIMMPoRie9D3KwsvJ4Vf6nxNtM/glLkQ5qQ03uA2St0?=
- =?us-ascii?Q?YYmPid/AkLwdEZM/D33xGfbcqbF/cV8kAzJ4el9uHGLlyOC1HF1wz805VyCn?=
- =?us-ascii?Q?3+k7GvSB9EqKHaGy7+UCdywj7PaN/9sJIK1iSB26523S7AqYcKFI2aX0Eady?=
- =?us-ascii?Q?Iw3YfqbAvT6XAt/9jcnxgUYzmRK4yn+Vm2iaq4kJZ6bBevU17UC2VOHO5JK6?=
- =?us-ascii?Q?sC5nVPtW3AHZ/AHlaB5R0+dilfKE7ktcJFS2nzv49HZB1IsYX+Izd21ihWyk?=
- =?us-ascii?Q?jKazrUeTBqoRK02vMtWVUs/YB5TgL6zHhrwZral4f9cKoLmt+7t5Ody/ov/q?=
- =?us-ascii?Q?IsWIUSfdpNfs6ejDbbPnrUi4qhdVZnIJJf+oc7wDOYJfWbGTFC7AE1ClZ3T6?=
- =?us-ascii?Q?vIvvnwlxsUX5awBfv7Y4xOnSwq5bk8S3OQ3Mhqo4I6nSTcabRvoJGGYeln/X?=
- =?us-ascii?Q?/yvod23Ag/yhGZBD1ZljqkAeztj2ujhdVh8UcFHHFYi4tuDP6aqDR6/4q/xo?=
- =?us-ascii?Q?ONP0BW/m97Kf7Z+wMfGgKT69bcKHiF394Q9JWW316optm+qNBvJY7rTF01so?=
- =?us-ascii?Q?BW3XedBUrCKtSXGg2hSMb369wODoI1IVWN2ETax+elg4Um3CzIDmy/ViLgEe?=
- =?us-ascii?Q?hjH6G0sklz1g7VKZyJ19Rv3vdnOzLYzFv8+uJ3FCsZvMDW+/nCf+pKvInrV4?=
- =?us-ascii?Q?fwjEmKJGIaMwRL2m/gM/+rAbdWH0jhLgKgRr6Zfx+cMG0sSwlR1OtiuZm+IX?=
- =?us-ascii?Q?OMeQnnfTxOTMjrDZWIaQ8z4eetwDtGOsthY8O+84C875JA+TPPf6dAgEOWk6?=
- =?us-ascii?Q?HWG28IWs7Ew3WuDC2NGmG899NH98f2+PuU5T5z5Vnb7pxfJHhEx5RircpgW3?=
- =?us-ascii?Q?4aq5V6iMbsmiddEAWpuSIdr2ov8a8mXsHr+OThXgwVQ8mlJKlywf0hhBNK3b?=
- =?us-ascii?Q?pe9Q6FFBUIFDeIU2WIPwvp9bEq1ojIoczrsuDI3n+R/nyfCozLJQKzSRBUXt?=
- =?us-ascii?Q?icP2MCHSadPPhhZ9EP2C?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf91efde-5ae0-495c-9032-08dc57d11a9d
-X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2024 13:37:58.8173
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8P194MB1662
+In-Reply-To: <CAKgT0Uex+e_g9nyqk6DiB03U4zs_A1z2LoztHnpYbJ9LPm=NFA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-This test that after a packet is delivered the number
-of unsent bytes is zero.
+On 2024/4/8 1:02, Alexander Duyck wrote:
+> On Sun, Apr 7, 2024 at 6:10 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> After [1], Only there are two implementations for page frag:
+>>
+>> 1. mm/page_alloc.c: net stack seems to be using it in the
+>>    rx part with 'struct page_frag_cache' and the main API
+>>    being page_frag_alloc_align().
+>> 2. net/core/sock.c: net stack seems to be using it in the
+>>    tx part with 'struct page_frag' and the main API being
+>>    skb_page_frag_refill().
+>>
+>> This patchset tries to unfiy the page frag implementation
+>> by replacing page_frag with page_frag_cache for sk_page_frag()
+>> first. net_high_order_alloc_disable_key for the implementation
+>> in net/core/sock.c doesn't seems matter that much now have
+>> have pcp support for high-order pages in commit 44042b449872
+>> ("mm/page_alloc: allow high-order pages to be stored on the
+>> per-cpu lists").
+>>
+>> As the related change is mostly related to networking, so
+>> targeting the net-next. And will try to replace the rest
+>> of page_frag in the follow patchset.
+>>
+>> After this patchset, we are not only able to unify the page
+>> frag implementation a little, but seems able to have about
+>> 0.5+% performance boost testing by using the vhost_net_test
+>> introduced in [1] and page_frag_test.ko introduced in this
+>> patch.
+> 
+> One question that jumps out at me for this is "why?". No offense but
+> this is a pretty massive set of changes with over 1400 additions and
+> 500+ deletions and I can't help but ask why, and this cover page
+> doesn't give me any good reason to think about accepting this set.
 
-Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
----
- tools/testing/vsock/util.c       |  6 +--
- tools/testing/vsock/util.h       |  3 ++
- tools/testing/vsock/vsock_test.c | 85 ++++++++++++++++++++++++++++++++
- 3 files changed, 91 insertions(+), 3 deletions(-)
+There are 375 + 256 additions for testing module and the documentation
+update in the last two patches, and there is 198 additions and 176
+deletions for moving the page fragment allocator from page_alloc into
+its own file in patch 1.
+Without above number, there are above 600+ additions and 300+ deletions,
+deos that seems reasonable considering 140+ additions are needed to for
+the new API, 300+ additions and deletions for updating the users to use
+the new API as there are many users using the old API?
 
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index 554b290fefdc..a3d448a075e3 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -139,7 +139,7 @@ int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_po
- }
- 
- /* Connect to <cid, port> and return the file descriptor. */
--static int vsock_connect(unsigned int cid, unsigned int port, int type)
-+int vsock_connect(unsigned int cid, unsigned int port, int type)
- {
- 	union {
- 		struct sockaddr sa;
-@@ -226,8 +226,8 @@ static int vsock_listen(unsigned int cid, unsigned int port, int type)
- /* Listen on <cid, port> and return the first incoming connection.  The remote
-  * address is stored to clientaddrp.  clientaddrp may be NULL.
-  */
--static int vsock_accept(unsigned int cid, unsigned int port,
--			struct sockaddr_vm *clientaddrp, int type)
-+int vsock_accept(unsigned int cid, unsigned int port,
-+		 struct sockaddr_vm *clientaddrp, int type)
- {
- 	union {
- 		struct sockaddr sa;
-diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-index e95e62485959..fff22d4a14c0 100644
---- a/tools/testing/vsock/util.h
-+++ b/tools/testing/vsock/util.h
-@@ -39,6 +39,9 @@ struct test_case {
- void init_signals(void);
- unsigned int parse_cid(const char *str);
- unsigned int parse_port(const char *str);
-+int vsock_connect(unsigned int cid, unsigned int port, int type);
-+int vsock_accept(unsigned int cid, unsigned int port,
-+		 struct sockaddr_vm *clientaddrp, int type);
- int vsock_stream_connect(unsigned int cid, unsigned int port);
- int vsock_bind_connect(unsigned int cid, unsigned int port,
- 		       unsigned int bind_port, int type);
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index f851f8961247..c19ffbcca9dd 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -20,6 +20,8 @@
- #include <sys/mman.h>
- #include <poll.h>
- #include <signal.h>
-+#include <sys/ioctl.h>
-+#include <linux/sockios.h>
- 
- #include "vsock_test_zerocopy.h"
- #include "timeout.h"
-@@ -1238,6 +1240,79 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
- 	}
- }
- 
-+#define MSG_BUF_IOCTL_LEN 64
-+static void test_unsent_bytes_server(const struct test_opts *opts, int type)
-+{
-+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-+	int client_fd;
-+
-+	client_fd = vsock_accept(VMADDR_CID_ANY, 1234, NULL, type);
-+	if (client_fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	recv_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
-+	control_writeln("RECEIVED");
-+
-+	close(client_fd);
-+}
-+
-+static void test_unsent_bytes_client(const struct test_opts *opts, int type)
-+{
-+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-+	int ret, fd, sock_bytes_unsent;
-+
-+	fd = vsock_connect(opts->peer_cid, 1234, type);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	for (int i = 0; i < sizeof(buf); i++)
-+		buf[i] = rand() & 0xFF;
-+
-+	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
-+	control_expectln("RECEIVED");
-+
-+	ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
-+	if (ret < 0) {
-+		perror("ioctl");
-+
-+		if (errno != EOPNOTSUPP)
-+			exit(EXIT_FAILURE);
-+
-+		fprintf(stderr, "Test skipped\n");
-+	} else if (ret == 0 && sock_bytes_unsent != 0) {
-+		fprintf(stderr,
-+			"Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
-+			sock_bytes_unsent);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	close(fd);
-+}
-+
-+static void test_stream_unsent_bytes_client(const struct test_opts *opts)
-+{
-+	test_unsent_bytes_client(opts, SOCK_STREAM);
-+}
-+
-+static void test_stream_unsent_bytes_server(const struct test_opts *opts)
-+{
-+	test_unsent_bytes_server(opts, SOCK_STREAM);
-+}
-+
-+static void test_seqpacket_unsent_bytes_client(const struct test_opts *opts)
-+{
-+	test_unsent_bytes_client(opts, SOCK_SEQPACKET);
-+}
-+
-+static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
-+{
-+	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
-+}
-+
- #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
- /* This define is the same as in 'include/linux/virtio_vsock.h':
-  * it is used to decide when to send credit update message during
-@@ -1523,6 +1598,16 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_rcvlowat_def_cred_upd_client,
- 		.run_server = test_stream_cred_upd_on_low_rx_bytes,
- 	},
-+	{
-+		.name = "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes",
-+		.run_client = test_stream_unsent_bytes_client,
-+		.run_server = test_stream_unsent_bytes_server,
-+	},
-+	{
-+		.name = "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes",
-+		.run_client = test_seqpacket_unsent_bytes_client,
-+		.run_server = test_seqpacket_unsent_bytes_server,
-+	},
- 	{},
- };
- 
--- 
-2.34.1
+> What is meant to be the benefit to the community for adding this? All
+> I am seeing is a ton of extra code to have to review as this
+> unification is adding an additional 1000+ lines without a good
+> explanation as to why they are needed.
 
+Some benefits I see for now:
+1. Improve the maintainability of page frag's implementation:
+   (1) future bugfix and performance can be done in one place.
+       For example, we may able to save some space for the
+       'page_frag_cache' API user, and avoid 'get_page()' for
+       the old 'page_frag' API user.
+
+   (2) Provide a proper API so that caller does not need to access
+       internal data field. Exposing the internal data field may
+       enable the caller to do some unexpcted implementation of
+       its own like below, after this patchset the API user is not
+       supposed to do access the data field of 'page_frag_cache'
+       directly[Currently it is still acessable from API caller if
+       the caller is not following the rule, I am not sure how to
+       limit the access without any performance impact yet].
+https://elixir.bootlin.com/linux/v6.9-rc3/source/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c#L1141
+
+2. page_frag API may provide a central point for netwroking to allocate
+   memory instead of calling page allocator directly in the future, so
+   that we can decouple 'struct page' from networking.
+
+> 
+> Also I wouldn't bother mentioning the 0.5+% performance gain as a
+> "bonus". Changes of that amount usually mean it is within the margin
+> of error. At best it likely means you haven't introduced a noticeable
+> regression.
+
+For micro-benchmark ko added in this patchset, performance gain seems quit
+stable from testing in system without any other load.
+
+> .
+> 
 
