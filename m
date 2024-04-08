@@ -1,226 +1,222 @@
-Return-Path: <netdev+bounces-85682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 568FB89BD98
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:53:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71AC889BD9C
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:54:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D3D1B22552
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:53:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7FD3B23908
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AA560260;
-	Mon,  8 Apr 2024 10:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36126214E;
+	Mon,  8 Apr 2024 10:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZDlkjqVh"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="rT4d0WfH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D380E5EE8D
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 10:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712573586; cv=fail; b=iq27shfHJEXTNdbClQg7OeQsq57Gnr3yjPe59mcgYLUI2mm2ZRktFarKE8OkzGY2zqxNS9CFURlyMuExE0xmu+XHEP33WCMf2zetoygQJlv8aT39rcCi1V3QUHSZUAA4F18GOAW7W43eXR04uIswezv5sY3bDQlqqHmfMBVtoBE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712573586; c=relaxed/simple;
-	bh=XULjBHKmQtq+4zzdQr01BvJu9ndyw2VD/e8CD4nLTn8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rTRt0Bfp+UMsSAAoFsbYpmYnzpceNdoRHgUl80TJuvRM+OqQ7k67c6P9YOUG1VYpFMcL6aRtpNnqiEn4vymKy2f8lHkvgBCWg5SVxQau6ePTewIkXB46aPI4/PpiD1JgauhymS0EpICU4ql7zoFauyzflRamo5/FJkw9mhY3pCs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZDlkjqVh; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712573571; x=1744109571;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=XULjBHKmQtq+4zzdQr01BvJu9ndyw2VD/e8CD4nLTn8=;
-  b=ZDlkjqVhkJm3SxeCN52CXKOpDY482/yjAyojrZ4BTTJUIGx+mTqYP+Qc
-   0WtyT6RHdlHJAzai3Lbh9vsNW2VNyxL8jc/v2BeqY0Y0AkNAQEufWrDFZ
-   v/5ehu9CFxWUYhblHAp7F+o9qfzsc5UkBARcg8dM1evqWYVVfM/lPyh+V
-   eI4gihQMhcxQ5IICfAVvT5Q04QjHHyrB2WyxTvbXJofyRmDivyLBD02A0
-   /s41MLudr01qxUhL+VoQ1/u2m8mi8fq/4da2TXKNi35IqY0C4NNtMG13l
-   0AUmvF+0kt2dNiKggI9Ve6aFwhy2i5Gvz7k5AopxJloKBseoa8hw5qg80
-   g==;
-X-CSE-ConnectionGUID: Q/5TDYhvTI2lscOMpusFXQ==
-X-CSE-MsgGUID: +easXw//TSGl0AsRcy1EDA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11037"; a="8422764"
-X-IronPort-AV: E=Sophos;i="6.07,186,1708416000"; 
-   d="scan'208";a="8422764"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 03:52:43 -0700
-X-CSE-ConnectionGUID: qTj64FnATmeFBb1HfSqXVw==
-X-CSE-MsgGUID: 9NsOFhYoTcmHptdQwHnTOA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,186,1708416000"; 
-   d="scan'208";a="20286080"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Apr 2024 03:52:43 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 8 Apr 2024 03:52:42 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 8 Apr 2024 03:52:42 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 8 Apr 2024 03:52:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jIHZDO9vKnpJuZ5LloXDQIfEkxcohFhbferWOt5UpOcvQjy1NpJpQ8F1rt36GSu45irB5ZbeXs6Uun4Wxr0hI/DtXaKlYFYn04an9na0AM2vbxjLwKxflPlzwwLqH8r2AZtNOyKLYk8+AMaTmfly/Vs5TezlXuCz7LtP6OuVjs6lKULtz43+fHyqCNnSvcJ7vVT0oEfQaMhw2DbCWKtin/+ezqIPEsbWNTaVSUZmoKd/u3YXZC3omqrGXq+bkg3wlqrh/mvInAOaFQUPJoyyCWDjnp5cbKNO64tE+xL0K6l61Di8l/WoG/N8wlcPw4RDJTlgs2bsjXk2ABPoKlxnqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3A7mwuRWRCJUn9jQtI1LQftSsipkfp6+kThFbIparaM=;
- b=BaMSCakQ2sEPKKIr7lJ4eTVRPsu1NDg/qaLM0ER7F54Tn8v9po1FGj1/fZTDTAjOJgoGXqEggD+tNRtiISMeSTL0EE4NESVYfnmLZULqEE48HushkQWCq2l1qVvkCA+G8JjWCvHGt3weDebOTn46kIjGRRNX0eEHLSDnWWeE20sTQf9Tk9DgUUw66e2TrlOui4UepY8jWyh7/6Vk1QOIgXm87XRDVaTv2sdZMc27xTGrN0YPfYzhVpCyWbc0M2vMWWhW90BbJEY9KxkmOFixcSBHyQfhz7kSbfW2tmAMhf4bDMm4pMVGrBrj3TkUeHRiMnQ7I6nJOIDFewACbVpNpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by DS0PR11MB8050.namprd11.prod.outlook.com (2603:10b6:8:117::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Mon, 8 Apr
- 2024 10:52:40 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9%6]) with mapi id 15.20.7452.019; Mon, 8 Apr 2024
- 10:52:40 +0000
-Message-ID: <2bcb7a6c-27b6-4929-ac9c-c6eba3b804b1@intel.com>
-Date: Mon, 8 Apr 2024 12:50:48 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v2] pfcp: avoid copy warning by simplifing code
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-CC: Simon Horman <horms@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>, "Arnd
- Bergmann" <arnd@arndb.de>
-References: <20240405063605.649744-1-michal.swiatkowski@linux.intel.com>
- <20240408081829.GC26556@kernel.org> <ZhPLEuZQ0T7mQHHT@mev-dev>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <ZhPLEuZQ0T7mQHHT@mev-dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DB8P191CA0002.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:10:130::12) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9565FB8F
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 10:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712573673; cv=none; b=RFAbD1Qb2CRbTmP4p2cMQYL4Ehv4F/8LXY4J7xikcXbgOpm1sDycfS2Yfsg35f8//tMGww7dzSY/DAyxBa82AjQL/MH3BV5/3fwFrxFVWDjvwxQiB8a2DC5mH68LBzywR6mrVNs9nIzXR7vzObMlYm5EV/Za06cnmVnv5UQUQ2s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712573673; c=relaxed/simple;
+	bh=6rQbGDsfroHgeS23XMLeLhOkDNTsoatJ5SVogpp5BSM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ifI8r93wpzdPfXQkfkUb4+Sie+cx1M1IuBsGCnTZdANrDAKK76FFxoybqUAQxLVvzQhY9H8aAd7G8FRVCHsCwI02tdHXj7d8VOz4o2C9ZcwYGacOrRKNV6mVItCwn02Sg2OkBONNm4wGmwe2N2qR+MGW3UKL4yPX5Wpq4JY3ZjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=rT4d0WfH; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-415523d9824so43298645e9.3
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 03:54:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712573669; x=1713178469; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6rQbGDsfroHgeS23XMLeLhOkDNTsoatJ5SVogpp5BSM=;
+        b=rT4d0WfHF2dL07Rlz7IQS/Fj7eyXFaR0potayVHoA60IS048NReluVwbFuxV5gXzxY
+         scKKVUMRePUnY8RmyFN12xm8nlTkxzDpqKTTbl5w1C7PAyEWjuZN1WGiGzv8/iEdsNBl
+         ED1f/Fee0zZfEoJOaOtqFqIx+gMGNMIcI3OT389R38SZpCGh/KCqlDC60SOSz0mU7Dyd
+         +xzDZzfI397wdi38/ID4fljKpGA5JUN8A3mzhiyQDf2eTcdQcB4j2GwSr6DQQnv/OmLI
+         Ss57w9f0XL8FsyeZwwSPFMeGQy+W6qL5uxCOkZuYrg0m+RZLFGe6hGtj75nHE1QtFlWZ
+         4DvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712573669; x=1713178469;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6rQbGDsfroHgeS23XMLeLhOkDNTsoatJ5SVogpp5BSM=;
+        b=ccHJ7WPW6y1EPscYn41aSHyezxpUubC+KEC18rNVPwg6bOj4dJF9rfxh6e3o4dcvDY
+         Ksp8CJMaijWfMnvWs7O/XouIfiv3/4XOFciGRuRxViX6vMU7uOAXkctgsM0p3iCKvTlU
+         kmiefOOZp/2HnzsLitN/WAOEcKWiANVyRzHWHZrE4H8wG+/E0mkg8oGbAgVUewTTLYXP
+         tQo5WuT98WkUqtxvIjpJQldTzog/i2425jHrCkmpqCxPCJwqHBnvh6yOQL9HJ1dwJR17
+         IQVfxVyK4NT9WXPbV9v978GbgnEVquh0B0L7aVrFJJn8yjCerKvDQdC0vdHwjTdfgbfv
+         5yQg==
+X-Gm-Message-State: AOJu0Yy+PsYpeh1H8fBPLc7X/I8BJyFzSKBti+C9U0wbdmfNemRK3Czc
+	Vkzugb7cUfJMb736nX9jJupOQPzY059s7nMAo/uBzILVhYrI9OBzkv/BBCpB6eA=
+X-Google-Smtp-Source: AGHT+IGwy/kPE65E40JO6QVimf0nyv7DMYmiAQafCkhNnlqKE0bFuKUurbfULGZMwtlbHvxLsbi1Jg==
+X-Received: by 2002:a05:600c:3501:b0:416:6344:895e with SMTP id h1-20020a05600c350100b004166344895emr2961268wmq.31.1712573669408;
+        Mon, 08 Apr 2024 03:54:29 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id fm13-20020a05600c0c0d00b00416458c71f2sm7273106wmb.45.2024.04.08.03.54.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 03:54:28 -0700 (PDT)
+Date: Mon, 8 Apr 2024 12:54:24 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <ZhPM4Kr6wkAfJhCT@nanopsycho>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <Zg6Q8Re0TlkDkrkr@nanopsycho>
+ <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
+ <Zg7JDL2WOaIf3dxI@nanopsycho>
+ <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS0PR11MB8050:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zCQVb9fTspXSoRqRU5hmkyvIzyKQKRDbdp8NpUjh9OEu9jZi1HS8xiDizM+CkbeaARL+sk6ozAV6g/SiDwW1WWm0q/tPCZB4rfX5R3TLKpC8slF20K6KDewumui4osAb9P45Juab2UVcYFnmbzHpqU8nRaCNkiy5ftLGUFn7/Sc9azOE2vGHablxjP85VAdwZWy+KcHAM5JOFzP+LV/tn0qX/7GyB+ovHmo2iwZTy51EZHr87DjLp1DySskXj2VZH83nBKwJSiepcQC7Q71eKRpSwzMpcJH3UBwQAa89zFVDaOO69RUDhRhpM2Xa7HAd49Aydbyk4IpWuLGkGUF9ginkZjPQSWSeEx8eMHvUQPpA3llIKHGBjTjh58sPXzS7dt9xblQcUrul3T6xBLIuIm8yA1W+HbrgpJnYFmYIJi1aeaN7MMDkJfCH9j8Ar3SmFXgsq9YU3eU3ZCKrj/VL01+ZGatwDVdY42pRdYUR6y1YeNUlIa4q0Mn0HwHT2kLnMJojm5aWVjJLpvXLsOx+R+EMuCEBOAfbzkMT3v17uhNzUunaqDf2jgKgBhDA/YwLuMujLs93Ssfs5Uot8gB2GEC5UuJHnTguuLloKLbcnsE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZllrdENqTUdBSXBxdjlIb25MTGQ3Z3lPUzFYc3JRRXNoRkhxTXdOMlFvQnhh?=
- =?utf-8?B?b2lSbHJnTHVkbjNaWEVtUW53dWxVZmNyUEQva0Q1c0RoZ2JtUzFOaGZ5SytS?=
- =?utf-8?B?YjdCMHVFSGtHdDdsSTVtN0ZDQWdEb1ErbFpyR2VoMnNoNHhOTzRQQVhtMXY5?=
- =?utf-8?B?WDBtRnh5TG1TQzBsYWFiZ3BEaWp0MmprZVhNRm93eHc4cytjL0dGWHA5dlVZ?=
- =?utf-8?B?SzEzNlk2bXE3eVdmT0hjbWtpN1BpcWVUSkx3M1NTNVVMV3QzWjhsWjd4anBn?=
- =?utf-8?B?amRlNi9VYW8yMEF2NlZXMVhxMkQ0eWZobHQvZjFiM1ptUXNDR1IyaytncmFq?=
- =?utf-8?B?Uk5RaUNFWTFDV1YzYlB5SlppNVdVTUMvNU5KeTIwWGZFeUpqb2l4Y2hvZGVl?=
- =?utf-8?B?ak9PVFNDZm9IWEJ1N3FlVFFOc0hMM1R2NXNWbDFId1dtWThzUTZWTFVWZ1dV?=
- =?utf-8?B?WHcranFjRHZ4VllWYmpKMXZrbVAyV1ZPK2M5c0N6ZFBQUTRCRGhkMUoyZHRj?=
- =?utf-8?B?bWtmS1FvV05tQXk2ZENmWVl0eVZPWnR1UGM4a0YzbVVpM0J0bTdpY1F6Mm9I?=
- =?utf-8?B?bDI3QnZ2aDJsNUE1UWo2WGpUUGVFd2VkRnpnOHhpOVFma3lVSHBIeTFZcVo0?=
- =?utf-8?B?bmxkYStHMHdTM0xMZ1BXelc5UHkwSmUwVGkrRmxla1Y4VVF4K1UxN2UrZU5N?=
- =?utf-8?B?OVIzenBOYlh3bWc0dWtYK3Vhd2gwVVFUaytrWjNuYkM4WHVmK0RFN2lQeUts?=
- =?utf-8?B?MDh4ODd4R2JUVUszeXI0YzRKb2R6VWprcTVMQUVmay9hblVNb1dYT0tyeEtY?=
- =?utf-8?B?WFVzZUJkV2ozTXAxMVlraDZjYkNNbHdYV1Q0aWZVTDkxWTdIeE12aHFHK0p2?=
- =?utf-8?B?RlM4Q0xGbHlBaVRiUXVJa3RpUnQ3cXplYm82NjJ5aVIweElKYVdpeXlUSWJw?=
- =?utf-8?B?WWVGMU12d0VzUit1WnFEVjEzWVVFbG5GMUcrVVMwZHVnbjkxRm5KLzdiYzg3?=
- =?utf-8?B?ZjFKRVNnZ2F3UWZmYTNyeDNDVjBrM2Nndll3QkhWSVFHZnZCc3hPdEVsM3BS?=
- =?utf-8?B?QVhNM2kvRzRqYXVUVDB0YXdwb2YybUcrMVExcW9tMTRSWEhPZFZwdG1idXlt?=
- =?utf-8?B?M2hzQVIxRGJBNFE0UmtJczlPWGVxd2R2RldVQXFFdGNmOUt4VFdObmZQU1Vt?=
- =?utf-8?B?YXhsUUJpV29sZkRLMllmNHdESmxNenM3U1JzVXljYUgzUzBJR1pYblhteEpO?=
- =?utf-8?B?aVVNK1dUNkI3ZWx0UDNzYUNKMzc0SitkTXJxQnFDc01ZWCtrcDY5U2dsTmtQ?=
- =?utf-8?B?bnEvdUpJdFZNTS9OWW1jOHBjOWI4eTBkb0VmakpjdEpQWjNIMWJGekptN2VS?=
- =?utf-8?B?S1hwUXRHdkhCTGlJUXdJTFdzeklRb2REdkJqZmtkMW1DVGNGQ0ZNVlcwZ3dr?=
- =?utf-8?B?THlKTkh4SnNaTExqcnZLWjJDK05DbTU3ZDh2M2d0Tkk3bHJWVFhycGo5K2xN?=
- =?utf-8?B?VVhya3lWeDdTa1U5Lzd3MDRNb3Bra3p4b1lUVGRMMTlRQlh4T2c3bVJtSmgy?=
- =?utf-8?B?UDUvWlFYWEcxd3B3MFlyemRDR0dIc1FUTjg5S3NQVU00end4WXdXQkZLbXVH?=
- =?utf-8?B?ZHFpdWtkQXB5ZFFab2c4WHZiTXpKaHFnZ0dGcTFIR2ZheDBFRHR0VU0yREMx?=
- =?utf-8?B?aTlSakZXWXVEaFptVCt1M1IzUXllemtkMFVXMUpUM293aEpaWVpFMjliWitC?=
- =?utf-8?B?cjlOeWlHRDRvdTdqQkZwbTEweFlOYmZQZkhQb3drZWxSbWhld1pXVE1RSWxt?=
- =?utf-8?B?MHZxMStBd0RxeE9qNVVCYVFsNDRNYi9LN1lLa3JzTUJWQUcrQm51VUMxNUN0?=
- =?utf-8?B?MmdMc2hXZnhQZzdsU3NoZCtuMHhVK3p4QXBOTzJ6d1pCVHQ5Q0tGdHU2Y0t2?=
- =?utf-8?B?NUM1dStkUDJuSW9HR1lhanNKaTlNSHBBcW5xSS83ZzMzZEVDRXVmRGRic0RJ?=
- =?utf-8?B?QjFxcXM3T1RWbHBqUUNOd3Z4TVFRTnFrc3hJQ2R4Q3BIY3Q4cStxbkkzK3Nw?=
- =?utf-8?B?ZlZGN2g0MGp6bCs0bzRXLytES0RnQWJWd1hCajBLK1pxTFdXYmFuTFozWUNF?=
- =?utf-8?B?MXhLS0plY0VTSm40OEtYc3ErbVRDdkxYajRxZ1VxSGVlclIzeFdJSkczYWsx?=
- =?utf-8?B?dGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2bf394da-9c4e-411f-b932-08dc57ba0295
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2024 10:52:39.9550
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: biGM6CItOR4JXii/3K3lrHAN8VweIlLZVoer3DLl8Cd35znH3R8jUNYXHua50WOi4esnLWq05MInbD60bIuUSRciQzDl5lgmfikgd1ar7f8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8050
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Date: Mon, 8 Apr 2024 12:46:42 +0200
-
-> On Mon, Apr 08, 2024 at 09:18:29AM +0100, Simon Horman wrote:
->> On Fri, Apr 05, 2024 at 08:36:05AM +0200, Michal Swiatkowski wrote:
->>> >From Arnd comments:
->>> "The memcpy() in the ip_tunnel_info_opts_set() causes
->>> a string.h fortification warning, with at least gcc-13:
->>>
->>>     In function 'fortify_memcpy_chk',
->>>         inlined from 'ip_tunnel_info_opts_set' at include/net/ip_tunnels.h:619:3,
->>>         inlined from 'pfcp_encap_recv' at drivers/net/pfcp.c:84:2:
->>>     include/linux/fortify-string.h:553:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
->>>       553 |                         __write_overflow_field(p_size_field, size);"
->>>
->>> It is a false-positivie caused by ambiguity of the union.
->>>
->>> However, as Arnd noticed, copying here is unescessary. The code can be
->>> simplified to avoid calling ip_tunnel_info_opts_set(), which is doing
->>> copying, setting flags and options_len.
->>>
->>> Set correct flags and options_len directly on tun_info.
->>>
->>> Fixes: 6dd514f48110 ("pfcp: always set pfcp metadata")
->>> Reported-by: Arnd Bergmann <arnd@arndb.de>
->>> Closes: https://lore.kernel.org/netdev/701f8f93-f5fb-408b-822a-37a1d5c424ba@app.fastmail.com/
->>> Acked-by: Arnd Bergmann <arnd@arndb.de>
->>> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Thu, Apr 04, 2024 at 09:22:02PM CEST, alexander.duyck@gmail.com wrote:
+>On Thu, Apr 4, 2024 at 8:36 AM Jiri Pirko <jiri@resnulli.us> wrote:
 >>
->> I agree that it's nice to avoid a copy.
->> But I do wonder where else this pattern may exist.
->> And if it might be worth introducing a helper for it.
-> 
-> Right, the same is done in vxlan, ip_gre and ip6_gre at least. I will
-> send v3 with helper.
-
-Dave applied v2 already, so send this helper as a general improvement
-w/o "Fixes:" :D
-
-> 
-> Thanks,
-> Michal
-> 
+>> Thu, Apr 04, 2024 at 04:45:14PM CEST, alexander.duyck@gmail.com wrote:
+>> >On Thu, Apr 4, 2024 at 4:37 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >>
+>> >> Wed, Apr 03, 2024 at 10:08:24PM CEST, alexander.duyck@gmail.com wrote:
+>
+><...>
+>
+>> >> Could you please shed some light for the motivation to introduce this
+>> >> driver in the community kernel? Is this device something people can
+>> >> obtain in a shop, or is it rather something to be seen in Meta
+>> >> datacenter only? If the second is the case, why exactly would we need
+>> >> this driver?
+>> >
+>> >For now this is Meta only. However there are several reasons for
+>> >wanting to include this in the upstream kernel.
+>> >
+>> >First is the fact that from a maintenance standpoint it is easier to
+>> >avoid drifting from the upstream APIs and such if we are in the kernel
+>> >it makes things much easier to maintain as we can just pull in patches
+>> >without having to add onto that work by having to craft backports
+>> >around code that isn't already in upstream.
 >>
->> Regardless, this looks good to me.
+>> That is making life easier for you, making it harder for the community.
+>> O relevance.
 >>
->> Reviewed-by: Simon Horman <horms@kernel.org>
 >>
->> ...
+>> >
+>> >Second is the fact that as we introduce new features with our driver
+>> >it is much easier to show a proof of concept with the driver being in
+>> >the kernel than not. It makes it much harder to work with the
+>> >community on offloads and such if we don't have a good vehicle to use
+>> >for that. What this driver will provide is an opportunity to push
+>> >changes that would be beneficial to us, and likely the rest of the
+>> >community without being constrained by what vendors decide they want
+>> >to enable or not. The general idea is that if we can show benefit with
+>> >our NIC then other vendors would be more likely to follow in our path.
+>>
+>> Yeah, so not even we would have to maintain driver nobody (outside Meta)
+>> uses or cares about, you say that we will likely maintain more of a dead
+>> code related to that. I think that in Linux kernel, there any many
+>> examples of similarly dead code that causes a lot of headaches to
+>> maintain.
+>>
+>> You just want to make your life easier here again. Don't drag community
+>> into this please.
+>
+>The argument itself doesn't really hold water. The fact is the Meta
+>data centers are not an insignificant consumer of Linux, so it isn't
+>as if the driver isn't going to be used. This implies some lack of
 
-Thanks,
-Olek
+Used by one user. Consider a person creating some custom proprietary
+FPGA based pet project for himself, trying to add driver for it to the
+mainline kernel. Why? Nobody else will ever see the device, why the
+community should be involved at all? Does not make sense. Have the
+driver for your internal cook-ups internal.
+
+
+>good faith from Meta. I don't understand that as we are contributing
+>across multiple areas in the kernel including networking and ebpf. Is
+>Meta expected to start pulling time from our upstream maintainers to
+>have them update out-of-tree kernel modules since the community isn't
+>willing to let us maintain it in the kernel? Is the message that the
+
+If Meta contributes whatever may be useful for somebody else, it is
+completely fine. This driver is not useful for anyone, except Meta.
+
+
+>kernel is expected to get value from Meta, but that value is not meant
+>to be reciprocated? Would you really rather have us start maintaining
+>our own internal kernel with our own "proprietary goodness", and ask
+
+I don't care, maintain whatever you want internally. Totally up to you.
+Just try to understand my POV. I may believe you have good faith and
+everything. But still, I think that community has to be selfish.
+
+
+>other NIC vendors to have to maintain their drivers against yet
+>another kernel if they want to be used in our data centers?
+>
+>As pointed out by Andew we aren't the first data center to push a
+>driver for our own proprietary device. The fact is there have been
+
+If you proprietary device is used by other people running virtual
+machines on your systems, that is completely fine. But that is incorrect
+analogy to your nic, no outside-Meta person will ever see it!
+
+
+>drivers added for devices that were for purely emulated devices with
+>no actual customers such as rocker. Should the switch vendors at the
+
+This is completely fault analogy. Rocker was introduced to solve
+chicken-egg problem to ass switch device support into kernel. It served
+the purpose quite well. Let it rot now.
+
+
+
+>time have pushed back on it stating it wasn't a real "for sale"
+>device? The whole argument seems counter to what is expected. When a
+>vendor creates a new device and will likely be enabling new kernel
+>features my understanding is that it is better to be in the kernel
+>than not.
+>
+>Putting a criteria on it that it must be "for sale" seems rather
+
+Not "for sale", but "available to the outside person".
+
+
+>arbitrary and capricious, especially given that most drivers have to
+
+Not capricious at all, I sorry you feel that way. You proceed your
+company goals, my position here is to defend the community and
+the unnecessary and pointless burden you are putting on it.
+
+
+>be pushed out long before they are available in the market in order to
+>meet deadlines to get the driver into OSV releases such as Redhat when
+>it hits the market. By that logic should we block all future drivers
+>until we can find them for sale somewhere? That way we don't run the
+
+That is or course obviously complete fault analogy again. You never plan
+to introduce your device to public. Big difference. Don't you see it?
+
+
+>risk of adding a vendor driver for a product that might be scrapped
+>due to a last minute bug that will cause it to never be released.
 
