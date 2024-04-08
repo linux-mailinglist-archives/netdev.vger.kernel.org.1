@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-85697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D6A89BDEB
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:18:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F17889BDEE
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:18:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05F4AB21CA8
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:18:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14F94281F10
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD89657B6;
-	Mon,  8 Apr 2024 11:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F25657CB;
+	Mon,  8 Apr 2024 11:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YUHVe/7a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U9KPa/X8"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF14651B3
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 11:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79ECF657A9
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 11:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712575105; cv=none; b=HdlRsNnpAYtS1bGHMmd6QQvFAOXL+b747zH7K0ORS+KPQAoIhfiL7rd3021lFO8Nc9K+LjNV2DMvha9afpzcdq9c2W6q4+9BCuOxSKYy+cG739ksRAcddYvhe7F/Ivap/FgtpEnL0pwDMk7pAbh8wLqtOfYWYyNDFRDnolD2Nx4=
+	t=1712575108; cv=none; b=c/ODgOCD/jJEHjqHoKw30HVAogrnUOGjILP4wmQmxEFYMfl9QGe2kmF3WQ1IRlwiHavUiyAYQkwLrZeN/MNdR8Z6MR2t58V4wSQOS7Pz8ZRTiKyqnGZ3GzT6Jw+wt8ohLIMEyWxNX8CtjlK1P0MapMdNS61kEkURIXNZSLqoER4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712575105; c=relaxed/simple;
-	bh=4Dop1DFtQSwYxf+DH46JK4MDp6Ech0Bp16Hl5e8zTP0=;
+	s=arc-20240116; t=1712575108; c=relaxed/simple;
+	bh=VUjc07/O2AnsdYN9j7j+UdMBTUDwCU4wJIYPpRL/8wY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Hg3WJIqYKQc7BetnJX+0yd1ryjuCVRngtrepHOo3/D0cSYmGFG5z40I7SW1dlVJ73oyeiUE9N9xx48y2wbUhfVkFyfuBaMyYBHr0FYstOT8Hp7YbvvHUMETSyjyOW9d+0soYe45s0Q5qYzi9XeTEDma3wDb+zjO07qOktQ8PK4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YUHVe/7a; arc=none smtp.client-ip=198.175.65.13
+	 MIME-Version; b=of6SUQ5qz/cxBCbt0J1LcVFeQVbHghr5Ny/rpBuVDly1g48QFDep1o/ldp8UZgaR8xOb0DAh/92sDFxmClPyz226bdz02YAYeE47lI4BUm1aMOyWM7uY6Nta/9afN8WZzU3LPZj6GXshVcURCFQDiRUjSmHOgbicC896ZZjkv3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U9KPa/X8; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712575103; x=1744111103;
+  t=1712575105; x=1744111105;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4Dop1DFtQSwYxf+DH46JK4MDp6Ech0Bp16Hl5e8zTP0=;
-  b=YUHVe/7adPNXaKe4/9Hd3dCgLOR/33LzGADnxn3Uc+HE9ZTFCuauFRNF
-   /E4sD6p3gUO4ZFXX+KQWe3Mo5jXt/3EhhksqA/NywI6FHsEbQfGbG4iUt
-   UsHZWNJv77a1rZZc9wmwIM+SlAdgGq7e9RBG3NAKhUEdNabQlkrVLJQRL
-   NEg/9LRrZyIt/OCpgQwtE0eK8s7bJ/NDDjCFap/QJTLBFrB+7+oJZ1eqs
-   pGzFTmOYkS+8SX9ptWq/nQCQLTKPID/QwNmhfJtKYh3QdEj6fYxwfRYvX
-   R/cBsv692Z/TIGz+ZTOvRudR1RYgtSmZXiIgnhre/oh9HJ7zJa8Ij9Glm
-   w==;
-X-CSE-ConnectionGUID: ZDNMv0anRAuDEqn8KsUyDQ==
-X-CSE-MsgGUID: LRNzz5KiTjiKdpcWvUE7EA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11037"; a="18988532"
+  bh=VUjc07/O2AnsdYN9j7j+UdMBTUDwCU4wJIYPpRL/8wY=;
+  b=U9KPa/X8HTnhpBP7x6Wp8FDW2w3Gw4FBnXzDmJydlmK0YfQROA30k65P
+   GVx9gqBAk0BAajcu+vanZ59K0za0sgqOBVpLiUVqIKyvholzMlw4dlM+S
+   VUp61aXc/pxPf8RFo+E9zDcED328WqRz31v1as8n1HC6qb5dBglyIorfT
+   bC0SL80Pf3dpEwUgEaS5fotYyuDAZaRTkeMgCH0WYAbrKorb3ClUec5kt
+   Omcbboj5oH9LOOily09GqzJQFzHj1vSV8qm8yQRhdfkCrHICgWF4DusQ1
+   RdxxtS6py6iSwl2JDGbWH/bddeUmXH8Uv7UaXNPnxGj8s3/B9Ageo2Q+E
+   g==;
+X-CSE-ConnectionGUID: 9YFb5ve3RvaHgdoJ9VTEKg==
+X-CSE-MsgGUID: ODFnjkFnT6+rlZ3fPJEIbg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11037"; a="18988538"
 X-IronPort-AV: E=Sophos;i="6.07,186,1708416000"; 
-   d="scan'208";a="18988532"
+   d="scan'208";a="18988538"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 04:18:23 -0700
-X-CSE-ConnectionGUID: WDiNjY3kSb2j7sQEB2OScA==
-X-CSE-MsgGUID: /XStnOnxR2SVDfKslhd2VQ==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 04:18:25 -0700
+X-CSE-ConnectionGUID: RmBg/4DdSiO4+CZq9h+lVg==
+X-CSE-MsgGUID: cvsQkUOERIaNlsCXB6R3cQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,186,1708416000"; 
-   d="scan'208";a="19904886"
+   d="scan'208";a="19904894"
 Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by fmviesa009.fm.intel.com with ESMTP; 08 Apr 2024 04:18:21 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 08 Apr 2024 04:18:23 -0700
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
 	jesse.brandeburg@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v7 iwl-next 02/12] ice: Introduce helper to get tmr_cmd_reg values
-Date: Mon,  8 Apr 2024 13:07:23 +0200
-Message-ID: <20240408111814.404583-16-karol.kolacinski@intel.com>
+Subject: [PATCH v7 iwl-next 03/12] ice: Implement Tx interrupt enablement functions
+Date: Mon,  8 Apr 2024 13:07:24 +0200
+Message-ID: <20240408111814.404583-17-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240408111814.404583-14-karol.kolacinski@intel.com>
 References: <20240408111814.404583-14-karol.kolacinski@intel.com>
@@ -81,226 +81,178 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 
-Multiple places in the driver code need to convert enum ice_ptp_tmr_cmd
-values into register bits for both the main timer and the PHY port
-timers. The main MAC register has one bit scheme for timer commands,
-while the PHY commands use a different scheme.
+Introduce functions enabling/disabling Tx TS interrupts
+for the E822 and ETH56G PHYs
 
-The E810 and E830 devices use the same scheme for port commands as used
-for the main timer. However, E822 and ETH56G hardware has a separate
-scheme used by the PHY.
-
-Introduce helper functions to convert the timer command enumeration into
-the register values, reducing some code duplication, and making it
-easier to later refactor the individual port write commands.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
-V4 -> V5: Changed operation sequence to shift tmr_idx instead of cmd_val
+V5 -> V6: Adjusted return in ice_phy_cfg_intr_e82x()
 
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 140 ++++++++++++--------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   2 +-
- 2 files changed, 89 insertions(+), 53 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp.c    | 63 ++++++++++-----------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 29 ++++++++++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  4 +-
+ 3 files changed, 61 insertions(+), 35 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index cca9d09b2d61..18d5dff6b872 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -1457,42 +1457,43 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
+  * @ena: bool value to enable or disable interrupt
+  * @threshold: Minimum number of packets at which intr is triggered
+  *
+- * Utility function to enable or disable Tx timestamp interrupt and threshold
++ * Utility function to configure all the PHY interrupt settings, including
++ * whether the PHY interrupt is enabled, and what threshold to use. Also
++ * configures The E82X timestamp owner to react to interrupts from all PHYs.
+  */
+ static int ice_ptp_cfg_phy_interrupt(struct ice_pf *pf, bool ena, u32 threshold)
+ {
++	struct device *dev = ice_pf_to_dev(pf);
+ 	struct ice_hw *hw = &pf->hw;
+-	int err = 0;
+-	int quad;
+-	u32 val;
+ 
+ 	ice_ptp_reset_ts_memory(hw);
+ 
+-	for (quad = 0; quad < ICE_GET_QUAD_NUM(hw->ptp.num_lports); quad++) {
+-		err = ice_read_quad_reg_e82x(hw, quad, Q_REG_TX_MEM_GBL_CFG,
+-					     &val);
+-		if (err)
+-			break;
+-
+-		if (ena) {
+-			val |= Q_REG_TX_MEM_GBL_CFG_INTR_ENA_M;
+-			val &= ~Q_REG_TX_MEM_GBL_CFG_INTR_THR_M;
+-			val |= FIELD_PREP(Q_REG_TX_MEM_GBL_CFG_INTR_THR_M,
+-					  threshold);
+-		} else {
+-			val &= ~Q_REG_TX_MEM_GBL_CFG_INTR_ENA_M;
++	switch (hw->ptp.phy_model) {
++	case ICE_PHY_E82X: {
++		int quad;
++
++		for (quad = 0; quad < ICE_GET_QUAD_NUM(hw->ptp.num_lports);
++		     quad++) {
++			int err;
++
++			err = ice_phy_cfg_intr_e82x(hw, quad, ena, threshold);
++			if (err) {
++				dev_err(dev, "Failed to configure PHY interrupt for quad %d, err %d\n",
++					quad, err);
++				return err;
++			}
+ 		}
+ 
+-		err = ice_write_quad_reg_e82x(hw, quad, Q_REG_TX_MEM_GBL_CFG,
+-					      val);
+-		if (err)
+-			break;
++		return 0;
++	}
++	case ICE_PHY_E810:
++		return 0;
++	case ICE_PHY_UNSUP:
++	default:
++		dev_warn(dev, "%s: Unexpected PHY model %d\n", __func__,
++			 hw->ptp.phy_model);
++		return -EOPNOTSUPP;
+ 	}
+-
+-	if (err)
+-		dev_err(ice_pf_to_dev(pf), "PTP failed in intr ena, err %d\n",
+-			err);
+-	return err;
+ }
+ 
+ /**
+@@ -3010,12 +3011,10 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
+ 	/* Release the global hardware lock */
+ 	ice_ptp_unlock(hw);
+ 
+-	if (!ice_is_e810(hw)) {
+-		/* Enable quad interrupts */
+-		err = ice_ptp_cfg_phy_interrupt(pf, true, 1);
+-		if (err)
+-			goto err_exit;
+-	}
++	/* Configure PHY interrupt settings */
++	err = ice_ptp_cfg_phy_interrupt(pf, true, 1);
++	if (err)
++		goto err_exit;
+ 
+ 	/* Ensure we have a clock device */
+ 	err = ice_ptp_create_clock(pf);
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index e86ca6cada79..0d8e051ff93b 100644
+index 0d8e051ff93b..bd25ebd976bc 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -227,40 +227,114 @@ static u64 ice_ptp_read_src_incval(struct ice_hw *hw)
+@@ -2715,6 +2715,35 @@ ice_get_phy_tx_tstamp_ready_e82x(struct ice_hw *hw, u8 quad, u64 *tstamp_ready)
+ 	return 0;
  }
  
- /**
-- * ice_ptp_src_cmd - Prepare source timer for a timer command
-- * @hw: pointer to HW structure
-+ * ice_ptp_tmr_cmd_to_src_reg - Convert to source timer command value
-+ * @hw: pointer to HW struct
-  * @cmd: Timer command
-  *
-- * Prepare the source timer for an upcoming timer sync command.
-+ * Returns: the source timer command register value for the given PTP timer
-+ * command.
-  */
--void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
-+static u32 ice_ptp_tmr_cmd_to_src_reg(struct ice_hw *hw,
-+				      enum ice_ptp_tmr_cmd cmd)
- {
--	u32 cmd_val;
--	u8 tmr_idx;
-+	u32 cmd_val, tmr_idx;
++/**
++ * ice_phy_cfg_intr_e82x - Configure TX timestamp interrupt
++ * @hw: pointer to the HW struct
++ * @quad: the timestamp quad
++ * @ena: enable or disable interrupt
++ * @threshold: interrupt threshold
++ *
++ * Configure TX timestamp interrupt for the specified quad
++ */
 +
-+	switch (cmd) {
-+	case ICE_PTP_INIT_TIME:
-+		cmd_val = GLTSYN_CMD_INIT_TIME;
-+		break;
-+	case ICE_PTP_INIT_INCVAL:
-+		cmd_val = GLTSYN_CMD_INIT_INCVAL;
-+		break;
-+	case ICE_PTP_ADJ_TIME:
-+		cmd_val = GLTSYN_CMD_ADJ_TIME;
-+		break;
-+	case ICE_PTP_ADJ_TIME_AT_TIME:
-+		cmd_val = GLTSYN_CMD_ADJ_INIT_TIME;
-+		break;
-+	case ICE_PTP_NOP:
-+	case ICE_PTP_READ_TIME:
-+		cmd_val = GLTSYN_CMD_READ_TIME;
-+		break;
-+	default:
-+		dev_warn(ice_hw_to_dev(hw),
-+			 "Ignoring unrecognized timer command %u\n", cmd);
-+		cmd_val = 0;
++int ice_phy_cfg_intr_e82x(struct ice_hw *hw, u8 quad, bool ena, u8 threshold)
++{
++	int err;
++	u32 val;
++
++	err = ice_read_quad_reg_e82x(hw, quad, Q_REG_TX_MEM_GBL_CFG, &val);
++	if (err)
++		return err;
++
++	val &= ~Q_REG_TX_MEM_GBL_CFG_INTR_ENA_M;
++	if (ena) {
++		val |= Q_REG_TX_MEM_GBL_CFG_INTR_ENA_M;
++		val &= ~Q_REG_TX_MEM_GBL_CFG_INTR_THR_M;
++		val |= FIELD_PREP(Q_REG_TX_MEM_GBL_CFG_INTR_THR_M, threshold);
 +	}
- 
- 	tmr_idx = ice_get_ptp_src_clock_index(hw);
--	cmd_val = tmr_idx << SEL_CPK_SRC;
 +
-+	return tmr_idx << SEL_CPK_SRC | cmd_val;
++	return ice_write_quad_reg_e82x(hw, quad, Q_REG_TX_MEM_GBL_CFG, val);
 +}
 +
-+/**
-+ * ice_ptp_tmr_cmd_to_port_reg- Convert to port timer command value
-+ * @hw: pointer to HW struct
-+ * @cmd: Timer command
-+ *
-+ * Note that some hardware families use a different command register value for
-+ * the PHY ports, while other hardware families use the same register values
-+ * as the source timer.
-+ *
-+ * Returns: the PHY port timer command register value for the given PTP timer
-+ * command.
-+ */
-+static u32 ice_ptp_tmr_cmd_to_port_reg(struct ice_hw *hw,
-+				       enum ice_ptp_tmr_cmd cmd)
-+{
-+	u32 cmd_val, tmr_idx;
-+
-+	/* Certain hardware families share the same register values for the
-+	 * port register and source timer register.
-+	 */
-+	switch (hw->ptp.phy_model) {
-+	case ICE_PHY_E810:
-+		return ice_ptp_tmr_cmd_to_src_reg(hw, cmd) & TS_CMD_MASK_E810;
-+	default:
-+		break;
-+	}
- 
- 	switch (cmd) {
- 	case ICE_PTP_INIT_TIME:
--		cmd_val |= GLTSYN_CMD_INIT_TIME;
-+		cmd_val = PHY_CMD_INIT_TIME;
- 		break;
- 	case ICE_PTP_INIT_INCVAL:
--		cmd_val |= GLTSYN_CMD_INIT_INCVAL;
-+		cmd_val = PHY_CMD_INIT_INCVAL;
- 		break;
- 	case ICE_PTP_ADJ_TIME:
--		cmd_val |= GLTSYN_CMD_ADJ_TIME;
-+		cmd_val = PHY_CMD_ADJ_TIME;
- 		break;
- 	case ICE_PTP_ADJ_TIME_AT_TIME:
--		cmd_val |= GLTSYN_CMD_ADJ_INIT_TIME;
-+		cmd_val = PHY_CMD_ADJ_TIME_AT_TIME;
- 		break;
- 	case ICE_PTP_READ_TIME:
--		cmd_val |= GLTSYN_CMD_READ_TIME;
-+		cmd_val = PHY_CMD_READ_TIME;
- 		break;
- 	case ICE_PTP_NOP:
-+		cmd_val = 0;
- 		break;
-+	default:
-+		dev_warn(ice_hw_to_dev(hw),
-+			 "Ignoring unrecognized timer command %u\n", cmd);
-+		cmd_val = 0;
- 	}
- 
-+	tmr_idx = ice_get_ptp_src_clock_index(hw);
-+
-+	return tmr_idx << SEL_PHY_SRC | cmd_val;
-+}
-+
-+/**
-+ * ice_ptp_src_cmd - Prepare source timer for a timer command
-+ * @hw: pointer to HW structure
-+ * @cmd: Timer command
-+ *
-+ * Prepare the source timer for an upcoming timer sync command.
-+ */
-+void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
-+{
-+	u32 cmd_val = ice_ptp_tmr_cmd_to_src_reg(hw, cmd);
-+
- 	wr32(hw, GLTSYN_CMD, cmd_val);
- }
- 
-@@ -3023,47 +3097,9 @@ static int ice_ptp_prep_phy_incval_e810(struct ice_hw *hw, u64 incval)
-  */
- static int ice_ptp_port_cmd_e810(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- {
--	u32 cmd_val, val;
--	int err;
-+	u32 val = ice_ptp_tmr_cmd_to_port_reg(hw, cmd);
- 
--	switch (cmd) {
--	case ICE_PTP_INIT_TIME:
--		cmd_val = GLTSYN_CMD_INIT_TIME;
--		break;
--	case ICE_PTP_INIT_INCVAL:
--		cmd_val = GLTSYN_CMD_INIT_INCVAL;
--		break;
--	case ICE_PTP_ADJ_TIME:
--		cmd_val = GLTSYN_CMD_ADJ_TIME;
--		break;
--	case ICE_PTP_READ_TIME:
--		cmd_val = GLTSYN_CMD_READ_TIME;
--		break;
--	case ICE_PTP_ADJ_TIME_AT_TIME:
--		cmd_val = GLTSYN_CMD_ADJ_INIT_TIME;
--		break;
--	case ICE_PTP_NOP:
--		return 0;
--	}
--
--	/* Read, modify, write */
--	err = ice_read_phy_reg_e810(hw, ETH_GLTSYN_CMD, &val);
--	if (err) {
--		ice_debug(hw, ICE_DBG_PTP, "Failed to read GLTSYN_CMD, err %d\n", err);
--		return err;
--	}
--
--	/* Modify necessary bits only and perform write */
--	val &= ~TS_CMD_MASK_E810;
--	val |= cmd_val;
--
--	err = ice_write_phy_reg_e810(hw, ETH_GLTSYN_CMD, val);
--	if (err) {
--		ice_debug(hw, ICE_DBG_PTP, "Failed to write back GLTSYN_CMD, err %d\n", err);
--		return err;
--	}
--
--	return 0;
-+	return ice_write_phy_reg_e810(hw, E810_ETH_GLTSYN_CMD, val);
- }
- 
  /**
+  * ice_ptp_init_phy_e82x - initialize PHY parameters
+  * @ptp: pointer to the PTP HW struct
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 3dce09af0d78..6246de3bacf3 100644
+index 6246de3bacf3..5645b20a9f87 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -485,7 +485,7 @@ int ice_cgu_get_output_pin_state_caps(struct ice_hw *hw, u8 pin_id,
- #define ETH_GLTSYN_SHADJ_H(_i)		(0x0300037C + ((_i) * 32))
+@@ -265,6 +265,7 @@ int ice_stop_phy_timer_e82x(struct ice_hw *hw, u8 port, bool soft_reset);
+ int ice_start_phy_timer_e82x(struct ice_hw *hw, u8 port);
+ int ice_phy_cfg_tx_offset_e82x(struct ice_hw *hw, u8 port);
+ int ice_phy_cfg_rx_offset_e82x(struct ice_hw *hw, u8 port);
++int ice_phy_cfg_intr_e82x(struct ice_hw *hw, u8 quad, bool ena, u8 threshold);
  
- /* E810 timer command register */
--#define ETH_GLTSYN_CMD			0x03000344
-+#define E810_ETH_GLTSYN_CMD		0x03000344
+ /* E810 family functions */
+ int ice_read_sma_ctrl_e810t(struct ice_hw *hw, u8 *data);
+@@ -342,11 +343,8 @@ int ice_cgu_get_output_pin_state_caps(struct ice_hw *hw, u8 pin_id,
+ #define Q_REG_TX_MEM_GBL_CFG		0xC08
+ #define Q_REG_TX_MEM_GBL_CFG_LANE_TYPE_S	0
+ #define Q_REG_TX_MEM_GBL_CFG_LANE_TYPE_M	BIT(0)
+-#define Q_REG_TX_MEM_GBL_CFG_TX_TYPE_S	1
+ #define Q_REG_TX_MEM_GBL_CFG_TX_TYPE_M	ICE_M(0xFF, 1)
+-#define Q_REG_TX_MEM_GBL_CFG_INTR_THR_S	9
+ #define Q_REG_TX_MEM_GBL_CFG_INTR_THR_M ICE_M(0x3F, 9)
+-#define Q_REG_TX_MEM_GBL_CFG_INTR_ENA_S	15
+ #define Q_REG_TX_MEM_GBL_CFG_INTR_ENA_M	BIT(15)
  
- /* Source timer incval macros */
- #define INCVAL_HIGH_M			0xFF
+ /* Tx Timestamp data registers */
 -- 
 2.43.0
 
