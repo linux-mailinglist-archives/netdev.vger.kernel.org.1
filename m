@@ -1,117 +1,98 @@
-Return-Path: <netdev+bounces-85821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07AF889C6EA
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 16:23:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82DB89C712
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 16:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 399BA1C21300
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 14:23:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FF782828DC
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 14:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B414C8662A;
-	Mon,  8 Apr 2024 14:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73A7130AF9;
+	Mon,  8 Apr 2024 14:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="MhcSCgyh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y8LB4WOq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E57126F08
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 14:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E74C130AED;
+	Mon,  8 Apr 2024 14:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712586185; cv=none; b=MzAJh6eRHdvkxSjreMANVRCo7eG6W5LnPWXJslbf7jwZDXRINDtKBWYaTAV55fzVhXCi45N+cwLK/H5xTU50czsUH9Tc1tN/ekVOIH7cswH8sHeKY3sHe+QJwC/1G9SMZU6wgL7HXW5LoznGWUkl8Narm+RalV38k1kyCrnuexc=
+	t=1712586627; cv=none; b=XbuD+REPW6Ku9rTVquAf2BXfS0JtVUtV1gtRsDNovWqlV01nrYelqw2qNyTrAoct8y+LyFRDD9U3HJhTfLjlq9I1VJVX2653gde2V9aDo2AfGMD/wKgD2gA4TqzZ0NW22yi7JyltTAyzHsIg3tm8CerATqzqELnhaG+S8B7cxPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712586185; c=relaxed/simple;
-	bh=ASwjOtafsNvaK1tlb8jIM/8bIFvFtdW7g4Y89s6XAik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nTl0P4m3T+jML12EtmowA00UE4h/YGLpoKBL8YcsnzsaLK0syG5Vf30m6T+g/OqqvVdzxUbW/xZ1Q7IqR/VLQ5KdEKZ8+lFtOQkkaVfL/AGpvsBJX6KB3pa69ibpu+iiCtMt5rY3fZl4qtI+jP+lOaw1nYgH6EGFKptzFzffQRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=MhcSCgyh; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4347bcc2b47so6854971cf.3
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 07:23:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1712586183; x=1713190983; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SD8rm/bO60JPEGFzrzXXf29p0Zi+gnvFHzCU8iQAQC0=;
-        b=MhcSCgyh6644fOR/YrkhDES5cxTFJCiqGASMVMVjRegNGFbuv3CfV4lpM3utI2otvj
-         kedg6k3XerXFzYBPBO3BaKDUl/a5Fj0XJrnt87sNZX3zPPSg2IMAvAU2kW+RrqrvzSru
-         Kfmjsf3YWoGyXaOZhjrTT6HYGq18RqDBoc442aP9MUj7tL8Ogb32F6aHmJ0aFcdt3Rln
-         e9oseoJO40Q/RCrzAwJOVzSIfQqSGplUJgrW7M05DQ+WoJcs4aIF3qDRfAxL5g0MCy6/
-         KJPeQldNPquBVSMocJWGF3uodlQfp1zMV5Gie8kzSll65IPUTaj2Np0l+hPyY5pnbRTv
-         YSrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712586183; x=1713190983;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SD8rm/bO60JPEGFzrzXXf29p0Zi+gnvFHzCU8iQAQC0=;
-        b=CbN98shEeeIIUU552rA4PYmGiAAjB6+WdncS/lvAbHPSg8qNuQJOanRmwvB8S8Moxa
-         M7WzlxkREpZz5l+h9qjaVmg4BQl9Ydk6wKArQ2o2lZ/q9RY1ilOLVHah8FGLTaabV9J7
-         JYJXANuw3ofJd50GOUL2bOb9e00JNuD9Dq36SsXXJCiZuLb3jGXw29bp0bzOvH5VwaZ/
-         +O5JaJE/4tk7qMUy9Mz/3RwG2DhWiQoQL+NQtQ7pZ4b9RU3eVy/rDPcxVdr3WDDDlRuy
-         TfcaO3bvnTRmZB7nmDEQsAR99zBnuFA74y2Mtp+INZVF5ZgXNVzV6kQS6DXRmBZ31vdN
-         qE+Q==
-X-Gm-Message-State: AOJu0YwXwtQKVH7ENKz2EOd8I9XQn3bqrPGk/Zn7/jTBwCTYRWhBKAIN
-	mNWNRwU8kX4Beiv5Kjz0aZK/nSUg0v0At46WV331AQqKANZpMvXMHoe/f7Dc/bI=
-X-Google-Smtp-Source: AGHT+IHp2J0PauJZ/6whw6FPfSiROjrnQAqEPvgrQbpT4bbiXu+sG4LXPgEiqdSRoEBhQ34wukAUrQ==
-X-Received: by 2002:ac8:5a4a:0:b0:434:c5f7:effe with SMTP id o10-20020ac85a4a000000b00434c5f7effemr633188qta.68.1712586182955;
-        Mon, 08 Apr 2024 07:23:02 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id fa11-20020a05622a4ccb00b004343f36ab58sm3742588qtb.81.2024.04.08.07.23.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 07:23:02 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rtptm-005H8u-2i;
-	Mon, 08 Apr 2024 11:23:02 -0300
-Date: Mon, 8 Apr 2024 11:23:02 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Denis Kirjanov <kirjanov@gmail.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, leon@kernel.org,
-	Denis Kirjanov <dkirjanov@suse.de>,
-	syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
-Subject: Re: [PATCH v3 net] Subject: [PATCH] RDMA/core: fix UAF with
- ib_device_get_netdev()
-Message-ID: <20240408142302.GC223006@ziepe.ca>
-References: <20240328133542.28572-1-dkirjanov@suse.de>
+	s=arc-20240116; t=1712586627; c=relaxed/simple;
+	bh=Alfp2ELwhITazKMEegUqvVbJyfZKJCbUEoIYjFPYgmc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bmTgg2tKgf0tuqkOiLlM99Y8x78iIOXearPG1MVSMaiCue6fAxdl/uMxqc75cm6/0FptviqEvLsMXwH+OinQ/hDx+Lfgxy9A7aj2FVUHWAiqyfgEQL1smgmVOyjR/rOaCJfc9NCniwVrU0r4A6Mrz50OwPMDSTVyMIyhJEgT1nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y8LB4WOq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 146D7C43390;
+	Mon,  8 Apr 2024 14:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712586627;
+	bh=Alfp2ELwhITazKMEegUqvVbJyfZKJCbUEoIYjFPYgmc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Y8LB4WOq8S/HKOQhBSfEl++bTKhnOqa+MVCjoT3nZKwZIP+iCIyBu+ibN53oksdkz
+	 y4amJknhZgJvaj7/9fNShGylwWb8GQZfjxbYK3Q27HvzCazJwQHtAxCTfShZpRXjCk
+	 0/3KJBS+Vg5YHmXGd7GVY6cLO7hvDPszraeG+YM5ZI6rR18LIrImi0/uwIHF6p4vaU
+	 b+NRCtF1c0s1fzeF5/9Pv6jWhwXTGVli4suxGVtF5OUOIGYR4dnwaABLIlqwGwWQDl
+	 CSme3uKEL0Q5bp+XGwwes4hqqZCDS7OKcaTD1FGqP9IahaOUZEke8KSAijKc1Ivpiy
+	 Q6rEm2aozqkRw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 067A5D72A03;
+	Mon,  8 Apr 2024 14:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240328133542.28572-1-dkirjanov@suse.de>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/2] Add missing mmc statistics in DW GMAC
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171258662702.25921.3073865414312265648.git-patchwork-notify@kernel.org>
+Date: Mon, 08 Apr 2024 14:30:27 +0000
+References: <20240408012943.66508-1-minda.chen@starfivetech.com>
+In-Reply-To: <20240408012943.66508-1-minda.chen@starfivetech.com>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
-On Thu, Mar 28, 2024 at 09:35:42AM -0400, Denis Kirjanov wrote:
-> A call to ib_device_get_netdev may lead to a race condition
-> while accessing a netdevice instance since we don't hold
-> the rtnl lock while checking
-> the registration state:
-> 	if (res && res->reg_state != NETREG_REGISTERED) {
+Hello:
+
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Mon,  8 Apr 2024 09:29:41 +0800 you wrote:
+> Add miss MMC statistic in DW GMAC
 > 
-> v2: unlock rtnl on error path
-> v3: update remaining callers of ib_device_get_netdev
+> base on 6.9-rc1
 > 
-> Reported-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
-> Fixes: d41861942fc55 ("IB/core: Add generic function to extract IB speed from netdev")
-> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
-> ---
->  drivers/infiniband/core/cache.c  |  2 ++
->  drivers/infiniband/core/device.c | 15 ++++++++++++---
->  drivers/infiniband/core/nldev.c  |  2 ++
->  drivers/infiniband/core/verbs.c  |  6 ++++--
->  4 files changed, 20 insertions(+), 5 deletions(-)
+> changed
+> v2:
+>    patch2 : remove mmc_rx_control_g due to it is gotten in
+> ethtool_ops::get_eth_ctrl_stats.
+> 
+> [...]
 
-This is a rdma patch you need to cc linux-rdma and ensure it reaches
-the rdma patchworks or it will not be applied..
+Here is the summary with links:
+  - [v2,1/2] net: stmmac: mmc_core: Add GMAC LPI statistics
+    https://git.kernel.org/netdev/net/c/dfe073f8714d
+  - [v2,2/2] net: stmmac: mmc_core: Add GMAC mmc tx/rx missing statistics
+    https://git.kernel.org/netdev/net/c/ff20393bdc45
 
-Thanks,
-Jason
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
