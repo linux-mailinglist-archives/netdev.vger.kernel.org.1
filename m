@@ -1,127 +1,128 @@
-Return-Path: <netdev+bounces-85578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93F9589B7B1
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 08:36:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C04589B7B4
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 08:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 342D51F226BE
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 06:36:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F19C21F2277C
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 06:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C926B7462;
-	Mon,  8 Apr 2024 06:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717EE11712;
+	Mon,  8 Apr 2024 06:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="PiVHLjsZ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BAFpQRgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AD3A171B0
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 06:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A3010976;
+	Mon,  8 Apr 2024 06:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712558159; cv=none; b=sxI/Um9gje4T6GxuMuU68QmBbMMhFV+ZrCni+hFRoecqBnrFDRtmbaC1l7PsGwbAiH9DDxB6mgJhEC7jXYkwaoxkPiNQmEADN+DRGgbGEMLEXy+CT+LhT07Go3DXdHpvRzqRwtLpQiImmlq1ngIjveaCb8o0/0IXwnFrcpnLJoI=
+	t=1712558222; cv=none; b=ISDYA7W6LgzusHi3PWG/qz4fkfoWvXiUAtW9plgj5+HkaeBl9KPgNq6XC/iuE4lpOf8p6FJQAkFzeYXpqHdF6wl5+gnkUyvykY9PjRh1XqPUyURq3cwlky1owtI6lhoSWgBEpDDilBkwv2451yW0dgoANJvVX8XacxdEmiGoA9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712558159; c=relaxed/simple;
-	bh=GB58bQle6/TE9XhpcBSQjj6cikX2bR8e+VuUWv1u+SE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aLcWx+MfAlOgzqSnrxC+oq9rImNBtwFtXf6VdJp7CSBhNSwaZaktcGO1scRdtTTmiUJVC+GKRNZ9f+HB/udznEG9KCaLaxG3SI/AbpDachxeyzd/0F5DeIwZhFNvQeea/rusU40Hla311AiHggN8GvQH95J6up2DiC59tj8xcJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=PiVHLjsZ; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a51a7dc45easo314849366b.2
-        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 23:35:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1712558156; x=1713162956; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GB58bQle6/TE9XhpcBSQjj6cikX2bR8e+VuUWv1u+SE=;
-        b=PiVHLjsZEyeApXJdxfGALGW1z5oS6aYyaXctRE2Yw88k3GCEQRr0DWo4ofr3+E7Gr/
-         BLPG5DGcdsH4vKrkjleF++t9NcXJJWH+dbtA/dioTBSUrh5Qu2eLen0P0C2e6EHXgG8k
-         woehRemp38+VRVkmmpP/NMXh8NpEm6KRyDU/Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712558156; x=1713162956;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GB58bQle6/TE9XhpcBSQjj6cikX2bR8e+VuUWv1u+SE=;
-        b=RuTvBOb/DkliN9B6f0ppPs/aFOhHogU1DtZfe7JFDyU+cQ4hDjHSryJqbRylNhWRKy
-         uZ9XoT1zdNylDRapzGHCvW/UCCA8zqIIVBKsC+0GkoouQHS7Ezroyx2xz/I3KE4uHVtj
-         vH/kJsJOOnqtPaAWiL95QNBSp6e6YCsOluEDMDzEtyyzP5/Ltz4bh6folZiOcJKbNqY2
-         1nz6SeRoQ4ATzl5IT8Trdz+8N9RgHE5kk1ulfl5aCQUTwSvWwxfvPDKBTgjTSwMZ/anA
-         +73bN2UamamvgrmfyX8D44BLKccguT6jEoF4nA0FnhJ16qLzfFeeOewgY7s0zaRW/Luq
-         RsGA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDCmqFeTESlzNC/Dy6aiNxv1+gJEYQ3od4/rF2c/osmwBLBElzEKzdcYpa0xH0dSmKoESP4cTANyYX18KuM+N49c2sQJo9
-X-Gm-Message-State: AOJu0YzB6acZCIs4Zu36Ar/eZgTL8UFqAO6f4tuSRwL61IfpYSzRIc2O
-	uk0MtESScMKEKH2b09qgY5xl7j7qro/Y5ND84LPl3ZqKUMf0gNNWeXst41URdFf6sYKlRgiUGjj
-	uGGHsnMZseWWjEW1TDbLocCYEqyqUpeV2s04N
-X-Google-Smtp-Source: AGHT+IHgOG1QFRsazaJJTQAM1OpfXlCUvvdH9XD6u9F4YJ8KIuAm8siPgnu/FFrnysbhWv7Ny+9JXK+VCjeK9WS7Rgs=
-X-Received: by 2002:a17:906:565a:b0:a51:9737:f23d with SMTP id
- v26-20020a170906565a00b00a519737f23dmr4595803ejr.70.1712558156369; Sun, 07
- Apr 2024 23:35:56 -0700 (PDT)
+	s=arc-20240116; t=1712558222; c=relaxed/simple;
+	bh=tBs/YJ2fLDfrIVtxpGytKjKUVc/9/3IKnSLB8drjLUQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TbjtPECDNWAQtlhUVz5Enblm2kEs01Db9DcIGNSO0gK6rztgMA4VYSx3uoGTQGg0v0trL+IXREFV9E9RG7CWFM3I9RBmWFet5zap2wgL2XS+gmdJ1/HfsgDrNsbArPuv5XHHR+5zBUnwHk4XolpxJdqUBbVpl63uXl0EAgIHylk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BAFpQRgR; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 437MmxNx020481;
+	Sun, 7 Apr 2024 23:36:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=j/ahPDX2/GgpboNxFpPN/xXlJANbz5Sc0e/KSoo81V4=; b=BAF
+	pQRgRG+tEooBaHX01dRwo2mFRCFsbGKRxx9TibWa+hgVHw/1NYV+f/oHKWy2kWhw
+	IGASlCahmeMdP6IYHfwDr3rqR1nifgjxhWMVBcwI+bxPZqd21y/G64YApFwyGnpo
+	oklZHOGEKxF3VgRDqIMnIRG+n49ZeoWtYOdovYTHS1K5NC9TGNNXcnYMPhgD1PHA
+	q5zoipkjgV+OByhGUYiCq17bKgwMpoeGZz7rYZyZIF6EBsxUybGny6bAeqdLgDcN
+	dTsrVmRB+UFsx9s1hSQCD/FJ4f7gin6Tcq3Xqj3/fvmbCsc6uAa128K4txM184zo
+	E2nV2MwhhtAkvSeaTvQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3xbdd4b15d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 07 Apr 2024 23:36:48 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sun, 7 Apr 2024 23:36:47 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sun, 7 Apr 2024 23:36:47 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 4397C3F70AE;
+	Sun,  7 Apr 2024 23:36:44 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net PATCH] octeontx2-af: Fix NIX SQ mode and BP config
+Date: Mon, 8 Apr 2024 12:06:43 +0530
+Message-ID: <20240408063643.26288-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
- <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
- <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
- <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
- <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com>
- <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
- <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
- <CA+9S74hs_1Ft9iyXOPU_vF_EFKuoG8LjDpSna0QSPMFnMywd_g@mail.gmail.com>
- <CACGkMEvHiAN7X_QBgihWX6zzEUOxhrV2Nqg1arw1sfYy2A5K0g@mail.gmail.com>
- <CAK8fFZ6P6e+6V6NUkc-H5SdkXqgHdZ-GEMEPp4hKZSJVaGbBYQ@mail.gmail.com>
- <20240404063737.7b6e3843@kernel.org> <CAK8fFZ5LHFMPAOFCKu-vr7JQJHKo9jshrgvCCP50d596nFiXUQ@mail.gmail.com>
-In-Reply-To: <CAK8fFZ5LHFMPAOFCKu-vr7JQJHKo9jshrgvCCP50d596nFiXUQ@mail.gmail.com>
-From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Date: Mon, 8 Apr 2024 08:35:30 +0200
-Message-ID: <CAK8fFZ74tj=u5HKfpFue1ejy_9V3xWdf-ekC0gLt8BmJs7Y5ZQ@mail.gmail.com>
-Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jason Wang <jasowang@redhat.com>, Igor Raits <igor@gooddata.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 8kyiDbbuHG5iSCnc8S6gEGh5qqReZe-U
+X-Proofpoint-GUID: 8kyiDbbuHG5iSCnc8S6gEGh5qqReZe-U
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-08_05,2024-04-05_02,2023-05-22_02
 
-=C4=8Dt 4. 4. 2024 v 20:17 odes=C3=ADlatel Jaroslav Pulchart
-<jaroslav.pulchart@gooddata.com> napsal:
->
-> =C4=8Dt 4. 4. 2024 v 15:37 odes=C3=ADlatel Jakub Kicinski <kuba@kernel.or=
-g> napsal:
-> >
-> > On Thu, 4 Apr 2024 07:42:45 +0200 Jaroslav Pulchart wrote:
-> > > We do not have much progress
-> >
-> > Random thought - do you have KFENCE enabled?
-> > It's sufficiently low overhead to run in production and maybe it could
-> > help catch the bug? You also hit some inexplicable bug in the Intel
-> > driver, IIRC, there may be something odd going on.. (it's not all
-> > happening on a single machine, right?)
->
-> We have KFENCE enabled.
->
-> Issue was observed at multiple servers. It is not a problem to reproduce =
-it
-> everywhere where we deploy Loki service. The trigger is: I click
-> once/twice "run query" (LogQL) button by Grafana UI. the Loki is
-> starting to load data from the minio cluster at a speed of ~2GB/s and
-> almost immediately it crashes.
->
-> The Intel ICE driver is in my suspicion as well, it will not be for
-> the first time when we are hitting some bugs there. I will try one
-> testing server where we have different NIC vendor later.
+NIX SQ mode and link backpressure configuration is required for
+all platforms. But in current driver this code is wrongly placed
+under specific platform check. This patch fixes the issue by 
+moving the code out of platform check.
 
-I run the setup on a server with a different network card than E810, I
-used BCM57414 NetXtreme-E + driver bnxt_en. The issue is not
-reproducible there. So it looks to be connected with Intel's ice
-driver for E810 network card and introduced in 6.3.
+Fixes: 5d9b976d4480 ("octeontx2-af: Support fixed transmit scheduler topology")
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 20 +++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index d39001cdc707..00af8888e329 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -4819,18 +4819,18 @@ static int rvu_nix_block_init(struct rvu *rvu, struct nix_hw *nix_hw)
+ 		 */
+ 		rvu_write64(rvu, blkaddr, NIX_AF_CFG,
+ 			    rvu_read64(rvu, blkaddr, NIX_AF_CFG) | 0x40ULL);
++	}
+ 
+-		/* Set chan/link to backpressure TL3 instead of TL2 */
+-		rvu_write64(rvu, blkaddr, NIX_AF_PSE_CHANNEL_LEVEL, 0x01);
++	/* Set chan/link to backpressure TL3 instead of TL2 */
++	rvu_write64(rvu, blkaddr, NIX_AF_PSE_CHANNEL_LEVEL, 0x01);
+ 
+-		/* Disable SQ manager's sticky mode operation (set TM6 = 0)
+-		 * This sticky mode is known to cause SQ stalls when multiple
+-		 * SQs are mapped to same SMQ and transmitting pkts at a time.
+-		 */
+-		cfg = rvu_read64(rvu, blkaddr, NIX_AF_SQM_DBG_CTL_STATUS);
+-		cfg &= ~BIT_ULL(15);
+-		rvu_write64(rvu, blkaddr, NIX_AF_SQM_DBG_CTL_STATUS, cfg);
+-	}
++	/* Disable SQ manager's sticky mode operation (set TM6 = 0)
++	 * This sticky mode is known to cause SQ stalls when multiple
++	 * SQs are mapped to same SMQ and transmitting pkts at a time.
++	 */
++	cfg = rvu_read64(rvu, blkaddr, NIX_AF_SQM_DBG_CTL_STATUS);
++	cfg &= ~BIT_ULL(15);
++	rvu_write64(rvu, blkaddr, NIX_AF_SQM_DBG_CTL_STATUS, cfg);
+ 
+ 	ltdefs = rvu->kpu.lt_def;
+ 	/* Calibrate X2P bus to check if CGX/LBK links are fine */
+-- 
+2.25.1
+
 
