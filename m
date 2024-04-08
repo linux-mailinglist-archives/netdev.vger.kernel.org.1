@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-85679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401BA89BD82
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E05AE89BD83
 	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E93E9284039
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C931B222EF
 	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA735FBB7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5D05FB8B;
 	Mon,  8 Apr 2024 10:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lF+gfVx5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oytWGUVo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8DD5FB8C;
-	Mon,  8 Apr 2024 10:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998A4524DE
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 10:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712573427; cv=none; b=iqWB96Mz1aGBDFXaK7jocStNzo/w7CT6YYMXNJDT25GeBuZzTGiN1bkQrAKc7fBI9deOcgYTdK9OUkWNu9CxIsRWmbd6Yp0mIdzBRJGehLv5m3Jb6QlhswKK7zDvRl68TCqAW46OL3RIpeL/66YaMXo2Kya57tkDk+UYgslJ044=
+	t=1712573427; cv=none; b=OjKgdN0bFAbnlXPBxmZ4CgefhUWfMS3E/+rvJJq4Eq/9HtrFNYhhiLMMPNEzBRtQMLLSiCmb6istSv9Wa4oRjZkoNLFtVHAVs2Y4uNtUa9iAlfSTgBM3QCNvtfZJPU/PEnkgkanSu9Wrgy+7xd8wAJwJ8qKTDyRtYX0q/CTD39k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712573427; c=relaxed/simple;
-	bh=nYFUGgAe6JEVlDZJ6H84eYG+or3I6A2rmoi4NbVi+bI=;
+	bh=tSLu4JFbNcsTulQYhIAN1Ya5xJF/tkz0vkFXRq+Di2o=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uAqObldMwYDlVmEfZghci+7nVWm5CHQOKekAzggX1heyDfw8RHvG7rQGtKZly2BmdK/SBNrO9aNRenw6aqZZZO5QkFXFxd6tpyAFcFyna6swBXRme+SBJmz6D0ALQ2di809YT3sOwaNnNYQqcmbxL0X0eufnKeF9mrZo+75h0q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lF+gfVx5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 59F8FC43390;
+	 In-Reply-To:To:Cc; b=qGWaI5bOM+Fk41bXsqq4U+KZnynH9rzFMMX20uZyd2Sp5qj3P8pUsZlbtwuYjNwY59pT32LTJUhhk+FYG2S5l79AnG0WVRytKPT7Z0nqO7UXHURTUWUOxR1bQb302fabsXW61pVGhQkXPwPjCHeX+/cxruNnXX0rg+JSnH9vm3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oytWGUVo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 67033C433F1;
 	Mon,  8 Apr 2024 10:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712573427;
-	bh=nYFUGgAe6JEVlDZJ6H84eYG+or3I6A2rmoi4NbVi+bI=;
+	bh=tSLu4JFbNcsTulQYhIAN1Ya5xJF/tkz0vkFXRq+Di2o=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lF+gfVx5Xe5MBpI46z/YyX7D21uLo+a7niU+ciALzFZlXk1VuxEcy+gUTsK+5Xr7I
-	 +2l+SxHn5orr/1jNoX+kvvS5wa36FSR6zidqSdjhmgQ/pLcDAiFmN+ODq/FbSccbDt
-	 5TCFK79Okj8S7xGkrB2Tw9A3wgpLjK0wF3O9/jdKi6m1+gXGuLh6d6gOlc9LfFHaqg
-	 9Nan/GwBMi2xMYBBi90FYioR/fqDqnvcigrRKs6aIHkf9rrb0AnpCg6DaxpNVRaTr4
-	 Gx+7PPfWLi9cfSqACjlxoZlCPyGe9Y4ZiNyCgONmL9cL2YcHV+avtOOhmNmTXWWTfC
-	 ed58pRA18nPkQ==
+	b=oytWGUVocblv+BEnu1Z+7JkA7qJhTBxWpw7mHa4DKx+KMOHDfMJmHHDprLsGP1/Yh
+	 v8Z0yq/VZvBk6K4cMGZ0xWfLra0HG0nOR2gUTVcs8vuu/tBSgfq3hlZB8p/G3iJOh1
+	 qHlYEMYZrO+u8usvJlEZrnxRGszdTM+deBP+GwtkIKthk3QgeThJ2GM9s+d668C2ha
+	 QeyANLvbj6om5XtZy0N9Sm+DTujVlAdTnfm3dunoNyywyBW0TIwCLl+yGNc1nFbKRC
+	 gqCaBlre5m90jreG8gdGvI+0fAaFRETmaVlJxUdrELbx3RYyimNE1KeWK/W/wI8ba5
+	 LNejzAYVxoEoQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 50FB3C54BD6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 58D4AC54BD4;
 	Mon,  8 Apr 2024 10:50:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,49 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/5] selftests: net: groundwork for YNL-based
- tests
+Subject: Re: [PATCH net-next] tcp: more struct tcp_sock adjustments
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171257342732.21044.16185402025320251923.git-patchwork-notify@kernel.org>
+ <171257342736.21044.8786404384177962110.git-patchwork-notify@kernel.org>
 Date: Mon, 08 Apr 2024 10:50:27 +0000
-References: <20240405024526.2752998-1-kuba@kernel.org>
-In-Reply-To: <20240405024526.2752998-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, sdf@google.com, donald.hunter@gmail.com,
- linux-kselftest@vger.kernel.org, petrm@nvidia.com
+References: <20240405102926.170698-1-edumazet@google.com>
+In-Reply-To: <20240405102926.170698-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  4 Apr 2024 19:45:21 -0700 you wrote:
-> Currently the options for writing networking tests are C, bash or
-> some mix of the two. YAML/Netlink gives us the ability to easily
-> interface with Netlink in higher level laguages. In particular,
-> there is a Python library already available in tree, under tools/net.
-> Add the scaffolding which allows writing tests using this library.
+On Fri,  5 Apr 2024 10:29:26 +0000 you wrote:
+> tp->recvmsg_inq is used from tcp recvmsg() thus should
+> be in tcp_sock_read_rx group.
 > 
-> The "scaffolding" is needed because the library lives under
-> tools/net and uses YAML files from under Documentation/.
-> So we need a small amount of glue code to find those things
-> and add them to TEST_FILES.
+> tp->tcp_clock_cache and tp->tcp_mstamp are written
+> both in rx and tx paths, thus are better placed
+> in tcp_sock_write_txrx group.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/5] selftests: net: add scaffolding for Netlink tests in Python
-    https://git.kernel.org/netdev/net-next/c/b86761ff6374
-  - [net-next,v3,2/5] selftests: nl_netdev: add a trivial Netlink netdev test
-    https://git.kernel.org/netdev/net-next/c/796c8c7fd257
-  - [net-next,v3,3/5] netdevsim: report stats by default, like a real device
-    https://git.kernel.org/netdev/net-next/c/f216306bfb60
-  - [net-next,v3,4/5] selftests: drivers: add scaffolding for Netlink tests in Python
-    https://git.kernel.org/netdev/net-next/c/b4db9f840283
-  - [net-next,v3,5/5] testing: net-drv: add a driver test for stats reporting
-    https://git.kernel.org/netdev/net-next/c/f0e6c86e4bab
+  - [net-next] tcp: more struct tcp_sock adjustments
+    https://git.kernel.org/netdev/net-next/c/d2c3a7eb1afa
 
 You are awesome, thank you!
 -- 
