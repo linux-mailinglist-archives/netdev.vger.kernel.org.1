@@ -1,134 +1,221 @@
-Return-Path: <netdev+bounces-85875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D111E89CAC1
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:27:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D8D89CACA
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:28:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8854628A7EF
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:27:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA86028A7DD
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821BA143C7A;
-	Mon,  8 Apr 2024 17:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8911E143C4A;
+	Mon,  8 Apr 2024 17:28:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="sA/UQbNT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88921448E6;
-	Mon,  8 Apr 2024 17:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A587A143880;
+	Mon,  8 Apr 2024 17:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712597189; cv=none; b=qURnUt6rqfVpzNCe06VLjdWtVeHlRISXbK9oyedjxsuaSp5fh7KGVYeAmbxCtRvoR72TtZP5a4ZKPTPkg5G/LlGbSSqOKqeICQ5Bun1WQQK0yCUeh5P9tV6ue26KPvHsgbKkYNgz5xuB4i49/zvI9DXex6UGSDMOBJ2Lnyrbp0c=
+	t=1712597288; cv=none; b=ehDdiLMCi70DE5t+2usR4ofPBEn9nA13bgE/EC0EK4uGdU6XV3bGYBjd5sSOYfOuJ/SnCeWM4abxysbJ8yJ8/6BgIsZeY8ehWHgQUsK/gc+QQ18/bOVWgxrjPiDonlSU9dRkwrH6wOFytrtSxOdciJIhaUh7o2T5t2AXvkpFKO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712597189; c=relaxed/simple;
-	bh=BB6xdcqBBRM0M9Ry0QYPtGpccU8xNKpU0XluHoHcNZ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YL7Rcz+5CN2y3BYcnKcHJ7uqk0UDJHymuB9Y+smsR0+moKWXX+/D+xuChAu8b2mWacGP7WMrwzKRixlcGZ85c2i5mErhN9qEE4c/JfZjj35SOvdHzA39El/0frLu7xhVa32fWI74M7b2UL3+lcs4rz7hs0HpfQnEVTfcB8YY870=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56e346224bdso2829746a12.1;
-        Mon, 08 Apr 2024 10:26:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712597186; x=1713201986;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3GvozmrLkyQGC20P7bfv/jYd6/SqOcwnOpAWpJop5SM=;
-        b=hR7YCcRgO5Daa4QdxJ788HQOrma8neTHfgybb/5ReWl0DtAkusRSm2P6ugAxy3cXkZ
-         9+V7dwgupJSMjxCw7zi1tlmkf5TlFofSit6O8IKkhGDZkPCSGWxhlYUsGet82e71xZj2
-         wrt3ZGp+3AFp8ZAV1znLwg3zJ88AW9hmsI/bvb2VSj1oNI8OK/r6I98+cpkF5mf+Ajj/
-         O5VfZOCbOGRFYMrGUaIlM3C4wZEbskJpgXFgWiqbLT8y/ycGc8MQgCtM3dEYmJnhLbe7
-         pw7cjBp8etPOtM17u8VlCcPSvXMTIWigJCz+U4M+fqAeBz4nb5V4GF0VapLrv3ReOMRQ
-         a5eQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXC1CrHOn4jPTj6hpyFqUjr6XnUqc9y1xJhrlVD10pebz1KzXX5eMUOlwpjJWrtdQZCVuV3XnrJTwgmAOwN0PgdvqRY2wc7
-X-Gm-Message-State: AOJu0YzqTdtQ/Zd9euBL9DL3DkZ/mmHrp0DbYHNpu/aLv1ShF8+Nv7Y2
-	h/iDRUd5h1UMpQ4UP7thl3R893+24CTvnZnvtGwDLo+hZJN2Iy0K
-X-Google-Smtp-Source: AGHT+IFYUbY4WZ/0ZBQpTqBC7RgrqLxqyOCgqu18pEEv4vjQdy70C9zgi5iIe95NEx65Yrgy3HJQzw==
-X-Received: by 2002:a50:ccd6:0:b0:56c:5a49:730 with SMTP id b22-20020a50ccd6000000b0056c5a490730mr6862966edj.19.1712597185851;
-        Mon, 08 Apr 2024 10:26:25 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-120.fbsv.net. [2a03:2880:30ff:78::face:b00c])
-        by smtp.gmail.com with ESMTPSA id q18-20020aa7d452000000b0056e247de8e3sm4311465edr.1.2024.04.08.10.26.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 10:26:25 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] net: dqs: make struct dql more cache efficient
-Date: Mon,  8 Apr 2024 10:25:56 -0700
-Message-ID: <20240408172605.635508-5-leitao@debian.org>
+	s=arc-20240116; t=1712597288; c=relaxed/simple;
+	bh=plYws3az66yYzUB9kegD6f/52t70PzV1zIDHcCsIMqY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T//fpqNGJAQzyxy5Zt+03PCxjDh26M2y0V+fzjCIWt/MtSI27cdjlNNmjWpE0G8HQUwFhP13fLwLPzG6EyocjfBsIpK8fxz2fep9ttQJ6fuWak4s3VUSHg0TuUX8XE4r/Yz8U0E7maNp4b0L9BZYBwXAlaGe7EpPh0wTxc+BD10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=sA/UQbNT; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 0CAB1600A2;
+	Mon,  8 Apr 2024 17:27:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1712597282;
+	bh=plYws3az66yYzUB9kegD6f/52t70PzV1zIDHcCsIMqY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sA/UQbNT4EI9oEo2CYem4mTORREN/kAXnH2EGdlfwUMc7gox03AYTTpK2O1C6VGYJ
+	 t2/AeX2TT1F1AgOxF6reGtZcUDdHmsJlwx1MrEo5cxvUXS2E4eH5jkP0TqccLzFfpg
+	 yR8NrKtxYpCnPgn4ctHYWbVqAphTCDGpJrdXagjRWKe+oO2GKBjLj6QpBBXvCZxy95
+	 AltTL3NG8MYaHwZmokak1pskwl//ZZckBwJr8wIU5yedHGYZmqN5tG+T7ldOQ/iCYh
+	 qIYAuqzdIoBgOVgoLwc35f5LxrCIzj8WuzE05jp7xB4Eqs86ROuk7V5CMOkBeUXcN5
+	 q5rIi+vk3teRQ==
+Received: by x201s (Postfix, from userid 1000)
+	id ED11A201CE7; Mon, 08 Apr 2024 17:27:47 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: sparx5: flower: fix fragment flags handling
+Date: Mon,  8 Apr 2024 17:27:35 +0000
+Message-ID: <20240408172738.96447-1-ast@fiberby.net>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240408172605.635508-1-leitao@debian.org>
-References: <20240408172605.635508-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-With the previous change, struct dqs->stall_thrs will be in the hot path
-(at queue side), even if DQS is disabled.
+I noticed that only 3 out of the 4 input bits were used,
+mt.key->flags & FLOW_DIS_IS_FRAGMENT was never checked.
 
-The other fields accessed in this function (last_obj_cnt and num_queued)
-are in the first cache line, let's move this field  (stall_thrs) to the
-very first cache line, since there is a hole there.
+In order to avoid a complicated maze, I converted it to
+use a 16 byte mapping table.
 
-This does not change the structure size, since it moves an short (2
-bytes) to 4-bytes whole in the first cache line.
+As shown in the table below the old heuristics doesn't
+always do the right thing, ie. when FLOW_DIS_IS_FRAGMENT=1/1
+then it used to only match follow-up fragment packets.
 
-This is the new structure format now:
+Here are all the combinations, and their resulting new/old
+VCAP key/mask filter:
 
-struct dql {
-	unsigned int    num_queued;     /* Total ever queued */
-	unsigned int    last_obj_cnt;       /* Count at last queuing */
-...
-	short unsigned int         stall_thrs;           /*    12     2 */
-	/* XXX 2 bytes hole, try to pack */
-...
-	/* --- cacheline 1 boundary (64 bytes) --- */
-...
- 	/* Longest stall detected, reported to user */
-	short unsigned int         stall_max;            /*   100     2 */
-	/* XXX 2 bytes hole, try to pack */
-};
+  /- FLOW_DIS_IS_FRAGMENT (key/mask)
+  |    /- FLOW_DIS_FIRST_FRAG (key/mask)
+  |    |    /-- new VCAP fragment (key/mask)
+  v    v    v    v- old VCAP fragment (key/mask)
 
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Breno Leitao <leitao@debian.org>
+ 0/0  0/0  -/-  -/-     impossible (due to entry cond. on mask)
+ 0/0  0/1  -/-  0/3 !!  invalid (can't match non-fragment + follow-up frag)
+ 0/0  1/0  -/-  -/-     impossible (key > mask)
+ 0/0  1/1  1/3  1/3     first fragment
+
+ 0/1  0/0  0/3  3/3 !!  not fragmented
+ 0/1  0/1  0/3  3/3 !!  not fragmented (+ not first fragment)
+ 0/1  1/0  -/-  -/-     impossible (key > mask)
+ 0/1  1/1  -/-  1/3 !!  invalid (non-fragment and first frag)
+
+ 1/0  0/0  -/-  -/-     impossible (key > mask)
+ 1/0  0/1  -/-  -/-     impossible (key > mask)
+ 1/0  1/0  -/-  -/-     impossible (key > mask)
+ 1/0  1/1  -/-  -/-     impossible (key > mask)
+
+ 1/1  0/0  1/1  3/3 !!  some fragment
+ 1/1  0/1  3/3  3/3     follow-up fragment
+ 1/1  1/0  -/-  -/-     impossible (key > mask)
+ 1/1  1/1  1/3  1/3     first fragment
+
+In the datasheet the VCAP fragment values are documented as:
+ 0 = no fragment
+ 1 = initial fragment
+ 2 = suspicious fragment
+ 3 = valid follow-up fragment
+
+Result: 3 combinations match the old behavior,
+        3 combinations have been corrected,
+        2 combinations are now invalid, and fail,
+        8 combinations are impossible.
+
+It should now be aligned with how FLOW_DIS_IS_FRAGMENT
+and FLOW_DIS_FIRST_FRAG is set in __skb_flow_dissect() in
+net/core/flow_dissector.c
+
+Since the VCAP fragment values are not a bitfield, we have
+to ignore the suspicious fragment value, eg. when matching
+on any kind of fragment with FLOW_DIS_IS_FRAGMENT=1/1.
+
+Only compile tested, and logic tested in userspace, as I
+unfortunately don't have access to this switch chip (yet).
+
+Fixes: d6c2964db3fe ("net: microchip: sparx5: Adding more tc flower keys for the IS2 VCAP")
+Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- include/linux/dynamic_queue_limits.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ .../microchip/sparx5/sparx5_tc_flower.c       | 60 ++++++++++++-------
+ 1 file changed, 39 insertions(+), 21 deletions(-)
 
-diff --git a/include/linux/dynamic_queue_limits.h b/include/linux/dynamic_queue_limits.h
-index 869afb800ea1..281298e77a15 100644
---- a/include/linux/dynamic_queue_limits.h
-+++ b/include/linux/dynamic_queue_limits.h
-@@ -50,6 +50,9 @@ struct dql {
- 	unsigned int	adj_limit;		/* limit + num_completed */
- 	unsigned int	last_obj_cnt;		/* Count at last queuing */
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
+index 523e0c470894f..2f87ccb8cf8c8 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
+@@ -135,6 +135,26 @@ sparx5_tc_flower_handler_basic_usage(struct vcap_tc_flower_parse_usage *st)
+ 	return err;
+ }
  
-+	/* Stall threshold (in jiffies), defined by user */
-+	unsigned short	stall_thrs;
++/* SparX-5 VCAP fragment types:
++ * 0 = no fragment, 1 = initial fragment,
++ * 2 = suspicious fragment, 3 = valid follow-up fragment
++ */
++enum {                   /* key / mask */
++	FRAG_NOT   = 0x03, /* 0 / 3 */
++	FRAG_SOME  = 0x11, /* 1 / 1 */
++	FRAG_FIRST = 0x13, /* 1 / 3 */
++	FRAG_LATER = 0x33, /* 3 / 3 */
++	FRAG_INVAL = 0xff, /* invalid */
++};
 +
- 	unsigned long	history_head;		/* top 58 bits of jiffies */
- 	/* stall entries, a bit per entry */
- 	unsigned long	history[DQL_HIST_LEN];
-@@ -71,8 +74,6 @@ struct dql {
- 	unsigned int	min_limit;		/* Minimum limit */
- 	unsigned int	slack_hold_time;	/* Time to measure slack */
++/* Flower fragment flag to VCAP fragment type mapping */
++static const u8 sparx5_vcap_frag_map[4][4] = {
++	{ FRAG_INVAL, FRAG_INVAL, FRAG_INVAL, FRAG_FIRST },
++	{ FRAG_NOT,   FRAG_NOT,   FRAG_INVAL, FRAG_INVAL },
++	{ FRAG_INVAL, FRAG_INVAL, FRAG_INVAL, FRAG_INVAL },
++	{ FRAG_SOME,  FRAG_LATER, FRAG_INVAL, FRAG_FIRST }
++};
++
+ static int
+ sparx5_tc_flower_handler_control_usage(struct vcap_tc_flower_parse_usage *st)
+ {
+@@ -145,29 +165,27 @@ sparx5_tc_flower_handler_control_usage(struct vcap_tc_flower_parse_usage *st)
+ 	flow_rule_match_control(st->frule, &mt);
  
--	/* Stall threshold (in jiffies), defined by user */
--	unsigned short	stall_thrs;
- 	/* Longest stall detected, reported to user */
- 	unsigned short	stall_max;
- 	unsigned long	last_reap;		/* Last reap (in jiffies) */
+ 	if (mt.mask->flags) {
+-		if (mt.mask->flags & FLOW_DIS_FIRST_FRAG) {
+-			if (mt.key->flags & FLOW_DIS_FIRST_FRAG) {
+-				value = 1; /* initial fragment */
+-				mask = 0x3;
+-			} else {
+-				if (mt.mask->flags & FLOW_DIS_IS_FRAGMENT) {
+-					value = 3; /* follow up fragment */
+-					mask = 0x3;
+-				} else {
+-					value = 0; /* no fragment */
+-					mask = 0x3;
+-				}
+-			}
+-		} else {
+-			if (mt.mask->flags & FLOW_DIS_IS_FRAGMENT) {
+-				value = 3; /* follow up fragment */
+-				mask = 0x3;
+-			} else {
+-				value = 0; /* no fragment */
+-				mask = 0x3;
+-			}
++		u8 is_frag_key = !!(mt.key->flags & FLOW_DIS_IS_FRAGMENT);
++		u8 is_frag_mask = !!(mt.mask->flags & FLOW_DIS_IS_FRAGMENT);
++		u8 is_frag_idx = (is_frag_key << 1) | is_frag_mask;
++
++		u8 first_frag_key = !!(mt.key->flags & FLOW_DIS_FIRST_FRAG);
++		u8 first_frag_mask = !!(mt.mask->flags & FLOW_DIS_FIRST_FRAG);
++		u8 first_frag_idx = (first_frag_key << 1) | first_frag_mask;
++
++		/* lookup verdict based on the 2 + 2 input bits */
++		u8 vdt = sparx5_vcap_frag_map[is_frag_idx][first_frag_idx];
++
++		if (vdt == FRAG_INVAL) {
++			NL_SET_ERR_MSG_MOD(st->fco->common.extack,
++					   "match on invalid fragment flag combination");
++			return -EINVAL;
+ 		}
+ 
++		/* extract VCAP fragment key and mask from verdict */
++		value = (vdt >> 4) & 0x3;
++		mask = vdt & 0x3;
++
+ 		err = vcap_rule_add_key_u32(st->vrule,
+ 					    VCAP_KF_L3_FRAGMENT_TYPE,
+ 					    value, mask);
 -- 
 2.43.0
 
