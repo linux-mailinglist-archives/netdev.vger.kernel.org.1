@@ -1,161 +1,187 @@
-Return-Path: <netdev+bounces-85922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D2D89CDBF
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:43:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7FB89CDC7
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 078A6B20E10
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:43:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82B151C21DCA
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA73B14885F;
-	Mon,  8 Apr 2024 21:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851CE148FFB;
+	Mon,  8 Apr 2024 21:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kyl8fTW9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oCKAg4T5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F51C147C60
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 21:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A13146A74
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 21:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712612604; cv=none; b=oGRcHun2ovThRX9atN6dXs8q+o4cy3xh01Qwps5H3ItsWIZKWhQshn9qqPn5dhj1OgHvBvIBOmw1exdGee+lTlpO1m+btn5CvClM/XIrU2qGCf2Eh5ATlj1mNdt+u4sn++uRCnfhPuPOpmLUat2TpJAbnA5nt7ycDjtC+34kWGA=
+	t=1712612712; cv=none; b=CM/bsB2ZE31fGNb5axwMxpvbE/OdP3CjWZryRlylNNXnBairfFuAm7vLyS34JVedIqhZAogQlrzGFu+KZ/hE5hYVkK3YxgUNxf3vrGJhms+mS6jsO9TKrz6clPkm3jNw9uo+jhBm65cr30DbjdMZkPxka88W0ORVZAkpTyxKFQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712612604; c=relaxed/simple;
-	bh=apa8Ycj0j8naOvh4JelaV7kxni6AgMh2aaN4ewxznek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jyWPsQWpjOVgnz0U6TmhxUVk9CZsKsMLVYSdnMveDeRxZfhepDh8xNBBZ6JYYjm7pwbaGgF68Zns+0pBh0s3b8CNMvYEAcmHLPjlO/f2aL94Uo9UhbHKL74xa+94KBU76zySKbrU1LDn3gdUAHBpsKG8WCDz+9+b+ETiFFH0RhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kyl8fTW9; arc=none smtp.client-ip=209.85.208.43
+	s=arc-20240116; t=1712612712; c=relaxed/simple;
+	bh=X7881QJirmg5kgKlNpkQ8RqV6ValjW0F1QdmK3UujVM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g1Chb+MLaJqKUoUsPhVFrWHZhEXZFVKiHPFS/kEkc+NYcAXO/+zMiLh6qGHmJLnsw0LJr8p94ePW8nhi/jdnKmZjXFpTHL20hMUubuti9kepT17BGYLTiIkxqZRuguVd6ZRvKAma0FytkAooEogZS+HW7SoVdjYaLH57OxfoqHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oCKAg4T5; arc=none smtp.client-ip=209.85.166.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e4a148aeeso613362a12.2
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 14:43:21 -0700 (PDT)
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-7d5ee54dcecso58872039f.0
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 14:45:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712612600; x=1713217400; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N4vQAFlYG/6Qo7oBuCHhBQsEdbkR4a/vMZEqym2juF0=;
-        b=Kyl8fTW96Dxthhl/mYPmUoVdDXKinzF/O0vp9T6lh5SfNYNV0GGjF7R9Xnr7WIx2Zv
-         Zw8Sr8YLwbrt8z+I/tLf7wHi0/Jt7WC3jbXyPQU/7339rfsNbm6HDb+ex7I+ioggVDHZ
-         YvqbkAP1tkMLELeH/Bv4fqB2VCso0qRvGuuEeuTSQP4W2RUG3gppoWbr0D1Xs94ZW+8q
-         LL/p9w4qg8sgn2h/cNQFKyFxJfhw5FF2WfGIIp/+M1i4ag468JAlnn61mPzjqrQolc2Z
-         U8T+LMfP5Ken0UoyJgpKkCA32Vjox6cnYCt5uCrHLJOCKRbsS4fX9b8+20bdRH66A82w
-         I+3g==
+        d=google.com; s=20230601; t=1712612709; x=1713217509; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fWZpTS9XdHFgXpHr6/MbkrB3un8w3RjB6kb0cWMEi/E=;
+        b=oCKAg4T5S6hImvAITr6uNGMtSyMLcpuU0HEv8kCQgByNXXAIKLV/86jkYvllx6VqM9
+         zo9+/144w1GgnwrURX+hm+jz8xcxfgdwH4lHJcvq7cAO2w9LCAqlKjiT6jVdq6jRn0Lj
+         F+u0sO+gKOUw0vOnhGnm4RZksUsTb0X5lDenEIYpZEZSiIUsa3Fnstu2kr+4AwjhtMfE
+         e9A6MTkGb45qQ3Ok7z1Tqp1su1ES6U/us9vj0G+/zc55+UJq1wDg2w4CRVA8088KElUq
+         PwAvSxKGnyO5XyXGj4+K5IBGfX4ImKxsPUomMp+NSEtlRNO6n5fz/vRmsVBEHcwUoOIo
+         dLMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712612600; x=1713217400;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N4vQAFlYG/6Qo7oBuCHhBQsEdbkR4a/vMZEqym2juF0=;
-        b=gKgbUFMqpgNtJ7y7LHr9VWEauIOtDBzm6xB9LXkrzZtpUONDxtM8Z4rPAUNvcqUOvZ
-         a9JXgGrZl30GWQKUI67TFJ451m2izcCyniubrHaSB05EkxYxXJYIA4z8OiDqDxZRF2sa
-         Rniibm6ILrrk3WDVSVkPcxGnOMLfiJLrbE/PlAAYtCqYsWOsFhMJq12VSlxJrZOcS1QR
-         9bVznUhmAQ80UiSgQ2H9zVV2J1kMZA32S7dGoDvW/zkHqqOVDfEgEH1TVZqMBtrtLE4R
-         20C68K+vSdR4MvOwbcICBR/Lmp2bSdL3EQyAI2tayZrSp78GoPOvEBL5ShSMFeAdxKTi
-         +TFg==
-X-Forwarded-Encrypted: i=1; AJvYcCVyvhMIldJtQW3M1JzVsbeuscDULqbb9kwW+vr6tQHZtaq6QI35qHHnbWtroJjrL7dwseip5HycXi0hmj4CQ9NxPrwsuOcq
-X-Gm-Message-State: AOJu0YznfaSwtLh+zDdI3wqiTPls/BNpxPmqyg29rjj/kks4agMZAZa2
-	4MhrkDOVq4VScJhvt+W6sGKNq/DJEda8LwU/OzS501MHFz7sM0B9u0LfKMZ979finLcs7z/nzDN
-	er+tInBBgPfMX7ENP+bEw1h0CbJKFeTvUUqXr
-X-Google-Smtp-Source: AGHT+IEm8jqnicmW5nkOw50duqY7RyFZhzu1CDgPdFVJGHa4FKyz9cRBhBph98h4jvYQzNt8e3LA//leAkZ5o070rS4=
-X-Received: by 2002:a50:8d15:0:b0:56e:ddc:17ad with SMTP id
- s21-20020a508d15000000b0056e0ddc17admr8315004eds.30.1712612600330; Mon, 08
- Apr 2024 14:43:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712612709; x=1713217509;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fWZpTS9XdHFgXpHr6/MbkrB3un8w3RjB6kb0cWMEi/E=;
+        b=cglTTJnqGEyqi/IDKYRTyKbdFvra1CQpmltG1cMeMRtnsF+74E8la5cGn+RejNJhVZ
+         WFQXLkW1X7EoV/iRD49CY+wVlAWYPVirwSi7RqprBg9cQSRsgKewPoKbZQMkSwqDk9hA
+         oZSYzIWmf6d3jK0hXL6jLBx4EeLdUGlUv2c09K8Oa92qmY1BHi1Y2ehyqDG/u4qOYWKI
+         YmsODr6wIxCWzF0uHKvkkP9otIz/oH3Td1vN50s6eX+cTgTjXYoX4wy7mJ7rKB7O3g7s
+         p4riylD5nF7THLTEC9a2sP4IJH8XjKGIBBPZQ0J9sOYJSY6EoYYJpW7YG+DTA4ZAR6B0
+         ofGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVB+Kc/EeBdhC3o36/kbbz7/3iFi1DFIcPAKWE9roGJvfPvRKJ1IaOMJ3L6k5qCAWDFuZApnjAFYgU9xvn+xiiP0FK2W/Im
+X-Gm-Message-State: AOJu0YybuL6A9/N5v1VAei09D6yssIp1fJXhxynItdW5no2m2+tvPZYw
+	3De+W5KJjqoDI96e4o1HQa2vDv3xSL5Y0kg0WrCmZD2Kl8RKWuiRGWIopNxtEQ==
+X-Google-Smtp-Source: AGHT+IFLq1rfhsWUUiNdA9bi7kvLMeZ12YsococyqKNZ8JgPgANUhC2CZCaaL5DaG2XegMan2Yy0ow==
+X-Received: by 2002:a05:6602:47cc:b0:7d5:ea22:5a0 with SMTP id ea12-20020a05660247cc00b007d5ea2205a0mr4333622iob.9.1712612708751;
+        Mon, 08 Apr 2024 14:45:08 -0700 (PDT)
+Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
+        by smtp.gmail.com with ESMTPSA id s6-20020a056602168600b007d5e2b5803fsm1239469iow.17.2024.04.08.14.45.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 14:45:08 -0700 (PDT)
+Date: Mon, 8 Apr 2024 21:45:05 +0000
+From: Justin Stitt <justinstitt@google.com>
+To: Erick Archer <erick.archer@outlook.com>
+Cc: Long Li <longli@microsoft.com>, Ajay Sharma <sharmaajay@microsoft.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kees Cook <keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Shradha Gupta <shradhagupta@linux.microsoft.com>, 
+	Konstantin Taranov <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	llvm@lists.linux.dev
+Subject: Re: [PATCH v3 3/3] net: mana: Avoid open coded arithmetic
+Message-ID: <sdj7w6zhu2lzbedahqtlorxv6v55gkogr7wisbzhcxwq4mubeg@yuddsvb2dec6>
+References: <20240406142337.16241-1-erick.archer@outlook.com>
+ <AS8PR02MB7237A21355C86EC0DCC0D83B8B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240406142337.16241-1-erick.archer@outlook.com>
- <AS8PR02MB7237E2900247571C9CB84C678B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
- <zrqicnpeu52n42yulmrupxmrejd7mhbsu35ycd2bgfjz6gmm2a@dtpv5qdxhmnu>
-In-Reply-To: <zrqicnpeu52n42yulmrupxmrejd7mhbsu35ycd2bgfjz6gmm2a@dtpv5qdxhmnu>
-From: Justin Stitt <justinstitt@google.com>
-Date: Mon, 8 Apr 2024 14:43:08 -0700
-Message-ID: <CAFhGd8pFy5=BYcYr_fa4fkLB54ktXRwS=QVJunzMd5z15RYDaA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] net: mana: Add flex array to struct mana_cfg_rx_steer_req_v2
-To: Erick Archer <erick.archer@outlook.com>
-Cc: Long Li <longli@microsoft.com>, Ajay Sharma <sharmaajay@microsoft.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kees Cook <keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Shradha Gupta <shradhagupta@linux.microsoft.com>, 
-	Konstantin Taranov <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AS8PR02MB7237A21355C86EC0DCC0D83B8B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
 
-On Mon, Apr 8, 2024 at 2:35=E2=80=AFPM Justin Stitt <justinstitt@google.com=
-> wrote:
->
-> Hi,
->
-> On Sat, Apr 06, 2024 at 04:23:35PM +0200, Erick Archer wrote:
-> > The "struct mana_cfg_rx_steer_req_v2" uses a dynamically sized set of
-> > trailing elements. Specifically, it uses a "mana_handle_t" array. So,
-> > use the preferred way in the kernel declaring a flexible array [1].
-> >
-> > At the same time, prepare for the coming implementation by GCC and Clan=
-g
-> > of the __counted_by attribute. Flexible array members annotated with
-> > __counted_by can have their accesses bounds-checked at run-time via
-> > CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE (for
-> > strcpy/memcpy-family functions).
-> >
-> > This is a previous step to refactor the two consumers of this structure=
-.
-> >
-> >  drivers/infiniband/hw/mana/qp.c
-> >  drivers/net/ethernet/microsoft/mana/mana_en.c
-> >
-> > The ultimate goal is to avoid the open-coded arithmetic in the memory
-> > allocator functions [2] using the "struct_size" macro.
-> >
-> > Link: https://www.kernel.org/doc/html/next/process/deprecated.html#zero=
--length-and-one-element-arrays [1]
-> > Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open=
--coded-arithmetic-in-allocator-arguments [2]
-> > Signed-off-by: Erick Archer <erick.archer@outlook.com>
->
-> I think this could have all been one patch, I found myself jumping
-> around the three patches here piecing together context.
+Hi,
 
-I now see Leon said to combine them in v2. Whoops, sorry to give
-conflicting feedback.
+On Sat, Apr 06, 2024 at 04:23:37PM +0200, Erick Archer wrote:
+> This is an effort to get rid of all multiplications from allocation
+> functions in order to prevent integer overflows [1][2].
+> 
+> As the "req" variable is a pointer to "struct mana_cfg_rx_steer_req_v2"
+> and this structure ends in a flexible array:
+> 
+> struct mana_cfg_rx_steer_req_v2 {
+>         [...]
+>         mana_handle_t indir_tab[] __counted_by(num_indir_entries);
+> };
+> 
+> the preferred way in the kernel is to use the struct_size() helper to
+> do the arithmetic instead of the calculation "size + size * count" in
+> the kzalloc() function.
+> 
+> Moreover, use the "offsetof" helper to get the indirect table offset
+> instead of the "sizeof" operator and avoid the open-coded arithmetic in
+> pointers using the new flex member. This new structure member also allow
+> us to remove the "req_indir_tab" variable since it is no longer needed.
+> 
+> Now, it is also possible to use the "flex_array_size" helper to compute
+> the size of these trailing elements in the "memcpy" function.
+> 
+> This way, the code is more readable and safer.
+> 
+> This code was detected with the help of Coccinelle, and audited and
+> modified manually.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]
+> Link: https://github.com/KSPP/linux/issues/160 [2]
+> Signed-off-by: Erick Archer <erick.archer@outlook.com>
 
->
-> Reviewed-by: Justin Stitt <justinstitt@google.com>
->
-> > ---
-> >  include/net/mana/mana.h | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> > index 4eeedf14711b..561f6719fb4e 100644
-> > --- a/include/net/mana/mana.h
-> > +++ b/include/net/mana/mana.h
-> > @@ -670,6 +670,7 @@ struct mana_cfg_rx_steer_req_v2 {
-> >       u8 hashkey[MANA_HASH_KEY_SIZE];
-> >       u8 cqe_coalescing_enable;
-> >       u8 reserved2[7];
-> > +     mana_handle_t indir_tab[] __counted_by(num_indir_entries);
-> >  }; /* HW DATA */
-> >
-> >  struct mana_cfg_rx_steer_resp {
-> > --
-> > 2.25.1
-> >
->
-> Thanks
-> Justin
+Reviewed-by: Justin Stitt <justinstitt@google.com>
+
+> ---
+>  drivers/net/ethernet/microsoft/mana/mana_en.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index d8af5e7e15b4..f2fae659bf3b 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -1058,11 +1058,10 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
+>  	struct mana_cfg_rx_steer_req_v2 *req;
+>  	struct mana_cfg_rx_steer_resp resp = {};
+>  	struct net_device *ndev = apc->ndev;
+> -	mana_handle_t *req_indir_tab;
+>  	u32 req_buf_size;
+>  	int err;
+>  
+> -	req_buf_size = sizeof(*req) + sizeof(mana_handle_t) * num_entries;
+> +	req_buf_size = struct_size(req, indir_tab, num_entries);
+>  	req = kzalloc(req_buf_size, GFP_KERNEL);
+>  	if (!req)
+>  		return -ENOMEM;
+> @@ -1074,7 +1073,8 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
+>  
+>  	req->vport = apc->port_handle;
+>  	req->num_indir_entries = num_entries;
+> -	req->indir_tab_offset = sizeof(*req);
+> +	req->indir_tab_offset = offsetof(struct mana_cfg_rx_steer_req_v2,
+> +					 indir_tab);
+>  	req->rx_enable = rx;
+>  	req->rss_enable = apc->rss_state;
+>  	req->update_default_rxobj = update_default_rxobj;
+> @@ -1086,11 +1086,9 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
+>  	if (update_key)
+>  		memcpy(&req->hashkey, apc->hashkey, MANA_HASH_KEY_SIZE);
+>  
+> -	if (update_tab) {
+> -		req_indir_tab = (mana_handle_t *)(req + 1);
+> -		memcpy(req_indir_tab, apc->rxobj_table,
+> -		       req->num_indir_entries * sizeof(mana_handle_t));
+> -	}
+> +	if (update_tab)
+> +		memcpy(req->indir_tab, apc->rxobj_table,
+> +		       flex_array_size(req, indir_tab, req->num_indir_entries));
+>  
+>  	err = mana_send_request(apc->ac, req, req_buf_size, &resp,
+>  				sizeof(resp));
+> -- 
+> 2.25.1
+> 
+
+Thanks
+Justin
 
