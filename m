@@ -1,215 +1,195 @@
-Return-Path: <netdev+bounces-85588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2474A89B824
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:09:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9838789BBDF
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE4C4282D18
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 07:09:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8980B2237A
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A891922338;
-	Mon,  8 Apr 2024 07:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D752E47F7C;
+	Mon,  8 Apr 2024 09:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="in/lzK3/"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GfEV0U65"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807EE21373;
-	Mon,  8 Apr 2024 07:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4266045958;
+	Mon,  8 Apr 2024 09:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712560160; cv=none; b=l2huUTVHq4twmXW/VG1FtMpM4lXyvNaBcJt20Hjm+NXS/tDSPZUXUUImZMi0YtJoacAxUnKJTF/MQkW/igIw69ZeiFZPIF3NpP3aWj4sf78Tn5xul4UwcfOEYh6m7c0G1D5cKlwmVQDMv5+Qv7zUrQOhhhVwyopuJuTutzHFyMg=
+	t=1712569004; cv=none; b=KmHbkPjnYzSMinBZp2VA6cxfTErGmQkLO08LzoZaOLyZYMixE6XTHuymV7n578m6ek+5rUUn72I6rU7RpCLOBnptZmWxzO4FqypG/KD7c4xppPB4yqkkVfVwzGqD/o33Erxo6d51papSW/RpdpucyVp/HThDtO8Q+mcPksOVdZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712560160; c=relaxed/simple;
-	bh=gHm79mf9dWuS5bcDHOIECrVCMjYGD3c3Yz1JJKRWYHw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=eD8OhkdBGDJXVXs/KQ+4YEOEW2fQNDdsCNl5i8eESsFPhefh6mFf6+JHCHapKQFy78E9e7J/Qe05vnIFDWcoRhBmLfyrrt1cjb/44ipnTfXanOMFJUSCy8MMB2KmPyzJxdDhE4tLkAUt2VrjObvEvZFMEnLwE0Yvq/9DPfmaXcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=in/lzK3/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4AC72C433F1;
-	Mon,  8 Apr 2024 07:09:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712560160;
-	bh=gHm79mf9dWuS5bcDHOIECrVCMjYGD3c3Yz1JJKRWYHw=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=in/lzK3/xJIYilF1HCvk4EMLomEzDXuKs8edinhjeb7U6MmlFxAKdnwy+95+XQPr5
-	 SNJ8VLOgX0qPyO2Gf3vry+VJ12uejDF/DaCALoOSRbCei+oDqR90KYFImISU5PlYlK
-	 ve6wllW0+8JTtJzJaQqAZovhtJabF/1U7Zn8YqnBmQccT2GkeITCVDIrHRnd2+wOld
-	 5BuKognz3hYDm7T0wSAKCQcAxtH728gzHF+zUdhWLgyxHeG5t18c3kGKaxgNjKMy/9
-	 kBUTbtCzEQKUxkdWgMGDEfzNRIlXgsIPdD+FJK7w6D/b65wwvCdvH4e8AkKxU3rLhc
-	 puTD1nrZkW62w==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40DE2CD1292;
-	Mon,  8 Apr 2024 07:09:20 +0000 (UTC)
-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL_via_B4_Relay?= <devnull+arinc.unal.arinc9.com@kernel.org>
-Date: Mon, 08 Apr 2024 10:08:53 +0300
-Subject: [PATCH net v3] net: dsa: mt7530: fix enabling EEE on MT7531 switch
- on all boards
+	s=arc-20240116; t=1712569004; c=relaxed/simple;
+	bh=rXoFAdo1tTS0PjGUrKhn6mS1KcUdpcQU1e2XnCLLWNA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EKHlA5WSHEuBjo6wBUgdlwVkVYDP6d2kdygRDMxIg4M6tQPJ0FLndnyIuITFfq0pfq1RE55/d8r3BQvZ/2uSkjcCN3ivqQu9cLh8JwnTuEvKOBEcdPWPeXQYdISeixjVDP43X3kSe78kfi3dFjoAd3nVxzqyj0w/UR7TllCy0g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GfEV0U65; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4388rgd3007326;
+	Mon, 8 Apr 2024 02:36:37 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=6sU5GxlK76ndUKi2361U/O6LtYlGS3aaQIWSH2fN1ig=; b=GfE
+	V0U654ipZQM9d4bChIiTSdErYMcxG7G5qgcZ4xkyOVp4Qu6RuTD5/gDEFPWJ8QFg
+	dkbMt17gvXwNUVXGJ4Qkb1zy0CvUzDAGk9dF8JY0IwXTUJ26VT3CnTGGJlyN90LK
+	EX6ZUAvOk8d79WArKpZKlftmhI9GukyRqPM+DTrYkIwWZrc8P5A9MvGXa2v2j4FF
+	jmUKpyP4WPgEfQ2C4jVqFLczT0KgK8eulp68KP9dH9au6+1SvTr46+ZCF0iIzJRB
+	hfktEzlekKL9xx/LNnphKWxkIg02HfEjtqYihW7TfVlG22c3opssL+wEVQUQHAaF
+	orIK9KDQnL9laGsdgTA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3xcdff02v2-15
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Apr 2024 02:36:37 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 8 Apr 2024 00:16:34 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 8 Apr 2024 00:16:34 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id E0E733F70C8;
+	Mon,  8 Apr 2024 00:16:30 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net-next PATCH] octeontx2-pf: Add support for offload tc with skbedit mark action
+Date: Mon, 8 Apr 2024 12:46:29 +0530
+Message-ID: <20240408071629.26390-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240408-for-net-mt7530-fix-eee-for-mt7531-mt7988-v3-1-84fdef1f008b@arinc9.com>
-X-B4-Tracking: v=1; b=H4sIAASYE2YC/5WNyw7CIBBFf6Vh7RielrryP4wLpINlIRhoiKbpv
- 4vEhe50Nbn3Ts5ZSMbkMZN9t5CExWcfQw1i0xE7mXBB8GPNhFMuqWA9uJgg4AzXuVeCgvN3QMR
- Wt4q9zqA1GGWVVMJaippU3C1hfW6qI6kEcqrl5PMc06PpC2vT26R/NxUGFIRjPec7ISXqg0k+2
- GFr47VZCv8gc/YHmVfyYNwwKirZ2eEXeV3XJ5AcQDRAAQAA
-To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- =?utf-8?q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>, 
- Russell King <linux@armlinux.org.uk>, 
- SkyLake Huang <SkyLake.Huang@mediatek.com>, 
- Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>, 
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1712560156; l=5377;
- i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
- bh=qltAZRBFaTmcscWTR0cgLD3pkbarl63ldtcQJSlZS1A=;
- b=SinTodZV5a3qq0Y5xSGw6i9NCkL5hPnKOUyl/NRE1zpg0H/wRH5jJCFeQ0Zc9TKpLseqAG5A0
- J+uMIgsnr23A8d9q/UMk7Prad+OU27kdgySMP/U1VPyHTu1HBa2IRBE
-X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
- pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
-X-Endpoint-Received: by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt
- with auth_id=115
-X-Original-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-Reply-To: arinc.unal@arinc9.com
+Content-Type: text/plain
+X-Proofpoint-GUID: fC6hvAVr3Lo6pDjyfu04X-u4CtOQ9kOF
+X-Proofpoint-ORIG-GUID: fC6hvAVr3Lo6pDjyfu04X-u4CtOQ9kOF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-08_07,2024-04-05_02,2023-05-22_02
 
-From: Arınç ÜNAL <arinc.unal@arinc9.com>
+Support offloading of skbedit mark action.
 
-The commit 40b5d2f15c09 ("net: dsa: mt7530: Add support for EEE features")
-brought EEE support but did not enable EEE on MT7531 switch MACs. EEE is
-enabled on MT7531 switch MACs by pulling the LAN2LED0 pin low on the board
-(bootstrapping), unsetting the EEE_DIS bit on the trap register, or setting
-the internal EEE switch bit on the CORE_PLL_GROUP4 register. Thanks to
-SkyLake Huang (黃啟澤) from MediaTek for providing information on the
-internal EEE switch bit.
+For example, to mark with 0x0008, with dest ip 60.60.60.2 on eth2
+interface:
 
-There are existing boards that were not designed to pull the pin low.
-Because of that, the EEE status currently depends on the board design.
+ # tc qdisc add dev eth2 ingress
+ # tc filter add dev eth2 ingress protocol ip flower \
+      dst_ip 60.60.60.2 action skbedit mark 0x0008 skip_sw
 
-The EEE_DIS bit on the trap pertains to the LAN2LED0 pin which is usually
-used to control an LED. Once the bit is unset, the pin will be low. That
-will make the active low LED turn on. The pin is controlled by the switch
-PHY. It seems that the PHY controls the pin in the way that it inverts the
-pin state. That means depending on the wiring of the LED connected to
-LAN2LED0 on the board, the LED may be on without an active link.
-
-To not cause this unwanted behaviour whilst enabling EEE on all boards, set
-the internal EEE switch bit on the CORE_PLL_GROUP4 register.
-
-My testing on MT7531 shows a certain amount of traffic loss when EEE is
-enabled. That said, I haven't come across a board that enables EEE. So
-enable EEE on the switch MACs but disable EEE advertisement on the switch
-PHYs. This way, we don't change the behaviour of the majority of the boards
-that have this switch. The mediatek-ge PHY driver already disables EEE
-advertisement on the switch PHYs but my testing shows that it is somehow
-enabled afterwards. Disabling EEE advertisement before the PHY driver
-initialises keeps it off.
-
-With this change, EEE can now be enabled using ethtool.
-
-Fixes: 40b5d2f15c09 ("net: dsa: mt7530: Add support for EEE features")
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 ---
-Here's some information for the record. EEE could not be enabled on MT7531
-on most boards using ethtool before this. On MT7988 SoC switch, EEE is
-disabled by default but can be turned on normally using ethtool. EEE is
-enabled by default on MT7530 and there's no need to make changes on the DSA
-subdriver for it.
----
-Changes in v3:
-- Remove patch 2, it was revealed that it doesn't fix a bug.
-- Patch 1
-  - Use the internal EEE switch bit provided by SkyLake Huang (黃啟澤). It
-    is a better method compared to unsetting the EEE_DIS bit of the trap as
-    the latter method causes unwanted behaviour on the LED connected to the
-    pin that pertains to the EEE_DIS bit.
-- Link to v2: https://lore.kernel.org/r/20240321-for-net-mt7530-fix-eee-for-mt7531-mt7988-v2-0-9af9d5041bfe@arinc9.com
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c  |  2 ++
+ .../ethernet/marvell/octeontx2/nic/otx2_common.h    |  2 ++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c    | 13 +++++++++++++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c  |  3 +++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.h  |  3 +++
+ 5 files changed, 23 insertions(+)
 
-Changes in v2:
-- Delegate the patch to the net tree.
-- Remove patch 3, it was revealed that it doesn't fix a bug.
-- Patch 1
-  - Disable EEE advertisement on MT7531 by default.
-- Link to v1: https://lore.kernel.org/r/20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com
----
- drivers/net/dsa/mt7530.c | 17 ++++++++++++-----
- drivers/net/dsa/mt7530.h |  1 +
- 2 files changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 1035820c2377..451ff0620c2e 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2505,18 +2505,25 @@ mt7531_setup(struct dsa_switch *ds)
- 	mt7530_rmw(priv, MT7531_GPIO_MODE0, MT7531_GPIO0_MASK,
- 		   MT7531_GPIO0_INTERRUPT);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index c75669c8fde7..6188921e9a20 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -1183,6 +1183,8 @@ static int npc_update_rx_entry(struct rvu *rvu, struct rvu_pfvf *pfvf,
+ 			action.pf_func = target;
+ 			action.op = NIX_RX_ACTIONOP_UCAST;
+ 		}
++		if (req->match_id)
++			action.match_id = req->match_id;
+ 	}
  
--	/* Enable PHY core PLL, since phy_device has not yet been created
--	 * provided for phy_[read,write]_mmd_indirect is called, we provide
--	 * our own mt7531_ind_mmd_phy_[read,write] to complete this
--	 * function.
-+	/* Enable Energy-Efficient Ethernet (EEE) and PHY core PLL, since
-+	 * phy_device has not yet been created provided for
-+	 * phy_[read,write]_mmd_indirect is called, we provide our own
-+	 * mt7531_ind_mmd_phy_[read,write] to complete this function.
- 	 */
- 	val = mt7531_ind_c45_phy_read(priv, MT753X_CTRL_PHY_ADDR,
- 				      MDIO_MMD_VEND2, CORE_PLL_GROUP4);
--	val |= MT7531_PHY_PLL_BYPASS_MODE;
-+	val |= MT7531_RG_SYSPLL_DMY2 | MT7531_PHY_PLL_BYPASS_MODE;
- 	val &= ~MT7531_PHY_PLL_OFF;
- 	mt7531_ind_c45_phy_write(priv, MT753X_CTRL_PHY_ADDR, MDIO_MMD_VEND2,
- 				 CORE_PLL_GROUP4, val);
+ 	entry->action = *(u64 *)&action;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 06910307085e..815ae13c371c 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -363,6 +363,7 @@ struct otx2_flow_config {
+ 	struct list_head	flow_list;
+ 	u32			dmacflt_max_flows;
+ 	u16                     max_flows;
++	u16			mark_flows;
+ 	struct list_head	flow_list_tc;
+ 	bool			ntuple;
+ };
+@@ -465,6 +466,7 @@ struct otx2_nic {
+ #define OTX2_FLAG_DMACFLTR_SUPPORT		BIT_ULL(14)
+ #define OTX2_FLAG_PTP_ONESTEP_SYNC		BIT_ULL(15)
+ #define OTX2_FLAG_ADPTV_INT_COAL_ENABLED BIT_ULL(16)
++#define OTX2_FLAG_TC_MARK_ENABLED		BIT_ULL(17)
+ 	u64			flags;
+ 	u64			*cq_op_addr;
  
-+	/* Disable EEE advertisement on the switch PHYs. */
-+	for (i = MT753X_CTRL_PHY_ADDR;
-+	     i < MT753X_CTRL_PHY_ADDR + MT7530_NUM_PHYS; i++) {
-+		mt7531_ind_c45_phy_write(priv, i, MDIO_MMD_AN, MDIO_AN_EEE_ADV,
-+					 0);
-+	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+index 4fd44b6eecea..fd1d78601811 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+@@ -511,7 +511,15 @@ static int otx2_tc_parse_actions(struct otx2_nic *nic,
+ 			nr_police++;
+ 			break;
+ 		case FLOW_ACTION_MARK:
++			if (act->mark & ~OTX2_RX_MATCH_ID_MASK) {
++				NL_SET_ERR_MSG_MOD(extack, "Bad flow mark, only 16 bit supported");
++				return -EOPNOTSUPP;
++			}
+ 			mark = act->mark;
++			req->match_id = mark & 0xFFFFULL;
++			req->op = NIX_RX_ACTION_DEFAULT;
++			nic->flags |= OTX2_FLAG_TC_MARK_ENABLED;
++			nic->flow_cfg->mark_flows++;
+ 			break;
+ 
+ 		case FLOW_ACTION_RX_QUEUE_MAPPING:
+@@ -1173,6 +1181,11 @@ static int otx2_tc_del_flow(struct otx2_nic *nic,
+ 		return -EINVAL;
+ 	}
+ 
++	/* Disable TC MARK flag if they are no rules with skbedit mark action */
++	if (flow_node->req.match_id)
++		if (!(--flow_cfg->mark_flows))
++			nic->flags &= ~OTX2_FLAG_TC_MARK_ENABLED;
 +
- 	mt7531_setup_common(ds);
+ 	if (flow_node->is_act_police) {
+ 		__clear_bit(flow_node->rq, &nic->rq_bmap);
  
- 	/* Setup VLAN ID 0 for VLAN-unaware bridges */
-diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
-index d17b318e6ee4..9439db495001 100644
---- a/drivers/net/dsa/mt7530.h
-+++ b/drivers/net/dsa/mt7530.h
-@@ -616,6 +616,7 @@ enum mt7531_clk_skew {
- #define  RG_SYSPLL_DDSFBK_EN		BIT(12)
- #define  RG_SYSPLL_BIAS_EN		BIT(11)
- #define  RG_SYSPLL_BIAS_LPF_EN		BIT(10)
-+#define  MT7531_RG_SYSPLL_DMY2		BIT(6)
- #define  MT7531_PHY_PLL_OFF		BIT(5)
- #define  MT7531_PHY_PLL_BYPASS_MODE	BIT(4)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 4d519ea833b2..d3c9759c9f06 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -380,6 +380,9 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
+ 	if (pfvf->netdev->features & NETIF_F_RXCSUM)
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
  
-
----
-base-commit: bccb798e07f8bb8b91212fe8ed1e421685449076
-change-id: 20240317-for-net-mt7530-fix-eee-for-mt7531-mt7988-a5c5453cc0e8
-
-Best regards,
++	if (pfvf->flags & OTX2_FLAG_TC_MARK_ENABLED)
++		skb->mark = parse->match_id;
++
+ 	skb_mark_for_recycle(skb);
+ 
+ 	napi_gro_frags(napi);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+index a82ffca8ce1b..3f1d2655ff77 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+@@ -62,6 +62,9 @@
+ #define CQ_OP_STAT_OP_ERR       63
+ #define CQ_OP_STAT_CQ_ERR       46
+ 
++/* Packet mark mask */
++#define OTX2_RX_MATCH_ID_MASK 0x0000ffff
++
+ struct queue_stats {
+ 	u64	bytes;
+ 	u64	pkts;
 -- 
-Arınç ÜNAL <arinc.unal@arinc9.com>
-
+2.25.1
 
 
