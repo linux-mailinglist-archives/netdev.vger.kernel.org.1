@@ -1,247 +1,114 @@
-Return-Path: <netdev+bounces-85576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E041889B739
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 07:40:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C59B589B78E
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 08:18:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96521281686
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 05:40:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 807EE2825CA
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 06:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4986579C2;
-	Mon,  8 Apr 2024 05:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6038820;
+	Mon,  8 Apr 2024 06:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SzBhiL+F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MlOndreW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463EE7462
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 05:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A36479FE;
+	Mon,  8 Apr 2024 06:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712554818; cv=none; b=P6EZkLN7Cdhum4H4SeZqchf0I0Uxci0zWjhYNnKGo4fRUojZuTfX/dK6M4ZEeOTwdFSRGkE2/WaNTpRAfymcyApRaNyVKXDkpdwblRhPPITPvKC8vfvnmySvDiokDndp48uTJ11qvwHhg2wqyPbauf+ddpgvfdJAqnEg0tXDfMo=
+	t=1712557131; cv=none; b=CXg9iTmBP2PYXlDjhQfVW5Tu60488x0+PPcs5hQ+wpeifkHubip7pJ7+aKUOiTt10/DVzV3saIPCjV1WmZf6TdDfALcmf76ypM61vX/22dtCk8wphgks/Wg5OvE55uT/FEfQNrUCiVAkQPO3xzFzoNsirbXwIUlbgAu6fY1gpbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712554818; c=relaxed/simple;
-	bh=hwP9/93yTUBSNOHrkALltgu6WO2MGK1MOTDRWzQCIYk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kg+K/MQOYZwutvXoprtuDGOD+vmjdLsG1H2U3HJOXDOjexRXf9kqIkUKkuNqJO4EzXzhZOVeG46HHnGOJSY+aLxQhsZ4ZUl4Zr+HqWVxcxqCiuYf3eGqXt/sPzeZjt7igI7BUbgT51vEBS7PnswqFTvAv7oQ5YSUDrTMMOBtrOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SzBhiL+F; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41687826509so5215e9.1
-        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 22:40:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712554815; x=1713159615; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QIWC9vvwzsPFLiTiHNlbceQ+j7iysO2Db2TSf4ijONQ=;
-        b=SzBhiL+F4hMpShwm85bOBkkkF/flyu0t4smPP83vt+dygUrvxDm1a0UlU7MJ9pNX9P
-         xD3C359a+kbSCTm8z73acjExlzzDrw7SDM/WvvF7cPUq8Oe/C235HEMjtWOMPhDRRTjC
-         DEsyZ/5t4PdNXrTGIIzjL6pONcFQsmBa9hvEg+LenZruOisR8fxj1WtDnDJi1SmeV/y/
-         7QX0E7JfKAvKvrkSoFzyxDO8nygeFDawfgw5Xeb3C2tyvuA7mSw2vurdM/RU3kBiyIMc
-         5oWWkBSJefndJczlv2Z7qA97LSxsU427XMrIVAnxtp89S57Q8af3EismFg/2e0kRKe/1
-         XK6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712554815; x=1713159615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QIWC9vvwzsPFLiTiHNlbceQ+j7iysO2Db2TSf4ijONQ=;
-        b=F8mSXv4uyZKXkSlSNIORPAfiICJ7aRSVVL4nOCY/CZmPUwQVeD4xDhfl+SyCttqv3r
-         X0oi/KRyEinNX8sZfM5vK7+ZHm6m+gTwq1CTx4jNo6JvgLcoqZR4bR55F+5jLR09Zjrr
-         LjkGMOJkYgwGycc1HKY0JmUFNTZL4tkMFHmxNdc2C8U+o13wQDoBoWpTyAgndOtaSYw4
-         wFOQus+Lev3K6rRo2F9kpA54+IyItBwBfaef7upFoRvRVdPyc8KnMKwiFYKGQkFooa2z
-         XNr49O6tfJzQdu6hdYeuxW26qHXPFfR78BirMBe/Di5AErXdNxc0blK3TatrrxACW+uI
-         YMKg==
-X-Forwarded-Encrypted: i=1; AJvYcCW1oxdws43osbK8IVKXgpBTmv7flLGczT7R4Hy6966THWThlx7LBDpsMk9FnDsKz5mOIwaiOb6RE3lEaxuTCeXqqEADh/JZ
-X-Gm-Message-State: AOJu0YxDqe89CmLepMKbRt/ItC9HJBOFpxi4PoDeZv15yutXeF+7ODDo
-	tpHWKFxaBB4OPlxEPkshdq8SKWBIUJcFF5mpjQzBsear5P5E5ly1kCYlcoo2Nqc2Rz19yXZX3H4
-	rouefyw98W9djm6LUZWhoXgOhTnKBJ2xcbk41
-X-Google-Smtp-Source: AGHT+IGEPJF2DbMp9F3g/z4behT0nb1A/GkBLGsynCOujqZ5X2o8cisakfbV+r0aEIhUnegvylF9PLcMhSNkJLbNZRw=
-X-Received: by 2002:a05:600c:511e:b0:416:8041:28d7 with SMTP id
- o30-20020a05600c511e00b00416804128d7mr30506wms.6.1712554814370; Sun, 07 Apr
- 2024 22:40:14 -0700 (PDT)
+	s=arc-20240116; t=1712557131; c=relaxed/simple;
+	bh=DIuA8oFwm/vpb38UIq95JDqRuLtIzxfyMX4vnoI6NeY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rLAFt78N5T+ABg2OYiI9cIPiWOcbip+SKtsANu42jJxx+nF+a0GYRIyuLg0OZBIea1EOya6L6XnXVobu7nVoIho9h1W8Do0om6WEGT3CjJcfBnQRpHD90F1zyX4d2QNE8+08vxfk/FHAbLAggGaX8TAYdUEMMPvZKo6WiNuErXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MlOndreW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BC4AC433F1;
+	Mon,  8 Apr 2024 06:18:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712557130;
+	bh=DIuA8oFwm/vpb38UIq95JDqRuLtIzxfyMX4vnoI6NeY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MlOndreWiIQHypWltN1SBSVOe0uo7bN2o4w2w2hIhozWzGK/7D9L3GyKt8BGqh40n
+	 XqQZeDmuyHtFLAeLQknY5Vv2tU9ibBrLM77CUPg/kmRtdGsI9OHtd53KCRJdFN6o5J
+	 DFxHHuRjTD1OzaOYHaS5ia9o99el5EdwmurHqyc5rTEXbSnR8zGHdORqdO17M9H1wH
+	 ePfbRVfGIUfuXKeIx6easXKTi3oE0VQzPxUfvf5R4txiUdRr93FjvaQBLfJ4015y6V
+	 jKYLpkc2P+p24BKmpysS7KJ0VgUvFMCjhIUmQt+B3qkvpTyoRCwtIR4TAkiiKqi+ju
+	 qJlGRVUB+J1qA==
+Date: Mon, 8 Apr 2024 09:18:46 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+	pabeni@redhat.com
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <20240408061846.GA8764@unreal>
+References: <Zg6Q8Re0TlkDkrkr@nanopsycho>
+ <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
+ <Zg7JDL2WOaIf3dxI@nanopsycho>
+ <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
+ <20240404132548.3229f6c8@kernel.org>
+ <660f22c56a0a2_442282088b@john.notmuch>
+ <20240404165000.47ce17e6@kernel.org>
+ <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+ <20240404193817.500523aa@kernel.org>
+ <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000c30be606158f33db@google.com>
-In-Reply-To: <000000000000c30be606158f33db@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 8 Apr 2024 07:40:00 +0200
-Message-ID: <CANn89iLq3PdiuS=qYAtUKFcrd24z2Kw8k=gMNcBcaEFkTWpd0g@mail.gmail.com>
-Subject: Re: [syzbot] [net?] KASAN: global-out-of-bounds Read in __nla_validate_parse
-To: syzbot <syzbot+ecd7e07b4be038658c9f@syzkaller.appspotmail.com>, 
-	Hangbin Liu <liuhangbin@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
 
-On Mon, Apr 8, 2024 at 7:37=E2=80=AFAM syzbot
-<syzbot+ecd7e07b4be038658c9f@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    8568bb2ccc27 Add linux-next specific files for 20240405
-> git tree:       linux-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D1644633918000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D48ca5acf8d2eb=
-3bc
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3Decd7e07b4be0386=
-58c9f
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
-ian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D134f60bd180=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1043b30318000=
-0
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/1d120b5e779c/dis=
-k-8568bb2c.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/a89e3589a585/vmlinu=
-x-8568bb2c.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/045e657c0e0d/b=
-zImage-8568bb2c.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+ecd7e07b4be038658c9f@syzkaller.appspotmail.com
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KASAN: global-out-of-bounds in validate_nla lib/nlattr.c:411 [inline=
-]
-> BUG: KASAN: global-out-of-bounds in __nla_validate_parse+0x1f1c/0x2f70 li=
-b/nlattr.c:635
-> Read of size 1 at addr ffffffff8c55d030 by task syz-executor361/5080
->
-> CPU: 1 PID: 5080 Comm: syz-executor361 Not tainted 6.9.0-rc2-next-2024040=
-5-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 03/27/2024
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
->  print_address_description mm/kasan/report.c:377 [inline]
->  print_report+0x169/0x550 mm/kasan/report.c:488
->  kasan_report+0x143/0x180 mm/kasan/report.c:601
->  validate_nla lib/nlattr.c:411 [inline]
->  __nla_validate_parse+0x1f1c/0x2f70 lib/nlattr.c:635
->  __nla_parse+0x40/0x60 lib/nlattr.c:732
->  __nlmsg_parse include/net/netlink.h:760 [inline]
->  genl_family_rcv_msg_attrs_parse+0x1d1/0x290 net/netlink/genetlink.c:945
->  genl_family_rcv_msg_doit net/netlink/genetlink.c:1093 [inline]
->  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->  genl_rcv_msg+0x802/0xec0 net/netlink/genetlink.c:1210
->  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
->  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
->  netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:745
->  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
->  ___sys_sendmsg net/socket.c:2638 [inline]
->  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
->  do_syscall_64+0xfb/0x240
->  entry_SYSCALL_64_after_hwframe+0x72/0x7a
-> RIP: 0033:0x7f831a5c23a9
-> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f=
-7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
- ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffcd752ec88 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007ffcd752ee58 RCX: 00007f831a5c23a9
-> RDX: 0000000000000000 RSI: 0000000020000100 RDI: 0000000000000003
-> RBP: 00007f831a635610 R08: 00007f831a5fda23 R09: 00007ffcd752ee58
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-> R13: 00007ffcd752ee48 R14: 0000000000000001 R15: 0000000000000001
->  </TASK>
->
-> The buggy address belongs to the variable:
->  team_nl_policy+0x30/0x60
->
-> The buggy address belongs to the physical page:
-> page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xc55d
-> flags: 0xfff80000002000(reserved|node=3D0|zone=3D1|lastcpupid=3D0xfff)
-> raw: 00fff80000002000 ffffea0000315748 ffffea0000315748 0000000000000000
-> raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
-> page dumped because: kasan: bad access detected
-> page_owner info is not present (never set?)
->
-> Memory state around the buggy address:
->  ffffffff8c55cf00: f9 f9 f9 f9 00 00 00 00 00 00 00 00 00 00 00 00
->  ffffffff8c55cf80: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 f9 f9 f9 f9
-> >ffffffff8c55d000: 00 00 00 00 00 00 f9 f9 f9 f9 f9 f9 00 00 00 00
->                                      ^
->  ffffffff8c55d080: 00 00 00 00 00 00 00 00 f9 f9 f9 f9 00 00 00 00
->  ffffffff8c55d100: 00 00 00 00 00 00 f9 f9 f9 f9 f9 f9 00 02 f9 f9
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
+On Fri, Apr 05, 2024 at 08:41:11AM -0700, Alexander Duyck wrote:
+> On Thu, Apr 4, 2024 at 7:38 PM Jakub Kicinski <kuba@kernel.org> wrote:
 
-Probably caused by
+<...>
 
-commit 948dbafc15da900b13c2bc9e244b9e109303907b
-Author: Hangbin Liu <liuhangbin@gmail.com>
-Date:   Mon Apr 1 11:10:03 2024 +0800
+> > > > Technical solution? Maybe if it's not a public device regression rules
+> > > > don't apply? Seems fairly reasonable.
+> > >
+> > > This is a hypothetical. This driver currently isn't changing anything
+> > > outside of itself. At this point the driver would only be build tested
+> > > by everyone else. They could just not include it in their Kconfig and
+> > > then out-of-sight, out-of-mind.
+> >
+> > Not changing does not mean not depending on existing behavior.
+> > Investigating and fixing properly even the hardest regressions in
+> > the stack is a bar that Meta can so easily clear. I don't understand
+> > why you are arguing.
+> 
+> I wasn't saying the driver wouldn't be dependent on existing behavior.
+> I was saying that it was a hypothetical that Meta would be a "less
+> than cooperative user" and demand a revert.  It is also a hypothetical
+> that Linus wouldn't just propose a revert of the fbnic driver instead
+> of the API for the crime of being a "less than cooperative maintainer"
+> and  then give Meta the Nvidia treatment.
 
-    net: team: use policy generated by YAML spec
+It is very easy to be "less than cooperative maintainer" in netdev world.
+1. Be vendor.
+2. Propose ideas which are different.
+3. Report for user-visible regression.
+4. Ask for a fix from the patch author or demand a revert according to netdev rules/practice.
 
-    generated with:
+And voilà, you are "less than cooperative maintainer".
 
-     $ ./tools/net/ynl/ynl-gen-c.py --mode kernel \
-     > --spec Documentation/netlink/specs/team.yaml --source \
-     > -o drivers/net/team/team_nl.c
-     $ ./tools/net/ynl/ynl-gen-c.py --mode kernel \
-     > --spec Documentation/netlink/specs/team.yaml --header \
-     > -o drivers/net/team/team_nl.h
+So in reality, the "hypothetical" is very close to the reality, unless
+Meta contribution will be treated as a special case.
 
-    The TEAM_ATTR_LIST_PORT in team_nl_policy is removed as it is only in t=
-he
-    port list reply attributes.
-
-    Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-    Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-    Link: https://lore.kernel.org/r/20240401031004.1159713-4-liuhangbin@gma=
-il.com
-    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Thanks
 
