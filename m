@@ -1,111 +1,104 @@
-Return-Path: <netdev+bounces-85937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 842C089CF11
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:51:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F3589CF13
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E45F1B20FA9
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:51:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55411B21E84
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E083149C49;
-	Mon,  8 Apr 2024 23:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88B8149C71;
+	Mon,  8 Apr 2024 23:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OAFxBOvi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMwy9lgM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E77017745;
-	Mon,  8 Apr 2024 23:50:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D38149C49
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 23:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712620261; cv=none; b=u9gUlGgErf7MoaGqznL2ZwBdwT9k5v2JTObOFBoyeHomHq4rK4zZF8NPBjebQiqTGO7U7ZscOrNnMJp6eS31OMp+SGeK7EAwpoQq0q/UJEoP+Kyu2yL5KnF7zvVuVUW1+BkW4MYccxDgLC/GAhJyzY1kQjMjNC9SSDUAimv871w=
+	t=1712620281; cv=none; b=ApeV/7krFDHXNrR/QUQM7OAv4b8uJoqeQU1y/qgPRzRJRluZ4Cgll3ZYKmCmcbH3MhaX9KbKe6lBvAr68C98s1sBWrMkQX1/J4Vc5X0eFF8FlaYzA+Y2rNTnmkI46adqF45FrREv8wTNQ6FVvhwizGR39kxW2Zn7GKPgeWwNjnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712620261; c=relaxed/simple;
-	bh=/qXwERbPA80vuw6Cz3GXcV4FMFiq++njEHzcXXx2Cok=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TgzksxdbsNrDIr7MB7RiEOJ82dO5+vFftXjbivrr5ONbteFlDorhJmdeGcUnUN19pTMcNUfQZ65zY6vOnaTQ9e20sPRbWG8hAiAek4LY8IwRRBoCtNfcIQWBhFNK7bWf4YZMjIEvEKewvYQLVMSGCZCv6UEwauTGaTRjPqSpN70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OAFxBOvi; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MkixZwnAYrqv/HAO7RC5V2PGJDgx96oe52MeasZ1GV0=; b=OAFxBOvi6qM/nztw4/0Z8QyH1R
-	m9Eyj/E+GE2qxQlBnljmtOvPVUfLfc9gouTwQ2i8oufLwdFhM+ODxSl7a9/0Z+ENMBFhhGbza/ZsD
-	mzNWK9lvSJT3stosb6D+6zNJTQQb4DMrKzj2tgk6cnjXLyVrTZBliGAaai3zgVGUxtyk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rtylK-00CWcj-Jh; Tue, 09 Apr 2024 01:50:54 +0200
-Date: Tue, 9 Apr 2024 01:50:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, linux@armlinux.org.uk,
-	linux-arm-kernel@lists.infradead.org, christophe.leroy@csgroup.eu,
-	herve.codina@bootlin.com, f.fainelli@gmail.com,
-	hkallweit1@gmail.com, vladimir.oltean@nxp.com,
-	kory.maincent@bootlin.com, jesse.brandeburg@intel.com,
-	corbet@lwn.net, kabel@kernel.org, piergiorgio.beruto@gmail.com,
-	o.rempel@pengutronix.de, nicveronese@gmail.com, horms@kernel.org,
-	mwojtas@chromium.org
-Subject: Re: [PATCH net-next v11 00/13] Introduce PHY listing and
- link_topology tracking
-Message-ID: <6c5f731e-a21e-4a4c-87a4-9585b2267c9e@lunn.ch>
-References: <20240404093004.2552221-1-maxime.chevallier@bootlin.com>
- <171242462917.4000.9759453824684907063.git-patchwork-notify@kernel.org>
- <20240408163219.64fe77b3@device-28.home>
+	s=arc-20240116; t=1712620281; c=relaxed/simple;
+	bh=SmHHLbj6PTOSxng2uyN/AmUVtQaR12xTfK6aPYVlavs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DMHtodvXxKoFe1AWcfjAgC9BKFTVmx2Q7WZiWsPtU/E8Hm748OJ2itdXzWb+CEbUYAwEiv7VCDadJtO2LCAXaheVAapr3YhtFmAes4W+goAWmo5surnf2g1+k82odNjbo9dyBeA2kudw5myGQwkaia+D3peHDEBuvlUKNo5MVDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dMwy9lgM; arc=none smtp.client-ip=209.85.222.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-7e328cd8e04so2054725241.0
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 16:51:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712620279; x=1713225079; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=URhNTL0g80dQnxxqD3gOwlfeZQfrIEaLzEz7hWrQ3Ts=;
+        b=dMwy9lgMhZS/3LrioQ8qiWuSpyV2BD5JEykutgEUv2lyGjpeNAT7/3NKcEQ9x4pR4J
+         MllLfaJLn46cW+PeCHRWRxvntmB/tjPlEYa948O/sKM/DxDhKanEC0EDm454ttI52lUu
+         lw7pJZsbGMkPb/Jmm+Oy55ERxQfk5V7CFwfRFkWd0l4E6AGpfcSxxGYJqeCDqq8uhzqc
+         6kH+CFRe93g7kTMgXpcSGsFYcVrWW2W3PsuSeYoEZbSkmrwQrxze1VuFH3BzN1Jk09Hq
+         AlklTx4EzlCBb+ZLrYrcFI/Du8cD/nRQ5t99hKc4ndCP4NZk2/xLWtNtIhaajnd4ibn7
+         QcBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712620279; x=1713225079;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=URhNTL0g80dQnxxqD3gOwlfeZQfrIEaLzEz7hWrQ3Ts=;
+        b=LjjoQ8YRc7XTliEXIco3DfU3lH5Mfvh8yrr6c4qnejqdMR9/YB2ZV1tlvasjAjg5gr
+         FtIWx3dzDnydFyog4ZbIwFRoMLaSGWoXJHzc2JSbAi5mHdt2dwjF6av6bns4VUBCgedT
+         edOUY5E9+L156z0c67fhacNMCk0jOlGZ7JiSvXIylgFXBOQ4bLXQphsv98e9jtTdbUOt
+         +BKoLl/FNIK+1Lznv51Qt2H1kTZDdb/9eyUZRzxgPPzU4Ue8RS2hdpDBeyDDkEf32QSJ
+         T1RAdc5887Li/6F4QQw3bo8O1JOJaot5vH9U112BFp6OSNf85xdAhWjB/39iWT2vvUaU
+         bf0w==
+X-Forwarded-Encrypted: i=1; AJvYcCW/hdS6jUCWh2bPQ7tMfdIEhBhOccYLy3kvD3gvFGeh4y6+QyUQvgqZGVMtioSz0DEbPm6+xOBTWBaOXuMugwtRXUKPZIxH
+X-Gm-Message-State: AOJu0YxpvE40ORm1JPYTdO2+nd7X0dOL+UsDCJJL3J9WBna5M9gID4ej
+	y1DGN9kkO374uOC5eDPt2BVOFtd2oE/uAZEdp2buNo1qoVv8if1k
+X-Google-Smtp-Source: AGHT+IF4OtlqC7zHZpSHLo25kHzpNvquTLDedHh1EAbeMnxQzXL6J7rI86/Xb2d2NZ3ej24sTX6IsA==
+X-Received: by 2002:a05:6122:4f0d:b0:4d4:20fa:eb0c with SMTP id gh13-20020a0561224f0d00b004d420faeb0cmr7695998vkb.5.1712620279071;
+        Mon, 08 Apr 2024 16:51:19 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id mn23-20020a0562145ed700b0069b23e58468sm624094qvb.43.2024.04.08.16.51.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Apr 2024 16:51:18 -0700 (PDT)
+Message-ID: <b515280b-69c9-4731-8e89-29e0b4d2c247@gmail.com>
+Date: Mon, 8 Apr 2024 16:51:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240408163219.64fe77b3@device-28.home>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] net: dsa: allow DSA switch drivers to
+ provide their own phylink mac ops
+Content-Language: en-US
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+References: <ZhPSpvJfvLqWi0Hu@shell.armlinux.org.uk>
+ <E1rtn25-0065p0-2C@rmk-PC.armlinux.org.uk>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <E1rtn25-0065p0-2C@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> > Here is the summary with links:
-> >   - [net-next,v11,01/13] net: phy: Introduce ethernet link topology representation
-> >     https://git.kernel.org/netdev/net-next/c/6916e461e793
-> >   - [net-next,v11,02/13] net: sfp: pass the phy_device when disconnecting an sfp module's PHY
-> >     https://git.kernel.org/netdev/net-next/c/0ec5ed6c130e
-> >   - [net-next,v11,03/13] net: phy: add helpers to handle sfp phy connect/disconnect
-> >     https://git.kernel.org/netdev/net-next/c/e75e4e074c44
-> >   - [net-next,v11,04/13] net: sfp: Add helper to return the SFP bus name
-> >     https://git.kernel.org/netdev/net-next/c/fdd353965b52
-> >   - [net-next,v11,05/13] net: ethtool: Allow passing a phy index for some commands
-> >     https://git.kernel.org/netdev/net-next/c/841942bc6212
-> >   - [net-next,v11,06/13] netlink: specs: add phy-index as a header parameter
-> >     (no matching commit)
-> >   - [net-next,v11,07/13] net: ethtool: Introduce a command to list PHYs on an interface
-> >     (no matching commit)
-> >   - [net-next,v11,08/13] netlink: specs: add ethnl PHY_GET command set
-> >     (no matching commit)
-> >   - [net-next,v11,09/13] net: ethtool: plca: Target the command to the requested PHY
-> >     (no matching commit)
-> >   - [net-next,v11,10/13] net: ethtool: pse-pd: Target the command to the requested PHY
-> >     (no matching commit)
-> >   - [net-next,v11,11/13] net: ethtool: cable-test: Target the command to the requested PHY
-> >     (no matching commit)
-> >   - [net-next,v11,12/13] net: ethtool: strset: Allow querying phy stats by index
-> >     (no matching commit)
-> >   - [net-next,v11,13/13] Documentation: networking: document phy_link_topology
-> >     (no matching commit)
+On 4/8/24 04:19, Russell King (Oracle) wrote:
+> Rather than having a shim for each and every phylink MAC operation,
+> allow DSA switch drivers to provide their own ops structure.
 > 
-> It looks like commits 6 to 13 didn't make it upstream with (the "no
-> matching commit" messages above). Is that expected ?
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-They are not in net-next, unlike 1-5.
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-You probably need to repost them.
-
-    Andrew
 
