@@ -1,228 +1,159 @@
-Return-Path: <netdev+bounces-85834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDD3089C7DB
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:10:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12FC089C83D
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EC86B21DA4
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:10:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B96DEB249E0
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FFD13F443;
-	Mon,  8 Apr 2024 15:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F8214038F;
+	Mon,  8 Apr 2024 15:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlBPUSKm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K7K7pxFA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B4B1CD21;
-	Mon,  8 Apr 2024 15:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54AED13E88F;
+	Mon,  8 Apr 2024 15:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712589003; cv=none; b=HaH64v8SxtISHTOcCzLZVo2IBs9xb0tIMiEFwO71K98Puh38P4nt9OuG6Sua+rvn5TGR3W4EEz9bFyTG3Nn8TrNKuOx5OG7NCK7GACYeaxspKCAM7Qdxiv7OA7oYkvYFS48GG/cVI9Fyt38+6v3y2+0mSe/Sb427f5tgrfNQQ24=
+	t=1712590033; cv=none; b=D1zS5gMT14n+r7Mg58v3i5ttY2z195xnaPz8UdRPgaiB+sIKVCqg4Wo+l34GfF7XIDiXbGBn55yJtGoBC4/Xwqu66CYkrLXwVJ+mvyTkUMVzzNEUV0u6VZQ1CQBF14+LxUvJC5N/lf6SVvYTqX0uXafhNXoVchKT3ScrWRsZWGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712589003; c=relaxed/simple;
-	bh=7RjjAX+l+5ybv+rftzcGFZmHFQtRiNYQm+IvwvQLEoo=;
+	s=arc-20240116; t=1712590033; c=relaxed/simple;
+	bh=3foDZQVCE9h+vCaa0c8f4ymTE90zsHWqZ+9zfPuIJ50=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G/TJWCjkRQyfRROq8xYVTyoO4ZgYYzLR7NqXwU6lWKc01ELFfuF00p0lNwhqclyR3HWEj/uhkkzl8wzybn5wGWtXnJ0M9EPvlWE6tR7bBtWnRefbrzsiIigX8iAhkksV/VS8twC5JC6zuX0Ombg106YUyp01Fogmk8/B4x+PulA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nlBPUSKm; arc=none smtp.client-ip=209.85.128.52
+	 To:Cc:Content-Type; b=qMkJfE7Wmj6vV+2fW3A85qYBa+GwVDbyW3Zv3KRagI8Lgbs/O4gEtomP3wp0UitafVnjAlBhCteENFvyYbp1ioZMPIpNe4mLh2mmk3phy/LBtX5ZlSrlvaJPXUIlzCZ0tramVskJqX9wBkBRPzky4KgzH5kJy/CMc1E+lVXiDss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K7K7pxFA; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-41650ee55ffso9455035e9.0;
-        Mon, 08 Apr 2024 08:10:00 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-343e46ec237so2606069f8f.2;
+        Mon, 08 Apr 2024 08:27:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712588999; x=1713193799; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712590030; x=1713194830; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5o7+hDSIuCWKDG8jzwsz/CU+9322M+SgxIxtVMZNuNI=;
-        b=nlBPUSKm9+uNXDQNnZa+6e6c47Z7wE7XuQeObWPWaF+3xUuW725GMn6bPB/SS+8yKI
-         2H4z12+MYZHzjeH6+Xx2xUjAGOjHcIV1cSN0wO1pBnAxIvDFx4irItjFDPMOsy0QaPeK
-         G5PP+u1/ZoFtA3kFGFEffVQKP1xA8IC/GCOGbeJZNhiE6uaErR3sSigYYszTTfs6qkfC
-         emeoiSxk57DNg+EKnWDocYbP1XBriWbQOB8xo1itFANj1/8014bQAjmmmZwZaUTSkYII
-         iZEkOlOvwJWJ67umvA8hKnj6Gn72Xnim7hPI2vxqSblA9EYIz///WYa9eDO0VFBLZ1+r
-         KBhQ==
+        bh=MxlFKPbTGJC+nZ4viqvDhx3xfCRju+xx+nTFlelxLEQ=;
+        b=K7K7pxFAeF0cMC6FY9bWy8G/9luK/6tStHcbZyAq+iTgFO6Mb8oz2I6F6bs/uptk1+
+         Fhm69gxghotYfsMa9UKn1jSYlBVK/pcFW40Y2daZ+2YM/sWq9o7a9EedVFsEjB6Io0Ly
+         hoNRdW0nfr0W5yc1GvQ8GC5JrVWo8jTLlTj9leJpMryEYkfyoQpf2A6ywREqtI9Du74n
+         I6/JqwXTD+ejuCaY6idD5M+KwPakfxYb9cPz5HkOMk8xZ04Z551us6BdbL+D/SJNiy+x
+         +RA/2f2u2RIYOsncWA4F59EymCx2DJTxbDSbXxCsTa0p+Mm/XrGZ9tXl83hA7VjBswnH
+         9ORw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712588999; x=1713193799;
+        d=1e100.net; s=20230601; t=1712590030; x=1713194830;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5o7+hDSIuCWKDG8jzwsz/CU+9322M+SgxIxtVMZNuNI=;
-        b=sfL4tQprEAFSxhIdM6qBF5mKAEC5dFsOvmij8cvPNNEueodSKKYVD7lWEthkOWYwyh
-         DqL6fmiEtFqdaYgCW1Ha7pC1j/q6fp+o1BBLUU5bHAkWXT2+rU0x6iCLXgzErBTC9czq
-         +JVK6r2yVsBnx4sdIRncO2KhoCjeRq+k8Sj/xQQQ7RSo+vmj6XPkAPL6SRFvT6NbPU/q
-         zotBEIBvexmBuNSJfpn99AfBcUiK7sweyG25MT6vaXw1e7TcDz1mXF+xJ3PhZTJkGlZI
-         QB7xLQ9NkDPJMfAnvOiuXV5MUL3zDrNlh1OhwRq8ODWUpMUo7FqVHxBefreP981sTobE
-         cSLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZZ/qhim/+QG/JEZy04JGOtxYEtfrkIc8373Sy6yY6W5q6HGxCbM0RZ1gV5pmK/VhONAxW75v2YSU8NvbsdLjFqEDZfqCNl/rnXGsjMW6o6cf7mwJDhU8kUtDUzNQjWTORaVy5pXY5Xcff/W5V4pT475+25WazTqiL
-X-Gm-Message-State: AOJu0YwatePjlq1XSKgOxFVFdB0+TjpgkwQ9VDJmhYkuQsUi29lyLz2n
-	o2rqbTGQOsoN5+2fYoGNqgusKIa3H8g/l3UJxrBKx7TE/3WEHDSpiSWT6RuWLcu9/c5TXcL2xbg
-	9bk2SDoHuGehIjqFibMwmM+B/rcA=
-X-Google-Smtp-Source: AGHT+IGfD5tw9rqnE5LU+TW60kXROajtXB4BtqIhZq3i2yRRlQkfuwvGF/5wsc9QyaA0puOL1oGI7yTw06d1aVVHif4=
-X-Received: by 2002:a05:6000:1048:b0:343:9d6d:59a4 with SMTP id
- c8-20020a056000104800b003439d6d59a4mr6383480wrx.28.1712588999269; Mon, 08 Apr
- 2024 08:09:59 -0700 (PDT)
+        bh=MxlFKPbTGJC+nZ4viqvDhx3xfCRju+xx+nTFlelxLEQ=;
+        b=qeVGXUegtWTds0v0E2mU4Zti41a/489Hue9+YwOPG+0wF2dwR5pavpV0HSp65TbPvq
+         +2FLKgf/6Et00Kf9GDzWrzCJTWof7FMOl3s17+LnDGQClWC7/ufiL9Gy3HHv4AaoshTy
+         ScwiBF6YyDMJzbLIpVcrM4KNUFL0xXQ57PPUPrIFqpfuPHaiMP973tMVpQkE0QiZJ392
+         8zJajXdLJcbHgV4OixMODedqx/DI8Li02DXiH7BDeOiDwWkDdo/yeKpgEGtrbTP/J2Fr
+         X0HTUsGNE5nqvULx9qRjFfA/zlMudIbQ6sLKLcwV0NjS29SMSE/380sUihkFr1tfceMs
+         SyDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxojzDJYtag9RW8bmypPpdXiauUq2rFWXuZ/4PWnO/LiKL7bJe2ENjVfpZJFEgIJz+9b6e/HMGj2ybIum4cl9gGRPI2KQRIU15enfR/fb1IpjanjOBbH7jzts8+0kLjOz0
+X-Gm-Message-State: AOJu0Yw5JUW0W6Qxyyrq7PRWCoB6OkqPFd8dLhgF9Aq55+xxZvqFApVI
+	S1/e7sszsPeONevfISHoFNE6RvSYaktaWtqDGcoMBTSPbPS0ITYBkBuNmphJxDAtb+VpzO2D52b
+	AChKhrTfWTe3lN0uCLusXO662Zoc=
+X-Google-Smtp-Source: AGHT+IEtrOxjmyNRURkAxVwwTKmft/RG0xyBmmm8uwi2Q3wqt2J/AKZ3hloz2706R/DbLGktlXZEz8o1K++xythm0is=
+X-Received: by 2002:a5d:588b:0:b0:345:ca71:5ddb with SMTP id
+ n11-20020a5d588b000000b00345ca715ddbmr2053513wrf.66.1712590029594; Mon, 08
+ Apr 2024 08:27:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240407130850.19625-1-linyunsheng@huawei.com>
- <CAKgT0Uex+e_g9nyqk6DiB03U4zs_A1z2LoztHnpYbJ9LPm=NFA@mail.gmail.com> <05c21500-033b-dfee-6aa7-1ee967616213@huawei.com>
-In-Reply-To: <05c21500-033b-dfee-6aa7-1ee967616213@huawei.com>
+References: <Zg6Q8Re0TlkDkrkr@nanopsycho> <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
+ <Zg7JDL2WOaIf3dxI@nanopsycho> <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
+ <20240404132548.3229f6c8@kernel.org> <660f22c56a0a2_442282088b@john.notmuch>
+ <20240404165000.47ce17e6@kernel.org> <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+ <20240404193817.500523aa@kernel.org> <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
+ <20240408061846.GA8764@unreal>
+In-Reply-To: <20240408061846.GA8764@unreal>
 From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 8 Apr 2024 08:09:22 -0700
-Message-ID: <CAKgT0UdjBXguCudxM9-tzKx2qWYg18xp5cG2xaeY893rVbw5qQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 00/12] First try to replace page_frag with page_frag_cache
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	bpf@vger.kernel.org
+Date: Mon, 8 Apr 2024 08:26:33 -0700
+Message-ID: <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, bhelgaas@google.com, 
+	linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, 
+	pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 8, 2024 at 6:38=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
+On Sun, Apr 7, 2024 at 11:18=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
+rote:
 >
-> On 2024/4/8 1:02, Alexander Duyck wrote:
-> > On Sun, Apr 7, 2024 at 6:10=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei=
-.com> wrote:
-> >>
-> >> After [1], Only there are two implementations for page frag:
-> >>
-> >> 1. mm/page_alloc.c: net stack seems to be using it in the
-> >>    rx part with 'struct page_frag_cache' and the main API
-> >>    being page_frag_alloc_align().
-> >> 2. net/core/sock.c: net stack seems to be using it in the
-> >>    tx part with 'struct page_frag' and the main API being
-> >>    skb_page_frag_refill().
-> >>
-> >> This patchset tries to unfiy the page frag implementation
-> >> by replacing page_frag with page_frag_cache for sk_page_frag()
-> >> first. net_high_order_alloc_disable_key for the implementation
-> >> in net/core/sock.c doesn't seems matter that much now have
-> >> have pcp support for high-order pages in commit 44042b449872
-> >> ("mm/page_alloc: allow high-order pages to be stored on the
-> >> per-cpu lists").
-> >>
-> >> As the related change is mostly related to networking, so
-> >> targeting the net-next. And will try to replace the rest
-> >> of page_frag in the follow patchset.
-> >>
-> >> After this patchset, we are not only able to unify the page
-> >> frag implementation a little, but seems able to have about
-> >> 0.5+% performance boost testing by using the vhost_net_test
-> >> introduced in [1] and page_frag_test.ko introduced in this
-> >> patch.
+> On Fri, Apr 05, 2024 at 08:41:11AM -0700, Alexander Duyck wrote:
+> > On Thu, Apr 4, 2024 at 7:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+>
+> <...>
+>
+> > > > > Technical solution? Maybe if it's not a public device regression =
+rules
+> > > > > don't apply? Seems fairly reasonable.
+> > > >
+> > > > This is a hypothetical. This driver currently isn't changing anythi=
+ng
+> > > > outside of itself. At this point the driver would only be build tes=
+ted
+> > > > by everyone else. They could just not include it in their Kconfig a=
+nd
+> > > > then out-of-sight, out-of-mind.
+> > >
+> > > Not changing does not mean not depending on existing behavior.
+> > > Investigating and fixing properly even the hardest regressions in
+> > > the stack is a bar that Meta can so easily clear. I don't understand
+> > > why you are arguing.
 > >
-> > One question that jumps out at me for this is "why?". No offense but
-> > this is a pretty massive set of changes with over 1400 additions and
-> > 500+ deletions and I can't help but ask why, and this cover page
-> > doesn't give me any good reason to think about accepting this set.
+> > I wasn't saying the driver wouldn't be dependent on existing behavior.
+> > I was saying that it was a hypothetical that Meta would be a "less
+> > than cooperative user" and demand a revert.  It is also a hypothetical
+> > that Linus wouldn't just propose a revert of the fbnic driver instead
+> > of the API for the crime of being a "less than cooperative maintainer"
+> > and  then give Meta the Nvidia treatment.
 >
-> There are 375 + 256 additions for testing module and the documentation
-> update in the last two patches, and there is 198 additions and 176
-> deletions for moving the page fragment allocator from page_alloc into
-> its own file in patch 1.
-> Without above number, there are above 600+ additions and 300+ deletions,
-> deos that seems reasonable considering 140+ additions are needed to for
-> the new API, 300+ additions and deletions for updating the users to use
-> the new API as there are many users using the old API?
-
-Maybe it would make more sense to break this into 2 sets. The first
-one adding your testing, and the second one consolidating the API.
-With that we would have a clearly defined test infrastructure in place
-for the second set which is making significant changes to the API. In
-addition it would provide the opportunity for others to point out any
-other test that they might want pulled in since this is likely to have
-impact outside of just the tests you have proposed.
-
-> > What is meant to be the benefit to the community for adding this? All
-> > I am seeing is a ton of extra code to have to review as this
-> > unification is adding an additional 1000+ lines without a good
-> > explanation as to why they are needed.
+> It is very easy to be "less than cooperative maintainer" in netdev world.
+> 1. Be vendor.
+> 2. Propose ideas which are different.
+> 3. Report for user-visible regression.
+> 4. Ask for a fix from the patch author or demand a revert according to ne=
+tdev rules/practice.
 >
-> Some benefits I see for now:
-> 1. Improve the maintainability of page frag's implementation:
->    (1) future bugfix and performance can be done in one place.
->        For example, we may able to save some space for the
->        'page_frag_cache' API user, and avoid 'get_page()' for
->        the old 'page_frag' API user.
-
-The problem as I see it is it is consolidating all the consumers down
-to the least common denominator in terms of performance. You have
-already demonstrated that with patch 2 which enforces that all drivers
-have to work from the bottom up instead of being able to work top down
-in the page.
-
-This eventually leads you down the path where every time somebody has
-a use case for it that may not be optimal for others it is going to be
-a fight to see if the new use case can degrade the performance of the
-other use cases.
-
->    (2) Provide a proper API so that caller does not need to access
->        internal data field. Exposing the internal data field may
->        enable the caller to do some unexpcted implementation of
->        its own like below, after this patchset the API user is not
->        supposed to do access the data field of 'page_frag_cache'
->        directly[Currently it is still acessable from API caller if
->        the caller is not following the rule, I am not sure how to
->        limit the access without any performance impact yet].
-> https://elixir.bootlin.com/linux/v6.9-rc3/source/drivers/net/ethernet/che=
-lsio/inline_crypto/chtls/chtls_io.c#L1141
-
-This just makes the issue I point out in 1 even worse. The problem is
-this code has to be used at the very lowest of levels and is as
-tightly optimized as it is since it is called at least once per packet
-in the case of networking. Networking that is still getting faster
-mind you and demanding even fewer cycles per packet to try and keep
-up. I just see this change as taking us in the wrong direction.
-
-> 2. page_frag API may provide a central point for netwroking to allocate
->    memory instead of calling page allocator directly in the future, so
->    that we can decouple 'struct page' from networking.
-
-I hope not. The fact is the page allocator serves a very specific
-purpose, and the page frag API was meant to serve a different one and
-not be a replacement for it. One thing that has really irked me is the
-fact that I have seen it abused as much as it has been where people
-seem to think it is just a page allocator when it was really meant to
-just provide a way to shard order 0 pages into sizes that are half a
-page or less in size. I really meant for it to be a quick-n-dirty slab
-allocator for sizes 2K or less where ideally we are working with
-powers of 2.
-
-It concerns me that you are talking about taking this down a path that
-will likely lead to further misuse of the code as a backdoor way to
-allocate order 0 pages using this instead of just using the page
-allocator.
-
-> >
-> > Also I wouldn't bother mentioning the 0.5+% performance gain as a
-> > "bonus". Changes of that amount usually mean it is within the margin
-> > of error. At best it likely means you haven't introduced a noticeable
-> > regression.
+> And voil=C3=A0, you are "less than cooperative maintainer".
 >
-> For micro-benchmark ko added in this patchset, performance gain seems qui=
-t
-> stable from testing in system without any other load.
+> So in reality, the "hypothetical" is very close to the reality, unless
+> Meta contribution will be treated as a special case.
+>
+> Thanks
 
-Again, that doesn't mean anything. It could just be that the code
-shifted somewhere due to all the code moved so a loop got more aligned
-than it was before. To give you an idea I have seen performance gains
-in the past from turning off Rx checksum for some workloads and that
-was simply due to the fact that the CPUs were staying awake longer
-instead of going into deep sleep states as such we could handle more
-packets per second even though we were using more cycles. Without
-significantly more context it is hard to say that the gain is anything
-real at all and a 0.5% gain is well within that margin of error.
+How many cases of that have we had in the past? I'm honestly curious
+as I don't actually have any reference.
+
+Also as far as item 3 isn't hard for it to be a "user-visible"
+regression if there are no users outside of the vendor that is
+maintaining the driver to report it? Again I am assuming that the same
+rules wouldn't necessarily apply in the vendor/consumer being one
+entity case.
+
+Also from my past experience the community doesn't give a damn about
+1. It is only if 3 is being reported by actual users that somebody
+would care. The fact is if vendors held that much power they would
+have run roughshod over the community long ago as I know there are
+vendors who love to provide one-off projects outside of the kernel and
+usually have to work to get things into the upstream later and no
+amount of complaining about "the users" will get their code accepted.
+The users may complain but it is the vendors fault for that so the
+community doesn't have to take action.
 
