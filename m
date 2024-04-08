@@ -1,367 +1,266 @@
-Return-Path: <netdev+bounces-85896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51F9F89CC5C
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:24:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD4089CC5D
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:24:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 762F11C217B3
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:24:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9A191F232FB
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307A8145332;
-	Mon,  8 Apr 2024 19:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89F49145359;
+	Mon,  8 Apr 2024 19:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0iYqdUe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/iXTebF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABCE1448E2
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 19:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03CC145326;
+	Mon,  8 Apr 2024 19:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712604267; cv=none; b=V1bFcysy7QD3JqxJO6fmvAtY4DJy9Cwl8pq7wA/wFMlDssjwDTTE1Y06T4SCo/TBnBZvDFtwcqhWP7XHousfjwkksTvCTuyxBQR96FHFMN2f4ERtOJsA1f1VnbkE5GZFMHDk28PX4pqHtwxeCCVY53vJ8yCylD6WCjaduXF4lpY=
+	t=1712604284; cv=none; b=ac3xKlNrRGehl9v9EL19AG+bo103a/Y4fFI4aCtIzSa+n1QbeBygiY9BAxJNIwlJuGczpO7UINxFwL4zeVkc7+l53r1b84KkCz1foM3KFQv1Qax/5PnfUxfDAkWVH/hmus4tJpJX1WVl8pnMbShPLhw0mMMf1t5DKrhbR9rmyfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712604267; c=relaxed/simple;
-	bh=Qhg4o/7jj5SKVyMC4N262rLjaslkVnZZpBD2wN+ce3I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OhQ7iqc2ZzlKwUTPrUS2Zm1HQwCEBgioKc9wxUKKPWr0wSgL4xxlZgLAQ5I9/hRBM7cA0QAnto7rGxZcMqI0K9OSYo6Bz+5KPVpqtF66FTV8+Z1FaNUAIZJf9QXLPhIKbVkeLma5uSkJT9ziMKXHgFC5Wq7WFvt8o7VFD4KYJbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A0iYqdUe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712604264;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tOLT7F3ls0PNXZ/tGZkH3E9/Sc/vtl2hCpvoDAB6ELU=;
-	b=A0iYqdUeSP6C6hVnb2CRWAH+nXQ/4fV8nnIYAUKoCaXDMHtHozbxcBeVr0rlfo1lclKpwL
-	xswf+5GRyp7hqhjZkYwZBucUAZk8Uny98dY0+zkChoCYe2ytaLrvI5iG0c9HkepuBybqkj
-	65w651KU2tM2ZVS3QmjIT+wNx32u9aA=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-437-Usp4dMKfMOWDknj1YpiVcw-1; Mon, 08 Apr 2024 15:24:22 -0400
-X-MC-Unique: Usp4dMKfMOWDknj1YpiVcw-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6963cd45fddso104108576d6.1
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 12:24:22 -0700 (PDT)
+	s=arc-20240116; t=1712604284; c=relaxed/simple;
+	bh=0J+7qAnEN8ZwzMROKbQFT0jLGJ8mF4BEyGRW+5cjQhk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=iwJg3zrXigfVae4bV9dUCbH7aAF8ft0fEMJtkuoONxbyl7HOrOxmYXZ861HUZRaM4nVyDGaJH06F70j0UMLVSlz6cBWdNQ7dnMhvYyS3ESe9D6ql6RnN6SzZ7Q8z56F78DTluyAKMNkvbt8eVMUKheR3kSLAZpde34YgGgJFeLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b/iXTebF; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-5dcc4076c13so3242296a12.0;
+        Mon, 08 Apr 2024 12:24:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712604282; x=1713209082; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0J+7qAnEN8ZwzMROKbQFT0jLGJ8mF4BEyGRW+5cjQhk=;
+        b=b/iXTebFCZGzzDHUk8KS8mPDi3fA9FJiaI7pW/6mBISU0y1zv+gqx8VE9W+LYA1TXa
+         OAK0GWnVw/XWbTdmFDoTMj9xRs7gjN6u2sbuoirfUAJZTEJeW0vLQm1oEZLdTam6sfob
+         4Qgq6gsqY9qXgHSiK6zE+mxMj8rT3MvDTlgVqsXr10k4xZ6SMBk0tIKO6acLsBjL/yji
+         Izw78Pru7HIu+588m+FSd9vRafhyA/rlUgLWnwnPSSENLGC+gn4M2IMtaeA+iBcNU0Ab
+         1ZhM5V1xBoK+dc/vOPz33eHntZjDyJ/ApUIRCWyg+gBPsoaPvLJzEXM26pl+jbUbMo1p
+         QoWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712604262; x=1713209062;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tOLT7F3ls0PNXZ/tGZkH3E9/Sc/vtl2hCpvoDAB6ELU=;
-        b=r2Km/kupkwk+aagArtFlXdsgBMr+3vRIxCOrk9Xpl5yHJHwiOpwjmLLsUDvy8TnD9h
-         3C31mtXx1PcyEkmXv9A+AtnONANEcf3anyCT0hgwtbOVnY9vqxD+TGK6KEJF89u+/jet
-         l2swkZduOSpIRVZvXaKKeH9zPjISCQH17sIs5ZzQjeAPwUwIpz7AgjCdB5vbapdXclQU
-         JVIW9tXbXxyIstvevilpljWZnxprQb1dv+iICbkSQAwDIBw5uGThn/gcfD45hJoiig5M
-         tmBIWyuzFhuQZekFB/6Wd5zbGrNGxwJ/pdlF0WtVCV/YjQdCDEx5xAzbcBFbipTAbW5X
-         o6xA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVPB7TJ4EbUKsV6+PjibAUkv4uN+XIeDmZP6in9T427QZFd2yR/SZDcxvl6ZyIxJm/rzSCF+dvOKVbmHkXYUHs+0sLy/tv
-X-Gm-Message-State: AOJu0YziTCA2AfpOVOc6ELlNBAcCal526ahOIdmQd+grlK3SAJ0SHGAI
-	H9HmaI+mB/vWuApCRUdMqNkmREjDrR54YHqCyVXxn3t0xuyEpssWnLYTKobR35d3JMHFt7cM6mr
-	zIprUIKL+PdQPDqbLDassWTVeca9K4Tx5FfNW7s3Fvxr4ZmhIixHxnA==
-X-Received: by 2002:a05:6214:3018:b0:699:2b22:ae13 with SMTP id ke24-20020a056214301800b006992b22ae13mr1150009qvb.12.1712604262065;
-        Mon, 08 Apr 2024 12:24:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGdfmfmLusppyPuRSwFcUAH83ctVy/bYKIEKS05X9qfeo2sTgZqDAGaFG2aCiQIy6HNxY+u3A==
-X-Received: by 2002:a05:6214:3018:b0:699:2b22:ae13 with SMTP id ke24-20020a056214301800b006992b22ae13mr1149979qvb.12.1712604261719;
-        Mon, 08 Apr 2024 12:24:21 -0700 (PDT)
-Received: from [192.168.1.132] ([193.177.208.51])
-        by smtp.gmail.com with ESMTPSA id dd17-20020ad45811000000b0069b1e63a79esm990457qvb.61.2024.04.08.12.24.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Apr 2024 12:24:21 -0700 (PDT)
-Message-ID: <801ccf5c-5ac9-455f-8d9a-48517d7db614@redhat.com>
-Date: Mon, 8 Apr 2024 21:24:17 +0200
+        d=1e100.net; s=20230601; t=1712604282; x=1713209082;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0J+7qAnEN8ZwzMROKbQFT0jLGJ8mF4BEyGRW+5cjQhk=;
+        b=E6KKPrqo5dOYQ5hjznkpiNYFfJqYEQOS/4ET6nZbZYNsn0+3xGmzn6d+73icCbAQId
+         tvvUYY22Xd9WoytuEXDnlJBNIrmDSyZsaic/ETY267cxZhGov9XaH6CIkBWxjFmi3cUg
+         RQ5BJhnTNKarQbHqx8PRUxuSMSIIDKU7DICmh5KHg9YBQ61gLk8amFdSN60KT2Ya4Aii
+         KhQTSg/Oew6Rg124676QBA4Qs3meyWrnOuCsxJmmNs5mcGmgBTDigA1Xydo2270N5k8h
+         dWwzqiwv4EvNp7ENjPYZGPUEvhHHATAciDTqEOqdlXx2Cqn2GOj80omfHL4NWOyFhUPI
+         syuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWg6VwR/gIfDAzlwctNK1TWavzu3Hm4O6hnY9t+GOLMnED619FF0XbXVfp8yUXKEUfT6H9/iSP2nxz1W+eyrB5ReOGlamTsD3EPsgl4HeD8r8WFL7f5R6tCUa4C
+X-Gm-Message-State: AOJu0YwgrkSXJG+jNPYFSsuQnzF5a8gTbG+abijPF70purOmEBUnrlHM
+	b3+SsWsWtkxkYY5Dq13NLv4lady7RPCHfv8Vxk8qCQS5pslNwx40
+X-Google-Smtp-Source: AGHT+IEgOGs4Jh3FPkMrr2e/Hk5j2J/vpqH+VlGG9k2//RkxTOK+FftQMv+1W/q5mj1EfOfvIzduUg==
+X-Received: by 2002:a17:902:d2c8:b0:1e2:6b74:5941 with SMTP id n8-20020a170902d2c800b001e26b745941mr682365plc.2.1712604281814;
+        Mon, 08 Apr 2024 12:24:41 -0700 (PDT)
+Received: from localhost ([98.97.36.54])
+        by smtp.gmail.com with ESMTPSA id w11-20020a170902e88b00b001e3e0968f8asm4912952plg.248.2024.04.08.12.24.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 12:24:41 -0700 (PDT)
+Date: Mon, 08 Apr 2024 12:24:40 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>, 
+ Jamal Hadi Salim <jhs@mojatatu.com>, 
+ netdev@vger.kernel.org
+Cc: deb.chatterjee@intel.com, 
+ anjali.singhai@intel.com, 
+ namrata.limaye@intel.com, 
+ tom@sipanda.io, 
+ mleitner@redhat.com, 
+ Mahesh.Shirshyad@amd.com, 
+ Vipin.Jain@amd.com, 
+ tomasz.osinski@intel.com, 
+ jiri@resnulli.us, 
+ xiyou.wangcong@gmail.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ vladbu@nvidia.com, 
+ horms@kernel.org, 
+ khalidm@nvidia.com, 
+ toke@redhat.com, 
+ martin.lau@linux.dev, 
+ victor@mojatatu.com, 
+ pctammela@mojatatu.com, 
+ alexei.starovoitov@gmail.com, 
+ bpf@vger.kernel.org
+Message-ID: <661444789fccf_49a6208ec@john.notmuch>
+In-Reply-To: <f27bfc4d-8985-6d3d-01f5-782ae1ccb9ee@iogearbox.net>
+References: <20240408122000.449238-1-jhs@mojatatu.com>
+ <20240408122000.449238-15-jhs@mojatatu.com>
+ <f27bfc4d-8985-6d3d-01f5-782ae1ccb9ee@iogearbox.net>
+Subject: Re: [PATCH net-next v15 14/15] p4tc: add set of P4TC table kfuncs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next v2 2/5] net: psample: add multicast filtering on
- group_id
-To: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org
-Cc: jiri@resnulli.us, xiyou.wangcong@gmail.com, cmi@nvidia.com,
- yotam.gi@gmail.com, aconole@redhat.com, echaudro@redhat.com, horms@kernel.org
-References: <20240408125753.470419-1-amorenoz@redhat.com>
- <20240408125753.470419-3-amorenoz@redhat.com>
- <2b79ebe9-4e83-418a-ae40-93024a3fb433@ovn.org>
-Content-Language: en-US
-From: Adrian Moreno <amorenoz@redhat.com>
-In-Reply-To: <2b79ebe9-4e83-418a-ae40-93024a3fb433@ovn.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Daniel Borkmann wrote:
+> On 4/8/24 2:19 PM, Jamal Hadi Salim wrote:
+> > We add an initial set of kfuncs to allow interactions from eBPF progr=
+ams
+> > to the P4TC domain.
+> > =
+
+> > - bpf_p4tc_tbl_read: Used to lookup a table entry from a BPF
+> > program installed in TC. To find the table entry we take in an skb, t=
+he
+> > pipeline ID, the table ID, a key and a key size.
+> > We use the skb to get the network namespace structure where all the
+> > pipelines are stored. After that we use the pipeline ID and the table=
+
+> > ID, to find the table. We then use the key to search for the entry.
+> > We return an entry on success and NULL on failure.
+> > =
+
+> > - xdp_p4tc_tbl_read: Used to lookup a table entry from a BPF
+> > program installed in XDP. To find the table entry we take in an xdp_m=
+d,
+> > the pipeline ID, the table ID, a key and a key size.
+> > We use struct xdp_md to get the network namespace structure where all=
+
+> > the pipelines are stored. After that we use the pipeline ID and the t=
+able
+> > ID, to find the table. We then use the key to search for the entry.
+> > We return an entry on success and NULL on failure.
+> > =
+
+> > - bpf_p4tc_entry_create: Used to create a table entry from a BPF
+> > program installed in TC. To create the table entry we take an skb, th=
+e
+> > pipeline ID, the table ID, a key and its size, and an action which wi=
+ll
+> > be associated with the new entry.
+> > We return 0 on success and a negative errno on failure
+> > =
+
+> > - xdp_p4tc_entry_create: Used to create a table entry from a BPF
+> > program installed in XDP. To create the table entry we take an xdp_md=
+, the
+> > pipeline ID, the table ID, a key and its size, and an action which wi=
+ll
+> > be associated with the new entry.
+> > We return 0 on success and a negative errno on failure
+> > =
+
+> > - bpf_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
+> > First does a lookup using the passed key and upon a miss will add the=
+ entry
+> > to the table.
+> > We return 0 on success and a negative errno on failure
+> > =
+
+> > - xdp_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
+> > First does a lookup using the passed key and upon a miss will add the=
+ entry
+> > to the table.
+> > We return 0 on success and a negative errno on failure
+> > =
+
+> > - bpf_p4tc_entry_update: Used to update a table entry from a BPF
+> > program installed in TC. To update the table entry we take an skb, th=
+e
+> > pipeline ID, the table ID, a key and its size, and an action which wi=
+ll
+> > be associated with the new entry.
+> > We return 0 on success and a negative errno on failure
+> > =
+
+> > - xdp_p4tc_entry_update: Used to update a table entry from a BPF
+> > program installed in XDP. To update the table entry we take an xdp_md=
+, the
+> > pipeline ID, the table ID, a key and its size, and an action which wi=
+ll
+> > be associated with the new entry.
+> > We return 0 on success and a negative errno on failure
+> > =
+
+> > - bpf_p4tc_entry_delete: Used to delete a table entry from a BPF
+> > program installed in TC. To delete the table entry we take an skb, th=
+e
+> > pipeline ID, the table ID, a key and a key size.
+> > We return 0 on success and a negative errno on failure
+> > =
+
+> > - xdp_p4tc_entry_delete: Used to delete a table entry from a BPF
+> > program installed in XDP. To delete the table entry we take an xdp_md=
+, the
+> > pipeline ID, the table ID, a key and a key size.
+> > We return 0 on success and a negative errno on failure
+> > =
+
+> > Note:
+> > All P4 objects are owned and reside on the P4TC side. IOW, they are
+> > controlled via TC netlink interfaces and their resources are managed
+> > (created, updated, freed, etc) by the TC side. As an example, the str=
+ucture
+> > p4tc_table_entry_act is returned to the ebpf side on table lookup. On=
+ the
+> > TC side that struct is wrapped around p4tc_table_entry_act_bpf_kern.
+> > A multitude of these structure p4tc_table_entry_act_bpf_kern are
+> > preallocated (to match the P4 architecture, patch #9 describes some o=
+f
+> > the subtleties involved) by the P4TC control plane and put in a kerne=
+l
+> > pool. Their purpose is to hold the action parameters for either a tab=
+le
+> > entry, a global per-table "miss" and "hit" action, etc - which are
+> > instantiated and updated via netlink per runtime requests. An instanc=
+e of
+> > the p4tc_table_entry_act_bpf_kern.p4tc_table_entry_act is returned
+> > to ebpf when there is a un/successful table lookup depending on how t=
+he
+> > P4 program is written. When the table entry is deleted the instance o=
+f
+> > the struct p4tc_table_entry_act_bpf_kern is recycled to the pool to b=
+e
+> > reused for a future table entry. The only time the pool memory is rel=
+eased
+> > is when the pipeline is deleted.
+> > =
+
+> > Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+> > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> > Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+> > Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> > Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+> > Nacked-by: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+> > Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> =
+
+> Given the many reasons stated earlier & for the record:
+> =
+
+> Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
+> =
 
 
+Same for me. For reasons already given tldr,
 
-On 4/8/24 15:18, Ilya Maximets wrote:
-> [copying my previous reply since this version actually has netdev@ in Cc]
-> 
-> On 4/8/24 14:57, Adrian Moreno wrote:
->> Packet samples can come from several places (e.g: different tc sample
->> actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
->> to differentiate them.
->>
->> Likewise, sample consumers that listen on the multicast group may only
->> be interested on a single group. However, they are currently forced to
->> receive all samples and discard the ones that are not relevant, causing
->> unnecessary overhead.
->>
->> Allow users to filter on the desired group_id by adding a new command
->> SAMPLE_FILTER_SET that can be used to pass the desired group id.
->> Store this filter on the per-socket private pointer and use it for
->> filtering multicasted samples.
->>
->> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
->> ---
->>   include/uapi/linux/psample.h |   1 +
->>   net/psample/psample.c        | 127 +++++++++++++++++++++++++++++++++--
->>   2 files changed, 122 insertions(+), 6 deletions(-)
->>
->> diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
->> index e585db5bf2d2..5e0305b1520d 100644
->> --- a/include/uapi/linux/psample.h
->> +++ b/include/uapi/linux/psample.h
->> @@ -28,6 +28,7 @@ enum psample_command {
->>   	PSAMPLE_CMD_GET_GROUP,
->>   	PSAMPLE_CMD_NEW_GROUP,
->>   	PSAMPLE_CMD_DEL_GROUP,
->> +	PSAMPLE_CMD_SAMPLE_FILTER_SET,
-> Other commands are names as PSAMPLE_CMD_VERB_NOUN, so this new one
-> should be PSAMPLE_CMD_SET_FILTER.  (The SAMPLE part seems unnecessary.)
-> Some functions/structures need to be renamed accordingly.
-> 
+ . p4 can be done already in xdp/tc with p4c backend
+ . not clear how hardware offload would be done
+ . shimming control path through 'tc' seems unnecessary
+ . related kfuncs duplicate map operations already there
+ . disagree with pipeline design e.g. single xdp.o is optimal
+ . keeping control path in userspace will be more flexible.
 
-Sure, I'll rename it when I sent the next version.
-
->>   };
->>   
->>   enum psample_tunnel_key_attr {
->> diff --git a/net/psample/psample.c b/net/psample/psample.c
->> index a5d9b8446f77..a0cef63dfdec 100644
->> --- a/net/psample/psample.c
->> +++ b/net/psample/psample.c
->> @@ -98,13 +98,84 @@ static int psample_nl_cmd_get_group_dumpit(struct sk_buff *msg,
->>   	return msg->len;
->>   }
->>   
->> -static const struct genl_small_ops psample_nl_ops[] = {
->> +struct psample_obj_desc {
->> +	struct rcu_head rcu;
->> +	u32 group_num;
->> +	bool group_num_valid;
->> +};
->> +
->> +struct psample_nl_sock_priv {
->> +	struct psample_obj_desc __rcu *flt;
-> 
-> Can we call it 'fileter' ?  I find it hard to read the code with
-> this unnecessary abbreviation.  Same for the lock below.
-> 
-
-Sure.
-
->> +	spinlock_t flt_lock; /* Protects flt. */
->> +};
->> +
->> +static void psample_nl_sock_priv_init(void *priv)
->> +{
->> +	struct psample_nl_sock_priv *sk_priv = priv;
->> +
->> +	spin_lock_init(&sk_priv->flt_lock);
->> +}
->> +
->> +static void psample_nl_sock_priv_destroy(void *priv)
->> +{
->> +	struct psample_nl_sock_priv *sk_priv = priv;
->> +	struct psample_obj_desc *flt;
->> +
->> +	flt = rcu_dereference_protected(sk_priv->flt, true);
->> +	kfree_rcu(flt, rcu);
->> +}
->> +
->> +static int psample_nl_sample_filter_set_doit(struct sk_buff *skb,
->> +					     struct genl_info *info)
->> +{
->> +	struct psample_nl_sock_priv *sk_priv;
->> +	struct nlattr **attrs = info->attrs;
->> +	struct psample_obj_desc *flt;
->> +
->> +	flt = kzalloc(sizeof(*flt), GFP_KERNEL);
->> +
->> +	if (attrs[PSAMPLE_ATTR_SAMPLE_GROUP]) {
->> +		flt->group_num = nla_get_u32(attrs[PSAMPLE_ATTR_SAMPLE_GROUP]);
->> +		flt->group_num_valid = true;
->> +	}
->> +
->> +	if (!flt->group_num_valid) {
->> +		kfree(flt);
-> 
-> Might be better to not allocate it in the first place.
-> 
-
-Absolutely.
-
->> +		flt = NULL;
->> +	}
->> +
->> +	sk_priv = genl_sk_priv_get(&psample_nl_family, NETLINK_CB(skb).sk);
->> +	if (IS_ERR(sk_priv)) {
->> +		kfree(flt);
->> +		return PTR_ERR(sk_priv);
->> +	}
->> +
->> +	spin_lock(&sk_priv->flt_lock);
->> +	flt = rcu_replace_pointer(sk_priv->flt, flt,
->> +				  lockdep_is_held(&sk_priv->flt_lock));
->> +	spin_unlock(&sk_priv->flt_lock);
->> +	kfree_rcu(flt, rcu);
->> +	return 0;
->> +}
->> +
->> +static const struct nla_policy
->> +	psample_sample_filter_set_policy[PSAMPLE_ATTR_SAMPLE_GROUP + 1] = {
->> +	[PSAMPLE_ATTR_SAMPLE_GROUP] = { .type = NLA_U32, },
-> 
-> This indentation is confusing, though I'm not sure what's a better way.
-> 
-
-I now! I'll try to move it around see if it improves things.
-
->> +};
->> +
->> +static const struct genl_ops psample_nl_ops[] = {
->>   	{
->>   		.cmd = PSAMPLE_CMD_GET_GROUP,
->>   		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
->>   		.dumpit = psample_nl_cmd_get_group_dumpit,
->>   		/* can be retrieved by unprivileged users */
->> -	}
->> +	},
->> +	{
->> +		.cmd		= PSAMPLE_CMD_SAMPLE_FILTER_SET,
->> +		.doit		= psample_nl_sample_filter_set_doit,
->> +		.policy		= psample_sample_filter_set_policy,
->> +		.flags		= 0,
->> +	},
->>   };
->>   
->>   static struct genl_family psample_nl_family __ro_after_init = {
->> @@ -114,10 +185,13 @@ static struct genl_family psample_nl_family __ro_after_init = {
->>   	.netnsok	= true,
->>   	.module		= THIS_MODULE,
->>   	.mcgrps		= psample_nl_mcgrps,
->> -	.small_ops	= psample_nl_ops,
->> -	.n_small_ops	= ARRAY_SIZE(psample_nl_ops),
->> +	.ops		= psample_nl_ops,
->> +	.n_ops		= ARRAY_SIZE(psample_nl_ops),
->>   	.resv_start_op	= PSAMPLE_CMD_GET_GROUP + 1,
->>   	.n_mcgrps	= ARRAY_SIZE(psample_nl_mcgrps),
->> +	.sock_priv_size		= sizeof(struct psample_nl_sock_priv),
->> +	.sock_priv_init		= psample_nl_sock_priv_init,
->> +	.sock_priv_destroy	= psample_nl_sock_priv_destroy,
->>   };
->>   
->>   static void psample_group_notify(struct psample_group *group,
->> @@ -360,6 +434,42 @@ static int psample_tunnel_meta_len(struct ip_tunnel_info *tun_info)
->>   }
->>   #endif
->>   
->> +static inline void psample_nl_obj_desc_init(struct psample_obj_desc *desc,
->> +					    u32 group_num)
->> +{
->> +	memset(desc, 0, sizeof(*desc));
->> +	desc->group_num = group_num;
->> +	desc->group_num_valid = true;
->> +}
->> +
->> +static bool psample_obj_desc_match(struct psample_obj_desc *desc,
->> +				   struct psample_obj_desc *flt)
->> +{
->> +	if (desc->group_num_valid && flt->group_num_valid &&
->> +	    desc->group_num != flt->group_num)
->> +		return false;
->> +	return true;
-> 
-> This fucntion returns 'true' if one of the arguments is not valid.
-> I'd not expect such behavior from a 'match' function.
-> 
-> I understand the intention that psample should sample everything
-> to sockets that do not request filters, but that should not be part
-> of the 'match' logic, or more appropriate function name should be
-> chosen.  Also, if the group is not initialized, but the filter is,
-> it should not match, logically.  The validity on filter and the
-> current sample is not symmetric.
-> 
-
-The descriptor should always be initialized but I think double checking should 
-be OK as in the context of this particular function, it might not be clear it is.
-
-> And I'm not really sure if the 'group_num_valid' is actually needed.
-> Can the NULL pointer be used as an indicator?  If so, then maybe
-> the whole psample_obj_desc structure is not needed as it will
-> contain a single field.
-
-If we only filter on group_id, then yes. However, as I was writing this, I 
-thought maybe opening the door to filtering on more fields such as the protocol 
-in/out interfaces, etc. Now that I read this I understand the current code is 
-confusing: I should have left a comment or mention it in the commit message.
-
-> 
->> +}
->> +
->> +static int psample_nl_sample_filter(struct sock *dsk, struct sk_buff *skb,
->> +				    void *data)
->> +{
->> +	struct psample_obj_desc *desc = data;
->> +	struct psample_nl_sock_priv *sk_priv;
->> +	struct psample_obj_desc *flt;
->> +	int ret = 0;
->> +
->> +	rcu_read_lock();
->> +	sk_priv = __genl_sk_priv_get(&psample_nl_family, dsk);
->> +	if (!IS_ERR_OR_NULL(sk_priv)) {
->> +		flt = rcu_dereference(sk_priv->flt);
->> +		if (flt)
->> +			ret = !psample_obj_desc_match(desc, flt);
->> +	}
->> +	rcu_read_unlock();
->> +	return ret;
->> +}
->> +
->>   void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->>   			   u32 sample_rate, const struct psample_metadata *md)
->>   {
->> @@ -370,6 +480,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->>   #ifdef CONFIG_INET
->>   	struct ip_tunnel_info *tun_info;
->>   #endif
->> +	struct psample_obj_desc desc;
->>   	struct sk_buff *nl_skb;
->>   	int data_len;
->>   	int meta_len;
->> @@ -487,8 +598,12 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->>   #endif
->>   
->>   	genlmsg_end(nl_skb, data);
->> -	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
->> -				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
->> +	psample_nl_obj_desc_init(&desc, group->group_num);
->> +	genlmsg_multicast_netns_filtered(&psample_nl_family,
->> +					 group->net, nl_skb, 0,
->> +					 PSAMPLE_NL_MCGRP_SAMPLE,
->> +					 GFP_ATOMIC, psample_nl_sample_filter,
->> +					 &desc);
->>   
->>   	return;
->>   error:
-> 
-
--- 
-Adrián Moreno
+Nacked-by: John Fastabend <john.fastabend@gmail.com>
 
 
