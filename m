@@ -1,529 +1,242 @@
-Return-Path: <netdev+bounces-85910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9B289CCFF
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 22:39:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B82B989CD07
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 22:44:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB6511F218D8
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 20:39:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE4F91C22306
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 20:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F1A146D6C;
-	Mon,  8 Apr 2024 20:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C86146D6C;
+	Mon,  8 Apr 2024 20:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hBzXOJim"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DF27482
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 20:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B767C5FB8F;
+	Mon,  8 Apr 2024 20:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712608772; cv=none; b=uncs+ddmIQIibngDRktuE+ygJUzTHOszMoMAe3v1g1IRqV0LNIiJZbjdrnWHKNhoeeyubWpYVCblBeLS3lqB1MdgeUO/bXTPsKd2SpNSJZiUMiCGRNMKGrc8A6wiTXLqSCjnd4kX4eHbn7chkzwMLyk1YcoMy9Ru9EdgpG8ugdU=
+	t=1712609049; cv=none; b=fpK7T1TEuocOuGwIdHBPJsnBker+sIvQ12su2YDutr0ntokinsXP8O1Fy3RHH9mhiSrV9OtQAXBwMkTYmj2MNjoFOnkg+335Sv8f05UtgRqTWjblOtmzoF7s4D6X3ubF8xH7n7qtKNgxpSNb7fj4xUnCSGQxw/iAMlzOFF0Szn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712608772; c=relaxed/simple;
-	bh=Mu6JG2F6UL+wJPi05Q9eiY6kU2n7cysENt+WCOti1bw=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Co6Pe+o7il/HTDG6C0myZgHipxWJqfQ/icVCfVEafCeTCqcC7eIRQICX65wDOvc+pZ3fGdw4fw/tv8y1jspF8ygXk7S2aJmqsu9JTEsaYKZiH1kEDEiUIm4NsWpa5HISeQHuhGtoemkEzZ2g+s/WsfzjltUAn4wbY8BeBmAv390=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 62CB060003;
-	Mon,  8 Apr 2024 20:39:26 +0000 (UTC)
-Message-ID: <4a86e5bb-f176-42fc-a2b1-f21dea943626@ovn.org>
-Date: Mon, 8 Apr 2024 22:40:09 +0200
+	s=arc-20240116; t=1712609049; c=relaxed/simple;
+	bh=Y5tz8yV+GP68iA41T4sdpFzai98Z9vK2g0m0fVuViBI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h/9pNqH+RaY89wb2JuxBkxFp7hK+5fYIyyp7+Bs6rHYoMWJ1JBL5m8Y/aS2xIu/fNsS1bNoKAZmXEbkKqXB1dli3Dv5u3NwN8bEN9hC/XivMhoofLqSzhU/QQ0o8+KM9j7uj3ypWXlPy7D7HcCWn2N/zYhz5AQz3w+HQpoH4UJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hBzXOJim; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4155819f710so37967895e9.2;
+        Mon, 08 Apr 2024 13:44:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712609046; x=1713213846; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d1o+4pjY29HDvvdTfVxnJIAgrnAGVX4TFUsURZsKsfc=;
+        b=hBzXOJimy/AMV5IlCwN8R6LTFyPhwNGSDAPxmLVJwpI3+wjgPC8601wKW2ojaF9gOz
+         W67J7aYJ5h05PkoZnGqwsOsytmvh6RN85e6LvJdBi9dTanE3XoawxPp3wpGN2FR+1ntz
+         FtMCGFbsYSriWguFvq94xLxJZkXBdSIH1KjHcr4bhxix6HkwQTjj0gbr90ZrsFaFloT0
+         g3ia9k9fxTs1BWt3zN10i0Ocp5Tsdkf4EIDQ8eE5NNdNtxcrHyXbqcmqubDzC6EcR8fN
+         F1yq7BxrTyQv1v1u6ylagJqGZYJFVrktPnGaTKTiFo+opuBay56Ym72p+OPiqhnL4Wes
+         HjZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712609046; x=1713213846;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d1o+4pjY29HDvvdTfVxnJIAgrnAGVX4TFUsURZsKsfc=;
+        b=qqcNXHLDeXsqAYYzpxb4HG/5XVQp9MN/TltHmKnCctwWeXZJ1uMJ5M17o6dw3HpoUL
+         a3qS/k6ucERiqF5nEN0vEImGn3EESyf7+b1ZKItXdiXGFaRHkhqHpSWybgQSKo8/Wsp8
+         jiiatDl3aS64pw/1vms0/NaDO2PbY9m9Z3eQSXIGQsPSj9Rxw7VQ40GzOKyxsQ1cmUjx
+         dU7bMG9f+mgtuasXL1jjXhO6+vynhIvD6O7CUq5XTy9XPC02Tj32kgFZHjfb4mD0KMCN
+         wi9jXcIgF1EE8YOQHi4P4tCY2FWHwJedoeDwEvuJIkbv0TNE+X7X1buOlVQ+fTX6LJi3
+         sshw==
+X-Forwarded-Encrypted: i=1; AJvYcCW8uOjx9BSivRq6SZcOoGRrtwFNdpSpdHx3/J8em87ubbIlV9++26LOk3JsDWL16PMtzZdWWLLMOjH752T9aHNfXg1xhvxz2Xp1cjB2kT/0QrVbT8AlQTaNkvdMA/ILYqa/
+X-Gm-Message-State: AOJu0YwwZpgZkCtH+o65wKkSXvqd14muJAEhgYDUWB5KMzsB5iJS36oz
+	35mp6l09BjQ366ONE6pnPgZWvd2kSnWpbOFH2IeudOLcxhtCnV7sGgSta45lJIvN56bmUQlGpA7
+	lFy26hwUSuj0HaausAj6l35DEh5s=
+X-Google-Smtp-Source: AGHT+IEO1N3e3RDKuQmb5tG2Jt5wT6nHcgPVNQPpVpGkMgSV0JrZPJbgdbxGeDa6u9x/O+vcH2YTT5y37o/8DqMt3nA=
+X-Received: by 2002:a05:600c:4e02:b0:416:9e38:3bdd with SMTP id
+ b2-20020a05600c4e0200b004169e383bddmr419800wmq.27.1712609045767; Mon, 08 Apr
+ 2024 13:44:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- cmi@nvidia.com, yotam.gi@gmail.com, aconole@redhat.com, echaudro@redhat.com,
- horms@kernel.org
-Subject: Re: [RFC net-next v2 5/5] net:openvswitch: add psample support
-Content-Language: en-US
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-References: <20240408125753.470419-1-amorenoz@redhat.com>
- <20240408125753.470419-6-amorenoz@redhat.com>
- <eb44af1d-7514-4084-b022-56f1845b109e@ovn.org>
- <ad55dd2d-c07e-4396-a32c-92d7aefe2ef0@redhat.com>
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <ad55dd2d-c07e-4396-a32c-92d7aefe2ef0@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+References: <Zg7JDL2WOaIf3dxI@nanopsycho> <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
+ <20240404132548.3229f6c8@kernel.org> <660f22c56a0a2_442282088b@john.notmuch>
+ <20240404165000.47ce17e6@kernel.org> <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+ <20240404193817.500523aa@kernel.org> <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
+ <20240408061846.GA8764@unreal> <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
+ <20240408184102.GA4195@unreal>
+In-Reply-To: <20240408184102.GA4195@unreal>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 8 Apr 2024 13:43:28 -0700
+Message-ID: <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, bhelgaas@google.com, 
+	linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/8/24 21:48, Adrian Moreno wrote:
-> 
-> 
-> On 4/8/24 15:37, Ilya Maximets wrote:
->> On 4/8/24 14:57, Adrian Moreno wrote:
->>> Add a new attribute to the sample action, called
->>> OVS_SAMPLE_ATTR_PSAMPLE to allow userspace to pass a group_id and a
->>> user-defined cookie.
->>>
->>> The maximum length of the user-defined cookie is set to 16, same as
->>> tc_cookie to discourage using cookies that will not be offloadable.
->>>
->>> When set, the sample action will use psample to multicast the sample.
->>>
->>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
->>> ---
->>>   include/uapi/linux/openvswitch.h | 22 +++++++--
->>>   net/openvswitch/actions.c        | 52 ++++++++++++++++++---
->>>   net/openvswitch/datapath.c       |  2 +-
->>>   net/openvswitch/flow_netlink.c   | 78 +++++++++++++++++++++++++-------
->>>   4 files changed, 127 insertions(+), 27 deletions(-)
->>
->> This cpatch is missing a few bits:
->>   - Update for Documentation/netlink/specs/ovs_flow.yaml
->>   - Maybe update for tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->>   - Maybe some basic selftests.
->>
-> 
-> Absolutely. I surely plan to add it on the first non-rfc version.
-> 
->>>
->>> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
->>> index efc82c318fa2..a5a32588f582 100644
->>> --- a/include/uapi/linux/openvswitch.h
->>> +++ b/include/uapi/linux/openvswitch.h
->>> @@ -646,15 +646,24 @@ enum ovs_flow_attr {
->>>    * %UINT32_MAX samples all packets and intermediate values sample intermediate
->>>    * fractions of packets.
->>>    * @OVS_SAMPLE_ATTR_ACTIONS: Set of actions to execute in sampling event.
->>> - * Actions are passed as nested attributes.
->>> + * Actions are passed as nested attributes. Optional if OVS_SAMPLE_ATTR_PSAMPLE
->>> + * is not set.
->>
->> 'is set' probably. >
->>> + * @OVS_SAMPLE_ATTR_PSAMPLE: Arguments to be passed to psample. Optional if
->>> + * OVS_SAMPLE_ATTR_ACTIONS is not set.
->>
->> Same here.
->>
-> 
-> Good catch, I rewrote those comments a bunch of times and the were left 
-> expressing the exact opposite!
-> 
-> 
->>>    *
->>> - * Executes the specified actions with the given probability on a per-packet
->>> - * basis.
->>> + * Either OVS_SAMPLE_ATTR_USER_COOKIE or OVS_SAMPLE_ATTR_USER_COOKIE must be
->>> + * specified.
->>> + *
->>> + * Executes the specified actions and/or sends the packet to psample
->>> + * with the given probability on a per-packet basis.
->>>    */
->>>   enum ovs_sample_attr {
->>>   	OVS_SAMPLE_ATTR_UNSPEC,
->>>   	OVS_SAMPLE_ATTR_PROBABILITY, /* u32 number */
->>>   	OVS_SAMPLE_ATTR_ACTIONS,     /* Nested OVS_ACTION_ATTR_* attributes. */
->>> +	OVS_SAMPLE_ATTR_PSAMPLE,     /* struct ovs_psample followed
->>> +				      * by the user-provided cookie.
->>> +				      */
->>>   	__OVS_SAMPLE_ATTR_MAX,
->>>   
->>>   #ifdef __KERNEL__
->>> @@ -675,6 +684,13 @@ struct sample_arg {
->>>   };
->>>   #endif
->>>   
->>> +#define OVS_PSAMPLE_COOKIE_MAX_SIZE 16
->>> +struct ovs_psample {
->>> +	__u32 group_id;		/* The group used for packet sampling. */
->>> +	__u32 user_cookie_len;	/* The length of the user-provided cookie. */
+On Mon, Apr 8, 2024 at 11:41=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
+rote:
+>
+> On Mon, Apr 08, 2024 at 08:26:33AM -0700, Alexander Duyck wrote:
+> > On Sun, Apr 7, 2024 at 11:18=E2=80=AFPM Leon Romanovsky <leon@kernel.or=
+g> wrote:
+> > >
+> > > On Fri, Apr 05, 2024 at 08:41:11AM -0700, Alexander Duyck wrote:
+> > > > On Thu, Apr 4, 2024 at 7:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.=
+org> wrote:
+> > >
+> > > <...>
+> > >
+> > > > > > > Technical solution? Maybe if it's not a public device regress=
+ion rules
+> > > > > > > don't apply? Seems fairly reasonable.
+> > > > > >
+> > > > > > This is a hypothetical. This driver currently isn't changing an=
+ything
+> > > > > > outside of itself. At this point the driver would only be build=
+ tested
+> > > > > > by everyone else. They could just not include it in their Kconf=
+ig and
+> > > > > > then out-of-sight, out-of-mind.
+> > > > >
+> > > > > Not changing does not mean not depending on existing behavior.
+> > > > > Investigating and fixing properly even the hardest regressions in
+> > > > > the stack is a bar that Meta can so easily clear. I don't underst=
+and
+> > > > > why you are arguing.
+> > > >
+> > > > I wasn't saying the driver wouldn't be dependent on existing behavi=
+or.
+> > > > I was saying that it was a hypothetical that Meta would be a "less
+> > > > than cooperative user" and demand a revert.  It is also a hypotheti=
+cal
+> > > > that Linus wouldn't just propose a revert of the fbnic driver inste=
+ad
+> > > > of the API for the crime of being a "less than cooperative maintain=
+er"
+> > > > and  then give Meta the Nvidia treatment.
+> > >
+> > > It is very easy to be "less than cooperative maintainer" in netdev wo=
+rld.
+> > > 1. Be vendor.
+> > > 2. Propose ideas which are different.
+> > > 3. Report for user-visible regression.
+> > > 4. Ask for a fix from the patch author or demand a revert according t=
+o netdev rules/practice.
+> > >
+> > > And voil=C3=A0, you are "less than cooperative maintainer".
+> > >
+> > > So in reality, the "hypothetical" is very close to the reality, unles=
+s
+> > > Meta contribution will be treated as a special case.
+> > >
+> > > Thanks
+> >
+> > How many cases of that have we had in the past? I'm honestly curious
+> > as I don't actually have any reference.
+>
+> And this is the problem, you don't have "any reference" and accurate
+> knowledge what happened, but you are saying "less than cooperative
+> maintainer".
 
-Here as well, not sure if u32 makes sense as userspace can't
-actually supply a cookie this large via netlink.
+By "less than cooperative maintainer" I was referring to the scenario
+where somebody is maintaining something unique to them, such as the
+Meta Host NIC, and not willing to work with the community to fix it
+and instead just demanding a revert of a change. It doesn't seem like
+it would be too much to ask to work with the author on a fix for the
+problem as long as the maintainer is willing to work with the author
+on putting together and testing the fix.
 
->>> +	__u8 user_cookie[];	/* The user-provided cookie. */
->>> +};
->>
->> Structures are not a good approach for modern netlink.
->> use nested attributes instead.  This way we can also
->> eliminate the need for variable-length array and the
->> length field, if the length can be taken from a netlink
->> attribute directly, e.g. similar to NLA_BINARY in tc.
->>
->> If necessary, there could be a structure in the private
->> header to store the data for internal use.
->>
-> 
-> Interesting. Thanks for the suggestion. I think it will also help action validation.
-> 
->>> +
->>>   /**
->>>    * enum ovs_userspace_attr - Attributes for %OVS_ACTION_ATTR_USERSPACE action.
->>>    * @OVS_USERSPACE_ATTR_PID: u32 Netlink PID to which the %OVS_PACKET_CMD_ACTION
->>> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
->>> index 6fcd7e2ca81f..45d2b325b76a 100644
->>> --- a/net/openvswitch/actions.c
->>> +++ b/net/openvswitch/actions.c
->>> @@ -24,6 +24,7 @@
->>>   #include <net/checksum.h>
->>>   #include <net/dsfield.h>
->>>   #include <net/mpls.h>
->>> +#include <net/psample.h>
->>>   #include <net/sctp/checksum.h>
->>>   
->>>   #include "datapath.h"
->>> @@ -1025,6 +1026,31 @@ static int dec_ttl_exception_handler(struct datapath *dp, struct sk_buff *skb,
->>>   	return 0;
->>>   }
->>>   
->>> +static int ovs_psample_packet(struct datapath *dp, struct sw_flow_key *key,
->>> +			      struct ovs_psample *psample, struct sk_buff *skb,
->>> +			      u32 rate)
->>> +{
->>> +	struct psample_group psample_group = {};
->>> +	struct psample_metadata md = {};
->>> +	struct vport *input_vport;
->>> +
->>> +	psample_group.group_num = psample->group_id;
->>> +	psample_group.net = ovs_dp_get_net(dp);
->>> +
->>> +	input_vport = ovs_vport_rcu(dp, key->phy.in_port);
->>> +	if (!input_vport)
->>> +		input_vport = ovs_vport_rcu(dp, OVSP_LOCAL);
->>> +
->>> +	md.in_ifindex = input_vport->dev->ifindex;
->>> +	md.user_cookie = psample->user_cookie;
->>> +	md.user_cookie_len = psample->user_cookie_len;
->>> +	md.trunc_size = skb->len;
->>> +
->>> +	psample_sample_packet(&psample_group, skb, rate, &md);
->>> +
->>> +	return 0;
->>> +}
->>> +
->>>   /* When 'last' is true, sample() should always consume the 'skb'.
->>>    * Otherwise, sample() should keep 'skb' intact regardless what
->>>    * actions are executed within sample().
->>> @@ -1033,16 +1059,17 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
->>>   		  struct sw_flow_key *key, const struct nlattr *attr,
->>>   		  bool last)
->>>   {
->>> -	struct nlattr *actions;
->>> +	const struct sample_arg *arg;
->>>   	struct nlattr *sample_arg;
->>>   	int rem = nla_len(attr);
->>> -	const struct sample_arg *arg;
->>> +	struct nlattr *next;
->>>   	bool clone_flow_key;
->>> +	int ret;
->>>   
->>>   	/* The first action is always 'OVS_SAMPLE_ATTR_ARG'. */
->>>   	sample_arg = nla_data(attr);
->>>   	arg = nla_data(sample_arg);
->>> -	actions = nla_next(sample_arg, &rem);
->>> +	next = nla_next(sample_arg, &rem);
->>>   
->>>   	if ((arg->probability != U32_MAX) &&
->>>   	    (!arg->probability || get_random_u32() > arg->probability)) {
->>> @@ -1051,9 +1078,22 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
->>>   		return 0;
->>>   	}
->>>   
->>> -	clone_flow_key = !arg->exec;
->>> -	return clone_execute(dp, skb, key, 0, actions, rem, last,
->>> -			     clone_flow_key);
->>> +	if (next->nla_type == OVS_SAMPLE_ATTR_PSAMPLE) {
->>
->> Maybe add a commnet that OVS_SAMPLE_ATTR_PSAMPLE is always a sencond
->> argument when present.
->>
->> Is there a better way to handle this?
->>
-> 
-> I also dislike it. The fact that actions are not nested but concatenated to 
-> makes the internal representation a bit flaky.
-> 
-> The alternative I considered was adding the group_id and cookie to the 
-> internal-only OVS_SAMPLE_ATTR_ARG. However, now I wonder:
-> - Should we also use nested attributes instead of structs for this internal one?
-> 
-> And, probably off-topic: what's the story behind using netlink attributes to 
-> store action arguments internally? Has it ever been discussed using a union for 
-> instance?
+With that said if the upstream version of things aren't broken then it
+doesn't matter. It shouldn't be expected of the community to maintain
+any proprietary code that wasn't accepted upstream.
 
-I'm not sure why it was originally done this way, but it is probably
-the most efficient of convenient ways to pack a tree-like structure.
-If we had a union, we would likely need a tree of actions with each
-action bing a separately allocated node, since we have clone() and
-even check_pkt_len() or other actions that can fork the pipeline.
-Or we'll need to use some dummy actions as parethesis, prectically
-emulating what we already have with netlink, but with structures.
+> >
+> > Also as far as item 3 isn't hard for it to be a "user-visible"
+> > regression if there are no users outside of the vendor that is
+> > maintaining the driver to report it?
+>
+> This wasn't the case. It was change in core code, which broke specific
+> version of vagrant. Vendor caught it simply by luck.
 
-Netlink format is fast to scan, since it's in a single liner chunk
-of memory.  Tree or list structure may have higher memory footprint
-and be slower to iterate due to cache misses.
+Any more info on this? Without context it is hard to say one way or the oth=
+er.
 
-There might be a better way to store all this for sure, but will
-require some careful performance and memory consumption testing.
+I know I have seen my fair share of hot issues such as when the
+introduction of the tracing framework was corrupting the NVRAM on
+e1000e NICs.[1] It got everyone's attention when it essentially
+bricked one of Linus's systems. I don't recall us doing a full revert
+on function tracing as a result, but I believe it was flagged as
+broken until it could be resolved. So depending on the situation there
+are cases where asking for a fix or revert might be appropriate.
 
-> 
->>> +		ret = ovs_psample_packet(dp, key, nla_data(next), skb,
->>> +					 arg->probability);
->>> +		if (last)
->>> +			ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
->>> +		if (ret)
->>> +			return ret;
->>> +		next = nla_next(next, &rem);
->>> +	}
->>> +
->>> +	if (nla_ok(next, rem)) {
->>> +		clone_flow_key = !arg->exec;
->>> +		ret = clone_execute(dp, skb, key, 0, next, rem, last,
->>> +				    clone_flow_key);
->>> +	}
->>> +	return ret;
->>>   }
->>>   
->>>   /* When 'last' is true, clone() should always consume the 'skb'.
->>> diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
->>> index 99d72543abd3..b5b560c2e74b 100644
->>> --- a/net/openvswitch/datapath.c
->>> +++ b/net/openvswitch/datapath.c
->>> @@ -976,7 +976,7 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
->>>   	struct sw_flow_match match;
->>>   	u32 ufid_flags = ovs_nla_get_ufid_flags(a[OVS_FLOW_ATTR_UFID_FLAGS]);
->>>   	int error;
->>> -	bool log = !a[OVS_FLOW_ATTR_PROBE];
->>> +	bool log = true;
->>
->> Debugging artifact?
->>
-> 
-> Yep, sorry.
-> 
->>>   
->>>   	/* Must have key and actions. */
->>>   	error = -EINVAL;
->>> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
->>> index f224d9bcea5e..f540686271b7 100644
->>> --- a/net/openvswitch/flow_netlink.c
->>> +++ b/net/openvswitch/flow_netlink.c
->>> @@ -2381,8 +2381,12 @@ static void ovs_nla_free_sample_action(const struct nlattr *action)
->>>   
->>>   	switch (nla_type(a)) {
->>>   	case OVS_SAMPLE_ATTR_ARG:
->>> -		/* The real list of actions follows this attribute. */
->>
->> Please, don't remove this comment.  Maybe extend it instead.
->>
->>>   		a = nla_next(a, &rem);
->>> +
->>> +		/* OVS_SAMPLE_ATTR_PSAMPLE may be present. */
->>> +		if (nla_type(a) == OVS_SAMPLE_ATTR_PSAMPLE)
->>> +			a = nla_next(a, &rem);
->>> +
->>>   		ovs_nla_free_nested_actions(a, rem);
->>>   		break;
->>>   	}
->>> @@ -2561,6 +2565,9 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
->>>   				  u32 mpls_label_count, bool log,
->>>   				  u32 depth);
->>>   
->>> +static int copy_action(const struct nlattr *from,
->>> +		       struct sw_flow_actions **sfa, bool log);
->>> +
->>>   static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->>>   				    const struct sw_flow_key *key,
->>>   				    struct sw_flow_actions **sfa,
->>> @@ -2569,10 +2576,10 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->>>   				    u32 depth)
->>>   {
->>>   	const struct nlattr *attrs[OVS_SAMPLE_ATTR_MAX + 1];
->>> -	const struct nlattr *probability, *actions;
->>> +	const struct nlattr *probability, *actions, *psample;
->>>   	const struct nlattr *a;
->>> -	int rem, start, err;
->>>   	struct sample_arg arg;
->>> +	int rem, start, err;
->>>   
->>>   	memset(attrs, 0, sizeof(attrs));
->>>   	nla_for_each_nested(a, attr, rem) {
->>> @@ -2589,7 +2596,23 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->>>   		return -EINVAL;
->>>   
->>>   	actions = attrs[OVS_SAMPLE_ATTR_ACTIONS];
->>> -	if (!actions || (nla_len(actions) && nla_len(actions) < NLA_HDRLEN))
->>> +	if (actions && (!nla_len(actions) || nla_len(actions) < NLA_HDRLEN))
->>> +		return -EINVAL;
->>> +
->>> +	psample = attrs[OVS_SAMPLE_ATTR_PSAMPLE];
->>> +	if (psample) {
->>> +		struct ovs_psample *ovs_ps;
->>> +
->>> +		if (!nla_len(psample) || nla_len(psample) < sizeof(*ovs_ps))
->>> +			return -EINVAL;
->>> +
->>> +		ovs_ps = nla_data(psample);
->>> +		if (ovs_ps->user_cookie_len > OVS_PSAMPLE_COOKIE_MAX_SIZE ||
->>> +		    nla_len(psample) != sizeof(*ovs_ps) + ovs_ps->user_cookie_len)
->>> +			return -EINVAL;
->>> +	}
->>> +
->>> +	if (!psample && !actions)
->>>   		return -EINVAL;
->>>   
->>>   	/* validation done, copy sample action. */
->>> @@ -2608,7 +2631,9 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->>>   	 * If the sample is the last action, it can always be excuted
->>>   	 * rather than deferred.
->>>   	 */
->>> -	arg.exec = last || !actions_may_change_flow(actions);
->>> +	if (actions)
->>> +		arg.exec = last || !actions_may_change_flow(actions);
->>
->> 'arg.exec' will remain uninitialized.
->>
-> 
-> Yes. I just wanted to avoid the call to actions_may_change_flow(NULL) in which 
-> case arg.exec is not used. I'll make sure to zero-initialize it nevertheless.
-> 
->>> +
->>>   	arg.probability = nla_get_u32(probability);
->>>   
->>>   	err = ovs_nla_add_action(sfa, OVS_SAMPLE_ATTR_ARG, &arg, sizeof(arg),
->>> @@ -2616,10 +2641,17 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->>>   	if (err)
->>>   		return err;
->>>   
->>> -	err = __ovs_nla_copy_actions(net, actions, key, sfa,
->>> -				     eth_type, vlan_tci, mpls_label_count, log,
->>> -				     depth + 1);
->>> +	if (psample)
->>> +		err = ovs_nla_add_action(sfa, OVS_SAMPLE_ATTR_PSAMPLE,
->>> +					 nla_data(psample), nla_len(psample),
->>> +					 log);
->>> +	if (err)
->>
->> Can be used uninitialized.
->>
-> 
-> You're right, it should be inside the if above, although err should have been 
-> initialized to output of ovs_nla_add_action.
+> > Again I am assuming that the same rules wouldn't necessarily apply
+> > in the vendor/consumer being one entity case.
+> >
+> > Also from my past experience the community doesn't give a damn about
+> > 1. It is only if 3 is being reported by actual users that somebody
+> > would care. The fact is if vendors held that much power they would
+> > have run roughshod over the community long ago as I know there are
+> > vendors who love to provide one-off projects outside of the kernel and
+> > usually have to work to get things into the upstream later and no
+> > amount of complaining about "the users" will get their code accepted.
+> > The users may complain but it is the vendors fault for that so the
+> > community doesn't have to take action.
+>
+> You are taking it to completely wrong direction with your assumptions.
+> The reality is that regression was reported by real user without any
+> vendor code involved. This is why the end result was so bad for all parti=
+es.
 
-Ah, I missed the previous assingnent.  But yes, it is still a little strange
-to handle errors this way.
+Okay, but that doesn't tie into what is going on here. In this case
+"vendor" =3D=3D "user". Like I was saying the community generally cares
+about the user so 3 would be the important case assuming they are
+using a stock kernel and driver and not hiding behind the vendor
+expecting some sort of proprietary fix. If they are using some
+proprietary stuff behind the scenes, then tough luck.
 
-> 
->>> +		return err;
->>>   
->>> +	if (actions)
->>> +		err = __ovs_nla_copy_actions(net, actions, key, sfa,
->>> +					     eth_type, vlan_tci,
->>> +					     mpls_label_count, log, depth + 1);
->>>   	if (err)
->>>   		return err;
->>>   
->>> @@ -3538,7 +3570,7 @@ static int sample_action_to_attr(const struct nlattr *attr,
->>>   	struct nlattr *start, *ac_start = NULL, *sample_arg;
->>>   	int err = 0, rem = nla_len(attr);
->>>   	const struct sample_arg *arg;
->>> -	struct nlattr *actions;
->>> +	struct nlattr *next;
->>>   
->>>   	start = nla_nest_start_noflag(skb, OVS_ACTION_ATTR_SAMPLE);
->>>   	if (!start)
->>> @@ -3546,27 +3578,39 @@ static int sample_action_to_attr(const struct nlattr *attr,
->>>   
->>>   	sample_arg = nla_data(attr);
->>>   	arg = nla_data(sample_arg);
->>> -	actions = nla_next(sample_arg, &rem);
->>> +	next = nla_next(sample_arg, &rem);
->>>   
->>>   	if (nla_put_u32(skb, OVS_SAMPLE_ATTR_PROBABILITY, arg->probability)) {
->>>   		err = -EMSGSIZE;
->>>   		goto out;
->>>   	}
->>>   
->>> -	ac_start = nla_nest_start_noflag(skb, OVS_SAMPLE_ATTR_ACTIONS);
->>> -	if (!ac_start) {
->>> -		err = -EMSGSIZE;
->>> -		goto out;
->>> +	if (nla_type(next) == OVS_SAMPLE_ATTR_PSAMPLE) {
->>> +		if (nla_put(skb, OVS_SAMPLE_ATTR_PSAMPLE, nla_len(next),
->>> +			    nla_data(next))) {
->>> +			err = -EMSGSIZE;
->>> +			goto out;
->>> +		}
->>> +		next = nla_next(next, &rem);
->>>   	}
->>>   
->>> -	err = ovs_nla_put_actions(actions, rem, skb);
->>> +	if (nla_ok(next, rem)) {
->>> +		ac_start = nla_nest_start_noflag(skb, OVS_SAMPLE_ATTR_ACTIONS);
->>> +		if (!ac_start) {
->>> +			err = -EMSGSIZE;
->>> +			goto out;
->>> +		}
->>> +		err = ovs_nla_put_actions(next, rem, skb);
->>> +	}
->>>   
->>>   out:
->>>   	if (err) {
->>> -		nla_nest_cancel(skb, ac_start);
->>> +		if (ac_start)
->>> +			nla_nest_cancel(skb, ac_start);
->>>   		nla_nest_cancel(skb, start);
->>>   	} else {
->>> -		nla_nest_end(skb, ac_start);
->>> +		if (ac_start)
->>> +			nla_nest_end(skb, ac_start);
->>>   		nla_nest_end(skb, start);
->>>   	}
->>>   
->>
-> 
+> So no, you can get "less than cooperative maintainer" label really easy i=
+n
+> current environment.
 
+I didn't say you couldn't. Without context I cannot say if it was
+deserved or not. I know in the example I cited above Intel had to add
+changes to the e1000e driver to make the NVRAM non-writable until the
+problem patch was found. So Intel was having to patch to fix an issue
+it didn't introduce and deal with the negative press and blow-back
+from a function tracing patch that was damaging NICs.
+
+The point I was trying to make is that if you are the only owner of
+something, and not willing to work with the community as a maintainer
+it becomes much easier for the community to just revert the driver
+rather than try to change the code if you aren't willing to work with
+them. Thus the "less than cooperative" part. The argument being made
+seems to be that once something is in the kernel it is forever and if
+we get it in and then refuse to work with the community it couldn't be
+reverted. I am arguing that isn't the case, especially if Meta were to
+become a "less than cooperative maintainer" for a device that is
+primarily only going to be available in Meta data centers.
+
+Thanks,
+
+- Alex
+
+[1]: https://lwn.net/Articles/304105/
 
