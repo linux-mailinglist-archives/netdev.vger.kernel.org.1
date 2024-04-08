@@ -1,109 +1,146 @@
-Return-Path: <netdev+bounces-85930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD0E89CEE7
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:21:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5294989CEED
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBF751C224C9
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:21:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DFFD287924
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAA1148854;
-	Mon,  8 Apr 2024 23:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4363E53807;
+	Mon,  8 Apr 2024 23:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="A7tfDht1"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="jlcl9s2Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E92143872
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 23:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CB6171B0
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 23:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712618455; cv=none; b=LT57IeenCtdeHfTdZGj/UPPMIyCSWgOzns3YUYUeNv+j61CykXwnLbWci7KgrcWDIbJ3GTDhhkhB+EzIEUZTtpZ7E7upoy/wvOD/nmndN6xH+/pG6CbaPd+dvJp/7ZQyuaC9VcDnYw83XCASbR58lCzjYzFWT8hwijzTtG9AVe8=
+	t=1712618750; cv=none; b=eSuBe93wms/l8JrDse/UOWGAdLZ9Hjwp8kYJ4uCyiYgbdwfh3hJtttsh6DjmTosNTC5DI+mZIWvocMBI7+lzuWhIAsqLpe6MD801f9tuFTMjmfIaM/VBgg/n0baTVStgtWyLEBovPN6hIGSRMV9wiJLOcpwImOXzHcavrBoW0rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712618455; c=relaxed/simple;
-	bh=ABYWepUPTpNOjIti27XRT5vSfcJbPAQWDlfjw/lOhZ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IQKvEP4LCb2s9rW+3+tbgTUwDF9o5uqvLP4g/oMGX/DmiJevxHEtJUDeJ+iFkbbLhgluMntyfDSfrM+b2A8jtQGYw2SlRnN1ZDUhKLx3WGk2opPi2v0ChRD1o7e9kgmmFLXc8+yEWREiCEn87zzBisto3nB/F4SX1H25DDM/iME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=A7tfDht1; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5d4a1e66750so3066348a12.0
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 16:20:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1712618454; x=1713223254; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k+SiT5TlstlnW48g/wuVm80XsJWvG2bQ8P1YkCxCZTo=;
-        b=A7tfDht1QiAasrAarWgQBcp8WjrM0U9g0mZZ4NCgvzol+70SMfDqbCwOKj9bkiy3aN
-         3zM/9kN7bm71kuIetoUPLapxRZOM9Rb0mmWODp0EpDPVy/MbcHOrIrKVRMRe48AKCxmJ
-         GqhxoZFqH0naH8qdkMPcGDY6ABkAGir+Zwq1w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712618454; x=1713223254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k+SiT5TlstlnW48g/wuVm80XsJWvG2bQ8P1YkCxCZTo=;
-        b=Yk/BGEB4+aY+BuXHHb1oVr6uZm5mFnYWspZ6EJ7omYs5JdTYBujFaM3iJfFKRIldrn
-         a7HWD0YRtNAZGRGK0GqgUf7xey4dFKsEdqDidE1S2V/wFMszgW8UoBaDT4lJjd+sBzDG
-         HvLUcOuxrxwVHbYYds5D6RLVB99e54Ify/Wl7r+ToPpjaNf3TWCbKQuIrixFrkJgEweJ
-         QRvIJMJFX2Cqsjllavw0A+7PV6fVVxKe0U6KfiP+amC+P2cy4v0TfxDdCTnVsBbW9GVZ
-         Dgdi44Mvo3Bi0EVY5djY7Tb1KyLtxZ3Xpj7+7wuKQ0XWug9KmEguCR9L65KF0a43ewGT
-         yVnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZjhmcFudOAOfpNhkTvvKyUWHS6KPcOwGQdeKCncR2Jr1aGAxPlHxs+B0mdoL1pVH0gEs6V1BCzyfJM8KjbooRfYYOwnFB
-X-Gm-Message-State: AOJu0Yy/Uz9zcEQ9jBpkmsEn5g6LAvXY2hwiyGvX9ANcjbUoxMtWtk8L
-	Tw88K41cHTtKz8HU6Ta8QtuEP4qpaPCxWMmfxqWMVu1NiBDMhOcxKtu3HV83rw==
-X-Google-Smtp-Source: AGHT+IFKJzLp05fcugYDvokyR1XjAmUqpeqvOeGNr/xDGBIzmxdVQH9EoFRUIn9jOHtI4yO1H7vVRA==
-X-Received: by 2002:a05:6300:8085:b0:1a7:3365:d8ed with SMTP id ap5-20020a056300808500b001a73365d8edmr9271766pzc.29.1712618453799;
-        Mon, 08 Apr 2024 16:20:53 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id 12-20020a170902e9cc00b001defa97c6basm7517122plk.235.2024.04.08.16.20.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 16:20:53 -0700 (PDT)
-Date: Mon, 8 Apr 2024 16:20:52 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH v3] net: dsa: lan9303: use ethtool_puts() for
- lan9303_get_strings()
-Message-ID: <202404081620.D050527@keescook>
-References: <20240408-strncpy-drivers-net-dsa-lan9303-core-c-v3-1-0c313694d25b@google.com>
+	s=arc-20240116; t=1712618750; c=relaxed/simple;
+	bh=nY+yierZIh2aQyUM/eztxjd7nDccsTrYf0rXHbe9KKk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gYoOtFWgcHdaYy+b9aQUTu7sod7qWLaugHE8afMK42o9AkEThdhf1WrUw1y5QGpCgzfjA8ANZErHO8FhNP2GjG2wOozp/xmkElOqL0WNsD1pH4TcRNZLQgZiNCytlwpUql6Yxu3pkMHNKs/1kEtXB9buvfgIEMNOiCykhxFQjBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=jlcl9s2Z; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1rtyMw-00CJYk-MC; Tue, 09 Apr 2024 01:25:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=t371Iy+FhYxhl7DOAG5fYy9u8vKqKRm49whvClVFQhQ=; b=jlcl9s2ZKl6uXldGBZ6SdGcclR
+	jihCQ7saS62qPqnXe8zkorN35ZT4gLHFfYI9gA32oeUM8eh70/+xkju0QsEa0tRc04IW9ITNQJZ/M
+	sVaWFWonuUOPb5s3ZWUszR9gjgAMzhFlg52royP2/RZrT753dN1NfJxGHVZwR3ATYezdABDGEsPA7
+	IVsn2K2jlLYGJrlk7mRKTtchuxEyCsgg1glnIrPqL/fSBOkGhvHWrJ22hf0Kalw7n3797tTQEKAXR
+	KoZfYUk+tDelJIKitftVTa7sxYmaARD91eDHyqtu9HGHLOf2u4lLs92vq7A7aeOTcEQ7kLdIoLJGI
+	GzCfXQ0A==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1rtyMv-0000Kd-QT; Tue, 09 Apr 2024 01:25:41 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1rtyMe-000ExV-7z; Tue, 09 Apr 2024 01:25:24 +0200
+Message-ID: <c3f212f8-01a5-4037-af76-39170aa6a6ce@rbox.co>
+Date: Tue, 9 Apr 2024 01:25:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240408-strncpy-drivers-net-dsa-lan9303-core-c-v3-1-0c313694d25b@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] af_unix: Fix garbage collector racing against
+ connect()
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com
+References: <20240408161336.612064-2-mhal@rbox.co>
+ <20240408211830.99829-1-kuniyu@amazon.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20240408211830.99829-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 08, 2024 at 09:01:57PM +0000, Justin Stitt wrote:
-> This pattern of strncpy with some pointer arithmetic setting fixed-sized
-> intervals with string literal data is a bit weird so let's use
-> ethtool_puts() as this has more obvious behavior and is less-error
-> prone.
+On 4/8/24 23:18, Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Mon,  8 Apr 2024 17:58:45 +0200
+...
+>>  	list_for_each_entry_safe(u, next, &gc_inflight_list, link) {
+>> -		long total_refs;
+>> -
+>> -		total_refs = file_count(u->sk.sk_socket->file);
+>> +		struct sock *sk = &u->sk;
+>> +		long total_refs = file_count(sk->sk_socket->file);
+>>  
+>>  		WARN_ON_ONCE(!u->inflight);
+>>  		WARN_ON_ONCE(total_refs < u->inflight);
+>> @@ -286,6 +295,11 @@ static void __unix_gc(struct work_struct *work)
+>>  			list_move_tail(&u->link, &gc_candidates);
+>>  			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
+>>  			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
+>> +
+>> +			if (sk->sk_state == TCP_LISTEN) {
+>> +				unix_state_lock(sk);
+>> +				unix_state_unlock(sk);
 > 
-> Nicely, we also get to drop a usage of the now deprecated strncpy() [1].
+> Less likely though, what if the same connect() happens after this ?
 > 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Cc: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> connect(S, addr)	sendmsg(S, [V]); close(V)	__unix_gc()
+> ----------------	-------------------------	-----------
+> NS = unix_create1()
+> skb1 = sock_wmalloc(NS)
+> L = unix_find_other(addr)
+> 						for u in gc_inflight_list:
+> 						  if (total_refs == inflight_refs)
+> 						    add u to gc_candidates
+> 						    // L was already traversed
+> 						    // in a previous iteration.
+> unix_state_lock(L)
+> unix_peer(S) = NS
+> 
+> 						// gc_candidates={L, V}
+> 
+> 						for u in gc_candidates:
+> 						  scan_children(u, dec_inflight)
+> 
+> 						// embryo (skb1) was not
+> 						// reachable from L yet, so V's
+> 						// inflight remains unchanged
+> __skb_queue_tail(L, skb1)
+> unix_state_unlock(L)
+> 						for u in gc_candidates:
+> 						  if (u.inflight)
+> 						    scan_children(u, inc_inflight_move_tail)
+> 
+> 						// V count=1 inflight=2 (!)
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+If I understand your question, in this case L's queue technically does change
+between scan_children()s: embryo appears, but that's meaningless. __unix_gc()
+already holds unix_gc_lock, so the enqueued embryo can not carry any SCM_RIGHTS
+(i.e. it doesn't affect the inflight graph). Note that unix_inflight() takes the
+same unix_gc_lock.
 
--- 
-Kees Cook
+Is there something I'm missing?
+
+> As you pointed out, this GC's assumption is basically wrong; the GC
+> works correctly only when the set of traversed sockets does not change
+> over 3 scan_children() calls.
+> 
+> That's why I reworked the GC not to rely on receive queue.
+> https://lore.kernel.org/netdev/20240325202425.60930-1-kuniyu@amazon.com/
+
+Right, I'll try to get my head around your series :)
 
