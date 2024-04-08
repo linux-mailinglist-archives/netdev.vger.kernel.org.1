@@ -1,111 +1,99 @@
-Return-Path: <netdev+bounces-85779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9686E89C1C6
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:23:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B723A89C0CE
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51C1A283132
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:23:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4EB5B26F80
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A6181AB4;
-	Mon,  8 Apr 2024 13:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E751671B20;
+	Mon,  8 Apr 2024 13:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="F3Q1XRoh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XW2GYNLA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113D38174E;
-	Mon,  8 Apr 2024 13:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49077173E
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712582415; cv=none; b=N7iE5tGtpAs8o0UR1Qcfpz6GwXnPsfRNZ7jbxZw1lifKZZo7bqWcjprMDvKovKMl7dEUTKbhUR3OazHcRGLboDy1ePAzWAYBt7+FtQ4ODe803M3t96qL7Rd/h7kofM4FvWr0ifaQXT+TfQ8o+mwtWV8FrZ3qVu7/Rj01tsANAsM=
+	t=1712581829; cv=none; b=itGMP06YJ3w1TREXrCyJ9QCjtTVHjAge2fMxr8ptV+NwtvBbj6pVWFVmhHxXnZKQWqnQsH+3YBTSK/C5UKD7KBcJszl3z0XnsGzmPAumvZ7sw57l6PVLuSPxlg/AJiI/Lq7ZHWY8D7Rg4fA7YqnjTRSdvJDOOn3up4qxu+avIsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712582415; c=relaxed/simple;
-	bh=bA6hKYZ82VB6o6udzZS2rqCWCcIdVnx+Qp8TMbmLPiA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D8UAkKME1HP+PIbo7ZjvxlmajWBEoz75tBwchw9MLTehuFVGrePr4RbSlvaVPa5VnrGCeqCRx4eWmyZoylkB22/c+zRh498RWS0K1jDUBc10Yn4VWjk2SvcVM+PMU0Ov2yks3S/69j32T72syz8Q/QGjtOrIyGn9KXOiPDm+D1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=F3Q1XRoh; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 89A85600A7;
-	Mon,  8 Apr 2024 13:10:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1712581838;
-	bh=bA6hKYZ82VB6o6udzZS2rqCWCcIdVnx+Qp8TMbmLPiA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F3Q1XRohx6nleEyeTdL+pgh9xmCk7cMb2eOrrlZDv2oAtbGAm14p7Cm+iyDtVRA/w
-	 ABiVn+gb2iVVem/6/Jf4VubV1slww0XYOKMuw5DdngbPtY4cb6+FDzg2qIWe2P9HDf
-	 FDU/mfObJ92rmEENQXZtPpGLl0khylNBKUhmDVyIO9pe1um0d2btvcD5tfBtEccjk3
-	 IaCP9YhdxFJ9fxbrFwwLH9bBg5u2aUpKY6m3vNziwssM5BpCNxTdg4GMICotIrKAH5
-	 p4UkEyY59z2QTka6nwMpaxWGD82W+b+25jKCAVHrsjGoTEicHj1kizzRtk05pGObdX
-	 FIqnEOx8KZoig==
-Received: by x201s (Postfix, from userid 1000)
-	id 9C4C320BDE4; Mon, 08 Apr 2024 13:09:43 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Louis Peens <louis.peens@corigine.com>,
-	Taras Chornyi <taras.chornyi@plvision.eu>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yanguo Li <yanguo.li@corigine.com>,
-	oss-drivers@corigine.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH net-next 6/6] net: dsa: microchip: ksz9477: flower: validate control flags
-Date: Mon,  8 Apr 2024 13:09:24 +0000
-Message-ID: <20240408130927.78594-7-ast@fiberby.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240408130927.78594-1-ast@fiberby.net>
-References: <20240408130927.78594-1-ast@fiberby.net>
+	s=arc-20240116; t=1712581829; c=relaxed/simple;
+	bh=94C6+G1zDPMgZaYNLGAZ2TB6IIE8Qvg489s3XjxyGkk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VZY3POF2i8hJBGNVH+FRU8l0cupsK9HeyshY0lrWbFTr4u4UxZ+mNzYHu/7C15hLa04sjRYoRdvL31+OiDoW27HAX1w+GHFWuG4AJLGdPpeX5W98bSXxs8iXx7afCoMwfdirs6K7QrUn0qR4t531Pu3VhiZVCTSOz1EdXx9KZbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XW2GYNLA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A334DC433A6;
+	Mon,  8 Apr 2024 13:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712581829;
+	bh=94C6+G1zDPMgZaYNLGAZ2TB6IIE8Qvg489s3XjxyGkk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XW2GYNLAzDuUJXDf5WDxxlmdOqmkVDOoX2zQ5dLbX58i420uyC2dVu+uAs/ElASfN
+	 uMlrVLzGizGX+FXkV7SDMftVdctKZn+oZYJStJqYVG3USeSCdgAGKPOcHaAEaRX2Ny
+	 04ZsY3/cr0IyvGcXQ5HRkVB92rRBR1nogdMTgTRQevGt9PetqPof33LNwISMcZIWCJ
+	 duGsMuQo5K3SlQ6Y2FCndR87qNMg9yp+dJvav0JERoJ21foaH0L9vkFEE5DkopMKxC
+	 o2Xgw6RwHVwT/58iLrULq9b6811yL4TYsljT9gYT1NBnVYOUfzM4Ho8Qh993z4oJGR
+	 CI3RGnv83YjjQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92BA4D72A03;
+	Mon,  8 Apr 2024 13:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next] net: display more skb fields in skb_dump()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171258182959.9669.7116178764304358673.git-patchwork-notify@kernel.org>
+Date: Mon, 08 Apr 2024 13:10:29 +0000
+References: <20240407080606.3153359-1-edumazet@google.com>
+In-Reply-To: <20240407080606.3153359-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ willemb@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-Add check for unsupported control flags.
+Hello:
 
-Only compile-tested, no access to HW.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
- drivers/net/dsa/microchip/ksz9477_tc_flower.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Sun,  7 Apr 2024 08:06:06 +0000 you wrote:
+> Print these additional fields in skb_dump() to ease debugging.
+> 
+> - mac_len
+> - csum_start (in v2, at Willem suggestion)
+> - csum_offset (in v2, at Willem suggestion)
+> - priority
+> - mark
+> - alloc_cpu
+> - vlan_all
+> - encapsulation
+> - inner_protocol
+> - inner_mac_header
+> - inner_network_header
+> - inner_transport_header
+> 
+> [...]
 
-diff --git a/drivers/net/dsa/microchip/ksz9477_tc_flower.c b/drivers/net/dsa/microchip/ksz9477_tc_flower.c
-index 8b2f5be667e01..4823a876ad8ab 100644
---- a/drivers/net/dsa/microchip/ksz9477_tc_flower.c
-+++ b/drivers/net/dsa/microchip/ksz9477_tc_flower.c
-@@ -124,6 +124,9 @@ static int ksz9477_flower_parse_key(struct ksz_device *dev, int port,
- 		return -EOPNOTSUPP;
- 	}
- 
-+	if (!flow_rule_match_no_control_flags(rule, extack))
-+		return -EOPNOTSUPP;
-+
- 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC) ||
- 	    flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
- 		ret = ksz9477_flower_parse_key_l2(dev, port, extack, rule,
+Here is the summary with links:
+  - [v2,net-next] net: display more skb fields in skb_dump()
+    https://git.kernel.org/netdev/net-next/c/4308811ba901
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
