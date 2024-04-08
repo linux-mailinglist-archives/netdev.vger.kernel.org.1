@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-85855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F67889C962
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 18:12:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF2089C974
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 18:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1B5DB23737
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 16:12:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEB40B264AF
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 16:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5DB1422B9;
-	Mon,  8 Apr 2024 16:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFADB1422DD;
+	Mon,  8 Apr 2024 16:14:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0PmQVPZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SaLLMuxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E294C757FF;
-	Mon,  8 Apr 2024 16:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40B81422C5;
+	Mon,  8 Apr 2024 16:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712592727; cv=none; b=njwVEHgzyWIvdWuCegXGMZGKQUn1qmYsFK6AVb+mXS0/3aH4jTucI/Fd8gWKhXDHZZaSzFsRIi8jqpzQ+kAusHjdX4cQXHVwW5sJH9Mk8t84nOl5GxKKfA0+AGTwNaZbbwJ+9RkHFAMU7J6Zn7s2mrnUiRlQvO76uvMUltYF1/c=
+	t=1712592880; cv=none; b=CJUJXn+dmBadwNaaYplYZww5YsoqUlnFDGk1Wg+crGWa/Xk3stpzM1LM+8zppZMdGIpOmTKX4jBDlxdWOBvywYG/8N2K+nXVR4ovkCCc04vYaq7Crzu9EWisbWb+VflYLVwadcQjtvoynvURpPnXMg6DxbvHKwPn4SVVeSUSyXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712592727; c=relaxed/simple;
-	bh=PzUvBEDSNmkvNMiv+D4xXdtXE7vcJ/e3P7TeoZzTE98=;
+	s=arc-20240116; t=1712592880; c=relaxed/simple;
+	bh=ypVidWJ5/T2oagwVDZNMW/jM65Pm3yZ4rUqOM2IWgLI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uqBDU57kSz0qnDnqbvP7IZR8bdW88TV1uQT/2wrf0S9fPNmryl7OvrdOxaZ3HP6BKy2yKeBK5BC+zjk7+3J9ZbYuLrrwp8wIukF6Spv0wJb+z5WbiRZeXobnd3jGS/PKuaODy4X9qncbXdj6pq+owmw/Wqwbf2fz1k6FbuIpX3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y0PmQVPZ; arc=none smtp.client-ip=209.85.128.50
+	 To:Cc:Content-Type; b=VLfNGTOm0G7Z4T4hT14B7GGKbI49hbM/aB6mgXcrti8cBctz3x1XvMte4Ch1ZNsFIRjQJoaacdqBjISNSc/jj9+OqdaTIflYkrXxD1W1hYi1IHQhy5hMK+VknMG44v3G5iKdnBYnCi46cDPc4m7AygJUfHhvO2bDfh02GM7jZqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SaLLMuxR; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41550858cabso30988645e9.2;
-        Mon, 08 Apr 2024 09:12:05 -0700 (PDT)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-343e7c20686so2528485f8f.1;
+        Mon, 08 Apr 2024 09:14:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712592724; x=1713197524; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712592876; x=1713197676; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uENSkFYk7LJQAn7mCGOHXBkbAqtqsej2uPu661a41kA=;
-        b=Y0PmQVPZJ93VGPyTxJT9oTLOViLusi53gJWRnfqIfcH2fPcwsJMypaWt+f0ah7LAm5
-         cHkOzUezV5pIO6pihYpf3NJjT9ajK8tACqRN6AApA0CcjVC09dHlu01lGKxlh5I8IDoq
-         +Z6gZYVqAMdXeEt+d8rBmKhvspidjyV8ojlUGPdE1Uiv4cJhB83WxEkevIu8VjUrl8Ot
-         vW53uWZ1tKCquYDaGoO6U3DM/H3cSTF54pgdjyuAp8IEsh3sXMytUfsSoVrVD51sQoHw
-         hXWAAqTQ8Je1cOvd6YxCIXJMQofbIKkjb00c2iam++uUpIdix35mE968Ka97G1k78FWn
-         kK5Q==
+        bh=rxQFu3J8wxSQLmoLY/QSxOgIAvqkXiwa4KCnsukDrRQ=;
+        b=SaLLMuxR8I5+DPFbh/apfNzDiseidm3zN64IcrCTNnZFFs062vZvH5rtEAVtY2Bh7M
+         mnyKJGgM/TdllK6XxpnHVODE2wdRPNYY+0D85Zx/cyc2pEqFc1bJ1fzShnY8AQY5ZuLu
+         j3a8XP4JaSbwNGxCzs8McnMfSSkp/rTlP4GxMNPKUuVQ73dLqw5sm23wDymD5FLMghis
+         enNkN/IsC2TbJyEvXA4dXneUdMw8GfnAWy9V7/L1WdKVcRSo350jR1wmsG++1VKKrFrh
+         9B3PDpQwP6h8fmbShwFNmkd4xNYxY/E05PFLOPeKnTA4PKwogDNjOb2KO7P+J7LBMOD0
+         xTyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712592724; x=1713197524;
+        d=1e100.net; s=20230601; t=1712592876; x=1713197676;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uENSkFYk7LJQAn7mCGOHXBkbAqtqsej2uPu661a41kA=;
-        b=RQF/mi1enhQ+o6V16qwmRdmA94c247rxfPxKD2Qu9sfKqw68QRqD8vSwa1vg+gAA/g
-         mT5w/QXDGwbDxbENuzXpeFtyJnpRxRgoHxjOeS+bKUIt5CtWi15xtnKhSs8EL7yvqGnl
-         KBkU4H1wzOX7fxKWQNh1dj4u/CCzc5opL98c9hpgycfW20uCH/pLCs1VmkCiUOU1DmG+
-         Mh7ycPVphkex4+GOf5T7GlSlCgdRis+VLHfXu9pvpUFk7oJHsazOT+Rn1Cok3MbVmEUJ
-         P7ZURpG6lfU/5RQ4e2Crb+cKwwk23DHkHnB44yTa3pnpxrUqHQAEcJYVQpYkMHWg/0ll
-         ZVQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXLFpGFPfGpu31/jHTCcU5eIw6i9cDht1RZ2EGokEh9JcSnONhCXsYGGjmteQdEDnVcmrOJGkCLsl/fcFJqKAwAwDoOB0TJkjK7flTf4L00wELrt2o2TWeJ2TNW1XtNd0221azG
-X-Gm-Message-State: AOJu0Yy/veSvO8H/8DzpQSXdR247AalQ9iBt3EtLq+y6pdKLcCoumJ2q
-	pLwHH0EGUZLhBPL4wf+GDepp9ybx9kBQXtkty5eDIyDdF1InLQht+dU+0/FVRh76lltj32jYK6x
-	cOnXz0q9+bYiW16dQYXUmqdYisTp3cDJZ
-X-Google-Smtp-Source: AGHT+IFAIaTKgph22acfUSjo2dBjVYyCDxQyK2ImPqk6Uch9Zdywdu/wpWrNnadC24R9520/rJ3mpRxVjsyKkoYeKKk=
-X-Received: by 2002:a05:600c:45cc:b0:415:45ea:9922 with SMTP id
- s12-20020a05600c45cc00b0041545ea9922mr7458671wmo.35.1712592724107; Mon, 08
- Apr 2024 09:12:04 -0700 (PDT)
+        bh=rxQFu3J8wxSQLmoLY/QSxOgIAvqkXiwa4KCnsukDrRQ=;
+        b=C86MEp0p5mWqu/dPP01CYr9NzSpsxuGv1i0sukvzXiYqsFXV6cl1IP9M3E6Hu1KcuA
+         QU9hdhPZW98JByaoOJTtlM1y54qmwyaWthryanKvhj0yJaMty8mT/+8HFLcML7GbYyqf
+         EelWywueZZUB6HjBgpJW+0pcsFa2zIERb1MTUR8aEmsoJjy1HUjMre/eRUM+tMKJQcpo
+         FS46FidapwpIjvM6BySpdnxJG96Dxf/52ACCVNtnsC7IWULNnyf9fzryQpQiKffMw2Ca
+         hYc/U4jX5IJPRdp4it5sJBaYx3n9WuSAmcUhjK/TspDGMxMZ3zcSbggHUBc+R9MS7YOW
+         XNhA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWxb8DQt6bQDFmW0FqH3/vhXfbucDX1QC59bqrHlYr7JWbCXnO7y2cqitC8jJsHs7vRgqzsYp5tCGD43C9y+Nw+3lRRFKZonYw9lYhyF9mTw3QovE44Ht1tI1+RXh/6NidhWfOewDZLywVCgp5KIwljQ1zw6TDC3vlOuC68KeJ
+X-Gm-Message-State: AOJu0YwNou2kd6ahh2OXrva8nnaTWLlYNVMM/HnBv4GVhFNgH+IaeCCW
+	9sMff2oPQFhrTNGG3J87Cky3GV4lVnTax9Z7ygrhrqYGdpstu+Nfsdlun2FG7xkfmcGR24K/yMW
+	wezXQS/okNoyvwulWXBFiIFju9Ww=
+X-Google-Smtp-Source: AGHT+IG/WiMnMCTVwJ9rD4gISqNoHb7M1mUzeUXDXj1b7Buc3SbDIKXU945XUBZcBVYDkOlC+s/l1VQ1QGkAtVk1e+Y=
+X-Received: by 2002:a5d:4f88:0:b0:343:dc46:bb4b with SMTP id
+ d8-20020a5d4f88000000b00343dc46bb4bmr6822587wru.59.1712592876179; Mon, 08 Apr
+ 2024 09:14:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,119 +72,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240407130850.19625-1-linyunsheng@huawei.com>
- <20240407130850.19625-3-linyunsheng@huawei.com> <43d99616cd4a2a6fce6a6b97f73d08ebc5361a61.camel@gmail.com>
- <cccbddc2-de64-46f9-7d71-60185d364f73@huawei.com>
-In-Reply-To: <cccbddc2-de64-46f9-7d71-60185d364f73@huawei.com>
+ <20240407130850.19625-13-linyunsheng@huawei.com> <b5c5866e626f6c90657a32b5e9adff724d5896db.camel@gmail.com>
+ <c1f5a78a-3040-0cc7-f113-d5ec82c6010f@huawei.com>
+In-Reply-To: <c1f5a78a-3040-0cc7-f113-d5ec82c6010f@huawei.com>
 From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 8 Apr 2024 09:11:27 -0700
-Message-ID: <CAKgT0Uf9hWmVjHfrX6yM_LgX6D5m+ktFiJatMhOhuHpADghh4Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 02/12] mm: page_frag: use initial zero offset
- for page_frag_alloc_align()
+Date: Mon, 8 Apr 2024 09:13:59 -0700
+Message-ID: <CAKgT0UfZBGEVJa1O7cdNt6zy_EEPoGo=aW6ugRKy8a44qg0j8w@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 12/12] mm: page_frag: update documentation and
+ maintainer for page_frag
 To: Yunsheng Lin <linyunsheng@huawei.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+	Jonathan Corbet <corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, Apr 8, 2024 at 6:39=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
 > wrote:
 >
-> On 2024/4/8 1:52, Alexander H Duyck wrote:
+> On 2024/4/8 2:13, Alexander H Duyck wrote:
 > > On Sun, 2024-04-07 at 21:08 +0800, Yunsheng Lin wrote:
-> >> We are above to use page_frag_alloc_*() API to not just
-> >> allocate memory for skb->data, but also use them to do
-> >> the memory allocation for skb frag too. Currently the
-> >> implementation of page_frag in mm subsystem is running
-> >> the offset as a countdown rather than count-up value,
-> >> there may have several advantages to that as mentioned
-> >> in [1], but it may have some disadvantages, for example,
-> >> it may disable skb frag coaleasing and more correct cache
-> >> prefetching
+> >> Update documentation about design, implementation and API usages
+> >> for page_frag.
 > >>
-> >> We have a trade-off to make in order to have a unified
-> >> implementation and API for page_frag, so use a initial zero
-> >> offset in this patch, and the following patch will try to
-> >> make some optimization to aovid the disadvantages as much
-> >> as possible.
-> >>
-> >> 1. https://lore.kernel.org/all/f4abe71b3439b39d17a6fb2d410180f367cadf5=
-c.camel@gmail.com/
+> >> Also update MAINTAINERS for page_frag. Alexander seems to be the
+> >> orginal author for page_frag, we can add him to the MAINTAINERS
+> >> later if we have an ack from him.
 > >>
 > >> CC: Alexander Duyck <alexander.duyck@gmail.com>
 > >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> >> ---
-> >>  mm/page_frag_cache.c | 31 ++++++++++++++-----------------
-> >>  1 file changed, 14 insertions(+), 17 deletions(-)
-> >>
-> >> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> >> index a0f90ba25200..3e3e88d9af90 100644
-> >> --- a/mm/page_frag_cache.c
-> >> +++ b/mm/page_frag_cache.c
-> >> @@ -67,9 +67,8 @@ void *__page_frag_alloc_align(struct page_frag_cache=
- *nc,
-> >>                            unsigned int fragsz, gfp_t gfp_mask,
-> >>                            unsigned int align_mask)
-> >>  {
-> >> -    unsigned int size =3D PAGE_SIZE;
-> >> +    unsigned int size, offset;
-> >>      struct page *page;
-> >> -    int offset;
-> >>
-> >>      if (unlikely(!nc->va)) {
-> >>  refill:
-> >> @@ -77,10 +76,6 @@ void *__page_frag_alloc_align(struct page_frag_cach=
-e *nc,
-> >>              if (!page)
-> >>                      return NULL;
-> >>
-> >> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> >> -            /* if size can vary use size else just use PAGE_SIZE */
-> >> -            size =3D nc->size;
-> >> -#endif
-> >>              /* Even if we own the page, we do not use atomic_set().
-> >>               * This would break get_page_unless_zero() users.
-> >>               */
-> >> @@ -89,11 +84,18 @@ void *__page_frag_alloc_align(struct page_frag_cac=
-he *nc,
-> >>              /* reset page count bias and offset to start of new frag =
-*/
-> >>              nc->pfmemalloc =3D page_is_pfmemalloc(page);
-> >>              nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> >> -            nc->offset =3D size;
-> >> +            nc->offset =3D 0;
-> >>      }
-> >>
-> >> -    offset =3D nc->offset - fragsz;
-> >> -    if (unlikely(offset < 0)) {
-> >> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> >> +    /* if size can vary use size else just use PAGE_SIZE */
-> >> +    size =3D nc->size;
-> >> +#else
-> >> +    size =3D PAGE_SIZE;
-> >> +#endif
-> >> +
-> >> +    offset =3D ALIGN(nc->offset, -align_mask);
-> >> +    if (unlikely(offset + fragsz > size)) {
 > >
-> > Rather than using "ALIGN" with a negative value it would probably make
-> > more sense to use __ALIGN_KERNEL_MASK with ~align_mask. I am not sure
-> > how well the compiler sorts out the use of negatives to flip values
-> > that are then converted to masks with the "(a) - 1".
+> > Again, this seems more like 2 different pathches at least. One for the
+> > Documentation and MAINTAINERS changes, and one for the function
+> > documentation.
 >
-> The next patch will remove the '-' in '-align_mask' as the 'ALIGN' operat=
-ion
-> is done in the inline helper. I am not sure that matter much to use
-> __ALIGN_KERNEL_MASK with ~align_mask?
+> Sure.
+>
 
-It is a matter of making the negations more obvious. Basically you
-could achieve the same alignment by doing:
-  (offset + (~align_mask)) & ~(~align_mask)
-rather than:
-  (offset + ((-align_mask) - 1)) & ~((-align_mask) - 1)
+[...]
 
-I'm not sure the compiler will pick up on the fact that the two are
-identical and can save a number of operations. Also my suggested
-approach is closer to how it used to work. Technically the one you are
-using only works if align_mask is a negative power of 2.
+> >> --- a/MAINTAINERS
+> >> +++ b/MAINTAINERS
+> >> @@ -16683,6 +16683,16 @@ F:  mm/page-writeback.c
+> >>  F:  mm/readahead.c
+> >>  F:  mm/truncate.c
+> >>
+> >> +PAGE FRAG
+> >> +M:  Yunsheng Lin <linyunsheng@huawei.com>
+> >> +L:  linux-mm@kvack.org
+> >> +L:  netdev@vger.kernel.org
+> >> +S:  Supported
+> >> +F:  Documentation/mm/page_frags.rst
+> >> +F:  include/linux/page_frag_cache.h
+> >> +F:  mm/page_frag_cache.c
+> >> +F:  mm/page_frag_test.c
+> >> +
+> >
+> > I would appreciate it if you could add me as I usually am having to
+> > deal with issues people have with this anyway. You can probably just go
+> > with:
+> > Alexander Duyck <alexander.duyck@gmail.com>
+>
+> Sure, good to your ack here.
+
+Just to be clear this isn't an Ack, but if you are going to list
+maintainers for this my name should be on the list so this is the
+preferred format. There are still some things to be cleaned up in this
+patch.
 
