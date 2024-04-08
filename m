@@ -1,177 +1,194 @@
-Return-Path: <netdev+bounces-85661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9B989BC9D
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:04:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C90789BC95
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A21011C21585
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:04:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 886AC1F21AB6
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F61552F85;
-	Mon,  8 Apr 2024 10:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18109524D1;
+	Mon,  8 Apr 2024 10:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V1m9DY18"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KY75uFhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144A84EB3D;
-	Mon,  8 Apr 2024 10:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397F4524D7
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 10:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712570662; cv=none; b=GDwaMx5d0F2vD5YytD5yojIKNSI4sCYDBkB7rRrfLlUvaxKThN1M8hK5PpXaY1lHLRCUgton/htXO+D4TeDVO8JdYOQ4nf/oU7qWKGXYnkW5zTfpVvsKzdClp6gMeNqmeQ6uFVCTIrv/PpYrnKTe+vvY5lHw7WN5rNa7uOUXx5M=
+	t=1712570631; cv=none; b=FJLmARQRL0/lVm4AOV/rn5llI5XKQxLs51GUXzVj4KRqPEySb7tiDc81jqDP1hsAwHOiFthOJ64a9FU8m5HakAKYeGuQo5Q6FilANCJcHtjuqmjg/eOhtGUElUEhXRB3j2X7ggoRd6bqD42P0sSPzY9zJ4TkXdDW6pGxB7ZVYW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712570662; c=relaxed/simple;
-	bh=7Um93ynodoKWvmi4hudSQ6ODRbJB2kpvSRbso69Gbb0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Message-ID:
-	 Content-Type:MIME-Version; b=NKjnsSbiRp4IZpjZe1msAQqMNApu96BxB5dCVMfisWNM3jfA1oZKRdgmBehRABZki2inWVx4zkNEsAycXXR8NRqZkCPqhSq7audkvpgZCo36byNGOnFGbrBFRS5oev5ka3ebc7UjI48SJVTk8FxjMLSHYj3AnS4jlacRaDOtLOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V1m9DY18; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4389vTLC024196;
-	Mon, 8 Apr 2024 10:03:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : reply-to : in-reply-to : references : message-id : content-type
- : content-transfer-encoding : mime-version; s=pp1;
- bh=WGRw+wpQ+8BkQKcdJ/jvqWzRkTuOQNEebcPy5PQD4Kw=;
- b=V1m9DY18uGHMz8vh9IxAKCdhy2XzRwg7vXDe5eU16f5nEfVNyFSH2bkwzlSGAU2+MppO
- 4KiihhZ6Fk01FJPzdXSR1BLEuGht8lFKOYZkgyQ+XDX6d86NzlDgaIq0J9qJC+jfnfB7
- aEeGTfrHV1qJLbUVw7VwF0wJD3GQGVNebGmuEEwqhBLJ9iqNw/OPA1h1UuFrYBwI63SP
- L8QiPE5Ov/+xNvSEFsQF6+fJ779nZgk/JgjuEZ8d5Yw4SPP9YYyN9phnIKPRv8VXU/FC
- LdWtpshSMMqQ0phdyUamMRN3ZDDlZNvPvkSzaRMK+nFo6z+Im4121GSQHwYWxTP0de2t 7g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xceda00e7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 10:03:21 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 438A3KAu002830;
-	Mon, 8 Apr 2024 10:03:20 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xceda00e4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 10:03:20 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4387uZ0H019096;
-	Mon, 8 Apr 2024 10:03:18 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbh3yym76-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Apr 2024 10:03:18 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 438A3FKl53084522
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Apr 2024 10:03:18 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D2E1D58058;
-	Mon,  8 Apr 2024 10:03:15 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F35F85806B;
-	Mon,  8 Apr 2024 10:03:10 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  8 Apr 2024 10:03:10 +0000 (GMT)
-Date: Mon, 08 Apr 2024 12:03:10 +0200
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Allen Pais <apais@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, tj@kernel.org, keescook@chromium.org,
-        vkoul@kernel.org, marcan@marcan.st, sven@svenpeter.dev,
-        florian.fainelli@broadcom.com, rjui@broadcom.com,
-        sbranden@broadcom.com, paul@crapouillou.net,
-        Eugeniy.Paltsev@synopsys.com, manivannan.sadhasivam@linaro.org,
-        vireshk@kernel.org, Frank.Li@nxp.com, leoyang.li@nxp.com,
-        zw@zh-kernel.org, wangzhou1@hisilicon.com, haijie1@huawei.com,
-        shawnguo@kernel.org, s.hauer@pengutronix.de, sean.wang@mediatek.com,
-        matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-        afaerber@suse.de, logang@deltatee.com, daniel@zonque.org,
-        haojian.zhuang@gmail.com, robert.jarzmik@free.fr, andersson@kernel.org,
-        konrad.dybcio@linaro.org, orsonzhai@gmail.com,
-        baolin.wang@linux.alibaba.com, zhang.lyra@gmail.com,
-        patrice.chotard@foss.st.com, linus.walleij@linaro.org, wens@csie.org,
-        jernej.skrabec@gmail.com, peter.ujfalusi@gmail.com, kys@microsoft.com,
-        haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-        jassisinghbrar@gmail.com, mchehab@kernel.org,
-        maintainers@bluecherrydvr.com, aubin.constans@microchip.com,
-        ulf.hansson@linaro.org, manuel.lauss@gmail.com,
-        mirq-linux@rere.qmqm.pl, jh80.chung@samsung.com, oakad@yahoo.com,
-        hayashi.kunihiko@socionext.com, mhiramat@kernel.org,
-        brucechang@via.com.tw, HaraldWelte@viatech.com, pierre@ossman.eu,
-        duncan.sands@free.fr, stern@rowland.harvard.edu, oneukum@suse.com,
-        openipmi-developer@lists.sourceforge.net, dmaengine@vger.kernel.org,
-        asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-rpi-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-        linux-mediatek@lists.infradead.org, linux-actions@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-usb@vger.kernel.org, Holger Dengler <dengler@linux.ibm.com>
-Subject: Re: [PATCH 7/9] s390: Convert from tasklet to BH workqueue
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <20240327160314.9982-8-apais@linux.microsoft.com>
-References: <20240327160314.9982-1-apais@linux.microsoft.com>
- <20240327160314.9982-8-apais@linux.microsoft.com>
-Message-ID: <702594ec5852c482f96cfcf84a02cab2@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vcJ1PwKFq1RysBO3jh1OFUS_rcqMuAYv
-X-Proofpoint-ORIG-GUID: X3ilzQ7TzOIWEyFQfqPrw-z8aSdSkVVd
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1712570631; c=relaxed/simple;
+	bh=TglUxC2B5T8fWiuGvHoMXF6o1k9bTTzHTKXSEJ9+4Ns=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cYFQ50b6MIEutDY/XNE/jpwcJsnXZ4iP+qZr7tBu3oZK2Id1UySbOxsaXgqpIsrT/ONejZOW0ifMLvhWag+UXz8xdsoXncGVCzV5kZtfbi5PaABpUerSPk6Lu9x9E6RI/YILeIOUdzn/8SIKwujLhqvW92OcSxeFMpi/mwGqFdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KY75uFhf; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e2e851794so14669a12.0
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 03:03:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712570627; x=1713175427; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zUeK8tUltCiiNIWWzwpRkvxOb1EySFIlgtsCvzHp/MA=;
+        b=KY75uFhfcAa9zRw6t9yYL17xytjmOXm+MOT8cEYPsl0yJcQBynExaR2hQ2yTHnfktG
+         txiwLUr93IZGIrfRXFtiVyg7ZcfgI/Dy2NoUYH3l3cmUbx8tAarajMRrR/vG8IMNy0SJ
+         2fT0GUZNNMyKpoTqhToeg49dqXUKF6OBXSIb8q2LDy3jkpoYX06yCXoYIE0LTwBuuoWq
+         eCZJ7R26Pkng9vrxIjI8Seu2hpVo5iCN4oxzyqbBdy/SmYuOXPFvY18KMagCtI2sKUYz
+         t6ddRkElKBwKT5HC5QEH8Tew5S66LciMvv8Ig/ScYf9SmeyyVuUulrrUPwic9m/6Ipx5
+         nmUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712570627; x=1713175427;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zUeK8tUltCiiNIWWzwpRkvxOb1EySFIlgtsCvzHp/MA=;
+        b=DqnsYV5phuUTlIjLlGgcfG/5PD/C0LuMi/WwUbkfZuqyMRIFqurslEKixt/v+Jcdtn
+         doLHTG55ZJQ05OhaBstHzWNyo6f2avhT8qL6tDnPCHw89bDjbSGV4NUajMkAWmazFkW3
+         5lZgQtokw6gVn36yS2ICpNuygeHiQW2A5SAXx763GvDHXREuH7n08fMFW8pfXAxPpycH
+         Ip7psZV4JOoKwZwqQTMGqqt9CGYtSBgEXpyJls39qMdgIx9nPEluplUm4BbqcuF7EA1Y
+         AbLz7pbHYbBi9SfUFsWlBTl3D40nyntjA7aIkveIMGLPDZ4J4ofG03mNyKHzSqw3VSjy
+         cS/g==
+X-Gm-Message-State: AOJu0YwWK9BExEpq7a3dBKoHQzx75y7vyaZY9Vul8jeJZ+eDc1vg3bsk
+	DFCORsZ4nH+Wr1LutFoDmpGJMIdgnlE2tZhKHbi6UhJcTb/aFfEHdBMuA4Edv6h2Fr2SxNEy3kS
+	2Qpqj+jPCbMCQM0xK3tD1FJ5gpPwyYXc3hLYt
+X-Google-Smtp-Source: AGHT+IHo4xqDV2ksYOcRZu/IBTlWIBBQ4JZAobA8bJwE8WOGynuS/UjeVbuj/3gPonZ9dTtC8OkJ9NXvnh5DfV9DROQ=
+X-Received: by 2002:a05:6402:2554:b0:56e:68ac:3d50 with SMTP id
+ l20-20020a056402255400b0056e68ac3d50mr58769edb.4.1712570627209; Mon, 08 Apr
+ 2024 03:03:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-08_08,2024-04-05_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=918
- lowpriorityscore=0 bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501
- malwarescore=0 phishscore=0 impostorscore=0 clxscore=1011 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404080077
+References: <20240406182107.261472-1-jmaloy@redhat.com> <20240406182107.261472-3-jmaloy@redhat.com>
+ <CANn89iJgXBXaZyX5gBwr4WiAz5DRn8sH_v0LLtNOSB84yDP3yg@mail.gmail.com>
+In-Reply-To: <CANn89iJgXBXaZyX5gBwr4WiAz5DRn8sH_v0LLtNOSB84yDP3yg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 8 Apr 2024 12:03:35 +0200
+Message-ID: <CANn89i+UjuasDbqH2tUu0wv=m+roHocBHwzcV4VS+Wotz-8hng@mail.gmail.com>
+Subject: Re: [net-next 2/2] tcp: correct handling of extreme menory squeeze
+To: jmaloy@redhat.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
+	dgibson@redhat.com, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-03-27 17:03, Allen Pais wrote:
-> The only generic interface to execute asynchronously in the BH context 
-> is
-> tasklet; however, it's marked deprecated and has some design flaws. To
-> replace tasklets, BH workqueue support was recently added. A BH 
-> workqueue
-> behaves similarly to regular workqueues except that the queued work 
-> items
-> are executed in the BH context.
-> 
-> This patch converts drivers/infiniband/* from tasklet to BH workqueue.
-> 
-> Based on the work done by Tejun Heo <tj@kernel.org>
-> Branch: https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git 
-> for-6.10
-> 
-> Note: Not tested. Please test/review.
-> 
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-> ---
-> ...
->  drivers/s390/crypto/ap_bus.c           | 24 +++++++-------
->  drivers/s390/crypto/ap_bus.h           |  2 +-
->  drivers/s390/crypto/zcrypt_msgtype50.c |  2 +-
->  drivers/s390/crypto/zcrypt_msgtype6.c  |  4 +--
-> ...
+On Sat, Apr 6, 2024 at 8:37=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Sat, Apr 6, 2024 at 8:21=E2=80=AFPM <jmaloy@redhat.com> wrote:
+> >
+> > From: Jon Maloy <jmaloy@redhat.com>
+> >
+> > Testing of the previous commit ("tcp: add support for SO_PEEK_OFF")
+> > in this series along with the pasta protocol splicer revealed a bug in
+> > the way tcp handles window advertising during extreme memory squeeze
+> > situations.
+> >
+> > The excerpt of the below logging session shows what is happeing:
+> >
+> > [5201<->54494]:     =3D=3D=3D=3D Activating log @ tcp_select_window()/2=
+68 =3D=3D=3D=3D
+> > [5201<->54494]:     (inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM) -=
+-> TRUE
+> > [5201<->54494]:   tcp_select_window(<-) tp->rcv_wup: 2812454294, tp->rc=
+v_wnd: 5812224, tp->rcv_nxt 2818016354, returning 0
+> > [5201<->54494]:   ADVERTISING WINDOW SIZE 0
+> > [5201<->54494]: __tcp_transmit_skb(<-) tp->rcv_wup: 2812454294, tp->rcv=
+_wnd: 5812224, tp->rcv_nxt 2818016354
+> >
+> > [5201<->54494]: tcp_recvmsg_locked(->)
+> > [5201<->54494]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 2812454294, tp->r=
+cv_wnd: 5812224, tp->rcv_nxt 2818016354
+> > [5201<->54494]:     (win_now: 250164, new_win: 262144 >=3D (2 * win_now=
+): 500328))? --> time_to_ack: 0
+> > [5201<->54494]:     NOT calling tcp_send_ack()
+> > [5201<->54494]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 2812454294, tp->r=
+cv_wnd: 5812224, tp->rcv_nxt 2818016354
+> > [5201<->54494]: tcp_recvmsg_locked(<-) returning 131072 bytes, window n=
+ow: 250164, qlen: 83
+> >
+> > [...]
+>
+> I would prefer a packetdrill test, it is not clear what is happening...
+>
+> In particular, have you used SO_RCVBUF ?
+>
+> >
+> > [5201<->54494]: tcp_recvmsg_locked(->)
+> > [5201<->54494]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 2812454294, tp->r=
+cv_wnd: 5812224, tp->rcv_nxt 2818016354
+> > [5201<->54494]:     (win_now: 250164, new_win: 262144 >=3D (2 * win_now=
+): 500328))? --> time_to_ack: 0
+> > [5201<->54494]:     NOT calling tcp_send_ack()
+> > [5201<->54494]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 2812454294, tp->r=
+cv_wnd: 5812224, tp->rcv_nxt 2818016354
+> > [5201<->54494]: tcp_recvmsg_locked(<-) returning 131072 bytes, window n=
+ow: 250164, qlen: 1
+> >
+> > [5201<->54494]: tcp_recvmsg_locked(->)
+> > [5201<->54494]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 2812454294, tp->r=
+cv_wnd: 5812224, tp->rcv_nxt 2818016354
+> > [5201<->54494]:     (win_now: 250164, new_win: 262144 >=3D (2 * win_now=
+): 500328))? --> time_to_ack: 0
+> > [5201<->54494]:     NOT calling tcp_send_ack()
+> > [5201<->54494]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 2812454294, tp->r=
+cv_wnd: 5812224, tp->rcv_nxt 2818016354
+> > [5201<->54494]: tcp_recvmsg_locked(<-) returning 57036 bytes, window no=
+w: 250164, qlen: 0
+> >
+> > [5201<->54494]: tcp_recvmsg_locked(->)
+> > [5201<->54494]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 2812454294, tp->r=
+cv_wnd: 5812224, tp->rcv_nxt 2818016354
+> > [5201<->54494]:     NOT calling tcp_send_ack()
+> > [5201<->54494]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 2812454294, tp->r=
+cv_wnd: 5812224, tp->rcv_nxt 2818016354
+> > [5201<->54494]: tcp_recvmsg_locked(<-) returning -11 bytes, window now:=
+ 250164, qlen: 0
+> >
+> > We can see that although we are adverising a window size of zero,
+> > tp->rcv_wnd is not updated accordingly. This leads to a discrepancy
+> > between this side's and the peer's view of the current window size.
+> > - The peer thinks the window is zero, and stops sending.
+> > - This side ends up in a cycle where it repeatedly caclulates a new
+> >   window size it finds too small to advertise.
+> >
+> > Hence no messages are received, and no acknowledges are sent, and
+> > the situation remains locked even after the last queued receive buffer
+> > has been consumed.
+> >
+> > We fix this by setting tp->rcv_wnd to 0 before we return from the
+> > function tcp_select_window() in this particular case.
+> > Further testing shows that the connection recovers neatly from the
+> > squeeze situation, and traffic can continue indefinitely.
+> >
+> > Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+> > Signed-off-by: Jon Maloy <jmaloy@redhat.com>
 
-Applied and tested the s390 AP bus and zcrypt part of the patch.
-Works fine, a sniff test did not show any problems.
-Thanks for your work.
+I do not think this patch is good. If we reach zero window, it is a
+sign something is wrong.
 
-Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
+TCP has heuristics to slow down the sender if the receiver does not
+drain the receive queue fast enough.
+
+MSG_PEEK is an obvious reason, and SO_RCVLOWAT too.
+
+I suggest you take a look at tcp_set_rcvlowat(), see what is needed
+for SO_PEEK_OFF (ab)use ?
+
+In short, when SO_PEEK_OFF is in action :
+- TCP needs to not delay ACK when receive queue starts to fill
+- TCP needs to make sure sk_rcvbuf and tp->window_clamp grow (if
+autotuning is enabled)
 
