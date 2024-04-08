@@ -1,232 +1,151 @@
-Return-Path: <netdev+bounces-85918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65BA589CD5E
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:19:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADAB389CDA3
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:35:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2D3F1F21B21
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:19:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29DD1C21814
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345801487F7;
-	Mon,  8 Apr 2024 21:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C4814882B;
+	Mon,  8 Apr 2024 21:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CmF8XPiY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yw1T7jLk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B9D1487F5
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 21:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA651487E0
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 21:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712611131; cv=none; b=PeBqXLk9PInmCy/+8u5i1jaVr7gEO7WUtqcG0cnj6l3k8dwUf4HY6KidyallJhSeVmy5a7T/Vd/6m6SERc3IaU1rFpPo4wTUnHqxfnKKKr/PbgdBELDR6W6SdIKd00WxLNKrdyeMiNO+K6kBG6YQxlST5j+d4Xdk1NGqnEWWcPU=
+	t=1712612105; cv=none; b=d+VpTfoACvGu7YtO1UV30gjlIMT0VsU0bkvwSW46d8LPNPc1md/2abWnkHGNMPEexh9CWebm+5CCSbwZxRrzxfoJSXL4JotIc/h7upOwoYgo4VSivXayQxW5zY16bcvxk/hoEeA/2JyC2qIN50UQwYKd+rZuL+e70GwW6fomkHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712611131; c=relaxed/simple;
-	bh=eK5WUWCNf6Mf/IHlEFpa89tl0quDFijpt+7Zvm1+0/s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VoUVZ095pOajQ+NCfe0xHh+He4EcGV2C6IMkRTy0ddW6LWrS8DozME0NdNmSrFS9OZOw5iM74nek7z+4D0a960mCG8Bf5LGxjo7fwRlCHyI8v513ilMIjLykgJiYqD85fLp9MRlhywBYPCRK3u8rJcoxwdezGgZhZwlpPrNqxSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CmF8XPiY; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1712612105; c=relaxed/simple;
+	bh=/nOvjmJ91jQb+qzpXpfMlSnSf1RVGQ++/tlSfZTbIVA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AdNpc4gnxCs0RXuSdx4XY3yRwVJtelu7KDTGVsTahm6fzV/GMj2XPIp7kGTdSnJ2siGPxCxItfjPNEOKJ68Sl/XCNs1IciBLp32bafo0EIk2i/V8vZwktmn51RV0/N6sbhqs4sWhAkmh/JYZXAgUp3sos41TlGttFH9ELBcf6vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yw1T7jLk; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7c8d2e0e9cfso131685139f.1
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 14:35:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712611130; x=1744147130;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LlrC9qWagV7kz0TWRqScH6ODBiuzdlUfJnnirk2YJrs=;
-  b=CmF8XPiYuvqrCOQvj6Wx3ZxiZpB6BroAbZcnAZrGkNK6ZWa2DrxT/cyG
-   bzCdDEQ3soqLJUk5jipplrE7+6AqYbZ5X5Oek0tXBH5A+220wPeKxo3bA
-   ktXym+jax+cN1uCBsyJq5nZqpnYc9SXxT/z0M5xWUjXwTaJ5+nkou0uQY
-   s=;
-X-IronPort-AV: E=Sophos;i="6.07,187,1708387200"; 
-   d="scan'208";a="398950461"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 21:18:47 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:55009]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.41:2525] with esmtp (Farcaster)
- id ef6101cd-b153-4a23-9731-6e65d732e26a; Mon, 8 Apr 2024 21:18:45 +0000 (UTC)
-X-Farcaster-Flow-ID: ef6101cd-b153-4a23-9731-6e65d732e26a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 8 Apr 2024 21:18:41 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.26) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Mon, 8 Apr 2024 21:18:38 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net 1/2] af_unix: Fix garbage collector racing against connect()
-Date: Mon, 8 Apr 2024 14:18:30 -0700
-Message-ID: <20240408211830.99829-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240408161336.612064-2-mhal@rbox.co>
-References: <20240408161336.612064-2-mhal@rbox.co>
+        d=google.com; s=20230601; t=1712612103; x=1713216903; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vt9E9ocYakJzoJGxxxpSMK28+2pLBkDtvg+Rt4wpS/Q=;
+        b=Yw1T7jLkSiefvwt/qMGREgvc9VQGG5sr3wNYRcFJoaYLVQM6wj3PebMjPYw9dQavXp
+         h8mgm3J31ip2SNeyMH6lp9TcjLSBIBdXrTDR9jHDE4wVda0A0Hl08blxp8y0Xm4u9WhE
+         QjQaI5EMoSEBnHanooBk5xgsbb1Imi4c8WbvbYPhK1t0GNDC6aXWjW+aHFwM7+j0r7bX
+         ypGy/EvnAUNMrBiVvtLUKS1CR0Yhl9WuKlsgC7ClDF1nEyVra3XnRgdQ8NztxpQr2RPK
+         te6vPfZQ7hrkWIFdAV+RTH/+FzgxLkmJwPbWNLRSQEOpspIQTqJAvLmMpjV7gDiHyP+/
+         aJjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712612103; x=1713216903;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vt9E9ocYakJzoJGxxxpSMK28+2pLBkDtvg+Rt4wpS/Q=;
+        b=LSqQ42vmjcCaFYaBfPSBy7OvsuSj81HqZgGcQ/cDHcJfAyp0DjdnmgX0eWFyDadj0f
+         GSgTO3QlGYrPiBfPSrelTM/CteyMGLUkJB7dmlfsqzLcBMQlK/TY+vhxlXdpwMxpj+kY
+         lJm250j0jYalcukFzE2xVjHgcai2U5YVCJOTuMOP0ZmfdWJqpgS04m0ajTJi3GMWHt+C
+         b+0v41jvbBZwlHUNdGP2tZ4cjc4DsWlBSX1frCc5EPKWiDcmyn02Dg7a8rRh5cGGkZpv
+         dJcEzMpVEOhocwKInbGzSuYla5ofgUed+gQPBOlJTV72VHe3T6vKshBtOyt/rsXQA/iO
+         iLig==
+X-Forwarded-Encrypted: i=1; AJvYcCUAX26/hQEXV9oH2vw2bmaKiTr42JNwRS7QjjsyFpA7XvXIuv78VHwpA6f9y6WABn1/12Ot4uyEbDvGL6zVnrgwYhtKmdFb
+X-Gm-Message-State: AOJu0YzgkS/0vx5vzaHkP/9mzrE57Ucc8q2z/SjwkKqGbh13qS8pzrjK
+	5aIurwtyqFU6MyWjyarlTY9OYbwwJbTV3lfihw5LPfa8kN/kJFG/0fh/4iKxng==
+X-Google-Smtp-Source: AGHT+IEdFSK5QqqKt9qncsKp7ryKn9H+Sg05GW6WePIo293/2ywIdxNeDfZ0TNP8GETEknDCzR6JAA==
+X-Received: by 2002:a05:6602:3946:b0:7d5:f931:c48e with SMTP id bt6-20020a056602394600b007d5f931c48emr3089366iob.17.1712612102715;
+        Mon, 08 Apr 2024 14:35:02 -0700 (PDT)
+Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
+        by smtp.gmail.com with ESMTPSA id ep7-20020a0566024b8700b007d06f222614sm2590462iob.32.2024.04.08.14.35.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 14:35:01 -0700 (PDT)
+Date: Mon, 8 Apr 2024 21:34:59 +0000
+From: Justin Stitt <justinstitt@google.com>
+To: Erick Archer <erick.archer@outlook.com>
+Cc: Long Li <longli@microsoft.com>, Ajay Sharma <sharmaajay@microsoft.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kees Cook <keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Shradha Gupta <shradhagupta@linux.microsoft.com>, 
+	Konstantin Taranov <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	llvm@lists.linux.dev
+Subject: Re: [PATCH v3 1/3] net: mana: Add flex array to struct
+ mana_cfg_rx_steer_req_v2
+Message-ID: <zrqicnpeu52n42yulmrupxmrejd7mhbsu35ycd2bgfjz6gmm2a@dtpv5qdxhmnu>
+References: <20240406142337.16241-1-erick.archer@outlook.com>
+ <AS8PR02MB7237E2900247571C9CB84C678B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AS8PR02MB7237E2900247571C9CB84C678B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Mon,  8 Apr 2024 17:58:45 +0200
-> Garbage collector does not take into account the risk of embryo getting
-> enqueued during the garbage collection. If such embryo has a peer that
-> carries SCM_RIGHTS, two consecutive passes of scan_children() may see a
-> different set of children. Leading to an incorrectly elevated inflight
-> count, and then a dangling pointer within the gc_inflight_list.
+Hi,
+
+On Sat, Apr 06, 2024 at 04:23:35PM +0200, Erick Archer wrote:
+> The "struct mana_cfg_rx_steer_req_v2" uses a dynamically sized set of
+> trailing elements. Specifically, it uses a "mana_handle_t" array. So,
+> use the preferred way in the kernel declaring a flexible array [1].
 > 
-> sockets are AF_UNIX/SOCK_STREAM
-> S is an unconnected socket
-> L is a listening in-flight socket bound to addr, not in fdtable
-> V's fd will be passed via sendmsg(), gets inflight count bumped
+> At the same time, prepare for the coming implementation by GCC and Clang
+> of the __counted_by attribute. Flexible array members annotated with
+> __counted_by can have their accesses bounds-checked at run-time via
+> CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE (for
+> strcpy/memcpy-family functions).
 > 
-> connect(S, addr)	sendmsg(S, [V]); close(V)	__unix_gc()
-> ----------------	-------------------------	-----------
+> This is a previous step to refactor the two consumers of this structure.
 > 
-> NS = unix_create1()
-> skb1 = sock_wmalloc(NS)
-> L = unix_find_other(addr)
-> unix_state_lock(L)
-> unix_peer(S) = NS
-> 			// V count=1 inflight=0
+>  drivers/infiniband/hw/mana/qp.c
+>  drivers/net/ethernet/microsoft/mana/mana_en.c
 > 
->  			NS = unix_peer(S)
->  			skb2 = sock_alloc()
-> 			skb_queue_tail(NS, skb2[V])
+> The ultimate goal is to avoid the open-coded arithmetic in the memory
+> allocator functions [2] using the "struct_size" macro.
 > 
-> 			// V became in-flight
-> 			// V count=2 inflight=1
-> 
-> 			close(V)
-> 
-> 			// V count=1 inflight=1
-> 			// GC candidate condition met
-> 
-> 						for u in gc_inflight_list:
-> 						  if (total_refs == inflight_refs)
-> 						    add u to gc_candidates
-> 
-> 						// gc_candidates={L, V}
-> 
-> 						for u in gc_candidates:
-> 						  scan_children(u, dec_inflight)
-> 
-> 						// embryo (skb1) was not
-> 						// reachable from L yet, so V's
-> 						// inflight remains unchanged
-> __skb_queue_tail(L, skb1)
-> unix_state_unlock(L)
-> 						for u in gc_candidates:
-> 						  if (u.inflight)
-> 						    scan_children(u, inc_inflight_move_tail)
-> 
-> 						// V count=1 inflight=2 (!)
-> 
-> If there is a GC-candidate listening socket, lock/unlock its state. This
-> makes GC wait until the end of any ongoing connect() to that socket. After
-> flipping the lock, a possibly SCM-laden embryo is already enqueued. And if
-> there is another connect() coming, its embryo won't carry SCM_RIGHTS as we
-> already took the unix_gc_lock.
-> 
-> Fixes: 1fd05ba5a2f2 ("[AF_UNIX]: Rewrite garbage collector, fixes race.")
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#zero-length-and-one-element-arrays [1]
+> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [2]
+> Signed-off-by: Erick Archer <erick.archer@outlook.com>
+
+I think this could have all been one patch, I found myself jumping
+around the three patches here piecing together context.
+
+Reviewed-by: Justin Stitt <justinstitt@google.com>
+
 > ---
->  net/unix/garbage.c | 20 +++++++++++++++++---
->  1 file changed, 17 insertions(+), 3 deletions(-)
+>  include/net/mana/mana.h | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> index fa39b6265238..cd3e8585ceb2 100644
-> --- a/net/unix/garbage.c
-> +++ b/net/unix/garbage.c
-> @@ -274,11 +274,20 @@ static void __unix_gc(struct work_struct *work)
->  	 * receive queues.  Other, non candidate sockets _can_ be
->  	 * added to queue, so we must make sure only to touch
->  	 * candidates.
-> +	 *
-> +	 * Embryos, though never candidates themselves, affect which
-> +	 * candidates are reachable by the garbage collector.  Before
-> +	 * being added to a listener's queue, an embryo may already
-> +	 * receive data carrying SCM_RIGHTS, potentially making the
-> +	 * passed socket a candidate that is not yet reachable by the
-> +	 * collector.  It becomes reachable once the embryo is
-> +	 * enqueued.  Therefore, we must ensure that no SCM-laden
-> +	 * embryo appears in a (candidate) listener's queue between
-> +	 * consecutive scan_children() calls.
->  	 */
->  	list_for_each_entry_safe(u, next, &gc_inflight_list, link) {
-> -		long total_refs;
-> -
-> -		total_refs = file_count(u->sk.sk_socket->file);
-> +		struct sock *sk = &u->sk;
-> +		long total_refs = file_count(sk->sk_socket->file);
+> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+> index 4eeedf14711b..561f6719fb4e 100644
+> --- a/include/net/mana/mana.h
+> +++ b/include/net/mana/mana.h
+> @@ -670,6 +670,7 @@ struct mana_cfg_rx_steer_req_v2 {
+>  	u8 hashkey[MANA_HASH_KEY_SIZE];
+>  	u8 cqe_coalescing_enable;
+>  	u8 reserved2[7];
+> +	mana_handle_t indir_tab[] __counted_by(num_indir_entries);
+>  }; /* HW DATA */
 >  
->  		WARN_ON_ONCE(!u->inflight);
->  		WARN_ON_ONCE(total_refs < u->inflight);
-> @@ -286,6 +295,11 @@ static void __unix_gc(struct work_struct *work)
->  			list_move_tail(&u->link, &gc_candidates);
->  			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
->  			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
-> +
-> +			if (sk->sk_state == TCP_LISTEN) {
-> +				unix_state_lock(sk);
-> +				unix_state_unlock(sk);
-
-Less likely though, what if the same connect() happens after this ?
-
-connect(S, addr)	sendmsg(S, [V]); close(V)	__unix_gc()
-----------------	-------------------------	-----------
-NS = unix_create1()
-skb1 = sock_wmalloc(NS)
-L = unix_find_other(addr)
-						for u in gc_inflight_list:
-						  if (total_refs == inflight_refs)
-						    add u to gc_candidates
-						    // L was already traversed
-						    // in a previous iteration.
-unix_state_lock(L)
-unix_peer(S) = NS
-
-						// gc_candidates={L, V}
-
-						for u in gc_candidates:
-						  scan_children(u, dec_inflight)
-
-						// embryo (skb1) was not
-						// reachable from L yet, so V's
-						// inflight remains unchanged
-__skb_queue_tail(L, skb1)
-unix_state_unlock(L)
-						for u in gc_candidates:
-						  if (u.inflight)
-						    scan_children(u, inc_inflight_move_tail)
-
-						// V count=1 inflight=2 (!)
-
-
-As you pointed out, this GC's assumption is basically wrong; the GC
-works correctly only when the set of traversed sockets does not change
-over 3 scan_children() calls.
-
-That's why I reworked the GC not to rely on receive queue.
-https://lore.kernel.org/netdev/20240325202425.60930-1-kuniyu@amazon.com/
-
-
-> +			}
->  		}
->  	}
->  
+>  struct mana_cfg_rx_steer_resp {
 > -- 
-> 2.44.0
+> 2.25.1
 > 
+
+Thanks
+Justin
 
