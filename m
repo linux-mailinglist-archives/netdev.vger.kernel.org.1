@@ -1,181 +1,135 @@
-Return-Path: <netdev+bounces-85878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A44289CAE4
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:36:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1403D89CAFB
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:47:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95B5A1F21EE8
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:36:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476991C22B2E
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35FF0143C6C;
-	Mon,  8 Apr 2024 17:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DEE143C64;
+	Mon,  8 Apr 2024 17:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="DGqFJ0zy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TLaGFlYd"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A87143C59;
-	Mon,  8 Apr 2024 17:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49538143C79;
+	Mon,  8 Apr 2024 17:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712597759; cv=none; b=d38y7qPxbcmx9HP3aZ59G7Bg17JjxdIe2n9vlfcPCrGNq8RB5c1002LQFdL576UR56bNlmCrQahJm54hD/GGl8oduW6veqUxkOLfsjcYbzqmboTd2vkDRffPN3R7iExuOsNtn2utLYFSZeQYJgN3pFiEfulKELxbS+s/yH3r2XA=
+	t=1712598445; cv=none; b=uo6mUpMpXaN2mBcwrIRDUiKpCjPi/RdCx74TjC0Jb1xOW9RI8w9ZYqaEhnzRRYG5yKXe+i1LyHWJ7ZePhhTRpqbX3cPwpfV7a5CFONnBvHSb8wZv1IPO+1RfxBqbfZR9O+RcWGrz37qWBQaplQ/FAQXubaF7BxJVqazxV8cDQFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712597759; c=relaxed/simple;
-	bh=Gt8kmdgt3jC/2C9AavtI++umsEd4HivNfc+qOWCE0NU=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=KY01pcekunPvivqGrsi4X6McV9ol8yh7pgRys4oOM0hNnbmDlcfhffxxgXikObMsFjVZuHHzWxj+ggqvDyS3tA7DI2jXdHDMFIh0shFm5mjUcGs6TXsHn1Ev69tJE6H49OEZj91lGkJPP+qEtVZTPVcUWd8vkX/dEzsJHcAKSrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=DGqFJ0zy; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=zqfMpMqh1K3K3KMFWSlU2agOFI0BMTv0sMd0UrEYpvs=; b=DGqFJ0zysgp7o499yBYyBB6WfC
-	yR2ohk87cpJpLV06Eelb6o9zTkF+mqWriNNps/zRHCOWKgd/fP6yKKAMLhQvorQrrkyZklWK8q5GL
-	zB6Ls8+2n5A4Uz9W7ukbid8nMcLa/slUT5Mls2Tp8mPbBzNR5EOXBwKftWN/P7JkkrCd33AwxmD5a
-	PGGuD4SvjXsu4LhZSnjICaHFzeZpVjeebDqRW62LvSkp7mbIdwYsWdJdAWRv0pDeJx/w8EBmSN5Y1
-	r3r7SVVHqimntxjr1D6frifuhBVP9YZZxtoPZFHzOfqhH98NzawuNyOLLo8VF3nS0ZVjquTtgW00E
-	aDdA815g==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rtsuH-000ASw-2u; Mon, 08 Apr 2024 19:35:45 +0200
-Received: from [178.197.249.16] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rtsuF-0081uc-2G;
-	Mon, 08 Apr 2024 19:35:43 +0200
-Subject: Re: [PATCH net-next v15 14/15] p4tc: add set of P4TC table kfuncs
-To: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
-Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
- namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com,
- Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com,
- jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com,
- horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, martin.lau@linux.dev,
- victor@mojatatu.com, pctammela@mojatatu.com, alexei.starovoitov@gmail.com,
- bpf@vger.kernel.org
-References: <20240408122000.449238-1-jhs@mojatatu.com>
- <20240408122000.449238-15-jhs@mojatatu.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <f27bfc4d-8985-6d3d-01f5-782ae1ccb9ee@iogearbox.net>
-Date: Mon, 8 Apr 2024 19:35:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1712598445; c=relaxed/simple;
+	bh=4I86mxqxviiRcVJTe3puc8bAtdUf+v4wN/fHetei+G4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tY1hYQtSAU8nA3R+gY96EKWxB1G9iqeI2D2jJTfRauMRqKUI3jKBvxBDiZ+4SI7PJN2TMxwOYqeSQYbFI7IaCIwyz7220hy+/YXi6KKbHePU0i8ifuHTQ5x9ulVd4nDEjZ+CRVRAP8mU3nLWsG4HoZ4nnZYlKwInk3HHynImF4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TLaGFlYd; arc=none smtp.client-ip=209.85.161.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5a4930d9c48so1428483eaf.1;
+        Mon, 08 Apr 2024 10:47:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712598443; x=1713203243; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JwaQrBi/Lb4swFNBzhz/Zq2k8S4Qq8Dh3rIl0JBflxU=;
+        b=TLaGFlYdyP8dXg5ca7IKlQ9I/mYiMpnMFyUlBD6+thdibSuzgm9Vr2kuYaJC1Lk8al
+         yAUYduwgLXe54MK34jI6TatWVA+3vGw05ljskRhaxf5DSgRKtJ9p1b+eIL5Z52vV9zzv
+         8DQv0cfA/tu/QPHFY+LymbhgeE0j9GsU5+TAuFmmV9ohQeLkSKOjaCgh5f5Y0wK+yU2e
+         aUxJ24Nmyz+T6A9aKLShOMNFcOcp5+z5tLp5lbEbqZlhzhB8Jvk2UElb5HxWl7r//MHV
+         LqRQZHkq0f1eqYVc8/UXnIzQVIwJBvcZhl4gtZ4OTIsmLx1g2DESqvGM3wIIaGIuUxtn
+         J4cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712598443; x=1713203243;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JwaQrBi/Lb4swFNBzhz/Zq2k8S4Qq8Dh3rIl0JBflxU=;
+        b=VVn7MMPChQ5D8oIR0HYnEz+CJ2CT2i+iuw0+u2e1pamUZfUczmZugtkGK1ftUwUFS1
+         F7gTxq99TymYuy5brpCt1mOG4OEPX2dFx8KDtFtxDHGdYrbvM5q+rPhLGPG9s54vMDhc
+         PcA9HUl0MK/LEYWRcQJYYt8LP3+1bCsyMu806xTL/fnY0mxoZOyxcz3oR4d3ZhaTrPoH
+         ALFcsD1vNC1L+hsAfeF5EmZbhYTdPkv4EIqmkXbm6zhXr3F7ZlJQyqcHLDBozvS/PMJg
+         YcaEryblCFp+v1gkSl6UYuQGb0oCxqqfNK24SG4cyPmXpfnSi+6jXAYiFhO6dkAw3ahg
+         S6/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWfVlXJd4muD/pJ02n0zjARIAemgRIXxgzu7l1woLjxPDCvv+LGdC7Oq2y9r+g+ThQ2z5Lsa7ep54zGVge9iIUy8wH0sQjtqYcLAh7KYKKKgG+C6Gyaha6OsnOcdVLiyIiqjNvP
+X-Gm-Message-State: AOJu0YwHuSgwrv9EDNnZESw7XZ+owLvOfbfMANbAajE3bu3aI1cUKOlf
+	pK2Y7UHDSejYfIRrShkvYMcjDInzm6lBk2BMGgPZVwMEibokmF1D
+X-Google-Smtp-Source: AGHT+IFnY7oyhUQ2h1YHDDpIJAZW8c1j5v0T5sdQe4YExZyP043/DJ68ik+7HU4G7BhF8KWbj8RTDQ==
+X-Received: by 2002:a05:6358:9dae:b0:185:fea7:fecd with SMTP id d46-20020a0563589dae00b00185fea7fecdmr5923178rwo.0.1712598443274;
+        Mon, 08 Apr 2024 10:47:23 -0700 (PDT)
+Received: from visitorckw-System-Product-Name.. ([140.113.216.168])
+        by smtp.gmail.com with ESMTPSA id k26-20020a63ff1a000000b005e4666261besm6821143pgi.50.2024.04.08.10.47.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 10:47:22 -0700 (PDT)
+From: Kuan-Wei Chiu <visitorckw@gmail.com>
+To: toke@toke.dk
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jserv@ccns.ncku.edu.tw,
+	cake@lists.bufferbloat.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kuan-Wei Chiu <visitorckw@gmail.com>
+Subject: [PATCH net-next v2] net: sched: cake: Optimize the number of function calls and branches in heap construction
+Date: Tue,  9 Apr 2024 01:47:16 +0800
+Message-Id: <20240408174716.751069-1-visitorckw@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240408122000.449238-15-jhs@mojatatu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27239/Mon Apr  8 10:26:06 2024)
 
-On 4/8/24 2:19 PM, Jamal Hadi Salim wrote:
-> We add an initial set of kfuncs to allow interactions from eBPF programs
-> to the P4TC domain.
-> 
-> - bpf_p4tc_tbl_read: Used to lookup a table entry from a BPF
-> program installed in TC. To find the table entry we take in an skb, the
-> pipeline ID, the table ID, a key and a key size.
-> We use the skb to get the network namespace structure where all the
-> pipelines are stored. After that we use the pipeline ID and the table
-> ID, to find the table. We then use the key to search for the entry.
-> We return an entry on success and NULL on failure.
-> 
-> - xdp_p4tc_tbl_read: Used to lookup a table entry from a BPF
-> program installed in XDP. To find the table entry we take in an xdp_md,
-> the pipeline ID, the table ID, a key and a key size.
-> We use struct xdp_md to get the network namespace structure where all
-> the pipelines are stored. After that we use the pipeline ID and the table
-> ID, to find the table. We then use the key to search for the entry.
-> We return an entry on success and NULL on failure.
-> 
-> - bpf_p4tc_entry_create: Used to create a table entry from a BPF
-> program installed in TC. To create the table entry we take an skb, the
-> pipeline ID, the table ID, a key and its size, and an action which will
-> be associated with the new entry.
-> We return 0 on success and a negative errno on failure
-> 
-> - xdp_p4tc_entry_create: Used to create a table entry from a BPF
-> program installed in XDP. To create the table entry we take an xdp_md, the
-> pipeline ID, the table ID, a key and its size, and an action which will
-> be associated with the new entry.
-> We return 0 on success and a negative errno on failure
-> 
-> - bpf_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
-> First does a lookup using the passed key and upon a miss will add the entry
-> to the table.
-> We return 0 on success and a negative errno on failure
-> 
-> - xdp_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
-> First does a lookup using the passed key and upon a miss will add the entry
-> to the table.
-> We return 0 on success and a negative errno on failure
-> 
-> - bpf_p4tc_entry_update: Used to update a table entry from a BPF
-> program installed in TC. To update the table entry we take an skb, the
-> pipeline ID, the table ID, a key and its size, and an action which will
-> be associated with the new entry.
-> We return 0 on success and a negative errno on failure
-> 
-> - xdp_p4tc_entry_update: Used to update a table entry from a BPF
-> program installed in XDP. To update the table entry we take an xdp_md, the
-> pipeline ID, the table ID, a key and its size, and an action which will
-> be associated with the new entry.
-> We return 0 on success and a negative errno on failure
-> 
-> - bpf_p4tc_entry_delete: Used to delete a table entry from a BPF
-> program installed in TC. To delete the table entry we take an skb, the
-> pipeline ID, the table ID, a key and a key size.
-> We return 0 on success and a negative errno on failure
-> 
-> - xdp_p4tc_entry_delete: Used to delete a table entry from a BPF
-> program installed in XDP. To delete the table entry we take an xdp_md, the
-> pipeline ID, the table ID, a key and a key size.
-> We return 0 on success and a negative errno on failure
-> 
-> Note:
-> All P4 objects are owned and reside on the P4TC side. IOW, they are
-> controlled via TC netlink interfaces and their resources are managed
-> (created, updated, freed, etc) by the TC side. As an example, the structure
-> p4tc_table_entry_act is returned to the ebpf side on table lookup. On the
-> TC side that struct is wrapped around p4tc_table_entry_act_bpf_kern.
-> A multitude of these structure p4tc_table_entry_act_bpf_kern are
-> preallocated (to match the P4 architecture, patch #9 describes some of
-> the subtleties involved) by the P4TC control plane and put in a kernel
-> pool. Their purpose is to hold the action parameters for either a table
-> entry, a global per-table "miss" and "hit" action, etc - which are
-> instantiated and updated via netlink per runtime requests. An instance of
-> the p4tc_table_entry_act_bpf_kern.p4tc_table_entry_act is returned
-> to ebpf when there is a un/successful table lookup depending on how the
-> P4 program is written. When the table entry is deleted the instance of
-> the struct p4tc_table_entry_act_bpf_kern is recycled to the pool to be
-> reused for a future table entry. The only time the pool memory is released
-> is when the pipeline is deleted.
-> 
-> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-> Nacked-by: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-> Acked-by: Toke Høiland-Jørgensen <toke@redhat.com>
+When constructing a heap, heapify operations are required on all
+non-leaf nodes. Thus, determining the index of the first non-leaf node
+is crucial. In a heap, the left child's index of node i is 2 * i + 1
+and the right child's index is 2 * i + 2. Node CAKE_MAX_TINS *
+CAKE_QUEUES / 2 has its left and right children at indexes
+CAKE_MAX_TINS * CAKE_QUEUES + 1 and CAKE_MAX_TINS * CAKE_QUEUES + 2,
+respectively, which are beyond the heap's range, indicating it as a
+leaf node. Conversely, node CAKE_MAX_TINS * CAKE_QUEUES / 2 - 1 has a
+left child at index CAKE_MAX_TINS * CAKE_QUEUES - 1, confirming its
+non-leaf status. The loop should start from it since it's not a leaf
+node.
 
-Given the many reasons stated earlier & for the record:
+By starting the loop from CAKE_MAX_TINS * CAKE_QUEUES / 2 - 1, we
+minimize function calls and branch condition evaluations. This
+adjustment theoretically reduces two function calls (one for
+cake_heapify() and another for cake_heap_get_backlog()) and five branch
+evaluations (one for iterating all non-leaf nodes, one within
+cake_heapify()'s while loop, and three more within the while loop
+with if conditions).
 
-Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
+Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
+---
+ net/sched/sch_cake.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index edee926ccde8..2eabc4dc5b79 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1512,7 +1512,7 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ 	if (!q->overflow_timeout) {
+ 		int i;
+ 		/* Build fresh max-heap */
+-		for (i = CAKE_MAX_TINS * CAKE_QUEUES / 2; i >= 0; i--)
++		for (i = CAKE_MAX_TINS * CAKE_QUEUES / 2 - 1; i >= 0; i--)
+ 			cake_heapify(q, i);
+ 	}
+ 	q->overflow_timeout = 65535;
+-- 
+2.34.1
+
 
