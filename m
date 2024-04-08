@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-85706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2FAA89BDFD
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:19:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C11489BDFE
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:19:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 698A0280FDC
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:19:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F3981C20E22
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156746A325;
-	Mon,  8 Apr 2024 11:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352626A337;
+	Mon,  8 Apr 2024 11:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fBeHSnAw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IR1G4N3c"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E002657CD
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 11:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850DA6A32F
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 11:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712575126; cv=none; b=uOAHUpcN30fKRJGmvgdZ0f5COVLzqA8A0DijqxUZZBRakBWQjiBzIBCwj2qv3qc+6/qV1GtD7uRvATSHjMDjH7zcXYx6iaGsbCrotg7wQCDqZYyTvJGxv+yFb3ccWaQJoAnd/HY5RzcgT6ube0HBkJaFzK2uMoxCI6UIIKewUlY=
+	t=1712575128; cv=none; b=WBuKdf4Hla4eqWEHY+wfuQI14KG6Yu5mJ/zlj00On0kadaBrjz95BSeX2LOijhRuW+A9Kt+CpYguXqKlwmh1+8VqgUMlmlpKBJ/TqK6EfAp4lVlMdX5BKPo9iwQoRo0xTCFq6SzRSDitGfRio0so41CP/sa8YpdAzHMSNJI/XeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712575126; c=relaxed/simple;
-	bh=I2unYy9WtPx1qRz9s7k/H3lA9lxXpJYqtG/sRA1CB2M=;
+	s=arc-20240116; t=1712575128; c=relaxed/simple;
+	bh=tD7rAzaUCs6+G8XM/vaND6K1eBFXUIxKHfOl04kvuJ0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gHWK1MHPu5hODkhJydnLfgof8r7+muJvM4LKUY1XuSm08B7GpBpXtoJFeAcrkrxM/1v5bMWxjWQu8wGb+FX0GV5lzG4g8tiJylHkfqOCen/Cx4MiG6pgXuDjfKQ1wULwcxVV5zOs22r8K3KXwDRjvuUz3e2ZdNLadQkM+vq+g60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fBeHSnAw; arc=none smtp.client-ip=198.175.65.13
+	 MIME-Version; b=t88d4Df0y8kn3becgqWUNzYyleLXQx8Cw+Mmfjz3kMd5+JgUUzQXsKGe4cQII+57tn11YiLEQMiV0a6mrjSqAcZiFpyeMIFpgcHJAOD+jA+HWCmhVgTq2zufM2IkZdoOme9VV5svgIIoGNeV1hLDSfJBkRuzE1mrMGzdO9E+IR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IR1G4N3c; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712575124; x=1744111124;
+  t=1712575126; x=1744111126;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=I2unYy9WtPx1qRz9s7k/H3lA9lxXpJYqtG/sRA1CB2M=;
-  b=fBeHSnAwfFnMdj9T6iWHfqamvyO/XtOtea7z85HfK8DXXYdSHvjwo4C9
-   T9Aaih/3k71XDQE8a9azyBBNhUFukYrsbeO85m9sZCPwIcEAXB6p9lcfK
-   fEuIVdGEGXX0HHKjOE6a3HdVWHtmSvDW0NqsLdophDdZGEdRKXMYrFNyT
-   GPAmQS7rdiSaWUVQCtmiNUjaFwP4hCnNtGtJACbR3gRCtH494/uXPrhmh
-   YjKTcxf90R9g9lYBizxew6LqOBrNcHPp/UJb7TbwBF6MP8Xi6lVFAmCk/
-   5lUVNd2Hdt4eLwk69cueozne3x7nq4l29GYEof9pSsj/4/EJXpqUEmSoP
-   g==;
-X-CSE-ConnectionGUID: MhCUzfPrRUGDtZAUP3Aoww==
-X-CSE-MsgGUID: 0f0ybgm5RIqy9oYUkI5VEA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11037"; a="18988624"
+  bh=tD7rAzaUCs6+G8XM/vaND6K1eBFXUIxKHfOl04kvuJ0=;
+  b=IR1G4N3c7BJmBGaD5IrOfTLKsFsukByrxIKnT8cNgrkhfVSSjxySUlV2
+   d5vSegZsmbHX4HsjzFG8jK5wX2K8zkHgQVyj4a12wnu2EgGElG43PKo2/
+   dSEd9Cod2CKNdN7neLX/tJ0TaavC4+iqmSVuRpD1ycHmhYO1oy72EJ8Un
+   1L5xtIUH0Ze96Qzt9lKNPKInLdOSGQ6W1jNMplCJTdMt3887Am4YTnUrJ
+   tJ5F1jwiMN0jVXmdaP6AO7Ps5M7zHDcY+6xW9oED4wQCWqMPQwSkLL6kR
+   9PEki2mywSjBUefzfFB8GscJW8HuPrpyXHlY+Qn7wJSRlZPH41rBto8Yg
+   w==;
+X-CSE-ConnectionGUID: DuKt+lnST4m/yVPZeNEBEg==
+X-CSE-MsgGUID: BwQW43wORx+/raO+RIjvNA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11037"; a="18988628"
 X-IronPort-AV: E=Sophos;i="6.07,186,1708416000"; 
-   d="scan'208";a="18988624"
+   d="scan'208";a="18988628"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 04:18:44 -0700
-X-CSE-ConnectionGUID: 6oQN/w+GTjKPLx/fAIg2Rw==
-X-CSE-MsgGUID: NeacceJnRku2tH+ZMD1diw==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2024 04:18:46 -0700
+X-CSE-ConnectionGUID: 5a4yEXWnRIuFOyAFSi5INw==
+X-CSE-MsgGUID: nIEj/x6BTbms1YPMZ4MyDQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,186,1708416000"; 
-   d="scan'208";a="19904955"
+   d="scan'208";a="19904958"
 Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by fmviesa009.fm.intel.com with ESMTP; 08 Apr 2024 04:18:42 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 08 Apr 2024 04:18:44 -0700
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
 	jesse.brandeburg@intel.com,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Igor Bagnucki <igor.bagnucki@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH v7 iwl-next 11/12] ice: Support 2XNAC configuration using auxbus
-Date: Mon,  8 Apr 2024 13:07:32 +0200
-Message-ID: <20240408111814.404583-25-karol.kolacinski@intel.com>
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v7 iwl-next 12/12] ice: Adjust PTP init for 2x50G E825C devices
+Date: Mon,  8 Apr 2024 13:07:33 +0200
+Message-ID: <20240408111814.404583-26-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240408111814.404583-14-karol.kolacinski@intel.com>
 References: <20240408111814.404583-14-karol.kolacinski@intel.com>
@@ -81,283 +80,142 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There are E825C products featuring 2 NACs. Those have only one source
-clock on the primary NAC.
-For those devices, there
-should be only one clock controller on the primary NAC. All PFs from
-both NACs should connect as auxiliary devices to the auxiliary driver on
-the primary NAC.
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+From FW/HW perspective, 2 port topology in E825C devices requires
+merging of 2 port mapping internally and breakout mapping externally.
+As a consequence, it requires different port numbering from PTP code
+perspective.
+For that topology, pf_id can not be used to index PTP ports. Even if
+the 2nd port is identified as port with pf_id = 1, all PHY operations
+need to be performed as it was port 2. Thus, special mapping is needed
+for the 2nd port.
+This change adds detection of 2x50G topology and applies 'custom'
+mapping on the 2nd port.
+
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice.h        | 23 +++++++-
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 62 +++++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 28 ++++++++--
- drivers/net/ethernet/intel/ice/ice_type.h   |  2 +
- 4 files changed, 101 insertions(+), 14 deletions(-)
+V4 -> V5: - reworded commit mesage
+          - renamed GLGEN_SWITCH_MODE_CONFIG_SELECT_25X4_ON_SINGLE_QUAD_M to
+            GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 67a3236ab1fc..b8319851bef1 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -197,8 +197,6 @@
- 
- #define ice_pf_to_dev(pf) (&((pf)->pdev->dev))
- 
--#define ice_pf_src_tmr_owned(pf) ((pf)->hw.func_caps.ts_func_info.src_tmr_owned)
--
- enum ice_feature {
- 	ICE_F_DSCP,
- 	ICE_F_PHY_RCLK,
-@@ -1010,4 +1008,25 @@ static inline void ice_clear_rdma_cap(struct ice_pf *pf)
- }
- 
- extern const struct xdp_metadata_ops ice_xdp_md_ops;
-+
-+/**
-+ * ice_pf_src_tmr_owned - check if PF is owner of source timer
-+ * @pf: Board private structure
-+ */
-+static inline bool ice_pf_src_tmr_owned(struct ice_pf *pf)
-+{
-+	if (pf->hw.ptp.phy_model == ICE_PHY_ETH56G && !pf->hw.ptp.primary_nac)
-+		return false;
-+	else
-+		return pf->hw.func_caps.ts_func_info.src_tmr_owned;
-+}
-+
-+/**
-+ * ice_is_primary - check if PF is on a primary NAC
-+ * @pf: Board private structure
-+ */
-+static inline bool ice_is_primary(struct ice_pf *pf)
-+{
-+	return pf->hw.dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M;
-+}
- #endif /* _ICE_H_ */
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |  4 ++++
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  5 +++++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 22 +++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_type.h     |  9 ++++++++
+ 4 files changed, 40 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
+index cfac1d432c15..91cbae1eec89 100644
+--- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
++++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
+@@ -157,6 +157,8 @@
+ #define GLGEN_RTRIG_CORER_M			BIT(0)
+ #define GLGEN_RTRIG_GLOBR_M			BIT(1)
+ #define GLGEN_STAT				0x000B612C
++#define GLGEN_SWITCH_MODE_CONFIG		0x000B81E0
++#define GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M	BIT(2)
+ #define GLGEN_VFLRSTAT(_i)			(0x00093A04 + ((_i) * 4))
+ #define PFGEN_CTRL				0x00091000
+ #define PFGEN_CTRL_PFSWR_M			BIT(0)
+@@ -177,6 +179,8 @@
+ #define GLINT_CTL_ITR_GRAN_50_M			ICE_M(0xF, 24)
+ #define GLINT_CTL_ITR_GRAN_25_S			28
+ #define GLINT_CTL_ITR_GRAN_25_M			ICE_M(0xF, 28)
++#define GLGEN_MAC_LINK_TOPO			0x000B81DC
++#define GLGEN_MAC_LINK_TOPO_LINK_TOPO_M		GENMASK(1, 0)
+ #define GLINT_DYN_CTL(_INT)			(0x00160000 + ((_INT) * 4))
+ #define GLINT_DYN_CTL_INTENA_M			BIT(0)
+ #define GLINT_DYN_CTL_CLEARPBA_M		BIT(1)
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 105caf51261a..29a86fcfd312 100644
+index 29a86fcfd312..71b19fcb7d14 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -371,6 +371,9 @@ ice_ptp_read_src_clk_reg(struct ice_pf *pf, struct ptp_system_timestamp *sts)
- 	u32 hi, lo, lo2;
- 	u8 tmr_idx;
- 
-+	if (!hw->ptp.primary_nac)
-+		hw = hw->ptp.primary_hw;
-+
- 	tmr_idx = ice_get_ptp_src_clock_index(hw);
- 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
- 	/* Read the system timestamp pre PHC read */
-@@ -2673,6 +2676,31 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
- 				   msecs_to_jiffies(err ? 10 : 500));
- }
- 
-+/**
-+ * ice_ptp_prepare_rebuild_sec - Prepare second NAC for PTP reset or rebuild
-+ * @pf: Board private structure
-+ * @rebuild: rebuild if true, prepare if false
-+ * @reset_type: the reset type being performed
-+ */
-+static void ice_ptp_prepare_rebuild_sec(struct ice_pf *pf, bool rebuild,
-+					enum ice_reset_req reset_type)
-+{
-+	struct ice_ptp_port *port;
-+
-+	mutex_lock(&pf->ptp.ports_owner.lock);
-+	list_for_each_entry(port, &pf->ptp.ports_owner.ports, list_member) {
-+		struct ice_pf *peer_pf = ptp_port_to_pf(port);
-+
-+		if (!peer_pf->hw.ptp.primary_nac) {
-+			if (rebuild)
-+				ice_ptp_rebuild(peer_pf, reset_type);
-+			else
-+				ice_ptp_prepare_for_reset(peer_pf, reset_type);
-+		}
-+	}
-+	mutex_unlock(&pf->ptp.ports_owner.lock);
-+}
-+
- /**
-  * ice_ptp_prepare_for_reset - Prepare PTP for reset
-  * @pf: Board private structure
-@@ -2681,6 +2709,7 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
- void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- {
- 	struct ice_ptp *ptp = &pf->ptp;
-+	struct ice_hw *hw = &pf->hw;
- 	u8 src_tmr;
- 
- 	if (ptp->state != ICE_PTP_READY)
-@@ -2696,15 +2725,18 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	if (reset_type == ICE_RESET_PFR)
+@@ -1470,6 +1470,8 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
  		return;
  
-+	if (ice_pf_src_tmr_owned(pf) && ice_is_e825c(hw))
-+		ice_ptp_prepare_rebuild_sec(pf, false, reset_type);
-+
- 	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
+ 	ptp_port = &pf->ptp.port;
++	if (ice_is_e825c(hw) && hw->ptp.is_2x50g_muxed_topo)
++		port *= 2;
+ 	if (WARN_ON_ONCE(ptp_port->port_num != port))
+ 		return;
  
- 	/* Disable periodic outputs */
- 	ice_ptp_disable_all_clkout(pf);
- 
--	src_tmr = ice_get_ptp_src_clock_index(&pf->hw);
-+	src_tmr = ice_get_ptp_src_clock_index(hw);
- 
- 	/* Disable source clock */
--	wr32(&pf->hw, GLTSYN_ENA(src_tmr), (u32)~GLTSYN_ENA_TSYN_ENA_M);
-+	wr32(hw, GLTSYN_ENA(src_tmr), (u32)~GLTSYN_ENA_TSYN_ENA_M);
- 
- 	/* Acquire PHC and system timer to restore after reset */
- 	ptp->reset_time = ktime_get_real_ns();
-@@ -2800,6 +2832,9 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 		err = ice_ptp_rebuild_owner(pf);
- 		if (err)
- 			goto err;
-+
-+		if (ice_is_e825c(&pf->hw))
-+			ice_ptp_prepare_rebuild_sec(pf, true, reset_type);
+@@ -3327,6 +3329,9 @@ void ice_ptp_init(struct ice_pf *pf)
  	}
  
- 	ptp->state = ICE_PTP_READY;
-@@ -2872,6 +2907,9 @@ static int ice_ptp_auxbus_probe(struct auxiliary_device *aux_dev,
- 		 &owner_pf->ptp.ports_owner.ports);
- 	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
- 
-+	if (!aux_pf->hw.ptp.primary_nac)
-+		aux_pf->hw.ptp.primary_hw = &owner_pf->hw;
+ 	ptp->port.port_num = hw->pf_id;
++	if (ice_is_e825c(hw) && hw->ptp.is_2x50g_muxed_topo)
++		ptp->port.port_num = hw->pf_id * 2;
 +
+ 	err = ice_ptp_init_port(pf, &ptp->port);
+ 	if (err)
+ 		goto err;
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index 5d42ca771117..bfdb640fde57 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -2456,6 +2456,26 @@ static int ice_get_phy_tx_tstamp_ready_eth56g(struct ice_hw *hw, u8 port,
  	return 0;
  }
  
-@@ -2949,6 +2987,7 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
- {
- 	struct auxiliary_driver *aux_driver;
- 	struct ice_ptp *ptp;
-+	char busdev[8] = {};
- 	struct device *dev;
- 	char *name;
- 	int err;
-@@ -2958,8 +2997,10 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
- 	aux_driver = &ptp->ports_owner.aux_driver;
- 	INIT_LIST_HEAD(&ptp->ports_owner.ports);
- 	mutex_init(&ptp->ports_owner.lock);
--	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
--			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
-+	if (ice_is_e810(&pf->hw))
-+		sprintf(busdev, "%u_%u_", pf->pdev->bus->number,
-+			PCI_SLOT(pf->pdev->devfn));
-+	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_%sclk%u", busdev,
- 			      ice_get_ptp_src_clock_index(&pf->hw));
- 	if (!name)
- 		return -ENOMEM;
-@@ -3163,6 +3204,7 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
- {
- 	struct auxiliary_device *aux_dev;
- 	struct ice_ptp *ptp;
-+	char busdev[8] = {};
- 	struct device *dev;
- 	char *name;
- 	int err;
-@@ -3174,8 +3216,11 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
- 
- 	aux_dev = &ptp->port.aux_dev;
- 
--	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
--			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
-+	if (ice_is_e810(&pf->hw))
-+		sprintf(busdev, "%u_%u_", pf->pdev->bus->number,
-+			PCI_SLOT(pf->pdev->devfn));
++/**
++ * ice_is_muxed_topo - detect breakout 2x50G topology for E825C
++ * @hw: pointer to the HW struct
++ *
++ * Returns: true if it's 2x50 breakout topology, false otherwise
++ */
++static bool ice_is_muxed_topo(struct ice_hw *hw)
++{
++	u8 link_topo;
++	bool mux;
++	u32 val;
 +
-+	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_%sclk%u", busdev,
- 			      ice_get_ptp_src_clock_index(&pf->hw));
- 	if (!name)
- 		return -ENOMEM;
-@@ -3263,6 +3308,11 @@ void ice_ptp_init(struct ice_pf *pf)
- 
- 	ptp->state = ICE_PTP_INITIALIZING;
- 
-+	if (ice_is_e825c(hw) && !ice_is_primary(pf))
-+		hw->ptp.primary_nac = false;
-+	else
-+		hw->ptp.primary_nac = true;
++	val = rd32(hw, GLGEN_SWITCH_MODE_CONFIG);
++	mux = FIELD_GET(GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M, val);
++	val = rd32(hw, GLGEN_MAC_LINK_TOPO);
++	link_topo = FIELD_GET(GLGEN_MAC_LINK_TOPO_LINK_TOPO_M, val);
 +
- 	ice_ptp_init_hw(hw);
- 
- 	ice_ptp_init_tx_interrupt_mode(pf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 53d97eca194b..5d42ca771117 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -834,7 +834,10 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- {
- 	u32 cmd_val = ice_ptp_tmr_cmd_to_src_reg(hw, cmd);
- 
--	wr32(hw, GLTSYN_CMD, cmd_val);
-+	if (hw->ptp.primary_nac)
-+		wr32(hw, GLTSYN_CMD, cmd_val);
-+	else
-+		wr32(hw->ptp.primary_hw, GLTSYN_CMD, cmd_val);
- }
- 
++	return (mux && link_topo == ICE_LINK_TOPO_UP_TO_2_LINKS);
++}
++
  /**
-@@ -850,7 +853,10 @@ static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- 	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
- 
- 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
--	wr32(hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
-+	if (hw->ptp.primary_nac)
-+		wr32(hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
-+	else
-+		wr32(hw->ptp.primary_hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
- 	ice_flush(hw);
+  * ice_ptp_init_phy_e825c - initialize PHY parameters
+  * @hw: pointer to the HW struct
+@@ -2488,6 +2508,8 @@ static void ice_ptp_init_phy_e825c(struct ice_hw *hw)
+ 			return;
+ 		}
+ 	}
++
++	ptp->is_2x50g_muxed_topo = ice_is_muxed_topo(hw);
  }
  
-@@ -2168,8 +2174,13 @@ static int ice_read_phy_and_phc_time_eth56g(struct ice_hw *hw, u8 port,
- 	ice_ptp_exec_tmr_cmd(hw);
- 
- 	/* Read the captured PHC time from the shadow time registers */
--	zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
--	lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
-+	if (hw->ptp.primary_nac) {
-+		zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
-+		lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
-+	} else {
-+		zo = rd32(hw->ptp.primary_hw, GLTSYN_SHTIME_0(tmr_idx));
-+		lo = rd32(hw->ptp.primary_hw, GLTSYN_SHTIME_L(tmr_idx));
-+	}
- 	*phc_time = (u64)lo << 32 | zo;
- 
- 	/* Read the captured PHY time from the PHY shadow registers */
-@@ -2319,8 +2330,13 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
- 	if (err)
- 		return err;
- 
--	lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
--	hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
-+	if (hw->ptp.primary_nac) {
-+		lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
-+		hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
-+	} else {
-+		lo = rd32(hw->ptp.primary_hw, GLTSYN_INCVAL_L(tmr_idx));
-+		hi = rd32(hw->ptp.primary_hw, GLTSYN_INCVAL_H(tmr_idx));
-+	}
- 	incval = (u64)hi << 32 | lo;
- 
- 	err = ice_write_40b_ptp_reg_eth56g(hw, port, PHY_REG_TIMETUS_L, incval);
+ /* E822 family functions
 diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 841860784e3c..abce7a8786f3 100644
+index abce7a8786f3..9228ff31dbae 100644
 --- a/drivers/net/ethernet/intel/ice/ice_type.h
 +++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -858,6 +858,8 @@ struct ice_ptp_hw {
+@@ -853,6 +853,14 @@ enum ice_phy_model {
+ 	ICE_PHY_ETH56G,
+ };
+ 
++/* Global Link Topology */
++enum ice_global_link_topo {
++	ICE_LINK_TOPO_UP_TO_2_LINKS,
++	ICE_LINK_TOPO_UP_TO_4_LINKS,
++	ICE_LINK_TOPO_UP_TO_8_LINKS,
++	ICE_LINK_TOPO_RESERVED,
++};
++
+ struct ice_ptp_hw {
+ 	enum ice_phy_model phy_model;
  	union ice_phy_params phy;
- 	u8 num_lports;
+@@ -860,6 +868,7 @@ struct ice_ptp_hw {
  	u8 ports_per_phy;
-+	bool primary_nac;
-+	struct ice_hw *primary_hw;
+ 	bool primary_nac;
+ 	struct ice_hw *primary_hw;
++	bool is_2x50g_muxed_topo;
  };
  
  /* Port hardware description */
