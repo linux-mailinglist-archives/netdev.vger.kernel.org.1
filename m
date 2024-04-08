@@ -1,353 +1,476 @@
-Return-Path: <netdev+bounces-85650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11DE89BC15
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:41:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A16B689BC1F
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:42:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46C451F22FA5
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:41:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B4611F22F4C
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB7150A8F;
-	Mon,  8 Apr 2024 09:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B80A481DF;
+	Mon,  8 Apr 2024 09:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=surbannet.onmicrosoft.com header.i=@surbannet.onmicrosoft.com header.b="EqcydbrQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2134.outbound.protection.outlook.com [40.107.8.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DEB5027B;
-	Mon,  8 Apr 2024 09:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712569229; cv=none; b=FqE/an16NqeYH8fItQKulxnc6xyWb1oU+pxW/cEz7LNaCvKKApyq6GXBSQODU3aYlPwryA6vLf5VErZSTqM3kmXDkykdXEvSWSyoWRRJnRZgLoCLn15RzTWbuj36dgFI8dPGxJWDAIlFqF6OYj5Cf0f+Q5NjF9q0Mdg1LsVsVpM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712569229; c=relaxed/simple;
-	bh=NY+y50EeFT3zDJgNa//Ls2FXBG/qKme14tasGwEfcRo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dma+0R1IpX+yKawIoNgF0n8fNK3KMVuKwM2lPxzINcOMWe53PKGQ3r9ayI0A6RBsCCtEomyoZZcrAziDZtBDXV/rF8FJo9WP8lpSkdkxUjvVYz1Dk4ogDE1Lw++zDBfshT7nnUkYZLvXrSrM4CQrlH9NkJKw0UwLpSu6ekzusbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VCkXC4RNWzwRZc;
-	Mon,  8 Apr 2024 17:37:31 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id DA2B818007D;
-	Mon,  8 Apr 2024 17:40:24 +0800 (CST)
-Received: from mscphis02103.huawei.com (10.123.65.215) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 8 Apr 2024 17:40:22 +0800
-From: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-To: <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-Subject: [RFC PATCH v1 10/10] samples/landlock: Support socket protocol restrictions
-Date: Mon, 8 Apr 2024 17:39:27 +0800
-Message-ID: <20240408093927.1759381-11-ivanov.mikhail1@huawei-partners.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4E448CFC;
+	Mon,  8 Apr 2024 09:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.134
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712569334; cv=fail; b=QIbaFVXLX75aIm/jIq5Emk7yUTO7kLCYdbkuLn7A+A5fDgecZ8od0tOZH6Weohb0xEWfNgu2xsRVrR7a6r31HzBFcATMrTxpcwNp38vNrgBYsWZ9GnwsyITzh9wb2A5HZTjuikWbGl0AIkOhUaYBpT4fYjrgoJFsFG+K8oup/cI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712569334; c=relaxed/simple;
+	bh=P39wapwnd0nF2lfl/ghQZ29y/uniaw3RlCGI6dY9v/0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HIFCU+I1cyd9DZApDvpsqoHItmmXo/6Vx5Qp8rwy5LLCEaLNPy/3u3IPyRdp9s98F9XaRSzJCCIrxQjWNXX/iRB7GUyBXAG+2cuHGTyXkSyVM/14fFU36fs6fFGNL/qb1i6YIHJRSFqjjyVoinRkz2F7ufEWc+ruhUTjnH7ykLw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=surban.net; spf=pass smtp.mailfrom=surban.net; dkim=pass (1024-bit key) header.d=surbannet.onmicrosoft.com header.i=@surbannet.onmicrosoft.com header.b=EqcydbrQ; arc=fail smtp.client-ip=40.107.8.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=surban.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=surban.net
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a78D9clNiVVZB3kVHlYmQO1xsYzswIovTboaRuEHdtjORK/2QQDsdkU/jn47z8WqO67q3QOmQ/3GlhKlmrJlgBz41hcsONWmWMnczN6CZmkIhP8NHTeJLMsqAVu+Ex09FoU3wKPP90p5Zp+aQoyhGop1AlStn9i1wKiiyGl0QLn+SbTB1uNBpBLOKC84VBHsIc1y4a3aYhHSjS0MHvIo8TIWOKMCeicPIsreZey1wBhRrZv6ZEV+6WhQ0EjzciLU8dCUl2ZWNCDI4e5S7yMeGd68pxTIMeq76MTW2u6D4MSei93dh9fAdptL7mgIsdaGYrcyFrZi9UyRigbEeUfQKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SlB4tCKJYvukhLevB9WcB8uLtEBHFOD3C+/0QzfDEYA=;
+ b=kp0Sv1xGiz9WIMS3SrklCpRO43nJGKUUTAjVrL100383gv8mUhE0UKpoPip6IsPR9Am658SuuR098/DmOtHGr6bDKGKA06gf5UYrb2q4JIu68mRO2yOyie2BR/W9WoHIRZ3uxxuGkQp4jaYALITCDLfQ3ta6dK0jVDZ9B3/Vy0cCQ82giobLFfEKGoObUOv4GVyaM3BA8Wr47Tmaffr4fnhz+sdmN51wwasN6fJMaW4Y1e8D9jzF6qVZ+12N+2n4tMkdBPFmHeD3BJvhXR4o7gJWzqoc3oSx7uha4+yNeCSDyPmBY1YXJqoI0gl+TyLHFSq8XLxBwtI6uRnkkxHUow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=surban.net; dmarc=pass action=none header.from=surban.net;
+ dkim=pass header.d=surban.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=surbannet.onmicrosoft.com; s=selector2-surbannet-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SlB4tCKJYvukhLevB9WcB8uLtEBHFOD3C+/0QzfDEYA=;
+ b=EqcydbrQsBtPbVkCaaopzsZU9l8y1l6GnV9Vn1pCkaElNR7GSojvzySMSiWLFPY5+6kaWjtcKpP1Xz4iDxzn7tIIeAjebKMRAAnQgamgqsPFyNP+8vHclpoKUuOJHD/QnYsEIxTWdX+aDxxHrF4pYv2qHJg1l8oFi7FgOXK0DrE=
+Received: from DB9P189MB1978.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:37d::18)
+ by DB9P189MB2003.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:37e::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 8 Apr
+ 2024 09:42:08 +0000
+Received: from DB9P189MB1978.EURP189.PROD.OUTLOOK.COM
+ ([fe80::7185:1ee3:7e5f:f9b1]) by DB9P189MB1978.EURP189.PROD.OUTLOOK.COM
+ ([fe80::7185:1ee3:7e5f:f9b1%3]) with mapi id 15.20.7409.042; Mon, 8 Apr 2024
+ 09:42:08 +0000
+From: Sebastian Urban <surban@surban.net>
+To:
+Cc: Sebastian Urban <surban@surban.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4] Bluetooth: compute LE flow credits based on recvbuf space
+Date: Mon,  8 Apr 2024 11:41:41 +0200
+Message-Id: <20240408094141.720096-1-surban@surban.net>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com>
-References: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240408005625.57115-1-surban@surban.net>
+References: <20240408005625.57115-1-surban@surban.net>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ZR0P278CA0038.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:1d::7) To DB9P189MB1978.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:10:37d::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB9P189MB1978:EE_|DB9P189MB2003:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	viDrF12Lqpal08IdZlvSkoecCT8t3QZr6AARkHdlRYZoCpZKo8YQyFf+WuItQwSe2il/eGAWkXBHLjTw994gkgfooNcVzL4trANMjCZmIPrgGvMtVWDAAWROgH4CL1m+tiFc5NWzkoiI0PnuICtYGcvwrY13WB3EpT5wFMZ49XCsVK/V0WLHjOvn3/vAE+xCfz1S5ytpb4xsKjc4qwOALeCunEPleVcoRa6k4oFYz8tdhFBywEXyEnwqG3d6TtQK+SRE21vCscogZwmVbQeJQhj4PalrtR0Y3W4uOXXeoxf3gwqMhxCgD/zT78WbFeJq8bKViP0pNfRQVxGaU3OS3FOfJu3mmibtVnViXrcjVsP3rBkPTRi4sD3zgpvV+YUTcd9RGrUwC5b3np5lGyHCuWvka4859VvVUfIUh+5MS+8eN5FXxq3mwKvcn0PCwJIaMfxosyUeKSRiFjP83gxBqFHBnUuBy1cER0SLDs/BhkQNnb7fnF5jpuYr8KOYsl8GCI2kYA88GxAIG0f6iZs0SL/jjg8JRt2/muFth1Pu7mHXd5vXILwnR6LtHhiE51kFYzcPIe/wz7T1CWchb8YGwZPGNhf6Tkr8NIA151uq8Q5rAz7y0Pj+uCzIqGnPFvl3BZjZCguohUZ05fGrVWOOGBmZ0i482yJH3Wf2x7eC0qQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9P189MB1978.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(52116005)(376005)(366007)(7416005)(1800799015);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?scri8qN6WnlWQHJVHtuJlIc8H/J+nBCS9328RT2j3opc16wUnKvKRnTnBnfi?=
+ =?us-ascii?Q?VEFV+FbHwgnF2JGPcdsAKf/Bk3B+qSyHkkC9md0P4Z21E1I2WQDBdEr2wlFk?=
+ =?us-ascii?Q?d9mdo8p/UR+qwArgUPV787Ul15UwcMnP1s4roS7Si9WNyxTO54gVUyLr7X7y?=
+ =?us-ascii?Q?Fx85p/TdW9aVosdHpk2Lygip5OPjIxeZXjLCh2/aYuTLPS0ITIKCxrm4AxxN?=
+ =?us-ascii?Q?a0bay1ih3+OInJPACFHecFoVSq0rUOAdvHvhH0c+k0USNjWaiCoTBlbwy4EB?=
+ =?us-ascii?Q?pIJtkUUtcULbsjwAxn1Mf4hgeld6j0+EVgdR3A8miLhMnr0EDL7R6VCzLbYJ?=
+ =?us-ascii?Q?NHyqZHVp9Llvd5y66yvDdaz8d/+nTgoVYOTKaItwBdpt4U+8hVn30fnexCZg?=
+ =?us-ascii?Q?nuCScrfZeLi+qX8mwI0/dwXTLZyxb6qF7l/dJQ4YpTmnfLNCJthFVZ7dWG2C?=
+ =?us-ascii?Q?oUdvR+qNhtxD1rwzhxFTe8kyI9Fi0vJmxzljWIrwF3tvTsyTSzyVxfrbQu0U?=
+ =?us-ascii?Q?V6tyhWjG+qAaVzlsDZ+M6vzco/jFGXICcieQwRMyWBFnMHQn4XF2BlIj0KY1?=
+ =?us-ascii?Q?/4y17B7gCgJBnJ9X8Bhez1muJ07SvrjI+r55dt6rFRCw0DblPOoguYO47Dr+?=
+ =?us-ascii?Q?Xn6LOq+guB3UJx0kurM3h40mnxSe6ykkZg9++7SREZWoQ3mXXdeZjWpnKmK2?=
+ =?us-ascii?Q?Uvixld0ZgkCfCtp/Zn2ASYr8Av0Q3p96EW6u/NCvyk3a3G/Wxam7ZdwE/YOg?=
+ =?us-ascii?Q?emOKHtXJRnQ4rovukj/nmWvfo2gzPDcNS/rzq+bN/tzKyhNZpyj9dZ7ojo1e?=
+ =?us-ascii?Q?94EF6vzHnUesZC9Xi4Bp2/WYc851FbHb4RQz9iCBHHqU0o0dBbYtyZJ/9tcR?=
+ =?us-ascii?Q?TRglwpkEBc/dIb6L7ADLaKoqb8anVjfQH9t3OnofrOwSIoS2euvXJI65juyF?=
+ =?us-ascii?Q?r3jSR05XybG7xP8ZJ9fATURdVaNc3ZKadTAXIpAzT3ZJytBeRW7whvxmND9P?=
+ =?us-ascii?Q?O4TdObN+VY5ztt7A9h69euTkmqNtgBehlNYsg3jgGVakRSFtlt2qzHpCxKSl?=
+ =?us-ascii?Q?9jFp/JPK99S340x1SdBv6ZzeodKyhHR3Mh9SB/nKj2WIPUzRI+ENUl/50q5t?=
+ =?us-ascii?Q?wbKBr5Cy5wf7A8z9xuDrx+Zk+Um19HJjqFNStNz3Funt/eg3cjodAKXaVeGn?=
+ =?us-ascii?Q?QSnBi0koXviobLoHbR+skPHm+qLPFIZ/7kzrlKgD+comW1J44JBfIPOGH1QJ?=
+ =?us-ascii?Q?Kh5O1/kjBVrxHc3NCojSiYMfS7N4rSXJGtpA7K1NDxxPo6nHibP4gmuJZtSv?=
+ =?us-ascii?Q?sIQ6/wwmep0q6g+3VS33s+nsUpKn39MwgmlGRCjVz98FFPXum3lkTahLz67v?=
+ =?us-ascii?Q?mnPpBZbk2CPsNfFG0wsI8LVCD+PRpmeoAYPTjPHoCIxqcYUIkVHltB+wXYMs?=
+ =?us-ascii?Q?Rt5OyM2Wm+GifGBqei3J6o59H+u80FhURZLHU9uJlIZW0EQn+NsMYi7l8Ll6?=
+ =?us-ascii?Q?6oBUsrIuniCKa7fakdBzAU72aNaJ64SRFuWXCPx+lF8VUreJ5/OMYlIXVeis?=
+ =?us-ascii?Q?FI5QXkQG+6slDeFufzQIiUKGqrcm+O5waV3jh/nqhXkjMtciIi2db+2rG2AE?=
+ =?us-ascii?Q?idCwOI6PsCIILxNLgt30ZF8pc729EbZ54TpAF3Tbzaac?=
+X-OriginatorOrg: surban.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: b25446af-62c3-4462-15c4-08dc57b02851
+X-MS-Exchange-CrossTenant-AuthSource: DB9P189MB1978.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2024 09:42:08.4673
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a27af4ff-c4b3-4dec-be8d-845345d2ab67
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oIxgbukc6A6kJlP3MgzN+iuCdevkFbkTYxxHfx8E+gdi2Ab0UwM8SuqZzIi/IJXGwIpeinn5BpG5xHxRb7rNmQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9P189MB2003
 
-Add socket protocol control support in sandboxer demo. It's possible
-to allow a sandboxer to create sockets with specified family(domain)
-and type values. This is controlled with the new LL_SOCKET_CREATE
-environment variable. Single token in this variable looks like this:
-'FAMILY.TYPE', where FAMILY corresponds to one of the possible socket
-family name and TYPE to the possible socket type name (see socket(2)).
-Add ENV_TOKEN_INTERNAL_DELIMITER.
+Previously LE flow credits were returned to the
+sender even if the socket's receive buffer was
+full. This meant that no back-pressure
+was applied to the sender, thus it continued to
+send data, resulting in data loss without any
+error being reported. Furthermore, the amount
+of credits was essentially fixed to a small amount,
+leading to reduced performance.
 
-Add get_socket_protocol() method to parse socket family and type strings
-to the appropriate constants. Add CHECK_DOMAIN() and CHECK_TYPE()
-macroses to prevent copypaste.
+This is fixed by computing the number of returned
+LE flow credits based on the available space in the
+receive buffer of an L2CAP socket. Consequently,
+if the receive buffer is full, no credits are returned
+until the buffer is read and thus cleared by user-space.
 
-Signed-off-by: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Reviewed-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Since the computation of available
+receive buffer space can only be performed
+approximately, i.e. sk_buff overhead is ignored,
+and the receive buffer size may be changed by
+user-space after flow credits have been sent,
+superfluous received data is temporary stored within
+l2cap_pinfo. This is necessary because Bluetooth LE
+provides no retransmission mechanism once the
+data has been acked by the physical layer.
+
+Signed-off-by: Sebastian Urban <surban@surban.net>
 ---
- samples/landlock/sandboxer.c | 149 ++++++++++++++++++++++++++++++++---
- 1 file changed, 136 insertions(+), 13 deletions(-)
+ include/net/bluetooth/l2cap.h | 10 +++++-
+ net/bluetooth/l2cap_core.c    | 50 ++++++++++++++++++++++----
+ net/bluetooth/l2cap_sock.c    | 67 +++++++++++++++++++++++++----------
+ 3 files changed, 102 insertions(+), 25 deletions(-)
 
-diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-index 32e930c85..4642a7437 100644
---- a/samples/landlock/sandboxer.c
-+++ b/samples/landlock/sandboxer.c
-@@ -14,6 +14,7 @@
- #include <fcntl.h>
- #include <linux/landlock.h>
- #include <linux/prctl.h>
-+#include <linux/socket.h>
- #include <stddef.h>
- #include <stdio.h>
- #include <stdlib.h>
-@@ -55,8 +56,11 @@ static inline int landlock_restrict_self(const int ruleset_fd,
- #define ENV_FS_RW_NAME "LL_FS_RW"
- #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
- #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
-+#define ENV_SOCKET_CREATE_NAME "LL_SOCKET_CREATE"
- #define ENV_DELIMITER ":"
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 3f4057ced971..bc6ff40ebc9f 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -547,6 +547,8 @@ struct l2cap_chan {
  
-+#define ENV_TOKEN_INTERNAL_DELIMITER "."
-+
- static int parse_path(char *env_path, const char ***const path_list)
- {
- 	int i, num_paths = 0;
-@@ -85,6 +89,49 @@ static int parse_path(char *env_path, const char ***const path_list)
+ 	__u16		tx_credits;
+ 	__u16		rx_credits;
++	int		rx_avail;
++	int		rx_staged;
  
- /* clang-format on */
+ 	__u8		tx_state;
+ 	__u8		rx_state;
+@@ -682,10 +684,15 @@ struct l2cap_user {
+ /* ----- L2CAP socket info ----- */
+ #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
  
-+#define CHECK_DOMAIN(domain_variant) \
-+	do { \
-+		if (strcmp(strdomain, #domain_variant) == 0) { \
-+			protocol->domain = domain_variant; \
-+			domain_parsed = 1; \
-+			goto domain_check; \
-+		} \
-+	} while (0)
++struct l2cap_rx_busy {
++	struct list_head	list;
++	struct sk_buff		*skb;
++};
 +
-+#define CHECK_TYPE(type_variant) \
-+	do { \
-+		if (strcmp(strtype, #type_variant) == 0) { \
-+			protocol->type = type_variant; \
-+			type_parsed = 1; \
-+			goto type_check; \
-+		} \
-+	} while (0)
+ struct l2cap_pinfo {
+ 	struct bt_sock		bt;
+ 	struct l2cap_chan	*chan;
+-	struct sk_buff		*rx_busy_skb;
++	struct list_head	rx_busy;
+ };
+ 
+ enum {
+@@ -944,6 +951,7 @@ int l2cap_chan_reconfigure(struct l2cap_chan *chan, __u16 mtu);
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 		    const struct sockcm_cookie *sockc);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
++void l2cap_chan_rx_avail(struct l2cap_chan *chan, int rx_avail);
+ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
+ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
+ int l2cap_ertm_init(struct l2cap_chan *chan);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b0970462a689..f3fc63992b00 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -454,6 +454,9 @@ struct l2cap_chan *l2cap_chan_create(void)
+ 	/* Set default lock nesting level */
+ 	atomic_set(&chan->nesting, L2CAP_NESTING_NORMAL);
+ 
++	/* Available receive buffer space is initially unknown */
++	chan->rx_avail = -1;
 +
-+static int get_socket_protocol(char *strdomain, char *strtype,
-+				struct landlock_socket_attr *protocol)
+ 	write_lock(&chan_list_lock);
+ 	list_add(&chan->global_l, &chan_list);
+ 	write_unlock(&chan_list_lock);
+@@ -535,6 +538,26 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan)
+ }
+ EXPORT_SYMBOL_GPL(l2cap_chan_set_defaults);
+ 
++static __u16 l2cap_le_rx_credits(struct l2cap_chan *chan)
 +{
-+	int domain_parsed = 0, type_parsed = 0;
++	if (chan->mps == 0)
++		return 0;
 +
-+	CHECK_DOMAIN(AF_UNIX);
-+	CHECK_DOMAIN(AF_INET);
-+	CHECK_DOMAIN(AF_INET6);
++	/* If we don't know the available space in the receiver buffer, give
++	 * enough credits for a full packet.
++	 */
++	if (chan->rx_avail == -1)
++		return (chan->imtu / chan->mps) + 1;
 +
-+domain_check:
-+	if (!domain_parsed)
-+		return 1;
-+
-+	CHECK_TYPE(SOCK_STREAM);
-+	CHECK_TYPE(SOCK_DGRAM);
-+
-+type_check:
-+	if (!type_parsed)
-+		return 1;
-+	return 0;
++	/* If we know how much space is available in the receive buffer, give
++	 * out as many credits as would fill the buffer.
++	 */
++	if (chan->rx_avail <= chan->rx_staged)
++		return 0;
++	return min_t(int, U16_MAX,
++		     (chan->rx_avail - chan->rx_staged) / chan->mps);
 +}
 +
-+#undef CHECK_DOMAIN
-+#undef CHECK_TYPE
-+
- static int populate_ruleset_fs(const char *const env_var, const int ruleset_fd,
- 			       const __u64 allowed_access)
+ static void l2cap_le_flowctl_init(struct l2cap_chan *chan, u16 tx_credits)
  {
-@@ -182,6 +229,58 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
- 	return ret;
+ 	chan->sdu = NULL;
+@@ -543,8 +566,7 @@ static void l2cap_le_flowctl_init(struct l2cap_chan *chan, u16 tx_credits)
+ 	chan->tx_credits = tx_credits;
+ 	/* Derive MPS from connection MTU to stop HCI fragmentation */
+ 	chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
+-	/* Give enough credits for a full packet */
+-	chan->rx_credits = (chan->imtu / chan->mps) + 1;
++	chan->rx_credits = l2cap_le_rx_credits(chan);
+ 
+ 	skb_queue_head_init(&chan->tx_q);
+ }
+@@ -556,7 +578,7 @@ static void l2cap_ecred_init(struct l2cap_chan *chan, u16 tx_credits)
+ 	/* L2CAP implementations shall support a minimum MPS of 64 octets */
+ 	if (chan->mps < L2CAP_ECRED_MIN_MPS) {
+ 		chan->mps = L2CAP_ECRED_MIN_MPS;
+-		chan->rx_credits = (chan->imtu / chan->mps) + 1;
++		chan->rx_credits = l2cap_le_rx_credits(chan);
+ 	}
  }
  
-+static int populate_ruleset_socket(const char *const env_var,
-+				const int ruleset_fd, const __u64 allowed_access)
+@@ -6520,9 +6542,7 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_le_credits pkt;
+-	u16 return_credits;
+-
+-	return_credits = (chan->imtu / chan->mps) + 1;
++	u16 return_credits = l2cap_le_rx_credits(chan);
+ 
+ 	if (chan->rx_credits >= return_credits)
+ 		return;
+@@ -6541,6 +6561,15 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
+ 	l2cap_send_cmd(conn, chan->ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
+ }
+ 
++void l2cap_chan_rx_avail(struct l2cap_chan *chan, int rx_avail)
 +{
-+	int ret = 1;
-+	char *env_protocol_name, *env_protocol_name_next;
-+	char *strprotocol, *strdomain, *strtype;
-+	struct landlock_socket_attr protocol = {
-+		.allowed_access = allowed_access,
-+		.domain = 0,
-+		.type = 0,
-+	};
++	BT_DBG("chan %p has %d bytes avail for rx", chan, rx_avail);
 +
-+	env_protocol_name = getenv(env_var);
-+	if (!env_protocol_name)
-+		return 0;
-+	env_protocol_name = strdup(env_protocol_name);
-+	unsetenv(env_var);
++	chan->rx_avail = rx_avail;
 +
-+	env_protocol_name_next = env_protocol_name;
-+	while ((strprotocol = strsep(&env_protocol_name_next, ENV_DELIMITER))) {
-+		strdomain = strsep(&strprotocol, ENV_TOKEN_INTERNAL_DELIMITER);
-+		strtype   = strsep(&strprotocol, ENV_TOKEN_INTERNAL_DELIMITER);
-+
-+		if (!strtype) {
-+			fprintf(stderr, "Failed to extract socket protocol with "
-+							"unspecified type value\n");
-+			goto out_free_name;
-+		}
-+
-+		if (get_socket_protocol(strdomain, strtype, &protocol)) {
-+			fprintf(stderr, "Failed to extract socket protocol with "
-+							"domain: \"%s\", type: \"%s\"\n",
-+				strdomain, strtype);
-+			goto out_free_name;
-+		}
-+
-+		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
-+				      &protocol, 0)) {
-+			fprintf(stderr,
-+				"Failed to update the ruleset with "
-+				"domain \"%s\" and type \"%s\": %s\n",
-+				strdomain, strtype, strerror(errno));
-+			goto out_free_name;
-+		}
-+	}
-+	ret = 0;
-+
-+out_free_name:
-+	free(env_protocol_name);
-+	return ret;
++	l2cap_chan_le_send_credits(chan);
 +}
 +
- /* clang-format off */
- 
- #define ACCESS_FS_ROUGHLY_READ ( \
-@@ -205,14 +304,14 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
- 
- /* clang-format on */
- 
--#define LANDLOCK_ABI_LAST 4
-+#define LANDLOCK_ABI_LAST 5
- 
- int main(const int argc, char *const argv[], char *const *const envp)
+ static int l2cap_ecred_recv(struct l2cap_chan *chan, struct sk_buff *skb)
  {
- 	const char *cmd_path;
- 	char *const *cmd_argv;
- 	int ruleset_fd, abi;
--	char *env_port_name;
-+	char *env_optional_name;
- 	__u64 access_fs_ro = ACCESS_FS_ROUGHLY_READ,
- 	      access_fs_rw = ACCESS_FS_ROUGHLY_READ | ACCESS_FS_ROUGHLY_WRITE;
+ 	int err;
+@@ -6550,6 +6579,14 @@ static int l2cap_ecred_recv(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	/* Wait recv to confirm reception before updating the credits */
+ 	err = chan->ops->recv(chan, skb);
  
-@@ -220,18 +319,19 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 		.handled_access_fs = access_fs_rw,
- 		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
- 				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-+		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
- 	};
- 
- 	if (argc < 2) {
- 		fprintf(stderr,
--			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
-+			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
- 			"<cmd> [args]...\n\n",
- 			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
--			ENV_TCP_CONNECT_NAME, argv[0]);
-+			ENV_TCP_CONNECT_NAME, ENV_SOCKET_CREATE_NAME, argv[0]);
- 		fprintf(stderr,
- 			"Execute a command in a restricted environment.\n\n");
- 		fprintf(stderr,
--			"Environment variables containing paths and ports "
-+			"Environment variables containing paths, ports and protocols "
- 			"each separated by a colon:\n");
- 		fprintf(stderr,
- 			"* %s: list of paths allowed to be used in a read-only way.\n",
-@@ -240,7 +340,7 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 			"* %s: list of paths allowed to be used in a read-write way.\n\n",
- 			ENV_FS_RW_NAME);
- 		fprintf(stderr,
--			"Environment variables containing ports are optional "
-+			"Environment variables containing ports or protocols are optional "
- 			"and could be skipped.\n");
- 		fprintf(stderr,
- 			"* %s: list of ports allowed to bind (server).\n",
-@@ -248,22 +348,25 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 		fprintf(stderr,
- 			"* %s: list of ports allowed to connect (client).\n",
- 			ENV_TCP_CONNECT_NAME);
-+		fprintf(stderr,
-+			"* %s: list of socket protocols allowed to be created.\n",
-+			ENV_SOCKET_CREATE_NAME);
- 		fprintf(stderr,
- 			"\nexample:\n"
- 			"%s=\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
- 			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
- 			"%s=\"9418\" "
- 			"%s=\"80:443\" "
-+			"%s=\"AF_INET6.SOCK_STREAM:AF_UNIX.SOCK_STREAM\" "
- 			"%s bash -i\n\n",
- 			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
--			ENV_TCP_CONNECT_NAME, argv[0]);
-+			ENV_TCP_CONNECT_NAME, ENV_SOCKET_CREATE_NAME, argv[0]);
- 		fprintf(stderr,
- 			"This sandboxer can use Landlock features "
- 			"up to ABI version %d.\n",
- 			LANDLOCK_ABI_LAST);
- 		return 1;
- 	}
--
- 	abi = landlock_create_ruleset(NULL, 0, LANDLOCK_CREATE_RULESET_VERSION);
- 	if (abi < 0) {
- 		const int err = errno;
-@@ -325,6 +428,16 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 			"provided by ABI version %d (instead of %d).\n",
- 			LANDLOCK_ABI_LAST, abi);
- 		__attribute__((fallthrough));
-+	case 4:
-+		/* Removes socket support for ABI < 5 */
-+		ruleset_attr.handled_access_socket &=
-+			~LANDLOCK_ACCESS_SOCKET_CREATE;
-+		fprintf(stderr,
-+			"Hint: You should update the running kernel "
-+			"to leverage Landlock features "
-+			"provided by ABI version %d (instead of %d).\n",
-+			LANDLOCK_ABI_LAST, abi);
-+		__attribute__((fallthrough));
- 	case LANDLOCK_ABI_LAST:
- 		break;
- 	default:
-@@ -338,18 +451,23 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 	access_fs_rw &= ruleset_attr.handled_access_fs;
- 
- 	/* Removes bind access attribute if not supported by a user. */
--	env_port_name = getenv(ENV_TCP_BIND_NAME);
--	if (!env_port_name) {
-+	env_optional_name = getenv(ENV_TCP_BIND_NAME);
-+	if (!env_optional_name) {
- 		ruleset_attr.handled_access_net &=
- 			~LANDLOCK_ACCESS_NET_BIND_TCP;
- 	}
- 	/* Removes connect access attribute if not supported by a user. */
--	env_port_name = getenv(ENV_TCP_CONNECT_NAME);
--	if (!env_port_name) {
-+	env_optional_name = getenv(ENV_TCP_CONNECT_NAME);
-+	if (!env_optional_name) {
- 		ruleset_attr.handled_access_net &=
- 			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
- 	}
--
-+	/* Removes socket create access attribute if not supported by a user. */
-+	env_optional_name = getenv(ENV_SOCKET_CREATE_NAME);
-+	if (!env_optional_name) {
-+		ruleset_attr.handled_access_socket &=
-+			~LANDLOCK_ACCESS_SOCKET_CREATE;
-+	}
- 	ruleset_fd =
- 		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
- 	if (ruleset_fd < 0) {
-@@ -373,6 +491,11 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 		goto err_close_ruleset;
- 	}
- 
-+	if (populate_ruleset_socket(ENV_SOCKET_CREATE_NAME, ruleset_fd,
-+				 LANDLOCK_ACCESS_SOCKET_CREATE)) {
-+		goto err_close_ruleset;
++	chan->rx_staged = 0;
++
++	if (err < 0 && chan->rx_avail != -1) {
++		BT_ERR("Queueing received LE L2CAP data failed");
++		l2cap_send_disconn_req(chan, ECONNRESET);
++		return err;
 +	}
 +
- 	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)) {
- 		perror("Failed to restrict privileges");
- 		goto err_close_ruleset;
+ 	/* Update credits whenever an SDU is received */
+ 	l2cap_chan_le_send_credits(chan);
+ 
+@@ -6571,6 +6608,7 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ 		return -ENOBUFS;
+ 	}
+ 
++	chan->rx_staged += skb->len;
+ 	chan->rx_credits--;
+ 	BT_DBG("rx_credits %u -> %u", chan->rx_credits + 1, chan->rx_credits);
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 7846a068bf60..46603605cb69 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1157,6 +1157,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
++	int avail;
+ 	int err;
+ 
+ 	if (unlikely(flags & MSG_ERRQUEUE))
+@@ -1192,28 +1193,34 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	else
+ 		err = bt_sock_recvmsg(sock, msg, len, flags);
+ 
+-	if (pi->chan->mode != L2CAP_MODE_ERTM)
++	if (pi->chan->mode != L2CAP_MODE_ERTM &&
++	    pi->chan->mode != L2CAP_MODE_LE_FLOWCTL &&
++	    pi->chan->mode != L2CAP_MODE_EXT_FLOWCTL)
+ 		return err;
+ 
+-	/* Attempt to put pending rx data in the socket buffer */
+-
+ 	lock_sock(sk);
+ 
+-	if (!test_bit(CONN_LOCAL_BUSY, &pi->chan->conn_state))
+-		goto done;
++	avail = max(0, sk->sk_rcvbuf - atomic_read(&sk->sk_rmem_alloc));
++	l2cap_chan_rx_avail(pi->chan, avail);
+ 
+-	if (pi->rx_busy_skb) {
+-		if (!__sock_queue_rcv_skb(sk, pi->rx_busy_skb))
+-			pi->rx_busy_skb = NULL;
+-		else
++	/* Attempt to put pending rx data in the socket buffer */
++	while (!list_empty(&pi->rx_busy)) {
++		struct l2cap_rx_busy *rx_busy =
++			list_first_entry(&pi->rx_busy,
++					 struct l2cap_rx_busy,
++					 list);
++		if (__sock_queue_rcv_skb(sk, rx_busy->skb) < 0)
+ 			goto done;
++		list_del(&rx_busy->list);
++		kfree(rx_busy);
+ 	}
+ 
+ 	/* Restore data flow when half of the receive buffer is
+ 	 * available.  This avoids resending large numbers of
+ 	 * frames.
+ 	 */
+-	if (atomic_read(&sk->sk_rmem_alloc) <= sk->sk_rcvbuf >> 1)
++	if (test_bit(CONN_LOCAL_BUSY, &pi->chan->conn_state) &&
++	    atomic_read(&sk->sk_rmem_alloc) <= sk->sk_rcvbuf >> 1)
+ 		l2cap_chan_busy(pi->chan, 0);
+ 
+ done:
+@@ -1474,17 +1481,21 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+ 	struct sock *sk = chan->data;
++	struct l2cap_pinfo *pi = l2cap_pi(sk);
++	int avail;
+ 	int err;
+ 
+ 	lock_sock(sk);
+ 
+-	if (l2cap_pi(sk)->rx_busy_skb) {
++	if (chan->mode == L2CAP_MODE_ERTM && !list_empty(&pi->rx_busy)) {
+ 		err = -ENOMEM;
+ 		goto done;
+ 	}
+ 
+ 	if (chan->mode != L2CAP_MODE_ERTM &&
+-	    chan->mode != L2CAP_MODE_STREAMING) {
++	    chan->mode != L2CAP_MODE_STREAMING &&
++	    chan->mode != L2CAP_MODE_LE_FLOWCTL &&
++	    chan->mode != L2CAP_MODE_EXT_FLOWCTL) {
+ 		/* Even if no filter is attached, we could potentially
+ 		 * get errors from security modules, etc.
+ 		 */
+@@ -1495,7 +1506,10 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 
+ 	err = __sock_queue_rcv_skb(sk, skb);
+ 
+-	/* For ERTM, handle one skb that doesn't fit into the recv
++	avail = max(0, sk->sk_rcvbuf - atomic_read(&sk->sk_rmem_alloc));
++	l2cap_chan_rx_avail(chan, avail);
++
++	/* For ERTM and LE, handle a skb that doesn't fit into the recv
+ 	 * buffer.  This is important to do because the data frames
+ 	 * have already been acked, so the skb cannot be discarded.
+ 	 *
+@@ -1504,8 +1518,18 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	 * acked and reassembled until there is buffer space
+ 	 * available.
+ 	 */
+-	if (err < 0 && chan->mode == L2CAP_MODE_ERTM) {
+-		l2cap_pi(sk)->rx_busy_skb = skb;
++	if (err < 0 &&
++	    (chan->mode == L2CAP_MODE_ERTM ||
++	     chan->mode == L2CAP_MODE_LE_FLOWCTL ||
++	     chan->mode == L2CAP_MODE_EXT_FLOWCTL)) {
++		struct l2cap_rx_busy *rx_busy =
++			kmalloc(sizeof(*rx_busy), GFP_KERNEL);
++		if (!rx_busy) {
++			err = -ENOMEM;
++			goto done;
++		}
++		rx_busy->skb = skb;
++		list_add_tail(&rx_busy->list, &pi->rx_busy);
+ 		l2cap_chan_busy(chan, 1);
+ 		err = 0;
+ 	}
+@@ -1731,6 +1755,8 @@ static const struct l2cap_ops l2cap_chan_ops = {
+ 
+ static void l2cap_sock_destruct(struct sock *sk)
+ {
++	struct l2cap_rx_busy *rx_busy, *next;
++
+ 	BT_DBG("sk %p", sk);
+ 
+ 	if (l2cap_pi(sk)->chan) {
+@@ -1738,9 +1764,10 @@ static void l2cap_sock_destruct(struct sock *sk)
+ 		l2cap_chan_put(l2cap_pi(sk)->chan);
+ 	}
+ 
+-	if (l2cap_pi(sk)->rx_busy_skb) {
+-		kfree_skb(l2cap_pi(sk)->rx_busy_skb);
+-		l2cap_pi(sk)->rx_busy_skb = NULL;
++	list_for_each_entry_safe(rx_busy, next, &l2cap_pi(sk)->rx_busy, list) {
++		kfree_skb(rx_busy->skb);
++		list_del(&rx_busy->list);
++		kfree(rx_busy);
+ 	}
+ 
+ 	skb_queue_purge(&sk->sk_receive_queue);
+@@ -1845,6 +1872,8 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 	sk->sk_destruct = l2cap_sock_destruct;
+ 	sk->sk_sndtimeo = L2CAP_CONN_TIMEOUT;
+ 
++	INIT_LIST_HEAD(&l2cap_pi(sk)->rx_busy);
++
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+ 		sk_free(sk);
+@@ -1853,6 +1882,8 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 
+ 	l2cap_chan_hold(chan);
+ 
++	l2cap_chan_rx_avail(chan, sk->sk_rcvbuf);
++
+ 	l2cap_pi(sk)->chan = chan;
+ 
+ 	return sk;
 -- 
 2.34.1
 
