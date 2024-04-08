@@ -1,152 +1,161 @@
-Return-Path: <netdev+bounces-85864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E5A89C9FB
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 18:43:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FAA089CA05
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 18:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 576DC1C23D85
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 16:43:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D87EB22837
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 16:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF5E1428E3;
-	Mon,  8 Apr 2024 16:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 479751428E8;
+	Mon,  8 Apr 2024 16:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJ6UPBrY"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uNCbksfu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2122.outbound.protection.outlook.com [40.107.93.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41E414263A;
-	Mon,  8 Apr 2024 16:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712594627; cv=none; b=NUaQ4fqPeql954nTIojncKPwH+x2soQJXFXPZj3OBlhD0ZbzmYo8R3EG9fVNoSqlGVNcu/z7nsy6mbNcxHCC2FKg2oaqGkIctZVvYmQumvW5qupF/tiz2jN8EyPx8/MvQs1hM2qSC+5Fab6zfC1ttlnO9/CaXVB/Ta+7plTaqD0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712594627; c=relaxed/simple;
-	bh=GxSn5Dg+E+RmqcRAj1lrGgjD7usuAbhQ8PYEXM7ou9g=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=lxUWH+kDo4NbC+1/q+sFBUMep3EH6xxdhq9dKKaaGbEKXCQHmntxPOaU0mgkwZY87HYETmG56bLEAyZpRuMTPMwP+XDXKPKFKZ+bBkHzdxaG7ivQobWfZuZBO+6StqRKNwD+aOTasPa0ynhnC7c8VzzjxHyPz/CpMuiQtI98mZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJ6UPBrY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 917E9C433F1;
-	Mon,  8 Apr 2024 16:43:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712594626;
-	bh=GxSn5Dg+E+RmqcRAj1lrGgjD7usuAbhQ8PYEXM7ou9g=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=uJ6UPBrYDRX64lzJjnzYDk2dG7dGz66e0Kjkj3DhPYIhov5Cbu3a8bv5NOlBOxV0i
-	 ZbxNxh/2qy/gKrHkqfwCDSpWbeyPuF4Dvg2qmFObpMbgx725MaqI+boXwK492Vc/Yu
-	 Ei4orRw1hSzNT3BMXch7zz9+y8lhsmG+tnA3tOt/+SWnXalqgYR2jvc5SyrOuyU4Q+
-	 jJMRerXFKzKnA18oD/mnvjCJkgGzc0dFkIib/OsvqYtX0sBNcIU+XRBk++Be+8jKO9
-	 T71DVZH25KdQHwLPglR99BeQYDP4BlcHHOBVIcQ/uhYo0Pdrc2BI5Gf3Atw9iwFEcA
-	 yNcPxsfHyeF+A==
-From: Kalle Valo <kvalo@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org,  ath11k@lists.infradead.org,
-  ath10k@lists.infradead.org,  linux-wireless@vger.kernel.org,
-  imitsyanko@quantenna.com,  geomatsi@gmail.com,
-  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org
-Subject: Re: [PATCH 0/3] wifi: Un-embed ath10k and ath11k dummy netdev
-References: <20240405122123.4156104-1-leitao@debian.org>
-	<87y19r264m.fsf@kernel.org> <ZhPyRHHlVot+a8Xq@gmail.com>
-Date: Mon, 08 Apr 2024 19:43:42 +0300
-In-Reply-To: <ZhPyRHHlVot+a8Xq@gmail.com> (Breno Leitao's message of "Mon, 8
-	Apr 2024 06:33:56 -0700")
-Message-ID: <87pluz24ap.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2B11E4AF;
+	Mon,  8 Apr 2024 16:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.122
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712594757; cv=fail; b=nyf6TfES8Eom1edZpkksc0f9z627Da33On8vl9cp5FGZDbz1fj8CC6mr7x6pKd2LMUk69PKp3Tq6vMhMFQrsutgraiy4TId2gQ9CWtmVPYI+YJ/n9YwTLbihdu9CziRF1+ygrTDcoz2DT8g5uUKhu8fQOpk0sIv/GDhBE5yJ3ho=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712594757; c=relaxed/simple;
+	bh=RZ/ueJxTkVDTmh8NmDquDPCiiNqP/H14fl3M9L7DoUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=BK0+aMtog+0dlJcaGzx1xy5KVIYnn+0y2HNqqJh4azjEcsp69aQO5naw2Sn1tsRvnQtS/js6CVu6RdDREkcK5mI7kPZKA9ZjwoyCcft85IGr5a4impBJtca7T0V3Rx6N4l/hdMk1nXt5NY4Q06sGH2t1s6QVOEFS4NsSEIbGSYo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uNCbksfu; arc=fail smtp.client-ip=40.107.93.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UrmsQodySDf0++3xR0tNAlDGKBGDYhDIONRxCp+WG5ESRR+i14FTgYxw8hYsC1tz2RvlxQAWUES5WzUdTknZyRUe5UIjMi4zO4cw5rMMH8CWJuu57iHzqATt8XJ6IqkDVLTRVEEZ9A5X3p2ffx41M7GSaci1mgJR5tAaAg2t1t0TYuWl5HxV+hQ1a1C+qDJnOKp9Ybw5dVi7jd1ZTESaAzAdYk6lOaty3+ZoJFzDOJ8yhFXG0bSXxDsaxDyi8LxbtRAX3cxjRI12TE8PYZLtEGXdASjlYvlwwvXxAxSq5wOHX/wecW54LC0jh054ACDi/FMgrrDrGLoBa7Vp2dOwBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RZ/ueJxTkVDTmh8NmDquDPCiiNqP/H14fl3M9L7DoUA=;
+ b=jc4lrJtbV5p+SjojS78evXhZGWfttqCvqsX3yL+iSXyDEtZHwC9KaWudBSMFmd+wGK/ati84Q9ftNpNCKAnXIpLTngYdMfSzbL7aLDrIFUSl65Ub8Ju8S5GVTvWc7K1++cuvDlWXL3Njo1h/us+tACY+/XLPOVaQa+qzdPMiWalekRUTPhBw7rOAJIG9m+OP5rWdDrKXsfi0ouBXNfomxRvyO+MjhPLLHtBB6qnM+PGTvdNG1ka9vLvtLsgM30Hv9CHoGlfa201Se4QjhsP6mdz0aR4J0H0k1AMCDIqAmJjS3nxN7NeVfBzNW6hsLicxndwhaqR59mcLgLcA2Vyyiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RZ/ueJxTkVDTmh8NmDquDPCiiNqP/H14fl3M9L7DoUA=;
+ b=uNCbksfuzaCgFy0x1ZhYS6fYUYcFdBW56EOhChb1apQ1KRQVCF2OloeU86R6461dD1WujNml/z394KDVbcGhC78q8p9qeYB7vfPytYOnLUlq67etWlTNYikDPEJF6cf1MtJAokzal4qgXyhGNhvD3QdZzuoF4EabougMaJEoQ3uZ2hNJHQo0fCtQRvUZIgCoh1P3Wd3i7ra7ymWXn9RjLuTDXDYMbhKwRcJOIS9v4d1PM1vtFSUmGXv47YlARqfL1bBq8DbNU/ksgmSKuZ7tRxhWtXWjOb4AET3HBGb3wn2iMAbv03LBXT49Sw5r8WN/DDn8y9MCWWu4iWNkhR37og==
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by CH3PR12MB8185.namprd12.prod.outlook.com (2603:10b6:610:123::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 8 Apr
+ 2024 16:45:52 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7409.053; Mon, 8 Apr 2024
+ 16:45:52 +0000
+Date: Mon, 8 Apr 2024 13:45:51 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, David Ahern <dsahern@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	linux-kernel@vger.kernel.org,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240408164551.GQ5383@nvidia.com>
+References: <0ea32dd4-f408-5870-77eb-f18899f1ad44@gmail.com>
+ <20240402184055.GP946323@nvidia.com>
+ <83025203-fefb-d828-724d-259e5df7c1b2@gmail.com>
+ <20240404183305.GM1723999@nvidia.com>
+ <20240404125339.14695f27@kernel.org>
+ <20240404204454.GO1723999@nvidia.com>
+ <20240404143407.64b44a88@kernel.org>
+ <20240405111306.GB5383@nvidia.com>
+ <20240405083827.78cc1b20@kernel.org>
+ <20240405104829.2ba1a3b1@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240405104829.2ba1a3b1@kernel.org>
+X-ClientProxiedBy: BL1PR13CA0420.namprd13.prod.outlook.com
+ (2603:10b6:208:2c2::35) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|CH3PR12MB8185:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TGyNIzmbHR2cmQnZ0uJP7k3ynSWTTEC+rFSPA/g79h583QJyGlrpIobYpTXNayfdQCRlkimL8NuoBGPCnz5B6P9i8cRwXUEBycLHU8NvBpGS8ccusGgvRVesrPanVbQwpB5XdD7KTJhIBJlSbxD5N/KSexKH8mP7FmMDrvrTe80nXqTlYgLIkeSABnwIcdhmgO9PzMbXA2cYO83mh0l7K3LbVoP4GShWz1Rsr1rFlz75CnVtBS4wu1b2V88RQEFkTfqdQfn6DcO4JqOXH2qFvXrFCrc5d+tUayFF+GjbsaDw9nhY0nei8YqbAEUD9Xe7jkNJ5C4f8+rswW+lZC05PzWqFtrQ0PlK/p8JyrO+HIgYrF77AZDaBTh+QI3iFN2mLTUB2AMhv31K5SeEla/lxI6WQ38Ag9erAWi86Yj9FwfzzO8RxFLENudQa9dV06qlhHG03hbD0slAFpE45lS9hh6LX2TViF3nAI04X0iW1XEaGMGzTy7oIoMfOJ0a8lo7JqqfDBDy3goNZ4Wvf7j33B2EboXnJP8X7xbJ4zPUAY3jGSDrRGGWpRk0UMKkrBu7cndmuBB96fSrU+Q01DjKWY0vFJm/gMBs0yKzRvVlVALYUib5FNwGsK56SNYj96kloI7nKR1cxk/OPlV9nqF4rd36FltjFSB/BCKnIjYLvbU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(7416005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Ew/emZbaTE95nRUzilBFhj9swuj6FuuW6zXFTyxnQemcx8EgQ9umNYgzteuV?=
+ =?us-ascii?Q?d65MX5p2T9t8LOUizIfn8I9Pb9CyK3sxxdrbnWbatu0KQ+Dy3KjVbnW5lBwk?=
+ =?us-ascii?Q?uMy5MIG0wv1wMjDWuvhQoiKPSjkSSzZqw/+8+Cn0+qI9aT1PxdEVh3nyZLWM?=
+ =?us-ascii?Q?3paoUwaP5gspTYBc/WK/p4VDUuyq/ZSilxFU3fQRTFL60I52uYh/y7B+NIwJ?=
+ =?us-ascii?Q?hsfOKmGhAaBMfv25nif4yBAx8PdXPxTVs5NZ0piQrg9fddP2833bCzLgI9R8?=
+ =?us-ascii?Q?+nxIdxqbI4fIJbsFDF/e7nDvl3LIPDyDu8fHrmE2jz10nBNGCRHdwb1vJYiy?=
+ =?us-ascii?Q?LhB6QGgcW4gfHbQyA5bZNV/uLtOd9iY+5mx+giziVDWCqph6ATWo02SQF+4j?=
+ =?us-ascii?Q?BeIHbtKcLUgApkS+7/tGMpms9zyeemLpxqBM768btd5vAfrpbchC/sn9YTXg?=
+ =?us-ascii?Q?1KbCVuhMLgQcV1R5+kbjfcNzMSnKT1ocpIUYaO7BCNPaW4NOCIrJV6m9yZwD?=
+ =?us-ascii?Q?qM9S75NmXo+C3BOksJlVWSy0X4NPPkVO5+TuXjT5y8P5/oucy/7k4pLUNHEA?=
+ =?us-ascii?Q?z04rQ4IpNioqjArh+Qs7hf8j3E4HY7xXYasNaZqOHYQLsgyUz/RyZjI+kN6R?=
+ =?us-ascii?Q?pEZdnwaXCEWU24kUWgrQZV1Do9u6xtimBaFHZSSWZErGA5FugPI+Oz8n/D0N?=
+ =?us-ascii?Q?acKMlmbsRRrda06uxTV00H9f2mDBs9RHSWEL3UJGk/G7bBp2n58EWaWo2m13?=
+ =?us-ascii?Q?TWwz9h0NEN3WiYbOPgGCtnKHFiWl0+rc869KtKCJ9EDN/OsO5oRynr8y7M6N?=
+ =?us-ascii?Q?MIcpLSTeWmXNQJ5j7B2/KFebgikI4TstaqZze3iXdgwnAGToDgcWMd+M37PD?=
+ =?us-ascii?Q?z90d1/GyWWKitj4Wwd3+RD9IQO6JxEHzEb5aMUnmYn/PJo8kVIXRvhE4dpbc?=
+ =?us-ascii?Q?ZxjLVykzVoA231/u5I7bGHJoDQYstNes0RPosnKH4VU5eMXLaarVNq7kL/ej?=
+ =?us-ascii?Q?W3l+azWnhuzJ/AR41W5m4oayqtuIN7d8duYJijZHydcBxU6WV865RLOxuBeW?=
+ =?us-ascii?Q?fnlsuhv8dekXM+uDYCn1+O4WhpCvA5Al5zciN1gITv0n/62DKpB2FpZZeGlK?=
+ =?us-ascii?Q?HZKGJQD+3iIPDObKIk+9OEQGNtj9Y86DnQSn0V9oQpLxQMRHwACbmEN8n+85?=
+ =?us-ascii?Q?AQf+Zp4wqAx19WkkNXVMPFRCWVFIOblNiAUhVELV5pMFeGpHhyy7tEugRkO7?=
+ =?us-ascii?Q?gHyCvAr84Ir3qIZxM2xV665GbifAneUgF1u4pHFY4zDBFjT8wKydp6J4VgtP?=
+ =?us-ascii?Q?jcMWoVSuoXvfXT9SbWrbusKS+a3XKrEiATFIShTvR1m31xvqbw0+V79Z1OE7?=
+ =?us-ascii?Q?NXE90ioDcN9pSEK/QroY4n7cZtFc9VAE2Bzk7Rvl7FSNxVLCdzSMxYC8PIss?=
+ =?us-ascii?Q?tIk+HWIGY5alHE6K8qfywlLA3GoZhJmu0fZ9e6wY5tZrgZUPKjasmznB1Vwg?=
+ =?us-ascii?Q?j5prnj8wjrOrHIPiGsNNVcFbuO8TDH0bli4y/w7rxsA0Fg0kNxI0o4byPznj?=
+ =?us-ascii?Q?lZXZsauaC8METygsMGUQyUHmBEOyQiD7n0d9l4WT?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f69ea96-c0bc-4bca-c8f2-08dc57eb5a6d
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2024 16:45:52.6951
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 77mSj8/GO/epp6LdRWi1lLSeLZM3UffmerkaUDllLp2C5TBwInrwcGUxLQhXJOqw
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8185
 
-Breno Leitao <leitao@debian.org> writes:
+On Fri, Apr 05, 2024 at 10:48:29AM -0700, Jakub Kicinski wrote:
 
-> Hello Kalle,
->
-> On Fri, Apr 05, 2024 at 06:15:05PM +0300, Kalle Valo wrote:
->> Breno Leitao <leitao@debian.org> writes:
->> 
->> > struct net_device shouldn't be embedded into any structure, instead,
->> > the owner should use the private space to embed their state into
->> > net_device.
->> >
->> > This patch set fixes the problem above for ath10k and ath11k. This also
->> > fixes the conversion of qtnfmac driver to the new helper.
->> >
->> > This patch set depends on a series that is still under review:
->> > https://lore.kernel.org/all/20240404114854.2498663-1-leitao@debian.org/#t
->> >
->> > If it helps, I've pushed the tree to
->> > https://github.com/leitao/linux/tree/wireless-dummy
->> >
->> > PS: Due to lack of hardware, unfortunately all these patches are
->> > compiled tested only.
->> >
->> > Breno Leitao (3):
->> >   wifi: qtnfmac: Use netdev dummy allocator helper
->> >   wifi: ath10k: allocate dummy net_device dynamically
->> >   wifi: ath11k: allocate dummy net_device dynamically
->> 
->> Thanks for setting up the branch, that makes the testing very easy. I
->> now tested the branch using the commit below with ath11k WCN6855 hw2.0
->> on an x86 box:
->> 
->> 5be9a125d8e7 wifi: ath11k: allocate dummy net_device dynamically
->> 
->> But unfortunately it crashes, the stack trace below. I can easily test
->> your branches, just let me know what to test. A direct 'git pull'
->> command is the best.
->
-> Thanks for the test.
->
-> Reading the issue, I am afraid that freeing netdev explicitly
-> (free_netdev()) might not be the best approach at the exit path.
->
-> I would like to try to leverage the ->needs_free_netdev netdev
-> mechanism to do the clean-up, if that makes sense. I've updated the
-> ath11k patch, and I am curious if that is what we want.
->
-> Would you mind testing a net patch I have, please?
->
->   https://github.com/leitao/linux/tree/wireless-dummy_v2
+> I wish I could support that out by referring to the OCP NIC SW spec,
+> by it's stuck in "legal review" of one of the vendors for months.
+> I'd like to ask that vendor not to pull up the ladder and let everyone
+> else enjoy access to NIC requirements and recommendations from Meta
+> and Google.
 
-I tested this again with my WCN6855 hw2.0 x86 test box on this commit:
+Heh. Building standards is hard. It is a delicate game of politics to
+convince everyone that they are getting some kind of win-win-win,
+especially when IP and competitive concerns becomes involved. Many
+attempts fail while still immature, it is why there is so much value
+in the successful ones.
 
-a87674ac820e wifi: ath11k: allocate dummy net_device dynamically
-
-It passes my tests and doesn't crash, but I see this kmemleak warning a
-lot:
-
-unreferenced object 0xffff888127109400 (size 128):
-  comm "insmod", pid 2813, jiffies 4294926528
-  hex dump (first 32 bytes):
-    d0 93 d5 0a 81 88 ff ff d0 93 d5 0a 81 88 ff ff  ................
-    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 870e4f12):
-    [<ffffffff99bcd375>] kmemleak_alloc+0x45/0x80
-    [<ffffffff975707a8>] kmalloc_trace+0x278/0x2c0
-    [<ffffffff992904c5>] __hw_addr_create+0x55/0x260
-    [<ffffffff992909cb>] __hw_addr_add_ex+0x2fb/0x6d0
-    [<ffffffff99294004>] dev_addr_init+0x144/0x230
-    [<ffffffff992629ee>] alloc_netdev_mqs+0x12e/0xfe0
-    [<ffffffff992638c5>] alloc_netdev_dummy+0x25/0x30
-    [<ffffffffc0b6b0cd>] ath11k_pcic_ext_irq_config+0x1ad/0xc10 [ath11k]
-    [<ffffffffc0b6c431>] ath11k_pcic_config_irq+0x2f1/0x4b0 [ath11k]
-    [<ffffffffc0cb8314>] ath11k_pci_probe+0x874/0x1210 [ath11k_pci]
-    [<ffffffff97febf06>] local_pci_probe+0xd6/0x180
-    [<ffffffff97feefaa>] pci_call_probe+0x15a/0x400
-    [<ffffffff97ff03d6>] pci_device_probe+0xa6/0x100
-    [<ffffffff98abe315>] really_probe+0x1d5/0x920
-    [<ffffffff98abed48>] __driver_probe_device+0x2e8/0x3f0
-    [<ffffffff98abee9a>] driver_probe_device+0x4a/0x140
-
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Jason
 
