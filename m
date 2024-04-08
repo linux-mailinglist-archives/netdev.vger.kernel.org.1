@@ -1,178 +1,232 @@
-Return-Path: <netdev+bounces-85741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2580489BF73
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 14:51:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C39B889BF85
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 14:54:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BDE5B23152
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:51:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C3F31F22CA3
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C7A7442A;
-	Mon,  8 Apr 2024 12:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225257350E;
+	Mon,  8 Apr 2024 12:54:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W15dvdJ9"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cOBge/Yc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2083.outbound.protection.outlook.com [40.107.223.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104796FE1A
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 12:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712580654; cv=none; b=JWSIOUtFYp+d+GgfY2cqEHuO+gHFYHy4f3zGGMazFr2ptCiA7GTeKWrfVbeReIS94S/F7/7XCyCKBKLBdmlckaFTZYn6uKCGnWb0INcvD4OuRYp/+izzS89Pyww3gWAAF4ojPyJMPFR9chnzOt0bF/aO2QDrAMXN08WwJZ+NNPc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712580654; c=relaxed/simple;
-	bh=t6rY2U7J7pGdzJQQnj7Amc0EfelzVuwnd+M+I4FgGm8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NmU0cLfjm1IjFjvez52HuDTAcGqpHmfFyac62QacfW7LMxwPjMi0B0VJEh0kRQ6MUcAb1s7ulR+oKVVVv2KKu93MfGsgAj+4GDTZhoHn/qFgYh1XnxySgXg5gVXsR6OMe/xjFsefO5gmMrUchlUuc9M+BVT1smNw4B6NXNvcdCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W15dvdJ9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712580652;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fgyAj+d0mXsaKlJNf1FRqd+kTl9TVEHoCjOdqUp78UU=;
-	b=W15dvdJ9TA3730gS/AMNRxIc8wq3wYXgX4Su1hXKIoXc40lMJaUTf70kvhajY2JwAuEPVf
-	by92uLFro3casX3yXBcippOl10AnmSttki/+Ib9XiSSFdwFKg/l/NDh3WQ0budI+9bkk5f
-	XBcO8Ah/unt7aEw9Da9LZZriLQ/khuo=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-511-mF7njwxwPFO5ikwbiZKWiA-1; Mon, 08 Apr 2024 08:50:49 -0400
-X-MC-Unique: mF7njwxwPFO5ikwbiZKWiA-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d871310b3aso23076001fa.0
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 05:50:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712580647; x=1713185447;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fgyAj+d0mXsaKlJNf1FRqd+kTl9TVEHoCjOdqUp78UU=;
-        b=hk39PLLDIvf/BvMQ2WsTMMr2aD65GmY6dG2HOGa87QOojTMsA51Z7MHsXoeIhqTEtd
-         aSH0hs47y048cSVqVeEl216ShHB8d1MSQLoHJRFO43dzR+koOeKvIsYPZlA8MvlD0b8e
-         +iXc1kzDNNPnw0bLI1PjlMt2+qGnRhWxEqikJDYMtWfPAphYuAhCc/NjeAaIBp6FAkV9
-         4h9Ejb3YvhNeb/yp0gRJmH+Vx8/p3ZtZoBz4P6w01UU2LelZuc9qTleIJsk8Ct8R2KSV
-         nwxCSOV4LOOBVCXiPPw1VicU9h9WpnYPXCc4D+n4O5kRgCmRTfZBZWYifalL/E6n1BG1
-         AcCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXY6AnX6arnIf4v9PUyNp066HSwFFAwc+t8odVDcbIVSFGDDiaKa9RLnu8eUQlCEP66JqGqo/DZrGZUCbm/lX4ZLuTlNeY+
-X-Gm-Message-State: AOJu0YwswEgynnp+oCI7SoKRZ7srBxHfKKkXoBVCM3OU/lNa+z4Jfw0A
-	MBAC1UuTlvHyeZ5ny1nFGMYxFST+P/UPeDNDu4k+Ke3Ke09cIDYt/bZIgHZeI9Qe6mT4iMJqR4Y
-	ol2SWpknQHu01McB2vcx+7dApjJaOjeuUm7giuR/OpMcx00JBjJYkHQ==
-X-Received: by 2002:a2e:b0ca:0:b0:2d8:6fc4:d0b5 with SMTP id g10-20020a2eb0ca000000b002d86fc4d0b5mr6644112ljl.8.1712580647635;
-        Mon, 08 Apr 2024 05:50:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHlvCW0RSMUg3H9tBOc1SwabjdiTPzS2Fm8vr4WbbbbyDGcjVCN/zOPqhNUznAU5UGSgB/nQg==
-X-Received: by 2002:a2e:b0ca:0:b0:2d8:6fc4:d0b5 with SMTP id g10-20020a2eb0ca000000b002d86fc4d0b5mr6644089ljl.8.1712580647022;
-        Mon, 08 Apr 2024 05:50:47 -0700 (PDT)
-Received: from redhat.com ([2.52.152.188])
-        by smtp.gmail.com with ESMTPSA id oz31-20020a170906cd1f00b00a4e8e080869sm4432937ejb.176.2024.04.08.05.50.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 05:50:46 -0700 (PDT)
-Date: Mon, 8 Apr 2024 08:50:43 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] Documentation: Add reconnect process for VDUSE
-Message-ID: <20240408085008-mutt-send-email-mst@kernel.org>
-References: <20240404055635.316259-1-lulu@redhat.com>
- <20240408033804-mutt-send-email-mst@kernel.org>
- <CACLfguUL=Kteorvyn=wRUWFJFvhvgRyp+V7GNBp2R33hK1vnSw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0266F08E;
+	Mon,  8 Apr 2024 12:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712580875; cv=fail; b=fkb0qdnT7KRIgf4kbUt17BC858oVFBD3rziHywVwLxgQ30RYkqgbz8NiShN7eHaQ3S4qD5QRT7XwQ5fNVaoBMD1ofafZCifsgrfgvRsDDUFY49Kj+tfowX8Xs78hSQQJHEQv+Ya+lGIIX84lDJ+BUNN1pwlEJllRp6VfPXfnemc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712580875; c=relaxed/simple;
+	bh=GzCHQb+b5mjqjQX85hu+ZTeXNPz7/e9N6h8o/vKorxg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mMkWExw5DJmugALKTjfM5zKQMg49j7hCDpg9/qmokoEb8YJAcWRzZCadQPBjX1NdZiuQJFi8udQLekZzp6e/hkAjRPZXkOo/3Hg0INL8GbKpnQsTyNBDELUkaWuAj7pTk45CsC1nwg2MWFPMVGmXUO5zEL1sZwRyADdVBSWrLBo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cOBge/Yc; arc=fail smtp.client-ip=40.107.223.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VGxF4rf6toKkc4ymR2ZPEhd7lHG95JLm+Dt/dcZWAPriAp+X0z2jHnr/I4XhjLsZqjhWjccRlbrGzo2H8AR4jzOwWMVyfmTXuZVWJUWfPeK9qdb5PISHp3SQOzrBosy8cSWcWo3RVDctX2QZ/srrR0jcP6cJSxk0+BBSzMN2pQTymS3IrQwezcaNIcn0hIDgM+1G6j9NtINcutg5s8fuCBAglTQumZsGNCKvLZK6UMAfy7zZjblB0fBkYq70RChiKRWEAYEptJrPTmNPCt+cT2qer0SOIs91X0PSIL7THcwuUvan/REKrMHSuZzekL6Bok1bMOmXlDOEjObv2pjwXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vetlP21hQJ95M8t3oHmkorJC8ZQy2jcFN8CRJiGwgN4=;
+ b=ej1WImZ/g/RoRSkGVp/9RETgDJbZUVCrwVxDlRSaYGFPKo5rKXNb1G/Ytsxb+aUCbrVEq+kAjWQbUC2WeudImZfOwXKZGgTHZI2uUzkRIq1U0+wIuTT1B08c8GYo2oV1bbMRmVdSdBoJGZNLH+0LVGQVCEa1ahJREiG97S/HcOlx1yj6C9ZqFwZcBrCorlit0rsQcg4wMvC8y0SuwjUoAIs4pbl3WDF3XihtxlzXmsGmKMPM5uW491m5I7CSlaVDG3Io/ul50qnejo/hnBx0Q7gsfy6pRBME0nD+F/ZsHNOUKkMXUynUDiByfjoz0vEogEUcuWjQT21l8DjM75h7Fg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vetlP21hQJ95M8t3oHmkorJC8ZQy2jcFN8CRJiGwgN4=;
+ b=cOBge/Yclf10Jy7YAh2sxlghAd3aAw7mKzDTPY4k56UzHl3V2ieSvMT4ttsIY1ff1DYR6EOud0FVR46e1yvCPLNPse2kFngUYfjcYZqCrZdYvGSWTEcp3illX5gTMu/i6MrQkFdPE/9lbOjV+sxICF6a0hbMDUtTuOzt7vA7GQaADqeI7LXQ3kIqXWv6OoT7S2tig+x9oC824LdbA9GtERwRV2sfurcF6urEulla01758/oVkS0y6dclImeCbcoviJuQDGzrBIG95ZZ8C5HBgrOW/AiOc+cBMeD2qcMA5NITdOrqmUVR9IXACp8VMZux6Ios/pO2JCSU+sD48Tu38w==
+Received: from BN9PR03CA0797.namprd03.prod.outlook.com (2603:10b6:408:13f::22)
+ by CH0PR12MB8579.namprd12.prod.outlook.com (2603:10b6:610:182::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 8 Apr
+ 2024 12:54:22 +0000
+Received: from BN1PEPF00004689.namprd05.prod.outlook.com
+ (2603:10b6:408:13f:cafe::b2) by BN9PR03CA0797.outlook.office365.com
+ (2603:10b6:408:13f::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.30 via Frontend
+ Transport; Mon, 8 Apr 2024 12:54:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN1PEPF00004689.mail.protection.outlook.com (10.167.243.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Mon, 8 Apr 2024 12:54:22 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 8 Apr 2024
+ 05:54:02 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Mon, 8 Apr 2024 05:53:57 -0700
+From: Danielle Ratson <danieller@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
+	<sdf@google.com>, <kory.maincent@bootlin.com>,
+	<maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
+	<przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
+	<richardcochran@gmail.com>, <shayagr@amazon.com>, <paul.greenwalt@intel.com>,
+	<jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <mlxsw@nvidia.com>, <petrm@nvidia.com>,
+	<idosch@nvidia.com>, Danielle Ratson <danieller@nvidia.com>
+Subject: [PATCH net-next 00/10] Add ability to flash modules' firmware
+Date: Mon, 8 Apr 2024 15:53:30 +0300
+Message-ID: <20240408125340.2084269-1-danieller@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACLfguUL=Kteorvyn=wRUWFJFvhvgRyp+V7GNBp2R33hK1vnSw@mail.gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004689:EE_|CH0PR12MB8579:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c8b7112-7190-49fa-612e-08dc57cb035b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Y2cX2Q9wRjcNIj86e6549ijVF96MWpc1bzqqaJCBwYdug8ohdrXAmAlqLRWF7t1chXn6DyKIQ8Zx/BnXOZziBYYFO+IKhZfDJZVTpPnrJvHpaLlw/96UW0aVEw94K3YvdNk85hBhP55aMAiOYsJEHI40B793nLqu9JgxEPExwv/WhgTLE+Lbywb2nSmewDeYJ6bZrArAaUnlcIqkes0r2iA2fOZ7xiyCXHif6AnVcR0i1gy5HGRBEuqPf8VGQGDad3+HQL1RvqWL373cJ1AqbManfARtQUE6S5DX+6beU3mYlTvirKY/XY0Nfso8xlSimp+tI8ZVxGDAIeGsX6gpxDmuUSYufobGjqvJXE7qq2EkK1ed8tWHDzH6MH7CcSNE1tH/B3eSz0pcDjlpYu8NNXqPe4diKc8Kj2UAmRRAbknG6ZFtuYfPgPNbeYbdAQwVLLNLMdOIbAhIHtj/RACcFdfOMogQgzbSN0Cxt4b9XToXLR+2d+FVO9dfeArXQbVsWIhL0f+D9yqBM2TuiVh2H7DuICBHhpW3j3Qf16wCXQgJeciImm9E7TqJ2OXvYr3bqQm0kGkL3NLRmJIwrU93yJ2z1oE3eeaJv3q6XSG0fSxCccQitTCjlFriMaBh8sbirfXRSaiTIDSVLnuY+gPSpGHPiV4SBHgPwzZw238vlG9aidqTS3P3iV52Rnnrv0hfc9E/ZFsj6mQAP/zfX4zbckXulrPooKowZKY1IDIRPeNtqlAbw73f4ZVGf9ouIUIJ
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(1800799015)(7416005)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2024 12:54:22.3721
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c8b7112-7190-49fa-612e-08dc57cb035b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004689.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8579
 
-On Mon, Apr 08, 2024 at 08:39:21PM +0800, Cindy Lu wrote:
-> On Mon, Apr 8, 2024 at 3:40 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Thu, Apr 04, 2024 at 01:56:31PM +0800, Cindy Lu wrote:
-> > > Add a document explaining the reconnect process, including what the
-> > > Userspace App needs to do and how it works with the kernel.
-> > >
-> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > > ---
-> > >  Documentation/userspace-api/vduse.rst | 41 +++++++++++++++++++++++++++
-> > >  1 file changed, 41 insertions(+)
-> > >
-> > > diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/userspace-api/vduse.rst
-> > > index bdb880e01132..7faa83462e78 100644
-> > > --- a/Documentation/userspace-api/vduse.rst
-> > > +++ b/Documentation/userspace-api/vduse.rst
-> > > @@ -231,3 +231,44 @@ able to start the dataplane processing as follows:
-> > >     after the used ring is filled.
-> > >
-> > >  For more details on the uAPI, please see include/uapi/linux/vduse.h.
-> > > +
-> > > +HOW VDUSE devices reconnection works
-> > > +------------------------------------
-> > > +1. What is reconnection?
-> > > +
-> > > +   When the userspace application loads, it should establish a connection
-> > > +   to the vduse kernel device. Sometimes,the userspace application exists,
-> > > +   and we want to support its restart and connect to the kernel device again
-> > > +
-> > > +2. How can I support reconnection in a userspace application?
-> > > +
-> > > +2.1 During initialization, the userspace application should first verify the
-> > > +    existence of the device "/dev/vduse/vduse_name".
-> > > +    If it doesn't exist, it means this is the first-time for connection. goto step 2.2
-> > > +    If it exists, it means this is a reconnection, and we should goto step 2.3
-> > > +
-> > > +2.2 Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
-> > > +    /dev/vduse/control.
-> > > +    When ioctl(VDUSE_CREATE_DEV) is called, kernel allocates memory for
-> > > +    the reconnect information. The total memory size is PAGE_SIZE*vq_mumber.
-> >
-> > Confused. Where is that allocation, in code?
-> >
-> > Thanks!
-> >
-> this should allocated in function vduse_create_dev(),
+CMIS compliant modules such as QSFP-DD might be running a firmware that
+can be updated in a vendor-neutral way by exchanging messages between
+the host and the module as described in section 7.2.2 of revision
+4.0 of the CMIS standard.
 
-I mean, it's not allocated there ATM right? This is just doc patch
-to become part of a larger patchset?
+According to the CMIS standard, the firmware update process is done
+using a CDB commands sequence.
 
-> I will rewrite
-> this part  to make it more clearer
-> will send a new version soon
-> Thanks
-> cindy
-> 
-> > > +2.3 Check if the information is suitable for reconnect
-> > > +    If this is reconnection :
-> > > +    Before attempting to reconnect, The userspace application needs to use the
-> > > +    ioctl(VDUSE_DEV_GET_CONFIG, VDUSE_DEV_GET_STATUS, VDUSE_DEV_GET_FEATURES...)
-> > > +    to get the information from kernel.
-> > > +    Please review the information and confirm if it is suitable to reconnect.
-> > > +
-> > > +2.4 Userspace application needs to mmap the memory to userspace
-> > > +    The userspace application requires mapping one page for every vq. These pages
-> > > +    should be used to save vq-related information during system running. Additionally,
-> > > +    the application must define its own structure to store information for reconnection.
-> > > +
-> > > +2.5 Completed the initialization and running the application.
-> > > +    While the application is running, it is important to store relevant information
-> > > +    about reconnections in mapped pages. When calling the ioctl VDUSE_VQ_GET_INFO to
-> > > +    get vq information, it's necessary to check whether it's a reconnection. If it is
-> > > +    a reconnection, the vq-related information must be get from the mapped pages.
-> > > +
-> > > +2.6 When the Userspace application exits, it is necessary to unmap all the
-> > > +    pages for reconnection
-> > > --
-> > > 2.43.0
-> >
+CDB (Command Data Block Message Communication) reads and writes are
+performed on memory map pages 9Fh-AFh according to the CMIS standard,
+section 8.12 of revision 4.0.
+
+Add a pair of new ethtool messages that allow:
+
+* User space to trigger firmware update of transceiver modules
+
+* The kernel to notify user space about the progress of the process
+
+The user interface is designed to be asynchronous in order to avoid RTNL
+being held for too long and to allow several modules to be updated
+simultaneously. The interface is designed with CMIS compliant modules in
+mind, but kept generic enough to accommodate future use cases, if these
+arise.
+
+The kernel interface that will implement the firmware update using CDB
+command will include 2 layers that will be added under ethtool:
+
+* The upper layer that will be triggered from the module layer, is
+ cmis_ fw_update.
+* The lower one is cmis_cdb.
+
+In the future there might be more operations to implement using CDB
+commands. Therefore, the idea is to keep the cmis_cdb interface clean and
+the cmis_fw_update specific to the cdb commands handling it.
+
+The communication between the kernel and the driver will be done using
+two ethtool operations that enable reading and writing the transceiver
+module EEPROM.
+The operation ethtool_ops::get_module_eeprom_by_page, that is already
+implemented, will be used for reading from the EEPROM the CDB reply,
+e.g. reading module setting, state, etc.
+The operation ethtool_ops::set_module_eeprom_by_page, that is added in
+the current patchset, will be used for writing to the EEPROM the CDB
+command such as start firmware image, run firmware image, etc.
+
+Therefore in order for a driver to implement module flashing, that
+driver needs to implement the two functions mentioned above.
+
+Patchset overview:
+Patch #1-#2: Implement the EEPROM writing in mlxsw.
+Patch #3: Define the interface between the kernel and user space.
+Patch #4: Add ability to notify the flashing firmware progress.
+Patch #5: Add firmware flashing in progress flag.
+Patch #6: Add extended compliance codes.
+Patch #7: Add the cdb layer.
+Patch #8: Add the fw_update layer.
+Patch #9: Add ability to flash transceiver modules' firmware.
+Patch #10: Veto problematic scenarios.
+
+Danielle Ratson (8):
+  ethtool: Add an interface for flashing transceiver modules' firmware
+  ethtool: Add flashing transceiver modules' firmware notifications
+    ability
+  include: netdevice: Add module firmware flashing in progress flag to
+    net_device
+  net: sfp: Add more extended compliance codes
+  ethtool: cmis_cdb: Add a layer for supporting CDB commands
+  ethtool: cmis_fw_update: add a layer for supporting firmware update
+    using CDB
+  ethtool: Add ability to flash transceiver modules' firmware
+  ethtool: Veto some operations during firmware flashing process
+
+Ido Schimmel (2):
+  ethtool: Add ethtool operation to write to a transceiver module EEPROM
+  mlxsw: Implement ethtool operation to write to a transceiver module
+    EEPROM
+
+ Documentation/netlink/specs/ethtool.yaml      |  63 ++
+ Documentation/networking/ethtool-netlink.rst  |  62 ++
+ .../net/ethernet/mellanox/mlxsw/core_env.c    |  57 ++
+ .../net/ethernet/mellanox/mlxsw/core_env.h    |   6 +
+ drivers/net/ethernet/mellanox/mlxsw/minimal.c |  15 +
+ .../mellanox/mlxsw/spectrum_ethtool.c         |  15 +
+ include/linux/ethtool.h                       |  20 +-
+ include/linux/netdevice.h                     |   4 +-
+ include/linux/sfp.h                           |   6 +
+ include/uapi/linux/ethtool.h                  |  18 +
+ include/uapi/linux/ethtool_netlink.h          |  20 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/cmis.h                            | 121 ++++
+ net/ethtool/cmis_cdb.c                        | 549 ++++++++++++++++++
+ net/ethtool/cmis_fw_update.c                  | 391 +++++++++++++
+ net/ethtool/eeprom.c                          |   6 +
+ net/ethtool/ioctl.c                           |  12 +
+ net/ethtool/module.c                          | 286 +++++++++
+ net/ethtool/module_fw.h                       |  38 ++
+ net/ethtool/netlink.c                         |  37 +-
+ net/ethtool/netlink.h                         |   2 +
+ 21 files changed, 1719 insertions(+), 11 deletions(-)
+ create mode 100644 net/ethtool/cmis.h
+ create mode 100644 net/ethtool/cmis_cdb.c
+ create mode 100644 net/ethtool/cmis_fw_update.c
+ create mode 100644 net/ethtool/module_fw.h
+
+-- 
+2.43.0
 
 
