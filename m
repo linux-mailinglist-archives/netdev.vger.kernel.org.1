@@ -1,464 +1,184 @@
-Return-Path: <netdev+bounces-85794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBB189C58A
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:58:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B158489C3A8
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1086DB2CEAF
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:42:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5DC61C2182D
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B6147E0FF;
-	Mon,  8 Apr 2024 13:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C2812CD9C;
+	Mon,  8 Apr 2024 13:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="LTlNtjEd"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04olkn2084.outbound.protection.outlook.com [40.92.74.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A047E0EB
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712583389; cv=none; b=IQ2S9d9SIqzNuPIcxoZpt2MZo5HX27SS/ssK8abiSzHVhLjDOY0AcLtc5LDoz1SWP/+j17QZRHNVJdXszX5QA9+79KSdBLouEmjRKEKWcXe8QRasBcPq7eav5eM+nVCZlcRK9jQ9iy73W9QcR37d1AroRxUu+X0IdNv2acRMBKM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712583389; c=relaxed/simple;
-	bh=YBD1BB0K76r3KviCzpGZ+NcBimAzzRHGuYP66KAXRzY=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=KGM/PHlkfXVNxPYTkG2WbB4ov0A1i8nybC7hONYUGUuHw6tRpv4xKCQzweLdupUqHMH2HECPZg6OLCuUzfwbcTwH+p4ii0asRwMxnbqFvI/+zUmZvU2piX8QbnZUbNFcMZZ+0UYsL3ujWh21Uvb7kg1c7szbWML74WS0JqybOVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 68B25240003;
-	Mon,  8 Apr 2024 13:36:23 +0000 (UTC)
-Message-ID: <eb44af1d-7514-4084-b022-56f1845b109e@ovn.org>
-Date: Mon, 8 Apr 2024 15:37:06 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC04812C7E8;
+	Mon,  8 Apr 2024 13:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.74.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712583481; cv=fail; b=L+x652MRXTQOkitsUflR5W+k2aU83h2jsZoCFMxYOBSfm0O6g33cMMBTgsL0u+M6QFXTMM3ZkHzMYUD501FOz9wyFp0p4FFDpQfKLr2Hcj3C3F+ABXBbOts7M/QX6kUXCMKm9b0LK6Dy4g3gpOb3PcwMhzyMR0jVCTtROy261yU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712583481; c=relaxed/simple;
+	bh=v2kkyX6TxtLab5v9MRYP/8mP3IdNn7VGnPN+B8NhR0o=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=PYlU0W4vLXY9z2QI7qIOLxW4Gimi+MkgwkPp4/TAUs9DIPzW7TSd6nVVbNpjrG9f0I6Dmw/PSUbwXgovHRSa0yQFtVlVrUuzC+m+bFe5nf9efi8varBri4SbD22XgXxBMu8ti/OIbQYSoNEnbWivG4iVEJauJXS546ptCGh/S/s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=LTlNtjEd; arc=fail smtp.client-ip=40.92.74.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ejfVFezfvSZqu/ZdKOd3mutIkXBCLX3zv0e7KrskyKpamT99PZ4mGs8CC+4RgAKi+aUkrC1Cd5YC56JyYsBXfvcggScZCDWkTze6dsgWC+dA32Pl2IqefShivSjt203Ar+B4ezIIVkvkfPk/bGoD0ThX2e1n3gv/Np7xuSJtoxkbdGEV/A27J4a7NQR0UyExWeBtd9LiaL/YkwA+MfdflG0iO5M5p/9paT90+Nd7/TYk4iAD8nkqq3PQDHDjtZ+Qj/Kl991U+F2zv+bMqOvYPeD+EGh4GUHEIdUT1FXpbZNLPg2zW2DsAE9ec4dZO1QtPyF6fWcv02zoGjvJs/drig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/jZWmpaWdwJn1GG3i9Qe9HWpGH0DCjrM9CeCdLCm5Jo=;
+ b=gzGYL31m7XAUTYaYxHIuentnlKZxdbytxNykNgHpBErFxnHZxLfgFagQXIuHjs+zZaaTkjvE3rDiTIpJqmsEQ/0BPG7RXHIPerRZcSCiE/zrbt4nmC8DtcvybebTVm0O5FUoqaklBwkgXFKSxXRt/zRKauMAL6/QpGjS0yXqc0i87VxIl4qN7sL4QQLko7wlV4Zp4j+OktYiRh1ipDtuNAfJyMp49WTLnUwqyYfK/ujKg6MmbCrQaznKepKpM0/3klD/4N6nW0MvxWCwRXq08OXylIVcYOJvvm2rh8ofKcC+g1LQiSKmkP0Z5zzKQMWTo52jtPO3YedYN/wXd2YDQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/jZWmpaWdwJn1GG3i9Qe9HWpGH0DCjrM9CeCdLCm5Jo=;
+ b=LTlNtjEdz1tgHwtXinxenmMHRLpp1pGmUnlDrpxOFk3lCUzeXbcp6m8OKKV9om7nj6IP9jQCku+71SN5W0O9jICcDuT76JI6VchTUyMkXyObXlJmtfrm1Z7pPq4EwhNwVeMVZ638snTH/ZHAWs8Aywndn336WkVWznzpBqyRUHPPwRQ2scYjpRDqglfFEFpIeZb23syo/0021PyrBvCS1KEr8IysSm7FHPrJCMx/+IcetOMSh6LFwGN/gicNw7VsuQVNL9mGHKzmLPp1nKj+zNVben0Jt3cJj+Ajh6cHN6upWyCrx8XINU4Upc2BvWtlXJEwykKtwsbT67ov+yKVVw==
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
+ by AM8P194MB1662.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:321::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.47; Mon, 8 Apr
+ 2024 13:37:56 +0000
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::56f0:1717:f1a8:ea4e]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::56f0:1717:f1a8:ea4e%2]) with mapi id 15.20.7409.042; Mon, 8 Apr 2024
+ 13:37:56 +0000
+From: Luigi Leonardi <luigi.leonardi@outlook.com>
+To: mst@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	virtualization@lists.linux.dev,
+	sgarzare@redhat.com,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	stefanha@redhat.com,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	kvm@vger.kernel.org,
+	jasowang@redhat.com
+Cc: Luigi Leonardi <luigi.leonardi@outlook.com>
+Subject: [PATCH net-next v2 0/3] This patch series introduce the support for ioctl(s) in AF_VSOCK.
+Date: Mon,  8 Apr 2024 15:37:46 +0200
+Message-ID:
+ <AS2P194MB2170E1933C4257264D53AB069A002@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.34.1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-TMN: [ny+j1VmChUN0F9G40nHNFY4xTfyDBCB0]
+X-ClientProxiedBy: MI0P293CA0013.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:44::18) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:20b:642::8)
+X-Microsoft-Original-Message-ID:
+ <20240408133749.510520-1-luigi.leonardi@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- cmi@nvidia.com, yotam.gi@gmail.com, aconole@redhat.com, echaudro@redhat.com,
- horms@kernel.org
-Subject: Re: [RFC net-next v2 5/5] net:openvswitch: add psample support
-Content-Language: en-US
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-References: <20240408125753.470419-1-amorenoz@redhat.com>
- <20240408125753.470419-6-amorenoz@redhat.com>
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- xsFNBF77bOMBEADVZQ4iajIECGfH3hpQMQjhIQlyKX4hIB3OccKl5XvB/JqVPJWuZQRuqNQG
- /B70MP6km95KnWLZ4H1/5YOJK2l7VN7nO+tyF+I+srcKq8Ai6S3vyiP9zPCrZkYvhqChNOCF
- pNqdWBEmTvLZeVPmfdrjmzCLXVLi5De9HpIZQFg/Ztgj1AZENNQjYjtDdObMHuJQNJ6ubPIW
- cvOOn4WBr8NsP4a2OuHSTdVyAJwcDhu+WrS/Bj3KlQXIdPv3Zm5x9u/56NmCn1tSkLrEgi0i
- /nJNeH5QhPdYGtNzPixKgPmCKz54/LDxU61AmBvyRve+U80ukS+5vWk8zvnCGvL0ms7kx5sA
- tETpbKEV3d7CB3sQEym8B8gl0Ux9KzGp5lbhxxO995KWzZWWokVUcevGBKsAx4a/C0wTVOpP
- FbQsq6xEpTKBZwlCpxyJi3/PbZQJ95T8Uw6tlJkPmNx8CasiqNy2872gD1nN/WOP8m+cIQNu
- o6NOiz6VzNcowhEihE8Nkw9V+zfCxC8SzSBuYCiVX6FpgKzY/Tx+v2uO4f/8FoZj2trzXdLk
- BaIiyqnE0mtmTQE8jRa29qdh+s5DNArYAchJdeKuLQYnxy+9U1SMMzJoNUX5uRy6/3KrMoC/
- 7zhn44x77gSoe7XVM6mr/mK+ViVB7v9JfqlZuiHDkJnS3yxKPwARAQABzSJJbHlhIE1heGlt
- ZXRzIDxpLm1heGltZXRzQG92bi5vcmc+wsGUBBMBCAA+AhsDBQsJCAcCBhUKCQgLAgQWAgMB
- Ah4BAheAFiEEh+ma1RKWrHCY821auffsd8gpv5YFAmP+Y/MFCQjFXhAACgkQuffsd8gpv5Yg
- OA//eEakvE7xTHNIMdLW5r3XnWSEY44dFDEWTLnS7FbZLLHxPNFXN0GSAA8ZsJ3fE26O5Pxe
- EEFTf7R/W6hHcSXNK4c6S8wR4CkTJC3XOFJchXCdgSc7xS040fLZwGBuO55WT2ZhQvZj1PzT
- 8Fco8QKvUXr07saHUaYk2Lv2mRhEPP9zsyy7C2T9zUzG04a3SGdP55tB5Adi0r/Ea+6VJoLI
- ctN8OaF6BwXpag8s76WAyDx8uCCNBF3cnNkQrCsfKrSE2jrvrJBmvlR3/lJ0OYv6bbzfkKvo
- 0W383EdxevzAO6OBaI2w+wxBK92SMKQB3R0ZI8/gqCokrAFKI7gtnyPGEKz6jtvLgS3PeOtf
- 5D7PTz+76F/X6rJGTOxR3bup+w1bP/TPHEPa2s7RyJISC07XDe24n9ZUlpG5ijRvfjbCCHb6
- pOEijIj2evcIsniTKER2pL+nkYtx0bp7dZEK1trbcfglzte31ZSOsfme74u5HDxq8/rUHT01
- 51k/vvUAZ1KOdkPrVEl56AYUEsFLlwF1/j9mkd7rUyY3ZV6oyqxV1NKQw4qnO83XiaiVjQus
- K96X5Ea+XoNEjV4RdxTxOXdDcXqXtDJBC6fmNPzj4QcxxyzxQUVHJv67kJOkF4E+tJza+dNs
- 8SF0LHnPfHaSPBFrc7yQI9vpk1XBxQWhw6oJgy3OwU0EXvts4wEQANCXyDOic0j2QKeyj/ga
- OD1oKl44JQfOgcyLVDZGYyEnyl6b/tV1mNb57y/YQYr33fwMS1hMj9eqY6tlMTNz+ciGZZWV
- YkPNHA+aFuPTzCLrapLiz829M5LctB2448bsgxFq0TPrr5KYx6AkuWzOVq/X5wYEM6djbWLc
- VWgJ3o0QBOI4/uB89xTf7mgcIcbwEf6yb/86Cs+jaHcUtJcLsVuzW5RVMVf9F+Sf/b98Lzrr
- 2/mIB7clOXZJSgtV79Alxym4H0cEZabwiXnigjjsLsp4ojhGgakgCwftLkhAnQT3oBLH/6ix
- 87ahawG3qlyIB8ZZKHsvTxbWte6c6xE5dmmLIDN44SajAdmjt1i7SbAwFIFjuFJGpsnfdQv1
- OiIVzJ44kdRJG8kQWPPua/k+AtwJt/gjCxv5p8sKVXTNtIP/sd3EMs2xwbF8McebLE9JCDQ1
- RXVHceAmPWVCq3WrFuX9dSlgf3RWTqNiWZC0a8Hn6fNDp26TzLbdo9mnxbU4I/3BbcAJZI9p
- 9ELaE9rw3LU8esKqRIfaZqPtrdm1C+e5gZa2gkmEzG+WEsS0MKtJyOFnuglGl1ZBxR1uFvbU
- VXhewCNoviXxkkPk/DanIgYB1nUtkPC+BHkJJYCyf9Kfl33s/bai34aaxkGXqpKv+CInARg3
- fCikcHzYYWKaXS6HABEBAAHCwXwEGAEIACYCGwwWIQSH6ZrVEpascJjzbVq59+x3yCm/lgUC
- Y/5kJAUJCMVeQQAKCRC59+x3yCm/lpF7D/9Lolx00uxqXz2vt/u9flvQvLsOWa+UBmWPGX9u
- oWhQ26GjtbVvIf6SECcnNWlu/y+MHhmYkz+h2VLhWYVGJ0q03XkktFCNwUvHp3bTXG3IcPIC
- eDJUVMMIHXFp7TcuRJhrGqnlzqKverlY6+2CqtCpGMEmPVahMDGunwqFfG65QubZySCHVYvX
- T9SNga0Ay/L71+eVwcuGChGyxEWhVkpMVK5cSWVzZe7C+gb6N1aTNrhu2dhpgcwe1Xsg4dYv
- dYzTNu19FRpfc+nVRdVnOto8won1SHGgYSVJA+QPv1x8lMYqKESOHAFE/DJJKU8MRkCeSfqs
- izFVqTxTk3VXOCMUR4t2cbZ9E7Qb/ZZigmmSgilSrOPgDO5TtT811SzheAN0PvgT+L1Gsztc
- Q3BvfofFv3OLF778JyVfpXRHsn9rFqxG/QYWMqJWi+vdPJ5RhDl1QUEFyH7ok/ZY60/85FW3
- o9OQwoMf2+pKNG3J+EMuU4g4ZHGzxI0isyww7PpEHx6sxFEvMhsOp7qnjPsQUcnGIIiqKlTj
- H7i86580VndsKrRK99zJrm4s9Tg/7OFP1SpVvNvSM4TRXSzVF25WVfLgeloN1yHC5Wsqk33X
- XNtNovqA0TLFjhfyyetBsIOgpGakgBNieC9GnY7tC3AG+BqG5jnVuGqSTO+iM/d+lsoa+w==
-In-Reply-To: <20240408125753.470419-6-amorenoz@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|AM8P194MB1662:EE_
+X-MS-Office365-Filtering-Correlation-Id: 96385924-3355-4006-b3c9-08dc57d1192a
+X-MS-Exchange-SLBlob-MailProps:
+	/UmSaZDmfYCe9ICa+qD7o10Vv1KVb8VQ99OJLclpbL92WqSgnQ4ICxG+FRLwF8QlCD6ILazI1uzwoWVKNNN82rLWo5LMJHziqAivNGAzVQzibBc8NeBOy9nVkKgz/lvrJPTt8sxrSxAumOEML2Lc2fVBmRnx+pFHDX7ZTPdSc0y6iG5MBSgTHnGuuJXeX7rLb5GYUWBZd6Esnz/gLVujIzKwchSBurD7C1XV+RKtXpc0HQX8Fzi9o9evXLzQDi7ZfcNIh7xV+IwY7o5YujwriQvXULD1wE128Mspn5nBxVrnnuvTV+lfqpVmr6vePWiFrV6NJPLyPyg4zt0c19bp+Yjia/azwVarkpu4p7n+OwBsWTHoP9En0UuN7SN9jQhxg2Ee9Rqp5VrMQdL+EbBK3J7zyD4QW7pa1nKofo/c1InWDZxjn2RrB3RBgW1+OZ02WOxeST4QQsJb0y4fDcbCObsece7W1rX5Co9FEtxVGmIAElJMPPoNXF5gdplHTKFhaQd+wEjWANqX9QK9lZpSj/m4rosTKT8/jZ7KJDUovASGOra9N37NWECOHYJXO7tQkTE80go+oGZXE6E62cLzg3MheCmOVteo9ZSCa26QfVUAnP5uJvumH+CgHd9sQK283X28DjuYjw7rnwnXTWgtrOy9nHE6uSQ9AMrRLzo3kvq3kXLeBvKrvjLAnYCcsF3phlRxXuGIW9PQ3hCLsEPGnQinCJDRbk2y2+i/BydmnCfIVt22idmE7+5+HhVePbxpF6C0x6ie6ClFAGIq4OEBjYkYy3ZshLOM8RHASo28JEfyH+fqxM3Fnk+sxSbl0yZnHEmeHPVZ7l0OJZs8QELJsA==
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	DdCz+dCsdpGgN2+vomiOo9T+eYm29VlLRjrqmOsVnjm1rScuUJT1d3f5gMsWIKcZw8yxoLgAfkJc2G5oSfX4gDc0c+u9KKk3ApwDE/n1HEvdyeCYyd3s2VihYNSQS1YHpk+zRKy4RjuHHzdPsbeH3J/ni9sBBfs3qiuIjuvj7k/LzD8JyZzB293u4w57br7KZOUbTQsMUoHTTkxXqpmqhovb3o+eB4YUDzj3s9zbybMVQ1ocJFAyknxb43sAEVfQ6GXPMAgD1633JeMUWXO2L4iKX+ohHLeyiEjWpUwnsY2KqsSSguBB2eGB7O70zXNt+9vEWnPr1SWrET3ENS5jIw1+fpX7+7OA4gjY4AA6FWos5RIbXCVzgfys7K14BQLVaEcXG6I35LhwxEkNO06JHdu5NLFJponX5JCkbWoDbesMUGsG/yUNN396a6vdecGjdNg4R6pV745oaxpHJv3UpX8SpfJyreVTfGMYCDgilUac2YxVetAWIhMU/7oWyBPeVDo2HTSa8cEox+pM9OSHZtIuiRg3WIVo9nbHe8KUVyXpto+aO3Qcc2VuoerRAei035DNlykPjQk8rXM44A283Ejsh65YBkco93I9rldVhKCZkRVkidvjaddzpsMmoyvwgRgs6EAd9OF+i2+SaDIfP+OBss8rw54Mr37Al3d91Rc=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RUJ3azNqSEFKYjJCT094VU9RUnVEWEdqT0p1WlUrMEhPVTU2eG1EaThUU0NQ?=
+ =?utf-8?B?Ly8wWEJaVDNOR1kwS1ZvaXI4elFEcjEvdEttbGRjY1hrZlJQR0RwTFJHWHlE?=
+ =?utf-8?B?blFhSUptZEVUUkVHaVRKb3VidmJqQWRTdXFGZ29VYkZMRDRyaHg1WGlBalF0?=
+ =?utf-8?B?L0I2STNKYk9uczdGdnAzS3hRNW44MSszWlBtclVlNHJmaXNSYTBoMHp4ZlVi?=
+ =?utf-8?B?TlNaSWdjMmNGby9HS2g1TFUzOFFUQjArcEJNRnNJVzk0Y2JJM3p6dXJpcVdC?=
+ =?utf-8?B?bmZxSk5uSHhPQktITUxLMGRqeFo3WVVVQUhuK2xhcHN6TFhaOUZKQXRGY1RJ?=
+ =?utf-8?B?MldXTllVTFI4TEgxTHBqb2wyak5jbnNEeUIzRXdIeG04MjRpYk5Tem1LNDcr?=
+ =?utf-8?B?WGZSYm1RTzM5MXZ6QkFqZ0lSeXZ2c2dVMit3dlp6OUNjZnc0MVlhYWEvSDM4?=
+ =?utf-8?B?Wlo2d0l5czUxaHBTdlEwNnJoQ2RDVWxVbytNUVBSbEFBVnF2TllXQTVPblg3?=
+ =?utf-8?B?eFp1ZXMvL3NFOUdnRGJaOWVSWnUva2ZlcVdvNVJhekQ1dW9hWGE0eHkra25r?=
+ =?utf-8?B?aU9KTGxGWGMza2VQUVZKaDRqaTR2V1VBUjlOK3I3dTVxUFBtOEtmWjdBYTRE?=
+ =?utf-8?B?ZVZvS0tkMkd6WjUrR1dlRFNPcy9SbzJMRlNxRzM5MW5oNDFUMjA1MUxVWVpi?=
+ =?utf-8?B?TVU2TVhLOE1yczFaYi9yUWQ5clhHL3I0SEwrS1oyZTUweno1azJFdXBBbVdZ?=
+ =?utf-8?B?dmNQN1B4MkwwQmFxSHN6TEl1TjFCYmxja2J3bU1IU2x5Y2VveFlSOTRxSjcy?=
+ =?utf-8?B?Rnd5cURaOE4zWnllTy9IMmo0UVoxcjBVNWFkNm9RMTM2S29qS3dnaTZKVC9a?=
+ =?utf-8?B?amt0WUZlY2N0QzVCYWJkSm85OFUvOWxWd29vZlIxNzMxTnlxWCtPeGhmR3hV?=
+ =?utf-8?B?M0JxREcwUWsra2I5bWpHR0VaVy9xelA3eno2WFQrY1VyenpGTWhMQkFPeGwz?=
+ =?utf-8?B?YUhBZ2lESy9PMlhVK016Sm1wYXZiYjhyYzY2ZFJjeEZrRS9IdHVXengxOTcv?=
+ =?utf-8?B?UllCZ1BUL3UxVVowQUZ5aHBWbVErZEViNXgxdVZIMDcwdTQ0YTl6Z3Fza3Ro?=
+ =?utf-8?B?OHVyY2JFUG5zNXg0emYva2tpMG1vbGZXWk9KbGFHOHBTYjRqSUVDUGxkUWE1?=
+ =?utf-8?B?NEtFdmNON2piRFZpNEc1UTlJV1o3TlRuWVU1Sm5qczhrVVBZMUppSEdGUHdB?=
+ =?utf-8?B?OHkweDdrZ3ExU3dIOVpUWlBlUkVzYTd0b3ZlVlpNeXkyR3RjNEN4ZXNWYzBy?=
+ =?utf-8?B?WVhWR2w5elFFM0M2cGhqdXFvTU4wM2YrRWdtUkVGTmR0ZTdtZFBuenI4N0J2?=
+ =?utf-8?B?d0ZmMDI0VmhYRG5UZndhMXB1dTVyNFZsZ3Aza0pLaDVMSmVRbFdSNW8ySDdm?=
+ =?utf-8?B?M0syZ0lrM0NNd2swVysvRndHMWdGNzNTV1dVU1cyMnBCYTEzN2FsU2NpMTBP?=
+ =?utf-8?B?N25nSlBodFpxZ3FkNkxZSHpxRDFRTi90ZS9NZENsNmtHcWl2M2NnWm16c3Nl?=
+ =?utf-8?B?MlVnTG1zT3hlcGUyVHZQMWdTekpZTEQ1Z2ozQkVqVTVlTnN4aXpFR2I4aUJk?=
+ =?utf-8?B?VjdzL200ODhHRENQMmxHU3dISXUvbXNVWDFEa3FxN3hReHFpTHIydVZBekt2?=
+ =?utf-8?Q?7XaaTwirAKPr9RyeS7qr?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96385924-3355-4006-b3c9-08dc57d1192a
+X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2024 13:37:56.4305
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8P194MB1662
 
-On 4/8/24 14:57, Adrian Moreno wrote:
-> Add a new attribute to the sample action, called
-> OVS_SAMPLE_ATTR_PSAMPLE to allow userspace to pass a group_id and a
-> user-defined cookie.
-> 
-> The maximum length of the user-defined cookie is set to 16, same as
-> tc_cookie to discourage using cookies that will not be offloadable.
-> 
-> When set, the sample action will use psample to multicast the sample.
-> 
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  include/uapi/linux/openvswitch.h | 22 +++++++--
->  net/openvswitch/actions.c        | 52 ++++++++++++++++++---
->  net/openvswitch/datapath.c       |  2 +-
->  net/openvswitch/flow_netlink.c   | 78 +++++++++++++++++++++++++-------
->  4 files changed, 127 insertions(+), 27 deletions(-)
+the number of unsent or unacked packets. It is available for
+SOCK_STREAM, SOCK_SEQPACKET and SOCK_DGRAM.
 
-This cpatch is missing a few bits:
- - Update for Documentation/netlink/specs/ovs_flow.yaml
- - Maybe update for tools/testing/selftests/net/openvswitch/ovs-dpctl.py
- - Maybe some basic selftests.
+As this information is transport-dependent, a new optional callback
+is introduced: stream_bytes_unsent.
 
-> 
-> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-> index efc82c318fa2..a5a32588f582 100644
-> --- a/include/uapi/linux/openvswitch.h
-> +++ b/include/uapi/linux/openvswitch.h
-> @@ -646,15 +646,24 @@ enum ovs_flow_attr {
->   * %UINT32_MAX samples all packets and intermediate values sample intermediate
->   * fractions of packets.
->   * @OVS_SAMPLE_ATTR_ACTIONS: Set of actions to execute in sampling event.
-> - * Actions are passed as nested attributes.
-> + * Actions are passed as nested attributes. Optional if OVS_SAMPLE_ATTR_PSAMPLE
-> + * is not set.
+The first patch add ioctl support in AF_VSOCK, while the second
+patch introduce support for SOCK_STREAM and SOCK_SEQPACKET
+in all virtio-based transports: virtio_transport (G2H),
+vhost-vsock (H2G) and vsock-loopback.
 
-'is set' probably.
+The latest patch introduce two tests for this new feature.
+More details can be found in each patch changelog.
 
-> + * @OVS_SAMPLE_ATTR_PSAMPLE: Arguments to be passed to psample. Optional if
-> + * OVS_SAMPLE_ATTR_ACTIONS is not set.
+v1->v2
+Applied all Stefano's suggestions:
+    - vsock_do_ioctl has been rewritten
+    - ioctl(SIOCOUTQ) test is skipped when it is not supported
+    - Minor variable/function name changes
+    - rebased to latest net-next
 
-Same here.
+Link: https://lore.kernel.org/netdev/AS2P194MB2170C0FC43DDA2CB637CE6B29A3E2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
 
->   *
-> - * Executes the specified actions with the given probability on a per-packet
-> - * basis.
-> + * Either OVS_SAMPLE_ATTR_USER_COOKIE or OVS_SAMPLE_ATTR_USER_COOKIE must be
-> + * specified.
-> + *
-> + * Executes the specified actions and/or sends the packet to psample
-> + * with the given probability on a per-packet basis.
->   */
->  enum ovs_sample_attr {
->  	OVS_SAMPLE_ATTR_UNSPEC,
->  	OVS_SAMPLE_ATTR_PROBABILITY, /* u32 number */
->  	OVS_SAMPLE_ATTR_ACTIONS,     /* Nested OVS_ACTION_ATTR_* attributes. */
-> +	OVS_SAMPLE_ATTR_PSAMPLE,     /* struct ovs_psample followed
-> +				      * by the user-provided cookie.
-> +				      */
->  	__OVS_SAMPLE_ATTR_MAX,
->  
->  #ifdef __KERNEL__
-> @@ -675,6 +684,13 @@ struct sample_arg {
->  };
->  #endif
->  
-> +#define OVS_PSAMPLE_COOKIE_MAX_SIZE 16
-> +struct ovs_psample {
-> +	__u32 group_id;		/* The group used for packet sampling. */
-> +	__u32 user_cookie_len;	/* The length of the user-provided cookie. */
-> +	__u8 user_cookie[];	/* The user-provided cookie. */
-> +};
+Luigi Leonardi (3):
+  vsock: add support for SIOCOUTQ ioctl for all vsock socket types.
+  vsock/virtio: add SIOCOUTQ support for all virtio based transports
+  test/vsock: add ioctl unsent bytes test
 
-Structures are not a good approach for modern netlink.
-use nested attributes instead.  This way we can also
-eliminate the need for variable-length array and the
-length field, if the length can be taken from a netlink
-attribute directly, e.g. similar to NLA_BINARY in tc.
+ drivers/vhost/vsock.c                   |  4 +-
+ include/linux/virtio_vsock.h            |  7 ++
+ include/net/af_vsock.h                  |  3 +
+ net/vmw_vsock/af_vsock.c                | 51 ++++++++++++++-
+ net/vmw_vsock/virtio_transport.c        |  4 +-
+ net/vmw_vsock/virtio_transport_common.c | 33 ++++++++++
+ net/vmw_vsock/vsock_loopback.c          |  7 ++
+ tools/testing/vsock/util.c              |  6 +-
+ tools/testing/vsock/util.h              |  3 +
+ tools/testing/vsock/vsock_test.c        | 85 +++++++++++++++++++++++++
+ 10 files changed, 195 insertions(+), 8 deletions(-)
 
-If necessary, there could be a structure in the private
-header to store the data for internal use.
-
-> +
->  /**
->   * enum ovs_userspace_attr - Attributes for %OVS_ACTION_ATTR_USERSPACE action.
->   * @OVS_USERSPACE_ATTR_PID: u32 Netlink PID to which the %OVS_PACKET_CMD_ACTION
-> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> index 6fcd7e2ca81f..45d2b325b76a 100644
-> --- a/net/openvswitch/actions.c
-> +++ b/net/openvswitch/actions.c
-> @@ -24,6 +24,7 @@
->  #include <net/checksum.h>
->  #include <net/dsfield.h>
->  #include <net/mpls.h>
-> +#include <net/psample.h>
->  #include <net/sctp/checksum.h>
->  
->  #include "datapath.h"
-> @@ -1025,6 +1026,31 @@ static int dec_ttl_exception_handler(struct datapath *dp, struct sk_buff *skb,
->  	return 0;
->  }
->  
-> +static int ovs_psample_packet(struct datapath *dp, struct sw_flow_key *key,
-> +			      struct ovs_psample *psample, struct sk_buff *skb,
-> +			      u32 rate)
-> +{
-> +	struct psample_group psample_group = {};
-> +	struct psample_metadata md = {};
-> +	struct vport *input_vport;
-> +
-> +	psample_group.group_num = psample->group_id;
-> +	psample_group.net = ovs_dp_get_net(dp);
-> +
-> +	input_vport = ovs_vport_rcu(dp, key->phy.in_port);
-> +	if (!input_vport)
-> +		input_vport = ovs_vport_rcu(dp, OVSP_LOCAL);
-> +
-> +	md.in_ifindex = input_vport->dev->ifindex;
-> +	md.user_cookie = psample->user_cookie;
-> +	md.user_cookie_len = psample->user_cookie_len;
-> +	md.trunc_size = skb->len;
-> +
-> +	psample_sample_packet(&psample_group, skb, rate, &md);
-> +
-> +	return 0;
-> +}
-> +
->  /* When 'last' is true, sample() should always consume the 'skb'.
->   * Otherwise, sample() should keep 'skb' intact regardless what
->   * actions are executed within sample().
-> @@ -1033,16 +1059,17 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
->  		  struct sw_flow_key *key, const struct nlattr *attr,
->  		  bool last)
->  {
-> -	struct nlattr *actions;
-> +	const struct sample_arg *arg;
->  	struct nlattr *sample_arg;
->  	int rem = nla_len(attr);
-> -	const struct sample_arg *arg;
-> +	struct nlattr *next;
->  	bool clone_flow_key;
-> +	int ret;
->  
->  	/* The first action is always 'OVS_SAMPLE_ATTR_ARG'. */
->  	sample_arg = nla_data(attr);
->  	arg = nla_data(sample_arg);
-> -	actions = nla_next(sample_arg, &rem);
-> +	next = nla_next(sample_arg, &rem);
->  
->  	if ((arg->probability != U32_MAX) &&
->  	    (!arg->probability || get_random_u32() > arg->probability)) {
-> @@ -1051,9 +1078,22 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
->  		return 0;
->  	}
->  
-> -	clone_flow_key = !arg->exec;
-> -	return clone_execute(dp, skb, key, 0, actions, rem, last,
-> -			     clone_flow_key);
-> +	if (next->nla_type == OVS_SAMPLE_ATTR_PSAMPLE) {
-
-Maybe add a commnet that OVS_SAMPLE_ATTR_PSAMPLE is always a sencond
-argument when present.
-
-Is there a better way to handle this?
-
-> +		ret = ovs_psample_packet(dp, key, nla_data(next), skb,
-> +					 arg->probability);
-> +		if (last)
-> +			ovs_kfree_skb_reason(skb, OVS_DROP_LAST_ACTION);
-> +		if (ret)
-> +			return ret;
-> +		next = nla_next(next, &rem);
-> +	}
-> +
-> +	if (nla_ok(next, rem)) {
-> +		clone_flow_key = !arg->exec;
-> +		ret = clone_execute(dp, skb, key, 0, next, rem, last,
-> +				    clone_flow_key);
-> +	}
-> +	return ret;
->  }
->  
->  /* When 'last' is true, clone() should always consume the 'skb'.
-> diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-> index 99d72543abd3..b5b560c2e74b 100644
-> --- a/net/openvswitch/datapath.c
-> +++ b/net/openvswitch/datapath.c
-> @@ -976,7 +976,7 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
->  	struct sw_flow_match match;
->  	u32 ufid_flags = ovs_nla_get_ufid_flags(a[OVS_FLOW_ATTR_UFID_FLAGS]);
->  	int error;
-> -	bool log = !a[OVS_FLOW_ATTR_PROBE];
-> +	bool log = true;
-
-Debugging artifact?
-
->  
->  	/* Must have key and actions. */
->  	error = -EINVAL;
-> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-> index f224d9bcea5e..f540686271b7 100644
-> --- a/net/openvswitch/flow_netlink.c
-> +++ b/net/openvswitch/flow_netlink.c
-> @@ -2381,8 +2381,12 @@ static void ovs_nla_free_sample_action(const struct nlattr *action)
->  
->  	switch (nla_type(a)) {
->  	case OVS_SAMPLE_ATTR_ARG:
-> -		/* The real list of actions follows this attribute. */
-
-Please, don't remove this comment.  Maybe extend it instead.
-
->  		a = nla_next(a, &rem);
-> +
-> +		/* OVS_SAMPLE_ATTR_PSAMPLE may be present. */
-> +		if (nla_type(a) == OVS_SAMPLE_ATTR_PSAMPLE)
-> +			a = nla_next(a, &rem);
-> +
->  		ovs_nla_free_nested_actions(a, rem);
->  		break;
->  	}
-> @@ -2561,6 +2565,9 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
->  				  u32 mpls_label_count, bool log,
->  				  u32 depth);
->  
-> +static int copy_action(const struct nlattr *from,
-> +		       struct sw_flow_actions **sfa, bool log);
-> +
->  static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->  				    const struct sw_flow_key *key,
->  				    struct sw_flow_actions **sfa,
-> @@ -2569,10 +2576,10 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->  				    u32 depth)
->  {
->  	const struct nlattr *attrs[OVS_SAMPLE_ATTR_MAX + 1];
-> -	const struct nlattr *probability, *actions;
-> +	const struct nlattr *probability, *actions, *psample;
->  	const struct nlattr *a;
-> -	int rem, start, err;
->  	struct sample_arg arg;
-> +	int rem, start, err;
->  
->  	memset(attrs, 0, sizeof(attrs));
->  	nla_for_each_nested(a, attr, rem) {
-> @@ -2589,7 +2596,23 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->  		return -EINVAL;
->  
->  	actions = attrs[OVS_SAMPLE_ATTR_ACTIONS];
-> -	if (!actions || (nla_len(actions) && nla_len(actions) < NLA_HDRLEN))
-> +	if (actions && (!nla_len(actions) || nla_len(actions) < NLA_HDRLEN))
-> +		return -EINVAL;
-> +
-> +	psample = attrs[OVS_SAMPLE_ATTR_PSAMPLE];
-> +	if (psample) {
-> +		struct ovs_psample *ovs_ps;
-> +
-> +		if (!nla_len(psample) || nla_len(psample) < sizeof(*ovs_ps))
-> +			return -EINVAL;
-> +
-> +		ovs_ps = nla_data(psample);
-> +		if (ovs_ps->user_cookie_len > OVS_PSAMPLE_COOKIE_MAX_SIZE ||
-> +		    nla_len(psample) != sizeof(*ovs_ps) + ovs_ps->user_cookie_len)
-> +			return -EINVAL;
-> +	}
-> +
-> +	if (!psample && !actions)
->  		return -EINVAL;
->  
->  	/* validation done, copy sample action. */
-> @@ -2608,7 +2631,9 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->  	 * If the sample is the last action, it can always be excuted
->  	 * rather than deferred.
->  	 */
-> -	arg.exec = last || !actions_may_change_flow(actions);
-> +	if (actions)
-> +		arg.exec = last || !actions_may_change_flow(actions);
-
-'arg.exec' will remain uninitialized.
-
-> +
->  	arg.probability = nla_get_u32(probability);
->  
->  	err = ovs_nla_add_action(sfa, OVS_SAMPLE_ATTR_ARG, &arg, sizeof(arg),
-> @@ -2616,10 +2641,17 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
->  	if (err)
->  		return err;
->  
-> -	err = __ovs_nla_copy_actions(net, actions, key, sfa,
-> -				     eth_type, vlan_tci, mpls_label_count, log,
-> -				     depth + 1);
-> +	if (psample)
-> +		err = ovs_nla_add_action(sfa, OVS_SAMPLE_ATTR_PSAMPLE,
-> +					 nla_data(psample), nla_len(psample),
-> +					 log);
-> +	if (err)
-
-Can be used uninitialized.
-
-> +		return err;
->  
-> +	if (actions)
-> +		err = __ovs_nla_copy_actions(net, actions, key, sfa,
-> +					     eth_type, vlan_tci,
-> +					     mpls_label_count, log, depth + 1);
->  	if (err)
->  		return err;
->  
-> @@ -3538,7 +3570,7 @@ static int sample_action_to_attr(const struct nlattr *attr,
->  	struct nlattr *start, *ac_start = NULL, *sample_arg;
->  	int err = 0, rem = nla_len(attr);
->  	const struct sample_arg *arg;
-> -	struct nlattr *actions;
-> +	struct nlattr *next;
->  
->  	start = nla_nest_start_noflag(skb, OVS_ACTION_ATTR_SAMPLE);
->  	if (!start)
-> @@ -3546,27 +3578,39 @@ static int sample_action_to_attr(const struct nlattr *attr,
->  
->  	sample_arg = nla_data(attr);
->  	arg = nla_data(sample_arg);
-> -	actions = nla_next(sample_arg, &rem);
-> +	next = nla_next(sample_arg, &rem);
->  
->  	if (nla_put_u32(skb, OVS_SAMPLE_ATTR_PROBABILITY, arg->probability)) {
->  		err = -EMSGSIZE;
->  		goto out;
->  	}
->  
-> -	ac_start = nla_nest_start_noflag(skb, OVS_SAMPLE_ATTR_ACTIONS);
-> -	if (!ac_start) {
-> -		err = -EMSGSIZE;
-> -		goto out;
-> +	if (nla_type(next) == OVS_SAMPLE_ATTR_PSAMPLE) {
-> +		if (nla_put(skb, OVS_SAMPLE_ATTR_PSAMPLE, nla_len(next),
-> +			    nla_data(next))) {
-> +			err = -EMSGSIZE;
-> +			goto out;
-> +		}
-> +		next = nla_next(next, &rem);
->  	}
->  
-> -	err = ovs_nla_put_actions(actions, rem, skb);
-> +	if (nla_ok(next, rem)) {
-> +		ac_start = nla_nest_start_noflag(skb, OVS_SAMPLE_ATTR_ACTIONS);
-> +		if (!ac_start) {
-> +			err = -EMSGSIZE;
-> +			goto out;
-> +		}
-> +		err = ovs_nla_put_actions(next, rem, skb);
-> +	}
->  
->  out:
->  	if (err) {
-> -		nla_nest_cancel(skb, ac_start);
-> +		if (ac_start)
-> +			nla_nest_cancel(skb, ac_start);
->  		nla_nest_cancel(skb, start);
->  	} else {
-> -		nla_nest_end(skb, ac_start);
-> +		if (ac_start)
-> +			nla_nest_end(skb, ac_start);
->  		nla_nest_end(skb, start);
->  	}
->  
+-- 
+2.34.1
 
 
