@@ -1,121 +1,333 @@
-Return-Path: <netdev+bounces-85894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40DEA89CC57
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:21:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4143C89CC5A
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 21:22:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF0DD286A6D
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:21:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 637041C214CE
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30EC145356;
-	Mon,  8 Apr 2024 19:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A343145332;
+	Mon,  8 Apr 2024 19:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qkb7ZVxC"
+	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="K7UWHmpJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="swqlnenr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout7-smtp.messagingengine.com (fout7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDB6143C59;
-	Mon,  8 Apr 2024 19:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C7F143C59;
+	Mon,  8 Apr 2024 19:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712604080; cv=none; b=RLBnG7Wq3wUuzXysCCq7e8vlVB5Gu9NFmUX91PjB8PukbZdOgQlYiDIOlten1KpbB3cN58XmtJ2vttm68EpBiDWXknY/6GvcAXcaHib7cNtXRHLqqfFx3baxUDecfdYpG7MN6VRmeclqRjnW00zJnaBEQzg0d8uGIM0E/QBbkzo=
+	t=1712604132; cv=none; b=m0xNvZcpdbe3ljAMmaclGS/WlzmbVMjWziSMvB3y8i3ivxTql/LEYdaLSPQxBJSarCXyE94t3JGrGomvllBO5ZBbMkN3rl5rVoxgLXvzXpQh4XrHOzsmoDBFCVEL588/jrIpzRbhKWYmJH+AmlvpyTboOMYLJgW+vqBeBj4/1CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712604080; c=relaxed/simple;
-	bh=yWTzWK6xiTolmcMAZmDBPdb70p3OB+ZD4SGUXyqhAkg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=seXATynhjVjSBQkzR2ZfkPhj5mHi5FY4F7C6V+Mo2A46rOTqwQRhXlpjEgDiMm21pIEcjst9OSTbqmQkbZtSCxIenh7aZwlb9zkH28T7CGKvAxZyNApuSEA2FEGBE9ZKHNfuqz8Li+pHQ6alcpHe2mCfqi+xujf7e8S0KMwvyTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qkb7ZVxC; arc=none smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5aa16c0583eso1469817eaf.1;
-        Mon, 08 Apr 2024 12:21:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712604078; x=1713208878; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AamdBDO/VS9vOUYPUdxb7pzEW1gk+yCkE+Fv1jk8Ttg=;
-        b=Qkb7ZVxCrbaw3VoorF+IakEsRLHi6zsA77tjPb5IxeEM78fLhQCT/a3ankSVn9OUJ0
-         YKhoeTRWbxqRvmc4Hvaof2m5fnEZi/hrcUVZKwEAvoL2foKIcBqXIYGzgsxQ8ep9nMi7
-         dFNqbLtIzmayk/fw5VMmvPZL+0c2gtgc7iszkrzoSZK3SQE45o3stNU2NPe6bFFLuBsE
-         JqIFwaBI613We7UCwH35Baiy/KvyCbT7GJQIABf+YgYaxGA8p0oGIlSow+mky3gUqtsE
-         X/ADcns6ajjSUvjDe0q30LKyc3FdC2+RqKMzugkSmPTW8cKiMKgaRjiTZenrEkAt2mTQ
-         JIXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712604078; x=1713208878;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AamdBDO/VS9vOUYPUdxb7pzEW1gk+yCkE+Fv1jk8Ttg=;
-        b=ZT+XcUDnxB3syZJ5nO3A+NsPuD2EctAKu/k7WC+LHNl4jaILar9l4BJicmdr/vGiLf
-         vCjmj6A/l/Gax2JFVL9139bm7pIZPmOlaq37kTMDJrRF9a+8ENy3L7Z0BPsmFweE2N5L
-         qYoKDwjpo6W71QDNouthkVlIV34K6X7YCuarS5Ga5NTf2/e/2AzUjypA6aYzyWBhVRkm
-         ufBdAYaLLtXP0pzvz/CAArEMwYTp/w0BbXdvT6eKdGr7agfjGzjgNmHfFyo0Ta2DyJ6b
-         +KgSNaC/j5rlcjRYRO9GUtH42RNlgFW1L95Js1oFPuNaDYNhJiQE5tiTDg8Vu1v6h2as
-         LmOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWB9w7H024+LSDXdjxAMW+zTxS4LgTnf1wawJBJAU9QopbIkZYlCIWE5G5Qv/w2bWiIpFW9Qz0DQ9b6SqQhpyEs3HegC8wFVoPzpW4fip/cL/EENSmT3Oyh3Xt5O/8MXRtkdBTwovxz085Vx24TuZnTQv9vxGPO8ilhCct1cKcGza+PKWiNgM0LLqgC0NZPiZXzlcacTsKivPP0HA==
-X-Gm-Message-State: AOJu0Yxh834Nr0/YHRt6VjsIemFLUuGgGKkCxiosQdKxA2w8YpmSgdti
-	uE95gSx9SgAqxEEN/M+xWkfVfi8TgrKUmgpNZDS4pki/s89TT+Bo
-X-Google-Smtp-Source: AGHT+IE6qOZ10utu6Mbidwe88/lmT5YDCQNznzNpFX1CMDFk8/4ST4mEeN2WAnfgVNwPDNjKcMoDUQ==
-X-Received: by 2002:a05:6820:150e:b0:5aa:18a1:cc5 with SMTP id ay14-20020a056820150e00b005aa18a10cc5mr8792365oob.6.1712604078079;
-        Mon, 08 Apr 2024 12:21:18 -0700 (PDT)
-Received: from [192.168.7.169] (c-98-197-58-203.hsd1.tx.comcast.net. [98.197.58.203])
-        by smtp.gmail.com with ESMTPSA id q10-20020a9d4b0a000000b006ea24b907b1sm34217otf.5.2024.04.08.12.21.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Apr 2024 12:21:17 -0700 (PDT)
-Message-ID: <28f45cfb-6c77-b893-2927-d4c8a99e2c04@gmail.com>
-Date: Mon, 8 Apr 2024 14:21:15 -0500
+	s=arc-20240116; t=1712604132; c=relaxed/simple;
+	bh=Rw9IFOnEBCicwaGlH8ecRN2r1NxESmq9TD7t3kCONrw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=NPKtI7n0d0Kvb17J1cPz8FsezjVTrggClOyyDF0lxBJ6nUYbRV3RpAHkFUYBgCoTd0nvlbG1l/u9fhszHm9pFNTbkJaDNv9oTvoo2Mvt5dsyly4F3OOlnefu3PTasiyf7ikOQo/wi8dohWRYr3ISrF54UfSb2+AGzqMv8wOXZ84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=invisiblethingslab.com; spf=none smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=K7UWHmpJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=swqlnenr; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=invisiblethingslab.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=invisiblethingslab.com
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfout.nyi.internal (Postfix) with ESMTP id 15EDF13800E7;
+	Mon,  8 Apr 2024 15:22:09 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Mon, 08 Apr 2024 15:22:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	invisiblethingslab.com; h=cc:cc:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm2; t=1712604129; x=1712690529; bh=OM
+	rRvq4Iqu/zIvPT1p/NI6auBHl3fwxbb+lwjrIxmN4=; b=K7UWHmpJz0ZoEq0GYY
+	H6PJOX9+K6EWlZIHP0E0zEKmMUBfzEvFw9qy2hVmR5zVp/9vGxgJW9eiY5EZG2C5
+	AXBkfrClRpM9v8/C19HQJJOz9TlrhRUSZ38J4tyBjnHkzXD1P3dSo1ZE3CXUjHAA
+	VHXlOIP5trfqg1QzEc30E5oNl5NQQrcmti2DisNepBspaTAoYNAUYRb2Lt7jMfM4
+	JwQs65F6IEbGUR9/rVOd4md6X0QFbfw60reg6PkUAMBSrWsXaU4KR3gAObV83bU9
+	oDZ4LHslDLduFbfuAdIj9ck8S3Xs4TKq7MUF8mgVGI31KzbnWCUm+nFytNvH7k7t
+	xMAQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:message-id
+	:mime-version:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1712604129; x=1712690529; bh=OMrRvq4Iqu/zIvPT1p/NI6auBHl3fwxbb+l
+	wjrIxmN4=; b=swqlnenrgZgF8YtQojw1CHK2jMRsxz0hwwVmqjFjKAxBMCK6VBk
+	R74c2770NM1DOXEm5EXjnXrw+d4bFrlehLurVt/GtAxxUiuoe0dgPrKh6m3V4twT
+	4nX+zbgnS0m2vOo2YsLk+GRJUgI7YqYJWJ8CQLEjzW7ymz1oYVelcCxQqcmfu2+t
+	5YbZZYzvLsTyLBulbaV9wlj3PJuDW925xzGjysLX3cyCtBqXTU8FSOKyVIt0ftHL
+	XOt8ZqnDJnWeGT8TiRZ0Wo/ljm3qVLYeZil8uAz8wPAQHeDtyFyNmIM27vuOWt0H
+	K8DdM0LjFSwmdqHY7j6jzvABS/chZkhrmag==
+X-ME-Sender: <xms:4EMUZmw65ClnQrCF37cKHbctwGyMuHGqI69faH6P2CgO3hkt4F2XYA>
+    <xme:4EMUZiQEMK4SyVnLKKb6kEgETEdH-UvUKJ3ZAuIgFQYSQ_UpmAhjCC0WuCZRm55zl
+    o-rzo9RvF4m3Q>
+X-ME-Received: <xmr:4EMUZoVzuk5oAWfmN11qlbIYodd_Wr6h6An6igjSfiZYWrXVxKl159lRYny4xoG7wLZBb3cvArHbBzdF3zjfSaBL1GpnRZvg1g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudegiedgudefhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkgggtugesghdtre
+    ertddtjeenucfhrhhomhepofgrrhgvkhcuofgrrhgtiiihkhhofihskhhiqdfikphrvggt
+    khhiuceomhgrrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomh
+    eqnecuggftrfgrthhtvghrnhephfetuefhiefgtddtlefggffggeevhedtvdefffeugfei
+    ieeiheefteefgefggeejnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmrghrmhgrrhgvkhes
+    ihhnvhhishhisghlvghthhhinhhgshhlrggsrdgtohhm
+X-ME-Proxy: <xmx:4EMUZsgZrCKl4hoqoE-DrKYnvga5VU86z7pY_RQnP58ui9P9lfENCw>
+    <xmx:4EMUZoBuFNPovYmB01h_zOhzlZEXQ7cRwZyG7qMW17vTYpql3YIgNA>
+    <xmx:4EMUZtKo4Jnmnomv6LIPm4hiJBIZ7PObe_43z25WsejdNp23FooFTA>
+    <xmx:4EMUZvAeiozwSITluWk_RS-FU5eJA6Ee4ulpz6yPyNXUufeRRQiHqw>
+    <xmx:4UMUZrPLjhtvIsx82tJpZypKgtOgv0UW-qduAPn_bFxpCAPWv3fqn2Wr>
+Feedback-ID: i1568416f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Apr 2024 15:22:08 -0400 (EDT)
+Date: Mon, 8 Apr 2024 21:22:05 +0200
+From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+To: netdev@vger.kernel.org, linux-leds@vger.kernel.org
+Cc: regressions@lists.linux.dev
+Subject: 6.9-rc2: Deadlock on unbinding network device from a driver
+ (regression)
+Message-ID: <ZhRD3cOtz5i-61PB@mail-itl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH V3 5/7] clk: qcom: Add NSS clock Controller driver for
- IPQ9574
-Content-Language: en-US
-To: Devi Priya <quic_devipriy@quicinc.com>, andersson@kernel.org,
- konrad.dybcio@linaro.org, mturquette@baylibre.com, sboyd@kernel.org,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
- richardcochran@gmail.com, geert+renesas@glider.be, arnd@arndb.de,
- neil.armstrong@linaro.org, nfraprado@collabora.com, m.szyprowski@samsung.com
-Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
-References: <20240129051104.1855487-1-quic_devipriy@quicinc.com>
- <20240129051104.1855487-6-quic_devipriy@quicinc.com>
-From: mr.nuke.me@gmail.com
-In-Reply-To: <20240129051104.1855487-6-quic_devipriy@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="rb0skLUNgwT7nFvb"
+Content-Disposition: inline
 
 
+--rb0skLUNgwT7nFvb
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 8 Apr 2024 21:22:05 +0200
+From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+To: netdev@vger.kernel.org, linux-leds@vger.kernel.org
+Cc: regressions@lists.linux.dev
+Subject: 6.9-rc2: Deadlock on unbinding network device from a driver
+ (regression)
 
-On 1/28/24 23:11, Devi Priya wrote:
-> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
-> devices.
-> 
-> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
-> ---
->   Changes in V3:
-> 	- Moved DT_XO to the beginning of the enum list
-> 	- Hex values changed to lowercase
-> 	- Construct mask for resets which require multiple bits to be set/cleared.
-> 	- Dropped pm_clks as the necessary nss clocks are enabled in the
-> 	  probe function of gcc driver.
-> 
->   drivers/clk/qcom/Kconfig         |    7 +
->   drivers/clk/qcom/Makefile        |    1 +
->   drivers/clk/qcom/nsscc-ipq9574.c | 3068 ++++++++++++++++++++++++++++++
->   3 files changed, 3076 insertions(+)
->   create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
+Hi,
 
-Tested-by: Alexandru Gagniuc <mr.nuke.me@gmail.com>
+After updating to 6.9-rc2 I can no longer unbind device from the igc
+driver. "echo" into "unbind" file hangs, and via sysrq "w" I get this
+call trace:
+
+    [   84.553112] Call Trace:
+    [   84.553118]  <TASK>
+    [   84.553123]  __schedule+0x23b/0x5c0
+    [   84.553134]  schedule+0x27/0xa0
+    [   84.553142]  schedule_preempt_disabled+0x15/0x30
+    [   84.553152]  __mutex_lock.constprop.0+0x34c/0x6a0
+    [   84.553165]  unregister_netdevice_notifier+0x25/0xc0
+    [   84.553178]  netdev_trig_deactivate+0x1e/0x60 [ledtrig_netdev]
+    [   84.553195]  led_trigger_set+0x105/0x340
+    [   84.553206]  led_classdev_unregister+0x4a/0x110
+    [   84.553219]  release_nodes+0x3d/0xb0
+    [   84.553229]  devres_release_all+0x8c/0xc0
+    [   84.553238]  device_del+0x27a/0x3f0
+    [   84.553248]  unregister_netdevice_many_notify+0x46a/0x6a0
+    [   84.553260]  unregister_netdevice_queue+0xf0/0x130
+    [   84.553271]  unregister_netdev+0x1c/0x30
+    [   84.553280]  igc_remove+0xe3/0x1d0 [igc]
+    [   84.553298]  pci_device_remove+0x3f/0xb0
+    [   84.553308]  device_release_driver_internal+0x19f/0x200
+    [   84.553320]  unbind_store+0xa1/0xb0
+    [   84.553329]  kernfs_fop_write_iter+0x11f/0x200
+    [   84.553341]  vfs_write+0x293/0x460
+    [   84.553351]  ksys_write+0x6f/0xf0
+    [   84.553360]  do_syscall_64+0x87/0x170
+    [   84.553368]  ? syscall_exit_work+0xf3/0x120
+    [   84.553378]  ? syscall_exit_to_user_mode+0x69/0x220
+    [   84.553389]  ? do_syscall_64+0x96/0x170
+    [   84.553397]  ? do_syscall_64+0x96/0x170
+    [   84.553404]  ? do_syscall_64+0x96/0x170
+    [   84.553412]  ? do_syscall_64+0x96/0x170
+    [   84.553420]  ? __irq_exit_rcu+0x4b/0xb0
+    [   84.553429]  entry_SYSCALL_64_after_hwframe+0x71/0x79
+    [   84.553439] RIP: 0033:0x7b46ae7c5ee4
+    [   84.553446] RSP: 002b:00007ffe580c2dd8 EFLAGS: 00000202 ORIG_RAX: 00=
+00000000000001
+    [   84.553460] RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007b4=
+6ae7c5ee4
+    [   84.553474] RDX: 000000000000000d RSI: 00006458ac50b4b0 RDI: 0000000=
+000000001
+    [   84.553487] RBP: 00007ffe580c2e00 R08: 0000000000000073 R09: 0000000=
+000000001
+    [   84.553500] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000=
+00000000d
+    [   84.553514] R13: 00006458ac50b4b0 R14: 00007b46ae8965c0 R15: 00007b4=
+6ae893f20
+    [   84.553528]  </TASK>
+
+It worked fine on 6.8.4.
+
+Similar issue happens on few other systems, including one with Realtek
+RTL8111/8168/8411 device, so it may be not specific to the igc driver
+but some common API (LED trigger?). The issue does not affect a system
+with e1000e driver.=20
+
+Lockdep says:
+
+    [   18.589322] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+    [   18.589329] WARNING: possible circular locking dependency detected
+    [   18.589335] 6.9.0-rc2-1.qubes.fc32.x86_64 #378 Not tainted
+    [   18.589340] ------------------------------------------------------
+    [   18.589347] prepare-suspend/1145 is trying to acquire lock:
+    [   18.589352] ffff897494bc37b8 (&led_cdev->trigger_lock){+.+.}-{3:3}, =
+at: led_classdev_unregister+0x32/0x110
+    [   18.589367]
+    [   18.589367] but task is already holding lock:
+    [   18.589373] ffffffffb034dfa8 (rtnl_mutex){+.+.}-{3:3}, at: unregiste=
+r_netdev+0xe/0x20
+    [   18.589384]
+    [   18.589384] which lock already depends on the new lock.
+    [   18.589384]
+    [   18.589391]
+    [   18.589391] the existing dependency chain (in reverse order) is:
+    [   18.589399]
+    [   18.589399] -> #1 (rtnl_mutex){+.+.}-{3:3}:
+    [   18.589407]        __mutex_lock+0xb2/0xbd0
+    [   18.589413]        set_device_name+0x2d/0x140 [ledtrig_netdev]
+    [   18.589423]        netdev_trig_activate+0x1a6/0x220 [ledtrig_netdev]
+    [   18.589432]        led_trigger_set+0x20f/0x340
+    [   18.589438]        led_trigger_register+0x16d/0x1a0
+    [   18.589443]        do_one_initcall+0x6f/0x3d0
+    [   18.589451]        do_init_module+0x60/0x240
+    [   18.589459]        init_module_from_file+0x86/0xc0
+    [   18.589465]        idempotent_init_module+0x126/0x2c0
+    [   18.589471]        __x64_sys_finit_module+0x5a/0xb0
+    [   18.589477]        do_syscall_64+0x96/0x190
+    [   18.589482]        entry_SYSCALL_64_after_hwframe+0x71/0x79
+    [   18.589490]
+    [   18.589490] -> #0 (&led_cdev->trigger_lock){+.+.}-{3:3}:
+    [   18.589498]        __lock_acquire+0x13e7/0x2180
+    [   18.589505]        lock_acquire+0xd5/0x2f0
+    [   18.589510]        down_write+0x2a/0xc0
+    [   18.589515]        led_classdev_unregister+0x32/0x110
+    [   18.589522]        devres_release_all+0xb5/0x110
+    [   18.589530]        device_del+0x275/0x3f0
+    [   18.589535]        unregister_netdevice_many_notify+0x5ba/0x870
+    [   18.589543]        unregister_netdevice_queue+0xf3/0x130
+    [   18.589549]        unregister_netdev+0x18/0x20
+    [   18.589555]        igc_remove+0xe1/0x1c0 [igc]
+    [   18.589566]        pci_device_remove+0x3b/0xb0
+    [   18.589574]        device_release_driver_internal+0x1a5/0x210
+    [   18.589581]        unbind_store+0x9d/0xb0
+    [   18.589587]        kernfs_fop_write_iter+0x15b/0x210
+    [   18.589595]        vfs_write+0x2bd/0x560
+    [   18.589601]        ksys_write+0x71/0xf0
+    [   18.589608]        do_syscall_64+0x96/0x190
+    [   18.589614]        entry_SYSCALL_64_after_hwframe+0x71/0x79
+    [   18.589620]
+    [   18.589620] other info that might help us debug this:
+    [   18.589620]
+    [   18.589628]  Possible unsafe locking scenario:
+    [   18.589628]
+    [   18.589635]        CPU0                    CPU1
+    [   18.589640]        ----                    ----
+    [   18.589645]   lock(rtnl_mutex);
+    [   18.589650]                                lock(&led_cdev->trigger_l=
+ock);
+    [   18.589657]                                lock(rtnl_mutex);
+    [   18.589664]   lock(&led_cdev->trigger_lock);
+    [   18.589670]
+    [   18.589670]  *** DEADLOCK ***
+    [   18.589670]
+    [   18.589676] 4 locks held by prepare-suspend/1145:
+    [   18.589682]  #0: ffff8974873a7420 (sb_writers#3){.+.+}-{0:0}, at: ks=
+ys_write+0x71/0xf0
+    [   18.589693]  #1: ffff897495886288 (&of->mutex){+.+.}-{3:3}, at: kern=
+fs_fop_write_iter+0x114/0x210[   18.589704]  #2: ffff8974820991b0 (&dev->mu=
+tex){....}-{3:3}, at: device_release_driver_internal+0x39/0x210
+    [   18.589715]  #3: ffffffffb034dfa8 (rtnl_mutex){+.+.}-{3:3}, at: unre=
+gister_netdev+0xe/0x20
+    [   18.589726]
+    [   18.589726] stack backtrace:
+    [   18.589731] CPU: 1 PID: 1145 Comm: prepare-suspend Not tainted 6.9.0=
+-rc2-1.qubes.fc32.x86_64 #378
+    [   18.589741] Hardware name: Xen HVM domU, BIOS 4.17.3 03/12/2024
+    [   18.589748] Call Trace:
+    [   18.589752]  <TASK>
+    [   18.589755]  dump_stack_lvl+0x73/0xb0
+    [   18.589761]  check_noncircular+0x148/0x160
+    [   18.589766]  ? stack_trace_save+0x4a/0x70
+    [   18.589773]  __lock_acquire+0x13e7/0x2180
+    [   18.589780]  lock_acquire+0xd5/0x2f0
+    [   18.589786]  ? led_classdev_unregister+0x32/0x110
+    [   18.589793]  down_write+0x2a/0xc0
+    [   18.589798]  ? led_classdev_unregister+0x32/0x110
+    [   18.589804]  led_classdev_unregister+0x32/0x110
+    [   18.589811]  devres_release_all+0xb5/0x110
+    [   18.589816]  device_del+0x275/0x3f0
+    [   18.589821]  unregister_netdevice_many_notify+0x5ba/0x870
+    [   18.589829]  unregister_netdevice_queue+0xf3/0x130
+    [   18.589835]  unregister_netdev+0x18/0x20
+    [   18.589840]  igc_remove+0xe1/0x1c0 [igc]
+    [   18.589850]  pci_device_remove+0x3b/0xb0
+    [   18.589855]  device_release_driver_internal+0x1a5/0x210
+    [   18.589861]  unbind_store+0x9d/0xb0
+    [   18.589867]  kernfs_fop_write_iter+0x15b/0x210
+    [   18.589874]  vfs_write+0x2bd/0x560
+    [   18.589880]  ksys_write+0x71/0xf0
+    [   18.589886]  do_syscall_64+0x96/0x190
+    [   18.589891]  ? find_held_lock+0x2b/0x80
+    [   18.589896]  ? lock_release+0x143/0x2c0
+    [   18.589902]  ? do_user_addr_fault+0x354/0x8a0
+    [   18.589909]  ? exc_page_fault+0x126/0x260
+    [   18.589916]  entry_SYSCALL_64_after_hwframe+0x71/0x79
+    [   18.589922] RIP: 0033:0x76426194fee4
+    [   18.589927] Code: c7 00 16 00 00 00 b8 ff ff ff ff c3 66 2e 0f 1f 84=
+ 00 00 00 00 00 f3 0f 1e fa 80 3d 85 74 0d 00 00 74 13 b8 01 00 00 00 0f 05=
+ <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 55 48 89 e5 48 83 ec 20 48 89
+    [   18.589946] RSP: 002b:00007ffe69a0ca98 EFLAGS: 00000202 ORIG_RAX: 00=
+00000000000001
+    [   18.589955] RAX: ffffffffffffffda RBX: 000000000000000d RCX: 0000764=
+26194fee4
+    [   18.589963] RDX: 000000000000000d RSI: 000058ae60024480 RDI: 0000000=
+000000001
+    [   18.589971] RBP: 00007ffe69a0cac0 R08: 0000000000000000 R09: 0000000=
+000000001
+    [   18.589979] R10: 0000000000000004 R11: 0000000000000202 R12: 0000000=
+00000000d
+    [   18.589987] R13: 000058ae60024480 R14: 0000764261a205c0 R15: 0000764=
+261a1df20
+    [   18.589997]  </TASK>
+
+
+This is happening in a HVM domain on Xen, with PCI passthrough of
+relevant devices, but I don't think it's related to the issue.
+
+There is some more details on
+https://github.com/QubesOS/qubes-issues/issues/9096.
+
+
+#regzbot introduced: v6.8.4..v6.9-rc2
+
+--=20
+Best Regards,
+Marek Marczykowski-G=C3=B3recki
+Invisible Things Lab
+
+--rb0skLUNgwT7nFvb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAmYUQ90ACgkQ24/THMrX
+1yxJKAf+LVhXJPQx78YTODCpBT0iZVgwkDbzVf688nGAYjWmYPzQRvvKzeoVyzjh
+wQ4/I6oQuon0LP8FIFEenIHqtwJ4SF4bleT0c+qdsdGttbwxqT2u11HbDHNC48fz
+lEu3gDObtkDEyaqG4/D3RTz9L2jG3rqQVaCgBo6TSJ9YlTT6b5nKkwPvWzyx/qyy
+CaEY2OM1O+DEq5S+wwok45w7+PcdB7L5tMBZqDkxXAys7K+7lpw4lkzm+R+vV+lP
+Kyk1tAIwyqV9cJ1oMrVseyEKEokrLa5T06TLbeQXwPFE5jmC3PrDPu44NXSQ/Of6
+tdjYTRTAdcFooz97pBkFQr3wAr5g9Q==
+=/H5P
+-----END PGP SIGNATURE-----
+
+--rb0skLUNgwT7nFvb--
 
