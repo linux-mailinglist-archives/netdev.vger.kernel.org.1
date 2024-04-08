@@ -1,177 +1,122 @@
-Return-Path: <netdev+bounces-85656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60C5D89BC45
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:48:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0A089BC6B
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:56:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00DF51F21F77
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:48:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA9A3B21E82
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6244D9F4;
-	Mon,  8 Apr 2024 09:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63EFA4EB43;
+	Mon,  8 Apr 2024 09:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h4Dyzskj"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6068639FDD;
-	Mon,  8 Apr 2024 09:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3D34E1CA
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 09:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712569732; cv=none; b=mc658PcC/6cInkb4LG3XWRy+I0uj+WR6de11D/7XaUYL8b9oTjjR6dg563tEP2GMzxbQZABpHEiwZl8lVqq+O5hnowcefG6omJueRj6piJZIF+M69LsRqhaNfCJTr1WZgHGRgo10lBuyA9qpbirkjy+GBUm24KU9GtLFMDLa+Z4=
+	t=1712570169; cv=none; b=m0EBrAB+d2kBg43y+V1fx7FlSkSjCUo3K+ZA25I0YSg530nIW/gc+0/GnM212NoUJnw80UgH4k5OwWZW8CsBFCXGDhIPiGOJTK3Jnx0BK0DIordTahBekR4XuwVpqRVloYPG18tdh4ToWKEcLRtGPxNbj3TC4kJ/gwKvSpM6eFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712569732; c=relaxed/simple;
-	bh=QASNcFLq4kfgEx+JMHc/eYSmFPFGV7YTjoey+j/hzVQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ONoScqQwsXHplstiVJoVZb7Gz4i/QZLfUd5Y6py9amQsIVpeLhPySRmiv5y7J0Ht8dhzfTHgqP+jRDaSt9DZMfjvae0iybbOftPDwep6qhYAJM9doEI9c7ecE0u9BFkeJsj07ydkksvVBvqRr++GYtE2QJartTi0fUCx764Q0Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VCkjx6v8Gz1h64s;
-	Mon,  8 Apr 2024 17:45:57 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id DC05018005F;
-	Mon,  8 Apr 2024 17:48:47 +0800 (CST)
-Received: from mscphis02103.huawei.com (10.123.65.215) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 8 Apr 2024 17:48:45 +0800
-From: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-To: <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-Subject: [PATCH 2/2] selftests/landlock: Create 'listen_zero', 'deny_listen_zero' tests
-Date: Mon, 8 Apr 2024 17:47:47 +0800
-Message-ID: <20240408094747.1761850-3-ivanov.mikhail1@huawei-partners.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
-References: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1712570169; c=relaxed/simple;
+	bh=LwyvMM/osJwH6vJPmU4ZO2uCiOeVzGUiiHNqjIKfpJ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UYuf/YiV0oa8nyTh/mTvxPrrXLh2Wihspk9QgyM7CrRMZMN1K4czFBPkHVSSRXJwEOllIcyOkpDQUnfNZGC0gCTmUWTBJAHVpTQyhFIwcNGjcZVTGfN5CnpIEF+t9oQdsGRcVlTyVQ5NJpDlZI+j2l4qDo+0veeI35pnUHeeGYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h4Dyzskj; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so7260a12.1
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 02:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712570166; x=1713174966; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5NBLlpBXDu8VTMGb4M7KQYnrZBt176tELNst411LxfI=;
+        b=h4DyzskjeqyNDor3BayhZbsEIlgTDmEw4jidjv/vi3IEVKrFIUGWor2I7VYTc9O4kf
+         Ey/WTu3YOd2eElxZXDzb6R+q8gFaXH77wiX6pf+eMJuiKPJ+kxgWnSuAdGG7hVVCVVgo
+         fWkKsvx/pY9vhsjt3kaBSUZ8NGylWJGUfPa/+zjXcs5Uq3n6D73D8WNfCGIHbnx7o7tj
+         mWzxNjIGSRa0mPKuNbxaziNAKTM14o4igFfkORjxBxzZeo2VCaFN5wbttjyedm1+cWCx
+         sCBhZBvyuUGJflPa8PN10A2494KkGyCRYFk7gVxwUQQMQB56JGyWHvIaTR0IA0uw/oK2
+         PEhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712570166; x=1713174966;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5NBLlpBXDu8VTMGb4M7KQYnrZBt176tELNst411LxfI=;
+        b=XMcNbea6aJAza70nih8kcgUshI2lL/CH9mSPeOxeiHIkw0nKdzkU44ljEvGxiOA00O
+         M4Kg2WGUpQzDuVWzGNEfyG5MweL+h378UfhC2MTNMoLbLbJiuYTFQ8Iz+FnY6bUHtWii
+         uDeg7YSUK7TV8s0TcJqxcEOu7z4wJjggYZ/3t/RkY9EPA8ULu+R9PzKlHKthM3+UsQfl
+         YsFUoKStJZX0hIC40DLMh7SS8uDD0Eq5CCJbPi5BQqB5lyPEFousCYkQiQsholZ68NcU
+         U5MmAu9y04nV3PDRUYqI3XFW2M/Y4D7nQP9vB6JCJm1wCoV7ZcivPEfjfjeRGH+f4rJZ
+         3WnA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNfN6TQOpiIh27MTnPg/BQ+SKI2W7OKrL311jq7MOOHWTsoWMkg6BqtFbTvrHi6OYbBEEtQC25TyIfBQJ0hcBSwW0z9f//
+X-Gm-Message-State: AOJu0YwfDAa3G+T017hHZtyiYQ2qREup/pAduwavW/qXFJbJiCoKG1/o
+	o2iZm4PCJfF2ygvBeZD6DFIbwethYyd8g/sCQy/09NR8bDvy4dAlljHe/Df3S+BI0zDxqr6OkVJ
+	4KEa0XUBDvKVH2t2FNMRcjUSJJz+KnABx//T5
+X-Google-Smtp-Source: AGHT+IE2qUojADKYdZJqeft3RAdXwSfc5OVrWJTQOnEo9gh9I4EVlEFyGGCO3ijZKUTup4SuuVnvMf9PS8JbxJKUuiU=
+X-Received: by 2002:a05:6402:3125:b0:56e:556b:c3fd with SMTP id
+ dd5-20020a056402312500b0056e556bc3fdmr120190edb.3.1712570165564; Mon, 08 Apr
+ 2024 02:56:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+References: <ZhJTu7qmOtTs9u2c@zeus>
+In-Reply-To: <ZhJTu7qmOtTs9u2c@zeus>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 8 Apr 2024 11:55:54 +0200
+Message-ID: <CANn89iJrQevxPFLCj2P=U+XSisYD0jqrUQpa=zWMXTjj5+RriA@mail.gmail.com>
+Subject: Re: [PATCH net] nfc: nci: Fix uninit-value in nci_rx_work
+To: Ryosuke Yasuoka <ryasuoka@redhat.com>
+Cc: krzysztof.kozlowski@linaro.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syoshida@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Suggested code test scenarios where listen(2) call without explicit
-bind(2) is allowed and forbidden.
+On Sun, Apr 7, 2024 at 10:05=E2=80=AFAM Ryosuke Yasuoka <ryasuoka@redhat.co=
+m> wrote:
+>
+> syzbot reported the following uninit-value access issue [1]
+>
+> nci_rx_work() parses received packet from ndev->rx_q. It should be
+> checked skb->len is non-zero to verify if it is valid before processing
+> the packet. If skb->len is zero but skb->data is not, such packet is
+> invalid and should be silently discarded.
+>
+> Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_nt=
+f_packet")
+> Reported-and-tested-by: syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail=
+.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Dd7b4dc6cd50410152534 [1=
+]
+> Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
+> ---
+>  net/nfc/nci/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
+> index 0d26c8ec9993..b7a020484131 100644
+> --- a/net/nfc/nci/core.c
+> +++ b/net/nfc/nci/core.c
+> @@ -1516,7 +1516,7 @@ static void nci_rx_work(struct work_struct *work)
+>                 nfc_send_to_raw_sock(ndev->nfc_dev, skb,
+>                                      RAW_PAYLOAD_NCI, NFC_DIRECTION_RX);
+>
+> -               if (!nci_plen(skb->data)) {
+> +               if (!skb->len || !nci_plen(skb->data)) {
 
-Signed-off-by: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Reviewed-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
----
- tools/testing/selftests/landlock/net_test.c | 89 +++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+#define nci_plen(hdr)           (__u8)((hdr)[2])
 
-diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
-index 936cfc879f1d..6d6b5aef387f 100644
---- a/tools/testing/selftests/landlock/net_test.c
-+++ b/tools/testing/selftests/landlock/net_test.c
-@@ -1714,6 +1714,95 @@ TEST_F(port_specific, bind_connect_zero)
- 	EXPECT_EQ(0, close(bind_fd));
- }
- 
-+TEST_F(port_specific, listen_zero)
-+{
-+	int listen_fd, connect_fd;
-+	uint16_t port;
-+
-+	/* Adds a rule layer with bind actions. */
-+	if (variant->sandbox == TCP_SANDBOX) {
-+		const struct landlock_ruleset_attr ruleset_attr = {
-+			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP,
-+		};
-+		const struct landlock_net_port_attr tcp_bind_zero = {
-+			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
-+			.port = 0,
-+		};
-+		int ruleset_fd;
-+
-+		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
-+						     sizeof(ruleset_attr), 0);
-+		ASSERT_LE(0, ruleset_fd);
-+
-+		/* Checks zero port value on bind action. */
-+		EXPECT_EQ(0,
-+			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-+					    &tcp_bind_zero, 0));
-+
-+		enforce_ruleset(_metadata, ruleset_fd);
-+		EXPECT_EQ(0, close(ruleset_fd));
-+	}
-+
-+	listen_fd = socket_variant(&self->srv0);
-+	ASSERT_LE(0, listen_fd);
-+
-+	connect_fd = socket_variant(&self->srv0);
-+	ASSERT_LE(0, listen_fd);
-+	/*
-+	 * Allow listen(2) to select a random port for the socket,
-+	 * since bind(2) wasn't called.
-+	 */
-+	EXPECT_EQ(0, listen(listen_fd, backlog));
-+
-+	/* Sets binded (by listen(2)) port for both protocol families. */
-+	port = get_binded_port(listen_fd, &variant->prot);
-+	EXPECT_NE(0, port);
-+	set_port(&self->srv0, port);
-+
-+	/* Connects on the binded port. */
-+	EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
-+
-+	EXPECT_EQ(0, close(listen_fd));
-+	EXPECT_EQ(0, close(connect_fd));
-+}
-+
-+TEST_F(port_specific, deny_listen_zero)
-+{
-+	int listen_fd, ret;
-+
-+	/* Adds a rule layer with bind actions. */
-+	if (variant->sandbox == TCP_SANDBOX) {
-+		const struct landlock_ruleset_attr ruleset_attr = {
-+			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP,
-+		};
-+		int ruleset_fd;
-+
-+		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
-+						     sizeof(ruleset_attr), 0);
-+		ASSERT_LE(0, ruleset_fd);
-+
-+		/* Forbid binding to any port. */
-+		enforce_ruleset(_metadata, ruleset_fd);
-+		EXPECT_EQ(0, close(ruleset_fd));
-+	}
-+
-+	listen_fd = socket_variant(&self->srv0);
-+	ASSERT_LE(0, listen_fd);
-+	/* 
-+	 * Check that listen(2) call is prohibited without first calling bind(2).
-+	 */
-+	ret = listen(listen_fd, backlog);
-+	if (is_restricted(&variant->prot, variant->sandbox)) {
-+		/* Denied by Landlock. */
-+		EXPECT_NE(0, ret);
-+		EXPECT_EQ(EACCES, errno);
-+	} else {
-+		EXPECT_EQ(0, ret);
-+	}
-+
-+	EXPECT_EQ(0, close(listen_fd));
-+}
-+
- TEST_F(port_specific, bind_connect_1023)
- {
- 	int bind_fd, connect_fd, ret;
--- 
-2.34.1
-
+So your patch will not help if skb->len is 1 or 2.
 
