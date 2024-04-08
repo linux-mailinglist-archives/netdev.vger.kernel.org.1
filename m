@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-85774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571BA89C189
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:21:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A5DD89C1A6
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:22:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C36ED1F226B1
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:21:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EF3B1C21622
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9DA7E59F;
-	Mon,  8 Apr 2024 13:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9221D77F11;
+	Mon,  8 Apr 2024 13:18:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA497E59A
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876EB7FBBC
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712582260; cv=none; b=BwPA/+dKp9To0tLb35aHVogogbWnSF1uhbO9laNucjJsMZ/dVhr4g8xVvZhwzoV5duTr7CpaHMQsTE7ttxp/jGnAl2wB7ImIQWEZX9v1X2mrs46SvTmpRTQfiKrL3jYhuc6AQHWLlqwRbUK4Io6cd33c2Z+j6hMh9qplfMVsNWE=
+	t=1712582336; cv=none; b=PA72ykjvT9LFX/NY1KxspaljofbI3ZOrIX1CboUotmJn97zphf0Ei6NAgnYqUr8pkfEQOyq4qsfRI2wsT8zzKYfVkybad3moNcv5UOIQ7ojLNlNrAMlqUyX6DaTPCVvYuXWvBHzRTxm+yo+qVSpM80I0iv0wuoEIlCe49VJhhNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712582260; c=relaxed/simple;
-	bh=P3zk1/6k2t6jHMu2C+zJQkPkLoMnlfKdrzleF71UXes=;
+	s=arc-20240116; t=1712582336; c=relaxed/simple;
+	bh=1Bo6ojBgi/lqEbbKTmThh71N5IusHEBeQN7J0pisNos=;
 	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jnOcicTjwa7/KKsOHtI2TnsJwcVM5mw+Ap3Ss0Cx21rAbDuUkyiet58aIaMyBpDg+WoUupqPDkjH828F+ahb6SE+RDKa/GZv5/IuMS47dtAaIzvSG4O69c/5Rn94lxCmMwOb9VJUXwC6GgLGYpujizclvycPDcqwVCXEnLJ2qnc=
+	 In-Reply-To:Content-Type; b=Jr/5CofZunWNVcUPW4Im2edTo7oZtD1NAQ3wy7nTysnFr3QMe2z5BbUgo0ESbGjJOC0nX6IXAKQ5x+mzt88jvYp6IwqVl9JxE7O4W4kKrKxRygRzyqzrNYVHlSU7+tzqNDPtecRnd6TbNDthIWtWhkbjZaQl7+pcjh5tzCYxc+4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4026D240004;
-	Mon,  8 Apr 2024 13:17:35 +0000 (UTC)
-Message-ID: <2b79ebe9-4e83-418a-ae40-93024a3fb433@ovn.org>
-Date: Mon, 8 Apr 2024 15:18:18 +0200
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9A9C224000A;
+	Mon,  8 Apr 2024 13:18:51 +0000 (UTC)
+Message-ID: <281c9e36-6a83-488e-b104-09d80aef83fc@ovn.org>
+Date: Mon, 8 Apr 2024 15:19:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,12 +43,11 @@ User-Agent: Mozilla Thunderbird
 Cc: i.maximets@ovn.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
  cmi@nvidia.com, yotam.gi@gmail.com, aconole@redhat.com, echaudro@redhat.com,
  horms@kernel.org
-Subject: Re: [RFC net-next v2 2/5] net: psample: add multicast filtering on
- group_id
+Subject: Re: [RFC net-next v2 3/5] net: psample: add user cookie
 Content-Language: en-US
 To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
 References: <20240408125753.470419-1-amorenoz@redhat.com>
- <20240408125753.470419-3-amorenoz@redhat.com>
+ <20240408125753.470419-4-amorenoz@redhat.com>
 From: Ilya Maximets <i.maximets@ovn.org>
 Autocrypt: addr=i.maximets@ovn.org; keydata=
  xsFNBF77bOMBEADVZQ4iajIECGfH3hpQMQjhIQlyKX4hIB3OccKl5XvB/JqVPJWuZQRuqNQG
@@ -93,7 +92,7 @@ Autocrypt: addr=i.maximets@ovn.org; keydata=
  o9OQwoMf2+pKNG3J+EMuU4g4ZHGzxI0isyww7PpEHx6sxFEvMhsOp7qnjPsQUcnGIIiqKlTj
  H7i86580VndsKrRK99zJrm4s9Tg/7OFP1SpVvNvSM4TRXSzVF25WVfLgeloN1yHC5Wsqk33X
  XNtNovqA0TLFjhfyyetBsIOgpGakgBNieC9GnY7tC3AG+BqG5jnVuGqSTO+iM/d+lsoa+w==
-In-Reply-To: <20240408125753.470419-3-amorenoz@redhat.com>
+In-Reply-To: <20240408125753.470419-4-amorenoz@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GND-Sasl: i.maximets@ovn.org
@@ -101,240 +100,84 @@ X-GND-Sasl: i.maximets@ovn.org
 [copying my previous reply since this version actually has netdev@ in Cc]
 
 On 4/8/24 14:57, Adrian Moreno wrote:
-> Packet samples can come from several places (e.g: different tc sample
-> actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
-> to differentiate them.
+> Add a user cookie to the sample metadata so that sample emitters can
+> provide more contextual information to samples.
 > 
-> Likewise, sample consumers that listen on the multicast group may only
-> be interested on a single group. However, they are currently forced to
-> receive all samples and discard the ones that are not relevant, causing
-> unnecessary overhead.
-> 
-> Allow users to filter on the desired group_id by adding a new command
-> SAMPLE_FILTER_SET that can be used to pass the desired group id.
-> Store this filter on the per-socket private pointer and use it for
-> filtering multicasted samples.
+> If present, send the user cookie in a new attribute:
+> PSAMPLE_ATTR_USER_COOKIE.
 > 
 > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 > ---
->  include/uapi/linux/psample.h |   1 +
->  net/psample/psample.c        | 127 +++++++++++++++++++++++++++++++++--
->  2 files changed, 122 insertions(+), 6 deletions(-)
+>  include/net/psample.h        |  2 ++
+>  include/uapi/linux/psample.h |  1 +
+>  net/psample/psample.c        | 12 +++++++++++-
+>  3 files changed, 14 insertions(+), 1 deletion(-)
 > 
+> diff --git a/include/net/psample.h b/include/net/psample.h
+> index 0509d2d6be67..2503ab3c92a5 100644
+> --- a/include/net/psample.h
+> +++ b/include/net/psample.h
+> @@ -25,6 +25,8 @@ struct psample_metadata {
+>  	   out_tc_occ_valid:1,
+>  	   latency_valid:1,
+>  	   unused:5;
+> +	u8 *user_cookie;
+
+The code doesn't take ownership of this data.  It should probably
+be a const pointer in this case.
+
+This should also allow us to avoid a double copy first to the
+psample_metadata and then to netlink skb, as users will know that
+it is a const pointer and so they can hand the data directly.
+
+> +	u32 user_cookie_len;
+>  };
+>  
+>  struct psample_group *psample_group_get(struct net *net, u32 group_num);
 > diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
-> index e585db5bf2d2..5e0305b1520d 100644
+> index 5e0305b1520d..1f61fd7ef7fd 100644
 > --- a/include/uapi/linux/psample.h
 > +++ b/include/uapi/linux/psample.h
-> @@ -28,6 +28,7 @@ enum psample_command {
->  	PSAMPLE_CMD_GET_GROUP,
->  	PSAMPLE_CMD_NEW_GROUP,
->  	PSAMPLE_CMD_DEL_GROUP,
-> +	PSAMPLE_CMD_SAMPLE_FILTER_SET,
-Other commands are names as PSAMPLE_CMD_VERB_NOUN, so this new one
-should be PSAMPLE_CMD_SET_FILTER.  (The SAMPLE part seems unnecessary.)
-Some functions/structures need to be renamed accordingly.
+> @@ -19,6 +19,7 @@ enum {
+>  	PSAMPLE_ATTR_LATENCY,		/* u64, nanoseconds */
+>  	PSAMPLE_ATTR_TIMESTAMP,		/* u64, nanoseconds */
+>  	PSAMPLE_ATTR_PROTO,		/* u16 */
+> +	PSAMPLE_ATTR_USER_COOKIE,
 
->  };
+A comment would be nice.
+
 >  
->  enum psample_tunnel_key_attr {
+>  	__PSAMPLE_ATTR_MAX
+>  };
 > diff --git a/net/psample/psample.c b/net/psample/psample.c
-> index a5d9b8446f77..a0cef63dfdec 100644
+> index a0cef63dfdec..9fdb88e01f21 100644
 > --- a/net/psample/psample.c
 > +++ b/net/psample/psample.c
-> @@ -98,13 +98,84 @@ static int psample_nl_cmd_get_group_dumpit(struct sk_buff *msg,
->  	return msg->len;
->  }
+> @@ -497,7 +497,8 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>  		   nla_total_size(sizeof(u32)) +	/* group_num */
+>  		   nla_total_size(sizeof(u32)) +	/* seq */
+>  		   nla_total_size_64bit(sizeof(u64)) +	/* timestamp */
+> -		   nla_total_size(sizeof(u16));		/* protocol */
+> +		   nla_total_size(sizeof(u16)) +	/* protocol */
+> +		   nla_total_size(md->user_cookie_len);	/* user_cookie */
 >  
-> -static const struct genl_small_ops psample_nl_ops[] = {
-> +struct psample_obj_desc {
-> +	struct rcu_head rcu;
-> +	u32 group_num;
-> +	bool group_num_valid;
-> +};
-> +
-> +struct psample_nl_sock_priv {
-> +	struct psample_obj_desc __rcu *flt;
-
-Can we call it 'fileter' ?  I find it hard to read the code with
-this unnecessary abbreviation.  Same for the lock below.
-
-> +	spinlock_t flt_lock; /* Protects flt. */
-> +};
-> +
-> +static void psample_nl_sock_priv_init(void *priv)
-> +{
-> +	struct psample_nl_sock_priv *sk_priv = priv;
-> +
-> +	spin_lock_init(&sk_priv->flt_lock);
-> +}
-> +
-> +static void psample_nl_sock_priv_destroy(void *priv)
-> +{
-> +	struct psample_nl_sock_priv *sk_priv = priv;
-> +	struct psample_obj_desc *flt;
-> +
-> +	flt = rcu_dereference_protected(sk_priv->flt, true);
-> +	kfree_rcu(flt, rcu);
-> +}
-> +
-> +static int psample_nl_sample_filter_set_doit(struct sk_buff *skb,
-> +					     struct genl_info *info)
-> +{
-> +	struct psample_nl_sock_priv *sk_priv;
-> +	struct nlattr **attrs = info->attrs;
-> +	struct psample_obj_desc *flt;
-> +
-> +	flt = kzalloc(sizeof(*flt), GFP_KERNEL);
-> +
-> +	if (attrs[PSAMPLE_ATTR_SAMPLE_GROUP]) {
-> +		flt->group_num = nla_get_u32(attrs[PSAMPLE_ATTR_SAMPLE_GROUP]);
-> +		flt->group_num_valid = true;
-> +	}
-> +
-> +	if (!flt->group_num_valid) {
-> +		kfree(flt);
-
-Might be better to not allocate it in the first place.
-
-> +		flt = NULL;
-> +	}
-> +
-> +	sk_priv = genl_sk_priv_get(&psample_nl_family, NETLINK_CB(skb).sk);
-> +	if (IS_ERR(sk_priv)) {
-> +		kfree(flt);
-> +		return PTR_ERR(sk_priv);
-> +	}
-> +
-> +	spin_lock(&sk_priv->flt_lock);
-> +	flt = rcu_replace_pointer(sk_priv->flt, flt,
-> +				  lockdep_is_held(&sk_priv->flt_lock));
-> +	spin_unlock(&sk_priv->flt_lock);
-> +	kfree_rcu(flt, rcu);
-> +	return 0;
-> +}
-> +
-> +static const struct nla_policy
-> +	psample_sample_filter_set_policy[PSAMPLE_ATTR_SAMPLE_GROUP + 1] = {
-> +	[PSAMPLE_ATTR_SAMPLE_GROUP] = { .type = NLA_U32, },
-
-This indentation is confusing, though I'm not sure what's a better way.
-
-> +};
-> +
-> +static const struct genl_ops psample_nl_ops[] = {
->  	{
->  		.cmd = PSAMPLE_CMD_GET_GROUP,
->  		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
->  		.dumpit = psample_nl_cmd_get_group_dumpit,
->  		/* can be retrieved by unprivileged users */
-> -	}
-> +	},
-> +	{
-> +		.cmd		= PSAMPLE_CMD_SAMPLE_FILTER_SET,
-> +		.doit		= psample_nl_sample_filter_set_doit,
-> +		.policy		= psample_sample_filter_set_policy,
-> +		.flags		= 0,
-> +	},
->  };
->  
->  static struct genl_family psample_nl_family __ro_after_init = {
-> @@ -114,10 +185,13 @@ static struct genl_family psample_nl_family __ro_after_init = {
->  	.netnsok	= true,
->  	.module		= THIS_MODULE,
->  	.mcgrps		= psample_nl_mcgrps,
-> -	.small_ops	= psample_nl_ops,
-> -	.n_small_ops	= ARRAY_SIZE(psample_nl_ops),
-> +	.ops		= psample_nl_ops,
-> +	.n_ops		= ARRAY_SIZE(psample_nl_ops),
->  	.resv_start_op	= PSAMPLE_CMD_GET_GROUP + 1,
->  	.n_mcgrps	= ARRAY_SIZE(psample_nl_mcgrps),
-> +	.sock_priv_size		= sizeof(struct psample_nl_sock_priv),
-> +	.sock_priv_init		= psample_nl_sock_priv_init,
-> +	.sock_priv_destroy	= psample_nl_sock_priv_destroy,
->  };
->  
->  static void psample_group_notify(struct psample_group *group,
-> @@ -360,6 +434,42 @@ static int psample_tunnel_meta_len(struct ip_tunnel_info *tun_info)
->  }
->  #endif
->  
-> +static inline void psample_nl_obj_desc_init(struct psample_obj_desc *desc,
-> +					    u32 group_num)
-> +{
-> +	memset(desc, 0, sizeof(*desc));
-> +	desc->group_num = group_num;
-> +	desc->group_num_valid = true;
-> +}
-> +
-> +static bool psample_obj_desc_match(struct psample_obj_desc *desc,
-> +				   struct psample_obj_desc *flt)
-> +{
-> +	if (desc->group_num_valid && flt->group_num_valid &&
-> +	    desc->group_num != flt->group_num)
-> +		return false;
-> +	return true;
-
-This fucntion returns 'true' if one of the arguments is not valid.
-I'd not expect such behavior from a 'match' function.
-
-I understand the intention that psample should sample everything
-to sockets that do not request filters, but that should not be part
-of the 'match' logic, or more appropriate function name should be
-chosen.  Also, if the group is not initialized, but the filter is,
-it should not match, logically.  The validity on filter and the
-current sample is not symmetric.
-
-And I'm not really sure if the 'group_num_valid' is actually needed.
-Can the NULL pointer be used as an indicator?  If so, then maybe
-the whole psample_obj_desc structure is not needed as it will
-contain a single field.
-
-> +}
-> +
-> +static int psample_nl_sample_filter(struct sock *dsk, struct sk_buff *skb,
-> +				    void *data)
-> +{
-> +	struct psample_obj_desc *desc = data;
-> +	struct psample_nl_sock_priv *sk_priv;
-> +	struct psample_obj_desc *flt;
-> +	int ret = 0;
-> +
-> +	rcu_read_lock();
-> +	sk_priv = __genl_sk_priv_get(&psample_nl_family, dsk);
-> +	if (!IS_ERR_OR_NULL(sk_priv)) {
-> +		flt = rcu_dereference(sk_priv->flt);
-> +		if (flt)
-> +			ret = !psample_obj_desc_match(desc, flt);
-> +	}
-> +	rcu_read_unlock();
-> +	return ret;
-> +}
-> +
->  void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->  			   u32 sample_rate, const struct psample_metadata *md)
->  {
-> @@ -370,6 +480,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
 >  #ifdef CONFIG_INET
->  	struct ip_tunnel_info *tun_info;
+>  	tun_info = skb_tunnel_info(skb);
+> @@ -596,6 +597,15 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>  			goto error;
+>  	}
 >  #endif
-> +	struct psample_obj_desc desc;
->  	struct sk_buff *nl_skb;
->  	int data_len;
->  	int meta_len;
-> @@ -487,8 +598,12 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->  #endif
+> +	if (md->user_cookie && md->user_cookie_len) {
+> +		int nla_len = nla_total_size(md->user_cookie_len);
+> +		struct nlattr *nla;
+> +
+> +		nla = skb_put(nl_skb, nla_len);
+> +		nla->nla_type = PSAMPLE_ATTR_USER_COOKIE;
+> +		nla->nla_len = nla_attr_size(md->user_cookie_len);
+> +		memcpy(nla_data(nla), md->user_cookie, md->user_cookie_len);
+> +	}
 >  
 >  	genlmsg_end(nl_skb, data);
-> -	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
-> -				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
-> +	psample_nl_obj_desc_init(&desc, group->group_num);
-> +	genlmsg_multicast_netns_filtered(&psample_nl_family,
-> +					 group->net, nl_skb, 0,
-> +					 PSAMPLE_NL_MCGRP_SAMPLE,
-> +					 GFP_ATOMIC, psample_nl_sample_filter,
-> +					 &desc);
->  
->  	return;
->  error:
+>  	psample_nl_obj_desc_init(&desc, group->group_num);
 
 
