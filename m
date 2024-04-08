@@ -1,91 +1,90 @@
-Return-Path: <netdev+bounces-85791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E30E89C2DB
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:35:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE38089C358
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:41:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDE842810B7
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:35:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE89DB2D36C
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C37128370;
-	Mon,  8 Apr 2024 13:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D1F7F7F6;
+	Mon,  8 Apr 2024 13:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJL5ITCx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="swSSJ9So"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4645E128366
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7352C78285
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 13:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712583027; cv=none; b=UeOqV63HD4uoGaHj4Za23uoTpLtTS/aMSq99M7xeOMwZ2MjfOkDxcRlxo4ubStKKGalAIO+8oaebv3g+Z0tjbtScaqx9o3amMadNLD2isMwK+ij7yOuwtZJzf2bvuExAwte4GPhDdC4KigsDFf5QiqqUkIIgh3HTFNQ2X4PyfEI=
+	t=1712583143; cv=none; b=C/h/91Zpjqqjm28pFd5y2QccoeC7zyQd+CXtSuxRZ0uGwUfPqzPW8bu0+Fz5mKl3qxLbCyJDrAT1mVEd6WCE3W0/nfqrMHiNR5Mj+OJ29+1HCf9exBQBNrHdVL57UhIFulwtA3M8kj0RVTCRiQ6ltnsOHqFCmIniJrNhlEs0omU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712583027; c=relaxed/simple;
-	bh=xJBwVgikP1XUaMWt9dmwTggazzWT2VXiKgssWxijGLw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=svbs1y3DL68XoJHJgcI9YuJpO3DrX/3gLHJoinwRLDYFrSKNl7wzEETqW14ESijHd3mC82isplDLRgcCgrfNDER9N8Y9Sfs4anbJTFpnyqRrTHgwtkZFL9IcoxCHSv9BWWd9mmp+aQAnMLU9B6g2Jw1RJ0sjvyyz8Gv4g8cSi+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJL5ITCx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 027A0C43609;
-	Mon,  8 Apr 2024 13:30:27 +0000 (UTC)
+	s=arc-20240116; t=1712583143; c=relaxed/simple;
+	bh=ZZ1j49kXRZioyRheEpLmhWE7M5mUvy3M3llmDuAPn30=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e7Iy4HoAdIpo/+zFxQ/PkIfdv27Fv5cKCmHppcNigEQFZvc7jxx0knwO9qt38R1R7yq+hQYEIUska6R9deVzcJCJgUkxYZxe18bb00IpK20tu242yaECQyYgj2Wxl6bjo0bOQavny2BYBJElNcswTTtP/wYtRxrmBC990HCgkXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swSSJ9So; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AB82C43390;
+	Mon,  8 Apr 2024 13:32:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712583027;
-	bh=xJBwVgikP1XUaMWt9dmwTggazzWT2VXiKgssWxijGLw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YJL5ITCxpOfHsLU1huujBDWrbp2Z4Qng8GnwaSKMpjkYfH3sphLfHD61vivZlr3pV
-	 nGSal/0FfM1O6G8UjX3dN1lHnlSSqxNfoJS0aVrb1MVISFytCmJQTf7js0lrpQnIc1
-	 jCgddZXluvisfhJBP0BAePgS31jEqLOxnP/Uuq+bYvosk5q+2CxURn7JRKyL2fobzO
-	 9XGYGCyFBtdFEFs/kagT+X/s8G3jRTZim9MKYs6O87AlmXGoqKieHoJHXndT7jgFH/
-	 1d81udx0CKf/BeNPys7A1y9pMGYd6Hjms4A2f2bojceNPn8FP87WAk92Kkl3oT9eCr
-	 XN7JpeO/h/e4g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E93D6D72A01;
-	Mon,  8 Apr 2024 13:30:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1712583143;
+	bh=ZZ1j49kXRZioyRheEpLmhWE7M5mUvy3M3llmDuAPn30=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=swSSJ9SooD5M6Rix+XRmlpY++WFoyuTVfLVp7SRZzpP20Js2SpqLIP/Ya2bFaM3fV
+	 OK38CVwArYXsyCRocQMdQ2Xu5guDsmtYfgCjIz0psaC21v4wmaOh9NwsTr17MrNA8h
+	 jeoR8GZ4R2DTFecJLG5otcT6GTJsuNCFn9b/Ms55/WwSymzQlk7mhLoaXRpk7nlpb+
+	 pYeI0azsAjhhmnPG7uCiR90/FMDu20/q8V8f7ASMUkeiEmrV+GelJ08i5yrvwY3LnD
+	 EbRXud2hOmQniaQIjjFBkcWyv1eRert6hWdxIl0nB2E3ePcls4ezlFED9kuOkWE4c/
+	 M2SYWn5/VFlMg==
+Date: Mon, 8 Apr 2024 14:32:17 +0100
+From: Simon Horman <horms@kernel.org>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	mschmidt@redhat.com, anthony.l.nguyen@intel.com,
+	pawel.chmielewski@intel.com, aleksandr.loktionov@intel.com,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Liang-Min Wang <liang-min.wang@intel.com>
+Subject: Re: [PATCH iwl-next v5] ice: Add automatic VF reset on Tx MDD events
+Message-ID: <20240408133217.GI26556@kernel.org>
+References: <20240404140451.504359-1-marcin.szycik@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] r8169: add support for RTL8168M
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171258302695.21343.3708141520167683167.git-patchwork-notify@kernel.org>
-Date: Mon, 08 Apr 2024 13:30:26 +0000
-References: <0f0d8911-4b36-480e-b0d7-636f72c7beec@gmail.com>
-In-Reply-To: <0f0d8911-4b36-480e-b0d7-636f72c7beec@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
- davem@davemloft.net, nic_swsd@realtek.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240404140451.504359-1-marcin.szycik@linux.intel.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Sun, 7 Apr 2024 23:19:25 +0200 you wrote:
-> A user reported an unknown chip version. According to the r8168 vendor
-> driver it's called RTL8168M, but handling is identical to RTL8168H.
-> So let's simply treat it as RTL8168H.
+On Thu, Apr 04, 2024 at 04:04:51PM +0200, Marcin Szycik wrote:
+> In cases when VF sends malformed packets that are classified as malicious,
+> it can cause Tx queue to freeze as a result of Malicious Driver Detection
+> event. Such malformed packets can appear as a result of a faulty userspace
+> app running on VF. This frozen queue can be stuck for several minutes being
+> unusable.
 > 
-> Tested-by: Евгений <octobergun@gmail.com>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> User might prefer to immediately bring the VF back to operational state
+> after such event, which can be done by automatically resetting the VF which
+> caused MDD. This is already implemented for Rx events (mdd-auto-reset-vf
+> flag private flag needs to be set).
 > 
-> [...]
+> Extend the VF auto reset to also cover Tx MDD events. When any MDD event
+> occurs on VF (Tx or Rx) and the mdd-auto-reset-vf private flag is set,
+> perform a graceful VF reset to quickly bring it back to operational state.
+> 
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Co-developed-by: Liang-Min Wang <liang-min.wang@intel.com>
+> Signed-off-by: Liang-Min Wang <liang-min.wang@intel.com>
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 
-Here is the summary with links:
-  - [net-next] r8169: add support for RTL8168M
-    https://git.kernel.org/netdev/net-next/c/39f59c72ad3a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
