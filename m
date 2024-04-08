@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-85755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C2F89BFB2
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:00:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 738C689BFAF
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 14:59:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFFBFB28FDE
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:59:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D55621F2259D
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F757BAE7;
-	Mon,  8 Apr 2024 12:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F6A7C0B0;
+	Mon,  8 Apr 2024 12:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZLE26bVk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Arg762VZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58396762DA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C6470CDA
 	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 12:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712581108; cv=none; b=S8ulQzVPO15Q+vALy7VzuEIuUUIYpYsxjNA6PaH2toj966D4HNNK5FOJReg2Kjr5Xs95UqC8iIPZMvIRSRAzw33hD1D7+RZ63RYo5m3rT0i+vuOHvlo8YJBYJkwEvYb+K+nRpVgbnPERaBvMJfqi820chjKTZtvAOnuzWzT1Q+A=
+	t=1712581109; cv=none; b=CMFhHC+ZpfPrnw4RRhHxVn+msbFyCqHPEJN7KkfJtSeis0p7SL3uH1Bjk/GMOMHWqEhiM85/mTpZA07KsD9lEaPhnAB0WvN4gyx+yOwLdTe2fLMVhcp16UMhS1zsD6GIsoUsWiDX+uyPsRiFQ242AhqqVU+9xX6LRyMgFDgYKGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712581108; c=relaxed/simple;
-	bh=3AyGycfT0WMau/4BHOkgdyQ3sS/qjOjS/YxEFf70SDM=;
+	s=arc-20240116; t=1712581109; c=relaxed/simple;
+	bh=PEVYbxeaDX3yxZvZ8EuaIuTFCCKeAPFoxiU/zE4/i4k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m7rsGI40WtI4c82EytbF1y0nS9LA/qmTvrxxJbAzmVlpJrePwpeiz1xsUMRT6P2m1JIROf9iSDGg2RvrWb26GxdyHLHrEVJz3v3HSSDIt1Du+9+TTEMz1wZRbxKuK/b6zxKO3Cq0Bo8h5sSckZjwz3pGubKqOhMNIvMO8gOzEcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZLE26bVk; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=CFiNPTFpiXRRhbafjI+mSrx+5skSUaWCavm/LpiFHakl1AeoQfs+njXS3b8eBAzPJ8JQGf9h0VlLffNQMZd+jiuvVxW3BuMzncMYMNFgSvXKtx+nuEJ2rqvrZVMegMafojrRXSgwJcFYKCJApY//SSPyQMsTweIGmqj8m4CHv8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Arg762VZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712581106;
+	s=mimecast20190719; t=1712581107;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2q1CIE8IfTYGc+n0dUKKT+JjLmE8wbfXj7V+fytNap4=;
-	b=ZLE26bVkH9ibvLvGw/n0EJX2Odqb9EdZ9An/7TtNUuxRxKVwMNQRs3mfBIHYc065sjaln7
-	lxxN1ceLpe0PZs1NDKChSP7pNd20HY5zd2SSRh73oFiORpwm8kfaMOnOD9Uz1Nhtt0bzFn
-	/kA2axQ+Zy5x6bd2zw98711ZQdN/QE0=
+	bh=V/aDzcVcLzeBPVZ5j9YK8Jwgxn6uUSBkSWCxCOExK2Q=;
+	b=Arg762VZ3ypot97sOuuuTP/Fc6SXyfVEfEB/hklSNZUZHcYtM9qnkFSv7TkJtCrPUU1gnY
+	AUOUfUP5qjhBKXJZkSK14hGxub+RlAyyW+KbhPE8KNEeIsnokMTE3t+ba0UCI/MUehayTH
+	5P4a/be1B33DaZ0k1CnSJkdldF5u/1Q=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-NNqM-5KPOLCUDf7c-Zl0Rw-1; Mon,
- 08 Apr 2024 08:58:20 -0400
-X-MC-Unique: NNqM-5KPOLCUDf7c-Zl0Rw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-202-H5KAer7NMIWtkt8A2pTaQg-1; Mon,
+ 08 Apr 2024 08:58:23 -0400
+X-MC-Unique: H5KAer7NMIWtkt8A2pTaQg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 558903806222;
-	Mon,  8 Apr 2024 12:58:20 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 986ED380621A;
+	Mon,  8 Apr 2024 12:58:22 +0000 (UTC)
 Received: from antares.redhat.com (unknown [10.39.193.170])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5542547F;
-	Mon,  8 Apr 2024 12:58:18 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id AC3BF47E;
+	Mon,  8 Apr 2024 12:58:20 +0000 (UTC)
 From: Adrian Moreno <amorenoz@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Adrian Moreno <amorenoz@redhat.com>,
@@ -66,9 +66,9 @@ Cc: Adrian Moreno <amorenoz@redhat.com>,
 	aconole@redhat.com,
 	echaudro@redhat.com,
 	horms@kernel.org
-Subject: [RFC net-next v2 1/5] net: netlink: export genl private pointer getters
-Date: Mon,  8 Apr 2024 14:57:40 +0200
-Message-ID: <20240408125753.470419-2-amorenoz@redhat.com>
+Subject: [RFC net-next v2 2/5] net: psample: add multicast filtering on group_id
+Date: Mon,  8 Apr 2024 14:57:41 +0200
+Message-ID: <20240408125753.470419-3-amorenoz@redhat.com>
 In-Reply-To: <20240408125753.470419-1-amorenoz@redhat.com>
 References: <20240408125753.470419-1-amorenoz@redhat.com>
 Precedence: bulk
@@ -80,35 +80,211 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Both "__genl_sk_priv_get" and "genl_sk_priv_get" are useful functions to
-handle private pointers attached to genetlink sockets.
-Export them so they can be used in modules.
+Packet samples can come from several places (e.g: different tc sample
+actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
+to differentiate them.
+
+Likewise, sample consumers that listen on the multicast group may only
+be interested on a single group. However, they are currently forced to
+receive all samples and discard the ones that are not relevant, causing
+unnecessary overhead.
+
+Allow users to filter on the desired group_id by adding a new command
+SAMPLE_FILTER_SET that can be used to pass the desired group id.
+Store this filter on the per-socket private pointer and use it for
+filtering multicasted samples.
 
 Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- net/netlink/genetlink.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/uapi/linux/psample.h |   1 +
+ net/psample/psample.c        | 127 +++++++++++++++++++++++++++++++++--
+ 2 files changed, 122 insertions(+), 6 deletions(-)
 
-diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-index feb54c63a116..beafa415a9f5 100644
---- a/net/netlink/genetlink.c
-+++ b/net/netlink/genetlink.c
-@@ -726,6 +726,7 @@ void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
- 		return ERR_PTR(-EINVAL);
- 	return xa_load(family->sock_privs, (unsigned long) sk);
- }
-+EXPORT_SYMBOL(__genl_sk_priv_get);
+diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
+index e585db5bf2d2..5e0305b1520d 100644
+--- a/include/uapi/linux/psample.h
++++ b/include/uapi/linux/psample.h
+@@ -28,6 +28,7 @@ enum psample_command {
+ 	PSAMPLE_CMD_GET_GROUP,
+ 	PSAMPLE_CMD_NEW_GROUP,
+ 	PSAMPLE_CMD_DEL_GROUP,
++	PSAMPLE_CMD_SAMPLE_FILTER_SET,
+ };
  
- /**
-  * genl_sk_priv_get - Get family private pointer for socket
-@@ -764,6 +765,7 @@ void *genl_sk_priv_get(struct genl_family *family, struct sock *sk)
- 	}
- 	return priv;
+ enum psample_tunnel_key_attr {
+diff --git a/net/psample/psample.c b/net/psample/psample.c
+index a5d9b8446f77..a0cef63dfdec 100644
+--- a/net/psample/psample.c
++++ b/net/psample/psample.c
+@@ -98,13 +98,84 @@ static int psample_nl_cmd_get_group_dumpit(struct sk_buff *msg,
+ 	return msg->len;
  }
-+EXPORT_SYMBOL(genl_sk_priv_get);
  
- /**
-  * genl_register_family - register a generic netlink family
+-static const struct genl_small_ops psample_nl_ops[] = {
++struct psample_obj_desc {
++	struct rcu_head rcu;
++	u32 group_num;
++	bool group_num_valid;
++};
++
++struct psample_nl_sock_priv {
++	struct psample_obj_desc __rcu *flt;
++	spinlock_t flt_lock; /* Protects flt. */
++};
++
++static void psample_nl_sock_priv_init(void *priv)
++{
++	struct psample_nl_sock_priv *sk_priv = priv;
++
++	spin_lock_init(&sk_priv->flt_lock);
++}
++
++static void psample_nl_sock_priv_destroy(void *priv)
++{
++	struct psample_nl_sock_priv *sk_priv = priv;
++	struct psample_obj_desc *flt;
++
++	flt = rcu_dereference_protected(sk_priv->flt, true);
++	kfree_rcu(flt, rcu);
++}
++
++static int psample_nl_sample_filter_set_doit(struct sk_buff *skb,
++					     struct genl_info *info)
++{
++	struct psample_nl_sock_priv *sk_priv;
++	struct nlattr **attrs = info->attrs;
++	struct psample_obj_desc *flt;
++
++	flt = kzalloc(sizeof(*flt), GFP_KERNEL);
++
++	if (attrs[PSAMPLE_ATTR_SAMPLE_GROUP]) {
++		flt->group_num = nla_get_u32(attrs[PSAMPLE_ATTR_SAMPLE_GROUP]);
++		flt->group_num_valid = true;
++	}
++
++	if (!flt->group_num_valid) {
++		kfree(flt);
++		flt = NULL;
++	}
++
++	sk_priv = genl_sk_priv_get(&psample_nl_family, NETLINK_CB(skb).sk);
++	if (IS_ERR(sk_priv)) {
++		kfree(flt);
++		return PTR_ERR(sk_priv);
++	}
++
++	spin_lock(&sk_priv->flt_lock);
++	flt = rcu_replace_pointer(sk_priv->flt, flt,
++				  lockdep_is_held(&sk_priv->flt_lock));
++	spin_unlock(&sk_priv->flt_lock);
++	kfree_rcu(flt, rcu);
++	return 0;
++}
++
++static const struct nla_policy
++	psample_sample_filter_set_policy[PSAMPLE_ATTR_SAMPLE_GROUP + 1] = {
++	[PSAMPLE_ATTR_SAMPLE_GROUP] = { .type = NLA_U32, },
++};
++
++static const struct genl_ops psample_nl_ops[] = {
+ 	{
+ 		.cmd = PSAMPLE_CMD_GET_GROUP,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+ 		.dumpit = psample_nl_cmd_get_group_dumpit,
+ 		/* can be retrieved by unprivileged users */
+-	}
++	},
++	{
++		.cmd		= PSAMPLE_CMD_SAMPLE_FILTER_SET,
++		.doit		= psample_nl_sample_filter_set_doit,
++		.policy		= psample_sample_filter_set_policy,
++		.flags		= 0,
++	},
+ };
+ 
+ static struct genl_family psample_nl_family __ro_after_init = {
+@@ -114,10 +185,13 @@ static struct genl_family psample_nl_family __ro_after_init = {
+ 	.netnsok	= true,
+ 	.module		= THIS_MODULE,
+ 	.mcgrps		= psample_nl_mcgrps,
+-	.small_ops	= psample_nl_ops,
+-	.n_small_ops	= ARRAY_SIZE(psample_nl_ops),
++	.ops		= psample_nl_ops,
++	.n_ops		= ARRAY_SIZE(psample_nl_ops),
+ 	.resv_start_op	= PSAMPLE_CMD_GET_GROUP + 1,
+ 	.n_mcgrps	= ARRAY_SIZE(psample_nl_mcgrps),
++	.sock_priv_size		= sizeof(struct psample_nl_sock_priv),
++	.sock_priv_init		= psample_nl_sock_priv_init,
++	.sock_priv_destroy	= psample_nl_sock_priv_destroy,
+ };
+ 
+ static void psample_group_notify(struct psample_group *group,
+@@ -360,6 +434,42 @@ static int psample_tunnel_meta_len(struct ip_tunnel_info *tun_info)
+ }
+ #endif
+ 
++static inline void psample_nl_obj_desc_init(struct psample_obj_desc *desc,
++					    u32 group_num)
++{
++	memset(desc, 0, sizeof(*desc));
++	desc->group_num = group_num;
++	desc->group_num_valid = true;
++}
++
++static bool psample_obj_desc_match(struct psample_obj_desc *desc,
++				   struct psample_obj_desc *flt)
++{
++	if (desc->group_num_valid && flt->group_num_valid &&
++	    desc->group_num != flt->group_num)
++		return false;
++	return true;
++}
++
++static int psample_nl_sample_filter(struct sock *dsk, struct sk_buff *skb,
++				    void *data)
++{
++	struct psample_obj_desc *desc = data;
++	struct psample_nl_sock_priv *sk_priv;
++	struct psample_obj_desc *flt;
++	int ret = 0;
++
++	rcu_read_lock();
++	sk_priv = __genl_sk_priv_get(&psample_nl_family, dsk);
++	if (!IS_ERR_OR_NULL(sk_priv)) {
++		flt = rcu_dereference(sk_priv->flt);
++		if (flt)
++			ret = !psample_obj_desc_match(desc, flt);
++	}
++	rcu_read_unlock();
++	return ret;
++}
++
+ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+ 			   u32 sample_rate, const struct psample_metadata *md)
+ {
+@@ -370,6 +480,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+ #ifdef CONFIG_INET
+ 	struct ip_tunnel_info *tun_info;
+ #endif
++	struct psample_obj_desc desc;
+ 	struct sk_buff *nl_skb;
+ 	int data_len;
+ 	int meta_len;
+@@ -487,8 +598,12 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+ #endif
+ 
+ 	genlmsg_end(nl_skb, data);
+-	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
+-				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
++	psample_nl_obj_desc_init(&desc, group->group_num);
++	genlmsg_multicast_netns_filtered(&psample_nl_family,
++					 group->net, nl_skb, 0,
++					 PSAMPLE_NL_MCGRP_SAMPLE,
++					 GFP_ATOMIC, psample_nl_sample_filter,
++					 &desc);
+ 
+ 	return;
+ error:
 -- 
 2.44.0
 
