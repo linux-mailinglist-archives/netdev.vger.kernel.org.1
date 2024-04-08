@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-85801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6629C89C3CF
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:44:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65FA989C3E1
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:45:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98B731C21194
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:44:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B15128451F
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE5876402;
-	Mon,  8 Apr 2024 13:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DDE7FBB9;
+	Mon,  8 Apr 2024 13:39:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02966D1A9;
-	Mon,  8 Apr 2024 13:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2366279F0;
+	Mon,  8 Apr 2024 13:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712583557; cv=none; b=lOWWyRacAZD1qi8L5m6rGZQEN9XOmfx7BRv/Mxg6XC6qOosG1R2hZIyxhtl+F9nSrQze8d2w3CDewRlKs7Yu7GF7SGAyqOtt+z2V0MFgvF5JdRS7a5PRTLLfhEQslzLo7Yob8hPi5M25i+w1oLfcWK5dA8OUhfdWC1uAoAwTPQQ=
+	t=1712583589; cv=none; b=W3zRT5EscCa8Vs6RsgKWyN2OYpqI297rNS8CMEiZUN0ujEA4ER7qG3jk6GYInzbYMCqlkU7ruyiujdlUD1fVI+sKoWNY3/Wi6fyrSZRJDBf1Or1SyWcITZqBftcikBoVsL6plQiyFmYOklcnq9/v4igIaF96RiDasnQNcFZRECs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712583557; c=relaxed/simple;
-	bh=oI31ZN7653Zpm2X/5BYpChfstj63prSTMYTZKZz+H/I=;
+	s=arc-20240116; t=1712583589; c=relaxed/simple;
+	bh=HBiOHkqW/9TipkYoD4a9v0jztvyOEos6tX06fqvWb6s=;
 	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=erHDU+mEHys7OYqyFz+BYOxaEU4aLDWoTfatyxWjxKtCx+46Gd1Ig6VzxCMLXs1Dib6YtbfRKbm6EDfxnEzu7UK2Ku+jmZaPn4pxT0XhaXPmOVMt91TibKKWDgmqh2sVjggjcgDj8e5tVATePZ8QgdSUNSdTZdR1URYUXt6jsD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 In-Reply-To:Content-Type; b=MwekOagle4r6vXBdXfas35sCQtdDpqR2shMwOFfS98pifAl7LcEHIMxEospMiiSV0y+IrsC+a2li013yANGeNADdyKEZcLENJCl7HiFZwURJ3gESA7HIhBgGoJdXcKLSLzs7iwDdLxj9wfX0wHOJpw9L/wMyqgS8KAXRPfyt33A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VCqrN74T4zNmxt;
-	Mon,  8 Apr 2024 21:36:52 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VCqs70pSLz1ymQ9;
+	Mon,  8 Apr 2024 21:37:31 +0800 (CST)
 Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1616B140134;
-	Mon,  8 Apr 2024 21:39:07 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id BA03B1401E0;
+	Mon,  8 Apr 2024 21:39:44 +0800 (CST)
 Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
  (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 8 Apr
- 2024 21:39:06 +0800
-Subject: Re: [PATCH net-next v1 02/12] mm: page_frag: use initial zero offset
- for page_frag_alloc_align()
+ 2024 21:39:44 +0800
+Subject: Re: [PATCH net-next v1 12/12] mm: page_frag: update documentation and
+ maintainer for page_frag
 To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
 	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>,
+	<linux-mm@kvack.org>, <linux-doc@vger.kernel.org>
 References: <20240407130850.19625-1-linyunsheng@huawei.com>
- <20240407130850.19625-3-linyunsheng@huawei.com>
- <43d99616cd4a2a6fce6a6b97f73d08ebc5361a61.camel@gmail.com>
+ <20240407130850.19625-13-linyunsheng@huawei.com>
+ <b5c5866e626f6c90657a32b5e9adff724d5896db.camel@gmail.com>
 From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <cccbddc2-de64-46f9-7d71-60185d364f73@huawei.com>
-Date: Mon, 8 Apr 2024 21:39:06 +0800
+Message-ID: <c1f5a78a-3040-0cc7-f113-d5ec82c6010f@huawei.com>
+Date: Mon, 8 Apr 2024 21:39:44 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
  Thunderbird/52.2.0
 Precedence: bulk
@@ -59,93 +60,225 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <43d99616cd4a2a6fce6a6b97f73d08ebc5361a61.camel@gmail.com>
+In-Reply-To: <b5c5866e626f6c90657a32b5e9adff724d5896db.camel@gmail.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 2024/4/8 1:52, Alexander H Duyck wrote:
+On 2024/4/8 2:13, Alexander H Duyck wrote:
 > On Sun, 2024-04-07 at 21:08 +0800, Yunsheng Lin wrote:
->> We are above to use page_frag_alloc_*() API to not just
->> allocate memory for skb->data, but also use them to do
->> the memory allocation for skb frag too. Currently the
->> implementation of page_frag in mm subsystem is running
->> the offset as a countdown rather than count-up value,
->> there may have several advantages to that as mentioned
->> in [1], but it may have some disadvantages, for example,
->> it may disable skb frag coaleasing and more correct cache
->> prefetching
+>> Update documentation about design, implementation and API usages
+>> for page_frag.
 >>
->> We have a trade-off to make in order to have a unified
->> implementation and API for page_frag, so use a initial zero
->> offset in this patch, and the following patch will try to
->> make some optimization to aovid the disadvantages as much
->> as possible.
->>
->> 1. https://lore.kernel.org/all/f4abe71b3439b39d17a6fb2d410180f367cadf5c.camel@gmail.com/
+>> Also update MAINTAINERS for page_frag. Alexander seems to be the
+>> orginal author for page_frag, we can add him to the MAINTAINERS
+>> later if we have an ack from him.
 >>
 >> CC: Alexander Duyck <alexander.duyck@gmail.com>
 >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> ---
->>  mm/page_frag_cache.c | 31 ++++++++++++++-----------------
->>  1 file changed, 14 insertions(+), 17 deletions(-)
->>
->> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
->> index a0f90ba25200..3e3e88d9af90 100644
->> --- a/mm/page_frag_cache.c
->> +++ b/mm/page_frag_cache.c
->> @@ -67,9 +67,8 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->>  			      unsigned int fragsz, gfp_t gfp_mask,
->>  			      unsigned int align_mask)
->>  {
->> -	unsigned int size = PAGE_SIZE;
->> +	unsigned int size, offset;
->>  	struct page *page;
->> -	int offset;
->>  
->>  	if (unlikely(!nc->va)) {
->>  refill:
->> @@ -77,10 +76,6 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->>  		if (!page)
->>  			return NULL;
->>  
->> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->> -		/* if size can vary use size else just use PAGE_SIZE */
->> -		size = nc->size;
->> -#endif
->>  		/* Even if we own the page, we do not use atomic_set().
->>  		 * This would break get_page_unless_zero() users.
->>  		 */
->> @@ -89,11 +84,18 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->>  		/* reset page count bias and offset to start of new frag */
->>  		nc->pfmemalloc = page_is_pfmemalloc(page);
->>  		nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
->> -		nc->offset = size;
->> +		nc->offset = 0;
->>  	}
->>  
->> -	offset = nc->offset - fragsz;
->> -	if (unlikely(offset < 0)) {
->> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->> +	/* if size can vary use size else just use PAGE_SIZE */
->> +	size = nc->size;
->> +#else
->> +	size = PAGE_SIZE;
->> +#endif
->> +
->> +	offset = ALIGN(nc->offset, -align_mask);
->> +	if (unlikely(offset + fragsz > size)) {
 > 
-> Rather than using "ALIGN" with a negative value it would probably make
-> more sense to use __ALIGN_KERNEL_MASK with ~align_mask. I am not sure
-> how well the compiler sorts out the use of negatives to flip values
-> that are then converted to masks with the "(a) - 1".
+> Again, this seems more like 2 different pathches at least. One for the
+> Documentation and MAINTAINERS changes, and one for the function
+> documentation.
 
-The next patch will remove the '-' in '-align_mask' as the 'ALIGN' operation
-is done in the inline helper. I am not sure that matter much to use
-__ALIGN_KERNEL_MASK with ~align_mask?
+Sure.
 
->
+> 
+>> ---
+>>  Documentation/mm/page_frags.rst | 115 ++++++++++++++++++----------
+>>  MAINTAINERS                     |  10 +++
+>>  include/linux/page_frag_cache.h | 128 ++++++++++++++++++++++++++++++++
+>>  mm/page_frag_cache.c            |  51 ++++++++++---
+>>  4 files changed, 256 insertions(+), 48 deletions(-)
+>>
+>> diff --git a/Documentation/mm/page_frags.rst b/Documentation/mm/page_frags.rst
+>> index 503ca6cdb804..77256dfb58bf 100644
+>> --- a/Documentation/mm/page_frags.rst
+>> +++ b/Documentation/mm/page_frags.rst
+>> @@ -1,43 +1,80 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>>  ==============
+>>  Page fragments
+>>  ==============
+>>  
+>> -A page fragment is an arbitrary-length arbitrary-offset area of memory
+>> -which resides within a 0 or higher order compound page.  Multiple
+>> -fragments within that page are individually refcounted, in the page's
+>> -reference counter.
+>> -
+>> -The page_frag functions, page_frag_alloc and page_frag_free, provide a
+>> -simple allocation framework for page fragments.  This is used by the
+>> -network stack and network device drivers to provide a backing region of
+>> -memory for use as either an sk_buff->head, or to be used in the "frags"
+>> -portion of skb_shared_info.
+>> -
+>> -In order to make use of the page fragment APIs a backing page fragment
+>> -cache is needed.  This provides a central point for the fragment allocation
+>> -and tracks allows multiple calls to make use of a cached page.  The
+>> -advantage to doing this is that multiple calls to get_page can be avoided
+>> -which can be expensive at allocation time.  However due to the nature of
+>> -this caching it is required that any calls to the cache be protected by
+>> -either a per-cpu limitation, or a per-cpu limitation and forcing interrupts
+>> -to be disabled when executing the fragment allocation.
+>> -
+>> -The network stack uses two separate caches per CPU to handle fragment
+>> -allocation.  The netdev_alloc_cache is used by callers making use of the
+>> -netdev_alloc_frag and __netdev_alloc_skb calls.  The napi_alloc_cache is
+>> -used by callers of the __napi_alloc_frag and napi_alloc_skb calls.  The
+>> -main difference between these two calls is the context in which they may be
+>> -called.  The "netdev" prefixed functions are usable in any context as these
+>> -functions will disable interrupts, while the "napi" prefixed functions are
+>> -only usable within the softirq context.
+>> -
+>> -Many network device drivers use a similar methodology for allocating page
+>> -fragments, but the page fragments are cached at the ring or descriptor
+>> -level.  In order to enable these cases it is necessary to provide a generic
+>> -way of tearing down a page cache.  For this reason __page_frag_cache_drain
+>> -was implemented.  It allows for freeing multiple references from a single
+>> -page via a single call.  The advantage to doing this is that it allows for
+>> -cleaning up the multiple references that were added to a page in order to
+>> -avoid calling get_page per allocation.
+>> -
+>> -Alexander Duyck, Nov 29, 2016.
+> 
+> What is the point of removing this just to add it to a C file further
+> down in the diff? Honestly I am not a fan of all the noise this is
+> adding to these diffs. Can we do a little less moving of lines for the
+> sake of moving them? All it does is pollute the git blame if you try to
+> figure out the origin of the lines.
+
+I was thinking about move the doc related code to file where code is related,
+so that author will remember to update the doc when changing the code.
+Maybe above does not matter that much?
+
+> 
+>> +.. kernel-doc:: mm/page_frag_cache.c
+>> +   :doc: page_frag allocator
+>> +
+>> +Architecture overview
+>> +=====================
+>> +
+>> +.. code-block:: none
+>> +
+>> +    +----------------------+
+>> +    | page_frag API caller |
+>> +    +----------------------+
+>> +            ^
+>> +            |
+>> +            |
+>> +            |
+>> +            v
+>> +    +----------------------------------------------+
+>> +    |          request page fragment               |
+>> +    +----------------------------------------------+
+>> +        ^                                        ^
+>> +        |                                        |
+>> +        | Cache empty or not enough              |
+>> +        |                                        |
+>> +        v                                        |
+>> +    +--------------------------------+           |
+>> +    | refill cache with order 3 page |           |
+>> +    +--------------------------------+           |
+>> +     ^                  ^                        |
+>> +     |                  |                        |
+>> +     |                  | Refill failed          |
+>> +     |                  |                        | Cache is enough
+>> +     |                  |                        |
+>> +     |                  v                        |
+>> +     |    +----------------------------------+   |
+>> +     |    |  refill cache with order 0 page  |   |
+>> +     |    +----------------------------------+   |
+>> +     |                       ^                   |
+>> +     | Refill succeed        |                   |
+>> +     |                       | Refill succeed    |
+>> +     |                       |                   |
+>> +     v                       v                   v
+>> +    +----------------------------------------------+
+>> +    |       allocate fragment from cache           |
+>> +    +----------------------------------------------+
+>> +
+> 
+> +1 for the simple visualization of how this works.
+> 
+>> +API interface
+>> +=============
+>> +As the design and implementation of page_frag API, the allocation side does not
+>> +allow concurrent calling, it is assumed that the caller must ensure there is not
+>> +concurrent alloc calling to the same page_frag_cache instance by using it's own
+>> +lock or rely on some lockless guarantee like NAPI softirq.
+>> +
+>> +Depending on different use cases, callers expecting to deal with va, page or
+>> +both va and page for them may call page_frag_alloc_va(), page_frag_alloc_pg(),
+>> +or page_frag_alloc() accordingly.
+>> +
+> 
+> So the new documentation is good up to here.
+> 
+>> +There is also a use case that need minimum memory in order for forward
+>> +progressing, but can do better if there is more memory available. Introduce
+>> +page_frag_alloc_prepare() and page_frag_alloc_commit() related API, the caller
+>> +requests the minimum memory it need and the prepare API will return the maximum
+>> +size of the fragment returned, caller need to report back to the page_frag core
+>> +how much memory it actually use by calling commit API, or not calling the commit
+>> +API if deciding to not use any memory.
+>> +
+> 
+> This part is as clear as mud to me. It sounds like kind of a convoluted
+> setup where you are having the caller have to know a fair bit about the
+> internal structure of the cache and it is essentially checking the
+> state and then performing a commit. Not a huge fan. I would almost
+> prefer to see something more like what we used to do with msix where
+> you just had a range you could request and if it can't give you at
+> least the minimum it fails.>
+> I assume the patch is somewhere here in the set. Will take a look at it
+> later.
+
+Yes, the API is introduced in patch 9 and used in patch 10.
+
+> 
+>> +.. kernel-doc:: include/linux/page_frag_cache.h
+>> +   :identifiers: page_frag_cache_init page_frag_cache_is_pfmemalloc
+>> +                 page_frag_alloc_va __page_frag_alloc_va_align
+>> +                 page_frag_alloc_va_align page_frag_alloc_va_prepare
+>> +                 page_frag_alloc_va_prepare_align page_frag_alloc_pg_prepare
+>> +                 page_frag_alloc_prepare page_frag_alloc_commit
+>> +                 page_frag_alloc_commit_noref page_frag_free_va
+>> +
+>> +.. kernel-doc:: mm/page_frag_cache.c
+>> +   :identifiers: page_frag_cache_drain
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 4745ea94d463..2f84aba59428 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -16683,6 +16683,16 @@ F:	mm/page-writeback.c
+>>  F:	mm/readahead.c
+>>  F:	mm/truncate.c
+>>  
+>> +PAGE FRAG
+>> +M:	Yunsheng Lin <linyunsheng@huawei.com>
+>> +L:	linux-mm@kvack.org
+>> +L:	netdev@vger.kernel.org
+>> +S:	Supported
+>> +F:	Documentation/mm/page_frags.rst
+>> +F:	include/linux/page_frag_cache.h
+>> +F:	mm/page_frag_cache.c
+>> +F:	mm/page_frag_test.c
+>> +
+> 
+> I would appreciate it if you could add me as I usually am having to
+> deal with issues people have with this anyway. You can probably just go
+> with:
+> Alexander Duyck <alexander.duyck@gmail.com>
+
+Sure, good to your ack here.
+
+> 
+>>  PAGE POOL
+>>  M:	Jesper Dangaard Brouer <hawk@kernel.org>
+>>  M:	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+>> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
+>> index 28185969cd2c..d8edbecdd179 100644
 
