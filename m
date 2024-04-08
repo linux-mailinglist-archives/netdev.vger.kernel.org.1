@@ -1,105 +1,113 @@
-Return-Path: <netdev+bounces-85870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 324FD89CA3F
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:04:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20A3589CAB8
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 19:26:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2F1228287F
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:04:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACF851F27714
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C302142E7F;
-	Mon,  8 Apr 2024 17:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sta3/99x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D944C143893;
+	Mon,  8 Apr 2024 17:26:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D85B6E60E;
-	Mon,  8 Apr 2024 17:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD247460;
+	Mon,  8 Apr 2024 17:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712595862; cv=none; b=ri7XL6h+QtOi+T57vA/vcNYSYkCVBOe4fwAcw+NM5LEHPGbQ/0aR+1azfMFZZWteQMetiIRRRrUcP/5DGYZzSRdj33cqNObEt77febxZKpwGIf/UQeQ1DGOLEz0DofvCETicTVW/XniwQ+T1i4AKk4of5tFIOpnWjVuQKaaGG1Y=
+	t=1712597175; cv=none; b=p04EzlOcwJ4/v/HyUA/iFt8GxRo5nXF6/tG6nXefAfuobvmYRANcOZFE//cbq2DqHfrGfLQL8Od3qZG+okZPAn0U7sPumNtHrPDujxYziSa1rGyd/0IMZFpSyEaPAduxqAvwxommohqY2NOncX7WsOoo6XH+/VN5GK7anauoTbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712595862; c=relaxed/simple;
-	bh=dy3oPXhtT+DA8A9ZwN7rVbw8cVMFMCW5FtsQNnUysX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kq8iC2Fo6nxQ2JHk1Q5NRGRLE6lh8auFiPd9+5iuMLzg4MbEdGxsU63niVqStsLSMCEQyaggZkIiFhz5Xfnuk7XbeCwkK4dK4LYy2xx11mp46oBGQrIPz2RcL+r7QVi2Xmv1UwbBmPoovsPWBq8HaVjH9zIBH1YtaUXoITekJRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sta3/99x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC845C433F1;
-	Mon,  8 Apr 2024 17:04:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712595862;
-	bh=dy3oPXhtT+DA8A9ZwN7rVbw8cVMFMCW5FtsQNnUysX8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sta3/99x+vUdccGZVczBTBP2IyoYbfDmqeeDUdY7Igf2g9XzJMbYpi1zPYOhZwnoq
-	 9foZTZRBqSHD5TRDoiePadF4JgdwjTSO6Bs0pgQ0OKy0lLDyKLnf9qOAtowOOxGgYV
-	 EydTrUD4xfnyaU0vi6OsqNjuQnWHCcnW0KDMiYlr+vD+k4yqqWkKTT3kicerOKnSSh
-	 ZeoT0sKIcvA4rejXW1WnXiIiZRqolPMoIbhqALDOI8FLeTdjJA/lANXcrIaIRgJo0i
-	 tYI+rs1wULoLQdbI8DAPdDpBAtz1ZabgSuX60NEav5/D7AP7GRh2gpYSvNFhuNLAy7
-	 Wb/eoFp9E73dQ==
-Date: Mon, 8 Apr 2024 18:04:16 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Sascha Hauer <s.hauer@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	David Wu <david.wu@rock-chips.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH] dt-bindings: net: rockchip-dwmac: use rgmii-id in example
-Message-ID: <20240408-handpick-scouting-b04de6bec84a@spud>
-References: <20240408-rockchip-dwmac-rgmii-id-binding-v1-1-3886d1a8bd54@pengutronix.de>
+	s=arc-20240116; t=1712597175; c=relaxed/simple;
+	bh=7kdOk4ITZylKnr8pBP2i71I3BILRIe0aVqKcpr7nQas=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K5iTq5buceSZ/E+bLA/5ncHDF+H23bJiO8h2Hj5lu1jfx2EiTj/WhpybDXc7J+LsjMjFcYgklfstwW1FyOBxeTMordpo+xvhPIsMmgnhKcS6T7yoWmVOyS+f1uEZ9nHsjcVdFIP7QMI5SuxHQf0/5fS63/9195JiBcTqV8SWVeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56e69888a36so1249582a12.3;
+        Mon, 08 Apr 2024 10:26:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712597172; x=1713201972;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fXqKi997L3PagciIuldmRmvr0R9pdf27i5jWxsqbl7k=;
+        b=w9xEG/coOOMLYe+jeECThqKMU4bgc8/BdU/UfeUk0KOoJI4Z6kt//ZSpjN7/MgJvlP
+         KPO217y9eJUyxRjwT7bsxPxXtgP3jDV3SxePXRqzUztaPudU040mH5pCcU3rtmHBrf9L
+         Sy9vPodStIllrl+AfKOfj4/opitMfGlrSt9Xb4zHu4w92OhieHFHyiIBq2UF+eSqOG+2
+         dJeROkT4I63LZXPMOy4eKp0EkqBq+NvrJHR3XuzSLVcYdUt7CW/uQGakYO95wNp4RwnU
+         b9+4Henlo7isza0YUkpfI+xzg4a90M8DAPKGOmrDKzmLozdEZQyk1TZnYMDLUlYxJwrC
+         KnDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJ9fOgyk8+MEXICzBGXDqP5+qVZ7uIg4f+GbUbCENDxRfqQKSjKag4oGPBUpVu5NqZPrsElyg18Jjg8CBpSiVqSUeW/pLD
+X-Gm-Message-State: AOJu0YwSJ8K1XuUMf79VQtJiLuCKbVIGugcr88kv2+cmO8XY0yOnM6aG
+	90dO2tCZ4tjiK3F0dsYHwKrse+omLMfP/DXBGxUUktmPJ9xMhaKs
+X-Google-Smtp-Source: AGHT+IEsOOE3bcXYiFnIV+Lmdls4F+bKEio38wciboMmKVKKIZoF0r8mLFYbPnS9wMO6DoxP9WjbaQ==
+X-Received: by 2002:a17:906:cd03:b0:a47:4a32:604 with SMTP id oz3-20020a170906cd0300b00a474a320604mr6100227ejb.26.1712597172180;
+        Mon, 08 Apr 2024 10:26:12 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id dr2-20020a170907720200b00a4ea1fbb323sm4645341ejc.98.2024.04.08.10.26.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 10:26:11 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 0/4] net : dqs: optimize if stall threshold is not set
+Date: Mon,  8 Apr 2024 10:25:52 -0700
+Message-ID: <20240408172605.635508-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="whOycmADd1NrPPmb"
-Content-Disposition: inline
-In-Reply-To: <20240408-rockchip-dwmac-rgmii-id-binding-v1-1-3886d1a8bd54@pengutronix.de>
+Content-Transfer-Encoding: 8bit
+
+Here are four patches aimed at enhancing the Dynamic Queue Limit (DQL)
+subsystem within the networking stack.
+
+The first two commits involve code refactoring, while the third patch
+introduces the actual change. The fourth patch just improves the cache
+locality.
+
+Typically, when DQL is enabled, stall information is always populated
+through dql_queue_stall(). However, this information is only necessary
+if a stall threshold is set, which is stored in struct dql->stall_thrs.
+
+Although dql_queue_stall() is relatively inexpensive, it is not entirely
+free due to memory barriers and similar overheads.
+
+To optimize performance, refrain from calling dql_queue_stall() when no
+stall threshold is set, thus avoiding the processing of unnecessary
+information.
+
+Changelog:
+
+v1:
+	* https://lore.kernel.org/all/20240404145939.3601097-1-leitao@debian.org/
+v2:
+	* Moved the stall_thrs to the very first cache line, as a new
+	  patch. Suggested by Eric Dumazet.
 
 
---whOycmADd1NrPPmb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Breno Leitao (4):
+  net: dql: Avoid calling BUG() when WARN() is enough
+  net: dql: Separate queue function responsibilities
+  net: dql: Optimize stall information population
+  net: dqs: make struct dql more cache efficient
 
-On Mon, Apr 08, 2024 at 08:44:10AM +0200, Sascha Hauer wrote:
-> The dwmac supports specifying the RGMII clock delays, but it is
-> recommended to use rgmii-id and to specify the delays in the phy node
-> instead [1].
->=20
-> Change the example accordingly to no longer promote this undesired
-> setting.
->=20
-> [1] https://lore.kernel.org/all/1a0de7b4-f0f7-4080-ae48-f5ffa9e76be3@lunn=
-=2Ech/
->=20
-> Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+ include/linux/dynamic_queue_limits.h | 50 +++++++++++++++++-----------
+ 1 file changed, 30 insertions(+), 20 deletions(-)
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+-- 
+2.43.0
 
---whOycmADd1NrPPmb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZhQjkAAKCRB4tDGHoIJi
-0vZaAQCzEUq832WzZ37GUbKIrB0V8uvvHYrxPBDcsr17McinxAEA4If1pTgFZfkX
-zWzresFYoT+wuXAVCB7RoeelxHJHWg4=
-=8IjP
------END PGP SIGNATURE-----
-
---whOycmADd1NrPPmb--
 
