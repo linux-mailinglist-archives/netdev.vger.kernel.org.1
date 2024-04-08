@@ -1,182 +1,167 @@
-Return-Path: <netdev+bounces-85848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1C7B89C914
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:56:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2211789C924
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:58:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CC341F21E8A
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:56:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31EB6B23368
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1001422A8;
-	Mon,  8 Apr 2024 15:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71DAD1422AB;
+	Mon,  8 Apr 2024 15:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="B/4PRm6e";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="z2UnEQSf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TrzSNofB"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2201422A6;
-	Mon,  8 Apr 2024 15:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712591729; cv=fail; b=LqOWc73zLdNB7KmaJzQSYU/iHXXJPb2EVmmaoZd350dpKr3Jq3/qrTfYVGg4E5gyy7alXjW7vT3l3Lgpyjz9ZilogC7FLB4AFJs5jRqwn8y4SvYJ6ZwiHj8yQ7P8VwHbwLZ2cC97favIy/TKWxsKKJGv5aPatJp3C0pdO5IR1AE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712591729; c=relaxed/simple;
-	bh=gU51C1MxQ/YbvD0xXdczHdcC8fwAPMHfxca8lnl/7ns=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=r1BJgNLjpnGr+5R2KkhzVrhCw2GSmzp5HjTsq7C/Jp3Y8IKkOiikj4icg6VDhH/t76BuyZHy/W9yfzE++vJbX6s/v+c1ryqLdInd625Jjp/zIGuEqTYkYY8KsXiaJOucxjCb/OFAg4m1pBKLFChO3hUow/t/15EgZjTi5h7oDMs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=B/4PRm6e; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=z2UnEQSf; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1712591728; x=1744127728;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=gU51C1MxQ/YbvD0xXdczHdcC8fwAPMHfxca8lnl/7ns=;
-  b=B/4PRm6eSE8iKmpE2kbX7p7eW3Efa1yiR81hlYey3M5kJQ5NwVVWYf/t
-   rdJ66DcswQBu7tH3n1G+9+FqTm88kRIyF3r4au4b5mtctV0z5Xyj82q0+
-   wkqGY3KzV94rN6I1oUElHhHFC7Ofis1UE4pnTfJIPup2Wuh+a6/QjIBM4
-   yivD+zit++IzI6TS05mFJ997//Xel36IIi2cunb70SR65o4vkRj3AUnNy
-   OObeyWkVSG0rxbiSeKUrAsZ/sDeQqqVX4zlwZ7WC8IFKxSh+0EJqgD+kt
-   ElbTqqHCz3dPo6AsjYK7XZZs0XJ3Qw3X5wf4dCsHlwQIWt+HBgiTsBPVA
-   w==;
-X-CSE-ConnectionGUID: DcvkUWtSTkeLpSaAcbP3XQ==
-X-CSE-MsgGUID: IMSdbHIGT92qRFlb0/+POg==
-X-IronPort-AV: E=Sophos;i="6.07,187,1708412400"; 
-   d="scan'208";a="20039637"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Apr 2024 08:55:27 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 8 Apr 2024 08:55:09 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 8 Apr 2024 08:55:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jpfpi/sv/0u8Xm7XYn72zDirUu3U92X9w+0MVGeP8mNYp+GaBNK3SIv1Zbw73RW70tgBHPitp/zCojeufQY2tr17tlnDRfx2L87XvWCouIBGT47A7+6abQ/Vf0claBTDqSAhrgsy43j/74Dd+99Da7wz/5T3Xh7d5hyg7fx52RDLxV8Me8Xmm4CueXbUm86RxZvG+AV+GS3U3ckFYZnEuSZ/84kzXaN/ctkabFE46dUq3m/L8f1Ux4FRT4Ny2/COk0mXJBSU/WRXi5KsxgZz2pqxcXZEzFnp5z/7VPjZMmUPMa/ygCNpG0CxQ/YFTN/lS0IGwe83kfJYsel2LXkPnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gU51C1MxQ/YbvD0xXdczHdcC8fwAPMHfxca8lnl/7ns=;
- b=TXnn4f710rJBhdIndTjJJCHOTIZLC1jYbTXrRkQGQNgN5vC9pyF291o+5m3vZl/FDcGO0d0xAcGGhSx4WKXoNaaIII4d4NXrcs9BiVfiBJ3trE8D2Lwy4Aan6HXMXwZMVq9sEgxEyhsm6zVgGbj/Y2wSnEaeIHCej/zKzgQjHSdbyRfjsSTNidGdTQkxIp3xdPKDKql3u3kE0XaB4aTMbNDVHQlL+3UOp8r7cBpg8s6unjaTh7uWbaRrLzX4rmIwndcUm2ES0VlcFZ3q2S/5Pum5DyssKmbD81YoRCTh5gdzKLZEpp5+t+eSBZhdNCHl63AE9TgEDZh5dZCm14v9pw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gU51C1MxQ/YbvD0xXdczHdcC8fwAPMHfxca8lnl/7ns=;
- b=z2UnEQSf0GmdHP6hLOyoHbcWjz+tzOPOYrMXHIuPkFeb9+BddkMFSrXGsPDKADfgQcU8ijirck80AnR7MROHap13r4f4r5LdUt+SLJVPaVkYuDbJfJlOgx3mlywAMJBmj1YEVJYdf35T3qt7exMyJG3yUhkjefjEumOlZ8Vbp3xmRQQRG1+NHeGHrLiEdVAes1CUENxuh2xXTKSTfdd2o/QryE2KUdTc5YlI7X8hFytFGYSwxmGDwXEC12t/pA5y/1Oq4hE3X0S4AwHAh10rcAfFdoF4HS49U0V0ctKw3sozoDO8vm5MNUmZn02KnvXkYFVzhp41HS8nVoRdVxPXuA==
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com (2603:10b6:510:246::12)
- by SA0PR11MB4766.namprd11.prod.outlook.com (2603:10b6:806:92::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Mon, 8 Apr
- 2024 15:55:07 +0000
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::d529:f716:6630:2a1d]) by PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::d529:f716:6630:2a1d%3]) with mapi id 15.20.7430.045; Mon, 8 Apr 2024
- 15:55:07 +0000
-From: <Arun.Ramadoss@microchip.com>
-To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-	<Woojung.Huh@microchip.com>, <pabeni@redhat.com>, <o.rempel@pengutronix.de>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>
-CC: <kernel@pengutronix.de>, <dsahern@kernel.org>, <san@skov.dk>,
-	<willemb@google.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <horms@kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next v4 9/9] net: dsa: microchip: let DCB code do PCP
- and DSCP policy configuration
-Thread-Topic: [PATCH net-next v4 9/9] net: dsa: microchip: let DCB code do PCP
- and DSCP policy configuration
-Thread-Index: AQHaiYk9dEFtVxX3Wky4OHP8Vjm2EbFeh5yA
-Date: Mon, 8 Apr 2024 15:55:07 +0000
-Message-ID: <00a1b758271bb1a38877d6c60d5071ddaae34481.camel@microchip.com>
-References: <20240408074758.1825674-1-o.rempel@pengutronix.de>
-	 <20240408074758.1825674-10-o.rempel@pengutronix.de>
-In-Reply-To: <20240408074758.1825674-10-o.rempel@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.36.5-0ubuntu1 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB8033:EE_|SA0PR11MB4766:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8+bGTAwvC/MmTcKKhM/+GN4VHPzKT7/Pi4nd1sNLodXV0DgKKLK0s7LPNSJUF3GxLTg/pcLIfYjCOaRW8dJT9ebwk5vZyztRUZMAbNVyC98FOd8NsLVwYk/3RJVTLLK++TwFXjlT6ukurj4Q3OccItYbXov7anHj3QVbXSCQshaXDx3d25UqeYYRRM8RpJo37GTkaoL9o8uOHavZQejxFXYEcPKvkpbGemUqZXy8NBTUXDdBARttjGmVxofJCZ2w8LO1IU7MOLiMeoufpinKv/cIJDPIoMbtKihNrFYsahTEqs4ovaqqoF/unQlGrmZ3ohdctHVovkQ+VOvdcBvz9jI0V2t/YIcU+vlc/YoWGuqIK4MuUspErmfKB1phsIICK1dl1AwAAXNzW38G15lc0DJT1CcCmjsDQcWL00Zj0J6DJ4W5w0IkF4YLNSizWiBe1l7CJ8FvA9p/9yVZbEua73BXYM8vWVmAYKU/wNCjhimBHbTF1EE966GWSVhLcc5TnowGVnFUsXEMDjIK5dq3j/5F2akIZdvJENk5O9rDl4yTSYEk7EVL2iUT6q0lw81MFdaOmTjBpgdHniVWGvu388hmOveIgAnxPkVa2zGTW68Q/n2yAj/i+LWSdjd0MlaVii8mvFFvp5fZhGkks/iJYNIA1ps8HgD8YN/7NjZmcTQ=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8033.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(366007)(1800799015);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TlRaM3pwck1oYUIrWnhJVlkrUkp6bEs4Y000dCtoRVpGUTBoR3grZmZTVkZS?=
- =?utf-8?B?dUljUHpOTno0aU5oRkdTQUpNVTJudUdlSENJWWNYM1g2c2haL1ZwL0RqbUEv?=
- =?utf-8?B?ZXZTeElydjYvZ3RnZmFjVnhPMWNqdFhGbVBoeWhEeWhOcU1ZaWJnT2xLWTBr?=
- =?utf-8?B?VWhBMzlzRDNMUk10bnlUdnVNcDB2Z0pKdlc5RkpHRHFYdERob0R6OWRteG81?=
- =?utf-8?B?L0Z2WVlCTVBtQjJBT1pheW52ZTJPbWMycmRFL3NLLzU2OG45YVR0UmJrU1dE?=
- =?utf-8?B?bEl3d1VZdE1kNmV3TnZldFZwbVBKeGoyWTJIcmcxMlZtTXlxZHlsNEFTcXlu?=
- =?utf-8?B?M1NiNGpIbmdDd1c1M3RNbzkvZTRaQjFKNTVYMHRrWEZtNVZoVTZXUlN0ZVhr?=
- =?utf-8?B?NFVlV0xKYjMxSGdRRHRWaHpLZVNzSEQyVXhiV240S0libE9kQlZmK1hUN3RK?=
- =?utf-8?B?V0FEUEl3NHNKTnFjclRrSFE0MERyR2R6VjcrcWZqa3YraGhCNmNMQVpMR21B?=
- =?utf-8?B?NHRnWEJzZ2JvT1R6OXViTmZhTUM5c0RNSkpKWWJZQmU0bEEzSi9uUTlzUDlk?=
- =?utf-8?B?RXkzWUpGVHVhU1hoTTlGQ3g3TzBWWTQxNzZ1T0pHcWxPajVOVXlDMzNKdWU3?=
- =?utf-8?B?TjZCSVUzRkZleTFJSmwvZlNVRTYrZDZYRVpMNW82WXN5aHFFSTl2alRiNi95?=
- =?utf-8?B?NkJ3VE9BTGxDQ0xYaTlyblQ0dG1MZWNGQmkxUnFxQmFLVHlNU0NVVjVxTUNr?=
- =?utf-8?B?WkR6eDFkMEorYUtmTCtSRkxQWjhJeGZKS0NTcGZ6SXNvQTNxeFgrOENZNTJH?=
- =?utf-8?B?VSsvQUhBZ255eGJRNk5BYWpmQVVVc0s5cGIzdWlHVEFSaTNUV0VodWh4aDdv?=
- =?utf-8?B?ZVlZaUQxK01YcWxLdHZSWEJxNXhFRGM1dWhrS1o4dFV4blYrVk9ZY0tWZCtQ?=
- =?utf-8?B?V0tOR3BCZjVzSlU0ck5YcmZXRXFMOWdqdTFja2NNQk5MbWdnNHNrNGZVRzU0?=
- =?utf-8?B?c1RqSjRQNDRnNTNmcElTNGJudlBQNzEvdjQxTjYwVzUzNnVVd0kzYzkrMVhI?=
- =?utf-8?B?cmlvbjZoNXZhbzJXaldXOTNtcU9oakVjVzh3MEEzQk42c0ZNWlY0bnZYTUtG?=
- =?utf-8?B?QzEvT3RsRFptSHdaS1FlcXhOM290NVhkd0lsY2JEWlRUcEg0MGJpeWJaVDY4?=
- =?utf-8?B?c3VXRXNkZXRreGtscjBKUmhWK2w1eTJCd1ZWY2g5WXh3eFZ2cXVqLzY4MmxJ?=
- =?utf-8?B?VTdxemVNT0FJZkNGNjZURTJ6aHJmTHUrK1pBUlVNeU8wWXdBb3RxSUJKaDJo?=
- =?utf-8?B?aEs0N0VKalFIR09aenFUYURoM3gxRjUzakpMeVg1R1ora3pobGtSa2lmNDRW?=
- =?utf-8?B?Yi9aZmhQRkRlR25RVnZ5ZklndnZGNm5laThTNk8zbm9hb1ZwMy9JOE5IWkZt?=
- =?utf-8?B?K1pNODVLQWkzbGhLTkpFNEhCRmlYMmY1djhUSG53Z05XMnRXVytuN3Y3dCtM?=
- =?utf-8?B?bngvcmsxeDFTeVdMZERFait1SG9sQTM3UDZPbWxlUXp2TXJRRkhHcVkxZTRO?=
- =?utf-8?B?UDNCOC9RNDJVbVU5dW1LTGdFbk9lMmRFVEJ2R2ZZcDV6b254Q21yeklZSGdq?=
- =?utf-8?B?VXE2SDhjYTgzQUppeEVYRDhZVjdBN2l5RmRndEFYZU9kbnhCZWNEeGsvZHpZ?=
- =?utf-8?B?Z3MzV3gxV3FJQWVVMHU5bVVqbkNQSDhhUy9tcG54Zi94dEZub2E3dzVKSXJM?=
- =?utf-8?B?UE93MlFBVmtaRGN5N1BxTEZDSDErWlJ1SHNSTHVPSGNUTUV2a1JmRFQ3YUV0?=
- =?utf-8?B?QVVIUkRuUGluUkl2NXBxalAxOWszaVFSZlhCdFdIV2V1UXNTS0dSYWxIMmNq?=
- =?utf-8?B?ZSswRUYxNjM0NGtiWk16WkMrbHNyNG95czNKVWNSM2RZWUk4YlhlQnJQZlU1?=
- =?utf-8?B?TjZpOUtiTXZZdyt4NHN0VngrSWxaS25SUGxxcUx4T1E4N1Z2SmxPWGRyYUZ6?=
- =?utf-8?B?STZZdyswOGJDZ3BjdUVTdjhrUVBCdXdFT1c5OXhGTzZJaGEvRjFBUm1oeXJL?=
- =?utf-8?B?OS9sU205cHZLSi9rdDVLZ0hzQ1piemNRdTVyVVhLc1JXekZHV0ZFd0RzVjFs?=
- =?utf-8?B?UDNVY1c4VDI3cFBqYW9IMUlOVWYyOERVYTQ3Um0zZUwxZWFRRzBublFENElW?=
- =?utf-8?B?Mmc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D53013600693234DBF9A2244A8CF142E@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDF913E8AB;
+	Mon,  8 Apr 2024 15:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712591875; cv=none; b=PQywnX5uztTVx9AI0iExlBcQNFRTCMK+tBcYC6yxbJ+sZq/y8aqC2igGy4QhuWL4q14iyuT4Mv15pnMP0ND4DLtu36TRDpTuoCK2JMyyPzW6Gh7L3MG/MmMBE0HPzmJgkycEXq1GxdT9sRRVbsnyXkFywPKwFCXJiSNkpZjh8SM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712591875; c=relaxed/simple;
+	bh=untIyZUBolJmBC+haXZFudxoskemR2WDjgQpB/oOF7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RAhNUrixkYqgxk2QY20ZvekhYMobftoLrmhVzYKVELwU+qDx7DRtdaUNPIhRTJZ4FZ+HgmypCMZjqT8vwKOYIgkT7THIh5MJFVtXcZQCFzrshdRGeQkDV24MEksvuAvaJZ0NWNokb+j6EzHRcCmdzSAGBCBz56FAAglruVA41to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TrzSNofB; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2a2dd2221d3so2964693a91.0;
+        Mon, 08 Apr 2024 08:57:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712591873; x=1713196673; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=untIyZUBolJmBC+haXZFudxoskemR2WDjgQpB/oOF7s=;
+        b=TrzSNofB/+7iwz1qwxJ1kx0l5z5mdAWXGOBXrFX0/7cCpJd56VBWD77mwheGgmZXka
+         x/bkuUA47B7QKpQNp27XN05H2RS7obfhlX6q79Uy7QOCbxxGBRnu/8dQgJPAaeBfHDij
+         d9b7GrCih5KNDBgz8KQd09ZF66VWfxTDDLhR1QAFn7l2qA2yCJwJci9KMa21ysJAyonc
+         0kK9/Q1Hzvrmsd/NNt+3ZrWR7dCvOsuGJERt6rMBWKbFJytsE5iSl2LQWF6Cy/puXDn5
+         IGqpGy5FYYbmIdMlgclBw3TAuAalaLPliQTaKsN1jvtFJalCo1Uk29ywbrF95rph4zEa
+         Ab8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712591873; x=1713196673;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=untIyZUBolJmBC+haXZFudxoskemR2WDjgQpB/oOF7s=;
+        b=lVuarr2uS2MH6lsfPCn6zLOuWVoko2A3PPf5Zc69DJogpOnpHeLeDP5dO2qBBPN5ya
+         11TXycCdMsVPXwofEXHKMsRq6ILjaiCDHp84/dShSk34KMSANBPS8JJ4Wof4m0HAlGSm
+         wiebhAp8RAxADqV/PQSkNV0C0cSCVT940s+Azz2x4PdVPczGZa6lKzt2Ao4mW+GQgITZ
+         HKKJAubI4TFOldsBt9Q3xHusQ6Cv+PDrvrpGUdAbqzIOCIyIvbKd0UXJYK4DtS3dOlcj
+         CGISW2uckWR/2TPAgStAaLk2oI3fbjR75r37njFswkeGfiopgFVsAD/VF11TRcfcPRbH
+         29YA==
+X-Forwarded-Encrypted: i=1; AJvYcCWNso1C0Ns8zo1jhEyzhhtO74YZHqpNsZ/trlLewZmZwA8OAT6d7dgMFxa1YoQ99j3lexpRp+qwhVJntQx7q2/BhW4+m5fiATA/fTcFgfrKzUAvy4eWyk8DSr05BTwVXcO7FaZbwZkc4pyArUDvqRE23nM+UG0DqCyUsuVkEmOjb62mF6FgqZ44zG/rddngL+NHUWGpZvPaQXSwTK4KX53BfEDOxPMO2FRju/0Q+E4Sm/kNO8jz5OYlgRxCirRFtf5AxRpv0NPQY3K5c0vxJ13mTA/7I8ZDbDzXZ5Iy2Ll+Om8NwzHYlAuN8OmxF3IQ454PKvxs3daX21Imr0NoijRlDwIlJsUectnnMC97qrj5IZzQpQtPvUgA5/edslVDkxXGYEygawhsNWSr2i9USbDtzOOk5vEahcNx0+n6VS+0v2dkpPo/gbdO1kbBmyUE+gKssjdT0JOGXB1ZxfnAD1z+OhSN3tPTATeoRC+WtQ==
+X-Gm-Message-State: AOJu0YyXWuQctnrMCEUojAFSK1BQfSW5IAp/oDstMbA8vc7dZ6DwaeB4
+	FC+8NkTMNiO0moavdL5qhWZM8bBWyfRQVR52u1gFmrH+FmV3wcZ8
+X-Google-Smtp-Source: AGHT+IGJbb2MaWRtYADIA840woW+fg7lVmIt69WB4JS2RPl12DQD69jPbBmSk/iEenJzneHNW7DHjg==
+X-Received: by 2002:a17:90a:ab0d:b0:2a5:513:921e with SMTP id m13-20020a17090aab0d00b002a50513921emr2739861pjq.31.1712591873008;
+        Mon, 08 Apr 2024 08:57:53 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:13a8:4fe8:4da1:7ea2])
+        by smtp.gmail.com with ESMTPSA id z24-20020a17090ab11800b002a2559fe52esm6580894pjq.56.2024.04.08.08.57.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 08:57:52 -0700 (PDT)
+Date: Mon, 8 Apr 2024 08:57:51 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>,
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [RFC PATCH net-next v8 14/14] selftests: add ncdevmem, netcat
+ for devmem TCP
+Message-ID: <ZhQT/4RpKIkUmWut@pop-os.localdomain>
+References: <20240403002053.2376017-1-almasrymina@google.com>
+ <20240403002053.2376017-15-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8033.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88627fd6-1b70-41a3-a351-08dc57e4436f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2024 15:55:07.4921
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TMnfsi02NZ2eYQrYbhVinSqTBTGtMaDFuQvN/ODg3iL0e08ES17O7T7jqwqneeaTVGajUGU5WpKbHnxgwhHPmyrRwoP8eUFnxBWekUyS+0Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4766
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240403002053.2376017-15-almasrymina@google.com>
 
-T24gTW9uLCAyMDI0LTA0LTA4IGF0IDA5OjQ3ICswMjAwLCBPbGVrc2lqIFJlbXBlbCB3cm90ZToN
-Cj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRz
-IHVubGVzcyB5b3UNCj4ga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPiA4MDIuMVAgKFBD
-UCkgYW5kIERpZmZTZXJ2IChEU0NQKSBhcmUgaGFuZGxlZCBub3cgYnkgRENCIGNvZGUuIExldCBp
-dA0KPiBkbw0KPiBhbGwgbmVlZGVkIGluaXRpYWwgY29uZmlndXJhdGlvbi4NCj4gDQo+IFNpZ25l
-ZC1vZmYtYnk6IE9sZWtzaWogUmVtcGVsIDxvLnJlbXBlbEBwZW5ndXRyb25peC5kZT4NCg0KQWNr
-ZWQtYnk6IEFydW4gUmFtYWRvc3MgPGFydW4ucmFtYWRvc3NAbWljcm9jaGlwLmNvbT4NCg==
+On Tue, Apr 02, 2024 at 05:20:51PM -0700, Mina Almasry wrote:
+> +static char *server_ip = "192.168.1.4";
+> +static char *client_ip = "192.168.1.2";
+> +static char *port = "5201";
+> +static size_t do_validation;
+> +static int start_queue = 8;
+> +static int num_queues = 8;
+> +static char *ifname = "eth1";
+> +static unsigned int ifindex = 3;
+> +static char *nic_pci_addr = "0000:06:00.0";
+
+It seems this is set but never used.
+
+Thanks.
 
