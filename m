@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-85613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81FCD89B950
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:54:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA92089B955
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14DB51F2161B
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 07:54:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBE791C21E72
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 07:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3344CB45;
-	Mon,  8 Apr 2024 07:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D055928DDE;
+	Mon,  8 Apr 2024 07:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5J8RCAs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iesaAbYl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871F15FB95;
-	Mon,  8 Apr 2024 07:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EB528DBF;
+	Mon,  8 Apr 2024 07:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712562512; cv=none; b=e3y3+mL4GtWTLUqtHEVQmfySzENNMmlfHQCqL/LrtGT5rRHnYoTu4i8dmylTQtrDLDl/5Z2NjEUwRixKAcP1NBQeqilSsG3mXW8b64ilZHrFQFBdoaY96UBtIWq4qVmUVc7cEhx47o3obIGNYerITeQwUqzZ7G19WC3kpQ8MVrg=
+	t=1712562585; cv=none; b=BIX4A7rTf6ZHdKAqYSMmVPXpIBNDuO95D2Zpnk39y9jRp3xCmhRmHu+NyhrzE+vMcv3HYZ6kFya0jUaNPlkrNaElJe5v5zSJve4Z7upBhK+Dl/QvVJJ/gQRF7RU52Q64G46OYgXvFpUPaEm51qLOhYhJyi09bY5grcT66+Sric0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712562512; c=relaxed/simple;
-	bh=OyivqxCyCQHaU0TBvZu93VhrYPwd0djlXetBhWNnesg=;
+	s=arc-20240116; t=1712562585; c=relaxed/simple;
+	bh=LAW48u0YukI7Nx6rcTEvzNn8pI0xiVP9cLF5MviH2/A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pxs8y2cBebP20ZMzIVPeyFU7CeUGGQ4jvr4n/Yerc1EJZ7qYRzMRqKBGRsZljS/3U9eyB6vNzG/fztruHmpEdH8lE+f2T8e4lgVv+oV/tfwotwq1SyLmU5xhrgK7L/wjwXg9kjaT6W6f0RBjz+FOp32Eq/vZFClacVoBVXNSesA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5J8RCAs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6E45C433C7;
-	Mon,  8 Apr 2024 07:48:29 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/fWkxd0iJps2qEs9clBuWW0DdxQDFrfm1Za64xO3L+X+WWmm64L8Ito/Gc5PF7nqFkqfytCGLME1IIQhSFfK7rdH4QPgtxPT0wKAYSDRWbBVA1z4qIG8K7u01dsqh6IchGJvGpmxyXga9yVy48ooDTj3qEiaB6vL8s548TQPhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iesaAbYl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A0F2C433F1;
+	Mon,  8 Apr 2024 07:49:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712562512;
-	bh=OyivqxCyCQHaU0TBvZu93VhrYPwd0djlXetBhWNnesg=;
+	s=k20201202; t=1712562585;
+	bh=LAW48u0YukI7Nx6rcTEvzNn8pI0xiVP9cLF5MviH2/A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B5J8RCAsrKzRVEhhwi/e38juo3WpjVWQRnbyNanqNA6q/wEidu68HX91oGo+Wts8M
-	 HSrpru0oR2wUqZq9D+fZQi6I84bKIyh7Enb7oHQHXWYdlAcylmkepJI1OKJo2scDII
-	 7o/efqaTf1SyH5XZWL20kh29NdFdsDcTljpDSZIjs8VlSnpwqV0ry3N+ce4m1fp9Z+
-	 D16nABgcaVDmzyXmXuhbuU+bZkEPTrbPThBBk7MaMb6np+OubsWPXAMM62NcID6MPt
-	 l4KWRstfel4q0W2nWeYICj5y7GWvzx3pYRowW6oG+TQZXw78gnJX7UUAhBUghxvTSA
-	 sEBn334ShUFmg==
-Date: Mon, 8 Apr 2024 08:48:26 +0100
+	b=iesaAbYlJbY3bVmvw//J/0XvCbKc6p8GuvTQhEd4Ec0egMIIG+RZFgflhWdgPSHXP
+	 O0XIL5WSXYQe7POMezMhEceqMj+XViMr16DM13dMbMizMAPwA6j12JcflZHjVVZSZB
+	 a+9y5RHha2wBrayG0v85B5Sl4Lqdd57rtUt6MON5H2xy9ta9A+YYEqIRsHh6NOcs73
+	 yAjA4aLPAvqt7e8AvDeJOEzUGsg59uKmdxpLRpinZy0xnG3mGDb4ujGrGbtk9Yo2E1
+	 FlY9cfoUsDpa4dKc64W5eeKKW5VQ6lOP0jNZ6Q7Tu9bv08VqIi0NV1+fWnuqL2oDgW
+	 B2eYiQyXb2p2Q==
+Date: Mon, 8 Apr 2024 08:49:39 +0100
 From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	David Ahern <dsahern@kernel.org>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] ip_tunnel: harden copying IP tunnel params to
- userspace
-Message-ID: <20240408074826.GA26556@kernel.org>
-References: <20240404160302.3585661-1-aleksander.lobakin@intel.com>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Palmer Dabbelt <palmer@rivosinc.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Charlie Jenkins <charlie@rivosinc.com>,
+	Noah Goldstein <goldstein.w.n@gmail.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] lib: checksum: hide unused expected_csum_ipv6_magic[]
+Message-ID: <20240408074939.GB26556@kernel.org>
+References: <20240404163702.241706-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,20 +64,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240404160302.3585661-1-aleksander.lobakin@intel.com>
+In-Reply-To: <20240404163702.241706-1-arnd@kernel.org>
 
-On Thu, Apr 04, 2024 at 06:03:02PM +0200, Alexander Lobakin wrote:
-> Structures which are about to be copied to userspace shouldn't have
-> uninitialized fields or paddings.
-> memset() the whole &ip_tunnel_parm in ip_tunnel_parm_to_user() before
-> filling it with the kernel data. The compilers will hopefully combine
-> writes to it.
+On Thu, Apr 04, 2024 at 06:36:45PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Fixes: 117aef12a7b1 ("ip_tunnel: use a separate struct to store tunnel params in the kernel")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Closes: https://lore.kernel.org/netdev/5f63dd25-de94-4ca3-84e6-14095953db13@moroto.mountain
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> When CONFIG_NET is disabled, an extra warning shows up for this
+> unused variable:
+> 
+> lib/checksum_kunit.c:218:18: error: 'expected_csum_ipv6_magic' defined but not used [-Werror=unused-const-variable=]
+> 
+> Replace the #ifdef with an IS_ENABLED() check that makes the compiler's
+> dead-code-elimination take care of the link failure.
+> 
+> Fixes: f24a70106dc1 ("lib: checksum: Fix build with CONFIG_NET=n")
+> Suggested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> resending v2 to netdev
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
+Tested-by: Simon Horman <horms@kernel.org> # build-tested
 
