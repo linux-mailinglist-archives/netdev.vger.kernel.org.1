@@ -1,168 +1,185 @@
-Return-Path: <netdev+bounces-85623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ED2989BA3D
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:29:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 668E789BA53
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:31:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0AB01C221FE
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 08:29:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DD8E288B49
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 08:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBE838DF1;
-	Mon,  8 Apr 2024 08:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mb891Tlf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731E834CDE;
+	Mon,  8 Apr 2024 08:31:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DA0381BB
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 08:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED35383BF
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 08:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712564934; cv=none; b=aqVJJugi2giulxjYi+kU4UelnPHxdi5OX7rSji6fo5OG45/GGM7Ln5CJjXfTKcCKqQgrxYwXPoAhC6tC/fNvHtzpW+cJ5m1DgKquf3qOFa9qzSDeeafFbe7tc9DmhVSS5HBsuGOdTvXZSSdEvutppMp7+7mQX8F60Ut/bvR7kLQ=
+	t=1712565085; cv=none; b=Hk6wTxFPUwntBj695kKlGOVMJOXr6Tmj491ylKUATOe2xi7JJWnwwfW6i9QFHviGk1Ql265HrYWxD1L185ZhPe+uYUh4r0UYCnTJg9aARODL3x+HGE1E7FNmoleOSOdxfKeE8DC/TwlLLH8NTSq0eLYfagw2Foe3xlpMu6/JCQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712564934; c=relaxed/simple;
-	bh=MYqlv9D40H40f13UIjC7zHoLDwM0tMcccHa/6DwQS1I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VquS9OhW0Dxiqhv5v2XnTQOWDPyGbb/LOG6LHxZf/1j5e38vSPuwoeUArk1xMTnhrDEbtTeOcbybifeiZKWP1w+kP4eHqdKMV+YXnf/1f9KXxc5y+28bp0oRbeM8c6bbCbaHAIvaQomK+AYWt9qx8xFnv6LRAP52MhihXAJ637w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mb891Tlf; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61814249649so6514587b3.3
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 01:28:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712564932; x=1713169732; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jsgjVYS5+lt6E4DMR+pupChoDCeq4tx4ij2d6OvD65U=;
-        b=Mb891TlfHIeKipw7Y0XUy1ywq/oRGig6o22nIdAr0eePzv8yrir5h7PO8l27/n2uVg
-         NkYPUnoxtjjj5oRhljnmQbqGmsyomh4sCR70fzYzSwqgJUAPFOTLuu0GOFelg8MkySCk
-         rwEcDcTbvRdLl5V0q6YolHGkMv7RlcAAFndcXx1vIurNbtQExa/PYC71MgMOeiD9pTxv
-         vG4aX19B3VqswUN1J2IRfJy+KsTIyO8NG9nVwY46nJR4aFLkOrbpItRt/k3xKi0DUOPT
-         EY0iV635ifiWQwOgPjR/9Ngh5Dqr7keVPgVBDJiNFC0Boim+O/8xk3MexDdbVi0RXatT
-         ONzg==
+	s=arc-20240116; t=1712565085; c=relaxed/simple;
+	bh=SvWrYKKF7tFCzrd01GY6b+TJR7TXTnF6RQx0uR9ei8o=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=G728BOn5q5D2aBlKvt4U8rXsqBSf+V+Lq5+gltT+pJDhtmBoYD60+LIEUDsRGjfiFuVinqGH2Udgy40BZqU0hhmMUjRgxBDhUEbrDwsDywMLyM2KlpjnKYtwPIzPfx/0THrTVl1nd1XDOGVuce2OpIqwFm/osDmHxsaUMNuBPlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7cc74ea8606so497398839f.2
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 01:31:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712564932; x=1713169732;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jsgjVYS5+lt6E4DMR+pupChoDCeq4tx4ij2d6OvD65U=;
-        b=jo6HVjttMFXj5v4W0Ca/b//zFm5liNQkcgCCAJ9ZvpfT/slDVtWBVGxqKm7y9j7blt
-         DSV3MTX96sEmoMg0YwwKAhbWhHOJZe9H07gBUdB2JlzeOozcqlovbAIF8AHuW1AFt7yM
-         f7t3UwL5tRjTLIm/x8TLHm2GITrXywb5RnuzEP3vdyABtxFX+yQ+1LGDgk46gicVCIYI
-         J34rzikmlnRg6KMNAnlql9YNi0UHcQa3ZApSqWsoOZUaGl+20k6iNRqx7sJsDMBki5+I
-         E0Z7i39NF+7ltIEQQ/vcd10Hbvi9bb2wjPWddDCwSzPIzhBoBP6jzSmHptQGDqgBfI/2
-         LdpA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXjW7LFJQ3zc4fzp5i5luijkkEbx2rl0/rUM1GB5T+/yWlYB3kzq+qWh4iF5pc9wsqSLp+4Dkgbu9I86ksVt422vyKZmcC
-X-Gm-Message-State: AOJu0Ywc+eaI1xmcuM6I87drIl1v+0zYtaRznrMsWjYHWWzo7dM6Y3UT
-	9QFHeh/EzTnXbvkMblx/HUwFZZiS9zOUyB74aufQ4QnHV5qRaXZUybwxMSstJCqkWth0YXdOA9n
-	L3SHCFJVc/A==
-X-Google-Smtp-Source: AGHT+IHqZBDQM0gMzggv+1JmYNlJhuzPTb0GeD+FJ1Ms5i/xIesAAiv2KHG5Z+tj07/kW9K6qi/TtONkJMIHMw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:84c4:0:b0:617:cbc7:26f9 with SMTP id
- u187-20020a8184c4000000b00617cbc726f9mr1955066ywf.10.1712564932164; Mon, 08
- Apr 2024 01:28:52 -0700 (PDT)
-Date: Mon,  8 Apr 2024 08:28:45 +0000
-In-Reply-To: <20240408082845.3957374-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1712565082; x=1713169882;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iozYkUc2qvNqy70fx2rka/MS22ZH8JtD6mcNL0+butg=;
+        b=O4jm54CKMNg30JXdSvY5G/IO9nL0SwyV19pYkhbkg10Jpu1jbXW8D5CqL7lOW0eDhl
+         sN1DZi9EDfIAOCXD68Jnt0JEhRf8ZrMgG7Gt/+sIc3P2Ch21fvQ2dHR3Wk4EYxDZPZw0
+         G7pmVNSrUH8eaQaN7kwOyHhoIuEbG/J/Q3qESJc/Li0WpmK1iZXvPiuLyMY4L9bWZnvG
+         Sajr2QDKM5DPOKMlx85XGEyfIQlQI98veUL87cqOG7XUANKjxZrlJQb2AB2HYyybErpO
+         rKMRVqT4M3sxIK8IRHdKYxxZLMxVJsMfKcNzlZ80se9oxJImD9y9yLWk20uWX/0OGkCo
+         B9DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXzicZ/tLKXAumMcAZUQbOn7qjFKwbU6AcR91y8xaSd4409FCfGd4uI00zeZAxOX+IzXaeDu2sT+99QTy5iUkGY2RJu5s1S
+X-Gm-Message-State: AOJu0YwxVPF2ONQ+UNiaP2+qYWn9fieQ4GaVfxOgF8LyUyrXJ8YAyiPG
+	UOUqXZoEPcCGLKaPKtObQ82lm+FpqfTNuDokw3Gk9Gi6eXqptqTy1bEJ6Ixc7sMlCJ0Cd3gsKqE
+	gfnjsBXvr8T4pTU1CaVPbnXQ0g62jhh9dOQZ+f1isrJTqROveKzQCxZ8=
+X-Google-Smtp-Source: AGHT+IH9rbGx0qFELfZIoyo/enSFmaj0Zh9IHtxzaUh92qkUIkzwUcUpaPT4lAlOLtETqqit7vEO2d3bQ/gJUz5ZjqcJ3k12YbFr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240408082845.3957374-1-edumazet@google.com>
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240408082845.3957374-4-edumazet@google.com>
-Subject: [PATCH net 3/3] nfc: llcp: fix nfc_llcp_setsockopt() unsafe copies
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6638:22c7:b0:47f:20b3:925b with SMTP id
+ j7-20020a05663822c700b0047f20b3925bmr412692jat.0.1712565082795; Mon, 08 Apr
+ 2024 01:31:22 -0700 (PDT)
+Date: Mon, 08 Apr 2024 01:31:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006a3d3e061591a19b@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: global-out-of-bounds Read in __timer_delete
+From: syzbot <syzbot+0a63bf51a80298491d8e@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot reported unsafe calls to copy_from_sockptr() [1]
+Hello,
 
-Use copy_safe_from_sockptr() instead.
+syzbot found the following issue on:
 
-[1]
+HEAD commit:    f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=17c5cc26180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=0a63bf51a80298491d8e
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
- BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/sockptr.h:55 [inline]
- BUG: KASAN: slab-out-of-bounds in nfc_llcp_setsockopt+0x6c2/0x850 net/nfc/llcp_sock.c:255
-Read of size 4 at addr ffff88801caa1ec3 by task syz-executor459/5078
+Unfortunately, I don't have any reproducer for this issue yet.
 
-CPU: 0 PID: 5078 Comm: syz-executor459 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/65d3f3eb786e/disk-f99c5f56.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/799cf7f28ff8/vmlinux-f99c5f56.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ab26c60c3845/bzImage-f99c5f56.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0a63bf51a80298491d8e@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: global-out-of-bounds in timer_is_static_object+0x5f/0x80 kernel/time/timer.c:735
+Read of size 8 at addr ffffffff94884578 by task syz-executor.2/7343
+
+CPU: 1 PID: 7343 Comm: syz-executor.2 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
 Call Trace:
  <TASK>
-  __dump_stack lib/dump_stack.c:88 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
-  print_address_description mm/kasan/report.c:377 [inline]
-  print_report+0x169/0x550 mm/kasan/report.c:488
-  kasan_report+0x143/0x180 mm/kasan/report.c:601
-  copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
-  copy_from_sockptr include/linux/sockptr.h:55 [inline]
-  nfc_llcp_setsockopt+0x6c2/0x850 net/nfc/llcp_sock.c:255
-  do_sock_setsockopt+0x3b1/0x720 net/socket.c:2311
-  __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
-  __do_sys_setsockopt net/socket.c:2343 [inline]
-  __se_sys_setsockopt net/socket.c:2340 [inline]
-  __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
- do_syscall_64+0xfd/0x240
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ timer_is_static_object+0x5f/0x80 kernel/time/timer.c:735
+ lookup_object_or_alloc lib/debugobjects.c:581 [inline]
+ debug_object_assert_init+0x228/0x440 lib/debugobjects.c:898
+ debug_timer_assert_init kernel/time/timer.c:846 [inline]
+ debug_assert_init kernel/time/timer.c:891 [inline]
+ __timer_delete+0xad/0x380 kernel/time/timer.c:1413
+ del_timer include/linux/timer.h:194 [inline]
+ try_to_grab_pending+0x159/0xab0 kernel/workqueue.c:2089
+ __cancel_work+0xb8/0x390 kernel/workqueue.c:4278
+ sco_sock_clear_timer net/bluetooth/sco.c:119 [inline]
+ sco_conn_del+0x161/0x310 net/bluetooth/sco.c:200
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:2022 [inline]
+ hci_conn_hash_flush+0xff/0x240 net/bluetooth/hci_conn.c:2566
+ hci_dev_close_sync+0x9ab/0x1050 net/bluetooth/hci_sync.c:5153
+ hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
+ hci_unregister_dev+0x1e3/0x4e0 net/bluetooth/hci_core.c:2773
+ vhci_release+0x83/0xd0 drivers/bluetooth/hci_vhci.c:674
+ __fput+0x429/0x8a0 fs/file_table.c:423
+ task_work_run+0x24f/0x310 kernel/task_work.c:180
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xa1b/0x27e0 kernel/exit.c:878
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1027
+ get_signal+0x176e/0x1850 kernel/signal.c:2907
+ arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
+ exit_to_user_mode_loop kernel/entry/common.c:105 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:201 [inline]
+ syscall_exit_to_user_mode+0xc9/0x360 kernel/entry/common.c:212
+ do_syscall_64+0x10a/0x240 arch/x86/entry/common.c:89
  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f7fac07fd89
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 91 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff660eb788 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f7fac07fd89
-RDX: 0000000000000000 RSI: 0000000000000118 RDI: 0000000000000004
-RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000000000
-R10: 0000000020000a80 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+RIP: 0033:0x7fb920c7cc9a
+Code: Unable to access opcode bytes at 0x7fb920c7cc70.
+RSP: 002b:00007fff790ac930 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: 00007fb920c7cc9a
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 00007fff790ac9ac R08: 00007fff790ac28c R09: 00007fff790ac697
+R10: 00007fff790ac310 R11: 0000000000000293 R12: 0000000000000032
+R13: 000000000002aad7 R14: 000000000002aac1 R15: 0000000000000003
+ </TASK>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+The buggy address belongs to the variable:
+ xa_init_flags.__key+0x18/0x20
+
+The buggy address belongs to the physical page:
+page:ffffea0000522100 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x14884
+flags: 0xfff00000004000(reserved|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000004000 ffffea0000522108 ffffea0000522108 0000000000000000
+raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner info is not present (never set?)
+
+Memory state around the buggy address:
+ ffffffff94884400: 00 00 00 00 00 00 00 00 00 00 00 00 f9 f9 f9 f9
+ ffffffff94884480: f9 f9 f9 f9 f9 f9 f9 f9 f9 f9 f9 f9 00 00 00 00
+>ffffffff94884500: 00 00 f9 f9 00 00 f9 f9 04 f9 f9 f9 00 00 f9 f9
+                                                                ^
+ ffffffff94884580: 00 f9 f9 f9 01 f9 f9 f9 00 f9 f9 f9 04 f9 f9 f9
+ ffffffff94884600: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
+
+
 ---
- net/nfc/llcp_sock.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-index 819157bbb5a2c6ef775633931721490b747f2fc8..d5344563e525c9bc436d5ad0b84380f0bcae62a8 100644
---- a/net/nfc/llcp_sock.c
-+++ b/net/nfc/llcp_sock.c
-@@ -252,10 +252,10 @@ static int nfc_llcp_setsockopt(struct socket *sock, int level, int optname,
- 			break;
- 		}
- 
--		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
--			err = -EFAULT;
-+		err = copy_safe_from_sockptr(&opt, sizeof(opt),
-+					     optval, optlen);
-+		if (err)
- 			break;
--		}
- 
- 		if (opt > LLCP_MAX_RW) {
- 			err = -EINVAL;
-@@ -274,10 +274,10 @@ static int nfc_llcp_setsockopt(struct socket *sock, int level, int optname,
- 			break;
- 		}
- 
--		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
--			err = -EFAULT;
-+		err = copy_safe_from_sockptr(&opt, sizeof(opt),
-+					     optval, optlen);
-+		if (err)
- 			break;
--		}
- 
- 		if (opt > LLCP_MAX_MIUX) {
- 			err = -EINVAL;
--- 
-2.44.0.478.gd926399ef9-goog
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
