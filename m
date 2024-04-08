@@ -1,98 +1,158 @@
-Return-Path: <netdev+bounces-85586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A17389B7FA
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 08:51:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 384BE89B820
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 09:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E87BF2820B5
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 06:50:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 697411C218C9
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 07:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95ABF18C19;
-	Mon,  8 Apr 2024 06:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1860521364;
+	Mon,  8 Apr 2024 07:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="H6nbwhCa";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kp5S05NQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from fhigh3-smtp.messagingengine.com (fhigh3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB422554B
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 06:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEFF23A8;
+	Mon,  8 Apr 2024 07:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712559057; cv=none; b=Cvz5dbPnVDeXHJWOiJ6q8B2jVZUkkhCyJksTEekgWBb+b8SqlxjS5wOO/LjmkAv2s1gGpbF49Vj0iJPxOP95kWwAOwxy3LxkPsVVAoKzmnFvb7Lfk8NxeIwDCYmj1Nsdq7gV4L8ePyHURjff0vpmApBTQ5+IIUTUCz56uDmGSqk=
+	t=1712560007; cv=none; b=HrVl4NGfOsTwo4OhzdQeZfp0zoVqgBPdUfN6y96VDiJAZ9rNX4pbcJGHXcgrZn4ixwKtNHCJpUrQbuDq9C6O3WsgyzExOSMK+6AtCR2OqipgYI0Eim6/lrlA6Cyddw+ng1ZqHhVlgDNQE8JmBmyD+xQsgI+uInGMNMPjPyKVXCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712559057; c=relaxed/simple;
-	bh=yhQHsp6FMk4jNNLFCEj7Uj3j/v7sXrplLuabWESrz00=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=Hdcjn6Pngak0EN3NIXhtnUQS7cVVxNUie2qWQE6+aWHHGAQAfzGZ054O35wVGP7/NrA4Q3fJzw5MVny49QWDQRoFF+7DmpKyAG75v8kjabKE8DZWLtyTRG0uzuFGi1RbmnyFevOqiMLsp3g5E5kDL227Ho5skbZWijpdTcvoeVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtp89t1712559027tn67808s
-X-QQ-Originating-IP: s86thkMQ/dptL23uE9kCnAxCM7XGqyh83+BkYMUOHCA=
-Received: from smtpclient.apple ( [183.128.132.155])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 08 Apr 2024 14:50:25 +0800 (CST)
-X-QQ-SSF: 00400000000000O0Z000000A0000000
-X-QQ-FEAT: 41oFSI3bg8ZENj7mGI1hEu8sidzwfghW/BQRTmYiFRSnS+OJ6BogV+3NjXXkx
-	q9IKwdZEBP1BEP6ivrJmPtPQtUOTetSqrpi6NQSQLWM4c0+ItP5iiYJ4G0L10SHa0YiDbo+
-	TBh3Q/63G7vUXbLAL3H0b0+nhKgNm8AvA3sqYoKXOpcxUdfeW6OZbSNKOYhs991Kn9ZnpE2
-	cyRzgyvnhGFznjeKEdnUOhmEZ7GRjgKdplbz2po2jGC/mKapzRBzEivhX/zxSsrRTEWT0GU
-	M4aZSixRvNOX1Rn9BYrmTGZ5yXRUj66s3E3qQJhyeph709hyz1Fwv8F4cAo8Y8YRJ1juiIF
-	B0V+21o6vXe0yJl/GFZZWOfcGhFhgZv0D9Z8W2OVifzPUjnflODnZwend+F5NHSWa+BVYzG
-	uvsMqWjDOOg=
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 15544089858339600893
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1712560007; c=relaxed/simple;
+	bh=TsTg0Em0hnQwG1kyroyG8fwVKnHzk4bQZW79kIttRXM=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=g1TyqVFn0fXqKkU5TIYjyVt/yEaD0kEU5THjxTD/Aeo4pjwvs+wbXxq9EvfaYpqr5gcl3cxhMRqFGS8sZLpfCkp4NZu7boIIdmkbVRf/eYje1n8mhWx34UrL6xy6YekWEL1aFyQx2Sa/9KGR3FZ+fRY0U+TZrCP4vaY210FDcsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=H6nbwhCa; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kp5S05NQ; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id CFA0011400D1;
+	Mon,  8 Apr 2024 03:06:43 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Mon, 08 Apr 2024 03:06:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1712560003; x=1712646403; bh=mnxNgod+mQ
+	25GqKBWPAlL1brKBlWJhE7aWmS2Nl0Wm4=; b=H6nbwhCaMCIBbpeE3pA3TNVaAm
+	JR4F/RzgmG3MGDor5L+WGbW/atMmwXVxSoglH+yQ2Mt70jAN7l7eCZxJ9Kalral1
+	8UQc0xHNOpSetWaeDzlJRFE6Av/YIcS2JTBuOHNflIN8OCycse60bH5+9En7fU9w
+	WRMyYYZcNDNUV3ao3ykySyp05bpFjZe61qMq9ErTbTjDvvlLAkpqnIxNAYq9UKyj
+	f9ZlPGHdOSoCdldwdq2puNBxFOvBB0l3IOk5zizfUHvtN6CthyAMdCECHsS9qY6o
+	JxDxMQEwRW1y+WinFVx1IEGXJNaYbN48MHCaV9rVGM6aQ5Didoc8EMbXKu8w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1712560003; x=1712646403; bh=mnxNgod+mQ25GqKBWPAlL1brKBlW
+	JhE7aWmS2Nl0Wm4=; b=kp5S05NQS+3/yLNrmlzZUcU1zMoM94Bv3NFVHyIKkZ3I
+	gZJyYgwg8Wh2ZtrhSIHXttMCu2F1ZJ68RT3jp4D8+I5zJ9U2wfOIM4YMP7dbEMG7
+	XuMD7LIbjXMGeHN0L0G2WVYrV0wDN2ynwRaUzhZ7I3bPDoQrUfViba7hXmKQL1I3
+	b42IvSRh0F+sO/jGk7NRc/lFxoG6bF4ugf8yqA8ciiIKAdPL0GByFbe+/VVnpNdc
+	r33RL7m4+GWokvAzG2lLZXCurHDbyoG0fqmg6kND1gkXU3CwkKlFQmubIqloeqSd
+	D9P4uSb80VU6cd4GmKOI2VBp71f7w0GPZ7H8aM64dw==
+X-ME-Sender: <xms:gpcTZveQNBT4simoXhkgi6yX_7gMIvB9m2rakniQ_mcLtez_zE7YqA>
+    <xme:gpcTZlO_SfKTANDeDIg5GlqyqbO7SdQc458048n87Hg0am6Q1-w9awCNYRS3TBSMy
+    tJ3OniymnbVgJxe9IQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudeghedguddugecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeejvddvvdduleduheejiedtheehiedvjefgleelffeigfevhffhueduhfeg
+    feefheenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:gpcTZohgL73J6oIzKZ8vxRcTgx8PzAJrTRdnweZr-Mti9ommZ39RNg>
+    <xmx:gpcTZg-2KVDmDEvjkAsvEU-TbgaLTuf5vYXcYoeN3_67GcrBN1ekJA>
+    <xmx:gpcTZrvCa69j0jZ_PbbvliwfaRx_R5FAfsRRXpAjeSap6rE48mVvug>
+    <xmx:gpcTZvGHILEgqIs5Uvv9Lr97c92V7vCQAVAtNR_ERymOtIHvGSKepA>
+    <xmx:g5cTZgW8NwC8DDq3UfpoowyZ2lDW3uo7RZeYX0B8NK0NZtaVXpPUbsFa>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 31EF3B6008D; Mon,  8 Apr 2024 03:06:42 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-368-gc733b1d8df-fm-20240402.001-gc733b1d8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.500.153.1.1\))
-Subject: Re: [PATCH net-next v2 7/7] net: txgbe: add sriov function support
-From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-In-Reply-To: <20240403185300.702a8271@kernel.org>
-Date: Mon, 8 Apr 2024 14:50:15 +0800
-Cc: netdev@vger.kernel.org,
- Jiawen Wu <jiawenwu@trustnetic.com>,
- =?utf-8?B?5rip56uv5by6?= <duanqiangwen@net-swift.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <409E8C82-269B-4D62-B878-B4B451995590@net-swift.com>
-References: <20240403092714.3027-1-mengyuanlou@net-swift.com>
- <BDE9D80ABE699DA7+20240403092714.3027-8-mengyuanlou@net-swift.com>
- <20240403185300.702a8271@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-X-Mailer: Apple Mail (2.3774.500.153.1.1)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
+MIME-Version: 1.0
+Message-Id: <763214eb-20eb-4627-8d4b-2e7f29db829a@app.fastmail.com>
+In-Reply-To: <202402161301.BBFA14EE@keescook>
+References: <20240216202657.2493685-1-arnd@kernel.org>
+ <202402161301.BBFA14EE@keescook>
+Date: Mon, 08 Apr 2024 09:06:21 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Kees Cook" <keescook@chromium.org>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Steffen Klassert" <steffen.klassert@secunet.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Nathan Chancellor" <nathan@kernel.org>,
+ "Nick Desaulniers" <ndesaulniers@google.com>,
+ "Bill Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ "Leon Romanovsky" <leon@kernel.org>, "Lin Ma" <linma@zju.edu.cn>,
+ "Simon Horman" <horms@kernel.org>, "Breno Leitao" <leitao@debian.org>,
+ "Tobias Brunner" <tobias@strongswan.org>, "Raed Salem" <raeds@nvidia.com>,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev
+Subject: Re: [PATCH] [RFC] xfrm: work around a clang-19 fortifiy-string false-positive
+Content-Type: text/plain
 
+On Fri, Feb 16, 2024, at 22:19, Kees Cook wrote:
+> On Fri, Feb 16, 2024 at 09:26:40PM +0100, Arnd Bergmann wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>> 
+>> clang-19 recently got branched from clang-18 and is not yet released.
+>> The current version introduces exactly one new warning that I came
+>> across in randconfig testing, in the copy_to_user_tmpl() function:
+>> 
+>> include/linux/fortify-string.h:420:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
+>>   420 |                         __write_overflow_field(p_size_field, size);
+>> 
+>> I have not yet produced a minimized test case for it, but I have a
+>> local workaround, which avoids the memset() here by replacing it with
+>> an initializer.
+>> 
+>> The memset is required to avoid leaking stack data to user space
+>> and was added in commit 1f86840f8977 ("xfrm_user: fix info leak in
+>> copy_to_user_tmpl()"). Simply changing the initializer to set all fields
+>> still risks leaking data in the padding between them, which the compiler
+>> is free to do here. To work around that problem, explicit padding fields
+>> have to get added as well.
+>
+> Per C11, padding bits are zero initialized if there is an initializer,
+> so "= { }" here should be sufficient -- no need to add the struct
+> members.
+>
+>> Since this is a false positive, a better fix would likely be to
+>> fix the compiler.
+>
+> As Nathan has found, this appears to be a loop unrolling bug in Clang.
+> https://github.com/ClangBuiltLinux/linux/issues/1985
+>
+> The shorter fix (in the issue) is to explicitly range-check before
+> the loop:
+>
+>        if (xp->xfrm_nr > XFRM_MAX_DEPTH)
+>                return -ENOBUFS;
 
+I ran into this issue again and I see that Nathan's fix has
+made it into mainline and backports, but it's apparently
+not sufficient.
 
-> 2024=E5=B9=B44=E6=9C=884=E6=97=A5 09:53=EF=BC=8CJakub Kicinski =
-<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Wed,  3 Apr 2024 17:10:04 +0800 Mengyuan Lou wrote:
->> + .ndo_set_vf_spoofchk    =3D wx_ndo_set_vf_spoofchk,
->> + .ndo_set_vf_link_state =3D wx_ndo_set_vf_link_state,
->> + .ndo_get_vf_config      =3D wx_ndo_get_vf_config,
->> + .ndo_set_vf_vlan        =3D wx_ndo_set_vf_vlan,
->> + .ndo_set_vf_mac         =3D wx_ndo_set_vf_mac,
->=20
-> We don't accept any new implementations of the old SR-IOV API.
-> Please offload standard networking constructs like flow rules,
-> bridge etc.
-> =E2=80=94
-Is there some exact documents and guidance.
+I don't see the warning with my patch from this thread, but
+there may still be a better fix.
 
-What links and rst are available.
-
-Thanks.
-
-> pw-bot: reject
->=20
->=20
-
+      Arnd
 
