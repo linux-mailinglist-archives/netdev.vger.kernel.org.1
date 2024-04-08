@@ -1,218 +1,188 @@
-Return-Path: <netdev+bounces-85739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0765289BF68
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 14:49:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4C289BF1A
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 14:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C25B1C213ED
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:49:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F83AB24AEB
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFD66E61B;
-	Mon,  8 Apr 2024 12:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A77F6F062;
+	Mon,  8 Apr 2024 12:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YCm7SQmc"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158326D1C7
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 12:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763FF6CDA1
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 12:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712580538; cv=none; b=CwJ18aYYdw31GnU5V8fCn3UtevWMJy1X9d79qT6sM0VKtSnj3AXStRof6EsGZUrmv4mAzYm4iA8k6n02MsOPoaHlagc92WgEPOtIqjlIWW/Mhaaym8sxDr1rHEX1fYnptOVj470ghTThyMM1yS/ThbXjXQc+uljy7La4SETUAN0=
+	t=1712580008; cv=none; b=S0zLYwruGDH38GeprbQ8pAg/+CRVGsMa077XQoypZ9E1EoOWKq8Q2DJAEQXW0Ul1aPH/PTPz9VGGkxMOiABpSdSEMKsN1ajzvDwEjvb7NoOhjECT9hAnFzoCDF0EE8Kp1DnWXvPm4Ndm1MTY/byTpTZAN/49fauI6SKWEp6B+ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712580538; c=relaxed/simple;
-	bh=2LbnILn254uQeF1Erbsc8WdQQ1lxYYnqPNbeUD+tPK4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iwjpxEcYptTAfqucU/Yo5GY/GmBkjHhyj3v/urxlOt7VrXuWkpT5X0bkCqvd+n0MWy8gDWjisqEJpkStmV1I0d0UKcJyWWbUmodivF2vB9tHO3Ma3rM3m1LQoMurdzKjg05CiKUwd02/doq03b8Pp3PBcbGZCNu3/m+qVoLx7B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VCpm81m7Qz1GG59;
-	Mon,  8 Apr 2024 20:48:08 +0800 (CST)
-Received: from dggpemd100005.china.huawei.com (unknown [7.185.36.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id 42AF51401E0;
-	Mon,  8 Apr 2024 20:48:52 +0800 (CST)
-Received: from localhost.huawei.com (10.137.16.203) by
- dggpemd100005.china.huawei.com (7.185.36.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 8 Apr 2024 20:48:51 +0800
-From: renmingshuai <renmingshuai@huawei.com>
-To: <renmingshuai@huawei.com>
-CC: <dsahern@gmail.com>, <liaichun@huawei.com>, <netdev@vger.kernel.org>,
-	<stephen@networkplumber.org>, <yanan@huawei.com>
-Subject: Re: [PATCH] iplink: add an option to set IFLA_EXT_MASK attribute
-Date: Mon, 8 Apr 2024 20:34:58 +0800
-Message-ID: <20240408123458.50943-1-renmingshuai@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240403032021.29899-1-renmingshuai@huawei.com>
-References: <20240403032021.29899-1-renmingshuai@huawei.com>
+	s=arc-20240116; t=1712580008; c=relaxed/simple;
+	bh=fxPXw2p77yhgVxO+9PcInO2jf4CRcklB5uKFPixrm8U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=taFIpiFUD95gTMVouSeS0qExVp4XJ9+lwMXETviA6ri6SA9ZQsPDlMfz+2vD4I59DovdQgJ5N3yITtHzG8N+Fu9wqsFqNkC2m4MHTOASUKxaOKlUPk/DRs+e5Ma+cCgIDuZBYyc5iAvrhCvi+mxLp210hHF8AzVyvACdFTxL5I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YCm7SQmc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712580005;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ae2COtjajtOOtS6X4ygU+qeHK/f9eu0OjppudYN/LXQ=;
+	b=YCm7SQmcEUk160x0TBkSusRJOgTGSwEl1E2R/SQ8XkbF6zi89iLdIn22ICHyfEk1fT/6SW
+	bjIUuiwPpzwfva2QyG9TzMaCGqo6Ht4UQCNBeUgaxhDFGZaI0tlYO7FW3yCJePUE8b7wd/
+	jMYbTCtTp/QwAGOa4n0Ipqz4/PEo5Ag=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-691-gWD-ecNdOLavuBSJHT5OTA-1; Mon, 08 Apr 2024 08:40:01 -0400
+X-MC-Unique: gWD-ecNdOLavuBSJHT5OTA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a51b00fc137so155412066b.0
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 05:40:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712580001; x=1713184801;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ae2COtjajtOOtS6X4ygU+qeHK/f9eu0OjppudYN/LXQ=;
+        b=IjqASWohrfhopwrUYWm1jZdWNuIAbBh16oh/DwCmCfygESJX36k/E+EwhFTayqJLnZ
+         fDphVuDFrKDmNnCQFZdRlJfzFhEyvrNi9RP+csoX9s4qjiisAOCHRsV8laa2dJG2a35q
+         px4PQbFDGI4w93GfwB5/LNST6T5KR3O31wlbFImlYIa7QSKkvXgtgJ/vreNFTWKieaCT
+         sJSJ2W8OfJgKyoulak/vKe39A+PjoXvEvPB2ioYNz2FNGFe7hkUo2KMrigbTNGKX4FX/
+         H1IqwT4gNVpYv945FwlSaAn4aKDFvuyig4Nqv/wh/iDYGIgQmRbSzDLh3npQMU1mzU/u
+         hBYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWQ9gXEcLvrlt9diHqIyK5FYC+q9gEea1/N4NaU51SBZbUNTfVPwbu5JTYEA2ZwU6BtLAgv8/YMQ7YklFlTpjzbHlmOwsB
+X-Gm-Message-State: AOJu0YxqMFSaHlyXmkQa1rey0fUQfwEAR+71VqgZgWsAmlJJPy1Asumc
+	3DY3w5fxuaQilsZbltKqR5rTNDC5LQR94+OhbWoDfJTBoyJuHzLS7D3Wlbjwzq7Mdfcq56ghU14
+	rnzuVBHRqoSGHdouzLT1gMVGmrkyXcHxGBAT1iFJm1Sg+rpfnXgH5+OP6RMxMXp/14zyez7s87E
+	s6SDdP++fUIApPGBonQ+3sJaYEpl/f
+X-Received: by 2002:a17:907:9444:b0:a51:d70f:b5f2 with SMTP id dl4-20020a170907944400b00a51d70fb5f2mr2084586ejc.20.1712580000867;
+        Mon, 08 Apr 2024 05:40:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFg3MkKq/gJZBjDBVnAKe4jU7q9XkeS1BfnnkBObgzhdnwCFitOZa/DmVr4r6jMIn9yjc43uLBh88PkDhgd3Mk=
+X-Received: by 2002:a17:907:9444:b0:a51:d70f:b5f2 with SMTP id
+ dl4-20020a170907944400b00a51d70fb5f2mr2084571ejc.20.1712580000551; Mon, 08
+ Apr 2024 05:40:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemd100005.china.huawei.com (7.185.36.102)
+References: <20240404055635.316259-1-lulu@redhat.com> <20240408033804-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240408033804-mutt-send-email-mst@kernel.org>
+From: Cindy Lu <lulu@redhat.com>
+Date: Mon, 8 Apr 2024 20:39:21 +0800
+Message-ID: <CACLfguUL=Kteorvyn=wRUWFJFvhvgRyp+V7GNBp2R33hK1vnSw@mail.gmail.com>
+Subject: Re: [PATCH v3] Documentation: Add reconnect process for VDUSE
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->> Kernel has add IFLA_EXT_MASK attribute for indicating that certain
->> extended ifinfo values are requested by the user application. The ip
->> link show cmd always request VFs extended ifinfo.
->> 
->> RTM_GETLINK for greater than about 220 VFs truncates IFLA_VFINFO_LIST
->> due to the maximum reach of nlattr's nla_len being exceeded.
->> As a result, ip link show command only show the truncated VFs info
->> sucn as:
->> 
->>     #ip link show dev eth0
->>     1: eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 ...
->>         link/ether ...
->>         vf 0     link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
->>         ...
->>     Truncated VF list: eth0
->> 
->> Add an option to set IFLA_EXT_MASK attribute and users can choose to
->> show the extended ifinfo or not.
->> 
->> Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>
+On Mon, Apr 8, 2024 at 3:40=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
 >
-> Adding a new option with on/off seems like more than is necessary.
-> If we need an option it should just be one word. Any new filter should
-> have same conventions as existing filters.  Maybe 'novf'
-> 
-> And it looks like not sending IFLA_EXT_MASK will break the changes
-> made for the link filter already done for VF's.
+> On Thu, Apr 04, 2024 at 01:56:31PM +0800, Cindy Lu wrote:
+> > Add a document explaining the reconnect process, including what the
+> > Userspace App needs to do and how it works with the kernel.
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  Documentation/userspace-api/vduse.rst | 41 +++++++++++++++++++++++++++
+> >  1 file changed, 41 insertions(+)
+> >
+> > diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/user=
+space-api/vduse.rst
+> > index bdb880e01132..7faa83462e78 100644
+> > --- a/Documentation/userspace-api/vduse.rst
+> > +++ b/Documentation/userspace-api/vduse.rst
+> > @@ -231,3 +231,44 @@ able to start the dataplane processing as follows:
+> >     after the used ring is filled.
+> >
+> >  For more details on the uAPI, please see include/uapi/linux/vduse.h.
+> > +
+> > +HOW VDUSE devices reconnection works
+> > +------------------------------------
+> > +1. What is reconnection?
+> > +
+> > +   When the userspace application loads, it should establish a connect=
+ion
+> > +   to the vduse kernel device. Sometimes,the userspace application exi=
+sts,
+> > +   and we want to support its restart and connect to the kernel device=
+ again
+> > +
+> > +2. How can I support reconnection in a userspace application?
+> > +
+> > +2.1 During initialization, the userspace application should first veri=
+fy the
+> > +    existence of the device "/dev/vduse/vduse_name".
+> > +    If it doesn't exist, it means this is the first-time for connectio=
+n. goto step 2.2
+> > +    If it exists, it means this is a reconnection, and we should goto =
+step 2.3
+> > +
+> > +2.2 Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
+> > +    /dev/vduse/control.
+> > +    When ioctl(VDUSE_CREATE_DEV) is called, kernel allocates memory fo=
+r
+> > +    the reconnect information. The total memory size is PAGE_SIZE*vq_m=
+umber.
+>
+> Confused. Where is that allocation, in code?
+>
+> Thanks!
+>
+this should allocated in function vduse_create_dev(), I will rewrite
+this part  to make it more clearer
+will send a new version soon
+Thanks
+cindy
 
-Thanks for your reply. As you suggested, I've added an option
-named noVF, which has same conventions as existing filter.
-Also, this new patch does not send RTEXT_FILTER_VF instead of
-IFLA_EXT_MASK, and it does not break the changes made for the link
-filter already done for VF's.
-Please review it again.
-
----
- ip/ip_common.h        |  1 +
- ip/ipaddress.c        | 15 ++++++++++-----
- ip/iplink.c           |  2 +-
- man/man8/ip-link.8.in |  7 ++++++-
- 4 files changed, 18 insertions(+), 7 deletions(-)
-
-diff --git a/ip/ip_common.h b/ip/ip_common.h
-index b65c2b41..d3645a2c 100644
---- a/ip/ip_common.h
-+++ b/ip/ip_common.h
-@@ -30,6 +30,7 @@ struct link_filter {
- 	int target_nsid;
- 	bool have_proto;
- 	int proto;
-+	int vfinfo;
- };
- 
- const char *get_ip_lib_dir(void);
-diff --git a/ip/ipaddress.c b/ip/ipaddress.c
-index e536912f..a8899dc4 100644
---- a/ip/ipaddress.c
-+++ b/ip/ipaddress.c
-@@ -2029,10 +2029,11 @@ static int ipaddr_flush(void)
- 
- static int iplink_filter_req(struct nlmsghdr *nlh, int reqlen)
- {
--	__u32 filt_mask;
-+	__u32 filt_mask = 0;
- 	int err;
- 
--	filt_mask = RTEXT_FILTER_VF;
-+	if (!filter.vfinfo)
-+		filt_mask |= RTEXT_FILTER_VF;
- 	if (!show_stats)
- 		filt_mask |= RTEXT_FILTER_SKIP_STATS;
- 	err = addattr32(nlh, reqlen, IFLA_EXT_MASK, filt_mask);
-@@ -2070,12 +2071,13 @@ static int ipaddr_link_get(int index, struct nlmsg_chain *linfo)
- 		.i.ifi_family = filter.family,
- 		.i.ifi_index = index,
- 	};
--	__u32 filt_mask = RTEXT_FILTER_VF;
-+	__u32 filt_mask = 0;
- 	struct nlmsghdr *answer;
- 
-+	if (!filter.vfinfo)
-+		filt_mask |= RTEXT_FILTER_VF;
- 	if (!show_stats)
- 		filt_mask |= RTEXT_FILTER_SKIP_STATS;
--
- 	addattr32(&req.n, sizeof(req), IFLA_EXT_MASK, filt_mask);
- 
- 	if (rtnl_talk(&rth, &req.n, &answer) < 0) {
-@@ -2139,6 +2141,7 @@ static int ipaddr_list_flush_or_save(int argc, char **argv, int action)
- 	ipaddr_reset_filter(oneline, 0);
- 	filter.showqueue = 1;
- 	filter.family = preferred_family;
-+	filter.vfinfo = 0;
- 
- 	if (action == IPADD_FLUSH) {
- 		if (argc <= 0) {
-@@ -2221,6 +2224,8 @@ static int ipaddr_list_flush_or_save(int argc, char **argv, int action)
- 				invarg("\"proto\" value is invalid\n", *argv);
- 			filter.have_proto = true;
- 			filter.proto = proto;
-+		} else if (strcmp(*argv, "noVF") == 0) {
-+			filter.vfinfo = -1;
- 		} else {
- 			if (strcmp(*argv, "dev") == 0)
- 				NEXT_ARG();
-@@ -2274,7 +2279,7 @@ static int ipaddr_list_flush_or_save(int argc, char **argv, int action)
- 	 * the link device
- 	 */
- 	if (filter_dev && filter.group == -1 && do_link == 1) {
--		if (iplink_get(filter_dev, RTEXT_FILTER_VF) < 0) {
-+		if (iplink_get(filter_dev, filter.vfinfo < 0 ? 0 : RTEXT_FILTER_VF) < 0) {
- 			perror("Cannot send link get request");
- 			delete_json_obj();
- 			exit(1);
-diff --git a/ip/iplink.c b/ip/iplink.c
-index 95314af5..ad4b068b 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -111,7 +111,7 @@ void iplink_usage(void)
- 		"		[ gro_max_size BYTES ] [ gro_ipv4_max_size BYTES ]\n"
- 		"\n"
- 		"	ip link show [ DEVICE | group GROUP ] [up] [master DEV] [vrf NAME] [type TYPE]\n"
--		"		[nomaster]\n"
-+		"		[nomaster] [ noVF ]\n"
- 		"\n"
- 		"	ip link xstats type TYPE [ ARGS ]\n"
- 		"\n"
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index 31e2d7f0..dd497d5f 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -202,7 +202,8 @@ ip-link \- network device configuration
- .IR ETYPE " ] ["
- .B vrf
- .IR NAME " ] ["
--.BR nomaster " ]"
-+.BR nomaster " ] ["
-+.BR noVF " ]"
- 
- .ti -8
- .B ip link xstats
-@@ -2898,6 +2899,10 @@ output.
- .B nomaster
- only show devices with no master
- 
-+.TP
-+.B noVF
-+only show devices with no VF info
-+
- .SS  ip link xstats - display extended statistics
- 
- .TP
--- 
-2.33.0
+> > +2.3 Check if the information is suitable for reconnect
+> > +    If this is reconnection :
+> > +    Before attempting to reconnect, The userspace application needs to=
+ use the
+> > +    ioctl(VDUSE_DEV_GET_CONFIG, VDUSE_DEV_GET_STATUS, VDUSE_DEV_GET_FE=
+ATURES...)
+> > +    to get the information from kernel.
+> > +    Please review the information and confirm if it is suitable to rec=
+onnect.
+> > +
+> > +2.4 Userspace application needs to mmap the memory to userspace
+> > +    The userspace application requires mapping one page for every vq. =
+These pages
+> > +    should be used to save vq-related information during system runnin=
+g. Additionally,
+> > +    the application must define its own structure to store information=
+ for reconnection.
+> > +
+> > +2.5 Completed the initialization and running the application.
+> > +    While the application is running, it is important to store relevan=
+t information
+> > +    about reconnections in mapped pages. When calling the ioctl VDUSE_=
+VQ_GET_INFO to
+> > +    get vq information, it's necessary to check whether it's a reconne=
+ction. If it is
+> > +    a reconnection, the vq-related information must be get from the ma=
+pped pages.
+> > +
+> > +2.6 When the Userspace application exits, it is necessary to unmap all=
+ the
+> > +    pages for reconnection
+> > --
+> > 2.43.0
+>
 
 
