@@ -1,181 +1,156 @@
-Return-Path: <netdev+bounces-85845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BBAC89C8AF
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:47:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7970F89C901
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 17:55:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F678B21F47
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:47:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BE5C1F24EA9
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 15:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30ECA1420A6;
-	Mon,  8 Apr 2024 15:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3DF1448F4;
+	Mon,  8 Apr 2024 15:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KbmngdNZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyGDyBa+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319A324B4A;
-	Mon,  8 Apr 2024 15:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991481448FB
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 15:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712591236; cv=none; b=cooes9R5ZiS+EblWSnT4b65nlgU+UIuhx7Rg6oTg8CdNBKJ/YWe7A3qdi484MIqspqk5VtQsXw1P+8UGg3CDr500BfQILWwao6VsV9zlKBD8zSLWHnTdxovMFp2mPb5cK2+hBpSLMP/hR0Oh4oLhA56DyPceAHHTn0QMtD91vnk=
+	t=1712591615; cv=none; b=lArilEyqhGQlTRik+OAIBcMvqlRtvQJK0nZS4IzKIz6oDryUT70WUS9J/BJz9PIBMxHdYzPRi7H4ZJpBmDht9jeh2P9ygYMR9cxD7M2cxiB2x+DmbImqZFhEcuBzlAPVNYwapLEQQy0oW1Zwv2W8GTBbGBO1WP3ykOJsQMYXH8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712591236; c=relaxed/simple;
-	bh=XWTxD0GDjCGkak87HIqNe6ZKIZfYTqzhwrsShJ6reOU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U+3QyQdvjEmh/NzWz4BpCauxLm4eVnXiv6jvvNPJU0cFFMLDljplsOI7mdN9dxTCpkB8KD+HHoQRrBYDkDEAGhdDc/is1JUSlUcfXup1LD259IYafu2lP/xAfIbjHmOIzXt0/67Qmsga3MvJ3t2hjRJySkGF1CKz/GMeIEiai5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KbmngdNZ; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d89f7cf980so1124121fa.1;
-        Mon, 08 Apr 2024 08:47:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712591232; x=1713196032; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XWTxD0GDjCGkak87HIqNe6ZKIZfYTqzhwrsShJ6reOU=;
-        b=KbmngdNZCqFrdRYKpLLlD4pGXQa0ORe+EQC13PTYqe5Ctr9+O1UI3oXQWnuouZunWq
-         O42nhkVYVd1VGqZeChN9NhxFspO+DDaH3YQ+bJC3FaEGjNt5CCW10RUJQkHv4Fq9N6mH
-         K6jyNESAUSbj0CR+B5aew+k0kXnYAi7mD9eJLpZbNf+ZBw7Ko8urcckV9+gdefiJ0gsY
-         ZgFokV2PJPSFVT0a+XfbPna47sHFPZXF3TktlY9Ejq7uAhf3A6lz0X2VwvhGr8f9QOuk
-         +QgQrU/uVhG0y/RHW/6l6Zk0OvyRRx2YjM9GIoUIiRo7JoGEb0RPEY4NerZMtrtPagtU
-         UZdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712591232; x=1713196032;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XWTxD0GDjCGkak87HIqNe6ZKIZfYTqzhwrsShJ6reOU=;
-        b=VJYuA1PyZK1EAksjzKQKvsn99FQeWL/0hWGx1RJobQDPAinVqvJ4eI9asTueBTbIk+
-         ysED8wTjm0+CekgE/jl79IcrVWG7f6RUIaGLirB85utpm6CCTh4E3XCxQjI8Sd+G2uwX
-         oOuJkbZiWxWluUp2j+13i3qu0TsKvDirTUiTreukleCbR8IuYb6C9Rd904YqvqISmDwD
-         0VATxBbvO4YsORUcj8YmXmsUOHTKBPyRxnZjHj2W65G2DpG6bGpdXTN9/VNakiMUAKDd
-         4wSjoQChITwMilWo9hwnf/i2dh5XKZx0goeZBwadiuajXZgLib4URv1pJy4pVVC9RQAh
-         EwkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/zVh7TNBBybfgWnQZ+Nlj3sV3o4JkUvFakHkmvit+os6/fUcm5IHS5nl9E3KT5a/D8MGqxeaeV3FYGVZPRMYgJ+wOdhJI8plJOWbuLqF9kiiECDInfGq+Y9PututpuoCi
-X-Gm-Message-State: AOJu0YyAsbMtXZIJedSe6deZIfalUCv5Em9zk4NLJVOodVlhZ1vHHOLE
-	KIBtWzvS71vx8uY6338DhDM11tT742xOeFV/kz2+ImlGJKb7TMhgkHaG9zAXqbDoLSRn1wZsU0f
-	Bro1Uddp/laVMM+bX5Oayz9Z96qw=
-X-Google-Smtp-Source: AGHT+IGIQZnLjgx9HHyb69wZviN7mn4HV0dhMzfiJf3+/dHDemCOy40Z+kds1Lh504MKYWTIifBbhwPh1rKnpTfvtKQ=
-X-Received: by 2002:a05:651c:1411:b0:2d8:3d69:b066 with SMTP id
- u17-20020a05651c141100b002d83d69b066mr5195169lje.7.1712591232034; Mon, 08 Apr
- 2024 08:47:12 -0700 (PDT)
+	s=arc-20240116; t=1712591615; c=relaxed/simple;
+	bh=c7hBMA4mXgWP8KpfW/frrWt9OAipSAHQsJKBjgulmnE=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=BYCq8+beWDc+Pm36N4kxXK5QTMJ6p5YEoP4b4TMuqJ2cK4KUJKOLNSpFNrF1Y60J3UTT9XAj4VyxnWp0Yy2eqb5q+CXHhyDX0UKny9xa9SIcf14vZjlUW5uLMM9jvhZoHY9kIesFvD6nngCFBQKEvhmvXEmwpau2IEF4SiAC/Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VyGDyBa+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712591612;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CFuGX1yyoTN69ecCATsVj4UhORzkDiRUWoktVVAJ3+Q=;
+	b=VyGDyBa+h8TPU+dWbJ0sYT3KoDzOIl3rIXze9P3SBi9Z9AoimgqtbbWh0HrcJAbyE7MV3+
+	a7fZHOLRygFXsQ79Eq0HLYrhRlA3lRNdLx6lCQKWVE8ZnsFncUKnlWc1+rOtjbsU5/GQqn
+	WbujvoiuD4DAmrmJ6CdHgT1LKIfnllw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-137-HJAhESVFMaKi_61YaghcgA-1; Mon, 08 Apr 2024 11:53:27 -0400
+X-MC-Unique: HJAhESVFMaKi_61YaghcgA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EEA2C90ACC7;
+	Mon,  8 Apr 2024 15:53:25 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 084C62033AC1;
+	Mon,  8 Apr 2024 15:53:21 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240328163424.2781320-24-dhowells@redhat.com>
+References: <20240328163424.2781320-24-dhowells@redhat.com> <20240328163424.2781320-1-dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+    Matthew Wilcox <willy@infradead.org>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
+    Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH 23/26] netfs: Cut over to using new writeback code
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
- <20240404132548.3229f6c8@kernel.org> <660f22c56a0a2_442282088b@john.notmuch>
- <20240404165000.47ce17e6@kernel.org> <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
- <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
- <20240405122646.GA166551@nvidia.com> <CAKgT0UeBCBfeq5TxTjND6G_S=CWYZsArxQxVb-2paK_smfcn2w@mail.gmail.com>
- <20240405151703.GF5383@nvidia.com> <CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
- <ZhPaIjlGKe4qcfh_@nanopsycho>
-In-Reply-To: <ZhPaIjlGKe4qcfh_@nanopsycho>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 8 Apr 2024 08:46:35 -0700
-Message-ID: <CAKgT0UfcK8cr8UPUBmqSCxyLDpEZ60tf1YwTAxoMVFyR1wwdsQ@mail.gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bhelgaas@google.com, 
-	linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, 
-	Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <877901.1712591597.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 Apr 2024 16:53:17 +0100
+Message-ID: <877902.1712591597@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On Mon, Apr 8, 2024 at 4:51=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote:
->
-> Fri, Apr 05, 2024 at 08:38:25PM CEST, alexander.duyck@gmail.com wrote:
-> >On Fri, Apr 5, 2024 at 8:17=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> =
-wrote:
-> >>
-> >> On Fri, Apr 05, 2024 at 07:24:32AM -0700, Alexander Duyck wrote:
-> >> > > Alex already indicated new features are coming, changes to the cor=
+David Howells <dhowells@redhat.com> wrote:
+
+> +		/* Wait for writeback to complete.  The writeback engine owns
+> +		 * the info in folio->private and may change it until it
+> +		 * removes the WB mark.
+> +		 */
+> +		if (folio_wait_writeback_killable(folio)) {
+> +			ret =3D written ? -EINTR : -ERESTARTSYS;
+> +			goto error_folio_unlock;
+> +		}
+> +
+
+It turns out that this really kills performance with fio with as many jobs=
+ as
+cpus.  It's taking up to around 8x longer to complete a pwrite() on averag=
 e
-> >> > > code will be proposed. How should those be evaluated? Hypothetical=
-ly
-> >> > > should fbnic be allowed to be the first implementation of somethin=
-g
-> >> > > invasive like Mina's DMABUF work? Google published an open userspa=
-ce
-> >> > > for NCCL that people can (in theory at least) actually run. Meta w=
-ould
-> >> > > not be able to do that. I would say that clearly crosses the line =
-and
-> >> > > should not be accepted.
-> >> >
-> >> > Why not? Just because we are not commercially selling it doesn't mea=
+and perf shows a 30% of the CPU cycles are being spent in contention on th=
+e
+i_rwsem.
+
+The reason this was added here is that writeback cannot take the folio loc=
+k in
+order to clean up folio->private without risking deadlock vs the truncatio=
 n
-> >> > we couldn't look at other solutions such as QEMU. If we were to
-> >> > provide a github repo with an emulation of the NIC would that be
-> >> > enough to satisfy the "commercial" requirement?
-> >>
-> >> My test is not "commercial", it is enabling open source ecosystem vs
-> >> benefiting only proprietary software.
-> >
-> >Sorry, that was where this started where Jiri was stating that we had
-> >to be selling this.
->
-> For the record, I never wrote that. Not sure why you repeat this over
-> this thread.
+routines (IIRC).
 
-Because you seem to be implying that the Meta NIC driver shouldn't be
-included simply since it isn't going to be available outside of Meta.
-The fact is Meta employs a number of kernel developers and as a result
-of that there will be a number of kernel developers that will have
-access to this NIC and likely do development on systems containing it.
-In addition simply due to the size of the datacenters that we will be
-populating there is actually a strong likelihood that there will be
-more instances of this NIC running on Linux than there are of some
-other vendor devices that have been allowed to have drivers in the
-kernel.
+I can mitigate this by skipping the wait if folio->private is not set and =
+if
+we're not going to attach anything there (see attached).  Note that if
+writeout is ongoing and there is nothing attached to ->private, then we sh=
+ould
+not be engaging write-streaming mode and attaching a new netfs_folio (and =
+if
+we did, we'd flush the page and wait for it anyway).
 
-So from what I can tell the only difference is if we are manufacturing
-this for sale, or for personal use. Thus why I mention "commercial"
-since the only difference from my perspective is the fact that we are
-making it for our own use instead of selling it.
+The other possibility is if we have a writeback group to set.  This only
+applies to ceph for the moment and is something that will need dealing wit=
+h
+if/when ceph is made to use this code.
 
-[...]
+David
+---
 
-> >> > I agree. We need a consistent set of standards. I just strongly
-> >> > believe commercial availability shouldn't be one of them.
-> >>
-> >> I never said commercial availability. I talked about open source vs
-> >> proprietary userspace. This is very standard kernel stuff.
-> >>
-> >> You have an unavailable NIC, so we know it is only ever operated with
-> >> Meta's proprietary kernel fork, supporting Meta's proprietary
-> >> userspace software. Where exactly is the open source?
-> >
-> >It depends on your definition of "unavailable". I could argue that for
-> >many most of the Mellanox NICs are also have limited availability as
-> >they aren't exactly easy to get a hold of without paying a hefty
-> >ransom.
->
-> Sorry, but I have to say this is ridiculous argument, really Alex.
-> Apples and oranges.
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index 1eff9413eb1b..279b296f8014 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -255,7 +255,8 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct=
+ iov_iter *iter,
+ 		 * the info in folio->private and may change it until it
+ 		 * removes the WB mark.
+ 		 */
+-		if (folio_wait_writeback_killable(folio)) {
++		if (folio_get_private(folio) &&
++		    folio_wait_writeback_killable(folio)) {
+ 			ret =3D written ? -EINTR : -ERESTARTSYS;
+ 			goto error_folio_unlock;
+ 		}
 
-Really? So would you be making the same argument if it was
-Nvidia/Mellanox pushing the driver and they were exclusively making it
-just for Meta, Google, or some other big cloud provider? I suspect
-not. If nothing else they likely wouldn't disclose the plan for
-exclusive sales to get around this sort of thing. The fact is I know
-many of the vendors make proprietary spins of their firmware and
-hardware for specific customers. The way I see it this patchset is
-being rejected as I was too honest about the general plan and use case
-for it.
-
-This is what I am getting at. It just seems like we are playing games
-with semantics where if it is a vendor making the arrangement then it
-is okay for them to make hardware that is inaccessible to most, but if
-it is Meta then somehow it isn't.
 
