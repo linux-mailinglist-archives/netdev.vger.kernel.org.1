@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-85665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3DB89BCB4
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:10:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94C0089BCB7
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 12:10:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19F951F21287
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:10:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D051B1C21BF3
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 10:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B289535C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49905380D;
 	Mon,  8 Apr 2024 10:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+mPKhMt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlp4k2VD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753CB53389
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 10:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754425338D;
+	Mon,  8 Apr 2024 10:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712571027; cv=none; b=FQB2IT1CypMUspilfHAy7vxDXAELBdhcrmzq04P6Kwpkc0fKlXMluzA7tqn9lT7r9obmMHLz0RSvkYju4LRDWYhTi1jXAaotvLurYuSeUIhfk2tcS60YdSoG1mXL7TWz7Df21zRR8Ho3BDAxL19mtzVH5PgTxyVMIHKhXrSGKMg=
+	t=1712571027; cv=none; b=U7fWdaoXLNFdDmBG9UuvA13PhIthVc6SQVQ8KCtq6p1ay3rhB66JVNmnsUIYhrMuoGzuFDfNhS7+3MKyJBlY02MNhxato6V+ocf6bWK9W/p1OUMPy0ksHiHY5WDIvj1iTQxnZhD8axehoz2aHGVvn+SKEq9GuKhu1QW6JoTDuZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712571027; c=relaxed/simple;
-	bh=NX5af7LaHQ8RprrXxWuEvooWdDIOx7sNUW2cPns0rO8=;
+	bh=x+XrOol6yWyCizxrCWOJ4+a0py0a9Q0xvIdnby2O6R0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OHyMVqJybqUPhlPOcpjxwYU2pA5YSDMrcsPu6zb/Bk/T36i79o1/PHTQUcNqFsZ/ifXvSHNnNnYN6OJDub5BVIt7zsbS0einOUBycnDcmcEi58YmLFsHZkaVVyFmlRsHPsaKzhLndlEeXzjB6uvHCfi/1hZ51dDTRiEitB3P5gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+mPKhMt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 26675C43609;
+	 In-Reply-To:To:Cc; b=Jc3aDZ6MKd4BkiQRvvkZmX44KXTyeveMk/PZ93Gmxd2UAX1IsuT7rC8D5Ges8SgbYSaCQ4Db5SJNdFYhbPSGr688XklmO3k1iv7WSeLt4Z7iCr6g7oZvjPBWc+u/wGffsmQb83wvo6kmFTEGoPgMaxh3RjEnfvhd2N/4A7yc4SE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlp4k2VD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2BE3AC43394;
 	Mon,  8 Apr 2024 10:10:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712571027;
-	bh=NX5af7LaHQ8RprrXxWuEvooWdDIOx7sNUW2cPns0rO8=;
+	bh=x+XrOol6yWyCizxrCWOJ4+a0py0a9Q0xvIdnby2O6R0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Z+mPKhMtqPCNqsJ6sRcyt3OOiNjxtSO7Y0aKdjTljyZYPLN41hr07WCRl0D8OOFOu
-	 V2a4npM7dzDxEYcAEybFlpnTZdcinJLxljb/GHnCB4SuBlucS8AgfBwMzNE8fBnSFU
-	 rZMsK1MSkxjYwhFTM5zHGZgeBLArayk1Q0AIMTz1BHtpdSghx6pLV12mkvp7MxKNQA
-	 d0RNgWkE2iyk985nDJj/t4eXSPyaLs8HbBRxa87Thmb2IILsJQarIAONrinBgZ+TBj
-	 06L13TlhDq22yG06nt+zROFzSJ6L2ZGyW0be+MsH09cPazVgEsXLI5m6PlQaliU4tG
-	 oJg+Y8gpTdm8g==
+	b=qlp4k2VDn9EuhCEJk7K3FBy3HYyssjwc6Q8Z6TIDwXjvRWs8iEtjO8rtbGlclPSSW
+	 lyiHMiLP6hYzFvOL0oJ5QKSTNTWmnfH5dKpu+A9oAJcLIxzvVp/KZvMkLT9UvjnK6A
+	 ymVtTiu81lybfdx0DhYxq3h9orjun1qP1LgpD9VXlXo8whpqXOrI+54W/CDI0Zdu6y
+	 CClsuWCjtzn+dWR+HgM76Kvu1nplipakS2h8Y8Ypj2OUQaQj3lPWvpv1HCi8l/6jhI
+	 TG75Zya/QxSLXpW22pdQpxI0f7QVDu4lhouQz4GIL5Pl9q//g/u7plnfHKRaUztIJL
+	 1ebsv50Ml6aBA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1A790C54BD6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 212C4C54BD9;
 	Mon,  8 Apr 2024 10:10:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] inet: frags: delay fqdir_free_fn()
+Subject: Re: [PATCH net-next] ip_tunnel: harden copying IP tunnel params to
+ userspace
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171257102710.30740.16098288868677962814.git-patchwork-notify@kernel.org>
+ <171257102713.30740.3149927029161291551.git-patchwork-notify@kernel.org>
 Date: Mon, 08 Apr 2024 10:10:27 +0000
-References: <20240404130751.2532093-1-edumazet@google.com>
-In-Reply-To: <20240404130751.2532093-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240404160302.3585661-1-aleksander.lobakin@intel.com>
+In-Reply-To: <20240404160302.3585661-1-aleksander.lobakin@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dan.carpenter@linaro.org, dsahern@kernel.org,
+ horms@kernel.org, nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  4 Apr 2024 13:07:51 +0000 you wrote:
-> fqdir_free_fn() is using very expensive rcu_barrier()
+On Thu,  4 Apr 2024 18:03:02 +0200 you wrote:
+> Structures which are about to be copied to userspace shouldn't have
+> uninitialized fields or paddings.
+> memset() the whole &ip_tunnel_parm in ip_tunnel_parm_to_user() before
+> filling it with the kernel data. The compilers will hopefully combine
+> writes to it.
 > 
-> When one netns is dismantled, we often call fqdir_exit()
-> multiple times, typically lauching fqdir_free_fn() twice.
-> 
-> Delaying by one second fqdir_free_fn() helps to reduce
-> the number of rcu_barrier() calls, and lock contention
-> on rcu_state.barrier_mutex.
+> Fixes: 117aef12a7b1 ("ip_tunnel: use a separate struct to store tunnel params in the kernel")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/netdev/5f63dd25-de94-4ca3-84e6-14095953db13@moroto.mountain
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] inet: frags: delay fqdir_free_fn()
-    https://git.kernel.org/netdev/net-next/c/802e12ff9cbf
+  - [net-next] ip_tunnel: harden copying IP tunnel params to userspace
+    https://git.kernel.org/netdev/net-next/c/5a66cda52d7d
 
 You are awesome, thank you!
 -- 
